@@ -105,7 +105,6 @@
 #     }
 class UsersController < ApplicationController
   include Twitter
-  include LinkedIn
   include DeliciousDiigo
   include SearchHelper
   include I18nUtilities
@@ -148,7 +147,8 @@ class UsersController < ApplicationController
     elsif params[:service] == "twitter"
       redirect_to twitter_request_token_url(return_to_url)
     elsif params[:service] == "linked_in"
-      redirect_to linked_in_request_token_url(return_to_url)
+      linkedin_connection = LinkedIn.new
+      redirect_to linkedin_connection.linked_in_request_token_url(return_to_url, @current_user, session, request.host_with_port, oauth_success_url(:service => 'linked_in'))
     elsif params[:service] == "facebook"
       oauth_request = OauthRequest.create(
         :service => 'facebook',
@@ -193,7 +193,8 @@ class UsersController < ApplicationController
         end
       elsif params[:service] == "linked_in"
         begin
-          linked_in_get_access_token(oauth_request, params[:oauth_verifier])
+          linkedin_connection = LinkedIn.new
+          linkedin_connection.linked_in_get_access_token(oauth_request, params[:oauth_verifier], session)
           flash[:notice] = t('linkedin_added', "LinkedIn account successfully added!")
         rescue => e
           ErrorReport.log_exception(:oauth, e)

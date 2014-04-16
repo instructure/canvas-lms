@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module LinkedIn
+class LinkedIn
   def linked_in_get_service_user(access_token)
     body = access_token.get('/v1/people/~:(id,first-name,last-name,public-profile-url,picture-url)').body
     data = Nokogiri::XML(body)
@@ -26,7 +26,7 @@ module LinkedIn
     return service_user_id, service_user_name, service_user_url
   end
   
-  def linked_in_get_access_token(oauth_request, oauth_verifier)
+  def linked_in_get_access_token(oauth_request, oauth_verifier, session)
     consumer = linked_in_consumer
     request_token = OAuth::RequestToken.new(consumer,
                                             session.delete(:oauth_linked_in_request_token_token),
@@ -51,9 +51,9 @@ module LinkedIn
     access_token
   end
   
-  def linked_in_request_token_url(return_to)
+  def linked_in_request_token_url(return_to, user, session, host_with_port, oauth_callback)
     consumer = linked_in_consumer
-    request_token = consumer.get_request_token(:oauth_callback => oauth_success_url(:service => 'linked_in'))
+    request_token = consumer.get_request_token(:oauth_callback => oauth_callback)
     session[:oauth_linked_in_request_token_token] = request_token.token
     session[:oauth_linked_in_request_token_secret] = request_token.secret
     OauthRequest.create(
@@ -61,8 +61,8 @@ module LinkedIn
       :token => request_token.token,
       :secret => request_token.secret,
       :return_url => return_to,
-      :user => @current_user,
-      :original_host_with_port => request.host_with_port
+      :user => user,
+      :original_host_with_port => host_with_port
     )
     request_token.authorize_url
   end
@@ -83,9 +83,7 @@ module LinkedIn
   end
   
   def self.config_check(settings)
-    o = Object.new
-    o.extend(LinkedIn)
-    consumer = o.linked_in_consumer(settings[:api_key], settings[:secret_key])
+    consumer = self.new.linked_in_consumer(settings[:api_key], settings[:secret_key])
     token = consumer.get_request_token rescue nil
     token ? nil : "Configuration check failed, please check your settings"
   end
