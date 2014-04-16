@@ -38,7 +38,7 @@ class Assignment < ActiveRecord::Base
     :notify_of_update, :time_zone_edited, :turnitin_enabled,
     :turnitin_settings, :context, :position, :allowed_extensions,
     :external_tool_tag_attributes, :freeze_on_copy, :assignment_group_id,
-    :only_visible_to_overrides
+    :only_visible_to_overrides, :post_to_sis
 
   attr_accessor :previous_id, :updating_user, :copying
 
@@ -124,6 +124,7 @@ class Assignment < ActiveRecord::Base
     all_day_date
     created_at
     updated_at
+    post_to_sis
   )
   # create a shim for plugins that use the old association name. this is
   # TEMPORARY. the plugins should update to use the new association name, and

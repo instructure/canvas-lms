@@ -171,6 +171,7 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
       data = @assignment.toView()
       _.extend data,
         kalturaEnabled: ENV?.KALTURA_ENABLED or false
+        postToSISEnabled: ENV?.POST_TO_SIS or false
         isLargeRoster: ENV?.IS_LARGE_ROSTER or false
         submissionTypesFrozen: _.include(data.frozenAttributes, 'submission_types')
 
@@ -197,6 +198,8 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
       unless ENV?.IS_LARGE_ROSTER
         data = @groupCategorySelector.filterFormData data
       # should update the date fields.. pretty hacky.
+      unless data.post_to_sis
+        data.post_to_sis = false
       @dueDateOverrideView.updateOverrides()
       defaultDates = @dueDateOverrideView.getDefaultDueDate()
       data.lock_at = defaultDates?.get('lock_at') or null

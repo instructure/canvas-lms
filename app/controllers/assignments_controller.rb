@@ -312,6 +312,7 @@ class AssignmentsController < ApplicationController
     group = get_assignment_group(params[:assignment])
     @assignment ||= @context.assignments.build(params[:assignment])
     @assignment.workflow_state ||= @context.feature_enabled?(:draft_state) ? "unpublished" : "published"
+    @assignment.post_to_sis ||= @context.feature_enabled?(:post_to_sis) ? true : false
     @assignment.updating_user = @current_user
     @assignment.content_being_saved_by(@current_user)
     @assignment.assignment_group = group if group
@@ -354,7 +355,7 @@ class AssignmentsController < ApplicationController
       @assignment.submission_types = params[:submission_types] if params[:submission_types]
       @assignment.assignment_group_id = params[:assignment_group_id] if params[:assignment_group_id]
       @assignment.ensure_assignment_group(false)
-
+      @assignment.post_to_sis = params[:post_to_sis] if params[:post_to_sis]
       if @assignment.submission_types == 'online_quiz' && @assignment.quiz
         return redirect_to edit_course_quiz_url(@context, @assignment.quiz, index_edit_params)
       elsif @assignment.submission_types == 'discussion_topic' && @assignment.discussion_topic
@@ -374,6 +375,7 @@ class AssignmentsController < ApplicationController
         :ASSIGNMENT_GROUPS => json_for_assignment_groups,
         :GROUP_CATEGORIES => group_categories,
         :KALTURA_ENABLED => !!feature_enabled?(:kaltura),
+        :POST_TO_SIS => @context.feature_enabled?(:post_grades),
         :SECTION_LIST => (@context.course_sections.active.map { |section|
           {:id => section.id, :name => section.name }
         }),
@@ -400,6 +402,7 @@ class AssignmentsController < ApplicationController
     if authorized_action(@assignment, @current_user, :update)
       params[:assignment][:time_zone_edited] = Time.zone.name if params[:assignment]
       params[:assignment] ||= {}
+      @assignment.post_to_sis = params[:assignment][:post_to_sis]
       @assignment.updating_user = @current_user
       if params[:assignment][:default_grade]
         params[:assignment][:overwrite_existing_grades] = (params[:assignment][:overwrite_existing_grades] == "1")

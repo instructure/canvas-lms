@@ -35,6 +35,7 @@ module Api::V1::Assignment
       assignment_group_id
       peer_reviews
       automatic_peer_reviews
+      post_to_sis
       grade_group_students_individually
       group_category_id
       grading_standard_id
@@ -46,6 +47,7 @@ module Api::V1::Assignment
       points_possible
       due_at
       assignment_group_id
+      post_to_sis
     )
   }
 
@@ -67,6 +69,8 @@ module Api::V1::Assignment
     hash = api_json(assignment, user, session, fields)
     hash['course_id'] = assignment.context_id
     hash['name'] = assignment.title
+
+    hash['post_to_sis'] = assignment.post_to_sis
     hash['submission_types'] = assignment.submission_types_array
     hash['has_submitted_submissions'] = assignment.has_submitted_submissions?
 
@@ -403,6 +407,11 @@ module Api::V1::Assignment
       end
     end
 
+    if assignment.context.feature_enabled?(:post_grades)
+      if assignment_params.has_key? "post_to_sis"
+        assignment.post_to_sis = value_to_boolean(assignment_params['post_to_sis'])
+      end
+    end
     assignment.updating_user = @current_user
     assignment.attributes = update_params
     assignment.infer_times

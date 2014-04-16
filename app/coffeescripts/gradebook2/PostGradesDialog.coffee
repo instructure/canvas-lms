@@ -172,27 +172,37 @@ define [
     postGrades: (e)->
       json_to_post = {}
       json_to_post['canvas_domain'] = document.domain
+      json_to_post['assignments'] = _.map(@model.get('assignments_to_post'), (assignment) -> assignment.id)
       if @model.get('section_id')
         json_to_post['section_id'] = @model.get('section_id')
+        $.ajax 'http://localhost:9292/grades/section/' + @model.get('section_id'), #need to add SIS APP endpoint to post data
+          type: 'POST'
+          data: JSON.stringify(json_to_post)
+          contentType: 'application/json; charset=utf-8'
+          error: (data) ->
+            $.flashError('An error occurred posting your grades. ' + "HTTP Error " + data.status + " : " + data.statusText)
+          success: (data) ->
+            $.flashMessage('Assignments are being posted.')
+            console.log(data)
+
+        @close()
       else
         json_to_post['course_id'] = @model.get('course_id')
+        $.ajax 'http://localhost:9292/grades/course' + @model.get('course_id'), #need to add SIS APP endpoint to post data
+          type: 'POST'
+          data: JSON.stringify(json_to_post)
+          contentType: 'application/json; charset=utf-8'
+          error: (data) ->
+            $.flashError('An error occurred posting your grades. ' + "HTTP Error " + data.status + " : " + data.statusText)
+          success: (data) ->
+            $.flashMessage('Assignments are being posted.')
+            console.log(data)
 
-      json_to_post['assignments'] = _.map(@model.get('assignments_to_post'), (assignment) -> assignment.id)
+        @close()
 
-      $.ajax 'http://localhost:4567/post', #need to add SIS APP endpoint to post data
-        type: 'POST'
-        data: JSON.stringify(json_to_post)
-        contentType: 'application/json; charset=utf-8'
-        error: (data) ->
-          window.response_data = data
-          $.flashError('An error occurred posting your grades. ' + "HTTP Error " + data.status + " : " + data.statusText)
-          console.log(data)
-        success: (data) ->
-          $.flashMessage('Assignments are being posted.')
-          window.data = data
-          console.log(data)
 
-      @close()
+
+
 
 
 

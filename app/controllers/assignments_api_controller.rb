@@ -307,6 +307,11 @@
 #           "example": 1,
 #           "type": "integer"
 #         },
+#         "post_to_sis": {
+#           "example": true,
+#           "type" : "boolean",
+#           "description" : "(optional, present if Post Grades to SIS feature is enabled)"
+#         },
 #         "muted": {
 #           "description": "whether the assignment is muted",
 #           "type": "integer"
@@ -658,7 +663,6 @@ class AssignmentsApiController < ApplicationController
   def create
     @assignment = @context.assignments.build
     @assignment.workflow_state = 'unpublished' if @context.feature_enabled?(:draft_state)
-
     if authorized_action(@assignment, @current_user, :create)
       save_and_render_response
     end
@@ -682,7 +686,6 @@ class AssignmentsApiController < ApplicationController
   # @returns Assignment
   def update
     @assignment = @context.assignments.find(params[:id])
-
     if authorized_action(@assignment, @current_user, :update)
       save_and_render_response
     end
