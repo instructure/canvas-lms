@@ -225,6 +225,11 @@ class AppointmentGroup < ActiveRecord::Base
 
   set_policy do
     given { |user, session|
+      active? && participant_for(user)
+    }
+    can :reserve and can :read
+
+    given { |user, session|
       next false if deleted?
       next false unless active_contexts.all? { |c| c.grants_right? user, nil, :manage_calendar }
       if appointment_group_sub_contexts.present? && appointment_group_sub_contexts.first.sub_context_type == 'CourseSection'
@@ -238,12 +243,6 @@ class AppointmentGroup < ActiveRecord::Base
     }
     can :manage and can :manage_calendar and can :read and can :read_appointment_participants and
     can :create and can :update and can :delete
-
-    given { |user, session|
-      active? &&
-      participant_for(user)
-    }
-    can :reserve and can :read
 
     given { |user, session|
       participant_visibility == 'protected' && grants_right?(user, session, :reserve)
@@ -340,8 +339,8 @@ class AppointmentGroup < ActiveRecord::Base
 
   def participant_for(user)
     @participant_for ||= {}
-    return @participant_for[user.id] if @participant_for.has_key?(user.id)
-    @participant_for[user.id] = begin
+    return @participant_for[user.global_id] if @participant_for.has_key?(user.global_id)
+    @participant_for[user.global_id] = begin
       participant = if participant_type == 'User'
           user
         else
@@ -452,18 +451,18 @@ class AppointmentGroup < ActiveRecord::Base
 
   def contexts_for_user(user)
     @contexts_for_user ||= {}
-    return @contexts_for_user[user.id] if @contexts_for_user.has_key?(user.id)
-    @contexts_for_user[user.id] = begin
+    return @contexts_for_user[user.global_id] if @contexts_for_user.has_key?(user.global_id)
+    @contexts_for_user[user.global_id] = begin
       context_codes = context_codes_for_user(user)
       course_ids = appointment_group_contexts.select{|agc| context_codes.include? agc.context_code }.map(&:context_id)
-    Course.where(:id => course_ids).all
+      Course.where(:id => course_ids).all
     end
   end
 
   def context_codes_for_user(user)
     @context_codes_for_user ||= {}
-    @context_codes_for_user[user.id] if @context_codes_for_user.has_key?(user.id)
-    @context_codes_for_user[user.id] = begin
+    @context_codes_for_user[user.global_id] if @context_codes_for_user.has_key?(user.global_id)
+    @context_codes_for_user[user.global_id] = begin
       manageable_codes = user.manageable_appointment_context_codes
       user_codes = user.appointment_context_codes[:primary] |
         manageable_codes[:full] | manageable_codes[:limited]
