@@ -1087,6 +1087,33 @@ describe ContentMigration do
       end
     end
 
+    it "should copy assignment attributes" do
+      assignment_model(:course => @copy_from, :points_possible => 40, :submission_types => 'file_upload', :grading_type => 'points')
+      @assignment.turnitin_enabled = true
+      @assignment.peer_reviews_assigned = true
+      @assignment.peer_reviews = true
+      @assignment.peer_review_count = 2
+      @assignment.automatic_peer_reviews = true
+      @assignment.anonymous_peer_reviews = true
+      @assignment.allowed_extensions = ["doc", "xls"]
+      @assignment.position = 2
+      @assignment.muted = true
+
+      @assignment.save!
+
+      attrs = [:turnitin_enabled, :peer_reviews_assigned, :peer_reviews,
+          :automatic_peer_reviews, :anonymous_peer_reviews,
+          :grade_group_students_individually, :allowed_extensions,
+          :position, :peer_review_count, :muted]
+
+      run_course_copy
+
+      new_assignment = @copy_to.assignments.find_by_migration_id(mig_id(@assignment))
+      attrs.each do |attr|
+        @assignment[attr].should == new_assignment[attr]
+      end
+    end
+
     it "should copy discussion topic attributes" do
       topic = @copy_from.discussion_topics.create!(:title => "topic", :message => "<p>bloop</p>",
                                                    :pinned => true, :discussion_type => "threaded",
