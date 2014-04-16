@@ -1760,7 +1760,7 @@ class Assignment < ActiveRecord::Base
     [:turnitin_enabled, :peer_reviews_assigned, :peer_reviews,
      :automatic_peer_reviews, :anonymous_peer_reviews,
      :grade_group_students_individually, :allowed_extensions,
-     :position, :peer_review_count
+     :position, :peer_review_count, :muted
     ].each do |prop|
       item.send("#{prop}=", hash[prop]) unless hash[prop].nil?
     end
