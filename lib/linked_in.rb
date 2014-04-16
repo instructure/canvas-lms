@@ -17,7 +17,7 @@
 #
 
 class LinkedIn
-  def linked_in_get_service_user(access_token)
+  def get_service_user(access_token)
     body = access_token.get('/v1/people/~:(id,first-name,last-name,public-profile-url,picture-url)').body
     data = Nokogiri::XML(body)
     service_user_id = data.css("id")[0].content
@@ -26,48 +26,18 @@ class LinkedIn
     return service_user_id, service_user_name, service_user_url
   end
   
-  def linked_in_get_access_token(oauth_request, oauth_verifier, session)
-    consumer = linked_in_consumer
-    request_token = OAuth::RequestToken.new(consumer,
-                                            session.delete(:oauth_linked_in_request_token_token),
-                                            session.delete(:oauth_linked_in_request_token_secret))
-    access_token = request_token.get_access_token(:oauth_verifier => oauth_verifier)
-    service_user_id, service_user_name, service_user_url = linked_in_get_service_user(access_token)
-    session[:oauth_linked_in_access_token_token] = access_token.token
-    session[:oauth_linked_in_access_token_secret] = access_token.secret
-    if oauth_request.user
-      UserService.register(
-        :service => "linked_in", 
-        :access_token => access_token, 
-        :user => oauth_request.user,
-        :service_domain => "linked_in.com",
-        :service_user_id => service_user_id,
-        :service_user_name => service_user_name,
-        :service_user_url => service_user_url
-      )
-      session.delete(:oauth_linked_in_access_token_token)
-      session.delete(:oauth_linked_in_access_token_secret)
-    end
-    access_token
+  def get_access_token(token, secret, oauth_verifier)
+    consumer = self.class.consumer
+    request_token = OAuth::RequestToken.new(consumer, token, secret)
+    request_token.get_access_token(:oauth_verifier => oauth_verifier)
   end
   
-  def linked_in_request_token_url(return_to, user, session, host_with_port, oauth_callback)
-    consumer = linked_in_consumer
-    request_token = consumer.get_request_token(:oauth_callback => oauth_callback)
-    session[:oauth_linked_in_request_token_token] = request_token.token
-    session[:oauth_linked_in_request_token_secret] = request_token.secret
-    OauthRequest.create(
-      :service => 'linked_in',
-      :token => request_token.token,
-      :secret => request_token.secret,
-      :return_url => return_to,
-      :user => user,
-      :original_host_with_port => host_with_port
-    )
-    request_token.authorize_url
+  def request_token(oauth_callback)
+    consumer = self.class.consumer
+    consumer.get_request_token(:oauth_callback => oauth_callback)
   end
   
-  def linked_in_consumer(key=nil, secret=nil)
+  def self.consumer(key=nil, secret=nil)
     require 'oauth'
     require 'oauth/consumer'
     config = LinkedIn.config
@@ -83,7 +53,7 @@ class LinkedIn
   end
   
   def self.config_check(settings)
-    consumer = self.new.linked_in_consumer(settings[:api_key], settings[:secret_key])
+    consumer = self.consumer(settings[:api_key], settings[:secret_key])
     token = consumer.get_request_token rescue nil
     token ? nil : "Configuration check failed, please check your settings"
   end
