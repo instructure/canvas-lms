@@ -18,15 +18,16 @@ define [
         # so that the default due date can still be rendered/updated without
         # error.
         @sections.add Section.defaultDueDateSection()
+
       # if we don't have an override for each real section
       if @assignment? && @overrides.length < @sections.length
-        override = AssignmentOverride.defaultDueDate
-          due_at: @assignment.get( 'due_at' )
-          lock_at: @assignment.get( 'lock_at' )
-          unlock_at: @assignment.get( 'unlock_at' )
-        @overrides.add override
-        unless @findDefaultDueDateSection()
-          @sections.add Section.defaultDueDateSection()
+        @sections.add Section.defaultDueDateSection() unless @findDefaultDueDateSection()
+        unless (ENV.DIFFERENTIATED_ASSIGNMENTS_ENABLED && @assignment.isOnlyVisibleToOverrides())
+          override = AssignmentOverride.defaultDueDate
+            due_at: @assignment.get( 'due_at' )
+            lock_at: @assignment.get( 'lock_at' )
+            unlock_at: @assignment.get( 'unlock_at' )
+          @overrides.add override
       @updateDefaultDueDateSection()
       @overrides.on 'add', @updateDefaultDueDateSection
       @overrides.on 'remove', @updateDefaultDueDateSection
@@ -92,4 +93,3 @@ define [
     toJSON: =>
       overrides: @overrides.toJSON()
       sections: @sections.toJSON()
-

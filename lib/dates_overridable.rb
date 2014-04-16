@@ -62,7 +62,19 @@ module DatesOverridable
 
   def all_due_dates
     all_dates = assignment_overrides.active.overriding_due_at.map(&:as_hash)
-    all_dates << base_due_date_hash
+    all_dates << base_due_date_hash unless differentiated_assignments_applies?
+  end
+
+  def differentiated_assignments_applies?
+    return false if !context.feature_enabled?(:differentiated_assignments)
+
+    if self.is_a?(Assignment)
+      self.only_visible_to_overrides
+    elsif self.assignment
+      self.assignment.only_visible_to_overrides
+    else
+      false
+    end
   end
 
   def all_dates_visible_to(user)
@@ -71,7 +83,9 @@ module DatesOverridable
     elsif context.user_has_been_student?(user) || context.user_has_been_admin?(user) || context.user_has_been_observer?(user)
       overrides = overrides_for(user)
       overrides = overrides.map(&:as_hash)
-      overrides << base_due_date_hash if overrides.empty? || context.user_has_been_admin?(user)
+      unless differentiated_assignments_applies?
+        overrides << base_due_date_hash if overrides.empty? || context.user_has_been_admin?(user)
+      end
       overrides
     elsif context.user_has_no_enrollments?(user)
       all_due_dates
@@ -88,8 +102,8 @@ module DatesOverridable
   def dates_hash_visible_to(user)
     all_dates = all_dates_visible_to(user)
 
-    # remove base if all sections are set
     if all_dates
+      # remove base if all sections are set
       overrides = all_dates.select { |d| d[:set_type] == 'CourseSection' }
       if overrides.count > 0 && overrides.count == context.active_course_sections.count
         all_dates.delete_if {|d| d[:base] }

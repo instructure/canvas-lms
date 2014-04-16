@@ -173,6 +173,7 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
         kalturaEnabled: ENV?.KALTURA_ENABLED or false
         postToSISEnabled: ENV?.POST_TO_SIS or false
         isLargeRoster: ENV?.IS_LARGE_ROSTER or false
+        differentiatedAssignmnetsEnabled: ENV?.DIFFERENTIATED_ASSIGNMENTS_ENABLED or false
         submissionTypesFrozen: _.include(data.frozenAttributes, 'submission_types')
 
     _attachEditorToDescription: =>
@@ -205,6 +206,8 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
       data.lock_at = defaultDates?.get('lock_at') or null
       data.unlock_at = defaultDates?.get('unlock_at') or null
       data.due_at = defaultDates?.get('due_at') or null
+      if ENV?.DIFFERENTIATED_ASSIGNMENTS_ENABLED
+        data.only_visible_to_overrides = @dueDateOverrideView.containsSectionsWithoutOverrides()
       data.assignment_overrides = @dueDateOverrideView.getOverrides()
       return data
 
@@ -221,7 +224,6 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
           validationFn: -> sections
           labelFn: (section) -> section.get 'name'
           success: =>
-            @model.setNullDates()
             ValidatedFormView::submit.call(this)
         missingDateDialog.cancel = (e) ->
           missingDateDialog.$dialog.dialog('close').remove()

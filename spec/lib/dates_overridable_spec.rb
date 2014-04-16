@@ -299,6 +299,48 @@ shared_examples_for "an object whose dates are overridable" do
       end
     end
   end
+
+  describe "differentiated_assignments_applies?" do
+    before do
+      course_with_student(:course => course)
+    end
+
+    context "when feature flag is off" do
+      it "returns false" do
+        overridable.differentiated_assignments_applies?.should be_false
+      end
+    end
+
+    context "when feature flag is on" do
+      before do
+        course.enable_feature!(:differentiated_assignments)
+      end
+
+      it "returns false when there is no assignment" do
+        if overridable_type == :quiz
+          as = overridable.assignment
+          overridable.assignment = nil # a survey quiz
+          overridable.differentiated_assignments_applies?.should be_false
+        end
+      end
+
+      it "returns the value of only_visible_to_overrides on the assignment" do
+        if overridable_type == :quiz && overridable.try(:assignment) # not a survey quiz
+          overridable.assignment.only_visible_to_overrides = true
+          overridable.differentiated_assignments_applies?.should be_true
+          overridable.assignment.only_visible_to_overrides = false
+          overridable.differentiated_assignments_applies?.should be_false
+        elsif overridable_type == :assignment
+          overridable.only_visible_to_overrides = true
+          overridable.differentiated_assignments_applies?.should be_true
+          overridable.only_visible_to_overrides = false
+          overridable.differentiated_assignments_applies?.should be_false
+        end
+      end
+
+    end
+
+  end
 end
 
 describe Assignment do
