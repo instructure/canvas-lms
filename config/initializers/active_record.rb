@@ -982,8 +982,9 @@ unless CANVAS_RAILS2
       batch_size = options[:batch_size] || 1000
       klass.transaction do
         begin
-          cursor = "#{table_name}_in_batches_cursor"
-          connection.execute("DECLARE #{cursor} CURSOR FOR #{to_sql}")
+          sql = to_sql
+          cursor = "#{table_name}_in_batches_cursor_#{sql.hash.abs.to_s(36)}"
+          connection.execute("DECLARE #{cursor} CURSOR FOR #{sql}")
           includes = includes_values
           klass.send(:with_exclusive_scope) do
             batch = connection.uncached { klass.find_by_sql("FETCH FORWARD #{batch_size} FROM #{cursor}") }
