@@ -143,7 +143,28 @@ class FoldersController < ApplicationController
       render :json => folders_json(@folders, @current_user, session, :can_manage_files => can_manage_files)
     end
   end
-  
+
+  # @API Resolve path
+  # @subtopic Folders
+  # Given the full path to a folder, returns a list of all Folders in the path hierarchy,
+  # starting at the root folder, and ending at the requested folder. If no folder exists
+  # with the given full path, a Not Found error is returned.
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/folders/by_path/foo/bar/baz' \
+  #        -H 'Authorization: Bearer <token>'
+  #
+  # @returns [Folder]
+  def resolve_path
+    if authorized_action(@context, @current_user, :read)
+      can_manage_files = @context.grants_right?(@current_user, session, :manage_files)
+      folders = Folder.resolve_path(@context, params[:full_path], can_manage_files)
+      raise ActiveRecord::RecordNotFound if folders.blank?
+      render json: folders_json(folders, @current_user, session, :can_manage_files => can_manage_files)
+    end
+  end
+
   # @API Get folder
   # @subtopic Folders
   # Returns the details for a folder
