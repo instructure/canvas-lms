@@ -23,6 +23,7 @@ class AssignmentsController < ApplicationController
   include Api::V1::AssignmentOverride
   include Api::V1::AssignmentGroup
   include Api::V1::Outcome
+  include Api::V1::ExternalTools
 
   include KalturaHelper
   before_filter :require_context
@@ -108,11 +109,20 @@ class AssignmentsController < ApplicationController
     if authorized_action(@assignment, @current_user, :read)
       @assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @current_user)
       @assignment.ensure_assignment_group
+
+      if @assignment.submission_types.include?("online_upload") || @assignment.submission_types.include?("online_url")
+        @external_tools = ContextExternalTool.all_tools_for(@context, :user => @current_user)
+          .select(&:has_homework_submission)
+      else
+        @external_tools = []
+      end
+
       js_env({
         :ROOT_OUTCOME_GROUP => outcome_group_json(@context.root_outcome_group, @current_user, session),
         :DRAFT_STATE => @context.feature_enabled?(:draft_state),
         :COURSE_ID => @context.id,
-        :ASSIGNMENT_ID => @assignment.id
+        :ASSIGNMENT_ID => @assignment.id,
+        :EXTERNAL_TOOLS => external_tools_json(@external_tools, @context, @current_user, session)
       })
 
       @locked = @assignment.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)

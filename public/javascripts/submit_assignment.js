@@ -19,8 +19,10 @@
 define([
   'i18n!assignments' /* I18n.t */,
   'jquery' /* $ */,
+  'underscore' /* _ */,
   'compiled/views/GoogleDocsTreeView',
   'jst/assignments/homework_submission_tool',
+  'compiled/external_tools/HomeworkSubmissionLtiContainer',
   'compiled/jquery.rails_flash_notifications',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.inst_tree' /* instTree */,
@@ -33,13 +35,15 @@ define([
   'tinymce.editor_box' /* editorBox */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/tabs' /* /\.tabs/ */
-], function(I18n, $, GoogleDocsTreeView, homework_submission_tool) {
+], function(I18n, $, _, GoogleDocsTreeView, homework_submission_tool, HomeworkSubmissionLtiContainer) {
 
   window.submissionAttachmentIndex = -1;
 
   $(document).ready(function() {
     var submitting = false,
         submissionForm = $('.submit_assignment_form');
+
+    var homeworkSubmissionLtiContainer = new HomeworkSubmissionLtiContainer('#submit_from_external_tool_form');
 
     // grow and shrink the comments box on focus/blur if the user
     // hasn't entered any content.
@@ -53,11 +57,11 @@ define([
 
     submissionForm.submit(function(event) {
       var $turnitin = $(this).find(".turnitin_pledge");
-      if($("#external_tool_submission_type").val() == "online_url_to_file") { 
+      if($("#external_tool_submission_type").val() == "online_url_to_file") {
         event.preventDefault();
         event.stopPropagation();
         uploadFileFromUrl();
-        return; 
+        return;
       }
       if($turnitin.length > 0 && !$turnitin.attr('checked')) {
         alert(I18n.t('messages.agree_to_pledge', "You must agree to the submission pledge before you can submit this assignment."));
@@ -150,7 +154,7 @@ define([
       $(".submit_assignment_link").hide();
       $("html,body").scrollTo($("#submit_assignment"));
       $("#submit_online_text_entry_form textarea:first").editorBox();
-      checkForHomeworkSubmissionTools();
+      homeworkSubmissionLtiContainer.loadExternalTools();
     });
 
     $(".switch_text_entry_submission_views").click(function(event) {
@@ -165,7 +169,15 @@ define([
       $(".submit_assignment_link").show();
     });
 
-    $("#submit_assignment_tabs").tabs();
+    $("#submit_assignment_tabs").tabs({
+      beforeActivate: function( event, ui ) {
+        // determine if this is an external tool
+        if ($(event.currentTarget).hasClass('external-tool')) {
+          var externalToolId = $(event.currentTarget).data('id');
+          homeworkSubmissionLtiContainer.embedLtiLaunch(externalToolId)
+        }
+      }
+    });
 
     $("#uploaded_files > ul").instTree({
       autoclose: false,
@@ -270,36 +282,9 @@ define([
       });
     });
   });
-  
+
   var $tools = $("#submit_from_external_tool_form");
-  // The "More" tab will only appear for users once the API has
-  // returned at least one valid homework submission tool, so
-  // most users will never see it.
-  // TODO: Change this to add the "More" tab for everyone with
-  // a way to browse/suggest tools if the user has none set up
-  function checkForHomeworkSubmissionTools() {
-    if(!checkForHomeworkSubmissionTools.loading) {
-      checkForHomeworkSubmissionTools.loading = true;
-      var url = $("#external_tools_url").attr('href');
-      $.ajaxJSON(url, 'GET', {}, function(data) {
-        if(!data.length) {
-          $tools.find("ul.tools li").text(I18n.t('no_tools_found', 'No tools found'));
-        } else {
-          $(".submit_from_external_tool_option").parent().show();
-          $tools.find("ul.tools").empty();
-          for(var idx = 0; idx < data.length; idx++) {
-            var tool = data[idx];
-            tool.display_text = tool.homework_submission.label;
-            var html = homework_submission_tool(tool);
-            var $li = $(html).data('tool', tool);
-            $tools.find("ul.tools").append($li);
-          }
-        }
-      }, function() {
-        $tools.find("ul.tools li.none").text(I18n.t('loading_tools_failed', 'Loading tools failed'));
-      });
-    }
-  }
+
   function uploadFileFromUrl() {
     var promise = $.Deferred();
     function checkFileStatus(url, callback, error) {
@@ -336,11 +321,13 @@ define([
   };
   $("#submit_from_external_tool_form .tools li").live('click', function(event) {
     event.preventDefault();
+
     var tool = $(this).data('tool');
     var url = "/courses/" + ENV.COURSE_ID + "/external_tools/" + tool.id + "/resource_selection?homework=1&assignment_id=" + ENV.SUBMIT_ASSIGNMENT.ID;
-    var width = tool.homework_submission.selection_width || tool.selection_width;
-    var height = tool.homework_submission.selection_height || tool.selection_height;
-    var title = tool.display_text;
+
+    var width = tool.get('homework_submission').selection_width || tool.get('selection_width');
+    var height = tool.get('homework_submission').selection_height || tool.get('selection_height');
+    var title = tool.get('display_text');
     var $div = $("<div/>", {id: "homework_selection_dialog", style: "padding: 0; overflow-y: hidden;"}).appendTo($("body"));
     function invalidToolReturn(message) {
       $.flashError(I18n.t("invalid_tool_return", "The launched tool returned an invalid resource for this assignment"));

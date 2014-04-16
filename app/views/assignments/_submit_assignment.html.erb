@@ -32,7 +32,15 @@
       <% if @assignment.submission_types && @assignment.submission_types.match(/media_recording/) %>
         <li><a href="#submit_media_recording_form" class="submit_media_recording_option"><%= t 'links.submit.media', "Media" %></a></li>
       <% end %>
-      <li style='display: none;'><a href="#submit_from_external_tool_form" class="submit_from_external_tool_option"><%= t 'links.submit.external_tool', "More" %></a></li>
+      <% (@external_tools[0,3] || []).each do |external_tool| %>
+        <li><a href="#submit_from_external_tool_form_<%= external_tool.id %>"
+          class="external-tool"
+          data-id="<%= external_tool.id %>"
+          data-name="<%= external_tool.name %>"><%= external_tool.name %></a></li>
+      <% end %>
+      <% if @external_tools.length > 3 %>
+        <li><a href="#submit_from_external_tool_form" class="submit_from_external_tool_option"><%= t 'links.submit.external_tool', "More" %></a></li>
+      <% end %>
     </ul>
     <% if @assignment.submission_types && @assignment.submission_types.match(/online_upload/) %>
     <%= form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_online_upload_form", :class => "submit_assignment_form", :multipart => true }) do %>
@@ -131,8 +139,8 @@
     </table>
     <% end %>
     <% end %>
-    
-    <% if @assignment.submission_types && @assignment.submission_types.match(/online_url/) %>    
+
+    <% if @assignment.submission_types && @assignment.submission_types.match(/online_url/) %>
     <%= form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_online_url_form", :class => "submit_assignment_form"}) do %>
     <%= hidden_field :submission, :submission_type, :value => "online_url" %>
     <table class="formtable" style="width: 100%;">
@@ -323,59 +331,65 @@
        <% end %>
       <% end %>
     <% end %>
-    
-    <%= form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_from_external_tool_form", :class => "submit_assignment_form" }) do %>
-    <%= hidden_field :submission, :submission_type, :value => "online_url", :id => 'external_tool_submission_type' %>
-    <%= hidden_field :submission, :filename, :id => 'external_tool_filename' %>
-    <%= hidden_field :submission, :attachment_ids, :id => 'external_tool_file_id' %>
-    <%= hidden_field :submission, :url, :id => 'external_tool_url' %>
-    <%= hidden_field :submission, :content_type, :id => 'external_tool_content_type' %>
-    <a href="<%= context_url(@context, :homework_submissions_context_external_tools_url) %>" id="external_tools_url"></a>
-    <a href="/api/v1/courses/<%= @context.id %>/assignments/<%= @assignment.id %>/submissions/<%= @current_user.id %>/files" id="homework_file_url"></a>
-    <table class="formtable" style="width: 100%;">
-      <tr>
-        <td colspan="2">
-          <%= t 'instructions.from_external_tool', "Select a tool from the list below to load and submit a resource provided by that tool." %>
-          <%= render :partial => "assignments/group_submission_reminder" if @assignment.has_group_category? %>
-        </td>
-      </tr>
-      <tr>
-        <td colspan="2">
-          <ul class='tools'>
-            <li><%= t 'loading_tools', "Loading tools..." %></li>
-          </ul>
-        </td>
-      </tr>
-      <tr>
-        <td colspan="2">
-          <%= t('submission_url', "Submission:") %>
-          <span id="external_tool_submission_details" class='not_selected'>
-            <%= t('no_submission', 'No Submission Selected') %>
-          </span>
-          <% if @assignment.allowed_extensions.present? -%>
-            <div class='bad_ext_msg error_message' style="display: none">
-              <%= t 'errors.unacceptable_file_type', "This file type is not allowed. Accepted file types are: %{allowed_extensions_list}", :allowed_extensions_list => @assignment.allowed_extensions.to_sentence %>
-            </div>
-          <% end -%>
-        </td>
-      </tr><tr>
-        <td colspan="2" style="text-align: center;">
-          <div style="text-align: left;">
-            <%= text_area :submission, :comment, :class => 'submission_comment_textarea', :style => "height: 16px;", :placeholder => t('comments_placeholder', 'Comments...'), :title => t('additional_comments', 'Additional comments') %>
-          </div>
-        </td>
-      </tr>
-      <%= render :partial => "group_comment" %>
-      <% if @assignment.turnitin_enabled? %>
-        <%= render :partial => "turnitin" %>
+
+    <% (@external_tools || []).each do |external_tool| %>
+      <div id="submit_from_external_tool_form_<%= external_tool.id %>" style="padding: 5px 5px 0 5px;"></div>
+    <% end %>
+
+    <% if @external_tools.length > 3 %>
+      <%= form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_from_external_tool_form", :class => "submit_assignment_form" }) do %>
+        <%= hidden_field :submission, :submission_type, :value => "online_url", :id => 'external_tool_submission_type' %>
+        <%= hidden_field :submission, :filename, :id => 'external_tool_filename' %>
+        <%= hidden_field :submission, :attachment_ids, :id => 'external_tool_file_id' %>
+        <%= hidden_field :submission, :url, :id => 'external_tool_url' %>
+        <%= hidden_field :submission, :content_type, :id => 'external_tool_content_type' %>
+        <a href="<%= context_url(@context, :homework_submissions_context_external_tools_url) %>" id="external_tools_url"></a>
+        <a href="/api/v1/courses/<%= @context.id %>/assignments/<%= @assignment.id %>/submissions/<%= @current_user.id %>/files" id="homework_file_url"></a>
+        <table class="formtable" style="width: 100%;">
+          <tr>
+            <td colspan="2">
+              <%= t 'instructions.from_external_tool', "Select a tool from the list below to load and submit a resource provided by that tool." %>
+              <%= render :partial => "assignments/group_submission_reminder" if @assignment.has_group_category? %>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <ul class='tools'>
+                <li><%= t 'loading_tools', "Loading tools..." %></li>
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <%= t('submission_url', "Submission:") %>
+              <span id="external_tool_submission_details" class='not_selected'>
+                <%= t('no_submission', 'No Submission Selected') %>
+              </span>
+              <% if @assignment.allowed_extensions.present? -%>
+                <div class='bad_ext_msg error_message' style="display: none">
+                  <%= t 'errors.unacceptable_file_type', "This file type is not allowed. Accepted file types are: %{allowed_extensions_list}", :allowed_extensions_list => @assignment.allowed_extensions.to_sentence %>
+                </div>
+              <% end -%>
+            </td>
+          </tr><tr>
+            <td colspan="2" style="text-align: center;">
+              <div style="text-align: left;">
+                <%= text_area :submission, :comment, :class => 'submission_comment_textarea', :style => "height: 16px;", :placeholder => t('comments_placeholder', 'Comments...'), :title => t('additional_comments', 'Additional comments') %>
+              </div>
+            </td>
+          </tr>
+          <%= render :partial => "group_comment" %>
+          <% if @assignment.turnitin_enabled? %>
+            <%= render :partial => "turnitin" %>
+          <% end %>
+          <tr>
+            <td colspan="2" class='button-container'>
+              <button type="button" class="cancel_button btn"><%= t '#buttons.cancel', "Cancel" %></button>
+              <button type="submit" class="btn btn-primary"><%= t 'buttons.submit_assignment', "Submit Assignment" %></button>
+            </td>
+          </tr>
+        </table>
       <% end %>
-      <tr>
-        <td colspan="2" class='button-container'>
-          <button type="button" class="cancel_button btn"><%= t '#buttons.cancel', "Cancel" %></button>
-          <button type="submit" class="btn btn-primary"><%= t 'buttons.submit_assignment', "Submit Assignment" %></button>
-        </td>
-      </tr>
-    </table>
     <% end %>
   </div>
 </div>
