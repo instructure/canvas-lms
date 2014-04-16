@@ -135,10 +135,27 @@ var speakMessage = function ($this, message) {
   $.timeString = function(date) {
     return (date != null && tz.format(date, '%l:%M%P')) || "";
   };
-  $.datetimeString = function(date) {
-    date = tz.parse(date);
-    if (date == null) return "";
-    return I18n.t('#time.event', '%{date} at %{time}', { date: $.dateString(date), time: $.timeString(date) });
+  $.datetimeString = function(datetime, localized) {
+    datetime = tz.parse(datetime);
+    if (datetime == null) return "";
+    if (localized == false) {
+      // temporary unlocalized (which means avoiding tz.format)
+      // expansion of the other branch. intent of being able to call
+      // this with localized false, triggering this code, is if it's
+      // called to fill the value attribute of a datetime picker field,
+      // since the field will complain about localized dates. the real
+      // solution is to teach the datetime picker about parsing
+      // localized date strings (by using tz.parse).
+      //
+      // TODO: implement that real solution and remove this
+      var fudged = $.fudgeDateForProfileTimezone(datetime);
+      datePart = $.sameYear(datetime, new Date()) ? fudged.toString("MMM d") : fudged.toString("MMM d, yyyy");
+      timePart = fudged.toString("h:mmtt").toLowerCase();
+      return datePart + " at " + timePart;
+    }
+    else {
+      return I18n.t('#time.event', '%{date} at %{time}', { date: $.dateString(datetime), time: $.timeString(datetime) });
+    }
   };
   // end batch
 
