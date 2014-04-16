@@ -645,6 +645,9 @@ define([
       var options = {
         addable: true
       };
+
+      limitTextInputFor($formQuestion, question_type);
+
       if (question_type == 'multiple_choice_question') {
       } else if (question_type == 'true_false_question') {
         options.addable = false;
@@ -1295,6 +1298,17 @@ define([
     return false;
   }
 
+  function limitTextInputFor(form, question_type) {
+    // Add character limit class
+    if (question_type == 'missing_word_question' ||
+        question_type == 'fill_in_multiple_blanks_question' ||
+        question_type == 'short_answer_question')  {
+      form.find("input[name='answer_text']").addClass("limit_text");
+    } else {
+      form.find("input[name='answer_text']").removeClass("limit_text");
+    }
+  }
+
   function parseFloatOrPercentage(val) {
     if (val == "") { return val; }
     var result;
@@ -1482,6 +1496,15 @@ define([
         $("#quiz_cant_go_back").attr('checked', false);
       }
     }).triggerHandler('change');
+
+    $(".question").on("change", ".limit_text", function() {
+      var answerValue = $(this).val();
+      var textLength = answerValue.length;
+      if(textLength > 80) {
+        alert(I18n.t('quiz_short_answer_length_error', 'Answers for fill in the blank questions must be under 80 characters long'));
+        $(this).val(answerValue.substring(0, 80));
+      }
+    });
 
     $("#multiple_attempts_option,#limit_attempts_option,#quiz_allowed_attempts").change(function() {
       var checked = $("#multiple_attempts_option").prop('checked') && $("#limit_attempts_option").prop('checked');
@@ -1744,6 +1767,7 @@ define([
       $formQuestion.addClass('selectable');
       $form.find(".answer_selection_type").change().show();
       if (question.question_type != 'missing_word_question') { $form.find("option.missing_word").remove(); }
+
       if ($question.hasClass('missing_word_question') || question.question_type == 'missing_word_question') {
         question = $question.getTemplateData({textValues: ['text_before_answers', 'text_after_answers']});
         answer_data = $question.find(".original_question_text").getFormData();
@@ -1823,6 +1847,9 @@ define([
       if ($question.hasClass('essay_question') || $question.hasClass('file_upload')) {
         $formQuestion.find(".comments_header").text(I18n.beforeLabel('comments_on_question', "Comments for this question"));
       }
+
+      limitTextInputFor($form, question.question_type);
+
       $question.hide().after($form);
       quiz.showFormQuestion($form);
       $form.attr('action', $question.find(".update_question_url").attr('href'))
