@@ -2,10 +2,11 @@ define [
   'ember'
   'ember-data'
   'i18n!quizzes'
-], (Em, DS, I18n) ->
+  'ic-ajax'
+], (Em, DS, I18n, ajax) ->
 
   {alias, equal, any} = Em.computed
-  {belongsTo} = DS
+  {belongsTo, PromiseObject} = DS
 
   Em.onerror = (error) ->
     console.log 'ERR', error, error.stack
@@ -71,3 +72,11 @@ define [
         when 'graded_survey' then I18n.t 'graded_survey', 'Graded Survey'
         when 'practice_quiz' then I18n.t 'practice_quiz', 'Practice Quiz'
     ).property('quizType')
+    # temporary until we ship the show page with quiz submission info in ember
+    quizSubmissionHtmlURL: attr()
+    quizSubmissionHTML: (->
+      promise = ajax(@get 'quizSubmissionHtmlURL').then (html) =>
+        @set 'didLoadQuizSubmissionHTML', true
+        { html: html }
+      PromiseObject.create promise: promise
+    ).property('quizSubmissionHtmlURL')

@@ -12,7 +12,7 @@ define [
       initialize: (container, application) ->
         env.setEnv(window.ENV)
 
-  Ember.$.ajaxPrefilter (options, originalOptions, xhr) ->
+  Ember.$.ajaxPrefilter 'json', (options, originalOptions, xhr) ->
     options.dataType = 'json'
     options.headers = 'Accept': 'application/vnd.api+json'
 

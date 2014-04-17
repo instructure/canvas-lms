@@ -24,6 +24,7 @@ define [
           "hide_correct_answers_at":null,
           "hide_results":null,
           "id":1,
+          "quiz_submission_html_url": "/courses/1/quizzes/1/submission_html"
           "ip_filter":null,
           "due_at":"2013-11-01T06:59:59Z",
           "lock_at":"2013-11-01T06:59:59Z",
@@ -69,6 +70,7 @@ define [
           "shuffle_answers":false,
           "time_limit":null,
           "title":"Another test",
+          "quiz_submission_html_url": "/courses/1/quizzes/2/submission_html"
           "html_url":"http://localhost:3000/courses/1/quizzes/2",
           "mobile_url":"http://localhost:3000/courses/1/quizzes/2?force_user=1&persist_headless=1",
           "question_count":0,
@@ -100,5 +102,9 @@ define [
         response: JSON.parse(JSON.stringify quizIndexResponse),
         jqXHR: {}
         testStatus: '200'
+
+      ajax.defineFixture '/courses/1/quizzes/1/submission_html',
+        response: 'submission html!'
+        textStatus: '200'
   }
 
