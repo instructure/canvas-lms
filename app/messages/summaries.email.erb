@@ -16,8 +16,8 @@
 
 <%= delayed_message.name_of_topic %>
 
-    <%= indent(html_to_simple_text(delayed_message.summary, :base_url => content(:link)), 4) %>
-  
+    <%= indent(html_to_text(delayed_message.summary, :base_url => content(:link)), 4) %>
+
     <%= delayed_message.link %>
 <% end %>
 

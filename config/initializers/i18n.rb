@@ -167,6 +167,10 @@ I18n.class_eval do
     end
     string.html_safe
   end
+
+  def self.qualified_locale
+    I18n.t("qualified_locale", "en-US")
+  end
 end
 
 if CANVAS_RAILS2
@@ -191,6 +195,17 @@ else
       @lookup_context.i18n_scope = old_i18n_scope
     end
     alias_method_chain :render_template, :assign
+  end
+
+  ActionView::PartialRenderer.class_eval do
+    def render_partial_with_assign
+      old_i18n_scope = @lookup_context.i18n_scope
+      @lookup_context.i18n_scope = @path.sub(/\/_/, '/').gsub('/', '.') if @path
+      render_partial_without_assign
+    ensure
+      @lookup_context.i18n_scope = old_i18n_scope
+    end
+    alias_method_chain :render_partial, :assign
   end
 
   ActionView::Base.class_eval do

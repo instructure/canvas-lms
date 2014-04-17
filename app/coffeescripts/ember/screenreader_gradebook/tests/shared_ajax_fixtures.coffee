@@ -322,6 +322,7 @@ define [
           id: '1'
           name: 'AG1'
           position: 1
+          group_weight: 0
           assignments: [
             {
               id: '1'
@@ -342,7 +343,7 @@ define [
               points_possible: null
               due_at: null
               position: 10
-              submission_types: ["none"]
+              submission_types: ["online_url", "online_text_entry"]
               assignment_group_id:'1'
               published: true
               muted: true
@@ -365,6 +366,7 @@ define [
           id: '2'
           name: 'AG2'
           position: 10
+          group_weight: 0
           assignments: [
             {
               id: '4'
@@ -406,6 +408,7 @@ define [
           id: '4'
           name: 'Silent Assignments'
           position: 2
+          group_weight: 0
           assignments: [
             {
               id: '20'
@@ -435,6 +438,7 @@ define [
           id: '5'
           name: 'Invalid AG'
           position: 3
+          group_weight: 0
           assignments: [
             {
               id: '24'
@@ -455,23 +459,23 @@ define [
         {
           user_id: '1'
           submissions: [
-            { id: '1', user_id: '1', assignment_id: '1', grade: '3' }
-            { id: '2', user_id: '1', assignment_id: '2', grade: null }
-            { id: '5', user_id: '1', assignment_id: '6', grade: 'incomplete' }
+            { id: '1', user_id: '1', assignment_id: '1', grade: '3', score: '3' }
+            { id: '2', user_id: '1', assignment_id: '2', grade: null, score: null  }
+            { id: '5', user_id: '1', assignment_id: '6', grade: 'incomplete', score: 'incomplete' }
           ]
         }
         {
           user_id: '2'
           submissions: [
-            { id: '3', user_id: '2', assignment_id: '1', grade: '9' }
-            { id: '4', user_id: '2', assignment_id: '2', grade: null }
+            { id: '3', user_id: '2', assignment_id: '1', grade: '9', score: '9' }
+            { id: '4', user_id: '2', assignment_id: '2', grade: null, score: null }
           ]
         }
         {
           user_id: '3'
           submissions: [
-            { id: '5', user_id: '3', assignment_id: '1', grade: '10' }
-            { id: '6', user_id: '3', assignment_id: '2', grade: null }
+            { id: '5', user_id: '3', assignment_id: '1', grade: '10', score: '10' }
+            { id: '6', user_id: '3', assignment_id: '2', grade: null, score: null }
           ]
         }
         {

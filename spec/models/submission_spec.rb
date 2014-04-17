@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -106,11 +106,16 @@ describe Submission do
     assignment_model
     @assignment.workflow_state = 'published'
     @assignment.save!
-    @course.teacher_enrollments.create(:user => @teacher, :workflow_state => 'accepted')
-    @course.teacher_enrollments.create(:user => @teacher, :workflow_state => 'accepted')
-    @course.teacher_enrollments.create(:user => @teacher, :workflow_state => 'accepted')
-    @course.teacher_enrollments.create(:user => @teacher, :workflow_state => 'invited')
-    @course.teacher_enrollments.create(:user => @teacher, :workflow_state => 'completed')
+    section1 = @course.course_sections.create(name: '1')
+    section2 = @course.course_sections.create(name: '2')
+    section3 = @course.course_sections.create(name: '3')
+    section4 = @course.course_sections.create(name: '4')
+    section5 = @course.course_sections.create(name: '5')
+    section1.enroll_user(@teacher, 'TeacherEnrollment', 'accepted')
+    section2.enroll_user(@teacher, 'TeacherEnrollment', 'accepted')
+    section3.enroll_user(@teacher, 'TeacherEnrollment', 'accepted')
+    section4.enroll_user(@teacher, 'TeacherEnrollment', 'invited')
+    section5.enroll_user(@teacher, 'TeacherEnrollment', 'completed')
     @course.offer!
     @course.enroll_student(@student = user)
     @assignment.context.reload
@@ -920,9 +925,33 @@ describe Submission do
       @submission.should_not be_missing
     end
 
-    it "should be true if not submitted and past due" do
+    it "should be true if not submitted, past due, and expects a submission" do
+      @submission.assignment.submission_types = "online_quiz"
       @submission.submission_type = nil # forces submitted_at to be nil
       @submission.cached_due_date = 1.day.ago
+
+      # Regardless of score
+      @submission.score = 0.00000001
+      @submission.graded_at = Time.zone.now + 1.day
+
+      @submission.should be_missing
+    end
+
+    it "should be true if not submitted, score of zero, and does not expect a submission" do
+      @submission.assignment.submission_types = "on_paper"
+      @submission.submission_type = nil # forces submitted_at to be nil
+      @submission.cached_due_date = 1.day.ago
+      @submission.score = 0
+      @submission.graded_at = Time.zone.now + 1.day
+      @submission.should be_missing
+    end
+
+    it "should be false if not submitted, score greater than zero, and does not expect a submission" do
+      @submission.assignment.submission_types = "on_paper"
+      @submission.submission_type = nil # forces submitted_at to be nil
+      @submission.cached_due_date = 1.day.ago
+      @submission.score = 0.00000001
+      @submission.graded_at = Time.zone.now + 1.day
       @submission.should be_missing
     end
   end

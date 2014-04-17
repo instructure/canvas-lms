@@ -103,6 +103,7 @@ module UserContent
       'quizzes' => Quizzes::Quiz,
       'groups' => Group,
       'wiki' => WikiPage,
+      'pages' => WikiPage,
       'grades' => nil,
       'users' => nil,
       'external_tools' => nil,
@@ -154,7 +155,7 @@ module UserContent
 
       html.gsub(@toplevel_regex) do |relative_url|
         type, obj_id, rest = [$1, $2, $3]
-        if type != "wiki"
+        if type != "wiki" && type != "pages"
           if obj_id.to_i > 0
             obj_id = obj_id.to_i
           else

@@ -52,6 +52,10 @@ describe AvatarHelper do
         self.expects(:session).returns({"reported_#{user.id}" => true})
         avatar_image_attrs(user).should == ["/images/messages/avatar-50.png", '']
       end
+
+      it "falls back to a blank avatar when the user is nil" do
+        avatar_image_attrs(nil).should == ["/images/messages/avatar-50.png", '']
+      end
     end
 
     describe ".avatar" do
@@ -72,6 +76,10 @@ describe AvatarHelper do
 
       it "links to the user's page" do
         avatar(user).should match("/users/#{user.id}")
+      end
+
+      it "falls back to a blank avatar when the user is nil" do
+        avatar(nil).should match("/images/messages/avatar-50.png")
       end
     end
 

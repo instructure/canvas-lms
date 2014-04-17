@@ -210,7 +210,7 @@ describe "API Authentication", type: :request do
           response.should be_success
           json = JSON.parse(response.body)
           json.size.should == 1
-          json.first['enrollments'].should == [{'type' => 'teacher', 'role' => 'TeacherEnrollment'}]
+          json.first['enrollments'].should == [{'type' => 'teacher', 'role' => 'TeacherEnrollment', 'enrollment_state' => 'invited'}]
           AccessToken.authenticate(token).should == AccessToken.last
           AccessToken.last.purpose.should == 'fun'
 
@@ -457,7 +457,7 @@ describe "API Authentication", type: :request do
             response.should be_success
             json = JSON.parse(response.body)
             json.size.should == 1
-            json.first['enrollments'].should == [{'type' => 'teacher', 'role' => 'TeacherEnrollment'}]
+            json.first['enrollments'].should == [{'type' => 'teacher', 'role' => 'TeacherEnrollment', 'enrollment_state' => 'invited'}]
             AccessToken.last.should == AccessToken.authenticate(token)
           end
         end

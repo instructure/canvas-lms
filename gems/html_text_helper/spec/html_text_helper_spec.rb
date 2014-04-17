@@ -80,12 +80,112 @@ describe HtmlTextHelper do
       th.html_to_text("<a href='www.example.com'>www.example.com</a>").should == "www.example.com"
     end
 
+    it "should not format href-less links" do
+      th.html_to_text("<a>Link</a>").should == "Link"
+    end
+
     it "should turn images into urls" do
       th.html_to_text("<img src='http://www.example.com/a'>").should == "http://www.example.com/a"
     end
 
+    it "should turn images with alt text into markdown style links" do
+      th.html_to_text('<img alt="an image" src="/image.png"').should == "[an image](/image.png)"
+    end
+
+    it "should add base urls to links" do
+      th.html_to_text('<a href="/link">Link</a>', base_url: "http://example.com").should == "[Link](http://example.com/link)"
+      th.html_to_text('<a href="http://example.org/link">Link</a>', base_url: "http://example.com").should == "[Link](http://example.org/link)"
+    end
+
+    it "should add base urls to img src" do
+      th.html_to_text('<img src="/image.png" alt="Image" />', base_url: "http://example.com").should == "[Image](http://example.com/image.png)"
+      th.html_to_text('<img src="http://example.org/image.png" />', base_url: "http://example.com").should == "http://example.org/image.png"
+    end
+
+    it "should format list elements" do
+      th.html_to_text("<li>Item 1</li><li>Item 2</li>\n<li>Item 3</li> <li>Item 4\n<li>  Item 5").should == <<EOS.strip
+* Item 1
+
+* Item 2
+
+* Item 3
+
+* Item 4
+
+* Item 5
+EOS
+    end
+
+    it "should format headings" do
+      th.html_to_text("<h1>heading 1</h1><h2>heading two<br>text\n</h2>\n<h3>heading 3 <br> through heading 6</h3>").should == <<EOS.strip
+*********
+heading 1
+*********
+
+-----------
+heading two
+text
+-----------
+
+heading 3
+through heading 6
+-----------------
+EOS
+    end
+
+    it "should format headings in a word wrap friendly way" do
+      th.html_to_text("<h1>heading 1</h1><h2>heading two<br>text\n</h2>\n<h3>heading 3 through heading 6</h3>", line_width: 9).should == <<EOS.strip
+*********
+heading 1
+*********
+
+---------
+heading
+two
+text
+---------
+
+heading 3
+through
+heading 6
+---------
+EOS
+    end
+
+    it "should word wrap" do
+      th.html_to_text("text that is a bit too long", line_width: 10).should == <<EOS.strip
+text that
+is a bit
+too long
+EOS
+    end
+
+    it "should squeeze whitespace" do
+      th.html_to_text("too     many\n\n\nspaces   ").should == "too many spaces"
+    end
+
+    it "should strip link and script tags" do
+      th.html_to_text('<script>script script script</script>text<link rel="stuff">').should == "text"
+    end
+
+    it "should strip other tags but leave their text" do
+      th.html_to_text("text<span>span text</span>").should == "textspan text"
+    end
+
+    it "should replace html entities" do
+      th.html_to_text("&&amp; >&lt;&nbsp;").should == "&& ><\302\240"
+    end
+
+    it "should add newlines around block elements" do
+      th.html_to_text("text<div>div text</div>").should == "text\n\ndiv text"
+    end
+
+    it "should preserve whitespace in pre tags (until squeezing)" do
+      th.html_to_text("<pre>i have\nactual\n\nnewlines\n\n\n!</pre>").should == "i have\nactual\n\nnewlines\n\n!"
+    end
+
     it "should insert newlines for ps and brs" do
-      th.html_to_text("Ohai<br>Text <p>paragraph of text.</p>End").should == "Ohai\n\nText paragraph of text.\n\nEnd"
+      th.html_to_text("Ohai<br>Text <p>paragraph of text.</p>End").should == "Ohai\nText\n\nparagraph of text.\n\nEnd"
     end
 
     it "should return a string with no html back unchanged" do

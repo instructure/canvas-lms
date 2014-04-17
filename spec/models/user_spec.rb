@@ -933,21 +933,6 @@ describe User do
       search_messageable_users(@student, :context => "course_#{course2.id}", :ids => [@admin.id]).should_not be_empty
     end
 
-    it "should return names with shared contexts" do
-      set_up_course_with_users
-      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
-      @group.users << @student
-
-      @student.shared_contexts(@this_section_user).should eql ['the course', 'the group']
-      @student.short_name_with_shared_contexts(@this_section_user).should eql "#{@this_section_user.short_name} (the course and the group)"
-
-      @student.shared_contexts(@other_section_user).should eql ['the course']
-      @student.short_name_with_shared_contexts(@other_section_user).should eql "#{@other_section_user.short_name} (the course)"
-
-      @student.shared_contexts(@unrelated_user).should eql []
-      @student.short_name_with_shared_contexts(@unrelated_user).should eql @unrelated_user.short_name
-    end
-
     it "should not rank results by default" do
       set_up_course_with_users
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')

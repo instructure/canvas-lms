@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -547,6 +547,25 @@ module Api
   def self.value_to_array(value)
     value.is_a?(String) ? value.split(',') : (value || [])
   end
+
+  def self.invalid_time_stamp_error(attribute, message)
+    ErrorReport.log_error('invalid_date_time',
+                          message: "invalid #{attribute}",
+                          exception_message: message)
+  end
+
+  # regex for valid iso8601 dates
+  ISO8601_REGEX = /^(?<year>-?[0-9]{4})-
+                    (?<month>1[0-2]|0[1-9])-
+                    (?<day>3[0-1]|0[1-9]|[1-2][0-9])T
+                    (?<hour>2[0-3]|[0-1][0-9]):
+                    (?<minute>[0-5][0-9]):
+                    (?<second>60|[0-5][0-9])
+                    (?<fraction>\.[0-9]+)?
+                    (?<timezone>Z|[+-](?:2[0-3]|[0-1][0-9]):[0-5][0-9])?$/x
+
+  # regex for valid dates
+  DATE_REGEX = /^\d{4}[- \/.](0[1-9]|1[012])[- \/.](0[1-9]|[12][0-9]|3[01])$/
 
   # regex for shard-aware ID
   ID = '(?:\d+~)?\d+'

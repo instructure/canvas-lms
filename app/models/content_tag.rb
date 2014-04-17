@@ -346,6 +346,10 @@ class ContentTag < ActiveRecord::Base
     Quizzes::Quiz.class_names.include?(self.content_type)
   end
 
+  def content_type_discussion?
+    'DiscussionTopic' == self.content_type
+  end
+
   def context_module_action(user, action, points=nil)
     self.context_module.update_for(user, action, self, points) if self.context_module
   end

@@ -1,6 +1,11 @@
 @import environment.sass
 @import learning_outcome_gradebook.scss
 
+#footer
+  display: none
+#main
+  margin-bottom: 0
+
 $cell_height: 33px
 
 // ******* overrides of the default slick.grid.css styles ********
@@ -407,7 +412,7 @@ $gradebook_checkbox_width: 16px
   width: 200px
   overflow-x: hidden
   overflow-y: auto
-  max-height: 550px
+  max-height: 275px
   label
     +gradebook_menu_label(12px)
   .ui-state-focus:last-child

@@ -29,7 +29,7 @@
       background-image:     -ms-linear-gradient(left, #ddd, #aaa, #eee);
       background-image:      -o-linear-gradient(left, #ddd, #aaa, #eee);" />
 
-  <p><strong><%= html_to_simple_text(delayed_message.name_of_topic, :base_url => content(:link)) %></strong></p>
+  <p><strong><%= html_to_text(delayed_message.name_of_topic, :base_url => content(:link)) %></strong></p>
   <p><%= html_to_simple_html(delayed_message.summary, :base_url => content(:link)) %></p>
   <p><a href="<%= delayed_message.link %>"><%= t :view, "Click to view" %></a></p>
 <% end %>

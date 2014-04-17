@@ -148,7 +148,7 @@ define [
         @app.formPane.refresh() if @isActive(data.id)
 
       data.lastMessage = data[@lastMessageKey()]
-      data.lastMessageAt = $.friendlyDatetime($.parseFromISO(data[@lastMessageKey() + "_at"]).datetime)
+      data.lastMessageAt = $.friendlyDatetime($.fudgeDateForProfileTimezone(data[@lastMessageKey() + "_at"]))
       data.hideCount = data.message_count is 1
 
       classes = (property for property in data.properties)

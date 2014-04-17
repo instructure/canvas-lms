@@ -44,7 +44,14 @@ module ActiveModel
         options[:default] ||= keys
 
         # the send here is to avoid rake i18n:check complaining about passing a non-string-literal to I18n.t
-        I18n.send(:translate, key, options)
+        result = catch(:exception) do
+          I18n.send(:translate, key, options)
+        end
+        if result.is_a?(I18n::MissingTranslation)
+          # fallback on activerecord.errors scope if translation is missing for rails 3
+          result = I18n.send(:translate, key, options.merge(:scope => [:activerecord, :errors], :throw => false))
+        end
+        result
       end
 
       protected
@@ -62,7 +69,7 @@ module ActiveModel
         if CANVAS_RAILS2
           super().merge(scope: [:activerecord, :errors])
         else
-          super().merge(scope: [:errors])
+          super().merge(scope: [:errors], throw: true)
         end
       end
 

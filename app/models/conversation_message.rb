@@ -130,7 +130,7 @@ class ConversationMessage < ActiveRecord::Base
     true
   end
 
-  # override AR association magic 
+  # override AR association magic
   def attachment_ids
     read_attribute :attachment_ids
   end
@@ -233,6 +233,22 @@ class ConversationMessage < ActiveRecord::Base
     recipient.user_notes.create(:creator => author, :title => title, :note => note)
   end
 
+  def author_short_name_with_shared_contexts(recipient)
+    if conversation.context
+      context_names = [conversation.context.name]
+    else
+      shared_tags = author.conversation_context_codes(false)
+      shared_tags &= recipient.conversation_context_codes(false)
+      context_components = shared_tags.map{|t| ActiveRecord::Base.parse_asset_string(t)}
+      context_names = Context.names_by_context_types_and_ids(context_components[0,2]).values
+    end
+    if context_names.empty?
+      author.short_name
+    else
+      "#{author.short_name} (#{context_names.to_sentence})"
+    end
+  end
+
   def formatted_body(truncate=nil)
     res = format_message(body).first
     res = truncate_html(res, :max_length => truncate, :words => true) if truncate
@@ -331,4 +347,3 @@ class ConversationMessage < ActiveRecord::Base
     end
   end
 end
-

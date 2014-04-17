@@ -63,5 +63,34 @@ define(['vendor/jquery-1.7.2'], function($) {
     return ($.browser.safari ? $("body") : $("html")).scrollTop();
   };
 
+  // indicate we want stringified IDs for JSON responses
+  $.ajaxPrefilter("json", function( options, originalOptions, jqXHR ) {
+    if (options.accepts.json)
+      options.accepts.json = options.accepts.json + ', application/json+canvas-string-ids';
+    else
+      options.accepts.json = 'application/json+canvas-string-ids';
+  });
+
+  // see: https://github.com/rails/jquery-ujs/blob/master/src/rails.js#L80
+  var CSRFProtection =  function(xhr) {
+    if (ENV.AUTHENTICITY_TOKEN) xhr.setRequestHeader('X-CSRF-Token', ENV.AUTHENTICITY_TOKEN);
+  }
+
+  $.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
+    if ( !options.crossDomain ) CSRFProtection(jqXHR);
+
+    // sends timing info of XHRs to google analytics so we can track ajax speed.
+    // (ONLY for ajax requests that took longer than a second)
+    var urlWithoutPageViewParam = options.url;
+    var start = new Date().getTime();
+    jqXHR.done(function(data, textStatus, jqXHR){
+      var duration = new Date().getTime() - start;
+      if (duration > 1000) {
+        var label = '{"requestingPage": "' + window.location + '," "status": "' + textStatus + '", "X-Request-Context-Id" : "' + jqXHR.getResponseHeader('X-Request-Context-Id') + '", "X-Runtime": ' + jqXHR.getResponseHeader('X-Runtime') + '}';
+        $.trackEvent('XHRs', urlWithoutPageViewParam, label, duration );
+      }
+    });
+  });
+
   return $;
 });

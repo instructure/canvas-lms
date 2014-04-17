@@ -67,13 +67,13 @@ describe ContextModule do
       @module.completion_requirements = { @tag.id => { :type => 'must_contribute' } }
       @module.save!
 
-      @progression = @module.evaluate_for(@user, true, true)
+      @progression = @module.evaluate_for(@user, true)
       @progression.should_not be_nil
       @progression.should_not be_completed
       @progression.should be_unlocked
       @progression.current_position.should eql(@tag.position)
       yield
-      @progression = @module.evaluate_for(@user, true, true)
+      @progression = @module.evaluate_for(@user, true)
       @progression.should be_completed
       @progression.current_position.should eql(@tag.position)
     end
@@ -146,18 +146,15 @@ describe ContextModule do
         html.css('#test_content').length.should == (@test_content_length || 0)
 
         # complete first module's requirements
-        p1 = @mod1.evaluate_for(@student, true, true)
+        p1 = @mod1.evaluate_for(@student, true)
         p1.workflow_state.should == 'unlocked'
 
         @quiz_submission = @quiz.generate_submission(@student)
         @quiz_submission.grade_submission
-        @quiz_submission.workflow_state = 'completed'
+        @quiz_submission.workflow_state = 'complete'
+        @quiz_submission.manually_scored = true
         @quiz_submission.kept_score = 1
         @quiz_submission.save!
-
-        #emulate settings on progression if the user took the quiz but background jobs haven't run yet
-        p1.requirements_met = [{:type=>"min_score", :min_score=>"1", :max_score=>nil, :id=>@quiz.id}]
-        p1.save!
 
         # navigate to the second item (forcing update to progression)
         next_link = progress_by_item_link ? 

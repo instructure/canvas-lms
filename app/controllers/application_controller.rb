@@ -120,6 +120,8 @@ class ApplicationController < ActionController::Base
     end
     @js_env[:IS_LARGE_ROSTER] = true if !@js_env[:IS_LARGE_ROSTER] && @context.respond_to?(:large_roster?) && @context.large_roster?
     @js_env[:context_asset_string] = @context.try(:asset_string) if !@js_env[:context_asset_string]
+    @js_env[:TIMEZONE] = Time.zone.tzinfo.identifier if !@js_env[:TIMEZONE]
+    @js_env[:LOCALE] = I18n.qualified_locale if !@js_env[:LOCALE]
     @js_env
   end
   helper_method :js_env
@@ -784,7 +786,7 @@ class ApplicationController < ActionController::Base
     return true if !page_views_enabled?
 
     if @current_user && @log_page_views != false
-      updated_fields = params.slice(:interaction_seconds, :page_view_contributed)
+      updated_fields = params.slice(:interaction_seconds)
       if request.xhr? && params[:page_view_id] && !updated_fields.empty? && !(@page_view && @page_view.generated_by_hand)
         @page_view = PageView.find_for_update(params[:page_view_id])
         if @page_view

@@ -18,6 +18,7 @@ module.exports = function(config) {
       {pattern: 'spec/javascripts/compiled/*.js', included: false, served: true},
       {pattern: 'spec/javascripts/compiled/**/*.js', included: false, served: true},
       {pattern: 'spec/**/javascripts/compiled/**/*.js', included: false, served: true},
+      {pattern: 'spec/javascripts/fixtures/*', included: false, served: true},
       {pattern: 'public/javascripts/**/*.js', included: false, served: true},
       'spec/javascripts/load_tests.js'
     ],

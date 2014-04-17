@@ -47,7 +47,9 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
     initialize: (options) ->
       @assignment = @model.get("assignment")
       @dueDateOverrideView = options.views['js-assignment-overrides']
-      @model.on 'sync', -> window.location = @get 'html_url'
+      @model.on 'sync', =>
+        @unwatchUnload()
+        window.location = @model.get 'html_url'
       super
 
     isTopic: => @model.constructor is DiscussionTopic
@@ -96,8 +98,10 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
       _.defer(@renderGradingTypeOptions)
       _.defer(@renderGroupCategoryOptions)
       _.defer(@renderPeerReviewOptions)
+      _.defer(@watchUnload)
 
       @$(".datetime_field").datetime_field()
+
 
       this
 

@@ -333,17 +333,6 @@ describe "discussions" do
       end
 
       describe "gear menu" do
-        it "should delete a topic" do
-          topic
-          get url
-
-          f('.al-trigger').click
-          fj('.icon-trash:visible').click
-          driver.switch_to.alert.accept
-          wait_for_ajaximations
-          topic.reload.workflow_state.should == 'deleted'
-          f('.discussion-list li.discussion').should be_nil
-        end
 
         it "should give the teacher delete/lock permissions on all topics" do
           student_topic
@@ -359,6 +348,7 @@ describe "discussions" do
           fj('.icon-pin:visible').click
           wait_for_ajaximations
           topic.reload.should be_pinned
+          topic.position.should_not be_nil
           ffj('.pinned.discussion-list li.discussion:visible').length.should == 1
         end
 
@@ -398,7 +388,10 @@ describe "discussions" do
           wait_for_ajaximations
 
           f('.pinned.discussion-list .al-trigger').click
-          ffj('.icon-lock:visible').length.should == 1
+          fj('.icon-lock:visible').click
+          wait_for_ajaximations
+          f('.locked.discussion-list .al-trigger').click
+          fj('.icon-pin:visible').should include_text('Pin')
         end
 
         it "should allow pinning a locked topic" do
@@ -407,7 +400,26 @@ describe "discussions" do
           wait_for_ajaximations
 
           f('.locked.discussion-list .al-trigger').click
-          ffj('.icon-pin:visible').length.should == 1
+          fj('.icon-pin:visible').click
+          wait_for_ajaximations
+          f('.pinned.discussion-list .al-trigger').click
+          fj('.icon-lock:visible').should include_text('Open')
+          fj('.icon-lock:visible').click
+          wait_for_ajaximations
+          f('.pinned.discussion-list .al-trigger').click
+          fj('.icon-lock:visible').should include_text('Close')
+        end
+
+        it "should delete a topic" do
+          topic
+          get url
+
+          f('.al-trigger').click
+          fj('.icon-trash:visible').click
+          driver.switch_to.alert.accept
+          wait_for_ajaximations
+          topic.reload.workflow_state.should == 'deleted'
+          f('.discussion-list li.discussion').should be_nil
         end
       end
     end

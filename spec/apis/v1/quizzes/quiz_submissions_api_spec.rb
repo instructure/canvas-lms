@@ -66,7 +66,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
     end
 
     def normalize(value)
-      value = 0 if value = 0.0
+      value = 0 if value == 0.0
       value.to_json.to_s
     end
 

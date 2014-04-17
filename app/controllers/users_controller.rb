@@ -283,7 +283,7 @@ class UsersController < ApplicationController
 
   before_filter :require_password_session, :only => [:masquerade]
   def masquerade
-    @user = User.find_by_id(params[:user_id])
+    @user = api_find(User, params[:user_id])
     return render_unauthorized_action unless @user.can_masquerade?(@real_current_user || @current_user, @domain_root_account)
     if request.post?
       if @user == @real_current_user
@@ -299,6 +299,9 @@ class UsersController < ApplicationController
   end
 
   def user_dashboard
+    if custom_dash = @domain_root_account.settings[:dashboard_url]
+      return redirect_to custom_dash
+    end
     check_incomplete_registration
     get_context
 
@@ -874,6 +877,12 @@ class UsersController < ApplicationController
   # @argument communication_channel[address] [Optional, String]
   #   The communication channel address, e.g. the user's email address.
   #
+  # @argument skip_confirmation [Optional, Boolean]
+  #   Only valid for site admins and account admins making requests; If true, the channel is
+  #   automatically validated and no confirmation email or SMS is sent.
+  #   Otherwise, the user must respond to a confirmation message to confirm the
+  #   channel.
+  #
   # @returns User
   def create
     # Look for an incomplete registration with this pseudonym
@@ -893,6 +902,8 @@ class UsersController < ApplicationController
     if params[:communication_channel]
       cc_type = params[:communication_channel][:type] || CommunicationChannel::TYPE_EMAIL
       cc_addr = params[:communication_channel][:address]
+      skip_confirmation = value_to_boolean(params[:communication_channel][:skip_confirmation]) &&
+          (Account.site_admin.grants_right?(@current_user, :manage_students) || Account.default.grants_right?(@current_user, :manage_students))
     else
       cc_type = CommunicationChannel::TYPE_EMAIL
       cc_addr = params[:pseudonym].delete(:path) || params[:pseudonym][:unique_id]
@@ -960,7 +971,7 @@ class UsersController < ApplicationController
       @user.communication_channels.where(:path_type => cc_type).by_path(cc_addr).first ||
       @user.communication_channels.build(:path_type => cc_type, :path => cc_addr)
     @cc.user = @user
-    @cc.workflow_state = 'unconfirmed' unless @cc.workflow_state == 'confirmed'
+    @cc.workflow_state = skip_confirmation ? 'active' : 'unconfirmed' unless @cc.workflow_state == 'confirmed'
 
     if @user.valid? && @pseudonym.valid? && @observee.nil?
       # saving the user takes care of the @pseudonym and @cc, so we can't call
@@ -1442,12 +1453,16 @@ class UsersController < ApplicationController
       user_id = User.user_id_from_avatar_key(params[:user_id])
     end
     account_avatar_setting = service_enabled?(:avatars) ? @domain_root_account.settings[:avatars] || 'enabled' : 'disabled'
-    url = Rails.cache.fetch(Cacher.avatar_cache_key(user_id, account_avatar_setting)) do
-      user = User.find_by_id(user_id) if user_id.present?
-      if user
-        user.avatar_url(nil, account_avatar_setting, "%{fallback}")
-      else
-        '%{fallback}'
+    user_id, user_shard = Shard.local_id_for(user_id)
+    user_shard ||= Shard.current
+    url = user_shard.activate do
+      Rails.cache.fetch(Cacher.avatar_cache_key(user_id, account_avatar_setting)) do
+        user = User.find_by_id(user_id) if user_id.present?
+        if user
+          user.avatar_url(nil, account_avatar_setting, "%{fallback}")
+        else
+          '%{fallback}'
+        end
       end
     end
     fallback = User.avatar_fallback_url(params[:fallback], request)

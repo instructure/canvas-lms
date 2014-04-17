@@ -122,16 +122,16 @@ class CommunicationChannelsController < ApplicationController
   #   it.
   #
   # @argument skip_confirmation [Optional, Boolean]
-  #   Only valid for site admins making requests; If true, the channel is
+  #   Only valid for site admins and account admins making requests; If true, the channel is
   #   automatically validated and no confirmation email or SMS is sent.
   #   Otherwise, the user must respond to a confirmation message to confirm the
   #   channel.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/users/1/communication_channels \ 
-  #          -H 'Authorization: Bearer <token>' \ 
-  #          -d 'communication_channel[address]=new@example.com' \ 
-  #          -d 'communication_channel[type]=email' \ 
+  #     curl https://<canvas>/api/v1/users/1/communication_channels \
+  #          -H 'Authorization: Bearer <token>' \
+  #          -d 'communication_channel[address]=new@example.com' \
+  #          -d 'communication_channel[type]=email' \
   #
   # @returns CommunicationChannel
   def create
@@ -142,7 +142,7 @@ class CommunicationChannelsController < ApplicationController
     params.delete(:build_pseudonym) if api_request?
 
     skip_confirmation = value_to_boolean(params[:skip_confirmation]) &&
-      Account.site_admin.grants_right?(@current_user, :manage_students)
+        (Account.site_admin.grants_right?(@current_user, :manage_students) || Account.default.grants_right?(@current_user, :manage_students))
 
     # If a new pseudonym is requested, build (but don't save) a pseudonym to ensure
     # that the unique_id is valid. The pseudonym will be created on approval of the

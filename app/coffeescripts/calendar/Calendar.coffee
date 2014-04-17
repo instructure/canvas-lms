@@ -312,7 +312,7 @@ define [
       @_eventDrop(event, minuteDelta, allDay, revertFunc)
 
     _eventDrop: (event, minuteDelta, allDay, revertFunc) ->
-      if event.eventType == "assignment" && allDay
+      if @currentView == 'week' && allDay && event.eventType == "assignment"
         revertFunc()
         return
 
@@ -555,7 +555,7 @@ define [
       @setCurrentDate(start)
 
     setCurrentDate: (d) ->
-      @updateFragment view_start: $.dateToISO8601UTC(d)
+      @updateFragment view_start: d.toISOString()
       $.publish('Calendar/currentDate', d)
 
     getCurrentDate: () ->

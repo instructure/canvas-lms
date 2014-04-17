@@ -26,6 +26,8 @@ define [
           "Calendar/visibleContextListChanged" : @visibleContextListChanged
           "Calendar/refetchEvents" : @refetchEvents
           "Calendar/currentDate" : @gotoDate
+          "CommonEvent/eventDeleted" : @eventSaved
+          "CommonEvent/eventSaved" : @eventSaved
       )
 
     getEvents: (start, end, cb) =>
@@ -56,6 +58,9 @@ define [
       false # don't render the event
 
     visibleContextListChanged: (list) =>
+      @refetchEvents()
+
+    eventSaved: =>
       @refetchEvents()
 
     refetchEvents: () =>

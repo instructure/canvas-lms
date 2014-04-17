@@ -25,7 +25,21 @@ if CANVAS_RAILS2
   end
 end
 
-begin; require File.expand_path(File.dirname(__FILE__) + "/../parallelized_specs/lib/parallelized_specs.rb"); rescue LoadError; end
+unless CANVAS_RAILS2
+  require 'timeout'
+  RSpec.configure do |c|
+    c.around(:each) do |example|
+      Timeout::timeout(300) {
+        example.run
+      }
+    end
+  end
+end
+
+begin
+  ; require File.expand_path(File.dirname(__FILE__) + "/../parallelized_specs/lib/parallelized_specs.rb");
+rescue LoadError;
+end
 
 ENV["RAILS_ENV"] = 'test'
 
@@ -47,6 +61,7 @@ if CANVAS_RAILS2
     args.last[:location] ||= caller(0)[1]
     describe_without_rspec2_types(*args, &block)
   end
+
   alias :describe_without_rspec2_types :describe
   alias :describe :describe_with_rspec2_types
 
@@ -57,6 +72,7 @@ if CANVAS_RAILS2
       end
       process_without_use_route_shim(action, parameters, session, flash, http_method)
     end
+
     alias_method_chain :process, :use_route_shim
   end
 
@@ -80,6 +96,7 @@ else
         def assigns
           @assigns ||= super
         end
+
         alias :view_assigns :assigns
 
         delegate :content_for, :to => :view
@@ -114,6 +131,7 @@ else
           end
           render_without_helpers(*args)
         end
+
         alias_method_chain :render, :helpers
       end
     end
@@ -155,12 +173,21 @@ else
     end
   end
 end
-require 'webrat'
-require 'mocha/api'
 require 'action_controller_test_process'
 require File.expand_path(File.dirname(__FILE__) + '/mocha_rspec_adapter')
 require File.expand_path(File.dirname(__FILE__) + '/mocha_extensions')
 require File.expand_path(File.dirname(__FILE__) + '/ams_spec_helper')
+
+# if mocha was initialized before rails (say by another spec), CollectionProxy would have
+# undef_method'd them; we need to restore them
+unless CANVAS_RAILS2
+  Mocha::ObjectMethods.instance_methods.each do |m|
+    ActiveRecord::Associations::CollectionProxy.class_eval <<-RUBY
+      def #{m}; end
+      remove_method #{m.inspect}
+RUBY
+  end
+end
 
 Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb").each { |file| require file }
 
@@ -223,7 +250,8 @@ def truncate_all_tables
       table_names = connection.tables & models.map(&:table_name)
       connection.execute("TRUNCATE TABLE #{table_names.map { |t| connection.quote_table_name(t) }.join(',')}")
     else
-      models.each { |model| truncate_table(model) }
+      table_names = connection.tables
+      models.each { |model| truncate_table(model) if table_names.include?(model.table_name) }
     end
   end
 end
@@ -363,7 +391,6 @@ end
 
   ((config.debug = true) rescue nil) unless CANVAS_RAILS2
 
-  config.include Webrat::Matchers, :type => :views
   config.include Helpers
 
   config.before :all do
@@ -671,7 +698,7 @@ end
     @account = opts[:account] || Account.default
     @announcement = @account.announcements.build(message: message, required_account_service: req_service)
     @announcement.start_at = opts[:start_at] || 5.minutes.ago.utc
-    @announcement.account_notification_roles.build(roles.map{ |r| { account_notification_id: @announcement.id, role_type: r} }) unless roles.empty?
+    @announcement.account_notification_roles.build(roles.map { |r| {account_notification_id: @announcement.id, role_type: r} }) unless roles.empty?
     @announcement.save!
   end
 
@@ -951,7 +978,7 @@ end
 
   def assert_unauthorized
     assert_status(401) #unauthorized
-                       #    response.headers['Status'].should eql('401 Unauthorized')
+    #    response.headers['Status'].should eql('401 Unauthorized')
     response.should render_template("shared/unauthorized")
   end
 
@@ -1023,7 +1050,30 @@ end
   end
 
   def enable_cache(new_cache=:memory_store)
-    Rails.force_cache(new_cache) { yield }
+    new_cache ||= :null_store
+    if CANVAS_RAILS2 && new_cache == :null_store
+      require 'nil_store'
+      new_cache = NilStore.new
+    end
+    new_cache = ActiveSupport::Cache.lookup_store(new_cache)
+    previous_cache = Rails.cache
+    Rails.stubs(:cache).returns(new_cache)
+    ActionController::Base.stubs(:cache_store).returns(new_cache)
+    ActionController::Base.any_instance.stubs(:cache_store).returns(new_cache)
+    previous_perform_caching = ActionController::Base.perform_caching
+    ActionController::Base.stubs(:perform_caching).returns(true)
+    ActionController::Base.any_instance.stubs(:perform_caching).returns(true)
+    if block_given?
+      begin
+        yield
+      ensure
+        Rails.stubs(:cache).returns(previous_cache)
+        ActionController::Base.stubs(:cache_store).returns(previous_cache)
+        ActionController::Base.any_instance.stubs(:cache_store).returns(previous_cache)
+        ActionController::Base.stubs(:perform_caching).returns(previous_perform_caching)
+        ActionController::Base.any_instance.stubs(:perform_caching).returns(previous_perform_caching)
+      end
+    end
   end
 
   # enforce forgery protection, so we can verify usage of the authenticity token
@@ -1039,32 +1089,6 @@ end
       ActionController::Base.stubs(:allow_forgery_protection).returns(old_value)
       ActionController::Base.any_instance.stubs(:allow_forgery_protection).returns(old_value)
     end
-  end
-
-  def start_test_http_server(requests=1)
-    post_lines = []
-    server = TCPServer.open(0)
-    port = server.addr[1]
-    post_lines = []
-    server_thread = Thread.new(server, post_lines) do |server, post_lines|
-      requests.times do
-        client = server.accept
-        content_length = 0
-        loop do
-          line = client.readline
-          post_lines << line.strip unless line =~ /\AHost: localhost:|\AContent-Length: /
-          content_length = line.split(":")[1].to_i if line.strip =~ /\AContent-Length: [0-9]+\z/
-          if line.strip.blank?
-            post_lines << client.read(content_length)
-            break
-          end
-        end
-        client.puts("HTTP/1.1 200 OK\nContent-Length: 0\n\n")
-        client.close
-      end
-      server.close
-    end
-    return server, server_thread, post_lines
   end
 
   def stub_kaltura
@@ -1221,6 +1245,15 @@ end
   def send_multipart(url, post_params = {}, http_headers = {}, method = :post)
     mp = Multipart::Post.new
     query, headers = mp.prepare_query(post_params)
+
+    # A bug in the testing adapter in Rails 3-2-stable doesn't corretly handle
+    # translating this header to the Rack/CGI compatible version:
+    # (https://github.com/rails/rails/blob/3-2-stable/actionpack/lib/action_dispatch/testing/integration.rb#L289)
+    #
+    # This issue is fixed in Rails 4-0 stable, by using a newer version of
+    # ActionDispatch Http::Headers which correctly handles the merge
+    headers = headers.dup.tap { |h| h['CONTENT_TYPE'] ||= h.delete('Content-type') }
+
     send(method, url, query, headers.merge(http_headers))
   end
 
@@ -1367,21 +1400,21 @@ end
 
     @page_view = PageView.new { |p|
       p.assign_attributes({
-          :id => @request_id,
-          :url => "http://test.one/",
-          :session_id => "phony",
-          :context => @context,
-          :controller => opts[:controller] || 'courses',
-          :action => opts[:action] || 'show',
-          :user_request => true,
-          :render_time => 0.01,
-          :user_agent => 'None',
-          :account_id => @account.id,
-          :request_id => request_id,
-          :interaction_seconds => 5,
-          :user => @user,
-          :remote_ip => '192.168.0.42'
-      }, :without_protection => true)
+                              :id => @request_id,
+                              :url => "http://test.one/",
+                              :session_id => "phony",
+                              :context => @context,
+                              :controller => opts[:controller] || 'courses',
+                              :action => opts[:action] || 'show',
+                              :user_request => true,
+                              :render_time => 0.01,
+                              :user_agent => 'None',
+                              :account_id => @account.id,
+                              :request_id => request_id,
+                              :interaction_seconds => 5,
+                              :user => @user,
+                              :remote_ip => '192.168.0.42'
+                          }, :without_protection => true)
     }
     @page_view.save!
     @page_view

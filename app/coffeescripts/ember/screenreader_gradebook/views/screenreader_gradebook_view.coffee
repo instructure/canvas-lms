@@ -9,12 +9,15 @@ define [
   ScreenreaderGradebookView = Ember.View.extend
 
     setupDialog: (->
-      @agDialog = new AssignmentGroupWeightsDialog({context: ENV.GRADEBOOK_OPTIONS, assignmentGroups:[]})
+      @agDialog = new AssignmentGroupWeightsDialog({context: ENV.GRADEBOOK_OPTIONS, assignmentGroups:[], mergeFunction: @mergeObjects})
     ).on('didInsertElement')
 
     removeDialog: (->
       @agDialog.$dialog.dialog('destroy')
     ).on('willDestroyElement')
+
+    mergeObjects: (old_ag, new_ag) ->
+      Ember.setProperties(old_ag, new_ag)
 
     didInsertElement: ->
       #horrible hack to get disabled instead of disabled="disabled" on buttons

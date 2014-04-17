@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -291,6 +291,7 @@ module Api::V1::Assignment
 
     if update_params.has_key?('peer_reviews_assign_at')
       update_params['peer_reviews_due_at'] = update_params['peer_reviews_assign_at']
+      update_params.delete('peer_reviews_assign_at')
     end
 
     if update_params["submission_types"].is_a? Array
@@ -317,9 +318,40 @@ module Api::V1::Assignment
       assignment.muted = value_to_boolean(assignment_params.delete("muted"))
     end
 
+    exception_message = ["invalid due_at",
+                         "assignment_params: #{assignment_params}",
+                         "user: #{@current_user.attributes}",
+                         "account: #{assignment.context.root_account.attributes}",
+                         "course: #{assignment.context.attributes}",
+                         "assignment: #{assignment.attributes}"].join(",\n")
+
     # do some fiddling with due_at for fancy midnight and add to update_params
-    if update_params.has_key?("due_at")
-      update_params["time_zone_edited"] = Time.zone.name
+    # validate that date and times are iso8601 otherwise ignore them, but still
+    # allow clearing them when set to nil
+    if update_params['due_at'].present? && update_params['due_at'] !~ Api::ISO8601_REGEX
+      Api.invalid_time_stamp_error('due_at', exception_message)
+      # todo stop logging and delete invalid dates
+      # update_params.delete(:due_at)
+    elsif update_params.has_key?('due_at')
+      update_params['time_zone_edited'] = Time.zone.name
+    end
+
+    if update_params['lock_at'].present? && update_params['lock_at'] !~ Api::ISO8601_REGEX
+      Api.invalid_time_stamp_error('lock_at', exception_message)
+      # todo stop logging and delete invalid dates
+      # update_params.delete(:lock_at)
+    end
+
+    if update_params['unlock_at'].present? && update_params['unlock_at'] !~ Api::ISO8601_REGEX
+      Api.invalid_time_stamp_error('unlock_at', exception_message)
+      # todo stop logging and delete invalid dates
+      # update_params.delete(:unlock_at)
+    end
+
+    if update_params['peer_reviews_due_at'].present? && update_params['peer_reviews_due_at'] !~ Api::ISO8601_REGEX
+      Api.invalid_time_stamp_error('peer_reviews_due_at', exception_message)
+      # todo stop logging and delete invalid dates
+      # update_params.delete(:peer_reviews_due_at)
     end
 
     if !assignment.context.try(:turnitin_enabled?)

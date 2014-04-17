@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -556,7 +556,6 @@ class RoleOverride < ActiveRecord::Base
       :read_reports => {
         :label => lambda { t('permissions.read_reports', "View usage reports for the course") },
         :available_to => [
-          'StudentEnrollment',
           'TaEnrollment',
           'DesignerEnrollment',
           'TeacherEnrollment',
@@ -643,6 +642,12 @@ class RoleOverride < ActiveRecord::Base
       },
       :view_statistics => {
         :label => lambda { t('permissions.view_statistics', "View statistics") },
+        :account_only => true,
+        :true_for => %w(AccountAdmin),
+        :available_to => %w(AccountAdmin AccountMembership)
+      },
+      :manage_data_exports => {
+        :label => lambda { t('permissions.generate_data_exports', "Generate Data Exports") }, #TODO add this setting to Permissions pane in account/settings.html.erb
         :account_only => true,
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership)

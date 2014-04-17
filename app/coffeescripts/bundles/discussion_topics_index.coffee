@@ -157,9 +157,11 @@ require [
     #
     # Returns nothing.
     moveModel: (model) =>
-      view.collection.remove(model) for key, view of @discussions
-      @discussions[@_modelBucket(model)].collection.add(model)
+      bucket = @discussions[@_modelBucket(model)].collection
+      return if bucket == model.collection
+      model.collection.remove(model)
+      bucket.add(model)
 
   # Start up the page
-  router = new DiscussionIndexRouter
+  @router = new DiscussionIndexRouter
   Backbone.history.start()

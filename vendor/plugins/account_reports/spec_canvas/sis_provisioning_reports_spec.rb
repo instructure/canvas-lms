@@ -194,7 +194,10 @@ describe "Default Account Reports" do
     @enrollment7 = @course2.enroll_user(@user1,'ObserverEnrollment',:enrollment_state => :active,
                                         :associated_user_id => @user3.id)
     @enrollment8 = @course4.enroll_user(@user5,'TeacherEnrollment',:enrollment_state => :active)
-    @enrollment9 = @section1.enroll_user(@user4,'TeacherEnrollment','active')
+    @enrollment9 = @course1.enroll_user(@user4, 'TeacherEnrollment',
+                                        enrollment_state: 'active',
+                                        allow_multiple_enrollments: true,
+                                        section: @section1)
     @enrollment10 = @course1.enroll_user(@user6,'TeacherEnrollment',
                                          :enrollment_state => :completed)
     @enrollment11 = @course2.enroll_user(@user4,'DesignerEnrollment',

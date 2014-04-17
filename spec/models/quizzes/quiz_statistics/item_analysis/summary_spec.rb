@@ -15,6 +15,31 @@ describe Quizzes::QuizStatistics::ItemAnalysis::Summary do
     end
   end
 
+  describe "#buckets" do
+    it "distributes the students accordingly" do
+      simple_quiz_with_submissions %w{T T A},
+        %w{T F B},%w{T F A},%w{F F A},%w{T T A},
+        %w{F T A},%w{T T A},%w{F F B},%w{F T A},
+        %w{F F C},%w{F F A},%w{F T A},%w{T T B},
+        %w{F F B},%w{T F A},%w{F T A},%w{T T A},
+        %w{F T A},%w{F T A},%w{F F B},%w{F T A},
+        %w{F F C},%w{F F A},%w{F T A},%w{T T B},
+        %w{F F C},%w{T T A},%w{F T A},%w{T T B}
+
+
+      summary = Quizzes::QuizStatistics::ItemAnalysis::Summary.new(@quiz)
+      buckets = summary.buckets
+      total = buckets.inject(0) { |num, (k, v)| num += v.size; num}
+      top, middle, bottom = buckets[:top].size/total.to_f, buckets[:middle].size/total.to_f, buckets[:bottom].size/total.to_f
+
+
+      # because of the small sample size, this is slightly off, but close enough for gvt work
+      top.should be_approximately 0.27, 0.02
+      middle.should be_approximately 0.46, 0.05
+      bottom.should be_approximately 0.27, 0.02
+    end
+  end
+
   describe "#add_response" do
     it "should not add unsupported response types" do
       summary.add_response({:question_type => "foo", :answers => []}, 0, 0)

@@ -104,7 +104,7 @@ class GradebooksController < ApplicationController
         @rubric_context = Context.find_by_asset_string(params[:context_code])
       end
       @rubric_associations = @context.sorted_rubrics(@current_user, @rubric_context)
-      render :json => @rubric_associations.map{ |r| r.as_json(methods: [:context_name], include: :rubric) }
+      render :json => @rubric_associations.map{ |r| r.as_json(methods: [:context_name], include: {:rubric => {:include_root => false}}) }
     else
       render :json => @rubric_contexts
     end

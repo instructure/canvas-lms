@@ -22,7 +22,7 @@
       display: block;
     }
   </style>
-  <p>
+  <p aria-hidden="true">
     <a class="icon-question element_toggler"
        aria-controls="gradebook-upload-help"
        data-hide-while-target-shown="true"
@@ -127,6 +127,10 @@
       </tbody>
     </table>
     <p>{{#t "instructions.csv_download_and_upload"}}If in doubt, you can always <a href="{{download_gradebook_csv_url}}">download a CSV</a>, change the grades you want and re-upload the same file.{{/t}}</p>
+  </div>
+
+  <div class="screenreader-only" id="screenreader-csv-explainer">
+      {{#t "screenreader_csv_explainer"}}What should be in my CSV File? The following columns should be in your upload: "Student", "ID", and "Existing Assignment (#)". The Student column should have the name of each student, formatted as Last Name, First Name. For example, "Smith, John". Existing assignment columns should say the assignment name followed by the assignment ID in parentheses. For example, "Chapter One Worksheet (201)". If you use SIS, include the following columns: "SIS User ID" and "SIS Login ID". If you wish to create a new assignment, include a column titled with the name of the assignment. For example, "Derivatives Worksheet". The following columns are optional: "Section", "Current Score", "Final Score".{{/t}}
   </div>
 
   <p style="font-size: 1.2em;">

@@ -253,6 +253,7 @@ define([
     },
     init: function() {
       wikiSidebar.inited = true;
+
       $editor_tabs.find("#pages_accordion a.add").click(function(event){
         event.preventDefault();
         $editor_tabs.find('#new_page_drop_down').slideToggle("fast", function() {

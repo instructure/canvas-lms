@@ -128,8 +128,8 @@ define [
 
       params = {
         'calendar_event[title]': data.title ? @event.title
-        'calendar_event[start_at]': if start_date then $.dateToISO8601UTC($.unfudgeDateForProfileTimezone(start_date)) else ''
-        'calendar_event[end_at]': if end_date then $.dateToISO8601UTC($.unfudgeDateForProfileTimezone(end_date)) else ''
+        'calendar_event[start_at]': if start_date then $.unfudgeDateForProfileTimezone(start_date).toISOString() else ''
+        'calendar_event[end_at]': if end_date then $.unfudgeDateForProfileTimezone(end_date).toISOString() else ''
       }
 
       if @event.isNewEvent()
@@ -137,8 +137,8 @@ define [
         objectData =
           calendar_event:
             title: params['calendar_event[title]']
-            start_at: if start_date then $.dateToISO8601UTC(start_date) else null
-            end_at: if end_date then $.dateToISO8601UTC(end_date) else null
+            start_at: if start_date then start_date.toISOString() else null
+            end_at: if end_date then end_date.toISOString() else null
             context_code: @form.find(".context_id").val()
         newEvent = commonEventFactory(objectData, @event.possibleContexts())
         newEvent.save(params)

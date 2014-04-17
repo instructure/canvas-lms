@@ -25,7 +25,7 @@ define [
       show_end: @get('permissions')['initiate'] && @get('started_at') && @get('long_running')
 
     schedule_data: ->
-      scheduled: 'scheduled_date' in @get('user_settings')
+      scheduled: 'scheduled_date' of @get('user_settings')
       scheduled_at: @get('user_settings').scheduled_date
 
     toJSON: ->

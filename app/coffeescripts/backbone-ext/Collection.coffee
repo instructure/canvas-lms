@@ -1,10 +1,9 @@
 define [
-  'use!vendor/backbone'
+  'vendor/backbone'
   'underscore'
   'compiled/util/mixin'
   'compiled/backbone-ext/DefaultUrlMixin'
 ], (Backbone, _, mixin, DefaultUrlMixin) ->
-
   class Backbone.Collection extends Backbone.Collection
     ##
     # Mixes in objects to a model's definition, being mindful of certain

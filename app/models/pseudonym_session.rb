@@ -53,21 +53,40 @@ class PseudonymSession < Authlogic::Session::Base
     end
   end
 
-  # modifications to authlogic's cookie persistence (used for the "remember me" token)
-  # see the SessionPersistenceToken class for details
-  #
-  # also, the version of authlogic canvas is on doesn't support httponly (or
-  # secure-only) for the "remember me" cookie yet, so we add that support here.
-  def save_cookie
-    return unless remember_me?
-    token = SessionPersistenceToken.generate(record)
-    controller.cookies[cookie_key] = {
-      :value => token.pseudonym_credentials,
-      :expires => remember_me_until,
-      :domain => controller.cookie_domain,
-      :httponly => true,
-      :secure => controller.request.session_options[:secure],
-    }
+  if CANVAS_RAILS2
+    # modifications to authlogic's cookie persistence (used for the "remember me" token)
+    # see the SessionPersistenceToken class for details
+    #
+    # also, the version of authlogic canvas is on doesn't support httponly (or
+    # secure-only) for the "remember me" cookie yet, so we add that support here.
+    def save_cookie
+      return unless remember_me?
+      token = SessionPersistenceToken.generate(record)
+      controller.cookies[cookie_key] = {
+        :value => token.pseudonym_credentials,
+        :expires => remember_me_until,
+        :domain => controller.cookie_domain,
+        :httponly => true,
+        :secure => controller.request.session_options[:secure],
+      }
+    end
+  else
+    secure CanvasRails::Application.config.session_options[:secure]
+    httponly true
+
+    # modifications to authlogic's cookie persistence (used for the "remember me" token)
+    # see the SessionPersistenceToken class for details
+    def save_cookie
+      return unless remember_me?
+      token = SessionPersistenceToken.generate(record)
+      controller.cookies[cookie_key] = {
+        :value => token.pseudonym_credentials,
+        :expires => remember_me_until,
+        :domain => controller.cookie_domain,
+        :httponly => httponly,
+        :secure => secure,
+      }
+    end
   end
 
   def persist_by_cookie

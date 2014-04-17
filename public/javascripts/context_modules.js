@@ -28,7 +28,7 @@ define([
   'compiled/models/Publishable',
   'compiled/views/PublishButtonView',
   'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.instructure_date_and_time' /* parseFromISO, time_field, datetime_field */,
+  'jquery.instructure_date_and_time' /* dateString, datetimeString, time_field, datetime_field */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, formErrors, errorBox */,
   'jqueryui/dialog',
   'compiled/jquery/fixDialogButtons' /* fix dialog formatting */,
@@ -224,10 +224,10 @@ define([
             $context_module_item = $("#context_module_item_" + id);
             var data = {};
             if (info["points_possible"] != null) {
-              data["points_possible_display"] = I18n.t('points_possible_short', '%{points} pts', { 'points': "<span class='points_possible_block'>" + info["points_possible"] + "</span>" });
+              data["points_possible_display"] = I18n.t('points_possible_short', '%{points} pts', { 'points': "" + info["points_possible"]});
             }
             if (info["due_date"] != null) {
-              data["due_date_display"] = $.parseFromISO(info["due_date"]).date_formatted
+              data["due_date_display"] = $.dateString(info["due_date"])
             } else if (info["vdd_tooltip"] != null) {
               info['vdd_tooltip']['link_href'] = $context_module_item.find('a.title').attr('href');
               $context_module_item.find('.due_date_display').html(vddTooltipView(info["vdd_tooltip"]));
@@ -495,7 +495,7 @@ define([
 
     // -------- BINDING THE UPDATE EVENT -----------------
     $(".context_module").bind('update', function(event, data) {
-      data.context_module.unlock_at = $.parseFromISO(data.context_module.unlock_at).datetime_formatted;
+      data.context_module.unlock_at = $.datetimeString(data.context_module.unlock_at);
       var $module = $("#context_module_" + data.context_module.id);
       $module.attr('aria-label', data.context_module.name);
       $module.find(".header").fillTemplateData({
@@ -693,9 +693,7 @@ define([
       var $option = $(this).parents(".completion_criterion_option");
       $option.find(".min_score_box").showIf($(this).val() == 'min_score');
       var id = $option.find(".id").val();
-      var points_possible = $.trim($("#context_module_item_" + id + " .points_possible").text()) ||
-          // for some reason the previous did not have anything in it sometimes (noticed when you are dealing with a newly added module)
-          $.trim($("#context_module_item_" + id + " .points_possible_block").text());
+      var points_possible = $.trim($("#context_module_item_" + id + " .points_possible_display").text().split(' ')[0]);
       if(points_possible.length > 0) {
         $option.find(".points_possible").text(points_possible);
         $option.find(".points_possible_parent").show();
@@ -770,7 +768,7 @@ define([
         var $module = $("#context_module_" + data.content_tag.context_module_id);
         var $item = modules.addItemToModule($module, data.content_tag);
         $module.find(".context_module_items.ui-sortable").sortable('refresh');
-        if (data.content_tag.content_id != 0) {
+        if (data.content_tag.content_id != 0 && data.content_tag.content_type != 'ContextExternalTool') {
           modules.updateAllItemInstances(data.content_tag);
         }
         modules.updateAssignmentData();

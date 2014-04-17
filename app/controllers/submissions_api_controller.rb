@@ -201,8 +201,9 @@ class SubmissionsApiController < ApplicationController
         result << hash
       end
     else
-      submissions = @context.submissions.except(:order).where(:user_id => student_ids).includes(:user).order(:id)
+      submissions = @context.submissions.except(:order).where(:user_id => student_ids).order(:id)
       submissions = submissions.where(:assignment_id => assignments) unless assignments.empty?
+      submissions = CANVAS_RAILS2 ? submissions.includes(:user) : submissions.preload(:user)
       submissions = Api.paginate(submissions, self, polymorphic_url([:api_v1, @section || @context, :student_submissions]))
       Submission.bulk_load_versioned_attachments(submissions)
       result = submissions.map do |s|

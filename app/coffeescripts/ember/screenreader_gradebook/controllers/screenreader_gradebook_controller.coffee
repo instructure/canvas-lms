@@ -7,10 +7,11 @@ define [
   'i18n!sr_gradebook'
   'ember'
   'underscore'
+  'timezone'
   'compiled/AssignmentDetailsDialog'
   'compiled/AssignmentMuter'
   'compiled/grade_calculator'
-  ], (ajax, round, userSettings, fetchAllPages, parseLinkHeader, I18n, Ember, _,  AssignmentDetailsDialog, AssignmentMuter, GradeCalculator ) ->
+  ], (ajax, round, userSettings, fetchAllPages, parseLinkHeader, I18n, Ember, _, tz, AssignmentDetailsDialog, AssignmentMuter, GradeCalculator ) ->
 
   {get, set, setProperties} = Ember
 
@@ -53,7 +54,7 @@ define [
 
     contextUrl: get(window, 'ENV.GRADEBOOK_OPTIONS.context_url')
 
-    downloadUrl: (->
+    downloadCsvUrl: (->
       "#{@get('contextUrl')}/gradebook.csv"
     ).property()
 
@@ -178,7 +179,7 @@ define [
 
     calculateAllGrades: (->
       @get('students').forEach (student) => @calculateStudentGrade student
-    ).observes('includeUngradedAssignments','groupsAreWeighted')
+    ).observes('includeUngradedAssignments','groupsAreWeighted', 'assignment_groups.@each.group_weight')
 
     setFinalGradeDisplay: (->
       @get('students').forEach (student) =>
@@ -381,7 +382,7 @@ define [
     ).observes('submissions.@each')
 
     updateSubmission: (submission, student) ->
-      submission.submitted_at = Ember.$.parseFromISO(submission.submitted_at) if submission.submitted_at
+      submission.submitted_at = tz.parse(submission.submitted_at)
       set(student, "assignment_#{submission.assignment_id}", submission)
 
     assignments: Ember.ArrayProxy.createWithMixins(Ember.SortableMixin,
@@ -398,8 +399,9 @@ define [
       set as, 'ag_position', assignmentGroup.position
       set as, 'noPointsPossibleWarning', assignmentGroup.invalid
       if as.due_at
-        set as, 'due_at', Ember.$.parseFromISO(as.due_at)
-        set as, 'sortable_date', as.due_at.timestamp
+        due_at = tz.parse(as.due_at)
+        set as, 'due_at', due_at
+        set as, 'sortable_date', +due_at / 1000
       else
         set as, 'sortable_date', Number.MAX_VALUE
 
@@ -535,6 +537,31 @@ define [
       }
       locals
     ).property('selectedAssignment', 'students.@each.total_grade')
+
+    assignmentSubmissionTypes: (->
+      types = @get('selectedAssignment.submission_types')
+      submissionTypes = @get('submissionTypes')
+      if types == undefined || types.length == 0
+        submissionTypes['none']
+      else if types.length == 1
+        submissionTypes[types[0]]
+      else
+        result = []
+        types.forEach (type) -> result.push(submissionTypes[type])
+        result.join(', ')
+    ).property('selectedAssignment')
+
+    submissionTypes: {
+      'discussion_topic': I18n.t 'discussion_topic', 'Discussion topic'
+      'online_quiz': I18n.t 'online_quiz', 'Online quiz'
+      'on_paper': I18n.t 'on_paper', 'On paper'
+      'none': I18n.t 'none', 'None'
+      'external_tool': I18n.t 'external_tool', 'External tool'
+      'online_text_entry': I18n.t 'online_text_entry', 'Online text entry'
+      'online_url': I18n.t 'online_url', 'Online URL'
+      'online_upload': I18n.t 'online_upload', 'Online upload'
+      'media_recording': I18n.t 'media_recordin', 'Media recording'
+    }
 
     # Next/Previous Student/Assignment
 

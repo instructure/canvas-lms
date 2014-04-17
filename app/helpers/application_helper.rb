@@ -73,17 +73,21 @@ module ApplicationHelper
       image_tag "messages/avatar-50.png"
     else
       avatar_settings = @domain_root_account && @domain_root_account.settings[:avatars] || 'enabled'
-      image_url, alt_tag = Rails.cache.fetch(Cacher.inline_avatar_cache_key(user_id, avatar_settings)) do
-        if !user && user_id.to_i > 0
-          user = User.find(user_id)
+      user_id, user_shard = Shard.local_id_for(user_id)
+      user_shard ||= Shard.current
+      image_url, alt_tag = user_shard.activate do
+        Rails.cache.fetch(Cacher.inline_avatar_cache_key(user_id, avatar_settings)) do
+          if !user && user_id.to_i > 0
+            user = User.find(user_id)
+          end
+          if user
+            url = avatar_url_for_user(user)
+          else
+            url = "messages/avatar-50.png"
+          end
+          alt = user ? user.short_name : ''
+          [url, alt]
         end
-        if user
-          url = avatar_url_for_user(user)
-        else
-          url = "messages/avatar-50.png"
-        end
-        alt = user ? user.short_name : ''
-        [url, alt]
       end
       image_tag(image_url,
         :style => "width: #{width}px; min-height: #{(width/1.6).to_i}px; max-height: #{(width*1.6).to_i}px",
@@ -491,7 +495,7 @@ module ApplicationHelper
     global_inst_object = { :environment =>  Rails.env }
     {
       :allowMediaComments       => Kaltura::ClientV3.config && @context.try_rescue(:allow_media_comments?),
-      :kalturaSettings          => Kaltura::ClientV3.config.try(:slice, 'domain', 'resource_domain', 'rtmp_domain', 'partner_id', 'subpartner_id', 'player_ui_conf', 'player_cache_st', 'kcw_ui_conf', 'upload_ui_conf', 'max_file_size_bytes', 'do_analytics', 'do_flash_var_test'),
+      :kalturaSettings          => Kaltura::ClientV3.config.try(:slice, 'domain', 'resource_domain', 'rtmp_domain', 'partner_id', 'subpartner_id', 'player_ui_conf', 'player_cache_st', 'kcw_ui_conf', 'upload_ui_conf', 'max_file_size_bytes', 'do_analytics', 'use_alt_record_widget', 'hide_rte_button', 'js_uploader'),
       :equellaEnabled           => !!equella_enabled?,
       :googleAnalyticsAccount   => Setting.get('google_analytics_key', nil),
       :http_status              => @status,
@@ -507,6 +511,7 @@ module ApplicationHelper
       # dont worry about keys that are nil or false because in javascript: if (INST.featureThatIsUndefined ) { //won't happen }
       global_inst_object[key] = value if value
     end
+
     global_inst_object
   end
 
@@ -865,5 +870,13 @@ module ApplicationHelper
         '**' => link_to('\1', @domain_root_account.privacy_policy_url, target: '_blank')
       }
     )
+  end
+
+  def dashboard_url(opts={})
+    @domain_root_account.settings[:dashboard_url] || super(opts)
+  end
+
+  def dashboard_path(opts={})
+    @domain_root_account.settings[:dashboard_url] || super(opts)
   end
 end

@@ -1,5 +1,8 @@
 <% context ||= @context; asset ||= nil %>
 <% if context && context.is_a?(Course) && asset && @headers != false %>
+ <% if context.feature_enabled?(:draft_state) %>
+  <div id="sequence_footer" class="draft_state_enabled" data-course-id="<%= context.id %>" data-asset-id="<%= asset.id %>" data-asset-type="<%= Api::API_DATA_TYPE[asset.class.to_s] || asset.class.to_s %>"></div>
+ <% else %>
   <div id="sequence_footer" style="display: none;">
     <a class="prev btn" href="#">
       <i class="icon-arrow-left"></i> <span class="text"><%= t(:previous, "Previous") %></span>
@@ -17,4 +20,5 @@
     </div>
     <div class="clear"></div>
   </div>
+ <% end %>
 <% end %>

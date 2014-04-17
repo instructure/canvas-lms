@@ -1,5 +1,6 @@
 define [
   'jquery'
+  'timezone'
   'underscore'
   'Backbone'
   'compiled/str/splitAssetString'
@@ -9,7 +10,7 @@ define [
   'compiled/views/wiki/WikiPageReloadView'
   'compiled/views/PublishButtonView'
   'i18n!pages'
-], ($, _, Backbone, splitAssetString, template, StickyHeaderMixin, WikiPageDeleteDialog, WikiPageReloadView, PublishButtonView, I18n) ->
+], ($, tz, _, Backbone, splitAssetString, template, StickyHeaderMixin, WikiPageDeleteDialog, WikiPageReloadView, PublishButtonView, I18n) ->
 
   class WikiPageView extends Backbone.View
 
@@ -111,9 +112,9 @@ define [
 
       json.lock_info = _.clone(json.lock_info) if json.lock_info
       if json.lock_info?.unlock_at
-        json.lock_info.unlock_at = if Date.parse(json.lock_info.unlock_at) < Date.now()
+        json.lock_info.unlock_at = if tz.parse(json.lock_info.unlock_at) < new Date()
           null
         else
-          $.parseFromISO(json.lock_info.unlock_at).datetime_formatted
+          $.datetimeString(json.lock_info.unlock_at)
 
       json

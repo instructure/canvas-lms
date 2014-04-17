@@ -7,5 +7,12 @@ describe "Converting QTI items" do
 
     question[:question_text].should == 'MC - multiple correct with multiple selection. C and D are correct'
   end
+
+  it "should sanitize InstructureMetadata" do
+    file_path = File.join(BASE_FIXTURE_DIR, 'qti')
+    question = get_question_hash(file_path, 'sanitize_metadata')
+    question[:question_bank_name].should eql 'Sad & Broken'
+    question[:question_text].should_not =~ /divp/
+  end
 end
 end

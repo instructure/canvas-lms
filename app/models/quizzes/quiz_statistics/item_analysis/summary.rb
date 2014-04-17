@@ -29,7 +29,7 @@ class Quizzes::QuizStatistics::ItemAnalysis::Summary
     @options = options
     @options[:buckets] ||= [
       [:bottom, 0.27],
-      [:middle, 0.63],
+      [:middle, 0.73],
       [:top, 1]
     ]
 
