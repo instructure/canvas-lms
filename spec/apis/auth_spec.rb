@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -271,7 +271,10 @@ describe "API Authentication", type: :request do
           cas = CASClient::Client.new(:cas_base_url => account.account_authorization_config.auth_base)
           cas.instance_variable_set(:@stub_user, @user)
           def cas.validate_service_ticket(st)
-            st.response = CASClient::ValidationResponse.new("yes\n#{@stub_user.pseudonyms.first.unique_id}\n")
+            response = CASClient::ValidationResponse.new("yes\n#{@stub_user.pseudonyms.first.unique_id}\n")
+            st.user = response.user
+            st.success = response.is_success?
+            return st
           end
           CASClient::Client.stubs(:new).returns(cas)
 
