@@ -336,9 +336,16 @@ class ContentMigration < ActiveRecord::Base
   alias_method :export_content, :queue_migration
 
   def set_default_settings
-    if !migration_settings.has_key?(:overwrite_quizzes)
-      migration_settings[:overwrite_quizzes] = for_course_copy? || (self.migration_type && self.migration_type == 'canvas_cartridge_importer')
+    if self.context && self.context.respond_to?(:root_account) && account = self.context.root_account
+      if default_ms = account.settings[:default_migration_settings]
+        self.migration_settings = default_ms.merge(self.migration_settings).with_indifferent_access
+      end
     end
+
+    if !self.migration_settings.has_key?(:overwrite_quizzes)
+      self.migration_settings[:overwrite_quizzes] = for_course_copy? || (self.migration_type && self.migration_type == 'canvas_cartridge_importer')
+    end
+
     check_quiz_id_prepender
   end
 
