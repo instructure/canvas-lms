@@ -26,7 +26,7 @@ describe FacebookController do
   describe "get_facebook_user" do
     before do
       # avoid making actual requests
-      Facebook.stubs(:send_request => '', :send_graph_request => '')
+      Facebook.stubs(:send_graph_request => '')
     end
 
     def signed_request(data={})

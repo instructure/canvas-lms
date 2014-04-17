@@ -29,9 +29,9 @@ describe Facebook do
   it 'should increment the app counter' do
     Facebook.
       expects(:send_graph_request).
-      with('12345/apprequests', :post, facebook_service,
-        message: 'You have a new message from Canvas').
+      with('12345/apprequests', :post, facebook_service.token,
+        message: 'some message').
       returns(true)
-    Facebook.dashboard_increment_count(facebook_service)
+    Facebook.dashboard_increment_count(facebook_service.service_user_id, facebook_service.token, 'some message')
   end
 end

@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Facebook
+class Facebook
   API_URL   = 'https://api.facebook.com'
   GRAPH_URL = 'https://graph.facebook.com'
 
@@ -28,38 +28,14 @@ module Facebook
     [data, sig == generated_sig ? sig : nil]
   end
   
-  def self.dashboard_increment_count(service)
-    path = "#{service.service_user_id}/apprequests"
-    msg  = I18n.t(:new_facebook_message, 'You have a new message from Canvas')
-    send_graph_request(path, :post, service, message: msg)
+  def self.dashboard_increment_count(user_id, token, msg)
+    path = "#{user_id}/apprequests"
+    send_graph_request(path, :post, token, message: msg)
   end
-  
-  def self.protocol
-    "http#{config['disable_ssl'] ? '' : 's'}"
-  end
-  
-  def self.authorize_url(oauth_request)
+
+  def self.authorize_url(state)
     callback_url = "#{protocol}://#{config['canvas_domain']}/facebook_success.html"
-    state = Canvas::Security.encrypt_password(oauth_request.global_id.to_s, 'facebook_oauth_request').join('.')
     "https://www.facebook.com/dialog/oauth?client_id=#{config['app_id']}&redirect_uri=#{CGI.escape(callback_url)}&response_type=token&scope=offline_access&state=#{CGI.escape(state)}"
-  end
-  
-  def self.oauth_request_id(state)
-    key,salt = state.split('.', 2)
-    request_id = Canvas::Security.decrypt_password(key, salt, 'facebook_oauth_request')
-  end
-  
-  def self.authorize_success(user, token)
-    @service = UserService.find_by_user_id_and_service(user.id, 'facebook')
-    @service ||= UserService.new(:user => user, :service => 'facebook')
-    @service.token = token
-    data = send_graph_request('/me', :get, @service)
-    return nil unless data
-    @service.service_user_id = data['id']
-    @service.service_user_name = data['name']
-    @service.service_user_url = data['link']
-    @service.save
-    @service
   end
   
   def self.app_url
@@ -93,8 +69,8 @@ module Facebook
     end
   end
   
-  def self.send_graph_request(path, method, service, params = {})
-    params[:access_token] = service.token
+  def self.send_graph_request(path, method, token, params = {})
+    params[:access_token] = token
     query_string          = ActionController::Routing::Route.new.build_query_string(params)
     uri                   = URI("#{GRAPH_URL}/#{path}#{query_string}")
     client                = Net::HTTP.new(uri.host, uri.port)
@@ -114,22 +90,13 @@ module Facebook
       body
     end
   end
-  
-  def self.send_request(method, service, params)
-    params[:format] = 'json'
-    params[:access_token] = service.token if service
-    url = "#{API_URL}/method/#{method}" + ActionController::Routing::Route.new.build_query_string(params)
-    uri = URI.parse(url)
-    http = Net::HTTP.new(uri.host, uri.port)
-    http.use_ssl = true
-    tmp_url = uri.path+"?"+uri.query
-    request = Net::HTTP::Get.new(tmp_url)
-    response = http.request(request)
-    response.body
-  end
-  
+
   def self.config
     res = Canvas::Plugin.find(:facebook).try(:settings)
     res && res['app_id'] ? res : nil
+  end
+
+  def self.protocol
+    "http#{config['disable_ssl'] ? '' : 's'}"
   end
 end

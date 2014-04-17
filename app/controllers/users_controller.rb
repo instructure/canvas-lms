@@ -190,7 +190,8 @@ class UsersController < ApplicationController
         :user => @current_user,
         :original_host_with_port => request.host_with_port
       )
-      redirect_to Facebook.authorize_url(oauth_request)
+      state = Canvas::Security.encrypt_password(oauth_request.global_id.to_s, 'facebook_oauth_request').join('.')
+      redirect_to Facebook.authorize_url(state)
     end
   end
 
@@ -199,7 +200,10 @@ class UsersController < ApplicationController
     if params[:oauth_token]
       oauth_request = OauthRequest.find_by_token_and_service(params[:oauth_token], params[:service])
     elsif params[:state] && params[:service] == 'facebook'
-      oauth_request = OauthRequest.find_by_id(Facebook.oauth_request_id(params[:state]))
+      key,salt = params[:state].split('.', 2)
+      request_id = Canvas::Security.decrypt_password(key, salt, 'facebook_oauth_request')
+
+      oauth_request = OauthRequest.find_by_id(request_id)
     end
 
     if !oauth_request || (request.host_with_port == oauth_request.original_host_with_port && oauth_request.user != @current_user)
@@ -210,8 +214,18 @@ class UsersController < ApplicationController
       redirect_to url
     else
       if params[:service] == "facebook"
-        service = Facebook.authorize_success(@current_user, params[:access_token])
-        if service
+        service = UserService.find_by_user_id_and_service(@current_user.id, 'facebook')
+        service ||= UserService.new(:user => @current_user, :service => 'facebook')
+        service.token = params[:access_token]
+        data = Facebook.send_graph_request('/me', :get, service.token)
+
+        if data
+          service.service_user_id = data['id']
+          service.service_user_name = data['name']
+          service.service_user_url = data['link']
+          service.save
+          service
+
           flash[:notice] = t('facebook_added', "Facebook account successfully added!")
         else
           flash[:error] = t('facebook_fail', "Facebook authorization failed.")
