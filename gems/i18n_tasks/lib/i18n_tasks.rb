@@ -9,4 +9,6 @@ module I18nTasks
   require "i18n_tasks/lolcalize"
   require "i18n_tasks/utils"
   require "i18n_tasks/i18n_import"
+
+  require_relative "i18n_tasks/railtie" if defined?(Rails) && CANVAS_RAILS3
 end
