@@ -2,7 +2,8 @@ define [
   'timezone'
   'vendor/timezone/America/Detroit'
   'vendor/timezone/fr_FR'
-], (tz, detroit, french)->
+  'vendor/timezone/pt_PT'
+], (tz, detroit, french, portuguese)->
   module 'timezone',
     setup: ->
       @snapshot = tz.snapshot()
@@ -53,6 +54,19 @@ define [
 
   test 'format() should return null if the format string is unrecognized', ->
     equal tz.format(moonwalk, 'bogus'), null
+
+  test "format() should preserve 12-hour+am/pm if the locale does define am/pm", ->
+    time = tz.parse('1969-07-21 15:00:00')
+    equal tz.format(time, '%-l%P'), "3pm"
+    equal tz.format(time, '%I%P'), "03pm"
+    equal tz.format(time, '%r'), "03:00:00 PM"
+
+  test "format() should promote 12-hour+am/pm into 24-hour if the locale doesn't define am/pm", ->
+    time = tz.parse('1969-07-21 15:00:00')
+    tz.changeLocale(french, 'fr_FR')
+    equal tz.format(time, '%-l%P'), "15"
+    equal tz.format(time, '%I%P'), "15"
+    equal tz.format(time, '%r'), "15:00:00"
 
   test 'shift() should adjust the date as appropriate', ->
     equal +tz.shift(moonwalk, '-1 day'), moonwalk - 86400000
