@@ -77,6 +77,7 @@ class Assignment < ActiveRecord::Base
   validates_associated :external_tool_tag, :if => :external_tool?
   validate :validate_draft_state_change, :if => :workflow_state_changed?
   validate :group_category_changes_ok?
+  validate :positive_points_possible?
 
   accepts_nested_attributes_for :external_tool_tag, :update_only => true, :reject_if => proc { |attrs|
     # only accept the url and new_tab params, the other accessible
@@ -96,6 +97,18 @@ class Assignment < ActiveRecord::Base
       end
     end
     true
+  end
+
+  def positive_points_possible?
+    return if self.points_possible.to_i >= 0
+    return unless self.points_possible_changed?
+    errors.add(
+      :points_possible,
+      I18n.t(
+        "invalid_points_possible",
+        "The value of possible points for this assigment must be zero or greater."
+      )
+    )
   end
 
   def group_category_changes_ok?

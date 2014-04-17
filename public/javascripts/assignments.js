@@ -73,7 +73,9 @@ define([
     $(".assignment_group_count").text(I18n.t('assignment_groups_count', "Group", {count: assignmentGroupCount}));
   }
   function editAssignment($assignment) {
-    hideAssignmentForm();
+    if ($assignment.attr('id') != "assignment_new") {
+      hideAssignmentForm();
+    }
     $assignment.find(".content").hide()
       .before($("#add_assignment_form").show());
     $assignment.addClass('editing');
@@ -123,7 +125,7 @@ define([
     if(due_at) {
       data.due_at = due_at.toString($.datetime.defaultFormat);
     }
-    if(id == 'assignment_new') {
+    if (id == 'assignment_new') {
       if(defaultShowDateOptions) {
         $form.find(".date_options").show();
         $form.find(".show_date_link").hide();
@@ -269,7 +271,7 @@ define([
     var oldData = $assignment.getTemplateData({
       textValues: ['multiple_due_dates']
     });
-    if((id == 'assignment_new' || id == 'assignment_creating')) {
+    if (id == 'assignment_new') {
       updateAssignmentCounts();
     }
     if (oldData.multiple_due_dates === 'true') {
@@ -294,9 +296,9 @@ define([
       assignment.timestamp = 0;
     }
     var isNew = false;
-    if($assignment.attr('id') == 'assignment_creating') {
+    if ($assignment.attr('id') == "assignment_new") {
       isNew = true;
-    }
+    };
     $assignment.fillTemplateData({
       id: "assignment_" + assignment.id,
       data: assignment,
@@ -881,19 +883,24 @@ define([
         //$("html,body").scrollToVisible($assignment);
 
         var isNew = false;
-        if($assignment.attr('id') == "assignment_new") {
+        if ($assignment.attr('id') == "assignment_new") {
           isNew = true;
-          $assignment.attr('id', "assignment_creating");
+        } else {
+          hideAssignmentForm();
         }
-        hideAssignmentForm();
         return $assignment;
       },
       success: function(data, $assignment) {
         $(document).triggerHandler('assignment_update');
+        $assignment.loadingImage('remove');
+        hideAssignmentForm();
         updateAssignment($assignment, data);
+        $assignment.fillTemplateData({ data: data });
         $assignment.find('a.title').focus();
       },
       error: function(data, $assignment) {
+        $assignment.loadingImage('remove');
+        editAssignment($assignment);
       }
     });
     $("#add_assignment_form .cancel_button").click(function() {

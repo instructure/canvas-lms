@@ -160,7 +160,7 @@ describe Assignment do
       @assignment.reload
       @assignment.needs_grading_count.should eql(0)
     end
-  
+
     it "should update when enrollment changes" do
       setup_assignment_with_homework
       @assignment.needs_grading_count.should eql(1)
@@ -173,29 +173,29 @@ describe Assignment do
       e.accept
       @assignment.reload
       @assignment.needs_grading_count.should eql(1)
-  
+
       # multiple enrollments should not cause double-counting (either by creating as or updating into "active")
       section2 = @course.course_sections.create!(:name => 's2')
-      e2 = @course.enroll_student(@user, 
+      e2 = @course.enroll_student(@user,
                                   :enrollment_state => 'invited',
                                   :section => section2,
                                   :allow_multiple_enrollments => true)
       e2.accept
       section3 = @course.course_sections.create!(:name => 's2')
-      e3 = @course.enroll_student(@user, 
-                                  :enrollment_state => 'active', 
+      e3 = @course.enroll_student(@user,
+                                  :enrollment_state => 'active',
                                   :section => section3,
                                   :allow_multiple_enrollments => true)
       @user.enrollments.where(:workflow_state => 'active').count.should eql(3)
       @assignment.reload
       @assignment.needs_grading_count.should eql(1)
-  
+
       # and as long as one enrollment is still active, the count should not change
       e2.destroy
       e3.complete
       @assignment.reload
       @assignment.needs_grading_count.should eql(1)
-  
+
       # ok, now gone for good
       e.destroy
       @assignment.reload
@@ -720,7 +720,7 @@ describe Assignment do
       lambda {
         sub = yield(@assignment, @user)
       }.should_not raise_error
-      
+
       sub.should_not be_new_record
       sub.should eql real_sub
     end
@@ -2781,6 +2781,45 @@ describe Assignment do
       @assignment.description = 'blah'
       @assignment.save!
     end
+  end
+
+  describe "basic validation" do
+
+    describe "possible points" do
+
+      it "does not allow a negative value" do
+        assignment = Assignment.new(points_possible: -1)
+        assignment.valid?
+        assignment.errors.keys.include?(:points_possible).should be_true
+      end
+
+      it "allows a nil value" do
+        assignment = Assignment.new(points_possible: nil)
+        assignment.valid?
+        assignment.errors.keys.include?(:points_possible).should be_false
+      end
+
+      it "allows a 0 value" do
+        assignment = Assignment.new(points_possible: 0)
+        assignment.valid?
+        assignment.errors.keys.include?(:points_possible).should be_false
+      end
+
+      it "allows a positive value" do
+        assignment = Assignment.new(points_possible: 13)
+        assignment.valid?
+        assignment.errors.keys.include?(:points_possible).should be_false
+      end
+
+      it "does not attempt validation unless points_possible has changed" do
+        assignment = Assignment.new(points_possible: -13)
+        assignment.stubs(:points_possible_changed?).returns(false)
+        assignment.valid?
+        assignment.errors.keys.include?(:points_possible).should be_false
+      end
+
+    end
+
   end
 
   describe "group category validation" do
