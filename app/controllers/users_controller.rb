@@ -147,7 +147,7 @@ class UsersController < ApplicationController
     elsif params[:service] == "twitter"
       redirect_to twitter_request_token_url(return_to_url)
     elsif params[:service] == "linked_in"
-      linkedin_connection = LinkedIn.new
+      linkedin_connection = LinkedIn::Connection.new
 
       request_token = linkedin_connection.request_token(oauth_success_url(:service => 'linked_in'))
 
@@ -207,11 +207,11 @@ class UsersController < ApplicationController
         end
       elsif params[:service] == "linked_in"
         begin
-          linkedin_connection = LinkedIn.new
+          linkedin_connection = LinkedIn::Connection.new
           token = session.delete(:oauth_linked_in_request_token_token)
           secret = session.delete(:oauth_linked_in_request_token_secret)
           access_token = linkedin_connection.get_access_token(token, secret, params[:oauth_verifier])
-          service_user_id, service_user_name, service_user_url = linkedin_connection.get_service_user(access_token)
+          service_user_id, service_user_name, service_user_url = linkedin_connection.get_service_user_info(access_token)
 
           if oauth_request.user
             UserService.register(

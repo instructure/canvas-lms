@@ -1283,7 +1283,7 @@ class ApplicationController < ActionController::Base
       elsif feature == :facebook
         !!Facebook.config
       elsif feature == :linked_in
-        !!LinkedIn.config
+        !!LinkedIn::Connection.config
       elsif feature == :google_docs
         !!GoogleDocs.config
       elsif feature == :etherpad

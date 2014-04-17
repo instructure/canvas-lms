@@ -1141,7 +1141,7 @@ class Account < ActiveRecord::Base
       :linked_in => {
         :name => t("account_settings.linked_in", "LinkedIn"), 
         :description => "",
-        :expose_to_ui => (LinkedIn.config ? :service : false)
+        :expose_to_ui => (LinkedIn::Connection.config ? :service : false)
       },
       :twitter => {
         :name => t("account_settings.twitter", "Twitter"), 

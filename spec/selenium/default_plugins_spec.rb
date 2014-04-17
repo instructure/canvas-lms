@@ -95,7 +95,7 @@ describe "default plugins" do
     settings = Canvas::Plugin.find(:linked_in).try(:settings)
     settings.should be_nil
 
-    LinkedIn.stubs(:config_check).returns("Bad check")
+    LinkedIn::Connection.stubs(:config_check).returns("Bad check")
     get "/plugins/linked_in"
 
     multiple_accounts_select
@@ -107,7 +107,7 @@ describe "default plugins" do
 
     assert_flash_error_message /There was an error/
 
-    LinkedIn.stubs(:config_check).returns(nil)
+    LinkedIn::Connection.stubs(:config_check).returns(nil)
     submit_form('#new_plugin_setting')
     wait_for_ajax_requests
 

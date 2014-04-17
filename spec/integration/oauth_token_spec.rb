@@ -26,7 +26,12 @@ describe integration do
 
   def oauth_start(integration)
     UsersController.any_instance.expects(:feature_and_service_enabled?).with(integration.underscore).returns(true)
-    integration.constantize.expects(:config).at_least_once.returns({})
+    if integration == "LinkedIn"
+      LinkedIn::Connection.expects(:config).at_least_once.returns({})
+    else
+      integration.constantize.expects(:config).at_least_once.returns({})
+    end
+
     # mock up the response from the 3rd party service, so we don't actually contact it
     OAuth::Consumer.any_instance.expects(:token_request).returns({:oauth_token => "test_token", :oauth_token_secret => "test_secret", :authorize_url => "http://oauth.example.com/start"})
     OAuth::RequestToken.any_instance.expects(:authorize_url).returns("http://oauth.example.com/start")
@@ -91,7 +96,7 @@ describe integration do
       if integration == "GoogleDocs"
         GoogleDocs.any_instance.expects(:get_service_user).with(instance_of(OAuth::AccessToken)).returns(["test_user_id", "test_user_name"])
       elsif integration == "LinkedIn"
-        LinkedIn.any_instance.expects(:get_service_user).with(instance_of(OAuth::AccessToken)).returns(["test_user_id", "test_user_name"])
+        LinkedIn::Connection.any_instance.expects(:get_service_user_info).with(instance_of(OAuth::AccessToken)).returns(["test_user_id", "test_user_name"])
       else
         UsersController.any_instance.expects("#{integration.underscore}_get_service_user").with(instance_of(OAuth::AccessToken)).returns(["test_user_id", "test_user_name"])
       end
@@ -118,7 +123,7 @@ describe integration do
       if integration == "GoogleDocs"
         GoogleDocs.any_instance.expects(:get_service_user).with(instance_of(OAuth::AccessToken)).raises(RuntimeError, "Third-party service totally like, failed")
       elsif integration == "LinkedIn"
-        LinkedIn.any_instance.expects(:get_service_user).with(instance_of(OAuth::AccessToken)).raises(RuntimeError, "Third-party service totally like, failed")
+        LinkedIn::Connection.any_instance.expects(:get_service_user_info).with(instance_of(OAuth::AccessToken)).raises(RuntimeError, "Third-party service totally like, failed")
       else
         UsersController.any_instance.expects("#{integration.underscore}_get_service_user").with(instance_of(OAuth::AccessToken)).raises(RuntimeError, "Third-party service totally like, failed")
       end
