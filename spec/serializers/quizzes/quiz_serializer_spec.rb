@@ -296,6 +296,15 @@ describe Quizzes::QuizSerializer do
     end
   end
 
+  describe "quiz_submission_html_url" do
+    it "includes a url to the quiz_submission html only if JSONAPI request" do
+      serializer.as_json[:quiz][:quiz_submission_html_url].should ==
+        controller.send(:course_quiz_submission_html_url, context.id, quiz.id)
+      controller.expects(:accepts_jsonapi?).at_least_once.returns false
+      serializer.as_json[:quiz].should_not have_key :quiz_submission_html_url
+    end
+  end
+
   describe "permissions" do
     it "serializes permissions" do
       serializer.as_json[:quiz][:permissions].should == {

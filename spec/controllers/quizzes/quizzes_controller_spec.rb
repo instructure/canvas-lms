@@ -1217,6 +1217,34 @@ describe Quizzes::QuizzesController do
     end
   end
 
+  describe "GET 'submission_html'" do
+
+    before do
+      course_with_teacher_logged_in(active_all: true)
+      course_quiz(true)
+    end
+
+    it "renders nothing if there's no submission for current user" do
+      get 'submission_html', course_id: @course.id, quiz_id: @quiz.id
+      response.should be_success
+      response.body.strip.should be_empty
+    end
+
+    it "renders submission html if there is a submission" do
+      sub = @quiz.generate_submission(@teacher)
+      sub.mark_completed
+      sub.save!
+      get 'submission_html', course_id: @course.id, quiz_id: @quiz.id
+      response.should be_success
+      template = if CANVAS_RAILS2
+        "quizzes/quizzes/submission_html.html.erb"
+      else
+        "quizzes/submission_html"
+      end
+      response.should render_template(template)
+    end
+  end
+
   describe "POST 'unpublish'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)

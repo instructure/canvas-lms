@@ -466,11 +466,7 @@
   </header>
 
   <% if @submission && @submission.completed? %>
-    <% if @quiz.assignment && @quiz.assignment.muted? %>
-      <%= render(:partial => "muted") %>
-    <% else %>
-      <%= render(:partial => "quiz_submission") %>
-    <% end %>
+    <%= render "quiz_submission_results" %>
   <% end %>
 
   <% if @quiz.cant_go_back? %>

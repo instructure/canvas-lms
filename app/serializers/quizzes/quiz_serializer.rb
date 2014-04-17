@@ -16,7 +16,7 @@ module Quizzes
                 :require_lockdown_browser, :require_lockdown_browser_for_results,
                 :require_lockdown_browser_monitor, :lockdown_browser_monitor_data,
                 :speed_grader_url, :permissions, :quiz_reports_url, :quiz_statistics_url,
-                :message_students_url
+                :message_students_url, :quiz_submission_html_url
 
     def_delegators :@controller,
       :api_v1_course_assignment_group_url,
@@ -25,6 +25,7 @@ module Quizzes
       :api_v1_course_quiz_submissions_url,
       :api_v1_course_quiz_reports_url,
       :api_v1_course_quiz_statistics_url,
+      :course_quiz_submission_html_url,
       :api_v1_course_quiz_submission_users_url,
       :api_v1_course_quiz_submission_users_message_url
 
@@ -59,9 +60,8 @@ module Quizzes
       if user_may_grade?
         api_v1_course_quiz_submissions_url(context, quiz)
       else
-        quiz_submission = quiz.quiz_submissions.where(user_id: current_user).first
-        if quiz_submission
-          api_v1_course_quiz_submission_url(context, quiz, quiz_submission)
+        if submission_for_current_user?
+          api_v1_course_quiz_submission_url(quiz.context, quiz, submission_for_current_user)
         else
           nil
         end
@@ -74,6 +74,10 @@ module Quizzes
 
     def submitted_students_url
       api_v1_course_quiz_submission_users_url(context, quiz, submitted: true)
+    end
+
+    def quiz_submission_html_url
+      course_quiz_submission_html_url(context, quiz)
     end
 
     def html_url
@@ -106,6 +110,7 @@ module Quizzes
         when :access_code, :speed_grader_url, :message_students_url then user_may_grade?
         when :unpublishable then include_unpublishable?
         when :submitted_students, :unsubmitted_students then user_may_grade?
+        when :quiz_submission_html_url then accepts_jsonapi?
         else true
         end
       end
@@ -209,5 +214,16 @@ module Quizzes
     def user_finder
       @user_finder ||= Quizzes::QuizUserFinder.new(quiz, current_user)
     end
+
+    def submission_for_current_user
+      @submission_for_current_user ||= (
+        quiz.quiz_submissions.where(user_id: current_user).first
+      )
+    end
+
+    def submission_for_current_user?
+      !!submission_for_current_user
+    end
+
   end
 end

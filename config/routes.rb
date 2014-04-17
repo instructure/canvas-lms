@@ -310,6 +310,7 @@ routes.draw do
       match 'history' => 'quizzes/quizzes#history', :as => :history
       match 'statistics' => 'quizzes/quizzes#statistics', :as => :statistics
       match 'read_only' => 'quizzes/quizzes#read_only', :as => :read_only
+      match 'submission_html' => 'quizzes/quizzes#submission_html', :as => :submission_html
 
       collection do
         get :fabulous_quizzes

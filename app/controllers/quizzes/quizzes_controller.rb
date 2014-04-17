@@ -25,7 +25,7 @@ class Quizzes::QuizzesController < ApplicationController
   before_filter :require_context
   add_crumb(proc { t('#crumbs.quizzes', "Quizzes") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_quizzes_url }
   before_filter { |c| c.active_tab = "quizzes" }
-  before_filter :require_quiz, :only => [:statistics, :edit, :show, :history, :update, :destroy, :moderate, :read_only, :managed_quiz_data, :submission_versions]
+  before_filter :require_quiz, :only => [:statistics, :edit, :show, :history, :update, :destroy, :moderate, :read_only, :managed_quiz_data, :submission_versions, :submission_html]
   before_filter :set_download_submission_dialog_title , only: [:show,:statistics]
   # The number of questions that can display "details". After this number, the "Show details" option is disabled
   # and the data is not even loaded.
@@ -581,6 +581,15 @@ class Quizzes::QuizzesController < ApplicationController
       add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
       js_env(quiz_max_combination_count: QUIZ_MAX_COMBINATION_COUNT)
       render
+    end
+  end
+
+  def submission_html
+    @submission = get_submission
+    if @submission && @submission.completed?
+      render layout: false
+    else
+      render nothing: true
     end
   end
 
