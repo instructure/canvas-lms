@@ -866,6 +866,7 @@ class FilesController < ApplicationController
         # Need to be careful on this one... we can't let students turn in a
         # file and then edit it after the fact...
         params[:attachment].delete(:uploaded_data) if @context.is_a?(User)
+        @attachment.user = @current_user if params[:attachment][:uploaded_data].present?
         @attachment.attributes = params[:attachment]
         if just_hide == '1'
           @attachment.locked = false

@@ -506,6 +506,7 @@ describe FilesController do
       response.should be_redirect
       assigns[:attachment].should eql(@file)
       assigns[:attachment].display_name.should eql("new name")
+      assigns[:attachment].user_id.should be_nil
     end
 
     it "should move file into a folder" do
@@ -518,6 +519,18 @@ describe FilesController do
 
       @file.reload
       @file.folder.should eql(@folder)
+    end
+
+    it "should replace content and update user_id" do
+      course_with_teacher_logged_in(:active_all => true)
+      course_file
+      new_content = fixture_file_upload('scribd_docs/txt.txt', 'text/plain', true)
+      put 'update', :course_id => @course.id, :id => @file.id, :attachment => {:uploaded_data => new_content}
+      response.should be_redirect
+      assigns[:attachment].should eql(@file)
+      @file.reload
+      @file.size.should eql new_content.size
+      @file.user.should eql @teacher
     end
   end
 
