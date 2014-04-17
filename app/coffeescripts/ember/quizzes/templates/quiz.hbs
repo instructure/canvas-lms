@@ -35,9 +35,20 @@
           {{#t 'overview'}}Overview{{/t}}
         {{/link-to}}
       {{/link-to}}
-      <li><a href="#">Moderate</li></a>
-      <li><a href="#">Statistics</li></a>
-      <li><a href="#">Rubric</li></a>
+
+      {{#link-to 'quiz.moderate' this tagName='li'}}
+        {{#link-to 'quiz.moderate' this.id}}
+          {{#t 'moderate'}}Moderate{{/t}}
+        {{/link-to}}
+      {{/link-to}}
+
+      <li><a href="#">Statistics</a></li>
+
+      {{#link-to 'quiz.rubric' this tagName='li'}}
+        {{#link-to 'quiz.rubric' this.id}}
+          {{#t 'rubric'}}Rubric{{/t}}
+        {{/link-to}}
+      {{/link-to}}
     </ol>
   </div>
 
