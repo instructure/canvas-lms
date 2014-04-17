@@ -102,7 +102,7 @@ module Api::V1::Attachment
     @attachment.submission_attachment = true if opts[:submission_attachment]
     @attachment.file_state = 'deleted'
     @attachment.workflow_state = 'unattached'
-    @attachment.user = @current_user if opts[:set_user_id]
+    @attachment.user = @current_user
     @attachment.content_type = params[:content_type].presence || Attachment.mimetype(@attachment.filename)
     # Handle deprecated folder path
     params[:parent_folder_path] ||= params[:folder]

@@ -41,8 +41,7 @@ class SubmissionCommentsApiController < ApplicationController
 
     if authorized_action?(@assignment, @current_user,
                           :attach_submission_comment_files)
-      api_attachment_preflight(@assignment, request, check_quota: true,
-                               set_user_id: true)
+      api_attachment_preflight(@assignment, request, check_quota: true)
     end
   end
 end
