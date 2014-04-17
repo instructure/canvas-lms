@@ -978,6 +978,12 @@ class UsersController < ApplicationController
     @user ||= User.new
     if params[:user]
       params[:user].delete(:self_enrollment_code) unless self_enrollment
+      if params[:user][:birthdate].present? && params[:user][:birthdate] !~ Api::ISO8601_REGEX &&
+          params[:user][:birthdate] !~ Api::DATE_REGEX
+        return render(:json => {:errors => {:birthdate => t(:birthdate_invalid,
+          'Invalid date or invalid datetime for birthdate')}}, :status => 400)
+      end
+
       @user.attributes = params[:user]
     end
     @user.name ||= params[:pseudonym][:unique_id]
@@ -1175,7 +1181,7 @@ class UsersController < ApplicationController
     end
 
     managed_attributes = []
-    managed_attributes.concat [:name, :short_name, :sortable_name] if @user.grants_right?(@current_user, nil, :rename)
+    managed_attributes.concat [:name, :short_name, :sortable_name, :birthdate] if @user.grants_right?(@current_user, nil, :rename)
     managed_attributes << :terms_of_use if @user == (@real_current_user || @current_user)
     if @user.grants_right?(@current_user, nil, :manage_user_details)
       managed_attributes.concat([:time_zone, :locale])
@@ -1214,6 +1220,12 @@ class UsersController < ApplicationController
 
       if session[:require_terms]
         @user.require_acceptance_of_terms = true
+      end
+
+      if user_params[:birthdate].present? && user_params[:birthdate] !~ Api::ISO8601_REGEX &&
+          params[:user][:birthdate] !~ Api::DATE_REGEX
+        return render(:json => {:errors => {:birthdate => t(:birthdate_invalid,
+          'Invalid date or invalid datetime for birthdate')}}, :status => 400)
       end
 
       respond_to do |format|
