@@ -200,6 +200,36 @@ $muteTextColor: #aaa;
     }
   }
 
+  .essay-score-chart-section {
+    width: 580px;
+    height: 120px;
+
+    path.score-line, circle {
+      stroke: #3cb878;
+      shape-rendering: geometricPrecision;
+      image-rendering: optimizeQuality;
+    }
+
+    path.score-line {
+      stroke-width: 4;
+      fill: none;
+    }
+
+    .area {
+      fill: #9ddbbb;
+    }
+
+    circle {
+      stroke-width: 4px;
+      stroke: white;
+      fill: #3cb878;
+
+      &:hover {
+        fill: orangered;
+      }
+    }
+  }
+
   .answer-drilldown {
     list-style-type: none;
     margin: 0;

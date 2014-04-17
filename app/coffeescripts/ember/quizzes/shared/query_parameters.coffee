@@ -31,7 +31,7 @@ define [ 'ember' ], ({$}) ->
     # @example
     #   url = 'http://www.google.com?page=1&include[]=images&include[]=source'
     #   params = QueryParameters.extract(url)
-    #   console.debug(params) // => { page: 1, include: [ 'images', 'source' ]}
+    #   params; // => { page: 1, include: [ 'images', 'source' ]}
     extractParameters: (queryString) ->
       queryString ||= ''
       fragments = queryString.match(EXTRACTOR) || []

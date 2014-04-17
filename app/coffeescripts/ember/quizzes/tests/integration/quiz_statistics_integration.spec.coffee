@@ -26,11 +26,13 @@ define [
     equal find('#quiz-statistics').length, 1
 
   testPage 'it loads the quiz, statistics, and question statistics', ->
+    store = App.__container__.lookup('store:main')
     route = App.__container__.lookup('route:quizStatistics')
     ok q = route.modelFor('quiz'), 'loads the quiz'
     equal q.get('quizReports.length'), 2, 'loads quiz reports'
     ok qs = route.modelFor('quizStatistics'), 'loads quiz statistics'
-    equal qs.get('questionStatistics.length'), 11, 'loads question statistics'
+    equal store.all('questionStatistics').get('length'), 11, 'loads question statistics into the store'
+    equal qs.get('questionStatistics.length'), 11, 'associates question statistics'
 
   testRedirection
     path: '/1/statistics'

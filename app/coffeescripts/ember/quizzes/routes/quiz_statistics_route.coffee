@@ -1,13 +1,5 @@
-define [
-  'ember'
-  'underscore'
-  '../mixins/redirect'
-], (Ember, _, Redirect) ->
-
-  {RSVP} = Ember
-
+define [ 'ember', '../mixins/redirect' ], (Ember, Redirect) ->
   Ember.Route.extend Redirect,
-
     beforeModel: (transition) ->
       @validateRoute('canManage', 'quiz.show')
 
@@ -20,11 +12,3 @@ define [
         # load the reports, we need these to be able to generate if requested
         quiz.get('quizReports').then ->
           latestStatistics
-
-    afterModel: ->
-      # for some reason, the quiz is not associating with the quiz_questions,
-      # although the inverse is true (quiz questions *are* associated to the quiz),
-      # anyway, do it manually:
-      set = @modelFor('quizStatistics').get('questionStatistics')
-      set.clear()
-      set.pushObjects(@store.all('questionStatistics'))

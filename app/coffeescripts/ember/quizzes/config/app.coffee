@@ -1,11 +1,12 @@
 define [
   'ember'
   '../shared/environment'
+  '../shared/util'
   '../../shared/components/ic_actions_component'
   '../../shared/components/ic_publish_icon_component'
   './date_transform'
-], (Ember, env) ->
-
+], (Ember, env, Util) ->
+  Ember.Util = Util
   Ember.onLoad 'Ember.Application', (Application) ->
     Application.initializer
       name: 'env'

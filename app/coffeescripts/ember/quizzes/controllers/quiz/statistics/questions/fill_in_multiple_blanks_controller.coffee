@@ -1,7 +1,4 @@
-define [
-  '../questions_controller'
-  'underscore'
-], (Base, _) ->
+define [ '../questions_controller' ], (Base) ->
   Base.extend
     # @property [Object] activeAnswer
     #
@@ -24,8 +21,6 @@ define [
 
     actions:
       activateAnswer: (blankId) ->
-        window.$E = this
-
         @get('answerSets').forEach (answerSet) ->
           answerSet.set('active', answerSet.get('id') == blankId)
 

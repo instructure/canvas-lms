@@ -45,13 +45,13 @@ module CanvasQuizStatistics::AnswerAnalyzers
     #   ]
     # }
     def run(question_data, responses)
-      full_credit = question_data[:points_possible]
+      full_credit = question_data[:points_possible].to_f
 
       stats = {}
       stats[:graded] = responses.select { |r| r[:correct] == 'defined' }.length
 
       stats[:full_credit] = responses.select do |response|
-        response[:points] == full_credit
+        response[:points].to_f >= full_credit
       end.length
 
       point_distribution = Hash.new(0).tap do |vector|

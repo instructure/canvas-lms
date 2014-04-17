@@ -8,7 +8,7 @@ define [
   {Model, attr, belongsTo} = DS
 
   Model.extend
-    quizStatistics: belongsTo 'quizStatistics', async: false
+    quizStatistics: belongsTo 'quiz_statistics', async: false
     questionType: attr()
     questionName: attr()
     questionText: attr()
@@ -18,6 +18,8 @@ define [
     responses: attr()
     responseValues: attr()
     unexpectedResponseValues: attr()
+
+    # MC/TF stats
     topStudentCount: attr()
     middleStudentCount: attr()
     bottomStudentCount: attr()
@@ -28,6 +30,8 @@ define [
     correctTopStudentCount: attr()
     correctMiddleStudentCount: attr()
     correctBottomStudentCount: attr()
+
+    speedGraderUrl: Em.computed.alias('quizStatistics.quiz.speedGraderUrl').readOnly()
 
     # Helper for calculating the ratio of correct responses for this question.
     #
@@ -42,6 +46,11 @@ define [
         Em.Object.create(set)
     ).property('_data.answer_sets')
 
+    # Essay stats
+    fullCredit: attr()
+    graded: attr()
+    pointDistribution: attr()
+
     renderableType: (->
       switch @get('questionType')
         when 'multiple_choice_question', 'true_false_question'
@@ -50,11 +59,15 @@ define [
           'short_answer'
         when 'fill_in_multiple_blanks_question', 'multiple_dropdowns_question'
           'fill_in_multiple_blanks'
+        when 'essay_question'
+          'essay'
         else
           'generic'
     ).property('questionType')
 
     discriminationIndex: (->
-      pointBiserials = @get('pointBiserials') || []
-      pointBiserials.findBy('correct', true).point_biserial
+      if pointBiserials = @get('pointBiserials')
+        pointBiserials.findBy('correct', true).point_biserial
+      else
+        return 0
     ).property('pointBiserials')

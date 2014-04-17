@@ -1,12 +1,12 @@
-define [
-  'ember'
-  'underscore'
-], (Ember, _) ->
-  Ember.ObjectController.extend
+define [ 'ember' ], (Em) ->
+  Em.ObjectController.extend
     ratioFor: (score) ->
-      quizPoints = Math.max(@get('model.quiz.pointsPossible'), 1) # avoid division by zero
-      ratio = @get("model.#{score}") / quizPoints
-      Math.round (ratio * 100.0)
+      quizPoints = parseFloat(@get('quiz.pointsPossible'))
+
+      if quizPoints > 0
+        Em.Util.round(@get(score) / quizPoints * 100.0, 0)
+      else
+        0
 
     avgScoreRatio: (->
       @ratioFor('avgScore')

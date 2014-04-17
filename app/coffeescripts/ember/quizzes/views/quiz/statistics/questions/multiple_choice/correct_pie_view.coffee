@@ -1,8 +1,4 @@
-define [
-  'ember'
-  'vendor/d3.v3'
-], ({View, run}, d3) ->
-
+define [ 'ember', 'vendor/d3.v3' ], ({View}, d3) ->
   # This view plots a donut chart that shows the ratio of correct answers.
   View.extend
     # @config [Integer] [radius=80]

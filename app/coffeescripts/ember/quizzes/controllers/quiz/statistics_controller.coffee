@@ -12,7 +12,7 @@ define [
     })
 
     populateQuestionStatistics: (->
-      @get('questionStatistics').set 'content', @get('model.questionStatistics')
+      @set('questionStatistics.content', @get('model.questionStatistics'))
     ).observes('model.questionStatistics.@each')
 
     sortLabel: (->

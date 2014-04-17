@@ -1,8 +1,8 @@
-define [ 'ember-data', 'underscore' ], (DS, _) ->
+define [ 'ember', 'ember-data' ], (Em, DS) ->
   respondentCount = 0
 
   calculateResponseRatio = (answer) ->
-    Math.round(answer.responses / respondentCount * 100)
+    Em.Util.round(answer.responses / respondentCount * 100)
 
   decorateAnswers = (answers) ->
     (answers || []).forEach (answer) ->
@@ -23,11 +23,23 @@ define [ 'ember-data', 'underscore' ], (DS, _) ->
 
   DS.ActiveModelSerializer.extend
     extractArray: (store, type, payload, id, requestType) ->
-      payload.question_statistics = payload.quiz_statistics[0].question_statistics
+      data = {
+        quizStatistics: payload.quiz_statistics
+        questionStatistics: payload.quiz_statistics[0].question_statistics
+      }
+
+      data.questionStatistics.forEach (questionStatistics) ->
+        questionStatistics.id = "#{questionStatistics.id}"
+
+        # assign a FK between question and quiz statistics
+        questionStatistics.quiz_statistics_id = data.quizStatistics[0].id
 
       @decorate(payload.quiz_statistics[0])
 
-      @_super(store, type, payload, id, requestType)
+      # set of FKs between quiz and question stats
+      data.quizStatistics[0].question_statistic_ids = Em.A(data.questionStatistics).mapBy('id')
+
+      @_super(store, type, data, id, requestType)
 
     # TODO: remove once deprecated (the new stats API will expose these items)
     decorate: (quiz_statistics) ->

@@ -1,2 +1,2 @@
-define [ './multiple_choice_controller' ], (MultipleChoiceController) ->
-  MultipleChoiceController.extend({})
+define [ '../questions_controller' ], (Base) ->
+  Base

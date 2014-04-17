@@ -2,14 +2,15 @@ define [
   'ember'
   'underscore'
   'vendor/d3.v3'
+  '../../../../../mixins/views/chart_inspector'
   'compiled/behaviors/tooltip'
-], ({View}, _, d3) ->
+], ({View}, _, d3, ChartInspectorMixin) ->
   # This view renders a bar chart that plots each question answer versus the
   # amount of responses each answer has received.
   #
   # Also, each bar that represents an answer provides a tooltip on hover that
   # displays more information.
-  View.extend
+  View.extend ChartInspectorMixin,
     # @config [Integer] [barWidth=30]
     #   Width of the bars in the chart in pixels.
     barWidth: 30
@@ -23,37 +24,10 @@ define [
     w: 220
     h: 120
 
-    hideAuxiliaryContent: (->
-      @$('.auxiliary').hide()
-    ).on('didInsertElement')
-
-    buildInspector: ->
-      @inspector = @$('.inspector').tooltip({
-        tooltipClass: 'center bottom vertical',
-        show: false,
-        hide: false
-      }).data('tooltip')
-
-    removeInspector: (->
-      if @inspector
-        @inspector.destroy()
-        @inspector = null
-    ).on('willDestroyElement')
-
-    inspect: (datapoint, target) ->
-      content = @$(".auxiliary [data-answer='#{datapoint.id}']")
-      inspector = @inspector || @buildInspector()
-      inspector.option
-        content: () -> content.clone()
-        position:
-          my: "center+#{@get('barWidth') / 2} bottom"
-          at: 'center top-8'
-          of: target
-          collision: 'fit fit'
-      inspector.element.mouseover()
-
-    stopInspecting: ->
-      @inspector.element.mouseout()
+    tooltipOptions:
+      position:
+        my: 'center+15 bottom'
+        at: 'center top-8'
 
     renderChart: (->
       data = @get('controller.chartData')
@@ -95,8 +69,7 @@ define [
           .attr("width", barWidth)
           .attr("y", (d) -> y(d.y + visibilityThreshold))
           .attr("height", (d) -> height - y(d.y + visibilityThreshold))
-          .on('mouseover', (d) => @inspect(d, d3.event.target))
-          .on('mouseout', => @stopInspecting())
+          .inspectable(this)
 
       # If the special "No Answer" is present, we represent it as a diagonally-
       # striped bar, but to do that we need to render the <svg:pattern> that

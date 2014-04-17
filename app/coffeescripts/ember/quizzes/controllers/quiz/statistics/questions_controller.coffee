@@ -1,13 +1,9 @@
-define [
-  'ember'
-  'underscore'
-  'i18n!quiz_statistics'
-], (Ember, _, I18n) ->
-  Ember.ObjectController.extend
+define [ 'ember', 'i18n!quiz_statistics' ], (Em, I18n) ->
+  Em.ObjectController.extend
     needs: [ 'quizStatistics' ]
 
-    participantCount: Ember.computed.alias('ratioCalculator.participantCount'),
-    correctResponseRatio: Ember.computed.alias('ratioCalculator.ratio')
+    participantCount: Em.computed.alias('ratioCalculator.participantCount').readOnly()
+    correctResponseRatio: Em.computed.alias('ratioCalculator.ratio').readOnly()
 
     attemptsLabel: (->
       I18n.t('attempts', 'Attempts: %{count} out of %{total}', {
@@ -20,7 +16,7 @@ define [
       I18n.t('correct_response_ratio',
         '%{ratio}% of your students correctly answered this question.',
         {
-          ratio: Math.round(@get('correctResponseRatio') * 100)
+          ratio: Em.Util.round(@get('correctResponseRatio') * 100, 0)
         })
     ).property('correctResponseRatio')
 

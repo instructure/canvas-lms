@@ -24,6 +24,14 @@ describe CanvasQuizStatistics::AnswerAnalyzers::Essay do
         output[:full_credit].should == 2
       end
 
+      it 'should count students who received more than full credit' do
+        output = subject.run(question_data, [
+          { points: 3 }, { points: 2 }, { points: 5 }
+        ])
+
+        output[:full_credit].should == 2
+      end
+
       it 'should be 0 otherwise' do
         output = subject.run(question_data, [
           { points: 1 }

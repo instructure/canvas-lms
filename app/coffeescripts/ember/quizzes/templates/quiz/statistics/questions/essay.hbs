@@ -1,0 +1,23 @@
+<header>
+  <aside class="pull-right">
+    <a {{bind-attr href=speedGraderUrl}} target="_blank">
+      {{t 'speedgrader' 'View in SpeedGrader'}}
+    </a>
+  </aside>
+
+  <span class="question-attempts">{{attemptsLabel}}</span>
+
+  <div class="question-text">
+    {{{questionText}}}
+  </div>
+</header>
+
+<div>
+  <section class="correct-answer-ratio-section">
+    {{render "quiz/statistics/questions/multiple_choice/correct_pie" controller}}
+  </section>
+
+  <section class="essay-score-chart-section">
+    {{render "quiz/statistics/questions/essay/score_chart" controller}}
+  </section>
+</div>

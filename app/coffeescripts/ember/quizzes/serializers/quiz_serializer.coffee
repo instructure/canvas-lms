@@ -26,7 +26,6 @@ define [
       this._super store, type, payload, id, requestType
 
     normalizePayload: (type, hash, prop) ->
-      # how can we add query parameters to model.find('quiz_statistics') ??
       if hash.quizzes
         _(hash.quizzes).each (quiz) ->
           if quiz.links
