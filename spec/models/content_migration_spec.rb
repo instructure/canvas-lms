@@ -1335,6 +1335,18 @@ describe ContentMigration do
       run_course_copy(["Couldn't copy file \"dummy.txt\""])
     end
 
+    it "should convert domains in imported urls if specified in account settings" do
+      account = @copy_to.root_account
+      account.settings[:default_migration_settings] = {:domain_substitution_map => {"http://derp.derp" => "https://derp.derp"}}
+      account.save!
+
+      @copy_from.syllabus_body = "<p><a href=\"http://derp.derp/stuff\">this is a link to an insecure domain that could cause problems</a></p>"
+
+      run_course_copy
+
+      @copy_to.syllabus_body.should == @copy_from.syllabus_body.sub("http://derp.derp", "https://derp.derp")
+    end
+
     it "should preserve media comment links" do
       pending unless Qti.qti_enabled?
 
