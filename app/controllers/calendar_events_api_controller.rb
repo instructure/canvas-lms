@@ -260,10 +260,10 @@ class CalendarEventsApiController < ApplicationController
   # @argument type [Optional, String, "event"|"assignment"] Defaults to "event"
   # @argument start_date [Optional, Date]
   #   Only return events since the start_date (inclusive). 
-  #   Defaults to today. The value should be formatted as: yyyy-mm-dd.
+  #   Defaults to today. The value should be formatted as: yyyy-mm-dd or ISO 8601 YYYY-MM-DDTHH:MM:SSZ.
   # @argument end_date [Optional, Date]
   #   Only return events before the end_date (inclusive). 
-  #   Defaults to start_date. The value should be formatted as: yyyy-mm-dd.
+  #   Defaults to start_date. The value should be formatted as: yyyy-mm-dd or ISO 8601 YYYY-MM-DDTHH:MM:SSZ.
   #   If end_date is the same as start_date, then only events on that day are 
   #   returned.
   # @argument undated [Optional, Boolean]
@@ -281,6 +281,7 @@ class CalendarEventsApiController < ApplicationController
   #
   # @returns [CalendarEvent]
   def index
+    @errors = {}
     codes = (params[:context_codes] || [@current_user.asset_string])[0, 10]
     get_options(codes)
 
@@ -306,7 +307,11 @@ class CalendarEventsApiController < ApplicationController
     CalendarEvent.send(:preload_associations, events, :child_events) if @type == :event
     events = apply_assignment_overrides(events) if @type == :assignment
 
-    render :json => events.map { |event| event_json(event, @current_user, session) }
+    if @errors.empty?
+      render :json => events.map { |event| event_json(event, @current_user, session) }
+    else
+      render json: {errors: @errors.as_json}, status: :bad_request
+    end
   end
 
   # @API Create a calendar event
@@ -344,11 +349,11 @@ class CalendarEventsApiController < ApplicationController
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/calendar_events.json' \
-  #        -X POST \ 
-  #        -F 'calendar_event[context_code]=course_123' \ 
-  #        -F 'calendar_event[title]=Paintball Fight!' \ 
-  #        -F 'calendar_event[start_at]=2012-07-19T21:00:00Z' \ 
-  #        -F 'calendar_event[end_at]=2012-07-19T22:00:00Z' \ 
+  #        -X POST \
+  #        -F 'calendar_event[context_code]=course_123' \
+  #        -F 'calendar_event[title]=Paintball Fight!' \
+  #        -F 'calendar_event[start_at]=2012-07-19T21:00:00Z' \
+  #        -F 'calendar_event[end_at]=2012-07-19T22:00:00Z' \
   #        -H "Authorization: Bearer <token>"
   def create
     if params[:calendar_event][:description].present?
@@ -391,8 +396,8 @@ class CalendarEventsApiController < ApplicationController
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/calendar_events/345/reservations.json' \
-  #        -X POST \ 
-  #        -F 'cancel_existing=true' \ 
+  #        -X POST \
+  #        -F 'cancel_existing=true' \
   #        -H "Authorization: Bearer <token>"
   def reserve
     get_event
@@ -455,8 +460,8 @@ class CalendarEventsApiController < ApplicationController
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/calendar_events/234.json' \
-  #        -X PUT \ 
-  #        -F 'calendar_event[title]=Epic Paintball Fight!' \ 
+  #        -X PUT \
+  #        -F 'calendar_event[title]=Epic Paintball Fight!' \
   #        -H "Authorization: Bearer <token>"
   def update
     get_event(true)
@@ -489,8 +494,8 @@ class CalendarEventsApiController < ApplicationController
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/calendar_events/234.json' \
-  #        -X DELETE \ 
-  #        -F 'cancel_reason=Greendale layed off the janitorial staff :(' \ 
+  #        -X DELETE \
+  #        -F 'cancel_reason=Greendale layed off the janitorial staff :(' \
   #        -H "Authorization: Bearer <token>"
   def destroy
     get_event
@@ -616,27 +621,36 @@ class CalendarEventsApiController < ApplicationController
     end
   end
 
+  def validate_dates
+    @errors ||= {}
+    if params[:start_date].present?
+      if params[:start_date] =~ Api::DATE_REGEX
+        @start_date ||= Time.zone.parse(params[:start_date]).beginning_of_day
+      elsif params[:start_date] =~ Api::ISO8601_REGEX
+        @start_date ||= Time.zone.parse(params[:start_date])
+      else # params[:start_date] is not valid
+        @errors[:start_date] = t(:invalid_date_or_time, 'Invalid date or invalid datetime for %{attr}', attr: 'start_date')
+      end
+    end
+
+    if params[:end_date].present?
+      if params[:end_date] =~ Api::DATE_REGEX
+        @end_date ||= Time.zone.parse(params[:end_date]).end_of_day
+      elsif params[:end_date] =~ Api::ISO8601_REGEX
+        @end_date ||= Time.zone.parse(params[:end_date])
+      else # params[:end_date] is not valid
+        @errors[:end_date] =  t(:invalid_date_or_time, 'Invalid date or invalid datetime for %{attr}', attr: 'end_date')
+      end
+    end
+  end
+
   def get_options(codes)
     @all_events = value_to_boolean(params[:all_events])
     @undated = value_to_boolean(params[:undated])
     if !@all_events && !@undated
-      if params[:start_date].present? && params[:start_date] !~ Api::DATE_REGEX
-        Api.invalid_time_stamp_error('start_date', @current_user.attributes.to_s +
-          ErrorReport.useful_http_env_stuff_from_request(request).to_s)
-        # todo stop logging and delete invalid dates
-        # params.delete(:start_date)
-      end
-
-      if params[:end_date].present? && params[:end_date] !~ Api::DATE_REGEX
-        Api.invalid_time_stamp_error('end_date', @current_user.attributes.to_s +
-          ErrorReport.useful_http_env_stuff_from_request(request).to_s)
-        # todo stop logging and delete invalid dates
-        # params.delete(:end_date)
-      end
-
-      today = Time.zone.now
-      @start_date ||= CanvasTime.try_parse(params[:start_date], today).beginning_of_day
-      @end_date ||= CanvasTime.try_parse(params[:end_date], today).end_of_day
+      validate_dates
+      @start_date ||= Time.zone.now.beginning_of_day
+      @end_date ||= Time.zone.now.end_of_day
       @end_date = @start_date.end_of_day if @end_date < @start_date
     end
 
@@ -707,7 +721,7 @@ class CalendarEventsApiController < ApplicationController
 
   def assignment_context_scope
     # contexts have to be partitioned into two groups so they can be queried effectively
-    contexts = @contexts.select{ |c| @context_codes.include?(c.asset_string) }
+    contexts = @contexts.select { |c| @context_codes.include?(c.asset_string) }
     view_unpublished, other = contexts.partition { |c| c.grants_right?(@current_user, session, :view_unpublished_items) }
 
     sql = []
