@@ -1082,20 +1082,27 @@ class ApplicationController < ActionController::Base
     @wiki = @context.wiki
     @wiki.check_has_front_page
 
-    page_name = params[:wiki_page_id] || params[:id] || (params[:wiki_page] && params[:wiki_page][:title])
-    page_name ||= (@wiki.get_front_page_url || Wiki::DEFAULT_FRONT_PAGE_URL) unless @context.feature_enabled?(:draft_state)
+    @page_name = params[:wiki_page_id] || params[:id] || (params[:wiki_page] && params[:wiki_page][:title])
+    @page_name ||= (@wiki.get_front_page_url || Wiki::DEFAULT_FRONT_PAGE_URL) unless @context.feature_enabled?(:draft_state)
     if(params[:format] && !['json', 'html'].include?(params[:format]))
-      page_name += ".#{params[:format]}"
+      @page_name += ".#{params[:format]}"
       params[:format] = 'html'
     end
-    return if @page || !page_name
+    return if @page || !@page_name
 
     if params[:action] != 'create'
-      @page = @wiki.wiki_pages.not_deleted.find_by_url(page_name.to_s) ||
-              @wiki.wiki_pages.not_deleted.find_by_url(page_name.to_s.to_url) ||
-              @wiki.wiki_pages.not_deleted.find_by_id(page_name.to_i)
+      @page = @wiki.wiki_pages.not_deleted.find_by_url(@page_name.to_s) ||
+              @wiki.wiki_pages.not_deleted.find_by_url(@page_name.to_s.to_url) ||
+              @wiki.wiki_pages.not_deleted.find_by_id(@page_name.to_i)
     end
-    @page ||= @wiki.build_wiki_page(@current_user, :url => page_name)
+
+    unless @page
+      if params[:titleize].present? && !value_to_boolean(params[:titleize])
+        @page = @wiki.build_wiki_page(@current_user, :title => @page_name)
+      else
+        @page = @wiki.build_wiki_page(@current_user, :url => @page_name)
+      end
+    end
   end
 
   def context_wiki_page_url

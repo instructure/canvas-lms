@@ -352,10 +352,10 @@ define([
 
       $("#new_page_drop_down").submit(function(event){
         event.preventDefault();
-        var pageName = $.trim($("#new_page_name").val()).replace(/\s/g, '-').toLowerCase();
+        var pageName = encodeURIComponent($("#new_page_name").val());
         wikiSidebar.editor.editorBox('create_link', {
-          title: $("#new_page_name").val(),
-          url: $("#new_page_url_prefix").val()+ "/" + pageName
+          title: htmlEscape($("#new_page_name").val()),
+          url: $("#new_page_url_prefix").val()+ "/" + pageName + "?titleize=0"
         });
         $('#new_page_drop_down').slideUp("fast");
         $("#new_page_name").val("");
