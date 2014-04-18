@@ -255,7 +255,7 @@ class ContextModulesController < ApplicationController
     if authorized_action(@module, @current_user, :update)
       order = params[:order].split(",").map{|id| id.to_i}
       tags = @context.context_module_tags.not_deleted.find_all_by_id(order).compact
-      affected_module_ids = tags.map(&:context_module_id).uniq.compact
+      affected_module_ids = (tags.map(&:context_module_id) + [@module.id]).uniq.compact
       affected_items = []
       items = order.map{|id| tags.detect{|t| t.id == id.to_i } }.compact.uniq
       items.each_with_index do |item, idx|
