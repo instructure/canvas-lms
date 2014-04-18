@@ -169,14 +169,20 @@ module Canvas
       return super unless association.embed_ids? && !association.embed_in_root
       name     = association.name
       instance = send(name)
-      # We want to use `empty?` instead of `present?` for has_many associations
+      # We want to use `exists?` instead of `present?` for has_many associations
       # so that we don't attempt to load all records into the database.
-      # Unfortunately, `empty?` doesn't exist for
+      # Unfortunately, `exists?` doesn't exist for
       # ActiveRecord::Associations::BelongsToAssociation, so we'll fall back
       # to using `present?` for has_one associations, which won't overload
       # app memory or the database with a large query.
       if instance && association.is_a?(ActiveModel::Serializer::Association::HasMany)
-        send("#{name}_url".to_sym) unless instance.empty?
+        # fall back to empty? for plain old arrays
+        instance_does_not_exist = if instance.respond_to?(:exists?)
+          !instance.exists?
+        else
+          instance.empty?
+        end
+        send("#{name}_url".to_sym) unless instance_does_not_exist
       elsif instance.present?
         send("#{name}_url".to_sym)
       end
