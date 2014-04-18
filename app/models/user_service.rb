@@ -224,8 +224,8 @@ class UserService < ActiveRecord::Base
   end
   
   def service_access_link
-    if service == 'facebook' && Facebook.config && Facebook.config['canvas_name']
-      "https://apps.facebook.com/#{Facebook.config['canvas_name']}"
+    if service == 'facebook' && Facebook::Connection.config && Facebook::Connection.config['canvas_name']
+      "https://apps.facebook.com/#{Facebook::Connection.config['canvas_name']}"
     else
       service_user_link
     end

@@ -61,6 +61,53 @@ describe UsersController do
     end
   end
 
+  describe "GET oauth" do
+    it "sets up oauth for facebook" do
+      Facebook::Connection.config = Proc.new do
+        {}
+      end
+      CanvasUuid::Uuid.stubs(:generate).returns("some_uuid")
+
+      user_with_pseudonym
+      user_session(@user)
+
+      OauthRequest.expects(:create).with(
+          :service => "facebook",
+          :secret => "some_uuid",
+          :return_url => "http://example.com",
+          :user => @user,
+          :original_host_with_port => "test.host"
+      ).returns(stub(global_id: "123"))
+      Facebook::Connection.expects(:authorize_url).returns("http://example.com/redirect")
+
+      get :oauth, {service: "facebook", return_to: "http://example.com"}
+
+      response.should redirect_to "http://example.com/redirect"
+    end
+  end
+
+  describe "GET oauth_success" do
+    it "handles facebook post oauth redirects" do
+
+      user_with_pseudonym
+      user_session(@user)
+
+
+      Canvas::Security.expects(:decrypt_password).with("some", "state", 'facebook_oauth_request').returns("123")
+      mock_oauth_request = stub(original_host_with_port: "test.host", user: @user, return_url: "example.com")
+      OauthRequest.expects(:find_by_id).with("123").returns(mock_oauth_request)
+      Facebook::Connection.expects(:get_service_user_info).with("access_token").returns({"id" => "456", "name" => "joe", "link" => "some_link"})
+      UserService.any_instance.expects(:save) do |user_service|
+        user_service.id.should == "456"
+        user_service.name.should == "joe"
+        user_service.link.should == "some_link"
+      end
+
+      get :oauth_success, state: "some.state", service: "facebook", access_token: "access_token"
+
+    end
+  end
+
   it "should not include deleted courses in manageable courses" do
     course_with_teacher_logged_in(:course_name => "MyCourse1", :active_all => 1)
     course1 = @course

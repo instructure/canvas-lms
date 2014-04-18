@@ -191,7 +191,7 @@ class UsersController < ApplicationController
         :original_host_with_port => request.host_with_port
       )
       state = Canvas::Security.encrypt_password(oauth_request.global_id.to_s, 'facebook_oauth_request').join('.')
-      redirect_to Facebook.authorize_url(state)
+      redirect_to Facebook::Connection.authorize_url(state)
     end
   end
 
@@ -217,7 +217,7 @@ class UsersController < ApplicationController
         service = UserService.find_by_user_id_and_service(@current_user.id, 'facebook')
         service ||= UserService.new(:user => @current_user, :service => 'facebook')
         service.token = params[:access_token]
-        data = Facebook.send_graph_request('/me', :get, service.token)
+        data = Facebook::Connection.get_service_user_info(service.token)
 
         if data
           service.service_user_id = data['id']
