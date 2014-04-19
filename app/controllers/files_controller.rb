@@ -211,6 +211,11 @@ class FilesController < ApplicationController
   # @argument search_term [Optional, String]
   #   The partial name of the files to match and return.
   #
+  # @argument include[] [Optional, "user"]
+  #   Array of additional information to include.
+  #
+  #   "user":: the user who uploaded the file or last edited its content
+  #
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/folders/<folder_id>/files?content_types[]=image&content_types[]=text/plain \
@@ -231,6 +236,7 @@ class FilesController < ApplicationController
     if authorized_action(folder, @current_user, :read_contents)
       @context = folder.context unless context_index
       can_manage_files = @context.grants_right?(@current_user, session, :manage_files)
+      params[:include] = Array(params[:include])
 
       if context_index
         if can_manage_files
@@ -246,6 +252,7 @@ class FilesController < ApplicationController
           scope = folder.visible_file_attachments.not_hidden.not_locked
         end
       end
+      scope = scope.includes(:user) if params[:include].include? 'user'
       scope = Attachment.search_by_attribute(scope, :display_name, params[:search_term])
       if params[:sort_by] == 'position'
         scope = scope.by_position_then_display_name
@@ -259,7 +266,7 @@ class FilesController < ApplicationController
 
       url = context_index ? context_files_url : api_v1_list_files_url(folder)
       @files = Api.paginate(scope, self, url)
-      render :json => attachments_json(@files, @current_user, {}, :can_manage_files => can_manage_files)
+      render :json => attachments_json(@files, @current_user, {}, :can_manage_files => can_manage_files, :include => params[:include])
     end
   end
 
@@ -356,6 +363,10 @@ class FilesController < ApplicationController
   # @API Get file
   # Returns the standard attachment json object
   #
+  # @argument include[] [Optional, "user"]
+  #   Array of additional information to include.
+  #
+  #   "user":: the user who uploaded the file or last edited its content
   #
   # @example_request
   #
@@ -366,8 +377,9 @@ class FilesController < ApplicationController
   def api_show
     @attachment = Attachment.find(params[:id])
     raise ActiveRecord::RecordNotFound if @attachment.deleted?
+    params[:include] = Array(params[:include])
     if authorized_action(@attachment,@current_user,:read)
-      render :json => attachment_json(@attachment, @current_user)
+      render :json => attachment_json(@attachment, @current_user, {}, { include: params[:include] })
     end
   end
 

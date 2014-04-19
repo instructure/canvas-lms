@@ -263,6 +263,21 @@ describe "Files API", type: :request do
       json = api_call(:get, @files_path + "?search_term=fir", @files_path_options.merge(:search_term => 'fir'), {})
       json.map{|h| h['id']}.sort.should == atts.map(&:id).sort
     end
+
+    it "should include user if requested" do
+      @a1.update_attribute(:user, @user)
+      json = api_call(:get, @files_path + "?include[]=user", @files_path_options.merge(include: ['user']))
+      json.map{|f|f['user']}.should eql [
+        {},
+        {},
+        {
+          "id" => @user.id,
+          "display_name" => @user.short_name,
+          "avatar_image_url" => User.avatar_fallback_url,
+          "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@user.id}"
+        }
+      ]
+    end
   end
 
   describe "#index for courses" do
@@ -471,6 +486,17 @@ describe "Files API", type: :request do
       @att.hidden = true
       @att.save!
       api_call(:get, @file_path, @file_path_options, {}, {}, :expected_status => 200)
+    end
+
+    it "should return user if requested" do
+      @att.update_attribute(:user, @user)
+      json = api_call(:get, @file_path + "?include[]=user", @file_path_options.merge(include: ['user']))
+      json['user'].should eql({
+        "id" => @user.id,
+        "display_name" => @user.short_name,
+        "avatar_image_url" => User.avatar_fallback_url,
+        "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@user.id}"
+      })
     end
   end
 

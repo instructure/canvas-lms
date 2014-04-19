@@ -19,6 +19,7 @@
 module Api::V1::Attachment
   include Api::V1::Json
   include Api::V1::Locked
+  include Api::V1::User
 
   def attachments_json(files, user, url_options = {}, options = {})
     files.map do |f|
@@ -81,6 +82,7 @@ module Api::V1::Attachment
       'thumbnail_url' => thumbnail_download_url,
     }
     locked_json(hash, attachment, user, 'file')
+    hash['user'] = user_display_json(attachment.user, attachment.context) if (options[:include] || []).include? 'user'
     hash
   end
 
