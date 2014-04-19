@@ -224,7 +224,7 @@ class DiscussionTopicsController < ApplicationController
   #
   # Returns the paginated list of discussion topics for this course or group.
   #
-  # @argument order_by [String, "position"|"recent_activity"]
+  # @argument order_by [Optional, String, "position"|"recent_activity"]
   #   Determines the order of the discussion topic list. Defaults to "position".
   #
   # @argument scope [Optional, String, "locked"|"unlocked"|"pinned"|"unpinned"]
@@ -481,8 +481,11 @@ class DiscussionTopicsController < ApplicationController
   # Create an new discussion topic for the course or group.
   #
   # @argument title [String]
+  #
   # @argument message [String]
-  # @argument discussion_type [String]
+  #
+  # @argument discussion_type [Optional, String, "side_comment"|"threaded"]
+  #   The type of discussion. Defaults to side_comment if not value is given. Accepted values are 'side_comment', for discussions that only allow one level of nested comments, and 'threaded' for fully threaded discussions.
   #
   # @argument published [Optional, Boolean]
   #   Whether this topic is published (true) or draft state (false). Only
@@ -496,10 +499,10 @@ class DiscussionTopicsController < ApplicationController
   #   provided timestamp. If the timestamp is in the past, the topic will be
   #   locked.
   #
-  # @argument podcast_enabled [Boolean]
+  # @argument podcast_enabled [Optional, Boolean]
   #   If true, the topic will have an associated podcast feed.
   #
-  # @argument podcast_has_student_posts [Boolean]
+  # @argument podcast_has_student_posts [Optional, Boolean]
   #   If true, the podcast will include posts from students as well. Implies
   #   podcast_enabled.
   #
@@ -507,7 +510,7 @@ class DiscussionTopicsController < ApplicationController
   #   If true then a user may not respond to other replies until that user has
   #   made an initial reply. Defaults to false.
   #
-  # @argument assignment [Assignment]
+  # @argument assignment [Optional, Assignment]
   #   To create an assignment discussion, pass the assignment parameters as a
   #   sub-object. See the {api:AssignmentsApiController#create Create an Assignment API}
   #   for the available parameters. The name parameter will be ignored, as it's
@@ -515,12 +518,12 @@ class DiscussionTopicsController < ApplicationController
   #   an assignment NOT an assignment, pass set_assignment = false as part of
   #   the assignment object
   #
-  # @argument is_announcement [Boolean]
+  # @argument is_announcement [Optional, Boolean]
   #   If true, this topic is an announcement. It will appear in the
   #   announcement's section rather than the discussions section. This requires
   #   announcment-posting permissions.
   #
-  # @argument position_after [String]
+  # @argument position_after [Optional, String]
   #   By default, discussions are sorted chronologically by creation date, you
   #   can pass the id of another topic to have this one show up after the other
   #   when they are listed.
@@ -607,7 +610,7 @@ class DiscussionTopicsController < ApplicationController
   # Puts the pinned discussion topics in the specified order.
   # All pinned topics should be included.
   #
-  # @argument order[] [Required, Integer]
+  # @argument order[] [Optional, Integer]
   #   The ids of the pinned discussion topics in the desired order.
   #   (For example, "order=104,102,103".)
   #
