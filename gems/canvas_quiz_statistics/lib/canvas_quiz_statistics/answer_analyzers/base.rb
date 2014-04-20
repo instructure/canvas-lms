@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -15,15 +15,17 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+module CanvasQuizStatistics::AnswerAnalyzers
+  class Base
+    def run(question_data, responses)
+      {}
+    end
 
-class Quizzes::QuizQuestion::EssayQuestion < Quizzes::QuizQuestion::Base
-  def requires_manual_scoring?(user_answer)
-    true
-  end
-
-  def correct_answer_parts(user_answer)
-    config = CanvasSanitize::SANITIZE
-    user_answer.answer_details[:text] = Sanitize.clean(user_answer.answer_text, config) || ""
-    nil
+    # Test whether the response contains an answer to the question.
+    #
+    # Default behavior is to text whether the "text" field is populated.
+    def answer_present?(response)
+      response[:text].present?
+    end
   end
 end

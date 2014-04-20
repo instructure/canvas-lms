@@ -54,3 +54,6 @@ Gemfile.lock3
 #remove this once we move jqeury into bower
 /public/javascripts/bower/jquery/
 
+[canvas-gems]
+/gems/*/coverage
+/gems/*/tmp

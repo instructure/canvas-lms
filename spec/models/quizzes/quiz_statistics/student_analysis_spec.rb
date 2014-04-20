@@ -316,4 +316,25 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     stats.last[9].should == "lolcats,lolrus"
   end
 
+  describe 'question statistics' do
+    subject { Quizzes::QuizStatistics::StudentAnalysis.new({}) }
+
+    it 'should proxy to the gem for Essay question stats' do
+      question_data = { question_type: 'essay_question' }
+      responses = []
+      stats = { foo: 'bar' }
+      analyzer = stub
+
+      CanvasQuizStatistics::QuestionAnalyzer.
+        expects(:new).with(question_data).
+        returns(analyzer)
+
+      analyzer.expects(:run).with(responses).returns(stats)
+      output = subject.send(:stats_for_question, question_data, responses)
+      output.should == {
+        question_type: 'essay_question',
+        foo: 'bar'
+      }.with_indifferent_access
+    end
+  end
 end

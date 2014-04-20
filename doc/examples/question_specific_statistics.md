@@ -123,8 +123,20 @@ may include extra metrics. You can find these metrics below.
 
 ```javascript
 {
-  // TODO
-  "essay_responses": null
+   // The number of students whose responses were graded by the teacher so
+   // far.
+   "graded": 5,
+
+   // The number of students who got graded with a full score.
+   "full_credit": 4,
+
+   // A set of maps of scores and the number of students who received
+   // each score.
+   "point_distribution": [
+     { "score": 0, "count": 1 },
+     { "score": 1, "count": 1 },
+     { "score": 3, "count": 3 }
+   ]
 }
 ```
 
