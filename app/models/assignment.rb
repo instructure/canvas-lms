@@ -1193,6 +1193,8 @@ class Assignment < ActiveRecord::Base
       }
     end
 
+    enrollments = context.enrollments_visible_to(user)
+
     res[:context][:students] = students.map { |u|
       u.as_json(:include_root => false,
                 :methods => avatar_methods,
@@ -1200,7 +1202,7 @@ class Assignment < ActiveRecord::Base
     }
     res[:context][:active_course_sections] = context.sections_visible_to(user).
       map{|s| s.as_json(:include_root => false, :only => [:id, :name]) }
-    res[:context][:enrollments] = context.enrollments_visible_to(user).
+    res[:context][:enrollments] = enrollments.
         map{|s| s.as_json(:include_root => false, :only => [:user_id, :course_section_id]) }
     res[:context][:quiz] = self.quiz.as_json(:include_root => false, :only => [:anonymous_submissions])
 
@@ -1212,6 +1214,8 @@ class Assignment < ActiveRecord::Base
 
     res[:too_many_quiz_submissions] = too_many = too_many_qs_versions?(submissions)
     qs_versions = quiz_submission_versions(submissions, too_many)
+
+    enrollment_types_by_id = enrollments.inject({}){ |h, e| h[e.user_id] ||= e.type; h }
 
     res[:submissions] = submissions.map do |sub|
       json = sub.as_json(:include_root => false,
@@ -1226,7 +1230,8 @@ class Assignment < ActiveRecord::Base
         },
         :methods => [:scribdable?, :scribd_doc, :submission_history, :late],
         :only => submission_fields
-      )
+      ).merge("from_enrollment_type" => enrollment_types_by_id[sub.user_id])
+
       json['submission_history'] = if json['submission_history'] && (quiz.nil? || too_many)
                                      json['submission_history'].map do |version|
                                        version.as_json(

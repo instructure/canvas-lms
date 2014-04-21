@@ -1260,13 +1260,16 @@ define([
         })
       );
 
-      var gradedStudents = $.grep(jsonData.studentsWithSubmissions, function(s){
-        return (s.submission && s.submission.workflow_state === 'graded');
+      var gradedStudents = $.grep(jsonData.studentsWithSubmissions, function(s) {
+        return (s.submission &&
+                s.submission.workflow_state === 'graded' &&
+                s.submission.from_enrollment_type === "StudentEnrollment"
+        );
       });
-      var scores = $.map(gradedStudents, function(s){
+
+      var scores = $.map(gradedStudents , function(s){
         return s.submission.score;
       });
-      //scores shoud be an array that has all of the scores of the students that have submisisons
 
       if (scores.length) { //if there are some submissions that have been graded.
         $average_score_wrapper.show();
@@ -1288,9 +1291,10 @@ define([
       else { //there are no submissions that have been graded.
         $average_score_wrapper.hide();
       }
+
       $grded_so_far.html(
         I18n.t('portion_graded', '%{x} / %{y} Graded', {
-          x: scores.length,
+          x: gradedStudents.length,
           y: jsonData.context.students.length
         })
       );
