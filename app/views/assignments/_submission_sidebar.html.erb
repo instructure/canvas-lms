@@ -23,8 +23,6 @@
     <a href="<%= context_url(@assignment.context, :context_assignment_submission_url, @assignment.id, @current_user.id) %>" class='forward'><%= t 'links.submission.details', "Submission Details" %></a><br/>
     <% if @current_user_submission.submission_type == "online_url" %>
       <a href="<%= @current_user_submission.url %>" target="_new" class='link'><%= t 'links.submission.view_original_page', "View the Original Page" %></a><br/>
-    <% elsif @current_user_submission.submission_type == "online_text_entry" %>
-      <a href="<%= context_url(@assignment.context, :context_assignment_submission_url, @assignment.id, @current_user.id) %>" target="_new" class='text-entry'><%= t 'links.submission.view_original_entry', "View the Original Entry" %></a><br/>
     <% elsif @current_user_submission.submission_type == "online_upload" %>
       <% @current_user_submission.attachments.each do |attachment| %>
         <a href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @current_user_submission.user_id, :download => attachment.id) %>" class='file-big'><%= t 'links.submission.download_attachment', "Download %{attachment_display_name}", :attachment_display_name => attachment.display_name %></a><br/>
