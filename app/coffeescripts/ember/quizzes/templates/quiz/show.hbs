@@ -1,12 +1,14 @@
-<div class="row">
-  <div class="span12 quiz-description">
-    {{{description}}}
+<div class="quiz-overview">
+  {{#if description}}
+  <div class="row-fluid">
+    <div class="span12 quiz-description">
+      {{{description}}}
+    </div>
   </div>
-</div>
+  {{/if}}
 
-<div class="row" id="quiz-attribute-table">
-  <dl>
-    <div class="span4 quiz-attribute-column">
+  <div class="row-fluid" id="quiz-attribute-table">
+    <dl class="span4 quiz-attribute-column">
       <dt>{{#t 'quiz_type'}}Quiz Type{{/t}}</dt>
       <dd>{{tQuizType}}</dd>
 
@@ -21,9 +23,9 @@
           {{#t 'no_time_limit'}}None{{/t}}
         {{/if}}
       </dd>
-    </div>
+    </dl>
 
-    <div class="span3 quiz-attribute-column">
+    <dl class="span4 quiz-attribute-column">
       <dt>{{#t 'assignment_group'}}Assignment Group{{/t}}</dt>
       <dd>{{assignmentGroup.name}}</dd>
       <dt>{{#t 'attempts'}}Attempts{{/t}}</dt>
@@ -39,9 +41,9 @@
         <dt>{{#t 'access_code'}}Access Code{{/t}}</dt>
         <dd>{{accessCode}}</dd>
       {{/if}}
-    </div>
+    </dl>
 
-    <div class="span3 quiz-attribute-column">
+    <dl class="span4 quiz-attribute-column">
       {{#if multipleAttemptsAllowed}}
         <dt>{{#t 'score_to_keep'}}Score To Keep{{/t}}</dt>
         <dd>{{tScoringPolicy}}</dd>
@@ -68,23 +70,23 @@
           {{#t 'none'}}None{{/t}}
         {{/if}}
       </dd>
-    </div>
+    </dl>
   </div>
-</dl>
 
-<table class="table align-center" id="due-dates-table">
-  <thead>
-    <tr>
-      <td>{{#t 'due'}}Due{{/t}}</td>
-      <td>{{#t 'for'}}For{{/t}}</td>
-      <td>{{#t 'dates_available'}}Dates Available{{/t}}</td>
-    </tr>
-  </thead>
-  <tbody>
-    {{#each allDates}}
+  <table class="quiz-table table" id="due-dates-table">
+    <thead>
       <tr>
-        {{render "due_date_table_row" this}}
+        <th>{{#t 'due'}}Due{{/t}}</th>
+        <th>{{#t 'for'}}For{{/t}}</th>
+        <th>{{#t 'dates_available'}}Dates Available{{/t}}</th>
       </tr>
-    {{/each}}
-  </tbody>
-</table>
+    </thead>
+    <tbody>
+      {{#each allDates}}
+        <tr>
+          {{render "due_date_table_row" this}}
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</div>

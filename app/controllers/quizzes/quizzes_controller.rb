@@ -86,7 +86,6 @@ class Quizzes::QuizzesController < ApplicationController
     if !@context.root_account.enable_fabulous_quizzes? || !authorized_action(@context, @current_user, :read)
       redirect_to course_quizzes_path
     end
-    @body_classes << 'with_item_groups'
     js_env(:PERMISSIONS => {
       :create  => can_do(@context.quizzes.scoped.new, @current_user, :create),
       :manage  => can_do(@context, @current_user, :manage_assignments)
