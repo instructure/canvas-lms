@@ -46,7 +46,7 @@ module Quizzes::QuizRegrader
 
     def submissions
       # Using a class level scope here because if a restored "model" from a quiz
-      # version is passed (e.g. during the grade_submission method on quiz
+      # version is passed (e.g. during the grade_submission method on SubmissionGrader
       # submissions), the association will always be empty.
       @submissions ||= Quizzes::QuizSubmission.where(quiz_id: quiz.id).select(&:completed?)
     end

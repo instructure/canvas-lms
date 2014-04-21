@@ -346,7 +346,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
     if self.completed?
       if self.submission_data && self.submission_data.is_a?(Hash)
-        self.grade_submission
+        Quizzes::SubmissionGrader.new(self).grade_submission
       end
       self.kept_score = score_to_keep
     end
@@ -521,6 +521,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def grade_submission(opts={})
+    warn '[DEPRECATED] Quizzes::QuizSubmission#grade_submission is deprecated, use Quizzes::SubmissionGrader#grade_submission'
     Quizzes::SubmissionGrader.new(self).grade_submission(opts)
   end
 
@@ -529,7 +530,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   #  - generating a (full) snapshot of the current state along with any
   #  additional answer data that you pass in
   #  - marking the QS as complete (see #workflow_state)
-  #  - grading the QS (see #grade_submission)
+  #  - grading the QS (see SubmissionGrader#grade_submission)
   #
   # @param [Hash] submission_data
   #   Additional answer data to attach to the QS before completing it.
@@ -538,7 +539,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   def complete!(submission_data={})
     self.snapshot!(submission_data, true)
     self.mark_completed
-    self.grade_submission
+    Quizzes::SubmissionGrader.new(self).grade_submission
     self
   end
 
@@ -756,7 +757,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     # a graceful period of 1 minute after the true end date of the submission,
     # which doesn't work for us here.
     if self.untaken?
-      self.grade_submission(:finished_at => self.end_at)
+      Quizzes::SubmissionGrader.new(self).grade_submission(:finished_at => self.end_at)
     end
   end
 

@@ -73,7 +73,7 @@ class Quizzes::QuizzesController < ApplicationController
       @submissions_hash = {}
       @current_user && @current_user.quiz_submissions.where('quizzes.context_id=? AND quizzes.context_type=?', @context, @context.class.to_s).includes(:quiz).each do |s|
         if s.needs_grading?
-          s.grade_submission(:finished_at => s.end_at)
+          Quizzes::SubmissionGrader.new(s).grade_submission(:finished_at => s.end_at)
           s.reload
         end
         @submissions_hash[s.quiz_id] = s
@@ -138,7 +138,7 @@ class Quizzes::QuizzesController < ApplicationController
 
       @just_graded = false
       if @submission && @submission.needs_grading?(!!params[:take])
-        @submission.grade_submission(:finished_at => @submission.end_at)
+        Quizzes::SubmissionGrader.new(@submission).grade_submission(:finished_at => @submission.end_at)
         @submission.reload
         @just_graded = true
       end
@@ -489,7 +489,7 @@ class Quizzes::QuizzesController < ApplicationController
       @submission = nil if @submission && @submission.settings_only?
       @user = @submission && @submission.user
       if @submission && @submission.needs_grading?
-        @submission.grade_submission(:finished_at => @submission.end_at)
+        Quizzes::SubmissionGrader.new(@submission).grade_submission(:finished_at => @submission.end_at)
         @submission.reload
       end
       setup_attachments

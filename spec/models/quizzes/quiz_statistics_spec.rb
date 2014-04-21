@@ -39,7 +39,7 @@ describe Quizzes::QuizStatistics do
   it "should use the last completed submission, even if the current submission is in progress" do
     # one complete submission
     qs = @quiz.generate_submission(@student)
-    qs.grade_submission
+    Quizzes::SubmissionGrader.new(qs).grade_submission
 
     # and one in progress
     qs = @quiz.generate_submission(@student)
@@ -51,7 +51,7 @@ describe Quizzes::QuizStatistics do
   it 'should include previous versions even if the current version is incomplete' do
     # one complete submission
     qs = @quiz.generate_submission(@student)
-    qs.grade_submission
+    Quizzes::SubmissionGrader.new(qs).grade_submission
 
     # and one in progress
     @quiz.generate_submission(@student)
@@ -63,9 +63,9 @@ describe Quizzes::QuizStatistics do
   it 'should not include previous versions by default' do
     # two complete submissions
     qs = @quiz.generate_submission(@student)
-    qs.grade_submission
+    Quizzes::SubmissionGrader.new(qs).grade_submission
     qs = @quiz.generate_submission(@student)
-    qs.grade_submission
+    Quizzes::SubmissionGrader.new(qs).grade_submission
 
     stats = CSV.parse(csv)
     stats.first.length.should == 12

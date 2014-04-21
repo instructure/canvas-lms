@@ -829,7 +829,7 @@ end
     @quiz_submission = @quiz.generate_submission(@user)
     @quiz_submission.mark_completed
     @quiz_submission.submission_data = yield if block_given?
-    @quiz_submission.grade_submission
+    Quizzes::SubmissionGrader.new(@quiz_submission).grade_submission
   end
 
   def survey_with_submission(questions, &block)

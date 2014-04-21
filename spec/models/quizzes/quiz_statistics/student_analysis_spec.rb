@@ -90,7 +90,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
 
       @quiz_submission = @quiz.generate_submission(temporary_user_code)
       @quiz_submission.mark_completed
-      @quiz_submission.grade_submission
+      Quizzes::SubmissionGrader.new(@quiz_submission).grade_submission
       @quiz_submission.save!
     end
 
@@ -107,7 +107,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       @quiz.update_attribute :anonymous_submissions, true
       # one complete submission
       qs = @quiz.generate_submission(@student)
-      qs.grade_submission
+      Quizzes::SubmissionGrader.new(qs).grade_submission
 
       # and one in progress
       @quiz.generate_submission(@student)
@@ -139,7 +139,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       @student.save!
       # one complete submission
       qs = @quiz.generate_submission(@student)
-      qs.grade_submission
+      Quizzes::SubmissionGrader.new(qs).grade_submission
 
       stats = CSV.parse(csv(:include_all_versions => true))
       stats.last[0].should == "nobody@example.com"
@@ -180,7 +180,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       qs.submission_data = {
           "question_#{@quiz.quiz_questions[2].id}_#{AssessmentQuestion.variable_id('ans1')}" => 'baz'
       }
-      qs.grade_submission
+      Quizzes::SubmissionGrader.new(qs).grade_submission
       stats = CSV.parse(csv)
       stats.last.size.should == 16 # 3 questions * 2 lines + ten more (name, id, sis_id, section, section_id, section_sis_id, submitted, correct, incorrect, score)
       stats.last[11].should == ',baz'
@@ -201,7 +201,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       qs.submission_data = {
         "question_#{@quiz.quiz_questions[1].id}" => 5
       }
-      qs.grade_submission
+      Quizzes::SubmissionGrader.new(qs).grade_submission
 
       stats = CSV.parse(csv)
       stats.last[9].should == '5'
@@ -233,11 +233,11 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       :uploaded_data => io
     qs.submission_data["question_#{question.id}".to_sym] = [ attach.id.to_s ]
     qs.save!
-    qs.grade_submission
+    Quizzes::SubmissionGrader.new(qs).grade_submission
     qs = q.generate_submission student2
     qs.submission_data["question_#{question.id}".to_sym] = nil
     qs.save!
-    qs.grade_submission
+    Quizzes::SubmissionGrader.new(qs).grade_submission
     # make student2's submission first
     qs.updated_at = 3.days.ago
     qs.save!
@@ -260,7 +260,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
         "question_#{q.quiz_data[1][:id]}_answer_#{q.quiz_data[1][:answers][0][:id]}" => "1",
         "question_#{q.quiz_data[1][:id]}_answer_#{q.quiz_data[1][:answers][1][:id]}" => "1"
     }
-    qs.grade_submission
+    Quizzes::SubmissionGrader.new(qs).grade_submission
 
     # visual statistics
     stats = q.statistics

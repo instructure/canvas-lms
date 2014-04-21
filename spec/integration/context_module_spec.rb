@@ -150,7 +150,7 @@ describe ContextModule do
         p1.workflow_state.should == 'unlocked'
 
         @quiz_submission = @quiz.generate_submission(@student)
-        @quiz_submission.grade_submission
+        Quizzes::SubmissionGrader.new(@quiz_submission).grade_submission
         @quiz_submission.workflow_state = 'complete'
         @quiz_submission.manually_scored = true
         @quiz_submission.kept_score = 1

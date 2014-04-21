@@ -42,7 +42,7 @@ describe Quizzes::QuizSubmissionsController do
       @quiz.cant_go_back = true
       @quiz.save!
       @submission = @quiz.find_or_create_submission(@student)
-      @submission.grade_submission
+      Quizzes::SubmissionGrader.new(@submission).grade_submission
       post 'create', :course_id => @quiz.context_id, :quiz_id => @quiz.id, :question_123 => 'hi', :validation_token => @submission.validation_token
       response.should be_redirect
     end

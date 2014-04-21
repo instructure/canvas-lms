@@ -101,7 +101,7 @@ describe Quizzes::QuizSubmission do
     it "should update scores for a completed submission" do
       qs = @quiz.generate_submission(@student)
       qs.submission_data = { "question_1" => "1658" }
-      qs.grade_submission
+      Quizzes::SubmissionGrader.new(qs).grade_submission
 
       # sanity check
       qs.reload
@@ -126,11 +126,11 @@ describe Quizzes::QuizSubmission do
     it "should update scores for a previous submission" do
       qs = @quiz.generate_submission(@student)
       qs.submission_data = { "question_1" => "2405" }
-      qs.grade_submission
+      Quizzes::SubmissionGrader.new(qs).grade_submission
 
       qs = @quiz.generate_submission(@student)
       qs.submission_data = { "question_1" => "8544" }
-      qs.grade_submission
+      Quizzes::SubmissionGrader.new(qs).grade_submission
 
       # sanity check
       qs.score.should == 0
@@ -147,7 +147,7 @@ describe Quizzes::QuizSubmission do
     it "should allow updating scores on a completed version of a submission while the current version is in progress" do
       qs = @quiz.generate_submission(@student)
       qs.submission_data = { "question_1" => "2405" }
-      qs.grade_submission
+      Quizzes::SubmissionGrader.new(qs).grade_submission
 
       qs = @quiz.generate_submission(@student)
       qs.backup_submission_data({ "question_1" => "" }) # simulate k/v pairs we store for quizzes in progress
@@ -168,7 +168,7 @@ describe Quizzes::QuizSubmission do
     it "should keep kept_score up-to-date when score changes while quiz is being re-taken" do
       qs = @quiz.generate_submission(@user)
       qs.submission_data = { "question_1" => "2405" }
-      qs.grade_submission
+      Quizzes::SubmissionGrader.new(qs).grade_submission
       qs.kept_score.should == 0
 
       qs = @quiz.generate_submission(@user)
@@ -196,7 +196,7 @@ describe Quizzes::QuizSubmission do
     q.write_attribute(:submission_data, [])
     res = false
     begin
-      res = q.grade_submission
+      res = Quizzes::SubmissionGrader.new(q).grade_submission
       0.should eql(1)
     rescue => e
       e.to_s.should match(Regexp.new("Can't grade an already-submitted submission"))
@@ -541,7 +541,7 @@ describe Quizzes::QuizSubmission do
       question_2 = @q2.data[:id]
       @sub.submission_data["question_#{question_1}"] = answer_1
       @sub.submission_data["question_#{question_2}"] = answer_2 + 1
-      @sub.grade_submission
+      Quizzes::SubmissionGrader.new(@sub).grade_submission
       @sub.score.should eql(1.0)
       @outcome.reload
       @results = @outcome.learning_outcome_results.find_all_by_user_id(@user.id)
@@ -572,7 +572,7 @@ describe Quizzes::QuizSubmission do
       question_2 = @q2.data[:id]
       @sub.submission_data["question_#{question_1}"] = answer_1
       @sub.submission_data["question_#{question_2}"] = answer_2 + 1
-      @sub.grade_submission
+      Quizzes::SubmissionGrader.new(@sub).grade_submission
       @sub.score.should eql(1.0)
       @outcome.reload
       @results = @outcome.learning_outcome_results.find_all_by_user_id(@user.id)
@@ -589,7 +589,7 @@ describe Quizzes::QuizSubmission do
       question_2 = @q2.data[:id]
       @sub.submission_data["question_#{question_1}"] = answer_1 + 1
       @sub.submission_data["question_#{question_2}"] = answer_2
-      @sub.grade_submission
+      Quizzes::SubmissionGrader.new(@sub).grade_submission
       @sub.score.should eql(1.0)
       @outcome.reload
       @results = @outcome.learning_outcome_results.find_all_by_user_id(@user.id)
@@ -629,27 +629,27 @@ describe Quizzes::QuizSubmission do
       it "should be the submission score for one complete submission" do
         qs = @quiz.generate_submission(@student)
         qs.submission_data = { "question_1" => "1658" }
-        qs.grade_submission
+        Quizzes::SubmissionGrader.new(qs).grade_submission
         qs.score_to_keep.should == @quiz.points_possible
       end
 
       it "should be correct for multiple complete versions" do
         qs = @quiz.generate_submission(@student)
         qs.submission_data = { "question_1" => "1658" }
-        qs.grade_submission
+        Quizzes::SubmissionGrader.new(qs).grade_submission
         qs = @quiz.generate_submission(@student)
         qs.submission_data = { "question_1" => "2405" }
-        qs.grade_submission
+        Quizzes::SubmissionGrader.new(qs).grade_submission
         qs.score_to_keep.should == @quiz.points_possible
       end
 
       it "should be correct for multiple versions, current version in progress" do
         qs = @quiz.generate_submission(@student)
         qs.submission_data = { "question_1" => "1658" }
-        qs.grade_submission
+        Quizzes::SubmissionGrader.new(qs).grade_submission
         qs = @quiz.generate_submission(@student)
         qs.submission_data = { "question_1" => "2405" }
-        qs.grade_submission
+        Quizzes::SubmissionGrader.new(qs).grade_submission
         qs = @quiz.generate_submission(@student)
         qs.score_to_keep.should == @quiz.points_possible
       end
@@ -669,27 +669,27 @@ describe Quizzes::QuizSubmission do
       it "should be the submission score for one complete submission" do
         qs = @quiz.generate_submission(@student)
         qs.submission_data = { "question_1" => "1658" }
-        qs.grade_submission
+        Quizzes::SubmissionGrader.new(qs).grade_submission
         qs.score_to_keep.should == @quiz.points_possible
       end
 
       it "should be correct for multiple complete versions" do
         qs = @quiz.generate_submission(@student)
         qs.submission_data = { "question_1" => "1658" }
-        qs.grade_submission
+        Quizzes::SubmissionGrader.new(qs).grade_submission
         qs = @quiz.generate_submission(@student)
         qs.submission_data = { "question_1" => "2405" }
-        qs.grade_submission
+        Quizzes::SubmissionGrader.new(qs).grade_submission
         qs.score_to_keep.should == 0
       end
 
       it "should be correct for multiple versions, current version in progress" do
         qs = @quiz.generate_submission(@student)
         qs.submission_data = { "question_1" => "1658" }
-        qs.grade_submission
+        Quizzes::SubmissionGrader.new(qs).grade_submission
         qs = @quiz.generate_submission(@student)
         qs.submission_data = { "question_1" => "2405" }
-        qs.grade_submission
+        Quizzes::SubmissionGrader.new(qs).grade_submission
         qs = @quiz.generate_submission(@student)
         qs.score_to_keep.should == 0
       end
@@ -925,7 +925,7 @@ describe Quizzes::QuizSubmission do
     let(:submission) { @quiz.quiz_submissions.build }
 
     before do
-      submission.grade_submission
+      Quizzes::SubmissionGrader.new(submission).grade_submission
     end
 
     it "should find regrade versions for a submission" do
@@ -1043,7 +1043,7 @@ describe Quizzes::QuizSubmission do
 
       it "returns false if it has already been graded" do
         submission = @quiz.generate_submission(@student)
-        submission.grade_submission
+        Quizzes::SubmissionGrader.new(submission).grade_submission
         submission.save!
 
         submission.needs_grading?.should be_false
@@ -1090,7 +1090,7 @@ describe Quizzes::QuizSubmission do
     survey_with_submission(questions) { submission_data }
     teacher_in_course(course: @course, active_all: true)
     @quiz.update_attributes(points_possible: 15, quiz_type: 'graded_survey')
-    @quiz_submission.reload.grade_submission
+    Quizzes::SubmissionGrader.new(@quiz_submission.reload).grade_submission
 
     @quiz_submission.should be_completed
     @quiz_submission.submission.should be_graded
@@ -1110,12 +1110,12 @@ describe Quizzes::QuizSubmission do
 
     it 'sends a graded notification after grading the quiz submission' do
       @submission.messages_sent.should_not include 'Submission Graded'
-      @submission.grade_submission
+      Quizzes::SubmissionGrader.new(@submission).grade_submission
       @submission.reload.messages_sent.keys.should include 'Submission Graded'
     end
 
     it 'sends a grade changed notification after re-grading the quiz submission' do
-      @submission.grade_submission
+      Quizzes::SubmissionGrader.new(@submission).grade_submission
       @submission.score = @submission.score + 5
       @submission.save!
       @submission.reload.messages_sent.keys.should include('Submission Grade Changed')
@@ -1270,11 +1270,11 @@ describe Quizzes::QuizSubmission do
       it "finds the versions with both namespaced and non-namespaced quizzes" do
         qs = @quiz.generate_submission(@student)
         qs.submission_data = { "question_1" => "2405" }
-        qs.grade_submission
+        Quizzes::SubmissionGrader.new(qs).grade_submission
 
         qs = @quiz.generate_submission(@student)
         qs.submission_data = { "question_1" => "8544" }
-        qs.grade_submission
+        Quizzes::SubmissionGrader.new(qs).grade_submission
 
         qs.versions.count.should == 2
         Version.update_all("versionable_type='QuizSubmission'","versionable_id=#{qs.id} AND versionable_type='Quizzes::QuizSubmission'")

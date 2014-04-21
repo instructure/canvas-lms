@@ -71,7 +71,7 @@ describe "speed grader" do
     q.save!
     qs = q.generate_submission(student)
     qs.submission_data = {"foo" => "bar1"}
-    qs.grade_submission
+    Quizzes::SubmissionGrader.new(qs).grade_submission
 
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     wait_for_ajaximations
@@ -105,7 +105,7 @@ describe "speed grader" do
     [student, @teacher].each do |user|
       q.generate_submission(student).tap do |qs|
         qs.submission_data = {'foo' => 'bar1'}
-        qs.grade_submission
+        Quizzes::SubmissionGrader.new(qs).grade_submission
       end
     end
 
@@ -129,7 +129,7 @@ describe "speed grader" do
       2.times do |i|
         qs = @quiz.generate_submission(@student)
         opts = i == 0 ? {finished_at: (Date.today - 7) + 30.minutes} : {}
-        qs.grade_submission(opts)
+        Quizzes::SubmissionGrader.new(qs).grade_submission(opts)
       end
     end
 

@@ -297,11 +297,11 @@ describe Submission do
         user       = account_admin_user
         channel    = user.communication_channels.create!(:path => 'admin@example.com')
         submission = quiz.generate_submission(user, false)
-        submission.grade_submission
+        Quizzes::SubmissionGrader.new(submission).grade_submission
 
         channel2   = @teacher.communication_channels.create!(:path => 'chang@example.com')
         submission2 = quiz.generate_submission(@teacher, false)
-        submission2.grade_submission
+        Quizzes::SubmissionGrader.new(submission2).grade_submission
 
         submission.submission.messages_sent.should_not be_include('Submission Graded')
         submission2.submission.messages_sent.should_not be_include('Submission Graded')

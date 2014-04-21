@@ -677,7 +677,7 @@ describe Quizzes::Quiz do
     q.quiz_submissions.size.should == 0
 
     # create a graded submission
-    q.generate_submission(User.create!(:name => "some_user")).grade_submission
+    Quizzes::SubmissionGrader.new(q.generate_submission(User.create!(:name => "some_user"))).grade_submission
     q.reload
 
     q.quiz_submissions.size.should == 1
