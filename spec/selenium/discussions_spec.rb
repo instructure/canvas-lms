@@ -660,6 +660,35 @@ describe "discussions" do
         user_session(teacher)
       end
 
+      describe "rubrics" do
+        it "should change points when used for grading" do
+          get "/courses/#{course.id}/discussion_topics/#{assignment_topic.id}"
+          wait_for_ajax_requests
+
+          f('.al-trigger').click
+          wait_for_ajaximations
+
+          fj('.icon-rubric').click
+          wait_for_ajaximations
+
+          new_points = get_value(".criterion_points")
+          dialog = fj(".ui-dialog:visible")
+
+          set_value fj(".grading_rubric_checkbox:visible", dialog), true
+
+          fj(".save_button:visible", dialog).click
+          wait_for_ajaximations
+
+          fj(".ui-button:contains('Change'):visible").click
+          wait_for_ajaximations
+
+          fj(".save_button:visible", dialog).click
+          wait_for_ajaximations
+
+          fj(".discussion-title").should include_text(new_points)
+        end
+      end
+
       it "should escape correctly when posting an attachment" do
         get url
         message = "message that needs escaping ' \" & !@#^&*()$%{}[];: blah"

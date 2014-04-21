@@ -699,7 +699,7 @@ define([
         if (!$rubric.find(".criterion:not(.blank)").length) return false;
         var data = rubricEditing.rubricData($rubric);
         if (data['rubric_association[use_for_grading]'] == '1') {
-          var assignmentPoints = parseFloat($("#assignment_show .points_possible").text());
+          var assignmentPoints = parseFloat($("#assignment_show .points_possible, .discussion-title .discussion-points").text());
           var rubricPoints = parseFloat(data.points_possible);
           if (assignmentPoints != null && assignmentPoints != undefined && rubricPoints != assignmentPoints && !forceSubmit) {
             var $confirmDialog = $(changePointsPossibleToMatchRubricDialog({
@@ -756,6 +756,10 @@ define([
         rubricEditing.updateRubric($rubric, rubric);
         if (data.rubric_association && data.rubric_association.use_for_grading && !data.rubric_association.skip_updating_points_possible) {
           $("#assignment_show .points_possible").text(rubric.points_possible);
+          discussion_points_text = I18n.t('discussion_points_possible',
+                                          {one: '%{count} point possible', other: '%{count} points possible' },
+                                          {count: rubric.points_possible || 0})
+          $(".discussion-title .discussion-points").text(discussion_points_text);
         }
         $rubric.find(".rubric_title .links:not(.locked)").show();
       }
