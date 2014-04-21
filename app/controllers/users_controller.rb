@@ -1239,8 +1239,12 @@ class UsersController < ApplicationController
   end
 
   def media_download
-    asset = CanvasKaltura::ClientV3.new.media_sources(params[:entryId]).find{|a| a[:fileExt] == params[:type] }
-    url = asset && asset[:url]
+    fetcher = MediaSourceFetcher.new(CanvasKaltura::ClientV3.new)
+    url = fetcher.fetch_preferred_source_url(
+       media_id: params[:entryId],
+       file_extension: params[:type],
+       media_type: params[:media_type]
+    )
     if url
       if params[:redirect] == '1'
         redirect_to url

@@ -413,20 +413,16 @@ module Api
       media_id = anchor['id'].try(:sub, /^media_comment_/, '')
       next if media_id.blank?
 
-      if anchor['class'].try(:match, /\baudio_comment\b/)
-        node = Nokogiri::XML::Node.new('audio', doc)
-        node['data-media_comment_type'] = 'audio'
-      else
-        node = Nokogiri::XML::Node.new('video', doc)
-        thumbnail = media_object_thumbnail_url(media_id, :width => 550, :height => 448, :type => 3, :host => host, :protocol => protocol)
-        node['poster'] = thumbnail
-        node['data-media_comment_type'] = 'video'
+      media_type = anchor['class'].try(:match, /\baudio_comment\b/) ? 'audio' : 'video'
+      node = Nokogiri::XML::Node.new(media_type, doc)
+      node['data-media_comment_type'] = media_type
+      if media_type == 'video'
+        node['poster'] = media_object_thumbnail_url(media_id, :width => 550, :height => 448, :type => 3, :host => host, :protocol => protocol)
       end
-
       node['preload'] = 'none'
       node['class'] = 'instructure_inline_media_comment'
       node['data-media_comment_id'] = media_id
-      media_redirect = polymorphic_url([context, :media_download], :entryId => media_id, :type => 'mp4', :redirect => '1', :host => host, :protocol => protocol)
+      media_redirect = polymorphic_url([context, :media_download], :entryId => media_id, :media_type => media_type, :redirect => '1', :host => host, :protocol => protocol)
       node['controls'] = 'controls'
       node['src'] = media_redirect
       node.inner_html = anchor.inner_html
