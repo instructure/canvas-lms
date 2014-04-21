@@ -84,7 +84,7 @@ gem 'netaddr', '1.5.0'
 gem 'nokogiri', '1.5.6'
 # oauth gem, with rails3 fixes rolled in
 gem 'oauth-instructure', '0.4.10', :require => 'oauth'
-gem 'rake', '10.1.1'
+gem 'rake', '10.3.1'
 gem 'rdoc', '3.12'
 gem 'ratom-instructure', '0.6.9', :require => "atom" # custom gem until necessary changes are merged into mainstream
 gem 'rdiscount', '1.6.8'
