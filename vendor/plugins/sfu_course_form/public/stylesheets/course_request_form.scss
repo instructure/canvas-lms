@@ -29,6 +29,13 @@ div.actions.choices button {
   margin: 0 0.25em;
 }
 
+#copyright_dialog {
+  display: none; // hide contents of the modal dialog
+}
+#copyright_dialog iframe {
+  border: none;
+}
+
 // -- Calendar Course --
 
 .term.tag {

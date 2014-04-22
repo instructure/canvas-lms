@@ -116,17 +116,62 @@
     }
     // END no-flash upload FIX
 
-    // Alphabetize course drop-down list (Import Content page only)
-    // NOTE: This is no longer needed when XHR results are pre-sorted by Canvas
+    // Add copyright compliance notice under the Publish Course button
+    utils.onPage(/^\/courses\/\d+$/, function() {
+        // The Publish Course button ID attribute contains the course ID
+        var $publishButton = $('#' + location.pathname.replace('/courses/', 'edit_course_'));
+        var $readMoreLink = $('<a href="/sfu/copyright/disclaimer" class="element_toggler" aria-controls="copyright_dialog" target="_blank">Read more.</a>');
+        var $disclaimer = $('<iframe src="/sfu/copyright/disclaimer" seamless="seamless" width="100%" height="100%">').css('border', 'none');
+        $("<p>I confirm that the use of copyright protected materials in this course complies with Canada's <em>Copyright Act</em> and SFU Policy R30.04 - <em>Copyright Compliance and Administration</em>. </p>")
+            .append($readMoreLink)
+            .insertAfter($publishButton);
+        // Use a modal dialog to display the full disclaimer
+        $('<form id="copyright_dialog" title="Copyright Disclaimer">')
+            .attr('data-turn-into-dialog', '{"width":600,"height":500,"modal":true}')
+            .append($disclaimer)
+            .hide()
+            .appendTo('body');
+    });
+
+    // CANVAS-244 1/2 Add enrollment term to course autocomplete
+    utils.onPage(/accounts\/\d+(\/courses)?$/, function () {
+        // Override the method that renders the autocomplete item
+        var autocompleteData = $('#course_name').data('ui-autocomplete');
+        if (autocompleteData) {
+            autocompleteData._renderItem = function (ul, item) {
+                return $('<li>')
+                    .append('<a><div>' + item.label + '</div><div><small><em>' + item.term + '</em></small></div></a>')
+                    .appendTo(ul);
+            };
+        }
+    });
+    // END CANVAS-244 1/2
+
+    // Fixes for Import Content page only
     utils.onPage(/courses\/\d+\/content_migrations/, function() {
+        // The fixes are for elements that are dynamically generated when a specific XHR call completes
         $(document).ajaxComplete(function (event, XMLHttpRequest, ajaxOptions) {
-            // Sort <option>s inside each <optgroup> when the relevant XHR call completes
             if (ajaxOptions.url && ajaxOptions.url.match(/users\/\d+\/manageable_courses/)) {
+                // Alphabetize course drop-down list, by sorting <option>s inside each <optgroup>
+                // NOTE: This is no longer needed when XHR results are pre-sorted by Canvas
                 $('optgroup', $('#courseSelect')).each(function (i, termGroup) {
                     $('option', termGroup)
                         .sort(function (a, b) { return $(a).text().localeCompare($(b).text()); })
                         .appendTo(termGroup);
                 });
+                // END Alphabetize course drop-down list
+
+                // CANVAS-244 2/2 Add enrollment term to course autocomplete
+                // Override the method that renders the autocomplete item
+                var autocompleteData = $('#courseSearchField').data('ui-autocomplete');
+                if (autocompleteData) {
+                    autocompleteData._renderItem = function (ul, item) {
+                        return $('<li>')
+                            .append('<a><div>' + item.label + '</div><div><small><em>' + item.term + '</em></small></div></a>')
+                            .appendTo(ul);
+                    };
+                }
+                // END CANVAS-244 2/2
             }
         });
     });
