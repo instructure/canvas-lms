@@ -34,3 +34,7 @@ define [
         collection: 'courses'
       copied_from:
         collection: 'courses'
+      reset_to:
+        collection: 'courses'
+      reset_from:
+        collection: 'courses'

@@ -1868,6 +1868,7 @@ class CoursesController < ApplicationController
     get_context
     return unless authorized_action(@context, @current_user, :reset_content)
     @new_course = @context.reset_content
+    Auditors::Course.record_reset(@context, @new_course, @current_user, source: api_request? ? :api : :manual)
     redirect_to course_settings_path(@new_course.id)
   end
 

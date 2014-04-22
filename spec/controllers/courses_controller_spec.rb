@@ -1182,6 +1182,12 @@ describe CoursesController do
       assert_status(401)
       @course.reload.should be_available
     end
+
+    it "should log reset audit event" do
+      course_with_teacher_logged_in(:active_all => true)
+      Auditors::Course.expects(:record_reset).once.with(@course, anything, @user, anything)
+      post 'reset_content', :course_id => @course.id
+    end
   end
 
   context "changed_settings" do

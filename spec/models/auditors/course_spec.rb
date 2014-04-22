@@ -118,7 +118,6 @@ describe Auditors::Course do
       @event.event_data.should == {}
     end
 
-
     it "should log copied event" do
       @course, @copy_course = @course, course(:active_all => true)
       @from_event, @to_event = Auditors::Course.record_copied(@course, @copy_course, @teacher, source: :api)
@@ -131,7 +130,20 @@ describe Auditors::Course do
       @to_event.event_type.should == "copied_to"
       @to_event.event_data.should == { :"copied_to" => Shard.global_id_for(@copy_course) }
     end
-  end
+
+    it "should log reset event" do
+      @course, @new_course = @course, course(:active_all => true)
+      @from_event, @to_event = Auditors::Course.record_reset(@course, @new_course, @teacher, source: :api)
+
+      @from_event.course.should == @new_course
+      @from_event.event_type.should == "reset_from"
+      @from_event.event_data.should == { :"reset_from" => Shard.global_id_for(@course) }
+
+      @to_event.course.should == @course
+      @to_event.event_type.should == "reset_to"
+      @to_event.event_data.should == { :"reset_to" => Shard.global_id_for(@new_course) }
+    end
+ end
 
   describe "options forwarding" do
     before do

@@ -30,10 +30,10 @@ module Api::V1::CourseEvent
       :sis_batch => Shard.relative_id_for(event.sis_batch_id, Shard.current, Shard.current)
     }
 
-    # Since copied events relate to another course lets put that where it
+    # Since copied/reset events relate to another course lets put that where it
     # belongs according to jsonapi.
     event_data = event.event_data
-    if event.event_type == "copied_to" || event.event_type == "copied_from"
+    if event.event_type == "copied_to" || event.event_type == "copied_from" || event.event_type == "reset_to" || event.event_type == "reset_from"
       # try to convert the id to a relative id.
       if event_data.has_key?(event.event_type)
         event_data[event.event_type] = Shard.relative_id_for(event_data[event.event_type], Shard.current, Shard.current)

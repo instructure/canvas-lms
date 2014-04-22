@@ -507,5 +507,21 @@ describe "admin_tools" do
       show_event_details("Copied From", @copied_course.name, @from_event)
       fj('.ui-dialog dl dd:last').text.should == @course.name
     end
+
+    it "should show reset_to event details" do
+      @course, @reset_course = @course, course(active_course: true, course_name: "Reset Course")
+      @from_event, @to_event = Auditors::Course.record_reset(@course, @reset_course, @teacher)
+
+      show_event_details("Reset To", @course.name, @to_event)
+      fj('.ui-dialog dl dd:last').text.should == @reset_course.name
+    end
+
+    it "should show copied_from event details" do
+      @course, @reset_course = @course, course(active_course: true, course_name: "Reset Course")
+      @from_event, @to_event = Auditors::Course.record_reset(@course, @reset_course, @teacher)
+
+      show_event_details("Reset From", @reset_course.name, @from_event)
+      fj('.ui-dialog dl dd:last').text.should == @course.name
+    end
   end
 end

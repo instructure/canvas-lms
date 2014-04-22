@@ -36,6 +36,10 @@ define [
           json.event_type_present = I18n.t("event_type.copied_from", "Copied From")
         when "copied_to"
           json.event_type_present = I18n.t("event_type.copied_to", "Copied To")
+        when "reset_from"
+          json.event_type_present = I18n.t("event_type.reset_from", "Reset From")
+        when "reset_to"
+          json.event_type_present = I18n.t("event_type.reset_to", "Reset To")
         else
           json.event_type_present = json.event_type
 
