@@ -28,13 +28,13 @@ describe "Importing assignments" do
 
         data[:assignments_to_import] = {}
         expect {
-          Assignment.import_from_migration(data, context).should be_nil
+          Importers::AssignmentImporter.import_from_migration(data, context).should be_nil
         }.to change(Assignment, :count).by(0)
 
         data[:assignments_to_import][data[:migration_id]] = true
         expect {
-          Assignment.import_from_migration(data, context)
-          Assignment.import_from_migration(data, context)
+          Importers::AssignmentImporter.import_from_migration(data, context)
+          Importers::AssignmentImporter.import_from_migration(data, context)
         }.to change(Assignment, :count).by(1)
         a = Assignment.find_by_migration_id(data[:migration_id])
         
@@ -58,7 +58,7 @@ describe "Importing assignments" do
     rubric.points_possible = 42
     rubric.save!
 
-    Assignment.import_from_migration(assignment_hash, context)
+    Importers::AssignmentImporter.import_from_migration(assignment_hash, context)
     a = Assignment.find_by_migration_id(assignment_hash[:migration_id])
     a.points_possible.should == rubric.points_possible
   end

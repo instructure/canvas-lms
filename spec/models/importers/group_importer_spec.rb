@@ -27,13 +27,13 @@ describe "Importing Groups" do
         context = get_import_context(system)
 
         data[:groups_to_import] = {}
-        Group.import_from_migration(data, context).should be_nil
-        Group.count.should == 0
+        Importers::GroupImporter.import_from_migration(data, context).should be_nil
+        context.groups.count.should == 0
 
         data[:groups_to_import][data[:migration_id]] = true
-        Group.import_from_migration(data, context)
-        Group.import_from_migration(data, context)
-        Group.count.should == 1
+        Importers::GroupImporter.import_from_migration(data, context)
+        Importers::GroupImporter.import_from_migration(data, context)
+        context.groups.count.should == 1
         g = Group.find_by_migration_id(data[:migration_id])
 
         g.name.should == data[:title]
@@ -45,8 +45,8 @@ describe "Importing Groups" do
     data = get_import_data('bb8', 'group')
     context = get_import_context('bb8')
 
-    Group.import_from_migration(data, context)
-    Group.count.should == 1
+    Importers::GroupImporter.import_from_migration(data, context)
+    context.groups.count.should == 1
 
     category = get_import_data('bb8', 'group_discussion')
 
@@ -54,11 +54,10 @@ describe "Importing Groups" do
       topic['group_id'] = category['group_id']
       group = Group.find_by_context_id_and_context_type_and_migration_id(context.id, context.class.to_s, topic['group_id'])
       if group
-        Importers::DiscussionTopic.import_from_migration(topic, group)
+        Importers::DiscussionTopicImporter.import_from_migration(topic, group)
       end
     end
 
-    DiscussionTopic.count.should == 1
     group = Group.find_by_migration_id(data[:migration_id])
     group.discussion_topics.count.should == 1
   end

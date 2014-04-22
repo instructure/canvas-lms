@@ -176,7 +176,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
 
   def self.import_from_migration(hash, context, quiz=nil, quiz_group=nil)
     unless hash[:prepped_for_import]
-      AssessmentQuestion.prep_for_import(hash, context)
+      Importers::AssessmentQuestionImporter.prep_for_import(hash, context)
     end
 
     question_data = self.connection.quote hash.to_yaml

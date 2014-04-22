@@ -2929,18 +2929,6 @@ describe Course, ".import_from_migration" do
     course_with_teacher
   end
 
-  it "should wait for media objects on canvas cartridge import" do
-    migration = mock(:canvas_import? => true)
-    MediaObject.expects(:add_media_files).with([@attachment], true)
-    @course.import_media_objects([@attachment], migration)
-  end
-
-  it "should not wait for media objects on other import" do
-    migration = mock(:canvas_import? => false)
-    MediaObject.expects(:add_media_files).with([@attachment], false)
-    @course.import_media_objects([@attachment], migration)
-  end
-
   it "should know when it has open course imports" do
     # no course imports
     @course.should_not have_open_course_imports
@@ -2961,45 +2949,6 @@ describe Course, ".import_from_migration" do
     # failed course import
     @course.course_imports.first.update_attribute(:workflow_state, 'failed')
     @course.should_not have_open_course_imports
-  end
-
-  describe "setting storage quota" do
-    before do
-      course_with_teacher
-      @course.storage_quota = 1
-      @cm = ContentMigration.new(:context => @course, :user => @user, :copy_options => {:everything => "1"})
-      @cm.user = @user
-      @cm.save!
-    end
-
-    it "should not adjust for unauthorized user" do
-      @course.import_settings_from_migration({:course=>{:storage_quota => 4}}, @cm)
-      @course.storage_quota.should == 1
-    end
-
-    it "should adjust for authorized user" do
-      account_admin_user(:user => @user)
-      @course.import_settings_from_migration({:course=>{:storage_quota => 4}}, @cm)
-      @course.storage_quota.should == 4
-    end
-
-    it "should be set for course copy" do
-      @cm.source_course = @course
-      @course.import_settings_from_migration({:course=>{:storage_quota => 4}}, @cm)
-      @course.storage_quota.should == 4
-    end
-  end
-
-  describe "shift_date_options" do
-    it "should default options[:time_zone] to the root account's time zone" do
-      account = Account.default.sub_accounts.create!
-      course_with_teacher(account: account)
-      @course.root_account.default_time_zone = 'America/New_York'
-      @course.start_at = 1.month.ago
-      @course.conclude_at = 1.month.from_now
-      options = @course.shift_date_options(@course, {})
-      options[:time_zone].should == ActiveSupport::TimeZone['Eastern Time (US & Canada)']
-    end
   end
 end
 

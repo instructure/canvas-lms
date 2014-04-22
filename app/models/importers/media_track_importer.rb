@@ -17,7 +17,9 @@
 #
 
 module Importers
-  class MediaTrack
+  class MediaTrackImporter < Importer
+
+    self.item_class = MediaTrack
 
     def self.process_migration(data, migration)
       return unless data.present?

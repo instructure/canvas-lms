@@ -17,8 +17,9 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '../../../import_helper')
 
-describe Importers::CalendarEvent do
+describe Importers::CalendarEventImporter do
 
   let(:migration_course) { course(active_all: true) }
 
@@ -53,7 +54,7 @@ describe Importers::CalendarEvent do
   end
 
   def attachment_suffix(type, value)
-    Importers::CalendarEvent.import_migration_attachment_suffix(
+    Importers::CalendarEventImporter.import_migration_attachment_suffix(
       {
         attachment_type: type,
         attachment_value: value,
@@ -79,7 +80,7 @@ describe Importers::CalendarEvent do
         attachment_type: 'external_url',
         attachment_value: 'http://example.com'
       }
-      Importers::CalendarEvent.import_from_migration(hash, migration_course, event)
+      Importers::CalendarEventImporter.import_from_migration(hash, migration_course, event)
       event.should_not be_new_record
       event.imported.should be_true
       event.migration_id.should == 42
@@ -135,5 +136,27 @@ describe Importers::CalendarEvent do
       result.should be_empty
     end
 
+  end
+
+  SYSTEMS.each do |system|
+    if import_data_exists? system, 'calendar_event'
+      it "should import calendar events for #{system}" do
+        data = get_import_data(system, 'calendar_event')
+        context = get_import_context(system)
+
+        data[:events_to_import] = {}
+        Importers::CalendarEventImporter.import_from_migration(data, context).should be_nil
+        context.calendar_events.count.should == 0
+
+        data[:events_to_import][data[:migration_id]] = true
+        Importers::CalendarEventImporter.import_from_migration(data, context)
+        Importers::CalendarEventImporter.import_from_migration(data, context)
+        context.calendar_events.count.should == 1
+
+        event = CalendarEvent.find_by_migration_id(data[:migration_id])
+        event.title.should == data[:title]
+        event.description.gsub("&#x27;", "'").index(data[:description]).should_not be_nil
+      end
+    end
   end
 end

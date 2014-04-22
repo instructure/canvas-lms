@@ -1356,12 +1356,7 @@ class Account < ActiveRecord::Base
   end
 
   def import_from_migration(data, params, migration)
-
-    LearningOutcome.process_migration(data, migration)
-
-    migration.progress=100
-    migration.workflow_state = :imported
-    migration.save
+    Importers::AccountContentImporter.import_content(self, data, params, migration)
   end
 
   def enable_fabulous_quizzes!

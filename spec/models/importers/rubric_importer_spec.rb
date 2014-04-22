@@ -29,13 +29,13 @@ describe "Importing Rubrics" do
         migration.stubs(:context).returns(context)
 
         data[:rubrics_to_import] = {}
-        Rubric.import_from_migration(data, migration).should be_nil
-        Rubric.count.should == 0
+        Importers::RubricImporter.import_from_migration(data, migration).should be_nil
+        context.rubrics.count.should == 0
 
         data[:rubrics_to_import][data[:migration_id]] = true
-        Rubric.import_from_migration(data, migration)
-        Rubric.import_from_migration(data, migration)
-        Rubric.count.should == 1
+        Importers::RubricImporter.import_from_migration(data, migration)
+        Importers::RubricImporter.import_from_migration(data, migration)
+        context.rubrics.count.should == 1
         r = Rubric.find_by_migration_id(data[:migration_id])
         
         r.title.should == data[:title]

@@ -909,52 +909,15 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def self.process_migration(data, migration)
-    process_announcements_migration(Array(data['announcements']), migration)
-    process_discussion_topics_migration(Array(data['discussion_topics']), migration)
+    # TODO: access Importers::DiscussionTopic directly
+    Importers::DiscussionTopicImporter.process_migration(data, migration)
   end
 
-  def self.process_announcements_migration(announcements, migration)
-    announcements.each do |event|
-      next unless migration.import_object?('announcements', event['migration_id'])
-      event[:type] = 'announcement'
-
-      begin
-        import_from_migration(event, migration.context)
-      rescue
-        migration.add_import_warning(t('#migration.announcement_type', "Announcement"), event[:title], $!)
-      end
-    end
-  end
-
-  def self.process_discussion_topics_migration(discussion_topics, migration)
-    topic_entries_to_import = migration.to_import('topic_entries')
-    discussion_topics.each do |topic|
-      context = Group.where(context_id: migration.context.id,
-        context_type: migration.context.class.to_s,
-        migration_id: topic['group_id']).first if topic['group_id']
-      context ||= migration.context
-      next unless context && can_import_topic?(topic, migration)
-      begin
-        import_from_migration(topic.merge(topic_entries_to_import: topic_entries_to_import), context)
-      rescue
-        migration.add_import_warning(t('#migration.discussion_topic_type', "Discussion Topic"), topic[:title], $!)
-      end
-    end
-  end
-
-  def self.can_import_topic?(topic, migration)
-    migration.import_object?('discussion_topics', topic['migration_id']) ||
-      migration.import_object?("topics", topic['migration_id']) ||
-      (topic['type'] == 'announcement' &&
-       migration.import_object?('announcements', topic['migration_id']))
-  end
-
-  def self.import_from_migration(hash, context, item=nil)
+  def self.import_from_migration(*args)
     # TODO: access Importers::DiscussionTopic directly
     # this class method will eventually go away. leaving now
     # for edge cases that may be using it.
-    importer = Importers::DiscussionTopic.new(hash, context, item)
-    importer.run
+    Importers::DiscussionTopicImporter.import_from_migration(*args)
   end
 
   def self.podcast_elements(messages, context)

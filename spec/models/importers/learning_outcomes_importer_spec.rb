@@ -26,10 +26,10 @@ describe "Importing Learning Outcomes" do
     data = get_import_data [], 'outcomes'
     data = {'learning_outcomes'=>data}
 
-    LearningOutcome.process_migration(data, migration)
-    LearningOutcome.process_migration(data, migration)
+    Importers::LearningOutcomeImporter.process_migration(data, migration)
+    Importers::LearningOutcomeImporter.process_migration(data, migration)
 
-    LearningOutcome.count.should == 2
+    context.learning_outcomes.count.should == 2
     lo1 = LearningOutcome.find_by_migration_id("bdf6dc13-5d8f-43a8-b426-03380c9b6781")
     lo1.description.should == "Outcome 1: Read stuff"
     lo2 = LearningOutcome.find_by_migration_id("fa67b467-37c7-4fb9-aef4-21a33a06d0be")

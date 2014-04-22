@@ -711,7 +711,7 @@ describe ContentMigration do
                "migration_id"=>"id1072dcf40e801c6468d9eaa5774e56d"}
       
       @cm.outcome_to_id_map = {}
-      LearningOutcome.import_from_migration(hash, @cm)
+      Importers::LearningOutcomeImporter.import_from_migration(hash, @cm)
       
       @cm.warnings.should == ["The external Learning Outcome couldn't be found for \"root outcome\", creating a copy."]
       
@@ -745,7 +745,7 @@ describe ContentMigration do
               "migration_id"=>"id1072dcf40e801c6468d9eaa5774e56d"}
 
       @cm.outcome_to_id_map = {}
-      Rubric.import_from_migration(hash, @cm)
+      Importers::RubricImporter.import_from_migration(hash, @cm)
 
       @cm.warnings.should == ["The external Rubric couldn't be found for \"root rubric\", creating a copy."]
 

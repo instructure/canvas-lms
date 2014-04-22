@@ -26,13 +26,13 @@ describe "Importing modules" do
         data = get_import_data(system, 'module')
         context = get_import_context(system)
         data[:modules_to_import] = {}
-        ContextModule.import_from_migration(data, context).should be_nil
-        ContextModule.count.should == 0
+        Importers::ContextModuleImporter.import_from_migration(data, context).should be_nil
+        context.context_modules.count.should == 0
 
         data[:modules_to_import][data[:migration_id]] = true
-        ContextModule.import_from_migration(data, context)
-        ContextModule.import_from_migration(data, context)
-        ContextModule.count.should == 1
+        Importers::ContextModuleImporter.import_from_migration(data, context)
+        Importers::ContextModuleImporter.import_from_migration(data, context)
+        context.context_modules.count.should == 1
 
         mod = ContextModule.find_by_migration_id(data[:migration_id])
         mod.content_tags.count.should == data[:items].count{|m|m[:linked_resource_type]=='URL_TYPE'}
@@ -46,7 +46,7 @@ describe "Importing modules" do
     context = get_import_context('vista')
     context.external_url_hash = {}
 
-    topic = ContextModule.import_from_migration(data, context)
+    topic = Importers::ContextModuleImporter.import_from_migration(data, context)
     topic.content_tags.count.should == 2
   end
   
@@ -56,14 +56,14 @@ describe "Importing modules" do
     context.external_url_hash = {}
 
 
-    topic = ContextModule.import_from_migration(data, context)
+    topic = Importers::ContextModuleImporter.import_from_migration(data, context)
     topic.content_tags.count.should == 0
 
     ass = get_import_data('bb8', 'assignment')
-    Assignment.import_from_migration(ass, context)
+    Importers::AssignmentImporter.import_from_migration(ass, context)
     context.assignments.count.should == 1
     
-    topic = ContextModule.import_from_migration(data, context)
+    topic = Importers::ContextModuleImporter.import_from_migration(data, context)
     topic.content_tags.count.should == 1
   end
   

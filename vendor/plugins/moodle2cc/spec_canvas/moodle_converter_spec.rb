@@ -24,7 +24,7 @@ describe Moodle::Converter do
   end
 
   it "should successfully import the course" do
-    @course.import_from_migration(@course_data, nil, @cm)
+    Importers::CourseContentImporter.import_content(@course, @course_data, nil, @cm)
     allowed_warnings = ["Multiple Dropdowns question may have been imported incorrectly",
                         "Possible answers will need to be regenerated for Formula question",
                         "Missing links found in imported content"]
@@ -64,8 +64,8 @@ describe Moodle::Converter do
   context "discussion topics" do
     before(:each) do
       #These need to be ran twice because they can reference each other
-      DiscussionTopic.process_migration(@course_data, @cm)
-      DiscussionTopic.process_migration(@course_data, @cm)
+      Importers::DiscussionTopicImporter.process_migration(@course_data, @cm)
+      Importers::DiscussionTopicImporter.process_migration(@course_data, @cm)
     end
 
     it "should convert discussion topics" do
@@ -84,8 +84,8 @@ describe Moodle::Converter do
   context "assignments" do
     before(:each) do
       #These need to be ran twice because they can reference each other
-      Assignment.process_migration(@course_data, @cm)
-      Assignment.process_migration(@course_data, @cm)
+      Importers::AssignmentImporter.process_migration(@course_data, @cm)
+      Importers::AssignmentImporter.process_migration(@course_data, @cm)
     end
 
     it "should convert assignments" do
@@ -110,8 +110,8 @@ describe Moodle::Converter do
   context "wiki pages" do
     before(:each) do
       #These need to be ran twice because they can reference each other
-      WikiPage.process_migration(@course_data, @cm)
-      WikiPage.process_migration(@course_data, @cm)
+      Importers::WikiPageImporter.process_migration(@course_data, @cm)
+      Importers::WikiPageImporter.process_migration(@course_data, @cm)
     end
 
     it "should convert wikis" do
@@ -139,14 +139,14 @@ describe Moodle::Converter do
   context "quizzes" do
     before(:each) do
       pending if !Qti.qti_enabled?
-      question_data = AssessmentQuestion.process_migration(@course_data, @cm)
-      Group.process_migration(@course_data, @cm)
-      LearningOutcome.process_migration(@course_data, @cm)
-      Rubric.process_migration(@course_data, @cm)
-      AssignmentGroup.process_migration(@course_data, @cm)
-      ExternalFeed.process_migration(@course_data, @cm)
-      GradingStandard.process_migration(@course_data, @cm)
-      Quizzes::QuizImporter.process_migration(@course_data, @cm, question_data)
+      question_data = Importers::AssessmentQuestionImporter.process_migration(@course_data, @cm)
+      Importers::GroupImporter.process_migration(@course_data, @cm)
+      Importers::LearningOutcomeImporter.process_migration(@course_data, @cm)
+      Importers::RubricImporter.process_migration(@course_data, @cm)
+      Importers::AssignmentGroupImporter.process_migration(@course_data, @cm)
+      Importers::ExternalFeedImporter.process_migration(@course_data, @cm)
+      Importers::GradingStandardImporter.process_migration(@course_data, @cm)
+      Importers::QuizImporter.process_migration(@course_data, @cm, question_data)
     end
 
     it "should convert quizzes" do

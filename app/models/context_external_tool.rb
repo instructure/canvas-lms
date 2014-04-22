@@ -152,7 +152,7 @@ class ContextExternalTool < ActiveRecord::Base
     if tool_hash[:error]
       @config_errors << [error_field, tool_hash[:error]]
     else
-      ContextExternalTool.import_from_migration(tool_hash, context, self)
+      Importers::ContextExternalToolImporter.import_from_migration(tool_hash, context, self)
     end
     self.name = real_name unless real_name.blank?
   rescue CC::Importer::BLTIConverter::CCImportError => e
@@ -512,18 +512,6 @@ class ContextExternalTool < ActiveRecord::Base
   end
   
   def self.serialization_excludes; [:shared_secret,:settings]; end
-  
-  def self.process_migration(data, migration)
-    tools = data['external_tools'] ? data['external_tools']: []
-    tools.each do |tool|
-      if migration.import_object?("context_external_tools", tool['migration_id']) || migration.import_object?("external_tools", tool['migration_id'])
-        item = import_from_migration(tool, migration.context)
-        if item.consumer_key == 'fake' || item.shared_secret == 'fake'
-          migration.add_warning(t('external_tool_attention_needed', 'The security parameters for the external tool "%{tool_name}" need to be set in Course Settings.', :tool_name => item.name))
-        end
-      end
-    end
-  end
 
   # sets the custom fields from the main tool settings, and any on individual resource type settings
   def set_custom_fields(hash, resource_type)
@@ -541,45 +529,16 @@ class ContextExternalTool < ActiveRecord::Base
     end
   end
 
+  def self.process_migration(*args)
+    Importers::ContextExternalToolImporter.process_migration(*args)
+  end
+
+  def self.import_from_migration(*args)
+    Importers::ContextExternalToolImporter.import_from_migration(*args)
+  end
+
   def resource_selection_settings
     settings[:resource_selection]
-  end
-  
-  def self.import_from_migration(hash, context, item=nil)
-    hash = hash.with_indifferent_access
-    return nil if hash[:migration_id] && hash[:external_tools_to_import] && !hash[:external_tools_to_import][hash[:migration_id]]
-    item ||= find_by_context_id_and_context_type_and_migration_id(context.id, context.class.to_s, hash[:migration_id]) if hash[:migration_id]
-    item ||= context.context_external_tools.new
-    item.migration_id = hash[:migration_id]
-    item.name = hash[:title]
-    item.description = hash[:description]
-    item.tool_id = hash[:tool_id]
-    item.url = hash[:url] unless hash[:url].blank?
-    item.domain = hash[:domain] unless hash[:domain].blank?
-    item.privacy_level = hash[:privacy_level] || 'name_only'
-    item.consumer_key ||= hash[:consumer_key] || 'fake'
-    item.shared_secret ||= hash[:shared_secret] || 'fake'
-    item.settings = hash[:settings].with_indifferent_access if hash[:settings].is_a?(Hash)
-    if hash[:custom_fields].is_a? Hash
-      item.settings[:custom_fields] ||= {}
-      item.settings[:custom_fields].merge! hash[:custom_fields] 
-    end
-    if hash[:extensions].is_a? Array
-      item.settings[:vendor_extensions] ||= []
-      hash[:extensions].each do |ext|
-        next unless ext[:custom_fields].is_a? Hash
-        if existing = item.settings[:vendor_extensions].find { |ve| ve[:platform] == ext[:platform] }
-          existing[:custom_fields] ||= {}
-          existing[:custom_fields].merge! ext[:custom_fields]
-        else
-          item.settings[:vendor_extensions] << {:platform => ext[:platform], :custom_fields => ext[:custom_fields]}
-        end
-      end
-    end
-    
-    item.save!
-    context.imported_migration_items << item if context.respond_to?(:imported_migration_items) && context.imported_migration_items && item.new_record?
-    item
   end
 
   def opaque_identifier_for(asset)

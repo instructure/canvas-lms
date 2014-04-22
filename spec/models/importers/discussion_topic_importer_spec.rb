@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '../../../import_helper')
 
-describe Importers::DiscussionTopic do
+describe Importers::DiscussionTopicImporter do
 
   SYSTEMS.each do |system|
     if import_data_exists? system, 'discussion_topic'
@@ -29,13 +29,13 @@ describe Importers::DiscussionTopic do
         context = get_import_context(system)
 
         data[:topics_to_import] = {}
-        Importers::DiscussionTopic.import_from_migration(data, context).should be_nil
-        DiscussionTopic.count.should == 0
+        Importers::DiscussionTopicImporter.import_from_migration(data, context).should be_nil
+        context.discussion_topics.count.should == 0
 
         data[:topics_to_import][data[:migration_id]] = true
-        Importers::DiscussionTopic.import_from_migration(data, context)
-        Importers::DiscussionTopic.import_from_migration(data, context)
-        DiscussionTopic.count.should == 1
+        Importers::DiscussionTopicImporter.import_from_migration(data, context)
+        Importers::DiscussionTopicImporter.import_from_migration(data, context)
+        context.discussion_topics.count.should == 1
 
         topic = DiscussionTopic.find_by_migration_id(data[:migration_id])
         topic.title.should == data[:title]
@@ -43,7 +43,7 @@ describe Importers::DiscussionTopic do
         topic.message.index(parsed_description).should_not be_nil
 
         if data[:grading]
-          Assignment.count.should == 1
+          context.assignments.count.should == 1
           topic.assignment.should_not be_nil
           topic.assignment.points_possible.should == data[:grading][:points_possible].to_f
           topic.assignment.submission_types.should == 'discussion_topic'
@@ -52,4 +52,28 @@ describe Importers::DiscussionTopic do
       end
     end
   end
+
+  describe "Importing announcements" do
+    SYSTEMS.each do |system|
+      if import_data_exists? system, 'announcements'
+        it "should import assignments for #{system}" do
+          data = get_import_data(system, 'announcements')
+          context = get_import_context(system)
+          data[:topics_to_import] = {}
+          Importers::DiscussionTopicImporter.import_from_migration(data, context).should be_nil
+          context.discussion_topics.count.should == 0
+
+          data[:topics_to_import][data[:migration_id]] = true
+          Importers::DiscussionTopicImporter.import_from_migration(data, context)
+          Importers::DiscussionTopicImporter.import_from_migration(data, context)
+          context.discussion_topics.count.should == 1
+
+          topic = DiscussionTopic.find_by_migration_id(data[:migration_id])
+          topic.title.should == data[:title]
+          topic.message.index(data[:text]).should_not be_nil
+        end
+      end
+    end
+  end
+
 end

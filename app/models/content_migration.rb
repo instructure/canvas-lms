@@ -405,6 +405,7 @@ class ContentMigration < ActiveRecord::Base
       @zip_file.close
 
       migration_settings[:migration_ids_to_import] ||= {:copy=>{}}
+
       self.context.import_from_migration(data, migration_settings[:migration_ids_to_import], self)
 
       if !self.import_immediately?

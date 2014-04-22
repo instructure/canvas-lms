@@ -28,13 +28,13 @@ describe "Importing Assignment Groups" do
 
         data[:assignment_groups_to_import] = {}
         expect {
-          AssignmentGroup.import_from_migration(data, context).should be_nil
+          Importers::AssignmentGroupImporter.import_from_migration(data, context).should be_nil
         }.to change(AssignmentGroup, :count).by(0)
 
         data[:assignment_groups_to_import][data[:migration_id]] = true
         expect {
-          AssignmentGroup.import_from_migration(data, context)
-          AssignmentGroup.import_from_migration(data, context)
+          Importers::AssignmentGroupImporter.import_from_migration(data, context)
+          Importers::AssignmentGroupImporter.import_from_migration(data, context)
         }.to change(AssignmentGroup, :count).by(1)
         g = AssignmentGroup.find_by_migration_id(data[:migration_id])
 
@@ -47,11 +47,11 @@ describe "Importing Assignment Groups" do
     data = get_import_data('bb8', 'assignment_group')
     context = get_import_context('bb8')
     expect {
-      AssignmentGroup.import_from_migration(data, context)
+      Importers::AssignmentGroupImporter.import_from_migration(data, context)
     }.to change(AssignmentGroup, :count).by(1)
 
     expect {
-      ass = Assignment.import_from_migration(get_import_data('bb8', 'assignment'), context)
+      ass = Importers::AssignmentImporter.import_from_migration(get_import_data('bb8', 'assignment'), context)
       ass.assignment_group.name.should == data[:title]
     }.to change(AssignmentGroup, :count).by(0)
   end

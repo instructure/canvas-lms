@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '../../../spec_helper.rb')
 
 module Importers
-  describe Importers::Attachment do
+  describe Importers::AttachmentImporter do
 
     describe '#process_migration', no_retry: true do
       let(:course) { ::Course.new }
@@ -54,7 +54,7 @@ module Importers
         attachment.expects(:display_name=).never
         attachment.expects(:save_without_broadcasting!)
 
-        subject.process_migration(data, migration)
+        Importers::AttachmentImporter.process_migration(data, migration)
 
         course.imported_migration_items.should == [attachment]
       end
@@ -76,7 +76,7 @@ module Importers
         migration.expects(:import_object?).with('attachments', migration_id).returns(true)
         attachment.expects(:save_without_broadcasting!)
 
-        subject.process_migration(data, migration)
+        Importers::AttachmentImporter.process_migration(data, migration)
       end
 
       it "finds attachments by migration id" do
@@ -94,7 +94,7 @@ module Importers
         migration.expects(:import_object?).with('attachments', migration_id).returns(true)
         attachment.expects(:save_without_broadcasting!)
 
-        subject.process_migration(data, migration)
+        Importers::AttachmentImporter.process_migration(data, migration)
       end
 
       it "finds attachment from the path" do
@@ -114,7 +114,7 @@ module Importers
         migration.expects(:import_object?).with('attachments', migration_id).returns(true)
         attachment.expects(:save_without_broadcasting!)
 
-        subject.process_migration(data, migration)
+        Importers::AttachmentImporter.process_migration(data, migration)
       end
 
       it "uses files if attachments are not found on the migration" do
@@ -133,7 +133,7 @@ module Importers
 
         attachment.expects(:save_without_broadcasting!)
 
-        subject.process_migration(data, migration)
+        Importers::AttachmentImporter.process_migration(data, migration)
       end
 
       it "does not add to the imported_migration_items if imported_migration_items is nil" do
@@ -151,7 +151,7 @@ module Importers
         migration.expects(:import_object?).with('attachments', migration_id).returns(true)
         attachment.expects(:save_without_broadcasting!)
 
-        subject.process_migration(data, migration)
+        Importers::AttachmentImporter.process_migration(data, migration)
 
         course.imported_migration_items.should == nil
       end
@@ -169,7 +169,7 @@ module Importers
 
         ::Attachment.expects(:find_by_context_type_and_context_id_and_id).never
 
-        subject.process_migration(data, migration)
+        Importers::AttachmentImporter.process_migration(data, migration)
       end
 
       it "does not import files if there is a file_to_import key" do
@@ -186,7 +186,7 @@ module Importers
 
         ::Attachment.expects(:find_by_context_type_and_context_id_and_id).never
 
-        subject.process_migration(data, migration)
+        Importers::AttachmentImporter.process_migration(data, migration)
       end
 
       it 'sets locked, file_state, and display_name when present' do
@@ -207,7 +207,7 @@ module Importers
         attachment.expects(:file_state=).with('hidden')
         attachment.expects(:display_name=).with('display name')
 
-        subject.process_migration(data, migration)
+        Importers::AttachmentImporter.process_migration(data, migration)
       end
 
       it "locks folders" do
@@ -226,7 +226,7 @@ module Importers
         folder.expects(:locked=).with(true)
         folder.expects(:save)
 
-        subject.process_migration(data, migration)
+        Importers::AttachmentImporter.process_migration(data, migration)
       end
 
       it "hidden_folders" do
@@ -245,7 +245,7 @@ module Importers
         folder.expects(:workflow_state=).with("hidden")
         folder.expects(:save)
 
-        subject.process_migration(data, migration)
+        Importers::AttachmentImporter.process_migration(data, migration)
       end
 
       describe "saving import failures" do
@@ -264,7 +264,7 @@ module Importers
           ::Attachment.expects(:find_by_context_type_and_context_id_and_id).raises(error)
           migration.expects(:add_import_warning).with(I18n.t('#migration.file_type', "File"), "foo", error)
 
-          subject.process_migration(data, migration)
+          Importers::AttachmentImporter.process_migration(data, migration)
         end
 
         it "saves import failures with path name" do
@@ -282,7 +282,7 @@ module Importers
           ::Attachment.expects(:find_by_context_type_and_context_id_and_id).raises(error)
           migration.expects(:add_import_warning).with(I18n.t('#migration.file_type', "File"), "bar", error)
 
-          subject.process_migration(data, migration)
+          Importers::AttachmentImporter.process_migration(data, migration)
         end
       end
     end

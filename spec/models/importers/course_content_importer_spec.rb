@@ -55,7 +55,7 @@ describe Course do
       :new_end_date=>"Apr 13, 2011"
     }}.with_indifferent_access
 
-    course.import_from_migration(data, migration.migration_settings[:migration_ids_to_import], migration)
+    Importers::CourseContentImporter.import_content(course, data, migration.migration_settings[:migration_ids_to_import], migration)
     course.reload
 
     # discussion topic tests
@@ -200,7 +200,7 @@ describe Course do
     migration.migration_settings[:migration_ids_to_import] = params
     migration.save!
 
-    @course.import_from_migration(data, params, migration)
+    Importers::CourseContentImporter.import_content(@course, data, params, migration)
 
     aqb1 = @course.assessment_question_banks.find_by_migration_id("i7ed12d5eade40d9ee8ecb5300b8e02b2")
     aqb1.assessment_questions.count.should == 3
@@ -220,7 +220,7 @@ describe Course do
     migration.migration_settings[:migration_ids_to_import] = params
     migration.save!
 
-    @course.import_from_migration(data, params, migration)
+    Importers::CourseContentImporter.import_content(@course, data, params, migration)
 
     aqb1 = @course.assessment_question_banks.find_by_migration_id("i7ed12d5eade40d9ee8ecb5300b8e02b2")
     aqb1.assessment_questions.count.should == 3
@@ -228,6 +228,63 @@ describe Course do
     aqb2.should be_nil
 
     @course.assessment_questions.count.should == 3
+  end
+
+  describe "shift_date_options" do
+    it "should default options[:time_zone] to the root account's time zone" do
+      account = Account.default.sub_accounts.create!
+      course_with_teacher(account: account)
+      @course.root_account.default_time_zone = 'America/New_York'
+      @course.start_at = 1.month.ago
+      @course.conclude_at = 1.month.from_now
+      options = Importers::CourseContentImporter.shift_date_options(@course, {})
+      options[:time_zone].should == ActiveSupport::TimeZone['Eastern Time (US & Canada)']
+    end
+  end
+
+  describe "import_media_objects" do
+    before do
+      attachment_model(:uploaded_data => stub_file_data('test.m4v', 'asdf', 'video/mp4'))
+    end
+
+    it "should wait for media objects on canvas cartridge import" do
+      migration = mock(:canvas_import? => true)
+      MediaObject.expects(:add_media_files).with([@attachment], true)
+      Importers::CourseContentImporter.import_media_objects([@attachment], migration)
+    end
+
+    it "should not wait for media objects on other import" do
+      migration = mock(:canvas_import? => false)
+      MediaObject.expects(:add_media_files).with([@attachment], false)
+      Importers::CourseContentImporter.import_media_objects([@attachment], migration)
+    end
+  end
+
+  describe "import_settings_from_migration" do
+    before do
+      course_with_teacher
+      @course.storage_quota = 1
+      @cm = ContentMigration.new(:context => @course, :user => @user, :copy_options => {:everything => "1"})
+      @cm.user = @user
+      @cm.save!
+    end
+
+    it "should not adjust for unauthorized user" do
+      Importers::CourseContentImporter.import_settings_from_migration(@course, {:course=>{:storage_quota => 4}}, @cm)
+      @course.storage_quota.should == 1
+    end
+
+    it "should adjust for authorized user" do
+      account_admin_user(:user => @user)
+      Importers::CourseContentImporter.import_settings_from_migration(@course, {:course=>{:storage_quota => 4}}, @cm)
+      @course.storage_quota.should == 4
+    end
+
+    it "should be set for course copy" do
+      @cm.source_course = @course
+      Importers::CourseContentImporter.import_settings_from_migration(@course, {:course=>{:storage_quota => 4}}, @cm)
+      @course.storage_quota.should == 4
+    end
   end
 end
 

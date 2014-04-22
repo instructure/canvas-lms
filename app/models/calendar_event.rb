@@ -505,26 +505,12 @@ class CalendarEvent < ActiveRecord::Base
     return CalendarEvent::IcalEvent.new(self).to_ics(in_own_calendar)
   end
 
-  def self.process_migration(data, migration)
-    events = data['calendar_events'] ? data['calendar_events']: []
-    events.each do |event|
-      if migration.import_object?("calendar_events", event['migration_id']) || migration.import_object?("events", event['migration_id'])
-        begin
-          import_from_migration(event, migration.context)
-        rescue
-          migration.add_import_warning(t('#migration.calendar_event_type', "Calendar Event"), event[:title], $!)
-        end
-      end
-    end
+  def self.process_migration(*args)
+    Importers::CalendarEventImporter.process_migration(*args)
   end
 
-  def self.import_from_migration(hash, context, item=nil)
-    hash = hash.with_indifferent_access
-    return nil if hash[:migration_id] && hash[:events_to_import] && !hash[:events_to_import][hash[:migration_id]]
-    item ||= find_by_context_type_and_context_id_and_id(context.class.to_s, context.id, hash[:id])
-    item ||= find_by_context_type_and_context_id_and_migration_id(context.class.to_s, context.id, hash[:migration_id]) if hash[:migration_id]
-    item ||= context.calendar_events.new
-    Importers::CalendarEvent.import_from_migration(hash, context, item)
+  def self.import_from_migration(*args)
+    Importers::CalendarEventImporter.import_from_migration(*args)
   end
 
   def self.max_visible_calendars

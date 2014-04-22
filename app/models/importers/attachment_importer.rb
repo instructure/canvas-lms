@@ -16,8 +16,11 @@
 #
 
 module Importers
-  class Attachment
-    def process_migration(data, migration)
+  class AttachmentImporter < Importer
+
+    self.item_class = Attachment
+
+    def self.process_migration(data, migration)
       attachments = data['file_map'] ? data['file_map']: {}
       attachments = attachments.with_indifferent_access
       attachments.values.each do |att|
@@ -53,11 +56,11 @@ module Importers
 
     private
 
-    def import_from_migration(hash, context, item=nil)
+    def self.import_from_migration(hash, context, item=nil)
       return nil if hash[:files_to_import] && !hash[:files_to_import][hash[:migration_id]]
-      item ||= ::Attachment.find_by_context_type_and_context_id_and_id(context.class.to_s, context.id, hash[:id])
-      item ||= ::Attachment.find_by_context_type_and_context_id_and_migration_id(context.class.to_s, context.id, hash[:migration_id]) # if hash[:migration_id]
-      item ||= ::Attachment.find_from_path(hash[:path_name], context)
+      item ||= Attachment.find_by_context_type_and_context_id_and_id(context.class.to_s, context.id, hash[:id])
+      item ||= Attachment.find_by_context_type_and_context_id_and_migration_id(context.class.to_s, context.id, hash[:migration_id]) # if hash[:migration_id]
+      item ||= Attachment.find_from_path(hash[:path_name], context)
       if item
         item.context = context
         item.migration_id = hash[:migration_id]

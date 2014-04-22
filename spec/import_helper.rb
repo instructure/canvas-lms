@@ -54,7 +54,7 @@ def import_example_questions(context)
   QUESTIONS.each do |question|
     if import_data_exists?(['vista', 'quiz'], question[0])
       q = get_import_data ['vista', 'quiz'], question[0]
-      q = AssessmentQuestion.import_from_migration(q, context)
+      q = Importers::AssessmentQuestionImporter.import_from_migration(q, context)
       question_data[:aq_data][q['migration_id']] = q
     end
   end

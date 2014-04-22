@@ -1029,9 +1029,9 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def self.process_migration(data, migration, question_data)
-    # TODO: use Quizzes::QuizImporter directly. this class method
+    # TODO: use Importers::QuizImporter directly. this class method
     # will eventually get removed. leaving here while plugins get updated
-    Quizzes::QuizImporter.process_migration(data, migration, question_data)
+    Importers::QuizImporter.process_migration(data, migration, question_data)
   end
 
   def self.serialization_excludes

@@ -17,17 +17,30 @@
 #
 
 module Importers
-  class CalendarEvent
+  class CalendarEventImporter < Importer
 
-    # forward translations to CalendarEvent; they used to live there.
-    class << self
-      def translate(key, default, options = {})
-        ::CalendarEvent.translate(key, default, options)
+    self.item_class = CalendarEvent
+
+    def self.process_migration(data, migration)
+      events = data['calendar_events'] ? data['calendar_events']: []
+      events.each do |event|
+        if migration.import_object?("calendar_events", event['migration_id']) || migration.import_object?("events", event['migration_id'])
+          begin
+            import_from_migration(event, migration.context)
+          rescue
+            migration.add_import_warning(t('#migration.calendar_event_type', "Calendar Event"), event[:title], $!)
+          end
+        end
       end
-      alias :t :translate
     end
 
-    def self.import_from_migration(hash, context, item)
+    def self.import_from_migration(hash, context, item=nil)
+      hash = hash.with_indifferent_access
+      return nil if hash[:migration_id] && hash[:events_to_import] && !hash[:events_to_import][hash[:migration_id]]
+      item ||= CalendarEvent.find_by_context_type_and_context_id_and_id(context.class.to_s, context.id, hash[:id])
+      item ||= CalendarEvent.find_by_context_type_and_context_id_and_migration_id(context.class.to_s, context.id, hash[:migration_id]) if hash[:migration_id]
+      item ||= context.calendar_events.new
+
       item.migration_id = hash[:migration_id]
       item.workflow_state = 'active' if item.deleted?
       item.title = hash[:title] || hash[:name]
