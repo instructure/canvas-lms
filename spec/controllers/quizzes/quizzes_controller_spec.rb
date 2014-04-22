@@ -601,7 +601,7 @@ describe Quizzes::QuizzesController do
       course_quiz(true)
       @quiz.locked = true
       @quiz.save!
-      @sub = @quiz.find_or_create_submission(@user, nil, 'settings_only')
+      @sub = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@user, nil, 'settings_only')
       @sub.manually_unlocked = true
       @sub.save!
       post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
@@ -625,7 +625,7 @@ describe Quizzes::QuizzesController do
       course_quiz(true)
       @quiz.time_limit = 60
       @quiz.save!
-      @sub = @quiz.find_or_create_submission(@user, nil, 'settings_only')
+      @sub = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@user, nil, 'settings_only')
       @sub.extra_time = 30
       @sub.save!
       post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'

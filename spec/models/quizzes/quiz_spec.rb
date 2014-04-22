@@ -598,7 +598,7 @@ describe Quizzes::Quiz do
       lock_at = 1.day.ago
       u = User.create!(:name => "Fred Colon")
       q = @course.quizzes.create!(:title => "locked yesterday", :lock_at => lock_at)
-      sub = q.find_or_create_submission(u, nil, 'settings_only')
+      sub = Quizzes::SubmissionManager.new(q).find_or_create_submission(u, nil, 'settings_only')
       sub.manually_unlocked = true
       sub.save!
       sub2 = q.generate_submission(u)

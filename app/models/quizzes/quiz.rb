@@ -632,14 +632,10 @@ class Quizzes::Quiz < ActiveRecord::Base
     q
   end
 
-  def find_or_create_submission(user, temporary=false, state=nil)
-    Quizzes::SubmissionManager.new(self).find_or_create_submission(user, temporary, state)
-  end
-
   # Generates a submission for the specified user on this quiz, based
   # on the SAVED version of the quiz.  Does not consider permissions.
   def generate_submission(user, preview=false)
-    submission = self.find_or_create_submission(user, preview)
+    submission = Quizzes::SubmissionManager.new(self).find_or_create_submission(user, preview)
     submission.retake
     submission.attempt = (submission.attempt + 1) rescue 1
     user_questions = []
