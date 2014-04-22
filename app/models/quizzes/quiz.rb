@@ -633,7 +633,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def find_or_create_submission(user, temporary=false, state=nil)
-    Quizzes::SubmissionManager.new(self).create_or_update_submission(user, temporary, state)
+    Quizzes::SubmissionManager.new(self).find_or_create_submission(user, temporary, state)
   end
 
   # Generates a submission for the specified user on this quiz, based

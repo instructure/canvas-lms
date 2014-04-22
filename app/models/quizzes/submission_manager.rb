@@ -5,27 +5,34 @@ module Quizzes
       @quiz = quiz
     end
 
-    def create_or_update_submission(user, temporary=false, state=nil)
+    def find_or_create_submission(user, temporary=false, state=nil)
       s = nil
       state ||= 'untaken'
       @quiz.shard.activate do
         Quizzes::QuizSubmission.unique_constraint_retry do
-          if temporary || !user.is_a?(::User)
-            user_code = "#{user.to_s}"
-            user_code = "user_#{user.id}" if user.is_a?(::User)
-            s = @quiz.quiz_submissions.where(temporary_user_code: user_code).first
-            s ||= @quiz.quiz_submissions.build(temporary_user_code: user_code)
-            s.workflow_state ||= state
-            s.save! if s.changed?
+          if !user.is_a?(::User)
+            query_hash = { temporary_user_code: "#{user.to_s}" }
+          elsif temporary
+            query_hash = { temporary_user_code: "user_#{user.id}" }
           else
-            s = @quiz.quiz_submissions.where(user_id: user).first
-            s ||= @quiz.quiz_submissions.build(user: user)
-            s.workflow_state ||= state
-            s.save! if s.changed?
+            query_hash = { user_id: user.id }
           end
+
+          s = @quiz.quiz_submissions.where(query_hash).first
+          s ||= @quiz.quiz_submissions.build(generate_build_hash(query_hash, user))
+
+          s.workflow_state ||= state
+          s.save! if s.changed?
         end
       end
       s
+    end
+
+    private
+    # this is needed because Rails 2 expects a User object instead of an id
+    def generate_build_hash(query_hash, user)
+      return query_hash unless query_hash[:user_id]
+      { user: user}
     end
 
   end
