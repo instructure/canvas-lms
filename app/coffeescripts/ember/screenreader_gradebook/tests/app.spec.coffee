@@ -31,3 +31,7 @@ define [
   test 'fetches custom_columns', ->
     equal @controller.get('custom_columns.length'), 1
     equal @controller.get('custom_columns.firstObject').title, fixtures.custom_columns[0].title
+
+  test 'fetches outcomes', ->
+    equal @controller.get('outcomes').objectAt(0).title, 'Eating'
+    equal @controller.get('outcomes').objectAt(1).title, 'Drinking'

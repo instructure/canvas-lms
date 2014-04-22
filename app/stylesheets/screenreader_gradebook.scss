@@ -72,3 +72,16 @@ table.table {
 
 // padding helper for vertical spacing
 h3.assignment_selection { margin-bottom: 0px; }
+
+ic-tab {
+  padding: 6px 12px;
+  margin: 2px;
+  border-radius: 5px;
+  &:hover, &:focus {
+    background-color: $grayLighter;
+  }
+  &[selected] {
+    background-color: $linkColor;
+    color: $white;
+  }
+}

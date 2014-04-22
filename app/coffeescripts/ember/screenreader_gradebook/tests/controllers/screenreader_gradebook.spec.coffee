@@ -33,6 +33,8 @@ define [
         assignment_groups: Ember.ArrayProxy.create(content: clone fixtures.assignment_groups)
         submissions: Ember.ArrayProxy.create(content: [])
         sections: Ember.ArrayProxy.create(content: clone fixtures.sections)
+        outcomes: Ember.ArrayProxy.create(content: clone fixtures.outcomes)
+        outcome_rollups: Ember.ArrayProxy.create(content: clone fixtures.outcome_rollups)
       })
 
   teardown = ->
@@ -57,6 +59,10 @@ define [
     equal @srgb.get('assignments.length'), 7
     ok !@srgb.get('assignments').findBy('name', 'Not Graded')
     equal @srgb.get('assignments.firstObject').name, fixtures.assignment_groups[0].assignments[0].name
+
+  test 'calculates outcomes properly', ->
+    equal @srgb.get('outcomes.length'), 2
+    equal @srgb.get('outcomes.firstObject').title, fixtures.outcomes[0].title
 
   test 'studentsHash returns the expected hash', ->
     _.each @srgb.studentsHash(), (obj) =>
@@ -191,14 +197,16 @@ define [
     equal @srgb.get('disableNextStudentButton'), true
     equal @srgb.get('disablePrevStudentButton'), false
 
-  module 'screenreader_gradebook_controller: with selected student and selected assignment',
+  module 'screenreader_gradebook_controller: with selected student, assignment, and outcome',
     setup: ->
       setup.call this
       Ember.run =>
         @student = @srgb.get('students.firstObject')
         @assignment = @srgb.get('assignments.firstObject')
+        @outcome = @srgb.get('outcomes.firstObject')
         @srgb.set('selectedStudent', @student)
         @srgb.set('selectedAssignment', @assignment)
+        @srgb.set('selectedOutcome', @outcome)
 
     teardown: ->
       teardown.call this
@@ -208,6 +216,11 @@ define [
     selectedAssignment = @srgb.get('selectedAssignment')
     strictEqual ad.assignment, selectedAssignment
     strictEqual ad.cnt, 3
+
+  test 'outcomeDetails is computed properly', ->
+    od = @srgb.get('outcomeDetails')
+    selectedOutcome = @srgb.get('selectedOutcome')
+    strictEqual od.cnt, 1
 
   test 'selectedSubmission is computed properly', ->
     selectedSubmission = @srgb.get('selectedSubmission')

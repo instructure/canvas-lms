@@ -303,6 +303,12 @@ define [
         mode = _.reject(counts, (n) -> n[0] < max)
         mode = Grid.Math.mean(_.map(mode, _.last), true)
 
+      max: (values) -> Math.max(values...)
+
+      min: (values) -> Math.min(values...)
+
+      cnt: (values) -> values.length
+
     View:
       # Public: Render a SlickGrid cell.
       #

@@ -11,8 +11,9 @@ define [
   'compiled/AssignmentDetailsDialog'
   'compiled/AssignmentMuter'
   'compiled/grade_calculator'
+  'compiled/gradebook2/OutcomeGradebookGrid'
   '../../shared/components/ic_submission_download_dialog_component'
-  ], (ajax, round, userSettings, fetchAllPages, parseLinkHeader, I18n, Ember, _, tz, AssignmentDetailsDialog, AssignmentMuter, GradeCalculator, ic_submission_download_dialog ) ->
+  ], (ajax, round, userSettings, fetchAllPages, parseLinkHeader, I18n, Ember, _, tz, AssignmentDetailsDialog, AssignmentMuter, GradeCalculator, outcomeGrid, ic_submission_download_dialog ) ->
 
   {get, set, setProperties} = Ember
 
@@ -51,6 +52,8 @@ define [
     args.push options
     Ember.arrayComputed.apply(null, args)
 
+  contextUrl = get(window, 'ENV.GRADEBOOK_OPTIONS.context_url')
+
   ScreenreaderGradebookController = Ember.ObjectController.extend
 
     errors: (->
@@ -63,22 +66,20 @@ define [
         Ember.$(node).appendTo(Ember.$('#flash_screenreader_holder'))
     ).on('init')
 
-    contextUrl: get(window, 'ENV.GRADEBOOK_OPTIONS.context_url')
+    contextUrl: contextUrl
 
-    downloadCsvUrl: (->
-      "#{@get('contextUrl')}/gradebook.csv"
-    ).property()
+    downloadCsvUrl: "#{contextUrl}/gradebook.csv"
 
-    gradingHistoryUrl:(->
-      "#{@get('contextUrl')}/gradebook/history"
-    ).property()
+    downloadOutcomeCsvUrl: "#{contextUrl}/outcome_rollups.csv"
+
+    gradingHistoryUrl:"#{contextUrl}/gradebook/history"
 
     speedGraderUrl: (->
-      "#{@get('contextUrl')}/gradebook/speed_grader?assignment_id=#{@get('selectedAssignment.id')}"
+      "#{contextUrl}/gradebook/speed_grader?assignment_id=#{@get('selectedAssignment.id')}"
     ).property('selectedAssignment')
 
     studentUrl: (->
-      "#{@get('contextUrl')}/grades/#{@get('selectedStudent.id')}"
+      "#{contextUrl}/grades/#{@get('selectedStudent.id')}"
     ).property('selectedStudent')
 
     showTotalAsPoints: (->
@@ -144,6 +145,8 @@ define [
       Ember.run.next =>
         if prop is 'selectedStudent' and @get('hideStudentNames')
           text_to_announce = get item, 'hiddenName'
+        else if prop is 'selectedOutcome'
+          text_to_announce = get item, 'title'
         else
           text_to_announce = get item, 'name'
         @set 'ariaAnnounced', text_to_announce
@@ -227,6 +230,7 @@ define [
     sectionSelectDefaultLabel: I18n.t "all_sections", "All Sections"
     studentSelectDefaultLabel: I18n.t "no_student", "No Student Selected"
     assignmentSelectDefaultLabel: I18n.t "no_assignment", "No Assignment Selected"
+    outcomeSelectDefaultLabel: I18n.t "no_outcome", "No Outcome Selected"
 
     students: studentsUniqByEnrollments('enrollments')
 
@@ -246,7 +250,7 @@ define [
 
         return unless notYetLoaded.length
         student_ids = notYetLoaded.mapBy('id')
-        fetchAllPages(ENV.GRADEBOOK_OPTIONS.submissions_url, student_ids: student_ids,  @get('submissions'))
+        fetchAllPages(ENV.GRADEBOOK_OPTIONS.submissions_url, records: @get('submissions'), data: student_ids: student_ids)
     ).observes('students.@each').on('init')
 
     publishToSisEnabled: (->
@@ -560,6 +564,22 @@ define [
         }
     ).property('selectedStudent', 'selectedAssignment')
 
+    selectedOutcomeResult: ( ->
+      return null unless @get('selectedStudent')? and @get('selectedOutcome')?
+      student = @get 'selectedStudent'
+      outcome = @get 'selectedOutcome'
+      result = @get('outcome_rollups').find (x) ->
+        x.user_id == student.id && x.outcome_id == outcome.id
+      result or {
+        user_id: student.id
+        outcome_id: outcome.id
+      }
+    ).property('selectedStudent', 'selectedOutcome')
+
+    outcomeResultIsDefined: ( ->
+      @get('selectedOutcomeResult').score?
+    ).property('selectedOutcomeResult')
+
     showAssignmentPointsWarning: (->
       @get("selectedAssignment.noPointsPossibleWarning") and @get('groupsAreWeighted')
     ).property('selectedAssignment', 'groupsAreWeighted')
@@ -580,6 +600,17 @@ define [
       }
       locals
     ).property('selectedAssignment', 'students.@each.total_grade')
+
+    outcomeDetails: (->
+      return null unless @get('selectedOutcome')?
+      rollups = @get('outcome_rollups').filterBy('outcome_id', @get('selectedOutcome').id)
+      scores = _.filter(_.pluck(rollups, 'score'), _.isNumber)
+      details =
+        average: outcomeGrid.Math.mean(scores)
+        max: outcomeGrid.Math.max(scores)
+        min: outcomeGrid.Math.min(scores)
+        cnt: outcomeGrid.Math.cnt(scores)
+    ).property('selectedOutcome', 'outcome_rollups')
 
     assignmentSubmissionTypes: (->
       types = @get('selectedAssignment.submission_types')
@@ -611,6 +642,7 @@ define [
     getList: (property) ->
       return @get('studentsInSelectedSection') if property == 'selectedStudent'
       return @get('assignments') if property == 'selectedAssignment'
+      return @get('outcomes') if property == 'selectedOutcome'
 
     getButton: (property) ->
       return 'student' if property == 'selectedStudent'
@@ -626,8 +658,14 @@ define [
       if selected then @get('studentsInSelectedSection').indexOf(selected) else -1
     ).property('selectedStudent', 'selectedSection')
 
+    outcomeIndex: (->
+      selected = @get('selectedOutcome')
+      if selected then @get('outcomes').indexOf(selected) else -1
+    ).property('selectedOutcome')
+
     disablePrevAssignmentButton: Ember.computed.lte('assignmentIndex', 0)
     disablePrevStudentButton: Ember.computed.lte('studentIndex', 0)
+    disablePrevOutcomeButton: Ember.computed.lte('outcomeIndex', 0)
 
     disableNextAssignmentButton: (->
       next = @get('assignments').objectAt(@get('assignmentIndex') + 1)
@@ -638,6 +676,11 @@ define [
       next = @get('studentsInSelectedSection').objectAt(@get('studentIndex') + 1)
       !(@get('studentsInSelectedSection.length') and next)
     ).property('selectedStudent', 'studentsInSelectedSection', 'selectedSection')
+
+    disableNextOutcomeButton: (->
+      next = @get('outcomes').objectAt(@get('outcomeIndex') + 1)
+      !(@get('outcomes.length') and next)
+    ).property('selectedOutcome', 'outcomes.@each')
 
     displayName: (->
       if @get('hideStudentNames')
@@ -654,5 +697,5 @@ define [
 
       enrollments = @get('enrollments')
       enrollments.clear()
-      fetchAllPages(url, null, enrollments)
+      fetchAllPages(url, records: enrollments)
     ).observes('showConcludedEnrollments')
