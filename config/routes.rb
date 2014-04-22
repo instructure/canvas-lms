@@ -945,19 +945,23 @@ routes.draw do
     end
 
     scope(:controller => :content_migrations) do
-      get 'courses/:course_id/content_migrations/migrators', :action => :available_migrators, :path_name => 'course_content_migration_migrators_list'
-      get 'courses/:course_id/content_migrations/:id', :action => :show, :path_name => 'course_content_migration'
-      get 'courses/:course_id/content_migrations', :action => :index, :path_name => 'course_content_migration_list'
-      post 'courses/:course_id/content_migrations', :action => :create, :path_name => 'course_content_migration_create'
-      put 'courses/:course_id/content_migrations/:id', :action => :update, :path_name => 'course_content_migration_update'
-      get 'courses/:course_id/content_migrations/:id/selective_data', :action => :content_list, :path_name => 'course_content_migration_selective_data'
+      %w(course group user).each do |context|
+        get "#{context.pluralize}/:#{context}_id/content_migrations/migrators", :action => :available_migrators, :path_name => "#{context}_content_migration_migrators_list"
+        get "#{context.pluralize}/:#{context}_id/content_migrations/:id", :action => :show, :path_name => "#{context}_content_migration"
+        get "#{context.pluralize}/:#{context}_id/content_migrations", :action => :index, :path_name => "#{context}_content_migration_list"
+        post "#{context.pluralize}/:#{context}_id/content_migrations", :action => :create, :path_name => "#{context}_content_migration_create"
+        put "#{context.pluralize}/:#{context}_id/content_migrations/:id", :action => :update, :path_name => "#{context}_content_migration_update"
+        get "#{context.pluralize}/:#{context}_id/content_migrations/:id/selective_data", :action => :content_list, :path_name => "#{context}_content_migration_selective_data"
+      end
     end
 
     scope(:controller => :migration_issues) do
-      get 'courses/:course_id/content_migrations/:content_migration_id/migration_issues/:id', :action => :show, :path_name => 'course_content_migration_migration_issue'
-      get 'courses/:course_id/content_migrations/:content_migration_id/migration_issues', :action => :index, :path_name => 'course_content_migration_migration_issue_list'
-      post 'courses/:course_id/content_migrations/:content_migration_id/migration_issues', :action => :create, :path_name => 'course_content_migration_migration_issue_create'
-      put 'courses/:course_id/content_migrations/:content_migration_id/migration_issues/:id', :action => :update, :path_name => 'course_content_migration_migration_issue_update'
+      %w(course group user).each do |context|
+        get "#{context.pluralize}/:#{context}_id/content_migrations/:content_migration_id/migration_issues/:id", :action => :show, :path_name => "#{context}_content_migration_migration_issue"
+        get "#{context.pluralize}/:#{context}_id/content_migrations/:content_migration_id/migration_issues", :action => :index, :path_name => "#{context}_content_migration_migration_issue_list"
+        post "#{context.pluralize}/:#{context}_id/content_migrations/:content_migration_id/migration_issues", :action => :create, :path_name => "#{context}_content_migration_migration_issue_create"
+        put "#{context.pluralize}/:#{context}_id/content_migrations/:content_migration_id/migration_issues/:id", :action => :update, :path_name => "#{context}_content_migration_migration_issue_update"
+      end
     end
 
     scope(:controller => :discussion_topics_api) do

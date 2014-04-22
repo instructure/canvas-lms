@@ -2276,12 +2276,11 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
   end
 
   context "zip file import" do
-    it "should import" do
-      course_with_teacher
+    def test_zip_import(context)
       zip_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/file.zip")
-      cm = ContentMigration.new(:context => @course, :user => @user,)
+      cm = ContentMigration.new(:context => context, :user => @user,)
       cm.migration_type = 'zip_file_importer'
-      cm.migration_settings[:folder_id] = Folder.root_folders(@course).first.id
+      cm.migration_settings[:folder_id] = Folder.root_folders(context).first.id
       cm.save!
 
       attachment = Attachment.new
@@ -2295,8 +2294,22 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
 
       cm.queue_migration
       run_jobs
-      @course.reload
-      @course.attachments.count.should == 1
+      context.reload.attachments.count.should == 1
+    end
+
+    it "should import into a course" do
+      course_with_teacher
+      test_zip_import(@course)
+    end
+
+    it "should import into a user" do
+      user
+      test_zip_import(@user)
+    end
+
+    it "should import into a group" do
+      group_with_user
+      test_zip_import(@group)
     end
   end
 

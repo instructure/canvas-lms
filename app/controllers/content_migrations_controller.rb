@@ -190,6 +190,13 @@ class ContentMigrationsController < ApplicationController
     render :json => content_migration_json(@content_migration, @current_user, session)
   end
 
+  def migration_plugin_supported?(plugin)
+    # FIXME most migration types don't support Account either, but plugins that do would have to set additional_contexts
+    # in order to not be broken by this
+    @context.is_a?(Course) || @context.is_a?(Account) || Array(plugin.settings[:additional_contexts]).include?(@context.class.to_s)
+  end
+  private :migration_plugin_supported?
+
   # @API Create a content migration
   #
   # Create a content migration. If the migration requires a file to be uploaded
@@ -302,6 +309,10 @@ class ContentMigrationsController < ApplicationController
     if !@plugin
       return render(:json => { :message => t('bad_migration_type', "Invalid migration_type") }, :status => :bad_request)
     end
+    unless migration_plugin_supported?(@plugin)
+      return render(:json => { :message => t('unsupported_migration_type', "Unsupported migration_type for context") }, :status => :bad_request)
+    end
+
     settings = @plugin.settings || {}
     if settings[:requires_file_upload]
       if !(params[:pre_attachment] && params[:pre_attachment][:name].present?) && !(params[:settings] && params[:settings][:file_url].present?)
@@ -353,7 +364,7 @@ class ContentMigrationsController < ApplicationController
   #
   # @returns [Migrator]
   def available_migrators
-    systems = ContentMigration.migration_plugins(true)
+    systems = ContentMigration.migration_plugins(true).select{|sys| migration_plugin_supported?(sys)}
     json = systems.map{|p| {
             :type => p.id,
             :requires_file_upload => !!p.settings[:requires_file_upload],

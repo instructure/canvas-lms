@@ -59,6 +59,7 @@ class Group < ActiveRecord::Base
   has_many :collaborations, :as => :context, :order => 'title, created_at', :dependent => :destroy
   has_many :media_objects, :as => :context
   has_many :zip_file_imports, :as => :context
+  has_many :content_migrations, :as => :context
   belongs_to :avatar_attachment, :class_name => "Attachment"
 
   before_validation :ensure_defaults

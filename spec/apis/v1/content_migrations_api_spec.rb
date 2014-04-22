@@ -64,6 +64,41 @@ describe ContentMigrationsController, type: :request do
       api_call(:get, @migration_url, @params)
       @course.reload.folders.should_not be_empty
     end
+
+    context "User" do
+      before do
+        @migration = @user.content_migrations.create
+        @migration.migration_type = 'zip_file_import'
+        @migration.user = @user
+        @migration.save!
+        @migration_url = "/api/v1/users/#{@user.id}/content_migrations"
+        @params = @params.reject{ |k| k == :course_id }.merge(user_id: @user.id)
+      end
+
+      it "should return list" do
+        json = api_call(:get, @migration_url, @params)
+        json.length.should == 1
+        json.first['id'].should == @migration.id
+      end
+    end
+
+    context "Group" do
+      before do
+        group_with_user user: @user
+        @migration = @group.content_migrations.create
+        @migration.migration_type = 'zip_file_import'
+        @migration.user = @user
+        @migration.save!
+        @migration_url = "/api/v1/groups/#{@group.id}/content_migrations"
+        @params = @params.reject{ |k| k == :course_id }.merge(group_id: @group.id)
+      end
+
+      it "should return list" do
+        json = api_call(:get, @migration_url, @params)
+        json.length.should == 1
+        json.first['id'].should == @migration.id
+      end
+    end
   end
 
   describe 'show' do
@@ -144,6 +179,40 @@ describe ContentMigrationsController, type: :request do
       @migration.should be_failed
       @migration.migration_issues.first.description.should == "The file upload process timed out."
     end
+
+    context "User" do
+      before do
+        @migration = @user.content_migrations.create
+        @migration.migration_type = 'zip_file_import'
+        @migration.user = @user
+        @migration.save!
+        @migration_url = "/api/v1/users/#{@user.id}/content_migrations/#{@migration.id}"
+        @params = @params.reject{ |k| k == :course_id }.merge(user_id: @user.id, id: @migration.to_param)
+      end
+
+      it "should return migration" do
+        json = api_call(:get, @migration_url, @params)
+        json['id'].should == @migration.id
+      end
+    end
+
+    context "Group" do
+      before do
+        group_with_user user: @user
+        @migration = @group.content_migrations.create
+        @migration.migration_type = 'zip_file_import'
+        @migration.user = @user
+        @migration.save!
+        @migration_url = "/api/v1/groups/#{@group.id}/content_migrations/#{@migration.id}"
+        @params = @params.reject{ |k| k == :course_id }.merge(group_id: @group.id, id: @migration.to_param)
+      end
+
+      it "should return migration" do
+        json = api_call(:get, @migration_url, @params)
+        json['id'].should == @migration.id
+      end
+    end
+
   end
 
   describe 'create' do
@@ -292,6 +361,46 @@ describe ContentMigrationsController, type: :request do
       end
     end
 
+    context "User" do
+      before do
+        @migration_url = "/api/v1/users/#{@user.id}/content_migrations"
+        @params = @params.reject{|k| k == :course_id}.merge(:user_id => @user.to_param)
+        @folder = Folder.root_folders(@user).first
+      end
+
+      it "should error for an unsupported type" do
+        json = api_call(:post, @migration_url, @params, {:migration_type => 'common_cartridge_importer'},
+                        {}, :expected_status => 400)
+        json.should == {"message"=>"Unsupported migration_type for context"}
+      end
+
+      it "should queue a migration" do
+        json = api_call(:post, @migration_url, @params,
+          { :migration_type => 'zip_file_importer',
+            :settings => { :file_url => 'http://example.com/oi.zip',
+                           :folder_id => @folder.id }})
+        migration = ContentMigration.find json['id']
+        migration.context.should eql @user
+      end
+    end
+
+    context "Group" do
+      before do
+        group_with_user user: @user
+        @migration_url = "/api/v1/groups/#{@group.id}/content_migrations"
+        @params = @params.reject{|k| k == :course_id}.merge(:group_id => @group.to_param)
+        @folder = Folder.root_folders(@group).first
+      end
+
+      it "should queue a migration" do
+        json = api_call(:post, @migration_url, @params,
+                        { :migration_type => 'zip_file_importer',
+                          :settings => { :file_url => 'http://example.com/oi.zip',
+                                         :folder_id => @folder.id }})
+        migration = ContentMigration.find json['id']
+        migration.context.should eql @group
+      end
+    end
   end
 
   describe 'update' do
@@ -381,6 +490,19 @@ describe ContentMigrationsController, type: :request do
                               "requires_file_upload" => true,
                               "name" => "Common Cartridge 1.0/1.1/1.2 Package",
                               "required_settings" => []
+                      }]
+    end
+
+    it "should filter by context type" do
+      Canvas::Plugin.stubs(:all_for_tag).returns([Canvas::Plugin.find('common_cartridge_importer'),
+                                                  Canvas::Plugin.find('zip_file_importer')])
+      json = api_call(:get, "/api/v1/users/#{@user.id}/content_migrations/migrators",
+                      {:controller=>"content_migrations", :action=>"available_migrators", :format=>"json", :user_id=>@user.to_param})
+      json.should == [{
+                          "type" => "zip_file_importer",
+                          "requires_file_upload" => true,
+                          "name" => "Unzip .zip file into folder",
+                          "required_settings" => ['source_folder_id']
                       }]
     end
   end
