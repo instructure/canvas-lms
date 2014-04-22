@@ -266,6 +266,20 @@ describe GroupCategory do
     end
   end
 
+  describe "max_membership_change" do
+    it "should update groups if the group limit changed" do
+      course_with_teacher(:active_all => true)
+      category = group_category
+      category.group_limit = 2
+      category.save
+      group = category.groups.create(:context => @course)
+      group.max_membership.should == 2
+      category.group_limit = 4
+      category.save
+      group.reload.max_membership.should == 4
+    end
+  end
+
   describe "group_for" do
     before :each do
       course_with_teacher(:active_all => true)

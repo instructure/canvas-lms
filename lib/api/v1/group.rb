@@ -21,7 +21,7 @@ module Api::V1::Group
   include Api::V1::Context
 
   API_GROUP_JSON_OPTS = {
-    :only => %w(id name description is_public join_level group_category_id),
+    :only => %w(id name description is_public join_level group_category_id max_membership),
     :methods => %w(members_count storage_quota_mb),
   }
 

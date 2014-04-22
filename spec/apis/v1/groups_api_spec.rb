@@ -28,6 +28,7 @@ describe "Groups API", type: :request do
       'is_public' => group.is_public,
       'join_level' => group.join_level,
       'members_count' => group.members_count,
+      'max_membership' => group.max_membership,
       'avatar_url' => group.avatar_attachment && "http://www.example.com/images/thumbnails/#{group.avatar_attachment.id}/#{group.avatar_attachment.uuid}",
       'context_type' => group.context_type,
       "#{group.context_type.downcase}_id" => group.context_id,

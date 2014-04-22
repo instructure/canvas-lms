@@ -18,6 +18,11 @@ define [
       super
       if groups = @get('groups')
         @groups groups
+      @on 'change:group_limit', @updateGroups
+
+    updateGroups: ->
+      if @_groups
+        @_groups.fetch()
 
     groups: (models = null) ->
       @_groups = new GroupCollection models,

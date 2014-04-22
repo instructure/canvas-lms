@@ -31,6 +31,7 @@ class GroupCategory < ActiveRecord::Base
   EXPORTABLE_ASSOCIATIONS = [:context, :groups, :assignments]
 
   after_save :auto_create_groups
+  after_update :update_groups_max_membership
 
   validates_each :name do |record, attr, value|
     next unless record.name_changed? || value.blank?
@@ -406,4 +407,9 @@ class GroupCategory < ActiveRecord::Base
     current_progress.reload
   end
 
+  def update_groups_max_membership
+    if group_limit_changed?
+      groups.update_all(:max_membership => group_limit)
+    end
+  end
 end

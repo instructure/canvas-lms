@@ -42,6 +42,7 @@ define [
       @users = @model.users()
       @model.on 'destroy', @remove, this
       @model.on 'change:members_count', @updateFullState, this
+      @model.on 'change:max_membership', @updateFullState, this
 
     afterRender: ->
       @$el.toggleClass 'group-expanded', @expanded
