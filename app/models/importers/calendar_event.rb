@@ -117,7 +117,7 @@ module Importers
 
     def self.object_url_part(object)
       case object
-      when Attachment then "files/#{object.id}/download"
+      when ::Attachment then "files/#{object.id}/download"
       else "#{object.class.to_s.demodulize.underscore.pluralize}/#{object.id}"
       end
     end
