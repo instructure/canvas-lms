@@ -74,27 +74,27 @@ class ExternalToolsController < ApplicationController
       end
       @tools = ContextExternalTool.search_by_attribute(@tools, :name, params[:search_term])
       respond_to do |format|
-          @tools = Api.paginate(@tools, self, tool_pagination_url)
-          format.json {render :json => external_tools_json(@tools, @context, @current_user, session)}
+        @tools = Api.paginate(@tools, self, tool_pagination_url)
+        format.json { render :json => external_tools_json(@tools, @context, @current_user, session) }
       end
     end
   end
-  
+
   def homework_submissions
     if authorized_action(@context, @current_user, :read)
       @tools = ContextExternalTool.all_tools_for(@context, :user => @current_user).select(&:has_homework_submission)
       respond_to do |format|
-        format.json {render :json => external_tools_json(@tools, @context, @current_user, session)}
+        format.json { render :json => external_tools_json(@tools, @context, @current_user, session) }
       end
     end
   end
-  
+
   def finished
     @headers = false
     if authorized_action(@context, @current_user, :read)
     end
   end
-  
+
   def retrieve
     if authorized_action(@context, @current_user, :read)
       @tool = ContextExternalTool.find_external_tool(params[:url], @context)
@@ -215,7 +215,7 @@ class ExternalToolsController < ApplicationController
       end
       uri.query = {:verifier => verifier}.to_query
 
-      render :json => { :id => @tool.id, :name => @tool.name, :url => uri.to_s }
+      render :json => {:id => @tool.id, :name => @tool.name, :url => uri.to_s}
     end
   end
 
@@ -304,8 +304,8 @@ class ExternalToolsController < ApplicationController
     selection_type = 'editor_button' if params[:editor]
     selection_type = 'homework_submission' if params[:homework]
 
-    @return_url    = external_content_success_url('external_tool')
-    @headers       = false
+    @return_url = external_content_success_url('external_tool')
+    @headers = false
     @tool_launch_type = 'self'
 
     find_tool(params[:external_tool_id], selection_type)
@@ -315,12 +315,14 @@ class ExternalToolsController < ApplicationController
   def find_tool(id, selection_type)
     begin
       @tool = ContextExternalTool.find_for(id, @context, selection_type)
-    rescue ActiveRecord::RecordNotFound; end
+    rescue ActiveRecord::RecordNotFound;
+    end
     if !@tool
       flash[:error] = t "#application.errors.invalid_external_tool_id", "Couldn't find valid settings for this tool"
       redirect_to named_context_url(@context, :context_url)
     end
   end
+
   protected :find_tool
 
   def render_tool(selection_type)
@@ -345,6 +347,7 @@ class ExternalToolsController < ApplicationController
 
     render :template => 'external_tools/tool_show'
   end
+
   protected :render_tool
 
   # @API Create an external tool
@@ -511,6 +514,7 @@ class ExternalToolsController < ApplicationController
       set_tool_attributes(@tool, params[:external_tool] || params)
       respond_to do |format|
         if @tool.save
+          invalidate_nav_tabs_cache(@tool)
           if api_request?
             format.json { render :json => external_tool_json(@tool, @context, @current_user, session) }
           else
@@ -539,6 +543,7 @@ class ExternalToolsController < ApplicationController
       respond_to do |format|
         set_tool_attributes(@tool, params[:external_tool] || params)
         if @tool.save
+          invalidate_nav_tabs_cache(@tool)
           if api_request?
             format.json { render :json => external_tool_json(@tool, @context, @current_user, session) }
           else
@@ -565,6 +570,7 @@ class ExternalToolsController < ApplicationController
       respond_to do |format|
         if @tool.destroy
           if api_request?
+            invalidate_nav_tabs_cache(@tool)
             format.json { render :json => external_tool_json(@tool, @context, @current_user, session) }
           else
             format.json { render :json => @tool.as_json(:methods => [:readable_state, :custom_fields_string], :include_root => false) }
@@ -575,15 +581,22 @@ class ExternalToolsController < ApplicationController
       end
     end
   end
-  
+
   private
-  
+
   def set_tool_attributes(tool, params)
     attrs = ContextExternalTool::EXTENSION_TYPES
     attrs += [:name, :description, :url, :icon_url, :domain, :privacy_level, :consumer_key, :shared_secret,
-    :custom_fields, :custom_fields_string, :text, :config_type, :config_url, :config_xml]
+              :custom_fields, :custom_fields_string, :text, :config_type, :config_url, :config_xml]
     attrs.each do |prop|
       tool.send("#{prop}=", params[prop]) if params.has_key?(prop)
     end
   end
+
+  def invalidate_nav_tabs_cache(tool)
+    if tool.has_user_navigation || tool.has_course_navigation || tool.has_account_navigation
+      Lti::NavigationCache.new(@domain_root_account).invalidate_cache_key
+    end
+  end
+
 end
