@@ -249,6 +249,8 @@ ja:
     announcement_deleted_notice: アナウンスは正常に削除されました
     permission_denied_notice: このアカウントに対してアナウンスは作成できません
   account_reports: 
+    bucks: 
+      courses_only: "オンライン セクションのみ"
     ccp: 
       course: 
         check_box: "対象コース: %{course_id};"
@@ -264,6 +266,8 @@ ja:
       section_text: "対象のセクション: %{section};"
       start_text: "開始日時: %{start_at};"
       term_text: "期間: %{term_name};"
+    galen: 
+      no_term: 具体的な期間を指定する必要があります。期間を選択してください
     grades: 
       deleted: "削除されたオブジェクトを含む: true;"
     mississippi: 
@@ -503,6 +507,13 @@ ja:
         zero: 提出済み
       title: プロフィール画像
       unlock_link: ロックの解除
+    bucks_zero_activity_csv_description: 
+      account_reports: 
+        bucks: 
+          description: 
+            header: 例
+          student_login: 
+            text: "このレポートでは、指定した期間中にいずれかのコースに登録している受講生がすべて表示されます。生成される csv ファイルでは、指定の日付以降にコースを訪問していない登録受講生がそれぞれ 1 行で示されます。オンライン フィルタでは、セクション名に「.E」が付くセクションからの登録のみが含まれます。"
     cannot_manage_account: アカウント設定を管理する権限がありません
     cannot_manage_quotas: クォータ設定を管理する権限がありません
     ccp_zero_activity_csv_description: 
@@ -545,6 +556,17 @@ ja:
       teachers_label: 講師
     course_add_failed_message: コースの追加に失敗しました。もう一度やり直してください
     course_added_message: "%{course} は正常に追加されました!"
+    course_enrollment_csv_description: 
+      account_reports: 
+        cedar_rapids: 
+          course_status: 
+            text: |-
+                このレポートでは、指定した期間のすべてのコースの状況が示されます。
+                生成される csv ファイルでは、コース セクションごとに 1 行を使用して、
+                コース、コース状況、期間、有効開始日および有効終了日、登録数、学科、
+                およびアカウントが示されます。
+          description: 
+            header: 例
     course_status_csv_description: 
       account_reports: 
         auburn: 
@@ -589,6 +611,14 @@ ja:
         edison: 
           outcome: 
             text: "outcome_id:"
+    cv_non_graded_data_csv_description: 
+      account_reports: 
+        galen: 
+          cv: 
+            non_graded: 
+              text: このレポートでは、クイズ、サーベイ、およびディスカッションについて、コースごとに未採点の提出物が示されます。
+          description: 
+            header: 例
     cv_submission_data_csv_description: 
       account_reports: 
         galen: 
@@ -643,6 +673,13 @@ ja:
       page_title: アカウント
       title: 自分の管理しているアカウント
     integer_required: 整数の値が必要です
+    last_submission_activity_csv_description: 
+      account_reports: 
+        concorde: 
+          description: 
+            header: 例
+          last_submission: 
+            text: このレポートでは、提出物に対する受講生の最終アクティビティが示されます。
     last_user_access_csv_description: 
       account_reports: 
         default: 
@@ -1113,20 +1150,6 @@ ja:
             header: 例
           student_login: 
             text: "このレポートでは、指定した期間の指定のコースまたはすべてのコースに登録しているすべての受講生が示されます。生成される csv ファイルでは、登録受講生がそれぞれ 1 行ずつで示されます。"
-    student_login_csv_description: 
-      account_reports: 
-        bucks: 
-          description: 
-            header: 例
-          student_login: 
-            text: このレポートでは、指定の日付以降にログインしていない受講生が示されます。
-    student_login_csv_parameters: 
-      account_reports: 
-        bucks: 
-          login: 
-            check_box: 一度もログインしていないユーザを含めますか?
-          parameters: 
-            note: "このレポートでは、Canvas 内での前回のアクティビティではなく、ユーザがログインした時刻が示されます。"
     student_submissions_csv_description: 
       account_reports: 
         vilas: 
@@ -1466,6 +1489,7 @@ ja:
       upload_as_zip: "ファイルは .zip 形式でアップロードしてください"
     feed_entry_title: "課題: %{assignment}"
     feed_entry_title_with_course: "課題、%{course}: %{assignment}"
+    gpa_scale_explainer: "GPA スケール採点とは"
     group_assignment_must_have_group_set: "この課題に対するグループ セットを選択してください"
     imported_assignments_group: インポートされた課題
     labels: 
@@ -1486,6 +1510,7 @@ ja:
       external_tool: 外部ツール
       on_paper: 筆記
     titles: 
+      gpa_scale_explainer: "GPA スケール採点とは"
       grading_scheme_info: 採点スキームの表示/編集
   assignment_details: 
     no_graded_submissions: 採点済みの提出物なし
@@ -1499,7 +1524,7 @@ ja:
     no_one_scored_lower: "%{min} を下回るスコアの受講者はいませんでした"
     scores_higher_than_the_average: "平均点 %{average} を上回るスコア"
     scores_lower_than_the_average: "平均点 %{average} を下回るスコア"
-    total_submitted: "提出物の総数:"
+    total_graded_submissions: "採点済みの提出物合計:"
   assignment_group: 
     default_name: 課題
     default_title: 課題
@@ -1586,7 +1611,7 @@ ja:
       edit: 編集
       group_weight: "合計の %{groupWeight}%"
       manage: 管理
-      move: 移動先&hellip;
+      move: 移動先...
     assignment_group_selector: 
       assignment_group: 課題グループ
       assignment_group_options: 
@@ -1601,7 +1626,7 @@ ja:
       delete: 削除
       edit: 編集
       module: モジュール
-      move: 移動先&hellip;
+      move: 移動先...
       multiple_modules: 複数のモジュール
       no_points_possible: 配点なし
       points_possible: "%{pointsPossible} 点"
@@ -1671,6 +1696,10 @@ ja:
       assignment_groups_wrapper: " (%{number_of_groups} 件のグループ中)"
       links: 
         add_assignment_group: 課題グループの追加
+    available_date_description: 
+      available_until: 次の日付まで利用可能
+      closed: 締切済み
+      not_available_until: 次の日付まで利用不可
     buttons: 
       add_group: グループの追加
       delete_group: グループの削除
@@ -1712,11 +1741,7 @@ ja:
     create_new_crumb: 新規作成
     date_available_column_view: 
       available: 使用可能
-      available_on: 次の日付で利用可能
-      available_until: 次の日付まで利用可能
-      closed: 締切済み
       multiple_dates: 複数の日付
-      not_available_until: 次の日付まで利用不可
     date_due_column_view: 
       due: 期限
       due_date: 期限
@@ -1760,6 +1785,7 @@ ja:
       buttons: 
         not_published: 未公開
         published: 公開済み
+      manage: 管理
       titles: 
         delete: 削除
     edit_view: 
@@ -1802,13 +1828,22 @@ ja:
           *ファイル名で区別しますので、提出ファイルのファイル名は変更しないでください。*
       titles: 
         related_items: 関連アイテム
+    grade_gpa_scale_screenreader: "成績: %{grade}"
     grade_letter_grade_screenreader: "成績: %{grade}"
     grade_pass_fail_screenreader: "成績: %{grade}"
     grade_percent: "%{grade}%"
     grade_percent_screenreader: "成績: %{grade}%"
     grading_type_selector: 
       display_grade_as: 成績の表示方法
+      gpa_scale_explainer: "GPA スケール採点は、すべての課題で 4.0 満点 (場合によっては 5.0 や 6.0 満点) のスケールを使用する学校のための採点法です。この採点スキームは、レター グレード表示と似ていますが、いくつかの重要な相違点もあります。"
+      gpa_scale_input_explainer: "スコアは、4.0 満点のスケールで入力されます。たとえば、ある課題が 100 点満点の場合、4.0 の成績なら 100%、3.0 の成績なら 87% などとなります。"
+      gpa_scale_letters_explainer: "数字の成績に加えてレター グレードを使用することもできます。"
+      gpa_scale_percentage_explainer: "点数を直接入力することはできず、パーセンテージで入力します。たとえば、ある課題が 50 点満点の場合、「40」と入力することはできません。「80%」と入力します。"
+      gpa_scale_recommendation: "学校で成績に 4.0 満点 (または 5.0/6.0 満点) のスケールを使用していない場合は、レター グレードで成績を表示することをお勧めします。"
+      gpa_scale_scores_explainer: 許容されるスコアは、採点スキームに事前定義されます。
+      gpa_scale_title: "GPA スケール採点とは"
       grading_type_options: 
+        gpa_scale: "GPA スケール"
         letter_grade: 成績
         not_graded: 未採点
         pass_fail: 完了/未完了
@@ -1818,10 +1853,10 @@ ja:
     group_category_selector: 
       grade_group_students_individually: それぞれの受講生を個別に採点
       group_assignment_header: グループ課題
+      group_category_locked_explanation: 受講生は、この課題の宿題を既に提出しているため、グループ設定を変更できません。
       group_category_options: "新しいグループ カテゴリ"
       group_set: "グループ セット"
       is_group_assignment: これはグループ課題です
-      students_already_submitted_warning: "過去に個別に提出された課題は、グループでの提出とはみなされず、SpeedGrader で正しく表示されません。"
     group_comment: 
       labels: 
         group_comment: グループ全体にコメントを送信
@@ -2177,9 +2212,12 @@ ja:
         wizard: 
           details: "課題にかかわる要素は、期日や点数以外にもたくさんあります。課題の説明を入力する場合は、ファイルをアップロードできるようにし、採点の種類やその他一式を変更し、課題の名前をクリックするか、または %{edit_icon} アイコンをクリックしてから、\"詳細オプション\" をクリックします。"
           group: 
+            screenreader_step1: "課題グループは、課題を編成するために使用します。それぞれのグループに名前を付けます。最終的な成績をグループに基づいて重み付けしたい場合は、それぞれのグループに対してパーセンテージによるスコアを設定できます。グループを作成するには \"課題グループの追加\" をクリックします。"
             step1: "課題グループは、課題を編成するために使用します。それぞれのグループに名前を付けます。最終的な成績をグループ (*where?*) に基づいて重み付けしたい場合は、それぞれのグループに対してパーセンテージによるスコアを設定できます。グループを作成するには \"課題グループの追加\" をクリックします。"
           overview: 高いレベルでコースを設定するためのページです。課題を追加し、課題をグループ化してから、課題グループを重み付けすることができます。まずは頭の中を整理してから詳細に進もうという考え方です。それにしても、ここで行えることはたくさんあります。
           quizzes: "クイズは特殊なタイプの課題です。左側のサイドバーにある \"クイズ\" リンクをクリックすると、クイズを作成またはインポートすることができます。"
+          screenreader_details: "課題にかかわる要素は、期日や点数以外にもたくさんあります。課題の説明を入力する場合は、ファイルをアップロードできるようにし、採点の種類やその他一式を変更し、課題の名前をクリックするか、または編集アイコンをクリックしてから、\"詳細オプション\" をクリックします。"
+          screenreader_step1: "課題は常にグループ編成されます。そのため、課題を追加する場合はまず最初に、どのグループに追加すればいいか、自分で分かっている必要があります。グループに新しい課題を追加するには、まずグループを選択し、\"課題の追加\" をクリックするか、または追加アイコンをクリックします。"
           step1: "課題は常にグループ編成されます。そのため、課題を追加する場合はまず最初に、どのグループに追加すればいいか、自分で分かっている必要があります。グループに新しい課題を追加するには、まずグループを選択し、\"課題の追加\" をクリックするか、または %{add_icon} アイコンをクリックします。"
           step2: "OK です!次に、詳細情報を入力します。課題のタイトル、期日、および配点などを入力できます。ほかに望むことがあるにしても、まずは課題の作成が先決です。"
           step3: 完了です!これで、課題がグループに追加されました!マウスで課題をポイントすると、オプション一式が表示されます。次のオプションがあります。
@@ -2188,6 +2226,9 @@ ja:
         create_assignment_group: 課題グループの作成
         create_or_import_quiz: クイズの作成/インポート
         edit_assignment_in_detail: 課題の詳細の編集
+        screenreader_show_me_add_assignment: "[課題の追加] ボタンに移動"
+        screenreader_show_me_add_assignment_group: "[課題グループの追加] ボタンに移動"
+        screenreader_show_me_weight_final_grade: "[最終的な成績を重み付けする] チェックボックスに移動"
         show_me_where: どこに表示するか
       subtitles: 
         edit_assignment_in_detail: " (アップロード、説明の編集、などを可能にします。)"
@@ -2432,7 +2473,7 @@ ja:
       scheduler_explanation_teacher_paragraph_1: "これはスケジューラ ツールです。講師はこのツールを使用して、受講生がサインアップする予定グループを作成できます。"
       scheduler_explanation_teacher_paragraph_2: "例えば、講師がコースの各受講生に中間筆記課題を出すものとします。そのような場合は、新しい予定グループを作成し、自分の都合の良い日時を指定し、その時間を 15 分のブロックに分割して、各時間ブロックで 1 人の受講生だけを受け付けるようにします。"
       scheduler_explanation_teacher_paragraph_3: その後、受講生向けに、指定の時間ブロックのいずれかにサインアップする必要があることを通知します。受講生のカレンダーには、利用できる時間ブロックが他のすべての予定と共に表示されるので、受講生は都合のよい時間を選択できます。
-      scheduler_explanation_teacher_paragraph_4: "* 今すぐ始めるには、右側の [予定グループの作成] ボタンをクリックします *"
+      scheduler_explanation_teacher_paragraph_4: "* 今すぐ始めるには、右側の [予定グループの作成] ボタンをクリックします。 *"
     buttons: 
       cancel: キャンセル
       send_message: 送信
@@ -3128,21 +3169,27 @@ ja:
     upload_timeout_error: "ファイル アップロード プロセスがタイムアウトしました"
   content_migrations: 
     angel_exporter: 
+      content: コンテンツ
       options: オプション
     bad_migration_type: 無効な移行タイプ
     blackboard_export: 
+      content: コンテンツ
       options: オプション
     canvas_export: 
+      content: コンテンツ
       options: オプション
     common_cartridge: 
+      content: コンテンツ
       options: オプション
     content_migration: コンテンツ移行
     content_migration_issue: 
       error_report: "エラー レポート"
     copy_course: 
+      content: コンテンツ
       options: オプション
     course_list_error: コースを取得できませんでした。インターネットに接続していますか?
     d2_l_export: 
+      content: コンテンツ
       options: オプション
     file_required: コンテンツのインポート元のファイルを選択する必要があります
     file_too_large: "移行するファイルのサイズは %{file_size} 以下である必要があります"
@@ -3158,6 +3205,7 @@ ja:
       import_from_label: "コンテンツ タイプ"
       import_migration: インポート
     moodle_zip: 
+      content: コンテンツ
       options: オプション
     must_upload_file: "ファイルのアップロードまたは URL が必要です"
     no_content_selected: インポートするコンテンツが選択されていません。
@@ -3233,7 +3281,8 @@ ja:
         question_bank_title: 新しい問題バンクの名前
         select_question_bank: 問題バンクの選択
       select_content_checkbox: 
-        select_migration_label: 移行コンテンツの選択
+        select_all_content: すべてのコンテンツ
+        select_specific_content: 特定のコンテンツを選択
     upload_warning: このページから移動すると、アップロード処理がキャンセルされます。
     uploading: アップロードしています...
     web_ct: 
@@ -3882,7 +3931,7 @@ ja:
     no_course: コースなし
     select_course: コースの選択
   conversation_message: 
-    subject: "非公開メッセージ、%{timestamp}"
+    subject_specified: "非公開メッセージ: %{subject}"
     users_added: 
       one: "%{list_of_users} が %{current_user} によって会話に追加されました"
       other: "%{list_of_users} が %{current_user} によって会話に追加されました"
@@ -3977,7 +4026,6 @@ ja:
       inbox_view: 表示
       inbox_views: 
         archived_messages: アーカイブされました
-        discussion_replies: ディスカッションへの返信
         inbox: 受信箱
         sent_messages: 送信済み
         starred_messages: スターあり
@@ -4015,6 +4063,7 @@ ja:
       forward: 早送り
       help: ヘルプ
       inbox: 受信箱
+      mark_as_read: 既読にする
       mark_as_unread: 未読にする
       more_options: その他のオプション
       reply: 返信
@@ -4206,6 +4255,7 @@ ja:
     default_short_name: コース-101
     errors: 
       sis_in_use: "SIS ID \"%{sis_id}\" は既に使用されています"
+    failed_import_media_objects: "メディア オブジェクトのインポートに失敗しました"
     file_copy_error: "ファイル \"%{name}\" をコピーできませんでした"
     grade_export_types: 
       instructure_csv: "Instructure の CSV形式"
@@ -4439,14 +4489,16 @@ ja:
     copy: 
       buttons: 
         create_course: コースの作成
-      choose_content: コピーするアイテムの選択
       conclude_at: 終了日
+      content_label: コンテンツ
       course_code: "コース コード"
       details: このコースのコピーの作成を開始するには、次の詳細情報を入力してください。
       enrollment_term_id: 期間
       headings: 
         copy_course: "%{course} のコピー"
       name: 名前
+      select_all_content: すべてのコンテンツ
+      select_specific_content: 特定のコンテンツを選択
       start_at: 開始日
       titles: 
         copy_course: コースのコピー
@@ -4673,6 +4725,7 @@ ja:
         pending_acceptance_of_invitation: 保留
       roster_users: 
         canvas_user_id: "Canvas ユーザ ID"
+        last_activity: 最終アクティビティ
         login_name_or_sis_id: "ログイン/SIS ID"
         name: 名前
         no_people_found: メンバーが見つかりません
@@ -5319,9 +5372,10 @@ ja:
       close_for_comments: コメントを締め切る
       delete: 削除
       due: 期限
-      graded_discussion: 課題用ディスカッション
+      graded_discussion: "課題用ディスカッション:"
       last_post_date: "前回の投稿 %{display_last_reply_at}"
       manage: 管理
+      move: 移動先&hellip;
       no_due_date: 期日なし
       open_to_comments: コメントを受け付ける
       pin: 固定
@@ -5331,8 +5385,8 @@ ja:
     discussion_feed_title: "%{title} ディスカッション フィード"
     discussion_list: 
       no_pinned_discussions: 現在、固定したディスカッションはありません
-      pinned_instructions: "ディスカッションを受講生のディスカッション ページ上部に固定するには、ここにドラッグします。"
-      there_are_no_discussions_show: 表示できるディスカッションはありません。
+      pinned_instructions: "ディスカッションをページの上部に固定するには、ここにディスカッションをドラッグして、ディスカッションの設定メニューから [固定] を選択します。"
+      there_are_no_discussions_show: このセクションに表示できるディスカッションはありません。
     discussions_settings_view: 
       allow_student_discussion_editing: 自分の投稿を編集または削除
       allow_student_topics: "ディスカッション トピックを作成する"
@@ -5405,13 +5459,13 @@ ja:
       your_search_did_not_match_any_discussion_topics: "検索に一致するディスカッション トピックはありませんでした。"
     new_and_total_badge: 
       reply_count_tooltip: 
-        one: "1 件の返信"
-        other: "%{count} 件の返信"
-        zero: 返信なし
+        one: "1 件の返信があります。"
+        other: "%{count} 件の返信があります。"
+        zero: 返信がありません。
       unread_count_tooltip: 
-        one: "%{count} 件の返信が未読"
-        other: "%{count} 件の返信が未読"
-        zero: 未読の返信なし
+        one: "%{count} 件の未読の返信があります。"
+        other: "%{count} 件の未読の返信があります。"
+        zero: 未読の返信はありません。
     page_nav: 
       Page: ページ
       current_page: 現在
@@ -5419,9 +5473,9 @@ ja:
       last_page: 最後
     points_possible_number: 配点は数値で入力してください
     reply_count_tooltip: 
-      one: "1 件の返信"
-      other: "%{count} 件の返信"
-      zero: 返信なし
+      one: "1 件の返信があります。"
+      other: "%{count} 件の返信があります。"
+      zero: 返信がありません。
     show: 
       add_rubric: 注釈の追加
       announcement_closed: このアナウンスへのコメントは締め切られています
@@ -5479,9 +5533,9 @@ ja:
       topic_podcast_feed: "トピックのポッドキャスト フィード"
     topic_deleted_notice: "%{topic_title} は正常に削除されました"
     unread_count_tooltip: 
-      one: "1 件の返信が未読"
-      other: "%{count} 件の返信が未読"
-      zero: 未読の返信なし
+      one: "1 件の未読の返信があります。"
+      other: "%{count} 件の未読の返信があります。"
+      zero: 未読の返信はありません。
     user_settings_view: 
       manually_mark_as_read: 投稿を手動で既読にする
       my_settings: マイ設定
@@ -5513,7 +5567,6 @@ ja:
       show_more: 詳細
     hide_due_dates: 期日を非表示
     initial_post_required_to_subscribe: 購読する前に返信を投稿する必要があります
-    lock: ロック
     mark_as_read: 既読にする
     mark_as_unread: 未読にする
     no_content: コンテンツなし
@@ -5526,7 +5579,6 @@ ja:
     ordered_by_recent_activity: 最近のアクティビティで並べ替え
     participant: 
       anonymous_user: 匿名
-    pin: 固定
     pinned_discussions: 固定されたディスカッション
     reply: 
       error_saving_reply: "*エラーが発生しました*。後でもう一度返信を投稿してください"
@@ -5549,12 +5601,10 @@ ja:
     subscribe: このトピックを購読
     subscribed: 購読済み
     subscribed_hint: このトピックを購読しています。購読を中止するにはクリックします。
-    toggle_message: ディスカッションの表示/非表示の切り替え
+    toggle_message: セクションの表示/非表示の切り替え
     uknown_author: 不明な作成者
     unknown: 不明
     unknown_author: 不明な作成者
-    unlock: ロックの解除
-    unpin: 固定の解除
     unsubscribe: このトピックの購読を中止
     unsubscribed: 購読中止済み
     unsubscribed_hint: このトピックを購読していません。購読するにはクリックします。
@@ -5638,7 +5688,7 @@ ja:
     titles: 
       font_size: "フォント サイズ、押して選択"
       formatting: 書式設定、押して選択
-      rte_help: "リッチ テキスト領域。ツールバーの場合は ALT + F10 を押してください。ヘルプの場合は ALT + 0 を押してください。"
+      rte_help: "リッチ テキスト領域。ツールバーの場合は ALT + F10 を押してください。ヘルプの場合は ALT + F8 を押してください。"
   email: 
     default_from_name: "Instructure Canvas"
   enrollment: 
@@ -5953,6 +6003,7 @@ ja:
     registration_incomplete: "このページを表示するには、先に電子メール アドレスを確認する必要があります。"
     required: 必須
     sis_id_in_use: "SIS ID \"%{sis_id}\" は既に使用されています"
+    unsaved_changes: 未保存の変更内容があります。
   external_content: 
     cancel: 
       canceling: 取り消しています...
@@ -6155,8 +6206,8 @@ ja:
         この機能をオフにすると、コースのすべての既存のオブジェクトが公開されます。処理を続行する前に、すべての
         ドラフト コンテンツを公開してすべてのユーザが利用できるようにする準備が整っていることを確認してください。
     google_docs_domain_restriction: "Google ドキュメントのドメイン制限"
+    individual_gradebook: 個別の成績表ビュー
     outcome_gradebook: 成果成績表
-    screenreader_gradebook: "スクリーン リーダー用成績表"
     student_outcome_gradebook: 受講生成果成績表
   file_browser_view: 
     folder_tree_instructions: "上および下方向キーを使用して、ツリー内をナビゲートします。フォルダを展開するには右方向キーを、折りたたむには左方向キーを、画像を選択するには Enter キーを押します。"
@@ -6540,6 +6591,7 @@ ja:
     no_assignments_have_points_warning: 課題に配点を設定するまで、スコアは計算できません
     notes: メモ
     outcome_gradebook: 
+      export_report: レポートのエクスポート
       toggle_sidebar: サイドバーの切り替え
     outcome_popover: 
       mastery_set_at: "達成の設定:"
@@ -6658,6 +6710,7 @@ ja:
     leaving_id_will_match_better_can_add_new_assignment: "ID は変更しないほうが一致しやすくなります (この例では \"(581)\" という部分)。進行中に作成される新しい課題を追加することもできます。"
     new_assignment_example: 新しい課題
     optional_ignored: オプションです。無視されました。
+    screenreader_csv_explainer: "アップロードする CSV ファイルには、「受講生」、「ID」、および「既存の課題 (ID)」の列が必要です。受講生の列には、「山田, 太郎」のように、「姓, 名」の形式で各受講生の名前を指定します。既存の課題の列には、「第 1 章のワークシート (201)」のように、課題の名前の後に、課題 ID をかっこで囲んで指定します。SIS を使用している場合は、「SIS ユーザ ID」と「SIS ログイン ID」の列を含めます。新しい課題を作成する場合は、「派生物のワークシート」のように、課題の名前を指定した列を含めます。「セクション」、「現在のスコア」、「最終的なスコア」の列はオプションです。"
     titles: 
       upload_form: "アップロードする CSV ファイルの選択"
     what_should_csv_look_like: "CSV ファイルはどのような表示にしたいですか?"
@@ -6811,7 +6864,7 @@ ja:
         send_comment: この受講生にコメントを送信
         sort_columns: 成績表の列の並べ替え
         sort_rows: 成績表の行の並べ替え
-        total_submitted: 提出物の総数
+        total_grade_subs: 採点済みの提出物合計
       links: 
         add_assignments: コースへの課題の追加
         add_students: コースへの受講生の追加
@@ -6970,7 +7023,6 @@ ja:
       titles: 
         download_file: このファイルをダウンロード
         not_newest: 上のドロップダウンを使用して、表示対象の提出物を変更
-        on_time: 時間内に提出済み
         preview_file: このファイルのプレビュー
         speedgrader_options: "Speedgrader オプション"
       tooltips: 
@@ -7092,6 +7144,7 @@ ja:
     name_too_long: 短いカテゴリ名を入力してください
     name_unavailable: "%{name} は既に使用されています。"
     self_signup_for_courses: "セルフ サインアップは、コース グループまたはコミュニティに対してのみ有効化できます"
+  group_category_locked: "受講生は、この課題に対して既に提出を完了しているため、グループ カテゴリを変更できません"
   group_membership: 
     errors: 
       group_full: グループに空きがありません。
@@ -7465,6 +7518,7 @@ ja:
     invalid_file_size: "画像ファイルのサイズが大きすぎます (最大: %{max} バイト、指定されたサイズ: %{actual})"
     invalid_file_type: "無効なファイル タイプです: %{type}。指定可能なタイプ: %{type_list}"
     not_an_image: 選択されたファイルは画像ではありません
+  individual_gradebook_description: 個別の成績表ビューは、アクセシビリティに配慮した設計の成績表ビューを提供します。
   info: 
     notices: 
       error_reported: ご協力ありがとうございます!すぐに取り掛かります
@@ -7749,7 +7803,7 @@ ja:
     en: 英語
     ja: 日本語
   logged_out_user: "ログアウトしたユーザ %{user_counter}"
-  m2c_file_description: "Moodle 1.9 .zip ファイル"
+  m2c_file_description: "Moodle 1.9/2.x"
   m2c_name: "Moodle インポーター"
   manage_avatars: 
     errors: 
@@ -7784,6 +7838,8 @@ ja:
       save_failed: 保存が失敗したようです。このポップアップを閉じて、もう一度試してください。
       save_failed_try_again: エントリの保存に失敗しました。もう一度、試してください。
       upload_failed: "アップロードが失敗し、次のエラーが発生しました:"
+    file_size_error: "%{file} のサイズが、許容される最大ファイル サイズ %{max} を超えています。"
+    file_type_error: "%{file} は、許容される %{type} ファイルではありません。"
     links: 
       minimize_embedded_kaltura_content: 埋め込みコンテンツを最小化する
     loading: メディアを読み込んでいます...
@@ -10004,6 +10060,10 @@ ja:
     invalid_file: "無効な成果グループ ファイルです"
   outcome_groups_api: 
     account_group_description: "アカウント レベルの成果グループ。"
+  outcome_path_mastery_points: "%{path} 熟達の点数"
+  outcome_path_result: "%{path} 結果"
+  outcome_results: 
+    outcomes_filename: 成果
   outcomes: 
     account_standards: アカウント標準
     account_standards_description: 左側には、これらのコースのために組織が設定した標準が表示されます。
@@ -10373,6 +10433,7 @@ ja:
         domain_settings: ドメイン設定
         misc_settings: その他の設定
         ui_conf_ids: "UI 会議 ID"
+      hide_rte_button_note: (会話/SpeedGrader/メディアの記録の宿題の提出では表示されます)
       hints: 
         domain: "ホスティングされるアカウントの場合は、\"www.kaltura.com\" を使用します"
         resource_domain: "ホスティングされるアカウントの場合は、\"cdn.kaltura.com\" を使用します"
@@ -10382,8 +10443,9 @@ ja:
       labels: 
         cache_play_list_seconds: "プレイリスト URL をキャッシュする秒数"
         do_analytics: 分析イベントの送信
-        do_flash_var_test: 試験的なフラッシュ設定を有効化
         domain: ドメイン
+        hide_rte_button: "リッチ コンテンツ エディタでビデオ アイコンを非表示にします。"
+        js_uploader: "html5 (アクセシビリティ対応) アップローダーを使用"
         kaltura_sis: "SIS データを Kaltura に書き込む"
         kcw_ui_conf: "KCW UI 会議 ID"
         partner_id: "パートナー ID"
@@ -10393,6 +10455,7 @@ ja:
         secret_key: 管理者シークレット
         subpartner_id: "サブ パートナー ID"
         upload_ui_conf: "アップローダ UI 会議 ID"
+        use_alt_record_widget: "代替の Flash 録画ウィジェットを使用"
         user_secret_key: "ユーザ シークレット"
       ui_conf_ids: "Kaltura がホスティングするお客様の場合は、これらの ID を提供してくれるようKaltura に依頼してください。自己ホスティングするインスタンスは、これらの値を ui_confs 表から検索することができます。"
     linked_in: 
@@ -10531,13 +10594,12 @@ ja:
       titles: 
         delete_this_token: このトークンの削除
     buttons: 
-      add_file: ファイルの追加
-      adding_file: ファイルを追加しています...
       generate_token: トークンの生成
       generating_token: トークンを生成しています...
       regenerate_token: トークンの再生成
       regenerating_token: トークンを再生成しています...
-      select_image: 画像の選択
+      save: 保存
+      select_profile_picture: プロフィール画像の選択
       selecting_image: 画像を選択しています...
     communication: 
       confirm_email_instructions: "お知らせを受け取るには、その前に、お送りした電子メールのリンクをクリックして、電子メール アドレス (%{email}) を確認してください。電子メールが見つからない場合は、*クリックして電子メールを再送信* し、スパム用の受信箱も確認してみてください"
@@ -10560,7 +10622,6 @@ ja:
       default_email_option: "[電子メールの選択]"
       new_email_option: "新しい電子メール アドレス"
     errors: 
-      adding_file_failed: ファイルの追加に失敗しました
       confirmation_failed: 確認に失敗しました。もう一度、試してください。
       generating_token_failed: トークンの生成に失敗しました
       invalid_old_passowrd: "ログイン情報 %{pseudonym} の古いパスワードが無効です"
@@ -10740,7 +10801,6 @@ ja:
       contact_not_confirmed: この連絡先は確認されていません。詳細についてはアドレスをクリックしてください
       email_not_confirmed: この電子メールは確認されていません。詳細についてはアドレスをクリックしてください
       register_communication: コミュニケーションの登録
-      select_profile_pic: プロフィール画像の選択
       unconfirmed_click_to_confirm: 確認されていません。クリックして確認してください
     token_never_expires: 一切なし
     twitter_select: 
@@ -10796,13 +10856,13 @@ ja:
     you_have_no_services: "どのサービスにも登録していません。*設定* ページで追加できます。"
   profiles: 
     avatar_dialog: 
-      butons: 
-        add_picture_file: ファイルの追加
-      headers: 
-        loading_images: 画像を読み込んでいます...
-      links: 
-        upload_new_image: 新しい画像をアップロード
-      profile_pictures: "プロフィールとして使用する画像を選択するか、または新しい画像をアップロードしてください:"
+      from_gravatar: "Gravatar から"
+      take_a_picture: 写真を撮影
+      upload_a_picture: 画像をアップロード
+    gravatar_view: 
+      button: 
+        preview: プレビュー
+      enter_gravatar_email_below: "以下に *Gravatar* の電子メール アドレスを入力してください"
     notification_preferences: 
       captions: 
         notification_preferences: "%{name} のお知らせイベントと設定"
@@ -10811,6 +10871,12 @@ ja:
         ok: OK
         privacy_notice: "注意: お知らせには機密情報が含まれる場合があります。組織で提供されているアドレス以外の電子メールでお知らせを受信するように選択すると、Canvas のコースとグループに関する機密情報が組織外のシステムに送信される可能性があります。"
         privacy_notice_title: プライバシーに関する注意
+    take_picture_view: 
+      retry: 再試行
+      take_picture: 写真を撮影
+    upload_file_view: 
+      choose_a_picture: 画像の選択
+      crop_instructions: "画像の一部を切り出すには、選択枠をドラッグして、以下の [保存] ボタンをクリックします。"
   pseudonym: 
     errors: 
       bad_credentials: 無効なユーザ名またはパスワード
@@ -11068,7 +11134,7 @@ ja:
     regrade: 
       give_everyone_full_credit: この問題で全員を満点にします。
       no_scores_reduced: "修正された回答と元々正しい回答両方に対して点数を与える (*減点なし*)"
-      regrade_disabled: 受講生が提出物を完了した後に解答が削除されているため、この問題についての再評価はできません。
+      regrade_disabled: 受講生が提出物を完了した後、解答が削除されているか、または問題の種類が変更されているため、この問題についての再評価はできません。
       regrade_options: "再評価オプション *(すでにこの問題に回答した受講生用):*"
       some_scores_reduced: "正しい回答に対してのみポイントを与える (*一部の受講生は減点される場合があります*)"
       update_question_without_regrading: 再評価せずに問題を更新する
@@ -11079,9 +11145,6 @@ ja:
       generated_at_date_time: "作成日: %{dateAndTime}"
       generating_report_name: "%{report_name}を生成しています..."
       item_analysis_not_available: サーベイではアイテム分析は利用できません
-  quiz_submissions: 
-    show: 
-      score_out_of: "配点 %{points_possible} のうち、スコアは %{score} でした。"
   quizzes: 
     after_last_attempt: 前回の試行以降
     alerts: 
@@ -11290,8 +11353,26 @@ ja:
       one: "%{count} 件の問題"
       other: "%{count} 件の問題"
     question_limit_reached: "クイズの最大問題数に達しました (%{count}/%{limit})。\\n\\n問題数の制限を避けるには、複数のクイズに分けてください。"
+    quiz: 
+      current_filter: 現在のフィルタ
+      default_question_input: "[ 選択 ]"
+      default_text_only_question_name: スペーサ
+      default_title: 名前の付いていないクイズ
+      errors: 
+        invalid_hide_results: 結果の非表示は無効です
+        invalid_ip_filter: "IP フィルタは無効です"
+        invalid_quiz_type: クイズの種類は無効です
+      question_name_counter: "問題 %{question_number}"
+      types: 
+        quiz: クイズ
+        survey: サーベイ
     quiz_attempts_length_error: "クイズの試行は 3 桁に制限されています。受講生に無制限の試行を許可する場合は、左側の [複数回の試行を許可] ボックスをオンにしないでください"
     quiz_attempts_nan_error: クイズの試行は数値でのみ指定できます
+    quiz_group: 
+      errors: 
+        no_bank: "クイズ グループ %{group_name} の問題バンクが見つかりませんでした"
+        no_permissions: "ユーザにはクイズ グループ %{group_name} の問題バンクを参照する権限がありませんでした"
+      question_group: 問題グループ
     quiz_item_group_view: 
       no_quizzes: クイズが見つかりません
       no_surveys: サーベイが見つかりません
@@ -11302,6 +11383,14 @@ ja:
       settings: 設定
       title_delete: クイズの削除
       title_edit: クイズの編集
+    quiz_question: 
+      defaults: 
+        question_name: 問題
+    quiz_statistics: 
+      statistics_filename: "%{quiz_title} %{quiz_type} %{report_type} レポート"
+      types: 
+        item_analysis: アイテム分析
+        student_analysis: 受講生分析
     quiz_submission: 
       titles: 
         this_is_an_external_element: これはテキストではなく、外部要素であり、受講生が提出したときから変更されている可能性があります。
@@ -11312,6 +11401,8 @@ ja:
         invalid_submissions: このクイズへの提出物は、提出者のものであると確認できませんでした。もう一度やり直してください。
         late_quiz: このクイズの提出が遅れました。解答は記録されていない可能性があります。
         protected_quiz: このクイズは保護されており、特定の場所でのみ利用できます。現在ご利用のコンピュータが置かれている場所は、このクイズに参加できる正当な場所ではないようです。
+      show: 
+        score_out_of: "配点 %{points_possible} のうち、スコアは %{score} でした。"
       still_zipping: ファイルの圧縮が進行中です...
     quizzes: 
       access_code: 
@@ -11354,6 +11445,7 @@ ja:
         not_yet_graded: まだ採点されていません
         original_score: "元のスコア:"
         points_possible: "%{points_possible} 点"
+        question_number: "問題 %{question_number}"
         regraded_score: "再評価スコア:"
         show_ansers_for_variable: "%{variable} の解答を表示"
         skip_question_text: 問題文までスキップします。
@@ -12105,34 +12197,9 @@ ja:
     : "True"
     ungraded_survey: 未採点のサーベイ
     warnings: 
+      draft_state_unsaved_changes: "*このクイズの問題は変更されています。*これらの変更内容は、クイズを保存するまで、受講生には表示されません。"
       unpublished_changes: "*このクイズに加えた変更内容は未公開です。*これらの変更内容は、クイズを公開または再公開するまで、受講生には表示されません。"
       unpublished_quiz: "*このクイズは未公開です* 公開されるまでは、このクイズを表示できるのは講師のみです。"
-  quizzes/quiz: 
-    current_filter: 現在のフィルタ
-    default_question_input: "[ 選択 ]"
-    default_text_only_question_name: スペーサ
-    default_title: 名前の付いていないクイズ
-    errors: 
-      invalid_hide_results: 結果の非表示は無効です
-      invalid_ip_filter: "IP フィルタは無効です"
-      invalid_quiz_type: クイズの種類は無効です
-    question_name_counter: "問題 %{question_number}"
-    types: 
-      quiz: クイズ
-      survey: サーベイ
-  quizzes/quiz_group: 
-    errors: 
-      no_bank: "クイズ グループ %{group_name} の問題バンクが見つかりませんでした"
-      no_permissions: "ユーザにはクイズ グループ %{group_name} の問題バンクを参照する権限がありませんでした"
-    question_group: 問題グループ
-  quizzes/quiz_question: 
-    defaults: 
-      question_name: 問題
-  quizzes/quiz_statistics: 
-    statistics_filename: "%{quiz_title} %{quiz_type} %{report_type} レポート"
-    types: 
-      item_analysis: アイテム分析
-      student_analysis: 受講生分析
   quizzes_model: 
     cant_unpublish_when_students_submit: 受講生の提出物がある場合は、未公開にできません
     confirms: 
@@ -12213,6 +12280,7 @@ ja:
       create_accounts: "新しいルート アカウントの作成"
       create_collaborations: 受講生の共同作業の作成
       create_conferences: "Web 会議の作成"
+      generate_data_exports: "データ エクスポートの生成"
       manage_account_memberships: アカウントに対する他の管理者の追加/削除
       manage_account_settings: "アカウント レベルの設定の管理"
       manage_admin_users: "コースに対する他の講師、コース設計者、または TA の追加/削除"
@@ -12370,7 +12438,6 @@ ja:
         are_you_sure_delete: この注釈を削除してもよろしいですか?注釈を削除しても、現在この注釈を使用している場所からは注釈にアクセスできますが、ほかの人はこの注釈を使用できなくなります。
         are_you_sure_remove: この注釈をリストから削除してもよろしいですか?
       remove_rubric: "この注釈をマイ リストから削除"
-  screenreader_gradebook_description: "スクリーン リーダー用成績表は、アクセシビリティに配慮して設計された成績表へのインターフェイスを提供します。"
   scribd: 
     upgrade_flash: "古いバージョンの Adobe Flash Player をお使いです。iPaper (および Web 上のさまざまな機能) を使用するには、%{link_tag}最新の Flash Player を入手する%{end_link}必要があります。"
   search: 
@@ -12459,6 +12526,8 @@ ja:
         current_enrollments: 現在の登録
         decrosslist_section: このセクションのクロスリスティングを除去
   select_content: コンテンツの選択
+  select_content_checkbox: 
+    select_content_error: "コンテンツ オプションを選択する必要があります"
   select_content_dialog: 
     buttons: 
       add_item: アイテムの追加
@@ -12646,6 +12715,13 @@ ja:
     errors: 
       400_message: 
         description: ふむ。要求されたページを読み込む際に、問題が発生したようです。
+        error: "エラー:"
+        headings: 
+          page: "ページ エラー"
+        title: "ページ エラー"
+      403_message: 
+        description: ここにはアクセスできません。
+        error: "エラー:"
         headings: 
           page: "ページ エラー"
         title: "ページ エラー"
@@ -12732,6 +12808,7 @@ ja:
       range_upper: 範囲の上限
       remove_row: 行を削除
       remove_scheme: 採点スキームの削除
+      select_another_scheme: 別のスキームの選択
       some_standard: およそ標準
       use_this_standard: この採点基準を使用
     home_menu: 
@@ -12865,6 +12942,8 @@ ja:
       service_contact: "%{service} で %{user} と連絡をとる"
       social_instructions: プロフィールで他のユーザに対して表示する連絡方法を選択してください。
       title: タイトル
+      titles: 
+        click_to_change_profile_pic: クリックして、プロフィール画像を変更
       user_has_no_bio: "%{user} は略歴を追加していません"
       ways_to_contact_user: "%{name} への連絡方法"
     recent_activity: 
@@ -13218,11 +13297,11 @@ ja:
       date: 日付
       value: 値
     domain_not_found: 
-      body_description: "URL を確認してからもう一度試すか、自身の教育機関または講師に連絡してサポートを受けてください。"
-      body_reference: "特定の教育機関に関連付けられていないフリーの Canvas アカウントをご希望の場合は、次の URL からサインアップできます:"
+      body_description: "Canvas URL  を確認してからもう一度試してください。Canvas URL がわからない場合は、自身の教育機関またはコースのインストラクタに連絡してください。"
+      body_reference: "特定の教育機関に関連付けられていない無料の Canvas アカウントをご希望の場合は、次の URL からサインアップできます:"
       links: 
         canvas_instructure: canvas.instructure.com
-      page_title: "Canvas のインスタンスが見つかりませんでした。"
+      page_title: "Canvas でログイン ページが見つかりませんでした。"
       you_typed: "入力内容:"
     institution_suspended: 
       body: "学校の Canvas アカウントが一時停止されています。Canvas 管理者に連絡してください。"
@@ -13254,12 +13333,21 @@ ja:
     assignment_order_assignment_groups: 課題グループおよび職位順
     assignment_order_due_date: 期日ごと
     assignment_unmuted: クリックしてミュートします
+    discussion_topic: "ディスカッション トピック"
+    external_tool: 外部ツール
     invalid_group_warning: 
       one: "注: グループ %{list_of_group_names} の課題には 配点がないため、スコアに含まれません。"
       other: "注: グループ %{list_of_group_names} の課題には 配点がないため、スコアに含まれません。"
+    media_recordin: メディアの記録
     no_assignment: 課題が選択されていません
     no_student: 受講生が選択されていません
+    none: なし
     notes: メモ
+    on_paper: 筆記
+    online_quiz: "オンライン クイズ"
+    online_text_entry: "オンライン テキスト入力"
+    online_upload: "オンライン アップロード"
+    online_url: "オンライン URL"
     student_hidden_name: "受講生 %{position}"
   statistics: 
     csv_columns: 
@@ -13286,6 +13374,8 @@ ja:
     not_available: 次の日付で利用可能
     pending: 次の日付まで利用不可
   step: 手順
+  student_id: "受講生 ID"
+  student_name: 受講生名
   student_outcome_gradebook_description: |-
       受講生は、受講生成果成績表を使用して、コース学習成果の進捗を簡単に表示できます。
       成果は成績表のような形式で表示され、進捗が数字のスコアおよび達成/ほぼ達成/
@@ -13416,13 +13506,16 @@ ja:
       no_submission: 提出なし
       paper_view: 印刷表示
       plain_view: "プレーン テキスト表示"
-      preview_document: この文書をプレビュー
+      preview_crocodoc_document: 提出物をプレビューして、講師のフィードバックがある場合は確認します
+      preview_scribd_document: 提出物のプレビュー
       preview_title: "%{title} のプレビュー"
       quiz_submission: この提出物は、クイズへの提出物です。クイズのページにリダイレクトします。
       show_entire_discussion: ディスカッション全体の表示
       student: 受講生
       url_preview: "URL のプレビュー"
+      view_feedback_button: フィードバックの表示
       view_original_submission: "%{user} さんへの元の提出物を表示"
+      view_preview_button: プレビュー
     still_zipping: まだファイルの圧縮が進行中です...
     submission_download: 
       download_message: "**受講生の提出物を収集** し、zip ファイルに圧縮しています。提出ファイルのサイズと数により、しばらく時間がかかる場合があります。"
