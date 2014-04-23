@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -623,15 +623,15 @@ class AssignmentsApiController < ApplicationController
   #
   # @argument assignment[due_at] [Timestamp]
   #   The day/time the assignment is due.
-  #   Accepts times in ISO 8601 format, e.g. 2011-10-21T18:48Z.
+  #   Accepts times in ISO 8601 format, e.g. 2014-10-21T18:48:00Z.
   #
   # @argument assignment[lock_at] [Timestamp]
   #   The day/time the assignment is locked after.
-  #   Accepts times in ISO 8601 format, e.g. 2011-10-21T18:48Z.
+  #   Accepts times in ISO 8601 format, e.g. 2014-10-21T18:48:00Z.
   #
   # @argument assignment[unlock_at] [Timestamp]
   #   The day/time the assignment is unlocked.
-  #   Accepts times in ISO 8601 format, e.g. 2011-10-21T18:48Z.
+  #   Accepts times in ISO 8601 format, e.g. 2014-10-21T18:48:00Z.
   #
   # @argument assignment[description] [String]
   #   The assignment's description, supports HTML.
