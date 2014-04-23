@@ -78,6 +78,30 @@ describe UserMerge do
       user2.reload.submissions.should == [s4.reload]
     end
 
+    it "should move quiz submissions to the new user (but only if they don't already exist)" do
+      q1 = quiz_model
+      qs1 = q1.generate_submission(user1)
+      qs2 = q1.generate_submission(user2)
+
+      q2 = quiz_model
+      qs3 = q2.generate_submission(user2)
+
+      user1.quiz_submissions.length.should eql(1)
+      user2.quiz_submissions.length.should eql(2)
+
+      UserMerge.from(user2).into(user1)
+
+      user2.reload
+      user1.reload
+
+      user2.quiz_submissions.length.should eql(1)
+      user2.quiz_submissions.first.id.should eql(qs2.id)
+
+      user1.quiz_submissions.length.should eql(2)
+      user1.quiz_submissions.map(&:id).should be_include(qs1.id)
+      user1.quiz_submissions.map(&:id).should be_include(qs3.id)
+    end
+
     it "should move ccs to the new user (but only if they don't already exist)" do
       # unconfirmed => active conflict
       user1.communication_channels.create!(:path => 'a@instructure.com')
