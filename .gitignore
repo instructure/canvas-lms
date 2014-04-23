@@ -17,6 +17,7 @@
 /config/*.yml
 /config/build.js
 /config/environments/*-local.rb
+/config/locales/generated/
 /db/schema.rb
 /db/*.sqlite*
 /db/*sql
