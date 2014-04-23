@@ -360,7 +360,7 @@ class ContextModulesController < ApplicationController
   def progressions
     if authorized_action(@context, @current_user, :read)
       if request.format == :json
-        if @context.context_modules.scoped.new.grants_right?(@current_user, session, :update)
+        if @context.grants_right?(@current_user, session, :view_all_grades)
           if params[:user_id] && @user = @context.students.find(params[:user_id])
             @progressions = @context.context_modules.active.map{|m| m.evaluate_for(@user, true) }
           else
@@ -378,7 +378,7 @@ class ContextModulesController < ApplicationController
         end
       elsif !@context.feature_enabled?(:draft_state)
         redirect_to named_context_url(@context, :context_context_modules_url, :anchor => "student_progressions")
-      elsif !@context.grants_right?(@current_user, session, :manage_students)
+      elsif !@context.grants_right?(@current_user, session, :view_all_grades)
         @restrict_student_list = true
         student_ids = @context.observer_enrollments.for_user(@current_user).map(&:associated_user_id)
         student_ids << @current_user.id if @context.user_is_student?(@current_user)
