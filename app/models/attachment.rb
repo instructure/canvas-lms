@@ -28,6 +28,9 @@ class Attachment < ActiveRecord::Base
   override_polymorphic_types context_type: {'QuizStatistics' => 'Quizzes::QuizStatistics',
                                             'QuizSubmission' => 'Quizzes::QuizSubmission'}
 
+  EXCLUDED_COPY_ATTRIBUTES = %w{id root_attachment_id uuid folder_id user_id filename namespace
+    scribd_doc workflow_state submitted_to_scribd_at scribd_attempts}
+
   include HasContentTags
   include ContextModuleItem
   include SearchTermHelper
@@ -262,8 +265,7 @@ class Attachment < ActiveRecord::Base
     existing ||= self.cloned_item_id ? context.attachments.find_by_cloned_item_id(self.cloned_item_id) : nil
     dup ||= Attachment.new
     dup = existing if existing && options[:overwrite]
-    dup.assign_attributes(self.attributes.except(*%w[id root_attachment_id uuid folder_id user_id filename namespace
-                                                     scribd_doc workflow_state submitted_to_scribd_at scribd_attempts]), :without_protection => true)
+    dup.assign_attributes(self.attributes.except(*EXCLUDED_COPY_ATTRIBUTES), :without_protection => true)
     dup.write_attribute(:filename, self.filename)
     # avoid cycles (a -> b -> a) and self-references (a -> a) in root_attachment_id pointers
     if dup.new_record? || ![self.id, self.root_attachment_id].include?(dup.id)
@@ -1753,6 +1755,40 @@ class Attachment < ActiveRecord::Base
         return attachment
       else
         raise CanvasHttp::InvalidResponseCodeError.new(http_response.code.to_i)
+      end
+    end
+  end
+
+  def self.migrate_attachments(from_context, to_context)
+    from_attachments = from_context.shard.activate do
+      Attachment.where(:context_type => from_context.class.name, :context_id => from_context).not_deleted.to_a
+    end
+
+    to_context.shard.activate do
+      to_attachments = Attachment.where(:context_type => to_context.class.name, :context_id => to_context).not_deleted.to_a
+
+      from_attachments.each do |attachment|
+        match = to_attachments.detect{|a| attachment.matches_full_display_path?(a.full_display_path)}
+        next if match && match.md5 == attachment.md5
+
+        new_attachment = Attachment.new
+        new_attachment.assign_attributes(attachment.attributes.except(*EXCLUDED_COPY_ATTRIBUTES), :without_protection => true)
+        
+        new_attachment.context = to_context
+        new_attachment.folder = Folder.assert_path(attachment.folder_path, to_context)
+        new_attachment.namespace = new_attachment.infer_namespace
+        if existing_attachment = new_attachment.find_existing_attachment_for_md5
+          new_attachment.root_attachment = existing_attachment
+        else
+          new_attachment.write_attribute(:filename, attachment.filename)
+          new_attachment.uploaded_data = attachment.open
+        end
+
+        new_attachment.save_without_broadcasting!
+        if match
+          new_attachment.folder.reload
+          new_attachment.handle_duplicates(:rename)
+        end
       end
     end
   end
