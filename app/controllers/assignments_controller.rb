@@ -133,7 +133,7 @@ class AssignmentsController < ApplicationController
       end
 
       begin
-        google_docs = GoogleDocs.new(google_docs_user, session)
+        google_docs = GoogleDocs.new(logged_in_user, session)
         @google_docs_token = google_docs.retrieve_access_token
       rescue GoogleDocs::NoTokenError
         #do nothing
@@ -165,7 +165,7 @@ class AssignmentsController < ApplicationController
     if assignment.allow_google_docs_submission? && @real_current_user.blank?
       docs = {}
       begin
-        google_docs = GoogleDocs.new(google_docs_user, session)
+        google_docs = GoogleDocs.new(logged_in_user, session)
         docs = google_docs.list_with_extension_filter(assignment.allowed_extensions)
       rescue NoTokenError
         #do nothing

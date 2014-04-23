@@ -1720,12 +1720,13 @@ class ApplicationController < ActionController::Base
     js_env hash
   end
 
-  ## having @real_current_user first ensures that a masquerading user never sees the
-  ## masqueradee's files, but in general you may want to block access to google
-  ## docs for masqueraders earlier in the request
-  def google_docs_user
-    @real_current_user || @current_user || (self.respond_to?(:user) && self.user.is_a?(User) && self.user) || nil
+  # returns the user actually logged into canvas, even if they're currently masquerading
+  #
+  # This is used by the google docs integration, among other things --
+  # having @real_current_user first ensures that a masquerading user never sees the
+  # masqueradee's files, but in general you may want to block access to google
+  # docs for masqueraders earlier in the request
+  def logged_in_user
+    @real_current_user || @current_user
   end
-
-
 end

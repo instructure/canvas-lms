@@ -64,7 +64,7 @@ class CollaborationsController < ApplicationController
     @collaborations = @context.collaborations.active
     log_asset_access("collaborations:#{@context.asset_string}", "collaborations", "other")
 
-    google_docs = GoogleDocs.new(google_docs_user, session)
+    google_docs = GoogleDocs.new(logged_in_user, session)
     @google_docs_authorized = google_docs.verify_access_token rescue false
     js_env :TITLE_MAX_LEN => Collaboration::TITLE_MAX_LENGTH,
            :collaboration_types => Collaboration.collaboration_types
