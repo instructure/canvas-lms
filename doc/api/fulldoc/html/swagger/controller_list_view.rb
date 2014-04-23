@@ -10,7 +10,7 @@ class ControllerListView < HashView
   end
 
   def symbolic_name
-    @name.underscore
+    @name.underscore.gsub(/\s+/, '_')
   end
 
   def domain
@@ -18,7 +18,7 @@ class ControllerListView < HashView
   end
 
   def swagger_file
-    "#{@name.underscore.gsub(' ', '_')}.json"
+    "#{symbolic_name}.json"
   end
 
   def swagger_reference

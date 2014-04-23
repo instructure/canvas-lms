@@ -20,19 +20,6 @@
 #
 # API for creating, accessing and updating calendar events.
 #
-# @model CalendarLink
-#     {
-#       "id": "CalendarLink",
-#       "description": "",
-#       "properties": {
-#         "ics": {
-#           "description": "The URL of the calendar in ICS format",
-#           "example": "https://canvas.instructure.com/feeds/calendars/course_abcdef.ics",
-#           "type": "string"
-#          }
-#       }
-#     }
-#
 # @model CalendarEvent
 #     {
 #       "id": "CalendarEvent",
@@ -291,6 +278,8 @@ class CalendarEventsApiController < ApplicationController
   #   no course/group events). Limited to 10 context codes, additional ones are 
   #   ignored. The format of this field is the context type, followed by an 
   #   underscore, followed by the context id. For example: course_42
+  #
+  # @returns [CalendarEvent]
   def index
     codes = (params[:context_codes] || [@current_user.asset_string])[0, 10]
     get_options(codes)
@@ -379,7 +368,7 @@ class CalendarEventsApiController < ApplicationController
 
   # @API Get a single calendar event or assignment
   #
-  # Returns information for a single event or assignment
+  # @returns CalendarEvent
   def show
     get_event(true)
     if authorized_action(@event, @current_user, :read)

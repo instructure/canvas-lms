@@ -237,6 +237,19 @@ require 'set'
 #       }
 #     }
 #
+# @model CalendarLink
+#     {
+#       "id": "CalendarLink",
+#       "description": "",
+#       "properties": {
+#         "ics": {
+#           "description": "The URL of the calendar in ICS format",
+#           "example": "https://canvas.instructure.com/feeds/calendars/course_abcdef.ics",
+#           "type": "string"
+#          }
+#       }
+#     }
+#
 class CoursesController < ApplicationController
   include SearchHelper
 
