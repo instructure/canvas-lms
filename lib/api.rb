@@ -555,7 +555,7 @@ module Api
   end
 
   # regex for valid iso8601 dates
-  ISO8601_REGEX = /^(?<year>-?[0-9]{4})-
+  ISO8601_REGEX = /^(?<year>[0-9]{4})-
                     (?<month>1[0-2]|0[1-9])-
                     (?<day>3[0-1]|0[1-9]|[1-2][0-9])T
                     (?<hour>2[0-3]|[0-1][0-9]):
