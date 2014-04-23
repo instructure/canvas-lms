@@ -101,7 +101,7 @@ class UserMerge
         Rails.cache.delete([cc.path, 'invited_enrollments'].cache_key)
       end
       [
-        [:quiz_id, :quiz_submissions],
+        [:quiz_id, :'quizzes/quiz_submissions'],
         [:assignment_id, :submissions]
       ].each do |unique_id, table|
         begin
