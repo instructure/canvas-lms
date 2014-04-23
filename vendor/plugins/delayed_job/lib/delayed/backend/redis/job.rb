@@ -230,7 +230,7 @@ class Job
     end
 
     def ==(other)
-      id == other.id
+      other.is_a?(self.class) && id == other.id
     end
 
     def hash
