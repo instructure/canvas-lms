@@ -169,6 +169,8 @@ class UserMerge
         end
       end
 
+      Attachment.send_later(:migrate_attachments, from_user, target_user)
+
       context_updates = ['calendar_events']
       context_updates.each do |table|
         klass = table.classify.constantize
