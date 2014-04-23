@@ -45,6 +45,7 @@ class ApplicationController < ActionController::Base
   # load_user checks masquerading permissions, so this needs to be cleared first
   before_filter :clear_cached_contexts
   before_filter :load_account, :load_user
+  before_filter Filters::AllowAppProfiling
   before_filter :check_pending_otp
   before_filter :set_user_id_header
   before_filter :set_time_zone
@@ -135,6 +136,16 @@ class ApplicationController < ActionController::Base
   #   HTTP status code or symbol.
   def reject!(cause, status=:bad_request)
     raise RequestError.new(cause, status)
+  end
+
+  # returns the user actually logged into canvas, even if they're currently masquerading
+  #
+  # This is used by the google docs integration, among other things --
+  # having @real_current_user first ensures that a masquerading user never sees the
+  # masqueradee's files, but in general you may want to block access to google
+  # docs for masqueraders earlier in the request
+  def logged_in_user
+    @real_current_user || @current_user
   end
 
   unless CANVAS_RAILS2
@@ -1718,15 +1729,5 @@ class ApplicationController < ActionController::Base
     end
 
     js_env hash
-  end
-
-  # returns the user actually logged into canvas, even if they're currently masquerading
-  #
-  # This is used by the google docs integration, among other things --
-  # having @real_current_user first ensures that a masquerading user never sees the
-  # masqueradee's files, but in general you may want to block access to google
-  # docs for masqueraders earlier in the request
-  def logged_in_user
-    @real_current_user || @current_user
   end
 end
