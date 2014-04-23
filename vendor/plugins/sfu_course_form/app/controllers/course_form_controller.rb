@@ -22,6 +22,12 @@ class CourseFormController < ApplicationController
     end
   end
 
+  def new_adhoc
+    @user = User.find(@current_user.id)
+    @sfuid = @user.pseudonym.unique_id
+    @sfuid.slice! "@sfu.ca"
+  end
+
   def create
     req_user = User.find(@current_user.id).pseudonym.unique_id
     selected_courses = []

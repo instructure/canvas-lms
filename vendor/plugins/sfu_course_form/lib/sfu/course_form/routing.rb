@@ -6,6 +6,7 @@ module SFU #:nodoc:
         def course_form_urls
           @set.add_route("/sfu/course/new", {:controller => "course_form", :action => "new"})
           @set.add_route("/sfu/course/create", {:controller => "course_form", :action => "create"})
+          @set.add_route("/sfu/adhoc/new", {:controller => "course_form", :action => "new_adhoc"})
         end
 
        end

@@ -85,6 +85,15 @@ module SFU
 
               course_name_too_long = true if ncc_course[:short_long_name].length > CANVAS_COURSE_NAME_MAX
               course_sis_id_too_long = true if ncc_course[:course_id].length > CANVAS_COURSE_SIS_ID_MAX
+            elsif course.starts_with? 'adhoc'
+              Rails.logger.info "[SFU Course Form] Creating adhoc course for #{teacher_username} requested by #{req_user}"
+              adhoc_course = adhoc_info(course, teacher_sis_user_id, teacher2_sis_user_id, teacher2_role)
+
+              course_array.push adhoc_course[:course]
+              enrollment_array.concat adhoc_course[:enrollments]
+
+              course_name_too_long = true if adhoc_course[:short_long_name].length > CANVAS_COURSE_NAME_MAX
+              course_sis_id_too_long = true if adhoc_course[:course_id].length > CANVAS_COURSE_SIS_ID_MAX
             else
               Rails.logger.info "[SFU Course Form] Creating single course container : #{course} requested by #{req_user}"
               course_info = course_info(course, account_id, teacher_sis_user_id, teacher2_sis_user_id, teacher2_role)
@@ -193,6 +202,20 @@ module SFU
         ncc[:enrollments] << [ncc[:course_id], teacher1, 'teacher', nil, 'active']
         ncc[:enrollments] << [ncc[:course_id], teacher2, teacher2_role, nil, 'active'] unless teacher2.nil?
         ncc
+      end
+
+      # e.g. course_line = adhoc-kipling-71113273-My ad hoc group
+      def adhoc_info(course_line, teacher1, teacher2 = nil, teacher2_role = 'Moderator')
+        account_sis_id = 'sfu:::adhoc'
+        course_arr = course_line.split('-', 4)
+        course = { :enrollments => [] }
+        course[:course_id] = course_arr.first(3).join('-') # e.g. adhoc-kipling-71113273
+        course[:short_long_name] = course_arr.last
+
+        course[:course] = [course[:course_id], course[:short_long_name], course[:short_long_name], account_sis_id, nil, 'active']
+        course[:enrollments] << [course[:course_id], teacher1, 'Moderator', nil, 'active']
+        course[:enrollments] << [course[:course_id], teacher2, teacher2_role, nil, 'active'] unless teacher2.nil?
+        course
       end
 
       def time_stamp

@@ -1,0 +1,43 @@
+<%
+   add_crumb 'Start a New Ad Hoc Space'
+   content_for :page_title, 'Start a New Ad Hoc Space'
+   jammit_css :course_request_form, :plugin => :sfu_course_form
+   js_bundle :course_request_form, :plugin => :sfu_course_form
+%>
+
+<section id="step-1" class="step form-horizontal">
+  <h1>Start a New Ad Hoc Space</h1>
+  <p>An ad hoc space can be used for group collaboration that is not associated with a particular course. Examples include student clubs and associations.</p>
+  <div class="control-group">
+    <label for="txt-adhoc_name" class="control-label">Name of Space</label>
+    <div class="controls"><input type="text" id="txt-adhoc_name" name="adhoc_name" maxlength="255" /></div>
+    <%# Emulate the Instructor Computing ID field from the main Start a New Course form %>
+    <input type="hidden" id="txt-user_id" name="user_id" data-default="<%= @sfuid %>" />
+  </div>
+  <hr />
+  <div class="copyright">
+    <h2>Copyright Disclaimer</h2>
+    <p>
+      I confirm that any use of copyright protected materials I may include in this course complies with Canada's <em>Copyright Act</em> and SFU Policy R30.04 - <em>Copyright Compliance and Administration</em>.
+      <a href="/sfu/copyright/disclaimer" class="element_toggler" aria-controls="copyright_dialog" target="_blank">Read more.</a>
+    </p>
+    <form id="copyright_dialog" title="Copyright Disclaimer" data-turn-into-dialog='{"width":600,"height":500,"modal":true}'>
+      <iframe src="/sfu/copyright/disclaimer" seamless="seamless" width="100%" height="100%"></iframe>
+    </form>
+  </div>
+  <div class="form-actions">
+    <button type="button" id="action-submit-adhoc" class="action btn btn-primary">Create Ad Hoc Space</button>
+  </div>
+</section>
+<section id="step-4" class="step">
+  <h1>Sending&hellip;</h1>
+  <p>Please wait while your request is being sent.</p>
+</section>
+<section id="step-5" class="step">
+  <h1>Ad Hoc Space Request Submitted Successfully</h1>
+  <p>The creation process can take up to 5 minutes to complete.</p>
+  <p>Once finished, your new space will show up in your Course List.</p>
+  <div class="actions">
+    <button type="button" id="action-go-course_list" class="action btn"><i class="icon-more" aria-hidden="hidden"></i> Course List</button>
+  </div>
+</section>

@@ -29,6 +29,14 @@ describe 'A courses request' do
       courses[0]['account_id'].should == 'sfu:::ncc'
       courses[0]['term_id'].should == '1141'
     end
+    it 'should be handled properly for an ad hoc space' do
+      @courses_csv, @sections_csv, @enrollments_csv = SFU::CourseForm::CSVBuilder.build('kipling', ["adhoc-kipling-71113273-#{funky_name}"], 2, 'kipling', '55599068', nil, nil, false)
+      courses = CSV.parse(@courses_csv, :headers => true)
+      courses.count.should == 1
+      courses[0]['long_name'].should == funky_name
+      courses[0]['account_id'].should == 'sfu:::adhoc'
+      courses[0]['term_id'].should be_nil
+    end
   end
 
   context 'with an excessively long cross-list' do
@@ -74,6 +82,11 @@ describe 'A courses request' do
         SFU::CourseForm::CSVBuilder.build('kipling', ["ncc-kipling-71113273-1141-#{long_name}"], 2, 'kipling', '55599068', nil, nil, false)
       end.should raise_error
     end
+    it 'should fail with error for an ad hoc space' do
+      lambda do
+        SFU::CourseForm::CSVBuilder.build('kipling', ["adhoc-kipling-71113273-#{long_name}"], 2, 'kipling', '55599068', nil, nil, false)
+      end.should raise_error
+    end
   end
 
   # TODO: implement this
@@ -102,6 +115,11 @@ describe 'A courses request' do
     it 'should fail with error for a sandbox' do
       lambda do
         SFU::CourseForm::CSVBuilder.build('kipling', ['sandbox-kipling-71113273'], 2, 'idontexist', nil, nil, nil, false)
+      end.should raise_error
+    end
+    it 'should fail with error for an ad hoc space' do
+      lambda do
+        SFU::CourseForm::CSVBuilder.build('kipling', ['adhoc-kipling-71113273-My special space'], 2, 'idontexist', nil, nil, nil, false)
       end.should raise_error
     end
   end
@@ -354,6 +372,11 @@ describe 'A cross-list course request' do
 
   # TODO: implement this
   context 'for a sandbox' do
+    it 'should fail with error'
+  end
+
+  # TODO: implement this
+  context 'for an ad hoc space' do
     it 'should fail with error'
   end
 
@@ -620,6 +643,75 @@ describe 'A sandbox request' do
     let(:teacher2_sis_id) { '555123456' }
     let(:teacher2_role) { 'designer' }
     it 'should enroll the teacher and designer to the default section' do
+      verify_enrollments
+    end
+  end
+
+end
+
+describe 'An ad hoc space request' do
+
+  before(:all) do
+    @courses_csv, @sections_csv, @enrollments_csv = SFU::CourseForm::CSVBuilder.build('kipling', ['adhoc-kipling-71113273-A test space'], 2, 'kipling', '55599068', nil, nil, false)
+    @courses = CSV.parse(@courses_csv, :headers => true)
+    @sections = CSV.parse(@sections_csv, :headers => true)
+  end
+
+  it 'should create one course' do
+    @courses.count.should == 1
+    @courses[0]['course_id'].should == 'adhoc-kipling-71113273'
+    @courses[0]['account_id'].should == 'sfu:::adhoc'
+    @courses[0]['term_id'].should be_nil
+    @courses[0]['status'].should == 'active'
+  end
+
+  it 'should not create any sections' do
+    @sections.count.should == 0
+  end
+
+end
+
+describe 'An ad hoc space request' do
+
+  before do
+    @courses_csv, @sections_csv, @enrollments_csv = SFU::CourseForm::CSVBuilder.build('kipling', ['adhoc-kipling-71113273-A test space'], 2, 'kipling', '55599068', teacher2_sis_id, teacher2_role, false)
+    @enrollments = CSV.parse(@enrollments_csv, :headers => true)
+  end
+
+  def verify_enrollments
+    @enrollments.count.should == (teacher2_sis_id.nil? ? 1 : 2)
+    @enrollments[0]['user_id'].should == '55599068'
+    @enrollments[0]['role'].should == 'Moderator'
+    unless teacher2_sis_id.nil?
+      @enrollments[1]['user_id'].should == teacher2_sis_id
+      @enrollments[1]['role'].should == teacher2_role
+    end
+    @enrollments.each do |enrollment|
+      enrollment['course_id'].should == 'adhoc-kipling-71113273'
+      enrollment['section_id'].should be_nil
+    end
+  end
+
+  context 'for one moderator' do
+    let(:teacher2_sis_id) { nil }
+    let(:teacher2_role) { nil }
+    it 'should enroll the moderator to the default section' do
+      verify_enrollments
+    end
+  end
+
+  context 'for two moderators' do
+    let(:teacher2_sis_id) { '555123456' }
+    let(:teacher2_role) { 'Moderator' }
+    it 'should enroll the moderators to the default section' do
+      verify_enrollments
+    end
+  end
+
+  context 'for a moderator and a contributor' do
+    let(:teacher2_sis_id) { '555123456' }
+    let(:teacher2_role) { 'Contributor' }
+    it 'should enroll the moderator and contributor to the default section' do
       verify_enrollments
     end
   end
