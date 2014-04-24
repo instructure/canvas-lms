@@ -172,7 +172,6 @@ class PseudonymsController < ApplicationController
   #   manage SIS permissions on the account.
   def create
     return unless get_user
-    return unless @user == @current_user || authorized_action(@user, @current_user, :manage_logins)
 
     if api_request?
       return unless context_is_root_account?
@@ -182,16 +181,16 @@ class PseudonymsController < ApplicationController
       params[:pseudonym] = params[:login]
     else
       account_id = params[:pseudonym].delete(:account_id)
-      if Account.site_admin.grants_right?(@current_user, :manage_user_logins)
-        @account = Account.root_accounts.find(account_id)
-      else
-        @account = @domain_root_account
-        unless @domain_root_account.settings[:admins_can_change_passwords]
-          params[:pseudonym].delete :password
-          params[:pseudonym].delete :password_confirmation
-        end
+      @account = Account.root_accounts.find(account_id) if account_id
+      @account ||= @domain_root_account
+      if !@account.settings[:admins_can_change_passwords] &&
+          !Account.site_admin.grants_right?(@current_user, :manage_user_logins)
+        params[:pseudonym].delete :password
+        params[:pseudonym].delete :password_confirmation
       end
     end
+    return unless authorized_action?(@account, @current_user, :manage_user_logins) &&
+                  authorized_action?(@user, @current_user, :manage_logins)
 
     params[:pseudonym][:user] = @user
     sis_user_id = params[:pseudonym].delete(:sis_user_id)
