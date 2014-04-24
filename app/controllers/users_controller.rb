@@ -912,7 +912,7 @@ class UsersController < ApplicationController
   # @argument communication_channel[address] [Optional, String]
   #   The communication channel address, e.g. the user's email address.
   #
-  # @argument skip_confirmation [Optional, Boolean]
+  # @argument communication_channel[skip_confirmation] [Optional, Boolean]
   #   Only valid for site admins and account admins making requests; If true, the channel is
   #   automatically validated and no confirmation email or SMS is sent.
   #   Otherwise, the user must respond to a confirmation message to confirm the
