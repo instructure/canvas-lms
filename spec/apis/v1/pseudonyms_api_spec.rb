@@ -191,6 +191,16 @@ describe PseudonymsController, type: :request do
         response.code.should eql '401'
       end
     end
+
+    it "should not allow user to add their own pseudonym to an arbitrary account" do
+      user_with_pseudonym(active_all: true)
+      raw_api_call(:post, "/api/v1/accounts/#{Account.site_admin.id}/logins",
+                   { account_id: Account.site_admin.id.to_param, controller: 'pseudonyms',
+                     action: 'create', format: 'json'},
+                   user: { id: @user.id },
+                   login: { unique_id: 'user'} )
+      response.code.should eql '401'
+    end
   end
 
   describe "pseudonym updates" do
