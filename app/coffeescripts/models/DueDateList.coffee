@@ -9,6 +9,9 @@ define [
   class DueDateList
 
     constructor: (@overrides, @sections, @assignment) ->
+      # how many course sections before we add defaults
+      @courseSectionsLength = @sections.length
+
       unless @sections.length
         # If there's no "default" section for the course already present,
         # such as a course that has been created without one, create a fake one
@@ -66,14 +69,7 @@ define [
 
     containsSectionsWithoutOverrides: =>
       return false if @overrides.containsDefaultDueDate()
-      @sectionsWithOverrides().length < @_sectionsLength()
-
-    _sectionsLength: =>
-      if @assignment?
-        # to account for default section
-        @sections.length - 1
-      else
-        @sections.length
+      @sectionsWithOverrides().length < @courseSectionsLength
 
     sectionIDs: => @sections.ids()
 
