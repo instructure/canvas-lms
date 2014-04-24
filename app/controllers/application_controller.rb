@@ -1355,11 +1355,18 @@ class ApplicationController < ActionController::Base
 
   def require_site_admin_with_permission(permission)
     unless Account.site_admin.grants_right?(@current_user, permission)
-      if @current_user
-        flash[:error] = t "#application.errors.permission_denied", "You don't have permission to access that page"
-        redirect_to root_url
-      else
-        redirect_to_login
+      respond_to do |format|
+        format.html do
+          if @current_user
+            flash[:error] = t "#application.errors.permission_denied", "You don't have permission to access that page"
+            redirect_to root_url
+          else
+            redirect_to_login
+          end
+        end
+        format.json do
+          render_json_unauthorized
+        end
       end
       return false
     end
