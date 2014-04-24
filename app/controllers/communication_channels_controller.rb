@@ -373,6 +373,7 @@ class CommunicationChannelsController < ApplicationController
       end
     else
       flash[:notice] = t 'notices.registration_confirmed', "Registration confirmed!"
+      @current_user ||= @user # since dashboard_url may need it
       respond_to do |format|
         format.html { @enrollment ? redirect_to(course_url(@course)) : redirect_back_or_default(dashboard_url) }
         format.json { render :json => {:url => @enrollment ? course_url(@course) : dashboard_url} }

@@ -434,4 +434,25 @@ describe ApplicationHelper do
       end
     end
   end
+
+  describe "dashboard_url" do
+    it "should return a regular canvas dashboard url" do
+      @controller.expects(:dashboard_url).with({}).returns("frd")
+      @domain_root_account = Account.default
+      dashboard_url.should == "frd"
+    end
+
+    it "should return the account's custom dashboard_url" do
+      @domain_root_account = Account.default
+      @domain_root_account.settings[:dashboard_url] = "http://foo.bar"
+      dashboard_url.should == "http://foo.bar"
+    end
+
+    it "should return the account's custom dashboard_url with the current user's id" do
+      @domain_root_account = Account.default
+      @domain_root_account.settings[:dashboard_url] = "http://foo.bar"
+      @current_user = user
+      dashboard_url.should == "http://foo.bar?current_user_id=#{@current_user.id}"
+    end
+  end
 end
