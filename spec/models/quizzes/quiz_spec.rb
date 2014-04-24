@@ -352,6 +352,24 @@ describe Quizzes::Quiz do
       q.publish!
       q.assignment.published?.should be true
     end
+
+    it "should send a message when quiz is published" do
+      Notification.create!(:name => 'Assignment Created')
+      @course.offer
+
+      q = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment")
+      q.save!
+      q.should_not be_available
+
+      q.assignment_id.should_not be_nil
+      q.assignment.published?.should be false
+      q.assignment.expects(:save_without_broadcasting!).never
+
+      q.publish!
+
+      q.assignment.published?.should be true
+      q.assignment.messages_sent.should include('Assignment Created')
+    end
   end
 
   it "should create the assignment if created in published state" do

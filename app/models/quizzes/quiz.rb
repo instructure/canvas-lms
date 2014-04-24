@@ -412,6 +412,7 @@ class Quizzes::Quiz < ActiveRecord::Base
         if context.feature_enabled?(:draft_state) && !deleted?
           a.workflow_state = self.published? ? 'published' : 'unpublished'
         end
+        @notify_of_update ||= a.workflow_state_changed? && a.published?
         a.notify_of_update = @notify_of_update
         a.with_versioning(false) do
           @notify_of_update ? a.save : a.save_without_broadcasting!
