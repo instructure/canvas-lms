@@ -93,11 +93,6 @@ module SIS
             pseudo ||= pseudo_by_login
             pseudo ||= @root_account.pseudonyms.active.by_unique_id(email).first if email.present?
 
-            if !first_name.present? && !last_name.present? && short_name.present?
-              @messages << "user #{user_id} is missing a full name, skipping"
-              next
-            end
-
             status_is_active = !(status =~ /\Adeleted/i)
             if pseudo
               if pseudo.sis_user_id && pseudo.sis_user_id != user_id

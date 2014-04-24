@@ -138,24 +138,6 @@ describe SIS::CSV::UserImporter do
     user.name.should eql(" ")
   end
 
-  it "should error nicely when first and last names are blank, but display name is not" do
-    importer = process_csv_data(
-        "user_id,login_id,first_name,last_name,short_name,email,status",
-        "user_1,user1,,,The Uno,user@example.com,active"
-    )
-    importer.errors.should == []
-    importer.warnings.length.should == 1
-    importer.warnings.last.last.should == 'user user_1 is missing a full name, skipping'
-
-    importer = process_csv_data(
-        "user_id,login_id,short_name,email,status",
-        "user_2,user2,The Dos,user2@example.com,active"
-    )
-    importer.errors.should == []
-    importer.warnings.length.should == 1
-    importer.warnings.last.last.should == 'user user_2 is missing a full name, skipping'
-  end
-
   it "should set passwords and not overwrite current passwords" do
     process_csv_data_cleanly(
       "user_id,login_id,password,first_name,last_name,email,status,ssha_password",
