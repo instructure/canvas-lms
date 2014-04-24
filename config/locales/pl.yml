@@ -517,7 +517,7 @@ pl:
           description: 
             header: Przykład
           student_login: 
-            text: "W tym raporcie uwzględniono wszystkich uczestników zapisanych do jakiegokolwiek kursu w danym semestrze. Wynikowy plik csv będzie zawierał jeden rząd na zapis uczestnika, który nie odwiedził kursu od określonej daty. Filtr online będzie uwzględniał jedynie zapisy z sekcji, które maja oznaczenie „.E” w nazwie sekcji."
+            text: "W tym raporcie uwzględniono wszystkich uczestników zapisanych do jakiegokolwiek kursu w danym semestrze. Wynikowy plik csv będzie zawierał jeden rząd na zapis uczestnika, który nie odwiedził kursu od określonej daty. Filtr online będzie uwzględniał jedynie zapisy z sekcji, które mają oznaczenie „.E” w nazwie sekcji."
     cannot_manage_account: "Brak uprawnień, aby zarządzać ustawieniami konta"
     cannot_manage_quotas: "Brak uprawnień, aby zarządzać ustawieniami przydziału"
     ccp_zero_activity_csv_description: 
@@ -5420,7 +5420,7 @@ pl:
     discussion_list: 
       no_pinned_discussions: "Nie masz obecnie przypiętych dyskusji"
       pinned_instructions: "Aby przypiąć dyskusję na górną część strony, przeciągnij ją tutaj lub wybierz polecenie Przypnij z menu Ustawienia dyskusji."
-      there_are_no_discussions_show: "Brak dyskusji do wyświetlenia w tej części."
+      there_are_no_discussions_show: "Brak dyskusji do wyświetlenia w tej sekcji."
     discussions_settings_view: 
       allow_student_discussion_editing: "Edytuj lub usuwaj ich posty"
       allow_student_topics: "Utwórz tematy dyskusji"
@@ -10164,7 +10164,7 @@ pl:
     invalid_file: "Nieprawidłowy plik grupy wyników"
   outcome_groups_api: 
     account_group_description: "Grupa wyników na poziomie kont."
-  outcome_path_mastery_points: "Liczba punktów biegłości: %{path}"
+  outcome_path_mastery_points: "%{path} punkty biegłości"
   outcome_path_result: "%{path} wynik"
   outcome_results: 
     outcomes_filename: Wyniki
@@ -11494,7 +11494,7 @@ pl:
     quiz_group: 
       errors: 
         no_bank: "Nie można odnaleźć banku pytań dla grupy quizów %{group_name}"
-        no_permissions: "Użytkownik nie ma uprawnień, aby odwołać się do banku pytań w grupie quizów %{group_name}"
+        no_permissions: "Użytkownik nie ma uprawnień, aby odwołać się do banku pytań w grupie testów %{group_name}"
       question_group: "Grupa pytań"
     quiz_item_group_view: 
       no_quizzes: "Nie znaleziono testów"
@@ -12896,7 +12896,7 @@ pl:
           page: "Błąd strony"
         title: "Błąd strony"
       403_message: 
-        description: "Hmm, wygląda na to, że nie powinno Ciebie tu być"
+        description: "Hmm, wygląda na to, że trafiłeś/-aś w nieodpowiednie miejsce."
         error: "Błąd:"
         headings: 
           page: "Błąd strony"
@@ -13692,7 +13692,7 @@ pl:
       no_submission: "Brak przesłanych zadań"
       paper_view: "Widok strony"
       plain_view: "Widok zwykłego tekstu"
-      preview_crocodoc_document: "Pokaż podgląd przesłanego zadania i wyświetl opinie instruktora, jęsli jest dostępna"
+      preview_crocodoc_document: "Pokaż podgląd przesłanego zadania i wyświetl opinię instruktora, jeśli jest dostępna"
       preview_scribd_document: "Pokaż podgląd przesłanego zadania"
       preview_title: "Podgląd %{title} "
       quiz_submission: "Zadanie wymaga przesłania testu. Trwa przekierowywanie do strony testu."
