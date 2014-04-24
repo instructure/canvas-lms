@@ -494,6 +494,7 @@ describe "API Authentication", type: :request do
       @me = @user
       Account.default.add_user(@user)
       u2 = user
+      Account.default.pseudonyms.create!(unique_id: 'user', user: u2)
       @user = @me
       check_used do
         post "/api/v1/accounts/#{Account.default.id}/admins", {
