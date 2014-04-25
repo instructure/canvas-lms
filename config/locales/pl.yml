@@ -2240,9 +2240,9 @@ pl:
         create_assignment_group: "Utwórz grupę zadań"
         create_or_import_quiz: "Utwórz/zaimportuj test"
         edit_assignment_in_detail: "Edytuj szczegóły zadań"
-        screenreader_show_me_add_assignment: "Poprowadź do przycisku Dodaj zadanie"
-        screenreader_show_me_add_assignment_group: "Poprowadź do przycisku Dodaj grupę zadań"
-        screenreader_show_me_weight_final_grade: "Poprowadź do pola wyboru Wyważ ocenę końcową"
+        screenreader_show_me_add_assignment: "Prowadź do przycisku Dodaj zadanie"
+        screenreader_show_me_add_assignment_group: "Prowadź do przycisku Dodaj grupę zadań"
+        screenreader_show_me_weight_final_grade: "Prowadź do pola wyboru Wyważ ocenę końcową"
         show_me_where: "Pokaż, gdzie"
       subtitles: 
         edit_assignment_in_detail: "(zezwalaj na przekazywanie, edytuj opis itd.)"
@@ -10564,7 +10564,7 @@ pl:
         secret_key: "Klucz tajny administratora"
         subpartner_id: "Dodatkowy identyfikator partnera"
         upload_ui_conf: "Identyfikatory konfiguracji interfejsu użytkownika w przekazywarce"
-        use_alt_record_widget: "Skorzystaj z alternatywnego elementu widget nagrywania flash"
+        use_alt_record_widget: "Skorzystaj z alternatywnego widgetu nagrywania flash"
         user_secret_key: "Klucz tajny użytkownika"
       ui_conf_ids: "Klienci korzystający z platformy Kaltura mogą poprosić o przesłanie tych identyfikatorów. W przypadku wersji pochodnych wartości te można znaleźć w tabeli ui_confs."
     linked_in: 
