@@ -47,8 +47,6 @@ describe GoogleDocs::Connection do
     GoogleDocs::Connection.config = Proc.new do
       config
     end
-    #Setting.stubs(:from_config).returns(config)
-    #Canvas::Plugin.stubs(:find).returns(nil)
   end
 
   describe "#retrieve_access_token" do
