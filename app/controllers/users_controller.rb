@@ -965,7 +965,7 @@ class UsersController < ApplicationController
       cc_type = params[:communication_channel][:type] || CommunicationChannel::TYPE_EMAIL
       cc_addr = params[:communication_channel][:address]
       skip_confirmation = value_to_boolean(params[:communication_channel][:skip_confirmation]) &&
-          (Account.site_admin.grants_right?(@current_user, :manage_students) || Account.default.grants_right?(@current_user, :manage_students))
+          (Account.site_admin.grants_right?(@current_user, :manage_students) || @account.grants_right?(@current_user, :manage_students))
     else
       cc_type = CommunicationChannel::TYPE_EMAIL
       cc_addr = params[:pseudonym].delete(:path) || params[:pseudonym][:unique_id]
