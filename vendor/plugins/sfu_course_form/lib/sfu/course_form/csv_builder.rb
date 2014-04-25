@@ -20,6 +20,7 @@ module SFU
 
         course_name_too_long = false
         course_sis_id_too_long = false
+        course_name_empty = false
 
         if cross_list
 
@@ -85,6 +86,7 @@ module SFU
 
               course_name_too_long = true if ncc_course[:short_long_name].length > CANVAS_COURSE_NAME_MAX
               course_sis_id_too_long = true if ncc_course[:course_id].length > CANVAS_COURSE_SIS_ID_MAX
+              course_name_empty = true if ncc_course[:short_long_name].empty?
             elsif course.starts_with? 'adhoc'
               Rails.logger.info "[SFU Course Form] Creating adhoc course for #{teacher_username} requested by #{req_user}"
               adhoc_course = adhoc_info(course, teacher_sis_user_id, teacher2_sis_user_id, teacher2_role)
@@ -94,6 +96,7 @@ module SFU
 
               course_name_too_long = true if adhoc_course[:short_long_name].length > CANVAS_COURSE_NAME_MAX
               course_sis_id_too_long = true if adhoc_course[:course_id].length > CANVAS_COURSE_SIS_ID_MAX
+              course_name_empty = true if adhoc_course[:short_long_name].empty?
             else
               Rails.logger.info "[SFU Course Form] Creating single course container : #{course} requested by #{req_user}"
               course_info = course_info(course, account_id, teacher_sis_user_id, teacher2_sis_user_id, teacher2_role)
@@ -115,6 +118,7 @@ module SFU
 
         raise 'The course name is too long.' if course_name_too_long
         raise 'The resulting course SIS ID is too long.' if course_sis_id_too_long
+        raise 'The course name is empty.' if course_name_empty
 
         course_csv = csv_string(course_array)
         section_csv = csv_string(section_array)

@@ -89,6 +89,19 @@ describe 'A courses request' do
     end
   end
 
+  context 'with an empty name' do
+    it 'should fail with error for a non-calendar course' do
+      lambda do
+        SFU::CourseForm::CSVBuilder.build('kipling', ["ncc-kipling-71113273-1141-"], 2, 'kipling', '55599068', nil, nil, false)
+      end.should raise_error
+    end
+    it 'should fail with error for an ad hoc space' do
+      lambda do
+        SFU::CourseForm::CSVBuilder.build('kipling', ["adhoc-kipling-71113273-"], 2, 'kipling', '55599068', nil, nil, false)
+      end.should raise_error
+    end
+  end
+
   # TODO: implement this
   context 'in a non-existent term' do
     it 'should fail with error for a calendar course'
