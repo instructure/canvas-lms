@@ -1,15 +1,18 @@
 <% p = asset.is_a?(Pseudonym) ? asset : (asset.pseudonym || asset.user.pseudonym) %>
+<% a = p.account %>
+<% product_name = a.product_name %>
 <% cc = asset.is_a?(CommunicationChannel) ? asset : (p.communication_channel || p.user.communication_channel) %>
 <% define_content :link do %>
   <%= HostUrl.protocol %>://<%= HostUrl.context_host((p.account rescue nil)) %>/register/<%= cc.confirmation_code %>
 <% end %>
 
 <% define_content :subject do %>
-  <%= t :subject, "Confirm Registration: Canvas" %>
+  <%= t :subject, "Confirm Registration: %{product_name}", product_name: product_name %>
 <% end %>
 
 <%= t :body,
-      "Thank you for registering with Canvas!  This email is confirmation that the user %{user} is registering for a new account at %{website}.",
+      "Thank you for registering with %{product_name}!  This email is confirmation that the user %{user} is registering for a new account at %{website}.",
+      :product_name => product_name,
       :user => asset.user.short_name,
       :website => (HostUrl.context_host((p.account rescue nil)) || HostUrl.default_host) %>
 
