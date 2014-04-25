@@ -181,6 +181,7 @@ class Account < ActiveRecord::Base
   add_setting :js_kaltura_uploader, :boolean => true, :root_only => true, :default => false
   add_setting :google_docs_domain, root_only: true
   add_setting :dashboard_url, root_only: true
+  add_setting :product_name, root_only: true
 
   def settings=(hash)
     if hash.is_a?(Hash)
@@ -208,6 +209,10 @@ class Account < ActiveRecord::Base
       end
     end
     settings
+  end
+
+  def product_name
+    settings[:product_name] || t("#product_name", "Canvas")
   end
 
   def allow_global_includes?
