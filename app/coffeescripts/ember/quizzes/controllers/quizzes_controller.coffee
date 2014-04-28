@@ -21,6 +21,8 @@ define [
     practicesLabel: I18n.t('practices_label', 'Practice Quizzes toggle quiz visibility')
     surveysLabel: I18n.t('surveys_label', 'Surveys toggle quiz visibility')
 
+    environment: environment
+
     canManage: alias 'environment.canManage'
 
     newQuizLink: (->
