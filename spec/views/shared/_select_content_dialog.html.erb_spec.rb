@@ -63,6 +63,15 @@ describe "/shared/_select_content_dialog" do
     page.css(%Q{#assignments_select .module_item_select option[value="new"]}).should be_empty
   end
 
+  it "should offer to create assigments if the user has permission" do
+    @account = Account.default
+    course_with_ta account: @account, active_all: true
+    view_context
+    render partial: 'shared/select_content_dialog'
+    page = Nokogiri(response.body)
+    page.css(%Q{#assignments_select .module_item_select option[value="new"]}).should_not be_empty
+  end
+
   it "should create new topics in unpublished state if draft state is enabled" do
     course_with_teacher(active_all: true, draft_state: true)
     view_context
