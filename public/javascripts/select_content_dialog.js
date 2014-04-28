@@ -197,7 +197,7 @@ $(document).ready(function() {
             item_data['item[title]'] = item_data['item[title]'] || obj.display_name
             var $option = $(document.createElement('option'));
             $option.val(obj.id).text(item_data['item[title]']);
-            $("#" + item_data['item[type]'] + "s_select").find(".module_item_select option:last").before($option);
+            $("#" + item_data['item[type]'] + "s_select").find(".module_item_select option:last").after($option);
             submit(item_data);
           };
           if(item_data['item[type]'] == 'attachment') {

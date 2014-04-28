@@ -228,10 +228,10 @@
         </div>
         <div style="margin-top: 5px;">
         <select class="module_item_select" multiple>
+          <% if @context.grants_right?(@current_user, session, :manage_assignments) %>
+            <option value="new"><%= t :new_assignment_option, "[ New Assignment ]" %></option>
+          <% end %>
           <% @context.assignment_groups.active.include_active_assignments.each do |group| %>
-            <% if @context.grants_right?(@current_user, session, :manage_assignments) %>
-              <option value="new"><%= t :new_assignment_option, "[ New Assignment ]" %></option>
-            <% end %>
             <optgroup label="<%= group.name %>">
             <% group.active_assignments.no_graded_quizzes_or_topics.limit(200).each do |assignment| %>
               <option value="<%= assignment.id %>"><%= assignment.title %></option>
