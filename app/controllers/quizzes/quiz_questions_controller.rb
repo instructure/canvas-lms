@@ -176,7 +176,6 @@ class Quizzes::QuizQuestionsController < ApplicationController
 
   before_filter :require_context, :require_quiz
   before_filter :require_question, :only => [:show]
-  before_filter :require_quiz_visibility, only: [:index, :show]
 
   # @API List questions in a quiz
   # @beta
@@ -387,23 +386,5 @@ class Quizzes::QuizQuestionsController < ApplicationController
 
   def censored?
     !@quiz.grants_right?(@current_user, session, :update)
-  end
-
-  # make sure not to expose questions to students until they start a quiz
-  # and have access to view the results afterwards
-  # TODO - this will filter student visibility when we turn visibility of
-  #        questions back on for students
-  def require_quiz_visibility
-    return if @quiz.grants_right?(@current_user, :update)
-
-    # students need to have made a submission to see the questions or their
-    # results, and their results need to be visible
-    participant = Quizzes::QuizParticipant.new(@current_user, temporary_user_code)
-    submission ||= participant.find_quiz_submission(@quiz.quiz_submissions)
-
-    unless submission.present? && submission.results_visible?
-      msg = t('#application.errors.question_access', 'You do not have access to quiz questions')
-      raise RequestError.new(msg, 401)
-    end
   end
 end
