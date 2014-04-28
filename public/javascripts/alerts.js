@@ -108,7 +108,9 @@ define([
       var $recipients = $alert.find('.recipients');
       $recipients.empty();
       for(var idx in data.recipients) {
-        $recipients.append(createRecipient(data.recipients[idx], 'li'));
+        if (ENV.ALERTS.POSSIBLE_RECIPIENTS[data.recipients[idx]]) {
+          $recipients.append(createRecipient(data.recipients[idx], 'li'));
+        }
       }
       if(data.repetition) {
         $alert.find('input[name="repetition"][value="value"]').attr('checked', true);
