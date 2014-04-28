@@ -168,11 +168,20 @@ define [
 
 
     initPostGrades: () ->
-      postGradesModel = new PostGradesModel({gradebook: ENV.GRADEBOOK_OPTIONS, assignments: @assignments, section_id: @sectionToShow})
-      postGradesDialog = new PostGradesDialog(postGradesModel)
 
       $("#publish").click (event) =>
         event.preventDefault()
+
+        postGradesModel = new PostGradesModel(
+          {
+            gradebook: ENV.GRADEBOOK_OPTIONS,
+            assignments: @assignments,
+            section_id: if @sectionToShow then @sections[@sectionToShow].integration_id else null,
+            course_id: ENV.GRADEBOOK_OPTIONS.context_integration_id
+          }
+        )
+
+        postGradesDialog = new PostGradesDialog(postGradesModel)
         postGradesModel.reset_ignored_assignments()
         postGradesDialog.render().show()
         open = $('#post-grades-container').dialog('isOpen')
@@ -200,8 +209,6 @@ define [
           assignment.assignment_group = group
           assignment.due_at = tz.parse(assignment.due_at)
           @assignments[assignment.id] = assignment
-
-      @initPostGrades()
 
     gotSections: (sections) =>
       @sections = {}
@@ -828,6 +835,7 @@ define [
         sections: @sectionList(),
         currentSection: @sectionToShow)
       @sectionMenu.render()
+      @initPostGrades()
 
     updateCurrentSection: (section, author) =>
       @sectionToShow = section

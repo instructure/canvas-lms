@@ -15,9 +15,7 @@ define [
   'jquery.instructure_date_and_time'
   'jquery.toJSON'
 ], (I18n, $, _, Backbone, tz, DialogBaseView, error_template, summary_template, needs_grading_template, ungraded_template) ->
-  window.tz = tz
-  window._ = _
-  window.Backbone = Backbone
+
   class PostGradesDialog extends DialogBaseView
     
     initialize: (model) ->
@@ -157,7 +155,6 @@ define [
 
     goToUrl: (e) ->
       e.preventDefault()
-      window.e = e
       window.location = $(e.currentTarget).data('url')
 
     postUngraded: ->
@@ -183,12 +180,10 @@ define [
             $.flashError('An error occurred posting your grades. ' + "HTTP Error " + data.status + " : " + data.statusText)
           success: (data) ->
             $.flashMessage('Assignments are being posted.')
-            console.log(data)
-
         @close()
       else
         json_to_post['course_id'] = @model.get('course_id')
-        $.ajax 'http://localhost:9292/grades/course' + @model.get('course_id'), #need to add SIS APP endpoint to post data
+        $.ajax 'http://localhost:9292/grades/course/' + @model.get('course_id'), #need to add SIS APP endpoint to post data
           type: 'POST'
           data: JSON.stringify(json_to_post)
           contentType: 'application/json; charset=utf-8'
@@ -196,8 +191,6 @@ define [
             $.flashError('An error occurred posting your grades. ' + "HTTP Error " + data.status + " : " + data.statusText)
           success: (data) ->
             $.flashMessage('Assignments are being posted.')
-            console.log(data)
-
         @close()
 
 
