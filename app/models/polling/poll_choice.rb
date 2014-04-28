@@ -18,7 +18,7 @@
 
 module Polling
   class PollChoice < ActiveRecord::Base
-    attr_accessible :text, :poll
+    attr_accessible :text, :poll, :is_correct
 
     belongs_to :poll, class_name: 'Polling::Poll'
 

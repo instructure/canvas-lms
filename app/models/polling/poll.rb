@@ -25,5 +25,18 @@ module Polling
     has_many :poll_submissions, class_name: 'Polling::PollSubmission'
 
     validates_presence_of :title, :course
+
+    set_policy do
+      given do |user, session|
+        self.cached_context_grants_right?(user, session, :manage_assignments)
+      end
+      can :read and can :update and can :delete and can :create
+
+      given do |user, session|
+        cached_context_grants_right?(user, session, :read)
+      end
+      can :read
+    end
+
   end
 end

@@ -1386,8 +1386,25 @@ routes.draw do
     scope(:controller => 'quizzes/quiz_ip_filters') do
       get 'courses/:course_id/quizzes/:quiz_id/ip_filters', :action => :index, :path_name => 'course_quiz_ip_filters'
     end
+
     scope(:controller => 'quizzes/quiz_statistics') do
       get 'courses/:course_id/quizzes/:quiz_id/statistics', :action => :index, :path_name => 'course_quiz_statistics'
+    end
+
+    scope(:controller => 'polling/polls') do
+      get "courses/:course_id/polls", :action => :index, :path_name => 'course_polls'
+      post "courses/:course_id/polls", :action => :create, :path_name => 'course_poll_create'
+      get "courses/:course_id/polls/:id", :action => :show, :path_name => 'course_poll'
+      put "courses/:course_id/polls/:id", :action => :update, :path_name => 'course_poll_update'
+      delete "courses/:course_id/polls/:id", :action => :destroy, :path_name => 'course_poll_destroy'
+    end
+
+    scope(:controller => 'polling/poll_choices') do
+      get "courses/:course_id/polls/:poll_id/poll_choices", :action => :index, :path_name => 'course_poll_choices'
+      post "courses/:course_id/polls/:poll_id/poll_choices", :action => :create, :path_name => 'course_poll_choices_create'
+      get "courses/:course_id/polls/:poll_id/poll_choices/:id", :action => :show, :path_name => 'course_poll_choice'
+      put "courses/:course_id/polls/:poll_id/poll_choices/:id", :action => :update, :path_name => 'course_poll_choice_update'
+      delete "courses/:course_id/polls/:poll_id/poll_choices/:id", :action => :destroy, :path_name => 'course_poll_choice_destroy'
     end
 
     scope(:controller => :outcome_groups_api) do
