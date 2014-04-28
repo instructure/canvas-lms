@@ -1,6 +1,7 @@
 #!/bin/bash
 result=0
 
+echo "################ canvas_breach_mitigation ################"
 bundle install
 bundle exec rspec spec
 let result=$result+$?

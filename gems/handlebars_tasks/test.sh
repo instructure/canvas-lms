@@ -1,7 +1,7 @@
 #!/bin/bash
 result=0
 
-
+echo "################ handlebars_tasks ################"
 bundle install
 bundle exec rspec spec
 result+=$?

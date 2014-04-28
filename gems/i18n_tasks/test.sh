@@ -1,6 +1,7 @@
 #!/bin/bash
 result=0
 
+echo "################ i18n_tasks ################"
 echo "################ Running tests against Rails 2 ################"
 export CANVAS_RAILS3=0
 bundle install

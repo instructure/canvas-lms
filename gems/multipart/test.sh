@@ -1,8 +1,7 @@
 #!/bin/bash
 result=0
 
-
-
+echo "################ multipart ################"
 bundle install
 bundle exec rspec spec
 result+=$?

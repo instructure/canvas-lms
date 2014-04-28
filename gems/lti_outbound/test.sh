@@ -1,7 +1,7 @@
 #!/bin/bash
 result=0
 
-
+echo "################ lti_outbound ################"
 bundle install
 bundle exec rspec spec
 let result=$result+$?

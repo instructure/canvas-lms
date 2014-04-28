@@ -1,6 +1,7 @@
 #!/bin/bash
 result=0
 
+echo "################ linked_in ################"
 bundle install
 bundle exec rspec spec
 let result=$result+$?
