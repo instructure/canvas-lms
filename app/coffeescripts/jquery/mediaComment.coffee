@@ -54,11 +54,11 @@ define [
     dfd
 
   # After clicking an image to play the video, load the sources and tracks
-  # for that video then play them with Media Element JS. 
+  # for that video then play them with Media Element JS.
   #
   # @returns jQuery object
   # @api private
-  createMediaTag = (options) -> 
+  createMediaTag = (options) ->
     {sourcesAndTracks, mediaType, height, width} = options
     tag_type = if mediaType is 'video' then 'video' else 'audio'
 
