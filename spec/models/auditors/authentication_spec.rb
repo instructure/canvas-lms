@@ -19,11 +19,21 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/../../cassandra_spec_helper')
 
-describe AuthenticationAuditApiController do
+describe Auditors::Authentication do
   include_examples "cassandra audit logs"
 
+  let(:request_id) { 42 }
+
   before do
-    RequestContextGenerator.stubs( :request_id => 'xyz' )
+    shard_class = Class.new {
+      define_method(:activate) { |&b| b.call }
+    }
+
+    EventStream.current_shard_lookup = lambda {
+      shard_class.new
+    }
+
+    RequestContextGenerator.stubs( :request_id => request_id )
     @account = Account.default
     user_with_pseudonym(active_all: true)
     @event = Auditors::Authentication.record(@pseudonym, 'login')
@@ -43,6 +53,10 @@ describe AuthenticationAuditApiController do
     it "should include event at user" do
       Auditors::Authentication.for_user(@user).paginate(:per_page => 1).
         should include(@event)
+    end
+
+    it "should set request_id" do
+      @event.request_id.should == request_id.to_s
     end
   end
 

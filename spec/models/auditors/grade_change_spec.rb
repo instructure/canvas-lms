@@ -19,11 +19,21 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/../../cassandra_spec_helper')
 
-describe GradeChangeAuditApiController do
+describe Auditors::GradeChange do
   include_examples "cassandra audit logs"
 
+  let(:request_id) { 42 }
+
   before do
-    RequestContextGenerator.stubs( :request_id => 'xyz' )
+    RequestContextGenerator.stubs( :request_id => request_id )
+
+    shard_class = Class.new {
+      define_method(:activate) { |&b| b.call }
+    }
+
+    EventStream.current_shard_lookup = lambda {
+      shard_class.new
+    }
 
     @account = Account.default
     @sub_account = Account.create!(:parent_account => @account)
@@ -68,6 +78,10 @@ describe GradeChangeAuditApiController do
       Auditors::GradeChange.for_assignment(@assignment).paginate(:per_page => 5).should include(@event)
       Auditors::GradeChange.for_course(@course).paginate(:per_page => 5).should include(@event)
       Auditors::GradeChange.for_root_account_student(@account, @student).paginate(:per_page => 5).should include(@event)
+    end
+
+    it "should set request_id" do
+      @event.request_id.should == request_id.to_s
     end
   end
 

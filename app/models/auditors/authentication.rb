@@ -19,7 +19,7 @@
 module Auditors; end
 
 class Auditors::Authentication
-  class Record < ::EventStream::Record
+  class Record < EventStream::Record
     attributes :pseudonym_id,
                :account_id,
                :user_id
@@ -30,6 +30,8 @@ class Auditors::Authentication
 
     def initialize(*args)
       super(*args)
+
+      self.request_id ||= RequestContextGenerator.request_id
 
       if attributes['pseudonym']
         self.pseudonym = attributes.delete('pseudonym')
@@ -56,10 +58,11 @@ class Auditors::Authentication
     end
   end
 
-  Stream = ::EventStream.new do
-    database_name :auditors
+  Stream = EventStream::Stream.new do
+    database -> { Canvas::Cassandra::DatabaseBuilder.from_config(:auditors) }
     table :authentications
     record_type Auditors::Authentication::Record
+    read_consistency_level -> { Canvas::Cassandra::DatabaseBuilder.read_consistency_setting(:auditors) }
 
     add_index :pseudonym do
       table :authentications_by_pseudonym

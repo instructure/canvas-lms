@@ -188,4 +188,30 @@ describe CanvasCassandra do
       db.insert_record("test_table", {:id => 5}, {:name => [nil, "test"], :nick => [nil, nil]})
     end
   end
+
+  describe "#available?" do
+    it 'asks #db.active?' do
+      expect(db.db).to receive(:active?) { true }
+      expect(db.available?).to be_true
+
+      expect(db.db).to receive(:active?) { false }
+      expect(db.available?).to be_false
+    end
+  end
+
+  describe "#keyspace" do
+    it 'asks #db.keyspace' do
+      keyspace_name = 'keyspace'
+
+      expect(db.db).to receive(:keyspace) { keyspace_name }
+      expect(db.keyspace).to eq keyspace_name
+    end
+
+    it 'aliases name' do
+      keyspace_name = 'keyspace'
+
+      expect(db.db).to receive(:keyspace) { keyspace_name }
+      expect(db.name).to eq keyspace_name
+    end
+  end
 end

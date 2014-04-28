@@ -19,7 +19,7 @@
 module Auditors; end
 
 class Auditors::Course
-  class Record < ::EventStream::Record
+  class Record < EventStream::Record
     attributes :course_id,
                :user_id,
                :event_source,
@@ -41,6 +41,8 @@ class Auditors::Course
 
     def initialize(*args)
       super(*args)
+
+      self.request_id ||= RequestContextGenerator.request_id
 
       if attributes['course']
         self.course = attributes.delete('course')
@@ -104,10 +106,11 @@ class Auditors::Course
     end
   end
 
-  Stream = ::EventStream.new do
-    database_name :auditors
+  Stream = EventStream::Stream.new do
+    database -> { Canvas::Cassandra::DatabaseBuilder.from_config(:auditors) }
     table :courses
     record_type Auditors::Course::Record
+    read_consistency_level -> { Canvas::Cassandra::DatabaseBuilder.read_consistency_setting(:auditors) }
 
     add_index :course do
       table :courses_by_course

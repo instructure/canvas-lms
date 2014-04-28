@@ -36,6 +36,13 @@ module Canvas
       def self.config_names
         Setting.from_config('cassandra').try(:keys) || []
       end
+
+      def self.read_consistency_setting(database_name = nil)
+        setting_key = 'event_stream.read_consistency'
+        setting_value = Setting.get("#{setting_key}.#{database_name}", nil) || Setting.get(setting_key, nil)
+
+        setting_value if setting_value.present?
+      end
     end
   end
 end

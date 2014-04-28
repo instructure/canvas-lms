@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013 Instructure, Inc.
+# Copyright (C) 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-
 class EventStream::Record < Struct.new(:attributes)
   def self.attributes(*attribute_names)
     attribute_names.each do |attribute_name|
@@ -29,27 +28,17 @@ class EventStream::Record < Struct.new(:attributes)
              :created_at,
              :event_type
 
- def initialize(*args)
+  def initialize(*args)
     super(*args)
 
-    attributes['id'] ||= UUIDSingleton.instance.generate
-
-    if attributes['request_id'].nil? && request_id = RequestContextGenerator.request_id
+    if request_id = attributes['request_id']
       attributes['request_id'] = request_id.to_s
     end
 
+    attributes['id'] ||= CanvasUuid::Uuid.generate
     attributes['created_at'] ||= Time.zone.now
     attributes['created_at'] = Time.zone.at(attributes['created_at'].to_i)
-
-    if attributes['page_view']
-      @page_view = attributes.delete('page_view')
-    end
-
     attributes['event_type'] ||= self.class.name.gsub("::#{self.class.name.demodulize}", '').demodulize.underscore
-  end
-
-  def changes
-    attributes
   end
 
   def request_id
@@ -62,11 +51,11 @@ class EventStream::Record < Struct.new(:attributes)
     attributes['request_id'] = value && value.to_s
   end
 
-  def page_view
-    @page_view ||= PageView.find_by_id(request_id)
+  def changes
+    attributes
   end
 
-  def self.from_attributes(attributes)
+ def self.from_attributes(attributes)
     new(attributes)
   end
 end

@@ -135,17 +135,18 @@ class PageView < ActiveRecord::Base
     self.page_view_method == :cassandra
   end
 
-  EventStream = ::EventStream.new do
-    database_name :page_views
+  EventStream = EventStream::Stream.new do
+    database -> { Canvas::Cassandra::DatabaseBuilder.from_config(:page_views) }
     table :page_views
     id_column :request_id
     record_type PageView
+    read_consistency_level -> { Canvas::Cassandra::DatabaseBuilder.read_consistency_setting(:page_views) }
 
     add_index :user do
       table :page_views_history_by_context
       id_column :request_id
       key_column :context_and_time_bucket
-      scrollback_setting 'page_views_scrollback_limit:users'
+      scrollback_limit -> { Setting.get('page_views_scrollback_limit:users', 52.weeks) }
 
       # index by the page view's user, but use the user's global_asset_string
       # when writing the index

@@ -1,5 +1,4 @@
-#
-# Copyright (C) 2013 Instructure, Inc.
+# Copyright (C) 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,7 +16,7 @@
 #
 
 class EventStream::Index
-  include AttrConfig
+  include EventStream::AttrConfig
 
   attr_reader :event_stream
 
@@ -25,10 +24,9 @@ class EventStream::Index
   attr_config :id_column, :type => String, :default => 'id'
   attr_config :key_column, :type => String, :default => 'key'
   attr_config :bucket_size, :type => Fixnum, :default => 1.week
-  attr_config :scrollback_setting, :type => String, :default => nil
-  attr_config :scrollback_default, :type => Fixnum, :default => 52.weeks
-  attr_config :entry_proc
-  attr_config :key_proc, :default => nil
+  attr_config :scrollback_limit, :type => Fixnum, :default => 52.weeks
+  attr_config :entry_proc, :type => Proc
+  attr_config :key_proc, :type => Proc, :default => nil
 
   def initialize(event_stream, &blk)
     @event_stream = event_stream
@@ -40,20 +38,12 @@ class EventStream::Index
     event_stream.database
   end
 
-  def scrollback_limit
-    if scrollback_setting
-      Setting.get(scrollback_setting, scrollback_default.to_s).to_i
-    else
-      scrollback_default
-    end
-  end
-
   def bucket_for_time(time)
     time.to_i - (time.to_i % bucket_size)
   end
 
   def bookmark_for(record)
-    prefix = record.id.to_s[0,8]
+    prefix = record.id.to_s[0, 8]
     bucket = bucket_for_time(record.created_at)
     ordered_id = "#{record.created_at.to_i}/#{prefix}"
     [bucket, ordered_id]
@@ -69,12 +59,10 @@ class EventStream::Index
   end
 
   def for_key(key, options={})
-    shard = Shard.current
+    shard = EventStream.current_shard
     bookmarker = EventStream::Index::Bookmarker.new(self)
     BookmarkedCollection.build(bookmarker) do |pager|
-      if event_stream.available?
-        shard.activate { history(key, pager, options) }
-      end
+      shard.activate { history(key, pager, options) }
     end
   end
 
@@ -171,8 +159,8 @@ class EventStream::Index
 
     # now that the bookmark's been set, convert the ids to rows from the
     # related event stream, preserving the order
-    ids = pager.map{ |row| row[id_column] }
+    ids = pager.map { |row| row[id_column] }
     events = event_stream.fetch(ids)
-    pager.replace events.sort_by{ |event| ids.index(event.id) }
+    pager.replace events.sort_by { |event| ids.index(event.id) }
   end
 end

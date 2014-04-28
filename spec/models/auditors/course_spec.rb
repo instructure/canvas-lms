@@ -19,11 +19,13 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/../../cassandra_spec_helper')
 
-describe CourseAuditApiController do
+describe Auditors::Course do
   include_examples "cassandra audit logs"
 
+  let(:request_id) { 42 }
+
   before do
-    RequestContextGenerator.stubs( :request_id => 'xyz' )
+    RequestContextGenerator.stubs( :request_id => request_id )
 
     @account = Account.default
     @sub_account = Account.create!(:parent_account => @account)
@@ -40,6 +42,11 @@ describe CourseAuditApiController do
     it "should include event" do
       @event = Auditors::Course.record_updated(@course, @teacher, @course.changes)
       Auditors::Course.for_course(@course).paginate(:per_page => 5).should include(@event)
+    end
+
+    it "should set request_id" do
+      @event = Auditors::Course.record_updated(@course, @teacher, @course.changes)
+      @event.request_id.should == request_id.to_s
     end
   end
 

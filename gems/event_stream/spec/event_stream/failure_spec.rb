@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013 Instructure, Inc.
+# Copyright (C) 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,68 +16,69 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
+require 'spec_helper'
 
 describe EventStream::Failure do
   describe "log!" do
     before do
-      @record = stub('record',
-        :id => stub('record_id', :to_s => 'record_id_string'),
+      @record = double('record',
+        :id => double('record_id', :to_s => 'record_id_string'),
         :attributes => { 'attribute' => 'attribute_value' },
         :changes => { 'changed_attribute' => 'changed_value' })
 
-      @stream = stub('stream', :identifier => 'stream_identifier')
-      @stream.stubs(:operation_payload).with(:insert, @record).returns(@record.attributes)
-      @stream.stubs(:operation_payload).with(:update, @record).returns(@record.changes)
+      @stream = double('stream', :identifier => 'stream_identifier')
+      allow(@stream).to receive(:operation_payload).with(:insert, @record).and_return(@record.attributes)
+      allow(@stream).to receive(:operation_payload).with(:update, @record).and_return(@record.changes)
 
       @exception = Exception.new
-      @exception.stubs(:message).returns(stub('exception_message', :to_s => 'exception_message_string'))
-      @exception.stubs(:backtrace).returns([stub('exception_backtrace')])
+      allow(@exception).to receive(:message).and_return(double('exception_message', :to_s => 'exception_message_string'))
+      allow(@exception).to receive(:backtrace).and_return([42])
 
       # By default the log! method raises exceptions in test env.  Override this
-      # to log the event and not raise it for these tests.
-      Rails.env.stubs(:test?).returns(false)
+      # to log the CanvasEvent and not raise it for these tests.
+      allow(Rails.env).to receive(:test?).and_return(false)
     end
 
-    it "should create a new db record" do
-      lambda{ EventStream::Failure.log!(:insert, @stream, @record, @exception) }.
-        should change(EventStream::Failure, :count)
+    it "creates a new db record" do
+      expect {
+        EventStream::Failure.log!(:insert, @stream, @record, @exception)
+      }.to change(EventStream::Failure, :count)
     end
 
-    it "should save the failed operation type" do
+    it "saves the failed operation type" do
       failure = EventStream::Failure.log!(:insert, @stream, @record, @exception)
-      failure.operation.should == 'insert'
+      expect(failure.operation).to eq 'insert'
 
       failure = EventStream::Failure.log!(:update, @stream, @record, @exception)
-      failure.operation.should == 'update'
+      expect(failure.operation).to eq 'update'
     end
 
-    it "should save the event stream identifier" do
+    it "saves the CanvasEvent stream identifier" do
       failure = EventStream::Failure.log!(:insert, @stream, @record, @exception)
-      failure.event_stream.should == @stream.identifier
+      expect(failure.event_stream).to eq @stream.identifier
     end
 
-    it "should save the record id as a string" do
+    it "saves the record id as a string" do
       failure = EventStream::Failure.log!(:insert, @stream, @record, @exception)
-      failure.record_id.should == @record.id.to_s
+      expect(failure.record_id).to eq @record.id.to_s
     end
 
-    it "should save the operation-appropriate payload" do
+    it "saves the operation-appropriate payload" do
       failure = EventStream::Failure.log!(:insert, @stream, @record, @exception)
-      failure.payload.should == @record.attributes
+      expect(failure.payload).to eq @record.attributes
 
       failure = EventStream::Failure.log!(:update, @stream, @record, @exception)
-      failure.payload.should == @record.changes
+      expect(failure.payload).to eq @record.changes
     end
 
-    it "should save the exception message as a string" do
+    it "saves the exception message as a string" do
       failure = EventStream::Failure.log!(:insert, @stream, @record, @exception)
-      failure.exception.should == @exception.message.to_s
+      expect(failure.exception).to eq @exception.message.to_s
     end
 
-    it "should save the exception backtrace" do
+    it "saves the exception backtrace" do
       failure = EventStream::Failure.log!(:insert, @stream, @record, @exception)
-      failure.backtrace.should == @exception.backtrace
+      expect(failure.backtrace.first).to equal 42
     end
   end
 end

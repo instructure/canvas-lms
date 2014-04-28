@@ -1,6 +1,6 @@
 # encoding: utf-8
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -183,6 +183,15 @@ module CanvasCassandra
       where_clause = conditions.sort_by { |k,v| k.to_s }.map { |k,v| where_args << v; "#{k} = ?" }.join(" AND ")
       return where_clause, where_args
     end
+
+    def available?
+      db.active?
+    end
+
+    def keyspace
+      db.keyspace
+    end
+    alias :name :keyspace
 
     protected
 

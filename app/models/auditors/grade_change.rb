@@ -19,7 +19,7 @@
 module Auditors; end
 
 class Auditors::GradeChange
-  class Record < ::EventStream::Record
+  class Record < EventStream::Record
     attributes :account_id,
                :grade_after,
                :grade_before,
@@ -40,6 +40,8 @@ class Auditors::GradeChange
 
     def initialize(*args)
       super(*args)
+
+      self.request_id ||= RequestContextGenerator.request_id
 
       if attributes['submission']
         self.submission = attributes.delete('submission')
@@ -119,10 +121,11 @@ class Auditors::GradeChange
     end
   end
 
-  Stream = ::EventStream.new do
-    database_name :auditors
+  Stream = EventStream::Stream.new do
+    database -> { Canvas::Cassandra::DatabaseBuilder.from_config(:auditors) }
     table :grade_changes
     record_type Auditors::GradeChange::Record
+    read_consistency_level -> { Canvas::Cassandra::DatabaseBuilder.read_consistency_setting(:auditors) }
 
     add_index :assignment do
       table :grade_changes_by_assignment
