@@ -49,7 +49,10 @@ define [
 
     not_unique_assignments: ->
       duplicates = (assignment) -> assignment.length > 1
-      _.chain(@assignment_list()).groupBy("name").filter( duplicates ).flatten().value()
+      add_not_unique_flag = (assignment) ->
+        assignment['not_unique'] = true
+        return assignment
+      _.chain(@assignment_list()).groupBy("name").filter( duplicates ).flatten().map(add_not_unique_flag).value()
 
     missing_due_date: ->
       missing_dates = _.chain(@assignment_list()).filter( (assignment) -> return !assignment.due_at ).flatten().value()

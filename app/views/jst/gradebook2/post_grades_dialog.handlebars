@@ -46,14 +46,23 @@
         background: #f00;
         border: 1px solid #f00;
     }
-    .data-circle-success{
+    .data-circle-clean{
         margin-top: 12px;
-        margin-right: 0px;
+        margin-right: -20px;
         border-radius: 50%;
         width: 4px;
         height: 4px;
-        background: green;
-        border: 1px solid green;
+        background: transparent;
+        border: 1px solid transparent;
+    }
+    .data-circle-success{
+        margin-top: 12px;
+        margin-right: -20px;
+        border-radius: 50%;
+        width: 4px;
+        height: 4px;
+        background: transparent;
+        border: 1px solid transparent;
     }
     .lead{
         margin-bottom: 20px;
@@ -96,17 +105,19 @@
        {{#each missing_not_unique}}
            <div class="row">
                <div id="assignment-error-{{id}}">
-                   <div class="span1 data-circle-error" style="width: 4px"></div>
+                   <div class={{#if not_unique}}"span1 data-circle-error"{{else}}"span1 data-circle-clean"{{/if}} style="width: 4px"></div>
                    <form id="passback-form" class="form-inline">
                        <div class="span4">
                            <input type="text" class="input-xlarge" style="padding-right: 100px" placeholder="{{name}}" value="{{name}}">
                        </div>
 
                        {{#if due_at}}
-                           <div class="span1 data-circle-error" style="width: 4px"></div><div class="span2 date_field_container">
+                           <div class="span1 data-circle-clean" style="width: 4px"></div>
+                           <div class="span2 date_field_container">
                            <input type="text" class="input-medium date_field assignment-info" value="{{datetimeFormatted due_at}}">
                        {{else}}
-                           <div class="span1 data-circle-error" style="width: 4px"></div><div class="span2 date_field_container">
+                           <div class="span1 data-circle-error" style="width: 4px"></div>
+                           <div class="span2 date_field_container">
                            <input type="text" class="input-medium date_field assignment-info" placeholder="No Due Date">
                        {{/if}}
                        </div>
