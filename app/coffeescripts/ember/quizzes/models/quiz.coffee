@@ -11,7 +11,8 @@ define [
   Em.onerror = (error) ->
     console.log 'ERR', error, error.stack
 
-  Model.extend
+  {Model, attr} = DS
+  Quiz = Model.extend
     title: attr()
     quizType: attr()
     links: attr()
@@ -88,3 +89,13 @@ define [
     ).property('quizSubmissionHtmlURL')
     quizStatistics: hasMany 'quiz_statistics', async: true
     quizReports: hasMany 'quiz_report', async: true
+    sortSlug: (->
+      dateField = if @get('isAssignment') then 'dueAt' else 'lockAt'
+      dueAt = @get(dateField)?.toISOString() or Quiz.SORT_LAST
+      title = @get('title') or ''
+      dueAt + title
+    ).property('isAssignment', 'dueAt', 'lockAt', 'title')
+
+  Quiz.SORT_LAST = 'ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ'
+
+  Quiz
