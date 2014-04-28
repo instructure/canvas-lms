@@ -127,35 +127,6 @@ describe Quizzes::QuizQuestionsController, type: :request do
       end
     end
 
-    context "whom cannot view hidden results" do
-      before do
-        @quiz.hide_results = 'always'
-        @quiz.save!
-        @quiz.generate_submission(@student)
-      end
-
-      describe 'GET /courses/:course_id/quizzes/:quiz_id/questions (index)' do
-        it "should be unauthorized" do
-          raw_api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions",
-                              :controller => "quizzes/quiz_questions", :action => "index", :format => "json",
-                              :course_id => @course.id.to_s, :quiz_id => @quiz.id.to_s)
-          assert_status(401)
-        end
-      end
-
-      describe 'GET /courses/:course_id/quizzes/:quiz_id/questions/:id (show) ' do
-        it "should be unauthorized" do
-          @question = @quiz.quiz_questions.create!(:question_data => multiple_choice_question_data)
-
-          raw_api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions/#{@question.id}",
-                             :controller => "quizzes/quiz_questions", :action => "show", :format => "json",
-                             :course_id => @course.id.to_s, :quiz_id => @quiz.id.to_s, :id => @question.id)
-          assert_status(401)
-        end
-      end
-    end
-
-
     context 'whom has started a quiz' do
       before do
         @quiz.generate_submission(@student)
@@ -168,41 +139,6 @@ describe Quizzes::QuizQuestionsController, type: :request do
                               :course_id => @course.id.to_s, :quiz_id => @quiz.id.to_s)
           assert_status(401)
         end
-
-        it 'returns a censored version of multiple choice questions' do
-          pending # pending until we turn on ability for students to see
-                  # answers via the api
-
-          @quiz.quiz_questions.create!(:question_data => multiple_choice_question_data)
-
-          json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions",
-                          :controller => "quizzes/quiz_questions", :action => "index", :format => "json",
-                          :course_id => @course.id.to_s, :quiz_id => @quiz.id.to_s)
-
-          json.length.should == 1
-          json.each do |question|
-            question["answers"].class.name.should == 'Array'
-            question["answers"].each do |answer|
-              answer.include?("weight").should be_false
-              answer.include?("comments").should be_false
-            end
-          end
-        end
-
-        it 'returns a censored version of short answer questions' do
-          pending # pending until we turn on ability for students to see
-                  # answers via the api
-
-          @quiz.quiz_questions.create!(:question_data => short_answer_question_data)
-
-          json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions",
-                          :controller => "quizzes/quiz_questions", :action => "index", :format => "json",
-                          :course_id => @course.id.to_s, :quiz_id => @quiz.id.to_s)
-          json.length.should == 1
-          json.each do |question|
-            question.include?("answers").should be_false
-          end
-        end
       end
 
       describe 'GET /courses/:course_id/quizzes/:quiz_id/questions/:id (show)' do
@@ -214,93 +150,6 @@ describe Quizzes::QuizQuestionsController, type: :request do
                              :course_id => @course.id.to_s, :quiz_id => @quiz.id.to_s, :id => @question.id)
           assert_status(401)
         end
-
-        it 'returns a censored version of the question' do
-          pending # pending until we turn on ability for students to see
-                  # answers via the api
-
-          @quiz.quiz_questions.create!(:question_data => multiple_choice_question_data)
-
-          json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions",
-                          :controller => "quizzes/quiz_questions", :action => "index", :format => "json",
-                          :course_id => @course.id.to_s, :quiz_id => @quiz.id.to_s)
-
-          json.length.should == 1
-          json.each do |question|
-            question["answers"].class.name.should == 'Array'
-            question["answers"].each do |answer|
-              answer.include?("weight").should be_false
-              answer.include?("comments").should be_false
-            end
-          end
-        end
-
-        it 'censors both the question and its assessment multiple choice question' do
-          pending # pending until we turn on ability for students to see
-                  # answers via the api
-
-          @quiz.quiz_questions.create!(:question_data => multiple_choice_question_data)
-
-          json = api_call(:get,
-            "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions",
-            {
-              :controller => "quizzes/quiz_questions",
-              :action => "index",
-              :format => "json",
-              :course_id => @course.id.to_s,
-              :quiz_id => @quiz.id.to_s
-            }, {
-              :include => [ :assessment_question ]
-            })
-
-          json.length.should == 1
-
-          question = json[0]
-          question["answers"].class.name.should == 'Array'
-          question["answers"].each do |answer|
-            answer.include?("weight").should be_false
-            answer.include?("comments").should be_false
-          end
-
-          assessment_question = question["assessment_question"]
-          assessment_question.should be_present
-          assessment_question["question_data"].should be_present
-          assessment_question["question_data"].should be_present
-          assessment_question["question_data"]["answers"].class.name.should == 'Array'
-          assessment_question["question_data"]["answers"].each do |answer|
-            answer.include?("weight").should be_false
-          end
-        end
-
-        it 'censors both the question and its assessment short answer question' do
-          pending # pending until we turn on ability for students to see
-                  # answers via the api
-
-          @quiz.quiz_questions.create!(:question_data => short_answer_question_data)
-
-          json = api_call(:get,
-            "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions",
-            {
-              :controller => "quizzes/quiz_questions",
-              :action => "index",
-              :format => "json",
-              :course_id => @course.id.to_s,
-              :quiz_id => @quiz.id.to_s
-            }, {
-              :include => [ :assessment_question ]
-            })
-
-          json.length.should == 1
-
-          question = json[0]
-          question.include?("answers").should be_false
-
-          assessment_question = question["assessment_question"]
-          assessment_question.should be_present
-          assessment_question["question_data"].should be_present
-          assessment_question["question_data"].include?("answers").should be_false
-        end
-
       end
     end
   end

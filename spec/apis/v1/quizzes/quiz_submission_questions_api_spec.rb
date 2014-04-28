@@ -131,13 +131,20 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
   end
 
   describe 'GET /quiz_submissions/:quiz_submission_id/questions [index]' do
+    it 'should be unauthorized' do
+      json = api_index({}, { raw: true })
+      assert_status(401)
+    end
+
     it 'should return an empty list' do
+      pending
       json = api_index
       json.has_key?('quiz_submission_questions').should be_true
       json['quiz_submission_questions'].size.should == 0
     end
 
     it 'should list all items' do
+      pending
       ask_and_answer_stuff
 
       json = api_index
@@ -145,6 +152,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
     end
 
     it 'should restrict access to itself' do
+      pending
       student_in_course
       json = api_index({}, { raw: true })
       assert_status(401)
@@ -157,13 +165,20 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
       @question = @qq1
     end
 
+    it 'should be unauthorized' do
+      json = api_show({}, { raw: true })
+      assert_status(401)
+    end
+
     it 'should grant access to its student' do
+      pending
       json = api_show
       json.has_key?('quiz_submission_questions').should be_true
       json['quiz_submission_questions'].length.should == 1
     end
 
     it 'should deny access by other students' do
+      pending
       student_in_course
       api_show({}, { raw: true })
       assert_status(401)
@@ -171,6 +186,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
 
     context 'Output' do
       it 'should include the quiz question id' do
+        pending
         json = api_show
         json.has_key?('quiz_submission_questions').should be_true
         json['quiz_submission_questions'][0]['id'].should ==
@@ -178,6 +194,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
       end
 
       it 'should include the flagged status' do
+        pending
         json = api_show
         json.has_key?('quiz_submission_questions').should be_true
         json['quiz_submission_questions'][0].has_key?('flagged').should be_true
@@ -187,6 +204,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
 
     context 'Links' do
       it 'should include its linked quiz_question' do
+        pending
         json = api_show({
           :include => %w[ quiz_question ]
         })
@@ -203,11 +221,13 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
 
     context 'JSON-API compliance' do
       it 'should conform to the JSON-API spec when returning the object' do
+        pending
         json = api_show
         assert_jsonapi_compliance(json, 'quiz_submission_questions')
       end
 
       it 'should conform to the JSON-API spec when returning linked objects' do
+        pending
         includables = Api::V1::QuizSubmissionQuestion::Includables
 
         json = api_show({

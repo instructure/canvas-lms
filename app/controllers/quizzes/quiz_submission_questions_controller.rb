@@ -67,8 +67,8 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
   #    "quiz_submission_questions": [QuizSubmissionQuestion]
   #  }
   def index
-    if authorized_action(@quiz_submission, @current_user, :read)
-      render json: quiz_submission_questions_json(@quiz.quiz_questions,
+    if authorized_action(@quiz, @current_user, :update)
+      render json: quiz_submission_questions_json(@quiz.active_quiz_questions,
         @quiz_submission.submission_data,
         {
           user: @current_user,
@@ -93,7 +93,7 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
   #    "quiz_submission_questions": [QuizSubmissionQuestion]
   #  }
   def show
-    if authorized_action(@quiz_submission, @current_user, :read)
+    if authorized_action(@quiz, @current_user, :update)
       render json: quiz_submission_questions_json(@question,
         @quiz_submission.submission_data,
         {
