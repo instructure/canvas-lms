@@ -149,3 +149,29 @@ define [
               assignment_group_text = find(".assignment-group-grade").first().text()
               equal(parseFloat(new_final_grade), "3")
               notEqual(assignment_group_text.indexOf("3 / 100"), -1)
+
+  module 'screenreader_gradebook: curve grades display',
+    setup: ->
+      App = startApp()
+      visit('/').then =>
+        @controller = App.__container__.lookup('controller:screenreader_gradebook')
+        @selected = @controller.get('assignments').objectAt(0)
+        Ember.run =>
+          @controller.set('selectedAssignment', @selected)
+
+    teardown: ->
+      Ember.run App, 'destroy'
+
+  test 'curve grades button does display with points poisslbe', ->
+    curve_button_text = find('#curve_grades').text()
+    notEqual(curve_button_text.indexOf("Curve Grades"), -1)
+
+  test 'curve grades button does not display with 0 points poisslbe', ->
+    Ember.run =>
+      @controller.set('selectedAssignment.points_possible', 0)
+    equal(find('#curve_grades').text(), "")
+
+  test 'curve grades button does not display with null points poisslbe', ->
+    Ember.run =>
+      @controller.set('selectedAssignment.points_possible', null)
+    equal(find('#curve_grades').text(), "")
