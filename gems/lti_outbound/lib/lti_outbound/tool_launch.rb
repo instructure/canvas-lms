@@ -58,11 +58,11 @@ module LtiOutbound
       hash['custom_canvas_assignment_id'] = '$Canvas.assignment.id'
     end
 
-    def generate
+    def generate(overrides={})
       hash['lti_message_type'] = 'basic-lti-launch-request'
       hash['lti_version'] = 'LTI-1p0'
       hash['resource_link_id'] = link_code
-      hash['resource_link_title'] = tool.name
+      hash['resource_link_title'] = overrides['resource_link_title'] || tool.name
       hash['user_id'] = user.opaque_identifier
       hash['user_image'] = user.avatar_url
       hash['text'] = CGI::escape(selected_html) if selected_html
