@@ -78,7 +78,12 @@ class Entry
   end
 
   def download_url
-    @entry.content.src
+    url = @entry.content.src
+    if url && (parsed_url = (URI.parse(url) rescue nil)) && (ext = extension)
+      parsed_url.query = [parsed_url.query, "exportFormat=#{ext}", "format=#{ext}"].compact.join("&")
+      url = parsed_url.to_s
+    end
+    url
   end
 
   def to_hash

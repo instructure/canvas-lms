@@ -1,5 +1,6 @@
 require "atom"
 require "oauth"
+require 'uri'
 
 module GoogleDocs
   require "google_docs/connection"

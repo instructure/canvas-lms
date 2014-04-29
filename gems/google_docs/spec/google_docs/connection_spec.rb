@@ -197,7 +197,8 @@ describe GoogleDocs::Connection do
       doc_id = 'spreadsheet:0AiN8C_VHrPxkdEF6YmQyc3p2Qm02ODhJWGJnUmJYY2c'
       access_token = mock_access_token
       document_response = mock()
-      access_token.expects(:get).with('https://docs.google.com/feeds/download/spreadsheets/Export?key=0AiN8C_VHrPxkdEF6YmQyc3p2Qm02ODhJWGJnUmJYY2c').returns(document_response)
+
+      access_token.expects(:get).returns(document_response)
       response = mock()
       response.expects(:body).returns(xml_doc_list_many)
       access_token.expects(:get).with(xml_schema_id).returns(response)
@@ -216,7 +217,7 @@ describe GoogleDocs::Connection do
 
       redirect = Net::HTTPFound.new(1.0, 302, "FOUND")
       redirect['Location'] = 'http://example.com/1234'
-      access_token.expects(:get).with('https://docs.google.com/feeds/download/spreadsheets/Export?key=0AiN8C_VHrPxkdEF6YmQyc3p2Qm02ODhJWGJnUmJYY2c').returns(redirect)
+      access_token.expects(:get).returns(redirect)
       access_token.expects(:get).with('http://example.com/1234').returns(document_response)
 
       response = mock()
@@ -253,7 +254,7 @@ describe GoogleDocs::Connection do
       new_document.document_id.should == 'document:1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA'
       new_document.extension.should == 'doc'
       new_document.display_name.should == 'test document'
-      new_document.download_url.should == 'https://docs.google.com/feeds/download/documents/export/Export?id=1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA'
+      new_document.download_url.should include('id=1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA')
       new_document.alternate_url.should be_a(Atom::Link)
       new_document.alternate_url.href.should == 'https://docs.google.com/document/d/1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA/edit?hl=en_US'
     end
