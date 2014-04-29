@@ -27,7 +27,6 @@ stylesheets:
     - public/stylesheets/static/mediaelementplayer.css
     - public/stylesheets/compiled/g_instructure.css
     - public/stylesheets/compiled/g_assignments.css
-    - public/stylesheets/compiled/g_context_inbox.css
     - public/stylesheets/compiled/g_groups.css # TODO: remove me when new manage_groups lands
     - public/stylesheets/compiled/g_media_comments.css
     - public/stylesheets/compiled/g_context_modules.css
@@ -40,7 +39,6 @@ stylesheets:
     - public/stylesheets/compiled/g_syllabus.css
     - public/stylesheets/compiled/g_mini_calendar.css
     - public/stylesheets/compiled/helpDialog.css
-    - public/stylesheets/compiled/print.css
   context_modules: 
     - public/stylesheets/compiled/context_modules.css
   context_modules2: 
@@ -56,8 +54,6 @@ stylesheets:
     - public/stylesheets/compiled/profile/show.css
   profile_edit:
     - public/stylesheets/compiled/profile/edit.css
-  group_settings:
-    - public/stylesheets/compiled/groups/edit.css
   facebook:
     - public/stylesheets/compiled/facebook.css
   speed_grader:
@@ -65,8 +61,6 @@ stylesheets:
     - public/stylesheets/compiled/speed_grader.css
   conferences:
     - public/stylesheets/compiled/conferences.css
-  plugins:
-    - public/stylesheets/compiled/plugins.css
   gradebook_uploads:
     - public/stylesheets/static/slick.grid.css
     - public/stylesheets/compiled/gradebook_uploads.css
@@ -183,8 +177,6 @@ stylesheets:
     - public/javascripts/tinymce/jscripts/tiny_mce/plugins/inlinepopups/skins/clearlooks2/window.css
   messages:
     - public/stylesheets/compiled/messages.css
-  content_imports:
-    - public/stylesheets/compiled/content_imports.css
   user_notes:
     - public/stylesheets/compiled/user_notes.css
   imports:
