@@ -7,17 +7,17 @@
     </p>
   {{/if}}
 
-  <div class="content-box border border-trbl border-round">
+  <div class="content-box border border-trbl border-round pad-box">
     {{#if is_amazon_url}}
-      <div class="media-track-step">
+      <div>
         <p class="uploadMediaTrackFormDescription">
         <strong>{{#t "upload_media_track_form_step1_label"}}Step 1:{{/t}}</strong>
           {{#t "upload_media_track_form_description_1"}}Copy this video url:{{/t}}
         </p>
         <div class="content-callout media-track-video-url">{{video_url}}</div>
-      </div><!-- media track step -->
+      </div>
 
-      <div class="media-track-step">
+      <div>
         <p class="uploadMediaTrackFormDescription">
         <strong>{{#t "upload_media_track_form_step2_label"}}Step 2:{{/t}}</strong>
           {{#t "upload_media_track_form_description_2"}}Create a subtitle file by clicking this link and following the instructions.{{/t}}
@@ -29,10 +29,10 @@
             <button class="btn btn-small media-track-form-button" type="submit" value="Begin">{{#t "media_track_form_button"}}Go to subtitle creation tool{{/t}}</button>
           </form>
         </div>
-      </div><!-- media track step -->
+      </div>
     {{/if}}
 
-    <div class="media-track-step">
+    <div>
 
       <p class="uploadMediaTrackFormDescription">
         {{#if is_amazon_url}}
