@@ -1642,6 +1642,7 @@ class ApplicationController < ActionController::Base
     includes ||= []
     data = user_profile_json(profile, viewer, session, includes, profile)
     data[:can_edit] = viewer == profile.user
+    data[:can_edit_name] = data[:can_edit] && profile.user.user_can_edit_name?
     known_user = viewer.load_messageable_user(profile.user)
     common_courses = []
     common_groups = []

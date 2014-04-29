@@ -15,18 +15,24 @@
       <% end %>
     </div>
     <div class="image-block-content row-fluid">
-      <h1 class="h1">
-        <span class="hide-if-editing"><%= @user_data[:short_name] %></span>
-      </h1>
-      <% if @user_data[:can_edit] %>
+      <% if @user_data[:can_edit_name] %>
+        <h1 class="h1">
+          <span class="hide-if-editing"><%= @user_data[:short_name] %></span>
+        </h1>
         <label class="show-if-editing"><%= t('name', 'Name') %>: <br><input type="text" name="user[short_name]" value="<%= @user_data[:short_name] %>" required></label>
-      <% end %>
-      <p>
-        <span class="hide-if-editing"><%= @user_data[:title] %></span>
-        <% if @user_data[:can_edit] %>
+        <p>
+          <span class="hide-if-editing"><%= @user_data[:title] %></span>
           <label class="show-if-editing"><%= t('title', 'Title') %>: <br><input type="text" name="user_profile[title]" value="<%= @user_data[:title] %>"></label>
-        <% end %>
-      </p>
+        </p>
+      <% else %>
+        <h1 class="h1">
+          <span><%= @user_data[:short_name] %></span>
+        </h1>
+        <p>
+          <span><%= @user_data[:title] %></span>
+        </p>
+      <% end %>
+
       <div class="show-if-editing edit-contact-methods">
         <h2 class="h5 border border-b"><%= t('#profile.ways_to_contact_me', "Ways to contact me") %></h2>
         <% if @user_data[:user_services].present? %>

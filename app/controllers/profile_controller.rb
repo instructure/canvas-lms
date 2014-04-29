@@ -368,8 +368,11 @@ class ProfileController < ApplicationController
     @context = @profile
 
     short_name = params[:user] && params[:user][:short_name]
-    @user.short_name = short_name if short_name
-    @profile.attributes = params[:user_profile]
+    @user.short_name = short_name if short_name && @user.user_can_edit_name?
+    if params[:user_profile]
+      params[:user_profile].delete(:title) unless @user.user_can_edit_name?
+      @profile.attributes = params[:user_profile]
+    end
 
     if params[:link_urls] && params[:link_titles]
       @profile.links = []
