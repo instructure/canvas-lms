@@ -51,4 +51,25 @@ describe GoogleDocs::Entry do
       entry.extension.should == "doc"
     end
   end
+
+  describe '#download_url' do
+    it 'should add exportFormat and format parameters when applicable' do
+      entry = GoogleDocs::Entry.new(entry_feed)
+      entry.stubs(:extension).returns("xls")
+
+      url = URI.parse(entry.download_url)
+
+      url.scheme.should == "https"
+      url.host.should == "docs.google.com"
+      url.path.should == "/feeds/download/documents/export/Export"
+
+      params = url.query.split("&")
+      params.should include("id=1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA")
+      params.should include("exportFormat=xls")
+      params.should include("format=xls")
+
+      entry.stubs(:extension).returns(nil)
+      entry.download_url.should == "https://docs.google.com/feeds/download/documents/export/Export?id=1HJoN38KHlnu32B5z_THgchnTMUbj7dgs8P-Twrm38cA"
+    end
+  end
 end
