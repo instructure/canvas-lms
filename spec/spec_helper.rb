@@ -121,6 +121,7 @@ else
         def render_with_helpers(*args)
           controller_class = ("#{@controller.controller_path.camelize}Controller".constantize rescue nil) || ApplicationController
 
+          controller_class.instance_variable_set(:@js_env, nil)
           # this extends the controller's helper methods to the view
           # however, these methods are delegated to the test controller
           view.singleton_class.class_eval do
