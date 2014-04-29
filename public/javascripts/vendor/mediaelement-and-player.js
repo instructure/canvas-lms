@@ -4191,7 +4191,8 @@ if (typeof jQuery != 'undefined') {
 		hasChapters: false,
 
 		buildtracks: function(player, controls, layers, media) {
-			if (player.tracks.length == 0)
+			// INSTRUCTURE added code (the '&& !player.options.can_add_captions' part)
+			if (player.tracks.length == 0 && !player.options.can_add_captions)
 				return;
 
 			var t = this, 
@@ -4286,9 +4287,12 @@ if (typeof jQuery != 'undefined') {
 			// add to list
 			for (i=0; i<player.tracks.length; i++) {
 				if (player.tracks[i].kind == 'subtitles') {
-					player.addTrackButton(player.tracks[i].srclang, player.tracks[i].label);
+					player.addTrackButton(player.tracks[i].srclang, player.tracks[i].label, player.tracks[i].src);
 				}
 			}
+
+			// INSTRUCTURE added code
+      if (player.options.can_add_captions) player.addUploadTrackButton();
 
 			// start loading tracks
 			player.loadNextTrack();
@@ -4441,16 +4445,40 @@ if (typeof jQuery != 'undefined') {
 			t.adjustLanguageBox();
 		},
 
-		addTrackButton: function(lang, label) {
+		// INSTRUCTURE added code
+    addUploadTrackButton: function() {
+      var t = this;
+
+      $('<a href="#" style="color:white">Upload subtitles</a>')
+        .appendTo(t.captionsButton.find('ul'))
+        .wrap('<li>')
+        .click(function(e){
+          e.preventDefault();
+          require(['compiled/widget/UploadMediaTrackForm'], function(UploadMediaTrackForm){
+            new UploadMediaTrackForm(t.options.mediaCommentId, t.media.src);
+          });
+        });
+      t.adjustLanguageBox();
+    },
+
+		addTrackButton: function(lang, label, src) {
 			var t = this;
 			if (label === '') {
 				label = mejs.language.codes[lang] || lang;
+			}
+
+			// INSTRUCTURE added code
+			var deleteButtonHtml = '';
+			if (t.options.can_add_captions) {
+				deleteButtonHtml = '<a href="#" data-remove="li" data-confirm="Are you sure you want to delete this track?" data-url="' + src + '">×</a>';
 			}
 
 			t.captionsButton.find('ul').append(
 				$('<li>'+
 					'<input type="radio" name="' + t.id + '_captions" id="' + t.id + '_captions_' + lang + '" value="' + lang + '" disabled="disabled" />' +
 					'<label for="' + t.id + '_captions_' + lang + '">' + label + ' (loading)' + '</label>'+
+					// INSTRUCTURE added code
+					deleteButtonHtml +
 				'</li>')
 			);
 
@@ -4483,7 +4511,8 @@ if (typeof jQuery != 'undefined') {
 					}
 				}	
 					
-				if (!hasSubtitles) {
+				// INSTRUCTURE added code
+				if (!hasSubtitles && !t.options.can_add_captions) {
 					t.captionsButton.hide();
 					t.setControlsSize();
 				}													
