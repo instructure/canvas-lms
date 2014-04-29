@@ -401,6 +401,9 @@
                     ({{#t 'pts'}}{{final_grade_point_ratio}} points{{/t}})
                   {{/with}}
                 {{/if}}
+                {{#if showLetterGrades}}
+                  - {{selectedStudent.final_letter_grade}}
+                {{/if}}
               {{else}}
                 -
               {{/if}}

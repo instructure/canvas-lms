@@ -27,7 +27,7 @@ define [
       @component.reopen
         gradingStandard: (->
           originalGradingStandard = this._super
-          undefined
+          [["A", 0.50],["C", 0.05],["F", 0.00]]
         ).property()
         weightingScheme: (->
           originalWeightingScheme = this._super
@@ -57,6 +57,10 @@ define [
   test 'percent', ->
     expected = "8.5%"
     equal @component.get('percent'), expected
+
+  test 'letterGrade', ->
+    expected = "C"
+    equal @component.get('letterGrade'), expected
 
   test 'scoreDetail', ->
     expected = "(85.12 / 1000.11)"

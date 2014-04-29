@@ -219,6 +219,8 @@ define [
     setFinalGradeDisplay: (->
       @get('students').forEach (student) =>
         set(student, "final_grade_point_ratio", @pointRatioDisplay(student, @get('groupsAreWeighted')))
+        if @get('showLetterGrades')
+          set(student, "final_letter_grade", GradeCalculator.letter_grade(ENV.GRADEBOOK_OPTIONS.grading_standard, student.total_percent))
     ).observes('students.@each.total_grade','groupsAreWeighted')
 
     pointRatioDisplay: (student, weighted_groups) ->
@@ -255,11 +257,15 @@ define [
 
     publishToSisEnabled: (->
       ENV.GRADEBOOK_OPTIONS.publish_to_sis_enabled
-      ).property()
+    ).property()
 
     publishToSisURL:(->
       ENV.GRADEBOOK_OPTIONS.publish_to_sis_url
-      ).property()
+    ).property()
+
+    showLetterGrades:(->
+      !!ENV.GRADEBOOK_OPTIONS.grading_standard
+    ).property()
 
     teacherNotes: (->
       ENV.GRADEBOOK_OPTIONS.teacher_notes
