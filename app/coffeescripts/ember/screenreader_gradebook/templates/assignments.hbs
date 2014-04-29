@@ -533,13 +533,15 @@
           >
             {{#t 'set_default_grade'}}Set default grade{{/t}}
           </button>
-          <button
-            id="curve_grades"
-            class="btn"
-            {{ action 'openDialog' 'curve_grades' target=view }}
-          >
-            {{#t 'curve_grades'}}Curve Grades{{/t}}
-          </button>
+          {{#if selectedAssignment.points_possible}}
+            <button
+              id="curve_grades"
+              class="btn"
+              {{ action 'openDialog' 'curve_grades' target=view }}
+            >
+              {{#t 'curve_grades'}}Curve Grades{{/t}}
+            </button>
+          {{/if}}
         </div>
       {{else}}
         <p class="assignment_selection pad-box top-only">
