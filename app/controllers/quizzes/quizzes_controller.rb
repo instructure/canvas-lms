@@ -35,7 +35,7 @@ class Quizzes::QuizzesController < ApplicationController
   def index
     if authorized_action(@context, @current_user, :read)
       if @context.root_account.enable_fabulous_quizzes? && @context.feature_enabled?(:draft_state)
-        redirect_to fabulous_quizzes_course_quizzes_path
+        redirect_to ember_urls.course_quizzes_url
       end
       return unless tab_enabled?(@context.class::TAB_QUIZZES)
       @quizzes = @context.quizzes.active.include_assignment.sort_by{|q| [(q.assignment ? q.assignment.due_at : q.lock_at) || CanvasSort::Last, Canvas::ICU.collation_key(q.title || CanvasSort::First)]}
@@ -97,11 +97,17 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def show
+    if @context.root_account.enable_fabulous_quizzes? && @context.feature_enabled?(:draft_state)
+      redirect_to ember_urls.course_quiz_url(@quiz.id)
+      return
+    end
+
     if @quiz.deleted?
       flash[:error] = t('errors.quiz_deleted', "That quiz has been deleted")
       redirect_to named_context_url(@context, :context_quizzes_url)
       return
     end
+
     if authorized_action(@quiz, @current_user, :read)
       # optionally force auth even for public courses
       return if value_to_boolean(params[:force_user]) && !force_user
@@ -396,6 +402,11 @@ class Quizzes::QuizzesController < ApplicationController
 
   # student_analysis report
   def statistics
+    if @context.root_account.enable_fabulous_quizzes? && @context.feature_enabled?(:draft_state)
+      redirect_to ember_urls.course_quiz_statistics_url(@quiz.id)
+      return
+    end
+
     if authorized_action(@quiz, @current_user, :read_statistics)
         respond_to do |format|
           format.html {
@@ -542,6 +553,11 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def moderate
+    if @context.root_account.enable_fabulous_quizzes? && @context.feature_enabled?(:draft_state)
+      redirect_to ember_urls.course_quiz_moderate_url(@quiz.id)
+      return
+    end
+
     if authorized_action(@quiz, @current_user, :grade)
       @all_students = @context.students_visible_to(@current_user).order_by_sortable_name
       @students = @all_students
@@ -758,5 +774,12 @@ class Quizzes::QuizzesController < ApplicationController
   def set_download_submission_dialog_title
     js_env SUBMISSION_DOWNLOAD_DIALOG_TITLE: I18n.t('#quizzes.download_all_quiz_file_upload_submissions',
                                                     'Download All Quiz File Upload Submissions')
+  end
+
+  # give us some helper methods for linking to the ember pages
+  def ember_urls
+    @ember_urls ||= CanvasEmberUrl::UrlMappings.new(
+      :course_quizzes => fabulous_quizzes_course_quizzes_url
+    )
   end
 end
