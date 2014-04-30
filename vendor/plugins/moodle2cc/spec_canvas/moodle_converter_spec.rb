@@ -26,8 +26,39 @@ describe Moodle::Converter do
   it "should successfully import the course" do
     @course.import_from_migration(@course_data, nil, @cm)
     allowed_warnings = ["Multiple Dropdowns question may have been imported incorrectly",
+                        "Possible answers will need to be regenerated for Formula question",
                         "Missing links found in imported content"]
     @cm.old_warnings_format.all?{|w| allowed_warnings.find{|aw| w[0].start_with?(aw)}}.should == true
+  end
+
+  it "should add at most 2 warnings per bank for problematic questions" do
+    converter = Moodle::Converter.new({:no_archive_file => true})
+    test_course = {:assessment_questions => {:assessment_questions => [
+      {'question_type' => 'multiple_dropdowns_question', 'question_bank_id' => '1'},
+      {'question_type' => 'calculated_question', 'question_bank_id' => '1'},
+      {'question_type' => 'multiple_dropdowns_question', 'question_bank_id' => '2'},
+      {'question_type' => 'calculated_question', 'question_bank_id' => '2'},
+
+      {'question_type' => 'multiple_dropdowns_question', 'question_bank_id' => '1'},
+      {'question_type' => 'multiple_dropdowns_question', 'question_bank_id' => '1'},
+      {'question_type' => 'calculated_question', 'question_bank_id' => '2'},
+      {'question_type' => 'calculated_question', 'question_bank_id' => '2'},
+      {'question_type' => 'calculated_question', 'question_bank_id' => '2'},
+
+    ]}}.with_indifferent_access
+
+    converter.instance_variable_set(:@course, test_course)
+    converter.add_question_warnings
+    converted_course = converter.instance_variable_get(:@course)
+    questions = converted_course[:assessment_questions][:assessment_questions]
+    questions[0]['import_warnings'].should == ["There are 3 Multiple Dropdowns questions in this bank that may have been imported incorrectly"]
+    questions[1]['import_warnings'].should == ["Possible answers will need to be regenerated for Formula question"]
+    questions[2]['import_warnings'].should == ["Multiple Dropdowns question may have been imported incorrectly"]
+    questions[3]['import_warnings'].should == ["There are 4 Formula questions in this bank that will need to have their possible answers regenerated"]
+
+    [4, 5, 6, 7, 8].each do |idx|
+      questions[idx]['import_warnings'].should be_nil
+    end
   end
 
   context "discussion topics" do
@@ -137,6 +168,13 @@ describe Moodle::Converter do
       question.question_data[:question_text].should == "How much is [a] + [b] ?"
       question.question_data[:question_type].should == 'calculated_question'
       question.question_data[:neutral_comments].should == 'Calculated Question General Feedback'
+
+      # add warnings because these question types seem to be ambiguously structured in moodle
+      warnings = @cm.migration_issues.select{|w|
+        w.description == "Possible answers will need to be regenerated for Formula question" &&
+            w.fix_issue_html_url.include?("question_#{question.assessment_question_id}")
+      }
+      warnings.count.should == 1
     end
 
     it "should convert Moodle Description Question to Canvas text_only_question" do

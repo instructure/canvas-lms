@@ -23,10 +23,53 @@ module Moodle
     def add_question_warnings
       return unless @course[:assessment_questions] && @course[:assessment_questions][:assessment_questions]
 
+      warning_map = {}
+
       @course[:assessment_questions][:assessment_questions].each do |q_hash|
-        if q_hash['question_type'] == 'multiple_dropdowns_question'
-          q_hash['import_warnings'] ||= []
-          q_hash['import_warnings'] << I18n.t(:moodle_dropdown_warning_title, 'Multiple Dropdowns question may have been imported incorrectly')
+        qb_ident = q_hash['question_bank_id'] || q_hash['question_bank_name'] || :default
+
+        if q_hash['question_type'] == 'multiple_dropdowns_question' || q_hash['question_type'] == 'calculated_question'
+          warning_map[qb_ident] ||= {}
+          warning_map[qb_ident][q_hash['question_type']] ||= []
+          warning_map[qb_ident][q_hash['question_type']] << q_hash
+        end
+      end
+
+      add_warnings_to_map(warning_map)
+    end
+
+    def add_warnings_to_map(warning_map)
+      warning_map.values.each do |warnings|
+        if hashes = warnings['multiple_dropdowns_question']
+          if hashes.count > 2
+            q_hash = hashes.first
+            q_hash['import_warnings'] ||= []
+            q_hash['import_warnings'] << I18n.t(:moodle_dropdown_many_warning_title,
+              "There are %{count} Multiple Dropdowns questions in this bank that may have been imported incorrectly",
+              :count => hashes.count)
+          else
+            hashes.each do |q_hash|
+              q_hash['import_warnings'] ||= []
+              q_hash['import_warnings'] << I18n.t(:moodle_dropdown_warning_title,
+                "Multiple Dropdowns question may have been imported incorrectly")
+            end
+          end
+        end
+
+        if hashes = warnings['calculated_question']
+          if hashes.count > 2
+            q_hash = hashes.first
+            q_hash['import_warnings'] ||= []
+            q_hash['import_warnings'] << I18n.t(:moodle_formula_many_warning_title,
+              "There are %{count} Formula questions in this bank that will need to have their possible answers regenerated",
+              :count => hashes.count)
+          else
+            hashes.each do |q_hash|
+              q_hash['import_warnings'] ||= []
+              q_hash['import_warnings'] << I18n.t(:moodle_formula_warning_title,
+                "Possible answers will need to be regenerated for Formula question")
+            end
+          end
         end
       end
     end
