@@ -1574,63 +1574,66 @@ class Course < ActiveRecord::Base
     else
       enrollment_state = 'creation_pending' if enrollment_state == 'invited' && !self.available?
     end
-    if opts[:allow_multiple_enrollments]
-      e = self.all_enrollments.where(user_id: user, type: type, role_name: role_name, associated_user_id: associated_user_id, course_section_id: section.id).first
-    else
-      # order by course_section_id<>section.id so that if there *is* an existing enrollment for this section, we get it (false orders before true)
-      e = self.all_enrollments.
+    Course.unique_constraint_retry do
+      if opts[:allow_multiple_enrollments]
+        e = self.all_enrollments.where(user_id: user, type: type, role_name: role_name, associated_user_id: associated_user_id, course_section_id: section.id).first
+      else
+        # order by course_section_id<>section.id so that if there *is* an existing enrollment for this section, we get it (false orders before true)
+        e = self.all_enrollments.
           where(user_id: user, type: type, role_name: role_name, associated_user_id: associated_user_id).
           order("course_section_id<>#{section.id}").
           first
-    end
-    if e
-      e.already_enrolled = true
-      e.attributes = {
-        :course_section => section,
-        :workflow_state => 'invited',
-        :limit_privileges_to_course_section => limit_privileges_to_course_section } if e.completed? || e.rejected? || e.deleted?
-    end
-    # if we're creating a new enrollment, we want to return it as the correct
-    # subclass, but without using associations, we need to manually activate
-    # sharding. We should probably find a way to go back to using the
-    # association here -- just ran out of time.
-    self.shard.activate do
-      e ||= Enrollment.typed_enrollment(type).new(
-        :user => user,
-        :course => self,
-        :course_section => section,
-        :workflow_state => enrollment_state,
-        :limit_privileges_to_course_section => limit_privileges_to_course_section)
-    end
-    e.associated_user_id = associated_user_id
-    e.role_name = role_name
-    e.self_enrolled = self_enrolled
-    e.start_at = start_at
-    e.end_at = end_at
-    if e.changed?
-      transaction do
-        if connection.adapter_name == 'PostgreSQL' && connection.send(:postgresql_version) < 90300
-          # without this, inserting/updating on enrollments will share lock the course, but then
-          # it tries to touch the course, which will deadlock with another transaction doing the
-          # same thing. on 9.3, it will KEY SHARE lock, which doesn't conflict with the NO KEY
-          # UPDATE needed to touch it
-          self.lock!
-        end
-        if opts[:no_notify]
-          e.save_without_broadcasting
-        else
-          e.save
+      end
+      if e
+        e.already_enrolled = true
+        e.attributes = {
+          :course_section => section,
+          :workflow_state => 'invited',
+          :limit_privileges_to_course_section => limit_privileges_to_course_section } if e.completed? || e.rejected? || e.deleted?
+      end
+      # if we're creating a new enrollment, we want to return it as the correct
+      # subclass, but without using associations, we need to manually activate
+      # sharding. We should probably find a way to go back to using the
+      # association here -- just ran out of time.
+      self.shard.activate do
+        e ||= Enrollment.typed_enrollment(type).new(
+          :user => user,
+          :course => self,
+          :course_section => section,
+          :workflow_state => enrollment_state,
+          :limit_privileges_to_course_section => limit_privileges_to_course_section)
+
+      end
+      e.associated_user_id = associated_user_id
+      e.role_name = role_name
+      e.self_enrolled = self_enrolled
+      e.start_at = start_at
+      e.end_at = end_at
+      if e.changed?
+        transaction do
+          if connection.adapter_name == 'PostgreSQL' && connection.send(:postgresql_version) < 90300
+            # without this, inserting/updating on enrollments will share lock the course, but then
+            # it tries to touch the course, which will deadlock with another transaction doing the
+            # same thing. on 9.3, it will KEY SHARE lock, which doesn't conflict with the NO KEY
+            # UPDATE needed to touch it
+            self.lock!
+          end
+          if opts[:no_notify]
+            e.save_without_broadcasting
+          else
+            e.save
+          end
         end
       end
+      e.user = user
+      self.claim if self.created? && e && e.admin?
+      unless opts[:skip_touch_user]
+        e.associated_user.try(:touch)
+        user.touch
+      end
+      user.reload
+      e
     end
-    e.user = user
-    self.claim if self.created? && e && e.admin?
-    unless opts[:skip_touch_user]
-      e.associated_user.try(:touch)
-      user.touch
-    end
-    user.reload
-    e
   end
 
   def enroll_student(user, opts={})
