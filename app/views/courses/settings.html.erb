@@ -145,6 +145,11 @@
         <td class="form-label"><%= f.blabel :conclude_at, :en => "Ends" %></td>
         <td class="nobr">
           <span class="course_form"><%= f.text_field :conclude_at, :class => "date_entry", :value => unlocalized_datetime_string(@context.conclude_at, :verbose) %></span>
+          <i id="course_conclude_at_warning" style="<%= hidden %>" class="date-warning icon-warning" data-tooltip='{"tooltipClass":"popover", "position":"right"}'
+             title="<div class='popover-title'><%= t(:course_conclude_at_warning_title, "Course Ending at Midnight") %></div><div class='popover-content'><p>
+            <%= t(:course_conclude_at_warning_message, "The course is currently set to end at midnight,
+              meaning that the previous day will be the last day this course is active.") %></p></div>">
+          </i>
           <span class="course_info conclude_at"><%= datetime_string(@context.conclude_at, :verbose, nil, true) || t('no_date', "No Date Set") %></span>
           <div class="course_form">
             <%= f.check_box :restrict_enrollments_to_course_dates %>

@@ -289,18 +289,19 @@ define([
     $course_form.find(".grading_standard_checkbox").change(function() {
       $course_form.find(".grading_standard_link").showIf($(this).attr('checked'));
     }).change();
+    $course_form.find("#course_conclude_at").change(function() {
+      var date = $.datetime.parse($(this).val());
+      if (date) { date = $.unfudgeDateForProfileTimezone(date); }
+      $course_form.find("#course_conclude_at_warning").detach().appendTo($(this).parent()).showIf(
+        date && date.getMinutes() == 0 && date.getHours() == 0
+      );
+    });
     $course_form.formSubmit({
       processData: function(data) {
         var date = $.datetime.parse(data['course[start_at]']);
-        if (date) {
-          date.setHours(0); date.setMinutes(0); date.setSeconds(0); date.setMilliseconds(0);
-        }
         data['course[start_at]'] = date ? $.unfudgeDateForProfileTimezone(date).toISOString() : "";
 
         date = $.datetime.parse(data['course[conclude_at]']);
-        if (date) {
-          date.setHours(23); date.setMinutes(55); date.setSeconds(0); date.setMilliseconds(0);
-        }
         data['course[conclude_at]'] = date ? $.unfudgeDateForProfileTimezone(date).toISOString() : "";
 
         return data;
