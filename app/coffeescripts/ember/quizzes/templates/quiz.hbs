@@ -30,14 +30,14 @@
 
   <div class="row-fluid" id="quiz-show-tabs">
     <ol>
-      {{#link-to 'quiz.show' this tagName='li'}}
-        {{#link-to 'quiz.show' this.id}}
+      {{#link-to 'quiz.show' this tagName='li' replace=true}}
+        {{#link-to 'quiz.show' this.id replace=true}}
           {{#t 'overview'}}Overview{{/t}}
         {{/link-to}}
       {{/link-to}}
 
-      {{#link-to 'quiz.moderate' this tagName='li'}}
-        {{#link-to 'quiz.moderate' this.id}}
+      {{#link-to 'quiz.moderate' this tagName='li' replace=true}}
+        {{#link-to 'quiz.moderate' this.id replace=true}}
           {{#t 'moderate'}}Moderate{{/t}}
         {{/link-to}}
       {{/link-to}}
