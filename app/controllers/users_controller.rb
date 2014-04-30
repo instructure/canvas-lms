@@ -965,7 +965,7 @@ class UsersController < ApplicationController
       cc_type = params[:communication_channel][:type] || CommunicationChannel::TYPE_EMAIL
       cc_addr = params[:communication_channel][:address]
       skip_confirmation = value_to_boolean(params[:communication_channel][:skip_confirmation]) &&
-          (Account.site_admin.grants_right?(@current_user, :manage_students) || @account.grants_right?(@current_user, :manage_students))
+          (Account.site_admin.grants_right?(@current_user, :manage_students) || @context.grants_right?(@current_user, :manage_students))
     else
       cc_type = CommunicationChannel::TYPE_EMAIL
       cc_addr = params[:pseudonym].delete(:path) || params[:pseudonym][:unique_id]
@@ -998,7 +998,7 @@ class UsersController < ApplicationController
       @user.require_self_enrollment_code = self_enrollment
       @user.validation_root_account = @domain_root_account
     end
-    
+
     @observee = nil
     if @user.initial_enrollment_type == 'observer'
       # TODO: SAML/CAS support
@@ -1089,7 +1089,7 @@ class UsersController < ApplicationController
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/users/<user_id>/settings \
-  #     -X PUT \ 
+  #     -X PUT \
   #     -F 'manual_mark_as_read=true'
   #     -H 'Authorization: Bearer <token>'
   def settings
@@ -1155,11 +1155,11 @@ class UsersController < ApplicationController
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/users/133.json' \
-  #        -X PUT \ 
-  #        -F 'user[name]=Sheldon Cooper' \ 
-  #        -F 'user[short_name]=Shelly' \ 
-  #        -F 'user[time_zone]=Pacific Time (US & Canada)' \ 
-  #        -F 'user[avatar][token]=<opaque_token>' \ 
+  #        -X PUT \
+  #        -F 'user[name]=Sheldon Cooper' \
+  #        -F 'user[short_name]=Shelly' \
+  #        -F 'user[time_zone]=Pacific Time (US & Canada)' \
+  #        -F 'user[avatar][token]=<opaque_token>' \
   #        -H "Authorization: Bearer <token>"
   #
   # @returns User
@@ -1373,8 +1373,8 @@ class UsersController < ApplicationController
   # you won't be able to make API calls or log into Canvas.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/users/5 \ 
-  #       -H 'Authorization: Bearer <ACCESS_TOKEN>' \ 
+  #     curl https://<canvas>/api/v1/users/5 \
+  #       -H 'Authorization: Bearer <ACCESS_TOKEN>' \
   #       -X DELETE
   #
   # @returns User
@@ -1475,7 +1475,7 @@ class UsersController < ApplicationController
         student = User.find(params[:student_id])
         enrollments = student.student_enrollments.active.includes(:course).all
         enrollments.each do |enrollment|
-          should_include = enrollment.course.user_has_been_instructor?(@teacher) && 
+          should_include = enrollment.course.user_has_been_instructor?(@teacher) &&
                            enrollment.course.enrollments_visible_to(@teacher, :include_priors => true).find_by_id(enrollment.id) &&
                            enrollment.course.grants_right?(@current_user, :read_reports)
           if should_include
