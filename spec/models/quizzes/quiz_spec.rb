@@ -213,10 +213,10 @@ describe Quizzes::Quiz do
   end
 
   it "should update the assignment it is associated with" do
-    a = @course.assignments.create!(:title => "some assignment", :points_possible => 5)
+    a = @course.assignments.create!(:title => "some assignment", :points_possible => 5, :only_visible_to_overrides => false)
     a.points_possible.should eql(5.0)
     a.submission_types.should_not eql("online_quiz")
-    q = @course.quizzes.build(:assignment_id => a.id, :title => "some quiz", :points_possible => 10)
+    q = @course.quizzes.build(:assignment_id => a.id, :title => "some quiz", :points_possible => 10, :only_visible_to_overrides => true)
     q.workflow_state = 'available'
     q.save
     q.should be_available

@@ -1555,6 +1555,9 @@ define([
         data['quiz[allowed_attempts]'] = attempts;
         overrideView.updateOverrides();
         var overrides = overrideView.getOverrides();
+        if (ENV.DIFFERENTIATED_ASSIGNMENTS_ENABLED) {
+          data['quiz[only_visible_to_overrides]'] = overrideView.containsSectionsWithoutOverrides();
+        }
         var quizData = overrideView.getDefaultDueDate();
         if (quizData) {
           quizData = quizData.toJSON().assignment_override;

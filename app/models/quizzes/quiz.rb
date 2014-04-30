@@ -37,7 +37,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     :require_lockdown_browser_for_results, :context, :notify_of_update,
     :one_question_at_a_time, :cant_go_back, :show_correct_answers_at, :hide_correct_answers_at,
     :require_lockdown_browser_monitor, :lockdown_browser_monitor_data,
-    :one_time_results
+    :one_time_results, :only_visible_to_overrides
 
   attr_readonly :context_id, :context_type
   attr_accessor :notify_of_update
@@ -61,7 +61,8 @@ class Quizzes::Quiz < ActiveRecord::Base
     :id, :title, :description, :quiz_data, :points_possible, :context_id, :context_type, :assignment_id, :workflow_state, :shuffle_answers, :show_correct_answers, :time_limit,
     :allowed_attempts, :scoring_policy, :quiz_type, :created_at, :updated_at, :lock_at, :unlock_at, :deleted_at, :could_be_locked, :cloned_item_id, :unpublished_question_count,
     :due_at, :question_count, :last_assignment_id, :published_at, :last_edited_at, :anonymous_submissions, :assignment_group_id, :hide_results, :ip_filter, :require_lockdown_browser,
-    :require_lockdown_browser_for_results, :one_question_at_a_time, :cant_go_back, :show_correct_answers_at, :hide_correct_answers_at, :require_lockdown_browser_monitor, :lockdown_browser_monitor_data
+    :require_lockdown_browser_for_results, :one_question_at_a_time, :cant_go_back, :show_correct_answers_at, :hide_correct_answers_at, :require_lockdown_browser_monitor, :lockdown_browser_monitor_data,
+    :only_visible_to_overrides
   ]
 
   EXPORTABLE_ASSOCIATIONS = [:quiz_questions, :quiz_submissions, :quiz_groups, :quiz_statistics, :attachments, :quiz_regrades, :context, :assignment, :assignment_group]
@@ -218,6 +219,7 @@ class Quizzes::Quiz < ActiveRecord::Base
       assignment = self.assignment
       assignment ||= self.context.assignments.build(:title => self.title, :due_at => self.due_at, :submission_types => 'online_quiz')
       assignment.assignment_group_id = self.assignment_group_id
+      assignment.only_visible_to_overrides = self.only_visible_to_overrides
       assignment.saved_by = :quiz
       if context.feature_enabled?(:draft_state) && !deleted?
         assignment.workflow_state = self.published? ? 'published' : 'unpublished'
@@ -404,6 +406,7 @@ class Quizzes::Quiz < ActiveRecord::Base
         a.due_at = self.due_at
         a.lock_at = self.lock_at
         a.unlock_at = self.unlock_at
+        a.only_visible_to_overrides = self.only_visible_to_overrides
         a.submission_types = "online_quiz"
         a.assignment_group_id = self.assignment_group_id
         a.saved_by = :quiz

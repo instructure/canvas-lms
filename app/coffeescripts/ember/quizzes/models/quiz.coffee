@@ -79,6 +79,9 @@ define [
         when 'graded_survey' then I18n.t 'graded_survey', 'Graded Survey'
         when 'practice_quiz' then I18n.t 'practice_quiz', 'Practice Quiz'
     ).property('quizType')
+    onlyVisibleToOverrides: attr()
+    daEnabled: ENV.FLAGS.differentiated_assignments
+    differentiatedAssignmentsApplies: Em.computed.and('daEnabled', 'onlyVisibleToOverrides')
 
     quizSubmissionHtmlUrl: attr()
     quizSubmissionVersionsHtmlUrl: attr()
@@ -97,7 +100,7 @@ define [
     allDates: (->
       dates = []
       overrides = @get('assignmentOverrides').toArray()
-      if overrides.length == 0 || overrides.length != @get 'sectionCount'
+      if (overrides.length == 0 || overrides.length != @get 'sectionCount') && !@get 'differentiatedAssignmentsApplies'
         title = if overrides.length > 0
           I18n.t('everyone_else', 'Everyone Else')
         else

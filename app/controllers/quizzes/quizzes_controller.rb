@@ -50,7 +50,8 @@ class Quizzes::QuizzesController < ApplicationController
         :FLAGS => {
           :question_banks => feature_enabled?(:question_banks),
           :quiz_statistics => true,
-          :quiz_moderate   => @context.feature_enabled?(:quiz_moderate)
+          :quiz_moderate   => @context.feature_enabled?(:quiz_moderate),
+          :differentiated_assignments => @context.feature_enabled?(:differentiated_assignments)
         })
 
         # headless prevents inception in submission preview
@@ -244,6 +245,7 @@ class Quizzes::QuizzesController < ApplicationController
       sections = @context.course_sections.active
       hash = { :ASSIGNMENT_ID => @assigment.present? ? @assignment.id : nil,
              :ASSIGNMENT_OVERRIDES => assignment_overrides_json(@quiz.overrides_for(@current_user)),
+             :DIFFERENTIATED_ASSIGNMENTS_ENABLED => @context.feature_enabled?(:differentiated_assignments),
              :QUIZ => quiz_json(@quiz, @context, @current_user, session),
              :SECTION_LIST => sections.map { |section| { :id => section.id, :name => section.name } },
              :QUIZZES_URL => course_quizzes_url(@context),
@@ -282,6 +284,7 @@ class Quizzes::QuizzesController < ApplicationController
       @quiz.content_being_saved_by(@current_user)
       @quiz.infer_times
       overrides = delete_override_params
+      params[:quiz].delete(:only_visible_to_overrides) unless @context.feature_enabled?(:differentiated_assignments)
       @quiz.transaction do
         @quiz.update_attributes!(params[:quiz])
         batch_update_assignment_overrides(@quiz,overrides) unless overrides.nil?
@@ -335,6 +338,7 @@ class Quizzes::QuizzesController < ApplicationController
 
           auto_publish = @context.feature_enabled?(:draft_state) && @quiz.published?
           @quiz.with_versioning(auto_publish) do
+            params[:quiz].delete(:only_visible_to_overrides) unless @context.feature_enabled?(:differentiated_assignments)
             # using attributes= here so we don't need to make an extra
             # database call to get the times right after save!
             @quiz.attributes = params[:quiz]

@@ -19,7 +19,7 @@ module Quizzes
                 :message_students_url, :quiz_submission_html_url, :section_count,
                 :moderate_url, :take_quiz_url, :quiz_extensions_url, :takeable,
                 :quiz_submissions_zip_url, :preview_url, :quiz_submission_versions_html_url,
-                :assignment_id, :one_time_results
+                :assignment_id, :one_time_results, :only_visible_to_overrides
 
     def_delegators :@controller,
       :api_v1_course_assignment_group_url,
@@ -175,7 +175,9 @@ module Quizzes
              :speed_grader_url,
              :message_students_url,
              :submitted_students,
-             :unsubmitted_students then user_may_grade?
+             :only_visible_to_overrides then user_may_grade?
+
+        when :unsubmitted_students then user_may_grade? || user_may_manage?
 
         when :quiz_extensions_url,
              :moderate_url,
@@ -234,6 +236,7 @@ module Quizzes
         hash['links']['quiz_statistics'] = hash.delete(:quiz_statistics_url)
         hash['links']['quiz_reports'] = hash.delete(:quiz_reports_url)
       end
+      hash.delete(:only_visible_to_overrides) unless quiz.context.feature_enabled?(:differentiated_assignments)
       hash
     end
 
@@ -251,6 +254,10 @@ module Quizzes
 
     def quiz_extensions_url
       api_v1_course_quiz_extensions_create_url(quiz.context, quiz)
+    end
+
+    def only_visible_to_overrides
+      quiz.only_visible_to_overrides || false
     end
 
     def stringify_ids?
