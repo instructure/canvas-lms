@@ -702,7 +702,7 @@ class AccountsController < ApplicationController
         format.json  {
           cancel_cache_buster
           expires_in 30.minutes
-          render :json => @courses.map{ |c| {:label => c.name, :id => c.id} }
+          render :json => @courses.map{ |c| {:label => c.name, :id => c.id, :term => c.enrollment_term.name} }
         }
       end
     end

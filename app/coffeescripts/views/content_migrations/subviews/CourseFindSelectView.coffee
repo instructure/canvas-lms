@@ -3,9 +3,10 @@ define [
   'Backbone'
   'underscore'
   'jst/content_migrations/subviews/CourseFindSelect'
+  'jst/courses/autocomplete_item'
   'jquery.ajaxJSON'
   'jquery.disableWhileLoading'
-], ($, Backbone, _, template) -> 
+], ($, Backbone, _, template, autocompleteItemTemplate) ->
   class CourseFindSelectView extends Backbone.View
     @optionProperty 'current_user_id'
     template: template
@@ -31,6 +32,8 @@ define [
       @$courseSearchField.autocomplete 
         source: @manageableCourseUrl()
         select: @updateSelect
+      @$courseSearchField.data('ui-autocomplete')._renderItem = (ul, item) ->
+        $(autocompleteItemTemplate(item)).appendTo(ul)
 
     toJSON: -> 
       json = super
