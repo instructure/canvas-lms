@@ -34,7 +34,7 @@ class Quizzes::QuizzesController < ApplicationController
 
   def index
     if authorized_action(@context, @current_user, :read)
-      if @context.root_account.enable_fabulous_quizzes?
+      if @context.root_account.enable_fabulous_quizzes? && @context.feature_enabled?(:draft_state)
         redirect_to fabulous_quizzes_course_quizzes_path
       end
       return unless tab_enabled?(@context.class::TAB_QUIZZES)

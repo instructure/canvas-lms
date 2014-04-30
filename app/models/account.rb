@@ -1356,6 +1356,7 @@ class Account < ActiveRecord::Base
   end
 
   def enable_fabulous_quizzes!
+    root_account.enable_feature! :draft_state
     change_root_account_setting!(:enable_fabulous_quizzes, true)
   end
 
