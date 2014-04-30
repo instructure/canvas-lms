@@ -324,9 +324,6 @@ define([
         if(!data) { return $("<div/>"); }
         data.id = data.id || 'new'
         data.type = data.type || data['item[type]'] || $.underscore(data.content_type);
-        if (data.type === 'quiz' || data.type === 'Quizzes::quiz') {
-          data.type = 'quizzes/quiz'
-        }
         data.title = data.title || data['item[title]'];
         data.new_tab = data.new_tab ? '1' : '0';
         var $item, $olditem = (data.id != 'new') ? $("#context_module_item_" + data.id) : [];
@@ -657,7 +654,7 @@ define([
           displayType = I18n.t('optgroup.assignments', "Assignments");
         } else if (data.type == 'attachment') {
           displayType = I18n.t('optgroup.files', "Files");
-        } else if (data.type == 'quizzes/quiz') {
+        } else if (data.type == 'quiz') {
           displayType = I18n.t('optgroup.quizzes', "Quizzes");
         } else if (data.type == 'external_url') {
           displayType = I18n.t('optgroup.external_urls', "External URLs");

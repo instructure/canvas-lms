@@ -39,7 +39,7 @@
         <span class="criterion_type" style="display: none;"><%= (criterion && criterion[:type]) || nbsp %></span>
       </span>
 
-      <span class="type" style="display: none;"><%= tag ? (tag.graded? ? 'assignment' : tag.content_type.underscore) : nbsp %></span>
+      <span class="type" style="display: none;"><%= tag ? tag.content_type_class : nbsp %></span>
       <span class="id" style="display: none;"><%= tag ? tag.id : nbsp %></span>
     </td><!-- module_item_icons -->
 

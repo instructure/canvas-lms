@@ -56,7 +56,7 @@ TEXT
 <div id="context_modules_sortable_container">
   <div id="context_modules" tabindex="0" aria-label="<%= t('headings.course_modules', %{Course Modules}) %>" class="<%= 'editable' if can_do(@context, @current_user, :manage_content) %>">
     <% editable = can_do(@context, @current_user, :manage_content) %>
-    <% cache([@context.cache_key, editable, 'all_context_modules', collection_cache_key(@modules)].join('/')) do %>
+    <% cache([@context.cache_key, editable, 'all_context_modules_4', collection_cache_key(@modules)].join('/')) do %>
       <% ContextModule.send(:preload_associations, @modules, :content_tags => :content) %>
       <% @modules.each do |m| %>
         <%= render :partial => 'context_modules/context_module', :object => m, :locals => {:editable => editable } %>
