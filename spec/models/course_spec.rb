@@ -702,7 +702,6 @@ describe Course, "score_to_grade" do
     @course.score_to_grade(0).should eql("F")
     @course.score_to_grade(-100).should eql("F")
   end
-  
 end
 
 describe Course, "gradebook_to_csv" do
@@ -715,7 +714,7 @@ describe Course, "gradebook_to_csv" do
     @course.recompute_student_scores
     @user.reload
     @course.reload
-    
+
     csv = @course.gradebook_to_csv
     csv.should_not be_nil
     rows = CSV.parse(csv)
@@ -797,6 +796,29 @@ describe Course, "gradebook_to_csv" do
      rows[5][0]].should == ["Aardvark, Aardvark", "Ned, Ned", "Zed, Zed", "Student, Test"]
   end
 
+  it "should include all section names in alphabetical order" do
+    course
+    sections = []
+    students = []
+    ['COMPSCI 123 LEC 001', 'COMPSCI 123 DIS 101', 'COMPSCI 123 DIS 102'].each do |section_name|
+      add_section(section_name)
+      sections << @course_section
+    end
+    3.times {|i| students << student_in_section(sections[0], :user => user(:name => "Student #{i}")) }
+
+    @course.enroll_user(students[0], 'StudentEnrollment', :section => sections[1], :enrollment_state => 'active', :allow_multiple_enrollments => true)
+    @course.enroll_user(students[2], 'StudentEnrollment', :section => sections[1], :enrollment_state => 'active', :allow_multiple_enrollments => true)
+    @course.enroll_user(students[2], 'StudentEnrollment', :section => sections[2], :enrollment_state => 'active', :allow_multiple_enrollments => true)
+
+    csv = @course.gradebook_to_csv
+    csv.should_not be_nil
+    rows = CSV.parse(csv)
+    rows.length.should equal(5)
+    rows[2][2].should == "COMPSCI 123 DIS 101 and COMPSCI 123 LEC 001"
+    rows[3][2].should == "COMPSCI 123 LEC 001"
+    rows[4][2].should == "COMPSCI 123 DIS 101, COMPSCI 123 DIS 102, and COMPSCI 123 LEC 001"
+  end
+
   it "should generate csv with final grade if enabled" do
     course_with_student(:active_all => true)
     @course.grading_standard_id = 0
@@ -809,7 +831,7 @@ describe Course, "gradebook_to_csv" do
     @course.recompute_student_scores
     @user.reload
     @course.reload
-    
+
     csv = @course.gradebook_to_csv
     csv.should_not be_nil
     rows = CSV.parse(csv)

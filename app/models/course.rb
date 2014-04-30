@@ -1426,8 +1426,8 @@ class Course < ActiveRecord::Base
     includes = [:user, :course_section]
     includes = {:user => {:pseudonyms => :account}, :course_section => []} if options[:include_sis_id]
     scope = options[:user] ? self.enrollments_visible_to(options[:user]) : self.student_enrollments
-    student_enrollments = scope.includes(includes).order_by_sortable_name # remove duplicate enrollments for students enrolled in multiple sections
-    student_enrollments = student_enrollments.all.uniq(&:user_id)
+    student_enrollments = scope.includes(includes).order_by_sortable_name
+    student_enrollments = student_enrollments.all
     student_enrollments.partition{|enrollment| enrollment.type != "StudentViewEnrollment"}.flatten
   end
   private :enrollments_for_csv
@@ -1435,8 +1435,14 @@ class Course < ActiveRecord::Base
   def gradebook_to_csv(options = {})
     student_enrollments = enrollments_for_csv(options)
 
-    calc = GradeCalculator.new(student_enrollments.map(&:user_id), self,
-                               :ignore_muted => false)
+    student_section_names = {}
+    student_enrollments.each do |enrollment|
+      student_section_names[enrollment.user_id] ||= []
+      student_section_names[enrollment.user_id] << (enrollment.course_section.display_name rescue nil)
+    end
+    student_enrollments = student_enrollments.uniq(&:user_id) # remove duplicate enrollments for students enrolled in multiple sections
+
+    calc = GradeCalculator.new(student_enrollments.map(&:user_id), self, :ignore_muted => false)
     grades = calc.compute_scores
 
     submissions = {}
@@ -1500,7 +1506,7 @@ class Course < ActiveRecord::Base
 
       student_enrollments.each do |student_enrollment|
         student = student_enrollment.user
-        student_section = (student_enrollment.course_section.display_name rescue nil) || ""
+        student_sections = student_section_names[student.id].sort.to_sentence
         student_submissions = assignments.map do |a|
           submission = submissions[[student.id, a.id]]
           submission.try(:score)
@@ -1514,7 +1520,7 @@ class Course < ActiveRecord::Base
           row << pseudonym.try(:unique_id)
         end
 
-        row << student_section
+        row << student_sections
         row.concat(student_submissions)
 
         (current_info, current_group_info),
