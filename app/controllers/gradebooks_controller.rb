@@ -158,8 +158,8 @@ class GradebooksController < ApplicationController
   end
 
   def show
-    # Check for redirect to gb2 or SRGB
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
+      return old_gradebook if ["csv", "json"].include?(request.format)
       if @context.feature_enabled?(:screenreader_gradebook)
         set_js_env
         case @current_user.preferred_gradebook_version(@context)

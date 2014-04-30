@@ -383,15 +383,49 @@ describe GradebooksController do
     end
 
     describe "csv" do
-      it "should not re-compute enrollment grades" do
+      before do
+        Course.any_instance.stubs(:feature_enabled?).with(:draft_state).returns(true)
+        Course.any_instance.stubs(:feature_enabled?).with(:outcome_gradebook).returns(false)
         course_with_teacher_logged_in(:active_all => true)
         student_in_course(:active_all => true)
         assignment1 = @course.assignments.create(:title => "Assignment 1")
         assignment2 = @course.assignments.create(:title => "Assignment 2")
-        Enrollment.expects(:recompute_final_score).never
-        get 'show', :course_id => @course.id, :init => 1, :assignments => 1, :format => 'csv'
-        response.should be_success
-        response.body.should match(/\AStudent,/)
+      end
+
+      shared_examples_for "working download" do
+        it "should successfully return data" do
+          get 'show', :course_id => @course.id, :init => 1, :assignments => 1, :format => 'csv'
+          response.should be_success
+          response.body.should match(/\AStudent,/)
+        end
+        it "should not recompute enrollment grades" do
+          Enrollment.expects(:recompute_final_score).never
+          get 'show', :course_id => @course.id, :init => 1, :assignments => 1, :format => 'csv'
+        end
+      end
+
+      context "with teacher that prefers gradebook2" do
+        before do
+          Course.any_instance.stubs(:feature_enabled?).with(:screenreader_gradebook).returns(true)
+          @user.preferences[:gradebook_version] = "2"
+        end
+        include_examples "working download"
+      end
+
+      context "with teacher that prefers screenreader gradebook" do
+        before do
+          Course.any_instance.stubs(:feature_enabled?).with(:screenreader_gradebook).returns(true)
+          @user.preferences[:gradebook_version] = "srgb"
+        end
+        include_examples "working download"
+      end
+
+      context "with teacher that prefers the old gradebook" do
+        before do
+          Course.any_instance.stubs(:feature_enabled?).with(:screenreader_gradebook).returns(false)
+          @user.preferences[:use_gradebook2] = false
+        end
+        include_examples "working download"
       end
     end
 
