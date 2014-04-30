@@ -432,7 +432,7 @@ class WikiPage < ActiveRecord::Base
     # force the url to be the same as the url_name given, since there are
     # likely other resources in the import that link to that url
     if hash[:url_name].present?
-      item.url = hash[:url_name]
+      item.url = hash[:url_name].to_url
       item.only_when_blank = true
     end
     if hash[:root_folder] && ['folder', 'FOLDER_TYPE'].member?(hash[:type])
