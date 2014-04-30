@@ -149,5 +149,15 @@ describe CourseProgress do
       # assert that assignment 2 doesn't count toward the total (2 -> 1)
       progress[:requirement_completed_count].should == 1
     end
+
+    it "only queries active ContentTags" do
+      progress1 = CourseProgress.new(@course, @user)
+      old_content_tag = progress1.current_content_tag
+      old_content_tag.destroy
+
+      # build a new progress object to refresh memoization caching
+      progress2 = CourseProgress.new(@course, @user)
+      progress2.current_content_tag.id.should_not == old_content_tag.id
+    end
   end
 end
