@@ -601,6 +601,7 @@ class Quizzes::QuizzesController < ApplicationController
 
   def submission_html
     @submission = get_submission
+    setup_attachments
     if @submission && @submission.completed?
       render layout: false
     else
