@@ -2,7 +2,7 @@ define [
   'ember'
   'ember-data'
   'i18n!quizzes'
-  'ic-ajax'
+  '../shared/ic-ajax-jsonapi'
 ], (Em, DS, I18n, ajax) ->
 
   {alias, equal, any} = Em.computed
@@ -75,7 +75,13 @@ define [
     # temporary until we ship the show page with quiz submission info in ember
     quizSubmissionHtmlURL: attr()
     quizSubmissionHTML: (->
-      promise = ajax(@get 'quizSubmissionHtmlURL').then (html) =>
+      promise = ajax(
+        url: @get 'quizSubmissionHtmlURL'
+        dataType: 'html'
+        contentType: 'text/html'
+        headers:
+          Accept: 'text/html'
+      ).then (html) =>
         @set 'didLoadQuizSubmissionHTML', true
         { html: html }
       PromiseObject.create promise: promise
