@@ -314,6 +314,19 @@ describe ContentMigration do
       page_to.body.should == body % [@copy_to.id, tag_to.id]
     end
 
+    it "should not escape links to wiki urls" do
+      page1 = @copy_from.wiki.wiki_pages.create!(:title => "keepthese%20percent signs", :body => "blah")
+
+      body = %{<p>Link to module item: <a href="/courses/%s/#{@copy_from.feature_enabled?(:draft_state) ? 'pages' : 'wiki'}/%s#header">some assignment</a></p>}
+      page2 = @copy_from.wiki.wiki_pages.create!(:title => "some page", :body => body % [@copy_from.id, page1.url])
+
+      run_course_copy
+
+      page1_to = @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(page1))
+      page2_to = @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(page2))
+      page2_to.body.should == body % [@copy_to.id, page1_to.url]
+    end
+
     context "unpublished items" do
       before :each do
         Account.default.enable_feature!(:draft_state)
