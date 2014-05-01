@@ -207,7 +207,7 @@ define([
           $this.html('<p>' + htmlEscape(I18n.t('errors.document_preview_processing', 'The document preview is currently being processed. Please try again later.')) + '</p>');
           $.ajaxJSON(opts.attachment_scribd_render_url, 'POST', {}, function() {}, function() {});
         } else {
-          $this.html('<p>' + htmlEscape(I18n.t('errors.cannot_view_document_inline', 'This document cannot be viewed inline.')) + '</p>');
+          $this.html('<p>' + htmlEscape(I18n.t('errors.cannot_view_document_in_canvas', 'This document cannot be displayed within Canvas.')) + '</p>');
         }
       }
     });
