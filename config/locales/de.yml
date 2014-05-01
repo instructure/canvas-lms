@@ -245,6 +245,8 @@ de:
     announcement_deleted_notice: "Ankündigung erfolgreich gelöscht"
     permission_denied_notice: "Sie können keine Ankündigungen für dieses Konto erstellen"
   account_reports: 
+    bucks: 
+      courses_only: "Nur Online-Kursabschnitte"
     ccp: 
       course: 
         check_box: "Für Kurs: %{course_id};"
@@ -260,6 +262,8 @@ de:
       section_text: "Für Abschnitt: %{section};"
       start_text: "Beginnen mit: %{start_at};"
       term_text: "Kursperiode: %{term_name};"
+    galen: 
+      no_term: "Eine bestimmte Kursperiode ist erforderlich. Wählen Sie eine Kursperiode aus."
     grades: 
       deleted: "Einschließlich gelöschter Objekte: wahr;"
     mississippi: 
@@ -499,6 +503,13 @@ de:
         zero: Gesendet
       title: Profilbilder
       unlock_link: freigeben
+    bucks_zero_activity_csv_description: 
+      account_reports: 
+        bucks: 
+          description: 
+            header: Beispiel
+          student_login: 
+            text: "Dieser Bericht zeigt alle für beliebige Kurse in einer bestimmten Kursperiode eingeschriebenen Studenten. Die erstellte CSV-Datei enthält eine Zeile für jeden eingeschriebenen Studenten, der den Kurs seit dem Datum nicht besucht hat. Durch den Online-Filter werden nur Einschreibungen aus Kursabschnitten eingefügt, deren Name \".E\" enthält."
     cannot_manage_account: "Sie dürfen keine Kontoeinstellungen verwalten"
     cannot_manage_quotas: "Sie dürfen keine Kontingenteinstellungen verwalten"
     ccp_zero_activity_csv_description: 
@@ -541,6 +552,13 @@ de:
       teachers_label: Dozenten
     course_add_failed_message: "Hinzufügen des Kurses fehlgeschlagen, bitte erneut versuchen"
     course_added_message: "%{course} erfolgreich hinzugefügt!"
+    course_enrollment_csv_description: 
+      account_reports: 
+        cedar_rapids: 
+          course_status: 
+            text: "Dieser Bericht zeigt den Status aller Kurse für eine angegebene Kursperiode. Die erstellte CSV-Datei enthält eine Zeile pro Kursabschnitt und zeigt den Kurs, den Kursstatus, die Kursperiode, das effektive Start- und Enddatum, die Anzahl der Einschreibungen, die Abteilung und das Konto."
+          description: 
+            header: Beispiel
     course_status_csv_description: 
       account_reports: 
         auburn: 
@@ -585,6 +603,14 @@ de:
         edison: 
           outcome: 
             text: "outcome_id:"
+    cv_non_graded_data_csv_description: 
+      account_reports: 
+        galen: 
+          cv: 
+            non_graded: 
+              text: "Dieser Bericht zeigt nicht benotete Einsendungen nach Kurs für Quiz, Befragungen und Diskussionen."
+          description: 
+            header: Beispiel
     cv_submission_data_csv_description: 
       account_reports: 
         galen: 
@@ -639,6 +665,13 @@ de:
       page_title: Konten
       title: "Konten I Verwalten"
     integer_required: "Ein ganzzahliger Wert ist erforderlich"
+    last_submission_activity_csv_description: 
+      account_reports: 
+        concorde: 
+          description: 
+            header: Beispiel
+          last_submission: 
+            text: "Dieser Bericht zeigt die letzte Aktivität der Studenten für Einsendungen."
     last_user_access_csv_description: 
       account_reports: 
         default: 
@@ -1104,20 +1137,6 @@ de:
             header: Beispiel
           student_login: 
             text: "Dieser Bericht zeigt alle für einen bestimmten Kurse oder für alle Kurse in einer bestimmten Kursperiode eingeschriebenen Studenten. Die erstellte CSC-Datei enthält eine Zeile pro eingeschriebenem Studenten."
-    student_login_csv_description: 
-      account_reports: 
-        bucks: 
-          description: 
-            header: Beispiel
-          student_login: 
-            text: "Dieser Bericht zeigt die Studenten, die sich seit einem bestimmten Datum nicht angemeldet haben."
-    student_login_csv_parameters: 
-      account_reports: 
-        bucks: 
-          login: 
-            check_box: "Benutzer einschließen, die sich nie angemeldet haben?"
-          parameters: 
-            note: "Dieser Bericht gibt nicht die letzte Aktivität in Canvas an, sondern den letzten Zeitpunkt, zu dem sich der Benutzer angemeldet hat."
     student_submissions_csv_description: 
       account_reports: 
         vilas: 
@@ -1131,7 +1150,7 @@ de:
           students_with_no_submissions: 
             description: 
               header: Beispiel
-            text: "Dies ist ein Bericht über alle für einen Kurs in einer bestimmten Kursperiode eingeschriebenen Studenten, die keine Aufgabe in dem für einen Kurs angegebenen Datumsbereich eingesendet haben. Der Bericht enthält eine Zeile für jeden eingeschriebenen Studenten, der diese Kriterien erfüllt. Der Datumsbereich darf maximal zwei Wochen betragen."
+            text: "Dies ist ein Bericht aller für einen Kurs in einer bestimmten Kursperiode eingeschriebenen Studenten, die keine Aufgabe in dem für einen Kurs angegebenen Datumsbereich eingesendet haben. Der Bericht enthält eine Zeile für jeden eingschriebenen Studenten, der diese Kriterien erfüllt. Der Datumsbereich darf maximal zwei Wochen betragen."
     students_with_no_submissions_csv_parameters: 
       account_reports: 
         default: 
@@ -1457,6 +1476,7 @@ de:
       upload_as_zip: "Bitte laden Sie die Dateien im ZIP-Format hoch"
     feed_entry_title: "Aufgabe: %{assignment}"
     feed_entry_title_with_course: "Aufgabe, %{course}: %{assignment}"
+    gpa_scale_explainer: "Was versteht man unter Benotung nach GPA-Skala?"
     group_assignment_must_have_group_set: "Wählen Sie eine für diese Aufgabe festgelegte Gruppe aus "
     imported_assignments_group: "Importierte Aufgaben"
     labels: 
@@ -1477,6 +1497,7 @@ de:
       external_tool: "Ein externes Tool"
       on_paper: "Als Papierdokument"
     titles: 
+      gpa_scale_explainer: "Was versteht man unter Benotung nach GPA-Skala?"
       grading_scheme_info: "Benotungssystem anzeigen/bearbeiten"
   assignment_details: 
     no_graded_submissions: "Keine benoteten Einsendungen"
@@ -1490,7 +1511,7 @@ de:
     no_one_scored_lower: "Niemand hat weniger Punkte erzielt als %{min}"
     scores_higher_than_the_average: "Punktzahlen oberhalb des Durchschnitts von %{average}"
     scores_lower_than_the_average: "Punktzahlen unterhalb des Durchschnitts von %{average}"
-    total_submitted: "Gesamtzahl der Einsendungen:"
+    total_graded_submissions: "Benotete Einsendungen gesamt:"
   assignment_group: 
     default_name: Aufgaben
     default_title: Aufgaben
@@ -1576,7 +1597,7 @@ de:
       edit: Bearbeiten
       group_weight: "%{groupWeight}% der Gesamtzahl"
       manage: Verwalten
-      move: "Verschieben nach&hellip;"
+      move: "Verschieben nach ..."
     assignment_group_selector: 
       assignment_group: Aufgabengruppe
       assignment_group_options: 
@@ -1591,7 +1612,7 @@ de:
       delete: Löschen
       edit: Bearbeiten
       module: Modul
-      move: "Verschieben nach&hellip;"
+      move: "Verschieben nach ..."
       multiple_modules: "Mehrere Module"
       no_points_possible: "Keine Punkte möglich"
       points_possible: "%{pointsPossible} Pkte."
@@ -1661,6 +1682,10 @@ de:
       assignment_groups_wrapper: "( in %{number_of_groups})"
       links: 
         add_assignment_group: "Aufgabengruppe hinzufügen"
+    available_date_description: 
+      available_until: "Verfügbar bis"
+      closed: Abgeschlossen
+      not_available_until: "Erst verfügbar am"
     buttons: 
       add_group: "Gruppe hinzufügen"
       delete_group: "Gruppe löschen"
@@ -1702,11 +1727,7 @@ de:
     create_new_crumb: "Neu erstellen"
     date_available_column_view: 
       available: Verfügbar
-      available_on: "Verfügbar am"
-      available_until: "Verfügbar bis"
-      closed: Geschlossen
       multiple_dates: "Mehrere Daten"
-      not_available_until: "Erst verfügbar am"
     date_due_column_view: 
       due: Fällig
       due_date: Fällig
@@ -1750,6 +1771,7 @@ de:
       buttons: 
         not_published: "Nicht veröffentlicht"
         published: Veröffentlicht
+      manage: Verwalten
       titles: 
         delete: Löschen
     edit_view: 
@@ -1789,13 +1811,22 @@ de:
           *Bitte achten Sie darauf, dass die Namen der eingesandten Dateien unverändert bleiben, so dass eine eindeutige Zuordnung möglich ist.*
       titles: 
         related_items: "Verwandte Elemente"
+    grade_gpa_scale_screenreader: "Note: %{grade}"
     grade_letter_grade_screenreader: "Note: %{grade}"
     grade_pass_fail_screenreader: "Note: %{grade}"
     grade_percent: "%{grade}%"
     grade_percent_screenreader: "Note: %{grade}%"
     grading_type_selector: 
       display_grade_as: "Noten anzeigen als"
+      gpa_scale_explainer: "Die Benotung nach GPA-Skala ist für Bildungseinrichtungen vorgesehen, die eine Skala von 4,0 (oder 5,0/6,0) für alle Aufgaben verwenden. Dieses Benotungssystem entspricht der Anzeige von Buchstabennoten, mit einigen wichtigen Ausnahmen:"
+      gpa_scale_input_explainer: "Die Punktzahl wird entsprechend der 4,0-Skala eingegeben. Beispiel: Wenn für eine Aufgabe 100 Punkte vorgesehen sind, entspricht 4,0 100 %, 3,0 87 % usw."
+      gpa_scale_letters_explainer: "Buchstabennoten können zusätzlich zu Zahlennoten verwendet werden."
+      gpa_scale_percentage_explainer: "Punkte können nicht direkt eingegeben werden. Sie können jedoch Prozentsätze eingeben. Beispiel: Wenn für eine Aufgabe 50 Punkte vorgesehen sind, können Sie nicht \"40\" eingeben, sondern 80 %."
+      gpa_scale_recommendation: "Canvas empfiehlt, Noten als Buchstabennoten anzuzeigen, es sei denn, Ihre Bildungseinrichtung verwenden die 4,0-Skala (oder 5,0/6,0) für die Benotung."
+      gpa_scale_scores_explainer: "Die zulässigen Punktzahlen sind im Benotungssystem vordefiniert."
+      gpa_scale_title: "\"Was versteht man unter Benotung nach GPA-Skala?`\""
       grading_type_options: 
+        gpa_scale: GPA-Skala
         letter_grade: Buchstaben-Note
         not_graded: Unbenotet
         pass_fail: Abgeschlossen/Unvollständig
@@ -1805,10 +1836,10 @@ de:
     group_category_selector: 
       grade_group_students_individually: "Noten für alle Studenten einzeln vergeben"
       group_assignment_header: Gruppenaufgabe
+      group_category_locked_explanation: "Studenten haben bereits Hausaufgaben für diese Aufgabe eingesendet. Die Gruppeneinstellungen können deshalb nicht geändert werden."
       group_category_options: "Neue Gruppenkategorie"
       group_set: Gruppensatz
       is_group_assignment: "Dies ist eine Gruppenaufgabe"
-      students_already_submitted_warning: "Vorherige individuelle Einreichungen werden nicht als Gruppeneinreichungen gezählt und werden in SpeedGrader falsch angezeigt."
     group_comment: 
       labels: 
         group_comment: "Kommentar an die gesamte Gruppe verschicken"
@@ -2161,9 +2192,12 @@ de:
         wizard: 
           details: "Bei der Erstellung von Aufgaben ist einiges mehr zu beachten als Abgabefristen und Punktevergabe. Um eine Beschreibung der Aufgabe einzugeben, Dateiuploads zu erlauben, die Art der Bewertung zu ändern oder viele andere Optionen festzulegen, klicken Sie entweder auf den Aufgabennamen oder das %{edit_icon}-symbol und wählen Sie anschließend \"weitere Optionen\"."
           group: 
+            screenreader_step1: "Aufgabengruppen erleichtern die Organisation der Aufgaben. Bestimmen Sie einen Namen für jede Gruppe. Wenn Sie sich entscheiden, die Gesamtnote nach Gruppen zu gewichten, können Sie außerdem einen Prozentsatz für jede Gruppe bestimmen. Klicken Sie auf \"Aufgabengruppe hinzufügen\", um eine Gruppe zu erstellen."
             step1: "Aufgabengruppen erleichtern die Organisation der Aufgaben. Bestimmen Sie einen Namen für jede Gruppe. Wenn Sie sich entscheiden, die Gesamtnote nach Gruppen zu gewichten (*wo?*), können Sie außerdem einen Prozentsatz für jede Gruppe bestimmen. Klicken Sie auf \"Aufgabengruppe hinzufügen\", um eine Gruppe zu erstellen."
           overview: "Auf dieser Seite können Sie auf der höchsten Ebene die Einstellungen für Ihren Kurs vornehmen. Sie können Aufgaben hinzufügen, Gruppen zuordnen und die Gruppen unterschiedlich gewichten. Als Vorgehensweise empfiehlt es sich, zunächst die grundlegende Struktur zu einzurichten und sich erst dann mit den Einzelheiten zu befassen. Gleichwohl stehen auch auf dieser Ebene eine Vielzahl an Optionen zur Verfügung."
           quizzes: "Ein Quiz ist eine spezielle Aufgabenart. Sie können ein Quiz erstellen oder importieren, indem Sie in der linken Seitenleiste auf \"Quiz\" klicken."
+          screenreader_details: "Bei der Erstellung von Aufgaben ist einiges mehr zu beachten als Abgabefristen und Punktevergabe. Um eine Beschreibung der Aufgabe einzugeben, Dateiuploads zu erlauben, die Art der Bewertung zu ändern oder viele andere Optionen festzulegen, klicken Sie entweder auf den Aufgabennamen oder das Symbol zum Bearbeiten, und wählen Sie anschließend \"Weitere Optionen\" aus."
+          screenreader_step1: "Aufgaben werden immer in Gruppen organisiert. Um eine Aufgabe hinzuzufügen, müssen Sie zunächst entscheiden, zu welcher Gruppe diese Aufgabe hinzugefügt werden soll. Wählen Sie die entsprechende Gruppe aus, und klicken Sie auf \"Aufgabe hinzufügen\", oder klicken Sie auf das Symbol zum Hinzufügen, um eine neue Aufgabe für eine Gruppe zu erstellen.."
           step1: "Jede Aufgabe wird einer Gruppe zugeordnet. Um eine Aufgabe hinzuzufügen, müssen Sie zunächst entscheiden, welcher Gruppe diese Aufgabe zugeordnet werden soll. Wählen Sie die entsprechende Gruppe aus und klicken Sie auf \"Aufgabe zuordnen\" oder klicken Sie auf das %{add_icon}-symbol."
           step2: "Sehr gut! Bitte geben Sie nun Ihre Informationen ein. Sie können den Titel der Aufgabe, die Abgabefrist und die maximale Punktzahl definieren. Wenn Sie weitere Einstellungen vornehmen wollen, können Sie dies nach der Erstellung der Aufgabe tun."
           step3: "Fertig! Die Aufgabe wird nun der Gruppe hinzugefügt! Wenn Sie den Mauszeiger über die Aufgabe bewegen, werden mehrere Optionen angezeigt. Diese Optionen stehen zur Verfügung:"
@@ -2172,6 +2206,9 @@ de:
         create_assignment_group: "Neue Aufgabengruppe erstellen"
         create_or_import_quiz: "Quiz erstellen/importieren"
         edit_assignment_in_detail: "Aufgabendetails bearbeiten"
+        screenreader_show_me_add_assignment: "Schaltfläche zum Hinzufügen von Aufgaben zeigen"
+        screenreader_show_me_add_assignment_group: "Schaltfläche zum Hinzufügen von Aufgabengruppen zeigen"
+        screenreader_show_me_weight_final_grade: "Kontrollkästchen zum Gewichten der Gesamtnote zeigen"
         show_me_where: Wo?
       subtitles: 
         edit_assignment_in_detail: "(Uploads erlauben, Beschreibung bearbeiten usw.)"
@@ -3102,21 +3139,27 @@ de:
     upload_timeout_error: "Beim Hochladen der Datei ist eine Zeitüberschreitung aufgetreten"
   content_migrations: 
     angel_exporter: 
+      content: Inhalt
       options: Optionen
     bad_migration_type: "Ungültiger Migrationstyp"
     blackboard_export: 
+      content: Inhalt
       options: Optionen
     canvas_export: 
+      content: Inhalt
       options: Optionen
     common_cartridge: 
+      content: Inhalt
       options: Optionen
     content_migration: Inhaltsmigration
     content_migration_issue: 
       error_report: Fehlerbericht
     copy_course: 
+      content: Inhalt
       options: Optionen
     course_list_error: "Kurse konnten nicht abgerufen werden. Sind Sie mit dem Internet verbunden?"
     d2_l_export: 
+      content: Inhalt
       options: Optionen
     file_required: "Sie müssen eine Datei auswählen, aus der Inhalte importiert werden können"
     file_too_large: "Die Migration darf %{file_size} nicht übersteigen"
@@ -3132,6 +3175,7 @@ de:
       import_from_label: Inhaltstyp
       import_migration: Importieren
     moodle_zip: 
+      content: Inhalt
       options: Optionen
     must_upload_file: "Hochladen einer Datei oder URL erforderlich"
     no_content_selected: "Sie haben keine Inhalte zum Importieren ausgewählt."
@@ -3207,7 +3251,8 @@ de:
         question_bank_title: "Neuer Name für Fragenpool"
         select_question_bank: "Fragenpool auswählen"
       select_content_checkbox: 
-        select_migration_label: "Migrationsinhalt auswählen"
+        select_all_content: "Gesamter Inhalt"
+        select_specific_content: "Bestimmten Inhalt auswählen"
     upload_warning: "Beim Verlassen dieser Seite wird der Hochladevorgang abgebrochen."
     uploading: "Wird hochgeladen..."
     web_ct: 
@@ -3857,7 +3902,7 @@ de:
     no_course: "Kein Kurs"
     select_course: "Kurs auswählen"
   conversation_message: 
-    subject: "Private Nachricht, %{timestamp}"
+    subject_specified: "Private Nachricht: %{subject}"
     users_added: 
       one: "%{user} wurde von %{current_user} zur Konversation hinzugefügt"
       other: "%{list_of_users} wurden von %{current_user} zur Konversation hinzugefügt"
@@ -3952,7 +3997,6 @@ de:
       inbox_view: ANSICHT
       inbox_views: 
         archived_messages: Archiviert
-        discussion_replies: Diskussionsantworten
         inbox: Posteingang
         sent_messages: Gesendet
         starred_messages: "Mit Stern markiert"
@@ -3990,6 +4034,7 @@ de:
       forward: Weiterleiten
       help: Hilfe
       inbox: Posteingang
+      mark_as_read: "Als gelesen markieren"
       mark_as_unread: "Als ungelesen markieren"
       more_options: "Weitere Optionen"
       reply: Antwort
@@ -4181,6 +4226,7 @@ de:
     default_short_name: Kurs-101
     errors: 
       sis_in_use: "Die SIS-ID \"%{sis_id}\" wird bereits verwendet"
+    failed_import_media_objects: "Fehler beim Import von Medienobjekten"
     file_copy_error: "Die Datei \"%{name}\" konnte nicht kopiert werden"
     grade_export_types: 
       instructure_csv: "Instructure-formatierte CSV-datei"
@@ -4414,14 +4460,16 @@ de:
     copy: 
       buttons: 
         create_course: "Kurs erstellen"
-      choose_content: "Elemente zum Kopieren auswählen"
       conclude_at: Enddatum
+      content_label: Inhalt
       course_code: Kurscode
       details: "Geben Sie folgende Daten ein, um mit der Erstellung dieses Kurses zu beginnen."
       enrollment_term_id: Kursperiode
       headings: 
         copy_course: "Kopieren %{course}"
       name: Name
+      select_all_content: "Gesamter Inhalt"
+      select_specific_content: "Bestimmten Inhalt auswählen"
       start_at: Startdatum
       titles: 
         copy_course: "Kurs kopieren"
@@ -4646,6 +4694,7 @@ de:
         pending_acceptance_of_invitation: Ausstehend
       roster_users: 
         canvas_user_id: Canvas-Benutzer-ID
+        last_activity: "Letzte Aktivität"
         login_name_or_sis_id: Zugangskennung/SID-ID
         name: Name
         no_people_found: "Keine Personen gefunden"
@@ -5292,9 +5341,10 @@ de:
       close_for_comments: "Für Kommentare schließen"
       delete: Löschen
       due: Fällig
-      graded_discussion: "Benotete Diskussion"
+      graded_discussion: "Benotete Diskussion:"
       last_post_date: "Letzter Beitrag %{display_last_reply_at}"
       manage: Verwalten
+      move: "Verschieben nach&hellip;"
       no_due_date: "Kein Abgabetermin"
       open_to_comments: "Für Kommentare öffnen"
       pin: Anheften
@@ -5304,8 +5354,8 @@ de:
     discussion_feed_title: "%{title}-diskussions-feed"
     discussion_list: 
       no_pinned_discussions: "Sie verfügen derzeit nicht über angeheftete Diskussionen"
-      pinned_instructions: "Ziehen Sie eine Diskussion hierher, um Sie oben auf der Diskussionsseite der Studenten anzuheften."
-      there_are_no_discussions_show: "Es sind keine Diskussionen zum Anzeigen vorhanden."
+      pinned_instructions: "Um eine Diskussion oben auf der Seite anzuheften, ziehen Sie die Diskussion hierher, oder wählen Sie \"Anheften\" aus dem Menü mit den Diskussionseinstellungen aus."
+      there_are_no_discussions_show: "Es sind keine Diskussionen zum Anzeigen in diesem Kursabschnitt vorhanden."
     discussions_settings_view: 
       allow_student_discussion_editing: "Eigene Beiträge bearbeiten und löschen"
       allow_student_topics: "Diskussionsthemen erstellen"
@@ -5379,12 +5429,12 @@ de:
     new_and_total_badge: 
       reply_count_tooltip: 
         one: "1 Antwort"
-        other: "%{count} Antworten"
-        zero: "Keine Antworten"
+        other: "%{count} Antworten."
+        zero: "Keine Antworten."
       unread_count_tooltip: 
-        one: "%{count} ungelesene Antworten"
-        other: "%{count} ungelesene Antworten"
-        zero: "Keine ungelesenen Antworten"
+        one: "%{count} ungelesene Antworten."
+        other: "%{count} ungelesene Antworten."
+        zero: "Keine ungelesenen Antworten."
     page_nav: 
       Page: Seite
       current_page: Aktuell
@@ -5392,9 +5442,9 @@ de:
       last_page: Letzte
     points_possible_number: "Der Wert für die möglichen Punkte muss eine Zahl sein"
     reply_count_tooltip: 
-      one: "1 Antwort"
-      other: "%{count} Antworten"
-      zero: "Keine Antworten"
+      one: "1 Antwort."
+      other: "%{count} Antworten."
+      zero: "Keine Antworten."
     show: 
       add_rubric: "Rubrik hinzufügen"
       announcement_closed: "Für diese Ankündigung können keine Kommentare abgegeben werden"
@@ -5453,8 +5503,8 @@ de:
       topic_podcast_feed: "Podcast-feed des Themas"
     topic_deleted_notice: "%{topic_title} erfolgreich gelöscht"
     unread_count_tooltip: 
-      one: "1 ungelesene Antwort"
-      other: "%{count} ungelesene Antworten"
+      one: "1 ungelesene Antwort."
+      other: "%{count} ungelesene Antworten."
       zero: "Keine ungelesenen Antworten"
     user_settings_view: 
       manually_mark_as_read: "Beiträge manuell als gelesen kennzeichnen"
@@ -5485,7 +5535,6 @@ de:
       show_more: "Weitere anzeigen"
     hide_due_dates: "Abgabetermine ausblenden"
     initial_post_required_to_subscribe: "Sie müssen eine Anwort veröffentlichen, bevor Sie sich anmelden"
-    lock: Sperren
     mark_as_read: "Als gelesen markieren"
     mark_as_unread: "Als ungelesen markieren"
     no_content: "Keine Inhalte vorhanden"
@@ -5498,7 +5547,6 @@ de:
     ordered_by_recent_activity: "Sortiert nach aktuellen Aktivitäten"
     participant: 
       anonymous_user: Anonym
-    pin: Anheften
     pinned_discussions: "Angeheftete Diskussionen"
     reply: 
       error_saving_reply: "*Ein Fehler ist aufgetreten*, bitte stellen Sie Ihre Antwort später noch einmal ein"
@@ -5521,12 +5569,10 @@ de:
     subscribe: "Für dieses Thema anmelden"
     subscribed: Angemeldet
     subscribed_hint: "Sie haben sich für dieses Thema angemeldet. Klicken Sie, um sich abzumelden"
-    toggle_message: "Sichtbarkeit der Diskussion ein/aus"
+    toggle_message: "Sichtbarkeit des Kursabschnitts ein/aus"
     uknown_author: "Unbekannter Autor"
     unknown: Unbekannt
     unknown_author: "Unbekannter Autor"
-    unlock: "Sperre aufheben"
-    unpin: Lösen
     unsubscribe: "Für dieses Thema abmelden"
     unsubscribed: Abgemeldet
     unsubscribed_hint: "Sie haben sich nicht für dieses Thema angemeldet. Klicken Sie, um sich anzumelden."
@@ -5610,7 +5656,7 @@ de:
     titles: 
       font_size: "Schriftgröße, zum Auswählen Nach-Unten-Taste drücken"
       formatting: "Formatierung, zum Auswählen Nach-Unten-Taste drücken"
-      rte_help: "Rich-Text-Bereich. Drücken Sie ALT+F10, um die Symbolleiste anzuzeigen. Drücken Sie ALT+0, um die Hilfe anzuzeigen."
+      rte_help: "Rich-Text-Bereich. Drücken Sie ALT+F10, um die Symbolleiste anzuzeigen. Drücken Sie ALT+F8, um die Hilfe anzuzeigen."
   email: 
     default_from_name: "Instructure Canvas"
   enrollment: 
@@ -5922,6 +5968,7 @@ de:
     registration_incomplete: "Sie müssen Ihre E-mailadresse bestätigen, bevor Sie diese Seite aufrufen können"
     required: Erforderlich
     sis_id_in_use: "Die SIS-ID \"%{sis_id}\" wird bereits verwendet"
+    unsaved_changes: "Sie haben nicht gespeicherte Änderungen."
   external_content: 
     cancel: 
       canceling: "Wird abgebrochen..."
@@ -6125,8 +6172,8 @@ de:
         Bei Deaktivierung dieser Funktion werden ALLE im Kurs vorhandenen Objekte veröffentlicht. Bevor Sie fortfahren,
         stellen Sie sicher, dass alle Entwurfsinhalte bereit für die Veröffentlichung sind und allen Benutzern des Kurses zur Verfügung stehen.
     google_docs_domain_restriction: "Google Docs Domain-Beschränkung"
+    individual_gradebook: "Ansicht für einzelne Notenbücher"
     outcome_gradebook: "Notenbuch für Ergebnisse"
-    screenreader_gradebook: "Screenreader Gradebook"
     student_outcome_gradebook: "Notenbuch für Ergebnisse der Studenten"
   file_browser_view: 
     folder_tree_instructions: "Verwenden Sie die Nach-oben- und die Nach-unten-Tasten, um durch die Baumstruktur zu navigieren. Drücken Sie die Nach-rechts-Taste, um Ordner zu erweitern, die Nach-links-Taste, um sie zu minimieren, und die Eingabetaste, um ein Bild auszuwählen."
@@ -6509,6 +6556,7 @@ de:
     no_assignments_have_points_warning: "Die Punktzahl kann erst berechnet werden, wenn für die Aufgabe Punkte vergeben werden können"
     notes: Anmerkungen
     outcome_gradebook: 
+      export_report: "Bericht exportieren"
       toggle_sidebar: "Seitenleiste ein/aus"
     outcome_popover: 
       mastery_set_at: "Leistungsziel festgelegt auf"
@@ -6628,6 +6676,7 @@ de:
     leaving_id_will_match_better_can_add_new_assignment: "Für eine zuverlässige Zuordnung empfiehlt es sich, die ID unverändert zu lassen (in diesem Fall Abschnitt \"(581)\"). Sie können auch zwischendurch neue Aufgaben hinzufügen."
     new_assignment_example: "Eine neue Aufgabe"
     optional_ignored: "Optional, ignoriert."
+    screenreader_csv_explainer: "Welchen Inhalt muss meine CSV-Datei haben? Die von Ihnen hochgeladene Datei muss die folgenden Spalten enthalten: \"Student\", \"ID\" und \"Vorhandene Aufgabe (#)\". In der Spalte \"Student\" müssen die Namen der einzelnen Studenten angegeben sein, im Format Nachname, Vorname. Beispiel: \"Schmitt, Thomas\". Die Spalte für vorhandene Aufgaben muss den Namen der Aufgabe gefolgt von der Aufgaben-ID in Klammern enthalten. Beispiel, \"Arbeitsblatt Kapitel eins (201)\". Wenn Sie SIS verwenden, fügen Sie die folgenden Spalten ein: \"SIS-Benutzer-ID\" und \"SIS-Anmelde- ID\". Wenn Sie eine neue Aufgabe erstellen möchten, fügen Sie eine Spalte mit dem Namen der Aufgabe ein. Beispiel: \"Arbeitsblatt für Derivate\". Die folgenden Spalten sind optional: \"Kursabschnitt\", \"Aktuelle Punktzahl\", \"Gesamtpunktzahl\"."
     titles: 
       upload_form: "Wählen Sie eine CSV-Datei zum Hochladen aus"
     what_should_csv_look_like: "Wie sollte diese CSV-Datei aussehen?"
@@ -6781,7 +6830,7 @@ de:
         send_comment: "Kommentar an den Studenten verschicken"
         sort_columns: "Notenbuchspalten sortieren"
         sort_rows: "Notenbuchzeilen sortieren"
-        total_submitted: "Gesamtzahl der Einsendungen"
+        total_grade_subs: "Gesamtzahl der benoteten Einsendungen"
       links: 
         add_assignments: "Aufgaben zum Kurs hinzufügen"
         add_students: "Studenten zum Kurs hinzufügen"
@@ -6940,7 +6989,6 @@ de:
       titles: 
         download_file: "Diese Datei herunterladen"
         not_newest: "Angezeigte Einsendung über Dropdownliste auswählen"
-        on_time: "Fristgerecht eingesandt"
         preview_file: "Diese Datei als Vorschau anzeigen"
         speedgrader_options: Speedgrader-einstellungen
       tooltips: 
@@ -7062,6 +7110,7 @@ de:
     name_too_long: "Geben Sie einen kürzeren Namen für die Kategorie ein"
     name_unavailable: "%{name} wird bereits verwendet."
     self_signup_for_courses: "Die Selbstregistrierung kann nur für Kursgruppen oder -Communitys aktiviert werden"
+  group_category_locked: "Die Gruppenkategorie kann nicht geändert werden, da bereits Einsendungen durch Studenten für diese Aufgabe vorliegen"
   group_membership: 
     errors: 
       group_full: "Die Gruppe ist voll."
@@ -7432,6 +7481,7 @@ de:
     invalid_file_size: "Bilddatei zu groß (Max. %{max} Byte, tatsächliche Größe %{actual})"
     invalid_file_type: "Ungültiger Dateityp %{type}. Zu den zulässigen Typen gehören: %{type_list}"
     not_an_image: "Ausgewählte Datei ist kein Bild"
+  individual_gradebook_description: "Die Ansicht für einzelne Notenbücher ist eine leicht zugängliche  Notenbuchansicht."
   info: 
     notices: 
       error_reported: "Vielen Dank für Ihre Hilfe!  Wir werden Ihre Informationen schnellstmöglich bearbeiten"
@@ -7716,7 +7766,7 @@ de:
     de: Deutsch
     en: Englisch
   logged_out_user: "Abgemeldeter Benutzer %{user_counter}"
-  m2c_file_description: "Moodle 1.9 ZIP-Datei"
+  m2c_file_description: "Moodle 1.9/2x"
   m2c_name: "Moodle Importer"
   manage_avatars: 
     errors: 
@@ -7751,6 +7801,8 @@ de:
       save_failed: "Das Speichern ist offenbar fehlgeschlagen.  Bitte schließen Sie dieses Popup-fenster und versuchen Sie es erneut."
       save_failed_try_again: "Der Eintrag konnte nicht gespeichert werden.  Bitte versuchen Sie es erneut."
       upload_failed: "Hochladevorgang ist fehlgeschlagen  bei folgendem Fehler:"
+    file_size_error: "Größe von %{file} übersteigt die maximal %{max} zulässige Dateigröße."
+    file_type_error: "%{file} ist keine zulässige %{type}-Datei."
     links: 
       minimize_embedded_kaltura_content: "Eingebettete Inhalte minimieren"
     loading: "Medien werden geladen..."
@@ -9959,6 +10011,10 @@ de:
     invalid_file: "Ungültige Resultatsgruppen-datei"
   outcome_groups_api: 
     account_group_description: "Ergebnisgruppe auf Kontoebene"
+  outcome_path_mastery_points: "%{path} Punkte für Leistungsziel erreicht"
+  outcome_path_result: "%{path}-Ergebnis"
+  outcome_results: 
+    outcomes_filename: Ergebnisse
   outcomes: 
     account_standards: Kontostandards
     account_standards_description: "Links sehen Sie die Standards, die Ihre Institution zur Verwendung in Ihren Kursen erstellt hat."
@@ -10324,6 +10380,7 @@ de:
         domain_settings: Domaineinstellungen
         misc_settings: "Sonst. Einstellungen"
         ui_conf_ids: "UI Conf IDs"
+      hide_rte_button_note: "(noch für Einsendungen für Hausaufgaben für Konversationen/SpeedGrader/Medienaufzeichnungen vorhanden)"
       hints: 
         domain: "Für serverbasierte Benutzerkonten verwenden Sie \"www.kaltura.com\""
         resource_domain: "Für serverbasierte Benutzerkonten verwenden Sie \"cdn.kaltura.com\""
@@ -10333,8 +10390,9 @@ de:
       labels: 
         cache_play_list_seconds: "Sekunden zum Zwischenspeichern der Wiedergabeliste-URL"
         do_analytics: "Analyse-Events senden"
-        do_flash_var_test: "Experimentelle Flash-Einstellungen aktivieren"
         domain: Domain
+        hide_rte_button: "Videosymbol in Rich Content Editor ausblenden"
+        js_uploader: "HTML5-Uploader verwenden (zugänglich) "
         kaltura_sis: "SIS-Daten an Kaltura weitergeben"
         kcw_ui_conf: "KCW UI Conf ID"
         partner_id: Partner-ID
@@ -10344,6 +10402,7 @@ de:
         secret_key: "Administrator Secret"
         subpartner_id: Subpartner-ID
         upload_ui_conf: "Uploader UI Conf ID"
+        use_alt_record_widget: "Alternatives Flash-Aufzeichnungswidget verwenden"
         user_secret_key: "User Secret"
       ui_conf_ids: "Für Kaltura-gehostete Kunden können Sie diese IDs bei Kaltura erfahren. Bei selbst gehosteten Instanzen finden Sie diese Werte in der Tabelle ui_confs."
     linked_in: 
@@ -10480,13 +10539,12 @@ de:
       titles: 
         delete_this_token: "Dieses Token löschen"
     buttons: 
-      add_file: "Datei hinzufügen"
-      adding_file: "Datei wird hinzugefügt..."
       generate_token: "Token erstellen"
       generating_token: "Token wird erstellt..."
       regenerate_token: "Token erneut erstellen"
       regenerating_token: "Token wird erneut erstellt..."
-      select_image: "Bild auswählen"
+      save: Speichern
+      select_profile_picture: "Profilbild auswählen"
       selecting_image: "Bild wird ausgewählt..."
     communication: 
       confirm_email_instructions: "Bevor Sie Benachrichtigungen empfangen können, müssen Sie Ihre E-mailadresse (%{email}) bestätigen, indem Sie in der Ihnen zugesandten E-mail auf den Aktivierungslink klicken. Falls Sie diese E-mail nicht erhalten haben, *Klicken sie hier zum Neuversenden* und überprüfen Sie Ihren Spamordner."
@@ -10509,7 +10567,6 @@ de:
       default_email_option: "[E-mail auswählen]"
       new_email_option: "Neue E-mailadresse"
     errors: 
-      adding_file_failed: "Hinzufügen von Datei fehlgeschlagen"
       confirmation_failed: "Bestätigung fehlgeschlagen. Bitte versuchen Sie es nochmal."
       generating_token_failed: "Erstellen des Token fehlgeschlagen"
       invalid_old_passowrd: "Ungültiges veraltetes Passwort für die Zugangskennung %{pseudonym}"
@@ -10681,7 +10738,6 @@ de:
       contact_not_confirmed: "Dieser Kontakt wurde nicht bestätigt. Für Details auf die Adresse klicken"
       email_not_confirmed: "Diese E-mail wurde nicht bestätigt. Für Details auf die Adresse klicken"
       register_communication: "Kontaktmöglichkeit registrieren"
-      select_profile_pic: "Profilbild auswählen"
       unconfirmed_click_to_confirm: "Nicht bestätigt. zum Bestätigen jetzt klicken"
     token_never_expires: nie
     twitter_select: 
@@ -10737,13 +10793,13 @@ de:
     you_have_no_services: "Sie haben keine Dienste angemeldet; auf der *Einstellungen*-seite können Sie dies tun."
   profiles: 
     avatar_dialog: 
-      butons: 
-        add_picture_file: "Datei hinzufügen"
-      headers: 
-        loading_images: "Bilder werden geladen..."
-      links: 
-        upload_new_image: "Neues Bild hochladen"
-      profile_pictures: "Wählen Sie das Bild aus, das in Ihrem Profil verwendet werden soll, oder laden Sie ein neues Bild hoch:"
+      from_gravatar: "Von Gravatar"
+      take_a_picture: "Foto machen"
+      upload_a_picture: "Bild hochladen"
+    gravatar_view: 
+      button: 
+        preview: Vorschau
+      enter_gravatar_email_below: "Geben Sie unten Ihre E-Mail-Adresse für *Gravatar* ein"
     notification_preferences: 
       captions: 
         notification_preferences: "%{name}-Benachrichtigungs-Events und -einstellungen"
@@ -10752,6 +10808,12 @@ de:
         ok: OK
         privacy_notice: "Hinweis: Manche Benachrichtigungen enthalten möglicherweise vertrauliche Informationen. Wenn Sie auswählen, dass Sie Benachrichtigungen an eine andere Adresse als die von Ihrer Institution bereitgestellte Adresse erhalten möchten, können vertrauliche Informationen zu Canvas-Kursen und Gruppen an Empfänger außerhalb des Institutionssystems gesendet werden."
         privacy_notice_title: Datenschutzhinweis
+    take_picture_view: 
+      retry: Wiederholen
+      take_picture: "Foto machen"
+    upload_file_view: 
+      choose_a_picture: "Bild auswählen"
+      crop_instructions: "Um das Bild auszuschneiden, ziehen Sie den ausgewählten Bereich, und klicken Sie dann unten auf die Schaltfläche \"Speichern\"."
   pseudonym: 
     errors: 
       bad_credentials: "Benutzername oder Passwort ungültig"
@@ -11009,7 +11071,7 @@ de:
     regrade: 
       give_everyone_full_credit: "Allen die volle Punktzahl für diese Frage geben."
       no_scores_reduced: "Punkte für korrigierte und zuvor richtig beantwortete Fragen vergeben (*es werden keine Punktzahlen reduziert*)"
-      regrade_disabled: "Für diese Frage ist keine Neubenotung zulässig, da die Antwort nach Abschluss einer Einsendung durch einen Studenten entfernt wurde."
+      regrade_disabled: "Für diese Frage ist keine Neubenotung zulässig, da die Antwort nach Abschluss einer Einsendung durch einen Studenten entfernt oder der Fragetyp geändert wurde."
       regrade_options: "Optionen für die Neubenotung *(für Studenten, die diese Frage bereits beantwortet haben):*"
       some_scores_reduced: "Punkte nur für richtige Anwort vergeben (*die Punkte mancher Studenten werden möglicherweise reduziert*)"
       update_question_without_regrading: "Frage aktualisieren, ohne eine Neubenotung durchzuführen"
@@ -11020,9 +11082,6 @@ de:
       generated_at_date_time: "Generiert %{dateAndTime}"
       generating_report_name: "%{report_name} wird generiert..."
       item_analysis_not_available: "Elementanalyse steht für Befragungen nicht zur Verfügung"
-  quiz_submissions: 
-    show: 
-      score_out_of: "Sie erhielten %{score} von insgesamt %{points_possible}"
   quizzes: 
     after_last_attempt: "Nach dem letzten Versuch"
     alerts: 
@@ -11231,8 +11290,26 @@ de:
       one: "1 Frage"
       other: "%{count} Fragen"
     question_limit_reached: "Sie haben die maximale Fragenanzahl (%{count}/%{limit}) für ein Quiz erreicht.\\n\\n Notfalls können sie ihre Materialien auf mehrere Quizzes verteilen."
+    quiz: 
+      current_filter: "Aktueller Filter"
+      default_question_input: "[ Auswählen ]"
+      default_text_only_question_name: Abstandshalter
+      default_title: "Unbenanntes Quiz"
+      errors: 
+        invalid_hide_results: "Ausblenden von Ergebnissen ist nicht gültig"
+        invalid_ip_filter: "IP-Filter ist nicht gültig"
+        invalid_quiz_type: "Quiztyp ist nicht gültig"
+      question_name_counter: "Frage %{question_number}"
+      types: 
+        quiz: Quiz
+        survey: Befragung
     quiz_attempts_length_error: "Die Anzahl der Quiz-Versuche ist auf 3 Stellen beschränkt. Wenn Sie Ihren Studenten eine unbegrenzte Anzahl von Versuchen zur Verfügung stellen möchten, dürfen Sie das Kontrollkästchen \"Mehrere Versuche zulassen\" auf der linken Seite nicht aktivieren."
     quiz_attempts_nan_error: "Quiz-Versuche können nur als Zahl angegeben werden"
+    quiz_group: 
+      errors: 
+        no_bank: "Der Fragenpool für die Quizgruppe %{group_name} konnte nicht gefunden werden"
+        no_permissions: "Der Benutzer verfügte nicht über die erforderliche Berechtigung zum Referenzieren des Fragenpools in der Quizgruppe %{group_name}"
+      question_group: Fragengruppe
     quiz_item_group_view: 
       no_quizzes: "Es wurden keine Quiz gefunden"
       no_surveys: "Es wurden keine Befragungen gefunden"
@@ -11243,6 +11320,14 @@ de:
       settings: Einstellungen
       title_delete: "Quiz löschen"
       title_edit: "Quiz bearbeiten"
+    quiz_question: 
+      defaults: 
+        question_name: Frage
+    quiz_statistics: 
+      statistics_filename: "%{quiz_title} %{quiz_type} %{report_type}-Bericht"
+      types: 
+        item_analysis: Elementanalyse
+        student_analysis: Studentenanalyse
     quiz_submission: 
       titles: 
         this_is_an_external_element: "Dies ist ein externes Element, kein Text und könnte seit der letzten Einsendung des Studenten geändert worden sein"
@@ -11253,6 +11338,8 @@ de:
         invalid_submissions: "Diese Quiz-Einsendung konnte nicht als Ihre verifiziert werden. Versuchen Sie es erneut."
         late_quiz: "Sie haben dieses Quiz zu spät eingesandt, daher wurden Ihre Antworten möglicherweise nicht gespeichert."
         protected_quiz: "Dieses Quiz ist geschützt und nur für bestimmte IP-Adressen verfügbar.  Der Computer, den Sie gerade verwenden, scheint keine IP-Adresse zu besitzen, die zur Teilnahme an diesem Quiz berechtigt."
+      show: 
+        score_out_of: "Sie haben %{score} von insgesamt %{points_possible} erhalten"
       still_zipping: "ZIP-Datei wird noch erstellt ..."
     quizzes: 
       access_code: 
@@ -11295,6 +11382,7 @@ de:
         not_yet_graded: "Noch nicht benotet"
         original_score: "Ursprüngliche Punktzahl:"
         points_possible: "%{points_possible} Pkte."
+        question_number: "Frage %{question_number}"
         regraded_score: "Punktzahl nach Neubenotung:"
         show_ansers_for_variable: "Antworten für %{variable} zeigen"
         skip_question_text: "Direkt mit Fragetext fortfahren."
@@ -12045,34 +12133,9 @@ de:
     : Wahr
     ungraded_survey: "Unbenotete Befragung"
     warnings: 
+      draft_state_unsaved_changes: "*Sie haben die Fragen in diesem Quiz geändert.* Diese Änderungen werden Studenten erst angezeigt, wenn Sie das Quiz speichern."
       unpublished_changes: "*Sie haben nicht veröffentlichte Änderungen an diesem Quiz vorgenommen.* Diese Änderungen werden den Studenten erst angezeigt, wenn Sie das Quiz veröffentlichen oder neu veröffentlichen."
       unpublished_quiz: "*Dieses Quiz wurde nicht veröffentlicht* Das Quiz ist bis zur Veröffentlichung nur für Dozenten sichtbar."
-  quizzes/quiz: 
-    current_filter: "Aktueller Filter"
-    default_question_input: "[ Auswählen ]"
-    default_text_only_question_name: Abstandshalter
-    default_title: "Unbenanntes Quiz"
-    errors: 
-      invalid_hide_results: "Ausblenden von Ergebnissen ist nicht gültig"
-      invalid_ip_filter: "IP-Filter ist nicht gültig"
-      invalid_quiz_type: "Quiztyp ist nicht gültig"
-    question_name_counter: "Frage %{question_number}"
-    types: 
-      quiz: Quiz
-      survey: Befragung
-  quizzes/quiz_group: 
-    errors: 
-      no_bank: "Der Fragenpool für die Quizgruppe %{group_name} konnte nicht gefunden werden"
-      no_permissions: "Der Benutzer verfügte nicht über die nötigte Berechtigung, um den Fragenpool in der Quizgruppe %{group_name} zu referenzieren"
-    question_group: Fragengruppe
-  quizzes/quiz_question: 
-    defaults: 
-      question_name: Frage
-  quizzes/quiz_statistics: 
-    statistics_filename: "%{quiz_title} %{quiz_type} %{report_type}-Bericht"
-    types: 
-      item_analysis: Elementanalyse
-      student_analysis: Studentenanalyse
   quizzes_model: 
     cant_unpublish_when_students_submit: "Veröffentlichung kann nicht rückgängig gemacht werden, wenn Einsendungen von Studenten vorhanden sind"
     confirms: 
@@ -12153,6 +12216,7 @@ de:
       create_accounts: "Neue Stammkonten erstellen"
       create_collaborations: "Studentenkollaborationen erstellen"
       create_conferences: "Webkonferenzen erstellen"
+      generate_data_exports: "Datenexporte generieren"
       manage_account_memberships: "Andere Konto-Admins hinzufügen/entfernen"
       manage_account_settings: "Einstellungen der Kontoebene verwalten"
       manage_admin_users: "Andere Dozenten, Kursdesigner oder Lehrassistenten dem Kurs hinzufügen/entfernen"
@@ -12310,7 +12374,6 @@ de:
         are_you_sure_delete: "Möchten Sie diese Rubrik wirklich löschen?  Für jeden Benutzer, der die Rubrik zurzeit verwendet, bleibt sie weiterhin verfügbar, aber niemand sonst kann sie einsetzen."
         are_you_sure_remove: "Möchten Sie diese Rubrik wirklich aus Ihrer Liste entfernen?"
       remove_rubric: "Diese Rubrik aus meiner Liste entfernen"
-  screenreader_gradebook_description: "Screenreader Gradebook stellt eine zugriffsfreundliche Schnittstelle zum Notenbuch bereit."
   scribd: 
     upgrade_flash: "Hallo, Sie verfügen über eine veraltete Version von Adobe Flash Player. Um iPaper (und viele andere Dinge im Netz) zu verwenden, benötigen Sie %{link_tag}den aktuellen Flash player%{end_link}."
   search: 
@@ -12399,6 +12462,8 @@ de:
         current_enrollments: "Aktuelle Einschreibungen"
         decrosslist_section: "Zweiteintragung für diesen Kursabschnitt entfernen"
   select_content: "Inhalt auswählen"
+  select_content_checkbox: 
+    select_content_error: "Sie müssen eine Inhaltsoption auswählen"
   select_content_dialog: 
     buttons: 
       add_item: "Element hinzufügen"
@@ -12586,6 +12651,13 @@ de:
     errors: 
       400_message: 
         description: "Oh. Offenbar ist beim Laden der von Ihnen angeforderten Seite ein Problem aufgetreten."
+        error: "Fehler:"
+        headings: 
+          page: Seitenfehler
+        title: Seitenfehler
+      403_message: 
+        description: "Hmm. Wie es scheint, sollten Sie nicht hier sein."
+        error: "Fehler:"
         headings: 
           page: Seitenfehler
         title: Seitenfehler
@@ -12672,6 +12744,7 @@ de:
       range_upper: "Oberes Bereichslimit"
       remove_row: "Zeile entfernen"
       remove_scheme: "Benotungssystem entfernen"
+      select_another_scheme: "Anderes System auswählen"
       some_standard: "Einige Standards"
       use_this_standard: "Diese Benotungskriterien anwenden"
     home_menu: 
@@ -12802,6 +12875,8 @@ de:
       service_contact: "%{user} mithilfe von %{service} kontaktieren"
       social_instructions: "Markieren Sie die Kontaktoptionen, die anderen auf Ihrem Profil angezeigt werden sollen."
       title: Titel
+      titles: 
+        click_to_change_profile_pic: "Klicken, um Profilbild zu ändern"
       user_has_no_bio: "%{user} hat keine Biografie hinzugefügt"
       ways_to_contact_user: "Kontaktoptionen für %{name}"
     recent_activity: 
@@ -13154,11 +13229,11 @@ de:
       date: Datum
       value: Wert
     domain_not_found: 
-      body_description: "Überprüfen Sie die URL, und versuchen Sie es erneut. Wenden Sie sich andernfalls an Ihre Bildungseinrichtung oder Ihren Dozenten, um Hilfestellung zu erhalten."
+      body_description: "Überprüfen Sie Ihre Canvas-URL, und versuchen Sie es erneut. Wenn Sie Ihre Canvas-URL nicht wissen, wenden Sie sich an Ihre Bildungseinrichtung oder Ihren Dozenten für den Kurs."
       body_reference: "Wenn Sie an einem kostenlosen Canvas-Konto interessiert sind, das nicht mit einer bestimmten Bildungseinrichtung verknüpft ist, können Sie sich hier registrieren"
       links: 
         canvas_instructure: canvas.instructure.com
-      page_title: "Wir konnten Ihre Canvas-Instanz leider nicht finden."
+      page_title: "Canvas kann Ihre Anmeldeseite leider nicht finden."
       you_typed: "Sie haben Folgendes eingegeben"
     institution_suspended: 
       body: "Das Canvas-Konto Ihrer Schule wurde vorrübergehend gesperrt. Wenden Sie sich an Ihren Canvas-Administrator."
@@ -13190,12 +13265,21 @@ de:
     assignment_order_assignment_groups: "Nach Aufgabengruppe und Position"
     assignment_order_due_date: "Nach Abgabefrist"
     assignment_unmuted: "Zum Stummschalten klicken."
+    discussion_topic: Diskussionsthema
+    external_tool: "Externes Tool"
     invalid_group_warning: 
       one: "Hinweis: Der Punktestand enthält keine Aufgaben der Gruppe %{list_of_group_names}, da für diese keine Punkte möglich sind."
       other: "Hinweis: Der Punktestand enthält keine Aufgaben der Gruppen %{list_of_group_names}, da für diese keine Punkte möglich sind."
+    media_recordin: Medienaufzeichnung
     no_assignment: "Keine Aufgabe ausgewählt"
     no_student: "Kein Student ausgewählt"
+    none: Keine
     notes: Anmerkungen
+    on_paper: "Als Papierdokument"
+    online_quiz: Online-Quiz
+    online_text_entry: Online-Texteingabe
+    online_upload: Online-Upload
+    online_url: Online-URL
     student_hidden_name: "Student %{position}"
   statistics: 
     csv_columns: 
@@ -13222,6 +13306,8 @@ de:
     not_available: "Verfügbar am"
     pending: "Erst verfügbar am"
   step: Schritt
+  student_id: Studenten-ID
+  student_name: "Name des Studenten"
   student_outcome_gradebook_description: |-
       Mithilfe des Notenbuchs für Ergebnisse der Studenten können Studenten den Fortschritt
       in Bezug auf die Lernergebnisse des Kurses schnell anzeigen. Die Ergebnisse werden in
@@ -13353,13 +13439,16 @@ de:
       no_submission: "Keine Einsendung"
       paper_view: "Aufsatz anzeigen"
       plain_view: "Ansicht als Klartext"
-      preview_document: "Dokument als Vorschau anzeigen"
+      preview_crocodoc_document: "Vorschau der Einsendung und Feedback des Dozenten anzeigen, falls vorhanden"
+      preview_scribd_document: "Vorschau der Einsendung anzeigen"
       preview_title: "Vorschau von %{title}"
       quiz_submission: "Diese Einsendung war eine Quizeinsendung. Sie werden zur Quizseite weitergeleitet."
       show_entire_discussion: "Ganze Diskussion zeigen"
       student: Student
       url_preview: URL-vorschau
+      view_feedback_button: "Feedback anzeigen"
       view_original_submission: "Ursprüngliche Einsendung für %{user} anzeigen"
+      view_preview_button: Vorschau
     still_zipping: "Zip-datei wird noch erstellt..."
     submission_download: 
       download_message: "**Ihre Studenteneinsendungen werden gesammelt** und zu einer Zip-datei komprimiert. Dies kann abhängig von der Größe und Anzahl der eingesandten Dateien eine Weile dauern."
