@@ -265,7 +265,7 @@ es:
       start_text: "Inicio: %{start_at};"
       term_text: "Período: %{term_name};"
     galen: 
-      no_term: "Es obligatorio un término específico. Por favor, seleccione un término"
+      no_term: "Es obligatorio un período específico. Por favor, seleccione un período"
     grades: 
       deleted: "Incluir objetos eliminados: verdadero;"
     mississippi: 
@@ -612,7 +612,7 @@ es:
         galen: 
           cv: 
             non_graded: 
-              text: "Este informe muestra los envíos que no han sido calificados en cada curso para los debates y encuestas de evaluaciones."
+              text: "Este informe muestra los envíos que no han sido calificados en cada curso para los debates y las encuestas de evaluaciones."
           description: 
             header: Ejemplo
     cv_submission_data_csv_description: 
@@ -1833,11 +1833,11 @@ es:
     grade_percent_screenreader: "Nota: %{grade}%"
     grading_type_selector: 
       display_grade_as: "Mostrar calificación como"
-      gpa_scale_explainer: "La calificación de escala GPA se ha diseñado para las escuelas que utilizan una escala de 4.0 (o 5.0/6.0) para todas las tareas. Este esquema de calificaciones es parecido a la calificación por letras pero incluye varias diferencias importantes:"
-      gpa_scale_input_explainer: "Las puntuaciones se basan en una escala de 4.0. Por ejemplo, si una tarea tiene un valor de 100 puntos, un 4.0 correspondería al 100%, un 3.0 correspondería a un 87%, etc."
+      gpa_scale_explainer: "La calificación de escala GPA se ha diseñado para las escuelas que utilizan una escala de 4,0 (o 5,0/6,0) para todas las tareas. Este esquema de calificaciones es parecido a la calificación por letras pero presenta varias diferencias importantes:"
+      gpa_scale_input_explainer: "Las puntuaciones se basan en una escala de 4,0. Por ejemplo, si una tarea tiene un valor de 100 puntos, un 4,0 correspondería al 100%, un 3,0 correspondería al 87%, etc."
       gpa_scale_letters_explainer: "Las calificaciones por letras se pueden utilizar como complemento a las calificaciones por números."
       gpa_scale_percentage_explainer: "No se pueden dar puntos directamente pero sí porcentajes. Por ejemplo, si una tarea tiene un valor de 50 puntos, no podrá poner \"40\", pero sí \"80%\"."
-      gpa_scale_recommendation: "A menos que su centro utilice una escala de 4.0 (0 5.0/6.0) para calificar, Canvas recomienda que utilice la calificación por letras para mostrar la puntuación."
+      gpa_scale_recommendation: "A menos que su centro utilice una escala de 4,0 (o 5,0/6,0) para calificar, Canvas recomienda que utilice la calificación por letras para mostrar la puntuación."
       gpa_scale_scores_explainer: "Solo se permiten las puntuaciones predefinidas en el esquema de calificaciones."
       gpa_scale_title: "\"¿Qué es la calificación de escala GPA?\""
       grading_type_options: 
@@ -2224,9 +2224,9 @@ es:
         create_assignment_group: "Crear un Grupo de Trabajo"
         create_or_import_quiz: "Crear/Importar una Evaluación"
         edit_assignment_in_detail: "Editar la Tareas en Detalle"
-        screenreader_show_me_add_assignment: "Llévame al botón de agregar tareas"
-        screenreader_show_me_add_assignment_group: "Llévame al botón de añadir grupo de tareas"
-        screenreader_show_me_weight_final_grade: "Llévame a la casilla de verificación de calificación final ponderada"
+        screenreader_show_me_add_assignment: "Lléveme al botón de agregar tareas"
+        screenreader_show_me_add_assignment_group: "Lléveme al botón de añadir grupo de tarea"
+        screenreader_show_me_weight_final_grade: "Lléveme a la casilla de verificación de la calificación final ponderada"
         show_me_where: "Mostrarme donde"
       subtitles: 
         edit_assignment_in_detail: "(permitir cargas, edición de descripción, etc.)"
@@ -5375,7 +5375,7 @@ es:
     discussion_feed_title: "Canal de Discusión %{title}"
     discussion_list: 
       no_pinned_discussions: "Actualmente no tiene debates anclados"
-      pinned_instructions: "Para anclar un debate en la parte superior de la página, arrastre un debate aquí, o seleccione Anclar en el menú de configuración de debates."
+      pinned_instructions: "Para anclar un debate en la parte superior de la página, arrastre un debate aquí o seleccione Anclar en el menú de configuración de debates."
       there_are_no_discussions_show: "No hay debates que mostrar en esta sección."
     discussions_settings_view: 
       allow_student_discussion_editing: "Editar y eliminar sus propias publicaciones"
@@ -5449,7 +5449,7 @@ es:
       your_search_did_not_match_any_discussion_topics: "Su búsqueda no coincidió con ningún tema de discusión."
     new_and_total_badge: 
       reply_count_tooltip: 
-        one: "1 respuesta"
+        one: "1 respuesta."
         other: "%{count} respuestas."
         zero: "Sin respuestas."
       unread_count_tooltip: 
@@ -5463,7 +5463,7 @@ es:
       last_page: Última
     points_possible_number: "Puntos posibles debe ser un número"
     reply_count_tooltip: 
-      one: "1 respuesta"
+      one: "1 respuesta."
       other: "%{count} respuestas."
       zero: "Sin respuestas."
     show: 
@@ -5673,7 +5673,7 @@ es:
     titles: 
       font_size: "Tamaño del texto, pulse abajo para seleccionar"
       formatting: "Formato, pulse abajo para seleccionar"
-      rte_help: "Area de texto enriquecido. Presione ALT F10 para acceder a la barra de herramientas. Presione ALT 8 para acceder a la ayuda. "
+      rte_help: "Area de texto enriquecido. Pulse ALT F10 para acceder a la barra de herramientas. Pulse ALT F8 para acceder a la ayuda. "
   email: 
     default_from_name: "Instructure Canvas"
   enrollment: 
@@ -6185,7 +6185,7 @@ es:
     draft_state_account_disable_warning: "Deshabilitar esta función afectará a los cursos existentes. Para obtener asistencia para deshabilitar esta función, póngase en contacto con su Canvas Success Manager."
     draft_state_course_disable_warning: "Desactivar esta función hará que se publiquen TODOS los objetos existentes en su curso. Por favor, asegúrese de que todo el contenido del borrador está listo para ser publicado y disponible para todos los usuarios del curso antes de continuar."
     google_docs_domain_restriction: "Restricción de dominio de Google Docs"
-    individual_gradebook: "Vista de libro de calificaciones individual"
+    individual_gradebook: "Vista del libro de calificaciones individual"
     outcome_gradebook: "Libro de calificaciones de resultados"
     student_outcome_gradebook: "Libro de calificaciones de resultados del alumno"
   file_browser_view: 
@@ -6684,7 +6684,7 @@ es:
     leaving_id_will_match_better_can_add_new_assignment: "Al dejar el ID intact (la parte \"(581)\" en este caso) ayudará a hacer el apareamiento más fácil. Puede también agregar tareas nuevas que serán creadas rápidamente."
     new_assignment_example: "Una Tarea Nueva"
     optional_ignored: "Opcional, ignorado."
-    screenreader_csv_explainer: "¿Qué me debería encontrar en el archivo CSV? Su archivo cargado debería tener las siguientes columnas:  \"Alumno\", \"ID\" y \"Tarea existente (nº)\". En la columna Alumno debe aparecer el nombre de cada alumno, con el siguiente formato: Apellido, Nombre. Por ejemplo, \"Smith, John\". Las columnas de tareas existentes deberían mostrar el nombre de la tarea seguido de la ID de la tarea entre paréntesis. Por ejemplo, \"Hoja de trabajo del capítulo uno (201)\". Si utiliza SIS, incluya las siguientes columnas: \"ID SIS de usuario\" and \"ID SIS de inicio de sesión\". Si desea crear una nueva tarea, incluya una columna cuyo título coincida con el nombre de la tarea. Por ejemplo, \"Hoja de trabajo de derivadas\". Las siguientes columnas son optativas: \"Sección\", \"Calificación actual\", \"Calificación final\". "
+    screenreader_csv_explainer: "¿Qué me debería encontrar en el archivo CSV? Su archivo cargado debería tener las siguientes columnas:  \"Alumno\", \"ID\" y \"Tarea existente (nº)\". En la columna Alumno debe aparecer el nombre de cada alumno, con el siguiente formato: Apellido, Nombre. Por ejemplo, \"Smith, John\". Las columnas de tareas existentes deberían mostrar el nombre de la tarea seguido de la ID de la tarea entre paréntesis. Por ejemplo, \"Hoja de trabajo del capítulo uno (201)\". Si utiliza SIS, incluya las siguientes columnas: \"ID SIS de usuario\" e \"ID SIS de inicio de sesión\". Si desea crear una nueva tarea, incluya una columna cuyo título coincida con el nombre de la tarea. Por ejemplo, \"Hoja de trabajo de derivadas\". Las siguientes columnas son optativas: \"Sección\", \"Calificación actual\", \"Calificación final\". "
     titles: 
       upload_form: "Escoger un archivo CSV para cargar"
     what_should_csv_look_like: "¿Cómo se debería ver el archivo CSV?"
@@ -7495,7 +7495,7 @@ es:
     invalid_file_size: "El tamaño del archivo de la imagen es demasiado grande (máx %{max} bytes, real %{actual})"
     invalid_file_type: "Tipo de archivo no válido %{type}. Los tipos de archivo válidos son: %{type_list}"
     not_an_image: "El archivo seleccionado no es una imagen"
-  individual_gradebook_description: "La vista de libro de calificaciones individual ofrece una vista de libro de calificaciones diseñada para la accesibilidad."
+  individual_gradebook_description: "La vista del libro de calificaciones individual ofrece una vista del libro de calificaciones diseñada para la accesibilidad."
   info: 
     notices: 
       error_reported: "¡Gracias por su ayuda! Comenzaremos rápidamente"
@@ -10839,7 +10839,7 @@ es:
     gravatar_view: 
       button: 
         preview: "Vista previa"
-      enter_gravatar_email_below: "Escriba su dirección de correo electrónico de *Gravatar* "
+      enter_gravatar_email_below: "Escriba su dirección de correo electrónico de *Gravatar* a continuación"
     notification_preferences: 
       captions: 
         notification_preferences: "Eventos y configuración de notificaciones de %{name}"
@@ -10853,7 +10853,7 @@ es:
       take_picture: "Hacer foto"
     upload_file_view: 
       choose_a_picture: "elegir una imagen"
-      crop_instructions: "Para recortar la imagen, arrastre la selección y, a continuación, haga clic en el botón \"Guardar\" que aparece a continuación"
+      crop_instructions: "Para recortar la imagen, arrastre la selección y, a continuación, haga clic en el botón \"Guardar\" que aparece a continuación."
   pseudonym: 
     errors: 
       bad_credentials: "Nombre de usuario o contraseña inválido"
@@ -12180,7 +12180,7 @@ es:
     : Verdadero
     ungraded_survey: "Encuesta no calificada"
     warnings: 
-      draft_state_unsaved_changes: "*Ha realizado cambios a las preguntas de esta evaluación.* Estos cambios no serán visibles para los alumnos hasta que no guarde la evaluación."
+      draft_state_unsaved_changes: "*Ha realizado cambios en las preguntas de esta evaluación.* Estos cambios no serán visibles para los alumnos hasta que no guarde la evaluación."
       unpublished_changes: "*Ha realizado cambios a este cuestionario que aún no se han publicado.* Estos cambios no estarán visibles para los alumnos hasta que no publique o vuelva a publicar el cuestionario."
       unpublished_quiz: "*Este cuestionario no está publicado* Solo los profesores pueden ver el cuestionario hasta que esté publicado."
   quizzes_model: 
@@ -12510,7 +12510,7 @@ es:
         decrosslist_section: "Eliminar el listado cruzado de esta sección"
   select_content: "Seleccionar contenido"
   select_content_checkbox: 
-    select_content_error: "Debe elegir una opción de ontenido"
+    select_content_error: "Debe elegir una opción de contenido"
   select_content_dialog: 
     buttons: 
       add_item: "Agregar Elemento"
@@ -12707,8 +12707,8 @@ es:
         description: "Vaya. Parece que no deberías estar aquí."
         error: "Error:"
         headings: 
-          page: "Error de Página"
-        title: "Error de Página"
+          page: "Error de página"
+        title: "Error de página"
       404_message: 
         generic_description: "Oops, no pudimos encontrar esa página."
         headings: 
@@ -13277,7 +13277,7 @@ es:
       date: Fecha
       value: Valor
     domain_not_found: 
-      body_description: "Compruebe la URL de Canvas e inténtelo de nuevo. Si no conoce su URL de Canvas, póngase en contacto con su institución o profesor para solicitar ayuda."
+      body_description: "Compruebe la URL de Canvas e inténtelo de nuevo. Si no conoce su URL de Canvas, póngase en contacto con su institución o profesor."
       body_reference: "Si le interesa una cuenta gratuita de Canvas no vinculada a una institución específica, puede registrarse en"
       links: 
         canvas_instructure: canvas.instructure.com
@@ -13314,7 +13314,7 @@ es:
     assignment_order_due_date: "Por fecha límite"
     assignment_unmuted: "Haga clic para desactivar audio"
     discussion_topic: "Tema de debate"
-    external_tool: "Herramienta Externa"
+    external_tool: "Herramienta externa"
     invalid_group_warning: 
       one: "Nota: La puntuación no incluye tareas del grupo %{list_of_group_names} porque no tiene puntos asociados."
       other: "Nota: La puntuación no incluye tareas de los grupos %{list_of_group_names} porque no tienen puntos asociados."
@@ -13483,8 +13483,8 @@ es:
       no_submission: "Sin Envíos"
       paper_view: "Vista del Artículo"
       plain_view: "Vista de Texto Normal"
-      preview_crocodoc_document: "Vista previa del envío y consultar los comentarios del profesor, si está disponible"
-      preview_scribd_document: "Vista previa del envío"
+      preview_crocodoc_document: "Ver una vista previa del envío y consultar los comentarios del profesor, si están disponibles"
+      preview_scribd_document: "Ver una vista previa del envío"
       preview_title: "Vista previa de %{title}"
       quiz_submission: "Este envío fue un envío de evaluación. Redirigiendo a la página de evaluaciones."
       show_entire_discussion: "Mostrar la Discusión Completa"
