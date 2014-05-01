@@ -34,7 +34,6 @@ class Auditors::GradeChange
     def self.generate(submission, event_type=nil)
       new(
         'submission' => submission,
-        'created_at' => submission.graded_at,
         'event_type' => event_type
       )
     end

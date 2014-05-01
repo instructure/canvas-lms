@@ -42,14 +42,15 @@ module Canvas::Oauth
       @key ||= DeveloperKey.find_by_id(@client_id)
     end
 
-    #Checks to see if a token has already been issued to this client and if we can
-    #reissue the same token to that client without asking for user permmission again.
+    # Checks to see if a token has already been issued to this client and
+    # if we can reissue the same token to that client without asking for
+    # user permission again. If the developer key is trusted, access
+    # tokens will be automatically authorized without prompting the end-
+    # user
     def authorized_token?(user)
-      token = nil
-
       if !self.class.is_oob?(redirect_uri)
-        token = Token.find_userinfo_access_token(user, key, scopes, purpose)
-        return !token.nil? && token.remember_access?
+        return true if Token.find_reusable_access_token(user, key, scopes, purpose)
+        return true if key.trusted?
       end
 
       return false

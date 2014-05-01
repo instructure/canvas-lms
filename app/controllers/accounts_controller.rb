@@ -478,7 +478,8 @@ class AccountsController < ApplicationController
         end
       end
       load_course_right_side
-      @account_users = @account.account_users.includes(:user)
+      @account_users = @account.account_users
+      AccountUser.send(:preload_associations, @account_users, :user)
       order_hash = {}
       @account.available_account_roles.each_with_index do |type, idx|
         order_hash[type] = idx

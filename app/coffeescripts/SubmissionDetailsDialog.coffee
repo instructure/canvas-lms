@@ -58,7 +58,6 @@ define [
       @submission.moreThanOneSubmission = @submission.submission_history.length > 1
       @submission.loading = false
       for submission in @submission.submission_history
-        submission.submissionWasLate = @assignment.due_at && new Date(@assignment.due_at) > new Date(submission.submitted_at)
         for comment in submission.submission_comments || []
           comment.url = "#{@options.context_url}/users/#{comment.author_id}"
           urlPrefix = "#{location.protocol}//#{location.host}"

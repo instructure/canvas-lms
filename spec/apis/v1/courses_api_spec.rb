@@ -67,6 +67,41 @@ describe Api::V1::Course do
       @test_api.course_json(@course1, @me, {}, [], []).has_key?("apply_assignment_group_weights").should be_true
     end
 
+    it "should include course progress" do
+      mod = @course2.context_modules.create!(:name => "some module", :require_sequential_progress => true)
+      assignment = @course2.assignments.create!(:title => "some assignment")
+      tag = mod.add_item({:id => assignment.id, :type => 'assignment'})
+      mod.completion_requirements = {tag.id => {:type => 'must_submit'}}
+      mod.require_sequential_progress = true
+      mod.publish
+      mod.save!
+
+      class CourseProgress
+        def course_context_modules_item_redirect_url(opts = {})
+          "course_context_modules_item_redirect_url(:course_id => #{opts[:course_id]}, :id => #{opts[:id]}, :host => HostUrl.context_host(Course.find(#{opts[:course_id]}))"
+        end
+      end
+
+      json = @test_api.course_json(@course2, @me, {}, ['course_progress'], [])
+      json.should include('course_progress')
+      json['course_progress'].should == {
+        'requirement_count' => 1,
+        'requirement_completed_count' => 0,
+        'next_requirement_url' => "course_context_modules_item_redirect_url(:course_id => #{@course2.id}, :id => #{tag.id}, :host => HostUrl.context_host(Course.find(#{@course2.id}))",
+        'completed_at' => nil
+      }
+    end
+
+    it "should include course progress error unless course is module based" do
+      json = @test_api.course_json(@course2, @me, {}, ['course_progress'], [])
+      json.should include('course_progress')
+      json['course_progress'].should == {
+          'error' => {
+              'message' => 'no progress available because this course is not module based (has modules and module completion requirements) or the user is not enrolled as a student in this course'
+          }
+      }
+    end
+
     context "total_scores" do
       before do
         @enrollment.computed_current_score = 95.0;

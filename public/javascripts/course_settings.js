@@ -313,8 +313,8 @@ define([
       },
       success: function(data) {
         var course = data.course;
-        course.start_at = $.datetimeString(course.start_at);
-        course.conclude_at = $.datetimeString(course.conclude_at);
+        course.start_at = $.datetimeString(course.start_at, false);
+        course.conclude_at = $.datetimeString(course.conclude_at, false);
         course.is_public = course.is_public ? I18n.t('public_course', 'Public') : I18n.t('private_course', 'Private');
         course.indexed = course.indexed ? I18n.t('indexed_course', "Included in public course index") : "";
         course.grading_scheme_set = course.grading_standard_title || (course.grading_standard_id ? I18n.t('grading_standard_set', "Currently Set") : I18n.t('grading_standard_unset', "Not Set"));

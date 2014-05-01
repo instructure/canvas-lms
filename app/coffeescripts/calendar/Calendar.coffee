@@ -376,7 +376,10 @@ define [
       changed = false
       for k, v of opts
         changed = true if data[k] != v
-        data[k] = v
+        if v
+          data[k] = v
+        else
+          delete data[k]
       location.href = "#" + $.param(data) if changed
 
     viewDisplay: (view) =>

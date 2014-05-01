@@ -68,7 +68,7 @@
           <input id="assignment_peer_reviews_assign_at"
             name="{{#if nested}}assignment[peer_reviews_assign_at]{{else}}peer_reviews_assign_at{{/if}}"
             class="date_field datetime_field hasDatePicker"
-            value="{{datetimeFormatted peerReviewsAssignAt}}"
+            value="{{datetimeFormatted peerReviewsAssignAt false}}"
             type="text"
             {{disabledIfIncludes frozenAttributes "peer_reviews"}}/>
           <div class="explanation nest">

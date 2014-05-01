@@ -65,7 +65,7 @@
           class="datetime_field input-medium"
           type="text"
           name="due_at"
-          value="{{datetimeFormatted dueAt}}"
+          value="{{datetimeFormatted dueAt false}}"
           {{disabledIfIncludes frozenAttributes "due_at"}}/>
       {{/if}}
       </div>

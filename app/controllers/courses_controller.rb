@@ -44,6 +44,34 @@ require 'set'
 #       }
 #     }
 #
+# @model CourseProgress
+#     {
+#       "id": "CourseProgress",
+#       "description": "",
+#       "properties": {
+#         "requirement_count": {
+#           "description": "total number of requirements from all modules",
+#           "example": 10,
+#           "type": "integer"
+#         },
+#         "requirement_completed_count": {
+#           "description": "total number of requirements the user has completed from all modules",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "next_requirement_url": {
+#           "description": "url to next module item that has an unmet requirement. null if the user has completed the course or the current module does not require sequential progress",
+#           "example": "http://localhost/courses/1/modules/items/2",
+#           "type": "string"
+#         },
+#         "completed_at": {
+#           "description": "date the course was completed. null if the course has not been completed by this user",
+#           "example": "2013-06-01T00:00:00-06:00",
+#           "type": "datetime"
+#         }
+#       }
+#     }
+#
 # @model Course
 #     {
 #       "id": "Course",
@@ -138,6 +166,10 @@ require 'set'
 #           "description": "optional: the enrollment term object for the course returned only if include[]=term",
 #           "$ref": "Term"
 #         },
+#         "course_progress": {
+#           "description": "optional (beta): information on progress through the course returned only if include[]=course_progress",
+#           "$ref": "CourseProgress"
+#         },
 #         "apply_assignment_group_weights": {
 #           "description": "weight final grade based on assignment group percentages",
 #           "example": true,
@@ -225,7 +257,7 @@ class CoursesController < ApplicationController
   #   'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'ObserverEnrollment',
   #   or 'DesignerEnrollment'.
   #
-  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"total_scores"|"term"]
+  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"total_scores"|"term"|"course_progress"]
   #   - "needs_grading_count": Optional information to include with each Course.
   #     When needs_grading_count is given, and the current user has grading
   #     rights, the total number of submissions needing grading for all
@@ -247,6 +279,18 @@ class CoursesController < ApplicationController
   #   - "term": Optional information to include with each Course. When
   #     term is given, the information for the enrollment term for each course
   #     is returned.
+  #   - "course_progress": Optional information to include with each Course.
+  #     When course_progress is given, each course will include a
+  #     'course_progress' object with the fields: 'requirement_count', an integer
+  #     specifying the total number of requirements in the course,
+  #     'requirement_completed_count', an integer specifying the total number of
+  #     requirements in this course that have been completed, and
+  #     'next_requirement_url', a string url to the next requirement item, and
+  #     'completed_at', the date the course was completed (null if incomplete).
+  #     'next_requirement_url' will be null if all requirements have been
+  #     completed or the current module does not require sequential progress.
+  #     "course_progress" will return an error message if the course is not
+  #     module based or the user is not enrolled as a student in the course.
   #
   # @argument state[] [Optional, String, "unpublished"|"available"|"completed"|"deleted"]
   #   If set, only return courses that are in the given state(s).
@@ -952,7 +996,7 @@ class CoursesController < ApplicationController
     elsif !@current_user && enrollment.user.registered? || !enrollment.user.email_channel
       session[:return_to] = course_url(@context.id)
       flash[:notice] = t('notices.login_to_accept', "You'll need to log in before you can accept the enrollment.")
-      return redirect_to login_url(:re_login => 1) if @current_user
+      return redirect_to login_url(:force_login => 1) if @current_user
       redirect_to login_url
     else
       # defer to CommunicationChannelsController#confirm for the logic of merging users
@@ -1494,8 +1538,8 @@ class CoursesController < ApplicationController
       authorized_action(@context, @current_user, :read_as_admin) &&
       authorized_action(@domain_root_account.manually_created_courses_account, @current_user, [:create_courses, :manage_courses])
     # For prepopulating the date fields
-    js_env(:OLD_START_DATE => datetime_string(@context.start_at, :verbose, nil, true))
-    js_env(:OLD_END_DATE => datetime_string(@context.conclude_at, :verbose, nil, true))
+    js_env(:OLD_START_DATE => unlocalized_datetime_string(@context.start_at, :verbose))
+    js_env(:OLD_END_DATE => unlocalized_datetime_string(@context.conclude_at, :verbose))
   end
 
   def copy_course

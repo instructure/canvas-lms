@@ -288,6 +288,8 @@ class ContentTag < ActiveRecord::Base
       end
     end
 
+    context_module.remove_completion_requirement(id) if context_module
+
     self.workflow_state = 'deleted'
     self.save!
 

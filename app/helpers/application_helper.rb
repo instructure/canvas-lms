@@ -873,10 +873,18 @@ module ApplicationHelper
   end
 
   def dashboard_url(opts={})
-    @domain_root_account.settings[:dashboard_url] || super(opts)
+    custom_dashboard_url || super(opts)
   end
 
   def dashboard_path(opts={})
-    @domain_root_account.settings[:dashboard_url] || super(opts)
+    custom_dashboard_url || super(opts)
+  end
+
+  def custom_dashboard_url
+    url = @domain_root_account.settings[:dashboard_url]
+    if url.present?
+      url += "?current_user_id=#{@current_user.id}" if @current_user
+      url
+    end
   end
 end
