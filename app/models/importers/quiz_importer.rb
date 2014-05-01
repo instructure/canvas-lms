@@ -168,7 +168,7 @@ module Importers
       end
       item.reload # reload to catch question additions
 
-      if hash[:assignment] && hash[:available]
+      if hash[:assignment]
         if hash[:assignment][:migration_id]
           item.assignment ||= Quizzes::Quiz.find_by_context_type_and_context_id_and_migration_id(context.class.to_s, context.id, hash[:assignment][:migration_id])
         end
@@ -176,6 +176,11 @@ module Importers
         item.assignment ||= context.assignments.new
 
         item.assignment = ::Importers::AssignmentImporter.import_from_migration(hash[:assignment], context, item.assignment, item)
+
+        if !hash[:available]
+          item.workflow_state = 'unpublished'
+          item.assignment.workflow_state = 'unpublished'
+        end
       elsif !item.assignment && grading = hash[:grading]
         # The actual assignment will be created when the quiz is published
         item.quiz_type = 'assignment'
@@ -195,6 +200,7 @@ module Importers
       end
 
       item.save
+      item.assignment.save if item.assignment && item.assignment.changed?
 
       context.imported_migration_items << item if context.imported_migration_items
       item

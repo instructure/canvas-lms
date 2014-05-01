@@ -370,7 +370,7 @@ describe ContentMigration do
         end
       end
 
-      it "should copy unpublised wiki pages" do
+      it "should copy unpublished wiki pages" do
         wiki = @copy_from.wiki.wiki_pages.create(:title => "wiki", :body => "ohai")
         wiki.workflow_state = :unpublished
         wiki.save!
@@ -379,6 +379,29 @@ describe ContentMigration do
 
         wiki2 = @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(wiki))
         wiki2.workflow_state.should == 'unpublished'
+      end
+
+      it "should copy unpublished quiz assignments" do
+        pending unless Qti.qti_enabled?
+        @quiz = @copy_from.quizzes.create!
+        @quiz.did_edit
+        @quiz.offer!
+        @quiz.unpublish!
+        @quiz.assignment.should be_unpublished
+
+        @cm.copy_options = {
+            :assignments => {mig_id(@quiz.assignment) => "0"},
+            :quizzes => {mig_id(@quiz) => "1"},
+        }
+        @cm.save!
+
+        run_course_copy
+
+        quiz_to = @copy_to.quizzes.find_by_migration_id(mig_id(@quiz))
+        quiz_to.should_not be_nil
+        quiz_to.assignment.should_not be_nil
+        quiz_to.assignment.should be_unpublished
+        quiz_to.assignment.migration_id.should == mig_id(@quiz.assignment)
       end
     end
 
