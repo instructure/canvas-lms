@@ -190,10 +190,13 @@ describe Attachment do
         # first attempt
         @attachment.submit_to_crocodoc
 
+        time = Time.now
         # nth attempt won't create more jobs
         attempts.times {
-          Timecop.freeze(1.hour.from_now)
-          run_jobs
+          time += 1.hour
+          Timecop.freeze(time) do
+            run_jobs
+          end
         }
       end
 
