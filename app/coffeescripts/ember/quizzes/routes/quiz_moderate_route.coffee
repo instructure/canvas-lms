@@ -1,7 +1,12 @@
 define [
   'ember'
-], (Em) ->
+  '../mixins/redirect'
+], (Em, Redirect) ->
 
-  Em.Route.extend
+  Em.Route.extend Redirect,
+
+    beforeModel: (transition) ->
+      @validateRoute('canManage', 'quiz.show')
+
     model: ->
       @modelFor 'quiz'
