@@ -473,19 +473,21 @@ TEXT
               <!-- put all of the helpful dialogs describing what each service does in here
                    the magic is in giving it an id of "<name_of_service>_help_dialog" and class="service_help_dialog" -->
               <div class="service_help_dialog" title="<%= t(:about_google_docs_tooltip, "About Google Docs Previews") %>" id="google_docs_previews_help_dialog">
-                <%= mt(:about_google_docs,
-                  "In order to make it easier for users, rather than forcing them to download " +
-                  "things like Word docs, PDFs, Excel spreadsheets, and open office documents " +
-                  "(In addition to requiring that those programs be installed on their on their " +
-                  "computer), in many areas throughout Canvas, it will allow you an inline " +
-                  "preview of the document.\n\n" +
+                <%= mt(:about_google_docs, <<-TEXT, :terms_url => "https://docs.google.com/viewer/TOS")
+Google Docs Previews allow users to view documents from
+within Canvas, rather than having to download them and
+open the corresponding program (e.g. Word or Excel).
 
-                  "If Scribd has been enabled for this account, it will try to use it to show the preview. " +
-                  "But because Scribd uses flash paper to display the documents, and many users " +
-                  "(namely those using an iPad/iPhone) do not have Flash Player installed, that preview " +
-                  "will not work.  By leaving Google Docs Previews enabled, when a browser does not have " +
-                  "Flash enabled, or if Scribd is not enabled, it will use preview powered by Google Docs. " +
-                  "Using this service is subject to Google's viewer [terms of service](%{terms_url})", :terms_url => "https://docs.google.com/viewer/TOS") %>
+If Scribd has been enabled on this account, Canvas will
+try to use it to show the preview. If the document
+cannot be previewed in Scribd, or if the user does not
+have the Flash player installed (e.g. iPad/iPhone),
+Canvas will fall back to using Google Docs Previews
+if they are enabled. By using this service you
+acknowledge that you have read and agreed to the
+[Google Docs Viewer Terms of Service](%{terms_url}).
+                  TEXT
+                %>
               </div>
             </div>
           </fieldset>
