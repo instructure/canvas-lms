@@ -522,7 +522,7 @@ class ActiveRecord::Base
   if CANVAS_RAILS2
   def self.find_in_batches_with_usefulness(options = {}, &block)
     # already in a transaction (or transactions don't matter); cursor is fine
-    if (connection.adapter_name == 'PostgreSQL' && (Shackles.environment == :slave || connection.open_transactions > (Rails.env.test? ? 1 : 0))) && !options[:start]
+    if (connection.adapter_name == 'PostgreSQL' && (connection.readonly? || connection.open_transactions > (Rails.env.test? ? 1 : 0))) && !options[:start]
       shard = scope(:find, :shard)
       if shard
         shard.activate(shard_category) { find_in_batches_with_cursor(options, &block) }
@@ -920,6 +920,13 @@ unless defined? OpenDataExport
   end
 end
 
+ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.class_eval do
+  def readonly?(table = nil, column = nil)
+    return @readonly unless @readonly.nil?
+    @readonly = (select_value("SELECT pg_is_in_recovery();") == "t")
+  end
+end
+
 unless CANVAS_RAILS2
   # join dependencies in AR 3 insert the conditions right away, but because we have
   # some reflection conditions that rely on joined tables, we need to insert them later on
@@ -965,7 +972,7 @@ unless CANVAS_RAILS2
   ActiveRecord::Relation.class_eval do
     def find_in_batches_with_usefulness(options = {}, &block)
       # already in a transaction (or transactions don't matter); cursor is fine
-      if (connection.adapter_name == 'PostgreSQL' && (Shackles.environment == :slave || connection.open_transactions > (Rails.env.test? ? 1 : 0))) && !options[:start]
+      if (connection.adapter_name == 'PostgreSQL' && (connection.readonly? || connection.open_transactions > (Rails.env.test? ? 1 : 0))) && !options[:start]
         self.activate { find_in_batches_with_cursor(options, &block) }
       elsif order_values.any? || group_values.any? || select_values.to_s =~ /DISTINCT/i || uniq_value
         raise ArgumentError.new("GROUP and ORDER are incompatible with :start") if options[:start]
