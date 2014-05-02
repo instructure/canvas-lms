@@ -3,7 +3,8 @@ define [
   '../start_app'
   '../environment_setup'
   '../shared_ajax_fixtures'
-], (Ember, startApp, env, fixtures) ->
+  '../test_redirection'
+], (Ember, startApp, env, fixtures, testRedirection) ->
   App = null
 
   {$} = Ember
@@ -18,6 +19,7 @@ define [
 
   testPage = (desc, callback) ->
     test desc, ->
+      env.setUserPermissions(true, true)
       visit('/1/statistics').then callback
 
   testPage 'it renders', ->
@@ -29,3 +31,8 @@ define [
     equal q.get('quizReports.length'), 2, 'loads quiz reports'
     ok qs = route.modelFor('quizStatistics'), 'loads quiz statistics'
     equal qs.get('questionStatistics.length'), 11, 'loads question statistics'
+
+  testRedirection
+    path: '/1/statistics'
+    defaultRoute: 'quiz.statistics'
+    redirectRoute: 'quiz.show'

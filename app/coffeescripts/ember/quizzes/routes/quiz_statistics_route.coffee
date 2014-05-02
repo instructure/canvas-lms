@@ -1,7 +1,16 @@
-define [ 'ember', 'underscore' ], (Ember, _) ->
+define [
+  'ember'
+  'underscore'
+  '../mixins/redirect'
+], (Ember, _, Redirect) ->
+
   {RSVP} = Ember
 
-  Ember.Route.extend
+  Ember.Route.extend Redirect,
+
+    beforeModel: (transition) ->
+      @validateRoute('canManage', 'quiz.show')
+
     model: (transition, options) ->
       quiz = @modelFor('quiz')
       quiz.get('quizStatistics').then((items)->
