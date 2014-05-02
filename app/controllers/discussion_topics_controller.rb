@@ -244,7 +244,7 @@ class DiscussionTopicsController < ApplicationController
   #   The partial title of the discussion topics to match and return.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \ 
+  #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \
   #          -H 'Authorization: Bearer <token>'
   def index
     return unless authorized_action(@context.discussion_topics.scoped.new, @current_user, :read)
@@ -361,7 +361,9 @@ class DiscussionTopicsController < ApplicationController
             @topic.assignment.overrides_for(@current_user)
             ))
         hash[:ATTRIBUTES][:assignment][:has_student_submissions] = @topic.assignment.has_student_submissions?
+        hash[:ATTRIBUTES][:only_visible_to_overrides] = @topic.assignment.only_visible_to_overrides if @topic.assignment.differentiated_assignments_applies?
       end
+
 
       categories = @context.respond_to?(:group_categories) ? @context.group_categories : []
       sections = @context.respond_to?(:course_sections) ? @context.course_sections.active : []
@@ -372,7 +374,8 @@ class DiscussionTopicsController < ApplicationController
                      map { |category| { id: category.id, name: category.name } },
                  CONTEXT_ID: @context.id,
                  CONTEXT_ACTION_SOURCE: :discussion_topic,
-                 DRAFT_STATE: @topic.draft_state_enabled?}
+                 DRAFT_STATE: @topic.draft_state_enabled?,
+                 DIFFERENTIATED_ASSIGNMENTS_ENABLED: @context.feature_enabled?(:differentiated_assignments)}
       append_sis_data(js_hash)
       js_env(js_hash)
       render :action => "edit"
@@ -540,17 +543,17 @@ class DiscussionTopicsController < ApplicationController
   #   to the group.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \ 
-  #         -F title='my topic' \ 
-  #         -F message='initial message' \ 
-  #         -F podcast_enabled=1 \ 
+  #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \
+  #         -F title='my topic' \
+  #         -F message='initial message' \
+  #         -F podcast_enabled=1 \
   #         -H 'Authorization: Bearer <token>'
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \ 
-  #         -F title='my assignment topic' \ 
-  #         -F message='initial message' \ 
-  #         -F assignment[points_possible]=15 \ 
+  #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \
+  #         -F title='my assignment topic' \
+  #         -F message='initial message' \
+  #         -F assignment[points_possible]=15 \
   #         -H 'Authorization: Bearer <token>'
   #
   def create
@@ -562,9 +565,9 @@ class DiscussionTopicsController < ApplicationController
   # Accepts the same parameters as create
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id> \ 
-  #         -F title='This will be positioned after Topic #1234' \ 
-  #         -F position_after=1234 \ 
+  #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id> \
+  #         -F title='This will be positioned after Topic #1234' \
+  #         -F position_after=1234 \
   #         -H 'Authorization: Bearer <token>'
   #
   def update
@@ -577,7 +580,7 @@ class DiscussionTopicsController < ApplicationController
   # an assignment discussion.
   #
   # @example_request
-  #     curl -X DELETE https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id> \ 
+  #     curl -X DELETE https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id> \
   #          -H 'Authorization: Bearer <token>'
   def destroy
     @topic = @context.all_discussion_topics.find(params[:id] || params[:topic_id])

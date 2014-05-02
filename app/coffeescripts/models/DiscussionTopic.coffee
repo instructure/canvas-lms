@@ -160,6 +160,10 @@ define [
         return lock_at
       @get('lock_at')
 
+    isOnlyVisibleToOverrides: (overrideFlag) ->
+      return @get('only_visible_to_overrides') || false unless arguments.length > 0
+      @set('only_visible_to_overrides', overrideFlag)
+
     updateBucket: (data) ->
       _.defaults data,
         pinned: @get('pinned')

@@ -109,7 +109,7 @@
             aria-controls="podcast_has_student_posts_container"}}
           {{#t "enable_podcast_feed"}}Enable podcast feed{{/t}}
         </label>
-  
+
         <label id="podcast_has_student_posts_container"
                style="{{hiddenUnless podcast_url}}"
                class="checkbox" for="podcast_has_student_posts">
@@ -193,6 +193,18 @@
         <div id="peer_review_options" class="control-group"></div>
       {{/unless}}
     </fieldset>
+
+    <hr>
+
+    {{#if differentiatedAssignmnetsEnabled}}
+      <div class="text-center pad-box-mini" style="margin-bottom:10px">
+        <span>
+          <em>
+          {{#t "only_visible_to_overrides_note"}}Note: This discussion is <strong>only</strong> visible to the section(s) specified below:{{/t}}
+          </em>
+        </span>
+      </div>
+    {{/if}}
 
     <div class='js-assignment-overrides'></div>
   </div>
