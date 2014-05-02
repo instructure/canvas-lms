@@ -49,7 +49,7 @@ class Folder < ActiveRecord::Base
   EXPORTABLE_ASSOCIATIONS = [:context, :cloned_item, :parent_folder, :file_attachments, :sub_folders]
   
   acts_as_list :scope => :parent_folder
-  
+
   before_save :infer_full_name
   before_save :default_values
   after_save :update_sub_folders
@@ -86,7 +86,7 @@ class Folder < ActiveRecord::Base
     state :hidden
     state :deleted
   end
-  
+
   alias_method :destroy!, :destroy
   def destroy
     self.workflow_state = 'deleted'
@@ -95,7 +95,7 @@ class Folder < ActiveRecord::Base
     self.deleted_at = Time.now.utc
     self.save
   end
-  
+
   scope :active, where("folders.workflow_state<>'deleted'")
   scope :not_hidden, where("folders.workflow_state<>'hidden'")
   scope :not_locked, lambda { where("(folders.locked IS NULL OR folders.locked=?) AND ((folders.lock_at IS NULL) OR
@@ -106,7 +106,7 @@ class Folder < ActiveRecord::Base
   def display_name
     name
   end
-  
+
   def full_name(reload=false)
     return read_attribute(:full_name) if !reload && read_attribute(:full_name)
     folder = self
@@ -117,7 +117,7 @@ class Folder < ActiveRecord::Base
     end
     names.reverse.join("/")
   end
-  
+
   def default_values
     self.last_unlock_at = self.unlock_at if self.unlock_at
     self.last_lock_at = self.lock_at if self.lock_at
@@ -127,12 +127,12 @@ class Folder < ActiveRecord::Base
       self.parent_folder_id = root_folder.id
     end
   end
-  
+
   def infer_hidden_state
     self.workflow_state ||= self.parent_folder.workflow_state if self.parent_folder && !self.deleted?
   end
   protected :infer_hidden_state
-  
+
   def infer_full_name
     # TODO i18n
     t :default_folder_name, 'folder'
@@ -149,22 +149,22 @@ class Folder < ActiveRecord::Base
     @folder_id = self.id
   end
   protected :infer_full_name
-  
+
   def update_sub_folders
     return unless @update_sub_folders
-    self.sub_folders.each{|f| 
+    self.sub_folders.each{|f|
       f.reload
       f.full_name = f.full_name(true)
       f.save
     }
   end
-  
+
   def clean_up_children
     Attachment.find_all_by_folder_id(@folder_id).each do |a|
       a.destroy
     end
   end
-  
+
   def subcontent(opts={})
     res = []
     res += self.active_sub_folders
@@ -213,7 +213,7 @@ class Folder < ActiveRecord::Base
   def has_contents?
     self.active_file_attachments.any? || self.active_sub_folders.any?
   end
-  
+
   attr_accessor :clone_updated
   def clone_for(context, dup=nil, options={})
     if !self.cloned_item && !self.new_record?
@@ -250,7 +250,7 @@ class Folder < ActiveRecord::Base
     dup.clone_updated = true
     dup
   end
-  
+
   def root_folder?
     !self.parent_folder_id
   end
@@ -278,11 +278,11 @@ class Folder < ActiveRecord::Base
 
     root_folders
   end
-  
+
   def attachments
     file_attachments
   end
-  
+
   # if a block is given, it'll be called with each new folder created by this
   # method before the folder is saved
   def self.assert_path(path, context)
@@ -308,7 +308,7 @@ class Folder < ActiveRecord::Base
     end
     @@path_lookups[key] = current_folder
   end
-  
+
   def self.unfiled_folder(context)
     folder = context.folders.find_by_parent_folder_id_and_workflow_state_and_name(Folder.root_folders(context).first.id, 'visible', 'unfiled')
     unless folder
@@ -318,7 +318,7 @@ class Folder < ActiveRecord::Base
     end
     folder
   end
-  
+
   def self.find_folder(context, folder_id)
     if folder_id
       current_folder = context.folders.active.find(folder_id)
@@ -396,16 +396,16 @@ class Folder < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user, session| self.visible? && self.cached_context_grants_right?(user, session, :read) }#students.include?(user) }
+    given { |user, session| self.visible? && self.context.grants_right?(user, session, :read) }#students.include?(user) }
     can :read
 
-    given { |user, session| self.visible? && !self.locked? && self.cached_context_grants_right?(user, session, :read) && !(self.context.is_a?(Course) && self.context.tab_hidden?(Course::TAB_FILES)) }#students.include?(user) }
+    given { |user, session| self.visible? && !self.locked? && self.context.grants_right?(user, session, :read) && !(self.context.is_a?(Course) && self.context.tab_hidden?(Course::TAB_FILES)) }#students.include?(user) }
     can :read_contents
 
-    given { |user, session| self.cached_context_grants_right?(user, session, :manage_files) }#admins.include?(user) }
+    given { |user, session| self.context.grants_right?(user, session, :manage_files) }#admins.include?(user) }
     can :update and can :delete and can :create and can :read and can :read_contents
 
-    given {|user, session| self.protected? && !self.locked? && self.cached_context_grants_right?(user, session, :read) && self.context.users.include?(user) }
+    given {|user, session| self.protected? && !self.locked? && self.context.grants_right?(user, session, :read) && self.context.users.include?(user) }
     can :read and can :read_contents
   end
 end

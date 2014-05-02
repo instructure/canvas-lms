@@ -1480,16 +1480,16 @@ describe Quizzes::Quiz do
 
         it "doesn't let student read/submit quizzes that are unpublished" do
           @quiz.unpublish!.reload
-          @quiz.grants_right?(@student, nil, :read).should == false
-          @quiz.grants_right?(@student, nil, :submit).should == false
-          @quiz.grants_right?(@teacher, nil, :read).should == true
+          @quiz.grants_right?(@student, :read).should == false
+          @quiz.grants_right?(@student, :submit).should == false
+          @quiz.grants_right?(@teacher, :read).should == true
         end
 
         it "does let students read/submit quizzes that are published" do
           @quiz.publish!
-          @quiz.grants_right?(@student, nil, :read).should == true
-          @quiz.grants_right?(@student, nil, :submit).should == true
-          @quiz.grants_right?(@teacher, nil, :read).should == true
+          @quiz.grants_right?(@student, :read).should == true
+          @quiz.grants_right?(@student, :submit).should == true
+          @quiz.grants_right?(@teacher, :read).should == true
         end
 
       end
@@ -1499,19 +1499,19 @@ describe Quizzes::Quiz do
         it "always lets students view the quiz, even if not available" do
           @quiz.workflow_state = 'edited'
           @quiz.save!
-          @quiz.grants_right?(@student, nil, :read).should == true
+          @quiz.grants_right?(@student, :read).should == true
           @quiz.workflow_state = 'available'
           @quiz.save!
-          @quiz.grants_right?(@student, nil, :read).should == true
+          @quiz.grants_right?(@student, :read).should == true
         end
 
         it "only allows submitting for available assignments" do
           @quiz.workflow_state = 'edited'
           @quiz.save!
-          @quiz.grants_right?(@student, nil, :submit).should == false
+          @quiz.grants_right?(@student, :submit).should == false
           @quiz.workflow_state = 'available'
           @quiz.save!
-          @quiz.grants_right?(@student, nil, :submit).should == true
+          @quiz.grants_right?(@student, :submit).should == true
         end
       end
     end

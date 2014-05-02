@@ -193,10 +193,10 @@ describe DiscussionEntry do
       @sub_topic.root_topic_id = @parent_topic.id
       @sub_topic.save!
       @sub_entry = @sub_topic.discussion_entries.create!(:message => "entry", :user => @first_user)
-      @group_entry.grants_right?(@first_user, nil, :update).should eql(true)
-      @group_entry.grants_right?(@second_user, nil, :update).should eql(false)
-      @sub_entry.grants_right?(@first_user, nil, :update).should eql(true)
-      @sub_entry.grants_right?(@second_user, nil, :update).should eql(false)
+      @group_entry.grants_right?(@first_user, :update).should eql(true)
+      @group_entry.grants_right?(@second_user, :update).should eql(false)
+      @sub_entry.grants_right?(@first_user, :update).should eql(true)
+      @sub_entry.grants_right?(@second_user, :update).should eql(false)
     end
   end
 

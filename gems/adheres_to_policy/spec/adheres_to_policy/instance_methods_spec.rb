@@ -34,7 +34,7 @@ describe AdheresToPolicy::InstanceMethods do
   end
 
   it "should have setup a series of methods on the instance" do
-    %w(rights_status granted_rights grants_rights? grants_right?).each do |method|
+    %w(rights_status granted_rights grants_right? grants_any_right? grants_all_rights?).each do |method|
       @some_class.new.should respond_to(method)
     end
   end
@@ -64,12 +64,6 @@ describe AdheresToPolicy::InstanceMethods do
     actor.rights_status(1, :read, :write).should == {:read => true, :write => true}
     actor.rights_status(2, :read, :update, :delete).should == {:read => false, :update => true, :delete => true}
     actor.rights_status(3, :read, :manage, :set_permissions).should == {:read => false, :manage => true, :set_permissions => true}
-
-    # Deprecated grants_rights?
-    actor.grants_rights?(1).should == {:read => true, :write => true}
-    actor.grants_rights?(1, :read, :write, :manage).should == {:read => true, :write => true, :manage => false}
-    actor.grants_rights?(2, :read, :update, :delete).should == {:read => false, :update => true, :delete => true}
-    actor.grants_rights?(3, :read, :manage, :set_permissions).should == {:read => false, :manage => true, :set_permissions => true}
   end
 
   it "should execute all conditions when searching for all rights" do

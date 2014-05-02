@@ -36,42 +36,42 @@ class UserNote < ActiveRecord::Base
     state :active
     state :deleted
   end
-  
+
   scope :active, where("workflow_state<>'deleted'")
   scope :desc_by_date, order('created_at DESC')
-  
+
   set_policy do
     given { |user| self.creator == user }
     can :delete and can :read
-    
-    given { |user| self.user.grants_right?(user, nil, :delete_user_notes) }
+
+    given { |user| self.user.grants_right?(user, :delete_user_notes) }
     can :delete and can :read
-    
-    given { |user| self.user.grants_right?(user, nil, :read_user_notes) }
+
+    given { |user| self.user.grants_right?(user, :read_user_notes) }
     can :read
   end
-  
+
   alias_method :destroy!, :destroy
   def destroy
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now.utc
     save!
   end
-  
+
   def formatted_note(truncate=nil)
     self.extend TextHelper
     res = self.note
     res = truncate_html(self.note, :max_length => truncate, :words => true) if truncate
     res
   end
-  
+
   def creator_name
     self.creator ? self.creator.name : nil
   end
-  
+
   def update_last_user_note
     self.user.update_last_user_note
     self.user.save
   end
-  
+
 end

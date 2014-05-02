@@ -35,17 +35,17 @@ class ContentZipper
   end
 
   def self.process_attachment(*args)
-    options = args.last.is_a?(Hash) ? args.pop : {} 
+    options = args.last.is_a?(Hash) ? args.pop : {}
     ContentZipper.new(options).process_attachment(*args)
   end
-  
+
   def process_attachment(attachment, user = nil)
     raise "No attachment provided to ContentZipper.process_attachment" unless attachment
-    
+
     attachment.update_attribute(:workflow_state, 'zipping')
     @user = user
     @logger.debug("file found: #{attachment.id} zipping files...")
-    
+
     begin
       case attachment.context
       when Assignment; zip_assignment(attachment, attachment.context)
@@ -62,7 +62,7 @@ class ContentZipper
       attachment.update_attribute(:workflow_state, 'to_be_zipped')
     end
   end
-  
+
   def assignment_zip_filename(assignment)
     "#{assignment.context.short_name_slug}-#{assignment.title_slug} submissions"
   end
@@ -154,7 +154,7 @@ class ContentZipper
                                 :content_type,
                                 :uuid,
                                 :attachment)
-  
+
   def zip_eportfolio(zip_attachment, portfolio)
     static_attachments = []
     submissions = []
@@ -219,11 +219,11 @@ class ContentZipper
     res = av.render(:partial => "eportfolios/static_page", :locals => {:page => page, :portfolio => portfolio, :static_attachments => static_attachments, :submissions_hash => submissions_hash})
     res
   end
-  
+
   def self.zip_base_folder(*args)
     ContentZipper.new.zip_base_folder(*args)
   end
-  
+
   def zip_base_folder(zip_attachment, folder)
     @files_added = true
     @logger.debug("zipping into attachment: #{zip_attachment.id}")
@@ -241,7 +241,7 @@ class ContentZipper
       complete_attachment!(zip_attachment, zip_name)
     end
   end
-  
+
   def process_folder(folder, zipfile, start_dirs=[], &callback)
     if callback
       zip_folder(folder, zipfile, start_dirs, &callback)
@@ -249,7 +249,7 @@ class ContentZipper
       zip_folder(folder, zipfile, start_dirs)
     end
   end
-  
+
   # make a tmp directory and yield a filename under that directory to the block
   # given. the tmp directory is deleted when the block returns.
   def make_zip_tmpdir(filename)
@@ -259,30 +259,30 @@ class ContentZipper
       yield zip_name
     end
   end
-  
+
   # The callback should accept two arguments, the attachment/folder and the folder names
   def zip_folder(folder, zipfile, folder_names, &callback)
     if callback && (folder.hidden? || folder.locked)
       callback.call(folder, folder_names)
     end
-    # @user = nil either means that 
+    # @user = nil either means that
     # 1. this is part of a public course, and is being downloaded by somebody
     # not logged in - OR -
     # 2. we're doing this inside a course context export, and are bypassing
     # the user check (@check_user == false)
-    attachments = if !@check_user || folder.context.grants_right?(@user, nil, :manage_files)
+    attachments = if !@check_user || folder.context.grants_right?(@user, :manage_files)
                 folder.active_file_attachments
               else
                 folder.visible_file_attachments
               end
-    attachments.select{|a| !@check_user || a.grants_right?(@user, nil, :download)}.each do |attachment|
+    attachments.select{|a| !@check_user || a.grants_right?(@user, :download)}.each do |attachment|
       callback.call(attachment, folder_names) if callback
       @context = folder.context
       @logger.debug("  found attachment: #{attachment.unencoded_filename}")
       path = folder_names.empty? ? attachment.display_name : File.join(folder_names, attachment.display_name)
       @files_added = false unless add_attachment_to_zip(attachment, zipfile, path)
     end
-    folder.active_sub_folders.select{|f| !@check_user || f.grants_right?(@user, nil, :read_contents)}.each do |sub_folder|
+    folder.active_sub_folders.select{|f| !@check_user || f.grants_right?(@user, :read_contents)}.each do |sub_folder|
       new_names = Array.new(folder_names) << sub_folder.name
       if callback
         zip_folder(sub_folder, zipfile, new_names, &callback)
@@ -311,7 +311,7 @@ class ContentZipper
   def zipped_successfully?
     !!@zip_successful
   end
-  
+
   def add_attachment_to_zip(attachment, zipfile, filename = nil)
     filename ||= attachment.filename
 
@@ -320,7 +320,7 @@ class ContentZipper
     @files_in_zip ||= Set.new
     filename = Attachment.make_unique_filename(filename, @files_in_zip)
     @files_in_zip << filename
-    
+
     handle = nil
     begin
       handle = attachment.open(:need_local_file => true)
@@ -331,7 +331,7 @@ class ContentZipper
     ensure
       handle.close if handle
     end
-    
+
     true
   end
 

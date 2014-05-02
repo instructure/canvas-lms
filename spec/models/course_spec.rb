@@ -153,7 +153,7 @@ describe Course do
       sub_sub_account = Account.create!(:parent_account => sub_account)
       user = account_admin_user(:account => sub_account)
       course = Course.create!(:account => sub_sub_account)
-      course.grants_right?(user, nil, :manage).should be_true
+      course.grants_right?(user, :manage).should be_true
     end
 
     # we have to reload the users after each course change here to catch the
@@ -170,44 +170,44 @@ describe Course do
       @course.enroll_ta(@ta).accept!
 
       # active, non-sis course
-      @course.grants_right?(@teacher, nil, :delete).should be_true
-      @course.grants_right?(@designer, nil, :delete).should be_true
-      @course.grants_right?(@ta, nil, :delete).should be_false
-      @course.grants_right?(@admin1, nil, :delete).should be_true
-      @course.grants_right?(@admin2, nil, :delete).should be_false
+      @course.grants_right?(@teacher, :delete).should be_true
+      @course.grants_right?(@designer, :delete).should be_true
+      @course.grants_right?(@ta, :delete).should be_false
+      @course.grants_right?(@admin1, :delete).should be_true
+      @course.grants_right?(@admin2, :delete).should be_false
 
       # active, sis course
       @course.sis_source_id = 'sis_id'
       @course.save!
       [@course, @teacher, @designer, @ta, @admin1, @admin2].each(&:reload)
 
-      @course.grants_right?(@teacher, nil, :delete).should be_false
-      @course.grants_right?(@designer, nil, :delete).should be_false
-      @course.grants_right?(@ta, nil, :delete).should be_false
-      @course.grants_right?(@admin1, nil, :delete).should be_true
-      @course.grants_right?(@admin2, nil, :delete).should be_true
+      @course.grants_right?(@teacher, :delete).should be_false
+      @course.grants_right?(@designer, :delete).should be_false
+      @course.grants_right?(@ta, :delete).should be_false
+      @course.grants_right?(@admin1, :delete).should be_true
+      @course.grants_right?(@admin2, :delete).should be_true
 
       # completed, non-sis course
       @course.sis_source_id = nil
       @course.complete!
       [@course, @teacher, @designer, @ta, @admin1, @admin2].each(&:reload)
 
-      @course.grants_right?(@teacher, nil, :delete).should be_true
-      @course.grants_right?(@designer, nil, :delete).should be_true
-      @course.grants_right?(@ta, nil, :delete).should be_false
-      @course.grants_right?(@admin1, nil, :delete).should be_true
-      @course.grants_right?(@admin2, nil, :delete).should be_false
+      @course.grants_right?(@teacher, :delete).should be_true
+      @course.grants_right?(@designer, :delete).should be_true
+      @course.grants_right?(@ta, :delete).should be_false
+      @course.grants_right?(@admin1, :delete).should be_true
+      @course.grants_right?(@admin2, :delete).should be_false
 
       # completed, sis course
       @course.sis_source_id = 'sis_id'
       @course.save!
       [@course, @teacher, @designer, @ta, @admin1, @admin2].each(&:reload)
 
-      @course.grants_right?(@teacher, nil, :delete).should be_false
-      @course.grants_right?(@designer, nil, :delete).should be_false
-      @course.grants_right?(@ta, nil, :delete).should be_false
-      @course.grants_right?(@admin1, nil, :delete).should be_true
-      @course.grants_right?(@admin2, nil, :delete).should be_true
+      @course.grants_right?(@teacher, :delete).should be_false
+      @course.grants_right?(@designer, :delete).should be_false
+      @course.grants_right?(@ta, :delete).should be_false
+      @course.grants_right?(@admin1, :delete).should be_true
+      @course.grants_right?(@admin2, :delete).should be_true
     end
 
     it "should grant reset_content to the proper individuals" do
@@ -222,44 +222,44 @@ describe Course do
       @course.enroll_ta(@ta).accept!
 
       # active, non-sis course
-      @course.grants_right?(@teacher, nil, :reset_content).should be_true
-      @course.grants_right?(@designer, nil, :reset_content).should be_true
-      @course.grants_right?(@ta, nil, :reset_content).should be_false
-      @course.grants_right?(@admin1, nil, :reset_content).should be_true
-      @course.grants_right?(@admin2, nil, :reset_content).should be_false
+      @course.grants_right?(@teacher, :reset_content).should be_true
+      @course.grants_right?(@designer, :reset_content).should be_true
+      @course.grants_right?(@ta, :reset_content).should be_false
+      @course.grants_right?(@admin1, :reset_content).should be_true
+      @course.grants_right?(@admin2, :reset_content).should be_false
 
       # active, sis course
       @course.sis_source_id = 'sis_id'
       @course.save!
       [@course, @teacher, @designer, @ta, @admin1, @admin2].each(&:reload)
 
-      @course.grants_right?(@teacher, nil, :reset_content).should be_true
-      @course.grants_right?(@designer, nil, :reset_content).should be_true
-      @course.grants_right?(@ta, nil, :reset_content).should be_false
-      @course.grants_right?(@admin1, nil, :reset_content).should be_true
-      @course.grants_right?(@admin2, nil, :reset_content).should be_false
+      @course.grants_right?(@teacher, :reset_content).should be_true
+      @course.grants_right?(@designer, :reset_content).should be_true
+      @course.grants_right?(@ta, :reset_content).should be_false
+      @course.grants_right?(@admin1, :reset_content).should be_true
+      @course.grants_right?(@admin2, :reset_content).should be_false
 
       # completed, non-sis course
       @course.sis_source_id = nil
       @course.complete!
       [@course, @teacher, @designer, @ta, @admin1, @admin2].each(&:reload)
 
-      @course.grants_right?(@teacher, nil, :reset_content).should be_false
-      @course.grants_right?(@designer, nil, :reset_content).should be_false
-      @course.grants_right?(@ta, nil, :reset_content).should be_false
-      @course.grants_right?(@admin1, nil, :reset_content).should be_true
-      @course.grants_right?(@admin2, nil, :reset_content).should be_false
+      @course.grants_right?(@teacher, :reset_content).should be_false
+      @course.grants_right?(@designer, :reset_content).should be_false
+      @course.grants_right?(@ta, :reset_content).should be_false
+      @course.grants_right?(@admin1, :reset_content).should be_true
+      @course.grants_right?(@admin2, :reset_content).should be_false
 
       # completed, sis course
       @course.sis_source_id = 'sis_id'
       @course.save!
       [@course, @teacher, @designer, @ta, @admin1, @admin2].each(&:reload)
 
-      @course.grants_right?(@teacher, nil, :reset_content).should be_false
-      @course.grants_right?(@designer, nil, :reset_content).should be_false
-      @course.grants_right?(@ta, nil, :reset_content).should be_false
-      @course.grants_right?(@admin1, nil, :reset_content).should be_true
-      @course.grants_right?(@admin2, nil, :reset_content).should be_false
+      @course.grants_right?(@teacher, :reset_content).should be_false
+      @course.grants_right?(@designer, :reset_content).should be_false
+      @course.grants_right?(@ta, :reset_content).should be_false
+      @course.grants_right?(@admin1, :reset_content).should be_true
+      @course.grants_right?(@admin2, :reset_content).should be_false
     end
 
     def make_date_completed
@@ -274,8 +274,8 @@ describe Course do
       course_with_teacher(:active_all => 1)
       make_date_completed
       @course.prior_enrollments.should == []
-      @course.grants_right?(@teacher, nil, :read_as_admin).should be_true
-      @course.grants_right?(@teacher, nil, :read_forum).should be_true
+      @course.grants_right?(@teacher, :read_as_admin).should be_true
+      @course.grants_right?(@teacher, :read_forum).should be_true
     end
 
     it "should grant read_as_admin and read to date-completed teacher of unpublished course" do
@@ -283,18 +283,18 @@ describe Course do
       @course.update_attribute(:workflow_state, 'claimed')
       make_date_completed
       @course.prior_enrollments.should == []
-      @course.grants_right?(@teacher, nil, :read_as_admin).should be_true
-      @course.grants_right?(@teacher, nil, :read).should be_true
+      @course.grants_right?(@teacher, :read_as_admin).should be_true
+      @course.grants_right?(@teacher, :read).should be_true
     end
 
     it "should grant read_as_admin, read, manage, and update to date-active designer" do
       course(:active_all => 1)
       @designer = user(:active_all => 1)
       @course.enroll_designer(@designer).accept!
-      @course.grants_right?(@designer, nil, :read_as_admin).should be_true
-      @course.grants_right?(@designer, nil, :read).should be_true
-      @course.grants_right?(@designer, nil, :manage).should be_true
-      @course.grants_right?(@designer, nil, :update).should be_true
+      @course.grants_right?(@designer, :read_as_admin).should be_true
+      @course.grants_right?(@designer, :read).should be_true
+      @course.grants_right?(@designer, :manage).should be_true
+      @course.grants_right?(@designer, :update).should be_true
     end
 
     it "should grant read_as_admin, read_roster, and read_prior_roster to date-completed designer" do
@@ -307,9 +307,9 @@ describe Course do
       @enrollment.save!
       @enrollment.reload.state_based_on_date.should == :completed
       @course.prior_enrollments.should == []
-      @course.grants_right?(@designer, nil, :read_as_admin).should be_true
-      @course.grants_right?(@designer, nil, :read_roster).should be_true
-      @course.grants_right?(@designer, nil, :read_prior_roster).should be_true
+      @course.grants_right?(@designer, :read_as_admin).should be_true
+      @course.grants_right?(@designer, :read_roster).should be_true
+      @course.grants_right?(@designer, :read_prior_roster).should be_true
     end
 
     it "should grant read_as_admin and read to date-completed designer of unpublished course" do
@@ -320,24 +320,24 @@ describe Course do
       @course.update_attribute(:workflow_state, 'claimed')
       make_date_completed
       @course.prior_enrollments.should == []
-      @course.grants_right?(@designer, nil, :read_as_admin).should be_true
-      @course.grants_right?(@designer, nil, :read).should be_true
+      @course.grants_right?(@designer, :read_as_admin).should be_true
+      @course.grants_right?(@designer, :read).should be_true
     end
 
     it "should not grant read_user_notes or view_all_grades to designer" do
       course(:active_all => 1)
       @designer = user(:active_all => 1)
       @course.enroll_designer(@designer).accept!
-      @course.grants_right?(@designer, nil, :read_user_notes).should be_false
-      @course.grants_right?(@designer, nil, :view_all_grades).should be_false
+      @course.grants_right?(@designer, :read_user_notes).should be_false
+      @course.grants_right?(@designer, :view_all_grades).should be_false
     end
 
     it "should grant read_grades read_forum to date-completed student" do
       course_with_student(:active_all => 1)
       make_date_completed
       @course.prior_enrollments.should == []
-      @course.grants_right?(@student, nil, :read_grades).should be_true
-      @course.grants_right?(@student, nil, :read_forum).should be_true
+      @course.grants_right?(@student, :read_grades).should be_true
+      @course.grants_right?(@student, :read_forum).should be_true
     end
 
     it "should not grant read to completed students of an unpublished course" do
@@ -2794,7 +2794,7 @@ describe Course, "conclusions" do
     @course.reload
 
     # active
-    @course.grants_rights?(@user, nil, :read, :participate_as_student).should == {:read => true, :participate_as_student => true}
+    @course.rights_status(@user, :read, :participate_as_student).should == {:read => true, :participate_as_student => true}
 
     # soft conclusion
     enrollment.start_at = 4.days.ago
@@ -2808,7 +2808,7 @@ describe Course, "conclusions" do
     enrollment.state_based_on_date.should == :completed
     enrollment.should_not be_participating_student
 
-    @course.grants_rights?(@user, nil, :read, :participate_as_student).should == {:read => true, :participate_as_student => false}
+    @course.rights_status(@user, :read, :participate_as_student).should == {:read => true, :participate_as_student => false}
 
     # hard enrollment conclusion
     enrollment.start_at = enrollment.end_at = nil
@@ -2820,7 +2820,7 @@ describe Course, "conclusions" do
     enrollment.state.should == :completed
     enrollment.state_based_on_date.should == :completed
 
-    @course.grants_rights?(@user, nil, :read, :participate_as_student).should == {:read => true, :participate_as_student => false}
+    @course.rights_status(@user, :read, :participate_as_student).should == {:read => true, :participate_as_student => false}
 
     # course conclusion
     enrollment.workflow_state = 'active'
@@ -2833,7 +2833,7 @@ describe Course, "conclusions" do
     enrollment.state.should == :completed
     enrollment.state_based_on_date.should == :completed
 
-    @course.grants_rights?(@user, nil, :read, :participate_as_student).should == {:read => true, :participate_as_student => false}
+    @course.rights_status(@user, :read, :participate_as_student).should == {:read => true, :participate_as_student => false}
   end
 
   context "appointment cancelation" do
@@ -3392,23 +3392,23 @@ describe Course do
         site_admin.add_user(@user)
 
         @shard1.activate do
-          @course.grants_right?(@site_admin, nil, :manage_content).should be_true
-          @course.grants_right?(@teacher, nil, :manage_content).should be_true
-          @course.grants_right?(@student, nil, :manage_content).should be_false
+          @course.grants_right?(@site_admin, :manage_content).should be_true
+          @course.grants_right?(@teacher, :manage_content).should be_true
+          @course.grants_right?(@student, :manage_content).should be_false
         end
 
-        @course.grants_right?(@site_admin, nil, :manage_content).should be_true
+        @course.grants_right?(@site_admin, :manage_content).should be_true
       end
 
       enable_cache do
         # do it in a different order
         @shard1.activate do
-          @course.grants_right?(@student, nil, :manage_content).should be_false
-          @course.grants_right?(@teacher, nil, :manage_content).should be_true
-          @course.grants_right?(@site_admin, nil, :manage_content).should be_true
+          @course.grants_right?(@student, :manage_content).should be_false
+          @course.grants_right?(@teacher, :manage_content).should be_true
+          @course.grants_right?(@site_admin, :manage_content).should be_true
         end
 
-        @course.grants_right?(@site_admin, nil, :manage_content).should be_true
+        @course.grants_right?(@site_admin, :manage_content).should be_true
       end
     end
 

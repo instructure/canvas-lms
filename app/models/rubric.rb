@@ -44,44 +44,44 @@ class Rubric < ActiveRecord::Base
 
   serialize :data
   simply_versioned
-  
+
   scope :publicly_reusable, lambda { where(:reusable => true).order(best_unicode_collation_key('title')) }
   scope :matching, lambda { |search| where(wildcard('rubrics.title', search)).order("rubrics.association_count DESC") }
   scope :before, lambda { |date| where("rubrics.created_at<?", date) }
   scope :active, where("workflow_state<>'deleted'")
 
   set_policy do
-    given {|user, session| self.cached_context_grants_right?(user, session, :manage_rubrics)}
+    given {|user, session| self.context.grants_right?(user, session, :manage_rubrics)}
     can :read and can :create and can :delete_associations
-    
-    given {|user, session| self.cached_context_grants_right?(user, session, :manage_assignments)}
+
+    given {|user, session| self.context.grants_right?(user, session, :manage_assignments)}
     can :read and can :create and can :delete_associations
-    
-    given {|user, session| self.cached_context_grants_right?(user, session, :manage)}
+
+    given {|user, session| self.context.grants_right?(user, session, :manage)}
     can :read and can :create and can :delete_associations
-    
+
     # read_only means "associated with > 1 object for grading purposes"
-    given {|user, session| !self.read_only && self.rubric_associations.for_grading.length < 2 && self.cached_context_grants_right?(user, session, :manage_assignments)}
-    can :update and can :delete
-    
-    given {|user, session| !self.read_only && self.rubric_associations.for_grading.length < 2 && self.cached_context_grants_right?(user, session, :manage_rubrics)}
+    given {|user, session| !self.read_only && self.rubric_associations.for_grading.length < 2 && self.context.grants_right?(user, session, :manage_assignments)}
     can :update and can :delete
 
-    given {|user, session| self.cached_context_grants_right?(user, session, :manage_assignments)}
-    can :delete
-    
-    given {|user, session| self.cached_context_grants_right?(user, session, :manage_rubrics)}
+    given {|user, session| !self.read_only && self.rubric_associations.for_grading.length < 2 && self.context.grants_right?(user, session, :manage_rubrics)}
+    can :update and can :delete
+
+    given {|user, session| self.context.grants_right?(user, session, :manage_assignments)}
     can :delete
 
-    given {|user, session| self.cached_context_grants_right?(user, session, :read) }
+    given {|user, session| self.context.grants_right?(user, session, :manage_rubrics)}
+    can :delete
+
+    given {|user, session| self.context.grants_right?(user, session, :read) }
     can :read
   end
-  
+
   workflow do
     state :active
     state :deleted
   end
-  
+
   def default_values
     original_title = self.title
     cnt = 0
@@ -93,19 +93,19 @@ class Rubric < ActiveRecord::Base
     end
     self.context_code = "#{self.context_type.underscore}_#{self.context_id}" rescue nil
   end
-  
+
   alias_method :destroy!, :destroy
   def destroy
     rubric_associations.update_all(:bookmarked => false, :updated_at => Time.now.utc)
     self.workflow_state = 'deleted'
     self.save
   end
-  
+
   def restore
     self.workflow_state = 'active'
     self.save
   end
-  
+
   # If any rubric_associations for a given context are marked as
   # bookmarked, then the rubric will show up in the context's list
   # of rubrics.  The two main values for the 'purpose' field on
@@ -147,11 +147,11 @@ class Rubric < ActiveRecord::Base
   def data_outcome_ids
     (data || []).map{|c| c[:learning_outcome_id] }.compact.map(&:to_i).uniq
   end
-  
+
   def criteria_object
     OpenObject.process(self.data)
   end
-  
+
   def display_name
     res = ""
     res += self.user.name + ", " rescue ""
@@ -198,7 +198,7 @@ class Rubric < ActiveRecord::Base
     @used_ids[id] = true
     id
   end
-  
+
   def update_criteria(params)
     self.without_versioning(&:save) if self.new_record?
     data = generate_criteria(params)
@@ -210,7 +210,7 @@ class Rubric < ActiveRecord::Base
     self.save
     self
   end
-  
+
   def will_change_with_update?(params)
     return true if params[:free_form_criterion_comments] && !!self.free_form_criterion_comments != (params[:free_form_criterion_comments] == '1')
     data = generate_criteria(params)
@@ -218,7 +218,7 @@ class Rubric < ActiveRecord::Base
     return true if data.criteria != self.criteria
     false
   end
-  
+
   CriteriaData = Struct.new(:criteria, :points_possible, :title)
   def generate_criteria(params)
     @used_ids = {}
@@ -261,7 +261,7 @@ class Rubric < ActiveRecord::Base
     criteria = criteria.compact
     CriteriaData.new(criteria, points_possible, title)
   end
-  
+
   def update_assessments_for_new_criteria(new_criteria)
     criteria = self.data
   end

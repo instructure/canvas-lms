@@ -28,7 +28,7 @@ class GradeSummaryPresenter
   end
 
   def user_has_elevated_permissions?
-    (@context.grants_right?(@current_user, nil, :manage_grades) || @context.grants_right?(@current_user, nil, :view_all_grades))
+    @context.grants_any_right?(@current_user, :manage_grades, :view_all_grades)
   end
 
   def user_needs_redirection?
@@ -65,13 +65,13 @@ class GradeSummaryPresenter
   end
 
   def linkable_observed_students
-    observed_students.keys.select{ |student| observed_students[student].all? { |e| e.grants_right?(@current_user, nil, :read_grades) } }
+    observed_students.keys.select{ |student| observed_students[student].all? { |e| e.grants_right?(@current_user, :read_grades) } }
   end
 
   def selectable_courses
     courses_with_grades.to_a.select do |course|
       student_enrollment = course.all_student_enrollments.find_by_user_id(student)
-      student_enrollment.grants_right?(@current_user, nil, :read_grades)
+      student_enrollment.grants_right?(@current_user, :read_grades)
     end
   end
 

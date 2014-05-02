@@ -23,11 +23,11 @@ describe MediaObject do
     it "should load by either media_id or old_media_id" do
       course
       mo = factory_with_protected_attributes(MediaObject, :media_id => '0_abcdefgh', :old_media_id => '1_01234567', :context => @course)
-      
+
       MediaObject.by_media_id('0_abcdefgh').first.should == mo
       MediaObject.by_media_id('1_01234567').first.should == mo
     end
-    
+
     it "should raise an error if someone tries to use find_by_media_id" do
       lambda { MediaObject.find_by_media_id('fjdksl') }.should raise_error
     end
@@ -111,8 +111,8 @@ describe MediaObject do
         mo.user = nil
         mo.save!
 
-        mo.grants_right?(@teacher, nil, :add_captions).should == true
-        mo.grants_right?(@teacher, nil, :delete_captions).should == true
+        mo.grants_right?(@teacher, :add_captions).should == true
+        mo.grants_right?(@teacher, :delete_captions).should == true
       end
 
       it "should not allow course non-admin users to add_captions to userless objects" do
@@ -122,8 +122,8 @@ describe MediaObject do
         mo.user = nil
         mo.save!
 
-        mo.grants_right?(@student, nil, :add_captions).should == false
-        mo.grants_right?(@student, nil, :delete_captions).should == false
+        mo.grants_right?(@student, :add_captions).should == false
+        mo.grants_right?(@student, :delete_captions).should == false
       end
 
       it "should allow course non-admin users to add_captions to objects belonging to them" do
@@ -133,8 +133,8 @@ describe MediaObject do
         mo.user = @student
         mo.save!
 
-        mo.grants_right?(@student, nil, :add_captions).should == true
-        mo.grants_right?(@student, nil, :delete_captions).should == true
+        mo.grants_right?(@student, :add_captions).should == true
+        mo.grants_right?(@student, :delete_captions).should == true
       end
 
       it "should not allow course non-admin users to add_captions to objects not belonging to them" do
@@ -145,8 +145,8 @@ describe MediaObject do
         mo.user = @user
         mo.save!
 
-        mo.grants_right?(@student, nil, :add_captions).should == false
-        mo.grants_right?(@student, nil, :delete_captions).should == false
+        mo.grants_right?(@student, :add_captions).should == false
+        mo.grants_right?(@student, :delete_captions).should == false
       end
     end
   end

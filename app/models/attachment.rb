@@ -1115,18 +1115,18 @@ class Attachment < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user, session| self.cached_context_grants_right?(user, session, :manage_files) } #admins.include? user }
+    given { |user, session| self.context.grants_right?(user, session, :manage_files) } #admins.include? user }
     can :read and can :update and can :delete and can :create and can :download
 
     given { |user| self.public? }
     can :read and can :download
 
-    given { |user, session| self.cached_context_grants_right?(user, session, :read) } #students.include? user }
+    given { |user, session| self.context.grants_right?(user, session, :read) } #students.include? user }
     can :read
 
     given { |user, session|
-      self.cached_context_grants_right?(user, session, :read) &&
-      (self.cached_context_grants_right?(user, session, :manage_files) || !self.locked_for?(user))
+      self.context.grants_right?(user, session, :read) &&
+      (self.context.grants_right?(user, session, :manage_files) || !self.locked_for?(user))
     }
     can :download
 
@@ -1136,7 +1136,7 @@ class Attachment < ActiveRecord::Base
     given { |user, session|
         session && session['file_access_user_id'].present? &&
         (u = User.find_by_id(session['file_access_user_id'])) &&
-        self.cached_context_grants_right?(u, session, :read) &&
+        self.context.grants_right?(u, session, :read) &&
         session['file_access_expiration'] && session['file_access_expiration'].to_i > Time.now.to_i
     }
     can :read
@@ -1144,8 +1144,8 @@ class Attachment < ActiveRecord::Base
     given { |user, session|
         session && session['file_access_user_id'].present? &&
         (u = User.find_by_id(session['file_access_user_id'])) &&
-        self.cached_context_grants_right?(u, session, :read) &&
-        (self.cached_context_grants_right?(u, session, :manage_files) || !self.locked_for?(u)) &&
+        self.context.grants_right?(u, session, :read) &&
+        (self.context.grants_right?(u, session, :manage_files) || !self.locked_for?(u)) &&
         session['file_access_expiration'] && session['file_access_expiration'].to_i > Time.now.to_i
     }
     can :download
@@ -1163,7 +1163,7 @@ class Attachment < ActiveRecord::Base
 
   def locked_for?(user, opts={})
     return false if @skip_submission_attachment_lock_checks
-    return false if opts[:check_policies] && self.grants_right?(user, nil, :update)
+    return false if opts[:check_policies] && self.grants_right?(user, :update)
     return {:asset_string => self.asset_string, :manually_locked => true} if self.locked || (self.folder && self.folder.locked?)
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       locked = false
@@ -1585,7 +1585,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def protect_for(user)
-    @cant_preview_scribd_doc = !self.grants_right?(user, nil, :download)
+    @cant_preview_scribd_doc = !self.grants_right?(user, :download)
   end
 
   def self.attachment_list_from_migration(context, ids)

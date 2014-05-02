@@ -139,7 +139,7 @@ module ApplicationHelper
 
   # Helper for easily checking vender/plugins/adheres_to_policy.rb
   # policies from within a view.  Caches the response, but basically
-  # user calls object.grants_right?(user, nil, action)
+  # user calls object.grants_right?(user, action)
   def can_do(object, user, *actions)
     return false unless object
     if object.is_a?(OpenObject) && object.type
@@ -416,7 +416,7 @@ module ApplicationHelper
   end
 
   def show_user_create_course_button(user)
-    @domain_root_account.manually_created_courses_account.grants_rights?(user, session, :create_courses, :manage_courses).values.any?
+    @domain_root_account.manually_created_courses_account.grants_any_right?(user, session, :create_courses, :manage_courses)
   end
 
   # Public: Create HTML for a sidebar button w/ icon.

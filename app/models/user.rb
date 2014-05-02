@@ -911,7 +911,7 @@ class User < ActiveRecord::Base
   end
 
   def courses_with_grades
-    @courses_with_grades ||= self.available_courses.with_each_shard.select{|c| c.grants_right?(self, nil, :participate_as_student)}
+    @courses_with_grades ||= self.available_courses.with_each_shard.select{|c| c.grants_right?(self, :participate_as_student)}
   end
 
   def sis_pseudonym_for(context, include_trusted = false)
@@ -958,22 +958,22 @@ class User < ActiveRecord::Base
         # by default this means that the user we are given is an administrator
         # of an account of one of the courses that this user is enrolled in, or
         # an admin (teacher/ta/designer) in the course
-        self.all_courses.any? { |c| c.grants_right?(user, nil, :read_reports) }
+        self.all_courses.any? { |c| c.grants_right?(user, :read_reports) }
       )
     end
     can :rename and can :remove_avatar and can :read_reports
 
     given do |user|
-      user && self.all_courses.any? { |c| c.grants_right?(user, nil, :manage_user_notes) }
+      user && self.all_courses.any? { |c| c.grants_right?(user, :manage_user_notes) }
     end
     can :create_user_notes and can :read_user_notes
 
-    given { |user| user && self.all_courses.any? { |c| c.grants_right?(user, nil, :read_user_notes) } }
+    given { |user| user && self.all_courses.any? { |c| c.grants_right?(user, :read_user_notes) } }
     can :read_user_notes
 
     given do |user|
       user && (
-        self.associated_accounts.any?{|a| a.grants_right?(user, nil, :manage_user_notes)}
+        self.associated_accounts.any?{|a| a.grants_right?(user, :manage_user_notes)}
       )
     end
     can :create_user_notes and can :read_user_notes and can :delete_user_notes
@@ -981,7 +981,7 @@ class User < ActiveRecord::Base
     given do |user|
       user && (
       Account.site_admin.grants_right?(user, :view_statistics) ||
-          self.associated_accounts.any?{|a| a.grants_right?(user, nil, :view_statistics)  }
+          self.associated_accounts.any?{|a| a.grants_right?(user, :view_statistics)  }
       )
     end
     can :view_statistics
@@ -990,7 +990,7 @@ class User < ActiveRecord::Base
       user && (
         # or, if the user we are given is an admin in one of this user's accounts
         Account.site_admin.grants_right?(user, :manage_students) ||
-        self.associated_accounts.any? {|a| a.grants_right?(user, nil, :manage_students) }
+        self.associated_accounts.any? {|a| a.grants_right?(user, :manage_students) }
       )
     end
     can :manage_user_details and can :update_avatar and can :remove_avatar and can :rename and can :view_statistics and can :read and can :read_reports and can :manage_feature_flags
@@ -998,7 +998,7 @@ class User < ActiveRecord::Base
     given do |user|
       user && (
         Account.site_admin.grants_right?(user, :manage_user_logins) ||
-        self.associated_accounts.any?{|a| a.grants_right?(user, nil, :manage_user_logins)  }
+        self.associated_accounts.any?{|a| a.grants_right?(user, :manage_user_logins)  }
       )
     end
     can :view_statistics and can :read and can :read_reports
@@ -1007,7 +1007,7 @@ class User < ActiveRecord::Base
       user && (
         # or, if the user we are given is an admin in one of this user's accounts
         Account.site_admin.grants_right?(user, :manage_user_logins) ||
-        (self.associated_accounts.any?{|a| a.grants_right?(user, nil, :manage_user_logins) } &&
+        (self.associated_accounts.any?{|a| a.grants_right?(user, :manage_user_logins) } &&
          self.all_accounts.select(&:root_account?).all? {|a| has_subset_of_account_permissions?(user, a) } )
       )
     end
@@ -1017,7 +1017,7 @@ class User < ActiveRecord::Base
   def can_masquerade?(masquerader, account)
     return true if self == masquerader
     # student view should only ever have enrollments in a single course
-    return true if self.fake_student? && self.courses.any?{ |c| c.grants_right?(masquerader, nil, :use_student_view) }
+    return true if self.fake_student? && self.courses.any?{ |c| c.grants_right?(masquerader, :use_student_view) }
     return false unless
         account.grants_right?(masquerader, nil, :become_user) && self.find_pseudonym_for_account(account, true)
     has_subset_of_account_permissions?(masquerader, account)
@@ -1794,7 +1794,7 @@ class User < ActiveRecord::Base
   def select_upcoming_assignments(assignments,opts)
     time = opts[:time] || Time.zone.now
     assignments.select do |a|
-      if a.grants_right?(self, nil, :delete)
+      if a.grants_right?(self, :delete)
         a.dates_hash_visible_to(self).any? do |due_hash|
           due_hash[:due_at] && due_hash[:due_at] >= time && due_hash[:due_at] <= opts[:end_at]
         end
@@ -1877,7 +1877,7 @@ class User < ActiveRecord::Base
     return @manageable_appointment_context_codes if @manageable_appointment_context_codes
     ret = {:full => [], :limited => [], :secondary => []}
     cached_current_enrollments.each do |e|
-      next unless e.course.grants_right?(self, nil, :manage_calendar)
+      next unless e.course.grants_right?(self, :manage_calendar)
       if e.course.visibility_limited_to_course_sections?(self)
         ret[:limited] << "course_#{e.course_id}"
         ret[:secondary] << "course_section_#{e.course_section_id}"

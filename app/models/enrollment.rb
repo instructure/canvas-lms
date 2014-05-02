@@ -867,13 +867,13 @@ class Enrollment < ActiveRecord::Base
   end
 
   set_policy do
-    given {|user, session| self.course.grants_rights?(user, session, :manage_students, :manage_admin_users).values.any? }
+    given {|user, session| self.course.grants_any_right?(user, session, :manage_students, :manage_admin_users) }
     can :read
 
     given { |user| self.user == user }
     can :read and can :read_grades
 
-    given { |user, session| self.course.students_visible_to(user, true).map(&:id).include?(self.user_id) && self.course.grants_rights?(user, session, :manage_grades, :view_all_grades).values.any? }
+    given { |user, session| self.course.students_visible_to(user, true).map(&:id).include?(self.user_id) && self.course.grants_any_right?(user, session, :manage_grades, :view_all_grades) }
     can :read and can :read_grades
 
     given { |user| course.observer_enrollments.find_by_user_id_and_associated_user_id(user.id, self.user_id).present? }

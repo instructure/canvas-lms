@@ -704,7 +704,7 @@ describe Quizzes::QuizSubmission do
       oe.update_attribute(:associated_user, @user)
       @quiz = @course.quizzes.create!
       qs = @quiz.generate_submission(@user)
-      qs.grants_right?(@observer, nil, :read).should be_true
+      qs.grants_right?(@observer, :read).should be_true
     end
 
     it "allows users with the manage_grades permission but not 'manage' permission to update scores and add attempts" do

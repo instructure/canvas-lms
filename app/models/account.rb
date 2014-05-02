@@ -90,7 +90,7 @@ class Account < ActiveRecord::Base
     conds.unshift(sql.join(" OR "))
     AssessmentQuestionBank.where(conds)
   end
-  
+
   include LearningOutcomeContext
   include RubricContext
 
@@ -106,7 +106,7 @@ class Account < ActiveRecord::Base
   before_save :set_update_account_associations_if_changed
   after_save :update_account_associations_if_changed
   after_create :default_enrollment_term
-  
+
   serialize :settings, Hash
   include TimeZoneHelper
 
@@ -312,13 +312,13 @@ class Account < ActiveRecord::Base
         # so it has a max length.  I figure whatever we set it to this
         # setter should at the very least limit stored values to that
         # length.
-        ips << val if ip && val.length <= 255 
+        ips << val if ip && val.length <= 255
       end
       filters[key] = ips.join(',') unless ips.empty?
     end
     settings[:ip_filters] = filters
   end
-  
+
   def ensure_defaults
     self.uuid ||= CanvasUuid::Uuid.generate_securish_uuid
     self.lti_guid ||= self.uuid if self.respond_to?(:lti_guid)
@@ -333,13 +333,13 @@ class Account < ActiveRecord::Base
 
     root = self.root_account
     existing_account = Account.find_by_root_account_id_and_sis_source_id(root.id, self.sis_source_id)
-    
+
     return true if !existing_account || existing_account.id == self.id
 
     self.errors.add(:sis_source_id, t('#account.sis_id_in_use', "SIS ID \"%{sis_id}\" is already in use", :sis_id => self.sis_source_id))
     false
   end
-  
+
   def set_update_account_associations_if_changed
     self.root_account_id ||= self.parent_account.root_account_id if self.parent_account
     self.root_account_id ||= self.parent_account_id
@@ -348,11 +348,11 @@ class Account < ActiveRecord::Base
     @should_update_account_associations = self.parent_account_id_changed? || self.root_account_id_changed?
     true
   end
-  
+
   def update_account_associations_if_changed
     send_later_if_production(:update_account_associations) if @should_update_account_associations
   end
-  
+
   def equella_settings
     endpoint = self.settings[:equella_endpoint] || self.equella_endpoint
     if !endpoint.blank?
@@ -365,14 +365,14 @@ class Account < ActiveRecord::Base
       nil
     end
   end
-  
+
   def settings
     result = self.read_attribute(:settings)
     return result if result
     return write_attribute(:settings, {}) unless frozen?
     {}.freeze
   end
-  
+
   def domain
     HostUrl.context_host(self)
   end
@@ -380,7 +380,7 @@ class Account < ActiveRecord::Base
   def self.find_by_domain(domain)
     self.default if HostUrl.default_host == domain
   end
-  
+
   def root_account?
     !self.root_account_id
   end
@@ -408,7 +408,7 @@ class Account < ActiveRecord::Base
   end
 
   def users_visible_to(user)
-    self.grants_right?(user, nil, :read) ? self.all_users : self.all_users.none
+    self.grants_right?(user, :read) ? self.all_users : self.all_users.none
   end
 
   def users_name_like(query="")
@@ -445,7 +445,7 @@ class Account < ActiveRecord::Base
     @cached_all_users ||= {}
     @cached_all_users[limit] ||= User.of_account(self).limit(limit)
   end
-  
+
   def fast_all_users(limit=nil)
     @cached_fast_all_users ||= {}
     @cached_fast_all_users[limit] ||= self.all_users(limit).active.select("users.id, users.name, users.sortable_name").order_by_sortable_name
@@ -475,17 +475,17 @@ class Account < ActiveRecord::Base
   def file_namespace
     Shard.birth.activate { "account_#{self.root_account.id}" }
   end
-  
+
   def self.account_lookup_cache_key(id)
     ['_account_lookup2', id].cache_key
   end
-  
+
   def self.invalidate_cache(id)
     Rails.cache.delete(account_lookup_cache_key(id)) if id
-  rescue 
+  rescue
     nil
   end
-  
+
   def quota
     Rails.cache.fetch(['current_quota', self].cache_key) do
       read_attribute(:storage_quota) ||
@@ -493,21 +493,21 @@ class Account < ActiveRecord::Base
         Setting.get('account_default_quota', 500.megabytes.to_s).to_i
     end
   end
-  
+
   def default_storage_quota
-    read_attribute(:default_storage_quota) || 
+    read_attribute(:default_storage_quota) ||
       (self.parent_account.default_storage_quota rescue nil) ||
       Setting.get('account_default_quota', 500.megabytes.to_s).to_i
   end
-  
+
   def default_storage_quota_mb
     default_storage_quota / 1.megabyte
   end
-  
+
   def default_storage_quota_mb=(val)
     self.default_storage_quota = val.try(:to_i).try(:megabytes)
   end
-  
+
   def default_storage_quota=(val)
     val = val.to_f
     val = nil if val <= 0
@@ -533,7 +533,7 @@ class Account < ActiveRecord::Base
   def default_user_storage_quota_mb
     default_user_storage_quota / 1.megabyte
   end
-  
+
   def default_user_storage_quota_mb=(val)
     self.default_user_storage_quota = val.try(:to_i).try(:megabytes)
   end
@@ -561,7 +561,7 @@ class Account < ActiveRecord::Base
     return if secret.blank?
     self.turnitin_crypted_secret, self.turnitin_salt = Canvas::Security.encrypt_password(secret, 'instructure_turnitin_secret_shared')
   end
-  
+
   def turnitin_shared_secret
     return nil unless self.turnitin_salt && self.turnitin_crypted_secret
     Canvas::Security.decrypt_password(self.turnitin_crypted_secret, self.turnitin_salt, 'instructure_turnitin_secret_shared')
@@ -637,7 +637,7 @@ class Account < ActiveRecord::Base
   def associated_accounts
     self.account_chain
   end
-  
+
   def account_chain_ids(opts={})
     account_chain(opts).map(&:id)
   end
@@ -691,21 +691,21 @@ class Account < ActiveRecord::Base
     # auth configs
     self.account_authorization_configs.first
   end
-  
+
   def login_handle_name_is_customized?
     self.account_authorization_config && self.account_authorization_config.login_handle_name.present?
   end
-  
+
   def login_handle_name
     login_handle_name_is_customized? ? self.account_authorization_config.login_handle_name :
         (self.delegated_authentication? ? AccountAuthorizationConfig.default_delegated_login_handle_name :
             AccountAuthorizationConfig.default_login_handle_name)
   end
-  
+
   def self_and_all_sub_accounts
     @self_and_all_sub_accounts ||= Account.where("root_account_id=? OR parent_account_id=?", self, self).pluck(:id).uniq + [self.id]
   end
-  
+
   workflow do
     state :active
     state :deleted
@@ -800,29 +800,29 @@ class Account < ActiveRecord::Base
       entry.title     = self.name
       entry.updated   = self.updated_at
       entry.published = self.created_at
-      entry.links    << Atom::Link.new(:rel => 'alternate', 
+      entry.links    << Atom::Link.new(:rel => 'alternate',
                                     :href => "/accounts/#{self.id}")
     end
   end
-  
+
   def default_enrollment_term
     return @default_enrollment_term if @default_enrollment_term
     if self.root_account?
       @default_enrollment_term = self.enrollment_terms.active.find_or_create_by_name(EnrollmentTerm::DEFAULT_TERM_NAME)
     end
   end
-  
+
   def add_user(user, membership_type = nil)
     return nil unless user && user.is_a?(User)
     membership_type ||= 'AccountAdmin'
     au = self.account_users.find_by_user_id_and_membership_type(user.id, membership_type)
     au ||= self.account_users.create(:user => user, :membership_type => membership_type)
   end
-  
+
   def context_code
     raise "DONT USE THIS, use .short_name instead" unless Rails.env.production?
   end
-  
+
   def short_name
     name
   end
@@ -884,7 +884,7 @@ class Account < ActiveRecord::Base
   def find_courses(string)
     self.all_courses.select{|c| c.name.match(string) }
   end
-  
+
   def find_users(string)
     self.pseudonyms.map{|p| p.user }.select{|u| u.name.match(string) }
   end
@@ -988,7 +988,7 @@ class Account < ActiveRecord::Base
       User.update_account_associations(all_user_ids.to_a, :account_chain_cache => account_chain_cache)
     end
   end
-  
+
   # this will take an account and make it a sub_account of
   # itself.  Also updates all it's descendant accounts to point to
   # the correct root account, and updates the pseudonyms to
@@ -1024,7 +1024,7 @@ class Account < ActiveRecord::Base
       self.sis_batches.find_by_id(current_sis_batch_id)
     end
   end
-  
+
   def turnitin_settings
     return @turnitin_settings if defined?(@turnitin_settings)
     if self.turnitin_account_id.present? && self.turnitin_shared_secret.present?
@@ -1033,7 +1033,7 @@ class Account < ActiveRecord::Base
       @turnitin_settings = self.parent_account.try(:turnitin_settings)
     end
   end
-  
+
   def closest_turnitin_pledge
     if self.turnitin_pledge && !self.turnitin_pledge.empty?
       self.turnitin_pledge
@@ -1042,7 +1042,7 @@ class Account < ActiveRecord::Base
       res ||= t('#account.turnitin_pledge', "This assignment submission is my own, original work")
     end
   end
-  
+
   def closest_turnitin_comments
     if self.turnitin_comments && !self.turnitin_comments.empty?
       self.turnitin_comments
@@ -1050,7 +1050,7 @@ class Account < ActiveRecord::Base
       self.parent_account.try(:closest_turnitin_comments)
     end
   end
-  
+
   def self_enrollment_allowed?(course)
     if !settings[:self_enrollment].blank?
       !!(settings[:self_enrollment] == 'any' || (!course.sis_source_id && settings[:self_enrollment] == 'manually_created'))
@@ -1058,7 +1058,7 @@ class Account < ActiveRecord::Base
       !!(parent_account && parent_account.self_enrollment_allowed?(course))
     end
   end
-  
+
   TAB_COURSES = 0
   TAB_STATISTICS = 1
   TAB_PERMISSIONS = 2
@@ -1092,35 +1092,35 @@ class Account < ActiveRecord::Base
      }
     end
   end
-  
+
   def tabs_available(user=nil, opts={})
-    manage_settings = user && self.grants_right?(user, nil, :manage_account_settings)
+    manage_settings = user && self.grants_right?(user, :manage_account_settings)
     if site_admin?
       tabs = []
-      tabs << { :id => TAB_USERS, :label => t('#account.tab_users', "Users"), :css_class => 'users', :href => :account_users_path } if user && self.grants_right?(user, nil, :read_roster)
-      tabs << { :id => TAB_PERMISSIONS, :label => t('#account.tab_permissions', "Permissions"), :css_class => 'permissions', :href => :account_permissions_path } if user && self.grants_right?(user, nil, :manage_role_overrides)
+      tabs << { :id => TAB_USERS, :label => t('#account.tab_users', "Users"), :css_class => 'users', :href => :account_users_path } if user && self.grants_right?(user, :read_roster)
+      tabs << { :id => TAB_PERMISSIONS, :label => t('#account.tab_permissions', "Permissions"), :css_class => 'permissions', :href => :account_permissions_path } if user && self.grants_right?(user, :manage_role_overrides)
       tabs << { :id => TAB_SUB_ACCOUNTS, :label => t('#account.tab_sub_accounts', "Sub-Accounts"), :css_class => 'sub_accounts', :href => :account_sub_accounts_path } if manage_settings
       tabs << { :id => TAB_AUTHENTICATION, :label => t('#account.tab_authentication', "Authentication"), :css_class => 'authentication', :href => :account_account_authorization_configs_path } if manage_settings
-      tabs << { :id => TAB_PLUGINS, :label => t("#account.tab_plugins", "Plugins"), :css_class => "plugins", :href => :plugins_path, :no_args => true } if self.grants_right?(user, nil, :manage_site_settings)
-      tabs << { :id => TAB_JOBS, :label => t("#account.tab_jobs", "Jobs"), :css_class => "jobs", :href => :jobs_path, :no_args => true } if self.grants_right?(user, nil, :view_jobs)
-      tabs << { :id => TAB_DEVELOPER_KEYS, :label => t("#account.tab_developer_keys", "Developer Keys"), :css_class => "developer_keys", :href => :developer_keys_path, :no_args => true } if self.grants_right?(user, nil, :manage_developer_keys)
+      tabs << { :id => TAB_PLUGINS, :label => t("#account.tab_plugins", "Plugins"), :css_class => "plugins", :href => :plugins_path, :no_args => true } if self.grants_right?(user, :manage_site_settings)
+      tabs << { :id => TAB_JOBS, :label => t("#account.tab_jobs", "Jobs"), :css_class => "jobs", :href => :jobs_path, :no_args => true } if self.grants_right?(user, :view_jobs)
+      tabs << { :id => TAB_DEVELOPER_KEYS, :label => t("#account.tab_developer_keys", "Developer Keys"), :css_class => "developer_keys", :href => :developer_keys_path, :no_args => true } if self.grants_right?(user, :manage_developer_keys)
     else
       tabs = []
-      tabs << { :id => TAB_COURSES, :label => t('#account.tab_courses', "Courses"), :css_class => 'courses', :href => :account_path } if user && self.grants_right?(user, nil, :read_course_list)
-      tabs << { :id => TAB_USERS, :label => t('#account.tab_users', "Users"), :css_class => 'users', :href => :account_users_path } if user && self.grants_right?(user, nil, :read_roster)
-      tabs << { :id => TAB_STATISTICS, :label => t('#account.tab_statistics', "Statistics"), :css_class => 'statistics', :href => :statistics_account_path } if user && self.grants_right?(user, nil, :view_statistics)
-      tabs << { :id => TAB_PERMISSIONS, :label => t('#account.tab_permissions', "Permissions"), :css_class => 'permissions', :href => :account_permissions_path } if user && self.grants_right?(user, nil, :manage_role_overrides)
-      if user && self.grants_right?(user, nil, :manage_outcomes)
+      tabs << { :id => TAB_COURSES, :label => t('#account.tab_courses', "Courses"), :css_class => 'courses', :href => :account_path } if user && self.grants_right?(user, :read_course_list)
+      tabs << { :id => TAB_USERS, :label => t('#account.tab_users', "Users"), :css_class => 'users', :href => :account_users_path } if user && self.grants_right?(user, :read_roster)
+      tabs << { :id => TAB_STATISTICS, :label => t('#account.tab_statistics', "Statistics"), :css_class => 'statistics', :href => :statistics_account_path } if user && self.grants_right?(user, :view_statistics)
+      tabs << { :id => TAB_PERMISSIONS, :label => t('#account.tab_permissions', "Permissions"), :css_class => 'permissions', :href => :account_permissions_path } if user && self.grants_right?(user, :manage_role_overrides)
+      if user && self.grants_right?(user, :manage_outcomes)
         tabs << { :id => TAB_OUTCOMES, :label => t('#account.tab_outcomes', "Outcomes"), :css_class => 'outcomes', :href => :account_outcomes_path }
         tabs << { :id => TAB_RUBRICS, :label => t('#account.tab_rubrics', "Rubrics"), :css_class => 'rubrics', :href => :account_rubrics_path }
       end
-      tabs << { :id => TAB_GRADING_STANDARDS, :label => t('#account.tab_grading_standards', "Grading Schemes"), :css_class => 'grading_standards', :href => :account_grading_standards_path } if user && self.grants_right?(user, nil, :manage_grades)
-      tabs << { :id => TAB_QUESTION_BANKS, :label => t('#account.tab_question_banks', "Question Banks"), :css_class => 'question_banks', :href => :account_question_banks_path } if user && self.grants_right?(user, nil, :manage_grades)
+      tabs << { :id => TAB_GRADING_STANDARDS, :label => t('#account.tab_grading_standards', "Grading Schemes"), :css_class => 'grading_standards', :href => :account_grading_standards_path } if user && self.grants_right?(user, :manage_grades)
+      tabs << { :id => TAB_QUESTION_BANKS, :label => t('#account.tab_question_banks', "Question Banks"), :css_class => 'question_banks', :href => :account_question_banks_path } if user && self.grants_right?(user, :manage_grades)
       tabs << { :id => TAB_SUB_ACCOUNTS, :label => t('#account.tab_sub_accounts', "Sub-Accounts"), :css_class => 'sub_accounts', :href => :account_sub_accounts_path } if manage_settings
-      tabs << { :id => TAB_FACULTY_JOURNAL, :label => t('#account.tab_faculty_journal', "Faculty Journal"), :css_class => 'faculty_journal', :href => :account_user_notes_path} if self.enable_user_notes && user && self.grants_right?(user, nil, :manage_user_notes)
+      tabs << { :id => TAB_FACULTY_JOURNAL, :label => t('#account.tab_faculty_journal', "Faculty Journal"), :css_class => 'faculty_journal', :href => :account_user_notes_path} if self.enable_user_notes && user && self.grants_right?(user, :manage_user_notes)
       tabs << { :id => TAB_TERMS, :label => t('#account.tab_terms', "Terms"), :css_class => 'terms', :href => :account_terms_path } if self.root_account? && manage_settings
       tabs << { :id => TAB_AUTHENTICATION, :label => t('#account.tab_authentication', "Authentication"), :css_class => 'authentication', :href => :account_account_authorization_configs_path } if self.root_account? && manage_settings
-      tabs << { :id => TAB_SIS_IMPORT, :label => t('#account.tab_sis_import', "SIS Import"), :css_class => 'sis_import', :href => :account_sis_import_path } if self.root_account? && self.allow_sis_import && user && self.grants_right?(user, nil, :manage_sis)
+      tabs << { :id => TAB_SIS_IMPORT, :label => t('#account.tab_sis_import', "SIS Import"), :css_class => 'sis_import', :href => :account_sis_import_path } if self.root_account? && self.allow_sis_import && user && self.grants_right?(user, :manage_sis)
     end
     tabs += external_tool_tabs(opts)
     tabs << { :id => TAB_ADMIN_TOOLS, :label => t('#account.tab_admin_tools', "Admin Tools"), :css_class => 'admin_tools', :href => :account_admin_tools_path } if can_see_admin_tools_tab?(user)
@@ -1132,14 +1132,14 @@ class Account < ActiveRecord::Base
     return false if !user || site_admin?
     admin_tool_permissions = RoleOverride.manageable_permissions(self).find_all{|p| p[1][:admin_tool]}
     admin_tool_permissions.any? do |p|
-      self.grants_right?(user, nil, p.first)
+      self.grants_right?(user, p.first)
     end
   end
 
   def is_a_context?
     true
   end
-  
+
   def help_links
     Canvas::Help.default_links + (settings[:custom_help_links] || [])
   end
@@ -1147,42 +1147,42 @@ class Account < ActiveRecord::Base
   def self.allowable_services
     {
       :google_docs => {
-        :name => t("account_settings.google_docs", "Google Docs"), 
+        :name => t("account_settings.google_docs", "Google Docs"),
         :description => "",
         :expose_to_ui => (GoogleDocs::Connection.config ? :service : false)
       },
       :google_docs_previews => {
-        :name => t("account_settings.google_docs_preview", "Google Docs Preview"), 
+        :name => t("account_settings.google_docs_preview", "Google Docs Preview"),
         :description => "",
         :expose_to_ui => :service
       },
       :facebook => {
-        :name => t("account_settings.facebook", "Facebook"), 
+        :name => t("account_settings.facebook", "Facebook"),
         :description => "",
         :expose_to_ui => (Facebook::Connection.config ? :service : false)
       },
       :skype => {
-        :name => t("account_settings.skype", "Skype"), 
+        :name => t("account_settings.skype", "Skype"),
         :description => "",
         :expose_to_ui => :service
       },
       :linked_in => {
-        :name => t("account_settings.linked_in", "LinkedIn"), 
+        :name => t("account_settings.linked_in", "LinkedIn"),
         :description => "",
         :expose_to_ui => (LinkedIn::Connection.config ? :service : false)
       },
       :twitter => {
-        :name => t("account_settings.twitter", "Twitter"), 
+        :name => t("account_settings.twitter", "Twitter"),
         :description => "",
         :expose_to_ui => (Twitter::Connection.config ? :service : false)
       },
       :delicious => {
-        :name => t("account_settings.delicious", "Delicious"), 
+        :name => t("account_settings.delicious", "Delicious"),
         :description => "",
         :expose_to_ui => :service
       },
       :diigo => {
-        :name => t("account_settings.diigo", "Diigo"), 
+        :name => t("account_settings.diigo", "Diigo"),
         :description => "",
         :expose_to_ui => :service
       },
@@ -1213,7 +1213,7 @@ class Account < ActiveRecord::Base
   def self.default_allowable_services
     self.allowable_services.reject {|s, info| info[:default] == false }
   end
-  
+
   def set_service_availability(service, enable)
     service = service.to_sym
     raise "Invalid Service" unless Account.allowable_services[service]
@@ -1232,36 +1232,36 @@ class Account < ActiveRecord::Base
         allowed_service_names << "-#{service}" if Account.default_allowable_services[service]
       end
     end
-    
+
     @allowed_services_hash = nil
     self.allowed_services = allowed_service_names.empty? ? nil : allowed_service_names.join(",")
   end
-  
+
   def enable_service(service)
     set_service_availability(service, true)
   end
-  
+
   def disable_service(service)
     set_service_availability(service, false)
   end
-  
+
   def allowed_services_hash
     return @allowed_services_hash if @allowed_services_hash
     account_allowed_services = Account.default_allowable_services
     if self.allowed_services
       allowed_service_names = self.allowed_services.split(",").compact
-      
+
       if allowed_service_names.count > 0
         unless [ '+', '-' ].member?(allowed_service_names[0][0,1])
           # This account has a hard-coded list of services, so we clear out the defaults
           account_allowed_services = { }
         end
-        
+
         allowed_service_names.each do |service_switch|
           if service_switch =~ /\A([+-]?)(.*)\z/
             flag = $1
             service_name = $2.to_sym
-            
+
             if flag == '-'
               account_allowed_services.delete(service_name)
             else
@@ -1293,7 +1293,7 @@ class Account < ActiveRecord::Base
       self.allowed_services_hash.has_key?(service)
     end
   end
-  
+
   def self.all_accounts_for(context)
     if context.respond_to?(:account)
       context.account.account_chain
@@ -1303,9 +1303,9 @@ class Account < ActiveRecord::Base
       []
     end
   end
-  
+
   def self.serialization_excludes; [:uuid]; end
-  
+
   # This could be much faster if we implement a SQL tree for the account tree
   # structure.
   def find_child(child_id)

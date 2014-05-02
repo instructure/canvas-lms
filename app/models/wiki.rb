@@ -25,7 +25,7 @@
 #  created_at :datetime
 #  updated_at :datetime
 #
-  
+
 class Wiki < ActiveRecord::Base
   attr_accessible :title
 
@@ -55,11 +55,11 @@ class Wiki < ActiveRecord::Base
       entry.title     = self.title
       entry.updated   = self.updated_at
       entry.published = self.created_at
-      entry.links    << Atom::Link.new(:rel => 'alternate', 
+      entry.links    << Atom::Link.new(:rel => 'alternate',
                                     :href => "/wikis/#{self.id}")
     end
   end
-  
+
   def update_default_wiki_page_roles(new_roles, old_roles)
     return if new_roles == old_roles
     self.wiki_pages.each do |p|
@@ -78,7 +78,7 @@ class Wiki < ActiveRecord::Base
     self.front_page_url = url unless self.has_no_front_page
     self.save
   end
-  
+
   def front_page
     url = self.get_front_page_url
     return nil if url.nil?
@@ -144,16 +144,16 @@ class Wiki < ActiveRecord::Base
     given {|user| self.context.is_public}
     can :read
 
-    given {|user, session| self.cached_context_grants_right?(user, session, :read)}
+    given {|user, session| self.context.grants_right?(user, session, :read)}
     can :read
 
-    given {|user, session| self.cached_context_grants_right?(user, session, :view_unpublished_items)}
+    given {|user, session| self.context.grants_right?(user, session, :view_unpublished_items)}
     can :view_unpublished_items
 
-    given {|user, session| self.cached_context_grants_right?(user, session, :participate_as_student) && self.context.allow_student_wiki_edits}
+    given {|user, session| self.context.grants_right?(user, session, :participate_as_student) && self.context.allow_student_wiki_edits}
     can :read and can :create_page and can :update_page and can :update_page_content
 
-    given {|user, session| self.cached_context_grants_right?(user, session, :manage_wiki)}
+    given {|user, session| self.context.grants_right?(user, session, :manage_wiki)}
     can :manage and can :read and can :update and can :create_page and can :delete_page and can :delete_unpublished_page and can :update_page and can :update_page_content
   end
 

@@ -1751,7 +1751,7 @@ describe User do
       user = User.new
       assignments.each do |assignment|
         assignment.stubs(:due_at => time)
-        assignment.expects(:grants_right?).with(user,nil,:delete).returns false
+        assignment.expects(:grants_right?).with(user, :delete).returns false
       end
       user.select_upcoming_assignments(assignments,{:end_at => time}).should == assignments
     end
@@ -1765,7 +1765,7 @@ describe User do
         due_date3 = {:due_at => 2.weeks.from_now }
         due_date4 = {:due_at => nil }
         assignments.each do |assignment|
-          assignment.expects(:grants_right?).with(user,nil,:delete).returns true
+          assignment.expects(:grants_right?).with(user, :delete).returns true
         end
         assignments.first.expects(:dates_hash_visible_to).with(user).
           returns [due_date1]

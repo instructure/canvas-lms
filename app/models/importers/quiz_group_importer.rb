@@ -28,7 +28,7 @@ module Importers
           end
 
           if bank
-            if bank.grants_right?(migration.user, nil, :read)
+            if bank.grants_right?(migration.user, :read)
               item.assessment_question_bank_id = bank.id
             else
               migration.add_warning(t('#quizzes.quiz_group.errors.no_permissions', "User didn't have permission to reference question bank in quiz group %{group_name}", :group_name => item.name))

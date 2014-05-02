@@ -720,30 +720,30 @@ class DiscussionTopic < ActiveRecord::Base
     given { |user| self.user && self.user == user and self.discussion_entries.active.empty? && self.available_for?(user) && !self.root_topic_id && context.user_can_manage_own_discussion_posts?(user) }
     can :delete
 
-    given { |user, session| self.active? && self.cached_context_grants_right?(user, session, :read_forum) }#
+    given { |user, session| self.active? && self.context.grants_right?(user, session, :read_forum) }#
     can :read
 
-    given { |user, session| self.active? && self.available_for?(user) && self.cached_context_grants_right?(user, session, :post_to_forum) }#students.include?(user) }
+    given { |user, session| self.active? && self.available_for?(user) && self.context.grants_right?(user, session, :post_to_forum) }#students.include?(user) }
     can :reply and can :read
 
-    given { |user, session| self.active? && self.cached_context_grants_right?(user, session, :post_to_forum) }#students.include?(user) }
+    given { |user, session| self.active? && self.context.grants_right?(user, session, :post_to_forum) }#students.include?(user) }
     can :read
 
     given { |user, session|
       !is_announcement &&
-      cached_context_grants_right?(user, session, :post_to_forum) &&
+      context.grants_right?(user, session, :post_to_forum) &&
       context_allows_user_to_create?(user)
     }
     can :create
 
-    given { |user, session| context.respond_to?(:allow_student_forum_attachments) && context.allow_student_forum_attachments && cached_context_grants_right?(user, session, :post_to_forum) }
+    given { |user, session| context.respond_to?(:allow_student_forum_attachments) && context.allow_student_forum_attachments && context.grants_right?(user, session, :post_to_forum) }
     can :attach
 
-    given { |user, session| !self.root_topic_id && self.cached_context_grants_right?(user, session, :moderate_forum) && self.available_for?(user) }
+    given { |user, session| !self.root_topic_id && self.context.grants_right?(user, session, :moderate_forum) && self.available_for?(user) }
     can :update and can :delete and can :create and can :read and can :attach
 
     # Moderators can still modify content even in unavailable topics (*especially* unlocking them), but can't create new content
-    given { |user, session| !self.root_topic_id && self.cached_context_grants_right?(user, session, :moderate_forum) }
+    given { |user, session| !self.root_topic_id && self.context.grants_right?(user, session, :moderate_forum) }
     can :update and can :delete and can :read
 
     given { |user, session| self.root_topic && self.root_topic.grants_right?(user, session, :update) }
@@ -896,7 +896,7 @@ class DiscussionTopic < ActiveRecord::Base
     return true if user == self.user
 
     # user is an admin in the context (teacher/ta/designer)
-    return true if context.grants_right?(user, :manage, nil)
+    return true if context.grants_right?(user, :manage)
 
     # topic is not published
     if !published?
@@ -921,7 +921,7 @@ class DiscussionTopic < ActiveRecord::Base
   #         delayed_post_at is in the future or the group assignment is locked. This does not determine
   #         the visibility of the topic to the user, only that they are unable to reply.
   def locked_for?(user, opts={})
-    return false if opts[:check_policies] && self.grants_right?(user, nil, :update)
+    return false if opts[:check_policies] && self.grants_right?(user, :update)
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       locked = false
       if (self.delayed_post_at && self.delayed_post_at > Time.now)

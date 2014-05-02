@@ -335,7 +335,7 @@ class SearchController < ApplicationController
     asset_type = $2.to_sym
     return unless [:course, :section, :group].include?(asset_type)
     return unless context = Context.find_by_asset_string(asset_string)
-    return unless context.grants_right?(@current_user, nil, :read_as_admin)
+    return unless context.grants_right?(@current_user, :read_as_admin)
     @admin_context = context
   end
 

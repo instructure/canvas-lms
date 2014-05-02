@@ -8,15 +8,15 @@ module Api
       let(:course) { stub(:course) }
       let(:user) { stub(:user) }
       let(:course_json) { CourseJson.new( course, nil, includes, [] ) }
-  
+
       describe '#include_description' do
         let(:predicate){ course_json.include_description }
-        
+
         it 'affirms when the public_description key is in the includes array' do
           includes << 'public_description'
           predicate.should be_true
         end
-        
+
         it 'affirms when the public_description key is a symbol' do
           includes << :public_description
           predicate.should be_true
@@ -26,7 +26,7 @@ module Api
           predicate.should be_false
         end
       end
-    
+
 
       describe '#include_total_scores' do
         let(:predicate) { course_json.include_total_scores }
@@ -34,19 +34,19 @@ module Api
         let(:course) { stub( course_settings ) }
 
         describe 'when total scores key is set' do
-          before { includes << :total_scores } 
-          
+          before { includes << :total_scores }
+
           it 'is false if the final grade is hidden' do
-            course_settings[:hide_final_grades?] = true 
+            course_settings[:hide_final_grades?] = true
             predicate.should be_false
           end
 
           it 'is true if the course allows the grade to be seen' do
-            course_settings[:hide_final_grades?] = false 
+            course_settings[:hide_final_grades?] = false
             predicate.should be_true
           end
         end
-        
+
         describe 'when total scores key is not set' do
           before { includes.clear }
 
@@ -106,7 +106,7 @@ module Api
             hash['enrollments'] = nil
             course_json.clear_unneeded_fields(hash).should == { }
           end
-        
+
           it 'keeps the key-value pair if the value is not nil' do
             course_json.clear_unneeded_fields(hash).should == {'enrollments' => [] }
           end
@@ -119,12 +119,12 @@ module Api
             hash['some_other_key'] = nil
             course_json.clear_unneeded_fields(hash).should == { 'some_other_key' => nil }
           end
-        
+
           it 'keeps the key-value pair if the value is not nil' do
             course_json.clear_unneeded_fields(hash).should == {'some_other_key' => 'some_value' }
           end
         end
-        
+
       end
 
       describe '#description' do
@@ -161,35 +161,36 @@ module Api
       end
 
       describe '#set_sis_course_id' do
-        let(:rights) { {} }
-        let(:sis_course) { stub(:root_account => stub( :grants_rights? => rights ), :sis_source_id => @sis_id ) }
+        let(:sis_course) { stub(:root_account => stub( :grants_any_right? => @has_right ), :sis_source_id => @sis_id ) }
         let(:hash) { Hash.new }
 
-        before { @sis_id = 1357 }
+        before do
+          @sis_id = 1357
+          @has_right = false
+        end
 
         describe 'when appropriate rights are granted' do
-          before { rights[:read_sis] = :read_sis }
-          
+          before { @has_right = true }
+
           it 'adds sis the key-value pair to the hash' do
             course_json.set_sis_course_id( hash, sis_course, user )
             hash['sis_course_id'].should == 1357
           end
 
           describe 'with a nil sis_id' do
-            before do 
-              @sis_id = nil 
+            before do
+              @sis_id = nil
               course_json.set_sis_course_id( hash, sis_course, user )
             end
-          
+
             it 'allows the nil value to go into the has' do
-              hash['sis_course_id'].should == nil 
+              hash['sis_course_id'].should == nil
             end
 
             it 'does not get cleared out before translation to json' do
               course_json.clear_unneeded_fields( hash ).should == { 'sis_course_id' => nil }
             end
           end
-
         end
 
         it 'doesnt add the sis_course_id key at all if the rights are NOT present' do

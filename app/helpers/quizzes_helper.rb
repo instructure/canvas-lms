@@ -470,7 +470,7 @@ module QuizzesHelper
     score_html = \
       if options[:id] or options[:class] or options[:style] then
         content_tag('span',
-          render_score(score, options[:precision]), 
+          render_score(score, options[:precision]),
           options.slice(:class, :id, :style))
       else
         render_score(score, options[:precision])
@@ -596,7 +596,7 @@ module QuizzesHelper
     elsif !show_correct_answers?(quiz, user, submission)
       true
     elsif quiz.hide_correct_answers_at.present?
-      !quiz.grants_right?(user, nil, :grade)
+      !quiz.grants_right?(user, :grade)
     end
   end
 

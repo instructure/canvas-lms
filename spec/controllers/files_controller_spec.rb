@@ -45,7 +45,7 @@ describe FilesController do
     course_with_student_logged_in(:active_all => true)
     @file = factory_with_protected_attributes(@course.attachments, :uploaded_data => io)
     @module = @course.context_modules.create!(:name => "module")
-    @tag = @module.add_item({:type => 'attachment', :id => @file.id}) 
+    @tag = @module.add_item({:type => 'attachment', :id => @file.id})
     @module.reload
     hash = {}
     hash[@tag.id.to_s] = {:type => 'must_view'}
@@ -647,8 +647,8 @@ describe FilesController do
       group.add_user(@student)
       user_session(@student)
 
-      #assignment.grants_right?(@student, nil, :submit).should be_true
-      #assignment.grants_right?(@student, nil, :nothing).should be_true
+      #assignment.grants_right?(@student, :submit).should be_true
+      #assignment.grants_right?(@student, :nothing).should be_true
 
       s3_storage!
       post 'create_pending', {:attachment => {

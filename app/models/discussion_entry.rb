@@ -248,7 +248,7 @@ class DiscussionEntry < ActiveRecord::Base
   def infer_root_entry_id
     # don't allow parent ids for flat discussions
     self.parent_entry = nil if self.discussion_topic.discussion_type == DiscussionTopic::DiscussionTypes::FLAT
-    
+
     # only allow non-root parents for threaded discussions
     unless self.discussion_topic.try(:threaded?)
       self.parent_entry = parent_entry.try(:root_entry) || parent_entry
@@ -274,28 +274,28 @@ class DiscussionEntry < ActiveRecord::Base
     given { |user| self.user && self.user == user && self.discussion_topic.available_for?(user) && context.user_can_manage_own_discussion_posts?(user) }
     can :update and can :delete
 
-    given { |user, session| self.cached_context_grants_right?(user, session, :read_forum) }
+    given { |user, session| self.context.grants_right?(user, session, :read_forum) }
     can :read
 
-    given { |user, session| self.cached_context_grants_right?(user, session, :post_to_forum) && self.discussion_topic.available_for?(user) }
+    given { |user, session| self.context.grants_right?(user, session, :post_to_forum) && self.discussion_topic.available_for?(user) }
     can :reply and can :create and can :read
 
-    given { |user, session| self.cached_context_grants_right?(user, session, :post_to_forum) }
+    given { |user, session| self.context.grants_right?(user, session, :post_to_forum) }
     can :read
 
-    given { |user, session| context.respond_to?(:allow_student_forum_attachments) && context.allow_student_forum_attachments && cached_context_grants_right?(user, session, :post_to_forum) && discussion_topic.available_for?(user) }
+    given { |user, session| context.respond_to?(:allow_student_forum_attachments) && context.allow_student_forum_attachments && context.grants_right?(user, session, :post_to_forum) && discussion_topic.available_for?(user) }
     can :attach
 
-    given { |user, session| !self.discussion_topic.root_topic_id && self.cached_context_grants_right?(user, session, :moderate_forum) && self.discussion_topic.available_for?(user) }
+    given { |user, session| !self.discussion_topic.root_topic_id && self.context.grants_right?(user, session, :moderate_forum) && self.discussion_topic.available_for?(user) }
     can :update and can :delete and can :reply and can :create and can :read and can :attach
 
-    given { |user, session| !self.discussion_topic.root_topic_id && self.cached_context_grants_right?(user, session, :moderate_forum) }
+    given { |user, session| !self.discussion_topic.root_topic_id && self.context.grants_right?(user, session, :moderate_forum) }
     can :update and can :delete and can :read
 
-    given { |user, session| self.discussion_topic.root_topic && self.discussion_topic.root_topic.cached_context_grants_right?(user, session, :moderate_forum) && self.discussion_topic.available_for?(user) }
+    given { |user, session| self.discussion_topic.root_topic && self.discussion_topic.root_topic.context.grants_right?(user, session, :moderate_forum) && self.discussion_topic.available_for?(user) }
     can :update and can :delete and can :reply and can :create and can :read and can :attach
 
-    given { |user, session| self.discussion_topic.root_topic && self.discussion_topic.root_topic.cached_context_grants_right?(user, session, :moderate_forum) }
+    given { |user, session| self.discussion_topic.root_topic && self.discussion_topic.root_topic.context.grants_right?(user, session, :moderate_forum) }
     can :update and can :delete and can :read
 
     given { |user, session| self.discussion_topic.context.respond_to?(:collection) && self.discussion_topic.context.collection.grants_right?(user, session, :read) }
@@ -453,9 +453,9 @@ class DiscussionEntry < ActiveRecord::Base
 
   # Public: Find the existing DiscussionEntryParticipant, or create a default
   # participant, for the specified user.
-  # 
+  #
   # user - The User to lookup the participant for.
-  # 
+  #
   # Returns the DiscussionEntryParticipant for the user, or a participant with
   # default values set. The returned record is marked as readonly! If you need
   # to update a participant, use the #update_or_create_participant method

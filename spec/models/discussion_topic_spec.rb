@@ -397,8 +397,8 @@ describe DiscussionTopic do
       @sub_topic = @group.discussion_topics.build(:title => "sub topic", :message => "not ok to be edited", :user => @first_user)
       @sub_topic.root_topic_id = @parent_topic.id
       @sub_topic.save!
-      @group_topic.grants_right?(@second_user, nil, :update).should eql(false)
-      @sub_topic.grants_right?(@second_user, nil, :update).should eql(false)
+      @group_topic.grants_right?(@second_user, :update).should eql(false)
+      @sub_topic.grants_right?(@second_user, :update).should eql(false)
     end
   end
 

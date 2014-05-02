@@ -347,7 +347,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
     # NOTE: We don't have a submission user when the teacher is previewing the
     # quiz and displaying the results'
-    return true if self.grants_right?(user, nil, :grade) &&
+    return true if self.grants_right?(user, :grade) &&
       (submission && submission.user && submission.user != user)
 
     return false if !self.show_correct_answers
@@ -687,7 +687,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     submission.end_at = nil
     submission.end_at = submission.started_at + (self.time_limit.to_f * 60.0) if self.time_limit
     # Admins can take the full quiz whenever they want
-    unless user.is_a?(::User) && self.grants_right?(user, nil, :grade)
+    unless user.is_a?(::User) && self.grants_right?(user, :grade)
       submission.end_at = due_at if due_at && ::Time.now < due_at && (!submission.end_at || due_at < submission.end_at)
       submission.end_at = lock_at if lock_at && !submission.manually_unlocked && (!submission.end_at || lock_at < submission.end_at)
     end
@@ -781,7 +781,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
 
   def locked_for?(user, opts={})
-    return false if opts[:check_policies] && self.grants_right?(user, nil, :update)
+    return false if opts[:check_policies] && self.grants_right?(user, :update)
     ::Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       locked = false
       quiz_for_user = self.overridden_for(user)
@@ -1037,10 +1037,10 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user, session| self.cached_context_grants_right?(user, session, :manage_assignments) } #admins.include? user }
+    given { |user, session| self.context.grants_right?(user, session, :manage_assignments) } #admins.include? user }
     can :read_statistics and can :manage and can :read and can :update and can :delete and can :create and can :submit
 
-    given { |user, session| self.cached_context_grants_right?(user, session, :manage_grades) } #admins.include? user }
+    given { |user, session| self.context.grants_right?(user, session, :manage_grades) } #admins.include? user }
     can :read_statistics and can :read and can :submit and can :grade
 
     given { |user| self.available? && self.context.try_rescue(:is_public) && !self.graded? }
@@ -1048,16 +1048,16 @@ class Quizzes::Quiz < ActiveRecord::Base
 
     given do |user, session|
       (feature_enabled?(:draft_state) ? published? : true) &&
-        cached_context_grants_right?(user, session, :read)
+        context.grants_right?(user, session, :read)
     end
     can :read
 
-    given { |user, session| self.cached_context_grants_right?(user, session, :view_all_grades) }
+    given { |user, session| self.context.grants_right?(user, session, :view_all_grades) }
     can :read_statistics and can :review_grades
 
     given do |user, session|
       available? &&
-        cached_context_grants_right?(user, session, :participate_as_student)
+        context.grants_right?(user, session, :participate_as_student)
     end
     can :read and can :submit
   end

@@ -192,7 +192,7 @@ class Submission < ActiveRecord::Base
     given { |user| user && user.id == self.user_id && !self.assignment.muted? }
     can :read_grade
 
-    given {|user, session| self.assignment.cached_context_grants_right?(user, session, :view_all_grades) }
+    given {|user, session| self.assignment.context.grants_right?(user, session, :view_all_grades) }
     can :read and can :read_grade
 
     given {|user| self.assignment && self.assignment.context && user && self.user &&
@@ -203,7 +203,7 @@ class Submission < ActiveRecord::Base
       self.assignment.context.observer_enrollments.find_by_user_id_and_associated_user_id_and_workflow_state(user.id, self.user.id, 'active').try(:grants_right?, user, :read_grades) }
     can :read_grade
 
-    given {|user, session| self.assignment.published? && self.assignment.cached_context_grants_right?(user, session, :manage_grades) }#admins.include?(user) }
+    given {|user, session| self.assignment.published? && self.assignment.context.grants_right?(user, session, :manage_grades) }#admins.include?(user) }
     can :read and can :comment and can :make_group_comment and can :read_grade and can :grade
 
     given {|user| self.assignment.published? && user && self.assessment_requests.map{|a| a.assessor_id}.include?(user.id) }
@@ -212,7 +212,7 @@ class Submission < ActiveRecord::Base
     given { |user, session|
       grants_right?(user, session, :read_grade) &&
       turnitin_data &&
-      (assignment.cached_context_grants_right?(user, session, :manage_grades) ||
+      (assignment.context.grants_right?(user, session, :manage_grades) ||
         case assignment.turnitin_settings[:originality_report_visibility]
           when 'immediate'; true
           when 'after_grading'; current_submission_graded?
@@ -306,9 +306,9 @@ class Submission < ActiveRecord::Base
     if self.turnitin_data && self.turnitin_data[asset_string] && self.turnitin_data[asset_string][:similarity_score]
       turnitin = Turnitin::Client.new(*self.context.turnitin_settings)
       self.send_later(:check_turnitin_status)
-      if self.grants_right?(user, nil, :grade)
+      if self.grants_right?(user, :grade)
         turnitin.submissionReportUrl(self, asset_string)
-      elsif self.grants_right?(user, nil, :view_turnitin_report)
+      elsif self.grants_right?(user, :view_turnitin_report)
         turnitin.submissionStudentReportUrl(self, asset_string)
       end
     else

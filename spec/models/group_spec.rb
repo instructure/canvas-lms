@@ -182,12 +182,12 @@ describe Group do
     course = e.context
     teacher = e.user
     group = course.groups.create
-    course.grants_right?(teacher, nil, :manage_groups).should be_true
-    group.grants_right?(teacher, nil, :manage_wiki).should be_true
-    group.grants_right?(teacher, nil, :manage_files).should be_true
-    group.wiki.grants_right?(teacher, nil, :update_page).should be_true
+    course.grants_right?(teacher, :manage_groups).should be_true
+    group.grants_right?(teacher, :manage_wiki).should be_true
+    group.grants_right?(teacher, :manage_files).should be_true
+    group.wiki.grants_right?(teacher, :update_page).should be_true
     attachment = group.attachments.build
-    attachment.grants_right?(teacher, nil, :create).should be_true
+    attachment.grants_right?(teacher, :create).should be_true
   end
 
   it "should only allow me to moderate_forum if I can moderate_forum of group's context" do
@@ -195,8 +195,8 @@ describe Group do
     student_in_course
     group = @course.groups.create
 
-    group.grants_right?(@teacher, nil, :moderate_forum).should be_true
-    group.grants_right?(@student, nil, :moderate_forum).should be_false
+    group.grants_right?(@teacher, :moderate_forum).should be_true
+    group.grants_right?(@student, :moderate_forum).should be_false
   end
 
   it "should grant read_roster permissions to students that can freely join or request an invitation to the group" do
@@ -205,18 +205,18 @@ describe Group do
 
     # default join_level == 'invitation_only' and default category is not self-signup
     group = @course.groups.create
-    group.grants_right?(@student, nil, :read_roster).should be_false
+    group.grants_right?(@student, :read_roster).should be_false
 
     # join_level allows requesting group membership
     group = @course.groups.create(:join_level => 'parent_context_request')
-    group.grants_right?(@student, nil, :read_roster).should be_true
+    group.grants_right?(@student, :read_roster).should be_true
 
     # category is self-signup
     category = @course.group_categories.build(name: 'category name')
     category.self_signup = 'enabled'
     category.save
     group = @course.groups.create(:group_category => category)
-    group.grants_right?(@student, nil, :read_roster).should be_true
+    group.grants_right?(@student, :read_roster).should be_true
   end
 
   describe "root account" do

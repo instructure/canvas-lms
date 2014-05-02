@@ -239,7 +239,7 @@ class AppointmentGroup < ActiveRecord::Base
 
     given { |user|
       next false if deleted?
-      next false unless active_contexts.all? { |c| c.grants_right? user, nil, :manage_calendar }
+      next false unless active_contexts.all? { |c| c.grants_right? user, :manage_calendar }
       if appointment_group_sub_contexts.present? && appointment_group_sub_contexts.first.sub_context_type == 'CourseSection'
         sub_context_ids = appointment_group_sub_contexts.map(&:sub_context_id)
         user_visible_sections = sub_context_ids & contexts.map { |c|

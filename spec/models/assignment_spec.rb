@@ -974,8 +974,8 @@ describe Assignment do
       @enr1 = @course.enroll_teacher(@teacher = user)
       @enr1.accept
       @assignment.to_json.should_not match(/permissions/)
-      @assignment.to_json(:permissions => {:user => nil}).should match(/\"permissions\"\s*:\s*\{\}/)
-      @assignment.grants_right?(@teacher, nil, :create).should eql(true)
+      @assignment.to_json(:permissions => {:user => nil}).should match(/\"permissions\"\s*:\s*\{/)
+      @assignment.grants_right?(@teacher, :create).should eql(true)
       @assignment.to_json(:permissions => {:user => @teacher, :session => nil}).should match(/\"permissions\"\s*:\s*\{\"/)
       hash = @assignment.as_json(:permissions => {:user => @teacher, :session => nil})
       hash["assignment"].should_not be_nil
@@ -1735,15 +1735,6 @@ describe Assignment do
   end
 
   context "adheres_to_policy" do
-    it "should return the same grants_right? with nil parameters" do
-      course_with_teacher(:active_all => true)
-      @assignment = @course.assignments.create!(:title => "some assignment")
-      rights = @assignment.grants_rights?(@user)
-      rights.should_not be_empty
-      rights.should == @assignment.grants_rights?(@user, nil)
-      rights.should == @assignment.grants_rights?(@user, nil, nil)
-    end
-
     it "should serialize permissions" do
       course_with_teacher(:active_all => true)
       @assignment = @course.assignments.create!(:title => "some assignment")

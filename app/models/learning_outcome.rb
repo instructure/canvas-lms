@@ -37,11 +37,11 @@ class LearningOutcome < ActiveRecord::Base
 
   set_policy do
     # managing a contextual outcome requires manage_outcomes on the outcome's context
-    given {|user, session| self.context_id && self.cached_context_grants_right?(user, session, :manage_outcomes) }
+    given {|user, session| self.context_id && self.context.grants_right?(user, session, :manage_outcomes) }
     can :create and can :read and can :update and can :delete
 
     # reading a contextual outcome is also allowed by read_outcomes on the outcome's context
-    given {|user, session| self.context_id && self.cached_context_grants_right?(user, session, :read_outcomes) }
+    given {|user, session| self.context_id && self.context.grants_right?(user, session, :read_outcomes) }
     can :read
 
     # managing a global outcome requires manage_global_outcomes on the site_admin

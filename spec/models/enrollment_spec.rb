@@ -122,18 +122,18 @@ describe Enrollment do
     @enrollment.end_at = 4.days.from_now
     @enrollment.workflow_state = 'active'
     @enrollment.save!
-    @course.grants_right?(@enrollment.user, nil, :read).should eql(false)
+    @course.grants_right?(@enrollment.user, :read).should eql(false)
     # post to forum comes from role_override; inactive enrollments should not
     # get any permissions form role_override
-    @course.grants_right?(@enrollment.user, nil, :post_to_forum).should eql(false)
+    @course.grants_right?(@enrollment.user, :post_to_forum).should eql(false)
   end
 
   it "should not allow read permission on a course if explicitly inactive" do
     course_with_student(:active_all => true)
     @enrollment.workflow_state = 'inactive'
     @enrollment.save!
-    @course.grants_right?(@enrollment.user, nil, :read).should eql(false)
-    @course.grants_right?(@enrollment.user, nil, :post_to_forum).should eql(false)
+    @course.grants_right?(@enrollment.user, :read).should eql(false)
+    @course.grants_right?(@enrollment.user, :post_to_forum).should eql(false)
   end
 
   it "should allow read, but not post_to_forum on a course if date completed" do
@@ -142,18 +142,18 @@ describe Enrollment do
     @enrollment.end_at = 2.days.ago
     @enrollment.workflow_state = 'active'
     @enrollment.save!
-    @course.grants_right?(@enrollment.user, nil, :read).should eql(true)
+    @course.grants_right?(@enrollment.user, :read).should eql(true)
     # post to forum comes from role_override; completed enrollments should not
     # get any permissions form role_override
-    @course.grants_right?(@enrollment.user, nil, :post_to_forum).should eql(false)
+    @course.grants_right?(@enrollment.user, :post_to_forum).should eql(false)
   end
 
   it "should allow read, but not post_to_forum on a course if explicitly completed" do
     course_with_student(:active_all => true)
     @enrollment.workflow_state = 'completed'
     @enrollment.save!
-    @course.grants_right?(@enrollment.user, nil, :read).should eql(true)
-    @course.grants_right?(@enrollment.user, nil, :post_to_forum).should eql(false)
+    @course.grants_right?(@enrollment.user, :read).should eql(true)
+    @course.grants_right?(@enrollment.user, :post_to_forum).should eql(false)
   end
 
   context "typed_enrollment" do
@@ -276,13 +276,13 @@ describe Enrollment do
   context "permissions" do
     it "should be able to read grades if the course grants management rights to the enrollment" do
       @new_user = user_model
-      @enrollment.grants_rights?(@new_user, nil, :read_grades)[:read_grades].should be_false
+      @enrollment.grants_rights?(@new_user, :read_grades)[:read_grades].should be_false
       @course.enroll_teacher(@new_user)
-      @enrollment.grants_rights?(@user, nil, :read_grades).should be_true
+      @enrollment.grants_rights?(@user, :read_grades).should be_true
     end
 
     it "should allow the user itself to read its own grades" do
-      @enrollment.grants_rights?(@user, nil, :read_grades).should be_true
+      @enrollment.grants_rights?(@user, :read_grades).should be_true
     end
   end
 

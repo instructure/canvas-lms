@@ -520,33 +520,33 @@ class CalendarEvent < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user, session| self.cached_context_grants_right?(user, session, :read) }#students.include?(user) }
+    given { |user, session| self.context.grants_right?(user, session, :read) }#students.include?(user) }
     can :read
 
-    given { |user, session| !appointment_group? ^ cached_context_grants_right?(user, session, :read_appointment_participants) }
+    given { |user, session| !appointment_group? ^ context.grants_right?(user, session, :read_appointment_participants) }
     can :read_child_events
 
     given { |user, session| parent_event && appointment_group? && parent_event.grants_right?(user, session, :manage) }
     can :read and can :delete
 
-    given { |user, session| appointment_group? && cached_context_grants_right?(user, session, :manage) }
+    given { |user, session| appointment_group? && context.grants_right?(user, session, :manage) }
     can :manage
 
     given { |user, session|
       appointment_group? && (
         grants_right?(user, session, :manage) ||
-        cached_context_grants_right?(user, nil, :reserve) && context.participant_for(user).present?
+        context.grants_right?(user, :reserve) && context.participant_for(user).present?
       )
     }
     can :reserve
 
-    given { |user, session| self.cached_context_grants_right?(user, session, :manage_calendar) }#admins.include?(user) }
+    given { |user, session| self.context.grants_right?(user, session, :manage_calendar) }#admins.include?(user) }
     can :read and can :create
 
-    given { |user, session| (!locked? || context.is_a?(AppointmentGroup)) && !deleted? && self.cached_context_grants_right?(user, session, :manage_calendar) }#admins.include?(user) }
+    given { |user, session| (!locked? || context.is_a?(AppointmentGroup)) && !deleted? && self.context.grants_right?(user, session, :manage_calendar) }#admins.include?(user) }
     can :update and can :update_content
 
-    given { |user, session| !deleted? && self.cached_context_grants_right?(user, session, :manage_calendar) }
+    given { |user, session| !deleted? && self.context.grants_right?(user, session, :manage_calendar) }
     can :delete
   end
 

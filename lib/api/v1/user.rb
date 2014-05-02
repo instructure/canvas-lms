@@ -48,7 +48,7 @@ module Api::V1::User
           json.merge! :sis_user_id => sis_pseudonym.sis_user_id,
                       :integration_id => sis_pseudonym.integration_id,
                       # TODO: don't send sis_login_id; it's garbage data
-                      :sis_login_id => sis_pseudonym.unique_id if @domain_root_account.grants_rights?(current_user, :read_sis, :manage_sis).values.any?
+                      :sis_login_id => sis_pseudonym.unique_id if @domain_root_account.grants_any_right?(current_user, :read_sis, :manage_sis)
           json[:sis_import_id] = sis_pseudonym.sis_batch_id if @domain_root_account.grants_right?(current_user, session, :manage_sis)
           json[:root_account] = HostUrl.context_host(sis_pseudonym.account) if include_root_account
         end
@@ -124,7 +124,7 @@ module Api::V1::User
       !!(
         permissions_context.grants_right?(current_user, :manage_students) ||
         permissions_account.membership_for_user(current_user) ||
-        permissions_account.root_account.grants_rights?(current_user, :manage_sis, :read_sis).values.any?
+        permissions_account.root_account.grants_any_right?(current_user, :manage_sis, :read_sis)
       )
     )
   end
@@ -163,7 +163,7 @@ module Api::V1::User
           end
         end
       end
-      if @domain_root_account.grants_rights?(@current_user, :read_sis, :manage_sis).values.any?
+      if @domain_root_account.grants_any_right?(@current_user, :read_sis, :manage_sis)
         json[:sis_course_id] = enrollment.course.sis_source_id
         json[:course_integration_id] = enrollment.course.integration_id
         json[:sis_section_id] = enrollment.course_section.sis_source_id
@@ -188,6 +188,6 @@ module Api::V1::User
     course = enrollment.course
 
     (user.id == enrollment.user_id && !course.hide_final_grades?) ||
-     course.grants_rights?(user, :manage_grades, :view_all_grades).values.any?
+     course.grants_any_right?(user, :manage_grades, :view_all_grades)
   end
 end

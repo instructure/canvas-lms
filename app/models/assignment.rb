@@ -777,7 +777,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def locked_for?(user, opts={})
-    return false if opts[:check_policies] && self.grants_right?(user, nil, :update)
+    return false if opts[:check_policies] && self.grants_right?(user, :update)
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       locked = false
       assignment_for_user = self.overridden_for(user)
@@ -831,20 +831,20 @@ class Assignment < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user, session| self.cached_context_grants_right?(user, session, :read) && self.published? }
+    given { |user, session| self.context.grants_right?(user, session, :read) && self.published? }
     can :read and can :read_own_submission
 
     given { |user, session|
       (submittable_type? || submission_types == "discussion_topic") &&
-      cached_context_grants_right?(user, session, :participate_as_student) &&
+      self.context.grants_right?(user, session, :participate_as_student) &&
       !locked_for?(user)
     }
     can :submit and can :attach_submission_comment_files
 
-    given { |user, session| self.cached_context_grants_right?(user, session, :manage_grades) }
+    given { |user, session| self.context.grants_right?(user, session, :manage_grades) }
     can :grade and can :read and can :attach_submission_comment_files
 
-    given { |user, session| self.cached_context_grants_right?(user, session, :manage_assignments) }
+    given { |user, session| self.context.grants_right?(user, session, :manage_assignments) }
     can :update and can :delete and can :create and can :read and can :attach_submission_comment_files
   end
 
@@ -933,7 +933,7 @@ class Assignment < ActiveRecord::Base
   def grade_student(original_student, opts={})
     raise "Student is required" unless original_student
     raise "Student must be enrolled in the course as a student to be graded" unless context.includes_student?(original_student)
-    raise "Grader must be enrolled as a course admin" if opts[:grader] && !self.context.grants_right?(opts[:grader], nil, :manage_grades)
+    raise "Grader must be enrolled as a course admin" if opts[:grader] && !self.context.grants_right?(opts[:grader], :manage_grades)
     opts.delete(:id)
     dont_overwrite_grade = opts.delete(:dont_overwrite_grade)
     group_comment = Canvas::Plugin.value_to_boolean(opts.delete(:group_comment))
@@ -1349,7 +1349,7 @@ class Assignment < ActiveRecord::Base
 
   def visible_rubric_assessments_for(user)
     if self.rubric_association
-      self.rubric_association.rubric_assessments.select{|a| a.grants_rights?(user, :read)[:read]}.sort_by{|a| [a.assessment_type == 'grading' ? CanvasSort::First : CanvasSort::Last, Canvas::ICU.collation_key(a.assessor_name)] }
+      self.rubric_association.rubric_assessments.select{|a| a.grants_right?(user, :read)}.sort_by{|a| [a.assessment_type == 'grading' ? CanvasSort::First : CanvasSort::Last, Canvas::ICU.collation_key(a.assessor_name)] }
     end
   end
 

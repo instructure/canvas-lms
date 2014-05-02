@@ -83,20 +83,20 @@ describe "courses/settings.html.erb" do
         view_context(@course, admin)
         assigns[:current_user] = admin
       end
-  
+
       it "should show quota input box" do
         render
         response.should have_tag "input#course_storage_quota_mb"
       end
     end
-  
+
     context "as teacher" do
       before do
         view_context(@course, @teacher)
         assigns[:current_user] = @teacher
         @user = @teacher
       end
-  
+
       it "should not show quota input box" do
         render
         response.should_not have_tag "input#course_storage_quota_mb"
@@ -116,7 +116,7 @@ describe "courses/settings.html.erb" do
       @course.save!
 
       @user = account_admin_user(:account => subaccount, :active_user => true)
-      root_account.grants_right?(@user, nil, :manage_courses).should be_false
+      root_account.grants_right?(@user, :manage_courses).should be_false
       view_context(@course, @user)
 
       render

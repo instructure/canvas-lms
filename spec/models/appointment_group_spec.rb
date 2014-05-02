@@ -238,7 +238,7 @@ describe AppointmentGroup do
       visible_groups = AppointmentGroup.reservable_by(@teacher).sort_by(&:id)
       visible_groups.should eql []
       @groups.each{ |g|
-        g.grants_right?(@teacher, nil, :reserve).should be_false
+        g.grants_right?(@teacher, :reserve).should be_false
         g.eligible_participant?(@teacher).should be_false
       }
 
@@ -246,26 +246,26 @@ describe AppointmentGroup do
       visible_groups = AppointmentGroup.reservable_by(@ta).sort_by(&:id)
       visible_groups.should eql []
       @groups.each{ |g|
-        g.grants_right?(@ta, nil, :reserve).should be_false
+        g.grants_right?(@ta, :reserve).should be_false
         g.eligible_participant?(@ta).should be_false
       }
 
       # student can reserve course-level ones, as well as section-specific ones
       visible_groups = AppointmentGroup.reservable_by(@student).sort_by(&:id)
       visible_groups.should eql [@g1, @g3, @g4, @g7]
-      @g1.grants_right?(@student, nil, :reserve).should be_true
-      @g2.grants_right?(@student, nil, :reserve).should be_false # not active yet
+      @g1.grants_right?(@student, :reserve).should be_true
+      @g2.grants_right?(@student, :reserve).should be_false # not active yet
       @g2.eligible_participant?(@student).should be_true # though an admin could reserve on his behalf
-      @g3.grants_right?(@student, nil, :reserve).should be_true
-      @g4.grants_right?(@student, nil, :reserve).should be_true
+      @g3.grants_right?(@student, :reserve).should be_true
+      @g4.grants_right?(@student, :reserve).should be_true
       @g4.eligible_participant?(@student).should be_false # student can't directly participate
       @g4.eligible_participant?(@user_group).should be_true # but his group can
       @user_group.should eql(@g4.participant_for(@student))
-      @g5.grants_right?(@student, nil, :reserve).should be_false
-      @g6.grants_right?(@student, nil, :reserve).should be_false
-      @g7.grants_right?(@student, nil, :reserve).should be_true
-      @g7.grants_right?(@student_in_section2, nil, :reserve).should be_true
-      @g7.grants_right?(@student_in_section3, nil, :reserve).should be_false
+      @g5.grants_right?(@student, :reserve).should be_false
+      @g6.grants_right?(@student, :reserve).should be_false
+      @g7.grants_right?(@student, :reserve).should be_true
+      @g7.grants_right?(@student_in_section2, :reserve).should be_true
+      @g7.grants_right?(@student_in_section3, :reserve).should be_false
 
       # multiple contexts
       @student_in_course1 = @student
@@ -273,17 +273,17 @@ describe AppointmentGroup do
       @student_in_course2 = @user
       student_in_course(:course => @course3, :active_all => true)
       @student_in_course3 = @user
-      @g8.grants_right?(@student_in_course1, nil, :reserve).should be_false
-      @g8.grants_right?(@student_in_course2, nil, :reserve).should be_true
-      @g8.grants_right?(@student_in_course3, nil, :reserve).should be_true
+      @g8.grants_right?(@student_in_course1, :reserve).should be_false
+      @g8.grants_right?(@student_in_course2, :reserve).should be_true
+      @g8.grants_right?(@student_in_course3, :reserve).should be_true
 
       # multiple contexts and sub contexts
-      @g9.grants_right?(@student_in_course1, nil, :reserve).should be_false
-      @g9.grants_right?(@student_in_course2, nil, :reserve).should be_false
-      @g9.grants_right?(@student_in_course3, nil, :reserve).should be_false
+      @g9.grants_right?(@student_in_course1, :reserve).should be_false
+      @g9.grants_right?(@student_in_course2, :reserve).should be_false
+      @g9.grants_right?(@student_in_course3, :reserve).should be_false
 
-      @g9.grants_right?(@student_in_course2_section2, nil, :reserve).should be_true
-      @g9.grants_right?(@student_in_course3_section2, nil, :reserve).should be_true
+      @g9.grants_right?(@student_in_course2_section2, :reserve).should be_true
+      @g9.grants_right?(@student_in_course3_section2, :reserve).should be_true
     end
 
 
@@ -291,43 +291,43 @@ describe AppointmentGroup do
       # teacher can manage everything in the course
       visible_groups = AppointmentGroup.manageable_by(@teacher).sort_by(&:id)
       visible_groups.should eql [@g1, @g2, @g3, @g4, @g5, @g7]
-      @g1.grants_right?(@teacher, nil, :manage).should be_true
-      @g2.grants_right?(@teacher, nil, :manage).should be_true
-      @g3.grants_right?(@teacher, nil, :manage).should be_true
-      @g4.grants_right?(@teacher, nil, :manage).should be_true
-      @g5.grants_right?(@teacher, nil, :manage).should be_true
-      @g6.grants_right?(@teacher, nil, :manage).should be_false
-      @g7.grants_right?(@teacher, nil, :manage).should be_true
+      @g1.grants_right?(@teacher, :manage).should be_true
+      @g2.grants_right?(@teacher, :manage).should be_true
+      @g3.grants_right?(@teacher, :manage).should be_true
+      @g4.grants_right?(@teacher, :manage).should be_true
+      @g5.grants_right?(@teacher, :manage).should be_true
+      @g6.grants_right?(@teacher, :manage).should be_false
+      @g7.grants_right?(@teacher, :manage).should be_true
 
       # ta can only manage stuff in section
       visible_groups = AppointmentGroup.manageable_by(@ta).sort_by(&:id)
       visible_groups.should eql [@g5, @g7]
-      @g1.grants_right?(@ta, nil, :manage).should be_false
-      @g2.grants_right?(@ta, nil, :manage).should be_false
-      @g3.grants_right?(@ta, nil, :manage).should be_false
-      @g4.grants_right?(@ta, nil, :manage).should be_false
-      @g5.grants_right?(@ta, nil, :manage).should be_true
-      @g6.grants_right?(@ta, nil, :manage).should be_false
-      @g7.grants_right?(@ta, nil, :manage).should be_false # not in all sections
+      @g1.grants_right?(@ta, :manage).should be_false
+      @g2.grants_right?(@ta, :manage).should be_false
+      @g3.grants_right?(@ta, :manage).should be_false
+      @g4.grants_right?(@ta, :manage).should be_false
+      @g5.grants_right?(@ta, :manage).should be_true
+      @g6.grants_right?(@ta, :manage).should be_false
+      @g7.grants_right?(@ta, :manage).should be_false # not in all sections
 
       # student can't manage anything
       visible_groups = AppointmentGroup.manageable_by(@student).sort_by(&:id)
       visible_groups.should eql []
-      @groups.each{ |g| g.grants_right?(@student, nil, :manage).should be_false }
+      @groups.each{ |g| g.grants_right?(@student, :manage).should be_false }
 
       # multiple contexts
-      @g8.grants_right?(@teacher, nil, :manage).should be_false  # not in any courses
-      @g8.grants_right?(@teacher2, nil, :manage).should be_true
-      @g8.grants_right?(@teacher3, nil, :manage).should be_false # not in all courses
+      @g8.grants_right?(@teacher, :manage).should be_false  # not in any courses
+      @g8.grants_right?(@teacher2, :manage).should be_true
+      @g8.grants_right?(@teacher3, :manage).should be_false # not in all courses
 
       # multiple contexts and sub contexts
-      @g9.grants_right?(@teacher2, nil, :manage).should be_true
-      @g9.grants_right?(@teacher3, nil, :manage).should be_false
+      @g9.grants_right?(@teacher2, :manage).should be_true
+      @g9.grants_right?(@teacher3, :manage).should be_false
     end
 
     it "should ignore deleted courses when performing permissions checks" do
       @course3.destroy
-      @g8.reload.grants_right?(@teacher2, nil, :manage).should be_true
+      @g8.reload.grants_right?(@teacher2, :manage).should be_true
     end
   end
 

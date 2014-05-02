@@ -20,7 +20,7 @@ module EportfolioPage
   def eportfolio_page_attributes
     @portfolio.setup_defaults
     @categories = @portfolio.eportfolio_categories
-    if @portfolio.grants_rights?(@current_user, session, :manage)[:manage]
+    if @portfolio.grants_right?(@current_user, session, :manage)
       @recent_submissions = @current_user.submissions.order("created_at DESC").all if @current_user && @current_user == @portfolio.user
       @files = @current_user.attachments.to_a
       @folders = @current_user.active_folders_detailed.to_a
@@ -48,5 +48,5 @@ module EportfolioPage
       add_crumb(@page.name, eportfolio_named_category_entry_path(@portfolio.id, @category.slug, @page.slug))
     end
   end
-  
+
 end

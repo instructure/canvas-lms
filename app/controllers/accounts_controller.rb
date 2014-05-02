@@ -130,7 +130,7 @@ class AccountsController < ApplicationController
     return unless authorized_action(@account, @current_user, :read)
     respond_to do |format|
       format.html do
-        return redirect_to account_settings_url(@account) if @account.site_admin? || !@account.grants_right?(@current_user, nil, :read_course_list)
+        return redirect_to account_settings_url(@account) if @account.site_admin? || !@account.grants_right?(@current_user, :read_course_list)
         js_env(:ACCOUNT_COURSES_PATH => account_courses_path(@account, :format => :json))
         load_course_right_side
         @courses = @account.fast_all_courses(:term => @term, :limit => @maximum_courses_im_gonna_show, :hide_enrollmentless_courses => @hide_enrollmentless_courses)
@@ -508,9 +508,9 @@ class AccountsController < ApplicationController
       return render_unauthorized_action
     end
 
-    authentication_logging = @account.grants_rights?(@current_user, :view_statistics, :manage_user_logins).values.any?
-    grade_change_logging = @account.grants_rights?(@current_user, :view_grade_changes).values.any?
-    course_logging = @account.grants_rights?(@current_user, :view_course_changes).values.any?
+    authentication_logging = @account.grants_any_right?(@current_user, :view_statistics, :manage_user_logins)
+    grade_change_logging = @account.grants_right?(@current_user, :view_grade_changes)
+    course_logging = @account.grants_right?(@current_user, :view_course_changes)
     if authentication_logging || grade_change_logging || course_logging
       logging = {
         authentication: authentication_logging,
@@ -600,14 +600,14 @@ class AccountsController < ApplicationController
   def statistics
     if authorized_action(@account, @current_user, :view_statistics)
       add_crumb(t(:crumb_statistics, "Statistics"), statistics_account_url(@account))
-      if @account.grants_right?(@current_user, nil, :read_course_list)
+      if @account.grants_right?(@current_user, :read_course_list)
         @recently_started_courses = @account.all_courses.recently_started
         @recently_ended_courses = @account.all_courses.recently_ended
         if @account == Account.default
           @recently_created_courses = @account.all_courses.recently_created
         end
       end
-      if @account.grants_right?(@current_user, nil, :read_roster)
+      if @account.grants_right?(@current_user, :read_roster)
         @recently_logged_users = @account.all_users.recently_logged_in
       end
       @counts_report = @account.report_snapshots.detailed.last.try(:data)

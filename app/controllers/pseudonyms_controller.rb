@@ -105,7 +105,7 @@ class PseudonymsController < ApplicationController
     @cc = nil if @pseudonym.managed_password?
     @headers = false
     # Allow unregistered users to change password.  How else can they come back later
-    # and finish the registration process? 
+    # and finish the registration process?
     if !@cc || @cc.path_type != 'email'
       flash[:error] = t 'errors.cant_change_password', "Cannot change the password for that login, or login does not exist"
       redirect_to root_url
@@ -255,7 +255,7 @@ class PseudonymsController < ApplicationController
     return unless @user == @current_user || authorized_action(@user, @current_user, :manage_logins)
     return render(:json => nil, :status => :bad_request) if params[:pseudonym].blank?
     params[:pseudonym].delete :account_id
-    params[:pseudonym].delete :unique_id unless @user.grants_right?(@current_user, nil, :manage_logins)
+    params[:pseudonym].delete :unique_id unless @user.grants_right?(@current_user, :manage_logins)
     unless @pseudonym.account.grants_right?(@current_user, session, :manage_user_logins)
       params[:pseudonym].delete :unique_id
       params[:pseudonym].delete :password
@@ -293,8 +293,8 @@ class PseudonymsController < ApplicationController
   # Delete an existing login.
   #
   # @example_request
-  #   curl https://<canvas>/api/v1/users/:user_id/logins/:login_id \ 
-  #     -H "Authorization: Bearer <ACCESS-TOKEN>" \ 
+  #   curl https://<canvas>/api/v1/users/:user_id/logins/:login_id \
+  #     -H "Authorization: Bearer <ACCESS-TOKEN>" \
   #     -X DELETE
   #
   # @example_response

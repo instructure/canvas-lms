@@ -62,7 +62,7 @@ class MediaObject < ActiveRecord::Base
 
 
   set_policy do
-    given { |user| (self.user && self.user == user) || (self.context && self.context.grants_right?(user, nil, :manage_content)) }
+    given { |user| (self.user && self.user == user) || (self.context && self.context.grants_right?(user, :manage_content)) }
     can :add_captions and can :delete_captions
   end
 
@@ -238,7 +238,7 @@ class MediaObject < ActiveRecord::Base
   def media_sources
     CanvasKaltura::ClientV3.new.media_sources(self.media_id)
   end
-  
+
   def retrieve_details_ensure_codecs(attempt=0)
     retrieve_details
     if (!self.data || !self.data[:extensions] || !self.data[:extensions][:flv]) && self.created_at > 6.hours.ago

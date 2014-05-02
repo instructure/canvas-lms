@@ -143,8 +143,8 @@ class FilesController < ApplicationController
     if params[:user_id] && params[:ts] && params[:sf_verifier]
       user = api_find(User, params[:user_id]) if params[:user_id].present?
       if user && user.valid_access_verifier?(params[:ts], params[:sf_verifier])
-        # attachment.rb checks for this session attribute when determining 
-        # permissions, but it should be ignored by the rest of the models' 
+        # attachment.rb checks for this session attribute when determining
+        # permissions, but it should be ignored by the rest of the models'
         # permission checks
         session['file_access_user_id'] = user.id
         session['file_access_expiration'] = 1.hour.from_now.to_i
@@ -361,7 +361,7 @@ class FilesController < ApplicationController
   def text_show
     @attachment = @context.attachments.find(params[:file_id])
     if authorized_action(@attachment,@current_user,:read)
-      if @attachment.grants_right?(@current_user, nil, :download)
+      if @attachment.grants_right?(@current_user, :download)
         @headers = false
         render
       else
@@ -517,7 +517,7 @@ class FilesController < ApplicationController
         options = {:permissions => {:user => @current_user}}
         if attachment.grants_right?(@current_user, session, :download)
           # Right now we assume if they ask for json data on the attachment
-          # which includes the scribd doc data, then that means they have 
+          # which includes the scribd doc data, then that means they have
           # viewed or are about to view the file in some form.
           if @current_user &&
             ((feature_enabled?(:scribd) && attachment.scribd_doc) ||
@@ -564,7 +564,7 @@ class FilesController < ApplicationController
 
   # checks if for the current root account there's a 'files' domain
   # defined and tried to use that.  This way any files that we stream through
-  # a canvas URL are at least on a separate subdomain and the javascript 
+  # a canvas URL are at least on a separate subdomain and the javascript
   # won't be able to access or update data with AJAX requests.
   def safer_domain_available?
     if !@files_domain && request.host_with_port != HostUrl.file_host(@domain_root_account, request.host_with_port)
@@ -604,7 +604,7 @@ class FilesController < ApplicationController
       if params[:file_path] || !params[:wrap]
         send_stored_file(attachment)
       else
-        # If the file is inlineable then redirect to the 'show' action 
+        # If the file is inlineable then redirect to the 'show' action
         # so we can wrap it in all the Canvas header/footer stuff
         redirect_to(named_context_url(@context, :context_file_url, attachment.id))
       end
@@ -818,7 +818,7 @@ class FilesController < ApplicationController
     end
     @folder ||= Folder.unfiled_folder(@context)
     params[:attachment][:uploaded_data] ||= params[:attachment_uploaded_data]
-    params[:attachment][:uploaded_data] ||= params[:file] 
+    params[:attachment][:uploaded_data] ||= params[:file]
     params[:attachment][:user] = @current_user
     params[:attachment].delete :context_id
     params[:attachment].delete :context_type
@@ -926,8 +926,8 @@ class FilesController < ApplicationController
   #   The new display name of the file
   #
   # @argument parent_folder_id [String]
-  #   The id of the folder to move this file into. 
-  #   The new folder must be in the same context as the original parent folder. 
+  #   The id of the folder to move this file into.
+  #   The new folder must be in the same context as the original parent folder.
   #   If the file is in a context without folders this does not apply.
   #
   # @argument lock_at [DateTime]
@@ -944,9 +944,9 @@ class FilesController < ApplicationController
   #
   # @example_request
   #
-  #   curl -XPUT 'https://<canvas>/api/v1/files/<file_id>' \ 
-  #        -F 'name=<new_name>' \ 
-  #        -F 'locked=true' \ 
+  #   curl -XPUT 'https://<canvas>/api/v1/files/<file_id>' \
+  #        -F 'name=<new_name>' \
+  #        -F 'locked=true' \
   #        -H 'Authorization: Bearer <token>'
   #
   # @returns File

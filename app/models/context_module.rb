@@ -32,7 +32,7 @@ class ContextModule < ActiveRecord::Base
   ]
 
   EXPORTABLE_ASSOCIATIONS = [:context, :context_module_prograssions, :content_tags]
-  
+
   serialize :prerequisites
   serialize :completion_requirements
   before_save :infer_position
@@ -106,7 +106,7 @@ class ContextModule < ActiveRecord::Base
     self.prerequisites = prereqs
     self.position
   end
-  
+
   alias_method :destroy!, :destroy
   def destroy
     self.workflow_state = 'deleted'
@@ -116,12 +116,12 @@ class ContextModule < ActiveRecord::Base
     save!
     true
   end
-  
+
   def restore
     self.workflow_state = context.feature_enabled?(:draft_state) ? 'unpublished' : 'active'
     self.save
   end
-  
+
   def update_downstreams(original_position=nil)
     original_position ||= self.position || 0
     positions = ContextModule.module_positions(self.context).to_a.sort_by{|a| a[1] }
@@ -129,7 +129,7 @@ class ContextModule < ActiveRecord::Base
     downstreams = downstream_ids.empty? ? [] : self.context.context_modules.not_deleted.find_all_by_id(downstream_ids)
     downstreams.each {|m| m.save_without_touching_context }
   end
-  
+
   workflow do
     state :active do
       event :unpublish, :transitions_to => :unpublished
@@ -139,7 +139,7 @@ class ContextModule < ActiveRecord::Base
     end
     state :deleted
   end
-  
+
   scope :active, where(:workflow_state => 'active')
   scope :unpublished, where(:workflow_state => 'unpublished')
   scope :not_deleted, where("context_modules.workflow_state<>'deleted'")
@@ -154,24 +154,24 @@ class ContextModule < ActiveRecord::Base
   end
 
   set_policy do
-    given {|user, session| self.cached_context_grants_right?(user, session, :manage_content) }
+    given {|user, session| self.context.grants_right?(user, session, :manage_content) }
     can :read and can :create and can :update and can :delete
-    
-    given {|user, session| self.cached_context_grants_right?(user, session, :read) }
+
+    given {|user, session| self.context.grants_right?(user, session, :read) }
     can :read
   end
-  
+
   def locked_for?(user, opts={})
-    return false if self.grants_right?(user, nil, :update)
+    return false if self.grants_right?(user, :update)
     available = self.available_for?(user, opts)
     return {:asset_string => self.asset_string, :context_module => self.attributes} unless available
     return {:asset_string => self.asset_string, :context_module => self.attributes, :unlock_at => self.unlock_at} if self.to_be_unlocked
     false
   end
-  
+
   def available_for?(user, opts={})
     return true if self.active? && !self.to_be_unlocked && self.prerequisites.blank? && !self.require_sequential_progress
-    if self.grants_right?(user, nil, :update)
+    if self.grants_right?(user, :update)
       return true
     elsif !self.active?
       return false
@@ -193,7 +193,7 @@ class ContextModule < ActiveRecord::Base
     end
     res
   end
-  
+
   def current?
     (self.start_at || self.end_at) && (!self.start_at || Time.now >= self.start_at) && (!self.end_at || Time.now <= self.end_at) rescue true
   end
@@ -232,7 +232,7 @@ class ContextModule < ActiveRecord::Base
     end
     write_attribute(:prerequisites, prereqs)
   end
-  
+
   def completion_requirements=(val)
     if val.is_a?(Array)
       hash = {}
@@ -321,9 +321,9 @@ class ContextModule < ActiveRecord::Base
       added_item.attributes = {
         :url => params[:url],
         :new_tab => params[:new_tab],
-        :tag_type => 'context_module', 
-        :title => title, 
-        :indent => params[:indent], 
+        :tag_type => 'context_module',
+        :title => title,
+        :indent => params[:indent],
         :position => position
       }
       added_item.content_id = 0
@@ -343,11 +343,11 @@ class ContextModule < ActiveRecord::Base
       end
       added_item.attributes = {
         :content => tool,
-        :url => params[:url], 
+        :url => params[:url],
         :new_tab => params[:new_tab],
-        :tag_type => 'context_module', 
-        :title => title, 
-        :indent => params[:indent], 
+        :tag_type => 'context_module',
+        :title => title,
+        :indent => params[:indent],
         :position => position
       }
       added_item.context_module_id = self.id
@@ -360,8 +360,8 @@ class ContextModule < ActiveRecord::Base
       added_item ||= self.content_tags.build(:context => self.context)
       added_item.attributes = {
         :tag_type => 'context_module',
-        :title => title, 
-        :indent => params[:indent], 
+        :title => title,
+        :indent => params[:indent],
         :position => position
       }
       added_item.content_id = 0
@@ -378,8 +378,8 @@ class ContextModule < ActiveRecord::Base
       added_item.attributes = {
         :content => item,
         :tag_type => 'context_module',
-        :title => title, 
-        :indent => params[:indent], 
+        :title => title,
+        :indent => params[:indent],
         :position => position
       }
       added_item.context_module_id = self.id
@@ -389,7 +389,7 @@ class ContextModule < ActiveRecord::Base
       added_item
     end
   end
-  
+
   def update_for(user, action, tag, points=nil)
     retry_count = 0
     begin
@@ -463,7 +463,7 @@ class ContextModule < ActiveRecord::Base
     clear_cached_lookups
     super
   end
-  
+
   def clear_cached_lookups
     @cached_active_tags = nil
   end
@@ -471,7 +471,7 @@ class ContextModule < ActiveRecord::Base
   def cached_active_tags
     @cached_active_tags ||= self.content_tags.active
   end
-  
+
   def confirm_valid_requirements(do_save=false)
     return if @already_confirmed_valid_requirements
     @already_confirmed_valid_requirements = true
@@ -480,7 +480,7 @@ class ContextModule < ActiveRecord::Base
     self.save if do_save && self.completion_requirements_changed?
     self.completion_requirements
   end
-  
+
   def find_or_create_progressions(users)
     users = Array(users)
     users_hash = {}
@@ -493,7 +493,7 @@ class ContextModule < ActiveRecord::Base
     progressions.each{|p| p.user = users_hash[p.user_id] }
     progressions.uniq
   end
-  
+
   def find_or_create_progression(user)
     return nil unless user
     progression = nil
@@ -512,7 +512,7 @@ class ContextModule < ActiveRecord::Base
     progression.context_module = self
     progression
   end
-  
+
   def evaluate_for(user_or_progression)
     if user_or_progression.is_a?(ContextModuleProgression)
       progression, user = [user_or_progression, user_or_progression.user]

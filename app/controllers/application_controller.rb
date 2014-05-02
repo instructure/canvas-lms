@@ -507,7 +507,7 @@ class ApplicationController < ActionController::Base
         # don't load it again if we've already got it
         next if @contexts.any? { |c| c.asset_string == include_context }
         context = Context.find_by_asset_string(include_context)
-        @contexts << context if context && context.grants_right?(@current_user, nil, :read)
+        @contexts << context if context && context.grants_right?(@current_user, :read)
       end
     end
     @contexts = @contexts.uniq

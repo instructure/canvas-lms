@@ -1577,10 +1577,10 @@ class CoursesController < ApplicationController
       if params[:course][:account_id]
         account = Account.find(params[:course][:account_id])
       end
-      account = nil unless account.grants_rights?(@current_user, session, :create_courses, :manage_courses).values.any?
+      account = nil unless account.grants_any_right?(@current_user, session, :create_courses, :manage_courses)
       account ||= @domain_root_account.manually_created_courses_account
       return unless authorized_action(account, @current_user, [:create_courses, :manage_courses])
-      if account.grants_rights?(@current_user, session, :manage_courses)
+      if account.grants_right?(@current_user, session, :manage_courses)
         root_account = account.root_account
         enrollment_term_id = params[:course].delete(:term_id).presence || params[:course].delete(:enrollment_term_id).presence
         args[:enrollment_term] = root_account.enrollment_terms.find_by_id(enrollment_term_id) if enrollment_term_id

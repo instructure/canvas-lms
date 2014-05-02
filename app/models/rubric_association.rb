@@ -81,7 +81,7 @@ class RubricAssociation < ActiveRecord::Base
       record.just_created && !record.context.is_a?(Course)
     }
   end
-  
+
   scope :bookmarked, where(:bookmarked => true)
   scope :for_purpose, lambda { |purpose| where(:purpose => purpose) }
   scope :for_grading, where(:purpose => 'grading')
@@ -96,7 +96,7 @@ class RubricAssociation < ActiveRecord::Base
       end
     end
   end
-  
+
   def assignment
     if self.association_object.is_a?(Assignment)
       self.association_object
@@ -114,40 +114,40 @@ class RubricAssociation < ActiveRecord::Base
     LearningOutcome.update_alignments(assignment, context, outcome_ids)
     true
   end
-  
+
   def update_old_rubric
     if self.rubric_id_changed? && self.rubric_id_was && self.rubric_id_was != self.rubric_id
       rubric = Rubric.find(self.rubric_id_was)
       rubric.destroy if rubric.rubric_associations.count == 0 && rubric.rubric_assessments.count == 0
     end
   end
-  
+
   def context_name
     @cached_context_name ||= Rails.cache.fetch(['short_name_lookup', self.context_code].cache_key) do
       self.context.short_name rescue ""
     end
   end
-  
+
   def update_values
     self.bookmarked = true if self.purpose == 'bookmark' || self.bookmarked.nil?
     self.context_code ||= "#{self.context_type.underscore}_#{self.context_id}" rescue nil
     self.title ||= (self.association_object.title rescue self.association_object.name) rescue nil
   end
   protected :update_values
-  
+
   attr_accessor :assessing_user_id
 
   set_policy do
-    given {|user, session| self.cached_context_grants_right?(user, session, :manage) }
+    given {|user, session| self.context.grants_right?(user, session, :manage) }
     can :update and can :delete and can :manage and can :assess
-    
+
     given {|user| user && @assessing_user_id && self.assessment_requests.for_assessee(@assessing_user_id).map{|r| r.assessor_id}.include?(user.id) }
     can :assess
-    
-    given {|user, session| self.cached_context_grants_right?(user, session, :participate_as_student) }
+
+    given {|user, session| self.context.grants_right?(user, session, :participate_as_student) }
     can :submit
   end
-  
+
   def update_assignment_points
     if self.use_for_grading && !self.skip_updating_points_possible && self.association_object && self.association_object.respond_to?(:points_possible=) && self.rubric && self.rubric.points_possible && self.association_object.points_possible != self.rubric.points_possible
       self.association_object.update_attribute(:points_possible, self.rubric.points_possible)
@@ -161,7 +161,7 @@ class RubricAssociation < ActiveRecord::Base
     assessment_request.send_reminder! if assessment_request.assigned?
     assessment_request
   end
-  
+
   def update_rubric
     cnt = self.rubric.rubric_associations.for_grading.length rescue 0
     if self.rubric
@@ -195,7 +195,7 @@ class RubricAssociation < ActiveRecord::Base
   def unsubmitted_users
     self.context.students - self.rubric_assessments.map{|a| a.user} - self.assessment_requests.map{|a| a.user}
   end
-  
+
   def self.generate(current_user, rubric, context, params)
     raise "context required" unless context
     association_object = params.delete :association_object
@@ -214,7 +214,7 @@ class RubricAssociation < ActiveRecord::Base
     association.association_object = association_object
     association
   end
-  
+
   def assessments_unique_per_asset?(assessment_type)
     self.association_object.is_a?(Assignment) && self.purpose == "grading" && assessment_type == "grading"
   end
@@ -229,16 +229,16 @@ class RubricAssociation < ActiveRecord::Base
     raise "Assessor required for assessing" unless opts[:assessor]
     raise "Artifact required for assessing" unless opts[:artifact]
     raise "Assessment type required for assessing" unless params[:assessment_type]
-    
+
     if self.association_object.is_a?(Assignment) && !self.association_object.grade_group_students_individually
       students_to_assess = self.association_object.group_students(opts[:artifact].user).last
-      artifacts_to_assess = students_to_assess.map do |student| 
+      artifacts_to_assess = students_to_assess.map do |student|
         self.association_object.find_asset_for_assessment(self, student).first
       end
     else
       artifacts_to_assess = [opts[:artifact]]
     end
-    
+
     ratings = []
     score = 0
     replace_ratings = false
@@ -287,7 +287,7 @@ class RubricAssociation < ActiveRecord::Base
       assessment = nil
       if assessments_unique_per_asset?(params[:assessment_type])
         # Unless it's for grading, in which case assessments are unique per artifact (the assessor can change, depending on if the teacher/TA updates it)
-        assessment = association.rubric_assessments.find_by_artifact_id_and_artifact_type_and_assessment_type(artifact.id, artifact.class.to_s, params[:assessment_type]) 
+        assessment = association.rubric_assessments.find_by_artifact_id_and_artifact_type_and_assessment_type(artifact.id, artifact.class.to_s, params[:assessment_type])
       else
         # Assessments are unique per artifact/assessor/assessment_type.
         assessment = association.rubric_assessments.find_by_artifact_id_and_artifact_type_and_assessor_id_and_assessment_type(artifact.id, artifact.class.to_s, opts[:assessor].id, params[:assessment_type])

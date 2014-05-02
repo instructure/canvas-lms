@@ -230,7 +230,7 @@ class ConversationsController < ApplicationController
       return redirect_to conversations_path(:scope => params[:redirect_scope]) if params[:redirect_scope]
       load_all_contexts :permissions => [:manage_user_notes]
       notes_enabled = @current_user.associated_accounts.any?{|a| a.enable_user_notes }
-      can_add_notes_for_account = notes_enabled && @current_user.associated_accounts.any?{|a| a.grants_right?(@current_user, nil, :manage_students) }
+      can_add_notes_for_account = notes_enabled && @current_user.associated_accounts.any?{|a| a.grants_right?(@current_user, :manage_students) }
       js_env(:CONVERSATIONS => {
                :ATTACHMENTS_FOLDER_ID => @current_user.conversation_attachments_folder.id,
                :ACCOUNT_CONTEXT_CODE => "account_#{@domain_root_account.id}",

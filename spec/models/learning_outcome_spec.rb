@@ -52,7 +52,7 @@ describe LearningOutcome do
       @rubric.learning_outcome_alignments.should_not be_empty
       @rubric.learning_outcome_alignments.first.learning_outcome_id.should eql(@outcome.id)
     end
-    
+
     it "should delete learning outcome alignments when they no longer exist" do
       assignment_model
       @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
@@ -107,7 +107,7 @@ describe LearningOutcome do
       @rubric.reload
       @rubric.learning_outcome_alignments.active.should be_empty
     end
-    
+
     it "should create learning outcome associations for multiple outcome rows" do
       assignment_model
       @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
@@ -161,7 +161,7 @@ describe LearningOutcome do
       @rubric.learning_outcome_alignments.should_not be_empty
       @rubric.learning_outcome_alignments.map(&:learning_outcome_id).sort.should eql([@outcome.id, @outcome2.id].sort)
     end
-    
+
     it "should create outcome results when outcome-aligned rubrics are assessed" do
       assignment_model
       @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
@@ -242,7 +242,7 @@ describe LearningOutcome do
       @result.original_score.should eql(2.0)
       @result.mastery.should eql(true)
     end
-    
+
     it "should override non-rubric-based alignments with rubric-based alignments for the same assignment" do
       assignment_model
       @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
@@ -276,7 +276,7 @@ describe LearningOutcome do
       @rubric.save!
       @rubric.reload
       @rubric.should_not be_new_record
-      
+
       @rubric.learning_outcome_alignments.should_not be_empty
       @rubric.learning_outcome_alignments.first.learning_outcome_id.should eql(@outcome.id)
       @user = user(:active_all => true)
@@ -346,7 +346,7 @@ describe LearningOutcome do
       @rubric.save!
       @rubric.reload
       @rubric.should_not be_new_record
-      
+
       @rubric.learning_outcome_alignments.should_not be_empty
       @rubric.learning_outcome_alignments.first.learning_outcome_id.should eql(@outcome.id)
       @user = user(:active_all => true)

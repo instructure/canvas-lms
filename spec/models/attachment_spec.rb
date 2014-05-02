@@ -950,14 +950,14 @@ describe Attachment do
       user = user_model
       a = attachment_model
       @course.update_attribute(:is_public, false)
-      a.grants_right?(user, nil, :read).should eql(false)
+      a.grants_right?(user, :read).should eql(false)
     end
 
     it "should allow anonymous access for public contexts" do
       user = user_model
       a = attachment_model
       @course.update_attribute(:is_public, true)
-      a.grants_right?(user, nil, :read).should eql(false)
+      a.grants_right?(user, :read).should eql(false)
     end
 
     it "should allow students to read files" do
@@ -967,7 +967,7 @@ describe Attachment do
       @course.offer
       @course.enroll_student(user).accept
       a.reload
-      a.grants_right?(user, nil, :read).should eql(true)
+      a.grants_right?(user, :read).should eql(true)
     end
 
     it "should allow students to download files" do
@@ -977,7 +977,7 @@ describe Attachment do
       user = user_model
       @course.enroll_student(user).accept
       a.reload
-      a.grants_right?(user, nil, :download).should eql(true)
+      a.grants_right?(user, :download).should eql(true)
     end
 
     it "should allow students to read (but not download) locked files" do
@@ -988,8 +988,8 @@ describe Attachment do
       user = user_model
       @course.enroll_student(user).accept
       a.reload
-      a.grants_right?(user, nil, :read).should eql(true)
-      a.grants_right?(user, nil, :download).should eql(false)
+      a.grants_right?(user, :read).should eql(true)
+      a.grants_right?(user, :download).should eql(false)
     end
 
     it "should allow user access based on 'file_access_user_id' and 'file_access_expiration' in the session" do
@@ -999,8 +999,8 @@ describe Attachment do
       user = user_model
       @course.enroll_student(user).accept
       a.reload
-      a.grants_right?(nil, nil, :read).should eql(false)
-      a.grants_right?(nil, nil, :read).should eql(false)
+      a.grants_right?(nil, :read).should eql(false)
+      a.grants_right?(nil, :read).should eql(false)
       a.grants_right?(nil, {'file_access_user_id' => user.id, 'file_access_expiration' => 1.hour.from_now.to_i}, :read).should eql(true)
       a.grants_right?(nil, {'file_access_user_id' => user.id, 'file_access_expiration' => 1.hour.from_now.to_i}, :download).should eql(true)
     end
@@ -1011,8 +1011,8 @@ describe Attachment do
       user = user_model
       @course.enroll_student(user).accept
       a.reload
-      a.grants_right?(nil, nil, :read).should eql(false)
-      a.grants_right?(nil, nil, :read).should eql(false)
+      a.grants_right?(nil, :read).should eql(false)
+      a.grants_right?(nil, :read).should eql(false)
       a.grants_right?(nil, {'file_access_user_id' => 0, 'file_access_expiration' => 1.hour.from_now.to_i}, :read).should eql(false)
     end
     it "should not allow user access based on incorrect 'file_access_expiration' in the session" do
@@ -1022,8 +1022,8 @@ describe Attachment do
       user = user_model
       @course.enroll_student(user).accept
       a.reload
-      a.grants_right?(nil, nil, :read).should eql(false)
-      a.grants_right?(nil, nil, :read).should eql(false)
+      a.grants_right?(nil, :read).should eql(false)
+      a.grants_right?(nil, :read).should eql(false)
       a.grants_right?(nil, {'file_access_user_id' => user.id, 'file_access_expiration' => 1.minute.ago.to_i}, :read).should eql(false)
     end
   end
@@ -1269,14 +1269,14 @@ describe Attachment do
 
       @shard1.activate do
         user = User.create!
-        user.attachments.build.grants_right?(user, nil, :read).should be_true
+        user.attachments.build.grants_right?(user, :read).should be_true
       end
 
       @shard2.activate do
-        user.attachments.build.grants_right?(user, nil, :read).should be_true
+        user.attachments.build.grants_right?(user, :read).should be_true
       end
 
-      user.attachments.build.grants_right?(user, nil, :read).should be_true
+      user.attachments.build.grants_right?(user, :read).should be_true
     end
   end
 
