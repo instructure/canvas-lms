@@ -38,7 +38,7 @@ define [
           browser:
             data:
               per_page: 100
-              type: 'user'
+              types: ['user']
       input = @$('#student_input').data('token_input')
       input.$fakeInput.css('width', '100%')
 
