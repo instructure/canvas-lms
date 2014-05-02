@@ -3,6 +3,8 @@
 skip_locale_loading = (Rails.env.development? || Rails.env.test? || $0 == 'irb') && !ENV['RAILS_LOAD_ALL_LOCALES']
 if skip_locale_loading
   I18n.load_path = I18n.load_path.grep(%r{/(locales|en)\.yml\z})
+else
+  I18n.load_path += ["config/locales/locales.yml"] # add it at the end, to trump any weird/invalid stuff in locale-specific files
 end
 
 I18n.backend = I18nema::Backend.new
@@ -11,7 +13,10 @@ I18n.backend.init_translations
 
 I18n.enforce_available_locales = true
 
-I18n.send :extend, I18nTasks::Lolcalize if ENV['LOLCALIZE']
+if ENV['LOLCALIZE']
+  require 'i18n_tasks'
+  I18n.send :extend, I18nTasks::Lolcalize
+end
 
 module I18nUtilities
   def before_label(text_or_key, default_value = nil, *args)
@@ -169,7 +174,7 @@ I18n.class_eval do
   end
 
   def self.qualified_locale
-    I18n.t("qualified_locale", "en-US")
+    I18n.backend.direct_lookup(I18n.locale.to_s, "qualified_locale") || "en-US"
   end
 end
 
