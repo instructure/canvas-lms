@@ -337,9 +337,6 @@ module Api::V1::Assignment
       if standard_id.present?
         grading_standard = GradingStandard.standards_for(context).find_by_id(standard_id)
         assignment.grading_standard = grading_standard if grading_standard
-        unless assignment.grading_type == "gpa_scale" || update_params['grading_type'] == "gpa_scale"
-          update_params['grading_type'] = 'letter_grade'
-        end
       else
         assignment.grading_standard = nil
       end

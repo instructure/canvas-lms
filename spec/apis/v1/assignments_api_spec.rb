@@ -1147,7 +1147,6 @@ describe AssignmentsApiController, type: :request do
         )
         @assignment.reload
         @assignment.grading_standard.should == @account_standard
-        @assignment.grading_type.should == 'letter_grade'
       end
 
       it "allows setting a course level grading standard" do
@@ -1165,7 +1164,6 @@ describe AssignmentsApiController, type: :request do
         )
         @assignment.reload
         @assignment.grading_standard.should == @course_standard
-        @assignment.grading_type.should == 'letter_grade'
       end
 
       it "should update a sub account level grading standard" do
@@ -1188,7 +1186,6 @@ describe AssignmentsApiController, type: :request do
         )
         assignment2.reload
         assignment2.grading_standard.should == sub_account_standard
-        assignment2.grading_type.should == 'letter_grade'
       end
 
       it "should not update grading standard from sub account not on account chain" do
