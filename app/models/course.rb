@@ -2188,7 +2188,7 @@ class Course < ActiveRecord::Base
 
   # derived from policy for Group#grants_right?(user, nil, :read)
   def groups_visible_to(user, groups = active_groups)
-    if grants_rights?(user, nil, :manage_groups, :view_group_pages).values.any?
+    if grants_any_right?(user, :manage_groups, :view_group_pages)
       # course-wide permissions; all groups are visible
       groups
     else

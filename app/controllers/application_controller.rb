@@ -317,24 +317,20 @@ class ApplicationController < ActionController::Base
   alias :authorized_action? :authorized_action
 
   def is_authorized_action?(object, *opts)
+    return false unless object
+
     user = opts.shift
-    action_session = nil
     action_session ||= session
     action_session = opts.shift if !opts[0].is_a?(Symbol) && !opts[0].is_a?(Array)
-    actions = Array(opts.shift)
-    can_do = false
+    actions = Array(opts.shift).flatten
 
     begin
-      if object == @context && user == @current_user
-        @context_all_permissions ||= @context.grants_rights?(user, session, nil)
-        can_do = actions.any?{|a| @context_all_permissions[a] }
-      else
-        can_do = object.grants_rights?(user, action_session, *actions).values.any?
-      end
+      return object.grants_any_right?(user, action_session, *actions)
     rescue => e
-      logger.warn "#{object.inspect} raised an error while granting rights.  #{e.inspect}"
+      logger.warn "#{object.inspect} raised an error while granting rights.  #{e.inspect}" if logger
     end
-    can_do
+
+    false
   end
 
   def render_unauthorized_action

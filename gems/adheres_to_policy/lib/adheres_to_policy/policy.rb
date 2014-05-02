@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module AdheresToPolicy #:nodoc:
+module AdheresToPolicy
   class Policy
     attr_reader :conditions
 
@@ -43,6 +43,10 @@ module AdheresToPolicy #:nodoc:
       @conditions.last.last.concat(syms.flatten)
       @conditions.last.last.uniq!
       true
+    end
+
+    def available_rights
+      @all_rights ||= @conditions.map { |c| c.last }.flatten.compact.uniq
     end
   end
 end

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -31,7 +31,7 @@ describe "/gradebooks/gradebook2" do
     assigns[:gradebook_upload] = @course.build_gradebook_upload
     assigns[:body_classes] = []
     @course.expects(:allows_grade_publishing_by).with(@user).returns(course_allows)
-    @course.expects(:grants_rights?).with(@user, {}, nil).returns(permissions_allow ? {:manage_grades=>true} : {}) if course_allows
+    @course.expects(:grants_any_right?).returns(permissions_allow) if course_allows
     render "/gradebooks/gradebook2"
     response.should_not be_nil
     if course_allows && permissions_allow

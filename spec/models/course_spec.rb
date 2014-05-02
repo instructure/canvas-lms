@@ -3288,25 +3288,25 @@ describe Course do
 
     it "should allow course-wide visibility regardless of membership given :manage_groups permission" do
       @course.groups_visible_to(@user).should be_empty
-      @course.expects(:check_policy).with(@user).returns([:manage_groups])
+      @course.expects(:grants_any_right?).returns(true)
       @course.groups_visible_to(@user).should == [@group]
     end
 
     it "should allow course-wide visibility regardless of membership given :view_group_pages permission" do
       @course.groups_visible_to(@user).should be_empty
-      @course.expects(:check_policy).with(@user).returns([:view_group_pages])
+      @course.expects(:grants_any_right?).returns(true)
       @course.groups_visible_to(@user).should == [@group]
     end
 
     it "should default to active groups only" do
-      @course.expects(:check_policy).with(@user).returns([:manage_groups]).at_least_once
+      @course.expects(:grants_any_right?).returns(true).at_least_once
       @course.groups_visible_to(@user).should == [@group]
       @group.destroy
       @course.reload.groups_visible_to(@user).should be_empty
     end
 
     it "should allow overriding the scope" do
-      @course.expects(:check_policy).with(@user).returns([:manage_groups]).at_least_once
+      @course.expects(:grants_any_right?).returns(true).at_least_once
       @group.destroy
       @course.groups_visible_to(@user).should be_empty
       @course.groups_visible_to(@user, @course.groups).should == [@group]
@@ -3352,7 +3352,7 @@ describe Course do
 
       it 'can be read by a prior user' do
         user.student_enrollments.create!(:workflow_state => 'completed', :course => @course)
-        @course.check_policy(user).should == [:read, :read_outcomes, :read_grades, :read_forum]
+        @course.check_policy(user).sort.should == [:read, :read_forum, :read_grades, :read_outcomes]
       end
 
       it 'can have its forum read by an observer' do

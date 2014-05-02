@@ -289,7 +289,7 @@ class Group < ActiveRecord::Base
       member = self.group_memberships.create(attrs)
     end
     # permissions for this user in the group are probably different now
-    Rails.cache.delete(permission_cache_key_for(user))
+    clear_permissions_cache(user)
     return member
   end
 
@@ -304,7 +304,7 @@ class Group < ActiveRecord::Base
     users.sort_by!(&:id)
     notification_name = options[:notification_name] || "New Context Group Membership"
     notification = Notification.by_name(notification_name)
-    users.each {|user| Rails.cache.delete(permission_cache_key_for(user))}
+    users.each {|user| clear_permissions_cache(user) }
 
     users.each_with_index do |user, index|
       Instructure::BroadcastPolicy::NotificationPolicy.send_later_enqueue_args(:send_notification,

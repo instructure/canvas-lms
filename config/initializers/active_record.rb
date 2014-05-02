@@ -145,6 +145,11 @@ class ActiveRecord::Base
     @global_asset_string ||= "#{self.class.reflection_type_name}_#{global_id}"
   end
 
+  # Override the adheres_to_policy permission_cache_key for to make it shard aware.
+  def permission_cache_key_for(user, session, right)
+    Shard.default.activate { super }
+  end
+
   # little helper to keep checks concise and avoid a db lookup
   def has_asset?(asset, field = :context)
     asset.id == send("#{field}_id") && asset.class.base_ar_class.name == send("#{field}_type")
@@ -198,20 +203,18 @@ class ActiveRecord::Base
 
   def self.clear_cached_contexts
     @@cached_contexts = {}
-    @@cached_permissions = {}
   end
 
   def cached_context_grants_right?(user, session, *permissions)
-    @@cached_contexts ||= {}
-    context_key = "#{self.context_type}_#{self.context_id}" if self.respond_to?(:context_type)
-    context_key ||= "Course_#{self.course_id}"
-    @@cached_contexts[context_key] ||= self.context if self.respond_to?(:context)
-    @@cached_contexts[context_key] ||= self.course
-    @@cached_permissions ||= {}
-    key = [context_key, (user ? user.id : nil)].cache_key
-    @@cached_permissions[key] = nil if session && session[:session_affects_permissions]
-    @@cached_permissions[key] ||= @@cached_contexts[context_key].grants_rights?(user, session, nil).keys
-    (@@cached_permissions[key] & Array(permissions).flatten).any?
+    permissions.flatten!
+    permissions.compact!
+    permissions.uniq!
+
+    if self.respond_to?(:context)
+      self.context.grants_any_right?(user, session, *permissions)
+    elsif self.respond_to?(:course)
+      self.course.grants_any_right?(user, session, *permissions)
+    end
   end
 
   def cached_context_short_name
@@ -430,7 +433,7 @@ class ActiveRecord::Base
       :group => expression,
       :order => expression
     )
-    # mysql gives us date keys, sqlite/postgres don't 
+    # mysql gives us date keys, sqlite/postgres don't
     return result if result.keys.first.is_a?(Date)
     Hash[result.map { |date, count|
       [Time.zone.parse(date).to_date, count]

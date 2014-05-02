@@ -153,29 +153,12 @@ module ApplicationHelper
       return can_do(obj, user, actions)
     end
     actions = Array(actions).flatten
-    if (object == @context || object.is_a?(Course)) && user == @current_user
-      @context_all_permissions ||= {}
-      @context_all_permissions[object.asset_string] ||= object.grants_rights?(user, session, nil)
-      return !(@context_all_permissions[object.asset_string].keys & actions).empty?
-    end
-    @permissions_lookup ||= {}
-    return true if actions.any? do |action|
-      lookup = [object ? object.asset_string : nil, user ? user.id : nil, action]
-      @permissions_lookup[lookup] if @permissions_lookup[lookup] != nil
-    end
     begin
-      rights = object.grants_rights?(user, session, *actions)
+      return object.grants_any_right?(user, session, *actions)
     rescue => e
       logger.warn "#{object.inspect} raised an error while granting rights.  #{e.inspect}" if logger
-      return false
     end
-    res = false
-    rights.each do |action, value|
-      lookup = [object ? object.asset_string : nil, user ? user.id : nil, action]
-      @permissions_lookup[lookup] = value
-      res ||= value
-    end
-    res
+    false
   end
 
   # Loads up the lists of files needed for the wiki_sidebar.  Called from

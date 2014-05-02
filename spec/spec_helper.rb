@@ -409,6 +409,10 @@ end
     # so before(:all)'s don't get confused
     Account.clear_special_account_cache!
     Notification.after_create { Notification.reset_cache! }
+
+    # Since AdheresToPolicy::Cache uses an instance variable class cache lets clear
+    # it so we start with a clean slate.
+    AdheresToPolicy::Cache.clear
   end
 
   def delete_fixtures!
