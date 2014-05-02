@@ -1274,4 +1274,16 @@ describe DiscussionTopic do
       @topic.locked?.should be_false
     end
   end
+
+  describe "update_order" do
+    it "should handle existing null positions" do
+      topics = (1..4).map{discussion_topic_model(pinned: true)}
+      topics.each {|x| x.position = nil; x.save}
+
+      new_order = [2, 3, 4, 1]
+      ids = new_order.map {|x| topics[x-1].id}
+      topics[0].update_order(ids)
+      topics.first.list_scope.map(&:id).should == ids
+    end
+  end
 end
