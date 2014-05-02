@@ -79,9 +79,21 @@ otherwise) it will <em>not</em> be overwritten</p></td>
 <td>Last name of the user.</td>
 </tr>
 <tr>
+<td>full_name</td>
+<td>text</td>
+<td>Full name of the user. Omit first_name and last_name if this is provided.</td>
+</tr>
+<tr>
+<td>sortable_name</td>
+<td>text</td>
+<td>Sortable name of the user. This is normally inferred from the user's name,
+but you can customize it here.</td>
+</tr>
+<tr>
 <td>short_name</td>
 <td>text</td>
-<td>Display name of the user.</td>
+<td>Display name of the user. This is normally inferred from the user's name,
+but you can customize it here.</td>
 </tr>
 <tr>
 <td>email</td>
@@ -95,6 +107,9 @@ still be provided.</td>
 <td><b>Required field</b>. active, deleted</td>
 </tr>
 </table>
+
+<p>The user's name (either first_name and last_name, or full_name) should always
+be provided. Otherwise, the name will be blanked out.</p>
 
 <p>When a student is 'deleted' all of its enrollments will also be deleted and
 they won't be able to log in to the school's account. If you still want the

@@ -110,6 +110,78 @@ describe SIS::CSV::UserImporter do
     cc.path.should eql("user2@example.com")
   end
 
+  it "should create new users with full name" do
+    process_csv_data_cleanly(
+        "user_id,login_id,full_name,email,status",
+        "user_1,user1,User Uno,user@example.com,active"
+    )
+    user = CommunicationChannel.find_by_path('user@example.com').user
+    user.account.should eql(@account)
+    user.name.should eql("User Uno")
+
+    user.pseudonyms.count.should eql(1)
+    pseudonym = user.pseudonyms.first
+    pseudonym.unique_id.should eql('user1')
+
+    user.communication_channels.count.should eql(1)
+    cc = user.communication_channels.first
+    cc.path.should eql("user@example.com")
+
+    # Field order shouldn't matter
+    process_csv_data_cleanly(
+        "user_id,login_id,email,status,full_name",
+        "user_2,user2,user2@example.com,active,User Dos"
+    )
+    user = CommunicationChannel.find_by_path('user2@example.com').user
+    user.account.should eql(@account)
+    user.name.should eql("User Dos")
+
+    user.pseudonyms.count.should eql(1)
+    pseudonym = user.pseudonyms.first
+    pseudonym.unique_id.should eql('user2')
+
+    user.communication_channels.count.should eql(1)
+    cc = user.communication_channels.first
+    cc.path.should eql("user2@example.com")
+  end
+
+  it "should create new users with sortable name" do
+    process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,sortable_name,email,status",
+        "user_1,user1,User,Uno,\"One, User\",user@example.com,active"
+    )
+    user = CommunicationChannel.find_by_path('user@example.com').user
+    user.account.should eql(@account)
+    user.name.should eql("User Uno")
+    user.sortable_name.should eql("One, User")
+
+    user.pseudonyms.count.should eql(1)
+    pseudonym = user.pseudonyms.first
+    pseudonym.unique_id.should eql('user1')
+
+    user.communication_channels.count.should eql(1)
+    cc = user.communication_channels.first
+    cc.path.should eql("user@example.com")
+
+    # Field order shouldn't matter
+    process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status,sortable_name",
+        "user_2,user2,User,Dos,user2@example.com,active,\"Two, User\""
+    )
+    user = CommunicationChannel.find_by_path('user2@example.com').user
+    user.account.should eql(@account)
+    user.name.should eql("User Dos")
+    user.sortable_name.should eql("Two, User")
+
+    user.pseudonyms.count.should eql(1)
+    pseudonym = user.pseudonyms.first
+    pseudonym.unique_id.should eql('user2')
+
+    user.communication_channels.count.should eql(1)
+    cc = user.communication_channels.first
+    cc.path.should eql("user2@example.com")
+  end
+
   it "should preserve first name/last name split" do
     process_csv_data_cleanly(
       "user_id,login_id,password,first_name,last_name,email,status,ssha_password",
@@ -136,6 +208,24 @@ describe SIS::CSV::UserImporter do
     )
     user = CommunicationChannel.find_by_path('user2@example.com').user
     user.name.should eql(" ")
+  end
+
+  it "should ignore first and last names if full name is provided" do
+    process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,full_name,email,status",
+        "user_1,user1,,,User One,user@example.com,active"
+    )
+    user = CommunicationChannel.find_by_path('user@example.com').user
+    user.name.should eql("User One")
+    user.sortable_name.should eql("One, User")
+
+    process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,full_name,email,status",
+        "user_2,user2,User,Dos,User Two,user2@example.com,active"
+    )
+    user = CommunicationChannel.find_by_path('user2@example.com').user
+    user.name.should eql("User Two")
+    user.sortable_name.should eql("Two, User")
   end
 
   it "should set passwords and not overwrite current passwords" do
@@ -390,6 +480,34 @@ describe SIS::CSV::UserImporter do
     Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_1").user.short_name.should == "The Uno-Dos"
   end
 
+  it "should allow a user to update full name name specifically" do
+    process_csv_data_cleanly(
+        "user_id,login_id,full_name,email,status",
+        "user_1,user1,User Uno,user1@example.com,active"
+    )
+
+    process_csv_data_cleanly(
+        "user_id,login_id,full_name,email,status",
+        "user_1,user1,User Dos,user1@example.com,active"
+    )
+
+    Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_1").user.name.should == "User Dos"
+  end
+
+  it "should allow a user to update sortable name specifically" do
+    process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,sortable_name,email,status",
+        "user_1,user1,User,Uno,\"One, User\",user1@example.com,active"
+    )
+
+    process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,sortable_name,email,status",
+        "user_1,user1,User,Uno,\"Two, User\",user1@example.com,active"
+    )
+
+    Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_1").user.sortable_name.should == "Two, User"
+  end
+
   it "should allow a user to update emails specifically" do
     enable_cache do
       now = Time.now
@@ -409,6 +527,22 @@ describe SIS::CSV::UserImporter do
 
       Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_1").user.email.should == "user2@example.com"
     end
+  end
+
+  it "should update sortable name properly when full name is updated" do
+    process_csv_data_cleanly(
+        "user_id,login_id,full_name,email,status",
+        "user_1,user1,User Uno,user1@example.com,active"
+    )
+
+    Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_1").user.sortable_name.should == "Uno, User"
+
+    process_csv_data_cleanly(
+        "user_id,login_id,full_name,email,status",
+        "user_1,user1,User Dos,user1@example.com,active"
+    )
+
+    Pseudonym.find_by_account_id_and_sis_user_id(@account.id, "user_1").user.sortable_name.should == "Dos, User"
   end
 
   it "should add two users with different user_ids, login_ids, but the same email" do
@@ -658,16 +792,22 @@ describe SIS::CSV::UserImporter do
 
   it "should strip white space on fields" do
     process_csv_data_cleanly(
-      "user_id,login_id,first_name,last_name,email,status",
-      "user_1  ,user1   ,User   ,Uno   ,user@example.com   ,active  ",
-      "   user_2,   user2,   User,   Dos,   user2@example.com,  active"
+      "user_id,login_id,first_name,last_name,short_name,sortable_name,email,status",
+      "user_1  ,user1   ,User   ,Uno   ,The Uno   ,\"Uno, User   \",user@example.com   ,active  ",
+      "   user_2,   user2,   User,   Dos,   The Dos,\"   Dos, User\",   user2@example.com,  active"
     )
     user = CommunicationChannel.find_by_path('user@example.com').user
     user.should_not be_nil
+    user.name.should == "User Uno"
+    user.sortable_name.should == "Uno, User"
+    user.short_name.should == "The Uno"
     p = user.pseudonyms.first
     p.unique_id.should == "user1"
     user = CommunicationChannel.find_by_path('user2@example.com').user
     user.should_not be_nil
+    user.name.should == "User Dos"
+    user.sortable_name.should == "Dos, User"
+    user.short_name.should == "The Dos"
     p = user.pseudonyms.first
     p.unique_id.should == "user2"
   end
@@ -798,6 +938,52 @@ describe SIS::CSV::UserImporter do
     )
     user.reload
     user.short_name.should == 'The Uno-Dos'
+  end
+
+  it "should handle full name stickiness" do
+    process_csv_data_cleanly(
+        "user_id,login_id,full_name,email,status",
+        "user_1,user1,User Uno,,active"
+    )
+    user = Pseudonym.find_by_unique_id('user1').user
+    user.name = 'The Amazing Uno'
+    user.save!
+    process_csv_data_cleanly(
+        "user_id,login_id,full_name,email,status",
+        "user_1,user1,User Uno,,active"
+    )
+    user.reload
+    user.name.should == 'The Amazing Uno'
+    process_csv_data_cleanly(
+        "user_id,login_id,full_name,email,status",
+        "user_1,user1,User Uno,,active",
+        {:override_sis_stickiness => true}
+    )
+    user.reload
+    user.name.should == 'User Uno'
+  end
+
+  it "should handle sortable name stickiness" do
+    process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,sortable_name,email,status",
+        "user_1,user1,User,Uno,\"One, User\",,active"
+    )
+    user = Pseudonym.find_by_unique_id('user1').user
+    user.sortable_name = 'Uno, The Amazing'
+    user.save!
+    process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,sortable_name,email,status",
+        "user_1,user1,User,Uno,\"Two, User\",,active"
+    )
+    user.reload
+    user.sortable_name.should == 'Uno, The Amazing'
+    process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,sortable_name,email,status",
+        "user_1,user1,User,Uno,\"Two, User\",,active",
+        {:override_sis_stickiness => true}
+    )
+    user.reload
+    user.sortable_name.should == 'Two, User'
   end
 
   it 'should leave users around always' do
