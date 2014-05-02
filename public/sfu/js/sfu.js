@@ -183,6 +183,36 @@
             jQuery('div#main').css('top', '92px');
         }
     });
+
+    // CANVAS-246 Create button that links to the Start a New Ad Hoc Space form (only on these pages: / and /courses)
+    utils.onPage(/^\/(courses)?$/, function () {
+        // Add the button right after the existing Start a New Course button
+        var addAdHocButton = function () {
+            var $courseButton = $('#start_new_course');
+            var $adhocButton = $courseButton.clone();
+            $adhocButton
+                .text('Start a New Ad Hoc Space')
+                .attr('id', 'start_new_adhoc')
+                .attr('aria-controls', 'new_adhoc_form')
+                .insertAfter($courseButton)
+                .on('click', function () {
+                    window.location = '/sfu/adhoc/new';
+                });
+        }
+
+        // If the button is not there yet, it's likely still being loaded in the sidebar.
+        // Wait for it to complete, and then add the button. This is meant for the home page.
+        if ($('#start_new_course').length == 0) {
+            $(document).ajaxComplete(function (event, XMLHttpRequest, ajaxOptions) {
+                if (ajaxOptions.url && ajaxOptions.url.match(/dashboard-sidebar/)) {
+                    addAdHocButton();
+                }
+            });
+        } else {
+            addAdHocButton();
+        }
+    });
+    // END CANVAS-246
 })(jQuery);
 
 // google analytics

@@ -38,6 +38,8 @@ require [
   sandboxList = {}
   sandboxListView = {}
 
+  adhocTextbox = {}
+
   timeId = do ->
     now = new Date()
     [now.getMonth() + 1, now.getDate(), now.getYear() - 100, now.getTime().toString().substr(10)].join('')
@@ -116,6 +118,22 @@ require [
 
     submitRequest payload, '3-sandbox'
 
+  processSubmitAdhoc = ->
+    # With ad hoc spaces, the user is always create the space for him/herself
+    user = currentUser
+
+    if $.trim(adhocTextbox.val()) == ''
+      alert 'The Name of Space must not be empty'
+      return
+
+    showStep '4'
+    payload = initPayload()
+
+    payload["selected_course_adhoc_#{timeId}"] = "adhoc-#{payload.username}-#{timeId}-#{adhocTextbox.val()}"
+
+    # NOTE: The adhoc form fields are in step 1
+    submitRequest payload, '1'
+
   submitRequest = (payload, destinationOnFailure) ->
     request = $.post '/sfu/course/create', payload
     request.done (data) ->
@@ -183,6 +201,7 @@ require [
       when 'action-submit-calendar' then processSubmitCalendar()
       when 'action-submit-non_calendar' then processSubmitNonCalendar()
       when 'action-submit-sandbox' then processSubmitSandbox()
+      when 'action-submit-adhoc' then processSubmitAdhoc()
     # back actions
       when 'action-back-faculty-delegate' then showStep '1'
       when 'action-back-calendar', 'action-back-non_calendar', 'action-back-sandbox' then showStep '2-faculty'
@@ -244,10 +263,15 @@ require [
     enrollMeAsSelect = $('#sel-enroll_me_as')
 
     nonCalendarCourseTextbox = $('#txt-course_name')
-    nonCalendarCourseTextbox .bind 'keydown', (event) ->
+    nonCalendarCourseTextbox.bind 'keydown', (event) ->
       # make RETURN/ENTER key trigger the next step
       processSubmitNonCalendar() if event.which == 13
     nonCalendarTermSelect = $('#sel-term')
+
+    adhocTextbox = $('#txt-adhoc_name')
+    adhocTextbox.bind 'keydown', (event) ->
+      # make RETURN/ENTER key trigger the next step
+      processSubmitAdhoc() if event.which == 13
 
     showStep '1'
 
