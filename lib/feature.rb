@@ -115,6 +115,18 @@ END
       beta: true,
       development: true
     },
+    'html5_first_videos' =>
+    {
+      display_name: -> { I18n.t('features.html5_first_videos', 'Prefer HTML5 for video playback') },
+      description: -> { I18n.t('html5_first_videos_description', <<-END) },
+By default, Canvas will try to use Flash first to play videos. Turn this on to try using HTML5 first,
+then fall back to Flash.
+END
+      applies_to: 'RootAccount',
+      state: 'allowed',
+      beta: true,
+      development: true
+    },
     'high_contrast' =>
     {
       display_name: -> { I18n.t('features.high_contrast', 'Use High Contrast Styles') },

@@ -484,6 +484,7 @@ module ApplicationHelper
       :disableScribdPreviews    => !feature_enabled?(:scribd),
       :disableCrocodocPreviews  => !feature_enabled?(:crocodoc),
       :enableScribdHtml5        => feature_enabled?(:scribd_html5),
+      :enableHtml5FirstVideos   => @domain_root_account.feature_enabled?(:html5_first_videos),
       :logPageViews             => !@body_class_no_headers,
       :maxVisibleEditorButtons  => 3,
       :editorButtons            => editor_buttons,
