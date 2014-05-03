@@ -6,10 +6,10 @@ define [
   'compiled/views/assignments/AssignmentGroupListItemView'
   'compiled/views/assignments/AssignmentListItemView'
   'jquery'
+  'helpers/fakeENV'
   'helpers/jquery.simulate'
   'compiled/behaviors/elementToggler'
-], (Backbone, AssignmentGroupCollection, AssignmentGroup, Assignment, AssignmentGroupListItemView, AssignmentListItemView, $) ->
-
+], (Backbone, AssignmentGroupCollection, AssignmentGroup, Assignment, AssignmentGroupListItemView, AssignmentListItemView, $, fakeENV) ->
   fixtures = $('#fixtures')
 
   assignment1 = ->
@@ -72,6 +72,13 @@ define [
       "position":2
       "rules": {"drop_lowest":1, "drop_highest":2, "never_drop":[3,4]} # intentionally include an invalid assignment id
 
+  group3 = ->
+      buildGroup
+        "id":3
+        "name":"Even more Assignments"
+        "position":3
+        "rules": {"drop_lowest":1, "drop_highest":1}
+
   buildGroup = (options) ->
     options ?= {}
 
@@ -92,10 +99,8 @@ define [
 
   createView = (model, options) ->
     options = $.extend {canManage: true}, options
-    sinon.stub( AssignmentGroupListItemView.prototype, "canManage", -> options.canManage )
+    ENV.PERMISSIONS = { manage: options.canManage }
     sinon.stub( AssignmentGroupListItemView.prototype, "currentUserId", -> 1)
-    sinon.stub( AssignmentListItemView.prototype, "canManage", -> options.canManage )
-    sinon.stub( AssignmentListItemView.prototype, "modules", -> )
 
     view = new AssignmentGroupListItemView
       model: model
@@ -107,13 +112,13 @@ define [
 
   module 'AssignmentGroupListItemView',
     setup: ->
+      fakeENV.setup()
       @model = createAssignmentGroup()
 
     teardown: ->
-      AssignmentGroupListItemView.prototype.canManage.restore()
-      AssignmentListItemView.prototype.canManage.restore()
-      AssignmentListItemView.prototype.modules.restore()
+      fakeENV.teardown()
       AssignmentGroupListItemView.prototype.currentUserId.restore()
+      $('#fixtures').empty()
 
   test "initializes collection", ->
     view = createView(@model)
@@ -160,15 +165,29 @@ define [
     json = view.toJSON()
     equal json.groupWeight, 1
 
-  test "shouldBeExpanded returnes cache state", ->
+  test "shouldBeExpanded returns cache state", ->
+    view = createView(@model)
+    #make sure the cache starts at true
+    view.toggleCache() unless view.shouldBeExpanded()
+    key = view.cache.toKey view.cacheKey()
+
+    ok view.shouldBeExpanded()
+    equal localStorage[key], 'true'
+
+    view.toggleCache()
+    ok !view.shouldBeExpanded()
+    equal localStorage[key], 'false'
+
+  test "toggleCache correctly toggles cache state", ->
     view = createView(@model)
     #make sure the cache starts at true
     view.toggleCache() unless view.shouldBeExpanded()
 
-    ok view.shouldBeExpanded()
-
     view.toggleCache()
+
     ok !view.shouldBeExpanded()
+    view.toggleCache()
+    ok view.shouldBeExpanded()
 
   test "currentlyExpanded returns expanded state", ->
     view = createView(@model)
@@ -195,3 +214,16 @@ define [
   test "cacheKey builds unique key", ->
     view = createView(@model)
     deepEqual view.cacheKey(), ["course", 1, "user", 1, "ag", 1, "expanded"]
+
+  test "not allow group to be deleted with frozen assignments", ->
+    assignments = @model.get('assignments')
+    assignments.first().set('frozen', true)
+    view = createView(@model)
+    ok !view.$("#assignment_group_#{@model.id} a.delete_group").length
+
+  test "correctly displays rules tooltip", ->
+    model = createAssignmentGroup(group3())
+    view = createView(model)
+    anchor = view.$("#assignment_group_3 .ag-header-controls .tooltip_link")
+    equal anchor.text(), "2 Rules"
+    equal anchor.attr("title"), "Drop the lowest score and Drop the highest score"

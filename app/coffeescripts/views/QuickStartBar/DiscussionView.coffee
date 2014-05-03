@@ -1,11 +1,12 @@
 define [
   'compiled/views/QuickStartBar/BaseItemView'
+  'jquery'
   'underscore'
   'compiled/models/DiscussionTopic'
   'jst/quickStartBar/discussion'
   'jquery.instructure_date_and_time'
   'vendor/jquery.placeholder'
-], (BaseItemView, _, Discussion, template) ->
+], (BaseItemView, $, _, Discussion, template) ->
 
   class DiscussionView extends BaseItemView
 

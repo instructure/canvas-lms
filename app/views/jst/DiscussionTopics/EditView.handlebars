@@ -1,3 +1,21 @@
+{{#if draftStateEnabled}}
+  <div class="discussion-edit-header row-fluid">
+    <div class="span4 offset8 text-right">
+      {{#if published}}
+        <span id="topic-draft-state" class="published-status published">
+          <i class="icon-publish"></i>
+          {{#t "buttons.published"}}Published{{/t}}
+        </span>
+      {{else}}
+        <span id="topic-draft-state" class="published-status unpublished">
+          <i class="icon-unpublished"></i>
+          {{#t "buttons.not_published"}}Not Published{{/t}}
+        </span>
+      {{/if}}
+    </div>
+  </div>
+{{/if}}
+
 <fieldset>
   <div class="control-group">
     <label class="hidden-inline-text" for="discussion-title">{{#t "topic_title"}}Topic Title{{/t}}</label>
@@ -11,7 +29,12 @@
   </div>
   <div class="control-group">
       <div style="float: right;">
-        <a href="#" class="rte_switch_views_link">{{#t "#editor.switch_views"}}Switch Views{{/t}}</a>
+        <a href="#" class="rte_switch_views_link">
+          {{#t "#editor.switch_editor_html"}}HTML Editor{{/t}}
+        </a>
+        <a href="#" class="rte_switch_views_link" style="display:none;">
+          {{#t "#editor.switch_editor_visual"}}Visual Editor{{/t}}
+        </a>
       </div>
       <div style="clear:both;"></div>
       <textarea name="message"
@@ -24,7 +47,7 @@
 <fieldset>
 
   <div class="control-group">
-    <label class="control-label" for="attachment_uploaded_data">{{#t "attachment"}}Attachment{{/t}}</label>
+    <label class="control-label" for="discussion_attachment_uploaded_data">{{#t "attachment"}}Attachment{{/t}}</label>
     <div class="controls">
       {{#each attachments}}
         <div class="attachmentRow">
@@ -35,7 +58,7 @@
       <input type="file"
              name="attachment"
              {{#if attachments}}style="display:none"{{/if}}
-             id="attachment_uploaded_data" >
+             id="discussion_attachment_uploaded_data" >
     </div>
   </div>
 
@@ -70,7 +93,7 @@
                    class="datetime_field input-medium"
                    name="delayed_post_at"
                    {{! TODO: what would be the best way to get this formatted right? }}
-                   value="{{datetimeFormatted delayed_post_at}}">
+                   value="{{datetimeFormatted delayed_post_at false}}">
           </label>
         {{/if}}
         <label class="checkbox">
@@ -121,7 +144,7 @@
                    class="datetime_field input-medium"
                    name="delayed_post_at"
                    {{! TODO: what would be the best way to get this formatted right? }}
-                   value="{{datetimeFormatted delayed_post_at}}">
+                   value="{{datetimeFormatted delayed_post_at false}}">
           </div>
         </div>
       </fieldset>
@@ -135,7 +158,7 @@
                      class="datetime_field input-medium"
                      name="lock_at"
                      {{! TODO: what would be the best way to get this formatted right? }}
-                     value="{{datetimeFormatted lock_at}}">
+                     value="{{datetimeFormatted lock_at false}}">
             </div>
           </div>
         </fieldset>
@@ -150,7 +173,7 @@
       <div class="control-group">
         <label class="control-label" for="discussion_topic_assignment_points_possible">{{#t "points_possible"}}Points Possible{{/t}}</label>
         <div class="controls">
-          <input type="number"
+          <input type="text"
                  id="discussion_topic_assignment_points_possible"
                  name="assignment[points_possible]"
                  class="input-small"

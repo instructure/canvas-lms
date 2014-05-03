@@ -20,7 +20,7 @@
       <%= notification.subject %>
     </div>
     <div class="message user_content">
-      <%= user_content(notification.message) %>
+      <%= user_content(notification.message.gsub(/(({{)|(%7B%7B))ACCOUNT_DOMAIN((}})|(%7D%7D))/,request.host_with_port)) unless notification.message.nil? %>
     </div>
   </div>
 </div>

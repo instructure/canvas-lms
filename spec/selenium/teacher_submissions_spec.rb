@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/submissions_common')
 
 describe "submissions" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   context 'as a teacher' do
 

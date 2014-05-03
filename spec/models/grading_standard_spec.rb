@@ -54,7 +54,7 @@ describe GradingStandard do
     input = [['A', 0.9999]]
     standard = GradingStandard.new
     standard.data = input
-    standard.data[0][1].should be_close(0.999, 0.00001)
+    standard.data[0][1].should be_close(0.9999, 0.00001)
     input[0][1].should be_close(0.9999, 0.00001)
   end
 
@@ -79,7 +79,7 @@ describe GradingStandard do
     it "should return standards that match the context" do
       course_with_teacher
       grading_standard_for @course
-      
+
       standards = GradingStandard.standards_for(@course)
       standards.length.should == 1
       standards[0].id.should == @standard.id

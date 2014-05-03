@@ -52,7 +52,8 @@ module CC::Importer::Canvas
     
     def get_quiz_meta(doc, quiz)
       ['title', 'description', 'access_code', 'ip_filter',
-       'quiz_type', 'scoring_policy', 'hide_results'].each do |string_type|
+       'quiz_type', 'scoring_policy', 'hide_results', 
+       'lockdown_browser_monitor_data'].each do |string_type|
         val = get_node_val(doc, string_type)
         quiz[string_type] = val unless val.nil?
       end
@@ -61,11 +62,14 @@ module CC::Importer::Canvas
       quiz['lock_at'] = get_time_val(doc, 'lock_at')
       quiz['unlock_at'] = get_time_val(doc, 'unlock_at')
       quiz['due_at'] = get_time_val(doc, 'due_at')
+      quiz['show_correct_answers_at'] = get_time_val(doc, 'show_correct_answers_at')
+      quiz['hide_correct_answers_at'] = get_time_val(doc, 'hide_correct_answers_at')
       quiz['time_limit'] = get_int_val(doc, 'time_limit')
       quiz['allowed_attempts'] = get_int_val(doc, 'allowed_attempts')
       ['could_be_locked','anonymous_submissions','show_correct_answers',
        'require_lockdown_browser','require_lockdown_browser_for_results',
-       'shuffle_answers','available', 'cant_go_back', 'one_question_at_a_time'
+       'shuffle_answers','available', 'cant_go_back', 'one_question_at_a_time',
+       'require_lockdown_browser_monitor'
       ].each do |bool_val|
         val = get_bool_val(doc, bool_val)
         quiz[bool_val] = val unless val.nil?

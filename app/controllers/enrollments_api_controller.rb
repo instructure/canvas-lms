@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011-2012 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,7 +17,137 @@
 #
 
 # @API Enrollments
+#
 # API for creating and viewing course enrollments
+#
+# @model Grade
+#     {
+#       "id": "Grade",
+#       "description": "",
+#       "properties": {
+#         "html_url": {
+#           "description": "The URL to the Canvas web UI page for the user's grades, if this is a student enrollment.",
+#           "example": "",
+#           "type": "string"
+#         },
+#         "current_grade": {
+#           "description": "The user's current grade in the class. Only included if user has permissions to view this grade.",
+#           "example": "",
+#           "type": "string"
+#         },
+#         "final_grade": {
+#           "description": "The user's final grade for the class. Only included if user has permissions to view this grade.",
+#           "example": "",
+#           "type": "string"
+#         },
+#         "current_score": {
+#           "description": "The user's current score in the class. Only included if user has permissions to view this score.",
+#           "example": "",
+#           "type": "string"
+#         },
+#         "final_score": {
+#           "description": "The user's final score for the class. Only included if user has permissions to view this score.",
+#           "example": "",
+#           "type": "string"
+#         }
+#       }
+#     }
+#
+# @model Enrollment 
+#       {
+#         "id": "Enrollment",
+#         "description": "",
+#         "properties": {
+#           "id": {
+#             "description": "The ID of the enrollment.",
+#             "example": 1,
+#             "type": "integer"
+#           },
+#           "course_id": {
+#             "description": "The unique id of the course.",
+#             "example": 1,
+#             "type": "integer"
+#           },
+#           "course_section_id": {
+#             "description": "The unique id of the user's section.",
+#             "example": 1,
+#             "type": "integer"
+#           },
+#           "enrollment_state": {
+#             "description": "The state of the user's enrollment in the course.",
+#             "example": "active",
+#             "type": "string"
+#           },
+#           "limit_privileges_to_course_section": {
+#             "description": "User can only access his or her own course section.",
+#             "example": true,
+#             "type": "boolean"
+#           },
+#           "sis_import_id": {
+#             "description": "The unique identifier for the SIS import. This field is only included if the user has permission to manage SIS information.",
+#             "example": 83,
+#             "type": "integer"
+#           },
+#           "root_account_id": {
+#             "description": "The unique id of the user's account.",
+#             "example": 1,
+#             "type": "integer"
+#           },
+#           "type": {
+#             "description": "The enrollment type. One of 'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment', 'ObserverEnrollment'.",
+#             "example": "StudentEnrollment",
+#             "type": "string"
+#           },
+#           "user_id": {
+#             "description": "The unique id of the user.",
+#             "example": 1,
+#             "type": "integer"
+#           },
+#           "associated_user_id": {
+#             "example": null,
+#             "type": "integer"
+#           },
+#           "role": {
+#             "description": "The enrollment role, for course-level permissions. This field will match `type` if the enrollment role has not been customized.",
+#             "example": "StudentEnrollment",
+#             "type": "string"
+#           },
+#           "updated_at": {
+#             "description": "The updated time of the enrollment, in ISO8601 format.",
+#             "example": "2012-04-18T23:08:51Z",
+#             "type": "datetime"
+#           },
+#           "start_at": {
+#             "description": "The start time of the enrollment, in ISO8601 format.",
+#             "example": "2012-04-18T23:08:51Z",
+#             "type": "datetime"
+#           },
+#           "end_at": {
+#             "description": "The end time of the enrollment, in ISO8601 format.",
+#             "example": "2012-04-18T23:08:51Z",
+#             "type": "datetime"
+#           },
+#           "last_activity_at": {
+#             "description": "The last activity time of the user for the enrollment, in ISO8601 format.",
+#             "example": "2012-04-18T23:08:51Z",
+#             "type": "datetime"
+#           },
+#           "html_url": {
+#             "description": "The URL to the Canvas web UI page for this course enrollment.",
+#             "example":  "https://...",
+#             "type": "string"
+#           },
+#           "grades": {
+#             "description": "The URL to the Canvas web UI page the grades associated with this enrollment.",
+#             "$ref": "Grade"
+#           },
+#           "user": {
+#             "description": "A description of the user.",
+#             "type": "User"
+#           }
+#         }
+#       }
+#
 class EnrollmentsApiController < ApplicationController
   before_filter :get_course_from_section, :require_context
 
@@ -60,106 +190,25 @@ class EnrollmentsApiController < ApplicationController
   #   Filter by enrollment state. If omitted, 'active' and 'invited' enrollments
   #   are returned.
   #
-  # @response_field id The unique id of the enrollment.
-  # @response_field course_id The unique id of the course.
-  # @response_field course_section_id The unique id of the user's section.
-  # @response_field enrollment_state The state of the user's enrollment in the course.
-  # @response_field limit_privileges_to_course_section User can only access his or her own course section.
-  # @response_field root_account_id The unique id of the user's account.
-  # @response_field type The type of the enrollment.
-  # @response_field role The enrollment role, for course-level permissions.
-  # @response_field user_id The unique id of the user.
-  # @response_field html_url The URL to the Canvas web UI page for this course enrollment.
-  # @response_field grades[html_url] The URL to the Canvas web UI page for the user's grades, if this is a student enrollment.
-  # @response_field grades[current_grade] The user's current grade in the class. Only included if user has permissions to view this grade.
-  # @response_field grades[final_grade] The user's final grade for the class. Only included if user has permissions to view this grade.
-  # @response_field user[id] The unique id of the user.
-  # @response_field user[login_id] The unique login of the user.
-  # @response_field user[name] The name of the user.
-  # @response_field user[short_name] The short name of the user.
-  # @response_field user[sortable_name] The sortable name of the user.
-  #
-  # @example_response
-  #   [
-  #     {
-  #       "id": 1,
-  #       "course_id": 1,
-  #       "course_section_id": 1,
-  #       "enrollment_state": "active",
-  #       "limit_privileges_to_course_section": true,
-  #       "root_account_id": 1,
-  #       "type": "StudentEnrollment",
-  #       "user_id": 1,
-  #       "html_url": "https://...",
-  #       "grades": {
-  #         "html_url": "https://...",
-  #       },
-  #       "user": {
-  #         "id": 1,
-  #         "login_id": "bieberfever@example.com",
-  #         "name": "Justin Bieber",
-  #         "short_name": "Justin B.",
-  #         "sortable_name": "Bieber, Justin"
-  #       }
-  #     },
-  #     {
-  #       "id": 2,
-  #       "course_id": 1,
-  #       "course_section_id": 2,
-  #       "enrollment_state": "active",
-  #       "limit_privileges_to_course_section": false,
-  #       "root_account_id": 1,
-  #       "type": "TeacherEnrollment",
-  #       "user_id": 2,
-  #       "html_url": "https://...",
-  #       "grades": {
-  #         "html_url": "https://...",
-  #       },
-  #       "user": {
-  #         "id": 2,
-  #         "login_id": "changyourmind@example.com",
-  #         "name": "Señor Chang",
-  #         "short_name": "S. Chang",
-  #         "sortable_name": "Chang, Señor"
-  #       }
-  #     },
-  #     {
-  #       "id": 3,
-  #       "course_id": 1,
-  #       "course_section_id": 2,
-  #       "enrollment_state": "active",
-  #       "limit_privileges_to_course_section": false,
-  #       "root_account_id": 1,
-  #       "type": "StudentEnrollment",
-  #       "user_id": 2,
-  #       "html_url": "https://...",
-  #       "grades": {
-  #         "html_url": "https://...",
-  #       },
-  #       "user": {
-  #         "id": 2,
-  #         "login_id": "changyourmind@example.com",
-  #         "name": "Señor Chang",
-  #         "short_name": "S. Chang",
-  #         "sortable_name": "Chang, Señor"
-  #       }
-  #     }
-  #   ]
+  # @returns [Enrollment]
   def index
     endpoint_scope = (@context.is_a?(Course) ? (@section.present? ? "section" : "course") : "user")
-    scope_arguments = {
-      :conditions => enrollment_index_conditions,
-      :order => "enrollments.type, #{User.sortable_name_order_by_clause("users")}",
-      :include => [:user, :course, :course_section]
-    }
 
     return unless enrollments = @context.is_a?(Course) ?
-      course_index_enrollments(scope_arguments) :
-      user_index_enrollments(scope_arguments)
+      course_index_enrollments :
+      user_index_enrollments
+
+    enrollments = enrollments.joins(:user).select("enrollments.*").
+      order("enrollments.type, #{User.sortable_name_order_by_clause("users")}")
+
+    has_courses = enrollments.where_values.any? { |cond| cond.is_a?(String) && cond =~ /courses\./ }
+    enrollments = enrollments.joins(:course) if has_courses
 
     enrollments = Api.paginate(
       enrollments,
       self, send("api_v1_#{endpoint_scope}_enrollments_url"))
+
+    Enrollment.send(:preload_associations, enrollments, [:user, :course, :course_section])
     includes = [:user] + Array(params[:include])
 
     user_json_preloads(enrollments.map(&:user))
@@ -184,6 +233,7 @@ class EnrollmentsApiController < ApplicationController
   #   If set to 'active,' student will be immediately enrolled in the course.
   #   Otherwise they will be required to accept a course invitation. Default is
   #   'invited.'
+  #
   # @argument enrollment[course_section_id] [Optional, Integer]
   #   The ID of the course section to enroll the student in. If the
   #   section-specific URL is used, this argument is redundant and will be
@@ -194,8 +244,34 @@ class EnrollmentsApiController < ApplicationController
   #   section given by course_section_id.
   #
   # @argument enrollment[notify] [Optional, Boolean]
-  #   If false, a notification will not be sent to the enrolled user.
-  #   Notifications are sent by default.
+  #   If true, a notification will be sent to the enrolled user.
+  #   Notifications are not sent by default.
+  #
+  # @argument enrollment[self_enrollment_code] [Optional, String]
+  #   If the current user is not allowed to manage enrollments in this
+  #   course, but the course allows self-enrollment, the user can self-
+  #   enroll as a student in the default section by passing in a valid
+  #   code. When self-enrolling, the user_id must be 'self'. The
+  #   enrollment_state will be set to 'active' and all other arguments
+  #   will be ignored.
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/courses/:course_id/enrollments \
+  #     -X POST \
+  #     -F 'user_id=1' \
+  #     -F 'type=StudentEnrollment' \
+  #     -F 'enrollment_state=active' \
+  #     -F 'course_section_id=1' \
+  #     -F 'limit_privileges_to_course_section=true' \
+  #     -F 'notify=false'
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/courses/:course_id/enrollments \
+  #     -X POST \
+  #     -F 'user_id=2' \
+  #     -F 'type=StudentEnrollment'
+  #
+  # @returns Enrollment
   def create
     # error handling
     errors = []
@@ -203,6 +279,8 @@ class EnrollmentsApiController < ApplicationController
     if params[:enrollment].blank?
       errors << @@errors[:missing_parameters] if params[:enrollment].blank?
     else
+      return create_self_enrollment if params[:enrollment][:self_enrollment_code]
+
       role_name = params[:enrollment].delete(:role)
       type = params[:enrollment].delete(:type)
       if Enrollment.valid_type?(role_name)
@@ -235,25 +313,56 @@ class EnrollmentsApiController < ApplicationController
       errors << @@errors[:missing_user_id] unless params[:enrollment][:user_id].present?
     end
     errors << @@errors[:concluded_course] if @context.completed? || @context.soft_concluded?
-    unless errors.blank?
-      render(:json => { :message => errors.join(', ') }, :status => 403) && return
-    end
+    return render_create_errors(errors) if errors.present?
 
     # create enrollment
 
-    params[:enrollment][:no_notify] = true unless params[:enrollment][:notify].nil? && value_to_boolean(params[:enrollment][:notify])
+    params[:enrollment][:no_notify] = true unless value_to_boolean(params[:enrollment][:notify])
     unless @current_user.can_create_enrollment_for?(@context, session, type)
-      render_unauthorized_action(@context) && return
+      render_unauthorized_action && return
     end
     params[:enrollment][:course_section_id] = @section.id if @section.present?
     if params[:enrollment][:course_section_id].present?
       params[:enrollment][:section] = @context.course_sections.active.find params[:enrollment].delete(:course_section_id)
     end
-    user = api_find(User, params[:enrollment].delete(:user_id))
+    api_user_id = params[:enrollment].delete(:user_id)
+    user = api_find(User, api_user_id)
+    raise(ActiveRecord::RecordNotFound, "Couldn't find User with API id '#{api_user_id}'") unless user.can_be_enrolled_in_course?(@context)
     @enrollment = @context.enroll_user(user, type, params[:enrollment].merge(:allow_multiple_enrollments => true))
     @enrollment.valid? ?
       render(:json => enrollment_json(@enrollment, @current_user, session)) :
-      render(:json => @enrollment.errors)
+      render(:json => @enrollment.errors, :status => :bad_request)
+  end
+
+  def render_create_errors(errors)
+    render json: {message: errors.join(', ')}, status: 403
+  end
+
+  def create_self_enrollment
+    require_user
+
+    options = params[:enrollment]
+    code = options[:self_enrollment_code]
+    # we don't just do a straight-up comparison of the code, since
+    # plugins can override Account#self_enrollment_course_for to allow
+    # for synthetic ones
+    errors = []
+    if @context != @context.root_account.self_enrollment_course_for(code)
+      errors << "enrollment[self_enrollment_code] is invalid"
+    end
+    if options[:user_id] != 'self'
+      errors << "enrollment[user_id] must be 'self' when self-enrolling"
+    end
+    return render_create_errors(errors) if errors.present?
+
+    @current_user.validation_root_account = @domain_root_account
+    @current_user.require_self_enrollment_code = true
+    @current_user.self_enrollment_code = code
+    if @current_user.save
+      render(json: enrollment_json(@current_user.self_enrollment, @current_user, session))
+    else
+      render(json: {user: @current_user.errors}, status: :bad_request)
+    end
   end
 
   # @API Conclude an enrollment
@@ -267,27 +376,13 @@ class EnrollmentsApiController < ApplicationController
   #     -X DELETE \ 
   #     -F 'task=conclude'
   #
-  # @example_response
-  #   {
-  #     "root_account_id": 15,
-  #     "id": 75,
-  #     "user_id": 4,
-  #     "course_section_id": 12,
-  #     "limit_privileges_to_course_section": false,
-  #     "enrollment_state": "completed",
-  #     "course_id": 12,
-  #     "type": "StudentEnrollment",
-  #     "html_url": "http://www.example.com/courses/12/users/4",
-  #     "grades": { "html_url": "http://www.example.com/courses/12/grades/4" },
-  #     "associated_user_id": null,
-  #     "updated_at": "2012-04-18T23:08:51Z"
-  #   }
+  # @returns Enrollment
   def destroy
-    @enrollment = Enrollment.find(params[:id])
+    @enrollment = @context.enrollments.find(params[:id])
     task = %w{conclude delete}.include?(params[:task]) ? params[:task] : 'conclude'
 
     unless @enrollment.send("can_be_#{task}d_by", @current_user, @context, session)
-      return render_unauthorized_action(@context)
+      return render_unauthorized_action
     end
 
     task = 'destroy' if task == 'delete'
@@ -302,13 +397,10 @@ class EnrollmentsApiController < ApplicationController
   # Internal: Collect course enrollments that @current_user has permissions to
   # read.
   #
-  # scope_arguments - A hash to be passed as :conditions to an AR scope.
-  #                   Allowed keys are any keys allowed in :conditions.
-  #
   # Returns an ActiveRecord scope of enrollments on success, false on failure.
-  def course_index_enrollments(scope_arguments)
+  def course_index_enrollments
     if authorized_action(@context, @current_user, [:read_roster, :view_all_grades, :manage_grades])
-      scope = @context.enrollments_visible_to(@current_user, :type => :all, :include_priors => true).scoped(scope_arguments)
+      scope = @context.enrollments_visible_to(@current_user, :type => :all, :include_priors => true).where(enrollment_index_conditions)
       unless params[:state].present?
         scope = scope.where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')")
       end
@@ -321,45 +413,40 @@ class EnrollmentsApiController < ApplicationController
   # Internal: Collect user enrollments that @current_user has permissions to
   # read.
   #
-  # scope_arguments - A hash to be passed as :conditions to an AR scope.
-  #                   Allowed keys are any keys allowed in :conditions.
-  #
   # Returns an ActiveRecord scope of enrollments on success, false on failure.
-  def user_index_enrollments(scope_arguments)
+  def user_index_enrollments
     user = api_find(User, params[:user_id])
 
-    # if user is requesting for themselves, just return all of their
-    # enrollments without any extra checking.
     if user == @current_user
-      enrollments = if params[:state].present?
-                      user.enrollments.scoped(scope_arguments.merge(
-                        :conditions => enrollment_index_conditions(true)))
-                    else
-                      user.current_and_invited_enrollments.scoped(scope_arguments)
-                    end
+      # if user is requesting for themselves, just return all of their
+      # enrollments without any extra checking.
+      if params[:state].present?
+        enrollments = user.enrollments.where(enrollment_index_conditions(true))
+      else
+        enrollments = user.current_and_invited_enrollments.where(enrollment_index_conditions)
+      end
+    else
+      # otherwise check for read_roster rights on all of the requested
+      # user's accounts
+      approved_accounts = user.associated_root_accounts.inject([]) do |accounts, ra|
+        accounts << ra.id if ra.grants_right?(@current_user, session, :read_roster)
+        accounts
+      end
 
-      return enrollments
+      # if there aren't any ids in approved_accounts, then the user doesn't have
+      # permissions.
+      render_unauthorized_action and return false if approved_accounts.empty?
+
+      enrollments = user.enrollments.where(enrollment_index_conditions).
+        where(root_account_id: approved_accounts)
+
+      # by default, return active and invited courses. don't use the existing
+      # current_and_invited_enrollments scope because it won't return enrollments
+      # on unpublished courses.
+      enrollments = enrollments.where(workflow_state: %w{active invited}) unless params[:state].present?
     end
 
-    # otherwise check for read_roster rights on all of the requested
-    # user's accounts
-    approved_accounts = user.associated_root_accounts.inject([]) do |accounts, ra|
-      accounts << ra.id if ra.grants_right?(@current_user, session, :read_roster)
-      accounts
-    end
-
-    # if there aren't any ids in approved_accounts, then the user doesn't have
-    # permissions.
-    render_unauthorized_action(@user) and return false if approved_accounts.empty?
-
-    additional_conditions = { 'enrollments.root_account_id' => approved_accounts }
-
-    # by default, return active and invited courses. don't use the existing
-    # current_and_invited_enrollments scope because it won't return enrollments
-    # on unpublished courses.
-    additional_conditions.merge!({:workflow_state => %w{active invited}}) unless params[:state].present?
-
-    user.enrollments.scoped(scope_arguments).where(additional_conditions)
+    enrollments
   end
 
   # Internal: Collect type, section, state, and role info from params and format them

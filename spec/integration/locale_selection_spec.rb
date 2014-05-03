@@ -24,7 +24,7 @@ describe "locale_selection" do
   end
 
   after do
-    I18n.locale = nil
+    I18n.locale = I18n.default_locale
   end
 
   it "should set the locale when authenticated" do

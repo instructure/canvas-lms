@@ -17,9 +17,22 @@
 #
 
 define [
-  'compiled/widget/ScrollableList',
-  'helpers/loadFixture'
-], (ScrollableList, loadFixture) ->
+  'jquery'
+  'compiled/widget/ScrollableList'
+], ($, ScrollableList) ->
+  scrollableListFixture = """
+    <h3>Scrollable List Spec</h3>
+    <style>
+      #scrollable_list_container {
+        height: 100px;
+        overflow: hidden;
+      }
+      #scrollable_list_container li {
+        height: 20px;
+      }
+    </style>
+    <div id="scrollable_list_container"></div>
+  """
 
   module 'ScrollableList',
 
@@ -51,7 +64,7 @@ define [
           ]
           request.respond response...
 
-      @fixture = loadFixture 'ScrollableList'
+      @fixture = $(scrollableListFixture).appendTo('#fixtures')
       @$container = $('#scrollable_list_container')
       @clock  = sinon.useFakeTimers()
       @server = sinon.fakeServer.create()
@@ -80,7 +93,7 @@ define [
     teardown: ->
       @clock.restore()
       @server.restore()
-      @fixture.detach()
+      @fixture.remove()
 
   test 'should load the initial data plus the buffer', ->
     @server.respondWith(/.+/, @fakeApi())

@@ -94,6 +94,10 @@ class ChoiceInteraction < AssessmentItemConverter
             answer[:text] = DEFAULT_ANSWER_TEXT
           end
         end
+        if @flavor == Qti::Flavors::BBLEARN && @question[:question_type] == 'true_false_question'
+          answer[:text] = choice['identifier']
+        end
+
         @question[:answers] << answer
         if ci['responseIdentifier'] and @question[:question_type] == 'multiple_dropdowns_question'
           answer[:blank_id] = ci['responseIdentifier']

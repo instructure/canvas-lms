@@ -185,16 +185,24 @@ describe AssignmentOverride do
       @override.should_not be_valid
     end
 
+    # necessary to allow soft deleting overrides that belonged to a cross
+    # listed section after it is de-cross-listed
+    it "should not reject sections in different course than assignment when deleted" do
+      @other_course = course_model
+      @override.set = @other_course.default_section
+      @override.workflow_state = 'deleted'
+      @override.should be_valid
+    end
+
     it "should reject groups in different category than assignment" do
       @assignment.group_category = group_category
       @category = group_category(name: "bar")
-      @override.set = @category.groups.create
+      @override.set = @category.groups.create!(context: @assignment.context)
       @override.should_not be_valid
     end
 
-    # necessary to allow deleting but otherwise keeping assignments that were
-    # for an assignment's previous group category when the assignment's group
-    # category changes
+    # necessary to allow soft deleting overrides that were for an assignment's
+    # previous group category when the assignment's group category changes
     it "should not reject groups in different category than assignment when deleted" do
       @assignment.group_category = group_category
       @category = group_category(name: "bar")
@@ -536,7 +544,7 @@ describe AssignmentOverride do
 
   describe "default_values" do
     let(:override) { AssignmentOverride.new }
-    let(:quiz) { Quiz.new }
+    let(:quiz) { Quizzes::Quiz.new }
     let(:assignment) { Assignment.new }
 
     context "when the override belongs to a quiz" do
@@ -660,6 +668,7 @@ describe AssignmentOverride do
     let(:due_at) { Time.utc(2013,1,10,12,30) }
     let(:unlock_at) { Time.utc(2013,1,9,12,30) }
     let(:lock_at) { Time.utc(2013,1,11,12,30) }
+    let(:id) { 1 }
     let(:title) { "My Wonderful VDD" }
     let(:override) do
       override = AssignmentOverride.new
@@ -669,6 +678,7 @@ describe AssignmentOverride do
       override.all_day_date = due_at.to_date
       override.lock_at = lock_at
       override.unlock_at = unlock_at
+      override.id = id
       override
     end
 
@@ -696,6 +706,10 @@ describe AssignmentOverride do
 
     it "includes the lock_at" do
       hash[:lock_at].should == lock_at
+    end
+
+    it "includes the id" do
+      hash[:id].should == id
     end
   end
 end

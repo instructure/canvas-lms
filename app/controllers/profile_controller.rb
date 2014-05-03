@@ -17,6 +17,123 @@
 #
 
 # @API Users
+#
+# @model Profile
+#     {
+#       "id": "Profile",
+#       "description": "Profile details for a Canvas user.",
+#       "properties": {
+#         "id": {
+#           "description": "The ID of the user.",
+#           "example": 1234,
+#           "type": "integer"
+#         },
+#         "name": {
+#           "description": "Sample User",
+#           "example": "Sample User",
+#           "type": "string"
+#         },
+#         "short_name": {
+#           "description": "Sample User",
+#           "example": "Sample User",
+#           "type": "string"
+#         },
+#         "sortable_name": {
+#           "description": "user, sample",
+#           "example": "user, sample",
+#           "type": "string"
+#         },
+#         "title": {
+#           "type": "string"
+#         },
+#         "bio": {
+#           "type": "string"
+#         },
+#         "primary_email": {
+#           "description": "sample_user@example.com",
+#           "example": "sample_user@example.com",
+#           "type": "string"
+#         },
+#         "login_id": {
+#           "description": "sample_user@example.com",
+#           "example": "sample_user@example.com",
+#           "type": "string"
+#         },
+#         "sis_user_id": {
+#           "description": "sis1",
+#           "example": "sis1",
+#           "type": "string"
+#         },
+#         "sis_login_id": {
+#           "description": "sis1-login",
+#           "example": "sis1-login",
+#           "type": "string"
+#         },
+#         "avatar_url": {
+#           "description": "The avatar_url can change over time, so we recommend not caching it for more than a few hours",
+#           "example": "..url..",
+#           "type": "string"
+#         },
+#         "calendar": {
+#           "$ref": "CalendarLink"
+#         },
+#         "time_zone": {
+#           "description": "Optional: This field is only returned in certain API calls, and will return the IANA time zone name of the user's preferred timezone.",
+#           "example": "America/Denver",
+#           "type": "string"
+#         }
+#       }
+#     }
+#
+# @model Avatar
+#     {
+#       "id": "Avatar",
+#       "description": "Possible avatar for a user.",
+#       "required": ["type", "url", "token", "display_name"],
+#       "properties": {
+#         "type": {
+#           "description": "['gravatar'|'attachment'|'no_pic'] The type of avatar record, for categorization purposes.",
+#           "example": "gravatar",
+#           "type": "string"
+#         },
+#         "url": {
+#           "description": "The url of the avatar",
+#           "example": "https://secure.gravatar.com/avatar/2284...",
+#           "type": "string"
+#         },
+#         "token": {
+#           "description": "A unique representation of the avatar record which can be used to set the avatar with the user update endpoint. Note: this is an internal representation and is subject to change without notice. It should be consumed with this api endpoint and used in the user update endpoint, and should not be constructed by the client.",
+#           "example": "<opaque_token>",
+#           "type": "string"
+#         },
+#         "display_name": {
+#           "description": "A textual description of the avatar record.",
+#           "example": "user, sample",
+#           "type": "string"
+#         },
+#         "id": {
+#           "description": "['attachment' type only] the internal id of the attachment",
+#           "example": 12,
+#           "type": "integer"
+#         },
+#         "content-type": {
+#           "description": "['attachment' type only] the content-type of the attachment.",
+#           "example": "image/jpeg",
+#           "type": "string"
+#         },
+#         "filename": {
+#           "description": "['attachment' type only] the filename of the attachment",
+#           "example": "profile.jpg",
+#           "type": "string"
+#         },
+#         "size": {
+#           "description": "['attachment' type only] the size of the attachment",
+#           "example": 32649,
+#           "type": "integer"
+#         }
+#       }
+#     }
+#
 class ProfileController < ApplicationController
   before_filter :require_registered_user, :except => [:show, :settings, :communication, :communication_update]
   before_filter :require_user, :only => [:settings, :communication, :communication_update]
@@ -25,9 +142,8 @@ class ProfileController < ApplicationController
   before_filter :require_password_session, :only => [:settings, :communication, :communication_update, :update]
 
   include Api::V1::Avatar
-  include Api::V1::Notification
-  include Api::V1::NotificationPolicy
   include Api::V1::CommunicationChannel
+  include Api::V1::NotificationPolicy
   include Api::V1::UserProfile
 
   include TextHelper
@@ -65,22 +181,7 @@ class ProfileController < ApplicationController
   # When requesting the profile for the user accessing the API, the user's
   # calendar feed URL will be returned as well.
   #
-  # @example_response
-  #
-  #   {
-  #     'id': 1234,
-  #     'name': 'Sample User',
-  #     'short_name': 'Sample User'
-  #     'sortable_name': 'user, sample',
-  #     'primary_email': 'sample_user@example.com',
-  #     'login_id': 'sample_user@example.com',
-  #     'sis_user_id': 'sis1',
-  #     'sis_login_id': 'sis1-login',
-  #     // The avatar_url can change over time, so we recommend not caching it for more than a few hours
-  #     'avatar_url': '..url..',
-  #     'calendar': { 'ics' => '..url..' },
-  #     'time_zone': 'America/Denver'
-  #   }
+  # @returns Profile
   def settings
     if api_request?
       # allow querying this basic profile data for the current user, or any
@@ -90,6 +191,7 @@ class ProfileController < ApplicationController
     else
       @user = @current_user
     end
+    @user_data = profile_data(@user.profile, @current_user, session, [])
     @channels = @user.communication_channels.unretired
     @email_channels = @channels.select{|c| c.path_type == "email"}
     @sms_channels = @channels.select{|c| c.path_type == 'sms'}
@@ -120,10 +222,20 @@ class ProfileController < ApplicationController
 
     # Get the list of Notification models (that are treated like categories) that make up the full list of Categories.
     full_category_list = Notification.dashboard_categories(@user)
+    categories = full_category_list.map do |category|
+      category.as_json(only: %w{id name workflow_state user_id}, include_root: false).tap do |json|
+        # Add custom method result entries to the json
+        json[:category]             = category.category.underscore.gsub(/\s/, '_')
+        json[:display_name]         = category.category_display_name
+        json[:category_description] = category.category_description
+        json[:option]               = category.related_user_setting(@user)
+      end
+    end
+
     js_env  :NOTIFICATION_PREFERENCES_OPTIONS => {
       :channels => @user.communication_channels.all_ordered_for_display(@user).map { |c| communication_channel_json(c, @user, session) },
-      :policies => NotificationPolicy.setup_with_default_policies(@user, full_category_list).map{ |p| notification_policy_json(p, @user, session) },
-      :categories => full_category_list.map{ |c| notification_category_json(c, @user, session) },
+      :policies => NotificationPolicy.setup_with_default_policies(@user, full_category_list).map { |p| notification_policy_json(p, @user, session).tap { |json| json[:communication_channel_id] = p.communication_channel_id } },
+      :categories => categories,
       :update_url => communication_update_profile_path,
       },
       :READ_PRIVACY_INFO => @user.preferences[:read_notification_privacy_info],
@@ -149,7 +261,7 @@ class ProfileController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/users/1/avatars.json' \ 
+  #   curl 'https://<canvas>/api/v1/users/1/avatars.json' \
   #        -H "Authorization: Bearer <token>"
   #
   # @example_response
@@ -178,6 +290,7 @@ class ProfileController < ApplicationController
   #       "display_name":"no pic"
   #     }
   #   ]
+  # @returns [Avatar]
   def profile_pics
     @user = if api_request? then api_find(User, params[:user_id]) else @current_user end
     if authorized_action(@user, @current_user, :update_avatar)
@@ -187,6 +300,10 @@ class ProfileController < ApplicationController
   
   def update
     @user = @current_user
+
+    if params[:user] && params[:user][:enabled_theme]
+      @user.enabled_theme = params[:user].delete(:enabled_theme)
+    end
 
     if params[:privacy_notice].present?
       @user.preferences[:read_notification_privacy_info] = Time.now.utc.to_s
@@ -236,7 +353,7 @@ class ProfileController < ApplicationController
         unless pseudonymed
           flash[:notice] = t('notices.updated_profile', "Settings successfully updated")
           format.html { redirect_to user_profile_url(@current_user) }
-          format.json { render :json => @user.as_json(:methods => :avatar_url, :include => {:communication_channel => {:only => [:id, :path]}, :pseudonym => {:only => [:id, :unique_id]} }) }
+          format.json { render :json => @user.as_json(:methods => :avatar_url, :include => {:communication_channel => {:only => [:id, :path], :include_root => false}, :pseudonym => {:only => [:id, :unique_id], :include_root => false} }) }
         end
       else
         format.html
@@ -259,12 +376,14 @@ class ProfileController < ApplicationController
     @profile.attributes = params[:user_profile]
 
     if params[:link_urls] && params[:link_titles]
-      links = params[:link_urls].zip(params[:link_titles]).
+      @profile.links = []
+      params[:link_urls].zip(params[:link_titles]).
         reject { |url, title| url.blank? && title.blank? }.
-        map { |url, title|
-          UserProfileLink.new :url => url, :title => title
+        each { |url, title|
+          @profile.links.build :url => url, :title => title
         }
-      @profile.links = links
+    elsif params[:delete_links]
+      @profile.links = []
     end
 
     if @user.valid? && @profile.valid?

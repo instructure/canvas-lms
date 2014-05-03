@@ -1,10 +1,11 @@
 define [
   'i18n!conversations'
+  'jquery'
   'underscore'
   'str/htmlEscape'
   'compiled/util/listWithOthers'
   'jquery.instructure_misc_helpers'
-], (I18n, _, h, listWithOthers) ->
+], (I18n, $, _, h, listWithOthers) ->
 
   format = (person) ->
     str = h(person.name)

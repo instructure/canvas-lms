@@ -20,6 +20,45 @@ define [
   'jqueryui/tooltip'
 ], (_, $) ->
 
+  # create a custom widget that inherits from the default jQuery UI
+  # tooltip but extends the open method with a setTimeout wrapper so
+  # that our browser can scroll to the tabbed focus element before
+  # positioning the tooltip relative to window.
+  do ($) ->
+    $.widget "custom.timeoutTooltip", $.ui.tooltip,
+      _open: ( event, target, content ) ->
+        # if you move very fast, it's possible that
+        # @timeout will be defined
+        return if @timeout
+        apply = @_superApply.bind(@, arguments)
+        @timeout = setTimeout (=>
+          # make sure close will be called
+          delete @timeout
+          # remove extra handlers we added, super will add them back
+          @_off(target, "mouseleave focusout keyup")
+          apply.call(@)
+        ), 20
+        # this is from the jquery ui tooltip _open
+        # we need to bind events to trigger close so that the
+        # timeout is cleared when we mouseout / or leave focus
+        @_on( target, {
+          mouseleave: "close"
+          focusout: "close"
+          keyup: ( event ) ->
+            if ( event.keyCode == $.ui.keyCode.ESCAPE )
+              fakeEvent = $.Event(event)
+              fakeEvent.currentTarget = target[0]
+              this.close( fakeEvent, true )
+          }
+        )
+
+      close: (event) ->
+        if @timeout
+          clearTimeout(@timeout)
+          delete @timeout
+          return
+        @_superApply(arguments)
+
   # you can provide a 'using' option to jqueryUI position (which gets called by jqueryui Tooltip to
   # position it on the screen), it will be passed the position cordinates and a feedback object which,
   # among other things, tells you where it positioned it relative to the target. we use it to add some
@@ -67,7 +106,7 @@ define [
     if opts.position of positions
       opts.position = positions[opts.position]
 
-  $('body').on 'mouseenter', '[data-tooltip]', (event) ->
+  $('body').on 'mouseenter focusin', '[data-tooltip]', (event) ->
     $this = $(this)
     opts = $this.data('tooltip')
 
@@ -89,6 +128,6 @@ define [
 
     $this
       .removeAttr('data-tooltip')
-      .tooltip(opts)
-      .tooltip('open')
-      .click -> $this.tooltip('close')
+      .timeoutTooltip(opts)
+      .timeoutTooltip('open')
+      .click -> $this.timeoutTooltip('close')

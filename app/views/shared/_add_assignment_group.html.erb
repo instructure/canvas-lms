@@ -1,5 +1,5 @@
 <div id="add_assignment_type" style="padding: 0; display: none; position: relative;">
-  <% form_for :assignment_group, :url => (context_url(@context, :context_assignment_groups_url) rescue "."), :html => {:id => "add_assignment_type_form", :style => "padding: 10px;"} do |f| %>
+  <%= form_for :assignment_group, :url => (context_url(@context, :context_assignment_groups_url) rescue "."), :html => {:id => "add_assignment_type_form", :style => "padding: 10px;"} do |f| %>
   <table class="formtable">
     <tr>
       <td><%= f.blabel :name, :en => "Name" %></td>

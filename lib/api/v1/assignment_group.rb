@@ -33,33 +33,26 @@ module Api::V1::AssignmentGroup
 
     hash = api_json(group, user, session,
                     :only => %w(id name position group_weight))
-    hash['rules'] = group.rules_hash
+
+    hash['rules'] = group.rules_hash(stringify_json_ids: opts[:stringify_json_ids])
 
     if includes.include?('assignments')
-      assignment_scope = group.active_assignments
-
-      # fake assignment used for checking if the @current_user can read unpublished assignments
-      fake = group.context.assignments.new
-      fake.workflow_state = 'unpublished'
-      if @domain_root_account.enable_draft? && !fake.grants_right?(user, session, :read)
-        # user should not see unpublished assignments
-        assignment_scope = assignment_scope.published
-      end
-
-      include_discussion_topic = includes.include?('discussion_topic')
-      include_all_dates        = includes.include?('all_dates')
+      assignment_scope   = opts[:assignment_group_assignment_scope]
+      assignment_scope ||= assignment_group_assignment_scope(group.context, user)
+      assignments = group.send(assignment_scope)
 
       user_content_attachments   = opts[:preloaded_user_content_attachments]
       user_content_attachments ||= api_bulk_load_user_content_attachments(
-        assignment_scope.map(&:description),
+        assignments.map(&:description),
         group.context,
         user
       )
-      hash['assignments'] = assignment_scope.map { |a|
+      hash['assignments'] = assignments.map { |a|
         a.context = group.context
         assignment_json(a, user, session,
-          include_discussion_topic: include_discussion_topic,
-          include_all_dates: include_all_dates,
+          include_discussion_topic: includes.include?('discussion_topic'),
+          include_all_dates: includes.include?('all_dates'),
+          include_module_ids: includes.include?('module_ids'),
           override_dates: opts[:override_assignment_dates],
           preloaded_user_content_attachments: user_content_attachments)
       }
@@ -80,5 +73,19 @@ module Api::V1::AssignmentGroup
     assignment_group.attributes = update_params
 
     assignment_group.save
+  end
+
+  def assignment_group_assignment_scope(context, user)
+    scope = :active_assignments
+
+    # fake assignment used for checking if the @current_user can read unpublished assignments
+    fake = context.assignments.scoped.new
+    fake.workflow_state = 'unpublished'
+    if context.feature_enabled?(:draft_state) && !fake.grants_right?(user, session, :read)
+      # user should not see unpublished assignments
+      scope = :published_assignments
+    end
+
+    scope
   end
 end

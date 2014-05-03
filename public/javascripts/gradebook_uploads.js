@@ -63,10 +63,10 @@ define([
           editor: GradeCellEditor,
           formatter: simpleGradeCellFormatter,
           active: true,
-          original_id: this.original_id
+          previous_id: this.previous_id
         };
         gridData.columns.push(col);
-        if (this.original_id) {
+        if (this.previous_id) {
           col.cssClass = "active changed"
         } else {
           col.cssClass = "active new"
@@ -131,7 +131,7 @@ define([
         needingReview[thing] = [];
 
         $.each(uploadedGradebook[thing+"s"], function(){
-          if (!this.original_id) {
+          if (!this.previous_id) {
             needingReview[thing].push(this);
           }
         });
@@ -218,7 +218,7 @@ define([
               var obj = _.detect(uploadedGradebook[thing+"s"], function(thng){
                 return id == thng.id;
               });
-              obj.id = obj.original_id = val;
+              obj.id = obj.previous_id = val;
               if (thing === 'assignment') {
                 // find the original grade for this assignment for each student
                 $.each(uploadedGradebook['students'], function() {
@@ -252,7 +252,7 @@ define([
           // remove assignments that have no changes
           var indexes_to_delete = [];
           $.each(uploadedGradebook.assignments, function(index){
-            if(uploadedGradebook.assignments[index].original_id && _.all(uploadedGradebook.students, function(student){
+            if(uploadedGradebook.assignments[index].previous_id && _.all(uploadedGradebook.students, function(student){
               var submission = student.submissions[index];
               return submission.original_grade == submission.grade || (!submission.original_grade && !submission.grade);
             })) {

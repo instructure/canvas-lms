@@ -20,25 +20,22 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe "site-wide" do
   before do
-    ActionController::Base.consider_all_requests_local = false
+    consider_all_requests_local(false)
   end
 
   after do
-    ActionController::Base.consider_all_requests_local = true
+    consider_all_requests_local(true)
   end
 
   it "should render 404 when user isn't logged in" do
     Setting.set 'show_feedback_link', 'true'
-    expect {
-      get "/dashbo"
-    }.to change(ErrorReport, :count).by +1
-    response.status.should == "404 Not Found"
-    ErrorReport.last.category.should == "404"
+    get "/dashbo"
+    assert_status(404)
   end
 
   it "should set the x-ua-compatible http header" do
     get "/login"
-    response['x-ua-compatible'].should == "IE=edge,chrome=1"
+    response['x-ua-compatible'].should == "IE=Edge,chrome=1"
   end
 
   it "should set no-cache headers for html requests" do

@@ -72,6 +72,7 @@ module Canvas::HTTP
         http_response.read_body(tmpfile)
         tmpfile.rewind
         attachment = opts[:attachment] || Attachment.new(:filename => File.basename(uri.path))
+        attachment.filename ||= File.basename(uri.path)
         attachment.uploaded_data = tmpfile
         if attachment.content_type.blank? || attachment.content_type == "unknown/unknown"
           attachment.content_type = http_response.content_type
@@ -88,10 +89,13 @@ module Canvas::HTTP
   def self.tempfile_for_uri(uri)
     basename = File.basename(uri.path)
     basename, ext = basename.split(".", 2)
-    if ext
+    tmpfile = if ext
       Tempfile.new([basename, ext])
     else
       Tempfile.new(basename)
     end
+    tmpfile.set_encoding(Encoding::BINARY) if tmpfile.respond_to?(:set_encoding)
+    tmpfile.binmode
+    tmpfile
   end
 end

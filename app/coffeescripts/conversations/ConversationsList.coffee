@@ -1,10 +1,12 @@
 define [
   'i18n!conversations.conversations_list'
+  'jquery'
   'compiled/widget/ScrollableList'
   'compiled/conversations/Conversation'
   'jst/conversations/conversationItem'
   'jquery.instructure_date_and_time'
-], (I18n, ScrollableList, Conversation, conversationItemTemplate) ->
+  'jst/_avatar' # needed by conversationItem template
+], (I18n, $, ScrollableList, Conversation, conversationItemTemplate) ->
 
   class extends ScrollableList
     constructor: (@pane, $scroller) ->
@@ -75,7 +77,7 @@ define [
     clicked: (e) =>
       # ignore clicks that come from the gear menu
       unless $(e.target).closest('.admin-links').length
-        @select $(e.currentTarget).data('id')
+        @select $(e.currentTarget).attr('data-id')
 
     lastMessageKey: ->
       if @scope is 'sent'
@@ -146,7 +148,7 @@ define [
         @app.formPane.refresh() if @isActive(data.id)
 
       data.lastMessage = data[@lastMessageKey()]
-      data.lastMessageAt = $.friendlyDatetime($.parseFromISO(data[@lastMessageKey() + "_at"]).datetime)
+      data.lastMessageAt = $.friendlyDatetime($.fudgeDateForProfileTimezone(data[@lastMessageKey() + "_at"]))
       data.hideCount = data.message_count is 1
 
       classes = (property for property in data.properties)

@@ -7,7 +7,7 @@ define [], ->
   # see also lib/i18n/lolcalize.rb
   letThereBeLols = (str) ->
     # don't want to mangle placeholders, wrappers, etc.
-    pattern = /(\s*%\{[^\}]+\}\s*|\s*[\n\\`\*_\{\}\[\]\(\)\#\+\-!]+\s*|^\s+)/
+    pattern = /(\s*%h?\{[^\}]+\}\s*|\s*[\n\\`\*_\{\}\[\]\(\)\#\+\-!]+\s*|^\s+)/
     result = for token in str.split(pattern)
       if token.match(pattern)
         token

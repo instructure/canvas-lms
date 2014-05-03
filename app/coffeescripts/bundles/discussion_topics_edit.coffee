@@ -16,7 +16,7 @@ DueDateListView, OverrideView, AssignmentGroupCollection, SectionCollection,
 splitAssetString) ->
 
   is_announcement = ENV.DISCUSSION_TOPIC.ATTRIBUTES?.is_announcement
-  model = new (if is_announcement then Announcement else DiscussionTopic)(ENV.DISCUSSION_TOPIC.ATTRIBUTES)
+  model = new (if is_announcement then Announcement else DiscussionTopic)(ENV.DISCUSSION_TOPIC.ATTRIBUTES, parse: true)
   model.urlRoot = ENV.DISCUSSION_TOPIC.URL_ROOT
   assignment = model.get('assignment')
 

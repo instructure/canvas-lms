@@ -72,7 +72,7 @@ jQuery(function($){
       $(this).loadingImage({image_size: 'small'}).addClass('saving');
     },
     success: function(data) {
-      var account = data.account;
+      var account = data;
       $(this).loadingImage('remove').removeClass('saving');
       $(this).parents(".header")
         .fillTemplateData({

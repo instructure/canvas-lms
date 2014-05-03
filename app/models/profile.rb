@@ -17,6 +17,10 @@ class Profile < ActiveRecord::Base
 
   self.abstract_class = true
 
+  unless CANVAS_RAILS2
+    self.table_name = 'profiles'
+  end
+
   def title=(title)
     write_attribute(:title, title)
     write_attribute(:path, infer_path) if path.nil?

@@ -17,15 +17,29 @@
 #
 
 class Setting < ActiveRecord::Base
+  # This is needed because Setting is called in Canvas.cache_store_config
+  # before switchman is loaded
+  cattr_accessor :shard_category unless self.respond_to?(:shard_category)
+  self.shard_category = :unsharded
+
   attr_accessible :name, :value
 
   @@cache = {}
   @@yaml_cache = {}
 
   def self.get(name, default)
-    Setting.find_or_initialize_by_name(name, :value => default).value
+    if @@cache.has_key?(name)
+      @@cache[name]
+    else
+      @@cache[name] = Setting.find_or_initialize_by_name(name, :value => default).value
+    end
   end
-  
+
+  class << self
+    alias_method :get_cached, :get
+  end
+
+  # Note that after calling this, you should send SIGHUP to all running Canvas processes
   def self.set(name, value)
     @@cache.delete(name)
     s = Setting.find_or_initialize_by_name(name)
@@ -43,14 +57,7 @@ class Setting < ActiveRecord::Base
   
   # this cache doesn't get invalidated by other rails processes, obviously, so
   # use this only for relatively unchanging data
-  def self.get_cached(name, default)
-    if @@cache.has_key?(name)
-      @@cache[name]
-    else
-      @@cache[name] = self.get(name, default)
-    end
-  end
-  
+
   def self.clear_cache(name)
     @@cache.delete(name)
   end

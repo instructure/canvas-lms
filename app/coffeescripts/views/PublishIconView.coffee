@@ -1,6 +1,7 @@
 define [
-  'compiled/views/PublishButtonView'
-], (PublishButtonView) ->
+  'compiled/views/PublishButtonView',
+  'underscore'
+], (PublishButtonView, _) ->
 
   class PublishIconView extends PublishButtonView
     publishClass: 'publish-icon-publish'
@@ -10,7 +11,7 @@ define [
     tagName: 'span'
     className: 'publish-icon'
 
-    setElement: ->
-      super
-      @$el.attr 'data-tooltip', ''
+    initialize: ->
+      @events = _.extend({}, PublishButtonView.prototype.events, @events)
 
+    events: {'keyclick' : 'click'}

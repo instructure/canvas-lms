@@ -31,6 +31,7 @@ define [
   class ContentView extends Backbone.View
 
     initialize: ({@readOnly, @setQuizMastery, @useForScoring, @instructionsTemplate, @renderInstructions}) ->
+      super
       @render()
 
     # accepts: Outcome and OutcomeGroup

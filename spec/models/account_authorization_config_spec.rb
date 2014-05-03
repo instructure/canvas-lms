@@ -34,12 +34,12 @@ describe AccountAuthorizationConfig do
         aac.auth_type = 'ldap'
         aac.ldap_filter = 'bob'
         aac.test_ldap_search.should be_false
-        aac.errors.first.last.should match /Invalid filter syntax/
+        aac.errors.full_messages.join.should match /Invalid filter syntax/
 
         aac.errors.clear
         aac.ldap_filter = '(sAMAccountName={{login}})'
         aac.test_ldap_search.should be_false
-        aac.errors.first.last.should_not match /Invalid filter syntax/
+        aac.errors.full_messages.join.should_not match /Invalid filter syntax/
       end
     end
   end
@@ -63,6 +63,7 @@ describe AccountAuthorizationConfig do
 
   context "SAML settings" do
     before(:each) do
+      pending("requires SAML extension") unless AccountAuthorizationConfig.saml_enabled
       @account = Account.create!(:name => "account")
       @file_that_exists = File.expand_path(__FILE__)
     end

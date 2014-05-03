@@ -29,7 +29,7 @@ describe 'MessageDispatcher' do
       track_jobs { MessageDispatcher.dispatch(@message) }
       created_jobs.size.should == 1
       job = created_jobs.first
-      Mailer.expects(:deliver_message).raises(Timeout::Error)
+      Mailer.expects(:create_message).raises(Timeout::Error)
       run_jobs
       @message.reload.dispatch_at.should > Time.now.utc + 4.minutes
       job.reload.attempts.should == 1
@@ -58,7 +58,9 @@ describe 'MessageDispatcher' do
       job = created_jobs.first
       @messages[0].cancel
 
-      Mailer.expects(:deliver_message).twice.raises(Timeout::Error).then.returns(true)
+      am_message = mock()
+      am_message.expects(:deliver).returns(true)
+      Mailer.expects(:create_message).twice.raises(Timeout::Error).then.returns(am_message)
 
       track_jobs { Delayed::Worker.new.perform(job) }
       created_jobs.size.should == 1

@@ -59,6 +59,7 @@ define [
         title: I18n.t('equation_editor_title', 'Use the toolbars here, or Switch View to Advanced to type/paste in LaTeX')
         dialogClass: 'math-dialog'
         open: @initialRender
+        close: @onClose
         buttons: [
           {
             class: 'btn-primary'
@@ -66,6 +67,10 @@ define [
             click: @onSubmit
           }
         ]
+
+
+    onClose: (e, ui) =>
+      @restoreCaret()
 
     initialRender: =>
       nodes = $('<span>').html @editor.selection.getContent()
@@ -101,7 +106,8 @@ define [
       else if view == 'mathjax'
         return @$mathjaxEditor.val()
 
-    toggleView: =>
+    toggleView: (e) =>
+      e.preventDefault()
       view = @$el.data('view')
       equation = @getEquation()
       @$mathjaxMessage.empty()
@@ -111,9 +117,13 @@ define [
       if view == 'mathquill'
         @$mathjaxView.hide()
         @$mathquillView.show()
+        setTimeout( =>
+          @$mathquillView.find('.mathquill-tab-bar li.mathquill-tab-selected a').focus()
+        , 200)
       else if view == 'mathjax'
         @$mathquillView.hide()
         @$mathjaxView.show()
+        @$mathjaxView.find('.mathquill-tab-bar li.mathquill-tab-selected a').focus()
 
       if !@renderEquation(view, equation)
         @setView('mathjax', equation)

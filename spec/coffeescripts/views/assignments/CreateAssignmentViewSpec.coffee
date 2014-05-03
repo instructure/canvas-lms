@@ -7,6 +7,7 @@ define [
   'compiled/views/DialogFormView'
   'jquery'
   'helpers/jquery.simulate'
+  'compiled/behaviors/tooltip'
 ], (Backbone, AssignmentGroupCollection, AssignmentGroup, Assignment, CreateAssignmentView, DialogFormView, $) ->
 
   fixtures = $('#fixtures')
@@ -16,6 +17,9 @@ define [
 
   assignment2 = ->
     new Assignment(buildAssignment2())
+
+  assignment3 = ->
+    new Assignment(buildAssignment3())
 
   buildAssignment1 = ->
     date1 =
@@ -42,6 +46,15 @@ define [
       "due_at":"2013-08-23T23:59:00-06:00"
       "points_possible":10
       "position":2
+    )
+
+  buildAssignment3 = ->
+    buildAssignment(
+      "id":4
+      "name":""
+      "due_at":"2013-08-23T23:59:00-06:00"
+      "points_possible":10
+      "position":3
     )
 
   buildAssignment = (options) ->
@@ -82,6 +95,7 @@ define [
     setup: ->
       @assignment1 = assignment1()
       @assignment2 = assignment2()
+      @assignment3 = assignment3()
       @group       = assignmentGroup()
 
   test "initialize generates a new assignment for creation", ->
@@ -119,6 +133,17 @@ define [
     view.onSaveSuccess()
 
     equal @group.get("assignments").length, 3
+
+    DialogFormView.prototype.close.restore()
+
+  test "the form is cleared after adding an assignment", ->
+    sinon.stub( DialogFormView.prototype, "close", -> )
+
+    view = createView(@group)
+    view.onSaveSuccess()
+
+    equal view.$("#ag_#{@group.id}_assignment_name").val(), ""
+    equal view.$("#ag_#{@group.id}_assignment_points").val(), "0"
 
     DialogFormView.prototype.close.restore()
 
@@ -191,3 +216,21 @@ define [
     $.fn.datetime_field.restore()
     DialogFormView.prototype.openAgain.restore()
 
+  test "requires name to save assignment", ->
+    view = createView(@assignment3)
+    data =
+      name: ""
+    errors = view.validateBeforeSave(data, [])
+
+    ok errors["name"]
+    equal errors["name"].length, 1
+    equal errors["name"][0]["message"], "Name is required!"
+
+  test 'rejects a letter for points_possible', ->
+    view = createView(@assignment3)
+    data =
+      name: "foo"
+      points_possible: 'a'
+    errors = view.validateBeforeSave(data, [])
+    ok errors["points_possible"]
+    equal errors['points_possible'][0]['message'], 'Points possible must be a number'

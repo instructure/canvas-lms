@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -39,7 +39,7 @@ describe Submission do
     Submission.create!(@valid_attributes)
   end
 
-  it_should_behave_like "url validation tests"
+  include_examples "url validation tests"
   it "should check url validity" do
     test_url_validation(Submission.create!(@valid_attributes))
   end
@@ -106,11 +106,16 @@ describe Submission do
     assignment_model
     @assignment.workflow_state = 'published'
     @assignment.save!
-    @course.teacher_enrollments.create(:user => @teacher, :workflow_state => 'accepted')
-    @course.teacher_enrollments.create(:user => @teacher, :workflow_state => 'accepted')
-    @course.teacher_enrollments.create(:user => @teacher, :workflow_state => 'accepted')
-    @course.teacher_enrollments.create(:user => @teacher, :workflow_state => 'invited')
-    @course.teacher_enrollments.create(:user => @teacher, :workflow_state => 'completed')
+    section1 = @course.course_sections.create(name: '1')
+    section2 = @course.course_sections.create(name: '2')
+    section3 = @course.course_sections.create(name: '3')
+    section4 = @course.course_sections.create(name: '4')
+    section5 = @course.course_sections.create(name: '5')
+    section1.enroll_user(@teacher, 'TeacherEnrollment', 'accepted')
+    section2.enroll_user(@teacher, 'TeacherEnrollment', 'accepted')
+    section3.enroll_user(@teacher, 'TeacherEnrollment', 'accepted')
+    section4.enroll_user(@teacher, 'TeacherEnrollment', 'invited')
+    section5.enroll_user(@teacher, 'TeacherEnrollment', 'completed')
     @course.offer!
     @course.enroll_student(@student = user)
     @assignment.context.reload
@@ -124,6 +129,18 @@ describe Submission do
     se = @course.enroll_student(user)
     MediaObject.expects(:ensure_media_object).with("fake", { :context => se.user, :user => se.user })
     @submission = @assignment.submit_homework(se.user, :media_comment_id => "fake", :media_comment_type => "audio")
+  end
+
+  it "should log submissions with grade changes" do
+    submission_spec_model
+
+    Auditors::GradeChange.expects(:record).once
+
+    @submission.score = 5
+    @submission.save!
+
+    @submission.grader_id = @user.id
+    @submission.save!
   end
 
   context "Discussion Topic" do
@@ -234,7 +251,7 @@ describe Submission do
       it "should not create a message when this is a quiz submission" do
         submission_spec_model
         @cc = @user.communication_channels.create(:path => "somewhere")
-        @quiz = Quiz.create!(:context => @course)
+        @quiz = Quizzes::Quiz.create!(:context => @course)
         @submission.quiz_submission = @quiz.generate_submission(@user)
         @submission.save!
         @submission.reload
@@ -319,7 +336,7 @@ describe Submission do
     context "Submission Grade Changed" do
       it "should create a message when the score is changed and the grades were already published" do
         Notification.create(:name => 'Submission Grade Changed')
-        @assignment.stubs(:score_to_grade).returns(10.0)
+        @assignment.stubs(:score_to_grade).returns("10.0")
         @assignment.stubs(:due_at).returns(Time.now  - 100)
         submission_spec_model
 
@@ -334,10 +351,10 @@ describe Submission do
 
       it 'doesnt create a grade changed message when theres a quiz attached' do
         Notification.create(:name => 'Submission Grade Changed')
-        @assignment.stubs(:score_to_grade).returns(10.0)
+        @assignment.stubs(:score_to_grade).returns("10.0")
         @assignment.stubs(:due_at).returns(Time.now  - 100)
         submission_spec_model
-        @quiz = Quiz.create!(:context => @course)
+        @quiz = Quizzes::Quiz.create!(:context => @course)
         @submission.quiz_submission = @quiz.generate_submission(@user)
         @submission.save!
         @cc = @user.communication_channels.create(:path => "somewhere")
@@ -352,7 +369,7 @@ describe Submission do
       it "should create a message when the score is changed and the grades were already published" do
         Notification.create(:name => 'Submission Grade Changed')
         Notification.create(:name => 'Submission Graded')
-        @assignment.stubs(:score_to_grade).returns(10.0)
+        @assignment.stubs(:score_to_grade).returns("10.0")
         @assignment.stubs(:due_at).returns(Time.now  - 100)
         submission_spec_model
 
@@ -367,7 +384,7 @@ describe Submission do
       it "should not create a message when the score is changed and the grades were already published for a muted assignment" do
         Notification.create(:name => 'Submission Grade Changed')
         @assignment.mute!
-        @assignment.stubs(:score_to_grade).returns(10.0)
+        @assignment.stubs(:score_to_grade).returns("10.0")
         @assignment.stubs(:due_at).returns(Time.now  - 100)
         submission_spec_model
 
@@ -383,7 +400,7 @@ describe Submission do
 
       it "should NOT create a message when the score is changed and the submission was recently graded" do
         Notification.create(:name => 'Submission Grade Changed')
-        @assignment.stubs(:score_to_grade).returns(10.0)
+        @assignment.stubs(:score_to_grade).returns("10.0")
         @assignment.stubs(:due_at).returns(Time.now  - 100)
         submission_spec_model
 
@@ -789,6 +806,26 @@ describe Submission do
     end
   end
 
+  describe "autograded" do
+    let(:submission) { Submission.new }
+
+    it "returns false when its not autograded" do
+      assignment = stub(:muted? => false)
+      @submission = Submission.new
+      @submission.autograded?.should == false
+
+      @submission.grader_id = Shard.global_id_for(@user.id)
+      @submission.autograded?.should == false
+    end
+
+    it "returns true when its autograded" do
+      assignment = stub(:muted? => false)
+      @submission = Submission.new
+      @submission.grader_id = -1
+      @submission.autograded?.should == true
+    end
+  end
+
   describe "past_due" do
     before do
       u1 = @user
@@ -888,9 +925,33 @@ describe Submission do
       @submission.should_not be_missing
     end
 
-    it "should be true if not submitted and past due" do
+    it "should be true if not submitted, past due, and expects a submission" do
+      @submission.assignment.submission_types = "online_quiz"
       @submission.submission_type = nil # forces submitted_at to be nil
       @submission.cached_due_date = 1.day.ago
+
+      # Regardless of score
+      @submission.score = 0.00000001
+      @submission.graded_at = Time.zone.now + 1.day
+
+      @submission.should be_missing
+    end
+
+    it "should be true if not submitted, score of zero, and does not expect a submission" do
+      @submission.assignment.submission_types = "on_paper"
+      @submission.submission_type = nil # forces submitted_at to be nil
+      @submission.cached_due_date = 1.day.ago
+      @submission.score = 0
+      @submission.graded_at = Time.zone.now + 1.day
+      @submission.should be_missing
+    end
+
+    it "should be false if not submitted, score greater than zero, and does not expect a submission" do
+      @submission.assignment.submission_types = "on_paper"
+      @submission.submission_type = nil # forces submitted_at to be nil
+      @submission.cached_due_date = 1.day.ago
+      @submission.score = 0.00000001
+      @submission.graded_at = Time.zone.now + 1.day
       @submission.should be_missing
     end
   end
@@ -904,9 +965,26 @@ describe Submission do
       override.set = @course.default_section
       override.override_due_at(Time.zone.now + 1.day)
       override.save!
+      # mysql just truncated the timestamp
+      override.reload
 
       submission = @assignment.submissions.create(:user => @user)
       submission.cached_due_date.should == override.due_at
+    end
+  end
+
+  describe "update_attachment_associations" do
+    before do
+      course_with_student active_all: true
+      @assignment = @course.assignments.create!
+    end
+
+    it "doesn't include random attachment ids" do
+      f = Attachment.create! uploaded_data: StringIO.new('blah'),
+        context: @course,
+        filename: 'blah.txt'
+      sub = @assignment.submit_homework(@user, attachments: [f])
+      sub.attachments.should == []
     end
   end
 
@@ -945,6 +1023,36 @@ describe Submission do
       submissions.each_with_index { |s, i|
         s.versioned_attachments.should == attachments[i]
       }
+    end
+  end
+
+  describe "#assign_assessor" do
+    def peer_review_assignment
+      assignment = @course.assignments.build(title: 'Peer review',
+        due_at: Time.now - 1.day,
+        points_possible: 5,
+        submission_types: 'online_text_entry')
+      assignment.peer_reviews_assigned = true
+      assignment.peer_reviews = true
+      assignment.automatic_peer_reviews = true
+      assignment.save!
+
+      assignment
+    end
+
+    before(:each) do
+      student_in_course(active_all: true)
+      @student2 = user
+      @course.enroll_student(@student2).accept!
+      @assignment = peer_review_assignment
+      @assignment.submit_homework(@student,  body: 'Lorem ipsum dolor')
+      @assignment.submit_homework(@student2, body: 'Sit amet consectetuer')
+    end
+
+    it "should send a reminder notification" do
+      AssessmentRequest.any_instance.expects(:send_reminder!).once
+      submission1, submission2 = @assignment.submissions
+      submission1.assign_assessor(submission2)
     end
   end
 end

@@ -1,7 +1,7 @@
 class DropReallyOldUnusedColumns < ActiveRecord::Migration
   tag :postdeploy
 
-  self.transactional = false
+  disable_ddl_transaction!
 
   # cleanup for some legacy database schema that may not even exist for databases created post-OSS release
   def self.maybe_drop(table, column)

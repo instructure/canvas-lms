@@ -22,12 +22,12 @@ module Canvas::Plugins::Validators::GoogleDocsValidator
       {}
     else
       if settings.map(&:last).any?(&:blank?)
-        plugin_setting.errors.add_to_base(I18n.t('canvas.plugins.errors.all_fields_required', 'All fields are required'))
+        plugin_setting.errors.add(:base, I18n.t('canvas.plugins.errors.all_fields_required', 'All fields are required'))
         false
       else
         res = GoogleDocs.config_check(settings)
         if res
-          plugin_setting.errors.add_to_base(res)
+          plugin_setting.errors.add(:base, res)
           false
         else
           settings.slice(:api_key, :secret_key)

@@ -1,6 +1,38 @@
 require File.expand_path("../canvas_rails3", __FILE__)
 
-if CANVAS_RAILS3
+if CANVAS_RAILS2
+  unless Gem.respond_to?(:source_index)
+    module Gem
+      def self.source_index
+        sources
+      end
+
+      def self.cache
+        sources
+      end
+
+      SourceIndex = Specification
+
+      class SourceList
+        # If you want vendor gems, this is where to start writing code.
+        def search( *args ); []; end
+        def each( &block ); end
+        include Enumerable
+      end
+    end
+  end
+
+  def environment_configuration(config)
+    yield(config)
+  end
+
+  # Bootstrap the Rails environment, frameworks, and default configuration
+  require File.expand_path('../boot', __FILE__)
+
+  Rails::Initializer.run do |config|
+    eval(File.read(File.expand_path("../shared_boot.rb", __FILE__)), binding, "config/shared_boot.rb", 1)
+  end
+else
   def environment_configuration(_config)
     CanvasRails::Application.configure do
       yield(config)
@@ -12,15 +44,4 @@ if CANVAS_RAILS3
 
   # Initialize the rails application
   CanvasRails::Application.initialize!
-else
-  def environment_configuration(config)
-    yield(config)
-  end
-
-  # Bootstrap the Rails environment, frameworks, and default configuration
-  require File.expand_path('../boot', __FILE__)
-
-  Rails::Initializer.run do |config|
-    eval(File.read(File.expand_path("../shared_boot.rb", __FILE__)), binding, "config/shared_boot.rb", 1)
-  end
 end

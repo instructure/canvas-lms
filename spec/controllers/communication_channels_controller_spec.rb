@@ -147,7 +147,7 @@ describe CommunicationChannelsController do
         u2 = user_with_pseudonym(:username => 'asdf@qwerty.com', :active_user => true)
 
         post 'confirm', :nonce => cc1.confirmation_code, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}
-        response.status.should =~ /400 Bad Request/
+        assert_status(400)
         u1.reload
         u1.should_not be_registered
       end
@@ -432,7 +432,7 @@ describe CommunicationChannelsController do
         @enrollment.should be_invited
 
         post 'confirm', :nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}
-        response.status.should =~ /400 Bad Request/
+        assert_status(400)
       end
     end
 

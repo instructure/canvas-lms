@@ -16,18 +16,35 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 # @API Favorites
-# @object Favorite
-#     {
-#       // The ID of the object the Favorite refers to
-#       "context_id": 1170,
 #
-#       // The type of the object the Favorite refers to (currently, only "Course" is supported)
-#       "context_type": "Course"
+# @model Favorite
+#     {
+#       "id": "Favorite",
+#       "description": "",
+#       "required": [""],
+#       "properties": {
+#         "context_id": {
+#           "description": "The ID of the object the Favorite refers to",
+#           "example": 1170,
+#           "type": "integer"
+#         },
+#         "context_type": {
+#           "description": "The type of the object the Favorite refers to (currently, only 'Course' is supported)",
+#           "example": "Course",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "Course"
+#             ]
+#           }
+#         }
+#       }
 #     }
+#
 class FavoritesController < ApplicationController
 
   before_filter :require_user
-  before_filter :check_defaults, :only => [:add_favorite_course, :remove_favorite_course]
+  before_filter :check_defaults, :only => [:remove_favorite_course]
   after_filter :touch_user, :only => [:add_favorite_course, :remove_favorite_course, :reset_course_favorites]
 
   include Api::V1::Favorite
@@ -47,8 +64,7 @@ class FavoritesController < ApplicationController
   #
   def list_favorite_courses
     includes = Set.new(Array(params[:include]))
-    courses = Api.paginate(@current_user.menu_courses, self, api_v1_list_favorite_courses_url)
-    render :json => courses.map { |course|
+    render :json => @current_user.menu_courses.map { |course|
       enrollments = course.current_enrollments.where(:user_id => @current_user).all
       course_json(course, @current_user, session, includes, enrollments)
     }
@@ -73,10 +89,14 @@ class FavoritesController < ApplicationController
   def add_favorite_course
     course = api_find(Course, params[:id])
     fave = nil
-    Favorite.unique_constraint_retry do
-      fave = @current_user.favorites.where(:context_type => 'Course', :context_id => course).first
-      fave ||= @current_user.favorites.create!(:context => course)
+
+    @current_user.shard.activate do
+      Favorite.unique_constraint_retry do
+        fave = @current_user.favorites.where(:context_type => 'Course', :context_id => course).first
+        fave ||= @current_user.favorites.create!(:context => course)
+      end
     end
+
     render :json => favorite_json(fave, @current_user, session)
   end
 
@@ -97,12 +117,12 @@ class FavoritesController < ApplicationController
     # allow removing a Favorite whose context object no longer exists
     # but also allow referencing by sis id, if possible
     courses = api_find_all(Course, [params[:id]])
-    course_id = courses.any? ? courses.first.id : params[:id]
+    course_id = Shard.relative_id_for(courses.any? ? courses.first.id : params[:id], Shard.current, @current_user.shard)
     fave = @current_user.favorites.where(:context_type => 'Course', :context_id => course_id).first
     if fave
       result = favorite_json(fave, @current_user, session)
       fave.destroy
-      render :json => result 
+      render :json => result
     else
       # can't really return a 404 here without making browsers freak out
       # in the Courses UI (it's easy for the client's state to get out of

@@ -93,22 +93,6 @@ module CoursesHelper
     end
   end
 
-  def role_select_options(role_hash, is_admin_role=false)
-    extra = is_admin_role ? 'data-is-admin' : ''
-    out = <<-HTML
-    <option value="#{role_hash[:base_role_name]}" #{extra}>#{role_hash[:plural_label]}</option>
-    HTML
-    role_hash[:custom_roles].each do |cr|
-      next unless cr[:workflow_state] == 'active'
-      name = cr[:name].html_safe
-      out += <<-HTML
-      <option value="#{name}"  #{extra}>#{name}</option>
-      HTML
-    end
-
-    out
-  end
-
   def skip_custom_role?(cr)
     cr[:count] == 0 && cr[:workflow_state] == 'inactive'
   end

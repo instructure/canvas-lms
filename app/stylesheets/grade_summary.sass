@@ -87,6 +87,9 @@
     color: black
     font-weight: normal
 
+#grades_summary th.assignment_score
+  text-align: center
+
 #grades_summary td.assignment_score
   cursor: pointer
   text-align: center
@@ -99,14 +102,25 @@
   color: #800
   font-weight: bold
 
+#grades_summary th.possible
+  text-align: right
+  white-space: nowrap
+
 #grades_summary td.possible
   text-align: right
   padding-right: 15px
+
+#grades_summary td.details
+  text-align: right
+  padding-left: 0
+  white-space: nowrap
+  min-width: 80px // 4 x 20 pixel icons
 
 #grades_summary th.title
   font-size: 1.1em
   font-weight: normal
   padding-left: 20px
+  word-break: break-all
   
   @media print
     padding-left: 0
@@ -234,3 +248,81 @@
   label
     font-size: 0.8em
     display: block
+
+.score_details_table
+  :font-size 1.3em
+  :width 100%
+  :border 1px solid black
+
+a.screenreader-toggle
+  :color #b7b7b7
+  :font-weight normal
+  :padding-right 5px
+
+div.rubric-toggle
+  :padding-bottom 5px
+
+#navpills li
+  border: none
+  border-radius: 4px
+  background: none
+  float: left
+  list-style-type: none
+
+  &.ui-tabs-active
+    background-color: #1588CC
+    a
+      color: #fff
+
+  a
+    padding: 0.3em 1.3em
+    font-weight: inherit
+    text-shadow: none
+    float: left
+
+#navpills
+  overflow: hidden
+  margin: 0
+  padding: 0
+  margin-bottom: 1em
+
+.ui-tabs .ui-tabs-nav
+  border: none
+
+.ui-tabs .ui-tabs-panel
+  border: none
+  padding: 0
+
+$outcome-border: 1px solid #BCC2CA
+
+#outcomes ul
+  background-color: #f4f4f4
+  border: $outcome-border
+  border-radius: 3px
+  overflow: hidden
+
+#outcomes li
+  list-style-type: none
+  overflow: hidden
+  border-top: $outcome-border
+
+  &:first-child
+    border-top: none
+
+  .outcome
+    float: left
+    width: 80%
+    padding: 1em
+    border-right: $outcome-border
+    -moz-box-sizing: border-box
+    box-sizing: border-box
+
+  .description
+    color: #b4b4b4
+
+  .score
+    float: right
+    width: 20%
+    padding: 1em
+    -moz-box-sizing: border-box
+    box-sizing: border-box

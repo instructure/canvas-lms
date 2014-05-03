@@ -1,12 +1,10 @@
-define ['compiled/views/GoogleDocsTreeView'], (GoogleDocsTreeView) ->
+define ['jquery', 'compiled/views/GoogleDocsTreeView'], ($, GoogleDocsTreeView) ->
 
   file1 = { name: 'File 1', extension: 'tst', document_id: '12345', alternate_url: {href: '#'}}
   fileData = { files: [file1] }
   folderData = { folders: [ { name: 'Folder 1', files: [file1] } ] }
 
-  module 'GoogleDocsTreeView',
-    setup: ->
-    teardown: ->
+  module 'GoogleDocsTreeView'
 
   test 'renders a top level file', ()->
     tree = new GoogleDocsTreeView({model: fileData})

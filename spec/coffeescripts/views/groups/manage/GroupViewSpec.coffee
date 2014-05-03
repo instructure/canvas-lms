@@ -2,11 +2,12 @@ define [
   'jquery'
   'compiled/views/groups/manage/GroupView'
   'compiled/views/groups/manage/GroupUsersView'
+  'compiled/views/groups/manage/GroupDetailView'
   'compiled/collections/GroupCollection'
   'compiled/collections/GroupUserCollection'
   'compiled/models/Group'
   'helpers/fakeENV'
-], ($, GroupView, GroupUsersView, GroupCollection, GroupUserCollection, Group) ->
+], ($, GroupView, GroupUsersView, GroupDetailView, GroupCollection, GroupUserCollection, Group, fakeENV) ->
 
   view = null
   group = null
@@ -14,6 +15,7 @@ define [
 
   module 'GroupView',
     setup: ->
+      fakeENV.setup()
       group = new Group
         id: 42
         name: 'Foo Group'
@@ -21,34 +23,36 @@ define [
       users = new GroupUserCollection [
         {id: 1, name: "bob", sortable_name: "bob"}
         {id: 2, name: "joe", sortable_name: "joe"}
-      ]
+      ], {group}
       users.loaded = true
       users.loadedAll = true
       group.users = -> users
-      groupUsersView = new GroupUsersView {group, collection: users}
-      view = new GroupView {groupUsersView, model: group}
+      groupUsersView = new GroupUsersView {model: group, collection: users}
+      groupDetailView = new GroupDetailView {model: group, users}
+      view = new GroupView {groupUsersView, groupDetailView, model: group}
       view.render()
       view.$el.appendTo($(document.body))
 
     teardown: ->
+      fakeENV.teardown()
       view.remove()
 
-  assertContracted = (view) ->
+  assertCollapsed = (view) ->
     ok view.$el.hasClass('group-collapsed'), 'expand visible'
-    ok not view.$el.hasClass('group-expanded'), 'contract hidden'
+    ok not view.$el.hasClass('group-expanded'), 'collapse hidden'
 
   assertExpanded = (view) ->
     ok not view.$el.hasClass('group-collapsed'), 'expand hidden'
-    ok view.$el.hasClass('group-expanded'), 'contract visible'
+    ok view.$el.hasClass('group-expanded'), 'collapse visible'
 
-  test 'initial state should be contracted', ->
-    assertContracted view
+  test 'initial state should be collapsed', ->
+    assertCollapsed view
 
-  test 'expand/contract buttons', ->
+  test 'expand/collpase buttons', ->
     view.$('.toggle-group').eq(0).click()
     assertExpanded view
     view.$('.toggle-group').eq(0).click()
-    assertContracted view
+    assertCollapsed view
 
   test 'renders groupUsers', ->
     ok view.$('.group-user').length
@@ -72,26 +76,3 @@ define [
 
     server.restore()
     confirmStub.restore()
-
-  test 'editing group should change name', ->
-    url = "/api/v1/groups/#{view.model.get('id')}"
-    new_name = 'Newly changed name'
-    server = sinon.fakeServer.create()
-    server.respondWith url, [
-      200
-      'Content-Type': 'application/json'
-      JSON.stringify {
-        id: 42
-        name: new_name}
-    ]
-
-    # when
-    view.$('.edit-group').click()
-    # verify it opens with the current group name displayed
-    equal $('#group_category_name').val(), group.get('name')
-    # set a new name
-    $('#group_category_name').val(new_name)
-    $(".group-edit-dialog button[type=submit]").click()
-    server.respond()
-
-    equal group.get('name'), new_name

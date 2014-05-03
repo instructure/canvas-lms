@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -31,18 +31,21 @@ describe Enrollment do
 
   it "should have an interesting state machine" do
     enrollment_model
-    @user.stubs(:dashboard_messages).returns(Message.where("?", false))
+    @user.stubs(:dashboard_messages).returns(Message.none)
     @enrollment.state.should eql(:invited)
     @enrollment.accept
     @enrollment.state.should eql(:active)
     @enrollment.reject
     @enrollment.state.should eql(:rejected)
+    @enrollment.destroy!
     enrollment_model
     @enrollment.complete
     @enrollment.state.should eql(:completed)
+    @enrollment.destroy!
     enrollment_model
     @enrollment.reject
     @enrollment.state.should eql(:rejected)
+    @enrollment.destroy!
     enrollment_model
     @enrollment.accept
     @enrollment.state.should eql(:active)
@@ -51,6 +54,7 @@ describe Enrollment do
   it "should be pending if it is invited or creation_pending" do
     enrollment_model(:workflow_state => 'invited')
     @enrollment.should be_pending
+    @enrollment.destroy!
 
     enrollment_model(:workflow_state => 'creation_pending')
     @enrollment.should be_pending
@@ -460,11 +464,11 @@ describe Enrollment do
         @enrollment.accept.should be_true
       end
 
-      def enrollment_dates_override_test(enrollment_type)
+      def enrollment_dates_override_test
         @term = @course.enrollment_term
         @term.should_not be_nil
         @term.save!
-        @override = @term.enrollment_dates_overrides.create!(:enrollment_type => enrollment_type, :enrollment_term => @term)
+        @override = @term.enrollment_dates_overrides.create!(:enrollment_type => @enrollment.type, :enrollment_term => @term)
         @override.start_at = 2.days.ago
         @override.end_at = 2.days.from_now
         @override.save!
@@ -502,7 +506,7 @@ describe Enrollment do
         @term.start_at = 2.days.from_now
         @term.end_at = 4.days.from_now
         @term.save!
-        @enrollment.reload.state_based_on_date.should eql(:inactive)
+        @enrollment.reload.state_based_on_date.should eql(@enrollment.admin? ? :active : :inactive)
       end
 
       context "as a student" do
@@ -527,7 +531,7 @@ describe Enrollment do
         end
 
         it "should accept into the right state based on availability dates on enrollment_dates_override" do
-          enrollment_dates_override_test('StudentEnrollment')
+          enrollment_dates_override_test
         end
 
         it "should have the correct state for a half-open past course" do
@@ -566,19 +570,14 @@ describe Enrollment do
         end
 
         it "should accept into the right state based on availability dates on enrollment_dates_override" do
-          enrollment_dates_override_test("TeacherEnrollment")
+          enrollment_dates_override_test
         end
       end
     end
 
     context 'dates change' do
       before do
-        @old_cache = RAILS_CACHE
-        silence_warnings { Object.const_set(:RAILS_CACHE, ActiveSupport::Cache::MemoryStore.new) }
-      end
-
-      after do
-        silence_warnings { Object.const_set(:RAILS_CACHE, @old_cache) }
+        enable_cache
       end
 
       it "should return the right state based on availability dates on enrollment" do
@@ -844,7 +843,7 @@ describe Enrollment do
       @term.end_at = 4.days.from_now
       @term.save!
 
-      @teacher_enrollment.reload.state_based_on_date.should == :inactive
+      @teacher_enrollment.reload.state_based_on_date.should == :active
       @student_enrollment.reload.state_based_on_date.should == :inactive
 
       # Now between course and term dates, course first
@@ -1171,7 +1170,7 @@ describe Enrollment do
         @enrollment.reject!
         # have to get the new updated_at
         @user.reload
-        @user.cached_current_enrollments(true).should == []
+        @user.cached_current_enrollments.should == []
       end
     end
 
@@ -1308,60 +1307,6 @@ describe Enrollment do
     end
   end
 
-  describe ".remove_duplicate_enrollments_from_sections" do
-    before do
-      course_with_student(:active_all => true)
-      @e1 = @enrollment
-      @e1.sis_batch_id = 2
-      @e1.sis_source_id = 'ohai'
-      @e1.save!
-    end
-
-    it "should leave single enrollments alone" do
-      expect { Enrollment.remove_duplicate_enrollments_from_sections }.to change(Enrollment, :count).by(0)
-      @e1.reload.should be_active
-    end
-
-    it "should remove duplicates" do
-      enrollment_model(:course_section => @course.course_sections.first, :user => @user, :sis_source_id => 'ohai', :workflow_state => 'active', :type => "StudentEnrollment")
-      expect { Enrollment.remove_duplicate_enrollments_from_sections }.to change(Enrollment, :count).by(-1)
-    end
-
-    it "should prefer the highest sis_batch_id" do
-      enrollment_model(:course_section => @course.course_sections.first, :user => @user, :sis_source_id => 'ohai', :type => "StudentEnrollment", :sis_batch_id => 1)
-      expect { Enrollment.remove_duplicate_enrollments_from_sections }.to change(Enrollment, :count).by(-1)
-      @e1.reload.state.should == :active
-    end
-
-    it "should group by user_id" do
-      enrollment_model(:course_section => @course.course_sections.first, :user => user, :sis_source_id => 'ohai2', :type => "StudentEnrollment")
-      expect { Enrollment.remove_duplicate_enrollments_from_sections }.to change(Enrollment, :count).by(0)
-    end
-
-    it "should group by type" do
-      enrollment_model(:course_section => @course.course_sections.first, :user => @user, :sis_source_id => 'ohai', :type => "TeacherEnrollment")
-      expect { Enrollment.remove_duplicate_enrollments_from_sections }.to change(Enrollment, :count).by(0)
-    end
-
-    it "should group by section" do
-      enrollment_model(:course_section => @course.course_sections.create!(:name => 's2'), :user => @user, :sis_source_id => 'ohai', :type => "StudentEnrollment")
-      expect { Enrollment.remove_duplicate_enrollments_from_sections }.to change(Enrollment, :count).by(0)
-    end
-
-    it "should group by associated_user_id" do
-      @e1.type = "ObserverEnrollment"
-      @e1.save!
-      enrollment_model(:course_section => @course.course_sections.first, :user => @user, :sis_source_id => 'ohai', :associated_user_id => user.id, :type => "ObserverEnrollment")
-      expect { Enrollment.remove_duplicate_enrollments_from_sections }.to change(Enrollment, :count).by(0)
-    end
-
-    it "should ignore non-sis enrollments" do
-      @e1.update_attribute('sis_source_id', nil)
-      enrollment_model(:course_section => @course.course_sections.first, :user => @user, :type => "StudentEnrollment")
-      expect { Enrollment.remove_duplicate_enrollments_from_sections }.to change(Enrollment, :count).by(0)
-    end
-  end
-
   describe "effective_start_at" do
     before :each do
       course_with_student(:active_all => true)
@@ -1482,7 +1427,7 @@ describe Enrollment do
         @user.cached_current_enrollments.should == [ @enrollment ]
         @enrollment.conclude
         @user.reload
-        @user.cached_current_enrollments(true).should == []
+        @user.cached_current_enrollments.should == []
       end
     end
   end
@@ -1516,31 +1461,6 @@ describe Enrollment do
 
       se.complete
       pe.reload.should be_completed
-    end
-
-    it 'should update the best observer enrollment if there are duplicates' do
-      se = course_with_student(:user => @student)
-      pe = @parent.observer_enrollments.first
-      pe.should_not be_nil
-
-      pe.destroy
-      pe2 = @parent.observer_enrollments.build
-      pe2.course_id = pe.course_id
-      pe2.course_section_id = pe.course_section_id
-      pe2.associated_user_id = pe.associated_user_id
-      pe2.save!
-
-      se.invite
-      pe.reload.should be_deleted
-      pe2.reload.should be_invited
-
-      se.accept
-      pe.reload.should be_deleted
-      pe2.reload.should be_active
-
-      se.complete
-      pe.reload.should be_deleted
-      pe2.reload.should be_completed
     end
 
     it 'should not undelete observer enrollments if the student enrollment wasn\'t already deleted' do
@@ -1636,20 +1556,21 @@ describe Enrollment do
       ]
     end
 
-    it "triggers when enrollment is created" do
-      DueDateCacher.expects(:recompute).with(@assignments.first).once
-      DueDateCacher.expects(:recompute).with(@assignments.last).once
+    it "triggers a batch when enrollment is created" do
+      DueDateCacher.expects(:recompute).never
+      DueDateCacher.expects(:recompute_course).with(@course)
       @course.enroll_student(user)
     end
 
-    it "triggers when enrollment is deleted" do
-      DueDateCacher.expects(:recompute).with(@assignments.first).once
-      DueDateCacher.expects(:recompute).with(@assignments.last).once
+    it "triggers a batch when enrollment is deleted" do
+      DueDateCacher.expects(:recompute).never
+      DueDateCacher.expects(:recompute_course).with(@course)
       @enrollment.destroy
     end
 
     it "does not trigger when nothing changed" do
       DueDateCacher.expects(:recompute).never
+      DueDateCacher.expects(:recompute_course).never
       @enrollment.save
     end
   end

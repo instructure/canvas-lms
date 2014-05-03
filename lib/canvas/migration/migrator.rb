@@ -102,7 +102,7 @@ class Migrator
     zip_file = File.join(@base_export_dir, MigratorHelper::ALL_FILES_ZIP)
     make_export_dir
 
-    Zip::ZipFile.open(zip_file, 'w') do |zipfile|
+    Zip::File.open(zip_file, 'w') do |zipfile|
       @course[:file_map].each_value do |val|
         file_path = File.join(base_dir, val[:real_path] || val[:path_name])
         val.delete :real_path

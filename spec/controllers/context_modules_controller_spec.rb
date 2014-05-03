@@ -104,19 +104,19 @@ describe ContextModulesController do
       assignmentTag2 = @module.add_item :type => 'assignment', :id => assignment2.id
       header2 = @module.add_item :type => 'context_module_sub_header'
 
-      get 'module_redirect', :course_id => @course.id, :context_module_id => @module.id, :first => 1
+      get 'module_redirect', :course_id => @course.id, :context_module_id => @module.id, :first => 1, :use_route => :course_context_module_first_redirect
       response.should redirect_to course_assignment_url(@course.id, assignment1.id, :module_item_id => assignmentTag1.id)
 
-      get 'module_redirect', :course_id => @course.id, :context_module_id => @module.id, :last => 1
+      get 'module_redirect', :course_id => @course.id, :context_module_id => @module.id, :last => 1, :use_route => :course_context_module_last_redirect
       response.should redirect_to course_assignment_url(@course.id, assignment2.id, :module_item_id => assignmentTag2.id)
 
       assignmentTag1.destroy
       assignmentTag2.destroy
 
-      get 'module_redirect', :course_id => @course.id, :context_module_id => @module.id, :first => 1
+      get 'module_redirect', :course_id => @course.id, :context_module_id => @module.id, :first => 1, :use_route => :course_context_module_first_redirect
       response.should redirect_to course_context_modules_url(@course.id, :anchor => "module_#{@module.id}")
 
-      get 'module_redirect', :course_id => @course.id, :context_module_id => @module.id, :last => 1
+      get 'module_redirect', :course_id => @course.id, :context_module_id => @module.id, :last => 1, :use_route => :course_context_module_last_redirect
       response.should redirect_to course_context_modules_url(@course.id, :anchor => "module_#{@module.id}")
     end
   end
@@ -187,27 +187,6 @@ describe ContextModulesController do
       assigns[:tool].should == @tool2
     end
     
-    it "should find the preferred tool even if the url is different, but only if the url was inserted as part of a resourse_selection directive" do
-      course_with_student_logged_in(:active_all => true)
-      @module = @course.context_modules.create!
-      @tool1 = @course.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
-      @tool1.settings[:resource_selection] = {:url => "http://www.google.com", :selection_width => 400, :selection_height => 400}
-      @tool1.save!
-
-      tag1 = @module.add_item :type => 'context_external_tool', :id => @tool1.id, :url => "http://www.yahoo.com"
-      tag1.content_id.should == @tool1.id
-
-      get "item_redirect", :course_id => @course.id, :id => tag1.id
-      response.should be_success
-      assigns[:tool].should == @tool1
-      
-      @tool1.settings.delete :resource_selection
-      @tool1.save!
-      get "item_redirect", :course_id => @course.id, :id => tag1.id
-      response.should be_redirect
-      assigns[:tool].should == nil
-    end
-    
     it "should fail if there is no matching tool" do
       course_with_student_logged_in(:active_all => true)
       
@@ -254,6 +233,7 @@ describe ContextModulesController do
       
       @module = @course.context_modules.create!
       quiz = @course.quizzes.create!
+      quiz.publish!
 
       tag = @module.add_item :type => 'quiz', :id => quiz.id
       
@@ -336,6 +316,22 @@ describe ContextModulesController do
       ct1.context_module.should == m1
     end
 
+    it "should reorder unpublished items" do
+      course_with_teacher_logged_in(active_all: true, draft_state: true)
+      pageA = @course.wiki.wiki_pages.create title: "pageA"
+      pageA.workflow_state = 'unpublished'
+      pageA.save
+      pageB = @course.wiki.wiki_pages.create! title: "pageB"
+      m1 = @course.context_modules.create!
+      tagB = m1.add_item({type: "wiki_page", id: pageB.id}, nil, position: 1)
+      tagB.should be_published
+      tagA = m1.add_item({type: "wiki_page", id: pageA.id}, nil, position: 2)
+      tagA.should be_unpublished
+      m1.reload.content_tags.order(:position).pluck(:id).should == [tagB.id, tagA.id]
+      post 'reorder_items', course_id: @course.id, context_module_id: m1.id, order: "#{tagA.id},#{tagB.id}"
+      m1.reload.content_tags.order(:position).pluck(:id).should == [tagA.id, tagB.id]
+    end
+
     it "should only touch module once on reorder" do
       course_with_teacher_logged_in(:active_all => true)
       assign_group = @course.assignment_groups.create!
@@ -347,7 +343,7 @@ describe ContextModulesController do
         tags << make_content_tag(assign, @course, mod)
       end
 
-      ContextModule.expects(:update_all).once
+      ContentTag.expects(:touch_context_modules).once
       order = tags.reverse.map(&:id)
       post 'reorder_items', :course_id => @course.id, :context_module_id => mod.id, :order => order.join(",")
       mod.reload.content_tags.map(&:id).should == order
@@ -426,6 +422,17 @@ describe ContextModulesController do
       json["next_module"]["context_module"]["id"].should == @m3.id
     end
 
+    it "should parse namespaced quiz as id" do
+      course_with_teacher_logged_in(:course => @course, :active_all => true)
+      quiz = @course.quizzes.create!
+      quiz.publish!
+
+      quiz_tag = @m2.add_item :type => 'quiz', :id => quiz.id
+
+      get 'item_details', :course_id => @course.id, :module_item_id => quiz_tag.id, :id => "quizzes:quiz_#{quiz.id}"
+      json = JSON.parse response.body.gsub("while(1);",'')
+      json['current_item']['content_tag']['content_type'].should == 'Quizzes::Quiz'
+    end
   end
   
   describe "GET progressions" do
@@ -472,6 +479,25 @@ describe ContextModulesController do
         get 'progressions', :course_id => @course.id, :format => "json"
         json = JSON.parse response.body.gsub("while(1);",'')
         json.length.should == 0
+      end
+    end
+  end
+
+  describe "GET assignment_info" do
+    it "should return updated due dates/points possible" do
+      Timecop.freeze(1.minute.ago) do
+        course_with_student_logged_in active_all: true
+        @mod = @course.context_modules.create!
+        @assign = @course.assignments.create! title: "WHAT", points_possible: 123
+        @tag = @mod.add_item(type: 'assignment', id: @assign.id)
+      end
+      enable_cache do
+        get 'content_tag_assignment_data', course_id: @course.id, format: 'json' # precache
+        @assign.points_possible = 456
+        @assign.save!
+        get 'content_tag_assignment_data', course_id: @course.id, format: 'json'
+        json = JSON.parse response.body.gsub("while(1);",'')
+        json[@tag.id.to_s]["points_possible"].to_i.should eql 456
       end
     end
   end

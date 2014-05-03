@@ -69,7 +69,7 @@ module CC::Importer::Canvas
       zip_file = File.join(@base_export_dir, 'all_files.zip')
       make_export_dir
       path = get_full_path(WEB_RESOURCES_FOLDER)
-      Zip::ZipFile.open(zip_file, 'w') do |zipfile|
+      Zip::File.open(zip_file, 'w') do |zipfile|
         Dir["#{path}/**/**"].each do |file|
           file_path = file.sub(path+'/', '')
           zipfile.add(file_path, file)

@@ -15,8 +15,16 @@ module Canvas::Migration
           settings = cm.migration_settings.clone
           settings[:content_migration_id] = migration_id
           settings[:user_id] = cm.user_id
-          settings[:attachment_id] = cm.attachment.id rescue nil
           settings[:content_migration] = cm
+
+          if cm.attachment
+            settings[:attachment_id] = cm.attachment.id
+          elsif settings[:file_url]
+            att = Canvas::Migration::Worker.download_attachment(cm, settings[:file_url])
+            settings[:attachment_id] = att.id
+          elsif !settings[:no_archive_file]
+            raise Canvas::Migration::Error, I18n.t(:no_migration_file, "File required for content migration.")
+          end
 
           converter = Qti::Converter.new(settings)
           assessments = converter.export

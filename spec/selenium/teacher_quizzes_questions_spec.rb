@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 
 describe "quizzes questions" do
-  it_should_behave_like "quizzes selenium tests"
+  include_examples "quizzes selenium tests"
 
   before (:each) do
     course_with_teacher_logged_in
@@ -158,7 +158,7 @@ describe "quizzes questions" do
 
       click_save_settings_button
       wait_for_ajax_requests
-      quiz = Quiz.last
+      quiz = Quizzes::Quiz.last
       quiz.reload
       quiz.quiz_questions.length.should == @question_count
     end
@@ -174,7 +174,7 @@ describe "quizzes questions" do
         q.save
         q.reload
 
-        get "/courses/#{@course.id}/quizzes/#{Quiz.last.id}"
+        get "/courses/#{@course.id}/quizzes/#{Quizzes::Quiz.last.id}"
         fj('.summary td:eq(2)').text.should == "99.75%"
       end
     end
@@ -205,7 +205,7 @@ describe "quizzes questions" do
         wait_for_ajaximations
       end
       expect_new_page_load do
-        driver.find_element(:link, 'Take the Quiz').click
+        f("#take_quiz_link").click
         wait_for_ajaximations
       end
 
@@ -275,7 +275,7 @@ describe "quizzes questions" do
       get "/courses/#{@course.id}/quizzes/#{q.id}/edit"
       f('.quiz-publish-button')
       get "/courses/#{@course.id}/quizzes/#{q.id}/take?user_id=#{@user.id}"
-      driver.find_element(:link, 'Take the Quiz').click
+      f("#take_quiz_link").click
 
       wait_for_ajax_requests
     end
@@ -288,15 +288,6 @@ describe "quizzes questions" do
         confirm_dialog.accept
         true
       end
-    end
-
-    it "should selectmenu-ify select elements" do
-      select = f('.question select')
-      keep_trying_until { fj('.question_select:visible').should be_nil }
-
-      f('.ui-selectmenu').click
-      ff('.ui-selectmenu-open li')[1].click
-      select[:selectedIndex].should == "1"
     end
   end
 end

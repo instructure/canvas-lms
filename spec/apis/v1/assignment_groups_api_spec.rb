@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe AssignmentGroupsController, :type => :integration do
+describe AssignmentGroupsController, type: :request do
   include Api
   include Api::V1::Assignment
 
@@ -123,6 +123,22 @@ describe AssignmentGroupsController, :type => :integration do
     ]
 
     compare_json(json, expected)
+  end
+
+  it "should include module_ids when requested" do
+    course_with_teacher active_all: true
+    mods = 2.times.map { |i| @course.context_modules.create! name: "Mod#{i}" }
+    g = @course.assignment_groups.create! name: 'assignments'
+    a = @course.assignments.create! assignment_group: g, title: "blah"
+    mods.each { |m| m.add_item type: "assignment", id: a.id }
+
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignment_groups.json?include[]=assignments&include[]=module_ids",
+          { :controller => 'assignment_groups', :action => 'index',
+            :format => 'json', :course_id => @course.id.to_s,
+            :include => %w[assignments module_ids]})
+    assignment_json = json.first["assignments"].first
+    assignment_json["module_ids"].sort.should == mods.map(&:id).sort
   end
 
   it "should not include all dates " do
@@ -258,7 +274,7 @@ describe AssignmentGroupsController, :type => :integration do
 
   it "should not return unpublished assignments to students" do
     course_with_student(:active_all => true)
-    @course.root_account.tap{ |a| a.settings[:enable_draft] = true }.save!
+    @course.root_account.enable_feature!(:draft_state)
     @course.require_assignment_group
     assignment = @course.assignments.create! do |a|
       a.title = "test"
@@ -279,7 +295,7 @@ describe AssignmentGroupsController, :type => :integration do
 end
 
 
-describe AssignmentGroupsApiController, :type => :integration do
+describe AssignmentGroupsApiController, type: :request do
   include Api
   include Api::V1::Assignment
 
@@ -287,7 +303,8 @@ describe AssignmentGroupsApiController, :type => :integration do
 
     before do
       course_with_teacher(:active_all => true)
-      @group = @course.assignment_groups.create!(:name => 'group')
+      rules_in_db = "drop_lowest:1\ndrop_highest:1\nnever_drop:1\nnever_drop:2\n"
+      @group = @course.assignment_groups.create!(:name => 'group', :rules => rules_in_db)
     end
 
     it 'should succeed' do
@@ -307,7 +324,7 @@ describe AssignmentGroupsApiController, :type => :integration do
         :format => 'json',
         :course_id => @course.id.to_s,
         :assignment_group_id => not_exist.to_s)
-      response.status.to_i.should == 404
+      assert_status(404)
     end
 
     it 'should include assignments' do
@@ -322,8 +339,35 @@ describe AssignmentGroupsApiController, :type => :integration do
 
       json['assignments'].should_not be_empty
     end
-  end
 
+    it 'should return never_drop rules as strings with Accept header' do
+      rules = {'never_drop' => ["1","2"], 'drop_lowest' => 1, 'drop_highest' => 1}
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups/#{@group.id}", {
+        :controller => 'assignment_groups_api',
+        :action => 'show',
+        :format => 'json',
+        :course_id => @course.id.to_s,
+        :assignment_group_id => @group.id.to_s},
+        {},
+        { 'Accept' => 'application/json+canvas-string-ids' })
+
+      json['rules'].should == rules
+    end
+
+    it 'should return never_drop rules as ints without Accept header' do
+      rules = {'never_drop' => [1,2], 'drop_lowest' => 1, 'drop_highest' => 1}
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups/#{@group.id}", {
+        :controller => 'assignment_groups_api',
+        :action => 'show',
+        :format => 'json',
+        :course_id => @course.id.to_s,
+        :assignment_group_id => @group.id.to_s}
+        )
+
+      json['rules'].should == rules
+    end
+
+  end
   context '#create' do
     before do
       course_with_teacher(:active_all => true)
@@ -364,7 +408,7 @@ describe AssignmentGroupsApiController, :type => :integration do
     end
 
     it 'should update rules properly' do
-      rules = {'never_drop' => [1,2], 'drop_lowest' => 1, 'drop_highest' => 1}
+      rules = {'never_drop' => ["1","2"], 'drop_lowest' => 1, 'drop_highest' => 1}
       rules_in_db = "drop_lowest:1\ndrop_highest:1\nnever_drop:1\nnever_drop:2\n"
       params = {'rules' => rules}
       json = api_call(:put, "/api/v1/courses/#{@course.id}/assignment_groups/#{@assignment_group.id}", {
@@ -373,7 +417,8 @@ describe AssignmentGroupsApiController, :type => :integration do
         :format => 'json',
         :course_id => @course.id.to_s,
         :assignment_group_id => @assignment_group.id.to_s},
-        params)
+        params,
+        { 'Accept' => 'application/json+canvas-string-ids' })
 
       json['rules'].should == rules
       @assignment_group.reload

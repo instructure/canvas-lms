@@ -79,7 +79,7 @@ describe NotificationPolicy do
                          :category => "TestImmediately"
     Message.any_instance.stubs(:get_template).returns("here's a free <%= data.favorite_soda %>")
     class DataTest < ActiveRecord::Base
-      set_table_name :courses
+      self.table_name = :courses
       attr_protected
       has_a_broadcast_policy
       set_broadcast_policy do
@@ -112,18 +112,18 @@ describe NotificationPolicy do
     it "should have a named scope for users" do
       user_with_pseudonym(:active_all => 1)
       notification_policy_model(:communication_channel => @cc)
-      NotificationPolicy.for(@user).should eql([@notification_policy])
+      NotificationPolicy.for(@user).should == [@notification_policy]
     end
 
     it "should have a named scope for notifications" do
       notification_model
       notification_policy_model(:notification => @notification)
-      NotificationPolicy.for(@notification).should eql([@notification_policy])
+      NotificationPolicy.for(@notification).should == [@notification_policy]
     end
     
     it "should not slow down from other kinds of input on the *for* named scope" do
       notification_policy_model
-      NotificationPolicy.for(:anything_else).should eql(NotificationPolicy.all)
+      NotificationPolicy.for(:anything_else).should == NotificationPolicy.all
     end
     
     context "by" do
@@ -136,10 +136,10 @@ describe NotificationPolicy do
       end
       
       it "should have a scope to differentiate by frequency" do
-        NotificationPolicy.by(:immediately).should eql([@n1])
-        NotificationPolicy.by(:daily).should eql([@n2])
-        NotificationPolicy.by(:weekly).should eql([@n3])
-        NotificationPolicy.by(:never).should eql([@n4])
+        NotificationPolicy.by(:immediately).should == [@n1]
+        NotificationPolicy.by(:daily).should == [@n2]
+        NotificationPolicy.by(:weekly).should == [@n3]
+        NotificationPolicy.by(:never).should == [@n4]
       end
     
       it "should be able to differentiate by several frequencies at once" do
@@ -186,7 +186,7 @@ describe NotificationPolicy do
       policies.should_not be_include(n2)
       policies.should be_include(n3)
       policies.should be_include(n4)
-      policies.size.should eql(2)
+      policies.size.should == 2
       
     end
     
@@ -217,19 +217,35 @@ describe NotificationPolicy do
       }
       n1 = notification_policy_model(trifecta_opts.merge(:notification => notify1) )
       n2 = notification_policy_model(trifecta_opts.merge(:notification => notify2) )
-      params = {:category => 'MultiCategory', :channel_id => @communication_channel.id, :frequency => Notification::FREQ_IMMEDIATELY}
+      params = {:category => 'multi_category', :channel_id => @communication_channel.id, :frequency => Notification::FREQ_IMMEDIATELY}
       NotificationPolicy.setup_for(@user, params)
       n1.reload; n2.reload
       n1.frequency.should == Notification::FREQ_IMMEDIATELY
       n2.frequency.should == Notification::FREQ_IMMEDIATELY
     end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "should create records on the correct shard" do
+        user_with_pseudonym(active_all: true)
+        NotificationPolicy.delete_all
+        notification_model
+        @shard1.activate do
+          @user.notification_policies.scoped.exists?.should be_false
+          NotificationPolicy.setup_for(@user, channel_id: @cc.id, frequency: Notification::FREQ_IMMEDIATELY, category: 'test_immediately')
+          @user.notification_policies.scoped.exists?.should be_true
+        end
+      end
+    end
   end
 
   describe "setup_with_default_policies" do
     before :each do
-      user_model
-      communication_channel_model
+      @user = User.create!
+      @communication_channel = @user.communication_channels.create!(path: 'email@example.com')
       @announcement = notification_model(:name => 'Setting 1', :category => 'Announcement')
+      Notification.stubs(:all).returns([@notification])
     end
 
     it "should create default NotificationPolicy entries if missing" do
@@ -326,12 +342,12 @@ describe NotificationPolicy, "communication_preference" do
   
   it "should use the channel defined, if one is given" do
     @notification_policy.stubs(:communication_channel).returns(@cc2)
-    @notification_policy.communication_preference.should eql(@cc2)
+    @notification_policy.communication_preference.should == @cc2
   end
 
   it "should use the users default communication channel if one isn't given" do
     @notification_policy.stubs(:communication_channel).returns(nil)
-    @notification_policy.communication_preference.should eql(@cc1)
+    @notification_policy.communication_preference.should == @cc1
   end
   
 end

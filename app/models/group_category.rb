@@ -83,12 +83,17 @@ class GroupCategory < ActiveRecord::Base
       role_category_for_context('communities', context)
     end
 
+    def uncategorized
+      GroupCategory.new(name: name_for_role('uncategorized'), role: 'uncategorized')
+    end
+
     protected
     def name_for_role(role)
       case role
       when 'student_organized' then t('group_categories.student_organized', "Student Groups")
       when 'imported'          then t('group_categories.imported', "Imported Groups")
       when 'communities'       then t('group_categories.communities', "Communities")
+      when 'uncategorized'     then t('group_categories.uncategorized', "Uncategorized")
       end
     end
 
@@ -112,7 +117,7 @@ class GroupCategory < ActiveRecord::Base
       return unless context and protected_role_for_context?(role, context)
       category = context.group_categories.find_by_role(role) ||
                  context.group_categories.build(:name => name_for_role(role), :role => role)
-      category.save(false) if category.new_record?
+      category.save(CANVAS_RAILS2 ? false : {:validate => false}) if category.new_record?
       category
     end
   end
@@ -172,7 +177,7 @@ class GroupCategory < ActiveRecord::Base
   end
 
   def group_for(user)
-    groups.active.to_a.find{ |g| g.users.include?(user) }
+    groups.active.where("EXISTS (?)", GroupMembership.active.where("group_id=groups.id").where(user_id: user)).first
   end
 
   alias_method :destroy!, :destroy
@@ -182,67 +187,171 @@ class GroupCategory < ActiveRecord::Base
     # destroy. also, the group destroy happens to be "soft" as well, and I
     # double checked groups.destroy_all does the right thing. :)
     groups.destroy_all
-    self.deleted_at = Time.now
+    self.deleted_at = Time.now.utc
     self.save
   end
 
   def distribute_members_among_groups(members, groups)
-    return [] if groups.empty?
+    if groups.empty? || members.empty?
+      complete_progress
+      return []
+    end
+
+    ##
+    # new memberships to be returned
     new_memberships = []
-    touched_groups = [].to_set
+    members_assigned_count = 0
 
-    groups_by_size = {}
+    ##
+    # shuffle for randomness
+    members.shuffle!
+
+    ##
+    # pool fill algorithm:
+    # 1) sort groups by member count
+    #
+    #  m   8  |
+    #  e   7  |
+    #  m   6  |                X  --- largest_group_size = 6
+    #  b   5  |                X  --- currently_assigned_count = 14
+    #  e   4  |             X  X  --- groups.size = 6
+    #  r   3  |          X  X  X  --- member_count = ???
+    #  s   2  |          X  X  X
+    #      1  |_______X__X__X__X
+    #           a  b  c  d  e  f
+    #                groups
+    groups.sort_by! {|group| group.users.size }
+
+    ##
+    # 2) ideally, the groups would have equal member counts,
+    #    which would enable us to simply partition the members
+    #    equally across each group.
+
+    #    the simplest case occurs when we have enough members
+    #    to fill the pool all the way to the largest group:
+    #
+    #    X: old member
+    #    O: new member
+    #
+    #  m   8  |                   --- largest_group_size = 6
+    #  e   7  |                   --- currently_assigned_count = 14
+    #  m   6  | O  O  O  O  O  X  --- groups.size = 6
+    #  b   5  | O  O  O  O  O  X  --- equalizing_count = largest_group_size * groups.size
+    #  e   4  | O  O  O  O  X  X                       = 6 * 6 = 36
+    #  r   3  | O  O  O  X  X  X  --- delta_required = equalizing_count - currently_assigned_count
+    #  s   2  | O  O  O  X  X  X                     = 36 - 14 = 22
+    #      1  |_O__O__X__X__X__X  --- member_count >= 22
+    #           a  b  c  d  e  f
+    #                groups
+    #
+    #   for member_counts > 22, partition extra members equally
+    #   amongst the now equal groups
+    member_count = members.size
+    currently_assigned_count = groups.inject(0) {|sum, group| sum += group.users.size}
+    largest_group_size = 0
+    delta_required = 0
+
+    ##
+    # 3) however, we may not be able to fill to the largest group
+    #    say member_count = 12
+    #
+    #    in this case, we should distribute the members like so:
+    #
+    #  m   8  |
+    #  e   7  |
+    #  m   6  |                X
+    #  b   5  |                X
+    #  e   4  | O  O  O  O  X  X
+    #  r   3  | O  O  O  X  X  X
+    #  s   2  | O  O  O  X  X  X
+    #      1  |_O__O__X__X__X__X
+    #           a  b  c  d  e  f
+    #                groups
+    #
+    #   with only 12 members, we are unable to bring all groups up
+    #   to 6 members each, the number of the users in the largest group (f)
+    #
+    #   that is, our member_count < delta_required
+    #
+    #   but fear not! we can pop off that last group and pretend it doesn't exist!
+    #
+    #  m   8  |                 --- largest_group_size = 4 (UPDATED to be the next largest)
+    #  e   7  |                 --- currently_assigned_count = 8 (UPDATED)
+    #  m   6  |                 --- groups.size = 5 (UPDATED -= 1)
+    #  b   5  |                 --- equalizing_count = largest_group_size * groups.size
+    #  e   4  | O  O  O  O  X                        = 4 * 5 = 20
+    #  r   3  | O  O  O  X  X   --- delta_required = equalizing_count - currently_assigned_count
+    #  s   2  | O  O  O  X  X                      = 20 - 8 = 12
+    #      1  |_O__O__X__X__X   --- member_count = 12
+    #           a  b  c  d  e
+    #              groups
+
+    ##
+    # to summarize:
+    #
+    # if there are enough new members to equalize the groups,
+    # equalize them and evenly distribute the surplus.
+    #
+    # if there are not enough, discard the fullest groups until there
+    # are. equalize the remaining groups and distribute the surplus
+    # members among them
+    #
+    # in all cases where things do not divide evenly, sprinkle the
+    # remainder around
+
+    loop do
+      largest_group = groups.last
+      largest_group_size = largest_group.users.size
+      equalizing_count = largest_group_size * groups.size
+      delta_required = equalizing_count - currently_assigned_count
+
+      break if member_count > delta_required
+      currently_assigned_count -= largest_group_size
+      groups.pop
+    end
+
+    chunk_count, sprinkle_count = (member_count - delta_required).divmod(groups.size)
+
     groups.each do |group|
-      size = group.users.size
-      groups_by_size[size] ||= []
-      groups_by_size[size] << group
-    end
-    smallest_group_size = groups_by_size.keys.min
-    members_count = members.size
-
-    GroupMembership.skip_callback(:update_cached_due_dates) do
-      members.sort_by{ rand }.each_with_index do |member, i|
-        group = groups_by_size[smallest_group_size].first
-        membership = group.add_user(member)
-        if membership.valid?
-          new_memberships << membership
-          touched_groups << group.id
-
-          # successfully added member to group, move it to the new size bucket
-          groups_by_size[smallest_group_size].shift
-          groups_by_size[smallest_group_size + 1] ||= []
-          groups_by_size[smallest_group_size + 1] << group
-
-          # was that the last group of that size?
-          if groups_by_size[smallest_group_size].empty?
-            groups_by_size.delete(smallest_group_size)
-            smallest_group_size += 1
-          end
-        end
-        update_progress(i, members_count)
+      sprinkle = sprinkle_count > 0 ? 1 : 0
+      number_to_bring_base_equality = largest_group_size - group.users.size
+      number_of_users_to_add = number_to_bring_base_equality + chunk_count + sprinkle
+      ##
+      # respect group limits!
+      if self.group_limit
+        slots_remaining = self.group_limit - group.users.size
+        number_of_users_to_add = [slots_remaining, number_of_users_to_add].min
       end
+      next if number_of_users_to_add <= 0
+
+      new_members_to_add = members.pop(number_of_users_to_add)
+      new_memberships.concat(group.bulk_add_users_to_group(new_members_to_add))
+      members_assigned_count += number_of_users_to_add
+
+      update_progress(members_assigned_count, member_count)
+      break if members.empty?
+      sprinkle_count -= 1
     end
-    if !touched_groups.empty?
-      Group.where(:id => touched_groups.to_a).update_all(:updated_at => Time.now.utc)
-      if context_type != 'Account'
-        Assignment.where(context_type: context_type, context_id: context_id, group_category_id: self).pluck(:id).each do |assignment|
-          DueDateCacher.recompute(assignment)
-        end
+
+    if !groups.empty?
+      Group.where(:id => groups.map(&:id)).update_all(:updated_at => Time.now.utc)
+      if context_type == 'Course'
+        DueDateCacher.recompute_course(context_id, Assignment.where(context_type: context_type, context_id: context_id, group_category_id: self).pluck(:id))
       end
     end
     complete_progress
-    return new_memberships
+    new_memberships
   end
 
   def create_group_count=(num)
     @create_group_count = num && num > 0 ?
-      [num, Setting.get_cached('max_groups_in_new_category', '200').to_i].min :
+      [num, Setting.get('max_groups_in_new_category', '200').to_i].min :
       nil
   end
 
   def auto_create_groups
-    create_groups(@create_group_count) if @create_group_count && @create_group_count > 0
-    assign_unassigned_members if @assign_unassigned_members
+    create_groups(@create_group_count) if @create_group_count
+    assign_unassigned_members if @assign_unassigned_members && @create_group_count
     @create_group_count = @assign_unassigned_members = nil
   end
 
@@ -255,9 +364,14 @@ class GroupCategory < ActiveRecord::Base
     end
   end
 
+  def unassigned_users
+    context.users_not_in_groups(allows_multiple_memberships? ? [] : groups.active)
+  end
+
   def assign_unassigned_members
-    potential_members = context.users_not_in_groups(groups.active)
-    distribute_members_among_groups(potential_members, groups.active)
+    Delayed::Batch.serial_batch do
+      distribute_members_among_groups(unassigned_users, groups.active)
+    end
   end
 
   def assign_unassigned_members_in_background
@@ -279,10 +393,7 @@ class GroupCategory < ActiveRecord::Base
 
   def update_progress(i, total)
     return unless current_progress
-    do_progress_update = i % 100 == 0
-    if do_progress_update
-      current_progress.calculate_completion! i, total
-    end
+    current_progress.calculate_completion! i, total
   end
 
   def complete_progress

@@ -51,6 +51,15 @@ describe Announcement do
 
       announcement.should be_post_delayed
     end
+
+    it "should create a single job for delayed posting even though we do a double-save" do
+      course = Course.new
+      course.lock_all_announcements = true
+      course.save!
+      expect {
+        course.announcements.create!(valid_announcement_attributes.merge(delayed_post_at: 1.week.from_now))
+      }.to change(Delayed::Job, :count).by(1)
+    end
   end
   
   context "broadcast policy" do

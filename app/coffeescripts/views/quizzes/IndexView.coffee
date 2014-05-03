@@ -1,9 +1,10 @@
 define [
+  'jquery'
   'underscore'
   'Backbone'
   'compiled/views/quizzes/QuizItemGroupView'
   'jst/quizzes/IndexView'
-], (_, Backbone, QuizItemGroupView, template) ->
+], ($, _, Backbone, QuizItemGroupView, template) ->
 
   class IndexView extends Backbone.View
     template: template
@@ -17,6 +18,7 @@ define [
 
     events:
       'keyup #searchTerm': 'keyUpSearch'
+      'mouseup #searchTerm': 'keyUpSearch' #ie10 x-close workaround
 
     initialize: ->
       super
@@ -46,5 +48,11 @@ define [
 
     filter: (model, term) =>
       return true unless term
-      regex = new RegExp(term, 'ig')
-      model.get('title').match(regex)
+
+      title = model.get('title').toLowerCase()
+      numMatches = 0
+      keys = term.toLowerCase().split(' ')
+      for part in keys
+        #not using match to avoid javascript string to regex oddness
+        numMatches++ if title.indexOf(part) != -1
+      numMatches == keys.length

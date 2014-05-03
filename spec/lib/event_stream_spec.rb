@@ -26,8 +26,8 @@ describe EventStream do
     def @database.update_record(*args); end
     def @database.insert_record(*args); end
     def @database.update(*args); end
-    ::Canvas::Cassandra::Database.stubs(:from_config).with(@database_name.to_s).returns(@database)
-    ::Canvas::Cassandra::Database.stubs(:configured?).with(@database_name.to_s).returns(true)
+    ::Canvas::Cassandra::DatabaseBuilder.stubs(:from_config).with(@database_name.to_s).returns(@database)
+    ::Canvas::Cassandra::DatabaseBuilder.stubs(:configured?).with(@database_name.to_s).returns(true)
   end
 
   context "setup block" do
@@ -353,7 +353,7 @@ describe EventStream do
 
       describe "generated for_thing method" do
         it "should forward argument to index's for_key" do
-          @index.expects(:for_key).once.with(@entry, {})
+          @index.expects(:for_key).once.with([@entry], {})
           @stream.for_thing(@entry)
         end
 
@@ -365,7 +365,7 @@ describe EventStream do
 
         it "should permit and forward options" do
           options = {oldest: 1.day.ago}
-          @index.expects(:for_key).once.with(@entry, options)
+          @index.expects(:for_key).once.with([@entry], options)
           @stream.for_thing(@entry, options)
         end
       end
@@ -384,6 +384,12 @@ describe EventStream do
       end
 
       shared_examples_for "recording failures" do
+        before do
+          # By default the log! method raises exceptions in test env.  Override this
+          # to log the event and not raise it for these tests.
+          Rails.env.stubs(:test?).returns(false)
+        end
+
         it "should record failed inserts" do
           EventStream::Failure.expects(:log!).once.with(:insert, @stream, @record, @exception)
           @stream.insert(@record)
@@ -400,7 +406,7 @@ describe EventStream do
           @database.stubs(:batch).raises(@exception)
         end
 
-        it_should_behave_like "recording failures"
+        include_examples "recording failures"
       end
 
       context "failing callbacks" do
@@ -424,7 +430,7 @@ describe EventStream do
           @stream.update(@record)
         end
 
-        it_should_behave_like "recording failures"
+        include_examples "recording failures"
       end
     end
   end

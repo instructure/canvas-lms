@@ -55,6 +55,9 @@ Use pad-box if you want to arbitrarily add some padding to an element.
   &.no-sides {
     padding-left: 0; padding-right: 0;
   }
+  &.sides-only {
+    padding-top: 0; padding-bottom: 0;
+  }
   &.top-only {
     padding-bottom: 0; padding-right: 0; padding-left: 0;
   }

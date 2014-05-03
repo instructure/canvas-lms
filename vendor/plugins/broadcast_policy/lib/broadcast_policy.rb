@@ -172,18 +172,22 @@ module Instructure #:nodoc:
           return false
         end
 
+        NotificationPolicy.send_notification(record, self.dispatch, notification, to_list, asset_context, data)
+      end
+
+      def self.send_notification(record, dispatch, notification, to_list, asset_context=nil, data=nil)
         n = DelayedNotification.send_later_if_production_enqueue_args(
-          :process,
-          { :priority => Delayed::LOW_PRIORITY },
-          record, notification, (to_list || []).compact.map(&:asset_string), asset_context, data)
+            :process,
+            { :priority => Delayed::LOW_PRIORITY },
+            record, notification, (to_list || []).compact.map(&:asset_string), asset_context, data)
+
         n ||= DelayedNotification.new(:asset => record, :notification => notification,
                                       :recipient_keys => (to_list || []).compact.map(&:asset_string),
                                       :asset_context => asset_context, :data => data)
         if Rails.env.test?
-          record.messages_sent[self.dispatch] = n.is_a?(DelayedNotification) ? n.process : n
+          record.messages_sent[dispatch] = n.is_a?(DelayedNotification) ? n.process : n
         end
         n
-        # notification.create_message(record, to_list)
       end
     end # NotificationPolicy
 

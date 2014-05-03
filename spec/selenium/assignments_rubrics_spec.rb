@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "assignment rubrics" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   context "assignment rubrics as a teacher" do
     before (:each) do
@@ -90,7 +90,7 @@ describe "assignment rubrics" do
       f('#rubric_dialog_'+@rubric.id.to_s+' .title').should include_text(@rubric.title)
       f('#rubric_dialog_'+@rubric.id.to_s+' .select_rubric_link').click
       wait_for_ajaximations
-      f('#rubric_'+@rubric.id.to_s+' > thead .title').should include_text(@rubric.title)
+      f('#rubric_'+@rubric.id.to_s+' .rubric_title .title').should include_text(@rubric.title)
     end
 
     it "should not adjust assignment points possible for grading rubric" do

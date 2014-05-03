@@ -92,6 +92,6 @@ class DiscussionTopicPresenter
   end
 
   def draft_state_allows_speedgrader?
-    topic.context.draft_state_enabled? ? topic.assignment.published? : true
+    topic.context.feature_enabled?(:draft_state) ? topic.assignment.published? : true
   end
 end

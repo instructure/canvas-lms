@@ -5,6 +5,7 @@ define [
   'jst/courseList/content'
   'vendor/jquery.ba-tinypubsub'
 ], (jQuery, CustomList, wrapper, content) ->
+  $ = jQuery
 
   init: ->
     jQuery ->
@@ -23,7 +24,7 @@ define [
 
         jQuery.getJSON '/all_menu_courses', (enrollments) ->
           courseList = new CustomList '#menu_enrollments', enrollments,
-            appendTarget: '#menu_enrollments'
+            appendTarget: '#menu_enrollments .menu-item-customize'
             autoOpen: autoOpen
             wrapper: wrapper
             content: content

@@ -1,13 +1,13 @@
 class FixNeedNotifyIndexCondition < ActiveRecord::Migration
   tag :predeploy
-  self.transactional = false
+  disable_ddl_transaction!
 
   # this migration fixes a the bad index condition in AddNeedNotifyColumnToAttachments
 
   def self.up
     if connection.adapter_name =~ /\Apostgresql/i
       execute("DROP INDEX IF EXISTS index_attachments_on_need_notify")
-      add_index :attachments, :need_notify, :concurrently => true, :conditions => "need_notify"
+      add_index :attachments, :need_notify, :algorithm => :concurrently, :where => "need_notify"
     end
   end
 

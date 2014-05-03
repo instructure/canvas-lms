@@ -1,5 +1,6 @@
 require [
   'i18n!conversations'
+  'jquery'
   'underscore'
   'Backbone'
   'compiled/models/Message'
@@ -13,14 +14,14 @@ require [
   'compiled/collections/CourseCollection'
   'compiled/collections/FavoriteCourseCollection'
   'jquery.disableWhileLoading'
-], (I18n, _, Backbone, Message, MessageCollection, MessageView, MessageListView, MessageDetailView, MessageFormDialog,
+], (I18n, $, _, Backbone, Message, MessageCollection, MessageView, MessageListView, MessageDetailView, MessageFormDialog,
  InboxHeaderView, deparam, CourseCollection, FavoriteCourseCollection) ->
 
   class ConversationsRouter extends Backbone.Router
 
     routes:
       '': 'index'
-      'filter?:state': 'filter'
+      'filter=:state': 'filter'
 
     messages:
       confirmDelete: I18n.t('confirm.delete_conversation', 'Are you sure you want to delete your copy of this conversation? This action cannot be undone.')
@@ -43,19 +44,50 @@ require [
       value = window.location.search.match(regex)
       if value then decodeURIComponent(value[1]) else null
 
+    # Internal: Perform a batch update of all selected messages.
+    #
+    # event - The event to batch (e.g. 'star' or 'destroy').
+    # fn - A function called with each selected message. Used for side-effecting.
+    #
+    # Returns an array of impacted message IDs.
+    batchUpdate: (event, fn = $.noop) ->
+      messages = _.map @list.selectedMessages, (message) =>
+        fn.call(this, message)
+        message.get('id')
+      $.ajaxJSON '/api/v1/conversations', 'PUT',
+        'conversation_ids[]': messages
+        event: event
+      @list.selectedMessages = [] if event == 'destroy'
+      @list.selectedMessages = [] if event == 'archive'      && @filters.type != 'sent'
+      @list.selectedMessages = [] if event == 'mark_as_read' && @filters.type == 'archived'
+      @list.selectedMessages = [] if event == 'unstar'       && @filters.type == 'starred'
+      messages
+
+    lastFetch: null
+
     onSelected: (model) =>
+      @lastFetch.abort() if @lastFetch
       @header.onModelChange(null, @model)
       @model = model
-      unless model.get('selected')
-        if model.id == @detail.model?.id
-          delete @detail.model
-          return @detail.render()
+      messages = @list.selectedMessages
+      if messages.length == 0
+        delete @detail.model
+        return @detail.render()
+      else if messages.length > 1
+        delete @detail.model
+        @detail.render(batch: true)
+        @header.onModelChange(messages[0], null)
+        @header.toggleReplyBtn(true)
+        @header.toggleReplyAllBtn(true)
+        @header.hideForwardBtn(true)
         return
-
-      if model.get('messages')
-        @selectConversation(model)
       else
-        @detail.$el.disableWhileLoading(model.fetch(success: @selectConversation))
+        model = @list.selectedMessage()
+        if model.get('messages')
+          @selectConversation(model)
+        else
+          @lastFetch = model.fetch(success: @selectConversation)
+          @detail.$el.disableWhileLoading(@lastFetch)
 
     selectConversation: (model) =>
       @header.onModelChange(model, null)
@@ -77,17 +109,21 @@ require [
       @compose.show(@detail.model, to: type, trigger: trigger, message: message)
 
     onArchive: =>
-      state = if @detail.model.get('workflow_state') == 'archived' then 'read' else 'archived'
-      @detail.model.save(workflow_state: state)
-      @header.onArchivedStateChange(@detail.model)
-      if @filters.type == 'inbox' || @filters.type == 'archived'
-        @list.collection.remove(@detail.model)
+      action = if @list.selectedMessage().get('workflow_state') == 'archived' then 'mark_as_read' else 'archive'
+      messages = @batchUpdate(action, (m) ->
+        newState = if action == 'mark_as_read' then 'read' else 'archived'
+        m.set('workflow_state', newState)
+        @header.onArchivedStateChange(m)
+      )
+      if _.include(['inbox', 'archived'], @filters.type)
+        @list.collection.remove(messages)
         @selectConversation(null)
 
     onDelete: =>
       return unless confirm(@messages.confirmDelete)
-      @detail.model.destroy()
+      messages = @batchUpdate('destroy')
       delete @detail.model
+      @list.collection.remove(messages)
       @detail.render()
 
     onCompose: (e) =>
@@ -100,6 +136,7 @@ require [
       filters = @filters = deparam(state)
       @header.displayState(filters)
       @selectConversation(null)
+      @list.selectedMessages = []
       @list.collection.reset()
       @list.collection.setParam('scope', filters.type)
       @list.collection.setParam('filter', @_currentFilter())
@@ -108,9 +145,10 @@ require [
       @compose.setDefaultCourse(filters.course)
 
     onMarkUnread: =>
-      @detail.model.toggleReadState(false)
-      @detail.model.save()
-      @header.hideMarkUnreadBtn(true)
+      @batchUpdate('mark_as_unread', (m) -> m.toggleReadState(false))
+
+    onMarkRead: =>
+      @batchUpdate('mark_as_read', (m) -> m.toggleReadState(true))
 
     onForward: (message) =>
       model = if message
@@ -126,11 +164,14 @@ require [
       @compose.show(model, to: 'forward', trigger: trigger)
 
     onStarToggle: =>
-      @detail.model.toggleStarred()
-      @detail.model.save()
+      event    = if @list.selectedMessage().get('starred') then 'unstar' else 'star'
+      messages = @batchUpdate(event, (m) -> m.toggleStarred(event == 'star'))
+      if @filters.type == 'starred'
+        @selectConversation(null) if event == 'unstar'
+        @list.collection.remove(messages)
 
     onFilter: (filters) =>
-      @navigate('filter?'+$.param(filters), {trigger: true})
+      @navigate('filter='+$.param(filters), {trigger: true})
 
     onCourse: (course) =>
       @list.updateCourse(course)
@@ -174,6 +215,7 @@ require [
       @header.on('filter',      @onFilter)
       @header.on('course',      @onCourse)
       @header.on('mark-unread', @onMarkUnread)
+      @header.on('mark-read', @onMarkRead)
       @header.on('forward',     @onForward)
       @header.on('star-toggle', @onStarToggle)
       @header.on('search',      @onSearch)
@@ -186,6 +228,7 @@ require [
       @detail.on('reply-all',   @onReplyAll)
       @detail.on('forward',     @onForward)
       $(document).ready(@onPageLoad)
+      $(window).keydown(@onKeyDown)
 
     onPageLoad: (e) ->
       # we add the top style here instead of in the css because
@@ -222,6 +265,9 @@ require [
       @list.collection.reset()
       @searchTokens = if tokens.length then tokens else null
       @list.collection.setParam('filter', @_currentFilter())
+      delete @detail.model
+      @list.selectedMessages = []
+      @detail.render()
       @list.collection.fetch()
 
     _initListView: ->
@@ -241,7 +287,19 @@ require [
       @header.render()
 
     _initComposeDialog: ->
-      @compose = new MessageFormDialog(courses: @courses, folderId: ENV.CONVERSATIONS.ATTACHMENTS_FOLDER_ID)
+      @compose = new MessageFormDialog
+        courses: @courses
+        folderId: ENV.CONVERSATIONS.ATTACHMENTS_FOLDER_ID
+        account_context_code: ENV.CONVERSATIONS.ACCOUNT_CONTEXT_CODE
+
+    onKeyDown: (e) =>
+      nodeName = e.target.nodeName.toLowerCase()
+      return if nodeName == 'input' || nodeName == 'textarea'
+      ctrl = e.ctrlKey || e.metaKey
+      if e.which == 65 && ctrl # ctrl-a
+        e.preventDefault()
+        @list.selectAll()
+        return
 
   window.conversationsRouter = new ConversationsRouter
   Backbone.history.start()

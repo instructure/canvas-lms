@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../../../../../spec/spec_helper')
 
-describe "Account Reports" , :type => :integration do
+describe "Account Reports" , type: :request do
 
   it "should see extra text when there is extra text" do
 
@@ -31,6 +31,7 @@ describe "Account Reports" , :type => :integration do
     csv = Attachment.create!(:filename => 'grades_export.csv', :uploaded_data => StringIO.new('sometextstuffgoeshere'), :context => @account)
     report = Account.default.account_reports.create!(user: @admin)
     report.workflow_state = "complete"
+    report.progress = 100
     report.report_type = "student_assignment_outcome_map_csv"
     report.parameters = {}
     report.parameters["extra_text"] = 'someuniquetextstuffgoeshere'

@@ -1,4 +1,4 @@
-<% form_tag '#', :id => "edit_category_form", :style => "margin-bottom: 1em; display: none;" do %>
+<%= form_tag '#', :id => "edit_category_form", :style => "margin-bottom: 1em; display: none;" do %>
   <%= text_field_tag 'category[name]', nil, :style => "font-size: 150%; width: 95%; padding: 0.2em; margin-bottom: 0.2em;" %>
   <% unless @context.is_a?(Account) %>
   <div style="margin: 0.5em 0;">

@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe LtiApiController, :type => :integration do
+describe LtiApiController, type: :request do
   before do
     course_with_student(:active_all => true)
     @student = @user
@@ -40,7 +40,7 @@ describe LtiApiController, :type => :integration do
     req.body = opts['body'] if opts['body']
     post "https://www.example.com#{req.path}",
       req.body,
-      { "content-type" => opts['content-type'], "Authorization" => req['Authorization'] }
+      { "CONTENT_TYPE" => opts['content-type'], "HTTP_AUTHORIZATION" => req['Authorization'] }
   end
 
   it "should respond 'unsupported' for any unknown xml body" do
@@ -51,12 +51,12 @@ describe LtiApiController, :type => :integration do
 
   it "should require a content-type of application/xml" do
     make_call('content-type' => 'application/other')
-    response.status.should == "415 Unsupported Media Type"
+    assert_status(415)
   end
 
   it "should require the correct shared secret" do
     make_call('secret' => 'bad secret is bad')
-    response.status.should == "401 Unauthorized"
+    assert_status(401)
   end
 
   def replace_result(score=nil, sourceid = nil, result_data=nil)
@@ -81,7 +81,7 @@ describe LtiApiController, :type => :integration do
       result_data_xml += "\n</resultData>\n"
     end
     
-    body = %{
+    body = <<-XML
 <?xml version = "1.0" encoding = "UTF-8"?>
 <imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
   <imsx_POXHeader>
@@ -104,12 +104,12 @@ describe LtiApiController, :type => :integration do
     </replaceResultRequest>
   </imsx_POXBody>
 </imsx_POXEnvelopeRequest>
-    }
+XML
   end
 
   def read_result(sourceid = nil)
     sourceid ||= BasicLTI::BasicOutcomes.encode_source_id(@tool, @course, @assignment, @student)
-    body = %{
+    body = <<-XML
 <?xml version = "1.0" encoding = "UTF-8"?>
 <imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
   <imsx_POXHeader>
@@ -128,12 +128,12 @@ describe LtiApiController, :type => :integration do
     </readResultRequest>
   </imsx_POXBody>
 </imsx_POXEnvelopeRequest>
-    }
+    XML
   end
 
   def delete_result(sourceid = nil)
     sourceid ||= BasicLTI::BasicOutcomes.encode_source_id(@tool, @course, @assignment, @student)
-    body = %{
+    body = <<-XML
 <?xml version = "1.0" encoding = "UTF-8"?>
 <imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
   <imsx_POXHeader>
@@ -152,7 +152,7 @@ describe LtiApiController, :type => :integration do
     </deleteResultRequest>
   </imsx_POXBody>
 </imsx_POXEnvelopeRequest>
-    }
+    XML
   end
 
   def check_failure(failure_type = 'unsupported')
@@ -386,7 +386,7 @@ to because the assignment has no points possible.
 
   it "should reject if the assignment is no longer a tool assignment" do
     @assignment.update_attributes(:submission_types => 'online_upload')
-    @assignment.external_tool_tag.destroy!
+    @assignment.reload.external_tool_tag.destroy!
     make_call('body' => replace_result('0.5'))
     check_failure
   end
@@ -399,9 +399,9 @@ to because the assignment has no points possible.
   if Canvas.redis_enabled?
     it "should not allow the same nonce to be used more than once" do
       make_call('nonce' => 'not_so_random', 'content-type' => 'none')
-      response.status.should == "415 Unsupported Media Type"
+      assert_status(415)
       make_call('nonce' => 'not_so_random', 'content-type' => 'none')
-      response.status.should == "401 Unauthorized"
+      assert_status(401)
       response.body.should match(/nonce/i)
     end
   end
@@ -409,7 +409,7 @@ to because the assignment has no points possible.
   it "should block timestamps more than 90 minutes old" do
     # the 90 minutes value is suggested by the LTI spec
     make_call('timestamp' => 2.hours.ago.utc.to_i, 'content-type' => 'none')
-    response.status.should == "401 Unauthorized"
+    assert_status(401)
     response.body.should match(/expired/i)
   end
 
@@ -422,12 +422,12 @@ to because the assignment has no points possible.
       req = consumer.create_signed_request(:post, opts['path'], nil, { :scheme => 'header', :timestamp => opts['timestamp'], :nonce => opts['nonce'] }, opts['body'])
       post "https://www.example.com#{req.path}",
         req.body,
-        { 'content-type' => 'application/x-www-form-urlencoded', "Authorization" => req['Authorization'] }
+        { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded', "HTTP_AUTHORIZATION" => req['Authorization'] }
     end
 
     it "should require the correct shared secret" do
       make_call('secret' => 'bad secret is bad')
-      response.status.should == "401 Unauthorized"
+      assert_status(401)
     end
 
     def sourceid
@@ -587,7 +587,7 @@ to because the assignment has no points possible.
 
     it "should reject if the assignment is no longer a tool assignment" do
       @assignment.update_attributes(:submission_types => 'online_upload')
-      @assignment.external_tool_tag.destroy!
+      @assignment.reload.external_tool_tag.destroy!
       make_call('body' => update_result('0.5'))
       check_failure
     end

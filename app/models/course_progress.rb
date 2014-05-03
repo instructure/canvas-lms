@@ -1,0 +1,117 @@
+#
+# Copyright (C) 2011 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
+class CourseProgress
+  if CANVAS_RAILS2
+    include ActionController::UrlWriter
+  else
+    include Rails.application.routes.url_helpers
+  end
+
+  attr_accessor :course, :user
+
+  def initialize(course, user)
+    @course = course
+    @user = user
+  end
+
+  def modules
+    @_modules ||= course.modules_visible_to(user)
+  end
+
+  def current_module
+    @_current_module ||= modules.detect { |m| m.evaluate_for(user).completed? == false }
+  end
+
+  def module_progressions
+    @_module_progressions ||= user.context_module_progressions
+                                  .where("context_module_id IN (?)", modules.map(&:id))
+  end
+
+  def current_module_progression
+    return unless in_progress?
+    @_current_module_progresssion = current_module.evaluate_for(user)
+  end
+
+  def current_content_tag
+    return unless in_progress?
+    current_position = current_module_progression.current_position
+    current_module.content_tags.where(:position => current_position).first
+  end
+
+  def requirements
+    @_requirements ||= modules.flat_map(&:completion_requirements).map { |req| req[:id] }
+  end
+
+  def requirement_count
+    requirements.size
+  end
+
+  def has_requirements?
+    requirement_count > 0
+  end
+
+  def requirements_completed
+    @_requirements_completed ||= module_progressions.flat_map { |cmp| cmp.requirements_met.to_a.uniq { |r| r[:id] } }
+                                                    .select { |req| requirements.include?(req[:id]) }
+  end
+
+  def requirement_completed_count
+    requirements_completed.size
+  end
+
+  def current_requirement_url
+    return unless in_progress?
+    course_context_modules_item_redirect_url(:course_id => course.id,
+                                             :id => current_content_tag.id,
+                                             :host => HostUrl.context_host(course))
+  end
+
+  def in_progress?
+    current_module && current_module.require_sequential_progress
+  end
+
+  def completed?
+    has_requirements? && requirement_completed_count >= requirement_count
+  end
+
+  def most_recent_module_completed_at
+    return unless module_progressions
+    module_progressions.maximum(:completed_at)
+  end
+
+  def completed_at
+    return unless completed?
+    most_recent_module_completed_at.utc.iso8601 rescue nil
+  end
+
+  def to_json
+    if course.module_based? && course.user_is_student?(user)
+      {
+        requirement_count: requirement_count,
+        requirement_completed_count: requirement_completed_count,
+        next_requirement_url: current_requirement_url,
+        completed_at: completed_at
+      }
+    else
+      { error:
+          { message: 'no progress available because this course is not module based (has modules and module completion requirements) or the user is not enrolled as a student in this course' }
+      }
+    end
+  end
+end

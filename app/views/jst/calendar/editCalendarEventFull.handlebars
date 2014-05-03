@@ -1,3 +1,7 @@
+<h1 class="screenreader-only">
+  {{#if newRecord}}{{#t "new_calendar_event_header"}}New Calendar Event{{/t}}
+  {{else}}{{#t "edit_calendar_event_header"}}Edit Calendar Event{{/t}}{{/if}}
+</h1>
 <form id="editCalendarEventFull" class="{{#if use_section_dates}}use_section_dates{{/if}}">
   <input type="text"
          name="title"
@@ -7,6 +11,14 @@
          value="{{title}}"
          maxlength="255" />
 
+  <div class="clearfix">
+    <a href="#" class="switch_event_description_view pull-right">
+      {{#t "#editor.switch_editor_html"}}HTML Editor{{/t}}
+    </a>
+    <a href="#" class="switch_event_description_view pull-right" style="display:none;">
+      {{#t "#editor.switch_editor_visual"}}Visual Editor{{/t}}
+    </a>
+  </div>
   <textarea class="input-block-level"
             name="description"
             aria-label="{{#t "event_description"}}Event Description{{/t}}"

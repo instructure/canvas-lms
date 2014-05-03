@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -50,7 +50,7 @@ class Folder < ActiveRecord::Base
   before_save :infer_hidden_state
   validates_presence_of :context_id, :context_type
   validates_length_of :name, :maximum => maximum_string_length
-  validate_on_update :reject_recursive_folder_structures
+  validate :reject_recursive_folder_structures, on: :update
 
   def reject_recursive_folder_structures
     return true if !self.parent_folder_id_changed?
@@ -84,7 +84,7 @@ class Folder < ActiveRecord::Base
     self.workflow_state = 'deleted'
     self.active_file_attachments.each{|a| a.destroy }
     self.active_sub_folders.each{|s| s.destroy }
-    self.deleted_at = Time.now
+    self.deleted_at = Time.now.utc
     self.save
   end
   
@@ -93,7 +93,7 @@ class Folder < ActiveRecord::Base
   scope :not_locked, lambda { where("(folders.locked IS NULL OR folders.locked=?) AND ((folders.lock_at IS NULL) OR
     (folders.lock_at>? OR (folders.unlock_at IS NOT NULL AND folders.unlock_at<?)))", false, Time.now.utc, Time.now.utc) }
   scope :by_position, order(:position)
-  scope :by_name, order(name_order_by_clause('folders'))
+  scope :by_name, lambda { order(name_order_by_clause('folders')) }
 
   def display_name
     name
@@ -163,40 +163,40 @@ class Folder < ActiveRecord::Base
     res += self.active_file_attachments unless opts[:exclude_files]
     res
   end
-  
+
   def visible?
     # everything but private folders should be visible... for now...
-    (self.workflow_state == "visible") && (!self.parent_folder || self.parent_folder.visible?)
+    return @visible if defined?(@visible)
+    @visible = (self.workflow_state == "visible") && (!self.parent_folder || self.parent_folder.visible?)
   end
-  memoize :visible?
-  
+
   def hidden?
-    self.workflow_state == 'hidden' || (self.parent_folder && self.parent_folder.hidden?)
+    return @hidden if defined?(@hidden)
+    @hidden = self.workflow_state == 'hidden' || (self.parent_folder && self.parent_folder.hidden?)
   end
-  memoize :hidden?
-  
+
   def hidden
     hidden?
   end
-  
+
   def hidden=(val)
     self.workflow_state = (val == true || val == '1' || val == 'true' ? 'hidden' : 'visible')
   end
-  
+
   def just_hide
     self.workflow_state == 'hidden'
   end
-  
+
   def protected?
-    (self.workflow_state == 'protected') || (self.parent_folder && self.parent_folder.protected?)
+    return @protected if defined?(@protected)
+    @protected = (self.workflow_state == 'protected') || (self.parent_folder && self.parent_folder.protected?)
   end
-  memoize :protected?
-  
+
   def public?
-    self.workflow_state == 'public' || (self.parent_folder && self.parent_folder.public?)
+    return @public if defined?(@public)
+    @public = self.workflow_state == 'public' || (self.parent_folder && self.parent_folder.public?)
   end
-  memoize :public?
-  
+
   def mime_class
     "folder"
   end
@@ -257,6 +257,8 @@ class Folder < ActiveRecord::Base
     end
 
     root_folders = []
+    # something that doesn't have folders?!
+    return root_folders unless context.respond_to?(:folders)
 
     context.shard.activate do
       Folder.unique_constraint_retry do
@@ -351,17 +353,17 @@ class Folder < ActiveRecord::Base
   end
 
   def locked?
-    self.locked ||
-    (self.lock_at && Time.now > self.lock_at) ||
-    (self.unlock_at && Time.now < self.unlock_at) ||
-    (self.parent_folder && self.parent_folder.locked?)
+    return @locked if defined?(@locked)
+    @locked = self.locked ||
+      (self.lock_at && Time.now > self.lock_at) ||
+      (self.unlock_at && Time.now < self.unlock_at) ||
+      (self.parent_folder && self.parent_folder.locked?)
   end
-  memoize :locked?
 
   def currently_locked
     self.locked || (self.lock_at && Time.now > self.lock_at) || (self.unlock_at && Time.now < self.unlock_at) || self.workflow_state == 'hidden'
   end
-  
+
   set_policy do
     given { |user, session| self.visible? && self.cached_context_grants_right?(user, session, :read) }#students.include?(user) }
     can :read

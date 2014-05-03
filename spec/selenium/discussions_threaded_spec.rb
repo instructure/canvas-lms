@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/discussions_common')
 
 
 describe "threaded discussions" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   before (:each) do
     @topic_title = 'threaded discussion topic'

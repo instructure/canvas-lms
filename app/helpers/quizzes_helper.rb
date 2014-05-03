@@ -17,14 +17,24 @@
 #
 
 module QuizzesHelper
-  def needs_unpublished_warning?(quiz=@quiz)
-    return false if quiz.available? && !can_publish(quiz)
+  def needs_unpublished_warning?(quiz=@quiz, user=@current_user)
+    if quiz.feature_enabled?(:draft_state)
+      return false unless can_publish(quiz)
+      show_unpublished_changes = true
+    else
+      return false unless can_read(quiz)
+      show_unpublished_changes = can_publish(quiz)
+    end
 
-    !quiz.available? || quiz.unpublished_changes?
+    !quiz.available? || (show_unpublished_changes && quiz.unpublished_changes?)
   end
 
-  def can_publish(quiz)
-    can_do(quiz, @current_user, :update) || can_do(quiz, @current_user, :manage)
+  def can_read(quiz, user=@current_user)
+    can_do(quiz, user, :read)
+  end
+
+  def can_publish(quiz, user=@current_user)
+    can_do(quiz, user, :update) || can_do(quiz, user, :manage)
   end
 
   def unpublished_quiz_warning
@@ -40,6 +50,30 @@ module QuizzesHelper
       'These changes will not appear for students until you publish or ' +
       'republish the quiz.',
       :wrapper => '<strong class=unpublished_quiz_warning>\1</strong>')
+  end
+
+  def draft_state_unsaved_changes_warning
+    I18n.t("#quizzes.warnings.draft_state_unsaved_changes",
+      '*You have made changes to the questions in this quiz.* '+
+      'These changes will not appear for students until you ' +
+      'save the quiz.',
+      :wrapper => '<strong class=unsaved_quiz_warning>\1</strong>')
+  end
+
+  def quiz_published_state_warning(quiz=@quiz)
+    if !quiz.available?
+      unpublished_quiz_warning
+    else
+      if quiz.feature_enabled? :draft_state
+        draft_state_unsaved_changes_warning
+      else
+        unpublished_changes_warning
+      end
+    end
+  end
+
+  def display_save_button?(quiz=@quiz)
+    quiz.available? && quiz.feature_enabled?(:draft_state) && can_publish(quiz)
   end
 
   def render_score(score, precision=2)
@@ -69,6 +103,74 @@ module QuizzesHelper
       I18n.t('#quizzes.keep_highest', 'Highest')
     when "keep_latest"
       I18n.t('#quizzes.keep_latest', 'Latest')
+    end
+  end
+
+  def render_show_correct_answers(quiz)
+    if !quiz.show_correct_answers
+      return I18n.t('#options.no', 'No')
+    end
+
+    show_at = quiz.show_correct_answers_at
+    hide_at = quiz.hide_correct_answers_at
+
+    if show_at && hide_at
+      I18n.t('#quizzes.show_and_hide_correct_answers', 'From %{from} to %{to}', {
+        from: datetime_string(quiz.show_correct_answers_at),
+        to: datetime_string(quiz.hide_correct_answers_at)
+      })
+    elsif show_at
+      I18n.t('#quizzes.show_correct_answers_after', 'After %{date}', {
+        date: datetime_string(quiz.show_correct_answers_at)
+      })
+    elsif hide_at
+      I18n.t('#quizzes.show_correct_answers_until', 'Until %{date}', {
+        date: datetime_string(quiz.hide_correct_answers_at)
+      })
+    else
+      I18n.t('#quizzes.show_correct_answers_immediately', 'Immediately')
+    end
+  end
+
+  def render_correct_answer_protection(quiz)
+    show_at = quiz.show_correct_answers_at
+    hide_at = quiz.hide_correct_answers_at
+    now = Time.now
+
+    # Some labels will be used in more than one case, so we'll pre-define them.
+    labels = {}
+    if hide_at
+      labels[:available_until] = I18n.t('#quizzes.correct_answers_shown_until',
+        'Correct answers are available until %{date}.', {
+        date: datetime_string(quiz.hide_correct_answers_at)
+      })
+    end
+
+    if !quiz.show_correct_answers
+      I18n.t('#quizzes.correct_answers_protected',
+        'Correct answers are hidden.')
+    elsif hide_at.present? && hide_at < now
+      I18n.t('#quizzes.correct_answers_no_longer_available',
+        'Correct answers are no longer available.')
+    elsif show_at.present? && hide_at.present?
+      # If the answers are currently visible, there's no need to show the range
+      # of availability.
+      if now > show_at
+        labels[:available_until]
+      else
+        I18n.t('#quizzes.correct_answers_shown_between',
+          'Correct answers will be available %{from} - %{to}.', {
+            from: datetime_string(show_at),
+            to: datetime_string(hide_at)
+          })
+      end
+    elsif show_at.present?
+      I18n.t('#quizzes.correct_answers_shown_after',
+        'Correct answers will be available on %{date}.', {
+          date: datetime_string(show_at)
+        })
+    elsif hide_at.present?
+      labels[:available_until]
     end
   end
 
@@ -315,7 +417,7 @@ module QuizzesHelper
       if answer_list && !answer_list.empty?
 
         #  Replace the {{question_BLAH}} template text with the user's answer text.
-        match = match.sub(/\{\{question_.*?\}\}/, a).
+        match = match.sub(/\{\{question_.*?\}\}/, a.to_s).
           # Match on "/>" but only when at the end of the string and insert "readonly" if set to be readonly
           sub(/\/\>\Z/, readonly_markup)
       end
@@ -326,7 +428,7 @@ module QuizzesHelper
 
     unless answer_list && !answer_list.empty?
       answers.delete_if { |k, v| !k.match /^question_#{hash_get(question, :id)}/ }
-      answers.each { |k, v| res.sub! /\{\{#{k}\}\}/, v }
+      answers.each { |k, v| res.sub! /\{\{#{k}\}\}/, h(v) }
       res.gsub! /\{\{question_[^}]+\}\}/, ""
     end
 
@@ -390,7 +492,7 @@ module QuizzesHelper
 
   def take_quiz_url
     user_id = @current_user && @current_user.id
-    polymorphic_path([@context, @quiz, :take], :user_id => user_id)
+    course_quiz_take_path(@context, @quiz, user_id: user_id)
   end
 
   def link_to_take_or_retake_poll(opts={})
@@ -463,16 +565,49 @@ module QuizzesHelper
     end
   end
 
-  def has_regraded_version?(versions)
-    versions.detect {|v| v.score_before_regrade.present? }
-  end
-
   def submission_has_regrade?(submission)
     submission && submission.score_before_regrade.present?
   end
 
   def score_affected_by_regrade?(submission)
     submission && submission.score_before_regrade != submission.kept_score
+  end
+
+  def answer_title(selected_answer, correct_answer, show_correct_answers)
+    titles = []
+    if selected_answer
+      titles << I18n.t(:selected_answer, "You selected this answer.")
+    end
+
+    if correct_answer && show_correct_answers
+      titles << I18n.t(:correct_answer, "This was the correct answer.")
+    end
+
+    title = "title=\"#{titles.join(' ')}\"" if titles.length > 0
+  end
+
+  def show_correct_answers?(quiz=@quiz, user=@current_user, submission=@submission)
+    @quiz && @quiz.try_rescue(:show_correct_answers?, @current_user, @submission)
+  end
+
+  def correct_answers_protected?(quiz=@quiz, user=@current_user, submission=@submission)
+    if !quiz
+      false
+    elsif !show_correct_answers?(quiz, user, submission)
+      true
+    elsif quiz.hide_correct_answers_at.present?
+      !quiz.grants_right?(user, nil, :grade)
+    end
+  end
+
+  def point_value_for_input(user_answer, question)
+    return user_answer[:points] unless user_answer[:correct] == 'undefined'
+
+    if ["assignment", "practice_quiz"].include?(@quiz.quiz_type)
+      "--"
+    else
+      question[:points_possible] || 0
+    end
   end
 
 end

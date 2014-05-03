@@ -76,29 +76,6 @@ describe "courses/settings.html.erb" do
     end
   end
 
-  describe "add user link" do
-    it "should not show add user link for hard concluded course" do
-      admin = account_admin_user(:account => @course.root_account)
-      @course.complete
-      view_context(@course, admin)
-      assigns[:current_user] = admin
-      render
-      response.should_not have_tag('.add_users_link')
-    end
-
-    it "should not show add user link for soft concluded course" do
-      admin = account_admin_user(:account => @course.root_account)
-      @course.conclude_at = 1.day.ago
-      @course.restrict_enrollments_to_course_dates = true
-      @course.save!
-      view_context(@course, admin)
-      assigns[:current_user] = admin
-      render
-      response.should_not have_tag('.add_users_link')
-    end
-
-  end
-
   describe "quota box" do
     context "as account admin" do
       before do

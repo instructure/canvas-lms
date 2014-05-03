@@ -2,19 +2,51 @@
   border: 1px solid #ccc;
   background: #fff;
   margin-bottom: 3px;
-  padding: 0 15px;
+  padding: 0 15px 0 0;
+  line-height: 30px;
   border-radius: 3px;
   position: relative;
+  cursor: pointer;
+  &.ui-draggable-dragging {
+    cursor: move;
+    list-style: none;
+    z-index: 9999;
+  }
+  &.group-user-highlight {
+    animation: highlight-shadow-fade ease-in 1s;
+    -webkit-animation: highlight-shadow-fade ease-in 1s;
+    -moz-animation: highlight-shadow-fade ease-in 1s;
+  }
+  .al-trigger {
+    padding: 0;
+    text-align:right;
+  }
 }
 
-.remove-from-group,
+.group-user-actions,
 .assign-to-group {
   position: absolute;
-  right: 3px;
   top: 0px;
+  right: 3px;
+  top: 1px;
+  i:before {
+    color: #aaa;
+    font-size: 0.8em;
+  }
+  .icon-mini-arrow-down{
+    text-align:left;
+  }
+}
+
+.assign-to-group {
+  position: absolute;
+  top: 0px;
+  right: 1px;
 }
 
 .group .group-users {
+  margin: 1.25em 0 -8px;
+  padding: 8px 0;
   overflow: hidden;
   .collectionViewItems {
     width: 103%;
@@ -24,7 +56,11 @@
 .group .group-user {
   float: left;
   width: 31%;
-  margin: 0 2% 10px 0;
+  margin: 0 2% 3px 0;
+  .group-category-contents-condensed & {
+    width: 23.5%;
+    margin: 0 1% 3px 0;
+  }
   box-sizing: border-box;
   .group-user-name {
     margin-right: 0;
@@ -32,9 +68,13 @@
 }
 
 .group-user-name {
+  max-width: 85%;
   overflow: hidden;
   white-space: nowrap;
   margin-right: 10px;
+  font-size: 0.9em;
+  font-weight: bold;
+  color: #777;
 }
 
 .group-users .paginatedLoadingIndicator {

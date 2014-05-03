@@ -2,7 +2,7 @@
 
 <% content_for :auto_discovery do %>
   <% if @current_user %>
-      <%= auto_discovery_link_tag(:atom, feeds_user_format_path(@current_user.feed_code, :atom), {:title => t('titles.rss.course_announcements', "Course Announcements Atom Feed")}) %>
+    <%= auto_discovery_link_tag(:atom, feeds_user_format_path(@current_user.feed_code, :atom), {:title => t('titles.rss.course_announcements', "Course Announcements Atom Feed")}) %>
   <% end %>
 <% end %>
 
@@ -25,6 +25,22 @@
   <ul class="unstyled_list context_list current_enrollments">
     <% @current_enrollments.each do |enrollment| %>
       <%= render :partial => "shared/current_enrollment", :object => enrollment %>
+    <% end %>
+  </ul>
+<% end %>
+
+<% unless @current_user.current_groups.empty? %>
+  <h2><%= t('headings.my_groups', %{My Groups}) %></h2>
+  <ul class="unstyled_list context_list current_groups">
+    <% @current_user.current_groups.each do |group| %>
+      <% group_name = group.name %>
+      <li>
+        <a href=<%= group_path(group) %>>
+        <span class="name ellipsis" title=<%= group_name %>>
+          <%= group_name %>
+        </span>
+        </a>
+      </li>
     <% end %>
   </ul>
 <% end %>

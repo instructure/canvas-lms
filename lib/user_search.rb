@@ -4,7 +4,7 @@ module UserSearch
     search_term = search_term.to_s
     base_scope = scope_for(context, searcher, options.slice(:enrollment_type, :enrollment_role, :exclude_groups))
     if search_term.to_s =~ Api::ID_REGEX
-      db_id = Shard.relative_id_for(search_term)
+      db_id = Shard.relative_id_for(search_term, Shard.current, Shard.current)
       user = base_scope.where(id: db_id).first
       if user
         return [user]
@@ -64,7 +64,7 @@ module UserSearch
     end
 
     if exclude_groups
-      users = users.where(Group.not_in_group_sql_fragment(exclude_groups, false))
+      users = users.where(Group.not_in_group_sql_fragment(exclude_groups))
     end
 
     users
@@ -88,11 +88,11 @@ module UserSearch
   end
 
   def self.gist_search_enabled?
-    Setting.get_cached('user_search_with_gist', 'true') == 'true'
+    Setting.get('user_search_with_gist', 'true') == 'true'
   end
 
   def self.complex_search_enabled?
-    Setting.get_cached('user_search_with_full_complexity', 'true') == 'true'
+    Setting.get('user_search_with_full_complexity', 'true') == 'true'
   end
 
   def self.like_condition(value)

@@ -228,18 +228,6 @@ describe CalendarEvent do
     end
   end
 
-  context "clone_for" do
-    it "should clone for another context" do
-      calendar_event_model(:start_at => "Sep 3 2008", :title => "some event")
-      course
-      @new_event = @event.clone_for(@course)
-      @new_event.context.should_not eql(@event.context)
-      @new_event.context.should eql(@course)
-      @new_event.start_at.should eql(@event.start_at)
-      @new_event.title.should eql(@event.title)
-    end
-  end
-
   context "for_user_and_context_codes" do
     before do
       course_with_student(:active_all => true)

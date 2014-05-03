@@ -240,7 +240,12 @@ Either use `<a>` with icon desired icon class added or insert `<i>` inside `<but
 <div class="row-fluid">
   <span class="span3"><i class="icon-reply-2"></i> icon-reply-2</span>
   <span class="span3"><i class="icon-reply-all-2"></i> icon-reply-all-2</span>
-   <span class="span3"><i class="icon-drag-handle"></i> icon-drag-handle</span>
+  <span class="span3"><i class="icon-drag-handle"></i> icon-drag-handle</span>
+  <span class="span3"><i class="icon-remove-from-collection"></i> icon-remove-from-collection</span>
+</div>
+<div class="row-fluid">
+  <span class="span3"><i class="icon-arrow-open-right"></i> icon-arrow-open-right</span>
+  <span class="span3"><i class="icon-arrow-open-left"></i> icon-arrow-open-left</span>
 </div>
 */
 
@@ -265,6 +270,7 @@ i[class*=icon-], i[class^=icon-], a[class*=icon-], a[class^=icon-] {
     font-family: 'canvasregular';
     display: inline-block;
     vertical-align: middle;
+    line-height: 1;
     position: relative;
     top: -1px;
     text-rendering: optimizeLegibility;
@@ -481,6 +487,9 @@ h1, h2, h3, h4, .h1, .h2, .h3, .h4, p {
 .icon-reply-2:before { content: "\e103" }
 .icon-reply-all-2:before { content: "\e104" }
 .icon-drag-handle:before { content: "\e105" }
+.icon-remove-from-collection:before { content: "\e106" }
+.icon-arrow-open-right:before { content: "\e107" }
+.icon-arrow-open-left:before { content: "\e108" }
 
 // deprecated in favor of .screenreader-only, which is meant to be usable anywhere
 span.screen-reader-text {

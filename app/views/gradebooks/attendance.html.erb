@@ -88,7 +88,7 @@
   <div style="display: none;">
     <div id="new_assignment_dialog">
       <h3><%= t('headers.new_column', "New Attendance Column") %></h3>
-      <% form_for :assignment, :url => context_url(@context, :context_assignments_url), :html => {:id => "add_assignment_form"} do |f| %>
+      <%= form_for :assignment, :url => context_url(@context, :context_assignments_url), :html => {:id => "add_assignment_form"} do |f| %>
       <%= f.hidden_field :submission_types, :value => "attendance" %>
       <table class="formtable">
         <tr>

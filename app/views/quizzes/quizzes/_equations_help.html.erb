@@ -1,0 +1,98 @@
+<div id="help_with_equations_dialog" style="display: none;">
+  <div id="equations_dialog_tabs">
+    <ul>
+      <li><a href="#intro"><%= t('links.intro', "Intro") %></a></li>
+      <li><a href="#variables"><%= t('links.variables', "Variables") %></a></li>
+      <li><a href="#functions"><%= t('links.functions', "Functions") %></a></li>
+    </ul>
+    <div id="intro">
+      <% concat(t(:equation_intro, <<-TEXT,
+Calculated questions are based on a set of one or more formulas computed 
+in order.  You can define intermediate variables in these formulas, but the
+numerical result of the last formula is what is used to generate the
+correct answer.  For example:
+
+%{example}
+
+For this set of formulas, the final answer is 71.  However,
+there are no predefined variables, so all students would have the
+same question with the same answer. See the "variables" tab for more
+information on variables.
+TEXT
+      :example => capture{ %>
+      <table>
+        <tr>
+          <td><pre>7+3*5</pre></td>
+          <td><pre style="font-weight: bold;"> = 22</pre></td>
+        </tr><tr>
+          <td><pre>value = 5*(6+7)</pre></td>
+          <td><pre style="font-weight: bold;"> = 65</pre></td>
+        </tr><tr>
+          <td><pre>value + 6</pre></td>
+          <td><pre style="font-weight: bold;"> = 71</pre></td>
+        </tr>
+      </table>
+      <% })) %>
+    </div>
+    <div id="variables">
+
+      <% concat(t(:equation_variables2, <<-TEXT,
+You can also define variables in your question text using brackets 
+("What is [a] + [b]?").  For every variable, you'll see an "Example Value"
+based on the variable settings.  This allows you to check your math and
+make sure the formulas work.
+
+For example, if your question was "What is [a] + 5?" then you'd
+be asked to define the variable "a".  If the example value for "a" 
+were 5.2, you could write:
+
+%{example}
+
+With this formula you can generate any number of solution sets, with a 
+different value of "a" in each set.  One student might see the question,
+"What is 5.2 + 5?" and another might see "What is 9 + 5?".
+TEXT
+      :example => capture{ %>
+      <table>
+        <tr>
+          <td><pre>a + 5</pre></td>
+          <td><pre style='font-weight: bold;'> = 10.2</pre></td>
+        </tr>
+      </table>
+      <% })) %>
+    </div>
+    <div id="functions">
+      <% concat(t(:equation_functions, <<-TEXT,
+In addition to variables, there are also a collection of helper functions
+you can use to generate useful values.  For example:
+
+%{example}
+
+To see an exaplanation of a given helper function, select it from the list
+below:
+TEXT
+      :example => capture{ %>
+      <table>
+        <tr>
+          <td><pre>abs(-2)</pre></td>
+          <td><pre style="font-weight: bold;"> = 2</pre></td>
+        </tr><tr>
+          <td><pre>ln(1)</pre></td>
+          <td><pre style="font-weight: bold;"> = 0</pre></td>
+        </tr><tr>
+          <td><pre>round(5.253)</pre></td>
+          <td><pre style="font-weight: bold;"> = 5</pre></td>
+        </tr>
+      </table>
+      <% })) %>
+      <p>
+        <select id="calc_helper_methods">
+        </select>
+        <div id="calc_helper_method_description">
+        </div>
+        <div id="calc_helper_method_examples" style="margin: 5px 20px;">
+        </div>
+      </p>
+    </div>
+  </div>
+</div>

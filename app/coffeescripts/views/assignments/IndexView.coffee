@@ -1,11 +1,17 @@
 define [
+  'i18n!assignments'
+  'compiled/views/KeyboardNavDialog'
+  'jst/KeyboardNavDialog'
+  'jquery'
   'underscore'
   'Backbone'
   'jst/assignments/IndexView'
   'jst/assignments/NoAssignmentsSearch'
-], (_, Backbone, template, NoAssignments) ->
+  'compiled/views/assignments/AssignmentKeyBindingsMixin'
+], (I18n, KeyboardNavDialog, keyboardNavTemplate, $, _, Backbone, template, NoAssignments, AssignmentKeyBindingsMixin) ->
 
   class IndexView extends Backbone.View
+    @mixin AssignmentKeyBindingsMixin
 
     template: template
     el: '#content'
@@ -25,6 +31,7 @@ define [
     initialize: ->
       super
       @collection.once 'reset', @enableSearch, @
+      @collection.on 'cancelSearch', @clearSearch, @
 
     afterRender: ->
       # need to hide child views and set trigger manually
@@ -37,8 +44,17 @@ define [
         @assignmentSettingsView.hide()
         @assignmentSettingsView.setTrigger @$assignmentSettingsButton
 
+      @filterKeyBindings() if @userIsStudent()
+
+      @kbDialog = new KeyboardNavDialog().render(keyboardNavTemplate({keyBindings:@keyBindings}))
+      window.onkeydown = @focusOnAssignments
+
     enableSearch: ->
       @$('#search_term').prop 'disabled', false
+
+    clearSearch: ->
+      @$('#search_term').val('')
+      @filterResults()
 
     search: _.debounce ->
       @filterResults()
@@ -79,3 +95,15 @@ define [
 
     cleanSearchTerm: (text) ->
       text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&")
+
+    focusOnAssignments: (e) =>
+      if 74 == e.keyCode
+        unless($(e.target).is("input"))
+          $(".assignment_group").filter(":visible").first().attr("tabindex",-1).focus()
+
+    userIsStudent: ->
+      _.include(ENV.current_user_roles, "student")
+
+    filterKeyBindings: =>
+      @keyBindings = @keyBindings.filter (binding) ->
+        ! _.contains([69,68,65], binding.keyCode)

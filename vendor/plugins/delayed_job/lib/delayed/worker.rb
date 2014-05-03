@@ -6,11 +6,10 @@ require 'tmpdir'
 
 class Worker
 
-  Settings = [ :max_run_time, :max_attempts ]
+  Settings = [ :max_attempts ]
   cattr_accessor :queue, *Settings
 
   self.max_attempts = 15
-  self.max_run_time = 4.hours
 
   def self.queue=(queue_name)
     raise(ArgumentError, "queue_name must not be blank") if queue_name.blank?
@@ -33,6 +32,10 @@ class Worker
     @@on_max_failures = block
   end
   cattr_reader :on_max_failures
+
+  def self.lifecycle
+    @lifecycle ||= Delayed::Lifecycle.new
+  end
 
   def initialize(options = {})
     @exit = false
@@ -86,9 +89,9 @@ class Worker
 
   def run
     # need to do this here, since we're avoiding db calls in the master process pre-fork
-    @sleep_delay ||= Setting.get_cached('delayed_jobs_sleep_delay', '5.0').to_f
-    @sleep_delay_stagger ||= Setting.get_cached('delayed_jobs_sleep_delay_stagger', '2.5').to_f
-    @make_tmpdir ||= Setting.get_cached('delayed_jobs_unique_tmpdir', 'true') == 'true'
+    @sleep_delay ||= Setting.get('delayed_jobs_sleep_delay', '5.0').to_f
+    @sleep_delay_stagger ||= Setting.get('delayed_jobs_sleep_delay_stagger', '2.5').to_f
+    @make_tmpdir ||= Setting.get('delayed_jobs_unique_tmpdir', 'true') == 'true'
 
     job = Delayed::Job.get_and_lock_next_available(
       name,
@@ -124,22 +127,24 @@ class Worker
 
   def perform(job)
     count = 1
-    set_process_name("run:#{job.id}:#{job.name}")
-    say("Processing #{log_job(job, :long)}", :info)
-    runtime = Benchmark.realtime do
-      if job.batch?
-        # each job in the batch will have perform called on it, so we don't
-        # need a timeout around this 
-        count = perform_batch(job.payload_object)
-      else
-        Timeout.timeout(self.class.max_run_time.to_f, Delayed::TimeoutError) { job.invoke_job }
+    self.class.lifecycle.run_callbacks(:perform, self, job) do
+      set_process_name("run:#{job.id}:#{job.name}")
+      say("Processing #{log_job(job, :long)}", :info)
+      runtime = Benchmark.realtime do
+        if job.batch?
+          # each job in the batch will have perform called on it, so we don't
+          # need a timeout around this 
+          count = perform_batch(job.payload_object)
+        else
+          job.invoke_job
+        end
+        Delayed::Stats.job_complete(job, self)
+        Rails.logger.quietly do
+          job.destroy
+        end
       end
-      Delayed::Stats.job_complete(job, self)
-      Rails.logger.silence do
-        job.destroy
-      end
+      say("Completed #{log_job(job)} #{"%.0fms" % (runtime * 1000)}", :info)
     end
-    say("Completed #{log_job(job)} #{"%.0fms" % (runtime * 1000)}", :info)
     count
   rescue Exception => e
     handle_failed_job(job, e)

@@ -1,18 +1,20 @@
 define [
-  'i18n!GroupView'
+  'jquery'
   'underscore'
   'Backbone'
   'jst/groups/manage/group'
   'compiled/views/groups/manage/GroupUsersView'
-  'compiled/views/groups/manage/GroupEditView'
-  'compiled/jquery.rails_flash_notifications'
-], (I18n, _, {View}, template, GroupUsersView, GroupEditView) ->
+  'compiled/views/groups/manage/GroupDetailView'
+], ($, _, {View}, template, GroupUsersView, GroupDetailView) ->
 
   class GroupView extends View
 
     tagName: 'li'
 
-    className: 'group well'
+    className: 'group'
+
+    attributes: ->
+      "data-id": @model.id
 
     template: template
 
@@ -21,54 +23,43 @@ define [
     @optionProperty 'addUnassignedMenu'
 
     @child 'groupUsersView', '[data-view=groupUsers]'
+    @child 'groupDetailView', '[data-view=groupDetail]'
 
     events:
       'click .toggle-group': 'toggleDetails'
-      'click .edit-group': 'editGroup'
-      'click .delete-group': 'deleteGroup'
       'click .add-user': 'showAddUser'
       'focus .add-user': 'showAddUser'
       'blur .add-user': 'hideAddUser'
 
-    els:
-      '.group-summary': '$summary'
+    dropOptions:
+      accept: '.group-user'
+      activeClass: 'droppable'
+      hoverClass: 'droppable-hover'
+      tolerance: 'pointer'
 
     attach: ->
       @expanded = false
       @users = @model.users()
-      @model.on 'change', @render
       @model.on 'destroy', @remove, this
-      @users.on 'add remove reset', @updateSummary
-
-    editGroup: (e) =>
-      e.preventDefault()
-      @editView ?= new GroupEditView({@model})
-      @editView.toggle();
-
-    deleteGroup: (e) =>
-      e.preventDefault()
-      return unless confirm I18n.t('delete_confirm', 'Are you sure you want to remove this group?')
-      @model.destroy
-        success: -> $.flashMessage I18n.t('flash.removed', 'Group successfully removed.')
-        failure: -> $.flashError I18n.t('flash.removeError', 'Unable to remove the group. Please try again later.')
-
-    toJSON: ->
-      json = super
-      json.summary = @summary()
-      json
-
-    summary: ->
-      if ENV.group_user_type is 'student'
-        I18n.t "student_count", "student", count: @model.usersCount()
-      else
-        I18n.t "user_count", "user", count: @model.usersCount()
-
-    updateSummary: =>
-      @$summary.text @summary()
+      @model.on 'change:members_count', @updateFullState, this
 
     afterRender: ->
       @$el.toggleClass 'group-expanded', @expanded
       @$el.toggleClass 'group-collapsed', !@expanded
+      @groupDetailView.$toggleGroup.attr 'aria-expanded', '' + @expanded
+      @updateFullState()
+
+    updateFullState: ->
+      return if @model.isLocked()
+      if @model.isFull()
+        @$el.droppable("destroy") if @$el.data('droppable')
+        @$el.addClass('slots-full')
+      else
+        # enable droppable on the child GroupView (view)
+        if !@$el.data('droppable')
+          @$el.droppable(_.extend({}, @dropOptions))
+            .on('drop', @_onDrop)
+        @$el.removeClass('slots-full')
 
     toggleDetails: (e) ->
       e.preventDefault()
@@ -87,3 +78,18 @@ define [
     hideAddUser: (e) ->
       @addUnassignedMenu.hide()
 
+    closeMenus: ->
+      @groupDetailView.closeMenu()
+      @groupUsersView.closeMenus()
+
+    ##
+    # handle drop events on a GroupView
+    # e - Event object.
+    #   e.currentTarget - group the user is dropped on
+    # ui - jQuery UI object.
+    #   ui.draggable - the user being dragged
+    _onDrop: (e, ui) =>
+      user = ui.draggable.data('model')
+      newGroupId = $(e.currentTarget).data('id')
+      setTimeout =>
+        @model.collection.category.reassignUser(user, newGroupId)

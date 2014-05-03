@@ -179,6 +179,22 @@
       display: table-cell;
       vertical-align: middle;
     }
+    &.discussion-unpublished {
+      .discussion-type, .discussion-title a {
+        color: #696969;
+      }
+    }
+    &.discussion-published {
+      .discussion-type, .discussion-title a {
+        color: #33802a;
+      }
+    }
+  }
+
+  .draggable-handle {
+    width: 16px;
+    color: #B4B7BA;
+    cursor: pointer;
   }
 
   .discussion-type {
@@ -186,16 +202,35 @@
     width: 36px;
   }
 
+  .discussion-date-available {
+    width: 200px;
+
+    .status-description {
+      font-weight: bold;
+    }
+  }
+
   .discussion-due-date {
-    width: 150px;
+    width: 200px;
+
+    .discussion-date-type {
+      font-weight: bold;
+    }
   }
 
   .discussion-status {
     color: #bbb;
-    width: 40px;
+    width: 60px;
 
-    .subscription-toggler:focus {
-      outline: none;
+    .publish-icon {
+      margin-right: 10px;
+    }
+
+    .subscription-toggler {
+      padding: 5px;
+      &:before {
+      margin: 0;
+      }
     }
 
     a[class*=icon-] {

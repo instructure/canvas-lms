@@ -52,6 +52,22 @@ define([
     inputMethods.disableInputs('[type=radio], [type=checkbox]');
     inputMethods.setWidths();
 
+    $('form.edit_quizzes_quiz').on('submit', function(e) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      $(this).find('.loading').removeClass('hidden');
+      var data = $(this).serializeArray();
+      var url = $(this).attr('action');
+      $.ajax({
+        url: url,
+        data: data,
+        type: 'POST',
+        success: function() {
+          $('.edit_quizzes_quiz').parents('.alert').hide();
+        }
+      });
+    });
+
     $(".delete_quiz_link").click(function(event) {
       event.preventDefault();
       var deleteConfirmMessage = I18n.t('confirms.delete_quiz', "Are you sure you want to delete this quiz?");
@@ -169,7 +185,7 @@ define([
     });
 
     var $el = $('#quiz-publish-link');
-    var model = new Quiz($.extend(ENV.QUIZ, {publishable: !$el.hasClass("disabled")}));
+    var model = new Quiz($.extend(ENV.QUIZ, {unpublishable: !$el.hasClass("disabled")}));
     var view = new PublishButtonView({model: model, el: $el});
 
     var refresh = function() {

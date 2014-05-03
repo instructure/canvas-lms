@@ -100,6 +100,7 @@ module Api::V1::Attachment
     @attachment.submission_attachment = true if opts[:submission_attachment]
     @attachment.file_state = 'deleted'
     @attachment.workflow_state = 'unattached'
+    @attachment.user = @current_user if opts[:set_user_id]
     @attachment.content_type = params[:content_type].presence || Attachment.mimetype(@attachment.filename)
     # Handle deprecated folder path
     params[:parent_folder_path] ||= params[:folder]
@@ -147,7 +148,12 @@ module Api::V1::Attachment
       render :json => json
     end
   end
-  
+
+  def api_attachment_preflight_json(context, request, opts={})
+    opts[:return_json] = true
+    {:attachments => [api_attachment_preflight(context, request, opts)]}
+  end
+
   def check_quota_after_attachment(request)
     exempt = request.params[:quota_exemption] == @attachment.quota_exemption_key
     if !exempt && Attachment.over_quota?(@attachment.context, @attachment.size)

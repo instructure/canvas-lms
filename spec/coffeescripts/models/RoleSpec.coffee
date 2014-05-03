@@ -18,7 +18,7 @@ define [
 
   test 'the id gets set to the role name when role is created', 1, ->
     @role.fetch success: =>
-      equal @role.get('id'), "existingRole", "Role id should equal the roles name" 
+      equal @role.id, "existingRole", "Role id should equal the roles name" 
 
     @server.respond 'GET', @role.url(), [200, {
       'Content-Type': 'application/json'

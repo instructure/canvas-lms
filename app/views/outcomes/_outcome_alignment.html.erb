@@ -4,7 +4,9 @@
     <%= image_tag "blank.png", :class => "type_icon", :alt => outcome_alignment.try_rescue(:content_type).try_rescue(:titleize), :title => outcome_alignment.try_rescue(:content_type).try_rescue(:titleize) %>
     <% url = context_url(@context, :context_outcome_alignment_redirect_url, @outcome.id, outcome_alignment ? outcome_alignment.id : "{{ id }}") rescue nil %>
     <% url = "#{context_prefix(outcome_alignment.context_code)}/outcomes/#{@outcome.id}/alignments/#{outcome_alignment.id}" if outcome_alignment %>
-    <a href="<%= url %>" class="title">
+    <% class_name = "title" %>
+    <% class_name = "#{class_name} icon-#{outcome_alignment.content_type.to_s.downcase}" if outcome_alignment %>
+    <a href="<%= url %>" class="<%= class_name %>">
       <%= outcome_alignment.try_rescue(:title) || nbsp %>
     </a>
   </div>

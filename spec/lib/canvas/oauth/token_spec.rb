@@ -37,7 +37,7 @@ module Canvas::Oauth
       end
 
       it 'is false when the client id does not match the key id' do
-        stub_out_cache 21
+        stub_out_cache (key.id + 1)
         token.is_for_valid_code?.should be_false
       end
 

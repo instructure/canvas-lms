@@ -1,5 +1,5 @@
 class AddForeignKeys6 < ActiveRecord::Migration
-  self.transactional = false
+  disable_ddl_transaction!
   tag :postdeploy
 
   def self.up

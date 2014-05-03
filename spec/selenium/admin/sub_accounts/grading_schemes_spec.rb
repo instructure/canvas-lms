@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../common')
 require File.expand_path(File.dirname(__FILE__) + '/../../helpers/grading_schemes_common')
 
 describe "sub account grading schemes" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   let(:account) { Account.create(:name => 'sub account from default account', :parent_account => Account.default) }
   let(:url) { "/accounts/#{account.id}/grading_standards" }

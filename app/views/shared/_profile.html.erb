@@ -5,16 +5,16 @@
   js_env PROFILE: @user_data
   js_env(folder_id: @user.profile_pics_folder.id) if @user == @current_user
 %>
-<% form_tag update_profile_profile_path, { :method => :put, :id => :edit_profile_form, :class => "bootstrap-form form-vertical" } do %>
+<%= form_tag update_profile_profile_path, { :method => :put, :id => :edit_profile_form, :class => "bootstrap-form form-vertical" } do %>
   <div class="image-block">
     <div class="image-block-image profile-avatar-wrapper">
       <% if @user_data[:can_edit] %>
-        <a href="#" class="profile-link">
-          <%= avatar_image @user_data[:id], 128 %>
+        <a href="#" class="profile-link" title="<%= t('titles.click_to_change_profile_pic', "Click to change profile pic") %>">
+          <%= square_avatar_image @user_data[:id], 128 %>
           <i class="icon-edit"></i>
         </a>
       <% else %>
-        <%= avatar_image @user_data[:id], 128 %>
+        <%= square_avatar_image @user_data[:id], 128 %>
       <% end %>
     </div>
     <div class="image-block-content row-fluid">
@@ -66,7 +66,7 @@
           <% if current_user_is_account_admin %>
             <li><a href="<%= message_user_path(@user) %>" class="social message" title="<%= t :message_title, 'Message' %>" data-tooltip><%= t :message_user_canvas, 'Message %{user} in Canvas', :user => @user_data[:short_name] %></a></li>
           <% end %>
-          <% if @user_data[:user_services].present? %>
+          <% if @user_data[:user_services].present? && @user.show_user_services %>
             <% @user_data[:user_services].select{|s| s[:visible] }.each do |s| %>
               <% service_name = s[:service_name] || s[:service].to_s.titleize %>
               <li><a href="<%= s[:service_user_link] %>" class="social <%= s[:service] %>" title="<%= service_name %>" data-tooltip><%= t :service_contact, 'contact %{user} with %{service}', :user => @user_data[:short_name], :service => service_name %></a></li>
@@ -122,6 +122,7 @@
       </div>
 
       <% if @user_data[:can_edit] %>
+        <input type="hidden" name="delete_links" value="1">
         <div class="show-if-editing">
           <table id="edit_links_table">
             <thead>

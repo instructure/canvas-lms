@@ -22,7 +22,7 @@ module SIS
     def process
       start = Time.now
       importer = Work.new(@batch_id, @root_account, @logger)
-      Course.skip_callback(:update_enrollments_later) do
+      Course.suspend_callbacks(:update_enrollments_later) do
         Course.process_as_sis(@sis_options) do
           CourseSection.process_as_sis(@sis_options) do
             Course.skip_updating_account_associations do

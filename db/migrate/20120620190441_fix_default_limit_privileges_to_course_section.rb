@@ -1,6 +1,6 @@
 class FixDefaultLimitPrivilegesToCourseSection < ActiveRecord::Migration
   tag :predeploy, :postdeploy
-  self.transactional = false
+  disable_ddl_transaction!
 
   def self.up
     Enrollment.find_ids_in_ranges do |(start_id, end_id)|

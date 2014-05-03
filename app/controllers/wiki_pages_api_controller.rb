@@ -21,93 +21,119 @@
 # Pages are rich content associated with Courses and Groups in Canvas.
 # The Pages API allows you to create, retrieve, update, and delete pages.
 #
-# @object Page
+# @model Page
 #     {
-#       // the unique locator for the page
-#       "url": "my-page-title",
-#
-#       // the title of the page
-#       "title": "My Page Title",
-#
-#       // the creation date for the page
-#       "created_at": "2012-08-06T16:46:33-06:00",
-#
-#       // the date the page was last updated
-#       "updated_at": "2012-08-08T14:25:20-06:00",
-#
-#       // whether this page is hidden from students
-#       // (note: students will never see this true; pages hidden from them will be omitted from results)
-#       "hide_from_students": false,
-#
-#       // roles allowed to edit the page; comma-separated list comprising a combination of
-#       // 'teachers', 'students', 'members', and/or 'public'
-#       // if not supplied, course defaults are used
-#       "editing_roles": "teachers,students",
-#
-#       // the User who last edited the page
-#       // (this may not be present if the page was imported from another system)
-#       "last_edited_by": { 
-#         "id": 133,
-#         "display_name": "Rey del Pueblo",
-#         "avatar_image_url": "https://canvas.example.com/images/thumbnails/bm90aGluZyBoZXJl",
-#         "html_url": "https://canvas.example.com/courses/789/users/133"
-#       },
-#
-#       // the page content, in HTML
-#       // (present when requesting a single page; omitted when listing pages)
-#       "body": "<p>Page Content</p>",
-#
-#       // whether the page is published (true) or draft state (false).
-#       "published": true,
-#
-#       // whether this page is the front page for the wiki
-#       "front_page": false,
-#
-#       // Whether or not this is locked for the user.
-#       "locked_for_user": false,
-#
-#       // (Optional) Information for the user about the lock. Present when locked_for_user is true.
-#       "lock_info": {
-#         // Asset string for the object causing the lock
-#         "asset_string": "wiki_page_1",
-#
-#         // (Optional) Context module causing the lock.
-#         "context_module": {}
-#       },
-#
-#       // (Optional) An explanation of why this is locked for the user. Present when locked_for_user is true.
-#       "lock_explanation": "This page is locked until September 1 at 12:00am"
+#       "id": "Page",
+#       "description": "",
+#       "properties": {
+#         "url": {
+#           "description": "the unique locator for the page",
+#           "example": "my-page-title",
+#           "type": "string"
+#         },
+#         "title": {
+#           "description": "the title of the page",
+#           "example": "My Page Title",
+#           "type": "string"
+#         },
+#         "created_at": {
+#           "description": "the creation date for the page",
+#           "example": "2012-08-06T16:46:33-06:00",
+#           "type": "datetime"
+#         },
+#         "updated_at": {
+#           "description": "the date the page was last updated",
+#           "example": "2012-08-08T14:25:20-06:00",
+#           "type": "datetime"
+#         },
+#         "hide_from_students": {
+#           "description": "whether this page is hidden from students (note: students will never see this true; pages hidden from them will be omitted from results)",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "editing_roles": {
+#           "description": "roles allowed to edit the page; comma-separated list comprising a combination of 'teachers', 'students', 'members', and/or 'public' if not supplied, course defaults are used",
+#           "example": "teachers,students",
+#           "type": "string"
+#         },
+#         "last_edited_by": {
+#           "description": "the User who last edited the page (this may not be present if the page was imported from another system)",
+#           "$ref": "User"
+#         },
+#         "body": {
+#           "description": "the page content, in HTML (present when requesting a single page; omitted when listing pages)",
+#           "example": "<p>Page Content</p>",
+#           "type": "string"
+#         },
+#         "published": {
+#           "description": "whether the page is published (true) or draft state (false).",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "front_page": {
+#           "description": "whether this page is the front page for the wiki",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "locked_for_user": {
+#           "description": "Whether or not this is locked for the user.",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "lock_info": {
+#           "description": "(Optional) Information for the user about the lock. Present when locked_for_user is true.",
+#           "$ref": "LockInfo"
+#         },
+#         "lock_explanation": {
+#           "description": "(Optional) An explanation of why this is locked for the user. Present when locked_for_user is true.",
+#           "example": "This page is locked until September 1 at 12:00am",
+#           "type": "string"
+#         }
+#       }
 #     }
 #
-# @object PageRevision
+# @model PageRevision
 #     {
-#       // an identifier for this revision of the page
-#       "revision_id": 7,
-#
-#       // the time when this revision was saved
-#       "updated_at": "2012-08-07T11:23:58-06:00",
-#
-#       // the User who saved this revision, if applicable
-#       // (this may not be present if the page was imported from another system)
-#       "edited_by": {
-#         "id": 1123,
-#         "display_name": "Leonardo Fibonacci",
-#         "avatar_image_url": "https://canvas.example.com/images/thumbnails/bWVhbmluZ2xlc3M=",
-#         "html_url": "https://canvas.example.com/courses/789/users/1123"
-#       },
-#
-#       // the following fields are not included in the index action
-#       // and may be omitted from the show action via summary=1
-#
-#       // the historic url of the page
-#       "url": "old-page-title",
-#
-#       // the historic page title
-#       "title": "Old Page Title",
-#
-#       // the historic page contents
-#       "body": "<p>Old Page Content</p>"
+#       "id": "PageRevision",
+#       "description": "",
+#       "properties": {
+#         "revision_id": {
+#           "description": "an identifier for this revision of the page",
+#           "example": 7,
+#           "type": "integer"
+#         },
+#         "updated_at": {
+#           "description": "the time when this revision was saved",
+#           "example": "2012-08-07T11:23:58-06:00",
+#           "type": "datetime"
+#         },
+#         "latest": {
+#           "description": "whether this is the latest revision or not",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "edited_by": {
+#           "description": "the User who saved this revision, if applicable (this may not be present if the page was imported from another system)",
+#           "$ref": "User"
+#         },
+#         "url": {
+#           "description": "the following fields are not included in the index action and may be omitted from the show action via summary=1 the historic url of the page",
+#           "example": "old-page-title",
+#           "type": "string"
+#         },
+#         "title": {
+#           "description": "the historic page title",
+#           "example": "Old Page Title",
+#           "type": "string"
+#         },
+#         "body": {
+#           "description": "the historic page contents",
+#           "example": "<p>Old Page Content</p>",
+#           "type": "string"
+#         }
+#       }
 #     }
+#
 class WikiPagesApiController < ApplicationController
   before_filter :require_context
   before_filter :get_wiki_page, :except => [:create, :index]
@@ -163,7 +189,8 @@ class WikiPagesApiController < ApplicationController
   #   Whether the page is published (true) or draft state (false).
   #
   #   *Note:* when draft state is disabled, attempts to set +published+
-  #   will be ignored and the value returned will always be true.
+  #   will be ignored and the value returned will always be the inverse of the
+  #   +hide_from_students+ value.
   #
   # @example_request
   #     curl -X PUT -H 'Authorization: Bearer <token>' \
@@ -187,6 +214,11 @@ class WikiPagesApiController < ApplicationController
   # @argument search_term [Optional, String]
   #   The partial title of the pages to match and return.
   #
+  # @argument published [Optional, Boolean]
+  #   If true, include only published paqes. If false, exclude published
+  #   pages. If not present, do not filter on published status.
+  #
+  #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \ 
   #          https://<canvas>/api/v1/courses/123/pages?sort=title&order=asc
@@ -197,8 +229,13 @@ class WikiPagesApiController < ApplicationController
       pages_route = polymorphic_url([:api_v1, @context, :wiki_pages])
       # omit body from selection, since it's not included in index results
       scope = @context.wiki.wiki_pages.select(WikiPage.column_names - ['body']).includes(:user)
-      scope = @context.grants_right?(@current_user, session, :view_unpublished_items) ? scope.not_deleted : scope.active
-      scope = scope.not_hidden unless @context.grants_right?(@current_user, session, :view_hidden_items)
+      if params.has_key?(:published)
+        scope = value_to_boolean(params[:published]) ? scope.published : scope.unpublished
+      else
+        scope = scope.not_deleted
+      end
+      # published parameter notwithstanding, hide unpublished items if the user doesn't have permission to see them
+      scope = scope.published unless @context.grants_right?(@current_user, session, :view_unpublished_items)
 
       scope = WikiPage.search_by_attribute(scope, :title, params[:search_term])
 
@@ -253,7 +290,8 @@ class WikiPagesApiController < ApplicationController
   #   Whether the page is published (true) or draft state (false).
   #
   #   *Note:* when draft state is disabled, attempts to set +published+
-  #   will be ignored and the value returned will always be true.
+  #   will be ignored and the value returned will always be the inverse of the
+  #   +hide_from_students+ value.
   #
   # @argument wiki_page[front_page] [Optional, Boolean]
   #   Set an unhidden page as the front page (if true)
@@ -331,7 +369,8 @@ class WikiPagesApiController < ApplicationController
   #   Whether the page is published (true) or draft state (false).
   #
   #   *Note:* when draft state is disabled, attempts to set +published+
-  #   will be ignored and the value returned will always be true.
+  #   will be ignored and the value returned will always be the inverse of the
+  #   +hide_from_students+ value.
   #
   # @argument wiki_page[front_page] [Optional, Boolean]
   #   Set an unhidden page as the front page (if true)
@@ -398,7 +437,7 @@ class WikiPagesApiController < ApplicationController
       route = polymorphic_url([:api_v1, @context, @page, :revisions])
       scope = @page.versions
       revisions = Api.paginate(scope, self, route)
-      render :json => wiki_page_revisions_json(revisions, @current_user, session)
+      render :json => wiki_page_revisions_json(revisions, @current_user, session, @page.current_version)
     end
   end
 
@@ -433,7 +472,7 @@ class WikiPagesApiController < ApplicationController
                         else
                           true
                         end
-      render :json => wiki_page_revision_json(revision, @current_user, session, include_content)
+      render :json => wiki_page_revision_json(revision, @current_user, session, include_content, @page.current_version)
     end
   end
 
@@ -460,7 +499,7 @@ class WikiPagesApiController < ApplicationController
       @page.url = @revision.url
       @page.user_id = @current_user.id if @current_user
       if @page.save
-        render :json => wiki_page_revision_json(@page.versions.current, @current_user, session, true)
+        render :json => wiki_page_revision_json(@page.versions.current, @current_user, session, true, @page.current_version)
       else
         render :json => @page.errors, :status => :bad_request
       end
@@ -517,14 +556,18 @@ class WikiPagesApiController < ApplicationController
   def get_update_params(allowed_fields=Set[])
     # normalize parameters
     page_params = params[:wiki_page] || {}
-    if @context.draft_state_enabled?
+    if @context.feature_enabled?(:draft_state)
       page_params.slice!(*%w(title body notify_of_update published front_page editing_roles))
     else
       page_params.slice!(*%w(title body hide_from_students notify_of_update front_page editing_roles))
+      workflow_state = 'active' if @page.new_record?
     end
 
+    hide_from_students_provided = page_params.has_key?(:hide_from_students)
     if page_params.has_key?(:published)
       workflow_state = value_to_boolean(page_params.delete(:published)) ? 'active' : 'unpublished'
+    elsif hide_from_students_provided
+      workflow_state = value_to_boolean(page_params.delete(:hide_from_students)) ? 'unpublished' : 'active'
     end
 
     if page_params.has_key?(:editing_roles)
@@ -539,17 +582,23 @@ class WikiPagesApiController < ApplicationController
     end
 
     if page_params.has_key?(:front_page)
-      @set_front_page = true
       @set_as_front_page = value_to_boolean(page_params.delete(:front_page))
+      @set_front_page = true if @was_front_page != @set_as_front_page
     end
-    change_front_page = @set_front_page && @was_front_page != @set_as_front_page
+    change_front_page = !!@set_front_page
 
     # check user permissions
     rejected_fields = Set[]
     if @wiki.grants_right?(@current_user, session, :manage)
       allowed_fields.clear
     else
-      rejected_fields << :published if workflow_state && workflow_state != @page.workflow_state
+      if workflow_state && workflow_state != @page.workflow_state
+        if hide_from_students_provided
+          rejected_fields << :hide_from_students
+        else
+          rejected_fields << :published
+        end
+      end
 
       if editing_roles
         existing_editing_roles = (@page.editing_roles || '').split(',')
@@ -557,8 +606,6 @@ class WikiPagesApiController < ApplicationController
         editing_roles_changed |= editing_roles.reject{|role| existing_editing_roles.include?(role)}.length > 0
         rejected_fields << :editing_roles if editing_roles_changed
       end
-
-      rejected_fields << :hide_from_students if page_params.include?(:hide_from_students) && value_to_boolean(page_params[:hide_from_students]) != @page.hide_from_students
 
       unless @page.grants_right?(@current_user, session, :update)
         allowed_fields << :body
@@ -582,18 +629,6 @@ class WikiPagesApiController < ApplicationController
 
     # check for a valid front page
     valid_front_page = true
-
-    if change_front_page || page_params.include?(:hide_from_students)
-      new_front_page = change_front_page ? @set_as_front_page : @page.is_front_page?
-      new_hide_from_students = page_params.include?(:hide_from_students) ? value_to_boolean(page_params[:hide_from_students]) : @page.hide_from_students
-      if new_front_page && new_hide_from_students
-        valid_front_page = false
-        error_message = t(:cannot_hide_front_page, 'The front page cannot be hidden from students')
-        @page.errors.add(:front_page, error_message) if change_front_page
-        @page.errors.add(:hide_from_students, error_message) if page_params.include?(:hide_from_students)
-      end
-    end
-
     if change_front_page || workflow_state
       new_front_page = change_front_page ? @set_as_front_page : @page.is_front_page?
       new_workflow_state = workflow_state ? workflow_state : @page.workflow_state
@@ -602,7 +637,11 @@ class WikiPagesApiController < ApplicationController
         valid_front_page = false
         error_message = t(:cannot_have_unpublished_front_page, 'The front page cannot be unpublished')
         @page.errors.add(:front_page, error_message) if change_front_page
-        @page.errors.add(:published, error_message) if workflow_state
+        if hide_from_students_provided
+          @page.errors.add(:hide_from_students, t(:cannot_have_hidden_front_page, 'The front page cannot be hidden'))
+        elsif workflow_state
+          @page.errors.add(:published, error_message)
+        end
       end
     end
 
@@ -616,6 +655,7 @@ class WikiPagesApiController < ApplicationController
     @page.workflow_state = workflow_state if workflow_state
 
     page_params[:user_id] = @current_user.id if @current_user
+    page_params[:body] = process_incoming_html_content(page_params[:body]) if page_params.include?(:body)
     page_params
   end
 
@@ -634,6 +674,11 @@ class WikiPagesApiController < ApplicationController
         return @page.set_as_front_page!
       end
     end
+
+    if !@context.feature_enabled?(:draft_state)
+      @page.set_as_front_page! if !@wiki.has_front_page? && @page.is_front_page? && !@page.deleted?
+    end
+
     return true
   end
 end

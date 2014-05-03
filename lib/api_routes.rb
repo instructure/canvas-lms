@@ -20,7 +20,11 @@ require 'lib/api_route_set'
 require 'bundler'
 Bundler.setup
 require 'action_controller'
-require 'fake_rails3_routes'
+if CANVAS_RAILS2
+  require 'fake_rails3_routes'
+else
+  CanvasRails::Application.routes.disable_clear_and_finalize = true
+end
 
 # load routing files, including those in plugins
 require 'config/routes'

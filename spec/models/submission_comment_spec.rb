@@ -85,10 +85,6 @@ describe SubmissionComment do
     @comment.messages_sent.should be_include('Submission Comment For Teacher')
   end
   
-  it "should respond to attachments" do
-    SubmissionComment.new.should be_respond_to(:attachments)
-  end
-  
   it "should allow valid attachments" do
     a = Attachment.create!(:context => @assignment, :uploaded_data => default_uploaded_data)
     @comment = SubmissionComment.create!(@valid_attributes)
@@ -239,6 +235,20 @@ This text has a http://www.google.com link in it...
         sconvo = @student1.conversations.first
         sconvo.should be_unread
         tconvo.reload.should be_read
+      end
+
+      it "should not create conversations for teachers in new conversations" do
+        @teacher1.preferences[:use_new_conversations] = true
+        @teacher1.save!
+        @submission1.add_comment(author: @student1, comment: 'test')
+        @teacher1.reload.unread_conversations_count.should == 0
+      end
+
+      it "should not create conversations for students in new conversations" do
+        @student1.preferences[:use_new_conversations] = true
+        @student1.save!
+        @submission1.add_comment(author: @teacher1, comment: 'test')
+        @student1.reload.unread_conversations_count.should == 0
       end
 
       context "teacher makes first submission comment" do
@@ -664,7 +674,7 @@ This text has a http://www.google.com link in it...
       @submission.unread?(@student).should be_true
     end
 
-    it "should be unread after submission is commented on by self" do
+    it "should be read after submission is commented on by self" do
       expect {
         @comment = SubmissionComment.create!(@valid_attributes.merge({:author => @student}))
       }.to change(ContentParticipation, :count).by(0)

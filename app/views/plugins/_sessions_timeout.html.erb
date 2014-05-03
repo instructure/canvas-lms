@@ -1,4 +1,4 @@
-<% fields_for :settings, OpenObject.new(settings) do |f| %>
+<%= fields_for :settings, OpenObject.new(settings) do |f| %>
   <table style="width: 500px;" class="formtable">
     <tr>
       <td><%= f.blabel :session_timeout, :en => "Time before session expires in minutes (20 minimum)" %></td>

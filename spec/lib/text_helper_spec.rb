@@ -140,46 +140,6 @@ describe TextHelper do
     end
   end
 
-  context "format_message" do
-    it "should detect and linkify URLs" do
-      str = th.format_message("click here: (http://www.instructure.com) to check things out\nnewline").first
-      html = Nokogiri::HTML::DocumentFragment.parse(str)
-      link = html.css('a').first
-      link['href'].should == "http://www.instructure.com"
-
-      str = th.format_message("click here: http://www.instructure.com\nnewline").first
-      html = Nokogiri::HTML::DocumentFragment.parse(str)
-      link = html.css('a').first
-      link['href'].should == "http://www.instructure.com"
-
-      str = th.format_message("click here: www.instructure.com/a/b?a=1&b=2\nnewline").first
-      html = Nokogiri::HTML::DocumentFragment.parse(str)
-      link = html.css('a').first
-      link['href'].should == "http://www.instructure.com/a/b?a=1&b=2"
-
-      str = th.format_message("click here: http://www.instructure.com/\nnewline").first
-      html = Nokogiri::HTML::DocumentFragment.parse(str)
-      link = html.css('a').first
-      link['href'].should == "http://www.instructure.com/"
-
-      str = th.format_message("click here: http://www.instructure.com/courses/1/wiki/informação").first
-      html = Nokogiri::HTML::DocumentFragment.parse(str)
-      link = html.css('a').first
-      link['href'].should == "http://www.instructure.com/courses/1/wiki/informa%C3%A7%C3%A3o"
-
-      str = th.format_message("click here: http://www.instructure.com/'onclick=alert(document.cookie)//\nnewline").first
-      html = Nokogiri::HTML::DocumentFragment.parse(str)
-      link = html.css('a').first
-      # we don't match parens in a url, so the link ends on the opening paren
-      link['href'].should == "http://www.instructure.com/%27onclick=alert"
-    end
-
-    it "should handle having the placeholder in the text body" do
-      str = th.format_message("this text has the placeholder #{TextHelper::AUTO_LINKIFY_PLACEHOLDER} embedded right in it.\nhttp://www.instructure.com/\n").first
-      str.should == "this text has the placeholder #{TextHelper::AUTO_LINKIFY_PLACEHOLDER} embedded right in it.<br/>\r\n<a href='http://www.instructure.com/'>http://www.instructure.com/</a><br/>\r"
-    end
-  end
-
   context "truncate_text" do
     it "should not split if max_length is exact text length" do
       str = "I am an exact length"
@@ -229,109 +189,6 @@ describe TextHelper do
     TextHelper.make_subject_reply_to('Re: ohai').should == 'Re: ohai'
   end
 
-  context ".html_to_text" do
-    it "should format links in markdown-like style" do
-      th.html_to_text("<a href='www.example.com'>Link</a>").should == "[Link](www.example.com)"
-      th.html_to_text("<a href='www.example.com'>www.example.com</a>").should == "www.example.com"
-    end
-
-    it "should turn images into urls" do
-      th.html_to_text("<img src='http://www.example.com/a'>").should == "http://www.example.com/a"
-    end
-
-    it "should insert newlines for ps and brs" do
-      th.html_to_text("Ohai<br>Text <p>paragraph of text.</p>End").should == "Ohai\n\nText paragraph of text.\n\nEnd"
-    end
-
-    it "should return a string with no html back unchanged" do
-      th.html_to_text('String without HTML').should == 'String without HTML'
-    end
-
-    it "should return an empty string if passed a nil value" do
-      th.html_to_text(nil).should == ''
-    end
-  end
-
-  describe "simplify html" do
-    before(:each) do
-      @body = <<-END.strip_heredoc.strip
-        <p><strong>This is a bold tag</strong></p>
-        <p><em>This is an em tag</em></p>
-        <p><h1>This is an h1 tag</h1></p>
-        <p><h2>This is an h2 tag</h2></p>
-        <p><h3>This is an h3 tag</h3></p>
-        <p><h4>This is an h4 tag</h4></p>
-        <p><h5>This is an h5 tag</h5></p>
-        <p><h6>This is an h6 tag</h6></p>
-        <p><a href="http://foo.com">Link to Foo</a></p>
-        <p><img src="http://google.com/someimage.png" width="50" height="50" alt="Some Image" title="Some Image" /></p>
-      END
-    end
-
-    it "should convert simple tags to plain text" do
-      text = th.html_to_simple_text(@body)
-      text.should == <<-END.strip_heredoc.strip
-        This is a bold tag
-
-        This is an em tag
-
-        *****************
-        This is an h1 tag
-        *****************
-
-        -----------------
-        This is an h2 tag
-        -----------------
-
-        This is an h3 tag
-        -----------------
-
-        This is an h4 tag
-        -----------------
-
-        This is an h5 tag
-        -----------------
-
-        This is an h6 tag
-        -----------------
-
-        Link to Foo ( http://foo.com )
-
-        Some Image
-      END
-    end
-
-    it "should convert simple tags to minimal html" do
-      html = th.html_to_simple_html(@body).gsub("\r\n", "\n") # gsub only for test matching
-      html.should == <<-END.strip_heredoc.strip
-        <p>This is a bold tag<br/>
-        <br/>
-        This is an em tag<br/>
-        <br/>
-        This is an h1 tag<br/>
-        <br/>
-        This is an h2 tag<br/>
-        <br/>
-        This is an h3 tag<br/>
-        <br/>
-        This is an h4 tag<br/>
-        <br/>
-        This is an h5 tag<br/>
-        <br/>
-        This is an h6 tag<br/>
-        <br/>
-        Link to Foo ( <a href='http://foo.com'>http://foo.com</a> )<br/>
-        <br/>
-        Some Image</p>
-      END
-    end
-
-    it "should convert relative links to absolute links" do
-      html = th.html_to_simple_html("<a href=\"/this/is/a/relative/link\">Relative Link</a>", :base_url => "http://example.com")
-      html.should == "<p>Relative Link ( <a href='http://example.com/this/is/a/relative/link'>http://example.com/this/is/a/relative/link</a> )</p>"
-    end
-  end
-
   context "markdown" do
     context "safety" do
       it "should escape Strings correctly" do
@@ -344,7 +201,7 @@ describe TextHelper do
     context "i18n" do
       it "should automatically escape Strings" do
         th.mt(:foo, "We **don't** trust the following input: %{input}", :input => "`a` **b** _c_ ![d](e)\n# f\n + g\n - h").
-          should == "We <strong>don&#39;t</strong> trust the following input: `a` **b** _c_ ![d](e) # f + g - h"
+          should == "We <strong>don&#x27;t</strong> trust the following input: `a` **b** _c_ ![d](e) # f + g - h"
       end
 
       it "should not escape MarkdownSafeBuffers" do

@@ -32,7 +32,7 @@ class AssignmentOverrideMigration < ActiveRecord::Migration
       add_index :assignment_overrides, [:assignment_id, :set_type, :set_id],
         :name => 'index_assignment_overrides_on_assignment_and_set',
         :unique => true,
-        :conditions => "workflow_state='active' and set_id is not null"
+        :where => "workflow_state='active' and set_id is not null"
     else
       # can't enforce unique without conditions, since when set_type is 'adhoc'
       # and set_id null, there may be multiple overrides

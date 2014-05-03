@@ -18,7 +18,7 @@ module Delayed
       # Contains the work object as a YAML field.
       class Job < ::ActiveRecord::Base
         include Delayed::Backend::Base
-        set_table_name :delayed_jobs
+        self.table_name = :delayed_jobs
 
         def self.reconnect!
           connection.reconnect!
@@ -95,10 +95,6 @@ module Delayed
         # When a worker is exiting, make sure we don't have any locked jobs.
         def self.clear_locks!(worker_name)
           where(:locked_by => worker_name).update_all(:locked_by => nil, :locked_at => nil)
-        end
-
-        def self.unlock_expired_jobs(max_run_time = Delayed::Worker.max_run_time)
-          where("locked_by<>'on hold' AND locked_at<?", db_time_now - max_run_time).update_all(:locked_by => nil, :locked_at => nil)
         end
 
         def self.strand_size(strand)
@@ -197,7 +193,7 @@ module Delayed
             end
 
           scope = scope.group(:tag).offset(offset).limit(limit)
-          (Rails.version < "3.0" ?
+          (CANVAS_RAILS2 ?
               scope.count(:tag, :order => "COUNT(tag) DESC") :
               scope.order("COUNT(tag) DESC").count).map { |t,c| { :tag => t, :count => c } }
         end
@@ -210,9 +206,9 @@ module Delayed
           check_queue(queue)
           check_priorities(min_priority, max_priority)
 
-          self.batch_size ||= Setting.get_cached('jobs_get_next_batch_size', '5').to_i
+          self.batch_size ||= Setting.get('jobs_get_next_batch_size', '5').to_i
           if self.select_random.nil?
-            self.select_random = Setting.get_cached('jobs_select_random', 'false') == 'true'
+            self.select_random = Setting.get('jobs_select_random', 'false') == 'true'
           end
           loop do
             jobs = find_available(@batch_size, queue, min_priority, max_priority)
@@ -258,12 +254,23 @@ module Delayed
               yield
             end
           when 'MySQL', 'Mysql2'
-            self.transaction do
+            if Rails.env.test? && connection.open_transactions > 0
+              raise "cannot get table lock inside of transaction" if connection.open_transactions > 1
+              # can't actually lock, but it's okay cause tests aren't multi-process
+              yield
+            else
+              raise "cannot get table lock inside of transaction" if connection.open_transactions > 0
               begin
+                # see http://dev.mysql.com/doc/refman/5.0/en/lock-tables-and-transactions.html
+                connection.execute("SET autocommit=0")
                 connection.execute("LOCK TABLES #{table_name} WRITE")
+                connection.increment_open_transactions
                 yield
+                connection.execute("COMMIT")
               ensure
+                connection.decrement_open_transactions
                 connection.execute("UNLOCK TABLES")
+                connection.execute("SET autocommit=1")
               end
             end
           when 'SQLite'
@@ -345,7 +352,7 @@ module Delayed
 
         class Failed < Job
           include Delayed::Backend::Base
-          set_table_name :failed_jobs
+          self.table_name = :failed_jobs
         end
       end
 

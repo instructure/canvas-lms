@@ -28,6 +28,10 @@ module Api::V1::Course
     settings
   end
 
+  def courses_json(courses, user, session, includes, enrollments)
+    courses.map{ |course| course_json(course, user, session, includes, enrollments) }
+  end
+
   # Public: Returns a course hash to serialize for a json api request.
   #
   # course - The course information to return as the hash.
@@ -59,6 +63,7 @@ module Api::V1::Course
     Api::V1::CourseJson.to_hash(course, user, includes, enrollments) do |builder, allowed_attributes, methods, permissions_to_include|
       hash = api_json(course, user, session, { :only => allowed_attributes, :methods => methods }, permissions_to_include)
       hash['term'] = enrollment_term_json(course.enrollment_term, user, session, {}) if includes.include?('term')
+      hash['course_progress'] = CourseProgress.new(course, user).to_json if includes.include?('course_progress')
       hash['apply_assignment_group_weights'] = course.apply_group_weights?
       add_helper_dependant_entries(hash, course, builder)
     end

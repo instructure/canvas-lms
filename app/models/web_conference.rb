@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -38,6 +38,8 @@ class WebConference < ActiveRecord::Base
   has_a_broadcast_policy
   
   scope :for_context_codes, lambda { |context_codes| where(:context_code => context_codes) }
+
+  scope :with_config, lambda { where(conference_type: WebConference.conference_types.map{|ct| ct['conference_type']}) }
 
   serialize :settings
   def settings
@@ -107,8 +109,17 @@ class WebConference < ActiveRecord::Base
     user_setting_fields[name] = options
   end
 
-  def self.user_setting_fields
-    read_inheritable_attribute(:user_setting_fields) || write_inheritable_attribute(:user_setting_fields, {})
+  if CANVAS_RAILS2
+    def self.user_setting_fields
+      read_inheritable_attribute(:user_setting_fields) || write_inheritable_attribute(:user_setting_fields, {})
+    end
+  else
+    def self.user_setting_fields
+      @user_setting_fields ||= {}
+    end
+    def self.user_setting_fields=(val)
+      @user_setting_fields = val
+    end
   end
 
   def self.user_setting_field_name(key)
@@ -133,8 +144,17 @@ class WebConference < ActiveRecord::Base
     send("#{key}_external_url", user, url_id) || []
   end
 
-  def self.external_urls
-    read_inheritable_attribute(:external_urls) || write_inheritable_attribute(:external_urls, {})
+  if CANVAS_RAILS2
+    def self.external_urls
+      read_inheritable_attribute(:external_urls) || write_inheritable_attribute(:external_urls, {})
+    end
+  else
+    def self.external_urls
+      @external_urls ||= {}
+    end
+    def self.external_urls=(val)
+      @external_urls = val
+    end
   end
 
   def self.external_url(name, options)
@@ -142,7 +162,7 @@ class WebConference < ActiveRecord::Base
   end
 
   def assign_uuid
-    self.uuid ||= AutoHandle.generate_securish_uuid
+    self.uuid ||= CanvasUuid::Uuid.generate_securish_uuid
   end
   protected :assign_uuid
   
@@ -262,6 +282,16 @@ class WebConference < ActiveRecord::Base
     self.ended_at = nil
     self.save
   end
+
+  # Default implementation since most implementations don't support scheduling yet
+  def scheduled?
+    self.started_at.nil? && scheduled_date && scheduled_date > Time.now
+  end
+
+  # Default implementation since most implementations don't support scheduling yet
+  def scheduled_date
+    nil
+  end
   
   def active?(force_check=false)
     if !force_check
@@ -322,11 +352,10 @@ class WebConference < ActiveRecord::Base
     []
   end
 
-
   def craft_url(user=nil,session=nil,return_to="http://www.instructure.com")
     user ||= self.user
     initiate_conference and touch or return nil
-    if (user == self.user || self.grants_right?(user,session,:initiate)) && !active?(true)
+    if user == self.user || self.grants_right?(user, session, :initiate)
       admin_join_url(user, return_to)
     else
       participant_join_url(user, return_to)
@@ -340,16 +369,6 @@ class WebConference < ActiveRecord::Base
     has_advanced_settings? ? 1 : 0
   end
 
-  def clone_for(context, dup=nil, options={})
-    dup ||= WebConference.new
-    self.attributes.delete_if{|k,v| [:id, :conference_key, :user_id, :added_user_id, :started_at, :uuid, :invited_user_ids].include?(k.to_sym) }.each do |key, val|
-      dup.send("#{key}=", val)
-    end
-    dup.context = context
-    context.log_merge_result("Web Conference \"#{dup.title}\" created")
-    dup
-  end
-  
   scope :after, lambda { |date| where("web_conferences.start_at IS NULL OR web_conferences.start_at>?", date) }
 
   set_policy do
@@ -358,13 +377,13 @@ class WebConference < ActiveRecord::Base
     
     given { |user, session| self.users.include?(user) && self.cached_context_grants_right?(user, session, :read) && long_running? && active? }
     can :resume
-    
-    given { |user, session| (self.is_public rescue false) }
+
+    given { |user, session| (self.respond_to?(:is_public) && self.is_public rescue false) }
     can :read and can :join
-    
+
     given { |user, session| self.cached_context_grants_right?(user, session, :create_conferences) }
     can :create
-    
+
     given { |user, session| user && user.id == self.user_id && self.cached_context_grants_right?(user, session, :create_conferences) }
     can :initiate
     

@@ -1,4 +1,4 @@
-# ruby 1.9 compatibility fixes for Rails 2.3
+# ruby pre-2.0 compatibility fixes
 
 if RUBY_VERSION < '2.0'
   # see https://bugs.ruby-lang.org/issues/7547
@@ -33,43 +33,14 @@ if RUBY_VERSION < '2.0'
   end
 end
 
-# See http://developer.uservoice.com/entries/how-to-upgrade-a-rails-2.3.14-app-to-ruby-1.9.3/
-# TZInfo needs to be patched.  In particular, you'll need to re-implement the datetime_new! method:
-require 'tzinfo'
-
-module TZInfo
-  # Methods to support different versions of Ruby.
-  module RubyCoreSupport #:nodoc:
-    HALF_DAYS_IN_DAY = rational_new!(1, 2)
-
-    # Rails 2.3 defines datetime_new! in terms of methods that don't exist in
-    # Ruby 1.9.3, so we have to redefine it here
-    def self.datetime_new!(ajd = 0, of = 0, sg = Date::ITALY)
-      # Convert from an Astronomical Julian Day number to a civil Julian Day number.
-      jd = ajd + of + HALF_DAYS_IN_DAY
-
-      # Ruby trunk revision 31862 changed the behaviour of DateTime.jd so that it will no
-      # longer accept a fractional civil Julian Day number if further arguments are specified.
-      # Calculate the hours, minutes and seconds to pass to jd.
-
-      jd_i = jd.to_i
-      jd_i -= 1 if jd < 0
-      hours = (jd - jd_i) * 24
-      hours_i = hours.to_i
-      minutes = (hours - hours_i) * 60
-      minutes_i = minutes.to_i
-      seconds = (minutes - minutes_i) * 60
-
-      DateTime.jd(jd_i, hours_i, minutes_i, seconds, of, sg)
-    end
-  end
-end
-
-if Rails.version < "3.0"
-
+if CANVAS_RAILS2
   require "active_support/core_ext/string/output_safety"
   class ERB
     module Util
+
+      # rails 2 uses decimal, rails 3 uses hex, so we use hex everywhere
+      HTML_ESCAPE["'"] = "&#x27;"
+
       # see https://github.com/rails/rails/issues/7430
       def html_escape(s)
         s = s.to_s
@@ -167,30 +138,46 @@ class ActiveRecord::Base
   # existed in the DB before Canvas was Ruby 1.9 only. We've verified that
   # none of these columns should legitimately contain binary data, only text.
   SERIALIZED_COLUMNS_WITH_POTENTIALLY_INVALID_UTF8 = {
-    'AssessmentQuestion'       => %w[question_data],
-    'ContextExternalTool'      => %w[settings],
-    'EportfolioEntry'          => %w[content],
-    'ErrorReport'              => %w[http_env data],
-    'LearningOutcome'          => %w[data],
-    'Profile'                  => %w[data],
-    'Quiz'                     => %w[quiz_data],
-    'QuizQuestion'             => %w[question_data],
-    'QuizSubmission'           => %w[quiz_data submission_data],
-    'QuizSubmissionSnapshot'   => %w[data],
-    'Rubric'                   => %w[data],
-    'RubricAssessment'         => %w[data],
-    'SisBatch'                 => %w[processing_errors processing_warnings],
-    'StreamItem'               => %w[data]
+    'AssessmentQuestion'                => %w[question_data],
+    'ContextExternalTool'               => %w[settings],
+    'EportfolioEntry'                   => %w[content],
+    'ErrorReport'                       => %w[http_env data],
+    'LearningOutcome'                   => %w[data],
+    'Profile'                           => %w[data],
+    'Quizzes::Quiz'                     => %w[quiz_data],
+    'Quizzes::QuizQuestion'             => %w[question_data],
+    'Quizzes::QuizSubmission'           => %w[quiz_data submission_data],
+    'Quizzes::QuizSubmissionSnapshot'   => %w[data],
+    'Rubric'                            => %w[data],
+    'RubricAssessment'                  => %w[data],
+    'SisBatch'                          => %w[processing_errors processing_warnings],
+    'StreamItem'                        => %w[data]
   }
 
-  def unserialize_attribute_with_utf8_check(attr_name)
-    value = unserialize_attribute_without_utf8_check(attr_name)
-    if SERIALIZED_COLUMNS_WITH_POTENTIALLY_INVALID_UTF8[self.class.name].try(:include?, attr_name.to_s)
-      TextHelper.recursively_strip_invalid_utf8!(value, true)
+  class << self
+    def strip_invalid_utf8_from_attribute(attr_name, value)
+      if SERIALIZED_COLUMNS_WITH_POTENTIALLY_INVALID_UTF8[self.name].try(:include?, attr_name.to_s)
+        TextHelper.recursively_strip_invalid_utf8!(value, true)
+      end
+      value
     end
-    value
   end
-  alias_method_chain :unserialize_attribute, :utf8_check
+
+  if CANVAS_RAILS2
+    def unserialize_attribute_with_utf8_check(attr_name)
+      value = unserialize_attribute_without_utf8_check(attr_name)
+      self.class.strip_invalid_utf8_from_attribute(attr_name, value)
+    end
+    alias_method_chain :unserialize_attribute, :utf8_check
+  else
+    class << self
+      def type_cast_attribute_with_utf8_check(attr_name, attributes, cache={})
+        value = type_cast_attribute_without_utf8_check(attr_name, attributes, cache)
+        strip_invalid_utf8_from_attribute(attr_name, value)
+      end
+      alias_method_chain :type_cast_attribute, :utf8_check
+    end
+  end
 end
 
 # Make sure the flash sets the encoding to UTF-8 as well.

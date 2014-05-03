@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "enhanceable_content" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   it "should automatically enhance content using jQuery UI" do
     stub_kaltura
@@ -99,7 +99,7 @@ describe "enhanceable_content" do
     divs[0].should be_displayed
     divs[1].should_not be_displayed
     headers[1].click
-    sleep 1
+    wait_for_ajaximations
     headers[0].should have_class('ui-state-default')
     headers[1].should have_class('ui-state-active')
     divs[0].should_not be_displayed

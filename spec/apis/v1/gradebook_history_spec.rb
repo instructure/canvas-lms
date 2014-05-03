@@ -35,9 +35,7 @@ module Api::V1
     end
 
     def submit(assignment, student, day, grader)
-      submission = assignment.submit_homework(student)
-      submission.update_attributes!(:graded_at => day, :grader_id => grader.try(:id))
-      submission
+      bare_submission_model(assignment, student, :graded_at => day, :grader_id => grader.try(:id))
     end
 
     describe '#days_json' do
@@ -128,23 +126,27 @@ module Api::V1
         @course = ::Course.create!
         student1 = ::User.create!
         @course.enroll_student(student1)
-        grader1 = ::User.create!(:name => 'grader 1')
-        grader2 = ::User.create!(:name => 'grader 2')
+        @grader1 = ::User.create!(:name => 'grader 1')
+        @grader2 = ::User.create!(:name => 'grader 2')
         @assignment = @course.assignments.create!(:title => "some assignment")
-        @submission = submit(@assignment, student1, now, grader1)
+        @submission = @assignment.submit_homework(student1)
+        @submission.update_attributes(graded_at: now, grader_id: @grader1.id)
         @submission.score = 90
         @submission.grade = '90'
-        @submission.grader = grader2
+        @submission.grader = @grader2
         @submission.save!
-        @submissions_hash = GradebookHistoryHarness.new.submissions_for(@course, api_context, now, grader2.id, @assignment.id)
       end
 
       it 'should be an array of submissions' do
-        @submissions_hash.first[:submission_id].should == @submission.id
+        harness = GradebookHistoryHarness.new
+        submissions_hash = harness.submissions_for(@course, api_context, now, @grader2.id, @assignment.id)
+        submissions_hash.first[:submission_id].should == @submission.id
       end
 
       it 'has the version hash' do
-        version1 = @submissions_hash.first[:versions].first
+        harness = GradebookHistoryHarness.new
+        submissions_hash = harness.submissions_for(@course, api_context, now, @grader2.id, @assignment.id)
+        version1 = submissions_hash.first[:versions].first
         version1[:assignment_id].should == @assignment.id
         version1[:current_grade].should == "90"
         version1[:current_grader].should == 'grader 2'
@@ -158,11 +160,25 @@ module Api::V1
         # yes, this is crazy.  autograded submissions have the grader_id of (quiz_id x -1)
         submission.grader_id = -987
         submission.save!
+
         submissions = GradebookHistoryHarness.new.submissions_for(@course, api_context, now, 0, @assignment.id)
         submissions.first[:submission_id].should == submission.id
       end
-    end
 
+      it 'should properly set pervious_* attributes' do
+        # regrade to get a second version
+        @submission.score = 80
+        @submission.score = '80'
+        @submission.save!
+
+        harness = GradebookHistoryHarness.new
+        submissions = harness.submissions_for(@course, api_context, now, @grader2.id, @assignment.id)
+        submissions.first[:versions][0][:grade].should == "80"
+        submissions.first[:versions][0][:previous_grade].should == "90"
+        submissions.first[:versions][1][:grade].should == "90"
+        submissions.first[:versions][1][:previous_grade].should == nil
+      end
+    end
 
     describe '#day_string_for' do
       it 'builds a formatted date' do
@@ -184,7 +200,7 @@ module Api::V1
 
       before do
         course.enroll_student(student)
-        @submission = assignment.submit_homework(student)
+        @submission = bare_submission_model(assignment, student)
       end
 
       context 'when the submission has been graded' do
@@ -196,8 +212,7 @@ module Api::V1
         def add_submission
           other_student = ::User.create!
           course.enroll_student(other_student)
-          other_submission = assignment.submit_homework(other_student)
-          other_submission.graded_at = 2.hours.ago.in_time_zone
+          other_submission = bare_submission_model(assignment, other_student, graded_at: 2.hours.ago.in_time_zone)
           other_submission.save!
         end
 

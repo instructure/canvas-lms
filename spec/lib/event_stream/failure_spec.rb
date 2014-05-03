@@ -23,8 +23,8 @@ describe EventStream::Failure do
     before do
       @record = stub('record',
         :id => stub('record_id', :to_s => 'record_id_string'),
-        :attributes => { stub('attribute') => stub('attribute_value') },
-        :changes => { stub('changed_attribute') => stub('changed_value') })
+        :attributes => { 'attribute' => 'attribute_value' },
+        :changes => { 'changed_attribute' => 'changed_value' })
 
       @stream = stub('stream', :identifier => 'stream_identifier')
       @stream.stubs(:operation_payload).with(:insert, @record).returns(@record.attributes)
@@ -33,6 +33,10 @@ describe EventStream::Failure do
       @exception = Exception.new
       @exception.stubs(:message).returns(stub('exception_message', :to_s => 'exception_message_string'))
       @exception.stubs(:backtrace).returns([stub('exception_backtrace')])
+
+      # By default the log! method raises exceptions in test env.  Override this
+      # to log the event and not raise it for these tests.
+      Rails.env.stubs(:test?).returns(false)
     end
 
     it "should create a new db record" do

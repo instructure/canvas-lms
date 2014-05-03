@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -19,6 +19,141 @@
 # @API SIS Imports
 #
 # API for importing data from Student Information Systems
+#
+# @model SisImportData
+#     {
+#       "id": "SisImportData",
+#       "description": "",
+#       "properties": {
+#         "import_type": {
+#           "description": "The type of SIS import",
+#           "example": "instructure_csv",
+#           "type": "string"
+#         },
+#         "supplied_batches": {
+#           "description": "Which file were included in the SIS import",
+#           "example": "[\"term\", \"course\", \"section\", \"user\", \"enrollment\"]",
+#           "type": "array",
+#           "items": { "type": "string" }
+#         },
+#         "counts": {
+#           "description": "The number of rows processed for each type of import",
+#           "$ref": "SisImportCounts"
+#         }
+#       }
+#     }
+#
+# @model SisImportCounts
+#     {
+#       "id": "SisImportCounts",
+#       "description": "",
+#       "properties": {
+#         "accounts": {
+#           "example": 0,
+#           "type": "integer"
+#         },
+#         "terms": {
+#           "example": 3,
+#           "type": "integer"
+#         },
+#         "abstract_courses": {
+#           "example": 0,
+#           "type": "integer"
+#         },
+#         "courses": {
+#           "example": 121,
+#           "type": "integer"
+#         },
+#         "sections": {
+#           "example": 278,
+#           "type": "integer"
+#         },
+#         "xlists": {
+#           "example": 0,
+#           "type": "integer"
+#         },
+#         "users": {
+#           "example": 346,
+#           "type": "integer"
+#         },
+#         "enrollments": {
+#           "example": 1542,
+#           "type": "integer"
+#         },
+#         "groups": {
+#           "example": 0,
+#           "type": "integer"
+#         },
+#         "group_memberships": {
+#           "example": 0,
+#           "type": "integer"
+#         },
+#         "grade_publishing_results": {
+#           "example": 0,
+#           "type": "integer"
+#         }
+#       }
+#     }
+#
+# @model SisImport
+#     {
+#       "id": "SisImport",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "The unique identifier for the SIS import.",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "created_at": {
+#           "description": "The date the SIS import was created.",
+#           "example": "2013-12-01T23:59:00-06:00",
+#           "type": "datetime"
+#         },
+#         "ended_at": {
+#           "description": "The date the SIS import finished. Returns null if not finished.",
+#           "example": "2013-12-02T00:03:21-06:00",
+#           "type": "datetime"
+#         },
+#         "updated_at": {
+#           "description": "The date the SIS import was last updated.",
+#           "example": "2013-12-02T00:03:21-06:00",
+#           "type": "datetime"
+#         },
+#         "workflow_state": {
+#           "description": "The current state of the SIS import. - 'created': The SIS import has been created.\n - 'importing': The SIS import is currently processing.\n - 'imported': The SIS import has completed successfully.\n - 'imported_with_messages': The SIS import completed with errors or warnings.\n - 'failed_with_messages': The SIS import failed with errors.\n - 'failed': The SIS import failed.",
+#           "example": "imported",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "created",
+#               "imported",
+#               "imported_with_messages",
+#               "failed_with_messages",
+#               "failed"
+#             ]
+#           }
+#         },
+#         "data": {
+#           "description": "data",
+#           "$ref": "SisImportData"
+#         },
+#         "progress": {
+#           "description": "The progress of the SIS import.",
+#           "example": "100",
+#           "type": "string"
+#         },
+#         "processing_warnings": {
+#           "description": "Only imports that are complete will get this data. An array of csv/warning pairs.",
+#           "example": "[['students.csv','user John Doe has already claimed john_doe's requested login information, skipping], ...]",
+#           "type": "array",
+#           "items": {
+#             "$ref": "Array"
+#           }
+#         }
+#       }
+#     }
+#
 class SisImportsApiController < ApplicationController
   before_filter :get_context
   before_filter :check_account
@@ -26,6 +161,22 @@ class SisImportsApiController < ApplicationController
   def check_account
     raise "SIS imports can only be executed on root accounts" unless @account.root_account?
     raise "SIS imports can only be executed on enabled accounts" unless @account.allow_sis_import
+  end
+
+  # @API Get SIS import list
+  #
+  # Returns the list of SIS imports for an account
+  #
+  #   Examples:
+  #     curl 'https://<canvas>/api/v1/accounts/<account_id>/sis_imports' \ 
+  #         -H "Authorization: Bearer <token>"
+  #
+  # @returns [SisImport]
+  def index
+    if authorized_action(@account, @current_user, :manage_sis)
+      @batches = Api.paginate(@account.sis_batches.order('created_at DESC'), self, url_for({action: :index, controller: :sis_imports_api}))
+      render :json => ({ sis_imports: @batches})
+    end
   end
 
   # @API Import SIS data
@@ -74,38 +225,40 @@ class SisImportsApiController < ApplicationController
   #         -H "Authorization: Bearer <token>" \ 
   #         'https://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?import_type=instructure_csv&batch_mode=1&batch_mode_term_id=15'
   #
-  # @argument extension Recommended for raw post request style imports. This
-  #   field will be used to distinguish between zip, xml, csv, and other file
-  #   format extensions that would usually be provided with the filename in the
-  #   multipart post request scenario. If not provided, this value will be
-  #   inferred from the Content-Type, falling back to zip-file format if all
-  #   else fails.
+  # @argument extension [Optional,String]
+  #   Recommended for raw post request style imports. This field will be used to
+  #   distinguish between zip, xml, csv, and other file format extensions that
+  #   would usually be provided with the filename in the multipart post request
+  #   scenario. If not provided, this value will be inferred from the
+  #   Content-Type, falling back to zip-file format if all else fails.
   #
-  # @argument batch_mode [Boolean]
+  # @argument batch_mode [Optional,Boolean]
   #   If set, this SIS import will be run in batch mode, deleting any data
   #   previously imported via SIS that is not present in this latest import.
   #   See the SIS CSV Format page for details.
   #
-  # @argument batch_mode_term_id [String]
-  #   Limit deletions to only this term, if batch mode is enabled.
+  # @argument batch_mode_term_id [Optional,String]
+  #   Limit deletions to only this term. Required if batch mode is enabled.
   #
-  # @argument override_sis_stickiness [Boolean]
+  # @argument override_sis_stickiness [Optional,Boolean]
   #   Many fields on records in Canvas can be marked "sticky," which means that
   #   when something changes in the UI apart from the SIS, that field gets
   #   "stuck." In this way, by default, SIS imports do not override UI changes.
   #   If this field is present, however, it will tell the SIS import to ignore
   #   "stickiness" and override all fields.
   #
-  # @argument add_sis_stickiness [Boolean]
+  # @argument add_sis_stickiness [Optional,Boolean]
   #   This option, if present, will process all changes as if they were UI
   #   changes. This means that "stickiness" will be added to changed fields.
   #   This option is only processed if 'override_sis_stickiness' is also provided.
   #
-  # @argument clear_sis_stickiness [Boolean]
+  # @argument clear_sis_stickiness [Optional,Boolean]
   #   This option, if present, will clear "stickiness" from all fields touched
   #   by this import. Requires that 'override_sis_stickiness' is also provided.
   #   If 'add_sis_stickiness' is also provided, 'clear_sis_stickiness' will
   #   overrule the behavior of 'add_sis_stickiness'
+  #
+  # @returns SisImport
   def create
     if authorized_action(@account, @current_user, :manage_sis)
       params[:import_type] ||= 'instructure_csv'
@@ -190,6 +343,12 @@ class SisImportsApiController < ApplicationController
   # @API Get SIS import status
   #
   # Get the status of an already created SIS import.
+  #
+  #   Examples:
+  #     curl 'https://<canvas>/api/v1/accounts/<account_id>/sis_imports/<sis_import_id>' \ 
+  #         -H "Authorization: Bearer <token>"
+  #
+  # @returns SisImport
   def show
     if authorized_action(@account, @current_user, :manage_sis)
       @batch = SisBatch.find(params[:id])

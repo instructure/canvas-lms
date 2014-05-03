@@ -1,5 +1,6 @@
 require [
   'i18n!quizzes'
+  'jquery'
   'underscore'
   'Backbone'
   'compiled/views/quizzes/QuizItemGroupView'
@@ -7,7 +8,7 @@ require [
   'compiled/views/quizzes/IndexView'
   'compiled/collections/QuizCollection'
   'compiled/util/vddTooltip'
-], (I18n, _, Backbone, QuizItemGroupView, NoQuizzesView, IndexView, QuizCollection, vddTooltip) ->
+], (I18n, $, _, Backbone, QuizItemGroupView, NoQuizzesView, IndexView, QuizCollection, vddTooltip) ->
 
   class QuizzesIndexRouter extends Backbone.Router
     routes:

@@ -18,7 +18,7 @@ of the configured tools in a dropdown.
 
 When tools are loaded as rich editor buttons, Canvas sends an additional 
 parameter to notify the tool of the directive, 
-<code>ext_content_return_types=embed_content</code>. When a tool receives this directive,
+`ext_content_return_types=embed_content`. When a tool receives this directive,
 it means Canvas is expecting the tool to redirect the user to the LTI 
 success URL with some additional parameters. These additional parameters 
 tell Canvas what type of content to embed, as listed below. Remember to 
@@ -54,7 +54,7 @@ that all URLs you return be over SSL (https instead of http).
 </table>
 
 #### examples:
-If the <code>launch_presentation_return_url</code> were
+If the `launch_presentation_return_ur`l</code> were
 <code>http://www.example.com/done</code>, possible return URLs could include:
 
 - http://www.example.com/done?return_type=image_url&url=https%3A%2F%2Fothersite.com%2Fimage.gif&alt=good+picture&width=30&height=50
@@ -86,7 +86,7 @@ If the <code>launch_presentation_return_url</code> were
 </table>
 
 #### examples:
-If the <code>launch_presentation_return_url</code> were
+If the `launch_presentation_return_url`</code> were
 <code>http://www.example.com/done</code>, possible return URLs could include:
 
 - http://www.example.com/done?return_type=iframe&url=https%3A%2F%2Fothersite.com%2Fiframe&width=30&height=50
@@ -118,7 +118,7 @@ If the <code>launch_presentation_return_url</code> were
 </table>
 
 #### examples:
-If the <code>launch_presentation_return_url</code> were
+If the `launch_presentation_return_url` were
 <code>http://www.example.com/done</code>, possible return URLs could include:
 
 - http://www.example.com/done?return_type=url&url=https%3A%2F%2Fothersite.com%2Flink
@@ -147,7 +147,7 @@ If the <code>launch_presentation_return_url</code> were
 </table>
 
 #### examples:
-If the <code>launch_presentation_return_url</code> were
+If the `launch_presentation_return_url` were
 <code>http://www.example.com/done</code>, possible return URLs could include:
 
 - http://www.example.com/done?return_type=lti_launch_url&url=https%3A%2F%2Fothersite.com%2Flti_link
@@ -176,7 +176,7 @@ For other types of rich content (such as a video tag, a large block of text, etc
 </table>
 
 #### examples:
-If the <code>launch_presentation_return_url</code> were
+If the `launch_presentation_return_url` were
 <code>http://www.example.com/done</code>, possible return URLs could include:
 
 - http://www.example.com/done?return_type=oembed&endpoint=https%3A%2F%2Fothersite.com%2Foembed&url=https%3A%2F%2Fothersite.com%2Fresources%2Fimage1

@@ -1,9 +1,10 @@
 define [
+  'compiled/util/round'
   'underscore'
   'compiled/views/DialogFormView'
   'jst/EmptyDialogFormWrapper'
   'jst/assignments/AssignmentSettings'
-], (_, DialogFormView, wrapper, assignmentSettingsTemplate) ->
+], (round, _, DialogFormView, wrapper, assignmentSettingsTemplate) ->
 
   class AssignmentSettingsView extends DialogFormView
     template: assignmentSettingsTemplate
@@ -41,7 +42,7 @@ define [
 
     onSaveSuccess: ->
       super
-      @assignmentGroups.view.render()
+      @assignmentGroups.trigger 'change:groupWeights'
 
     toggleTableByModel: ->
       checked = @model.get('apply_assignment_group_weights')
@@ -53,10 +54,12 @@ define [
 
     toggleWeightsTable: (show) ->
       if show
-        @$el.find('#ag_weights_wrapper').show()
+        @$('#ag_weights_wrapper').show()
+        @$('#apply_assignment_group_weights').prop('checked', true)
         @setDimensions(null, @defaults.height)
       else
-        @$el.find('#ag_weights_wrapper').hide()
+        @$('#ag_weights_wrapper').hide()
+        @$('#apply_assignment_group_weights').prop('checked', false)
         @setDimensions(null, @defaults.collapsedHeight)
 
     addAssignmentGroups: ->
@@ -71,6 +74,7 @@ define [
         @weights.push v
         #sum group weights
         total_weight += v.findWeight() || 0
+      total_weight = round(total_weight,2)
 
       @$el.find('#percent_total').html(total_weight + "%")
 
@@ -82,6 +86,7 @@ define [
       total_weight = 0
       for v in @weights
         total_weight += v.findWeight() || 0
+      total_weight = round(total_weight,2)
       @$el.find('#percent_total').html(total_weight + "%")
 
     toJSON: ->

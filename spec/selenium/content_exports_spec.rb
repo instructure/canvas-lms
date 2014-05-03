@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "content exports" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   context "as a teacher" do
 
@@ -44,7 +44,7 @@ describe "content exports" do
       @export.export_type.should == 'qti'
 
       file_handle = @export.attachment.open :need_local_file => true
-      zip_file = Zip::ZipFile.open(file_handle.path)
+      zip_file = Zip::File.open(file_handle.path)
       manifest_doc = Nokogiri::XML.parse(zip_file.read("imsmanifest.xml"))
 
       manifest_doc.at_css("resource[identifier=#{CC::CCHelper.create_key(q1)}]").should_not be_nil

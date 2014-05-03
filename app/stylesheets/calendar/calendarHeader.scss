@@ -1,10 +1,12 @@
 @import "environment";
+@import 'bootstrap/button-groups';
 
 #calendar_header {
   .header-table {
     display: table;
     width: 100%;
-    margin-bottom: 12px;
+    height: 40px;
+    margin-bottom: 5px;
   }
 
   .header-table-row {
@@ -30,12 +32,18 @@
   }
 }
 
-.scheduler_navigator {
-  margin-bottom: 12px;
-}
-
-.calendar-navigator {
+.calendar_navigator, .scheduler_navigator {
   display: inline-block;
+
+  .datetime_suggest, .input-append {
+    display: inline-block;
+    vertical-align: middle;
+    margin-bottom: 0;
+  }
+
+  .input-append input, .input-append button {
+    vertical-align: middle;
+  }
 }
 
 .navigation_buttons {

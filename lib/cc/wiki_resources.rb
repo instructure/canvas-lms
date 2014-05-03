@@ -31,9 +31,9 @@ module CC
           path = File.join(wiki_folder, file_name)
           meta_fields = {:identifier => migration_id}
           meta_fields[:editing_roles] = page.editing_roles
-          meta_fields[:hide_from_students] = page.hide_from_students
           meta_fields[:notify_of_update] = page.notify_of_update
           meta_fields[:workflow_state] = page.workflow_state
+          meta_fields[:workflow_state] = 'unpublished' if page.hide_from_students && page.workflow_state == 'active'
           meta_fields[:front_page] = page.is_front_page?
 
           File.open(path, 'w') do |file|

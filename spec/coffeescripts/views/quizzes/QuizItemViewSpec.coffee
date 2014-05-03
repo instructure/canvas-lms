@@ -4,8 +4,9 @@ define [
   'compiled/views/quizzes/QuizItemView'
   'compiled/views/PublishIconView'
   'jquery'
+  'helpers/fakeENV'
   'helpers/jquery.simulate'
-], (Backbone, Quiz, QuizItemView, PublishIconView, $) ->
+], (Backbone, Quiz, QuizItemView, PublishIconView, $, fakeENV) ->
 
   fixtures = $('#fixtures')
 
@@ -19,7 +20,8 @@ define [
     view.render()
 
   module 'QuizItemView',
-    setup: ->
+    setup: -> fakeENV.setup()
+    teardown: -> fakeENV.teardown()
 
   test 'renders admin if can_update', ->
     quiz = new Quiz(id: 1, title: 'Foo', can_update: true)

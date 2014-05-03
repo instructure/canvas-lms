@@ -33,9 +33,17 @@ define [
         [a-z0-9.\-]+[.][a-z]{2,4}/               # looks like domain name followed by a slash
       )
 
-      [^\s()<>]+                                 # Run of non-space, non-()<>
+      (?:
+        [^\s()<>]+                               # Run of non-space, non-()<>
+        |                                        # or
+        \([^\s()<>]*\)                           # balanced parens, single level
+      )+
 
-      [^\s`!()\[\]{};:'".,<>?«»“”‘’]             # End with: not a space or one of these punct chars
+      (?:
+        \([^\s()<>]*\)                           # balanced parens, single level
+        |                                        # or
+        [^\s`!()\[\]{};:'".,<>?«»“”‘’]           # End with: not a space or one of these punct chars
+      )
     ) | (
       LINK-PLACEHOLDER
     )

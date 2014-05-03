@@ -17,7 +17,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe "Module Items API", :type => :integration do
+describe "Module Items API", type: :request do
   before do
     course.offer!
 
@@ -25,6 +25,7 @@ describe "Module Items API", :type => :integration do
     @assignment = @course.assignments.create!(:name => "pls submit", :submission_types => ["online_text_entry"], :points_possible => 20)
     @assignment_tag = @module1.add_item(:id => @assignment.id, :type => 'assignment')
     @quiz = @course.quizzes.create!(:title => "score 10")
+    @quiz.publish!
     @quiz_tag = @module1.add_item(:id => @quiz.id, :type => 'quiz')
     @topic = @course.discussion_topics.create!(:message => 'pls contribute')
     @topic_tag = @module1.add_item(:id => @topic.id, :type => 'discussion_topic')
@@ -65,7 +66,8 @@ describe "Module Items API", :type => :integration do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
                       :controller => "context_module_items_api", :action => "index", :format => "json",
                       :course_id => "#{@course.id}", :module_id => "#{@module1.id}")
-      json.should eql [
+
+      expected = [
           {
               "type" => "Assignment",
               "id" => @assignment_tag.id,
@@ -88,7 +90,7 @@ describe "Module Items API", :type => :integration do
               "position" => 2,
               "title" => @quiz_tag.title,
               "indent" => 0,
-              "completion_requirement" => { "type" => "min_score", "min_score" => 10 },
+              "completion_requirement" => { "type" => "min_score", "min_score" => 10.0 },
               "published" => true,
               "module_id" => @module1.id
           },
@@ -127,6 +129,7 @@ describe "Module Items API", :type => :integration do
               "module_id" => @module1.id
           }
       ]
+      compare_json(json, expected)
     end
 
     it "should include item content details for index" do
@@ -198,6 +201,14 @@ describe "Module Items API", :type => :integration do
                       :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :include => ['content_details'],
                       :id => "#{@assignment_tag.id}")
       json['content_details'].should == {'points_possible' => @assignment.points_possible}
+    end
+
+    it "should frame_external_urls" do
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@external_url_tag.id}?frame_external_urls=true",
+                      :controller => "context_module_items_api", :action => "show", :format => "json",
+                      :course_id => "#{@course.id}", :module_id => "#{@module1.id}", :frame_external_urls => 'true',
+                      :id => "#{@external_url_tag.id}")
+      json['html_url'].should eql "http://www.example.com/courses/#{@course.id}/modules/items/#{@external_url_tag.id}"
     end
 
     it "should paginate the module item list" do
@@ -283,6 +294,18 @@ describe "Module Items API", :type => :integration do
                         {}, {:expected_status => 400})
       end
 
+      it "should require a non-deleted page_url" do
+        page = @course.wiki.wiki_pages.create(:title => 'Deleted Page')
+        page.workflow_state = 'deleted'
+        page.save!
+
+        json = api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
+                        {:controller => "context_module_items_api", :action => "create", :format => "json",
+                         :course_id => "#{@course.id}", :module_id => "#{@module1.id}"},
+                        {:module_item => {:title => 'Deleted Page', :type => 'Page', :page_url => page.url}},
+                        {}, {:expected_status => 400})
+      end
+
       it "should create with new_tab for external tool items" do
         tool = @course.context_external_tools.create!(:name => "b", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
 
@@ -333,7 +356,8 @@ describe "Module Items API", :type => :integration do
         tag.position.should == 3
 
         tags.each{|t| t.reload}
-        tags.map(&:position).should == [1, 2, 4, 5]
+        # 2 is deleted; 3 is the new one, that displaced the others to 4-6
+        tags.map(&:position).should == [1, 4, 5, 6]
       end
 
       it "should set completion requirement" do
@@ -344,12 +368,12 @@ describe "Module Items API", :type => :integration do
                         {:module_item => {:title => 'title', :type => 'Assignment', :content_id => assignment.id,
                          :completion_requirement => {:type => 'min_score', :min_score => 2}}})
 
-        json['completion_requirement'].should == {"type" => "min_score", "min_score" => "2"}
+        json['completion_requirement'].should == {"type" => "min_score", "min_score" => 2}
 
         @module1.reload
         req = @module1.completion_requirements.find{|h| h[:id] == json['id'].to_i}
         req[:type].should == 'min_score'
-        req[:min_score].should == "2"
+        req[:min_score].should == 2
       end
 
       it "should require valid completion requirement type" do
@@ -423,7 +447,7 @@ describe "Module Items API", :type => :integration do
       end
 
       it "should update the position" do
-        tags = @module1.content_tags
+        tags = @module1.content_tags.to_a
 
         json = api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
                         {:controller => "context_module_items_api", :action => "update", :format => "json",
@@ -453,12 +477,12 @@ describe "Module Items API", :type => :integration do
                         {:module_item => {:title => 'title',
                                           :completion_requirement => {:type => 'min_score', :min_score => 3}}})
 
-        json['completion_requirement'].should == {"type" => "min_score", "min_score" => "3"}
+        json['completion_requirement'].should == {"type" => "min_score", "min_score" => 3}
 
         @module1.reload
         req = @module1.completion_requirements.find{|h| h[:id] == json['id'].to_i}
         req[:type].should == 'min_score'
-        req[:min_score].should == "3"
+        req[:min_score].should == 3
       end
 
       it "should remove completion requirement" do
@@ -666,7 +690,7 @@ describe "Module Items API", :type => :integration do
         json['modules'].map {|mod| mod['id']}.sort.should == [@module1.id, @module2.id].sort
       end
 
-      it "should find find a wiki page by url" do
+      it "should find a (non-deleted) wiki page by url" do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=Page&asset_id=#{@wiki_page.url}",
                         :controller => "context_module_items_api", :action => "item_sequence", :format => "json",
                         :course_id => @course.to_param, :asset_type => 'Page', :asset_id => @wiki_page.to_param)
@@ -675,6 +699,15 @@ describe "Module Items API", :type => :integration do
         json['items'][0]['current']['id'].should == @wiki_page_tag.id
         json['items'][0]['next']['id'].should == @attachment_tag.id
         json['modules'].map {|mod| mod['id']}.sort.should == [@module1.id, @module2.id].sort
+
+        @wiki_page.workflow_state = 'deleted'
+        @wiki_page.save!
+
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=Page&asset_id=#{@wiki_page.url}",
+                        :controller => "context_module_items_api", :action => "item_sequence", :format => "json",
+                        :course_id => @course.to_param, :asset_type => 'Page', :asset_id => @wiki_page.to_param)
+        json['items'].size.should eql 0
+        json['modules'].size.should eql 0
       end
 
       it "should skip a deleted module" do
@@ -788,6 +821,8 @@ describe "Module Items API", :type => :integration do
       @override_student.user = @student
       @override_student.save!
       overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
+      @student = nil
+      overrides
     end
 
     it "should list module items" do
@@ -813,7 +848,6 @@ describe "Module Items API", :type => :integration do
     end
 
     it "should include user specific content details on index" do
-      @assignment_tag.unpublish
       override_assignment
 
       json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items?include[]=content_details",
@@ -827,7 +861,6 @@ describe "Module Items API", :type => :integration do
     end
 
     it "should include user specific content details on show" do
-      @assignment_tag.unpublish
       override_assignment
 
       json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}?include[]=content_details",

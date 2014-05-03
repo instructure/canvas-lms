@@ -143,8 +143,10 @@ define([
           // if we don't have a url on the page, build one using the current context.
           // url should look like: /courses/2/external_tools/15/resoruce_selection?editor=1
           var asset = ENV.context_asset_string.split('_');
-          url = '/' + asset[0] + 's/' + asset[1] + '/external_tools/' + button.id + '/resource_selection?editor=1'
+          url = '/' + asset[0] + 's/' + asset[1] + '/external_tools/' + button.id + '/resource_selection?editor=1';
         }
+        var selection = ed.selection.getContent() || "";
+        url += (url.indexOf('?') > -1 ? '&' : '?') + "selection=" + encodeURIComponent(selection)
         $dialog.find("iframe").attr('src', url);
       }
       for(var idx in INST.editorButtons) {

@@ -10,6 +10,7 @@ define [
   'underscore'
   'compiled/userSettings'
   'compiled/util/hsvToRgb'
+  'bower/color-slicer/dist/color-slicer'
   'jst/calendar/calendarApp'
   'compiled/calendar/EventDataSource'
   'compiled/calendar/commonEventFactory'
@@ -17,14 +18,16 @@ define [
   'compiled/calendar/EditEventDetailsDialog'
   'compiled/calendar/Scheduler'
   'compiled/views/calendar/CalendarNavigator'
+  'compiled/views/calendar/AgendaView'
   'compiled/calendar/CalendarDefaults'
-  'vendor/fullcalendar'
+  'compiled/util/deparam'
 
+  'vendor/fullcalendar'
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
   'vendor/jquery.ba-tinypubsub'
   'jqueryui/button'
-], (I18n, $, _, userSettings, hsvToRgb, calendarAppTemplate, EventDataSource, commonEventFactory, ShowEventDetailsDialog, EditEventDetailsDialog, Scheduler, CalendarNavigator, calendarDefaults) ->
+], (I18n, $, _, userSettings, hsvToRgb, colorSlicer, calendarAppTemplate, EventDataSource, commonEventFactory, ShowEventDetailsDialog, EditEventDetailsDialog, Scheduler, CalendarNavigator, AgendaView, calendarDefaults, deparam) ->
 
   class Calendar
     constructor: (selector, @contexts, @manageContexts, @dataSource, @options) ->
@@ -36,6 +39,62 @@ define [
 
       @activeAjax = 0
 
+      @subscribeToEvents()
+      @header = @options.header
+
+      @el = $(selector).html calendarAppTemplate()
+
+      @schedulerNavigator = new CalendarNavigator(el: $('.scheduler_navigator'))
+      @schedulerNavigator.hide()
+
+      @agenda = new AgendaView(el: $('.agenda-wrapper'), dataSource: @dataSource)
+      @scheduler = new Scheduler(".scheduler-wrapper", this)
+
+      fullCalendarParams = @initializeFullCalendarParams()
+
+      data = @dataFromDocumentHash()
+      if not data.view_start and @options?.viewStart
+        data.view_start = @options.viewStart
+        @updateFragment data
+      if data.view_start
+        date = $.fullCalendar.parseISO8601(data.view_start)
+      else
+        date = $.fudgeDateForProfileTimezone(new Date)
+      fullCalendarParams.year = date.getFullYear()
+      fullCalendarParams.month = date.getMonth()
+      fullCalendarParams.date = date.getDate()
+
+      @calendar = @el.find("div.calendar").fullCalendar fullCalendarParams
+
+      if data.show && data.show != ''
+        @visibleContextList = data.show.split(',')
+
+      $(document).fragmentChange(@fragmentChange)
+
+      @colorizeContexts()
+
+      if @options.showScheduler
+        # Pre-load the appointment group list, for the badge
+        @dataSource.getAppointmentGroups false, (data) =>
+          required = 0
+          for group in data
+            required += 1 if group.requiring_action
+          @header.setSchedulerBadgeCount(required)
+
+      @connectHeaderEvents()
+      @connectSchedulerNavigatorEvents()
+      @connectAgendaEvents()
+
+      @header.selectView(@getCurrentView())
+
+      if data.view_name == 'scheduler' && data.appointment_group_id
+        @scheduler.viewCalendarForGroupId data.appointment_group_id
+
+      window.setInterval(@drawNowLine, 1000 * 60)
+
+
+
+    subscribeToEvents: ->
       $.subscribe
         "CommonEvent/eventDeleting" : @eventDeleting
         "CommonEvent/eventDeleted" : @eventDeleted
@@ -47,25 +106,37 @@ define [
         "EventDataSource/ajaxEnded" : @ajaxEnded
         "Calendar/refetchEvents" : @refetchEvents
         'CommonEvent/assignmentSaved' : @updateOverrides
+        'Calendar/colorizeContexts': @colorizeContexts
 
-      weekColumnFormatter = """
-        '<span class="agenda-col-wrapper">
-          <span class="day-num">'d'</span>
-          <span class="day-and-month">
-            <span class="day-name">'dddd'</span><br />
-            <span class="month-name">'MMM'</span>
-          </span>
-        </span>'
-      """
+    connectHeaderEvents: ->
+      @header.on('navigatePrev',  => @handleArrow('prev'))
+      @header.on 'navigateToday', @today
+      @header.on('navigateNext',  => @handleArrow('next'))
+      @header.on('navigateDate', @gotoDate)
+      @header.on('week', => @loadView('week'))
+      @header.on('month', => @loadView('month'))
+      @header.on('agenda', => @loadView('agenda'))
+      @header.on('scheduler', => @loadView('scheduler'))
+      @header.on('createNewEvent', @addEventClick)
+      @header.on('refreshCalendar', @reloadClick)
+      @header.on('done', @schedulerSingleDoneClick)
 
-      @header = @options.header
+    connectSchedulerNavigatorEvents: ->
+      @schedulerNavigator.on('navigatePrev',  => @handleArrow('prev'))
+      @schedulerNavigator.on('navigateToday', @today)
+      @schedulerNavigator.on('navigateNext',  => @handleArrow('next'))
+      @schedulerNavigator.on('navigateDate', @gotoDate)
 
-      fullCalendarParams = _.defaults(
+    connectAgendaEvents: ->
+      @agenda.on('agendaDateRange', @renderDateRange)
+
+    initializeFullCalendarParams: ->
+      _.defaults(
         header: false
         editable: true
         columnFormat:
-          month: 'dddd'
-          week: weekColumnFormatter
+          month: 'ddd'
+          week: 'ddd M/d'
         buttonText:
           today: I18n.t 'today', 'Today'
         defaultEventMinutes: 60
@@ -88,73 +159,18 @@ define [
         viewDisplay: @viewDisplay
         windowResize: @windowResize
         drop: @drop
+
+        dragRevertDuration: { month: 0 }
+        dragHelper: { month: 'clone' }
+        dragAppendTo: { month: '#calendar-drag-and-drop-container' }
+        dragZIndex: { month: 350 }
+        dragCursorAt: { month: {top: -5, left: -5} }
+
         , calendarDefaults)
 
-      data = @dataFromDocumentHash()
-      if not data.view_start and @options?.viewStart
-        data.view_start = @options.viewStart
-        location.hash = $.encodeToHex(JSON.stringify(data))
-      if data.view_start
-        date = $.fullCalendar.parseISO8601(data.view_start)
-        if date
-          fullCalendarParams.year = date.getFullYear()
-          fullCalendarParams.month = date.getMonth()
-          fullCalendarParams.date = date.getDate()
-
-      @el = $(selector).html calendarAppTemplate()
-
-      @schedulerNavigator = new CalendarNavigator(el: $('.scheduler_navigator'))
-      @schedulerNavigator.hide()
-
-      data.view_name = 'agendaWeek' if data.view_name == 'week'
-      if data.view_name == 'month' || data.view_name == 'agendaWeek'
-        viewName = if data.view_name == 'agendaWeek' then 'week' else 'month'
-        @header.selectView(viewName)
-        fullCalendarParams.defaultView = data.view_name
-
-      if data.show && data.show != ''
-        @visibleContextList = data.show.split(',')
-
-      @calendar = @el.find("div.calendar").fullCalendar fullCalendarParams
-
-      $(document).fragmentChange(@fragmentChange)
-
-      @colorizeContexts()
-
-      @scheduler = new Scheduler(".scheduler-wrapper", this)
-
-      if @options.showScheduler
-        # Pre-load the appointment group list, for the badge
-        @dataSource.getAppointmentGroups false, (data) =>
-          required = 0
-          for group in data
-            required += 1 if group.requiring_action
-          @header.setSchedulerBadgeCount(required)
-
-      @connectHeaderEvents()
-      @connectSchedulerNavigatorEvents()
-
-      window.setTimeout =>
-        if data.view_name == 'scheduler'
-          @header.selectView('scheduler')
-          if data.appointment_group_id
-            @scheduler.viewCalendarForGroupId data.appointment_group_id
-
-    connectHeaderEvents: ->
-      @header.on('navigatePrev',  => @calendar.fullCalendar('prev'))
-      @header.on('navigateToday', => @calendar.fullCalendar('today'))
-      @header.on('navigateNext',  => @calendar.fullCalendar('next'))
-      @header.on('week', => @loadView('week'))
-      @header.on('month', => @loadView('month'))
-      @header.on('scheduler', => @loadView('scheduler'))
-      @header.on('createNewEvent', @addEventClick)
-      @header.on('refreshCalendar', @reloadClick)
-      @header.on('done', @schedulerSingleDoneClick)
-
-    connectSchedulerNavigatorEvents: ->
-      @schedulerNavigator.on('navigatePrev',  => @calendar.fullCalendar('prev'))
-      @schedulerNavigator.on('navigateToday', => @calendar.fullCalendar('today'))
-      @schedulerNavigator.on('navigateNext',  => @calendar.fullCalendar('next'))
+    today: =>
+      now = $.fudgeDateForProfileTimezone(new Date)
+      @gotoDate(now)
 
     # FullCalendar callbacks
 
@@ -201,7 +217,7 @@ define [
 
         events
 
-      @dataSource.getEvents $.unfudgeDateForProfileTimezone(start), $.unfudgeDateForProfileTimezone(end), @visibleContextList, (events) =>
+      @dataSource.getEvents start, end, @visibleContextList, (events) =>
         if @displayAppointmentEvents
           @dataSource.getEventsForAppointmentGroup @displayAppointmentEvents, (aEvents) =>
             # Make sure any events in the current appointment group get marked -
@@ -226,6 +242,7 @@ define [
 
     windowResize: (view) =>
       @closeEventPopups()
+      @drawNowLine()
 
     eventRender: (event, element, view) =>
       $element = $(element)
@@ -259,17 +276,22 @@ define [
       $element.attr('title', $.trim("#{timeString}\n#{$element.find('.fc-event-title').text()}\n\n#{I18n.t('calendar_title', 'Calendar:')} #{event.contextInfo.name}"))
       $element.find('.fc-event-inner').prepend($("<span class='screenreader-only'>#{I18n.t('calendar_title', 'Calendar:')} #{event.contextInfo.name}</span>"));
       $element.find('.fc-event-title').prepend($("<span class='screenreader-only'>#{screenReaderTitleHint}</span>"))
+      element.find('.fc-event-inner').prepend($('<i />', {'class': "icon-#{event.iconType()}"}))
       true
 
     eventAfterRender: (event, element, view) =>
       if event.isDueAtMidnight()
         # show the actual time instead of the midnight fudged time
-        element.find('.fc-event-time').html @calendar.fullCalendar('formatDate', event.startDate(), 'h(:mm)t')
+        time = element.find('.fc-event-time')
+        html = time.html()
+        # the time element also contains the title for calendar events
+        html = html.replace(/^\d+:\d+\w?/, @calendar.fullCalendar('formatDate', event.startDate(), 'h(:mm)t'))
+        time.html(html)
       if event.eventType.match(/assignment/) && view.name == "agendaWeek"
         element.height('') # this fixes it so it can wrap and not be forced onto 1 line
           .find('.ui-resizable-handle').remove()
-      if event.eventType.match(/assignment/)
-        element.find('.fc-event-time').html I18n.t('labels.due', 'due')
+      if event.eventType.match(/assignment/) && event.isDueAtMidnight() && view.name == "month"
+        element.find('.fc-event-time').empty()
       if event.eventType == 'calendar_event' && @options?.activateEvent && event.id == "calendar_event_#{@options?.activateEvent}"
         @options.activateEvent = null
         @eventClick event,
@@ -279,6 +301,7 @@ define [
           view
 
     eventDragStart: (event, jsEvent, ui, view) =>
+      @lastEventDragged = event
       @closeEventPopups()
 
     eventResizeStart: (event, jsEvent, ui, view) =>
@@ -286,8 +309,10 @@ define [
 
     # event triggered by items being dropped from within the calendar
     eventDrop: (event, dayDelta, minuteDelta, allDay, revertFunc, jsEvent, ui, view) =>
+      @_eventDrop(event, minuteDelta, allDay, revertFunc)
 
-      if event.eventType == "assignment" && allDay
+    _eventDrop: (event, minuteDelta, allDay, revertFunc) ->
+      if @currentView == 'week' && allDay && event.eventType == "assignment"
         revertFunc()
         return
 
@@ -305,6 +330,7 @@ define [
         event.end = new Date(event.start.getTime() + originalDuration)
 
       event.saveDates null, revertFunc
+      return true
 
     eventResize: (event, dayDelta, minuteDelta, revertFunc, jsEvent, ui, view) =>
       # assignments can't be resized
@@ -320,6 +346,7 @@ define [
       allowedContexts = userSettings.get('checked_calendar_codes') or _.pluck(@contexts, 'asset_string')
       activeContexts  = _.filter @contexts, (c) -> _.contains(allowedContexts, c.asset_string)
       event = commonEventFactory(null, activeContexts)
+      event.date = @getCurrentDate()
 
       new EditEventDetailsDialog(event).show()
 
@@ -346,59 +373,91 @@ define [
 
     updateFragment: (opts) ->
       data = @dataFromDocumentHash()
+      changed = false
       for k, v of opts
-        data[k] = v
-      location.replace("#" + $.encodeToHex(JSON.stringify(data)))
+        changed = true if data[k] != v
+        if v
+          data[k] = v
+        else
+          delete data[k]
+      location.href = "#" + $.param(data) if changed
 
     viewDisplay: (view) =>
-      @updateFragment view_start: $.dateToISO8601UTC(view.start)
-      @header.setHeaderText(view.title)
-      @schedulerNavigator.setTitle(view.title)
+      @setDateTitle(view.title)
+      @drawNowLine()
+
+    isSameWeek: (date1, date2) ->
+      # Note that our date-js's getWeek is Monday-based.
+      sunday = new Date(date1.getTime())
+      sunday.setDate(sunday.getDate() - sunday.getDay())
+      weekStart = sunday.getTime()
+      weekEnd = weekStart + 7 * 24 * 3600 * 1000
+      weekStart <= date2 <= weekEnd
+
+    drawNowLine: =>
+      return unless @currentView == 'week'
+
+      if !@nowLine
+        @nowLine = $('<div />', {'class': 'calendar-nowline'})
+      $('.fc-agenda-slots').parent().append(@nowLine)
+
+      now = $.fudgeDateForProfileTimezone(new Date)
+      midnight = new Date(now.getTime())
+      midnight.setHours(0, 0, 0)
+      seconds = (now.getTime() - midnight.getTime())/1000
+
+      @nowLine.toggle(@isSameWeek(@getCurrentDate(), now))
+
+      @nowLine.css('width', $('.fc-agenda-slots .fc-widget-content:first').css('width'))
+      secondHeight = $('.fc-agenda-slots').css('height').replace('px', '')/24/3600
+      @nowLine.css('top', seconds*secondHeight + 'px')
+
+    setDateTitle: (title) =>
+      @header.setHeaderText(title)
+      @schedulerNavigator.setTitle(title)
 
     # event triggered by items being dropped from outside the calendar
     drop: (date, allDay, jsEvent, ui) =>
       eventId    = $(ui.helper).data('event-id')
       event      = $("[data-event-id=#{eventId}]").data('calendarEvent')
+      return unless event
+      event.start = date
+      event.addClass 'event_pending'
       revertFunc = -> console.log("could not save date on undated event")
 
-      if event
-        event.start = date
-        event.addClass 'event_pending'
+      return unless @_eventDrop(event, 0, allDay, revertFunc)
+      @calendar.fullCalendar('renderEvent', event)
 
-        if event.eventType == "assignment" && allDay
-          revertFunc()
-          return
+    # callback from minicalendar telling us an event from here was dragged there
+    dropOnMiniCalendar: (date, allDay, jsEvent, ui) ->
+      event = @lastEventDragged
+      return unless event
+      originalStart = new Date(event.start.getTime())
+      originalEnd = new Date(event.end?.getTime())
+      @copyYMD(event.start, date)
+      @copyYMD(event.end, date)
+      @_eventDrop(event, 0, false, =>
+        event.start = originalStart
+        event.end = originalEnd
+        @calendar.fullCalendar('updateEvent', event)
+      )
 
-        # isDueAtMidnight() will read cached midnightFudged property
-        if event.eventType == "assignment" && event.isDueAtMidnight() && minuteDelta == 0
-          event.start.setMinutes(59)
-
-        # set event as an all day event if allDay
-        if event.eventType == "calendar_event" && allDay
-          event.allDay = true
-
-        # if a short event gets dragged, we don't want to change its duration
-        if event.end && event.endDate()
-          originalDuration = event.endDate().getTime() - event.startDate().getTime()
-          event.end = new Date(event.start.getTime() + originalDuration)
-
-        @calendar.fullCalendar('renderEvent', event)
-        event.saveDates null, revertFunc
+    copyYMD: (target, source) ->
+      return unless target
+      target.setFullYear(source.getFullYear())
+      target.setMonth(source.getMonth())
+      target.setDate(source.getDate())
 
     # DOM callbacks
 
     fragmentChange: (event, hash) =>
       data = @dataFromDocumentHash()
-      view = @calendar?.fullCalendar('getView')
-      return unless view && !$.isEmptyObject(data)
+      return if $.isEmptyObject(data)
 
-      if (data.view_name == 'month' || data.view_name == 'agendaWeek') && data.view_name != view.name
-        @calendar.fullCalendar('changeView', data.view_name)
+      if data.view_name != @currentView
+        @loadView(data.view_name)
 
-      if data.view_start && data.view_start != $.dateToISO8601UTC(view.start)
-        date = $.fullCalendar.parseISO8601(data.view_start)
-        if date
-          @calendar.fullCalendar('gotoDate', date)
+      @gotoDate(@getCurrentDate())
 
     reloadClick: (event) =>
       event?.preventDefault()
@@ -458,6 +517,7 @@ define [
 
     visibleContextListChanged: (newList) =>
       @visibleContextList = newList
+      @loadAgendaView() if @currentView == 'agenda'
       @calendar.fullCalendar('refetchEvents')
 
     ajaxStarted: () =>
@@ -474,28 +534,105 @@ define [
 
     # Methods
 
-    gotoDate: (d) -> @calendar.fullCalendar("gotoDate", d)
+    gotoDate: (d) =>
+      @calendar.fullCalendar("gotoDate", d)
+      @agendaViewFetch(d) if @currentView == 'agenda'
+      @setCurrentDate(d)
+
+    handleArrow: (type) ->
+      @calendar.fullCalendar(type)
+      calendarDate = @calendar.fullCalendar('getDate')
+      now = $.fudgeDateForProfileTimezone(new Date)
+      if @currentView == 'month'
+        if calendarDate.getMonth() == now.getMonth() && calendarDate.getFullYear() == now.getFullYear()
+          start = now
+        else
+          start = new Date(calendarDate.getTime())
+          start.setDate(1)
+      else
+        if @isSameWeek(calendarDate, now)
+          start = now
+        else
+          start = new Date(calendarDate.getTime())
+          start.setDate(start.getDate() - start.getDay())
+      @setCurrentDate(start)
+
+    setCurrentDate: (d) ->
+      @updateFragment view_start: d.toISOString()
+      $.publish('Calendar/currentDate', d)
+
+    getCurrentDate: () ->
+      data = @dataFromDocumentHash()
+      if data.view_start
+        $.fullCalendar.parseISO8601(data.view_start)
+      else
+        $.fudgeDateForProfileTimezone(new Date)
+
+    setCurrentView: (view) ->
+      @updateFragment view_name: view
+      @currentView = view
+      userSettings.set('calendar_view', view)
+
+    getCurrentView: ->
+      if @currentView
+        @currentView
+      else if (data = @dataFromDocumentHash()) && data.view_name
+        data.view_name
+      else if userSettings.get('calendar_view')
+        userSettings.get('calendar_view')
+      else
+        'month'
 
     loadView: (view) =>
-      @updateFragment view_name: view
+      return if view == @currentView
+      @setCurrentView(view)
 
-      if view != 'scheduler'
-        @currentView = view
-        @calendar.removeClass('scheduler-mode')
+      $('.agenda-wrapper').removeClass('active')
+      @header.showNavigator()
+      @header.showPrevNext()
+      @header.hideAgendaRecommendation()
+      if view != 'scheduler' and view != 'agenda'
+        @calendar.removeClass('scheduler-mode').removeClass('agenda-mode')
         @displayAppointmentEvents = null
         @scheduler.hide()
+        @header.showAgendaRecommendation()
         @calendar.show()
-        @header.showNavigator()
         @schedulerNavigator.hide()
         @calendar.fullCalendar('refetchEvents')
         @calendar.fullCalendar('changeView', if view == 'week' then 'agendaWeek' else 'month')
-      else
-        @currentView = 'scheduler'
+        @calendar.fullCalendar('render')
+      else if view == 'scheduler'
         @calendar.addClass('scheduler-mode')
         @calendar.hide()
         @header.showSchedulerTitle()
         @schedulerNavigator.hide()
         @scheduler.show()
+      else
+        @calendar.hide()
+        @scheduler.hide()
+        @header.hidePrevNext()
+
+    loadAgendaView: ->
+      date = @getCurrentDate()
+      @agendaViewFetch(date)
+
+    agendaViewFetch: (start) ->
+      start.setHours(0)
+      start.setMinutes(0)
+      start.setSeconds(0)
+      @setDateTitle(I18n.l('#date.formats.medium', start))
+      @agenda.fetch(@visibleContextList, start)
+
+    renderDateRange: (start, end) =>
+      @setDateTitle(I18n.l('#date.formats.medium', start)+' &ndash; '+I18n.l('#date.formats.medium', end))
+      # for "load more" with voiceover, we want the alert to happen later so
+      # the focus change doesn't interrupt it.
+      window.setTimeout =>
+        $.screenReaderFlashMessage I18n.t('agenda_view_displaying_start_end', "Now displaying %{start} through %{end}",
+          start: I18n.l('#date.formats.long', start)
+          end:   I18n.l('#date.formats.long', end)
+        )
+      , 500
 
     showSchedulerSingle: ->
       @calendar.show()
@@ -522,24 +659,27 @@ define [
       rgbArray = hsvToRgb(h,s,b)
       "rgb(#{rgbArray.join ' ,'})"
 
-    colorizeContexts: ->
-      [bgSaturation, bgBrightness]         = [30, 96]
-      [textSaturation, textBrightness]     = [60, 40]
-      [strokeSaturation, strokeBrightness] = [70, 70]
-
+    colorizeContexts: =>
+      colors = colorSlicer.getColors(@contextCodes.length)
       html = for contextCode, index in @contextCodes
-        hue = hues[index % hues.length]
+        color = colors[index]
         ".group_#{contextCode}{
-           color: #{cssColor hue, textSaturation, textBrightness};
-           border-color: #{cssColor hue, strokeSaturation, strokeBrightness};
-           background-color: #{cssColor hue, bgSaturation, bgBrightness};
+           color: #{color};
+           border-color: #{color};
+           background-color: #{color};
         }"
+
       $styleContainer.html "<style>#{html.join('')}</style>"
 
     dataFromDocumentHash: () =>
       data = {}
       try
-        data = $.parseJSON($.decodeFromHex(location.hash.substring(1))) || {}
+        fragment = location.hash.substring(1)
+        if fragment.indexOf('=') != -1
+          data = deparam(location.hash.substring(1)) || {}
+        else
+          # legacy
+          data = $.parseJSON($.decodeFromHex(location.hash.substring(1))) || {}
       catch e
         data = {}
       data

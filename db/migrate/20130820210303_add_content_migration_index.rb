@@ -1,9 +1,9 @@
 class AddContentMigrationIndex < ActiveRecord::Migration
   tag :postdeploy
-  self.transactional = false
+  disable_ddl_transaction!
 
   def self.up
-    add_index :content_migrations, :context_id, concurrently: true
+    add_index :content_migrations, :context_id, algorithm: :concurrently
   end
 
   def self.down

@@ -1,6 +1,13 @@
-define ['Backbone'], ({View}) ->
-
-  module 'View'
+define [
+  'Backbone'
+  'compiled/util/mixin'
+  'helpers/fakeENV'
+], ({View}, mixing, fakeENV) -> 
+  module 'View',
+    setup: ->
+      fakeENV.setup()
+    teardown: ->
+      fakeENV.teardown()
 
   test 'defaults', ->
     class SomeView extends Backbone.View
@@ -100,25 +107,25 @@ define ['Backbone'], ({View}) ->
 
   test 'toJSON', ->
     view = new Backbone.View foo: 'bar'
-    expected = foo: 'bar', cid: view.cid
+    expected = foo: 'bar', cid: view.cid, ENV: ENV
     deepEqual expected, view.toJSON(), 'returns options'
 
     collection = new Backbone.Collection
     collection.toJSON = -> foo: 'bar'
     view = new Backbone.View {collection}
-    expected = foo: 'bar', cid: view.cid
+    expected = foo: 'bar', cid: view.cid, ENV: ENV
     deepEqual expected, view.toJSON(), 'uses @collection.toJSON'
     collection.present = -> foo: 'baz'
-    expected = foo: 'baz', cid: view.cid
+    expected = foo: 'baz', cid: view.cid, ENV: ENV
     deepEqual expected, view.toJSON(), 'uses @collection.present over toJSON'
 
     model = new Backbone.Model
     model.toJSON = -> foo: 'qux'
     view.model = model
-    expected = foo: 'qux', cid: view.cid
+    expected = foo: 'qux', cid: view.cid, ENV: ENV
     deepEqual expected, view.toJSON(), 'uses @model.toJSON over @collection'
     model.present = -> foo: 'quux'
-    expected = foo: 'quux', cid: view.cid
+    expected = foo: 'quux', cid: view.cid, ENV: ENV
     deepEqual expected, view.toJSON(), 'uses @model.present over toJSON'
 
   test 'View.mixin', 3, ->
@@ -171,3 +178,40 @@ define ['Backbone'], ({View}) ->
     equal View::defaults.foo, undefined, 'View::defaults was not appended'
     equal Foo::defaults.foo, 'bar', 'Foo::defaults was appended'
 
+  test 'View.mixin with compound mixins', ->
+    afterRender1 = sinon.spy()
+    mixin1 = afterRender: afterRender1
+    afterRender2 = sinon.spy()
+    mixin2 = mixing {}, mixin1, afterRender: afterRender2
+    afterRender3 = sinon.spy()
+    mixin3 = afterRender: afterRender3
+    afterRenderFoo = sinon.spy()
+    class Foo extends View
+      @mixin mixin2, mixin3
+      afterRender: -> super and afterRenderFoo()
+    window.Foo = Foo
+    view = new Foo
+    view.render()
+    ok afterRender1.calledOnce, 'called mixin1 afterRender'
+    ok afterRender2.calledOnce, 'called mixin2 afterRender'
+    ok afterRender3.calledOnce, 'called mixin3 afterRender'
+    ok afterRenderFoo.calledOnce, 'called foo afterRender'
+
+    # order of mixing in shouldn't matter
+    afterRender4 = sinon.spy()
+    afterRender5 = sinon.spy()
+    afterRender6 = sinon.spy()
+    mixin4 = afterRender: afterRender4
+    mixin5 = mixing {}, mixin4, afterRender: afterRender5
+    mixin6 = afterRender: afterRender6
+    afterRenderBar = sinon.spy()
+    class Bar extends View
+      @mixin mixin6, mixin5
+      afterRender: -> super and afterRenderBar()
+    window.Bar = Bar
+    bar = new Bar
+    bar.render()
+    ok afterRender4.calledOnce, 'called mixin4 afterRender'
+    ok afterRender5.calledOnce, 'called mixin5 afterRender'
+    ok afterRender6.calledOnce, 'called mixin6 afterRender'
+    ok afterRenderBar.calledOnce, 'called bar afterRender'

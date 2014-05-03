@@ -1,9 +1,13 @@
 define [
+  'jquery'
   'Backbone'
   'compiled/jquery/outerclick'
-], ({View}) ->
+], ($, {View}) ->
 
   class PopoverMenuView extends View
+
+    defaults:
+      zIndex: 1
 
     events:
       'click': 'cancelHide'
@@ -16,10 +20,10 @@ define [
       @cancelHide()
       setTimeout => # IE needs this to happen async frd
         @render()
-        @$el.insertAfter($target)
+        @attachElement($target)
         @$el.show()
         @setElement @$el
-        @$el.zIndex(1)
+        @$el.zIndex(@options.zIndex)
         @setWidth?()
         @$el.position
           my: @my or 'left+6 top-47'
@@ -37,9 +41,8 @@ define [
       parentBound = parent.offset().top + parent.height()
       popoverOffset = popover.offset().top
       popoverHeader = popover.find('.popover-title').outerHeight()
-      contentPadding = content.outerHeight() - content.height()
       defaultHeight = parseInt content.css('maxHeight')
-      newHeight = parentBound - popoverOffset - popoverHeader - contentPadding
+      newHeight = parentBound - popoverOffset - popoverHeader
       content.css maxHeight: Math.min(defaultHeight, newHeight)
 
     cancelHide: =>
@@ -48,6 +51,10 @@ define [
     hide: =>
       @hideTimeout = setTimeout =>
         @$el.detach()
+      , 100
 
     checkEsc: (e) ->
       @hide() if e.keyCode is 27 # escape
+
+    attachElement: ($target) ->
+      @$el.insertAfter($target)

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -20,170 +20,246 @@
 #
 # API for creating, accessing and updating calendar events.
 #
-# @object CalendarEvent
+# @model CalendarLink
 #     {
-#       // The ID of the calendar event
-#       "id": 234,
-#
-#       // The title of the calendar event
-#       "title": "Paintball Fight!",
-#
-#       // The start timestamp of the event
-#       "start_at": "2012-07-19T15:00:00-06:00",
-#
-#       // The end timestamp of the event
-#       "end_at": "2012-07-19T16:00:00-06:00",
-#
-#       // The HTML description of the event
-#       "description": "<b>It's that time again!</b>",
-#
-#       // The location name of the event
-#       "location_name": "Greendale Community College",
-#
-#       // The address where the event is taking place
-#       "location_address": "Greendale, Colorado",
-#
-#       // the context code of the calendar this event belongs to (course, user
-#       // or group)
-#       "context_code": "course_123",
-#
-#       // if specified, it indicates which calendar this event should be
-#       // displayed on. for example, a section-level event would have the
-#       // course's context code here, while the section's context code would
-#       // be returned above)
-#       "effective_context_code": null,
-#
-#       // Current state of the event ("active", "locked" or "deleted")
-#       // "locked" indicates that start_at/end_at cannot be changed (though
-#       // the event could be deleted). Normally only reservations or time
-#       // slots with reservations are locked (see the Appointment Groups API)
-#       "workflow_state": "active",
-#
-#       // Whether this event should be displayed on the calendar. Only true
-#       // for course-level events with section-level child events.
-#       "hidden": false,
-#
-#       // Normally null. If this is a reservation (see the Appointment Groups
-#       // API), the id will indicate the time slot it is for. If this is a
-#       // section-level event, this will be the course-level parent event.
-#       "parent_event_id": null,
-#
-#       // The number of child_events. See child_events (and parent_event_id)
-#       "child_events_count": 0,
-#
-#       // Included by default, but may be excluded (see include[] option).
-#       // If this is a time slot (see the Appointment Groups API) this will
-#       // be a list of any reservations. If this is a course-level event,
-#       // this will be a list of section-level events (if any)
-#       "child_events": [],
-#
-#       // URL for this calendar event (to update, delete, etc.)
-#       "url": "https://example.com/api/v1/calendar_events/234",
-#
-#       // URL for a user to view this event
-#       "html_url": "https://example.com/calendar?event_id=234&include_contexts=course_123",
-#
-#       // The date of this event
-#       "all_day_date": "2012-07-19",
-#
-#       // Boolean indicating whether this is an all-day event (midnight to
-#       // midnight)
-#       "all_day": false,
-#
-#       // When the calendar event was created
-#       "created_at": "2012-07-12T10:55:20-06:00",
-#
-#       // When the calendar event was last updated
-#       "updated_at": "2012-07-12T10:55:20-06:00",
-#
-#
-#       ///////////////////////////////////////////////////////////////////////
-#       // Various Appointment-Group-related fields                          //
-#       //                                                                   //
-#       // These fields are only pertinent to time slots (appointments) and  //
-#       // reservations of those time slots. See the Appointment Groups API  //
-#       ///////////////////////////////////////////////////////////////////////
-#
-#       // The id of the appointment group
-#       "appointment_group_id": null,
-#
-#       // The API URL of the appointment group
-#       "appointment_group_url": null,
-#
-#       // If the event is a reservation, this a boolean indicating whether it
-#       // is the current user's reservation, or someone else's
-#       "own_reservation": null,
-#
-#       // If the event is a time slot, the API URL for reserving it 
-#       "reserve_url": null,
-#
-#       // If the event is a time slot, a boolean indicating whether the user
-#       // has already made a reservation for it 
-#       "reserved": null,
-#
-#       // If the event is a time slot, this is the participant limit
-#       "participants_per_appointment": null,
-#
-#       // If the event is a time slot and it has a participant limit, an
-#       // integer indicating how many slots are available
-#       "available_slots": null,
-#
-#       // If the event is a user-level reservation, this will contain the user
-#       // participant JSON (refer to the Users API).
-#       "user": null,
-#
-#       // If the event is a group-level reservation, this will contain the
-#       // group participant JSON (refer to the Groups API).
-#       "group": null
+#       "id": "CalendarLink",
+#       "description": "",
+#       "properties": {
+#         "ics": {
+#           "description": "The URL of the calendar in ICS format",
+#           "example": "https://canvas.instructure.com/feeds/calendars/course_abcdef.ics",
+#           "type": "string"
+#          }
+#       }
 #     }
 #
-# @object AssignmentEvent
+# @model CalendarEvent
 #     {
-#       // A synthetic ID for the assignment
-#       "id": "assignment_987",
-#
-#       // The title of the assignment
-#       "title": "Essay",
-#
-#       // The due_at timestamp of the assignment
-#       "start_at": "2012-07-19T23:59:00-06:00",
-#
-#       // The due_at timestamp of the assignment
-#       "end_at": "2012-07-19T23:59:00-06:00",
-#
-#       // The HTML description of the assignment
-#       "description": "<b>Write an essay. Whatever you want.</b>",
-#
-#       // the context code of the (course) calendar this assignment belongs to
-#       "context_code": "course_123",
-#
-#       // Current state of the assignment ("published" or "deleted")
-#       "workflow_state": "published",
-#
-#       // URL for this assignment (note that updating/deleting should be done
-#       // via the Assignments API)
-#       "url": "https://example.com/api/v1/calendar_events/assignment_987",
-#
-#       // URL for a user to view this assignment
-#       "html_url": "http://example.com/courses/123/assignments/987",
-#
-#       // The due date of this assignment
-#       "all_day_date": "2012-07-19",
-#
-#       // Boolean indicating whether this is an all-day event (e.g. assignment
-#       // due at midnight)
-#       "all_day": true,
-#
-#       // When the assignment was created
-#       "created_at": "2012-07-12T10:55:20-06:00",
-#
-#       // When the assignment was last updated
-#       "updated_at": "2012-07-12T10:55:20-06:00",
-#
-#       // The full assignment JSON data (See the Assignments API)
-#       "assignment": {}
+#       "id": "CalendarEvent",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "The ID of the calendar event",
+#           "example": 234,
+#           "type": "integer"
+#         },
+#         "title": {
+#           "description": "The title of the calendar event",
+#           "example": "Paintball Fight!",
+#           "type": "string"
+#         },
+#         "start_at": {
+#           "description": "The start timestamp of the event",
+#           "example": "2012-07-19T15:00:00-06:00",
+#           "type": "datetime"
+#         },
+#         "end_at": {
+#           "description": "The end timestamp of the event",
+#           "example": "2012-07-19T16:00:00-06:00",
+#           "type": "datetime"
+#         },
+#         "description": {
+#           "description": "The HTML description of the event",
+#           "example": "<b>It's that time again!</b>",
+#           "type": "string"
+#         },
+#         "location_name": {
+#           "description": "The location name of the event",
+#           "example": "Greendale Community College",
+#           "type": "string"
+#         },
+#         "location_address": {
+#           "description": "The address where the event is taking place",
+#           "example": "Greendale, Colorado",
+#           "type": "string"
+#         },
+#         "context_code": {
+#           "description": "the context code of the calendar this event belongs to (course, user or group)",
+#           "example": "course_123",
+#           "type": "string"
+#         },
+#         "effective_context_code": {
+#           "description": "if specified, it indicates which calendar this event should be displayed on. for example, a section-level event would have the course's context code here, while the section's context code would be returned above)",
+#           "type": "string"
+#         },
+#         "workflow_state": {
+#           "description": "Current state of the event ('active', 'locked' or 'deleted') 'locked' indicates that start_at/end_at cannot be changed (though the event could be deleted). Normally only reservations or time slots with reservations are locked (see the Appointment Groups API)",
+#           "example": "active",
+#           "type": "string"
+#         },
+#         "hidden": {
+#           "description": "Whether this event should be displayed on the calendar. Only true for course-level events with section-level child events.",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "parent_event_id": {
+#           "description": "Normally null. If this is a reservation (see the Appointment Groups API), the id will indicate the time slot it is for. If this is a section-level event, this will be the course-level parent event.",
+#           "type": "integer"
+#         },
+#         "child_events_count": {
+#           "description": "The number of child_events. See child_events (and parent_event_id)",
+#           "example": 0,
+#           "type": "integer"
+#         },
+#         "child_events": {
+#           "description": "Included by default, but may be excluded (see include[] option). If this is a time slot (see the Appointment Groups API) this will be a list of any reservations. If this is a course-level event, this will be a list of section-level events (if any)",
+#           "type": "array",
+#           "items": {"type": "integer"}
+#         },
+#         "url": {
+#           "description": "URL for this calendar event (to update, delete, etc.)",
+#           "example": "https://example.com/api/v1/calendar_events/234",
+#           "type": "string"
+#         },
+#         "html_url": {
+#           "description": "URL for a user to view this event",
+#           "example": "https://example.com/calendar?event_id=234&include_contexts=course_123",
+#           "type": "string"
+#         },
+#         "all_day_date": {
+#           "description": "The date of this event",
+#           "example": "2012-07-19",
+#           "type": "datetime"
+#         },
+#         "all_day": {
+#           "description": "Boolean indicating whether this is an all-day event (midnight to midnight)",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "created_at": {
+#           "description": "When the calendar event was created",
+#           "example": "2012-07-12T10:55:20-06:00",
+#           "type": "datetime"
+#         },
+#         "updated_at": {
+#           "description": "When the calendar event was last updated",
+#           "example": "2012-07-12T10:55:20-06:00",
+#           "type": "datetime"
+#         },
+#         "appointment_group_id": {
+#           "description": "Various Appointment-Group-related fields.These fields are only pertinent to time slots (appointments) and reservations of those time slots. See the Appointment Groups API. The id of the appointment group",
+#           "type": "integer"
+#         },
+#         "appointment_group_url": {
+#           "description": "The API URL of the appointment group",
+#           "type": "string"
+#         },
+#         "own_reservation": {
+#           "description": "If the event is a reservation, this a boolean indicating whether it is the current user's reservation, or someone else's",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "reserve_url": {
+#           "description": "If the event is a time slot, the API URL for reserving it",
+#           "type": "string"
+#         },
+#         "reserved": {
+#           "description": "If the event is a time slot, a boolean indicating whether the user has already made a reservation for it",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "participants_per_appointment": {
+#           "description": "If the event is a time slot, this is the participant limit",
+#           "type": "integer"
+#         },
+#         "available_slots": {
+#           "description": "If the event is a time slot and it has a participant limit, an integer indicating how many slots are available",
+#           "type": "integer"
+#         },
+#         "user": {
+#           "description": "If the event is a user-level reservation, this will contain the user participant JSON (refer to the Users API).",
+#           "type": "string"
+#         },
+#         "group": {
+#           "description": "If the event is a group-level reservation, this will contain the group participant JSON (refer to the Groups API).",
+#           "type": "string"
+#         }
+#       }
 #     }
-
+#
+# @model AssignmentEvent
+#     {
+#       "id": "AssignmentEvent",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "A synthetic ID for the assignment",
+#           "example": "assignment_987",
+#           "type": "string"
+#         },
+#         "title": {
+#           "description": "The title of the assignment",
+#           "example": "Essay",
+#           "type": "string"
+#         },
+#         "start_at": {
+#           "description": "The due_at timestamp of the assignment",
+#           "example": "2012-07-19T23:59:00-06:00",
+#           "type": "datetime"
+#         },
+#         "end_at": {
+#           "description": "The due_at timestamp of the assignment",
+#           "example": "2012-07-19T23:59:00-06:00",
+#           "type": "datetime"
+#         },
+#         "description": {
+#           "description": "The HTML description of the assignment",
+#           "example": "<b>Write an essay. Whatever you want.</b>",
+#           "type": "string"
+#         },
+#         "context_code": {
+#           "description": "the context code of the (course) calendar this assignment belongs to",
+#           "example": "course_123",
+#           "type": "string"
+#         },
+#         "workflow_state": {
+#           "description": "Current state of the assignment ('published' or 'deleted')",
+#           "example": "published",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "published",
+#               "deleted"
+#             ]
+#           }
+#         },
+#         "url": {
+#           "description": "URL for this assignment (note that updating/deleting should be done via the Assignments API)",
+#           "example": "https://example.com/api/v1/calendar_events/assignment_987",
+#           "type": "string"
+#         },
+#         "html_url": {
+#           "description": "URL for a user to view this assignment",
+#           "example": "http://example.com/courses/123/assignments/987",
+#           "type": "string"
+#         },
+#         "all_day_date": {
+#           "description": "The due date of this assignment",
+#           "example": "2012-07-19",
+#           "type": "datetime"
+#         },
+#         "all_day": {
+#           "description": "Boolean indicating whether this is an all-day event (e.g. assignment due at midnight)",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "created_at": {
+#           "description": "When the assignment was created",
+#           "example": "2012-07-12T10:55:20-06:00",
+#           "type": "datetime"
+#         },
+#         "updated_at": {
+#           "description": "When the assignment was last updated",
+#           "example": "2012-07-12T10:55:20-06:00",
+#           "type": "datetime"
+#         },
+#         "assignment": {
+#           "description": "The full assignment JSON data (See the Assignments API)",
+#           "$ref": "Assignment"
+#         }
+#       }
+#     }
+#
 class CalendarEventsApiController < ApplicationController
   include Api::V1::CalendarEvent
 
@@ -236,12 +312,12 @@ class CalendarEventsApiController < ApplicationController
       end
     end
 
-    scope  = @type == :assignment ? assignment_scope : calendar_event_scope
+    scope = @type == :assignment ? assignment_scope : calendar_event_scope
     events = Api.paginate(scope, self, api_v1_calendar_events_url)
     CalendarEvent.send(:preload_associations, events, :child_events) if @type == :event
     events = apply_assignment_overrides(events) if @type == :assignment
 
-    render :json => events.map{ |event| event_json(event, @current_user, session) }
+    render :json => events.map { |event| event_json(event, @current_user, session) }
   end
 
   # @API Create a calendar event
@@ -278,7 +354,7 @@ class CalendarEventsApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/calendar_events.json' \ 
+  #   curl 'https://<canvas>/api/v1/calendar_events.json' \
   #        -X POST \ 
   #        -F 'calendar_event[context_code]=course_123' \ 
   #        -F 'calendar_event[title]=Paintball Fight!' \ 
@@ -325,7 +401,7 @@ class CalendarEventsApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/calendar_events/345/reservations.json' \ 
+  #   curl 'https://<canvas>/api/v1/calendar_events/345/reservations.json' \
   #        -X POST \ 
   #        -F 'cancel_existing=true' \ 
   #        -H "Authorization: Bearer <token>"
@@ -345,12 +421,12 @@ class CalendarEventsApiController < ApplicationController
       rescue CalendarEvent::ReservationError => err
         reservations = participant ? @event.appointment_group.reservations_for(participant) : []
         render :json => [{
-            :attribute => 'reservation',
-            :type => 'calendar_event',
-            :message => err.message,
-            :reservations => reservations.map{ |r| event_json(r, @current_user, session) }
-          }],
-          :status => :bad_request
+                           :attribute => 'reservation',
+                           :type => 'calendar_event',
+                           :message => err.message,
+                           :reservations => reservations.map { |r| event_json(r, @current_user, session) }
+                         }],
+               :status => :bad_request
       end
     end
   end
@@ -389,7 +465,7 @@ class CalendarEventsApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/calendar_events/234.json' \ 
+  #   curl 'https://<canvas>/api/v1/calendar_events/234.json' \
   #        -X PUT \ 
   #        -F 'calendar_event[title]=Epic Paintball Fight!' \ 
   #        -H "Authorization: Bearer <token>"
@@ -423,7 +499,7 @@ class CalendarEventsApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/calendar_events/234.json' \ 
+  #   curl 'https://<canvas>/api/v1/calendar_events/234.json' \
   #        -X DELETE \ 
   #        -F 'cancel_reason=Greendale layed off the janitorial staff :(' \ 
   #        -H "Authorization: Bearer <token>"
@@ -461,10 +537,10 @@ class CalendarEventsApiController < ApplicationController
         # Add in any appointment groups this user can manage and someone has reserved
         appointment_codes = manageable_appointment_group_codes
         @events.concat CalendarEvent.active.
-          for_user_and_context_codes(@current_user, appointment_codes).
-          send(*date_scope_and_args).
-          events_with_child_events.
-          all
+                         for_user_and_context_codes(@current_user, appointment_codes).
+                         send(*date_scope_and_args).
+                         events_with_child_events.
+                         all
       end
     else
       # if the feed url doesn't give us the requesting user,
@@ -480,24 +556,37 @@ class CalendarEventsApiController < ApplicationController
       end
     end
 
-    @events = @events.sort_by{ |e| [e.start_at || SortLast, Canvas::ICU.collation_key(e.title)] }
+    @events = @events.sort_by { |e| [e.start_at || SortLast, Canvas::ICU.collation_key(e.title)] }
 
     @contexts.each do |context|
       log_asset_access("calendar_feed:#{context.asset_string}", "calendar", 'other')
     end
     respond_to do |format|
       format.ics do
-        render :text => @events.to_ics(t('ics_title', "%{course_or_group_name} Calendar (Canvas)", :course_or_group_name => @context.name),
-          case
-            when @context.is_a?(Course)
-              t('ics_description_course', "Calendar events for the course, %{course_name}", :course_name => @context.name)
-            when @context.is_a?(Group)
-              t('ics_description_group', "Calendar events for the group, %{group_name}", :group_name => @context.name)
-            when @context.is_a?(User)
-              t('ics_description_user', "Calendar events for the user, %{user_name}", :user_name => @context.name)
-            else
-              t('ics_description', "Calendar events for %{context_name}", :context_name => @context.name)
-          end)
+        name = t('ics_title', "%{course_or_group_name} Calendar (Canvas)", :course_or_group_name => @context.name)
+        description = case
+                        when @context.is_a?(Course)
+                          t('ics_description_course', "Calendar events for the course, %{course_name}", :course_name => @context.name)
+                        when @context.is_a?(Group)
+                          t('ics_description_group', "Calendar events for the group, %{group_name}", :group_name => @context.name)
+                        when @context.is_a?(User)
+                          t('ics_description_user', "Calendar events for the user, %{user_name}", :user_name => @context.name)
+                        else
+                          t('ics_description', "Calendar events for %{context_name}", :context_name => @context.name)
+                      end
+
+        calendar = Icalendar::Calendar.new
+        # to appease Outlook
+        calendar.custom_property("METHOD", "PUBLISH")
+        calendar.custom_property("X-WR-CALNAME", name)
+        calendar.custom_property("X-WR-CALDESC", description)
+
+        @events.each do |event|
+          ics_event = event.to_ics(false)
+          calendar.add_event(ics_event) if ics_event
+        end
+
+        render :text => calendar.to_ical
       end
       format.atom do
         feed = Atom::Feed.new do |f|
@@ -523,11 +612,11 @@ class CalendarEventsApiController < ApplicationController
 
   def get_event(search_assignments = false)
     @event = if params[:id] =~ /\Aassignment_(.*)/
-      raise ActiveRecord::RecordNotFound unless search_assignments
-      Assignment.find($1)
-    else
-      CalendarEvent.find(params[:id])
-    end
+               raise ActiveRecord::RecordNotFound unless search_assignments
+               Assignment.find($1)
+             else
+               CalendarEvent.find(params[:id])
+             end
   end
 
   def date_scope_and_args(between_scope = :between)
@@ -542,6 +631,20 @@ class CalendarEventsApiController < ApplicationController
     @all_events = value_to_boolean(params[:all_events])
     @undated = value_to_boolean(params[:undated])
     if !@all_events && !@undated
+      if params[:start_date].present? && params[:start_date] !~ Api::DATE_REGEX
+        Api.invalid_time_stamp_error('start_date', @current_user.attributes.to_s +
+          ErrorReport.useful_http_env_stuff_from_request(request).to_s)
+        # todo stop logging and delete invalid dates
+        # params.delete(:start_date)
+      end
+
+      if params[:end_date].present? && params[:end_date] !~ Api::DATE_REGEX
+        Api.invalid_time_stamp_error('end_date', @current_user.attributes.to_s +
+          ErrorReport.useful_http_env_stuff_from_request(request).to_s)
+        # todo stop logging and delete invalid dates
+        # params.delete(:end_date)
+      end
+
       today = Time.zone.now
       @start_date ||= TimeHelper.try_parse(params[:start_date], today).beginning_of_day
       @end_date ||= TimeHelper.try_parse(params[:end_date], today).end_of_day
@@ -574,14 +677,14 @@ class CalendarEventsApiController < ApplicationController
       end
 
       # filter the contexts to only the requested contexts
-      selected_contexts = @contexts.select{ |c| codes.include?(c.asset_string) }
+      selected_contexts = @contexts.select { |c| codes.include?(c.asset_string) }
     else
       selected_contexts = @contexts
     end
     @context_codes = selected_contexts.map(&:asset_string)
     @section_codes = []
     if @current_user
-      @section_codes = selected_contexts.inject([]){ |ary, context|
+      @section_codes = selected_contexts.inject([]) { |ary, context|
         next ary unless context.is_a?(Course)
         ary + context.sections_visible_to(@current_user).map(&:asset_string)
       }
@@ -589,13 +692,13 @@ class CalendarEventsApiController < ApplicationController
 
     if @type == :event && @start_date && @current_user
       # pull in reservable appointment group events, if requested
-      group_codes = codes.grep(/\Aappointment_group_(\d+)\z/).map{ |m| m.sub(/.*_/, '').to_i }
+      group_codes = codes.grep(/\Aappointment_group_(\d+)\z/).map { |m| m.sub(/.*_/, '').to_i }
       if group_codes.present?
         @context_codes += AppointmentGroup.
-                            reservable_by(@current_user).
-                            intersecting(@start_date, @end_date).
-                            find_all_by_id(group_codes).
-                            map(&:asset_string)
+          reservable_by(@current_user).
+          intersecting(@start_date, @end_date).
+          find_all_by_id(group_codes).
+          map(&:asset_string)
       end
       # include manageable appointment group events for the specified contexts
       # and dates
@@ -607,11 +710,31 @@ class CalendarEventsApiController < ApplicationController
     # Fully ordering by due_at requires examining all the overrides linked and as it applies to
     # specific people, sections, etc. This applies the base assignment due_at for ordering
     # as a more sane default then natural DB order. No, it isn't perfect but much better.
-    scope = Assignment.active.order_by_base_due_at.
-      for_context_codes(@context_codes)
+    scope = assignment_context_scope.active.order_by_base_due_at
 
     scope = scope.send(*date_scope_and_args(:due_between_with_overrides)) unless @all_events
     scope
+  end
+
+  def assignment_context_scope
+    # contexts have to be partitioned into two groups so they can be queried effectively
+    contexts = @contexts.select{ |c| @context_codes.include?(c.asset_string) }
+    view_unpublished, other = contexts.partition { |c| c.grants_right?(@current_user, session, :view_unpublished_items) }
+
+    sql = []
+    conditions = []
+    unless view_unpublished.empty?
+      sql << '(assignments.context_code IN (?))'
+      conditions << view_unpublished.map(&:asset_string)
+    end
+
+    unless other.empty?
+      sql << '(assignments.context_code IN (?) AND assignments.workflow_state = ?)'
+      conditions << other.map(&:asset_string)
+      conditions << 'published'
+    end
+
+    Assignment.where([sql.join(' OR ')] + conditions)
   end
 
   def calendar_event_scope
@@ -632,6 +755,7 @@ class CalendarEventsApiController < ApplicationController
 
   def apply_assignment_overrides(events)
     events = events.inject([]) do |assignments, assignment|
+
       _, admin_dates = assignment.due_dates_for(@current_user)
       if admin_dates.present?
         overridden_dates, original_dates = admin_dates.partition { |date| date[:override] }
@@ -640,13 +764,15 @@ class CalendarEventsApiController < ApplicationController
           assignments << AssignmentOverrideApplicator.assignment_with_overrides(assignment, [date[:override]])
         end
 
-        original_dates.each { |date| assignments << assignment }
+        if original_dates.present? && assignment.context.course_sections.active.count != overridden_dates.size
+          assignments << assignment
+        end
+
       else
         assignment = assignment.overridden_for(@current_user)
         assignment.infer_all_day
         assignments << assignment
       end
-
       assignments
     end
 

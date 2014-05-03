@@ -121,8 +121,8 @@
         <div style="margin-top: 5px;">
         <select class="module_item_select" multiple>
           <%# cache on the context.wiki instead of just the context because even though it will require a db query, we will get a much better cache hit rate %>
-          <% cache([@context.wiki, 'active_wiki_pages']) do  %>
-            <% @context.wiki.wiki_pages.active.select([:id, :title]).each do |page| %>
+          <% cache([@context.wiki, 'non_deleted_wiki_pages']) do  %>
+            <% @context.wiki.wiki_pages.not_deleted.select([:id, :title]).each do |page| %>
               <% if page && !page.new_record? %>
                 <option value="<%= page.id %>"><%= page.title %></option>
               <% end %>
@@ -190,7 +190,9 @@
           <% @context.quizzes.active.limit(400).each do |quiz| %>
             <option value="<%= quiz.id %>"><%= quiz.title %></option>
           <% end %>
-          <option value="new"><%= t :new_quiz_option, "[ New Quiz ]" %></option>
+          <% if @context.grants_right?(@current_user, session, :manage_assignments) %>
+            <option value="new"><%= t :new_quiz_option, "[ New Quiz ]" %></option>
+          <% end %>
         </select>
         </div>
         <div class="new" style="margin-top: 5px;">
@@ -234,7 +236,9 @@
             <% end %>
             </optgroup>
           <% end %>
-          <option value="new"><%= t :new_assignment_option, "[ New Assignment ]" %></option>
+          <% if @context.grants_right?(@current_user, session, :manage_assignments) %>
+            <option value="new"><%= t :new_assignment_option, "[ New Assignment ]" %></option>
+          <% end %>
         </select>
         </div>
         <div class="new" style="margin-top: 5px;">
@@ -261,6 +265,9 @@
         <div class="new" style="margin-top: 5px;">
           <%= before_label :topic_name, "Topic Name" %>
           <input type="text" name="title" class="item_title"/>
+          <% if @context.feature_enabled? :draft_state %>
+            <input type="hidden" name="published" value="false"/>
+          <% end %>
           <a href="<%= context_url(@context, :api_v1_context_discussion_topics_url) %>" style="display: none;" class="add_item_url">&nbsp;</a>
         </div>
       </div>

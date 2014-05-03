@@ -22,40 +22,76 @@
 # API for accessing the messages (emails, sms, facebook, twitter, etc) that have 
 # been sent to a user. 
 #
-# @object CommMessage
+# @model CommMessage
 #     {
-#       // The ID of the CommMessage.
-#       "id": 42,
-#
-#       // The date and time this message was created
-#       "created_at": "2013-03-19T21:00:00Z",
-#
-#       // The date and time this message was sent
-#       "sent_at": "2013-03-20T22:42:00Z",
-#
-#       // The workflow state of the message.
-#       // One of "created", "staged", "sending", "sent", "bounced",
-#       // "dashboard", "cancelled", or "closed"
-#       "workflow_state": "sent",
-#
-#       // The address that was put in the "from" field of the message
-#       "from": "notifications@example.com",
-#
-#       // The address the message was sent to:
-#       "to": "someone@example.com",
-#
-#       // The reply_to header of the message
-#       "reply_to": "notifications+specialdata@example.com",
-#
-#       // The message subject
-#       "subject": "example subject line",
-#
-#       // The plain text body of the message
-#       "body": "This is the body of the message",
-#
-#       // The HTML body of the message.
-#       "html_body": "<html><body>This is the body of the message</body></html>"
+#       "id": "CommMessage",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "The ID of the CommMessage.",
+#           "example": 42,
+#           "type": "integer"
+#         },
+#         "created_at": {
+#           "description": "The date and time this message was created",
+#           "example": "2013-03-19T21:00:00Z",
+#           "type": "datetime"
+#         },
+#         "sent_at": {
+#           "description": "The date and time this message was sent",
+#           "example": "2013-03-20T22:42:00Z",
+#           "type": "datetime"
+#         },
+#         "workflow_state": {
+#           "description": "The workflow state of the message. One of 'created', 'staged', 'sending', 'sent', 'bounced', 'dashboard', 'cancelled', or 'closed'",
+#           "example": "sent",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "created",
+#               "staged",
+#               "sending",
+#               "sent",
+#               "bounced",
+#               "dashboard",
+#               "cancelled",
+#               "closed"
+#             ]
+#           }
+#         },
+#         "from": {
+#           "description": "The address that was put in the 'from' field of the message",
+#           "example": "notifications@example.com",
+#           "type": "string"
+#         },
+#         "to": {
+#           "description": "The address the message was sent to:",
+#           "example": "someone@example.com",
+#           "type": "string"
+#         },
+#         "reply_to": {
+#           "description": "The reply_to header of the message",
+#           "example": "notifications+specialdata@example.com",
+#           "type": "string"
+#         },
+#         "subject": {
+#           "description": "The message subject",
+#           "example": "example subject line",
+#           "type": "string"
+#         },
+#         "body": {
+#           "description": "The plain text body of the message",
+#           "example": "This is the body of the message",
+#           "type": "string"
+#         },
+#         "html_body": {
+#           "description": "The HTML body of the message.",
+#           "example": "<html><body>This is the body of the message</body></html>",
+#           "type": "string"
+#         }
+#       }
 #     }
+#
 class CommMessagesApiController < ApplicationController
   include Api::V1::CommMessage
 
@@ -80,20 +116,21 @@ class CommMessagesApiController < ApplicationController
     start_time = TimeHelper.try_parse(params[:start_time])
     end_time = TimeHelper.try_parse(params[:end_time])
 
-    conditions = case
-      when Account.site_admin.grants_right?(@current_user, :read_messages)
-        {} # No further restrictions, site admins see all
-      when @domain_root_account.settings[:admins_can_view_notifications] &&
-            @domain_root_account.grants_right?(@current_user, :view_notifications)
-        { :root_account_id => @domain_root_account.id }
-      else
+    query = user.messages.order('created_at DESC')
+
+    # site admins see all, but if not a site admin...
+    if !Account.site_admin.grants_right?(@current_user, :read_messages)
+      # ensure they can see the domain root account
+      unless @domain_root_account.settings[:admins_can_view_notifications] &&
+        @domain_root_account.grants_right?(@current_user, :view_notifications)
         return render_unauthorized_action
+      end
+      # and then scope to just the messages from that root account
+      query = query.where(root_account_id: @domain_root_account)
     end
 
-    query = user.messages.scoped(:order => 'created_at DESC')
-    query = query.scoped(:conditions => conditions) unless conditions.empty?
-    query = query.scoped(:conditions => ['created_at >= ?', start_time]) if start_time
-    query = query.scoped(:conditions => ['created_at <= ?', end_time]) if end_time
+    query = query.where('created_at >= ?', start_time) if start_time
+    query = query.where('created_at <= ?', end_time) if end_time
     messages = Api.paginate(query, self, api_v1_comm_messages_url)
 
     messages_json = messages.map { |m| comm_message_json(m) }

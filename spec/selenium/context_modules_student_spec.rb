@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + "/common")
 
 describe "context_modules" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   context "as a student" do
     def create_context_module(module_name)
@@ -45,6 +45,7 @@ describe "context_modules" do
 
       @module_3 = create_context_module('Module Three')
       @quiz_1 = @course.quizzes.create!(:title => "some quiz")
+      @quiz_1.publish!
       @tag_3 = @module_3.add_item({:id => @quiz_1.id, :type => 'quiz'})
       @module_3.completion_requirements = {@tag_3.id => {:type => 'must_view'}}
       @module_3.prerequisites = "module_#{@module_2.id}"
@@ -137,7 +138,7 @@ describe "context_modules" do
       @module_1.completion_requirements = {@tag_1.id => {:type => 'must_view'}, module1_unpublished_tag.id => {:type => 'must_view'}}
       @module_1.save!
       @module_1.completion_requirements.map{|h| h[:id]}.should include(@tag_1.id)
-      @module_1.completion_requirements.map{|h| h[:id]}.should_not include(module1_unpublished_tag.id)
+      @module_1.completion_requirements.map{|h| h[:id]}.should include(module1_unpublished_tag.id) # unpublished requirements SHOULD remain
 
       module2_published_tag = @module_2.add_item({:id => @quiz_1.id, :type => 'quiz'})
       @module_2.save!

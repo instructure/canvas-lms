@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "default plugins" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   before(:each) do
     user_logged_in
@@ -15,6 +15,7 @@ describe "default plugins" do
     Twitter.stubs(:config_check).returns("Bad check")
     get "/plugins/twitter"
 
+    multiple_accounts_select
     f("#plugin_setting_disabled").click
     wait_for_ajaximations
     f("#settings_api_key").send_keys("asdf")
@@ -41,8 +42,8 @@ describe "default plugins" do
     settings.should be_nil
 
     get "/plugins/etherpad"
-    get "/plugins/etherpad"
 
+    multiple_accounts_select
     f("#plugin_setting_disabled").click
     wait_for_ajaximations
     f("#settings_domain").send_keys("asdf")
@@ -69,6 +70,7 @@ describe "default plugins" do
     GoogleDocs.stubs(:config_check).returns("Bad check")
     get "/plugins/google_docs"
 
+    multiple_accounts_select
     f("#plugin_setting_disabled").click
     wait_for_ajaximations
     f("#settings_api_key").send_keys("asdf")
@@ -96,6 +98,7 @@ describe "default plugins" do
     LinkedIn.stubs(:config_check).returns("Bad check")
     get "/plugins/linked_in"
 
+    multiple_accounts_select
     f("#plugin_setting_disabled").click
     wait_for_ajaximations
     f("#settings_api_key").send_keys("asdf")
@@ -123,6 +126,7 @@ describe "default plugins" do
     ScribdAPI.stubs(:config_check).returns("Bad check")
     get "/plugins/scribd"
 
+    multiple_accounts_select
     f("#plugin_setting_disabled").click
 
     f("#settings_api_key").send_keys("asdf")
@@ -145,31 +149,11 @@ describe "default plugins" do
     settings[:secret_key].should == 'asdf'
   end
 
-  it "should allow configuring tinychat plugin" do
-    settings = Canvas::Plugin.find(:tinychat).try(:settings)
-    settings.should be_nil
-
-    Tinychat.stubs(:config_check).returns("Bad check")
-    get "/plugins/tinychat"
-
-    f("#plugin_setting_disabled").click
-    wait_for_ajaximations
-    f("#settings_api_key").send_keys("asdf")
-    f("#settings_secret_key").send_keys("asdf")
-    submit_form('#new_plugin_setting')
-
-    assert_flash_error_message /There was an error/
-
-    Tinychat.stubs(:config_check).returns(nil)
-    submit_form('#new_plugin_setting')
-    wait_for_ajax_requests
-
-    assert_flash_notice_message /successfully updated/
-
-    settings = Canvas::Plugin.find(:tinychat).try(:settings)
-    settings.should_not be_nil
-    settings[:api_key].should == 'asdf'
-    settings[:secret_key].should == 'asdf'
+  def multiple_accounts_select
+    if !f("#plugin_setting_disabled").displayed?
+      f("#accounts_select option:nth-child(2)").click
+      keep_trying_until { f("#plugin_setting_disabled").displayed? }
+    end
   end
 end
 

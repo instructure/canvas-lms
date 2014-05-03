@@ -109,7 +109,7 @@ describe UnzipAttachment do
 
     it "should import files alphabetically" do
       filename = fixture_filename('alphabet_soup.zip')
-      Zip::ZipFile.open(filename) do |zip|
+      Zip::File.open(filename) do |zip|
         # make sure the files aren't read from the zip in alphabetical order (so it's not alphabetized by chance)
         fake_files = []
         fake_files << zip.get_entry('f.txt')
@@ -119,7 +119,7 @@ describe UnzipAttachment do
         fake_files << zip.get_entry('b.txt')
         fake_files << zip.get_entry('a.txt')
 
-        Zip::ZipFile.stubs(:open).returns(fake_files)
+        Zip::File.stubs(:open).returns(fake_files)
 
         ua = UnzipAttachment.new(:course => @course, :filename => 'fake')
         ua.process
@@ -157,6 +157,37 @@ describe UnzipAttachment do
       it 'should be able to rescue the file quota error' do
         Attachment.stubs(:get_quota).returns({:quota => 5000, :quota_used => 0})
         unzipper.process rescue nil
+      end
+    end
+
+    describe 'zip bomb mitigation' do
+      # unzip -l output for this file:
+      #  Length     Date   Time    Name
+      # --------    ----   ----    ----
+      #       12  02-05-14 16:03   a
+      #       18  02-05-14 16:03   b
+      #       70  02-05-14 16:05   c   <-- this is a lie.  the file is really 10K
+      #       19  02-05-14 16:03   d
+      let(:filename) { fixture_filename('zipbomb.zip') }
+
+      it 'double-checks the extracted file sizes in case the central directory lies' do
+        Attachment.stubs(:get_quota).returns({:quota => 5000, :quota_used => 0})
+        lambda{ unzipper.process }.should raise_error(Attachment::OverQuotaError)
+        # a and b should have been attached
+        # but we should have bailed once c ate the remaining quota
+        @course.attachments.count.should eql 2
+      end
+
+      it "doesn't interfere when the quota is 0 (unlimited)" do
+        Attachment.stubs(:get_quota).returns({:quota => 0, :quota_used => 0})
+        lambda{ unzipper.process }.should_not raise_error
+        @course.attachments.count.should eql 4
+      end
+
+      it "lets incorrect central directory size slide if the quota isn't exceeded" do
+        Attachment.stubs(:get_quota).returns({:quota => 15000, :quota_used => 0})
+        lambda{ unzipper.process }.should_not raise_error
+        @course.attachments.count.should eql 4
       end
     end
 

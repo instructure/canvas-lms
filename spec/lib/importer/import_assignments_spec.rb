@@ -27,18 +27,20 @@ describe "Importing assignments" do
         context = get_import_context(system)
 
         data[:assignments_to_import] = {}
-        Assignment.import_from_migration(data, context).should be_nil
-        Assignment.count.should == 0
+        expect {
+          Assignment.import_from_migration(data, context).should be_nil
+        }.to change(Assignment, :count).by(0)
 
         data[:assignments_to_import][data[:migration_id]] = true
-        Assignment.import_from_migration(data, context)
-        Assignment.import_from_migration(data, context)
-        Assignment.count.should == 1
+        expect {
+          Assignment.import_from_migration(data, context)
+          Assignment.import_from_migration(data, context)
+        }.to change(Assignment, :count).by(1)
         a = Assignment.find_by_migration_id(data[:migration_id])
         
         a.title.should == data[:title]
-        a.description.should contain(data[:instructions]) if data[:instructions]
-        a.description.should contain(data[:description]) if data[:description]
+        a.description.should include(data[:instructions]) if data[:instructions]
+        a.description.should include(data[:description]) if data[:description]
         a.due_at = Time.at(data[:due_date].to_i / 1000)
         a.points_possible.should == data[:grading][:points_possible].to_f
       end

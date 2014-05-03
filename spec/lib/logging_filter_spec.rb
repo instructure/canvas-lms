@@ -55,5 +55,29 @@ describe "LoggingFilter" do
         "ApI_KeY" => "[FILTERED]"
       }
     end
+
+    it "should filter nested keys in string format" do
+      params = {
+        "pseudonym_session[password]" => 123
+      }
+      filtered_params = LoggingFilter.filter_params(params)
+      filtered_params.should == {
+        "pseudonym_session[password]" => "[FILTERED]"
+      }
+    end
+
+    it "should filter ested keys in hash format" do
+      params = {
+        :pseudonym_session => {
+          :password => 123
+        }
+      }
+      filtered_params = LoggingFilter.filter_params(params)
+      filtered_params.should == {
+        :pseudonym_session => {
+          :password => "[FILTERED]"
+        }
+      }
+    end
   end
 end

@@ -26,14 +26,14 @@ module Stats
     data['full_command'] = job.full_name
     data['run_time'] = data['finished_at'] - data['locked_at']
     redis.hmset("job_stats:id:#{job.id}", *data.to_a.flatten)
-    ttl = Setting.get_cached('delayed_jobs_stats_ttl', 1.month.to_s).to_i.from_now
+    ttl = Setting.get('delayed_jobs_stats_ttl', 1.month.to_s).to_i.from_now
     redis.expireat("job_stats:id:#{job.id}", ttl.to_i)
   rescue
     Rails.logger.warn "Failed saving job stats: #{$!.inspect}"
   end
 
   def self.enabled?
-    Setting.get_cached('delayed_jobs_store_stats', 'false') == 'redis'
+    Setting.get('delayed_jobs_store_stats', 'false') == 'redis'
   end
 
   # remove deleted/expired keys from indexes

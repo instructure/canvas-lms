@@ -16,82 +16,172 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'action_controller_test_process'
+
 # @API Submissions
 #
-# @object Submission
+# @model MediaComment
 #     {
-#       // The submission's assignment id
-#       "assignment_id": 23,
-#
-#       // The submission's assignment (see the assignments API) (optional)
-#       "assignment": "Assignment",
-#
-#       // The submission's course (see the course API) (optional)
-#       "course": "Course",
-#
-#       // This is the submission attempt number.
-#       "attempt": 1,
-#
-#       // The content of the submission, if it was submitted directly in a
-#       // text field.
-#       "body": "There are three factors too...",
-#
-#       // The grade for the submission, translated into the assignment grading
-#       // scheme (so a letter grade, for example).
-#       "grade": "A-",
-#
-#       // A boolean flag which is false if the student has re-submitted since
-#       // the submission was last graded.
-#       "grade_matches_current_submission": true,
-#
-#       // URL to the submission. This will require the user to log in.
-#       "html_url": "http://example.com/courses/255/assignments/543/submissions/134",
-#
-#       // URL to the submission preview. This will require the user to log in.
-#       "preview_url": "http://example.com/courses/255/assignments/543/submissions/134?preview=1",
-#
-#       // The raw score
-#       "score": 13.5,
-#
-#       // Associated comments for a submission (optional)
-#       "submission_comments": [
-#         {
-#           "id": 37,
-#           "author_id": 134,
-#           "author_name": "Toph Beifong",
-#           "comment": "Well here's the thing...",
-#           "created_at": "2012-01-01T01:00:00Z",
-#           "media_comment": {
-#             "content-type": "audio/mp4",
-#             "display_name": "something",
-#             "media_id": "3232",
-#             "media_type": "audio",
-#             "url":  "http://example.com/media_url"
-#           }
+#       "id": "MediaComment",
+#       "description": "",
+#       "properties": {
+#         "content-type": {
+#           "example": "audio/mp4",
+#           "type": "string"
+#         },
+#         "display_name": {
+#           "example": "something",
+#           "type": "string"
+#         },
+#         "media_id": {
+#           "example": "3232",
+#           "type": "string"
+#         },
+#         "media_type": {
+#           "example": "audio",
+#           "type": "string"
+#         },
+#         "url": {
+#           "example": "http://example.com/media_url",
+#           "type": "string"
 #         }
-#       ],
+#       }
+#     }
 #
-#       // The types of submission
-#       // ex: ("online_text_entry"|"online_url"|"online_upload"|"media_recording")
-#       "submission_type": "online_text_entry",
+# @model SubmissionComment
+#     {
+#       "id": "SubmissionComment",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "example": 37,
+#           "type": "integer"
+#         },
+#         "author_id": {
+#           "example": 134,
+#           "type": "integer"
+#         },
+#         "author_name": {
+#           "example": "Toph Beifong",
+#           "type": "string"
+#         },
+#         "comment": {
+#           "example": "Well here's the thing...",
+#           "type": "string"
+#         },
+#         "created_at": {
+#           "example": "2012-01-01T01:00:00Z",
+#           "type": "datetime"
+#         },
+#         "media_comment": {
+#           "$ref": "MediaComment"
+#         }
+#       }
+#     }
 #
-#       // The timestamp when the assignment was submitted
-#       "submitted_at": "2012-01-01T01:00:00Z",
-#
-#       // The URL of the submission (for "online_url" submissions).
-#       "url": null,
-#
-#       // The id of the user who created the submission
-#       "user_id": 134,
-#
-#       // The id of the user who graded the submission
-#       "grader_id": 86,
-#
-#       // The submissions user (see user API) (optional)
-#       "user": "User",
-#
-#       // Whether the submission was made after the applicable due date
-#       "late": false
+# @model Submission
+#     {
+#       "id": "Submission",
+#       "description": "",
+#       "properties": {
+#         "assignment_id": {
+#           "description": "The submission's assignment id",
+#           "example": 23,
+#           "type": "integer"
+#         },
+#         "assignment": {
+#           "description": "The submission's assignment (see the assignments API) (optional)",
+#           "example": "Assignment",
+#           "type": "string"
+#         },
+#         "course": {
+#           "description": "The submission's course (see the course API) (optional)",
+#           "example": "Course",
+#           "type": "string"
+#         },
+#         "attempt": {
+#           "description": "This is the submission attempt number.",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "body": {
+#           "description": "The content of the submission, if it was submitted directly in a text field.",
+#           "example": "There are three factors too...",
+#           "type": "string"
+#         },
+#         "grade": {
+#           "description": "The grade for the submission, translated into the assignment grading scheme (so a letter grade, for example).",
+#           "example": "A-",
+#           "type": "string"
+#         },
+#         "grade_matches_current_submission": {
+#           "description": "A boolean flag which is false if the student has re-submitted since the submission was last graded.",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "html_url": {
+#           "description": "URL to the submission. This will require the user to log in.",
+#           "example": "http://example.com/courses/255/assignments/543/submissions/134",
+#           "type": "string"
+#         },
+#         "preview_url": {
+#           "description": "URL to the submission preview. This will require the user to log in.",
+#           "example": "http://example.com/courses/255/assignments/543/submissions/134?preview=1",
+#           "type": "string"
+#         },
+#         "score": {
+#           "description": "The raw score",
+#           "example": 13.5,
+#           "type": "float"
+#         },
+#         "submission_comments": {
+#           "description": "Associated comments for a submission (optional)",
+#           "type": "array",
+#           "items": { "$ref": "SubmissionComment" }
+#         },
+#         "submission_type": {
+#           "description": "The types of submission ex: ('online_text_entry'|'online_url'|'online_upload'|'media_recording')",
+#           "example": "online_text_entry",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "online_text_entry",
+#               "online_url",
+#               "online_upload",
+#               "media_recording"
+#             ]
+#           }
+#         },
+#         "submitted_at": {
+#           "description": "The timestamp when the assignment was submitted",
+#           "example": "2012-01-01T01:00:00Z",
+#           "type": "datetime"
+#         },
+#         "url": {
+#           "description": "The URL of the submission (for 'online_url' submissions).",
+#           "type": "string"
+#         },
+#         "user_id": {
+#           "description": "The id of the user who created the submission",
+#           "example": 134,
+#           "type": "integer"
+#         },
+#         "grader_id": {
+#           "description": "The id of the user who graded the submission",
+#           "example": 86,
+#           "type": "integer"
+#         },
+#         "user": {
+#           "description": "The submissions user (see user API) (optional)",
+#           "example": "User",
+#           "type": "string"
+#         },
+#         "late": {
+#           "description": "Whether the submission was made after the applicable due date",
+#           "example": false,
+#           "type": "boolean"
+#         }
+#       }
 #     }
 #
 class SubmissionsController < ApplicationController
@@ -106,7 +196,7 @@ class SubmissionsController < ApplicationController
     @assignment = @context.assignments.active.find(params[:assignment_id])
     if authorized_action(@assignment, @current_user, :grade)
       if params[:zip]
-        submission_zip
+        generate_submission_zip(@assignment, @context)
       else
         respond_to do |format|
           format.html { redirect_to named_context_url(@context, :context_assignment_url, @assignment.id) }
@@ -136,8 +226,8 @@ class SubmissionsController < ApplicationController
     append_sis_data(hash)
     js_env(hash)
 
-    @submission = @assignment.find_submission(@user)
-    @submission ||= @context.submissions.build(:user => @user, :assignment_id => @assignment.id)
+    @submission = @assignment.submissions.where(user_id: @user).first
+    @submission ||= @assignment.submissions.build(:user => @user)
     @submission.grants_rights?(@current_user, session)
     @rubric_association = @assignment.rubric_association
     @rubric_association.assessing_user_id = @submission.user_id if @rubric_association
@@ -353,28 +443,12 @@ class SubmissionsController < ApplicationController
         end
       elsif !api_request? && params[:google_doc] && params[:google_doc][:document_id] && params[:submission][:submission_type] == "google_doc"
         params[:submission][:submission_type] = 'online_upload'
-        doc_response, display_name, file_extension = google_docs_download(params[:google_doc][:document_id])
-        unless doc_response && doc_response.is_a?(Net::HTTPOK)
-          # couldn't get document
-          flash[:error] = t('errors.assignment_submit_fail', "Assignment failed to submit")
-          redirect_to course_assignment_url(@context, @assignment)
+        attachment = submit_google_doc(params[:google_doc][:document_id])
+        if attachment
+          params[:submission][:attachments] << attachment
+        else
           return
         end
-        filename = "google_doc_#{Time.now.strftime("%Y%m%d%H%M%S")}#{@current_user.id}.#{file_extension}"
-        path = File.join("tmp", filename)
-        f = File.new(path, 'wb')
-        f.write doc_response.body
-        f.close
-
-        require 'action_controller'
-        require 'action_controller/test_process.rb'
-        @attachment = @assignment.attachments.new(
-          :uploaded_data => ActionController::TestUploadedFile.new(path, doc_response.content_type, true), 
-          :display_name => "#{display_name}",
-          :user => @current_user
-        )
-        @attachment.save!
-        params[:submission][:attachments] << @attachment
       elsif !api_request? && params[:submission][:submission_type] == 'media_recording' && params[:submission][:media_comment_id].blank?
         flash[:error] = t('errors.media_file_attached', "There was no media recording in the submission")
         return redirect_to named_context_url(@context, :context_assignment_url, @assignment)
@@ -422,6 +496,43 @@ class SubmissionsController < ApplicationController
       end
     end
   end
+
+  # Internal: Submit a Google Doc.
+  def submit_google_doc(document_id)
+    # fetch document from google
+    document_response, display_name, file_extension = google_docs_download(document_id)
+
+    # error handling
+    unless document_response.try(:is_a?, Net::HTTPOK)
+      flash[:error] = t('errors.assignment_submit_fail', 'Assignment failed to submit')
+    end
+
+    restriction_enabled           = @domain_root_account.feature_enabled?(:google_docs_domain_restriction)
+    restricted_google_docs_domain = @domain_root_account.settings[:google_docs_domain]
+    if restriction_enabled && !@current_user.gmail.match(%r{@#{restricted_google_docs_domain}$})
+      flash[:error] = t('errors.invalid_google_docs_domain', 'You cannot submit assignments from this google_docs domain')
+    end
+
+    if flash[:error]
+      redirect_to(course_assignment_url(@context, @assignment))
+      return false
+    end
+
+    # process the file and create an attachment
+    filename = "google_doc_#{Time.now.strftime("%Y%m%d%H%M%S")}#{@current_user.id}.#{file_extension}"
+    path     = File.join("tmp", filename)
+    File.open(path, 'wb') do |f|
+      f.write(document_response.body)
+    end
+
+    @attachment = @assignment.attachments.new(
+      uploaded_data: Rack::Test::UploadedFile.new(path, document_response.content_type, true),
+      display_name: display_name, user: @current_user
+    )
+    @attachment.save!
+    @attachment
+  end
+  protected :submit_google_doc
 
   def turnitin_report
     return render(:nothing => true, :status => 400) unless params_are_integers?(:assignment_id, :submission_id)
@@ -530,44 +641,6 @@ class SubmissionsController < ApplicationController
 
   protected
 
-  def submission_zip
-    @attachments = @assignment.attachments.where(:display_name => 'submissions.zip', :workflow_state => ['to_be_zipped', 'zipping', 'zipped', 'errored', 'unattached'], :user_id => @current_user).order(:created_at).all
-    @attachment = @attachments.pop
-    @attachments.each{|a| a.destroy! }
-    if @attachment && (@attachment.created_at < 1.hour.ago || @attachment.created_at < (@assignment.submissions.map{|s| s.submitted_at}.compact.max || @attachment.created_at))
-      @attachment.destroy!
-      @attachment = nil
-    end
-    if !@attachment
-      @attachment = @assignment.attachments.build(:display_name => 'submissions.zip')
-      @attachment.workflow_state = 'to_be_zipped'
-      @attachment.file_state = '0'
-      @attachment.user = @current_user
-      @attachment.save!
-      ContentZipper.send_later_enqueue_args(:process_attachment, { :priority => Delayed::LOW_PRIORITY, :max_attempts => 1 }, @attachment)
-      render :json => @attachment
-    else
-      respond_to do |format|
-        if @attachment.zipped?
-          if Attachment.s3_storage?
-            format.html { redirect_to @attachment.cacheable_s3_inline_url }
-            format.zip { redirect_to @attachment.cacheable_s3_inline_url }
-          else
-            cancel_cache_buster
-            format.html { send_file(@attachment.full_filename, :type => @attachment.content_type_with_encoding, :disposition => 'inline') }
-            format.zip { send_file(@attachment.full_filename, :type => @attachment.content_type_with_encoding, :disposition => 'inline') }
-          end
-          format.json { render :json => @attachment.as_json(:methods => :readable_size) }
-        else
-          flash[:notice] = t('still_zipping', "File zipping still in process...")
-          format.html { redirect_to named_context_url(@context, :context_assignment_url, @assignment.id) }
-          format.zip { redirect_to named_context_url(@context, :context_assignment_url, @assignment.id) }
-          format.json { render :json => @attachment }
-        end
-      end
-    end
-  end
-
   def update_student_entered_score(score)
     if score.present? && score != "null"
       @submission.student_entered_score = score.to_f.round(2)
@@ -575,5 +648,47 @@ class SubmissionsController < ApplicationController
       @submission.student_entered_score = nil
     end
     @submission.save
+  end
+
+  def generate_submission_zip(assignment, context)
+    attachment = submission_zip(assignment)
+
+    respond_to do |format|
+      if attachment.zipped?
+        if Attachment.s3_storage?
+          format.html { redirect_to attachment.cacheable_s3_inline_url }
+          format.zip { redirect_to attachment.cacheable_s3_inline_url }
+        else
+          cancel_cache_buster
+
+          format.html do
+            send_file(attachment.full_filename, {
+              :type => attachment.content_type_with_encoding,
+              :disposition => 'inline'
+            })
+          end
+
+          format.zip do
+            send_file(attachment.full_filename, {
+              :type => attachment.content_type_with_encoding,
+              :disposition => 'inline'
+            })
+          end
+        end
+        format.json { render :json => attachment.as_json(:methods => :readable_size) }
+      else
+        flash[:notice] = t('still_zipping', "File zipping still in process...")
+
+        format.html do
+          redirect_to named_context_url(context, :context_assignment_url, assignment.id)
+        end
+
+        format.zip do
+          redirect_to named_context_url(context, :context_assignment_url, assignment.id)
+        end
+
+        format.json { render :json => attachment }
+      end
+    end
   end
 end

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -21,6 +21,7 @@ class DiscussionEntry < ActiveRecord::Base
   include SendToInbox
   include SendToStream
   include TextHelper
+  include HtmlTextHelper
 
   attr_accessible :plaintext_message, :message, :discussion_topic, :user, :parent, :attachment, :parent_entry
   attr_readonly :discussion_topic_id, :user_id, :parent_id
@@ -44,10 +45,10 @@ class DiscussionEntry < ActiveRecord::Base
   after_create :create_participants
   validates_length_of :message, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_presence_of :discussion_topic_id
-  before_validation_on_create :set_depth
-  validate_on_create :validate_depth
+  before_validation :set_depth, :on => :create
+  validate :validate_depth, on: :create
 
-  sanitize_field :message, Instructure::SanitizeField::SANITIZE
+  sanitize_field :message, CanvasSanitize::SANITIZE
 
   has_a_broadcast_policy
   attr_accessor :new_record_header
@@ -107,7 +108,7 @@ class DiscussionEntry < ActiveRecord::Base
 
   # The maximum discussion entry threading depth that is allowed
   def self.max_depth
-    Setting.get_cached('discussion_entry_max_depth', '50').to_i
+    Setting.get('discussion_entry_max_depth', '50').to_i
   end
 
   def set_depth
@@ -116,7 +117,7 @@ class DiscussionEntry < ActiveRecord::Base
 
   def validate_depth
     if !self.depth || self.depth > self.class.max_depth
-      errors.add_to_base("Maximum entry depth reached")
+      errors.add(:base, "Maximum entry depth reached")
     end
   end
 
@@ -175,7 +176,7 @@ class DiscussionEntry < ActiveRecord::Base
   alias_method :destroy!, :destroy
   def destroy
     self.workflow_state = 'deleted'
-    self.deleted_at = Time.now
+    self.deleted_at = Time.now.utc
     save!
     update_topic_submission
     decrement_unread_counts_for_this_entry
@@ -228,7 +229,7 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   def update_topic_subscription
-    discussion_topic.user_ids_who_have_posted_and_admins(true) # pesky memoization
+    discussion_topic.user_ids_who_have_posted_and_admins
     unless discussion_topic.user_can_see_posts?(user)
       discussion_topic.unsubscribe(user)
     end
@@ -264,31 +265,31 @@ class DiscussionEntry < ActiveRecord::Base
     given { |user| self.user && self.user == user }
     can :read
 
-    given { |user| self.user && self.user == user && !self.discussion_topic.locked? }
+    given { |user| self.user && self.user == user && self.discussion_topic.available_for?(user) }
     can :reply
 
-    given { |user| self.user && self.user == user && !self.discussion_topic.locked? && context.user_can_manage_own_discussion_posts?(user) }
+    given { |user| self.user && self.user == user && self.discussion_topic.available_for?(user) && context.user_can_manage_own_discussion_posts?(user) }
     can :update and can :delete
 
     given { |user, session| self.cached_context_grants_right?(user, session, :read_forum) }
     can :read
 
-    given { |user, session| self.cached_context_grants_right?(user, session, :post_to_forum) && !self.discussion_topic.locked? }
+    given { |user, session| self.cached_context_grants_right?(user, session, :post_to_forum) && self.discussion_topic.available_for?(user) }
     can :reply and can :create and can :read
 
     given { |user, session| self.cached_context_grants_right?(user, session, :post_to_forum) }
     can :read
 
-    given { |user, session| context.respond_to?(:allow_student_forum_attachments) && context.allow_student_forum_attachments && cached_context_grants_right?(user, session, :post_to_forum) && !discussion_topic.locked? }
+    given { |user, session| context.respond_to?(:allow_student_forum_attachments) && context.allow_student_forum_attachments && cached_context_grants_right?(user, session, :post_to_forum) && discussion_topic.available_for?(user) }
     can :attach
 
-    given { |user, session| !self.discussion_topic.root_topic_id && self.cached_context_grants_right?(user, session, :moderate_forum) && !self.discussion_topic.locked? }
+    given { |user, session| !self.discussion_topic.root_topic_id && self.cached_context_grants_right?(user, session, :moderate_forum) && self.discussion_topic.available_for?(user) }
     can :update and can :delete and can :reply and can :create and can :read and can :attach
 
     given { |user, session| !self.discussion_topic.root_topic_id && self.cached_context_grants_right?(user, session, :moderate_forum) }
     can :update and can :delete and can :read
 
-    given { |user, session| self.discussion_topic.root_topic && self.discussion_topic.root_topic.cached_context_grants_right?(user, session, :moderate_forum) && !self.discussion_topic.locked? }
+    given { |user, session| self.discussion_topic.root_topic && self.discussion_topic.root_topic.cached_context_grants_right?(user, session, :moderate_forum) && self.discussion_topic.available_for?(user) }
     can :update and can :delete and can :reply and can :create and can :read and can :attach
 
     given { |user, session| self.discussion_topic.root_topic && self.discussion_topic.root_topic.cached_context_grants_right?(user, session, :moderate_forum) }
@@ -306,7 +307,7 @@ class DiscussionEntry < ActiveRecord::Base
   scope :after, lambda { |date| where("created_at>?", date) }
   scope :top_level_for_topics, lambda {|topics| where(:root_entry_id => nil, :discussion_topic_id => topics) }
   scope :all_for_topics, lambda { |topics| where(:discussion_topic_id => topics) }
-  scope :newest_first, order("discussion_entries.created_at DESC")
+  scope :newest_first, order("discussion_entries.created_at DESC, discussion_entries.id DESC")
 
   def to_atom(opts={})
     author_name = self.user.present? ? self.user.name : t('atom_no_author', "No Author")
@@ -326,26 +327,6 @@ class DiscussionEntry < ActiveRecord::Base
                                     :href => "http://#{HostUrl.context_host(self.discussion_topic.context)}/#{self.discussion_topic.context_prefix}/discussion_topics/#{self.discussion_topic_id}")
       entry.content   = Atom::Content::Html.new(self.message)
     end
-  end
-
-  def clone_for(context, dup=nil, options={})
-    options[:migrate] = true if options[:migrate] == nil
-    dup ||= DiscussionEntry.new
-    self.attributes.delete_if{|k,v| [:id, :discussion_topic_id, :attachment_id].include?(k.to_sym) }.each do |key, val|
-      dup.send("#{key}=", val)
-    end
-    dup.parent_id = context.merge_mapped_id("discussion_entry_#{self.parent_id}")
-    dup.attachment_id = context.merge_mapped_id(self.attachment)
-    if !dup.attachment_id && self.attachment
-      attachment = self.attachment.clone_for(context)
-      attachment.folder_id = nil
-      attachment.save_without_broadcasting!
-      context.map_merge(self.attachment, attachment)
-      context.warn_merge_result(t :file_added_warning, "Added file \"%{file_path}\" which is needed for an entry in the topic \"%{discussion_topic_title}\"", :file_path => "%{attachment.folder.full_name}/#{attachment.display_name}", :discussion_topic_title => self.discussion_topic.title)
-      dup.attachment_id = attachment.id
-    end
-    dup.message = context.migrate_content_links(self.message, self.context) if options[:migrate]
-    dup
   end
 
   def context
@@ -480,10 +461,11 @@ class DiscussionEntry < ActiveRecord::Base
     participant = discussion_entry_participants.where(:user_id => user).first
     unless participant
       # return a temporary record with default values
-      participant = discussion_entry_participants.new({
+      participant = DiscussionEntryParticipant.new({
         :workflow_state => "unread",
         :forced_read_state => false,
         })
+      participant.discussion_entry = self
       participant.user = user
     end
 

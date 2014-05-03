@@ -17,25 +17,27 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
+require_webmock
 
 describe "Canvas::HTTP" do
 
-  def mock_response(host, port, str)
-    req = StringIO.new
-    @sio = StringIO.new(str.gsub("\n", "\r\n"))
-    @sio.stubs(:write).returns { req.write(s) }
-    TCPSocket.expects(:open).with(host, port).returns(@sio)
+  include WebMock::API
+
+  before do
+    WebMock.enable!
+  end
+
+  after do
+    WebMock.reset!
+    WebMock.disable!
   end
 
   describe ".get" do
     it "should return response objects" do
       http_stub = Net::HTTP.any_instance
       http_stub.expects(:use_ssl=).never
-      mock_response("www.example.com", 80,
-%{HTTP/1.1 200 OK
-Content-Length:5
-
-Hello})
+      stub_request(:get, "http://www.example.com/a/b").
+        to_return(body: "Hello", headers: { 'Content-Length' => 5 })
       res = Canvas::HTTP.get("http://www.example.com/a/b")
       res.should be_a Net::HTTPOK
       res.body.should == "Hello"
@@ -51,29 +53,22 @@ Hello})
     end
 
     it "should follow redirects" do
-      mock_response("www.example.com", 80,
-%{HTTP/1.1 301 Moved
-Location: http://www.example2.com/a})
-      mock_response("www.example2.com", 80,
-%{HTTP/1.1 301 Moved
-Location: http://www.example3.com/a})
-      mock_response("www.example3.com", 80,
-%{HTTP/1.1 200 OK
-Content-Length:5
-
-Hello})
+      stub_request(:get, "http://www.example.com/a").
+        to_return(status: 301, headers: { 'Location' => 'http://www.example2.com/a'})
+      stub_request(:get, "http://www.example2.com/a").
+        to_return(status: 301, headers: { 'Location' => 'http://www.example3.com/a'})
+      stub_request(:get, "http://www.example3.com/a").
+        to_return(body: "Hello", headers: { 'Content-Length' => 5 })
       res = Canvas::HTTP.get("http://www.example.com/a")
       res.should be_a Net::HTTPOK
       res.body.should == "Hello"
     end
 
     it "should fail on too many redirects" do
-      mock_response("www.example.com", 80,
-%{HTTP/1.1 301 Moved
-Location: http://www.example2.com/a})
-      mock_response("www.example2.com", 80,
-%{HTTP/1.1 301 Moved
-Location: http://www.example3.com/a})
+      stub_request(:get, "http://www.example.com/a").
+        to_return(status: 301, headers: { 'Location' => 'http://www.example2.com/a'})
+      stub_request(:get, "http://www.example2.com/a").
+        to_return(status: 301, headers: { 'Location' => 'http://www.example3.com/a'})
       expect { Canvas::HTTP.get("http://www.example.com/a", {}, 2) }.to raise_error(Canvas::HTTP::TooManyRedirectsError)
     end
   end

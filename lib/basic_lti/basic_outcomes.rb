@@ -150,7 +150,7 @@ module BasicLTI::BasicOutcomes
       end
 
       op = self.operation_ref_identifier
-      if self.respond_to?("handle_#{op}")
+      if self.respond_to?("handle_#{op}", true)
         return self.send("handle_#{op}", tool, course, assignment, user)
       end
 

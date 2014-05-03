@@ -34,13 +34,13 @@ class AssessmentRequest < ActiveRecord::Base
   has_a_broadcast_policy
 
   def infer_uuid
-    self.uuid ||= AutoHandle.generate_securish_uuid
+    self.uuid ||= CanvasUuid::Uuid.generate_securish_uuid
   end
   protected :infer_uuid
 
   set_broadcast_policy do |p|
     p.dispatch :rubric_assessment_submission_reminder
-    p.to { self.user }
+    p.to { self.assessor }
     p.whenever { |record|
       record.assigned? && @send_reminder
     }

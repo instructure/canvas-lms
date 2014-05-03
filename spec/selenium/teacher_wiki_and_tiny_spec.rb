@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/wiki_and_tiny_common')
 
 describe "Wiki pages and Tiny WYSIWYG editor" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   context "as a teacher" do
 
@@ -41,9 +41,9 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       @assignment = @course.assignments.create(:name => assignment_name)
       get "/courses/#{@course.id}/wiki"
 
-      f('.wiki_switch_views_link').click
+      fj('.wiki_switch_views_link:visible').click
       clear_wiki_rce
-      f('.wiki_switch_views_link').click
+      fj('.wiki_switch_views_link:visible').click
       #check assignment accordion
       accordion = f('#pages_accordion')
       accordion.find_element(:link, I18n.t('links_to.assignments', 'Assignments')).click
@@ -64,11 +64,11 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       it "should validate correct permissions for #{permission}" do
         title = "test_page"
         title2 = "test_page2"
-        hfs = false
+        unpublished = false
         edit_roles = "public"
         validations = ["teachers", "teachers,students", "teachers,students,public"]
 
-        p = create_wiki_page(title, hfs, edit_roles)
+        p = create_wiki_page(title, unpublished, edit_roles)
         get "/courses/#{@course.id}/wiki/#{p.title}"
 
         keep_trying_until { f("#wiki_page_new").should be_displayed }
@@ -89,10 +89,10 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
 
     it "should take user to page history" do
       title = "test_page"
-      hfs = false
+      unpublished = false
       edit_roles = "public"
 
-      p = create_wiki_page(title, hfs, edit_roles)
+      p = create_wiki_page(title, unpublished, edit_roles)
       #sets body
       p.update_attributes(:body => "test")
 
@@ -107,11 +107,11 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
 
     it "should load the previous version of the page and roll-back page" do
       title = "test_page"
-      hfs = false
+      unpublished = false
       edit_roles = "public"
       body = "test"
 
-      p = create_wiki_page(title, hfs, edit_roles)
+      p = create_wiki_page(title, unpublished, edit_roles)
       #sets body and then resets it for history verification
       p.update_attributes(:body => body)
       p.update_attributes(:body => "sample")
@@ -133,10 +133,10 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
 
     it "should restore the latest version of the page" do
       title = "test_page"
-      hfs = false
+      unpublished = false
       edit_roles = "public"
 
-      p = create_wiki_page(title, hfs, edit_roles)
+      p = create_wiki_page(title, unpublished, edit_roles)
       #sets body and then resets it for history verification
       p.update_attributes(:body => "test")
       p.update_attributes(:body => "sample")
@@ -155,10 +155,10 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
 
     it "should take user back to revision history" do
       title = "test_page"
-      hfs = false
+      unpublished = false
       edit_roles = "public"
 
-      p = create_wiki_page(title, hfs, edit_roles)
+      p = create_wiki_page(title, unpublished, edit_roles)
       #sets body and then resets it for history verification
       p.update_attributes(:body => "test")
       version = p.versions[1].id

@@ -19,6 +19,7 @@ define [
       'click': 'showProgressions'
 
     initialize: ->
+      super
       @$index = @model.collection.view.$el
       @$students = @$index.find('#progression_students')
       @$modules = @$index.find('#progression_modules')
@@ -26,6 +27,7 @@ define [
     afterRender: ->
       super
       @showProgressions() if !@model.collection.currentStudentView
+      @syncHeight()
 
     createProgressions: ->
       studentId = @model.get('id')
@@ -48,7 +50,7 @@ define [
         student_link: "<a href='#{studentUrl}'>#{@model.get('name')}</a>"
 
       @progressions.render()
-      @progressions.$el.appendTo($('#progression_modules'))
+      @progressions.$el.appendTo(@$modules)
 
     showProgressions: ->
       @$modules.attr('aria-busy', 'true')
@@ -69,5 +71,7 @@ define [
     syncHeight: =>
       setTimeout =>
         @$students.height(@$modules.height())
+        @$students.find('.collectionViewItems').
+          height((@$students.height() || 0) - (@$students.find('.header').height() || 16) - 16)
       , 0
 

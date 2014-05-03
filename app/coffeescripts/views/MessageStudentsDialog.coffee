@@ -1,14 +1,16 @@
 define [
   'i18n!quizzes'
-  'compiled/views/ValidatedFormView'
+  'jquery'
+  'compiled/views/DialogFormView'
   'jst/messageStudentsDialog'
+  'jst/EmptyDialogFormWrapper'
   'compiled/models/Conversation'
   'jst/_messageStudentsWhoRecipientList'
   'underscore'
   'compiled/jquery/serializeForm'
-], (I18n, ValidatedFormView, messageStudentsDialog, Conversation, recipientList, _) ->
+], (I18n, $, DialogFormView, template, wrapperTemplate, Conversation, recipientList, _) ->
 
-  class MessageStudentsDialog extends ValidatedFormView
+  class MessageStudentsDialog extends DialogFormView
 
     # A list of "recipientGroups" that have two properties:
     # name: String # Describes the group of users
@@ -22,28 +24,34 @@ define [
     # Message Students for <context> when the dialog is rendered.
     @optionProperty 'context'
 
+    template: template
+    wrapperTemplate: wrapperTemplate
+    className: 'validated-form-view form-dialog'
+
+    defaults:
+      height: 500
+      width: 500
+
     els:
       '[name=recipientGroupName]': '$recipientGroupName'
       '#message-recipients': '$messageRecipients'
       '[name=body]': '$messageBody'
 
-    template: messageStudentsDialog
-
-    className: 'validated-form-view form-dialog'
+    events: _.extend {},
+      DialogFormView::events
+      'change [name=recipientGroupName]': 'updateListOfRecipients'
+      'click .dialog_closer': 'close'
+      'dialogclose': 'close'
 
     initialize: (opts) ->
       super
-      @title = if @context
+      @options.title = if @context
         I18n.t('message_students_for_context', 'Message students for %{context}', {@context})
       else
         I18n.t('message_students', 'Message students')
 
       @recipients = @recipientGroups[0].recipients
       @model or= new Conversation
-
-    events: _.extend({}, ValidatedFormView::events,
-      'change [name=recipientGroupName]': 'updateListOfRecipients'
-      'click .dialog_closer': 'close')
 
     toJSON: =>
       json = {}
@@ -74,10 +82,7 @@ define [
       @close()
       $.flashMessage(I18n.t('notices.message_sent', "Message Sent!"))
 
-    open: ->
-      @render()
-      @$el.dialog(autoOpen: false, height: 500, width: 500, title: @title).dialog('open')
-
     close: ->
-      @$el.dialog('close')
+      super
+      @hideErrors()
       @remove()

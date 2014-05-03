@@ -127,7 +127,7 @@ class Pool
 
     unlocked_jobs = Delayed::Job.unlock_orphaned_jobs(pid)
     say "Unlocked #{unlocked_jobs} orphaned jobs" if unlocked_jobs > 0
-    ActiveRecord::Base.connection_handler.clear_all_connections!
+    ActiveRecord::Base.connection_handler.clear_all_connections! unless Rails.env.test?
   end
 
   def spawn_all_workers

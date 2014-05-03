@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -19,70 +19,73 @@
 # @API Roles
 # API for managing account- and course-level roles, and their associated permissions.
 #
-# @object Role
-#   {
-#     // The label and unique identifier of the role.
-#     "role": "New Role",
-#
-#     // The role type that is being used as a base for this role.
-#     // For account-level roles, this is "AccountMembership".
-#     // For course-level roles, it is an enrollment type.
-#     "base_role_type": "AccountMembership",
-#
-#     // JSON representation of the account the role is in.
-#     "account": {
-#       "id": 1019,
-#       "name": "CGNU",
-#       "parent_account_id": 73,
-#       "root_account_id": 1,
-#       "sis_account_id": "cgnu"
-#     },
-#
-#     // The state of the role: "active" or "inactive"
-#     "workflow_state": "active",
-#
-#     // A dictionary of permissions keyed by name (see permissions input
-#     // parameter in the "Create a role" API). The value for a given permission
-#     // is a dictionary of the following boolean flags:
-#     // - enabled:  Whether the role has the permission.
-#     // - locked: Whether the permission is locked by this role.
-#     // - readonly: Whether the permission can be modified in this role (i.e.
-#     //     whether the permission is locked by an upstream role).
-#     // - explicit: Whether the value of enabled is specified explicitly by
-#     //     this role, or inherited from an upstream role.
-#     // - prior_default: The value that would have been inherited from upstream
-#     //     if the role had not explicitly set a value. Only present if explicit
-#     //     is true.
-#     "permissions": {
-#       "read_course_content": {
-#         "enabled": true,
-#         "locked": false,
-#         "readonly": false,
-#         "explicit": true,
-#         "prior_default": false
-#       },
-#       "read_course_list": {
-#         "enabled": true,
-#         "locked": true,
-#         "readonly": true,
-#         "explicit": false
-#       },
-#       "read_question_banks": {
-#         "enabled": false,
-#         "locked": true,
-#         "readonly": false,
-#         "explicit": true,
-#         "prior_default": false
-#       },
-#       "read_reports": {
-#         "enabled": true,
-#         "locked": false,
-#         "readonly": false,
-#         "explicit": false
+# @model RolePermissions
+#     {
+#       "id": "RolePermissions",
+#       "description": "",
+#       "properties": {
+#         "enabled": {
+#           "description": "Whether the role has the permission",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "locked": {
+#           "description": "Whether the permission is locked by this role",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "readonly": {
+#           "description": "Whether the permission can be modified in this role (i.e. whether the permission is locked by an upstream role).",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "explicit": {
+#           "description": "Whether the value of enabled is specified explicitly by this role, or inherited from an upstream role.",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "prior_default": {
+#           "description": "The value that would have been inherited from upstream if the role had not explicitly set a value. Only present if explicit is true.",
+#           "example": false,
+#           "type": "boolean"
+#         }
 #       }
-#       // ...
 #     }
-#   }
+#
+# @model Role
+#     {
+#       "id": "Role",
+#       "description": "",
+#       "properties": {
+#         "role": {
+#           "description": "The label and unique identifier of the role.",
+#           "example": "New Role",
+#           "type": "string"
+#         },
+#         "base_role_type": {
+#           "description": "The role type that is being used as a base for this role. For account-level roles, this is 'AccountMembership'. For course-level roles, it is an enrollment type.",
+#           "example": "AccountMembership",
+#           "type": "string"
+#         },
+#         "account": {
+#           "description": "JSON representation of the account the role is in.",
+#           "example": "{\"id\"=>1019, \"name\"=>\"CGNU\", \"parent_account_id\"=>73, \"root_account_id\"=>1, \"sis_account_id\"=>\"cgnu\"}",
+#           "$ref": "Account"
+#         },
+#         "workflow_state": {
+#           "description": "The state of the role: 'active' or 'inactive'",
+#           "example": "active",
+#           "type": "string"
+#         },
+#         "permissions": {
+#           "description": "A dictionary of permissions keyed by name (see permissions input parameter in the 'Create a role' API).",
+#           "example": "{\"read_course_content\"=>{\"enabled\"=>true, \"locked\"=>false, \"readonly\"=>false, \"explicit\"=>true, \"prior_default\"=>false}, \"read_course_list\"=>{\"enabled\"=>true, \"locked\"=>true, \"readonly\"=>true, \"explicit\"=>false}, \"read_question_banks\"=>{\"enabled\"=>false, \"locked\"=>true, \"readonly\"=>false, \"explicit\"=>true, \"prior_default\"=>false}, \"read_reports\"=>{\"enabled\"=>true, \"locked\"=>false, \"readonly\"=>false, \"explicit\"=>false}}",
+#           "type": "map",
+#           "key": { "type": "string" },
+#           "value": { "$ref": "RolePermissions" }
+#         }
+#       }
+#     }
 #
 class RoleOverridesController < ApplicationController
   before_filter :require_context
@@ -216,6 +219,7 @@ class RoleOverridesController < ApplicationController
   #     site_admin                       -- Use the Site Admin section and admin all other accounts
   #     view_error_reports               -- View error reports
   #     view_statistics                  -- View statistics
+  #     manage_feature_flags             -- Enable or disable features at an account level
   #
   #     [For both Account-Level and Course-Level roles]
   #      Note: Applicable enrollment types for course-level roles are given in brackets:
@@ -245,7 +249,7 @@ class RoleOverridesController < ApplicationController
   #     moderate_forum                   -- [sTADo] Moderate discussions (delete/edit others' posts, lock topics)
   #     post_to_forum                    -- [STADo] Post to discussions
   #     read_question_banks              -- [ TADo] View and link to question banks
-  #     read_reports                     -- [sTAD ] View usage reports for the course
+  #     read_reports                     -- [ TAD ] View usage reports for the course
   #     read_roster                      -- [STADo] See the list of users
   #     read_sis                         -- [sTa  ] Read SIS data
   #     send_messages                    -- [STADo] Send messages to individual course members
@@ -266,7 +270,7 @@ class RoleOverridesController < ApplicationController
   #   upstream. May occur multiple times with unique values for <X>.
   #
   # @example_request
-  #   curl 'http://<canvas>/api/v1/accounts/<account_id>/roles.json' \ 
+  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/roles.json' \
   #        -H "Authorization: Bearer <token>" \ 
   #        -F 'role=New Role' \ 
   #        -F 'permissions[read_course_content][explicit]=1' \ 

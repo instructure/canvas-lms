@@ -4,7 +4,6 @@ class ContextExternalTool < ActiveRecord::Base
 
   has_many :content_tags, :as => :content
   belongs_to :context, :polymorphic => true
-  belongs_to :cloned_item
   attr_accessible :privacy_level, :domain, :url, :shared_secret, :consumer_key, 
                   :name, :description, :custom_fields, :custom_fields_string,
                   :course_navigation, :account_navigation, :user_navigation,
@@ -50,7 +49,7 @@ class ContextExternalTool < ActiveRecord::Base
                              :tool => self,
                              :user => user,
                              :context => context,
-                             :link_code => context.opaque_identifier(:asset_string),
+                             :link_code => opaque_identifier_for(context),
                              :return_url => return_url,
                              :resource_type => selection_type)
   end
@@ -384,27 +383,43 @@ class ContextExternalTool < ActiveRecord::Base
       26
     end
   end
-  
-  def matches_url?(url, match_queries_exactly=true)
+
+  def standard_url
     if !defined?(@standard_url)
       @standard_url = !self.url.blank? && ContextExternalTool.standardize_url(self.url)
     end
+    @standard_url
+  end
+  
+  def matches_url?(url, match_queries_exactly=true)
     if match_queries_exactly
       url = ContextExternalTool.standardize_url(url)
-      return true if url == @standard_url
-    elsif @standard_url.present?
+      return true if url == standard_url
+    elsif standard_url.present?
       if !defined?(@url_params)
-        res = URI.parse(@standard_url)
+        res = URI.parse(standard_url)
         @url_params = res.query.present? ? res.query.split(/&/) : []
       end
       res = URI.parse(url).normalize
       res.query = res.query.split(/&/).select{|p| @url_params.include?(p)}.sort.join('&') if res.query.present?
       res.query = nil if res.query.blank?
       res.normalize!
-      return true if res.to_s == @standard_url
+      return true if res.to_s == standard_url
     end
     host = URI.parse(url).host rescue nil
     !!(host && ('.' + host).match(/\.#{domain}\z/))
+  end
+
+  def matches_domain?(url)
+    url = ContextExternalTool.standardize_url(url)
+    host = URI.parse(url).host
+    if domain
+      domain == host
+    elsif standard_url
+      URI.parse(standard_url).host == host
+    else
+      false
+    end
   end
   
   def self.all_tools_for(context, options={})
@@ -463,12 +478,10 @@ class ContextExternalTool < ActiveRecord::Base
       end
     end
 
-    # Always use the preferred tool if it's valid and has a resource_selection configuration.
-    # If it didn't have resource_selection then a change in the URL would have been done manually,
-    # and there's no reason to assume a different URL was intended. With a resource_selection 
-    # insertion, there's a stronger chance that a different URL was intended.
     preferred_tool = ContextExternalTool.active.find_by_id(preferred_tool_id)
-    return preferred_tool if preferred_tool && preferred_tool.resource_selection
+    if preferred_tool && contexts.member?(preferred_tool.context) && preferred_tool.matches_domain?(url)
+      return preferred_tool
+    end
 
     sorted_external_tools = contexts.collect{|context| context.context_external_tools.active.sort_by{|t| [t.precedence, t.id == preferred_tool_id ? SortFirst : SortLast] }}.flatten(1)
 
@@ -485,9 +498,11 @@ class ContextExternalTool < ActiveRecord::Base
     nil
   end
   
-  scope :having_setting, lambda { |setting| where("has_#{setting.to_s}" => true) }
+  scope :having_setting, lambda { |setting| setting ? where("has_#{setting.to_s}" => true) : scoped }
 
   def self.find_for(id, context, type)
+    id = id[Api::ID_REGEX] if id.is_a?(String)
+    raise ActiveRecord::RecordNotFound unless id.present?
     tool = context.context_external_tools.having_setting(type).find_by_id(id)
     if !tool && context.is_a?(Group)
       context = context.context
@@ -541,26 +556,6 @@ class ContextExternalTool < ActiveRecord::Base
     end
   end
 
-  def clone_for(context, dup=nil, options={})
-    if !self.cloned_item && !self.new_record?
-      self.cloned_item = ClonedItem.create(:original_item => self)
-      self.save!
-    end
-    existing = ContextExternalTool.active.find_by_context_type_and_context_id_and_id(context.class.to_s, context.id, self.id)
-    existing ||= ContextExternalTool.active.find_by_context_type_and_context_id_and_cloned_item_id(context.class.to_s, context.id, self.cloned_item_id)
-    return existing if existing && !options[:overwrite]
-    new_tool = existing
-    new_tool ||= ContextExternalTool.new
-    new_tool.context = context
-    new_tool.settings = self.settings.clone
-    [:name, :shared_secret, :url, :domain, :consumer_key, :workflow_state, :description].each do |att|
-      new_tool.write_attribute(att, self.read_attribute(att))
-    end
-    new_tool.cloned_item_id = self.cloned_item_id
-    
-    new_tool
-  end
-
   def resource_selection_settings
     settings[:resource_selection]
   end
@@ -600,6 +595,18 @@ class ContextExternalTool < ActiveRecord::Base
     item.save!
     context.imported_migration_items << item if context.respond_to?(:imported_migration_items) && context.imported_migration_items && item.new_record?
     item
+  end
+
+  def opaque_identifier_for(asset)
+    ContextExternalTool.opaque_identifier_for(asset, self.shard)
+  end
+
+  def self.opaque_identifier_for(asset, shard)
+    shard.activate do
+      str = asset.asset_string.to_s
+      raise "Empty value" if str.blank?
+      Canvas::Security.hmac_sha1(str, shard.settings[:encryption_key])
+    end
   end
 
   private

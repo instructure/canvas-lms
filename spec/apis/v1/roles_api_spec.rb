@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe "Roles API", :type => :integration do
+describe "Roles API", type: :request do
   before do
     @account = Account.default
     account_admin_user(:account => @account)
@@ -277,7 +277,7 @@ describe "Roles API", :type => :integration do
       raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/roles",
         { :controller => 'role_overrides', :action => 'add_role', :format => 'json', :account_id => @admin.account.id.to_s },
         { :permissions => { @permission => { :explicit => '1', :enabled => '1' } } })
-      response.status.should == '400 Bad Request'
+      assert_status(400)
       JSON.parse(response.body).should == {"message" => "missing required parameter 'role'"}
     end
 
@@ -290,7 +290,7 @@ describe "Roles API", :type => :integration do
       raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/roles",
         { :controller => 'role_overrides', :action => 'add_role', :format => 'json', :account_id => @admin.account.id.to_s },
         { :role => @role })
-      response.status.should == '400 Bad Request'
+      assert_status(400)
       JSON.parse(response.body).should == {"message" => "role already exists"}
     end
 
@@ -301,7 +301,7 @@ describe "Roles API", :type => :integration do
       raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/roles",
         { :controller => 'role_overrides', :action => 'add_role', :format => 'json', :account_id => @admin.account.id.to_s },
         { :role => @role })
-      response.status.should == '400 Bad Request'
+      assert_status(400)
       JSON.parse(response.body).should == {"message" => "role already exists"}
     end
 
@@ -320,7 +320,7 @@ describe "Roles API", :type => :integration do
       raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/roles",
         { :controller => 'role_overrides', :action => 'add_role', :format => 'json', :account_id => @admin.account.id.to_s },
         { :role => @role, :base_role_type => "notagoodbaserole" })
-      response.status.should == '400 Bad Request'
+      assert_status(400)
       JSON.parse(response.body).should == {"message" => "Base role type is invalid"}
     end
 
@@ -328,7 +328,7 @@ describe "Roles API", :type => :integration do
       raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/roles",
                    { :controller => 'role_overrides', :action => 'add_role', :format => 'json', :account_id => @admin.account.id.to_s },
                    { :role => 'student', :base_role_type => "StudentEnrollment" })
-      response.status.should == '400 Bad Request'
+      assert_status(400)
       JSON.parse(response.body).should == {"message" => "Name is reserved"}
     end
 
@@ -549,7 +549,7 @@ describe "Roles API", :type => :integration do
                  { :controller => 'role_overrides', :action => 'add_role', :format => 'json', :account_id => @account.id.to_s },
                  {:role => role_name, :base_role_type => 'StudentEnrollment'})
 
-        @path = @path.sub(/TeacherEnrollment/, role_name)
+        @path = @path.sub(/TeacherEnrollment/, URI.escape(role_name))
         @path_options[:role] = role_name
         @permissions[:permissions][:read_question_banks][:enabled] = 1
 

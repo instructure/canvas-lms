@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 
 describe "One Question at a Time Quizzes" do
-  it_should_behave_like "quizzes selenium tests"
+  include_examples "quizzes selenium tests"
 
   def create_oqaat_quiz(opts={})
 
@@ -22,14 +22,15 @@ describe "One Question at a Time Quizzes" do
   end
 
   def quiz_question(name, question, id)
-    answers = {
-      :a => {:weight=>100, :answer_text=>"A", :answer_comments=>"", :id=>1490},
-      :b => {:weight=>0, :answer_text=>"B", :answer_comments=>"", :id=>1020},
-      :c => {:weight=>0, :answer_text=>"C", :answer_comments=>"", :id=>7051}
-    }
+    answers = [
+      {:weight=>100, :answer_text=>"A", :answer_comments=>"", :id=>1490},
+      {:weight=>0, :answer_text=>"B", :answer_comments=>"", :id=>1020},
+      {:weight=>0, :answer_text=>"C", :answer_comments=>"", :id=>7051}
+    ]
     data = { :question_name=>name, :points_possible=>1, :question_text=>question,
       :answers=>answers, :question_type=>"multiple_choice_question"
     }
+
     @quiz.quiz_questions.create!(:question_data => data)
   end
 
@@ -231,14 +232,14 @@ describe "One Question at a Time Quizzes" do
     end
 
     context "on a OQAAT quiz" do
-      it "displays one question at a time" do
-        take_the_quiz
-        back_and_forth_flow
-      end
-
       it "saves answers and grades the quiz" do
         take_the_quiz
         answers_flow
+      end
+
+      it "displays one question at a time" do
+        take_the_quiz
+        back_and_forth_flow
       end
 
       it "warns you about submitting unanswered questions" do
@@ -330,14 +331,14 @@ describe "One Question at a Time Quizzes" do
     end
 
     context "on a OQAAT quiz" do
-      it "displays one question at a time" do
-        preview_the_quiz
-        back_and_forth_flow
-      end
-
       it "saves answers and grades the quiz" do
         preview_the_quiz
         answers_flow
+      end
+
+      it "displays one question at a time" do
+        preview_the_quiz
+        back_and_forth_flow
       end
     end
 

@@ -56,6 +56,8 @@ describe Course do
     }}.with_indifferent_access
 
     course.import_from_migration(data, migration.migration_settings[:migration_ids_to_import], migration)
+    course.reload
+
     # discussion topic tests
     course.discussion_topics.length.should eql(3)
     migration_ids = ["1864019689002", "1865116155002", "4488523052421"].sort
@@ -95,7 +97,8 @@ describe Course do
     
     # assignment tests
     course.reload
-    course.assignments.length.should eql(4)
+    length = course.root_account.feature_enabled?(:draft_state) ? 5 : 4
+    course.assignments.length.should eql(length)
     course.assignments.map(&:migration_id).sort.should eql(['1865116155002', '1865116014002', '4407365899221', '4469882339231'].sort)
     # assignment with due date
     assignment = course.assignments.find_by_migration_id("1865116014002")

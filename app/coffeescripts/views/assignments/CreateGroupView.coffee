@@ -1,4 +1,7 @@
 define [
+  'compiled/util/round'
+  'i18n!assignments'
+  'jquery'
   'underscore'
   'compiled/models/AssignmentGroup'
   'compiled/collections/NeverDropCollection'
@@ -6,7 +9,7 @@ define [
   'compiled/views/DialogFormView'
   'jst/assignments/CreateGroup'
   'jst/EmptyDialogFormWrapper'
-], ( _, AssignmentGroup, NeverDropCollection, NeverDropCollectionView, DialogFormView, template, wrapper) ->
+], (round, I18n, $, _, AssignmentGroup, NeverDropCollection, NeverDropCollectionView, DialogFormView, template, wrapper) ->
 
   class CreateGroupView extends DialogFormView
     defaults:
@@ -15,6 +18,7 @@ define [
 
     events: _.extend({}, @::events,
       'click .dialog_closer': 'close'
+      'blur .group_weight': 'roundWeight'
     )
 
     els:
@@ -27,6 +31,13 @@ define [
     @optionProperty 'assignmentGroup'
     @optionProperty 'course'
 
+    messages:
+      non_number: I18n.t('non_number', 'You must use a number')
+      positive_number: I18n.t('positive_number', 'You must use a positive number')
+      max_number: I18n.t('higher_than_max', 'You cannot use a number greater than the number of assignments')
+      no_name_error: I18n.t('no_name_error', 'A name is required')
+      name_too_long_error: I18n.t('name_too_long_error', 'Name is too long')
+
     initialize: ->
       super
       #@assignmentGroup will be defined when editing
@@ -35,13 +46,16 @@ define [
 
     onSaveSuccess: ->
       super
-      if @assignmentGroup # meaning we are editing
-        @model.collection.view.render()
+      # meaning we are editing
+      if @assignmentGroup
+        # trigger instead of calling render directly
+        @model.collection.trigger 'render', @model.collection
       else
         @assignmentGroups.add(@model)
         @model = new AssignmentGroup(assignments: [])
 
-      @render()
+        @render()
+
 
     getFormData: ->
       data = super
@@ -49,6 +63,29 @@ define [
       delete data.rules.drop_highest if _.contains(["", "0"], data.rules.drop_highest)
       delete data.rules.never_drop if data.rules.never_drop?.length == 0
       data
+
+    validateFormData: (data) ->
+      max = 0
+      if @assignmentGroup
+        as = @assignmentGroup.get('assignments')
+        max = as.size() if as?
+      errors = {}
+      if data.name.length > 255
+        errors["name"] = [{type: 'name_too_long_error', message: @messages.name_too_long_error}]
+      if data.name == ""
+        errors["name"] = [{type: 'no_name_error', message: @messages.no_name_error}]
+      _.each data.rules, (value, name) =>
+        # don't want to validate the never_drop field
+        return if name is 'never_drop'
+        val = parseInt(value)
+        field = "rules[#{name}]"
+        if isNaN(val)
+          errors[field] = [{type: 'number', message: @messages.non_number}]
+        if val < 0
+          errors[field] = [{type: 'positive_number', message: @messages.positive_number}]
+        if val > max
+          errors[field] = [{type: 'maximum', message: @messages.max_number}]
+      errors
 
     showWeight: ->
       course = @course or @model.collection?.course
@@ -75,6 +112,10 @@ define [
         @never_drops.reset rules.never_drop,
           parse: true
 
+    roundWeight: (e) ->
+      value = $(e.target).val()
+      rounded_value = round(parseFloat(value), 2)
+      $(e.target).val(rounded_value)
 
     toJSON: ->
       data = @model.toJSON()

@@ -68,13 +68,22 @@ module SeleniumTestsHelperMethods
         if SELENIUM_CONFIG[:firefox_profile].present?
           profile = Selenium::WebDriver::Firefox::Profile.from_name(SELENIUM_CONFIG[:firefox_profile])
         end
-        profile.native_events = native
+        profile.native_events = true
         options[:profile] = profile
       end
       if path = SELENIUM_CONFIG[:paths].try(:[], browser)
         Selenium::WebDriver.const_get(browser.to_s.capitalize).path = path
       end
-      driver = Selenium::WebDriver.for(browser, options)
+      begin
+        tries ||= 3
+        puts "Thread: provisioning selenium driver"
+        driver = nil
+        driver = Selenium::WebDriver.for(browser, options)
+      rescue Exception => e
+        puts "Thread #{THIS_ENV}\n try ##{tries}\nError attempting to start remote webdriver: #{e}"
+        sleep 2
+        retry unless (tries -= 1).zero?
+      end
     else
       caps = SELENIUM_CONFIG[:browser].try(:to_sym) || :firefox
       if caps == :firefox
@@ -86,25 +95,7 @@ module SeleniumTestsHelperMethods
         caps = Selenium::WebDriver::Remote::Capabilities.firefox(:firefox_profile => profile)
         caps.native_events = native
       end
-
-      driver = nil
-      puts 'setting up selenium server'
-      start_selenium_server_node
-      #curbs race conditions on selenium grid nodes
-      stagger_threads
-      begin
-        tries ||= 20
-        puts "Thread #{THIS_ENV} connecting to hub over port #{PORT_NUM}, try ##{tries}"
-        driver = Selenium::WebDriver.for(
-            :remote,
-            :url => "http://127.0.0.1:#{PORT_NUM}/wd/hub",
-            :desired_capabilities => caps
-        )
-      rescue Exception => e
-        puts "Thread #{THIS_ENV}\n try ##{tries}\nError attempting to start remote webdriver: #{e}"
-        sleep 2
-        retry unless (tries -= 1).zero?
-      end
+      raise('error with how selenium is being setup')
     end
     driver.manage.timeouts.implicit_wait = 10
     driver
@@ -112,21 +103,6 @@ module SeleniumTestsHelperMethods
 
   def set_native_events(setting)
     driver.instance_variable_get(:@bridge).instance_variable_get(:@capabilities).instance_variable_set(:@native_events, setting)
-  end
-
-  def start_selenium_server_node
-    puts "stopping selenium server node: #{THIS_ENV}"
-    `selenium_procs=$(ps -ef | grep #{PORT_NUM} | awk '{print $2}') && kill -9 $selenium_procs`
-    `sudo rm -rf /tmp/.X#{THIS_ENV}-lock`
-    `xvfb_procs=$(ps -ef | grep 'Xvfb :#{THIS_ENV}' | awk '{print $2}') && kill -9 $xvfb_procs`
-    puts "restarting xvfb screen and selenium server node: #{THIS_ENV}"
-    sleep 7
-    `Xvfb :#{THIS_ENV} -ac -noreset -screen 0 1280x1024x24 &`
-    sleep 2
-    #add configs for selenium version
-    `export DISPLAY=:#{THIS_ENV} && java -Djava.io.tmpdir=/tmp/node#{THIS_ENV} -jar /usr/lib/selenium/selenium-server-standalone-#{SELENIUM_CONFIG[:version]}.jar -port #{PORT_NUM} -timeout 60000  > /var/log/selenium/selenium-output#{THIS_ENV}.log 2> /var/log/selenium/selenium-error#{THIS_ENV}.log & echo $! > /selenium/selenium#{THIS_ENV}.pid &`
-    sleep 5
-    puts "selenium server node: #{THIS_ENV} has been restarted"
   end
 
 
@@ -170,12 +146,6 @@ module SeleniumTestsHelperMethods
   def t(*a, &b)
     I18n.t(*a, &b)
   end
-
-  def stagger_threads(step_time = 6)
-    wait_time = THIS_ENV * step_time
-    sleep(wait_time)
-  end
-
 
   def app_host
     "http://#{$app_host_and_port}"
@@ -230,9 +200,13 @@ module SeleniumTestsHelperMethods
   def self.rack_app()
     app = Rack::Builder.new do
       use Rails::Rack::Debugger unless Rails.env.test?
-      map '/' do
-        use Rails::Rack::Static
-        run ActionController::Dispatcher.new
+      if CANVAS_RAILS2
+        map '/' do
+          use Rails::Rack::Static
+          run ActionController::Dispatcher.new
+        end
+      else
+        run CanvasRails::Application
       end
     end.to_app
     return app
@@ -314,7 +288,11 @@ shared_examples_for "all selenium tests" do
   include CustomSeleniumRspecMatchers
 
   # set up so you can use rails urls helpers in your selenium tests
-  include ActionController::UrlWriter
+  if CANVAS_RAILS2
+    include ActionController::UrlWriter
+  else
+    include Rails.application.routes.url_helpers
+  end
 
   def selenium_driver;
     $selenium_driver
@@ -423,7 +401,7 @@ shared_examples_for "all selenium tests" do
 
   def check_domready
     dom_is_ready = driver.execute_script "return window.seleniumDOMIsReady"
-    requirejs_resources_loaded = driver.execute_script "return require.resourcesDone"
+    requirejs_resources_loaded = driver.execute_script "return !requirejs.s.contexts._.defQueue.length"
     dom_is_ready and requirejs_resources_loaded
   end
 
@@ -443,7 +421,7 @@ shared_examples_for "all selenium tests" do
     driver.execute_async_script(<<-JS)
      var callback = arguments[arguments.length - 1];
      var pollForJqueryAndRequire = function(){
-        if (window.jQuery && window.require && window.require.resourcesDone) {
+        if (window.jQuery && window.require && !window.requirejs.s.contexts._.defQueue.length) {
           jQuery(function(){
             setTimeout(callback, 1);
           });
@@ -933,6 +911,13 @@ shared_examples_for "all selenium tests" do
     drag_with_js source_selector, dx, dy
   end
 
+  ##
+  # drags the source element to the target element and waits for ajaximations
+  def drag_and_drop_element(source, target)
+    driver.action.drag_and_drop(source, target).perform
+    wait_for_ajaximations
+  end
+
 ##
 # returns true if a form validation error message is visible, false otherwise
   def error_displayed?
@@ -940,7 +925,7 @@ shared_examples_for "all selenium tests" do
     driver.execute_script("return $('.error_text:visible').filter(function(){ return $(this).offset().left >= 0 }).length > 0")
   end
 
-  append_after(:each) do
+  after(:each) do
     begin
       wait_for_ajax_requests
     rescue Selenium::WebDriver::Error::WebDriverError
@@ -949,13 +934,31 @@ shared_examples_for "all selenium tests" do
     truncate_all_tables unless self.use_transactional_fixtures
   end
 
+  unless CANVAS_RAILS2 || EncryptedCookieStore.respond_to?(:test_secret)
+    EncryptedCookieStore.class_eval do
+      cattr_accessor :test_secret
+
+      def call_with_test_secret(env)
+        @secret = self.class.test_secret
+        @encryption_key = unhex(@secret)
+        call_without_test_secret(env)
+      end
+      alias_method_chain :call, :test_secret
+    end
+  end
+
   append_before (:each) do
     #the driver sometimes gets in a hung state and this if almost always the first line of code to catch it
     begin
       tries ||= 3
       driver.manage.timeouts.implicit_wait = 3
       driver.manage.timeouts.script_timeout = 60
-      EncryptedCookieStore.any_instance.stubs(:secret).returns(SecureRandom.hex(64))
+      if CANVAS_RAILS2
+        EncryptedCookieStore.any_instance.stubs(:secret).returns(SecureRandom.hex(64))
+      else
+        EncryptedCookieStore.test_secret = SecureRandom.hex(64)
+      end
+
       enable_forgery_protection
     rescue
       if ENV['PARALLEL_EXECS'] != nil
@@ -988,7 +991,7 @@ shared_examples_for "all selenium tests" do
     end
   end
 
-  append_after(:each) do
+  after(:each) do
     clear_timers!
   end
 
@@ -1090,7 +1093,7 @@ def find_css_in_string(string_of_html, css_selector)
 end
 
 shared_examples_for "in-process server selenium tests" do
-  it_should_behave_like "all selenium tests"
+  include_examples "all selenium tests"
   prepend_before (:all) do
     $in_proc_webserver_shutdown ||= SeleniumTestsHelperMethods.start_webserver(WEBSERVER)
   end
@@ -1107,16 +1110,18 @@ shared_examples_for "in-process server selenium tests" do
       @db_connection = ActiveRecord::Base.connection
       @dj_connection = Delayed::Backend::ActiveRecord::Job.connection
 
-      # synchronize the execute method for a modicum of thread safety
+      # synchronize db connection methods for a modicum of thread safety
+      methods_to_sync = CANVAS_RAILS2 ? %w{execute} : %w{execute exec_cache exec_no_cache query}
       [@db_connection, @dj_connection].each do |conn|
-        if !conn.respond_to?(:execute_without_synchronization)
-          conn.class.class_eval do
-            def execute_with_synchronization(*args)
-              @mutex ||= Mutex.new
-              @mutex.synchronize { execute_without_synchronization(*args) }
-            end
-
-            alias_method_chain :execute, :synchronization
+        methods_to_sync.each do |method_name|
+          if conn.respond_to?(method_name, true) && !conn.respond_to?("#{method_name}_with_synchronization", true)
+            conn.class.class_eval <<-RUBY
+              def #{method_name}_with_synchronization(*args)
+                @mutex ||= Mutex.new
+                @mutex.synchronize { #{method_name}_without_synchronization(*args) }
+              end
+              alias_method_chain :#{method_name}, :synchronization
+            RUBY
           end
         end
       end

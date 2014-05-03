@@ -20,28 +20,13 @@
 module Api::V1::NotificationPolicy
   include Api::V1::Json
 
-  # Internal: The attributes returned by notification_category_json.
   JSON_OPTS = {
-    :only => %w{ id notification_id communication_channel_id frequency } }
+    :only => %w{ frequency } }
 
-  # Public: Given a NotificationPolicy model, return it in an API-friendly format.
-  #
-  # policy - The notification policy object to turn into a hash.
-  # user - The requesting user.
-  # session - The current session (or nil, if no session is available)
-  #
-  # Returns a Hash of notification attributes and additional method results:
-  #   :id
-  #   :notification_id
-  #   :communication_channel_id
-  #   :frequency
   def notification_policy_json(policy, user, session)
     api_json(policy, user, session, JSON_OPTS).tap do |json|
-      # Add the category from the linked notification
-      json[:category] = policy.notification.try(:category)
-      # Rename some attributes for more friendly usage
-      json[:channel_id] = json.delete(:communication_channel_id)
+      json[:notification] = policy.notification && policy.notification.name.underscore.gsub(/\s/, '_')
+      json[:category] = policy.notification && policy.notification.category.underscore.gsub(/\s/, '_')
     end
   end
-
 end

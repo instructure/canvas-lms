@@ -1,7 +1,17 @@
 <% @routes.each do |route| %>
-<% route_path = route.segments.inject("") { |str,s| str << s.to_s }.sub(/\(\.:format\)\?/, '').sub(/\/$/, '')
-   next if route_path =~ /\.json$/ %>
-<h3 class='endpoint'>
-  <%= route.conditions[:method].to_s.upcase %> <%= route_path %>
-</h3>
+  <% if CANVAS_RAILS2
+       route_path = route.segments.inject("") { |str,s| str << s.to_s }.sub(/\(\.:format\)\?/, '').sub(/\/$/, '')
+       verb = route.conditions[:method].to_s.upcase
+     else
+       route_path = route.path.spec.to_s.sub("(.json)(.:format)", "")
+       if route.verb.source =~ /\^?(\w*)\$/
+         verb = $1.upcase
+       else
+         verb = route.verb.source
+       end
+     end
+     next if route_path =~ /\.json$/ %>
+  <h3 class='endpoint'>
+    <%= verb %> <%= route_path %>
+  </h3>
 <% end %>

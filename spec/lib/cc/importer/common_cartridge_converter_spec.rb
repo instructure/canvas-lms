@@ -68,7 +68,7 @@ describe "Standard Common Cartridge importing" do
     if Qti.qti_enabled?
       tag = mod1.content_tags[index]
       tag.title.should == "Pretest"
-      tag.content_type.should == 'Quiz'
+      tag.content_type.should == 'Quizzes::Quiz'
       tag.content_id.should == @course.quizzes.find_by_migration_id("I_00003_R").id
       tag.indent.should == 1
       index += 1
@@ -227,14 +227,13 @@ describe "Standard Common Cartridge importing" do
     
     it "should point to new attachment from module" do
       @course.context_modules.count.should == 3
-      
+
       mod1 = @course.context_modules.find_by_migration_id("I_00000")
       mod1.content_tags.active.count.should == (Qti.qti_enabled? ? 5 : 4)
       mod1.name.should == "Your Mom, Research, & You"
       tag = mod1.content_tags.active[0]
       tag.content_type.should == 'Attachment'
       tag.content_id.should == @course.attachments.active.find_by_migration_id("I_00001_R").id
-      puts mod1.content_tags.active.count
     end
   end
 
@@ -542,7 +541,7 @@ describe "non-ASCII attachment names" do
                 "web_resources/abc.txt"]
     @converter.resources.values.map { |v| v[:files][0][:href] }.sort.should == contents.sort
 
-    Zip::ZipFile.open File.join(@converter.base_export_dir, "all_files.zip") do |zipfile|
+    Zip::File.open File.join(@converter.base_export_dir, "all_files.zip") do |zipfile|
       zipcontents = zipfile.entries.map(&:name)
       (contents - zipcontents).should eql []
     end

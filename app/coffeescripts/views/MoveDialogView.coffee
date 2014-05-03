@@ -1,10 +1,11 @@
 define [
+  'jquery'
   'underscore'
   'compiled/views/DialogFormView'
   'compiled/views/MoveDialogSelect'
   'jst/MoveDialog'
   'jst/EmptyDialogFormWrapper'
-], (_, DialogFormView, MoveDialogSelect, template, wrapper) ->
+], ($, _, DialogFormView, MoveDialogSelect, template, wrapper) ->
 
   class MoveDialogView extends DialogFormView
     setViewProperties: false
@@ -148,8 +149,8 @@ define [
 
 
     onSaveSuccess: (data) =>
-      # assume collID is an int
-      collID = parseInt @parentListView?.value(), 10
+      # collID must be a string
+      collID = @parentListView?.value()
       newCollection = @parentCollection?.get(collID).get(@childKey)
 
       # there is a currentCollection, but it doesn't match the model's collection

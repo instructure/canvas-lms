@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013 Instructure, Inc.
+# Copyright (C) 2013 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'csv'
+
 module Canvas::AccountReports
 
   class StudentReports
@@ -24,6 +26,7 @@ module Canvas::AccountReports
 
     def initialize(account_report)
       @account_report = account_report
+      @account_report.parameters ||= {}
     end
 
     def start_and_end_times
@@ -54,9 +57,33 @@ module Canvas::AccountReports
       if !start_at && !end_at
         @start = 2.weeks.ago
         @account_report.parameters["start_at"] = @start
-        @end = Time.now
+        @end = Time.zone.now
         @account_report.parameters["end_at"] = @end
       end
+    end
+
+    def include_enrollment_state
+      if @account_report.has_parameter? "include_enrollment_state"
+        state = @account_report.parameters["include_enrollment_state"]
+      end
+      state
+    end
+
+    def enrollment_states
+      if @account_report.has_parameter? "enrollment_state"
+        states = @account_report.parameters["enrollment_state"]
+      end
+      states = nil if Array(states).include?('all')
+      states
+    end
+
+    def enrollment_states_string
+      if enrollment_states
+        states = Array(enrollment_states).join(' ')
+      else
+        states = 'all'
+      end
+      states
     end
 
     def students_with_no_submissions
@@ -67,9 +94,9 @@ module Canvas::AccountReports
       CSV.open(file, "w") do |csv|
 
         condition = [""]
-        condition.first << " AND submitted_at > ?"
+        condition.first << " AND s.submitted_at > ?"
         condition << start_at
-        condition.first << " AND submitted_at < ?"
+        condition.first << " AND s.submitted_at < ?"
         condition << end_at
 
         time_span_join = Pseudonym.send(:sanitize_sql, condition)
@@ -78,7 +105,8 @@ module Canvas::AccountReports
           select("p.user_id, p.sis_user_id, courses.id AS course_id,
                   u.sortable_name, courses.name AS course_name,
                   courses.sis_source_id AS course_sis_id, cs.id AS section_id,
-                  cs.sis_source_id AS section_sis_id, cs.name AS section_name").
+                  cs.sis_source_id AS section_sis_id, cs.name AS section_name,
+                  e.workflow_state AS enrollment_state").
           joins("INNER JOIN enrollments e ON e.course_id = courses.id
                    AND e.root_account_id = courses.root_account_id
                    AND e.type = 'StudentEnrollment'
@@ -86,22 +114,33 @@ module Canvas::AccountReports
                  INNER JOIN pseudonyms p ON e.user_id = p.user_id
                    AND courses.root_account_id = p.account_id
                  INNER JOIN users u ON u.id = p.user_id").
-          where("NOT EXISTS (SELECT user_id
+          where("NOT EXISTS (SELECT s.user_id
                              FROM submissions s
                              INNER JOIN assignments a ON s.assignment_id = a.id
-                             INNER JOIN courses c ON a.context_id = c.id
                                AND a.context_type = 'Course'
                              WHERE s.user_id = p.user_id
-                             AND c.id = courses.id
+                               AND a.context_id = courses.id
                              #{time_span_join})")
 
+        no_subs = no_subs.where(e: {workflow_state: enrollment_states}) if enrollment_states
         no_subs = add_term_scope(no_subs)
         no_subs = add_course_enrollments_scope(no_subs, 'e')
         no_subs = add_course_sub_account_scope(no_subs) unless course
 
-        csv << ['user id','user sis id','user name','section id',
-                'section sis id', 'section name','course id',
-                'course sis id', 'course name']
+        if include_enrollment_state
+          add_extra_text(I18n.t('account_reports.student.enrollment_state',
+                                'Include Enrollment State: true;'))
+        end
+
+        add_extra_text(I18n.t('account_reports.student.enrollment_states',
+                              "Enrollment States: %{states};", states: enrollment_states_string))
+
+        headers = ['user id','user sis id','user name','section id',
+                   'section sis id', 'section name','course id',
+                   'course sis id', 'course name']
+        headers << 'enrollment state' if include_enrollment_state
+
+        csv << headers
         Shackles.activate(:slave) do
           no_subs.find_each do |u|
             row = []
@@ -114,6 +153,7 @@ module Canvas::AccountReports
             row << u["course_id"]
             row << u["course_sis_id"]
             row << u["course_name"]
+            row << u["enrollment_state"] if include_enrollment_state
             csv << row
           end
         end
@@ -213,8 +253,12 @@ module Canvas::AccountReports
         end
 
         csv << ['user id','user sis id','user name','last access at','last ip']
+
+        pseudonyms_in_report = Set.new
         Shackles.activate(:slave) do
           students.find_each do |u|
+            next if pseudonyms_in_report.include? [u.user_id, u.sis_user_id]
+            pseudonyms_in_report << [u.user_id, u.sis_user_id]
             row = []
             row << u.user_id
             row << u.sis_user_id

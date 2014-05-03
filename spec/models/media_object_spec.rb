@@ -150,4 +150,15 @@ describe MediaObject do
       end
     end
   end
+
+  describe ".add_media_files" do
+    it "should work for user context" do
+      stub_kaltura
+      user
+      attachment_obj_with_context(@user, user: @user)
+      Kaltura::ClientV3.any_instance.stubs(:startSession).returns(nil)
+      Kaltura::ClientV3.any_instance.stubs(:bulkUploadAdd).returns({})
+      MediaObject.add_media_files(@attachment, false)
+    end
+  end
 end

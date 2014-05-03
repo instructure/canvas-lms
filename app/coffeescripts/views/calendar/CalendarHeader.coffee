@@ -1,15 +1,17 @@
 define [
   'i18n!calendar',
+  'jquery'
   'Backbone',
   'jst/calendar/calendarHeader'
   'compiled/views/calendar/CalendarNavigator'
-], (I18n, Backbone, template, CalendarNavigator) ->
+], (I18n, $, Backbone, template, CalendarNavigator) ->
 
   class CalendarHeader extends Backbone.View
     template: template
 
     els:
       '.calendar_view_buttons'   : '$calendarViewButtons'
+      '.recommend_agenda'        : '$recommendAgenda'
       '.calendar_navigator'      : '$navigator'
       '.appointment_group_title' : '$appointmentGroupTitle'
       '.scheduler_done_button'   : '$schedulerDoneButton'
@@ -19,17 +21,17 @@ define [
     events:
       'click #week'      : '_triggerWeek'
       'click #month'     : '_triggerMonth'
+      'click #agenda'    : '_triggerAgenda'
+      'click #use_agenda': '_selectAgenda'
       'click #scheduler' : '_triggerScheduler'
       'click .scheduler_done_button': '_triggerDone'
       'click #create_new_event_link': '_triggerCreateNewEvent'
       'click #refresh_calendar_link': '_triggerRefreshCalendar'
 
     initialize: ->
+      super
       @render()
-      @navigator = new CalendarNavigator(
-        el: @$navigator
-      )
-      @$calendarViewButtons.buttonset()
+      @navigator = new CalendarNavigator(el: @$navigator)
       @showNavigator()
       # The badge is part of the buttonset, so we can't find it beforehand with els
       @$badge = @$el.find('.counter-badge')
@@ -40,7 +42,19 @@ define [
       @navigator.on('navigatePrev', => @trigger('navigatePrev'))
       @navigator.on('navigateToday', => @trigger('navigateToday'))
       @navigator.on('navigateNext', => @trigger('navigateNext'))
+      @navigator.on('navigateDate', (selectedDate) => @trigger('navigateDate', selectedDate))
+      @$calendarViewButtons.on('click', 'button', @toggleView)
+      $.subscribe('Calendar/loadStatus', @animateLoading)
       @$schedulerDoneButton
+
+    toggleView: (e) ->
+      e.preventDefault()
+      $target = $(this)
+      $target.attr('aria-checked', true)
+             .addClass('active')
+      $target.siblings()
+             .attr('aria-checked', false)
+             .removeClass('active')
 
     showNavigator: ->
       @$navigator.show()
@@ -60,17 +74,32 @@ define [
       @$appointmentGroupTitle.hide()
       @$schedulerDoneButton.show()
 
-    setHeaderText: (newText) ->
+    showAgendaRecommendation: ->
+      @$recommendAgenda.show()
+
+    hideAgendaRecommendation: ->
+      @$recommendAgenda.hide()
+
+    setHeaderText: (newText) =>
       @navigator.setTitle(newText)
 
     selectView: (viewName) ->
       $("##{viewName}").click()
 
-    animateLoading: (shouldAnimate) ->
+    animateLoading: (shouldAnimate) =>
       @$refreshCalendarLink.toggleClass('loading', shouldAnimate)
 
     setSchedulerBadgeCount: (badgeCount) ->
       @$badge.toggle(badgeCount > 0).text(badgeCount)
+
+    showPrevNext: ->
+      @navigator.showPrevNext()
+
+    hidePrevNext: ->
+      @navigator.hidePrevNext()
+
+    _selectAgenda: (event) ->
+      @selectView('agenda')
 
     _triggerDone: (event) ->
       @trigger('done')
@@ -81,6 +110,9 @@ define [
     _triggerMonth: (event) ->
       @trigger('month')
 
+    _triggerAgenda: (event) ->
+      @trigger('agenda')
+ 
     _triggerScheduler: (event) ->
       @trigger('scheduler')
 

@@ -33,6 +33,12 @@
             After the Due Date
           {{/t}}
         </option>
+        <option value="never"
+        {{selectedIf originalityReportVisibility "never"}} >
+          {{#t "turnitin_settings.originality_report_never"}}
+            Never
+          {{/t}}
+        </option>
       </select>
     </div>
   </div>

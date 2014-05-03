@@ -1,10 +1,11 @@
 define [
   'require'
   'Backbone'
+  'jquery'
   'underscore'
   'compiled/collections/PaginatedCollection'
   'compiled/collections/FilesCollection'
-], (require, Backbone, _, PaginatedCollection, FilesCollection) ->
+], (require, Backbone, $, _, PaginatedCollection, FilesCollection) ->
 
   # this breaks the circular dependency between Folder <-> FoldersCollection
   FoldersCollection = null

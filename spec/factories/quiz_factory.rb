@@ -113,8 +113,12 @@ def multiple_dropdowns_question_data
   ], "question_text"=>"[structure1] [event1] [structure2] [structure3] [structure4] [structure5] [structure6] [event2] [structure7]"}.with_indifferent_access
 end
 
-def matching_question_data
-  {"id" => 1, "name"=>"Question", "correct_comments"=>"", "question_type"=>"matching_question", "assessment_question_id"=>4, "neutral_comments"=>"", "incorrect_comments"=>"", "question_name"=>"Question", "points_possible"=>50.0, "matches"=>[{"match_id"=>6061, "text"=>"1"}, {"match_id"=>3855, "text"=>"2"}, {"match_id"=>1397, "text"=>"1"}, {"match_id"=>2369, "text"=>"3"}, {"match_id"=>6065, "text"=>"4"}, {"match_id"=>5779, "text"=>"5"}, {"match_id"=>3562, "text"=>"6"}, {"match_id"=>1500, "text"=>"7"}, {"match_id"=>8513, "text"=>"8"}, {"match_id" => 6067, "text" => "a2"}, {"match_id" => 6068, "text" => "a3"}, {"match_id" => 6069, "text" => "a4"}], "answers"=>[
+# @param [Hash] options
+# @param [Boolean] options.answer_parser_compatibility
+#   Set this to true if you want the fixture to be compatible with
+#   QuizQuestion::AnswerParsers::Matching.
+def matching_question_data(options = {})
+  data = {"id" => 1, "name"=>"Question", "correct_comments"=>"", "question_type"=>"matching_question", "assessment_question_id"=>4, "neutral_comments"=>"", "incorrect_comments"=>"", "question_name"=>"Question", "points_possible"=>50.0, "matches"=>[{"match_id"=>6061, "text"=>"1"}, {"match_id"=>3855, "text"=>"2"}, {"match_id"=>1397, "text"=>"1"}, {"match_id"=>2369, "text"=>"3"}, {"match_id"=>6065, "text"=>"4"}, {"match_id"=>5779, "text"=>"5"}, {"match_id"=>3562, "text"=>"6"}, {"match_id"=>1500, "text"=>"7"}, {"match_id"=>8513, "text"=>"8"}, {"match_id" => 6067, "text" => "a2"}, {"match_id" => 6068, "text" => "a3"}, {"match_id" => 6069, "text" => "a4"}], "answers"=>[
     {"left"=>"a", "comments"=>"", "match_id"=>6061, "text"=>"a", "id"=>7396, "right"=>"1"},
     {"left"=>"b", "comments"=>"", "match_id"=>3855, "text"=>"b", "id"=>6081, "right"=>"2"},
     {"left"=>"ca", "comments"=>"", "match_id"=>1397, "text"=>"ca", "id"=>4224, "right"=>"1"},
@@ -122,6 +126,25 @@ def matching_question_data
     {"left"=>"a3", "comments"=>"", "match_id"=>6068, "text"=>"a", "id"=>7398, "right"=>"a3"},
     {"left"=>"a4", "comments"=>"", "match_id"=>6069, "text"=>"a", "id"=>7399, "right"=>"a4"},
   ], "question_text"=>"<p>Test Question</p>"}.with_indifferent_access
+
+  if options[:answer_parser_compatibility]
+    data['answers'].each do |record|
+      record['answer_match_left'] = record['left']
+      record['answer_match_text'] = record['text']
+      record['answer_match_right'] = record['right']
+      record['answer_comments'] = record['comments']
+
+      %w[ left text right comments ].each { |k| record.delete k }
+    end
+
+    # match#1397 has a duplicate text with #7396 that needs to be adjusted
+    i = data['matches'].index { |record| record['match_id'] == 1397 }
+    data['matches'][i]['text'] = '_1'
+    i = data['answers'].index { |record| record['match_id'] == 1397 }
+    data['answers'][i]['text'] = '_1'
+  end
+
+  data
 end
 
 def numerical_question_data
@@ -158,8 +181,12 @@ def calculated_question_data
    "id" => 1}.with_indifferent_access
 end
 
-def multiple_answers_question_data
-  {"name"=>"Question",
+# @param [Hash] options
+# @param [Boolean] options.answer_parser_compatibility
+#   Set this to true if you want the fixture to be compatible with
+#   QuizQuestion::AnswerParsers::MultipleAnswers.
+def multiple_answers_question_data(options = {})
+  data = {"name"=>"Question",
    "correct_comments"=>"",
    "question_type"=>"multiple_answers_question",
    "assessment_question_id"=>8197062,
@@ -178,6 +205,14 @@ def multiple_answers_question_data
      {"comments"=>"", "weight"=>100, "text"=>"431", "id"=>9701},
      {"comments"=>"", "weight"=>0, "text"=>"schadenfreude", "id"=>7381}],
    "question_text"=>"<p>which of these are numbers?</p>", "id" => 1}.with_indifferent_access
+
+  if options[:answer_parser_compatibility]
+    data['answers'].each do |record|
+      record['answer_weight'] = record['weight']
+    end
+  end
+
+  data
 end
 
 def fill_in_multiple_blanks_question_data

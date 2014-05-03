@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/conversations_common')
 
 describe "conversations attachments local tests" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   before do
     conversation_setup
@@ -140,7 +140,7 @@ describe "conversations attachments local tests" do
 end
 
 describe "conversations attachments S3 tests" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   before do
     conversation_setup

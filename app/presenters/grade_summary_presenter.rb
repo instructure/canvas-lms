@@ -51,7 +51,7 @@ class GradeSummaryPresenter
   end
 
   def selectable_courses
-    courses_with_grades.select do |course|
+    courses_with_grades.to_a.select do |course|
       student_enrollment = course.all_student_enrollments.find_by_user_id(student)
       student_enrollment.grants_right?(@current_user, nil, :read_grades)
     end
@@ -60,14 +60,20 @@ class GradeSummaryPresenter
   def student_enrollment
     @student_enrollment ||= begin
       if @id_param # always use id if given
-        user_id = Shard.relative_id_for(@id_param, @context.shard)
-        @context.all_student_enrollments.find_by_user_id(user_id)
+        validate_id
+        user_id = Shard.relative_id_for(@id_param, @context.shard, @context.shard)
+        @context.shard.activate { @context.all_student_enrollments.find_by_user_id(user_id) }
       elsif observed_students.present? # otherwise try to find an observed student
         observed_student
       else # or just fall back to @current_user
-        @context.all_student_enrollments.find_by_user_id(@current_user)
+        @context.shard.activate { @context.all_student_enrollments.find_by_user_id(@current_user) }
       end
     end
+  end
+
+  def validate_id
+    raise ActiveRecord::RecordNotFound if ( !@id_param.is_a?(User) && (@id_param.to_s =~ Api::ID_REGEX).nil? )
+    true
   end
 
   def student
@@ -83,44 +89,87 @@ class GradeSummaryPresenter
   end
 
   def groups
-    @groups ||= @context.assignment_groups.active.all
+    @groups ||= @context.assignment_groups.
+      active.includes(relevant_assignments_scope => :assignment_overrides).all
   end
 
   def assignments
     @assignments ||= begin
-      scope = @context.assignments.active.gradeable
-      array = scope.includes(:assignment_overrides).collect{|a| a.overridden_for(student)}.sort
-      # pre-cache the assignment group for each assignment object
       group_index = groups.index_by(&:id)
-      array.each{ |a| a.assignment_group = group_index[a.assignment_group_id] }
-      array
+
+      groups.flat_map(&relevant_assignments_scope).select { |a|
+        a.submission_types != 'not_graded'
+      }.map { |a|
+        # prevent extra loads
+        a.context = @context
+        a.assignment_group = group_index[a.assignment_group_id]
+
+        a.overridden_for(student)
+      }.sort
     end
   end
 
-  def submissions
-    @submissions ||= @context.submissions.
-      except(:includes).
-      includes(:submission_comments, :rubric_assessments, :assignment).
-      find_all_by_user_id(student)
+  def relevant_assignments_scope
+    AssignmentGroup.assignment_scope_for_grading(@context)
   end
 
-  def submissions_by_assignment
-    @submissions_by_assignment ||=
-      if allow_loading_all_submissions?
-        # Yes, fetch *all* submissions for this course; otherwise the view will end up doing a query for each
-        # assignment in order to calculate grade distributions
-        @context.submissions.
-          select([:assignment_id, :score, :grade, :quiz_submission_id]).
-          except(:includes).
-          group_by(&:assignment_id)
-      else
-        {}
-      end
+  def submissions
+    @submissions ||= begin
+      ss = @context.submissions
+      .includes(:visible_submission_comments,
+                {:rubric_assessments => [:rubric, :rubric_association]},
+                :content_participations)
+      .where("assignments.workflow_state != 'deleted'")
+      .find_all_by_user_id(student)
+
+      assignments_index = assignments.index_by(&:id)
+
+      # preload submission comment stuff
+      comments = ss.map { |s|
+        assign = assignments_index[s.assignment_id]
+        s.assignment = assign if assign.present?
+
+        s.visible_submission_comments.map { |c|
+          c.submission = s
+          c
+        }
+      }.flatten
+      SubmissionComment.preload_attachments comments
+
+      ss
+    end
+  end
+
+  def submission_counts
+    @submission_counts ||= @context.assignments.active
+      .except(:order)
+      .joins(:submissions)
+      .where("submissions.user_id in (?)", real_and_active_student_ids)
+      .group("assignments.id")
+      .count("submissions.id")
+  end
+
+  def assignment_stats
+    @stats ||= @context.assignments.active
+      .except(:order)
+      .joins(:submissions)
+      .where("submissions.user_id in (?)", real_and_active_student_ids)
+      .group("assignments.id")
+      .select("assignments.id, max(score) max, min(score) min, avg(score) avg")
+      .index_by(&:id)
+  end
+
+  def real_and_active_student_ids
+    @context.all_real_student_enrollments
+      .where("workflow_state not in (?)", ['rejected','inactive'])
+      .pluck(:user_id).uniq
   end
 
   def assignment_presenters
     submission_index = submissions.index_by(&:assignment_id)
-    assignments.map{|a| GradeSummaryAssignmentPresenter.new(self, @current_user, a, submission_index[a.id]) }
+    assignments.map{ |a|
+      GradeSummaryAssignmentPresenter.new(self, @current_user, a, submission_index[a.id])
+    }
   end
 
   def has_muted_assignments?
@@ -167,12 +216,5 @@ class GradeSummaryPresenter
   def groups_assignments=(value)
     @groups_assignments = value
     assignments.concat(value)
-  end
-
-  protected
-
-  def allow_loading_all_submissions?
-    threshold = Setting.get_cached('grade_distributions_submission_count_threshold', '0').to_i
-    @context.allows_gradebook_uploads? && (threshold == 0 || @context.submissions.count < threshold)
   end
 end

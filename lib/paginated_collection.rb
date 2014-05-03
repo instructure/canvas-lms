@@ -55,18 +55,7 @@ module PaginatedCollection
   end
 
   class Collection < Array
-    # these are set before the collection is populated
-    attr_accessor :current_page, :per_page
-    # these can optionally be set while populating the collection
-    attr_accessor :next_page, :previous_page, :first_page, :last_page, :total_entries
-
-    def total_pages
-      if total_entries
-        (total_entries / per_page.to_f).ceil
-      else
-        nil
-      end
-    end
+    include Folio::Page
   end
 
   class Proxy
@@ -86,7 +75,9 @@ module PaginatedCollection
 
     def configure_pager(pager, options)
       raise(ArgumentError, "per_page required") unless options[:per_page] && options[:per_page] > 0
-      pager.current_page = options[:page]
+      current_page = options.fetch(:page) { nil }
+      current_page = pager.first_page if current_page.nil?
+      pager.current_page = current_page
       pager.per_page = options[:per_page]
       pager.total_entries = options[:total_entries]
       pager

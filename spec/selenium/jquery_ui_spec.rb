@@ -3,7 +3,7 @@
 require File.expand_path(File.dirname(__FILE__) + "/common")
 
 describe "jquery ui" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   def active
     driver.switch_to.active_element

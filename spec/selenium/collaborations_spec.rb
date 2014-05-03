@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "collaborations" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   # Helper methods
   # ==============
@@ -47,7 +47,9 @@ describe "collaborations" do
       if execute_script
         driver.execute_script 'window.confirm = function(msg) { return true; }'
       end
-      form_visible?.should == form_visible
+      keep_trying_until {
+        form_visible?.should == form_visible  
+      }
     end
   end
 
@@ -72,6 +74,7 @@ describe "collaborations" do
     @collaboration         = Collaboration.typed_collaboration_instance(title)
     @collaboration.context = @course
     @collaboration.title   = title
+    @collaboration.user = @user
     @collaboration.save!
   end
 
@@ -85,6 +88,14 @@ describe "collaborations" do
             CollaborationsController.any_instance.
               stubs(:google_docs_verify_access_token).
               returns(true)
+
+            GoogleDocsCollaboration.any_instance.
+                stubs(:initialize_document).
+                returns(nil)
+
+            GoogleDocsCollaboration.any_instance.
+                stubs(:delete_document).
+                returns(nil)
           end
         end
 
@@ -157,10 +168,12 @@ describe "collaborations" do
           @collaboration1 = Collaboration.typed_collaboration_instance(title)
           @collaboration1.context = @course
           @collaboration1.attributes = {:title => "My Collab 1"}
+          @collaboration1.user = @user
           @collaboration1.save!
           @collaboration2 = Collaboration.typed_collaboration_instance(title)
           @collaboration2.context = @course
           @collaboration2.attributes = {:title => "My Collab 2"}
+          @collaboration2.user = @user
           @collaboration2.save!
 
           validate_collaborations("/courses/#{@course.id}/collaborations/", false, true)
@@ -189,7 +202,9 @@ describe "collaborations" do
 
           wait_for_ajaximations
 
-          ffj('.available-users:visible li').length.should == 1
+          keep_trying_until {
+            ffj('.available-users:visible li').length.should == 1
+          }
         end
 
         it 'should select collaborators' do
@@ -201,9 +216,10 @@ describe "collaborations" do
           get "/courses/#{@course.id}/collaborations"
 
           wait_for_ajaximations
-
           fj('.available-users:visible a').click
-          ffj('.members-list li').length.should == 1
+          keep_trying_until {
+            ffj('.members-list li').length.should == 1  
+          }
         end
 
         it 'should deselect collaborators' do

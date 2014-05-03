@@ -42,9 +42,9 @@
           <% end %>
           <br/>
         <% if can_do(@assignment, @current_user, :grade) %>
-          <span class="published_score" style="<%= hidden if @assignment.grading_type == 'points' %>"><%= @submission.published_score %></span>
+               <span class="published_score" style="<%= hidden if @assignment.grading_type == 'points' %>"><% if @submission.published_score? %><%= @submission.published_score.round(2)%><% end %></span>
         <% elsif can_do(@submission, @current_user, :read_grade) %>
-          <span class="score" style="<%= hidden if @assignment.grading_type == 'points' %>"><%= @submission.score %></span>
+          <span class="score" style="<%= hidden if @assignment.grading_type == 'points' %>"><% if @submission.score? %><%=@submission.score.round(2) %><% end %></span>
         <% end %>
         <% if @submission.assignment.points_possible %>
           <%= t('out_of_points', 'out of %{points_possible}', :points_possible => @submission.assignment.points_possible) %>
@@ -61,7 +61,7 @@
         <% end %>
       <% end %>
       <% if @rubric_association && (can_do(@submission, @current_user, :read_grade) || can_do(@rubric_association, @current_user, :assess)) %>
-        <a href="#" class="assess_submission_link rubric" style="font-size: 0.8em;"><%= t('show_rubric', 'Show Rubric') %></a>
+        <a href="#" class="assess_submission_link rubric" style="font-size: 0.8em;" tabindex='0'><%= t('show_rubric', 'Show Rubric') %></a>
       <% end %>
     </div>
     <h2 class="submission_header" style="margin-bottom: 0;"><%= @assessment_request ? t('peer_review', "Peer Review") : t('submission_details', "Submission Details") %></h2>
@@ -100,7 +100,14 @@
   <% if @assignment.rubric_association %>
     <% @visible_rubric_assessments ||= [] %>
   <div id="rubric_holder" style="position: absolute; right: 0px; padding: 5px; background-color: #fff; border: 1px solid #aaa; border-right-width: 0; display: none;">
-    <button type="button" class="btn button-secondary hide_rubric_link" style="float: right; margin-right:0 !important;"><%= image_tag("delete_circle.png") %></button>
+    <a
+      class="hide_rubric_link"
+      style="float: right; margin-right:0 !important;"
+      title="<%= t('hide_rubric_button', 'Hide Rubric') %>"
+      role="button"
+      aria-label="<%= t('hide_rubric_button', 'Hide Rubric') %>"
+      tabindex='0'
+    ><i class="icon-x standalone-icon"></i></a>
     <div id="rubric_assessments_list" style="text-align: right; margin-bottom: 5px; <%= hidden if @visible_rubric_assessments.empty? %>">
       <%= before_label('show_assessment_by', 'Show Assessment By') %>
       <select id="rubric_assessments_select">

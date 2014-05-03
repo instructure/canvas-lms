@@ -17,6 +17,7 @@ define [
     """
 
     initialize: (options) ->
+      super
       @validationFn = options.validationFn
       @labelFn      = options.labelFn or @defaultLabelFn
       @success      = options.success

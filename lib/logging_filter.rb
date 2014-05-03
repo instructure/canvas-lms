@@ -4,7 +4,7 @@ module LoggingFilter
     FILTERED_PARAMETERS
   end
 
-  EXTENDED_FILTERED_PARAMETERS = ["pseudonym[password]", "login[password]"]
+  EXTENDED_FILTERED_PARAMETERS = ["pseudonym[password]", "login[password]", "pseudonym_session[password]"]
   def self.all_filtered_parameters
     FILTERED_PARAMETERS.map(&:to_s) + EXTENDED_FILTERED_PARAMETERS
   end
@@ -20,8 +20,9 @@ module LoggingFilter
   end
 
   def self.filter_params(params)
-    params.keys.each do |k|
+    params.each do |k,v|
       params[k] = "[FILTERED]" if all_filtered_parameters.include?(k.to_s.downcase)
+      params[k] = filter_params(v) if v.is_a? Hash
     end
     params
   end

@@ -43,6 +43,8 @@ define [
     ##
     # options.page: 'current', 'next', 'prev', 'first', 'last', 'top', 'bottom'
     fetch: (options = {}) ->
+      options = _.clone(options)
+      @loadedAll = false
       exclusionFlag = "fetching#{capitalize options.page}Page"
       @[exclusionFlag] = true
       if options.page?
@@ -60,14 +62,16 @@ define [
       # before _setStateAfterFetch has happened, so the state is just barely off
       xhr = null
       options.dataFilter = (data) =>
+        @[exclusionFlag] = false
         @_setStateAfterFetch(xhr, options)
         data
 
       xhr = super(options).done (response, text, xhr) =>
-        @[exclusionFlag] = false
         @trigger 'fetch', this, response, options
         @trigger "fetch:#{options.page}", this, response, options if options.page?
-        @trigger 'fetched:last', arguments... unless @urls?.next
+        unless @urls?.next
+          @trigger 'fetched:last', arguments...
+          @loadedAll = true
         if @loadAll and @urls.next?
           setTimeout =>
             @fetch page: 'next' # next tick so we can show loading indicator, etc.
@@ -104,8 +108,8 @@ define [
         perPage = parseInt(url.match(@perPageRegex)[1], 10)
         (@options.params ?= {}).per_page = perPage
 
-      if @urls.last
-        @totalPages = parseInt(@urls.last.match(@pageRegex)[1], 10)
+      if @urls.last and match = @urls.last.match(@pageRegex)
+        @totalPages = parseInt(match[1], 10)
 
       @atLeastOnePageFetched = true
 

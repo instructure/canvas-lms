@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe AppointmentGroupsController, :type => :integration do
+describe AppointmentGroupsController, type: :request do
   before do
     course_with_teacher(:active_all => true, :user => user_with_pseudonym(:active_user => true))
     @course1 = @course

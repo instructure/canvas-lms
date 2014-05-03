@@ -22,12 +22,12 @@ module Canvas::Plugins::Validators::AppCenterValidator
       {}
     else
       if settings.map(&:last).any?(&:blank?)
-        plugin_setting.errors.add_to_base(I18n.t('canvas.plugins.errors.all_fields_required', 'All fields are required'))
+        plugin_setting.errors.add(:base, I18n.t('canvas.plugins.errors.all_fields_required', 'All fields are required'))
         false
       else
         uri = URI.parse(settings[:base_url].strip) rescue nil
         if !uri
-          plugin_setting.errors.add_to_base(I18n.t('canvas.plugins.errors.invalid_url', 'Invalid URL'))
+          plugin_setting.errors.add(:base, I18n.t('canvas.plugins.errors.invalid_url', 'Invalid URL'))
           false
         else
           settings.slice(:base_url, :token, :apps_index_endpoint, :app_reviews_endpoint)

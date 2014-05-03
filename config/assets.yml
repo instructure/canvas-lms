@@ -15,6 +15,8 @@ css_compressor: 'sass'
 javascripts:
 
 stylesheets:
+  course_show: 
+    - public/stylesheets/compiled/course_show.css
   content_migrations: 
     - public/stylesheets/compiled/content_migrations.css
   vendor:
@@ -75,6 +77,8 @@ stylesheets:
     - public/stylesheets/compiled/calendar/sidebar.css
     - public/stylesheets/compiled/calendar/scheduler.css
     - public/stylesheets/compiled/calendar/calendarHeader.css
+  agenda_view:
+    - public/stylesheets/compiled/agenda_view.css
   course_settings:
     - public/stylesheets/compiled/course_settings.css
     - public/stylesheets/compiled/external_tools.css
@@ -96,6 +100,9 @@ stylesheets:
   gradebook2:
     - public/stylesheets/compiled/message_students.css
     - public/stylesheets/compiled/gradebook2.css
+  screenreader_gradebook:
+    - public/stylesheets/compiled/message_students.css
+    - public/stylesheets/compiled/screenreader_gradebook.css
   attendance:
     - public/stylesheets/compiled/attendance.css
   quizzes:
@@ -103,12 +110,16 @@ stylesheets:
     - public/stylesheets/compiled/quizzes-mobile.css
     - public/stylesheets/compiled/message_students.css
     - public/stylesheets/compiled/ui.selectmenu.css
+  quizzes_ember:
+    - public/stylesheets/compiled/quizzes_ember.css
   moderate_quiz:
     - public/stylesheets/compiled/moderate_quiz.css
   assignments:
     - public/stylesheets/compiled/assignments.css
     - public/stylesheets/compiled/grading_standards.css
     - public/stylesheets/static/embed_content.css
+  assignments_edit:
+    - public/stylesheets/compiled/assignments_edit.css
   new_assignments:
     - public/stylesheets/compiled/new_assignments.css
   grading_standards:

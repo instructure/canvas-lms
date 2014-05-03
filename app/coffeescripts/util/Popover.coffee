@@ -1,7 +1,7 @@
 
 define [
-  # 'jquery'
-], () ->
+  'jquery'
+], ($) ->
 
 
   # you can provide a 'using' option to jqueryUI position
@@ -19,7 +19,7 @@ define [
   activePopovers = []
 
   class Popover
-    constructor: (clickEvent, @content) ->
+    constructor: (clickEvent, @content, @options = {}) ->
       @trigger = $(clickEvent.currentTarget)
       @el = $(@content)
               .addClass('carat-bottom')
@@ -52,14 +52,13 @@ define [
       @el.find(':tabbable').not('.popover_close').first().focus(1)
       @position()
 
-      # handle sticking the carat right above where you clicked on the button
+      # handle sticking the carat right above where you clicked on the button, bounded by the dialog
       @el.find(".ui-menu-carat").remove()
       differenceInOffset = @trigger.offset().left - @el.offset().left
       actualOffset = clickEvent.pageX - @trigger.offset().left
-      caratOffset = Math.min(
-        Math.max(20, actualOffset),
-        @trigger.width() - 20
-      ) + differenceInOffset
+      leftBound = Math.max(0, @trigger.width() / 2 - @el.width() / 2) + 20
+      rightBound = @trigger.width() - leftBound
+      caratOffset = Math.min(Math.max(leftBound, actualOffset), rightBound) + differenceInOffset
       $('<span class="ui-menu-carat"><span /></span>').css('left', caratOffset).prependTo(@el)
 
       @positionInterval = setInterval @position, 200
@@ -74,6 +73,8 @@ define [
       clearInterval @positionInterval
       $(window).unbind 'click', @outsideClickHandler
 
+      @trigger.focus() if @trigger && @trigger.is(':visible')
+
     ignoreOutsideClickSelector: '.ui-dialog'
 
     # uses a fat arrow so that it has a unique guid per-instance for jquery event unbinding
@@ -83,10 +84,10 @@ define [
 
     position: =>
       @el.position
-        my: 'center bottom',
-        at: 'center top',
+        my: 'center '+(if @options.verticalSide == 'bottom' then 'top' else 'bottom'),
+        at: 'center '+(@options.verticalSide || 'top'),
         of: @trigger,
         offset: '0 -10px',
         within: 'body',
-        collision: 'flipfit flipfit'
+        collision: 'flipfit '+(if @options.verticalSide then 'none' else 'flipfit')
         using: using

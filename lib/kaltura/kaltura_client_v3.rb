@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,6 +17,7 @@
 #
 
 require 'rubygems'
+require 'csv'
 require 'net/http'
 require 'uri'
 require 'nokogiri'
@@ -25,7 +26,7 @@ require 'libxml'
 # Test Console and API Documentation at:
 # http://www.kaltura.com/api_v3/testmeDoc/index.php
 module Kaltura
-  include Multipart
+
   class SessionType
     USER = 0;
     ADMIN = 2;
@@ -56,7 +57,9 @@ module Kaltura
 
       # default settings
       res = res.dup
-      res['max_file_size_bytes'] = 500.megabytes unless res['max_file_size_bytes'].to_i > 0
+      # the kaltura flash widget's calculation is a bit off, so give a bit extra space
+      # to make sure 500 mb files can be uploaded
+      res['max_file_size_bytes'] = 510.megabytes unless res['max_file_size_bytes'].to_i > 0
 
       res
     end
@@ -134,10 +137,19 @@ module Kaltura
 
     # Given an array of sources, it will sort them putting preferred file types at the front,
     # preferring converted assets over the original (since they're likely to stream better)
-    # and sorting by descending bitrate for identical file types.
+    # and sorting by descending bitrate for identical file types, discounting
+    # suspiciously high bitrates.
     def sort_source_list(sources)
+      original_source = sources.detect{ |s| s[:isOriginal].to_i != 0 }
+      # CNVS-11227 features broken conversions at 20x+ the original source's bitrate
+      # (in addition to working conversions at bitrates comparable to the original)
+      suspicious_bitrate_threshold = original_source ? original_source[:bitrate].to_i * 5 : 0
       sources = sources.sort_by do |a|
-        [a[:hasWarnings] ? SortLast : SortFirst, a[:isOriginal] == '0' ? SortFirst : SortLast, PREFERENCE.index(a[:fileExt]) || PREFERENCE.size + 1, 0 - a[:bitrate].to_i]
+        [a[:hasWarnings] || a[:isOriginal] != '0' ? SortLast : SortFirst,
+         a[:isOriginal] == '0' ? SortFirst : SortLast,
+         PREFERENCE.index(a[:fileExt]) || PREFERENCE.size + 1,
+         a[:bitrate].to_i < suspicious_bitrate_threshold ? SortFirst : SortLast,
+         0 - a[:bitrate].to_i]
       end
       sources.each{|a| a.delete(:hasWarnings)}
       sources
@@ -150,17 +162,9 @@ module Kaltura
         :vid_sec => 5,
         :bgcolor => "ffffff",
         :type => "2",
-        :protocol => ""
       }.merge(opts)
 
-      protocol = if [ "http", "https" ].include?(opts[:protocol])
-        opts[:protocol] + ":"
-      else
-        ""
-      end
-
-      "#{protocol}" +
-        "//#{@resource_domain}/p/#{@partnerId}/thumbnail" +
+        "https://#{@resource_domain}/p/#{@partnerId}/thumbnail" +
         "/entry_id/#{entryId.gsub(/[^a-zA-Z0-9_]/, '')}" +
         "/width/#{opts[:width].to_i}" +
         "/height/#{opts[:height].to_i}" +
@@ -172,7 +176,7 @@ module Kaltura
     def startSession(type = SessionType::USER, userId = nil)
       partnerId = @partnerId
       secret = type == SessionType::USER ? @user_secret : @secret
-      result = sendRequest(:session, :start,
+      result = getRequest(:session, :start,
                            :secret => secret,
                            :partnerId => partnerId,
                            :userId => userId,
@@ -181,7 +185,7 @@ module Kaltura
     end
 
     def mediaGet(entryId)
-      result = sendRequest(:media, :get,
+      result = getRequest(:media, :get,
                             :ks => @ks,
                             :entryId => entryId)
       item = {}
@@ -199,7 +203,7 @@ module Kaltura
       attributes.each do |key, val|
         hash["mediaEntry:#{key}"] = val
       end
-      result = sendRequest(:media, :update, hash)
+      result = getRequest(:media, :update, hash)
       item = {}
       result.children.each do |child|
         item[child.name.to_sym] = child.content
@@ -212,8 +216,7 @@ module Kaltura
         :ks => @ks,
         :entryId => entryId
       }
-      result = sendRequest(:media, :delete, hash)
-      result
+      getRequest(:media, :delete, hash)
     end
 
     def mediaTypeToSymbol(type)
@@ -230,7 +233,7 @@ module Kaltura
     end
 
     def bulkUploadGet(id)
-      result = sendRequest(:bulkUpload, :get,
+      result = getRequest(:bulkUpload, :get,
                            :ks => @ks,
                            :id => id
                           )
@@ -262,6 +265,12 @@ module Kaltura
                            :conversionProfileId => -1,
                            :csvFileData => KalturaStringIO.new(csv, "bulk_data.csv")
                        )
+      unless result.css('logFileUrl').any?
+        code = result.css('error > code').first.try(:content)
+        message = result.css('error > message').first.try(:content)
+        message ||= result.to_xml
+        raise "kaltura bulkUpload failed: #{message} (#{code})"
+      end
       parseBulkUpload(result)
       # results will have entryId values -- do we get them right away?
     end
@@ -283,7 +292,7 @@ module Kaltura
     end
 
     def flavorAssetGetByEntryId(entryId)
-      result = sendRequest(:flavorAsset, :getByEntryId,
+      result = getRequest(:flavorAsset, :getByEntryId,
                            :ks => @ks,
                            :entryId => entryId)
       items = []
@@ -305,7 +314,7 @@ module Kaltura
     end
 
     def flavorAssetGetDownloadUrl(assetId)
-      result = sendRequest(:flavorAsset, :getDownloadUrl,
+      result = getRequest(:flavorAsset, :getDownloadUrl,
                            :ks => @ks,
                            :id => assetId)
       return result.content if result
@@ -317,7 +326,8 @@ module Kaltura
     # will likely download from Kaltura, and not S3 (for example).
     def flavorAssetGetPlaylistUrl(entryId, flavorId)
       playlist_url = "/p/#{@partnerId}/playManifest/entryId/#{entryId}/flavorId/#{flavorId}"
-      res = Net::HTTP.get_response(@host, playlist_url)
+
+      res = sendRequest(Net::HTTP::Get.new(playlist_url))
       return nil unless res.kind_of?(Net::HTTPSuccess)
 
       doc = Nokogiri::XML(res.body)
@@ -325,39 +335,47 @@ module Kaltura
       mediaNode ? mediaNode["url"] : nil
     end
 
-    def assetSwfUrl(assetId, protocol = "http")
+    def assetSwfUrl(assetId)
       config = Kaltura::ClientV3.config
       return nil unless config
-      "#{protocol}://#{config['domain']}/kwidget/wid/_#{config['partner_id']}/uiconf_id/#{config['player_ui_conf']}/entry_id/#{assetId}"
+      "https://#{config['domain']}/kwidget/wid/_#{config['partner_id']}/uiconf_id/#{config['player_ui_conf']}/entry_id/#{assetId}"
     end
 
     private
 
     def postRequest(service, action, params)
-      mp = Multipart::MultipartPost.new
-      query, headers = mp.prepare_query(params)
-      res = nil
-      Net::HTTP.start(@host) {|con|
-        req = Net::HTTP::Post.new(@endpoint + "/?service=#{service}&action=#{action}", headers)
-        con.read_timeout = 30
-        begin
-          res = con.request(req, query) #con.post(url.path, query, headers)
-        rescue => e
-          puts "POSTING Failed #{e}... #{Time.now}"
-        end
-      }
-      doc = Nokogiri::XML(res.body)
-      doc.css('result').first
+      requestParams = "service=#{service}&action=#{action}"
+      multipart_body, headers = Multipart::Post.new.prepare_query(params)
+      response = sendRequest(
+        Net::HTTP::Post.new("#{@endpoint}/?#{requestParams}", headers),
+        multipart_body
+      )
+      Nokogiri::XML(response.body).css('result').first
     end
-    def sendRequest(service, action, params)
+
+    def getRequest(service, action, params)
       requestParams = "service=#{service}&action=#{action}"
       params.each do |key, value|
         next if value.nil?
         requestParams += "&#{URI.escape(key.to_s)}=#{URI.escape(value.to_s)}"
       end
-      res = Net::HTTP.get_response(@host, "#{@endpoint}/?#{requestParams}")
-      doc = Nokogiri::XML(res.body)
-      doc.css('result').first
+      response = sendRequest(Net::HTTP::Get.new("#{@endpoint}/?#{requestParams}"))
+      Nokogiri::XML(response.body).css('result').first
+    end
+
+    # FIXME: SSL verifification should not be turned off, but since we're just
+    # turning on HTTPS everywhere for kaltura, we're being gentle about it in
+    # the first pass
+    def sendRequest(request, body=nil)
+      response = nil
+      Canvas.timeout_protection("kaltura", fallback_timeout_length: 30) do
+        http = Net::HTTP.new(@host, Net::HTTP.https_default_port)
+        http.use_ssl = true
+        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        response = http.request(request, body)
+      end
+      raise Timeout::Error unless response
+      response
     end
   end
 end

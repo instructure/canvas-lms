@@ -64,7 +64,8 @@ $(document).ready(function() {
     },
     error: function(errors) {
       var accountId = $(this).find(".account_id select").val();
-      errors = Pseudonym.prototype.normalizeErrors(errors, ENV.PASSWORD_POLICIES[accountId] || ENV.PASSWORD_POLICY);
+      var policy = ENV.PASSWORD_POLICIES && ENV.PASSWORD_POLICIES[accountId] || ENV.PASSWORD_POLICY;
+      errors = Pseudonym.prototype.normalizeErrors(errors, policy);
       $(this).formErrors(errors);
     }
   });
@@ -93,6 +94,11 @@ $(document).ready(function() {
     $form.toggleClass('passwordable', passwordable);
     $form.find("tr.password").showIf(passwordable);
     $form.find(".account_id").hide();
+    var $account_select = $form.find(".account_id select");
+    var accountId = $(this).data("accountId");
+    if( $account_select && accountId ){
+      $account_select.val(accountId);
+    }
     $form.dialog({
       width: 'auto',
       close: function() {
@@ -100,7 +106,7 @@ $(document).ready(function() {
           $form.data('unique_id_text').parents(".login").remove();
         }
       }
-    }).fixDialogButtons();
+    });
     $form.dialog('option', 'title', I18n.t('titles.update_login', 'Update Login'))
       .find(".submit_button").text(I18n.t('buttons.update_login', "Update Login"));
     $form.dialog('option', 'beforeClose', function(){

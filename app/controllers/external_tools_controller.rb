@@ -105,17 +105,14 @@ class ExternalToolsController < ApplicationController
       end
       @resource_title = @tool.name
       @resource_url = params[:url]
-      @opaque_id = @context.opaque_identifier(:asset_string)
+      @opaque_id = @tool.opaque_identifier_for(@context)
       add_crumb(@context.name, named_context_url(@context, :context_url))
       @return_url = url_for(@context)
       @launch = BasicLTI::ToolLaunch.new(:url => @resource_url, :tool => @tool, :user => @current_user, :context => @context, :link_code => @opaque_id, :return_url => @return_url, :resource_type => @resource_type)
       @tool_settings = @launch.generate
 
-      if params[:borderless]
-        render :partial => 'external_tools/borderless_launch'
-      else
-        render :template => 'external_tools/tool_show'
-      end
+      @tool_launch_type = 'self' if params['borderless']
+      render :template => 'external_tools/tool_show'
     end
   end
 
@@ -238,7 +235,8 @@ class ExternalToolsController < ApplicationController
     @resource_title = launch_settings['tool_name']
     @tool_settings = launch_settings['tool_settings']
 
-    render :partial => 'external_tools/borderless_launch'
+    @tool_launch_type = 'self'
+    render :template => 'external_tools/tool_show'
   end
 
   # @API Get a single external tool
@@ -307,7 +305,7 @@ class ExternalToolsController < ApplicationController
 
     @return_url    = external_content_success_url('external_tool')
     @headers       = false
-    @self_target   = true
+    @tool_launch_type = 'self'
 
     find_tool(params[:external_tool_id], selection_type)
     render_tool(selection_type)
@@ -333,6 +331,7 @@ class ExternalToolsController < ApplicationController
       @assignment = @context.assignments.active.find(params[:assignment_id])
       @launch.for_homework_submission!(@assignment)
     end
+    @launch.has_selection_html!(params[:selection]) if params[:selection]
     @resource_url = @launch.url
     resource_uri = URI.parse @launch.url
     @tool_id = @tool.tool_id || resource_uri.host || 'unknown'
@@ -464,7 +463,7 @@ class ExternalToolsController < ApplicationController
   # @example_request
   #
   #   This would create a tool on this course with two custom fields and a course navigation tab
-  #   curl 'http://<canvas>/api/v1/courses/<course_id>/external_tools' \ 
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/external_tools' \
   #        -H "Authorization: Bearer <token>" \ 
   #        -F 'name=LTI Example' \ 
   #        -F 'consumer_key=asdfg' \ 
@@ -480,7 +479,7 @@ class ExternalToolsController < ApplicationController
   # @example_request
   #
   #   This would create a tool on the account with navigation for the user profile page
-  #   curl 'http://<canvas>/api/v1/accounts/<account_id>/external_tools' \ 
+  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/external_tools' \
   #        -H "Authorization: Bearer <token>" \ 
   #        -F 'name=LTI Example' \ 
   #        -F 'consumer_key=asdfg' \ 
@@ -494,7 +493,7 @@ class ExternalToolsController < ApplicationController
   # @example_request
   #
   #   This would create a tool on the account with configuration pulled from an external URL
-  #   curl 'http://<canvas>/api/v1/accounts/<account_id>/external_tools' \ 
+  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/external_tools' \
   #        -H "Authorization: Bearer <token>" \ 
   #        -F 'name=LTI Example' \ 
   #        -F 'consumer_key=asdfg' \ 
@@ -525,7 +524,7 @@ class ExternalToolsController < ApplicationController
   # @example_request
   #
   #   This would update the specified keys on this external tool
-  #   curl -X PUT 'http://<canvas>/api/v1/courses/<course_id>/external_tools/<external_tool_id>' \ 
+  #   curl -X PUT 'https://<canvas>/api/v1/courses/<course_id>/external_tools/<external_tool_id>' \
   #        -H "Authorization: Bearer <token>" \ 
   #        -F 'name=Public Example' \ 
   #        -F 'privacy_level=public'
@@ -553,7 +552,7 @@ class ExternalToolsController < ApplicationController
   # @example_request
   #
   #   This would delete the specified external tool
-  #   curl -X DELETE 'http://<canvas>/api/v1/courses/<course_id>/external_tools/<external_tool_id>' \ 
+  #   curl -X DELETE 'https://<canvas>/api/v1/courses/<course_id>/external_tools/<external_tool_id>' \
   #        -H "Authorization: Bearer <token>"
   def destroy
     @tool = @context.context_external_tools.active.find(params[:id] || params[:external_tool_id])

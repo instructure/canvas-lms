@@ -1,0 +1,11 @@
+{{#if isPassFail}}
+  {{
+    fast-select
+    id=input-id
+    items=passFailGrades
+    value=value
+  }}
+{{ else }}
+  {{input value=value id=input-id type="text"}}
+{{/if}}
+{{outOfText}}

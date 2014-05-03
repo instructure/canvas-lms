@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 require File.expand_path(File.dirname(__FILE__) + '/../../../../spec/spec_helper')
-require 'zip/zipfilesystem'
+require 'zip/filesystem'
 
 if Qti.migration_executable
 
@@ -37,61 +37,58 @@ describe Qti::Converter do
     quiz.assignment.should be_nil
   end
 
-  it "should publish as assignment on import if specified" do
-    copy = Tempfile.new(['spec-canvas', '.zip'])
-    FileUtils.cp(fname, copy.path)
-    Zip::ZipFile.open(copy.path) do |zf|
-      zf.file.open("settings.xml", 'w') do |f|
-        f.write <<-XML
-        <settings>
-          <setting name='hasSettings'>true</setting>
-          <setting name='publishNow'>true</setting>
-        </settings>
-        XML
+  describe "applying respondus settings" do
+    before do
+      @copy = Tempfile.new(['spec-canvas', '.zip'])
+      FileUtils.cp(fname, @copy.path)
+      Zip::File.open(@copy.path) do |zf|
+        zf.file.open("settings.xml", 'w') do |f|
+          f.write <<-XML
+          <settings>
+            <setting name='hasSettings'>true</setting>
+            <setting name='publishNow'>true</setting>
+          </settings>
+          XML
+        end
       end
+      setup_migration(@copy.path)
+      @migration.update_migration_settings(:apply_respondus_settings_file => true)
+      @migration.save!
     end
-    setup_migration(copy.path)
-    @migration.update_migration_settings(:apply_respondus_settings_file => true)
-    @migration.save!
-    do_migration
 
-    quiz = @course.quizzes.last
-    quiz.should be_present
-    quiz.assignment.should_not be_nil
-    quiz.assignment.title.should == quiz.title
-    quiz.assignment.should be_published
-  end
+    it "should publish as assignment on import if specified" do
+      do_migration
 
-  it "should re-use the same assignment on update" do
-    copy = Tempfile.new(['spec-canvas', '.zip'])
-    FileUtils.cp(fname, copy.path)
-    Zip::ZipFile.open(copy.path) do |zf|
-      zf.file.open("settings.xml", 'w') do |f|
-        f.write <<-XML
-        <settings>
-          <setting name='hasSettings'>true</setting>
-          <setting name='publishNow'>true</setting>
-        </settings>
-        XML
-      end
+      quiz = @course.quizzes.last
+      quiz.should be_present
+      quiz.assignment.should_not be_nil
+      quiz.assignment.title.should == quiz.title
+      quiz.assignment.should be_published
     end
-    setup_migration(copy.path)
-    @migration.update_migration_settings(:apply_respondus_settings_file => true)
-    @migration.save!
-    do_migration
 
-    setup_migration(copy.path)
-    @migration.update_migration_settings(:apply_respondus_settings_file => true, :quiz_id_to_update => @course.quizzes.last.id)
-    @migration.save!
-    do_migration
+    it "should re-use the same assignment on update" do
+      do_migration
 
-    @course.quizzes.size.should == 1
-    @course.assignments.size.should == 1
-    quiz = @course.quizzes.last
-    quiz.should be_present
-    quiz.assignment.should_not be_nil
-    quiz.assignment.title.should == quiz.title
-    quiz.assignment.should be_published
+      setup_migration(@copy.path)
+      @migration.update_migration_settings(:apply_respondus_settings_file => true, :quiz_id_to_update => @course.quizzes.last.id)
+      @migration.save!
+      do_migration
+
+      @course.quizzes.size.should == 1
+      @course.assignments.size.should == 1
+      quiz = @course.quizzes.last
+      quiz.should be_present
+      quiz.assignment.should_not be_nil
+      quiz.assignment.title.should == quiz.title
+      quiz.assignment.should be_published
+    end
+
+    it "should correctly set the assignment submission_type" do
+      do_migration
+      assign = @course.assignments.last
+      assign.submission_types.should == 'online_quiz'
+      assign.quiz.for_assignment?.should be_true
+    end
   end
 
   it "should publish spec-canvas-1 correctly" do
@@ -162,8 +159,10 @@ describe Qti::Converter do
     when Array
       a.size.should == b.size
       a.each_with_index do |e,i|
-        match_ignoring(e, b[i], ignoring)
+        match_ignoring(e.to_hash, b[i], ignoring)
       end
+    when Quizzes::QuizQuestion::QuestionData
+      a.to_hash.should == b
     else
       a.should == b
     end

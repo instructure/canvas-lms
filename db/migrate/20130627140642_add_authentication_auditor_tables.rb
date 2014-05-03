@@ -16,6 +16,10 @@ class AddAuthenticationAuditorTables < ActiveRecord::Migration
   end
 
   def self.up
+    compression_params = cassandra.db.use_cql3? ?
+        "WITH compression = { 'sstable_compression' : 'DeflateCompressor' }" :
+        "WITH compression_parameters:sstable_compression='DeflateCompressor'"
+
     cassandra.execute %{
       CREATE TABLE authentications (
         id                    text PRIMARY KEY,
@@ -24,9 +28,7 @@ class AddAuthenticationAuditorTables < ActiveRecord::Migration
         account_id            bigint,
         user_id               bigint,
         event_type            text
-      ) WITH
-        compression_parameters:sstable_compression='DeflateCompressor';
-    }
+      ) #{compression_params}}
 
     indexes.each do |index_name|
       cassandra.execute %{
@@ -35,9 +37,7 @@ class AddAuthenticationAuditorTables < ActiveRecord::Migration
           ordered_id text,
           id text,
           PRIMARY KEY (key, ordered_id)
-        ) WITH
-          compression_parameters:sstable_compression='DeflateCompressor';
-      }
+        ) #{compression_params}}
     end
   end
 

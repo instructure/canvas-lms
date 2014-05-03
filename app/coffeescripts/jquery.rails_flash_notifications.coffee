@@ -1,14 +1,16 @@
 # does Rails-style flash message/error boxes that drop down from the top of the screen
 define [
   'i18n!shared.flash_notices'
+  'jquery'
   'underscore'
   'compiled/fn/preventDefault'
   'jqueryui/effects/drop'
   'vendor/jquery.cookie'
-], (I18n, _, preventDefault) ->
+], (I18n, $, _, preventDefault) ->
 
   $buffer = $("#flash_message_buffer")
   $holder = $("#flash_message_holder")
+  $screenreader_holder = $("#flash_screenreader_holder")
   $holder.on 'click', '.close_link', preventDefault
   $holder.on 'click', 'li', ->
     $this = $(this)
@@ -18,9 +20,18 @@ define [
     if (bufferIndex = $this.data('buffer-index'))?
       $buffer.find("[data-buffer-index=#{bufferIndex}]").remove()
 
+  screenReaderFlashBox = (type, content) ->
+    $screenreader_node = $("""
+      <span role="alert">#{content}</span>
+    """)
+
+    $screenreader_node.appendTo($screenreader_holder)
+    # these aren't displayed, so removing them at a specified time is not critical
+    window.setTimeout((-> $screenreader_node.remove()), 20000)
+
   flashBox = (type, content, timeout, cssOptions = {}) ->
     $node = $("""
-      <li class="ic-flash-#{type}" role="alert">
+      <li class="ic-flash-#{type}">
         <i></i>
         #{content}
         <a href="#" class="close_link icon-end">#{I18n.t("close", "Close")}</a>
@@ -33,7 +44,9 @@ define [
       delay(timeout || 7000).
       animate({'z-index': 1}, 0).
       fadeOut('slow', -> $(this).slideUp('fast', -> $(this).remove()))
-  
+
+    screenReaderFlashBox(type, content)
+
   # Pops up a small notification box at the top of the screen.
   $.flashMessage = (content, timeout = 3000) ->
     flashBox("success", content, timeout)
@@ -42,8 +55,8 @@ define [
   $.flashError = (content, timeout) ->
     flashBox("error", content, timeout)
 
-  $.screenReaderFlashMessage = (content, timeout = 3000) ->
-    flashBox('success', content, timeout, position: 'absolute', left: -10000)
+  $.screenReaderFlashMessage = (content) ->
+    screenReaderFlashBox('success', content)
 
-  $.screenReaderFlashError = (content, timeout = 3000) ->
-    flashBox('error', content, timeout, position: 'absolute', left: -10000)
+  $.screenReaderFlashError = (content) ->
+    screenReaderFlashBox('error', content)

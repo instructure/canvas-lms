@@ -22,11 +22,11 @@ define [
     comparator: 'position'
 
   genSetup = ->
-    @assignments_1 = new Assignments((id: i, name: "Assignment #{i}") for i in [1..3])
-    @assignments_2 = new Assignments((id: i, name: "Assignment #{i}") for i in [5..10])
+    @assignments_1 = new Assignments((id: "#{i}", name: "Assignment #{i}") for i in [1..3])
+    @assignments_2 = new Assignments((id: "#{i}", name: "Assignment #{i}") for i in [5..10])
     @assignmentGroups = new AssignmentGroups [
-      new Backbone.Model assignments: @assignments_1, id: 1
-      new Backbone.Model assignments: @assignments_2, id: 2
+      new Backbone.Model assignments: @assignments_1, id: "1"
+      new Backbone.Model assignments: @assignments_2, id: "2"
     ]
 
   createDialog = (hasParentCollection, saveURL) ->
@@ -174,3 +174,27 @@ define [
     ]
 
     ok @model.has('assignment_group_id')
+
+
+  test 'parentKey value on the model is updated on save success and is a string', ->
+    saveURL = "/test"
+    createDialog.call @, true, saveURL
+    # we don't initially have a parentKey relationship on the stub model
+    ok !@model.has('assignment_group_id')
+    @moveDialog.open()
+
+    # need to change the parentCollection selector
+    firstSelect = @moveDialog.$('select').first()
+    firstSelect.find('option').last().prop('selected', true)
+    firstSelect.trigger('change')
+
+    @moveDialog.submit()
+    server.respond 'POST', '/test', [
+      200
+      'Content-Type': 'application/json'
+      JSON.stringify [2,1,3]
+    ]
+
+    ok @model.has('assignment_group_id')
+    ok typeof @model.get('assignment_group_id') == 'string'
+

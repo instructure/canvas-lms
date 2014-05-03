@@ -181,7 +181,7 @@ module CCHelper
           "#{folder}/#{URI.escape(obj.display_name)}#{CCHelper.file_query_string(match.rest)}"
         end
       end
-      @rewriter.set_handler('wiki') do |match|
+      wiki_handler = Proc.new do |match|
         # WikiPagesController allows loosely-matching URLs; fix them before exporting
         if match.obj_id.present?
           url_or_title = match.obj_id
@@ -195,6 +195,8 @@ module CCHelper
           "#{WIKI_TOKEN}/#{match.type}/#{match.obj_id}"
         end
       end
+      @rewriter.set_handler('wiki', &wiki_handler)
+      @rewriter.set_handler('pages', &wiki_handler)
       @rewriter.set_handler('items') do |match|
         item = ContentTag.find(match.obj_id)
         migration_id = CCHelper.create_key(item)
@@ -238,7 +240,7 @@ module CCHelper
       %{<html>\n<head>\n<meta http-equiv="Content-Type" content="text/html; charset=utf-8">\n<title>#{title}</title>\n#{meta_html}</head>\n<body>\n#{content}\n</body>\n</html>}
     end
 
-    UrlAttributes = Instructure::SanitizeField::SANITIZE[:protocols].inject({}) { |h,(k,v)| h[k] = v.keys; h }
+    UrlAttributes = CanvasSanitize::SANITIZE[:protocols].inject({}) { |h,(k,v)| h[k] = v.keys; h }
 
     def html_content(html)
       html = @rewriter.translate_content(html)

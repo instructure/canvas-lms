@@ -5,10 +5,11 @@ define [
   class ProgressingStatusView extends Backbone.View
     template: template
     initialize: ->
+      super
       @progress = @model.progressModel
 
     render: ->
-      if statusView = @model.collection.view.getStatusView(@model)
+      if statusView = @model.collection?.view?.getStatusView(@model)
         @$el.html(statusView)
       else
         super

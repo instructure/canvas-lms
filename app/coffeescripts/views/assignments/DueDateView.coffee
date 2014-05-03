@@ -45,7 +45,6 @@ define [
       json = @$el.find('form').toJSON()
       for dateField in [ 'due_at', 'lock_at', 'unlock_at' ]
         json[dateField] = $.unfudgeDateForProfileTimezone(json[dateField])
-      json.course_section_id = parseInt(json.course_section_id, 10)
       errs = @validateBeforeSave json, {}
       @$el.hideErrors()
       for own el, msg of errs.assignmentOverrides

@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-describe CollaborationsController, :type => :integration do
+describe CollaborationsController, type: :request do
 
   it 'should properly link to the user who posted the collaboration' do
     PluginSetting.create!(:name => 'etherpad', :settings => {})

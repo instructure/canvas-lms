@@ -76,8 +76,6 @@ describe CollaborationsController do
       get 'show', :course_id=>collab_course.id, :id => collaboration.id
     end
 
-    after { Setting.set 'enable_page_views', 'false' }
-
     it 'loads the correct collaboration' do
       assigns(:collaboration).should == collaboration
     end
@@ -108,7 +106,7 @@ describe CollaborationsController do
 
     it "should fail with invalid collaboration type" do
       course_with_teacher_logged_in(:active_all => true)
-      rescue_action_in_public!
+      rescue_action_in_public! if CANVAS_RAILS2
       post 'create', :course_id => @course.id, :collaboration => {:title => "My Collab"}
       assert_status(500)
     end

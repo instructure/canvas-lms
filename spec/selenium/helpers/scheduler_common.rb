@@ -57,7 +57,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
   end
 
   def click_scheduler_link
-    f('.calendar_view_buttons .ui-button[for="scheduler"]').click
+    f('button#scheduler').click
     wait_for_ajaximations
   end
 

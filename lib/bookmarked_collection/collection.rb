@@ -17,6 +17,8 @@
 #
 
 class BookmarkedCollection::Collection < Array
+  include Folio::Page
+
   FIRST_TOKEN = "first"
 
   def initialize(bookmarker)
@@ -60,8 +62,6 @@ class BookmarkedCollection::Collection < Array
     end
   end
 
-  attr_accessor :per_page
-
   # typically not set unless part of a merger of many collections
   # (including merging by sharding).
   #
@@ -78,7 +78,8 @@ class BookmarkedCollection::Collection < Array
   end
 
   def page_to_bookmark(page)
-    if page.nil? || page == FIRST_TOKEN
+    page = first_page if page.nil?
+    if page == first_page
       nil
     else
       if page =~ /^bookmark:/
@@ -100,8 +101,12 @@ class BookmarkedCollection::Collection < Array
     page
   end
 
+  def first_page
+    FIRST_TOKEN
+  end
+
   def current_page
-    bookmark_to_page(current_bookmark)
+    bookmark_to_page(current_bookmark) || first_page
   end
 
   def next_page
@@ -111,11 +116,4 @@ class BookmarkedCollection::Collection < Array
   def has_more!
     self.next_bookmark = bookmark_for(last)
   end
-
-  # always uses FIRST_TOKEN
-  def first_page; FIRST_TOKEN; end
-
-  # not supported, but defined for WillPaginate interface
-  attr_reader :previous_page, :last_page, :total_pages
-  attr_accessor :total_entries
 end

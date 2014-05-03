@@ -1,10 +1,15 @@
 define [
+  'underscore'
   'Backbone'
   'compiled/backbone-ext/DefaultUrlMixin'
-], ({Model}, DefaultUrlMixin) ->
+], (_, {Model}, DefaultUrlMixin) ->
 
   class ExternalTool extends Model
     @mixin DefaultUrlMixin
+
+    initialize: ->
+      super
+      delete @url if _.has(@, 'url')
 
     resourceName: 'external_tools'
 

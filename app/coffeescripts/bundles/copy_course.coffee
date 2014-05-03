@@ -1,4 +1,5 @@
 require [
+  'i18n!content_migrations'
   'jquery',
   'Backbone',
   'compiled/views/content_migrations/subviews/DateShiftView',
@@ -8,7 +9,7 @@ require [
   'jst/content_migrations/subviews/DaySubstitutionCollection',
   'compiled/models/ContentMigration',
   'jquery.instructure_date_and_time'
-], ($, Backbone, DateShiftView, DaySubstitutionView, DaySubstitutionCollection, CollectionView, template, ContentMigration)->
+], (I18n, $, Backbone, DateShiftView, DaySubstitutionView, DaySubstitutionCollection, CollectionView, template, ContentMigration)->
 
   $(document).ready ->
     $(".datetime_field").datetime_field(addHiddenInput: true)
@@ -16,7 +17,7 @@ require [
   daySubCollection          = new DaySubstitutionCollection
   daySubCollectionView      = new CollectionView
                                  collection: daySubCollection
-                                 emptyTemplate: -> "No Day Substitutions Added"
+                                 emptyMessage: -> I18n.t('no_day_substitutions', "No Day Substitutions Added")
                                  itemView: DaySubstitutionView
                                  template: template
 

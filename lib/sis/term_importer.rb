@@ -40,7 +40,7 @@ module SIS
         @success_count = 0
       end
 
-      def add_term(term_id, name, status, start_date=nil, end_date=nil)
+      def add_term(term_id, name, status, start_date=nil, end_date=nil, integration_id=nil)
         @logger.debug("Processing Term #{[term_id, name, status, start_date, end_date].inspect}")
 
         raise ImportError, "No term_id given for a term" if term_id.blank?
@@ -56,6 +56,7 @@ module SIS
           term.name = name
         end
 
+        term.integration_id = integration_id
         term.sis_source_id = term_id
         term.sis_batch_id = @batch_id if @batch_id
         if status =~ /active/i

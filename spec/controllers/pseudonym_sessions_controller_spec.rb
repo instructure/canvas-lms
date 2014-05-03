@@ -42,7 +42,7 @@ describe PseudonymSessionsController do
 
     it "should render normal layout if not iphone/ipod" do
       get 'new'
-      response.should render_template("pseudonym_sessions/new.html.erb")
+      response.should render_template('new')
     end
 
     it "should render special iPhone/iPod layout if coming from one of those" do
@@ -57,21 +57,21 @@ describe PseudonymSessionsController do
 
   it "should re-render if no user" do
     post 'create'
-    response.status.should == '400 Bad Request'
+    assert_status(400)
     response.should render_template('new')
   end
 
   it "should re-render if incorrect password" do
     user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty')
     post 'create', :pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'dvorak'}
-    response.status.should == '400 Bad Request'
+    assert_status(400)
     response.should render_template('new')
   end
 
   it "should re-render if no password given" do
     user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :password => 'qwerty')
     post 'create', :pseudonym_session => { :unique_id => 'jt@instructure.com', :password => ''}
-    response.status.should == '400 Bad Request'
+    assert_status(400)
     response.should render_template('new')
     flash[:error].should match(/no password/i)
   end
@@ -117,7 +117,7 @@ describe PseudonymSessionsController do
       aac = Account.default.account_authorization_configs.create!(:auth_type => 'ldap', :identifier_format => 'uid')
       aac.any_instantiation.expects(:ldap_bind_result).once.with('username', 'password').returns(nil)
       post 'create', :pseudonym_session => { :unique_id => 'username', :password => 'password'}
-      response.status.should == '400 Bad Request'
+      assert_status(400)
       response.should render_template('new')
     end
 
@@ -210,6 +210,10 @@ describe PseudonymSessionsController do
   end
 
   context "saml" do
+    before do
+      pending("requires SAML extension") unless AccountAuthorizationConfig.saml_enabled
+    end
+
     it "should scope logins to the correct domain root account" do
       Setting.set_config("saml", {})
       unique_id = 'foo@example.com'
@@ -232,10 +236,10 @@ describe PseudonymSessionsController do
       get 'saml_consume', :SAMLResponse => "foo"
       response.should redirect_to(dashboard_url(:login_success => 1))
       session[:saml_unique_id].should == unique_id
-      Pseudonym.find(session[:pseudonym_credentials_id]).should == user1.pseudonyms.first
+      Pseudonym.find(session['pseudonym_credentials_id']).should == user1.pseudonyms.first
 
       (controller.instance_variables.grep(/@[^_]/) - ['@mock_proxy']).each{ |var| controller.send :remove_instance_variable, var }
-      session.reset
+      CANVAS_RAILS2 ? session.reset : session.clear
 
       controller.stubs(:saml_response).returns(
         stub('response', :is_valid? => true, :success_status? => true, :name_id => unique_id, :name_qualifier => nil, :session_index => nil, :process => nil)
@@ -245,7 +249,7 @@ describe PseudonymSessionsController do
       get 'saml_consume', :SAMLResponse => "bar"
       response.should redirect_to(dashboard_url(:login_success => 1))
       session[:saml_unique_id].should == unique_id
-      Pseudonym.find(session[:pseudonym_credentials_id]).should == user2.pseudonyms.first
+      Pseudonym.find(session['pseudonym_credentials_id']).should == user2.pseudonyms.first
 
       Setting.set_config("saml", nil)
     end
@@ -697,10 +701,10 @@ describe PseudonymSessionsController do
       get 'new', :ticket => 'ST-abcd'
       response.should redirect_to(dashboard_url(:login_success => 1))
       session[:cas_session].should == 'ST-abcd'
-      Pseudonym.find(session[:pseudonym_credentials_id]).should == user1.pseudonyms.first
+      Pseudonym.find(session['pseudonym_credentials_id']).should == user1.pseudonyms.first
 
       (controller.instance_variables.grep(/@[^_]/) - ['@mock_proxy']).each{ |var| controller.send :remove_instance_variable, var }
-      session.reset
+      CANVAS_RAILS2 ? session.reset : session.clear
 
       stubby("yes\n#{unique_id}\n")
 
@@ -708,7 +712,7 @@ describe PseudonymSessionsController do
       get 'new', :ticket => 'ST-efgh'
       response.should redirect_to(dashboard_url(:login_success => 1))
       session[:cas_session].should == 'ST-efgh'
-      Pseudonym.find(session[:pseudonym_credentials_id]).should == user2.pseudonyms.first
+      Pseudonym.find(session['pseudonym_credentials_id']).should == user2.pseudonyms.first
     end
   end
 
@@ -801,6 +805,55 @@ describe PseudonymSessionsController do
         response.should render_template('otp_login')
         session[:pending_otp_secret_key].should be_nil
         assigns[:cc].should == cc
+      end
+    end
+
+    context "oauth" do
+      before do
+        user_with_pseudonym(:active_all => 1, :password => 'qwerty')
+
+        redis = stub('Redis')
+        redis.stubs(:setex)
+        redis.stubs(:hmget)
+        redis.stubs(:del)
+        Canvas.stubs(:redis => redis)
+      end
+
+      let(:key) { DeveloperKey.create! :redirect_uri => 'https://example.com' }
+      let(:params) { {:pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwerty' } } }
+
+      it 'should redirect to the confirm url if the user has no token' do
+        provider = Canvas::Oauth::Provider.new(key.id, key.redirect_uri, [], nil)
+
+        post :create, params, :oauth2 => provider.session_hash
+        response.should redirect_to(oauth2_auth_confirm_url)
+      end
+
+      it 'should redirect to the redirect uri if the user already has remember-me token' do
+        @user.access_tokens.create!({:developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil})
+        provider = Canvas::Oauth::Provider.new(key.id, key.redirect_uri, ['/auth/userinfo'], nil)
+
+        post :create, params, :oauth2 => provider.session_hash
+        response.should be_redirect
+        response.location.should match(/https:\/\/example.com/)
+      end
+
+      it 'should not reuse userinfo tokens for other scopes' do
+        @user.access_tokens.create!({:developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil})
+        provider = Canvas::Oauth::Provider.new(key.id, key.redirect_uri, [], nil)
+
+        post :create, params, :oauth2 => provider.session_hash
+        response.should redirect_to(oauth2_auth_confirm_url)
+      end
+
+      it 'should redirect to the redirect uri if the developer key is trusted' do
+        key.trusted = true
+        key.save!
+        provider = Canvas::Oauth::Provider.new(key.id, key.redirect_uri, [], nil)
+
+        post :create, params, :oauth2 => provider.session_hash
+        response.should be_redirect
+        response.location.should match(/https:\/\/example.com/)
       end
     end
   end
@@ -960,8 +1013,8 @@ describe PseudonymSessionsController do
           session[:pending_otp_communication_channel_id] = @cc.id
           code = ROTP::TOTP.new(@secret_key).now
           # make sure we get 5 minutes of drift
-          ROTP::TOTP.any_instance.expects(:verify_with_drift).with(code, 300).once.returns(true)
-          post 'otp_login', :otp_login => { :verification_code => code }
+          ROTP::TOTP.any_instance.expects(:verify_with_drift).with(code.to_s, 300).once.returns(true)
+          post 'otp_login', :otp_login => { :verification_code => code.to_s }
           response.should redirect_to settings_profile_url
           @user.reload.otp_secret_key.should == @secret_key
           @user.otp_communication_channel.should == @cc
@@ -1058,17 +1111,16 @@ describe PseudonymSessionsController do
 
   describe 'GET oauth2_auth' do
     let(:key) { DeveloperKey.create! :redirect_uri => 'https://example.com' }
-    let(:user) { User.create! }
 
     it 'renders a 400 when there is no client_id' do
       get :oauth2_auth
-      response.status.should == '400 Bad Request'
+      assert_status(400)
       response.body.should =~ /invalid client_id/
     end
 
     it 'renders 400 on a bad redirect_uri' do
       get :oauth2_auth, :client_id => key.id
-      response.status.should == '400 Bad Request'
+      assert_status(400)
       response.body.should =~ /invalid redirect_uri/
     end
 
@@ -1080,6 +1132,48 @@ describe PseudonymSessionsController do
     it 'passes on canvas_login if provided' do
       get :oauth2_auth, :client_id => key.id, :redirect_uri => Canvas::Oauth::Provider::OAUTH2_OOB_URI, :canvas_login => 1
       response.should redirect_to(login_url(:canvas_login => 1))
+    end
+
+    context 'with a user logged in' do
+      before do
+        user_with_pseudonym(:active_all => 1, :password => 'qwerty')
+        user_session(@user)
+
+        redis = stub('Redis')
+        redis.stubs(:setex)
+        Canvas.stubs(:redis => redis)
+      end
+
+      it 'should redirect to the confirm url if the user has no token' do
+        get :oauth2_auth, :client_id => key.id, :redirect_uri => Canvas::Oauth::Provider::OAUTH2_OOB_URI
+        response.should redirect_to(oauth2_auth_confirm_url)
+      end
+
+      it 'redirects to login_url with ?force_login=1' do
+        get :oauth2_auth, :client_id => key.id, :redirect_uri => Canvas::Oauth::Provider::OAUTH2_OOB_URI, :force_login => 1
+        response.should redirect_to(login_url(:force_login => 1))
+      end
+
+      it 'should redirect to the redirect uri if the user already has remember-me token' do
+        @user.access_tokens.create!({:developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil})
+        get :oauth2_auth, :client_id => key.id, :redirect_uri => 'https://example.com', :scopes => '/auth/userinfo'
+        response.should be_redirect
+        response.location.should match(/https:\/\/example.com/)
+      end
+
+      it 'should not reuse userinfo tokens for other scopes' do
+        @user.access_tokens.create!({:developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil})
+        get :oauth2_auth, :client_id => key.id, :redirect_uri => 'https://example.com'
+        response.should redirect_to(oauth2_auth_confirm_url)
+      end
+
+      it 'should redirect to the redirect uri if the developer key is trusted' do
+        key.trusted = true
+        key.save!
+        get :oauth2_auth, :client_id => key.id, :redirect_uri => 'https://example.com', :scopes => '/auth/userinfo'
+        response.should be_redirect
+        response.location.should match(/https:\/\/example.com/)
+      end
     end
   end
 
@@ -1098,20 +1192,20 @@ describe PseudonymSessionsController do
 
     it 'renders a 400 if theres no client_id' do
       get :oauth2_token
-      response.status.should == '400 Bad Request'
+      assert_status(400)
       response.body.should =~ /invalid client_id/
     end
 
     it 'renders a 400 if the secret is invalid' do
       get :oauth2_token, :client_id => key.id, :client_secret => key.api_key + "123"
-      response.status.should == '400 Bad Request'
+      assert_status(400)
       response.body.should =~ /invalid client_secret/
     end
 
     it 'renders a 400 if the provided code does not match a token' do
       Canvas.stubs(:redis => redis)
       get :oauth2_token, :client_id => key.id, :client_secret => key.api_key, :code => "NotALegitCode"
-      response.status.should == '400 Bad Request'
+      assert_status(400)
       response.body.should =~ /invalid code/
     end
 
@@ -1133,7 +1227,7 @@ describe PseudonymSessionsController do
     before { user_session user }
 
     it 'uses the global id of the user for generating the code' do
-      Canvas::Oauth::Token.expects(:generate_code_for).with(user.global_id, key.id, {:scopes => nil, :remember_access => nil}).returns('code')
+      Canvas::Oauth::Token.expects(:generate_code_for).with(user.global_id, key.id, {:scopes => nil, :remember_access => nil, :purpose => nil}).returns('code')
       oauth_accept
       response.should redirect_to(oauth2_auth_url(:code => 'code'))
     end
@@ -1141,12 +1235,12 @@ describe PseudonymSessionsController do
     it 'saves the requested scopes with the code' do
       scopes = 'userinfo'
       session_hash[:oauth2][:scopes] = scopes
-      Canvas::Oauth::Token.expects(:generate_code_for).with(user.global_id, key.id, {:scopes => scopes, :remember_access => nil}).returns('code')
+      Canvas::Oauth::Token.expects(:generate_code_for).with(user.global_id, key.id, {:scopes => scopes, :remember_access => nil, :purpose => nil}).returns('code')
       oauth_accept
     end
 
     it 'remembers the users access preference with the code' do
-      Canvas::Oauth::Token.expects(:generate_code_for).with(user.global_id, key.id, {:scopes => nil, :remember_access => '1'}).returns('code')
+      Canvas::Oauth::Token.expects(:generate_code_for).with(user.global_id, key.id, {:scopes => nil, :remember_access => '1', :purpose => nil}).returns('code')
       post :oauth2_accept, {:remember_access => '1'}, session_hash
     end
 

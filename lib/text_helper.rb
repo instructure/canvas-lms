@@ -17,139 +17,9 @@
 
 module TextHelper
   def strip_and_truncate(text, options={})
-    truncate_text(strip_tags(text), options)
+    truncate_text(HtmlTextHelper.strip_tags(text), options)
   end
   module_function :strip_and_truncate
-
-  def strip_tags(text)
-    text ||= ""
-    text.gsub(/<\/?[^>\n]*>/, "").gsub(/&#\d+;/) {|m| puts m; m[2..-1].to_i.chr(text.encoding) rescue '' }.gsub(/&\w+;/, "")
-  end
-
-  # Converts a string of html to plain text, preserving as much of the
-  # formatting and information as possible
-  #
-  # This is still a pretty basic implementation, I'm sure we'll find ways to
-  # tweak and improve it as time goes on.
-  def html_to_text(html_str)
-    html_str ||= ''
-    doc = Nokogiri::HTML::DocumentFragment.parse(html_str.squeeze(" ").squeeze("\n"))
-    # translate anchor tags into a markdown-style name/link combo
-    doc.css('a').each { |node| next if node.text.strip == node['href']; node.replace("[#{node.text}](#{node['href']})") }
-    # translate img tags into just a url to the image
-    doc.css('img').each { |node| node.replace(node['src'] || '') }
-    # append a line break to br and p tags, so they retain a line break after stripping tags
-    doc.css('br, p').each { |node| node.after("\n\n") }
-    doc.text.strip
-  end
-
-  # Converts a string of html to plain text using the Premailer gem.
-  def html_to_simple_text(html_str, opts={})
-    return "" if html_str.blank?
-    pm = Premailer.new(html_str, { :with_html_string => true, :input_encoding => 'UTF-8', :adapter => :nokogiri }.merge(opts))
-    pm.to_plain_text
-  end
-
-  def html_to_simple_html(html_str, opts={})
-    return "" if html_str.blank?
-    text = html_to_simple_text(html_str, opts)
-    text.gsub!(/^([\*\-]+\n*)$/, '') # Remove the H tag markers
-    text.gsub!(/\n{3,}/, "\n\n")     # Remove the triple breaks left by the H tag marker removals
-    html = format_message(text).first
-    "<p>#{html}</p>".html_safe
-  end
-
-  def quote_clump(quote_lines)
-    txt = "<div class='quoted_text_holder'><a href='#' class='show_quoted_text_link'>#{TextHelper.escape_html(I18n.t('lib.text_helper.quoted_text_toggle', "show quoted text"))}</a><div class='quoted_text' style='display: none;'>"
-    txt += quote_lines.join("\n")
-    txt += "</div></div>"
-    txt
-  end
-
-  # http://daringfireball.net/2010/07/improved_regex_for_matching_urls
-  # released to the public domain
-  AUTO_LINKIFY_PLACEHOLDER = "LINK-PLACEHOLDER"
-  AUTO_LINKIFY_REGEX = %r{
-    \b
-    (                                            # Capture 1: entire matched URL
-      (?:
-        https?://                                # http or https protocol
-        |                                        # or
-        www\d{0,3}[.]                            # "www.", "www1.", "www2." … "www999."
-        |                                        # or
-        [a-z0-9.\-]+[.][a-z]{2,4}/               # looks like domain name followed by a slash
-      )
-
-      [^\s()<>]+                                 # Run of non-space, non-()<>
-
-      [^\s`!()\[\]{};:'".,<>?«»“”‘’]             # End with: not a space or one of these punct chars
-    ) | (
-      #{AUTO_LINKIFY_PLACEHOLDER}
-    )
-  }xi
-
-  # Converts a plaintext message to html, with newlinification, quotification, and linkification
-  def format_message(message, opts={ :url => nil, :notification_id => nil })
-    return '' unless message
-    # insert placeholders for the links we're going to generate, before we go and escape all the html
-    links = []
-    placeholder_blocks = []
-    message ||= ''
-    message = message.gsub(AUTO_LINKIFY_REGEX) do |match|
-      placeholder_blocks << if match == AUTO_LINKIFY_PLACEHOLDER
-        AUTO_LINKIFY_PLACEHOLDER
-      else
-        s = $1
-        link = s
-        link = "http://#{link}" if link[0,3] == 'www'
-        link = add_notification_to_link(link, opts[:notification_id]) if opts[:notification_id]
-        link = URI.escape(link).gsub("'", "%27")
-        links << link
-        "<a href='#{ERB::Util.h(link)}'>#{ERB::Util.h(s)}</a>"
-      end
-      AUTO_LINKIFY_PLACEHOLDER
-    end
-
-    # now escape any html
-    message = TextHelper.escape_html(message)
-
-    # now put the links back in
-    message = message.gsub(AUTO_LINKIFY_PLACEHOLDER) do |match|
-      placeholder_blocks.shift
-    end
-
-    message = message.gsub(/\r?\n/, "<br/>\r\n")
-    processed_lines = []
-    quote_block = []
-    message.split("\n").each do |line|
-      # check for lines starting with '>'
-      if /^(&gt;|>)/ =~ line
-        quote_block << line
-      else
-        processed_lines << quote_clump(quote_block) if !quote_block.empty?
-        quote_block = []
-        processed_lines << line
-      end
-    end
-    processed_lines << quote_clump(quote_block) if !quote_block.empty?
-    message = processed_lines.join("\n")
-    if opts[:url]
-      url = add_notification_to_link(opts[:url], opts[:notification_id]) if opts[:notification_id]
-      links.unshift opts[:url]
-    end
-    links.unshift message.html_safe
-  end
-
-  def add_notification_to_link(url, notification_id)
-    parts = "#{url}".split("#", 2)
-    link = parts[0]
-    link += link.match(/\?/) ? "&" : "?"
-    link += "clear_notification_id=#{notification_id}"
-    link += parts[1] if parts[1]
-    link
-  rescue
-    return ""
-  end
 
   def truncate_text(text, options={})
     truncated = text || ""
@@ -170,14 +40,6 @@ module TextHelper
     # unicode characters at the end.
     truncated = truncated[0,actual_length][/.{0,#{actual_length}}/mu]
     truncated + ellipsis
-  end
-
-  def self.escape_html(text)
-    CGI::escapeHTML text
-  end
-
-  def self.unescape_html(text)
-    CGI::unescapeHTML text
   end
 
   def indent(text, spaces=2)
@@ -281,6 +143,15 @@ def self.date_component(start_date, style=:normal)
         I18n.t('time.ranges.different_days', "%{start_date_and_time} to %{end_date_and_time}", :start_date_and_time => start_string, :end_date_and_time => end_string)
       end
     end
+  end
+
+  def unlocalized_datetime_string(start_datetime, datetime_type=:event)
+    start_datetime = start_datetime.in_time_zone rescue start_datetime
+    return nil unless start_datetime
+
+    date_format = (datetime_type == :verbose || start_datetime.year != Time.zone.today.year) ? "%b %-d, %Y" : "%b %-d"
+    time_format = start_datetime.min == 0 ?  "%l%P" : "%l:%M%P"
+    return start_datetime.strftime("#{date_format} at #{time_format}")
   end
 
   def time_ago_in_words_with_ago(time)
@@ -446,7 +317,7 @@ def self.date_component(start_date, style=:normal)
     result = RDiscount.new(string).to_html.strip
     # Strip wrapping <p></p> if inlinify == :auto && they completely wrap the result && there are not multiple <p>'s
     result.gsub!(/<\/?p>/, '') if inlinify == :auto && result =~ /\A<p>.*<\/p>\z/m && !(result =~ /.*<p>.*<p>.*/m)
-    result.html_safe.strip
+    result.strip.html_safe
   end
 
   # This doesn't make any attempt to convert other encodings to utf-8, it just

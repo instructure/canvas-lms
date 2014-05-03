@@ -74,9 +74,7 @@ class InfoController < ApplicationController
   end
 
   def record_js_error
-    error = params[:error]
-    error[:backtrace] = error[:url]
-    ErrorReport.log_error('javascript', error)
+    ErrorReport.log_error('javascript', params[:error])
     # Render a 0x0 gif
     render  :content_type =>'image/gif', :text => "GIF89a\001\000\001\000\200\377\000\377\377\377\000\000\000,\000\000\000\000\001\000\001\000\000\002\002D\001\000;"
   end

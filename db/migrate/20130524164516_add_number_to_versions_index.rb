@@ -1,6 +1,6 @@
 class AddNumberToVersionsIndex < ActiveRecord::Migration
   tag :postdeploy
-  self.transactional = false
+  disable_ddl_transaction!
 
   def self.up
     # eliminate duplicates
@@ -13,7 +13,7 @@ class AddNumberToVersionsIndex < ActiveRecord::Migration
       find_each do |version|
         versionable_object_scope = Version.where(:versionable_id => version.versionable_id,
                                                  :versionable_type => version.versionable_type)
-        dups = versionable_object_scope.where(:number => row['number']).order(:created_at, :id).all
+        dups = versionable_object_scope.where(:number => version.number).order(:created_at, :id).all
         # leave the first one alone
         dups.shift
         next if dups.empty? # ???
@@ -25,12 +25,12 @@ class AddNumberToVersionsIndex < ActiveRecord::Migration
         end
       end
 
-    add_index :versions, [:versionable_id, :versionable_type, :number], :unique => true, :concurrently => true, :name => "index_versions_on_versionable_object_and_number"
+    add_index :versions, [:versionable_id, :versionable_type, :number], :unique => true, :algorithm => :concurrently, :name => "index_versions_on_versionable_object_and_number"
     remove_index :versions, [:versionable_id, :versionable_type]
   end
 
   def self.down
-    add_index :versions, [:versionable_id, :versionable_type], :concurrently => true
+    add_index :versions, [:versionable_id, :versionable_type], :algorithm => :concurrently
     remove_index :versions, :name => "index_versions_on_versionable_object_and_number"
   end
 end

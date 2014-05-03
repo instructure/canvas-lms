@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
 describe "account admin courses tab" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   def add_course(course_name, has_student = false)
     Account.default.courses.create(:name => course_name).offer!
@@ -65,8 +65,7 @@ describe "account admin courses tab" do
       f("#course_name").send_keys(" "+name[1])
       ff(".ui-menu-item .ui-corner-all").count > 0
       keep_trying_until { fj(".ui-menu-item .ui-corner-all:visible").text.should include_text(course.name) }
-      f("#new_course button").click
-      wait_for_ajax_requests
+      expect_new_page_load { fj("#new_course button").click }
       f("#crumb_course_#{course.id}").should be_displayed
     end
 

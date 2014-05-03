@@ -23,7 +23,7 @@ class Announcement < DiscussionTopic
   has_a_broadcast_policy
   include HasContentTags
   
-  sanitize_field :message, Instructure::SanitizeField::SANITIZE
+  sanitize_field :message, CanvasSanitize::SANITIZE
   
   before_save :infer_content
   before_save :respect_context_lock_rules
@@ -31,9 +31,12 @@ class Announcement < DiscussionTopic
   validates_presence_of :context_type
   validates_presence_of :message
 
-  acts_as_list scope: %q{context_id = '#{context_id}' AND
-                         context_type = '#{context_type}' AND
-                         type = 'Announcement'}
+  acts_as_list scope: { context: self, type: 'Announcement' }
+
+  def validate_draft_state_change
+    old_draft_state, new_draft_state = self.changes['workflow_state']
+    self.errors.add :workflow_state, I18n.t('#announcements.error_draft_state', "This topic cannot be set to draft state because it is an announcement.") if new_draft_state == 'unpublished'
+  end
 
   def infer_content
     self.title ||= t(:no_title, "No Title")
@@ -52,7 +55,7 @@ class Announcement < DiscussionTopic
     to { active_participants(true) - [user] }
     whenever { |record|
       record.context.available? and
-      ((record.just_created and not record.post_delayed?) || record.changed_state(:active, :post_delayed))
+      ((record.just_created and !(record.post_delayed? || record.unpublished?)) || record.changed_state(:active, record.draft_state_enabled? ? :unpublished : :post_delayed))
     }
   end
 
@@ -85,5 +88,17 @@ class Announcement < DiscussionTopic
 
   def subscription_hold(user, context_enrollment, session)
     :topic_is_announcement
+  end
+
+  def can_unpublish?
+    false
+  end
+
+  def draft_state_enabled?
+    false
+  end
+
+  def published?
+    true
   end
 end

@@ -75,7 +75,7 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/view' \ 
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/view' \
   #        -H "Authorization: Bearer <token>"
   #
   # @example_response
@@ -95,25 +95,38 @@ class DiscussionTopicsApiController < ApplicationController
   #     ]
   #   }
   def view
-    structure, participant_ids, entry_ids, new_entries_structure = @topic.materialized_view(:include_new_entries => params[:include_new_entries] == '1')
+    structure, participant_ids, entry_ids, new_entries = @topic.materialized_view(:include_new_entries => params[:include_new_entries] == '1')
 
     if structure
-      participant_info = Shard.partition_by_shard(participant_ids) do |shard_ids|
-        User.find(shard_ids).map do |user|
-          user_display_json(user, @context.is_a_context? && @context)
-        end
+
+      # we assume that json_structure will typically be served to users requesting string IDs
+      unless stringify_json_ids?
+        entries = JSON.parse(structure)
+        Api.recursively_stringify_json_ids(entries, reverse: true)
+        structure = entries.to_json
       end
+
+      participants = Shard.partition_by_shard(participant_ids) do |shard_ids|
+        User.find(shard_ids)
+        end
+
+      participant_info = participants.map do |participant|
+        user_display_json(participant, @context.is_a_context? && @context)
+      end
+
       unread_entries = entry_ids - DiscussionEntryParticipant.read_entry_ids(entry_ids, @current_user)
+      unread_entries = unread_entries.map(&:to_s) if stringify_json_ids?
       forced_entries = DiscussionEntryParticipant.forced_read_state_entry_ids(entry_ids, @current_user)
+      forced_entries = forced_entries.map(&:to_s) if stringify_json_ids?
       # as an optimization, the view structure is pre-serialized as a json
       # string, so we have to do a bit of manual json building here to fit it
       # into the response.
       fragments = {
         :unread_entries => unread_entries.to_json,
         :forced_entries => forced_entries.to_json,
-        :participants   => participant_info.to_json,
+        :participants   => json_cast(participant_info).to_json,
         :view           => structure,
-        :new_entries    => new_entries_structure,
+        :new_entries    => json_cast(new_entries).to_json,
       }
       fragments = fragments.map { |k, v| %("#{k}": #{v}) }
       render :json => "{ #{fragments.join(', ')} }"
@@ -134,7 +147,7 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entries.json' \ 
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entries.json' \
   #        -F 'message=<message>' \ 
   #        -F 'attachment=@<filename>' \ 
   #        -H "Authorization: Bearer <token>"
@@ -246,7 +259,7 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entries/<entry_id>/replies.json' \ 
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entries/<entry_id>/replies.json' \
   #        -F 'message=<message>' \ 
   #        -F 'attachment=@<filename>' \ 
   #        -H "Authorization: Bearer <token>"
@@ -339,7 +352,7 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entry_list?ids[]=1&ids[]=2&ids[]=3' \ 
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entry_list?ids[]=1&ids[]=2&ids[]=3' \
   #        -H "Authorization: Bearer <token>"
   #
   # @example_response
@@ -364,7 +377,7 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/read.json' \ 
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/read.json' \
   #        -X PUT \ 
   #        -H "Authorization: Bearer <token>" \ 
   #        -H "Content-Length: 0"
@@ -381,7 +394,7 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/read.json' \ 
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/read.json' \
   #        -X DELETE \ 
   #        -H "Authorization: Bearer <token>"
   def mark_topic_unread
@@ -401,7 +414,7 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/read_all.json' \ 
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/read_all.json' \
   #        -X PUT \ 
   #        -H "Authorization: Bearer <token>" \ 
   #        -H "Content-Length: 0"
@@ -422,7 +435,7 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/read_all.json' \ 
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/read_all.json' \
   #        -X DELETE \ 
   #        -H "Authorization: Bearer <token>"
   def mark_all_unread
@@ -442,7 +455,7 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entries/<entry_id>/read.json' \ 
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entries/<entry_id>/read.json' \
   #        -X PUT \ 
   #        -H "Authorization: Bearer <token>"\ 
   #        -H "Content-Length: 0"
@@ -463,7 +476,7 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entries/<entry_id>/read.json' \ 
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/entries/<entry_id>/read.json' \
   #        -X DELETE \ 
   #        -H "Authorization: Bearer <token>"
   def mark_entry_unread
@@ -476,7 +489,7 @@ class DiscussionTopicsApiController < ApplicationController
   # On success, the response will be 204 No Content with an empty body
   #
   # @example_request
-  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/subscribed.json' \ 
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/subscribed.json' \
   #        -X PUT \ 
   #        -H "Authorization: Bearer <token>" \ 
   #        -H "Content-Length: 0"
@@ -490,7 +503,7 @@ class DiscussionTopicsApiController < ApplicationController
   # On success, the response will be 204 No Content with an empty body
   #
   # @example_request
-  #   curl 'http://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/subscribed.json' \ 
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id>/subscribed.json' \
   #        -X DELETE \ 
   #        -H "Authorization: Bearer <token>" 
   def unsubscribe_topic
@@ -499,11 +512,7 @@ class DiscussionTopicsApiController < ApplicationController
   
   protected
   def require_topic
-    if params[:topic_id] == "self" && @context.is_a?(CollectionItem)
-      @topic = @context.discussion_topic
-    else
-      @topic = @context.all_discussion_topics.active.find(params[:topic_id])
-    end
+    @topic = @context.all_discussion_topics.active.find(params[:topic_id])
     return authorized_action(@topic, @current_user, :read)
   end
 
@@ -533,7 +542,7 @@ class DiscussionTopicsApiController < ApplicationController
       generate_new_page_view
       @entry.context_module_action
       if has_attachment
-        @attachment = @context.attachments.create(:uploaded_data => params[:attachment])
+        @attachment = (@current_user || @context).attachments.create(:uploaded_data => params[:attachment])
         @entry.attachment = @attachment
         @entry.save
       end

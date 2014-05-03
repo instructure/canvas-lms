@@ -99,8 +99,8 @@ describe ContextExternalTool do
     it "should not validate with no domain or url setting" do
       @tool = @course.context_external_tools.create(:name => "a", :consumer_key => '12345', :shared_secret => 'secret')
       @tool.should be_new_record
-      @tool.errors['url'].should == "Either the url or domain should be set."
-      @tool.errors['domain'].should == "Either the url or domain should be set."
+      @tool.errors['url'].should == ["Either the url or domain should be set."]
+      @tool.errors['domain'].should == ["Either the url or domain should be set."]
     end
 
     it "should accept both a domain and a url" do
@@ -267,17 +267,10 @@ describe ContextExternalTool do
       @found_tool.should eql(@tool2)
     end
     
-    it "should find the preferred tool even if there is a higher priority tool configured, provided the preferred tool has resource_selection set" do
+    it "should find the preferred tool even if there is a higher priority tool configured" do
       @tool = @course.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
-      @course.context_external_tools.create!(:name => "b", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
-      @account.context_external_tools.create!(:name => "c", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
-      @account.context_external_tools.create!(:name => "d", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
-      @root_account.context_external_tools.create!(:name => "e", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
-      @preferred = @root_account.context_external_tools.create!(:name => "f", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
-      @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id), @preferred.id)
-      @found_tool.should eql(@tool)
-      @preferred.settings[:resource_selection] = {:url => "http://www.example.com", :selection_width => 400, :selection_height => 400}
-      @preferred.save!
+      @preferred = @root_account.context_external_tools.create!(:name => "f", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
+
       @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id), @preferred.id)
       @found_tool.should eql(@preferred)
     end
@@ -293,6 +286,19 @@ describe ContextExternalTool do
       @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id), @preferred.id)
       @found_tool.should eql(@tool)
     end
+
+    it "should not return preferred tool outside of context chain" do
+      preferred = @root_account.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
+      ContextExternalTool.find_external_tool("http://www.google.com", @course, preferred.id).should == preferred
+    end
+
+    it "should not return preferred tool if url doesn't match" do
+      c1 = @course
+      c2 = course_model
+      preferred = c1.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
+      ContextExternalTool.find_external_tool("http://example.com", c2, preferred.id).should be_nil
+    end
+
   end
   
   describe "custom fields" do
@@ -675,6 +681,11 @@ describe ContextExternalTool do
       tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
       tool.save!
       (ContextExternalTool.find_for(tool.id, @course, :user_navigation) rescue nil).should be_nil
+    end
+
+    it "should raise RecordNotFound if the id is invalid" do
+      course_model
+      expect { ContextExternalTool.find_for("horseshoes", @course, :course_navigation) }.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
   

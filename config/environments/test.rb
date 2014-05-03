@@ -1,3 +1,44 @@
+if ENV['COVERAGE'] == "1"
+  puts "Code Coverage enabled"
+  require 'simplecov'
+  require 'simplecov-rcov'
+
+  SimpleCov.use_merging
+  SimpleCov.merge_timeout(10000)
+
+  SimpleCov.command_name "RSpec:#{Process.pid}#{ENV['TEST_ENV_NUMBER']}"
+  SimpleCov.start do
+    SimpleCov.at_exit {
+      SimpleCov.result
+      #SimpleCov.result.format! to get a coverage report without vendored_gems
+    }
+  end
+else
+  puts "Code coverage not enabled"
+end
+
+if ENV['BULLET']
+  puts "Bullet enabled"
+  require 'bullet'
+
+  config.after_initialize do
+    Bullet.enable = true
+    Bullet.bullet_logger = true
+  end
+
+elsif ENV['BULLET_GEM']
+  puts "Bullet enabled"
+  require 'bullet_instructure'
+
+  config.after_initialize do
+    Bullet.enable = true
+    Bullet.bullet_logger = true
+  end
+
+else
+  puts "Bullet not enabled"
+end
+
 environment_configuration(defined?(config) && config) do |config|
   # Settings specified here will take precedence over those in config/application.rb
 
@@ -12,7 +53,7 @@ environment_configuration(defined?(config) && config) do |config|
   config.whiny_nils = false
 
   # Show full error reports and disable caching
-  if Rails.version < "3.0"
+  if CANVAS_RAILS2
     config.action_controller.consider_all_requests_local = true
   else
     config.consider_all_requests_local = true
@@ -23,7 +64,7 @@ environment_configuration(defined?(config) && config) do |config|
   # ENV['USE_OPTIMIZED_JS']                            = 'true'
 
   # Disable request forgery protection in test environment
-  config.action_controller.allow_forgery_protection    = false
+  config.action_controller.allow_forgery_protection = false
 
   # Tell Action Mailer not to deliver emails to the real world.
   # The :test delivery method accumulates sent emails in the
@@ -36,12 +77,16 @@ environment_configuration(defined?(config) && config) do |config|
   # eval <env>-local.rb if it exists
   Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read) }
 
-  # XXX: Rails3 NullStore wasn't added until Rails 3.2, but can replace our custom NilStore
-  #config.cache_store = :null
-  require_dependency 'nil_store'
-  config.cache_store = NilStore.new
+  if CANVAS_RAILS2
+    require_dependency 'nil_store'
+    config.cache_store = NilStore.new
+  else
+    config.cache_store = :null_store
+  end
 
-  if Rails.version < "3.0"
+  if CANVAS_RAILS2
+    require_dependency 'canvas'
+
     # Raise an exception on bad mass assignment. Helps us catch these bugs before
     # they hit.
     Canvas.protected_attribute_error = :raise
@@ -51,7 +96,7 @@ environment_configuration(defined?(config) && config) do |config|
     Canvas.dynamic_finder_nil_arguments_error = :raise
   else
     # Raise exceptions instead of rendering exception templates
-    config.action_dispatch.show_exceptions = false
+    config.action_dispatch.show_exceptions = true
 
     # Print deprecation notices to the stderr
     config.active_support.deprecation = :stderr

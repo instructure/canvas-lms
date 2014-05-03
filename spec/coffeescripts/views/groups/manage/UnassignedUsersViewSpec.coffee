@@ -3,10 +3,12 @@ define [
   'compiled/views/groups/manage/UnassignedUsersView'
   'compiled/views/groups/manage/AssignToGroupMenu'
   'compiled/collections/GroupCollection'
-  'compiled/collections/GroupUserCollection'
+  'compiled/collections/UnassignedGroupUserCollection'
   'compiled/models/Group'
+  'compiled/models/GroupCategory'
   'helpers/fakeENV'
-], ($, UnassignedUsersView, AssignToGroupMenu, GroupCollection, GroupUserCollection, Group) ->
+  'helpers/jquery.simulate'
+], ($, UnassignedUsersView, AssignToGroupMenu, GroupCollection, UnassignedGroupUserCollection, Group, GroupCategory, fakeENV) ->
 
   clock = null
   view = null
@@ -15,15 +17,17 @@ define [
 
   module 'UnassignedUsersView',
     setup: ->
+      fakeENV.setup()
+      $('#fixtures').html('<div id="content"></div>')
       clock = sinon.useFakeTimers()
       groups = new GroupCollection [
         new Group name: "a group"
         new Group name: "another group"
       ]
-      users = new GroupUserCollection [
+      users = new UnassignedGroupUserCollection [
         {id: 1, name: "bob", sortable_name: "bob"}
         {id: 2, name: "joe", sortable_name: "joe"}
-      ]
+      ], {category: new GroupCategory}
       menu = new AssignToGroupMenu
         collection: groups
       view = new UnassignedUsersView
@@ -31,25 +35,18 @@ define [
         groupsCollection: groups
         assignToGroupMenu: menu
       view.render()
-      view.$el.appendTo($(document.body))
+      $('#fixtures').append( view.$el )
+                    .append( $('<div />', id: 'content') )
 
     teardown: ->
+      fakeENV.teardown()
+      $('#fixtures').empty()
       clock.restore()
       view.remove()
-      $('.assign-to-group-menu').remove()
-
-  test 'toggles group class if canAssignToGroup', ->
-    groups.pop() # no change yet, because not empty
-    ok view.$el.attr('class').indexOf('group-category-empty') == -1
-
-    group = groups.pop()
-    ok view.$el.attr('class').indexOf('group-category-empty') >= 0
-
-    groups.push(group)
-    ok view.$el.attr('class').indexOf('group-category-empty') == -1
+      $('#fixtures').empty()
 
   test 'opens the assignToGroupMenu', ->
-    view.$('.assign-to-group').eq(0).click()
+    view.$('.assign-to-group').eq(0).simulate('click')
     clock.tick(100)
     $menu = $('.assign-to-group-menu').filter(':visible')
     equal $menu.length, 1

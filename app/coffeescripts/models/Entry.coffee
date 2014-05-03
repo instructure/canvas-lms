@@ -106,7 +106,7 @@ define [
     # Computed attribute to determine if the entry can be moderated
     # by the current user
     canModerate: ->
-      isAuthorsEntry = @get('user_id') is ENV.DISCUSSION.CURRENT_USER.id
+      isAuthorsEntry = @get('user_id')+'' is ENV.DISCUSSION.CURRENT_USER.id
       isAuthorsEntry and ENV.DISCUSSION.PERMISSIONS.CAN_MANAGE_OWN or ENV.DISCUSSION.PERMISSIONS.MODERATE
 
     ##

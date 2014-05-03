@@ -17,10 +17,12 @@
  */
 
 define([
+  'compiled/util/round',
   'INST' /* INST */,
   'i18n!gradebook',
   'jquery' /* $ */,
   'underscore',
+  'timezone',
   'compiled/userSettings',
   'datagrid',
   'compiled/grade_calculator',
@@ -28,7 +30,7 @@ define([
   'compiled/gradebook2/Turnitin',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.dropdownList' /* dropdownList */,
-  'jquery.instructure_date_and_time' /* parseFromISO */,
+  'jquery.instructure_date_and_time' /* datetimeString */,
   'jquery.instructure_forms' /* ajaxJSONFiles, formSubmit, getFormData, formErrors, errorBox */,
   'jqueryui/dialog',
   'compiled/jquery/fixDialogButtons' /* fix dialog formatting */,
@@ -42,12 +44,13 @@ define([
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'jqueryui/position' /* /\.position\(/ */,
   'jqueryui/progressbar' /* /\.progressbar/ */
-], function(INST, I18n, $, _, userSettings, datagrid, GradeCalculator, htmlEscape, Turnitin) {
+], function(round, INST, I18n, $, _, tz, userSettings, datagrid, GradeCalculator, htmlEscape, Turnitin) {
 
-  var grading_scheme = window.grading_scheme;
+  var grading_scheme = ENV.grading_scheme;
   var readOnlyGradebook = window.readOnlyGradebook;
   var gradebook = window.gradebook;
   var speedGraderEnabled = ENV.speed_grader_enabled;
+  var object_data = null;
 
   var $loading_gradebook_progressbar = $("#loading_gradebook_progressbar"),
       $default_grade_form = $("#default_grade_form"),
@@ -264,6 +267,7 @@ define([
                 height = grid.cell.height(),
                 assignment_id = submission.assignment_id,
                 $box = $("#student_grading_" + assignment_id).clone(true),
+                //  todo: replace .andSelf with .addBack when JQuery is upgraded.
                 $input = $box.children().andSelf().filter(".grading_value");
             $grade.hide().after($box);
             $box.css('display', 'block');
@@ -572,6 +576,7 @@ define([
                   title: title,
                   points_possible: data.points_possible,
                   students: students,
+                  context_code: data.context_code,
                   callback: function(selected, cutoff, students) {
                     students = $.grep(students, function($student, idx) {
                       var student = $student.user_data;
@@ -586,6 +591,18 @@ define([
                       }
                     });
                     return $.map(students, function(student) { return student.user_data.id; });
+                  },
+                  subjectCallback: function(selected, cutoff) {
+                    cutoff = cutoff || '';
+                    if(selected == I18n.t('students_who.not_submitted_yet', "Haven't submitted yet")) {
+                      return I18n.t('students_who.no_submission_for', 'No submission for %{assignment}', {assignment: data.title});
+                    } else if (selected == I18n.t("students_who.havent_been_graded", "Haven't been graded")) {
+                      return I18n.t('students_who.no_grade_for', 'No grade for %{assignment}', {assignment: data.title});
+                    } else if(selected == I18n.t('students_who.scored_less_than', "Scored less than")) {
+                      return I18n.t('students_who.scored_less_than_on', 'Scored less than %{cutoff} on %{assignment}', {assignment: data.title, cutoff: cutoff});
+                    } else if(selected == I18n.t('students_who.scored_more_than', "Scored more than")) {
+                      return I18n.t('students_who.scored_more_than_on', 'Scored more than %{cutoff} on %{assignment}', {assignment: data.title, cutoff: cutoff});
+                    }
                   }
                 });
               });
@@ -751,6 +768,8 @@ define([
       }).change();
       $("#groups_data")
       .find(".group_weight").change(function(event) {
+        var val = parseFloat($(this).val(), 10);
+        $(this).val(round(val,2));
         var $group = $(this).parents(".group"),
             url = $group.find(".assignment_group_url").attr('href'),
             formData = $group.getFormData(),
@@ -1443,6 +1462,12 @@ define([
     }
   }
 
+  var minute_timestamp = function(value) {
+    var datetime = tz.parse(value);
+    var timestamp = +datetime / 1000;
+    return timestamp - (timestamp % 60);
+  }
+
   function updateSubmission(submission) {
     if(!submission) { return; }
     var $submission = null;
@@ -1463,8 +1488,8 @@ define([
     submission.student_id = submission.user_id;
     $submission = $submission || $("#submission_" + submission.student_id + "_" + submission.assignment_id);
     $submission.css('visibility', '');
-    var submission_stamp = submission && $.parseFromISO(submission.submitted_at).minute_timestamp;
-    var assignment_stamp = assignment && $.parseFromISO(assignment.due_at).minute_timestamp;
+    var submission_stamp = submission && minute_timestamp(submission.submitted_at);
+    var assignment_stamp = assignment && minute_timestamp(assignment.due_at);
     $submission.parent().toggleClass('late', !!(submission && submission.late));
     if(submission.grade !== "" && submission.grade == 0) {
       submission.grade = "0";
@@ -1643,9 +1668,9 @@ define([
         url = $.replaceTags(url, "user_id", submission.user_id);
         $type.append(" <a href='" + url + "' target='_new' class='view_submission_link'>" + I18n.t('links.view_submission', "View Submission") + "</a>");
       }
-    } else if(submission.quiz_submission) {
+    } else if(submission.quiz_submission_id) {
       var url = $("#gradebook_urls .view_quiz_url").attr('href');
-      url = $.replaceTags(url, "quiz_id", submission.quiz_submission.quiz_id);
+      url = $.replaceTags(url, "quiz_id", assignment.quiz_id);
       url = $.replaceTags(url, "user_id", submission.user_id);
       if(submission.workflow_state == "pending_review") {
         $type.append($("#submission_pending_review_image").clone().removeAttr('id'));
@@ -1677,7 +1702,7 @@ define([
     submission.id = submission.id || "";
     var late = submission.late;
     $submission_information.find(".submitted_at_box").showIf(submission.submitted_at).toggleClass('late_submission', !!late);
-    submission.submitted_at_string = $.parseFromISO(submission.submitted_at).datetime_formatted;
+    submission.submitted_at_string = $.datetimeString(submission.submitted_at);
     $submission_information.fillTemplateData({
       data: submission,
       except: ['created_at', 'submission_comments', 'submission_comment', 'comment', 'attachments', 'attachment']
@@ -1685,7 +1710,7 @@ define([
     for(var idx in submission.submission_comments) {
       var comment = submission.submission_comments[idx].submission_comment;
       var $comment = $("#submission_comment_blank").clone(true).removeAttr('id');
-      comment.posted_at = $.parseFromISO(comment.created_at).datetime_formatted;
+      comment.posted_at = $.datetimeString(comment.created_at);
       $comment.fillTemplateData({
         data: comment,
         except: ['attachments']
@@ -1939,7 +1964,7 @@ define([
       }
       total += val;
     });
-    $("#groups_data").find(".total_weight").text(total);
+    $("#groups_data").find(".total_weight").text(round(total,2));
     if(updateGrades && gradebook.updateAllStudentGrades) {
       gradebook.updateAllStudentGrades();
     }

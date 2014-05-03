@@ -66,11 +66,18 @@ class GoogleDocsCollaboration < Collaboration
   def remove_users_from_document(users_to_remove)
     google_docs_acl_remove(self.document_id, users_to_remove) if self.document_id
   end
-  
+
   def add_users_to_document(new_users)
-    google_docs_acl_add(self.document_id, new_users) if self.document_id
+    domain = if context.root_account.feature_enabled?(:google_docs_domain_restriction)
+              context.root_account.settings[:google_docs_domain]
+             else
+               nil
+             end
+    if document_id
+      google_docs_acl_add(self.document_id, new_users, domain)
+    end
   end
-  
+
   def parse_data
     @entry_data ||= Atom::Entry.load_entry(self.data)
   end

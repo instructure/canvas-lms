@@ -85,7 +85,7 @@ namespace :i18n do
     rb_extractor = I18nExtraction::RubyExtractor.new(:translations => @translations)
     process_files(files) do |file|
       source = File.read(file)
-      source = Erubis::Eruby.new(source).src if file =~ /\.erb\z/
+      source = RailsXss::Erubis.new(source).src if file =~ /\.erb\z/
 
       # add a magic comment since that's the best way to convince RubyParser
       # 3.x it should treat the source as utf-8 (it ignores the source string encoding)

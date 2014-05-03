@@ -22,7 +22,7 @@ class BookmarkedCollection::WrapProxy < BookmarkedCollection::Proxy
       scope = base_scope
       scope = bookmarker.restrict_scope(scope, pager)
       scope = yield scope if block_given?
-      scope.paginate(:page => 1, :per_page => pager.per_page)
+      scope.paginate(:page => 1, :per_page => pager.per_page, :total_entries => scope.except(:group).count)
     }
   end
 

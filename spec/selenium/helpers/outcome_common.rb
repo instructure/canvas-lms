@@ -154,6 +154,16 @@ def should_create_a_learning_outcome_nested
 
   # submit
   driver.execute_script("$('.submit_button').click()")
+  if !f('.submit_button').nil?
+    driver.execute_script("$('.submit_button').click()")
+  end
+  refresh_page
+
+  #select group
+  f('.outcome-group').click
+  wait_for_ajaximations
+  #select nested outcome
+  f('.outcome-link').click
   wait_for_ajaximations
 
   ## expect
@@ -289,7 +299,6 @@ end
 def should_create_a_learning_outcome_with_a_new_rating_nested
   get outcome_url
 
-
   ## when
   # create group
   f('.add_outcome_group').click
@@ -305,6 +314,17 @@ def should_create_a_learning_outcome_with_a_new_rating_nested
   replace_content f('.outcomes-content input[name=title]'), nested_group_title
   # submit
   driver.execute_script("$('.submit_button').click()")
+  if !f('.submit_button').nil?
+    driver.execute_script("$('.submit_button').click()")
+  end
+  refresh_page
+
+  #select group
+  fj('.outcome-level:eq(0) .outcome-group').click
+  wait_for_ajaximations
+
+  #select nested group
+  fj('.outcome-level:eq(1) .outcome-group').click
   wait_for_ajaximations
 
   ## expect

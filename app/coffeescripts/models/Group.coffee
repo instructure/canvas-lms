@@ -25,18 +25,21 @@ define [
     modelType: 'group'
     resourceName: 'groups'
 
+    initialize: (attrs, options) ->
+      super
+      @newAndEmpty = options?.newAndEmpty
+
     users: ->
-      @_users = new GroupUserCollection(null, groupId: @id)
-      @_users.group = this
-      @_users.url = "/api/v1/groups/#{@id}/users?per_page=50"
+      initialUsers = if @newAndEmpty then [] else null
+      @_users = new GroupUserCollection initialUsers,
+        group: this
+        category: @collection?.category
+      @_users.on 'fetched:last', => @set('members_count', @_users.length)
       @users = -> @_users
       @_users
 
     usersCount: ->
-      if @_users?.loadedAll
-        @_users.length
-      else
-        @get('members_count')
+      @get('members_count')
 
     sync: (method, model, options = {}) ->
       options.url = @urlFor(method)
@@ -47,3 +50,15 @@ define [
         "/api/v1/group_categories/#{@get('group_category_id')}/groups"
       else
         "/api/v1/groups/#{@id}"
+
+    isFull: ->
+      limit = @collection?.category?.get 'group_limit'
+      limit and @get('members_count') >= limit
+
+    isLocked: ->
+      @collection?.category?.isLocked()
+
+    toJSON: ->
+      json = super
+      json.isFull = @isFull()
+      json

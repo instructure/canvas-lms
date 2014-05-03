@@ -1,4 +1,4 @@
-<% fields_for :settings, OpenObject.new(settings) do |f| %>
+<%= fields_for :settings, OpenObject.new(settings) do |f| %>
   <table style="width: 500px;" class="formtable">
     <tr>
       <td colspan="2"><%= mt(:description, <<-TEXT, :site_url => raw('<span class="nobr">https://&lt; ' + t(:domain_name, 'domain') + ' &gt;/</span>'), :canvas_url => raw('<span class="nobr">https://&lt; ' + t(:domain_name, 'domain') + ' &gt;/facebook</span>'), :facebook_url => "http://www.facebook.com/developers")
@@ -61,20 +61,4 @@ TEXT
       </td>
     </tr>
   </table>
-<% end %>
-<% js_block do %>
-<script>
-require([
-  'jquery' /* $ */
-], function($) {
-
-$(document).ready(function() {
-  $(".facebook_setup_link").click(function(event) {
-    event.preventDefault();
-    $("#facebook_setup").slideToggle();
-  });
-});
-
-});
-</script>
 <% end %>

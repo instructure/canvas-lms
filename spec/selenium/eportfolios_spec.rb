@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "eportfolios" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   def create_eportfolio(is_public = false)
     get "/dashboard/eportfolios"
@@ -83,18 +83,28 @@ describe "eportfolios" do
 
     it "should have a working flickr search dialog" do
       get "/eportfolios/#{@eportfolio.id}"
-      edit_link = keep_trying_until do
-        f("#page_list a.page_url").click
-        f("#page_sidebar .edit_content_link")
-      end
-      edit_link.click
+      f("#page_list a.page_url").click
+      keep_trying_until {
+        f("#page_list a.page_url").should be_displayed
+      }
+      f("#page_sidebar .edit_content_link").click
+      keep_trying_until {
+        f('.add_content_link.add_rich_content_link').should be_displayed
+      }
       f('.add_content_link.add_rich_content_link').click
       wait_for_tiny(f('textarea.edit_section'))
+      keep_trying_until {
+        f('a.mce_instructure_image').should be_displayed
+      }
       f('a.mce_instructure_image').click
+      keep_trying_until {
+        f('a[href="#tabFlickr"]').should be_displayed
+      }
       f('a[href="#tabFlickr"]').click
-      f('form.FindFlickrImageView').should be_displayed
+      keep_trying_until {
+        f('form.FindFlickrImageView').should be_displayed
+      }
     end
-
 
     it "should not have new section option when adding submission" do
       @assignment = @course.assignments.create!(:title => "hardest assignment ever", :submission_types => "online_url,online_upload")
@@ -113,9 +123,11 @@ describe "eportfolios" do
       wait_for_ajax_requests
       f(".delete_eportfolio_link").click
       submit_form("#delete_eportfolio_form")
-      f("#wrapper-container .eportfolios").click
-      f("#whats_an_eportfolio .add_eportfolio_link").should be_displayed
-      fj("#portfolio_#{@eportfolio.id}").should be_nil
+      fj("#wrapper-container .eportfolios").click
+      keep_trying_until {
+        f("#whats_an_eportfolio .add_eportfolio_link").should be_displayed
+        f("#portfolio_#{@eportfolio.id}").should be_nil
+      }
       Eportfolio.first.workflow_state.should == 'deleted'
     end
 
@@ -212,7 +224,7 @@ describe "eportfolios" do
           f(".edit_content_link").click
           hover_and_click("#page_section_1 .delete_page_section_link")
           try_to_close_modal
-          sleep 1
+          wait_for_ajaximations
           submit_form(".form_content")
           wait_for_ajaximations
           @eportfolio.eportfolio_entries.first.content[0].should == "No Content Added Yet"
@@ -232,7 +244,8 @@ describe "eportfolios" do
 
       it "should add a course submission" do
         f(".add_submission_link").click
-        f(".submission_list").should include_text(@assignment.title)
+        wait_for_ajaximations
+        keep_trying_until { f(".submission_list").should include_text(@assignment.title) }
         f(".select_submission_button").click
         submit_form(".form_content")
       end
@@ -264,7 +277,7 @@ describe "eportfolios" do
 end
 
 describe "eportfolios file upload" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   before (:each) do
     @password = "asdfasdf"

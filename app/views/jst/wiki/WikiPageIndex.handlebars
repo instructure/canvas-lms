@@ -15,22 +15,16 @@
 <div class="index-content-container">
   <div class="index-content">
     <table class="table" role="grid">
-      <thead><tr role="row" class="header-row">
-        <th width="{{#if CAN.MANAGE}}{{#if CAN.PUBLISH}}52%{{else}}56%{{/if}}{{else}}60%{{/if}}" role="columnheader" aria-label="{{#t 'headers.page_title'}}Page title{{/t}}">
+      <thead><tr class="header-row" role="row">
+        <th width="{{#if CAN.MANAGE}}{{#if CAN.PUBLISH}}52%{{else}}56%{{/if}}{{else}}60%{{/if}}" role="columnheader">
           <a href="#" data-sort-field="title" tabindex="0" role="button" class="sort-field">{{#t 'headers.page_title'}}Page title{{/t}} <i></i></a>
         </th>
-        <th width="20%" role="columnheader" aria-label="{{#t 'headers.creation_date'}}Creation date{{/t}}">
+        <th width="20%" role="columnheader">
           <a href="#" data-sort-field="created_at" tabindex="0" role="button" class="sort-field">{{#t 'headers.creation_date'}}Creation date{{/t}} <i></i></a>
         </th>
-        <th width="20%" role="columnheader" aria-label="{{#t 'headers.last_edit'}}Last edit{{/t}}">
+        <th width="20%" role="columnheader">
           <a href="#" data-sort-field="updated_at" tabindex="0" role="button" class="sort-field">{{#t 'headers.last_edit'}}Last edit{{/t}} <i></i></a>
         </th>
-        {{#if CAN.MANAGE}}
-          {{#if CAN.PUBLISH}}
-            <th width="4%" role="columnheader"><span class="screenreader-only">{{#t 'headers.published'}}Published{{/t}}</span></th>
-          {{/if}}
-          <th width="4%" role="columnheader"><span class="screenreader-only">{{#t 'headers.settings'}}Settings{{/t}}</span></th>
-        {{/if}}
       </tr></thead>
       <tbody class="collectionViewItems">
         {{#if fetched}}

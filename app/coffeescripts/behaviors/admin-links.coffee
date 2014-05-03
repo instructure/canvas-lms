@@ -9,5 +9,7 @@ define [
     $trigger = $(this)
     return if $trigger.data('kyleMenu')
     opts = $.extend {noButton: true}, $trigger.data('kyleMenuOptions')
+    opts.appendMenuTo = 'body' if $trigger.data('append-to-body')
     new KyleMenu($trigger, opts)
+
     $trigger.trigger(event)

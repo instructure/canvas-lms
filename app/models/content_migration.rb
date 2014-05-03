@@ -376,7 +376,7 @@ class ContentMigration < ActiveRecord::Base
 
     begin
       @exported_data_zip = download_exported_data
-      @zip_file = Zip::ZipFile.open(@exported_data_zip.path)
+      @zip_file = Zip::File.open(@exported_data_zip.path)
       @exported_data_zip.close
       data = JSON.parse(@zip_file.read('course_export.json'), :max_nesting => 50)
       data = prepare_data(data)

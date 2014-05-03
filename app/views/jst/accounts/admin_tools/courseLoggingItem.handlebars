@@ -1,0 +1,17 @@
+<td>
+  {{tDateToString created_at "medium"}}
+</td>
+<td>
+  {{tTimeToString created_at "tiny"}}
+</td>
+<td>
+  {{user.name}}
+</td>
+<td>
+  {{event_type_present}}
+</td>
+<td class="courseLoggingDetails">
+  <a href="#" data-id="{{id}}">
+  {{#t "view_event_details"}}View Details{{/t}}
+  </a>
+</td>

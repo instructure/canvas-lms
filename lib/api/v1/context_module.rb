@@ -27,7 +27,8 @@ module Api::V1::ContextModule
   # optionally pass progression to include 'state', 'completed_at'
   def module_json(context_module, current_user, session, progression = nil, includes = [], opts = {})
     hash = api_json(context_module, current_user, session, :only => MODULE_JSON_ATTRS)
-    hash['require_sequential_progress'] = !!context_module.require_sequential_progress
+    hash['require_sequential_progress'] = !!context_module.require_sequential_progress?
+    hash['publish_final_grade'] = context_module.publish_final_grade?
     hash['prerequisite_module_ids'] = context_module.prerequisites.reject{|p| p[:type] != 'context_module'}.map{|p| p[:id]}
     if progression
       hash['state'] = progression.workflow_state
@@ -39,7 +40,7 @@ module Api::V1::ContextModule
     count = tags.count
     hash['items_count'] = count
     hash['items_url'] = polymorphic_url([:api_v1, context_module.context, context_module, :items])
-    if includes.include?('items') && count <= Setting.get_cached('api_max_per_page', '50').to_i
+    if includes.include?('items') && count <= Setting.get('api_max_per_page', '50').to_i
       if opts[:search_term].present? && !context_module.matches_attribute?(:name, opts[:search_term])
         tags = ContentTag.search_by_attribute(tags, :title, opts[:search_term])
         return nil if tags.count == 0
@@ -66,8 +67,13 @@ module Api::V1::ContextModule
     unless content_tag.content_type == 'ContextModuleSubHeader'
       hash['html_url'] = case content_tag.content_type
         when 'ExternalUrl'
-          # API prefers to redirect to the external page, rather than host in an iframe
-          api_v1_course_context_module_item_redirect_url(:id => content_tag.id)
+          if value_to_boolean(request.params[:frame_external_urls])
+            # canvas UI wants external links hosted in iframe
+            course_context_modules_item_redirect_url(:id => content_tag.id)
+          else
+            # API prefers to redirect to the external page, rather than host in an iframe
+            api_v1_course_context_module_item_redirect_url(:id => content_tag.id)
+          end
         else
           # otherwise we'll link to the same thing the web UI does
           course_context_modules_item_redirect_url(:id => content_tag.id)
@@ -88,7 +94,9 @@ module Api::V1::ContextModule
     api_url = nil
     case content_tag.content_type
       # course context
-      when 'Assignment', 'WikiPage', 'DiscussionTopic', 'Quiz'
+      when *Quizzes::Quiz.class_names
+        api_url = api_v1_course_quiz_url(context_module.context, content_tag.content)
+      when 'Assignment', 'WikiPage', 'DiscussionTopic'
         api_url = polymorphic_url([:api_v1, context_module.context, content_tag.content])
       # no context
       when 'Attachment'

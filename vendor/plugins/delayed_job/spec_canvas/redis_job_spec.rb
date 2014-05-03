@@ -19,7 +19,7 @@ describe 'Delayed::Backend::Redis::Job' do
     Delayed::Job.redis.flushdb
   end
 
-  it_should_behave_like 'a delayed_jobs implementation'
+  include_examples 'a delayed_jobs implementation'
 
   describe "tickle_strand" do
     it "should continue trying to tickle until the strand is empty" do
@@ -73,7 +73,7 @@ describe 'Delayed::Backend::Redis::Job' do
       job = "string".send_later :reverse
       job.should be_nil
       Delayed::Job.jobs_count(:current).should == before_count
-      Delayed::Job.connection.run_transaction_commit_callbacks
+      ActiveRecord::Base.connection.run_transaction_commit_callbacks
       Delayed::Job.jobs_count(:current) == before_count + 1
     end
   end

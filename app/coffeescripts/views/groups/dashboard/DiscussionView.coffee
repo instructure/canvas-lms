@@ -1,6 +1,7 @@
 define [
+  'jquery'
   'compiled/views/QuickStartBar/AnnouncementView'
-], (BaseAnnouncementView) ->
+], ($, BaseAnnouncementView) ->
 
   class AnnouncementView extends BaseAnnouncementView
     

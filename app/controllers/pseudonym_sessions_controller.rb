@@ -24,7 +24,7 @@ class PseudonymSessionsController < ApplicationController
   skip_before_filter :require_reacceptance_of_terms
 
   def new
-    if @current_user && !params[:re_login] && !params[:confirm] && !params[:expected_user_id] && !session[:used_remember_me_token]
+    if @current_user && !params[:force_login] && !params[:confirm] && !params[:expected_user_id] && !session[:used_remember_me_token]
       redirect_to dashboard_url
       return
     end
@@ -120,7 +120,7 @@ class PseudonymSessionsController < ApplicationController
       @login_handle_name = @domain_root_account.login_handle_name rescue AccountAuthorizationConfig.default_login_handle_name
       @login_handle_is_email = @login_handle_name == AccountAuthorizationConfig.default_login_handle_name
       js_env(
-        :GOOGLE_ANALYTICS_KEY => Setting.get_cached('google_analytics_key', nil),
+        :GOOGLE_ANALYTICS_KEY => Setting.get('google_analytics_key', nil),
         :RESET_SENT =>  t("password_confirmation_sent", "Password confirmation sent. Make sure you check your spam box."),
         :RESET_ERROR =>  t("password_confirmation_error", "Error sending request.")
       )
@@ -202,6 +202,7 @@ class PseudonymSessionsController < ApplicationController
     message = session[:delegated_message]
 
     if @domain_root_account.saml_authentication? and session[:saml_unique_id]
+      increment_saml_stat("logout_attempt")
       # logout at the saml identity provider
       # once logged out it'll be redirected to here again
       if aac = @domain_root_account.account_authorization_configs.find_by_id(session[:saml_aac_id])
@@ -274,6 +275,7 @@ class PseudonymSessionsController < ApplicationController
         logger.info "SAMLResponse[#{idx+1}/#{chunks.length}] #{chunk}"
       end
 
+      increment_saml_stat('login_response_received')
       response = saml_response(params[:SAMLResponse])
 
       if @domain_root_account.account_authorization_configs.count > 1
@@ -342,6 +344,7 @@ class PseudonymSessionsController < ApplicationController
               aac.debug_set(:login_to_canvas_success, 'true')
               aac.debug_set(:logged_in_user_id, @user.id)
             end
+            increment_saml_stat("normal.login_success")
 
             session[:saml_unique_id] = unique_id
             session[:name_id] = response.name_id
@@ -352,6 +355,7 @@ class PseudonymSessionsController < ApplicationController
 
             successful_login(@user, @pseudonym)
           else
+            increment_saml_stat("errors.unknown_user")
             message = "Received SAML login request for unknown user: #{unique_id}"
             logger.warn message
             aac.debug_set(:canvas_login_fail_message, message) if debugging
@@ -360,24 +364,28 @@ class PseudonymSessionsController < ApplicationController
             redirect_to :action => :destroy
           end
         elsif response.auth_failure?
+          increment_saml_stat("normal.login_failure")
           message = "Failed to log in correctly at IdP"
           logger.warn message
           aac.debug_set(:canvas_login_fail_message, message) if debugging
           flash[:delegated_message] = login_error_message
           redirect_to login_url(:no_auto=>'true')
         elsif response.no_authn_context?
+          increment_saml_stat("errors.no_authn_context")
           message = "Attempted SAML login for unsupported authn_context at IdP."
           logger.warn message
           aac.debug_set(:canvas_login_fail_message, message) if debugging
           flash[:delegated_message] = login_error_message
           redirect_to login_url(:no_auto=>'true')
         else
+          increment_saml_stat("errors.unexpected_response_status")
           message = "Unexpected SAML status code - status code: #{response.status_code rescue ""} - Status Message: #{response.status_message rescue ""}"
           logger.warn message
           aac.debug_set(:canvas_login_fail_message, message) if debugging
           redirect_to login_url(:no_auto=>'true')
         end
       else
+        increment_saml_stat("errors.invalid_response")
         if debugging
           aac.debug_set(:is_valid_login_response, 'false')
           aac.debug_set(:login_response_validation_error, response.validation_error)
@@ -402,6 +410,7 @@ class PseudonymSessionsController < ApplicationController
 
   def saml_logout
     if @domain_root_account.account_authorization_configs.any? { |aac| aac.saml_authentication? } && params[:SAMLResponse]
+      increment_saml_stat("logout_response_received")
       response = saml_logout_response(params[:SAMLResponse])
       if  aac = @domain_root_account.account_authorization_configs.find_by_idp_entity_id(response.issuer)
         settings = aac.saml_settings(request.host_with_port)
@@ -446,11 +455,11 @@ class PseudonymSessionsController < ApplicationController
   end
 
   def otp_remember_me_cookie_domain
-    ActionController::Base.session_options[:domain]
+    CANVAS_RAILS2 ? ActionController::Base.session_options[:domain] : CanvasRails::Application.config.session_options[:domain]
   end
 
   def otp_login(send_otp = false)
-    if !@current_user.otp_secret_key || request.method == :get
+    if !@current_user.otp_secret_key || request.get?
       session[:pending_otp_secret_key] ||= ROTP::Base32.random_base32
     end
     if session[:pending_otp_secret_key] && params[:otp_login].try(:[], :otp_communication_channel_id)
@@ -502,12 +511,12 @@ class PseudonymSessionsController < ApplicationController
 
       if params[:otp_login][:remember_me] == '1'
         now = Time.now.utc
-        self.cookies['canvas_otp_remember_me'] = {
+        cookies['canvas_otp_remember_me'] = {
               :value => @current_user.otp_secret_key_remember_me_cookie(now),
               :expires => now + 30.days,
               :domain => otp_remember_me_cookie_domain,
               :httponly => true,
-              :secure => ActionController::Base.session_options[:secure],
+              :secure => CANVAS_RAILS2 ? ActionController::Base.session_options[:secure] : CanvasRails::Application.config.session_options[:secure],
               :path => '/login'
             }
       end
@@ -547,7 +556,7 @@ class PseudonymSessionsController < ApplicationController
     otp_passed ||= cookies['canvas_otp_remember_me'] &&
         @current_user.validate_otp_secret_key_remember_me_cookie(cookies['canvas_otp_remember_me'])
     if !otp_passed
-      mfa_settings = @current_pseudonym.mfa_settings
+      mfa_settings = @current_user.mfa_settings
       if (@current_user.otp_secret_key && mfa_settings == :optional) ||
           mfa_settings == :required
         session[:pending_otp] = true
@@ -558,8 +567,9 @@ class PseudonymSessionsController < ApplicationController
     session[:require_terms] = true if @domain_root_account.require_acceptance_of_terms?(@current_user)
 
     respond_to do |format|
-      if session[:oauth2]
-        return redirect_to(oauth2_auth_confirm_url)
+      if oauth = session[:oauth2]
+        provider = Canvas::Oauth::Provider.new(oauth[:client_id], oauth[:redirect_uri], oauth[:scopes], oauth[:purpose])
+        return oauth2_confirmation_redirect(provider)
       elsif session[:course_uuid] && user && (course = Course.find_by_uuid_and_workflow_state(session[:course_uuid], "created"))
         claim_session_course(course, user)
         format.html { redirect_to(course_url(course, :login_success => '1')) }
@@ -584,7 +594,6 @@ class PseudonymSessionsController < ApplicationController
           redirect_to login_url
         else
           @errored = true
-          @pre_registered = @user if @user && !@user.registered?
           @headers = false
           maybe_render_mobile_login :bad_request
         end
@@ -613,29 +622,25 @@ class PseudonymSessionsController < ApplicationController
     scopes =  params[:scopes].split(',') if params.key? :scopes
     scopes ||= []
 
-    provider = Canvas::Oauth::Provider.new(params[:client_id], params[:redirect_uri], scopes)
+    provider = Canvas::Oauth::Provider.new(params[:client_id], params[:redirect_uri], scopes, params[:purpose])
 
     return render(:status => 400, :json => { :message => "invalid client_id" }) unless provider.has_valid_key?
     return render(:status => 400, :json => { :message => "invalid redirect_uri" }) unless provider.has_valid_redirect?
     session[:oauth2] = provider.session_hash
     session[:oauth2][:state] = params[:state] if params.key?(:state)
 
-    if @current_pseudonym
-      if provider.authorized_token? @current_user
-        final_oauth2_redirect(session[:oauth2][:redirect_uri], final_oauth2_redirect_params)
-      elsif
-        redirect_to oauth2_auth_confirm_url
-      end
+    if @current_pseudonym && !params[:force_login]
+      oauth2_confirmation_redirect(provider)
     else
-      redirect_to login_url(:canvas_login => params[:canvas_login])
+      redirect_to login_url(params.slice(:canvas_login, :pseudonym_session, :force_login))
     end
   end
 
   def oauth2_confirm
-    @provider = Canvas::Oauth::Provider.new(session[:oauth2][:client_id], session[:oauth2][:redirect_uri], session[:oauth2][:scopes])
+    @provider = Canvas::Oauth::Provider.new(session[:oauth2][:client_id], session[:oauth2][:redirect_uri], session[:oauth2][:scopes], session[:oauth2][:purpose])
 
     if mobile_device?
-      js_env :GOOGLE_ANALYTICS_KEY => Setting.get_cached('google_analytics_key', nil)
+      js_env :GOOGLE_ANALYTICS_KEY => Setting.get('google_analytics_key', nil)
       render :layout => 'mobile_auth', :action => 'oauth2_confirm_mobile'
     end
   end
@@ -651,7 +656,11 @@ class PseudonymSessionsController < ApplicationController
   end
 
   def oauth2_token
-    basic_user, basic_pass = ActionController::HttpAuthentication::Basic.user_name_and_password(request) if ActionController::HttpAuthentication::Basic.authorization(request)
+    if CANVAS_RAILS2
+      basic_user, basic_pass = ActionController::HttpAuthentication::Basic.user_name_and_password(request) if ActionController::HttpAuthentication::Basic.authorization(request)
+    else
+      basic_user, basic_pass = ActionController::HttpAuthentication::Basic.user_name_and_password(request) if request.authorization
+    end
 
     client_id = params[:client_id].presence || basic_user
     secret = params[:client_secret].presence || basic_pass
@@ -669,13 +678,23 @@ class PseudonymSessionsController < ApplicationController
   end
 
   def oauth2_logout
+    logout_current_user if params[:expire_sessions]
     return render :json => { :message => "can't delete OAuth access token when not using an OAuth access token" }, :status => 400 unless @access_token
     @access_token.destroy
     render :json => {}
   end
 
+  def oauth2_confirmation_redirect(provider)
+    # skip the confirmation page if access is already (or automatically) granted
+    if provider.authorized_token?(@current_user)
+      final_oauth2_redirect(session[:oauth2][:redirect_uri], final_oauth2_redirect_params)
+    else
+      redirect_to oauth2_auth_confirm_url
+    end
+  end
+
   def final_oauth2_redirect_params(options = {})
-    options = {:scopes => session[:oauth2][:scopes], :remember_access => options[:remember_access]}
+    options = {:scopes => session[:oauth2][:scopes], :remember_access => options[:remember_access], :purpose => session[:oauth2][:purpose]}
     code = Canvas::Oauth::Token.generate_code_for(@current_user.global_id, session[:oauth2][:client_id], options)
     redirect_params = { :code => code }
   end

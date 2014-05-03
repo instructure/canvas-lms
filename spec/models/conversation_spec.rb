@@ -231,11 +231,11 @@ describe Conversation do
       end
     end
 
-    it_should_behave_like "message counts"
+    include_examples "message counts"
 
     context "sharding" do
       specs_require_sharding
-      it_should_behave_like "message counts"
+      include_examples "message counts"
     end
   end
 
@@ -318,10 +318,10 @@ describe Conversation do
       end
     end
 
-    it_should_behave_like "unread counts"
+    include_examples "unread counts"
     context "sharding" do
       specs_require_sharding
-      it_should_behave_like "unread counts"
+      include_examples "unread counts"
     end
   end
 
@@ -1124,44 +1124,44 @@ describe Conversation do
       context "matching shards" do
         it "user from another shard participating in both conversations" do
           merge_and_check(@sender, @conversation1, @conversation2, @user2, @user2)
-          @conversation2.associated_shards.should == [Shard.default, @shard1]
+          @conversation2.associated_shards.sort_by(&:id).should == [Shard.default, @shard1].sort_by(&:id)
         end
 
         it "user from another shard participating in source conversation only" do
           merge_and_check(@sender, @conversation1, @conversation2, @user2, nil)
-          @conversation2.associated_shards.should == [Shard.default, @shard1]
+          @conversation2.associated_shards.sort_by(&:id).should == [Shard.default, @shard1].sort_by(&:id)
         end
       end
 
       context "differing shards" do
         it "user from source shard participating in both conversations" do
           merge_and_check(@sender, @conversation1, @conversation3, @user1, @user1)
-          @conversation3.associated_shards.should == [@shard1, Shard.default]
+          @conversation3.associated_shards.sort_by(&:id).should == [@shard1, Shard.default].sort_by(&:id)
         end
 
         it "user from destination shard participating in both conversations" do
           merge_and_check(@sender, @conversation1, @conversation3, @user2, @user2)
-          @conversation3.associated_shards.should == [@shard1, Shard.default]
+          @conversation3.associated_shards.sort_by(&:id).should == [@shard1, Shard.default].sort_by(&:id)
         end
 
         it "user from third shard participating in both conversations" do
           merge_and_check(@sender, @conversation1, @conversation3, @user3, @user3)
-          @conversation3.associated_shards.sort_by(&:id).should == [Shard.default, @shard1, @shard2]
+          @conversation3.associated_shards.sort_by(&:id).should == [Shard.default, @shard1, @shard2].sort_by(&:id)
         end
 
         it "user from source shard participating in source conversation only" do
           merge_and_check(@sender, @conversation1, @conversation3, @user1, nil)
-          @conversation3.associated_shards.should == [@shard1, Shard.default]
+          @conversation3.associated_shards.sort_by(&:id).should == [@shard1, Shard.default].sort_by(&:id)
         end
 
         it "user from destination shard participating in source conversation only" do
           merge_and_check(@sender, @conversation1, @conversation3, @user2, nil)
-          @conversation3.associated_shards.should == [@shard1, Shard.default]
+          @conversation3.associated_shards.sort_by(&:id).should == [@shard1, Shard.default].sort_by(&:id)
         end
 
         it "user from third shard participating in source conversation only" do
           merge_and_check(@sender, @conversation1, @conversation3, @user3, nil)
-          @conversation3.associated_shards.sort_by(&:id).should == [Shard.default, @shard1, @shard2]
+          @conversation3.associated_shards.sort_by(&:id).should == [Shard.default, @shard1, @shard2].sort_by(&:id)
         end
       end
     end

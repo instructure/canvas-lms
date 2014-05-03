@@ -2,8 +2,8 @@
 
 <% content_for :right_side do %>
   <div class="rs-margin-lr rs-margin-top">
-    <% if @context.allow_student_organized_groups %>
-      <% if can_do(@context.groups.new, @current_user, :create) %>
+    <% if @context.respond_to?(:allow_student_organized_groups) && @context.allow_student_organized_groups %>
+      <% if can_do(@context.groups.scoped.new, @current_user, :create) %>
         <a href="#" class="btn button-sidebar-wide add_group_link icon-add"><%= t 'actions.add', 'Start a New Group' %></a>
       <% end %>
     <% else %>
@@ -38,7 +38,7 @@ TEXT
   </ul>
 <% end %>
 
-<% form_for :group, :url => context_url(@context, :context_groups_url), :html => {:id => "add_group_form", :style => "display: none;"} do |f| %>
+<%= form_for :group, :url => context_url(@context, :context_groups_url), :html => {:id => "add_group_form", :style => "display: none;"} do |f| %>
 <h2><%= t 'headings.new_group', 'Make a New Group' %></h2>
 <%= image_tag "warning.png" %>
 <%= t :student_group_warning, <<-TEXT

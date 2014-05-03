@@ -25,7 +25,7 @@ class ExternalStatuses
   class <<self
 
     def possible_external_statuses
-      if Setting.get_cached("support_multiple_account_types", "true") == "true"
+      if Setting.get("support_multiple_account_types", "true") == "true"
         ALL_POSSIBLE_EXTERNAL_STATUSES
       else
         [DEFAULT_EXTERNAL_STATUS]

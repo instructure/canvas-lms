@@ -2,10 +2,12 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/manage_groups_common
 require 'thread'
 
 describe "manage groups students" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   before (:each) do
     course_with_teacher_logged_in
+    Account.default.settings[:enable_manage_groups2] = false
+    Account.default.save!
   end
 
   context "misc" do
@@ -275,6 +277,7 @@ describe "manage groups students" do
       confirm_dialog = driver.switch_to.alert
       confirm_dialog.accept
       ff(".left_side .group").should be_empty
+      wait_for_ajaximations
       @course.group_categories.all.count.should == 0
     end
 
@@ -381,7 +384,11 @@ describe "manage groups students" do
       loading = fj("#category_#{@category.id} .group_blank .loading_members:visible")
       loading.text.should == 'Assigning Students...'
       lock.unlock
-      GroupsController.filter_chain.pop
+      if CANVAS_RAILS2
+        GroupsController.filter_chain.pop
+      else
+        UsersController._process_action_callbacks.pop
+      end
       # make sure we wait before moving on
       wait_for_ajax_requests
     end

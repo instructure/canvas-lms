@@ -1,4 +1,4 @@
-<% fields_for :settings, OpenObject.new(settings) do |f| %>
+<%= fields_for :settings, OpenObject.new(settings) do |f| %>
   <table style="width: 500px;" class="formtable">
     <tr>
       <td colspan="2"><%= mt(:description, <<-TEXT, :scribd_url => 'http://www.scribd.com/developers')
@@ -18,6 +18,11 @@ TEXT
       <td><%= f.blabel :secret_key, :en => "API secret" %></td>
       <td>
         <%= f.text_field :secret_key %>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2">
+        <%= f.check_box :enable_html5_viewer %> <%= f.label :enable_html5_viewer, :en => "Enable HTML5 Document Viewer" %>
       </td>
     </tr>
   </table>

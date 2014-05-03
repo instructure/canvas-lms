@@ -1,6 +1,6 @@
 <div class="row-fluid message-info">
-	<div class="span8 user-info">
-		<img src="{{author.avatar_url}}" alt="" class="avatar pull-left" />
+  <div class="span8 user-info">
+    {{>avatar author}}
     <div class="message-author-and-participants">
       <b class="username">{{author.name}}</b>{{#if participants.length}},{{/if}}
 

@@ -1,6 +1,10 @@
 require 'uri'
 require 'open-uri'
 
+# need the plugin to be registered
+require 'canvas/plugins/default_plugins'
+ScribdAPI.initialize rescue nil # the db may not exist yet
+
 module Scribd
   class Document
     

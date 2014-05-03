@@ -22,6 +22,7 @@ describe AccountsController do
 
   context "SAML meta data" do
     before(:each) do
+      pending("requires SAML extension") unless AccountAuthorizationConfig.saml_enabled
       Setting.set_config('saml', {
               :tech_contact_name => nil,
               :tech_contact_email => nil

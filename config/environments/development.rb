@@ -10,12 +10,11 @@ environment_configuration(defined?(config) && config) do |config|
   config.whiny_nils = true
 
   # Show full error reports and disable caching
-  if Rails.version < "3.0"
+  if CANVAS_RAILS2
     config.action_controller.consider_all_requests_local = true
   else
     config.consider_all_requests_local = true
   end
-  config.action_view.debug_rjs             = true
   config.action_controller.perform_caching = false
 
   # run rake js:build to build the optimized JS if set to true
@@ -24,27 +23,28 @@ environment_configuration(defined?(config) && config) do |config|
   # Really do care if the message wasn't sent.
   config.action_mailer.raise_delivery_errors = true
 
-  # initialize cache store
-  # this needs to happen in each environment config file, rather than a
-  # config/initializer/* file, to allow Rails' full initialization of the cache
-  # to take place, including middleware inserts and such.
-  require_dependency 'canvas'
-  config.cache_store = Canvas.cache_store_config
+  # initialize cache store. has to eval, not just require, so that it has
+  # access to config.
+  eval(File.new(File.dirname(__FILE__) + "/cache_store.rb").read)
 
   # eval <env>-local.rb if it exists
   Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read) }
 
   # allow debugging only in development environment by default
-  # ruby-debug is currently broken in 1.9.3
   #
   # Option to DISABLE_RUBY_DEBUGGING is helpful IDE-based debugging.
   # The ruby debug gems conflict with the IDE-based debugger gem.
   # Set this option in your dev environment to disable.
   unless ENV['DISABLE_RUBY_DEBUGGING']
-    require "debugger"
+    if RUBY_VERSION >= '2.0.0'
+      require 'byebug'
+      Kernel.send(:alias_method, :debugger, :byebug)
+    else
+      require "debugger"
+    end
   end
 
-  if Rails.version < "3.0"
+  if CANVAS_RAILS2
     config.to_prepare do
       # Raise an exception on bad mass assignment. Helps us catch these bugs before
       # they hit.

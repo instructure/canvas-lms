@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe "Outcome Groups API", :type => :integration do
+describe "Outcome Groups API", type: :request do
   before :each do
     Pseudonym.any_instance.stubs(:works_for_account?).returns(true)
     user_with_pseudonym(:active_all => true)
@@ -48,7 +48,7 @@ describe "Outcome Groups API", :type => :integration do
                      :controller => 'outcome_groups_api',
                      :action => 'redirect',
                      :format => 'json')
-        response.status.to_i.should == 302
+        assert_status(302)
       end
 
       it "should require a user" do
@@ -57,7 +57,7 @@ describe "Outcome Groups API", :type => :integration do
                      :controller => 'outcome_groups_api',
                      :action => 'redirect',
                      :format => 'json')
-        response.status.to_i.should == 401
+        assert_status(401)
       end
 
       it "should redirect to the root global group" do
@@ -66,7 +66,7 @@ describe "Outcome Groups API", :type => :integration do
                      :controller => 'outcome_groups_api',
                      :action => 'redirect',
                      :format => 'json')
-        response.status.to_i.should == 302
+        assert_status(302)
         response.location.should == polymorphic_url([:api_v1, :global, :outcome_group], :id => root.id)
       end
 
@@ -96,7 +96,7 @@ describe "Outcome Groups API", :type => :integration do
                      :action => 'redirect',
                      :account_id => @account.id.to_s,
                      :format => 'json')
-        response.status.to_i.should == 302
+        assert_status(302)
       end
 
       it "should require read permission to read" do
@@ -107,7 +107,7 @@ describe "Outcome Groups API", :type => :integration do
                      :action => 'redirect',
                      :account_id => @account.id.to_s,
                      :format => 'json')
-        response.status.to_i.should == 401
+        assert_status(401)
       end
 
       it "should redirect to the root group" do
@@ -117,7 +117,7 @@ describe "Outcome Groups API", :type => :integration do
                      :action => 'redirect',
                      :account_id => @account.id.to_s,
                      :format => 'json')
-        response.status.to_i.should == 302
+        assert_status(302)
         response.location.should == polymorphic_url([:api_v1, @account, :outcome_group], :id => root.id)
       end
 
@@ -144,10 +144,53 @@ describe "Outcome Groups API", :type => :integration do
                      :action => 'redirect',
                      :course_id => @course.id.to_s,
                      :format => 'json')
-        response.status.to_i.should == 302
+        assert_status(302)
         response.location.should == polymorphic_url([:api_v1, @course, :outcome_group], :id => root.id)
       end
     end
+  end
+
+  describe "index" do
+    before :each do
+      @account = Account.default
+      @account_user = @user.account_users.create(:account => @account)
+    end
+
+    it "should return active groups" do
+      @child_group = @account.root_outcome_group.child_outcome_groups.create!(title: 'child group')
+      @deleted_group = @account.root_outcome_group.child_outcome_groups.create!(title: 'deleted group')
+      @deleted_group.workflow_state = 'deleted'
+      @deleted_group.save!
+
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_groups",
+        controller: 'outcome_groups_api', action: 'index', account_id: @account.id, format: 'json')
+      expected_ids = [@account.root_outcome_group, @child_group].map(&:id).sort
+      json.map{|j| j['id']}.sort.should == expected_ids
+    end
+
+  end
+
+  describe "link_index" do
+    before :each do
+      @account = Account.default
+      @account_user = @user.account_users.create(:account => @account)
+      @group = @account.root_outcome_group
+    end
+
+    it "should return active links" do
+      @links = (1..3).map{ create_outcome }
+      link = @links.pop
+      link.workflow_state = 'deleted'
+      link.save!
+
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_group_links",
+        controller: 'outcome_groups_api', action: 'link_index', account_id: @account.id, format: 'json')
+      expected_outcome_ids = @links.map(&:content).map(&:id).sort
+      expected_group_ids = @links.map(&:associated_asset).map(&:id).sort
+      json.map {|j| j['outcome']['id']}.sort.should == expected_outcome_ids
+      json.map {|j| j['outcome_group']['id']}.sort.should == expected_group_ids
+    end
+
   end
 
   describe "show" do
@@ -174,7 +217,7 @@ describe "Outcome Groups API", :type => :integration do
                      :action => 'show',
                      :id => group.id.to_s,
                      :format => 'json')
-        response.status.to_i.should == 404
+        assert_status(404)
       end
 
       it "should 404 for deleted groups" do
@@ -185,7 +228,7 @@ describe "Outcome Groups API", :type => :integration do
                      :action => 'show',
                      :id => group.id.to_s,
                      :format => 'json')
-        response.status.to_i.should == 404
+        assert_status(404)
       end
 
       it "should return the group json" do
@@ -263,7 +306,7 @@ describe "Outcome Groups API", :type => :integration do
                      :account_id => @account.id.to_s,
                      :id => group.id.to_s,
                      :format => 'json')
-        response.status.to_i.should == 404
+        assert_status(404)
       end
 
       it "should include the account in the group json" do
@@ -309,7 +352,7 @@ describe "Outcome Groups API", :type => :integration do
                    :account_id => @account.id.to_s,
                    :id => @group.id.to_s,
                    :format => 'json')
-      response.status.to_i.should == 401
+      assert_status(401)
     end
 
     it "should require manage_global_outcomes permission for global outcomes" do
@@ -322,7 +365,7 @@ describe "Outcome Groups API", :type => :integration do
                    :action => 'update',
                    :id => @group.id.to_s,
                    :format => 'json')
-      response.status.to_i.should == 401
+      assert_status(401)
     end
 
     it "should fail for root groups" do
@@ -333,7 +376,7 @@ describe "Outcome Groups API", :type => :integration do
                    :account_id => @account.id.to_s,
                    :id => @group.id.to_s,
                    :format => 'json')
-      response.status.to_i.should == 400
+      assert_status(400)
     end
 
     it "should allow setting title and description" do
@@ -393,7 +436,7 @@ describe "Outcome Groups API", :type => :integration do
                      :id => @group.id.to_s,
                      :format => 'json' },
                    { :parent_outcome_group_id => child_group.id })
-      response.status.to_i.should == 400
+      assert_status(400)
     end
 
     it "should fail (400) if the update is invalid" do
@@ -406,7 +449,7 @@ describe "Outcome Groups API", :type => :integration do
                  :format => 'json' },
                { :title => "New Title",
                  :description => too_long_description })
-      response.status.to_i.should == 400
+      assert_status(400)
     end
 
     it "should return the updated group json" do
@@ -462,7 +505,7 @@ describe "Outcome Groups API", :type => :integration do
                    :account_id => @account.id.to_s,
                    :id => @group.id.to_s,
                    :format => 'json')
-      response.status.to_i.should == 401
+      assert_status(401)
     end
 
     it "should require manage_global_outcomes permission for global outcomes" do
@@ -475,7 +518,7 @@ describe "Outcome Groups API", :type => :integration do
                    :action => 'destroy',
                    :id => @group.id.to_s,
                    :format => 'json')
-      response.status.to_i.should == 401
+      assert_status(401)
     end
 
     it "should fail for root groups" do
@@ -486,7 +529,7 @@ describe "Outcome Groups API", :type => :integration do
                    :account_id => @account.id.to_s,
                    :id => @group.id.to_s,
                    :format => 'json')
-      response.status.to_i.should == 400
+      assert_status(400)
     end
 
     it "should delete the group" do
@@ -549,7 +592,7 @@ describe "Outcome Groups API", :type => :integration do
                    :account_id => @account.id.to_s,
                    :id => @group.id.to_s,
                    :format => 'json')
-      response.status.to_i.should == 200
+      response.should be_success
     end
 
     it "should return the outcomes linked into the group" do
@@ -660,7 +703,7 @@ describe "Outcome Groups API", :type => :integration do
                    :id => @group.id.to_s,
                    :outcome_id => @outcome.id.to_s,
                    :format => 'json')
-      response.status.to_i.should == 401
+      assert_status(401)
     end
 
     it "should require manage_global_outcomes permission for global groups" do
@@ -673,7 +716,7 @@ describe "Outcome Groups API", :type => :integration do
                    :id => @group.id.to_s,
                    :outcome_id => @outcome.id.to_s,
                    :format => 'json')
-      response.status.to_i.should == 401
+      assert_status(401)
     end
 
     it "should fail if the outcome isn't available to the context" do
@@ -686,7 +729,7 @@ describe "Outcome Groups API", :type => :integration do
                    :id => @group.id.to_s,
                    :outcome_id => @outcome.id.to_s,
                    :format => 'json')
-      response.status.to_i.should == 400
+      assert_status(400)
     end
 
     it "should link the outcome into the group" do
@@ -760,7 +803,7 @@ describe "Outcome Groups API", :type => :integration do
                    { :points => 0, :description => "Does Not Meet Expectations" }
                  ]
                })
-      response.status.to_i.should == 400
+      assert_status(400)
     end
 
     it "should create a new outcome" do
@@ -830,7 +873,7 @@ describe "Outcome Groups API", :type => :integration do
                    :id => @group.id.to_s,
                    :outcome_id => @outcome.id.to_s,
                    :format => 'json')
-      response.status.to_i.should == 401
+      assert_status(401)
     end
 
     it "should require manage_global_outcomes permission for global groups" do
@@ -844,7 +887,7 @@ describe "Outcome Groups API", :type => :integration do
                    :id => @group.id.to_s,
                    :outcome_id => @outcome.id.to_s,
                    :format => 'json')
-      response.status.to_i.should == 401
+      assert_status(401)
     end
 
     it "should 404 if the outcome isn't linked in the group" do
@@ -856,7 +899,7 @@ describe "Outcome Groups API", :type => :integration do
                    :id => @group.id.to_s,
                    :outcome_id => @outcome.id.to_s,
                    :format => 'json')
-      response.status.to_i.should == 404
+      assert_status(404)
     end
 
     it "should fail (400) if this is the last link for an aligned outcome" do
@@ -869,7 +912,7 @@ describe "Outcome Groups API", :type => :integration do
                    :id => @group.id.to_s,
                    :outcome_id => @outcome.id.to_s,
                    :format => 'json')
-      response.status.to_i.should == 400
+      assert_status(400)
       parsed_body = JSON.parse( response.body )
       parsed_body[ 'message' ].should =~ /link is the last link/i
     end
@@ -935,7 +978,7 @@ describe "Outcome Groups API", :type => :integration do
                    :account_id => @account.id.to_s,
                    :id => @group.id.to_s,
                    :format => 'json')
-      response.status.to_i.should == 200
+      response.should be_success
     end
 
     def create_subgroup(opts={})
@@ -1033,7 +1076,7 @@ describe "Outcome Groups API", :type => :integration do
                    :account_id => @account.id.to_s,
                    :id => @group.id.to_s,
                    :format => 'json')
-      response.status.to_i.should == 401
+      assert_status(401)
     end
 
     it "should require manage_global_outcomes permission for global groups" do
@@ -1045,7 +1088,7 @@ describe "Outcome Groups API", :type => :integration do
                    :action => 'create',
                    :id => @group.id.to_s,
                    :format => 'json')
-      response.status.to_i.should == 401
+      assert_status(401)
     end
 
     it "should create a new outcome group" do
@@ -1122,7 +1165,7 @@ describe "Outcome Groups API", :type => :integration do
                      :id => @target_group.id.to_s,
                      :format => 'json' },
                    { :source_outcome_group_id => @source_group.id.to_s })
-      response.status.to_i.should == 401
+      assert_status(401)
     end
 
     it "should require manage_global_outcomes permission for global groups" do
@@ -1135,7 +1178,7 @@ describe "Outcome Groups API", :type => :integration do
                      :id => @target_group.id.to_s,
                      :format => 'json' },
                    { :source_outcome_group_id => @source_group.id.to_s })
-      response.status.to_i.should == 401
+      assert_status(401)
     end
 
     it "should fail if the source group doesn't exist (or is deleted)" do
@@ -1148,7 +1191,7 @@ describe "Outcome Groups API", :type => :integration do
                      :id => @target_group.id.to_s,
                      :format => 'json' },
                    { :source_outcome_group_id => @source_group.id.to_s })
-      response.status.to_i.should == 400
+      assert_status(400)
     end
 
     it "should fail if the source group isn't available to the context" do
@@ -1161,7 +1204,7 @@ describe "Outcome Groups API", :type => :integration do
                      :id => @target_group.id.to_s,
                      :format => 'json' },
                    { :source_outcome_group_id => @source_group.id.to_s })
-      response.status.to_i.should == 400
+      assert_status(400)
     end
 
     it "should create a new outcome group" do

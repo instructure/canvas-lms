@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -47,6 +47,7 @@ module Api::V1::User
           json.merge! :sis_user_id => sis_pseudonym.sis_user_id,
                       # TODO: don't send sis_login_id; it's garbage data
                       :sis_login_id => sis_pseudonym.unique_id if @domain_root_account.grants_rights?(current_user, :read_sis, :manage_sis).values.any?
+          json[:sis_import_id] = sis_pseudonym.sis_batch_id if @domain_root_account.grants_right?(current_user, session, :manage_sis)
         end
         if pseudonym = (sis_pseudonym || user.find_pseudonym_for_account(@domain_root_account))
           json[:login_id] = pseudonym.unique_id
@@ -68,7 +69,7 @@ module Api::V1::User
       if includes.include?('last_login')
         last_login = user.read_attribute(:last_login)
         if last_login.is_a?(String)
-          Time.use_zone('utc') { last_login = Time.zone.parse(last_login) }
+          Time.use_zone('UTC') { last_login = Time.zone.parse(last_login) }
         end
         json[:last_login] = last_login.try(:iso8601)
       end
@@ -108,6 +109,7 @@ module Api::V1::User
   # optimization hint, currently user only needs to pull pseudonyms from the db
   # if a site admin is making the request or they can manage_students
   def user_json_is_admin?(context = @context, current_user = @current_user)
+    return false if context.nil? || current_user.nil?
     @user_json_is_admin ||= {}
     @user_json_is_admin[[context.class.name, context.id, current_user.id]] ||= (
       if context.is_a?(::UserProfile)
@@ -133,12 +135,19 @@ module Api::V1::User
                               :limit_privileges_to_course_section,
                               :workflow_state,
                               :updated_at,
+                              :created_at,
+                              :start_at,
+                              :end_at,
                               :type]
 
   def enrollment_json(enrollment, user, session, includes = [])
     api_json(enrollment, user, session, :only => API_ENROLLMENT_JSON_OPTS).tap do |json|
       json[:enrollment_state] = json.delete('workflow_state')
       json[:role] = enrollment.role
+      json[:last_activity_at] = enrollment.last_activity_at
+      if enrollment.root_account.grants_right?(user, session, :manage_sis)
+        json[:sis_import_id] = enrollment.sis_batch_id
+      end
       if enrollment.student?
         json[:grades] = {
           :html_url => course_student_grades_url(enrollment.course_id, enrollment.user_id),

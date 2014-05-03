@@ -3,7 +3,7 @@
   <div class="alert_separator"></div>
 <% end %>
 <% alert_counter = '{{id}}' if alert_counter == -1 %>
-<% form_for [@context, alert], :html => { :class => "alert displaying #{'blank' if alert.new_record?}" } do |f| %>
+<%= form_for [@context, alert], :html => { :class => "alert displaying #{'blank' if alert.new_record?}" } do |f| %>
   <div class="links">
     <a href="#" class="displaying edit_link no-hover" title="<%= t('links.title.edit_alert', %{Edit alert}) %>"><i class="icon-edit"></i></a>
     <a href="#" class="delete_link no-hover" title="<%= t('links.title.delete_alert', %{Delete this alert}) %>"><i class="icon-trash"></i></a>

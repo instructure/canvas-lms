@@ -1,5 +1,5 @@
 <div id="add_assignment" style="display: none;">
-  <% form_for :assignment,
+  <%= form_for :assignment,
               :url => context_url(@context, :controller => :assignments, :action => :create),
               :html => { :style => 'display: none;',
                          :id    => 'add_assignment_form',

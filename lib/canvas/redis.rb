@@ -26,13 +26,13 @@ module Canvas::Redis
   end
 
   def self.ignore_redis_failures?
-    Setting.get_cached('ignore_redis_failures', 'true') == 'true'
+    Setting.get('ignore_redis_failures', 'true') == 'true'
   end
 
   def self.redis_failure?(redis_name)
     return false unless last_redis_failure[redis_name]
     # i feel this dangling rescue is justifiable, given the try-to-be-failsafe nature of this code
-    return (Time.now - last_redis_failure[redis_name]) < (Setting.get_cached('redis_failure_time', '300').to_i rescue 300)
+    return (Time.now - last_redis_failure[redis_name]) < (Setting.get('redis_failure_time', '300').to_i rescue 300)
   end
 
   def self.last_redis_failure
@@ -47,8 +47,8 @@ module Canvas::Redis
     return failure_retval if redis_failure?(redis_name)
     yield
   rescue Redis::BaseConnectionError => e
-    Canvas::Statsd.increment("redis.errors.all")
-    Canvas::Statsd.increment("redis.errors.#{Canvas::Statsd.escape(redis_name)}")
+    CanvasStatsd::Statsd.increment("redis.errors.all")
+    CanvasStatsd::Statsd.increment("redis.errors.#{CanvasStatsd::Statsd.escape(redis_name)}")
     Rails.logger.error "Failure handling redis command on #{redis_name}: #{e.inspect}"
     if self.ignore_redis_failures?
       ErrorReport.log_exception(:redis, e)
@@ -74,8 +74,10 @@ module Canvas::Redis
         # for instance, Rails.cache.delete_matched will error out if the 'keys' command returns nil instead of []
         last_command = commands.try(:last)
         failure_val = case (last_command.respond_to?(:first) ? last_command.first : last_command).to_s
-          when 'keys'
+          when 'keys', 'hmget'
             []
+          when 'del'
+            0
           else
             nil
         end

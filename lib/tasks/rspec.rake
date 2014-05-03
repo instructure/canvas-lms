@@ -2,7 +2,11 @@
 unless ARGV.any? { |a| a =~ /\Agems/ }
 
   begin
-    require 'spec/rake/spectask'
+    if CANVAS_RAILS2
+      require 'spec/rake/spectask'
+    else
+      require 'rspec/core/rake_task'
+    end
   rescue MissingSourceFile, LoadError
     module Spec
       module Rake
@@ -35,8 +39,16 @@ unless ARGV.any? { |a| a =~ /\Agems/ }
   task :default => :spec
   task :stats => "spec:statsetup"
 
+  if CANVAS_RAILS2
+    spec_files_attr = :spec_files=
+    klass = Spec::Rake::SpecTask
+  else
+    spec_files_attr = :pattern=
+    klass = RSpec::Core::RakeTask
+  end
+
   desc "Run all specs in spec directory (excluding plugin specs)"
-  Spec::Rake::SpecTask.new(:spec) do |t|
+  klass.new(:spec) do |t|
     # you can also do SPEC_OPTS='-e "test name"' but this is a little easier I
     # suppose.
     if ENV['SINGLE_TEST']
@@ -59,14 +71,14 @@ unless ARGV.any? { |a| a =~ /\Agems/ }
         pid = Process.fork
         unless pid
           child = true
-          t.spec_files = spec_files.map { |x| x[j] }.compact
+          t.send(spec_files_attr, spec_files.map { |x| x[j] }.compact)
           break
         end
         processes << pid
       end
       exit Process.waitall.map(&:last).map(&:exitstatus).count { |x| x != 0 } unless child
     else
-      t.spec_files = spec_files
+      t.send(spec_files_attr, spec_files)
     end
   end
 
@@ -79,42 +91,42 @@ unless ARGV.any? { |a| a =~ /\Agems/ }
     end
 
     desc "Run non-selenium files in a single thread"
-    Spec::Rake::SpecTask.new(:single) do |t|
+    klass.new(:single) do |t|
       require File.expand_path(File.dirname(__FILE__) + '/parallel_exclude')
-      t.spec_files = ParallelExclude::AVAILABLE_FILES
+      t.send(spec_files_attr, ParallelExclude::AVAILABLE_FILES)
     end
 
     desc "Print Specdoc for all specs (excluding plugin specs)"
-    Spec::Rake::SpecTask.new(:doc) do |t|
+    klass.new(:doc) do |t|
       t.spec_opts = ["--format", "specdoc", "--dry-run"]
-      t.spec_files = FileList['spec/**/*/*_spec.rb']
+      t.send(spec_files_attr, FileList['spec/**/*/*_spec.rb'])
     end
 
     desc "Print Specdoc for all plugin examples"
-    Spec::Rake::SpecTask.new(:plugin_doc) do |t|
+    klass.new(:plugin_doc) do |t|
       t.spec_opts = ["--format", "specdoc", "--dry-run"]
-      t.spec_files = FileList['vendor/plugins/**/spec/**/*/*_spec.rb'].exclude('vendor/plugins/rspec/*')
+      t.send(spec_files_attr, FileList['vendor/plugins/**/spec/**/*/*_spec.rb'].exclude('vendor/plugins/rspec/*'))
     end
 
-    [:models, :controllers, :views, :helpers, :lib, :selenium].each do |sub|
+    [:models, :services, :controllers, :views, :helpers, :lib, :selenium].each do |sub|
       desc "Run the code examples in spec/#{sub}"
-      Spec::Rake::SpecTask.new(sub) do |t|
+      klass.new(sub) do |t|
         t.spec_opts = ['--options', "\"#{Rails.root}/spec/spec.opts\""]
-        t.spec_files = FileList["spec/#{sub}/**/*_spec.rb"]
+        t.send(spec_files_attr, FileList["spec/#{sub}/**/*_spec.rb"])
       end
     end
 
     desc "Run the code examples in vendor/plugins (except RSpec's own)"
-    Spec::Rake::SpecTask.new(:coverage) do |t|
+    klass.new(:coverage) do |t|
       t.spec_opts = ['--options', "\"#{Rails.root}/spec/spec.opts\""]
-      t.spec_files = FileList['vendor/plugins/*/spec_canvas/**/*_spec.rb'].exclude('vendor/plugins/*/spec_canvas/selenium/*_spec.rb') + FileList['spec/**/*_spec.rb'].exclude('spec/selenium/**/*_spec.rb')
+      t.send(spec_files_attr, FileList['vendor/plugins/*/spec_canvas/**/*_spec.rb'].exclude('vendor/plugins/*/spec_canvas/selenium/*_spec.rb') + FileList['spec/**/*_spec.rb'].exclude('spec/selenium/**/*_spec.rb'))
     end
 
     namespace :plugins do
       desc "Runs the examples for rspec_on_rails"
-      Spec::Rake::SpecTask.new(:rspec_on_rails) do |t|
+      klass.new(:rspec_on_rails) do |t|
         t.spec_opts = ['--options', "\"#{Rails.root}/spec/spec.opts\""]
-        t.spec_files = FileList['vendor/plugins/rspec-rails/spec/**/*/*_spec.rb']
+        t.send(spec_files_attr, FileList['vendor/plugins/rspec-rails/spec/**/*/*_spec.rb'])
       end
     end
 
@@ -122,12 +134,14 @@ unless ARGV.any? { |a| a =~ /\Agems/ }
     task :statsetup do
       require 'code_statistics'
       ::STATS_DIRECTORIES << %w(Model\ specs spec/models) if File.exist?('spec/models')
+      ::STATS_DIRECTORIES << %w(Service\ specs spec/services) if File.exist?('spec/services')
       ::STATS_DIRECTORIES << %w(View\ specs spec/views) if File.exist?('spec/views')
       ::STATS_DIRECTORIES << %w(Controller\ specs spec/controllers) if File.exist?('spec/controllers')
       ::STATS_DIRECTORIES << %w(Helper\ specs spec/helpers) if File.exist?('spec/helpers')
       ::STATS_DIRECTORIES << %w(Library\ specs spec/lib) if File.exist?('spec/lib')
       ::STATS_DIRECTORIES << %w(Routing\ specs spec/lib) if File.exist?('spec/routing')
       ::CodeStatistics::TEST_TYPES << "Model specs" if File.exist?('spec/models')
+      ::CodeStatistics::TEST_TYPES << "Service specs" if File.exist?('spec/services')
       ::CodeStatistics::TEST_TYPES << "View specs" if File.exist?('spec/views')
       ::CodeStatistics::TEST_TYPES << "Controller specs" if File.exist?('spec/controllers')
       ::CodeStatistics::TEST_TYPES << "Helper specs" if File.exist?('spec/helpers')

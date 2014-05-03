@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'csv'
+
 class MediaObject < ActiveRecord::Base
   include Workflow
   belongs_to :user
@@ -66,17 +68,18 @@ class MediaObject < ActiveRecord::Base
     files = []
     root_account_id = attachments.map{|a| a.root_account_id }.compact.first
     attachments.select{|a| !a.media_object }.each do |attachment|
-      pseudonym = attachment.user.sis_pseudonym_for(attachment.context) if attachment.user
+      pseudonym = attachment.user.sis_pseudonym_for(attachment.context) if attachment.user && attachment.context.respond_to?(:root_account)
       sis_source_id, sis_user_id = "", ""
       if Kaltura::ClientV3.config['kaltura_sis'].present? && Kaltura::ClientV3.config['kaltura_sis'] == "1"
         sis_source_id = %Q[,"sis_source_id":"#{attachment.context.sis_source_id}"] if attachment.context.respond_to?('sis_source_id') && attachment.context.sis_source_id
         sis_user_id = %Q[,"sis_user_id":"#{pseudonym ? pseudonym.sis_user_id : ''}"] if pseudonym
+        context_code = %Q[,"context_code":"#{[attachment.context_type, attachment.context_id].join('_').underscore}"]
       end
       files << {
                   :name       => attachment.display_name,
                   :url        => attachment.cacheable_s3_download_url,
                   :media_type => (attachment.content_type || "").match(/\Avideo/) ? 'video' : 'audio',
-                  :partner_data  => %Q[{"attachment_id":"#{attachment.id}","context_source":"file_upload" #{sis_source_id} #{sis_user_id}}]
+                  :partner_data  => %Q[{"attachment_id":"#{attachment.id}","context_source":"file_upload","root_account_id":"#{attachment.root_account_id}" #{sis_source_id} #{sis_user_id} #{context_code}}]
                }
     end
     res = client.bulkUploadAdd(files)
@@ -142,7 +145,12 @@ class MediaObject < ActiveRecord::Base
       if entry[:originalId].present? && (Integer(entry[:originalId]).is_a?(Integer) rescue false)
         attachment_id = entry[:originalId]
       elsif entry[:originalId].present? && entry[:originalId].length >= 2
-        partner_data = JSON.parse(entry[:originalId]).with_indifferent_access
+        partner_data = begin
+          JSON.parse(entry[:originalId]).with_indifferent_access
+        rescue JSON::ParserError
+          Rails.logger.error("Failed to parse kaltura partner info: #{entry[:originalId]}")
+          {}
+        end
         attachment_id = partner_data[:attachment_id] if partner_data[:attachment_id].present?
       end
       attachment = Attachment.find_by_id(attachment_id) if attachment_id

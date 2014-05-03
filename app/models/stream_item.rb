@@ -44,7 +44,11 @@ class StreamItem < ActiveRecord::Base
     when 'DiscussionTopic', 'Announcement'
       root_discussion_entries = data.delete(:root_discussion_entries)
       root_discussion_entries = root_discussion_entries.map { |entry| reconstitute_ar_object('DiscussionEntry', entry) }
-      res.root_discussion_entries.target = root_discussion_entries
+      if CANVAS_RAILS2
+        res.root_discussion_entries.target = root_discussion_entries
+      else
+        res.association(:root_discussion_entries).target = root_discussion_entries
+      end
       res.attachment = reconstitute_ar_object('Attachment', data.delete(:attachment))
     when 'Submission'
       data['body'] = nil
@@ -52,7 +56,11 @@ class StreamItem < ActiveRecord::Base
     if data.has_key?('users')
       users = data.delete('users')
       users = users.map { |user| reconstitute_ar_object('User', user) }
-      res.users.target = users
+      if CANVAS_RAILS2
+        res.users.target = users
+      else
+        res.association(:users).target = users
+      end
     end
     if data.has_key?('participants')
       users = data.delete('participants')
@@ -165,8 +173,6 @@ class StreamItem < ActiveRecord::Base
     when WebConference
       res = object.attributes
       res['users'] = object.users.map{|u| prepare_user(u)}
-    when CollectionItem
-      res = object.attributes
     else
       raise "Unexpected stream item type: #{object.class.to_s}"
     end
@@ -259,24 +265,15 @@ class StreamItem < ActiveRecord::Base
       # Old stream items are deleted in a periodic job.
       StreamItemInstance.where("user_id in (?) AND stream_item_id = ? AND id <= ?",
             user_ids_subset, stream_item_id, greatest_existing_id).delete_all
-    end
 
-
-    # Here is where we used to go through and update the stream item for anybody
-    # not in user_ids who had the item in their stream, so that the item would
-    # be up-to-date, but not jump to the top of their stream. Now that
-    # we're updating StreamItems in-place and just linking to them through
-    # StreamItemInstances, this happens automatically.
-    # If a teacher leaves a comment for a student, for example
-    # we don't want that to jump to the top of the *teacher's* stream, but
-    # if it's still visible on the teacher's stream then it had better show
-    # the teacher's comment even if it is farther down.
-
-    # touch all the users to invalidate the cache
-    if Rails.version < '3.0'
-      User.update_all({:updated_at => Time.now.utc}, {:id => user_ids})
-    else
-      User.where(:id => user_ids).update_all(:updated_at => Time.now.utc)
+      # touch all the users to invalidate the cache
+      User.transaction do
+        lock_type = true
+        lock_type = 'FOR NO KEY UPDATE' if User.connection.adapter_name == 'PostgreSQL' && User.connection.send(:postgresql_version) >= 90300
+        # lock the rows in a predefined order to prevent deadlocks
+        User.where(id: user_ids).lock(lock_type).order(:id).pluck(:id)
+        User.where(id: user_ids).update_all(updated_at: Time.now.utc)
+      end
     end
 
     return [res]
@@ -338,7 +335,7 @@ class StreamItem < ActiveRecord::Base
     scope = scope.includes(:stream_item_instances) if touch_users
 
     while true
-      batch = scope.all
+      batch = scope.reload.all
       batch.each do |item|
         count += 1
         if touch_users
@@ -352,7 +349,7 @@ class StreamItem < ActiveRecord::Base
 
     unless user_ids.empty?
       # touch all the users to invalidate the cache
-      if Rails.version < '3.0'
+      if CANVAS_RAILS2
         User.update_all({:updated_at => Time.now.utc}, {:id => user_ids.to_a})
       else
         User.where(:id => user_ids.to_a).update_all(:updated_at => Time.now.utc)
@@ -408,7 +405,14 @@ class StreamItem < ActiveRecord::Base
 
   public
   def destroy_stream_item_instances
-    # bare scoped call avoid Rails 2 HasManyAssociation loading all objects
-    self.stream_item_instances.with_each_shard { |scope| scope.scoped.delete_all; nil }
+    self.stream_item_instances.with_each_shard do |scope|
+      if CANVAS_RAILS2
+        # bare scoped call avoid Rails 2 HasManyAssociation loading all objects
+        scope.scoped.delete_all
+      else
+        scope.delete_all
+      end
+      nil
+    end
   end
 end

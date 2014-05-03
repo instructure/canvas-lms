@@ -36,14 +36,16 @@ describe "PaginatedCollection" do
       items.size.should == 2
       items.current_page.should == 1
       items.per_page.should == 5
-      %w(next_page previous_page first_page last_page total_entries).each { |a| items.send(a).should be_nil }
+      items.last_page.should == 1
+      %w(first_page next_page previous_page total_entries).each { |a| items.send(a).should be_nil }
     end
 
     it "should use the pager returned" do
       3.times { user_model }
       proxy = PaginatedCollection.build do |pager|
-        result = User.active.paginate(:page => pager.current_page, :per_page => pager.per_page, :order => :id)
+        result = User.active.order(:id).paginate(:page => pager.current_page, :per_page => pager.per_page)
         result.map! { |u| u.id }
+        result
       end
       p1 = proxy.paginate(:page => 1, :per_page => 2)
       p1.current_page.should == 1

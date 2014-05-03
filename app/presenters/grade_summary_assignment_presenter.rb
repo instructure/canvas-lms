@@ -9,7 +9,8 @@ class GradeSummaryAssignmentPresenter
   end
 
   def hide_distribution_graphs?
-    submissions.length < 5 || assignment.context.hide_distribution_graphs?
+    submission_count = @summary.submission_counts[assignment.id] || 0
+    submission_count < 5 || assignment.context.hide_distribution_graphs?
   end
 
   def is_unread?
@@ -68,18 +69,6 @@ class GradeSummaryAssignmentPresenter
     !assignment.special_class && (has_comments? || has_scoring_details?)
   end
 
-  def hide_max_scores?
-    assignment && assignment.hide_max_scores_for_assignments
-  end
-
-  def hide_min_scores?
-    assignment && assignment.hide_min_scores_for_assignments
-  end
-
-  def show_all_scores?
-    assignment && !hide_max_scores? && !hide_min_scores?
-  end
-
   def special_class
     assignment.special_class ? ("hard_coded " + assignment.special_class) : "editable"
   end
@@ -108,7 +97,12 @@ class GradeSummaryAssignmentPresenter
   end
 
   def grade_distribution
-    @grade_distribution ||= assignment.grade_distribution(submissions)
+    @grade_distribution ||= begin
+      stats = @summary.assignment_stats[assignment.id]
+      [stats.max.to_f.round(1),
+       stats.min.to_f.round(1),
+       stats.avg.to_f.round(1)]
+    end
   end
 
   def graph
@@ -121,10 +115,6 @@ class GradeSummaryAssignmentPresenter
 
   def file
     @file ||= submission.attachments.detect{|a| submission.turnitin_data && submission.turnitin_data[a.asset_string] }
-  end
-
-  def submissions
-    @submissions ||= @summary.submissions_by_assignment[assignment.id] || []
   end
 
   def comments

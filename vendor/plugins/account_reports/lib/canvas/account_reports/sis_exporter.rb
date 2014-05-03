@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 - 2013 Instructure, Inc.
+# Copyright (C) 2012 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+
+require 'csv'
 
 module Canvas::AccountReports
   class SisExporter
@@ -32,7 +34,7 @@ module Canvas::AccountReports
       if @account_report.has_parameter? "include_deleted"
         @include_deleted = @account_report.parameters["include_deleted"]
         @account_report.parameters["extra_text"] << I18n.t(
-        'account_reports.sis_exporter.deleted',' Include Deleted Objects: true;')
+          'account_reports.sis_exporter.deleted', ' Include Deleted Objects: true;')
       end
     end
 
@@ -64,11 +66,12 @@ module Canvas::AccountReports
     end
 
     def users
-      list_csv = CSV.generate do |csv|
+      filename = Canvas::AccountReports.generate_file(@account_report)
+      CSV.open(filename, "w") do |csv|
         if @sis_format
-          headers = ['user_id','login_id','password','first_name','last_name','email','status']
+          headers = ['user_id', 'login_id', 'password', 'first_name', 'last_name', 'email', 'status']
         else
-          headers = ['canvas_user_id','user_id','login_id','first_name','last_name','email','status']
+          headers = ['canvas_user_id', 'user_id', 'login_id', 'first_name', 'last_name', 'email', 'status']
         end
         csv << headers
         users = root_account.pseudonyms.except(:includes).joins(:user).select(
@@ -109,16 +112,17 @@ module Canvas::AccountReports
           end
         end
       end
-      list_csv
+      filename
     end
 
     def accounts
-      list_csv = CSV.generate do |csv|
+      filename = Canvas::AccountReports.generate_file(@account_report)
+      CSV.open(filename, "w") do |csv|
         if @sis_format
-          headers = ['account_id','parent_account_id', 'name','status']
+          headers = ['account_id', 'parent_account_id', 'name', 'status']
         else
-          headers = ['canvas_account_id','account_id','canvas_parent_id','parent_account_id',
-                     'name','status']
+          headers = ['canvas_account_id', 'account_id', 'canvas_parent_id', 'parent_account_id',
+                     'name', 'status']
         end
         csv << headers
         accounts = root_account.all_accounts.
@@ -138,7 +142,7 @@ module Canvas::AccountReports
 
         if account != root_account
           #this does not give the full tree pf sub accounts, just the direct children.
-          accounts = accounts.where(:accounts => { :parent_account_id => account })
+          accounts = accounts.where(:accounts => {:parent_account_id => account})
         end
 
         Shackles.activate(:slave) do
@@ -154,12 +158,13 @@ module Canvas::AccountReports
           end
         end
       end
-      list_csv
+      filename
     end
 
     def terms
-      list_csv = CSV.generate do |csv|
-        headers = ['term_id','name','status', 'start_date', 'end_date']
+      filename = Canvas::AccountReports.generate_file(@account_report)
+      CSV.open(filename, "w") do |csv|
+        headers = ['term_id', 'name', 'status', 'start_date', 'end_date']
         headers.unshift 'canvas_term_id' unless @sis_format
         csv << headers
         terms = root_account.enrollment_terms
@@ -187,17 +192,18 @@ module Canvas::AccountReports
           end
         end
       end
-      list_csv
+      filename
     end
 
     def courses
-      list_csv = CSV.generate do |csv|
+      filename = Canvas::AccountReports.generate_file(@account_report)
+      CSV.open(filename, "w") do |csv|
         if @sis_format
-          headers = ['course_id','short_name', 'long_name','account_id','term_id','status',
+          headers = ['course_id', 'short_name', 'long_name', 'account_id', 'term_id', 'status',
                      'start_date', 'end_date']
         else
-          headers = ['canvas_course_id','course_id','short_name','long_name','canvas_account_id',
-                     'account_id','canvas_term_id','term_id','status', 'start_date', 'end_date']
+          headers = ['canvas_course_id', 'course_id', 'short_name', 'long_name', 'canvas_account_id',
+                     'account_id', 'canvas_term_id', 'term_id', 'status', 'start_date', 'end_date']
         end
 
         csv << headers
@@ -205,7 +211,9 @@ module Canvas::AccountReports
         courses = courses.where("courses.sis_source_id IS NOT NULL") if @sis_format
 
         if @include_deleted
-          courses = courses.where("courses.workflow_state<>'deleted' OR courses.sis_source_id IS NOT NULL")
+          courses = courses.where("(courses.workflow_state='deleted' AND courses.updated_at > ?)
+                                    OR courses.workflow_state<>'deleted'
+                                    OR courses.sis_source_id IS NOT NULL", 120.days.ago)
         else
           courses = courses.where("courses.workflow_state<>'deleted' AND courses.workflow_state<>'completed'")
         end
@@ -231,7 +239,7 @@ module Canvas::AccountReports
             #for sis import format 'claimed', 'created', and 'available' are all considered active
             if @sis_format
               if c.workflow_state == 'deleted' || c.workflow_state == 'completed'
-                row << course_state_sub[c.workflow_state]
+                row << c.workflow_state
               else
                 row << 'active'
               end
@@ -249,16 +257,17 @@ module Canvas::AccountReports
           end
         end
       end
-      list_csv
+      filename
     end
 
     def sections
-      list_csv = CSV.generate do |csv|
+      filename = Canvas::AccountReports.generate_file(@account_report)
+      CSV.open(filename, "w") do |csv|
         if @sis_format
-          headers = ['section_id','course_id','name','status','start_date','end_date']
+          headers = ['section_id', 'course_id', 'name', 'status', 'start_date', 'end_date']
         else
-          headers = [ 'canvas_section_id','section_id','canvas_course_id','course_id','name',
-                      'status','start_date','end_date','canvas_account_id','account_id']
+          headers = ['canvas_section_id', 'section_id', 'canvas_course_id', 'course_id', 'name',
+                     'status', 'start_date', 'end_date', 'canvas_account_id', 'account_id']
         end
         csv << headers
         sections = root_account.course_sections.
@@ -276,9 +285,11 @@ module Canvas::AccountReports
                                      OR
                                      (course_sections.sis_source_id IS NOT NULL
                                       AND (nxc.sis_source_id IS NOT NULL
-                                      OR rc.sis_source_id IS NOT NULL))")
+                                           OR rc.sis_source_id IS NOT NULL))")
         else
-          sections = sections.where("course_sections.workflow_state<>'deleted'")
+          sections = sections.where("course_sections.workflow_state<>'deleted'
+                                     AND (nxc.workflow_state<>'deleted'
+                                          OR rc.workflow_state<>'deleted')")
         end
 
         if @sis_format
@@ -287,7 +298,7 @@ module Canvas::AccountReports
                                      OR rc.sis_source_id IS NOT NULL)")
         end
 
-        sections = add_course_sub_account_scope(sections,'rc')
+        sections = add_course_sub_account_scope(sections, 'rc')
         sections = add_term_scope(sections, 'rc')
 
         Shackles.activate(:slave) do
@@ -324,11 +335,12 @@ module Canvas::AccountReports
           end
         end
       end
-      list_csv
+      filename
     end
 
     def enrollments
-      list_csv = CSV.generate do |csv|
+      filename = Canvas::AccountReports.generate_file(@account_report)
+      CSV.open(filename, "w") do |csv|
         if @sis_format
           headers = ['course_id', 'user_id', 'role', 'section_id', 'status', 'associated_user_id']
         else
@@ -402,11 +414,12 @@ module Canvas::AccountReports
           end
         end
       end
-      list_csv
+      filename
     end
 
     def groups
-      list_csv = CSV.generate do |csv|
+      filename = Canvas::AccountReports.generate_file(@account_report)
+      CSV.open(filename, "w") do |csv|
         if @sis_format
           headers = ['group_id', 'account_id', 'name', 'status']
         else
@@ -430,7 +443,7 @@ module Canvas::AccountReports
         end
 
         if account != root_account
-          groups = groups.where(:groups => { :context_id => account, :context_type => 'Account' })
+          groups = groups.where(:groups => {:context_id => account, :context_type => 'Account'})
         end
 
         Shackles.activate(:slave) do
@@ -446,15 +459,16 @@ module Canvas::AccountReports
           end
         end
       end
-      list_csv
+      filename
     end
 
     def group_membership
-      list_csv = CSV.generate do |csv|
+      filename = Canvas::AccountReports.generate_file(@account_report)
+      CSV.open(filename, "w") do |csv|
         if @sis_format
           headers = ['group_id', 'user_id', 'status']
         else
-          headers = ['canvas_group_id', 'group_id','canvas_user_id', 'user_id', 'status']
+          headers = ['canvas_group_id', 'group_id', 'canvas_user_id', 'user_id', 'status']
         end
 
         csv << headers
@@ -483,30 +497,31 @@ module Canvas::AccountReports
         end
 
         if account != root_account
-          gm = gm.where(:groups => { :context_id => account, :context_type => 'Account' })
+          gm = gm.where(:groups => {:context_id => account, :context_type => 'Account'})
         end
 
         Shackles.activate(:slave) do
           gm.find_each do |gm|
             row = []
-            row << gm.group_id  unless @sis_format
+            row << gm.group_id unless @sis_format
             row << gm.sis_source_id
-            row << gm.user_id  unless @sis_format
+            row << gm.user_id unless @sis_format
             row << gm.user_sis_id
             row << gm.workflow_state
             csv << row
           end
         end
       end
-      list_csv
+      filename
     end
 
     def xlist
-      list_csv = CSV.generate do |csv|
+      filename = Canvas::AccountReports.generate_file(@account_report)
+      CSV.open(filename, "w") do |csv|
         if @sis_format
           headers = ['xlist_course_id', 'section_id', 'status']
         else
-          headers = ['canvas_xlist_course_id','xlist_course_id','canvas_section_id','section_id',
+          headers = ['canvas_xlist_course_id', 'xlist_course_id', 'canvas_section_id', 'section_id',
                      'status']
         end
         csv << headers
@@ -548,7 +563,7 @@ module Canvas::AccountReports
           end
         end
       end
-      list_csv
+      filename
     end
   end
 end

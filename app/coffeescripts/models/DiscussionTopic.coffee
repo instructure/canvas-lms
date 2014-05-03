@@ -6,7 +6,8 @@ define [
   'compiled/collections/ParticipantCollection'
   'compiled/collections/DiscussionEntriesCollection'
   'compiled/models/Assignment'
-], (I18n, Backbone, $, _, ParticipantCollection, DiscussionEntriesCollection, Assignment) ->
+  'compiled/models/DateGroup'
+], (I18n, Backbone, $, _, ParticipantCollection, DiscussionEntriesCollection, Assignment, DateGroup) ->
 
   class DiscussionTopic extends Backbone.Model
     resourceName: 'discussion_topics'
@@ -20,6 +21,8 @@ define [
       subscribed: false
       user_can_see_posts: true
       subscription_hold: null
+      publishable: true
+      unpublishable: true
 
     dateAttributes: [
       'last_reply_at'
@@ -29,22 +32,37 @@ define [
 
     initialize: ->
       @participants = new ParticipantCollection
-
       @entries = new DiscussionEntriesCollection
       @entries.url = => "#{_.result this, 'url'}/entries"
       @entries.participants = @participants
 
-      @set 'set_assignment', @get('assignment')?
-      assign_attributes = @get('assignment') or {}
+    parse: (json) ->
+      json.set_assignment = json.assignment?
+      assign_attributes = json.assignment || {}
       assign_attributes.assignment_overrides or= []
       assign_attributes.turnitin_settings or= {}
-      assign = new Assignment(assign_attributes)
+      json.assignment = @createAssignment(assign_attributes)
+      json.publishable = json.can_publish
+      json.unpublishable = json.can_unpublish
+
+      json
+
+    createAssignment: (attributes) ->
+      assign = new Assignment(attributes)
       assign.alreadyScoped = true
-      @set 'assignment', assign
+      assign
 
     # always include assignment in view presentation
     present: =>
       Backbone.Model::toJSON.call(this)
+
+    publish: ->
+      @updateOneAttribute('published', true)
+
+    unpublish: ->
+      @updateOneAttribute('published', false)
+
+    disabledMessage: -> I18n.t 'cannot_unpublish_with_replies', "Can't unpublish if there are replies"
 
     topicSubscribe: ->
       baseUrl = _.result this, 'url'
@@ -59,19 +77,12 @@ define [
     toJSON: ->
       json = super
       delete json.assignment unless json.set_assignment
-      assignment = if json.assignment
-        if typeof json.assignment.toJSON is 'function'
-          json.assignment.toJSON()
-        else
-          json.assignment
-      else
-        null
-
       _.extend json,
-        summary: @summary(),
-        unread_count_tooltip: @unreadTooltip(),
+        summary: @summary()
+        unread_count_tooltip: @unreadTooltip()
         reply_count_tooltip: @replyTooltip()
-        assignment: assignment
+        assignment: json.assignment?.toJSON()
+        defaultDates: @defaultDates().toJSON()
 
     unreadTooltip: ->
       I18n.t 'unread_count_tooltip', {
@@ -89,7 +100,7 @@ define [
 
     ##
     # this is for getting the topic 'full view' from the api
-    # see: http://<canvas>/doc/api/discussion_topics.html#method.discussion_topics_api.view
+    # see: https://<canvas>/doc/api/discussion_topics.html#method.discussion_topics_api.view
     fetchEntries: ->
       baseUrl = _.result this, 'url'
       $.get "#{baseUrl}/view", ({unread_entries, forced_entries, participants, view: entries}) =>
@@ -108,15 +119,49 @@ define [
     updateOneAttribute: (key, value, options = {}) ->
       data = {}
       data[key] = value
+      @updatePartial(data, options)
+
+    updatePartial: (data, options = {}) ->
+      @set(data) unless options.wait
       options = _.defaults options,
         data: JSON.stringify(data)
         contentType: 'application/json'
       @save {}, options
 
     positionAfter: (otherId) ->
-      @updateOneAttribute 'position_after', otherId
+      @updateOneAttribute 'position_after', otherId, wait: true
       collection = @collection
       otherIndex = collection.indexOf collection.get(otherId)
       collection.remove this, silent: true
       collection.models.splice (otherIndex), 0, this
       collection.reset collection.models
+
+    defaultDates: ->
+      group = new DateGroup
+        due_at:    @dueAt()
+        unlock_at: @unlockAt()
+        lock_at:   @lockAt()
+      return group
+
+    dueAt: ->
+      @get('assignment')?.get('due_at')
+
+    unlockAt: ->
+      if unlock_at = @get('assignment')?.get('unlock_at')
+        return unlock_at
+      @get('delayed_post_at')
+
+    lockAt:  ->
+      if lock_at = @get('assignment')?.get('lock_at')
+        return lock_at
+      @get('lock_at')
+
+    updateBucket: (data) ->
+      _.defaults data,
+        pinned: @get('pinned')
+        locked: @get('locked')
+      @updatePartial(data).done =>
+        # it would be cleaner to actually set position: null in the update,
+        # but it doesn't look to me like the controller allows it
+        @set('position', null)
+        @collection.trigger('addSync')

@@ -88,10 +88,11 @@ course will see this page first.  You can change that from [the course home page
 </div>
 <div id="wiki_edit_view_main" style="display:none; text-align: right;">
   <div>
-    <a href="#" class="wiki_switch_views_link"><%= t '#editor.switch_views', "Switch Views" %></a>
+    <a href="#" class="wiki_switch_views_link"><%= t '#editor.switch_editor_html', "HTML Editor" %></a>
+    <a href="#" class="wiki_switch_views_link" style="display:none;"><%= t '#editor.switch_editor_visual', "Visual Editor" %></a>
   </div>
   <div class="clear"></div>
-  <% form_for(@page, :url => (@page.new_record?) ? context_url(@context, :context_wiki_pages_url) : context_url(@context, :context_wiki_page_url, @page)) do |f| -%>
+  <%= form_for(@page, :url => (@page.new_record?) ? context_url(@context, :context_wiki_pages_url) : context_url(@context, :context_wiki_page_url, @page)) do |f| -%>
     <%= f.hidden_field :title %>
     <%= f.text_area :body, :style => "width:99%;" %>
     <% if course_home %>
@@ -137,23 +138,6 @@ course will see this page first.  You can change that from [the course home page
       </div>
     </div>
   <% end -%>
-<% js_block do  %>
-  <script type="text/javascript">
-  require([
-    'jquery' /* $ */,
-    'wiki',
-    'vendor/jquery.pageless' /* pageless */
-  ], function($, wikiPage) {
-    wikiPage.init(); //this is purposly not in a domready, for some reason it wont work there.
-
-    <% if @editing %>
-      $(document).ready(function() {
-        $("#wiki_show_view_secondary .edit_link:first").click();
-      });
-    <% end %>
-
-  });
-  </script>
-<% end %>
+<% js_bundle 'legacy/wiki_pages_content' %>
 </div>
 <div id="wiki_page_version_number" style="display: none;"><%= @page.version_number %></div>

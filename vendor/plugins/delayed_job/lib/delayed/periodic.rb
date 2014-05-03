@@ -26,11 +26,6 @@ class Periodic
 
   def self.load_periodic_jobs_config
     require Rails.root+'config/periodic_jobs'
-
-    # schedule the built-in unlocking job
-    self.cron('Unlock Expired Jobs', '*/5 * * * *') do
-      Delayed::Job.unlock_expired_jobs
-    end
   end
 
   STRAND = 'periodic scheduling'

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -153,7 +153,6 @@ describe User do
     google_docs_collaboration_model(:user_id => @user.id)
     @user.recent_stream_items.size.should == 1
     StreamItem.delete_all
-    @user.unmemoize_all
     @user.recent_stream_items.size.should == 0
   end
 
@@ -162,7 +161,7 @@ describe User do
       course_with_teacher(:active_all => true)
       course_with_student(:active_all => true, :course => @course)
       assignment = @course.assignments.create!(:title => "some assignment", :submission_types => ['online_text_entry'])
-      sub = assignment.submit_homework @student, :submission_type => "online_text_entry", :body => "submission"
+      sub = assignment.submit_homework @student, body: "submission"
       sub.add_comment :author => @teacher, :comment => "lol"
       item = StreamItem.last
       item.asset.should == sub
@@ -419,6 +418,14 @@ describe User do
               [Account.site_admin, @account].sort_by(&:id)
           @account.reload.user_account_associations.map(&:user).should == [@user]
         end
+        UserAccountAssociation.delete_all
+
+        @shard1.activate do
+          # check sharding for when we pass user IDs into update_account_associations, rather than user objects themselves
+          User.update_account_associations([@user.id], :all_shards => true)
+          @account.reload.all_users.should == [@user]
+        end
+        @shard2.activate { @account.reload.all_users.should == [@user] }
       end
     end
   end
@@ -444,6 +451,12 @@ describe User do
     @user.recent_feedback(:contexts => [@course]).should_not be_empty
   end
 
+  it "should not include recent feedback for unpublished assignments" do
+    create_course_with_student_and_assignment
+    @assignment.grade_student @user, :grade => 9
+    @assignment.unpublish
+    @user.recent_feedback(:contexts => [@course]).should be_empty
+  end
 
   describe '#courses_with_primary_enrollment' do
 
@@ -558,6 +571,12 @@ describe User do
     @user.workflow_state.should == "deleted"
     @user.reload
     @user.workflow_state.should == "deleted"
+  end
+
+  it "should record deleted_at" do
+    user = User.create
+    user.destroy
+    user.deleted_at.should_not be_nil
   end
 
   describe "can_masquerade?" do
@@ -914,21 +933,6 @@ describe User do
       search_messageable_users(@student, :context => "course_#{course2.id}", :ids => [@admin.id]).should_not be_empty
     end
 
-    it "should return names with shared contexts" do
-      set_up_course_with_users
-      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
-      @group.users << @student
-
-      @student.shared_contexts(@this_section_user).should eql ['the course', 'the group']
-      @student.short_name_with_shared_contexts(@this_section_user).should eql "#{@this_section_user.short_name} (the course and the group)"
-
-      @student.shared_contexts(@other_section_user).should eql ['the course']
-      @student.short_name_with_shared_contexts(@other_section_user).should eql "#{@other_section_user.short_name} (the course)"
-
-      @student.shared_contexts(@unrelated_user).should eql []
-      @student.short_name_with_shared_contexts(@unrelated_user).should eql @unrelated_user.short_name
-    end
-
     it "should not rank results by default" do
       set_up_course_with_users
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
@@ -1086,10 +1090,15 @@ describe User do
         "https://#{HostUrl.default_host}/images/messages/avatar-50.png"
       User.avatar_fallback_url("/somepath").should ==
         "https://#{HostUrl.default_host}/somepath"
+      HostUrl.expects(:default_host).returns('somedomain:3000')
+      User.avatar_fallback_url("/path").should ==
+        "https://somedomain:3000/path"
       User.avatar_fallback_url("//somedomain/path").should ==
         "https://somedomain/path"
       User.avatar_fallback_url("http://somedomain/path").should ==
         "http://somedomain/path"
+      User.avatar_fallback_url("http://somedomain:3000/path").should ==
+        "http://somedomain:3000/path"
       User.avatar_fallback_url(nil, OpenObject.new(:host => "foo", :protocol => "http://")).should ==
         "http://foo/images/messages/avatar-50.png"
       User.avatar_fallback_url("/somepath", OpenObject.new(:host => "bar", :protocol => "https://")).should ==
@@ -1239,6 +1248,51 @@ describe User do
       @course.enroll_user(@user2)
 
       @user1.menu_courses.should == [@course]
+    end
+  end
+
+  describe "favorites" do
+    before :each do
+      @user = User.create!
+
+      @courses = []
+      (1..3).each do |x|
+        course = course_with_student(:course_name => "Course #{x}", :user => @user, :active_all => true).course
+        @courses << course
+        @user.favorites.create!(context: course)
+      end
+
+      @user.save!
+    end
+
+    it "should default favorites to enrolled courses when favorite courses do not exist" do
+      @user.favorites.by("Course").destroy_all
+      @user.menu_courses.should == @courses
+    end
+
+    it "should only include favorite courses when set" do
+      course = @courses.shift
+      @user.favorites.where(context_type: "Course", context_id: course).first.destroy
+      @user.menu_courses.should == @courses
+    end
+
+    context "sharding" do
+      specs_require_sharding
+
+      before :each do
+        (4..6).each do |x|
+          course = course_with_student(:course_name => "Course #{x}", :user => @user, :active_all => true).course
+          @courses << course
+          @user.favorites.create!(context: course)
+        end
+
+        @user.save!
+      end
+
+      it "should include cross shard favorite courses" do
+        @user.favorites.by("Course").where("id % 2 = 0").destroy_all
+        @user.menu_courses.size.should eql(@courses.length / 2)
+      end
     end
   end
 
@@ -1395,12 +1449,40 @@ describe User do
     end
   end
 
+  describe "can_be_enrolled_in_course?" do
+    before do
+      course active_all: true
+    end
+
+    it "should allow a user with a pseudonym in the course's root account" do
+      user_with_pseudonym account: @course.root_account, active_all: true
+      @user.can_be_enrolled_in_course?(@course).should be_true
+    end
+
+    it "should allow a temporary user with an existing enrollment but no pseudonym" do
+      @user = User.create! { |u| u.workflow_state = 'creation_pending' }
+      @course.enroll_student(@user)
+      @user.can_be_enrolled_in_course?(@course).should be_true
+    end
+
+    it "should not allow a registered user with an existing enrollment but no pseudonym" do
+      user active_all: true
+      @course.enroll_student(@user)
+      @user.can_be_enrolled_in_course?(@course).should be_false
+    end
+
+    it "should not allow a user with neither an enrollment nor a pseudonym" do
+      user active_all: true
+      @user.can_be_enrolled_in_course?(@course).should be_false
+    end
+  end
+
   describe "email_channel" do
     it "should not return retired channels" do
-      u = User.new
-      retired = u.communication_channels.build(:path => 'retired@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'retired'}
+      u = User.create!
+      retired = u.communication_channels.create!(:path => 'retired@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'retired'}
       u.email_channel.should be_nil
-      active = u.communication_channels.build(:path => 'active@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active'}
+      active = u.communication_channels.create!(:path => 'active@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active'}
       u.email_channel.should == active
     end
   end
@@ -1563,6 +1645,18 @@ describe User do
         events.size.should eql 1
         events.first.title.should eql 'test appointment'
       end
+
+      it "should not include unpublished assignments when draft_state is enabled" do
+        course_with_student(:active_all => true)
+        @course.enable_feature!(:draft_state)
+        as = @course.assignments.create!({:title => "Published", :due_at => 2.days.from_now})
+        as.publish
+        as2 = @course.assignments.create!({:title => "Unpublished", :due_at => 2.days.from_now})
+        as2.unpublish
+        events = @user.calendar_events_for_calendar(:contexts => [@course])
+        events.size.should eql 1
+        events.first.title.should eql 'Published'
+      end
     end
 
     describe "upcoming_events" do
@@ -1584,10 +1678,22 @@ describe User do
         # user instead of failing.
         expect do
           events = @user.upcoming_events(:end_at => 1.week.from_now)
-        end.to_not raise_error 
+        end.to_not raise_error
 
         events.first.should == assignment2
         events.second.should == assignment
+      end
+
+      it "doesn't show unpublished assignments if draft_state is enabled" do
+        course_with_teacher_logged_in(:active_all => true)
+        @course.enable_feature!(:draft_state)
+        assignment = @course.assignments.create!(:title => "not published", :due_at => 1.days.from_now)
+        assignment.unpublish
+        assignment2 = @course.assignments.create!(:title => "published", :due_at => 1.days.from_now)
+        assignment2.publish
+        events = []
+        events = @user.upcoming_events(:end_at => 1.week.from_now)
+        events.first.should == assignment2
       end
 
     end
@@ -1616,13 +1722,13 @@ describe User do
         assignments.each do |assignment|
           assignment.expects(:grants_right?).with(user,nil,:delete).returns true
         end
-        assignments.first.expects(:all_dates_visible_to).with(user).
+        assignments.first.expects(:dates_hash_visible_to).with(user).
           returns [due_date1]
-        assignments.second.expects(:all_dates_visible_to).with(user).
+        assignments.second.expects(:dates_hash_visible_to).with(user).
           returns [due_date2]
-        assignments.third.expects(:all_dates_visible_to).with(user).
+        assignments.third.expects(:dates_hash_visible_to).with(user).
           returns [due_date3]
-        assignments[3].expects(:all_dates_visible_to).with(user).
+        assignments[3].expects(:dates_hash_visible_to).with(user).
           returns [due_date4]
         upcoming_assignments = user.select_upcoming_assignments(assignments,{
           :end_at => 1.week.from_now
@@ -1693,6 +1799,24 @@ describe User do
         @student.assignments_needing_submitting(:contexts => [@course]).count.should == 0
       end
     end
+
+    it "should not include unpublished assignments when draft_state is enabled" do
+      course_with_student_logged_in(:active_all => true)
+      @course.enable_feature!(:draft_state)
+      assignment_quiz([], :course => @course, :user => @user)
+      @assignment.unpublish
+      @quiz.unlock_at = 1.hour.ago
+      @quiz.lock_at = nil
+      @quiz.due_at = 2.days.from_now
+      @quiz.save!
+      assignment_quiz([], :course => @course, :user => @user)
+      @quiz.unlock_at = 1.hour.ago
+      @quiz.lock_at = nil
+      @quiz.due_at = 2.days.from_now
+      @quiz.save!
+
+      @student.assignments_needing_submitting(:contexts => [@course]).count.should == 1
+    end
   end
 
   describe "avatar_key" do
@@ -1728,21 +1852,24 @@ describe User do
 
   describe "order_by_sortable_name" do
     it "should sort lexicographically" do
-      User.create!(:name => "John Johnson")
-      User.create!(:name => "John John")
-      User.order_by_sortable_name.all.map(&:sortable_name).should == ["John, John", "Johnson, John"]
+      ids = []
+      ids << User.create!(:name => "John Johnson")
+      ids << User.create!(:name => "John John")
+      User.order_by_sortable_name.where(id: ids).all.map(&:sortable_name).should == ["John, John", "Johnson, John"]
     end
 
     it "should sort support direction toggle" do
-      User.create!(:name => "John Johnson")
-      User.create!(:name => "John John")
-      User.order_by_sortable_name(:direction => :descending).all.map(&:sortable_name).should == ["Johnson, John", "John, John"]
+      ids = []
+      ids << User.create!(:name => "John Johnson")
+      ids << User.create!(:name => "John John")
+      User.order_by_sortable_name(:direction => :descending).where(id: ids).all.map(&:sortable_name).should == ["Johnson, John", "John, John"]
     end
 
     it "should sort support direction toggle with a prior select" do
-      User.create!(:name => "John Johnson")
-      User.create!(:name => "John John")
-      User.select([:id, :sortable_name]).order_by_sortable_name(:direction => :descending).all.map(&:sortable_name).should == ["Johnson, John", "John, John"]
+      ids = []
+      ids << User.create!(:name => "John Johnson")
+      ids << User.create!(:name => "John John")
+      User.select([:id, :sortable_name]).order_by_sortable_name(:direction => :descending).where(id: ids).all.map(&:sortable_name).should == ["Johnson, John", "John, John"]
     end
 
     it "should sort by the current locale with pg_collkey if possible" do
@@ -1959,21 +2086,18 @@ describe User do
       [@course1, @course2].each do |course|
         assignment = course.assignments.create!(:title => "some assignment", :submission_types => ['online_text_entry'])
         [@studentA, @studentB].each do |student|
-          assignment.submit_homework student, :submission_type => "online_text_entry", :body => "submission for #{student.name}"
+          assignment.submit_homework student, body: "submission for #{student.name}"
         end
       end
     end
 
     it "should count assignments with ungraded submissions across multiple courses" do
-      @teacher.assignments_needing_grading_total_count.should eql(2)
       @teacher.assignments_needing_grading.size.should eql(2)
       @teacher.assignments_needing_grading.should be_include(@course1.assignments.first)
       @teacher.assignments_needing_grading.should be_include(@course2.assignments.first)
 
       # grade one submission for one assignment; these numbers don't change
       @course1.assignments.first.grade_student(@studentA, :grade => "1")
-      @teacher = User.find(@teacher.id) # use a new instance, since these are memoized
-      @teacher.assignments_needing_grading_total_count.should eql(2)
       @teacher.assignments_needing_grading.size.should eql(2)
       @teacher.assignments_needing_grading.should be_include(@course1.assignments.first)
       @teacher.assignments_needing_grading.should be_include(@course2.assignments.first)
@@ -1981,13 +2105,11 @@ describe User do
       # grade the other submission; now course1's assignment no longer needs grading
       @course1.assignments.first.grade_student(@studentB, :grade => "1")
       @teacher = User.find(@teacher.id)
-      @teacher.assignments_needing_grading_total_count.should eql(1)
       @teacher.assignments_needing_grading.size.should eql(1)
       @teacher.assignments_needing_grading.should be_include(@course2.assignments.first)
     end
 
     it "should only count submissions in accessible course sections" do
-      @ta.assignments_needing_grading_total_count.should eql(2)
       @ta.assignments_needing_grading.size.should eql(2)
       @ta.assignments_needing_grading.should be_include(@course1.assignments.first)
       @ta.assignments_needing_grading.should be_include(@course2.assignments.first)
@@ -1997,7 +2119,6 @@ describe User do
       @course1.assignments.first.grade_student(@studentA, :grade => "1")
       @course2.assignments.first.grade_student(@studentA, :grade => "1")
       @ta = User.find(@ta.id)
-      @ta.assignments_needing_grading_total_count.should eql(1)
       @ta.assignments_needing_grading.size.should eql(1)
       @ta.assignments_needing_grading.should be_include(@course2.assignments.first)
 
@@ -2005,7 +2126,6 @@ describe User do
       @course1.enroll_user(@ta, 'TaEnrollment', :enrollment_state => 'active', :section => @section1b,
                           :allow_multiple_enrollments => true, :limit_privileges_to_course_section => true)
       @ta = User.find(@ta.id)
-      @ta.assignments_needing_grading_total_count.should eql(2)
       @ta.assignments_needing_grading.size.should eql(2)
       @ta.assignments_needing_grading.should be_include(@course1.assignments.first)
       @ta.assignments_needing_grading.should be_include(@course2.assignments.first)
@@ -2014,15 +2134,9 @@ describe User do
     it "should limit the number of returned assignments" do
       20.times do |x|
         assignment = @course1.assignments.create!(:title => "excess assignment #{x}", :submission_types => ['online_text_entry'])
-        assignment.submit_homework @studentB, :submission_type => "online_text_entry", :body => "o hai"
-        assignment = @course2.assignments.create!(:title => "excess assignment #{x}", :submission_types => ['online_text_entry'])
-        assignment.submit_homework @studentB, :submission_type => "online_text_entry", :body => "kthxbye"
+        assignment.submit_homework @studentB, body: "hello"
       end
-      @teacher.assignments_needing_grading_total_count.should eql(42)
-      @teacher.assignments_needing_grading.size.should < 42
-
-      @ta.assignments_needing_grading_total_count.should eql(22)
-      @ta.assignments_needing_grading.size.should < 22
+      @teacher.assignments_needing_grading.size.should == 15
     end
 
     context "sharding" do
@@ -2037,19 +2151,17 @@ describe User do
           @course3.enroll_student(@studentA).accept!
           @course3.enroll_student(@studentB).accept!
           @assignment3 = @course3.assignments.create!(:title => "some assignment", :submission_types => ['online_text_entry'])
-          @assignment3.submit_homework @studentA, :submission_type => "online_text_entry", :body => "submission for A"
+          @assignment3.submit_homework @studentA, body: "submission for A"
         end
       end
 
       it "should find assignments from all shards" do
-        @teacher.assignments_needing_grading_total_count.should == 3
         @teacher.assignments_needing_grading.sort_by(&:id).should ==
             [@course1.assignments.first, @course2.assignments.first, @assignment3].sort_by(&:id)
       end
 
       it "should honor ignores for a separate shard" do
         @teacher.ignore_item!(@assignment3, 'grading')
-        @teacher.assignments_needing_grading_total_count.should == 2
         @teacher.assignments_needing_grading.sort_by(&:id).should ==
             [@course1.assignments.first, @course2.assignments.first].sort_by(&:id)
 
@@ -2057,7 +2169,7 @@ describe User do
           @assignment3.submit_homework @studentB, :submission_type => "online_text_entry", :body => "submission for B"
         end
         @teacher = User.find(@teacher)
-        @teacher.assignments_needing_grading_total_count.should == 3
+        @teacher.assignments_needing_grading.size.should == 3
       end
 
       it "should apply a global limit" do
@@ -2084,7 +2196,7 @@ describe User do
     end
   end
 
-  describe "accounts" do
+  describe "all_accounts" do
     specs_require_sharding
 
     it "should include accounts from multiple shards" do
@@ -2095,7 +2207,7 @@ describe User do
         @account2.add_user(@user)
       end
 
-      @user.accounts.map(&:id).sort.should == [Account.site_admin, @account2].map(&:id).sort
+      @user.all_accounts.map(&:id).sort.should == [Account.site_admin, @account2].map(&:id).sort
     end
   end
 
@@ -2131,7 +2243,11 @@ describe User do
 
   describe "prefers_gradebook2?" do
     let(:user) { User.new }
-    subject { user.prefers_gradebook2? }
+    subject { user.prefers_gradebook2?(@ctx) }
+    before {
+      @ctx = mock()
+      @ctx.stubs(:feature_enabled?).with(:screenreader_gradebook).returns(false)
+    }
 
     context "by default" do
       it { should be_true }
@@ -2150,6 +2266,27 @@ describe User do
     context "with an explicit preference for gradebook 1" do
       before { user.stubs(:preferences => { :use_gradebook2 => false }) }
       it { should be_false }
+    end
+
+    context "with screenreader_gradebook enabled" do
+      before {
+        @ctx.stubs(:feature_enabled?).with(:screenreader_gradebook).returns(true)
+      }
+
+      context "prefers gb2" do
+        before { user.stubs(:preferences => { :gradebook_version => '2' }) }
+        it {should be_true}
+      end
+
+      context "prefers srgb" do
+        before { user.stubs(:preferences => { :gradebook_version => 'srgb' }) }
+        it {should be_false}
+      end
+
+      context "nil preference" do
+        before { user.stubs(:preferences => { :gradebook_version => nil }) }
+        it {should be_true}
+      end
     end
   end
 
@@ -2318,6 +2455,22 @@ describe User do
         @shard1.activate{ @user.stamp_logout_time! }
         @user.reload.last_logged_out.should_not be_nil
       end
+    end
+  end
+
+  describe "delete_enrollments" do
+    before do
+      course
+      2.times { @course.course_sections.create! }
+      2.times { @course.assignments.create! }
+    end
+
+    it "should batch DueDateCacher jobs" do
+      DueDateCacher.expects(:recompute).never
+      DueDateCacher.expects(:recompute_course).twice # sync_enrollments and destroy_enrollments
+      test_student = @course.student_view_student
+      test_student.destroy
+      test_student.reload.enrollments.each { |e| e.should be_deleted }
     end
   end
 end

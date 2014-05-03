@@ -1,4 +1,5 @@
 define [
+  'compiled/util/round'
   'jquery'
   'jst/AssignmentGroupWeightsDialog'
   'jquery.ajaxJSON'
@@ -6,7 +7,7 @@ define [
   'jqueryui/dialog'
   'jquery.instructure_misc_helpers'
   'vendor/jquery.ba-tinypubsub'
-], ($, assignmentGroupWeightsDialogTemplate) -> class AssignmentGroupWeightsDialog
+], (round, $, assignmentGroupWeightsDialogTemplate) -> class AssignmentGroupWeightsDialog
 
   constructor: (options) ->
     @$dialog = $ assignmentGroupWeightsDialogTemplate()
@@ -27,6 +28,8 @@ define [
 
     @$group_template = @$dialog.find('.assignment_group_row.blank').removeClass('blank').detach().show()
     @$groups_holder = @$dialog.find('.groups_holder')
+    # ember objects dont work with $.extend, so for srgb we pass in options.mergeFunction
+    @mergeFunction = options.mergeFunction || $.extend
     @update(options)
 
   render: =>
@@ -41,15 +44,24 @@ define [
         .appendTo(@$groups_holder)
     @$dialog.find('#group_weighting_scheme').prop('checked', @options.context.group_weighting_scheme == 'percent').change()
     @calcTotal()
+    @addGroupWeightListener()
 
   update: (newOptions) =>
     @options = newOptions
     @render()
 
+  addGroupWeightListener: =>
+    $(".group_weight").on 'change', (e) ->
+      value = $(e.target).val()
+      rounded_value = round(parseFloat(value), 2)
+      unless isNaN(rounded_value)
+        $(e.target).val(rounded_value)
+
   calcTotal: =>
     total = 0
     @$dialog.find('.assignment_group_row input').each ->
       total += Number($(this).val())
+    total = round(total,2)
     @$dialog.find('.total_weight').text(total)
 
   save: =>
@@ -60,13 +72,15 @@ define [
     if newGroupWeightingScheme != @options.context.group_weighting_scheme
       requests.push $.ajaxJSON courseUrl, 'PUT', {'course[group_weighting_scheme]' : newGroupWeightingScheme}, (data) =>
         @options.context.group_weighting_scheme = data.course.group_weighting_scheme
+        if @options.context.group_weighting_scheme == "percent"
+          @options.context.show_total_grade_as_points = false
 
-    @$dialog.find('.assignment_group_row').each (i, row)->
+    @$dialog.find('.assignment_group_row').each (i, row) =>
       group = $(row).data('assignment_group')
       newWeight = Number($(row).find('input').val())
       if newWeight != group.group_weight
-        requests.push $.ajaxJSON "#{courseUrl}/assignment_groups/#{group.id}", 'PUT', {'assignment_group[group_weight]' : newWeight}, (data) ->
-          $.extend(group, data.assignment_group)
+        requests.push $.ajaxJSON "/api/v1#{courseUrl}/assignment_groups/#{group.id}", 'PUT', {'group_weight' : newWeight}, (data) =>
+          @mergeFunction(group, data)
 
     # when all the requests come back, call @afterSave
     promise = $.when.apply($, requests).done(@afterSave)
@@ -76,4 +90,3 @@ define [
     @$dialog.dialog('close')
     @render()
     $.publish('assignment_group_weights_changed', @options)
-

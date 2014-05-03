@@ -169,27 +169,15 @@ module Technoweenie # :nodoc:
         base.after_save :after_process_attachment
         base.after_destroy :destroy_file
         base.after_validation :process_attachment
-        if CANVAS_RAILS3
+        if CANVAS_RAILS2
+          base.define_callbacks :before_attachment_saved, :after_attachment_saved, :before_thumbnail_saved, :after_save_and_attachment_processing
+        else
           base.define_model_callbacks :resize, :attachment_saved, :save_and_attachment_processing, only: [:after]
           base.define_model_callbacks :attachment_saved, :thumbnail_saved, only: [:before]
-        else
-          base.define_callbacks :after_resize, :before_attachment_saved, :after_attachment_saved, :before_thumbnail_saved, :after_save_and_attachment_processing
         end
       end
 
       unless defined?(::ActiveSupport::Callbacks)
-        # Callback after an image has been resized.
-        #
-        #   class Foo < ActiveRecord::Base
-        #     acts_as_attachment
-        #     after_resize do |record, img|
-        #       record.aspect_ratio = img.columns.to_f / img.rows.to_f
-        #     end
-        #   end
-        def after_resize(&block)
-          write_inheritable_array(:after_resize, [block])
-        end
-
         # Callback after an attachment has been saved either to the file system or the DB.
         # Only called if the file has been changed, not necessarily if the record is updated.
         #
@@ -246,7 +234,7 @@ module Technoweenie # :nodoc:
       require 'rack'
 
       def self.included(base)
-        base.define_callbacks *[:after_resize, :after_attachment_saved, :before_thumbnail_saved] if base.respond_to?(:define_callbacks)
+        base.define_callbacks *[:after_attachment_saved, :before_thumbnail_saved] if CANVAS_RAILS2 && base.respond_to?(:define_callbacks)
       end
 
       # Checks whether the attachment's content type is an image content type
@@ -286,7 +274,6 @@ module Technoweenie # :nodoc:
             :temp_path                => temp_file,
             :thumbnail_resize_options => size
           }
-          callback_with_args :before_thumbnail_saved, thumb
           thumb.save!
         end
       end
@@ -355,7 +342,6 @@ module Technoweenie # :nodoc:
             self.root_attachment = nil
             self.root_attachment_id = nil
             self.scribd_mime_type_id = nil
-            self.scribd_user = nil
             self.submitted_to_scribd_at = nil
             self.workflow_state = nil
             self.scribd_doc = nil
@@ -571,37 +557,23 @@ module Technoweenie # :nodoc:
           end
         end
 
-        # Yanked from ActiveRecord::Callbacks, modified so I can pass args to the callbacks besides self.
-        # Only accept blocks, however
-        if ActiveSupport.const_defined?(:Callbacks)
-          # Rails 2.1 and beyond!
-          def callback_with_args(method, arg = self)
-            notify(method)
+        unless CANVAS_RAILS2
+          # callback is not defined in Rails 3
+          def callback(method)
+            runner_method = "_run_#{method}_callbacks"
+            unless self.respond_to?(runner_method, true)
+              chain = ActiveSupport::Callbacks::CallbackChain.new(method, {})
 
-            result = run_callbacks(method, { :object => arg }) { |result, object| result == false }
+              kind, chain_name = method.to_s.split('_', 2) # e.g. :after_save becomes 'after', 'save'
+              chain.concat(self.send("_#{chain_name}_callbacks").to_a.select{|callback| callback.kind.to_s == kind})
 
-            if result != false && respond_to_without_attributes?(method)
-              result = send(method)
+              str = chain.compile
+              class_eval <<-RUBY_EVAL, __FILE__, __LINE__ + 1
+                def #{runner_method}() #{str} end
+                protected :#{runner_method}
+              RUBY_EVAL
             end
-
-            result
-          end
-
-          def run_callbacks(kind, options = {}, &block)
-            options.reverse_merge!( :object => self )
-            self.class.send("#{kind}_callback_chain").run(options[:object], options, &block)
-          end
-        else
-          # Rails 2.0
-          def callback_with_args(method, arg = self)
-            notify(method)
-
-            result = nil
-            callbacks_for(method).each do |callback|
-              result = callback.call(self, arg)
-              return false if result == false
-            end
-            result
+            self.send(runner_method)
           end
         end
 

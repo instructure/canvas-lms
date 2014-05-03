@@ -1,0 +1,47 @@
+<div class="container-fluid" id="quiz-show">
+  <div class="row edit-header">
+    <div class="span7">
+      <label class="screenreader-only">
+        {{#t "quiz_title"}}Quiz Title{{/t}}
+      </label>
+      <h1>{{title}}</h1>
+    </div>
+
+    <div class="span3 teacher-action-buttons pull-right">
+      {{ic-publish-button
+        published=published
+        disabled=canNotUnpublish
+        on-publish='publish'
+        on-unpublish='unpublish'
+      }}
+
+      <a href="#" class="btn">
+        <i class="icon-edit"></i>{{#t 'edit'}}Edit{{/t}}
+      </a>
+      {{#ic-menu}}
+        {{#ic-menu-trigger}}
+          <button class="btn">
+            <i class="icon-settings"></i>
+          </button>
+        {{/ic-menu-trigger}}
+      {{/ic-menu}}
+    </div>
+  </div>
+
+  <div class="row" id="quiz-show-tabs">
+    <ol>
+      {{#link-to 'quiz.show' this tagName='li'}}
+        {{#link-to 'quiz.show' this.id}}
+          {{#t 'overview'}}Overview{{/t}}
+        {{/link-to}}
+      {{/link-to}}
+      <li><a href="#">Moderate</li></a>
+      <li><a href="#">Statistics</li></a>
+      <li><a href="#">Rubric</li></a>
+    </ol>
+  </div>
+
+  <div class="tabs-content">
+    {{outlet}}
+  </div>
+</div>

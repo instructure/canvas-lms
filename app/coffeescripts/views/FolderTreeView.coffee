@@ -1,25 +1,34 @@
 define [
   'Backbone'
+  'jquery'
   'underscore'
   'compiled/fn/preventDefault'
   'compiled/models/Folder'
   'compiled/views/PaginatedCollectionView'
   'compiled/views/FileItemView'
   'jst/FolderTreeCollection'
-], (Backbone, _, preventDefault, Folder, PaginatedCollectionView, FileItemView, collectionTemplate) ->
+], (Backbone, $, _, preventDefault, Folder, PaginatedCollectionView, FileItemView, collectionTemplate) ->
 
   class FolderTreeView extends Backbone.View
 
     tagName: 'li'
+    
+    @optionProperty 'nestingLevel'
+    
+    defaults:
+      nestingLevel: 1
 
     attributes: ->
       'role': 'treeitem'
       'aria-expanded': "#{!!@model.isExpanded}"
+      'aria-level': @nestingLevel
+      id: @tagId
 
     events:
       'click .folderLabel': 'toggle'
 
     initialize: ->
+      @tagId = _.uniqueId 'treenode-'
       @model.on         'all', @render, this
       @model.files.on   'all', @render, this
       @model.folders.on 'all', @render, this
@@ -42,7 +51,8 @@ define [
       @model.get('custom_name') || @model.get('name')
       
     renderSelf: ->
-      @$label ||= $("<a class='folderLabel' href='#' title='#{@title_text()}'/>").prependTo(@$el)
+      @$el.attr @attributes()
+      @$label ||= $("<a class='folderLabel' role='presentation' tabindex='-1' href='#' title='#{@title_text()}'/>").prependTo(@$el)
       @$label
         .text(@title_text())
         .toggleClass('expanded', !!@model.isExpanded)
@@ -55,6 +65,7 @@ define [
           foldersView = new PaginatedCollectionView(
             collection: @model.folders
             itemView: FolderTreeView
+            itemViewOptions: {nestingLevel: @nestingLevel+1 }
             tagName: 'li'
             className: 'folders'
             template: collectionTemplate
@@ -64,6 +75,7 @@ define [
           filesView = new PaginatedCollectionView(
             collection: @model.files
             itemView: FileItemView
+            itemViewOptions: {nestingLevel: @nestingLevel+1}
             tagName: 'li'
             className: 'files'
             template: collectionTemplate

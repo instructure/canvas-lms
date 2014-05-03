@@ -1,8 +1,9 @@
 define [
   'i18n!conversations'
   'Backbone'
+  'underscore'
   'jst/conversations/message'
-], (I18n, {View}, template) ->
+], (I18n, {View}, _, template) ->
 
   class MessageView extends View
 
@@ -15,10 +16,11 @@ define [
       '.read-state': '$readBtn'
 
     events:
-      'click': 'select'
-      'click .open-message': 'select'
+      'click': 'onSelect'
+      'click .open-message': 'onSelect'
       'click .star-btn':   'toggleStar'
       'click .read-state': 'toggleRead'
+      'mousedown': 'onMouseDown'
 
     messages:
       read:     I18n.t('mark_as_read', 'Mark as read')
@@ -35,11 +37,20 @@ define [
       @model.on('change:workflow_state', => @$readBtn.toggleClass('read', @model.get('workflow_state') isnt 'unread'))
       @model.on('change:selected', (m) => @$el.toggleClass('active', m.get('selected')))
 
-    select: (e) ->
-      return if e and e.target.className.match(/star|read/)
-      @model.collection.each((m) -> m.set('selected', false))
+    onSelect: (e) ->
+      return if e and e.target.className.match(/star|read-state/)
+      if e.shiftKey
+        return @model.collection.selectRange(@model)
+      modifier = e.metaKey or e.ctrlKey
+      if @model.get('selected') and modifier then @deselect(modifier) else @select(modifier)
+
+    select: (modifier) ->
+      _.each(@model.collection.without(@model), (m) -> m.set('selected', false)) unless modifier
       @model.set('selected', true)
       @model.set('workflow_state', 'read') if @model.unread()
+
+    deselect: (modifier) ->
+      @model.set('selected', false) if modifier
 
     toggleStar: (e) ->
       e.preventDefault()
@@ -56,6 +67,13 @@ define [
       @$readBtn.attr
         'aria-checked': @model.unread()
         title: if @model.unread() then @messages.read else @messages.unread
+
+    onMouseDown: (e) ->
+      if e.shiftKey
+        e.preventDefault()
+        setTimeout ->
+          window.getSelection().removeAllRanges() # IE
+        , 0
 
     toJSON: ->
       @model.toJSON().conversation

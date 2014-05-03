@@ -60,7 +60,7 @@ define [
       json
 
     displayName: ->          @model.get('migration_type_title')  ||  I18n.t('content_migration', 'Content Migration')
-    createdAt:   ->          @model.get('created_at')            ||  $.dateToISO8601UTC(new Date()) 
+    createdAt:   ->          @model.get('created_at')            ||  (new Date()).toISOString()
 
     # Render a collection view that represents issues for this migration. 
     #

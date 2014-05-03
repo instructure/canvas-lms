@@ -16,4 +16,4 @@ define [
       @autocompleteView.on('changeToken', @onSearch)
 
     onSearch: (tokens) =>
-      @trigger('search', tokens)
+      @trigger('search', _.map(tokens, (x)->"user_#{x}"))

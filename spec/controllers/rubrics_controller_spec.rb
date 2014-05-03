@@ -186,7 +186,7 @@ describe RubricsController do
       @rubric.save
       @rubric_association.context = @course2
       @rubric_association.save
-      rescue_action_in_public!
+      rescue_action_in_public! if CANVAS_RAILS2
       put 'update', :course_id => @course.id, :id => @rubric.id, :rubric => {:title => "new title"}, :rubric_association_id => @rubric_association.id
       assigns[:rubric].should_not be_nil
       assigns[:rubric].should_not eql(@rubric)
@@ -195,7 +195,7 @@ describe RubricsController do
     it "should not update the rubric if not updateable (should make a new one instead)" do
       course_with_teacher_logged_in(:active_all => true)
       rubric_association_model(:user => @user, :context => @course, :purpose => 'grading')
-      @rubric.rubric_associations.create!(:purpose => 'grading', :context => @course, :association => @course)
+      @rubric.rubric_associations.create!(:purpose => 'grading', :context => @course, :association_object => @course)
       put 'update', :course_id => @course.id, :id => @rubric.id, :rubric => {:title => "new title"}, :rubric_association_id => @rubric_association.id
       assigns[:rubric].should_not eql(@rubric)
       assigns[:rubric].should_not be_new_record
@@ -233,7 +233,7 @@ describe RubricsController do
       }
       @rubric.update_criteria(params)
       @rubric.save!
-      @rubric.rubric_associations.create!(:purpose => 'grading', :context => @course, :association => @course)
+      @rubric.rubric_associations.create!(:purpose => 'grading', :context => @course, :association_object => @course)
       criteria = @rubric.criteria
       put 'update', :course_id => @course.id, :id => @rubric.id, :rubric => params, :rubric_association_id => @rubric_association.id
       assigns[:rubric].should eql(@rubric)
@@ -264,7 +264,7 @@ describe RubricsController do
     it "should update the association if specified" do
       course_with_teacher_logged_in(:active_all => true)
       rubric_association_model(:user => @user, :context => @course)
-      put 'update', :course_id => @course.id, :id => @rubric.id, :rubric => {:title => "new title"}, :rubric_association => {:association_type => @rubric_association.association.class.to_s, :association_id => @rubric_association.association.id, :title => "some title", :id => @rubric_association.id}
+      put 'update', :course_id => @course.id, :id => @rubric.id, :rubric => {:title => "new title"}, :rubric_association => {:association_type => @rubric_association.association_object.class.to_s, :association_id => @rubric_association.association_object.id, :title => "some title", :id => @rubric_association.id}
       assigns[:rubric].should eql(@rubric)
       assigns[:rubric].title.should eql("new title")
       assigns[:association].should eql(@rubric_association)
@@ -481,12 +481,12 @@ describe RubricsController do
       Account.default.add_user(@user, 'AccountAdmin')
 
       @rubric = Rubric.create!(:user => @user, :context => @course)
-      RubricAssociation.create!(:rubric => @rubric, :context => @course, :purpose => :bookmark, :association => @course)
-      @course.rubric_associations.bookmarked.include_rubric.to_a.select(&:rubric_id).once_per(&:rubric_id).sort_by{|a| a.rubric.title }.map(&:rubric).should == [@rubric]
+      RubricAssociation.create!(:rubric => @rubric, :context => @course, :purpose => :bookmark, :association_object => @course)
+      @course.rubric_associations.bookmarked.include_rubric.to_a.select(&:rubric_id).uniq(&:rubric_id).sort_by{|a| a.rubric.title }.map(&:rubric).should == [@rubric]
 
       delete 'destroy', :course_id => @course.id, :id => @rubric.id
       response.should be_success
-      @course.rubric_associations.bookmarked.include_rubric.to_a.select(&:rubric_id).once_per(&:rubric_id).sort_by{|a| a.rubric.title }.map(&:rubric).should == []
+      @course.rubric_associations.bookmarked.include_rubric.to_a.select(&:rubric_id).uniq(&:rubric_id).sort_by{|a| a.rubric.title }.map(&:rubric).should == []
       @rubric.reload
       @rubric.deleted?.should be_true
     end
@@ -497,15 +497,40 @@ describe RubricsController do
       @user.reload
 
       @rubric = Rubric.create!(:user => @user, :context => Account.default)
-      RubricAssociation.create!(:rubric => @rubric, :context => @course, :purpose => :bookmark, :association => @course)
-      RubricAssociation.create!(:rubric => @rubric, :context => Account.default, :purpose => :bookmark, :association => @course)
-      @course.rubric_associations.bookmarked.include_rubric.to_a.select(&:rubric_id).once_per(&:rubric_id).sort_by{|a| a.rubric.title }.map(&:rubric).should == [@rubric]
+      RubricAssociation.create!(:rubric => @rubric, :context => @course, :purpose => :bookmark, :association_object => @course)
+      RubricAssociation.create!(:rubric => @rubric, :context => Account.default, :purpose => :bookmark, :association_object => @course)
+      @course.rubric_associations.bookmarked.include_rubric.to_a.select(&:rubric_id).uniq(&:rubric_id).sort_by{|a| a.rubric.title }.map(&:rubric).should == [@rubric]
       
       delete 'destroy', :course_id => @course.id, :id => @rubric.id
       response.should be_success
-      @course.rubric_associations.bookmarked.include_rubric.to_a.select(&:rubric_id).once_per(&:rubric_id).sort_by{|a| a.rubric.title }.map(&:rubric).should == []
+      @course.rubric_associations.bookmarked.include_rubric.to_a.select(&:rubric_id).uniq(&:rubric_id).sort_by{|a| a.rubric.title }.map(&:rubric).should == []
       @rubric.reload
       @rubric.deleted?.should be_false
+    end
+  end
+
+  describe "GET 'show'" do
+    before { course_with_teacher_logged_in(active_all: true) }
+
+    it "doesn't load nonsense" do
+      assert_page_not_found do
+        get 'show', id: "cats", course_id: @course.id
+      end
+    end
+
+    it "returns 404 if record doesn't exist" do
+      assert_page_not_found do
+        get 'show', id: "1", course_id: @course.id
+      end
+    end
+
+
+    it "works" do
+      r = Rubric.create! user: @teacher, context: Account.default
+      ra = RubricAssociation.create! rubric: r, context: @course,
+        purpose: :bookmark, association_object: @course
+      get 'show', id: r.id, course_id: @course.id
+      response.should be_success
     end
   end
 end

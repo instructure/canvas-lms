@@ -15,48 +15,199 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-if ENV['COVERAGE'] == "1"
-  puts "Code Coverage enabled"
-  require 'simplecov'
-  SimpleCov.start do
-    SimpleCov.formatter = SimpleCov::Formatter::HTMLFormatter
-    add_filter '/spec/'
-    add_filter '/config/'
-    add_filter 'spec_canvas'
 
-    add_group 'Controllers', 'app/controllers'
-    add_group 'Models', 'app/models'
-    add_group 'App', '/app/'
-    add_group 'Helpers', 'app/helpers'
-    add_group 'Libraries', '/lib/'
-    add_group 'Plugins', 'vendor/plugins'
-    add_group "Long files" do |src_file|
-      src_file.lines.count > 500
-    end
-    SimpleCov.at_exit do
-      SimpleCov.result.format!
+require File.expand_path(File.dirname(__FILE__) + '/../config/canvas_rails3')
+if CANVAS_RAILS2
+  Spec::Example::ExampleGroupMethods.module_eval do
+    def include_examples(*args)
+      it_should_behave_like(*args)
     end
   end
-else
-  puts "Code coverage not enabled"
+end
+
+unless CANVAS_RAILS2
+  require 'timeout'
+  RSpec.configure do |c|
+    c.around(:each) do |example|
+      Timeout::timeout(300) {
+        example.run
+      }
+    end
+  end
+end
+
+begin
+  ; require File.expand_path(File.dirname(__FILE__) + "/../parallelized_specs/lib/parallelized_specs.rb");
+rescue LoadError;
 end
 
 ENV["RAILS_ENV"] = 'test'
 
 require File.expand_path('../../config/environment', __FILE__) unless defined?(Rails)
-if CANVAS_RAILS3
-  require 'rspec/rails'
-else
+if CANVAS_RAILS2
   require 'spec'
   # require 'spec/autorun'
   require 'spec/rails'
+
+  # integration specs were renamed to request specs in rspec 2
+  def describe_with_rspec2_types(*args, &block)
+    unless args.last.is_a?(Hash)
+      args << {}
+    end
+    raise "please use type: :request instead of type: :integration for rspec 2 compatibility" if args.last[:type] == :integration
+    if args.last[:type] == :request
+      args.last[:type] = :integration
+    end
+    args.last[:location] ||= caller(0)[1]
+    describe_without_rspec2_types(*args, &block)
+  end
+
+  alias :describe_without_rspec2_types :describe
+  alias :describe :describe_with_rspec2_types
+
+  ActionController::TestProcess.module_eval do
+    def process_with_use_route_shim(action, parameters = nil, session = nil, flash = nil, http_method = 'GET')
+      if parameters.is_a?(Hash)
+        parameters.delete(:use_route)
+      end
+      process_without_use_route_shim(action, parameters, session, flash, http_method)
+    end
+
+    alias_method_chain :process, :use_route_shim
+  end
+
+  Spec::Rails::Example::ViewExampleGroup.class_eval do
+    alias :view :template
+
+    def content_for(name)
+      response.capture(name)
+    end
+  end
+else
+  require 'rspec/rails'
+
+  ActionView::TestCase::TestController.view_paths = ApplicationController.view_paths
+
+  module RSpec::Rails
+    module ViewExampleGroup
+      module ExampleMethods
+        # normally in rspec 2, assigns returns a newly constructed hash
+        # which means that 'assigns[:key] = value' in view specs does nothing
+        def assigns
+          @assigns ||= super
+        end
+
+        alias :view_assigns :assigns
+
+        delegate :content_for, :to => :view
+
+        def render_with_helpers(*args)
+          controller_class = ("#{@controller.controller_path.camelize}Controller".constantize rescue nil) || ApplicationController
+
+          # this extends the controller's helper methods to the view
+          # however, these methods are delegated to the test controller
+          view.singleton_class.class_eval do
+            include controller_class._helpers unless included_modules.include?(controller_class._helpers)
+          end
+
+          # so create a "real_controller"
+          # and delegate the helper methods to it
+          @controller.singleton_class.class_eval do
+            attr_accessor :real_controller
+
+            controller_class._helper_methods.each do |helper|
+              delegate helper, :to => :real_controller
+            end
+          end
+
+          real_controller = controller_class.new
+          real_controller.instance_variable_set(:@_request, @controller.request)
+          @controller.real_controller = real_controller
+
+          # just calling "render 'path/to/view'" by default looks for a partial
+          if args.first && args.first.is_a?(String)
+            file = args.shift
+            args = [{:template => file}] + args
+          end
+          render_without_helpers(*args)
+        end
+
+        alias_method_chain :render, :helpers
+      end
+    end
+
+    module Matchers
+      class HaveTag
+        include ActionDispatch::Assertions::SelectorAssertions
+        include Test::Unit::Assertions
+
+        def initialize(expected)
+          @expected = expected
+        end
+
+        def matches?(html, &block)
+          @selected = [HTML::Document.new(html).root]
+          assert_select(*@expected, &block)
+          return !@failed
+        end
+
+        def assert(val, msg=nil)
+          unless !!val
+            @msg = msg
+            @failed = true
+          end
+        end
+
+        def failure_message_for_should
+          @msg
+        end
+
+        def failure_message_for_should_not
+          @msg
+        end
+      end
+
+      def have_tag(*args)
+        HaveTag.new(args)
+      end
+    end
+  end
 end
-require 'webrat'
-require 'mocha/api'
+require 'action_controller_test_process'
 require File.expand_path(File.dirname(__FILE__) + '/mocha_rspec_adapter')
 require File.expand_path(File.dirname(__FILE__) + '/mocha_extensions')
+require File.expand_path(File.dirname(__FILE__) + '/ams_spec_helper')
+
+# if mocha was initialized before rails (say by another spec), CollectionProxy would have
+# undef_method'd them; we need to restore them
+unless CANVAS_RAILS2
+  Mocha::ObjectMethods.instance_methods.each do |m|
+    ActiveRecord::Associations::CollectionProxy.class_eval <<-RUBY
+      def #{m}; end
+      remove_method #{m.inspect}
+RUBY
+  end
+end
 
 Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb").each { |file| require file }
+
+def pend_with_bullet
+  if defined?(Bullet) && Bullet.enable?
+    pending ('PENDING: Bullet')
+  end
+end
+
+def require_webmock
+  # pull in webmock for selected tests, but leave it disabled by default.
+  # funky require order is to skip typhoeus because of an incompatibility
+  # see: https://github.com/typhoeus/typhoeus/issues/196
+  require 'webmock/util/version_checker'
+  require 'webmock/http_lib_adapters/http_lib_adapter_registry'
+  require 'webmock/http_lib_adapters/http_lib_adapter'
+  require 'webmock/http_lib_adapters/typhoeus_hydra_adapter'
+  WebMock::HttpLibAdapterRegistry.instance.http_lib_adapters.delete :typhoeus
+  require 'webmock/rspec'
+end
 
 # rspec aliases :describe to :context in a way that it's pretty much defined
 # globally on every object. :context is already heavily used in our application,
@@ -96,17 +247,19 @@ def truncate_all_tables
   models_by_connection = ActiveRecord::Base.all_models.group_by { |m| m.connection }
   models_by_connection.each do |connection, models|
     if connection.adapter_name == "PostgreSQL"
-      connection.execute("TRUNCATE TABLE #{models.map(&:table_name).map { |t| connection.quote_table_name(t) }.join(',')}")
+      table_names = connection.tables & models.map(&:table_name)
+      connection.execute("TRUNCATE TABLE #{table_names.map { |t| connection.quote_table_name(t) }.join(',')}")
     else
-      models.each { |model| truncate_table(model) }
+      table_names = connection.tables
+      models.each { |model| truncate_table(model) if table_names.include?(model.table_name) }
     end
   end
 end
 
 def truncate_all_cassandra_tables
-  Canvas::Cassandra::Database.config_names.each do |cass_config|
-    db = Canvas::Cassandra::Database.from_config(cass_config)
-    db.keyspace_information.tables.each do |table|
+  Canvas::Cassandra::DatabaseBuilder.config_names.each do |cass_config|
+    db = Canvas::Cassandra::DatabaseBuilder.from_config(cass_config)
+    db.tables.each do |table|
       db.execute("TRUNCATE #{table}")
     end
   end
@@ -117,7 +270,7 @@ end
 truncate_all_tables
 
 # Make AR not puke if MySQL auto-commits the transaction
-class ActiveRecord::ConnectionAdapters::MysqlAdapter < ActiveRecord::ConnectionAdapters::AbstractAdapter
+module MysqlOutsideTransaction
   def outside_transaction?
     # MySQL ignores creation of savepoints outside of a transaction; so if we can create one
     # and then can't release it because it doesn't exist, we're not in a transaction
@@ -126,7 +279,59 @@ class ActiveRecord::ConnectionAdapters::MysqlAdapter < ActiveRecord::ConnectionA
   end
 end
 
-Spec::Matchers.define :encompass do |expected|
+module ActiveRecord::ConnectionAdapters
+  if defined?(MysqlAdapter)
+    MysqlAdapter.send(:include, MysqlOutsideTransaction)
+  end
+  if defined?(Mysql2Adapter)
+    Mysql2Adapter.send(:include, MysqlOutsideTransaction)
+  end
+end
+
+# Be sure to actually test serializing things to non-existent caches,
+# but give Mocks a pass, since they won't exist in dev/prod
+Mocha::Mock.class_eval do
+  def marshal_dump
+    nil
+  end
+
+  def marshal_load(data)
+    raise "Mocks aren't really serializeable!"
+  end
+
+  def respond_to_with_marshalling?(symbol, include_private = false)
+    return true if [:marshal_dump, :marshal_load].include?(symbol)
+    respond_to_without_marshalling?(symbol, include_private)
+  end
+
+  alias_method_chain :respond_to?, :marshalling
+end
+
+[ActiveSupport::Cache::MemoryStore, (CANVAS_RAILS2 ? NilStore : ActiveSupport::Cache::NullStore)].each do |store|
+  store.class_eval do
+    def write_with_serialization_check(name, value, options = nil)
+      Marshal.dump(value)
+      write_without_serialization_check(name, value, options)
+    end
+
+    alias_method_chain :write, :serialization_check
+  end
+end
+
+unless CANVAS_RAILS2
+  ActiveSupport::Cache::NullStore.class_eval do
+    def fetch_with_serialization_check(name, options = {}, &block)
+      result = fetch_without_serialization_check(name, options, &block)
+      Marshal.dump(result) if result
+      result
+    end
+
+    alias_method_chain :fetch, :serialization_check
+  end
+end
+
+matchers_module = (CANVAS_RAILS2 ? Spec::Matchers : RSpec::Matchers)
+matchers_module.define :encompass do |expected|
   match do |actual|
     if expected.is_a?(Array) && actual.is_a?(Array)
       expected.size == actual.size && expected.zip(actual).all? { |e, a| a.slice(*e.keys) == e }
@@ -138,7 +343,7 @@ Spec::Matchers.define :encompass do |expected|
   end
 end
 
-Spec::Matchers.define :match_ignoring_whitespace do |expected|
+matchers_module.define :match_ignoring_whitespace do |expected|
   def whitespaceless(str)
     str.gsub(/\s+/, '')
   end
@@ -148,7 +353,35 @@ Spec::Matchers.define :match_ignoring_whitespace do |expected|
   end
 end
 
-Spec::Runner.configure do |config|
+module Helpers
+  def message(opts={})
+    m = Message.new
+    m.to = opts[:to] || 'some_user'
+    m.from = opts[:from] || 'some_other_user'
+    m.subject = opts[:subject] || 'a message for you'
+    m.body = opts[:body] || 'nice body'
+    m.sent_at = opts[:sent_at] || 5.days.ago
+    m.workflow_state = opts[:workflow_state] || 'sent'
+    m.user_id = opts[:user_id] || opts[:user].try(:id)
+    m.path_type = opts[:path_type] || 'email'
+    m.root_account_id = opts[:account_id] || Account.default.id
+    m.save!
+    m
+  end
+end
+
+# Make sure extensions will work with dynamically created shards
+if ActiveRecord::Base.connection.adapter_name == 'PostgreSQL' &&
+    ActiveRecord::Base.connection.schema_search_path == 'public'
+  %w{pg_trgm pg_collkey}.each do |extension|
+    current_schema = ActiveRecord::Base.connection.select_value("SELECT nspname FROM pg_extension INNER JOIN pg_namespace ON extnamespace=pg_namespace.oid WHERE extname='#{extension}'")
+    if current_schema && current_schema == 'public'
+      ActiveRecord::Base.connection.execute("ALTER EXTENSION #{extension} SET SCHEMA pg_catalog") rescue nil
+    end
+  end
+end
+
+(CANVAS_RAILS2 ? Spec::Runner : RSpec).configure do |config|
   # If you're not using ActiveRecord you should remove these
   # lines, delete config/database.yml and disable :active_record
   # in your config/boot.rb
@@ -156,12 +389,19 @@ Spec::Runner.configure do |config|
   config.use_instantiated_fixtures = false
   config.fixture_path = Rails.root+'spec/fixtures/'
 
-  config.include Webrat::Matchers, :type => :views
+  ((config.debug = true) rescue nil) unless CANVAS_RAILS2
+
+  config.include Helpers
 
   config.before :all do
     # so before(:all)'s don't get confused
     Account.clear_special_account_cache!
     Notification.after_create { Notification.reset_cache! }
+  end
+
+  def delete_fixtures!
+    # noop for now, needed for plugin spec tweaks. implementation coming
+    # in g/24755
   end
 
   config.before :each do
@@ -237,10 +477,8 @@ Spec::Runner.configure do |config|
         @teacher = u
       end
       if opts[:draft_state]
-        account.settings[:allow_draft] = true
-        account.save!
-        @course.enable_draft = true
-        @course.save!
+        account.allow_feature!(:draft_state)
+        @course.enable_feature!(:draft_state)
       end
     end
     @course
@@ -317,7 +555,8 @@ Spec::Runner.configure do |config|
     password = opts[:password] || "asdfasdf"
     password = nil if password == :autogenerate
     account = opts[:account] || Account.default
-    @pseudonym = account.pseudonyms.create!(:user => user, :unique_id => username, :password => password, :password_confirmation => password)
+    @pseudonym = account.pseudonyms.build(:user => user, :unique_id => username, :password => password, :password_confirmation => password)
+    @pseudonym.save_without_session_maintenance
     @pseudonym.communication_channel = communication_channel(user, opts)
     @pseudonym
   end
@@ -349,6 +588,7 @@ Spec::Runner.configure do |config|
     @course = opts[:course] || course(opts)
     @user = opts[:user] || @course.shard.activate { user(opts) }
     @enrollment = @course.enroll_user(@user, enrollment_type, opts)
+    @user.save!
     @enrollment.course = @course # set the reverse association
     if opts[:active_enrollment] || opts[:active_all]
       @enrollment.workflow_state = 'active'
@@ -383,6 +623,7 @@ Spec::Runner.configure do |config|
   def student_in_section(section, opts={})
     user
     enrollment = section.course.enroll_user(@user, 'StudentEnrollment', :section => section)
+    @user.save!
     enrollment.workflow_state = 'active'
     enrollment.save!
     @user
@@ -425,10 +666,8 @@ Spec::Runner.configure do |config|
     course = opts[:course] || @course
     account = opts[:account] || course.account
 
-    account.settings[:allow_draft] = true
-    account.save! unless opts[:no_save]
-    course.enable_draft = enabled
-    course.save! unless opts[:no_save]
+    account.allow_feature!(:draft_state)
+    course.set_feature_flag!(:draft_state, enabled ? 'on' : 'off')
 
     enabled
   end
@@ -452,10 +691,21 @@ Spec::Runner.configure do |config|
     session[:become_user_id].should == @fake_student.id.to_s
   end
 
+  def account_notification(opts={})
+    req_service = opts[:required_account_service] || nil
+    roles = opts[:roles] || []
+    message = opts[:message] || "hi there"
+    @account = opts[:account] || Account.default
+    @announcement = @account.announcements.build(message: message, required_account_service: req_service)
+    @announcement.start_at = opts[:start_at] || 5.minutes.ago.utc
+    @announcement.account_notification_roles.build(roles.map { |r| {account_notification_id: @announcement.id, role_type: r} }) unless roles.empty?
+    @announcement.save!
+  end
+
   VALID_GROUP_ATTRIBUTES = [:name, :context, :max_membership, :group_category, :join_level, :description, :is_public, :avatar_attachment]
 
   def group(opts={})
-    context = opts[:group_context] || Account.default
+    context = opts[:group_context] || opts[:context] || Account.default
     @group = context.groups.create! opts.slice(*VALID_GROUP_ATTRIBUTES)
   end
 
@@ -532,7 +782,7 @@ Spec::Runner.configure do |config|
                       "pseudonym_session[unique_id]" => username,
                       "pseudonym_session[password]" => password
     assert_response :success
-    path.should eql("/?login_success=1")
+    request.fullpath.should eql("/?login_success=1")
   end
 
   def assignment_quiz(questions, opts={})
@@ -543,7 +793,7 @@ Spec::Runner.configure do |config|
     @assignment.workflow_state = "published"
     @assignment.submission_types = "online_quiz"
     @assignment.save
-    @quiz = Quiz.find_by_assignment_id(@assignment.id)
+    @quiz = Quizzes::Quiz.find_by_assignment_id(@assignment.id)
     @questions = questions.map { |q| @quiz.quiz_questions.create!(q) }
     @quiz.generate_quiz_data
     @quiz.published_at = Time.now
@@ -568,7 +818,7 @@ Spec::Runner.configure do |config|
     @assignment.workflow_state = "published"
     @assignment.submission_types = "online_quiz"
     @assignment.save
-    @quiz = Quiz.find_by_assignment_id(@assignment.id)
+    @quiz = Quizzes::Quiz.find_by_assignment_id(@assignment.id)
     @quiz.anonymous_submissions = true
     @quiz.quiz_type = "graded_survey"
     @questions = questions.map { |q| @quiz.quiz_questions.create!(q) }
@@ -633,46 +883,46 @@ Spec::Runner.configure do |config|
     @outcome_group.save!
 
     rubric_params = {
-      :title => 'My Rubric',
-      :hide_score_total => false,
-      :criteria => {
-        "0" => {
-          :points => 3,
-          :mastery_points => 0,
-          :description => "Outcome row",
-          :long_description => @outcome.description,
-          :ratings => {
+        :title => 'My Rubric',
+        :hide_score_total => false,
+        :criteria => {
             "0" => {
-              :points => 3,
-              :description => "Rockin'",
+                :points => 3,
+                :mastery_points => 0,
+                :description => "Outcome row",
+                :long_description => @outcome.description,
+                :ratings => {
+                    "0" => {
+                        :points => 3,
+                        :description => "Rockin'",
+                    },
+                    "1" => {
+                        :points => 0,
+                        :description => "Lame",
+                    }
+                },
+                :learning_outcome_id => @outcome.id
             },
             "1" => {
-              :points => 0,
-              :description => "Lame",
+                :points => 5,
+                :description => "no outcome row",
+                :long_description => 'non outcome criterion',
+                :ratings => {
+                    "0" => {
+                        :points => 5,
+                        :description => "Amazing",
+                    },
+                    "1" => {
+                        :points => 3,
+                        :description => "not too bad",
+                    },
+                    "2" => {
+                        :points => 0,
+                        :description => "no bueno",
+                    }
+                }
             }
-          },
-          :learning_outcome_id => @outcome.id
-        },
-        "1" => {
-          :points => 5,
-          :description => "no outcome row",
-          :long_description => 'non outcome criterion',
-          :ratings => {
-            "0" => {
-              :points => 5,
-              :description => "Amazing",
-            },
-            "1" => {
-              :points => 3,
-              :description => "not too bad",
-            },
-            "2" => {
-              :points => 0,
-              :description => "no bueno",
-            }
-          }
         }
-      }
     }
 
     @rubric = @course.rubrics.build
@@ -722,29 +972,23 @@ Spec::Runner.configure do |config|
     mo
   end
 
-  def message(opts={})
-    m = Message.new
-    m.to = opts[:to] || 'some_user'
-    m.from = opts[:from] || 'some_other_user'
-    m.subject = opts[:subject] || 'a message for you'
-    m.body = opts[:body] || 'nice body'
-    m.sent_at = opts[:sent_at] || 5.days.ago
-    m.workflow_state = opts[:workflow_state] || 'sent'
-    m.user_id = opts[:user_id] || opts[:user].try(:id)
-    m.path_type = opts[:path_type] || 'email'
-    m.root_account_id = opts[:account_id] || Account.default.id
-    m.save!
-    m
-  end
-
   def assert_status(status=500)
     response.status.to_i.should eql(status)
   end
 
   def assert_unauthorized
     assert_status(401) #unauthorized
-                       #    response.headers['Status'].should eql('401 Unauthorized')
+    #    response.headers['Status'].should eql('401 Unauthorized')
     response.should render_template("shared/unauthorized")
+  end
+
+  def assert_page_not_found(&block)
+    if CANVAS_RAILS2
+      block.should raise_exception(ActiveRecord::RecordNotFound)
+    else
+      yield
+      assert_status(404)
+    end
   end
 
   def assert_require_login
@@ -752,10 +996,12 @@ Spec::Runner.configure do |config|
     flash[:warning].should eql("You must be logged in to access this page")
   end
 
+  def fixture_file_upload(path, mime_type=nil, binary=false)
+    Rack::Test::UploadedFile.new(File.join(ActionController::TestCase.fixture_path, path), mime_type, binary)
+  end
+
   def default_uploaded_data
-    require 'action_controller'
-    require 'action_controller/test_process.rb'
-    ActionController::TestUploadedFile.new(File.expand_path(File.dirname(__FILE__) + '/fixtures/scribd_docs/doc.doc'), 'application/msword', true)
+    fixture_file_upload('scribd_docs/doc.doc', 'application/msword', true)
   end
 
   def valid_gradebook_csv_content
@@ -803,54 +1049,46 @@ Spec::Runner.configure do |config|
     importer.warnings.should == []
   end
 
-  def enable_cache(new_cache = ActiveSupport::Cache::MemoryStore.new)
-    old_cache = RAILS_CACHE
-    ActionController::Base.cache_store = new_cache
-    silence_warnings { Object.const_set(:RAILS_CACHE, new_cache) }
-    old_perform_caching = ActionController::Base.perform_caching
-    ActionController::Base.perform_caching = true
-    yield
-  ensure
-    silence_warnings { Object.const_set(:RAILS_CACHE, old_cache) }
-    ActionController::Base.cache_store = old_cache
-    ActionController::Base.perform_caching = old_perform_caching
+  def enable_cache(new_cache=:memory_store)
+    new_cache ||= :null_store
+    if CANVAS_RAILS2 && new_cache == :null_store
+      require 'nil_store'
+      new_cache = NilStore.new
+    end
+    new_cache = ActiveSupport::Cache.lookup_store(new_cache)
+    previous_cache = Rails.cache
+    Rails.stubs(:cache).returns(new_cache)
+    ActionController::Base.stubs(:cache_store).returns(new_cache)
+    ActionController::Base.any_instance.stubs(:cache_store).returns(new_cache)
+    previous_perform_caching = ActionController::Base.perform_caching
+    ActionController::Base.stubs(:perform_caching).returns(true)
+    ActionController::Base.any_instance.stubs(:perform_caching).returns(true)
+    if block_given?
+      begin
+        yield
+      ensure
+        Rails.stubs(:cache).returns(previous_cache)
+        ActionController::Base.stubs(:cache_store).returns(previous_cache)
+        ActionController::Base.any_instance.stubs(:cache_store).returns(previous_cache)
+        ActionController::Base.stubs(:perform_caching).returns(previous_perform_caching)
+        ActionController::Base.any_instance.stubs(:perform_caching).returns(previous_perform_caching)
+      end
+    end
   end
 
   # enforce forgery protection, so we can verify usage of the authenticity token
   def enable_forgery_protection(enable = true)
     old_value = ActionController::Base.allow_forgery_protection
-    ActionController::Base.stubs(:allow_forgery_protection).including_subclasses.returns(enable)
+    ActionController::Base.stubs(:allow_forgery_protection).returns(enable)
+    ActionController::Base.any_instance.stubs(:allow_forgery_protection).returns(enable)
 
     yield if block_given?
 
   ensure
-    ActionController::Base.stubs(:allow_forgery_protection).including_subclasses.returns(old_value) if block_given?
-  end
-
-  def start_test_http_server(requests=1)
-    post_lines = []
-    server = TCPServer.open(0)
-    port = server.addr[1]
-    post_lines = []
-    server_thread = Thread.new(server, post_lines) do |server, post_lines|
-      requests.times do
-        client = server.accept
-        content_length = 0
-        loop do
-          line = client.readline
-          post_lines << line.strip unless line =~ /\AHost: localhost:|\AContent-Length: /
-          content_length = line.split(":")[1].to_i if line.strip =~ /\AContent-Length: [0-9]+\z/
-          if line.strip.blank?
-            post_lines << client.read(content_length)
-            break
-          end
-        end
-        client.puts("HTTP/1.1 200 OK\nContent-Length: 0\n\n")
-        client.close
-      end
-      server.close
+    if block_given?
+      ActionController::Base.stubs(:allow_forgery_protection).returns(old_value)
+      ActionController::Base.any_instance.stubs(:allow_forgery_protection).returns(old_value)
     end
-    return server, server_thread, post_lines
   end
 
   def stub_kaltura
@@ -1005,8 +1243,17 @@ Spec::Runner.configure do |config|
   # an array of [k,v] params so that the order of the params can be
   # defined
   def send_multipart(url, post_params = {}, http_headers = {}, method = :post)
-    mp = Multipart::MultipartPost.new
+    mp = Multipart::Post.new
     query, headers = mp.prepare_query(post_params)
+
+    # A bug in the testing adapter in Rails 3-2-stable doesn't corretly handle
+    # translating this header to the Rack/CGI compatible version:
+    # (https://github.com/rails/rails/blob/3-2-stable/actionpack/lib/action_dispatch/testing/integration.rb#L289)
+    #
+    # This issue is fixed in Rails 4-0 stable, by using a newer version of
+    # ActionDispatch Http::Headers which correctly handles the merge
+    headers = headers.dup.tap { |h| h['CONTENT_TYPE'] ||= h.delete('Content-type') }
+
     send(method, url, query, headers.merge(http_headers))
   end
 
@@ -1053,7 +1300,11 @@ Spec::Runner.configure do |config|
         compare_json(a, e)
       end
     else
-      actual.to_json.should == expected.to_json
+      if actual.is_a?(Fixnum) || actual.is_a?(Float)
+        actual.should == expected
+      else
+        actual.to_json.should == expected.to_json
+      end
     end
   end
 
@@ -1105,10 +1356,7 @@ Spec::Runner.configure do |config|
   end
 
   def dummy_io
-    ActionController::TestUploadedFile.new(
-        File.expand_path(File.dirname(__FILE__) +
-                             '/./fixtures/scribd_docs/doc.doc'),
-        'application/msword', true)
+    fixture_file_upload('scribd_docs/doc.doc', 'application/msword', true)
   end
 
   def create_attachment_for_file_upload_submission!(submission, opts={})
@@ -1128,6 +1376,48 @@ Spec::Runner.configure do |config|
   def n_students_in_course(n, opts={})
     opts.reverse_merge active_all: true
     n.times.map { student_in_course(opts); @student }
+  end
+
+  def consider_all_requests_local(value)
+    if CANVAS_RAILS2
+      ActionController::Base.consider_all_requests_local = value
+    else
+      Rails.application.config.consider_all_requests_local = value
+    end
+  end
+
+  def page_view_for(opts={})
+    @account = opts[:account] || Account.default
+    @context = opts[:context] || course(opts)
+
+    @request_id = opts[:request_id] || RequestContextGenerator.request_id
+    unless @request_id
+      @request_id = UUIDSingleton.instance.generate
+      RequestContextGenerator.stubs(:request_id => @request_id)
+    end
+
+    Setting.set('enable_page_views', 'db')
+
+    @page_view = PageView.new { |p|
+      p.assign_attributes({
+                              :id => @request_id,
+                              :url => "http://test.one/",
+                              :session_id => "phony",
+                              :context => @context,
+                              :controller => opts[:controller] || 'courses',
+                              :action => opts[:action] || 'show',
+                              :user_request => true,
+                              :render_time => 0.01,
+                              :user_agent => 'None',
+                              :account_id => @account.id,
+                              :request_id => request_id,
+                              :interaction_seconds => 5,
+                              :user => @user,
+                              :remote_ip => '192.168.0.42'
+                          }, :without_protection => true)
+    }
+    @page_view.save!
+    @page_view
   end
 end
 

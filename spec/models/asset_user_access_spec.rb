@@ -170,4 +170,29 @@ describe AssetUserAccess do
     end
 
   end
+
+  describe '#corrected_view_score' do
+    it 'should deduct the participation score from the view score for a quiz' do
+      subject.view_score = 10
+      subject.participate_score = 4
+      subject.asset_group_code = 'quizzes'
+
+      subject.corrected_view_score.should == 6
+    end
+
+    it 'should return the normal view score for anything but a quiz' do
+      subject.view_score = 10
+      subject.participate_score = 4
+
+      subject.corrected_view_score.should == 10
+    end
+
+    it 'should not complain if there is no current score' do
+      subject.view_score = nil
+      subject.participate_score = 4
+      subject.stubs(:asset_group_code).returns('quizzes')
+
+      subject.corrected_view_score.should == -4
+    end
+  end
 end

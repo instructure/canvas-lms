@@ -8,7 +8,7 @@ define [
 
     initialize: (attributes, options)->
       @_root = options['root']
-      @set 'publishable', true
+      @set 'unpublishable', true
 
     publish: =>
       @set 'published', true

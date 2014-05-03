@@ -46,7 +46,7 @@ class SpecFriendlyWEBrickServer < ::WEBrick::HTTPServlet::AbstractServlet
     env["QUERY_STRING"] ||= ""
     env["REQUEST_PATH"] ||= "/"
     unless env["PATH_INFO"] == ""
-      path, n = req.request_uri.path, env["SCRIPT_NAME"].length
+      path, n = req.fullpath.path, env["SCRIPT_NAME"].length
       env["PATH_INFO"] = path[n, path.length-n]
     end
 

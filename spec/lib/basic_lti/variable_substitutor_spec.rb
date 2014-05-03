@@ -20,53 +20,61 @@ require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper.r
 
 
 describe BasicLTI::VariableSubstitutor do
-
-  before do
-    @launch = mock()
-    @subber = BasicLTI::VariableSubstitutor.new(@launch)
-  end
+  let(:launch) { mock() }
+  let(:subber) {  BasicLTI::VariableSubstitutor.new(launch) }
 
   it "should substitute user info if allowed" do
-    @launch.stubs(:user).returns(@launch)
-    @launch.stubs(:tool).returns(@launch)
-    @launch.stubs("include_name?").returns(true)
-    @launch.stubs(:name).returns("full name")
-    @launch.stubs(:first_name).returns("full")
-    @launch.stubs(:last_name).returns("name")
-    @hash = {'full' => '$Person.name.full', 'last' => '$Person.name.family', 'first' => '$Person.name.given'}
-    @launch.stubs(:hash).returns(@hash)
+    launch.stubs(:user).returns(launch)
+    launch.stubs(:tool).returns(launch)
+    launch.stubs("include_name?").returns(true)
+    launch.stubs(:name).returns("full name")
+    launch.stubs(:first_name).returns("full")
+    launch.stubs(:last_name).returns("name")
+    params = {'full' => '$Person.name.full', 'last' => '$Person.name.family', 'first' => '$Person.name.given'}
+    launch.stubs(:hash).returns(params)
 
-    @subber.substitute!
-    @hash.should == {'full' => 'full name', 'last' => 'name', 'first' => 'full'}
-  end
-
-  it "should leave variable if not allowed" do
-    @launch.stubs(:user).returns(@launch)
-    @launch.stubs(:tool).returns(@launch)
-    @launch.stubs("include_name?").returns(false)
-    @launch.stubs(:name).returns("full name")
-    @hash = {'full' => '$Person.name.full'}
-    @launch.stubs(:hash).returns(@hash)
-
-    @subber.substitute!
-    @hash.should == {'full' => '$Person.name.full'}
+    subber.substitute!
+    params.should == {'full' => 'full name', 'last' => 'name', 'first' => 'full'}
   end
 
   it "should leave variable if not supported" do
-    @hash = {'something_crazy' => '$Person.social_security_number'}
-    @launch.stubs(:hash).returns(@hash)
+    params = {
+        'invalid_namespace' => '$Person.private_info.social_security_number',
+        'invalid_method' => '$Person.name.secret_identity',
+    }
 
-    @subber.substitute!
-    @hash.should == {'something_crazy' => '$Person.social_security_number'}
+    launch.stubs(:hash).returns(params)
+
+    subber.substitute!
+    params.should == {
+        'invalid_namespace' => '$Person.private_info.social_security_number',
+        'invalid_method' => '$Person.name.secret_identity',
+    }
   end
 
   it "should add concluded enrollments" do
-    @hash = {'concluded_roles' => '$Canvas.membership.concludedRoles'}
-    @launch.stubs(:hash).returns(@hash)
-    @launch.stubs(:user_data).returns({'concluded_role_types' => ['hey']})
+    params = {'concluded_roles' => '$Canvas.membership.concludedRoles'}
+    launch.stubs(:hash).returns(params)
+    launch.stubs(:user_data).returns({'concluded_role_types' => ['hey']})
 
-    @subber.substitute!
-    @hash.should == {'concluded_roles' => 'hey'}
+    subber.substitute!
+    params.should == {'concluded_roles' => 'hey'}
+  end
+
+  it "should not call inherited methods" do
+    params = {'class' => '$Canvas.user.class'}
+    launch.stubs(:hash).returns(params)
+
+    subber.substitute!
+    params.should == {'class' => '$Canvas.user.class'}
+  end
+
+  it "should handle invalid namespaces" do
+    params = {'class' => '$Invalid.user.name'}
+    launch.stubs(:hash).returns(params)
+
+    subber.substitute!
+    params.should == {'class' => '$Invalid.user.name'}
   end
 
 

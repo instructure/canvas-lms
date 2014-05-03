@@ -18,19 +18,7 @@
                 {{#t "available"}}Available{{/t}}
               {{/if}}
 
-              {{#if pending}}
-                {{#t "available_on"}}Available on{{/t}}
-                {{strftime unlockAt "%b %-d"}}
-              {{/if}}
-
-              {{#if open}}
-                {{#t "available_until"}}Available until{{/t}}
-                {{strftime lockAt "%b %-d"}}
-              {{/if}}
-
-              {{#if closed}}
-                {{#t "closed"}}Closed{{/t}}
-              {{/if}}
+              {{>[assignments/available_date_description]}}
             </dd>
           </dd>
         </div>
@@ -39,17 +27,9 @@
   </div>
 
 {{else}}
-  {{#if defaultDates.pending}}
-    <strong>{{#t "not_available_until"}}Not available until{{/t}}</strong>
-    {{strftime defaultDates.unlockAt "%b %-d"}}
-  {{/if}}
-
-  {{#if defaultDates.open}}
-    <strong>{{#t "available_until"}}Available until{{/t}}</strong>
-    {{strftime defaultDates.lockAt "%b %-d"}}
-  {{/if}}
-
-  {{#if defaultDates.closed}}
-    <strong>{{#t "closed"}}Closed{{/t}}</strong>
-  {{/if}}
+  <span class="default-dates">
+    {{#with defaultDates}}
+      {{>[assignments/available_date_description]}}
+    {{/with}}
+  </span>
 {{/if}}

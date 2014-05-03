@@ -252,6 +252,14 @@ describe RoleOverride do
         permission_data[:explicit].should be_false
       end
 
+      it "should be enabled for account if not specified" do
+        permission_data = RoleOverride.permission_for(@account, :view_grade_changes,
+                                                      'AccountMembership', 'AccountAdmin')
+        permission_data[:account_allows].should be_true
+        permission_data[:enabled].should be_true
+        permission_data[:explicit].should be_false
+      end
+
       it "should be enabled for account if specified" do
         root_account = @account.root_account
         root_account.settings[:admins_can_view_notifications] = true

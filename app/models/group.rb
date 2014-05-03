@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -20,11 +20,13 @@ class Group < ActiveRecord::Base
   include Context
   include Workflow
   include CustomValidations
-  include UserFollow::FollowedItem
 
   attr_accessible :name, :context, :max_membership, :group_category, :join_level, :default_view, :description, :is_public, :avatar_attachment, :storage_quota_mb
   validates_presence_of :context_id, :context_type, :account_id, :root_account_id, :workflow_state
   validates_allowed_transitions :is_public, false => true
+
+  # use to skip queries in can_participate?, called by policy block
+  attr_accessor :can_participate
 
   has_many :group_memberships, :dependent => :destroy, :conditions => ['group_memberships.workflow_state != ?', 'deleted']
   has_many :users, :through => :group_memberships, :conditions => ['users.workflow_state != ?', 'deleted']
@@ -55,13 +57,9 @@ class Group < ActiveRecord::Base
   belongs_to :wiki
   has_many :web_conferences, :as => :context, :dependent => :destroy
   has_many :collaborations, :as => :context, :order => 'title, created_at', :dependent => :destroy
-  has_one :scribd_account, :as => :scribdable
   has_many :media_objects, :as => :context
   has_many :zip_file_imports, :as => :context
-  has_many :collections, :as => :context
   belongs_to :avatar_attachment, :class_name => "Attachment"
-  has_many :following_user_follows, :class_name => 'UserFollow', :as => :followed_item
-  has_many :user_follows, :foreign_key => 'following_user_id'
 
   before_validation :ensure_defaults
   before_save :maintain_category_attribute
@@ -70,7 +68,13 @@ class Group < ActiveRecord::Base
   include StickySisFields
   are_sis_sticky :name
 
-  validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
+  validates_each :name do |record, attr, value|
+    if value.blank?
+      record.errors.add attr, t(:name_required, "Name is required")
+    elsif value.length > maximum_string_length
+      record.errors.add attr, t(:name_too_long, "Enter a shorter group name")
+    end
+  end
 
   alias_method :participating_users_association, :participating_users
 
@@ -135,16 +139,24 @@ class Group < ActiveRecord::Base
 
   def has_member?(user)
     return nil unless user.present?
-    self.shard.activate { self.participating_group_memberships.find_by_user_id(user.id) }
+    if self.group_memberships.loaded?
+      return self.group_memberships.to_a.find { |gm| gm.accepted? && gm.user_id == user.id }
+    else
+      self.shard.activate { self.participating_group_memberships.find_by_user_id(user.id) }
+    end
   end
 
   def has_moderator?(user)
     return nil unless user.present?
+    if self.group_memberships.loaded?
+      return self.group_memberships.to_a.find { |gm| gm.accepted? && gm.user_id == user.id && gm.moderator }
+    end
     self.shard.activate { self.participating_group_memberships.moderators.find_by_user_id(user.id) }
   end
 
-  def should_add_creator?
-    self.group_category && (self.group_category.communities? || self.group_category.student_organized?)
+  def should_add_creator?(creator)
+    self.group_category &&
+      (self.group_category.communities? || (self.group_category.student_organized? && self.context.user_is_student?(creator)))
   end
 
   def short_name
@@ -156,12 +168,14 @@ class Group < ActiveRecord::Base
     Group.find(ids)
   end
 
-  def self.not_in_group_sql_fragment(groups, prepend_and = true)
-    "#{"AND" if prepend_and} NOT EXISTS (SELECT * FROM group_memberships gm
-                      WHERE gm.user_id = users.id AND
-                      gm.workflow_state != 'deleted' AND
-                      gm.group_id IN (#{groups.map(&:id).join ','}))" unless groups.empty?
-
+  def self.not_in_group_sql_fragment(groups)
+    return nil if groups.empty?
+    sanitize_sql([<<-SQL, groups])
+      NOT EXISTS (SELECT * FROM group_memberships gm
+      WHERE gm.user_id = users.id AND
+      gm.workflow_state != 'deleted' AND
+      gm.group_id IN (?))
+    SQL
   end
 
   workflow do
@@ -187,7 +201,7 @@ class Group < ActiveRecord::Base
   alias_method :destroy!, :destroy
   def destroy
     self.workflow_state = 'deleted'
-    self.deleted_at = Time.now
+    self.deleted_at = Time.now.utc
     self.save
   end
 
@@ -201,6 +215,7 @@ class Group < ActiveRecord::Base
 
   scope :active, where("groups.workflow_state<>'deleted'")
   scope :by_name, lambda { order(Bookmarker.order_by) }
+  scope :uncategorized, where("groups.group_category_id IS NULL")
 
   def full_name
     res = before_label(self.name) + " "
@@ -238,6 +253,44 @@ class Group < ActiveRecord::Base
     # permissions for this user in the group are probably different now
     Rails.cache.delete(permission_cache_key_for(user))
     return member
+  end
+
+  def bulk_add_users_to_group(users, options = {})
+    return if users.empty?
+    user_ids = users.map(&:id)
+    old_group_memberships = self.group_memberships.where("user_id IN (?)", user_ids).all
+    bulk_insert_group_memberships(users, options)
+    all_group_memberships = self.group_memberships.where("user_id IN (?)", user_ids)
+    new_group_memberships = all_group_memberships - old_group_memberships
+    new_group_memberships.sort_by!(&:user_id)
+    users.sort_by!(&:id)
+    notification_name = options[:notification_name] || "New Context Group Membership"
+    notification = Notification.by_name(notification_name)
+    users.each {|user| Rails.cache.delete(permission_cache_key_for(user))}
+
+    users.each_with_index do |user, index|
+      Instructure::BroadcastPolicy::NotificationPolicy.send_later_enqueue_args(:send_notification,
+                                                                               {:priority => Delayed::LOW_PRIORITY},
+                                                                               new_group_memberships[index],
+                                                                               notification_name.parameterize.underscore.to_sym,
+                                                                               notification,
+                                                                               [user])
+    end
+    new_group_memberships
+  end
+
+  def bulk_insert_group_memberships(users, options = {})
+    current_time = Time.now
+    options = {
+        :group_id => self.id,
+        :workflow_state => 'accepted',
+        :moderator => false,
+        :created_at => current_time,
+        :updated_at => current_time
+    }.merge(options)
+    GroupMembership.bulk_insert(users.map{ |user|
+      options.merge({:user_id => user.id, :uuid => CanvasUuid::Uuid.generate_securish_uuid})
+    })
   end
 
   def invite_user(user)
@@ -290,8 +343,8 @@ class Group < ActiveRecord::Base
   end
 
   def ensure_defaults
-    self.name ||= AutoHandle.generate_securish_uuid
-    self.uuid ||= AutoHandle.generate_securish_uuid
+    self.name ||= CanvasUuid::Uuid.generate_securish_uuid
+    self.uuid ||= CanvasUuid::Uuid.generate_securish_uuid
     self.group_category ||= GroupCategory.student_organized_for(self.context)
     self.join_level ||= 'invitation_only'
     self.is_public ||= false
@@ -330,9 +383,7 @@ class Group < ActiveRecord::Base
     can :read_roster and
     can :send_messages and
     can :send_messages_all and
-    can :follow and
-    can :view_unpublished_items and
-    can :view_hidden_items
+    can :view_unpublished_items
 
     # if I am a member of this group and I can moderate_forum in the group's context
     # (makes it so group members cant edit each other's discussion entries)
@@ -369,14 +420,10 @@ class Group < ActiveRecord::Base
     can :read and
     can :read_roster and
     can :update and
-    can :view_unpublished_items and
-    can :view_hidden_items
+    can :view_unpublished_items
 
     given { |user, session| self.context && self.context.grants_right?(user, session, :view_group_pages) }
     can :read and can :read_roster
-
-    given { |user| user && self.is_public? }
-    can :follow
 
     # Participate means the user is connected to the group somehow and can be  
     given { |user| user && can_participate?(user) }
@@ -391,17 +438,18 @@ class Group < ActiveRecord::Base
   end
 
   def users_visible_to(user)
-    grants_rights?(user, :read) ? users : users.where("?", false)
+    grants_rights?(user, :read) ? users : users.none
   end
 
   # Helper needed by several permissions, use grants_right?(user, :participate)
   def can_participate?(user)
+    return true if can_participate
     return false unless user.present? && self.context.present?
     return true if self.group_category.try(:communities?)
     if self.context.is_a?(Course)
-      return self.context.enrollments.not_fake.where(:user_id => user.id).first.present?
+      return self.context.enrollments.not_fake.except(:includes).where(:user_id => user.id).exists?
     elsif self.context.is_a?(Account)
-      return self.context.user_account_associations.where(:user_id => user.id).first.present?
+      return self.context.user_account_associations.where(:user_id => user.id).exists?
     end
     return false
   end
@@ -438,7 +486,7 @@ class Group < ActiveRecord::Base
   end
 
   def self.default_storage_quota
-    Setting.get_cached('group_default_quota', 50.megabytes.to_s).to_i
+    Setting.get('group_default_quota', 50.megabytes.to_s).to_i
   end
 
   def storage_quota_mb
@@ -449,7 +497,7 @@ class Group < ActiveRecord::Base
     self.storage_quota = val.try(:to_i).try(:megabytes)
   end
   
-  TAB_HOME, TAB_PAGES, TAB_PEOPLE, TAB_DISCUSSIONS, TAB_CHAT, TAB_FILES,
+  TAB_HOME, TAB_PAGES, TAB_PEOPLE, TAB_DISCUSSIONS, TAB_FILES,
     TAB_CONFERENCES, TAB_ANNOUNCEMENTS, TAB_PROFILE, TAB_SETTINGS, TAB_COLLABORATIONS = *1..20
   def tabs_available(user=nil, opts={})
     available_tabs = [
@@ -458,7 +506,6 @@ class Group < ActiveRecord::Base
       { :id => TAB_PAGES,         :label => t("#group.tabs.pages", "Pages"), :css_class => 'pages', :href => :group_wiki_pages_path },
       { :id => TAB_PEOPLE,        :label => t("#group.tabs.people", "People"), :css_class => 'people', :href => :group_users_path },
       { :id => TAB_DISCUSSIONS,   :label => t("#group.tabs.discussions", "Discussions"), :css_class => 'discussions', :href => :group_discussion_topics_path },
-      { :id => TAB_CHAT,          :label => t("#group.tabs.chat", "Chat"), :css_class => 'chat', :href => :group_chat_path },
       { :id => TAB_FILES,         :label => t("#group.tabs.files", "Files"), :css_class => 'files', :href => :group_files_path },
     ]
 
@@ -554,21 +601,17 @@ class Group < ActiveRecord::Base
     ]
   end
 
-  def default_collection_name
-    t "#group.default_collection_name", "%{group_name}'s Collection", :group_name => self.name
-  end
-
   def associated_shards
     [Shard.default]
   end
 
-  # Public: Determine if the current context has draft_state enabled.
+  # Public: Determine whether a feature is enabled, deferring to the group's context.
   #
   # Returns a boolean.
-  def draft_state_enabled?
+  def feature_enabled?(feature)
     # shouldn't matter, but most specs create anonymous (contextless) groups :(
     return false if context.nil?
-    context.draft_state_enabled?
+    context.feature_enabled?(feature)
   end
 
   def serialize_permissions(permissions_hash, user, session)

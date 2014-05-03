@@ -23,6 +23,7 @@ class ContentImportsController < ApplicationController
   prepend_around_filter :load_pseudonym_from_policy, :only => :migrate_content_upload
   
   include Api::V1::Course
+  include ContentImportsHelper
 
   COPY_TYPES = %w{assignment_groups assignments context_modules learning_outcomes
                 quizzes assessment_question_banks folders attachments wiki_pages discussion_topics
@@ -39,6 +40,8 @@ class ContentImportsController < ApplicationController
   # current files UI uses this page for .zip uploads
   def files
     authorized_action(@context, @current_user, [:manage_content, :manage_files])
+    js_env(return_or_context_url: return_or_context_url,
+           return_to: params[:return_to])
   end
 
   # @API Get course copy status

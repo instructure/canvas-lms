@@ -1,9 +1,9 @@
 class AddUpdatedAtIndexToStreamItems < ActiveRecord::Migration
   tag :predeploy
-  self.transactional = false
+  disable_ddl_transaction!
 
   def self.up
-    add_index :stream_items, :updated_at, :concurrently => true
+    add_index :stream_items, :updated_at, :algorithm => :concurrently
   end
 
   def self.down

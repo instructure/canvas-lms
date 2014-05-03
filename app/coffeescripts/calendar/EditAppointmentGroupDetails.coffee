@@ -71,7 +71,7 @@ define [
         @form.find(".group-signup").toggle(checked)
       @form.find(".group-signup-checkbox").change()
 
-      $perSlotCheckbox = @form.find('#appointment-blocks-per-slot-option-button')
+      $perSlotCheckbox = @form.find('.appointment-blocks-per-slot-option-button')
       $perSlotInput =    @form.find('[name="participants_per_appointment"]')
       slotChangeHandler = (e) => @perSlotChange($perSlotCheckbox, $perSlotInput)
       $.merge($perSlotCheckbox, $perSlotInput).on 'change', slotChangeHandler
@@ -81,7 +81,7 @@ define [
       else
         $perSlotInput.attr('disabled', true)
 
-      $maxPerStudentCheckbox = @form.find('#max-per-student-option')
+      $maxPerStudentCheckbox = @form.find('.max-per-student-option')
       $maxPerStudentInput =    @form.find('[name="max_appointments_per_participant"]')
       maxApptHandler = (e) => @maxStudentAppointmentsChange($maxPerStudentCheckbox, $maxPerStudentInput)
       $.merge($maxPerStudentCheckbox, $maxPerStudentInput).on 'change', maxApptHandler
@@ -166,8 +166,8 @@ define [
       return false unless @timeBlockList.validate()
       for range in @timeBlockList.blocks()
         params['appointment_group[new_appointments]'].push([
-          $.dateToISO8601UTC($.unfudgeDateForProfileTimezone(range[0])),
-          $.dateToISO8601UTC($.unfudgeDateForProfileTimezone(range[1]))
+          $.unfudgeDateForProfileTimezone(range[0]).toISOString(),
+          $.unfudgeDateForProfileTimezone(range[1]).toISOString()
         ])
 
       if data.per_slot_option is '1'
@@ -259,4 +259,6 @@ define [
       @form.find(".group_select").html(genericSelectTemplate(groupsInfo))
 
     toggleContextsMenu: (jsEvent) =>
-      $('.ag_contexts_menu').toggleClass('hidden')
+      $menu = $('.ag_contexts_menu').toggleClass('hidden')
+      # For accessibility: put the user back where they started.
+      $('.ag_contexts_selector').focus() if $menu.hasClass 'hidden'

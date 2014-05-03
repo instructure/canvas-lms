@@ -28,7 +28,7 @@ describe WikiPagesController do
                                                 :body => "this is the content of the wikipage body asdfasdf"
     @wiki_page.destroy
     get course_wiki_page_url(@course, @wiki_page)
-    response.body.should_not have_text @wiki_page.body
+    response.body.should_not include(@wiki_page.body)
   end
 
   it "should link correctly in the breadcrumbs for group wikis" do
@@ -56,8 +56,7 @@ describe WikiPagesController do
   it "should permit the student to view the page history if they have permissions" do
     @wiki_page = @course.wiki.wiki_pages.create :title => "Some random wiki page",
                                                 :body => "this is the content of the wikipage body asdfasdf",
-                                                :editing_roles => "teachers,students",
-                                                :hide_from_students => false
+                                                :editing_roles => "teachers,students"
     student = user()
     enrollment = @course.enroll_student(student)
     enrollment.accept!
@@ -103,51 +102,62 @@ describe WikiPagesController do
 
     context "draft state enabled" do
       before do
-        root = @course.root_account
-        root.settings[:enable_draft] = true
-        root.save!
-        @course.reload
+        @course.root_account.enable_feature!(:draft_state)
       end
 
       it "should forward /wiki to /pages index if no front page" do
         @course.wiki.has_no_front_page = true
         @course.wiki.save!
         get @base_url + "wiki"
-        response.code.should == '302'
-        response.redirected_to.should =~ %r{/pages\z}
+        response.should redirect_to(course_pages_url(@course))
       end
 
       it "should forward /wiki to /pages/front-page" do
+        @front.save!
         @front.set_as_front_page!
         get @base_url + "wiki"
-        response.code.should == '302'
-        response.redirected_to.should =~ %r{/pages/front-page\z}
+        response.should redirect_to(course_named_page_url(@course, "front-page"))
       end
 
       it "should forward /wiki/name to /pages/name" do
         get @base_url + "wiki/a-page"
-        response.code.should == '302'
-        response.redirected_to.should =~ %r{/pages/a-page\z}
+        response.should redirect_to(course_named_page_url(@course, "a-page"))
+      end
+
+      it "should forward /wiki/name/revisions to /pages/name/revisions" do
+        get @base_url + "wiki/a-page/revisions"
+        response.should redirect_to(course_named_page_revisions_url(@course, "a-page"))
+      end
+
+      it "should forward /wiki/name/revisions/revision to /pages/name/revisions" do
+        get @base_url + "wiki/a-page/revisions/42"
+        response.should redirect_to(course_named_page_revisions_url(@course, "a-page"))
       end
     end
 
     context "draft state disabled" do
+      before do
+        @course.root_account.disable_feature!(:draft_state)
+      end
+
       it "should forward /pages to /wiki" do
         get @base_url + "pages"
-        response.code.should == '302'
-        response.redirected_to.should =~ %r{/wiki\z}
+        response.should redirect_to(course_wiki_pages_url(@course))
       end
 
       it "should forward /pages/name to /wiki/name" do
         get @base_url + "pages/a-page"
-        response.code.should == '302'
-        response.redirected_to.should =~ %r{/wiki/a-page\z}
+        response.should redirect_to(course_wiki_page_url(@course, "a-page"))
       end
 
       it "should forward /pages/name/edit to /wiki/name#edit" do
         get @base_url + "pages/a-page/edit"
-        response.code.should == '302'
-        response.redirected_to.should =~ %r{/wiki/a-page#edit\z}
+        response.should redirect_to(course_wiki_page_url(@course, "a-page", anchor: "edit"))
+      end
+
+      it "should forward /pages/name/revisions to /wiki/name/revisions" do
+        get @base_url + "pages/a-page/revisions"
+        response.should redirect_to(course_wiki_page_wiki_page_revisions_url(@course, "a-page"))
       end
     end
 

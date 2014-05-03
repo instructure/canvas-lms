@@ -88,8 +88,8 @@ class OutcomesController < ApplicationController
           codes = @context.all_courses.select(:id).map(&:asset_string)
         end
       end
-      @results = @outcome.learning_outcome_results.for_context_codes(codes).custom_ordering(params[:sort]).paginate(:page => params[:page], :per_page => 10)
-      render :json => @results
+      @results = @outcome.learning_outcome_results.for_context_codes(codes).custom_ordering(params[:sort])
+      render :json => Api.paginate(@results, self, polymorphic_url([@context, :outcome_results]))
     end
   end
   
@@ -184,13 +184,13 @@ class OutcomesController < ApplicationController
         elsif @result.artifact.is_a?(RubricAssessment) && @result.artifact.artifact && @result.artifact.artifact.is_a?(Submission)
           @submission = @result.artifact.artifact
           redirect_to named_context_url(@result.context, :context_assignment_submission_url, @submission.assignment_id, @submission.user_id)
-        elsif @result.artifact.is_a?(QuizSubmission) && @result.associated_asset
+        elsif @result.artifact.is_a?(Quizzes::QuizSubmission) && @result.associated_asset
           @submission = @result.artifact
           @question = @result.associated_asset
           if @submission.attempt <= @result.attempt
             @submission_version = @submission
           else
-            @submission_version = @submission.submitted_versions.detect{|s| s.attempt >= @result.attempt }
+            @submission_version = @submission.submitted_attempts.detect{|s| s.attempt >= @result.attempt }
           end
           question = @submission.quiz_data.detect{|q| q['assessment_question_id'] == @question.data[:id] }
           question_id = (question && question['id']) || @question.data[:id]

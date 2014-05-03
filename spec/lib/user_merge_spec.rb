@@ -28,9 +28,15 @@ describe UserMerge do
     it "should move submissions to the new user (but only if they don't already exist)" do
       a1 = assignment_model
       s1 = a1.find_or_create_submission(user1)
+      s1.submission_type = "online_quiz"
+      s1.save!
       s2 = a1.find_or_create_submission(user2)
+      s2.submission_type = "online_quiz"
+      s2.save!
       a2 = assignment_model
       s3 = a2.find_or_create_submission(user2)
+      s3.submission_type = "online_quiz"
+      s3.save!
       user2.submissions.length.should eql(2)
       user1.submissions.length.should eql(1)
       UserMerge.from(user2).into(user1)
@@ -41,6 +47,59 @@ describe UserMerge do
       user1.submissions.length.should eql(2)
       user1.submissions.map(&:id).should be_include(s1.id)
       user1.submissions.map(&:id).should be_include(s3.id)
+    end
+
+    it "should overwrite submission objects that do not contain actual student submissions (e.g. what_if grades)" do
+      a1 = assignment_model
+      s1 = a1.find_or_create_submission(user1)
+      s2 = a1.find_or_create_submission(user2)
+      s2.submission_type = "online_quiz"
+      s2.save!
+
+      UserMerge.from(user2).into(user1)
+
+      user1.reload.submissions.should == [s2.reload]
+      user2.reload.submissions.should == []
+
+      user1.destroy
+      user2.destroy
+
+      user1 = user_model
+      user2 = user_model
+      a2 = assignment_model
+      s3 = a2.find_or_create_submission(user1)
+      s3.submission_type = "online_quiz"
+      s3.save!
+      s4 = a2.find_or_create_submission(user2)
+
+      UserMerge.from(user2).into(user1)
+
+      user1.reload.submissions.should == [s3.reload]
+      user2.reload.submissions.should == [s4.reload]
+    end
+
+    it "should move quiz submissions to the new user (but only if they don't already exist)" do
+      q1 = quiz_model
+      qs1 = q1.generate_submission(user1)
+      qs2 = q1.generate_submission(user2)
+
+      q2 = quiz_model
+      qs3 = q2.generate_submission(user2)
+
+      user1.quiz_submissions.length.should eql(1)
+      user2.quiz_submissions.length.should eql(2)
+
+      UserMerge.from(user2).into(user1)
+
+      user2.reload
+      user1.reload
+
+      user2.quiz_submissions.length.should eql(1)
+      user2.quiz_submissions.first.id.should eql(qs2.id)
+
+      user1.quiz_submissions.length.should eql(2)
+      user1.quiz_submissions.map(&:id).should be_include(qs1.id)
+      user1.quiz_submissions.map(&:id).should be_include(qs3.id)
     end
 
     it "should move ccs to the new user (but only if they don't already exist)" do
@@ -118,13 +177,17 @@ describe UserMerge do
 
     it "should move and uniquify enrollments" do
       enrollment1 = course1.enroll_user(user1)
-      enrollment2 = course1.enroll_user(user2, 'StudentEnrollment', :enrollment_state => 'active')
-      enrollment3 = StudentEnrollment.create!(:course => course1, :course_section => course1.course_sections.create!, :user => user1)
+      enrollment2 = course1.enroll_student(user2, enrollment_state: 'active')
+      section = course1.course_sections.create!
+      enrollment3 = course1.enroll_student(user1,
+                                           enrollment_state: 'invited',
+                                           allow_multiple_enrollments: true,
+                                           section: section)
       enrollment4 = course1.enroll_teacher(user1)
 
       UserMerge.from(user1).into(user2)
       enrollment1.reload
-      enrollment1.user.should == user2
+      enrollment1.user.should == user1
       enrollment1.should be_deleted
       enrollment2.reload
       enrollment2.should be_active
@@ -136,13 +199,44 @@ describe UserMerge do
       enrollment4.should be_invited
 
       user1.reload
-      user1.enrollments.should be_empty
+      user1.enrollments.should == [enrollment1]
+    end
+
+    it "should remove conflicting module progressions" do
+      course1.enroll_user(user1)
+      course1.enroll_user(user2, 'StudentEnrollment', enrollment_state:'active')
+      assignment = course1.assignments.create!(title:"some assignment")
+      assignment2 = course1.assignments.create!(title:"some second assignment")
+      context_module = course1.context_modules.create!(name:"some module")
+      context_module2 = course1.context_modules.create!(name:"some second module")
+      tag = context_module.add_item(id:assignment, type:'assignment')
+      tag2 = context_module2.add_item(id:assignment2, type:'assignment')
+
+      context_module.completion_requirements = {tag.id => {type:'must_view'}}
+      context_module2.completion_requirements = {tag2.id => {type:'min_score', min_score:5}}
+      context_module.save
+      context_module2.save
+
+      #have a conflicting module_progrssion
+      assignment2.grade_student(user1, :grade => "10")
+      assignment2.grade_student(user2, :grade => "4")
+
+      #have a duplicate module_progression
+      context_module.update_for(user1, :read, tag)
+      context_module.update_for(user2, :read, tag)
+
+      #it should work
+      expect { UserMerge.from(user1).into(user2) }.to_not raise_error
+
+      #it should have deleted or moved the module progressions for User1 and kept the completed ones for user2
+      ContextModuleProgression.where(user_id:user1, context_module_id:[context_module, context_module2]).count.should == 0
+      ContextModuleProgression.where(user_id:user2, context_module_id:[context_module, context_module2],workflow_state:'completed').count.should == 2
     end
 
     it "should move and uniquify observee enrollments" do
       course2
-      enrollment1 = course1.enroll_user(user1)
-      enrollment2 = course1.enroll_user(user2)
+      course1.enroll_user(user1)
+      course1.enroll_user(user2)
 
       observer1 = user_model
       observer2 = user_model
@@ -151,8 +245,9 @@ describe UserMerge do
       ObserverEnrollment.count.should eql 3
 
       UserMerge.from(user1).into(user2)
-      user1.observee_enrollments.should be_empty
-      user2.observee_enrollments.size.should eql 3 # 1 deleted
+      user1.observee_enrollments.size.should eql 1 #deleted
+      user1.observee_enrollments.active_or_pending.should be_empty
+      user2.observee_enrollments.size.should eql 2
       user2.observee_enrollments.active_or_pending.size.should eql 2
       observer1.observer_enrollments.active_or_pending.size.should eql 1
       observer2.observer_enrollments.active_or_pending.size.should eql 1
@@ -211,6 +306,43 @@ describe UserMerge do
       oe.update_attribute(:associated_user_id, user1.id)
       UserMerge.from(user1).into(user2)
       oe.reload.associated_user_id.should == user2.id
+    end
+
+    it "should move appointments" do
+      enrollment1 = course1.enroll_user(user1, 'StudentEnrollment', :enrollment_state => 'active')
+      enrollment2 = course1.enroll_user(user2, 'StudentEnrollment', :enrollment_state => 'active')
+      ag = AppointmentGroup.create(:title => "test",
+       :contexts => [course1],
+       :participants_per_appointment => 1,
+       :min_appointments_per_participant => 1,
+       :new_appointments => [
+         ["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"],
+         ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]
+       ]
+      )
+      res1 = ag.appointments.first.reserve_for(user1, @teacher)
+      res2 = ag.appointments.last.reserve_for(user2, @teacher)
+      UserMerge.from(user1).into(user2)
+      res1.reload
+      res1.context_id.should == user2.id
+      res1.context_code.should == user2.asset_string
+    end
+
+    it "should move user attachments and handle duplicates" do
+      attachment1 = Attachment.create!(:user => user1, :context => user1, :filename => "test.txt", :uploaded_data => StringIO.new("first"))
+      attachment2 = Attachment.create!(:user => user1, :context => user1, :filename => "test.txt", :uploaded_data => StringIO.new("notfirst"))
+      attachment3 = Attachment.create!(:user => user2, :context => user2, :filename => "test.txt", :uploaded_data => StringIO.new("first"))
+
+      UserMerge.from(user1).into(user2)
+      run_jobs
+
+      user2.attachments.count.should == 2
+      user2.attachments.not_deleted.count.should == 2
+
+      user2.attachments.not_deleted.detect{|a| a.md5 == attachment1.md5}.should == attachment3
+
+      new_attachment = user2.attachments.not_deleted.detect{|a| a.md5 == attachment2.md5}
+      new_attachment.display_name.should_not == "test.txt" # attachment2 should be copied and renamed because it has unique file data
     end
   end
 
@@ -386,6 +518,7 @@ describe UserMerge do
 
       cc1 = @user2.communication_channels.sms.create!(:path => 'abc')
       cc1.retire!
+      @user2.reload
 
       UserMerge.from(@user2).into(user1)
       user1.communication_channels.reload.length.should == 1
@@ -394,6 +527,82 @@ describe UserMerge do
       cc2.workflow_state.should == 'retired'
     end
 
+    it "should move user attachments and handle duplicates" do
+      course
+      root_attachment = Attachment.create(:context => @course, :filename => "unique_name1.txt",
+                                          :uploaded_data => StringIO.new("root_attachment_data"))
+
+      user1 = User.create!
+      # should not copy because it's identical to @user2_attachment1
+      user1_attachment1 = Attachment.create!(:user => user1, :context => user1, :filename => "shared_name1.txt",
+                                             :uploaded_data => StringIO.new("shared_data"))
+      # copy should have root_attachment directed to @user2_attachment2, and be renamed
+      user1_attachment2 = Attachment.create!(:user => user1, :context => user1, :filename => "shared_name2.txt",
+                                             :uploaded_data => StringIO.new("shared_data2"))
+      # should copy as a root_attachment (even though it isn't one currently)
+      user1_attachment3 = Attachment.create!(:user => user1, :context => user1, :filename => "unique_name2.txt",
+                                             :uploaded_data => StringIO.new("root_attachment_data"))
+      user1_attachment3.root_attachment.should == root_attachment
+
+      @shard1.activate do
+        new_account = Account.create!
+        @user2 = user_with_pseudonym(:account => new_account)
+
+        @user2_attachment1 = Attachment.create!(:user => @user2, :context => @user2, :filename => "shared_name1.txt",
+                                                :uploaded_data => StringIO.new("shared_data"))
+
+        @user2_attachment2 = Attachment.create!(:user => @user2, :context => @user2, :filename => "unique_name3.txt",
+                                                :uploaded_data => StringIO.new("shared_data2"))
+
+        @user2_attachment3 = Attachment.create!(:user => @user2, :context => @user2, :filename => "shared_name2.txt",
+                                                :uploaded_data => StringIO.new("unique_data"))
+      end
+
+      UserMerge.from(user1).into(@user2)
+      run_jobs
+
+      @user2.attachments.not_deleted.count.should == 5
+
+      new_user2_attachment1 = @user2.attachments.not_deleted.detect{|a| a.md5 == user1_attachment2.md5 && a.id != @user2_attachment2.id}
+      new_user2_attachment1.root_attachment.should == @user2_attachment2
+      new_user2_attachment1.display_name.should_not == user1_attachment2.display_name #should rename
+      new_user2_attachment1.namespace.should_not == user1_attachment1.namespace
+
+      new_user2_attachment2 = @user2.attachments.not_deleted.detect{|a| a.md5 == user1_attachment3.md5}
+      new_user2_attachment2.root_attachment.should be_nil
+    end
+
+    context "manual invitation" do
+      it "should not keep a temporary invitation in cache for an enrollment deleted after a user merge" do
+        email = 'foo@example.com'
+
+        enable_cache do
+          course
+          @course.offer!
+
+          # create an active enrollment (usually through an SIS import)
+          user1 = user_with_pseudonym(:username => email, :active_all => true)
+          @course.enroll_user(user1).accept!
+
+          # manually invite the same email address into the course
+          # if open_registration is set on the root account, this creates a new temporary user
+          user2 = user_with_communication_channel(:username => email, :user_state => "creation_pending")
+          @course.enroll_user(user2)
+
+          # cache the temporary invitations
+          user1.temporary_invitations.should_not be_empty
+
+          # when the user follows the confirmation link, they will be prompted to merge into the other user
+          UserMerge.from(user2).into(user1)
+
+          # should not hold onto the now-deleted invitation
+          # (otherwise it will retrieve it in CoursesController#fetch_enrollment,
+          # which causes the login loop in CoursesController#accept_enrollment)
+          user1.reload
+          user1.temporary_invitations.should be_empty
+        end
+      end
+    end
   end
 
 end

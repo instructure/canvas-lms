@@ -24,7 +24,7 @@ describe 'ruby_version_compat' do
 
   describe "force_utf8_params" do
     it "should allow null filenames through" do
-      testfile = ActionController::TestUploadedFile.new(File.join(File.dirname(__FILE__), "/../fixtures/scribd_docs/txt.txt"), "text/plain", true)
+      testfile = fixture_file_upload("scribd_docs/txt.txt", "text/plain", true)
       testfile.instance_variable_set(:@original_filename, nil)
       controller = ApplicationController.new
       controller.stubs(:params).returns({ :upload => { :file1 => testfile } })

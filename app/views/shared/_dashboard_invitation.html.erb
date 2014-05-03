@@ -17,7 +17,7 @@
         %></p>
     </div>
     <div class="buttons">
-      <% form_tag course_enrollment_invitation_path(invitation.course_id) do %>
+      <%= form_tag course_enrollment_invitation_path(invitation.course_id) do %>
         <input type="hidden" name="invitation" value="<%= invitation.uuid %>" />
         <button type="submit" name="reject" class="btn btn-small"><%= t('buttons.decline', 'Decline') %></button>
         <button type="submit" name="accept" class="btn btn-small btn-primary"><%= t('buttons.accept', 'Accept') %></button>

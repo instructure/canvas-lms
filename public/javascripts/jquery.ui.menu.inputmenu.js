@@ -42,6 +42,15 @@ $.extend( proto, {
 			var textInput = $( event.target ).find( "a.ui-state-focus" ).children( "input[type='text']" );
 			if ( textInput.length )
 				textInput[0].focus();
+		});
+		// INSTRUCTURE
+		this.element.bind( "popupopen", function( event ) {
+			var selected = $( event.target ).find( "input[type=radio][checked]" ).closest('.ui-menu-item');
+			if (selected.length) {
+				setTimeout(function() {
+					that.focus( event, selected );
+				}, 0);
+			}
 		})
 		.bind( "menublur", function( event ) {
 			var textInput = $( event.target ).find( "input[type='text']:focus" );

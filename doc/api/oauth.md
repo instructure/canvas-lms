@@ -74,6 +74,18 @@ an authenticated request to the following endpoint:
 
 <h3 class="endpoint">DELETE /login/oauth2/token</h3>
 
+<h4>Parameters</h4>
+
+<ul class="argument">
+  <li>
+    <span class="name">expire_sessions</span>
+    <div class="inline">
+      optional.  Set this to '1' if you want to end all of the user's
+Canvas web sessions.  Without this argument, the endpoint will leave web sessions intact.
+    </div>
+  </li>
+</ul>
+
 </div>
 
 Oauth2 Based Identity Service
@@ -152,6 +164,23 @@ that domain.
       all api calls that a user can make.  The only other accepted value
       for this at present is '/auth/userinfo', which can be used to obtain
       the current canvas user's identity
+    </div>
+  </li>
+  <li>
+    <span class="name">purpose</span>
+    <div class="inline">
+      optional. This can be used to help the user identify which instance
+      of an application this token is for. For example, a mobile device
+      application could provide the name of the device.
+    </div>
+  </li>
+  <li>
+    <span class="name">force_login</span>
+    <div class="inline">
+      optional. Set to '1' if you want to force the user to enter their
+      credentials, even if they're already logged into Canvas. By default,
+      if a user already has an active Canvas web session, they will not be
+      asked to re-enter their credentials.
     </div>
   </li>
 </ul>
@@ -274,6 +303,24 @@ currently supported value is <code>code</code>.
       required. For native applications, currently the only supported value is
 <code>urn:ietf:wg:oauth:2.0:oob</code>, signifying that the credentials will be
 retrieved out-of-band using an embedded browser or other functionality.
+    </div>
+  </li>
+  <li>
+    <span class="name">scopes</span>
+    <div class="inline">
+      optional. This can be used to specify what information the access token
+      will provide access to.  By default an access token will have access to
+      all api calls that a user can make.  The only other accepted value
+      for this at present is '/auth/userinfo', which can be used to obtain
+      the current canvas user's identity
+    </div>
+  </li>
+  <li>
+    <span class="name">purpose</span>
+    <div class="inline">
+      optional. This can be used to help the user identify which instance
+      of an application this token is for. For example, a mobile device
+      application could provide the name of the device.
     </div>
   </li>
 </ul>

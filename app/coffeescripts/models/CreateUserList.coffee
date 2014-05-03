@@ -14,9 +14,7 @@ define ['Backbone', 'underscore'], ({Model}, _) ->
       enrolledUsers: null
 
     present: ->
-      json = @attributes
-      json.course_section_id = parseInt json.course_section_id, 10
-      json
+      @attributes
 
     toJSON: ->
       attrs = [

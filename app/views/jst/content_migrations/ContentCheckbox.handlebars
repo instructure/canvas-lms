@@ -1,15 +1,29 @@
-{{#if onlyLabel}}
-<i class="{{iconClass}}"></i>
-<label class="control-label" data-tooltip title="{{title}}">{{{truncate_left title 60 }}}</label>
-{{else}}
-  <label class="checkbox">
-    <i class="{{iconClass}}"></i>
-    <input type="checkbox" name="{{property}}" value="1" id="checkbox-{{cid}}" {{#if checked}}checked{{/if}}/> <span data-bind="title">{{title}}</span> {{#if count}}<span data-bind="count">({{count}})</span>{{/if}}
-     {{#if linkedMessage}}<span data-bind="linkedMessage">({{linkedMessage}})</span>{{/if}}
-  </label>
-{{/if}}
-{{#if showHide}}<div style="margin-left:20px" class="showHide {{#if checked}}hide{{/if}}"><a href="#" id="selectAll-{{cid}}">{{#t 'select_all'}}Select All{{/t}}</a> | <a href="#" id="selectNone-{{cid}}">{{#t 'select_non'}}Select None{{/t}}</a></div>{{/if}}
-
 {{#if hasSubCheckboxes }}
-  <ul data-content="sublevelCheckboxes"></ul>
+  <div class="treeitem-heading">
+    <a href="#" id="caret-{{cid}}" tabindex="-1" class="checkbox-caret"><i class="icon-arrow-down"></i><i class="icon-forward"></i></a>
+
+    <label class="checkbox">
+      <input type="checkbox" tabindex="-1" name="{{property}}" value="1" id="checkbox-{{cid}}"/>
+      <i class="{{iconClass}}"></i>
+      <span data-bind="title" class="checkbox-title">{{title}}</span>
+      <span class="screenreader-only">({{screenreaderType}})</span>
+
+      {{#if count}}
+      <span data-bind="count">({{count}})</span>
+      {{/if}}
+    </label>
+  </div>
+
+  <ul role="group">
+    <li data-content="sublevelCheckboxes">
+  </ul>
+{{else}}
+  <div class="treeitem-heading">
+    <label class="checkbox no-caret">
+      <input tabindex="-1" type="checkbox" name="{{property}}" value="1" id="checkbox-{{cid}}" />
+      {{#if isTopLevel}}<i class="{{iconClass}}"></i>{{/if}}
+      <span data-bind="title" class="checkbox-title">{{title}}</span>
+      <span class="screenreader-only">({{screenreaderType}})</span>
+    </label>
+  </div>
 {{/if}}

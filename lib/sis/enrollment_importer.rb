@@ -17,7 +17,6 @@
 #
 
 require "set"
-require "skip_callback"
 
 module SIS
   class EnrollmentImporter < BaseImporter
@@ -25,7 +24,7 @@ module SIS
     def process(messages, updates_every)
       start = Time.now
       i = Work.new(@batch_id, @root_account, @logger, updates_every, messages)
-      Enrollment.skip_callbacks(:belongs_to_touch_after_save_or_destroy_for_course, :update_cached_due_dates) do
+      Enrollment.suspend_callbacks(:belongs_to_touch_after_save_or_destroy_for_course, :update_cached_due_dates) do
         User.skip_updating_account_associations do
           Enrollment.process_as_sis(@sis_options) do
             yield i
@@ -45,12 +44,8 @@ module SIS
         Course.where(:id => batch).update_all(:updated_at => Time.now.utc)
       end
       i.courses_to_recache_due_dates.to_a.in_groups_of(1000, false) do |batch|
-        # do a transaction so the find_each will use a cursor, and avoid the sorting
-        # by id
-        Assignment.transaction do
-          Assignment.where(context_id: batch, context_type: 'Course').select(:id).find_each do |a|
-            DueDateCacher.recompute(a)
-          end
+        batch.each do |course_id|
+          DueDateCacher.recompute_course(course_id)
         end
       end
       # We batch these up at the end because normally a user would get several enrollments, and there's no reason

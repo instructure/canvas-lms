@@ -205,6 +205,9 @@ define [
     $edit_course_syllabus_form.on 'click', '.toggle_views_link', (ev) ->
       ev.preventDefault()
       $course_syllabus_body.editorBox 'toggle'
+      # hide the clicked link, and show the other toggle link.
+      # todo: replace .andSelf with .addBack when JQuery is upgraded.
+      $(ev.currentTarget).siblings('.toggle_views_link').andSelf().toggle()
 
     $edit_course_syllabus_form.on 'click', '.cancel_button', (ev) ->
       ev.preventDefault()

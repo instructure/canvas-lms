@@ -70,11 +70,15 @@ describe Canvas::ICU do
         results[0..1].sort.should == ["a", "A"].sort
         results[2..3].sort.should == ["b", "B"].sort
       end
+
+      it "should not ignore punctuation" do
+        Canvas::ICU.collate(["ab, cd", "a, bcd"]).should == ["a, bcd", "ab, cd"]
+      end
     end
   end
 
   context "NaiveCollator" do
-    it_should_behave_like "Collator"
+    include_examples "Collator"
 
     before do
       Canvas::ICU.stubs(:collator).returns(Canvas::ICU::NaiveCollator)
@@ -82,7 +86,7 @@ describe Canvas::ICU do
   end
 
   context "ICU" do
-    it_should_behave_like "Collator"
+    include_examples "Collator"
 
     before do
       pending if Canvas::ICU.collator == Canvas::ICU::NaiveCollator

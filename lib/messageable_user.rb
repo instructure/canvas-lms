@@ -120,7 +120,7 @@ class MessageableUser < User
   # this will be executed on the shard where the find was called (I think?).
   # as such, we can correctly interpret local ids in the common_courses and
   # common_groups
-  def after_find
+  def populate_common_contexts
     @global_common_courses = {}
     if common_courses = read_attribute(:common_courses)
       common_courses.to_s.split(',').each do |common_course|
@@ -142,6 +142,11 @@ class MessageableUser < User
         @global_common_groups[group_id] << 'Member'
       end
     end
+  end
+  if CANVAS_RAILS2
+    alias_method :after_find, :populate_common_contexts
+  else
+    after_find :populate_common_contexts
   end
 
   def include_common_contexts_from(other)
@@ -191,8 +196,8 @@ class MessageableUser < User
     def self.restrict_scope(scope, pager)
       if pager.current_bookmark
         name, id = pager.current_bookmark
-        scope_shard = scope.scope(:find, :shard)
-        id = Shard.relative_id_for(id, scope_shard) if scope_shard
+        scope_shard = scope.shard_value
+        id = Shard.relative_id_for(id, Shard.current, scope_shard) if scope_shard
 
         condition = [
           <<-SQL,

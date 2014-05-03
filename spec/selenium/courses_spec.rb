@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "courses" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   context "as a teacher" do
 
@@ -25,13 +25,13 @@ describe "courses" do
       create_new_course
 
       wizard_box = f("#wizard_box")
-      keep_trying_until { wizard_box.displayed? }
+      keep_trying_until { wizard_box.should be_displayed }
       wizard_box.find_element(:css, ".close_wizard_link").click
 
       refresh_page
       wait_for_ajaximations # we need to give the wizard a chance to pop up
       wizard_box = f("#wizard_box")
-      wizard_box.displayed?.should be_false
+      wizard_box.should_not be_displayed
 
       # un-remember the setting
       driver.execute_script "localStorage.clear()"
@@ -72,7 +72,7 @@ describe "courses" do
 
       # first try setting the quota explicitly
       get "/courses/#{@course.id}/details"
-      driver.find_element(:link, 'Course Details').click
+      f("#ui-id-1").click
       form = f("#course_form")
       f("#course_form .edit_course_link").should be_displayed
       form.find_element(:css, ".edit_course_link").click
@@ -106,10 +106,13 @@ describe "courses" do
     it "should redirect to the gradebook when switching courses when viewing a students grades" do
       teacher = user_with_pseudonym(:username => 'teacher@example.com', :active_all => 1)
       student = user_with_pseudonym(:username => 'student@example.com', :active_all => 1)
-      course1 = course_with_teacher_logged_in(:user => teacher, :active_all => 1).course
-      student_in_course :user => student, :active_all => 1
-      course2 = course_with_teacher(:user => teacher, :active_all => 1).course
-      student_in_course :user => student, :active_all => 1
+
+      course1 = course_with_teacher_logged_in(:user => teacher, :active_all => 1, :course_name => 'course1').course
+      student_in_course(:user => student, :active_all => 1)
+
+      course2 = course_with_teacher(:user => teacher, :active_all => 1, :course_name => 'course2').course
+      student_in_course(:user => student, :active_all => 1)
+
       create_session(student.pseudonyms.first, false)
 
       get "/courses/#{course1.id}/grades/#{student.id}"
@@ -117,11 +120,9 @@ describe "courses" do
       select = f('#course_url')
       options = select.find_elements(:css, 'option')
       options.length.should == 2
-      select.click
       wait_for_ajaximations
-      find_with_jquery('#course_url option:not([selected])').click
-
-      driver.current_url.should match %r{/courses/#{course2.id}/grades}
+      expect_new_page_load{ click_option('#course_url', course2.name) }
+      f('#section-tabs-header').text.should match course2.name
     end
 
     it "should load the users page using ajax" do
@@ -249,6 +250,18 @@ describe "courses" do
     it "should validate that a user cannot see a course they are not enrolled in" do
       login_as(@student.name)
       f('#menu').should_not include_text('Courses')
+    end
+
+    it "should display user groups on courses page" do
+      group = Group.create!(:name => "group1", :context => @course)
+      group.add_user(@student)
+
+      login_as(@student.name)
+      get '/courses'
+
+      content = f('#content')
+      content.should include_text('My Groups')
+      content.should include_text('group1')
     end
   end
 end

@@ -1,0 +1,48 @@
+<td>
+  {{tDateToString created_at "medium"}}
+</td>
+<td>
+  {{tTimeToString created_at "tiny"}}
+</td>
+<td>
+  {{#if grade_before}}
+    {{grade_before}}
+  {{else}}
+    -
+  {{/if}}
+</td>
+<td>
+  {{#if grade_after}}
+    {{grade_after}}
+  {{else}}
+    -
+  {{/if}}
+</td>
+<td>
+  {{#if grader}}
+    {{grader.name}}
+  {{else}}
+    -
+  {{/if}}
+</td>
+<td>
+  {{#if student}}
+    {{student.name}}
+  {{else}}
+    -
+  {{/if}}
+</td>
+<td>
+  {{#if course}}
+    {{course.name}}
+  {{else}}
+    -
+  {{/if}}
+</td>
+<td>
+  {{#if assignment}}
+    {{assignment.name}}
+  {{else}}
+    -
+  {{/if}}
+</td>

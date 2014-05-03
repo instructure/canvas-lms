@@ -1,11 +1,12 @@
 define [
   'i18n!dashboard'
+  'jquery'
   'compiled/views/QuickStartBar/BaseItemView'
   'compiled/models/Message'
   'jst/quickStartBar/message'
   'compiled/jquery.rails_flash_notifications'
   'jquery.disableWhileLoading'
-], (I18n, BaseItemView, Message, template) ->
+], (I18n, $, BaseItemView, Message, template) ->
 
   class MessageView extends BaseItemView
 
@@ -20,6 +21,7 @@ define [
         browser: false
 
     initialize: ->
+      super
       @model or= new Message
 
     save: (json) ->

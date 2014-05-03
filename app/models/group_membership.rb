@@ -35,37 +35,47 @@ class GroupMembership < ActiveRecord::Base
 
   after_save :ensure_mutually_exclusive_membership
   after_save :touch_groups
-  after_save :check_auto_follow_group
   after_save :update_cached_due_dates
   after_destroy :touch_groups
-  after_destroy :check_auto_follow_group
-  
+
   has_a_broadcast_policy
-  
+
   scope :include_user, includes(:user)
-  
+
   scope :active, where("group_memberships.workflow_state<>'deleted'")
   scope :moderators, where(:moderator => true)
 
   alias_method :context, :group
-  
+
   set_broadcast_policy do |p|
     p.dispatch :new_context_group_membership
     p.to { self.user }
-    p.whenever {|record| record.just_created && record.accepted? && record.group && record.group.context }
-    
+    p.whenever { |record|
+      record.just_created &&
+        record.accepted? &&
+        record.group &&
+        record.group.context &&
+        record.sis_batch_id.blank?
+    }
+
     p.dispatch :new_context_group_membership_invitation
     p.to { self.user }
-    p.whenever {|record| record.just_created && record.invited? && record.group && record.group.context }
-    
+    p.whenever { |record|
+      record.just_created &&
+        record.invited? &&
+        record.group &&
+        record.group.context &&
+        record.sis_batch_id.blank?
+    }
+
     p.dispatch :group_membership_accepted
     p.to { self.user }
     p.whenever {|record| record.changed_state(:accepted, :requested) }
-    
+
     p.dispatch :group_membership_rejected
     p.to { self.user }
     p.whenever {|record| record.changed_state(:rejected, :requested) }
-  
+
     p.dispatch :new_student_organized_group
     p.to { self.group.context.admins }
     p.whenever {|record|
@@ -76,9 +86,9 @@ class GroupMembership < ActiveRecord::Base
       record.group.student_organized?
     }
   end
-  
+
   def assign_uuid
-    self.uuid ||= AutoHandle.generate_securish_uuid
+    self.uuid ||= CanvasUuid::Uuid.generate_securish_uuid
   end
   protected :assign_uuid
 
@@ -131,21 +141,9 @@ class GroupMembership < ActiveRecord::Base
   end
   protected :capture_old_group_id
 
-  def check_auto_follow_group
-    if (self.id_changed? || self.workflow_state_changed?) && self.active?
-      UserFollow.create_follow(self.user, self.group)
-    elsif self.destroyed? || (self.workflow_state_changed? && self.deleted?)
-      user_follow = self.user.shard.activate { self.user.user_follows.where(:followed_item_id => self.group_id, :followed_item_type => 'Group').first }
-      user_follow.try(:destroy)
-    end
-  end
-
   def update_cached_due_dates
-    if workflow_state_changed? && group.group_category_id && group.context_type != 'Account'
-      Assignment.where(context_type: group.context_type, context_id: group.context_id, group_category_id: group.group_category_id).
-          pluck(:id).each do |assignment|
-        DueDateCacher.recompute(assignment)
-      end
+    if workflow_state_changed? && group.group_category_id && group.context_type == 'Course'
+      DueDateCacher.recompute_course(group.context_id, Assignment.where(context_type: group.context_type, context_id: group.context_id, group_category_id: group.group_category_id).pluck(:id))
     end
   end
   

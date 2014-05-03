@@ -18,7 +18,7 @@
 require 'builder'
 require 'digest'
 require 'set'
-require 'zip/zip'
+require 'zip'
 
 # Canvas Common Cartridge
 module CC

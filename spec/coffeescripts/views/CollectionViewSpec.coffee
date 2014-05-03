@@ -1,7 +1,9 @@
 define [
+  'jquery'
   'Backbone'
   'compiled/views/CollectionView'
-], (Backbone, CollectionView) ->
+  'helpers/fakeENV'
+], ($, Backbone, CollectionView, fakeENV) ->
 
   collection = null
   view = null
@@ -21,17 +23,19 @@ define [
 
   module 'CollectionView',
     setup: ->
+      fakeENV.setup()
       collection = new Collection [
         {name: 'Jon', id: 24}
         {name: 'Ryan', id: 56}
       ]
       view = new CollectionView
         collection: collection
-        emptyTemplate: -> "No Results"
+        emptyMessage: -> "No Results"
         itemView: ItemView
       view.$el.appendTo $('#fixtures')
       view.render()
     teardown: ->
+      fakeENV.teardown()
       ItemView['testing removed'] = 0
       view.remove()
 
@@ -50,7 +54,7 @@ define [
     ok $match.length, 'item found'
 
   assertEmptyTemplateRendered = ->
-    ok view.$el.text().match(/No items/), 'empty template rendered'
+    ok view.$el.text().match(/No Results/), 'empty template rendered'
 
   test 'renders added items', ->
     collection.reset()
@@ -72,7 +76,7 @@ define [
     collection.reset()
     assertEmptyTemplateRendered()
     collection.add {name: 'Joe', id: 110}
-    ok !view.$el.text().match(/No items/), 'empty template removed'
+    ok !view.$el.text().match(/No Results/), 'empty template removed'
     assertItemRendered 'Joe'
 
   test 'removes items and re-renders on collection reset', ->

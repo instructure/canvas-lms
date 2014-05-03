@@ -58,7 +58,7 @@ describe Folder do
     f3 = f2.sub_folders.create!(:name => "f3", :context => @course)
     f1.parent_folder = f3
     f1.save.should == false
-    f1.errors.on(:parent_folder_id).should be_present
+    f1.errors.detect { |e| e.first.to_s == 'parent_folder_id' }.should be_present
   end
 
   it "files without an explicit folder_id should be inferred" do

@@ -4,9 +4,10 @@ define [
   'compiled/views/DialogFormView'
   'jst/assignments/CreateAssignment'
   'jst/EmptyDialogFormWrapper'
+  'i18n!assignments'
   'jquery'
   'jquery.instructure_date_and_time'
-], (_, Assignment, DialogFormView, template, wrapper, $) ->
+], (_, Assignment, DialogFormView, template, wrapper, I18n, $) ->
 
   class CreateAssignmentView extends DialogFormView
     defaults:
@@ -36,7 +37,7 @@ define [
     getFormData: =>
       data = super
       unfudged = $.unfudgeDateForProfileTimezone(data.due_at)
-      data.due_at = $.dateToISO8601UTC(unfudged) if unfudged?
+      data.due_at = unfudged.toISOString() if unfudged?
       return data
 
     moreOptions: ->
@@ -88,3 +89,29 @@ define [
 
     newAssignmentUrl: ->
       ENV.URLS.new_assignment_url
+
+    validateBeforeSave: (data, errors) ->
+      errors = @_validateTitle data, errors
+      errors = @_validatePointsPossible data, errors
+      errors
+
+    _validateTitle: (data, errors) ->
+      frozenTitle = _.contains(@model.frozenAttributes(), "title")
+      if !frozenTitle and (!data.name or $.trim(data.name.toString()).length == 0)
+        errors["name"] = [
+          message: I18n.t 'name_is_required', 'Name is required!'
+        ]
+      if $.trim(data.name.toString()).length > 255
+        errors["name"] = [
+          message: I18n.t 'name_too_long', 'Name is too long'
+        ]
+      errors
+
+    _validatePointsPossible: (data, errors) =>
+      frozenPoints = _.contains(@model.frozenAttributes(), "points_possible")
+
+      if !frozenPoints and data.points_possible and isNaN(parseFloat(data.points_possible))
+        errors["points_possible"] = [
+          message: I18n.t 'points_possible_number', 'Points possible must be a number'
+        ]
+      errors

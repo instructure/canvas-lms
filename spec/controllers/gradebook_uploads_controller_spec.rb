@@ -18,6 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
+require 'csv'
+
 describe GradebookUploadsController do
 
   describe "POST 'create'" do
@@ -32,9 +34,7 @@ describe GradebookUploadsController do
       file = Tempfile.new("csv.csv")
       file.puts("not a good csv")
       file.close
-      require 'action_controller'
-      require 'action_controller/test_process.rb'
-      data = ActionController::TestUploadedFile.new(file.path, 'text/csv', true)
+      data = Rack::Test::UploadedFile.new(file.path, 'text/csv', true)
       post 'create', :course_id => @course.id, :gradebook_upload => {:uploaded_data => data}
       response.should be_redirect
     end
@@ -89,8 +89,7 @@ describe GradebookUploadsController do
       a2_sub.grader_id.should_not be_nil
       a2_sub.version_number.should == 2
 
-      response.should be_redirect
-      response.redirected_to.should =~ %r|/courses/#{@course.id}/gradebook2|
+      response.should redirect_to(course_gradebook2_url(@course))
     end
     
     it "should create new assignments" do
@@ -136,9 +135,7 @@ describe GradebookUploadsController do
     file = Tempfile.new("csv.csv")
     file.puts(@course.gradebook_to_csv(:include_sis_id => include_sis_id))
     file.close
-    require 'action_controller'
-    require 'action_controller/test_process.rb'
-    data = ActionController::TestUploadedFile.new(file.path, 'text/csv', true)
+    data = Rack::Test::UploadedFile.new(file.path, 'text/csv', true)
     post 'create', :course_id => @course.id, :gradebook_upload => {:uploaded_data => data}
     response.should be_success
     upload = assigns[:uploaded_gradebook]
@@ -158,7 +155,7 @@ describe GradebookUploadsController do
       uploaded_json = <<-JSON
       {
         "students": [{
-          "original_id": #{@student.id},
+          "previous_id": #{@student.id},
           "name": "#{@student.name}",
           "submissions": [{
             "grade": "40%",
@@ -168,7 +165,7 @@ describe GradebookUploadsController do
           "last_name_first": "#{@student.last_name_first}"
         }],
         "assignments": [{
-          "original_id": #{@assignment.id},
+          "previous_id": #{@assignment.id},
           "title": "#{@assignment.title}",
           "id": #{@assignment.id},
           "points_possible": #{@assignment.points_possible},

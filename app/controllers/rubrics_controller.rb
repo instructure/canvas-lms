@@ -26,16 +26,21 @@ class RubricsController < ApplicationController
     return unless authorized_action(@context, @current_user, :manage)
     js_env :ROOT_OUTCOME_GROUP => get_root_outcome
     @rubric_associations = @context.rubric_associations.bookmarked.include_rubric.to_a
-    @rubric_associations = Canvas::ICU.collate_by(@rubric_associations.select(&:rubric_id).once_per(&:rubric_id)) { |r| r.rubric.title }
+    @rubric_associations = Canvas::ICU.collate_by(@rubric_associations.select(&:rubric_id).uniq(&:rubric_id)) { |r| r.rubric.title }
     @rubrics = @rubric_associations.map(&:rubric)
     @context.is_a?(User) ? render(:action => 'user_index') : render
   end
 
   def show
     return unless authorized_action(@context, @current_user, :manage)
-    js_env :ROOT_OUTCOME_GROUP => get_root_outcome
-    @rubric_association = @context.rubric_associations.bookmarked.find_by_rubric_id(params[:id])
-    @actual_rubric = @rubric_association.rubric
+    if (id = params[:id]) =~ Api::ID_REGEX
+      js_env :ROOT_OUTCOME_GROUP => get_root_outcome
+      @rubric_association = @context.rubric_associations.bookmarked.find_by_rubric_id(params[:id])
+      raise ActiveRecord::RecordNotFound unless @rubric_association
+      @actual_rubric = @rubric_association.rubric
+    else
+      raise ActiveRecord::RecordNotFound
+    end
   end
 
   def create
@@ -54,8 +59,8 @@ class RubricsController < ApplicationController
     params[:rubric][:user] = @current_user if params[:rubric]
     if (!@association_object || authorized_action(@association_object, @current_user, :read)) && authorized_action(@context, @current_user, :manage_rubrics)
       @association = @context.rubric_associations.find_by_id(params[:rubric_association_id]) if params[:rubric_association_id].present?
-      @association_object ||= @association.association if @association
-      params[:rubric_association][:association] = @association_object
+      @association_object ||= @association.association_object if @association
+      params[:rubric_association][:association_object] = @association_object
       params[:rubric_association][:update_if_existing] = params[:action] == 'update'
       skip_points_update = !!(params[:skip_updating_points_possible] =~ /true/i)
       params[:rubric_association][:skip_updating_points_possible] = skip_points_update

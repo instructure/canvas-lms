@@ -1,6 +1,6 @@
 <div id="sidebar_content">
   <% if can_do(@assignment, @current_user, :grade) %>
-    <%= render :partial => "grade_assignment" if can_do(@assignment, @current_user, :grade) %>
+    <%= render :partial => "grade_assignment" %>
   <% end %>
 
   <% if @current_user_submission %>

@@ -17,6 +17,7 @@
 #
 
 require [
+  'jquery'
   'compiled/views/outcomes/ToolbarView'
   'compiled/views/outcomes/SidebarView'
   'compiled/views/outcomes/ContentView'
@@ -24,7 +25,7 @@ require [
   'compiled/models/OutcomeGroup'
   'jst/outcomes/browser'
   'jst/outcomes/mainInstructions'
-], (ToolbarView, SidebarView, ContentView, FindDialog, OutcomeGroup, browserTemplate, instructionsTemplate) ->
+], ($, ToolbarView, SidebarView, ContentView, FindDialog, OutcomeGroup, browserTemplate, instructionsTemplate) ->
 
   renderInstructions = ENV.PERMISSIONS.manage_outcomes
 

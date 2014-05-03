@@ -20,11 +20,13 @@ define([
   'INST' /* INST */,
   'i18n!calendars',
   'jquery' /* $ */,
+  'underscore',
+  'timezone',
   'compiled/userSettings',
   'calendar_move' /* calendarMonths */,
   'jqueryui/draggable' /* /\.draggable/ */,
   'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.instructure_date_and_time' /* parseDateTime, formatDateTime, parseFromISO, dateString, datepicker, date_field, time_field, datetime_field, /\$\.datetime/ */,
+  'jquery.instructure_date_and_time' /* parseDateTime, formatDateTime, timeString, dateString, datepicker, date_field, time_field, datetime_field, /\$\.datetime/ */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, hideErrors */,
   'jqueryui/dialog',
   'jquery.instructure_misc_helpers' /* encodeToHex, decodeFromHex, replaceTags */,
@@ -38,7 +40,7 @@ define([
   'jqueryui/resizable' /* /\.resizable/ */,
   'jqueryui/sortable' /* /\.sortable/ */,
   'jqueryui/tabs' /* /\.tabs/ */
-], function(INST, I18n, $, userSettings, calendarMonths) {
+], function(INST, I18n, $, _, tz, userSettings, calendarMonths) {
 
   window.calendar = {
     activateEventId: ENV.CALENDAR.ACTIVE_EVENT,
@@ -485,24 +487,46 @@ define([
       }
     }
   }
+
   var calendar_event_url = $("#event_details").find('.calendar_event_url').attr('href');
   var assignment_url = $("#event_details").find('.assignment_url').attr('href');
   var $event_blank = $("#event_blank");
   var $undated_count = $(".show_undated_link .undated_count");
+
+  // Internal: Pad a number with zeroes until it is max length.
+  //
+  // n - The number to pad.
+  // max - The desired length.
+  //
+  // Returns a zero-padded string.
+  function pad(n, max) {
+    var result = n.toString();
+
+    if (n < 0) throw new Error('n cannot be negative');
+
+    while (result.length < max) {
+      result = '0' + result;
+    }
+
+    return result;
+  }
+
   function updateEvent(data, $event, batch) {
     var event = $.extend({}, data.assignment);
     var id = null;
     var details_url = null;
     if(data.calendar_event) {
       event = $.extend({}, data.calendar_event);
-      var start_date_data = $.parseFromISO(event.start_at);
-      var end_date_data = $.parseFromISO(event.end_at);
-      event.start_time_string = start_date_data.time_string;
-      event.end_time_string = end_date_data.time_string;
-      event.start_time_formatted = start_date_data.time_formatted;
-      event.start_date_string = start_date_data.date_formatted;
-      event.end_time_formatted = end_date_data.time_formatted;
-      event.time_sortable = start_date_data.time_sortable;
+
+      var start_at = tz.parse(event.start_at);
+      var end_at = tz.parse(event.end_at);
+      event.datetime = tz.format(start_at, '%Y_%m_%d');
+      event.start_time_string = $.timeString(start_at);
+      event.end_time_string = $.timeString(end_at);
+      event.start_time_formatted = $.timeString(start_at);
+      event.start_date_string = $.dateString(start_at);
+      event.end_time_formatted = $.timeString(end_at);
+      event.time_sortable = tz.format(start_at, '%R');
       event.event_type = "calendar_event";
       id = "calendar_event_" + event.id;
       updateEvent.details_urls = updateEvent.details_urls || {};
@@ -515,13 +539,14 @@ define([
       }
       details_url = updateEvent.details_urls[key];
     } else {
-      var date_data = $.parseFromISO(event.due_at, 'due_date');
-      event.start_time_string = date_data.time_string;
-      event.end_time_string = date_data.time_string;
-      event.start_time_formatted = date_data.time_formatted;
-      event.start_date_string = date_data.date_formatted;
-      event.end_time_formatted = date_data.time_formatted;
-      event.time_sortable = date_data.time_sortable;
+      var due_at = tz.parse(event.due_at);
+      event.datetime = tz.format(due_at, '%Y_%m_%d');
+      event.start_time_string = $.timeString(due_at);
+      event.end_time_string = $.timeString(due_at);
+      event.start_time_formatted = $.timeString(due_at);
+      event.start_date_string = $.dateString(due_at);
+      event.end_time_formatted = $.timeString(due_at);
+      event.time_sortable = tz.format(due_at, '%R');
       event.start_at = event.due_at;
       event.event_type = "assignment";
       id = "assignment_" + event.id;
@@ -554,23 +579,21 @@ define([
       }
     }
     $event = $("#event_" + id);
-    var all_day_date = $.parseFromISO(event.all_day_date);
-    if(all_day_date.date_timestamp && false) {
-      event.start_at = event.all_day_date.substring(0, 10);
-      event.all_day_date = all_day_date.date_formatted;
-    } else {
-      event.all_day_date = '';
-    }
     if(event.all_day) {
-      event.start_at = event.all_day_date.substring(0, 10);
-      if(all_day_date.date_timestamp) {
-        event.all_day_date = all_day_date.date_formatted;
-        event.start_at = all_day_date.date_sortable.substring(0, 10);
+      var all_day_date = tz.parse(event.all_day_date);
+      if (_.isDate(all_day_date)) {
+        event.all_day_date = $.dateString(all_day_date);
+        event.start_at = tz.format(all_day_date, '%F');
+      } else {
+        event.all_day_date = '';
+        event.start_at = '';
       }
       event.start_time_formatted = '';
       event.end_time_formatted = '';
+    } else {
+      event.all_day_date = '';
     }
-    var isManagementContext = managementContexts && $.inArray(event.context_code, managementContexts) != -1;
+    var isManagementContext = ENV.calendarManagementContexts && $.inArray(event.context_code, ENV.calendarManagementContexts) != -1;
     if(event.permissions || isManagementContext) {
       event.can_edit = isManagementContext || (event.permissions && event.permissions.update);
       event.can_delete = isManagementContext || (event.permissions && event.permissions['delete']);
@@ -609,8 +632,8 @@ define([
     $event.find('.calendar-name-text').text($('.' + groupId).find('label').text());
     $event.addClass('event_' + id);
     var $day = $(".calendar_undated");
-    if(event.start_at != null) {
-      $day = $("#day_" + event.start_at.substring(0, 10).replace(/-/g, '_'));
+    if(event.datetime) {
+      $day = $('#day_' + event.datetime);
     }
     if(!$event.hasClass('event_pending')) {
       addEventToDay($event, $day, batch);
@@ -666,10 +689,10 @@ define([
       }
     }
     if(data.all_day == 'true') {
-      date = Date.parse(date_string);
+      date = tz.parse(date_string);
       data.time_string = $.dateString(date);
     } else if(data.start_time_string) {
-      date = Date.parse(date_string);
+      date = tz.parse(date_string);
       data.time_string = $.dateString(date);
     } else {
       data.time_string = "No Date Set";
@@ -1290,7 +1313,7 @@ define([
       }
       event.preventDefault();
       event.stopPropagation();
-      if(canCreateEvent) {
+      if(ENV.canCreateEvent) {
         editEvent($("#event_blank"), $(this));
         var context_code = ($(".group_reference_checkbox:checked:first").attr('id') || "").replace(/^group_/, '');
         if(!context_code) {

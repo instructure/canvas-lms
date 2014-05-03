@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
 describe "admin avatars" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   before (:each) do
     course_with_admin_logged_in
@@ -30,7 +30,7 @@ describe "admin avatars" do
       f(opts.keys[0]).click
     end
     f("#avatars .name").should include_text user.name
-    f(".avatar img").attribute('src').should_not be_nil
+    f(".avatar").attribute('style').should match(/http/)
   end
 
   def lock_avatar(user, element)

@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe ContentMigrationsController, :type => :integration do
+describe ContentMigrationsController, type: :request do
   before do
     course_with_teacher_logged_in(:active_all => true, :user => user_with_pseudonym)
     @migration_url = "/api/v1/courses/#{@course.id}/content_migrations"
@@ -198,6 +198,16 @@ describe ContentMigrationsController, :type => :integration do
       migration.job_progress.should be_nil
     end
 
+    it "should translate a sis source_course_id" do
+      other_course = course active_all: true
+      other_course.sis_source_id = "booga"
+      other_course.save!
+      json = api_call(:post, @migration_url + "?settings[source_course_id]=sis_course_id:booga&migration_type=course_copy_importer",
+                      @params.merge(:migration_type => 'course_copy_importer', :settings => {'source_course_id' => 'sis_course_id:booga'}))
+      migration = ContentMigration.find json['id']
+      migration.migration_settings[:source_course_id].should eql other_course.id
+    end
+
     context "migration file upload" do
       it "should set attachment pre-flight data" do
         json = api_call(:post, @migration_url, @params, @post_params)
@@ -215,7 +225,7 @@ describe ContentMigrationsController, :type => :integration do
       it "should error if upload file required but not provided" do
         @post_params.delete :pre_attachment
         json = api_call(:post, @migration_url, @params, @post_params, {}, :expected_status => 400)
-        json.should == {"message"=>"File upload is required"}
+        json.should == {"message"=>"File upload or url is required"}
       end
 
       it "should queue the migration when file finishes uploading" do
@@ -252,6 +262,17 @@ describe ContentMigrationsController, :type => :integration do
         migration = ContentMigration.find json['id']
         migration.workflow_state = 'pre_process_error'
       end
+    end
+
+    context "by url" do
+      it "should queue migration with url sent" do
+        post_params = {migration_type: 'common_cartridge_importer', settings:{file_url: 'http://example.com/oi.imscc'}}
+        json = api_call(:post, @migration_url, @params, post_params)
+        migration = ContentMigration.find json['id']
+        migration.attachment.should be_nil
+        migration.migration_settings[:file_url].should == post_params[:settings][:file_url]
+      end
+      
     end
 
   end

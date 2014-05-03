@@ -48,6 +48,10 @@ class CalendarsController < ApplicationController
         @contexts.each do |context|
           log_asset_access("dashboard_calendar:#{context.asset_string}", "calendar", 'other')
         end
+        calendarManagementContexts = @contexts.select{|c| can_do(c, @current_user, :manage_calendar) }.map(&:asset_string)
+        canCreateEvent = calendarManagementContexts.length > 0
+        js_env(calendarManagementContexts: calendarManagementContexts,
+               canCreateEvent: canCreateEvent)
         render :action => "show"
       end
       # this  unless @dont_render_again stuff is ugly but I wanted to send back a 304 but it started giving me "Double Render errors"
@@ -107,6 +111,7 @@ class CalendarsController < ApplicationController
       end
       info
     end
+    Api.recursively_stringify_json_ids(@contexts_json)
   end
 
   def build_calendar_events
@@ -225,7 +230,7 @@ class CalendarsController < ApplicationController
     end
     if @domain_root_account.enable_scheduler?
       if preferred_calendar == 'show'
-        add_crumb @template.link_to(t(:use_new_calendar, "Try out the new calendar"), switch_calendar_url('2'), :method => :post), nil, :id => 'change_calendar_version_link_holder'
+        add_crumb view_context.link_to(t(:use_new_calendar, "Try out the new calendar"), switch_calendar_url('2'), :method => :post), nil, :id => 'change_calendar_version_link_holder'
       end
     end
   end

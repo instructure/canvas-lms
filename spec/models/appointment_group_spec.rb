@@ -324,6 +324,11 @@ describe AppointmentGroup do
       @g9.grants_right?(@teacher2, nil, :manage).should be_true
       @g9.grants_right?(@teacher3, nil, :manage).should be_false
     end
+
+    it "should ignore deleted courses when performing permissions checks" do
+      @course3.destroy
+      @g8.reload.grants_right?(@teacher2, nil, :manage).should be_true
+    end
   end
 
   context "notifications" do

@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "assignments" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   context "as a student" do
 
@@ -234,10 +234,10 @@ describe "assignments" do
         keep_trying_until do
         submission_input.send_keys(fullpath_txt)
         ext_error.should_not be_displayed
-        submit_file_button.should_not have_class('disabled')
+        submit_file_button['disabled'].should be_nil
         submission_input.send_keys(fullpath_zip)
         ext_error.should be_displayed
-        submit_file_button.should have_class('disabled')
+        submit_file_button.should have_attribute(:disabled, "true")
         end
       end
 
@@ -261,8 +261,7 @@ describe "assignments" do
 
     context "draft state" do
       before do
-        Account.default.settings[:enable_draft] = true
-        Account.default.save!
+        Account.default.enable_feature!(:draft_state)
         @domain_root_account = Account.default
 
         get "/courses/#{@course.id}/assignments"

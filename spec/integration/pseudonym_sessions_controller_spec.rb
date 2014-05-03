@@ -133,6 +133,8 @@ describe PseudonymSessionsController do
         Canvas.redis.get("cas_session:ST-abcd").should == nil
 
         back_channel = open_session
+        # it starts out as a clone of the current session
+        back_channel.reset!
 
         # single-sign-out from CAS server has no effect now
         back_channel.post cas_logout_url, :logoutRequest => <<-SAML
@@ -141,7 +143,7 @@ describe PseudonymSessionsController do
 <samlp:SessionIndex>ST-abcd</samlp:SessionIndex>
 </samlp:LogoutRequest>
         SAML
-        back_channel.response.status.should == '404 Not Found'
+        back_channel.response.status.to_i.should == 404
 
         # this should refresh it
         get dashboard_url
@@ -150,10 +152,10 @@ describe PseudonymSessionsController do
 
         # unrelated logout should have no effect
         back_channel.post cas_logout_url :garbage => 1
-        back_channel.response.status.should == '404 Not Found'
+        back_channel.response.status.to_i.should == 404
 
         back_channel.post cas_logout_url :logoutRequest => "garbage"
-        back_channel.response.status.should == '404 Not Found'
+        back_channel.response.status.to_i.should == 404
 
         back_channel.post cas_logout_url :logoutRequest => <<-SAML
 <samlp:LogoutRequest xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" ID="1371236167rDkbdl8FGzbqwBhICvi" Version="2.0" IssueInstant="Fri, 14 Jun 2013 12:56:07 -0600">
@@ -161,7 +163,7 @@ describe PseudonymSessionsController do
 <samlp:SessionIndex>ST-abc</samlp:SessionIndex>
 </samlp:LogoutRequest>
         SAML
-        back_channel.response.status.should == '404 Not Found'
+        back_channel.response.status.to_i.should == 404
 
         # still logged in
         get dashboard_url
@@ -186,6 +188,10 @@ describe PseudonymSessionsController do
   end
 
   context "SAML" do
+    before do
+      pending("requires SAML extension") unless AccountAuthorizationConfig.saml_enabled
+    end
+
     it 'redirects to the discovery page when hitting a deep link while unauthenticated' do
       account = account_with_saml( :account => Account.default )
       discovery_url = 'http://discovery-url.example.com'

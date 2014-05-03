@@ -65,13 +65,16 @@ define [
       if e.originalEvent?.type != "click" && $target = $(ui.item).find('a')
         e.preventDefault()
         $target.trigger('click')
-      @$menu.popup('close').removeClass "ui-state-open"
+      @close()
 
     onClose: =>
       @$menu.insertBefore(@$placeholder) if @opts.appendMenuTo
       @$trigger.removeClass 'ui-state-active'
       @$menu.removeClass "ui-state-open"
       @$notifyParent.removeClass('menu_active') if @opts.notifyMenuActiveOnParent
+
+    close: =>
+      @$menu.popup('close').removeClass('ui-state-open')
 
     keepButtonActive: =>
       @$trigger.addClass('ui-state-active') if @$menu.is('.ui-state-open') && @$trigger.is('.btn, .ui-button')

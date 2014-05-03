@@ -35,7 +35,7 @@ describe PluginSetting do
 
   it "should not be valid if there are decrypt errors" do
     s = PluginSetting.new(:name => "plugin_setting_test", :settings => {:bar => "qwerty", :foo_enc => "invalid", :foo_salt => "invalid"})
-    s.send(:create_without_callbacks).should be_true
+    s.send(:save_without_callbacks).should be_true
 
     s.reload
     s.valid_settings?.should be_false
@@ -50,7 +50,7 @@ describe PluginSetting do
   
   it "should return updated content if created" do
     s = PluginSetting.new(:name => "plugin_setting_test", :settings => {:bar => "qwerty"})
-    s.send(:create_without_callbacks).should be_true
+    s.send(:save_without_callbacks).should be_true
     settings = PluginSetting.settings_for_plugin("plugin_setting_test")
     settings.should_not be_nil
     settings[:bar].should == "qwerty"
@@ -58,7 +58,7 @@ describe PluginSetting do
   
   it "should return default content if the setting is disabled" do
     s = PluginSetting.new(:name => "plugin_setting_test", :settings => {:bar => "qwerty"})
-    s.send(:create_without_callbacks).should be_true
+    s.send(:save_without_callbacks).should be_true
     settings = PluginSetting.settings_for_plugin("plugin_setting_test")
     settings.should_not be_nil
     settings[:bar].should == "qwerty"

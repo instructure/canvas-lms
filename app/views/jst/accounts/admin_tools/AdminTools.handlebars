@@ -6,8 +6,8 @@
     {{#if viewMessages}}
     <li class="notifications"><a href="#commMessagesPane">{{#t "view_messages"}}View Notifications{{/t}}</a></li>
     {{/if}}
-    {{#if authLogging}}
-    <li class="logging"><a href="#authLoggingPane">{{#t "auth_logging"}}Logging{{/t}}</a></li>
+    {{#if logging}}
+    <li class="logging"><a href="#loggingPane">{{#t "tab_labels.admin_tools_logging"}}Logging{{/t}}</a></li>
     {{/if}}
   </ul>
   <div id="adminToolsTabPanes">
@@ -17,8 +17,8 @@
     {{#if viewMessages}}
     <div id="commMessagesPane"></div>
     {{/if}}
-    {{#if authLogging}}
-    <div id="authLoggingPane"></div>
+    {{#if logging}}
+    <div id="loggingPane"></div>
     {{/if}}
   </div>
 </div>

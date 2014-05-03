@@ -46,10 +46,10 @@ module Context
     LearningOutcomeGroup = ::LearningOutcomeGroup
     MediaObject = ::MediaObject
     Progress = ::Progress
-    Quiz = ::Quiz
-    QuizGroup = ::QuizGroup
-    QuizQuestion = ::QuizQuestion
-    QuizSubmission = ::QuizSubmission
+    Quiz = ::Quizzes::Quiz
+    QuizGroup = ::Quizzes::QuizGroup
+    QuizQuestion = ::Quizzes::QuizQuestion
+    QuizSubmission = ::Quizzes::QuizSubmission
     Rubric = ::Rubric
     RubricAssociation = ::RubricAssociation
     Submission = ::Submission
@@ -117,7 +117,7 @@ module Context
 
   def sorted_rubrics(user, context)
     associations = RubricAssociation.bookmarked.for_context_codes(context.asset_string).include_rubric
-    Canvas::ICU.collate_by(associations.to_a.once_per(&:rubric_id).select{|r| r.rubric }) { |r| r.rubric.title || SortLast }
+    Canvas::ICU.collate_by(associations.to_a.uniq(&:rubric_id).select{|r| r.rubric }) { |r| r.rubric.title || SortLast }
   end
 
   def rubric_contexts(user)
@@ -131,7 +131,7 @@ module Context
     codes_order = {}
     context_codes.each_with_index{|c, idx| codes_order[c] = idx }
     associations = RubricAssociation.bookmarked.for_context_codes(context_codes).include_rubric
-    associations = associations.to_a.select{|a| a.rubric }.once_per{|a| [a.rubric_id, a.context_code] }
+    associations = associations.to_a.select{|a| a.rubric }.uniq{|a| [a.rubric_id, a.context_code] }
     contexts = associations.group_by{|a| a.context_code }.map do |code, associations|
       context_name = associations.first.context_name
       res = {
@@ -226,11 +226,12 @@ module Context
     true
   end
 
-  # Public: Boolean flag re: whether draft state is enabled or not. This
-  # method should be overridden in classes that include Context.
+  # Public: Boolean flag re: whether a feature is enabled
+  # provides defaults for objects that do not include FeatureFlags
+  # (note: include Context _before_ FeatureFlags)
   #
   # Returns false
-  def draft_state_enabled?
+  def feature_enabled?(feature)
     false
   end
 end

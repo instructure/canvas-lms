@@ -21,10 +21,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe ContentZipper do
   describe "zip_assignment" do
     it "sanitizes user names" do
-      s1, s2 = 2.times.map { course_with_student ; @student }
+      s1, s2, s3 = n_students_in_course(3)
       s1.update_attribute :sortable_name, 'some_999_, _1234_guy'
       s2.update_attribute :sortable_name, 'other 567, guy 8'
-      [s1, s2].each { |s|
+      s3.update_attribute :sortable_name, '45'
+      [s1, s2, s3].each { |s|
         submission_model user: s, assignment: @assignment, body: "blah"
       }
       attachment = Attachment.new(:display_name => 'my_download.zip')
@@ -36,9 +37,12 @@ describe ContentZipper do
       expected_file_patterns = [
         /other-567--guy-8/,
         /some-999----1234-guy/,
+        /-45-/,
       ]
-      Zip::ZipFile.foreach(attachment.reload.full_filename).each { |f|
-        f.name.should =~ expected_file_patterns.shift
+      Zip::File.foreach(attachment.reload.full_filename) { |f|
+        expect {
+          expected_file_patterns.delete_if { |expected_pattern| f.name =~ expected_pattern }
+        }.to change { expected_file_patterns.size }.by(-1)
       }
       expected_file_patterns.should be_empty
     end
@@ -55,10 +59,10 @@ describe ContentZipper do
       ContentZipper.process_attachment(attachment, @teacher)
       attachment.reload
       attachment.workflow_state.should == 'zipped'
-      Zip::ZipFile.foreach(attachment.full_filename) do |f|
+      Zip::File.foreach(attachment.full_filename) do |f|
         if f.file?
           f.name.should =~ /some-999----1234-guy/
-          f.get_input_stream.read.should match(%r{This submission was a url, we&#39;re taking you to the url link now.})
+          f.get_input_stream.read.should match(%r{This submission was a url, we&#x27;re taking you to the url link now.})
           f.get_input_stream.read.should be_include("http://www.instructure.com/")
         end
       end
@@ -75,7 +79,7 @@ describe ContentZipper do
       ContentZipper.process_attachment(attachment, @teacher)
       attachment.reload
       attachment.workflow_state.should == 'zipped'
-      Zip::ZipFile.foreach(attachment.full_filename) do |f|
+      Zip::File.foreach(attachment.full_filename) do |f|
         if f.file?
           f.get_input_stream.read.should be_include("hai this is my answer")
         end
@@ -120,11 +124,11 @@ describe ContentZipper do
       ContentZipper.process_attachment(attachment, @teacher)
       sub_count = 0
       expected_file_names = [/group-0/, /group-1/]
-      Zip::ZipFile.foreach(attachment.full_filename) do |f|
-        f.name.should =~ expected_file_names.shift
-        sub_count += 1
+      Zip::File.foreach(attachment.full_filename) do |f|
+        expect {
+          expected_file_names.delete_if { |expected_name| f.name =~ expected_name }
+        }.to change { expected_file_names.size }.by(-1)
       end
-      sub_count.should == 2
     end
   end
 
@@ -171,7 +175,7 @@ describe ContentZipper do
         ContentZipper.process_attachment(@attachment, user, :check_user => check_user)
         names = []
         @attachment.reload
-        Zip::ZipFile.foreach(@attachment.full_filename) {|f| names << f.name if f.file? }
+        Zip::File.foreach(@attachment.full_filename) {|f| names << f.name if f.file? }
         names.sort
       end
 
@@ -241,7 +245,7 @@ describe ContentZipper do
       ContentZipper.process_attachment(attachment, @user)
       attachment.reload
       names = []
-      Zip::ZipFile.foreach(attachment.full_filename) {|f| names << f.name if f.file? }
+      Zip::File.foreach(attachment.full_filename) {|f| names << f.name if f.file? }
       names.should == ['otherfile.png']
     end
   end
@@ -266,7 +270,7 @@ describe ContentZipper do
       attachment.context = eportfolio
       attachment.save!
       Dir.expects(:mktmpdir).once.yields('/tmp')
-      Zip::ZipFile.expects(:open).once.with('/tmp/etcpasswd.zip', Zip::ZipFile::CREATE)
+      Zip::File.expects(:open).once.with('/tmp/etcpasswd.zip', Zip::File::CREATE)
       ContentZipper.process_attachment(attachment, user)
     end
   end
@@ -308,13 +312,13 @@ describe ContentZipper do
       it "creates uploaded data for the assignment and marks it as available" do
         @attachment.expects(:save!).once
         zip_name = "submissions.zip"
+        zip_path = File.join(ActionController::TestCase.fixture_path, zip_name)
         data = "just some stub data"
-        ActionController::TestUploadedFile.expects(:new).
-          with(zip_name, 'application/zip').returns data
+        Rack::Test::UploadedFile.expects(:new).with(zip_path, 'application/zip').returns data
         @attachment.expects(:uploaded_data=).with data
         zipper = ContentZipper.new
         zipper.mark_successful!
-        zipper.complete_attachment!(@attachment,zip_name)
+        zipper.complete_attachment!(@attachment,zip_path)
         @attachment.should be_zipped
         @attachment.file_state.should == 'available'
       end
@@ -323,12 +327,13 @@ describe ContentZipper do
 
   describe "zip_quiz" do
     it "delegates to a QuizSubmissionZipper" do
+      course_with_teacher_logged_in(active_all: true)
       attachment = Attachment.new(:display_name => 'download.zip')
-      quiz = Quiz.new(:context => @course)
+      quiz = Quizzes::Quiz.new(:context => @course)
       zipper_stub = stub
       zipper_stub.expects(:zip!).once
       attachment.context = quiz
-      QuizSubmissionZipper.expects(:new).with(
+      Quizzes::QuizSubmissionZipper.expects(:new).with(
         quiz: quiz,
         zip_attachment: attachment
       ).returns zipper_stub

@@ -88,6 +88,7 @@ describe "BookmarkedCollection::MergeProxy" do
         @created_scope = Course.where(:workflow_state => 'created')
         @deleted_scope = Course.where(:workflow_state => 'deleted')
 
+        CourseAccountAssociation.delete_all
         Course.delete_all
         @courses = [
           @created_scope.create!,
@@ -160,12 +161,11 @@ describe "BookmarkedCollection::MergeProxy" do
     describe "with a merge proc" do
       before :each do
         #set @domain_root_account
-        @domain_root_account = Account.default
+        @domain_root_account = Account.create!
 
-        Course.delete_all
-        @courses = 6.times.map{ Course.create! }
-        @scope1 = Course.select("id, 1 as scope").where("id<?", @courses[4].id)
-        @scope2 = Course.select("id, 2 as scope").where("id>?", @courses[1].id)
+        @courses = 6.times.map{ @domain_root_account.courses.create! }
+        @scope1 = @domain_root_account.courses.select("id, '1' as scope").where("id<?", @courses[4].id).order(:id)
+        @scope2 = @domain_root_account.courses.select("id, '2' as scope").where("id>?", @courses[1].id).order(:id)
 
         @collection1 = BookmarkedCollection.wrap(MyBookmarker, @scope1)
         @collection2 = BookmarkedCollection.wrap(MyBookmarker, @scope2)

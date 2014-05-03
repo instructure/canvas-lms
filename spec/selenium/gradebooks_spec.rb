@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + "/common")
 
 describe "gradebook1" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   before(:each) do
     course_with_teacher_logged_in(:active_all => true)
@@ -44,7 +44,7 @@ describe "gradebook1" do
   end
 
   it "hides/shows assignments based on their draft state" do
-    @course.root_account.enable_draft!
+    @course.root_account.enable_feature!(:draft_state)
     @assignment.unpublish
     get "/courses/#{@course.id}/gradebook"
     wait_for_ajaximations
@@ -65,6 +65,7 @@ describe "gradebook1" do
     click_option("#section-to-show", section_name)
     driver.execute_script("$('#section-to-show').parent().parent().find('button').click()")
     wait_for_ajaximations
+    sleep 2
   end
 
   it "should filter by section" do

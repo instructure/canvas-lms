@@ -9,3 +9,4 @@ define [
     initialize: () ->
       super()
       @setParam('state', ['unpublished', 'available', 'completed'])
+      @setParam('include', ['term'])

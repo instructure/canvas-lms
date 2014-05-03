@@ -2,9 +2,10 @@ define [
   'jquery'
   'compiled/models/Quiz'
   'compiled/models/Assignment'
+  'compiled/models/DateGroup'
   'compiled/collections/AssignmentOverrideCollection'
   'jquery.ajaxJSON'
-], ($, Quiz, Assignment, AssignmentOverrideCollection) ->
+], ($, Quiz, Assignment, DateGroup, AssignmentOverrideCollection) ->
 
   module 'Quiz',
     setup: ->
@@ -55,16 +56,16 @@ define [
     equal @quiz.get('title_label'), 'Quiz'
 
 
-  test '#initialize defaults publishable to true', ->
-    ok @quiz.get('publishable')
+  test '#initialize defaults unpublishable to true', ->
+    ok @quiz.get('unpublishable')
 
-  test '#initialize sets publishable to false', ->
-    @quiz = new Quiz(publishable: false)
-    ok !@quiz.get('publishable')
+  test '#initialize sets unpublishable to false', ->
+    @quiz = new Quiz(unpublishable: false)
+    ok !@quiz.get('unpublishable')
 
   test '#initialize sets publishable from can_unpublish and published', ->
     @quiz = new Quiz(can_unpublish: false, published: true)
-    ok !@quiz.get('publishable')
+    ok !@quiz.get('unpublishable')
 
 
   test "#initialize sets question count", ->
@@ -81,7 +82,7 @@ define [
 
   test "#initialize sets possible points count with 0 points", ->
     @quiz = new Quiz(points_possible: 0)
-    equal @quiz.get('possible_points_label'), '0 pts'
+    equal @quiz.get('possible_points_label'), ''
 
   test "#initialize sets possible points count with 1 points", ->
     @quiz = new Quiz(points_possible: 1)
@@ -109,3 +110,107 @@ define [
   test '#unpublish sets published attribute to false', ->
     @quiz.unpublish()
     ok !@quiz.get('published')
+
+
+  # multiple due dates
+
+  module "Quiz#multipleDueDates"
+
+  test "checks for multiple due dates from assignment overrides", ->
+    quiz = new Quiz all_dates: [{title: "Winter"}, {title: "Summer"}]
+    ok quiz.multipleDueDates()
+
+  test "checks for no multiple due dates from quiz overrides", ->
+    quiz = new Quiz
+    ok !quiz.multipleDueDates()
+
+  module "Quiz#allDates"
+
+  test "gets the due dates from the assignment overrides", ->
+    dueAt = new Date("2013-08-20T11:13:00Z")
+    dates = [
+      new DateGroup due_at: dueAt, title: "Everyone"
+    ]
+    quiz     = new Quiz all_dates: dates
+    allDates = quiz.allDates()
+    first    = allDates[0]
+
+    equal first.dueAt+"", dueAt+""
+    equal first.dueFor,   "Everyone"
+
+  test "gets empty due dates when there are no dates", ->
+    quiz = new Quiz
+    deepEqual quiz.allDates(), []
+
+
+  # single section due date
+
+  test "gets the due date for section instead of null", ->
+    dueAt = new Date("2013-11-27T11:01:00Z")
+    quiz = new Quiz all_dates: [
+      {due_at: null, title: "Everyone"},
+      {due_at: dueAt, title: "Summer"}
+    ]
+    false_stub = sinon.stub quiz, "multipleDueDates"
+    false_stub.returns false
+    deepEqual quiz.singleSectionDueDate(), dueAt.toISOString()
+    false_stub.restore()
+
+  test "returns due_at when only one date/section are present", ->
+    date = Date.now()
+    quiz = new Quiz name: 'Taco party!'
+    quiz.set 'due_at', date
+    deepEqual quiz.singleSectionDueDate(), quiz.dueAt()
+
+  # toView
+
+  module "Quiz#toView"
+
+  test "returns the quiz's dueAt", ->
+    date = Date.now()
+    quiz = new Quiz name: 'foo'
+    quiz.dueAt date
+    json = quiz.toView()
+    deepEqual json.dueAt, date
+
+  test "returns quiz's lockAt", ->
+    lockAt = Date.now()
+    quiz = new Quiz name: 'foo'
+    quiz.lockAt lockAt
+    json = quiz.toView()
+    deepEqual json.lockAt, lockAt
+
+  test "includes quiz's unlockAt", ->
+    unlockAt = Date.now()
+    quiz = new Quiz name: 'foo'
+    quiz.unlockAt unlockAt
+    json = quiz.toView()
+    deepEqual json.unlockAt, unlockAt
+
+  test "includes htmlUrl", ->
+    quiz = new Quiz url: 'http://example.com/quizzes/1'
+    json = quiz.toView()
+    deepEqual json.htmlUrl, 'http://example.com/quizzes/1'
+
+  test "includes multipleDueDates", ->
+    quiz = new Quiz all_dates: [{title: "Summer"}, {title: "Winter"}]
+    json = quiz.toView()
+    deepEqual json.multipleDueDates, true
+
+  test "includes allDates", ->
+    quiz = new Quiz all_dates: [{title: "Summer"}, {title: "Winter"}]
+    json = quiz.toView()
+    equal json.allDates.length, 2
+
+  test "includes singleSectionDueDate", ->
+    dueAt = new Date("2013-11-27T11:01:00Z")
+    quiz = new Quiz all_dates: [
+      {due_at: null, title: "Everyone"},
+      {due_at: dueAt, title: "Summer"}
+    ]
+    false_stub = sinon.stub quiz, "multipleDueDates"
+    false_stub.returns false
+    json = quiz.toView()
+    equal json.singleSectionDueDate, dueAt.toISOString()
+    false_stub.restore()
+

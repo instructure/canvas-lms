@@ -1,13 +1,16 @@
 define [
   'jquery'
+  'underscore'
   'Backbone'
   'compiled/models/Assignment'
+  'compiled/models/DateGroup'
   'compiled/collections/AssignmentOverrideCollection'
+  'compiled/collections/DateGroupCollection'
   'str/pluralize'
   'i18n!quizzes'
   'jquery.ajaxJSON'
   'jquery.instructure_misc_helpers' # $.underscore
-], ($, Backbone, Assignment, AssignmentOverrideCollection, pluralize, I18n) ->
+], ($, _, Backbone, Assignment, DateGroup, AssignmentOverrideCollection, DateGroupCollection, pluralize, I18n) ->
 
   class Quiz extends Backbone.Model
     resourceName: 'quizzes'
@@ -16,7 +19,7 @@ define [
       due_at: null
       unlock_at: null
       lock_at: null
-      publishable: true
+      unpublishable: true
       points_possible: null
 
     initialize: (attributes, options = {}) ->
@@ -25,9 +28,10 @@ define [
       @initAssignmentOverrides()
       @initUrls()
       @initTitleLabel()
-      @initPublishable()
+      @initUnpublishable()
       @initQuestionsCount()
       @initPointsCount()
+      @initAllDates()
 
     # initialize attributes
     initAssignment: ->
@@ -51,8 +55,8 @@ define [
     initTitleLabel: ->
       @set 'title_label', @get('title') or @get('readable_type')
 
-    initPublishable: ->
-      @set('publishable', false) if @get('can_unpublish') == false and @get('published')
+    initUnpublishable: ->
+      @set('unpublishable', false) if @get('can_unpublish') == false and @get('published')
 
     initQuestionsCount: ->
       cnt = @get 'question_count'
@@ -61,15 +65,19 @@ define [
     initPointsCount: ->
       pts = @get 'points_possible'
       text = ''
-      text = I18n.t('assignment_points_possible', 'pt', count: pts) if pts isnt null
+      if pts && pts > 0
+        text = I18n.t('assignment_points_possible', 'pt', count: pts)
       @set 'possible_points_label', text
+
+    initAllDates: ->
+      if (allDates = @get('all_dates'))?
+        @set 'all_dates', new DateGroupCollection(allDates)
 
     # publishing
 
     publish: =>
-      if @get 'publishable'
-        @set 'published', true
-        $.ajaxJSON(@get('publish_url'), 'POST', 'quizzes': [@get 'id'])
+      @set 'published', true
+      $.ajaxJSON(@get('publish_url'), 'POST', 'quizzes': [@get 'id'])
 
     unpublish: =>
       @set 'published', false
@@ -77,3 +85,47 @@ define [
 
     disabledMessage: ->
       I18n.t('cant_unpublish_when_students_submit', "Can't unpublish if there are student submissions")
+
+    # methods needed by views
+
+    dueAt: (date) =>
+      return @get 'due_at' unless arguments.length > 0
+      @set 'due_at', date
+
+    unlockAt: (date) =>
+      return @get 'unlock_at' unless arguments.length > 0
+      @set 'unlock_at', date
+
+    lockAt: (date)  =>
+      return @get 'lock_at' unless arguments.length > 0
+      @set 'lock_at', date
+
+    htmlUrl: =>
+      @get 'url'
+
+    defaultDates: =>
+      group = new DateGroup
+        due_at:    @get("due_at")
+        unlock_at: @get("unlock_at")
+        lock_at:   @get("lock_at")
+
+    multipleDueDates: =>
+      dateGroups = @get("all_dates")
+      dateGroups && dateGroups.length > 1
+
+    allDates: =>
+      groups = @get("all_dates")
+      models = (groups and groups.models) or []
+      result = _.map models, (group) -> group.toJSON()
+
+    singleSectionDueDate: =>
+      _.find(@allDates(), 'dueAt')?.dueAt.toISOString() || @dueAt()
+
+    toView: =>
+      fields = [
+        'htmlUrl', 'multipleDueDates', 'allDates', 'dueAt', 'lockAt', 'unlockAt', 'singleSectionDueDate'
+      ]
+      hash = id: @get 'id'
+      for field in fields
+        hash[field] = @[field]()
+      hash

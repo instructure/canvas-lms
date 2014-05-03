@@ -1,7 +1,7 @@
 require 'json'
 require 'time'
 require 'set'
-require 'zip/zip'
+require 'zip'
 require 'net/http'
 require 'uri'
 require 'cgi'

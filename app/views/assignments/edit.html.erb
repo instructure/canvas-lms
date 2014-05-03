@@ -4,12 +4,12 @@
   <% if can_do(@assignment, @current_user, :update) %>
     <ul class="page-action-list">
       <li>
-        <% link_to new_course_discussion_topic_url(@context) do %>
+        <%= link_to new_course_discussion_topic_url(@context) do %>
           <i class="icon-discussion-new"></i> <%= t('new_discussion', "New Discussion") %>
         <% end %>
       </li>
       <li>
-        <% link_to new_course_quiz_url(@context) do %>
+        <%= link_to new_course_quiz_url(@context) do %>
           <i class="icon-quiz"></i> <%= t('new_quiz', "New Quiz") %>
         <% end %>
       </li>
@@ -18,11 +18,11 @@
 <% end %>
 
 <%
-  jammit_css :assignments, :tinymce
+  jammit_css :assignments, :assignments_edit, :tinymce
   js_bundle :assignment_edit
 %>
 
-<% if @context.draft_state_enabled? %>
+<% if @context.feature_enabled?(:draft_state) %>
   <div id="edit_assignment_header" class="header-bar">
   </div>
 <% end %>

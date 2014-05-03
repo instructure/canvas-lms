@@ -12,18 +12,33 @@
   margin-right: 0
   width: auto
 
-table.rubric
+.rubric_container
   :margin-top 20px
-  :border-collapse collapse
-  //for some reason, chrome puts a scrollbar on the table in the extended gradebook if it is 100%
-  :width 99.9%
-  :page-break-inside avoid
+
+  .rubric_table
+    :border-collapse collapse
+    //for some reason, chrome puts a scrollbar on the table in the extended gradebook if it is 100%
+    :width 99.9%
+    :page-break-inside avoid
 
   thead th
     :background-color #ccc
   td, th
     :border 1px solid #aaa
     :padding 2px 5px
+
+  .rubric_title
+    :background-color #ccc
+    :border-top 1px solid #aaa
+    :border-left 1px solid #aaa
+    :border-right 1px solid #aaa
+    :padding 5px
+    :margin-right 1px
+    :font-weight bold
+
+  .has-assessments-warning
+    :font-size 0.8em
+    :font-weight normal
 
   tr.criterion td.criterion_description
     // :max-width 150px
@@ -177,6 +192,11 @@ table.rubric
       td:hover .links
         :display block
 
+  .has-assessments-warning
+    :font-size 0.8em
+    :font-weight normal
+    :text-align left
+
 .rubric_summary
   margin-top: 0 !important
   .rating_holder
@@ -203,3 +223,11 @@ table.rubric
 .edit-rubric-form .button-container
   margin: 8px 0
   text-align: right
+
+#rubric_holder
+  .rubric_title
+    :margin-right 0
+
+  .hide_rubric_link
+    :color #333
+    :cursor pointer

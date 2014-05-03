@@ -43,7 +43,8 @@ module SearchHelper
             :term => term_for_course.call(course),
             :state => type == :current ? :active : (course.recently_ended? ? :recently_active : :inactive),
             :available => type == :current && course.available?,
-            :permissions => course.grants_rights?(@current_user)
+            :permissions => course.grants_rights?(@current_user),
+            :default_section_id => course.default_section(no_create: true).try(:id)
           }
         end
       end
@@ -65,7 +66,10 @@ module SearchHelper
       end
 
       add_groups = lambda do |groups|
+        Group.send(:preload_associations, groups, :group_category)
+        Group.send(:preload_associations, groups, :group_memberships, conditions: { group_memberships: { user_id: @current_user }})
         groups.each do |group|
+          group.can_participate = true
           contexts[:groups][group.id] = {
             :id => group.id,
             :name => group.name,
@@ -81,7 +85,9 @@ module SearchHelper
 
       if context.is_a?(Course)
         add_courses.call [context], :current
-        add_sections.call context.course_sections
+        visibility = context.enrollment_visibility_level_for(@current_user, context.section_visibilities_for(@current_user), true)
+        sections = visibility == :sections ? context.sections_visible_to(@current_user) : context.course_sections
+        add_sections.call sections
         add_groups.call context.groups
       else
         add_courses.call @current_user.concluded_courses.with_each_shard, :concluded

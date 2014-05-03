@@ -32,10 +32,13 @@
     <% if @context.root_account.settings[:enable_alerts] && can_do(@context, @current_user, :manage_interaction_alerts) %>
       <li id="alerts_tab"><a href="#tab-alerts" id="tab-alerts-link"><%= t('tabs.alerts', %{Alerts}) %></a></li>
     <% end %>
+    <% if can_do @context, @current_user, :manage_feature_flags %>
+      <li id="feature_flags_tab"><a href="#tab-features" id="tab-features-link"><%= t('tabs.feature_options', %{Feature Options}) %></a></li>
+    <% end %>
   </ul>
   <div id="tab-details">
     <h2><%= t('headings.details', %{Course Details}) %></h2>
-    <% form_for @context, :html => {:id => "course_form"} do |f| %>
+    <%= form_for @context, :html => {:id => "course_form"} do |f| %>
     <table class="coursesettings">
       <tr>
         <td class="form-label"><%= f.blabel :name, :course_name, :en => "Name" %></td>
@@ -124,13 +127,13 @@
       </tr><tr>
         <td class="form-label"><%= f.blabel :start_at, :en => "Starts" %></td>
         <td class="nobr">
-          <span class="course_form"><%= f.text_field :start_at, :class => "date_entry", :value => datetime_string(@context.start_at, :verbose, nil, true) %></span>
+          <span class="course_form"><%= f.text_field :start_at, :class => "date_entry", :value => unlocalized_datetime_string(@context.start_at, :verbose) %></span>
           <span class="course_info start_at"><%= datetime_string(@context.start_at, :verbose, nil, true) || t('no_date', "No Date Set") %></span>
         </td>
       </tr><tr>
         <td class="form-label"><%= f.blabel :conclude_at, :en => "Ends" %></td>
         <td class="nobr">
-          <span class="course_form"><%= f.text_field :conclude_at, :class => "date_entry", :value => datetime_string(@context.conclude_at, :verbose, nil, true) %></span>
+          <span class="course_form"><%= f.text_field :conclude_at, :class => "date_entry", :value => unlocalized_datetime_string(@context.conclude_at, :verbose) %></span>
           <span class="course_info conclude_at"><%= datetime_string(@context.conclude_at, :verbose, nil, true) || t('no_date', "No Date Set") %></span>
           <div class="course_form">
             <%= f.check_box :restrict_enrollments_to_course_dates %>
@@ -240,19 +243,34 @@ TEXT
         <td></td>
         <td colspan="3">
           <span class="self_enrollment_message" style="<%= hidden unless @context.self_enrollment %>">
-            <%= t 'course_open_enrollment', <<-TEXT, :url => enroll_url(@context.self_enrollment_code || '{{ self_enrollment_code }}'), :url2 => register_url, :code => @context.self_enrollment_code || '{{ self_enrollment_code }}', :wrapper => '<b>\1</b>'
-                  This course has enabled open enrollment. Students can
-                  self-enroll in the course once you share with them this URL:
-                  *%{url}*. Alternatively, they can sign up at *%{url2}* and
-                  use the following join code: *%{code}*
-                TEXT
-            %>
+            <% if @context.root_account.self_registration? %>
+              <%= t 'course_open_enrollment', <<-TEXT, :url => enroll_url(@context.self_enrollment_code || '{{ self_enrollment_code }}'), :url2 => register_url, :code => @context.self_enrollment_code || '{{ self_enrollment_code }}', :wrapper => '<b>\1</b>'
+                    This course has enabled open enrollment. Students can
+                    self-enroll in the course once you share with them this URL:
+                    *%{url}*. Alternatively, they can sign up at *%{url2}* and
+                    use the following join code: *%{code}*
+                  TEXT
+              %>
+            <% else %>
+              <%= t 'course_open_enrollment_without_code', <<-TEXT, :url => enroll_url(@context.self_enrollment_code || '{{ self_enrollment_code }}'), :wrapper => '<b>\1</b>'
+                    This course has enabled open enrollment. Students can
+                    self-enroll in the course once you share with them this URL:
+                    *%{url}*
+                  TEXT
+              %>
+            <% end %>
           </span>
           <a href="#" class="course_form course_form_more_options_link" style="padding-left: 20px;"><%= t('links.more_options', %{more options}) %></a>
           <div class="course_form_more_options" style="display: none; padding-left: 20px;">
             <% if @context.self_enrollment_allowed? %>
               <%= f.check_box :self_enrollment, :class => 'self_enrollment_checkbox' %>
-              <%= f.label :self_enrollment, :en => "Let students self-enroll by sharing with them a secret URL or code" %><br/>
+              <label for="course_self_enrollment">
+                <% if @context.root_account.self_registration? %>
+                  <%= t :self_enrollment, "Let students self-enroll by sharing with them a secret URL or code" %>
+                <% else %>
+                  <%= t :self_enrollment_without_code, "Let students self-enroll by sharing with them a secret URL" %>
+                <% end %>
+              </label><br/>
               <div class="open_enrollment_holder" style="display: none;">
               <%= f.check_box :open_enrollment %>
               <%= f.label :open_enrollment, :en => "Add a \"Join this Course\" link to the course home page" %><br/>
@@ -270,24 +288,6 @@ TEXT
             <%= f.label :hide_final_grades, :en => "Hide totals in student grades summary" %><br/>
             <%= f.check_box :hide_distribution_graphs %>
             <%= f.label :hide_distribution_graphs, :en => "Hide grade distribution graphs from students" %><br/>
-            <% if @context.root_account.allow_draft? && !@context.root_account.draft_state_enabled? %>
-              <%= f.check_box :enable_draft %>
-              <label for="course_enable_draft"><%= t('enable_draft', 'Enable Draft State (beta)') %>
-                <% draft_help_text = t('draft_explanation', 'Explanation of Draft State') %>
-                <a href="#" class="element_toggler" aria-controls="helpDialog" aria-label="<%= draft_help_text %>" title="<%= draft_help_text %>"><i class="icon-question"></i></a>
-                <div id="helpDialog" data-turn-into-dialog='{"width":400,"modal":true,"title":"<%= draft_help_text %>"}' style="display:none" title=<%= draft_help_text %>>
-                  <%= mt(:draft_state_description, <<-DRAFT )
-Draft state is a *beta* feature that allows course content to be published and unpublished.
-Unpublished content won't be visible to students and won't affect grades.
-It also includes a redesign of some course areas to make them more consistent in look and functionality.
-
-Unpublished content may not be available if Draft State is disabled.
-                  DRAFT
-                    %>
-                </div>
-              </label>
-              <br/>
-            <% end %>
             <%= f.check_box :lock_all_announcements %>
             <%= label_tag :course_lock_all_announcements, :en => 'Disable comments on announcements' %><br />
             <%= f.select :default_wiki_editing_roles, [
@@ -367,9 +367,9 @@ Unpublished content may not be available if Draft State is disabled.
         </span>
         <div class="clear"></div>
       </li>
-      <% if can_do(@context.course_sections.new, @current_user, :create) %>
+      <% if can_do(@context.course_sections.scoped.new, @current_user, :create) %>
         <li>
-          <% form_for :course_section, :url => context_url(@context, :context_sections_url), :html => {:id => "add_section_form", :class => "form-inline", :style => "margin-top: 20px;"} do |f| %>
+          <%= form_for :course_section, :url => context_url(@context, :context_sections_url), :html => {:id => "add_section_form", :class => "form-inline", :style => "margin-top: 20px;"} do |f| %>
             <h3><%= f.blabel :name, :course_section_name, :en => "Add a New Section" %></h3>
             <%= f.text_field :name %>
             <button class="btn btn-primary" type="submit"><i class="icon-add"></i> <%= t('buttons.add_section', %{Add Section}) %></button>
@@ -377,7 +377,7 @@ Unpublished content may not be available if Draft State is disabled.
         </li>
       <% end %>
     </ul>
-    <% form_for :course_section, :url => "", :html => {:id => "edit_section_form", :method => :put, :style => "display: none;"} do |f| %>
+    <%= form_for :course_section, :url => "", :html => {:id => "edit_section_form", :method => :put, :style => "display: none;"} do |f| %>
       <%= f.text_field :name %>
     <% end %>
   </div>
@@ -389,13 +389,13 @@ Unpublished content may not be available if Draft State is disabled.
 
       
       <%= t('navigation_keyboard_hint',
-        'To change the order of the course navigation links,
-        first turn the cursor off on your screen reader. Insert-z in JAWS.
-        Press tab to select first link.
-        Press up and down to select a link.
-        Press space to select a link to start dragging.
-        Then press up and down to select a destination.
-        Then press space a second time to drop link after destination.') %>
+        'If using a screen reader, to change the order of the course navigation links,
+        Turn off the virtual cursor or virtual buffer on your screen reader (press Insert-z for JAWS).
+        Press control-home to jump to the top of the page, then press the tab key until you reach the first course navigation link.
+        Press the up and down arrows until you hear the link you wish to move, and then press space to select it
+        Then, press the up and down arrow keys until you locate the new position.
+        Finally, press space again to place the link you are moving directly after the current link.
+        When finished, reenable the virtual buffer/cursor.') %>
     </div>
 
     <% keyboard_navigation([
@@ -404,7 +404,7 @@ Unpublished content may not be available if Draft State is disabled.
          {:key => t('keycodes.toggle_navigation_dragging', 'Space'), :description => t('keycode_descriptions.toggle_navigation_dragging', 'Select link to begin dragging, or drop previously selected link')}
      ]) %>
 
-    <% form_tag context_url(@context, :context_update_nav_url), {:id => "nav_form", :title => t('titles.edit_navigation', "Edit Course Navigation") } do %>
+    <%= form_tag context_url(@context, :context_update_nav_url), {:id => "nav_form", :title => t('titles.edit_navigation', "Edit Course Navigation") } do %>
       <input type="hidden" name="tabs_json" id="tabs_json" value="[]" />
       <% tabs = sortable_tabs %>
       <p style="margin-bottom: 4px; padding-top: 10px">
@@ -449,7 +449,7 @@ Unpublished content may not be available if Draft State is disabled.
   <% if publishing_enabled %>
     <div id="tab-grade-publishing">
       <h2><%= t('headings.grade_publishing', %{Grade Publishing}) %></h2>
-      <% form_tag context_url(@context, :context_publish_to_sis_url), { :id => "publish_to_sis_form", :style => "display: none;" } do %><% end %>
+      <%= form_tag context_url(@context, :context_publish_to_sis_url), { :id => "publish_to_sis_form", :style => "display: none;" } do %><% end %>
       <a href="#" id="publish_grades_link" class="btn disabled">...</a>
       <ul id="publish_grades_messages"></ul>
     </div>
@@ -461,13 +461,17 @@ Unpublished content may not be available if Draft State is disabled.
       <%= render :partial => 'alerts/alerts' %>
     </div>
   <% end %>
+
+  <% if can_do @context, @current_user, :manage_feature_flags %>
+    <div id="tab-features"></div>
+  <% end %>
 </div><!-- end course details tab -->
 
 <% if Account.site_admin.grants_right?(@current_user, nil, :manage_courses) %>
   <div id="move_course_dialog" style="display: none;">
     <h2><%= t('headings.move_course', %{Move the course to another root account}) %></h2>
     <%= t('deatils.move_course', %{Select a new root account for this course.  After you move the course you'll want to specify a new department for the course as well.}) %>
-    <% form_for :course, :url => course_url(@context), :html => {:method => :put} do |f| %>
+    <%= form_for :course, :url => course_url(@context), :html => {:method => :put} do |f| %>
       <table class="formtable">
         <tr>
           <td>

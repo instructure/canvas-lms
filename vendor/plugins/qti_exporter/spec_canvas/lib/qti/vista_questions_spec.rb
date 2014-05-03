@@ -85,6 +85,13 @@ describe "Converting Blackboard Vista qti" do
     hash[:question_text].should =~ %r{\$CANVAS_OBJECT_REFERENCE\$/attachments/67320753001}
   end
 
+  it "should convert short answer questions with multiple required answers to fimb" do
+    hash = get_question_hash(vista_question_dir, 'short_to_fimb', delete_answer_ids=true, opts={})
+    hash[:question_type].should == "fill_in_multiple_blanks_question"
+    hash[:question_text].should include("[SA01]")
+    hash[:question_text].should include("[SA02]")        
+  end
+
   it "should convert true/false questions" do
     hash = get_question("ID_4609865577341")
     hash.should == VistaExpected::TRUE_FALSE

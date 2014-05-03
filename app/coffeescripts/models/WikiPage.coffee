@@ -47,7 +47,7 @@ define [
     latestRevision: (options) ->
       if !@_latestRevision && @get('url')
         unless @_latestRevision
-          revisionOptions = _.extend({}, {@contextAssetString, pageUrl: @get('url'), latest: true, summary: true}, options)
+          revisionOptions = _.extend({}, {@contextAssetString, page: @, pageUrl: @get('url'), latest: true, summary: true}, options)
           @_latestRevision = new WikiPageRevision({revision_id: @revision}, revisionOptions)
       @_latestRevision
 

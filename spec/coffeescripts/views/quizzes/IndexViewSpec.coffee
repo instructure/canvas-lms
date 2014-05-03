@@ -6,8 +6,9 @@ define [
   'compiled/views/quizzes/QuizItemGroupView'
   'compiled/views/quizzes/NoQuizzesView'
   'jquery'
+  'helpers/fakeENV'
   'helpers/jquery.simulate'
-], (Backbone, Quiz, QuizCollection, IndexView, QuizItemGroupView, NoQuizzesView, $) ->
+], (Backbone, Quiz, QuizCollection, IndexView, QuizItemGroupView, NoQuizzesView, $, fakeENV) ->
 
   fixtures = $('#fixtures')
 
@@ -56,8 +57,8 @@ define [
     view.render()
 
   module 'IndexView',
-    setup: ->
-
+    setup: -> fakeENV.setup()
+    teardown: -> fakeENV.teardown()
 
   # hasNoQuizzes
   test '#hasNoQuizzes if assignment and open quizzes are empty', ->
@@ -102,7 +103,7 @@ define [
     ok view.options.hasSurveys
 
 
-  # search fitler
+  # search filter
   test 'should render the view', ->
     assignments = new QuizCollection([{id: 1, title: 'Foo Title'}, {id: 2, title: 'Bar Title'}])
     open        = new QuizCollection([{id: 3, title: 'Foo Title'}, {id: 4, title: 'Bar Title'}])
@@ -131,3 +132,16 @@ define [
     ok  view.filter(model, "name")
     ok !view.filter(model, "zzz")
 
+  test 'should not use regexp to filter models', ->
+    view = indexView()
+    model = new Quiz(title: "Foo Name")
+
+    ok !view.filter(model, ".*name")
+    ok !view.filter(model, "zzz")
+
+  test 'should filter models with multiple terms', ->
+    view = indexView()
+    model = new Quiz(title: "Foo Name bar")
+
+    ok  view.filter(model, "name bar")
+    ok !view.filter(model, "zzz")

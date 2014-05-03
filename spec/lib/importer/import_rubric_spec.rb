@@ -39,7 +39,7 @@ describe "Importing Rubrics" do
         r = Rubric.find_by_migration_id(data[:migration_id])
         
         r.title.should == data[:title]
-        r.description.should contain(data[:description]) if data[:description]
+        r.description.should include(data[:description]) if data[:description]
         r.points_possible.should == data[:points_possible].to_f
 
         crit_ids = r.data.map{|rub|rub[:ratings].first[:criterion_id]}

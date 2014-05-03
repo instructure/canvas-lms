@@ -49,6 +49,7 @@ define [
       40: 'DownArrow'
 
     initialize: (opts) ->
+      super
       @readOnly = opts.readOnly
       @dir = opts.dir
       @attachEvents()

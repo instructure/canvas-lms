@@ -228,6 +228,8 @@ define([
     $("#edit_page_form .switch_views_link").click(function(event) {
       event.preventDefault();
       $("#edit_page_content").editorBox('toggle');
+      //  todo: replace .andSelf with .addBack when JQuery is upgraded.
+      $(this).siblings(".switch_views_link").andSelf().toggle();
     });
     $("#edit_page_sidebar .add_content_link").click(function(event) {
       event.preventDefault();
@@ -702,7 +704,7 @@ define([
             var valid_ids = [];
             for(var idx in ids) {
               var id = ids[idx];
-              id = parseInt(id.substring(5));
+              id = id.substring(5);
               if(!isNaN(id)) { valid_ids.push(id); }
             }
             var order = valid_ids.join(",");
@@ -833,7 +835,7 @@ define([
             var valid_ids = [];
             for(var idx in ids) {
               var id = ids[idx];
-              id = parseInt(id.substring(8));
+              id = id.substring(8);
               if(!isNaN(id)) { valid_ids.push(id); }
             }
             var order = valid_ids.join(",");

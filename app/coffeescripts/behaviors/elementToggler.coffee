@@ -71,12 +71,18 @@ define [
 
       if showRegion
         $region.dialog('open')
+
+        if $region.data('read-on-open')
+          $region.dialog('widget')
+            .attr('aria-live', 'assertive')
+            .attr('aria-atomic', 'true')
+
       else if $region.dialog('isOpen')
         $region.dialog('close')
 
     $allElementsControllingRegion.each updateTextToState( if showRegion then 'Shown' else 'Hidden' )
 
-  $(document).on 'click change', '.element_toggler[aria-controls]', (event) ->
+  $(document).on 'click change keyclick', '.element_toggler[aria-controls]', (event) ->
     $this = $(this)
 
     if $this.is('input[type="checkbox"]')
@@ -92,3 +98,8 @@ define [
 
     $region = $parent.find("##{$this.attr('aria-controls').replace(/\s/g, ', #')}")
     toggleRegion($region, force, $this) if $region.length
+
+    $icon = $this.find('i[class*="icon-mini-arrow"].auto_rotate')
+    if $icon.length
+      $icon.toggleClass('icon-mini-arrow-down')
+      $icon.toggleClass('icon-mini-arrow-right')

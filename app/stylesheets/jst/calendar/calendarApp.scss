@@ -13,7 +13,7 @@
   position: relative;
 }
 
-.calendar {
+.calendar, #calendar-drag-and-drop-container {
   .fc-content {
     background-color: white;
   }
@@ -22,6 +22,12 @@
     font-size: 14px;
     background-color: #f6f7f9;
     line-height: 35px;
+  }
+  .fc-view-agendaWeek thead .fc-widget-header {
+    color: #617582;
+    font-weight: bold;
+    padding: 10px 0;
+    text-transform: uppercase;
   }
   .fc-widget-header, .fc-widget-content {
     border-color: #dadada;
@@ -48,6 +54,7 @@
   }
   .fc-event-time {
     font-weight: bold;
+    display: inline-block;
   }
   .fc-agenda {
     .fc-agenda-slots .fc-agenda-axis {
@@ -63,32 +70,6 @@
       background-color: #eeeeee !important;
     }
   }
-  .agenda-col-wrapper {
-    overflow: hidden;
-    display: inline-block;
-    color: #617582;
-    font-size: 9px;
-    font-weight: bold;
-    padding: 10px 0;
-    text-transform: uppercase;
-    text-align: left;
-    .day-num {
-      font-size: 24px;
-      float: left;
-      padding-right: 5px;
-      line-height: 23px;
-      text-shadow: -1px -1px 1px white;
-    }
-    .day-name {
-      float: left;
-      line-height: 13px;
-    }
-    .month-name {
-      line-height: 10px;
-      float: left;
-      color: #9da5ab;
-    }
-  }
 }
 
 .fc-event.assignment, .fc-event.assignment_override {
@@ -101,6 +82,11 @@
 .event-details {
   h3, .h3 {
     margin-bottom: 0;
+
+    a:focus {
+      outline: 0;
+      text-decoration: underline;
+    }
   }
   &.carat-bottom .ui-menu-carat span {
     border-color: white transparent;
@@ -122,9 +108,6 @@
   }
   td,th {
     vertical-align: top;
-  }
-  .delete_event_link {
-    float: right !important;
   }
   .event-details-content {
     overflow: auto;
@@ -247,4 +230,8 @@
 
 .event_button {
   margin-left: 3px;
+}
+
+.fc-grid .fc-day-number {
+  float: left;
 }

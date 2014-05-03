@@ -28,7 +28,7 @@ require([
       $(this).find("button").attr('disabled', false)
         .filter(".submit_button").text(I18n.t('add_course_button', "Add Course"));
       var course = data;
-      if(course.enrollment_term_id == parseInt($("#current_enrollment_term_id").text(), 10)) {
+      if(course.enrollment_term_id == $("#current_enrollment_term_id").text()) {
         var $course = $("#course_blank").clone(true);
         var course_data = {id: course.id};
         $course.find("a.name").text(course.name);

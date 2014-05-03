@@ -1,5 +1,5 @@
 <h1><%= t 'titles.upload', "Upload a File" %></h1>
-<% form_for(:attachment, :url => { :action => "create", :format => "json" }, :html => { :multipart => true }) do |f| %>
+<%= form_for(:attachment, :url => { :action => "create", :format => "json" }, :html => { :multipart => true }) do |f| %>
   <%= render :partial => 'fields', :locals => {:f => f} %>
   <%= f.submit t('buttons.create', "Create") %>
 <% end %>

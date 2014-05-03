@@ -1,9 +1,8 @@
 <% course_home ||= false %>
 <% js_env :COLLAPSED_MODULES => @collapsed_modules %>
-<% js_env :CAN_MANAGE_MODULES  => can_do(@context, @current_user, :manage_grades) || can_do(@context, @current_user, :manage_content) %>
+<% js_env :CAN_MANAGE_MODULES => can_do(@context, @current_user, :manage_content) %>
 <% js_env :COURSE_ID => @context.id %>
 <% js_env :NO_MODULE_PROGRESSIONS => @context.large_roster %>
-<% unless @context.draft_state_enabled? %>
 <% js_bundle :context_modules %>
 <% jammit_css :context_modules %>
 
@@ -25,7 +24,7 @@
 </div>
 
 <div id="no_context_modules_message" style="display:none; clear: both;">
-  <% if can_do(@context.context_modules.new, @current_user, :create) %>
+  <% if can_do(@context.context_modules.scoped.new, @current_user, :create) %>
     <%= mt 'help.create', <<TEXT, :button => t('#context_modules.buttons.add_module_first', 'Add a New Module')
 Course modules let you organize your assignments, pages, files, etc. into smaller sections or units. Modules could be centered around a theme, focused on a specific topic, or even just grouped chronologically.
 
@@ -56,9 +55,9 @@ TEXT
 ]) %>
 <div id="context_modules_sortable_container">
   <div id="context_modules" tabindex="0" aria-label="<%= t('headings.course_modules', %{Course Modules}) %>" class="<%= 'editable' if can_do(@context, @current_user, :manage_content) %>">
-    <% editable = can_do(@context, @current_user, :manage_grades) || can_do(@context, @current_user, :manage_content) %>
+    <% editable = can_do(@context, @current_user, :manage_content) %>
     <% cache([@context.cache_key, editable, 'all_context_modules', collection_cache_key(@modules)].join('/')) do %>
-      <% ContextModule.send(:preload_associations, @modules, [:context_module_progressions, {:content_tags => :content}]) %>
+      <% ContextModule.send(:preload_associations, @modules, :content_tags => :content) %>
       <% @modules.each do |m| %>
         <%= render :partial => 'context_modules/context_module', :object => m, :locals => {:editable => editable } %>
       <% end %>
@@ -68,7 +67,7 @@ TEXT
 <%= render :partial => 'context_modules/context_module', :object => nil %>
 <%= render :partial => 'context_modules/module_item', :object => nil %>
 <% if can_do(@context, @current_user, :manage_content) %>
-  <% form_for :context_module, :url => context_url(@context, :context_context_modules_url), :html => {:id => "add_context_module_form", :style => "display: none;"} do |f| %>
+  <%= form_for :context_module, :url => context_url(@context, :context_context_modules_url), :html => {:id => "add_context_module_form", :style => "display: none;"} do |f| %>
     <table class="formtable">
       <tr>
         <td colspan="2">
@@ -124,7 +123,16 @@ TEXT
           </div>
         </div>
       </td>
-    </tr><tr>
+    </tr>
+    <% if Canvas::Plugin.find!('grade_export').enabled? %>
+      <tr>
+        <td colspan="2">
+          <%= f.check_box :publish_final_grade, :id => "publish_final_grade" %>
+          <%= f.label :publish_final_grade, :en => "publish final grade for the student when this module is completed", :for => "publish_final_grade" %>
+        </td>
+      </tr>
+    <% end %>
+    <tr>
         <td colspan="2">
           <%= f.check_box :require_sequential_progress, :id => "require_sequential_progress" %>
           <%= f.label :require_sequential_progress, :en => "students must move through requirements in this module in sequential order", :for => "require_sequential_progress" %>
@@ -154,7 +162,7 @@ TEXT
   </div>
   <%= render :partial => "shared/select_content_dialog", :locals => {:for_modules => true} %>
   <div id="edit_item_dialog" style="display: none;">
-    <% form_for :content_tag, :url => "", :html => {:id => "edit_item_form", :method => :put, :style => "margin: 20px 10px;"} do |f| %>
+    <%= form_for :content_tag, :url => "", :html => {:id => "edit_item_form", :method => :put, :style => "margin: 20px 10px;"} do |f| %>
       <table class="formtable">
         <tr>
           <td><%= f.blabel :title, :en => "Title" %></td>
@@ -405,7 +413,4 @@ TEXT
     </li>
   </ul>
 <% end %>
-<% else %>
-  <% js_bundle :context_modules2 %>
-  <div id="modules"></div>
-<% end %>
+

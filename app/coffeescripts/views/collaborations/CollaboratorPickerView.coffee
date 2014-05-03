@@ -18,11 +18,12 @@
 
 define [
   'i18n!collaborations'
+  'jquery'
   'Backbone'
   'compiled/views/collaborations/ListView'
   'compiled/views/collaborations/MemberListView'
   'jst/collaborations/CollaboratorPicker'
-], (I18n, {View}, ListView, MemberListView, widgetTemplate) ->
+], (I18n, $, {View}, ListView, MemberListView, widgetTemplate) ->
 
   class CollaboratorPickerView extends View
     template: widgetTemplate
@@ -35,6 +36,7 @@ define [
         per_page: 50
 
     initialize: ->
+      super
       @cacheElements()
       @createLists()
       @attachEvents()

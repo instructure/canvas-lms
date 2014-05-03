@@ -396,11 +396,15 @@ matching, and to only return URLs matching that domain.
 ## Test Environment Setting Examples
 
 External tools can support different LTI environments for different canvas environments.
-If the URL is set it will replace the launch_url in the test and beta canvas environments.
-If the domain is set it will replace the domain setting and the domain on all configured
-links with the test domain.  It will only replace configured settings on tools.  For example,
-if the launch_url parameter is not set in the main configuration, the environment's
-launch_url will have no affect when the tool is copied to another canvas environment.
+
+* __domain__: All url domains in this tool's configuration will be replaced with this domain
+* __launch_url__: the blti:launch\_url property that should be used for all canvas test environments.
+This property takes precedent over domain changes if both properties are set.
+
+Additionally, the domain and launch\_urls can be set for for each canvas environment
+by specifying the environment as part of the property name (ie, test\_launch\_url,
+beta\_domain, etc).  When used in this manner, specific environment properties take
+precedent over the default values.
 
 ### Test Environment Example
 

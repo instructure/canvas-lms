@@ -117,7 +117,7 @@ describe WikiPagesController do
       page.should_not be_nil
       page.should_not be_new_record
       page.title.should == "Some Secret Page"
-      page.hide_from_students = true
+      page.workflow_state = 'unpublished'
       page.save
       page.reload
       student = user()
@@ -174,7 +174,7 @@ describe WikiPagesController do
 
     it "should set a page named 'Front Page' as the front page if there isn't one already and draft state is disabled" do
       account_model
-      @account.settings[:enable_draft] = false
+      @account.disable_feature! :draft_state
       course_with_teacher_logged_in(:account => @account, :active_all => true)
       post 'create', :course_id => @course.id, :wiki_page => {:title => "Front Page"}
       @course.reload

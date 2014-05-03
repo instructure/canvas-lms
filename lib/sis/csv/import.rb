@@ -16,11 +16,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'zip/zip'
+require 'action_controller_test_process'
+require 'csv'
+require 'zip'
 
 module SIS
   module CSV
     class Import
+
       attr_accessor :root_account, :batch, :errors, :warnings, :finished, :counts, :updates_every,
         :override_sis_stickiness, :add_sis_stickiness, :clear_sis_stickiness
 
@@ -314,7 +317,7 @@ module SIS
       end
     
       def unzip_file(file, dest)
-        Zip::ZipFile.open(file) do |zip_file|
+        Zip::File.open(file) do |zip_file|
           zip_file.each do |f|
             f_path = File.join(dest, f.name)
             FileUtils.mkdir_p(File.dirname(f_path))
@@ -344,7 +347,7 @@ module SIS
                   out_csv = nil
                   att = Attachment.new
                   att.context = @batch
-                  att.uploaded_data = ActionController::TestUploadedFile.new(path, Attachment.mimetype(path))
+                  att.uploaded_data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
                   att.display_name = new_csvs.last[:file]
                   att.save!
                   new_csvs.last.delete(:fullpath)
@@ -366,7 +369,7 @@ module SIS
             out_csv = nil
             att = Attachment.new
             att.context = @batch
-            att.uploaded_data = ActionController::TestUploadedFile.new(path, Attachment.mimetype(path))
+            att.uploaded_data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
             att.display_name = new_csvs.last[:file]
             att.save!
             new_csvs.last.delete(:fullpath)

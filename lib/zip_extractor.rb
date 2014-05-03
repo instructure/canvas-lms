@@ -17,7 +17,7 @@
 #
 
 require 'rubygems'
-require 'zip/zip'
+require 'zip'
 require 'fileutils'
 
 # Call this with a block.  The block will take an array of filenames
@@ -39,7 +39,7 @@ class ZipExtractor
   attr_reader :filename, :zip, :unzipped_files
   def initialize(filename)
     @filename = filename
-    @zip = Zip::ZipFile.open(@filename)
+    @zip = Zip::File.open(@filename)
   end
   
   # Grabs all files and dumps them into a temporary directory.
@@ -70,9 +70,9 @@ class ZipExtractor
   alias :dirname :make_safe_haven
 
   def safe_haven_name
-    dirname = "/tmp/#{AutoHandle.generate}"
+    dirname = "/tmp/#{CanvasUuid::Uuid.generate}"
     while File.exist?(dirname)
-      dirname = "/tmp/#{AutoHandle.generate}"
+      dirname = "/tmp/#{CanvasUuid::Uuid.generate}"
     end
     dirname
   end

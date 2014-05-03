@@ -45,6 +45,8 @@ class ExternalContentController < ApplicationController
       end
     end
     @headers = false
+    js_env(retrieved_data: (@retrieved_data || {}),
+           service: params[:service])
   end
 
   def normalize_deprecated_data!
@@ -109,5 +111,6 @@ class ExternalContentController < ApplicationController
   
   def cancel
     @headers = false
+    js_env(service: params[:service])
   end
 end

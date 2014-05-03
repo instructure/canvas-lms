@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../file_uploads_spec_helper')
 
-describe "Group Categories API", :type => :integration do
+describe "Group Categories API", type: :request do
   def category_json(category)
     {
       'id' => category.id,
@@ -28,7 +28,11 @@ describe "Group Categories API", :type => :integration do
       'self_signup' => category.self_signup,
       'context_type' => category.context_type,
       "#{category.context_type.downcase}_id" => category.context_id,
-      'group_limit' => category.group_limit
+      'group_limit' => category.group_limit,
+      'groups_count' => category.groups.size,
+      'unassigned_users_count' => category.unassigned_users.count,
+      'protected' => false,
+      'allows_multiple_memberships' => false
     }
   end
 
@@ -124,6 +128,14 @@ describe "Group Categories API", :type => :integration do
           (user.keys & expected_keys).sort.should == expected_keys.sort
           @category_unassigned_users.map(&:id).should include(user['id'])
         end
+      end
+
+      it "should include custom student roles in search" do
+        teacher = @user
+        custom_student = user(name: "blah")
+        @course.enroll_user(custom_student, 'StudentEnrollment', role_name: 'CustomStudent')
+        json = api_call_as_user(teacher, :get, api_url, api_route)
+        json.map{|u|u['id']}.should be_include custom_student.id
       end
     end
 
@@ -386,7 +398,7 @@ describe "Group Categories API", :type => :integration do
                      @category_path_options.merge(:action => 'assign_unassigned_members',
                                                   :group_category_id => category.to_param),
                      {'sync' => true}
-        response.status.should == '401 Unauthorized'
+        assert_status(401)
       end
 
       it "should require valid group :category_id" do
@@ -397,7 +409,7 @@ describe "Group Categories API", :type => :integration do
                      @category_path_options.merge(:action => 'assign_unassigned_members',
                                                   :group_category_id => (category.id + 1).to_param),
                      {'sync' => true}
-        response.status.should == '404 Not Found'
+        assert_status(404)
       end
 
       it "should fail for student organized groups" do
@@ -408,7 +420,7 @@ describe "Group Categories API", :type => :integration do
                      @category_path_options.merge(:action => 'assign_unassigned_members',
                                                   :group_category_id => category.to_param),
                      {'sync' => true}
-        response.status.should == '400 Bad Request'
+        assert_status(400)
       end
 
       it "should fail for restricted self signup groups" do
@@ -421,7 +433,7 @@ describe "Group Categories API", :type => :integration do
                      @category_path_options.merge(:action => 'assign_unassigned_members',
                                                   :group_category_id => category.to_param),
                      {'sync' => true}
-        response.status.should == '400 Bad Request'
+        assert_status(400)
 
         category.configure_self_signup(true, false)
         category.save

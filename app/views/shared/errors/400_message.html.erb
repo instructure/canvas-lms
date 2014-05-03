@@ -7,11 +7,10 @@
 %>
 <% content_for :page_title, t('title', 'Page Error') %>
 
-<%= render :partial => "shared/errors/backtrace", :locals => {:exception => exception} %>
 <div style="width: 410px; margin-left: auto; margin-right: auto; margin-top: 50px;">
   <h2><%= t('headings.page', %{Page Error}) %></h2>
   <p><%= t('description', %{Huh.  Looks like there was a problem loading the page you requested.}) %></p>
   <a href="#" style="font-size: 1.2em;" class="submit_error_link discussion-topic"><%= t('#links.errors.4xx_feedback', %{Click here to tell us what you were looking for.}) %></a>
-  <%= render :partial => "shared/errors/error_form", :locals => {:status => status, :error_category => '400'} %>
+  <%= render :partial => "shared/errors/error_form", :locals => {:status => response.status, :error_category => '400'} %>
 </div>
 

@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-describe ConferencesController, :type => :integration do
+describe ConferencesController, type: :request do
   before do
     WebConference.stubs(:plugins).returns([web_conference_plugin_mock("wimba", {:domain => "wimba.test"})])
   end

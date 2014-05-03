@@ -19,7 +19,7 @@
     background-image:     -ms-linear-gradient(left, #ddd, #aaa, #eee);
     background-image:      -o-linear-gradient(left, #ddd, #aaa, #eee);" />
 
-<p><%= asset.comment.gsub(/\n/,'</p><p>') %></p>
+<%= format_message(asset.comment).first %>
 
 <hr style="border: 0;
     height: 1px;

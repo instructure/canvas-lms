@@ -1,12 +1,18 @@
 define [
-  'compiled/collections/GroupCategoryUserCollection'
+  'compiled/collections/GroupUserCollection'
   'compiled/models/GroupUser'
+  'compiled/models/GroupCategory'
+  'compiled/models/Group'
   'compiled/views/groups/manage/AddUnassignedMenu'
   'jquery'
-], (GroupCategoryUserCollection,
+  'helpers/fakeENV'
+], (GroupUserCollection,
     GroupUser,
+    GroupCategory,
+    Group,
     AddUnassignedMenu,
-    $) ->
+    $,
+    fakeENV) ->
 
   clock = null
   server = null
@@ -21,11 +27,15 @@ define [
 
   module 'AddUnassignedMenu',
     setup: ->
+      fakeENV.setup()
       clock = sinon.useFakeTimers()
       server = sinon.fakeServer.create()
       waldo = new GroupUser id: 4, name: "Waldo", sortable_name: "Waldo"
-      users = new GroupCategoryUserCollection
+      users = new GroupUserCollection null,
+        group: new Group
+        category: new GroupCategory
       users.setParam 'search_term', 'term'
+      users.loaded = true
       view = new AddUnassignedMenu
         collection: users
       view.groupId = 777
@@ -38,6 +48,7 @@ define [
       view.$el.appendTo($(document.body))
 
     teardown: ->
+      fakeENV.teardown()
       clock.restore()
       server.restore()
       view.remove()
@@ -49,7 +60,7 @@ define [
 
     $waldoLink = $links.last()
     $waldoLink.click()
-    sendResponse 'POST', waldo.createMembershipUrl(777), {}
+    sendResponse 'POST',"/api/v1/groups/777/memberships", {}
     equal waldo.get('groupId'), 777
 
     ok not users.contains(waldo)

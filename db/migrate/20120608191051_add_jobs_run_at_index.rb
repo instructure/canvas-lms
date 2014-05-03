@@ -1,14 +1,14 @@
 class AddJobsRunAtIndex < ActiveRecord::Migration
   tag :predeploy
 
-  self.transactional = false
+  disable_ddl_transaction!
 
   def self.connection
     Delayed::Backend::ActiveRecord::Job.connection
   end
 
   def self.up
-    add_index :delayed_jobs, %w[run_at tag], :concurrently => true
+    add_index :delayed_jobs, %w[run_at tag], :algorithm => :concurrently
   end
 
   def self.down

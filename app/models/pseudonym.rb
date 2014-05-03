@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -67,7 +67,7 @@ class Pseudonym < ActiveRecord::Base
     password_changed? || (send(crypted_password_field).blank? && sis_ssha.blank?) || @require_password
   end
 
-  acts_as_list :scope => :user_id
+  acts_as_list :scope => :user
 
   set_broadcast_policy do |p|
     p.dispatch :confirm_registration
@@ -110,12 +110,16 @@ class Pseudonym < ActiveRecord::Base
   end
 
   scope :by_unique_id, lambda { |unique_id|
-    if %w{mysql mysql2}.include?(connection_pool.spec.config[:adapter])
-      where(:unique_id => unique_id)
-    else
-      where("LOWER(#{quoted_table_name}.unique_id)=LOWER(?)", unique_id)
-    end
+    where("#{to_lower_column(:unique_id)}=#{to_lower_column('?')}", unique_id)
   }
+
+  def self.to_lower_column(column)
+    if %w{mysql mysql2}.include?(connection_pool.spec.config[:adapter])
+      column
+    else
+      "LOWER(#{column})"
+    end
+  end
 
   def self.custom_find_by_unique_id(unique_id, which = :first)
     return nil unless unique_id
@@ -155,7 +159,7 @@ class Pseudonym < ActiveRecord::Base
     if !self.persistence_token || self.persistence_token == ''
       # Some pseudonyms can end up without a persistence token if they were created
       # using the SIS, for example.
-      self.persistence_token = AutoHandle.generate('pseudo', 15)
+      self.persistence_token = CanvasUuid::Uuid.generate('pseudo', 15)
       self.save
     end
     
@@ -222,7 +226,7 @@ class Pseudonym < ActiveRecord::Base
   def destroy(even_if_managed_password=false)
     raise "Cannot delete system-generated pseudonyms" if !even_if_managed_password && self.managed_password?
     self.workflow_state = 'deleted'
-    self.deleted_at = Time.now
+    self.deleted_at = Time.now.utc
     result = self.save
     self.user.try(:update_account_associations) if result
     result
@@ -262,18 +266,7 @@ class Pseudonym < ActiveRecord::Base
     user.save!
     user.email
   end
-  
-  def chat
-    user.chat if user
-  end
-  
-  def chat=(c)
-    return false unless user
-    self.user.chat=(c)
-    user.save!
-    user.chat
-  end
-  
+
   def sms
     user.sms if user
   end
@@ -384,11 +377,17 @@ class Pseudonym < ActiveRecord::Base
 
   def self.serialization_excludes; [:crypted_password, :password_salt, :reset_password_token, :persistence_token, :single_access_token, :perishable_token, :sis_ssha]; end
 
+  def self.associated_shards(unique_id_or_sis_user_id)
+    [Shard.default]
+  end
+
   def self.find_all_by_arbitrary_credentials(credentials, account_ids, remote_ip)
     return [] if credentials[:unique_id].blank? ||
                  credentials[:password].blank?
     too_many_attempts = false
+    associated_shards = associated_shards(credentials[:unique_id])
     pseudonyms = Shard.partition_by_shard(account_ids) do |account_ids|
+      next if GlobalLookups.enabled? && !associated_shards.include?(Shard.current)
       active.
         by_unique_id(credentials[:unique_id]).
         where(:account_id => account_ids).
@@ -423,15 +422,6 @@ class Pseudonym < ActiveRecord::Base
       Canvas::Security.failed_login!(self, remote_ip)
     end
     nil
-  end
-
-  def mfa_settings
-    case self.account.mfa_settings
-    when :required_for_admins
-      self.account.all_account_users_for(self.user).empty? ? :optional : :required
-    else
-      self.account.mfa_settings
-    end
   end
 
   def claim_cas_ticket(ticket)

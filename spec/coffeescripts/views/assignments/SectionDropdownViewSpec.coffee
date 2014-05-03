@@ -16,7 +16,7 @@ define [
 
   test "updates the course_section_id when the form element changes", ->
     @view.$el.val('2').trigger 'change'
-    strictEqual @override.get('course_section_id'), 2
+    strictEqual @override.get('course_section_id'), '2'
 
   test "renders all of the sections", ->
     viewHTML = @view.$el.html()

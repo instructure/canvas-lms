@@ -153,9 +153,11 @@ define([
       checkForHomeworkSubmissionTools();
     });
 
-    $("#switch_text_entry_submission_views").click(function(event) {
+    $(".switch_text_entry_submission_views").click(function(event) {
       event.preventDefault();
       $("#submit_online_text_entry_form textarea:first").editorBox('toggle');
+      //  todo: replace .andSelf with .addBack when JQuery is upgraded.
+      $(this).siblings(".switch_text_entry_submission_views").andSelf().toggle();
     });
 
     $(".submit_assignment_form .cancel_button").click(function() {
@@ -200,21 +202,30 @@ define([
       toggleRemoveAttachmentLinks();
     });
 
+    function listGoogleDocs(){
+      var url = window.location.pathname + "/list_google_docs";
+      $.get(url,{}, function(data, textStatus){
+
+        var tree = new GoogleDocsTreeView({model: data});
+        $('div#google_docs_container').html(tree.el);
+        tree.render();
+        tree.on('activate-file', function(file_id){
+          $("#submit_google_doc_form").find("input[name='google_doc[document_id]']").val(file_id);
+        });
+
+      }, 'json');
+    }
+
     $(".submit_online_url_option").click(function(event) {
       if($(this).attr("href") == '#submit_google_doc_form'){
-        var url = window.location.pathname + "/list_google_docs";
-        $.get(url,{}, function(data, textStatus){
-
-          var tree = new GoogleDocsTreeView({model: data});
-          $('div#google_docs_container').html(tree.el);
-          tree.render();
-          tree.on('activate-file', function(file_id){
-            $("#submit_google_doc_form").find("input[name='google_doc[document_id]']").val(file_id);
-          });
-
-        }, 'json');
+        listGoogleDocs();
       }
     });
+
+    //list Google Docs if Google Docs tab is active
+    if(window.location.hash == "#submit_google_doc_form"){
+      listGoogleDocs();
+    }
 
     function toggleRemoveAttachmentLinks(){
       $('#submit_online_upload_form .remove_attachment_link').showIf($('#submit_online_upload_form .submission_attachment:not(#submission_attachment_blank)').length > 1);
@@ -326,7 +337,7 @@ define([
   $("#submit_from_external_tool_form .tools li").live('click', function(event) {
     event.preventDefault();
     var tool = $(this).data('tool');
-    var url = "/courses/" + $("#identity .course_id").text() + "/external_tools/" + tool.id + "/resource_selection?homework=1&assignment_id=" + ENV.SUBMIT_ASSIGNMENT.ID;
+    var url = "/courses/" + ENV.COURSE_ID + "/external_tools/" + tool.id + "/resource_selection?homework=1&assignment_id=" + ENV.SUBMIT_ASSIGNMENT.ID;
     var width = tool.homework_submission.selection_width || tool.selection_width;
     var height = tool.homework_submission.selection_height || tool.selection_height;
     var title = tool.display_text;

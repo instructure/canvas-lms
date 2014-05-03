@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "course settings" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   before (:each) do
     course_with_teacher_logged_in :limit_privileges_to_course_section => false
@@ -45,7 +45,7 @@ describe "course settings" do
 
     it "should toggle more options correclty" do
       more_options_text = 'more options'
-      less_options_text = 'less options'
+      fewer_options_text = 'fewer options'
       get "/courses/#{@course.id}/settings"
 
       f('.edit_course_link').click
@@ -54,7 +54,7 @@ describe "course settings" do
       more_options_link.click
       extra_options = f('.course_form_more_options')
       extra_options.should be_displayed
-      more_options_link.text.should == less_options_text
+      more_options_link.text.should == fewer_options_text
       more_options_link.click
       wait_for_ajaximations
       extra_options.should_not be_displayed

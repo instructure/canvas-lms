@@ -18,7 +18,7 @@ define [
     setChosen: (e) ->
       $target = @$(e.currentTarget)
       @model.set
-        'chosen_id': parseInt $target.val(), 10
+        'chosen_id': $target.val()
         'focus': true
 
     removeNeverDrop: (e) ->

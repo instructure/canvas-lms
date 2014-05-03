@@ -250,6 +250,9 @@
     +transition(all 200ms ease)
     +transform(scale(0.5))
 
+    .customListRestore
+      float: left
+
     .customListClose
       float: right
       display: block
@@ -279,8 +282,11 @@
 
   .customListOpen
     color: $linkColor
-    float: right
     font-size: 11px
+    float: right
+    position: relative
+    top: -26px
+    right: 12px
 
 .customListEditing ul
   min-height: 350px

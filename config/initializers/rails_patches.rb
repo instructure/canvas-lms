@@ -1,11 +1,55 @@
-# CVE-2013-0333
-# https://groups.google.com/d/topic/rubyonrails-security/1h2DR63ViGo/discussion
-# With Rails 2.3.16 we could remove this line, but we still prefer JSONGem for performance reasons
-ActiveSupport::JSON.backend = "JSONGem"
+if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
+  ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.class_eval do
+    # Force things with (approximate) integer representations (Floats,
+    # BigDecimals, Times, etc.) into those representations. Raise
+    # ActiveRecord::StatementInvalid for any other non-integer things.
+    def quote_with_integer_enforcement(value, column = nil)
+      if column && column.type == :integer && !value.respond_to?(:quoted_id)
+        case value
+          when String, ActiveSupport::Multibyte::Chars, nil, true, false
+            # these already have branches for column.type == :integer (or don't
+            # need one)
+            quote_without_integer_enforcement(value, column)
+          else
+            if value.respond_to?(:to_i)
+              # quote the value in its integer representation
+              value.to_i.to_s
+            else
+              # doesn't have a (known) integer representation, can't quote it
+              # for an integer column
+              raise ActiveRecord::StatementInvalid, "#{value.inspect} cannot be interpreted as an integer"
+            end
+        end
+      else
+        quote_without_integer_enforcement(value, column)
+      end
+    end
+    alias_method_chain :quote, :integer_enforcement
 
-if Rails::VERSION::MAJOR == 3 && Rails::VERSION::MINOR >= 1
-  raise "This patch has been merged into rails 3.1, remove it from our repo"
-else
+    if Rails.version < '4'
+      # Handle quoting properly for Infinity and NaN. This fix exists in Rails 4.0
+      # and can be safely removed once we upgrade.
+      #
+      # This patch is covered by tests in spec/initializers/active_record_quoting_spec.rb
+      def quote_with_infinity_and_nan(value, column = nil) #:nodoc:
+        if value.kind_of?(Float)
+          if value.infinite? && column && column.type == :datetime
+            "'#{value.to_s.downcase}'"
+          elsif value.infinite? || value.nan?
+            "'#{value.to_s}'"
+          else
+            quote_without_infinity_and_nan(value, column)
+          end
+        else
+          quote_without_infinity_and_nan(value, column)
+        end
+      end
+      alias_method_chain :quote, :infinity_and_nan
+    end
+  end
+end
+
+if CANVAS_RAILS2
   # bug submitted to rails: https://rails.lighthouseapp.com/projects/8994/tickets/5802-activerecordassociationsassociationcollectionload_target-doesnt-respect-protected-attributes#ticket-5802-1
   # This fix has been merged into rails trunk and will be in the rails 3.1 release.
   class ActiveRecord::Associations::AssociationCollection
@@ -174,57 +218,6 @@ else
     end
   end
 
-  if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
-    ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.class_eval do
-      # Force things with (approximate) integer representations (Floats,
-      # BigDecimals, Times, etc.) into those representations. Raise
-      # ActiveRecord::StatementInvalid for any other non-integer things.
-      def quote_with_integer_enforcement(value, column = nil)
-        if column && column.type == :integer && !value.respond_to?(:quoted_id)
-          case value
-          when String, ActiveSupport::Multibyte::Chars, nil, true, false
-            # these already have branches for column.type == :integer (or don't
-            # need one)
-            quote_without_integer_enforcement(value, column)
-          else
-            if value.respond_to?(:to_i)
-              # quote the value in its integer representation
-              value.to_i.to_s
-            else
-              # doesn't have a (known) integer representation, can't quote it
-              # for an integer column
-              raise ActiveRecord::StatementInvalid, "#{value.inspect} cannot be interpreted as an integer"
-            end
-          end
-        else
-          quote_without_integer_enforcement(value, column)
-        end
-      end
-      alias_method_chain :quote, :integer_enforcement
-
-      # Handle quoting properly for Infinity and NaN. This fix exists in Rails 3.1
-      # and can be safely removed once we upgrade.
-      #
-      # Adapted from: https://github.com/rails/rails/commit/06c23c4c7ff842f7c6237f3ac43fc9d19509a947
-      #
-      # This patch is covered by tests in spec/initializers/active_record_quoting_spec.rb
-      def quote_with_infinity_and_nan(value, column = nil) #:nodoc:
-        if value.kind_of?(Float)
-          if value.infinite? && column && column.type == :datetime
-            "'#{value.to_s.downcase}'"
-          elsif value.infinite? || value.nan?
-            "'#{value.to_s}'"
-          else
-            quote_without_infinity_and_nan(value, column)
-          end
-        else
-          quote_without_infinity_and_nan(value, column)
-        end
-      end
-      alias_method_chain :quote, :infinity_and_nan
-    end
-  end
-
   # This change allows us to use whatever is in the latest tzinfo gem
   # (like the Moscow change to always be on daylight savings)
   # instead of the hard-coded list in ActiveSupport::TimeZone.zones_map
@@ -242,4 +235,14 @@ else
       end
     end
   end
+
+else
+  ActiveSupport::Cache::Entry.class_eval do
+    def value_with_untaint
+      @value.untaint if @value
+      value_without_untaint
+    end
+    alias_method_chain :value, :untaint
+  end
+
 end

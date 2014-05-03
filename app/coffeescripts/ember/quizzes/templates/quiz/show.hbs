@@ -1,0 +1,89 @@
+<div class="row">
+  <div class="span12 quiz-description">
+    {{{description}}}
+  </div>
+</div>
+
+<div class="row" id="quiz-attribute-table">
+  <dl>
+    <div class="span4 quiz-attribute-column">
+      <dt>{{#t 'quiz_type'}}Quiz Type{{/t}}</dt>
+      <dd>{{tQuizType}}</dd>
+
+      <dt>{{#t 'points'}}Points{{/t}}</dt>
+      <dd>{{pointsPossible}}</dd>
+
+      <dt>{{#t 'time_limit'}}Time Limit{{/t}}</dt>
+      <dd>
+        {{#if timeLimit}}
+          {{#t 'time_limit_with_minutes'}}{{timeLimit}} minutes{{/t}}
+        {{else}}
+          {{#t 'no_time_limit'}}None{{/t}}
+        {{/if}}
+      </dd>
+    </div>
+
+    <div class="span3 quiz-attribute-column">
+      <dt>{{#t 'assignment_group'}}Assignment Group{{/t}}</dt>
+      <dd>{{assignmentGroup.name}}</dd>
+      <dt>{{#t 'attempts'}}Attempts{{/t}}</dt>
+      <dd>
+        {{#if unlimitedAllowedAttempts}}
+          {{#t 'unlimited'}}Unlimited{{/t}}
+        {{else}}
+          {{allowedAttempts}}
+        {{/if}}
+      </dd>
+
+      {{#if accessCode}}
+        <dt>{{#t 'access_code'}}Access Code{{/t}}</dt>
+        <dd>{{accessCode}}</dd>
+      {{/if}}
+    </div>
+
+    <div class="span3 quiz-attribute-column">
+      {{#if multipleAttemptsAllowed}}
+        <dt>{{#t 'score_to_keep'}}Score To Keep{{/t}}</dt>
+        <dd>{{tScoringPolicy}}</dd>
+      {{/if}}
+
+      <dt>{{#t 'show_results'}}Show Results{{/t}}</dt>
+      <dd>
+        {{#if alwaysShowResults}}
+          {{#t 'always'}}Always{{/t}}
+        {{else}}
+          {{#if showResultsAfterLastAttempt}}
+            {{#t 'show_after_last_attempt'}}After Last Attempt{{/t}}
+          {{else}}
+            {{#t 'never'}}Never{{/t}}
+          {{/if}}
+        {{/if}}
+      </dd>
+
+      <dt>{{#t "ip_filter"}}IP Filter{{/t}}</dt>
+      <dd>
+        {{#if ipFilter}}
+          {{ipFilter}}
+        {{else}}
+          {{#t 'none'}}None{{/t}}
+        {{/if}}
+    </div>
+  </div>
+</dl>
+
+<table class="table align-center" id="due-dates-table">
+  <thead>
+    <tr>
+      <td>{{#t 'due'}}Due{{/t}}</td>
+      <td>{{#t 'for'}}For{{/t}}</td>
+      <td>{{#t 'dates_available'}}Dates Available{{/t}}</td>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each allDates}}
+      <tr>
+        {{render "due_date_table_row" this}}
+      </tr>
+    {{/each}}
+  </tbody>
+</table>

@@ -1,4 +1,4 @@
-<% fields_for :settings, OpenObject.new(settings) do |f| %>
+<%= fields_for :settings, OpenObject.new(settings) do |f| %>
   <table style="width: 500px;" class="formtable">
     <tr>
       <td colspan="2">
@@ -45,18 +45,4 @@
     </tr>
   </table>
 <% end %>
-<% js_block do %>
-<script>
-require([
-  'jquery' /* $ */
-], function($) {
-
-$(document).ready(function() {
-  $(".select_action").change(function() {
-    $(".sub_setting").hide().filter("." + $(this).val()).show();
-  }).change();
-});
-
-});
-</script>
-<% end %>
+<% js_bundle 'legacy/plugins_error_reporting_settings' %>

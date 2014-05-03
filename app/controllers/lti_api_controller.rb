@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'oauth/request_proxy/action_controller_request'
+require 'oauth/client/action_pack'
 
 class LtiApiController < ApplicationController
   skip_before_filter :verify_authenticity_token
@@ -68,7 +68,7 @@ class LtiApiController < ApplicationController
 
     timestamp = Time.zone.at(@signature.request.timestamp.to_i)
     # 90 minutes is suggested by the LTI spec
-    allowed_delta = Setting.get_cached('oauth.allowed_timestamp_delta', 90.minutes.to_s).to_i
+    allowed_delta = Setting.get('oauth.allowed_timestamp_delta', 90.minutes.to_s).to_i
     if timestamp < allowed_delta.ago || timestamp > allowed_delta.from_now
       raise BasicLTI::BasicOutcomes::Unauthorized, "Timestamp too old or too far in the future, request has expired"
     end

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -24,6 +24,14 @@ class TestApiInstance
     @domain_root_account = root_account
     @current_user = current_user
   end
+
+  def account_url(account)
+    URI.encode("http://www.example.com/accounts/#{account}")
+  end
+
+  def course_assignment_url(course, assignment)
+    URI.encode("http://www.example.com/courses/#{course}/assignments/#{assignment}")
+  end
 end
 
 describe Api do
@@ -44,6 +52,18 @@ describe Api do
     it 'should find an existing sis_id record' do
       @user = user_with_pseudonym :username => "sis_user_1@example.com"
       @api.api_find(User, "sis_login_id:sis_user_1@example.com").should == @user
+    end
+
+    it 'should not find record from other account' do
+      account = Account.create(name: 'new')
+      @user = user_with_pseudonym username: "sis_user_1@example.com", account: account
+      (lambda {@api.api_find(User, "sis_login_id:sis_user_2@example.com")}).should raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    it 'should allow passing account param and find record' do
+      account = Account.create(name: 'new')
+      @user = user_with_pseudonym username: "sis_user_1@example.com", account: account
+      @api.api_find(User, "sis_login_id:sis_user_1@example.com", account: account).should == @user
     end
 
     it 'should not find a missing sis_id record' do
@@ -73,6 +93,31 @@ describe Api do
       account = Account.create!
       Account.site_admin.should == TestApiInstance.new(account, nil).api_find(Account, 'site_admin')
     end
+
+    it 'should find term id "default"' do
+      account = Account.create!
+      TestApiInstance.new(account, nil).api_find(account.enrollment_terms, 'default').should == account.default_enrollment_term
+    end
+
+    it 'should find term id "current"' do
+      account = Account.create!
+      term = account.enrollment_terms.create!(start_at: 1.week.ago, end_at: 1.week.from_now)
+      TestApiInstance.new(account, nil).api_find(account.enrollment_terms, 'current').should == term
+    end
+
+    it 'should not find a "current" term if there is more than one candidate' do
+      account = Account.create!
+      account.enrollment_terms.create!(start_at: 1.week.ago, end_at: 1.week.from_now)
+      account.enrollment_terms.create!(start_at: 2.weeks.ago, end_at: 2.weeks.from_now)
+      TestApiInstance.new(account, nil).api_find_all(account.enrollment_terms, ['current']).should == []
+    end
+
+    it 'should find an open ended "current" term' do
+      account = Account.create!
+      term = account.enrollment_terms.create!(start_at: 1.week.ago)
+      TestApiInstance.new(account, nil).api_find(account.enrollment_terms, 'current').should == term
+    end
+
 
     it 'should not find a user with an invalid AR id' do
       (lambda {@api.api_find(User, "a1")}).should raise_error(ActiveRecord::RecordNotFound)
@@ -173,12 +218,12 @@ describe Api do
       collection.expects(:all).with({:conditions => { 'id' => [1, 2, 3]}}).returns("result")
       @api.api_find_all(collection, [1,2,3]).should == "result"
       collection.expects(:all).with({:conditions => { 'id' => [1, 2, 3]}, :limit => 3}).returns("result")
-      @api.api_find_all(collection, [1,2,3], 3).should == "result"
+      @api.api_find_all(collection, [1,2,3], limit: 3).should == "result"
     end
 
     it 'should limit results if a limit is provided - unmocked' do
       users = 0.upto(9).map{|x| user}
-      result = @api.api_find_all(User, 0.upto(9).map{|i| users[i].id}, 5)
+      result = @api.api_find_all(User, 0.upto(9).map{|i| users[i].id}, limit: 5)
       result.count.should == 5
       result.each { |user| users.include?(user).should be_true }
     end
@@ -595,6 +640,39 @@ describe Api do
     end
   end
 
+  context ".paginate" do
+    let(:request) { stub('request', query_parameters: {}) }
+    let(:response) { stub('response', headers: {}) }
+    let(:controller) { stub('controller', request: request, response: response, params: {}) }
+
+    describe "ordinal collection" do
+      let(:collection) { [1, 2, 3] }
+
+      it "should not raise Folio::InvalidPage for pages past the end" do
+        Api.paginate(collection, controller, 'example.com', page: collection.size + 1, per_page: 1).
+          should == []
+      end
+
+      it "should not raise Folio::InvalidPage for integer-equivalent non-Integer pages" do
+        Api.paginate(collection, controller, 'example.com', page: '1').
+          should == collection
+      end
+
+      it "should raise Folio::InvalidPage for pages <= 0" do
+        lambda{ Api.paginate(collection, controller, 'example.com', page: 0) }.
+          should raise_error(Folio::InvalidPage)
+
+        lambda{ Api.paginate(collection, controller, 'example.com', page: -1) }.
+          should raise_error(Folio::InvalidPage)
+      end
+
+      it "should raise Folio::InvalidPage for non-integer pages" do
+        lambda{ Api.paginate(collection, controller, 'example.com', page: 'abc') }.
+          should raise_error(Folio::InvalidPage)
+      end
+    end
+  end
+
   context ".build_links" do
     it "should not build links if not pagination is provided" do
       Api.build_links("www.example.com").should be_empty
@@ -654,6 +732,104 @@ describe Api do
         :next => 4,
       })
       links.first.should == "<www.example.com/?page=4&per_page=10>; rel=\"next\""
+    end
+  end
+
+  describe "#accepts_jsonapi?" do
+    class TestApiController
+      include Api
+    end
+
+    it "returns true when application/vnd.api+json in the Accept header" do
+      controller = TestApiController.new
+      controller.stubs(:request).returns stub(headers: {
+        'Accept' => 'application/vnd.api+json'
+      })
+      controller.accepts_jsonapi?.should == true
+    end
+
+    it "returns false when application/vnd.api+json not in the Accept header" do
+      controller = TestApiController.new
+      controller.stubs(:request).returns stub(headers: {
+        'Accept' => 'application/json'
+      })
+      controller.accepts_jsonapi?.should == false
+    end
+  end
+
+  describe ".value_to_array" do
+    it "splits comma delimited strings" do
+      Api.value_to_array('1,2,3').should == ['1', '2', '3']
+    end
+
+    it "does nothing to arrays" do
+      Api.value_to_array(['1', '2', '3']).should == ['1', '2', '3']
+    end
+
+    it "returns an empty array for nil" do
+      Api.value_to_array(nil).should == []
+    end
+  end
+
+  describe "#templated_url" do
+    before do
+      @api = TestApiInstance.new Account.default, nil
+    end
+
+    it "should return url with a single item" do
+      url = @api.templated_url(:account_url, "{courses.account}")
+      url.should == "http://www.example.com/accounts/{courses.account}"
+    end
+
+    it "should return url with multiple items" do
+      url = @api.templated_url(:course_assignment_url, "{courses.id}", "{courses.assignment}")
+      url.should == "http://www.example.com/courses/{courses.id}/assignments/{courses.assignment}"
+    end
+
+    it "should return url with no template items" do
+      url = @api.templated_url(:account_url, "1}")
+      url.should == "http://www.example.com/accounts/1%7D"
+    end
+
+    it "should return url with a combination of items" do
+      url = @api.templated_url(:course_assignment_url, "{courses.id}", "1}")
+      url.should == "http://www.example.com/courses/{courses.id}/assignments/1%7D"
+    end
+  end
+
+  describe "#reject!" do
+    before do
+      @api = TestApiInstance.new Account.default, nil
+    end
+
+    it "sets the message and status in the error json" do
+      expect { @api.reject!('test message', :not_found) }.to(raise_error(Api::V1::ApiError) do |e|
+        e.message.should == 'test message'
+        e.error_json[:message].should == 'test message'
+        e.error_json[:status].should == 'not_found'
+        e.response_status.should == 404
+      end)
+    end
+
+    it "defaults status to 'bad_request'" do
+      expect { @api.reject!('test message') }.to(raise_error(Api::V1::ApiError) do |e|
+        e.error_json[:status].should == 'bad_request'
+        e.response_status.should == 400
+      end)
+    end
+
+    it "accepts numeric status codes" do
+      expect { @api.reject!('test message', 403) }.to(raise_error(Api::V1::ApiError) do |e|
+        e.error_json[:status].should == 'forbidden'
+        e.response_status.should == 403
+      end)
+    end
+
+    it "accepts symbolic status codes" do
+      expect { @api.reject!('test message', :service_unavailable) }.to(raise_error(Api::V1::ApiError) do |e|
+        e.error_json[:status].should == 'service_unavailable'
+        e.response_status.should == 503
+      end)
     end
   end
 end

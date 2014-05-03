@@ -1,10 +1,11 @@
 define [
   'i18n!discussion_topics'
   'Backbone'
+  'jquery'
   'underscore'
   'jst/DiscussionTopics/SummaryView'
-  'jst/_api_avatar'
-], (I18n, Backbone, _, template) ->
+  'jst/_avatar'
+], (I18n, Backbone, $, _, template) ->
 
   class DiscussionTopicSummaryView extends Backbone.View
 
@@ -19,6 +20,7 @@ define [
       'click' : 'openOnClick'
 
     initialize: ->
+      super
       @model.on 'change reset', @render, this
       @model.on 'destroy', @remove, this
 

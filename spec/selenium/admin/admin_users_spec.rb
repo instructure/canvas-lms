@@ -3,14 +3,14 @@ require File.expand_path(File.dirname(__FILE__) + '/../helpers/shared_user_metho
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/basic/users_specs')
 
 describe "admin courses tab" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   context "add user basic" do
     describe "shared users specs" do
       let(:account) { Account.default }
       let(:url) { "/accounts/#{account.id}/users" }
       let(:opts) { {:name => 'student'} }
-      it_should_behave_like "users basic tests"
+      include_examples "users basic tests"
     end
   end
 

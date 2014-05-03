@@ -4,74 +4,22 @@
   @body_classes << "modal" if @body_classes
   content_for :page_title, t('registration_complete', "Registration Complete")
 %>
+<% js_bundle 'legacy/users_registered' %>
 <% js_block do %>
-<script type="text/javascript">
-// file: app/views/users/registered.html.erb
-require([
-  'i18nObj' /* I18n.t */,
-  'jquery' /* $ */,
-  'jquery.ajaxJSON' /* ajaxJSON */,
-  'jqueryui/dialog'
-], function(I18n, $) {
-
-$(document).ready(function() {
-  var runAjax = true;
-  $(".re_send_confirmation_link").click(function(event) {
-    event.preventDefault();
-    
-    //we dont really want them to just keep clicking resend a bunch of times, 
-    // if it doesnt work then its ok so they can try to see if they can get it to work.
-    if (runAjax) {
-      var $link = $(this);
-      $link.text(<%= jt("resending", "Re-Sending...") %>);
-      $.ajaxJSON($link.attr('href'), 'POST', {}, function(data) {
-        $link.text(<%= jt("done_resending", "Done! Message may take a few minutes.") %>);
-        runAjax = false;
-      }, function(data) {
-        $link.text(<%= jt("failed_resending", "Request failed. Try again.") %>);
-      }); 
-    }
-  });
-
-  var videoWidth = Math.max(Math.min($(window).width() - 120, ($(window).height() * 1390/900 - 120)), 800),
-      videoHeight = videoWidth * 900/1390,
-      params = { allowScriptAccess: "always" },
-      atts = { id: "youtube_player" };
-
-  swfobject.embedSWF("//www.youtube.com/v/SJY5p0qpzhA?version=3&rel=0&enablejsapi=1&disablekb=1&fs=1&hd=1&showsearch=0&iv_load_policy=3&feature=player_embedded", "youtube_player", videoWidth, videoHeight, "8", null, null, params, atts);
-  
-  // $("#video").width(videoWidth).height(videoHeight);
-  $("#play_overview_video_link").click(function(){
-    $("#video_wrapper").dialog({
-      width: videoWidth,
-      title: <%= jt("overview_video", "Overview Video of Canvas") %>
-    });
-    return false;
-  });
-  
-});
-});
-
-function onYouTubePlayerReady(playerid){
-  var player = document.getElementById("youtube_player");
-  player.setPlaybackQuality('hd720');
-  player.playVideo();
-}
-</script>
-<!-- Google Code for New Teacher Signup Conversion Page -->
-<script type="text/javascript">
-/* <![CDATA[ */
-var google_conversion_id = 1016624328;
-var google_conversion_language = "en";
-var google_conversion_format = "3";
-var google_conversion_color = "ffffff";
-var google_conversion_label = "WYEpCIj-0QEQyOnh5AM";
-var google_conversion_value = 0;
-/* ]]> */
-</script>
-<script type="text/javascript" src="//www.googleadservices.com/pagead/conversion.js"></script>
-
+  <!-- Google Code for New Teacher Signup Conversion Page -->
+  <script type="text/javascript">
+    /* <![CDATA[ */
+    var google_conversion_id = 1016624328;
+    var google_conversion_language = "en";
+    var google_conversion_format = "3";
+    var google_conversion_color = "ffffff";
+    var google_conversion_label = "WYEpCIj-0QEQyOnh5AM";
+    var google_conversion_value = 0;
+    /* ]]> */
+  </script>
+  <script type="text/javascript" src="//www.googleadservices.com/pagead/conversion.js"></script>
 <% end %>
+
 <div id="modal-box">
   <div style="margin: 55px 17px 0 45px; position: relative;">
     <h2><%= t('almost_there', "You're almost there...") %></h2>

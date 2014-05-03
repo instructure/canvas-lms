@@ -30,6 +30,7 @@ define [
     initialize: ->
       super
       @WIKI_RIGHTS ||= {}
+      @model.set('unpublishable', true)
       @model.on 'change', => @render()
 
     toJSON: ->

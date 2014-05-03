@@ -7,6 +7,8 @@
 <ul id="flash_message_buffer" aria-hidden="true">
   <%= render :partial => "shared/flash_notice", :collection => notices %>
 </ul>
-<ul id="flash_message_holder" aria-live="polite" role="alert">
+<ul id="flash_message_holder">
   <%= render :partial => "shared/flash_notice", :collection => notices %>
 </ul>
+<div id="flash_screenreader_holder" class="screenreader-only" role="alert">
+</div>

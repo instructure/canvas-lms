@@ -26,7 +26,10 @@
   {{else}}
     <div style="float: right;">
       <a href="#" class="rte_switch_views_link">
-        {{#t "#editor.switch_views"}}Switch Views{{/t}}
+        {{#t "#editor.switch_editor_html"}}HTML Editor{{/t}}
+      </a>
+      <a href="#" class="rte_switch_views_link" style="display:none;">
+        {{#t "#editor.switch_editor_visual"}}Visual Editor{{/t}}
       </a>
     </div>
     <div style="clear:both;"></div>
@@ -41,11 +44,15 @@
 
 </div>
 
+
 <div class="control-group">
-  <label for="assignment_points_possible" class="control-label">
-    {{#t "points_possible"}}Points{{/t}}
-  </label>
-  <div class="controls">
+  <div class="form-column-left no-group">
+    <label for="assignment_points_possible">
+      {{#t "points_possible"}}Points{{/t}}
+    </label>
+  </div>
+
+  <div class="form-column-right">
     <input id="assignment_points_possible"
       name="points_possible"
       value="{{pointsPossible}}"
@@ -54,84 +61,48 @@
   </div>
 </div>
 
-<div id="assignment_due_date_controls" 
-  class="control-group"
-  style="{{hiddenUnless isSimple}}">
-  <label for="assignment_due_date" class="control-label">
-    {{#t "due_date"}}Due Date{{/t}}
-  </label>
-  <div class="controls">
-    <input id="assignment_due_date"
-      name="due_at"
-      value="{{datetimeFormatted dueAt}}"
-      type="text"
-      {{#if isSimple}}
-        class="date_field datetime_field hasDatePicker"
-      {{/if}}
-      {{disabledIfIncludes frozenAttributes "due_at"}}/>
-  </div>
-</div>
-
 <fieldset id="assignment_group_selector" class="control-group">
 </fieldset>
 
-{{#if isSimple}}
-<div class="form-controls">
-  <div class="controls">
-    <a href="#"
-      id="assignment_toggle_advanced_options"
-      aria-controls="advanced_assignment_options">
-      {{#t "show_advanced_options"}}Show Advanced Options{{/t}} ▼
-    </a>
-  </div>
+<div id="grading_type_selector"></div>
+
+<div id="graded_assignment_fields"
+  aria-expanded="{{not isNotGraded}}"
+  style="{{hiddenIf isNotGraded}}">
+
+  {{>[assignments/submission_types_form]}}
+
+  {{#unless isLargeRoster}}
+    <fieldset id="group_category_selector"
+      class="control-group"
+      style="{{hiddenIf isExternalTool}}">
+    </fieldset>
+  {{/unless}}
+
+  {{#unless isLargeRoster}}
+    <fieldset id="assignment_peer_reviews_fields"
+      class="control-group"
+      style="{{hiddenIf isExternalTool}}">
+    </fieldset>
+  {{/unless}}
+
 </div>
+
+{{#if canFreeze}}
+  <div class="form-column-left"></div>
+  <div class="form-column-right">
+    <fieldset>
+      <label class="checkbox">
+        {{checkbox "freezeOnCopy"
+          id="assignment_freeze_on_copy"
+          name="freeze_on_copy"}}
+          {{#t "freeze_properties"}}Lock assignment properties when copied{{/t}}
+      </label>
+    </fieldset>
+  </div>
 {{/if}}
 
-<div id="advanced_assignment_options"
-  aria-expanded="{{not isSimple}}"
-  class="advanced-togglable-{{isSimple}}"
-  style="{{hiddenIf isSimple}}">
-
-  <div id="grading_type_selector" class="control-group"></div>
-
-  <div id="graded_assignment_fields"
-    aria-expanded="{{not isNotGraded}}"
-    style="{{hiddenIf isNotGraded}}">
-
-    {{>[assignments/submission_types_form]}}
-
-    {{#unless isLargeRoster}}
-      <fieldset id="group_category_selector"
-        class="control-group"
-        style="{{hiddenIf isExternalTool}}">
-      </fieldset>
-    {{/unless}}
-
-    {{#unless isLargeRoster}}
-      <fieldset id="assignment_peer_reviews_fields"
-        class="control-group"
-        style="{{hiddenIf isExternalTool}}">
-      </fieldset>
-    {{/unless}}
-
-  </div>
-
-  {{#if canFreeze}}
-    <fieldset>
-      <div class="control-group controls">
-        <label class="checkbox">
-          {{checkbox "freezeOnCopy"
-            id="assignment_freeze_on_copy"
-            name="freeze_on_copy"}}
-          {{#t "freeze_properties"}}Lock assignment properties when copied{{/t}}
-        </label>
-      </div>
-    </fieldset>
-  {{/if}}
-
-  <div class='js-assignment-overrides'></div>
-
-</div>
+<div class='js-assignment-overrides'></div>
 
 <div class="form-actions flush" style="padding-left: 10px;">
 

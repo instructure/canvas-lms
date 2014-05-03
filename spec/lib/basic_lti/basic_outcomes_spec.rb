@@ -87,7 +87,7 @@ describe BasicLTI::BasicOutcomes do
       request.code_major.should == 'success'
       request.handle_request(tool).should be_true
       submission = assignment.submissions.where(user_id: @user.id).first
-      submission.grade.should == (assignment.points_possible * 0.92).round(2).to_s
+      submission.grade.should == (assignment.points_possible * 0.92).to_s
     end
 
     it "accepts a result data without grade" do

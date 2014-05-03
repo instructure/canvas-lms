@@ -17,14 +17,16 @@
  */
 
 define([
+  'compiled/util/round',
   'INST' /* INST */,
   'i18n!assignments',
   'jquery' /* $ */,
+  'timezone',
   'str/htmlEscape',
   'compiled/util/vddTooltip',
   'jqueryui/draggable' /* /\.draggable/ */,
   'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.instructure_date_and_time' /* parseFromISO, dateString, datepicker, time_field, datetime_field, /\$\.datetime/ */,
+  'jquery.instructure_date_and_time' /* $.timeString, $.dateString, datepicker, time_field, datetime_field, /\$\.datetime/ */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData */,
   'jqueryui/dialog',
   'compiled/jquery/fixDialogButtons',
@@ -38,7 +40,7 @@ define([
   'jqueryui/datepicker' /* /\.datepicker/ */,
   'jqueryui/droppable' /* /\.droppable/ */,
   'jqueryui/sortable' /* /\.sortable/ */
-], function(INST, I18n, $, htmlEscape, vddTooltip) {
+], function(round, INST, I18n, $, tz, htmlEscape, vddTooltip) {
 
   var defaultShowDateOptions = false;
   function hideAssignmentForm() {
@@ -274,12 +276,12 @@ define([
       $assignment.find(".date_text").show();
     }
     else if(assignment.due_at) {
-      var date_data = $.parseFromISO(assignment.due_at, 'due_date');
-      assignment.due_date = date_data.date_formatted;
-      assignment.due_time = date_data.time_formatted;
-      assignment.timestamp = date_data.timestamp;
-      assignment.due_date_string = $.datepicker.formatDate("mm/dd/yy", date_data.date);
-      assignment.due_time_string = date_data.time_string;
+      var due_at = tz.parse(assignment.due_at);
+      assignment.due_date = $.dateString(due_at);
+      assignment.due_time = $.timeString(due_at);
+      assignment.timestamp = +due_at / 1000;
+      assignment.due_date_string = $.datepicker.formatDate("mm/dd/yy", due_at);
+      assignment.due_time_string = $.timeString(due_at);
       $assignment.find(".date_text").show();
     } else {
       $assignment.find(".date_text").hide();
@@ -496,12 +498,16 @@ define([
         if(isNaN(val)) { val = 0; }
         tally += val;
       });
-      $("#group_weight #group_weight_total").text(tally + "%");
+      $("#group_weight #group_weight_total").text(round(tally,2) + "%");
     });
-    $("#group_weight .weight").bind('change', function(event, submit) {
+    $("#assignment_group_group_weight").on('change', function(event){
+      var val = parseFloat($(this).val(), 10);
+      $(this).val(round(val,2));
+    })
+    $("#group_weight .weight").on('change', function(event, submit) {
       var val = parseFloat($(this).val(), 10);
       if(isNaN(val)) { val = 0; }
-      $(this).val(val);
+      $(this).val(round(val,2));
       $("#group_weight").triggerHandler('weight_change');
       if(submit !== false) {
         var $weight = $(this);
@@ -849,18 +855,14 @@ define([
         $assignment.fillTemplateData({ data: data });
         var date = null;
         if(data['assignment[due_at]']) {
-          date = Date.parse(data['assignment[due_at]']);
+          date = tz.parse(data['assignment[due_at]']);
         }
         var updatedTimestamp = 0;
         if(date) {
-          updatedTimestamp = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes()) / 1000;
-          due_time = date.toString('h:mmtt').toLowerCase();
-          if(due_time == '12:00am') {
-            due_time = '';
-          }
+          updatedTimestamp = +date / 1000;
           $assignment.fillTemplateData({data: {
             due_date: $.dateString(date),
-            due_time: due_time
+            due_time: $.midnight(date) ? '' : $.timeString(date)
           }});
         }
         $assignment.find(".date_text").show();
@@ -971,7 +973,7 @@ define([
       event.preventDefault();
       event.stopPropagation();
       if(event.keyString == 'f') {
-        $(this).find(".preview_assignment_link:visible:first").click();
+        window.location = $(this).find(".title:visible:first").attr("href");
       } else if(event.keyString == 'e') {
         $(this).find(".edit_assignment_link:visible:first").click();
       } else if(event.keyString == 'd') {

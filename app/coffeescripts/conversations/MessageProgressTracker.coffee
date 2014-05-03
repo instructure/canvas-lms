@@ -18,10 +18,11 @@
 
 define [
   'i18n!conversations'
+  'jquery'
   'underscore'
   'compiled/conversations/MessageProgressBar'
   'jquery.ajaxJSON'
-], (I18n, _, MessageProgressBar) ->
+], (I18n, $, _, MessageProgressBar) ->
 
   class MessageProgressTracker
     constructor: (@app) ->

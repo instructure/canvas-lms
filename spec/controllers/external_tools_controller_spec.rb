@@ -110,6 +110,16 @@ describe ExternalToolsController do
       assigns[:tool_settings]['custom_canvas_enrollment_state'].should == 'active'
     end
 
+    it "should set html selection if specified" do
+      course_with_teacher_logged_in(:active_all => true)
+      tool = new_valid_tool(@course)
+      html = "<img src='/blank.png'/>"
+      get 'resource_selection', :course_id => @course.id, :external_tool_id => tool.id, :editor_button => '1', :selection => html
+      response.should be_success
+      assigns[:tool].should == tool
+      assigns[:tool_settings]['text'].should == CGI::escape(html)
+    end
+
     it "should find account-level tools" do
       @user = account_admin_user
       user_session(@user)
@@ -162,13 +172,13 @@ describe ExternalToolsController do
   describe "POST 'create'" do
     it "should require authentication" do
       course_with_teacher(:active_all => true)
-      post 'create', :course_id => @course.id
-      response.should be_redirect
+      post 'create', :course_id => @course.id, :format => "json"
+      assert_status(401)
     end
     
     it "should accept basic configurations" do
       course_with_teacher_logged_in(:active_all => true)
-      post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret"}
+      post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret"}, :format => "json"
       response.should be_success
       assigns[:tool].should_not be_nil
       assigns[:tool].name.should == "tool name"
@@ -178,7 +188,7 @@ describe ExternalToolsController do
     end
     
     it "should fail on basic xml with no url or domain set" do
-      rescue_action_in_public!
+      rescue_action_in_public! if CANVAS_RAILS2
       course_with_teacher_logged_in(:active_all => true)
       xml = <<-XML
 <?xml version="1.0" encoding="UTF-8"?>
@@ -200,7 +210,7 @@ describe ExternalToolsController do
     <cartridge_icon identifierref="BLTI001_Icon"/>
 </cartridge_basiclti_link>  
       XML
-      post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_xml", :config_xml => xml}
+      post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_xml", :config_xml => xml}, :format => "json"
       response.should_not be_success
     end
     
@@ -234,7 +244,7 @@ describe ExternalToolsController do
     <cartridge_icon identifierref="BLTI001_Icon"/>
 </cartridge_basiclti_link>  
       XML
-      post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_xml", :config_xml => xml}
+      post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_xml", :config_xml => xml}, :format => "json"
       response.should be_success
       assigns[:tool].should_not be_nil
       # User-entered name overrides name provided in xml
@@ -275,7 +285,7 @@ describe ExternalToolsController do
     <cartridge_icon identifierref="BLTI001_Icon"/>
 </cartridge_basiclti_link>  
       XML
-      post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_xml", :config_xml => xml}
+      post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_xml", :config_xml => xml}, :format => "json"
       response.should be_success
       assigns[:tool].should_not be_nil
       # User-entered name overrides name provided in xml
@@ -291,7 +301,7 @@ describe ExternalToolsController do
     it "should fail gracefully on invalid xml configurations" do
       course_with_teacher_logged_in(:active_all => true)
       xml = "bob"
-      post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_xml", :config_xml => xml}
+      post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_xml", :config_xml => xml}, :format => "json"
       response.should_not be_success
       assigns[:tool].should be_new_record
       json = json_parse(response.body)
@@ -299,7 +309,7 @@ describe ExternalToolsController do
 
       course_with_teacher_logged_in(:active_all => true)
       xml = "<a><b>c</b></a>"
-      post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_xml", :config_xml => xml}
+      post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_xml", :config_xml => xml}, :format => "json"
       response.should_not be_success
       assigns[:tool].should be_new_record
       json = json_parse(response.body)
@@ -338,7 +348,7 @@ describe ExternalToolsController do
       XML
       obj = OpenStruct.new({:body => xml})
       Net::HTTP.any_instance.stubs(:request).returns(obj)
-      post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_url", :config_url => "http://config.example.com"}
+      post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_url", :config_url => "http://config.example.com"}, :format => "json"
       response.should be_success
       assigns[:tool].should_not be_nil
       # User-entered name overrides name provided in xml
@@ -354,7 +364,7 @@ describe ExternalToolsController do
       Net::HTTP.any_instance.stubs(:request).raises(Timeout::Error)
       course_with_teacher_logged_in(:active_all => true)
       xml = "bob"
-      post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_url", :config_url => "http://config.example.com"}
+      post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_url", :config_url => "http://config.example.com"}, :format => "json"
       response.should_not be_success
       assigns[:tool].should be_new_record
       json = json_parse(response.body)

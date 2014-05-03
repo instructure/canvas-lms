@@ -1,5 +1,5 @@
 class RemoveDuplicateSubmissionMessages < ActiveRecord::Migration
-  self.transactional = false
+  disable_ddl_transaction!
 
   def self.up
     # destroy rather than delete so that callbacks happen

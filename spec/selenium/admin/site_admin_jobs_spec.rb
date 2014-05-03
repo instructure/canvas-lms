@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
 describe "site admin jobs ui" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   module FlavorTags
     ALL = 'All'
@@ -120,7 +120,7 @@ describe "site admin jobs ui" do
           driver.switch_to.alert.should_not be_nil
           driver.switch_to.alert.accept
           wait_for_ajaximations
-          Delayed::Job.count.should eql num_of_jobs - 3
+          Delayed::Job.count.should == num_of_jobs - 3
         end
 
         fj("#jobs-grid .odd").should be_nil # using fj to bypass selenium cache
@@ -130,18 +130,18 @@ describe "site admin jobs ui" do
       it "should check current popular tags" do
         filter_tags(FlavorTags::CURRENT)
         keep_trying_until do
-          f("#tags-grid div[row='0'] .r0").text.should == "String#reverse"
-          f("#tags-grid div[row='0'] .r1").text.should == "2"
+          f("#tags-grid .slick-row:nth-child(1) .r0").text.should == "String#reverse"
+          f("#tags-grid .slick-row:nth-child(1) .r1").text.should == "2"
         end
       end
 
       it "should check all popular tags" do
         filter_tags(FlavorTags::ALL)
         keep_trying_until do
-          f("#tags-grid div[row='0'] .r0").text.should == "String#reverse"
-          f("#tags-grid div[row='0'] .r1").text.should == "2"
-          f("#tags-grid div[row='1'] .r0").text.should == "String#capitalize"
-          f("#tags-grid div[row='1'] .r1").text.should == "1"
+          f("#tags-grid .slick-row:nth-child(1) .r0").text.should == "String#reverse"
+          f("#tags-grid .slick-row:nth-child(1) .r1").text.should == "2"
+          f("#tags-grid .slick-row:nth-child(2) .r0").text.should == "String#capitalize"
+          f("#tags-grid .slick-row:nth-child(2) .r1").text.should == "1"
         end
       end
 
@@ -221,6 +221,46 @@ describe "site admin jobs ui" do
       keep_trying_until do
         first_cell = fj('#running-grid .slick-cell.l0.r0')
         first_cell.text.should == 'my test worker'
+      end
+    end
+
+    it "should sort by runtime by default" do
+      @all_jobs[0].lock_exclusively!('my test worker 1')
+      Delayed::Job.stubs(:db_time_now).returns(24.hours.ago)
+      @all_jobs[1].update_attribute(:run_at, 48.hours.ago)
+      @all_jobs[1].lock_exclusively!('my test worker 2')
+      Delayed::Job.unstub(:db_time_now)
+
+      load_jobs_page
+      ffj('#running-grid .slick-row').size.should == 2
+      keep_trying_until do
+        first_cell = fj('#running-grid .slick-cell.l0.r0')
+        first_cell.text.should == 'my test worker 2'
+        last_cell = fj('#running-grid .slick-cell.l6.r6 .super-slow')
+        last_cell.should_not be_nil
+        true
+      end
+    end
+
+    it "should sort dynamically" do
+      @all_jobs[0].lock_exclusively!('my test worker 1')
+      @all_jobs[1].lock_exclusively!('my test worker 2')
+
+      load_jobs_page
+      ffj('#running-grid .slick-row').size.should == 2
+      # sort ASC
+      worker_header = fj("#running-grid .slick-header div[id*='worker'] .slick-column-name")
+      worker_header.click
+      keep_trying_until do
+        first_cell = fj('#running-grid .slick-cell.l0.r0')
+        first_cell.text.should == 'my test worker 1'
+      end
+
+      # sort DESC
+      worker_header.click
+      keep_trying_until do
+        first_cell = fj('#running-grid .slick-cell.l0.r0')
+        first_cell.text.should == 'my test worker 2'
       end
     end
   end

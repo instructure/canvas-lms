@@ -17,6 +17,8 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
+
+require 'csv'
 require 'socket'
 
 describe Course do
@@ -36,32 +38,70 @@ describe Course do
     @course.apply_group_weights?.should == true
   end
 
-  it "should know if it has been soft-concluded" do
-    @course.enrollment_term = Account.default.enrollment_terms.create!
+  describe "soft-concluded?" do
+    before do
+      @course.enrollment_term = Account.default.enrollment_terms.create!
+    end
 
-    # Both course and term end_at dates are nil
-    @course.should_not be_soft_concluded
+    context "without term end date" do
+      it "should know if it has been soft-concluded" do
+        @course.update_attribute(:conclude_at, nil)
+        @course.should_not be_soft_concluded
 
-    # Course end_at is in the past
-    @course.update_attribute(:conclude_at, Time.now - 1.week)
-    @course.should be_soft_concluded
+        @course.update_attribute(:conclude_at, 1.week.from_now)
+        @course.should_not be_soft_concluded
 
-    # Course end_at in the future, term end_at in the past
-    @course.update_attribute(:conclude_at, Time.now + 1.week)
-    @course.enrollment_term.update_attribute(:end_at, Time.now - 1.week)
-    @course.should be_soft_concluded
+        @course.update_attribute(:conclude_at, 1.week.ago)
+        @course.should be_soft_concluded
+      end
+    end
 
-    # Both course and term end_at dates are in the future
-    @course.enrollment_term.update_attribute(:end_at, Time.now + 1.week)
-    @course.should_not be_soft_concluded
+    context "with term end date in the past" do
+      before do
+        @course.enrollment_term.update_attribute(:end_at, 1.week.ago)
+      end
+
+      it "should know if it has been soft-concluded" do
+        @course.update_attribute(:conclude_at, nil)
+        @course.should be_soft_concluded
+
+        @course.update_attribute(:conclude_at, 1.week.from_now)
+        @course.should_not be_soft_concluded
+
+        @course.update_attribute(:conclude_at, 1.week.ago)
+        @course.should be_soft_concluded
+      end
+    end
+
+    context "with term end date in the future" do
+      before do
+        @course.enrollment_term.update_attribute(:end_at, 1.week.from_now)
+      end
+
+      it "should know if it has been soft-concluded" do
+        @course.update_attribute(:conclude_at, nil)
+        @course.should_not be_soft_concluded
+
+        @course.update_attribute(:conclude_at, 1.week.from_now)
+        @course.should_not be_soft_concluded
+
+        @course.update_attribute(:conclude_at, 1.week.ago)
+        @course.should be_soft_concluded
+      end
+    end
   end
 
   context "#old_gradebook_visible?" do
-    it "should always return false when enrollment count is large enough" do
-        @course.large_roster = false
-        @course.old_gradebook_visible?.should be_true
-        @course.students.stubs(:count).returns(251)
+    it "should return true for small enrollments" do
+      @course.large_roster = false
+      @course.old_gradebook_visible?.should be_true
+    end
+
+    it "should return false when enrollment count is large enough" do
+      enable_cache do
+        Rails.cache.write(['student_count', @course].cache_key, 251)
         @course.old_gradebook_visible?.should be_false
+      end
     end
   end
 
@@ -90,6 +130,13 @@ describe Course do
     @uuid = @course.uuid
     @course2 = Course.create_unique(@uuid)
     @course.should eql(@course2)
+  end
+
+  it "should throw error for long sis id" do
+    #should throw rails validation error instead of db invalid statement error
+    @course = Course.create_unique
+    @course.sis_source_id = 'qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm'
+    (lambda {@course.save!}).should raise_error("Validation failed: Sis source is too long (maximum is 255 characters)")
   end
 
   it "should always have a uuid, if it was created" do
@@ -311,14 +358,6 @@ describe Course do
       @course.grants_right?(:read, @student).should be_false
     end
 
-    it "should not grant read to soft-inactive teachers" do
-      course_with_teacher(:active_user => 1)
-      @course.enrollment_term.update_attributes(:start_at => 2.days.from_now, :end_at => 4.days.from_now)
-      @enrollment.update_attribute(:workflow_state, 'active')
-      @enrollment.reload.state_based_on_date.should == :inactive
-      @course.grants_right?(:read, @teacher).should be_false
-    end
-
     it "should grant :read_outcomes to teachers in the course" do
       course_with_teacher(:active_all => 1)
       @course.grants_right?(@teacher, :read_outcomes).should be_true
@@ -346,7 +385,12 @@ describe Course do
       @course.self_enrollment = true
       @course.sis_source_id = 'sis_id'
       @course.stuck_sis_fields = [].to_set
+      profile = @course.profile
+      profile.description = "description"
+      profile.save!
       @course.save!
+      @course.reload
+
       @course.course_sections.should_not be_empty
       @course.students.should == [@student]
       @course.stuck_sis_fields.should == [].to_set
@@ -404,8 +448,13 @@ describe Course do
       @course.stuck_sis_fields = [].to_set
       @course.name = "course_name"
       @course.stuck_sis_fields.should == [:name].to_set
+      profile = @course.profile
+      profile.description = "description"
+      profile.save!
       @course.save!
       @course.stuck_sis_fields.should == [:name].to_set
+
+      @course.reload
 
       @new_course = @course.reset_content
 
@@ -477,18 +526,14 @@ describe Course do
       users.should be_include(@user2)
       users.should be_include(@user3)
     end
-  end
 
-  it "should order results of paginate_users_not_in_groups by user's sortable name" do
-    @course = course(:active_all => true)
-    @user1 = user_model; @user1.sortable_name = 'jonny'; @user1.save
-    @user2 = user_model; @user2.sortable_name = 'bob'; @user2.save
-    @user3 = user_model; @user3.sortable_name = 'richard'; @user3.save
-    @course.enroll_user(@user1)
-    @course.enroll_user(@user2)
-    @course.enroll_user(@user3)
-    users = @course.paginate_users_not_in_groups([], 1)
-    users.map{ |u| u.id }.should == [@user2.id, @user1.id, @user3.id]
+    it "should allow ordering by user's sortable name" do
+      @user1.sortable_name = 'jonny'; @user1.save
+      @user2.sortable_name = 'bob'; @user2.save
+      @user3.sortable_name = 'richard'; @user3.save
+      users = @course.users_not_in_groups([], order: User.sortable_name_order_by_clause('users'))
+      users.map{ |u| u.id }.should == [@user2.id, @user1.id, @user3.id]
+    end
   end
 
   context "events_for" do
@@ -623,7 +668,7 @@ end
 describe Course, "score_to_grade" do
   it "should correctly map scores to grades" do
     default = GradingStandard.default_grading_standard
-    default.to_json.should eql([["A", 0.94], ["A-", 0.90], ["B+", 0.87], ["B", 0.84], ["B-", 0.80], ["C+", 0.77], ["C", 0.74], ["C-", 0.70], ["D+", 0.67], ["D", 0.64], ["D-", 0.61], ["F", 0]].to_json)
+    default.to_json.should == ([["A", 0.94], ["A-", 0.90], ["B+", 0.87], ["B", 0.84], ["B-", 0.80], ["C+", 0.77], ["C", 0.74], ["C-", 0.70], ["D+", 0.67], ["D", 0.64], ["D-", 0.61], ["F", 0.0]].to_json)
     course_model
     @course.score_to_grade(95).should eql(nil)
     @course.grading_standard_id = 0
@@ -682,24 +727,24 @@ describe Course, "gradebook_to_csv" do
     rows[1][-2].should == "(read only)"
     rows[2][-2].should == "100"
   end
-  
-  it "should order assignments by position" do
+
+  it "should order assignments and groups by position" do
     course_with_student(:active_all => true)
 
     @assignment_group_1, @assignment_group_2 = [@course.assignment_groups.create!(:name => "Some Assignment Group 1", :group_weight => 100), @course.assignment_groups.create!(:name => "Some Assignment Group 2", :group_weight => 100)].sort_by{|a| a.id}
 
     now = Time.now
 
-    @course.assignments.create!(:title => "Assignment 01", :due_at => now + 1.days, :position => 3, :assignment_group => @assignment_group_1)
-    @course.assignments.create!(:title => "Assignment 02", :due_at => now + 1.days, :position => 1, :assignment_group => @assignment_group_1)
+    g1a1 = @course.assignments.create!(:title => "Assignment 01", :due_at => now + 1.days, :position => 3, :assignment_group => @assignment_group_1, :points_possible => 10)
+    @course.assignments.create!(:title => "Assignment 02", :due_at => now + 1.days, :position => 1, :assignment_group => @assignment_group_1, :points_possible => 10)
     @course.assignments.create!(:title => "Assignment 03", :due_at => now + 1.days, :position => 2, :assignment_group => @assignment_group_1)
     @course.assignments.create!(:title => "Assignment 05", :due_at => now + 4.days, :position => 4, :assignment_group => @assignment_group_1)
     @course.assignments.create!(:title => "Assignment 04", :due_at => now + 5.days, :position => 5, :assignment_group => @assignment_group_1)
     @course.assignments.create!(:title => "Assignment 06", :due_at => now + 7.days, :position => 6, :assignment_group => @assignment_group_1)
     @course.assignments.create!(:title => "Assignment 07", :due_at => now + 6.days, :position => 7, :assignment_group => @assignment_group_1)
-    @course.assignments.create!(:title => "Assignment 08", :due_at => now + 8.days, :position => 1, :assignment_group => @assignment_group_2)
+    g2a1 = @course.assignments.create!(:title => "Assignment 08", :due_at => now + 8.days, :position => 1, :assignment_group => @assignment_group_2, :points_possible => 10)
     @course.assignments.create!(:title => "Assignment 09", :due_at => now + 8.days, :position => 9, :assignment_group => @assignment_group_1)
-    @course.assignments.create!(:title => "Assignment 10", :due_at => now + 8.days, :position => 10, :assignment_group => @assignment_group_2)
+    @course.assignments.create!(:title => "Assignment 10", :due_at => now + 8.days, :position => 10, :assignment_group => @assignment_group_2, :points_possible => 10)
     @course.assignments.create!(:title => "Assignment 12", :due_at => now + 11.days, :position => 11, :assignment_group => @assignment_group_1)
     @course.assignments.create!(:title => "Assignment 14", :due_at => nil, :position => 14, :assignment_group => @assignment_group_1)
     @course.assignments.create!(:title => "Assignment 11", :due_at => now + 11.days, :position => 11, :assignment_group => @assignment_group_1)
@@ -709,15 +754,47 @@ describe Course, "gradebook_to_csv" do
     @user.reload
     @course.reload
 
+    g1a1.grade_student(@user, grade: 10)
+    g2a1.grade_student(@user, grade: 5)
+
     csv = @course.gradebook_to_csv
     csv.should_not be_nil
     rows = CSV.parse(csv)
     rows.length.should equal(3)
-    assignments = []
+    assignments, groups = [], []
     rows[0].each do |column|
-      assignments << column.sub(/ \([0-9]+\)/, '') if column =~ /Assignment/
+      assignments << column.sub(/ \([0-9]+\)/, '') if column =~ /Assignment \d+/
+      groups << column if column =~ /Some Assignment Group/
     end
     assignments.should == ["Assignment 02", "Assignment 03", "Assignment 01", "Assignment 05",  "Assignment 04", "Assignment 06", "Assignment 07", "Assignment 09", "Assignment 11", "Assignment 12", "Assignment 13", "Assignment 14", "Assignment 08", "Assignment 10"]
+    groups.should == ["Some Assignment Group 1 Current Points",
+                      "Some Assignment Group 1 Final Points",
+                      "Some Assignment Group 1 Current Score",
+                      "Some Assignment Group 1 Final Score",
+                      "Some Assignment Group 2 Current Points",
+                      "Some Assignment Group 2 Final Points",
+                      "Some Assignment Group 2 Current Score",
+                      "Some Assignment Group 2 Final Score"]
+
+    rows[2][-10].should == "100"    # ag1 current score
+    rows[2][-9].should  == "50"     # ag1 final score
+    rows[2][-6].should  == "50"     # ag2 current score
+    rows[2][-5].should  == "25"     # ag2 final score
+  end
+
+  it "should alphabetize by sortable name with the test student at the end" do
+    course
+    ["Ned Ned", "Zed Zed", "Aardvark Aardvark"].each{|name| student_in_course(:name => name)}
+    test_student_enrollment = student_in_course(:name => "Test Student")
+    test_student_enrollment.type = "StudentViewEnrollment"
+    test_student_enrollment.save!
+
+    csv = @course.gradebook_to_csv
+    rows = CSV.parse(csv)
+    [rows[2][0],
+     rows[3][0],
+     rows[4][0],
+     rows[5][0]].should == ["Aardvark, Aardvark", "Ned, Ned", "Zed, Zed", "Student, Test"]
   end
 
   it "should generate csv with final grade if enabled" do
@@ -775,9 +852,9 @@ describe Course, "gradebook_to_csv" do
     rows[0][2].should == 'SIS User ID'
     rows[0][3].should == 'SIS Login ID'
     rows[0][4].should == 'Section'
-    rows[1][2].should == ''
-    rows[1][3].should == ''
-    rows[1][4].should == ''
+    rows[1][2].should == nil
+    rows[1][3].should == nil
+    rows[1][4].should == nil
     rows[1][-1].should == '(read only)'
     rows[2][1].should == @user1.id.to_s
     rows[2][2].should == 'SISUSERID'
@@ -799,6 +876,12 @@ describe Course, "gradebook_to_csv" do
 
     it "includes points for unweighted courses" do
       csv = CSV.parse(@course.gradebook_to_csv)
+      csv[0][-8].should == "Assignments Current Points"
+      csv[0][-7].should == "Assignments Final Points"
+      csv[1][-8].should == "(read only)"
+      csv[1][-7].should == "(read only)"
+      csv[2][-8].should == "8"
+      csv[2][-7].should == "8"
       csv[0][-4].should == "Current Points"
       csv[0][-3].should == "Final Points"
       csv[1][-4].should == "(read only)"
@@ -810,6 +893,8 @@ describe Course, "gradebook_to_csv" do
     it "doesn't include points for weighted courses" do
       @course.update_attribute(:group_weighting_scheme, 'percent')
       csv = CSV.parse(@course.gradebook_to_csv)
+      csv[0][-8].should_not == "Assignments Current Points"
+      csv[0][-7].should_not == "Assignments Final Points"
       csv[0][-4].should_not == "Current Points"
       csv[0][-3].should_not == "Final Points"
     end
@@ -859,12 +944,12 @@ describe Course, "gradebook_to_csv" do
       rows[0][2].should == 'SIS User ID'
       rows[0][3].should == 'SIS Login ID'
       rows[0][4].should == 'Section'
-      rows[1][0].should == ''
+      rows[1][0].should == nil
       rows[1][5].should == 'Muted'
-      rows[1][6].should == ''
-      rows[2][2].should == ''
-      rows[2][3].should == ''
-      rows[2][4].should == ''
+      rows[1][6].should == nil
+      rows[2][2].should == nil
+      rows[2][3].should == nil
+      rows[2][4].should == nil
       rows[2][-1].should == '(read only)'
       rows[3][1].should == @user1.id.to_s
       rows[3][2].should == 'SISUSERID'
@@ -920,16 +1005,18 @@ describe Course, "tabs_available" do
     tab_ids.should eql(Course.default_tabs.map{|t| t[:id] })
     tab_ids.length.should eql(length)
   end
-  
+
   it "should overwrite the order of tabs if configured" do
-    course_with_teacher(:active_all => true)
-    length = Course.default_tabs.length
-    @course.tab_configuration = [{'id' => Course::TAB_COLLABORATIONS}, {'id' => Course::TAB_CHAT}]
-    tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
-    tab_ids.should eql(([Course::TAB_COLLABORATIONS, Course::TAB_CHAT] + Course.default_tabs.map{|t| t[:id] }).uniq)
-    tab_ids.length.should eql(length)
+    course_with_teacher(active_all: true)
+    @course.tab_configuration = [{ id: Course::TAB_COLLABORATIONS }]
+    available_tabs = @course.tabs_available(@user).map { |tab| tab[:id] }
+    default_tabs   = Course.default_tabs.map           { |tab| tab[:id] }
+    custom_tabs    = @course.tab_configuration.map     { |tab| tab[:id] }
+
+    available_tabs.should        == (custom_tabs + default_tabs).uniq
+    available_tabs.length.should == default_tabs.length
   end
-  
+
   it "should remove ids for tabs not in the default list" do
     course_with_teacher(:active_all => true)
     @course.tab_configuration = [{'id' => 912}]
@@ -1350,7 +1437,7 @@ describe Course, 'grade_publishing' do
 
       it 'should check whether or not grade export is enabled - success' do
         grade_publishing_user
-        @course.expects(:send_final_grades_to_endpoint).with(@user).returns(nil)
+        @course.expects(:send_final_grades_to_endpoint).with(@user, nil).returns(nil)
         @plugin.stubs(:enabled?).returns(true)
         @plugin_settings[:publish_endpoint] = "http://localhost/endpoint"
         @course.publish_final_grades(@user)
@@ -1370,7 +1457,7 @@ describe Course, 'grade_publishing' do
         @student_enrollments.map(&:workflow_state).should == ["active"] * 6 + ["inactive"] + ["active"] * 2
         @student_enrollments.map(&:last_publish_attempt_at).should == [nil] * 9
         grade_publishing_user
-        @course.expects(:send_final_grades_to_endpoint).with(@user).returns(nil)
+        @course.expects(:send_final_grades_to_endpoint).with(@user, nil).returns(nil)
         @plugin.stubs(:enabled?).returns(true)
         @plugin_settings[:publish_endpoint] = "http://localhost/endpoint"
         @course.publish_final_grades(@user)
@@ -1388,15 +1475,25 @@ describe Course, 'grade_publishing' do
 
       it 'should kick off the actual grade send' do
         grade_publishing_user
-        @course.expects(:send_later_if_production).with(:send_final_grades_to_endpoint, @user).returns(nil)
+        @course.expects(:send_later_if_production).with(:send_final_grades_to_endpoint, @user, nil).returns(nil)
         @plugin.stubs(:enabled?).returns(true)
         @plugin_settings[:publish_endpoint] = "http://localhost/endpoint"
         @course.publish_final_grades(@user)
       end
 
+      it 'should kick off the actual grade send for a specific user' do
+        grade_publishing_user
+        make_student_enrollments
+        @course.expects(:send_later_if_production).with(:send_final_grades_to_endpoint, @user, @student_enrollments.first.user_id).returns(nil)
+        @plugin.stubs(:enabled?).returns(true)
+        @plugin_settings[:publish_endpoint] = "http://localhost/endpoint"
+        @course.publish_final_grades(@user, @student_enrollments.first.user_id)
+        @student_enrollments.first.reload.grade_publishing_status.should == "pending"
+      end
+
       it 'should kick off the timeout when a success timeout is defined and waiting is configured' do
         grade_publishing_user
-        @course.expects(:send_later_if_production).with(:send_final_grades_to_endpoint, @user).returns(nil)
+        @course.expects(:send_later_if_production).with(:send_final_grades_to_endpoint, @user, nil).returns(nil)
         current_time = Time.now.utc
         Time.stubs(:now).returns(current_time)
         current_time.stubs(:utc).returns(current_time)
@@ -1412,7 +1509,7 @@ describe Course, 'grade_publishing' do
 
       it 'should not kick off the timeout when a success timeout is defined and waiting is not configured' do
         grade_publishing_user
-        @course.expects(:send_later_if_production).with(:send_final_grades_to_endpoint, @user).returns(nil)
+        @course.expects(:send_later_if_production).with(:send_final_grades_to_endpoint, @user, nil).returns(nil)
         current_time = Time.now.utc
         Time.stubs(:now).returns(current_time)
         current_time.stubs(:utc).returns(current_time)
@@ -1428,7 +1525,7 @@ describe Course, 'grade_publishing' do
 
       it 'should not kick off the timeout when a success timeout is not defined and waiting is not configured' do
         grade_publishing_user
-        @course.expects(:send_later_if_production).with(:send_final_grades_to_endpoint, @user).returns(nil)
+        @course.expects(:send_later_if_production).with(:send_final_grades_to_endpoint, @user, nil).returns(nil)
         current_time = Time.now.utc
         Time.stubs(:now).returns(current_time)
         current_time.stubs(:utc).returns(current_time)
@@ -1444,7 +1541,7 @@ describe Course, 'grade_publishing' do
 
       it 'should not kick off the timeout when a success timeout is not defined and waiting is configured' do
         grade_publishing_user
-        @course.expects(:send_later_if_production).with(:send_final_grades_to_endpoint, @user).returns(nil)
+        @course.expects(:send_later_if_production).with(:send_final_grades_to_endpoint, @user, nil).returns(nil)
         current_time = Time.now.utc
         Time.stubs(:now).returns(current_time)
         current_time.stubs(:utc).returns(current_time)
@@ -1512,8 +1609,8 @@ describe Course, 'grade_publishing' do
                 }
               }
           })
-        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post1", "test/mime1")
-        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post2", "test/mime2")
+        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post1", "test/mime1", {})
+        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post2", "test/mime2", {})
         @course.send_final_grades_to_endpoint @user
         @student_enrollments.map(&:reload).map(&:grade_publishing_status).should == ["unpublishable", "unpublishable", "published", "unpublishable", "published", "published", "unpublished", "unpublishable", "published"]
         @student_enrollments.map(&:grade_publishing_message).should == [nil] * 9
@@ -1545,6 +1642,35 @@ describe Course, 'grade_publishing' do
               }
           })
         @course.send_final_grades_to_endpoint @user
+        @checked.should be_true
+      end
+
+      it "should try to publish appropriate enrollments (limited users)" do
+        plugin_settings = Course.valid_grade_export_types["instructure_csv"]
+        Course.stubs(:valid_grade_export_types).returns(plugin_settings.merge({
+                "instructure_csv" => { :requires_grading_standard => true, :requires_publishing_pseudonym => true }}))
+        @course.grading_standard_enabled = true
+        @course.save!
+        grade_publishing_user
+        @plugin.stubs(:enabled?).returns(true)
+        @plugin_settings.merge!({
+                                    :publish_endpoint => "http://localhost/endpoint",
+                                    :format_type => "instructure_csv"
+                                })
+        @checked = false
+        Course.stubs(:valid_grade_export_types).returns({
+                                                            "instructure_csv" => {
+                                                                :callback => lambda {|course, enrollments, publishing_user, publishing_pseudonym|
+                                                                  course.should == @course
+                                                                  enrollments.should == [@student_enrollments.first]
+                                                                  publishing_pseudonym.should == @pseudonym
+                                                                  publishing_user.should == @user
+                                                                  @checked = true
+                                                                  return []
+                                                                }
+                                                            }
+                                                        })
+        @course.send_final_grades_to_endpoint @user, @student_enrollments.first.user_id
         @checked.should be_true
       end
 
@@ -1618,8 +1744,8 @@ describe Course, 'grade_publishing' do
                 }
               }
           })
-        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post1", "test/mime1")
-        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post2", "test/mime2")
+        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post1", "test/mime1", {})
+        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post2", "test/mime2", {})
         @course.send_final_grades_to_endpoint @user
         @student_enrollments.map(&:reload).map(&:grade_publishing_status).should == ["unpublishable", published_status, "unpublishable", published_status, published_status, "unpublishable", "unpublished", "unpublishable", published_status]
         @student_enrollments.map(&:grade_publishing_message).should == [nil] * 9
@@ -1679,9 +1805,9 @@ describe Course, 'grade_publishing' do
                 }
               }
           })
-        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post1", "test/mime1")
-        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post2", "test/mime2").raises("waaah fail")
-        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post3", "test/mime3")
+        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post1", "test/mime1", {})
+        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post2", "test/mime2", {}).raises("waaah fail")
+        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post3", "test/mime3", {})
         (lambda {@course.send_final_grades_to_endpoint(@user)}).should raise_error("waaah fail")
         @student_enrollments.map(&:reload).map(&:grade_publishing_status).should == ["published", "published", "published", "published", "error", "unpublishable", "unpublished", "unpublishable", "error"]
         @student_enrollments.map(&:grade_publishing_message).should == [nil] * 4 + ["waaah fail"] + [nil] * 3 + ["waaah fail"]
@@ -1712,9 +1838,9 @@ describe Course, 'grade_publishing' do
                 }
               }
           })
-        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post1", "test/mime1").raises("waaah fail")
-        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post2", "test/mime2").raises("waaah fail")
-        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post3", "test/mime3")
+        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post1", "test/mime1", {}).raises("waaah fail")
+        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post2", "test/mime2", {}).raises("waaah fail")
+        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post3", "test/mime3", {})
         (lambda {@course.send_final_grades_to_endpoint(@user)}).should raise_error("waaah fail")
         @student_enrollments.map(&:reload).map(&:grade_publishing_status).should == ["published", "error", "published", "error", "error", "unpublishable", "unpublished", "unpublishable", "error"]
         @student_enrollments.map(&:grade_publishing_message).should == [nil, "waaah fail", nil, "waaah fail", "waaah fail", nil, nil, nil, "waaah fail"]
@@ -1735,6 +1861,62 @@ describe Course, 'grade_publishing' do
         (lambda {@course.send_final_grades_to_endpoint(@user)}).should raise_error("waaah fail")
         @student_enrollments.map(&:reload).map(&:grade_publishing_status).should == ["error", "error", "error", "error", "error", "error", "unpublished", "error", "error"]
         @student_enrollments.map(&:grade_publishing_message).should == ["waaah fail"] * 6 + [nil] + ["waaah fail"] * 2
+      end
+
+      it "should pass header parameters to post" do
+        @plugin.stubs(:enabled?).returns(true)
+        @plugin_settings.merge! :publish_endpoint => "http://localhost/endpoint", :format_type => "test_format"
+        grade_publishing_user
+        @ase = @student_enrollments.find_all{|e| e.workflow_state == 'active'}
+        Course.stubs(:valid_grade_export_types).returns({
+                                                            "test_format" => {
+                                                                :callback => lambda {|course, enrollments, publishing_user, publishing_pseudonym|
+                                                                  course.should == @course
+                                                                  enrollments.sort_by(&:id).should == @ase.sort_by(&:id)
+                                                                  publishing_pseudonym.should == @pseudonym
+                                                                  publishing_user.should == @user
+                                                                  return [
+                                                                      [[@ase[1].id, @ase[3].id],
+                                                                       "post1",
+                                                                       "test/mime1",{"header_param" => "header_value"}],
+                                                                      [[@ase[4].id, @ase[5].id],
+                                                                       "post2",
+                                                                       "test/mime2"]]
+                                                                }
+                                                            }
+                                                        })
+        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post1", "test/mime1", {"header_param" => "header_value"})
+        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "post2", "test/mime2", {})
+        @course.send_final_grades_to_endpoint(@user)
+        @student_enrollments.map(&:reload).map(&:grade_publishing_status).should == ["unpublishable", "published", "unpublishable", "published", "published", "published", "unpublished", "unpublishable", "unpublishable"]
+      end
+
+      it 'should update enrollment status if no resource provided' do
+        @plugin.stubs(:enabled?).returns(true)
+        @plugin_settings.merge! :publish_endpoint => "http://localhost/endpoint", :format_type => "test_format"
+        grade_publishing_user
+        @ase = @student_enrollments.find_all{|e| e.workflow_state == 'active'}
+        Course.stubs(:valid_grade_export_types).returns({
+                                                            "test_format" => {
+                                                                :callback => lambda {|course, enrollments, publishing_user, publishing_pseudonym|
+                                                                  course.should == @course
+                                                                  enrollments.sort_by(&:id).should == @ase.sort_by(&:id)
+                                                                  publishing_pseudonym.should == @pseudonym
+                                                                  publishing_user.should == @user
+                                                                  return [
+                                                                      [[@ase[1].id, @ase[3].id],
+                                                                       nil,
+                                                                       nil],
+                                                                      [[@ase[4].id, @ase[7].id],
+                                                                       nil,
+                                                                       nil]]
+                                                                }
+                                                            }
+                                                        })
+        SSLCommon.expects(:post_data).never
+        @course.send_final_grades_to_endpoint @user
+        @student_enrollments.map(&:reload).map(&:grade_publishing_status).should == ["unpublishable", "published", "unpublishable", "published", "published", "unpublishable", "unpublished", "unpublishable", "published"]
+        @student_enrollments.map(&:grade_publishing_message).should == [nil] * 9
       end
 
     end
@@ -2027,7 +2209,7 @@ describe Course, 'grade_publishing' do
   end
 
   context 'integration suite' do
-    def quick_sanity_check(user)
+    def quick_sanity_check(user, expect_success = true)
       Course.valid_grade_export_types["test_export"] = {
           :name => "test export",
           :callback => lambda {|course, enrollments, publishing_user, publishing_pseudonym|
@@ -2038,26 +2220,22 @@ describe Course, 'grade_publishing' do
           },
           :requires_grading_standard => false, :requires_publishing_pseudonym => true}
 
-      server, server_thread, post_lines = start_test_http_server
-
       @plugin = Canvas::Plugin.find!('grade_export')
       @ps = PluginSetting.new(:name => @plugin.id, :settings => @plugin.default_settings)
       @ps.posted_settings = @plugin.default_settings.merge({
           :format_type => "test_export",
           :wait_for_success => "no",
-          :publish_endpoint => "http://localhost:#{server.addr[1]}/endpoint"
+          :publish_endpoint => "http://localhost/endpoint"
         })
       @ps.save!
 
       @course.grading_standard_id = 0
+      if expect_success
+        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "test-jt-data", "application/jtmimetype", {})
+      else
+        SSLCommon.expects(:post_data).never
+      end
       @course.publish_final_grades(user)
-      server_thread.join
-      verify_post_matches(post_lines, [
-          "POST /endpoint HTTP/1.1",
-          "Accept: */*",
-          "Content-Type: application/jtmimetype",
-          "",
-          "test-jt-data"])
     end
 
     it 'should pass a quick sanity check' do
@@ -2070,7 +2248,7 @@ describe Course, 'grade_publishing' do
 
     it 'should not allow grade publishing for a user that is disallowed' do
       @user = User.new
-      (lambda { quick_sanity_check(@user) }).should raise_error("publishing disallowed for this publishing user")
+      (lambda { quick_sanity_check(@user, false) }).should raise_error("publishing disallowed for this publishing user")
     end
 
     it 'should not allow grade publishing for a user with a pseudonym in the wrong account' do
@@ -2078,7 +2256,7 @@ describe Course, 'grade_publishing' do
       @pseudonym.account = account_model
       @pseudonym.sis_user_id = "U1"
       @pseudonym.save!
-      (lambda { quick_sanity_check(@user) }).should raise_error("publishing disallowed for this publishing user")
+      (lambda { quick_sanity_check(@user, false) }).should raise_error("publishing disallowed for this publishing user")
     end
 
     it 'should not allow grade publishing for a user with a pseudonym without a sis id' do
@@ -2086,7 +2264,7 @@ describe Course, 'grade_publishing' do
       @pseudonym.account_id = @course.root_account_id
       @pseudonym.sis_user_id = nil
       @pseudonym.save!
-      (lambda { quick_sanity_check(@user) }).should raise_error("publishing disallowed for this publishing user")
+      (lambda { quick_sanity_check(@user, false) }).should raise_error("publishing disallowed for this publishing user")
     end
 
     it 'should publish csv' do
@@ -2095,27 +2273,20 @@ describe Course, 'grade_publishing' do
       @pseudonym.account_id = @course.root_account_id
       @pseudonym.save!
 
-      server, server_thread, post_lines = start_test_http_server
-
       @plugin = Canvas::Plugin.find!('grade_export')
       @ps = PluginSetting.new(:name => @plugin.id, :settings => @plugin.default_settings)
       @ps.posted_settings = @plugin.default_settings.merge({
           :format_type => "instructure_csv",
           :wait_for_success => "no",
-          :publish_endpoint => "http://localhost:#{server.addr[1]}/endpoint"
+          :publish_endpoint => "http://localhost/endpoint"
         })
       @ps.save!
 
       @course.grading_standard_id = 0
+      csv = "publisher_id,publisher_sis_id,course_id,course_sis_id,section_id,section_sis_id,student_id," +
+          "student_sis_id,enrollment_id,enrollment_status,score,grade\n"
+      SSLCommon.expects(:post_data).with("http://localhost/endpoint", csv, "text/csv", {})
       @course.publish_final_grades(@user)
-      server_thread.join
-      verify_post_matches(post_lines, [
-          "POST /endpoint HTTP/1.1",
-          "Accept: */*",
-          "Content-Type: text/csv",
-          "",
-          "publisher_id,publisher_sis_id,course_id,course_sis_id,section_id,section_sis_id,student_id," +
-          "student_sis_id,enrollment_id,enrollment_status,score,grade\n"])
     end
 
     it 'should publish grades' do
@@ -2211,24 +2382,16 @@ describe Course, 'grade_publishing' do
       teacher = Pseudonym.find_by_sis_user_id("T1")
       teacher.should_not be_nil
 
-      server, server_thread, post_lines = start_test_http_server
-
       @plugin = Canvas::Plugin.find!('grade_export')
       @ps = PluginSetting.new(:name => @plugin.id, :settings => @plugin.default_settings)
       @ps.posted_settings = @plugin.default_settings.merge({
           :format_type => "instructure_csv",
           :wait_for_success => "no",
-          :publish_endpoint => "http://localhost:#{server.addr[1]}/endpoint"
+          :publish_endpoint => "http://localhost/endpoint"
         })
       @ps.save!
 
-      @course.publish_final_grades(teacher.user)
-      server_thread.join
-      verify_post_matches(post_lines, [
-          "POST /endpoint HTTP/1.1",
-          "Accept: */*",
-          "Content-Type: text/csv",
-          "",
+      csv =
           "publisher_id,publisher_sis_id,course_id,course_sis_id,section_id,section_sis_id,student_id," +
           "student_sis_id,enrollment_id,enrollment_status,score\n" +
           "#{teacher.user.id},T1,#{@course.id},C1,#{getsection("S1").id},S1,#{getpseudonym("S1").user.id},S1,#{getenroll("S1", "S1").id},active,70\n" +
@@ -2236,22 +2399,14 @@ describe Course, 'grade_publishing' do
           "#{teacher.user.id},T1,#{@course.id},C1,#{getsection("S2").id},S2,#{getpseudonym("S3").user.id},S3,#{getenroll("S3", "S2").id},active,80\n" +
           "#{teacher.user.id},T1,#{@course.id},C1,#{getsection("S1").id},S1,#{getpseudonym("S4").user.id},S4,#{getenroll("S4", "S1").id},active,0\n" +
           "#{teacher.user.id},T1,#{@course.id},C1,#{getsection("S3").id},S3,#{stud5.user.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud5.user.id, getsection("S3").id).id},active,85\n" +
-          "#{teacher.user.id},T1,#{@course.id},C1,#{sec4.id},S4,#{stud6.user.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud6.user.id, sec4.id).id},active,90\n"])
+          "#{teacher.user.id},T1,#{@course.id},C1,#{sec4.id},S4,#{stud6.user.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud6.user.id, sec4.id).id},active,90\n"
+      SSLCommon.expects(:post_data).with("http://localhost/endpoint", csv, "text/csv", {})
+      @course.publish_final_grades(teacher.user)
 
       @course.grading_standard_id = 0
       @course.save
-      server, server_thread, post_lines = start_test_http_server
-      @ps.posted_settings = @plugin.default_settings.merge({
-          :publish_endpoint => "http://localhost:#{server.addr[1]}/endpoint"
-        })
-      @ps.save!
-      @course.publish_final_grades(teacher.user)
-      server_thread.join
-      verify_post_matches(post_lines, [
-          "POST /endpoint HTTP/1.1",
-          "Accept: */*",
-          "Content-Type: text/csv",
-          "",
+
+      csv =
           "publisher_id,publisher_sis_id,course_id,course_sis_id,section_id,section_sis_id,student_id," +
           "student_sis_id,enrollment_id,enrollment_status,score,grade\n" +
           "#{teacher.user.id},T1,#{@course.id},C1,#{getsection("S1").id},S1,#{getpseudonym("S1").user.id},S1,#{getenroll("S1", "S1").id},active,70,C-\n" +
@@ -2259,20 +2414,13 @@ describe Course, 'grade_publishing' do
           "#{teacher.user.id},T1,#{@course.id},C1,#{getsection("S2").id},S2,#{getpseudonym("S3").user.id},S3,#{getenroll("S3", "S2").id},active,80,B-\n" +
           "#{teacher.user.id},T1,#{@course.id},C1,#{getsection("S1").id},S1,#{getpseudonym("S4").user.id},S4,#{getenroll("S4", "S1").id},active,0,F\n" +
           "#{teacher.user.id},T1,#{@course.id},C1,#{getsection("S3").id},S3,#{stud5.user.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud5.user.id, getsection("S3").id).id},active,85,B\n" +
-          "#{teacher.user.id},T1,#{@course.id},C1,#{sec4.id},S4,#{stud6.user.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud6.user.id, sec4.id).id},active,90,A-\n"])
+          "#{teacher.user.id},T1,#{@course.id},C1,#{sec4.id},S4,#{stud6.user.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud6.user.id, sec4.id).id},active,90,A-\n"
+      SSLCommon.expects(:post_data).with("http://localhost/endpoint", csv, "text/csv", {})
+      @course.publish_final_grades(teacher.user)
+
       admin = user_model
-      server, server_thread, post_lines = start_test_http_server
-      @ps.posted_settings = @plugin.default_settings.merge({
-          :publish_endpoint => "http://localhost:#{server.addr[1]}/endpoint"
-        })
-      @ps.save!
-      @course.publish_final_grades(admin)
-      server_thread.join
-      verify_post_matches(post_lines, [
-          "POST /endpoint HTTP/1.1",
-          "Accept: */*",
-          "Content-Type: text/csv",
-          "",
+
+      csv =
           "publisher_id,publisher_sis_id,course_id,course_sis_id,section_id,section_sis_id,student_id," +
           "student_sis_id,enrollment_id,enrollment_status,score,grade\n" +
           "#{admin.id},,#{@course.id},C1,#{getsection("S1").id},S1,#{getpseudonym("S1").user.id},S1,#{getenroll("S1", "S1").id},active,70,C-\n" +
@@ -2280,11 +2428,11 @@ describe Course, 'grade_publishing' do
           "#{admin.id},,#{@course.id},C1,#{getsection("S2").id},S2,#{getpseudonym("S3").user.id},S3,#{getenroll("S3", "S2").id},active,80,B-\n" +
           "#{admin.id},,#{@course.id},C1,#{getsection("S1").id},S1,#{getpseudonym("S4").user.id},S4,#{getenroll("S4", "S1").id},active,0,F\n" +
           "#{admin.id},,#{@course.id},C1,#{getsection("S3").id},S3,#{stud5.user.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud5.user.id, getsection("S3").id).id},active,85,B\n" +
-          "#{admin.id},,#{@course.id},C1,#{sec4.id},S4,#{stud6.user.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud6.user.id, sec4.id).id},active,90,A-\n"])
+          "#{admin.id},,#{@course.id},C1,#{sec4.id},S4,#{stud6.user.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud6.user.id, sec4.id).id},active,90,A-\n"
+      SSLCommon.expects(:post_data).with("http://localhost/endpoint", csv, "text/csv", {})
+      @course.publish_final_grades(admin)
     end
-
   end
-
 
 end
 
@@ -2577,7 +2725,7 @@ describe Course, "conclusions" do
     enrollment.save!
     @course.reload
     @user.reload
-    @user.cached_current_enrollments(:reload)
+    @user.cached_current_enrollments
 
     enrollment.reload.state.should == :active
     enrollment.state_based_on_date.should == :completed
@@ -2591,7 +2739,7 @@ describe Course, "conclusions" do
     enrollment.save!
     @course.reload
     @user.reload
-    @user.cached_current_enrollments(:reload)
+    @user.cached_current_enrollments
     enrollment.state.should == :completed
     enrollment.state_based_on_date.should == :completed
 
@@ -2603,7 +2751,7 @@ describe Course, "conclusions" do
     @course.reload
     @course.complete!
     @user.reload
-    @user.cached_current_enrollments(:reload)
+    @user.cached_current_enrollments
     enrollment.reload
     enrollment.state.should == :completed
     enrollment.state_based_on_date.should == :completed
@@ -2641,7 +2789,7 @@ describe Course, "inherited_assessment_question_banks" do
     @course.inherited_assessment_question_banks(true).should be_empty
 
     bank = @course.assessment_question_banks.create
-    @course.inherited_assessment_question_banks(true).should eql [bank]
+    @course.inherited_assessment_question_banks(true).should == [bank]
   end
 
   it "should include all banks in the account hierarchy" do
@@ -2654,7 +2802,7 @@ describe Course, "inherited_assessment_question_banks" do
     account_bank = @account.assessment_question_banks.create
 
     @course = Course.create(:account => @account)
-    @course.inherited_assessment_question_banks.sort_by(&:id).should eql [root_bank, account_bank]
+    @course.inherited_assessment_question_banks.sort_by(&:id).should == [root_bank, account_bank]
   end
 
   it "should return a useful scope" do
@@ -2670,7 +2818,7 @@ describe Course, "inherited_assessment_question_banks" do
     bank = @course.assessment_question_banks.create
 
     banks = @course.inherited_assessment_question_banks(true)
-    banks.order(:id).should eql [root_bank, account_bank, bank]
+    banks.order(:id).should == [root_bank, account_bank, bank]
     banks.find_by_id(bank.id).should eql bank
     banks.find_by_id(account_bank.id).should eql account_bank
     banks.find_by_id(root_bank.id).should eql root_bank
@@ -2715,7 +2863,7 @@ describe Course, "section_visibility" do
     end
 
     it "should return user's sections if a student" do
-      @course.sections_visible_to(@student1).should eql [@course.default_section]
+      @course.sections_visible_to(@student1).should == [@course.default_section]
     end
 
     it "should return users from all sections" do
@@ -2736,31 +2884,31 @@ describe Course, "section_visibility" do
 
   context "sections" do
     it "should return students from user's sections" do
-      @course.students_visible_to(@ta).should eql [@student1]
+      @course.students_visible_to(@ta).should == [@student1]
     end
 
     it "should return user's sections" do
-      @course.sections_visible_to(@ta).should eql [@course.default_section]
+      @course.sections_visible_to(@ta).should == [@course.default_section]
     end
 
     it "should return non-limited admins from other sections" do
-      @course.enrollments_visible_to(@ta, :type => :teacher, :return_users => true).should eql [@teacher]
+      @course.enrollments_visible_to(@ta, :type => :teacher, :return_users => true).should == [@teacher]
     end
   end
 
   context "restricted" do
     it "should return no students except self and the observed" do
-      @course.students_visible_to(@observer).should eql [@student1]
+      @course.students_visible_to(@observer).should == [@student1]
       RoleOverride.create!(:context => @course.account, :permission => 'read_roster',
                            :enrollment_type => "StudentEnrollment", :enabled => false)
-      @course.students_visible_to(@student1).should eql [@student1]
+      @course.students_visible_to(@student1).should == [@student1]
     end
 
     it "should return no sections" do
-      @course.sections_visible_to(@observer).should eql []
+      @course.sections_visible_to(@observer).should == []
       RoleOverride.create!(:context => @course.account, :permission => 'read_roster',
                            :enrollment_type => "StudentEnrollment", :enabled => false)
-      @course.sections_visible_to(@student1).should eql []
+      @course.sections_visible_to(@student1).should == []
     end
   end
 
@@ -2853,13 +3001,13 @@ describe Course, "enrollments" do
     @course.root_account = a1
     @course.save!
 
-    @course.student_enrollments.map(&:root_account_id).should eql [a1.id]
-    @course.course_sections.reload.map(&:root_account_id).should eql [a1.id]
+    @course.student_enrollments.map(&:root_account_id).should == [a1.id]
+    @course.course_sections.reload.map(&:root_account_id).should == [a1.id]
 
     @course.root_account = a2
     @course.save!
-    @course.student_enrollments(true).map(&:root_account_id).should eql [a2.id]
-    @course.course_sections.reload.map(&:root_account_id).should eql [a2.id]
+    @course.student_enrollments(true).map(&:root_account_id).should == [a2.id]
+    @course.course_sections.reload.map(&:root_account_id).should == [a2.id]
   end
 end
 
@@ -2972,6 +3120,15 @@ describe Course, "student_view_student" do
     student_view_student = student_view_course.student_view_student
 
     student_view_course.enrollments.map(&:user_id).should be_include(student_view_student.id)
+  end
+
+  it "should not create a section if a section already exists" do
+    student_view_course = Course.create!
+    not_default_section = student_view_course.course_sections.create! name: 'not default section'
+    not_default_section.should_not be_default_section
+    student_view_student = student_view_course.student_view_student
+    student_view_course.reload.course_sections.active.count.should eql 1
+    not_default_section.enrollments.map(&:user_id).should be_include(student_view_student.id)
   end
 
   it "should create and return the student view student for a course" do
@@ -3444,6 +3601,27 @@ describe Course do
       @course.enrollments.count.should == enrollment_count
     end
 
+    context "unique enrollments" do
+      before do
+        course(active_all: true)
+        user
+        @section2 = @course.course_sections.create!
+        @course.enroll_user(@user, 'StudentEnrollment', section: @course.default_section).reject!
+        @course.enroll_user(@user, 'StudentEnrollment', section: @section2, allow_multiple_enrollments: true).reject!
+        @user.enrollments.count.should == 2
+      end
+
+      it "should not cause problems moving a user between sections (s1)" do
+        # this should not cause a unique constraint violation
+        @course.enroll_user(@user, 'StudentEnrollment', section: @course.default_section)
+      end
+
+      it "should not cause problems moving a user between sections (s2)" do
+        # this should not cause a unique constraint violation
+        @course.enroll_user(@user, 'StudentEnrollment', section: @section2)
+      end
+    end
+
     describe "already_enrolled" do
       before do
         course
@@ -3575,44 +3753,34 @@ describe Course do
     end
   end
 
-  describe "#draft_state_enabled?" do
-    before(:each) do
-      @account = Account.create!
-      @account.settings[:allow_draft] = true
-      @account.save!
-      course(active_all: true)
-      @course.root_account = @account
-      @course.save!
-    end
+end
 
-    context "a course with enable_draft enabled" do
-      it "should check its own enable_draft setting" do
-        @course.enable_draft = true
-        @course.save!
+describe Course, "multiple_sections?" do
+  before(:each) do
+    course_with_teacher(:active_all => true)
+  end
 
-        @course.should be_draft_state_enabled
-      end
-    end
+  it "should return false for a class with one section" do
+    @course.multiple_sections?.should be_false
+  end
 
-    context "a course with an enable_draft account" do
-      it "should check its root_account's enable_draft setting" do
-        @course.root_account.settings[:enable_draft] = true
-        @course.root_account.save!
+  it "should return true for a class with more than one active section" do
+    @course.course_sections.create!
+    @course.multiple_sections?.should be_true
+  end
+end
 
-        @course.should be_draft_state_enabled
-      end
-    end
+describe Course, "default_section" do
+  it "should create the default section" do
+    c = Course.create!
+    s = c.default_section
+    c.course_sections.pluck(:id).should eql [s.id]
+  end
 
-    context "a course with an account that doesn't allow draft state" do
-      it "shouldn't be able to enable draft state" do
-        @account.settings[:allow_draft] = false
-        @account.save!
-
-        @course.enable_draft = true
-        @course.save!
-
-        @course.should_not be_draft_state_enabled
-      end
-    end
+  it "unless we ask it not to" do
+    c = Course.create!
+    s = c.default_section(no_create: true)
+    s.should be_nil
+    c.course_sections.pluck(:id).should be_empty
   end
 end

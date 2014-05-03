@@ -44,7 +44,7 @@ DETAILS
     <%= render :partial => "eportfolio", :collection => @portfolios %>
   </ul>
 <% end %>
-<% form_for Eportfolio.new, :url => eportfolios_path, :html => {:style => "display: none;", :id => "add_eportfolio_form"} do |f| %>
+<%= form_for Eportfolio.new, :url => eportfolios_path, :html => {:style => "display: none;", :id => "add_eportfolio_form"} do |f| %>
 <h2><%= t('headers.add_eportfolio', "Make an ePortfolio") %></h2>
 <table class="formtable">
   <tr>

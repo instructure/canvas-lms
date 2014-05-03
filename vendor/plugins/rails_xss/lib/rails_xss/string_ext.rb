@@ -1,3 +1,4 @@
+if CANVAS_RAILS2
 require 'active_support/deprecation'
 
 ActiveSupport::SafeBuffer.class_eval do
@@ -49,4 +50,5 @@ class String
     def also_html_safe?(other)
       other.respond_to?(:html_safe?) && other.html_safe?
     end
+end
 end

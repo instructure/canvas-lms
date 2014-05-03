@@ -16,8 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "skip_callback"
-
 module SIS
   class CourseImporter < BaseImporter
 
@@ -27,7 +25,7 @@ module SIS
       course_ids_to_update_associations = [].to_set
 
       importer = Work.new(@batch_id, @root_account, @logger, courses_to_update_sis_batch_id, course_ids_to_update_associations, messages)
-      Course.skip_callback(:update_enrollments_later) do
+      Course.suspend_callbacks(:update_enrollments_later) do
         Course.process_as_sis(@sis_options) do
           Course.skip_updating_account_associations do
             yield importer
@@ -58,7 +56,7 @@ module SIS
         @success_count = 0
       end
 
-      def add_course(course_id, term_id, account_id, fallback_account_id, status, start_date, end_date, abstract_course_id, short_name, long_name)
+      def add_course(course_id, term_id, account_id, fallback_account_id, status, start_date, end_date, abstract_course_id, short_name, long_name, integration_id)
 
         @logger.debug("Processing Course #{[course_id, term_id, account_id, fallback_account_id, status, start_date, end_date, abstract_course_id, short_name, long_name].inspect}")
 
@@ -84,6 +82,7 @@ module SIS
 
         update_account_associations = course.account_id_changed? || course.root_account_id_changed?
 
+        course.integration_id = integration_id
         course.sis_source_id = course_id
         if !course.stuck_sis_fields.include?(:workflow_state)
           if status =~ /active/i

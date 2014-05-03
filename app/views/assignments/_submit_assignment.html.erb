@@ -1,5 +1,8 @@
 <%
-  show_google_docs = @assignment.allow_google_docs_submission? && @real_current_user.blank? && @domain_root_account && feature_and_service_enabled?(:google_docs)
+    show_google_docs = @assignment.allow_google_docs_submission? &&
+                       @real_current_user.blank? &&
+                       @domain_root_account &&
+                       feature_and_service_enabled?(:google_docs)
 -%>
 <%
   js_bundle :submit_assignment
@@ -32,7 +35,7 @@
       <li style='display: none;'><a href="#submit_from_external_tool_form" class="submit_from_external_tool_option"><%= t 'links.submit.external_tool', "More" %></a></li>
     </ul>
     <% if @assignment.submission_types && @assignment.submission_types.match(/online_upload/) %>
-    <% form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_online_upload_form", :class => "submit_assignment_form", :multipart => true }) do %>
+    <%= form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_online_upload_form", :class => "submit_assignment_form", :multipart => true }) do %>
     <%= hidden_field :submission, :submission_type, :value => "online_upload" %>
     <%= hidden_field :submission, :attachment_ids, :value => "", :id => "submission_attachment_ids" %>
     <table class="formtable" style="width: 100%;">
@@ -94,7 +97,7 @@
     <% end %>
 
     <% if @assignment.submission_types && @assignment.submission_types.match(/online_text_entry/) %>
-    <% form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_online_text_entry_form", :class => "submit_assignment_form"}) do %>
+    <%= form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_online_text_entry_form", :class => "submit_assignment_form"}) do %>
     <%= hidden_field :submission, :submission_type, :value => "online_text_entry" %>
     <table class="formtable" style="width: 100%;">
       <tr>
@@ -105,7 +108,8 @@
       </tr><tr>
         <td>
           <div style="text-align: right; font-size: 0.8em;">
-            <a id="switch_text_entry_submission_views" href="#"><%= t '#links.switch_views', "Switch Views" %></a>
+            <a class="switch_text_entry_submission_views" href="#"><%= t '#editor.switch_editor_html', "HTML Editor" %></a>
+            <a class="switch_text_entry_submission_views" href="#" style="display:none"><%= t '#editor.switch_editor_visual', "Visual Editor" %></a>
           </div>
           <%= text_area :submission, :body, :style => "width: 100%; height: 250px;" %>
         </td>
@@ -129,7 +133,7 @@
     <% end %>
     
     <% if @assignment.submission_types && @assignment.submission_types.match(/online_url/) %>    
-    <% form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_online_url_form", :class => "submit_assignment_form"}) do %>
+    <%= form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_online_url_form", :class => "submit_assignment_form"}) do %>
     <%= hidden_field :submission, :submission_type, :value => "online_url" %>
     <table class="formtable" style="width: 100%;">
       <tr>
@@ -192,47 +196,68 @@
     </style>
     <% if show_google_docs %>
       <% if @google_docs_token %>
-        <% form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_google_doc_form", :class => "submit_assignment_form"}) do %>
-          <%= hidden_field :submission, :submission_type, :value => "google_doc" %>
-          <%= hidden_field :google_doc, :document_id, :value => "", :class => "google_doc_id" %>
-          <table class="formtable" style="width: 100%;">
-            <tr>
-              <td style="padding-bottom: 10px;" colspan="2">
-                <%= t 'instructions.google_docs', "Select the file from the list below." %>
-                <%= render :partial => "assignments/group_submission_reminder" if @assignment.has_group_category? %>
-                </td>
-            </tr><tr>
-              <td colspan="2">
-                <div id="google_docs_container" style="height: 200px; overflow: auto;">
-                  <div style="text-align: center; margin: 10px;">
-                    <%= image_tag "ajax-loader-bar.gif" %>
-                  </div>
-                </div>
-              </td>
-            </tr><tr>
-              <td colspan="2" style="text-align: center;">
-                <div style="text-align: left;">
-                  <%= text_area :submission, :comment, :class => 'submission_comment_textarea', :placeholder => t('comments_placeholder', 'Comments...'), :title => t('additional_comments', 'Additional comments') %>
-                </div>
-              </td>
-            </tr>
-            <%= render :partial => "group_comment" %>
-            <% if @assignment.turnitin_enabled? %>
-              <%= render :partial => "turnitin" %>
-            <% end %>
-            <tr>
-              <td colspan="2" class='button-container'>
-                <button type="button" class='cancel_button btn'><%= t '#buttons.cancel', "Cancel" %></button>
-                <button type="submit" class="btn btn-primary"><%= t 'buttons.submit_assignment', "Submit Assignment" %></button>
-              </td>
-            </tr>
-          </table>
-          <div id="uploading_google_doc_message" style="display: none;">
-            <%= t 'messages.uploading', "Retrieving a copy of your Google Doc to submit for this assignment.  This may take a little while, depending on the size of the file..." %>
-            <div style="text-align: center; margin: 10px;">
-              <%= image_tag "ajax-loader-bar.gif" %>
+        <% if @domain_root_account.feature_enabled?(:google_docs_domain_restriction) &&
+              @domain_root_account.settings[:google_docs_domain] &&
+             !@current_user.gmail.match(%r{@#{@domain_root_account.settings[:google_docs_domain]}$}) %>
+          <div id="submit_google_doc_form">
+            <p class="alert alert-error">
+              <i class="icon-warning"></i>
+              <%= t(:invalid_google_docs_domain, 'Invalid domain') %>
+            </p>
+
+           <p>
+            <%= t(:gmail_restriction_description, <<-END, domain: @domain_root_account.settings[:google_docs_domain])
+              Your account has restricted Google Doc submissions to Google accounts
+              on the %{domain} domain. To submit this assignment with a Google Doc,
+              you will need to reconfigure the Google Docs integration on your
+              user settings page.
+            END
+            %>
+           </p>
             </div>
-          </div>
+         <% else %>
+          <%= form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_google_doc_form", :class => "submit_assignment_form"}) do %>
+            <%= hidden_field :submission, :submission_type, :value => "google_doc" %>
+            <%= hidden_field :google_doc, :document_id, :value => "", :class => "google_doc_id" %>
+            <table class="formtable" style="width: 100%;">
+              <tr>
+                <td style="padding-bottom: 10px;" colspan="2">
+                  <%= t 'instructions.google_docs', "Select the file from the list below." %>
+                  <%= render :partial => "assignments/group_submission_reminder" if @assignment.has_group_category? %>
+                  </td>
+              </tr><tr>
+                <td colspan="2">
+                  <div id="google_docs_container" style="height: 200px; overflow: auto;">
+                    <div style="text-align: center; margin: 10px;">
+                      <%= image_tag "ajax-loader-bar.gif" %>
+                    </div>
+                  </div>
+                </td>
+              </tr><tr>
+                <td colspan="2" style="text-align: center;">
+                  <div style="text-align: left;">
+                    <%= text_area :submission, :comment, :class => 'submission_comment_textarea', :placeholder => t('comments_placeholder', 'Comments...'), :title => t('additional_comments', 'Additional comments') %>
+                  </div>
+                </td>
+              </tr>
+              <%= render :partial => "group_comment" %>
+              <% if @assignment.turnitin_enabled? %>
+                <%= render :partial => "turnitin" %>
+              <% end %>
+              <tr>
+                <td colspan="2" class='button-container'>
+                  <button type="button" class='cancel_button btn'><%= t '#buttons.cancel', "Cancel" %></button>
+                  <button type="submit" class="btn btn-primary"><%= t 'buttons.submit_assignment', "Submit Assignment" %></button>
+                </td>
+              </tr>
+            </table>
+            <div id="uploading_google_doc_message" style="display: none;">
+              <%= t 'messages.uploading', "Retrieving a copy of your Google Doc to submit for this assignment.  This may take a little while, depending on the size of the file..." %>
+              <div style="text-align: center; margin: 10px;">
+                <%= image_tag "ajax-loader-bar.gif" %>
+              </div>
+            </div>
+          <% end %>
         <% end %>
       <% else %>
         <div id="submit_google_doc_form">
@@ -250,7 +275,7 @@
           <p><%= t 'messages.media_recordings_disabled', "Media recordings are not enabled for this Canvas site, and you will not be able to submit these types of assignments.  Please contact your instructor about changing the settings for this assignment, or your system administrator about enabling media recordings." %></p>
         </div>
       <% else %>
-        <% form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_media_recording_form", :class => "submit_assignment_form", :multipart => true }) do %>
+        <%= form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_media_recording_form", :class => "submit_assignment_form", :multipart => true }) do %>
         <%= hidden_field :submission, :submission_type, :value => "media_recording" %>
         <%= hidden_field :submission, :media_comment_id, :value => "", :class => "media_comment_id" %>
         <%= hidden_field :submission, :media_comment_type, :value => "video" %>
@@ -299,7 +324,7 @@
       <% end %>
     <% end %>
     
-    <% form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_from_external_tool_form", :class => "submit_assignment_form" }) do %>
+    <%= form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_from_external_tool_form", :class => "submit_assignment_form" }) do %>
     <%= hidden_field :submission, :submission_type, :value => "online_url", :id => 'external_tool_submission_type' %>
     <%= hidden_field :submission, :filename, :id => 'external_tool_filename' %>
     <%= hidden_field :submission, :attachment_ids, :id => 'external_tool_file_id' %>

@@ -13,8 +13,12 @@
   margin-left: 20px
 
 #ag_weights_wrapper
-  height: 330px
-  overflow-y: scroll
+  overflow-y: auto
+  position: absolute
+  top: 35px
+  left: 15px
+  right: 15px
+  bottom: 15px
 
   #assignment_groups_weights
     margin-top: 30px
@@ -27,8 +31,13 @@
       font-weight: bold
 
 .assignment
+  .ig-title
+    right: 630px
+    min-width: 120px
   .ig-details
     width: 590px
+  .default-dates .status-description
+    font-weight: bold
 
 .ag-weights-tr
   border-bottom: 1px solid #dae1e6
@@ -113,3 +122,9 @@
 
 .move_select
   margin: 15px 0
+
+.row-fluid span.grade-display
+  margin-left: 9%
+
+.with-left-side
+  min-width: 971px

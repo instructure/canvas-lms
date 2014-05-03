@@ -31,9 +31,11 @@ describe AssignmentOverrideStudent do
       @override_student.should be_valid
     end
 
-    it "should reject an assignment other than that of the override" do
-      @override_student.assignment = assignment_model
-      @override_student.should_not be_valid
+    it "should always make assignment match the overriden assignment" do
+      assignment = assignment_model
+      @override_student.assignment = assignment
+      @override_student.should be_valid
+      @override_student.assignment.should == @override.assignment
     end
 
     it "should reject an empty assignment_override" do

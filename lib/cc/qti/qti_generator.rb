@@ -191,9 +191,13 @@ module CC
           q_node.points_possible quiz.points_possible
           q_node.require_lockdown_browser quiz.require_lockdown_browser unless quiz.require_lockdown_browser.nil?
           q_node.require_lockdown_browser_for_results quiz.require_lockdown_browser_for_results unless quiz.require_lockdown_browser_for_results.nil?
+          q_node.require_lockdown_browser_monitor quiz.require_lockdown_browser_monitor unless quiz.require_lockdown_browser_monitor.nil?
+          q_node.lockdown_browser_monitor_data quiz.lockdown_browser_monitor_data
           q_node.access_code quiz.access_code unless quiz.access_code.blank?
           q_node.ip_filter quiz.ip_filter unless quiz.ip_filter.blank?
           q_node.show_correct_answers quiz.show_correct_answers unless quiz.show_correct_answers.nil?
+          q_node.show_correct_answers_at quiz.show_correct_answers_at unless quiz.show_correct_answers_at.nil?
+          q_node.hide_correct_answers_at quiz.hide_correct_answers_at unless quiz.hide_correct_answers_at.nil?
           q_node.anonymous_submissions quiz.anonymous_submissions unless quiz.anonymous_submissions.nil?
           q_node.could_be_locked quiz.could_be_locked unless quiz.could_be_locked.nil?
           q_node.time_limit quiz.time_limit unless quiz.time_limit.nil?
@@ -249,7 +253,7 @@ module CC
                   else
                     add_quiz_question(section_node, item)
                   end
-                elsif item[:questions] # It's a QuizGroup
+                elsif item[:questions] # It's a Quizzes::QuizGroup
                   if for_cc
                     add_cc_group(section_node, item)
                   else

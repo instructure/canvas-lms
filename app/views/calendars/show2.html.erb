@@ -11,6 +11,7 @@
   }
   js_bundle :calendar2
   jammit_css :calendar2
+  jammit_css :agenda_view
   crumbs.clear
   @body_classes << "full-width no-page-block hide-content-while-scripts-not-loaded"
 %>
@@ -20,14 +21,28 @@
 <% end %>
 
 <% content_for :right_side do %>
+  <a href="#" class="skip-to-calendar screenreader-only"><%= t(:skip_to_calendar, "Skip to calendar") %></a>
+
   <div class="rs-section">
-    <div id="minical"></div>
+    <div id="minical" aria-hidden="true"></div>
   </div>
-  <div class="rs-section" id="context-list-holder"></div>
-  <div class="rs-section" id="undated-events"></div>
+  <div class="rs-section">
+    <h4 class="element_toggler" aria-controls="context-list-holder" aria-expanded="true" role="button"
+     aria-label="<%= t(:toggle_calendars, "Toggle calendars") %>" tabindex="0">
+      <i class="icon-mini-arrow-down auto_rotate"></i> <%= t(:calendars, "Calendars") %>
+    </h4>
+    <div id="context-list-holder"></div>
+  </div>
+  <div class="rs-section" id="undated-events-section">
+    <h4 class="element_toggler" aria-controls="undated-events" aria-expanded="false" role="button"
+     aria-label="<%= t(:toggle_undated_items, "Toggle undated items") %>" tabindex="0">
+      <i class="icon-mini-arrow-right auto_rotate"></i> <%= t(:undated_items, "Undated items") %>
+    </h4>
+    <div id="undated-events"></div>
+  </div>
   <div class="rs-section" id="calendar-feed">
-    <a class="dialog_opener small-calendar" aria-controls="calendar_feed_box" data-dialog-opts='{"resizable":false, "width": 400}' role="button" href="<%= @feed_url%>.ics">
-      <%= t :calendar_feed, "Calendar Feed" %>
+    <a class="dialog_opener" aria-controls="calendar_feed_box" data-dialog-opts='{"resizable":false, "width": 400}' role="button" href="<%= @feed_url%>.ics">
+      <i class="icon-calendar-days"></i> <%= t :calendar_feed, "Calendar Feed" %>
     </a>
   </div>
 <% end %>
@@ -43,4 +58,5 @@
 
 <div id="calendar_header"></div>
 <div id="calendar-app"></div>
+<div id="calendar-drag-and-drop-container"></div>
 

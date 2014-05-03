@@ -73,6 +73,24 @@ describe SubmissionVersion do
         SubmissionVersion.index_versions(versions)
       }.should change(SubmissionVersion, :count).by(n)
     end
+
+    context "invalid yaml" do
+      before do
+        @version.update_attribute(:yaml, "--- \n- 1\n- 2\n-")
+      end
+
+      it "should error on invalid yaml by default" do
+        lambda{
+          SubmissionVersion.index_versions([@version])
+        }.should raise_error
+      end
+
+      it "should allow ignoring invalid yaml errors" do
+        lambda{
+          SubmissionVersion.index_versions([@version], ignore_errors: true)
+        }.should_not raise_error
+      end
+    end
   end
 
   it "should skip submissions with no assignment" do

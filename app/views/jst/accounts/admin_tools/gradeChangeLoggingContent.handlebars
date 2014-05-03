@@ -1,0 +1,32 @@
+<h3>{{#t "grade_change_activity"}}Grade Change Activity{{/t}}</h3>
+
+<form id="gradeChangeLoggingForm" class='form-horizontal pad-box border border-trbl search-controls'>
+  <div id="gradeChangeGraderSearch" class="control-group"></div>
+  <div id="gradeChangeStudentSearch" class="control-group"></div>
+
+  <div class="control-group">
+    <div class="controls">
+      <input type="text" id="gradeChangeCourseSearch" class="" name="course_id" placeholder="{{#t "message_course_id"}}Course Id{{/t}}" maxlength="50" />
+    </div>
+  </div>
+
+  <div class="control-group">
+    <div class="controls">
+      <input type="text" id="gradeChangeAssignmentSearch" class="" name="assignment_id" placeholder="{{#t "message_assignment_id"}}Assignment Id{{/t}}" maxlength="50" />
+    </div>
+  </div>
+
+  <div id="gradeChangeDateRangeSearch"></div>
+
+  <div class="control-group">
+    <div class="controls">
+      <button type="submit" class="btn btn-primary" name="gradeChange_submit">
+        {{#t "find"}}Find{{/t}}
+      </button>
+    </div>
+  </div>
+</form>
+
+<hr />
+
+<div id="gradeChangeLoggingSearchResults"></div>

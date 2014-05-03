@@ -1,5 +1,5 @@
 <div class="form-dialog-content">
-  <p>
+  <p tabindex="0">
     {{#t "randomly_assign_students_dialog"}}
     This will automatically assign all unassigned students as evenly as possible among the existing student groups.
     {{/t}}
@@ -9,8 +9,8 @@
   <button
     type="button"
     class="btn dialog_closer"
-  >{{#t "add_more_users"}}Cancel{{/t}}</button>
+  >{{#t "cancel"}}Cancel{{/t}}</button>
   <button
     class="btn btn-primary randomly-assign-members-confirm"
-  >{{#t "close"}}Okay{{/t}}</button>
+    type='submit'>{{#t "okay"}}Okay{{/t}}</button>
 </div>

@@ -17,17 +17,22 @@
 #
 
 class LearningOutcomeResult < ActiveRecord::Base
+  include PolymorphicTypeOverride
+  override_polymorphic_types association_type: {'Quiz' => 'Quizzes::Quiz'},
+                             associated_asset_type: {'Quiz' => 'Quizzes::Quiz'},
+                             artifact_type: {'QuizSubmission' => 'Quizzes::QuizSubmission'}
+
   belongs_to :user
   belongs_to :learning_outcome
   belongs_to :alignment, :class_name => 'ContentTag', :foreign_key => :content_tag_id
-  belongs_to :association, :polymorphic => true
+  belongs_to :association_object, :polymorphic => true, :foreign_type => :association_type, :foreign_key => :association_id
   belongs_to :artifact, :polymorphic => true
   belongs_to :associated_asset, :polymorphic => true
   belongs_to :context, :polymorphic => true
   simply_versioned
   before_save :infer_defaults
 
-  attr_accessible :learning_outcome, :user, :association, :alignment, :associated_asset
+  attr_accessible :learning_outcome, :user, :association_object, :alignment, :associated_asset
   
   def infer_defaults
     self.learning_outcome_id = self.alignment.learning_outcome_id
@@ -41,10 +46,10 @@ class LearningOutcomeResult < ActiveRecord::Base
   end
   
   def assignment
-    if self.association.is_a?(Assignment)
-      self.association
+    if self.association_object.is_a?(Assignment)
+      self.association_object
     elsif self.artifact.is_a?(RubricAssessment)
-      self.artifact.rubric_association.association
+      self.artifact.rubric_association.association_object
     else
       nil
     end
@@ -94,5 +99,4 @@ class LearningOutcomeResult < ActiveRecord::Base
   scope :for_outcome_ids, lambda { |ids| where(:learning_outcome_id => ids) }
   scope :for_association, lambda { |association| where(:association_type => association.class.to_s, :association_id => association.id) }
   scope :for_associated_asset, lambda { |associated_asset| where(:associated_asset_type => associated_asset.class.to_s, :associated_asset_id => associated_asset.id) }
-  scope :for_user, lambda { |user| where(:user_id => user) }
 end

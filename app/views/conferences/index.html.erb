@@ -23,22 +23,12 @@
         <a class="element_toggler"
            aria-controls="new-conference-list"
            aria-expanded="true">
-          <i class="icon-mini-arrow-down"></i>
+          <i class="icon-mini-arrow-down auto_rotate"></i>
           <%= t(:new_conferences, 'New Conferences') %>
         </a>
       </h2>
     </div>
-    <div class="item-group-expandable" id="new-conference-list">
-      <ul class="ig-list">
-        <li class="no-new-conferences">
-          <div class="ig-row ig-row-empty">
-            <div class="ig-empty-msg">
-              <%= t(:no_new_conferences, 'There are no new conferences') %>
-            </div>
-          </div>
-        </li>
-      </ul>
-    </div>
+    <div class="item-group-expandable" id="new-conference-list"></div>
   </div>
 
   <div class="item-group-condensed">
@@ -47,22 +37,12 @@
         <a class="element_toggler"
             aria-controls="concluded-conference-list"
             aria-expanded="true">
-          <i class="icon-mini-arrow-down"></i>
+          <i class="icon-mini-arrow-down auto_rotate"></i>
           <%= t(:concluded_conferences, 'Concluded Conferences') %>
         </a>
       </h2>
     </div>
-    <div class="item-group-expandable" id="concluded-conference-list">
-      <ul class="ig-list">
-        <li class="no-concluded-conferences">
-          <div class="ig-row ig-row-empty">
-            <div class="ig-empty-msg">
-              <%= t(:no_concluded_conferences, 'There are no concluded conferences') %>
-            </div>
-          </div>
-        </li>
-      </ul>
-    </div>
+    <div class="item-group-expandable" id="concluded-conference-list"></div>
   </div>
 
 </div>

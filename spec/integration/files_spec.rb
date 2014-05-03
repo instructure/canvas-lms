@@ -4,6 +4,7 @@ describe FilesController do
   context "should support Submission as a context" do
     before(:each) do
       course_with_teacher(:active_all => true, :user => user_with_pseudonym)
+      host!("test.host")
       login_as
       @me = @user
       submission_model
@@ -44,6 +45,7 @@ describe FilesController do
   context "should support User as a context" do
     before(:each) do
       user_with_pseudonym
+      host!("test.host")
       login_as
       @me = @user
       @att = @me.attachments.create(:uploaded_data => stub_png_data('my-pic.png'))
@@ -126,6 +128,7 @@ describe FilesController do
 
   it "should use relative urls for safefiles in course context" do
     course_with_teacher(:active_all => true, :user => user_with_pseudonym)
+    host!("test.host")
     login_as
     a1 = attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png', :context => @course)
     HostUrl.stubs(:file_host_with_shard).returns(['files-test.host', Shard.default])
@@ -194,6 +197,7 @@ describe FilesController do
   it "should update module progressions for html safefiles iframe" do
     HostUrl.stubs(:file_host_with_shard).returns(['files-test.host', Shard.default])
     course_with_student(:active_all => true, :user => user_with_pseudonym)
+    host!("test.host")
     login_as
     @att = @course.attachments.create(:uploaded_data => stub_file_data("ohai.html", "<html><body>ohai</body></html>", "text/html"))
     @module = @course.context_modules.create!(:name => "module")
@@ -203,7 +207,7 @@ describe FilesController do
     hash[@tag.id.to_s] = {:type => 'must_view'}
     @module.completion_requirements = hash
     @module.save!
-    @module.evaluate_for(@user, true, true).state.should eql(:unlocked)
+    @module.evaluate_for(@user, true).state.should eql(:unlocked)
 
     # the response will be on the main domain, with an iframe pointing to the files domain and the actual uploaded html file
     get "http://test.host/courses/#{@course.id}/files/#{@att.id}"
@@ -217,12 +221,13 @@ describe FilesController do
     reset!
     get location
     response.should be_success
-    @module.evaluate_for(@user, true, true).state.should eql(:completed)
+    @module.evaluate_for(@user, true).state.should eql(:completed)
   end
 
   context "should support AssessmentQuestion as a context" do
     before do
       course_with_teacher(:active_all => true, :user => user_with_pseudonym)
+      host!("test.host")
       login_as
       bank = @course.assessment_question_banks.create!
       @aq = assessment_question_model(:bank => bank)
@@ -309,10 +314,10 @@ describe FilesController do
 
   it "should return the dynamically generated thumbnail of the size given" do
     attachment_model(:uploaded_data => stub_png_data)
-    sz = CollectionItemData::THUMBNAIL_SIZE
+    sz = "640x>"
     @attachment.any_instantiation.expects(:create_or_update_thumbnail).with(anything, sz, sz).returns { @attachment.thumbnails.create!(:thumbnail => "640x>", :uploaded_data => stub_png_data) }
-    get "/images/thumbnails/#{@attachment.id}/#{@attachment.uuid}?size=#{CollectionItemData::THUMBNAIL_SIZE}"
-    thumb = @attachment.thumbnails.find_by_thumbnail(CollectionItemData::THUMBNAIL_SIZE)
+    get "/images/thumbnails/#{@attachment.id}/#{@attachment.uuid}?size=640x#{URI.encode '>'}"
+    thumb = @attachment.thumbnails.find_by_thumbnail("640x>")
     response.should redirect_to(thumb.authenticated_s3_url)
   end
   

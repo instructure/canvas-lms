@@ -26,7 +26,7 @@ define [
 
     setupElement: ->
       @lastValue = @el?.value
-      @modelAttribute = @$el.attr('name') or @options.modelAttribute
+      @modelAttribute = @$el.attr('name') or @options?.modelAttribute
 
     attach: ->
       return unless @collection

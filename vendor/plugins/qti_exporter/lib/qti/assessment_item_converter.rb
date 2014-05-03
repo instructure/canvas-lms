@@ -140,6 +140,11 @@ class AssessmentItemConverter
           when 'WCT_FillInTheBlank'
             @question[:question_type] = 'fill_in_multiple_blanks_question'
             @question[:is_vista_fib] = true
+          when 'WCT_ShortAnswer'
+            if @doc.css("responseDeclaration[baseType=\"string\"]").count > 1
+              @question[:question_type] = 'fill_in_multiple_blanks_question'
+              @question[:is_vista_fib] = true
+            end
           when 'Jumbled Sentence'
             @question[:question_type] = 'multiple_dropdowns_question'
           when 'Essay'
@@ -232,7 +237,7 @@ class AssessmentItemConverter
     # root may not be an html element, so we just sanitize its children so we
     # don't blow away the whole thing
     node.children.each do |child|
-      Sanitize.clean_node!(child, Instructure::SanitizeField::SANITIZE)
+      Sanitize.clean_node!(child, CanvasSanitize::SANITIZE)
     end
 
     # replace any file references with the migration id of the file
@@ -242,11 +247,12 @@ class AssessmentItemConverter
         attrs.each do |attr|
           if subnode[attr]
             val = URI.unescape(subnode[attr])
-            if val.start_with?( WEBCT_REL_REGEX)
+            if val.start_with?(WEBCT_REL_REGEX)
               # It's from a webct package so the references may not be correct
               # Take a path like: /webct/RelativeResourceManager/Template/Imported_Resources/qti web/f11g3_r.jpg
               # Reduce to: Imported_Resources/qti web/f11g3_r.jpg
-              val.gsub!(WEBCT_REL_REGEX)
+              val.gsub!(WEBCT_REL_REGEX, '')
+              val.gsub!("RelativeResourceManager/Template/", "")
 
               # Sometimes that path exists, sometimes the desired file is just in the top-level with the .xml files
               # So check for the file starting with the full relative path, going down to just the file name

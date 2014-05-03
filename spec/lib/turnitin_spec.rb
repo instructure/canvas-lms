@@ -70,7 +70,7 @@ describe Turnitin::Client do
       status = @assignment.create_in_turnitin
 
       status.should be_true
-      @assignment.reload.turnitin_settings.should eql @sample_turnitin_settings.merge({ :created => true, :current => true })
+      @assignment.reload.turnitin_settings.should eql @sample_turnitin_settings.merge({ :created => true, :current => true, :s_view_report => "1" })
     end
 
     it "should store error code and message on failure" do
@@ -81,6 +81,7 @@ describe Turnitin::Client do
 
       status.should be_false
       @assignment.reload.turnitin_settings.should eql @sample_turnitin_settings.merge({
+        :s_view_report => "1",
         :error => {
           :error_code => 123,
           :error_message => 'You cannot create this assignment right now',
@@ -95,7 +96,16 @@ describe Turnitin::Client do
       status = @assignment.create_in_turnitin
 
       status.should be_true
-      @assignment.reload.turnitin_settings.should eql @sample_turnitin_settings.merge({ :created => true, :current => true })
+      @assignment.reload.turnitin_settings.should eql @sample_turnitin_settings.merge({ :created => true, :current => true, :s_view_report => "1" })
+    end
+
+    it "should set s_view_report to 0 if originality_report_visibility is 'never'" do
+      @sample_turnitin_settings[:originality_report_visibility] = 'never'
+      @assignment.update_attributes(:turnitin_settings => @sample_turnitin_settings)
+      @turnitin_api.expects(:sendRequest).returns(Nokogiri('<assignmentid>12345</assignmentid>'))
+      @assignment.create_in_turnitin
+
+      @assignment.reload.turnitin_settings.should eql @sample_turnitin_settings.merge({ :created => true, :current => true, :s_view_report => '0'})
     end
   end
 

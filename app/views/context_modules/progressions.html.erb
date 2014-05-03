@@ -4,4 +4,8 @@
 <% js_env :COURSE_ID => @context.id %>
 <% js_env :MODULES_URL => context_url(@context, :context_context_modules_url) %>
 <% js_env :COURSE_USERS_PATH => context_url(@context, :context_users_url) %>
+<% if @restrict_student_list %>
+  <% js_env :RESTRICTED_LIST => true %>
+  <% js_env :VISIBLE_STUDENTS => @visible_students %>
+<% end %>
 <% js_bundle :context_module_progressions %>

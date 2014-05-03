@@ -108,7 +108,6 @@ module Canvas::ICU
         collator = ICU::Collation::Collator.new(I18n.locale.to_s)
         collator.normalization_mode = true
         collator.numeric_collation = true
-        collator.alternate_handling = :shifted
         collator
       end
     end

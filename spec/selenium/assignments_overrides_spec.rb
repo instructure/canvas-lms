@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/assignment_overrides
 
 describe "assignment groups" do
   include AssignmentOverridesSeleniumHelper
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   context "as a teacher" do
 
@@ -19,7 +19,6 @@ describe "assignment groups" do
     it "should create an assignment with default dates" do
       visit_new_assignment_page
       fill_assignment_title 'vdd assignment'
-      toggle_advanced_options
       fill_assignment_overrides
       update_assignment!
       a = Assignment.find_by_title('vdd assignment')
@@ -29,7 +28,6 @@ describe "assignment groups" do
     it "should load existing due data into the form" do
       assignment = create_assignment!
       visit_assignment_edit_page(assignment)
-      toggle_advanced_options
 
       first_due_at_element.attribute(:value).
         should match due_at.strftime('%b %-d')
@@ -42,7 +40,6 @@ describe "assignment groups" do
     it "should edit a due date" do
       assignment = create_assignment!
       visit_assignment_edit_page(assignment)
-      toggle_advanced_options
 
       # set due_at, lock_at, unlock_at
       first_due_at_element.clear
@@ -57,7 +54,6 @@ describe "assignment groups" do
       assign = @course.assignments.create!(:title => "due tomorrow", :due_at => Time.zone.now + 2.days)
       get "/courses/#{@course.id}/assignments/#{assign.id}/edit"
 
-      f('#assignment_toggle_advanced_options').click
       f('.due-date-overrides [name="due_at"]').clear
       expect_new_page_load { submit_form('#edit_assignment_form') }
 
@@ -72,13 +68,12 @@ describe "assignment groups" do
 
       assign = create_assignment!
       visit_assignment_edit_page(assign)
-      toggle_advanced_options
 
-      sleep 5
+      wait_for_ajaximations
       click_option('.due-date-row:first select', default_section.name)
       first_due_at_element.clear
       first_due_at_element.
-        send_keys(default_section_due.strftime('%b %-d, %y'))
+      send_keys(default_section_due.strftime('%b %-d, %y'))
 
       add_override
 

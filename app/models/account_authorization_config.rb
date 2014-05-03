@@ -36,8 +36,13 @@ class AccountAuthorizationConfig < ActiveRecord::Base
                   :login_attribute, :idp_entity_id
 
   before_validation :set_saml_defaults, :if => Proc.new { |aac| aac.saml_authentication? }
+
+  VALID_AUTH_TYPES = %w[cas ldap saml]
+  validates_inclusion_of :auth_type, in: VALID_AUTH_TYPES, message: "invalid auth_type, must be one of #{VALID_AUTH_TYPES.join(',')}"
   validates_presence_of :account_id
   validates_presence_of :entity_id, :if => Proc.new{|aac| aac.saml_authentication?}
+  validate :validate_multiple_auth_configs
+
   after_create :disable_open_registration_if_delegated
   after_destroy :enable_canvas_authentication
   # if the config changes, clear out last_timeout_failure so another attempt can be made immediately
@@ -316,8 +321,8 @@ class AccountAuthorizationConfig < ActiveRecord::Base
 
   def disable_open_registration_if_delegated
     if self.delegated_authentication? && self.account.open_registration?
-      @account.settings = { :open_registration => false, :self_registration => false }
-      @account.save!
+      self.account.settings = { :open_registration => false, :self_registration => false }
+      self.account.save!
     end
   end
 
@@ -394,6 +399,16 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   def clear_last_timeout_failure
     unless self.last_timeout_failure_changed?
       self.last_timeout_failure = nil
+    end
+  end
+
+  def validate_multiple_auth_configs
+    return true unless account
+    other_configs = account.account_authorization_configs - [self]
+    if other_configs.any? { |other| other.auth_type != self.auth_type }
+      errors.add(:auth_type, :mixing_authentication_types)
+    elsif !other_configs.empty? && self.cas_authentication?
+      errors.add(:auth_type, :multiple_cas_configs)
     end
   end
 end

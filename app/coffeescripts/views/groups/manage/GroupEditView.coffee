@@ -8,11 +8,11 @@ define [
 
   class GroupEditView extends DialogFormView
 
+    @optionProperty 'groupCategory'
+
     defaults:
       width: 550
       title: I18n.t "edit_group", "Edit Group"
-      # Default to edit mode. Set to "false" for adding mode.
-      editing: true
 
     template: template
 
@@ -20,21 +20,20 @@ define [
 
     className: 'dialogFormView group-edit-dialog form-horizontal form-dialog'
 
-    events:
-      _.extend {},
-      DialogFormView::events,
+    events: _.extend {},
+      DialogFormView::events
       'click .dialog_closer': 'close'
 
     translations:
       too_long: I18n.t "name_too_long", "Name is too long"
-
-    initialize: (options) ->
-      super
-      @options.title = I18n.t "add_group", "Add Group" if !@options.editing
 
     openAgain: ->
       super
       # reset the form contents
       @render()
       # auto-focus the first input
-      @$el.find('input:first').focus()
+      @$('input:first').focus()
+
+    toJSON: ->
+      _.extend super,
+        role: @groupCategory.get('role')

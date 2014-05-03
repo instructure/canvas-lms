@@ -3,8 +3,8 @@ require File.expand_path('../spec_helper', File.dirname(__FILE__))
 
 describe AuthenticationMethods do
 
-  describe '#initiate_delegated_login' do
-    let(:request) { stub(:host_with_port => '' ) }
+  describe '#initiate_delegated_login' do;
+    let(:request) { stub(:host_with_port => '', :host => '' ) }
     let(:controller) { Spec::MockController.new(domain_root_account, request) }
 
     describe 'when auth is not delegated' do
@@ -62,6 +62,7 @@ describe AuthenticationMethods do
       let(:saml_request) { stub(:generate_request => 'saml_login_url') }
 
       before do
+        pending('requires SAML extension') unless AccountAuthorizationConfig.saml_enabled
         Onelogin::Saml::AuthRequest.stubs(:new => saml_request)
       end
 

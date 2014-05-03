@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "grading standards" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   it "should allow creating/deleting grading standards" do
     course_with_teacher_logged_in
@@ -39,7 +39,6 @@ describe "grading standards" do
 
     get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
     form = f("#edit_assignment_form")
-    f('#assignment_toggle_advanced_options').click
     click_option('#assignment_grading_type', "Letter Grade")
     f('.edit_letter_grades_link').should be_displayed
     f('.edit_letter_grades_link').click
@@ -125,10 +124,10 @@ describe "grading standards" do
     @assignment = @course.assignments.create!(:title => "new assignment", :points_possible => 1000, :assignment_group => @course.assignment_groups.first, :grading_type => 'points')
     @assignment.grade_student(student, :grade => 899)
     get "/courses/#{@course.id}/grades/#{student.id}"
-    grading_scheme = driver.execute_script "return grading_scheme"
+    grading_scheme = driver.execute_script "return ENV.grading_scheme"
     grading_scheme[2][0].should == 'B+'
-    driver.find_element(:css, '#right-side .final_grade .grade').text.should == '89.9'
-    driver.find_element(:css, '#final_letter_grade_text').text.should == 'B+'
+    f("#right-side .final_grade .grade").text.should == '89.9%'
+    f("#final_letter_grade_text").text.should == 'B+'
   end
 
   it "should allow editing the standard again without reloading the page" do

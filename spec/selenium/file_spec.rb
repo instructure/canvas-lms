@@ -2,15 +2,11 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
 
 describe "shared files tests" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   def fixture_file_path(file)
     path = ActionController::TestCase.respond_to?(:fixture_path) ? ActionController::TestCase.send(:fixture_path) : nil
     return "#{path}#{file}"
-  end
-
-  def fixture_file_upload(file, mimetype)
-    ActionController::TestUploadedFile.new(fixture_file_path(file), mimetype)
   end
 
   def add_file(fixture, context, name)
@@ -99,11 +95,12 @@ describe "shared files tests" do
         link.should be_displayed
         link.text.should == "edit content"
         link.click
+        wait_for_ajaximations
         keep_trying_until { fj("#edit_content_dialog").should be_displayed }
       end
 
       def switch_html_edit_views
-        f('.switch_views').click
+        fj('.switch_views:visible').click
       end
 
       def save_html_content
@@ -125,19 +122,21 @@ describe "shared files tests" do
 
       it "should validate adding a bold line changes the html" do
         click_edit_link
-        f('.switch_views').click
+        wait_for_ajaximations
+        switch_html_edit_views
         f('.mce_bold').click
         type_in_tiny('#edit_content_textarea', 'this is bold')
-        f('.switch_views').click
+        fj('.switch_views:visible').click
         driver.execute_script("return $('#edit_content_textarea')[0].value;").should =~ /<strong>this is bold<\/strong>/
         driver.execute_script("return $('#edit_content_textarea')[0].value = '<fake>lol</fake>';")
-        f('.switch_views').click
-        f('.switch_views').click
+        fj('.switch_views:visible').click
+        fj('.switch_views:visible').click
         driver.execute_script("return $('#edit_content_textarea')[0].value;").should =~ /<fake>lol<\/fake>/
       end
 
       it "should save changes from HTML view" do
         click_edit_link
+        wait_for_ajaximations
         switch_html_edit_views
         type_in_tiny('#edit_content_textarea', 'I am typing')
         save_html_content
@@ -189,7 +188,7 @@ end
 
 
 describe "zip file uploads" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   context "courses" do
     before do

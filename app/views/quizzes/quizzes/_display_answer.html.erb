@@ -1,0 +1,168 @@
+<% answer = display_answer 
+  assessment_results ||= false
+  question_type ||= OpenObject.new
+  question ||= nil
+  answer_type = question_type ? question_type.answer_type : "select_answer"
+  user_answer ||= nil
+  matched_answer ||= nil
+  # Determine if we should show the correct answers. Start with the quiz setting but enable if the user can grade but not on surveys.
+  # Also show if not on results page and no answers (i.e. when teacher editing quiz)
+  show_correct_answers = @quiz && @quiz.show_correct_answers?(@current_user, @submission) || (!assessment_results && !user_answer)
+  show_correct_answers = false if @quiz.try(:survey?)
+  answer_id = hash_get(answer, :id)
+  question_id = hash_get(question, :id)
+  selected_answer = user_answer && answer && hash_get(user_answer, :answer_id) == answer_id
+  selected_answer = true if user_answer && question_type.answer_type == "matching_answer"
+  selected_answer = (hash_get(user_answer, "answer_#{answer[:id]}")  == "1") if user_answer && hash_get(question, :question_type) == "multiple_answers_question"
+  selected_answer = false if question_type && question_type.display_answers == "single"
+  selected_answer = true if hash_get(question, :question_type) == "fill_in_multiple_blanks_question" && hash_get(matched_answer, :id) == answer_id
+  correct_answer = answer && hash_get(answer, :weight) == 100
+  correct_answer = (hash_get(user_answer, "answer_#{answer[:id]}").to_i == hash_get(answer, :match_id).to_i) if user_answer && answer && question_type && question_type.answer_type == "matching_answer"
+  correct_answer = false if !user_answer && question && hash_get(question, :question_type) == "matching_question"
+  correct_answer = false unless show_correct_answers || selected_answer
+  correct_answer_class = show_correct_answers ? (correct_answer ? "correct_answer" : "") : "unspecified_answer"
+  wrong_answer = selected_answer && !correct_answer
+  no_answer = wrong_answer && (hash_get(user_answer, "answer_#{answer[:id]}")  == '')
+  hide_right_arrow = false
+  show_comment = !assessment_results || selected_answer
+  has_answer_comment = hash_get(answer, :comments_html).present? || comment_get(answer, :comments).present?
+  skip_if_correct ||= nil
+  should_skip = (skip_if_correct && selected_answer && correct_answer) ||
+    (hash_get(question, :question_type) == 'fill_in_multiple_blanks_question' &&
+      answer.respond_to?(:[]) && answer['text'].blank? && answer['html'].blank?) ||
+    (hash_get(question, :question_type) == 'multiple_dropdowns_question' && !correct_answer && !selected_answer)
+%>
+<% unless question && [ "short_answer_question", "fill_in_multiple_blanks_question" ].include?(question[:question_type]) && !show_correct_answers %>
+  <% if false %>
+    <!-- Display skipped -->
+  <% else %>
+    <div class="answer answer_for_<%= hash_get(answer, :blank_id) %>
+         <%= "hide_right_arrow" if hide_right_arrow %>
+         <%= 'skipped' if should_skip %>
+         <%= 'wrong_answer' if wrong_answer && show_correct_answers %>
+         <%= 'no_answer' if no_answer %>
+         <%= "selected_answer" if selected_answer %> <%= correct_answer_class %>"
+       id="answer_<%= hash_get(answer, :id, "template") %>"
+       style="<%= hidden unless answer %>"
+       <%= answer_title(selected_answer, correct_answer, show_correct_answers) %>>
+
+      <span class='hidden id'><%= answer_id %></span>
+
+    <% if !user_answer || question_type.display_answers != "xsingle" %>
+    <div class="select_answer answer_type" <%= hidden(true) unless answer_type == "select_answer" %>>
+      <% if %w{radio checkbox}.include?(question_type.entry_type) %>
+        <input id="answer-<%= answer_id %>" name="question-<%= question_id %>" type="<%= question_type.entry_type %>" <%= 'checked' if selected_answer %> class="question_input" aria-hidden="true" />&nbsp;
+      <% end %>
+      <label for="answer-<%= answer_id %>">
+        <div class="answer_text" <%= hidden(true) if hash_get(answer, :html).present? %>><%= hash_get(answer, :text) %></div>
+        <div class="answer_html"><%= hash_get(answer, :html).to_s.html_safe %></div>
+      </label>
+    </div>
+    <div class="answer_type short_answer" <%= hidden(true) unless answer_type == "short_answer" %>>
+      <input name="answer_text" type="text" style="width: 200px; margin-bottom: 5px; color: #000;" disabled="true" value="<%= hash_get(answer, :text) %>"/>
+    </div>
+    <div class="answer_match matching_answer answer_type" <%= hidden(true) unless answer_type == "matching_answer" %>>
+      <div class="answer_match_left" <%= hidden(true) if (hash_get(answer, :left_html) || hash_get(answer, :html)).present? %>><%= (hash_get(answer, :left) || hash_get(answer, :text)) %></div>
+      <div class="answer_match_left_html" <%= hidden(true) unless (hash_get(answer, :left_html) || hash_get(answer, :html)).present? %>><%= (hash_get(answer, :left_html) || hash_get(answer, :html)).to_s.html_safe %></div>
+      <div class="answer_match_middle">&nbsp;</div>
+      <div class="answer_match_right">
+        <% if user_answer %>
+          <% if answer_type == 'matching_answer'
+               user_answer_choice = hash_get(user_answer, "answer_#{answer_id}".to_sym).to_i
+               display_choice = hash_get(question, :matches).find {|m| hash_get(m, :match_id) == user_answer_choice }
+          %>
+            <select class="question_input" readonly='readonly' style="max-width: 90%;">
+              <option value="" selected><%= display_choice[:text] rescue '' %></option>
+            </select>
+            <% show_comment = wrong_answer %>
+          <% else %>
+            <% if hash_get(user_answer, "answer_#{hash_get(answer,:id)}").to_i == hash_get(answer, :match_id).to_i %>
+              <%= (hash_get(answer, :right) || (question && hash_get(question, :matches, []).find{|m| hash_get(m, :match_id).to_i == hash_get(user_answer, "answer_#{answer_id}").to_i}[:text] rescue '')) %>
+            <% else %>
+              <% matched = (hash_get(question, :matches) || hash_get(question, :answers, [])).find{|a| hash_get(a, :match_id).to_i == hash_get(user_answer, "answer_#{answer_id}").to_i} %>
+              <span class="text_box_answer <%= 'correct_text_box_answer' if matched && matched[:weight] == 100 %>">
+                      <%= before_label(:your_answer, 'Your Answer') %>
+                <% user_text = (hash_get(matched, :right) || hash_get(matched, :text))
+                   user_text = nil if user_text.blank? %>
+                <b><%= user_text || t(:you_left_this_blank, '(You left this blank)') %></b>
+              </span>
+              <% if show_correct_answers %>
+                <br/>It was really: <%= (hash_get(answer, :right) || (question && hash_get(question, :matches, []).find{|m| hash_get(m, :match_id).to_i == hash_get(user_answer, :match_id).to_i}[:text] rescue '')) %>
+              <% end %>
+            <% end %>
+          <% end %>
+        <% else %>
+          <span class="correct_answer">
+            <%= (hash_get(answer, :right) || (question && hash_get(question, :matches, []).find{|m| hash_get(m, :match_id).to_i == hash_get(answer, :match_id).to_i}[:text] rescue '')) %>
+          </span>
+        <% end %>
+      </div>
+      <div class="clear"></div>
+    </div>
+    <div style="display: none;">
+      <span class="numerical_answer_type"><%= hash_get(answer, :numerical_answer_type, "exact_answer") %></span>
+      <span class="blank_id"><%= hash_get(answer, :blank_id, "none") %></span>
+      <span class="id"><%= answer_id %></span>
+      <span class="match_id"><%= hash_get(answer, :match_id) %></span>
+    </div>
+    <% if show_correct_answers %>
+      <% number_type = nil %>
+      <% number_type = "exact" if answer_type == "numerical_answer" && hash_get(answer, :numerical_answer_type) == "exact_answer" %>
+      <% number_type = "range" if answer_type == "numerical_answer" && hash_get(answer, :numerical_answer_type) != "exact_answer" %>
+      <% number_type = "equation" if answer_type == "numerical_answer" && hash_get(answer, :variables) %>
+      <div class="numerical_exact_answer answer_type" <%= hidden(true) unless number_type == 'exact' %>>
+        <span class="answer_exact"><%= hash_get(answer, :exact, "0") %></span> (<%= before_label :answer_with_margin, 'with margin' %> <span class="answer_error_margin"><%= hash_get(answer, :margin, "0") %></span>)
+      </div>
+      <div class="numerical_range_answer answer_type" <%= hidden(true) unless number_type == 'range' %>>
+        <%= t(:range_answer, "Between %{lower_bound} and %{upper_bound}",
+              :lower_bound => raw("<span class=\"answer_range_start\">#{hash_get(answer, :start, 0)}</span>"),
+              :upper_bound => raw("<span class=\"answer_range_end\">#{hash_get(answer, :end, 0)}</span>")) %>
+      </div>
+    <% end %>
+    <div class="numerical_range_answer answer_type" <%= hidden(true) unless number_type == 'equation' %>>
+      <span class="answer_equation"><%= hash_get(answer, :answer) || hash_get(answer, :exact) %></span>
+      <span class="margin" style="<%= hidden unless hash_get(question, :answer_tolerance, 0).to_f > 0 %>">
+        <%= t(:margin_of_error, "margin of error") %>
+        <span style="font-size: 0.8em;">
+          <%= t(:plus_or_minus, "+/-") %>
+        </span>
+        <span class="answer_tolerance"><%= hash_get(question, :answer_tolerance) %></span>
+      </span>
+    </div>
+    <% if show_correct_answers %>
+      <span class="answer_weight" style="display: none;"><%= hash_get(answer, :weight, 0) %></span>
+    <% end %>
+    <% if show_comment %>
+      <div class="quiz_comment <%= "empty" unless has_answer_comment %>">
+        <% if hash_get(answer, :comments_html).present? %>
+          <div class="answer_comment_html"><%= raw(hash_get(answer, :comments_html)) %></div>
+        <% else %>
+          <div class="answer_comment"><%= comment_get(answer, :comments) %></div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <% end %>
+    <div class="clear"></div>
+  </div>
+    <% if answer_type == 'matching_answer' && wrong_answer && show_correct_answers %>
+      <div class="answer full-opacity">
+        <div class="answer_match matching_answer answer_type">
+          <div class="answer_match_left">&nbsp;</div>
+          <div class="answer_match_left_html"></div>
+          <div class="answer_match_middle">&nbsp;</div>
+          <div class="answer_match_right">
+            <div class='answer correct_answer'>
+              <div class='answer_text'>
+                <%= (hash_get(answer, :right) || (question && hash_get(question, :matches, []).find{|m| hash_get(m, :match_id).to_i == hash_get(user_answer, :match_id).to_i}[:text] rescue '')) %>
+              </div>
+            </div>
+          </div>
+          <div class="clear"></div>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="clear"></div>
+  <% end %>
+<% end %>

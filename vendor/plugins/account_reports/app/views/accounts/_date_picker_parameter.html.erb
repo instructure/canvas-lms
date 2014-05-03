@@ -1,7 +1,7 @@
 <% if start_at_option %>
   <tr>
     <td><%= t('account_reports.default.start.parameters.header', %{Start at:}) %>
-      <input type="text" id="report_start_at" name="parameters[start_at]" class="datetime_field" value="<%= date_string(@term.try(:start_at)) %>" />
+      <input type="text" name="parameters[start_at]" class="datetime_field" value="<%= date_string(@term.try(:start_at)) %>" />
     </td>
   </tr>
 <%end%>
@@ -9,7 +9,7 @@
   <tr>
     <td>
       <%= t('account_reports.default.end.parameters.header', %{End at:}) %>
-      <input type="text" id="report_end_at" name="parameters[end_at]" class="datetime_field" value="<%= date_string(@term.try(:end_at)) %>" />
+      <input type="text" name="parameters[end_at]" class="datetime_field" value="<%= date_string(@term.try(:end_at)) %>" />
     </td>
   </tr>
 <%end%>

@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/assignments_common')
 
 describe "quizzes assignments" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
 
   before (:each) do
@@ -34,7 +34,7 @@ describe "quizzes assignments" do
       driver.execute_script %{$('#assignment_#{assign.id} .edit_assignment_link:first').addClass('focus');}
       f("#assignment_#{assign.id} .edit_assignment_link").click
       edit_assignment(:name => "Retest!", :submit => true)
-      Quiz.find_by_assignment_id(assign.id).title.should == "Retest!"
+      Quizzes::Quiz.find_by_assignment_id(assign.id).title.should == "Retest!"
     end
   end
 

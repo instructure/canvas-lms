@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -49,6 +49,10 @@ module Api::V1::Assignment
     )
   }
 
+  def assignments_json(assignments, user, session, opts = {})
+    assignments.map{ |assignment| assignment_json(assignment, user, session, opts) }
+  end
+
   def assignment_json(assignment, user, session, opts = {})
     opts.reverse_merge!(
       include_discussion_topic: true,
@@ -92,7 +96,7 @@ module Api::V1::Assignment
       hash['external_tool_tag_attributes'] = {
         'url' => external_tool_tag.url,
         'new_tab' => external_tool_tag.new_tab,
-        'resource_link_id' => external_tool_tag.opaque_identifier(:asset_string)
+        'resource_link_id' => ContextExternalTool.opaque_identifier_for(external_tool_tag, assignment.shard)
       }
       hash['url'] = sessionless_launch_url(@context,
                                            :launch_type => 'assessment',
@@ -138,6 +142,8 @@ module Api::V1::Assignment
         row_hash
       end
       hash['rubric_settings'] = {
+        'id' => rubric.id,
+        'title' => rubric.title,
         'points_possible' => rubric.points_possible,
         'free_form_criterion_comments' => !!rubric.free_form_criterion_comments
       }
@@ -150,16 +156,30 @@ module Api::V1::Assignment
         assignment.discussion_topic.context,
         user,
         session,
-        !:include_assignment)
+        include_assignment: false)
     end
 
     if opts[:include_all_dates] && assignment.assignment_overrides
       hash['all_dates'] = assignment.dates_hash_visible_to(user)
     end
 
-    #show published/unpublished if account.settings[:enable_draft]
-    if @domain_root_account.enable_draft?
+    if opts[:include_module_ids]
+      thing_in_module = case assignment.submission_types
+                        when "online_quiz" then assignment.quiz
+                        when "discussion_topic" then assignment.discussion_topic
+                        else assignment
+                        end
+      module_ids = thing_in_module.context_module_tags.map &:context_module_id
+      hash['module_ids'] = module_ids
+    end
+
+    if assignment.context.feature_enabled?(:draft_state)
       hash['published'] = ! assignment.unpublished?
+      hash['unpublishable'] = assignment.can_unpublish?
+    end
+
+    if assignment.context.feature_enabled?(:differentiated_assignments)
+      hash['only_visible_to_overrides'] = value_to_boolean(assignment.only_visible_to_overrides)
     end
 
     if submission = opts[:submission]
@@ -236,6 +256,8 @@ module Api::V1::Assignment
     overrides = deserialize_overrides(assignment_params.delete(:assignment_overrides))
     return if overrides && !overrides.is_a?(Array)
 
+    return false unless valid_assignment_group_id?(assignment, assignment_params)
+
     assignment = update_from_params(assignment, assignment_params)
 
     if overrides
@@ -253,11 +275,23 @@ module Api::V1::Assignment
     return false
   end
 
+  def valid_assignment_group_id?(assignment, assignment_params)
+    ag_id = assignment_params["assignment_group_id"].presence
+    # if ag_id is a non-numeric string, ag_id.to_i will == 0
+    if ag_id and ag_id.to_i <= 0
+      assignment.errors.add('assignment[assignment_group_id]', I18n.t(:not_a_number, "must be a positive number"))
+      false
+    else
+      true
+    end
+  end
+
   def update_from_params(assignment, assignment_params)
     update_params = assignment_params.slice(*API_ALLOWED_ASSIGNMENT_INPUT_FIELDS)
 
     if update_params.has_key?('peer_reviews_assign_at')
       update_params['peer_reviews_due_at'] = update_params['peer_reviews_assign_at']
+      update_params.delete('peer_reviews_assign_at')
     end
 
     if update_params["submission_types"].is_a? Array
@@ -284,9 +318,40 @@ module Api::V1::Assignment
       assignment.muted = value_to_boolean(assignment_params.delete("muted"))
     end
 
+    exception_message = ["invalid due_at",
+                         "assignment_params: #{assignment_params}",
+                         "user: #{@current_user.attributes}",
+                         "account: #{assignment.context.root_account.attributes}",
+                         "course: #{assignment.context.attributes}",
+                         "assignment: #{assignment.attributes}"].join(",\n")
+
     # do some fiddling with due_at for fancy midnight and add to update_params
-    if update_params.has_key?("due_at")
-      update_params["time_zone_edited"] = Time.zone.name
+    # validate that date and times are iso8601 otherwise ignore them, but still
+    # allow clearing them when set to nil
+    if update_params['due_at'].present? && update_params['due_at'] !~ Api::ISO8601_REGEX
+      Api.invalid_time_stamp_error('due_at', exception_message)
+      # todo stop logging and delete invalid dates
+      # update_params.delete(:due_at)
+    elsif update_params.has_key?('due_at')
+      update_params['time_zone_edited'] = Time.zone.name
+    end
+
+    if update_params['lock_at'].present? && update_params['lock_at'] !~ Api::ISO8601_REGEX
+      Api.invalid_time_stamp_error('lock_at', exception_message)
+      # todo stop logging and delete invalid dates
+      # update_params.delete(:lock_at)
+    end
+
+    if update_params['unlock_at'].present? && update_params['unlock_at'] !~ Api::ISO8601_REGEX
+      Api.invalid_time_stamp_error('unlock_at', exception_message)
+      # todo stop logging and delete invalid dates
+      # update_params.delete(:unlock_at)
+    end
+
+    if update_params['peer_reviews_due_at'].present? && update_params['peer_reviews_due_at'] !~ Api::ISO8601_REGEX
+      Api.invalid_time_stamp_error('peer_reviews_due_at', exception_message)
+      # todo stop logging and delete invalid dates
+      # update_params.delete(:peer_reviews_due_at)
     end
 
     if !assignment.context.try(:turnitin_enabled?)
@@ -313,10 +378,16 @@ module Api::V1::Assignment
       update_params["description"] = process_incoming_html_content(update_params["description"])
     end
 
-    if @domain_root_account.enable_draft?
+    if assignment.context.feature_enabled?(:draft_state)
       if assignment_params.has_key? "published"
         published = value_to_boolean(assignment_params['published'])
         assignment.workflow_state = published ? 'published' : 'unpublished'
+      end
+    end
+
+    if assignment.context.feature_enabled?(:differentiated_assignments)
+      if assignment_params.has_key? "only_visible_to_overrides"
+        assignment.only_visible_to_overrides = value_to_boolean(assignment_params['only_visible_to_overrides'])
       end
     end
 

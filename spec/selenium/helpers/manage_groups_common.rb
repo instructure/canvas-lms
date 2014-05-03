@@ -114,3 +114,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
     SCRIPT
     sleep 1
   end
+
+  def expand_group(group_id)
+    group_selector = (group_id == "unassigned" ? ".unassigned-students" : ".group[data-id=\"#{group_id}\"]")
+    return if group_selector == ".unassigned-students" || f(group_selector).attribute(:class) =~ /group-expanded/
+    fj("#{group_selector} .toggle-group").click
+    wait_for_ajax_requests
+  end

@@ -33,7 +33,6 @@ class ContentTag < ActiveRecord::Base
   belongs_to :learning_outcome
   # This allows doing a has_many_through relationship on ContentTags for linked LearningOutcomes. (see LearningOutcomeContext)
   belongs_to :learning_outcome_content, :class_name => 'LearningOutcome', :foreign_key => :content_id
-  belongs_to :cloned_item
   has_many :learning_outcome_results
   # This allows bypassing loading context for validation if we have
   # context_id and context_type set, but still allows validating when
@@ -47,6 +46,9 @@ class ContentTag < ActiveRecord::Base
   after_save :touch_context_if_learning_outcome
   include CustomValidations
   validates_as_url :url
+
+  include PolymorphicTypeOverride
+  override_polymorphic_types content_type: {'Quiz' => 'Quizzes::Quiz'}
 
   acts_as_list :scope => :context_module
 
@@ -66,6 +68,8 @@ class ContentTag < ActiveRecord::Base
     end
     state :deleted
   end
+
+  alias_method :published?, :active?
 
   scope :active, where(:workflow_state => 'active')
   scope :not_deleted, where("content_tags.workflow_state<>'deleted'")
@@ -136,7 +140,7 @@ class ContentTag < ActiveRecord::Base
   end
   
   def scoreable?
-    self.content_type == 'Quiz' || self.graded?
+    self.content_type_quiz? || self.graded?
   end
   
   def graded?
@@ -144,7 +148,7 @@ class ContentTag < ActiveRecord::Base
     return false unless self.content_type.constantize.column_names.include?('assignment_id') #.new.respond_to?(:assignment_id)
     return !content.assignment_id.nil? rescue false
   end
-  
+
   def content_type_class
     if self.content_type == 'Assignment'
       if self.content && self.content.submission_types == 'online_quiz'
@@ -154,6 +158,8 @@ class ContentTag < ActiveRecord::Base
       else
         'assignment'
       end
+    elsif self.content_type == 'Quizzes::Quiz'
+      'quiz'
     else
       self.content_type.underscore
     end
@@ -168,6 +174,7 @@ class ContentTag < ActiveRecord::Base
   
   alias_method :old_content, :content
   def content
+    #self.content_type = 'Quizzes::Quiz' if self.content_type == 'Quiz'
     klass = self.content_type.classify.constantize rescue nil
     klass.respond_to?("tableless?") && klass.tableless? ? nil : old_content
   end
@@ -184,40 +191,71 @@ class ContentTag < ActiveRecord::Base
     name
   end
 
-  def update_asset_name!
-    return unless self.sync_title_to_asset_title?
-    correct_context = self.content && self.content.respond_to?(:context) && self.content.context == self.context
-    if correct_context
-      if self.content.respond_to?("name=") && self.content.respond_to?("name") && self.content.name != self.title
-        self.content.update_attribute(:name, asset_safe_title('name'))
-      elsif self.content.respond_to?("title=") && self.content.title != self.title
-        self.content.update_attribute(:title, asset_safe_title('title'))
-      elsif self.content.respond_to?("display_name=") && self.content.display_name != self.title
-        self.content.update_attribute(:display_name, asset_safe_title('display_name'))
+  def self.asset_workflow_state(asset)
+    if asset.respond_to?(:published?)
+      if asset.respond_to?(:deleted?) && asset.deleted?
+        'deleted'
+      elsif asset.published?
+        'active'
+      else
+        'unpublished'
+      end
+    else
+      if asset.respond_to?(:workflow_state)
+        workflow_state = asset.workflow_state.to_s
+        if ['active', 'available', 'published'].include?(workflow_state)
+          'active'
+        elsif ['unpublished', 'deleted'].include?(workflow_state)
+          workflow_state
+        end
+      else
+        nil
       end
     end
   end
 
+  def asset_workflow_state
+    ContentTag.asset_workflow_state(self.content)
+  end
+
+  def asset_context_matches?
+    self.content && self.content.respond_to?(:context) && self.content.context == context
+  end
+
+  def update_asset_name!
+    return unless self.sync_title_to_asset_title?
+    return unless self.asset_context_matches?
+
+    # Assignment proxies name= and name to title= and title, which breaks the asset_safe_title logic
+    if content.respond_to?("name=") && content.respond_to?("name") && !content.is_a?(Assignment)
+      content.name = asset_safe_title('name')
+    elsif content.respond_to?("title=")
+      content.title = asset_safe_title('title')
+    elsif content.respond_to?("display_name=")
+      content.display_name = asset_safe_title('display_name')
+    end
+    content.save if content.changed?
+  end
+
   def update_asset_workflow_state!
     return unless self.sync_workflow_state_to_asset?
-    correct_context = self.content && self.content.respond_to?(:context) && self.content.context == self.context
-    if correct_context
-      asset_workflow_state = nil
-      if self.unpublished? && self.content.respond_to?(:unpublished?)
-        asset_workflow_state = 'unpublished'
-      elsif self.active?
-        if self.content.respond_to?(:active?)
-          asset_workflow_state = 'active'
-        elsif self.content.respond_to?(:available?)
-          asset_workflow_state = 'available'
-        elsif self.content.respond_to?(:published?)
-          asset_workflow_state = 'published'
-        end
+    return unless self.asset_context_matches?
+
+    new_asset_workflow_state = nil
+    if self.unpublished? && self.content.respond_to?(:unpublished?)
+      new_asset_workflow_state = 'unpublished'
+    elsif self.active?
+      if self.content.respond_to?(:active?)
+        new_asset_workflow_state = 'active'
+      elsif self.content.respond_to?(:available?)
+        new_asset_workflow_state = 'available'
+      elsif self.content.respond_to?(:published?)
+        new_asset_workflow_state = 'published'
       end
-      if asset_workflow_state
-        self.content.update_attribute(:workflow_state, asset_workflow_state)
-        self.class.update_for(self.content)
-      end
+    end
+    if new_asset_workflow_state
+      self.content.update_attribute(:workflow_state, new_asset_workflow_state)
+      self.class.update_for(self.content)
     end
   end
 
@@ -249,6 +287,8 @@ class ContentTag < ActiveRecord::Base
         raise LastLinkToOutcomeNotDestroyed.new(alignment) if alignment
       end
     end
+
+    context_module.remove_completion_requirement(id) if context_module
 
     self.workflow_state = 'deleted'
     self.save!
@@ -287,15 +327,12 @@ class ContentTag < ActiveRecord::Base
     # update workflow_state
     tag_ids = tags.select{|t| t.sync_workflow_state_to_asset? }.map(&:id)
     attr_hash = {:updated_at => Time.now.utc}
-    if asset.respond_to?(:workflow_state)
-      if ['active', 'available', 'published'].include?(asset.workflow_state)
-        attr_hash[:workflow_state] = 'active'
-      elsif ['unpublished', 'deleted'].include?(asset.workflow_state)
-        attr_hash[:workflow_state] = asset.workflow_state
-      end
-    end
+
+    workflow_state = asset_workflow_state(asset)
+    attr_hash[:workflow_state] = workflow_state if workflow_state
     ContentTag.where(:id => tag_ids).update_all(attr_hash) if attr_hash[:workflow_state] && !tag_ids.empty?
 
+    # update the module timestamp
     ContentTag.touch_context_modules(module_ids)
   end
   
@@ -304,9 +341,17 @@ class ContentTag < ActiveRecord::Base
   end
 
   def sync_workflow_state_to_asset?
-    ['Assignment', 'WikiPage'].include?(self.content_type)
+    self.content_type_quiz? || ['Assignment', 'WikiPage', 'DiscussionTopic'].include?(self.content_type)
   end
-  
+
+  def content_type_quiz?
+    Quizzes::Quiz.class_names.include?(self.content_type)
+  end
+
+  def content_type_discussion?
+    'DiscussionTopic' == self.content_type
+  end
+
   def context_module_action(user, action, points=nil)
     self.context_module.update_for(user, action, self, points) if self.context_module
   end
@@ -331,46 +376,6 @@ class ContentTag < ActiveRecord::Base
 
   def has_rubric_association?
     content.respond_to?(:rubric_association) && content.rubric_association
-  end
-  
-  attr_accessor :clone_updated
-  def clone_for(context, dup=nil, options={})
-    return nil if ( !(self.content && self.content.respond_to?(:clone_for)) && self.content_type != 'ExternalUrl' && self.content_type != 'ContextModuleSubHeader')
-    options[:migrate] = true if options[:migrate] == nil
-    if !self.cloned_item && !self.new_record?
-      self.cloned_item ||= ClonedItem.create(:original_item => self)
-      begin
-        self.save! 
-      rescue ActiveRecord::RecordInvalid => e
-        if e.message =~ /Url is not a valid URL/
-          self.url = URI::escape(self.url)
-          self.save!
-        else
-          raise e
-        end
-      end
-    end
-    existing = ContentTag.active.find_by_context_type_and_context_id_and_id(context.class.to_s, context.id, self.id)
-    existing ||= ContentTag.active.find_by_context_type_and_context_id_and_cloned_item_id(context.class.to_s, context.id, self.cloned_item_id)
-    return existing if existing && !options[:overwrite]
-    dup ||= ContentTag.new
-    dup = existing if existing && options[:overwrite]
-
-    self.attributes.delete_if{|k,v| [:id].include?(k.to_sym) }.each do |key, val|
-      dup.send("#{key}=", val)
-    end
-
-    dup.context = context
-    if self.content && self.content.respond_to?(:clone_for)
-      content = self.content.clone_for(context)
-      content.save! if content.new_record?
-      context.map_merge(self.content, content)
-      dup.content = content
-    end
-    context.log_merge_result("Tag \"#{self.title}\" created")
-    dup.updated_at = Time.now
-    dup.clone_updated = true
-    dup
   end
   
   scope :for_tagged_url, lambda { |url, tag| where(:url => url, :tag => tag) }

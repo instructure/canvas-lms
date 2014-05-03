@@ -22,14 +22,13 @@ describe "security" do
 
   describe "session fixation" do
     it "should change the cookie session id after logging in" do
-    
       u = user_with_pseudonym :active_user => true,
                               :username => "nobody@example.com",
                               :password => "asdfasdf"
       u.save!
-    
+
       https!
-      
+
       get_via_redirect "/login"
       assert_response :success
       cookie = cookies['_normandy_session']
@@ -41,7 +40,7 @@ describe "security" do
                                   "pseudonym_session[remember_me]" => "1",
                                   "redirect_to_ssl" => "1"
       assert_response :success
-      path.should eql("/?login_success=1")
+      request.fullpath.should eql("/?login_success=1")
       new_cookie = cookies['_normandy_session']
       new_cookie.should be_present
       cookie.should_not eql(new_cookie)
@@ -130,41 +129,45 @@ describe "security" do
       c2.should be_present
     end
 
-    it "should make both cookies httponly" do
-      u = user_with_pseudonym :active_user => true,
-                              :username => "nobody@example.com",
-                              :password => "asdfasdf"
-      u.save!
-      https!
-      post "/login", "pseudonym_session[unique_id]" => "nobody@example.com",
-        "pseudonym_session[password]" => "asdfasdf",
-        "pseudonym_session[remember_me]" => "1"
-      assert_response 302
-      c1 = response['Set-Cookie'].lines.grep(/\Apseudonym_credentials=/).first
-      c2 = response['Set-Cookie'].lines.grep(/\A_normandy_session=/).first
-      c1.should match(/; *HttpOnly/)
-      c2.should match(/; *HttpOnly/)
-      c1.should_not match(/; *secure/)
-      c2.should_not match(/; *secure/)
-    end
+    # these specs aren't needed in rails3, where we use a newer authlogic that
+    # has built-in support for the httponly/secure options
+    if CANVAS_RAILS2
+      it "should make both cookies httponly" do
+        u = user_with_pseudonym :active_user => true,
+                                :username => "nobody@example.com",
+                                :password => "asdfasdf"
+        u.save!
+        https!
+        post "/login", "pseudonym_session[unique_id]" => "nobody@example.com",
+          "pseudonym_session[password]" => "asdfasdf",
+          "pseudonym_session[remember_me]" => "1"
+        assert_response 302
+        c1 = response['Set-Cookie'].lines.grep(/\Apseudonym_credentials=/).first
+        c2 = response['Set-Cookie'].lines.grep(/\A_normandy_session=/).first
+        c1.should match(/; *HttpOnly/)
+        c2.should match(/; *HttpOnly/)
+        c1.should_not match(/; *secure/)
+        c2.should_not match(/; *secure/)
+      end
 
-    it "should make both cookies secure only if configured" do
-      ActionController::Base.session_options[:secure] = true
-      u = user_with_pseudonym :active_user => true,
-                              :username => "nobody@example.com",
-                              :password => "asdfasdf"
-      u.save!
-      https!
+      it "should make both cookies secure only if configured" do
+        ActionController::Base.session_options[:secure] = true
+        u = user_with_pseudonym :active_user => true,
+                                :username => "nobody@example.com",
+                                :password => "asdfasdf"
+        u.save!
+        https!
 
-      post "/login", "pseudonym_session[unique_id]" => "nobody@example.com",
-        "pseudonym_session[password]" => "asdfasdf",
-        "pseudonym_session[remember_me]" => "1"
-      assert_response 302
-      c1 = response['Set-Cookie'].lines.grep(/\Apseudonym_credentials=/).first
-      c2 = response['Set-Cookie'].lines.grep(/\A_normandy_session=/).first
-      c1.should match(/; *secure/)
-      c2.should match(/; *secure/)
-      ActionController::Base.session_options[:secure] = nil
+        post "/login", "pseudonym_session[unique_id]" => "nobody@example.com",
+          "pseudonym_session[password]" => "asdfasdf",
+          "pseudonym_session[remember_me]" => "1"
+        assert_response 302
+        c1 = response['Set-Cookie'].lines.grep(/\Apseudonym_credentials=/).first
+        c2 = response['Set-Cookie'].lines.grep(/\A_normandy_session=/).first
+        c1.should match(/; *secure/)
+        c2.should match(/; *secure/)
+        ActionController::Base.session_options[:secure] = nil
+      end
     end
   end
 
@@ -175,7 +178,7 @@ describe "security" do
     u.save!
     post "/login", { "pseudonym_session[unique_id]" => "nobody@example.com",
       "pseudonym_session[password]" => "asdfasdf",
-      "pseudonym_session[remember_me]" => "1" }, { 'Accept' => 'application/json' }
+      "pseudonym_session[remember_me]" => "1" }, { 'HTTP_ACCEPT' => 'application/json' }
     response.should be_success
     response['Content-Type'].should match(%r"^application/json")
     response.body.should_not match(%r{^while\(1\);})
@@ -188,7 +191,7 @@ describe "security" do
     response.should be_success
     response.body.should_not match(%r{^while\(1\);})
 
-    get "/logout", {}, { 'accept' => 'application/json' }
+    get "/logout", {}, { 'HTTP_ACCEPT' => 'application/json' }
     response.should be_success
     response.body.should_not match(%r{^while\(1\);})
   end
@@ -199,6 +202,14 @@ describe "security" do
     response.should be_success
     response['Content-Type'].should match(%r"^application/json")
     response.body.should match(%r{^while\(1\);})
+  end
+
+  it "should not prepend GET JSON responses to Accept application/json requests with protection" do
+    course_with_teacher_logged_in
+    get "/courses.json", nil, { 'HTTP_ACCEPT' => 'application/json' }
+    response.should be_success
+    response['Content-Type'].should match(%r"^application/json")
+    response.body.should_not match(%r{^while\(1\);})
   end
 
   it "should not prepend non-GET JSON responses with protection" do
@@ -434,7 +445,7 @@ describe "security" do
         post_via_redirect "/login",
           { "pseudonym_session[unique_id]" => "second@example.com", "pseudonym_session[password]" => "12341234" },
           { "REMOTE_ADDR" => "5.5.5.5" }
-        path.should eql("/?login_success=1")
+        request.fullpath.should eql("/?login_success=1")
       end
 
       it "should apply limitations correctly for cross-account logins" do
@@ -658,7 +669,7 @@ describe "security" do
         response.body.should_not match /Permissions/
 
         get "/accounts/#{Account.site_admin.id}/role_overrides"
-        response.status.should == "401 Unauthorized"
+        assert_status(401)
 
         add_permission :manage_role_overrides
 
@@ -676,7 +687,7 @@ describe "security" do
         add_permission :view_statistics
 
         get "/accounts/#{Account.default.id}/users"
-        response.status.should == "401 Unauthorized"
+        assert_status(401)
 
         get "/accounts/#{Account.default.id}/settings"
         response.should be_success
@@ -733,7 +744,7 @@ describe "security" do
 
       it "view_statistics" do
         get "/accounts/#{Account.default.id}/statistics"
-        response.status.should == "401 Unauthorized"
+        assert_status(401)
 
         get "/accounts/#{Account.default.id}/settings"
         response.should be_success
@@ -757,23 +768,23 @@ describe "security" do
         @user_note = UserNote.create!(:creator => @teacher, :user => @student)
 
         get "/accounts/#{Account.default.id}/user_notes"
-        response.status.should == "401 Unauthorized"
+        assert_status(401)
 
         get "/accounts/#{Account.default.id}/settings"
         response.should be_success
         response.body.should_not match /Faculty Journal/
 
         get "/users/#{@student.id}/user_notes"
-        response.status.should == "401 Unauthorized"
+        assert_status(401)
 
         post "/users/#{@student.id}/user_notes"
-        response.status.should == "401 Unauthorized"
+        assert_status(401)
 
         get "/users/#{@student.id}/user_notes/#{@user_note.id}"
-        response.status.should == "401 Unauthorized"
+        assert_status(401)
 
         delete "/users/#{@student.id}/user_notes/#{@user_note.id}"
-        response.status.should == "401 Unauthorized"
+        assert_status(401)
 
         add_permission :manage_user_notes
 
@@ -840,13 +851,13 @@ describe "security" do
 
       it 'read_roster' do
         get "/courses/#{@course.id}/users"
-        response.status.should == "401 Unauthorized"
+        assert_status(401)
 
         get "/courses/#{@course.id}/users/prior"
-        response.status.should == "401 Unauthorized"
+        assert_status(401)
 
         get "/courses/#{@course.id}/groups"
-        response.status.should == "401 Unauthorized"
+        assert_status(401)
 
         get "/courses/#{@course.id}/details"
         response.should be_success
@@ -875,13 +886,13 @@ describe "security" do
 
       it "manage_students" do
         get "/courses/#{@course.id}/users"
-        response.status.should == "401 Unauthorized"
+        assert_status(401)
 
         get "/courses/#{@course.id}/users/prior"
-        response.status.should == "401 Unauthorized"
+        assert_status(401)
 
         get "/courses/#{@course.id}/groups"
-        response.status.should == "401 Unauthorized"
+        assert_status(401)
 
         get "/courses/#{@course.id}/details"
         response.should be_success
@@ -898,7 +909,7 @@ describe "security" do
         response.should be_success
 
         get "/courses/#{@course.id}/groups"
-        response.status.should == "401 Unauthorized"
+        assert_status(401)
 
         get "/courses/#{@course.id}/details"
         response.should be_success
@@ -916,10 +927,10 @@ describe "security" do
 
       it 'view_all_grades' do
         get "/courses/#{@course.id}/grades"
-        response.status.should == '401 Unauthorized'
+        assert_status(401)
 
         get "/courses/#{@course.id}/gradebook"
-        response.status.should == '401 Unauthorized'
+        assert_status(401)
 
         add_permission :view_all_grades
 
@@ -940,10 +951,10 @@ describe "security" do
         response.should be_redirect
 
         get "/courses/#{@course.id}/assignments"
-        response.status.should == '401 Unauthorized'
+        assert_status(401)
 
         get "/courses/#{@course.id}/assignments/syllabus"
-        response.status.should == '401 Unauthorized'
+        assert_status(401)
 
         get "/courses/#{@course.id}/wiki"
         response.should be_redirect
@@ -951,19 +962,19 @@ describe "security" do
         response.should be_redirect
 
         get "/courses/#{@course.id}/quizzes"
-        response.status.should == '401 Unauthorized'
+        assert_status(401)
 
         get "/courses/#{@course.id}/discussion_topics"
-        response.status.should == '401 Unauthorized'
+        assert_status(401)
 
         get "/courses/#{@course.id}/files"
-        response.status.should == '401 Unauthorized'
+        assert_status(401)
 
         get "/courses/#{@course.id}/copy"
-        response.status.should == '401 Unauthorized'
+        assert_status(401)
 
         get "/courses/#{@course.id}/content_exports"
-        response.status.should == '401 Unauthorized'
+        assert_status(401)
 
         get "/courses/#{@course.id}/details"
         response.should be_success
@@ -1012,7 +1023,7 @@ describe "security" do
         response.should be_success
 
         get "/courses/#{@course.id}/copy"
-        response.status.should == '401 Unauthorized'
+        assert_status(401)
 
         get "/courses/#{@course.id}/content_exports"
         response.should be_success
@@ -1035,10 +1046,10 @@ describe "security" do
         html.css('#course_enrollment_term_id').should be_empty
 
         delete "/courses/#{@course.id}"
-        response.status.should == '401 Unauthorized'
+        assert_status(401)
 
         delete "/courses/#{@course.id}", :event => 'delete'
-        response.status.should == '401 Unauthorized'
+        assert_status(401)
 
         add_permission :manage_courses
 
@@ -1067,7 +1078,7 @@ describe "security" do
         response.body.should_not match /Import Content into this Course/
 
         get "/courses/#{@course.id}/content_migrations"
-        response.status.should == '401 Unauthorized'
+        assert_status(401)
 
         add_permission :manage_content
 
@@ -1088,7 +1099,7 @@ describe "security" do
         response.body.should_not match "Access Report"
 
         get "/courses/#{@course.id}/users/#{@student.id}/usage"
-        response.status.should == '401 Unauthorized'
+        assert_status(401)
 
         add_permission :read_reports
 
@@ -1109,13 +1120,13 @@ describe "security" do
         response.body.should_not match 'Add Section'
 
         post "/courses/#{@course.id}/sections"
-        response.status.should == '401 Unauthorized'
+        assert_status(401)
 
         get "/courses/#{@course.id}/sections/#{@course.default_section.id}"
         response.should be_success
 
         put "/courses/#{@course.id}/sections/#{@course.default_section.id}"
-        response.status.should == '401 Unauthorized'
+        assert_status(401)
       end
 
       it 'change_course_state' do
@@ -1127,7 +1138,7 @@ describe "security" do
         response.body.should_not match 'End this Course'
 
         delete "/courses/#{@course.id}", :event => 'conclude'
-        response.status.should == '401 Unauthorized'
+        assert_status(401)
       end
 
       it 'view_statistics' do
@@ -1143,7 +1154,7 @@ describe "security" do
         response.should be_success
 
         get "/users/#{@student.id}"
-        response.status.should == '401 Unauthorized'
+        assert_status(401)
 
         admin = account_admin_user :account => Account.site_admin
         user_session(admin)

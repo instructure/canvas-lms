@@ -18,10 +18,22 @@
 
 class Message < ActiveRecord::Base
   # Included modules
-  include ActionController::UrlWriter
+  if CANVAS_RAILS2
+    include ActionController::UrlWriter
+  else
+    include Rails.application.routes.url_helpers
+  end
+
+  include PolymorphicTypeOverride
+  override_polymorphic_types context_type: {'QuizSubmission' => 'Quizzes::QuizSubmission',
+                                            'QuizRegradeRun' => 'Quizzes::QuizRegradeRun'},
+                             asset_context_type: {'QuizSubmission' => 'Quizzes::QuizSubmission',
+                                                  'QuizRegradeRun' => 'Quizzes::QuizRegradeRun'}
+
   include ERB::Util
   include SendToStream
   include TextHelper
+  include HtmlTextHelper
   include Twitter
   include Workflow
 
@@ -40,6 +52,7 @@ class Message < ActiveRecord::Base
     :notification_name, :asset_context, :data, :root_account_id
 
   attr_writer :delayed_messages
+  attr_accessor :output_buffer
 
   # Callbacks
   after_save  :stage_message
@@ -200,7 +213,7 @@ class Message < ActiveRecord::Base
   end
 
   # Public: Custom getter that delegates and caches notification category to
-  # associated notification 
+  # associated notification
   #
   # Returns a notification category string.
   def notification_category
@@ -248,13 +261,17 @@ class Message < ActiveRecord::Base
   #
   # Returns an empty string.
   def define_content(name, &block)
-    old_output_buffer, @output_buffer = [@output_buffer, '']
+    old_output_buffer, @output_buffer = [@output_buffer, @output_buffer.dup.clear]
 
     yield
 
     instance_variable_set(:"@message_content_#{name}",
       @output_buffer.to_s.strip)
     @output_buffer = old_output_buffer.sub(/\n\z/, '')
+
+    if old_output_buffer.is_a?(ActiveSupport::SafeBuffer) && old_output_buffer.html_safe?
+      @output_buffer = old_output_buffer.class.new(@output_buffer)
+    end
 
     ''
   end
@@ -317,6 +334,7 @@ class Message < ActiveRecord::Base
     return nil unless template = load_html_template
 
     # Add the attribute 'inner_html' with the value of inner_html into the _binding
+    @output_buffer = nil
     inner_html = RailsXss::Erubis.new(template, :bufvar => '@output_buffer').result(_binding)
     setter = eval "inner_html = nil; lambda { |v| inner_html = v }", _binding
     setter.call(inner_html)
@@ -345,6 +363,7 @@ class Message < ActiveRecord::Base
 
     if path_type == 'facebook'
       # this will ensure we escape anything that's not already safe
+      @output_buffer = nil
       self.body = RailsXss::Erubis.new(message_body_template).result(_binding)
     else
       self.body = Erubis::Eruby.new(message_body_template,
@@ -399,7 +418,7 @@ class Message < ActiveRecord::Base
     message_body_template = get_template(filename)
 
     context, asset, user, delayed_messages, asset_context, data = [self.context,
-      self.context, @user, @delayed_messages, self.asset_context, @data]
+      self.context, self.user, @delayed_messages, self.asset_context, @data]
 
     if message_body_template.present? && path_type.present?
       populate_body(message_body_template, path_type, binding)
@@ -603,7 +622,7 @@ class Message < ActiveRecord::Base
     logger.info "Delivering mail: #{self.inspect}"
 
     begin
-      res = Mailer.deliver_message(self)
+      res = Mailer.create_message(self).deliver
     rescue Net::SMTPServerBusy => e
       @exception = e
       logger.error "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
@@ -635,11 +654,6 @@ class Message < ActiveRecord::Base
 
     true
   end
-
-  # Internal: No-op included for compatibility.
-  #
-  # Returns nothing.
-  def deliver_via_chat; end
 
   # Internal: Deliver the message through Twitter.
   #

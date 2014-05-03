@@ -30,7 +30,7 @@ namespace :db do
         else
           raise "Task not supported by '#{abcs[db]["adapter"]}'"
       end
-      ENV['RAILS_ENV'] = db
+      Rails.env = db
       Rake::Task["db:migrate"].dup.invoke
       Rake::Task["db:load_initial_data"].dup.invoke
       # Rake::Task["db:fixtures:load"].dup.invoke

@@ -19,7 +19,9 @@ module BroadcastPolicies
     end
 
     def should_dispatch_submission_needs_grading?
-      quiz_is_accepting_messages? && quiz_submission.pending_review?
+      !quiz.survey? &&
+      quiz_is_accepting_messages? &&
+      quiz_submission.pending_review?
     end
 
     private

@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "account" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   before (:each) do
     course_with_admin_logged_in
@@ -117,7 +117,7 @@ describe "account" do
       get "/accounts/#{Account.default.id}/users"
       f(".add_user_link").click
       dialog = f("#add_user_dialog")
-      dialog.find_element(:css, 'label[for="pseudonym_unique_id"]').text.should == "CAS Username:"
+      dialog.find_element(:css, 'label[for="pseudonym_unique_id"]').text.should == "CAS Username:*"
     end
 
     it "should be able to create a new course" do
@@ -133,7 +133,12 @@ describe "account" do
     end
 
     it "should be able to create a new course when no other courses exist" do
-      Account.default.courses.each { |c| c.enrollments.scoped.delete_all; c.destroy! }
+      Account.default.courses.each do |c|
+        c.course_account_associations.scoped.delete_all
+        c.enrollments.scoped.delete_all
+        c.course_sections.scoped.delete_all
+        c.destroy!
+      end
 
       get "/accounts/#{Account.default.to_param}"
       f('.add_course_link').click

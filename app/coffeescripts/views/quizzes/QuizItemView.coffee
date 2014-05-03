@@ -3,9 +3,11 @@ define [
   'jquery'
   'underscore'
   'Backbone'
+  'compiled/views/PublishIconView'
+  'compiled/views/assignments/DateDueColumnView'
+  'compiled/views/assignments/DateAvailableColumnView'
   'jst/quizzes/QuizItemView'
-  'jst/_vddTooltip'
-], (I18n, $, _, Backbone, template) ->
+], (I18n, $, _, Backbone, PublishIconView, DateDueColumnView, DateAvailableColumnView, template) ->
 
   class ItemView extends Backbone.View
 
@@ -14,7 +16,9 @@ define [
     tagName:   'li'
     className: 'quiz'
 
-    @child 'publishIconView', '[data-view=publish-icon]'
+    @child 'publishIconView',         '[data-view=publish-icon]'
+    @child 'dateDueColumnView',       '[data-view=date-due]'
+    @child 'dateAvailableColumnView', '[data-view=date-available]'
 
     events:
       'click': 'clickRow'
@@ -25,8 +29,18 @@ define [
       multipleDates: I18n.t('multiple_due_dates', 'Multiple Dates')
 
     initialize: (options) ->
+      @initializeChildViews()
       @observeModel()
       super
+
+    initializeChildViews: ->
+      @publishIconView = false
+
+      if @canManage()
+        @publishIconView = new PublishIconView(model: @model)
+
+      @dateDueColumnView       = new DateDueColumnView(model: @model)
+      @dateAvailableColumnView = new DateAvailableColumnView(model: @model)
 
     # make clicks follow through to url for entire row
     clickRow: (e) =>
@@ -54,6 +68,9 @@ define [
 
     upatePublishState: =>
       @$('.ig-row').toggleClass('ig-published', @model.get('published'))
+
+    canManage: ->
+      ENV.PERMISSIONS.manage
 
     toJSON: ->
       base = _.extend(@model.toJSON(), @options)

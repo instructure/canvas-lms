@@ -254,7 +254,7 @@ shared_examples_for "file uploads api" do
 end
 
 shared_examples_for "file uploads api with folders" do
-  it_should_behave_like "file uploads api"
+  include_examples "file uploads api"
 
   it "should allow specifying a folder with deprecated argument name" do
     preflight({ :name => "with_path.txt", :folder => "files/a/b/c/mypath" })

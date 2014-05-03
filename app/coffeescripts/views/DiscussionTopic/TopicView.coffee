@@ -6,13 +6,14 @@ define [
   'compiled/models/DiscussionTopic'
   'compiled/views/DiscussionTopic/EntriesView'
   'compiled/views/DiscussionTopic/EntryView'
+  'compiled/views/PublishButtonView',
   'jst/discussions/_reply_form'
   'compiled/discussions/Reply'
   'compiled/widget/assignmentRubricDialog'
   'compiled/util/wikiSidebarWithMultipleEditors'
   'jquery.instructure_misc_helpers' #scrollSidebar
   'str/htmlEscape'
-], (I18n, $, Backbone, _, DiscussionTopic, EntriesView, EntryView, replyTemplate, Reply, assignmentRubricDialog, htmlEscape) ->
+], (I18n, $, Backbone, _, DiscussionTopic, EntriesView, EntryView, PublishButtonView, replyTemplate, Reply, assignmentRubricDialog, htmlEscape) ->
 
   class TopicView extends Backbone.View
 
@@ -27,10 +28,12 @@ define [
       'click .rte_switch_views_link': 'toggleEditorMode'
       'click .topic-subscribe-button': 'subscribeTopic'
       'click .topic-unsubscribe-button': 'unsubscribeTopic'
+      'click .mark_all_as_read': 'markAllAsRead'
+      'click .mark_all_as_unread': 'markAllAsUnread'
 
     els:
       '.add_root_reply': '$addRootReply'
-      '#discussion_topic': '$topic'
+      '.topic .discussion-entry-reply-area': '$replyLink'
       '.due_date_wrapper': '$dueDates'
       '.reply-textarea:first': '$textarea'
       '#discussion-toolbar': '$discussionToolbar'
@@ -38,6 +41,7 @@ define [
       '.topic-unsubscribe-button': '$unsubscribeButton'
 
     initialize: ->
+      super
       @model.set 'id', ENV.DISCUSSION.TOPIC.ID
       # overwrite cid so Reply::getModelAttributes gets the right "go to parent" link
       @model.cid = 'main'
@@ -52,12 +56,13 @@ define [
 
       # catch when non-root replies are added so we can twiddle the subscribed button
       EntryView.on('addReply', => @setSubscribed(true))
+      $(window).on('keydown', @handleKeyDown)
 
     hideIfFiltering: =>
       if @filterModel.hasFilter()
-        @$topic.addClass 'hidden'
+        @$replyLink.addClass 'hidden'
       else
-        @$topic.removeClass 'hidden'
+        @$replyLink.removeClass 'hidden'
 
     afterRender: ->
       super
@@ -65,6 +70,9 @@ define [
       assignmentRubricDialog.initTriggers()
       @$el.toggleClass 'side_comment_discussion', !ENV.DISCUSSION.THREADED
       @subscriptionStatusChanged()
+      if $el = @$('#topic_publish_button')
+        @topic.set(unpublishable: ENV.DISCUSSION.TOPIC.CAN_UNPUBLISH, published: ENV.DISCUSSION.TOPIC.IS_PUBLISHED)
+        new PublishButtonView(model: @topic, el: $el).render()
 
     filter: @::afterRender
 
@@ -85,6 +93,9 @@ define [
       event.preventDefault()
       event.stopPropagation()
       @$textarea.editorBox('toggle')
+      # hide the clicked link, and show the other toggle link.
+      # todo: replace .andSelf with .addBack when JQuery is upgraded.
+      $(event.currentTarget).siblings('.rte_switch_views_link').andSelf().toggle()
 
     subscribeTopic: (event) ->
       event.preventDefault()
@@ -154,6 +165,7 @@ define [
       if ENV.DISCUSSION.PERMISSIONS.CAN_REPLY
         modelData = @model.toJSON()
         modelData.showBoxReplyLink = true
+        modelData.root = true
         html = replyTemplate modelData
         @$('#discussion_topic').append html
       super
@@ -164,9 +176,22 @@ define [
         htmlEscape value
 
     addRootReply: (event) ->
-      $el = @$ event.currentTarget
       target = $('#discussion_topic .discussion-reply-form')
       @addReply event
       $('html, body').animate scrollTop: target.offset().top - 100
 
+    markAllAsRead: (event) ->
+      event.preventDefault()
+      @trigger 'markAllAsRead'
 
+    markAllAsUnread: (event) ->
+      event.preventDefault()
+      @trigger 'markAllAsUnread'
+
+    handleKeyDown: (e) =>
+      nodeName = e.target.nodeName.toLowerCase()
+      return if nodeName == 'input' || nodeName == 'textarea'
+      return if e.which != 78 # n
+      @addRootReply(e)
+      e.preventDefault()
+      e.stopPropagation()

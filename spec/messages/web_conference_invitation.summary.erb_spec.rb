@@ -22,13 +22,13 @@ require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 describe 'web_conference_invitation.summary' do
   before do
     # these specs need an enabled web conference plugin
-    @plugin = PluginSetting.find_or_create_by_name('dim_dim')
+    @plugin = PluginSetting.find_or_create_by_name('wimba')
     @plugin.update_attribute(:settings, { :domain => 'www.example.com' })
   end
 
   it "should render" do
     course_model(:reusable => true)
-    @object = @course.web_conferences.create!(:conference_type => 'DimDim', :user => user)
+    @object = @course.web_conferences.create!(:conference_type => 'Wimba', :user => user)
     generate_message(:web_conference_invitation, :summary, @object)
   end
 end

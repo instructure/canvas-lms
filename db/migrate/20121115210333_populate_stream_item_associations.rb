@@ -1,6 +1,6 @@
 class PopulateStreamItemAssociations < ActiveRecord::Migration
   tag :postdeploy
-  self.transactional = false
+  disable_ddl_transaction!
 
   def self.up
     # the drop migration now exists, so this can no longer run async

@@ -317,6 +317,7 @@ define([
                   },
                   'class': "image_link",
                   src: image_url,
+                  tabindex: "0",
                   title: "embed " + (photo.title || ""),
                   alt: photo.title || ""
                 }))
@@ -330,14 +331,27 @@ define([
         // this request will be handled by window.jsonFlickerApi()
         $.getScript("https://secure.flickr.com/services/rest/?method=flickr.photos.search&format=json&api_key=734839aadcaa224c4e043eaf74391e50&per_page=25&license=1,2,3,4,5,6&sort=relevance&text=" + query);
       });
-      $dialog.delegate('.image_link', 'click', function(event) {
-        event.preventDefault();
+
+      var insertImage = function(image){
         $dialog.dialog('close');
         callback({
-          image_url: $(this).data('big_image_url') || $(this).attr('src'),
-          link_url: $(this).data('source'),
-          title: $(this).attr('alt')
+          image_url: $(image).data('big_image_url') || $(image).attr('src'),
+          link_url: $(image).data('source'),
+          title: $(image).attr('alt')
         });
+      }
+
+      $dialog.delegate('.image_link', 'click', function(event) {
+        event.preventDefault();
+        insertImage(this);
+      });
+
+      $dialog.delegate('.image_link','keyup', function(event) {
+        event.preventDefault();
+        var code = event.keyCode || event.which;
+        if(code == 13) { //Enter keycode
+          insertImage(this);
+        }
       });
     }
     $dialog.find("form img").attr('src', '/images/' + service_type + '_small_icon.png');

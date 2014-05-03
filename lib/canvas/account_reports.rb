@@ -16,9 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'zip/zip'
+require 'zip'
+require 'action_controller_test_process'
 
 module Canvas::AccountReports
+
   REPORTS = {}
 
   # account id is ignored; use PluginSetting to enable a subset of reports
@@ -46,8 +48,8 @@ module Canvas::AccountReports
       REPORTS[account_report.report_type][:proc].call(account_report)
     rescue => e
       account_report.logger.error e
-      er = ErrorReport.log_exception(:default, e, :user => account_report.user)
-      self.message_recipient(account_report, "Generating the report, #{account_report.report_type.to_s.titleize}, failed.  Please report the following error code to your system administrator: ErrorReport:#{er.id}")
+      @er = ErrorReport.log_exception(nil, e, :user => account_report.user)
+      self.message_recipient(account_report, "Generating the report, #{account_report.report_type.to_s.titleize}, failed.  Please report the following error code to your system administrator: ErrorReport:#{@er.id}")
     end
   end
 
@@ -62,11 +64,7 @@ module Canvas::AccountReports
     filepath
   end
 
-  def self.message_recipient(account_report, message, csv=nil)
-    user = account_report.user
-    account = account_report.account
-    notification = Notification.by_name("Report Generated")
-    notification = Notification.by_name("Report Generation Failed") if !csv
+  def self.report_attachment(account_report, csv=mil)
     attachment = nil
     if csv.is_a? Hash
       filename = generate_file_name(account_report, "zip")
@@ -74,16 +72,15 @@ module Canvas::AccountReports
       filepath = temp.path
       temp.close!
 
-      Zip::ZipFile.open(filepath, Zip::ZipFile::CREATE) do |zipfile|
+      Zip::File.open(filepath, Zip::File::CREATE) do |zipfile|
         csv.each do |report_name, contents|
-          zipfile.get_output_stream(report_name + ".csv") { |f| f << contents }
+          zipfile.add(report_name + ".csv", contents)
         end
+        zipfile.close
         zipfile
       end
       filetype = 'application/zip'
     elsif csv
-      require 'action_controller'
-      require 'action_controller/test_process.rb'
       ext = csv !~ /\n/ && File.extname(csv)
       case ext
         when ".csv"
@@ -106,19 +103,32 @@ module Canvas::AccountReports
       end
     end
     if filename
-      attachment = account.attachments.create!(
-        :uploaded_data => ActionController::TestUploadedFile.new(filepath, filetype, true),
+      attachment = account_report.account.attachments.create!(
+        :uploaded_data => Rack::Test::UploadedFile.new(filepath, filetype, true),
         :display_name => filename,
-        :user => user
+        :user => account_report.user
       )
     end
+    attachment.uploaded_data = Rack::Test::UploadedFile.new(filepath, filetype, true)
+    attachment.save
+    attachment
+  end
+
+  def self.message_recipient(account_report, message, csv=nil)
+    notification = Notification.by_name("Report Generated")
+    notification = Notification.by_name("Report Generation Failed") if !csv
+    attachment = report_attachment(account_report, csv) if csv
     account_report.message = message
+    account_report.parameters ||= {}
+    account_report.parameters["extra_text"] = (I18n.t('account_reports.default.error_text',
+      "Failed, please report the following error code to your system administrator: ErrorReport:%{error};",
+      :error => @er.id)) if !csv
     account_report.attachment = attachment
     account_report.workflow_state = csv ? 'complete' : 'error'
     account_report.update_attribute(:progress, 100)
     account_report.end_at ||= Time.now
     account_report.save
-    notification.create_message(account_report, [user])
+    notification.create_message(account_report, [account_report.user])
     message
   end
 

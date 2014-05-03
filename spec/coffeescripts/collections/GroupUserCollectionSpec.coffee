@@ -1,7 +1,11 @@
 define [
   'compiled/collections/GroupUserCollection'
+  'compiled/collections/UnassignedGroupUserCollection'
+  'compiled/models/GroupCategory'
+  'compiled/models/GroupUser'
+  'compiled/models/Group'
   'Backbone'
-], (GroupUserCollection, {Model}) ->
+], (GroupUserCollection, UnassignedGroupUserCollection, GroupCategory, GroupUser, Group, {Collection}) ->
 
   source = null
   target = null
@@ -9,15 +13,18 @@ define [
 
   module 'GroupUserCollection',
     setup: ->
+      group = new Group(id: 1)
+      category = new GroupCategory()
+      category._groups = new Collection([group])
       users = [
-        new Model(id: 1, name: "bob", sortable_name: "bob", groupId: null),
-        new Model(id: 2, name: "joe", sortable_name: "joe", groupId: null)
+        new GroupUser(id: 1, name: "bob", sortable_name: "bob", groupId: null),
+        new GroupUser(id: 2, name: "joe", sortable_name: "joe", groupId: null)
       ]
-      source = new GroupUserCollection(users, groupId: null)
-      target = new GroupUserCollection([], groupId: 1)
-
-    teardown: ->
-      GroupUserCollection.collectionMap = {}
+      source = new UnassignedGroupUserCollection users, {category}
+      category._unassignedUsers = source
+      target = new GroupUserCollection null, {group, category}
+      target.loaded = true
+      group._users = target
 
   test "moves user to target group's collection when groupId changes", ->
     users[0].set('groupId', 1)

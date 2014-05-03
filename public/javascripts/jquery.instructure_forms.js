@@ -312,8 +312,8 @@ define([
           (options.upload_error || options.error).call($this, data);
         }
         } finally {}
-        
-      }, function() { 
+
+      }, function() {
         return (options.upload_error || options.error).apply(this, arguments);
       });
     };
@@ -446,30 +446,30 @@ define([
           options.error.call(this, "aborted by the user", xhr, event);
         }
       }, false);
-      xhr.onreadystatechange = function(event) {
-        if(xhr.readyState == 4) {
-          var json = null;
-          try {
-            json = $.parseJSON(xhr.responseText);
-          } catch(e) { }
-          if($.httpSuccess(xhr)) {
-            if(json && !json.errors) {
-              if(options.success && $.isFunction(options.success)) {
-                options.success.call(this, json, xhr, event);
-              }
-            } else {
-              if(options.error && $.isFunction(options.error)) {
-                options.error.call(this, json || xhr.responseText, xhr, event);
-              }
+    }
+    xhr.onreadystatechange = function(event) {
+      if(xhr.readyState == 4) {
+        var json = null;
+        try {
+          json = $.parseJSON(xhr.responseText);
+        } catch(e) { }
+        if($.httpSuccess(xhr)) {
+          if(json && !json.errors) {
+            if(options.success && $.isFunction(options.success)) {
+              options.success.call(this, json, xhr, event);
             }
           } else {
             if(options.error && $.isFunction(options.error)) {
               options.error.call(this, json || xhr.responseText, xhr, event);
             }
           }
+        } else {
+          if(options.error && $.isFunction(options.error)) {
+            options.error.call(this, json || xhr.responseText, xhr, event);
+          }
         }
-      };
-    }
+      }
+    };
     xhr.open(method, url);
     xhr.setRequestHeader('Accept', 'application/json, text/javascript, */*');
     xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
@@ -974,7 +974,7 @@ define([
       lastField = $obj;
     });
     if (lastField) {lastField.focus();}
-    for(var idx in elementErrors) {
+    for(var idx=0, l=elementErrors.length; idx < l; idx++) {
       var $obj = elementErrors[idx][0];
       var msg = elementErrors[idx][1];
       hasErrors = true;
@@ -1006,13 +1006,19 @@ define([
                           "<img src='/images/error_bottom.png' class='error_bottom'/>" +
                         "</div>").appendTo("body");
       }
-      var $box = $template.clone(true).attr('id', '').css('zIndex', $obj.zIndex() + 1).appendTo("body");
-      $box.find(".error_text").html(message);
       // it'd be more semantic to make the error_box have a role=alert but that doesn't work everywhere
       // http://blog.paciellogroup.com/2012/06/html5-accessibility-chops-aria-rolealert-browser-support/
       // we also have to add aria_alerts to the layout itself, since creating
       // it dynamically means VoiceOver won't read it
-      $('#aria_alerts').append($('<div/>').html(message));
+
+      // if there is no container for ARIA alerts, add the role to the template, so it at least works for some users.
+      if ($('#aria_alerts').length === 0) {
+        $template.find(".error_text").attr('role', 'alert');
+      } else {
+        $('#aria_alerts').append($('<div/>').html(message));
+      }
+      var $box = $template.clone(true).attr('id', '').css('zIndex', $obj.zIndex() + 1).appendTo("body");
+      $box.find(".error_text").html(message);
 
       var offset = $obj.offset();
       var height = $box.outerHeight();
@@ -1025,21 +1031,25 @@ define([
         left: offset.left + objLeftIndent
       }).fadeIn('fast');
 
-      var fade = function() {
-        $box.fadeOut('slow', function() {
-          $box.remove();
-        });
+      var cleanup = function() {
+        $box.remove();
+        $obj.removeData('associated_error_box');
+        $obj.removeData('associated_error_object');
       };
+
+      var fade = function() {
+        $box.stop(true,true).fadeOut('slow', cleanup);
+      };
+
       $obj.data({
         associated_error_box :$box,
         associated_error_object: $obj
       }).click(fade).keypress(fade);
 
       $box.click(function() {
-        $(this).fadeOut('fast', function() {
-          $(this).remove();
-        });
+        $(this).fadeOut('fast', cleanup);
       });
+
       $.fn.errorBox.errorBoxes.push($obj);
       if(!$.fn.errorBox.isBeingAdjusted) {
         $.moveErrorBoxes();

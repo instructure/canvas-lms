@@ -1,7 +1,8 @@
 define [
+  'jquery'
   'i18n!calendar'
   'jst/calendar/TimeBlockRow'
-], (I18n, timeBlockRowTemplate) ->
+], ($, I18n, timeBlockRowTemplate) ->
 
   class TimeBlockRow
     constructor: (@TimeBlockList, data={}) ->
@@ -44,6 +45,8 @@ define [
       @$row.remove()
       # tell the list that I was removed
       @TimeBlockList.rowRemoved(this)
+      # Send the keyboard focus to a reasonable location.
+      $('input.date_field:visible').focus()
 
     focus: =>
       @$row.addClass('focused')

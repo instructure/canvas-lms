@@ -18,6 +18,7 @@
 
 class SubmissionComment < ActiveRecord::Base
   include SendToStream
+  include HtmlTextHelper
 
   belongs_to :submission #, :touch => true
   belongs_to :author, :class_name => 'User'
@@ -151,13 +152,17 @@ class SubmissionComment < ActiveRecord::Base
   end
 
   def attachments=(attachments)
-    # Accept attachments that were already approved, those that were just created
-    # or those that were part of some outside context.  This is all to prevent
-    # one student from sneakily getting access to files in another user's comments,
-    # since they're all being held on the assignment for now.
+    # Accept attachments that were already approved, just created, or approved
+    # elsewhere.  This is all to prevent one student from sneakily getting
+    # access to files in another user's comments, since they're all being held
+    # on the assignment for now.
     attachments ||= []
     old_ids = (self.attachment_ids || "").split(",").map{|id| id.to_i}
-    write_attribute(:attachment_ids, attachments.select{|a| old_ids.include?(a.id) || a.recently_created || a.context != self.submission.assignment }.map{|a| a.id}.join(","))
+    write_attribute(:attachment_ids, attachments.select { |a|
+      old_ids.include?(a.id) ||
+      a.recently_created ||
+      a.ok_for_submission_comment
+    }.map{|a| a.id}.join(","))
   end
 
   def infer_details
@@ -173,10 +178,16 @@ class SubmissionComment < ActiveRecord::Base
 
 
   def attachments
-    ids = (self.attachment_ids || "").split(",").map{|id| id.to_i}
+    ids = Set.new((attachment_ids || "").split(",").map { |id| id.to_i})
     attachments = associated_attachments
-    attachments += self.submission.assignment.attachments rescue []
-    attachments.select{|a| ids.include?(a.id) }
+    attachments += submission.assignment.attachments rescue []
+    attachments.select { |a| ids.include?(a.id) }
+  end
+
+  def self.preload_attachments(comments)
+    SubmissionComment.send :preload_associations, comments, [:associated_attachments, :submission]
+    submissions = comments.map(&:submission).uniq
+    Submission.send :preload_associations, submissions, :assignment => :attachments
   end
 
   def update_submission
@@ -190,7 +201,6 @@ class SubmissionComment < ActiveRecord::Base
     if formatted_body = read_attribute(:formatted_body)
       return formatted_body
     end
-    self.extend TextHelper
     res = format_message(comment).first
     res = truncate_html(res, :max_length => truncate, :words => true) if truncate
     res

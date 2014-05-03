@@ -42,28 +42,4 @@
         <%= t :installation_about, "To install the Canvas Facebook app, go to your profile page in Canvas and click the Facebook button to connect your account to Facebook." %>
       </p>
 <% end %>
-<% js_block do %>
-<script>
-require([
-  'jquery' /* $ */,
-  'jquery.instructure_misc_plugins' /* confirmDelete */
-], function($) {
-
-$(document).ready(function() {
-  $("#messages").delegate('.delete_link', 'click', function(event) {
-    event.preventDefault();
-    var $message = $(this).parents(".facebook_message");
-    $message.confirmDelete({
-      noMessage: true,
-      url: $(this).attr('rel'),
-      success: function() {
-        $(this).slideUp(function() {
-          $(this).remove();
-        });
-      }
-    });
-  });
-});
-});
-</script>
-<% end %>
+<% js_bundle 'legacy/facebook_index' %>

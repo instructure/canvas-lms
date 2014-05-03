@@ -1,0 +1,31 @@
+var require = {
+  baseUrl: '/base/public/javascripts',
+
+  paths: <%= paths %>,
+
+  // non-amd shims
+  shim: <%= shims %>,
+
+  packages: [
+    {
+      name: 'jqueryui',
+      location: 'vendor/jqueryui'
+    },
+    {
+      name: 'helpers',
+      location: '../../spec/javascripts/compiled/helpers',
+      main: 'helpers',
+      lib: './'
+    },
+    {
+      name: 'support',
+      location: '../../spec/javascripts/support',
+      main: 'support',
+      lib: './'
+    },
+    {
+      name: 'spec',
+      location: '../../spec'
+    },
+  ].concat(<%= packages %>)
+};

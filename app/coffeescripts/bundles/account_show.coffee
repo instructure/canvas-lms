@@ -1,4 +1,4 @@
-require ['compiled/behaviors/autocomplete'], ->
+require ['jquery', 'compiled/behaviors/autocomplete'], ($) ->
   $(document).ready ->
     # Add an on-select event to the course name autocomplete.
     $('#course_name').on 'autocompleteselect', (e, ui) ->

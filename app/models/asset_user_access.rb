@@ -146,11 +146,9 @@ class AssetUserAccess < ActiveRecord::Base
 
   def asset
     asset_code, general = self.asset_code.split(":").reverse
-    code_split = asset_code.split("_")
     asset = Context.find_asset_by_asset_string(asset_code, context)
     asset
   end
-  memoize :asset
 
   def asset_class_name
     self.asset.class.name.underscore if self.asset
@@ -178,9 +176,21 @@ class AssetUserAccess < ActiveRecord::Base
 
   def self.infer_asset(code)
     asset_code, general = code.split(":").reverse
-    code_split = asset_code.split("_")
     asset = Context.find_asset_by_asset_string(asset_code)
     asset
+  end
+
+  # For Quizzes, we want the view score not to include the participation score
+  # so it reflects the number of times a student really just browsed the quiz.
+  def corrected_view_score
+    deductible_points = 0
+
+    if 'quizzes' == self.asset_group_code
+      deductible_points = self.participate_score || 0
+    end
+
+    self.view_score ||= 0
+    self.view_score -= deductible_points
   end
 
   private

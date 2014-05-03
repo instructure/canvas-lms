@@ -22,14 +22,14 @@ class AssignmentGroup < ActiveRecord::Base
 
   attr_accessible :name, :rules, :assignment_weighting_scheme, :group_weight, :position, :default_assignment_name
   attr_readonly :context_id, :context_type
-  acts_as_list :scope => 'assignment_groups.context_type = #{connection.quote(context_type)} AND assignment_groups.context_id = #{context_id} AND assignment_groups.workflow_state <> \'deleted\''
+  belongs_to :context, :polymorphic => true
+  acts_as_list scope: { context: self, workflow_state: 'available' }
   has_a_broadcast_policy
 
   has_many :assignments, :order => 'position, due_at, title', :dependent => :destroy
   has_many :active_assignments, :class_name => 'Assignment', :conditions => ['assignments.workflow_state != ?', 'deleted'], :order => 'assignments.position, assignments.due_at, assignments.title'
+  has_many :published_assignments, :class_name => 'Assignment', :conditions => "assignments.workflow_state = 'published'", :order => 'assignments.position, assignments.due_at, assignments.title'
 
-  belongs_to :context, :polymorphic => true
-  belongs_to :cloned_item
   validates_presence_of :context_id, :context_type, :workflow_state
   validates_length_of :rules, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :default_assignment_name, :maximum => maximum_string_length, :allow_nil => true
@@ -37,24 +37,24 @@ class AssignmentGroup < ActiveRecord::Base
 
   before_save :set_context_code
   before_save :generate_default_values
-  before_save :group_weight_changed
   after_save :course_grading_change
   after_save :touch_context
   after_save :update_student_grades
 
   def generate_default_values
-    self.name ||= t 'default_title', "Assignments"
+    if self.name.blank?
+      self.name = t 'default_title', "Assignments"
+    end
     if !self.group_weight
       self.group_weight = 0
     end
-    @grades_changed = self.rules_changed? || self.group_weight_changed?
     self.default_assignment_name = self.name
     self.default_assignment_name = self.default_assignment_name.singularize if I18n.locale == :en
   end
   protected :generate_default_values
 
   def update_student_grades
-    if @grades_changed
+    if self.rules_changed? || self.group_weight_changed?
       connection.after_transaction_commit { self.context.recompute_student_scores }
     end
   end
@@ -64,10 +64,10 @@ class AssignmentGroup < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user, session| self.context.grants_rights?(user, session, :read, :view_all_grades).any?(&:last) }
+    given { |user, session| self.context.grants_rights?(user, session, :read, :view_all_grades, :manage_grades).any?(&:last) }
     can :read
 
-    given { |user, session| self.context.grants_rights?(user, session, :manage_assignments, :manage_grades).any?(&:last) }
+    given { |user, session| self.context.grants_rights?(user, session, :manage_assignments).any?(&:last) }
     can :read and can :create and can :update and can :delete
   end
 
@@ -97,7 +97,7 @@ class AssignmentGroup < ActiveRecord::Base
     to_restore.each { |assignment| assignment.restore(:assignment_group) }
   end
 
-  def rules_hash
+  def rules_hash (options={})
     return @rules_hash if @rules_hash
     @rules_hash = {}.with_indifferent_access
     (rules || "").split("\n").each do |rule|
@@ -105,7 +105,7 @@ class AssignmentGroup < ActiveRecord::Base
       if split.length > 1
         if split[0] == 'never_drop'
           @rules_hash[split[0]] ||= []
-          @rules_hash[split[0]] << split[1].to_i
+          @rules_hash[split[0]] << (options[:stringify_json_ids] ? split[1].to_s : split[1].to_i)
         else
           @rules_hash[split[0]] = split[1].to_i
         end
@@ -144,13 +144,8 @@ class AssignmentGroup < ActiveRecord::Base
   scope :for_context_codes, lambda { |codes| active.where(:context_code => codes).order(:position) }
   scope :for_course, lambda { |course| where(:context_id => course, :context_type => 'Course') }
 
-  def group_weight_changed
-    @group_weight_changed = self.group_weight_changed?
-    true
-  end
-
   def course_grading_change
-    self.context.grade_weight_changed! if @group_weight_changed && self.context && self.context.group_weighting_scheme == 'percent'
+    self.context.grade_weight_changed! if group_weight_changed? && self.context && self.context.group_weighting_scheme == 'percent'
     true
   end
 
@@ -161,27 +156,6 @@ class AssignmentGroup < ActiveRecord::Base
       false &&
       record.changed_in_state(:available, :fields => :group_weight)
     }
-  end
-
-  attr_accessor :clone_updated
-  def clone_for(context, dup=nil, options={})
-    if !self.cloned_item && !self.new_record?
-      self.cloned_item ||= ClonedItem.create(:original_item => self)
-      self.save
-    end
-    existing = context.assignment_groups.active.find_by_id(self.id)
-    existing ||= context.assignment_groups.active.find_by_cloned_item_id(self.cloned_item_id || 0)
-    return existing if existing && !options[:overwrite]
-    dup ||= AssignmentGroup.new
-    dup = existing if existing && options[:overwrite]
-    self.attributes.delete_if{|k,v| [:id, :position].include?(k.to_sym) }.each do |key, val|
-      dup.send("#{key}=", val)
-    end
-    dup.context = context
-    context.log_merge_result("Assignment Group \"#{self.name}\" created")
-    dup.updated_at = Time.now
-    dup.clone_updated = true
-    dup
   end
 
   def students
@@ -291,4 +265,11 @@ class AssignmentGroup < ActiveRecord::Base
     self.reload
   end
 
+  def self.assignment_scope_for_grading(context)
+    if context.feature_enabled?(:draft_state)
+      :published_assignments
+    else
+      :active_assignments
+    end
+  end
 end

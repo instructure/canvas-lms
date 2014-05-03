@@ -10,7 +10,7 @@ define([
     clearTestLDAP();
     $("#test_ldap_dialog").dialog({
       title: I18n.t('test_ldap_dialog_title', "Test LDAP Settings"),
-      width: 500
+      width: 600
     });
     ENV.LDAP_TESTS[0].js_function();
   }

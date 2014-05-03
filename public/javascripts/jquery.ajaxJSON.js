@@ -100,6 +100,10 @@ define([
     if(options && options.timeout) {
       params.timeout = options.timeout;
     }
+    if(options && options.contentType) {
+      params.contentType = options.contentType;
+    }
+
     var xhr = $.ajax(params);
     $.ajaxJSON.storeRequest(xhr, url, submit_type, data);
     return xhr;

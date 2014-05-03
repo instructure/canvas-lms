@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -104,6 +104,8 @@ class Account < ActiveRecord::Base
   include StickySisFields
   are_sis_sticky :name
 
+  include FeatureFlags
+
   def default_locale(recurse = false)
     read_attribute(:default_locale) ||
     (recurse && parent_account ? parent_account.default_locale(true) : nil)
@@ -111,23 +113,22 @@ class Account < ActiveRecord::Base
 
   cattr_accessor :account_settings_options
   self.account_settings_options = {}
-  
-  # I figure we're probably going to be adding more account-level
-  # settings in the future (and moving some of the column attributes
-  # to the settings hash), so it makes sense to have a general way
-  # of defining what settings are allowed when.  Somebody please tell
-  # me if I'm overarchitecting...
+
   def self.add_setting(setting, opts=nil)
     self.account_settings_options[setting.to_sym] = opts || {}
     if (opts && opts[:boolean] && opts.has_key?(:default))
       if opts[:default]
+        # if the default is true, we want a nil result to evaluate to true.
+        # this prevents us from having to backfill true values into a
+        # serialized column, which would be expensive.
         self.class_eval "def #{setting}?; settings[:#{setting}] != false; end"
       else
+        # if the default is not true, we can fall back to a straight boolean.
         self.class_eval "def #{setting}?; !!settings[:#{setting}]; end"
       end
     end
   end
-  
+
   # these settings either are or could be easily added to
   # the account settings page
   add_setting :global_includes, :root_only => true, :boolean => true, :default => false
@@ -140,6 +141,7 @@ class Account < ActiveRecord::Base
   add_setting :restrict_student_future_view, :boolean => true, :root_only => true, :default => false
   add_setting :teachers_can_create_courses, :boolean => true, :root_only => true, :default => false
   add_setting :students_can_create_courses, :boolean => true, :root_only => true, :default => false
+  add_setting :restrict_quiz_questions, :boolean => true, :root_only => true, :default => false
   add_setting :no_enrollments_can_create_courses, :boolean => true, :root_only => true, :default => false
   add_setting :allow_sending_scores_in_emails, :boolean => true, :root_only => true
   add_setting :support_url, :root_only => true
@@ -151,12 +153,10 @@ class Account < ActiveRecord::Base
   add_setting :users_can_edit_name, :boolean => true, :root_only => true
   add_setting :open_registration, :boolean => true, :root_only => true
   add_setting :enable_scheduler, :boolean => true, :root_only => true, :default => false
-  add_setting :enable_draft, :boolean => true, :root_only => true, :default => false
-  add_setting :allow_draft, :boolean => true, :root_only => true, :default => false
   add_setting :calendar2_only, :boolean => true, :root_only => true, :default => false
   add_setting :show_scheduler, :boolean => true, :root_only => true, :default => false
   add_setting :enable_profiles, :boolean => true, :root_only => true, :default => false
-  add_setting :enable_manage_groups2, :boolean => true, :root_only => true, :default => false
+  add_setting :enable_manage_groups2, :boolean => true, :root_only => true, :default => true
   add_setting :mfa_settings, :root_only => true
   add_setting :canvas_authentication, :boolean => true, :root_only => true
   add_setting :admins_can_change_passwords, :boolean => true, :root_only => true, :default => false
@@ -172,9 +172,16 @@ class Account < ActiveRecord::Base
   # invitation.
   add_setting :allow_invitation_previews, :boolean => true, :root_only => true, :default => false
   add_setting :self_registration, :boolean => true, :root_only => true, :default => false
+  # if self_registration_type is 'observer', then only observers (i.e. parents) can self register.
+  # if self_registration_type is 'all' or nil, any user type can self register.
+  add_setting :self_registration_type, :root_only => true
   add_setting :large_course_rosters, :boolean => true, :root_only => true, :default => false
   add_setting :edit_institution_email, :boolean => true, :root_only => true, :default => true
-  add_setting :enable_quiz_regrade, :boolean => true, :root_only => true, :default => false
+  add_setting :enable_fabulous_quizzes, :boolean => true, :root_only => true, :default => false
+  add_setting :js_kaltura_uploader, :boolean => true, :root_only => true, :default => false
+  add_setting :google_docs_domain, root_only: true
+  add_setting :dashboard_url, root_only: true
+  add_setting :product_name, root_only: true
 
   def settings=(hash)
     if hash.is_a?(Hash)
@@ -202,6 +209,10 @@ class Account < ActiveRecord::Base
       end
     end
     settings
+  end
+
+  def product_name
+    settings[:product_name] || t("#product_name", "Canvas")
   end
 
   def allow_global_includes?
@@ -234,16 +245,26 @@ class Account < ActiveRecord::Base
     !!settings[:self_registration] && canvas_authentication?
   end
 
+  def self_registration_type
+    settings[:self_registration_type]
+  end
+
+  def self_registration_allowed_for?(type)
+    return false unless self_registration?
+    return false if self_registration_type && self_registration_type != 'all' && type != self_registration_type
+    true
+  end
+
   def terms_of_use_url
-    Setting.get_cached('terms_of_use_url', 'http://www.instructure.com/policies/terms-of-use')
+    Setting.get('terms_of_use_url', 'http://www.instructure.com/policies/terms-of-use')
   end
 
   def privacy_policy_url
-    Setting.get_cached('privacy_policy_url', 'http://www.instructure.com/policies/privacy-policy-instructure')
+    Setting.get('privacy_policy_url', 'http://www.instructure.com/policies/privacy-policy-instructure')
   end
 
   def terms_required?
-    Setting.get_cached('terms_required', 'true') == 'true'
+    Setting.get('terms_required', 'true') == 'true'
   end
 
   def require_acceptance_of_terms?(user)
@@ -276,7 +297,7 @@ class Account < ActiveRecord::Base
   end
   
   def ensure_defaults
-    self.uuid ||= AutoHandle.generate_securish_uuid
+    self.uuid ||= CanvasUuid::Uuid.generate_securish_uuid
     self.lti_guid ||= self.uuid if self.respond_to?(:lti_guid)
   end
 
@@ -332,6 +353,10 @@ class Account < ActiveRecord::Base
   def domain
     HostUrl.context_host(self)
   end
+
+  def self.find_by_domain(domain)
+    self.default if HostUrl.default_host == domain
+  end
   
   def root_account?
     !self.root_account_id
@@ -360,7 +385,7 @@ class Account < ActiveRecord::Base
   end
 
   def users_visible_to(user)
-    self.grants_right?(user, nil, :read) ? self.all_users : self.all_users.where("?", false)
+    self.grants_right?(user, nil, :read) ? self.all_users : self.all_users.none
   end
 
   def users_name_like(query="")
@@ -369,7 +394,14 @@ class Account < ActiveRecord::Base
   end
 
   def associated_courses
-    Course.shard(shard).where("EXISTS (SELECT 1 FROM course_account_associations WHERE course_id=courses.id AND account_id=?)", self)
+    scope = if CANVAS_RAILS2
+      Course.shard(shard)
+    else
+      shard.activate do
+        Course.scoped
+      end
+    end
+    scope.where("EXISTS (SELECT 1 FROM course_account_associations WHERE course_id=courses.id AND account_id=?)", self)
   end
 
   def fast_course_base(opts)
@@ -396,22 +428,13 @@ class Account < ActiveRecord::Base
     @cached_fast_all_users[limit] ||= self.all_users(limit).active.select("users.id, users.name, users.sortable_name").order_by_sortable_name
   end
 
-  def users_not_in_groups_sql(groups, opts={})
-    ["SELECT users.id, users.name
-        FROM users
-       INNER JOIN user_account_associations uaa on uaa.user_id = users.id
-       WHERE uaa.account_id = ? AND users.workflow_state != 'deleted'
-       #{Group.not_in_group_sql_fragment(groups)}
-       #{"ORDER BY #{opts[:order_by]}" if opts[:order_by].present?}", self.id]
-  end
-
-  def users_not_in_groups(groups)
-    User.find_by_sql(users_not_in_groups_sql(groups))
-  end
-  
-  def paginate_users_not_in_groups(groups, page, per_page = 15)
-    User.paginate_by_sql(users_not_in_groups_sql(groups, :order_by => "#{User.sortable_name_order_by_clause('users')} ASC"),
-                         :page => page, :per_page => per_page)
+  def users_not_in_groups(groups, opts={})
+    scope = User.active.joins(:user_account_associations).
+      where(user_account_associations: {account_id: self}).
+      where(Group.not_in_group_sql_fragment(groups.map(&:id))).
+      select("users.id, users.name")
+    scope = scope.select(opts[:order]).order(opts[:order]) if opts[:order]
+    scope
   end
 
   def courses_name_like(query="", opts={})
@@ -444,14 +467,14 @@ class Account < ActiveRecord::Base
     Rails.cache.fetch(['current_quota', self].cache_key) do
       read_attribute(:storage_quota) ||
         (self.parent_account.default_storage_quota rescue nil) ||
-        Setting.get_cached('account_default_quota', 500.megabytes.to_s).to_i
+        Setting.get('account_default_quota', 500.megabytes.to_s).to_i
     end
   end
   
   def default_storage_quota
     read_attribute(:default_storage_quota) || 
       (self.parent_account.default_storage_quota rescue nil) ||
-      Setting.get_cached('account_default_quota', 500.megabytes.to_s).to_i
+      Setting.get('account_default_quota', 500.megabytes.to_s).to_i
   end
   
   def default_storage_quota_mb
@@ -522,29 +545,32 @@ class Account < ActiveRecord::Base
   end
 
   def account_chain(opts = {})
-    res = [self]
-
-    if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'postgresql'
-      self.shard.activate do
-        res.concat Account.find_by_sql(<<-SQL) if self.parent_account_id
-            WITH RECURSIVE t AS (
-              SELECT * FROM accounts WHERE id=#{self.parent_account_id}
-              UNION
-              SELECT accounts.* FROM accounts INNER JOIN t ON accounts.id=t.parent_account_id
-            )
-            SELECT * FROM t
-          SQL
+    unless @account_chain
+      res = [self]
+      if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'postgresql'
+        self.shard.activate do
+          res.concat Account.find_by_sql(<<-SQL) if self.parent_account_id
+              WITH RECURSIVE t AS (
+                SELECT * FROM accounts WHERE id=#{self.parent_account_id}
+                UNION
+                SELECT accounts.* FROM accounts INNER JOIN t ON accounts.id=t.parent_account_id
+              )
+              SELECT * FROM t
+            SQL
+        end
+      else
+        account = self
+        while account.parent_account
+          account = account.parent_account
+          res << account
+        end
       end
-    else
-      account = self
-      while account.parent_account
-        account = account.parent_account
-        res << account
-      end
+      res << self.root_account unless res.map(&:id).include?(self.root_account_id)
+      @account_chain = res.compact
     end
-    res << self.root_account unless res.map(&:id).include?(self.root_account_id)
-    res << Account.site_admin if opts[:include_site_admin] && !self.site_admin?
-    res.compact
+    results = @account_chain.dup
+    results << Account.site_admin if opts[:include_site_admin] && !self.site_admin?
+    results
   end
 
   def account_chain_loop
@@ -592,7 +618,6 @@ class Account < ActiveRecord::Base
   def account_chain_ids(opts={})
     account_chain(opts).map(&:id)
   end
-  memoize :account_chain_ids
 
   def membership_for_user(user)
     self.account_users.find_by_user_id(user && user.id)
@@ -667,12 +692,14 @@ class Account < ActiveRecord::Base
     return [] unless user
     @account_users_cache ||= {}
     if self == Account.site_admin
-      @account_users_cache[user] ||= Rails.cache.fetch('all_site_admin_account_users', :expires_in => 30.minutes) do
-        self.account_users.all
-      end.select { |au| au.user_id == user.id }.each { |au| au.account = self }
+      shard.activate do
+        @account_users_cache[user.global_id] ||= Rails.cache.fetch('all_site_admin_account_users') do
+          self.account_users.all
+        end.select { |au| au.user_id == user.id }.each { |au| au.account = self }
+      end
     else
       @account_chain_ids ||= self.account_chain(:include_site_admin => true).map { |a| a.active? ? a.id : nil }.compact
-      @account_users_cache[user] ||= Shard.partition_by_shard(@account_chain_ids) do |account_chain_ids|
+      @account_users_cache[user.global_id] ||= Shard.partition_by_shard(@account_chain_ids) do |account_chain_ids|
         if account_chain_ids == [Account.site_admin.id]
           Account.site_admin.account_users_for(user)
         else
@@ -680,8 +707,8 @@ class Account < ActiveRecord::Base
         end
       end
     end
-    @account_users_cache[user] ||= []
-    @account_users_cache[user]
+    @account_users_cache[user.global_id] ||= []
+    @account_users_cache[user.global_id]
   end
 
   # returns all account users for this entire account tree
@@ -716,7 +743,7 @@ class Account < ActiveRecord::Base
       result = false
 
       if !site_admin? && user
-        scope = user.enrollments.where(:root_account_id => root_account).where("enrollments.workflow_state<>'deleted'")
+        scope = root_account.enrollments.active.where(user_id: user)
         result = root_account.teachers_can_create_courses? &&
             scope.where(:type => ['TeacherEnrollment', 'DesignerEnrollment']).exists?
         result ||= root_account.students_can_create_courses? &&
@@ -741,7 +768,7 @@ class Account < ActiveRecord::Base
   alias_method :destroy!, :destroy
   def destroy
     self.workflow_state = 'deleted'
-    self.deleted_at = Time.now
+    self.deleted_at = Time.now.utc
     save!
   end
 
@@ -856,7 +883,7 @@ class Account < ActiveRecord::Base
   end
 
   def self.find_cached(id)
-    account = Rails.cache.fetch(account_lookup_cache_key(id), :expires_in => 1.hour) do
+    account = Rails.cache.fetch(account_lookup_cache_key(id)) do
       account = Account.find_by_id(id)
       account.precache if account
       account || :nil
@@ -960,17 +987,14 @@ class Account < ActiveRecord::Base
   def course_count
     self.child_courses.not_deleted.count('DISTINCT course_id')
   end
-  memoize :course_count
-  
+
   def sub_account_count
     self.sub_accounts.active.count
   end
-  memoize :sub_account_count
 
   def user_count
     self.user_account_associations.count
   end
-  memoize :user_count
 
   def current_sis_batch
     if (current_sis_batch_id = self.read_attribute(:current_sis_batch_id)) && current_sis_batch_id.present?
@@ -979,10 +1003,11 @@ class Account < ActiveRecord::Base
   end
   
   def turnitin_settings
+    return @turnitin_settings if defined?(@turnitin_settings)
     if self.turnitin_account_id.present? && self.turnitin_shared_secret.present?
-      [self.turnitin_account_id, self.turnitin_shared_secret, self.turnitin_host]
+      @turnitin_settings = [self.turnitin_account_id, self.turnitin_shared_secret, self.turnitin_host]
     else
-      self.parent_account.try(:turnitin_settings)
+      @turnitin_settings = self.parent_account.try(:turnitin_settings)
     end
   end
   
@@ -1321,13 +1346,6 @@ class Account < ActiveRecord::Base
     false
   end
 
-  # Public: Determine if draft state is enabled for this account.
-  #
-  # Returns a boolean (default: false).
-  def draft_state_enabled?
-    root_account.settings[:enable_draft]
-  end
-
   def import_from_migration(data, params, migration)
 
     LearningOutcome.process_migration(data, migration)
@@ -1337,20 +1355,12 @@ class Account < ActiveRecord::Base
     migration.save
   end
 
-  def enable_draft!
-    change_root_account_setting!(:enable_draft, true)
+  def enable_fabulous_quizzes!
+    change_root_account_setting!(:enable_fabulous_quizzes, true)
   end
 
-  def disable_draft!
-    change_root_account_setting!(:enable_draft, false)
-  end
-
-  def enable_quiz_regrade!
-    change_root_account_setting!(:enable_quiz_regrade, true)
-  end
-
-  def disable_quiz_regrade!
-    change_root_account_setting!(:enable_quiz_regrade, false)
+  def disable_fabulous_quizzes!
+    change_root_account_setting!(:enable_fabulous_quizzes, false)
   end
 
   def change_root_account_setting!(setting_name, new_value)
@@ -1358,4 +1368,5 @@ class Account < ActiveRecord::Base
     root_account.save!
   end
 
+  Bookmarker = BookmarkedCollection::SimpleBookmarker.new(Account, :name, :id)
 end

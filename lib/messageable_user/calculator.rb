@@ -166,7 +166,7 @@ class MessageableUser
     def count_messageable_users_in_scope(scope)
       if scope
         # convert the group by into a select distinct
-        group_as_select = scope.scope(:find, :group)
+        group_as_select = scope.group_values
         scope.except(:select, :group, :order).select(group_as_select).uniq.count
       else
         0
@@ -186,7 +186,7 @@ class MessageableUser
         # to return a bookmark-paginated collection, so we craft an empty scope
         # by default
         scope = messageable_users_in_context_scope(options.delete(:context), options)
-        scope = search_scope(scope, options[:search], global_exclude_ids)
+        scope = search_scope(scope, options[:search], global_exclude_ids) if scope
         scope ||= MessageableUser.where('?', false)
         bookmark(scope)
       else
@@ -416,14 +416,10 @@ class MessageableUser
           :include_concluded_students => false,
           :course_workflow_state => course.workflow_state))
         scope =
-          if options[:admin_context]
-            scope.where(full_visibility_clause([course]))
-          else
-            case course_visibility(course)
-            when :full then scope.where(full_visibility_clause([course]))
-            when :sections then scope.where(section_visibility_clause([course]))
-            when :restricted then scope.where(restricted_visibility_clause([course]))
-            end
+          case course_visibility(course)
+          when :full then scope.where(full_visibility_clause([course]))
+          when :sections then scope.where(section_visibility_clause([course]))
+          when :restricted then scope.where(restricted_visibility_clause([course]))
           end
         scope = scope.where(observer_restriction_clause) if student_courses.present?
         scope = scope.where('enrollments.type' => enrollment_types) if enrollment_types
@@ -490,8 +486,8 @@ class MessageableUser
 
     def search_scope(scope, search, global_exclude_ids)
       if global_exclude_ids.present?
-        target_shard = scope.scope(:find, :shard)
-        exclude_ids = global_exclude_ids.map{ |id| Shard.relative_id_for(id, target_shard) }
+        target_shard = scope.shard_value
+        exclude_ids = global_exclude_ids.map{ |id| Shard.relative_id_for(id, Shard.current, target_shard) }
         scope = scope.where(["users.id NOT IN (?)", exclude_ids])
       end
 
@@ -572,6 +568,7 @@ class MessageableUser
         :common_role_column => 'enrollments.type'
       }.merge(options)
       scope = base_scope(options)
+      scope = scope.joins("INNER JOIN enrollments ON enrollments.user_id=users.id") unless CANVAS_RAILS2 # see below
 
       enrollment_conditions = self.class.enrollment_conditions(options)
       if enrollment_conditions
@@ -581,12 +578,16 @@ class MessageableUser
         scope = scope.where('?', false)
       end
 
-      # this comes after the conditional join on courses that needs
-      # enrollments, because AREL is going to swap the order for some reason.
-      # if this came first (e.g. immediately after base_scope), then the join
-      # on courses would show up first in the SQL, which could make the
-      # database sad.
-      scope.joins("INNER JOIN enrollments ON enrollments.user_id=users.id")
+      if CANVAS_RAILS2
+        # this comes after the conditional join on courses that needs
+        # enrollments, because fake_arel is going to swap the order for some
+        # reason. if this came first (e.g. immediately after base_scope), then
+        # the join on courses would show up first in the SQL, which could make
+        # the database sad.
+        scope = scope.joins("INNER JOIN enrollments ON enrollments.user_id=users.id")
+      end
+
+      scope
     end
 
     # further restricts the enrollment scope to users whose enrollment is

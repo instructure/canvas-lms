@@ -14,6 +14,7 @@ define [
       'click a.delete-btn': 'remove'
 
     initialize: ->
+      super
       @model.set(isCondensable: @model.get('body').length > 180)
       @model.set(isCondensed: true)
 

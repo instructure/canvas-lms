@@ -20,7 +20,11 @@ module SendToInbox
 
   module SendToInboxClassMethods
     def self.extended(klass)
-      klass.send(:class_inheritable_accessor, :send_to_inbox_block)
+      if CANVAS_RAILS2
+        klass.send(:class_inheritable_accessor, :send_to_inbox_block)
+      else
+        klass.send(:class_attribute, :send_to_inbox_block)
+      end
     end
 
     def on_create_send_to_inboxes(&block)

@@ -24,30 +24,59 @@
 # In this API, the `:user_id` parameter can always be replaced with `self` if
 # the requesting user is asking for his/her own information.
 #
-# @object CommunicationChannel
+# @model CommunicationChannel
 #     {
-#       // The ID of the communication channel.
-#       "id": 16,
-#
-#       // The address, or path, of the communication channel.
-#       "address": "sheldon@caltech.example.com",
-#
-#       // The type of communcation channel being described. Possible values
-#       // are: "email", "sms", "chat", "facebook" or "twitter". This field
-#       // determines the type of value seen in "address".
-#       "type": "email",
-#
-#       // The position of this communication channel relative to the user's
-#       // other channels when they are ordered.
-#       "position": 1,
-#
-#       // The ID of the user that owns this communication channel.
-#       "user_id": 1,
-#
-#       // The current state of the communication channel. Possible values are:
-#       // "unconfirmed" or "active".
-#       "workflow_state": "active"
+#       "id": "CommunicationChannel",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "The ID of the communication channel.",
+#           "example": 16,
+#           "type": "integer"
+#         },
+#         "address": {
+#           "description": "The address, or path, of the communication channel.",
+#           "example": "sheldon@caltech.example.com",
+#           "type": "string"
+#         },
+#         "type": {
+#           "description": "The type of communcation channel being described. Possible values are: 'email', 'sms', 'chat', 'facebook' or 'twitter'. This field determines the type of value seen in 'address'.",
+#           "example": "email",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "email",
+#               "sms",
+#               "chat",
+#               "facebook",
+#               "twitter"
+#             ]
+#           }
+#         },
+#         "position": {
+#           "description": "The position of this communication channel relative to the user's other channels when they are ordered.",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "user_id": {
+#           "description": "The ID of the user that owns this communication channel.",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "workflow_state": {
+#           "description": "The current state of the communication channel. Possible values are: 'unconfirmed' or 'active'.",
+#           "example": "active",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "unconfirmed",
+#               "active"
+#             ]
+#           }
+#         }
+#       }
 #     }
+#
 class CommunicationChannelsController < ApplicationController
   before_filter :require_user, :only => [:create, :destroy]
   before_filter :reject_student_view_student
@@ -83,20 +112,26 @@ class CommunicationChannelsController < ApplicationController
   # @argument communication_channel[address] [String]
   #   An email address or SMS number.
   #
-  # @argument communication_channel[type] [String, "email"|"sms"]
+  # @argument communication_channel[type] [String, "email"|"sms"|"push"]
   #   The type of communication channel.
   #
+  #   In order to enable push notification support, the server must be
+  #   properly configured (via sns.yml) to communicate with Amazon
+  #   Simple Notification Services, and the developer key used to create
+  #   the access token from this request must have an SNS ARN configured on
+  #   it.
+  #
   # @argument skip_confirmation [Optional, Boolean]
-  #   Only valid for site admins making requests; If true, the channel is
+  #   Only valid for site admins and account admins making requests; If true, the channel is
   #   automatically validated and no confirmation email or SMS is sent.
   #   Otherwise, the user must respond to a confirmation message to confirm the
   #   channel.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/users/1/communication_channels \ 
-  #          -H 'Authorization: Bearer <token>' \ 
-  #          -d 'communication_channel[address]=new@example.com' \ 
-  #          -d 'communication_channel[type]=email' \ 
+  #     curl https://<canvas>/api/v1/users/1/communication_channels \
+  #          -H 'Authorization: Bearer <token>' \
+  #          -d 'communication_channel[address]=new@example.com' \
+  #          -d 'communication_channel[type]=email' \
   #
   # @returns CommunicationChannel
   def create
@@ -107,7 +142,7 @@ class CommunicationChannelsController < ApplicationController
     params.delete(:build_pseudonym) if api_request?
 
     skip_confirmation = value_to_boolean(params[:skip_confirmation]) &&
-      Account.site_admin.grants_right?(@current_user, :manage_students)
+        (Account.site_admin.grants_right?(@current_user, :manage_students) || Account.default.grants_right?(@current_user, :manage_students))
 
     # If a new pseudonym is requested, build (but don't save) a pseudonym to ensure
     # that the unique_id is valid. The pseudonym will be created on approval of the
@@ -122,13 +157,24 @@ class CommunicationChannelsController < ApplicationController
       end
     end
 
+    if params[:communication_channel][:type] == CommunicationChannel::TYPE_PUSH
+      if !@access_token
+        return render :json => { errors: { type: 'Push is only supported when using an access token'}}, status: :bad_request
+      end
+      if !@access_token.developer_key.try(:sns_arn)
+        return render :json => { errors: { type: 'SNS is not configured for this developer key'}}, status: :bad_request
+      end
+      skip_confirmation = true
+      @cc = @user.communication_channels.create_push(@access_token, params[:communication_channel][:address])
+    end
+
     # Find or create the communication channel.
-    @cc = @user.communication_channels.by_path(params[:communication_channel][:address]).
+    @cc ||= @user.communication_channels.by_path(params[:communication_channel][:address]).
       find_by_path_type(params[:communication_channel][:type])
     @cc ||= @user.communication_channels.build(:path => params[:communication_channel][:address],
       :path_type => params[:communication_channel][:type])
 
-    if (!@cc.new_record? && !@cc.retired?)
+    if (!@cc.new_record? && !@cc.retired? && @cc.path_type != CommunicationChannel::TYPE_PUSH)
       @cc.errors.add(:path, 'unique!')
       return render :json => @cc.errors.as_json, :status => :bad_request
     end
@@ -162,7 +208,7 @@ class CommunicationChannelsController < ApplicationController
       @root_account ||= @user.pseudonyms.first.try(:account) if @user.pre_registered?
       @root_account ||= @user.enrollments.first.try(:root_account) if @user.creation_pending?
       unless @root_account
-        account = @user.accounts.first
+        account = @user.all_accounts.first
         @root_account = account.try(:root_account)
       end
       @root_account ||= @domain_root_account
@@ -327,6 +373,7 @@ class CommunicationChannelsController < ApplicationController
       end
     else
       flash[:notice] = t 'notices.registration_confirmed', "Registration confirmed!"
+      @current_user ||= @user # since dashboard_url may need it
       respond_to do |format|
         format.html { @enrollment ? redirect_to(course_url(@course)) : redirect_back_or_default(dashboard_url) }
         format.json { render :json => {:url => @enrollment ? course_url(@course) : dashboard_url} }
@@ -359,14 +406,19 @@ class CommunicationChannelsController < ApplicationController
   # @returns CommunicationChannel
   def destroy
     @user = api_request? ? api_find(User, params[:user_id]) : @current_user
-    @cc   = @user.communication_channels.find(params[:id]) if params[:id]
+    if params[:type] && params[:address]
+      @cc = @user.communication_channels.unretired.of_type(params[:type]).by_path(params[:address]).first
+      raise ActiveRecord::RecordNotFound unless @cc
+    else
+      @cc = @user.communication_channels.unretired.find(params[:id])
+    end
 
     return render_unauthorized_action unless has_api_permissions?
     if @cc.imported? && !@domain_root_account.edit_institution_email?
       return render_unauthorized_action
     end
 
-    if @cc.nil? || @cc.destroy
+    if @cc.destroy
       @user.touch
       if api_request?
         render :json => communication_channel_json(@cc, @current_user, session)

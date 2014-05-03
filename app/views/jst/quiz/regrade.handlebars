@@ -5,35 +5,42 @@
     {{/t}}
   </h3>
 
-  {{#unless multipleAnswer}}
-  <label class="checkbox">
-    <input type="radio" name="regrade_option" class="regrade_option" value="current_and_previous_correct" {{checkedIf regradeOption "current_and_previous_correct"}}>
-    {{#t "no_scores_reduced"}}
-      Award points for both corrected and previously correct answers (<em>no scores will be reduced</em>)
+  <div class="disabled regrade_disabled" style="{{hiddenUnless regradeDisabled}}">
+    {{#t "regrade_disabled"}}
+      Regrading is not allowed on this question because an answer was
+      removed after a student completed a submission.
     {{/t}}
-  </label>
-  {{/unless}}
+  </div>
 
-  <label class="checkbox">
-    <input type="radio" name="regrade_option" class="regrade_option" value="current_correct_only" {{checkedIf regradeOption "current_correct_only"}} />
-    {{#t "some_scores_reduced"}}
-      Only award points for the correct answer (<em>some students' scores may be reduced</em>)
-    {{/t}}
-  </label>
+  <div class="regrade_enabled" style="{{hiddenIf regradeDisabled}}">
+    {{#unless multipleAnswer}}
+    <label class="checkbox">
+      <input type="radio" name="regrade_option" class="regrade_option" value="current_and_previous_correct" {{checkedIf regradeOption "current_and_previous_correct"}}>
+      {{#t "no_scores_reduced"}}
+        Award points for both corrected and previously correct answers (<em>no scores will be reduced</em>)
+      {{/t}}
+    </label>
+    {{/unless}}
 
-  <label class="checkbox">
-    <input type="radio" name="regrade_option" class="regrade_option" value="full_credit" {{checkedIf regradeOption "full_credit"}} >
-    {{#t "give_everyone_full_credit"}}
-      Give everyone full credit for this question.
-    {{/t}}
-  </label>
+    <label class="checkbox">
+      <input type="radio" name="regrade_option" class="regrade_option" value="current_correct_only" {{checkedIf regradeOption "current_correct_only"}} />
+      {{#t "some_scores_reduced"}}
+        Only award points for the correct answer (<em>some students' scores may be reduced</em>)
+      {{/t}}
+    </label>
 
-  <label class="checkbox">
-    <input type="radio" name="regrade_option" class="regrade_option" value="no_regrade" {{checkedIf regradeOption "no_regrade"}} >
-    {{#t "update_question_without_regrading"}}
-      Update question without regrading
-    {{/t}}
-  </label>
+    <label class="checkbox">
+      <input type="radio" name="regrade_option" class="regrade_option" value="full_credit" {{checkedIf regradeOption "full_credit"}} >
+      {{#t "give_everyone_full_credit"}}
+        Give everyone full credit for this question.
+      {{/t}}
+    </label>
 
+    <label class="checkbox">
+      <input type="radio" name="regrade_option" class="regrade_option" value="no_regrade" {{checkedIf regradeOption "no_regrade"}} >
+      {{#t "update_question_without_regrading"}}
+        Update question without regrading
+      {{/t}}
+    </label>
+  </div>
 </div>
-

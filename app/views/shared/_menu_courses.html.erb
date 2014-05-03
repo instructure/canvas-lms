@@ -1,8 +1,10 @@
 <td class="menu-item-drop-column" id="menu_enrollments">
   <span class="menu-item-heading">
-    <a class="customListOpen"><%= edit %></a>
     <%= title %>
   </span>
+  <div class="menu-item-customize">
+    <a class="customListOpen" href="#"><%= edit %></a>
+  </div>
   <ul class="menu-item-drop-column-list">
     <%= render :partial => 'shared/menu_course', :collection => collection %>
     <li class="menu-item-view-all"><%= link_to "#{link_text} (#{collection_size})", more_link_for_over_max %></li>

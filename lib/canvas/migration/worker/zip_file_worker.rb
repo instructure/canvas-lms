@@ -25,7 +25,15 @@ class Canvas::Migration::Worker::ZipFileWorker < Struct.new(:migration_id)
     cm.save
 
     begin
-      zipfile = cm.attachment.open(:need_local_file => true)
+      if cm.attachment
+        zipfile = cm.attachment.open(need_local_file: true)
+      elsif cm.migration_settings[:file_url]
+        att = Canvas::Migration::Worker.download_attachment(cm, cm.migration_settings[:file_url])
+        zipfile = att.open(need_local_file: true)
+      elsif !settings[:no_archive_file]
+        raise Canvas::Migration::Error, I18n.t(:no_migration_file, "File required for content migration.")
+      end
+
       folder = cm.context.folders.find(cm.migration_settings[:folder_id])
 
       progress = 0.0

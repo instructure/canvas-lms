@@ -104,12 +104,13 @@ class EnrollmentTerm < ActiveRecord::Base
   end
   
   def users_count
-    Enrollment.active.count(
-      :select => "enrollments.user_id", 
-      :distinct => true,
-      :joins => :course,
-      :conditions => ['enrollments.course_id = courses.id AND courses.enrollment_term_id = ? AND enrollments.root_account_id = ?', id, self.root_account_id]
-    )
+    scope = Enrollment.active.joins(:course).
+      where(root_account_id: root_account_id, courses: {enrollment_term_id: self})
+    if CANVAS_RAILS2
+      scope.count(:distinct => true, :select => "enrollments.user_id")
+    else
+      scope.select(:user_id).uniq.count
+    end
   end
   
   workflow do

@@ -20,4 +20,8 @@ class ScribdMimeType < ActiveRecord::Base
   has_many :attachments
 
   attr_accessible :extension, :name
+
+  unless CANVAS_RAILS2
+    self.shard_category = :unsharded
+  end
 end

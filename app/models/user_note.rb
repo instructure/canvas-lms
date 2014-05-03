@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -25,7 +25,7 @@ class UserNote < ActiveRecord::Base
   validates_length_of :note, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   after_save :update_last_user_note
 
-  sanitize_field :note, Instructure::SanitizeField::SANITIZE
+  sanitize_field :note, CanvasSanitize::SANITIZE
 
   workflow do
     state :active
@@ -49,7 +49,7 @@ class UserNote < ActiveRecord::Base
   alias_method :destroy!, :destroy
   def destroy
     self.workflow_state = 'deleted'
-    self.deleted_at = Time.now
+    self.deleted_at = Time.now.utc
     save!
   end
   

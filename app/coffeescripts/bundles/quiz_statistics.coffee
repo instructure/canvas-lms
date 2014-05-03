@@ -1,8 +1,9 @@
 require [
+  'jquery'
   'compiled/models/QuizReport'
   'compiled/views/quiz_reports/QuizReportGenerator'
   'quiz_statistics' # all the old crap
-], (QuizReport, QuizReportGenerator) ->
+], ($, QuizReport, QuizReportGenerator) ->
 
   $container = $('.quiz-reports')
   for report in ENV.quiz_reports

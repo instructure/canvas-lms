@@ -6,7 +6,7 @@ module Wiziq
 describe WiziqConference do
   include Wiziq
 
-  it_should_behave_like 'WebConference'
+  include_examples 'WebConference'
 
   before(:each) do
     PluginSetting.create!(:name => 'wiziq', :settings => { :api_url => 'http://wiziq.com/', :access_key => 'test_access_key', :secret_key => 'test_secret_key' })

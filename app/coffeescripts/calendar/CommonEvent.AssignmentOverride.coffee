@@ -1,9 +1,10 @@
 define [
   'i18n!calendar'
+  'jquery'
   'compiled/calendar/CommonEvent'
   'jquery.instructure_date_and_time'
   'jquery.instructure_misc_helpers'
-], (I18n, CommonEvent) ->
+], (I18n, $, CommonEvent) ->
 
   deleteConfirmation = I18n.t('prompts.delete_override', 'Are you sure you want to delete this assignment override?')
 
@@ -33,7 +34,6 @@ define [
       @description = @assignment.description
       @start = @parseStartDate()
       @end = null # in case it got set by midnight fudging
-      @originalStartDate = new Date(@start) if @start
 
     copyDataFromOverride: (override) ->
       @override = override
@@ -43,19 +43,19 @@ define [
     fullDetailsURL: () ->
       @assignment.html_url
 
-    startDate: () -> @originalStartDate
-
     parseStartDate: () ->
-      if @assignment.due_at then $.parseFromISO(@assignment.due_at, 'due_date').time else null
+      if @assignment.due_at then $.fudgeDateForProfileTimezone(@assignment.due_at) else null
 
     displayTimeString: () ->
-      if !@start
+      unless datetime = @originalStart
         return "No Date" # TODO: i18n
 
-      date = @start
       # TODO: i18n
-      time_string = "#{$.dateString(date)} at #{$.timeString(date)}"
-      "Due: <time datetime='#{date.toISOString()}'>#{time_string}</time>"
+      datetime = $.unfudgeDateForProfileTimezone(datetime)
+      "Due: <time datetime='#{datetime.toISOString()}'>#{$.datetimeString(datetime)}</time>"
+
+    readableType: () ->
+      @readableTypes[@assignmentType()]
 
     updateAssignmentTitle: (title) ->
       @assignment.title = title
@@ -63,7 +63,7 @@ define [
       @title = "#{title} #{titleContext}"
 
     saveDates: (success, error) =>
-      @save { 'assignment_override[due_at]': $.dateToISO8601UTC($.unfudgeDateForProfileTimezone(@start)) }, success, error
+      @save { 'assignment_override[due_at]': $.unfudgeDateForProfileTimezone(@start).toISOString() }, success, error
 
     methodAndURLForSave: () ->
       url = $.replaceTags(@contextInfo.assignment_override_url,

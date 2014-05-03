@@ -219,6 +219,20 @@ describe EventStream::Index do
       end
     end
 
+    describe "create_key" do
+      before do
+        @bucket = @index.bucket_for_time(@newest)
+      end
+
+      it "should handle an array for key" do
+        @index.create_key(@bucket, [ '42', '21' ]).should == "42/21/#{@bucket}"
+      end
+
+      it "should handle a single object for key" do
+        @index.create_key(@bucket, '42').should == "42/#{@bucket}"
+      end
+    end
+
     describe "for_key" do
       before do
         # force just one bucket

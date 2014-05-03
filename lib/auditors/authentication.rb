@@ -20,39 +20,20 @@ module Auditors; end
 
 class Auditors::Authentication
   class Record < ::EventStream::Record
+    attributes :pseudonym_id,
+               :account_id,
+               :user_id
+
     def self.generate(pseudonym, event_type)
-      new('id' => UUIDSingleton.instance.generate,
-          'created_at' => Time.zone.now,
-          'pseudonym' => pseudonym,
-          'event_type' => event_type)
+      new('pseudonym' => pseudonym, 'event_type' => event_type)
     end
 
     def initialize(*args)
       super(*args)
 
-      if attributes['created_at']
-        attributes['created_at'] = Time.zone.at(attributes['created_at'].to_i)
-      end
-
       if attributes['pseudonym']
         self.pseudonym = attributes.delete('pseudonym')
       end
-    end
-
-    def event_type
-      attributes['event_type']
-    end
-
-    def pseudonym_id
-      attributes['pseudonym_id']
-    end
-
-    def account_id
-      attributes['account_id']
-    end
-
-    def user_id
-      attributes['user_id']
     end
 
     def pseudonym

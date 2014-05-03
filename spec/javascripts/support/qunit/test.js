@@ -10,8 +10,10 @@
  *      phantomjs test.js http://localhost/qunit/test
  */
 
-var url = phantom.args[0];
+var system = require('system');
+var fs = require('fs');
 
+var url = phantom.args[0];
 var page = new WebPage();
 
 // Route "console.log()" calls from within the Page context to the main Phantom context (i.e. current "this")
@@ -42,6 +44,19 @@ page.open(url, function(status){
     return
   }
 
+  // allow access to phantom's environment
+  page.evaluate(function(env) { window.PHANTOM_ENV = env; }, system.env);
+
+  // inject runner javascript, if present
+  var runner = 'spec/javascripts/runner.js';
+  if (fs.exists(runner)) {
+    if (page.injectJs(runner)) {
+      console.log('runner injection successful');
+    } else {
+      console.log('runner injection FAILED');
+    }
+  }
+
   page.evaluate(addLogging);
   var interval = setInterval(function() {
     if (finished()) {
@@ -67,7 +82,7 @@ function onfinishedTests() {
 function addLogging() {
   var current_test_assertions = [];
 
-  QUnit.testDone = function(result) {
+  QUnit.testDone(function(result) {
     var name = result.module + ': ' + result.name;
     var i;
 
@@ -82,9 +97,9 @@ function addLogging() {
     }
 
     current_test_assertions = [];
-  };
+  });
 
-  QUnit.log = function(details) {
+  QUnit.log(function(details) {
     var response;
 
     if (details.result) {
@@ -102,15 +117,15 @@ function addLogging() {
     }
 
     current_test_assertions.push('Failed assertion: ' + response);
-  };
+  });
 
   // timer for PhantomJS, prints final results multiple times, prematurely w/o it :\
   var timer;
-  QUnit.done = function( result ) {
+  QUnit.done(function( result ) {
     clearTimeout(timer);
     timer = setTimeout(function () {
       console.log('');
       console.log('Took ' + result.runtime +  'ms to run ' + result.total + ' tests. ' + result.passed + ' passed, ' + result.failed + ' failed.');
     }, 2500);
-  };
+  });
 }

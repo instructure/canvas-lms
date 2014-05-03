@@ -44,7 +44,17 @@ module Canvas
               :base=>nil
       }.with_indifferent_access
     end
-    
+
+
+    # custom serialization, since the meta can containt procs
+    def _dump(depth)
+      self.id.to_s
+    end
+
+    def self._load(str)
+      find(str)
+    end
+
     def default_settings
       settings = @meta[:settings]
       settings = settings.call if settings.respond_to?(:call)
@@ -60,7 +70,7 @@ module Canvas
     end
 
     def enabled?
-      ps = PluginSetting.find_by_name(self.id.to_s)
+      ps = PluginSetting.cached_plugin_setting(self.id)
       return false unless ps
       ps.valid_settings? && ps.enabled?
     end
@@ -129,16 +139,16 @@ module Canvas
         if validator_module && validator_module.respond_to?(:validate)
           res = validator_module.validate(settings, plugin_setting)
           if res.is_a?(Hash)
-            plugin_setting.settings = (self.default_settings || {}).with_indifferent_access.merge(res || {})
+            plugin_setting.settings = (plugin_setting.settings || self.default_settings || {}).with_indifferent_access.merge(res || {})
           else
             false
           end
         else
-          plugin_setting.errors.add_to_base("provided validator #{validator} failed to load")
+          plugin_setting.errors.add(:base, "provided validator #{validator} failed to load")
           false
         end
       else
-        plugin_setting.settings = (self.default_settings || {}).with_indifferent_access.merge(settings || {})
+        plugin_setting.settings = (plugin_setting.settings || self.default_settings || {}).with_indifferent_access.merge(settings || {})
       end
     end
 

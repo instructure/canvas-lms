@@ -24,6 +24,8 @@
                                   '{{ assignment_id }}',
                                   '{{ user_id }}') %>
 
+<% assignment_has_multiple_due_dates = (assignment.context && assignment.multiple_due_dates?) %>
+
   <div id="assignment_<%= assignment.id || 'blank' %>"
        style="<%= hidden if assignment.new_record? %>"
        class="group_assignment
@@ -59,8 +61,8 @@
 
       <div class="data assignment_due">
         <div class="date_text"
-          style="<%= hidden unless assignment && (assignment.multiple_due_dates? || assignment.due_at) %>">
-          <% if assignment.multiple_due_dates? %>
+          style="<%= hidden unless assignment && (assignment_has_multiple_due_dates || assignment.due_at) %>">
+          <% if assignment_has_multiple_due_dates %>
             <%= multiple_due_date_tooltip(assignment, @current_user, :href => assignment_url) %>
           <% else %>
             <% ot(:due_at, '%{date} at %{time}', :date => capture { %>
@@ -99,7 +101,7 @@
           <span class="position"><%= assignment.position %></span>
           <span class="assignment_group_id"><%= assignment.assignment_group_id %></span>
           <span class="multiple_due_dates">
-            <%= assignment.multiple_due_dates? %>
+            <%= assignment_has_multiple_due_dates %>
           </span>
         </div>
 

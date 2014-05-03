@@ -42,7 +42,9 @@ class QuestionBanksController < ApplicationController
   
   def questions
     find_bank(params[:question_bank_id], params[:inherited] == '1') do
-      @questions = @bank.assessment_questions.active.paginate(:per_page => 50, :page => params[:page])
+      @questions = @bank.assessment_questions.active
+      url = polymorphic_url([@context, :question_bank_questions])
+      @questions = Api.paginate(@questions, self, url, default_per_page: 50)
       render :json => {:pages => @questions.total_pages, :questions => @questions}
     end
   end
@@ -86,12 +88,15 @@ class QuestionBanksController < ApplicationController
       else
         @questions.update_all(:assessment_question_bank_id => @new_bank)
       end
+
+      [ @bank, @new_bank ].each(&:touch)
+
       render :json => {}
     end
   end
   
   def create
-    if authorized_action(@context.assessment_question_banks.new, @current_user, :create)
+    if authorized_action(@context.assessment_question_banks.scoped.new, @current_user, :create)
       @bank = @context.assessment_question_banks.build(params[:assessment_question_bank])
       respond_to do |format|
         if @bank.save
@@ -123,7 +128,7 @@ class QuestionBanksController < ApplicationController
     if authorized_action(@bank, @current_user, :update)
       if @bank.update_attributes(params[:assessment_question_bank])
         @bank.reload
-        render :json => @bank.as_json(:include => {:learning_outcome_alignments => {:include => :learning_outcome}})
+        render :json => @bank.as_json(:include => {:learning_outcome_alignments => {:include => {:learning_outcome => {:include_root => false}}}})
       else
         render :json => @bank.errors, :status => :bad_request
       end

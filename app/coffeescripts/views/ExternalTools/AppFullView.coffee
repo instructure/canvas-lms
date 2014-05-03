@@ -24,17 +24,19 @@ define [
       @collection = new PaginatedCollection
       super
       @render()
+      $(document).scrollTop(0)
       @collection.resourceName = "app_center/apps/#{@model.id}/reviews"
       @collection.fetch()
 
     afterRender: ->
       @$('.app-star').raty
         readOnly: true
-        score: @model.get('avg_rating')
+        score: @model.get('average_rating')
         path: '/images/raty/'
 
     renderItem: (model) =>
-      if model.get('comments').length > 0
+      comments = model.get('comments')
+      if comments && comments.length > 0
         super
 
     refresh: ->

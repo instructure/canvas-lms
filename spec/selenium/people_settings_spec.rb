@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "course people" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
 
   before (:each) do
     course_with_teacher_logged_in :limit_privileges_to_course_section => false
@@ -34,11 +34,11 @@ describe "course people" do
       wait_for_ajaximations
 
       keep_trying_until { driver.execute_script("return $('##{input_id}').data('token_input').selector.list.query.search") == text }
-      wait_for_js
+      wait_for_ajaximations
       elements = ffj(".autocomplete_menu:visible .list:last ul:last li").map { |e|
         [e, (e.find_element(:tag_name, :b).text rescue e.text)]
       }
-      wait_for_js
+      wait_for_ajaximations
       element = elements.detect { |e| e.last == text }
       element.should_not be_nil
       element.first.click
@@ -90,7 +90,7 @@ describe "course people" do
     end
 
     def add_user_to_second_section(role_name=nil)
-      student_in_course(:role_name => role_name)
+      student_in_course(:user => user_with_pseudonym, :role_name => role_name)
       section_name = 'Another Section'
       add_section(section_name)
       # open tab
@@ -121,7 +121,7 @@ describe "course people" do
       # open dialog
       open_kyle_menu(@student)
       # when
-      link = driver.find_element(:link, 'User Details')
+      link = f("#ui-id-4")
       href = link['href']
       link.click
       wait_for_ajaximations
@@ -150,7 +150,7 @@ describe "course people" do
 
     it "should deal with observers linked to multiple students" do
       students = []
-      obs = user_model(:name => "The Observer")
+      obs = user_with_pseudonym(:name => "The Observer")
       2.times do |i|
         student_in_course(:name => "Student #{i}")
         students << @student
@@ -211,7 +211,7 @@ describe "course people" do
         send "custom_#{et}_role", "custom"
         send "course_with_#{et}", :course => @course, :active_all => true, :custom_role => 'custom'
         user_session @user
-        student_in_course :course => @course, :role_name => 'custom stu'
+        student_in_course :user => user_with_pseudonym, :course => @course, :role_name => 'custom stu'
 
         go_to_people_page
 
@@ -232,7 +232,7 @@ describe "course people" do
     context "multiple enrollments" do
       it "should link an observer enrollment when other enrollment types exist" do
         course_with_student :course => @course, :active_all => true, :name => 'teh student'
-        course_with_ta :course => @course, :active_all => true
+        course_with_ta :user => user_with_pseudonym, :course => @course, :active_all => true
         course_with_observer :course => @course, :active_all => true, :user => @ta
 
         go_to_people_page

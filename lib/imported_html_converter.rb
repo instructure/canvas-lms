@@ -18,6 +18,7 @@
 
 class ImportedHtmlConverter
   include TextHelper
+  include HtmlTextHelper
 
   CONTAINER_TYPES = ['div', 'p', 'body']
 
@@ -55,7 +56,7 @@ class ImportedHtmlConverter
               end
             end
           elsif val =~ %r{\$CANVAS_COURSE_REFERENCE\$/modules/items/(.*)}
-            if tag = context.context_module_tags.find_by_migration_id($1, :select => 'id')
+            if tag = context.context_module_tags.where(:migration_id => $1).select('id').first
               new_url = URI::escape "#{course_path}/modules/items/#{tag.id}"
             end
           elsif val =~ %r{(?:\$CANVAS_OBJECT_REFERENCE\$|\$WIKI_REFERENCE\$)/([^/]*)/(.*)}
@@ -63,8 +64,9 @@ class ImportedHtmlConverter
             migration_id = $2
             type_for_url = type
             type = 'context_modules' if type == 'modules'
-            if type == 'wiki'
-              new_url = URI::escape("#{course_path}/wiki/#{migration_id}")
+            type = 'pages' if type == 'wiki'
+            if type == 'pages'
+              new_url = URI::escape("#{course_path}/#{context.feature_enabled?(:draft_state) ? 'pages' : 'wiki'}/#{migration_id}")
             elsif type == 'attachments'
               if att = context.attachments.find_by_migration_id(migration_id)
                 new_url = URI::escape("#{course_path}/files/#{att.id}/preview")
@@ -105,6 +107,9 @@ class ImportedHtmlConverter
           elsif for_course_copy
             # For course copies don't try to fix relative urls. Any url we can
             # correctly alter was changed during the 'export' step
+            new_url = node[attr]
+          elsif val.start_with?('#')
+            # It's just a link to an anchor, leave it alone
             new_url = node[attr]
           else
             begin

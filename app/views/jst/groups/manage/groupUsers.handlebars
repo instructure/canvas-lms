@@ -1,12 +1,27 @@
 {{#ifAny count loading}}
   <ul class="collectionViewItems unstyled"></ul>
+  <div class="no-results-wrapper">
+    <div class="no-results hidden">
+      {{#ifEqual ENV.group_user_type "student"}}
+        {{#t "no_matching_students"}}No matching students.{{/t}}
+      {{else}}
+        {{#t "no_matching_users"}}No matching users.{{/t}}
+      {{/ifEqual}}
+    </div>
+  </div>
   <div class="paginatedLoadingIndicator"></div>
 {{else}}
-  <p>
+  <div class="no-results">
     {{#ifEqual ENV.group_user_type "student"}}
-      {{#t "no_students"}}No students{{/t}}
+      {{#t "no_students"}}There are currently no students in this group.{{/t}}
+      {{#unless locked}}
+        {{#t "add_student"}}Add a student to get started.{{/t}}
+      {{/unless}}
     {{else}}
-      {{#t "no_users"}}No users{{/t}}
+      {{#t "no_users"}}There are currently no users in this group.{{/t}}
+      {{#unless locked}}
+        {{#t "add_user"}}Add a user to get started.{{/t}}
+      {{/unless}}
     {{/ifEqual}}
-  </p>
+  </div>
 {{/ifAny}}

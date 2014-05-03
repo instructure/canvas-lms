@@ -11,7 +11,7 @@ module I18n
     # see also app/coffeescripts/str/i18nLolcalize.coffee
     def let_there_be_lols(str)
       # don't want to mangle placeholders, wrappers, etc.
-      pattern = /(\s*%\{[^\}]+\}\s*|\s*[\n\\`\*_\{\}\[\]\(\)\#\+\-!]+\s*|^\s+)/
+      pattern = /(\s*%h?\{[^\}]+\}\s*|\s*[\n\\`\*_\{\}\[\]\(\)\#\+\-!]+\s*|^\s+)/
       result = str.split(pattern).map do |token|
         if token =~ pattern
           token

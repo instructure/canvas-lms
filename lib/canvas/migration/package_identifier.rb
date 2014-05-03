@@ -17,7 +17,7 @@ module Canvas::Migration
     end
 
     def identify_package
-      zip_file = Zip::ZipFile.open(@archive.path)
+      zip_file = Zip::File.open(@archive.path)
       if zip_file.find_entry("AngelManifest.xml")
         :angel_7_4
       elsif zip_file.find_entry("angelData.xml")
@@ -66,7 +66,7 @@ module Canvas::Migration
       else
         :unknown
       end
-    rescue Zip::ZipError
+    rescue Zip::Error
       # Not a valid zip file
       :invalid_archive
     end
@@ -81,7 +81,7 @@ module Canvas::Migration
       if plugin = Canvas::Plugin.all_for_tag(:export_system).find{|p|p.settings[:provides] && p.settings[:provides][@type]}
         return plugin.settings[:provides][@type]
       end
-      raise "Unsupported content package"
+      raise Canvas::Migration::Error, I18n.t(:unsupported_package, "Unsupported content package")
     end
   end
 end

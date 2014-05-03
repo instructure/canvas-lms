@@ -18,9 +18,19 @@
 
 define [
   'compiled/collections/PaginatedCollection'
+  'compiled/collections/GroupUserCollection'
   'compiled/models/Group'
-], (PaginatedCollection, Group) ->
+], (PaginatedCollection, GroupUserCollection, Group) ->
 
   class GroupCollection extends PaginatedCollection
     model: Group
     comparator: (group) -> group.get('name').toLowerCase()
+
+    @optionProperty 'category'
+    @optionProperty 'loadAll'
+
+    url: ->
+      if @category?
+        @url = "/api/v1/group_categories/#{@category.id}/groups?per_page=50"
+      else
+        @url = super

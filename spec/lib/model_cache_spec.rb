@@ -19,9 +19,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require 'lib/model_cache'
 
 describe ModelCache do
-  before do
+  before(:all) do
     class TestModelCacheUser < ActiveRecord::Base
-      set_table_name :users # reuse exiting tables so AR doesn't asplode
+      self.table_name = :users # reuse exiting tables so AR doesn't asplode
       include ModelCache
       cacheable_by :id, :name
 
@@ -29,7 +29,7 @@ describe ModelCache do
     end
 
     class TestModelCachePseudonym < ActiveRecord::Base
-      set_table_name :pseudonyms
+      self.table_name = :pseudonyms
       include ModelCache
 
       belongs_to :test_model_cache_user, :foreign_key => :user_id
@@ -37,18 +37,22 @@ describe ModelCache do
 
       belongs_to :test_model_cache_user_copy, :class_name => 'TestModelCacheUser', :foreign_key => :user_id
     end
+  end
 
+  before do
     user_with_pseudonym(:name => 'qwerty')
     @user = TestModelCacheUser.where(:id => @user).first
     @pseudonym = TestModelCachePseudonym.where(:id => @pseudonym).first
   end
 
-  after do
+  after(:all) do
     ModelCache.keys.delete('TestModelCacheUser')
     ModelCache.keys.delete('TestModelCachePseudonym')
-    subclasses = ActiveRecord::Base.send(:class_variable_get, :@@subclasses)[ActiveRecord::Base]
-    subclasses.delete(TestModelCacheUser)
-    subclasses.delete(TestModelCachePseudonym)
+    if CANVAS_RAILS2
+      subclasses = ActiveRecord::Base.send(:class_variable_get, :@@subclasses)[ActiveRecord::Base]
+      subclasses.delete(TestModelCacheUser)
+      subclasses.delete(TestModelCachePseudonym)
+    end
     Object.send(:remove_const, :TestModelCacheUser)
     Object.send(:remove_const, :TestModelCachePseudonym)
   end

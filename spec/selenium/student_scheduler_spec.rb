@@ -3,13 +3,14 @@ require File.expand_path(File.dirname(__FILE__) + '/helpers/calendar2_common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/scheduler_common')
 
 describe "scheduler" do
-  it_should_behave_like "in-process server selenium tests"
+  include_examples "in-process server selenium tests"
   context "as a student" do
 
     before (:each) do
       Account.default.tap do |a|
         a.settings[:enable_scheduler] = true
-        a.settings[:show_scheduler] = true
+        a.settings[:show_scheduler]   = true
+        a.settings[:agenda_view]      = true
         a.save!
       end
       course_with_student_logged_in

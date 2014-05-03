@@ -11,7 +11,7 @@
 <%= render :partial => "settings_header" %>
 
 <div id="settings">
-  <% form_for(@plugin_setting, :url => plugin_path(@plugin.id, :all => params[:all]), :html => {:method => :put}) do |f| %>
+  <%= form_for(@plugin_setting, :url => plugin_path(@plugin.id, :all => params[:all]), :html => {:method => :put}) do |f| %>
     <div style="margin-bottom: 15px; margin-top: -10px;">
       <%= f.check_box :disabled, :class => "disabled_checkbox" %>
       <%= f.label :disabled, :en => "Disable this Plugin" %>

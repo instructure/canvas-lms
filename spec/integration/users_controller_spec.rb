@@ -150,7 +150,7 @@ describe UsersController do
       course(:account => account_model)
       student_in_course(:course => @course)
       get "/users/#{@student.id}"
-      response.status.should == "401 Unauthorized"
+      assert_status(401)
     end
 
     it "should show user to account users that have the view_statistics permission" do

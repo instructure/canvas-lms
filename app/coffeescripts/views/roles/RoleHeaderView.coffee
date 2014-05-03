@@ -26,7 +26,8 @@ define [
     events: 
       "click a" : "removeRole"
 
-    initialize: -> 
+    initialize: ->
+      super
       @model.on 'destroying', @addLoadingHeader
 
     # Method Summary

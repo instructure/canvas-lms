@@ -7,7 +7,7 @@
   <div class="control-group">
     <label class="control-label" for="web_conference_title">{{#t "name"}}Name{{/t}}</label>
     <div class="controls">
-      <input id="web_conference_title" name="web_conference[title]" type="text" value="{{conferenceData.title}}">
+      <input id="web_conference_title" name="web_conference[title]" type="text" value="{{conferenceData.title}}" maxlength="255">
     </div>
   </div>
   <div class="control-group">
@@ -56,6 +56,7 @@
     </div>
   </div>
   <legend>{{#t "members"}}Members{{/t}}</legend>
+  <div class="web_conference_member_user_settings"></div>
   <label class="checkbox" for="user_all">
     {{checkbox "user.all" class="all_users_checkbox" checked=inviteAll}}
     {{#t "invite_all"}}Invite All Course Members{{/t}}
@@ -72,14 +73,5 @@
         </li>
       {{/each}}
     </ul>
-  </div>
-
-  <div class="form-controls">
-    <button type="button" class="cancel_button btn">{{#t "buttons.cancel"}}Cancel{{/t}}</button>
-    {{# if settings.is_adding}}
-      <button type="submit" class="btn btn-primary save-button">{{#t "buttons.create_conference"}}Create Conference{{/t}}</button>
-    {{else}}
-      <button type="submit" class="btn btn-primary save-button">{{#t "buttons.update_condference"}}Update Conference{{/t}}</button>
-    {{/if}}
   </div>
 </form>

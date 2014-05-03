@@ -6,8 +6,10 @@
 
   {{#ifAny permissions.create permissions.manage}}
   <div class="header-bar-right form-inline">
-    <a href="{{urls.new_quiz_url}}" class="btn btn-primary new-quiz-link" role='button'>
-      {{#t "links.create_new_quiz"}}New Quiz{{/t}}
+    <a href="{{urls.new_quiz_url}}" class="btn btn-primary new-quiz-link icon-plus" role="button"
+       title='{{#t "title_add_quiz"}}Add Quiz{{/t}}'
+       aria-label='{{#t "title_add_quiz"}}Add Quiz{{/t}}'>
+      {{#t "add_quiz"}}Quiz{{/t}}
     </a>
 
     <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" href="#">

@@ -17,17 +17,17 @@ LTI content extension to communicate what types of content are
 accepted.  This extension adds the following parameters to the LTI
 launch event:
 
--   <b>ext_content_intended_use:</b> This describes what the content will be used
+-   <b>ext\_content\_intended\_use:</b> This describes what the content will be used
     for once it is returned to Canvas. For a homework submission tools the
     value will be "homework".
 
--   <b>ext_content_return_types:</b> A comma separated list of the possible return
+-   <b>ext\_content\_return\_types:</b> A comma separated list of the possible return
     types.  The possible values for homework submissions are "file" and "url".
 
--   <b>ext_content_return_url:</b> The url that the external tool should redirect
+-   <b>ext\_content\_return\_url:</b> The url that the external tool should redirect
     the user to with the selected content.
 
--   <b>ext_content_file_extensions</b> (optional): A comma separated list of the file
+-   <b>ext\_content\_file\_extensions</b> (optional): A comma separated list of the file
     extensions that are allowed as valid submissions for this assignment.
 
 When a tool receives these launch parameters, it means that Canvas is
@@ -62,7 +62,7 @@ that all URLs you return be over SSL (https instead of http).
 </table>
 
 #### examples:
-If the <code>launch_presentation_return_url</code> were
+If the `launch_presentation_return_url` were
 <code>http://www.example.com/done</code>, possible return URLs could include:
 
 - http://www.example.com/done?return_type=file&url=https%3A%2F%2Fothersite.com%2Ffile.pdf&text=good+picture.pdf
@@ -82,7 +82,7 @@ If the <code>launch_presentation_return_url</code> were
 </table>
 
 #### examples:
-If the <code>launch_presentation_return_url</code> were
+If the `launch_presentation_return_url` were
 <code>http://www.example.com/done</code>, possible return URLs could include:
 
 - http://www.example.com/done?return_type=url&url=https%3A%2F%2Fothersite.com%2Flink

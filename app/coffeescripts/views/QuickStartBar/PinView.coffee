@@ -1,4 +1,5 @@
 define [
+  'jquery'
   'underscore'
   'compiled/views/KollectionItems/KollectionItemSaveView'
   'compiled/views/QuickStartBar/BaseItemView'
@@ -7,7 +8,7 @@ define [
   'compiled/models/KollectionItem'
   'jquery.instructure_date_and_time'
   'compiled/jquery.rails_flash_notifications'
-], (_, KollectionItemSaveView, BaseItemView, Pin, template, KollectionItem) ->
+], ($, _, KollectionItemSaveView, BaseItemView, Pin, template, KollectionItem) ->
 
   class QuickStartKollectionItemSaveView extends KollectionItemSaveView
 

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -24,7 +24,7 @@ describe DataFixup::FixOutOfSyncOutcomeAlignments do
     outcome_with_rubric
     @rubric_association_object = @course.assignments.create!(:title => 'blah')
     @rubric_association = @rubric.rubric_associations.create!({
-      :association => @rubric_association_object,
+      :association_object => @rubric_association_object,
       :context => @course,
       :purpose => 'grading'
     })
@@ -74,7 +74,8 @@ describe DataFixup::FixOutOfSyncOutcomeAlignments do
 
   it "should delete alignments to assignments with rubrics without matching alignments" do
     align = @rubric_association_object.learning_outcome_alignments.first
-    @rubric.learning_outcome_alignments.update_all(:learning_outcome_id => 0)
+    lo = LearningOutcome.create!(short_description: 's')
+    @rubric.learning_outcome_alignments.update_all(:learning_outcome_id => lo)
 
     align.reload.should_not be_deleted
     DataFixup::FixOutOfSyncOutcomeAlignments.run

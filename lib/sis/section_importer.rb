@@ -48,7 +48,7 @@ module SIS
         @course_ids_to_update_associations = [].to_set
       end
 
-      def add_section(section_id, course_id, name, status, start_date=nil, end_date=nil)
+      def add_section(section_id, course_id, name, status, start_date=nil, end_date=nil, integration_id=nil)
         @logger.debug("Processing Section #{[section_id, course_id, name, status, start_date, end_date].inspect}")
 
         raise ImportError, "No section_id given for a section in course #{course_id}" if section_id.blank?
@@ -90,6 +90,7 @@ module SIS
           @course_ids_to_update_associations.merge [section.course_id, section.course_id_was].compact
         end
 
+        section.integration_id = integration_id
         section.sis_source_id = section_id
         if status =~ /active/i
           section.workflow_state = 'active'

@@ -1,10 +1,11 @@
 define [
   'Backbone'
   'i18n!dashboard'
+  'jquery'
   'underscore'
   'jst/quickStartBar/QuickStartBarView'
   'jquery.toJSON'
-], ({View, Model}, I18n, _, template) ->
+], ({View, Model}, I18n, $, _, template) ->
 
   capitalize = (str) ->
     str.replace /\b[a-z]/g, (match) -> match.toUpperCase()
@@ -22,6 +23,7 @@ define [
       'focus .expander': 'onExpandClick'
 
     initialize: ->
+      super
       @model or= new QuickStartBarModel
       @model.on 'change:modelName', @switchFormView
       @model.on 'change:expanded', @toggleExpanded

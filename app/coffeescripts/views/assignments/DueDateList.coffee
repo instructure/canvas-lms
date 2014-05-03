@@ -12,6 +12,7 @@ define [
   class DueDateList extends Backbone.View
 
     initialize: (options) ->
+      super
       @dueDateList = @model
       @dueDateViews = []
       @dueDateList.overrides.forEach (override) =>
@@ -71,5 +72,7 @@ define [
       @dueDateViews.push dueDateView
       @hideOrShowRemoveButtons()
       if render
-        @$el.append dueDateView.render().el
+        row = dueDateView.render().$el
+        @$el.append row
         @reRenderSections()
+        row.find(".section-list").focus()

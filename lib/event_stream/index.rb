@@ -64,7 +64,7 @@ class EventStream::Index
     return if ttl_seconds < 0
 
     bucket, ordered_id = bookmark_for(record)
-    key = "#{key}/#{bucket}"
+    key = create_key(bucket, key)
     database.update(insert_cql, key, ordered_id, record.id, ttl_seconds)
   end
 
@@ -76,6 +76,10 @@ class EventStream::Index
         shard.activate { history(key, pager, options) }
       end
     end
+  end
+
+  def create_key(bucket, key)
+    [*key, bucket].join('/')
   end
 
   class Bookmarker
@@ -141,7 +145,7 @@ class EventStream::Index
       # one extra so we can tell if there are more pages
       limit = pager.per_page + 1 - pager.size
       args = []
-      args << "#{key}/#{bucket}"
+      args << create_key(bucket, key)
       args << lower_bound
       if ordered_id
         ordered_id_clause = (pager.include_bookmark ? "AND ordered_id <= ?" : "AND ordered_id < ?")

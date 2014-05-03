@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe 'Account Reports API', :type => :integration do
+describe 'Account Reports API', type: :request do
   before do
     @admin = account_admin_user
     user_with_pseudonym(:user => @admin)
@@ -63,6 +63,12 @@ describe 'Account Reports API', :type => :integration do
       report.key?('status').should be_true
       report.key?('progress').should be_true
       report.key?('file_url').should be_true
+    end
+
+    it 'should 404 for non existing reports' do
+      raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/reports/bad_report_csv",
+                   { :report=> 'bad_report_csv', :controller => 'account_reports', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s })
+      assert_status(404)
     end
   end
 

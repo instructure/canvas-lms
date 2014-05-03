@@ -47,9 +47,13 @@ class ApiRouteSet
   end
 
   def self.routes_for(prefix)
-    builder = ActionController::Routing::RouteBuilder.new
-    segments = builder.segments_for_route_path(prefix)
-    ActionController::Routing::Routes.routes.select { |r| segments_match(r.segments[0,segments.size], segments) }
+    if CANVAS_RAILS2
+      builder = ActionController::Routing::RouteBuilder.new
+      segments = builder.segments_for_route_path(prefix)
+      ActionController::Routing::Routes.routes.select { |r| segments_match(r.segments[0,segments.size], segments) }
+    else
+      CanvasRails::Application.routes.set.select{|r| r.path.spec.to_s.start_with?(prefix)}
+    end
   end
 
   def self.segments_match(seg1, seg2)
@@ -57,7 +61,16 @@ class ApiRouteSet
   end
 
   def self.api_methods_for_controller_and_action(controller, action)
-    self.routes_for(prefix).find_all { |r| r.matches_controller_and_action?(controller, action) }
+    @routes ||= self.routes_for(prefix)
+    @routes.find_all { |r| matches_controller_and_action?(r, controller, action) }
+  end
+
+  def self.matches_controller_and_action?(route, controller, action)
+    if CANVAS_RAILS2
+      route.matches_controller_and_action?(controller, action)
+    else
+      route.requirements[:controller] == controller && route.requirements[:action] == action
+    end
   end
 
   def method_missing(m, *a, &b)
@@ -126,16 +139,16 @@ class ApiRouteSet
     end
     opts[:constraints] ||= {}
     opts[:constraints][:format] = 'json'
-    if CANVAS_RAILS3
-      opts[:format] = 'json'
-      mapper.send(method, "#{prefix}/#{path}(.json)", opts)
-    else
+    if CANVAS_RAILS2
       # Our fake rails3 router isn't clever enough to translate (.json) to
       # something that rails 2 routing understands, so we help it out here for
       # api routes.
       opts[:format] = false
       mapper.send(method, "#{prefix}/#{path}.json", opts)
       mapper.send(method, "#{prefix}/#{path}", opts)
+    else
+      opts[:format] = 'json'
+      mapper.send(method, "#{prefix}/#{path}(.json)", opts)
     end
   end
 

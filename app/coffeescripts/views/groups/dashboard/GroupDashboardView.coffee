@@ -12,6 +12,7 @@ define [
     ###
 
     initialize: ->
+      super
       @render()
 
     render: ->

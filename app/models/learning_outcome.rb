@@ -27,7 +27,7 @@ class LearningOutcome < ActiveRecord::Base
   validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :short_description, :maximum => maximum_string_length
   validates_presence_of :short_description, :workflow_state
-  sanitize_field :description, Instructure::SanitizeField::SANITIZE
+  sanitize_field :description, CanvasSanitize::SANITIZE
 
   set_policy do
     # managing a contextual outcome requires manage_outcomes on the outcome's context
@@ -125,8 +125,6 @@ class LearningOutcome < ActiveRecord::Base
     state :retired
     state :deleted
   end
-  
-  scope :active, where("workflow_state<>'deleted'")
 
   def cached_context_short_name
     @cached_context_name ||= Rails.cache.fetch(['short_name_lookup', self.context_code].cache_key) do
@@ -191,18 +189,6 @@ class LearningOutcome < ActiveRecord::Base
       end
     end
     self.learning_outcome_results.for_context_codes(codes).count
-  end
-  
-  def clone_for(context, parent)
-    lo = context.created_learning_outcomes.new
-    lo.context = context
-    lo.short_description = self.short_description
-    lo.description = self.description
-    lo.data = self.data
-    lo.save
-    parent.add_outcome(lo)
-    
-    lo
   end
 
   def self.delete_if_unused(ids)

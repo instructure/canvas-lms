@@ -1,7 +1,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe SearchController, :type => :integration do
+describe SearchController, type: :request do
   before do
+    @account = Account.default
     course_with_teacher(:active_course => true, :active_enrollment => true, :user => user_with_pseudonym(:active_user => true))
     @course.update_attribute(:name, "the course")
     @course.default_section.update_attributes(:name => "the section")
@@ -87,6 +88,18 @@ describe SearchController, :type => :integration do
     it "should return recipients found by id" do
       json = api_call(:get, "/api/v1/search/recipients?user_id=#{@bob.id}",
               { :controller => 'search', :action => 'recipients', :format => 'json', :user_id => @bob.id.to_s })
+      json.each { |c| c.delete("avatar_url") }
+      json.should eql [
+        {"id" => @bob.id, "name" => "bob", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},
+      ]
+    end
+
+    it "should return recipients found by sis id" do
+      p = Pseudonym.create(account: @account, user: @bob, unique_id: 'bob@example.com')
+      p.sis_user_id = 'abc123'
+      p.save!
+      json = api_call(:get, "/api/v1/search/recipients?user_id=sis_user_id:abc123",
+                      { :controller => 'search', :action => 'recipients', :format => 'json', :user_id=>"sis_user_id:abc123" })
       json.each { |c| c.delete("avatar_url") }
       json.should eql [
         {"id" => @bob.id, "name" => "bob", "common_courses" => {@course.id.to_s => ["StudentEnrollment"]}, "common_groups" => {@group.id.to_s => ["Member"]}},
@@ -306,7 +319,7 @@ describe SearchController, :type => :integration do
           l['search'].should == 'cletus'
           l['type'].should == 'user'
         end
-        links.map{ |l| l[:rel] }.should == ['current', 'first']
+        links.map{ |l| l[:rel] }.should == ['current', 'first', 'last']
       end
 
       it "should paginate contexts and return proper pagination headers" do
@@ -335,7 +348,7 @@ describe SearchController, :type => :integration do
           l['search'].should == 'ofcourse'
           l['type'].should == 'context'
         end
-        links.map{ |l| l[:rel] }.should == ['current', 'first']
+        links.map{ |l| l[:rel] }.should == ['current', 'first', 'last']
       end
 
       it "should ignore invalid per_page" do
@@ -361,7 +374,7 @@ describe SearchController, :type => :integration do
           l['search'].should == 'cletus'
           l['type'].should == 'user'
         end
-        links.map{ |l| l[:rel] }.should == ['current', 'first']
+        links.map{ |l| l[:rel] }.should == ['current', 'first', 'last']
       end
 
       it "should paginate combined context/user results" do
@@ -407,7 +420,7 @@ describe SearchController, :type => :integration do
           l[:uri].to_s.should match(%r{api/v1/search/recipients})
           l['search'].should == 'term'
         end
-        links.map{ |l| l[:rel] }.should == ['current', 'first']
+        links.map{ |l| l[:rel] }.should == ['current', 'first', 'last']
       end
     end
 

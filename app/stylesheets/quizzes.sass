@@ -3,6 +3,7 @@
 $backgroundColor: #dfe9f0
 $borderColor: #AAA
 $questionHeaderBackground: #F5F5F5
+$selectedBorderColor: #31b5ff
 
 #wrapper-container
   min-width: 1100px
@@ -13,9 +14,6 @@ $questionHeaderBackground: #F5F5F5
 .quizzes-speedgrader #wrapper-container
   min-width: 1000px
 
-  .update-scores
-    display: block
-    margin: 0 auto
 
 // quiz index
 li.quiz
@@ -29,7 +27,10 @@ li.quiz
 
   .ig-details
     right: 110px
-    width: 415px
+    width: 425px
+
+  .default-dates .status-description
+    font-weight: bold
 
 #quiz_show
   .alert
@@ -40,8 +41,10 @@ li.quiz
     #preview_quiz_button
       font-weight: normal
       color: #333333
-    .unpublished_quiz_warning
+    .unpublished_quiz_warning, .unsaved_quiz_warning
       display: block
+    form
+      margin-bottom: 0px
 
   .admin-links
     text-align: left
@@ -150,7 +153,11 @@ div#content
     font-weight: 500
 
 .quizzes-speedgrader .quizzes-speedgrader-padding
-  height: 80px
+  height: 60px
+
+.quizzes-speedgrader .grade-by-question-warning
+  padding: 5px
+  color: red
 
 .quiz-submission, .question_editing
   background: $backgroundColor
@@ -249,10 +256,6 @@ div#content
           :background-image none
         .answer.hide_right_arrow,.answer.selected_answer.hide_right_arrow
           :background-image none
-    &.correct
-      :border-color inherit
-    &.incorrect
-      :border-color inherit
   &.suppress_correct_answers, &.survey_results
     .question .answers .answer.wrong_answer
       border: none
@@ -274,6 +277,9 @@ div#content
         :border-width 2px
       .move
         :display none
+    .complete
+      background-color: #eeeeee
+      color: #999999
 
 
 #questions.assessing
@@ -422,7 +428,10 @@ div#content
   :_height 10px
 
   &.modified_but_not_saved
-    border-width: 3px
+    border-width: 2px
+  &.selected_single_question
+    border-color: $selectedBorderColor
+    border-width: 2px
   .move
     background: none !important
     float: left
@@ -671,20 +680,19 @@ div#content
   .answer
     .answer_select .select_answer
       :display block
-    .answer_select .select_answer:focus .answer_box
-      :background-image url(/images/partial_answer.png)
     .select_answer_link
       :display inline
-    .answer_select .answer_box
+    .answer_select .answer_image
       :background-repeat no-repeat
+      :background-position 3px 5px
       :cursor pointer
 
-    &.hover
-      .answer_select .answer_box
-        :background-image url(/images/partial_answer.png)
-    &.partial_answer .answer_select .answer_box
+    &.hover .answer_select .answer_image,
+    .answer_select .select_answer_link:focus .answer_image
       :background-image url(/images/partial_answer.png)
-    &.negative_answer .answer_select .answer_box
+    &.partial_answer .answer_select .answer_image
+      :background-image url(/images/partial_answer.png)
+    &.negative_answer .answer_select .answer_image
       :background-image url(/images/negative_answer.png)
 
 // Don't display the "select answer" answer_box for "fill-in-the-blank" questions where
@@ -720,16 +728,16 @@ div#content
     .answer
       .answer_select
         visibility: hidden
-      .answer_select .select_answer:focus .answer_box
+      .answer_select .select_answer:focus .answer_image
         :background-image none
       .answer_select .answer_box
         &.hover .answer_box
           :background-image none
 
       &.hover
-        .answer_select .answer_box
+        .answer_select .answer_image
           :background-image none
-      &.correct_answer .answer_select .answer_box
+      &.correct_answer .answer_select .answer_image
         :background-image none
 
 .question
@@ -963,8 +971,6 @@ ul#quiz_versions
         &.nowrap
           white-space: nowrap
       #keep_score_select,
-      #quiz_access_code,
-      #quiz_ip_filter,
       #quiz_allowed_attempts
         margin-left: 10px
       #quiz_allowed_attempts
@@ -972,7 +978,46 @@ ul#quiz_versions
         margin-bottom: 5px
       #keep_score_select
         width: 100px
-
+      #quiz_show_correct_answers_options
+        > div
+          margin-bottom: 10px
+        label.inline
+          min-width: 160px
+        .datetime_suggest
+          display: inline-block
+      .control-group
+        margin-bottom: 10px
+        overflow: visible
+      .option-group
+        padding: 10px 10px 0 10px
+        border: 1px solid #ccc
+        border-radius: 4px
+        margin-bottom: 15px
+        position: relative
+        overflow: hidden
+        &> label.checkbox
+          position: relative
+          z-index: 1
+          &:hover:before
+            content: ""
+            position: absolute
+            z-index: -1
+            top: -10px
+            right: -10px
+            bottom: -10px
+            left: -10px
+            background: #E7F4FF
+            border-radius: 4px
+      .option-group.disabled label
+        color: #999
+      .option-caption
+        font-size: 15px
+        font-weight: bold
+        line-height: 1.4em
+        &:not(:first-of-type)
+          margin-top: 30px
+      .options
+        margin-left: 20px
 
 .options_header
   font-weight: bold
@@ -1333,6 +1378,7 @@ ul#quiz_versions
 
 // quiz history-specific styles
 #update_history_form
+  margin: 0px
   .assessment_results
     clear: none
 
@@ -1399,8 +1445,8 @@ ul#quiz_versions
       .calculated_question_answers
         position: relative
       /* Display persistent correct answer arrow when editing only. */
-      &.selectable .form_answers .answer.correct_answer .answer_select .answer_box
-        background: url(/images/correct_answer.png) no-repeat 3px 5px
+      &.selectable .form_answers .answer.correct_answer .answer_select .answer_image
+        background-image: url(/images/correct_answer.png)
     .blank_id_select
       width: auto
       min-width: 220px
@@ -1500,7 +1546,9 @@ ul#quiz_versions
       line-height: 32px
     &.active a
       @include box-shadow(#31b5ff 0px 2px 1px)
-      border: 1px solid #31b5ff
+      background: white
+      border: 1px solid $selectedBorderColor
+      color: #0088cc
       font-weight: bold
     &.complete a
       background-color: #eeeeee
@@ -1588,3 +1636,100 @@ ul#quiz_versions
     border-top: 1px solid #C4AE90
     background-color: $warningBackground
 
+#speed_update_scores_container
+  background: #e8e8e8
+  border-top: 1px solid #ccc
+  width: 100%
+  padding: 20px 0 20px 20px
+  position: fixed
+  bottom: 0px
+  left: 0px
+  .update_scores_fudge
+    padding-right: 200px
+  .button-container
+    position: fixed
+    bottom: 30px
+    right: 10px
+
+#update_scores
+  position: relative
+  .update_scores_fudge
+    padding-right: 200px
+  .button-container
+    position: absolute
+    right: 0px
+    bottom: 0px
+    padding-bottom: 0px
+
+#ldb_deauthorized_dialog
+  position: absolute
+  top: 0
+  left: 0
+  right: 0
+  bottom: 0
+  background-color: #4b555d
+  background: url('/images/Money_Noise_tm.png'), -ms-radial-gradient(50% -100px, circle cover, rgba(255, 255, 255, 0.6) 0%, transparent 100%), -ms-linear-gradient(top, #59656e, #3e464c)
+  @include background(image-url("/images/Money_Noise_tm.png"), radial-gradient(50% -100px, circle cover, rgba(255, 255, 255, 0.6) 0%, transparent 100%), linear-gradient(top, #59656e, #3e464c))
+
+  padding: 0
+  margin: 0
+  color: #b3b3b3
+  border: none
+  label
+    display: none
+  div
+    margin: 0 20px
+  #unauthorized_message
+    margin: 0
+    width: auto
+    padding-left: 80px
+    h2
+      font-size: 1.5em
+      margin: 0 0 -10px 0
+      height: 41px
+    p
+      font-weight: normal
+      margin: 10px 0
+      padding: 0
+  h1
+    height: 107px
+    margin: 0 0 50px
+    @include bg-image(canvas, png, no-repeat, 20px, 66px, transparent, 136px, 33px)
+    text-indent: -999em
+  input[type="text"], input[type="password"]
+    background: #f6f6f6 none
+    border: 6px solid rgba(255, 255, 255, 0.25)
+    border-radius: 7px
+    padding: 12px 9px 12px 17px
+    box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.4)
+    background-clip: padding-box
+    width: 40%
+    max-width: 45%
+    font-size: 13px
+    color: #303030
+    // margin: 0 6px 6px 0
+    outline: none
+    display: inline-block
+    height: 20px
+    line-height: 20px
+    box-sizing: content-box
+    -moz-box-sizing: content-box
+  .dialog-actions
+    position: relative
+    .btn-primary
+      position: absolute
+      right: 0
+      top: 0
+      padding: 10px 36px
+      font-size: 15px
+  span.field + span.field
+    margin-left: 0
+
+// Fix for IE10 not showing hover icons for drag/drop when hovering over
+// questions on the "Questions" tab.
+.hover
+  .move .move_icon
+    display: inline
+    cursor: move
+  .links a
+    left: 0

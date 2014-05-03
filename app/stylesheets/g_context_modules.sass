@@ -117,6 +117,12 @@ $context_module_bg_color: #f2f3f4
 
 .context_module_item 
   border-bottom: 1px dotted #e0e0e0
+  &.indent_0
+    .outdent_item_link
+      display: none !important
+    .indent_item_link
+      border-top-left-radius: 8px
+      border-top-right-radius: 8px
   &.indent_1
     .type_icon
       padding-right: 20px
@@ -132,6 +138,8 @@ $context_module_bg_color: #f2f3f4
   &.indent_5
     .type_icon
       padding-right: 100px
+    .indent_item_link
+      display: none !important
   .type_icon
     display: inline-block
     i
@@ -215,13 +223,14 @@ $context_module_bg_color: #f2f3f4
     .incomplete_item_icon
       display: none
   &.after_current_position
-    +opacity(0.5)
-    .title 
-      display: none
-    .locked_title 
-      display: inline-block
-    .completion_requirement
-      color: #aaa
+    .item_name
+      +opacity(0.5)
+      .title
+        display: none
+      .locked_title
+        display: inline-block
+      .completion_requirement
+        color: #aaa
   .module_item_icons
     vertical-align: top
     padding-top: 2px
@@ -249,7 +258,6 @@ $context_module_bg_color: #f2f3f4
     vertical-align: top
     .title
       padding-left: 5px
-      display: inline-block
       padding-top: 5px
       padding-bottom: 5px
       font-size: 0.9em
@@ -295,10 +303,6 @@ $context_module_bg_color: #f2f3f4
   td.points_possible_display
     padding-right: 15px
     width: 40px
-    .points_possible_block
-      display: inline-block
-      text-align: right
-      min-width: 25px
   td.due_date_display
     padding-right: 5px
     padding-left: 15px

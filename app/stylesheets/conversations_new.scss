@@ -8,7 +8,8 @@
 
 #main {
   position: absolute;
-  bottom: 40px;
+  bottom: 0;
+  margin-bottom: 0;
   display: none;
   width: 100%;
   -moz-box-sizing: border-box;
@@ -16,8 +17,7 @@
 }
 
 #footer {
-  position: absolute;
-  bottom: 0;
+  display: none;
 }
 
 #content {
@@ -138,6 +138,7 @@
   .btn {
     border-radius: 0 16px 16px 0;
     float: left;
+    height: 32px;
   }
 }
 
@@ -154,6 +155,7 @@
 }
 
 .message-list {
+  height: 100%;
 
   .list-header {
     background: #f3f3f3;
@@ -374,11 +376,8 @@
 
   .user-info {
     .avatar {
-      border: 2px solid #eee;
-      border-radius: 30px;
-      height: 50px;
+      float: left;
       margin-right: 8px;
-      width: 50px;
     }
 
     .context {
@@ -479,7 +478,8 @@ input.dropdown-search {
 }
 
 .message-header-row .ac-input-box {
-  width: 93%;
+  max-height: 95px;
+  overflow-y: auto;
 }
 
 .beta-notice {

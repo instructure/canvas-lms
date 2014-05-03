@@ -6,28 +6,25 @@ environment_configuration(defined?(config) && config) do |config|
   config.cache_classes = true
 
   # Full error reports are disabled and caching is turned on
-  if CANVAS_RAILS3
-    config.consider_all_requests_local = false
-  else
+  if CANVAS_RAILS2
     config.action_controller.consider_all_requests_local = false
     config.action_view.cache_template_loading            = true
+  else
+    config.consider_all_requests_local = false
   end
   config.action_controller.perform_caching = true
 
   # run rake js:build to build the optimized JS if set to true
   ENV['USE_OPTIMIZED_JS']                              = "true"
 
-  # initialize cache store
-  # this needs to happen in each environment config file, rather than a
-  # config/initializer/* file, to allow Rails' full initialization of the cache
-  # to take place, including middleware inserts and such.
-  require_dependency 'canvas'
-  config.cache_store = Canvas.cache_store_config
+  # initialize cache store. has to eval, not just require, so that it has
+  # access to config.
+  eval(File.new(File.dirname(__FILE__) + "/cache_store.rb").read)
 
   # eval <env>-local.rb if it exists
   Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read) }
 
-  if CANVAS_RAILS3
+  unless CANVAS_RAILS2
     # Specifies the header that your server uses for sending files
     config.action_dispatch.x_sendfile_header = "X-Sendfile"
 

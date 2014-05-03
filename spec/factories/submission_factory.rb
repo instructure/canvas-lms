@@ -25,3 +25,13 @@ def submission_model(opts={})
   @submission.save!
   @submission
 end
+
+# just create the object, we don't care about callbacks or usual side effects
+def bare_submission_model(assignment, user, opts = {})
+  opts = (opts.presence || {submission_type: "online_text_entry", body: "o hai"}).merge(user: user, workflow_state: "submitted")
+  submitted_at = opts.delete(:submitted_at)
+  submission = assignment.submissions.build(opts)
+  submission.submitted_at = submitted_at if submitted_at
+  submission.save_without_callbacks
+  submission
+end

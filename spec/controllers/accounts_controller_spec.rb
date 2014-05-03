@@ -20,8 +20,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe AccountsController do
   def account_with_admin_logged_in(opts = {})
-    @account = Account.default
-    account_admin_user
+    @account = opts[:account] || Account.default
+    account_admin_user(account: @account)
     user_session(@admin)
   end
 
@@ -157,7 +157,7 @@ describe AccountsController do
       config = { :cas_base_url => account.account_authorization_config.auth_base }
       cas_client = CASClient::Client.new(config)
       get 'show', :id => account.id
-      response.should redirect_to(@controller.delegated_auth_redirect_uri(cas_client.add_service_to_login_url(cas_login_url)))
+      response.should redirect_to(controller.delegated_auth_redirect_uri(cas_client.add_service_to_login_url(cas_login_url)))
     end
 
     it "should respect canvas_login=1" do
@@ -178,8 +178,9 @@ describe AccountsController do
 
   describe "courses" do
     it "should count total courses correctly" do
-      account_with_admin_logged_in
-      course
+      account = Account.create!
+      account_with_admin_logged_in(account: account)
+      course(account: account)
       @course.course_sections.create!
       @course.course_sections.create!
       @course.update_account_associations
@@ -448,6 +449,19 @@ describe AccountsController do
         }
         response.should_not be_success
       end
+    end
+  end
+
+  describe "#settings" do
+    it "should load account report details" do
+      account_with_admin_logged_in
+      report_type = AccountReport.available_reports(@account).keys.first
+      report = @account.account_reports.create!(report_type: report_type, user: @admin)
+
+      get 'settings', account_id: @account
+      response.should be_success
+
+      assigns[:last_reports].first.last.should == report
     end
   end
 end

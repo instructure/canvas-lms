@@ -6,6 +6,6 @@ describe "sub account statistics" do
     let(:account) { Account.create(:name => 'sub account from default account', :parent_account => Account.default) }
     let(:url) { "/accounts/#{account.id}/statistics" }
     let(:list_css) { {:started => '#recently_started_item_list', :ended => '#recently_ended_item_list', :logged_in => '#recently_logged_in_item_list'} }
-    it_should_behave_like "statistics basic tests"
+    include_examples "statistics basic tests"
   end
 end
