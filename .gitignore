@@ -50,3 +50,5 @@ Gemfile.lock3
 /public/plugins/
 /spec/coffeescripts/plugins/
 /spec/plugins/
+.idea/
+vendor/bundle/
