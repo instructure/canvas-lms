@@ -202,7 +202,11 @@ module AuthenticationMethods
 
   def clean_return_to(url)
     return nil if url.blank?
-    uri = URI.parse(url)
+    begin
+      uri = URI.parse(url)
+    rescue URI::InvalidURIError
+      return nil
+    end
     return nil unless uri.path[0] == ?/
     return "#{request.protocol}#{request.host_with_port}#{uri.path}#{uri.query && "?#{uri.query}"}#{uri.fragment && "##{uri.fragment}"}"
   end
