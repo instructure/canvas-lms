@@ -25,19 +25,19 @@ describe DataFixup::PopulateGroupCategoryOnDiscussionTopics do
     group_category = @course.group_categories.create(:name => "category")
     @group = @course.groups.create(:name => "group", :group_category => group_category)
 
-    assignment1 = course.assignments.build(:submission_types => 'discussion_topic', :title => '')
+    assignment1 = course.assignments.build(:submission_types => 'discussion_topic', :title => 'a1')
     assignment1.group_category = group_category
-    assignment1.save
-    topic1 = @course.discussion_topics.create(:title => "topic 1")
+    assignment1.save!
+    topic1 = @course.discussion_topics.create!(:title => "topic 1")
     topic1.assignment = assignment1
-    topic1.save
+    topic1.save!
 
-    assignment2 = course.assignments.build(:submission_types => 'discussion_topic', :title => '')
-    topic2 = @course.discussion_topics.create(:title => "topic 2")
+    assignment2 = course.assignments.build(:submission_types => 'discussion_topic', :title => 'a2')
+    topic2 = @course.discussion_topics.create!(:title => "topic 2")
     topic2.assignment = assignment2
-    topic2.save
+    topic2.save!
 
-    topic3 = @course.discussion_topics.create(:title => "topic 1")
+    topic3 = @course.discussion_topics.create!(:title => "topic 1")
 
     # run the fix
     DataFixup::PopulateGroupCategoryOnDiscussionTopics.run

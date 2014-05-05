@@ -2819,7 +2819,44 @@ describe Assignment do
       end
 
     end
+  end
 
+  describe 'title validation' do
+    let(:assignment) { Assignment.new }
+    let(:errors) {
+      assignment.valid?
+      assignment.errors
+    }
+
+    it 'must allow a title equal to the maximum length' do
+      assignment.title = 'a' * Assignment.maximum_string_length
+      errors[:title].should be_empty
+    end
+
+    it 'must not allow a title longer than the maximum length' do
+      assignment.title = 'a' * (Assignment.maximum_string_length + 1)
+      errors[:title].should_not be_empty
+    end
+
+    it 'must allow a blank title when it is unchanged and was previously blank' do
+      setup_assignment
+      assignment = @c.assignments.create!(assignment_valid_attributes)
+      assignment.title = ''
+      assignment.save(validate: false)
+
+      assignment.valid?
+      errors = assignment.errors
+      errors[:title].should be_empty
+    end
+
+    it 'must not allow the title to be blank if changed' do
+      setup_assignment
+      assignment = @c.assignments.create!(assignment_valid_attributes)
+      assignment.title = ' '
+      assignment.valid?
+      errors = assignment.errors
+      errors[:title].should_not be_empty
+    end
   end
 
   describe "group category validation" do
