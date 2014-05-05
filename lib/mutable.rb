@@ -75,10 +75,6 @@ module Mutable
         [submission, comments.map(&:author_id).uniq.size == 1 ? [comments.last.author] : []]
       }.compact
       SubmissionComment.where(:hidden => true, :submission_id => submissions).update_all(:hidden => false)
-      Submission.send(:preload_associations, outstanding.map(&:first), :visible_submission_comments)
-      outstanding.each do |submission, skip_users|
-        submission.create_or_update_conversations!(:create, :skip_users => skip_users)
-      end
     end
   end
 end

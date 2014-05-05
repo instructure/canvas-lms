@@ -102,28 +102,6 @@ describe Submission do
     end
   end
 
-  it "should not return duplicate conversation groups" do
-    assignment_model
-    @assignment.workflow_state = 'published'
-    @assignment.save!
-    section1 = @course.course_sections.create(name: '1')
-    section2 = @course.course_sections.create(name: '2')
-    section3 = @course.course_sections.create(name: '3')
-    section4 = @course.course_sections.create(name: '4')
-    section5 = @course.course_sections.create(name: '5')
-    section1.enroll_user(@teacher, 'TeacherEnrollment', 'accepted')
-    section2.enroll_user(@teacher, 'TeacherEnrollment', 'accepted')
-    section3.enroll_user(@teacher, 'TeacherEnrollment', 'accepted')
-    section4.enroll_user(@teacher, 'TeacherEnrollment', 'invited')
-    section5.enroll_user(@teacher, 'TeacherEnrollment', 'completed')
-    @course.offer!
-    @course.enroll_student(@student = user)
-    @assignment.context.reload
-
-    @submission = @assignment.submit_homework(@student, :body => 'some message')
-    @submission.conversation_groups.should eql @submission.conversation_groups.uniq
-  end
-
   it "should ensure the media object exists" do
     assignment_model
     se = @course.enroll_student(user)

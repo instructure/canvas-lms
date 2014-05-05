@@ -1387,7 +1387,7 @@ class User < ActiveRecord::Base
   end
 
   def use_new_conversations?
-    preferences[:use_new_conversations] == true
+    true
   end
 
   def ignore_item!(asset, purpose, permanent = false)
