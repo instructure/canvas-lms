@@ -6,9 +6,10 @@
           title="{{#t "drag_up_or_down_to_reorder"}}Drag up or down to reorder{{/t}}"></span>
   </div>
 {{/if}}
+
 {{#if permissions.delete}}
   <label class="discussion-column">
-    <input class="toggleSelected" type="checkbox" {{#if selected}}checked{{/if}} >
+    <input class="toggleSelected" type="checkbox" aria-label="{{title}}" {{#if selected}}checked{{/if}} >
   </label>
 {{/if}}
 <div class="discussion-column image-block">
