@@ -20,6 +20,26 @@ define [
     RSVP.all promises
 
   QuizController = Ember.ObjectController.extend
+    disabledMessage: I18n.t('cant_unpublish_when_students_submit', "Can't unpublish if there are student submissions")
+
+    # preserve 'publishing' state by not directly binding to published attr
+    showAsPublished: false
+
+    displayPublished: (->
+      @set('showAsPublished', @get('published'))
+    ).observes('model')
+
+    updatePublished: (publishStatus) ->
+      success = (=> @displayPublished())
+
+      # they're not allowed to unpublish
+      failed = =>
+        @set 'published', true
+        @set 'unpublishable', false
+        @displayPublished()
+
+      @set 'published', publishStatus
+      @get('model').save().then success, failed
 
     deleteTitle: (->
       I18n.t 'delete_quiz', 'Delete Quiz'
@@ -53,12 +73,10 @@ define [
           $.flashMessage I18n.t('quiz_successfully_updated', 'Quiz Successfully Updated!')
 
       publish: ->
-        @set 'published', true
-        @get('model').save()
+        @updatePublished true
 
       unpublish: ->
-        @set 'published', false
-        @get('model').save()
+        @updatePublished false
 
       delete: ->
         model = @get 'model'

@@ -12,9 +12,9 @@ define [
       initialize: (container, application) ->
         env.setEnv(window.ENV)
 
-  Ember.Inflector.inflector.irregular('quizStatistics', 'quizStatistics');
-  Ember.Inflector.inflector.irregular('questionStatistics', 'questionStatistics');
-  Ember.Inflector.inflector.irregular('progress', 'progress');
+  Ember.Inflector.inflector.irregular('quizStatistics', 'quizStatistics')
+  Ember.Inflector.inflector.irregular('questionStatistics', 'questionStatistics')
+  Ember.Inflector.inflector.irregular('progress', 'progress')
 
   Ember.$.ajaxPrefilter 'json', (options, originalOptions, xhr) ->
     options.dataType = 'json'

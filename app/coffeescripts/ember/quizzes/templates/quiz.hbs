@@ -7,10 +7,11 @@
       <h1>{{title}}</h1>
     </div>
 
-    <div class="span3 teacher-action-buttons pull-right">
-      {{ic-publish-button
-        published=published
+    <div class="span4 teacher-action-buttons pull-right">
+      {{ic-publish-icon
         disabled=canNotUnpublish
+        is-published=showAsPublished
+        disabled-message=disabledMessage
         on-publish='publish'
         on-unpublish='unpublish'
       }}
