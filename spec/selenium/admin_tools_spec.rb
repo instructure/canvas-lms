@@ -273,7 +273,9 @@ describe "admin_tools" do
     include_examples "cassandra audit logs"
 
     before do
-      Auditors::Authentication.record(@student.pseudonyms.first, 'login')
+      Timecop.freeze(8.seconds.ago) do
+        Auditors::Authentication.record(@student.pseudonyms.first, 'login')
+      end
       Auditors::Authentication.record(@student.pseudonyms.first, 'logout')
       load_admin_tools_page
       click_view_tab "logging"
@@ -302,11 +304,19 @@ describe "admin_tools" do
     include_examples "cassandra audit logs"
 
     before do
-      course_with_teacher(course: @course, :user => user_with_pseudonym(:name => 'Teacher TestUser'))
+      Timecop.freeze(8.seconds.ago) do
+        course_with_teacher(course: @course, :user => user_with_pseudonym(:name => 'Teacher TestUser'))
+        @assignment = @course.assignments.create!(:title => 'Assignment', :points_possible => 10)
+      end
 
-      @assignment = @course.assignments.create!(:title => 'Assignment', :points_possible => 10)
-      @submission = @assignment.grade_student(@student, grade: 7, grader: @teacher).first
-      @submission = @assignment.grade_student(@student, grade: 8, grader: @teacher).first
+      Timecop.freeze(5.seconds.ago) do
+        @submission = @assignment.grade_student(@student, grade: 7, grader: @teacher).first
+      end
+
+      Timecop.freeze(3.seconds.ago) do
+        @submission = @assignment.grade_student(@student, grade: 8, grader: @teacher).first
+      end
+
       @submission = @assignment.grade_student(@student, grade: 9, grader: @teacher).first
 
       load_admin_tools_page
@@ -370,8 +380,9 @@ describe "admin_tools" do
         @course.name = "Course #{index}"
         @course.start_at = Date.today + index.days
         @course.conclude_at = @course.start_at + 7.days
-
-        @event = Auditors::Course.record_updated(@course, @teacher, @course.changes)
+        Timecop.freeze(index.seconds.from_now) do
+          @event = Auditors::Course.record_updated(@course, @teacher, @course.changes)
+        end
         @events << @event
       end
       @course.save
