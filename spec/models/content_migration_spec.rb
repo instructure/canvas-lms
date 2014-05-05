@@ -419,25 +419,50 @@ describe ContentMigration do
     end
 
     context "wiki front page" do
-      it "should copy wiki front page setting" do
+      it "should copy wiki front page setting if there is no front page" do
         page = @copy_from.wiki.wiki_pages.create!(:title => "stuff and stuff")
         @copy_from.wiki.set_front_page_url!(page.url)
 
+        @copy_to.wiki.unset_front_page!
         run_course_copy
 
         new_page = @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(page))
         @copy_to.wiki.front_page.should == new_page
       end
 
-      it "should copy wiki has_no_front_page setting if draft state is enabled" do
-        @copy_from.root_account.enable_feature!(:draft_state)
+      it "should not overwrite current front page" do
+        @copy_to.root_account.enable_feature!(:draft_state)
 
-        @copy_from.wiki.front_page.save!
-        @copy_from.wiki.unset_front_page!
+        copy_from_front_page = @copy_from.wiki.wiki_pages.create!(:title => "stuff and stuff")
+        @copy_from.wiki.set_front_page_url!(copy_from_front_page.url)
+
+        copy_to_front_page = @copy_to.wiki.wiki_pages.create!(:title => "stuff and stuff and even more stuf")
+        @copy_to.wiki.set_front_page_url!(copy_to_front_page.url)
 
         run_course_copy
 
-        @copy_to.wiki.has_no_front_page?.should == true
+        @copy_to.wiki.front_page.should == copy_to_front_page
+      end
+
+      it "should remain with no front page if other front page is not selected for copy" do
+        @copy_to.root_account.enable_feature!(:draft_state)
+
+        front_page = @copy_from.wiki.wiki_pages.create!(:title => "stuff and stuff")
+        @copy_from.wiki.set_front_page_url!(front_page.url)
+
+        other_page = @copy_from.wiki.wiki_pages.create!(:title => "stuff and other stuff")
+
+        @copy_to.wiki.unset_front_page!
+
+        # only select one of each type
+        @cm.copy_options = {
+            :wiki_pages => {mig_id(other_page) => "1", mig_id(front_page) => "0"}
+        }
+        @cm.save!
+
+        run_course_copy
+
+        @copy_to.wiki.has_no_front_page.should == true
       end
 
       it "should set retain default behavior if front page is missing and draft state is not enabled" do

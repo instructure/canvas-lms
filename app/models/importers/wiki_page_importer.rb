@@ -61,7 +61,7 @@ module Importers
           item.workflow_state = 'unpublished'
         end
       end
-      item.set_as_front_page! if !!hash[:front_page]
+      item.set_as_front_page! if !!hash[:front_page] && context.wiki.has_no_front_page
       context.imported_migration_items << item if context.imported_migration_items && item.new_record?
       item.migration_id = hash[:migration_id]
       (hash[:contents] || []).each do |sub_item|
