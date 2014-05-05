@@ -1632,14 +1632,6 @@ class Assignment < ActiveRecord::Base
   end
   protected :readable_submission_type
 
-  def self.process_migration(*args)
-    Importers::AssignmentImporter.process_migration(*args)
-  end
-
-  def self.import_from_migration(*args)
-    Importers::AssignmentImporter.import_from_migration(*args)
-  end
-
   def expects_submission?
     submission_types && submission_types.strip != "" && submission_types != "none" && submission_types != 'not_graded' && submission_types != "on_paper" && submission_types != 'external_tool'
   end

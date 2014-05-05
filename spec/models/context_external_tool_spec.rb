@@ -689,20 +689,4 @@ describe ContextExternalTool do
       expect { ContextExternalTool.find_for("horseshoes", @course, :course_navigation) }.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
-  
-  describe "import_from_migration" do
-    it "should work for course-level tools" do
-      course_model
-      tool = Importers::ContextExternalToolImporter.import_from_migration({:title => 'tool', :url => 'http://example.com'}, @course)
-      tool.should_not be_nil
-      tool.context.should == @course
-    end
-    
-    it "should work for account-level tools" do
-      course_model
-      tool = Importers::ContextExternalToolImporter.import_from_migration({:title => 'tool', :url => 'http://example.com'}, @course.account)
-      tool.should_not be_nil
-      tool.context.should == @course.account
-    end
-  end
 end

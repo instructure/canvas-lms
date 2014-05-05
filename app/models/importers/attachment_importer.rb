@@ -26,7 +26,7 @@ module Importers
       attachments.values.each do |att|
         if !att['is_folder'] && (migration.import_object?("attachments", att['migration_id']) || migration.import_object?("files", att['migration_id']))
           begin
-            import_from_migration(att, migration.context)
+            import_from_migration(att, migration.context, migration)
           rescue
             migration.add_import_warning(I18n.t('#migration.file_type', "File"), (att[:display_name] || att[:path_name]), $!)
           end
@@ -56,7 +56,7 @@ module Importers
 
     private
 
-    def self.import_from_migration(hash, context, item=nil)
+    def self.import_from_migration(hash, context, migration=nil, item=nil)
       return nil if hash[:files_to_import] && !hash[:files_to_import][hash[:migration_id]]
       item ||= Attachment.find_by_context_type_and_context_id_and_id(context.class.to_s, context.id, hash[:id])
       item ||= Attachment.find_by_context_type_and_context_id_and_migration_id(context.class.to_s, context.id, hash[:migration_id]) # if hash[:migration_id]
@@ -68,7 +68,7 @@ module Importers
         item.file_state = 'hidden' if hash[:hidden]
         item.display_name = hash[:display_name] if hash[:display_name]
         item.save_without_broadcasting!
-        context.imported_migration_items << item if context.imported_migration_items
+        migration.add_imported_item(item) if migration
       end
       item
     end

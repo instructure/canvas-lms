@@ -966,7 +966,7 @@ XML
     ag.migration_id = "i713e960ab2685259505efeb08cd48a1d"
     ag.save!
     
-    Importers::QuizImporter.import_from_migration(quiz_hash, @copy_to, {})
+    Importers::QuizImporter.import_from_migration(quiz_hash, @copy_to, nil, {})
     q = @copy_to.quizzes.find_by_migration_id("ie3d8f8adfad423eb225229c539cdc450")
     a = q.assignment
     a.assignment_group.id.should == ag.id

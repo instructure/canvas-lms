@@ -182,7 +182,7 @@ class Course < ActiveRecord::Base
   has_many :page_views, :as => :context
   has_many :asset_user_accesses, :as => :context
   has_many :role_overrides, :as => :context
-  has_many :content_migrations, :foreign_key => :context_id
+  has_many :content_migrations, :as => :context
   has_many :content_exports
   has_many :course_imports
   has_many :alerts, :as => :context, :include => :criteria
@@ -1925,15 +1925,11 @@ class Course < ActiveRecord::Base
     Canvas::Plugin.value_to_boolean(val)
   end
 
-  def import_from_migration(data, params, migration)
-    Importers::CourseContentImporter.import_content(self, data, params, migration)
-  end
-
   def add_migration_warning(message, exception='')
     self.content_migration.add_warning(message, exception) if self.content_migration
   end
 
-  attr_accessor :imported_migration_items, :full_migration_hash, :external_url_hash, :content_migration,
+  attr_accessor :full_migration_hash, :external_url_hash, :content_migration,
                 :folder_name_lookups, :attachment_path_id_lookup, :attachment_path_id_lookup_lower,
                 :assignment_group_no_drop_assignments, :migration_results
 

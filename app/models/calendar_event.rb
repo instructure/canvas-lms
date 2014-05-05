@@ -514,14 +514,6 @@ class CalendarEvent < ActiveRecord::Base
     return CalendarEvent::IcalEvent.new(self).to_ics(in_own_calendar)
   end
 
-  def self.process_migration(*args)
-    Importers::CalendarEventImporter.process_migration(*args)
-  end
-
-  def self.import_from_migration(*args)
-    Importers::CalendarEventImporter.import_from_migration(*args)
-  end
-
   def self.max_visible_calendars
     10
   end

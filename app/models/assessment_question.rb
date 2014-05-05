@@ -263,13 +263,5 @@ class AssessmentQuestion < ActiveRecord::Base
     dup
   end
 
-  def self.process_migration(*args)
-    Importers::AssessmentQuestionImporter.process_migration(*args)
-  end
-
-  def self.import_from_migration(*args)
-    Importers::AssessmentQuestionImporter.import_from_migration(*args)
-  end
-
   scope :active, where("assessment_questions.workflow_state<>'deleted'")
 end

@@ -433,12 +433,4 @@ class WikiPage < ActiveRecord::Base
       self.workflow_state = 'active'
     end
   end
-
-  def self.process_migration(*args)
-    Importers::WikiPageImporter.process_migration(*args)
-  end
-
-  def self.import_from_migration(*args)
-    Importers::WikiPageImporter.import_from_migration(*args)
-  end
 end

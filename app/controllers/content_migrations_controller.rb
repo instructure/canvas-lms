@@ -191,9 +191,7 @@ class ContentMigrationsController < ApplicationController
   end
 
   def migration_plugin_supported?(plugin)
-    # FIXME most migration types don't support Account either, but plugins that do would have to set additional_contexts
-    # in order to not be broken by this
-    @context.is_a?(Course) || @context.is_a?(Account) || Array(plugin.settings[:additional_contexts]).include?(@context.class.to_s)
+    Array(plugin.settings && plugin.settings[:valid_contexts]).include?(@context.class.to_s)
   end
   private :migration_plugin_supported?
 
@@ -446,7 +444,7 @@ class ContentMigrationsController < ApplicationController
   def find_migration_plugin(name)
     if name =~ /context_external_tool/
       plugin = Canvas::Plugin.new(name)
-      plugin.meta[:settings] = {requires_file_upload: true, worker: 'CCWorker'}.with_indifferent_access
+      plugin.meta[:settings] = {requires_file_upload: true, worker: 'CCWorker', valid_contexts: %w{Course}}.with_indifferent_access
       plugin
     else
       Canvas::Plugin.find(name)

@@ -33,7 +33,7 @@ class ContentMigration < ActiveRecord::Base
   DATE_FORMAT = "%m/%d/%Y"
 
   attr_accessible :context, :migration_settings, :user, :source_course, :copy_options, :migration_type, :initiated_source
-  attr_accessor :outcome_to_id_map
+  attr_accessor :imported_migration_items, :outcome_to_id_map
 
   EXPORTABLE_ATTRIBUTES = [
     :id, :context_id, :user_id, :workflow_state, :migration_settings, :started_at, :finished_at, :created_at, :updated_at, :context_type,
@@ -421,7 +421,7 @@ class ContentMigration < ActiveRecord::Base
 
       migration_settings[:migration_ids_to_import] ||= {:copy=>{}}
 
-      self.context.import_from_migration(data, migration_settings[:migration_ids_to_import], self)
+      Importers.content_importer_for(self.context_type).import_content(self.context, data, migration_settings[:migration_ids_to_import], self)
 
       if !self.import_immediately?
         update_import_progress(100)
@@ -608,5 +608,13 @@ class ContentMigration < ActiveRecord::Base
       sub_hash.merge!(clean_hash)
     end
     hash
+  end
+
+  def imported_migration_items
+    @imported_migration_items ||= []
+  end
+
+  def add_imported_item(item)
+    self.imported_migration_items << item unless self.imported_migration_items.include?(item)
   end
 end

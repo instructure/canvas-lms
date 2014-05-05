@@ -2,6 +2,7 @@ module Importers
   class CourseContentImporter < Importer
 
     self.item_class = Course
+    Importers.register_content_importer(self)
 
     def self.process_migration_files(course, data, migration)
       return unless data['all_files_export'] && data['all_files_export']['file_path']
@@ -69,14 +70,13 @@ module Importers
         course.external_url_hash[link['link_id']] = link
       end
       ActiveRecord::Base.skip_touch_context
-      course.imported_migration_items = []
 
       if !migration.for_course_copy?
         # These only need to be processed once
         Attachment.skip_media_object_creation do
           self.process_migration_files(course, data, migration); migration.update_import_progress(18)
           Importers::AttachmentImporter.process_migration(data, migration); migration.update_import_progress(20)
-          mo_attachments = course.imported_migration_items.find_all { |i| i.is_a?(Attachment) && i.media_entry_id.present? }
+          mo_attachments = migration.imported_migration_items.find_all { |i| i.is_a?(Attachment) && i.media_entry_id.present? }
           begin
             self.import_media_objects(mo_attachments, migration)
           rescue => e
@@ -138,7 +138,7 @@ module Importers
       syllabus_should_be_added = everything_selected || migration.copy_options[:syllabus_body] || migration.copy_options[:all_syllabus_body]
       if syllabus_should_be_added
         syllabus_body = data[:course][:syllabus_body] if data[:course]
-        self.import_syllabus_from_migration(course, syllabus_body) if syllabus_body
+        self.import_syllabus_from_migration(course, syllabus_body, migration) if syllabus_body
       end
 
       migration.add_warnings_for_missing_content_links
@@ -147,7 +147,7 @@ module Importers
         #Adjust dates
         if shift_options = migration.date_shift_options
           shift_options = self.shift_date_options(course, shift_options)
-          course.imported_migration_items.each do |event|
+          migration.imported_migration_items.each do |event|
             if event.is_a?(Assignment)
               event.due_at = shift_date(event.due_at, shift_options)
               event.lock_at = shift_date(event.lock_at, shift_options)
@@ -183,7 +183,7 @@ module Importers
       end
       migration.progress=100
       migration.migration_settings ||= {}
-      migration.migration_settings[:imported_assets] = course.imported_migration_items.map(&:asset_string)
+      migration.migration_settings[:imported_assets] = migration.imported_migration_items.map(&:asset_string)
       migration.workflow_state = :imported
       migration.save
       ActiveRecord::Base.skip_touch_context(false)
@@ -192,13 +192,14 @@ module Importers
       else
         course.touch
       end
+
       Auditors::Course.record_copied(migration.source_course, course, migration.user, source: migration.initiated_source)
-      course.imported_migration_items
+      migration.imported_migration_items
     end
 
-    def self.import_syllabus_from_migration(course, syllabus_body)
+    def self.import_syllabus_from_migration(course, syllabus_body, migration=nil)
       missing_links = []
-      course.syllabus_body = ImportedHtmlConverter.convert(syllabus_body, course, {:missing_links => missing_links})
+      course.syllabus_body = ImportedHtmlConverter.convert(syllabus_body, course, migration, {:missing_links => missing_links})
       course.content_migration.add_missing_content_links(:class => course.class.to_s,
                                                        :id => course.id, :field => "syllabus", :missing_links => missing_links,
                                                        :url => "/#{course.class.to_s.underscore.pluralize}/#{course.id}/assignments/syllabus")

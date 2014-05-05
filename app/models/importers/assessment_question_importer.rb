@@ -53,7 +53,7 @@ module Importers
             question[:question_bank_name] ||= migration.question_bank_name
             question[:question_bank_name] ||= AssessmentQuestionBank.default_imported_title
           end
-          if question[:assessment_question_migration_id]
+          if question[:assessment_question_migration_id] && !migration.migration_settings[:import_quiz_questions_without_quiz]
             question_data[:qq_data][question['migration_id']] = question
             next
           end
@@ -81,7 +81,7 @@ module Importers
           end
 
           begin
-            question = self.import_from_migration(question, migration.context, question_bank)
+            question = self.import_from_migration(question, migration.context, migration, question_bank)
 
             # If the question appears to have links, we need to translate them so that file links point
             # to the AssessmentQuestion. Ideally we would just do this before saving the question, but
@@ -102,7 +102,7 @@ module Importers
       question_data
     end
 
-    def self.import_from_migration(hash, context, bank=nil, options={})
+    def self.import_from_migration(hash, context, migration=nil, bank=nil, options={})
       hash = hash.with_indifferent_access
       if !bank
         hash[:question_bank_name] = nil if hash[:question_bank_name] == ''
@@ -120,8 +120,10 @@ module Importers
         end
       end
       hash.delete(:question_bank_migration_id) if hash.has_key?(:question_bank_migration_id)
-      context.imported_migration_items << bank if context.imported_migration_items && !context.imported_migration_items.include?(bank)
-      self.prep_for_import(hash, context)
+
+      migration.add_imported_item(bank) if migration
+      self.prep_for_import(hash, context, migration)
+
       if id = hash['assessment_question_id']
         AssessmentQuestion.where(id: id).update_all(name: hash[:question_name], question_data: hash.to_yaml,
             workflow_state: 'active', created_at: Time.now.utc, updated_at: Time.now.utc,
@@ -132,19 +134,19 @@ module Importers
           VALUES (?,?,'active',?,?,?,?)
         SQL
         id = AssessmentQuestion.connection.insert(query, "#{name} Create",
-                                                  AssessmentQuestion.primary_key, nil, AssessmentQuestion.sequence_name)
+          AssessmentQuestion.primary_key, nil, AssessmentQuestion.sequence_name)
         hash['assessment_question_id'] = id
       end
-      if context.respond_to?(:content_migration) && context.content_migration
+      if migration
         hash[:missing_links].each do |field, missing_links|
-          context.content_migration.add_missing_content_links(:class => self.to_s,
-                                                              :id => hash['assessment_question_id'], :field => field, :missing_links => missing_links,
-                                                              :url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/question_banks/#{bank.id}#question_#{hash['assessment_question_id']}_question_text")
+          migration.add_missing_content_links(:class => self.to_s,
+            :id => hash['assessment_question_id'], :field => field, :missing_links => missing_links,
+            :url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/question_banks/#{bank.id}#question_#{hash['assessment_question_id']}_question_text")
         end
         if hash[:import_warnings]
           hash[:import_warnings].each do |warning|
-            context.content_migration.add_warning(warning, {
-                :fix_issue_html_url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/question_banks/#{bank.id}#question_#{hash['assessment_question_id']}_question_text"
+            migration.add_warning(warning, {
+              :fix_issue_html_url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/question_banks/#{bank.id}#question_#{hash['assessment_question_id']}_question_text"
             })
           end
         end
@@ -153,11 +155,11 @@ module Importers
       hash
     end
 
-    def self.prep_for_import(hash, context)
+    def self.prep_for_import(hash, context, migration=nil)
       hash[:missing_links] = {}
       [:question_text, :correct_comments_html, :incorrect_comments_html, :neutral_comments_html, :more_comments_html].each do |field|
         hash[:missing_links][field] = []
-        hash[field] = ImportedHtmlConverter.convert(hash[field], context, {:missing_links => hash[:missing_links][field], :remove_outer_nodes_if_one_child => true}) if hash[field].present?
+        hash[field] = ImportedHtmlConverter.convert(hash[field], context, migration, {:missing_links => hash[:missing_links][field], :remove_outer_nodes_if_one_child => true}) if hash[field].present?
       end
       [:correct_comments, :incorrect_comments, :neutral_comments, :more_comments].each do |field|
         html_field = "#{field}_html".to_sym
@@ -168,7 +170,7 @@ module Importers
       hash[:answers].each_with_index do |answer, i|
         [:html, :comments_html, :left_html].each do |field|
           hash[:missing_links]["answer #{i} #{field}"] = []
-          answer[field] = ImportedHtmlConverter.convert(answer[field], context, {:missing_links => hash[:missing_links]["answer #{i} #{field}"], :remove_outer_nodes_if_one_child => true}) if answer[field].present?
+          answer[field] = ImportedHtmlConverter.convert(answer[field], context, migration, {:missing_links => hash[:missing_links]["answer #{i} #{field}"], :remove_outer_nodes_if_one_child => true}) if answer[field].present?
         end
         if answer[:comments].present? && answer[:comments] == answer[:comments_html]
           answer.delete(:comments_html)

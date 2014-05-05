@@ -524,14 +524,6 @@ class ContextModule < ActiveRecord::Base
     self.unlock_at && self.unlock_at > Time.now
   end
 
-  def self.process_migration(*args)
-    Importers::ContextModuleImporter.process_migration(*args)
-  end
-
-  def self.import_from_migration(*args)
-    Importers::ContextModuleImporter.import_from_migration(*args)
-  end
-
   def migration_position
     @migration_position_counter ||= 0
     @migration_position_counter = @migration_position_counter + 1

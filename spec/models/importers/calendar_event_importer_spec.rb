@@ -72,7 +72,7 @@ describe Importers::CalendarEventImporter do
     it 'initializes a calendar event based on hash data' do
       event = migration_course.calendar_events.build
       hash = {
-        migration_id: 42,
+        migration_id: '42',
         title: 'event title',
         description: 'the event description',
         start_at: Time.now,
@@ -80,10 +80,10 @@ describe Importers::CalendarEventImporter do
         attachment_type: 'external_url',
         attachment_value: 'http://example.com'
       }
-      Importers::CalendarEventImporter.import_from_migration(hash, migration_course, event)
+      Importers::CalendarEventImporter.import_from_migration(hash, migration_course, nil, event)
       event.should_not be_new_record
       event.imported.should be_true
-      event.migration_id.should == 42
+      event.migration_id.should == '42'
       event.title.should == 'event title'
       event.description.should match('the event description')
       event.description.should match('example.com')

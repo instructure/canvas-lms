@@ -308,7 +308,7 @@ describe Course do
 
       Auditors::Course.expects(:record_copied).once.with(migration.source_course, @course, migration.user, source: migration.initiated_source)
 
-      @course.import_from_migration(data, params, migration)
+      Importers::CourseContentImporter.import_content(@course, data, params, migration)
     end
   end
 end

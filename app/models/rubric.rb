@@ -264,12 +264,4 @@ class Rubric < ActiveRecord::Base
   def update_assessments_for_new_criteria(new_criteria)
     criteria = self.data
   end
-
-  def self.process_migration(*args)
-    Importers::RubricImporter.process_migration(*args)
-  end
-
-  def self.import_from_migration(*args)
-    Importers::RubricImporter.import_from_migration(*args)
-  end
 end

@@ -169,14 +169,6 @@ class AssignmentGroup < ActiveRecord::Base
     assignments.map(&:students).flatten
   end
 
-  def self.process_migration(*args)
-    Importers::AssignmentGroupImporter.process_migration(*args)
-  end
-
-  def self.import_from_migration(*args)
-    Importers::AssignmentGroupImporter.import_from_migration(*args)
-  end
-
   def self.add_never_drop_assignment(group, assignment)
     rule = "never_drop:#{assignment.id}\n"
     if group.rules

@@ -213,11 +213,4 @@ class LearningOutcome < ActiveRecord::Base
 
   scope :global, where(:context_id => nil)
 
-  def self.process_migration(*args)
-    Importers::LearningOutcomeImporter.process_migration(*args)
-  end
-
-  def self.import_from_migration(*args)
-    Importers::LearningOutcomeImporter.import_from_migration(*args)
-  end
 end

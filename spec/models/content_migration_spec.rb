@@ -2411,4 +2411,73 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
     worker.perform(cm)
   end
 
+  context "account-level import" do
+    it "should import question banks from qti migrations" do
+      pending unless Qti.qti_enabled?
+
+      account = Account.create!(:name => 'account')
+      @user = user
+      account.add_user(@user)
+      cm = ContentMigration.new(:context => account, :user => @user)
+      cm.migration_type = 'qti_converter'
+      cm.migration_settings['import_immediately'] = true
+      qb_name = 'Import Unfiled Questions Into Me'
+      cm.migration_settings['question_bank_name'] = qb_name
+      cm.save!
+
+      package_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/cc_default_qb_test.zip")
+      attachment = Attachment.new
+      attachment.context = cm
+      attachment.uploaded_data = File.open(package_path, 'rb')
+      attachment.filename = 'file.zip'
+      attachment.save!
+
+      cm.attachment = attachment
+      cm.save!
+
+      cm.queue_migration
+      run_jobs
+
+      cm.migration_issues.should be_empty
+
+      account.assessment_question_banks.count.should == 1
+      bank = account.assessment_question_banks.first
+      bank.title.should == qb_name
+
+      bank.assessment_questions.count.should == 1
+    end
+
+    it "should import questions from quizzes into question banks" do
+      pending unless Qti.qti_enabled?
+
+      account = Account.create!(:name => 'account')
+      @user = user
+      account.add_user(@user)
+      cm = ContentMigration.new(:context => account, :user => @user)
+      cm.migration_type = 'qti_converter'
+      cm.migration_settings['import_immediately'] = true
+      cm.save!
+
+      package_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/quiz_qti.zip")
+      attachment = Attachment.new
+      attachment.context = cm
+      attachment.uploaded_data = File.open(package_path, 'rb')
+      attachment.filename = 'file.zip'
+      attachment.save!
+
+      cm.attachment = attachment
+      cm.save!
+
+      cm.queue_migration
+      run_jobs
+
+      cm.migration_issues.should be_empty
+
+      account.assessment_question_banks.count.should == 1
+      bank = account.assessment_question_banks.first
+      bank.title.should == "Unnamed Quiz"
+
+      bank.assessment_questions.count.should == 1
+    end
+  end
 end

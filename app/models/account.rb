@@ -76,6 +76,8 @@ class Account < ActiveRecord::Base
   has_many :roles
   has_many :all_roles, :class_name => 'Role', :foreign_key => 'root_account_id'
   has_many :progresses, :as => :context
+  has_many :content_migrations, :as => :context
+
   def inherited_assessment_question_banks(include_self = false, *additional_contexts)
     sql = []
     conds = []
@@ -1369,10 +1371,6 @@ class Account < ActiveRecord::Base
 
   def canvas_network_enabled?
     false
-  end
-
-  def import_from_migration(data, params, migration)
-    Importers::AccountContentImporter.import_content(self, data, params, migration)
   end
 
   def enable_fabulous_quizzes!

@@ -427,24 +427,6 @@ describe Group do
     group.group_category.should == group_category
   end
 
-  context "import_from_migration" do
-    it "should respect group_category from the hash" do
-      course_with_teacher
-      group = @course.groups.build
-      @course.imported_migration_items = []
-      Importers::GroupImporter.import_from_migration({:group_category => "random category"}, @course, group)
-      group.group_category.name.should == "random category"
-    end
-
-    it "should default group_category to imported if not in the hash" do
-      course_with_teacher
-      group = @course.groups.build
-      @course.imported_migration_items = []
-      Importers::GroupImporter.import_from_migration({}, @course, group)
-      group.group_category.should == GroupCategory.imported_for(@course)
-    end
-  end
-
   it "as_json should include group_category" do
     course()
     gc = group_category(name: "Something")

@@ -943,18 +943,6 @@ class DiscussionTopic < ActiveRecord::Base
     Rails.cache.delete(root_topic.locked_cache_key(user)) if root_topic
   end
 
-  def self.process_migration(data, migration)
-    # TODO: access Importers::DiscussionTopic directly
-    Importers::DiscussionTopicImporter.process_migration(data, migration)
-  end
-
-  def self.import_from_migration(*args)
-    # TODO: access Importers::DiscussionTopic directly
-    # this class method will eventually go away. leaving now
-    # for edge cases that may be using it.
-    Importers::DiscussionTopicImporter.import_from_migration(*args)
-  end
-
   def self.podcast_elements(messages, context)
     attachment_ids = []
     media_object_ids = []

@@ -8,7 +8,7 @@ module Importers
       modules.each do |mod|
         if migration.import_object?("context_modules", mod['migration_id']) || migration.import_object?("modules", mod['migration_id'])
           begin
-            self.import_from_migration(mod, migration.context)
+            self.import_from_migration(mod, migration.context, migration)
           rescue
             migration.add_import_warning(t('#migration.module_type', "Module"), mod[:title], $!)
           end
@@ -18,13 +18,13 @@ module Importers
       migration.context.touch
     end
 
-    def self.import_from_migration(hash, context, item=nil)
+    def self.import_from_migration(hash, context, migration=nil, item=nil)
       hash = hash.with_indifferent_access
       return nil if hash[:migration_id] && hash[:modules_to_import] && !hash[:modules_to_import][hash[:migration_id]]
       item ||= ContextModule.find_by_context_type_and_context_id_and_id(context.class.to_s, context.id, hash[:id])
       item ||= ContextModule.find_by_context_type_and_context_id_and_migration_id(context.class.to_s, context.id, hash[:migration_id]) if hash[:migration_id]
       item ||= ContextModule.new(:context => context)
-      context.imported_migration_items << item if context.imported_migration_items && item.new_record?
+      migration.add_imported_item(item) if migration && item.new_record?
       item.name = hash[:title] || hash[:description]
       item.migration_id = hash[:migration_id]
       if hash[:workflow_state] == 'unpublished'
@@ -60,9 +60,9 @@ module Importers
       @item_migration_position = item.content_tags.not_deleted.map(&:position).compact.max || 0
       (hash[:items] || []).each do |tag_hash|
         begin
-          self.add_module_item_from_migration(item, tag_hash, 0, context, item_map)
+          self.add_module_item_from_migration(item, tag_hash, 0, context, item_map, migration)
         rescue
-          context.content_migration.add_import_warning(t(:migration_module_item_type, "Module Item"), tag_hash[:title], $!) if context.content_migration
+          migration.add_import_warning(t(:migration_module_item_type, "Module Item"), tag_hash[:title], $!) if migration
         end
       end
 
@@ -85,7 +85,7 @@ module Importers
     end
 
 
-    def self.add_module_item_from_migration(context_module, hash, level, context, item_map)
+    def self.add_module_item_from_migration(context_module, hash, level, context, item_map, migration=nil)
       hash = hash.with_indifferent_access
       hash[:migration_id] ||= hash[:item_migration_id]
       hash[:migration_id] ||= Digest::MD5.hexdigest(hash[:title]) if hash[:title]
@@ -97,7 +97,7 @@ module Importers
       else
         existing_item.workflow_state = 'active'
       end
-      context.imported_migration_items << existing_item if context.imported_migration_items && existing_item.new_record?
+      migration.add_imported_item(existing_item) if migration && existing_item.new_record?
       existing_item.migration_id = hash[:migration_id]
       hash[:indent] = [hash[:indent] || 0, level].max
       if hash[:linked_resource_type] =~ /wiki_type|wikipage/i
@@ -203,7 +203,7 @@ module Importers
       end
       if hash[:sub_items]
         hash[:sub_items].each do |tag_hash|
-          self.add_module_item_from_migration(context_module, tag_hash, level + 1, context, item_map)
+          self.add_module_item_from_migration(context_module, tag_hash, level + 1, context, item_map, migration)
         end
       end
       item

@@ -7,7 +7,7 @@ module Importers
       tools = data['external_tools'] ? data['external_tools']: []
       tools.each do |tool|
         if migration.import_object?("context_external_tools", tool['migration_id']) || migration.import_object?("external_tools", tool['migration_id'])
-          item = import_from_migration(tool, migration.context)
+          item = import_from_migration(tool, migration.context, migration)
           if item.consumer_key == 'fake' || item.shared_secret == 'fake'
             migration.add_warning(t('external_tool_attention_needed', 'The security parameters for the external tool "%{tool_name}" need to be set in Course Settings.', :tool_name => item.name))
           end
@@ -15,7 +15,7 @@ module Importers
       end
     end
 
-    def self.import_from_migration(hash, context, item=nil)
+    def self.import_from_migration(hash, context, migration=nil, item=nil)
       hash = hash.with_indifferent_access
       return nil if hash[:migration_id] && hash[:external_tools_to_import] && !hash[:external_tools_to_import][hash[:migration_id]]
       item ||= ContextExternalTool.find_by_context_id_and_context_type_and_migration_id(context.id, context.class.to_s, hash[:migration_id]) if hash[:migration_id]
@@ -48,7 +48,7 @@ module Importers
       end
 
       item.save!
-      context.imported_migration_items << item if context.respond_to?(:imported_migration_items) && context.imported_migration_items && item.new_record?
+      migration.add_imported_item(item) if migration && item.new_record?
       item
     end
   end

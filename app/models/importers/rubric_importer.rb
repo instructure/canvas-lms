@@ -60,7 +60,7 @@ module Importers
           end
         end
 
-        context.imported_migration_items << item if context.imported_migration_items && item.new_record?
+        migration.add_imported_item(item) if migration && item.new_record?
         item.save!
       end
 

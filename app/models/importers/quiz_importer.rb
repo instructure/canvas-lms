@@ -42,8 +42,7 @@ module Importers
             end
           end
           begin
-            assessment[:migration] = migration
-            Importers::QuizImporter.import_from_migration(assessment, migration.context, question_data, nil, allow_update)
+            Importers::QuizImporter.import_from_migration(assessment, migration.context, migration, question_data, nil, allow_update)
           rescue
             migration.add_import_warning(t('#migration.quiz_type', "Quiz"), assessment[:title], $!)
           end
@@ -53,7 +52,7 @@ module Importers
 
     # Import a quiz from a hash.
     # It assumes that all the referenced questions are already in the database
-    def self.import_from_migration(hash, context, question_data, item=nil, allow_update = false)
+    def self.import_from_migration(hash, context, migration=nil, question_data=nil, item=nil, allow_update = false)
       hash = hash.with_indifferent_access
       # there might not be an import id if it's just a text-only type...
       item ||= Quizzes::Quiz.find_by_context_type_and_context_id_and_id(context.class.to_s, context.id, hash[:id]) if hash[:id]
@@ -75,7 +74,7 @@ module Importers
       item.hide_correct_answers_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:hide_correct_answers_at]) if hash[:hide_correct_answers_at]
       item.scoring_policy = hash[:which_attempt_to_keep] if hash[:which_attempt_to_keep]
       hash[:missing_links] = []
-      item.description = ImportedHtmlConverter.convert(hash[:description], context, {:missing_links => hash[:missing_links]})
+      item.description = ImportedHtmlConverter.convert(hash[:description], context, migration, {:missing_links => hash[:missing_links]})
 
 
       %w[
@@ -106,8 +105,8 @@ module Importers
 
       item.save!
 
-      if context.respond_to?(:content_migration) && context.content_migration
-        context.content_migration.add_missing_content_links(
+      if migration
+        migration.add_missing_content_links(
           :class => item.class.to_s,
           :id => item.id, :missing_links => hash[:missing_links],
           :url => "/#{context.class.to_s.demodulize.underscore.pluralize}/#{context.id}/#{item.class.to_s.demodulize.underscore.pluralize}/#{item.id}"
@@ -143,21 +142,21 @@ module Importers
               if qq[:assessment_question_migration_id]
                 if aq = question_data[:aq_data][qq[:assessment_question_migration_id]]
                   qq['assessment_question_id'] = aq['assessment_question_id']
-                  aq_hash = ::Importers::AssessmentQuestionImporter.prep_for_import(qq, context)
-                  Quizzes::QuizQuestion.import_from_migration(aq_hash, context, item)
+                  aq_hash = ::Importers::AssessmentQuestionImporter.prep_for_import(qq, context, migration)
+                  Importers::QuizQuestionImporter.import_from_migration(aq_hash, context, migration, item)
                 else
-                  aq_hash = ::Importers::AssessmentQuestionImporter.import_from_migration(qq, context)
+                  aq_hash = ::Importers::AssessmentQuestionImporter.import_from_migration(qq, context, migration)
                   qq['assessment_question_id'] = aq_hash['assessment_question_id']
-                  Quizzes::QuizQuestion.import_from_migration(aq_hash, context, item)
+                  Importers::QuizQuestionImporter.import_from_migration(aq_hash, context, migration, item)
                 end
               end
             elsif aq = question_data[:aq_data][question[:migration_id]]
               aq[:position] = i + 1
               aq[:points_possible] = question[:points_possible] if question[:points_possible]
-              Quizzes::QuizQuestion.import_from_migration(aq, context, item)
+              Importers::QuizQuestionImporter.import_from_migration(aq, context, migration, item)
             end
           when "question_group"
-            Importers::QuizGroupImporter.import_from_migration(question, context, item, question_data, i + 1, hash[:migration])
+            Importers::QuizGroupImporter.import_from_migration(question, context, item, question_data, i + 1, migration)
           when "text_only_question"
             qq = item.quiz_questions.new
             qq.question_data = question
@@ -175,7 +174,7 @@ module Importers
         item.assignment = nil if item.assignment && item.assignment.quiz && item.assignment.quiz.id != item.id
         item.assignment ||= context.assignments.new
 
-        item.assignment = ::Importers::AssignmentImporter.import_from_migration(hash[:assignment], context, item.assignment, item)
+        item.assignment = ::Importers::AssignmentImporter.import_from_migration(hash[:assignment], context, migration, item.assignment, item)
 
         if !hash[:available]
           item.workflow_state = 'unpublished'
@@ -202,7 +201,7 @@ module Importers
       item.save
       item.assignment.save if item.assignment && item.assignment.changed?
 
-      context.imported_migration_items << item if context.imported_migration_items
+      migration.add_imported_item(item) if migration
       item
     end
 

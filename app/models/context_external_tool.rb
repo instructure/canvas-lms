@@ -160,7 +160,7 @@ class ContextExternalTool < ActiveRecord::Base
     if tool_hash[:error]
       @config_errors << [error_field, tool_hash[:error]]
     else
-      Importers::ContextExternalToolImporter.import_from_migration(tool_hash, context, self)
+      Importers::ContextExternalToolImporter.import_from_migration(tool_hash, context, nil, self)
     end
     self.name = real_name unless real_name.blank?
   rescue CC::Importer::BLTIConverter::CCImportError => e
@@ -535,14 +535,6 @@ class ContextExternalTool < ActiveRecord::Base
         end
       end
     end
-  end
-
-  def self.process_migration(*args)
-    Importers::ContextExternalToolImporter.process_migration(*args)
-  end
-
-  def self.import_from_migration(*args)
-    Importers::ContextExternalToolImporter.import_from_migration(*args)
   end
 
   def resource_selection_settings
