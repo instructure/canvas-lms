@@ -44,7 +44,7 @@ class WikiPagesController < ApplicationController
 
   def show
     if @context.feature_enabled?(:draft_state)
-      redirect_to polymorphic_url([@context, :named_page], :wiki_page_id => @page_name || @page, :titleize => params[:titleize])
+      redirect_to polymorphic_url([@context, :named_page], :wiki_page_id => @page_name || @page, :titleize => params[:titleize], :module_item_id => params[:module_item_id])
       return
     end
     @editing = true if Canvas::Plugin.value_to_boolean(params[:edit])
