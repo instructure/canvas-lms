@@ -128,7 +128,7 @@ shared_examples_for 'Delayed::Worker' do
       @worker.perform(job)
       old_id = @job.id
       @job = Delayed::Job.list_jobs(:failed, 1).first
-      (@job.respond_to?(:original_id) ? @job.original_id : @job.id).should == old_id
+      @job.original_job_id.should == old_id
       @job.last_error.should =~ /did not work/
       @job.last_error.should =~ /worker_spec.rb/
       @job.attempts.should == 1
