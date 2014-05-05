@@ -604,8 +604,8 @@ shared_examples_for 'a backend' do
       jobs[1].fail!
       failed = (Delayed::Job.list_jobs(:failed, 1, 0) + Delayed::Job.list_jobs(:failed, 1, 1)).sort_by { |j| j.id }
       failed.size.should == 2
-      failed[0].original_id.should == jobs[0].id
-      failed[1].original_id.should == jobs[1].id
+      failed[0].original_job_id.should == jobs[0].id
+      failed[1].original_job_id.should == jobs[1].id
     end
   end
 
