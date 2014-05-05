@@ -271,9 +271,9 @@ define [
     # Returns nothing.
     _onSearchResultLoad: =>
       @cache[@currentUrl] = @resultCollection.toJSON()
-      @resultCollection.each @_addToModelCache
       _.extend(@permissions, @_getPermissions())
       @_addEveryoneResult(@resultCollection) unless @excludeAll or !@_canSendToAll()
+      @resultCollection.each @_addToModelCache
       shouldDrawResults = @resultCollection.length
       isFinished        = !@nextRequest
       @_addBackResult(@resultCollection)
