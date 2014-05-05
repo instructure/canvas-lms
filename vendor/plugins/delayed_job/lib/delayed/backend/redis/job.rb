@@ -555,7 +555,6 @@ class Job
     def original_job_id
       id
     end
-    alias_method :original_id, :original_job_id
   end
 end
 end
