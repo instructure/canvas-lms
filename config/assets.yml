@@ -77,6 +77,6 @@ things like 'public/stylesheets_compiled/new_styles_high_contrast/speed_grader.c
 which was compiled with the $use_new_styles and $use_high_contrast variables set correctly.
 
 =end
-  require File.expand_path('../lib/multi_variant_compass_compiler',  __FILE__)
+  require File.join(Jammit::ASSET_ROOT, 'lib', 'multi_variant_compass_compiler')
   MultiVariantCompassCompiler.make_variants_from_real_assets_yml
 %>
