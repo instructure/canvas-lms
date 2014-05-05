@@ -175,8 +175,6 @@ class Account < ActiveRecord::Base
   add_setting :enable_eportfolios, :boolean => true, :root_only => true
   add_setting :users_can_edit_name, :boolean => true, :root_only => true
   add_setting :open_registration, :boolean => true, :root_only => true
-  add_setting :enable_scheduler, :boolean => true, :root_only => true, :default => false
-  add_setting :calendar2_only, :boolean => true, :root_only => true, :default => false
   add_setting :show_scheduler, :boolean => true, :root_only => true, :default => false
   add_setting :enable_profiles, :boolean => true, :root_only => true, :default => false
   add_setting :enable_manage_groups2, :boolean => true, :root_only => true, :default => true
@@ -1380,6 +1378,14 @@ class Account < ActiveRecord::Base
 
   def disable_fabulous_quizzes!
     change_root_account_setting!(:enable_fabulous_quizzes, false)
+  end
+
+  def calendar2_only?
+    true
+  end
+
+  def enable_scheduler?
+    true
   end
 
   def change_root_account_setting!(setting_name, new_value)

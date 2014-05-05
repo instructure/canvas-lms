@@ -244,10 +244,6 @@ TEXT
                   <%= settings.check_box :global_includes, :checked => @account.settings[:global_includes] %>
                   <%= settings.label :global_includes, :en => "Global CSS/JavaScript includes" %>
                 </div>
-                <div>
-                  <%= settings.check_box :enable_scheduler, :checked => @account.settings[:enable_scheduler] %>
-                  <%= settings.label :enable_scheduler, :en => "Enable Calendar 2" %>
-                </div>
                 <div id="show_scheduler_checkbox">
                   <%= settings.check_box :show_scheduler, :checked => @account.settings[:show_scheduler] %>
                   <%= settings.label :show_scheduler, :en => "Enable Scheduler" %>

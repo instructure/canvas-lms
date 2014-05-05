@@ -105,30 +105,17 @@ describe "assignments" do
 
     it "should display assignment on calendar and link to assignment" do
       assignment_name = 'first assignment'
-      current_date = Time.now.utc
-      due_date = current_date + 2.days
+      due_date = Time.now + 2.days
       @assignment = @course.assignments.create(:name => assignment_name, :due_at => due_date)
 
-      get "/calendar"
+      get "/calendar2#view_name=month&view_start=#{due_date.to_date.to_s}"
 
-      #click on assignment in calendar
-      if due_date.month > current_date.month
-        f('#content .next_month_link').click
-        wait_for_ajaximations
-      end
-      day_id = '#day_' + due_date.year.to_s() + '_' + due_date.strftime('%m') + '_' + due_date.strftime('%d')
-      day_div = f(day_id)
       wait_for_ajaximations
-      sleep 1 # this is one of those cases where if we click too early, no subsequent clicks will work
-      day_div.find_element(:link, assignment_name).click
+      f('.assignment').click
       wait_for_ajaximations
-      details_dialog = f('#event_details').find_element(:xpath, '..')
-      details_dialog.should include_text(assignment_name)
-      details_dialog.find_element(:css, '.edit_event_link').click
+      f('.edit_event_link').click
       wait_for_ajaximations
-      details_dialog = f('#edit_event').find_element(:xpath, '..')
-      details_dialog.find_element(:name, 'assignment[title]').should be_displayed
-      details_dialog.find_element(:css, '#edit_assignment_form .more_options_link').click
+      f('.more_options_link').click
       wait_for_ajaximations
       f('#assignment_name')['value'].should include_text(assignment_name)
     end

@@ -429,7 +429,6 @@ class AccountsController < ApplicationController
             :enable_alerts,
             :enable_eportfolios,
             :enable_profiles,
-            :enable_scheduler,
             :show_scheduler,
             :global_includes,
             :gmail_domain
