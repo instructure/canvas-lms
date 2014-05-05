@@ -407,24 +407,38 @@ describe ApplicationHelper do
     end
   end
 
-  describe "dashboard_url" do
-    it "should return a regular canvas dashboard url" do
-      @controller.expects(:dashboard_url).with({}).returns("frd")
+  context "dashboard_url" do
+    before :each do
       @domain_root_account = Account.default
-      dashboard_url.should == "frd"
     end
 
-    it "should return the account's custom dashboard_url" do
-      @domain_root_account = Account.default
-      @domain_root_account.settings[:dashboard_url] = "http://foo.bar"
-      dashboard_url.should == "http://foo.bar"
+    it "returns a regular canvas dashboard url" do
+      @controller.expects(:dashboard_url).with({}).returns("http://test.host/") if CANVAS_RAILS2
+      dashboard_url.should == "http://test.host/"
     end
 
-    it "should return the account's custom dashboard_url with the current user's id" do
-      @domain_root_account = Account.default
-      @domain_root_account.settings[:dashboard_url] = "http://foo.bar"
-      @current_user = user
-      dashboard_url.should == "http://foo.bar?current_user_id=#{@current_user.id}"
+    context "with a custom dashboard_url on the account" do
+      before :each do
+        @domain_root_account.settings[:dashboard_url] = "http://foo.bar"
+      end
+
+      it "returns the custom dashboard_url" do
+        dashboard_url.should == "http://foo.bar"
+      end
+
+      it "with login_success=1, returns a regular canvas dashboard url" do
+        dashboard_url(:login_success => '1').should == "http://test.host/?login_success=1"
+      end
+
+      context "with a user logged in" do
+        before :each do
+          @current_user = user
+        end
+
+        it "returns the custom dashboard_url with the current user's id" do
+          dashboard_url.should == "http://foo.bar?current_user_id=#{@current_user.id}"
+        end
+      end
     end
   end
 end

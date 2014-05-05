@@ -163,18 +163,6 @@ describe UsersController do
     end
   end
 
-  describe "GET 'user_dashboard'" do
-    context "with a custom dashboard_url" do
-      it "should redirect" do
-        @account = Account.default
-        @account.settings[:dashboard_url] = "http://test.com"
-        user_session(user)
-        get 'user_dashboard'
-        response.should redirect_to("http://test.com?current_user_id=#{@user.id}")
-      end
-    end
-  end
-
   context "POST 'destroy'" do
     it "should fail when the user doesn't exist" do
       account_admin_user

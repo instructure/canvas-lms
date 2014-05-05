@@ -398,9 +398,6 @@ class UsersController < ApplicationController
   end
 
   def user_dashboard
-    if custom_dashboard_url
-      return redirect_to custom_dashboard_url
-    end
     check_incomplete_registration
     get_context
 
