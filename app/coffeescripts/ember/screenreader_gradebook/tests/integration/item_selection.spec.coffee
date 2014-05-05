@@ -35,16 +35,16 @@ define [
       Ember.run App, 'destroy'
 
   test 'Previous Student button is disabled', ->
-    buttonDisabled('#prev_student', true)
+    buttonDisabled('.student_navigation .previous_object:first', true)
 
   test 'Previous Assignment button is disabled', ->
-    buttonDisabled('#prev_assignment', true)
+    buttonDisabled('.assignment_navigation .previous_object', true)
 
   test 'Next Student button is active', ->
-    buttonDisabled('#next_student', false)
+    buttonDisabled('.student_navigation .next_object:first', false)
 
   test 'Next Assignment button is active', ->
-    buttonDisabled('#next_assignment', false)
+    buttonDisabled('.assignment_navigation .next_object', false)
 
   test 'no student or assignment is loaded', ->
     checkText('.student_selection', 'Select a student to view additional information here.')
@@ -63,8 +63,8 @@ define [
       Ember.run App, 'destroy'
 
   test 'Previous buttons are disabled', ->
-    buttonDisabled('#prev_student', true)
-    buttonDisabled('#prev_assignment', true)
+    buttonDisabled('.student_navigation .previous_object:first', true)
+    buttonDisabled('.assignment_navigation .previous_object', true)
     checkText('.student_selection', 'Bob')
     checkText('.assignment_selection', 'Z Eats Soup')
 
@@ -72,7 +72,7 @@ define [
   test 'clicking Next Student button displays next student', ->
     before = @controller.get('selectedStudent')
     checkSelection(before.id, '#student_select')
-    click('#next_student').then =>
+    click('.student_navigation .next_object:first').then =>
       after = @controller.get('selectedStudent')
       checkSelection(after.id, '#student_select')
       notEqual(before.id, after.id)
@@ -83,7 +83,7 @@ define [
   test 'clicking Next Assignment button displays next assignment', ->
     before = @controller.get('selectedAssignment')
     checkSelection(before.id, '#assignment_select')
-    click('#next_assignment').then =>
+    click('.assignment_navigation .next_object').then =>
       after = @controller.get('selectedAssignment')
       checkSelection(after.id, '#assignment_select')
       notEqual(before, after)
@@ -91,14 +91,14 @@ define [
       equal(next, @controller.get('assignments').indexOf(after))
 
   test 'clicking next then previous will refocus on next student', ->
-    click('#next_student').then =>
-      click('#prev_student').then =>
-        equal($("#next_student")[0],document.activeElement)
+    click('.student_navigation .next_object:first').then =>
+      click('.student_navigation .previous_object:first').then =>
+        equal($(".student_navigation .next_object:first")[0],document.activeElement)
 
   test 'clicking next then previous will refocus on next assignment', ->
-    click('#next_assignment').then =>
-      click('#prev_assignment').then =>
-        equal($("#next_assignment")[0],document.activeElement)
+    click('.assignment_navigation .next_object').then =>
+      click('.assignment_navigation .previous_object').then =>
+        equal($(".assignment_navigation .next_object")[0],document.activeElement)
 
   module 'screenreader_gradebook student/assignment navigation: with second item selected',
     setup: ->
@@ -112,12 +112,12 @@ define [
       Ember.run App, 'destroy'
 
   test 'Previous/Next Student buttons are both active', ->
-    buttonDisabled('#prev_student', false)
-    buttonDisabled('#next_student', false)
+    buttonDisabled('.student_navigation .previous_object:first', false)
+    buttonDisabled('.student_navigation .next_object:first', false)
 
   test 'Previous/Next Assignment buttons are both active', ->
-    buttonDisabled('#prev_assignment', false)
-    buttonDisabled('#next_assignment', false)
+    buttonDisabled('.assignment_navigation .previous_object', false)
+    buttonDisabled('.assignment_navigation .next_object', false)
 
 
   module 'screenreader_gradebook student/assignment navigation: with last item selected',
@@ -132,22 +132,22 @@ define [
       Ember.run App, 'destroy'
 
   test 'Previous Student button is active', ->
-    buttonDisabled('#prev_student', false)
+    buttonDisabled('.student_navigation .previous_object:first', false)
 
   test 'Previous Assignment button is active', ->
-    buttonDisabled('#prev_assignment', false)
+    buttonDisabled('.assignment_navigation .previous_object', false)
 
   test 'Next Student button is disabled', ->
-    buttonDisabled('#next_student', true)
+    buttonDisabled('.student_navigation .next_object:first', true)
 
   test 'Next Assignment button is disabled', ->
-    buttonDisabled('#next_assignment', true)
+    buttonDisabled('.assignment_navigation .next_object', true)
 
   # compares & checks before/after objects
   test 'clicking Previous Student button displays previous student', ->
     before = @controller.get('selectedStudent')
     checkSelection(before.id, '#student_select')
-    click('#prev_student').then =>
+    click('.student_navigation .previous_object:first').then =>
       after = @controller.get('selectedStudent')
       checkSelection(after.id, '#student_select')
       notEqual(before.id, after.id)
@@ -155,10 +155,10 @@ define [
       equal(previous, @controller.get('students').indexOf(after))
 
   # compares & checks before/after objects
-  test 'clicking Previous Assignment button displays previous student', ->
+  test 'clicking Previous Assignment button displays previous assignment', ->
     before = @controller.get('selectedAssignment')
     checkSelection(before.id, '#assignment_select')
-    click('#prev_assignment').then =>
+    click('.assignment_navigation .previous_object').then =>
       after = @controller.get('selectedAssignment')
       checkSelection(after.id, '#assignment_select')
       notEqual(before.id, after.id)
@@ -166,14 +166,14 @@ define [
       equal(previous, @controller.get('assignments').indexOf(after))
 
   test 'clicking previous then next will reset the focus for students', ->
-    click('#prev_student').then =>
-      click('#next_student').then =>
-        equal($("#prev_student")[0],document.activeElement)
+    click('.student_navigation .previous_object:first').then =>
+      click('.student_navigation .next_object:first').then =>
+        equal($(".student_navigation .previous_object:first")[0],document.activeElement)
 
   test 'clicking previous then next will reset the focus for assignments', ->
-    click('#prev_assignment').then =>
-      click('#next_assignment').then =>
-        equal($("#prev_assignment")[0],document.activeElement)
+    click('.assignment_navigation .previous_object').then =>
+      click('.assignment_navigation .next_object').then =>
+        equal($(".assignment_navigation .previous_object")[0],document.activeElement)
 
   module 'screenreader_gradebook assignment navigation: display update',
     setup: ->
@@ -213,22 +213,22 @@ define [
     before = @controller.get('assignments.firstObject')
     Ember.run =>
       @controller.set('assignmentSort', @controller.get('assignmentSortOptions').findBy('value', 'alpha'))
-    buttonDisabled('#next_assignment', false)
-    buttonDisabled('#prev_assignment', true)
+    buttonDisabled('.assignment_navigation .next_object', false)
+    buttonDisabled('.assignment_navigation .previous_object', true)
     first = @controller.get('assignments.firstObject')
     notEqual(before, first)
-    click('#next_assignment').then =>
+    click('.assignment_navigation .next_object').then =>
       checkSelection(first.id, '#assignment_select')
 
   test 'due date', ->
     before = @controller.get('assignments.firstObject')
     Ember.run =>
       @controller.set('assignmentSort', @controller.get('assignmentSortOptions').findBy('value', 'due_date'))
-    buttonDisabled('#next_assignment', false)
-    buttonDisabled('#prev_assignment', true)
+    buttonDisabled('.assignment_navigation .next_object', false)
+    buttonDisabled('.assignment_navigation .previous_object', true)
     first = @controller.get('assignments.firstObject')
     notEqual(before, first)
-    click('#next_assignment').then =>
+    click('.assignment_navigation .next_object').then =>
       checkSelection(first.id, '#assignment_select')
 
   test 'changing sorting option with selectedAssignment', ->
@@ -237,20 +237,20 @@ define [
       @controller.set('assignmentSort', @controller.get('assignmentSortOptions').findBy('value', 'alpha'))
 
     # check first assignment
-    click('#next_assignment').then =>
+    click('.assignment_navigation .next_object').then =>
       first = @controller.get('selectedAssignment')
       checkSelection(first.id, '#assignment_select')
       equal(first.name, "Apples are good")
-      second = @controller.get('assignments').objectAt(@controller.get('assignmentIndex') + 1)
+      second = @controller.get('assignments').objectAt( @controller.get('assignmentIndex') + 1)
 
       # check Next
-      click('#next_assignment').then =>
+      click('.assignment_navigation .next_object').then =>
         checkSelection(second.id, '#assignment_select')
         notEqual(first.id, second.id)
         equal(second.name, "Big Bowl of Nachos")
 
         # check Previous
-        click('#prev_assignment').then =>
+        click('.assignment_navigation .previous_object').then =>
           selected = @controller.get('selectedAssignment')
           equal(selected.id, first.id)
           checkSelection(selected.id, '#assignment_select')
@@ -265,8 +265,9 @@ define [
           notEqual(oldIndex, @controller.get('assignmentIndex'))
 
           # check Next
-          next = @controller.get('assignments').objectAt(@controller.get('assignmentIndex') + 1)
-          click('#next_assignment').then =>
+          selectedIndex = @controller.get('assignmentIndex')
+          next = @controller.get('assignments').objectAt(selectedIndex + 1)
+          click('.assignment_navigation .next_object').then =>
             checkSelection(next.id, '#assignment_select')
 
   module 'screenreader_gradebook student navigation: section selection',
@@ -280,30 +281,30 @@ define [
       Ember.run App, 'destroy'
 
   test 'prev/next still work', ->
-    buttonDisabled('#prev_student', true)
-    buttonDisabled('#next_student', false)
+    buttonDisabled('.student_navigation .previous_object:first', true)
+    buttonDisabled('.student_navigation .next_object:first', false)
 
     # first in section
-    click('#next_student').then =>
+    click('.student_navigation .next_object:first').then =>
       first = @controller.get('selectedStudent')
       index = @controller.get('studentIndex')
-      buttonDisabled('#prev_student', true)
+      buttonDisabled('.student_navigation .previous_object:first', true)
       studentSectionAssertions(first, index, 0)
 
       # second in section
-      click('#next_student').then =>
+      click('.student_navigation .next_object:first').then =>
         second = @controller.get('selectedStudent')
         index = @controller.get('studentIndex')
-        buttonDisabled('#prev_student', false)
+        buttonDisabled('.student_navigation .previous_object:first', false)
         studentSectionAssertions(second, index, 1)
         notEqual(first, second)
 
-      click('#prev_student').then =>
-        buttonDisabled('#prev_student', true)
-        buttonDisabled('#next_student', false)
+      click('.student_navigation .previous_object:first').then =>
+        buttonDisabled('.student_navigation .previous_object:first', true)
+        buttonDisabled('.student_navigation .next_object:first', false)
 
   test 'resets selectedStudent when student is not in both sections', ->
-    click('#next_student').then =>
+    click('.student_navigation .next_object:first').then =>
       firstStudent = @controller.get('selectedStudent')
 
       Ember.run =>
@@ -312,7 +313,7 @@ define [
       notEqual(firstStudent, resetStudent)
       equal(resetStudent, null)
 
-      click('#next_student').then =>
+      click('.student_navigation .next_object:first').then =>
         current = @controller.get('selectedStudent')
         notEqual(current, firstStudent)
         notEqual(current, resetStudent)
@@ -324,8 +325,8 @@ define [
       @controller.set('selectedStudent', @controller.get('students').objectAt(4))
 
     visit('/').then =>
-      buttonDisabled('#prev_student', false)
-      buttonDisabled('#next_student', false)
+      buttonDisabled('.student_navigation .previous_object:first', false)
+      buttonDisabled('.student_navigation .next_object:first', false)
 
       selected = @controller.get('selectedStudent')
       checkSelectedText(selected.name, '#student_select')
@@ -334,13 +335,13 @@ define [
       # position in selected dropdown
       position = @controller.get('studentsInSelectedSection').indexOf(selected)
       equal(position, 1)
-      equal(@controller.get('studentIndex'), position)
+      equal(@controller.get("studentIndex"), position)
 
       # change section
       Ember.run =>
         @controller.set('selectedSection', @controller.get('sections.firstObject'))
-      buttonDisabled('#prev_student', false)
-      buttonDisabled('#next_student', false)
+      buttonDisabled('.student_navigation .previous_object:first', false)
+      buttonDisabled('.student_navigation .next_object:first', false)
 
       newSelected = @controller.get('selectedStudent')
       checkSelectedText(newSelected.name, '#student_select')
@@ -350,7 +351,7 @@ define [
       # position in selected dropdown
       position = @controller.get('studentsInSelectedSection').indexOf(selected)
       equal(position, 3)
-      equal(@controller.get('studentIndex'), position)
+      equal(@controller.get("studentIndex"), position)
 
   module 'screenreader_gradebook student/assignment navigation: announcing selection with aria-live',
     setup: ->
@@ -364,17 +365,17 @@ define [
       Ember.run App, 'destroy'
 
   test 'aria-announcer', ->
-    checkText '.aria-announcer', ''
+    equal Ember.$.trim(find(".aria-announcer").text()), ""
 
-    click('#next_student').then =>
+    click('.student_navigation .next_object:first').then =>
       expected = @controller.get('selectedStudent.name')
-      checkText '.aria-announcer', expected
+      equal Ember.$.trim(find(".aria-announcer").text()), expected
 
 
-    click('#next_assignment').then =>
+    click('.assignment_navigation .next_object').then =>
       expected = @controller.get('selectedAssignment.name')
-      checkText '.aria-announcer', expected
+      equal Ember.$.trim(find(".aria-announcer").text()), expected
 
     click('#hide_names_checkbox').then =>
       Ember.run ->
-        checkText '.aria-announcer', ''
+        equal Ember.$.trim(find(".aria-announcer").text()), ""

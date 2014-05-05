@@ -86,6 +86,21 @@ define [
       ENV.GRADEBOOK_OPTIONS.show_total_grade_as_points
     ).property()
 
+    isDraftState: ->
+      ENV.GRADEBOOK_OPTIONS.draft_state_enabled
+
+    publishToSisEnabled: (->
+      ENV.GRADEBOOK_OPTIONS.publish_to_sis_enabled
+    ).property()
+
+    publishToSisURL:(->
+      ENV.GRADEBOOK_OPTIONS.publish_to_sis_url
+    ).property()
+
+    teacherNotes: (->
+      ENV.GRADEBOOK_OPTIONS.teacher_notes
+    ).property().volatile()
+
     changeGradebookVersionUrl: (->
       "#{get(window, 'ENV.GRADEBOOK_OPTIONS.change_gradebook_version_url')}"
     ).property()
@@ -129,27 +144,14 @@ define [
       gradeUpdated: (submissions) ->
         @updateSubmissionsFromExternal submissions
 
-      selectItem: (property, goTo) ->
-        list = @getList(property)
-        currentIndex = list.indexOf(@get(property))
-
-        if goTo == 'previous'
-          item = list.objectAt(currentIndex - 1)
-          unless list.objectAt(currentIndex - 2)
-            $("#next_#{@getButton(property)}").focus()
-        if goTo == 'next'
-          item = list.objectAt(currentIndex + 1)
-          unless list.objectAt(currentIndex + 2)
-            $("#prev_#{@getButton(property)}").focus()
-
+      selectItem: (property, item) ->
         @announce property, item
-        @set property, item
 
     announce: (prop, item) ->
       Ember.run.next =>
-        if prop is 'selectedStudent' and @get('hideStudentNames')
+        if prop is 'student' and @get('hideStudentNames')
           text_to_announce = get item, 'hiddenName'
-        else if prop is 'selectedOutcome'
+        else if prop is 'outcome'
           text_to_announce = get item, 'title'
         else
           text_to_announce = get item, 'name'
@@ -220,19 +222,6 @@ define [
       @get('students').forEach (student) => @calculateStudentGrade student
     ).observes('includeUngradedAssignments','groupsAreWeighted', 'assignment_groups.@each.group_weight')
 
-    setFinalGradeDisplay: (->
-      @get('students').forEach (student) =>
-        set(student, "final_grade_point_ratio", @pointRatioDisplay(student, @get('groupsAreWeighted')))
-        if @get('showLetterGrades')
-          set(student, "final_letter_grade", GradeCalculator.letter_grade(ENV.GRADEBOOK_OPTIONS.grading_standard, student.total_percent))
-    ).observes('students.@each.total_grade','groupsAreWeighted')
-
-    pointRatioDisplay: (student, weighted_groups) ->
-      if weighted_groups or not student.total_grade
-        null
-      else
-        "#{student.total_grade.score} / #{student.total_grade.possible}"
-
     sectionSelectDefaultLabel: I18n.t "all_sections", "All Sections"
     studentSelectDefaultLabel: I18n.t "no_student", "No Student Selected"
     assignmentSelectDefaultLabel: I18n.t "no_assignment", "No Assignment Selected"
@@ -258,22 +247,6 @@ define [
         student_ids = notYetLoaded.mapBy('id')
         fetchAllPages(ENV.GRADEBOOK_OPTIONS.submissions_url, records: @get('submissions'), data: student_ids: student_ids)
     ).observes('students.@each').on('init')
-
-    publishToSisEnabled: (->
-      ENV.GRADEBOOK_OPTIONS.publish_to_sis_enabled
-    ).property()
-
-    publishToSisURL:(->
-      ENV.GRADEBOOK_OPTIONS.publish_to_sis_url
-    ).property()
-
-    showLetterGrades:(->
-      !!ENV.GRADEBOOK_OPTIONS.grading_standard
-    ).property()
-
-    teacherNotes: (->
-      ENV.GRADEBOOK_OPTIONS.teacher_notes
-    ).property().volatile()
 
     showNotesColumn: (->
       notes = @get('teacherNotes')
@@ -434,9 +407,6 @@ define [
         content: []
         sortProperties: ['ag_position', 'position']
       )
-
-    isDraftState: ->
-      ENV.GRADEBOOK_OPTIONS.draft_state_enabled
 
     processAssignment: (as, assignmentGroups) ->
       assignmentGroup = assignmentGroups.findBy('id', as.assignment_group_id)
@@ -647,17 +617,6 @@ define [
       'media_recording': I18n.t 'media_recordin', 'Media recording'
     }
 
-    # Next/Previous Student/Assignment
-
-    getList: (property) ->
-      return @get('studentsInSelectedSection') if property == 'selectedStudent'
-      return @get('assignments') if property == 'selectedAssignment'
-      return @get('outcomes') if property == 'selectedOutcome'
-
-    getButton: (property) ->
-      return 'student' if property == 'selectedStudent'
-      return 'assignment' if property == 'selectedAssignment'
-
     assignmentIndex: (->
       selected = @get('selectedAssignment')
       if selected then @get('assignments').indexOf(selected) else -1
@@ -672,25 +631,6 @@ define [
       selected = @get('selectedOutcome')
       if selected then @get('outcomes').indexOf(selected) else -1
     ).property('selectedOutcome')
-
-    disablePrevAssignmentButton: Ember.computed.lte('assignmentIndex', 0)
-    disablePrevStudentButton: Ember.computed.lte('studentIndex', 0)
-    disablePrevOutcomeButton: Ember.computed.lte('outcomeIndex', 0)
-
-    disableNextAssignmentButton: (->
-      next = @get('assignments').objectAt(@get('assignmentIndex') + 1)
-      !(@get('assignments.length') and next)
-    ).property('selectedAssignment', 'assignments.@each')
-
-    disableNextStudentButton: (->
-      next = @get('studentsInSelectedSection').objectAt(@get('studentIndex') + 1)
-      !(@get('studentsInSelectedSection.length') and next)
-    ).property('selectedStudent', 'studentsInSelectedSection', 'selectedSection')
-
-    disableNextOutcomeButton: (->
-      next = @get('outcomes').objectAt(@get('outcomeIndex') + 1)
-      !(@get('outcomes.length') and next)
-    ).property('selectedOutcome', 'outcomes.@each')
 
     displayName: (->
       if @get('hideStudentNames')
