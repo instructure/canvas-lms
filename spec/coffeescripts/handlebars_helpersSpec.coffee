@@ -45,6 +45,16 @@ define [
       name: 'likes[tacos]'
       checked: context.likes.tacos
 
+  test 'checkboxes - hidden input values', ->
+    hiddenInput = ({disabled}) ->
+      inputs = helpers.checkbox.call context, "blah",
+        hash: {disabled}
+      div = $("<div>#{inputs}</div>")
+      div.find("[type=hidden]")
+
+    ok !hiddenInput(disabled: false).prop("disabled")
+    ok  hiddenInput(disabled: true).prop("disabled")
+
   test 'titleize', ->
     equal helpers.titleize('test_string'), 'Test String'
     equal helpers.titleize(null), ''

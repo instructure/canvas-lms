@@ -17,6 +17,9 @@
 #
 
 class DelayedMessage < ActiveRecord::Base
+  include PolymorphicTypeOverride
+  override_polymorphic_types context_type: {'QuizSubmission' => 'Quizzes::QuizSubmission'}
+
   belongs_to :notification
   belongs_to :notification_policy
   belongs_to :context, :polymorphic => true

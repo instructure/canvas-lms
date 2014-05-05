@@ -1087,6 +1087,33 @@ describe ContentMigration do
       end
     end
 
+    it "should copy assignment attributes" do
+      assignment_model(:course => @copy_from, :points_possible => 40, :submission_types => 'file_upload', :grading_type => 'points')
+      @assignment.turnitin_enabled = true
+      @assignment.peer_reviews_assigned = true
+      @assignment.peer_reviews = true
+      @assignment.peer_review_count = 2
+      @assignment.automatic_peer_reviews = true
+      @assignment.anonymous_peer_reviews = true
+      @assignment.allowed_extensions = ["doc", "xls"]
+      @assignment.position = 2
+      @assignment.muted = true
+
+      @assignment.save!
+
+      attrs = [:turnitin_enabled, :peer_reviews_assigned, :peer_reviews,
+          :automatic_peer_reviews, :anonymous_peer_reviews,
+          :grade_group_students_individually, :allowed_extensions,
+          :position, :peer_review_count, :muted]
+
+      run_course_copy
+
+      new_assignment = @copy_to.assignments.find_by_migration_id(mig_id(@assignment))
+      attrs.each do |attr|
+        @assignment[attr].should == new_assignment[attr]
+      end
+    end
+
     it "should copy discussion topic attributes" do
       topic = @copy_from.discussion_topics.create!(:title => "topic", :message => "<p>bloop</p>",
                                                    :pinned => true, :discussion_type => "threaded",
@@ -1306,6 +1333,18 @@ describe ContentMigration do
       att.should_not be_valid
 
       run_course_copy(["Couldn't copy file \"dummy.txt\""])
+    end
+
+    it "should convert domains in imported urls if specified in account settings" do
+      account = @copy_to.root_account
+      account.settings[:default_migration_settings] = {:domain_substitution_map => {"http://derp.derp" => "https://derp.derp"}}
+      account.save!
+
+      @copy_from.syllabus_body = "<p><a href=\"http://derp.derp/stuff\">this is a link to an insecure domain that could cause problems</a></p>"
+
+      run_course_copy
+
+      @copy_to.syllabus_body.should == @copy_from.syllabus_body.sub("http://derp.derp", "https://derp.derp")
     end
 
     it "should preserve media comment links" do

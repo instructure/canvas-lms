@@ -30,7 +30,7 @@ module AppCenter
         response = Rails.cache.fetch(cache_key, :expires_in => expires) do
           uri = URI.parse("#{base_url}#{endpoint}")
           uri.query = [uri.query, "offset=#{offset}"].compact.join('&')
-          Canvas::HTTP.get(uri.to_s).body
+          CanvasHttp.get(uri.to_s).body
         end
 
         json = JSON.parse(response)
@@ -128,7 +128,7 @@ module AppCenter
         uri.query = URI.encode_www_form(params)
         uri.to_s
 
-        response = Canvas::HTTP.get(uri.to_s).body
+        response = CanvasHttp.get(uri.to_s).body
         json = JSON.parse(response)
         json = json['reviews'].first if json['reviews']
       rescue

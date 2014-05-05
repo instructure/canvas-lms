@@ -28,8 +28,8 @@ describe Canvas::ICU do
         result.last[:id].should == 1
       end
 
-      it "should handle SortFirst" do
-        array = [{id: 2, str: SortFirst}, {id:1, str: 'b'}]
+      it "should handle CanvasSort::First" do
+        array = [{id: 2, str: CanvasSort::First}, {id:1, str: 'b'}]
         result = Canvas::ICU.collate_by(array) { |x| x[:str] }
         result.first[:id].should == 2
         result.last[:id].should == 1
@@ -45,8 +45,8 @@ describe Canvas::ICU do
         (a_prime <=> b_prime).should == -1
       end
 
-      it "should pass-thru SortFirst" do
-        Canvas::ICU.collation_key(SortFirst).should == SortFirst
+      it "should pass-thru CanvasSort::First" do
+        Canvas::ICU.collation_key(CanvasSort::First).should == CanvasSort::First
       end
     end
 
@@ -55,8 +55,8 @@ describe Canvas::ICU do
         Canvas::ICU.compare("a", "b").should == -1
       end
 
-      it "should handle SortFirst" do
-        Canvas::ICU.compare(SortFirst, "a").should == -1
+      it "should handle CanvasSort::First" do
+        Canvas::ICU.compare(CanvasSort::First, "a").should == -1
       end
     end
 

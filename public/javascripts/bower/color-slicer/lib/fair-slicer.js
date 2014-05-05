@@ -1,10 +1,8 @@
-// This divides a range iteratively, using progressively smaller binary
-// increments. A potential improvement here would be jumping around
-// within each pass, to avoid having a temporarily lopsided distribution,
-// but it's not too bad.
-//
-// I originally implemented this using the golden ratio, which gives nice
-// results for small numbers, but it's significantly worse at scale.
+// This divides a range iteratively using the golden ratio.
+// This method keeps gaps to similar size and ensures
+// that any small contiguous set is spaced apart.
+
+var PHI = (1+ Math.sqrt(5))/2;
 
 module.exports = function(count, min, max, start) {
   if (min === undefined) {
@@ -18,26 +16,14 @@ module.exports = function(count, min, max, start) {
   }
   var width = max - min;
 
-  var step = 1;
-  var gapCount = 1;
-  var gapIdx = 0;
-  var pos = 0;
   var slices = [];
-  for (i = _i = 0; 0 <= count ? _i < count : _i > count; i = 0 <= count ? ++_i : --_i) {
-    var cut = pos + step;
-    pos += step * 2;
-    gapIdx++;
-    if (gapIdx === gapCount) {
-      gapIdx = 0;
-      pos = 0;
-      step /= 2;
-      gapCount = 1 / step / 2;
-    }
-    cut = min + cut * width + start;
-    if (cut >= max) {
-      cut -= width;
-    }
-    slices.push(cut);
+  var slice = start;
+  var shift = width / PHI;
+  for (var i = 0; i < count; i++) {
+    slices.push(slice);
+    slice += shift;
+    if (slice > max) {slice -= width;}
   }
+
   return slices;
 };

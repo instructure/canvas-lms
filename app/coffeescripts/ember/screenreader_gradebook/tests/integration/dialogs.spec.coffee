@@ -135,7 +135,7 @@ define [
   test 'group weights dialog update groups weights and final grade', ->
     $dialog = null
     visit('/').then =>
-      initial_final_grade = find(".total-grade").last().text()
+      initial_final_grade = find(".total-grade").text()
       equal(parseFloat(initial_final_grade), "2.1")
       openDialog("#ag_weights").then =>
         $dialog = find('.ui-dialog:visible', 'body')
@@ -146,7 +146,7 @@ define [
             click(find('.ui-button', $dialog))
             mockServerResponse(@server, "/api/v1/courses/1/assignment_groups/1", @modified_assignment_group)
             andThen =>
-              new_final_grade = find(".total-grade").last().text()
+              new_final_grade = find(".total-grade").text()
               assignment_group_text = find(".assignment-group-grade").first().text()
               equal(parseFloat(new_final_grade), "3")
-              notEqual(assignment_group_text.indexOf("100% of grade"), -1)
+              notEqual(assignment_group_text.indexOf("3 / 100"), -1)

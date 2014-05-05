@@ -1422,7 +1422,7 @@ class Course < ActiveRecord::Base
     includes = {:user => {:pseudonyms => :account}, :course_section => []} if options[:include_sis_id]
     scope = options[:user] ? self.enrollments_visible_to(options[:user]) : self.student_enrollments
     student_enrollments = scope.includes(includes).order_by_sortable_name # remove duplicate enrollments for students enrolled in multiple sections
-    student_enrollments = student_enrollments.all.uniq_by(&:user_id)
+    student_enrollments = student_enrollments.all.uniq(&:user_id)
     student_enrollments.partition{|enrollment| enrollment.type != "StudentViewEnrollment"}.flatten
   end
   private :enrollments_for_csv
@@ -1542,9 +1542,11 @@ class Course < ActiveRecord::Base
 
   def score_to_grade(score)
     return nil unless self.grading_standard_enabled? && score
-    @scheme ||= self.grading_standard.try(:data) ||
-                GradingStandard.default_grading_standard
-    GradingStandard.score_to_grade(@scheme, score)
+    if grading_standard
+      grading_standard.score_to_grade(score)
+    else
+      GradingStandard.default_instance.score_to_grade(score)
+    end
   end
 
   def participants(include_observers=false)
@@ -1926,7 +1928,7 @@ class Course < ActiveRecord::Base
   private :process_migration_files
 
   def import_media_objects(mo_attachments, migration)
-    wait_for_completion = (migration && migration.migration_settings[:worker_class] == CC::Importer::Canvas::Converter.name)
+    wait_for_completion = migration && migration.canvas_import?
     unless mo_attachments.blank?
       MediaObject.add_media_files(mo_attachments, wait_for_completion)
     end
@@ -1957,6 +1959,10 @@ class Course < ActiveRecord::Base
           er = ErrorReport.log_exception(:import_media_objects, e)
           migration.add_error(t(:failed_import_media_objects, %{Failed to import media objects}), error_report_id: er.id)
         end
+      end
+      if migration.canvas_import?
+        migration.update_import_progress(30)
+        MigrationImport::MediaTrack.process_migration(data[:media_tracks], migration)
       end
     end
 
@@ -2247,7 +2253,7 @@ class Course < ActiveRecord::Base
     result[:new_end_date] = Date.parse(options[:new_end_date]) rescue self.real_end_date
     result[:day_substitutions] = options[:day_substitutions]
     result[:time_zone] = options[:time_zone]
-    result[:time_zone] ||= course.account.default_time_zone unless course.account.nil?
+    result[:time_zone] ||= course.root_account.default_time_zone unless course.root_account.nil?
 
     result[:default_start_at] = DateTime.parse(options[:new_start_date]) rescue self.real_start_date
     result[:default_conclude_at] = DateTime.parse(options[:new_end_date]) rescue self.real_end_date

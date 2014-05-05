@@ -11,10 +11,6 @@
 # Run "rake -D time" for a list of tasks for finding time zone names. Comment line to use default local time.
 config.time_zone = 'UTC'
 
-if ENV['RUNNING_AS_DAEMON'] == 'true'
-  config.log_path = Rails.root+'log/delayed_job.log'
-end
-
 log_config = File.exists?(Rails.root+"config/logging.yml") && YAML.load_file(Rails.root+"config/logging.yml")[CANVAS_RAILS2 ? RAILS_ENV : Rails.env]
 log_config = { 'logger' => 'rails', 'log_level' => 'debug' }.merge(log_config || {})
 opts = {}
@@ -38,6 +34,11 @@ else
   log_path = CANVAS_RAILS2 ?
     config.log_path :
     config.paths['log'].first
+
+  if ENV['RUNNING_AS_DAEMON'] == 'true'
+    log_path = Rails.root+'log/delayed_job.log'
+  end
+
   config.logger = CanvasLogger.new(log_path, log_level, opts)
 end
 

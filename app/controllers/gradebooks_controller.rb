@@ -289,21 +289,29 @@ class GradebooksController < ApplicationController
 
   def update_submission
     if authorized_action(@context, @current_user, :manage_grades)
-      submissions = [params[:submission]]
-      if params[:submissions]
-        submissions = []
-        params[:submissions].each do |key, submission|
-          submissions << submission
-        end
+      if params[:submissions].blank? && params[:submission].blank?
+        render nothing: true, status: 400
+        return
       end
+
+      submissions = if params[:submissions]
+                      params[:submissions].values
+                    else
+                      [params[:submission]]
+                    end
+
+      valid_user_ids = Set.new(@context.students_visible_to(@current_user).pluck(:id))
+      submissions.select! { |s| valid_user_ids.include? s[:user_id].to_i }
+      users = @context.students.uniq.find(submissions.map { |s| s[:user_id] })
+        .index_by(&:id)
+      assignments = @context.assignments.active.find(submissions.map { |s|
+        s[:assignment_id]
+      }).index_by(&:id)
+
       @submissions = []
       submissions.compact.each do |submission|
-        @assignment = @context.assignments.active.find(submission[:assignment_id])
-        begin
-          @user = @context.students_visible_to(@current_user).find(submission[:user_id].to_i)
-        rescue ActiveRecord::RecordNotFound
-          next
-        end
+        @assignment = assignments[submission[:assignment_id].to_i]
+        @user = users[submission[:user_id].to_i]
         submission[:grader] = @current_user
         submission.delete :comment_attachments
         if params[:attachments]

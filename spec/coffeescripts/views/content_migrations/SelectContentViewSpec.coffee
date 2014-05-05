@@ -214,3 +214,11 @@ define [
 
     clock.restore()
 
+  test "active decendant is set propertly when clicking on treeitems", ->
+    $tree = @selectContentView.$el.find('[role=tree]')
+    $treeitem = @selectContentView.$el.find('[role=treeitem]:first')
+    $treeitemHeading = @selectContentView.$el.find('[role=treeitem]:first .treeitem-heading')
+
+    $treeitemHeading.click()
+
+    equal $tree.attr('aria-activedescendant'), $treeitem.attr('id')

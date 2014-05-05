@@ -45,7 +45,12 @@ describe BasicLTI::BasicOutcomes do
     )
   end
 
-  let(:source_id) { BasicLTI::BasicOutcomes.encode_source_id(tool, @course, assignment, @user) }
+  let(:source_id) {
+    tool.shard.activate do
+      payload = [tool.id, @course.id, assignment.id, @user.id].join('-')
+      "#{payload}-#{Canvas::Security.hmac_sha1(payload, tool.shard.settings[:encryption_key])}"
+    end
+  }
 
   let(:xml) do
     Nokogiri::XML.parse %Q{

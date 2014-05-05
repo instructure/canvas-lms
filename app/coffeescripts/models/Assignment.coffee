@@ -205,6 +205,9 @@ define [
     isLetterGraded: =>
       @gradingType() == 'letter_grade'
 
+    isGpaScaled: =>
+      @gradingType() == 'gpa_scale'
+
     published: (newPublished) =>
       return @get 'published' unless arguments.length > 0
       @set 'published', newPublished
@@ -263,7 +266,7 @@ define [
         'turnitinAvailable','turnitinEnabled',
         'gradeGroupStudentsIndividually', 'groupCategoryId', 'frozen',
         'frozenAttributes', 'freezeOnCopy', 'canFreeze', 'isSimple',
-        'gradingStandardId', 'isLetterGraded', 'assignmentGroupId', 'iconType',
+        'gradingStandardId', 'isLetterGraded', 'isGpaScaled', 'assignmentGroupId', 'iconType',
         'published', 'htmlUrl', 'htmlEditUrl', 'labelId', 'position',
         'multipleDueDates', 'allDates', 'isQuiz', 'singleSectionDueDate'
       ]

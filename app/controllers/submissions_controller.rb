@@ -185,7 +185,6 @@ require 'action_controller_test_process'
 #     }
 #
 class SubmissionsController < ApplicationController
-  include GoogleDocs
   include KalturaHelper
   before_filter :get_course_from_section, :only => :create
   before_filter :require_context
@@ -235,7 +234,7 @@ class SubmissionsController < ApplicationController
     if @assignment.muted? && !@submission.grants_right?(@current_user, :read_grade)
       @visible_rubric_assessments = []
     else
-      @visible_rubric_assessments = @submission.rubric_assessments.select{|a| a.grants_rights?(@current_user, session, :read)[:read]}.sort_by{|a| [a.assessment_type == 'grading' ? SortFirst : SortLast, Canvas::ICU.collation_key(a.assessor_name)] }
+      @visible_rubric_assessments = @submission.rubric_assessments.select{|a| a.grants_rights?(@current_user, session, :read)[:read]}.sort_by{|a| [a.assessment_type == 'grading' ? CanvasSort::First : CanvasSort::Last, Canvas::ICU.collation_key(a.assessor_name)] }
     end
 
     @assessment_request = @submission.assessment_requests.find_by_assessor_id(@current_user.id) rescue nil
@@ -500,7 +499,8 @@ class SubmissionsController < ApplicationController
   # Internal: Submit a Google Doc.
   def submit_google_doc(document_id)
     # fetch document from google
-    document_response, display_name, file_extension = google_docs_download(document_id)
+    google_docs = GoogleDocs.new(google_docs_user, session)
+    document_response, display_name, file_extension = google_docs.download(document_id)
 
     # error handling
     unless document_response.try(:is_a?, Net::HTTPOK)

@@ -20,7 +20,7 @@ describe Quizzes::QuizRegrader::Submission do
   end
 
   let(:quiz_data) do
-    question_regrades.map {|id, q| q.quiz_question.question_data.dup }
+    question_regrades.map {|id, q| q.quiz_question.question_data.dup.merge('question_name' => "Question #{id}") }
   end
 
   let(:submission_data) do
@@ -78,20 +78,31 @@ describe Quizzes::QuizRegrader::Submission do
   end
 
   describe "#rescored_submission" do
-    it "scores the submission based on the regraded answers" do
+    before do
       params = question_regrades.map do |key, qr|
-        {:id => key, :points_possible => question_group.question_points}
+        {:id => key, :points_possible => question_group.question_points, 'question_name' => "Question #{key}" }
       end
 
       submission.expects(:quiz_data=).with(params)
 
-      regrade_submission = Quizzes::QuizRegrader::Submission.new(
+      @regrade_submission = Quizzes::QuizRegrader::Submission.new(
         :submission        => submission,
         :question_regrades => question_regrades)
 
-      regrade_submission.expects(:answers_to_grade).returns []
-      regrade_submission.rescored_submission
+      @regrade_submission.expects(:answers_to_grade).returns []
     end
+
+    it "scores the submission based on the regraded answers" do
+      @regrade_submission.rescored_submission
+    end
+
+    it "doesn't change question names" do
+      @regrade_submission.rescored_submission.quiz_data.each_with_index do |q, i|
+        q['question_name'].should == "Question #{i + 1}"
+      end
+    end
+
   end
+
 
 end

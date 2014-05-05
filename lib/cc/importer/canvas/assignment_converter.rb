@@ -66,7 +66,7 @@ module CC::Importer::Canvas
       ["turnitin_enabled", "peer_reviews_assigned", "peer_reviews",
        "automatic_peer_reviews", "anonymous_peer_reviews", "freeze_on_copy",
        "grade_group_students_individually", "external_tool_new_tab",
-       "rubric_use_for_grading", "rubric_hide_score_total"].each do |bool_val|
+       "rubric_use_for_grading", "rubric_hide_score_total", "muted"].each do |bool_val|
         val = get_bool_val(meta_doc, bool_val)
         assignment[bool_val] = val unless val.nil?
       end

@@ -906,6 +906,20 @@ class ActiveRecord::Base
   end
 end
 
+unless defined? OpenDataExport
+  if CANVAS_RAILS2
+    %w{valid_keys_for_has_many_association valid_keys_for_has_one_association
+      valid_keys_for_belongs_to_association valid_keys_for_has_and_belongs_to_many_association}.each do |mattr|
+      ActiveRecord::Associations::ClassMethods.send(mattr) << :exportable
+    end
+  else
+    # allow an exportable option that we don't actually do anything with, because our open-source build may not contain OpenDataExport
+    ActiveRecord::Associations::Builder::Association.class_eval do
+      ([self] + self.descendants).each { |klass| klass.valid_options << :exportable }
+    end
+  end
+end
+
 unless CANVAS_RAILS2
   # join dependencies in AR 3 insert the conditions right away, but because we have
   # some reflection conditions that rely on joined tables, we need to insert them later on
@@ -968,8 +982,9 @@ unless CANVAS_RAILS2
       batch_size = options[:batch_size] || 1000
       klass.transaction do
         begin
-          cursor = "#{table_name}_in_batches_cursor"
-          connection.execute("DECLARE #{cursor} CURSOR FOR #{to_sql}")
+          sql = to_sql
+          cursor = "#{table_name}_in_batches_cursor_#{sql.hash.abs.to_s(36)}"
+          connection.execute("DECLARE #{cursor} CURSOR FOR #{sql}")
           includes = includes_values
           klass.send(:with_exclusive_scope) do
             batch = connection.uncached { klass.find_by_sql("FETCH FORWARD #{batch_size} FROM #{cursor}") }

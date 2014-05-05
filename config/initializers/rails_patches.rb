@@ -50,6 +50,11 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
 end
 
 if CANVAS_RAILS2
+
+  module ActiveSupport
+    HashWithIndifferentAccess = ::HashWithIndifferentAccess
+  end
+
   # bug submitted to rails: https://rails.lighthouseapp.com/projects/8994/tickets/5802-activerecordassociationsassociationcollectionload_target-doesnt-respect-protected-attributes#ticket-5802-1
   # This fix has been merged into rails trunk and will be in the rails 3.1 release.
   class ActiveRecord::Associations::AssociationCollection

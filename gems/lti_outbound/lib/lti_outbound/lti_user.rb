@@ -3,7 +3,7 @@ module LtiOutbound
     ACTIVE_STATE = 'active'
     INACTIVE_STATE = 'inactive'
 
-    attr_accessor :avatar_url, :concluded_roles, :currently_active_in_course,
+    proc_accessor :avatar_url, :concluded_roles, :currently_active_in_course,
                   :current_roles, :first_name, :email, :last_name, :login_id,
                   :name, :timezone
 
@@ -11,7 +11,7 @@ module LtiOutbound
     add_variable_mapping '$Canvas.user.sisSourceId', :sis_source_id
     add_variable_mapping '$Canvas.user.loginId', :login_id
     add_variable_mapping '$Canvas.enrollment.enrollmentState', :enrollment_state
-    add_variable_mapping '$Canvas.membership.concludedRoles', :concluded_roles
+    add_variable_mapping '$Canvas.membership.concludedRoles', :concluded_role_types
     add_variable_mapping '$Person.name.family', :last_name
     add_variable_mapping '$Person.name.full', :name
     add_variable_mapping '$Person.name.given', :first_name

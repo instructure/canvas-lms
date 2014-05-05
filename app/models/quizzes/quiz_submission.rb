@@ -644,7 +644,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     version_data["fudge_points"] = self.fudge_points if attrs.include?(:fudge_points)
     version_data["workflow_state"] = self.workflow_state if attrs.include?(:workflow_state)
     version_data["manually_scored"] = self.manually_scored if attrs.include?(:manually_scored)
-    TextHelper.recursively_strip_invalid_utf8!(version_data, true)
+    Utf8Cleaner.recursively_strip_invalid_utf8!(version_data, true)
     version.yaml = version_data.to_yaml
     res = version.save
     res

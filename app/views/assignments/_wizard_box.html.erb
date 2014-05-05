@@ -2,32 +2,41 @@
   <h3><%= t 'titles.wizard_box', "I would like to:" %></h3>
   <ul class="wizard_options_list">
     <li class="option create_assignment_option add_step">
-      <a href="#" class="icon-assignment"><%= t 'links.create_assignment', "Create a New Assignment" %></a>
-      <div class="details" style="display: none;">
+      <a href="#" class="icon-assignment" aria-describedby="wizard_create_assignment"><%= t 'links.create_assignment', "Create a New Assignment" %></a>
+      <div class="details" style="display: none;" >
         <%= t 'instructions.wizard.step1', %(Assignments are always organized into groups, so to add an assignment you first
         need to know what group you want to add it to.  Select the group and click 
         "Add Assignment to" or Click the %{add_icon} icon to start
         a new assignment for a group.), :add_icon => '<i class="icon-add"></i>'.html_safe %>
         <div style="text-align: center; margin-top: 5px; font-size: 1.5em;">
           <a href="#" class="highlight_add_assignment_icon"><%= t 'links.show_me_where', "Show Me Where" %></a>
-        </div>        
+        </div>
         <div style="display: none;" class="no_groups_message">
           <%= t 'errors.no_assignment_group', 'Oops.  You need to add an assignment group first.  Click "Create an
           Assignment Group" to see how.' %>
         </div>
       </div>
+      <div class="hidden" id="wizard_create_assignment">
+        <%= t 'instructions.wizard.screenreader_step1', %(Assignments are always organized into groups, so to add an assignment you first
+        need to know what group you want to add it to.  Select the group and click
+        "Add Assignment to" or Click the add icon to start
+        a new assignment for a group.) %>
+      </div>
+      <div class="screenreader-only">
+        <a href="#" class="show_me_add_assignment"><%= t 'links.screenreader_show_me_add_assignment', "Take me to the add assignment button" %></a>
+      </div>
     </li>
     <li class="option edit_assignment_option" style="display: none;">
-      <a href="#" class="wizard_edit_assignment_details"></a>
-      <div class="details" style="display: none;">
+      <a href="#" class="wizard_edit_assignment_details" aria-describedby="wizard_edit_assignment_details"></a>
+      <div class="details" style="display: none;" id="wizard_edit_assignment_details">
         <%= t 'instructions.wizard.step2', "Great!  Now fill in your details.  You can enter a title for your assignment,
         a due date and the number of points possible.  If you want to do more than that
         you can, but only after the assignment has been created."%>
       </div>
     </li>
     <li class="option review_assignment_option" style="display: none;">
-      <a href="#" class="wizard_edit_assignment_details"></a>
-      <div class="details" style="display: none;">
+      <a href="#" class="wizard_edit_assignment_details" aria-describedby="wizard_review_assignment_details"></a>
+      <div class="details" style="display: none;" id="wizard_review_assignment_details">
         <%= t 'instructions.wizard.step3', "Done!  The assignment is now added to the group!  If you hover your mouse over the
         assignment, you'll see a bunch of options.  Here's what they mean:" %>
         <ul style="list-style-type: none;">
@@ -39,7 +48,7 @@
       </div>
     </li>
     <li class="option add_step">
-      <a href="#" class="icon-group-new"><%= t 'links.create_assignment_group', "Create an Assignment Group" %></a>
+      <a href="#" class="icon-group-new" aria-describedby='wizard_create_assignment_group' ><%= t 'links.create_assignment_group', "Create an Assignment Group" %></a>
       <div class="details" style="display: none;">
         <%= t 'instructions.wizard.group.step1', 'Assignment groups are used to organize assignments.  You provide a name for each
         group.  If you choose to weight the final grade based on groups (*where?*) then
@@ -47,29 +56,44 @@
         to create a group.', :wrapper => '<a href="#" class="highlight_weight_groups"><b>\1</b></a>' %>
         <div style="text-align: center; margin-top: 5px; font-size: 1.5em;">
           <a href="#" class="highlight_add_assignment_group_icon"><%= t 'links.show_me_where', "Show Me Where" %></a>
-        </div>        
+        </div>
+      </div>
+      <div class="hidden" id="wizard_create_assignment_group">
+        <%= t 'instructions.wizard.group.screenreader_step1', 'Assignment groups are used to organize assignments.  You provide a name for each
+        group.  If you choose to weight the final grade based on groups then you can also set a
+        percentage score for each group.  Click "Add Assignment Group" to create a group.' %>
+      </div>
+      <div class="screenreader-only">
+        <a href="#" class="show_me_add_assignment_group"><%= t 'links.screenreader_show_me_add_assignment_group', "Take me to the add assignment group button" %></a>
+        <a href="#" class="show_me_weight_final_grade"><%= t 'links.screenreader_show_me_weight_final_grade', "Take me to the weight final grade checkbox" %></a>
       </div>
     </li>
     <li class="option edit_step" style="line-height: 1.1em;">
-      <a href="#" class="icon-edit"><%= t 'links.edit_assignment_in_detail', "Edit Assignments in Detail" %></a>
+      <a href="#" class="icon-edit" aria-describedby='wizard_edit_assignments_in_detail'><%= t 'links.edit_assignment_in_detail', "Edit Assignments in Detail" %></a>
       <div style="font-size: 0.6em; padding-left: 10px;"><%= t 'subtitles.edit_assignment_in_detail', "(allow uploads, edit description, etc.)" %></div>
-      <div class="details" style="display: none;">
+      <div class="details" style="display: none;" >
         <%= t 'instructions.wizard.details', %(There's a lot more that goes into an assignment than due dates and points.  If you
         want to type up a description of the assignment, allow file uploads, change the
         grading type or a bunch of other things, click the assignment's name
         or click the %{edit_icon} icon and then "more options".), :edit_icon => '<i class="icon-edit"></i>'.html_safe %>
       </div>
+      <div class="hidden" id='wizard_edit_assignments_in_detail'>
+        <%= t 'instructions.wizard.screenreader_details', %(There's a lot more that goes into an assignment than due dates and points.  If you
+        want to type up a description of the assignment, allow file uploads, change the
+        grading type or a bunch of other things, click the assignment's name
+        or click the edit icon and then "more options".) %>
+      </div>
     </li>
     <li class="option quiz_step">
-      <a href="#" class="icon-quiz"><%= t 'links.create_or_import_quiz', "Create/Import a Quiz" %></a>
-      <div class="details" style="display: none;">
+      <a href="#" class="icon-quiz" aria-describedby="wizard_quizzes_create_import"><%= t 'links.create_or_import_quiz', "Create/Import a Quiz" %></a>
+      <div class="details" style="display: none;" id="wizard_quizzes_create_import">
         <%= t 'instructions.wizard.quizzes', 'Quizzes are special types of assignments.  You can create or import quizzes by
         clicking the "Quizzes" link on the left sidebar.' %>
       </div>
     </li>
     <li class="option introduction" style="display: none;">
-      <a href="#" class="wizard_introduction"></a>
-      <div class="details" style="display: none;">
+      <a href="#" class="wizard_introduction" aria-describedby="wizard_introduction"></a>
+      <div class="details" style="display: none;" id="wizard_introduction">
         <%= t 'instructions.wizard.overview', "This page is for setting up your course at a high level.  You can add assignments,
         group them and then weight those groups.  The idea is to get yourself organized
         first, dive into the specifics second.  Even still, there's a lot you can do
@@ -79,7 +103,7 @@
   </ul>
   </div>
   <div class="wizard_details">
-    <div>
+    <div aria-live="polite" aria-relevant="all">
       <div class="header"></div>
     </div>
   </div>

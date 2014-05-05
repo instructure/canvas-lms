@@ -26,7 +26,7 @@
 # @model Appointment
 #     {
 #       "id": "Appointment",
-#       "description": "Date and time for an apointment",
+#       "description": "Date and time for an appointment",
 #       "properties": {
 #         "id": {
 #           "description": "The appointment identifier.",

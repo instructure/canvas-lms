@@ -20,8 +20,8 @@ require 'spec_helper'
 
 describe LtiOutbound::LTIModel do
   class Dummy < LtiOutbound::LTIModel
-    attr_accessor :test
-    add_variable_mapping '.test', :test
+    proc_accessor :attribute
+    add_variable_mapping '.test', :attribute
   end
 
   describe '#has_variable_mapping?' do
@@ -47,8 +47,35 @@ describe LtiOutbound::LTIModel do
 
     it 'calls the mapped method' do
       model = Dummy.new
-      model.test = 'value'
+      model.attribute = 'value'
       expect(model.variable_substitution_mapping('.test')).to eq 'value'
+    end
+  end
+
+  describe '#proc_accessor' do
+    it 'acts as a regular attr_accessor for assigned values' do
+      model = Dummy.new
+      model.attribute = 'test_value'
+      expect(model.attribute).to eq 'test_value'
+    end
+
+    it 'handles multiple attributes at once' do
+      Dummy.proc_accessor(:test1, :test2)
+    end
+
+    it 'evaluates a proc when assigned a proc' do
+      model = Dummy.new
+      model.attribute = -> { 'test_value' }
+      expect(model.attribute).to eq 'test_value'
+    end
+
+    it 'caches the result of the executed proc' do
+      model = Dummy.new
+      obj = double(:message => 'message')
+      model.attribute = -> { obj.message() }
+      2.times { model.attribute }
+
+      expect(obj).to have_received(:message).once
     end
   end
 end

@@ -23,13 +23,13 @@ shared_examples_for 'Takeable Quiz Services' do
   it 'should deny access to locked quizzes' do
     quiz.stubs(:locked?).returns true
 
-    expect { service_action.call }.to raise_error(ApiError, /is locked/i)
+    expect { service_action.call }.to raise_error(RequestError, /is locked/i)
   end
 
   it 'should validate the access code' do
     quiz.access_code = 'adooken'
 
-    expect { service_action.call }.to raise_error(ApiError, /access code/i)
+    expect { service_action.call }.to raise_error(RequestError, /access code/i)
   end
 
   it 'should accept a valid access code' do
@@ -42,7 +42,7 @@ shared_examples_for 'Takeable Quiz Services' do
     quiz.ip_filter = '10.0.0.1/24'
     participant.ip_address = '192.168.0.1'
 
-    expect { service_action.call }.to raise_error(ApiError, /ip address/i)
+    expect { service_action.call }.to raise_error(RequestError, /ip address/i)
   end
 
   it 'should accept a covered IP' do
@@ -53,8 +53,6 @@ shared_examples_for 'Takeable Quiz Services' do
 end
 
 describe Quizzes::QuizSubmissionService do
-  ApiError = Api::V1::ApiError
-
   subject { Quizzes::QuizSubmissionService.new participant }
 
   let :quiz do
@@ -114,7 +112,7 @@ describe Quizzes::QuizSubmissionService do
 
           expect do
             subject.create quiz
-          end.to raise_error(ApiError, /already exists/i)
+          end.to raise_error(RequestError, /already exists/i)
         end
       end
     end
@@ -134,7 +132,7 @@ describe Quizzes::QuizSubmissionService do
       it 'should deny access otherwise' do
         expect do
           subject.create quiz
-        end.to raise_error(ApiError, /not allowed to participate/i)
+        end.to raise_error(RequestError, /not allowed to participate/i)
       end
     end
   end
@@ -176,13 +174,13 @@ describe Quizzes::QuizSubmissionService do
       it 'should reject an invalid attempt' do
         expect do
           subject.complete qs, 'hi'
-        end.to raise_error(ApiError, /invalid attempt/)
+        end.to raise_error(RequestError, /invalid attempt/)
       end
 
       it 'should reject completing an old attempt' do
         expect do
           subject.complete qs, 0
-        end.to raise_error(ApiError, /attempt 0 can not be modified/)
+        end.to raise_error(RequestError, /attempt 0 can not be modified/)
       end
 
       it 'should reject an invalid validation_token' do
@@ -191,7 +189,7 @@ describe Quizzes::QuizSubmissionService do
 
         expect do
           subject.complete qs, qs.attempt
-        end.to raise_error(ApiError, /invalid token/)
+        end.to raise_error(RequestError, /invalid token/)
       end
 
       it 'should require the QS to be untaken' do
@@ -199,7 +197,7 @@ describe Quizzes::QuizSubmissionService do
 
         expect do
           subject.complete qs, qs.attempt
-        end.to raise_error(ApiError, /already complete/)
+        end.to raise_error(RequestError, /already complete/)
       end
     end
   end
@@ -236,7 +234,7 @@ describe Quizzes::QuizSubmissionService do
 
         expect do
           subject.update_question({ question_5_marked: true }, qs, qs.attempt)
-        end.to raise_error(ApiError, /already complete/)
+        end.to raise_error(RequestError, /already complete/)
       end
     end
 
@@ -247,7 +245,7 @@ describe Quizzes::QuizSubmissionService do
 
         expect do
           subject.complete qs, qs.attempt
-        end.to raise_error(ApiError, /not allowed to complete/i)
+        end.to raise_error(RequestError, /not allowed to complete/i)
       end
     end
   end
@@ -311,13 +309,13 @@ describe Quizzes::QuizSubmissionService do
 
         expect do
           subject.update_scores qs, qs.attempt, {}
-        end.to raise_error(ApiError, /invalid attempt/i)
+        end.to raise_error(RequestError, /invalid attempt/i)
       end
 
       it 'should require a complete attempt' do
         expect do
           subject.update_scores qs, qs.attempt, {}
-        end.to raise_error(ApiError, /attempt must be complete/i)
+        end.to raise_error(RequestError, /attempt must be complete/i)
       end
 
       it 'should reject a bad score' do
@@ -329,7 +327,7 @@ describe Quizzes::QuizSubmissionService do
               "1" => { score: [ 'adooken' ] }
             }
           }
-        end.to raise_error(ApiError, /must be an unsigned decimal/i)
+        end.to raise_error(RequestError, /must be an unsigned decimal/i)
       end
 
       it 'should be a no-op if no changes are requested' do
@@ -348,7 +346,7 @@ describe Quizzes::QuizSubmissionService do
       it 'should deny access' do
         expect do
           subject.update_scores qs, qs.attempt, {}
-        end.to raise_error(ApiError, /not allowed/i)
+        end.to raise_error(RequestError, /not allowed/i)
       end
     end
   end
