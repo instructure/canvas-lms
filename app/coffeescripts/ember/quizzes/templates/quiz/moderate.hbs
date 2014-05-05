@@ -1,13 +1,23 @@
-<div class="quiz-moderate">
+<div class="quiz-moderate allow-inputs">
   <table class="table quiz-table" id="moderate-table">
     <thead>
     <tr>
-      <th class="check"><input type="checkbox" /></th>
-      <th class="name">{{#t 'student'}}Student{{/t}}</th>
-      <th>{{#t 'attempt'}}Attempt{{/t}}</th>
-      <th>{{#t 'time'}}Time{{/t}}</th>
-      <th>{{#t 'attempts_left'}}Attempts Left{{/t}}</th>
-      <th>{{#t 'score'}}Score{{/t}}</th>
+      <th class="check">{{input type='checkbox' checked=headerChecked}}</th>
+      <th class="name">
+        {{#t 'student'}}Student{{/t}}
+      </th>
+      <th>
+        {{#t 'attempt'}}Attempt{{/t}}
+      </th>
+      <th>
+        {{#t 'time'}}Time{{/t}}
+      </th>
+      <th>
+        {{#t 'attempts_left'}}Attempts Left{{/t}}
+      </th>
+      <th>
+        {{#t 'score'}}Score{{/t}}
+      </th>
       <th>
         <a class="icon-refresh" href="#">
           <span class="screenreader-only">{{#t 'refresh'}}Refresh{{/t}}</span>
@@ -17,58 +27,30 @@
     </thead>
 
     <tbody>
-    <tr>
-      <td class="check"><input type="checkbox" /></td>
-      <td class="name">Adair, Callie Ann</td>
-      <td>1</td>
-      <td>10:34</td>
-      <td>3</td>
-      <td>11/15</td>
-      <td>
-        <a class="icon-edit" href="#">
-          <span class="screenreader-only">{{#t 'edit'}}Edit{{/t}}</span>
-        </a>
-      </td>
-    </tr>
-    <tr>
-      <td class="check"><input type="checkbox" /></td>
-      <td class="name">Anderson, Mary</td>
-      <td class="numeric">2</td>
-      <td>11:08</td>
-      <td>0</td>
-      <td>12/15</td>
-      <td>
-        <a class="icon-edit" href="#">
-          <span class="screenreader-only">{{#t 'edit'}}Edit{{/t}}</span>
-        </a>
-      </td>
-    </tr>
-    <tr>
-      <td class="check"><input type="checkbox" /></td>
-      <td class="name">Bevan, Jennifer</td>
-      <td>1</td>
-      <td>8:09</td>
-      <td>1</td>
-      <td>7/15</td>
-      <td>
-        <a class="icon-edit" href="#">
-          <span class="screenreader-only">{{#t 'edit'}}Edit{{/t}}</span>
-        </a>
-      </td>
-    </tr>
-    <tr>
-      <td class="check"><input type="checkbox" /></td>
-      <td class="name">Christopherson, Russ</td>
-      <td>1</td>
-      <td>2:12</td>
-      <td>2</td>
-      <td>14/15</td>
-      <td>
-        <a class="icon-edit" href="#">
-          <span class="screenreader-only">{{#t 'edit'}}Edit{{/t}}</span>
-        </a>
-      </td>
-    </tr>
+    {{#each user in controller itemController='quiz.submission_row'}}
+      <tr>
+        <td class="check">{{input type='checkbox' checked=selected}}</td>
+        <td class="name">
+          {{#if hasSubmission}}
+          <a {{bind-attr href='historyLink'}}>
+              {{user.sortableName}}
+            </a>
+          {{else}}
+            {{user.sortableName}}
+          {{/if}}
+        </td>
+        <td>{{attempts}}</td>
+        <td>{{user.friendlyTime}}</td>
+        <td>{{remainingAttempts}}</td>
+        <td>{{user.friendlyScore}}</td>
+        <td>
+          <a class="icon-edit" href="#" {{action 'editSubmissionUser' user}}>
+            <span class="screenreader-only">{{#t 'edit'}}Edit{{/t}}</span>
+          </a>
+        </td>
+      </tr>
+    {{/each}}
     </tbody>
+
   </table>
 </div>

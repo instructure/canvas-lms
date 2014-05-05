@@ -90,6 +90,8 @@ define [
     ).property('quizSubmissionHtmlURL')
     quizStatistics: hasMany 'quiz_statistics', async: true
     quizReports: hasMany 'quiz_report', async: true
+    users: hasMany 'user', async: true
+    quizSubmissions: hasMany 'quiz_submission', async: true
     sortSlug: (->
       dateField = if @get('isAssignment') then 'dueAt' else 'lockAt'
       dueAt = @get(dateField)?.toISOString() or Quiz.SORT_LAST
