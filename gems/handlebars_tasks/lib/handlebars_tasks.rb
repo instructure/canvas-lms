@@ -1,4 +1,3 @@
-require "execjs"
 require "i18n_extraction"
 require "compass"
 require "sass/plugin"
