@@ -137,9 +137,6 @@ describe "conversations new" do
 
   before do
     conversation_setup
-    @teacher.preferences[:use_new_conversations] = true
-    @teacher.save!
-
     @s1 = user(name: "first student")
     @s2 = user(name: "second student")
     [@s1, @s2].each { |s| @course.enroll_student(s).update_attribute(:workflow_state, 'active') }
@@ -165,8 +162,6 @@ describe "conversations new" do
 
     it "should allow admins to send a message without picking a context" do
       user = account_admin_user
-      user.preferences[:use_new_conversations] = true
-      user.save!
       user_logged_in({:user => user})
       get_conversations
       compose to: [@s1], subject: 'context-free', body: 'hallo!'
@@ -184,8 +179,6 @@ describe "conversations new" do
 
     it "should allow admins to message users from their profiles" do
       user = account_admin_user
-      user.preferences[:use_new_conversations] = true
-      user.save!
       user_logged_in({:user => user})
       get "/accounts/#{Account.default.id}/users"
       wait_for_ajaximations
@@ -223,8 +216,6 @@ describe "conversations new" do
       end
 
       it "should not be allowed for students" do
-        @s1.preferences[:use_new_conversations] = true
-        @s1.save!
         user_session(@s1)
         get_conversations
         compose course: @course, to: [@s2], body: 'hallo!', send: false

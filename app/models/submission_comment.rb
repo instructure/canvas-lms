@@ -46,8 +46,6 @@ class SubmissionComment < ActiveRecord::Base
   after_save :check_for_media_object
   after_destroy :delete_other_comments_in_this_group
   after_create :update_participants
-  after_create { |c| c.submission.create_or_update_conversations!(:create) if c.send_to_conversations? }
-  after_destroy { |c| c.submission.create_or_update_conversations!(:destroy) if c.send_to_conversations? }
 
   serialize :cached_attachments
 
@@ -218,10 +216,6 @@ class SubmissionComment < ActiveRecord::Base
   
   def avatar_path
     "/images/users/#{User.avatar_key(self.author_id)}"
-  end
-
-  def send_to_conversations?
-    !hidden? && submission.possible_participants_ids.include?(author_id)
   end
 
   def serialization_methods

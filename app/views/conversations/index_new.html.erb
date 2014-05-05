@@ -86,37 +86,6 @@
       <div id="sending-spinner"></div>
     </div>
 
-    <div class="admin-link pull-right" role="application">
-      <a id="help-btn"
-         class="al-trigger help-btn"
-         href="#"
-         role="button"
-         aria-haspopup="true"
-         aria-owns="help-menu-items">
-        <i class="icon-question"></i>
-        <i class="icon-mini-arrow-down"></i>
-        <span class="screenreader-only"><%= t(:help, "Help") %></span>
-      </a>
-
-      <ul id="help-menu-items"
-          class="al-options"
-          role="menu"
-          tabindex="0"
-          aria-hidden="true"
-          aria-expanded="false"
-          aria-activedescendant="switch-to-old-conversations-menu-item">
-        <li role="presentation">
-          <a id="switch-to-old-conversations-menu-item"
-             href="/conversations/toggle_new_conversations"
-             data-method="post"
-             rel="nofollow"
-             tabindex="-1"
-             role="menuitem"
-             title="<%= t(:switch_to_old_conversations, "Switch Back to Old Conversations") %>"><%= t(:switch_to_old_conversations, "Switch Back to Old Conversations")%></a>
-        </li>
-      </ul>
-    </div>
-
     <div role="search" class="search pull-right form-search">
       <div class="ac" id="search-autocomplete">
         <div class="ac-input-box">

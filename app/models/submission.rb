@@ -37,7 +37,12 @@ class Submission < ActiveRecord::Base
   has_many :rubric_assessments, :as => :artifact
   has_many :attachment_associations, :as => :context
   has_many :attachments, :through => :attachment_associations
+
+  # we no longer link submission comments and conversations, but we haven't fixed up existing
+  # linked conversations so this relation might be useful
+  # TODO: remove this when removing the conversationmessage asset columns
   has_many :conversation_messages, :as => :asset # one message per private conversation
+
   has_many :content_participations, :as => :content
 
   EXPORTABLE_ATTRIBUTES = [
@@ -49,7 +54,7 @@ class Submission < ActiveRecord::Base
 
   EXPORTABLE_ASSOCIATIONS = [
     :attachment, :assignment, :user, :grader, :group, :media_object, :student, :submission_comments, :assessment_requests, :assigned_assessments, :quiz_submission,
-    :rubric_assessment, :rubric_assessments, :attachments, :conversation_messages, :content_participations
+    :rubric_assessment, :rubric_assessments, :attachments, :content_participations
   ]
 
   serialize :turnitin_data, Hash
@@ -854,19 +859,6 @@ class Submission < ActiveRecord::Base
     comment
   end
 
-  def conversation_groups
-    participating_instructors.map{ |i| [user, i] }
-  end
-
-  def conversation_message_data
-    latest = visible_submission_comments.where(:author_id => possible_participants_ids).last or return
-    {
-      :created_at => latest.created_at,
-      :author => latest.author,
-      :body => latest.comment
-    }
-  end
-
   def comment_authors
     visible_submission_comments(:include => :author).map(&:author)
   end
@@ -881,55 +873,6 @@ class Submission < ActiveRecord::Base
 
   def possible_participants_ids
     [user_id] + context.participating_instructors.uniq.map(&:id)
-  end
-
-  # ensure that conversations/messages are created/updated for all relevant
-  # participants as submission comments are added/removed. there should be a
-  # conversation between the submitter and each participating admin, and it
-  # should have a single conversation_message that represents the submission
-  # (there may of course be other regular messages in the conversation)
-  #
-  # ==== Arguments
-  # * <tt>trigger</tt> - Values of :create, :destroy, :migrate are supported.
-  # * <tt>overrides</tt> - Hash of overrides that can be passed through when
-  #                        updating the conversation.
-  #
-  # ==== Overrides
-  # * <tt>:skip_users</tt> - Gets passed through to <tt>Conversation</tt>.<tt>update_all_for_asset</tt>.
-  #                        nil by default, which means mark-as-unread for
-  #                        everyone but the author.
-  def create_or_update_conversations!(trigger, overrides={})
-    options = {}
-    case trigger
-    when :create
-      options[:update_participants] = true
-      options[:update_for_skips] = false
-      options[:skip_users] = overrides[:skip_users] || [conversation_message_data[:author]] # don't mark-as-unread for the author
-      options[:skip_users] << user if user.preferences[:use_new_conversations]
-      participating_instructors.each do |t|
-        # Check their settings and add to :skip_users if set to suppress.
-        if t.preferences[:no_submission_comments_inbox] == true ||
-          t.preferences[:use_new_conversations]
-          options[:skip_users] << t
-        end
-      end
-    when :destroy
-      options[:delete_all] = visible_submission_comments.empty?
-      options[:only_existing] = true
-    when :migrate # don't mark-as-unread for anybody or add to empty conversations
-      return unless conversation_message_data
-      options[:recalculate_count] = true
-      options[:recalculate_last_authored_at] = true
-      options[:only_existing] = true
-    end
-
-    Conversation.update_all_for_asset(self, options)
-  end
-
-  def self.batch_migrate_conversations!(ids)
-    find_all_by_id(ids).each do |sub|
-      sub.create_or_update_conversations!(:migrate)
-    end
   end
 
   def limit_comments(user, session=nil)
