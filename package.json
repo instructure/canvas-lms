@@ -4,7 +4,8 @@
   "dependencies": {
     "requirejs": "~2.1.10",
     "uglify-js": "~2.4.12",
-    "glob": "~3.2.9"
+    "glob": "~3.2.9",
+    "compute-cluster": "0.0.7"
   },
   "devDependencies": {
     "loom": "~2.0.0",
@@ -18,8 +19,7 @@
     "karma-ie-launcher": "~0.1.1",
     "karma-osx-reporter": "0.0.4",
     "karma-firework-reporter": "~0.2.3",
-    "karma-coffee-preprocessor": "0.1.3",
-    "compute-cluster": "0.0.7"
+    "karma-coffee-preprocessor": "0.1.3"
   },
   "repository": {
     "type": "git",
