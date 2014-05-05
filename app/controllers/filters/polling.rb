@@ -13,10 +13,20 @@ module Filters::Polling
   def require_poll
     id = params.has_key?(:poll_id) ? params[:poll_id] : params[:id]
 
-    unless @poll = @course.polls.find(id)
+    unless @poll = Polling::Poll.find(id)
       raise ActiveRecord::RecordNotFound.new('Poll not found')
     end
 
     @poll
+  end
+
+  def require_poll_session
+    id = params[:poll_session_id]
+
+    unless @poll_session = @poll.poll_sessions.find(id)
+      raise ActiveRecord::RecordNotFound.new('Poll session not found')
+    end
+
+    @poll_session
   end
 end

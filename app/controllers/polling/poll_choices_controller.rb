@@ -23,11 +23,16 @@ module Polling
   # @model PollChoice
   #   {
   #     "id": "PollChoice",
-  #     "required": ["id", "text"],
+  #     "required": ["id", "poll_id", "text"],
   #     "properties": {
   #       "id": {
   #         "description": "The unique identifier for the poll choice.",
   #         "example": 1023,
+  #         "type": "integer"
+  #       },
+  #       "poll_id": {
+  #         "description": "The id of the poll this poll choice belongs to.",
+  #         "example": 1779,
   #         "type": "integer"
   #       },
   #       "is_correct": {
@@ -47,7 +52,6 @@ module Polling
     include Filters::Polling
 
     before_filter :require_user
-    before_filter :require_course
     before_filter :require_poll
 
     # @API List poll choices in a poll
@@ -55,14 +59,11 @@ module Polling
     #
     # Returns the list of PollChoices in this poll.
     #
-    # @argument poll_id [Required, Integer]
-    #   The associated poll's unique identifier
-    #
     # @returns [PollChoice]
     def index
       if authorized_action(@poll, @current_user, :read)
         @poll_choices = @poll.poll_choices
-        @poll_choices = Api.paginate(@poll_choices, self, api_v1_course_poll_choices_url(@course, @poll))
+        @poll_choices = Api.paginate(@poll_choices, self, api_v1_poll_choices_url(@poll))
 
         render json: serialize_json(@poll_choices)
       end
@@ -72,12 +73,6 @@ module Polling
     # @beta
     #
     # Returns the poll choice with the given id
-    #
-    # @argument poll_id [Required, Integer]
-    #   The associated poll's unique identifier
-    #
-    # @argument id [Required, Integer]
-    #   The poll choice unique identifier.
     #
     # @returns PollChoice
     def show
@@ -93,9 +88,6 @@ module Polling
     #
     # Create a new poll choice for this poll
     #
-    # @argument poll_id [Required, Integer]
-    #   The associated poll's unique identifier
-    #
     # @argument poll_choice[text] [Required, String]
     #   The descriptive text of the poll choice.
     #
@@ -105,8 +97,9 @@ module Polling
     # @returns PollChoice
     def create
       @poll_choice = @poll.poll_choices.new(params[:poll_choice])
+      @poll_choice.is_correct = false if params[:poll_choice] && params[:poll_choice][:is_correct].blank?
 
-      if authorized_action(@poll, @current_user, :create)
+      if authorized_action(@poll, @current_user, :update)
         if @poll_choice.save
           render json: serialize_json(@poll_choice)
         else
@@ -120,9 +113,6 @@ module Polling
     #
     # Update an existing poll choice for this poll
     #
-    # @argument poll_id [Required, Integer]
-    #   The associated poll's unique identifier
-    #
     # @argument poll_choice[text] [Required, String]
     #   The descriptive text of the poll choice.
     #
@@ -132,6 +122,10 @@ module Polling
     # @returns Poll
     def update
       @poll_choice = @poll.poll_choices.find(params[:id])
+
+      if params[:poll_choice] && params[:poll_choice][:is_correct].blank?
+        params[:poll_choice][:is_correct] = @poll_choice.is_correct
+      end
 
       if authorized_action(@poll, @current_user, :update)
         if @poll_choice.update_attributes(params[:poll_choice])
@@ -145,13 +139,7 @@ module Polling
     # @API Delete a poll choice
     # @beta
     #
-    # @argument poll_id [Required, Integer]
-    #   The associated poll's unique identifier
-    #
-    # @argument id [Required, Integer]
-    #   The poll choice's unique identifier
-    #
-    # <b>204 No Content<b> response code is returned if the deletion was successful.
+    # <b>204 No Content</b> response code is returned if the deletion was successful.
     def destroy
       @poll_choice = @poll.poll_choices.find(params[:id])
 

@@ -18,25 +18,42 @@
 
 module Polling
   class Poll < ActiveRecord::Base
-    attr_accessible :course, :title
+    attr_accessible :user, :question, :description
 
-    belongs_to :course
-    has_many :poll_choices, class_name: 'Polling::PollChoice'
+    belongs_to :user
+    has_many :poll_choices, class_name: 'Polling::PollChoice', dependent: :destroy
     has_many :poll_submissions, class_name: 'Polling::PollSubmission'
+    has_many :poll_sessions, class_name: 'Polling::PollSession'
 
-    validates_presence_of :title, :course
+    validates_presence_of :question, :user
+    validates_length_of :question, maximum: 255, allow_nil: true
+    validates_length_of :description, maximum: 255, allow_nil: true
 
     set_policy do
-      given do |user, session|
-        self.cached_context_grants_right?(user, session, :manage_assignments)
-      end
-      can :read and can :update and can :delete and can :create
+      given { |user| user.roles.include?("admin") }
+      can :create and can :update and can :read and can :delete and can :submit
+
+      given { |user| user.roles.include?("teacher") }
+      can :create
+
+      given { |user| self.user.present? && self.user == user }
+      can :update and can :read and can :delete
 
       given do |user, session|
-        cached_context_grants_right?(user, session, :read)
+        self.poll_sessions.any? { |poll_session| poll_session.grants_right?(user, session, :submit) }
       end
       can :read
     end
 
+
+    def total_results
+      poll_sessions.reduce(Hash.new(0)) do |poll_results, session|
+        poll_results = poll_results.merge(session.results) do |key, poll_result_value, session_result_value|
+          poll_result_value + session_result_value
+        end
+
+        poll_results
+      end
+    end
   end
 end

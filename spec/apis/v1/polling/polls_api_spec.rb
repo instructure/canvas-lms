@@ -26,17 +26,16 @@ describe Polling::PollsController, type: :request do
   describe 'GET index' do
     before(:each) do
       5.times do |n|
-        @course.polls.create!(title: "Example Poll #{n+1}")
+        @teacher.polls.create!(question: "Example Poll #{n+1}")
       end
     end
 
     def get_index(raw = false, data = {})
       helper = method(raw ? :raw_api_call : :api_call)
       helper.call(:get,
-                  "/api/v1/courses/#{@course.id}/polls",
-                  { controller: 'polling/polls', action: 'index', format: 'json',
-                    course_id: @course.id.to_s
-                  }, data)
+                  "/api/v1/polls",
+                  { controller: 'polling/polls', action: 'index', format: 'json' },
+                  data)
     end
 
     it "returns all existing polls" do
@@ -44,7 +43,7 @@ describe Polling::PollsController, type: :request do
       json.size.should == 5
 
       json.each_with_index do |poll, i|
-        poll['title'].should == "Example Poll #{5-i}"
+        poll['question'].should == "Example Poll #{5-i}"
       end
     end
 
@@ -52,7 +51,7 @@ describe Polling::PollsController, type: :request do
 
   describe 'GET show' do
     before(:each) do
-      @poll = @course.polls.create!(title: 'An Example Poll')
+      @poll = @teacher.polls.create!(question: 'An Example Poll')
       5.times do |n|
         @poll.poll_choices.create!(text: "Poll Choice #{n+1}", is_correct: false)
       end
@@ -61,9 +60,8 @@ describe Polling::PollsController, type: :request do
     def get_show(raw = false, data = {})
       helper = method(raw ? :raw_api_call : :api_call)
       helper.call(:get,
-                  "/api/v1/courses/#{@course.id}/polls/#{@poll.id}",
+                  "/api/v1/polls/#{@poll.id}",
                   { controller: 'polling/polls', action: 'show', format: 'json',
-                    course_id: @course.id.to_s,
                     id: @poll.id.to_s
                   }, data)
     end
@@ -71,31 +69,61 @@ describe Polling::PollsController, type: :request do
 
     it "retrieves the poll specified" do
       json = get_show
-      json['title'].should == 'An Example Poll'
+      json['question'].should == 'An Example Poll'
     end
 
+    context "as a teacher" do
+      it "displays the total results of all sessions" do
+        json = get_show
+        json.should have_key("total_results")
+      end
+    end
+
+    context "as a student" do
+      it "doesn't display the total results of all sessions" do
+        student_in_course(:active_all => true, :course => @course)
+
+        session = @poll.poll_sessions.create!(course: @course)
+        session.publish!
+
+        json = get_show
+        json.should_not have_key("total_results")
+      end
+
+      it "is unauthorized if there are no published sessions" do
+        student_in_course(:active_all => true, :course => @course)
+        section = @course.course_sections.create!(name: 'Section 2')
+
+        @poll.poll_sessions.create!(course: @course, course_section: section)
+
+        get_show(true)
+        response.code.should == '401'
+      end
+
+    end
   end
 
   describe 'POST create' do
     def post_create(params, raw=false)
       helper = method(raw ? :raw_api_call : :api_call)
       helper.call(:post,
-                  "/api/v1/courses/#{@course.id}/polls",
-                  { controller: 'polling/polls', action: 'create', format: 'json', course_id: @course.id.to_s },
+                  "/api/v1/polls",
+                  { controller: 'polling/polls', action: 'create', format: 'json' },
                   { poll: params }, {}, {})
     end
 
     context "as a teacher" do
       it "creates a poll successfully" do
-        post_create(title: 'A Test Poll')
-        @course.polls.first.title.should == 'A Test Poll'
+        post_create(question: 'A Test Poll', description: 'A test description.')
+        @teacher.polls.first.question.should == 'A Test Poll'
+        @teacher.polls.first.description.should == 'A test description.'
       end
     end
 
     context "as a student" do
       it "is unauthorized" do
         student_in_course(:active_all => true, :course => @course)
-        json = post_create({title: 'New Title'}, true)
+        post_create({question: 'New Title'}, true)
         response.code.should == '401'
       end
     end
@@ -104,16 +132,15 @@ describe Polling::PollsController, type: :request do
 
   describe 'PUT update' do
     before(:each) do
-      @poll = @course.polls.create!(title: 'An Old Title')
+      @poll = @teacher.polls.create!(question: 'An Old Title')
     end
 
     def put_update(params, raw=false)
       helper = method(raw ? :raw_api_call : :api_call)
 
       helper.call(:put,
-               "/api/v1/courses/#{@course.id}/polls/#{@poll.id}",
+               "/api/v1/polls/#{@poll.id}",
                { controller: 'polling/polls', action: 'update', format: 'json',
-                 course_id: @course.id.to_s,
                  id: @poll.id.to_s },
                { poll: params }, {}, {})
 
@@ -121,17 +148,63 @@ describe Polling::PollsController, type: :request do
 
     context "as a teacher" do
       it "updates a poll successfully" do
-        put_update(title: 'A New Title')
-        @poll.reload.title.should == 'A New Title'
+        put_update(question: 'A New Title')
+        @poll.reload.question.should == 'A New Title'
       end
     end
 
     context "as a student" do
       it "is unauthorized" do
         student_in_course(:active_all => true, :course => @course)
-        put_update({title: 'New Title'}, true)
+        put_update({question: 'New Title'}, true)
         response.code.should == '401'
       end
     end
+
   end
+
+  describe 'DELETE destroy' do
+    before(:each) do
+      @poll = @teacher.polls.create!(question: 'An Old Title')
+    end
+
+    def delete_destroy
+      raw_api_call(:delete,
+               "/api/v1/polls/#{@poll.id}",
+               { controller: 'polling/polls', action: 'destroy', format: 'json',
+                 id: @poll.id.to_s },
+               {}, {}, {})
+
+    end
+
+    context "as a teacher" do
+      it "deletes a poll successfully" do
+        delete_destroy
+
+        response.code.should == '204'
+        Polling::Poll.find_by_id(@poll.id).should be_nil
+      end
+
+      it "deletes all associated poll choices" do
+        choice_a = @poll.poll_choices.create!(text: 'choice a')
+        choice_b = @poll.poll_choices.create!(text: 'choice b')
+
+        delete_destroy
+        response.code.should == '204'
+        Polling::PollChoice.find_by_id(choice_a.id).should be_nil
+        Polling::PollChoice.find_by_id(choice_b.id).should be_nil
+      end
+    end
+
+    context "as a student" do
+      it "is unauthorized" do
+        student_in_course(:active_all => true, :course => @course)
+        delete_destroy
+        response.code.should == '401'
+        Polling::Poll.find_by_id(@poll.id).should == @poll
+      end
+    end
+
+  end
+
 end

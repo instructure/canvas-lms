@@ -1397,19 +1397,34 @@ routes.draw do
     end
 
     scope(:controller => 'polling/polls') do
-      get "courses/:course_id/polls", :action => :index, :path_name => 'course_polls'
-      post "courses/:course_id/polls", :action => :create, :path_name => 'course_poll_create'
-      get "courses/:course_id/polls/:id", :action => :show, :path_name => 'course_poll'
-      put "courses/:course_id/polls/:id", :action => :update, :path_name => 'course_poll_update'
-      delete "courses/:course_id/polls/:id", :action => :destroy, :path_name => 'course_poll_destroy'
+      get "polls", :action => :index, :path_name => 'polls'
+      post "polls", :action => :create, :path_name => 'poll_create'
+      get "polls/:id", :action => :show, :path_name => 'poll'
+      put "polls/:id", :action => :update, :path_name => 'poll_update'
+      delete "polls/:id", :action => :destroy, :path_name => 'poll_destroy'
     end
 
     scope(:controller => 'polling/poll_choices') do
-      get "courses/:course_id/polls/:poll_id/poll_choices", :action => :index, :path_name => 'course_poll_choices'
-      post "courses/:course_id/polls/:poll_id/poll_choices", :action => :create, :path_name => 'course_poll_choices_create'
-      get "courses/:course_id/polls/:poll_id/poll_choices/:id", :action => :show, :path_name => 'course_poll_choice'
-      put "courses/:course_id/polls/:poll_id/poll_choices/:id", :action => :update, :path_name => 'course_poll_choice_update'
-      delete "courses/:course_id/polls/:poll_id/poll_choices/:id", :action => :destroy, :path_name => 'course_poll_choice_destroy'
+      get "polls/:poll_id/poll_choices", :action => :index, :path_name => 'poll_choices'
+      post "polls/:poll_id/poll_choices", :action => :create, :path_name => 'poll_choices_create'
+      get "polls/:poll_id/poll_choices/:id", :action => :show, :path_name => 'poll_choice'
+      put "polls/:poll_id/poll_choices/:id", :action => :update, :path_name => 'poll_choice_update'
+      delete "polls/:poll_id/poll_choices/:id", :action => :destroy, :path_name => 'poll_choice_destroy'
+    end
+
+    scope(:controller => 'polling/poll_sessions') do
+      get "polls/:poll_id/poll_sessions", :action => :index, :path_name => 'poll_sessions'
+      post "polls/:poll_id/poll_sessions", :action => :create, :path_name => 'poll_sessions_create'
+      get "polls/:poll_id/poll_sessions/:id", :action => :show, :path_name => 'poll_session'
+      put "polls/:poll_id/poll_sessions/:id", :action => :update, :path_name => 'poll_session_update'
+      delete "polls/:poll_id/poll_sessions/:id", :action => :destroy, :path_name => 'poll_session_destroy'
+      get "polls/:poll_id/poll_sessions/:id/publish", :action => :publish, :path_name => 'poll_session_publish'
+      get "polls/:poll_id/poll_sessions/:id/close", :action => :close, :path_name => 'poll_session_close'
+    end
+
+    scope(:controller => 'polling/poll_submissions') do
+      post "polls/:poll_id/poll_sessions/:poll_session_id/poll_submissions", :action => :create, :path_name => 'poll_submissions_create'
+      get "polls/:poll_id/poll_sessions/:poll_session_id/poll_submissions/:id", :action => :show, :path_name => 'poll_submission'
     end
 
     scope(:controller => :outcome_groups_api) do

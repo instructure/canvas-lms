@@ -193,6 +193,7 @@ class User < ActiveRecord::Base
   has_many :current_and_concluded_courses, :source => :course, :through => :current_and_concluded_enrollments
   has_many :group_memberships, :include => :group, :dependent => :destroy
   has_many :groups, :through => :group_memberships
+  has_many :polls, class_name: 'Polling::Poll'
 
   has_many :current_group_memberships, :include => :group, :class_name => 'GroupMembership', :conditions => "group_memberships.workflow_state = 'accepted' AND groups.workflow_state <> 'deleted'"
   has_many :current_groups, :through => :current_group_memberships, :source => :group

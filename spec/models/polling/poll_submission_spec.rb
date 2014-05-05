@@ -22,32 +22,83 @@ describe Polling::PollSubmission do
   before(:each) do
     course_with_student
     @course.root_account.disable_feature!(:draft_state)
-    @poll = Polling::Poll.create!(course: @course, title: 'A Test Poll')
+    @section = @course.course_sections.create!(name: 'Section 2')
+    teacher_in_course(course: @course, active_all: true)
+
+    @poll = Polling::Poll.create!(user: @teacher, question: 'A Test Poll')
     @poll_choice = Polling::PollChoice.new(poll: @poll, text: 'Poll Choice A')
     @poll_choice.is_correct = true
     @poll_choice.save
+
+    @session = Polling::PollSession.create!(poll: @poll, course: @course, course_section: @section)
+    @session.publish!
   end
 
   context "creating a poll submission" do
     it "requires an associated poll" do
-      lambda { Polling::PollSubmission.create!(poll_choice: @poll_choice, user: @student) }.should raise_error(ActiveRecord::RecordInvalid,
-                                                                        /Poll can't be blank/)
+      lambda { Polling::PollSubmission.create!(poll_choice: @poll_choice,
+                                               user: @student,
+                                               poll_session: @session) }.should raise_error(ActiveRecord::RecordInvalid,
+                                                                                            /Poll can't be blank/)
     end
 
     it "requires an associated poll choice" do
-      lambda { Polling::PollSubmission.create!(poll: @poll, user: @student) }.should raise_error(ActiveRecord::RecordInvalid,
-                                                                        /Poll choice can't be blank/)
+      lambda { Polling::PollSubmission.create!(poll: @poll,
+                                               user: @student,
+                                               poll_session: @session) }.should raise_error(ActiveRecord::RecordInvalid,
+                                                                                            /Poll choice can't be blank/)
     end
 
     it "requires a user" do
-      lambda { Polling::PollSubmission.create!(poll: @poll, poll_choice: @poll_choice) }.should raise_error(ActiveRecord::RecordInvalid,
-                                                                        /User can't be blank/)
+      lambda { Polling::PollSubmission.create!(poll: @poll,
+                                               poll_choice: @poll_choice,
+                                               poll_session: @session) }.should raise_error(ActiveRecord::RecordInvalid,
+                                                                                            /User can't be blank/)
+    end
 
+    it "requires a poll session" do
+      lambda { Polling::PollSubmission.create!(poll: @poll,
+                                               user: @student,
+                                               poll_choice: @poll_choice).should raise_error(ActiveRecord::RecordInvalid,
+                                                                                             /Poll session can't be blank/)}
     end
 
     it "saves successfully" do
-      @poll_submission = Polling::PollSubmission.create(poll: @poll, poll_choice: @poll_choice, user: @student)
+      @poll_submission = Polling::PollSubmission.create(poll: @poll, poll_choice: @poll_choice, user: @student, poll_session: @session)
       @poll_submission.should be_valid
+    end
+
+    it "restricts a user to one submission per session" do
+      @poll_submission = Polling::PollSubmission.create!(poll: @poll, user: @student, poll_choice: @poll_choice, poll_session: @session)
+      @poll_submission.should be_valid
+
+      lambda { Polling::PollSubmission.create!(poll: @poll,
+                                               user: @student,
+                                               poll_choice: @poll_choice,
+                                               poll_session: @session) }.should raise_error(ActiveRecord::RecordInvalid,
+                                                                                            /can only submit one choice per poll session/)
+    end
+
+    it "insures the associated poll session is published" do
+      @session.close!
+      lambda { Polling::PollSubmission.create!(poll: @poll,
+                                               user: @student,
+                                               poll_choice: @poll_choice,
+                                               poll_session: @session) }.should raise_error(ActiveRecord::RecordInvalid,
+                                                                                            /This poll session is not open for submissions/)
+    end
+
+    it "insures the poll choice is associated to the submission's poll" do
+      new_poll = Polling::Poll.create!(user: @teacher, question: 'A New Poll')
+      poll_choice = Polling::PollChoice.new(poll: new_poll, text: 'Poll Choice A')
+      poll_choice.is_correct = true
+      poll_choice.save
+
+      lambda { Polling::PollSubmission.create!(poll: @poll,
+                                               user: @student,
+                                               poll_choice: poll_choice,
+                                               poll_session: @session) }.should raise_error(ActiveRecord::RecordInvalid,
+                                                                                            /That poll choice does not belong to the existing poll/)
     end
   end
 end

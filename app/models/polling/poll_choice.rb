@@ -22,6 +22,7 @@ module Polling
 
     belongs_to :poll, class_name: 'Polling::Poll'
 
-    validates_presence_of :poll
+    validates_presence_of :poll, :text
+    validates_length_of :text, maximum: 255, allow_nil: true
   end
 end

@@ -4,8 +4,8 @@ module Polling
 
     has_one :poll, embed: :id
 
-    def_delegators :object, :course, :poll
-    def_delegators :@controller, :api_v1_course_poll_url
+    def_delegators :object, :poll
+    def_delegators :@controller, :api_v1_poll_url
 
     def filter(keys)
       if is_teacher?
@@ -16,7 +16,7 @@ module Polling
     end
 
     def poll_url
-      api_v1_course_poll_url(course, poll)
+      api_v1_poll_url(poll)
     end
 
     private

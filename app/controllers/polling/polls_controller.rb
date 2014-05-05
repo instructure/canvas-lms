@@ -23,26 +23,22 @@ module Polling
   # @model Poll
   #    {
   #       "id": "Poll",
-  #       "required": ["id", "course", "title"],
+  #       "required": ["id", "question"],
   #       "properties": {
   #         "id": {
   #           "description": "The unique identifier for the poll.",
   #           "example": 1023,
   #           "type": "integer"
   #         },
-  #         "course": {
-  #           "description": "The course the poll belongs to.  See the Courses API for details.",
-  #           "$ref": "Course"
-  #         },
-  #         "title": {
-  #           "description": "The title of the poll.",
+  #         "question": {
+  #           "description": "The question/title of the poll.",
   #           "type": "string",
-  #           "example": "A Sample Poll"
+  #           "example": "What do you consider most important to your learning in this course?"
   #         },
   #         "description": {
   #           "description": "A short description of the poll.",
   #           "type": "string",
-  #           "example": "This poll is to quickly determine what you've learned in the past hour."
+  #           "example": "This poll is to determine what priorities the students in the course have."
   #         }
   #       }
   #    }
@@ -51,21 +47,18 @@ module Polling
     include Filters::Polling
 
     before_filter :require_user
-    before_filter :require_course
 
-    # @API List polls in a course
+    # @API List polls
     # @beta
     #
-    # Returns the list of polls in this course.
+    # Returns the list of polls for the current user.
     #
     # @returns [Poll]
     def index
-      if authorized_action(@course, @current_user, :read)
-        @polls = @course.polls
-        @polls = Api.paginate(@polls, self, api_v1_course_polls_url(@course))
+      @polls = @current_user.polls
+      @polls = Api.paginate(@polls, self, api_v1_polls_url)
 
-        render json: serialize_json(@polls)
-      end
+      render json: serialize_json(@polls)
     end
 
     # @API Get a single poll
@@ -73,12 +66,9 @@ module Polling
     #
     # Returns the poll with the given id
     #
-    # @argument id [Required, Integer]
-    #   The poll unique identifier.
-    #
     # @returns Poll
     def show
-      @poll = @course.polls.find(params[:id])
+      @poll = Polling::Poll.find(params[:id])
 
       if authorized_action(@poll, @current_user, :read)
         render json: serialize_json(@poll, true)
@@ -88,7 +78,7 @@ module Polling
     # @API Create a single poll
     # @beta
     #
-    # Create a new poll for this course
+    # Create a new poll for the current user
     #
     # @argument poll[title] [Required, String]
     #   The title of the poll.
@@ -98,22 +88,20 @@ module Polling
     #
     # @returns Poll
     def create
-      @poll = @course.polls.new(params[:poll])
-
+      @poll = @current_user.polls.new(params[:poll])
       if authorized_action(@poll, @current_user, :create)
         if @poll.save
           render json: serialize_json(@poll)
         else
           render json: @poll.errors, status: :bad_request
         end
-
       end
     end
 
     # @API Update a single poll
     # @beta
     #
-    # Update an existing poll for this course
+    # Update an existing poll belonging to the current user
     #
     # @argument poll[title] [Required, String]
     #   The title of the poll.
@@ -123,9 +111,11 @@ module Polling
     #
     # @returns Poll
     def update
-      @poll = @course.polls.find(params[:id])
+      @poll = Polling::Poll.find(params[:id])
 
       if authorized_action(@poll, @current_user, :update)
+        params[:poll].delete(:is_correct) if params[:poll] && params[:poll][:is_correct].blank?
+
         if @poll.update_attributes(params[:poll])
           render json: serialize_json(@poll)
         else
@@ -137,26 +127,12 @@ module Polling
     # @API Delete a poll
     # @beta
     #
-    # @argument id [Required, Integer]
-    #   The poll's unique identifier
-    #
-    # <b>204 No Content<b> response code is returned if the deletion was successful.
+    # <b>204 No Content</b> response code is returned if the deletion was successful.
     def destroy
-      @poll = @course.polls.find(params[:id])
-
+      @poll = Polling::Poll.find(params[:id])
       if authorized_action(@poll, @current_user, :delete)
         @poll.destroy
         head :no_content
-      end
-    end
-
-    def publish
-      if authorized_action(@poll, @current_user, :publish)
-      end
-    end
-
-    def close
-      if authorized_action(@poll, @current_user, :close)
       end
     end
 
