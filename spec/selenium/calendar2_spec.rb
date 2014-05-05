@@ -6,7 +6,6 @@ describe "calendar2" do
 
   before (:each) do
     Account.default.tap do |a|
-      a.settings[:enable_scheduler] = true
       a.settings[:show_scheduler]   = true
       a.save!
     end

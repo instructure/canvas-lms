@@ -141,8 +141,8 @@ describe "enrollment_date_restrictions" do
     @course.save!
     @enrollment.reload.state_based_on_date.should == :inactive
 
-    get '/calendar'
+    get '/calendar2'
     html = Nokogiri::HTML(response.body)
-    html.css("#group_course_#{@course.id}").length.should == 0
+    html.css(".group_course_#{@course.id}").length.should == 0
   end
 end

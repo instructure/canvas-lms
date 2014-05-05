@@ -41,7 +41,6 @@ describe CalendarEventsController do
     end
 
     it "should render show page" do
-      Account.default.update_attribute(:settings, {:enable_scheduler => true})
       course_with_student_logged_in(:active_all => true)
       course_event
       get 'show', :course_id => @course.id, :id => @event.id
