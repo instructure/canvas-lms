@@ -72,7 +72,7 @@ describe "calendar2" do
     keep_trying_until { f('.fc-view-month .fc-event-title').should include_text(assignment_title) }
   end
 
-  def create_calendar_event(event_title, should_add_date = false)
+  def create_calendar_event(event_title, should_add_date = false, should_add_location = false)
     middle_number = find_middle_day.find_element(:css, '.fc-day-number').text
     find_middle_day.click
     edit_event_dialog = f('#edit_event_tabs')
@@ -82,6 +82,7 @@ describe "calendar2" do
     keep_trying_until { title.displayed? }
     replace_content(title, event_title)
     add_date(middle_number) if should_add_date
+    replace_content(f('#calendar_event_location_name'), 'location title') if should_add_location
     submit_form(edit_event_form)
     wait_for_ajax_requests
     keep_trying_until { f('.fc-view-month .fc-event-title').should include_text(event_title) }
@@ -184,7 +185,7 @@ describe "calendar2" do
         end
 
         it "should truncate very long undated event titles" do
-          e = make_event :start => nil, :title => "asdfjkasldfjklasdjfklasdjfklasjfkljasdklfjasklfjkalsdjsadkfljasdfkljfsdalkjsfdlksadjklsadjsadklasdf"
+          make_event :start => nil, :title => "asdfjkasldfjklasdjfklasdjfklasjfkljasdklfjasklfjkalsdjsadkfljasdfkljfsdalkjsfdlksadjklsadjsadklasdf"
           get "/calendar2"
 
           f("#undated-events-section .element_toggler").click
@@ -203,9 +204,9 @@ describe "calendar2" do
         header.text
       end
 
-      def create_middle_day_event(name = 'new event')
+      def create_middle_day_event(name = 'new event', with_date = false, with_location = false)
         get "/calendar2"
-        create_calendar_event(name)
+        create_calendar_event(name, with_date, with_location)
       end
 
       def create_middle_day_assignment(name = 'new assignment')
@@ -518,6 +519,36 @@ describe "calendar2" do
           fj('#create_new_event_link').click
           edit_event_dialog = f('#edit_event_tabs')
           edit_event_dialog.should be_displayed
+        end
+
+        it "should create an event with a location name" do
+          event_name = 'event with location'
+          create_middle_day_event(event_name, false, true)
+          fj('.fc-event:visible').click
+          fj('.event-details-content:visible').should include_text('location title')
+        end
+
+        it 'should create an event with location name and address' do
+          get "/calendar2"
+          event_title = 'event title'
+          location_name = 'my house'
+          location_address = '555 test street'
+          find_middle_day.click
+          edit_event_dialog = f('#edit_event_tabs')
+          edit_event_dialog.should be_displayed
+          edit_event_form = edit_event_dialog.find_element(:id, 'edit_calendar_event_form')
+          title = edit_event_form.find_element(:id, 'calendar_event_title')
+          keep_trying_until { title.displayed? }
+          replace_content(title, event_title)
+          expect_new_page_load { f('.more_options_link').click }
+          f('.title').attribute('value').should == event_title
+          replace_content(f('#calendar_event_location_name'), location_name)
+          replace_content(f('#calendar_event_location_address'), location_address)
+          expect_new_page_load { submit_form(f('#editCalendarEventFull')) }
+          fj('.fc-event:visible').click
+          event_content = fj('.event-details-content:visible')
+          event_content.should include_text(location_name)
+          event_content.should include_text(location_address)
         end
       end
 

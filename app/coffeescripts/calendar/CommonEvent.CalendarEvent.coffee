@@ -21,6 +21,8 @@ define [
       @object = @calendarEvent = data
       @id = "calendar_event_#{data.id}" if data.id
       @title = data.title || "Untitled"
+      @location_name = data.location_name
+      @location_address = data.location_address
       @start = @parseStartDate()
       @end = @parseEndDate()
       @originalEndDate = new Date(@end) if @end

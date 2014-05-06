@@ -13,7 +13,7 @@ define [
 
     _filterAttributes: (obj) ->
       filtered = _(obj).pick 'start_at', 'end_at', 'title', 'description',
-        'context_code', 'remove_child_events'
+        'context_code', 'remove_child_events', 'location_name', 'location_address'
       if obj.use_section_dates && obj.child_event_data
         filtered.child_event_data = _.chain(obj.child_event_data)
           .compact()
