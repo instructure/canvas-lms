@@ -352,6 +352,35 @@ describe UserMerge do
       new_attachment = user2.attachments.not_deleted.detect{|a| a.md5 == attachment2.md5}
       new_attachment.display_name.should_not == "test.txt" # attachment2 should be copied and renamed because it has unique file data
     end
+
+    it "should move discussion topics and entries" do
+      topic = course1.discussion_topics.create!(user: user2)
+      entry = topic.discussion_entries.create!(user: user2)
+
+      UserMerge.from(user2).into(user1)
+
+      topic.reload.user.should == user1
+      entry.reload.user.should == user1
+    end
+
+    it "should freshen moved topics" do
+      topic = course1.discussion_topics.create!(user: user2)
+      now = Time.at(5.minutes.from_now.to_i) # truncate milliseconds
+      Timecop.freeze(now) do
+        UserMerge.from(user2).into(user1)
+        topic.reload.updated_at.should == now
+      end
+    end
+
+    it "should freshen topics with moved entries" do
+      topic = course1.discussion_topics.create!(user: user1)
+      entry = topic.discussion_entries.create!(user: user2)
+      now = Time.at(5.minutes.from_now.to_i) # truncate milliseconds
+      Timecop.freeze(now) do
+        UserMerge.from(user2).into(user1)
+        topic.reload.updated_at.should == now
+      end
+    end
   end
 
   it "should update account associations" do
