@@ -144,11 +144,23 @@ class UserMerge
         end
       end
       from_user.all_conversations.find_each { |c| c.move_to_user(target_user) } unless Shard.current != target_user.shard
+
+      # all topics changing ownership or with entries changing ownership need to be
+      # flagged as updated so the materialized views update
+      begin
+        entries = DiscussionEntry.where(user_id: from_user)
+        DiscussionTopic.where(id: entries.select(['discussion_topic_id'])).update_all(updated_at: Time.now.utc)
+        entries.update_all(user_id: target_user.id)
+        DiscussionTopic.where(user_id: from_user).update_all(user_id: target_user.id, updated_at: Time.now.utc)
+      rescue => e
+        Rails.logger.error "migrating discussions failed: #{e.to_s}"
+      end
+
       updates = {}
       ['account_users', 'access_tokens', 'asset_user_accesses',
        'attachments',
        'calendar_events', 'collaborations',
-       'context_module_progressions', 'discussion_entries', 'discussion_topics',
+       'context_module_progressions',
        'group_memberships', 'page_comments',
        'rubric_assessments',
        'submission_comment_participants', 'user_services', 'web_conferences',
