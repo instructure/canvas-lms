@@ -44,6 +44,7 @@ module Importers
           begin
             Importers::QuizImporter.import_from_migration(assessment, migration.context, migration, question_data, nil, allow_update)
           rescue
+            debugger
             migration.add_import_warning(t('#migration.quiz_type', "Quiz"), assessment[:title], $!)
           end
         end
@@ -116,9 +117,7 @@ module Importers
       if question_data
         hash[:questions] ||= []
 
-        if question_data[:qq_data] || question_data[:aq_data]
-          existing_questions = item.quiz_questions.active.where("migration_id IS NOT NULL").select([:id, :migration_id]).index_by(&:migration_id)
-        end
+        existing_questions = item.quiz_questions.active.where("migration_id IS NOT NULL").select([:id, :migration_id]).index_by(&:migration_id)
 
         if question_data[:qq_data]
           question_data[:qq_data].values.each do |q|
@@ -158,10 +157,17 @@ module Importers
           when "question_group"
             Importers::QuizGroupImporter.import_from_migration(question, context, item, question_data, i + 1, migration)
           when "text_only_question"
-            qq = item.quiz_questions.new
-            qq.question_data = question
-            qq.position = i + 1
-            qq.save!
+            if question['migration_id']
+              existing_question = existing_questions[question['migration_id']]
+              question['quiz_question_id'] = existing_question.id if existing_question
+              question['position'] = i + 1
+              Importers::QuizQuestionImporter.import_from_migration(question, context, migration, item)
+            else
+              qq = item.quiz_questions.new
+              qq.question_data = question
+              qq.position = i + 1
+              qq.save!
+            end
           end
         end
       end

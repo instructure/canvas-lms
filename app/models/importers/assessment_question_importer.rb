@@ -124,6 +124,9 @@ module Importers
       migration.add_imported_item(bank) if migration
       self.prep_for_import(hash, context, migration)
 
+      missing_links = hash.delete(:missing_links) || {}
+      import_warnings = hash.delete(:import_warnings)
+
       if id = hash['assessment_question_id']
         AssessmentQuestion.where(id: id).update_all(name: hash[:question_name], question_data: hash.to_yaml,
             workflow_state: 'active', created_at: Time.now.utc, updated_at: Time.now.utc,
@@ -137,21 +140,21 @@ module Importers
           AssessmentQuestion.primary_key, nil, AssessmentQuestion.sequence_name)
         hash['assessment_question_id'] = id
       end
+
       if migration
-        hash[:missing_links].each do |field, missing_links|
+        missing_links.each do |field, links|
           migration.add_missing_content_links(:class => self.to_s,
-            :id => hash['assessment_question_id'], :field => field, :missing_links => missing_links,
+            :id => hash['assessment_question_id'], :field => field, :missing_links => links,
             :url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/question_banks/#{bank.id}#question_#{hash['assessment_question_id']}_question_text")
         end
-        if hash[:import_warnings]
-          hash[:import_warnings].each do |warning|
+        if import_warnings
+          import_warnings.each do |warning|
             migration.add_warning(warning, {
               :fix_issue_html_url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/question_banks/#{bank.id}#question_#{hash['assessment_question_id']}_question_text"
             })
           end
         end
       end
-      hash.delete(:missing_links)
       hash
     end
 

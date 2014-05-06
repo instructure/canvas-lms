@@ -16,6 +16,8 @@ class FillInTheBlank < AssessmentItemConverter
       process_angel
     elsif @type == 'fillinmultiple'
       process_respondus
+    elsif @type == 'text_entry_interaction'
+      process_text_entry
     elsif @doc.at_css('itemBody extendedTextInteraction')
       process_d2l
     else
@@ -126,6 +128,20 @@ class FillInTheBlank < AssessmentItemConverter
           :text => sanitize_html_string(val_node.text, true),
           :blank_id => blank_id,
         }
+      end
+    end
+  end
+
+  def process_text_entry
+    @doc.css('responseDeclaration').each do |res_node|
+      res_id = res_node['identifier']
+      res_node.css('correctResponse value').each do |correct_id|
+        answer = {}
+        answer[:id] = unique_local_id
+        answer[:weight] = DEFAULT_CORRECT_WEIGHT
+        answer[:text] = correct_id.text
+        answer[:blank_id] = res_id
+        @question[:answers] << answer
       end
     end
   end
