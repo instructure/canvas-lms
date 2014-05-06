@@ -289,6 +289,9 @@ module AuthenticationMethods
   end
 
   def initiate_delegated_login(current_host=nil)
+    if cookies['canvas_sa_delegated'] && !params[:canvas_login]
+      @domain_root_account = Account.site_admin
+    end
     is_delegated = @domain_root_account.delegated_authentication? && !params[:canvas_login]
     is_cas = is_delegated && @domain_root_account.cas_authentication?
     is_saml = is_delegated && @domain_root_account.saml_authentication?

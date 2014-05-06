@@ -159,5 +159,6 @@ class Spec::MockController
     options[:target]
   end
 
+  def cookies; {}; end
 end
 

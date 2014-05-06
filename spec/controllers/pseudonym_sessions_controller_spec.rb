@@ -714,6 +714,42 @@ describe PseudonymSessionsController do
       session[:cas_session].should == 'ST-efgh'
       Pseudonym.find(session['pseudonym_credentials_id']).should == user2.pseudonyms.first
     end
+
+    it "should log our correctly if the user is from a different account" do
+      account = account_with_cas
+      user_with_pseudonym(active_all: true, account: account)
+
+      # *don't* stub domain_root_account
+      user_session(@user, @pseudonym)
+      PseudonymSession.find.stubs(:destroy)
+      session[:cas_session] = true
+      post 'destroy'
+      response.should be_redirect
+      response.location.should match %r{^https://localhost/cas/logout}
+    end
+
+    it "should set a cookie for site admin login" do
+      user_with_pseudonym(account: Account.site_admin)
+      stubby("yes\n#{@pseudonym.unique_id}\n")
+      account_with_cas(account: Account.site_admin)
+
+      controller.request.env['canvas.domain_root_account'] = Account.site_admin
+      get 'new', :ticket => 'ST-efgh'
+      response.should redirect_to(dashboard_url(:login_success => 1))
+      session[:cas_session].should == 'ST-efgh'
+      cookies['canvas_sa_delegated'].should == '1'
+    end
+
+    it "should redirect to site admin CAS if cookie set" do
+      user_with_pseudonym(account: Account.site_admin)
+      stubby("yes\n#{@pseudonym.unique_id}\n")
+      account_with_cas(account: Account.site_admin)
+
+      cookies['canvas_sa_delegated'] = '1'
+      # *don't* stub domain_root_account
+      get 'new'
+      response.should be_redirect
+    end
   end
 
   context "otp login cookie" do
