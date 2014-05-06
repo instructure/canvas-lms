@@ -47,9 +47,7 @@ class CalendarEventsController < ApplicationController
   def new
     @event = @context.calendar_events.build
     add_crumb(t('crumbs.new', "New Calendar Event"), named_context_url(@context, :new_context_calendar_event_url))
-    @event.start_at = params[:start_at]
-    @event.end_at = params[:end_at]
-    @event.title = params[:title]
+    @event.update_attributes!(params.slice(:title, :start_at, :end_at, :location_name, :location_address))
     @editing = true
     authorized_action(@event, @current_user, :create)
   end
@@ -75,9 +73,7 @@ class CalendarEventsController < ApplicationController
   def edit
     @event = @context.calendar_events.find(params[:id])
     if @event.grants_right?(@current_user, session, :update)
-      @event.start_at = params[:start_at] if params[:start_at]
-      @event.end_at = params[:end_at] if params[:end_at]
-      @event.title = params[:title] if params[:title]
+      @event.update_attributes!(params.slice(:title, :start_at, :end_at, :location_name, :location_address))
     end
     @editing = true
     if authorized_action(@event, @current_user, :update_content)

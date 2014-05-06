@@ -68,6 +68,24 @@
       </tbody>
     </table>
   </div>
+  <div>
+    <table id="calendar_event_location_info">
+      <tbody>
+        <tr>
+          <td>
+            <label for="calendar_event_location_name">{{#t "location_name"}}Location:{{/t}}</label>
+            <input id="calendar_event_location_name" name="location_name" size="30" maxlength="255" type="text" value="{{location_name}}"/>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label for="calendar_event_location_address">{{#t "location_address"}}Address:{{/t}}</label>
+            <input id="calendar_event_location_address" name="location_address" size="30" maxlength="255" type="text" value="{{location_address}}"/>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
   {{#if course_sections}}
     <table class="formtable show_if_using_sections">

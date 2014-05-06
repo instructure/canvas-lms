@@ -16,6 +16,7 @@ define [
         title: @event.title
         contexts: @event.possibleContexts()
         lockedTitle: @event.lockedTitle
+        location_name: @event.location_name
       }))
       $(selector).append @form
 
@@ -46,6 +47,7 @@ define [
       data = $("#edit_calendar_event_form").getFormData(object_name: 'calendar_event')
       params = {}
       if data.title then params['title'] = data.title
+      if data.location_name then params['location_name'] = data.location_name
       if data.date
         params['start_at'] = "#{data.date} #{data.start_time || ''}"
         params['end_at'] = "#{data.date} #{data.end_time || ''}"
@@ -125,11 +127,16 @@ define [
       else
         start_date = null
         end_date = null
+      if data.location_name
+        location_name = data.location_name
+      else
+        location_name = null
 
       params = {
         'calendar_event[title]': data.title ? @event.title
         'calendar_event[start_at]': if start_date then $.unfudgeDateForProfileTimezone(start_date).toISOString() else ''
         'calendar_event[end_at]': if end_date then $.unfudgeDateForProfileTimezone(end_date).toISOString() else ''
+        'calendar_event[location_name]': location_name
       }
 
       if @event.isNewEvent()
@@ -139,6 +146,7 @@ define [
             title: params['calendar_event[title]']
             start_at: if start_date then start_date.toISOString() else null
             end_at: if end_date then end_date.toISOString() else null
+            location_name: location_name
             context_code: @form.find(".context_id").val()
         newEvent = commonEventFactory(objectData, @event.possibleContexts())
         newEvent.save(params)
@@ -146,6 +154,7 @@ define [
         @event.title = params['calendar_event[title]']
         @event.start = start_date
         @event.end = end_date
+        @event.location_name = location_name
         @event.save(params)
 
       @closeCB()
