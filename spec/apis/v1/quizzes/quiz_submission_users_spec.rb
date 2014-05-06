@@ -95,7 +95,7 @@ describe Quizzes::QuizSubmissionUsersController, type: :request do
       @user = @teacher
       json = get_submitted_users(submitted: true)
       response.should be_success
-      json['users'].first['id'].should == @student.id
+      json['users'].first['id'].should == @student.id.to_s
     end
 
     it "allows teachers to see unsubmitted students with ?submitted=false" do
@@ -107,8 +107,8 @@ describe Quizzes::QuizSubmissionUsersController, type: :request do
       json = get_submitted_users(submitted: false)
       response.should be_success
       user_ids = json['users'].map { |h| h['id'] }
-      user_ids.should_not include @student_frd.id
-      user_ids.should include @student.id
+      user_ids.should_not include @student_frd.id.to_s
+      user_ids.should include @student.id.to_s
     end
 
     it "allows teachers to see all students for quiz when submitted parameter not passed" do
@@ -120,8 +120,20 @@ describe Quizzes::QuizSubmissionUsersController, type: :request do
       json = get_submitted_users
       response.should be_success
       user_ids = json['users'].map { |h| h['id'] }
-      user_ids.should include @student_frd.id
-      user_ids.should include @student.id
+      user_ids.should include @student_frd.id.to_s
+      user_ids.should include @student.id.to_s
+    end
+
+    it "will sideload quiz_submissions" do
+      course_with_student(active_all: true, course: @course)
+      @student_frd = @student
+      quiz_with_graded_submission([], course: @course, user: @student_frd)
+      course_with_student(active_all: true, course: @course)
+      @user = @teacher
+      json = get_submitted_users(include: ['quiz_submissions'])
+      response.should be_success
+      json['quiz_submissions'].first.with_indifferent_access[:id].should == @quiz_submission.id.to_s
+      json['quiz_submissions'].length.should == 1
     end
   end
 end
