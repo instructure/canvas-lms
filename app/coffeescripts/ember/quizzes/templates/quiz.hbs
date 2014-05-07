@@ -25,19 +25,31 @@
           {{#t "preview"}}Preview{{/t}}
         </a>
         {{#ic-actions}}
-          {{#ic-menu-item on-select="speedGrader"}}
+          {{#ic-menu-item on-select="speedGrader" classBinding="speedGraderActive::disabled"}}
             <i class="icon-speed-grader"></i>
-            <a {{bind-attr href="speedGraderUrl"}}>
+            {{#if speedGraderActive}}
               {{#t "speed_grader"}}Speed Grader{{/t}}
-            </a>
+            {{else}}
+              <span class="disabled">
+                {{#t "speed_grader"}}Speed Grader{{/t}}
+                <span class="screenreader-only">{{#t "option_is_disabled"}}this option is disabled{{/t}}</span>
+              </span>
+            {{/if}}
           {{/ic-menu-item}}
 
-          {{#if takeQuizVisible}}
-            {{#ic-menu-item on-select="takeQuiz" class="js-take-quiz"}}
-              <i class="icon-mark-as-read"></i>
-              <a {{bind-attr href="takeQuizUrl"}}>{{takeOrResumeMessage}}</a>
-            {{/ic-menu-item}}
-          {{/if}}
+          {{#ic-menu-item on-select="takeQuiz" classBinding=":js-take-quiz takeQuizActive::disabled"}}
+            <i class="icon-mark-as-read"></i>
+            {{#if takeQuizActive}}
+              {{takeOrResumeMessage}}
+            {{else}}
+              <span class="disabled">
+                {{takeOrResumeMessage}}
+                <span class="screenreader-only">
+                  {{#t "option_is_disabled"}}this option is disabled{{/t}}
+                </span>
+              </span>
+            {{/if}}
+          {{/ic-menu-item}}
 
           {{#ic-menu-item on-select="messageStudents" class="js-message-students"}}
             <i class="icon-discussion"></i>
@@ -73,7 +85,7 @@
 
     {{else}}
       <div class="span4 student-action-buttons pull-right">
-        {{#if takeQuizVisible}}
+        {{#if takeQuizActive}}
           <a {{bind-attr href="takeQuizUrl"}} {{action "takeQuiz"}} class="btn btn-primary">
             {{takeOrResumeMessage}}
           </a>

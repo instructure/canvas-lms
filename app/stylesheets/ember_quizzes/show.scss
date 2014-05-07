@@ -226,6 +226,13 @@
   ic-menu-item {
     display: block;
   }
+  ic-menu-item.disabled {
+    color: #aaa;
+  }
+  ic-menu-item.disabled:focus {
+    color: #999;
+    background-color: #f8f8f8;
+  }
   ic-menu-item a {
     color: inherit;
     text-decoration: none;

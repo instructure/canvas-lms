@@ -33,7 +33,11 @@ define [
       @set('showAsPublished', @get('published'))
     ).observes('model')
 
-    takeQuizVisible: (->
+    speedGraderActive: (->
+      @get('studentQuizSubmissions.length')
+    ).property('studentQuizSubmissions.length')
+
+    takeQuizActive: (->
       @get('published') and @get('takeable') and !@get('lockedForUser')
     ).property('published', 'takeable', 'lockedForUser')
 
@@ -134,15 +138,25 @@ define [
 
     actions:
       takeQuiz: ->
-        url = "#{@get 'takeQuizUrl'}&authenticity_token=#{ENV.AUTHENTICITY_TOKEN}"
-        $('<form></form>').
-          prop('action', url).
-          prop('method', 'POST').
-          appendTo("body").
-          submit()
+        if @get 'takeQuizActive'
+          url = "#{@get 'takeQuizUrl'}&authenticity_token=#{ENV.AUTHENTICITY_TOKEN}"
+          $('<form></form>').
+            prop('action', url).
+            prop('method', 'POST').
+            appendTo("body").
+            submit()
+        else
+          msg = if !@get('published')
+            I18n.t('cant_take_unpublished_quiz', "You can't take a quiz until it is published")
+          else
+            I18n.t('no_more_allowed_quiz_attempts', "You aren't allowed any more attempts on this quiz.")
+          $.flashWarning(msg)
 
       speedGrader: ->
-        window.location = @get 'speedGraderUrl'
+        if @get 'speedGraderActive'
+          window.location = @get 'speedGraderUrl'
+        else
+          $.flashWarning I18n.t('there_are_no_submissions_to_grade', 'There are no submissions to grade.')
 
       showStudentResults: ->
         @replaceRoute 'quiz.moderate'
