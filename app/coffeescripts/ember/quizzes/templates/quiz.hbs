@@ -76,11 +76,10 @@
           {{#if lockedForUser}}
             {{lockExplanation}}
           {{else}}
-          <a {{bind-attr href="takeQuizUrl"}} {{action "takeQuiz"}} class="btn btn-primary">
+            <a {{bind-attr href="takeQuizUrl"}} {{action "takeQuiz"}} class="btn btn-primary">
               {{takeOrResumeMessage}}
             </a>
           {{/if}}
-
         {{/if}}
       </div>
     {{/if}}
