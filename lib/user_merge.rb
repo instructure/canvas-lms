@@ -145,7 +145,7 @@ class UserMerge
       end
       from_user.all_conversations.find_each { |c| c.move_to_user(target_user) } unless Shard.current != target_user.shard
       updates = {}
-      ['account_users', 'asset_user_accesses',
+      ['account_users', 'access_tokens', 'asset_user_accesses',
        'attachments',
        'calendar_events', 'collaborations',
        'context_module_progressions', 'discussion_entries', 'discussion_topics',
