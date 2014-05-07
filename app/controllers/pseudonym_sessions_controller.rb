@@ -488,7 +488,7 @@ class PseudonymSessionsController < ApplicationController
 
     verification_code = params[:otp_login][:verification_code]
     if Canvas.redis_enabled?
-      key = "otp_used:#{verification_code}"
+      key = "otp_used:#{@current_user.global_id}:#{verification_code}"
       if Canvas.redis.get(key)
         force_fail = true
       else
