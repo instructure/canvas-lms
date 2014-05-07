@@ -122,17 +122,15 @@ module Importers
       hash.delete(:question_bank_migration_id) if hash.has_key?(:question_bank_migration_id)
       context.imported_migration_items << bank if context.imported_migration_items && !context.imported_migration_items.include?(bank)
       self.prep_for_import(hash, context)
-      question_data = AssessmentQuestion.connection.quote hash.to_yaml
-      question_name = AssessmentQuestion.connection.quote hash[:question_name]
       if id = hash['assessment_question_id']
-        query = "UPDATE assessment_questions"
-        query += " SET name = #{question_name}, question_data = #{question_data}, workflow_state = 'active', created_at = '#{Time.now.to_s(:db)}',"
-        query += " updated_at = '#{Time.now.to_s(:db)}', assessment_question_bank_id = #{bank.id}"
-        query += " WHERE id = #{id}"
-        AssessmentQuestion.connection.execute(query)
+        AssessmentQuestion.where(id: id).update_all(name: hash[:question_name], question_data: hash.to_yaml,
+            workflow_state: 'active', created_at: Time.now.utc, updated_at: Time.now.utc,
+            assessment_question_bank_id: bank.id)
       else
-        query = "INSERT INTO assessment_questions (name, question_data, workflow_state, created_at, updated_at, assessment_question_bank_id, migration_id)"
-        query += " VALUES (#{question_name},#{question_data},'active', '#{Time.now.to_s(:db)}', '#{Time.now.to_s(:db)}', #{bank.id}, '#{hash[:migration_id]}')"
+        query = AssessmentQuestion.send(:sanitize_sql, [<<-SQL, hash[:question_name], hash.to_yaml, Time.now.utc, Time.now.utc, bank.id, hash[:migration_id]])
+          INSERT INTO assessment_questions (name, question_data, workflow_state, created_at, updated_at, assessment_question_bank_id, migration_id)
+          VALUES (?,?,'active',?,?,?,?)
+        SQL
         id = AssessmentQuestion.connection.insert(query, "#{name} Create",
                                                   AssessmentQuestion.primary_key, nil, AssessmentQuestion.sequence_name)
         hash['assessment_question_id'] = id

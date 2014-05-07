@@ -183,21 +183,17 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
       Importers::AssessmentQuestionImporter.prep_for_import(hash, context)
     end
 
-    question_data = self.connection.quote hash.to_yaml
-    aq_id = hash['assessment_question_id'] ? hash['assessment_question_id'] : 'NULL'
-    g_id = quiz_group ? quiz_group.id : 'NULL'
-    q_id = quiz ? quiz.id : 'NULL'
-    position = hash[:position].nil? ? 'NULL' : hash[:position].to_i
+    position = hash[:position] && hash[:position].to_i
     if id = hash['quiz_question_id']
-      query = "UPDATE quiz_questions"
-      query += " SET quiz_group_id = #{g_id}, assessment_question_id = #{aq_id}, question_data = #{question_data},"
-      query += " created_at = '#{Time.now.to_s(:db)}', updated_at = '#{Time.now.to_s(:db)}',"
-      query += " migration_id = '#{hash[:migration_id]}', position = #{position}"
-      query += " WHERE id = #{id}"
-      self.connection.execute(query)
+      Quizzes::QuizQuestion.where(id: id).update_all(quiz_group_id: quiz_group,
+          assessment_question_id: hash['assessment_question_id'], question_data: hash.to_yaml,
+          created_at: Time.now.utc, updated_at: Time.now.utc, migration_id: hash[:migration_id],
+          position: position)
     else
-      query = "INSERT INTO quiz_questions (quiz_id, quiz_group_id, assessment_question_id, question_data, created_at, updated_at, migration_id, position)"
-      query += " VALUES (#{q_id}, #{g_id}, #{aq_id},#{question_data},'#{Time.now.to_s(:db)}', '#{Time.now.to_s(:db)}', '#{hash[:migration_id]}', #{position})"
+      query = sanitize_sql([<<-SQL, quiz && quiz.id, quiz_group && quiz_group.id, hash['assessment_question_id'], hash.to_yaml, Time.now.utc, Time.now.utc, hash[:migration_id], position])
+        INSERT INTO quiz_questions (quiz_id, quiz_group_id, assessment_question_id, question_data, created_at, updated_at, migration_id, position)
+        VALUES (?,?,?,?,?,?,?,?)
+      SQL
       self.connection.insert(query, "#{name} Create",
                              primary_key, nil, sequence_name)
     end
