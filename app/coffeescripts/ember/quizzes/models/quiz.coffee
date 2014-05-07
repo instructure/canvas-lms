@@ -92,7 +92,7 @@ define [
     quizStatistics: hasMany 'quiz_statistics', async: true
     quizReports: hasMany 'quiz_report', async: true
     users: hasMany 'user', async: true
-    quizSubmissions: hasMany 'quiz_submission', async: true
+    studentQuizSubmissions: hasMany 'student_quiz_submission', async: true
     sortSlug: (->
       dateField = if @get('isAssignment') then 'dueAt' else 'lockAt'
       dueAt = @get(dateField)?.toISOString() or Quiz.SORT_LAST
@@ -120,6 +120,8 @@ define [
     submittedStudents: hasMany 'user', polymporphic: true, async: true
     unsubmittedStudents: hasMany 'user', polymorphic: true, async: true
     messageStudentsUrl: attr()
+    quizSubmission: belongsTo 'quiz_submission'
+    quizSubmissions: alias('studentQuizSubmissions')
 
   Quiz.SORT_LAST = 'ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ'
 

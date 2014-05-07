@@ -202,31 +202,32 @@ describe Quizzes::QuizSerializer do
       end
     end
 
-    describe "quiz_submissions" do
+    describe "student_quiz_submissions" do
 
       it "sends the url for all submissions when user may grade" do
         course_with_teacher_logged_in(active_all: true)
         quiz_with_graded_submission([], course: @course)
         serializer = quiz_serializer(scope: @teacher)
-        serializer.as_json[:quiz]['links']['quiz_submissions'].should ==
+        serializer.as_json[:quiz]['links']['student_quiz_submissions'].should ==
           controller.send(:api_v1_course_quiz_submissions_url, @quiz.context.id, @quiz.id)
       end
 
-      it "sends the url to a student's submission for students" do
+      it "sends nil unless the user can grade" do
         course_with_student_logged_in(active_all: true)
         quiz_with_graded_submission([], user: @student, course: @course)
         serializer = quiz_serializer(scope: @student)
-        serializer.as_json[:quiz]['links']['quiz_submissions'].should ==
-          controller.send(:api_v1_course_quiz_submission_url,
-                          @quiz.context.id,
-                          @quiz.id,
-                          @quiz.quiz_submissions.where(user_id: @student).first.id)
+        serializer.as_json[:quiz]['links']['student_quiz_submissions'].should be_nil
       end
+    end
 
-      it "sends nil if user can't grade and doesn't have a submission" do
+    describe "quiz_submission" do
+      it "includes the quiz_submission in the response if it is present" do
         course_with_student_logged_in(active_all: true)
+        quiz_with_graded_submission([], user: @student, course: @course)
         serializer = quiz_serializer(scope: @student)
-        serializer.as_json[:quiz]['links']['quiz_submissions'].should be_nil
+        json = serializer.as_json
+        json['quiz_submissions'].length.should == 1
+        json[:quiz]['links']['quiz_submission'].should == @quiz_submission.id.to_s
       end
     end
 

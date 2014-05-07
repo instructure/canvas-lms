@@ -473,11 +473,7 @@ class Quizzes::QuizzesApiController < ApplicationController
   private
 
   def render_json
-    if accepts_jsonapi?
-      render json: { quizzes: quizzes_json([@quiz], @context, @current_user, session) }
-    else
-      render json: quiz_json(@quiz, @context, @current_user, session)
-    end
+    render json: quiz_json(@quiz, @context, @current_user, session)
   end
 
   def quiz_params

@@ -35,9 +35,23 @@ module Quizzes
      :unsubmitted_students_visible_to
 
     has_one :assignment_group, embed: :ids, root: :assignment_group
-    has_many :quiz_submissions, embed: :ids, root: :quiz_submissions
+    has_one :quiz_submission, embed: :ids, root: :quiz_submissions, embed_in_root: true, serializer: Quizzes::QuizSubmissionSerializer
+    has_many :student_quiz_submissions, embed: :ids, root: :student_quiz_submissions
     has_many :submitted_students, embed: :ids, root: :submitted_students
     has_many :unsubmitted_students, embed: :ids, root: :unsubmitted_students
+
+    def quiz_submission
+      if @self_quiz_submissions
+        @self_quiz_submissions[quiz.id]
+      else
+        quiz.quiz_submissions.where(user_id: current_user).first
+      end
+    end
+
+    def initialize(object, options={})
+      super
+      @self_quiz_submissions = options[:quiz_submissions]
+    end
 
     def submitted_students
       user_finder.submitted_students
@@ -45,6 +59,10 @@ module Quizzes
 
     def unsubmitted_students
       user_finder.unsubmitted_students
+    end
+
+    def student_quiz_submissions
+      @student_quiz_submissions ||= quiz.quiz_submissions
     end
 
     def message_students_url
@@ -56,15 +74,11 @@ module Quizzes
       speed_grader_course_gradebook_url(context, assignment_id: quiz.assignment.id)
     end
 
-    def quiz_submissions_url
+    def student_quiz_submissions_url
       if user_may_grade?
         api_v1_course_quiz_submissions_url(context, quiz)
       else
-        if submission_for_current_user?
-          api_v1_course_quiz_submission_url(quiz.context, quiz, submission_for_current_user)
-        else
-          nil
-        end
+        nil
       end
     end
 
@@ -115,6 +129,7 @@ module Quizzes
         when :access_code, :speed_grader_url, :message_students_url then user_may_grade?
         when :unpublishable then include_unpublishable?
         when :submitted_students, :unsubmitted_students then user_may_grade?
+        when :quiz_submission then accepts_jsonapi?
         when :quiz_submission_html_url then accepts_jsonapi?
         else true
         end
