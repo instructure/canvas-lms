@@ -161,7 +161,8 @@ class MediaObject < ActiveRecord::Base
         attachment_id = partner_data[:attachment_id] if partner_data[:attachment_id].present?
       end
       attachment = Attachment.find_by_id(attachment_id) if attachment_id
-      mo = MediaObject.find_or_initialize_by_media_id(entry[:entryId])
+      account = root_account || Account.default
+      mo = account.shard.activate { MediaObject.find_or_initialize_by_media_id(entry[:entryId]) }
       mo.root_account ||= root_account || Account.default
       mo.title ||= entry[:name]
       if attachment
