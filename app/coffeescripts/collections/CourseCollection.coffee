@@ -5,7 +5,7 @@ define [
 
   class CourseCollection extends PaginatedCollection
     url: '/api/v1/courses/'
-
+    loadAll: true
     initialize: () ->
       super()
       @setParam('state', ['unpublished', 'available', 'completed'])
