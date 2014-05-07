@@ -22,6 +22,7 @@ class Quizzes::QuizzesController < ApplicationController
   include KalturaHelper
   include Filters::Quizzes
 
+  before_filter :require_user, :only => :fabulous_quizzes
   before_filter :require_context
   add_crumb(proc { t('#crumbs.quizzes', "Quizzes") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_quizzes_url }
   before_filter { |c| c.active_tab = "quizzes" }
