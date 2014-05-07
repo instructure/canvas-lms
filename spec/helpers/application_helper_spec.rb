@@ -441,4 +441,23 @@ describe ApplicationHelper do
       end
     end
   end
+
+  context "include_custom_meta_tags" do
+    it "should be nil if @meta_tags is not defined" do
+      include_custom_meta_tags.should be_nil
+    end
+
+    it "should include tags if present" do
+      @meta_tags = [{ :name => "hi", :content => "there" }]
+      result = include_custom_meta_tags
+      result.should match(/meta/)
+      result.should match(/name="hi"/)
+      result.should match(/content="there"/)
+    end
+
+    it "should html_safe-ify them" do
+      @meta_tags = [{ :name => "hi", :content => "there" }]
+      include_custom_meta_tags.should be_html_safe
+    end
+  end
 end

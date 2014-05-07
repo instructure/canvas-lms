@@ -865,4 +865,13 @@ module ApplicationHelper
       url
     end
   end
+
+  def include_custom_meta_tags
+    if @meta_tags.present?
+      @meta_tags.
+        map{ |meta_attrs| tag("meta", meta_attrs) }.
+        join("\n").
+        html_safe
+    end
+  end
 end
