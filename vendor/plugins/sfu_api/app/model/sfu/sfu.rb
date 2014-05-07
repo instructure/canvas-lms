@@ -39,31 +39,39 @@ module SFU
         main_section = section_code[0..1].downcase 
         sections = []
         has_no_child_sections = true
+        section_exists = false
 
-        if details != "[]" && section_code.end_with?("00")
+        unless details == "[]" && section_code.end_with?("00")
           details.each do |info|
             code = info["course"]["name"] + info["course"]["number"]
             section = info["course"]["section"].downcase
-            if code.downcase == course_code.downcase && section.start_with?(main_section) && section.downcase != section_code.downcase
-              sections << info["course"]["section"]
-              has_no_child_sections = false
+
+            if section.eql? section_code.downcase
+              section_exists = true
+              if code.downcase == course_code.downcase && section.start_with?(main_section) && section.downcase != section_code.downcase
+                sections << info["course"]["section"]
+                has_no_child_sections = false
+              end
             end
           end
         end
 
         # Return main section e.g. d100 only for courses with no tutorial/lab sections
-        sections << section_code.upcase if has_no_child_sections
+        sections << section_code.upcase if has_no_child_sections && section_exists
 
         sections
       end
 
-      def title(course_code, term_code)
+      def title(course_code, term_code, section_code)
         details = info(course_code, term_code)
-        title = ""
+        title = nil
         unless details == "[]"
-	  title = details.first["course"]["title"]
+          details.each do |info|
+            section = info["course"]["section"].downcase
+            title = info["course"]["title"] if section.eql? section_code.downcase
+          end
         end
-	title
+	      title
       end
 
     end

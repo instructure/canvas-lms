@@ -51,10 +51,17 @@ class AmaintController < ApplicationController
         course_hash["name"].downcase +  "-" +
         course_hash["number"] + "-" +
         course_hash["section"].downcase
+
     # If asking for a specific property then clear hash
     course_hash = {} unless property.nil?
-    course_hash["sectionTutorials"] = SFU::Course.section_tutorials(course_info[1] + course_info[2], course_info.first, course_info[3]) if property.nil? || property.downcase.eql?("sectiontutorials")
-    course_hash["title"] = SFU::Course.title(course_info[1] + course_info[2], course_info.first) if property.nil? || property.downcase.eql?("title")
+    section_tutorials = SFU::Course.section_tutorials(course_info[1] + course_info[2], course_info.first, course_info[3]) if property.nil? || property.downcase.eql?("sectiontutorials")
+    course_hash["sectionTutorials"] = section_tutorials if !section_tutorials.empty?
+    course_title = SFU::Course.title(course_info[1] + course_info[2], course_info.first, course_info[3]) #if property.nil? || property.downcase.eql?("title")
+    course_hash["title"] = course_title if property.nil? || property.downcase.eql?("title")
+
+    # If course section doesn't exist in Amaint, then return 404
+    course_hash = {} if course_title.nil?
+
     course_hash
   end
 
