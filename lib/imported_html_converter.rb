@@ -252,7 +252,7 @@ class ImportedHtmlConverter
   end
   
   def self.relative_url?(url)
-    URI.parse(url).relative?
+    URI.parse(url).relative? && !url.to_s.start_with?("//")
   end
   
   def self.convert_text(text, context, import_source=:webct)
