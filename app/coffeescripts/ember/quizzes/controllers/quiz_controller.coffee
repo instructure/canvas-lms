@@ -33,6 +33,10 @@ define [
       @set('showAsPublished', @get('published'))
     ).observes('model')
 
+    takeQuizVisible: (->
+      @get('published') and @get('takeable')
+    ).property('published', 'takeable')
+
     takeOrResumeMessage: (->
       if @get('quizSubmission.isCompleted')
         if @get('isSurvey')

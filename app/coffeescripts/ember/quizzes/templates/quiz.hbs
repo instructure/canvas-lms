@@ -32,7 +32,7 @@
             </a>
           {{/ic-menu-item}}
 
-          {{#if takeable}}
+          {{#if takeQuizVisible}}
             {{#ic-menu-item on-select="takeQuiz" class="js-take-quiz"}}
               <i class="icon-mark-as-read"></i>
               <a {{bind-attr href="takeQuizUrl"}}>{{takeOrResumeMessage}}</a>
