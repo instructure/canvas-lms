@@ -271,10 +271,10 @@ class ContentTag < ActiveRecord::Base
     if self.unpublished? && self.content.respond_to?(:unpublished?)
       new_asset_workflow_state = 'unpublished'
     elsif self.active?
-      if self.content.respond_to?(:active?)
-        new_asset_workflow_state = 'active'
-      elsif self.content.respond_to?(:available?)
+      if self.content.respond_to?(:available?)
         new_asset_workflow_state = 'available'
+      elsif self.content.respond_to?(:active?)
+        new_asset_workflow_state = 'active'
       elsif self.content.respond_to?(:published?)
         new_asset_workflow_state = 'published'
       end

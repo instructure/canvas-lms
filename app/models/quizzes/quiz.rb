@@ -81,6 +81,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   sanitize_field :description, CanvasSanitize::SANITIZE
   copy_authorized_links(:description) { [self.context, nil] }
 
+  before_save :generate_quiz_data_on_publish, :if => :workflow_state_changed?
   before_save :build_assignment
   before_save :set_defaults
   before_save :flag_columns_that_need_republish
@@ -142,6 +143,16 @@ class Quizzes::Quiz < ActiveRecord::Base
     self.question_count = self.question_count(true)
     @update_existing_submissions = true if self.for_assignment? && self.quiz_type_changed?
     @stored_questions = nil
+  end
+
+  # quizzes differ from other publishable objects in that they require we
+  # generate quiz data and update time when we publish. This method makes it
+  # harder to mess up (like someone setting using workflow_state directly)
+  def generate_quiz_data_on_publish
+    if workflow_state == 'available'
+      self.generate_quiz_data
+      self.published_at = Time.zone.now
+    end
   end
 
   # some attributes require us to republish for non-draft state
@@ -1107,26 +1118,24 @@ class Quizzes::Quiz < ActiveRecord::Base
     assignment.try(:group_category_id)
   end
 
+  def publish
+    self.workflow_state = 'available'
+  end
+
+  def unpublish
+    self.workflow_state = 'unpublished'
+  end
+
   def publish!
     publish
     save!
     self
   end
 
-  def publish
-    self.generate_quiz_data
-    self.workflow_state = 'available'
-    self.published_at = Time.zone.now
-  end
-
   def unpublish!
     unpublish
     save!
     self
-  end
-
-  def unpublish
-    self.workflow_state = 'unpublished'
   end
 
   def can_unpublish?

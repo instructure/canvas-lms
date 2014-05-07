@@ -56,9 +56,8 @@ describe Quizzes::Quiz do
 
   describe "#publish!" do
     it "sets the workflow state to available and save!s the quiz" do
-      quiz = Quizzes::Quiz.new(:title => "hello")
+      quiz = @course.quizzes.build :title => "hello"
       quiz.expects(:generate_quiz_data).once
-      quiz.expects(:save!).once
       quiz.publish!
       quiz.workflow_state.should == 'available'
     end
@@ -66,7 +65,7 @@ describe Quizzes::Quiz do
 
   describe "#unpublish!" do
     it "sets the workflow state to unpublished and save!s the quiz" do
-      quiz = Quizzes::Quiz.new(:title => "hello")
+      quiz = @course.quizzes.build :title => "hello"
       quiz.expects(:save!).once
       quiz.publish!
       quiz.workflow_state.should == 'available'
@@ -212,9 +211,9 @@ describe Quizzes::Quiz do
     q.assignment.should eql(a)
     a.reload
     a.quiz.should eql(q)
-    q.points_possible.should eql(10.0)
+    q.title.should == "some quiz"
     q.assignment.submission_types.should eql("online_quiz")
-    q.assignment.points_possible.should eql(10.0)
+    q.assignment.title.should == "some quiz"
 
     g = @course.assignment_groups.create!(:name => "new group")
     q.assignment_group_id = g.id
@@ -235,10 +234,9 @@ describe Quizzes::Quiz do
 
   it "shouldn't create a new assignment on every edit" do
     a_count = Assignment.count
-    a = @course.assignments.create!(:title => "some assignment", :points_possible => 5)
-    a.points_possible.should eql(5.0)
+    a = @course.assignments.create!(:title => "some assignment")
     a.submission_types.should_not eql("online_quiz")
-    q = @course.quizzes.build(:title => "some quiz", :points_possible => 10)
+    q = @course.quizzes.build(:title => "some quiz")
     q.workflow_state = 'available'
     q.assignment_id = a.id
     q.save
@@ -249,9 +247,9 @@ describe Quizzes::Quiz do
     q.assignment.should eql(a)
     a.reload
     a.quiz.should eql(q)
-    q.points_possible.should eql(10.0)
+    q.title.should == "some quiz"
+    a.title.should == 'some quiz'
     a.submission_types.should eql("online_quiz")
-    a.points_possible.should eql(10.0)
     Assignment.count.should eql(a_count + 1)
   end
 
@@ -296,9 +294,7 @@ describe Quizzes::Quiz do
     q.assignment.should eql(a)
     a.reload
     a.quiz.should eql(q)
-    q.points_possible.should eql(10.0)
     q.assignment.submission_types.should eql("online_quiz")
-    q.assignment.points_possible.should eql(10.0)
     q.quiz_type = "practice_quiz"
     q.save
     q.assignment_id.should eql(nil)
@@ -426,7 +422,6 @@ describe Quizzes::Quiz do
     q = @course.quizzes.create!(:title => "new quiz")
     q.quiz_questions.create!
     q.quiz_questions.create!
-    q.save
     q.publish!
 
     q.reload.available_question_count.should eql(2)
