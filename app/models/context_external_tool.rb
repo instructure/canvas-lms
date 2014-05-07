@@ -10,7 +10,8 @@ class ContextExternalTool < ActiveRecord::Base
                   :course_navigation, :account_navigation, :user_navigation,
                   :resource_selection, :editor_button, :homework_submission,
                   :course_home_sub_navigation, :course_settings_sub_navigation,
-                  :config_type, :config_url, :config_xml, :tool_id
+                  :config_type, :config_url, :config_xml, :tool_id,
+                  :integration_type
 
   validates_presence_of :context_id, :context_type, :workflow_state
   validates_presence_of :name, :consumer_key, :shared_secret
@@ -443,12 +444,8 @@ class ContextExternalTool < ActiveRecord::Base
     end
   end
 
-  def self.all_tools_for(context, options={})
+  def self.contexts_to_search(context)
     contexts = []
-    tools = []
-    if options[:user]
-      contexts << options[:user]
-    end
     while context
       if context.is_a?(Group)
         contexts << context
@@ -463,9 +460,21 @@ class ContextExternalTool < ActiveRecord::Base
         context = nil
       end
     end
+
+    contexts
+  end
+  private_class_method :contexts_to_search
+
+  def self.all_tools_for(context, options={})
+    contexts = []
+    if options[:user]
+      contexts << options[:user]
+    end
+    contexts.concat contexts_to_search(context)
     return nil if contexts.empty?
-    contexts.each do |context|
-      tools += context.context_external_tools.active
+
+    tools = contexts.each_with_object([]) do |context, tools|
+      tools.concat context.context_external_tools.active
     end
     Canvas::ICU.collate_by(tools, &:name)
   end
@@ -483,22 +492,7 @@ class ContextExternalTool < ActiveRecord::Base
   # then check for a match on the current context (configured by
   # the teacher).
   def self.find_external_tool(url, context, preferred_tool_id=nil)
-    contexts = []
-    while context
-      if context.is_a?(Group)
-        contexts << context
-        context = context.context || context.account
-      elsif context.is_a?(Course)
-        contexts << context
-        context = context.account
-      elsif context.is_a?(Account)
-        contexts << context
-        context = context.parent_account
-      else
-        context = nil
-      end
-    end
-
+    contexts = contexts_to_search(context)
     preferred_tool = ContextExternalTool.active.find_by_id(preferred_tool_id)
     if preferred_tool && contexts.member?(preferred_tool.context) && preferred_tool.matches_domain?(url)
       return preferred_tool
@@ -515,6 +509,15 @@ class ContextExternalTool < ActiveRecord::Base
 
     res = sorted_external_tools.detect{|tool| tool.domain && tool.matches_url?(url) }
     return res if res
+
+    nil
+  end
+
+  def self.find_integration_for(context, type)
+    contexts_to_search(context).each do |context|
+      tools = context.context_external_tools.active.where(integration_type: type)
+      return tools.first unless tools.empty?
+    end
 
     nil
   end
