@@ -34,7 +34,12 @@ define [
     ).observes('model')
 
     takeOrResumeMessage: (->
-      if @get('quizSubmission.isUntaken')
+      if @get('quizSubmission.isCompleted')
+        if @get('isSurvey')
+          I18n.t 'take_the_survey_again', 'Take the Survey Again'
+        else
+          I18n.t 'take_the_quiz_again', 'Take the Quiz Again'
+      else if @get('quizSubmission.isUntaken')
         if @get('isSurvey')
           I18n.t 'resume_the_survey', 'Resume the Survey'
         else
