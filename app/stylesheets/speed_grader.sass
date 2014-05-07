@@ -418,17 +418,40 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
   margin-top: 0 !important
   left: -3px
   // opacity: 0.8
-  background:  no-repeat
-  background-image: url("/images/three_state_checkbox.gif") !important
 
-  .graded &
-    background-position: 0 -120px
+.ui-selectmenu-item-icon.speedgrader-selectmenu-icon
+  position: absolute
+  left: 0px
+
+  .ui-selectmenu-status &
+    top: -0.5px !important
+    left: 4px
+
   .not_graded &
-    background-position: 0 -65px
-  .not_submitted &
-    background-position: 0 -12px
+    font-size: 1.7em
+    color: $orange
   .resubmitted &
-    background-position: 0 -175px
+    font-size: 1.7em
+    color: $orange
+  .graded &
+    color: $green
+
+    i
+      width: 14px
+      height: 14px
+      line-height: 14px
+      &:before
+        font-size: 14px
+
+.ui-selectmenu-item-header
+  .not_submitted &
+    color: $grayLight
+  .ui-selectmenu-status &
+    margin-top: 1px
+
+.speedgrader-selectmenu-icon + .ui-selectmenu-item-header
+  margin-left: 5px
+
 .turnitin_info
   margin-top: 3px
   border-top: 1px solid #999999
