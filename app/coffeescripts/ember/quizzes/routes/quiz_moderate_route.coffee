@@ -15,7 +15,7 @@ define [
     combinedUsersSubmissionsPromise: ->
       quiz = @modelFor('quiz')
       _this = this
-      quiz.get('quizSubmissions').then (quizSubmissions) ->
+      quiz.get('studentQuizSubmissions').then (quizSubmissions) ->
         quizSubmissions ||= []
         quiz.get('users').then (users) ->
           _this.combineModels(users, quizSubmissions)
@@ -43,8 +43,8 @@ define [
           ), 500
           @combinedUsersSubmissionsPromise().then (models) =>
             @get('controller').set('content', models)
-      relationship = quiz.constructor.metaForProperty('quizSubmissions')
-      link = quiz.get('links.quizSubmissions')
+      relationship = quiz.constructor.metaForProperty('studentQuizSubmissions')
+      link = quiz.get('links.studentQuizSubmissions')
       @store.findHasMany(quiz, link, relationship, resolver)
 
     actions:

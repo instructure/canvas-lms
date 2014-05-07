@@ -13,7 +13,7 @@ define [
   emq.setResolver(Ember.DefaultResolver.create({namespace: App}))
 
   emq.moduleFor('controller:quiz.submission_row', 'SubmissionRowController', {
-    needs: ['controller:quiz']
+    needs: ['controller:quiz', 'controller:quiz_moderate']
     setup: ->
       App = startApp()
       emq.setResolver(Ember.DefaultResolver.create({namespace: App}))
@@ -31,8 +31,8 @@ define [
           quiz:
             allowedAttempts: 5
 
-
-      @subCtr = this.subject()
+      # explicitly defining content to avoid errors in controller init function
+      @subCtr = this.subject({content: {}})
       @subCtr.get('controllers.quiz').set('model', {allowedAttempts: 10})
       @subCtr.set('model', @model)
 

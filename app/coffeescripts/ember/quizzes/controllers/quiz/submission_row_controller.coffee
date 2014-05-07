@@ -3,19 +3,20 @@ define [
   '../../shared/seconds_to_time'
   '../../shared/environment'
   'i18n!quizzez_submission_row'
-], (Em, formatSeconds, env, I18n) ->
+  '../../mixins/submission_time'
+], (Em, formatSeconds, env, I18n, SubmissionTime) ->
 
-  Em.ObjectController.extend
+  Em.ObjectController.extend SubmissionTime,
 
-    needs: ['quiz']
+    needs: ['quiz', 'quiz_moderate']
 
-    timeSpent: Ember.computed.alias('quizSubmission.timeSpent')
     allowedAttempts: Ember.computed.alias('quizSubmission.quiz.allowedAttempts')
     multipleAttemptsAllowed: Ember.computed.alias('quizSubmission.quiz.multipleAttemptsAllowed')
     keptScore: Ember.computed.alias('quizSubmission.keptScore')
     quizPointsPossible: Ember.computed.alias('quizSubmission.quizPointsPossible')
     hasSubmission: Ember.computed.bool('quizSubmission.id')
     quiz: Ember.computed.alias('controllers.quiz.model')
+    okayToReload: Ember.computed.bool('controllers.quiz_moderate.okayToReload')
 
     selected: false
     missingIndicator: '--'
@@ -25,15 +26,10 @@ define [
       @get('quizSubmission.attempt')
     ).property('quizSubmission.attempt')
 
-    friendlyTime: ( ->
-      return if !@get('hasSubmission')
-      formatSeconds(@get('timeSpent'))
-    ).property('timeSpent')
-
     friendlyScore: ( ->
-      return if !@get('hasSubmission')
+      return if @get('isActive') || !@get('keptScore')
       "#{@get('keptScore')} / #{@get('quizPointsPossible')}"
-    ).property('score', 'quizPointsPossible')
+    ).property('keptScore', 'quizPointsPossible', 'isActive')
 
     remainingAttempts: ( ->
       return if @get('unlimitedAttempts')

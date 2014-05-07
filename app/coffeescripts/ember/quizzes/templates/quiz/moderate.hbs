@@ -42,7 +42,16 @@
           {{/if}}
         </td>
         <td>{{attempts}}</td>
-        <td>{{user.friendlyTime}}</td>
+
+        {{#if isActive}}
+          <td>
+            <i class="icon-clock"></i>
+            {{runningTime}}
+          </td>
+        {{else}}
+          <td>{{friendlyTime}}</td>
+        {{/if}}
+
         <td>{{remainingStatusLabel}}{{remainingAttempts}}</td>
         <td>{{user.friendlyScore}}</td>
         <td>
