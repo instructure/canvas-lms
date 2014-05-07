@@ -25,6 +25,13 @@ describe UserMerge do
       user1.pseudonyms.map(&:unique_id).should be_include('sam@yahoo.com')
     end
 
+    it "should move access tokens to the new user" do
+      at = AccessToken.create!(:user => user2, :developer_key => DeveloperKey.default)
+      UserMerge.from(user2).into(user1)
+      at.reload
+      at.user_id.should == user1.id
+    end
+
     it "should move submissions to the new user (but only if they don't already exist)" do
       a1 = assignment_model
       s1 = a1.find_or_create_submission(user1)
