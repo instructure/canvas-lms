@@ -15,7 +15,7 @@ namespace :js do
       end
     end
     Rake::Task['js:generate_runner'].invoke
-    exec("karma start --browsers #{browsers}")
+    exec("node_modules/.bin/karma start --browsers #{browsers}")
   end
 
   def matcher_for_ember_app app_name
