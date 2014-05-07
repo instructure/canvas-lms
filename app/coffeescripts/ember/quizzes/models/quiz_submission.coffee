@@ -27,6 +27,7 @@ define [
     timeSpent: attr()
     validationToken: attr()
     workflowState: attr()
+    questionsRegradedSinceLastAttempt: attr()
     isCompleted: computed.or 'isPendingReview', 'isComplete'
     isComplete: equal 'workflowState', 'complete'
     isPendingReview: equal 'workflowState', 'pending_review'

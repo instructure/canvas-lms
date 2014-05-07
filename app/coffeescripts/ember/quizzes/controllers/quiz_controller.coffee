@@ -67,6 +67,27 @@ define [
       @set 'published', publishStatus
       @get('model').save().then success, failed
 
+    submissionHasRegrade: (->
+      score = @get('quizSubmission.scoreBeforeRegrade')
+      score != null and score >= 0
+    ).property('quizSubmission.scoreBeforeRegrade')
+
+    scoreAffectedByRegradeLabel: (->
+      if @get('quizSubmission.scoreBeforeRegrade') != @get('quizSubmission.keptScore')
+        since = @get('quizSubmission.questionsRegradedSinceLastAttempt')
+        if since == 1
+          I18n.t('regrade_score_affected', 'This quiz has been regraded; your score was affected.')
+        else
+          I18n.t('regrade_count_affected', 'This quiz has been regraded; your new score reflects %{num} questions that were affected.', num: since)
+      else
+        I18n.t('quiz_regraded_your_score_not_affected', "This quiz has been regraded; your score was not affected.")
+
+    ).property('quizSubmission.scoreBeforeRegrade', 'quizSubmission.keptScore', 'quizSubmission.questionsRegradedSinceLastAttempt')
+
+    warningText: (->
+      I18n.t 'warning', 'Warning'
+    ).property()
+
     deleteTitle: (->
       I18n.t 'delete_quiz', 'Delete Quiz'
     ).property()

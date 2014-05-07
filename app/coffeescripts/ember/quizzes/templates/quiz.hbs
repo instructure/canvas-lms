@@ -81,6 +81,13 @@
     {{/if}}
   </div>
 
+  {{#if submissionHasRegrade}}
+    <div class="ui-state-warning ui-corner-all pad-box-micro text-center regraded-warning">
+      <i class="icon-warning" {{bind-attr aria-label='warningText'}}></i>
+      <strong>{{scoreAffectedByRegradeLabel}}</strong>
+    </div>
+  {{/if}}
+
   {{#if canUpdate}}
     {{partial "quiz/show_teacher"}}
   {{else}}
