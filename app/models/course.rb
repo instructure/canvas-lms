@@ -421,11 +421,16 @@ class Course < ActiveRecord::Base
               association = current_course_associations[key]
               if association.nil?
                 # new association, create it
-                CourseAccountAssociation.create! do |aa|
-                  aa.course_id = course.id
-                  aa.course_section_id = section.try(:id)
-                  aa.account_id = account_id
-                  aa.depth = depth
+                begin
+                  CourseAccountAssociation.create! do |aa|
+                    aa.course_id = course.id
+                    aa.course_section_id = section.try(:id)
+                    aa.account_id = account_id
+                    aa.depth = depth
+                  end
+                rescue ActiveRecord::Base::UniqueConstraintViolation
+                  course.course_account_associations.where(course_section_id: section,
+                    account_id: account_id).update_all(:depth => depth)
                 end
                 did_an_update = true
               else
