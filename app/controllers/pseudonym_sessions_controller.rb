@@ -91,6 +91,7 @@ class PseudonymSessionsController < ApplicationController
       initiate_cas_login(cas_client)
     elsif @is_saml && !params[:no_auto]
       if params[:account_authorization_config_id]
+        raise ActiveRecord::RecordNotFound if params[:account_authorization_config_id] !~ Api::ID_REGEX
         if aac = @domain_root_account.account_authorization_configs.find_by_id(params[:account_authorization_config_id])
           initiate_saml_login(request.host_with_port, aac)
         else
