@@ -15,34 +15,34 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# @API PollChoices
-# @beta
-# Manage choices for polls
-#
-# @model PollChoice
-#   {
-#     "id": "PollChoice",
-#     "required": ["id", "text"],
-#     "properties": {
-#       "id": {
-#         "description": "The unique identifier for the poll choice.",
-#         "example": 1023,
-#         "type": "integer"
-#       },
-#       "is_correct": {
-#         "description": "Specifies whether or not this poll choice is a 'correct' choice.",
-#         "example": "true",
-#         "type": "boolean"
-#       },
-#       "text": {
-#         "description": "The text of the poll choice.",
-#         "type": "string",
-#         "example": "Choice A"
-#       }
-#     }
-#   }
-#
 module Polling
+  # @API PollChoices
+  # @beta
+  # Manage choices for polls
+  #
+  # @model PollChoice
+  #   {
+  #     "id": "PollChoice",
+  #     "required": ["id", "text"],
+  #     "properties": {
+  #       "id": {
+  #         "description": "The unique identifier for the poll choice.",
+  #         "example": 1023,
+  #         "type": "integer"
+  #       },
+  #       "is_correct": {
+  #         "description": "Specifies whether or not this poll choice is a 'correct' choice.",
+  #         "example": "true",
+  #         "type": "boolean"
+  #       },
+  #       "text": {
+  #         "description": "The text of the poll choice.",
+  #         "type": "string",
+  #         "example": "Choice A"
+  #       }
+  #     }
+  #   }
+  #
   class PollChoicesController < ApplicationController
     include Filters::Polling
 

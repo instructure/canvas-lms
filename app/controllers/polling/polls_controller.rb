@@ -15,39 +15,38 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# @API Polls
-# @beta
-# Manage polls
-#
-# @model Poll
-#    {
-#       "id": "Poll",
-#       "required": ["id", "course", "title"],
-#       "properties": {
-#         "id": {
-#           "description": "The unique identifier for the poll.",
-#           "example": 1023,
-#           "type": "integer"
-#         },
-#         "course": {
-#           "description": "The course the poll belongs to.  See the Courses API for details.",
-#           "$ref": "Course"
-#         },
-#         "title": {
-#           "description": "The title of the poll.",
-#           "type": "string",
-#           "example": "A Sample Poll"
-#         },
-#         "description": {
-#           "description": "A short description of the poll.",
-#           "type": "string",
-#           "example": "This poll is to quickly determine what you've learned in the past hour."
-#         }
-#       }
-#    }
-#
-
 module Polling
+  # @API Polls
+  # @beta
+  # Manage polls
+  #
+  # @model Poll
+  #    {
+  #       "id": "Poll",
+  #       "required": ["id", "course", "title"],
+  #       "properties": {
+  #         "id": {
+  #           "description": "The unique identifier for the poll.",
+  #           "example": 1023,
+  #           "type": "integer"
+  #         },
+  #         "course": {
+  #           "description": "The course the poll belongs to.  See the Courses API for details.",
+  #           "$ref": "Course"
+  #         },
+  #         "title": {
+  #           "description": "The title of the poll.",
+  #           "type": "string",
+  #           "example": "A Sample Poll"
+  #         },
+  #         "description": {
+  #           "description": "A short description of the poll.",
+  #           "type": "string",
+  #           "example": "This poll is to quickly determine what you've learned in the past hour."
+  #         }
+  #       }
+  #    }
+  #
   class PollsController < ApplicationController
     include Filters::Polling
 

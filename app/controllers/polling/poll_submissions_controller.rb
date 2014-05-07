@@ -15,37 +15,36 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# @API PollSubmissions
-# @beta
-# Manage submissions for polls
-#
-# @model PollSubmission
-#    {
-#       "id": "PollSubmission",
-#       "required": ["id", "poll", "user"],
-#       "properties": {
-#         "id": {
-#           "description": "The unique identifier for the account role/user assignment.",
-#           "example": 1023,
-#           "type": "integer"
-#         },
-#         "poll": {
-#           "description": "The poll this submission is for.  See the Polls API for details.",
-#           "$ref": "Poll"
-#         },
-#         "user": {
-#           "description": "The user that submitted the poll submission. See the Users API for details.",
-#           "$ref": "User"
-#         },
-#         "status": {
-#           "description": "The status of the account role/user assignment.",
-#           "type": "string",
-#           "example": "deleted"
-#         }
-#       }
-#    }
-
 module Polling
+  # @API PollSubmissions
+  # @beta
+  # Manage submissions for polls
+  #
+  # @model PollSubmission
+  #    {
+  #       "id": "PollSubmission",
+  #       "required": ["id", "poll", "user"],
+  #       "properties": {
+  #         "id": {
+  #           "description": "The unique identifier for the account role/user assignment.",
+  #           "example": 1023,
+  #           "type": "integer"
+  #         },
+  #         "poll": {
+  #           "description": "The poll this submission is for.  See the Polls API for details.",
+  #           "$ref": "Poll"
+  #         },
+  #         "user": {
+  #           "description": "The user that submitted the poll submission. See the Users API for details.",
+  #           "$ref": "User"
+  #         },
+  #         "status": {
+  #           "description": "The status of the account role/user assignment.",
+  #           "type": "string",
+  #           "example": "deleted"
+  #         }
+  #       }
+  #    }
   class PollSubmissionsController < ApplicationController
     before_filter :require_user
 
