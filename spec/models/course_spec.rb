@@ -1063,6 +1063,13 @@ describe Course, "update_account_associations" do
     @c.associated_accounts.length.should eql(1)
     @c.associated_accounts.first.should eql(account2)
   end
+
+  it "should act like it's associated to its account and root account, even if associations are busted" do
+    account1 = Account.default.sub_accounts.create!
+    c = account1.courses.create!
+    c.course_account_associations.scoped.delete_all
+    c.associated_accounts.should == [account1, Account.default]
+  end
 end
 
 describe Course, "tabs_available" do
