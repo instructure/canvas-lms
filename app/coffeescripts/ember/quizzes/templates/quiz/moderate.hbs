@@ -1,8 +1,16 @@
 <div class="quiz-moderate allow-inputs">
+  <div class="clearfix">
+    <strong class="have-taken">{{studentsHaveTakenQuiz}}</strong>
+    {{#if checkedStudents.length}}
+      <a class="change-extensions-for icon-edit" href="#" {{action 'studentExtension' checkedStudents}}>
+        {{changeExtensionFor}}
+      </a>
+    {{/if}}
+  </div>
   <table class="table table-striped quiz-table" id="moderate-table">
     <thead>
     <tr>
-      <th class="check">{{input type='checkbox' checked=headerChecked}}</th>
+      <th class="check">{{input type='checkbox' checked=allChecked}}</th>
       <th class="name">
         {{#t 'student'}}Student{{/t}}
       </th>
@@ -18,7 +26,8 @@
       <th>
         {{#t 'score'}}Score{{/t}}
       </th>
-      <th>
+      <th class="unlocked">&nbsp;</th>
+      <th class="edit">
         <a {{bind-attr class="reloading::icon-refresh"}} {{action 'refreshData'}} href>
           <img {{bind-attr class=":icon-refreshing reloading::inactive" }}
                src='/images/ajax-reload-animated.gif' />
@@ -31,7 +40,7 @@
     <tbody>
     {{#each user in controller itemController='quiz.submission_row'}}
       <tr class='moderate-submission-row'>
-        <td class="check">{{input type='checkbox' checked=selected}}</td>
+        <td class="check">{{input type='checkbox' checked=isChecked}}</td>
         <td class="name">
           {{#if hasActiveSubmission}}
             <a {{bind-attr href='historyLink'}}>
@@ -57,7 +66,16 @@
 
         <td>{{remainingStatusLabel}}{{remainingAttempts}}</td>
         <td>{{user.friendlyScore}}</td>
-        <td>
+        <td class="unlocked">
+          {{#if quizSubmission.manuallyUnlocked}}
+          <span class="unlocked" title="{{#t 'manually_unlocked'}}Manually Unlocked{{/t}}">
+            <i class="icon-unlock standalone-icon">
+              <span class="screenreader-only">{{#t 'manually_unlocked'}}Manually Unlocked{{/t}}</span>
+            </i>
+          </span>
+          {{/if}}
+        </td>
+        <td class="edit">
           <a class="icon-edit" href="#" {{action 'studentExtension' user}}>
             <span class="screenreader-only">{{#t 'edit'}}Edit{{/t}}</span>
           </a>

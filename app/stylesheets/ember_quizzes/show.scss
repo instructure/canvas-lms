@@ -75,7 +75,7 @@
 
   .tabs-content {
     border-top: 1px solid #CAD0D7;
-    padding: 55px 35px;
+    padding: 25px 35px 55px 35px;
   }
 
   table.quiz-table {
@@ -168,49 +168,6 @@
     }
   }
 
-  //===== Moderate Tab ===
-
-  .quiz-moderate {
-
-    #moderate-table {
-      .check {
-        width: 12px;
-        line-height: 1em;
-        vertical-align: top;
-      }
-      .icon-refreshing {
-        &.inactive {
-          display:none;
-        }
-        position: relative;
-        left: -2px;
-        top: -2px;
-      }
-      th {
-        text-align: center;
-      }
-      td {
-        text-align: center;
-      }
-      th.name,
-      td.name {
-        text-align: left;
-      }
-      th a.icon-refresh:before {
-        font-size: 100%;
-      }
-      th a.icon-refresh,
-      td a.icon-edit {
-        color: #444;
-      }
-      .extra-time {
-        font-size: 85%;
-        color: #555;
-      }
-
-    }
-
-  }
 
   // ic-actions overrides
 
@@ -234,6 +191,7 @@
   }
 
 }
+
 // Dialogs - Put outside the #quiz_show scope because jQueryUI puts
 // it in the body.
 

@@ -53,11 +53,13 @@ define [
         @forceReload(quiz)
 
       studentExtension: (model) ->
-        controller = @controllerFor('quiz.moderate')
-        controller.set('selectedStudents', Em.A([model]))
+        model = if model.get("length") then model else [model]
+        controller = @controllerFor('quiz.moderate.student_extension')
+        controller.set('model', Em.A(model))
 
         @render 'quiz/moderate/student_extension',
           into: 'application'
           outlet: 'modal'
+          controller: controller
 
   ModerateRoute

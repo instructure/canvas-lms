@@ -1,3 +1,64 @@
+#quiz-show {
+  .quiz-moderate {
+    .have-taken {
+      float: left;
+      margin-bottom: 20px;
+      margin-left: 3px;
+    }
+    .change-extensions-for {
+      float: right;
+      margin-bottom: 20px;
+      margin-right: 3px;
+    }
+
+    #moderate-table {
+      .check {
+        width: 12px;
+        line-height: 1em;
+        vertical-align: top;
+      }
+      .icon-refreshing {
+        &.inactive {
+          display:none;
+        }
+        position: relative;
+        left: -2px;
+        top: -2px;
+      }
+      th {
+        text-align: center;
+      }
+      td {
+        text-align: center;
+      }
+      th.name,
+      td.name {
+        text-align: left;
+      }
+      th.unlocked,
+      td.unlocked {
+        padding: 8px 2px;
+      }
+      th.edit,
+      td.edit {
+        padding: 8px 2px;
+      }
+      th a.icon-refresh:before {
+        font-size: 100%;
+      }
+      th a.icon-refresh,
+      td a.icon-edit {
+        color: #444;
+      }
+      .extra-time {
+        font-size: 85%;
+        color: #555;
+      }
+
+    }
+  }
+}
+
 #student-extension-dialog {
   h2 {
     margin: 0 0 1.5em 0;
