@@ -38,6 +38,7 @@ define [
     ipFilter: attr()
     pointsPossible: attr()
     published: attr()
+    deleted: attr()
     speedGraderUrl: attr()
     allowedAttempts: attr('number')
     unpublishable: attr()

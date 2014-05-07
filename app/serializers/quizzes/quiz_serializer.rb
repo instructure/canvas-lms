@@ -10,7 +10,7 @@ module Quizzes
                 :scoring_policy, :allowed_attempts, :one_question_at_a_time,
                 :question_count, :points_possible, :cant_go_back,
                 :access_code, :ip_filter, :due_at, :lock_at, :unlock_at,
-                :published, :unpublishable, :locked_for_user, :lock_info,
+                :published, :deleted, :unpublishable, :locked_for_user, :lock_info,
                 :lock_explanation, :hide_results, :show_correct_answers_at,
                 :hide_correct_answers_at, :all_dates, :can_unpublish, :can_update,
                 :require_lockdown_browser, :require_lockdown_browser_for_results,
@@ -67,6 +67,10 @@ module Quizzes
       return true if !quiz_submission.completed?
       return true if quiz.unlimited_attempts?
       (quiz_submission.completed? && quiz_submission.attempts_left > 0)
+    end
+
+    def deleted
+      quiz.deleted?
     end
 
     def take_quiz_url
@@ -157,18 +161,25 @@ module Quizzes
     def filter(keys)
       super(keys).select do |key|
         case key
-        when :take_quiz_url then accepts_jsonapi?
         when :all_dates then include_all_dates?
-        when :section_count then user_may_grade?
-        when :access_code, :speed_grader_url, :message_students_url then user_may_grade?
-        when :quiz_extensions_url then user_may_manage?
         when :unpublishable then include_unpublishable?
-        when :submitted_students, :unsubmitted_students then user_may_grade?
-        when :quiz_submission then accepts_jsonapi?
-        when :quiz_submission_html_url then accepts_jsonapi?
-        when :quiz_submissions_zip_url then
-          accepts_jsonapi? && user_may_grade? && has_file_uploads?
-        when :preview_url then user_may_grade? && user_may_manage?
+
+        when :section_count,
+             :access_code,
+             :speed_grader_url,
+             :message_students_url,
+             :submitted_students,
+             :unsubmitted_students then user_may_grade?
+
+        when :quiz_extensions_url,
+             :deleted then accepts_jsonapi? && user_may_manage?
+
+        when :quiz_submission,
+             :quiz_submission_html_url,
+             :take_quiz_url then accepts_jsonapi?
+
+        when :quiz_submissions_zip_url then accepts_jsonapi? && user_may_grade? && has_file_uploads?
+        when :preview_url then accepts_jsonapi? && user_may_grade? && user_may_manage?
         else true
         end
       end
