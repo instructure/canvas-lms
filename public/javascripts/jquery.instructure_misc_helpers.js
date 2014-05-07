@@ -145,7 +145,7 @@ define([
   $.parseUserAgentString = function(userAgent) {
     userAgent = (userAgent || "").toLowerCase();
     var data = {
-      version: (userAgent.match( /.+(?:me|ox|it|ra|ie|er|rv)[\/: ]([\d.]+)/ ) || [0,null])[1],
+      version: (userAgent.match( /.+(?:me|ox|it|ra|ie|er|rv|version)[\/: ]([\d.]+)/ ) || [0,null])[1],
       chrome: /chrome/.test( userAgent ),
       safari: /webkit/.test( userAgent ),
       opera: /opera/.test( userAgent ),
