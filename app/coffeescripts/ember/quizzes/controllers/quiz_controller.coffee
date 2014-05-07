@@ -34,8 +34,8 @@ define [
     ).observes('model')
 
     takeQuizVisible: (->
-      @get('published') and @get('takeable')
-    ).property('published', 'takeable')
+      @get('published') and @get('takeable') and !@get('lockedForUser')
+    ).property('published', 'takeable', 'lockedForUser')
 
     takeOrResumeMessage: (->
       if @get('quizSubmission.isCompleted')

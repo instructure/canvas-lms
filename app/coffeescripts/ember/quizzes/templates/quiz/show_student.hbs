@@ -1,4 +1,8 @@
 <div class="quiz-overview">
+  {{#if lockedForUser}}
+    <p class="lock-explanation">{{{lockExplanation}}}</p>
+  {{/if}}
+
   <div class="quiz-attributes quiz-attributes-student clearfix">
     <dl class="quiz-attribute-column">
       <dt>{{#t 'due'}}Due{{/t}}</dt>
