@@ -94,7 +94,11 @@ module AuthenticationMethods
         # if the session was created before the last time the user explicitly
         # logged out (of any session for any of their pseudonyms), invalidate
         # this session
-        if (invalid_before = @current_pseudonym.user.last_logged_out) &&
+        invalid_before = @current_pseudonym.user.last_logged_out
+        # they logged out in the future?!? something's busted; just ignore it -
+        # either my clock is off or whoever set this value's clock is off
+        invalid_before = nil if invalid_before && invalid_before > Time.now.utc
+        if invalid_before &&
           (session_refreshed_at = request.env['encrypted_cookie_store.session_refreshed_at']) &&
           session_refreshed_at < invalid_before
 
