@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -31,6 +31,8 @@ class EportfolioEntry < ActiveRecord::Base
   after_save :update_portfolio
   validates_presence_of :eportfolio_id
   validates_presence_of :eportfolio_category_id
+  validates_length_of :name, :maximum => maximum_string_length, :allow_nil => false, :allow_blank => true
+  validates_length_of :slug, :maximum => maximum_string_length, :allow_nil => false, :allow_blank => true
   has_many :page_comments, :as => :page, :include => :user, :order => 'page_comments.created_at DESC'
   
 
