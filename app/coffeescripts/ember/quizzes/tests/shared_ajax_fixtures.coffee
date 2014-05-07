@@ -22,6 +22,8 @@ define [
             "assignment_group": "/api/v1/courses/1/assignment_groups/1"
             "quizStatistics": "/api/v1/courses/1/quizzes/1/statistics"
             "quizReports": "/api/v1/courses/1/quizzes/1/reports"
+            "submitted_students": "/api/v1/courses/1/quizzes/1/submission_users?submitted=true"
+            "unsubmitted_students": "/api/v1/courses/1/quizzes/1/submission_users?submitted=false"
           "cant_go_back":false,
           "description":"",
           "hide_correct_answers_at":null,
@@ -177,6 +179,71 @@ define [
         }
       ]
 
+  submissionUsers =
+    users: [
+      {
+        "id":"1",
+        "links":{"quiz_submission":3},
+        "name":"James Brown",
+        "sortable_name":"Brown, James",
+        "short_name":"James Brown"
+      },
+      {
+        "id":"2",
+        "links":{"quiz_submission":4},
+        "name":"Maceo Parker",
+        "sortable_name":"Parker, Maceo",
+        "short_name":"Maceo Parker"
+      }
+    ]
+    submissions: [
+      {
+        "attempt":1,
+        "end_at":null,
+        "extra_attempts":null,
+        "extra_time":null,
+        "finished_at":"2014-05-07T22:41:40Z",
+        "fudge_points":null,
+        "id":"3",
+        "kept_score":0,
+        "quiz_id":1,
+        "quiz_points_possible":1,
+        "quiz_version":1,
+        "score":0,
+        "score_before_regrade":null,
+        "started_at":"2014-05-07T22:41:34Z",
+        "submission_id":3,
+        "user_id":1,
+        "validation_token":"b1d62b22f0b6bf69e2b67437560f1555fd7ae925f3269e8b63f16c9e1fa8a956",
+        "workflow_state":"complete",
+        "time_spent":6,
+        "html_url":"http://localhost:3000/courses/1/quizzes/1/submissions/3"
+      },
+      {
+        "attempt":2,
+        "end_at":null,
+        "extra_attempts":null,
+        "extra_time":null,
+        "finished_at":"2014-05-07T22:41:40Z",
+        "fudge_points":null,
+        "id":"4",
+        "kept_score":0,
+        "quiz_id":1,
+        "quiz_points_possible":1,
+        "quiz_version":1,
+        "score":0,
+        "score_before_regrade":null,
+        "started_at":"2014-05-07T22:41:34Z",
+        "submission_id":4,
+        "user_id":2,
+        "validation_token":"b1d62b22f0b6bf69e2b67437560f1555fd7ae925f3269e8b63f16c9e1fa8a956",
+        "workflow_state":"complete",
+        "time_spent":6,
+        "html_url":"http://localhost:3000/courses/1/quizzes/1/submissions/4"
+      }
+    ]
+    meta: {}
+
   assignmentGroup =
     id: "1"
     name: "Assignments"
@@ -239,6 +306,11 @@ define [
           title: "My Section"
           due_at: new Date()
           lock_at: new Date()
+        testStatus: '200'
+        jqXHR: {}
+
+      ajax.defineFixture '/api/v1/courses/1/quizzez/1/submission_users?include[]=quiz_submissions',
+        response: submissionUsers
         testStatus: '200'
         jqXHR: {}
   }

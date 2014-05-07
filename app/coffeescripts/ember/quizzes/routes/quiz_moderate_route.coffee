@@ -2,8 +2,7 @@ define [
   'ember'
   '../mixins/redirect'
   '../shared/environment'
-  'ic-ajax'
-], (Em, Redirect, env, ajax) ->
+], (Em, Redirect, env) ->
 
   ModerateRoute = Em.Route.extend Redirect,
 
@@ -11,17 +10,22 @@ define [
       @validateRoute('canManage', 'quiz.show')
 
     model: ->
+      @combinedUsersSubmissionsPromise()
+
+    combinedUsersSubmissionsPromise: ->
       quiz = @modelFor('quiz')
-      quizSubmissions = quiz.get('quizSubmissions')
       _this = this
-      quizSubmissions.then ->
-        users = quiz.get('users')
-        users.then ->
-          userSubHash = _this.createSubHash(quizSubmissions.get('content'))
-          fakes = []
-          users.get('content').forEach (user) ->
-            quizSubmission = userSubHash[user.get('id')] || Ember.Object.create()
-            user.set('quizSubmission', quizSubmission)
+      quiz.get('quizSubmissions').then (quizSubmissions) ->
+        quizSubmissions ||= []
+        quiz.get('users').then (users) ->
+          _this.combineModels(users, quizSubmissions)
+
+    combineModels: (users, quizSubmissions) ->
+      userSubHash = @createSubHash(quizSubmissions)
+      users.forEach (user) ->
+        quizSubmission = userSubHash[user.get('id')] || Ember.Object.create()
+        user.set('quizSubmission', quizSubmission)
+      users
 
     createSubHash: (submissions) ->
       hash = {}
@@ -29,5 +33,23 @@ define [
         id = sub.get('user.id')
         hash[id] = sub
       hash
+
+    forceReload: (quiz) ->
+      resolver = Em.RSVP.defer()
+      resolver.resolve = (promise) =>
+        promise.then =>
+          Ember.run.later this, (->
+            @controllerFor('quiz.moderate').set('reloading', false)
+          ), 500
+          @combinedUsersSubmissionsPromise().then (models) =>
+            @get('controller').set('content', models)
+      relationship = quiz.constructor.metaForProperty('quizSubmissions')
+      link = quiz.get('links.quizSubmissions')
+      @store.findHasMany(quiz, link, relationship, resolver)
+
+    actions:
+      refreshData: ->
+        quiz = @modelFor('quiz')
+        @forceReload(quiz)
 
   ModerateRoute

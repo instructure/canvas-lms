@@ -179,6 +179,14 @@
         line-height: 1em;
         vertical-align: top;
       }
+      .icon-refreshing {
+        &.inactive {
+          display:none;
+        }
+        position: relative;
+        left: -2px;
+        top: -2px;
+      }
       th {
         text-align: center;
       }

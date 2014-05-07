@@ -1,5 +1,5 @@
 <div class="quiz-moderate allow-inputs">
-  <table class="table quiz-table" id="moderate-table">
+  <table class="table table-striped quiz-table" id="moderate-table">
     <thead>
     <tr>
       <th class="check">{{input type='checkbox' checked=headerChecked}}</th>
@@ -19,7 +19,9 @@
         {{#t 'score'}}Score{{/t}}
       </th>
       <th>
-        <a class="icon-refresh" href="#">
+        <a {{bind-attr class="reloading::icon-refresh"}} {{action 'refreshData'}} href>
+          <img {{bind-attr class=":icon-refreshing reloading::inactive" }}
+               src='/images/ajax-reload-animated.gif' />
           <span class="screenreader-only">{{#t 'refresh'}}Refresh{{/t}}</span>
         </a>
       </th>
@@ -28,7 +30,7 @@
 
     <tbody>
     {{#each user in controller itemController='quiz.submission_row'}}
-      <tr>
+      <tr class='moderate-submission-row'>
         <td class="check">{{input type='checkbox' checked=selected}}</td>
         <td class="name">
           {{#if hasSubmission}}
@@ -41,7 +43,7 @@
         </td>
         <td>{{attempts}}</td>
         <td>{{user.friendlyTime}}</td>
-        <td>{{remainingAttempts}}</td>
+        <td>{{remainingStatusLabel}}{{remainingAttempts}}</td>
         <td>{{user.friendlyScore}}</td>
         <td>
           <a class="icon-edit" href="#" {{action 'editSubmissionUser' user}}>

@@ -34,8 +34,8 @@ define [
               quiz.links.quiz_statistics += '?include=quiz_questions'
             if quiz.links.quiz_reports
               quiz.links.quiz_reports += '?includes_all_versions=true'
-            if quiz.links.submitted_students
-              quiz.links.users = quiz.links.submitted_students.match(/(.*)\?submitted/)[1]
+            if submitals = quiz.links.submitted_students || quiz.links.unsubmitted_students
+              quiz.links.users = submitals.replace(/\?submitted=(true|false)/, '')
               quiz.links.users += '?include[]=quiz_submissions'
               quiz.links.quiz_submissions = quiz.links.users
       hash
