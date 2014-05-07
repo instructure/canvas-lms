@@ -816,8 +816,9 @@ define([
       modules.editModule($module);
     });
 
-    $(".add_module_item_link").live('click', function(event) {
+    $(".add_module_item_link").on('click', function(event) {
       event.preventDefault();
+      $(event.currentTarget).blur();
       var $module = $(this).closest(".context_module");
       if($module.hasClass('collapsed_module')) {
         $module.find(".expand_module_link").triggerHandler('click', function() {

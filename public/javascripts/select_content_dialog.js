@@ -120,8 +120,9 @@ $(document).ready(function() {
     $dialog.find('.alert').remove();
     $dialog.dialog('close');
   });
-  $("#select_context_content_dialog .item_title").keycodes('return', function() {
-    $(this).parents(".module_item_option").find(".add_item_button").click();
+  $("#select_context_content_dialog select, #select_context_content_dialog input[type=text], .module_item_select").keycodes('return', function(event) {
+    $(event.currentTarget).blur();
+    $(this).parents(".ui-dialog").find(".add_item_button").last().click();
   });
   $("#select_context_content_dialog .add_item_button").click(function() {
     var submit = function(item_data) {
