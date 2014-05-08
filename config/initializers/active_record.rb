@@ -920,10 +920,12 @@ unless defined? OpenDataExport
   end
 end
 
-ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.class_eval do
-  def readonly?(table = nil, column = nil)
-    return @readonly unless @readonly.nil?
-    @readonly = (select_value("SELECT pg_is_in_recovery();") == "t")
+if defined? ActiveRecord::ConnectionAdapters::PostgreSQLAdapter
+  ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.class_eval do
+    def readonly?(table = nil, column = nil)
+      return @readonly unless @readonly.nil?
+      @readonly = (select_value("SELECT pg_is_in_recovery();") == "t")
+    end
   end
 end
 
