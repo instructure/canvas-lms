@@ -1136,6 +1136,7 @@ define([
         $.each(submission.versioned_attachments || [], function(i,a){
           var attachment = a.attachment;
           if (attachment['crocodoc_available?'] ||
+              attachment['canvadocable?'] ||
               (attachment.scribd_doc && attachment.scribd_doc.created) ||
               $.isPreviewable(attachment.content_type, 'google')) {
             inlineableAttachments.push(attachment);
@@ -1336,6 +1337,11 @@ define([
               EG.handleSubmissionSelectionChange();
             }
           ));
+        }
+        else if (attachment && attachment.canvadoc_url) {
+          $iframe_holder.show().loadDocPreview($.extend(previewOptions, {
+            canvadoc_session_url: attachment.canvadoc_url
+          }));
         }
         else if ( attachment && (attachment['scribdable?'] || $.isPreviewable(attachment.content_type, 'google')) ) {
           if (!INST.disableCrocodocPreviews) $no_annotation_warning.show();

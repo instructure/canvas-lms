@@ -227,7 +227,7 @@ Canvas::Plugin.register('assignment_freezer', nil, {
 
 Canvas::Plugin.register('crocodoc', :previews, {
   :name => lambda { t :name, 'Crocodoc' },
-  :description => lambda { t :description, 'Enabled Crocodoc as a document preview option' },
+  :description => lambda { t :description, 'Enable Crocodoc as a document preview option' },
   :website => 'https://crocodoc.com/',
   :author => 'Instructure',
   :author_website => 'http://www.instructure.com',
@@ -235,6 +235,17 @@ Canvas::Plugin.register('crocodoc', :previews, {
   :settings_partial => 'plugins/crocodoc_settings',
   :settings => nil
 })
+
+Canvas::Plugin.register('canvadocs', :previews, {
+  :name => lambda { t :name, 'Canvadocs' },
+  :description => lambda { t :description, 'Enable Canvadocs (compatible with Box View) as a document preview option' },
+  :author => 'Instructure',
+  :author_website => 'http://www.instructure.com',
+  :version => '1.0.0',
+  :settings_partial => 'plugins/canvadocs_settings',
+  :settings => nil
+})
+
 Canvas::Plugin.register('account_reports', nil, {
   :name => lambda{ t :name, 'Account Reports' },
   :description => lambda{ t :description, 'Select account reports' },
