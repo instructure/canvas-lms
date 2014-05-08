@@ -17,13 +17,14 @@
 #
 module LtiOutbound
   class ToolLaunch
-    attr_reader :url, :tool, :user, :context, :link_code, :return_url,
+    attr_reader :url, :tool, :user, :context, :link_code, :return_url, :account,
                 :resource_type, :consumer_instance, :hash, :assignment, :outgoing_email_address, :selected_html
 
     def initialize(options)
       @url = options[:url] || raise('URL required for generating LTI content')
       @tool = options[:tool] || raise('Tool required for generating LTI content')
       @user = options[:user] || raise('User required for generating LTI content')
+      @account = options[:account] || raise('Account required for generating LTI content')
       @context = options[:context] || raise('Context required for generating LTI content')
       @link_code = options[:link_code] || raise('Link Code required for generating LTI content')
       @return_url = options[:return_url] || raise('Return URL required for generating LTI content')
@@ -117,8 +118,8 @@ module LtiOutbound
       set_resource_type_keys()
       hash['oauth_callback'] = 'about:blank'
 
-      variable_substitutor = VariableSubstitutor.new
-      variable_substitutor.substitute_all!(hash, user, assignment, context, consumer_instance)
+      variable_substitutor = VariableSubstitutor.new(user:user, assignment:assignment, context:context, consumer_instance:consumer_instance, account:account)
+      variable_substitutor.substitute!(hash)
 
       self.class.generate_params(hash, url, tool.consumer_key, tool.shared_secret)
     end

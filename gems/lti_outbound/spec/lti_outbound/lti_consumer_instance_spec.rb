@@ -24,8 +24,4 @@ describe LtiOutbound::LTIConsumerInstance do
   it_behaves_like 'it has a proc attribute setter and getter for', :lti_guid
   it_behaves_like 'it has a proc attribute setter and getter for', :name
   it_behaves_like 'it has a proc attribute setter and getter for', :domain
-
-  it_behaves_like 'it provides variable mapping', '$Canvas.account.id', :id
-  it_behaves_like 'it provides variable mapping', '$Canvas.account.sisSourceId', :sis_source_id
-  it_behaves_like 'it provides variable mapping', '$Canvas.api.domain', :domain
 end
