@@ -168,7 +168,7 @@ define [
 
     postGrades: (e)->
       json_to_post = {}
-      json_to_post['canvas_domain'] = document.domain
+      json_to_post['canvas_domain'] = document.location.origin
       json_to_post['assignments'] = _.map(@model.get('assignments_to_post'), (assignment) -> assignment.id)
       if @model.get('section_id')
         json_to_post['section_id'] = @model.get('section_id')
