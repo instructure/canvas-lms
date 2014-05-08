@@ -14,7 +14,8 @@
       padding-left: 24px;
     }
   }
-  .teacher-action-buttons {
+  .teacher-action-buttons,
+  .student-action-buttons {
     // Makes ICPublishButtonComponent render inline-block
     div {
       display: inline-block
@@ -27,7 +28,7 @@
     padding-top: 15px;
 
     // Margin-right for the ic-actions dropdown to be absolutely positioned.
-    margin-right: 15px;
+    margin-right: 25px;
   }
 
   //===== Tabs ===
@@ -75,7 +76,7 @@
 
   .tabs-content {
     border-top: 1px solid #CAD0D7;
-    padding: 55px 50px;
+    padding: 55px 35px;
   }
 
   table.quiz-table {
@@ -87,7 +88,7 @@
       text-align: left;
     }
     tbody {
-      font-family: "HelveticaNeue-Light", "Helvetica Neue Light", Helvetica, Arial, sans-serif;
+      font-weight: 300;
     }
   }
 
@@ -95,28 +96,24 @@
 
   .quiz-overview {
     .quiz-description {
-      font-family: "HelveticaNeue-Light", "Helvetica Neue Light", Helvetica, Arial, sans-serif;
+      font-weight: 300;
       font-size: 14px;
       margin-bottom: 1.5em;
     }
 
-    #quiz-attribute-table {
-      overflow: hidden;
-      margin-bottom: 2.5em;
-
-      dl dt, dl dd {
+    .quiz-attributes {
+      dl dt,
+      dl dd {
         float: left;
         margin: 0 0.5em 10px 0;
       }
-
-      dl dd + dt, dl dd + dd {
+      dl dd + dt,
+      dl dd + dd {
         clear: left
       }
-
       dl dd + dd {
         float: none
       }
-
       dl dt {
         font-weight: bold;
         clear:left;
@@ -124,6 +121,28 @@
       dl dd {
         font-weight: 200;
       }
+    }
+
+    .quiz-attributes-student {
+      border-bottom: 1px solid #CAD0D7;
+      margin-bottom: 30px;
+      padding: 0 37px;
+
+      dl, dt, dd {
+        margin-bottom: 0;
+      }
+      .quiz-attribute-column {
+        float: left;
+        width: 20%;
+      }
+    }
+    .student-quiz-content {
+      padding: 0 35px 55px 35px;
+    }
+
+    .quiz-attributes-teacher {
+      overflow: hidden;
+      margin-bottom: 2.5em;
 
       .quiz-attribute-column {
         text-align: center;
@@ -135,7 +154,6 @@
           border-right: none;
         }
       }
-
     }
 
     #due-dates-table {
@@ -188,19 +206,16 @@
   ic-actions {
     position: absolute;
     top: 41px;
-    right: 0;
+    right: 6px;
     padding-right: 5px;
   }
-
   ic-menu-item {
     display: block;
   }
-
   ic-menu-item a {
     color: inherit;
     text-decoration: none;
   }
-
   ic-menu-list {
     top: 32px;
     right: 5px;

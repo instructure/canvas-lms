@@ -58,6 +58,9 @@ define [
     ).property('submittedStudents', 'unsubmittedStudents')
 
     actions:
+      takeQuiz: ->
+        console.log 'take it!'
+
       speedGrader: ->
         window.location = @get 'speedGraderUrl'
 
@@ -82,7 +85,7 @@ define [
         model = @get 'model'
         model.deleteRecord()
         model.save().then =>
-          @transitionTo 'quizzes'
+          @transitionToRoute 'quizzes'
 
       # For modal, just do nothing.
       cancel: K

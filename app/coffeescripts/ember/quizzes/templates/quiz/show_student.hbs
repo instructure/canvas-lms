@@ -1,0 +1,69 @@
+<div class="quiz-overview">
+  <div class="quiz-attributes quiz-attributes-student clearfix">
+    <dl class="quiz-attribute-column">
+      <dt>{{#t 'due'}}Due{{/t}}</dt>
+      <dd>
+        {{#if dueAt}}
+          {{friendlyDatetime dueAt}}
+        {{else}}
+          -
+        {{/if}}
+      </dd>
+    </dl>
+    <dl class="quiz-attribute-column">
+      <dt>{{#t 'points'}}Points{{/t}}</dt>
+      <dd>{{pointsPossible}}</dd>
+    </dl>
+    <dl class="quiz-attribute-column">
+      <dt>{{#t 'questions'}}Questions{{/t}}</dt>
+      <dd>{{questionCount}}</dd>
+    </dl>
+    <dl class="quiz-attribute-column">
+      <dt>{{#t 'time_limit'}}Time Limit{{/t}}</dt>
+      <dd>
+        {{#if timeLimit}}
+          {{#t 'time_limit_with_minutes'}}{{timeLimit}} minutes{{/t}}
+        {{else}}
+          {{#t 'no_time_limit'}}None{{/t}}
+        {{/if}}
+      </dd>
+    </dl>
+    <dl class="quiz-attribute-column">
+      <dt>{{#t 'attempts'}}Attempts{{/t}}</dt>
+      <dd>
+        {{#if unlimitedAllowedAttempts}}
+          {{#t 'unlimited'}}Unlimited{{/t}}
+        {{else}}
+          {{allowedAttempts}}
+        {{/if}}
+      </dd>
+    </dl>
+  </div>
+
+  <div class="student-quiz-content">
+    {{#if description}}
+    <div class="row-fluid">
+      <div class="span12 quiz-description">
+        {{{description}}}
+      </div>
+    </div>
+    {{/if}}
+
+    <table class="quiz-table table" id="quiz-attempts-table">
+    </table>
+
+    {{! this is only here for legacy styling to pull in
+      quiz submissions from the server! Confusing id-show above vs
+      id_show should be removed soon! }}
+    <div id="quiz_show">
+      {{#if didLoadQuizSubmissionHTML}}
+        {{{quizSubmissionHTML.html}}}
+      {{else}}
+        <div id='ember-loading'>
+          <img src='/images/ajax-loader-medium-444.gif' />
+          {{#t 'loading'}}Loading{{/t}}
+        </div>
+      {{/if}}
+    </div>
+  </div>
+</div>

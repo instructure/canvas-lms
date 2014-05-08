@@ -7,82 +7,70 @@
       <h1>{{title}}</h1>
     </div>
 
-    <div class="span4 teacher-action-buttons pull-right">
-      {{ic-publish-icon
-        disabled=canNotUnpublish
-        is-published=showAsPublished
-        disabled-message=disabledMessage
-        on-publish='publish'
-        on-unpublish='unpublish'
-      }}
+    {{#if canUpdate}}
+      <div class="span4 teacher-action-buttons pull-right">
+        {{ic-publish-icon
+          disabled=canNotUnpublish
+          is-published=showAsPublished
+          disabled-message=disabledMessage
+          on-publish='publish'
+          on-unpublish='unpublish'
+        }}
 
-      <a {{bind-attr href="editURL"}} class="btn">
-        <i class="icon-edit"></i>{{#t 'edit'}}Edit{{/t}}
-      </a>
-    </div>
-      {{#ic-actions}}
-        {{#ic-menu-item on-select="speedGrader"}}
-          <i class="icon-speed-grader"></i>
-          <a {{bindAttr href="speedGraderUrl"}}>
-            {{#t "speed_grader"}}Speed Grader{{/t}}
-          </a>
-        {{/ic-menu-item}}
-
-        {{#ic-menu-item on-select="messageStudents"}}
-          <i class="icon-discussion"></i>
-          {{#t 'Message Students'}}Message Students{{/t}}
-        {{/ic-menu-item}}
-
-        {{#ic-menu-item class="js-delete" on-select="confirmDeletion"}}
-          <i class="icon-trash"></i>
-          {{#t "delete"}}Delete{{/t}}
-        {{/ic-menu-item}}
-
-        {{#ic-menu-item}}
-          <i class="icon-mark-as-read"></i>
-          {{#t 'preview'}}Preview{{/t}}
-        {{/ic-menu-item}}
-
-        {{#if lockAt}}
-          {{#ic-menu-item class="js-due-date-toggler" on-select="unlock"}}
-            <i class="icon-unlock"></i>
-            {{#t 'unlock_this_quiz_now'}}Unlock This Quiz Now{{/t}}
+        <a {{bind-attr href="editURL"}} class="btn">
+          <i class="icon-edit"></i>{{#t 'edit'}}Edit{{/t}}
+        </a>
+        {{#ic-actions}}
+          {{#ic-menu-item on-select="speedGrader"}}
+            <i class="icon-speed-grader"></i>
+            <a {{bind-attr href="speedGraderUrl"}}>
+              {{#t "speed_grader"}}Speed Grader{{/t}}
+            </a>
           {{/ic-menu-item}}
-        {{else}}
-          {{#ic-menu-item class="js-due-date-toggler" on-select="lock"}}
-            <i class="icon-lock"></i>
-            {{#t 'lock_this_quiz_now'}}
-              Lock This Quiz Now
-            {{/t}}
+
+          {{#ic-menu-item on-select="messageStudents"}}
+            <i class="icon-discussion"></i>
+            {{#t 'Message Students'}}Message Students{{/t}}
           {{/ic-menu-item}}
-        {{/if}}
 
-      {{/ic-actions}}
+          {{#ic-menu-item class="js-delete" on-select="confirmDeletion"}}
+            <i class="icon-trash"></i>
+            {{#t "delete"}}Delete{{/t}}
+          {{/ic-menu-item}}
+
+          {{#ic-menu-item}}
+            <i class="icon-mark-as-read"></i>
+            {{#t 'preview'}}Preview{{/t}}
+          {{/ic-menu-item}}
+
+          {{#if lockAt}}
+            {{#ic-menu-item class="js-due-date-toggler" on-select="unlock"}}
+              <i class="icon-unlock"></i>
+              {{#t 'unlock_this_quiz_now'}}Unlock This Quiz Now{{/t}}
+            {{/ic-menu-item}}
+          {{else}}
+            {{#ic-menu-item class="js-due-date-toggler" on-select="lock"}}
+              <i class="icon-lock"></i>
+              {{#t 'lock_this_quiz_now'}}
+                Lock This Quiz Now
+              {{/t}}
+            {{/ic-menu-item}}
+          {{/if}}
+        {{/ic-actions}}
+      </div>
+
+    {{else}}
+      <div class="span4 student-action-buttons pull-right">
+        <button {{action "takeQuiz"}} class="btn btn-primary">
+          {{#t 'take_quiz'}}Take Quiz{{/t}}
+        </button>
+      </div>
+    {{/if}}
   </div>
 
-  <div class="row-fluid" id="quiz-show-tabs">
-    <ol>
-      {{#link-to 'quiz.show' this tagName='li' replace=true}}
-        {{#link-to 'quiz.show' this.id replace=true}}
-          {{#t 'overview'}}Overview{{/t}}
-        {{/link-to}}
-      {{/link-to}}
-
-      {{#link-to 'quiz.moderate' this tagName='li' replace=true}}
-        {{#link-to 'quiz.moderate' this.id replace=true}}
-          {{#t 'moderate'}}Moderate{{/t}}
-        {{/link-to}}
-      {{/link-to}}
-
-      {{#link-to 'quiz.statistics' this tagName='li' replace=true}}
-        {{#link-to 'quiz.statistics' this.id replace=true}}
-          {{#t 'statistics'}}Statistics{{/t}}
-        {{/link-to}}
-      {{/link-to}}
-    </ol>
-  </div>
-
-  <div class="tabs-content">
-    {{outlet}}
-  </div>
+  {{#if canUpdate}}
+    {{partial "quiz/show_teacher"}}
+  {{else}}
+    {{partial "quiz/show_student"}}
+  {{/if}}
 </div>

@@ -7,7 +7,7 @@
   </div>
   {{/if}}
 
-  <div class="row-fluid" id="quiz-attribute-table">
+  <div class="row-fluid quiz-attributes quiz-attributes-teacher">
     <dl class="span4 quiz-attribute-column">
       <dt>{{#t 'quiz_type'}}Quiz Type{{/t}}</dt>
       <dd>{{tQuizType}}</dd>
@@ -82,24 +82,28 @@
       </tr>
     </thead>
     <tbody>
-      {{#each allDates}}
-        <tr>
-          {{render "due_date_table_row" this}}
-        </tr>
-      {{/each}}
+    {{#each allDates}}
+      <tr>
+        {{render "due_date_table_row" this}}
+      </tr>
+    {{/each}}
     </tbody>
   </table>
 
-{{! this is only here for legacy styling to pull in
-  quiz submissions from the server! Confusing id-show above vs
-  id_show should be removed soon! }}
-<div id="quiz_show">
-  {{#if didLoadQuizSubmissionHTML}}
-    {{{quizSubmissionHTML.html}}}
-  {{else}}
-    <div id='ember-loading'>
-      <img src='/images/ajax-loader-medium-444.gif' />
-      {{#t 'loading'}}Loading{{/t}}
-    </div>
-  {{/if}}
+  <table class="quiz-table table" id="quiz-attempt-table">
+  </table>
+
+  {{! this is only here for legacy styling to pull in
+    quiz submissions from the server! Confusing id-show above vs
+    id_show should be removed soon! }}
+  <div id="quiz_show">
+    {{#if didLoadQuizSubmissionHTML}}
+      {{{quizSubmissionHTML.html}}}
+    {{else}}
+      <div id='ember-loading'>
+        <img src='/images/ajax-loader-medium-444.gif' />
+        {{#t 'loading'}}Loading{{/t}}
+      </div>
+    {{/if}}
+  </div>
 </div>

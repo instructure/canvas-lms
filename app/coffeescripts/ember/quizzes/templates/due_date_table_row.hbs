@@ -1,4 +1,10 @@
-<td>{{friendlyDatetime dueAt}}</td>
+<td>
+  {{#if dueAt}}
+    {{friendlyDatetime dueAt}}
+  {{else}}
+    -
+  {{/if}}
+</td>
 <td>
   {{#if title}}
     {{title}}
