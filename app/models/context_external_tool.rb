@@ -4,6 +4,7 @@ class ContextExternalTool < ActiveRecord::Base
 
   has_many :content_tags, :as => :content
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account']
   attr_accessible :privacy_level, :domain, :url, :shared_secret, :consumer_key, 
                   :name, :description, :custom_fields, :custom_fields_string,
                   :course_navigation, :account_navigation, :user_navigation,

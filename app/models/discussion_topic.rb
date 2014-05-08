@@ -47,6 +47,7 @@ class DiscussionTopic < ActiveRecord::Base
   has_one :external_feed_entry, :as => :asset
   belongs_to :external_feed
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Group']
   belongs_to :attachment
   belongs_to :assignment
   belongs_to :editor, :class_name => 'User'

@@ -20,6 +20,7 @@ class ExternalFeed < ActiveRecord::Base
   attr_accessible :url, :verbosity, :header_match
   belongs_to :user
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Group']
   has_many :external_feed_entries, :dependent => :destroy
 
   before_validation :infer_defaults

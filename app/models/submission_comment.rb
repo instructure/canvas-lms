@@ -25,6 +25,7 @@ class SubmissionComment < ActiveRecord::Base
   belongs_to :recipient, :class_name => 'User'
   belongs_to :assessment_request
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course']
   has_many :associated_attachments, :class_name => 'Attachment', :as => :context
   has_many :submission_comment_participants, :dependent => :destroy
   has_many :messages, :as => :context, :dependent => :destroy

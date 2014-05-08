@@ -20,6 +20,7 @@ class ContentMigration < ActiveRecord::Base
   include Workflow
   include TextHelper
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account', 'Group', 'User']
   belongs_to :user
   belongs_to :attachment
   belongs_to :overview_attachment, :class_name => 'Attachment'

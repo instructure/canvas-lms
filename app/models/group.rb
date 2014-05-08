@@ -33,6 +33,7 @@ class Group < ActiveRecord::Base
   has_many :participating_group_memberships, :class_name => "GroupMembership", :conditions => ['group_memberships.workflow_state = ?', 'accepted']
   has_many :participating_users, :source => :user, :through => :participating_group_memberships
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account']
   belongs_to :group_category
   belongs_to :account
   belongs_to :root_account, :class_name => "Account"

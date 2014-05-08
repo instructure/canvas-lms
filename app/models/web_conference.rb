@@ -22,6 +22,7 @@ class WebConference < ActiveRecord::Base
   attr_accessible :title, :duration, :description, :conference_type, :user, :user_settings, :context
   attr_readonly :context_id, :context_type
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Group', 'Account']
   has_many :web_conference_participants
   has_many :users, :through => :web_conference_participants
   has_many :invitees, :through => :web_conference_participants, :source => :user, :conditions => ['web_conference_participants.participation_type = ?', 'invitee']

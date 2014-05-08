@@ -22,6 +22,7 @@ class InboxItem < ActiveRecord::Base
 
   # Associations
   belongs_to :asset,  :polymorphic => true
+  validates_inclusion_of :asset_type, :allow_nil => true, :in => ['DiscussionEntry', 'SubmissionComment', 'ContextMessage']
   belongs_to :author, :class_name => 'User', :foreign_key => :sender_id
   belongs_to :user
 

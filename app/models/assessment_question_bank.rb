@@ -24,6 +24,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
   EXPORTABLE_ASSOCIATIONS = [:context, :assessment_questions, :assessment_question_bank_users, :learning_outcome_alignments, :quiz_groups]
 
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Account', 'Course']
   has_many :assessment_questions, :order => 'name, position, created_at'
   has_many :assessment_question_bank_users
   has_many :learning_outcome_alignments, :as => :content, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome', 'deleted'], :include => :learning_outcome

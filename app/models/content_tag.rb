@@ -27,8 +27,14 @@ class ContentTag < ActiveRecord::Base
   include Workflow
   include SearchTermHelper
   belongs_to :content, :polymorphic => true
+  validates_inclusion_of :content_type, :allow_nil => true, :in => ['Attachment', 'Assignment', 'WikiPage',
+    'ContextModuleSubHeader', 'Quizzes::Quiz', 'ExternalUrl', 'LearningOutcome', 'DiscussionTopic',
+    'Rubric', 'ContextExternalTool', 'LearningOutcomeGroup', 'AssessmentQuestionBank']
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'LearningOutcomeGroup',
+    'Assignment', 'Account', 'Quizzes::Quiz']
   belongs_to :associated_asset, :polymorphic => true
+  validates_inclusion_of :associated_asset_type, :allow_nil => true, :in => ['LearningOutcomeGroup']
   belongs_to :context_module
   belongs_to :learning_outcome
   # This allows doing a has_many_through relationship on ContentTags for linked LearningOutcomes. (see LearningOutcomeContext)

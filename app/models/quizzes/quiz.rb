@@ -48,6 +48,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   has_many :attachments, :as => :context, :dependent => :destroy
   has_many :quiz_regrades, class_name: 'Quizzes::QuizRegrade'
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course']
   belongs_to :assignment
   belongs_to :assignment_group
 

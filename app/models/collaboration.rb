@@ -24,6 +24,7 @@ class Collaboration < ActiveRecord::Base
   attr_readonly   :collaboration_type
 
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Group']
   belongs_to :user
   has_many :collaborators, :dependent => :destroy
   has_many :users, :through => :collaborators

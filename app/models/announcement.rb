@@ -19,6 +19,7 @@
 class Announcement < DiscussionTopic
   
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Group']
   
   EXPORTABLE_ATTRIBUTES = [
     :id, :context_id, :context_type, :title, :message, :type, :user_id,

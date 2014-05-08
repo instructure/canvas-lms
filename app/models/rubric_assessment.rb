@@ -29,6 +29,7 @@ class RubricAssessment < ActiveRecord::Base
   belongs_to :user
   belongs_to :assessor, :class_name => 'User'
   belongs_to :artifact, :polymorphic => true, :touch => true
+  validates_inclusion_of :artifact_type, :allow_nil => true, :in => ['Submission', 'Assignment']
   has_many :assessment_requests, :dependent => :destroy
   serialize :data
 

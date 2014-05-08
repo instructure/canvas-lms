@@ -23,6 +23,11 @@ class DelayedMessage < ActiveRecord::Base
   belongs_to :notification
   belongs_to :notification_policy
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['DiscussionEntry', 'Assignment',
+    'SubmissionComment', 'Submission', 'ConversationMessage', 'Course', 'DiscussionTopic',
+    'Enrollment', 'Attachment', 'AssignmentOverride', 'Quizzes::QuizSubmission', 'GroupMembership',
+    'CalendarEvent', 'WikiPage', 'AssessmentRequest', 'AccountUser', 'WebConference', 'Account', 'User',
+    'AppointmentGroup', 'Collaborator', 'AccountReport', 'Quizzes::QuizRegradeRun', 'CommunicationChannel']
   belongs_to :communication_channel
   attr_accessible :notification, :notification_policy, :frequency,
     :communication_channel, :linked_name, :name_of_topic, :link, :summary,

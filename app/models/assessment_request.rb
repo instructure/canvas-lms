@@ -28,7 +28,9 @@ class AssessmentRequest < ActiveRecord::Base
 
   belongs_to :user
   belongs_to :asset, :polymorphic => true
+  validates_inclusion_of :asset_type, :allow_nil => true, :in => ['Submission']
   belongs_to :assessor_asset, :polymorphic => true
+  validates_inclusion_of :assessor_asset_type, :allow_nil => true, :in => ['Submission', 'User']
   belongs_to :assessor, :class_name => 'User'
   belongs_to :submission, :foreign_key => 'asset_id'
   belongs_to :rubric_association

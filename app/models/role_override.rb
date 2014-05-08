@@ -17,7 +17,8 @@
 #
 
 class RoleOverride < ActiveRecord::Base
-  belongs_to :context, :polymorphic => true # only Account now; we dropped Course level role overrides
+  belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Account']
   has_many :children, :class_name => "Role", :foreign_key => "parent_id"
   belongs_to :parent, :class_name => "Role"
 

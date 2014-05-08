@@ -68,6 +68,7 @@ class Assignment < ActiveRecord::Base
   has_one :teacher_enrollment, :class_name => 'TeacherEnrollment', :foreign_key => 'course_id', :primary_key => 'context_id', :include => :user, :conditions => ["enrollments.workflow_state = 'active' AND enrollments.type = 'TeacherEnrollment'"]
   has_many :ignores, :as => :asset
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course']
   belongs_to :grading_standard
   belongs_to :group_category
 

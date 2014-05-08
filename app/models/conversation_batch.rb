@@ -5,6 +5,7 @@ class ConversationBatch < ActiveRecord::Base
   belongs_to :user
   belongs_to :root_conversation_message, :class_name => 'ConversationMessage'
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Account', 'Course']
 
   EXPORTABLE_ATTRIBUTES = [
     :id, :workflow_state, :user_id, :recipient_ids, :root_conversation_message_id, :conversation_message_ids, :tags, :created_at, :updated_at, :context_type,

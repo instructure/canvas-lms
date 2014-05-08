@@ -25,8 +25,10 @@ class RubricAssociation < ActiveRecord::Base
   attr_accessible :rubric, :association_object, :context, :use_for_grading, :title, :description, :summary_data, :purpose, :url, :hide_score_total, :bookmarked
   belongs_to :rubric
   belongs_to :association_object, :polymorphic => true, :foreign_type => :association_type, :foreign_key => :association_id
+  validates_inclusion_of :association_type, 'allow_nil' => true, :in => ['Account', 'Course', 'Assignment']
 
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account']
   has_many :rubric_assessments, :dependent => :nullify
   has_many :assessment_requests, :dependent => :destroy
 
