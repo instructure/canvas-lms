@@ -3,7 +3,7 @@ utils.onPage(/^\/courses\/\d+\/users$/, function() {
     function removeUnusedRoles(index) {
         var $this = $(this);
         var val = $this.val();
-        if (val && !(val === '' || val === 'Contributor' || val === 'Moderator')) {
+        if (!(val === '' || val === 'Contributor' || val === 'Moderator')) {
           $this.remove()
         }
     }
