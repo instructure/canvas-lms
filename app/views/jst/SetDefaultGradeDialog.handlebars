@@ -1,10 +1,10 @@
 <form action="{{url}}" method="POST" title="{{#t "dialog_title"}}Default grade for {{assignment.name}}{{/t}}">
-  <input type="hidden" name="assignment_id" class="assignment_id" value="{{assignment.id}}"/> 
+  <input type="hidden" name="assignment_id" class="assignment_id" value="{{assignment.id}}"/>
   <div>
     {{#t "default_grades"}}
       Give all students the same grade for <b>{{assignment.name}}</b> by entering and submitting a grade value below:
     {{/t}}
-  </div> 
+  </div>
   <p style="text-align: center;" class="grading_box_holder">
     {{> grading_box}}
   </p>

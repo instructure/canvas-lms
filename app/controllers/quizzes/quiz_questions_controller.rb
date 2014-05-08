@@ -184,7 +184,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
   #
   # @returns [QuizQuestion]
   def index
-    if authorized_action(@quiz, @current_user, :read)
+    if authorized_action(@quiz, @current_user, :update)
       scope = @quiz.quiz_questions
       api_route = polymorphic_url([:api, :v1, @context, :quiz_questions])
       @questions = Api.paginate(scope, self, api_route)
@@ -208,7 +208,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
   #
   # @returns QuizQuestion
   def show
-    if authorized_action(@quiz, @current_user, :read)
+    if authorized_action(@quiz, @current_user, :update)
       render :json => question_json(@question,
         @current_user,
         session,

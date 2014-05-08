@@ -41,8 +41,10 @@ class CrocodocDocument < ActiveRecord::Base
       crocodoc_api.upload(url)
     }
 
-    if response['uuid']
+    if response && response['uuid']
       update_attributes :uuid => response['uuid'], :process_state => 'QUEUED'
+    elsif response.nil?
+      raise "no response received (request timed out?)"
     else
       raise response.inspect
     end

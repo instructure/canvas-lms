@@ -47,7 +47,7 @@ define [
         @contexts.splice index, 1
       else
         @contexts.push context
-        @contexts.shift if @contexts.length > 10
+        @contexts.shift() if @contexts.length > 10
       @notify()
 
     notify: ->

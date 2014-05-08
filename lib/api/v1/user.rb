@@ -111,7 +111,7 @@ module Api::V1::User
   def user_json_is_admin?(context = @context, current_user = @current_user)
     return false if context.nil? || current_user.nil?
     @user_json_is_admin ||= {}
-    @user_json_is_admin[[context.class.name, context.id, current_user.id]] ||= (
+    @user_json_is_admin[[context.class.name, context.global_id, current_user.global_id]] ||= (
       if context.is_a?(::UserProfile)
         permissions_context = permissions_account = @domain_root_account
       else

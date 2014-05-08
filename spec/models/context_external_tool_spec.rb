@@ -67,14 +67,13 @@ describe ContextExternalTool do
                 :selection_width => 50,
                 :selection_height => 50
         }
-        @tool.save!
-        launch = @tool.create_launch(@course, @user, "http://test.com", :selection_type => type)
-        launch.resource_type.should == type
+
+        launch_url = @tool.extension_setting(type, :url)
 
         if nav_url
-          launch.url.should == nav_url
+          launch_url.should == nav_url
         else
-          launch.url.should == @tool.url
+          launch_url.should == @tool.url
         end
       end
     end
@@ -332,14 +331,16 @@ describe ContextExternalTool do
         }
         @tool.save!
 
-        hash = @tool.create_launch(@course, @user, "http://test.com", :selection_type => type).generate
+        hash = {}
+        @tool.set_custom_fields(hash, type)
         hash["custom_a"].should == "1"
         hash["custom_b"].should == "5"
         hash["custom_c"].should == "3"
 
+        hash = {}
         @tool.settings[type.to_sym][:custom_fields] = nil
-        @tool.save!
-        hash = @tool.create_launch(@course, @user, "http://test.com", :selection_type => type).generate
+        @tool.set_custom_fields(hash, type)
+
         hash["custom_a"].should == "1"
         hash["custom_b"].should == "2"
         hash.has_key?("custom_c").should == false

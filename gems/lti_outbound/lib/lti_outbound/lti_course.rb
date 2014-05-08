@@ -1,6 +1,6 @@
 module LtiOutbound
   class LTICourse < LTIContext
-    attr_accessor :course_code, :name
+    proc_accessor :course_code, :name
 
     add_variable_mapping '$Canvas.course.id', :id
     add_variable_mapping '$Canvas.course.sisSourceId', :sis_source_id

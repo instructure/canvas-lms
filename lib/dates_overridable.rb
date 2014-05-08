@@ -127,7 +127,7 @@ module DatesOverridable
   def formatted_dates_hash(dates)
     dates = dates.sort_by do |date|
       due_at = date[:due_at]
-      [ due_at.present? ? SortFirst : SortLast, due_at.presence || SortFirst ]
+      [ due_at.present? ? CanvasSort::First : CanvasSort::Last, due_at.presence || CanvasSort::First ]
     end
 
     dates.map { |h| h.slice(:id, :due_at, :unlock_at, :lock_at, :title, :base) }

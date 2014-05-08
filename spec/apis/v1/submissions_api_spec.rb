@@ -209,6 +209,43 @@ describe 'Submissions API', type: :request do
       json["grade"].should == "5"
     end
 
+    it "should not show rubric assessments to students on muted assignments" do
+      @a1.mute!
+      sub = @a1.grade_student(@student1, :grade => 5).first
+
+      rubric = rubric_model(
+        :user => @teacher,
+        :context => @course,
+        :data => larger_rubric_data
+      )
+      @a1.create_rubric_association(
+        :rubric => rubric,
+        :purpose => 'grading',
+        :use_for_grading => true,
+        :context => @course
+      )
+      ra = @a1.rubric_association.assess(
+        :assessor => @teacher,
+        :user => @student1,
+        :artifact => sub,
+        :assessment => {
+          :assessment_type => 'grading',
+          :criterion_crit1 => { :points => 3 },
+          :criterion_crit2 => { :points => 2, :comments => 'Hmm'}
+        }
+      )
+
+      @user = @student1
+      json = api_call(:get,
+            "/api/v1/sections/sis_section_id:my-section-sis-id/assignments/#{@a1.id}/submissions/#{@student1.id}",
+            { :controller => 'submissions_api', :action => 'show',
+              :format => 'json', :section_id => 'sis_section_id:my-section-sis-id',
+              :assignment_id => @a1.id.to_s, :user_id => @student1.id.to_s },
+            { :include => %w(submission_comments rubric_assessment) })
+
+      json['rubric_assessment'].should be_nil
+    end
+
     it "should not find sections in other root accounts" do
       acct = account_model(:name => 'other root')
       @first_course = @course

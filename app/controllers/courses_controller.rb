@@ -44,6 +44,34 @@ require 'set'
 #       }
 #     }
 #
+# @model CourseProgress
+#     {
+#       "id": "CourseProgress",
+#       "description": "",
+#       "properties": {
+#         "requirement_count": {
+#           "description": "total number of requirements from all modules",
+#           "example": 10,
+#           "type": "integer"
+#         },
+#         "requirement_completed_count": {
+#           "description": "total number of requirements the user has completed from all modules",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "next_requirement_url": {
+#           "description": "url to next module item that has an unmet requirement. null if the user has completed the course or the current module does not require sequential progress",
+#           "example": "http://localhost/courses/1/modules/items/2",
+#           "type": "string"
+#         },
+#         "completed_at": {
+#           "description": "date the course was completed. null if the course has not been completed by this user",
+#           "example": "2013-06-01T00:00:00-06:00",
+#           "type": "datetime"
+#         }
+#       }
+#     }
+#
 # @model Course
 #     {
 #       "id": "Course",
@@ -138,6 +166,10 @@ require 'set'
 #           "description": "optional: the enrollment term object for the course returned only if include[]=term",
 #           "$ref": "Term"
 #         },
+#         "course_progress": {
+#           "description": "optional (beta): information on progress through the course returned only if include[]=course_progress",
+#           "$ref": "CourseProgress"
+#         },
 #         "apply_assignment_group_weights": {
 #           "description": "weight final grade based on assignment group percentages",
 #           "example": true,
@@ -225,7 +257,7 @@ class CoursesController < ApplicationController
   #   'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'ObserverEnrollment',
   #   or 'DesignerEnrollment'.
   #
-  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"total_scores"|"term"]
+  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"total_scores"|"term"|"course_progress"]
   #   - "needs_grading_count": Optional information to include with each Course.
   #     When needs_grading_count is given, and the current user has grading
   #     rights, the total number of submissions needing grading for all
@@ -247,6 +279,18 @@ class CoursesController < ApplicationController
   #   - "term": Optional information to include with each Course. When
   #     term is given, the information for the enrollment term for each course
   #     is returned.
+  #   - "course_progress": Optional information to include with each Course.
+  #     When course_progress is given, each course will include a
+  #     'course_progress' object with the fields: 'requirement_count', an integer
+  #     specifying the total number of requirements in the course,
+  #     'requirement_completed_count', an integer specifying the total number of
+  #     requirements in this course that have been completed, and
+  #     'next_requirement_url', a string url to the next requirement item, and
+  #     'completed_at', the date the course was completed (null if incomplete).
+  #     'next_requirement_url' will be null if all requirements have been
+  #     completed or the current module does not require sequential progress.
+  #     "course_progress" will return an error message if the course is not
+  #     module based or the user is not enrolled as a student in the course.
   #
   # @argument state[] [Optional, String, "unpublished"|"available"|"completed"|"deleted"]
   #   If set, only return courses that are in the given state(s).
@@ -293,9 +337,7 @@ class CoursesController < ApplicationController
 
         hash = []
         enrollments_by_course = enrollments.group_by(&:course_id).values
-        # TODO temporary! remove this default_per_page parameter once dependent
-        # applications have had a chance to start honoring the pagination
-        enrollments_by_course = Api.paginate(enrollments_by_course, self, api_v1_courses_url, default_per_page: Api.max_per_page) if api_request?
+        enrollments_by_course = Api.paginate(enrollments_by_course, self, api_v1_courses_url) if api_request?
         enrollments_by_course.each do |course_enrollments|
           course = course_enrollments.first.course
           hash << course_json(course, @current_user, session, includes, course_enrollments)
@@ -437,6 +479,7 @@ class CoursesController < ApplicationController
           @course.enroll_user(@current_user, 'TeacherEnrollment', :enrollment_state => 'active') if params[:enroll_me].to_s == 'true'
           # offer updates the workflow state, saving the record without doing validation callbacks
           @course.offer if api_request? and params[:offer].present?
+
           format.html { redirect_to @course }
           format.json { render :json => course_json(
             @course,
@@ -956,7 +999,7 @@ class CoursesController < ApplicationController
     elsif !@current_user && enrollment.user.registered? || !enrollment.user.email_channel
       session[:return_to] = course_url(@context.id)
       flash[:notice] = t('notices.login_to_accept', "You'll need to log in before you can accept the enrollment.")
-      return redirect_to login_url(:re_login => 1) if @current_user
+      return redirect_to login_url(:force_login => 1) if @current_user
       redirect_to login_url
     else
       # defer to CommunicationChannelsController#confirm for the logic of merging users
@@ -1498,8 +1541,8 @@ class CoursesController < ApplicationController
       authorized_action(@context, @current_user, :read_as_admin) &&
       authorized_action(@domain_root_account.manually_created_courses_account, @current_user, [:create_courses, :manage_courses])
     # For prepopulating the date fields
-    js_env(:OLD_START_DATE => datetime_string(@context.start_at, :verbose, nil, true))
-    js_env(:OLD_END_DATE => datetime_string(@context.conclude_at, :verbose, nil, true))
+    js_env(:OLD_START_DATE => unlocalized_datetime_string(@context.start_at, :verbose))
+    js_env(:OLD_END_DATE => unlocalized_datetime_string(@context.conclude_at, :verbose))
   end
 
   def copy_course
@@ -1557,6 +1600,12 @@ class CoursesController < ApplicationController
   #
   # For possible arguments, see the Courses#create documentation (note: the enroll_me param is not allowed in the update action).
   #
+  # Additional arguments available for Courses#update
+  #
+  # @argument course[grading_standard_id] [Optional, Integer]
+  #   The grading standard id to set for the course.  If no value is provided for this argument the current grading_standard will be un-set from this course.
+  #
+  #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/<course_id> \
   #     -X PUT \
@@ -1585,10 +1634,6 @@ class CoursesController < ApplicationController
       if root_account_id && Account.site_admin.grants_right?(@current_user, session, :manage_courses)
         @course.root_account = Account.root_accounts.find(root_account_id)
       end
-      standard_id = params[:course].delete :grading_standard_id
-      if standard_id.present? && @course.grants_right?(@current_user, session, :manage_grades)
-        @course.grading_standard = GradingStandard.standards_for(@course).find_by_id(standard_id)
-      end
       if @course.root_account.grants_right?(@current_user, session, :manage_courses)
         if params[:course][:account_id]
           account = api_find(Account, params[:course].delete(:account_id))
@@ -1601,6 +1646,18 @@ class CoursesController < ApplicationController
         params[:course].delete :account_id
         params[:course].delete :term_id
         params[:course].delete :enrollment_term_id
+      end
+
+      if params[:course].has_key? :grading_standard_id
+        standard_id = params[:course].delete :grading_standard_id
+        if @course.grants_right?(@current_user, session, :manage_grades)
+          if standard_id.present?
+            grading_standard = GradingStandard.standards_for(@course).find_by_id(standard_id)
+            @course.grading_standard = grading_standard if grading_standard
+          else
+            @course.grading_standard = nil
+          end
+        end
       end
       unless @course.account.grants_right? @current_user, session, :manage_storage_quotas
         params[:course].delete :storage_quota

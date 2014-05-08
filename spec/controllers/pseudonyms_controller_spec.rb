@@ -237,6 +237,7 @@ describe PseudonymsController do
 
       it 'lets user create pseudonym for self' do
         post 'create', :user_id => @user.id, :pseudonym => { :account_id => Account.default.id, :unique_id => 'a_new_unique_name' }
+        response.should be_redirect
         @user.reload.pseudonyms.map(&:unique_id).should include('a_new_unique_name')
       end
 
@@ -245,6 +246,32 @@ describe PseudonymsController do
         Account.site_admin.add_user(siteadmin)
         Account.default.add_user(siteadmin)
         post 'create', :user_id => siteadmin.id, :pseudonym => { :account_id => Account.site_admin.id, :unique_id => 'a_new_unique_name' }
+        assert_unauthorized
+      end
+
+      it 'will not allow default admin to create pseudonym in another account' do
+        user2 = User.create!
+        Account.default.pseudonyms.create!(unique_id: 'user', user: user2)
+        account2 = Account.create!
+
+        LoadAccount.stubs(:default_domain_root_account).returns(account2)
+        post 'create', user_id: user2.id, pseudonym: { unique_id: 'user' }
+        assert_unauthorized
+      end
+
+      it 'will not allow default admin to create pseudonym in site admin' do
+        user2 = User.create!
+        Account.default.pseudonyms.create!(unique_id: 'user', user: user2)
+        Account.site_admin.add_user(user2)
+
+        LoadAccount.stubs(:default_domain_root_account).returns(Account.site_admin)
+        post 'create', user_id: user2.id, pseudonym: { unique_id: 'user' }
+        assert_unauthorized
+      end
+
+      it 'will not allow admin to add pseudonyms to unrelated users' do
+        user2 = User.create!
+        post 'create', user_id: user2.id, pseudonym: { unique_id: 'user' }
         assert_unauthorized
       end
     end
@@ -258,20 +285,34 @@ describe PseudonymsController do
         user_session(@user, @pseudonym)
       end
 
-      it "should ignore use the domain_root_account" do
+      it "should use the domain_root_account" do
         post 'create', :format => 'json', :user_id => @user.id, :pseudonym => { :unique_id => 'unique1' }
         response.should be_success
         @user.pseudonyms.size.should == 2
         (@user.pseudonyms - [@pseudonym]).last.account.should == @account
       end
 
-      it "should ignore account id in params and use the domain_root_account" do
+      it "should allow explicit account id in params as long as they have permission" do
         @account2 = Account.create!
-        post 'create', :format => 'json', :user_id => @user.id, :pseudonym => { :account_id => @account2.id, :unique_id => 'unique1' }
+        post 'create', :format => 'json', :user_id => @user.id, :pseudonym => { :account_id => @account.id, :unique_id => 'unique1' }
         response.should be_success
         @user.pseudonyms.size.should == 2
         (@user.pseudonyms - [@pseudonym]).last.account.should == @account
       end
+
+      it "should raise permission error if no permission on explict account id in params" do
+        @account2 = Account.create!
+        post 'create', :user_id => @user.id, :pseudonym => { :account_id => @account2.id, :unique_id => 'unique1' }
+        assert_unauthorized
+      end
+    end
+
+    it "should not allow user to add their own pseudonym to an arbitrary account" do
+      user_with_pseudonym(active_all: true)
+      account2 = Account.create!
+      user_session(@user, @pseudonym)
+      post 'create', user_id: @user.id, pseudonym: { account_id: account2.id, unique_id: 'user' }
+      assert_unauthorized
     end
   end
 

@@ -187,14 +187,23 @@ define [
         top: '-9999px'
       ).appendTo('body')
 
+    modelCache: new Backbone.Collection()
+
+    # Internal: Add the given model to the cache.
+    #
+    # This is necessary because previously selected
+    # tokens may not be present in the collection.
+    _addToModelCache: (model) =>
+      @modelCache.add(model)
+
     # Internal: Get the given model from the collection.
     #
     # id - The ID of the model to return.
     #
     # Returns a model object.
-    _getModel: (id) ->
+    _getModel: (id) =>
       id = id && String(id)
-      result = @resultCollection.find((model) -> model.id == id)
+      result = @modelCache.get(id)
 
     # Internal: Remove the "selected" class from result list items.
     #
@@ -262,6 +271,7 @@ define [
     # Returns nothing.
     _onSearchResultLoad: =>
       @cache[@currentUrl] = @resultCollection.toJSON()
+      @resultCollection.each @_addToModelCache
       _.extend(@permissions, @_getPermissions())
       @_addEveryoneResult(@resultCollection) unless @excludeAll or !@_canSendToAll()
       shouldDrawResults = @resultCollection.length
@@ -559,6 +569,12 @@ define [
     tokenParams: ->
       _.map(@tokens, (t) -> if (t).match then t else "user_#{t}")
 
+    # Public: Get the currently selected models.
+    #
+    # Returns an array of models.
+    tokenModels: ->
+      _.map(@tokens, @_getModel)
+
     # Public: Set the current course context.
     #
     # context - A context string, e.g. "course_123"
@@ -586,4 +602,6 @@ define [
     #
     # Returns nothing.
     setTokens: (tokens) ->
-      _.each(tokens, @_addToken)
+      _.each tokens, (token) =>
+        @_addToModelCache(token)
+        @_addToken(token)

@@ -68,7 +68,7 @@ describe ContextModuleProgression do
       ContextModuleProgression.prerequisites_satisfied?(@user, @module3).should == true
     end
 
-    it "should be satisfied if dependant on both a published and unpublished module" do
+    it "should be satisfied if dependent on both a published and unpublished module" do
       @module3.prerequisites = "module_#{@module.id}"
       @module3.prerequisites = [{:type=>"context_module", :id=>@module.id, :name=>@module.name}, {:type=>"context_module", :id=>@module2.id, :name=>@module2.name}]
       @module3.save!

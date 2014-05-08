@@ -41,11 +41,9 @@ define([
   var showDeauthorizedDialog;
   var quizSubmission = (function() {
     var timeMod = 0,
-        startedAt =  $(".started_at"),
         endAt = $(".end_at"),
-        startedAtText = startedAt.text(),
-        endAtText = endAt.text(),
-        endAtParsed = endAtText && new Date(endAtText),
+        endAtParsed = endAt.text() && new Date(endAt.text()),
+        startedAt = $(".started_at"),
         inBackground = false,
         $countdownSeconds = $(".countdown_seconds"),
         $timeRunningTimeRemaining = $(".time_running,.time_remaining"),
@@ -53,7 +51,6 @@ define([
 
     return {
       countDown: null,
-      isDeadline: true,
       fiveMinuteDeadline: false,
       oneMinuteDeadline: false,
       submitting: false,
@@ -62,10 +59,9 @@ define([
       contentBoxCounter: 0,
       lastSubmissionUpdate: new Date(),
       currentlyBackingUp: false,
-      startedAt: startedAt,
       endAt: endAt,
-      startedAtText: startedAtText,
-      timeLimit: parseInt($(".time_limit").text(), 10) || null,
+      endAtParsed: endAtParsed,
+      startedAt: startedAt,
       hasTimeLimit: !!ENV.QUIZ.time_limit,
       timeLeft: parseInt($(".time_left").text()) * 1000,
       oneAtATime: $("#submit_quiz_form").hasClass("one_question_at_a_time"),
@@ -90,6 +86,7 @@ define([
           return;
         }
         if(quizSubmission.currentlyBackingUp) { return; }
+
         quizSubmission.currentlyBackingUp = true;
         quizSubmission.lastSubmissionUpdate = new Date();
         var data = $("#submit_quiz_form").getFormData();
@@ -141,7 +138,7 @@ define([
                 }
                 if(data && data.end_at) {
                   var endAtFromServer     = Date.parse(data.end_at),
-                      submissionEndAt     = Date.parse(quizSubmission.endAt.text()),
+                      submissionEndAt     = Date.parse(endAt.text()),
                       serverEndAtTime     = endAtFromServer.getTime(),
                       submissionEndAtTime = submissionEndAt.getTime();
 
@@ -155,8 +152,7 @@ define([
                       $.flashMessage(I18n.t('notices.less_time', 'Your time for this quiz has been reduced.'));
 
                     quizSubmission.endAt.text(data.end_at);
-                    endAtText   = data.end_at;
-                    endAtParsed = new Date(data.end_at);
+                    quizSubmission.endAtParsed = endAtFromServer;
                   }
                 }
               },
@@ -194,36 +190,19 @@ define([
         }
       },
 
-      updateCounter: function() {
-        $(".time_header").text(I18n.beforeLabel('time_elapsed', "Time Elapsed"));
-        var now = new Date().getTime();
-        var startedAt = Date.parse(quizSubmission.startedAtText).getTime();
-        var timeElapsed = now - startedAt;
-
-        quizSubmission.updateTimeString(timeElapsed);
-      },
-
       updateTime: function() {
-        if(quizSubmission.hasTimeLimit) {
-          var timeLeft = quizSubmission.timeLeft = quizSubmission.timeLeft - quizSubmission.clockInterval;
-        } else {
-          return quizSubmission.updateCounter();
-        }
-
+        var currentTimeLeft = quizSubmission.timeLeft = quizSubmission.timeLeft - quizSubmission.clockInterval;
         var now = new Date();
-        var endAt = quizSubmission.timeLimit ? endAtText : null;
+        var endAt = quizSubmission.endAt.text();
+
         timeMod = (timeMod + 1) % 120;
         if(timeMod == 0 && !endAt && !quizSubmission.twelveHourDeadline) {
-          var end = endAtParsed;
-          if(!quizSubmission.timeLimit && (end - now) < 43200000) {
-            endAt = endAtText;
-          }
+          var end = quizSubmission.endAtParsed;
         }
 
+        currentTimeLeft = quizSubmission.floorTimeLeft(currentTimeLeft);
+
         if(quizSubmission.countDown) {
-          if(timeLeft <= 0) {
-            timeLeft = 0;
-          }
           var s = new Date((quizSubmission.countDown - now.getTime())).getUTCSeconds();
           if(now.getTime() < quizSubmission.countDown) { $countdownSeconds.text(s); }
 
@@ -232,46 +211,79 @@ define([
             quizSubmission.submitQuiz();
           }
         }
-        if(quizSubmission.isDeadline) {
-          if(timeLeft < 1000) {
-            timeLeft = 0;
-          }
-          if(timeLeft < 1000 && !quizSubmission.dialogged) {
-            quizSubmission.dialogged = true;
-            quizSubmission.countDown = new Date(now.getTime() + 10000);
 
-            $("#times_up_dialog").show().dialog({
-              title: I18n.t('titles.times_up', "Time's Up!"),
-              width: "auto",
-              height: "auto",
-              modal: true,
-              overlay: {
-                backgroundColor: "#000",
-                opacity: 0.7
-              },
-              close: function() {
-                if(!quizSubmission.submitting) {
-                  quizSubmission.submitting = true;
-                  quizSubmission.submitQuiz();
-                }
-              }
-            });
-          } else if(timeLeft >    30000 && timeLeft <    60000 && !quizSubmission.oneMinuteDeadline) {
-            quizSubmission.oneMinuteDeadline = true;
-            $.flashMessage(I18n.t('notices.one_minute_left', "One Minute Left"));
-          } else if(timeLeft >   250000 && timeLeft <   300000 && !quizSubmission.fiveMinuteDeadline) {
-            quizSubmission.fiveMinuteDeadline = true;
-            $.flashMessage(I18n.t('notices.five_minutes_left', "Five Minutes Left"));
-          } else if(timeLeft >  1800000 && timeLeft <  1770000 && !quizSubmission.thirtyMinuteDeadline) {
-            quizSubmission.thirtyMinuteDeadline = true;
-            $.flashMessage(I18n.t('notices.thirty_minutes_left', "Thirty Minutes Left"));
-          } else if(timeLeft > 43200000 && timeLeft < 43170000 && !quizSubmission.twelveHourDeadline) {
-            quizSubmission.twelveHourDeadline = true;
-            $.flashMessage(I18n.t('notices.twelve_hours_left', "Twelve Hours Left"));
-          }
+        if(quizSubmission.isTimeUp(currentTimeLeft)) {
+          quizSubmission.showTimeUpDialog(now);
+        } else {
+          quizSubmission.showWarnings(currentTimeLeft);
+        }
+        quizSubmission.updateTimeDisplay(currentTimeLeft);
+      },
+
+      floorTimeLeft: function(timeLeft) {
+        if(timeLeft < 1000) {
+          timeLeft = 0;
         }
 
-        quizSubmission.updateTimeString(timeLeft);
+        return timeLeft;
+      },
+
+      isTimeUp: function(currentTimeLeft) {
+        return currentTimeLeft < 1000 && !quizSubmission.dialogged;
+      },
+
+      showWarnings: function(currentTimeLeft) {
+        if(currentTimeLeft > 30000 && currentTimeLeft < 60000 && !quizSubmission.oneMinuteDeadline) {
+          quizSubmission.oneMinuteDeadline = true;
+          $.flashMessage(I18n.t('notices.one_minute_left', "One Minute Left"));
+        } else if(currentTimeLeft > 250000 && currentTimeLeft < 300000 && !quizSubmission.fiveMinuteDeadline) {
+          quizSubmission.fiveMinuteDeadline = true;
+          $.flashMessage(I18n.t('notices.five_minutes_left', "Five Minutes Left"));
+        } else if(currentTimeLeft > 1800000 && currentTimeLeft < 1770000 && !quizSubmission.thirtyMinuteDeadline) {
+          quizSubmission.thirtyMinuteDeadline = true;
+          $.flashMessage(I18n.t('notices.thirty_minutes_left', "Thirty Minutes Left"));
+        } else if(currentTimeLeft > 43200000 && currentTimeLeft < 43170000 && !quizSubmission.twelveHourDeadline) {
+          quizSubmission.twelveHourDeadline = true;
+          $.flashMessage(I18n.t('notices.twelve_hours_left', "Twelve Hours Left"));
+        }
+      },
+
+      showTimeUpDialog: function(now) {
+        quizSubmission.dialogged = true;
+        quizSubmission.countDown = new Date(now.getTime() + 10000);
+
+        $("#times_up_dialog").show().dialog({
+          title: I18n.t('titles.times_up', "Time's Up!"),
+          width: "auto",
+          height: "auto",
+          modal: true,
+          overlay: {
+            backgroundColor: "#000",
+            opacity: 0.7
+          },
+          close: function() {
+            if(!quizSubmission.submitting) {
+              quizSubmission.submitting = true;
+              quizSubmission.submitQuiz();
+            }
+          }
+        });
+
+      },
+
+      getTimeElapsed: function() {
+        $(".time_header").text(I18n.beforeLabel('time_elapsed', "Time Elapsed"));
+        var now = new Date().getTime();
+        var startedAt = Date.parse(quizSubmission.startedAt.text()).getTime();
+        return now - startedAt;
+      },
+
+      updateTimeDisplay: function(currentTimeLeft) {
+        if(quizSubmission.hasTimeLimit) {
+          quizSubmission.updateTimeString(currentTimeLeft);
+        } else {
+          quizSubmission.updateTimeString(quizSubmission.getTimeElapsed());
+        }
       },
 
       updateTimeString: function(timeDiff) {
@@ -291,6 +303,7 @@ define([
         if(true || sec) { times.push(I18n.t('seconds_count', "Second", {'count': sec})); }
         $timeRunningTimeRemaining.text(times.join(", "));
       },
+
       updateFinalSubmitButtonState: function() {
         var allQuestionsAnswered = ($("#question_list li:not(.answered)").length == 0);
         var lastQuizPage = ($("#submit_quiz_form").hasClass('last_page'));

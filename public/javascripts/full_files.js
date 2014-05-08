@@ -2026,8 +2026,8 @@ define([
         $("#lock_item_dialog form").hide();
 
         $form.show();
-        data.lock_at = $.datetimeString(data.last_lock_at);
-        data.unlock_at = $.datetimeString(data.last_unlock_at);
+        data.lock_at = $.datetimeString(data.last_lock_at, false);
+        data.unlock_at = $.datetimeString(data.last_unlock_at, false);
         data.locked = (!data.lock_at && !data.unlock_at) ? '1' : '0';
         $("#lock_item_dialog").fillTemplateData({data: {name: data.name}});
 
@@ -2154,6 +2154,9 @@ define([
           cancelImg: '/images/blank.png',
           onInit: function() {
             $add_file_link.text(I18n.t('links.add_files', "Add Files")).triggerHandler('show');
+          },
+          onFallback: function() {
+            $swfupload_holder.hide(); // hide to allow click-through to Add File link when Flash is unavailable
           },
           onSelect: fileUpload.swfFileQueue,
           onCancel: fileUpload.swfCancel,

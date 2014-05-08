@@ -4,11 +4,6 @@ gemspec
 gem 'simplecov', '0.8.2', :require => false
 gem 'simplecov-rcov', '0.2.3', :require => false
 
-if CANVAS_RAILS3
-  gem 'rails', '3.2.15'
-else
-  gem 'rails', :github => 'makandra/rails', :branch => '2-3-lts', :ref => 'e86daf8ff727d5efc0040c876ba00c9444a5d915'
-end
 
 platforms :ruby_20, :ruby_21 do
   gem 'syck', '1.0.1'

@@ -2930,13 +2930,13 @@ describe Course, ".import_from_migration" do
   end
 
   it "should wait for media objects on canvas cartridge import" do
-    migration = mock(:migration_settings => { 'worker_class' => 'CC::Importer::Canvas::Converter' }.with_indifferent_access)
+    migration = mock(:canvas_import? => true)
     MediaObject.expects(:add_media_files).with([@attachment], true)
     @course.import_media_objects([@attachment], migration)
   end
 
   it "should not wait for media objects on other import" do
-    migration = mock(:migration_settings => { 'worker_class' => 'CC::Importer::Standard::Converter' }.with_indifferent_access)
+    migration = mock(:canvas_import? => false)
     MediaObject.expects(:add_media_files).with([@attachment], false)
     @course.import_media_objects([@attachment], migration)
   end
@@ -2990,6 +2990,17 @@ describe Course, ".import_from_migration" do
     end
   end
 
+  describe "shift_date_options" do
+    it "should default options[:time_zone] to the root account's time zone" do
+      account = Account.default.sub_accounts.create!
+      course_with_teacher(account: account)
+      @course.root_account.default_time_zone = 'America/New_York'
+      @course.start_at = 1.month.ago
+      @course.conclude_at = 1.month.from_now
+      options = @course.shift_date_options(@course, {})
+      options[:time_zone].should == ActiveSupport::TimeZone['Eastern Time (US & Canada)']
+    end
+  end
 end
 
 describe Course, "enrollments" do

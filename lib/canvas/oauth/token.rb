@@ -47,7 +47,7 @@ module Canvas::Oauth
     end
 
     def access_token
-      @access_token ||= self.class.find_userinfo_access_token(user, key, scopes, purpose)
+      @access_token ||= self.class.find_reusable_access_token(user, key, scopes, purpose)
 
       if @access_token.nil?
         @access_token = user.access_tokens.create!({:developer_key => key, :remember_access => remember_access?, :scopes => scopes, :purpose => purpose})
@@ -57,6 +57,14 @@ module Canvas::Oauth
       @access_token
     end
 
+    def self.find_reusable_access_token(user, key, scopes, purpose)
+      if key.trusted?
+        find_access_token(user, key, scopes, purpose)
+      elsif AccessToken.scopes_match?(scopes, ["userinfo"])
+        find_userinfo_access_token(user, key, purpose)
+      end
+    end
+
     def as_json(options={})
       {
         'access_token' => access_token.full_token,
@@ -64,10 +72,14 @@ module Canvas::Oauth
       }
     end
 
-    def self.find_userinfo_access_token(user, developer_key, scopes, purpose)
+    def self.find_userinfo_access_token(user, developer_key, purpose)
+      find_access_token(user, developer_key, ["userinfo"], purpose, {remember_access: true})
+    end
+
+    def self.find_access_token(user, developer_key, scopes, purpose, conditions = {})
       user.shard.activate do
-        user.access_tokens.active.where(:remember_access => true, :developer_key_id => developer_key, :purpose => purpose).detect do |token|
-          token.scoped_to?(scopes) && token.scoped_to?(['userinfo'])
+        user.access_tokens.active.where({:developer_key_id => developer_key, :purpose => purpose}.merge(conditions)).detect do |token|
+          token.scoped_to?(scopes)
         end
       end
     end

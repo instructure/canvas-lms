@@ -24,6 +24,7 @@ module CC::Importer::Canvas
     include TopicConverter
     include WebcontentConverter
     include QuizConverter
+    include MediaTrackConverter
 
     MANIFEST_FILE = "imsmanifest.xml"
 
@@ -56,6 +57,8 @@ module CC::Importer::Canvas
       set_progress(60)
       package_course_files
       set_progress(70)
+      @course[:media_tracks] = convert_media_tracks(settings_doc(MEDIA_TRACKS))
+      set_progress(71)
       convert_quizzes if Qti.qti_enabled?
       set_progress(80)
       

@@ -37,6 +37,33 @@ describe Lti::LtiContextCreator do
 
   describe "#convert" do
 
+    describe "consumer instance" do
+      let(:canvas_user) { user(name: 'Shorty McLongishname') }
+      let(:lti_context_creator) { Lti::LtiContextCreator.new(canvas_user, canvas_tool) }
+
+      it "generates a consumer instance from the tool" do
+        consumer_instance = lti_context_creator.convert.consumer_instance
+
+        consumer_instance.should be_a(LtiOutbound::LTIConsumerInstance)
+        consumer_instance.name.should == 'root_account'
+        consumer_instance.lti_guid.should == 'lti_guid'
+        consumer_instance.domain.should == 'account_domain'
+        consumer_instance.id.should == 42
+        consumer_instance.sis_source_id.should == 'account_sis_id'
+      end
+
+      it "uses the consumer_instance_class property of LtiOutboundAdapter" do
+        some_class = Class.new(LtiOutbound::LTIConsumerInstance)
+        Lti::LtiOutboundAdapter.consumer_instance_class = some_class
+
+        consumer_instance = lti_context_creator.convert.consumer_instance
+
+        consumer_instance.should be_a(some_class)
+
+        Lti::LtiOutboundAdapter.consumer_instance_class = nil
+      end
+    end
+
     describe "for canvas user" do
       let(:canvas_user) { user(name: 'Shorty McLongishname') }
       let(:lti_context_creator) { Lti::LtiContextCreator.new(canvas_user, canvas_tool) }
@@ -50,17 +77,6 @@ describe Lti::LtiContextCreator do
         lti_user.opaque_identifier.should == 'opaque_id'
         lti_user.id.should == 123
         lti_user.name.should == 'Shorty McLongishname'
-      end
-
-      it "generates a consumer instance from the tool" do
-        consumer_instance = lti_context_creator.convert.consumer_instance
-
-        consumer_instance.should be_a(LtiOutbound::LTIConsumerInstance)
-        consumer_instance.name.should == 'root_account'
-        consumer_instance.lti_guid.should == 'lti_guid'
-        consumer_instance.domain.should == 'account_domain'
-        consumer_instance.id.should == 42
-        consumer_instance.sis_source_id.should == 'account_sis_id'
       end
     end
 

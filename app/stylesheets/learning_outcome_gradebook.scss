@@ -98,6 +98,7 @@ $page-dark: #ebeff2;
   border-left: 1px solid $border-dark;
   float: right;
   width: 265px;
+  position: relative;
 }
 
 .outcome-gradebook-sidebar .sidebar-toggle {
@@ -125,8 +126,16 @@ $page-dark: #ebeff2;
     padding: 0 4px;
   }
 
+  .operations li {
+    margin: 12px 0;
+  }
+
   .checkbox-label {
     display: none;
+  }
+  .operation-label {
+    position: absolute;
+    top: -999px;
   }
 
   .checkbox {
@@ -143,6 +152,25 @@ $page-dark: #ebeff2;
 
 .outcome-gradebook-sidebar-content {
   padding: 0 21px;
+
+  .operations {
+    border-top: 1px solid $border-sidebar;
+    position: absolute;
+    bottom: 0; left: 16px; right: 16px;
+
+    li {
+      margin: 12px;
+    }
+
+    a {
+      color: $font-color;
+      font-size: 16px;
+    }
+  }
+
+  .operation-label {
+    margin-left: 6px;
+  }
 }
 
 .gradebook-header .section-button-placeholder {

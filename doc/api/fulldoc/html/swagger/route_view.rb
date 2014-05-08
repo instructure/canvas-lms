@@ -22,11 +22,16 @@ class RouteView < HashView
     if CANVAS_RAILS2
       path = raw_route.segments.inject("") { |str,s| str << s.to_s }
     else
-      path = raw_route.path.spec.to_s
+      path = remove_parentheticals(raw_route.path.spec.to_s)
     end
-    path.chop! if path.length > 1 # remove trailing slash
+    path.chop! if path.length > 1 && path[-1] == '/' # remove trailing slash
     path
   end
+
+  def remove_parentheticals(str)
+    str.gsub(/\([^\)]+\)/, '')
+  end
+
 
   def path_variables
     api_path.scan(%r{:(\w+)}).map{ |v| v.first }
@@ -72,20 +77,8 @@ class RouteView < HashView
     arguments.map { |arg| arg.to_swagger }
   end
 
-  def unique_nickname_suffix
-    if method_view.routes.size == 1
-      ''
-    else
-      # This is a hack, and should probably be fixed in future. Rather than
-      # arbitrarily choosing the second segment of the path, we should use an
-      # algorithm to detect what part of the path makes this a unique route
-      # and use that.
-      '_' + api_path.scan(%r{/(\w+)}).map{ |v| v.first }[2]
-    end
-  end
-
   def nickname
-    method_view.nickname + unique_nickname_suffix
+    method_view.nickname + method_view.unique_nickname_suffix(self)
   end
 
   def operation

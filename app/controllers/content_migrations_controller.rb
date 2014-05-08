@@ -150,7 +150,7 @@ class ContentMigrationsController < ApplicationController
     if api_request?
       render :json => content_migration_json_hash
     else
-      @plugins = ContentMigration.migration_plugins(true).sort_by {|p| [p.metadata(:sort_order) || SortLast, p.metadata(:select_text)]}
+      @plugins = ContentMigration.migration_plugins(true).sort_by {|p| [p.metadata(:sort_order) || CanvasSort::Last, p.metadata(:select_text)]}
 
       options = @plugins.map{|p| {:label => p.metadata(:select_text), :id => p.id}}
 
@@ -159,8 +159,8 @@ class ContentMigrationsController < ApplicationController
       js_env :QUESTION_BANKS => @context.assessment_question_banks.except(:includes).select([:title, :id]).active
       js_env :COURSE_ID => @context.id
       js_env :CONTENT_MIGRATIONS => content_migration_json_hash
-      js_env(:OLD_START_DATE => datetime_string(@context.start_at, :verbose, nil, true))
-      js_env(:OLD_END_DATE => datetime_string(@context.conclude_at, :verbose, nil, true))
+      js_env(:OLD_START_DATE => unlocalized_datetime_string(@context.start_at, :verbose))
+      js_env(:OLD_END_DATE => unlocalized_datetime_string(@context.conclude_at, :verbose))
     end
   end
 

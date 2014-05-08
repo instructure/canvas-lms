@@ -29,40 +29,40 @@
         </label>
       </div>
     </div>
-    <hr/>
-    <fieldset>
-      <legend class="drop_rules_section">Number of scores to ignore for each student</legend>
+    {{#if editable_drop}}
+      <hr/>
+      <fieldset>
+        <legend class="drop_rules_section">Number of scores to ignore for each student</legend>
 
-      <div class="control-group">
-        <label class="control-label" for="ag_{{label_id}}_drop_lowest">
-          {{#t "drop_lowest"}}Lowest Scores:{{/t}}
-        </label>
-        <div class="controls">
-          <input
-            type="number"
-            id="ag_{{label_id}}_drop_lowest"
-            class="span1 field"
-            name="rules[drop_lowest]"
-            value="{{drop_lowest}}"
-          />
+        <div class="control-group">
+          <label class="control-label" for="ag_{{label_id}}_drop_lowest">
+            {{#t "drop_lowest"}}Lowest Scores:{{/t}}
+          </label>
+          <div class="controls">
+            <input
+              type="number"
+              id="ag_{{label_id}}_drop_lowest"
+              class="span1 field"
+              name="rules[drop_lowest]"
+              value="{{drop_lowest}}"
+            />
+          </div>
         </div>
-      </div>
-      <div class="control-group">
-        <label class="control-label" for="ag_{{label_id}}_drop_highest">
-          {{#t "drop_highest"}}Highest Scores:{{/t}}
-        </label>
-        <div class="controls">
-          <input
-            type="number"
-            id="ag_{{label_id}}_drop_highest"
-            class="span1 field"
-            name="rules[drop_highest]"
-            value="{{drop_highest}}"
-          />
+        <div class="control-group">
+          <label class="control-label" for="ag_{{label_id}}_drop_highest">
+            {{#t "drop_highest"}}Highest Scores:{{/t}}
+          </label>
+          <div class="controls">
+            <input
+              type="number"
+              id="ag_{{label_id}}_drop_highest"
+              class="span1 field"
+              name="rules[drop_highest]"
+              value="{{drop_highest}}"
+            />
+          </div>
         </div>
-      </div>
 
-      {{#if editable_never_drop}}
         <hr/>
         <div class="control-group">
           <label class="control-label" id="ag_{{label_id}}_never_drop">
@@ -71,9 +71,8 @@
           <div class="controls never_drop_rules_group">
           </div>
         </div>
-      {{/if}}
-    </fieldset>
-
+      </fieldset>
+    {{/if}}
   </div>
 </div>
 <div class="form-controls">

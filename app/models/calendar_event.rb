@@ -300,7 +300,7 @@ class CalendarEvent < ActiveRecord::Base
       self.workflow_state = 'deleted'
       self.deleted_at = Time.now.utc
       save!
-      child_events.each do |e|
+      child_events.find_each do |e|
         e.cancel_reason = cancel_reason
         e.updating_user = updating_user
         e.destroy(false)
@@ -451,7 +451,11 @@ class CalendarEvent < ActiveRecord::Base
   end
 
   def child_events_for(participant)
-    child_events.select{ |e| e.has_asset?(participant) }
+    if child_events.loaded?
+      child_events.select { |e| e.has_asset?(participant) }
+    else
+      child_events.where(context_type: participant.class.name, context_id: participant)
+    end
   end
 
   def participants_per_appointment

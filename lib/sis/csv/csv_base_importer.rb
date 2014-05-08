@@ -62,6 +62,7 @@ module SIS
 
       def importer_opts
         { :batch_id => @batch.try(:id),
+          :batch_user => @batch.try(:user),
           :logger => @sis.logger,
           :override_sis_stickiness => @sis.override_sis_stickiness,
           :add_sis_stickiness => @sis.add_sis_stickiness,

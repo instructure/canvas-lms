@@ -23,7 +23,7 @@ define [
     initDialog: =>
       templateLocals =
         assignment: @assignment
-        showPointsPossible: @assignment.points_possible || @assignment.points_possible == '0'
+        showPointsPossible: (@assignment.points_possible || @assignment.points_possible == '0') && @assignment.grading_type != "gpa_scale"
         url: "/courses/#{@context_id}/gradebook/update_submission"
       templateLocals["assignment_grading_type_is_#{@assignment.grading_type}"] = true
       @$dialog = $(setDefaultGradeDialogTemplate(templateLocals))

@@ -8,26 +8,21 @@ var fairSlicer = require('./lib/fair-slicer');
 var converter = require("color-convert");
 
 module.exports = {
-  lchToLab: function(lch) {
-    var l = lch[0];
-    var c = lch[1];
-    var h = lch[2] / 360 * 2 * Math.PI;
-    return [l, c * Math.cos(h), c * Math.sin(h)];
-  },
-
   hueToLch: function(options, h) {
+    h = Math.round(h);
     var l, c;
     if (options.l) {
       l = options.l;
       c = options.c;
     } else if (options.bright) {
-      l = 73;
-      c = 42;
+      l = 74;
+      c = 41;
     } else {
-      l = 50;
-      c = 32;
+      l = 49;
+      c = 29;
+
       // vary chroma to roughly match boundary of RGB-expressible colors
-      var delta = 18;
+      var delta = 17;
       var most_constrained_hue = 210;
       var hr = (h - most_constrained_hue) / 360 * 2 * Math.PI;
       c += delta - Math.round(delta * Math.cos(hr));
@@ -35,18 +30,12 @@ module.exports = {
     return [l, c, h]
   },
 
+  lchToRgb: function(lch) {
+    return converter.lch2rgb.apply(converter, lch);
+  },
+
   lchToCss: function(lch) {
-    return this.rgbToCss(this.labToRgb(this.lchToLab(lch)));
-  },
-
-  labToRgb: function(lab) {
-    var xyz = converter.lab2xyz.apply(converter, lab);
-    var rgb = converter.xyz2rgb.apply(converter, xyz);
-    return rgb;
-  },
-
-  rgbToCss: function(rgb) {
-    return "rgb("+rgb.join(',')+")";
+    return "rgb("+this.lchToRgb(lch).join(',')+")";
   },
 
   getLchColors: function(limit, startX, options) {
@@ -65,18 +54,13 @@ module.exports = {
     return slices.map(hueToLch);
   },
 
-  getLabColors: function(limit, startX, options) {
-    var lchColors = this.getLchColors(limit, startX, options);
-    return lchColors.map(this.lchToLab);
-  },
-
   getRgbColors: function(limit, startX, options) {
-    var labColors = this.getLabColors(limit, startX, options);
-    return labColors.map(this.labToRgb);
+    var lchColors = this.getLchColors(limit, startX, options);
+    return lchColors.map(this.lchToRgb);
   },
 
   getColors: function(limit, startX, options) {
-    var rgbColors = this.getRgbColors(limit, startX, options);
-    return rgbColors.map(this.rgbToCss);
+    var lchColors = this.getLchColors(limit, startX, options);
+    return lchColors.map(this.lchToCss.bind(this));
   }
 };
