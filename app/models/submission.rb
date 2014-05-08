@@ -113,7 +113,7 @@ class Submission < ActiveRecord::Base
   after_save :touch_user
   after_save :update_assignment
   after_save :update_attachment_associations
-  after_save :submit_attachments_to_crocodoc
+  after_save :submit_attachments_to_canvadocs
   after_save :queue_websnap
   after_save :update_final_score
   after_save :submit_to_turnitin_later
@@ -472,14 +472,15 @@ class Submission < ActiveRecord::Base
   end
   private :attachment_fake_belongs_to_group
 
-  def submit_attachments_to_crocodoc
+  def submit_attachments_to_canvadocs
     if attachment_ids_changed?
       attachments = attachment_associations.map(&:attachment)
       attachments.each do |a|
-        a.send_later_enqueue_args :submit_to_crocodoc,
-          :n_strand     => 'crocodoc',
+        a.send_later_enqueue_args :submit_to_canvadocs, {
+          :n_strand     => 'canvadocs',
           :max_attempts => 1,
           :priority => Delayed::LOW_PRIORITY
+        }, 1, wants_annotation: true
       end
     end
   end

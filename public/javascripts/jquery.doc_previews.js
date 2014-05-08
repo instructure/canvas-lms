@@ -91,7 +91,7 @@ define([
         // if I have a url to ping back to the app that I viewed this file inline, ping it.
         if (opts.attachment_view_inline_ping_url) {
           $.ajaxJSON(opts.attachment_view_inline_ping_url, 'POST', {}, function() { }, function() { });
-          $.trackEvent('Doc Previews', serviceUsed, JSON.stringify(opts, ['attachment_id', 'submission_id', 'mimetype', 'crocodoc_session_url', 'scribd_doc_id']));
+          $.trackEvent('Doc Previews', serviceUsed, JSON.stringify(opts, ['attachment_id', 'submission_id', 'mimetype', 'crocodoc_session_url', 'canvadoc_session_url', 'scribd_doc_id']));
         }
       }
 
@@ -104,6 +104,20 @@ define([
         iframe.appendTo($this);
         iframe.load(function() {
           tellAppIViewedThisInline('crocodoc');
+          if ($.isFunction(opts.ready))
+            opts.ready();
+        });
+      }
+      else if (opts.canvadoc_session_url) {
+        var iframe = $('<iframe/>', {
+            src: opts.canvadoc_session_url,
+            width: opts.width,
+            height: opts.height,
+            css: {border: 0}
+        });
+        iframe.appendTo($this);
+        iframe.load(function() {
+          tellAppIViewedThisInline('canvadocs');
           if ($.isFunction(opts.ready))
             opts.ready();
         });

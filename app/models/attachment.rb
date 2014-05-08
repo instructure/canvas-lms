@@ -67,6 +67,7 @@ class Attachment < ActiveRecord::Base
   has_one :thumbnail, :foreign_key => "parent_id", :conditions => {:thumbnail => "thumb"}
   has_many :thumbnails, :foreign_key => "parent_id"
   has_one :crocodoc_document
+  has_one :canvadoc
 
   before_save :infer_display_name
   before_save :default_values
@@ -1284,9 +1285,19 @@ class Attachment < ActiveRecord::Base
       CrocodocDocument::MIME_TYPES.include?(content_type)
   end
 
+  def canvadocable?
+    Canvadocs.enabled? && Canvadoc::MIME_TYPES.include?(content_type)
+  end
+
   def self.submit_to_scribd(ids)
     Attachment.find_all_by_id(ids).compact.each do |attachment|
       attachment.submit_to_scribd! rescue nil
+    end
+  end
+
+  def self.submit_to_canvadocs(ids)
+    Attachment.find_each(ids).each do |a|
+      a.submit_to_canvadocs
     end
   end
 
@@ -1309,11 +1320,12 @@ class Attachment < ActiveRecord::Base
   end
 
   def needs_scribd_doc?
-    if self.scribd_attempts >= MAX_SCRIBD_ATTEMPTS
+    if Canvadocs.enabled?
+      return false
+    elsif self.scribd_attempts >= MAX_SCRIBD_ATTEMPTS
       self.mark_errored
       false
-    end
-    if self.scribd_doc?
+    elsif self.scribd_doc?
       Scribd::API.instance.user = scribd_user
       begin
         status = self.scribd_doc.conversion_status
@@ -1383,6 +1395,31 @@ class Attachment < ActiveRecord::Base
       return true
     else
       return false
+    end
+  end
+
+  def submit_to_canvadocs(attempt = 1, opts = {})
+    # ... or crocodoc (this will go away soon)
+    return if Attachment.skip_3rd_party_submits?
+
+    if opts[:wants_annotation] && crocodocable?
+      submit_to_crocodoc(attempt)
+    elsif canvadocable?
+      doc = canvadoc || create_canvadoc
+      doc.upload
+      update_attribute(:workflow_state, 'processing')
+    end
+  rescue => e
+    update_attribute(:workflow_state, 'errored')
+    ErrorReport.log_exception(:canvadocs, e, :attachment_id => id)
+
+    if attempt <= Setting.get('max_canvadocs_attempts', '5').to_i
+      send_later_enqueue_args :submit_to_canvadocs, {
+        :n_strand => 'canvadocs_retries',
+        :run_at => (5 * attempt).minutes.from_now,
+        :max_attempts => 1,
+        :priority => Delayed::LOW_PRIORITY,
+      }, attempt + 1, opts
     end
   end
 
@@ -1696,6 +1733,10 @@ class Attachment < ActiveRecord::Base
     crocodoc_document.try(:available?)
   end
 
+  def canvadoc_available?
+    canvadoc.try(:available?)
+  end
+
   def view_inline_ping_url
     "/#{context_url_prefix}/files/#{self.id}/inline_view"
   end
@@ -1715,6 +1756,16 @@ class Attachment < ActiveRecord::Base
     else
       nil
     end
+  end
+
+  def canvadoc_url(user)
+    return unless canvadocable?
+    blob = {
+      user_id: user.global_id,
+      attachment_id: id,
+    }.to_json
+    hmac = Canvas::Security.hmac_sha1(blob)
+    "/canvadoc_session?blob=#{URI.encode blob}&hmac=#{URI.encode hmac}"
   end
 
   def check_rerender_scribd_doc

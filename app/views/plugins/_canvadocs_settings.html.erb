@@ -1,0 +1,20 @@
+<% settings[:base_url] = "https://view-api.box.com/1" if settings[:base_url].blank? %>
+<%= fields_for :settings, OpenObject.new(settings) do |f| %>
+  <table style="width: 500px;" class="formtable">
+    <tr>
+      <td colspan="2">
+        <p><%= t :description, "This plugin integrates with Canvadocs (or any
+        Box View compatible API) to provide an HTML5 document previewer." %></p>
+      </td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :api_key, :en => "API Key" %></td>
+      <td><%= f.text_field :api_key %></td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :base_url, :en => "Base URL" %></td>
+      <td><%= f.text_field :base_url %></td>
+    </tr>
+  </table>
+<% end %>
+

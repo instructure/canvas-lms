@@ -221,7 +221,11 @@ class FoldersController < ApplicationController
           res = {
             :actual_folder => @folder.as_json(folders_options),
             :sub_folders => sub_folders_scope.by_position.map { |f| f.as_json(folders_options) },
-            :files => files.map { |f| f.as_json(files_options)}
+            :files => files.map { |f|
+              f.as_json(files_options).tap { |json|
+                json['attachment']['canvadoc_session_url'] = f.canvadoc_url(@current_user)
+              }
+            }
           }
           format.json { render :json => res }
         end

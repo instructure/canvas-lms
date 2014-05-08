@@ -1229,7 +1229,7 @@ class Assignment < ActiveRecord::Base
                                              a.as_json(
                                                :only => attachment_fields,
                                                :methods => [:view_inline_ping_url, :scribd_render_url]
-                                             )
+                                             ).tap { |json| json[:attachment][:canvadoc_url] = a.canvadoc_url(user) }
                                            end
                                          end
                                        end
