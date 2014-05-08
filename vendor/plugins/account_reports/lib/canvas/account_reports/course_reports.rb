@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013 Instructure, Inc.
+# Copyright (C) 2013 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -54,8 +54,14 @@ module Canvas::AccountReports
 
       filename = Canvas::AccountReports.generate_file(@account_report)
       CSV.open(filename, "w") do |csv|
-        csv << ['id', 'sis id', 'short name', 'name', 'start date', 'end date']
-
+        headers = []
+        headers << I18n.t(:course_report_header_id,'id')
+        headers << I18n.t(:course_report_header_sis_id, 'sis id')
+        headers << I18n.t(:course_report_header_short_name, 'short name')
+        headers << I18n.t(:course_report_header_name, 'name')
+        headers << I18n.t(:course_report_header_start_date, 'start date')
+        headers << I18n.t(:course_report_header_end_date, 'end date')
+        csv << headers
         Shackles.activate(:slave) do
           @total = courses.count
           i = 0
@@ -134,8 +140,14 @@ module Canvas::AccountReports
         courses = add_term_scope(courses)
         courses = add_course_sub_account_scope(courses)
 
-        csv << ['course id','course sis id','short name','long name','status',
-                'created at']
+        headers = []
+        headers << I18n.t(:course_report_header_course_id,'course id')
+        headers << I18n.t(:course_report_header_course_sis_id, 'course sis id')
+        headers << I18n.t(:course_report_header_short_name, 'short name')
+        headers << I18n.t(:course_report_header_long_name, 'long name')
+        headers << I18n.t(:course_report_header_status, 'status')
+        headers << I18n.t(:course_report_header_created_at, 'created at')
+        csv << headers
 
         Shackles.activate(:slave) do
           courses.find_each do |c|

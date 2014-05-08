@@ -8,12 +8,23 @@
 
 <table class="report_example">
   <thead>
-  <tr><th>id</th><th>sis id</th><th>short name</th><th>name</th>
-    <th>start date</th><th>end date</th></tr>
+  <tr>
+    <th><%= t('course_report_header_id', %{id}) %></th>
+    <th><%= t('course_report_header_sis_id', %{sis id}) %></th>
+    <th><%= t('course_report_header_short_name', %{short name}) %></th>
+    <th><%= t('course_report_header_name', %{name}) %></th>
+    <th><%= t('course_report_header_start_date', %{start date}) %></th>
+    <th><%= t('course_report_header_end_date', %{end date}) %></th>
+  </tr>
   </thead>
   <tbody>
-  <tr><td>345</td><td>c342</td><td>MATH101</td><td>Mathematics 101</td>
-    <td>2012-09-26T00:00:00-05:00</td><td>2012-12-21T11:00:00-05:00</td>
+  <tr>
+    <td>345</td>
+    <td>c342</td>
+    <td>MATH101</td>
+    <td>Mathematics 101</td>
+    <td>2012-09-26T00:00:00-05:00</td>
+    <td>2012-12-21T11:00:00-05:00</td>
   </tr>
   </tbody>
 </table>

@@ -7,13 +7,31 @@
 
 <table class="report_example">
   <thead>
-  <tr><th>course id</th><th>course sis id</th><th>short name</th>
-    <th>long name</th><th>status</th><th>created at</th></tr>
+  <tr>
+    <th><%= t('course_report_header_course_id', %{course id}) %></th>
+    <th><%= t('course_report_header_course_sis_id', %{course sis id}) %></th>
+    <th><%= t('course_report_header_short_name', %{short name}) %></th>
+    <th><%= t('course_report_header_long_name', %{long name}) %></th>
+    <th><%= t('course_report_header_status', %{status}) %></th>
+    <th><%= t('course_report_header_created_at', %{created at}) %></th>
+  </tr>
   </thead>
   <tbody>
-  <tr><td>423945</td><td>c96872</td><td>MAT101</td><td>Math 101</td>
-    <td>unpublished</td><td>2013-02-26T11:50:36-07:00</td></tr>
-  <tr><td>423948</td><td>c94378</td><td>SCI101</td><td>Science 101</td>
-    <td>unpublished</td><td>2013-02-24T08:43:38-07:00</td></tr>
+  <tr>
+    <td>423945</td>
+    <td>c96872</td>
+    <td>MAT101</td>
+    <td>Math 101</td>
+    <td>unpublished</td>
+    <td>2013-02-26T11:50:36-07:00</td>
+  </tr>
+  <tr>
+    <td>423948</td>
+    <td>c94378</td>
+    <td>SCI101</td>
+    <td>Science 101</td>
+    <td>unpublished</td>
+    <td>2013-02-24T08:43:38-07:00</td>
+  </tr>
   </tbody>
 </table>
