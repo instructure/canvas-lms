@@ -175,6 +175,29 @@ define [
       click('#next_assignment').then =>
         equal($("#prev_assignment")[0],document.activeElement)
 
+  module 'screenreader_gradebook assignment navigation: display update',
+    setup: ->
+      App = startApp()
+      visit('/').then =>
+        @controller = App.__container__.lookup('controller:screenreader_gradebook')
+        Ember.run =>
+          @controller.set('selectedStudent', @controller.get('students.firstObject'))
+          @controller.set('selectedAssignment', @controller.get('assignments.firstObject'))
+    teardown: ->
+      Ember.run App, 'destroy'
+
+  test 'screenreader_gradebook assignment selection: grade for field updates', ->
+    assignment_name_selector = "label[for='student_and_assignment_grade']"
+
+    selectedAssigName = @controller.get('selectedAssignment.name')
+    checkText(assignment_name_selector, "Grade for: #{selectedAssigName}")
+
+    Ember.run =>
+      @controller.set('selectedAssignment', @controller.get('assignments').objectAt(2))
+
+    newSelectedAssigName = @controller.get('selectedAssignment.name')
+    checkText(assignment_name_selector, "Grade for: #{newSelectedAssigName}")
+
   module 'screenreader_gradebook assignment navigation: assignment sorting',
     setup: ->
       App = startApp()
@@ -328,7 +351,6 @@ define [
       position = @controller.get('studentsInSelectedSection').indexOf(selected)
       equal(position, 3)
       equal(@controller.get('studentIndex'), position)
-
 
   module 'screenreader_gradebook student/assignment navigation: announcing selection with aria-live',
     setup: ->

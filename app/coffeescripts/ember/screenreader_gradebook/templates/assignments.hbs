@@ -269,7 +269,9 @@
       {{#if selectedSubmission}}
         <div class="pad-box bottom-only">
           <label for="student_and_assignment_grade">
-            <strong>{{#t 'grade_for'}}Grade for:{{/t}} {{selectedAssignment.name}}</strong>
+            {{#with selectedAssignment}}
+              <strong>{{#t 'grade_for'}}Grade for:{{/t}} {{name}}</strong>
+            {{/with}}
           </label>
         </div>
         {{
@@ -395,7 +397,9 @@
               {{#if selectedStudent.total_grade.possible}}
                 {{selectedStudent.total_percent}}%
                 {{#if selectedStudent.final_grade_point_ratio}}
-                  ({{#t 'pts'}}{{selectedStudent.final_grade_point_ratio}} points{{/t}})
+                  {{#with selectedStudent}}
+                    ({{#t 'pts'}}{{final_grade_point_ratio}} points{{/t}})
+                  {{/with}}
                 {{/if}}
               {{else}}
                 -
