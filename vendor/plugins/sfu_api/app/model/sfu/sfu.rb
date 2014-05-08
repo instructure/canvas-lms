@@ -41,19 +41,19 @@ module SFU
         has_no_child_sections = true
         section_exists = false
 
-        unless details == "[]" && section_code.end_with?("00")
-          details.each do |info|
-            code = info["course"]["name"] + info["course"]["number"]
-            section = info["course"]["section"].downcase
-
-            if section.eql? section_code.downcase
-              section_exists = true
-              if code.downcase == course_code.downcase && section.start_with?(main_section) && section.downcase != section_code.downcase
-                sections << info["course"]["section"]
-                has_no_child_sections = false
+	unless details == "[]"
+            details.each do |info|
+              section = info["course"]["section"].downcase
+              section_exists = true if section.eql? section_code.downcase
+        
+	      if section_code.end_with?("00")
+                code = info["course"]["name"] + info["course"]["number"]
+	        if code.downcase == course_code.downcase && section.start_with?(main_section) && section.downcase != section_code.downcase
+                  sections << info["course"]["section"]
+                  has_no_child_sections = false
+                end
               end
-            end
-          end
+	  end
         end
 
         # Return main section e.g. d100 only for courses with no tutorial/lab sections
@@ -71,7 +71,8 @@ module SFU
             title = info["course"]["title"] if section.eql? section_code.downcase
           end
         end
-	      title
+
+	title
       end
 
     end
