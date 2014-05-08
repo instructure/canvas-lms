@@ -61,7 +61,7 @@ class LearningOutcome < ActiveRecord::Base
     tag = self.alignments.find_by_content_id_and_content_type_and_tag_type_and_context_id_and_context_type(asset.id, asset.class.to_s, 'learning_outcome', context.id, context.class.to_s)
     tag ||= self.alignments.create(:content => asset, :tag_type => 'learning_outcome', :context => context)
     mastery_type = opts[:mastery_type]
-    if mastery_type == 'points'
+    if mastery_type == 'points' || mastery_type == 'points_mastery'
       mastery_type = 'points_mastery'
     else
       mastery_type = 'explicit_mastery'

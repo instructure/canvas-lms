@@ -76,6 +76,21 @@ module CC
           out_node.is_global_outcome !item.context
           out_node.external_identifier item.id
         end
+
+        if item.alignments.exists?
+          out_node.alignments do |alignments_node|
+            item.alignments.each do |alignment|
+              alignments_node.alignment do |alignment_node|
+                alignment_node.content_type alignment.content_type
+                alignment_node.content_id CCHelper.create_key(alignment.content)
+                alignment_node.mastery_type alignment.tag
+                alignment_node.mastery_score alignment.mastery_score
+                alignment_node.position alignment.position
+              end
+            end
+          end
+        end
+
         if item.data && criterion = item.data[:rubric_criterion]
           out_node.points_possible criterion[:points_possible] if criterion[:points_possible]
           out_node.mastery_points criterion[:mastery_points] if criterion[:mastery_points]

@@ -76,9 +76,30 @@ module Importers
         end
 
         item.save!
+
         migration.add_imported_item(item) if migration && item.new_record?
       else
         item = outcome
+      end
+
+      if hash[:alignments]
+        alignments = hash[:alignments].sort_by{|a| a[:position].to_i}
+        alignments.each do |alignment|
+          next unless alignment[:content_type] && alignment[:content_id]
+          asset = nil
+
+          case alignment[:content_type]
+          when 'Assignment'
+            asset = Assignment.find_by_context_id_and_context_type_and_migration_id(context.id, context.class.to_s, alignment[:content_id])
+          when 'AssessmentQuestionBank'
+            asset = AssessmentQuestionBank.find_by_context_id_and_context_type_and_migration_id(context.id, context.class.to_s, alignment[:content_id])
+          end
+
+          if asset
+            options = alignment.slice(*[:mastery_type, :mastery_score])
+            item.align(asset, context, options)
+          end
+        end
       end
 
       log = hash[:learning_outcome_group] || context.root_outcome_group

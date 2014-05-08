@@ -593,6 +593,36 @@ describe ContentMigration do
       @copy_to.learning_outcome_groups.find_by_migration_id(mig_id(log)).should_not be_nil
     end
 
+    it "should copy learning outcome alignments with question banks" do
+      default = @copy_from.root_outcome_group
+      lo = @copy_from.created_learning_outcomes.new
+      lo.context = @copy_from
+      lo.short_description = "outcome1"
+      lo.workflow_state = 'active'
+      lo.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2}, {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
+      lo.save!
+      default.add_outcome(lo)
+
+      bank = @copy_from.assessment_question_banks.create!(:title => 'bank')
+      bank.assessment_questions.create!(:question_data => {'name' => 'test question', 'answers' => [{'id' => 1}, {'id' => 2}]})
+
+      lo.align(bank, @copy_from, {:mastery_type => 'points', :mastery_score => 50.0})
+
+      run_course_copy
+
+      new_lo = @copy_to.learning_outcomes.find_by_migration_id(mig_id(lo))
+      new_bank = @copy_to.assessment_question_banks.find_by_migration_id(mig_id(bank))
+
+      new_lo.alignments.count.should == 1
+      new_alignment = new_lo.alignments.first
+
+      new_alignment.content.should == new_bank
+      new_alignment.context.should == @copy_to
+
+      new_alignment.tag.should == 'points_mastery'
+      new_alignment.mastery_score.should == 50.0
+    end
+
     it "should re-copy deleted items" do
       dt1 = @copy_from.discussion_topics.create!(:message => "hi", :title => "discussion title")
       cm = @copy_from.context_modules.create!(:name => "some module")
