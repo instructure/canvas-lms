@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 - 2013 Instructure, Inc.
+# Copyright (C) 2012 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -80,8 +80,8 @@ module Canvas::AccountReports
       else
         students = students.where(
           "pseudonyms.workflow_state<>'deleted'
-	     AND c.workflow_state='available'
-	     AND e.workflow_state IN ('active', 'completed')")
+           AND c.workflow_state='available'
+           AND e.workflow_state IN ('active', 'completed')")
       end
 
       students = add_course_sub_account_scope(students, 'c')
@@ -89,10 +89,26 @@ module Canvas::AccountReports
 
       file = Canvas::AccountReports.generate_file(@account_report)
       CSV.open(file, "w") do |csv|
-        csv << ['student name', 'student id', 'student sis', 'course',
-                'course id', 'course sis', 'section', 'section id',
-                'section sis', 'term', 'term id', 'term sis', 'current score',
-                'final score', 'enrollment state']
+        headers = []
+
+        headers << I18n.t(:grade_report_header_student_name, 'student name')
+        headers << I18n.t(:grade_report_header_student_id, 'student id')
+        headers << I18n.t(:grade_report_header_student_sis, 'student sis')
+        headers << I18n.t(:grade_report_header_course, 'course')
+        headers << I18n.t(:grade_report_header_course_id, 'course id')
+        headers << I18n.t(:grade_report_header_course_sis, 'course sis')
+        headers << I18n.t(:grade_report_header_section, 'section')
+        headers << I18n.t(:grade_report_header_section_id, 'section id')
+        headers << I18n.t(:grade_report_header_section_sis, 'section sis')
+        headers << I18n.t(:grade_report_header_term, 'term')
+        headers << I18n.t(:grade_report_header_term_id, 'term id')
+        headers << I18n.t(:grade_report_header_term_sis, 'term sis')
+        headers << I18n.t(:grade_report_header_current_score, 'current score')
+        headers << I18n.t(:grade_report_header_final_score, 'final score')
+        headers << I18n.t(:grade_report_header_enrollment_state, 'enrollment state')
+
+        csv << headers
+
         Shackles.activate(:slave) do
           students.find_each do |student|
             arr = []

@@ -1,16 +1,65 @@
-<p><%= t('account_reports.default.description.text', %{This report shows the student final grade results for all students
-  in a given term. The resulting csv file will have one row per
-  enrollment, and will show the current and final grade that is
-  displayed in the course gradebook.}) %></p>
+<p><%= t('account_reports.default.description.text', %{This report shows the
+  student final grade results for all students in a given term. The resulting
+  csv file will have one row per enrollment, and will show the current and final
+  grade that is displayed in the course gradebook.}) %></p>
 
 <h3><%= t('account_reports.default.description.header', %{Example}) %></h3>
 
 <table class="report_example">
   <thead>
-    <tr><th>student name</th><th>student id</th><th>student sis</th><th>course</th><th>course id</th><th>course sis</th><th>section</th><th>section id</th><th>section sis</th><th>term</th><th>term id</th><th>term sis</th><th>current score</th><th>final score</th><th>enrollment state</th></tr>
+  <tr>
+    <th><%= t('course_report_header_course_id', %{course id}) %></th>
+    <th><%= t('grade_report_header_student_name', %{student name}) %></th>
+    <th><%= t('grade_report_header_student_id', %{student id}) %></th>
+    <th><%= t('grade_report_header_student_sis', %{student sis}) %></th>
+    <th><%= t('grade_report_header_course', %{course}) %></th>
+    <th><%= t('grade_report_header_course_id', %{course id}) %></th>
+    <th><%= t('grade_report_header_course_sis', %{course sis}) %></th>
+    <th><%= t('grade_report_header_section', %{section}) %></th>
+    <th><%= t('grade_report_header_section_id', %{section id}) %></th>
+    <th><%= t('grade_report_header_section_sis', %{section sis}) %></th>
+    <th><%= t('grade_report_header_term', %{term}) %></th>
+    <th><%= t('grade_report_header_term_id', %{term id}) %></th>
+    <th><%= t('grade_report_header_term_sis', %{term sis}) %></th>
+    <th><%= t('grade_report_header_current_score', %{current score}) %></th>
+    <th><%= t('grade_report_header_final_score', %{final score}) %></th>
+    <th><%= t('grade_report_header_enrollment_state', %{enrollment state}) %></th>
+  </tr>
   </thead>
   <tbody>
-    <tr><td>smith, heather</td><td>423945</td><td>u96872</td><td>Programming 330</td><td>3217</td><td>c5976</td><td>Section A</td><td>4985</td><td>s7854</td><td>Fall 2012</td><td>4561</td><td>t1649</td><td>96.3</td><td>79.8</td><td>active</td></tr>
-    <tr><td>smith, kacie</td><td>104837</td><td>u48956</td><td>English 101</td><td>4564</td><td>c7681</td><td>Section A</td><td>4563</td><td>s9456</td><td>Fall 2012</td><td>4561</td><td>t1649</td><td>91.1</td><td>70.9</td><td>concluded</td></tr>
+  <tr>
+    <td>smith, heather</td>
+    <td>423945</td>
+    <td>u96872</td>
+    <td>Programming 330</td>
+    <td>3217</td>
+    <td>c5976</td>
+    <td>Section A</td>
+    <td>4985</td>
+    <td>s7854</td>
+    <td>Fall 2012</td>
+    <td>4561</td>
+    <td>t1649</td>
+    <td>96.3</td>
+    <td>79.8</td>
+    <td>active</td>
+  </tr>
+  <tr>
+    <td>smith, kacie</td>
+    <td>104837</td>
+    <td>u48956</td>
+    <td>English 101</td>
+    <td>4564</td>
+    <td>c7681</td>
+    <td>Section A</td>
+    <td>4563</td>
+    <td>s9456</td>
+    <td>Fall 2012</td>
+    <td>4561</td>
+    <td>t1649</td>
+    <td>91.1</td>
+    <td>70.9</td>
+    <td>concluded</td>
+  </tr>
   </tbody>
 </table>
