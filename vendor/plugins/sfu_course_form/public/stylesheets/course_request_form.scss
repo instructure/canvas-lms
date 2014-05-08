@@ -9,6 +9,11 @@ input[type="checkbox"] {
   font-size: 1.3em;
 }
 
+// initially hide everything but the first step
+.step:not(#step-1) {
+  display: none;
+}
+
 div.actions.choices button {
   min-height: 40px; // taller buttons for major choices
   margin-left: 0.25em;
