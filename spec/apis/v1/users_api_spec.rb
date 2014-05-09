@@ -114,6 +114,7 @@ describe Api::V1::User do
           'login_id' => 'abc',
           'sis_login_id' => 'abc',
           'sis_user_id' => 'a',
+          'integration_id' => nil,
           'root_account' => 'school1',
           'sis_import_id' => nil,
       }
