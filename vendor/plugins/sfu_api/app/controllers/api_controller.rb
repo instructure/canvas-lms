@@ -23,9 +23,9 @@ class ApiController < ApplicationController
     account_id = Account.find_by_name('Simon Fraser University').id
     sfu_id = params[:sfu_id]
     pseudonym = Pseudonym.where(:unique_id => sfu_id, :account_id => account_id).all
-    
+
     raise(ActiveRecord::RecordNotFound) if pseudonym.empty?
-    
+
     user_hash = {}
     unless pseudonym.empty?
       user = User.find pseudonym.first.user_id
@@ -39,6 +39,7 @@ class ApiController < ApplicationController
         user_hash["id"] = user.id
         user_hash["name"] = user.name
         user_hash["uuid"] = user.uuid
+        user_hash["message_user_path"] = message_user_path(user)
       elsif params[:property].eql? "groups"
         user_hash = group_membership_for user
       elsif params[:property].eql? "mysfu"
