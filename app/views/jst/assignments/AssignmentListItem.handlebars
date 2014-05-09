@@ -62,8 +62,6 @@
           class="al-trigger al-trigger-gray"
           id="assign_{{id}}_manage_link"
           role="button"
-          aria-haspopup="true"
-          aria-owns="assignment_{{id}}_settings_list"
           tabindex="0"
           href="#"
         >
@@ -75,36 +73,29 @@
           id="assignment_{{id}}_settings_list"
           class="al-options"
           role="menu"
-          tabindex="0"
-          aria-hidden="true"
-          aria-expanded="false"
-          aria-activedescendant="assignment_{{id}}_settings_delete_item"
         >
-          <li role="presentation">
+          <li>
             <a
               href="#"
               class="edit_assignment icon-edit"
               id="assignment_{{id}}_settings_edit_item"
-              tabindex="-1"
-              role="menuitem"
               aria-label="{{#t 'assignment_edit'}}Edit Assignment{{/t}}"
               data-focus-returns-to="assign_{{id}}_manage_link"
             >{{#t "edit"}}Edit{{/t}}</a>
           </li>
           {{#unless frozen }}
-          <li role="presentation">
+          <li>
             <a
               href="#"
               class="delete_assignment icon-trash"
               id="assignment_{{id}}_settings_delete_item"
-              tabindex="-1"
-              role="menuitem"
               aria-label="{{#t 'assignment_delete'}}Delete Assignment{{/t}}"
+              data-focus-returns-to="assign_{{id}}_manage_link"
             >{{#t "delete"}}Delete{{/t}}</a>
           </li>
           {{/unless}}
           {{#if canMove}}
-          <li role="presentation">
+          <li>
             <a
               href="#"
               class="move_assignment icon-updown"
