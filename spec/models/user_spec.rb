@@ -1361,6 +1361,31 @@ describe User do
       @user.find_pseudonym_for_account(@account2).should == nil
     end
 
+    describe 'with cross-sharding' do
+      specs_require_sharding
+      it "should only search trusted shards" do
+        @account1 = Account.create!
+        @user = user(:active_all => 1, :account => @account1)
+        @shard1.activate do
+          @account2 = Account.create!
+          @pseudonym1 = pseudonym(@user, :account => @account2)
+        end
+
+        @shard2.activate do
+          @account3 = Account.create!
+          @pseudonym2 = pseudonym(@user, :account => @account3)
+        end
+
+        @account1.stubs(:trusted_account_ids).returns([@account3.id])
+
+        @shard1.expects(:activate).never
+        @shard2.expects(:activate).once
+
+        pseudonym = @user.find_pseudonym_for_account(@account1)
+        pseudonym.should == @psuedonym2
+      end
+    end
+
     it "should create a copy of an existing pseudonym" do
       @account1 = Account.create!
       @account2 = Account.create!

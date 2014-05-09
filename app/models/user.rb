@@ -2331,7 +2331,26 @@ class User < ActiveRecord::Base
       result = self.pseudonyms.detect { |p| p.active? && p.works_for_account?(account, allow_implicit) }
       return result if result || self.associated_shards.length == 1
     end
-    self.all_active_pseudonyms.detect { |p| p.works_for_account?(account, allow_implicit) }
+    if @all_active_pseudonyms
+      return @all_active_pseudonyms.detect { |p| p.works_for_account?(account, allow_implicit) }
+    else
+      shards = self.associated_shards
+      unless allow_implicit
+        # only search the shards with trusted accounts
+
+        trusted_shards = account.root_account.trusted_account_ids.map{|id| Shard.shard_for(id) }
+        trusted_shards << account.root_account.shard
+
+        shards = self.associated_shards & trusted_shards
+      end
+
+      Shard.with_each_shard(shards) do
+        pseudonym = Pseudonym.where(:user_id => self).active.to_a.detect{|p| p.works_for_account?(account, allow_implicit) }
+        return pseudonym if pseudonym
+      end
+
+      nil
+    end
   end
 
   # account = the account that you want a pseudonym for

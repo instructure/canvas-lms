@@ -573,7 +573,6 @@ describe "API Authentication", type: :request do
     end
 
     it "should allow as_user_id" do
-      @student.pseudonyms.create!(:unique_id => 'student', :account => Account.default)
       account_admin_user(:account => Account.site_admin)
       user_with_pseudonym(:user => @user)
 
