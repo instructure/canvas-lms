@@ -21,16 +21,6 @@ class Canvadoc < ActiveRecord::Base
 
   belongs_to :attachment
 
-  MIME_TYPES = %w(
-    application/excel
-    application/msword
-    application/pdf
-    application/vnd.ms-excel
-    application/vnd.ms-powerpoint
-    application/vnd.openxmlformats-officedocument.presentationml.presentation
-    application/vnd.openxmlformats-officedocument.wordprocessingml.document
-  )
-
   def upload
     return if document_id.present?
 
@@ -58,6 +48,18 @@ class Canvadoc < ActiveRecord::Base
 
   def available?
     !!(document_id && process_state != 'error' && Canvadocs.enabled?)
+  end
+
+  def self.mime_types
+    JSON.parse Setting.get('canvadoc_mime_types', %w[
+      application/excel
+      application/msword
+      application/pdf
+      application/vnd.ms-excel
+      application/vnd.ms-powerpoint
+      application/vnd.openxmlformats-officedocument.presentationml.presentation
+      application/vnd.openxmlformats-officedocument.wordprocessingml.document
+    ].to_json)
   end
 
   def canvadocs_api

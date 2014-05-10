@@ -1286,7 +1286,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def canvadocable?
-    Canvadocs.enabled? && Canvadoc::MIME_TYPES.include?(content_type)
+    Canvadocs.enabled? && Canvadoc.mime_types.include?(content_type)
   end
 
   def self.submit_to_scribd(ids)
