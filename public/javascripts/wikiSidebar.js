@@ -115,7 +115,7 @@ define([
           .attr('aria-level', children.data('level'))
           .attr('id', this.generateTreeItemID('file'))
           .addClass(file.mime_class)
-          .toggleClass('scribdable', file['scribdable?']);
+          .toggleClass('scribdable', file['scribdable?'] || file.canvadoc_session_url);
         if(file.media_entry_id) {
           $file
             .addClass('kalturable')

@@ -496,7 +496,9 @@ class FilesController < ApplicationController
           # Right now we assume if they ask for json data on the attachment
           # which includes the scribd doc data, then that means they have 
           # viewed or are about to view the file in some form.
-          if @current_user && ((feature_enabled?(:scribd) && attachment.scribd_doc) ||
+          if @current_user &&
+            ((feature_enabled?(:scribd) && attachment.scribd_doc) ||
+             attachment.canvadocable? ||
              (service_enabled?(:google_docs_previews) && attachment.authenticated_s3_url))
             attachment.context_module_action(@current_user, :read)
             attachment.record_inline_view
@@ -507,7 +509,12 @@ class FilesController < ApplicationController
           log_asset_access(attachment, "files", "files")
         end
       end
-      format.json { render :json => attachment.as_json(options) }
+      format.json {
+        render :json => attachment.as_json(options).tap { |json|
+          canvadoc_url = attachment.canvadoc_url(@current_user)
+          json['attachment']['canvadoc_session_url'] = canvadoc_url
+        }
+      }
     end
   end
   protected :render_attachment

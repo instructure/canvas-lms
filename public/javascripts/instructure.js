@@ -394,10 +394,14 @@ define([
           var attachment = data && data.attachment,
               scribdDocAttributes = attachment && attachment.scribd_doc && attachment.scribd_doc.attributes;
           $link.loadingImage('remove');
-          if (attachment && (attachment['scribdable?'] || $.isPreviewable(attachment.content_type, 'google'))) {
+          if (attachment &&
+                (attachment['scribdable?'] ||
+                 $.isPreviewable(attachment.content_type, 'google') ||
+                 attachment.canvadoc_session_url)) {
             var $div = $("<span><br /></span>")
               .insertAfter($link.parents(".link_holder:last"))
               .loadDocPreview({
+                canvadoc_session_url: attachment.canvadoc_session_url,
                 scribd_doc_id: scribdDocAttributes && scribdDocAttributes.doc_id,
                 scribd_access_key: scribdDocAttributes && scribdDocAttributes.access_key,
                 mimeType: attachment.content_type,
