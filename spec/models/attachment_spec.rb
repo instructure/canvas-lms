@@ -262,7 +262,8 @@ describe Attachment do
 
       it "prefers crocodoc when annotation is requested" do
         configure_crocodoc
-        Canvadoc::MIME_TYPES << "application/blah"
+        Setting.set('canvadoc_mime_types',
+                    (Canvadoc.mime_types << "application/blah").to_json)
 
         crocodocable = crocodocable_attachment_model
         canvadocable = canvadocable_attachment_model content_type: "application/blah"
