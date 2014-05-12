@@ -21,6 +21,7 @@ define [
         @model = store.createRecord 'quiz',
           pointsPossible: 1
           title: 'Assignment test'
+          htmlURL: 'foo/bar'
         @qc.set('model', @model)
 
     teardown: ->
@@ -40,3 +41,6 @@ define [
   test 'doesnt display when undefined points possible', ->
     run => @model.set('pointsPossible', undefined)
     equal(@qc.get('pointsPossible'), '')
+
+  test 'correctly creates edit url for quiz', ->
+    equal(@qc.get('editUrl'), 'foo/bar/edit')

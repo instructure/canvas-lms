@@ -1,39 +1,74 @@
+@import "bootstrap/variables";
 @import "bootstrap/mixins";
-.assignment_selection {
-  margin-bottom: 0;
-}
-dl {
-  @include clearfix;
-}
-dt,
-dd {
-  float: left;
-  width: 200px;
-  margin: 8px 16px 8px 0;
+@import "bootstrap/grid";
+@import "bootstrap/forms";
+@import "bootstrap/tables";
 
-}
-dt {
-  clear: left;
-}
-dd {
-  width: 40px;
-  text-align: right;
-  &.assignment-group-grade,
-  &.total-grade {
-    width: 100px;
+
+// expanded checkbox label with hover
+div.checkbox {
+  padding: 12px;
+  margin: 10px 0px;
+  background: $grayLighter;
+  @include border-radius(5px);
+  &:hover {
+    background: $infoBackground;
   }
 }
-.total-grade {
-  margin-top: 25px;
-  font-size: 17px;
-}
-.assignment-group-grade span {
-  display: block;
-}
-.weight,
-.dropped,
-.late,
-.resubmitted {
-  font-style: italic;
+
+// section separators (screenreader doesn't like the hr tag)
+.hr {
+  margin: 10px;
+  padding: 10px;
+  border-bottom: 1px solid $grayLighter;
 }
 
+// bootstrap table overrides for pretty formatting
+table.table {
+  border: 1px solid darken($grayLighter, 10%);
+  font-size: 12px;
+
+  th, td {
+    padding: 12px;
+    border: 1px solid darken($grayLighter, 10%);
+  }
+  th, td, tr {
+    text-align: center;
+  }
+  th {
+    background: $grayLighter;
+    font-weight: 400;
+  }
+
+  // left align the first column for student info tables
+  &.left-first {
+    th:first-child, td:first-child {
+      text-align: left;
+    }
+  }
+}
+
+// Force labels in dialogs to appear next to checkboxes
+.ui-dialog {
+  label {
+    display: inline;
+  }
+}
+
+// Force labels for dropdowns to align left on small screens
+.text-right-responsive {
+  text-align: right;
+  @media screen and (max-width: 1143px) {
+    text-align: left;
+  }
+}
+
+// restrict textarea width
+.custom-column-cell {
+  textarea {
+    max-width: 620px;
+  }
+}
+
+// padding helper for vertical spacing
+h3.assignment_selection { margin-bottom: 0px; }

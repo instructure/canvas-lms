@@ -90,6 +90,15 @@ define [
       next = @controller.get('assignments').indexOf(before) + 1
       equal(next, @controller.get('assignments').indexOf(after))
 
+  test 'clicking next then previous will refocus on next student', ->
+    click('#next_student').then =>
+      click('#prev_student').then =>
+        equal($("#next_student")[0],document.activeElement)
+
+  test 'clicking next then previous will refocus on next assignment', ->
+    click('#next_assignment').then =>
+      click('#prev_assignment').then =>
+        equal($("#next_assignment")[0],document.activeElement)
 
   module 'screenreader_gradebook student/assignment navigation: with second item selected',
     setup: ->
@@ -156,6 +165,15 @@ define [
       previous = @controller.get('assignments').indexOf(before) - 1
       equal(previous, @controller.get('assignments').indexOf(after))
 
+  test 'clicking previous then next will reset the focus for students', ->
+    click('#prev_student').then =>
+      click('#next_student').then =>
+        equal($("#prev_student")[0],document.activeElement)
+
+  test 'clicking previous then next will reset the focus for assignments', ->
+    click('#prev_assignment').then =>
+      click('#next_assignment').then =>
+        equal($("#prev_assignment")[0],document.activeElement)
 
   module 'screenreader_gradebook assignment navigation: assignment sorting',
     setup: ->

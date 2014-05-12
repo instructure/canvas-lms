@@ -1,4 +1,4 @@
-@import "bootstrap/variables.scss"
+@import "variables"
 
 [type=radio].styled-radio
   margin: 4px 7px 2px 2px
@@ -96,6 +96,8 @@ hr
     > .treeitem-heading
       padding: 5px
       padding-left: 33px
+      &:hover
+        background-color: $hover-color
 
   li li li li li
     > .treeitem-heading
@@ -109,7 +111,7 @@ hr
     border-radius: 5px
 
     > .treeitem-heading
-      background-color: $blueDark
+      background-color: $highlight-color
       label, a
         color: white
 

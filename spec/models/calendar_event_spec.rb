@@ -397,24 +397,21 @@ describe CalendarEvent do
 
       it "should notify all participants except the person reserving" do
         reservation = @appointment2.reserve_for(@group, @student1)
-        reservation.messages_sent.should be_include("Appointment Reserved For User")
-        reservation.messages_sent["Appointment Reserved For User"].map(&:user_id).sort.uniq.should eql [@student2.id]
+        Message.where(notification_id: Notification.by_name("Appointment Reserved For User"), user_id: [@student1, @student2]).pluck(:user_id).should == [@student2.id]
       end
 
       it "should notify all participants except the person canceling the reservation" do
         reservation = @appointment2.reserve_for(@group, @student1)
         reservation.updating_user = @student1
         reservation.destroy
-        reservation.messages_sent.should be_include("Appointment Deleted For User")
-        reservation.messages_sent["Appointment Deleted For User"].map(&:user_id).sort.uniq.should eql [@student2.id]
+        Message.where(notification_id: Notification.by_name("Appointment Deleted For User"), user_id: [@student1, @student2]).pluck(:user_id).should == [@student2.id]
       end
 
       it "should notify participants if teacher deletes the appointment time slot" do
         reservation = @appointment2.reserve_for(@group, @student1)
         @appointment2.updating_user = @teacher
         @appointment2.destroy
-        reservation.messages_sent.should be_include("Appointment Deleted For User")
-        reservation.messages_sent["Appointment Deleted For User"].map(&:user_id).sort.uniq.should eql [@student1.id, @student2.id]
+        Message.where(notification_id: Notification.by_name("Appointment Deleted For User"), user_id: [@student1, @student2]).pluck(:user_id).sort.should == [@student1.id, @student2.id]
       end
 
       it "should notify all participants when the the time slot is canceled" do
@@ -422,8 +419,7 @@ describe CalendarEvent do
         @appointment2.updating_user = @teacher
         @appointment2.destroy
         @appointment2.messages_sent.should be_empty
-        reservation.messages_sent.should be_include("Appointment Deleted For User")
-        reservation.messages_sent["Appointment Deleted For User"].map(&:user_id).sort.uniq.should eql [@student1.id, @student2.id]
+        Message.where(notification_id: Notification.by_name("Appointment Deleted For User"), user_id: [@student1, @student2]).pluck(:user_id).sort.should == [@student1.id, @student2.id]
       end
 
       it "should notify admins when a user reserves" do

@@ -179,17 +179,25 @@ describe Attachment do
       @attachment.crocodoc_document.uuid.should == '1234567890'
     end
 
-    it "should spawn a delayed job to retry failed uploads (once)" do
+    it "should spawn delayed jobs to retry failed uploads" do
       Crocodoc::API.any_instance.stubs(:upload).returns 'error' => 'blah'
       crocodocable_attachment_model
 
-      expects_job_with_tag('Attachment#submit_to_crocodoc', 1) do
+      attempts = 3
+      Setting.set('max_crocodoc_attempts', attempts)
+
+      track_jobs do
+        # first attempt
         @attachment.submit_to_crocodoc
+
+        # nth attempt won't create more jobs
+        attempts.times {
+          Timecop.freeze(1.hour.from_now)
+          run_jobs
+        }
       end
 
-      expects_job_with_tag('Attachment#submit_to_crocodoc', 0) do
-        @attachment.submit_to_crocodoc(2)
-      end
+      created_jobs.size.should == attempts
     end
 
     it "should submit to scribd if crocodoc fails to convert" do
@@ -414,19 +422,29 @@ describe Attachment do
     end
 
     describe "delete_scribd_doc" do
-      it "should delete the scribd doc" do
+      it "should not delete the scribd doc when the attachment is destroyed" do
         @att = attachment_with_scribd_doc(fake_scribd_doc('zero'))
-        @att.scribd_doc.expects(:destroy).once.returns(true)
+        @att.scribd_doc.expects(:destroy).never
         @att.destroy
-        @att.reload.workflow_state.should eql 'deleted'
-        @att.read_attribute(:scribd_doc).should be_nil
+        @att.file_state.should eql 'deleted'
+        @att.workflow_state.should eql 'pending_upload'
+        @att.read_attribute(:scribd_doc).should_not be_nil
       end
 
       it "should do nothing for non-root attachments" do
         @root = attachment_with_scribd_doc(fake_scribd_doc('zero'))
-        @child = attachment_with_scribd_doc(fake_scribd_doc('one'), :root_attachment => @root)
+        @child = attachment_model(root_attachment: @root)
         @child.scribd_doc.expects(:destroy).never
+        @child.scribd_doc.should == @root.scribd_doc
         @child.delete_scribd_doc
+      end
+
+      it "should delete scribd_doc" do
+        @root = attachment_with_scribd_doc(fake_scribd_doc('zero'))
+        @root.scribd_doc.expects(:destroy).once.returns(true)
+        @root.read_attribute(:scribd_doc).should_not be_nil
+        @root.delete_scribd_doc
+        @root.read_attribute(:scribd_doc).should be_nil
       end
     end
 
@@ -1628,6 +1646,39 @@ describe Attachment do
       Attachment.where(id: attachment).update_all(context_type: 'QuizStatistics')
 
       Attachment.find(attachment.id).context_type.should == 'Quizzes::QuizStatistics'
+    end
+  end
+
+  describe ".clone_url_as_attachment" do
+    it "should reject invalid urls" do
+      expect { Attachment.clone_url_as_attachment("ftp://some/stuff") }.to raise_error(ArgumentError)
+    end
+
+    it "should not raise on non-200 responses" do
+      url = "http://example.com/test.png"
+      CanvasHttp.expects(:get).with(url).yields(stub('code' => '401'))
+      expect { Attachment.clone_url_as_attachment(url) }.to raise_error(CanvasHttp::InvalidResponseCodeError)
+    end
+
+    it "should use an existing attachment if passed in" do
+      url = "http://example.com/test.png"
+      a = attachment_model
+      CanvasHttp.expects(:get).with(url).yields(FakeHttpResponse.new('200', 'this is a jpeg', 'content-type' => 'image/jpeg'))
+      Attachment.clone_url_as_attachment(url, :attachment => a)
+      a.save!
+      a.open.read.should == "this is a jpeg"
+    end
+
+    it "should detect the content_type from the body" do
+      url = "http://example.com/test.png"
+      CanvasHttp.expects(:get).with(url).yields(FakeHttpResponse.new('200', 'this is a jpeg', 'content-type' => 'image/jpeg'))
+      att = Attachment.clone_url_as_attachment(url)
+      att.should be_present
+      att.should be_new_record
+      att.content_type.should == 'image/jpeg'
+      att.context = Account.default
+      att.save!
+      att.open.read.should == 'this is a jpeg'
     end
   end
 

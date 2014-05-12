@@ -21,7 +21,7 @@ require 'spec_helper'
 describe LtiOutbound::LTICourse do
   it_behaves_like 'an LTI context'
 
-  it_behaves_like 'it has an attribute setter and getter for', :course_code
+  it_behaves_like 'it has a proc attribute setter and getter for', :course_code
 
   it_behaves_like 'it provides variable mapping', '$Canvas.course.id', :id
   it_behaves_like 'it provides variable mapping', '$Canvas.course.sisSourceId', :sis_source_id

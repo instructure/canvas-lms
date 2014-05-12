@@ -70,6 +70,7 @@ $(document).ready(function() {
   attachAddAssignment($("#assignments_select .module_item_select"));
   INST = INST || {};
   INST.selectContentDialog = function(options) {
+    var options = options || {};
     var for_modules = options.for_modules;
     var select_button_text = options.select_button_text || I18n.t('buttons.add_item', "Add Item");
     var holder_name = options.holder_name || "module";
@@ -110,7 +111,8 @@ $(document).ready(function() {
     $("#select_context_content_dialog .module_item_select").change();
     $("#select_context_content_dialog").dialog({
       title: dialog_title,
-      width: 400
+      width: options.width || 400,
+      height: options.height || 400
     }).fixDialogButtons();
     $("#select_context_content_dialog").dialog('option', 'title', dialog_title);
   }
@@ -195,7 +197,7 @@ $(document).ready(function() {
             item_data['item[title]'] = item_data['item[title]'] || obj.display_name
             var $option = $(document.createElement('option'));
             $option.val(obj.id).text(item_data['item[title]']);
-            $("#" + item_data['item[type]'] + "s_select").find(".module_item_select option:last").before($option);
+            $("#" + item_data['item[type]'] + "s_select").find(".module_item_select option:last").after($option);
             submit(item_data);
           };
           if(item_data['item[type]'] == 'attachment') {

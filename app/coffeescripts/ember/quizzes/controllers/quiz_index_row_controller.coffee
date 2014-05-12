@@ -32,12 +32,8 @@ define [
     deleteTitle: I18n.t('delete_quiz', 'Delete Quiz')
 
     editUrl: (->
-      @get('htmlUrl') + "/edit"
-    ).property('htmlUrl')
-
-    deleteUrl: (->
-      @get('htmlUrl')
-    ).property('htmlUrl')
+      @get('htmlURL') + "/edit"
+    ).property('htmlURL')
 
     pointsPossible: (->
       return '' unless pointsPossible = @get('model.pointsPossible')

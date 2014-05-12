@@ -248,6 +248,8 @@ tr:
     announcement_deleted_notice: "Duyuru başarıyla silindi"
     permission_denied_notice: "Bu hesap için duyuru oluşturamazsınız"
   account_reports: 
+    bucks: 
+      courses_only: "Sadece çevrimiçi bölümler"
     ccp: 
       course: 
         check_box: "Ders İçin: %{course_id};"
@@ -504,6 +506,13 @@ tr:
         zero: Gönderilen
       title: "Profil Resimleri"
       unlock_link: "kilidi kaldır"
+    bucks_zero_activity_csv_description: 
+      account_reports: 
+        bucks: 
+          description: 
+            header: Örnek
+          student_login: 
+            text: "Bu rapor, belirli bir dönemde, herhangi bir derste kayıtlı tüm öğrencileri gösterir. Oluşturulan csv dosyasında dersi başladığından beri ziyaret etmeyen her öğrenci kaydı için bir satır bulunmaktadır. Çevrimiçi filtrede yalnızca adında '.E' olan bölümlerden kayıtlar yer alacaktır."
     cannot_manage_account: "Hesap ayalarını yönetmeye izin verilmiyor"
     cannot_manage_quotas: "Kota ayarlarını yönetmenize izin verilemiyor"
     ccp_zero_activity_csv_description: 
@@ -1478,6 +1487,7 @@ tr:
       upload_as_zip: "Lütfen dosyaları .zip olarak yükleyin"
     feed_entry_title: "Ödev: %{assignment}"
     feed_entry_title_with_course: "Ödev, %{course}: %{assignment}"
+    gpa_scale_explainer: "GNO Notlandırma Ölçeği Nedir?"
     group_assignment_must_have_group_set: "Bu ödev için bir grup seçiniz"
     imported_assignments_group: "İçe Aktarılan Ödevler"
     labels: 
@@ -1498,6 +1508,7 @@ tr:
       external_tool: "bir harici araç"
       on_paper: "kağıt üzerinde"
     titles: 
+      gpa_scale_explainer: "GNO Notlandırma Ölçeği Nedir?"
       grading_scheme_info: "Notlandırma Şemasını Göster/Düzenle"
   assignment_details: 
     no_graded_submissions: "Notlandırılmış gönderi yok"
@@ -1597,7 +1608,7 @@ tr:
       edit: Düzenle
       group_weight: "Toplamın %{groupWeight}% o si"
       manage: Yönet
-      move: "Şuraya Taşı&hellip;"
+      move: "Şuraya Taşı..."
     assignment_group_selector: 
       assignment_group: "Ödev Grubu"
       assignment_group_options: 
@@ -1612,7 +1623,7 @@ tr:
       delete: Sil
       edit: Düzenle
       module: Modül
-      move: "Şuraya Taşı&hellip;"
+      move: "Şuraya Taşı..."
       multiple_modules: "Çoklu Modüller"
       no_points_possible: "Olası Puan Yok"
       points_possible: "%{pointsPossible} puan"
@@ -1815,13 +1826,22 @@ tr:
           *Gönderilen dosyaların adlarını değiştirmeyin ki sistem bu dosyaları tanımlayabilsin.*
       titles: 
         related_items: "İlişkili Öğeler"
+    grade_gpa_scale_screenreader: "Not: %{grade}"
     grade_letter_grade_screenreader: "Not: %{grade}"
     grade_pass_fail_screenreader: "Not: %{grade}"
     grade_percent: "%{grade}%"
     grade_percent_screenreader: "Not: %{grade}%"
     grading_type_selector: 
       display_grade_as: "Notu şu olarak Göster"
+      gpa_scale_explainer: "GNO Notlandırma Ölçeği, tüm ödevler için  4.0 (veya 5.0/6.0) ölçeği kullanan okullar için tasarlanmıştır. Bu notlandırma şeması Harf Notu görünümüne benzemekle birlikte bazı farklılıkları barındırmaktadır:"
+      gpa_scale_input_explainer: "Notlar 4.0 ölçeği üzerinden verilir. Örneğin, bir ödev 100 puan değerinde ise, 4.0 %100, 3.0 %87 vb. anlamına gelir."
+      gpa_scale_letters_explainer: "Rakam içeren notlandırmalara ek olarak harf notları kullanılabilir."
+      gpa_scale_percentage_explainer: "Yüzdeleri doğrudan girebilirken puanları doğrudan giremezsiniz. Örneğin, eğer bir ödev 50 puan ise ''40'' değerini girmek işe yaramayacaktır; ''%80'' girilmelidir."
+      gpa_scale_recommendation: "Okulunuz notlandırma için 4.0 (veya 5.0/6.0) ölçeği kullanmıyorsa Canvas notları Harf Notu olarak göstermenizi önerir."
+      gpa_scale_scores_explainer: "İzin verilen puanlar notlandırma şemasında önceden belirlenmiş olanlardır."
+      gpa_scale_title: "''GNO Notlandırma Ölçeği Nedir?''"
       grading_type_options: 
+        gpa_scale: "GNO Ölçeği"
         letter_grade: "Harf Notu"
         not_graded: Notlandırılmamış
         pass_fail: Tamamladı/Tamamlamadı
@@ -1831,10 +1851,10 @@ tr:
     group_category_selector: 
       grade_group_students_individually: "Her öğrenciye aynı değerlendirme notu ata"
       group_assignment_header: "Grup Ödevi"
+      group_category_locked_explanation: "Öğrenciler bu ödev için gönderimde bulunduklarından grup ayarları değiştirilemez."
       group_category_options: "Yeni Kategori Grubu"
       group_set: "Grup Seti"
       is_group_assignment: "Bu bir Grup Ödevidir"
-      students_already_submitted_warning: "Önceki bireysel gönderiler grub gönderileri olarak sayılmayacak ve speedgrader'da yanlış olarak gösterilecek."
     group_comment: 
       labels: 
         group_comment: "Grubun Tümüne Yorum Gönder"
@@ -2190,9 +2210,12 @@ tr:
         wizard: 
           details: "Bir ödevle ilgili teslim tarihi belirleme ve notlandırma dışında yapılabilecekler de vardır. Ödev ile iligli bir açıklama yazma, dosya göndermeye izin verme, notlandırma türünü değiştirme ve daha bir çok işlem için önce ödevin adına ya da %{edit_icon} simgesine sonra \"daha fazla seçenek\" e tıklayın."
           group: 
+            screenreader_step1: "Ödev grupları ödevleri organize etmede kullanılırlar. Her gruba ayrı bir isim verin. Final notunun ağırlığını gruplara göre belirlemeyi seçerseniz her grup için ayrı yüzde puanı belirleyebilirsiniz. \"Ödev Grubu Ekle\" ye tıklayarak grup oluşturabilirsiniz."
             step1: "Ödev grupları ödevleri organize etmede kullanılırlar. Her gruba ayrı bir isim verin. Final notunun ağırlığını gruplara (*nerede?*) göre belirlemeyi seçerseniz her grup için ayrı yüzde puanı belirleyebilirsiniz. \"Ödev Grubu Ekle\" ye tıklayarak grup oluşturabilirsiniz."
           overview: "Bu sayfada dersinizin üst düzey ayarlarını yapabilirsiniz. Ödevler ekleyip bu ödevleri gruplayabilir ve bu grupların ağırlıklarını belirleyebilirsiniz. Burada amaç önce organize edip sonra ayrıntıları belirlemenizdir. Yine de bu alanda yapabileceğiniz çok şey bulabilirsiniz."
           quizzes: "Kısa sınavlar özel bir tür ödevdir. Sol kenar çubuğundaki  \"Kısa Sınavlar\" bağlantısına tıklayarak kısa sınavlar oluşturabilir veya içeri aktarabilirsiniz."
+          screenreader_details: "Bir ödevle ilgili teslim tarihi belirleme ve notlandırma dışında yapılabilecekler de vardır. Ödev ile ilgili bir açıklama yazma, dosya göndermeye izin verme, notlandırma türünü değiştirme ve daha bir çok işlem için önce ödevin adına ya da düzenleme simgesine ve sonra \"daha fazla seçenek\" e tıklayın."
+          screenreader_step1: "Ödevler her zaman gruplar halinde düzenlenir, bu yüzden bir ödev eklemek için öncelikle ekleyeceğiniz grubu bilmeniz gerekir. Grubu seçin ve \"Ödev Ekle\" bağlantısına veya ekle simgesine tıklayarak grup için yeni bir ödev ekleyin."
           step1: "Ödevler her zaman gruplar halinde düzenlenir, bu yüzden bir ödev eklemek için öncelikle ekleyeceğiniz grubu bilmeniz gerekir. Grubu seçin ve \"Ödev Ekle\" bağlantısına veya %{add_icon} ikonuna tıklayarak grup için yeni bir ödev ekleyin."
           step2: "Harika! Şimdi ayrıntıları doldurun. Ödev için bir başlık, bir bitiş tarihi ve olası puanını girebilirsiniz. Eğer daha fazlasını istiyorsanız, ödevi oluşturduktan sonra yapabilirsiniz."
           step3: "Bitti! Ödev artık gruba eklendi! Eğer ödev üzerinde fareyi gezdirirseniz, daha fazla seçenek görürsünüz. Bunlar şu anlama gelir:"
@@ -2201,6 +2224,9 @@ tr:
         create_assignment_group: "Ödev Grubu Oluştur"
         create_or_import_quiz: "Kısa Sınav Oluştur/İçe Aktar"
         edit_assignment_in_detail: "Ödevleri Ayrıntılı olarak Dzüenle"
+        screenreader_show_me_add_assignment: "Beni ödev ekle butonuna götür"
+        screenreader_show_me_add_assignment_group: "Beni ödev grubu ekle butonuna götür"
+        screenreader_show_me_weight_final_grade: "Beni final notunun ağırlığını belirle denetim kutusuna götür"
         show_me_where: "Nerede Olduğunu Göster"
       subtitles: 
         edit_assignment_in_detail: "(yüklemeye, açıklamayı düzenlemeye vb izin ver.)"
@@ -3915,6 +3941,7 @@ tr:
     no_course: "Ders yok"
     select_course: "Ders seçiniz"
   conversation_message: 
+    subject_specified: "Özel mesaj: %{subject}"
     users_added: 
       one: "%{user}, %{current_user} tarafından tartışmaya eklendi"
       other: "%{list_of_users}, %{current_user} tarafından tartışmaya eklendi"
@@ -4708,6 +4735,7 @@ tr:
         pending_acceptance_of_invitation: gönderildi
       roster_users: 
         canvas_user_id: "Canvas Kullanıcı Kodu"
+        last_activity: "Son Etkinlik"
         login_name_or_sis_id: "Oturum Aç / SIS IP"
         name: Ad
         no_people_found: "Hiç kişi bulunamadı"
@@ -5354,9 +5382,10 @@ tr:
       close_for_comments: "Yorumlara kapat"
       delete: Sil
       due: Bitiş
-      graded_discussion: "Notlandırılmış tartışma"
+      graded_discussion: "Notlandırılmış tartışma:"
       last_post_date: "Son gönderilen yazı %{display_last_reply_at}"
       manage: Yönet
+      move: "Şuraya Taşı&hellip;"
       no_due_date: "Bitiş Tarihi Yok"
       open_to_comments: "Yorumlara aç"
       pin: Sabitle
@@ -5366,8 +5395,8 @@ tr:
     discussion_feed_title: "%{title} Tartışma Akışı"
     discussion_list: 
       no_pinned_discussions: "Şu anda hiçbir tartışma sabitlenmedi"
-      pinned_instructions: "Tartışmayı buraya sürükleyin ve öğrencileriniz sabit gönderileri sayfanın üstünde görsün."
-      there_are_no_discussions_show: "Hiçbir tartışma gösterilmiyor"
+      pinned_instructions: "Sayfanın en üstüne bir tartışma konusu yerleştirmek için tartışmayı buraya sürükleyebilir ya da tartışma ayarları menüsünden Sabitle'yi seçebilirsiniz."
+      there_are_no_discussions_show: "Bu bölümde gösterilecek tartışma yok."
     discussions_settings_view: 
       allow_student_discussion_editing: "Kendi gönderilerini sil ve düzenle"
       allow_student_topics: "Tarışma başlıkları oluştur"
@@ -5454,9 +5483,9 @@ tr:
       last_page: Son
     points_possible_number: "Olası puanlar bir sayı değeri olmalı"
     reply_count_tooltip: 
-      one: "1 cevap"
-      other: "%{count} cevap"
-      zero: "Cevap yok"
+      one: "1 yanıt."
+      other: "%{count} yanıt."
+      zero: "Yanıt yok."
     show: 
       add_rubric: "Değerlendirme Listesi Ekle"
       announcement_closed: "Bu duyuru yorumlara kapalıdır"
@@ -5515,9 +5544,9 @@ tr:
       topic_podcast_feed: "Konu Podcast Akışı"
     topic_deleted_notice: "%{topic_title} başarıyla silindi"
     unread_count_tooltip: 
-      one: "Okunmamış 1 yanıt"
-      other: "%{count} okunmamış cevap"
-      zero: "Okunmamış cevap yok"
+      one: "1 okunmamış yanıt."
+      other: "%{count} okunmamış cevap."
+      zero: "Okunmamış yanıt yok."
     user_settings_view: 
       manually_mark_as_read: "Elle okundu olarak işaretle"
       my_settings: Ayarlarım
@@ -5547,7 +5576,6 @@ tr:
       show_more: "Daha fazla göster"
     hide_due_dates: "Bitiş Tarihlerini Gizle"
     initial_post_required_to_subscribe: "Takip etmeden önce bir cevap göndermeniz gerekmektedir"
-    lock: Kilitle
     mark_as_read: "Okundu olarak işaretle"
     mark_as_unread: "Okunmadı olarak işaretle"
     no_content: "İçerik Yok"
@@ -5560,7 +5588,6 @@ tr:
     ordered_by_recent_activity: "Son etkinliklere göre sırala"
     participant: 
       anonymous_user: Anonim
-    pin: Sabitle
     pinned_discussions: "Sabitlenmiş Tartışmalar"
     reply: 
       error_saving_reply: "*Bir hata oluştu*, lütfen cevabınızı göndermeyi daha sonra tekrar deneyin"
@@ -5583,12 +5610,10 @@ tr:
     subscribe: "Bu başlığı takip et"
     subscribed: "Takip edildi"
     subscribed_hint: "Bu başlığı takip ediyorsunuz. Takibi bırakmak için tıklayınız."
-    toggle_message: "tartışma görünürlüğünü değiştir"
+    toggle_message: "Bölüm görünürlüğünü değiştir"
     uknown_author: "Yazar Bilinmiyor"
     unknown: Bilinmiyor
     unknown_author: "Yazar Bilinmiyor"
-    unlock: "Kilidi Kaldır"
-    unpin: Bırak
     unsubscribe: "Bu başlığı artık takip etmiyorsunuz"
     unsubscribed: "Takip Edilmiyor"
     unsubscribed_hint: "Bu başlığı takip etmiyorsunuz. Takip etmek için tıklayınız."
@@ -6190,8 +6215,8 @@ tr:
         Bu özelliği devre dışı bırakmak ders içinde var olan TÜM nesnelerin yayınlanmasını sağlayacak. Lütfen devam
         etmeden önce tüm taslak içeriğin yayına hazır ve dersteki tüm kullanıcılar için kullanılabilir olduğuna emin olun.
     google_docs_domain_restriction: "Google Docs Alan Adı Kısıtlamaları"
+    individual_gradebook: "Bireysel Notdefteri Görünümü"
     outcome_gradebook: "Öğrenme Çıktısı Not Defteri"
-    screenreader_gradebook: "Ekran okuyucu Not defteri"
     student_outcome_gradebook: "Öğrenci Çıktısı Not Defteri"
   file_browser_view: 
     folder_tree_instructions: "Ağaç üzerinde gezinmek için aşağı ve yukarı ok tuşlarını kullanın. Klasörleri genişletmek için sağ oka, daraltmak için sol oka ve görsel seçmek için enter tuşuna basın."
@@ -6575,6 +6600,7 @@ tr:
     no_assignments_have_points_warning: "Bir ödevde olası puanlar olmadıkça not hesaplanamaz"
     notes: Notlar
     outcome_gradebook: 
+      export_report: "raporu dışa aktar"
       toggle_sidebar: "Kenar Çubuğa Geçiş"
     outcome_popover: 
       mastery_set_at: "Yeterlik düzeyi şuna ayarlı"
@@ -7006,7 +7032,6 @@ tr:
       titles: 
         download_file: "Bu dosyayı indir"
         not_newest: "aşağıdaki sarkık menüyü kullanarak hangi gönderime bakılacağını seçin"
-        on_time: "Zamanında gönderildi"
         preview_file: "Bu Dosyayı Önizle"
         speedgrader_options: "Speedgrader Seçenekleri"
       tooltips: 
@@ -7128,6 +7153,7 @@ tr:
     name_too_long: "Kısa bir kategori ismi giriniz"
     name_unavailable: "%{name} zaten kullanılıyor."
     self_signup_for_courses: "Hızlı kayıt, sadece ders grupları veya topluluklar için etkin olabilir"
+  group_category_locked: "Öğrenciler bu ödev için gönderim yaptıkları için grup kategorisi değiştirilemez."
   group_membership: 
     errors: 
       group_full: "Bu grup dolu"
@@ -7507,6 +7533,7 @@ tr:
     invalid_file_size: "Resim dosyası boyutu çok büyük (Maksimum %{max} byte, %{actual})"
     invalid_file_type: "%{type} bilinmeyen dosya tipi. İzin verilen tipler : %{type_list}"
     not_an_image: "Seçtiğiniz dosya bir resim değil"
+  individual_gradebook_description: "Bireysel Notdefteri Görünümü, not defteri görünümünün erişilebilirliğine yönelik bir arayüzdür."
   info: 
     notices: 
       error_reported: "Yardımınız için teşekkürler! Bunu düzelteceğiz"
@@ -10062,6 +10089,10 @@ tr:
     invalid_file: "Geçersiz öğrenme çıktısı grubu dosyası"
   outcome_groups_api: 
     account_group_description: "Hesap düzeyi öğrenme çıktıları grubu."
+  outcome_path_mastery_points: "%{path} yeterlik puanı"
+  outcome_path_result: "%{path} sonuç"
+  outcome_results: 
+    outcomes_filename: "Öğrenme Çıktıları"
   outcomes: 
     account_standards: "Hesap Standartları"
     account_standards_description: "Sol tarafta bu derste kullanmanız için kurumunuzun oluşturduğu standartları görebilirsiniz."
@@ -10446,6 +10477,7 @@ tr:
         do_analytics: "Olay analizlerini yolla"
         domain: Alan
         hide_rte_button: "Zengin Metin Editöründe video simgesini gizle."
+        js_uploader: "Html5 (erişilebilir) yükleyici kullanın"
         kaltura_sis: "Kaltura'ya SIS verisi yazdır"
         kcw_ui_conf: "KCW UI Conf ID"
         partner_id: "Partner ID"
@@ -11143,7 +11175,7 @@ tr:
     regrade: 
       give_everyone_full_credit: "Bu soru için herkese tam kredi ver."
       no_scores_reduced: "Düzeltilmiş ve önceden doğru verilmiş cevaplar için ödül puan ver (*hiçbir not azalmayacak*)"
-      regrade_disabled: "Öğrenci gönderimde bulunduktan sonra cevabın biri kaldırıldığı için bu soruda yeniden notlandırılmaya izin verilmiyor."
+      regrade_disabled: "Doğru cevap silindiği ya da öğrenci gönderimde bulunduktan sonra soru türü değiştirildiği için bu soruda yeniden notlandırılmaya izin verilmiyor."
       regrade_options: "*(bu soruyu daha önce cevaplamış öğrenciler için)* Yeniden Notlandırma Seçenekleri:"
       some_scores_reduced: "Yalnızca doğru cevaba ödül puan ver (*bazı öğrencilerin notları azalabilir*)"
       update_question_without_regrading: "Tekrar değerlendirme olmadan soruyu güncelle"
@@ -11454,6 +11486,7 @@ tr:
         not_yet_graded: "Henüz Notlandırılmadı"
         original_score: "Orjinal Puan:"
         points_possible: "%{points_possible} puan"
+        question_number: "Soru %{question_number}"
         regraded_score: "Tekrar Değerlendirilen Puan:"
         show_ansers_for_variable: "%{variable} için Cevapları Göster"
         skip_question_text: "Soru metnine geçin."
@@ -12443,7 +12476,6 @@ tr:
         are_you_sure_delete: "Bu değerlendirme listesine silmek istediğinize emin misiniz? Bu değerlendirme listesiyle ilişkili herhangi bir dersten bu listeye erişilebilir fakat hiç bir yeni ders bu listeyi kullanamaz."
         are_you_sure_remove: "Değerlendirme listesini listenizden silmek istediğinize emin misiniz?"
       remove_rubric: "Değerlendirme listesini listemden sil"
-  screenreader_gradebook_description: "Screenreader Notlandırıcı, notlandırmadaki erişilebilirliği artırmak amaçlı bir arayüzdür."
   scribd: 
     upgrade_flash: "Merhaba, Adobe Flash Player versyonunuz eski. iPaper kullanmak için (ve Internet'te diğer çoğu şey için) Flash player'ın %{link_tag}en son versiyonunu indirin%{end_link}."
   search: 
@@ -12722,6 +12754,13 @@ tr:
     errors: 
       400_message: 
         description: "Huh. Görünüşe göre sayfanın yükleme isteğinde bir problem meydana geldi."
+        error: "Hata:"
+        headings: 
+          page: "Sayfada Hata"
+        title: "Sayfada Hata"
+      403_message: 
+        description: "Ha! Sanırım burada bulunmamanız gerekiyor."
+        error: "Hata:"
         headings: 
           page: "Sayfada Hata"
         title: "Sayfada Hata"
@@ -12808,6 +12847,7 @@ tr:
       range_upper: "Aralık üst sınırı"
       remove_row: "Satırı sil"
       remove_scheme: "Notlandırma Şemasını Sil"
+      select_another_scheme: "Başka bir Şema Seçiniz"
       some_standard: "Bazı standartlar"
       use_this_standard: "Bu Notlandırma Standartını Kullan"
     home_menu: 
@@ -13373,6 +13413,8 @@ tr:
     not_available: "Şu tarihte kullanılabilir"
     pending: "Şu zamana kadar kullanılamaz"
   step: Adım
+  student_id: "Öğrenci ID"
+  student_name: "Öğrenci adı"
   student_outcome_gradebook_description: |-
       Öğrenme Çıktısı Not Defteri öğrencilerin dersin öğrenme çıktılarına göre ders ilerleme 
       durumunu hızlı bir şekilde incelemelerini sağlar. Öğrenme çıktıları Not defterine

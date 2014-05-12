@@ -73,6 +73,38 @@ describe ApplicationController do
     end
   end
 
+  describe "#reject!" do
+    it "sets the message and status in the error json" do
+      expect { controller.reject!('test message', :not_found) }.to(raise_error(RequestError) do |e|
+        e.message.should == 'test message'
+        e.error_json[:message].should == 'test message'
+        e.error_json[:status].should == 'not_found'
+        e.response_status.should == 404
+      end)
+    end
+
+    it "defaults status to 'bad_request'" do
+      expect { controller.reject!('test message') }.to(raise_error(RequestError) do |e|
+        e.error_json[:status].should == 'bad_request'
+        e.response_status.should == 400
+      end)
+    end
+
+    it "accepts numeric status codes" do
+      expect { controller.reject!('test message', 403) }.to(raise_error(RequestError) do |e|
+        e.error_json[:status].should == 'forbidden'
+        e.response_status.should == 403
+      end)
+    end
+
+    it "accepts symbolic status codes" do
+      expect { controller.reject!('test message', :service_unavailable) }.to(raise_error(RequestError) do |e|
+        e.error_json[:status].should == 'service_unavailable'
+        e.response_status.should == 503
+      end)
+    end
+  end
+
   describe "safe_domain_file_user" do
     before :each do
       # safe_domain_file_url wants to use request.protocol

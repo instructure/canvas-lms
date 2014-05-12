@@ -36,9 +36,14 @@ class WikiPage < ActiveRecord::Base
 
   before_save :set_revised_at
   before_validation :ensure_unique_title
+  after_save :touch_wiki_context
 
   TITLE_LENGTH = WikiPage.columns_hash['title'].limit rescue 255
   SIMPLY_VERSIONED_EXCLUDE_FIELDS = [:workflow_state, :hide_from_students, :editing_roles, :notify_of_update]
+
+  def touch_wiki_context
+    self.wiki.touch_context if self.wiki && self.wiki.context
+  end
 
   def validate_front_page_visibility
     if !published? && self.is_front_page?

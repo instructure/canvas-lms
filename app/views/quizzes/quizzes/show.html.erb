@@ -33,9 +33,14 @@
               </li>
             <% end %>
 
-            <a href="<%= context_url(@context, :context_quiz_moderate_url, @quiz.id) %>">
-              <i class="icon-settings"><span class="screenreader-only"><%= qos_moderate_title %></span></i> <%= qos_moderate_title %>
-            </a>
+            <% if @quiz.published? %>
+              <li>
+                <a href="<%= context_url(@context, :context_quiz_moderate_url, @quiz.id) %>">
+                  <i class="icon-settings"><span class="screenreader-only"><%= qos_moderate_title %></span></i> <%= qos_moderate_title %>
+                </a>
+              </li>
+            <% end %>
+
             <%= render :partial => 'download_file_upload_submissions' %>
 
           <% end %>
@@ -47,10 +52,13 @@
               </a>
             </li>
           <% end %>
-          <% see_full_quiz_title = t('links.see_full_quiz', "See Full Quiz") %>
-          <a href="<%= context_url(@context, :context_quiz_read_only_url, @quiz.id) %>">
-            <i class="icon-quiz"><span class="screenreader-only"><%= see_full_quiz_title %></span></i> <%= see_full_quiz_title %>
-          </a>
+
+          <li>
+            <% see_full_quiz_title = t('links.see_full_quiz', "See Full Quiz") %>
+            <a href="<%= context_url(@context, :context_quiz_read_only_url, @quiz.id) %>">
+              <i class="icon-quiz"><span class="screenreader-only"><%= see_full_quiz_title %></span></i> <%= see_full_quiz_title %>
+            </a>
+          </li>
         <% end %>
 
         <% if (can_do(@quiz, @current_user, :grade) || can_do(@quiz, @current_user, :review_grades)) && @quiz.available? && @quiz.assignment && @context.allows_speed_grader? && (@quiz.published? || !@context.feature_enabled?(:draft_state)) %>

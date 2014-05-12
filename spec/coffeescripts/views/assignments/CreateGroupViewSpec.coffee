@@ -29,6 +29,18 @@ define [
     setup: -> fakeENV.setup()
     teardown: -> fakeENV.teardown()
 
+  test 'hides drop options for no assignments', ->
+    view = createView()
+    view.render()
+    ok view.$('[name="rules[drop_lowest]"]').length
+    ok view.$('[name="rules[drop_highest]"]').length
+
+    view.assignmentGroup.get('assignments').reset []
+    view.render()
+    equal view.$('[name="rules[drop_lowest]"]').length, 0
+    equal view.$('[name="rules[drop_highest]"]').length, 0
+
+
   test 'it should not add errors when never_drop rules are added', ->
     view = createView()
     data =

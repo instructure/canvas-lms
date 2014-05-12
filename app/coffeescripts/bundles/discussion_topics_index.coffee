@@ -17,7 +17,7 @@ require [
         pinned: I18n.t('pinned_discussions',  'Pinned Discussions')
       help:
         title: I18n.t('ordered_by_recent_activity', 'Ordered by Recent Activity')
-      toggleMessage: I18n.t('toggle_message', 'toggle discussion visibility')
+      toggleMessage: I18n.t('toggle_message', 'toggle section visibility')
 
     # Public: Routes to respond to.
     routes:
