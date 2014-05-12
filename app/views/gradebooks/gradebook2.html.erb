@@ -4,7 +4,7 @@
   @show_left_side = false
   @show_embedded_chat = false
   if @context.feature_enabled?(:screenreader_gradebook)
-    add_crumb t(:srgb_gradebook, "switch gradebooks"), context_url(@context, :change_gradebook_version_context_gradebook_url, :version => "srgb"), :id => 'change_gradebook_version_link_holder'
+    add_crumb t(:individual_view, "Switch to Individual View"), context_url(@context, :change_gradebook_version_context_gradebook_url, :version => "srgb"), :id => 'change_gradebook_version_link_holder'
   elsif @context.old_gradebook_visible?
     add_crumb t(:old_gradebook, "old gradebook", :version => 1), context_url(@context, :change_gradebook_version_context_gradebook_url, :reset => true), :id => 'change_gradebook_version_link_holder'
   end
