@@ -37,8 +37,17 @@ end
 Delayed::Worker.lifecycle.around(:perform) do |worker, job, &block|
   starting_mem = Canvas.sample_memory()
   starting_cpu = Process.times()
+  lag = ((Time.now - job.created_at) * 1000).round
+  tag = CanvasStatsd::Statsd.escape(job.tag)
+  stats = ["delayedjob.queue", "delayedjob.queue.tag.#{tag}", "delayedjob.queue.shard.#{job.current_shard.id}"]
+  stats << "delayedjob.queue.jobshard.#{job.shard.id}" if job.respond_to?(:shard)
+  CanvasStatsd::Statsd.timing(stats, lag)
   begin
-    block.call(worker, job)
+    stats = ["delayedjob.perform", "delayedjob.perform.tag.#{tag}", "delayedjob.perform.shard.#{job.current_shard.id}"]
+    stats << "delayedjob.perform.jobshard.#{job.shard.id}" if job.respond_to?(:shard)
+    CanvasStatsd::Statsd.time(stats) do
+      block.call(worker, job)
+    end
   ensure
     ending_cpu = Process.times()
     ending_mem = Canvas.sample_memory()
@@ -46,5 +55,11 @@ Delayed::Worker.lifecycle.around(:perform) do |worker, job, &block|
     system_cpu = ending_cpu.stime - starting_cpu.stime
 
     Rails.logger.info "[STAT] #{starting_mem} #{ending_mem} #{ending_mem - starting_mem} #{user_cpu} #{system_cpu}"
+  end
+end
+
+Delayed::Worker.lifecycle.around(:pop) do |worker, &block|
+  CanvasStatsd::Statsd.time(["delayedjob.pop", "delayedjob.pop.jobshard.#{Shard.current(:delayed_job)}"]) do
+    block.call(worker)
   end
 end

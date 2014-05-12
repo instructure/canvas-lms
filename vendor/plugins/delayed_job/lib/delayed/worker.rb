@@ -93,11 +93,14 @@ class Worker
     @sleep_delay_stagger ||= Setting.get('delayed_jobs_sleep_delay_stagger', '2.5').to_f
     @make_tmpdir ||= Setting.get('delayed_jobs_unique_tmpdir', 'true') == 'true'
 
-    job = Delayed::Job.get_and_lock_next_available(
-      name,
-      queue,
-      min_priority,
-      max_priority)
+    job =
+        self.class.lifecycle.run_callbacks(:pop, self) do
+          Delayed::Job.get_and_lock_next_available(
+            name,
+            queue,
+            min_priority,
+            max_priority)
+        end
 
     if job
       configure_for_job(job) do
