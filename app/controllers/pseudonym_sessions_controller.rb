@@ -648,7 +648,6 @@ class PseudonymSessionsController < ApplicationController
 
   def oauth2_accept
     redirect_params = final_oauth2_redirect_params(:remember_access => params[:remember_access])
-    redirect_params[:state] = session[:oauth2][:state] if session[:oauth2][:state]
     final_oauth2_redirect(session[:oauth2][:redirect_uri], redirect_params)
   end
 
@@ -698,6 +697,8 @@ class PseudonymSessionsController < ApplicationController
     options = {:scopes => session[:oauth2][:scopes], :remember_access => options[:remember_access], :purpose => session[:oauth2][:purpose]}
     code = Canvas::Oauth::Token.generate_code_for(@current_user.global_id, session[:oauth2][:client_id], options)
     redirect_params = { :code => code }
+    redirect_params[:state] = session[:oauth2][:state] if session[:oauth2][:state]
+    redirect_params
   end
 
   def final_oauth2_redirect(redirect_uri, opts = {})

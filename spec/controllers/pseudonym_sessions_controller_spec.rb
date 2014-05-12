@@ -838,6 +838,16 @@ describe PseudonymSessionsController do
         response.location.should match(/https:\/\/example.com/)
       end
 
+      it 'should redirect to the redirect uri with the provided state' do
+        @user.access_tokens.create!({:developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil})
+        provider = Canvas::Oauth::Provider.new(key.id, key.redirect_uri, ['/auth/userinfo'], nil)
+
+        post :create, params, :oauth2 => provider.session_hash.merge(state: "supersekrit")
+        response.should be_redirect
+        response.location.should match(/https:\/\/example.com/)
+        response.location.should match(/state=supersekrit/)
+      end
+
       it 'should not reuse userinfo tokens for other scopes' do
         @user.access_tokens.create!({:developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil})
         provider = Canvas::Oauth::Provider.new(key.id, key.redirect_uri, [], nil)
