@@ -24,6 +24,7 @@ class Course < ActiveRecord::Base
   include Workflow
   include TextHelper
   include HtmlTextHelper
+  include TimeZoneHelper
 
   attr_accessible :name,
                   :section,
@@ -65,7 +66,8 @@ class Course < ActiveRecord::Base
                   :hide_final_grades,
                   :hide_distribution_graphs,
                   :lock_all_announcements,
-                  :public_syllabus
+                  :public_syllabus,
+                  :time_zone
 
   EXPORTABLE_ATTRIBUTES = [
     :id, :name, :account_id, :group_weighting_scheme, :workflow_state, :uuid, :start_at, :conclude_at, :grading_standard_id, :is_public, :allow_student_wiki_edits,
@@ -82,6 +84,16 @@ class Course < ActiveRecord::Base
     :collaborations, :context_modules, :context_module_tags, :media_objects, :page_views, :asset_user_accesses, :role_overrides, :content_migrations, :content_exports,
     :course_imports, :alerts, :appointment_groups, :content_participation_counts
   ]
+
+  time_zone_attribute :time_zone
+  def time_zone_with_root_account
+    if read_attribute(:time_zone)
+      time_zone_without_root_account
+    else
+      root_account.default_time_zone
+    end
+  end
+  alias_method_chain :time_zone, :root_account
 
   serialize :tab_configuration
   serialize :settings, Hash

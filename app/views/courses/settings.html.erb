@@ -1,10 +1,11 @@
-<% 
+<%
   content_for :page_title, join_title(t(:page_title, "Course Details"), @context.name)
   jammit_css :course_settings
   js_bundle :course_settings
   @active_tab = "settings"
 
-  can_rename_course = can_do(@context.account, @current_user, :manage_courses) || !@context.root_account.settings[:prevent_course_renaming_by_teachers]
+  can_manage_courses = can_do(@context.account, @current_user, :manage_courses)
+  can_rename_course = can_manage_courses || !@context.root_account.settings[:prevent_course_renaming_by_teachers]
   has_multiple_sections = @context.course_sections.active.count > 1
 
   publishing_enabled = @context.allows_grade_publishing_by(@current_user) && can_do(@context, @current_user, :manage_grades)
@@ -60,6 +61,15 @@
             <span class="course_form course_code"><%= @context.course_code %></span>
           <% end %>
           <span class="course_info course_code"><%= @context.course_code %></span>
+        </td>
+      </tr>
+      <tr>
+        <td><%= f.blabel :time_zone, :en => "Time Zone" %></td>
+        <td>
+          <span class="course_form">
+            <%= f.time_zone_select :time_zone, ActiveSupport::TimeZone.us_zones %>
+          </span>
+          <span class="course_info time_zone"><%= @context.time_zone.name %></span>
         </td>
       <% if @context.sis_source_id && can_do(@context.root_account, @current_user, :read_sis) || can_do(@context.root_account, @current_user, :manage_sis) %>
         </tr><tr>
@@ -337,7 +347,7 @@ TEXT
       </tr>
     </table>
     <% end %>
-    
+
   </div>
   <div id="tab-sections">
     <h2 style="margin-top: 10px;"><%= t('headings.sections', %{Course Sections}) %></h2>
@@ -403,7 +413,7 @@ TEXT
 
     <div class="hidden-readable" tabindex="0" aria-label="keyboard instructions">
 
-      
+
       <%= t('navigation_keyboard_hint',
         'If using a screen reader, to change the order of the course navigation links,
         Turn off the virtual cursor or virtual buffer on your screen reader (press Insert-z for JAWS).

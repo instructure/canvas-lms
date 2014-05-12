@@ -90,6 +90,7 @@ describe "course settings" do
       course_name = 'new course name'
       course_code = 'new course-101'
       locale_text = 'English'
+      time_zone_value = 'Central Time (US & Canada)'
 
       get "/courses/#{@course.id}/settings"
 
@@ -100,6 +101,7 @@ describe "course settings" do
       code_input = course_form.find_element(:id, 'course_course_code')
       replace_content(code_input, course_code)
       click_option('#course_locale', locale_text)
+      click_option('#course_time_zone', time_zone_value, :value)
       f('.course_form_more_options_link').click
       wait_for_ajaximations
       f('.course_form_more_options').should be_displayed
@@ -109,6 +111,7 @@ describe "course settings" do
       f('.course_info').should include_text(course_name)
       f('.course_code').should include_text(course_code)
       f('span.locale').should include_text(locale_text)
+      f('span.time_zone').should include_text(time_zone_value)
     end
 
     it "should add a section" do
