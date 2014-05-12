@@ -653,7 +653,9 @@ describe ContentMigration do
       @copy_to.attachments.count.should == 1
       @copy_to.attachments.find_by_migration_id(mig_id(att)).file_state.should == 'available'
       @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(wiki)).workflow_state.should == 'active'
-      @copy_to.rubrics.find_by_migration_id(mig_id(rub1)).workflow_state.should == 'active'
+      rub2 = @copy_to.rubrics.find_by_migration_id(mig_id(rub1))
+      rub2.workflow_state.should == 'active'
+      rub2.rubric_associations.first.bookmarked.should == true
       @copy_to.created_learning_outcomes.find_by_migration_id(mig_id(lo)).workflow_state.should == 'active'
       @copy_to.quizzes.find_by_migration_id(mig_id(quiz)).workflow_state.should == 'created' if Qti.qti_enabled?
       @copy_to.context_external_tools.find_by_migration_id(mig_id(tool)).workflow_state.should == 'public'

@@ -64,7 +64,12 @@ module Importers
         item.save!
       end
 
-      unless context.rubric_associations.find_by_rubric_id(item.id)
+      if association = context.rubric_associations.find_by_rubric_id(item.id)
+        unless association.bookmarked
+          association.bookmarked = true
+          association.save!
+        end
+      else
         item.associate_with(context, context)
       end
 
