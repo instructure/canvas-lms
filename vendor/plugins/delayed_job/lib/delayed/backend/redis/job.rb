@@ -132,6 +132,7 @@ class Job
   column(:tag, :string)
   column(:max_attempts, :integer)
   column(:strand, :string)
+  column(:source, :string)
 
   if CANVAS_RAILS2
     attr_protected

@@ -151,10 +151,11 @@ class Worker
     count
   end
 
-  def perform_batch(job)
-    batch = job.payload_object
+  def perform_batch(parent_job)
+    batch = parent_job.payload_object
     if batch.mode == :serial
       batch.jobs.each do |job|
+        job.source = parent_job.source
         job.create_and_lock!(name)
         configure_for_job(job) do
           ensure_db_connection
