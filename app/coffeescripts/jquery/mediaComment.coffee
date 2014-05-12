@@ -45,7 +45,11 @@ define [
   getSourcesAndTracks = (id) ->
     dfd = new $.Deferred
     $.getJSON "/media_objects/#{id}/info", (data) ->
-      sources = _.map data.media_sources, (source) -> "<source type='#{source.content_type}' src='#{source.url}' />"
+      # this 'when ...' is because right now in canvas, none of the mp3 urls actually work.
+      # see: CNVS-12998
+      sources = for source in data.media_sources when source.content_type isnt 'audio/mp3'
+        "<source type='#{source.content_type}' src='#{source.url}' />"
+
       tracks = _.map data.media_tracks, (track) ->
           languageName = mejs.language.codes[track.locale] || track.locale
           "<track kind='#{track.kind}' label='#{languageName}' src='#{track.url}' srclang='#{track.locale}' />"
