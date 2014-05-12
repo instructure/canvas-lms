@@ -13,24 +13,16 @@
   {{/if}}
 </td>
 <td>
-  {{#if alwaysAvailable}}
-    -
-    <span class="screenreader-only">
-      {{#t "no_lock_or_unlock_date_for_quiz"}}
-        No lock or unlock date for quiz.
-      {{/t}}
-    </span>
+  {{#if unlockAt}}
+    {{friendlyDatetime unlockAt}}
   {{else}}
-    {{#if hasLockDateRange}}
-      {{{friendlyDateRangeString}}}
-    {{else}}
-      {{#if lockAt}}
-        {{friendlyLockAt}}
-      {{else}}
-        {{#if unlockAt}}
-          {{friendlyUnlockAt}}
-        {{/if}}
-      {{/if}}
-    {{/if}}
+    -
+  {{/if}}
+</td>
+<td>
+  {{#if lockAt}}
+    {{friendlyDatetime lockAt}}
+  {{else}}
+    -
   {{/if}}
 </td>
