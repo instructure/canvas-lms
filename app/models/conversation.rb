@@ -436,8 +436,11 @@ class Conversation < ActiveRecord::Base
           WHERE users.id = cp.user_id AND #{cp_conditions}
         SQL
       else
-        User.where("id IN (SELECT user_id FROM conversation_participants cp WHERE #{cp_conditions})").
-            update_all('unread_conversations_count = unread_conversations_count + 1')
+        lock_type = true
+        lock_type = 'FOR NO KEY UPDATE' if User.connection.adapter_name == 'PostgreSQL' && User.connection.send(:postgresql_version) >= 90300
+        # lock the rows in a predefined order to prevent deadlocks
+        ids = User.where(id: ConversationParticipant.from("conversation_participants cp").where(cp_conditions).select(:user_id)).lock(lock_type).order(:id).pluck(:id)
+        User.where(id: ids).update_all('unread_conversations_count = unread_conversations_count + 1')
       end
 
       conversation_participants.where("(last_message_at IS NULL OR subscribed) AND user_id NOT IN (?)", skip_ids).
