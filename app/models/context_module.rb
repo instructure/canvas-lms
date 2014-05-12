@@ -50,7 +50,7 @@ class ContextModule < ActiveRecord::Base
   private :invalidate_progressions
 
   def evaluate_all_progressions
-    current_column = '"context_module_progressions"."current"'
+    current_column = 'context_module_progressions.current'
     current_scope = context_module_progressions.where("#{current_column} IS NULL OR #{current_column} = ?", false)
     current_scope.find_each(batch_size: 100) do |progression|
       progression.evaluate!
