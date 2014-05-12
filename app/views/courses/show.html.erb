@@ -21,8 +21,8 @@
         <div class="course-options">
           <% if @can_manage_content %>
             <a class="button-sidebar-wide element_toggler" aria-controls="edit_course_home_content_form" href="<%= context_url(@context, :context_details_url) %>">
-              <i class="icon-edit"></i>
-              <%= t('links.edit_homepage', %{Edit Homepage}) %>
+              <i class="icon-target"></i>
+              <%= t('links.choose_home_page', %{Choose Home Page}) %>
             </a>
           <% end %>
 
@@ -144,7 +144,7 @@
   <% content_for :right_side do %>
     <div id="edit_course_home_content" style="display: none;">
       <h2><%= t('draft_state.headings.set_layout', %{Set Home Page Layout}) %></h2>
-      <%= form_for :course, :url => context_url(@context, :context_url), :html => {:tabindex=>"0", :'data-turn-into-dialog'=>'{"height": 300, "width":500,"modal":true}', :title=>t('headings.edit_homepage_title', %{Edit Homepage}), :style => "display:none", :id => "edit_course_home_content_form", :method => :put} do |f| %>
+      <%= form_for :course, :url => context_url(@context, :context_url), :html => {:tabindex=>"0", :'data-turn-into-dialog'=>'{"height": 300, "width":500,"modal":true}', :title=>t('headings.choose_home_page_title', %{Choose Home Page}), :style => "display:none", :id => "edit_course_home_content_form", :method => :put} do |f| %>
         <label for="edit_course_home_content_select"><%= t('draft_state.labels.select_content', %{Select what you'd like to display on the homepage.}) %></label>
         <br>
         <select name="course[default_view]" id="edit_course_home_content_select">
