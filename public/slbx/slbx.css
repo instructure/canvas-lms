@@ -1,0 +1,141 @@
+/* Replace the gray background with something that matches your colors.  You can use .pngs with alpha transparency. If you don't use an image, you need to remove ours*/
+#header { 
+  /*background: url("noisy_blue.png?v1") repeat-x scroll center transparent;*/
+  background-image: none; 
+  background-color: #E37B2F;
+  box-shadow: 0px 0px 15px #888;
+    height: 80px;
+}
+
+
+/*replace the canvas logo with your logo*/
+#header-logo, #header.no-user #header-logo {
+  background: url("/slbx/slbx_logo_small.png") no-repeat scroll 0 0 transparent;
+  bottom: 0px;
+  height: 60px;
+  left: 0px;
+  width: 210px;
+}
+
+
+/*if you replace the left canvas logo, move a smaller one to the right side of the header--I made the image gray first*/
+#header-logo-secondary {
+  background: url("header_canvas_logo2.png?v1") no-repeat scroll 0 0 transparent;
+  bottom: 11px;
+  height: 26;
+  position: absolute;
+  right: 26px;
+  width: 135px;
+  display: block;
+}
+
+/*if your logo is bigger, you can make room like this*/
+#menu { margin-left: 200px; }
+
+/*change the identity bar (the area that says â€œUser Inbox Settings Logout Help)*/
+#identity {
+    background-image: linear-gradient(to bottom, #18eeff, #008FD6);
+}
+
+/*change the color of the identity text*/
+#identity a { color: black; }
+/*change the color of the circle around the number of unread inbox messages*/
+#identity .inbox a .unread-messages-count { background-color: #F2F0DD; }
+#identity #identity-help-container a { color: black; }
+
+/*change the color of the menu items (courses & groups etc.). If the text looks fuzzy, remove the text shadow.*/
+.menu-item .menu-item-title, .menu-item .menu-item-no-drop {
+  color: #FAFBF4;
+  text-shadow: none;
+}
+
+/*Desktop Login*/
+
+
+/*login background color*/
+
+/*change the background color and the color of 'stay signed in'*/
+#modal-box.login-box {
+  background-color: #000000 !important
+   color: #2784A0;
+}
+	
+/*this will remove the extra canvas logo*/
+body.modal #modal-box.login-box h1 { 
+  background: url("/slbx/slbx_logo.png") no-repeat scroll 140px 40px transparent;
+  height: 130px;
+}
+
+
+
+/*login background image, if you are not using a background color*/
+
+/*change location of image and resize to match image height and width*/
+#modal-box-inner {
+  height: 400px;
+  width: 680px;
+/*adjust to move image to left and top*/
+  margin-left: -15px;
+  margin-top: -15px;
+ }
+
+/*change the color of 'don't know your password'*/
+body.modal #modal-box.login-box a { color: #2784A0 !important; } 
+
+/*change the color of the login button*/
+body.modal #modal-box .btn, body.modal #login-box .btn {
+  background-image: none !important;
+  border-color: #668F78;
+}
+  
+#login_form .btn-primary, #login_form .btn-primary:hover {
+  background-image: none;
+  border: none !important;
+  }
+
+/*CSS Override for Mobile Version*/
+
+/*update the image URL*/
+body{
+  background: url(https://hilary.instructure.com/images/blue/bg.jpg?1358195888);
+}
+
+#f1_container{
+  background: url(https://s3.amazonaws.com/SSL_Assets/hilary/header_logok-12.png) no-repeat center top;
+}
+
+.face{
+  background: url(https://s3.amazonaws.com/SSL_Assets/hilary/noisy_blue.png?v1);
+  border-radius: 0.3em;
+  box-shadow: 0px 4px 10px #999;
+}
+
+input{
+  background: #f3f3f3;
+  border-radius: 5px;
+  font-weight: normal;
+}
+
+button[type="submit"]{
+  border: none;
+  color: #fff;
+  text-shadow: 0 -1px 0 #36629b;
+}
+
+.flip-to-back, .flip-to-front{
+  text-shadow: 0 1px 0 #fff;
+  border: none;
+  border-radius: 6px;
+  background: #dddddd; /* Old browsers */
+  background: -moz-linear-gradient(top,  #dddddd 0%, #f3f3f3 50%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#dddddd), color-stop(50%,#f3f3f3)); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top,  #dddddd 0%,#f3f3f3 50%); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top,  #dddddd 0%,#f3f3f3 50%); /* Opera 11.10+ */
+  background: -ms-linear-gradient(top,  #dddddd 0%,#f3f3f3 50%); /* IE10+ */
+  background: linear-gradient(to bottom,  #dddddd 0%,#f3f3f3 50%); /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#dddddd', endColorstr='#f3f3f3',GradientType=0 ); /* IE6-9 */
+  color: #888;
+}
+body.modal #modal-box.login-box {
+    background: url('/images/Money_Noise_tm.png?1399865639') repeat scroll 0% 0%, radial-gradient(circle farthest-corner at 50% -100px, rgba(255, 255, 255, 0.6) 0%, transparent 100%) repeat scroll 0% 0%, -moz-linear-gradient(center top, #3bed5c, #b415ed) repeat scroll 0% 0% transparent;
+}
