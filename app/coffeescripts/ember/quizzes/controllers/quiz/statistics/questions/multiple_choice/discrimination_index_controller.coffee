@@ -19,15 +19,15 @@ define [ 'ember', 'underscore' ], (Ember, _) ->
     #     3, 1, 1
     #   ],
     #
-    #   // inverse of correct; those who didn't get it right
-    #   "incorrect": [
-    #     1, 2, 4
+    #   // total number of students in each bracket
+    #   "total": [
+    #     4, 2, 4
     #   ],
     #
-    #   // Highest count in all brackets, regardless of correct status.
-    #   //
-    #   // Useful for using as an axis domain boundary.
-    #   "maxPoint": 4
+    #   // % of students who got it right in each bracket
+    #   "ratio": [
+    #     0.75, 0.5, 0.25
+    #   ]
     # }
     # ```
     chartData: (->
@@ -43,18 +43,13 @@ define [ 'ember', 'underscore' ], (Ember, _) ->
           total: @get('model.bottomStudentCount')
       }
 
-      data = {
-        correct: [
-          stats.top.correct, stats.mid.correct, stats.bot.correct
-        ],
-
-        incorrect: [
-          stats.top.total - stats.top.correct,
-          stats.mid.total - stats.mid.correct,
-          stats.bot.total - stats.bot.correct
+      {
+        correct: [ stats.top.correct, stats.mid.correct, stats.bot.correct ],
+        total: [ stats.top.total, stats.mid.total, stats.bot.total ],
+        ratio: [
+          (1.0 * stats.top.correct / stats.top.total) || 0,
+          (1.0 * stats.mid.correct / stats.mid.total) || 0,
+          (1.0 * stats.bot.correct / stats.bot.total) || 0
         ]
       }
-
-      data.maxPoint = Math.max.apply Math, _.union(data.correct, data.incorrect)
-      data
     ).property('model.{top,middle,bottom}StudentCount')
