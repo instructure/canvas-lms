@@ -18,6 +18,26 @@ $muteTextColor: #aaa;
     line-height: 1;
     font-weight: bold;
   }
+
+  .answer-set-tabs {
+    margin-top: -10px; // negate the margin in the <p /> in the header above
+    margin-bottom: 20px;
+
+    button {
+      display: inline-block;
+      color: white;
+      background: #bfbfbf;
+      font-weight: bold;
+      padding: 5px 10px;
+      border: none;
+      border-radius: 4px;
+
+      &.active, &:hover {
+        background: #2894d1;
+        cursor: pointer;
+      }
+    }
+  }
 }
 
 #question-statistics-section {
@@ -201,7 +221,7 @@ $muteTextColor: #aaa;
         margin-left: 5%;
       }
     }
-    
+
     .answer-text {
       margin-left: 55px; /* for the answer response ratio label */
     }

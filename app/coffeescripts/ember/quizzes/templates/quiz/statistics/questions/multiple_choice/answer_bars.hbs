@@ -2,7 +2,7 @@
 <div title class="inspector"></div>
 
 <div class="auxiliary">
-  {{#each answer in controller.model.answers}}
+  {{#each answer in answers}}
     <div {{bind-attr data-answer="answer.id"}} class="answer-distribution-tooltip-content">
       <p>
         <span class="answer-response-ratio">{{answer.ratio}}%</span>

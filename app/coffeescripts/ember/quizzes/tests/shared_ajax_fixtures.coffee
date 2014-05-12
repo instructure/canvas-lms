@@ -291,12 +291,12 @@ define [
         textStatus: '200'
 
       ajax.defineFixture '/api/v1/courses/1/quizzes/1/statistics',
-        response: quizStatisticsResponse,
+        response: JSON.parse(JSON.stringify quizStatisticsResponse),
         jqXHR: {}
         testStatus: '200'
 
       ajax.defineFixture '/api/v1/courses/1/quizzes/1/reports',
-        response: quizReportsResponse,
+        response: JSON.parse(JSON.stringify quizReportsResponse),
         jqXHR: {}
         testStatus: '200'
 

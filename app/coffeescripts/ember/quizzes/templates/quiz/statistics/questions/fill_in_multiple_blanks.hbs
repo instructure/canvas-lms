@@ -1,0 +1,49 @@
+<header>
+  <span class="question-attempts">{{attemptsLabel}}</span>
+  <aside class="pull-right">
+    <button {{action "showDetails"}} class="btn">
+      <i {{bind-attr class="detailsVisible:icon-collapse:icon-expand"}}></i>
+    </button>
+  </aside>
+
+  <div class="question-text">
+    {{{questionText}}}
+  </div>
+</header>
+
+<div>
+  <nav class="row-fluid answer-set-tabs">
+    {{#each set in answerSets}}
+      {{#with set}}
+        <button {{bind-attr class="active:active"}} {{action "activateAnswer" id}}>
+          {{{text}}}
+        </button>
+      {{/with}}
+    {{/each}}
+  </nav>
+
+  <div class="row-fluid">
+    {{#if activeAnswer}}
+      <section class="correct-answer-ratio-section">
+        {{render "quiz/statistics/questions/fill_in_multiple_blanks/correct_pie" controller}}
+      </section>
+
+      <section class="answer-distribution-section">
+        {{render "quiz/statistics/questions/fill_in_multiple_blanks/answer_bars" controller}}
+      </section>
+    {{/if}}
+  </div>
+</div>
+
+<ol class="answer-drilldown detail-section">
+  {{#if activeAnswer}}
+    {{#each answer in activeAnswer.answer_matches}}
+      <li {{bind-attr class="answer.correct"}}>
+        <span class="answer-response-ratio">{{answer.ratio}}<sup>%</sup></span>
+        <div class="answer-text">
+          {{{answer.text}}}
+        </div>
+      </li>
+    {{/each}}
+  {{/if}}
+</ol>

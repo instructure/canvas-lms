@@ -25,47 +25,10 @@ define [
   test 'should run', ->
     ok true
 
-  test '#correctResponseRatio: happy path', ->
-    run ->
-      subject.set 'quizStatistics.submissionStatistics.unique_count', 10
+  test '#answerSets: it wraps _data.answer_sets as Ember.Objects', ->
+    subject.set '_data.answer_sets', [{}]
+    ok subject.get('answerSets.firstObject') instanceof Em.Object,
+      'it wraps objects'
 
-      subject.set 'answers', [{ id: 1, responses: 0, correct: true }]
-      equal subject.get('correctResponseRatio'), 0
-
-      subject.set 'answers', [{ id: 1, responses: 3, correct: true }]
-      equal subject.get('correctResponseRatio'), 0.3
-
-      subject.set 'answers', [{ id: 1, responses: 10, correct: true }]
-      equal subject.get('correctResponseRatio'), 1
-
-  test '#correctResponseRatio: doesnt divide by zero', ->
-    run ->
-      subject.set 'quizStatistics.submissionStatistics.unique_count', 0
-      subject.set 'answers', [{ id: 1, responses: 2, correct: true }]
-      equal subject.get('correctResponseRatio'), 0
-
-
-  test '#correctMultipleResponseRatio', ->
-    run ->
-      sinon.stub(subject, 'hasMultipleAnswers').returns(true)
-      subject.set 'quizStatistics.submissionStatistics.unique_count', 10
-      subject.set 'answers', [
-        { user_ids: [3], correct: true },
-        { user_ids: [ ], correct: false },
-        { user_ids: [3], correct: true },
-      ]
-
-      equal subject.get('correctResponseRatio'), 0.1,
-        'it counts only students who have picked all correct answers and nothing else'
-
-      subject.set 'answers', [
-        { user_ids: [3], correct: true },
-        { user_ids: [3], correct: false },
-        { user_ids: [3], correct: true },
-      ]
-
-      equal subject.get('correctResponseRatio'), 0,
-        "it doesn't count students who picked a wrong answer and a correct one"
-
-
-
+  test '#ratioCalculator: it builds the ratio calculator', ->
+    equal subject.get('ratioCalculator.ratio'), 0

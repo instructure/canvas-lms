@@ -1,10 +1,10 @@
 define [ 'ember' ], (Ember) ->
-  Ember.Controller.extend
+  Ember.ObjectController.extend
     chartData: (->
-      @get('model.answers').map (answer) ->
+      @get('answers').map (answer) ->
         {
           id: answer.id # we need the IDs for tooltip work
           y: answer.responses
           correct: answer.correct # correct answer bars get highlighted
         }
-    ).property('model.answers')
+    ).property('answers')

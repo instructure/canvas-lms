@@ -24,17 +24,8 @@ define [
     h: 120
 
     hideAuxiliaryContent: (->
-      @inspectionContent = @$('.auxiliary').detach()
+      @$('.auxiliary').hide()
     ).on('didInsertElement')
-
-    cleanup: (->
-      if @inspector
-        @inspector.destroy()
-        @inspector = null
-
-      if @svg
-        @svg.remove()
-    ).on('willDestroyElement')
 
     buildInspector: ->
       @inspector = @$('.inspector').tooltip({
@@ -43,8 +34,14 @@ define [
         hide: false
       }).data('tooltip')
 
+    removeInspector: (->
+      if @inspector
+        @inspector.destroy()
+        @inspector = null
+    ).on('willDestroyElement')
+
     inspect: (datapoint, target) ->
-      content = @inspectionContent.find("[data-answer='#{datapoint.id}']")
+      content = @$(".auxiliary [data-answer='#{datapoint.id}']")
       inspector = @inspector || @buildInspector()
       inspector.option
         content: () -> content.clone()
@@ -58,7 +55,7 @@ define [
     stopInspecting: ->
       @inspector.element.mouseout()
 
-    buildChart: (->
+    renderChart: (->
       data = @get('controller.chartData')
       $container = @$().parent()
 
@@ -127,6 +124,11 @@ define [
 
       @svg = svg # for cleanup
     ).on('didInsertElement')
+
+    removeChart: (->
+      if @svg
+        @svg.remove()
+    ).on('willDestroyElement')
 
     renderStripePattern: (svg) ->
       svg.append('pattern')
