@@ -243,7 +243,9 @@ define([
       },
       updateAllItemInstances: function(content_tag) {
         $(".context_module_item."+modules.itemClass(content_tag)+" .title").each(function() {
-          $(this).text(content_tag.title);
+          $this = $(this);
+          $this.text(content_tag.title);
+          $this.attr('title', content_tag.title);
         });
       },
       editModule: function($module) {
@@ -341,6 +343,7 @@ define([
         $item.addClass(data.type + "_" + data.id);
         $item.addClass(data.type);
         $item.attr('aria-label', data.title);
+        $item.find('.title').attr('title', data.title);
         $item.fillTemplateData({
           data: data,
           id: 'context_module_item_' + data.id,
@@ -375,7 +378,9 @@ define([
       refreshModuleList: function() {
         $("#module_list").find(".context_module_option").remove();
         $("#context_modules .context_module").each(function() {
-          var data = $(this).find(".header").getTemplateData({textValues: ['name', 'id']});
+          $this = $(this);
+          var data = $this.find(".header").getTemplateData({textValues: ['name', 'id']});
+          $this.find('.name').attr('title', data.name);
           var $option = $(document.createElement('option'));
           $option.val(data.id);
 
