@@ -1,0 +1,10 @@
+<ol class="answer-drilldown detail-section">
+  {{#each answer in answers}}
+    <li {{bind-attr class="answer.correct"}}>
+      <span class="answer-response-ratio">{{answer.ratio}}<sup>%</sup></span>
+      <div class="answer-text">
+        {{{answer.text}}}
+      </div>
+    </li>
+  {{/each}}
+</ol>

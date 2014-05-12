@@ -10,7 +10,7 @@ define [
     formatPercent: d3.format('%')
 
     renderChart: (->
-      ratio = @get('controller.correctStudentRatio')
+      ratio = @get('controller.correctResponseRatio')
       circle = 2 * Math.PI
 
       arc = d3.svg.arc()

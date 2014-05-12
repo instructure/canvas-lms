@@ -31,19 +31,62 @@ define [
     correctBottomStudentCount: attr()
 
     renderableType: (->
-      type = @get('questionType')
-
-      if [ 'multiple_choice_question', 'true_false_question' ].indexOf(type) > -1
-        'multiple_choice'
-      else
-        'generic'
-    ).property('question_type')
+      switch @get('questionType')
+        when 'multiple_choice_question', 'true_false_question'
+          'multiple_choice'
+        when 'short_answer_question', 'multiple_answers_question'
+          'short_answer'
+        else
+          'generic'
+    ).property('questionType')
 
     discriminationIndex: (->
-      pointBiserials = @get('pointBiserials')
-
-      unless pointBiserials
-        return null
-
-      _.findWhere(pointBiserials, { correct: true }).point_biserial
+      pointBiserials = @get('pointBiserials') || []
+      pointBiserials.findBy('correct', true).point_biserial
     ).property('pointBiserials')
+
+    hasMultipleAnswers: ->
+      Em.A([ 'multiple_answers_question' ]).contains(@get('questionType'))
+
+    # Calculates the ratio of students who answered this question correctly
+    # (partially correct answers do not count when applicable)
+    #
+    # TODO: this is better done on the back-end, but until then we'll do it here
+    correctResponseRatio: (->
+      participants = @get('quizStatistics.uniqueCount')
+
+      return 0 if participants <= 0
+      return @__correctMultipleResponseRatio() if @hasMultipleAnswers()
+
+      correctResponses = @get('answers').reduce (sum, answer) ->
+        sum += answer.responses if answer.correct
+        sum
+      , 0
+
+      correctResponses / participants
+    ).property('questionType', 'answers', 'quizStatistics.uniqueCount')
+
+    # Calculates a similar ratio to #correctResponseRatio but for questions that
+    # have multiple correct answers where the answer may be partially correct,
+    # in which case it is not counted.
+    #
+    # @private
+    #
+    # Please don't use this directly, use #correctResponseRatio instead.
+    __correctMultipleResponseRatio: ->
+      respondentsFor = (answerSet, flatten) ->
+        respondents = answerSet.map (answer) -> answer.user_ids
+        if flatten then _.flatten(respondents) else respondents
+
+      participants = @get 'quizStatistics.uniqueCount'
+      correctAnswers = @get('answers').filterBy 'correct', true
+      distractors = @get('answers').filterBy 'correct', false
+
+      # we need students who have picked all correct answers:
+      correctRespondents = _.intersection.apply _, respondentsFor(correctAnswers)
+
+      # and none of the wrong ones:
+      correctRespondents =
+        _.difference(correctRespondents, respondentsFor(distractors, true))
+
+      correctRespondents.length / participants
