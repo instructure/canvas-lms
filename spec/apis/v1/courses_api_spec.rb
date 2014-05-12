@@ -961,6 +961,32 @@ describe CoursesController, type: :request do
     end
   end
 
+  it "includes section enrollments if requested" do
+    json = api_call(:get, "/api/v1/courses.json",
+      { :controller => 'courses', :action => 'index', :format => 'json' },
+      { :include => ['sections'] })
+
+    course1_section_json = json.first['sections']
+
+    section = @course1.course_sections.first
+    course1_section_json.size.should == 1
+    course1_section_json.first['id'].should == section.id
+    course1_section_json.first['enrollment_role'].should == 'TeacherEnrollment'
+    course1_section_json.first['name'].should == section.name
+    course1_section_json.first['start_at'].should == section.start_at
+    course1_section_json.first['end_at'].should == section.end_at
+
+    course2_section_json = json.last['sections']
+
+    section = @course2.course_sections.first
+    course2_section_json.size.should == 1
+    course2_section_json.first['id'].should == section.id
+    course2_section_json.first['enrollment_role'].should == 'StudentEnrollment'
+    course2_section_json.first['name'].should == section.name
+    course2_section_json.first['start_at'].should == section.start_at
+    course2_section_json.first['end_at'].should == section.end_at
+  end
+
   it "should include term name in course list if requested" do
     [@course1.enrollment_term, @course2.enrollment_term].each do |term|
       term.start_at = 1.day.from_now

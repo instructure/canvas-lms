@@ -308,6 +308,10 @@ class CoursesController < ApplicationController
   #     completed or the current module does not require sequential progress.
   #     "course_progress" will return an error message if the course is not
   #     module based or the user is not enrolled as a student in the course.
+  #   - "sections": Section enrollment information to include with each Course.
+  #     Returns an array of hashes containing the section ID (id), section name
+  #     (name), start and end dates (start_at, end_at), as well as the enrollment
+  #     type (enrollment_role, e.g. 'StudentEnrollment').
   #
   # @argument state[] [Optional, String, "unpublished"|"available"|"completed"|"deleted"]
   #   If set, only return courses that are in the given state(s).
