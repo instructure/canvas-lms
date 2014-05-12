@@ -189,7 +189,7 @@ class SubmissionList
     # Produce @list, wich is a sorted, filtered, list of submissions with
     # all the meta data we need and no banned keys included. 
     def process
-      @list = self.submission_entries.sort_by { |a| [a[:graded_at] ? -a[:graded_at].to_f : SortLast, a[:safe_grader_id], a[:assignment_id]] }.
+      @list = self.submission_entries.sort_by { |a| [a[:graded_at] ? -a[:graded_at].to_f : CanvasSort::Last, a[:safe_grader_id], a[:assignment_id]] }.
           inject(Dictionary.new) do |d, se|
         d[se[:graded_on]] ||= []
         d[se[:graded_on]] << se

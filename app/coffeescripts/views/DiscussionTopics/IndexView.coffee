@@ -18,6 +18,8 @@ define [
 
     events:
       'click .ig-header .element_toggler': 'toggleDiscussionList'
+      'keydown .ig-header .element_toggler': 'toggleDiscussionList'
+      'click .discussion-list': 'toggleDiscussionListWithVo'
       'click #edit_discussions_settings':  'toggleSettingsView'
       'change #onlyUnread, #onlyGraded':   'filterResults'
       'keyup #searchTerm':                 'filterResults'
@@ -75,9 +77,26 @@ define [
       @settingsView().toggle()
 
     toggleDiscussionList: (e) ->
-      $(e.currentTarget).find('i')
-        .toggleClass('icon-mini-arrow-down')
-        .toggleClass('icon-mini-arrow-right')
+      $currentTarget = $(e.currentTarget)
+      # If we get a keydown that is not enter or space, ignore.
+      # Otherwise, simulate a click.
+      if e.type is 'keydown'
+        if e.keyCode in [13, 32]
+          e.preventDefault()
+          $currentTarget.click()
+        return
+      $icon = $currentTarget.find('i')
+      while $currentTarget.length && $icon.length is 0
+        $currentTarget = $currentTarget.parent()
+        $icon = $currentTarget.find('i')
+      return unless $icon.length
+      $icon.toggleClass('icon-mini-arrow-down').toggleClass('icon-mini-arrow-right')
+    
+    toggleDiscussionListWithVo: (e) ->
+      # if this event bubbled up from somewhere else, do nothing.
+      return unless e.target is e.delegateTarget or e.target.isSameNode?(e.delegateTarget)
+      $(e.target).find('.ig-header .element_toggler').first().click()
+      false
 
     settingsView: ->
       @_settingsView or= if @options.permissions.change_settings

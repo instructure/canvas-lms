@@ -254,7 +254,7 @@ class DiscussionTopicsController < ApplicationController
               @context.active_discussion_topics.only_discussion_topics
             end
 
-    scope = params[:order_by] == 'recent_activity' ? scope.by_last_reply_at : scope.by_position
+    scope = params[:order_by] == 'recent_activity' ? scope.by_last_reply_at : scope.by_position_legacy
 
     scope = DiscussionTopic.search_by_attribute(scope, :title, params[:search_term])
 
@@ -602,7 +602,32 @@ class DiscussionTopicsController < ApplicationController
   def public_topic_feed
   end
 
+  # @API Reorder pinned topics
+  #
+  # Puts the pinned discussion topics in the specified order.
+  # All pinned topics should be included.
+  #
+  # @argument order[] [Required, Integer]
+  #   The ids of the pinned discussion topics in the desired order.
+  #   (For example, "order=104,102,103".)
+  #
+  def reorder
+    if authorized_action(@context.discussion_topics.scoped.new, @current_user, :update)
+      order = Api.value_to_array(params[:order])
+      reject! "order parameter required" unless order && order.length > 0
+      topics = pinned_topics.where(id: order)
+      reject! "topics not found" unless topics.length == order.length
+      topics[0].update_order(order)
+      new_order = pinned_topics.by_position.pluck(:id).map(&:to_s)
+      render :json => {:reorder => true, :order => new_order}, :status => :ok
+    end
+  end
+
   protected
+
+  def pinned_topics
+    @context.active_discussion_topics.only_discussion_topics.where(pinned: true)
+  end
 
   def add_discussion_or_announcement_crumb
     if  @topic.is_a? Announcement
@@ -647,6 +672,7 @@ class DiscussionTopicsController < ApplicationController
       process_lock_parameters(discussion_topic_hash)
     end
     process_published_parameters(discussion_topic_hash)
+    process_pin_parameters(discussion_topic_hash)
 
     if @errors.present?
       render :json => {errors: @errors}, :status => :bad_request
@@ -737,6 +763,15 @@ class DiscussionTopicsController < ApplicationController
     elsif @topic.new_record? && !@topic.is_announcement && @topic.draft_state_enabled? && user_can_moderate
       @topic.unpublish
     end
+  end
+
+  # TODO: upgrade acts_as_list after rails3
+  # check_scope will probably handle this
+  def process_pin_parameters(discussion_topic_hash)
+    return unless params.has_key?(:pinned) && params[:pinned] != @topic.pinned?
+    @topic.pinned = params[:pinned]
+    @topic.position = nil
+    @topic.add_to_list_bottom
   end
 
   def apply_positioning_parameters

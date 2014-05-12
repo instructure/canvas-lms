@@ -62,6 +62,13 @@ describe Message do
       msg.body.should include('Account Admin')
       msg.html_body.should include('Account Admin')
     end
+
+    it "should have a sane body" do
+      @au = AccountUser.create(:account => account_model)
+      msg = generate_message(:account_user_notification, :email, @au)
+      msg.html_body.scan(/<html>/).length.should == 1
+      msg.html_body.index('<html>').should == 0
+    end
   end
 
   context "named scopes" do

@@ -22,7 +22,7 @@
     </div>
   <% end %>
   <div>
-    <% pages = Canvas::ICU.collate_by(@context.wiki.wiki_pages.not_deleted.select{|p| !p.new_record? }){|p| p.title || SortFirst} %>
+    <% pages = Canvas::ICU.collate_by(@context.wiki.wiki_pages.not_deleted.select{|p| !p.new_record? }){|p| p.title || CanvasSort::First} %>
     <% if pages.length > 10 %>
     <h2><%= t 'headers.common_pages', 'Common Pages' %></h2>
     <div class="rs-margin-lr rs-margin-bottom">

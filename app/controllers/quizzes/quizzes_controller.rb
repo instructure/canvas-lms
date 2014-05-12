@@ -39,7 +39,7 @@ class Quizzes::QuizzesController < ApplicationController
         redirect_to fabulous_quizzes_course_quizzes_path
       end
       return unless tab_enabled?(@context.class::TAB_QUIZZES)
-      @quizzes = @context.quizzes.active.include_assignment.sort_by{|q| [(q.assignment ? q.assignment.due_at : q.lock_at) || SortLast, Canvas::ICU.collation_key(q.title || SortFirst)]}
+      @quizzes = @context.quizzes.active.include_assignment.sort_by{|q| [(q.assignment ? q.assignment.due_at : q.lock_at) || CanvasSort::Last, Canvas::ICU.collation_key(q.title || CanvasSort::First)]}
 
       # draft state - only filter by available? for students
       if @context.feature_enabled?(:draft_state)

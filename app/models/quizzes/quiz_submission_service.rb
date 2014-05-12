@@ -23,8 +23,8 @@ class Quizzes::QuizSubmissionService
   # @param [Quiz] quiz
   #   The Quiz to take.
   #
-  # @throw ApiError(403) if the student isn't allowed to take the quiz
-  # @throw ApiError(403) if the user is not logged in and the Quiz isn't public
+  # @throw RequestError(403) if the student isn't allowed to take the quiz
+  # @throw RequestError(403) if the user is not logged in and the Quiz isn't public
   #
   # See #assert_takeability! for further errors that might be thrown.
   # See #assert_retriability! for further errors that might be thrown.
@@ -56,7 +56,7 @@ class Quizzes::QuizSubmissionService
   # @param [Hash] session
   #   The Rails session. Used for testing access permissions.
   #
-  # @throw ApiError(403) if the user isn't privileged to update the Quiz
+  # @throw RequestError(403) if the user isn't privileged to update the Quiz
   #
   # @return [QuizSubmission]
   #   The newly created preview QS.
@@ -79,8 +79,8 @@ class Quizzes::QuizSubmissionService
   #   The QuizSubmission#attempt that is requested to be completed. This must
   #   match the quiz_submission's current attempt index.
   #
-  # @throw ApiError(403) if the participant can't take the quiz
-  # @throw ApiError(400) if the QS is already complete
+  # @throw RequestError(403) if the participant can't take the quiz
+  # @throw RequestError(400) if the QS is already complete
   #
   # Further errors might be thrown from the following methods:
   #
@@ -140,9 +140,9 @@ class Quizzes::QuizSubmissionService
   #
   # @return [nil] nothing of significance
   #
-  # @throw ApiError(403) if the participant user isn't a teacher
-  # @throw ApiError(400) if the attempt isn't valid, or isn't complete
-  # @throw ApiError(400) if a question score is funny
+  # @throw RequestError(403) if the participant user isn't a teacher
+  # @throw RequestError(400) if the attempt isn't valid, or isn't complete
+  # @throw RequestError(400) if a question score is funny
   def update_scores(quiz_submission, attempt, scoring_data)
     unless quiz_submission.grants_right?(participant.user, :update_scores)
       reject! 'you are not allowed to update scores for this quiz submission', 403
@@ -207,8 +207,8 @@ class Quizzes::QuizSubmissionService
   #   The attempt index this answer/modification applies to. This must match
   #   the quiz_submission's current attempt index.
   #
-  # @throw ApiError(403) if the participant can't update the QS (ie, not the owner)
-  # @throw ApiError(400) if the QS is complete or overdue
+  # @throw RequestError(403) if the participant can't update the QS (ie, not the owner)
+  # @throw RequestError(400) if the QS is complete or overdue
   #
   # Further errors might be thrown from the following methods:
   #
@@ -247,7 +247,7 @@ class Quizzes::QuizSubmissionService
   #
   # See Api#reject! for usage.
   def reject!(cause, status)
-    raise Api::V1::ApiError.new(cause, status)
+    raise RequestError.new(cause, status)
   end
 
   # Verify that none of the following Quiz restrictions are preventing the Quiz
@@ -269,10 +269,10 @@ class Quizzes::QuizSubmissionService
   # @param [String] participant.ip_address
   #   The IP address of the participant.
   #
-  # @throw ApiError(400) if the Quiz is locked
-  # @throw ApiError(501) if the Quiz has the "can't go back" flag on
-  # @throw ApiError(403) if the access code is invalid
-  # @throw ApiError(403) if the IP address isn't covered
+  # @throw RequestError(400) if the Quiz is locked
+  # @throw RequestError(501) if the Quiz has the "can't go back" flag on
+  # @throw RequestError(403) if the access code is invalid
+  # @throw RequestError(403) if the IP address isn't covered
   def assert_takeability!(quiz, participant = self.participant)
     if quiz.locked?
       reject! 'quiz is locked', 400
@@ -294,7 +294,7 @@ class Quizzes::QuizSubmissionService
 
   # Verify the given QS is retriable.
   #
-  # @throw ApiError(409) if the QS is not new and can not be retried
+  # @throw RequestError(409) if the QS is not new and can not be retried
   #
   # See QuizSubmission#retriable?
   def assert_retriability!(quiz_submission)
@@ -322,8 +322,8 @@ class Quizzes::QuizSubmissionService
   # @param [Integer|String] attempt
   #   The attempt to validate.
   #
-  # @throw ApiError(400) if attempt isn't a valid integer
-  # @throw ApiError(400) if attempt is invalid (ie, isn't the latest one)
+  # @throw RequestError(400) if attempt isn't a valid integer
+  # @throw RequestError(400) if attempt is invalid (ie, isn't the latest one)
   def ensure_latest_attempt!(quiz_submission, attempt)
     attempt = Integer(attempt) rescue nil
 

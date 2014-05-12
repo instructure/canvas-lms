@@ -104,6 +104,7 @@
 #             "type": "integer"
 #           },
 #           "associated_user_id": {
+#             "description": "The unique id of the associated user. Will be null unless type is ObserverEnrollment.",
 #             "example": null,
 #             "type": "integer"
 #           },

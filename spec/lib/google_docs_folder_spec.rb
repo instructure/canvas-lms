@@ -18,34 +18,49 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
-module GoogleDocs
+describe GoogleDocs::Folder do
   class MockFile < Struct.new(:name); end
 
-  describe Folder do
-    let(:folder) do
-      Folder.new("root", [
-        Folder.new("one", [], [
+  let(:folder) do
+    folder1 = GoogleDocs::Folder.new(
+        "one",
+        [],
+        [
           MockFile.new("one-1"),
           MockFile.new("one-2"),
-          MockFile.new("one-3")]),
-        Folder.new("two", [], [
+          MockFile.new("one-3")
+        ]
+    )
+
+    folder2 = GoogleDocs::Folder.new(
+        "two",
+        [],
+        [
           MockFile.new("two-1"),
-          MockFile.new("two-2")])
-        ])
-    end
+          MockFile.new("two-2")
+        ]
+    )
 
-    it "can map files" do
-      names = folder.map{ |f| f.name }
-      names.should == ['one-1', 'one-2', 'one-3', 'two-1', 'two-2']
-    end
+    GoogleDocs::Folder.new(
+        "root",
+        [
+          folder1,
+          folder2
+        ]
+    )
+  end
 
-    it "can select files" do
-      tree = folder.select{ |f| f.name =~ /one-[12]/ }
-      tree.name.should == 'root'
-      tree.folders.size.should == 1
-      tree.folders.first.name.should == 'one'
-      tree.folders.first.files.size.should == 2
-      tree.folders.first.files.map{ |f| f.name }.should == ['one-1', 'one-2']
-    end
+  it "can map files" do
+    names = folder.map{ |f| f.name }
+    names.should == ['one-1', 'one-2', 'one-3', 'two-1', 'two-2']
+  end
+
+  it "can select files" do
+    tree = folder.select{ |f| f.name =~ /one-[12]/ }
+    tree.name.should == 'root'
+    tree.folders.size.should == 1
+    tree.folders.first.name.should == 'one'
+    tree.folders.first.files.size.should == 2
+    tree.folders.first.files.map{ |f| f.name }.should == ['one-1', 'one-2']
   end
 end

@@ -55,7 +55,13 @@ module Api::V1::CalendarEvent
     end
     hash['context_code'] ||= event.context_code
 
-    hash["child_events_count"] = event.child_events.size
+    # force it to load
+    include_child_events = include.include?('child_events')
+    if include_child_events
+      hash["child_events_count"] = event.child_events.length
+    else
+      hash["child_events_count"] = event.child_events.size
+    end
     hash['parent_event_id'] = event.parent_calendar_event_id
     # events are hidden when section-specific events override them
     # but if nobody is logged in, no sections apply, so show the base event
@@ -78,7 +84,8 @@ module Api::V1::CalendarEvent
     if event.context_type == 'AppointmentGroup'
       if context.grants_right?(user, session, :reserve)
         participant = context.participant_for(user)
-        hash['reserved'] = event.child_events_for(participant).present?
+        participant_child_events = event.child_events_for(participant)
+        hash['reserved'] = (Array === participant_child_events ? participant_child_events.present? : participant_child_events.exists?)
         hash['reserve_url'] = api_v1_calendar_event_reserve_url(event, participant)
       else
         hash['reserve_url'] = api_v1_calendar_event_reserve_url(event, '{{ id }}')
@@ -89,26 +96,34 @@ module Api::V1::CalendarEvent
       end
     end
 
-    hash["child_events"] = [] if include.include?('child_events') || hash['reserved']
-    if event.child_events.any?
-      can_read_child_events = include.include?('child_events') && event.grants_right?(user, session, :read_child_events)
+    hash["child_events"] = [] if include_child_events || hash['reserved']
+    if include_child_events && hash["child_events_count"] > 0
+      can_read_child_events = event.grants_right?(user, session, :read_child_events)
       if can_read_child_events || hash['reserved']
         events = can_read_child_events ? event.child_events : event.child_events_for(participant)
+
         appointment_group_id = event.context_id if event.context_type == 'AppointmentGroup'
+        # do some preloads
+        CalendarEvent.send(:preload_associations, events, :context)
+        if events.first.context.is_a?(User) && user_json_is_admin?(@context, user)
+          user_json_preloads(events.map(&:context))
+        end
+        can_manage = event.grants_right?(user, session, :manage)
+
         hash["child_events"] = events.map{ |e|
+          e.parent_event = event
           calendar_event_json(e, user, session,
             :include => appointment_group_id ? ['participants'] : [],
             :appointment_group => options[:appointment_group],
             :appointment_group_id => appointment_group_id,
             :current_participant => participant,
-            :url_override => event.grants_right?(user, session, :manage)
+            :url_override => can_manage
           )
         }
       end
     end
 
-    can_read = event.grants_right?(user, session, :read)
-    hash['url'] = api_v1_calendar_event_url(event) if options.has_key?(:url_override) ? options[:url_override] || hash['own_reservation'] : can_read
+    hash['url'] = api_v1_calendar_event_url(event) if options.has_key?(:url_override) ? options[:url_override] || hash['own_reservation'] : event.grants_right?(user, session, :read)
     hash['html_url'] = calendar_url_for(event.effective_context, :event => event)
     hash
   end

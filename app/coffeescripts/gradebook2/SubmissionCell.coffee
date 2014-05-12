@@ -121,6 +121,11 @@ define [
 
       SubmissionCell.prototype.cellWrapper(innerContents, {submission: submission, assignment: assignment, editable: false})
 
+  class SubmissionCell.gpa_scale extends SubmissionCell
+    @formatter: (row, col, submission, assignment) ->
+      innerContents = submission.grade
+
+      SubmissionCell.prototype.cellWrapper(innerContents, {submission: submission, assignment: assignment, editable: false, classes: "gpa_scale_cell"})
 
   class SubmissionCell.pass_fail extends SubmissionCell
 

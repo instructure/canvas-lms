@@ -7,6 +7,8 @@
   <input type="text" style="width: 35px;" maxlength="254"/> %
 <% elsif assignment.grading_type == "letter_grade" %>
   <input type="text" style="width: 35px;" maxlength="254"/>
+<% elsif assignment.grading_type == "gpa_scale" %>
+  <input type="text" style="width: 35px;" maxlength="254"/>
 <% elsif assignment.grading_type == "pass_fail" %>
   <select>
     <option value="">---</option>

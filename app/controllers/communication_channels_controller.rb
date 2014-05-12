@@ -142,7 +142,7 @@ class CommunicationChannelsController < ApplicationController
     params.delete(:build_pseudonym) if api_request?
 
     skip_confirmation = value_to_boolean(params[:skip_confirmation]) &&
-        (Account.site_admin.grants_right?(@current_user, :manage_students) || Account.default.grants_right?(@current_user, :manage_students))
+        (Account.site_admin.grants_right?(@current_user, :manage_students) || @domain_root_account.grants_right?(@current_user, :manage_students))
 
     # If a new pseudonym is requested, build (but don't save) a pseudonym to ensure
     # that the unique_id is valid. The pseudonym will be created on approval of the
@@ -257,7 +257,7 @@ class CommunicationChannelsController < ApplicationController
           @merge_opportunities.last.last.sort! { |a, b| Canvas::ICU.compare(a.account.name, b.account.name) }
         end
       end
-      @merge_opportunities.sort_by! { |a| [a.first == @current_user ? SortFirst : SortLast, Canvas::ICU.collation_key(a.first.name)] }
+      @merge_opportunities.sort_by! { |a| [a.first == @current_user ? CanvasSort::First : CanvasSort::Last, Canvas::ICU.collation_key(a.first.name)] }
 
       js_env :PASSWORD_POLICY => @domain_root_account.password_policy
 

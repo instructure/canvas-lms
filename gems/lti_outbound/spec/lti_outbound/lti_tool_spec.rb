@@ -19,10 +19,10 @@
 require 'spec_helper'
 
 describe LtiOutbound::LTITool do
-  it_behaves_like 'it has an attribute setter and getter for', :consumer_key
-  it_behaves_like 'it has an attribute setter and getter for', :privacy_level
-  it_behaves_like 'it has an attribute setter and getter for', :name
-  it_behaves_like 'it has an attribute setter and getter for', :shared_secret
+  it_behaves_like 'it has a proc attribute setter and getter for', :consumer_key
+  it_behaves_like 'it has a proc attribute setter and getter for', :privacy_level
+  it_behaves_like 'it has a proc attribute setter and getter for', :name
+  it_behaves_like 'it has a proc attribute setter and getter for', :shared_secret
 
   describe '#include_name?' do
     it 'returns true IFF the privacy level is public or name only' do

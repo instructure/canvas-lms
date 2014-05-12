@@ -237,6 +237,7 @@ class User < ActiveRecord::Base
   has_many :favorites
   has_many :zip_file_imports, :as => :context
   has_many :messages
+  has_many :sis_batches
 
   has_one :profile, :class_name => 'UserProfile'
   alias :orig_profile :profile
@@ -1365,7 +1366,7 @@ class User < ActiveRecord::Base
     context_codes = ([self] + self.management_contexts).uniq.map(&:asset_string)
     rubrics = self.context_rubrics.active
     rubrics += Rubric.active.find_all_by_context_code(context_codes)
-    rubrics.uniq.sort_by{|r| [(r.association_count || 0) > 3 ? SortFirst : SortLast, Canvas::ICU.collation_key(r.title || SortLast)]}
+    rubrics.uniq.sort_by{|r| [(r.association_count || 0) > 3 ? CanvasSort::First : CanvasSort::Last, Canvas::ICU.collation_key(r.title || CanvasSort::Last)]}
   end
 
   def assignments_recently_graded(opts={})
@@ -1866,7 +1867,7 @@ class User < ActiveRecord::Base
     event_codes = context_codes + AppointmentGroup.manageable_by(self, context_codes).intersecting(opts[:start_at], opts[:end_at]).map(&:asset_string)
     events += ev.for_user_and_context_codes(self, event_codes, []).between(opts[:start_at], opts[:end_at]).updated_after(opts[:updated_at])
     events += Assignment.published.for_context_codes(context_codes).due_between(opts[:start_at], opts[:end_at]).updated_after(opts[:updated_at]).with_just_calendar_attributes
-    events.sort_by{|e| [e.start_at, Canvas::ICU.collation_key(e.title || SortFirst)] }.uniq
+    events.sort_by{|e| [e.start_at, Canvas::ICU.collation_key(e.title || CanvasSort::First)] }.uniq
   end
 
   def upcoming_events(opts={})
@@ -2145,7 +2146,7 @@ class User < ActiveRecord::Base
   end
 
   def initiate_conversation(users, private = nil, options = {})
-    users = ([self] + users).uniq_by(&:id)
+    users = ([self] + users).uniq(&:id)
     private = users.size <= 2 if private.nil?
     Conversation.initiate(users, private, options).conversation_participants.find_by_user_id(self)
   end
@@ -2243,7 +2244,7 @@ class User < ActiveRecord::Base
 
       if existing_enrollment_info
         existing_enrollment_info[:types] << e.readable_type
-        existing_enrollment_info[:sortable] = [existing_enrollment_info[:sortable] || SortLast, [e.rank_sortable, e.state_sortable, 0 - e.id]].min
+        existing_enrollment_info[:sortable] = [existing_enrollment_info[:sortable] || CanvasSort::Last, [e.rank_sortable, e.state_sortable, 0 - e.id]].min
       else
         coalesced_enrollments << { :enrollment => e, :sortable => [e.rank_sortable, e.state_sortable, 0 - e.id], :types => [ e.readable_type ] }
       end

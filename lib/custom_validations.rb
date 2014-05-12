@@ -17,28 +17,15 @@
 #
 
 module CustomValidations
-  class RelativeUriError < ArgumentError; end
 
-  # returns [normalized_url_string, URI] if valid, raises otherwise
-  def self.validate_url(value)
-    value = value.strip
-    raise ArgumentError if value.empty?
-    uri = URI.parse(value)
-    unless uri.scheme
-      value = "http://#{value}"
-      uri = URI.parse(value)
-    end
-    raise(RelativeUriError) if uri.host.blank?
-    raise ArgumentError unless %w(http https).include?(uri.scheme.downcase)
-    return value, uri
-  end
 
   module ClassMethods
 
     def validates_as_url(*fields)
       validates_each(fields, :allow_nil => true) do |record, attr, value|
         begin
-          value, uri = CustomValidations.validate_url(value)
+          value, uri = CanvasHttp.validate_url(value)
+
           record.send("#{attr}=", value)
         rescue URI::InvalidURIError, ArgumentError
           record.errors.add attr, 'is not a valid URL'

@@ -50,6 +50,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   belongs_to :assignment
   belongs_to :assignment_group
+
   validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
   validates_presence_of :context_id
@@ -65,8 +66,10 @@ class Quizzes::Quiz < ActiveRecord::Base
   }
   sanitize_field :description, CanvasSanitize::SANITIZE
   copy_authorized_links(:description) { [self.context, nil] }
+
   before_save :build_assignment
   before_save :set_defaults
+  before_save :flag_columns_that_need_republish
   after_save :update_assignment
   after_save :touch_context
   after_save :regrade_if_published
@@ -166,6 +169,16 @@ class Quizzes::Quiz < ActiveRecord::Base
     self.question_count = self.question_count(true)
     @update_existing_submissions = true if self.for_assignment? && self.quiz_type_changed?
     @stored_questions = nil
+  end
+
+  # some attributes require us to republish for non-draft state
+  # We can safely remove this when draft state is permanent
+  def flag_columns_that_need_republish
+    return if context.feature_enabled?(:draft_state)
+
+    if shuffle_answers_changed? && !shuffle_answers
+      self.last_edited_at = Time.now.utc
+    end
   end
 
   protected :set_defaults
@@ -485,7 +498,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     result = []
     result.concat self.active_quiz_questions_without_group
     result.concat self.quiz_groups
-    result = result.sort_by { |e| e.position || ::SortLast }.map do |e|
+    result = result.sort_by { |e| e.position || ::CanvasSort::Last }.map do |e|
       res = nil
       if e.is_a? Quizzes::QuizQuestion
         res = e.data
@@ -496,7 +509,7 @@ class Quizzes::Quiz < ActiveRecord::Base
           data[:assessment_question_bank_id] = e.assessment_question_bank_id
           data[:questions] = []
         else
-          data[:questions] = e.quiz_questions.active.sort_by { |q| q.position || ::SortLast }.map(&:data)
+          data[:questions] = e.quiz_questions.active.sort_by { |q| q.position || ::CanvasSort::Last }.map(&:data)
         end
         data[:actual_pick_count] = e.actual_pick_count
         res = data
@@ -539,7 +552,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
       if val[:answers]
         val[:answers] = prepare_answers(val)
-        val[:matches] = val[:matches].sort_by { |m| m[:text] || ::SortFirst } if val[:matches]
+        val[:matches] = val[:matches].sort_by { |m| m[:text] || ::CanvasSort::First } if val[:matches]
       elsif val[:questions] # It's a Quizzes::QuizGroup
         if val[:assessment_question_bank_id]
           # It points to a question bank
@@ -549,7 +562,7 @@ class Quizzes::Quiz < ActiveRecord::Base
           val[:questions].each do |question|
             if question[:answers]
               question[:answers] = prepare_answers(question)
-              question[:matches] = question[:matches].sort_by { |m| m[:text] || ::SortFirst } if question[:matches]
+              question[:matches] = question[:matches].sort_by { |m| m[:text] || ::CanvasSort::First } if question[:matches]
             end
             questions << question
           end
@@ -667,7 +680,7 @@ class Quizzes::Quiz < ActiveRecord::Base
             questions.each do |question|
               if question[:answers]
                 question[:answers] = prepare_answers(question)
-                question[:matches] = question[:matches].sort_by { |m| m[:text] || ::SortFirst } if question[:matches]
+                question[:matches] = question[:matches].sort_by { |m| m[:text] || ::CanvasSort::First } if question[:matches]
               end
               question[:points_possible] = q[:question_points]
               question[:published_at] = q[:published_at]
@@ -1376,6 +1389,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def current_regrade
     Quizzes::QuizRegrade.where(quiz_id: id, quiz_version: version_number).
+      where("quiz_question_regrades.regrade_option != 'disabled'").
       includes(:quiz_question_regrades => :quiz_question).first
   end
 
@@ -1385,8 +1399,8 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def questions_regraded_since(created_at)
     question_regrades = Set.new
-    quiz_regrades.where("created_at > ?", created_at)
-    .includes(:quiz_question_regrades).each do |regrade|
+    quiz_regrades.where("quiz_regrades.created_at > ? AND quiz_question_regrades.regrade_option != 'disabled'", created_at)
+                 .includes(:quiz_question_regrades).each do |regrade|
       ids = regrade.quiz_question_regrades.map { |qqr| qqr.quiz_question_id }
       question_regrades.merge(ids)
     end

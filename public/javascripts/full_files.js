@@ -2155,6 +2155,9 @@ define([
           onInit: function() {
             $add_file_link.text(I18n.t('links.add_files', "Add Files")).triggerHandler('show');
           },
+          onFallback: function() {
+            $swfupload_holder.hide(); // hide to allow click-through to Add File link when Flash is unavailable
+          },
           onSelect: fileUpload.swfFileQueue,
           onCancel: fileUpload.swfCancel,
           onUploadError: fileUpload.swfFileError,

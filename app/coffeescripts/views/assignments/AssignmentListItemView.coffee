@@ -185,6 +185,9 @@ define [
       'letter_grade':
         nonscreenreader: "#{grade}"
         screenreader: I18n.t 'grade_letter_grade_screenreader', 'Grade: %{grade}', grade: grade
+      'gpa_scale':
+        nonscreenreader: "#{grade}"
+        screenreader: I18n.t 'grade_gpa_scale_screenreader', 'Grade: %{grade}', grade: grade
 
 
     _setJSONForGrade: (json) ->

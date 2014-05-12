@@ -21,17 +21,26 @@
     <option value="letter_grade" {{selectedIf gradingType "letter_grade"}}>
       {{#t "grading_type_options.letter_grade"}}Letter Grade{{/t}}
     </option>
+    <option value="gpa_scale" {{selectedIf gradingType "gpa_scale"}}>
+      {{#t "grading_type_options.gpa_scale"}}GPA Scale{{/t}}
+    </option>
     {{#unless preventNotGraded}}
       <option value="not_graded" {{selectedIf isNotGraded}}>
         {{#t "grading_type_options.not_graded"}}Not Graded{{/t}}
       </option>
     {{/unless}}
   </select>
+  <a id=gpa-scale-question
+     tabindex="0"
+     aria-label="{{gpaScaleQuestionLabel}}"
+     style="{{hiddenUnless isGpaScaled}}">
+     <i class="icon-question"></i>
+  </a>
 
   <p id=view-grading-levels
     class="help-block"
-    style="{{hiddenUnless isLetterGraded}}"
-    aria-expanded={{isLetterGraded}}>
+    style="{{hiddenUnless isLetterOrGpaGraded}}"
+    aria-expanded={{isLetterOrGpaGraded}}>
     <a href="#" class=edit_letter_grades_link>
       {{#t "view_grading_levels"}}View Grading Levels{{/t}}
     </a>
@@ -40,4 +49,23 @@
     class=grading_standard_id
     value="{{gradingStandardId}}"
     type="hidden">
+</div>
+
+<div
+  id="gpa-scale-dialog"
+  title={{#t 'gpa_scale_title'}}"What is GPA Scale Grading?"{{/t}}
+  style="display: none;">
+  <p>{{#t 'gpa_scale_explainer'}}GPA Scale Grading is designed for schools that use a 4.0 scale (or 5.0/6.0) for all assignments. This grading scheme is similar to the Letter Grade display but features some important differences:{{/t}}</p>
+
+  <ul>
+    <li>{{#t 'gpa_scale_input_explainer'}}Scores are inputted on the 4.0 scale. For instance, if an assignment is out of 100 points, inputting 4.0 results in 100%, 3.0 results in 87%, etc.{{/t}}</li>
+
+    <li>{{#t 'gpa_scale_percentage_explainer'}}You cannot input points directly, but can input percentages. For instance, if an assignment is out of 50 points, inputting "40" will not work, but "80%" will.{{/t}}</li>
+
+    <li>{{#t 'gpa_scale_scores_explainer'}}The only scores allowed are predefined in the grading scheme.{{/t}}</li>
+
+    <li>{{#t 'gpa_scale_letters_explainer'}}Letter grades can be used in addition to number grades.{{/t}}</li>
+  </ul>
+
+  <p>{{#t 'gpa_scale_recommendation'}}Unless your school uses a 4.0 scale (or 5.0/6.0) for grading, Canvas recommends displaying grades as Letter Grade.{{/t}}</p>
 </div>

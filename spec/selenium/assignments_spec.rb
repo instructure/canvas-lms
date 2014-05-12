@@ -166,7 +166,7 @@ describe "assignments" do
       f('h2.title').should include_text(assignment_name)
     end
 
-    %w(points percent pass_fail letter_grade).each do |grading_option|
+    %w(points percent pass_fail letter_grade gpa_scale).each do |grading_option|
       it "should create assignment with #{grading_option} grading option" do
         assignment_title = 'grading options assignment'
         manually_create_assignment(assignment_title)

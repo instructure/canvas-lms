@@ -154,6 +154,16 @@ describe "calendar2" do
           element_exists('.fc_event').should be_false
         end
 
+        it "should constrain context selection to 10" do
+          30.times do |x|
+            course_with_teacher(:course_name => "Course #{x + 1}", :user => @user, :active_all => true).course
+          end
+
+          get "/calendar2"
+          ff('.context_list_context').each(&:click)
+          ff('.context_list_context.checked').count.should == 10
+        end
+
         it "should validate calendar feed display" do
           get "/calendar2"
 

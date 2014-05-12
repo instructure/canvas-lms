@@ -65,11 +65,13 @@ class Quizzes::QuizRegrader::Submission
     @submitted_answer_ids ||= submitted_answers.map { |q| q[:question_id] }.to_set
   end
 
+  REGRADE_KEEP_FIELDS = (%w{id position name question_name published_at}).to_set
+
   def regraded_question_data
     submission.quiz_data.map do |question|
       id = question[:id]
       if submitted_answer_ids.include?(id)
-        question.keep_if {|k, v| %w{id position published_at}.include?(k) }
+        question.keep_if {|k, v| REGRADE_KEEP_FIELDS.include?(k) }
 
         quiz_question = question_regrades[id].quiz_question
         data  = quiz_question.question_data

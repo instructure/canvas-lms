@@ -10,6 +10,8 @@ define [
   class MoveDialogView extends DialogFormView
     setViewProperties: false
 
+    className: 'form-dialog'
+
     defaults:
       width: 450
       height: 340
