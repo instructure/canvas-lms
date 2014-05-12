@@ -96,7 +96,7 @@ class ContextModuleProgression < ActiveRecord::Base
       requirements_met << req
     end
 
-    def other_requirement_met?(req)
+    def any_requirement_met?(req)
       met = requirements_met.any? {|r| r[:id] == req[:id] }
       @started = true if met
       met
@@ -108,7 +108,7 @@ class ContextModuleProgression < ActiveRecord::Base
 
     def check_view_requirements
       view_requirements.each do |req|
-        requirement_met(req, other_requirement_met?(req))
+        requirement_met(req, any_requirement_met?(req))
       end
     end
   end
@@ -182,9 +182,9 @@ class ContextModuleProgression < ActiveRecord::Base
   def evaluate_score_requirement_met(requirement, tag)
     score = get_submission_score(tag)
     if requirement[:type] == "max_score"
-      !!score && score <= requirement[:max_score].to_f
+      score.present? && score <= requirement[:max_score].to_f
     else
-      !!score && score >= requirement[:min_score].to_f
+      score.present? && score >= requirement[:min_score].to_f
     end
   end
   private :evaluate_score_requirement_met
@@ -272,6 +272,12 @@ class ContextModuleProgression < ActiveRecord::Base
     Shackles.activate(:master) do
       self.save if self.changed?
     end
+  end
+
+  # This prevents active record using optimistic locking, until the data migration is complete
+  # (once the data migration is complete, this method can simply be removed)
+  def locking_enabled?
+    false
   end
 
   def trigger_completion_events

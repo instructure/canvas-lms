@@ -78,6 +78,30 @@ describe UserMerge do
       user2.reload.submissions.should == [s4.reload]
     end
 
+    it "should move quiz submissions to the new user (but only if they don't already exist)" do
+      q1 = quiz_model
+      qs1 = q1.generate_submission(user1)
+      qs2 = q1.generate_submission(user2)
+
+      q2 = quiz_model
+      qs3 = q2.generate_submission(user2)
+
+      user1.quiz_submissions.length.should eql(1)
+      user2.quiz_submissions.length.should eql(2)
+
+      UserMerge.from(user2).into(user1)
+
+      user2.reload
+      user1.reload
+
+      user2.quiz_submissions.length.should eql(1)
+      user2.quiz_submissions.first.id.should eql(qs2.id)
+
+      user1.quiz_submissions.length.should eql(2)
+      user1.quiz_submissions.map(&:id).should be_include(qs1.id)
+      user1.quiz_submissions.map(&:id).should be_include(qs3.id)
+    end
+
     it "should move ccs to the new user (but only if they don't already exist)" do
       # unconfirmed => active conflict
       user1.communication_channels.create!(:path => 'a@instructure.com')
@@ -219,6 +243,7 @@ describe UserMerge do
       user1.observers << observer1 << observer2
       user2.observers << observer2
       ObserverEnrollment.count.should eql 3
+      Enrollment.where(user_id: observer2, associated_user_id: user1).update_all(workflow_state: 'completed')
 
       UserMerge.from(user1).into(user2)
       user1.observee_enrollments.size.should eql 1 #deleted
@@ -302,6 +327,23 @@ describe UserMerge do
       res1.reload
       res1.context_id.should == user2.id
       res1.context_code.should == user2.asset_string
+    end
+
+    it "should move user attachments and handle duplicates" do
+      attachment1 = Attachment.create!(:user => user1, :context => user1, :filename => "test.txt", :uploaded_data => StringIO.new("first"))
+      attachment2 = Attachment.create!(:user => user1, :context => user1, :filename => "test.txt", :uploaded_data => StringIO.new("notfirst"))
+      attachment3 = Attachment.create!(:user => user2, :context => user2, :filename => "test.txt", :uploaded_data => StringIO.new("first"))
+
+      UserMerge.from(user1).into(user2)
+      run_jobs
+
+      user2.attachments.count.should == 2
+      user2.attachments.not_deleted.count.should == 2
+
+      user2.attachments.not_deleted.detect{|a| a.md5 == attachment1.md5}.should == attachment3
+
+      new_attachment = user2.attachments.not_deleted.detect{|a| a.md5 == attachment2.md5}
+      new_attachment.display_name.should_not == "test.txt" # attachment2 should be copied and renamed because it has unique file data
     end
   end
 
@@ -484,6 +526,51 @@ describe UserMerge do
       cc2 = user1.communication_channels.first
       cc2.path.should == 'abc'
       cc2.workflow_state.should == 'retired'
+    end
+
+    it "should move user attachments and handle duplicates" do
+      course
+      root_attachment = Attachment.create(:context => @course, :filename => "unique_name1.txt",
+                                          :uploaded_data => StringIO.new("root_attachment_data"))
+
+      user1 = User.create!
+      # should not copy because it's identical to @user2_attachment1
+      user1_attachment1 = Attachment.create!(:user => user1, :context => user1, :filename => "shared_name1.txt",
+                                             :uploaded_data => StringIO.new("shared_data"))
+      # copy should have root_attachment directed to @user2_attachment2, and be renamed
+      user1_attachment2 = Attachment.create!(:user => user1, :context => user1, :filename => "shared_name2.txt",
+                                             :uploaded_data => StringIO.new("shared_data2"))
+      # should copy as a root_attachment (even though it isn't one currently)
+      user1_attachment3 = Attachment.create!(:user => user1, :context => user1, :filename => "unique_name2.txt",
+                                             :uploaded_data => StringIO.new("root_attachment_data"))
+      user1_attachment3.root_attachment.should == root_attachment
+
+      @shard1.activate do
+        new_account = Account.create!
+        @user2 = user_with_pseudonym(:account => new_account)
+
+        @user2_attachment1 = Attachment.create!(:user => @user2, :context => @user2, :filename => "shared_name1.txt",
+                                                :uploaded_data => StringIO.new("shared_data"))
+
+        @user2_attachment2 = Attachment.create!(:user => @user2, :context => @user2, :filename => "unique_name3.txt",
+                                                :uploaded_data => StringIO.new("shared_data2"))
+
+        @user2_attachment3 = Attachment.create!(:user => @user2, :context => @user2, :filename => "shared_name2.txt",
+                                                :uploaded_data => StringIO.new("unique_data"))
+      end
+
+      UserMerge.from(user1).into(@user2)
+      run_jobs
+
+      @user2.attachments.not_deleted.count.should == 5
+
+      new_user2_attachment1 = @user2.attachments.not_deleted.detect{|a| a.md5 == user1_attachment2.md5 && a.id != @user2_attachment2.id}
+      new_user2_attachment1.root_attachment.should == @user2_attachment2
+      new_user2_attachment1.display_name.should_not == user1_attachment2.display_name #should rename
+      new_user2_attachment1.namespace.should_not == user1_attachment1.namespace
+
+      new_user2_attachment2 = @user2.attachments.not_deleted.detect{|a| a.md5 == user1_attachment3.md5}
+      new_user2_attachment2.root_attachment.should be_nil
     end
 
     context "manual invitation" do

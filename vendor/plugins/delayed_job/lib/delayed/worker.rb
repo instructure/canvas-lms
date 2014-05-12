@@ -134,7 +134,7 @@ class Worker
         if job.batch?
           # each job in the batch will have perform called on it, so we don't
           # need a timeout around this 
-          count = perform_batch(job.payload_object)
+          count = perform_batch(job)
         else
           job.invoke_job
         end
@@ -151,7 +151,8 @@ class Worker
     count
   end
 
-  def perform_batch(batch)
+  def perform_batch(job)
+    batch = job.payload_object
     if batch.mode == :serial
       batch.jobs.each do |job|
         job.create_and_lock!(name)

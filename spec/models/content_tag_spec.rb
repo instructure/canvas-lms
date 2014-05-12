@@ -493,4 +493,26 @@ describe ContentTag do
       content_tag.content_type.should == 'Assignment'
     end
   end
+
+  describe "destroy" do
+    it "updates completion requirements on its associated ContextModule" do
+      course_with_teacher(:active_all => true)
+
+      @module = @course.context_modules.create!(:name => "some module")
+      @assignment = @course.assignments.create!(:title => "some assignment")
+      @assignment2 = @course.assignments.create!(:title => "some assignment2")
+
+      @tag = @module.add_item({:id => @assignment.id, :type => 'assignment'})
+      @tag2 = @module.add_item({:id => @assignment2.id, :type => 'assignment'})
+
+      @module.completion_requirements = [{id: @tag.id, type: 'must_submit'},
+                                         {id: @tag2.id, type: 'must_submit'}]
+
+      @module.save
+
+      @tag.destroy
+
+      @module.reload.completion_requirements.should == [{id: @tag2.id, type: 'must_submit'}]
+    end
+  end
 end

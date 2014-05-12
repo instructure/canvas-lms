@@ -45,5 +45,37 @@ describe Quizzes::QuizQuestion::NumericalQuestion do
 
       question.correct_answer_parts(user_answer).should be_false
     end
+
+    describe 'flexible ranges' do
+      def self.test_range(range, answer, is_correct)
+        desc = "should calculate if %s falls %s (%d,%d)" % [
+          answer, is_correct ? 'within' : 'out of', range[0], range[1]
+        ]
+
+        it desc do
+          answer_data = {:"question_#{question_id}" => "#{answer}"}
+          question = Quizzes::QuizQuestion::NumericalQuestion.new({
+            answers: [{
+              id: 1,
+              weight: 100,
+              start: range[0],
+              end: range[1]
+            }]
+          })
+
+          user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
+          question.correct_answer_parts(user_answer).should == is_correct
+        end
+      end
+
+      test_range [-3, 3], -2.5, true
+      test_range [3, -3], -2.5, true
+      test_range [-3, 3], -3.5, false
+      test_range [3, -3], -3.5, false
+      test_range [2.5, 3.5], 2.5, true
+      test_range [2.5, 3.5], 2.49, false
+      test_range [100, 50], 75, true
+      test_range [50, 100], 75, true
+    end
   end
 end

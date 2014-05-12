@@ -19,7 +19,7 @@
       <% end %>
     </span>
     <br/>
-    
+
     <a href="<%= context_url(@assignment.context, :context_assignment_submission_url, @assignment.id, @current_user.id) %>" class='forward'><%= t 'links.submission.details', "Submission Details" %></a><br/>
     <% if @current_user_submission.submission_type == "online_url" %>
       <a href="<%= @current_user_submission.url %>" target="_new" class='link'><%= t 'links.submission.view_original_page', "View the Original Page" %></a><br/>

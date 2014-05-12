@@ -133,9 +133,9 @@ END
     },
     'screenreader_gradebook' =>
     {
-      display_name: -> { I18n.t('features.screenreader_gradebook', 'Screenreader Gradebook') },
-      description:  -> { I18n.t('screenreader_gradebook_description', <<-END) },
-Screenreader Gradebook provides an interface to gradebook that is designed for accessibility.
+      display_name: -> { I18n.t('features.individual_gradebook', 'Individual Gradebook View') },
+      description:  -> { I18n.t('individual_gradebook_description', <<-END) },
+Individual Gradebook View provides a gradebook view that is designed for accessibility.
 END
       applies_to: 'Course',
       state: 'hidden',

@@ -34,11 +34,13 @@
 
 
 // Completely hide, but make available to screenreader so it can read it.
-.screenreader-only { 
-  position: absolute !important;
-  clip: rect(1px 1px 1px 1px);
-  clip: rect(1px,1px,1px,1px);
-  width: 1px;
+.screenreader-only {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
   overflow: hidden;
-  top: 0;
+  padding: 0;
+  position: absolute;
+  width: 1px;
 }

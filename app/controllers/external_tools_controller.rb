@@ -105,11 +105,12 @@ class ExternalToolsController < ApplicationController
       end
       @resource_title = @tool.name
       @resource_url = params[:url]
-      @opaque_id = @tool.opaque_identifier_for(@context)
       add_crumb(@context.name, named_context_url(@context, :context_url))
       @return_url = url_for(@context)
-      @launch = BasicLTI::ToolLaunch.new(:url => @resource_url, :tool => @tool, :user => @current_user, :context => @context, :link_code => @opaque_id, :return_url => @return_url, :resource_type => @resource_type)
-      @tool_settings = @launch.generate
+
+      adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @context)
+      adapter.prepare_tool_launch(@return_url, resource_type: @resource_type, launch_url: @resource_url)
+      @tool_settings = adapter.generate_post_payload
 
       @tool_launch_type = 'self' if params['borderless']
       render :template => 'external_tools/tool_show'
@@ -189,19 +190,19 @@ class ExternalToolsController < ApplicationController
       end
 
       # generate the launch
-      @launch = @tool.create_launch(@context, @current_user, url_for(@context),
-                                    :selection_type => params[:launch_type],
-                                    :resource_url => params[:url])
-
-      if assignment
-        @launch.for_assignment!(assignment, lti_grade_passback_api_url(@tool), blti_legacy_grade_passback_api_url(@tool))
-      end
+      adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @context)
+      adapter.prepare_tool_launch(url_for(@context), resource_type: params[:launch_type], launch_url: params[:url])
 
       launch_settings = {
-        'launch_url' => @launch.url,
+        'launch_url' => adapter.launch_url,
         'tool_name' => @tool.name,
-        'tool_settings' => @launch.generate,
       }
+
+      if assignment
+        launch_settings['tool_settings'] = adapter.generate_post_payload_for_assignment(assignment, lti_grade_passback_api_url(@tool), blti_legacy_grade_passback_api_url(@tool))
+      else
+        launch_settings['tool_settings'] = adapter.generate_post_payload
+      end
 
       # store the launch settings and return to the user
       verifier = SecureRandom.hex(64)
@@ -326,18 +327,22 @@ class ExternalToolsController < ApplicationController
     return unless @tool
     @resource_title = @tool.label_for(selection_type.to_sym)
     @return_url ||= url_for(@context)
-    @launch = @tool.create_launch(@context, @current_user, @return_url, :selection_type => selection_type)
+
+    adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @context)
+    adapter.prepare_tool_launch(@return_url, resource_type: selection_type, selected_html: params[:selection])
     if selection_type == 'homework_submission'
       @assignment = @context.assignments.active.find(params[:assignment_id])
-      @launch.for_homework_submission!(@assignment)
+      @tool_settings = adapter.generate_post_payload_for_homework_submission(@assignment)
+    else
+      @tool_settings = adapter.generate_post_payload
     end
-    @launch.has_selection_html!(params[:selection]) if params[:selection]
-    @resource_url = @launch.url
-    resource_uri = URI.parse @launch.url
+
+    @resource_url = adapter.launch_url
+
+    resource_uri = URI.parse @resource_url
     @tool_id = @tool.tool_id || resource_uri.host || 'unknown'
     @tool_path = (resource_uri.path.empty? ? "/" : resource_uri.path)
 
-    @tool_settings = @launch.generate
     render :template => 'external_tools/tool_show'
   end
   protected :render_tool

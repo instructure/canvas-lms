@@ -556,7 +556,7 @@ class CalendarEventsApiController < ApplicationController
       end
     end
 
-    @events = @events.sort_by { |e| [e.start_at || SortLast, Canvas::ICU.collation_key(e.title)] }
+    @events = @events.sort_by { |e| [e.start_at || CanvasSort::Last, Canvas::ICU.collation_key(e.title)] }
 
     @contexts.each do |context|
       log_asset_access("calendar_feed:#{context.asset_string}", "calendar", 'other')
@@ -661,7 +661,7 @@ class CalendarEventsApiController < ApplicationController
 
     # only get pertinent contexts if there is a user
     if @current_user
-      get_all_pertinent_contexts(true)
+      get_all_pertinent_contexts(include_groups: true)
     end
 
     if codes

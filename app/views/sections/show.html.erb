@@ -127,11 +127,11 @@ h3 .tally {
   <% end %>
   <tr>
     <td><%= f.blabel :start_at, :en => "Starts" %></td>
-    <td><%= f.text_field :start_at, :class => "datetime_field", :value => datetime_string(@section.start_at), :style => 'width: 120px;' %></td>
+    <td><%= f.text_field :start_at, :class => "datetime_field", :value => unlocalized_datetime_string(@section.start_at), :style => 'width: 120px;' %></td>
   </tr>
   <tr>
     <td><%= f.blabel :end_at, :en => "Ends" %></td>
-    <td><%= f.text_field :end_at, :class => "datetime_field", :value => datetime_string(@section.end_at), :style => 'width: 120px;' %></td>
+    <td><%= f.text_field :end_at, :class => "datetime_field", :value => unlocalized_datetime_string(@section.end_at), :style => 'width: 120px;' %></td>
   </tr>
   <tr>
     <td colspan="2">

@@ -117,7 +117,7 @@ module Context
 
   def sorted_rubrics(user, context)
     associations = RubricAssociation.bookmarked.for_context_codes(context.asset_string).include_rubric
-    Canvas::ICU.collate_by(associations.to_a.uniq(&:rubric_id).select{|r| r.rubric }) { |r| r.rubric.title || SortLast }
+    Canvas::ICU.collate_by(associations.to_a.uniq(&:rubric_id).select{|r| r.rubric }) { |r| r.rubric.title || CanvasSort::Last }
   end
 
   def rubric_contexts(user)
@@ -140,20 +140,22 @@ module Context
         :name => context_name
       }
     end
-    contexts.sort_by{|c| codes_order[c[:context_code]] || SortLast }
+    contexts.sort_by{|c| codes_order[c[:context_code]] || CanvasSort::Last }
   end
 
   def active_record_types
     @active_record_types ||= Rails.cache.fetch(['active_record_types', self].cache_key) do
       res = {}
-      res[:files] = self.respond_to?(:attachments) && !self.attachments.active.empty?
-      res[:modules] = self.respond_to?(:context_modules) && !self.context_modules.active.empty?
-      res[:quizzes] = self.respond_to?(:quizzes) && !self.quizzes.active.empty?
-      res[:assignments] = self.respond_to?(:assignments) && !self.assignments.active.empty?
-      res[:pages] = self.respond_to?(:wiki) && self.wiki_id && !self.wiki.wiki_pages.active.empty?
-      res[:conferences] = self.respond_to?(:web_conferences) && !self.web_conferences.active.empty?
-      res[:announcements] = self.respond_to?(:announcements) && !self.announcements.active.empty?
-      res[:outcomes] = self.respond_to?(:has_outcomes?) && self.has_outcomes?
+      ActiveRecord::Base.uncached do
+        res[:files] = self.respond_to?(:attachments) && self.attachments.active.exists?
+        res[:modules] = self.respond_to?(:context_modules) && self.context_modules.active.exists?
+        res[:quizzes] = self.respond_to?(:quizzes) && self.quizzes.active.exists?
+        res[:assignments] = self.respond_to?(:assignments) && self.assignments.active.exists?
+        res[:pages] = self.respond_to?(:wiki) && self.wiki_id && self.wiki.wiki_pages.active.exists?
+        res[:conferences] = self.respond_to?(:web_conferences) && self.web_conferences.active.exists?
+        res[:announcements] = self.respond_to?(:announcements) && self.announcements.active.exists?
+        res[:outcomes] = self.respond_to?(:has_outcomes?) && self.has_outcomes?
+      end
       res
     end
   end

@@ -53,7 +53,7 @@ module Api::V1::Submission
       end
     end
 
-    if includes.include?("rubric_assessment") && submission.rubric_assessment
+    if includes.include?("rubric_assessment") && submission.rubric_assessment && submission.grants_right?(user, :read_grade)
       ra = submission.rubric_assessment.data
       hash['rubric_assessment'] = {}
       ra.each { |rating| hash['rubric_assessment'][rating[:criterion_id]] = rating.slice(:points, :comments) }

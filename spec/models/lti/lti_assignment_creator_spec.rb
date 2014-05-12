@@ -40,7 +40,7 @@ describe Lti::LtiAssignmentCreator do
     assignment.submission_types = 'external_tool'
     lti_assignment = Lti::LtiAssignmentCreator.new(assignment).convert
 
-    lti_assignment.return_types.should == ['text', 'url']
+    lti_assignment.return_types.should == ['url', 'text']
   end
 
   it "correctly maps return types" do

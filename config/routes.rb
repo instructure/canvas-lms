@@ -809,6 +809,10 @@ routes.draw do
   #   resources :collection_items, :only => [:show, :index]
   # end
 
+  scope(:controller => :outcome_results) do
+    get 'courses/:course_id/outcome_rollups', :action => :rollups, :path_name => 'course_outcome_rollups'
+  end
+
   ### API routes ###
 
   # TODO: api routes can't yet take advantage of concerns for DRYness, because of
@@ -964,6 +968,7 @@ routes.draw do
         get "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id", :action => :show, :path_name => "#{context}_discussion_topic"
         post "#{context.pluralize}/:#{context}_id/discussion_topics", :controller => :discussion_topics, :action => :create
         put "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id", :controller => :discussion_topics, :action => :update
+        post "#{context.pluralize}/:#{context}_id/discussion_topics/reorder", :controller => :discussion_topics, :action => :reorder
         delete "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id", :controller => :discussion_topics, :action => :destroy
 
         get "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/view", :action => :view, :path_name => "#{context}_discussion_topic_view"
@@ -1052,6 +1057,13 @@ routes.draw do
 
       put 'users/:id/merge_into/:destination_user_id', controller: 'users', action: 'merge_into'
       put 'users/:id/merge_into/accounts/:destination_account_id/users/:destination_user_id', controller: 'users', action: 'merge_into'
+    end
+
+    scope(:controller => :custom_data) do
+      glob = CANVAS_RAILS2 ? '/*scope' : '(/*scope)'
+      get "users/:user_id/custom_data#{glob}", action: 'get_data'
+      put "users/:user_id/custom_data#{glob}", action: 'set_data'
+      delete "users/:user_id/custom_data#{glob}", action: 'delete_data'
     end
 
     scope(:controller => :pseudonyms) do
@@ -1472,12 +1484,9 @@ routes.draw do
       get "#{prefix}/:id", :action => :show
     end
 
-    scope(:controller => :data_exports_api, :module => :data_exports_api) do
-      prefix = "accounts/:account_id/data_exports"
-      get prefix, :action => :index, :path_name => "data_exports"
-      post prefix, :action => :create
-      get '#{prefix}/:id', :action => :show, :path_name => "data_export"
-      delete '#{prefix}/:id', :action => :cancel
+    scope(:controller => :grading_standards_api) do
+      post 'accounts/:account_id/grading_standards', :action => :create
+      post 'courses/:course_id/grading_standards', :action => :create
     end
   end
 

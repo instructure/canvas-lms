@@ -101,7 +101,7 @@ class UserMerge
         Rails.cache.delete([cc.path, 'invited_enrollments'].cache_key)
       end
       [
-        [:quiz_id, :quiz_submissions],
+        [:quiz_id, :'quizzes/quiz_submissions'],
         [:assignment_id, :submissions]
       ].each do |unique_id, table|
         begin
@@ -168,6 +168,8 @@ class UserMerge
           Rails.logger.error "migrating #{table} column #{column} failed: #{e.to_s}"
         end
       end
+
+      Attachment.send_later(:migrate_attachments, from_user, target_user)
 
       context_updates = ['calendar_events']
       context_updates.each do |table|

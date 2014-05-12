@@ -112,6 +112,51 @@ module CC
       rel_path
     end
 
+    def process_media_tracks(tracks, media_file_migration_id, media_obj, video_path)
+      media_obj.media_tracks.each do |mt|
+        track_id = CCHelper.create_key(mt.content)
+        mt_path = video_path + ".#{mt.locale}.#{mt.kind}"
+        @zip_file.get_output_stream(mt_path) do |stream|
+          stream.write mt.content
+        end
+        @resources.resource(
+            "type" => CCHelper::WEBCONTENT,
+            :identifier => track_id,
+            :href => mt_path
+        ) do |res|
+          res.file(:href => mt_path)
+        end
+        tracks[media_file_migration_id] ||= []
+        tracks[media_file_migration_id] << {
+            kind: mt.kind,
+            locale: mt.locale,
+            identifierref: track_id
+        }
+      end
+    end
+
+    def add_tracks(track_map)
+      tracks_file = File.new(File.join(@canvas_resource_dir, CCHelper::MEDIA_TRACKS), 'w')
+      document = Builder::XmlMarkup.new(:target=>tracks_file, :indent=>2)
+      document.instruct!
+      document.media_tracks(
+          "xmlns" => CCHelper::CANVAS_NAMESPACE,
+          "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
+          "xsi:schemaLocation"=> "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
+      ) do |root_node|
+        track_map.each do |file_id, track_list|
+          # <media identifierref='(media file resource id)'>
+          root_node.media(identifierref: file_id) do |media_node|
+            track_list.each do |track|
+              # <track identifierref='(srt resource id)' kind='subtitles' locale='en'/>
+              media_node.track(track)
+            end
+          end
+        end
+      end
+      tracks_file.close
+    end
+
     MAX_MEDIA_OBJECT_SIZE = 4.gigabytes
     def add_media_objects(html_content_exporter)
       return if for_course_copy
@@ -136,6 +181,7 @@ module CC
       client = Kaltura::ClientV3.new
       client.startSession(Kaltura::SessionType::ADMIN)
 
+      tracks = {}
       html_content_exporter.used_media_objects.each do |obj|
         next if @added_attachment_ids.include?(obj.attachment_id)
         begin
@@ -144,12 +190,12 @@ module CC
           next unless info && info[:asset]
 
           unless Kaltura::ClientV3::ASSET_STATUSES[info[:asset][:status]] == :READY &&
-              url = client.flavorAssetGetDownloadUrl(info[:asset][:id])
+              url = (client.flavorAssetGetPlaylistUrl(obj.media_id, info[:asset][:id]) || client.flavorAssetGetDownloadUrl(info[:asset][:id]))
             add_error(I18n.t('course_exports.errors.media_file', "A media file failed to export"))
             next
           end
 
-          path = base_path = File.join(CCHelper::WEB_RESOURCES_FOLDER, CCHelper::MEDIA_OBJECTS_FOLDER, info[:filename])
+          path = File.join(CCHelper::WEB_RESOURCES_FOLDER, CCHelper::MEDIA_OBJECTS_FOLDER, info[:filename])
 
           remote_stream = open(url)
           @zip_file.get_output_stream(path) do |stream|
@@ -163,10 +209,14 @@ module CC
           ) do |res|
             res.file(:href => path)
           end
+
+          process_media_tracks(tracks, migration_id, obj, path)
         rescue
           add_error(I18n.t('course_exports.errors.media_file', "A media file failed to export"), $!)
         end
       end
+
+      add_tracks(tracks)
     end
   end
 end

@@ -26,10 +26,17 @@ class ImportedHtmlConverter
     doc = Nokogiri::HTML(html || "")
     attrs = ['rel', 'href', 'src', 'data', 'value']
     course_path = "/#{context.class.to_s.underscore.pluralize}/#{context.id}"
+
     for_course_copy = false
-    if context.respond_to?(:content_migration) && context.content_migration && context.content_migration.for_course_copy?
-      for_course_copy = true
+    domain_substitution_map = {}
+    if context.respond_to?(:content_migration) && context.content_migration
+      for_course_copy = true if context.content_migration.for_course_copy?
+
+      if ds_map = context.content_migration.migration_settings[:domain_substitution_map]
+        ds_map.each{|k, v| domain_substitution_map[k.to_s] = v.to_s } # ensure strings
+      end
     end
+
     doc.search("*").each do |node|
       attrs.each do |attr|
         if node[attr]
@@ -40,6 +47,7 @@ class ImportedHtmlConverter
           new_url = nil
           missing_relative_url = nil
           val = URI.unescape(node[attr])
+
           if val =~ /wiki_page_migration_id=(.*)/
             # This would be from a BB9 migration. 
             #todo: refactor migration systems to use new $CANVAS...$ flags
@@ -129,6 +137,11 @@ class ImportedHtmlConverter
           if missing_relative_url
             node[attr] = replace_missing_relative_url(missing_relative_url, context, course_path)
           end
+
+          if new_converted_url = check_domain_substitutions(new_url || val, domain_substitution_map)
+            new_url = new_converted_url
+          end
+
           if new_url
             node[attr] = new_url
           elsif opts[:missing_links]
@@ -150,7 +163,18 @@ class ImportedHtmlConverter
   rescue
     ""
   end
-  
+
+  def self.check_domain_substitutions(url, sub_map)
+    return nil if sub_map.empty?
+    new_url = nil
+    sub_map.each do |from_domain, to_domain|
+      if url.start_with?(from_domain)
+        new_url = url.sub(from_domain, to_domain)
+      end
+    end
+    return new_url
+  end
+
   def self.find_file_in_context(rel_path, context)
     mig_id = nil
     # This is for backward-compatibility: canvas attachment filenames are escaped

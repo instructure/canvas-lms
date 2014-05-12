@@ -31,6 +31,13 @@ define [
     wikiPageEditView.render()
     ok @attachWikiEditorStub.calledOnce, 'Attached wikisidebar to body'
 
+  test 'renders escaped angle brackets properly', ->
+    body = "<p>&lt;E&gt;</p>"
+    wikiPage = new WikiPage body: body
+    view = new WikiPageEditView model: wikiPage
+    view.render()
+    equal view.$wikiPageBody.val(), body
+
 
   module 'WikiPageEditView:UnsavedChanges'
   setupUnsavedChangesTest = (test, attributes) ->

@@ -3062,7 +3062,8 @@ if (typeof Slick === "undefined") {
         column: columnDef,
         item: item || {},
         commitChanges: commitEditAndSetFocus,
-        cancelChanges: cancelEditAndSetFocus
+        cancelChanges: cancelEditAndSetFocus,
+        maxLength: columns[activeCell].maxLength
       });
 
       if (item) {

@@ -476,6 +476,7 @@ class Submission < ActiveRecord::Base
     if assignment
       self.context_code = assignment.context_code
     end
+
     self.submitted_at ||= Time.now if self.has_submission? || (self.submission_type && !self.submission_type.empty?)
     self.quiz_submission.reload if self.quiz_submission_id
     self.workflow_state = 'unsubmitted' if self.submitted? && !self.has_submission?
@@ -552,7 +553,7 @@ class Submission < ActiveRecord::Base
       end
     end
     res = self.versions.to_a[0,1].map(&:model) if res.empty?
-    res.sort_by{ |s| s.submitted_at || SortFirst }
+    res.sort_by{ |s| s.submitted_at || CanvasSort::First }
   end
 
   def check_url_changed

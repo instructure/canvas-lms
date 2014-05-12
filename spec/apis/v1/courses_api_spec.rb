@@ -67,6 +67,41 @@ describe Api::V1::Course do
       @test_api.course_json(@course1, @me, {}, [], []).has_key?("apply_assignment_group_weights").should be_true
     end
 
+    it "should include course progress" do
+      mod = @course2.context_modules.create!(:name => "some module", :require_sequential_progress => true)
+      assignment = @course2.assignments.create!(:title => "some assignment")
+      tag = mod.add_item({:id => assignment.id, :type => 'assignment'})
+      mod.completion_requirements = {tag.id => {:type => 'must_submit'}}
+      mod.require_sequential_progress = true
+      mod.publish
+      mod.save!
+
+      class CourseProgress
+        def course_context_modules_item_redirect_url(opts = {})
+          "course_context_modules_item_redirect_url(:course_id => #{opts[:course_id]}, :id => #{opts[:id]}, :host => HostUrl.context_host(Course.find(#{opts[:course_id]}))"
+        end
+      end
+
+      json = @test_api.course_json(@course2, @me, {}, ['course_progress'], [])
+      json.should include('course_progress')
+      json['course_progress'].should == {
+        'requirement_count' => 1,
+        'requirement_completed_count' => 0,
+        'next_requirement_url' => "course_context_modules_item_redirect_url(:course_id => #{@course2.id}, :id => #{tag.id}, :host => HostUrl.context_host(Course.find(#{@course2.id}))",
+        'completed_at' => nil
+      }
+    end
+
+    it "should include course progress error unless course is module based" do
+      json = @test_api.course_json(@course2, @me, {}, ['course_progress'], [])
+      json.should include('course_progress')
+      json['course_progress'].should == {
+          'error' => {
+              'message' => 'no progress available because this course is not module based (has modules and module completion requirements) or the user is not enrolled as a student in this course'
+          }
+      }
+    end
+
     context "total_scores" do
       before do
         @enrollment.computed_current_score = 95.0;
@@ -514,6 +549,87 @@ describe CoursesController, type: :request do
         json = api_call(:put, @path, @params, :course => { :apply_assignment_group_weights =>  false})
         @course.reload
         @course.apply_group_weights?.should be_false
+      end
+
+      it "should update the grading standard with account level standard" do
+        @standard = @course.account.grading_standards.create!(:title => "account standard", :standard_data => {:a => {:name => 'A', :value => '95'}, :b => {:name => 'B', :value => '80'}, :f => {:name => 'F', :value => ''}})
+        json = api_call(:put, @path, @params, :course => { :grading_standard_id => @standard.id})
+        @course.reload
+        @course.grading_standard.should == @standard
+      end
+
+      it "should update the grading standard with course level standard" do
+        @standard = @course.grading_standards.create!(:title => "course standard", :standard_data => {:a => {:name => 'A', :value => '95'}, :b => {:name => 'B', :value => '80'}, :f => {:name => 'F', :value => ''}})
+        json = api_call(:put, @path, @params, :course => { :grading_standard_id => @standard.id})
+        @course.reload
+        @course.grading_standard.should == @standard
+      end
+
+      it "should update a sub account grading standard" do
+        sub_account = @course.account.sub_accounts.create!
+        c2 = sub_account.courses.create!
+        @path   = "/api/v1/courses/#{c2.id}"
+        @params[:id] = c2.to_param
+        @standard = sub_account.grading_standards.create!(:title => "sub account standard", :standard_data => {:a => {:name => 'A', :value => '95'}, :b => {:name => 'B', :value => '80'}, :f => {:name => 'F', :value => ''}})
+        json = api_call(:put, @path, @params, :course => { :grading_standard_id => @standard.id})
+        c2.reload
+        c2.grading_standard.should == @standard
+      end
+
+      it "should update the grading standard with account standard from sub account" do
+        sub_account = @course.account.sub_accounts.create!
+        c2 = sub_account.courses.create!
+        @path   = "/api/v1/courses/#{c2.id}"
+        @params[:id] = c2.to_param
+        @standard = @course.account.grading_standards.create!(:title => "sub account standard", :standard_data => {:a => {:name => 'A', :value => '95'}, :b => {:name => 'B', :value => '80'}, :f => {:name => 'F', :value => ''}})
+        json = api_call(:put, @path, @params, :course => { :grading_standard_id => @standard.id})
+        c2.reload
+        c2.grading_standard.should == @standard
+      end
+
+      it "should not update grading standard from sub account not on account chain" do
+        sub_account = @course.account.sub_accounts.create!
+        sub_account2 = @course.account.sub_accounts.create!
+        c2 = sub_account.courses.create!
+        @path   = "/api/v1/courses/#{c2.id}"
+        @params[:id] = c2.to_param
+        @standard = sub_account2.grading_standards.create!(:title => "sub account standard", :standard_data => {:a => {:name => 'A', :value => '95'}, :b => {:name => 'B', :value => '80'}, :f => {:name => 'F', :value => ''}})
+        json = api_call(:put, @path, @params, :course => { :grading_standard_id => @standard.id})
+        c2.reload
+        c2.grading_standard.should == nil
+      end
+
+      it "should not delete existing grading standard when invalid standard provided" do
+        sub_account = @course.account.sub_accounts.create!
+        sub_account2 = @course.account.sub_accounts.create!
+        c2 = sub_account.courses.create!
+        @path   = "/api/v1/courses/#{c2.id}"
+        @params[:id] = c2.to_param
+        @standard = sub_account.grading_standards.create!(:title => "sub account standard", :standard_data => {:a => {:name => 'A', :value => '95'}, :b => {:name => 'B', :value => '80'}, :f => {:name => 'F', :value => ''}})
+        @standard2 = sub_account2.grading_standards.create!(:title => "sub account standard 2", :standard_data => {:a => {:name => 'A', :value => '95'}, :b => {:name => 'B', :value => '80'}, :f => {:name => 'F', :value => ''}})
+        c2.grading_standard = @standard
+        c2.save!
+        json = api_call(:put, @path, @params, :course => { :grading_standard_id => @standard2.id})
+        c2.reload
+        c2.grading_standard.should == @standard
+      end
+
+      it "should remove a grading standard if an empty value is passed" do
+        @standard = @course.account.grading_standards.create!(:title => "account standard", :standard_data => {:a => {:name => 'A', :value => '95'}, :b => {:name => 'B', :value => '80'}, :f => {:name => 'F', :value => ''}})
+        @course.grading_standard = @standard
+        @course.save!
+        json = api_call(:put, @path, @params, :course => { :grading_standard_id => nil})
+        @course.reload
+        @course.grading_standard.should == nil
+      end
+
+      it "should not remove a grading standard if no value is passed" do
+        @standard = @course.account.grading_standards.create!(:title => "account standard", :standard_data => {:a => {:name => 'A', :value => '95'}, :b => {:name => 'B', :value => '80'}, :f => {:name => 'F', :value => ''}})
+        @course.grading_standard = @standard
+        @course.save!
+        json = api_call(:put, @path, @params, :course => {})
+        @course.reload
+        @course.grading_standard.should == @standard
       end
     end
 

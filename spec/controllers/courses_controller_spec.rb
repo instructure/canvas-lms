@@ -214,7 +214,7 @@ describe CoursesController do
       course_with_student_logged_in(:active_course => true, :active_user => true)
       @e2 = @course.enroll_user(@u2)
       post 'enrollment_invitation', :course_id => @course.id, :accept => '1', :invitation => @e2.uuid
-      response.should redirect_to(login_url(:re_login => 1))
+      response.should redirect_to(login_url(:force_login => 1))
     end
 
     it "should accept an enrollment for a restricted by dates course" do

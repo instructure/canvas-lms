@@ -2,11 +2,3 @@ source 'https://rubygems.org'
 
 # Specify your gem's dependencies in canvas_workflow.gemspec
 gemspec
-
-require File.expand_path("../../../config/canvas_rails3", __FILE__)
-
-if CANVAS_RAILS3
-  gem 'rails', '3.2.15'
-else
-  gem 'rails', :github => 'makandra/rails', :branch => '2-3-lts', :ref => 'e86daf8ff727d5efc0040c876ba00c9444a5d915'
-end

@@ -126,6 +126,17 @@ class ApplicationController < ActionController::Base
   end
   helper_method :js_env
 
+  # Reject the request by halting the execution of the current handler
+  # and returning a helpful error message (and HTTP status code).
+  #
+  # @param [String] cause
+  #   The reason the request is rejected for.
+  # @param [Optional, Fixnum|Symbol, Default :bad_request] status
+  #   HTTP status code or symbol.
+  def reject!(cause, status=:bad_request)
+    raise RequestError.new(cause, status)
+  end
+
   protected
 
   def assign_localizer
@@ -443,7 +454,7 @@ class ApplicationController < ActionController::Base
   # associated with the given context.  If the context is a user then it will
   # include all the user's current contexts.
   # Assigns it to the variable @contexts
-  def get_all_pertinent_contexts(include_groups = false)
+  def get_all_pertinent_contexts(opts = {})
     return if @already_ran_get_all_pertinent_contexts
     @already_ran_get_all_pertinent_contexts = true
 
@@ -456,7 +467,7 @@ class ApplicationController < ActionController::Base
       # the grants_right? check to avoid querying for the various memberships
       # again.
       courses = @context.current_enrollments.with_each_shard.select { |e| e.state_based_on_date == :active }.map(&:course).uniq
-      groups = include_groups ? @context.current_groups.with_each_shard.reject{|g| g.context_type == "Course" &&
+      groups = opts[:include_groups] ? @context.current_groups.with_each_shard.reject{|g| g.context_type == "Course" &&
           (g.context.completed? || g.context.soft_concluded?)} : []
       if only_contexts.present?
         # find only those courses and groups passed in the only_contexts
@@ -465,8 +476,14 @@ class ApplicationController < ActionController::Base
         course_ids = only_contexts.select { |c| c.first == "Course" }.map(&:last)
         courses = course_ids.empty? ? [] : courses.select { |c| course_ids.include?(c.id) }
         group_ids = only_contexts.select { |c| c.first == "Group" }.map(&:last)
-        groups = group_ids.empty? ? [] : groups.select { |g| group_ids.include?(g.id) } if include_groups
+        groups = group_ids.empty? ? [] : groups.select { |g| group_ids.include?(g.id) } if opts[:include_groups]
       end
+
+      if opts[:favorites_first]
+        favorite_course_ids = @context.favorite_context_ids("Course")
+        courses = courses.sort_by {|c| [favorite_course_ids.include?(c.id) ? 0 : 1, Canvas::ICU.collation_key(c.name)]}
+      end
+
       @contexts.concat courses
       @contexts.concat groups
     end
@@ -871,7 +888,8 @@ class ApplicationController < ActionController::Base
 
   # Custom error catching and message rendering.
   def rescue_action_in_public(exception)
-    response_code = response_code_for_rescue(exception)
+    response_code = exception.response_status if exception.respond_to?(:response_status)
+    response_code ||= response_code_for_rescue(exception) || 500
     begin
       status_code = interpret_status(response_code)
       status = status_code
@@ -892,7 +910,7 @@ class ApplicationController < ActionController::Base
       end
 
       if api_request?
-        rescue_action_in_api(exception, error)
+        rescue_action_in_api(exception, error, response_code)
       else
         render_rescue_action(exception, error, status, status_code)
       end
@@ -916,17 +934,20 @@ class ApplicationController < ActionController::Base
         :status => status
       }
     else
+      request.format = :html
       erbfile = "#{status.to_s[0,3]}_message.html.erb"
       erbpath = File.join('app', 'views', 'shared', 'errors', erbfile)
       erbfile = "500_message.html.erb" unless File.exists?(erbpath)
       @status_code = status_code
+      message = exception.is_a?(RequestError) ? exception.message : nil
       render :template => "shared/errors/#{erbfile}", 
         :layout => 'application',
         :status => status,
         :locals => {
           :error => error,
           :exception => exception,
-          :status => status
+          :status => status,
+          :message => message,
         }
     end
   end
@@ -937,18 +958,15 @@ class ApplicationController < ActionController::Base
     ActionDispatch::ShowExceptions.rescue_responses['AuthenticationMethods::AccessTokenError'] = 401
   end
 
-  def rescue_action_in_api(exception, error_report)
-    status_code = exception.response_status if exception.respond_to?(:response_status)
-    status_code ||= response_code_for_rescue(exception) || 500
-
+  def rescue_action_in_api(exception, error_report, response_code)
     data = exception.error_json if exception.respond_to?(:error_json)
-    data ||= api_error_json(exception, status_code)
+    data ||= api_error_json(exception, response_code)
 
     if error_report.try(:id)
       data[:error_report_id] = error_report.id
     end
 
-    render :json => data, :status => status_code
+    render :json => data, :status => response_code
   end
 
   def api_error_json(exception, status_code)
@@ -980,7 +998,7 @@ class ApplicationController < ActionController::Base
   end
 
   def rescue_action_locally(exception)
-    if api_request?
+    if api_request? or exception.is_a? RequestError
       # we want api requests to behave the same on error locally as in prod, to
       # ease testing and development. you can still view the backtrace, etc, in
       # the logs.
@@ -1112,12 +1130,15 @@ class ApplicationController < ActionController::Base
         return unless require_user
         @return_url = named_context_url(@context, :context_external_tool_finished_url, @tool.id, :include_host => true)
         @opaque_id = @tool.opaque_identifier_for(@tag)
-        @launch = BasicLTI::ToolLaunch.new(:url => @resource_url, :tool => @tool, :user => @current_user, :context => @context, :link_code => @opaque_id, :return_url => @return_url)
+
+        adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @context).prepare_tool_launch(@return_url, launch_url: @resource_url, link_code: @opaque_id)
         if @assignment
-          @launch.for_assignment!(@tag.context, lti_grade_passback_api_url(@tool), blti_legacy_grade_passback_api_url(@tool))
+          @tool_settings = adapter.generate_post_payload_for_assignment(@assignment, lti_grade_passback_api_url(@tool), blti_legacy_grade_passback_api_url(@tool))
+        else
+          @tool_settings = adapter.generate_post_payload
         end
+
         @tool_launch_type = 'window' if tag.new_tab
-        @tool_settings = @launch.generate
         render :template => 'external_tools/tool_show'
       end
     else
@@ -1683,5 +1704,13 @@ class ApplicationController < ActionController::Base
 
     js_env hash
   end
+
+  ## @real_current_user first ensures that a masquerading user never sees the
+  ## masqueradee's files, but in general you may want to block access to google
+  ## docs for masqueraders earlier in the request
+  def google_docs_user
+    @real_current_user || @current_user || (self.respond_to?(:user) && self.user.is_a?(User) && self.user) || nil
+  end
+
 
 end

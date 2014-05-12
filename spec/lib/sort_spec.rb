@@ -18,62 +18,62 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
-describe SortFirst do
+describe CanvasSort::First do
   it "should be equal to itself" do
-    SortFirst.should == SortFirst
+    CanvasSort::First.should == CanvasSort::First
   end
 
   it "should be less than any string" do
-    SortFirst.should < ""
-    SortFirst.should < "a"
+    CanvasSort::First.should < ""
+    CanvasSort::First.should < "a"
   end
 
   it "should be less than any string, commutatively" do
-    "".should > SortFirst
-    "a".should > SortFirst
+    "".should > CanvasSort::First
+    "a".should > CanvasSort::First
   end
 
   it "should be less than any number" do
-    SortFirst.should < 0
-    SortFirst.should < -1
-    SortFirst.should < 1
+    CanvasSort::First.should < 0
+    CanvasSort::First.should < -1
+    CanvasSort::First.should < 1
   end
 
   it "should be less than any number, commutatively" do
-    0.should > SortFirst
-    -1.should > SortFirst
-    1.should > SortFirst
+    0.should > CanvasSort::First
+    -1.should > CanvasSort::First
+    1.should > CanvasSort::First
   end
 
   it "should be less than any time or time with zone" do
-    SortFirst.should < Time.now
-    SortFirst.should < Time.at(0)
-    SortFirst.should < Time.at(-1)
-    SortFirst.should < Time.zone.now
+    CanvasSort::First.should < Time.now
+    CanvasSort::First.should < Time.at(0)
+    CanvasSort::First.should < Time.at(-1)
+    CanvasSort::First.should < Time.zone.now
   end
 
   it "should be less than any time or time with zone, commutatively" do
-    Time.now.should > SortFirst
-    Time.at(0).should > SortFirst
-    Time.at(-1).should > SortFirst
-    Time.zone.now.should > SortFirst
+    Time.now.should > CanvasSort::First
+    Time.at(0).should > CanvasSort::First
+    Time.at(-1).should > CanvasSort::First
+    Time.zone.now.should > CanvasSort::First
   end
 
   it "should sort with a few strings" do
-    [SortLast, 'a', SortFirst, 'b'].sort.should == [SortFirst, 'a', 'b', SortLast]
+    [CanvasSort::Last, 'a', CanvasSort::First, 'b'].sort.should == [CanvasSort::First, 'a', 'b', CanvasSort::Last]
   end
 
   it "should sort with a few numbers" do
-    [SortLast, 1, SortFirst, 2].sort.should == [SortFirst, 1, 2, SortLast]
+    [CanvasSort::Last, 1, CanvasSort::First, 2].sort.should == [CanvasSort::First, 1, 2, CanvasSort::Last]
   end
 
   it "should sort with a few times" do
     a = 5.seconds.ago
     b = Time.now
-    [SortLast, a, SortFirst, b].sort.should == [SortFirst, a, b, SortLast]
+    [CanvasSort::Last, a, CanvasSort::First, b].sort.should == [CanvasSort::First, a, b, CanvasSort::Last]
   end
 
   it "should work with Array#min" do
-    [1, 2, SortFirst].min.should == SortFirst
+    [1, 2, CanvasSort::First].min.should == CanvasSort::First
   end
 end

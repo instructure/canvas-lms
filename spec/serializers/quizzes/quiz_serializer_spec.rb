@@ -182,7 +182,6 @@ describe Quizzes::QuizSerializer do
     describe "quiz_submissions" do
 
       it "sends the url for all submissions when user may grade" do
-        pending
         course_with_teacher_logged_in(active_all: true)
         quiz_with_graded_submission([], course: @course)
         serializer = Quizzes::QuizSerializer.new(@quiz,
@@ -193,7 +192,6 @@ describe Quizzes::QuizSerializer do
       end
 
       it "sends the url to a student's submission for students" do
-        pending
         course_with_student_logged_in(active_all: true)
         quiz_with_graded_submission([], user: @student, course: @course)
         serializer = Quizzes::QuizSerializer.new(@quiz,

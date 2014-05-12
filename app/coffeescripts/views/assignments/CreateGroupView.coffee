@@ -11,6 +11,8 @@ define [
   'jst/EmptyDialogFormWrapper'
 ], (round, I18n, $, _, AssignmentGroup, NeverDropCollection, NeverDropCollectionView, DialogFormView, template, wrapper) ->
 
+  SHORT_HEIGHT = 250
+
   class CreateGroupView extends DialogFormView
     defaults:
       width: 600
@@ -43,7 +45,6 @@ define [
       #@assignmentGroup will be defined when editing
       @model = @assignmentGroup or new AssignmentGroup(assignments: [])
 
-
     onSaveSuccess: ->
       super
       # meaning we are editing
@@ -59,9 +60,10 @@ define [
 
     getFormData: ->
       data = super
-      delete data.rules.drop_lowest if _.contains(["", "0"], data.rules.drop_lowest)
-      delete data.rules.drop_highest if _.contains(["", "0"], data.rules.drop_highest)
-      delete data.rules.never_drop if data.rules.never_drop?.length == 0
+      if data.rules
+        delete data.rules.drop_lowest if _.contains(["", "0"], data.rules.drop_lowest)
+        delete data.rules.drop_highest if _.contains(["", "0"], data.rules.drop_highest)
+        delete data.rules.never_drop if data.rules.never_drop?.length == 0
       data
 
     validateFormData: (data) ->
@@ -125,10 +127,13 @@ define [
         label_id: @model.get('id') or 'new'
         drop_lowest: @model.rules()?.drop_lowest or 0
         drop_highest: @model.rules()?.drop_highest or 0
-        editable_never_drop: @model.get('assignments').length > 0
+        editable_drop: @model.get('assignments').length > 0
       })
 
     openAgain: ->
+      if @model.get('assignments').length == 0
+        @setDimensions(this.defaults.width, SHORT_HEIGHT)
+
       super
       @checkGroupWeight()
       @getNeverDrops()

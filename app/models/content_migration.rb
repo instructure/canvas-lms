@@ -47,7 +47,7 @@ class ContentMigration < ActiveRecord::Base
     state :imported
     state :failed
   end
-  
+
   def self.migration_plugins(exclude_hidden=false)
     plugins = Canvas::Plugin.all_for_tag(:export_system)
     exclude_hidden ? plugins.select{|p|!p.meta[:hide_from_users]} : plugins
@@ -79,15 +79,15 @@ class ContentMigration < ActiveRecord::Base
       migration_settings[key] = val
     end
   end
-  
+
   def import_immediately?
     !!migration_settings[:import_immediately]
   end
-  
+
   def converter_class=(c_class)
     migration_settings[:converter_class] = c_class
   end
-  
+
   def converter_class
     migration_settings[:converter_class]
   end
@@ -103,7 +103,7 @@ class ContentMigration < ActiveRecord::Base
   def n_strand
     ["migrations:import_content", self.root_account.try(:global_id) || "global"]
   end
-  
+
   def migration_ids_to_import=(val)
     migration_settings[:migration_ids_to_import] = val
     set_date_shift_options val[:copy]
@@ -167,9 +167,13 @@ class ContentMigration < ActiveRecord::Base
     end
   end
 
+  def canvas_import?
+    migration_settings[:worker_class] == CC::Importer::Canvas::Converter.name
+  end
+
   # add todo/error/warning issue to the import. user_message is what will be
-  # displayed to the end user. 
-  # type must be one of: :todo, :warning, :error 
+  # displayed to the end user.
+  # type must be one of: :todo, :warning, :error
   #
   # The possible opts keys are:
   #
@@ -177,7 +181,7 @@ class ContentMigration < ActiveRecord::Base
   # exception - an exception object
   # error_report_id - the id to an error report
   # fix_issue_html_url - the url to send the user to to fix problem
-  # 
+  #
   def add_issue(user_message, type, opts={})
     mi = self.migration_issues.build(:issue_type => type.to_s, :description => user_message)
     if opts[:error_report_id]
@@ -199,15 +203,15 @@ class ContentMigration < ActiveRecord::Base
 
     mi
   end
-  
+
   def add_todo(user_message, opts={})
     add_issue(user_message, :todo, opts)
   end
-  
+
   def add_error(user_message, opts={})
     add_issue(user_message, :error, opts)
   end
-  
+
   def add_warning(user_message, opts={})
     if !opts.is_a? Hash
       # convert deprecated behavior to new
@@ -332,9 +336,16 @@ class ContentMigration < ActiveRecord::Base
   alias_method :export_content, :queue_migration
 
   def set_default_settings
-    if !migration_settings.has_key?(:overwrite_quizzes)
-      migration_settings[:overwrite_quizzes] = for_course_copy? || (self.migration_type && self.migration_type == 'canvas_cartridge_importer')
+    if self.context && self.context.respond_to?(:root_account) && account = self.context.root_account
+      if default_ms = account.settings[:default_migration_settings]
+        self.migration_settings = default_ms.merge(self.migration_settings).with_indifferent_access
+      end
     end
+
+    if !self.migration_settings.has_key?(:overwrite_quizzes)
+      self.migration_settings[:overwrite_quizzes] = for_course_copy? || (self.migration_type && self.migration_type == 'canvas_cartridge_importer')
+    end
+
     check_quiz_id_prepender
   end
 
@@ -413,7 +424,7 @@ class ContentMigration < ActiveRecord::Base
 
   def prepare_data(data)
     data = data.with_indifferent_access if data.is_a? Hash
-    TextHelper.recursively_strip_invalid_utf8!(data, true)
+    Utf8Cleaner.recursively_strip_invalid_utf8!(data, true)
     data['all_files_export'] ||= {}
     data
   end
@@ -460,20 +471,20 @@ class ContentMigration < ActiveRecord::Base
       :temp_folder => config[:data_folder])
     @exported_data_zip
   end
-  
+
   def create_all_files_path(temp_path)
     "#{temp_path}_all_files.zip"
   end
-  
+
   def clear_migration_data
     @zip_file.close if @zip_file
     @zip_file = nil
   end
-  
+
   def finished_converting
     #todo finish progress if selective
   end
-  
+
   # expects values between 0 and 100 for the conversion process
   def update_conversion_progress(prog)
     if import_immediately?
@@ -482,7 +493,7 @@ class ContentMigration < ActiveRecord::Base
       fast_update_progress(prog)
     end
   end
-  
+
   # expects values between 0 and 100 for the import process
   def update_import_progress(prog)
     if import_immediately?

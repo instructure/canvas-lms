@@ -114,7 +114,7 @@
           <span class="course_form">
             <% if can_do(@context.root_account, @current_user, :manage_courses) %>
               <select name="course[enrollment_term_id]" id="course_enrollment_term_id">
-                <% @context.root_account.enrollment_terms.active.sort_by{|t| t.start_at || SortFirst}.each do |term| %>
+                <% @context.root_account.enrollment_terms.active.sort_by{|t| t.start_at || CanvasSort::First}.each do |term| %>
                   <option value="<%= term.id %>" <%= 'selected' if term.id == @context.enrollment_term_id %>><%= term.name %></option>
                 <% end %>
               </select>
@@ -127,13 +127,13 @@
       </tr><tr>
         <td class="form-label"><%= f.blabel :start_at, :en => "Starts" %></td>
         <td class="nobr">
-          <span class="course_form"><%= f.text_field :start_at, :class => "date_entry", :value => datetime_string(@context.start_at, :verbose, nil, true) %></span>
+          <span class="course_form"><%= f.text_field :start_at, :class => "date_entry", :value => unlocalized_datetime_string(@context.start_at, :verbose) %></span>
           <span class="course_info start_at"><%= datetime_string(@context.start_at, :verbose, nil, true) || t('no_date', "No Date Set") %></span>
         </td>
       </tr><tr>
         <td class="form-label"><%= f.blabel :conclude_at, :en => "Ends" %></td>
         <td class="nobr">
-          <span class="course_form"><%= f.text_field :conclude_at, :class => "date_entry", :value => datetime_string(@context.conclude_at, :verbose, nil, true) %></span>
+          <span class="course_form"><%= f.text_field :conclude_at, :class => "date_entry", :value => unlocalized_datetime_string(@context.conclude_at, :verbose) %></span>
           <span class="course_info conclude_at"><%= datetime_string(@context.conclude_at, :verbose, nil, true) || t('no_date', "No Date Set") %></span>
           <div class="course_form">
             <%= f.check_box :restrict_enrollments_to_course_dates %>

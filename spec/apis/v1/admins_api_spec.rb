@@ -27,6 +27,7 @@ describe "Admins API", type: :request do
   describe "create" do
     before :each do
       @new_user = user(:name => 'new guy')
+      @admin.account.root_account.pseudonyms.create!(unique_id: 'user', user: @new_user)
       @user = @admin
     end
 
@@ -71,7 +72,8 @@ describe "Admins API", type: :request do
           "id" => @new_user.id,
           "name" => @new_user.name,
           "short_name" => @new_user.short_name,
-          "sortable_name" => @new_user.sortable_name
+          "sortable_name" => @new_user.sortable_name,
+          "login_id" => "user",
         }
       }
     end
@@ -97,6 +99,14 @@ describe "Admins API", type: :request do
                       {:user_id => @new_user.to_param})
 
       # Expectation above should pass.
+    end
+
+    it "should not allow you to add a random user" do
+      @new_user.pseudonym.destroy
+      raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
+                   { :controller => 'admins', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
+                   { :user_id => @new_user.id })
+      response.code.should == '404'
     end
   end
   

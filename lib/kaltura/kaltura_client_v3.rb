@@ -144,13 +144,15 @@ module Kaltura
       # CNVS-11227 features broken conversions at 20x+ the original source's bitrate
       # (in addition to working conversions at bitrates comparable to the original)
       suspicious_bitrate_threshold = original_source ? original_source[:bitrate].to_i * 5 : 0
+
       sources = sources.sort_by do |a|
-        [a[:hasWarnings] || a[:isOriginal] != '0' ? SortLast : SortFirst,
-         a[:isOriginal] == '0' ? SortFirst : SortLast,
+        [a[:hasWarnings] || a[:isOriginal] != '0' ? CanvasSort::Last : CanvasSort::First,
+         a[:isOriginal] == '0' ? CanvasSort::First : CanvasSort::Last,
          PREFERENCE.index(a[:fileExt]) || PREFERENCE.size + 1,
-         a[:bitrate].to_i < suspicious_bitrate_threshold ? SortFirst : SortLast,
+         a[:bitrate].to_i < suspicious_bitrate_threshold ? CanvasSort::First : CanvasSort::Last,
          0 - a[:bitrate].to_i]
       end
+
       sources.each{|a| a.delete(:hasWarnings)}
       sources
     end
@@ -244,7 +246,7 @@ module Kaltura
       data = {}
       data[:result] = result
       url = result.css('logFileUrl')[0].content
-      csv = CSV.parse(Canvas::HTTP.get(url).body)
+      csv = CSV.parse(CanvasHttp.get(url).body)
       data[:entries] = []
       csv.each do |row|
         data[:entries] << {
@@ -346,8 +348,6 @@ module Kaltura
     def postRequest(service, action, params)
       requestParams = "service=#{service}&action=#{action}"
       multipart_body, headers = Multipart::Post.new.prepare_query(params)
-      # since we're not using Rack, translate 'CONTENT_TYPE' back to 'Content-Type'
-      headers = headers.dup.tap { |h| h['Content-Type'] ||= h.delete('CONTENT_TYPE') }
       response = sendRequest(
         Net::HTTP::Post.new("#{@endpoint}/?#{requestParams}", headers),
         multipart_body
