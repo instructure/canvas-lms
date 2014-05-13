@@ -780,6 +780,26 @@ describe ContentMigration do
       lo3_new.data.should == lo3.data
     end
 
+    it "should not copy deleted learning outcomes into the new course" do
+      old_root = @copy_from.root_outcome_group
+
+      log = @copy_from.learning_outcome_groups.new
+      log.context = @copy_from
+      log.title = "An outcome group"
+      log.description = "<p>Groupage</p>"
+      log.save!
+      old_root.adopt_outcome_group(log)
+
+      lo = create_outcome(@copy_from, log)
+      lo2 = create_outcome(@copy_from, log)
+      lo2.destroy
+
+      run_course_copy
+
+      @copy_to.created_learning_outcomes.count.should == 1
+      @copy_to.created_learning_outcomes.first.migration_id.should == mig_id(lo)
+    end
+
     it "should relink to external outcomes" do
       account = @copy_from.account
       a_group = account.root_outcome_group
