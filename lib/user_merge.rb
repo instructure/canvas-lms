@@ -138,7 +138,11 @@ class UserMerge
             # ditto
             subscope = Submission.from("(#{subscope.to_sql}) AS s").select(unique_id)
           end
-          scope.where("#{unique_id} NOT IN (?)", subscope).update_all(:user_id => target_user)
+          scope = scope.where("#{unique_id} NOT IN (?)", subscope)
+          model.transaction do
+            update_versions(from_user, target_user, scope, table, :user_id)
+            scope.update_all(:user_id => target_user)
+          end
         rescue => e
           Rails.logger.error "migrating #{table} column user_id failed: #{e.to_s}"
         end
@@ -170,11 +174,18 @@ class UserMerge
       updates['submission_comments'] = 'author_id'
       updates['conversation_messages'] = 'author_id'
       updates = updates.to_a
+      version_updates = ['rubric_assessments', 'wiki_pages']
       updates.each do |table, column|
         begin
           klass = table.classify.constantize
           if klass.new.respond_to?("#{column}=".to_sym)
-            klass.where(column => from_user).update_all(column => target_user.id)
+            scope = klass.where(column => from_user)
+            klass.transaction do
+              if version_updates.include?(table)
+                update_versions(from_user, target_user, scope, table, column)
+              end
+              scope.update_all(column => target_user.id)
+            end
           end
         rescue => e
           Rails.logger.error "migrating #{table} column #{column} failed: #{e.to_s}"
@@ -296,4 +307,29 @@ class UserMerge
     end
   end
 
+  def update_versions(from_user, target_user, scope, table, column)
+    scope.find_ids_in_batches do |ids|
+      versionable_type = table.to_s.classify
+      # TODO: This is a hack to support namespacing
+      versionable_type = ['QuizSubmission', 'Quizzes::QuizSubmission'] if table.to_s == 'quizzes/quiz_submissions'
+      Version.where(:versionable_type => versionable_type, :versionable_id => ids).find_each do |version|
+        begin
+          version_attrs = YAML.load(version.yaml)
+          if version_attrs[column.to_s] == from_user.id
+            version_attrs[column.to_s] = target_user.id
+          end
+          # i'm pretty sure simply_versioned just stores fields as strings, but
+          # i haven't had time to verify that 100% yet, so better safe than sorry
+          if version_attrs[column.to_sym] == from_user.id
+            version_attrs[column.to_sym] = target_user.id
+          end
+          version.yaml = version_attrs.to_yaml
+          version.save!
+        rescue => e
+          Rails.logger.error "migrating versions for #{table} column #{column} failed: #{e.to_s}"
+          raise e unless Rails.env.production?
+        end
+      end
+    end
+  end
 end
