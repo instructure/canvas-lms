@@ -95,7 +95,16 @@ class ContentTag < ActiveRecord::Base
   private :touch_context_module_after_transaction
   
   def self.touch_context_modules(ids=[])
-    ContextModule.where(:id => ids).update_all(:updated_at => Time.now.utc) unless ids.empty?
+    if ids.length == 1
+      ContextModule.where(id: ids).update_all(updated_at: Time.now.utc)
+    elsif ids.empty?
+      # do nothing
+    else
+      ContextModule.transaction do
+        ContextModule.where(id: ids).order(:id).lock.pluck(:id)
+        ContextModule.where(id: ids).update_all(updated_at: Time.now.utc)
+      end
+    end
     true
   end
   
