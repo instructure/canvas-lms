@@ -757,7 +757,7 @@ class AccountsController < ApplicationController
 
   def remove_account_user
     if authorized_action(@context, @current_user, :manage_account_memberships)
-      @account_user = AccountUser.find(params[:id])
+      @account_user = @context.account_users.find(params[:id])
       @account_user.destroy
       respond_to do |format|
         format.html { redirect_to account_settings_url(@context, :anchor => "tab-users") }
