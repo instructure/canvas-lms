@@ -151,6 +151,34 @@ describe AccountsController do
     end
   end
 
+  describe "remove_account_user" do
+    it "should remove account membership from a user" do
+      a = Account.default
+      user_to_remove = account_admin_user(account: a)
+      au_id = user_to_remove.account_users.first.id
+      account_with_admin_logged_in(account: a)
+      post 'remove_account_user', account_id: a.id, id: au_id
+      response.should be_redirect
+      AccountUser.find_by_id(au_id).should be_nil
+    end
+
+    it "should verify that the membership is in the caller's account" do
+      a1 = Account.default
+      a2 = Account.create!(name: 'other root account')
+      user_to_remove = account_admin_user(account: a1)
+      au_id = user_to_remove.account_users.first.id
+      account_with_admin_logged_in(account: a2)
+      begin
+        post 'remove_account_user', :account_id => a2.id, :id => au_id
+        # rails3 returns 404 status
+        response.should be_not_found
+      rescue ActiveRecord::RecordNotFound
+        # rails2 passes the exception through here
+      end
+      AccountUser.find_by_id(au_id).should_not be_nil
+    end
+  end
+
   describe "authentication" do
     it "should redirect to CAS if CAS is enabled" do
       account = account_with_cas({:account => Account.default})
