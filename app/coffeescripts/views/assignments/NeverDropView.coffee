@@ -1,8 +1,9 @@
 define [
   'Backbone'
   'underscore'
+  'i18n!assignments'
   'jst/assignments/NeverDrop'
-], (Backbone, _, neverDropTemplate) ->
+], (Backbone, _, I18n, neverDropTemplate) ->
 
   class NeverDrop extends Backbone.View
     className: 'never_drop_rule'
@@ -36,6 +37,9 @@ define [
 
     toJSON: =>
       json = super
+      json.buttonTitle = I18n.t('remove_unsaved_never_drop_rule', "Remove unsaved never drop rule")
       if @model.has('chosen_id')
         json.assignments = @model.collection.toAssignments(@model.get('chosen_id'))
+      if json.chosen
+        json.buttonTitle = I18n.t('remove_never_drop_rule', "Remove never drop rule") + " #{json.chosen}"
       json
