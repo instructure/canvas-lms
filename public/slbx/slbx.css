@@ -139,3 +139,4 @@ button[type="submit"]{
 body.modal #modal-box.login-box {
     background: url('/images/Money_Noise_tm.png?1399865639') repeat scroll 0% 0%, radial-gradient(circle farthest-corner at 50% -100px, rgba(255, 255, 255, 0.6) 0%, transparent 100%) repeat scroll 0% 0%, -moz-linear-gradient(center top, #3bed5c, #b415ed) repeat scroll 0% 0% transparent;
 }
+#footer {text-align: center;}
