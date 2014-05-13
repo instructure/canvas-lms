@@ -128,3 +128,10 @@ define [
 
     equal quiz.get('sortSlug'), App.Quiz.SORT_LAST + 'ohi', 'uses a sort_last token when no date'
 
+  test "allDates", ->
+    date = new Date()
+    run ->
+      quiz.set 'lockAt', date
+      equal quiz.get("allDates").length, 1, 'builds the date'
+
+

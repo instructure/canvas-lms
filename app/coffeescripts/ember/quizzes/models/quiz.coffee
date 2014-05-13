@@ -33,6 +33,7 @@ define [
     scoringPolicy: attr()
     oneQuestionAtATime: attr()
     questionCount: attr()
+    sectionCount: attr()
     accessCode: attr()
     ipFilter: attr()
     pointsPossible: attr()
@@ -101,14 +102,21 @@ define [
     assignmentOverrides: hasMany 'assignment_override'
     allDates: (->
       dates = []
-      dates.push Ember.Object.create
-        lockAt: @get 'lockAt'
-        unlockAt: @get 'unlockAt'
-        dueAt: @get 'dueAt'
-        base: true
-      dates = dates.concat(@get('assignmentOverrides').toArray())
-      Ember.A(dates)
-    ).property('lockAt', 'unlockAt', 'dueAt', 'assignmentOverrides.[]')
+      overrides = @get('assignmentOverrides').toArray()
+      if overrides.length == 0 || overrides.length != @get 'sectionCount'
+        title = if overrides.length > 0
+          I18n.t('everyone_else', 'Everyone Else')
+        else
+          I18n.t('everyone', 'Everyone')
+        dates.push Ember.Object.create
+          lockAt: @get 'lockAt'
+          unlockAt: @get 'unlockAt'
+          dueAt: @get 'dueAt'
+          base: true
+          title: title
+
+      Ember.A(dates.concat(overrides))
+    ).property('lockAt', 'unlockAt', 'dueAt', 'sectionCount', 'assignmentOverrides.[]')
 
   Quiz.SORT_LAST = 'ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ'
 

@@ -96,6 +96,16 @@ describe Quizzes::QuizSerializer do
     serializer.as_json[:quiz].should_not have_key :access_code
   end
 
+  it "doesn't include the section count unless the user can grade" do
+    quiz.expects(:grants_right?).with(@user, @session, :grade).
+      at_least_once.returns true
+    serializer.as_json[:quiz].should have_key :section_count
+
+    quiz.expects(:grants_right?).with(@user, @session, :grade).
+      at_least_once.returns false
+    serializer.as_json[:quiz].should_not have_key :section_count
+  end
+
   it "uses available_question_count for question_count" do
     quiz.stubs(:available_question_count).returns 5
     serializer.as_json[:quiz][:question_count].should == 5

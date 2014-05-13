@@ -16,7 +16,7 @@ module Quizzes
                 :require_lockdown_browser, :require_lockdown_browser_for_results,
                 :require_lockdown_browser_monitor, :lockdown_browser_monitor_data,
                 :speed_grader_url, :permissions, :quiz_reports_url, :quiz_statistics_url,
-                :message_students_url, :quiz_submission_html_url
+                :message_students_url, :quiz_submission_html_url, :section_count
 
     def_delegators :@controller,
       :api_v1_course_assignment_group_url,
@@ -92,6 +92,10 @@ module Quizzes
       quiz.formatted_dates_hash(due_dates[1])
     end
 
+    def section_count
+      context.active_course_sections.count
+    end
+
     def locked_for_json_type; 'quiz' end
 
     # Teacher or Observer?
@@ -107,6 +111,7 @@ module Quizzes
       super(keys).select do |key|
         case key
         when :all_dates then include_all_dates?
+        when :section_count then user_may_grade?
         when :access_code, :speed_grader_url, :message_students_url then user_may_grade?
         when :unpublishable then include_unpublishable?
         when :submitted_students, :unsubmitted_students then user_may_grade?
