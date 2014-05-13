@@ -260,6 +260,11 @@ class Message < ActiveRecord::Base
     end
   end
 
+  class UnescapedBuffer < String # acts like safe buffer except for the actually being safe part
+    alias :append= :<<
+    alias :safe_concat :concat
+  end
+
   # Public: Store content in a message_content_... instance variable.
   #
   # name  - The symbol name of the content.
@@ -267,7 +272,11 @@ class Message < ActiveRecord::Base
   #
   # Returns an empty string.
   def define_content(name, &block)
-    old_output_buffer, @output_buffer = [@output_buffer, @output_buffer.dup.clear]
+    if name == :subject || name == :user_name
+      old_output_buffer, @output_buffer = [@output_buffer, UnescapedBuffer.new]
+    else
+      old_output_buffer, @output_buffer = [@output_buffer, @output_buffer.dup.clear]
+    end
 
     yield
 
