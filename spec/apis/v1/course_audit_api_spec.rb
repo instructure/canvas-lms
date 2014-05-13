@@ -154,6 +154,14 @@ describe "CourseAudit API", type: :request do
 
         fetch_for_context(@course, expected_status: 401)
       end
+
+      it "should not allow other account models" do
+        new_root_account = Account.create!(name: 'New Account')
+        LoadAccount.stubs(:default_domain_root_account).returns(new_root_account)
+        @viewing_user = user_with_pseudonym(account: new_root_account)
+
+        fetch_for_context(@course, expected_status: 404)
+      end
     end
 
     describe "pagination" do

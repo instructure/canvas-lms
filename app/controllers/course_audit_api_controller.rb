@@ -182,7 +182,7 @@ class CourseAuditApiController < AuditorApiController
   # @returns [CourseEvent]
   #
   def for_course
-    @course = Course.find(params[:course_id])
+    @course = @domain_root_account.all_courses.find(params[:course_id])
     if authorize
       events = Auditors::Course.for_course(@course, query_options)
       render_events(events, api_v1_audit_course_for_course_url(@course))
