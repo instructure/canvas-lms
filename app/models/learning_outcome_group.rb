@@ -164,12 +164,12 @@ class LearningOutcomeGroup < ActiveRecord::Base
     copy.save!
 
     # copy the group contents
-    original.child_outcome_groups.each do |group|
+    original.child_outcome_groups.active.each do |group|
       next if opts[:only] && opts[:only][group.asset_string] != "1"
       copy.add_outcome_group(group, opts)
     end
 
-    original.child_outcome_links.each do |link|
+    original.child_outcome_links.active.each do |link|
       next if opts[:only] && opts[:only][link.asset_string] != "1"
       copy.add_outcome(link.content)
     end
