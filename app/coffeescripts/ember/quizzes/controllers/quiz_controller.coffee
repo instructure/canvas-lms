@@ -53,6 +53,10 @@ define [
       I18n.t 'cancel', 'Cancel'
     ).property()
 
+    timeLimitWithMinutes: (->
+      I18n.t('time_limit_minutes', "%{limit} minutes", {limit: @get("timeLimit")})
+    ).property('timeLimit')
+
     recipientGroups: (->
       [@get('submittedStudents'), @get('unsubmittedStudents')]
     ).property('submittedStudents', 'unsubmittedStudents')
