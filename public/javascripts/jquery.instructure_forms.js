@@ -1064,7 +1064,12 @@ define([
   $.moveErrorBoxes = function() {
     var list = [];
     var prevList = $.fn.errorBox.errorBoxes;
-    for(var idx in prevList) {
+    // ember does silly things with arrays
+    // so this for loop was changed from a for-in
+    // to how you see it below.
+    // That way, canvas doesn't blow up in some places
+    // ... at least not because of this
+    for(var idx = 0; idx < prevList.length; idx++) {
       var $obj = prevList[idx],
           $box = $obj.data('associated_error_box');
       if($box && $box.length && $box[0].parentNode) {
