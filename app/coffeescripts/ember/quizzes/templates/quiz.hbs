@@ -43,6 +43,11 @@
             {{#t 'preview'}}Preview{{/t}}
           {{/ic-menu-item}}
 
+          {{#ic-menu-item on-select="showStudentResults"}}
+            <i class="icon-group"></i>
+            {{#t 'show_quiz_results'}}Show Student Quiz Results{{/t}}
+          {{/ic-menu-item}}
+
           {{#if lockAt}}
             {{#ic-menu-item class="js-due-date-toggler" on-select="unlock"}}
               <i class="icon-unlock"></i>
