@@ -62,14 +62,14 @@ module SIS
         @users_to_update_account_associations = []
       end
 
-      def add_user(user_id, login_id, status, first_name, last_name, email=nil, password=nil, ssha_password=nil, integration_id=nil, short_name=nil)
-        @logger.debug("Processing User #{[user_id, login_id, status, first_name, last_name, email, password, ssha_password, integration_id, short_name].inspect}")
+      def add_user(user_id, login_id, status, first_name, last_name, email=nil, password=nil, ssha_password=nil, integration_id=nil, short_name=nil, full_name=nil, sortable_name=nil)
+        @logger.debug("Processing User #{[user_id, login_id, status, first_name, last_name, email, password, ssha_password, integration_id, short_name, full_name, sortable_name].inspect}")
 
         raise ImportError, "No user_id given for a user" if user_id.blank?
         raise ImportError, "No login_id given for user #{user_id}" if login_id.blank?
         raise ImportError, "Improper status for user #{user_id}" unless status =~ /\A(active|deleted)/i
 
-        @batched_users << [user_id.to_s, login_id, status, first_name, last_name, email, password, ssha_password, integration_id, short_name]
+        @batched_users << [user_id.to_s, login_id, status, first_name, last_name, email, password, ssha_password, integration_id, short_name, full_name, sortable_name]
         process_batch if @batched_users.size >= @updates_every
       end
 
@@ -86,7 +86,7 @@ module SIS
           while !@batched_users.empty? && tx_end_time > Time.now
             user_row = @batched_users.shift
             @logger.debug("Processing User #{user_row.inspect}")
-            user_id, login_id, status, first_name, last_name, email, password, ssha_password, integration_id, short_name = user_row
+            user_id, login_id, status, first_name, last_name, email, password, ssha_password, integration_id, short_name, full_name, sortable_name = user_row
 
             pseudo = @root_account.pseudonyms.find_by_sis_user_id(user_id.to_s)
             pseudo_by_login = @root_account.pseudonyms.active.by_unique_id(login_id).first
@@ -106,9 +106,14 @@ module SIS
               end
 
               user = pseudo.user
-              user.name = "#{first_name} #{last_name}" unless user.stuck_sis_fields.include?(:name)
+              unless user.stuck_sis_fields.include?(:name)
+                user.name = "#{first_name} #{last_name}"
+                user.name = full_name if full_name.present?
+              end
               unless user.stuck_sis_fields.include?(:sortable_name)
                 user.sortable_name = last_name.present? && first_name.present? ? "#{last_name}, #{first_name}" : "#{first_name}#{last_name}"
+                user.sortable_name = nil if full_name.present? # force User model to infer sortable name from the full name
+                user.sortable_name = sortable_name if sortable_name.present?
               end
               unless user.stuck_sis_fields.include?(:short_name)
                 user.short_name = short_name if short_name.present?
@@ -116,7 +121,10 @@ module SIS
             else
               user = User.new
               user.name = "#{first_name} #{last_name}"
+              user.name = full_name if full_name.present?
               user.sortable_name = last_name.present? && first_name.present? ? "#{last_name}, #{first_name}" : "#{first_name}#{last_name}"
+              user.sortable_name = nil if full_name.present? # force User model to infer sortable name from the full name
+              user.sortable_name = sortable_name if sortable_name.present?
               user.short_name = short_name if short_name.present?
             end
 
