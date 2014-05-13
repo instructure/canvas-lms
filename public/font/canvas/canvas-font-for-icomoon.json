@@ -16,7 +16,9 @@
 				"code": 57360,
 				"name": "uniE010",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 0
 		},
 		{
 			"icon": {
@@ -33,7 +35,9 @@
 				"code": 57361,
 				"name": "uniE011",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 1
 		},
 		{
 			"icon": {
@@ -50,7 +54,9 @@
 				"code": 57362,
 				"name": "uniE012",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 2
 		},
 		{
 			"icon": {
@@ -67,7 +73,9 @@
 				"code": 57363,
 				"name": "uniE013",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 3
 		},
 		{
 			"icon": {
@@ -84,7 +92,9 @@
 				"code": 57364,
 				"name": "uniE014",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 4
 		},
 		{
 			"icon": {
@@ -101,7 +111,9 @@
 				"code": 57365,
 				"name": "uniE015",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 5
 		},
 		{
 			"icon": {
@@ -118,7 +130,9 @@
 				"code": 57366,
 				"name": "uniE016",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 6
 		},
 		{
 			"icon": {
@@ -135,7 +149,9 @@
 				"code": 57367,
 				"name": "uniE017",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 7
 		},
 		{
 			"icon": {
@@ -152,7 +168,9 @@
 				"code": 57368,
 				"name": "uniE018",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 8
 		},
 		{
 			"icon": {
@@ -169,7 +187,9 @@
 				"code": 57369,
 				"name": "uniE019",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 9
 		},
 		{
 			"icon": {
@@ -186,7 +206,9 @@
 				"code": 57370,
 				"name": "uniE01A",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 10
 		},
 		{
 			"icon": {
@@ -203,7 +225,9 @@
 				"code": 57371,
 				"name": "uniE01B",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 11
 		},
 		{
 			"icon": {
@@ -220,7 +244,9 @@
 				"code": 57372,
 				"name": "uniE01C",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 12
 		},
 		{
 			"icon": {
@@ -237,7 +263,9 @@
 				"code": 57373,
 				"name": "uniE01D",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 13
 		},
 		{
 			"icon": {
@@ -254,7 +282,9 @@
 				"code": 57374,
 				"name": "uniE01E",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 14
 		},
 		{
 			"icon": {
@@ -271,7 +301,9 @@
 				"code": 57375,
 				"name": "uniE01F",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 15
 		},
 		{
 			"icon": {
@@ -288,7 +320,9 @@
 				"code": 57376,
 				"name": "uniE020",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 16
 		},
 		{
 			"icon": {
@@ -305,7 +339,9 @@
 				"code": 57377,
 				"name": "uniE021",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 17
 		},
 		{
 			"icon": {
@@ -322,7 +358,9 @@
 				"code": 57378,
 				"name": "uniE022",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 18
 		},
 		{
 			"icon": {
@@ -339,7 +377,9 @@
 				"code": 57379,
 				"name": "uniE023",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 19
 		},
 		{
 			"icon": {
@@ -356,7 +396,9 @@
 				"code": 57380,
 				"name": "uniE024",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 20
 		},
 		{
 			"icon": {
@@ -373,7 +415,9 @@
 				"code": 57381,
 				"name": "uniE025",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 21
 		},
 		{
 			"icon": {
@@ -390,7 +434,9 @@
 				"code": 57382,
 				"name": "uniE026",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 22
 		},
 		{
 			"icon": {
@@ -407,7 +453,9 @@
 				"code": 57383,
 				"name": "uniE027",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 23
 		},
 		{
 			"icon": {
@@ -424,7 +472,9 @@
 				"code": 57384,
 				"name": "uniE028",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 24
 		},
 		{
 			"icon": {
@@ -441,7 +491,9 @@
 				"code": 57385,
 				"name": "uniE029",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 25
 		},
 		{
 			"icon": {
@@ -458,7 +510,9 @@
 				"code": 57386,
 				"name": "uniE02A",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 26
 		},
 		{
 			"icon": {
@@ -475,7 +529,9 @@
 				"code": 57387,
 				"name": "uniE02B",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 27
 		},
 		{
 			"icon": {
@@ -492,7 +548,9 @@
 				"code": 57388,
 				"name": "uniE02C",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 28
 		},
 		{
 			"icon": {
@@ -509,7 +567,9 @@
 				"code": 57389,
 				"name": "uniE02D",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 29
 		},
 		{
 			"icon": {
@@ -526,7 +586,9 @@
 				"code": 57390,
 				"name": "uniE02E",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 30
 		},
 		{
 			"icon": {
@@ -543,7 +605,9 @@
 				"code": 57391,
 				"name": "uniE02F",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 31
 		},
 		{
 			"icon": {
@@ -560,7 +624,9 @@
 				"code": 57392,
 				"name": "uniE030",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 32
 		},
 		{
 			"icon": {
@@ -577,7 +643,9 @@
 				"code": 57393,
 				"name": "uniE031",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 33
 		},
 		{
 			"icon": {
@@ -594,7 +662,9 @@
 				"code": 57394,
 				"name": "uniE032",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 34
 		},
 		{
 			"icon": {
@@ -611,7 +681,9 @@
 				"code": 57395,
 				"name": "uniE033",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 35
 		},
 		{
 			"icon": {
@@ -628,7 +700,9 @@
 				"code": 57396,
 				"name": "uniE034",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 36
 		},
 		{
 			"icon": {
@@ -645,7 +719,9 @@
 				"code": 57397,
 				"name": "uniE035",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 37
 		},
 		{
 			"icon": {
@@ -662,7 +738,9 @@
 				"code": 57398,
 				"name": "uniE036",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 38
 		},
 		{
 			"icon": {
@@ -679,7 +757,9 @@
 				"code": 57399,
 				"name": "uniE037",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 39
 		},
 		{
 			"icon": {
@@ -696,7 +776,9 @@
 				"code": 57400,
 				"name": "uniE038",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 40
 		},
 		{
 			"icon": {
@@ -713,7 +795,9 @@
 				"code": 57401,
 				"name": "uniE039",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 41
 		},
 		{
 			"icon": {
@@ -730,7 +814,9 @@
 				"code": 57402,
 				"name": "uniE03A",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 42
 		},
 		{
 			"icon": {
@@ -747,7 +833,9 @@
 				"code": 57403,
 				"name": "uniE03B",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 43
 		},
 		{
 			"icon": {
@@ -764,7 +852,9 @@
 				"code": 57404,
 				"name": "uniE03C",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 44
 		},
 		{
 			"icon": {
@@ -781,7 +871,9 @@
 				"code": 57405,
 				"name": "uniE03D",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 45
 		},
 		{
 			"icon": {
@@ -798,7 +890,9 @@
 				"code": 57406,
 				"name": "uniE03E",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 46
 		},
 		{
 			"icon": {
@@ -815,7 +909,9 @@
 				"code": 57407,
 				"name": "uniE03F",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 47
 		},
 		{
 			"icon": {
@@ -832,7 +928,9 @@
 				"code": 57408,
 				"name": "uniE040",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 48
 		},
 		{
 			"icon": {
@@ -849,7 +947,9 @@
 				"code": 57409,
 				"name": "uniE041",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 49
 		},
 		{
 			"icon": {
@@ -866,7 +966,9 @@
 				"code": 57410,
 				"name": "uniE042",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 50
 		},
 		{
 			"icon": {
@@ -883,7 +985,9 @@
 				"code": 57411,
 				"name": "uniE043",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 51
 		},
 		{
 			"icon": {
@@ -900,7 +1004,9 @@
 				"code": 57412,
 				"name": "uniE044",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 52
 		},
 		{
 			"icon": {
@@ -917,7 +1023,9 @@
 				"code": 57413,
 				"name": "uniE045",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 53
 		},
 		{
 			"icon": {
@@ -934,7 +1042,9 @@
 				"code": 57414,
 				"name": "uniE046",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 54
 		},
 		{
 			"icon": {
@@ -951,7 +1061,9 @@
 				"code": 57415,
 				"name": "uniE047",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 55
 		},
 		{
 			"icon": {
@@ -968,7 +1080,9 @@
 				"code": 57416,
 				"name": "uniE048",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 56
 		},
 		{
 			"icon": {
@@ -985,7 +1099,9 @@
 				"code": 57417,
 				"name": "uniE049",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 57
 		},
 		{
 			"icon": {
@@ -1002,7 +1118,9 @@
 				"code": 57418,
 				"name": "uniE04A",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 58
 		},
 		{
 			"icon": {
@@ -1019,7 +1137,9 @@
 				"code": 57419,
 				"name": "uniE04B",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 59
 		},
 		{
 			"icon": {
@@ -1036,7 +1156,9 @@
 				"code": 57420,
 				"name": "uniE04C",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 60
 		},
 		{
 			"icon": {
@@ -1053,7 +1175,9 @@
 				"code": 57421,
 				"name": "uniE04D",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 61
 		},
 		{
 			"icon": {
@@ -1070,7 +1194,9 @@
 				"code": 57422,
 				"name": "uniE04E",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 62
 		},
 		{
 			"icon": {
@@ -1087,7 +1213,9 @@
 				"code": 57423,
 				"name": "uniE04F",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 63
 		},
 		{
 			"icon": {
@@ -1104,7 +1232,9 @@
 				"code": 57424,
 				"name": "uniE050",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 64
 		},
 		{
 			"icon": {
@@ -1121,7 +1251,9 @@
 				"code": 57425,
 				"name": "uniE051",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 65
 		},
 		{
 			"icon": {
@@ -1138,7 +1270,9 @@
 				"code": 57426,
 				"name": "uniE052",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 66
 		},
 		{
 			"icon": {
@@ -1155,7 +1289,9 @@
 				"code": 57427,
 				"name": "uniE053",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 67
 		},
 		{
 			"icon": {
@@ -1172,7 +1308,9 @@
 				"code": 57428,
 				"name": "uniE054",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 68
 		},
 		{
 			"icon": {
@@ -1189,7 +1327,9 @@
 				"code": 57429,
 				"name": "uniE055",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 69
 		},
 		{
 			"icon": {
@@ -1206,7 +1346,9 @@
 				"code": 57430,
 				"name": "uniE056",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 70
 		},
 		{
 			"icon": {
@@ -1223,7 +1365,9 @@
 				"code": 57431,
 				"name": "uniE057",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 71
 		},
 		{
 			"icon": {
@@ -1240,7 +1384,9 @@
 				"code": 57432,
 				"name": "uniE058",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 72
 		},
 		{
 			"icon": {
@@ -1257,7 +1403,9 @@
 				"code": 57433,
 				"name": "uniE059",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 73
 		},
 		{
 			"icon": {
@@ -1274,7 +1422,9 @@
 				"code": 57434,
 				"name": "uniE05A",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 74
 		},
 		{
 			"icon": {
@@ -1291,7 +1441,9 @@
 				"code": 57435,
 				"name": "uniE05B",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 75
 		},
 		{
 			"icon": {
@@ -1308,7 +1460,9 @@
 				"code": 57436,
 				"name": "uniE05C",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 76
 		},
 		{
 			"icon": {
@@ -1325,7 +1479,9 @@
 				"code": 57437,
 				"name": "uniE05D",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 77
 		},
 		{
 			"icon": {
@@ -1342,7 +1498,9 @@
 				"code": 57438,
 				"name": "uniE05E",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 78
 		},
 		{
 			"icon": {
@@ -1359,7 +1517,9 @@
 				"code": 57439,
 				"name": "uniE05F",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 79
 		},
 		{
 			"icon": {
@@ -1376,7 +1536,9 @@
 				"code": 57440,
 				"name": "uniE060",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 80
 		},
 		{
 			"icon": {
@@ -1393,7 +1555,9 @@
 				"code": 57441,
 				"name": "uniE061",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 81
 		},
 		{
 			"icon": {
@@ -1410,7 +1574,9 @@
 				"code": 57442,
 				"name": "uniE062",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 82
 		},
 		{
 			"icon": {
@@ -1427,7 +1593,9 @@
 				"code": 57443,
 				"name": "uniE063",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 83
 		},
 		{
 			"icon": {
@@ -1444,7 +1612,9 @@
 				"code": 57444,
 				"name": "uniE064",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 84
 		},
 		{
 			"icon": {
@@ -1461,7 +1631,9 @@
 				"code": 57445,
 				"name": "uniE065",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 85
 		},
 		{
 			"icon": {
@@ -1478,7 +1650,9 @@
 				"code": 57446,
 				"name": "uniE066",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 86
 		},
 		{
 			"icon": {
@@ -1495,7 +1669,9 @@
 				"code": 57447,
 				"name": "uniE067",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 87
 		},
 		{
 			"icon": {
@@ -1512,7 +1688,9 @@
 				"code": 57448,
 				"name": "uniE068",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 88
 		},
 		{
 			"icon": {
@@ -1529,7 +1707,9 @@
 				"code": 57449,
 				"name": "uniE069",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 89
 		},
 		{
 			"icon": {
@@ -1546,7 +1726,9 @@
 				"code": 57450,
 				"name": "uniE06A",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 90
 		},
 		{
 			"icon": {
@@ -1563,7 +1745,9 @@
 				"code": 57451,
 				"name": "uniE06B",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 91
 		},
 		{
 			"icon": {
@@ -1580,7 +1764,9 @@
 				"code": 57452,
 				"name": "uniE06C",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 92
 		},
 		{
 			"icon": {
@@ -1597,7 +1783,9 @@
 				"code": 57453,
 				"name": "uniE06D",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 93
 		},
 		{
 			"icon": {
@@ -1614,7 +1802,9 @@
 				"code": 57454,
 				"name": "uniE06E",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 94
 		},
 		{
 			"icon": {
@@ -1631,7 +1821,9 @@
 				"code": 57455,
 				"name": "uniE06F",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 95
 		},
 		{
 			"icon": {
@@ -1648,7 +1840,9 @@
 				"code": 57456,
 				"name": "uniE070",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 96
 		},
 		{
 			"icon": {
@@ -1665,7 +1859,9 @@
 				"code": 57457,
 				"name": "uniE071",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 97
 		},
 		{
 			"icon": {
@@ -1682,7 +1878,9 @@
 				"code": 57459,
 				"name": "uniE073",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 98
 		},
 		{
 			"icon": {
@@ -1699,7 +1897,9 @@
 				"code": 57460,
 				"name": "uniE074",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 99
 		},
 		{
 			"icon": {
@@ -1716,7 +1916,9 @@
 				"code": 57461,
 				"name": "uniE075",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 100
 		},
 		{
 			"icon": {
@@ -1733,7 +1935,9 @@
 				"code": 57462,
 				"name": "uniE076",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 101
 		},
 		{
 			"icon": {
@@ -1750,7 +1954,9 @@
 				"code": 57463,
 				"name": "uniE077",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 102
 		},
 		{
 			"icon": {
@@ -1767,7 +1973,9 @@
 				"code": 57464,
 				"name": "uniE078",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 103
 		},
 		{
 			"icon": {
@@ -1784,7 +1992,9 @@
 				"code": 57465,
 				"name": "uniE079",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 104
 		},
 		{
 			"icon": {
@@ -1801,7 +2011,9 @@
 				"code": 57466,
 				"name": "uniE07A",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 105
 		},
 		{
 			"icon": {
@@ -1818,7 +2030,9 @@
 				"code": 57467,
 				"name": "uniE07B",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 106
 		},
 		{
 			"icon": {
@@ -1835,7 +2049,9 @@
 				"code": 57468,
 				"name": "uniE07C",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 107
 		},
 		{
 			"icon": {
@@ -1852,7 +2068,9 @@
 				"code": 57469,
 				"name": "uniE07D",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 108
 		},
 		{
 			"icon": {
@@ -1869,7 +2087,9 @@
 				"code": 57470,
 				"name": "uniE07E",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 109
 		},
 		{
 			"icon": {
@@ -1886,7 +2106,9 @@
 				"code": 57471,
 				"name": "uniE07F",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 110
 		},
 		{
 			"icon": {
@@ -1903,7 +2125,9 @@
 				"code": 57472,
 				"name": "uniE080",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 111
 		},
 		{
 			"icon": {
@@ -1920,7 +2144,9 @@
 				"code": 57473,
 				"name": "uniE081",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 112
 		},
 		{
 			"icon": {
@@ -1937,7 +2163,9 @@
 				"code": 57474,
 				"name": "uniE082",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 113
 		},
 		{
 			"icon": {
@@ -1954,7 +2182,9 @@
 				"code": 57475,
 				"name": "uniE083",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 114
 		},
 		{
 			"icon": {
@@ -1971,7 +2201,9 @@
 				"code": 57476,
 				"name": "uniE084",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 115
 		},
 		{
 			"icon": {
@@ -1988,7 +2220,9 @@
 				"code": 57477,
 				"name": "uniE085",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 116
 		},
 		{
 			"icon": {
@@ -2005,7 +2239,9 @@
 				"code": 57478,
 				"name": "uniE086",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 117
 		},
 		{
 			"icon": {
@@ -2022,7 +2258,9 @@
 				"code": 57479,
 				"name": "uniE087",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 118
 		},
 		{
 			"icon": {
@@ -2039,7 +2277,9 @@
 				"code": 57480,
 				"name": "uniE088",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 119
 		},
 		{
 			"icon": {
@@ -2056,7 +2296,9 @@
 				"code": 57458,
 				"name": "uniE072",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 120
 		},
 		{
 			"icon": {
@@ -2073,7 +2315,9 @@
 				"code": 57493,
 				"name": "uniE095",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 121
 		},
 		{
 			"icon": {
@@ -2090,7 +2334,9 @@
 				"code": 57494,
 				"name": "uniE096",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 122
 		},
 		{
 			"icon": {
@@ -2107,7 +2353,9 @@
 				"code": 57495,
 				"name": "uniE097",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 123
 		},
 		{
 			"icon": {
@@ -2124,7 +2372,9 @@
 				"code": 57496,
 				"name": "uniE098",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 124
 		},
 		{
 			"icon": {
@@ -2141,7 +2391,9 @@
 				"code": 57497,
 				"name": "uniE099",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 125
 		},
 		{
 			"icon": {
@@ -2158,7 +2410,9 @@
 				"code": 57600,
 				"name": "uniE100",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 126
 		},
 		{
 			"icon": {
@@ -2175,7 +2429,9 @@
 				"code": 57488,
 				"name": "uniE090",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 127
 		},
 		{
 			"icon": {
@@ -2192,7 +2448,9 @@
 				"code": 57602,
 				"name": "uniE102",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 128
 		},
 		{
 			"icon": {
@@ -2209,7 +2467,9 @@
 				"code": 57601,
 				"name": "uniE101",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 129
 		},
 		{
 			"icon": {
@@ -2226,7 +2486,9 @@
 				"code": 57490,
 				"name": "uniE092",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 130
 		},
 		{
 			"icon": {
@@ -2243,7 +2505,9 @@
 				"code": 57491,
 				"name": "uniE093",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 131
 		},
 		{
 			"icon": {
@@ -2260,7 +2524,9 @@
 				"code": 57603,
 				"name": "uniE103",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 132
 		},
 		{
 			"icon": {
@@ -2277,7 +2543,9 @@
 				"code": 57604,
 				"name": "uniE104",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 133
 		},
 		{
 			"icon": {
@@ -2294,7 +2562,9 @@
 				"code": 57605,
 				"name": "uniE105",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 134
 		},
 		{
 			"icon": {
@@ -2311,7 +2581,9 @@
 				"code": 57606,
 				"name": "uniE106",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 135
 		},
 		{
 			"icon": {
@@ -2328,7 +2600,9 @@
 				"code": 57481,
 				"name": "uniE089",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 136
 		},
 		{
 			"icon": {
@@ -2345,7 +2619,9 @@
 				"code": 57345,
 				"name": "uniE001",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 137
 		},
 		{
 			"icon": {
@@ -2362,7 +2638,9 @@
 				"code": 57346,
 				"name": "uniE002",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 138
 		},
 		{
 			"icon": {
@@ -2379,7 +2657,9 @@
 				"code": 57347,
 				"name": "uniE003",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 139
 		},
 		{
 			"icon": {
@@ -2396,7 +2676,9 @@
 				"code": 57348,
 				"name": "uniE004",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 140
 		},
 		{
 			"icon": {
@@ -2413,7 +2695,9 @@
 				"code": 57349,
 				"name": "uniE005",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 141
 		},
 		{
 			"icon": {
@@ -2430,7 +2714,9 @@
 				"code": 57350,
 				"name": "uniE006",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 142
 		},
 		{
 			"icon": {
@@ -2447,7 +2733,9 @@
 				"code": 57351,
 				"name": "uniE007",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 143
 		},
 		{
 			"icon": {
@@ -2464,7 +2752,9 @@
 				"code": 57352,
 				"name": "uniE008",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 144
 		},
 		{
 			"icon": {
@@ -2481,7 +2771,9 @@
 				"code": 57353,
 				"name": "uniE009",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 145
 		},
 		{
 			"icon": {
@@ -2498,7 +2790,9 @@
 				"code": 57354,
 				"name": "uniE00A",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 146
 		},
 		{
 			"icon": {
@@ -2515,7 +2809,9 @@
 				"code": 57355,
 				"name": "uniE00B",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 147
 		},
 		{
 			"icon": {
@@ -2532,7 +2828,9 @@
 				"code": 57356,
 				"name": "uniE00C",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 148
 		},
 		{
 			"icon": {
@@ -2549,7 +2847,9 @@
 				"code": 57357,
 				"name": "uniE00D",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 149
 		},
 		{
 			"icon": {
@@ -2566,7 +2866,9 @@
 				"code": 57358,
 				"name": "uniE00E",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 150
 		},
 		{
 			"icon": {
@@ -2583,14 +2885,15 @@
 				"code": 57359,
 				"name": "uniE00F",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 151
 		},
 		{
 			"icon": {
 				"paths": [
 					"M0 0l1024 1024h-1024z"
 				],
-				"width": 0,
 				"defaultCode": 61440,
 				"grid": 32
 			},
@@ -2601,17 +2904,19 @@
 				"code": 61440,
 				"name": "uniF000",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 152
 		},
 		{
 			"icon": {
 				"paths": [
 					"M224 178.2l122.5-121.9 455.2 457.4-455.2 457.4-122.5-121.9 334-335.5z"
 				],
-				"grid": 32,
 				"tags": [
 					"icon-arrow-right"
-				]
+				],
+				"grid": 32
 			},
 			"properties": {
 				"order": 154,
@@ -2620,17 +2925,19 @@
 				"code": 57607,
 				"name": "icon-arrow-right",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 153
 		},
 		{
 			"icon": {
 				"paths": [
 					"M801.109 859.477l-124.587 123.904-463.189-465.237 463.189-465.579 124.587 123.904-339.627 341.333 339.627 341.675z"
 				],
-				"grid": 32,
 				"tags": [
 					"icon-arrow-left"
-				]
+				],
+				"grid": 32
 			},
 			"properties": {
 				"order": 155,
@@ -2639,7 +2946,94 @@
 				"code": 57608,
 				"name": "icon-arrow-left",
 				"ligatures": ""
-			}
+			},
+			"setIdx": 0,
+			"iconIdx": 154
+		},
+		{
+			"icon": {
+				"paths": [
+					"M0 192h1024v128h-1024v-128zM0 832v-128h1024v128h-1024zM0 576v-128h1024v128h-1024z"
+				],
+				"grid": 32,
+				"tags": [
+					"ico_hamburger"
+				]
+			},
+			"properties": {
+				"order": 156,
+				"id": 155,
+				"prevSize": 32,
+				"code": 57609,
+				"name": "icon-hamburger",
+				"ligatures": ""
+			},
+			"setIdx": 0,
+			"iconIdx": 155
+		},
+		{
+			"icon": {
+				"paths": [
+					"M640 576v-256h-256v256h-256l389.7 428.4 378.3-428.4z",
+					"M0 0h1024v170.7h-1024v-170.7z"
+				],
+				"grid": 32,
+				"tags": [
+					"icon_expand_items"
+				]
+			},
+			"properties": {
+				"order": 157,
+				"id": 156,
+				"prevSize": 32,
+				"code": 57616,
+				"name": "icon-expand-items",
+				"ligatures": ""
+			},
+			"setIdx": 0,
+			"iconIdx": 156
+		},
+		{
+			"icon": {
+				"paths": [
+					"M575.9 248.4c-448 0-563.5 472.2-282.8 775.6-113.7-206-163.9-520.3 282.8-509.8v253.8l384-384-384-384v248.4z"
+				],
+				"grid": 32,
+				"tags": [
+					"icon_forward"
+				]
+			},
+			"properties": {
+				"order": 158,
+				"id": 157,
+				"prevSize": 32,
+				"code": 57618,
+				"name": "icon-forward",
+				"ligatures": ""
+			},
+			"setIdx": 0,
+			"iconIdx": 157
+		},
+		{
+			"icon": {
+				"paths": [
+					"M512 64c-251.3 0-455 203.7-455 455s203.7 455 455 455 455-203.7 455-455-203.7-455-455-455zM557.4 879.8v-133.4h-91v133.4c-164.2-20.5-294.5-151-315.2-315.4h133.4v-91h-133.4c20.7-164.4 151-294.7 315.4-315.4v133.4h90.8v-133.2c164.4 20.7 294.7 151 315.4 315.4h-133.4v90.8h133.4c-20.7 164.4-151 294.9-315.4 315.4z"
+				],
+				"grid": 32,
+				"tags": [
+					"icon_target"
+				]
+			},
+			"properties": {
+				"order": 159,
+				"id": 158,
+				"prevSize": 32,
+				"code": 57619,
+				"name": "icon-target",
+				"ligatures": ""
+			},
+			"setIdx": 0,
+			"iconIdx": 158
 		}
 	],
 	"height": 1024,
@@ -2647,32 +3041,42 @@
 		"name": "canvas-webfont"
 	},
 	"preferences": {
-		"showGlyphs": true,
-		"showQuickUse": true,
 		"fontPref": {
 			"prefix": "icon-",
 			"metadata": {
-				"fontFamily": "canvas-webfont"
+				"fontFamily": "canvas-webfont",
+				"majorVersion": 1,
+				"minorVersion": 0
 			},
+			"showGlyphs": true,
 			"metrics": {
 				"emSize": 1024,
 				"baseline": 6.25,
 				"whitespace": 50
 			},
 			"resetPoint": 58880,
-			"embed": true,
-			"ie7": false,
-			"includeMetadata": false,
-			"useClassSelector": false,
-			"classSelector": ".icon",
-			"showMetrics": false,
-			"showMetadata": false
+			"showQuickUse": true,
+			"quickUsageToken": false,
+			"showMetrics": true,
+			"showMetadata": false,
+			"embed": false,
+			"showVersion": false
 		},
-		"imagePref": {},
+		"imagePref": {
+			"color": 0,
+			"height": 32,
+			"columns": 16,
+			"margin": 16,
+			"png": false,
+			"sprites": true
+		},
 		"historySize": 100,
-		"showCodes": true,
+		"showCodes": false,
 		"gridSize": 16,
 		"showLiga": true,
-		"showGrid": true
+		"showGrid": true,
+		"showGlyphs": true,
+		"showQuickUse": true,
+		"search": ""
 	}
 }
