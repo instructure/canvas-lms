@@ -141,6 +141,13 @@ describe ApplicationController do
       @controller.js_env[:TIMEZONE].should == 'America/Juneau'
     end
 
+    it "sets the contextual timezone from the context" do
+      Time.zone = "Mountain Time (US & Canada)"
+      controller.instance_variable_set(:@context, stub(time_zone: Time.zone, asset_string: ""))
+      controller.js_env({})
+      controller.js_env[:CONTEXT_TIMEZONE].should == 'America/Denver'
+    end
+
     it "should allow multiple items" do
       controller.js_env :A => 'a', :B => 'b'
       controller.js_env[:A].should == 'a'

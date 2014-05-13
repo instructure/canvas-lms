@@ -85,7 +85,7 @@ ul.user_list li.user.pending {
   color: #888;
   font-style: italic;
 }
-h3 .tally { 
+h3 .tally {
   font-family: arial,sans-serif;
   font-size: 12px;
   padding-left: 5px;
@@ -179,11 +179,11 @@ h3 .tally {
   <% if @section.start_at || @section.end_at %>
     <div>
       <% if @section.start_at && @section.end_at %>
-        <%= t('run_dates', 'Runs from %{start_date} to %{end_date}', :start_date => datetime_string(@section.start_at), :end_date => datetime_string(@section.end_at)) %>
+        <%= t('run_dates', 'Runs from %{start_date} to %{end_date}', :start_date => friendly_datetime(@section.start_at, context: @context).html_safe, :end_date => friendly_datetime(@section.end_at, context: @context).html_safe) %>
       <% elsif @section.end_at %>
-        <%= t('runs_until', 'Runs until %{end_date}', :end_date => datetime_string(@section.end_at)) %>
+        <%= t('runs_until', 'Runs until %{end_date}', :end_date => friendly_datetime(@section.end_at, context: @context).html_safe) %>
       <% elsif @section.start_at %>
-        <%= t('run_from', 'Runs from %{start_date} with no end date', :start_date => datetime_string(@section.start_at)) %>
+        <%= t('run_from', 'Runs from %{start_date} with no end date', :start_date => friendly_datetime(@section.start_at, context: @context).html_safe) %>
       <% end %>
     </div>
     <div style="margin-left: 10px; font-size: 0.8em;">
@@ -211,9 +211,9 @@ h3 .tally {
     <p>
       <%= t('crosslist_description', %{
       Cross-listing allows you to create a section in one account and
-      then move it to a course on a different account.  
+      then move it to a course on a different account.
       To cross-list this course, you'll need to find the course you
-      want to move it to, either using the search tool or by 
+      want to move it to, either using the search tool or by
       entering the course's ID. }) %>
     </p>
     <table class="formtable">
@@ -233,7 +233,7 @@ h3 .tally {
       </tr><tr>
         <td colspan="2">
           <div id="course_autocomplete_name_holder" style="margin-top: 20px;">
-            <%= before_label('labels.selected_course', 'Selected Course') %> 
+            <%= before_label('labels.selected_course', 'Selected Course') %>
             <div style="margin-left: 20px;">
               <div id="course_autocomplete_name" style="font-weight: bold;"></div>
               <div id="sis_id_holder" style="display: none;"><%= before_label('labels.sis_id', 'SIS ID') %> <span class="sis_id">&nbsp;</span></div>
@@ -261,7 +261,7 @@ h3 .tally {
       <p>
         <%= t('decrosslist_long_description', %{
         All grades for students in this course will no longer be visible.
-        You can retrieve the grades later by re-cross-listing the course, 
+        You can retrieve the grades later by re-cross-listing the course,
         but in the mean time the grades for these students will come from the original course.
         }) %>
       </p>

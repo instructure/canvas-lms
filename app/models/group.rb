@@ -79,6 +79,8 @@ class Group < ActiveRecord::Base
   after_save :close_memberships_if_deleted
   after_save :update_max_membership_from_group_category
 
+  delegate :time_zone, :to => :context
+
   include StickySisFields
   are_sis_sticky :name
 

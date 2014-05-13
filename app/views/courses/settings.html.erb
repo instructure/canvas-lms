@@ -149,7 +149,9 @@
         <td class="form-label"><%= f.blabel :start_at, :en => "Starts" %></td>
         <td class="nobr">
           <span class="course_form"><%= f.text_field :start_at, :class => "date_entry", :value => unlocalized_datetime_string(@context.start_at, :verbose) %></span>
-          <span class="course_info start_at"><%= datetime_string(@context.start_at, :verbose, nil, true) || t('no_date', "No Date Set") %></span>
+          <span class="course_info start_at" <%= context_sensitive_datetime_title(@context.start_at, @context) %>>
+            <%= datetime_string(@context.start_at, :verbose, nil, true) || t('no_date', "No Date Set") %>
+          </span>
         </td>
       </tr><tr>
         <td class="form-label"><%= f.blabel :conclude_at, :en => "Ends" %></td>
@@ -160,7 +162,9 @@
             <%= t(:course_conclude_at_warning_message, "The course is currently set to end at midnight,
               meaning that the previous day will be the last day this course is active.") %></p></div>">
           </i>
-          <span class="course_info conclude_at"><%= datetime_string(@context.conclude_at, :verbose, nil, true) || t('no_date', "No Date Set") %></span>
+          <span class="course_info conclude_at" <%= context_sensitive_datetime_title(@context.conclude_at, @context) %>>
+            <%= datetime_string(@context.conclude_at, :verbose, nil, true) || t('no_date', "No Date Set") %>
+          </span>
           <div class="course_form">
             <%= f.check_box :restrict_enrollments_to_course_dates %>
             <%= f.label :restrict_enrollments_to_course_dates, :en => "Users can only participate in the course between these dates" %>

@@ -783,18 +783,40 @@ module ApplicationHelper
   end
 
   # this should be the same as friendlyDatetime in handlebars_helpers.coffee
-  def friendly_datetime(datetime, opts={})
-    attributes = { :title => datetime }
+  def friendly_datetime(datetime, opts={}, attributes={})
     attributes[:pubdate] = true if opts[:pubdate]
+    context = opts[:context]
+    tag_type = opts.fetch(:tag_type, :time)
+    if datetime.present?
+      attributes[:title] ||= context_sensitive_datetime_title(datetime, context, just_text: true)
+      attributes['data-tooltip'] ||= 'top'
+    end
+
     if CANVAS_RAILS2 # see config/initializers/rails2.rb
-      content_tag_without_nil_return(:time, attributes) do
+      content_tag_without_nil_return(tag_type, attributes) do
         datetime_string(datetime)
       end
     else
-      content_tag(:time, attributes) do
+      content_tag(tag_type, attributes) do
         datetime_string(datetime)
       end
     end
+  end
+
+  def context_sensitive_datetime_title(datetime, context, options={})
+    just_text = options.fetch(:just_text, false)
+    return "" unless datetime.present?
+    local_time = datetime_string(datetime)
+    text = local_time
+    if context.present?
+      course_time = datetime_string(datetime, :event, nil, false, context.time_zone)
+      if course_time != local_time
+        text = "#{I18n.t('#helpers.local', "Local")}: #{local_time}<br>#{I18n.t('#helpers.course', "Course")}: #{course_time}".html_safe
+      end
+    end
+
+    return text if just_text
+    "data-tooltip title=\"#{text}\"".html_safe
   end
 
   # render a link with a tooltip containing a summary of due dates

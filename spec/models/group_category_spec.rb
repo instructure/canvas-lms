@@ -19,6 +19,14 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe GroupCategory do
+
+  it 'delegates time_zone through to its context' do
+    zone = ActiveSupport::TimeZone["America/Denver"]
+    course = Course.new(time_zone: zone)
+    category = GroupCategory.new(context: course)
+    category.time_zone.should =~ /Mountain Time/
+  end
+
   context "protected_name_for_context?" do
     it "should be false for 'Student Groups' in accounts" do
       account = Account.default

@@ -55,6 +55,12 @@ describe Group do
     @group.reload.is_public.should be_true
   end
 
+  it 'delegates time_zone through to its context' do
+    zone = ActiveSupport::TimeZone["America/Denver"]
+    @course.time_zone = zone
+    @group.time_zone.should =~ /Mountain Time/
+  end
+
   context "#peer_groups" do
     it "should find all peer groups" do
       context = course_model

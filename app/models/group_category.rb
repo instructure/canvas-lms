@@ -36,6 +36,8 @@ class GroupCategory < ActiveRecord::Base
   after_save :auto_create_groups
   after_update :update_groups_max_membership
 
+  delegate :time_zone, :to => :context
+
   validates_each :name do |record, attr, value|
     next unless record.name_changed? || value.blank?
     max_len = maximum_string_length

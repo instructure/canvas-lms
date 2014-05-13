@@ -119,6 +119,7 @@ class Account < ActiveRecord::Base
     end
   end
   alias_method_chain :default_time_zone, :root_account
+  alias_method :time_zone, :default_time_zone
 
   validates_locale :default_locale, :allow_nil => true
   validates_length_of :name, :maximum => maximum_string_length, :allow_blank => true

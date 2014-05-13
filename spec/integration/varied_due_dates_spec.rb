@@ -24,21 +24,21 @@ describe "varied due dates" do
   let(:multiple_due_dates) { "Multiple Due Dates" }
 
   def assert_coming_up_due_date(response, expected)
-    doc = Nokogiri::XML(response.body)
+    doc = Nokogiri::HTML(response.body)
     doc.at_css("#right-side .coming_up .event a .tooltip_text").text.should include(
       expected.is_a?(String) ? expected : datetime_string(expected)
     )
   end
 
   def assert_todo_due_date(response, expected)
-    doc = Nokogiri::XML(response.body)
+    doc = Nokogiri::HTML(response.body)
     doc.at_css("#right-side .to-do-list").text.should include(
       expected.is_a?(String) ? expected : datetime_string(expected)
     )
   end
 
   def assert_recent_feedback_due_date(response, expected)
-    doc = Nokogiri::XML(response.body)
+    doc = Nokogiri::HTML(response.body)
     doc.at_css("#right-side .recent_feedback .event a .tooltip_text").text.should include(
       expected.is_a?(String) ? expected : datetime_string(expected)
     )
@@ -200,7 +200,7 @@ describe "varied due dates" do
   context "on the assignments page" do
 
     def assert_due_date(response, expected)
-      doc = Nokogiri::XML(response.body)
+      doc = Nokogiri::HTML(response.body)
 
       [ "#assignment_#{@assignment.id} .date_text",
         "#right-side .event a em"

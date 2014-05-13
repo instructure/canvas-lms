@@ -75,9 +75,19 @@ describe TextHelper do
       th.datetime_string(today).split.size.should == (datestring.split.size - 1)
     end
 
+    it "accepts a timezone override" do
+      datetime = Time.zone.parse("#{Time.zone.now.year}-01-01 12:00:00")
+      mountain = th.datetime_string(datetime, :event, nil, false, ActiveSupport::TimeZone["America/Denver"])
+      central = th.datetime_string(datetime, :event, nil, false, ActiveSupport::TimeZone["America/Chicago"])
+      mountain.should == "Jan 1 at  5am"
+      central.should == "Jan 1 at  6am"
+    end
+
   end
 
   context "time_string" do
+    before { Timecop.freeze(Time.utc(2010, 8, 18, 12, 21)) }
+    after { Timecop.return }
 
     it "should be formatted properly" do
       time = Time.zone.now
@@ -89,6 +99,14 @@ describe TextHelper do
       time = Time.zone.now
       time -= time.min.minutes
       th.time_string(time).should == I18n.l(time, :format => :tiny_on_the_hour)
+    end
+
+    it "accepts a timezone override" do
+      time = Time.zone.now
+      mountain = th.time_string(time, nil, ActiveSupport::TimeZone["America/Denver"])
+      central = th.time_string(time, nil, ActiveSupport::TimeZone["America/Chicago"])
+      mountain.should == " 6:21am"
+      central.should == " 7:21am"
     end
 
   end

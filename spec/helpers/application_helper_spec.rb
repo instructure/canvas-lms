@@ -1,5 +1,5 @@
 # coding: utf-8
-# 
+#
 # Copyright (C) 2011 Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -23,6 +23,8 @@ describe ApplicationHelper do
   include ApplicationHelper
   include ERB::Util
 
+  alias_method :content_tag_without_nil_return, :content_tag
+
   context "folders_as_options" do
     before(:each) do
       course_model
@@ -33,30 +35,30 @@ describe ApplicationHelper do
       @f_2_1_1 = Folder.create!(:name => 'f_2_1_1', :parent_folder => @f_2_1, :context => @course)
       @all_folders = [ @f, @f_1, @f_2, @f_2_1, @f_2_1_1 ]
     end
-    
+
     it "should work work recursively" do
       option_string = folders_as_options([@f], :all_folders => @all_folders)
-      
+
       html = Nokogiri::HTML::DocumentFragment.parse("<select>#{option_string}</select>")
       html.css('option').count.should == 5
       html.css('option')[0].text.should == @f.name
       html.css('option')[1].text.should match /^\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_1.name}/
       html.css('option')[4].text.should match /^\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_2_1_1.name}/
     end
-    
+
     it "should limit depth" do
       option_string = folders_as_options([@f], :all_folders => @all_folders, :max_depth => 1)
-      
+
       html = Nokogiri::HTML::DocumentFragment.parse("<select>#{option_string}</select>")
       html.css('option').count.should == 3
       html.css('option')[0].text.should == @f.name
       html.css('option')[1].text.should match /^\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_1.name}/
       html.css('option')[2].text.should match /^\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_2.name}/
     end
-    
+
     it "should work without supplying all folders" do
       option_string = folders_as_options([@f])
-      
+
       html = Nokogiri::HTML::DocumentFragment.parse("<select>#{option_string}</select>")
       html.css('option').count.should == 5
       html.css('option')[0].text.should == @f.name
@@ -81,6 +83,69 @@ describe ApplicationHelper do
     it "should always return a time in the future" do
       now = 1.day.from_now.midnight - 5.seconds
       tomorrow_at_midnight.should > now
+    end
+  end
+
+  describe "Time Display Helpers" do
+    before do
+      @zone = Time.zone
+      Time.zone = "Alaska"
+      Timecop.freeze(Time.utc(2013,3,13,9,12))
+    end
+
+    after do
+      Timecop.return
+      Time.zone = @zone
+    end
+
+    describe '#context_sensitive_datetime_title' do
+      it "produces a string showing the local time and the course time" do
+        context = stub(time_zone: ActiveSupport::TimeZone["America/Denver"])
+        context_sensitive_datetime_title(Time.now, context).should == "data-tooltip title=\"Local: Mar 13 at  1:12am<br>Course: Mar 13 at  3:12am\""
+      end
+
+      it "only prints the text if just_text option passed" do
+        context = stub(time_zone: ActiveSupport::TimeZone["America/Denver"])
+        context_sensitive_datetime_title(Time.now, context, just_text: true).should == "Local: Mar 13 at  1:12am<br>Course: Mar 13 at  3:12am"
+      end
+
+      it "uses the simple title if theres no timezone difference" do
+        context = stub(time_zone: ActiveSupport::TimeZone["America/Anchorage"])
+        context_sensitive_datetime_title(Time.now, context, just_text: true).should == "Mar 13 at  1:12am"
+        context_sensitive_datetime_title(Time.now, context).should == "data-tooltip title=\"Mar 13 at  1:12am\""
+      end
+
+      it 'uses the simple title for nil context' do
+        context_sensitive_datetime_title(Time.now, nil, just_text: true).should == "Mar 13 at  1:12am"
+      end
+    end
+
+    describe '#friendly_datetime' do
+      let(:context) { stub(time_zone: ActiveSupport::TimeZone["America/Denver"]) }
+
+      it 'spits out a friendly time tag' do
+        tag = friendly_datetime(Time.now)
+        tag.should == "<time data-tooltip=\"top\" title=\"Mar 13 at  1:12am\">Mar 13 at  1:12am</time>"
+      end
+
+      it 'builds a whole time tag with a useful title showing the timezone offset if theres a context' do
+        tag = friendly_datetime(Time.now, context: context)
+        tag.should =~ /^<time.*<\/time>$/
+        tag.should =~ /Local: Mar 13 at  1:12am/
+        tag.should =~ /Course: Mar 13 at  3:12am/
+      end
+
+      it 'can produce an alternate tag type' do
+        tag = friendly_datetime(Time.now, context: context, tag_type: :span)
+        tag.should =~ /^<span.*<\/span>$/
+        tag.should =~ /Local: Mar 13 at  1:12am/
+        tag.should =~ /Course: Mar 13 at  3:12am/
+      end
+
+      it 'produces no tooltip for a nil datetime' do
+        tag = friendly_datetime(nil, context: context)
+        tag.should == "<time></time>"
+      end
     end
   end
 

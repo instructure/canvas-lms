@@ -16,8 +16,9 @@
           <a href="#" class="toggle_due_dates"><%= t(:show_due_dates, 'Show Due Dates') %></a>
 
         <% else %>
-          <b><%= t(:due_date, 'due %{date}',
-                   :date => OverrideListPresenter.new.due_at(@assignment)) %></b>
+          <b <%= context_sensitive_datetime_title(@assignment.due_at, @assignment.context) %> >
+            <%= t(:due_date, 'due %{date}', :date => OverrideListPresenter.new.due_at(@assignment)) %>
+          </b>
         <% end %>
       </div>
     </div>
@@ -36,7 +37,7 @@
             </tr>
           </thead>
 
-          <%= render 'shared/override_list', :assignment => @assignment, 
+          <%= render 'shared/override_list', :assignment => @assignment,
             :user => @current_user %>
 
         </table>

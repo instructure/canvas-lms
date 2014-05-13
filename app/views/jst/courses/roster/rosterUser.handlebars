@@ -25,7 +25,9 @@
 {{#if canViewLoginIdColumn}}
 <td>
   {{#each enrollments}}
-  <div>{{datetimeFormatted last_activity_at}}</div>
+    <div {{contextSensitiveDatetimeTitle last_activity_at }}>
+      {{datetimeFormatted last_activity_at}}
+    </div>
   {{/each}}
 </td>
 {{/if}}

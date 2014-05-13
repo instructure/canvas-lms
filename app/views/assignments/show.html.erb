@@ -1,4 +1,4 @@
-<% 
+<%
   content_for :page_title, @assignment.new_record? ? t(:new_assignment, "New Assignment") : @assignment.title
   content_for :right_side, render(:partial => "assignment_sidebar")
 %>
@@ -11,7 +11,7 @@
 
 <% else %>
 
-<% 
+<%
   jammit_css :assignments
   js_bundle :assignment_show
 %>
@@ -45,7 +45,7 @@
     <ul class='student-assignment-overview'>
       <li>
         <span class='title'><%= t :due_at, 'Due' %></span>
-        <span class='value'>
+        <span class='value' <%= context_sensitive_datetime_title(@assignment.due_at, @context) %>>
           <% if @assignment.due_at %>
             <% ot(:date_time_by, "%{date} by %{time}", :date => capture { %>
               <span class="display_date"><%= date_string(@assignment.due_at) rescue '' %></span><% }, :time => capture { %>
@@ -133,7 +133,7 @@
         </tr>
       </thead>
 
-      <%= render 'shared/override_list', :assignment => @assignment, 
+      <%= render 'shared/override_list', :assignment => @assignment,
         :user => @current_user %>
 
     </table>

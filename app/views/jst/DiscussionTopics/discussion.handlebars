@@ -19,7 +19,7 @@
         {{/if}}
         <a href="{{html_url}}" class="title">{{title}}</a>
       </div>
-      <small>{{#t "last_post_date"}}Last post {{display_last_reply_at}}{{/t}}</small>
+      <small {{ contextSensitiveDatetimeTitle last_reply_at }}>{{#t "last_post_date"}}Last post {{display_last_reply_at}}{{/t}}</small>
     </div>
 
     <div class="discussion-date-available">
@@ -33,8 +33,12 @@
     <div class="discussion-due-date">
       {{#if assignment}}
         {{#if assignment.due_at}}
-        <span class="discussion-date-type">{{#t "due"}}Due{{/t}}</span>
-        {{datetimeFormatted assignment.due_at}}
+          <span class="discussion-date-type">
+            {{#t "due"}}Due{{/t}}
+          </span>
+          <span {{ contextSensitiveDatetimeTitle assignment.due_at }}>
+            {{datetimeFormatted assignment.due_at}}
+          </span>
         {{else}}
           {{#t "no_due_date"}}No Due Date{{/t}}
         {{/if}}

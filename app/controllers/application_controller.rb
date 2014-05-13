@@ -122,6 +122,7 @@ class ApplicationController < ActionController::Base
     @js_env[:IS_LARGE_ROSTER] = true if !@js_env[:IS_LARGE_ROSTER] && @context.respond_to?(:large_roster?) && @context.large_roster?
     @js_env[:context_asset_string] = @context.try(:asset_string) if !@js_env[:context_asset_string]
     @js_env[:TIMEZONE] = Time.zone.tzinfo.identifier if !@js_env[:TIMEZONE]
+    @js_env[:CONTEXT_TIMEZONE] = @context.time_zone.tzinfo.identifier if !@js_env[:CONTEXT_TIMEZONE] && @context.respond_to?(:time_zone) && @context.time_zone.present?
     @js_env[:LOCALE] = I18n.qualified_locale if !@js_env[:LOCALE]
     @js_env
   end
@@ -186,7 +187,7 @@ class ApplicationController < ActionController::Base
   def fix_xhr_requests
     request.format = :js if request.xhr? && request.format == :html && !params[:html_xhr]
   end
-  
+
   # scopes all time objects to the user's specified time zone
   def set_time_zone
     if @current_user && !@current_user.time_zone.blank?
@@ -429,7 +430,7 @@ class ApplicationController < ActionController::Base
         @context = api_find(Group, params[:group_id])
         params[:context_id] = params[:group_id]
         params[:context_type] = "Group"
-        @context_enrollment = @context.group_memberships.find_by_user_id(@current_user.id) if @context && @current_user      
+        @context_enrollment = @context.group_memberships.find_by_user_id(@current_user.id) if @context && @current_user
         @context_membership = @context_enrollment
       elsif params[:user_id] || (self.is_a?(UsersController) && params[:user_id] = params[:id])
         @context = api_find(User, params[:user_id])
@@ -466,7 +467,7 @@ class ApplicationController < ActionController::Base
       end
     end
   end
-  
+
   # This is used by a number of actions to retrieve a list of all contexts
   # associated with the given context.  If the context is a user then it will
   # include all the user's current contexts.
@@ -665,8 +666,8 @@ class ApplicationController < ActionController::Base
     end
     false
   end
-  
-  # Used to retrieve the context from a :feed_code parameter.  These 
+
+  # Used to retrieve the context from a :feed_code parameter.  These
   # :feed_code attributes are keyed off the object type and the object's
   # uuid.  Using the uuid attribute gives us an unguessable url so
   # that we can offer the feeds without requiring password authentication.
@@ -730,20 +731,20 @@ class ApplicationController < ActionController::Base
   def discard_flash_if_xhr
     flash.discard if request.xhr? || request.format.to_s == 'text/plain'
   end
-  
+
   def cancel_cache_buster
     @cancel_cache_buster = true
   end
-  
+
   def cache_buster
-    # Annoying problem.  If I set the cache-control to anything other than "no-cache, no-store" 
+    # Annoying problem.  If I set the cache-control to anything other than "no-cache, no-store"
     # then the local cache is used when the user clicks the 'back' button.  I don't know how
     # to tell the browser to ALWAYS check back other than to disable caching...
     return true if @cancel_cache_buster || request.xhr? || api_request?
     response.headers["Pragma"] = "no-cache"
     response.headers["Cache-Control"] = "no-cache, no-store, max-age=0, must-revalidate"
   end
-  
+
   def clear_cached_contexts
     ActiveRecord::Base.clear_cached_contexts
     RoleOverride.clear_cached_contexts
@@ -754,7 +755,7 @@ class ApplicationController < ActionController::Base
 
     ENV['RAILS_HOST_WITH_PORT'] ||= request.host_with_port rescue nil
     # We only record page_views for html page requests coming from within the
-    # app, or if coming from a developer api request and specified as a 
+    # app, or if coming from a developer api request and specified as a
     # page_view.
     if (@developer_key && params[:user_request]) || (!@developer_key && @current_user && !request.xhr? && request.get?)
       generate_page_view
@@ -830,8 +831,8 @@ class ApplicationController < ActionController::Base
         end
       end
       # If we're logging the asset access, and it's either a participatory action
-      # or it's not an update to an already-existing page_view.  We check to make sure 
-      # it's not an update because if the page_view already existed, we don't want to 
+      # or it's not an update to an already-existing page_view.  We check to make sure
+      # it's not an update because if the page_view already existed, we don't want to
       # double-count it as multiple views when it's really just a single view.
       if @current_user && @accessed_asset && (@accessed_asset[:level] == 'participate' || !@page_view_update)
         @access = AssetUserAccess.find_or_initialize_by_user_id_and_asset_code(@current_user.id, @accessed_asset[:code])
@@ -961,7 +962,7 @@ class ApplicationController < ActionController::Base
       erbfile = "500_message.html.erb" unless File.exists?(erbpath)
       @status_code = status_code
       message = exception.is_a?(RequestError) ? exception.message : nil
-      render :template => "shared/errors/#{erbfile}", 
+      render :template => "shared/errors/#{erbfile}",
         :layout => 'application',
         :status => status,
         :locals => {
@@ -1032,7 +1033,7 @@ class ApplicationController < ActionController::Base
   def local_request?
     false
   end
-  
+
   def claim_session_course(course, user, state=nil)
     e = course.claim_with_teacher(user)
     session[:claimed_enrollment_uuids] ||= []
@@ -1087,7 +1088,7 @@ class ApplicationController < ActionController::Base
     session.send(:loaded?) rescue false
   end
 
-  # Retrieving wiki pages needs to search either using the id or 
+  # Retrieving wiki pages needs to search either using the id or
   # the page title.
   def get_wiki_page
     @wiki = @context.wiki
@@ -1185,8 +1186,8 @@ class ApplicationController < ActionController::Base
       options[:query][:event_id] = event.id
     end
     if !contexts_to_link_to.empty? && options[:anchor].is_a?(Hash)
-      options[:anchor][:show] = contexts_to_link_to.collect{ |c| 
-        "group_#{c.class.to_s.downcase}_#{c.id}" 
+      options[:anchor][:show] = contexts_to_link_to.collect{ |c|
+        "group_#{c.class.to_s.downcase}_#{c.id}"
       }.join(',')
       options[:anchor] = options[:anchor].to_json
     end
@@ -1232,7 +1233,7 @@ class ApplicationController < ActionController::Base
     end
   end
   helper_method :conversations_path
-  
+
   # escape everything but slashes, see http://code.google.com/p/phusion-passenger/issues/detail?id=113
   FILE_PATH_ESCAPE_PATTERN = Regexp.new("[^#{URI::PATTERN::UNRESERVED}/]")
   def safe_domain_file_url(attachment, host_and_shard=nil, verifier = nil, download = false) # TODO: generalize this
@@ -1587,7 +1588,7 @@ class ApplicationController < ActionController::Base
     @notices ||= begin
       notices = []
       if !browser_supported? && !@embedded_view && !cookies['unsupported_browser_dismissed']
-        notices << {:type => 'warning', :content => unsupported_browser, :classes => 'unsupported_browser'} 
+        notices << {:type => 'warning', :content => unsupported_browser, :classes => 'unsupported_browser'}
       end
       if error = flash[:error]
         flash.delete(:error)
