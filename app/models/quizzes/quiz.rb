@@ -1144,17 +1144,25 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def publish!
-    self.generate_quiz_data
-    self.workflow_state = 'available'
-    self.published_at = Time.zone.now
+    publish
     save!
     self
   end
 
+  def publish
+    self.generate_quiz_data
+    self.workflow_state = 'available'
+    self.published_at = Time.zone.now
+  end
+
   def unpublish!
-    self.workflow_state = 'unpublished'
+    unpublish
     save!
     self
+  end
+
+  def unpublish
+    self.workflow_state = 'unpublished'
   end
 
   def can_unpublish?
