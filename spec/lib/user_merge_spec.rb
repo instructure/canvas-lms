@@ -411,6 +411,83 @@ describe UserMerge do
     user2.associated_accounts.map(&:id).sort.should == [account1, account2, subaccount1, subaccount2, subsubaccount1, subsubaccount2].map(&:id).sort
   end
 
+  context "versions" do
+    let!(:user1) { user_model }
+    let!(:user2) { user_model }
+
+    it "should update submission versions" do
+      other_user = user_model
+
+      a1 = assignment_model(:submission_types => 'online_text_entry')
+      a1.submit_homework(user2, {
+        :submission_type => 'online_text_entry',
+        :body => 'hi'
+      })
+      s1 = a1.submit_homework(user2, {
+        :submission_type => 'online_text_entry',
+        :body => 'hi again'
+      })
+      s_other = a1.submit_homework(other_user, {
+        :submission_type => 'online_text_entry',
+        :body => 'hi again'
+      })
+
+      s1.versions.count.should eql(2)
+      s1.versions.each{ |v| v.model.user_id.should eql(user2.id) }
+      s_other.versions.first.model.user_id.should eql(other_user.id)
+
+      UserMerge.from(user2).into(user1)
+      s1 = Submission.find(s1.id)
+      s_other.reload
+
+      s1.versions.count.should eql(2)
+      s1.versions.each{ |v| v.model.user_id.should eql(user1.id) }
+      s_other.versions.first.model.user_id.should eql(other_user.id)
+    end
+
+    it "should update quiz submissions" do
+      quiz_with_graded_submission([], user: user2)
+      qs1 = @quiz_submission
+      quiz_with_graded_submission([], user: user2)
+      qs2 = @quiz_submission
+      Version.where(:versionable_type => "Quizzes::QuizSubmission", :versionable_id => qs2).update_all(:versionable_type => "QuizSubmission")
+
+      qs1.versions.should be_present
+      qs1.versions.each{ |v| v.model.user_id.should eql(user2.id) }
+      qs2.versions.should be_present
+      qs2.versions.each{ |v| v.model.user_id.should eql(user2.id) }
+
+      UserMerge.from(user2).into(user1)
+      qs1.reload
+      qs2.reload
+
+      qs1.versions.should be_present
+      qs1.versions.each{ |v| v.model.user_id.should eql(user1.id) }
+      qs2.versions.should be_present
+      qs2.versions.each{ |v| v.model.user_id.should eql(user1.id) }
+    end
+
+    it "should update other appropriate versions" do
+      course(:active_all => true)
+      wiki_page = @course.wiki.wiki_pages.create(:title => "Hi", :user_id => user2.id)
+      ra = rubric_assessment_model(:context => @course, :user => user2)
+
+      wiki_page.versions.should be_present
+      wiki_page.versions.each{ |v| v.model.user_id.should eql(user2.id) }
+      ra.versions.should be_present
+      ra.versions.each{ |v| v.model.user_id.should eql(user2.id) }
+
+      UserMerge.from(user2).into(user1)
+      wiki_page.reload
+      ra.reload
+
+      wiki_page.versions.should be_present
+      wiki_page.versions.each{ |v| v.model.user_id.should eql(user1.id) }
+      ra.versions.should be_present
+      ra.versions.each{ |v| v.model.user_id.should eql(user1.id) }
+    end
+  end
+
   context "sharding" do
     specs_require_sharding
 
