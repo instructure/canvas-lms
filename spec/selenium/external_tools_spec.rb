@@ -725,6 +725,41 @@ describe "external tools" do
       assert_flash_error_message(/couldn't find valid settings/i)
     end
 
+    describe "display type" do
+      before do
+        @tool.course_navigation = {}
+        @tool.save!
+      end
+
+      it "defaults to normal display type" do
+        get "/courses/#{@course.id}/external_tools/#{@tool.id}"
+        f('#footer').should be_displayed
+        f('#left-side').should_not be_nil
+        f('#breadcrumbs').should_not be_nil
+        f('body').attribute('class').should_not include('full-width')
+      end
+
+      it "shows full width if top level property specified" do
+        @tool.settings[:display_type] = "full_width"
+        @tool.save!
+        get "/courses/#{@course.id}/external_tools/#{@tool.id}"
+        f('#footer').should_not be_displayed
+        f('#left-side').should be_nil
+        f('#breadcrumbs').should be_nil
+        f('body').attribute('class').should include('full-width')
+      end
+
+      it "shows full width if extension property specified" do
+        @tool.course_navigation[:display_type] = "full_width"
+        @tool.save!
+        get "/courses/#{@course.id}/external_tools/#{@tool.id}"
+        f('#footer').should_not be_displayed
+        f('#left-side').should be_nil
+        f('#breadcrumbs').should be_nil
+        f('body').attribute('class').should include('full-width')
+      end
+    end
+
   end
 
   private

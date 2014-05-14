@@ -188,5 +188,7 @@ stylesheets:
     - public/stylesheets/compiled/locale.css
   mobile_auth:
     - public/stylesheets/compiled/mobile_auth.css
+  external_tool_full_width:
+    - public/stylesheets/compiled/external_tools/full_width.css
 
   <%= plugin_assets.anchors_yml %>

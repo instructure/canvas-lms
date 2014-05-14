@@ -262,6 +262,10 @@ class ContextExternalTool < ActiveRecord::Base
     write_attribute(:shared_secret, val) unless val.blank?
   end
 
+  def display_type(extension_type)
+    extension_setting(extension_type, :display_type) || 'in_context'
+  end
+
   def extension_setting(type, property = nil)
     type = type.to_sym
     return settings[type] unless property && settings[type]
@@ -583,6 +587,7 @@ class ContextExternalTool < ActiveRecord::Base
 
     settings[setting][:url] = hash[:url] if hash[:url]
     settings[setting][:text] = hash[:text] if hash[:text]
+    settings[setting][:display_type] = hash[:display_type] if hash[:display_type]
     settings[setting][:custom_fields] = hash[:custom_fields] if hash[:custom_fields]
     settings[setting][:enabled] = Canvas::Plugin.value_to_boolean(hash[:enabled]) if hash.has_key?(:enabled)
     keys.each { |key| settings[setting][key] = hash[key] if hash.has_key?(key) }

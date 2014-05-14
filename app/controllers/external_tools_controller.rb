@@ -27,6 +27,12 @@ class ExternalToolsController < ApplicationController
 
   REDIS_PREFIX = 'external_tool:sessionless_launch:'
 
+  TOOL_DISPLAY_TEMPLATES = {
+    'full_width' => 'external_tools/full_width',
+    'in_context' => 'external_tools/tool_show',
+    'default' => 'external_tools/tool_show',
+  }
+
   # @API List external tools
   # Returns the paginated list of external tools for the current context.
   # See the get request docs for a single tool for a list of properties on an external tool.
@@ -296,7 +302,7 @@ class ExternalToolsController < ApplicationController
       find_tool(params[:id], selection_type)
       @active_tab = @tool.asset_string if @tool
       @show_embedded_chat = false if @tool.try(:tool_id) == 'chat'
-      render_tool(selection_type)
+      render tool_launch(@tool, selection_type) if @tool
       add_crumb(@context.name, named_context_url(@context, :context_url))
     end
   end
@@ -314,7 +320,7 @@ class ExternalToolsController < ApplicationController
     @tool_launch_type = 'self'
 
     find_tool(params[:external_tool_id], selection_type)
-    render_tool(selection_type)
+    render tool_launch(@tool, selection_type) if @tool
   end
 
   def find_tool(id, selection_type)
@@ -330,15 +336,13 @@ class ExternalToolsController < ApplicationController
       redirect_to named_context_url(@context, :context_url)
     end
   end
-
   protected :find_tool
 
-  def render_tool(selection_type)
-    return unless @tool
-    @resource_title = @tool.label_for(selection_type.to_sym)
+  def tool_launch(tool, selection_type)
+    @resource_title = tool.label_for(selection_type.to_sym)
     @return_url ||= url_for(@context)
 
-    adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @context)
+    adapter = Lti::LtiOutboundAdapter.new(tool, @current_user, @context)
     adapter.prepare_tool_launch(@return_url, resource_type: selection_type, selected_html: params[:selection])
     if selection_type == 'homework_submission'
       @assignment = @context.assignments.active.find(params[:assignment_id])
@@ -350,13 +354,19 @@ class ExternalToolsController < ApplicationController
     @resource_url = adapter.launch_url
 
     resource_uri = URI.parse @resource_url
-    @tool_id = @tool.tool_id || resource_uri.host || 'unknown'
+    @tool_id = tool.tool_id || resource_uri.host || 'unknown'
     @tool_path = (resource_uri.path.empty? ? "/" : resource_uri.path)
 
-    render :template => 'external_tools/tool_show'
+    return :template => find_display_type_template(tool, selection_type)
   end
+  protected :tool_launch
 
-  protected :render_tool
+  def find_display_type_template(tool, selection_type)
+    TOOL_DISPLAY_TEMPLATES[tool.display_type(selection_type)] ||
+    TOOL_DISPLAY_TEMPLATES['default']
+  end
+  protected :find_display_type_template
+
 
   # @API Create an external tool
   # Create an external tool in the specified course/account.

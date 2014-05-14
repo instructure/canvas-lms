@@ -510,6 +510,28 @@ describe ContextExternalTool do
       tool.resource_selection.should_not == nil
       tool.editor_button.should_not == nil
     end
+
+    describe "display_type" do
+      it "should be 'in_context' by default" do
+        tool.display_type(:course_navigation).should == 'in_context'
+        tool.course_navigation = {enabled: true}
+        tool.save!
+        tool.display_type(:course_navigation).should == 'in_context'
+      end
+
+      it "should be configurable by a property" do
+        tool.course_navigation = { enabled: true }
+        tool.settings[:display_type] = "custom_display_type"
+        tool.save!
+        tool.display_type(:course_navigation).should == 'custom_display_type'
+      end
+
+      it "should be configurable in extension" do
+        tool.course_navigation = {display_type: 'other_display_type'}
+        tool.save!
+        tool.display_type(:course_navigation).should == 'other_display_type'
+      end
+    end
   end
 
   describe "change_domain" do
