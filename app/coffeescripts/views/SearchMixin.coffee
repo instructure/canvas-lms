@@ -1,10 +1,11 @@
 define [
   'i18n!course_users'
+  'jquery'
   'compiled/util/mixin'
   'compiled/views/ValidatedMixin'
   'jquery.instructure_forms'
   'vendor/jquery.placeholder'
-], (I18n, mixin, ValidatedMixin) ->
+], (I18n, $, mixin, ValidatedMixin) ->
 
   mixin {}, ValidatedMixin,
 

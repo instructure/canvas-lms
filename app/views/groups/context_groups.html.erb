@@ -3,7 +3,7 @@
 <% content_for :right_side do %>
   <div class="rs-margin-lr rs-margin-top">
     <% if @context.respond_to?(:allow_student_organized_groups) && @context.allow_student_organized_groups %>
-      <% if can_do(@context.groups.new, @current_user, :create) %>
+      <% if can_do(@context.groups.scoped.new, @current_user, :create) %>
         <a href="#" class="btn button-sidebar-wide add_group_link icon-add"><%= t 'actions.add', 'Start a New Group' %></a>
       <% end %>
     <% else %>

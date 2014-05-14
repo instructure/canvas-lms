@@ -1,7 +1,8 @@
 define [
+  'jquery'
   'compiled/models/User'
   'jquery.ajaxJSON'
-], (User) ->
+], ($, User) ->
 
   class GroupUser extends User
 

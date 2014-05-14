@@ -12,8 +12,8 @@ gemfile:
   - Gemfile
 env:
   - SPEC="spec/apis/**/[a-b]*_spec.rb"
-  - SPEC="spec/apis/**/[c-e]*_spec.rb"
-  - SPEC="spec/apis/**/[f-m]*_spec.rb"
+  - SPEC="spec/apis/**/c*_spec.rb"
+  - SPEC="spec/apis/**/[d-m]*_spec.rb"
   - SPEC="spec/apis/**/[n-z]*_spec.rb"
   - SPEC="spec/controllers/**/*_spec.rb"
   - SPEC="spec/gem_integration/**/*_spec.rb"
@@ -23,8 +23,9 @@ env:
   - SPEC="spec/lib/**/*_spec.rb"
   - SPEC="spec/messages/**/*_spec.rb"
   - SPEC="spec/migrations/**/*_spec.rb"
-  - SPEC="spec/models/[a-d]*_spec.rb"
-  - SPEC="spec/models/[e-m]*_spec.rb"
+  - SPEC="spec/models/[a-b]*_spec.rb"
+  - SPEC="spec/models/c*_spec.rb"
+  - SPEC="spec/models/[d-m]*_spec.rb"
   - SPEC="spec/models/[n-z]*_spec.rb"
   - SPEC="spec/models/*/*_spec.rb"
   - SPEC="spec/observers/**/*_spec.rb"

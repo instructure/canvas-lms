@@ -23,6 +23,13 @@ class Message < ActiveRecord::Base
   else
     include Rails.application.routes.url_helpers
   end
+
+  include PolymorphicTypeOverride
+  override_polymorphic_types context_type: {'QuizSubmission' => 'Quizzes::QuizSubmission',
+                                            'QuizRegradeRun' => 'Quizzes::QuizRegradeRun'},
+                             asset_context_type: {'QuizSubmission' => 'Quizzes::QuizSubmission',
+                                                  'QuizRegradeRun' => 'Quizzes::QuizRegradeRun'}
+
   include ERB::Util
   include SendToStream
   include TextHelper
@@ -45,6 +52,7 @@ class Message < ActiveRecord::Base
     :notification_name, :asset_context, :data, :root_account_id
 
   attr_writer :delayed_messages
+  attr_accessor :output_buffer
 
   # Callbacks
   after_save  :stage_message
@@ -205,7 +213,7 @@ class Message < ActiveRecord::Base
   end
 
   # Public: Custom getter that delegates and caches notification category to
-  # associated notification 
+  # associated notification
   #
   # Returns a notification category string.
   def notification_category
@@ -262,7 +270,7 @@ class Message < ActiveRecord::Base
     @output_buffer = old_output_buffer.sub(/\n\z/, '')
 
     if old_output_buffer.is_a?(ActiveSupport::SafeBuffer) && old_output_buffer.html_safe?
-      @output_buffer = ActiveSupport::SafeBuffer.new(@output_buffer)
+      @output_buffer = old_output_buffer.class.new(@output_buffer)
     end
 
     ''
@@ -326,11 +334,13 @@ class Message < ActiveRecord::Base
     return nil unless template = load_html_template
 
     # Add the attribute 'inner_html' with the value of inner_html into the _binding
+    @output_buffer = nil
     inner_html = RailsXss::Erubis.new(template, :bufvar => '@output_buffer').result(_binding)
     setter = eval "inner_html = nil; lambda { |v| inner_html = v }", _binding
     setter.call(inner_html)
 
     layout_path = Canvas::MessageHelper.find_message_path('_layout.email.html.erb')
+    @output_buffer = nil
     RailsXss::Erubis.new(File.read(layout_path)).result(_binding)
   ensure
     @i18n_scope = orig_i18n_scope
@@ -354,6 +364,7 @@ class Message < ActiveRecord::Base
 
     if path_type == 'facebook'
       # this will ensure we escape anything that's not already safe
+      @output_buffer = nil
       self.body = RailsXss::Erubis.new(message_body_template).result(_binding)
     else
       self.body = Erubis::Eruby.new(message_body_template,
@@ -472,7 +483,7 @@ class Message < ActiveRecord::Base
     end
 
     # not sure what this is even doing?
-    message_types.to_a.sort_by { |m| m[0] == 'Other' ? SortLast : m[0] }
+    message_types.to_a.sort_by { |m| m[0] == 'Other' ? CanvasSort::Last : m[0] }
   end
 
   # Public: Format and return the body for this message.

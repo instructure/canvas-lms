@@ -17,7 +17,7 @@ require [
         pinned: I18n.t('pinned_discussions',  'Pinned Discussions')
       help:
         title: I18n.t('ordered_by_recent_activity', 'Ordered by Recent Activity')
-      toggleMessage: I18n.t('toggle_message', 'toggle discussion visibility')
+      toggleMessage: I18n.t('toggle_message', 'toggle section visibility')
 
     # Public: Routes to respond to.
     routes:
@@ -157,9 +157,11 @@ require [
     #
     # Returns nothing.
     moveModel: (model) =>
-      view.collection.remove(model) for key, view of @discussions
-      @discussions[@_modelBucket(model)].collection.add(model)
+      bucket = @discussions[@_modelBucket(model)].collection
+      return if bucket == model.collection
+      model.collection.remove(model)
+      bucket.add(model)
 
   # Start up the page
-  router = new DiscussionIndexRouter
+  @router = new DiscussionIndexRouter
   Backbone.history.start()

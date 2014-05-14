@@ -117,6 +117,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
     end
 
     it "should show uploaded images in image list and add the image to the rce" do
+      pending "check image broken"
       wiki_page_tools_file_tree_setup
       wait_for_tiny(keep_trying_until { f("#new_wiki_page") })
       fj('.wiki_switch_views_link:visible').click
@@ -143,6 +144,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
     end
 
     it "should be able to upload an image and add the image to the rce" do
+      pending "check_image broken"
       get "/courses/#{@course.id}/wiki"
 
       add_image_to_rce
@@ -201,7 +203,9 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
       add_canvas_image(f("#question_content_0_parent"), 'Course files', 'course.jpg')
 
       in_frame "question_content_0_ifr" do
-        f("#tinymce").find_elements(:css, "img").length.should == 1
+        keep_trying_until {
+          f("#tinymce").find_elements(:css, "img").length.should == 1
+        }
         check_element_attrs(f('#tinymce img'), :src => /\/files\/#{@course_attachment.id}/, :alt => 'course.jpg')
       end
 

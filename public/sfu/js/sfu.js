@@ -103,19 +103,6 @@
 
     // END CANVAS-192
 
-    // FIX (temporary) for no-flash browsers to upload files using the Files tool
-    var hasFlash = false;
-    try {
-        if (new ActiveXObject('ShockwaveFlash.ShockwaveFlash')) hasFlash = true;
-    } catch(e) {
-        if (navigator.mimeTypes ["application/x-shockwave-flash"] != undefined) hasFlash = true;
-    }
-    if (!hasFlash) {
-        // remove the invisible element that is blocking the "Add File" link
-        $('#swfupload_holder').hide();
-    }
-    // END no-flash upload FIX
-
     // Add copyright compliance notice under the Publish Course button
     utils.onPage(/^\/courses\/\d+$/, function() {
         // The Publish Course button ID attribute contains the course ID
@@ -133,17 +120,45 @@
             .appendTo('body');
     });
 
-    // Alphabetize course drop-down list (Import Content page only)
-    // NOTE: This is no longer needed when XHR results are pre-sorted by Canvas
+    // CANVAS-244 1/2 Add enrollment term to course autocomplete
+    utils.onPage(/accounts\/\d+(\/courses)?$/, function () {
+        // Override the method that renders the autocomplete item
+        var autocompleteData = $('#course_name').data('ui-autocomplete');
+        if (autocompleteData) {
+            autocompleteData._renderItem = function (ul, item) {
+                return $('<li>')
+                    .append('<a><div>' + item.label + '</div><div><small><em>' + item.term + '</em></small></div></a>')
+                    .appendTo(ul);
+            };
+        }
+    });
+    // END CANVAS-244 1/2
+
+    // Fixes for Import Content page only
     utils.onPage(/courses\/\d+\/content_migrations/, function() {
+        // The fixes are for elements that are dynamically generated when a specific XHR call completes
         $(document).ajaxComplete(function (event, XMLHttpRequest, ajaxOptions) {
-            // Sort <option>s inside each <optgroup> when the relevant XHR call completes
             if (ajaxOptions.url && ajaxOptions.url.match(/users\/\d+\/manageable_courses/)) {
+                // Alphabetize course drop-down list, by sorting <option>s inside each <optgroup>
+                // NOTE: This is no longer needed when XHR results are pre-sorted by Canvas
                 $('optgroup', $('#courseSelect')).each(function (i, termGroup) {
                     $('option', termGroup)
                         .sort(function (a, b) { return $(a).text().localeCompare($(b).text()); })
                         .appendTo(termGroup);
                 });
+                // END Alphabetize course drop-down list
+
+                // CANVAS-244 2/2 Add enrollment term to course autocomplete
+                // Override the method that renders the autocomplete item
+                var autocompleteData = $('#courseSearchField').data('ui-autocomplete');
+                if (autocompleteData) {
+                    autocompleteData._renderItem = function (ul, item) {
+                        return $('<li>')
+                            .append('<a><div>' + item.label + '</div><div><small><em>' + item.term + '</em></small></div></a>')
+                            .appendTo(ul);
+                    };
+                }
+                // END CANVAS-244 2/2
             }
         });
     });
@@ -155,6 +170,36 @@
             jQuery('div#main').css('top', '92px');
         }
     });
+
+    // CANVAS-246 Create button that links to the Start a New Ad Hoc Space form (only on these pages: / and /courses)
+    utils.onPage(/^\/(courses)?$/, function () {
+        // Add the button right after the existing Start a New Course button
+        var addAdHocButton = function () {
+            var $courseButton = $('#start_new_course');
+            var $adhocButton = $courseButton.clone();
+            $adhocButton
+                .text('Start a New Ad Hoc Space')
+                .attr('id', 'start_new_adhoc')
+                .attr('aria-controls', 'new_adhoc_form')
+                .insertAfter($courseButton)
+                .on('click', function () {
+                    window.location = '/sfu/adhoc/new';
+                });
+        }
+
+        // If the button is not there yet, it's likely still being loaded in the sidebar.
+        // Wait for it to complete, and then add the button. This is meant for the home page.
+        if ($('#start_new_course').length == 0) {
+            $(document).ajaxComplete(function (event, XMLHttpRequest, ajaxOptions) {
+                if (ajaxOptions.url && ajaxOptions.url.match(/dashboard-sidebar/)) {
+                    addAdHocButton();
+                }
+            });
+        } else {
+            addAdHocButton();
+        }
+    });
+    // END CANVAS-246
 })(jQuery);
 
 // google analytics

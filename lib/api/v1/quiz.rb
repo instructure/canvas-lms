@@ -55,7 +55,7 @@ module Api::V1::Quiz
   end
 
   def quiz_json(quiz, context, user, session)
-    QuizSerializer.new(quiz,
+    Quizzes::QuizSerializer.new(quiz,
                        scope: user,
                        session: session,
                        root: false,
@@ -67,13 +67,21 @@ module Api::V1::Quiz
     api_route = options.fetch(:api_route)
     @quizzes, meta = Api.jsonapi_paginate(scope, self, api_route)
     meta[:primaryCollection] = 'quizzes'
+    add_meta_permissions!(meta)
     Canvas::APIArraySerializer.new(@quizzes,
                           scope: @current_user,
                           controller: self,
                           root: :quizzes,
                           meta: meta,
-                          each_serializer: QuizSerializer,
+                          each_serializer: Quizzes::QuizSerializer,
                           include_root: false).as_json
+  end
+
+  def add_meta_permissions!(meta)
+    meta[:permissions] ||= {}
+    meta[:permissions][:quizzes] = {
+      create: context.grants_right?(@current_user, session, :manage_assignments)
+    }
   end
 
   def filter_params(quiz_params)

@@ -1,6 +1,7 @@
 define [
+  'jquery'
   'compiled/views/QuickStartBar/DiscussionView'
-], (BaseDiscussionView) ->
+], ($, BaseDiscussionView) ->
 
   class DiscussionView extends BaseDiscussionView
     

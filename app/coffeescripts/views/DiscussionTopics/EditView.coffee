@@ -47,7 +47,9 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
     initialize: (options) ->
       @assignment = @model.get("assignment")
       @dueDateOverrideView = options.views['js-assignment-overrides']
-      @model.on 'sync', -> window.location = @get 'html_url'
+      @model.on 'sync', =>
+        @unwatchUnload()
+        window.location = @model.get 'html_url'
       super
 
     isTopic: => @model.constructor is DiscussionTopic
@@ -66,7 +68,7 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
         canModerate: @permissions.CAN_MODERATE
         isLargeRoster: ENV?.IS_LARGE_ROSTER || false
         threaded: data.discussion_type is "threaded"
-        draftStateEnabled: ENV.DRAFT_STATE
+        draftStateEnabled: ENV.DRAFT_STATE && ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MODERATE
       json.assignment = json.assignment.toView()
       json
 
@@ -96,8 +98,10 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
       _.defer(@renderGradingTypeOptions)
       _.defer(@renderGroupCategoryOptions)
       _.defer(@renderPeerReviewOptions)
+      _.defer(@watchUnload)
 
       @$(".datetime_field").datetime_field()
+
 
       this
 
@@ -157,7 +161,7 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
         # create assignments unless the user checked "Use for Grading".
         # The controller checks for set_assignment on the assignment model,
         # so we can't make it undefined here for the case of discussion topics.
-        data.assignment = {set_assignment: '0'}
+        data.assignment = @model.createAssignment(set_assignment: '0')
 
       # these options get passed to Backbone.sync in ValidatedFormView
       @saveOpts = multipart: !!data.attachment, proxyAttachment: true
@@ -175,7 +179,7 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
       data.assignment_overrides = @dueDateOverrideView.getOverrides()
 
       assignment = @model.get('assignment')
-      assignment or= new Assignment
+      assignment or= @model.createAssignment()
       assignment.set(data)
 
     removeAttachment: ->
@@ -221,7 +225,7 @@ htmlEscape, DiscussionTopic, Announcement, Assignment, $, preventDefault, Missin
         errors = @dueDateOverrideView.validateBeforeSave(data2, errors)
         errors = @_validatePointsPossible(data, errors)
       else
-        @model.set 'assignment', {set_assignment: false}
+        @model.set 'assignment', @model.createAssignment(set_assignment: false)
       errors
 
     _validatePointsPossible: (data, errors) =>

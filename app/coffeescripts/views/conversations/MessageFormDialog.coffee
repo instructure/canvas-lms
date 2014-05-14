@@ -18,6 +18,7 @@
 
 define [
   'i18n!conversation_dialog'
+  'jquery'
   'underscore'
   'Backbone'
   'compiled/views/DialogBaseView'
@@ -32,7 +33,7 @@ define [
   'compiled/views/conversations/ContextMessagesView'
   'compiled/widget/ContextSearch'
   'vendor/jquery.elastic'
-], (I18n, _, {Collection}, DialogBaseView, template, preventDefault, composeTitleBarTemplate, composeButtonBarTemplate, addAttachmentTemplate, Message, AutocompleteView, CourseSelectionView, ContextMessagesView) ->
+], (I18n, $, _, {Collection}, DialogBaseView, template, preventDefault, composeTitleBarTemplate, composeButtonBarTemplate, addAttachmentTemplate, Message, AutocompleteView, CourseSelectionView, ContextMessagesView) ->
 
   ##
   # reusable message composition dialog
@@ -56,6 +57,8 @@ define [
       '.message-body':                  '$messageBody'
       '.conversation_body':             '$conversationBody'
       '.compose_form':                  '$form'
+      '.user_note':                     '$userNote'
+      '.user_note_info':                '$userNoteInfo'
 
     messages:
       flashSuccess: I18n.t('message_sent', 'Message sent!')
@@ -167,7 +170,7 @@ define [
         el: @$recipients
         disabled: @model?.get('private')
       ).render()
-      @recipientView.on('changeToken', @resizeBody)
+      @recipientView.on('changeToken', @recipientIdsChanged)
 
       @$messageCourse.prop('disabled', !!@model)
       @courseView = new CourseSelectionView(
@@ -214,9 +217,6 @@ define [
         @recipientView.setTokens(tokens)
 
       @recipientView.setTokens([@launchParams.user]) if @launchParams
-
-      if @tokenInput
-        @tokenInput.change = @recipientIdsChanged
 
       if @model
         @$messageSubject.css('display', 'none')
@@ -299,10 +299,22 @@ define [
 
     recipientIdsChanged: (recipientIds) =>
       if recipientIds.length > 1 or recipientIds[0]?.match(/^(course|group)_/)
-        @toggleOptions(user_note: off, group_conversation: on)
+        @toggleUserNote(false)
       else
-        @toggleOptions(user_note: @canAddNotesFor(recipientIds[0]), group_conversation: off)
+        @toggleUserNote(@canAddNotesFor(@recipientView.tokenModels()[0]))
       @resizeBody()
+
+    canAddNotesFor: (user) =>
+      return false unless ENV.CONVERSATIONS.NOTES_ENABLED
+      return false unless user?
+      for id, roles of user.get('common_courses')
+        return true if 'StudentEnrollment' in roles and
+          (ENV.CONVERSATIONS.CAN_ADD_NOTES_FOR_ACCOUNT or ENV.CONVERSATIONS.CONTEXTS.courses[id]?.permissions?.manage_user_notes)
+      false
+
+    toggleUserNote: (state) ->
+      @$userNoteInfo.toggle(state)
+      @$userNote.prop('checked', false)
 
     resizeBody: =>
       @updateAttachmentOverflow()

@@ -28,37 +28,37 @@ class Account < ActiveRecord::Base
   belongs_to :parent_account, :class_name => 'Account'
   belongs_to :root_account, :class_name => 'Account'
   authenticates_many :pseudonym_sessions
-  has_many :courses
+  has_many :courses, :exportable => true
   has_many :all_courses, :class_name => 'Course', :foreign_key => 'root_account_id'
   has_many :group_categories, :as => :context, :conditions => ['deleted_at IS NULL']
   has_many :all_group_categories, :class_name => 'GroupCategory', :as => :context
-  has_many :groups, :as => :context
+  has_many :groups, :as => :context, :exportable => true
   has_many :all_groups, :class_name => 'Group', :foreign_key => 'root_account_id'
-  has_many :enrollment_terms, :foreign_key => 'root_account_id'
-  has_many :enrollments, :foreign_key => 'root_account_id', :conditions => ["enrollments.type != 'StudentViewEnrollment'"]
+  has_many :enrollment_terms, :foreign_key => 'root_account_id', :exportable => true
+  has_many :enrollments, :foreign_key => 'root_account_id', :conditions => ["enrollments.type != 'StudentViewEnrollment'"], :exportable => true
   has_many :sub_accounts, :class_name => 'Account', :foreign_key => 'parent_account_id', :conditions => ['workflow_state != ?', 'deleted']
   has_many :all_accounts, :class_name => 'Account', :foreign_key => 'root_account_id', :order => 'name'
-  has_many :account_users, :dependent => :destroy
-  has_many :course_sections, :foreign_key => 'root_account_id'
-  has_many :sis_batches
+  has_many :account_users, :dependent => :destroy, :exportable => true
+  has_many :course_sections, :foreign_key => 'root_account_id', :exportable => true
+  has_many :sis_batches, :exportable => true
   has_many :abstract_courses, :class_name => 'AbstractCourse', :foreign_key => 'account_id'
   has_many :root_abstract_courses, :class_name => 'AbstractCourse', :foreign_key => 'root_account_id'
-  has_many :users, :through => :account_users
-  has_many :pseudonyms, :include => :user
+  has_many :users, :through => :account_users, :exportable => true
+  has_many :pseudonyms, :include => :user, :exportable => true
   has_many :role_overrides, :as => :context
   has_many :course_account_associations
   has_many :child_courses, :through => :course_account_associations, :source => :course, :conditions => ['course_account_associations.depth = 0']
-  has_many :attachments, :as => :context, :dependent => :destroy
-  has_many :active_assignments, :as => :context, :class_name => 'Assignment', :conditions => ['assignments.workflow_state != ?', 'deleted']
-  has_many :folders, :as => :context, :dependent => :destroy, :order => 'folders.name'
+  has_many :attachments, :as => :context, :dependent => :destroy, :exportable => true
+  has_many :active_assignments, :as => :context, :class_name => 'Assignment', :conditions => ['assignments.workflow_state != ?', 'deleted'], :exportable => true
+  has_many :folders, :as => :context, :dependent => :destroy, :order => 'folders.name', :exportable => true
   has_many :active_folders, :class_name => 'Folder', :as => :context, :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_many :active_folders_with_sub_folders, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_many :active_folders_detailed, :class_name => 'Folder', :as => :context, :include => [:active_sub_folders, :active_file_attachments], :conditions => ['folders.workflow_state != ?', 'deleted'], :order => 'folders.name'
   has_many :account_authorization_configs, :order => "position"
   has_many :account_reports
-  has_many :grading_standards, :as => :context, :conditions => ['workflow_state != ?', 'deleted']
-  has_many :assessment_questions, :through => :assessment_question_banks
-  has_many :assessment_question_banks, :as => :context, :include => [:assessment_questions, :assessment_question_bank_users]
+  has_many :grading_standards, :as => :context, :conditions => ['workflow_state != ?', 'deleted'], :exportable => true
+  has_many :assessment_questions, :through => :assessment_question_banks, :exportable => true
+  has_many :assessment_question_banks, :as => :context, :include => [:assessment_questions, :assessment_question_bank_users], :exportable => true
   has_many :roles
   has_many :all_roles, :class_name => 'Role', :foreign_key => 'root_account_id'
   has_many :progresses, :as => :context
@@ -80,8 +80,8 @@ class Account < ActiveRecord::Base
 
   has_many :context_external_tools, :as => :context, :dependent => :destroy, :order => 'name'
   has_many :error_reports
-  has_many :announcements, :class_name => 'AccountNotification'
-  has_many :alerts, :as => :context, :include => :criteria
+  has_many :announcements, :class_name => 'AccountNotification', :exportable => true
+  has_many :alerts, :as => :context, :include => :criteria, :exportable => true
   has_many :user_account_associations
   has_many :report_snapshots
 
@@ -173,12 +173,15 @@ class Account < ActiveRecord::Base
   add_setting :allow_invitation_previews, :boolean => true, :root_only => true, :default => false
   add_setting :self_registration, :boolean => true, :root_only => true, :default => false
   # if self_registration_type is 'observer', then only observers (i.e. parents) can self register.
-  # else, any user type can self register.
+  # if self_registration_type is 'all' or nil, any user type can self register.
   add_setting :self_registration_type, :root_only => true
   add_setting :large_course_rosters, :boolean => true, :root_only => true, :default => false
   add_setting :edit_institution_email, :boolean => true, :root_only => true, :default => true
   add_setting :enable_fabulous_quizzes, :boolean => true, :root_only => true, :default => false
+  add_setting :js_kaltura_uploader, :boolean => true, :root_only => true, :default => false
   add_setting :google_docs_domain, root_only: true
+  add_setting :dashboard_url, root_only: true
+  add_setting :product_name, root_only: true
 
   def settings=(hash)
     if hash.is_a?(Hash)
@@ -206,6 +209,10 @@ class Account < ActiveRecord::Base
       end
     end
     settings
+  end
+
+  def product_name
+    settings[:product_name] || t("#product_name", "Canvas")
   end
 
   def allow_global_includes?
@@ -244,7 +251,7 @@ class Account < ActiveRecord::Base
 
   def self_registration_allowed_for?(type)
     return false unless self_registration?
-    return false if self_registration_type && type != self_registration_type
+    return false if self_registration_type && self_registration_type != 'all' && type != self_registration_type
     true
   end
 
@@ -290,7 +297,7 @@ class Account < ActiveRecord::Base
   end
   
   def ensure_defaults
-    self.uuid ||= AutoHandle.generate_securish_uuid
+    self.uuid ||= CanvasUuid::Uuid.generate_securish_uuid
     self.lti_guid ||= self.uuid if self.respond_to?(:lti_guid)
   end
 
@@ -387,7 +394,14 @@ class Account < ActiveRecord::Base
   end
 
   def associated_courses
-    Course.shard(shard).where("EXISTS (SELECT 1 FROM course_account_associations WHERE course_id=courses.id AND account_id=?)", self)
+    scope = if CANVAS_RAILS2
+      Course.shard(shard)
+    else
+      shard.activate do
+        Course.scoped
+      end
+    end
+    scope.where("EXISTS (SELECT 1 FROM course_account_associations WHERE course_id=courses.id AND account_id=?)", self)
   end
 
   def fast_course_base(opts)
@@ -729,7 +743,7 @@ class Account < ActiveRecord::Base
       result = false
 
       if !site_admin? && user
-        scope = user.enrollments.where(:root_account_id => root_account).where("enrollments.workflow_state<>'deleted'")
+        scope = root_account.enrollments.active.where(user_id: user)
         result = root_account.teachers_can_create_courses? &&
             scope.where(:type => ['TeacherEnrollment', 'DesignerEnrollment']).exists?
         result ||= root_account.students_can_create_courses? &&
@@ -837,7 +851,7 @@ class Account < ActiveRecord::Base
     return if self.settings[:auth_discovery_url].blank?
 
     begin
-      value, uri = CustomValidations.validate_url(self.settings[:auth_discovery_url])
+      value, uri = CanvasHttp.validate_url(self.settings[:auth_discovery_url])
       self.auth_discovery_url = value
     rescue URI::InvalidURIError, ArgumentError
       errors.add(:discovery_url, t('errors.invalid_discovery_url', "The discovery URL is not valid" ))

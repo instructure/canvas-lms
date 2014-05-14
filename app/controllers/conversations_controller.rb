@@ -19,6 +19,91 @@
 # @API Conversations
 #
 # API for creating, accessing and updating user conversations.
+#
+# @model Conversation
+#     {
+#       "id": "Conversation",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "the unique identifier for the conversation.",
+#           "example": 2,
+#           "type": "integer",
+#           "format": "int64"
+#         },
+#         "subject": {
+#           "description": "the subject of the conversation.",
+#           "example": 2,
+#           "type": "string"
+#         },
+#         "workflow_state": {
+#           "description": "The current state of the conversation (read, unread or archived).",
+#           "example": "unread",
+#           "type": "string"
+#         },
+#         "last_message": {
+#           "description": "A <=100 character preview from the most recent message.",
+#           "example": "sure thing, here's the file",
+#           "type": "string"
+#         },
+#         "start_at": {
+#           "description": "the date and time at which the last message was sent.",
+#           "example": "2011-09-02T12:00:00Z",
+#           "type": "datetime"
+#         },
+#         "message_count": {
+#           "description": "the number of messages in the conversation.",
+#           "example": 2,
+#           "type": "integer"
+#         },
+#         "subscribed": {
+#           "description": "whether the current user is subscribed to the conversation.",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "private": {
+#           "description": "whether the conversation is private.",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "starred": {
+#           "description": "whether the conversation is starred.",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "properties": {
+#           "description": "Additional conversation flags (last_author, attachments, media_objects). Each listed property means the flag is set to true (i.e. the current user is the most recent author, there are attachments, or there are media objects)",
+#           "type": "[string]"
+#         },
+#         "audience": {
+#           "description": "Array of user ids who are involved in the conversation, ordered by participation level, then alphabetical. Excludes current user, unless this is a monologue.",
+#           "type": "[integer]"
+#         },
+#         "audience_contexts": {
+#           "description": "Most relevant shared contexts (courses and groups) between current user and other participants. If there is only one participant, it will also include that user's enrollment(s)/ membership type(s) in each course/group.",
+#           "type": "[string]"
+#         },
+#         "avatar_url": {
+#           "description": "URL to appropriate icon for this conversation (custom, individual or group avatar, depending on audience).",
+#           "example": "https://canvas.instructure.com/images/messages/avatar-group-50.png",
+#           "type": "string"
+#         },
+#         "participants": {
+#           "description": "Array of users (id, name) participating in the conversation. Includes current user.",
+#           "type": "[string]"
+#         },
+#         "visible": {
+#           "description": "indicates whether the conversation is visible under the current scope and filter. This attribute is always true in the index API response, and is primarily useful in create/update responses so that you can know if the record should be displayed in the UI. The default scope is assumed, unless a scope or filter is passed to the create/update API call.",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "context_name": {
+#           "description": "Name of the course or group in which the conversation is occurring.",
+#           "example": "Canvas 101",
+#           "type": "string"
+#         }
+#       }
+#     }
 class ConversationsController < ApplicationController
   include ConversationsHelper
   include SearchHelper
@@ -125,6 +210,8 @@ class ConversationsController < ApplicationController
   #       "context_name": "Canvas 101"
   #     }
   #   ]
+  # @returns [Conversation]
+  #
   def index
     if request.format == :json
       @conversations_scope = @conversations_scope.where('message_count > 0')
@@ -142,18 +229,20 @@ class ConversationsController < ApplicationController
       render :json => @conversations_json
     else
       return redirect_to conversations_path(:scope => params[:redirect_scope]) if params[:redirect_scope]
+      load_all_contexts :permissions => [:manage_user_notes]
+      notes_enabled = @current_user.associated_accounts.any?{|a| a.enable_user_notes }
+      can_add_notes_for_account = notes_enabled && @current_user.associated_accounts.any?{|a| a.grants_right?(@current_user, nil, :manage_students) }
       if @current_user.use_new_conversations?
         js_env(:CONVERSATIONS => {
                  :ATTACHMENTS_FOLDER_ID => @current_user.conversation_attachments_folder.id,
                  :ACCOUNT_CONTEXT_CODE => "account_#{@domain_root_account.id}",
+                 :CONTEXTS => @contexts,
+                 :NOTES_ENABLED => notes_enabled,
+                 :CAN_ADD_NOTES_FOR_ACCOUNT => can_add_notes_for_account,
                })
         return render :template => 'conversations/index_new'
       else
         @current_user.reset_unread_conversations_counter
-        load_all_contexts :permissions => [:manage_user_notes]
-        notes_enabled = @current_user.associated_accounts.any?{|a| a.enable_user_notes }
-        can_add_notes_for_account = notes_enabled && @current_user.associated_accounts.any?{|a| a.grants_right?(@current_user, nil, :manage_students) }
-
         current_user_json = conversation_user_json(@current_user, @current_user, session, :include_participant_avatars => true)
         current_user_json[:id] = current_user_json[:id].to_s
         hash = {:CONVERSATIONS => {
@@ -275,7 +364,7 @@ class ConversationsController < ApplicationController
     render :json => err.record.errors, :status => :bad_request
   end
 
-  # @API
+  # @API Get running batches
   # Returns any currently running conversation batches for the current user.
   # Conversation batches are created when a bulk private message is sent
   # asynchronously (see the mode argument to the {api:ConversationsController#create create API action}).
@@ -676,7 +765,7 @@ class ConversationsController < ApplicationController
       end
       @conversation.reload
       messages.each { |msg| @conversation.conversation.add_message_to_participants msg, new_message: false, only_users: @recipients } if messages
-      @conversation.add_message message, :tags => @tags, :update_for_sender => false, only_users: @recipients ? @recipients + [@current_user] : nil
+      @conversation.add_message message, :tags => @tags, :update_for_sender => false, only_users: @recipients
 
       render :json => conversation_json(@conversation.reload, @current_user, session, :messages => [message])
     else
@@ -867,7 +956,7 @@ class ConversationsController < ApplicationController
   end
 
   def infer_visibility(conversations)
-    multiple = conversations.is_a? Enumerable
+    multiple = conversations.is_a?(Enumerable) || (!CANVAS_RAILS2 && conversations.is_a?(ActiveRecord::Relation))
     conversations = [conversations] unless multiple
     result = Hash.new(false)
     visible_conversations = @current_user.shard.activate do
@@ -891,7 +980,7 @@ class ConversationsController < ApplicationController
       MessageableUser.context_recipients(recipient_ids).map do |context|
         @recipients.concat @current_user.messageable_users_in_context(context)
       end
-      @recipients = @recipients.uniq_by(&:id)
+      @recipients = @recipients.uniq(&:id)
     end
   end
 

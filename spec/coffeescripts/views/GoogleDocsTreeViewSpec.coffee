@@ -1,4 +1,4 @@
-define ['compiled/views/GoogleDocsTreeView'], (GoogleDocsTreeView) ->
+define ['jquery', 'compiled/views/GoogleDocsTreeView'], ($, GoogleDocsTreeView) ->
 
   file1 = { name: 'File 1', extension: 'tst', document_id: '12345', alternate_url: {href: '#'}}
   fileData = { files: [file1] }

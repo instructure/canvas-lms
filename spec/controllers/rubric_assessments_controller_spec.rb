@@ -19,36 +19,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe RubricAssessmentsController do
-  describe "GET 'index'" do
-    it "should require authorization" do
-      course_with_teacher(:active_all => true)
-      rubric_assessment_model(:user => @user, :context => @course)
-      get 'index', :course_id => @course.id, :rubric_association_id => @rubric_association.id
-      assert_unauthorized
-    end
-    it "should assign variables" do
-      course_with_teacher_logged_in(:active_all => true)
-      rubric_assessment_model(:user => @user, :context => @course)
-      get 'index', :course_id => @course.id, :rubric_association_id => @rubric_association.id
-      response.should be_success
-    end
-  end
-  
-  describe "GET 'show'" do
-    it "should require authorization" do
-      course_with_teacher(:active_all => true)
-      rubric_assessment_model(:user => @user, :context => @course)
-      get 'show', :course_id => @course.id, :rubric_association_id => @rubric_association.id, :id => @rubric_assessment.id
-      assert_unauthorized
-    end
-    it "should assign variables" do
-      course_with_teacher_logged_in(:active_all => true)
-      rubric_assessment_model(:user => @user, :context => @course)
-      get 'show', :course_id => @course.id, :rubric_association_id => @rubric_association.id, :id => @rubric_assessment.id
-      response.should be_success
-    end
-  end
-  
   describe "POST 'create'" do
     it "should require authorization" do
       course_with_teacher(:active_all => true)

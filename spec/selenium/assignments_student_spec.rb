@@ -234,10 +234,10 @@ describe "assignments" do
         keep_trying_until do
         submission_input.send_keys(fullpath_txt)
         ext_error.should_not be_displayed
-        submit_file_button.should_not have_class('disabled')
+        submit_file_button['disabled'].should be_nil
         submission_input.send_keys(fullpath_zip)
         ext_error.should be_displayed
-        submit_file_button.should have_class('disabled')
+        submit_file_button.should have_attribute(:disabled, "true")
         end
       end
 

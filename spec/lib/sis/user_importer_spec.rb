@@ -19,29 +19,40 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe SIS::UserImporter do
-  it "should split into transactions based on time elapsed" do
-    account_model
-    messages = []
-    Setting.set('sis_transaction_seconds', '1')
-    # this is the fun bit where we get to stub User.new to insert a sleep into
-    # the transaction loop.
-    class User
-      def _stub_sleep
-        sleep 1
-        true
+  context "time elapsed" do
+    before do
+      class User
+        def _stub_sleep
+          sleep 1
+          true
+        end
+        before_save :_stub_sleep
       end
-      before_save :_stub_sleep
     end
 
-    SIS::UserImporter.new(@account, {}).process(2, messages) do |importer|
-      importer.add_user(*"U001,user1,active,User,One,user1@example.com".split(','))
-      importer.add_user(*"U002,user2,active,User,Two,user2@example.com".split(','))
-      importer.add_user(*"U003,user3,active,User,Three,user3@example.com".split(','))
+    after do
+      class User
+        if CANVAS_RAILS2
+          @before_save_callbacks.delete :_stub_sleep
+        else
+          _save_callbacks.delete_if {|cb| cb.filter == :_stub_sleep}
+        end
+      end
     end
-    Pseudonym.all.map(&:sis_user_id).sort.should == %w(U001 U002 U003)
 
-    class User
-      @before_save_callbacks.delete :_stub_sleep
+    it "should split into transactions based on time elapsed" do
+      account_model
+      messages = []
+      Setting.set('sis_transaction_seconds', '1')
+      # this is the fun bit where we get to stub User.new to insert a sleep into
+      # the transaction loop.
+
+      SIS::UserImporter.new(@account, {}).process(2, messages) do |importer|
+        importer.add_user(*"U001,user1,active,User,One,user1@example.com".split(','))
+        importer.add_user(*"U002,user2,active,User,Two,user2@example.com".split(','))
+        importer.add_user(*"U003,user3,active,User,Three,user3@example.com".split(','))
+      end
+      Pseudonym.all.map(&:sis_user_id).sort.should == %w(U001 U002 U003)
     end
   end
 

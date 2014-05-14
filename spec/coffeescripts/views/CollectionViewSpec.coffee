@@ -1,8 +1,9 @@
 define [
+  'jquery'
   'Backbone'
   'compiled/views/CollectionView'
   'helpers/fakeENV'
-], (Backbone, CollectionView, fakeENV) ->
+], ($, Backbone, CollectionView, fakeENV) ->
 
   collection = null
   view = null

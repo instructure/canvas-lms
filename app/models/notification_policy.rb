@@ -102,20 +102,17 @@ class NotificationPolicy < ActiveRecord::Base
       frequency = params[:frequency]
 
       # Find any existing NotificationPolicies for the category and the channel. If frequency is 'never', delete the
-      # entry. If other than than, create or update the entry.
+      # entry. If other than that, create or update the entry.
       NotificationPolicy.transaction do
         notifications.each do |notification_id|
+          scope = user.notification_policies.
+              where(communication_channel_id: params[:channel_id], notification_id: notification_id)
           if CANVAS_RAILS2
-            # can't use hash syntax for the where cause Rails 2 will try to
-            # call communication_channels= for the or_initialize portion
-            p = NotificationPolicy.includes(:communication_channel).where("communication_channels.user_id=?", user).
-                find_or_initialize_by_communication_channel_id_and_notification_id(params[:channel_id], notification_id)
+            # can't use find_or_initialize, cause Rails 2 gets confused
+            p = scope.first
+            p ||= user.notification_policies.build(communication_channel_id: params[:channel_id], notification_id: notification_id)
           else
-            p = NotificationPolicy.select('notification_policies.*').joins(:communication_channel).where(
-              communication_channels: {user_id: user},
-              communication_channel_id: params[:channel_id],
-              notification_id: notification_id
-            ).first_or_initialize
+            p = scope.first_or_initialize
           end
           # Set the frequency and save
           p.frequency = frequency

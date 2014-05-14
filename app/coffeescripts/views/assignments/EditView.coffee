@@ -29,8 +29,6 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
     dontRenableAfterSaveSuccess: true
 
     ASSIGNMENT_GROUP_SELECTOR = '#assignment_group_selector'
-    DUE_DATE_AREA = '#assignment_due_date_controls'
-    DUE_AT = '[name="due_at"]'
     DESCRIPTION = '[name="description"]'
     SUBMISSION_TYPE = '[name="submission_type"]'
     ONLINE_SUBMISSION_TYPES = '#assignment_online_submission_types'
@@ -39,10 +37,8 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
     RESTRICT_FILE_UPLOADS = '#assignment_restrict_file_extensions'
     RESTRICT_FILE_UPLOADS_OPTIONS = '#restrict_file_extensions_container'
     ALLOWED_EXTENSIONS = '#allowed_extensions_container'
-    ADVANCED_ASSIGNMENT_OPTIONS = '#advanced_assignment_options'
     TURNITIN_ENABLED = '#assignment_turnitin_enabled'
     ADVANCED_TURNITIN_SETTINGS = '#advanced_turnitin_settings_link'
-    ASSIGNMENT_TOGGLE_ADVANCED_OPTIONS = '#assignment_toggle_advanced_options'
     GRADING_TYPE_SELECTOR = '#grading_type_selector'
     GRADED_ASSIGNMENT_FIELDS = '#graded_assignment_fields'
     EXTERNAL_TOOL_SETTINGS = '#assignment_external_tool_settings'
@@ -54,8 +50,6 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
     els: _.extend({}, @::els, do ->
       els = {}
       els["#{ASSIGNMENT_GROUP_SELECTOR}"] = '$assignmentGroupSelector'
-      els["#{DUE_DATE_AREA}"] = '$dueDateArea'
-      els["#{DUE_AT}"] = '$dueAt'
       els["#{DESCRIPTION}"] = '$description'
       els["#{SUBMISSION_TYPE}"] = '$submissionType'
       els["#{ONLINE_SUBMISSION_TYPES}"] = '$onlineSubmissionTypes'
@@ -64,10 +58,8 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
       els["#{RESTRICT_FILE_UPLOADS}"] = '$restrictFileUploads'
       els["#{RESTRICT_FILE_UPLOADS_OPTIONS}"] = '$restrictFileUploadsOptions'
       els["#{ALLOWED_EXTENSIONS}"] = '$allowedExtensions'
-      els["#{ADVANCED_ASSIGNMENT_OPTIONS}"] = '$advancedAssignmentOptions'
       els["#{TURNITIN_ENABLED}"] = '$turnitinEnabled'
       els["#{ADVANCED_TURNITIN_SETTINGS}"] = '$advancedTurnitinSettings'
-      els["#{ASSIGNMENT_TOGGLE_ADVANCED_OPTIONS}"] = '$assignmentToggleAdvancedOptions'
       els["#{GRADING_TYPE_SELECTOR}"] = '$gradingTypeSelector'
       els["#{GRADED_ASSIGNMENT_FIELDS}"] = '$gradedAssignmentFields'
       els["#{EXTERNAL_TOOL_SETTINGS}"] = '$externalToolSettings'
@@ -81,7 +73,6 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
     events: _.extend({}, @::events, do ->
       events = {}
       events["click .cancel_button"] = 'handleCancel'
-      events["click #{ASSIGNMENT_TOGGLE_ADVANCED_OPTIONS}"] = 'toggleAdvancedOptions'
       events["change #{SUBMISSION_TYPE}"] = 'handleSubmissionTypeChange'
       events["change #{RESTRICT_FILE_UPLOADS}"] = 'handleRestrictFileUploadsChange'
       events["click #{ADVANCED_TURNITIN_SETTINGS}"] = 'showTurnitinDialog'
@@ -106,24 +97,6 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
     handleCancel: (ev) =>
       ev.preventDefault()
       window.location = ENV.CANCEL_TO if ENV.CANCEL_TO?
-
-    showingAdvancedOptions: =>
-      ariaExpanded = @$advancedAssignmentOptions.attr('aria-expanded')
-      ariaExpanded == 'true' or ariaExpanded == true
-
-    toggleAdvancedOptions: (ev) =>
-      ev.preventDefault()
-      $(ev.currentTarget).focus() # to ensure its errorBox gets cleaned up (if it has one)
-      expanded = @showingAdvancedOptions()
-      @$advancedAssignmentOptions.attr('aria-expanded', !expanded)
-      @$advancedAssignmentOptions.toggle(!expanded)
-      if expanded
-        @$dueDateArea.show()
-        text = I18n.t('show_advanced_options', 'Show Advanced Options') + ' ▼'
-      else
-        @$dueDateArea.hide()
-        text = I18n.t('hide_advanced_options', 'Hide Advanced Options') + ' ▲'
-      @$assignmentToggleAdvancedOptions.text text
 
     showTurnitinDialog: (ev) =>
       ev.preventDefault()
@@ -165,7 +138,6 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
       @$peerReviewsFields.toggleAccessibly subVal != 'external_tool'
 
     afterRender: =>
-      @_attachDatepickerToDateFields()
       @_attachEditorToDescription()
       $ @_initializeWikiSidebar
       this
@@ -185,10 +157,6 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
         # hide the clicked link, and show the other toggle link.
         $(e.currentTarget).siblings('.rte_switch_views_link').andSelf().toggle()
 
-    _attachDatepickerToDateFields: =>
-      if @assignment.isSimple()
-        @$dueAt.datetime_field()
-
     _initializeWikiSidebar: =>
       # $("#sidebar_content").hide()
       unless wikiSidebar.inited
@@ -204,16 +172,12 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
       unless ENV?.IS_LARGE_ROSTER
         data = @groupCategorySelector.filterFormData data
       # should update the date fields.. pretty hacky.
-      if @showingAdvancedOptions()
-        @dueDateOverrideView.updateOverrides()
-        defaultDates = @dueDateOverrideView.getDefaultDueDate()
-        data.lock_at = defaultDates?.get('lock_at') or null
-        data.unlock_at = defaultDates?.get('unlock_at') or null
-        data.due_at = defaultDates?.get('due_at') or null
-        data.assignment_overrides = @dueDateOverrideView.getOverrides()
-      else
-        unfudged = $.unfudgeDateForProfileTimezone(data.due_at)
-        data.due_at = $.dateToISO8601UTC(unfudged) if unfudged?
+      @dueDateOverrideView.updateOverrides()
+      defaultDates = @dueDateOverrideView.getDefaultDueDate()
+      data.lock_at = defaultDates?.get('lock_at') or null
+      data.unlock_at = defaultDates?.get('unlock_at') or null
+      data.due_at = defaultDates?.get('due_at') or null
+      data.assignment_overrides = @dueDateOverrideView.getOverrides()
       return data
 
     submit: (event) =>
@@ -261,7 +225,6 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
     # -- Pre-Save Validations --
 
     fieldSelectors: _.extend(
-      { assignmentToggleAdvancedOptions: '#assignment_toggle_advanced_options'},
       AssignmentGroupSelector::fieldSelectors,
       GroupCategorySelector::fieldSelectors
     )
@@ -282,7 +245,6 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
         errors = @groupCategorySelector.validateBeforeSave(data, errors)
       errors = @_validatePointsPossible(data, errors)
       errors = @_validatePercentagePoints(data, errors)
-      errors = @_validateAdvancedOptions(data, errors)
       data2 =
         assignment_overrides: @dueDateOverrideView.getAllDates(data)
       errors = @dueDateOverrideView.validateBeforeSave(data2,errors)
@@ -296,7 +258,6 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
           message: I18n.t 'name_is_required', 'Name is required!'
         ]
       errors
-
 
     _validateSubmissionTypes: (data, errors) =>
       if data.submission_type == 'online' and data.submission_types.length == 0
@@ -327,16 +288,5 @@ AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly) ->
       if data.grading_type == 'percent' and (data.points_possible == "0" or isNaN(parseFloat(data.points_possible)))
         errors["points_possible"] = [
           message: I18n.t 'percentage_points_possible', 'Points possible must be more than 0 for percentage grading'
-        ]
-      errors
-
-    # add an extra error box if errors are hidden
-    _validateAdvancedOptions: (data, errors) =>
-      ariaExpanded = @$advancedAssignmentOptions.attr('aria-expanded')
-      expanded = ariaExpanded == 'true' or ariaExpanded == true
-      error_keys = _.without(_.keys(errors), "name", "points_possible")
-      if error_keys.length > 0 and !expanded
-        errors["assignmentToggleAdvancedOptions"] = [
-          message: I18n.t 'advanced_options_errors', 'There were errors on one or more advanced options'
         ]
       errors

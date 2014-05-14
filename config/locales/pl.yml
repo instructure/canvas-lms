@@ -96,7 +96,6 @@ pl:
         login_handle_name: "Etykieta logowania"
       login_handle_name_description: "Etykieta używana do unikatowych identyfikatorów logowania. Przykłady: Login, nazwa użytkownika, identyfikator uczestnika itp."
       save_button: "Zapisz ustawienia uwierzytelniania"
-    deprecated_fail: "Nie można użyć zarówno starej oraz obecnej wersji tworzenia jednocześnie."
     index: 
       add_auth_desc: "Dodaj dostawcę tożsamości do tego konta:"
       canvas_login_tip: |-
@@ -179,11 +178,8 @@ pl:
       last_ldap_timeout_failure: "Ostatnie błędy przekroczenia czasu"
       ldap_timeout_failure_help2: "Jeśli system Canvas podczas komunikacji z serwerem LDAP przekroczy czas zbyt wiele razy, spowoduje to, że kolejne próby logowania nie będą mogły odbywać się za pomocą serwera LDAP przez okres %{time}."
     login_required: "należy podać"
-    no_auth_mixing: "Nie można mieszać typów uwierzytelnienia"
     no_changing_auth_types: "Nie można zmienić typu uwierzytelnienia konfiguracji; usuń i utwórz nową konfigurację."
-    no_config_sent: "Należy określić typ_aut"
     no_discovery_url: "Nie ustawiono"
-    only_one_cas: "Nie można utworzyć wielu konfiguracji CAS"
     password_required: "należy podać"
     saml_required: "Konfiguracja SAML jest wymagana, aby testować SAML"
     saml_settings: 
@@ -255,6 +251,8 @@ pl:
     announcement_deleted_notice: "Ogłoszenie zostało usunięte"
     permission_denied_notice: "Nie masz uprawnień do tworzenia ogłoszeń dla tego konta"
   account_reports: 
+    bucks: 
+      courses_only: "Jedynie sekcje online"
     ccp: 
       course: 
         check_box: "Dla kursu o identyfikatorze:%{course_id};"
@@ -272,6 +270,8 @@ pl:
       section_text: "Dla sekcji: %{section};"
       start_text: "Termin rozpoczęcia: %{start_at};"
       term_text: "Termin: %{term_name};"
+    galen: 
+      no_term: "Wymagany jest konkretny termin, wybierz termin"
     grades: 
       deleted: "Dołącz usunięte obiekty: prawda;"
     mississippi: 
@@ -281,6 +281,11 @@ pl:
     sis_exporter: 
       deleted: "Dołącz usunięte obiekty: prawda;"
       reports: "Raporty: %{files}"
+    student: 
+      enrollment_state: "Dołącz stan zapisu: prawda;"
+      enrollment_states: "Stany zapisów: %{states};"
+    usu: 
+      enrollment_types: "Typy zapisów: %{types} "
   account_settings: 
     account: Konto
     account_name_too_long: "Nazwa konta jest zbyt długa"
@@ -373,6 +378,28 @@ pl:
         messages_viewed: "Wysłano powiadomienia do użytkownika *%{user}* od *%{start_date}* do *%{end_date}*."
       comm_messages_search_results: 
         no_messages_found: "Nie znaleziono wiadomości"
+      course_logging_content: 
+        course_activity: "Aktywność kursu"
+        find: Znajdź
+      course_logging_details: 
+        Field: Pole
+        From: Od
+        To: Do
+        Value: Wartość
+        date: Data
+        event_id: "Identyfikator wydarzenia"
+        event_type_label: Typ
+        time: Godzina
+        user: Użytkownik
+      course_logging_item: 
+        view_event_details: "Pokaż informacje szczegółowe"
+      course_logging_results: 
+        date: Data
+        event_details: "Szczegółowe informacje o wydarzeniu"
+        event_type: Typ
+        no_item_found: "Nie znaleziono elementów"
+        time: Godzina
+        user: Użytkownik
       course_search_form: 
         labels: 
           find_deleted_course: "Znajdź usunięty kurs"
@@ -402,8 +429,8 @@ pl:
         message_date_from: "Od daty"
         message_date_to: "Do daty"
       grade_change_logging_content: 
-        auth_logging: "Zmiana ocen"
         find: Znajdź
+        grade_change_activity: "Zmiana ocen"
         message_assignment_id: "Identyfikator zadania"
         message_course_id: "Identyfikator kursu"
       grade_change_logging_results: 
@@ -418,6 +445,7 @@ pl:
         time: Godzina
       logging_content_pane: 
         authentication: "Logowanie / Wylogowywanie"
+        course: "Aktywność kursu"
         grade_change: "Zmiana ocen"
         select_default: "Wybierz typ dziennika"
         select_label: "Wybierz typ dziennika, żeby wyszukać."
@@ -483,6 +511,13 @@ pl:
         zero: Przesłano
       title: "Zdjęcia profilowe"
       unlock_link: odblokuj
+    bucks_zero_activity_csv_description: 
+      account_reports: 
+        bucks: 
+          description: 
+            header: Przykład
+          student_login: 
+            text: "W tym raporcie uwzględniono wszystkich uczestników zapisanych do jakiegokolwiek kursu w danym semestrze. Wynikowy plik csv będzie zawierał jeden rząd na zapis uczestnika, który nie odwiedził kursu od określonej daty. Filtr online będzie uwzględniał jedynie zapisy z sekcji, które maja oznaczenie „.E” w nazwie sekcji."
     cannot_manage_account: "Brak uprawnień, aby zarządzać ustawieniami konta"
     cannot_manage_quotas: "Brak uprawnień, aby zarządzać ustawieniami przydziału"
     ccp_zero_activity_csv_description: 
@@ -527,6 +562,13 @@ pl:
       teachers_label: Instruktorzy
     course_add_failed_message: "Dodawanie kursu nie powiodło się; ponów próbę"
     course_added_message: "Kurs %{course} został pomyślnie dodany!"
+    course_enrollment_csv_description: 
+      account_reports: 
+        cedar_rapids: 
+          course_status: 
+            text: "W tym raporcie uwzględniony został status wszystkich kursów w określonym semestrze. Wynikowy plik csv będzie zawierał jeden rząd na sekcję kursu; zostanie w nim pokazany kurs, status kursu, semestr, daty rozpoczęcia i zakończenia, liczba zapisów, dział oraz konto"
+          description: 
+            header: Przykład
     course_status_csv_description: 
       account_reports: 
         auburn: 
@@ -571,6 +613,14 @@ pl:
         edison: 
           outcome: 
             text: "identyfikator_wyniku:"
+    cv_non_graded_data_csv_description: 
+      account_reports: 
+        galen: 
+          cv: 
+            non_graded: 
+              text: "W raporcie przedstawiono nieocenione zadania za testy, ankiety i dyskusje."
+          description: 
+            header: Przykład
     cv_submission_data_csv_description: 
       account_reports: 
         galen: 
@@ -625,6 +675,13 @@ pl:
       page_title: Konta
       title: "Konta, którymi zarządzam"
     integer_required: "Liczba całkowita jest wymagana"
+    last_submission_activity_csv_description: 
+      account_reports: 
+        concorde: 
+          description: 
+            header: Przykład
+          last_submission: 
+            text: "W raporcie przedstawiono ostatnią aktywność przesyłanych zadań."
     last_user_access_csv_description: 
       account_reports: 
         default: 
@@ -851,6 +908,8 @@ pl:
         restrict_student_future_view: "Ogranicz liczbę studentów mających możliwość podglądania kursów przed datą rozpoczęcia"
         self_enrollment: "Zezwalaj na samodzielne zapisy"
         self_registration: "Samodzielna rejestracja"
+        self_registration_type_all: "Wszystkie typy konta"
+        self_registration_type_observer: "Jedynie konta obserwatorów"
         show_scheduler: "Uaktywnij planer"
         sis_source_id: "Identyfikator systemu SIS"
         start_at: Rozpoczęcie
@@ -1097,20 +1156,6 @@ pl:
             header: Przykład
           student_login: 
             text: "W tym raporcie uwzględniono wszystkich studentów zapisanych do określonego kursu lub we wszystkich kursach w danym semestrze. Wynikowy plik csv będzie zawierał jeden rząd na zapis studenta."
-    student_login_csv_description: 
-      account_reports: 
-        bucks: 
-          description: 
-            header: Przykład
-          student_login: 
-            text: "W tym raporcie uwzględniono studentów, którzy nie zalogowali się od określonej daty."
-    student_login_csv_parameters: 
-      account_reports: 
-        bucks: 
-          login: 
-            check_box: "Dołączyć użytkowników, którzy nigdy się nie zalogowali?"
-          parameters: 
-            note: "Ten raport bardziej odzwierciedla ostatnie logowanie do systemu Canvas niż ostatnią aktywności w tym systemie."
     student_submissions_csv_description: 
       account_reports: 
         vilas: 
@@ -1124,7 +1169,16 @@ pl:
           students_with_no_submissions: 
             description: 
               header: Przykład
-            text: "W tym raporcie uwzględniono wszystkich uczestników zapisanych do kursu w danym semestrze, którzy nie przesłali zadania w określonym na kursie zakresie dat. W raporcie zawarto jeden rząd na zapis uczestnika, który spełnia kryteria. Zakres dat nie może być większy niż dwa tygodnie."
+            text: "W tym raporcie uwzględniono wszystkich uczestników zapisanych do kursu w danym semestrze, którzy nie przesłali zadania w określonym na kursie zakresie dat. W raporcie zawarto jeden rząd na zapis uczestnika, który spełnia kryteria. Zakres dat nie może być dłuższy niż dwa tygodnie."
+    students_with_no_submissions_csv_parameters: 
+      account_reports: 
+        default: 
+          enrollment_state: 
+            header: "Stan zapisu"
+          include_enrollment_state: 
+            check_box: "Dołącz stan zapisu"
+      active: "Aktywne zapisy"
+      all: "Wszystkie zapisy"
     submission_data_csv_description: 
       account_reports: 
         submission_data: 
@@ -1172,6 +1226,24 @@ pl:
           main: 
             text: "To jest raport wszystkich kursów, które nie mają takich elementów jak: zadania, ogłoszenia, dyskusje, pliki, moduły, strony lub testy. "
     update_failed_notice: "Aktualizacja ustawień konta nie powiodła się"
+    user_access_csv_description: 
+      account_reports: 
+        usu: 
+          description: 
+            header: Przykład
+          user_activity: 
+            text: "W tym raporcie przedstawiono aktywność uczestników zapisanych na określony kurs lub wszystkie kursy w określonym semestrze. Wynikowy plik csv będzie zawierał jeden rząd na aktywność studenta i będą w nim następujące nagłówki: typ_zapisu, identyfikator sekcji, identyfikator sis użytkownika, nazwę sekcji, identyfikator kursu, identyfikator sis kursu, nazwę kursu, identyfikator użytkownika, identyfikator sis użytkownika, typ zawartości, zawartość, liczbę wyświetleń, liczbę wcześniejszego udziału, ostatnio przeglądane. Liczba wyświetleń i wcześniejszego udziału jest liczona od czasu rozpoczęcia do czasu wygenerowania raportu."
+    user_access_csv_parameters: 
+      account_reports: 
+        usu: 
+          enrollment_type: 
+            header: "Typ zapisów"
+      all: "Wszystkie zapisy"
+      designer: "Zapisy projektantów"
+      observer: "Zapisy obserwatora"
+      students: "Zapisy uczestników"
+      ta: "Zapisy asystentów instruktora"
+      teachers: "Zapisy nauczycieli"
     user_add_failed_message: "Dodawanie użytkownika nie powiodło się; ponów próbę"
     user_added_message: "Użytkownik %{user} został pomyślnie dodany!"
     user_added_message_sent_message: "Użytkownik %{user} został pomyślnie dodany! Wkrótce użytkownik powinien otrzymać wiadomość e-mail potwierdzającą dodanie."
@@ -1409,7 +1481,6 @@ pl:
     default_title: "Brak nazwy — %{course}"
     default_unfiled_title: "Nieprzyporządkowane pytania"
   assignment: 
-    advanced_options_errors: "Wystąpiły błędy w przypadku co najmniej jednej zaawansowanej opcji"
     assignment_group_must_have_group: "Wybierz grupę przypisania do tego zadania"
     at_least_one_file_type: "Określ przy najmniej jeden dozwolony typ pliku"
     at_least_one_submission_type: "Wybierz co najmniej jeden typ przesyłanego zadania"
@@ -1427,8 +1498,8 @@ pl:
       upload_as_zip: "Przekaż pliki w formacie .zip"
     feed_entry_title: "Zadanie: %{assignment}"
     feed_entry_title_with_course: "Zadanie, %{course}: %{assignment}"
+    gpa_scale_explainer: "Jak wygląda ocenianie w skali GPA?"
     group_assignment_must_have_group_set: "Wybierz zestaw grup do tego zadania"
-    hide_advanced_options: "Ukryj opcje zaawansowane"
     imported_assignments_group: "Zaimportowane zadania"
     labels: 
       due: "Termin dostarczenia"
@@ -1436,7 +1507,6 @@ pl:
     percentage_points_possible: "Możliwa liczba punktów musi być większa od 0 w przypadku oceniania procentowego"
     points_possible_number: "Możliwe punkty do zdobycia muszą być wartością liczbową"
     select_external_tool_dialog_title: "Konfiguruj narzędzia zewnętrzne"
-    show_advanced_options: "Pokaż opcje zaawansowane"
     submission_action_take_quiz: "Przystąp do: %{title}"
     submission_action_turn_in_assignment: "Wyślij: %{title}"
     submission_types: 
@@ -1449,6 +1519,7 @@ pl:
       external_tool: "narzędzie zewnętrzne"
       on_paper: "na papierze"
     titles: 
+      gpa_scale_explainer: "Jak wygląda ocenianie w skali GPA?"
       grading_scheme_info: "Pokaż/edytuj schemat oceniania"
   assignment_details: 
     no_graded_submissions: "Brak ocenionych zadań"
@@ -1462,7 +1533,7 @@ pl:
     no_one_scored_lower: "Żaden z uczestników nie uzyskał niższej liczby punktów niż %{min}"
     scores_higher_than_the_average: "Wyniki powyżej średniej wynoszącej %{average}"
     scores_lower_than_the_average: "Wyniki poniżej średniej wynoszącej %{average}"
-    total_submitted: "Łączna liczba przesłanych:"
+    total_graded_submissions: "Łącznie ocenionych zadań:"
   assignment_group: 
     default_name: Zadania
     default_title: Zadania
@@ -1549,7 +1620,7 @@ pl:
       edit: Edytuj
       group_weight: "%{groupWeight}% łącznie"
       manage: Zarządzaj
-      move: "Przenieś do To&hellip; "
+      move: "Przenieś do..."
     assignment_group_selector: 
       assignment_group: "Grupa zadań"
       assignment_group_options: 
@@ -1565,7 +1636,7 @@ pl:
       delete: Usuń
       edit: Edytuj
       module: Moduł
-      move: "Przenieś do To&hellip;"
+      move: "Przenieś do..."
       multiple_modules: "Wiele modułów"
       no_points_possible: "Brak możliwych punktów"
       points_possible: "%{points_possible} pkt"
@@ -1635,6 +1706,10 @@ pl:
       assignment_groups_wrapper: "( spośród %{number_of_groups})"
       links: 
         add_assignment_group: "Dodaj grupę zadań"
+    available_date_description: 
+      available_until: "Dostępny do"
+      closed: Zamknięte
+      not_available_until: "Niedostępny do"
     buttons: 
       add_group: "Dodaj grupę"
       delete_group: "Usuń grupę"
@@ -1676,11 +1751,7 @@ pl:
     create_new_crumb: "Utwórz nowy"
     date_available_column_view: 
       available: Dostępny
-      available_on: "Termin dostępności:"
-      available_until: "Dostępny do"
-      closed: Zamknięte
       multiple_dates: "Wiele dat"
-      not_available_until: "Niedostępny do"
     date_due_column_view: 
       due: "Termin dostarczenia"
       due_date: "Termin dostarczenia"
@@ -1726,6 +1797,7 @@ pl:
       buttons: 
         not_published: "Nie opublikowane"
         published: Opublikowane
+      manage: Zarządzaj
       titles: 
         delete: Usuń
     edit_view: 
@@ -1733,11 +1805,9 @@ pl:
       buttons: 
         update: "Aktualizuj zadanie"
       description: Opis
-      due_date: "Termin do"
       freeze_properties: "Zablokuj właściwości zadania podczas kopiowania"
       notify_content_change: "Powiadom użytkowników o zmianie tej zawartości"
       points_possible: Punkty
-      show_advanced_options: "Pokaż opcje zaawansowane"
       warnings: 
         assignment_is_frozen: "Niektóre ustawienia zostały administracyjnie zablokowane."
     errors: 
@@ -1770,13 +1840,22 @@ pl:
           *Upewnij się, że nazwy plików nie zostały zmienione, gdyż system może ich nie rozpoznać.*
       titles: 
         related_items: "Powiązane elementy"
+    grade_gpa_scale_screenreader: "Ocena: %{grade}"
     grade_letter_grade_screenreader: "Ocena: %{grade}"
     grade_pass_fail_screenreader: "Ocena: %{grade}"
     grade_percent: "%{grade}%"
     grade_percent_screenreader: "Ocena: %{grade}%"
     grading_type_selector: 
-      grading_type: "Typ oceniania"
+      display_grade_as: "Wyświetl ocenę jako"
+      gpa_scale_explainer: "Ocenianie w skali GPA jest przeznaczone do szkół, w których stosuje się opis 4.0 (lub 5.0/6.0) do wszystkich zadań. Ten schemat oceniania jest podobny do schematu oceniania literami, jednak ma kilka istotnych różnic:"
+      gpa_scale_input_explainer: "Wprowadzane są wyniki do wartości 4.0. Jeśli na przykład w zadaniu można zdobyć 100 punktów, ocena 4.0 oznacza 100%, ocena 3.0 oznacza 87% itd."
+      gpa_scale_letters_explainer: "Zamiast ocen cyfowych można stosować oceny literowe"
+      gpa_scale_percentage_explainer: "Nie można bezpośrednio wprowadzać punktów, lecz procenty. Jeśli, na przykład, w zadaniu można uzyskać 50 punktów, wprowadzenie wartości „40” nie będzie poprawne, natomiast wartość procentowa „80%” będzie poprawna."
+      gpa_scale_recommendation: "Jeśli szkoła nie korzysta ze skali oceniania 4.0 (lub 5.0/6.0), system Canvas zaleca wyświetlanie ocen literowych."
+      gpa_scale_scores_explainer: "Można stosować jedynie wyniki wcześniej zdefiniowane w schemacie oceniania."
+      gpa_scale_title: "„Jak wygląda ocenianie w skali GPA?”"
       grading_type_options: 
+        gpa_scale: "Skala GPA"
         letter_grade: "Ocena literowa"
         not_graded: "Bez oceny"
         pass_fail: "Ukończono/Nie ukończono"
@@ -1785,10 +1864,11 @@ pl:
       view_grading_levels: "Pokaż poziomy oceniania"
     group_category_selector: 
       grade_group_students_individually: "Wystaw oceny indywidualnie"
+      group_assignment_header: "Zadanie grupowe"
+      group_category_locked_explanation: "Uczestnicy przesłali już zadanie domowe, więc nie można dokonać zmiany ustawień grupy."
       group_category_options: "Kategoria Nowa grupa"
       group_set: "Zestaw grup"
       is_group_assignment: "To jest zadanie grupowe"
-      students_already_submitted_warning: "Wcześniejsze indywidualne zadania nie będą liczone jako zadania grupowe i nie wyświetlą się prawidłowo w programie Speedgrader. "
     group_comment: 
       labels: 
         group_comment: "Wyślij komentarz do całej grupy"
@@ -1864,6 +1944,8 @@ pl:
       submitting: "Trwa przesyłanie..."
     multiple_due_dates: "Więcej niż jeden termin dostarczenia"
     name_is_required: "Wymagana jest nazwa!"
+    name_too_long: "Nazwa jest zbyt długa"
+    name_too_long_error: "Nazwa jest zbyt długa"
     never_drop: 
       remove_rule: "Usuń regułę"
     never_drop_collection: 
@@ -1923,12 +2005,14 @@ pl:
         remind: "Przypomnij użytkownikowi %{assessor} o zadaniu; data ostatniego przypomnienia %{time}"
         reminder: "Przypomnij użytkownikowi %{assessor} o zadaniu; data ostatniego przypomnienia %{time}"
     peer_reviews_selector: 
+      how_to_peer_review: "Jak przypisać recenzje uczestnikom"
       labels: 
         automatically_assign_peer_reviews: "Automatycznie przypisz recenzję drugiego uczestnika"
         manually_assign_peer_reviews: "Ręcznie przypisz recenzję drugiego uczestnika"
         require_peer_reviews: "Wymagaj recenzji drugiego uczestnika"
       locked_until: "Przypisz recenzje"
       peer_reviews_assign_at_explanation: "Musi to być data późniejsza niż termin dostarczenia. Jeśli pole jest puste, używany jest termin dostarczenia."
+      peer_reviews_header: "Recenzje uczestników"
       reviews_per_user: "Liczba recenzji na jednego uczestnika"
     points_possible_number: "Możliwe punkty do zdobycia muszą być wartością liczbową"
     positive_number: "Należy wpisać liczbę dodatnią"
@@ -2012,17 +2096,19 @@ pl:
       advanced_turnitin_settings: "Ustawienia zaawansowane programu Turnitin"
       descriptions: 
         allowed_extensions: "Wprowadź listę dozwolonych rozszerzeń, na przykład: .doc, .xls, .txt"
+      external_tool_options: "Opcje narzędzi zewnętrznych"
       label: 
         external_tool_new_tab: "Załaduj to narzędzie w nowej karcie"
         external_tool_url: "Adres URL narzędzia zewnętrznego"
         turnitin_enabled: "Aktywuj przesłanie zadań narzędziami usługi Turnitin"
       labels: 
-        allow_file_uploads: "Zezwalaj na przekazywanie plików"
-        allow_media_recordings: "Akceptuj nagrania multimedialne"
-        allow_text_entry: "Akceptuj wpisy"
-        allow_url: "Akceptuj adresy URL witryn"
+        allow_file_uploads: "Przekazywanie plików"
+        allow_media_recordings: "Nagrania multimedialne"
+        allow_text_entry: "Hasło tekstowe"
+        allow_url: "Adres URL witryny"
         allowed_extensions: "Dozwolone rozszerzenia plików"
         restrict_file_extensions: "Ogranicz typy przekazywania plików"
+      online_entry_options: "Opcje wejścia online"
       submission_type: "Typ przesłanego zadania"
       submission_types: 
         external_tool: "Narzędzie zewnętrzne"
@@ -2140,9 +2226,12 @@ pl:
         wizard: 
           details: "Tworzenie zadania obejmuje znacznie więcej niż podanie terminów oddania i liczby punktów. Jeśli chcesz zamieścić opis zadania, umożliwić przekazywanie plików, zmienić sposób oceniania lub zmodyfikować zadanie w inny sposób, kliknij nazwę zadania lub ikonę %{edit_icon}, a następnie wybierz pozycję \"więcej opcji\"."
           group: 
+            screenreader_step1: "Podział na grupy zadań stosuje się, aby usprawnić organizację zadań. Wystarczy przypisać nazwę każdej grupie. Wyważenie oceny końcowej na podstawie grup pozwala również określić wartość procentową wyników punktowych dla każdej grupy. Kliknij opcję \"Dodaj grupę zadań\", aby utworzyć grupę."
             step1: "Podział na grupy zadań stosuje się, aby usprawnić organizację zadań. Wystarczy przypisać nazwę każdej grupie. Wyważenie oceny końcowej na podstawie grup (*gdzie?*) pozwala również określić wartość procentową wyników punktowych dla każdej grupy. Kliknij opcję \"Dodaj grupę zadań\", aby utworzyć grupę."
           overview: "Na tej stronie można skonfigurować zaawansowane ustawienia kursu. Można dodawać zadania, grupować je, a następnie ważyć grupy. Założeniem jest tu w pierwszej kolejności dobra organizacja, a następnie przejście do ustawień zaawansowanych. Z tego poziomu można jednak wiele zrobić."
           quizzes: "Testy to specjalne typy zadań. Testy można tworzyć lub importować, klikając łącze \"Testy\" znajdujące się w pasku po lewej stronie."
+          screenreader_details: "Tworzenie zadania obejmuje znacznie więcej niż podanie terminów oddania i liczby punktów. Jeśli chcesz zamieścić opis zadania, umożliwić przekazywanie plików, zmienić sposób oceniania lub zmodyfikować zadanie w inny sposób, kliknij nazwę zadania lub ikonę edytowania, a następnie wybierz pozycję \"więcej opcji\"."
+          screenreader_step1: "Zadania są zawsze uporządkowane w grupach, dlatego, aby dodać zadanie, należy najpierw zdecydować, w której grupie je umieścić. Wybierz grupę i kliknij pozycję \"Dodaj zadanie do\" lub kliknij ikonę dodawania, aby przypisać zadanie do grupy."
           step1: "Zadania są zawsze uporządkowane w grupach, dlatego, aby dodać zadanie, należy najpierw zdecydować, w której grupie je umieścić. Wybierz grupę i kliknij pozycję \"Dodaj zadanie do\" lub kliknij ikonę %{add_icon}, aby przypisać zadanie do grupy."
           step2: "Dobrze! Teraz podaj wszystkie szczegółowe informacje. Możesz podać nazwę zadania, termin dostarczenia oraz liczbę możliwych do uzyskania punktów. Konfiguracja zaawansowanych ustawień jest możliwa po utworzeniu zadania."
           step3: "Gotowe! Zadanie zostało dodane do grupy! Po ustawieniu kursora na zadaniu wyświetlą się dostępne opcje. Oto ich znaczenie:"
@@ -2151,6 +2240,9 @@ pl:
         create_assignment_group: "Utwórz grupę zadań"
         create_or_import_quiz: "Utwórz/zaimportuj test"
         edit_assignment_in_detail: "Edytuj szczegóły zadań"
+        screenreader_show_me_add_assignment: "Poprowadź do przycisku Dodaj zadanie"
+        screenreader_show_me_add_assignment_group: "Poprowadź do przycisku Dodaj grupę zadań"
+        screenreader_show_me_weight_final_grade: "Poprowadź do pola wyboru Wyważ ocenę końcową"
         show_me_where: "Pokaż, gdzie"
       subtitles: 
         edit_assignment_in_detail: "(zezwalaj na przekazywanie, edytuj opis itd.)"
@@ -3091,21 +3183,27 @@ pl:
     upload_timeout_error: "Proces przekazywania pliku przekroczył limit."
   content_migrations: 
     angel_exporter: 
+      content: Zawartość
       options: Opcje
     bad_migration_type: "Nieprawidłowy typ_migracji"
     blackboard_export: 
+      content: Zawartość
       options: Opcje
     canvas_export: 
+      content: Zawartość
       options: Opcje
     common_cartridge: 
+      content: Zawartość
       options: Opcje
     content_migration: "Migracja zawartości"
     content_migration_issue: 
       error_report: "Raport o błędzie"
     copy_course: 
+      content: Zawartość
       options: Opcje
     course_list_error: "Nie można przywrócić kursów. Czy jesteś podłączony do Internetu?"
     d2_l_export: 
+      content: Zawartość
       options: Opcje
     file_required: "Należy wybrać plik, z którego zaimportujesz zawartość"
     file_too_large: "Migracja nie może przekroczyć %{file_size} "
@@ -3121,6 +3219,7 @@ pl:
       import_from_label: "Typ zawartości"
       import_migration: Importuj
     moodle_zip: 
+      content: Zawartość
       options: Opcje
     must_upload_file: "Przekazywanie pliku lub adresu url jest wymagane"
     no_content_selected: "Nie wybrano zawartości do zaimportowania."
@@ -3141,6 +3240,7 @@ pl:
     select_content: 
       cancel_btn: Anuluj
       select_content_btn: "Wybierz zawartość"
+      select_content_label: "Wybierz treść, użyj strzałek do góry i w dół w celu nawigacji po drzewie. Naciśnij prawy przycisk, aby rozwinąć foldery, natomiast lewy w celu ich zwinięcia."
     select_course: "Wybierz kurs"
     show_issues: "Pokaż zagadnienia"
     subviews: 
@@ -3195,7 +3295,8 @@ pl:
         question_bank_title: "Nowa nazwa banku pytań"
         select_question_bank: "Wybierz bank pytań"
       select_content_checkbox: 
-        select_migration_label: "Wybierz zawartość migracji"
+        select_all_content: "Cała zawartość"
+        select_specific_content: "Wybierz określoną treść"
     upload_warning: "Przejście do innej strony spowoduje anulowanie procesu aktualizacji."
     uploading: "Trwa przekazywanie..."
     web_ct: 
@@ -3279,8 +3380,9 @@ pl:
         conclude_student: "Czy na pewno chcesz zaakceptować zapisy tego uczestnika?"
         delete_enrollment: "Czy na pewno chcesz usunąć zapisy tego uczestnika?"
       enrolled_as: "Zapisany jako %{enrollment_type}"
-      enrollment_change_failed: "Zmiana przywileju zapisów nie powiodła się, ponów próbę"
       enrollment_linked_to: "połączony z użytkownikiem %{linked_user}"
+      error: 
+        enrollment_change_failed: "Zmiana przywileju zapisów nie powiodła się, ponów próbę"
       labels: 
         user_privileges: Przywileje
       legends: 
@@ -3585,10 +3687,10 @@ pl:
         description: 
           delete: "Usuń bieżący moduł/element"
           edit: "Edytuj moduł/element"
-          indent: "Umieść wcięcie w bieżącym elemencie"
+          indent: "Zwiększ wcięcie"
           new: "Nowy moduł"
           next: "Następny moduł/element"
-          outdent: "Usuń wcięcie w bieżącym elemencie"
+          outdent: "Zmniejsz wcięcie"
           previous: "Poprzedni moduł/element"
       keycode_descriptions: 
         next_module_item: "Wybierz następny moduł lub element modułu"
@@ -3740,10 +3842,10 @@ pl:
       links: 
         edit_item: "Edytuj szczegółowe informacje dot. elementu"
         edit_item_details_label: "Edytuj szczegółowe informacje dot. elementu"
-        indent: "Umieść wcięcie dla tego elementu"
-        indent_label: "Umieść wcięcie dla tego elementu"
-        outdent: "Usuń wcięcie dla tego elementu"
-        outdent_label: "Usuń wcięcie dla tego elementu"
+        indent: "Zwiększ wcięcie"
+        indent_label: "Zwiększ wcięcie"
+        outdent: "Zmniejsz wcięcie"
+        outdent_label: "Zmniejsz wcięcie"
         remove_item: "Usuń element z modułu"
         remove_item_label: "Usuń element z modułu"
       max_score: 
@@ -3781,10 +3883,10 @@ pl:
       links: 
         edit_item: Edytuj
         edit_item_details: "Edytuj szczegółowe informacje dot. elementu"
-        indent: "Umieść wcięcie"
-        indent_item: "Umieść wcięcie dla tego elementu"
+        indent: "Zwiększ wcięcie"
+        indent_item: "Zwiększ wcięcie"
         outdent: "Zmniejsz wcięcie"
-        outdent_item: "Usuń wcięcie dla tego elementu"
+        outdent_item: "Zmniejsz wcięcie"
         remove_item: Usuń
         remove_item_from_module: "Usuń element z modułu"
       max_score: 
@@ -3844,7 +3946,7 @@ pl:
     no_course: "Brak kursu"
     select_course: "Wybierz kurs"
   conversation_message: 
-    subject: "Prywatna wiadomość, %{timestamp}"
+    subject_specified: "Prywatna wiadomość: %{subject}"
     users_added: 
       few: "%{list_of_users} zostali dodani do konwersacji przez %{current_user}"
       one: "%{list_of_users} został dodany do konwersacji przez %{current_user}"
@@ -3941,7 +4043,6 @@ pl:
       inbox_view: WIDOK
       inbox_views: 
         archived_messages: "Dodano do archiwum"
-        discussion_replies: "Odpowiedzi do dyskusji"
         inbox: "Skrzynka odbiorcza"
         sent_messages: Wysłana
         starred_messages: Oznaczona
@@ -3979,6 +4080,7 @@ pl:
       forward: Przekaż
       help: Pomoc
       inbox: "Skrzynka odbiorcza"
+      mark_as_read: "Oznacz jako przeczytane"
       mark_as_unread: "Oznacz jako nieprzeczytane"
       more_options: "Więcej opcji"
       reply: Odpowiedz
@@ -4174,6 +4276,7 @@ pl:
     default_short_name: Kurs-101
     errors: 
       sis_in_use: "Identyfikator SIS \"%{sis_id}\" jest już używany"
+    failed_import_media_objects: "Import obiektów multimedialnych zakończony niepowodzeniem"
     file_copy_error: "Nie można skopiować pliku o nazwie \"%{name}\""
     grade_export_types: 
       instructure_csv: "Plik .csv formatowany w systemie Instructure"
@@ -4249,6 +4352,62 @@ pl:
     wrapper: 
       close_course_menu_title: zamknij
       reset_course_menu: Resetuj
+  course_logging: 
+    event_type: 
+      concluded: Ukończone
+      created: Utworzono
+      updated: Zaktualizowane
+    field_label: 
+      abstract_course_id: "Identyfikator tematu kursu"
+      account_id: "Identyfikator konta"
+      allow_student_discussion_editing: "Akceptuj edytowanie dyskusji przez uczestników"
+      allow_student_discussion_topics: "Akceptuj tematy dyskusji uczestników"
+      allow_student_forum_attachments: "Akceptuj załączniki forum uczestników"
+      allow_student_organized_groups: "Akceptuj zorganizowane grupy uczestników"
+      allow_student_wiki_edits: "Akceptuj edycję stron Wiki uczestników"
+      allow_wiki_comments: "Akceptuj komentarze strony Wiki"
+      conclude_at: "Zakończono o"
+      course_code: "Kod kursu"
+      created_at: "Utworzono o"
+      default_view: "Widok domyślny"
+      default_wiki_editing_roles: "Domyślne role edytowania stron Wiki"
+      enrollment_term_id: "Identyfikator terminu zapisów"
+      grading_standard_id: "Identyfikator standardów oceniania"
+      group_weighting_scheme: "Schemat ważenia grup"
+      hide_distribution_graphs: "Nie pokazuj wykresów przydziału"
+      hide_final_grade: "Nie pokazuj oceny końcowej"
+      indexed: Indeksowane
+      integration_id: "Identyfikator integracji"
+      is_public: "jest opublicznione"
+      large_roster: "Duża lista"
+      license: Licencja
+      locale: "Ustawienia regionalne"
+      lock_all_announcements: "Zablokuj wszystkie ogłoszenia"
+      name: Nazwa
+      old_account_id: "Identyfikator starego konta"
+      open_enrollment: "Otwórz zapisy"
+      public_description: "Opis publiczny"
+      public_syllabus: "Program kursu, publiczny"
+      replacement_course_id: "Identyfikator kursu zastępczego"
+      restrict_enrollments_to_course_dates: "Ogranicz zapisy do dat kursu"
+      root_account_id: "Identyfikator konta źródłowego"
+      self_enrollment: "Samodzielne zapisy"
+      self_enrollment_code: "Kod samodzielnych zapisów"
+      self_enrollment_limit: "Ograniczenia dotyczące samodzielnych zapisów"
+      show_all_discussion_entries: "Wyświetl wszystkie wpisy do dyskusji"
+      show_public_context_messages: "Wyświetl publiczną wiadomość kontekstu"
+      sis_batch_id: "Identyfikator elementu wsadowego SIS"
+      sis_source_id: "Identyfikator danych źródłowych SIS"
+      start_at: "Rozpoczęto o"
+      storage_quota: "Przydział magazynowania"
+      syllabus_body: "treść_programu kursu"
+      tab_configuration: "Konfiguracja karty"
+      template_course_id: "Identyfikator szablonu kursu"
+      turnitin_comments: "Komentarze programu Turnitin"
+      updated_at: "Zaktualizowano o"
+      uuid: UUID
+      wiki_id: "Identyfikator strony Wiki"
+      workflow_state: "Stan pracy"
   course_restore: 
     restore_error: "Wystąpił błąd podczas próby przywracania kursu. Kurs nie został przywrócony."
   course_search: 
@@ -4289,7 +4448,7 @@ pl:
     invitation_sent_now: "Tylko teraz"
     link_students_placeholder: "Wprowadź nazwę uczestnika"
     links: 
-      less_options: "mniej opcji"
+      fewer_options: "mniej opcji"
       more_options: "więcej opcji"
       publish: "Publikuj stopnie w systemie SIS"
       publishing: "Trwa publikowanie stopni w systemie SIS..."
@@ -4353,14 +4512,16 @@ pl:
     copy: 
       buttons: 
         create_course: "Utwórz kurs"
-      choose_content: "Wybierz elementy do skopiowania"
       conclude_at: "Data zakończenia"
+      content_label: Zawartość
       course_code: "Kod kursu"
       details: "Wprowadź poniżej szczegółowe informacje, aby rozpocząć tworzenie kursu."
       enrollment_term_id: Termin
       headings: 
         copy_course: "Kopiuj %{course}"
       name: Nazwa
+      select_all_content: "Cała zawartość"
+      select_specific_content: "Wybierz określoną treść"
       start_at: "Data rozpoczęcia"
       titles: 
         copy_course: "Kopiuj kurs"
@@ -4574,6 +4735,7 @@ pl:
         pending_acceptance_of_invitation: oczekujące
       roster_users: 
         canvas_user_id: "Identyfikator użytkownika systemu Canvas"
+        last_activity: "Ostatnia aktywność"
         login_name_or_sis_id: "Identyfikator logowania / SIS"
         name: Nazwa
         no_people_found: "Nie znaleziono osób"
@@ -5196,6 +5358,10 @@ pl:
     cancel: Anuluj
     save_settings: "Zapisz ustawienia"
     saving: "Trwa zapisywanie..."
+  differentiated_assignments_description: |-
+      Zadania zróżnicowane stanowią funkcję *beta* umożliwiającą wybranie jednej sekcji (lub kilku), do której odnosi się zadanie.
+      Sekcje, do których nie przydzielono zadania nie będą wyświetlały go w zawartości kursu, a ich końcowa ocena będzie
+      obliczona bez tych punktów.
   discussion_entries: 
     created_entry_notice: "Wpis został pomyślnie utworzony."
     deleted_entry_notice: "Wpis został usunięty."
@@ -5240,9 +5406,10 @@ pl:
       close_for_comments: "Temat zablokowany"
       delete: Usuń
       due: "Termin dostarczenia"
-      graded_discussion: "Oceniana dyskusja"
+      graded_discussion: "Oceniana dyskusja:"
       last_post_date: "Ostatni wpis %{display_last_reply_at} "
       manage: Zarządzaj
+      move: "Przenieś do To&hellip;"
       no_due_date: "Brak terminu dostarczenia"
       open_to_comments: "Można dodawać komentarze"
       pin: Przypnij
@@ -5252,8 +5419,8 @@ pl:
     discussion_feed_title: "Kanał informacyjny dyskusji %{title}"
     discussion_list: 
       no_pinned_discussions: "Nie masz obecnie przypiętych dyskusji"
-      pinned_instructions: "Przeciągnij dyskusję tutaj, aby ją przypiąć do górnej strony dyskusji uczestników."
-      there_are_no_discussions_show: "Brak dyskusji do wyświetlenia."
+      pinned_instructions: "Aby przypiąć dyskusję na górną część strony, przeciągnij ją tutaj lub wybierz polecenie Przypnij z menu Ustawienia dyskusji."
+      there_are_no_discussions_show: "Brak dyskusji do wyświetlenia w tej części."
     discussions_settings_view: 
       allow_student_discussion_editing: "Edytuj lub usuwaj ich posty"
       allow_student_topics: "Utwórz tematy dyskusji"
@@ -5328,13 +5495,13 @@ pl:
       your_search_did_not_match_any_discussion_topics: "Wyszukiwanie nie odpowiada tematom dyskusji."
     new_and_total_badge: 
       reply_count_tooltip: 
-        one: "1 odpowiedź"
-        other: "%{count} odpowiedzi"
-        zero: "Brak odpowiedzi"
+        one: "1 odpowiedź."
+        other: "%{count} odpowiedzi."
+        zero: "Brak odpowiedzi."
       unread_count_tooltip: 
-        one: "%{count} nieprzeczytanych odpowiedzi"
-        other: "%{count} nieprzeczytanych odpowiedzi"
-        zero: "Brak nieprzeczytanych odpowiedzi"
+        one: "%{count} nieprzeczytanych odpowiedzi."
+        other: "%{count} nieprzeczytanych odpowiedzi."
+        zero: "Brak nieprzeczytanych odpowiedzi."
     page_nav: 
       Page: Strona
       current_page: Bieżące
@@ -5342,9 +5509,9 @@ pl:
       last_page: Ostatnia
     points_possible_number: "Możliwe punkty do zdobycia muszą być wartością liczbową"
     reply_count_tooltip: 
-      one: "1 odpowiedź"
-      other: "%{count} odpowiedzi"
-      zero: "Brak odpowiedzi"
+      one: "1 odpowiedź."
+      other: "%{count} odpowiedzi."
+      zero: "Brak odpowiedzi."
     show: 
       add_rubric: "Dodaj kryteria ocen"
       announcement_closed: "Tego ogłoszenia nie można komentować"
@@ -5402,9 +5569,9 @@ pl:
       topic_podcast_feed: "Kanał informacyjny Podcast dot. tematu"
     topic_deleted_notice: "%{topic_title} usunięto z powodzeniem"
     unread_count_tooltip: 
-      one: "1 nieprzeczytana odpowiedź"
-      other: "%{count} nieprzeczytanych odpowiedzi"
-      zero: "Brak nieprzeczytanych odpowiedzi"
+      one: "1 nieprzeczytana odpowiedź."
+      other: "%{count} nieprzeczytanych odpowiedzi."
+      zero: "Brak nieprzeczytanych odpowiedzi."
     user_settings_view: 
       manually_mark_as_read: "Ręcznie oznacz posty jako przeczytane"
       my_settings: "Moje ustawienia"
@@ -5434,7 +5601,6 @@ pl:
       show_more: "Pokaż więcej"
     hide_due_dates: "Ukryj terminy dostarczenia"
     initial_post_required_to_subscribe: "Należy wysłać odpowiedź przed dokonaniem subskrypcji"
-    lock: Zablokuj
     mark_as_read: "Oznacz jako przeczytane"
     mark_as_unread: "Oznacz jako nieprzeczytane"
     no_content: "Brak zawartości"
@@ -5447,7 +5613,6 @@ pl:
     ordered_by_recent_activity: "Kolejność wg ostatniej aktywności"
     participant: 
       anonymous_user: Anonimowy
-    pin: Przypnij
     pinned_discussions: "Przypięte dyskusje"
     reply: 
       error_saving_reply: "*Wystąpił błąd*, wyślij odpowiedź jeszcze raz później"
@@ -5471,15 +5636,17 @@ pl:
     subscribe: "Subskrybuj do tego tematu"
     subscribed: Subskrybowane
     subscribed_hint: "Dokonano subskrypcji do tego tematu. Kliknij, aby anulować subskrypcję."
-    toggle_message: "przełącz widoczność dyskusji"
+    toggle_message: "przełącz widoczność sekcji"
     uknown_author: "Nieznany autor"
     unknown: Nieznany
     unknown_author: "Nieznany autor"
-    unlock: Odblokuj
-    unpin: Odepnij
     unsubscribe: "Anuluj subskrypcję do tego tematu"
     unsubscribed: "Brak subskrypcji"
     unsubscribed_hint: "Uczestnik nie ma subskrypcji do tego tematu. Kliknij, aby subskrybować."
+  draft_state: 
+    cant_unpublish_when_students_submit: "Nie można cofnąć publikowania, jeśli znajdują się przesłane zadania uczestnika"
+    publish: Publikuj
+    unpublish: "Cofnij publikowanie"
   draft_state_description: |-
       Ta funkcja beta uwzględnia ponowne zaprojektowanie wielu elementów systemu Canvas i umożliwia przechowywanie treści w
       nowym nieopublikowanym stanie, która będzie niewidoczna dla uczestników i nie będzie miała wpływu
@@ -5556,7 +5723,7 @@ pl:
     titles: 
       font_size: "Rozmiar czcionki; naciskaj do dołu, aby wybrać"
       formatting: "Formatowanie; naciskaj do dołu, aby wybrać"
-      rte_help: "Wzbogacony obszar teksu. Naciśnij ALT F10, aby przejść do paska narzędzi. Naciśnij ALT 0, aby przejść do pomocy."
+      rte_help: "Wzbogacony obszar tekstu. Naciśnij ALT F10, aby przejść do paska narzędzi. Naciśnij ALT F8, aby przejść do pomocy."
   email: 
     default_from_name: "Instructure Canvas"
   enrollment: 
@@ -5872,6 +6039,7 @@ pl:
     registration_incomplete: "Musisz potwierdzić adres email zanim będziesz mógł przeglądać tę stronę."
     required: Wymagany
     sis_id_in_use: "Identyfikator SIS \"%{sis_id}\" jest już używany"
+    unsaved_changes: "Nie zapisano wszystkich zmian."
   external_content: 
     cancel: 
       canceling: "Trwa anulowanie..."
@@ -6064,6 +6232,7 @@ pl:
       feature_options: "Opcje funkcji"
       no_features_available: "Obecnie nie są dostępne żadne funkcje."
   features: 
+    differentiated_assignments: "Zadania zróżnicowane"
     draft_state: "Wersja robocza"
     draft_state_account_disable_warning: "Wyłączenie tej funkcji będzie miało wpływ na istniejące kursy. Aby uzyskać pomoc podczas wyłączania tej funkcji, skontaktuj się z:\n\
         Canvas Success Manager. "
@@ -6071,8 +6240,9 @@ pl:
         Wyłączenie tej funkcji spowoduje opublikowanie WSZYSTKICH obiektów w kursie. Sprawdź, czy wersja robocza
         jest gotowa do opublikowania i dostępna dla wszystkich użytkowników kursu przed kontynuacją.
     google_docs_domain_restriction: "Ograniczenie domeny Google Docs"
+    individual_gradebook: "Podgląd indywidualnego dzienniczka"
     outcome_gradebook: "Dzienniczek wyników"
-    screenreader_gradebook: "Dzienniczek czytnika ekranu"
+    student_outcome_gradebook: "Dzienniczek wyników uczestnika"
   file_browser_view: 
     folder_tree_instructions: "Użyj strzałek do góry i w dół w celu nawigacji po drzewie. Naciśnij prawy przycisk, aby rozwinąć foldery, lewy w celu ich zwinięcia lub klawisz enter, aby wybrać obraz."
   filebrowserview: 
@@ -6463,6 +6633,7 @@ pl:
     no_assignments_have_points_warning: "Wynik będzie można obliczyć, gdy zadanie będzie miało przydzielone punkty"
     notes: Uwagi
     outcome_gradebook: 
+      export_report: "eksportuj raport"
       toggle_sidebar: "Przełącz pasek boczny"
     outcome_popover: 
       mastery_set_at: "Biegłość ustawiono na"
@@ -6494,6 +6665,7 @@ pl:
       set_group_weights: "Ustaw wyważanie grup"
       show_attendance_columns: "Pokaż kolumny obecności"
       show_concluded_enrollments: "Pokaż zaakceptowane zapisy"
+      srgb_gradebook: "przełączaj dzienniczki"
       upload_scores: "Przekaż wyniki punktowe (z .csv)"
       view_grading_history: "Wyświetl historię oceniania"
     show_notes: "Pokaż kolumnę uwag"
@@ -6582,6 +6754,7 @@ pl:
     leaving_id_will_match_better_can_add_new_assignment: "Pozostawienie identyfikatora w niezmienionej formie (część \"(581)\" w tym przypadku) ułatwi lepsze dopasowanie. Możesz również dodać nowe zadania, które zostaną utworzone w razie potrzeby."
     new_assignment_example: "Nowe zadanie"
     optional_ignored: "Opcjonalne, pominięte."
+    screenreader_csv_explainer: "Co powinno znajdować się w pliku CSV? Plik powinien zawierać następujące kolumny: „Uczestnik”, „Identyfikator”, „Istniejące zadanie (#)”. W kolumnie Uczestnik należy podać nazwę każdego uczestnika — najpierw nazwisko, następnie imię, np. „Kowalski, Jan”. W kolumnach Istniejące zadania należy wpisać nazwę zadania, a następnie Identyfikator zadania w okrągłym nawiasie, np. „Zadania do rozdziału pierwszego (201)”. Jeśli korzystasz z danych SIS, uwzględnij następujące kolumny: „Identyfikator użytkownika SIS” oraz „Identyfikator loginu SIS”. Jeśli chcesz utworzyć nowe zadanie, uwzględnij kolumnę z nazwą zadania, np. „Zapożyczone zadania”. Następujące kolumny są opcjonalne: „Sekcja”, „Bieżący wynik”, „Końcowy wynik”."
     titles: 
       upload_form: "Wybierz plik CSV, który chcesz przekazać"
     what_should_csv_look_like: "Jak powinien wyglądać plik CSV?"
@@ -6636,6 +6809,7 @@ pl:
       muted: Ukryte
     grade_summary: 
       assessment_by: "Zadanie użytkownika %{name}"
+      assignments: Zadania
       buttons: 
         show_what_if: "Pokaż zapisane wyniki \"hipotetyczne\""
       change_score_instructions: "Kliknij dowolny wynik punktowy i wprowadź nową wartość, aby zobaczyć, jak zmiana wpłynie na wynik łączny."
@@ -6673,6 +6847,7 @@ pl:
         only_graded: "Oblicz bazując tylko na ocenionych zadaniach"
         total: Łącznie
         your_score: "Twój wynik"
+      learning_outcomes: "Nauka poziomu biegłości"
       links: 
         click_to_view: "kliknij tutaj, aby wyświetlić"
         download: "Pobierz %{attachment}"
@@ -6734,7 +6909,7 @@ pl:
         send_comment: "Wyślij komentarz do uczestnika"
         sort_columns: "Sortuj kolumny w dzienniczku"
         sort_rows: "Sortuj wiersze w dzienniczku"
-        total_submitted: "Łączna liczba przesłanych"
+        total_grade_subs: "Łącznie ocenionych zadań"
       links: 
         add_assignments: "Dodaj zadania do kursu"
         add_students: "Dodaj uczestników do kursu"
@@ -6896,7 +7071,6 @@ pl:
       titles: 
         download_file: "Pobierz ten plik"
         not_newest: "użyj rozwijanego menu znajdującego się powyżej, aby zmienić przesłane zadanie, które chcesz przeglądać"
-        on_time: "Przesłano w terminie"
         preview_file: "Pokaż podgląd tego pliku"
         speedgrader_options: "Opcje programu Speedgrader"
       tooltips: 
@@ -6963,6 +7137,7 @@ pl:
     grade_incomplete: Niekompletne
     grade_ungraded: Nieocenione
     out_of: "(na %{points} możliwych)"
+    out_of_nil: "Brak możliwych punktów"
     out_of_with_score: "(%{score} na %{points} możliwych)"
   grading_standard: 
     unknown_grading_details: "Nieznane informacje szczegółowe"
@@ -7019,6 +7194,7 @@ pl:
     name_too_long: "Wprowadź krótszą nazwę kategorii"
     name_unavailable: "%{name} jest już w użyciu."
     self_signup_for_courses: "Samodzielny zapis może być jedynie włączony w przypadku grup kursu lub społeczności"
+  group_category_locked: "Nie można zmienić kategorii grupy, ponieważ uczestnicy przesłali już zadanie"
   group_membership: 
     errors: 
       group_full: "Grupa jest pełna."
@@ -7401,6 +7577,7 @@ pl:
     invalid_file_size: "Rozmiar pliku z obrazem jest zbyt duży (maks. %{max} bajtów, wynosi %{actual})"
     invalid_file_type: "Nieprawidłowy typ pliku %{type}. Dozwolone typy uwzględniają: %{type_list}"
     not_an_image: "Wybrany plik nie jest obrazem"
+  individual_gradebook_description: "Podgląd indywidualnego dzienniczka zapewnia podgląd dzienniczka, który został stworzony w celu ułatwienia dostępu."
   info: 
     notices: 
       error_reported: "Dziękujemy za poświęcony czas!  Zajmiemy się tym"
@@ -7686,7 +7863,7 @@ pl:
     en: Angielski
     pl: Polski
   logged_out_user: "Użytkownik wylogowany %{user_counter}"
-  m2c_file_description: " Moodle 1.9 plik .zip"
+  m2c_file_description: " Moodle 1.9/2.x"
   m2c_name: "Importer Moodle "
   manage_avatars: 
     errors: 
@@ -7721,6 +7898,8 @@ pl:
       save_failed: "Zapisywanie nie powiodło się.  Zamknij to okno i spróbuj ponownie."
       save_failed_try_again: "Zapisywanie wprowadzonych danych nie powiodło się.  Spróbuj ponownie."
       upload_failed: "Przekazywanie nie powiodło się z powodu błędu:"
+    file_size_error: "Rozmiar pliku %{file} jest większy od maksymalnego rozmiaru pliku, który wynosi %{max}."
+    file_type_error: "Plik %{file} nie jest akceptowalnym plikiem %{type}."
     links: 
       minimize_embedded_kaltura_content: "Minimalizuj zawartość osadzoną"
     loading: "Trwa ładowanie multimediów..."
@@ -8527,10 +8706,10 @@ pl:
           audio_comment: "Wiadomość zawiera komentarze multimedialne. Aby przesłuchać zawartość lub odpowiedzieć na wiadomość, kliknij poniższe łącze:"
           body: "Użytkownik %{user_name} właśnie przesłał Ci wiadomość za pośrednictwem systemu Canvas:"
           download: pobieranie
-          reply_message: "Aby na nią odpowiedzieć, kliknij poniższe łącze:"
+          reply_to_conversation_message: "Na tę wiadomość w systemie Canvas można odpowiedzieć, odpowiadając bezpośrednio na tego e-maila."
           subject: "Użytkownik %{user_name} właśnie przesłał Ci wiadomość za pośrednictwem systemu Canvas."
           unknown_user: "Nieznany użytkownik"
-        reply_message: "Aby na nią odpowiedzieć, kliknij poniższe łącze:"
+        reply_to_conversation_message: "Na tę wiadomość w systemie Canvas można odpowiedzieć, odpowiadając bezpośrednio na tego e-maila."
         subject: "Użytkownik %{user_name} właśnie przesłał Ci wiadomość za pośrednictwem systemu Canvas."
         unknown_user: "Nieznany użytkownik"
       facebook: 
@@ -9150,10 +9329,10 @@ pl:
     new_discussion_entry: 
       email: 
         body: "Użytkownik %{user} opublikował nowy komentarz w wątku %{discussion_topic} dla kursu %{course}:"
-        details: "Tutaj można przyłączyć się do rozmowy:"
+        discussion_entry_reply_message: "Przyłącz się do rozmowy za pomocą poniższego łącza lub dodaj komentarz, odpowiadając na tę wiadomość."
         html: 
           body: "Użytkownik %{user} opublikował nowy komentarz w wątku %{discussion_topic} dla kursu %{course}:"
-          details: "Kliknij tutaj, aby przyłączyć się do rozmowy"
+          discussion_entry_link_message: "[Kliknij tutaj, aby przyłączyć się do rozmowy](%{url}) lub skomentuj, odpowiadając na tę wiadomość."
           subject: "Nowy komentarz w temacie %{discussion_topic}: %{course}"
         subject: "Nowy komentarz w temacie %{discussion_topic}: %{course}"
       facebook: 
@@ -9453,9 +9632,9 @@ pl:
         body: "Autor %{author} właśnie dodał komentarz dotyczący dostarczonego przez użytkownika %{user} zadania %{assignment}"
         html: 
           body: "Autor %{author} właśnie dodał komentarz dotyczący dostarczonego przez użytkownika %{user} zadania %{assignment}"
-          link_message: "Szczegółowe informacje na temat dostarczonego zadania można zobaczyć tutaj:"
           someone: Gość
           subject: "Komentarz do przesłanego zadania: %{user}, %{assignment}, %{context}"
+          submission_comment_link_message: "Szczegółowe informacje na temat dostarczonego zadania można uzyskać, klikając poniższe łącze; komentarz można dodać, odpowiadając na tę wiadomość."
         link_message: "Szczegółowe informacje na temat dostarczonego zadania można zobaczyć tutaj:"
         someone: Gość
         subject: "Komentarz do przesłanego zadania: %{user}, %{assignment}, %{context}"
@@ -9479,9 +9658,9 @@ pl:
           link_message: "Szczegółowe informacje na temat dostarczonego zadania można zobaczyć tutaj:"
           someone: Gość
           subject: "Komentarz do przesłanego zadania: %{user}, %{assignment}, %{context}"
-        link_message: "Szczegółowe informacje na temat dostarczonego zadania można zobaczyć tutaj:"
         someone: Gość
         subject: "Komentarz do przesłanego zadania: %{user}, %{assignment}, %{context}"
+        submission_comment_link_message: "Szczegółowe informacje na temat dostarczonego zadania można uzyskać, klikając poniższe łącze; komentarz można dodać, odpowiadając na tę wiadomość."
       facebook: 
         body: "*Autor %{author}* właśnie dodał komentarz dotyczący dostarczonego przez użytkownika **%{user} zadania %{assignment}**."
         someone: Gość
@@ -9985,6 +10164,10 @@ pl:
     invalid_file: "Nieprawidłowy plik grupy wyników"
   outcome_groups_api: 
     account_group_description: "Grupa wyników na poziomie kont."
+  outcome_path_mastery_points: "Liczba punktów biegłości: %{path}"
+  outcome_path_result: "%{path} wynik"
+  outcome_results: 
+    outcomes_filename: Wyniki
   outcomes: 
     account_standards: "Standardy konta"
     account_standards_description: "Po lewej stronie można przejrzeć standardy, które przypisała Ci instytucja w celu korzystania z nich  na kursach."
@@ -10227,14 +10410,6 @@ pl:
       description: "Wymagany jest dostęp do wersji systemu Dim Dim."
       labels: 
         domain: Domena
-    embedly: 
-      description: "Pobierz informacje Embedly dotyczące Kolekcji"
-      name: "Integracja Embedly "
-    embedly_settings: 
-      description: "Ta wtyczka integruje się z serwisem Embedly w celu wypełnienia informacji dotyczących elementów kolekcji. Plan płatny zwraca dodatkowe informacje w porównaniu z planem bezpłatnym: możesz wybierać z wielu obrazów na stronie a zwróci Ci wbudowaną informację w postaci podglądu (odtwarzanie filmów youtube itp.)."
-      labels: 
-        api_key: "Klucz API Embedly "
-        plan_type: "Typ planu płatności Embedly "
     error_reporting: 
       description: "Domyślny mechanizm raportowania błędów"
       name: "Raportowanie błędów"
@@ -10367,6 +10542,7 @@ pl:
         domain_settings: "Ustawienia domeny"
         misc_settings: "Różne ustawienia"
         ui_conf_ids: "Identyfikatory konfiguracji interfejsu użytkownika"
+      hide_rte_button_note: "(w dalszym ciągu do rozmów/programu SpeedGrader/nagrań multimedialnych przesłanych zadań domowych)"
       hints: 
         domain: "Dla kont hostowanych należy wpisać \"www.kaltura.com\""
         resource_domain: "Dla kont hostowanych należy wpisać \"cdn.kaltura.com\""
@@ -10376,8 +10552,9 @@ pl:
       labels: 
         cache_play_list_seconds: "Czas buforowania, podany w sekundach, pamięci podręcznej adresu URL listy odtwarzania "
         do_analytics: "Wyślij analizę"
-        do_flash_var_test: "Włącz próbne ustawienia Flash"
         domain: Domena
+        hide_rte_button: "Ukryj ikonę wideo w Edytorze wzbogaconej zawartości."
+        js_uploader: "Skorzystaj z funkcji przekazywania html5 (dostępnej)"
         kaltura_sis: "Wpisz dane SIS do platformy Kaltura"
         kcw_ui_conf: "Identyfikatory konfiguracji interfejsu użytkownika elementu KCW"
         partner_id: "Identyfikator Partnera"
@@ -10387,6 +10564,7 @@ pl:
         secret_key: "Klucz tajny administratora"
         subpartner_id: "Dodatkowy identyfikator partnera"
         upload_ui_conf: "Identyfikatory konfiguracji interfejsu użytkownika w przekazywarce"
+        use_alt_record_widget: "Skorzystaj z alternatywnego elementu widget nagrywania flash"
         user_secret_key: "Klucz tajny użytkownika"
       ui_conf_ids: "Klienci korzystający z platformy Kaltura mogą poprosić o przesłanie tych identyfikatorów. W przypadku wersji pochodnych wartości te można znaleźć w tabeli ui_confs."
     linked_in: 
@@ -10410,6 +10588,7 @@ pl:
       labels: 
         download_url: "Adres URL w celu pobrania programu LockDown Browser"
         plugin_enabled: Uaktywniony
+        use_lti_tool: "Użyj narzędzia LTI w celu zarządzania ustawieniami testu w programie LockDown Browser (wymagane do monitora)"
     med_cornell_export: 
       labels: 
         password: "Hasło w celu uwierzytelnienia"
@@ -10528,13 +10707,12 @@ pl:
       titles: 
         delete_this_token: "Usuń ten token"
     buttons: 
-      add_file: "Dodaj plik"
-      adding_file: "Trwa dodawanie pliku..."
       generate_token: "Generuj token"
       generating_token: "Trwa generowanie tokenu..."
       regenerate_token: "Ponownie generuj token"
       regenerating_token: "Trwa ponowne generowanie tokenu..."
-      select_image: "Zaznacz obraz"
+      save: Zapisz
+      select_profile_picture: "Wybierz zdjęcie profilu"
       selecting_image: "Trwa zaznaczanie obrazu..."
     communication: 
       confirm_email_instructions: "Zanim będziesz mógł otrzymywać powiadomienia, musisz potwierdzić adres email, (%{email}) klikając na łącze w e-mailu, który otrzymałeś. Jeśli go nie widzisz, *kliknij, aby wysłać ponownie email* i upewnij się, że sprawdziłeś folder ze spamem."
@@ -10557,7 +10735,6 @@ pl:
       default_email_option: "[Wybierz adres e-mail]"
       new_email_option: "Nowy adres e-mail"
     errors: 
-      adding_file_failed: "Dodawanie pliku nie powiodło się"
       confirmation_failed: "Potwierdzenie nie powiodło się. Spróbuj ponownie."
       generating_token_failed: "Generowanie tokenu nie powiodło się"
       invalid_old_passowrd: "Nieprawidłowe stare hasło dla nazwy logowania %{pseudonym}"
@@ -10732,7 +10909,6 @@ pl:
       contact_not_confirmed: "Ten kontakt nie został potwierdzony. Kliknij adres po więcej informacji."
       email_not_confirmed: "Ten email nie został potwierdzony. Kliknij adres po więcej informacji."
       register_communication: "Zarejestruj komunikację"
-      select_profile_pic: "Wybierz zdjęcie profilu"
       unconfirmed_click_to_confirm: "Niepotwierdzony. Kliknij, aby potwierdzić."
     token_never_expires: nigdy
     twitter_select: 
@@ -10788,13 +10964,13 @@ pl:
     you_have_no_services: "Nie zarejestrowano żadnych usług, można dodać niektóre z nich na stronie *Ustawienia*."
   profiles: 
     avatar_dialog: 
-      butons: 
-        add_picture_file: "Dodaj plik"
-      headers: 
-        loading_images: "Trwa ładowanie obrazów..."
-      links: 
-        upload_new_image: "Przekaż nowy obraz"
-      profile_pictures: "Wybierz obraz, który ma być zdjęciem profilu lub przekaż nowy obraz:"
+      from_gravatar: "Z grawatara"
+      take_a_picture: "Zrób zdjęcie"
+      upload_a_picture: "Przekaż zdjęcie"
+    gravatar_view: 
+      button: 
+        preview: Podgląd
+      enter_gravatar_email_below: "Podaj adres email *Gravatara* poniżej"
     notification_preferences: 
       captions: 
         notification_preferences: "%{name} zdarzenia powiadamiania i ustawienia"
@@ -10803,6 +10979,12 @@ pl:
         ok: Ok
         privacy_notice: "Uwaga: niektóre powiadomienia mogą zawierać informacje poufne. Wybranie opcji otrzymywania powiadomień na adres e-mail inny od dostarczonego przez instytucję może spowodować wysłanie kursu w systemie Canvas i informacji o grupie poza system instytucji."
         privacy_notice_title: "Powiadomienie o prywatności"
+    take_picture_view: 
+      retry: "Ponów próbę"
+      take_picture: "Zrób zdjęcie"
+    upload_file_view: 
+      choose_a_picture: "wybierz zdjęcie"
+      crop_instructions: "Aby przyciąć obraz, przeciągnij zaznaczenie, a następnie kliknij przycisk Zapisz znajdujący się poniżej. "
   pseudonym: 
     errors: 
       bad_credentials: "NIeprawidłowa nazwa użytkownika lub hasło"
@@ -10952,6 +11134,7 @@ pl:
   qti_display: QTI
   qti_file_description: "Plik .zip z zawartością QTI"
   qti_name: "QTI Converter"
+  qualified_locale: en-US
   question_answered: "Z udzieloną odpowiedzią"
   question_bank: 
     align_outcomes: "Uszereguj wyniki"
@@ -11070,18 +11253,10 @@ pl:
     regrade: 
       give_everyone_full_credit: "Wstaw wszystkim uczestnikom pełne zaliczenie za to pytanie."
       no_scores_reduced: "Przyznaj punkty za poprawną odpowiedź oraz poprzednie poprawne odpowiedzi (*wyniki nie zostaną zmniejszone*)"
-      regrade_disabled: "Brak pozwolenia na ponowne ocenienie odpowiedzi do tego pytania, ponieważ została ona usunięta po tym, jak uczestnik ukończył zadanie."
+      regrade_disabled: "Brak pozwolenia na ponowne ocenienie odpowiedzi do tego pytania, ponieważ odpowiedź lub typ pytania zmieniono po tym, jak uczestnik ukończył zadanie."
       regrade_options: "Opcje ponownego oceniania *(w odniesieniu do uczestników, którzy już odpowiedzieli na to pytanie):*"
       some_scores_reduced: "Przydziel punkty jedynie za poprawną odpowiedź (*wyniki niektórych studentów mogą zostać zmniejszone*)"
       update_question_without_regrading: "Aktualizuj pytanie bez ponownego oceniania"
-  quiz_group: 
-    errors: 
-      no_bank: "Nie można odnaleźć banku pytań dla grupy quizów %{group_name}"
-      no_permissions: "Użytkownik nie ma uprawnień, aby odwołać się do banku pytań w grupie quizów %{group_name}"
-    question_group: "Grupa pytań"
-  quiz_question: 
-    defaults: 
-      question_name: Pytanie
   quiz_reports: 
     quiz_report_generator: 
       download_report_name: "Pobieranie %{report_name}"
@@ -11089,27 +11264,7 @@ pl:
       generated_at_date_time: "Wygenerowano %{dateAndTime}"
       generating_report_name: "Trwa generowanie raportu o nazwie %{report_name}..."
       item_analysis_not_available: "Analiza elementu nie jest dostępna w przypadku ankiet"
-  quiz_statistics: 
-    statistics_filename: "Raport dotyczący %{quiz_title} %{quiz_type} %{report_type}"
-    types: 
-      item_analysis: "Analiza elementu"
-      student_analysis: "Analiza uczestnika"
-  quiz_submissions: 
-    errors: 
-      invalid_submissions: "Przesłany test zweryfikowano jako nie należący do Ciebie. Spróbuj ponownie."
-      late_quiz: "Użytkownik przesłał ten test po czasie, dlatego twoje odpowiedzi mogły nie zostać zapisane."
-      protected_quiz: "Ten test jest chroniony i jest dostępny tylko z niektórych lokalizacji.  Komputer, z którego korzystasz nie wydaje się prawidłową lokalizacją na podejście do testu."
-    show: 
-      score_out_of: "Twój wynik to %{score} na %{points_possible} możliwych"
-    still_zipping: "Trwa kompresowanie pliku..."
   quizzes: 
-    access_code: 
-      buttons: 
-        submit: Prześlij
-      labels: 
-        access_code: "Kod dostępu"
-      quiz_restricted: "Test chroniony kodem dostępu. Użytkownik powinien poprosić instruktora lub osobę nadzorującą o wpisanie lub podanie kodu dostępu w celu podejścia do testu."
-      survey_restricted: "Ankieta chroniona kodem dostępu. Użytkownik powinien poprosić instruktora lub osobę nadzorującą o wpisanie lub podanie kodu dostępu w celu udziału w ankiecie."
     after_last_attempt: "Po ostatniej próbie"
     alerts: 
       no_valid_combinations: "System nie był w stanie wygenerować prawidłowych kombinacji dla podanych parametrów"
@@ -11120,6 +11275,7 @@ pl:
     always: Zawsze
     answer_comments: "Komentarze do odpowiedzi"
     answer_text: "Treść odpowiedzi"
+    assignment: Zadanie
     assignment_points_possible: 
       few: "Liczba punktów: %{count}"
       one: "Liczba punktów: %{count}"
@@ -11153,87 +11309,13 @@ pl:
     default_answer_comments: "Wyślij komentarz, jeśli uczestnik wybierze tę odpowiedź"
     default_answer_comments_on_match: "Wyślij komentarz, jeśli uczestnik poprawnie dopasuje tę odpowiedź"
     default_comments_on_wrong_match: "Wyślij komentarz, jeśli uczestnik nie dopasuje poprawnej odpowiedzi"
-    default_history_crumb: Historia
     default_quesiton_name: Pytanie
     default_question_name: Pytanie
     default_quiz_title: Test
     default_response_to_essay: "Wyślij komentarz dla uczestnika po udzieleniu odpowiedzi"
     default_response_to_file_upload: "Wyślij komentarz dla uczestnika po udzieleniu odpowiedzi"
-    default_title: "Nowy test"
-    display_answer: 
-      labels: 
-        answer_with_margin: "z marginesem"
-        your_answer: "Twoja odpowiedź"
-      margin_of_error: "margines błędu"
-      plus_or_minus: +/-
-      range_answer: "Między %{lower_bound} a %{upper_bound}"
-      you_left_this_blank: "Użytkownik opuścił ten bank"
-    display_question: 
-      default_question_answer: "[ Wybierz ]"
-      flag_this_question: "Oflaguj to pytanie"
-      headers: 
-        formulas: Formuły
-        possible_solutions: "Możliwe rozwiązania"
-        solution_answer: Odpowiedź
-        variable_maximum: Maks.
-        variable_minimum: Min.
-        variable_name: Zmienna
-        variable_precision: "Miejsca dziesiętne"
-        variables: Zmienne
-      labels: 
-        additional_comments: "Komentarze dodatkowe"
-        for_answer_number: "Za %{answer_number} odpowiedzi"
-        warning_icon: Ostrzeżenie
-      links: 
-        delete_question: "Usuń to pytanie"
-        edit_question: "Edytuj to pytanie"
-        move_copy_question: "przenieś/skopiuj to pytanie do innego banku"
-      not_yet_graded: "Jeszcze nie oceniono"
-      original_score: "Oryginalny wynik:"
-      points_possible: "%{points_possible} pkt"
-      regraded_score: "Wynik oceniony ponownie:"
-      show_ansers_for_variable: "Wyświetl odpowiedzi dla %{variable}"
-      skip_question_text: "Pomiń i przejdź do treści pytania."
-      submission_was_regraded: "Pytanie zostało ponownie ocenione."
-      titles: 
-        question_correct_comment: "Uczestnicy zobaczą ten komentarz, jeśli poprawnie dopowiedzą na pytanie"
-        question_incorrect_comment: "Uczestnicy zobaczą ten komentarz, jeśli dopowiedzą na pytanie niepoprawnie"
-        question_neutral_comment: "Uczestnicy zobaczą ten komentarz po udzieleniu odpowiedzi na pytanie"
-      unsupported_question_type: "To pytanie zaimportowano z zewnętrznego źródła. Było to pytanie „%{question_type}”, które nie jest obsługiwane przez dane narzędzie do tworzenia pytań."
-      you_left_this_blank: "Użytkownik opuścił ten bank"
     download_all_quiz_file_upload_submissions: "Pobierz wszystkie przesłane zadania do testu"
-    download_file_upload_submissions: 
-      links: 
-        download_submissions: "Pobierz wszystkie pliki"
     enter_answer_variable_above: "[ Wprowadź alternatywne odpowiedzi powyżej ]"
-    equations_help: 
-      equation_functions: |-
-          Oprócz zmiennych dostępny jest również zbiór funkcji pomocniczych,
-          których można użyć do generowania użytecznych wartości.  Na przykład:
-          
-          %{example}
-          
-          Aby zobaczyć wyjaśnienie danej funkcji pomocniczej, zaznacz ją na liście
-          below:
-      equation_intro: |-
-          Seria pytań jest oparta na co najmniej jednej formule obliczanej 
-          w kolejności.  W formule można tworzyć zmienne pośrednie, ale
-          to wynik numeryczny ostatniej formuły jest używany do generowania 
-          poprawnej odpowiedzi.  Na przykład:
-          
-          %{example}
-          
-          Dla tego zestawu wzorów, końcowa odpowiedź to 71.  Jednak,
-          nie ma żadnych uprzednio zdefiniowanych zmiennych, więc wszyscy uczestnicy otrzymają
-          to samo pytanie z tą samą odpowiedzią. Zobacz etykieta „zmienne”,
-          aby uzyskać więcej informacji dotyczących zmiennych.
-      equation_variables2: |-
-          Zmienne również można określić w treści pytania za pomocą nawiasów 
-          („Ile wynosi [a] + [b]?”).  Dla każdej zmiennej widoczne będzie pole „Przykładowa wartość” oparte na ustawieniach zmiennych. Umożliwia to sprawdzenie własnych obliczeń i działania formuł. Na przykład, jeśli pytanie brzmi: „Ile wynosi [a] + 5?”, należy zdefiniować zmienną „a”.  Jeśli wartość zmiennej „a” wynosi na przykład 5,2, można napisać: %{example}. Dzięki tej formule można wygenerować dowolną liczbę zbiorów rozwiązań dla różnych wartości zmiennej „a” w każdym zbiorze.  Jeden z uczestników może otrzymać pytanie „Ile wynosi 5,2 + 5?”, a inny „Ile wynosi 9 + 5?”.
-      links: 
-        functions: Funkcje
-        intro: Wprowadzenie
-        variables: Zmienne
     errors: 
       adding_questions_failed: "Dodawanie pytań nie powiodło się, spróbuj ponownie"
       creating_group_failed: "Tworzenie grupy nie powiodło się, spróbuj ponownie"
@@ -11247,16 +11329,11 @@ pl:
       missing_ip_filter: "Należy wpisać prawidłowy adres IP"
       no_answer: "Dodaj co najmniej jedną odpowiedź"
       no_correct_answer: "Wybierz poprawną odpowiedź"
-      no_more_attempts: "Nie masz już więcej prób podejścia do testu"
       no_possible_solution: "Wygeneruj co najmniej jedno możliwe rozwiązanie"
-      quiz_deleted: "Test został usunięty"
       quiz_score_not_a_number: "Wynik powinien wynosić między 0 a 2 000 000 000."
       quiz_score_too_long: "Wynik musi być mniejszy niż 2 000 000 000."
       quiz_score_too_short: "Wynik musi być większy od 0."
-      quiz_update_failed: "Aktualizacja testu nie powiodła się"
       retrieving_filters_failed: "Pobieranie filtrów nie powiodło się"
-    fabulous_quizzes: 
-      page_titles: Testy
     ? "false"
     : Fałsz
     file_uploaded_or_removed: 
@@ -11264,134 +11341,6 @@ pl:
         file_successfully_uploaded: "Plik został pomyślnie przekazany."
         files_removed: "Plik %{display_name} został usunięty."
     final_answer: "Odpowiedź ostateczna"
-    find_question_from_bank: 
-      already_added: "to pytanie jest już w teście"
-      bank_description: "%{bank_name}, %{n} pytań"
-      buttons: 
-        add_questions: "Dodaj pytania"
-        create_group: "Utwórz grupę"
-        select_bank: "Wybierz bank"
-      group_pick_count: "%{pick_count} pytań"
-      group_points: "%{points} za pytanie"
-      headers: 
-        bank_name: "Nazwa banku"
-      hints: 
-        group_pick_count: "wybrano dotąd %{pick_count}"
-      labels: 
-        add_questions_to_group: "Dodaj pytania do tej grupy testów"
-        group_name: "Nazwa grupy"
-        group_pick_count: Pobierz
-        group_points: Punkty
-      links: 
-        clear_all_banks: "Usuń wszystko"
-        manage_question_banks: "Zarządzaj bankami pytań z kursu"
-        more_questions: "więcej pytań"
-        select_all_banks: "Zaznacz wszystko"
-      options: 
-        new_group: "[ Nowa grupa ]"
-        no_group: "[ Brak grup ]"
-      select_a_question_bank: "Wybierz bank pytań z poniższej listy, aby połączyć go z testem i utworzyć grupę pytań."
-      titles: 
-        add_new_question_group: "Dodaj nową Grupę pytań"
-    form_answer: 
-      answer_in_range_accessible: "między *zakres rozpoczęcia* a #zakres zakończenia#"
-      answer_text: "Treść odpowiedzi"
-      answer_weight: "Waga odpowiedzi"
-      exact_answer_with_error_margin_accessible: "*dokładna odpowiedź* z marginesem błędu #margines blędu#"
-      labels: 
-        answer_comments: "Wysyła komentarz, jeśli uczestnik wybierze tę odpowiedź"
-        answer_in_range: "Odpowiedź z zakresu"
-        exact_answer: "Dokładna odpowiedź"
-      matching_left: "Element do dopasowania po lewej stronie"
-      matching_right: "Element do dopasowania po prawej stronie"
-      numerical_answer: "Odpowiedź liczbowa"
-      possible_answer: "Możliwa odpowiedź"
-      titles: 
-        click_to_enter_answer_comments: "Kliknij, aby wprowadzić komentarz wyświetlany, jeśli uczestnik wybierze tę odpowiedź"
-        click_to_set_as_correct: "Kliknij, aby ustawić tę odpowiedź jako poprawną"
-        delete_answer: "Usuń tę odpowiedź"
-        edit_as_html: "Edytuj HTML"
-    form_question: 
-      allow_tolerance: "zezwól na margines błędu wynoszący +/- %{tolerance}"
-      buttons: 
-        create_update_question: "Utwórz/Aktualizuj pytanie"
-        generate: Generuj
-        recompute: "Oblicz ponownie"
-      correct_answer_comments: "Komentarze do poprawnych odpowiedzi"
-      distractor_instructions: "wpisz każdą fałszywą odpowiedź w odrębnej linijce"
-      equation_example: "np. \"ile jest 5 dodać [x]?\""
-      explanation: 
-        generate_possible_solutions: "Na koniec stwórz tyle kombinacji zmiennych i rozwiązań ile potrzeba do testu."
-      explanations: 
-        calculated: "Wprowadź pytanie, utwórz formułę i wygeneruj zestaw kombinacji możliwych odpowiedzi. Uczestnicy otrzymują pytanie i wybrany zestaw losowo ustawionych zmiennych i wprowadzają jako odpowiedź prawidłową wartość."
-        equations: "Zmienne można określić wpisując ich nazwy w nawiasie"
-        essay: "Uczestnicy wpisują swoją odpowiedź w wyświetlone pole tekstowe."
-        file_upload: "Uczestnicy będą mogli przekazać plik z odpowiedzią."
-        fill_in_multiple_blanks: "Wprowadź pytanie, określając rozmieszczenie luk. Następnie dla każdej z nich podaj możliwą, prawidłową odpowiedź. Uczestnicy wprowadzają prawidłowe odpowiedzi w pola tekstowe w miejscu każdej luki."
-        formula_definition: "Kolejny krok to utworzenie formuły lub formuł, które posłużą do obliczania poprawnej odpowiedzi. Należy użyć tych samych zmiennych, które podano powyżej."
-        matching: "Stwórz pary pasujących do siebie wartości. Uczestnicy widzą wartości po lewej, a ich zadaniem jest wybranie pasujących wartości z listy rozwijanej po prawej. Do kilku elementów można dopasować tę samą odpowiedź lub dodać kilka fałszywych wpisów po prawej."
-        missing_word: "Określ tekst wyświetlany przed listą rozwijaną i po niej. Utwórz zestaw możliwych odpowiedzi i zaznacz poprawną odpowiedź."
-        multi_answer_sets: "W polu poniżej, znajdującym się w miejscu umieszczenia pola odpowiedzi, wpisz słowo odnośnik (bez spacji) w nawiasie"
-        multiple_answers: "Pod pytaniem, przy każdej odpowiedzi wyświetlone będą pola wyboru, a zadaniem uczestnika jest wybranie WSZYSTKICH, które zostały oznaczone jako poprawne."
-        multiple_choice: "Wprowadź pytanie z zestawem odpowiedzi do wyboru i zaznacz jedną poprawną odpowiedź."
-        multiple_dropdowns: "Wprowadź pytanie, określając rozmieszczenie list rozwijanych. Następnie utwórz listę możliwych odpowiedzi, z których jedna jest poprawna."
-        numerical: "Określ poprawną odpowiedź jako numer z zakresu lub jako numer z danym marginesem błędu. Uczestnicy poprawny numer odpowiedzi wprowadzają w podane puste pole tekstowe."
-        short_answer: |-
-            Wprowadź treść pytania, a następnie określ wszystkie możliwe poprawne odpowiedzi dla każdej luki.  
-            Dla uczestników obok pytania zostanie wyświetlone niewielkie pole tekstowe, do którego należy wprowadzić odpowiedź.
-        text_only: "To \"pytanie\" nie będzie punktowane, ale może posłużyć do wprowadzenia zestawu powiązanych pytań."
-        true_false: "Wprowadź treść pytania, a następnie określ, czy prawidłowa odpowiedź to Prawda czy Fałsz."
-        variable_definitions: "Po wprowadzeniu zmiennych powyżej powinny one być widoczne na liście tutaj. Dla każdej z poniższych zmiennych można określić zakres możliwych odpowiedzi."
-      general_answer_comments: "Ogólne komentarze do odpowiedzi"
-      headers: 
-        formula_definition: "Definiowanie formuły"
-        generate_possible_solutions: "Generuj możliwe rozwiązania"
-        variable_definitions: "Definiowanie zmiennych"
-        variable_example_value: "Przykładowa wartość"
-        variable_maximum: Maks.
-        variable_minimum: Min.
-        variable_name: Zmienna
-        variable_precision: "Miejsca dziesiętne"
-      label: 
-        question: 
-          name: "Nazwa pytania"
-          points: "Wartość punktu pytania"
-          type: "Typ pytania"
-      labels: 
-        answers: Odpowiedzi
-        distractors: "Dodatkowe elementy do dopasowania (fałszywe odpowiedzi)"
-        missing_word_after: "Tekst wokół odpowiedzi"
-        points: pkt
-        question: Pytanie
-      links: 
-        add_another_answer: "Dodaj kolejną odpowiedź"
-        need_help: "Potrzebujesz pomocy?"
-      multi_answer_sets_example: "np. \"Róże są [kolor1], fiołki są [kolor2]\""
-      offer_combinations: "Podaj %{how_many} możliwych kombinacji wartości (maks. %{max_combinations})"
-      options: 
-        only_one_correct: "Tylko jedna poprawna odpowiedź"
-        students_select_multiple: "Uczestnicy wybierają kilka odpowiedzi"
-      question_type: 
-        calculated: "Pytanie oparte na formule"
-        essay: "Temat wypracowania"
-        file_upload: "Pytanie dotyczące przekazywania pliku"
-        fill_in_multiple_blanks: "Wypełnianie luk z podpowiedziami"
-        matching: Dopasowywanie
-        missing_word: "Brakujące słowo"
-        multiple_answers: "Kilka poprawnych odpowiedzi"
-        multiple_choice: "Pytanie wielokrotnego wyboru"
-        multiple_dropdowns: "Listy wielokrotnego wyboru"
-        numerical: "Odpowiedź liczbowa"
-        short_answer: "Wypełnianie luk"
-        text_only: "Tekst (bez pytania)"
-        true_false: Prawda/Fałsz
-      show_possible_answers: "Wyświetl możliwe odpowiedzi dla %{question}"
-      show_possible_answers_no_question: "Pokaż możliwe odpowiedzi dla"
-      titles: 
-        click_to_enter_correct_answer_comments: "Kliknij, aby wprowadzić komentarze do poprawnych odpowiedzi"
-        click_to_enter_general_answer_comments: "Kliknij, aby wprowadzić komentarze ogólne"
-        click_to_enter_wrong_answer_comments: "Kliknij, aby wprowadzić komentarze do błędnych odpowiedzi"
-      wrong_answer_comments: "Komentarze do błędnych odpowiedzi"
     graded_quiz: "Oceniony test"
     graded_survey: "Oceniona ankieta"
     headers: 
@@ -11420,69 +11369,14 @@ pl:
         other: "%{count} minut"
         zero: "mniej niż 1 minutę"
       score_out_of_points_possible: "%{score} na %{points_possible} możliwych"
-    history: 
-      anonymous_username: Uczestnik
-      buttons: 
-        allow_extra_attempt: "zezwól uczestnikowi na dodatkową próbę"
-      count_attempts_left: 
-        few: "%{user} pozostały %{count}  próby"
-        one: "%{user} pozostała 1 próba"
-        other: "Użytkownikowi %{user} pozostało %{count}  prób"
-      default_quiz_name: "Test z kursu %{course_name}"
-      default_survey_name: "Ankieta do kursu %{course_name}"
-      grade_by_question_warning: "Na funkcję „grade by question” mają wpływ pytania, których kolejność w grupie jest ustalana losowo."
-      headers: 
-        quiz_submissions: "Przesłane testy"
-        survey_submissions: "Przesłane ankiety"
-      latest_quiz_results: "Są to wyniki ostatniego testu użytkownika %{user}. Aby zmienić punkty przydzielone za dane pytanie lub dodać więcej komentarzy, kliknij przycisk \"Aktualizuj wyniki punktowe\" znajdujący się u dołu strony."
-      latest_survey_results: "Są to wyniki ostatniej ankiety użytkownika %{user}. Aby zmienić punkty przydzielone za dane pytanie lub dodać więcej komentarzy, kliknij przycisk \"Aktualizuj wyniki punktowe\" znajdujący się u dołu strony."
-      links: 
-        back_to_quiz: "Powrót do testu"
-        back_to_survey: "Powrót do ankiety"
-      logged_out_user: "Użytkownik wylogowany %{index}"
-      named_quiz_results: "%{quiz_name} Wyniki dla %{user}"
-      next_questions_arrow_title: "Następne pytanie"
-      no_more_attempts: "Użytkownik %{user} nie ma więcej prób"
-      page_title_quiz: "Historia testów użytkownika %{user}"
-      page_title_survey: "Historia ankiet użytkownika %{user}"
-      prev_questions_arrow_title: "Poprzednie pytania"
-      quiz_not_yet_taken: "Użytkownik nie podszedł jeszcze do testu."
-      quiz_not_yet_taken_or_in_progress: "Użytkownik nie podszedł jeszcze do testu lub właśnie go rozwiązuje"
-      quiz_unlimited_attempts: "Ten test ma nieograniczoną liczbę prób rozwiązania"
-      score_for_attempt: "Próba %{attempt_number}: %{score}"
-      survey_not_yet_taken: "Użytkownik nie brał jeszcze udziału w ankiecie."
-      survey_not_yet_taken_or_in_progress: "Użytkownik nie brał jeszcze udziału w ankiecie lub właśnie ją wypełnia"
-      survey_unlimited_attempts: "Ta ankieta ma nieograniczoną liczbę prób wypełnienia"
-      titles: 
-        score_pending_review: "Wynik punktowy oczekuje sprawdzenia i może ulec zmianie"
-        submission_needs_review: "Przesłane zadanie wymaga sprawdzenia"
-      unnamed_quiz_results: "Wyniki testów dla użytkownika %{user}"
-      unnamed_survey_results: "Wyniki ankiet dla użytkownika %{user}"
+    highest: najwyższe
     index: 
       buttons: 
-        publish_quizzes: "Publikuj testy"
         publishing_quizzes: "Trwa publikowanie testów..."
       confirms: 
         delete_quiz: "Czy na pewno chcesz usunąć ten test?"
       default_title: "Test bez nazwy"
-      headers: 
-        assignment_quizzes: "Zadania w formie testu"
-        course_quizzes: "Testy kursowe"
-        practice_quizzes: "Testy próbne"
-        publish_multiple_quizzes: "Publikuj wiele testów"
-        surveys: Ankiety
-        unpublished_quizzes: "Niepublikowane testy"
-      labels: 
-        publish_multiple_quizzes: "Wybierz testy, które chcesz opublikować tym razem"
-      links: 
-        create_new_quiz: "Utwórz nowy test"
-        manage_question_banks: "Zarządzaj bankami pytań"
-        publish_multiple_quizzes: "Publikuj wiele testów"
       multiple_due_dates: "Wiele dat"
-      no_quizzes: "Brak dostępnych testów"
-      page_titles: Testy
-      titles: 
-        this_quiz_is_locked: "Aktualnie test jest zablokowany. Kliknij w celu uzyskania dalszych informacji."
     index_view: 
       add_quiz: Test
       links: 
@@ -11491,9 +11385,6 @@ pl:
         settings: Ustawienia
       search_for_quiz: "Wyszukaj test"
       title_add_quiz: "Dodaj test"
-    invalid_ip: 
-      quiz_protected: "Ten test jest chroniony i jest dostępny tylko z niektórych lokalizacji. Komputer, z którego korzystasz nie wydaje się prawidłową lokalizacją na podejście do testu."
-      survey_protected: "Ta ankieta jest chroniona i jest dostępna tylko z niektórych lokalizacji. Komputer, z którego korzystasz, nie wydaje się prawidłową lokalizacją na udział w ankiecie."
     keep_highest: Najwyższe
     keep_latest: Najnowsze
     label: 
@@ -11512,6 +11403,14 @@ pl:
       multiple_blanks_question: "Uzupełnij puste pole, przeczytaj tekst"
       other_incorrect_matches: "Inne niepoprawne możliwości dopasowania"
       possible_answer: "Możliwa odpowiedź"
+    latest: najnowsze
+    ldb_login_popup: 
+      email: "Adres e-mail"
+      log_in: Zaloguj
+      logged_out_of_canvas: "*Zostałeś wylogowany z systemu Canvas.* Aby kontynuować, zaloguj się."
+      password: Hasło
+      titles: 
+        log_in: "Zaloguj się"
     links: 
       resume_quiz: "Wznów test"
       resume_survey: "Wznów ankietę"
@@ -11525,19 +11424,6 @@ pl:
     loading_question: "Trwa ładowanie pytania..."
     loading_question_banks: "Trwa ładowanie banków pytań..."
     loading_questions: "Trwa ładowanie pytań..."
-    lockdown_browser_required: 
-      headers: 
-        requires_lockdown: "Wymagany program Respondus LockDown Browser"
-      labels: 
-        download_lockdown: "Jeśli jeszcze nie zainstalowano przeglądarki, można ją pobrać tutaj"
-      links: 
-        download_lockdown: "[Pobierz Respondus LockDown Browser]"
-      requires_lockdown: "Test wymaga programu Respondus LockDown Browser. Uruchom program Respondus LockDown Browser, aby podejść do testu lub wyświetlić swoje wyniki."
-    managed_quiz_data: 
-      anonymous_student: "Uczestnik %{user_count}"
-      logged_out_user: "Użytkownik wylogowany %{user_counter}"
-      titles: 
-        submission_needs_review: "Przesłane zadanie wymaga sprawdzenia"
     message_students: "Wiadomość dla uczestników"
     message_students_for_context: "Wiadomość dla uczestników dla %{context}"
     messages: 
@@ -11546,9 +11432,7 @@ pl:
       no_unsubmitted_students_quiz: "Wszyscy uczestnicy napisali ten test"
       no_unsubmitted_students_survey: "Wszyscy uczestnicy wypełnili tę ankietę"
     moderate: 
-      add_time: "Dodaj godzinę"
       buttons: 
-        change_extensions_for_selected_students: "Zmień rozszerzenia dla %{n} wybranych uczestników"
         extend_time: "Wydłuż czas"
         extending_time: "Trwa wydłużanie czasu..."
         save: Zapisz
@@ -11558,9 +11442,6 @@ pl:
         time_extension_failed: "Wydłużanie czasu nie powiodło się, spróbuj ponownie"
       confirms: 
         taking_time_away: "To mniej czasu niż ma obecnie uczestnik.  Kontynuować mimo to?"
-      end_quiz_reference_time_current_end: "bieżąca godzina zakończenia"
-      end_quiz_reference_time_now: teraz
-      end_quiz_when: "Zakończ test na %{n} minut od %{reference_time}."
       errors: 
         quiz_submission_extra_attempts_not_a_number: "Dodatkowe próby muszą stanowić wartość liczbową."
         quiz_submission_extra_attempts_too_long: "Liczba dodatkowych prób nie może przekraczać 1000."
@@ -11569,129 +11450,24 @@ pl:
         quiz_submission_extra_time_too_long: "Dodatkowy czas musi stanowić wartość liczbową mniejszą od 10080."
         quiz_submission_extra_time_too_short: "Dodatkowy czas musi stanowić wartość liczbową większą niż 0."
         server_communication_failed: "Wystąpił problem w komunikacji z serwerem.  System ponowi próbę za pięć minut, możesz również ponownie załadować stronę"
-      extended_quiz_time_explanation: "Możesz przydzielić więcej czasu temu uczestnikowi w trakcie bieżącej próby rozwiązania testu. Ile dodatkowego czasu chcesz przydzielić?"
       extensions_for_student: "Rozszerzenia dla uczestnika %{student}"
       extensions_for_students: 
         few: "Przedłuzenie dla %{count} uczestników"
         one: "Przedłuzenie dla 1 uczestnika"
         other: "Przedłużenie dla %{count} uczestników"
-      finished_in: "zakończono w ciągu %{duration}"
       finished_in_duration: "zakończono w ciągu %{duration}"
-      global_extra_attempts: "wszyscy wykorzystali już %{n} próby"
-      headers: 
-        attempt: Próba
-        attempts_left: "Pozostała liczba prób"
-        extended_quiz_time: "Wydłuż czas testu"
-        score: "Wynik punktowy"
-        student: Uczestnik
-        student_extensions: "Rozszerzenia dla uczestnika"
-        time: Godzina
-      in_progress: "w trakcie"
-      labels: 
-        ending: Kończenie
-        extra_attempts: "Dodatkowe próby"
-        extra_time_per_attempt: "Dodatkowy czas na każdej z prób"
-        manually_unlock: "Ustaw ręczne odblokowanie testu do kolejnej próby"
-        started: Rozpoczęto
-      minutes: minuty
-      page_title: "Zarządzaj testem"
-      student_gets_extra_time: "*Uczestnik %{student_name}* **otrzymuje dodatkowe %{extra_time} minut na każdą z prób**"
-      student_n: "Uczestnik %{n}"
       time_up: "Czas minął!"
       titles: 
-        change_user_extensions: "Zmień rozszerzenia użytkownika"
         extend_quiz_time: "Wydłuż czas testu"
-        manually_unlocked: "Odblokowywany ręcznie"
-        minutes_to_add: "dodatkowe minuty"
-        select_deselect_all: "Zaznacz wszystkie/Usuń zaznaczenie wszystkich"
-        select_user: "Wybierz użytkownika %{user}"
         student_extensions: "Rozszerzenia dla uczestnika"
     more_questions: "więcej pytań"
-    multi_answer: 
-      choose_answer: Wybierz
-    muted: 
-      muted_quiz_description: "Wynik twojego testu jest niedostępny, ponieważ instruktor nie skończył jego oceniania. Po ocenieniu testu twój wynik będzie dostępny na tej stronie."
-      muted_quiz_header: "Test został ukryty"
-    new: 
-      allowed_attempts: "Dozwolona liczba prób"
-      anonymous_submissions: "Nie wyświetlaj autora przesłanego zadania"
-      buttons: 
-        not_published: "Nie opublikowane"
-        published: Opublikowane
-        save: Zapisz
-      cant_go_back: "Zablokuj pytania po udzieleniu odpowiedzi"
-      default_page_title: "Nowy test"
-      group: "Grupa zadań"
-      headers: 
-        ip_filters: "Co to są filtry adresu IP dla testów?"
-      hide_correct_answers_at: "Ukryj poprawne odpowiedzi przy"
-      hints: 
-        question_detail_disabled: "UWAGA: Szczegóły pytań niedostępne, kiedy więcej niż %{question_count}."
-        quiz_score: "uczestnicy automatycznie uzyskają pełne zaliczenie po wypełnieniu ankiety"
-      ip_filters: "Filtry IP testu służą do ograniczania dostępu do testów dla komputerów z danego zakresu IP. Filtry mogą być listami adresów oddzielonych przecinkami lub adresami, po których podana jest maska podsieci (\"192.168.217.1\", \"192.168.217.1/24\" lub \"192.168.217.1/255.255.255.0\")."
-      label: 
-        time_limit: "Limit czasu"
-      labels: 
-        allow_multiple_attempts: "Zezwalaj na wiele prób"
-        hide_results_only_after_last: "Dopiero po ostatniej próbie"
-        ip_filter: "Filtruj adresy IP"
-        never_hide_results: "Udostępniaj uczestnikom wyniki ich testów"
-        quiz_instructions: "Instrukcje do testu"
-        quiz_notify: "Powiadom użytkowników, że ten quiz się zmienił"
-        quiz_score: "Wynik punktowy"
-        require_access_code: "Wymagaj kodu dostępu"
-        restrict_quiz: "Ograniczenia testu"
-        show_question_details: "Wyświetl informacje szczegółowe pytania"
-      limited_attempts: "Dozwolona liczba prób"
-      links: 
-        cancel: Anuluj
-        find_questions: "Znajdź pytania"
-        new_question: "Nowe pytanie"
-        new_question_group: "Nowa grupa pytań"
-        show_assignment_rubric: "Pokaż kryteria ocen dla zadania"
-      manage: Zarządzaj
-      minutes: Minuty
-      new_assignment: "Nowe zadanie"
-      new_discussion: "Nowa dyskusja"
-      one_question_at_a_time: "Wyświetlaj pytania po kolei"
-      points_possible: "%{n} możliwych punktów"
-      quiz_title: "Tytuł testu"
-      quiz_type: "Typ testu"
-      require_lockdown_browser: "Wymagaj programu Respondus LockDown Browser"
-      require_lockdown_browser_for_results: "Wymagany do wyświetlenia wyników testu"
-      retrieving_filters: "Trwa pobieranie filtrów..."
-      score_to_keep: "Wynik punktowy z testu do zapisania"
-      show_correct_answers: "Udostępniaj uczestnikom poprawne odpowiedzi"
-      show_correct_answers_at: "Wyświetl poprawne odpowiedzi przy"
-      shuffle_answers: "Pomieszaj odpowiedzi"
-      students_cannot_view_responses_after_course_concludes: "Uczestnicy nie mogą podglądać odpowiedzi do testu po zakończeniu kursu"
-      time_limit: "Ile minut?"
-      titles: 
-        click_to_select_filter: "Kliknij, aby zaznaczyć filtr"
-        delete: Usuń
-        find_ip_address_filter: "Znajdź Filtr adresu IP"
-      warnings: 
-        has_student_submissions: "Uczestnicy już ukończyli ten test lub właśnie rozpoczęli jego pisanie, dlatego zachowaj ostrożność w czasie edycji. Jeśli w znaczący sposób zmienisz pytania testowe, być może będziesz chcieć ponownie ocenić uczestników, którzy zdawali poprzednią wersję testu."
     no_filters_found: "Nie znaleziono filtrów"
     no_quizzes_view: 
       headers: 
         course_quizzes: "Testy kursowe"
       no_quizzes: "Brak dostępnych testów"
     notices: 
-      cant_view_submission_while_muted: "Nie można wyświetlić historii ukrytego testu."
-      has_submissions_already: "Niektórzy uczestnicy już napisali lub właśnie piszą ten test"
-      less_than_allotted_time: "Użytkownik rozpoczął pisanie testu na krótko przed jego zakończeniem i dlatego nie będzie miał pełnego wymiaru czasu na jego napisanie."
       message_sent: "Wiadomość wysłana!"
-      no_submission_for_user: "Użytkownik nie przesłał jeszcze żadnych zadań"
-      quiz_updated: "Test został pomyślnie zaktualizowany"
-      quizzes_published: 
-        few: "%{count} quizy opublikowano z powodzeniem!"
-        one: "1 quiz opublikowano z powodzeniem!"
-        other: "%{count} quizów opublikowano z powodzeniem!"
-      quizzes_unpublished: 
-        few: "Pomyślnie cofnięto publikację następującej liczby testów: %{count} "
-        one: "Pomyślnie cofnięto publikację następującej liczby testów: %{count} "
-        other: "Pomyślnie cofnięto publikację następującej liczby testów: %{count} "
     practice_quiz: "Test próbny"
     practices_label: "Testy próbne, przełącz wyświetlanie testu"
     question_colon: "Pytanie:"
@@ -11699,73 +11475,27 @@ pl:
       few: "Liczba pytań: %{count}"
       one: "Liczba pytań: %{count}"
       other: "Liczba pytań: %{count}"
-    question_group: 
-      buttons: 
-        update: Aktualizuj
-      default_group_name: Grupa
-      edit_questions_and_points: "Pobierz następującą liczbę pytań: *%{num_questions}*, liczba punktów na pytanie: #%{num_points}#"
-      labels: 
-        group_name: "Nazwa grupy"
-        number_of_questions: "Liczba pytań"
-        points_per_question: "Punkty za pytanie"
-        question_bank: "Pytania będą losowane z banku"
-      links: 
-        link_to_a_question_bank: "Połącz z bankiem pytań"
-      show_questions_and_points: "Pobierz następującą liczbę pytań: *%{num_questions}*, liczba punktów na pytanie: #%{num_points}#"
-      titles: 
-        add_question_to_group: "Dodaj pytanie do tej grupy"
-        collapse_group: "Zwiń grupę"
-        delete_group: "Usuń grupę"
-        edit_group_details: "Edytuj informacje szczegółowe grupy"
-        expand_group: "Powiększ grupę"
     question_limit_reached: "Osiągnąłeś maksymalną liczbę pytań dostępną w quizie (%{count}/%{limit}).\\n\\nAby obejść ten problem, rozważ podzielenie materiału na kilka quizów."
-    question_list_right_side: 
-      headers: 
-        questions: Pytania
-    question_statistic: 
-      attempts: 
-        few: " %{count}  próby"
-        one: "1 próba"
-        other: " %{count}  prób"
-      empty_response: "Pusta odpowiedź"
-      labels: 
-        other_answers: "Inne odpowiedzi"
-      no_data: "Brak danych"
-      no_responses: "Brak odpowiedzi zapisanych dla tego pytania"
-      percent_of_responses: "Wybór tej odpowiedzi stanowi %{percent}% z %{total} wszystkich prób"
-      response_count: 
-        few: "%{count} uczestników otrzymało to pytanie"
-        one: "1 uczestnik otrzymał to pytanie"
-        other: "%{count} uczestników otrzymało to pytanie"
-    question_teaser: 
-      titles: 
-        click_to_show_details: "Kliknij, aby wyświetlić informacje szczegółowe pytania"
-        delete_this_question: "Usuń to pytanie"
-        edit_this_question: "Edytuj to pytanie"
+    quiz: 
+      current_filter: "Bieżący filtr"
+      default_question_input: "[ Wybierz ]"
+      default_text_only_question_name: Przekładka
+      default_title: "Test bez nazwy"
+      errors: 
+        invalid_hide_results: "Opcja Ukryj rezultaty jest nieprawidłowa"
+        invalid_ip_filter: "Filtr IP jest nieprawidłowy"
+        invalid_quiz_type: "Typ testu jest nieprawidłowy"
+      question_name_counter: "Pytanie nr %{question_number}"
+      types: 
+        quiz: Test
+        survey: Ankieta
     quiz_attempts_length_error: "Próby wejścia do testu ograniczone są do liczby 3-cyfrowej. Jeśli chcesz, aby studenci dysponowali nieograniczoną liczbą prób, nie zaznaczaj pola Zezwalaj na wiele prób po lewej stronie"
     quiz_attempts_nan_error: "Liczba prób wejścia do testów może być określona jedynie w liczbach"
-    quiz_details: 
-      allowed_attempts: "Dozwolona liczba prób"
-      headers: 
-        available: Dostępny
-        due: "Termin dostarczenia"
-        points: Punkty
-        questions: Pytania
-        time_limit: "Limit czasu"
-      multiple_due_dates: "Więcej niż jeden termin dostarczenia"
-      no_due_date: "Brak terminu dostarczenia."
-      none: Brak
-      quiz_availabile_through: |-
-          %{start_time} przez  
-          %{end_time}
-      quiz_available_after: "po %{start_time}"
-      quiz_available_until: "do %{end_time}"
-      requires_lockdown: "Wymaga programu Respondus LockDown Browser"
-      time_limit: 
-        few: "%{count} Minuty"
-        one: "1 Minuta"
-        other: "%{count} Minut"
-      unlimited: Nieograniczono
+    quiz_group: 
+      errors: 
+        no_bank: "Nie można odnaleźć banku pytań dla grupy quizów %{group_name}"
+        no_permissions: "Użytkownik nie ma uprawnień, aby odwołać się do banku pytań w grupie quizów %{group_name}"
+      question_group: "Grupa pytań"
     quiz_item_group_view: 
       no_quizzes: "Nie znaleziono testów"
       no_surveys: "Nie znaleziono ankiet"
@@ -11776,131 +11506,731 @@ pl:
       settings: Ustawienia
       title_delete: "Usuń test"
       title_edit: "Edytuj test"
-    quiz_right_side: 
-      attempts_left: 
-        few: " Pozostały jeszcze %{count} próby"
-        one: "Pozostała jeszcze 1 próba"
-        other: " Pozostało jeszcze %{count} prób"
-      attempts_so_far: 
-        few: "%{count}  Próby dotychczas"
-        one: "1 Próba dotychczas"
-        other: "%{count} Prób dotychczas"
-      labels: 
-        current_score: "Bieżący wynik punktowy"
-        kept_score: "Zapisany wynik punktowy"
-        last_attempt_details: "Informacje szczegółowe dot. ostatniej próby"
-        submission_details: "Szczegółowe informacje dot. przesłanego zadania"
-        time: Godzina
-      links: 
-        preview_quiz_again: "Ponownie wyświetl podgląd testu"
-        preview_survey_again: "Ponownie wyświetl podgląd ankiety"
-      no_more_attempts: "Nie ma więcej prób"
-      questions_not_graded: "Niektórych pytań jeszcze nie oceniono"
-      score_set_manually: "Ten wynik został ustalony przez nauczyciela"
-      unlimited_attempts: "Nieograniczona liczba prób"
-      view_previous_attempts: "Wyświetl poprzednie próby"
-    quiz_show_teacher: 
-      anonymous_submissions: "Anonimowe przesyłanie"
-      attempts: Próby
-      available_from: "Dostępne od"
-      cant_go_back: "Zablokuj pytania po udzieleniu odpowiedzi"
-      code: "Kod dostępu"
-      due: "Termin dostarczenia"
-      filter: "Filtr IP"
-      for: Dla
-      group: "Grupa zadań"
-      label: 
-        time_limit: "Limit czasu"
-      multiple_attempts: "Wielokrotna liczba prób"
-      no_time_limit: "Brak limitu czasu"
-      one_question_at_a_time: "Pytania w kolejności"
-      points: Punkty
-      quiz_type: "Typ testu"
-      require_lockdown_browser: "Wymagaj programu Respondus LockDown Browser"
-      require_lockdown_browser_for_results: "Wymagany do wyświetlenia wyników testu"
-      score_to_keep: "Wynik punktowy do zapisania"
-      show_correct_answers: "Pokaż Prawidłowe odpowiedzi"
-      shuffle_answers: "Pomieszaj odpowiedzi"
-      time_limit: 
-        few: "%{count} minuty"
-        one: "%{count} minuta"
-        other: "%{count} minut"
-      until: Do
-      view_responses: "Pokaż odpowiedzi"
+    quiz_question: 
+      defaults: 
+        question_name: Pytanie
+    quiz_statistics: 
+      statistics_filename: "Raport dotyczący %{quiz_title} %{quiz_type} %{report_type}"
+      types: 
+        item_analysis: "Analiza elementu"
+        student_analysis: "Analiza uczestnika"
     quiz_submission: 
-      attempt_duration: "Ta próba trwała %{duration}."
-      buttons: 
-        update_scores: "Aktualizuj wyniki punktowe"
-      labels: 
-        final_score: "Końcowy wynik punktowy"
-        fudge_points: "Dostosuj punkty"
-        fudge_points_changed_points_quiz: "Użytkownik %{user} napisał już test, jednak liczba punktów, którą można było uzyskać, zmieniła się o %{difference}. Można uwzględnić tę zmianę i ręcznie dodać lub odjąć punkty w tym polu."
-        fudge_points_changed_points_survey: "Użytkownik %{user} wypełnił już ankietę, jednak liczba punktów, którą można było uzyskać, zmieniła się o %{difference}. Można uwzględnić tę zmianę i ręcznie dodać lub odjąć punkty w tym polu."
-        fudge_points_generic_explanation: "Możesz ręcznie dostosować wynik punktowy, wpisując dodane lub ujęte punkty w to pole."
-        questions_need_review: "Następujące pytania wymagają sprawdzenia"
-        quiz_score: "Wynik testu"
-        score_for_attempt: "Wynik punktowy uzyskany w tej próbie"
-        score_for_quiz: "Wynik punktowy uzyskany za ten test"
-        score_for_survey: "Wynik punktowy uzyskany za tę ankietę"
-        survey_score: "Wynik punktowy za ankietę"
-      links: 
-        click_to_view_results: "Kliknij tutaj, aby wyświetlić wyniki."
-      questions_not_graded: "Niektórych pytań jeszcze nie oceniono"
-      quiz_fudged_negative: "Ten wynik punktowy z testu został ręcznie zmieniony o %{fudge} punkty."
-      quiz_fudged_positive: "Ten wynik punktowy z testu został ręcznie zmieniony o +%{fudge} punkty."
-      quiz_not_yet_taken: "Użytkownik nie podszedł jeszcze do tego testu."
-      quiz_results_protected: "Wyniki z tego testu są chronione i dlatego nie są widoczne dla uczestników."
-      quiz_results_protected_until_last_attempt: "Wyniki z tego testu są chronione i dlatego nie będą widoczne dla uczestników aż do przesłania ostatniej próby."
-      quiz_submission_needs_review: "Odkąd zadanie zostało przekazane do oceny test uległ znaczącej zmianie. To zadanie może wymagać ponownej oceny."
-      requires_lockdown: "Do wyświetlenia twoich wyników z testu wymagany jest program Respondus LockDown Browser."
-      submitted_at: "Przesłano %{when}"
-      survey_fudged_negative: "Ten wynik punktowy z ankiety został ręcznie zmieniony o %{fudge} punkty."
-      survey_fudged_positive: "Ten wynik punktowy z ankiety został ręcznie zmieniony o +%{fudge} punkty."
-      survey_not_yet_taken: "Użytkownik nie wypełnił jeszcze tej ankiety."
       titles: 
         this_is_an_external_element: "Jest to element zewnętrzny, nie tekst, który mógł się zmienić od momentu przesłania zadania"
         this_is_an_external_frame: "Jest to ramka zewnętrzna, nie tekst, która mogła się zmienić od momentu przesłania zadania"
         this_is_an_image: "Jest to obraz, nie tekst, który mógł się zmienić od momentu przesłania zadania"
-    quiz_summary: 
-      assignment_points_possible: 
-        few: "%{count} pkt"
-        one: "1 pkt"
-        other: "%{count} pkt"
-      labels: 
+    quiz_submissions: 
+      errors: 
+        invalid_submissions: "Przesłany test zweryfikowano jako nie należący do Ciebie. Spróbuj ponownie."
+        late_quiz: "Użytkownik przesłał ten test po czasie, dlatego twoje odpowiedzi mogły nie zostać zapisane."
+        protected_quiz: "Ten test jest chroniony i jest dostępny tylko z niektórych lokalizacji. Komputer, z którego korzystasz, prawdopodobnie nie znajduje się w takiej lokalizacji."
+      show: 
+        score_out_of: "Twój wynik to %{score} na %{points_possible} możliwych"
+      still_zipping: "Trwa kompresowanie pliku..."
+    quizzes: 
+      access_code: 
+        buttons: 
+          submit: Prześlij
+        labels: 
+          access_code: "Kod dostępu"
+        quiz_restricted: "Test chroniony kodem dostępu. Użytkownik powinien poprosić instruktora lub osobę nadzorującą o wpisanie lub podanie kodu dostępu w celu podejścia do testu."
+        survey_restricted: "Ankieta chroniona kodem dostępu. Użytkownik powinien poprosić instruktora lub osobę nadzorującą o wpisanie lub podanie kodu dostępu w celu udziału w ankiecie."
+      default_history_crumb: Historia
+      default_title: "Nowy test"
+      display_answer: 
+        labels: 
+          answer_with_margin: "z marginesem"
+          your_answer: "Twoja odpowiedź"
+        margin_of_error: "margines błędu"
+        plus_or_minus: +/-
+        range_answer: "Między %{lower_bound} a %{upper_bound}"
+        you_left_this_blank: "(Użytkownik pozostawił to miejsce puste)"
+      display_question: 
+        default_question_answer: "[ Wybierz ]"
+        flag_this_question: "Oflaguj to pytanie"
+        headers: 
+          formulas: Formuły
+          possible_solutions: "Możliwe rozwiązania"
+          solution_answer: Odpowiedź
+          variable_maximum: Maks.
+          variable_minimum: Min.
+          variable_name: Zmienna
+          variable_precision: "Miejsca dziesiętne"
+          variables: Zmienne
+        labels: 
+          additional_comments: "Komentarze dodatkowe"
+          for_answer_number: "Nr odpowiedzi %{answer_number}"
+          warning_icon: Ostrzeżenie
+        links: 
+          delete_question: "Usuń to pytanie"
+          edit_question: "Edytuj to pytanie"
+          move_copy_question: "przenieś/skopiuj to pytanie do innego banku"
+        not_yet_graded: "Jeszcze nie oceniono"
+        original_score: "Oryginalny wynik:"
+        points_possible: "%{points_possible} pkt"
+        question_number: "Pytanie nr %{question_number}"
+        regraded_score: "Wynik oceniony ponownie:"
+        show_ansers_for_variable: "Wyświetl odpowiedzi dla %{variable}"
+        skip_question_text: "Pomiń i przejdź do treści pytania."
+        submission_was_regraded: "Pytanie zostało ponownie ocenione."
+        titles: 
+          question_correct_comment: "Uczestnicy zobaczą ten komentarz, jeśli poprawnie dopowiedzą na pytanie"
+          question_incorrect_comment: "Uczestnicy zobaczą ten komentarz, jeśli dopowiedzą na pytanie niepoprawnie"
+          question_neutral_comment: "Uczestnicy zobaczą ten komentarz po udzieleniu odpowiedzi na pytanie"
+        unsupported_question_type: "To pytanie zaimportowano z zewnętrznego źródła. Było to pytanie „%{question_type}”, które nie jest obsługiwane przez dane narzędzie do tworzenia pytań."
+        you_left_this_blank: "(Użytkownik pozostawił to miejsce puste)"
+      download_file_upload_submissions: 
+        links: 
+          download_submissions: "Pobierz wszystkie pliki"
+      equations_help: 
+        equation_functions: |-
+            Oprócz zmiennych dostępny jest również zbiór funkcji pomocniczych,
+            których można użyć do generowania użytecznych wartości.  Na przykład:
+            
+            %{example}
+            
+            Aby zobaczyć wyjaśnienie danej funkcji pomocniczej, zaznacz ją na poniższej liście:
+        equation_intro: |-
+            Seria pytań jest oparta na co najmniej jednej formule obliczanej 
+            w kolejności.  W formule można tworzyć zmienne pośrednie, ale
+            to wynik numeryczny ostatniej formuły jest używany do generowania 
+            poprawnej odpowiedzi.  Na przykład:
+            
+            %{example}
+            
+            Dla tego zestawu wzorów, końcowa odpowiedź to 71.  Jednak,
+            nie ma żadnych uprzednio zdefiniowanych zmiennych, więc wszyscy uczestnicy otrzymają
+            to samo pytanie z tą samą odpowiedzią. Zobacz karta „zmienne”,
+            aby uzyskać więcej informacji dotyczących zmiennych.
+        equation_variables2: |-
+            Zmienne również można określić w treści pytania za pomocą nawiasów 
+            („Ile wynosi [a] + [b]?”).  Dla każdej zmiennej widoczne będzie pole „Przykładowa wartość” oparte na ustawieniach zmiennych. Umożliwia to sprawdzenie własnych obliczeń i działania formuł. Na przykład, jeśli pytanie brzmi: „Ile wynosi [a] + 5?”, należy zdefiniować zmienną „a”.  Jeśli wartość zmiennej „a” wynosi na przykład 5,2, można napisać: %{example}. Dzięki tej formule można wygenerować dowolną liczbę zbiorów rozwiązań dla różnych wartości zmiennej „a” w każdym zbiorze.  Jeden z uczestników może otrzymać pytanie „Ile wynosi 5,2 + 5?”, a inny „Ile wynosi 9 + 5?”.
+        links: 
+          functions: Funkcje
+          intro: Wprowadzenie
+          variables: Zmienne
+      errors: 
+        no_more_attempts: "Nie masz już więcej prób podejścia do testu"
+        quiz_deleted: "Test został usunięty"
+        quiz_update_failed: "Aktualizacja testu nie powiodła się"
+      fabulous_quizzes: 
+        page_titles: Testy
+      find_question_from_bank: 
+        already_added: "to pytanie jest już w teście"
+        bank_description: "%{bank_name}, %{n} pytań"
+        buttons: 
+          add_questions: "Dodaj pytania"
+          create_group: "Utwórz grupę"
+          select_bank: "Wybierz bank"
+        group_pick_count: "%{pick_count} pytań"
+        group_points: "%{points} za pytanie"
+        headers: 
+          bank_name: "Nazwa banku"
+        hints: 
+          group_pick_count: "wybrano dotąd %{pick_count}"
+        labels: 
+          add_questions_to_group: "Dodaj pytania do tej grupy testów"
+          group_name: "Nazwa grupy"
+          group_pick_count: Pobierz
+          group_points: Punkty
+        links: 
+          clear_all_banks: "Usuń wszystko"
+          manage_question_banks: "Zarządzaj bankami pytań z kursu"
+          more_questions: "więcej pytań"
+          select_all_banks: "Zaznacz wszystko"
+        options: 
+          new_group: "[ Nowa grupa ]"
+          no_group: "[ Brak grup ]"
+        select_a_question_bank: "Wybierz bank pytań z poniższej listy, aby połączyć go z testem i utworzyć grupę pytań."
+        titles: 
+          add_new_question_group: "Dodaj nową Grupę pytań"
+      form_answer: 
+        answer_in_range_accessible: "między *zakres rozpoczęcia* a #zakres zakończenia#"
+        answer_text: "Treść odpowiedzi"
+        answer_weight: "Waga odpowiedzi"
+        exact_answer_with_error_margin_accessible: "*dokładna odpowiedź* z marginesem błędu #margines blędu#"
+        labels: 
+          answer_comments: "Wysyła komentarz, jeśli uczestnik wybierze tę odpowiedź"
+          answer_in_range: "Odpowiedź z zakresu"
+          exact_answer: "Dokładna odpowiedź"
+        matching_left: "Element do dopasowania po lewej stronie"
+        matching_right: "Element do dopasowania po prawej stronie"
+        numerical_answer: "Odpowiedź liczbowa"
+        possible_answer: "Możliwa odpowiedź"
+        titles: 
+          click_to_enter_answer_comments: "Kliknij, aby wprowadzić komentarz wyświetlany, jeśli uczestnik wybierze tę odpowiedź"
+          click_to_set_as_correct: "Kliknij, aby ustawić tę odpowiedź jako poprawną"
+          delete_answer: "Usuń tę odpowiedź"
+          edit_as_html: "Zmień edytowanie tekstu odpowiedzi na HTML"
+      form_question: 
+        allow_tolerance: "zezwól na margines błędu wynoszący +/- %{tolerance}"
+        buttons: 
+          create_update_question: "Utwórz/Aktualizuj pytanie"
+          generate: Generuj
+          recompute: "Oblicz ponownie"
+        correct_answer_comments: "Komentarze do poprawnych odpowiedzi"
+        distractor_instructions: "wpisz każdą fałszywą odpowiedź w odrębnej linijce"
+        equation_example: "np. \"ile jest 5 dodać [x]?\""
+        explanation: 
+          generate_possible_solutions: "Na koniec stwórz tyle kombinacji zmiennych i rozwiązań ile potrzeba do testu."
+        explanations: 
+          calculated: "Wprowadź pytanie, utwórz formułę i wygeneruj zestaw kombinacji możliwych odpowiedzi. Uczestnicy otrzymują pytanie i wybrany zestaw losowo ustawionych zmiennych i wprowadzają jako odpowiedź prawidłową wartość."
+          equations: "Zmienne można określić, wpisując ich nazwy w nawiasie"
+          essay: "Uczestnicy wpisują swoją odpowiedź w wyświetlone pole tekstowe."
+          file_upload: "Uczestnicy będą mogli przekazać plik z odpowiedzią."
+          fill_in_multiple_blanks: "Wprowadź pytanie, określając rozmieszczenie luk. Następnie dla każdej z nich podaj możliwą, prawidłową odpowiedź. Uczestnicy wprowadzają prawidłowe odpowiedzi w pola tekstowe w miejscu każdej luki."
+          formula_definition: "Kolejny krok to utworzenie formuły lub formuł, które posłużą do obliczania poprawnej odpowiedzi. Należy użyć tych samych zmiennych, które podano powyżej."
+          matching: "Stwórz pary pasujących do siebie wartości. Uczestnicy widzą wartości po lewej, a ich zadaniem jest wybranie pasujących wartości z listy rozwijanej po prawej. Do kilku elementów można dopasować tę samą odpowiedź lub dodać kilka fałszywych wpisów po prawej."
+          missing_word: "Określ tekst wyświetlany przed listą rozwijaną i po niej. Utwórz zestaw możliwych odpowiedzi i zaznacz poprawną odpowiedź."
+          multi_answer_sets: "W polu poniżej, znajdującym się w miejscu umieszczenia pola odpowiedzi, wpisz słowo odnośnik (bez spacji) w nawiasie"
+          multiple_answers: "Pod pytaniem, przy każdej odpowiedzi wyświetlone będą pola wyboru, a zadaniem uczestnika jest wybranie WSZYSTKICH, które zostały oznaczone jako poprawne."
+          multiple_choice: "Wprowadź pytanie z zestawem odpowiedzi do wyboru i zaznacz jedną poprawną odpowiedź."
+          multiple_dropdowns: "Wprowadź pytanie, określając rozmieszczenie list rozwijanych. Następnie utwórz listę możliwych odpowiedzi, z których jedna jest poprawna."
+          numerical: "Określ poprawną odpowiedź jako numer z zakresu lub jako numer z danym marginesem błędu. Uczestnicy poprawny numer odpowiedzi wprowadzają w podane puste pole tekstowe."
+          short_answer: |-
+              Wprowadź treść pytania, a następnie określ wszystkie możliwe poprawne odpowiedzi dla każdej luki.  
+              Dla uczestników obok pytania zostanie wyświetlone niewielkie pole tekstowe, do którego należy wprowadzić odpowiedź.
+          text_only: "To „pytanie” nie będzie punktowane, ale może posłużyć do wprowadzenia zestawu powiązanych pytań."
+          true_false: "Wprowadź treść pytania, a następnie określ, czy prawidłowa odpowiedź to Prawda czy Fałsz."
+          variable_definitions: "Po wprowadzeniu zmiennych powyżej powinny one być widoczne na liście tutaj. Dla każdej z poniższych zmiennych można określić zakres możliwych odpowiedzi."
+        general_answer_comments: "Ogólne komentarze do odpowiedzi"
+        headers: 
+          formula_definition: "Definiowanie formuły"
+          generate_possible_solutions: "Generuj możliwe rozwiązania"
+          variable_definitions: "Definiowanie zmiennych"
+          variable_example_value: "Przykładowa wartość"
+          variable_maximum: Maks.
+          variable_minimum: Min.
+          variable_name: Zmienna
+          variable_precision: "Miejsca dziesiętne"
+        label: 
+          question: 
+            name: "Nazwa pytania"
+            points: "Wartość punktu pytania"
+            type: "Typ pytania"
+        labels: 
+          answers: Odpowiedzi
+          distractors: "Dodatkowe elementy do dopasowania (fałszywe odpowiedzi)"
+          missing_word_after: "Tekst wokół odpowiedzi"
+          points: pkt
+          question: Pytanie
+        links: 
+          add_another_answer: "Dodaj kolejną odpowiedź"
+          need_help: "Potrzebujesz pomocy?"
+        multi_answer_sets_example: "np. „Róże są [kolor1], fiołki są [kolor2]”"
+        offer_combinations: "Podaj %{how_many} możliwych kombinacji wartości (maks. %{max_combinations})"
+        options: 
+          only_one_correct: "Tylko jedna poprawna odpowiedź"
+          students_select_multiple: "Uczestnicy wybierają kilka odpowiedzi"
+        question_type: 
+          calculated: "Pytanie oparte na formule"
+          essay: "Temat wypracowania"
+          file_upload: "Pytanie dotyczące przekazywania pliku"
+          fill_in_multiple_blanks: "Wypełnianie luk z podpowiedziami"
+          matching: Dopasowywanie
+          missing_word: "Brakujące słowo"
+          multiple_answers: "Kilka poprawnych odpowiedzi"
+          multiple_choice: "Pytanie wielokrotnego wyboru"
+          multiple_dropdowns: "Listy wielokrotnego wyboru"
+          numerical: "Odpowiedź liczbowa"
+          short_answer: "Wypełnianie luk"
+          text_only: "Tekst (bez pytania)"
+          true_false: Prawda/Fałsz
+        show_possible_answers: "Wyświetl możliwe odpowiedzi dla %{question}"
+        show_possible_answers_no_question: "Pokaż możliwe odpowiedzi dla"
+        titles: 
+          click_to_enter_correct_answer_comments: "Kliknij, aby wprowadzić komentarze do poprawnych odpowiedzi"
+          click_to_enter_general_answer_comments: "Kliknij, aby wprowadzić komentarze ogólne"
+          click_to_enter_wrong_answer_comments: "Kliknij, aby wprowadzić komentarze do błędnych odpowiedzi"
+        wrong_answer_comments: "Komentarze do błędnych odpowiedzi"
+      history: 
+        anonymous_username: Uczestnik
+        buttons: 
+          allow_extra_attempt: "zezwól uczestnikowi na dodatkową próbę"
+        count_attempts_left: 
+          few: "%{user} pozostało %{count} proby"
+          one: "%{user} pozostała %{count} próba"
+          other: "%{user} pozostało %{count} prób"
+        default_quiz_name: "Test z kursu %{course_name}"
+        default_survey_name: "Ankieta do kursu %{course_name}"
+        grade_by_question_warning: "Na funkcję „grade by question” mają wpływ pytania, których kolejność w grupie jest ustalana losowo."
+        headers: 
+          quiz_submissions: "Przesłane testy"
+          survey_submissions: "Przesłane ankiety"
+        latest_quiz_results: "Są to wyniki ostatniego testu użytkownika %{user}. Aby zmienić punkty przydzielone za dane pytanie lub dodać więcej komentarzy, kliknij przycisk „Aktualizuj wyniki punktowe” znajdujący się u dołu strony."
+        latest_survey_results: "Są to wyniki ostatniej ankiety użytkownika %{user}. Aby zmienić punkty przydzielone za dane pytanie lub dodać więcej komentarzy, kliknij przycisk „Aktualizuj wyniki punktowe” znajdujący się u dołu strony."
+        links: 
+          back_to_quiz: "Powrót do testu"
+          back_to_survey: "Powrót do ankiety"
+        logged_out_user: "Użytkownik wylogowany %{index}"
+        named_quiz_results: "%{quiz_name} Wyniki dla %{user}"
+        next_questions_arrow_title: "Następne pytanie"
+        no_more_attempts: "Użytkownik %{user} nie ma więcej prób"
+        page_title_quiz: "Historia testów użytkownika %{user}"
+        page_title_survey: "Historia ankiet użytkownika %{user}"
+        prev_questions_arrow_title: "Poprzednie pytania"
+        quiz_not_yet_taken: "Użytkownik nie podszedł jeszcze do testu."
+        quiz_not_yet_taken_or_in_progress: "Użytkownik nie podszedł jeszcze do testu lub właśnie go rozwiązuje"
+        quiz_unlimited_attempts: "Ten test ma nieograniczoną liczbę prób rozwiązania"
+        score_for_attempt: "Próba %{attempt_number}: %{score}"
+        survey_not_yet_taken: "Użytkownik nie brał jeszcze udziału w ankiecie."
+        survey_not_yet_taken_or_in_progress: "Użytkownik nie brał jeszcze udziału w ankiecie lub właśnie ją wypełnia"
+        survey_unlimited_attempts: "Ta ankieta ma nieograniczoną liczbę prób wypełnienia"
+        titles: 
+          score_pending_review: "Wynik punktowy oczekuje sprawdzenia i może ulec zmianie"
+          submission_needs_review: "Przesłane zadanie wymaga sprawdzenia"
+        unnamed_quiz_results: "Wyniki testów dla użytkownika %{user}"
+        unnamed_survey_results: "Wyniki ankiet dla użytkownika %{user}"
+      index: 
+        buttons: 
+          publish_quizzes: "Publikuj testy"
+        headers: 
+          assignment_quizzes: "Zadania w formie testu"
+          course_quizzes: "Testy kursowe"
+          practice_quizzes: "Testy próbne"
+          publish_multiple_quizzes: "Publikuj wiele testów"
+          surveys: Ankiety
+          unpublished_quizzes: "Niepublikowane testy"
+        labels: 
+          publish_multiple_quizzes: "Wybierz testy, które chcesz opublikować tym razem"
+        links: 
+          create_new_quiz: "Utwórz nowy test"
+          manage_question_banks: "Zarządzaj bankami pytań"
+          publish_multiple_quizzes: "Publikuj wiele testów"
+        no_quizzes: "Brak dostępnych testów"
+        page_titles: Testy
+        titles: 
+          this_quiz_is_locked: "Aktualnie test jest zablokowany. Kliknij w celu uzyskania dalszych informacji."
+      invalid_ip: 
+        quiz_protected: "Ten test jest chroniony i jest dostępny tylko z niektórych lokalizacji. Komputer, z którego korzystasz nie wydaje się prawidłową lokalizacją na podejście do testu."
+        survey_protected: "Ta ankieta jest chroniona i jest dostępna tylko z niektórych lokalizacji. Komputer, z którego korzystasz, prawdopodobnie nie znajduje się w takiej lokalizacji."
+      lockdown_browser_required: 
+        headers: 
+          requires_lockdown: "Wymagany program Respondus LockDown Browser"
+        labels: 
+          download_lockdown: "Jeśli jeszcze nie zainstalowano przeglądarki, można ją pobrać tutaj"
+        links: 
+          download_lockdown: "[Pobierz Respondus LockDown Browser]"
+        requires_lockdown: "Test wymaga programu Respondus LockDown Browser. Uruchom program Respondus LockDown Browser, aby podejść do testu lub wyświetlić swoje wyniki."
+      managed_quiz_data: 
+        anonymous_student: "Uczestnik %{user_count}"
+        logged_out_user: "Użytkownik wylogowany %{user_counter}"
+        titles: 
+          submission_needs_review: "Przesłane zadanie wymaga sprawdzenia"
+      moderate: 
+        add_time: "Dodaj godzinę"
+        buttons: 
+          change_extensions_for_selected_students: "Zmień rozszerzenia dla %{n} wybranych uczestników"
+          extend_time: "Wydłuż czas"
+          save: Zapisz
+        end_quiz_reference_time_current_end: "bieżąca godzina zakończenia"
+        end_quiz_reference_time_now: teraz
+        end_quiz_when: "Zakończ test na %{n} minut od %{reference_time}."
+        extended_quiz_time_explanation: "Możesz przydzielić więcej czasu temu uczestnikowi w trakcie bieżącej próby rozwiązania testu. Ile dodatkowego czasu chcesz przydzielić?"
+        finished_in: "zakończono w ciągu %{duration}"
+        global_extra_attempts: "wszyscy wykorzystali już następującą liczbę prób: %{n}"
+        headers: 
+          attempt: Próba
+          attempts_left: "Pozostała liczba prób"
+          extended_quiz_time: "Wydłuż czas testu"
+          score: "Wynik punktowy"
+          student: Uczestnik
+          student_extensions: "Rozszerzenia dla uczestnika"
+          time: Godzina
+        in_progress: "w trakcie"
+        labels: 
+          ending: Kończenie
+          extra_attempts: "Dodatkowe próby"
+          extra_time_per_attempt: "Dodatkowy czas na każdej z prób"
+          manually_unlock: "Ustaw ręczne odblokowanie testu do kolejnej próby"
+          started: Rozpoczęto
+        minutes: minuty
+        page_title: "Zarządzaj testem"
+        student_gets_extra_time: "*Uczestnik %{student_name}* **otrzymuje dodatkowe %{extra_time} minut na każdą z prób**"
+        student_n: "Uczestnik %{n}"
+        titles: 
+          change_user_extensions: "Zmień rozszerzenia użytkownika"
+          manually_unlocked: "Odblokowywany ręcznie"
+          minutes_to_add: "dodatkowe minuty"
+          select_deselect_all: "Zaznacz wszystkie/Usuń zaznaczenie wszystkich"
+          select_user: "Wybierz użytkownika %{user}"
+      multi_answer: 
+        choose_answer: Wybierz
+      muted: 
+        muted_quiz_description: "Wynik twojego testu jest niedostępny, ponieważ instruktor nie skończył jego oceniania. Po ocenieniu testu twój wynik będzie dostępny na tej stronie."
+        muted_quiz_header: "Test został ukryty"
+      new: 
         allowed_attempts: "Dozwolona liczba prób"
-        attempts_left: "Pozostała liczba prób"
-        attempts_so_far: "Wykorzystane dotąd próby"
-        latest_submission: "Ostatnio przesłane zadania"
-        quiz_details: "Informacje szczegółowe dot. testu"
-        quiz_due: "Termin dostarczenia"
-        quiz_time_limit: "Limit czasu"
-        survey_details: "Informacje szczegółowe dot. ankiety"
-      no_details: "Brak szczegółowych informacji"
-      points_possible: "%{points_possible} możliwych punktów"
-      question_count: 
-        few: "%{count} Pytania"
-        one: "1 Pytanie"
-        other: "%{count} Pytań"
-      quiz_multiple_due_dates: "Wiele dat"
-      quiz_no_points: "Brak punktów"
-      quiz_points_possible: 
-        few: "%{count} Punkty"
-        one: "1 Punkt"
-        other: "%{count} Punktów"
-      student_mute_notification: "Instruktor jest w trakcie oceniania"
-      unlimited_attempts: "Nieograniczona liczba prób"
-    read_only: 
-      default_page_title: "Nowy test"
-      headers: 
-        quiz_details: "Informacje szczegółowe dot. testu"
-      labels: 
-        question_details: "Wyświetl informacje szczegółowe pytania"
+        anonymous_submissions: "Nie wyświetlaj autora przesłanego zadania"
+        buttons: 
+          not_published: "Nie opublikowane"
+          published: Opublikowane
+          save: Zapisz
+        cant_go_back: "Zablokuj pytania po udzieleniu odpowiedzi"
+        default_page_title: "Nowy test"
+        group: "Grupa zadań"
+        headers: 
+          ip_filters: "Co to są filtry adresu IP dla testów?"
+        hide_correct_answers_at: "Ukryj poprawne odpowiedzi przy"
+        hints: 
+          question_detail_disabled: "UWAGA: Szczegóły pytań niedostępne, kiedy więcej niż %{question_count}."
+          quiz_score: "uczestnicy automatycznie uzyskają pełne zaliczenie po wypełnieniu ankiety"
+        ip_filters: "Filtry IP testu służą do ograniczania dostępu do testów dla komputerów z danego zakresu IP. Filtry mogą być listami adresów oddzielonych przecinkami lub adresami, po których podana jest maska podsieci („192.168.217.1\", „192.168.217.1/24\" lub „192.168.217.1/255.255.255.0\")."
+        label: 
+          time_limit: "Limit czasu"
+        labels: 
+          allow_multiple_attempts: "Zezwalaj na wiele prób"
+          hide_results_only_after_last: "Dopiero po ostatniej próbie"
+          ip_filter: "Filtruj adresy IP"
+          never_hide_results: "Udostępniaj uczestnikom wyniki ich testów"
+          quiz_instructions: "Instrukcje do testu"
+          quiz_notify: "Powiadom użytkowników, że ten quiz się zmienił"
+          quiz_score: "Wynik punktowy"
+          require_access_code: "Wymagaj kodu dostępu"
+          restrict_quiz: "Ograniczenia testu"
+          show_question_details: "Wyświetl informacje szczegółowe pytania"
+        limited_attempts: "Dozwolona liczba prób"
+        links: 
+          cancel: Anuluj
+          find_questions: "Znajdź pytania"
+          new_question: "Nowe pytanie"
+          new_question_group: "Nowa grupa pytań"
+          show_assignment_rubric: "Wyświetl kryteria ocen"
+        manage: Zarządzaj
+        minutes: Minuty
+        new_assignment: "Nowe zadanie"
+        new_discussion: "Nowa dyskusja"
+        one_question_at_a_time: "Wyświetlaj pytania po kolei"
+        points_possible: "Punkty %{n}"
+        quiz_title: "Tytuł testu"
+        quiz_type: "Typ testu"
+        require_lockdown_browser: "Wymagaj programu Respondus LockDown Browser"
+        require_lockdown_browser_for_results: "Wymagany do wyświetlenia wyników testu"
+        retrieving_filters: "Trwa pobieranie filtrów..."
+        score_to_keep: "Wynik punktowy z testu do zapisania"
+        show_correct_answers: "Udostępniaj uczestnikom poprawne odpowiedzi"
+        show_correct_answers_at: "Wyświetl poprawne odpowiedzi przy"
+        shuffle_answers: "Pomieszaj odpowiedzi"
+        students_cannot_view_responses_after_course_concludes: "Uczestnicy nie mogą podglądać odpowiedzi do testu po zakończeniu kursu"
+        time_limit: "Ile minut?"
+        titles: 
+          click_to_select_filter: "Kliknij, aby zaznaczyć filtr"
+          delete: Usuń
+          find_ip_address_filter: "Znajdź Filtr adresu IP"
+        warnings: 
+          has_student_submissions: "Uczestnicy już ukończyli ten test lub właśnie rozpoczęli jego pisanie, dlatego zachowaj ostrożność w czasie edycji. Jeśli w znaczący sposób zmienisz pytania testowe, warto rozważyć ponowne ocenienie uczestników, którzy zdawali poprzednią wersję testu."
+      notices: 
+        cant_view_submission_while_muted: "Nie można wyświetlić historii ukrytego testu."
+        has_submissions_already: "Niektórzy uczestnicy już napisali lub właśnie piszą ten test"
+        less_than_allotted_time: "Użytkownik rozpoczął pisanie testu na krótko przed jego zakończeniem i dlatego nie będzie miał pełnego wymiaru czasu na jego napisanie."
+        no_submission_for_user: "Użytkownik nie przesłał jeszcze żadnych zadań"
+        quiz_updated: "Test został pomyślnie zaktualizowany"
+        quizzes_published: 
+          few: "%{count} quizy opublikowano z powodzeniem!"
+          one: "1 quiz opublikowano z powodzeniem!"
+          other: "%{count} quizów opublikowano z powodzeniem!"
+        quizzes_unpublished: 
+          few: "Pomyślnie cofnięto publikację następującej liczby testów: %{count} "
+          one: "Pomyślnie cofnięto publikację 1 testu! "
+          other: "Pomyślnie cofnięto publikację następującej liczby testów: %{count} "
+      question_group: 
+        buttons: 
+          update: Aktualizuj
+        default_group_name: Grupa
+        edit_questions_and_points: "Pobierz następującą liczbę pytań: *%{num_questions}*, liczba punktów na pytanie: #%{num_points}#"
+        labels: 
+          group_name: "Nazwa grupy"
+          number_of_questions: "Liczba pytań"
+          points_per_question: "Punkty za pytanie"
+          question_bank: "Pytania będą losowane z banku"
+        links: 
+          link_to_a_question_bank: "Połącz z bankiem pytań"
+        show_questions_and_points: "Pobierz następującą liczbę pytań: *%{num_questions}*, liczba punktów na pytanie: #%{num_points}#"
+        titles: 
+          add_question_to_group: "Dodaj pytanie do tej grupy"
+          collapse_group: "Zwiń grupę"
+          delete_group: "Usuń grupę"
+          edit_group_details: "Edytuj informacje szczegółowe grupy"
+          expand_group: "Rozwiń grupę"
+      question_list_right_side: 
+        headers: 
+          questions: Pytania
+      question_statistic: 
+        attempts: 
+          few: " %{count} próby"
+          one: "1 próba"
+          other: " %{count} prób"
+        empty_response: "Pusta odpowiedź"
+        labels: 
+          other_answers: "Inne odpowiedzi"
+        no_data: "Brak danych"
+        no_responses: "Brak odpowiedzi zapisanych dla tego pytania"
+        percent_of_responses: "Wybór tej odpowiedzi stanowi %{percent}% z %{total} wszystkich prób"
+        response_count: 
+          few: "%{count} uczestników otrzymało to pytanie"
+          one: "1 uczestnik otrzymał to pytanie"
+          other: "%{count} uczestników otrzymało to pytanie"
+      question_teaser: 
+        titles: 
+          click_to_show_details: "Kliknij, aby wyświetlić informacje szczegółowe pytania"
+          delete_this_question: "Usuń to pytanie"
+          edit_this_question: "Edytuj to pytanie"
+      quiz_details: 
+        allowed_attempts: "Dozwolona liczba prób"
+        headers: 
+          available: Dostępne
+          due: "Termin dostarczenia"
+          points: Punkty
+          questions: Pytania
+          time_limit: "Limit czasu"
+        multiple_due_dates: "Więcej niż jeden termin dostarczenia"
+        no_due_date: "Brak terminu dostarczenia"
+        none: Brak
+        quiz_availabile_through: "%{start_time}  %{end_time}"
+        quiz_available_after: "po %{start_time}"
+        quiz_available_until: "do %{end_time}"
+        requires_lockdown: "Wymaga programu Respondus LockDown Browser"
+        time_limit: 
+          few: "%{count} Minuty"
+          one: "1 Minuta"
+          other: "%{count} Minut"
+        unlimited: Nieograniczono
+      quiz_right_side: 
+        attempts_left: 
+          few: " Pozostały jeszcze %{count} próby"
+          one: " Pozostała jeszcze 1 próba"
+          other: " Pozostało jeszcze %{count} prób"
+        attempts_so_far: 
+          few: "%{count} Próby dotychczas"
+          one: "1 Próba dotychczas"
+          other: "%{count} Prób dotychczas"
+        labels: 
+          current_score: "Bieżący wynik punktowy"
+          kept_score: "Zapisany wynik punktowy"
+          last_attempt_details: "Informacje szczegółowe dot. ostatniej próby"
+          submission_details: "Szczegółowe informacje dot. przesłanego zadania"
+          time: Godzina
+        links: 
+          preview_quiz_again: "Ponownie wyświetl podgląd testu"
+          preview_survey_again: "Ponownie wyświetl podgląd ankiety"
+        no_more_attempts: "Nie ma więcej prób"
+        questions_not_graded: "Niektórych pytań jeszcze nie oceniono"
+        score_set_manually: "Ten wynik został ustalony przez nauczyciela"
+        unlimited_attempts: "Nieograniczona liczba prób"
+        view_previous_attempts: "Wyświetl poprzednie próby"
+      quiz_show_teacher: 
+        anonymous_submissions: "Anonimowe przesyłanie"
+        attempts: Próby
+        available_from: "Dostępne od"
+        cant_go_back: "Zablokuj pytania po udzieleniu odpowiedzi"
+        code: "Kod dostępu"
+        due: "Termin dostarczenia"
+        filter: "Filtr IP"
+        for: Dla
+        group: "Grupa zadań"
+        label: 
+          time_limit: "Limit czasu"
+        multiple_attempts: "Wielokrotna liczba prób"
+        no_time_limit: "Brak limitu czasu"
+        one_question_at_a_time: "Pytania w kolejności"
+        points: Punkty
+        quiz_type: "Typ testu"
+        require_lockdown_browser: "Wymagaj programu Respondus LockDown Browser"
+        require_lockdown_browser_for_results: "Wymagany do wyświetlenia wyników testu"
+        require_lockdown_browser_monitor: "Wymagana kamera internetowa"
+        score_to_keep: "Wynik punktowy do zapisania"
+        show_correct_answers: "Pokaż Prawidłowe odpowiedzi"
+        shuffle_answers: "Pomieszaj odpowiedzi"
+        time_limit: 
+          few: "%{count} Minuty"
+          one: "1 Minuta"
+          other: "%{count} Minut"
+        until: Do
+        view_responses: "Pokaż odpowiedzi"
+      quiz_submission: 
+        attempt_duration: "Ta próba trwała %{duration}."
+        buttons: 
+          update_scores: "Aktualizuj wyniki punktowe"
+        labels: 
+          final_score: "Końcowy wynik punktowy"
+          fudge_points: "Dostosuj punkty"
+          fudge_points_changed_points_quiz: "Użytkownik %{user} napisał już test, jednak liczba punktów, którą można było uzyskać, zmieniła się o %{difference}. Można uwzględnić tę zmianę i ręcznie dodać lub odjąć punkty w tym polu."
+          fudge_points_changed_points_survey: "Użytkownik %{user} wypełnił już ankietę, jednak liczba punktów, którą można było uzyskać, zmieniła się o %{difference}. Można uwzględnić tę zmianę i ręcznie dodać lub odjąć punkty w tym polu."
+          fudge_points_generic_explanation: "Możesz ręcznie dostosować wynik punktowy, wpisując dodane lub ujęte punkty w to pole."
+          questions_need_review: "Następujące pytania wymagają sprawdzenia"
+          quiz_score: "Wynik testu"
+          score_for_attempt: "Wynik punktowy uzyskany w tej próbie"
+          score_for_quiz: "Wynik punktowy uzyskany za ten test"
+          score_for_survey: "Wynik punktowy uzyskany za tę ankietę"
+          survey_score: "Wynik punktowy za ankietę"
+        links: 
+          click_to_view_results: "Kliknij tutaj, aby wyświetlić wyniki."
+        questions_not_graded: "Niektórych pytań jeszcze nie oceniono"
+        quiz_fudged_negative: "Ten wynik punktowy z testu został ręcznie zmieniony o następującą liczbę punktów: %{fudge}"
+        quiz_fudged_positive: "Ten wynik punktowy z testu został ręcznie zmieniony o następującą liczbę punktów: +%{fudge}"
+        quiz_not_yet_taken: "Użytkownik nie podszedł jeszcze do tego testu."
+        quiz_results_protected: "Wyniki z tego testu są chronione i dlatego nie są widoczne dla uczestników."
+        quiz_results_protected_until_last_attempt: "Wyniki z tego testu są chronione i dlatego nie będą widoczne dla uczestników aż do przesłania ostatniej próby."
+        quiz_submission_needs_review: "Odkąd zadanie zostało przekazane do oceny test uległ znaczącej zmianie. To zadanie może wymagać ponownej oceny."
+        requires_lockdown: "Do wyświetlenia wyników z testu wymagany jest program Respondus LockDown Browser."
+        submitted_at: "Przesłano %{when}"
+        survey_fudged_negative: "Ten wynik punktowy z ankiety został ręcznie zmieniony o następującą liczbę punktów: %{fudge}"
+        survey_fudged_positive: "Ten wynik punktowy z ankiety został ręcznie zmieniony o następującą liczbę punktów: +%{fudge}"
+        survey_not_yet_taken: "Użytkownik nie wypełnił jeszcze tej ankiety."
+      quiz_summary: 
+        assignment_points_possible: 
+          few: "%{count} pkt"
+          one: "1 pkt"
+          other: "%{count} pkt"
+        labels: 
+          allowed_attempts: "Dozwolona liczba prób"
+          attempts_left: "Pozostała liczba prób"
+          attempts_so_far: "Wykorzystane dotąd próby"
+          latest_submission: "Ostatnio przesłane zadania"
+          quiz_details: "Informacje szczegółowe dot. testu"
+          quiz_due: "Termin dostarczenia"
+          quiz_time_limit: "Limit czasu"
+          survey_details: "Informacje szczegółowe dot. ankiety"
+        no_details: "Brak szczegółowych informacji"
+        points_possible: "%{points_possible} możliwych punktów"
+        question_count: 
+          few: "%{count} Pytania"
+          one: "1 Pytanie"
+          other: "%{count} Pytań"
+        quiz_multiple_due_dates: "Wiele dat"
+        quiz_no_points: "Brak punktów"
+        quiz_points_possible: 
+          few: "%{count} Punkty"
+          one: "1 Punkt"
+          other: "%{count} Punktów"
+        student_mute_notification: "Instruktor jest w trakcie oceniania"
+        unlimited_attempts: "Nieograniczona liczba prób"
+      read_only: 
+        default_page_title: "Nowy test"
+        headers: 
+          quiz_details: "Informacje szczegółowe dot. testu"
+        labels: 
+          question_details: "Wyświetl informacje szczegółowe pytania"
+          quiz_instructions: "Instrukcje do testu"
+        links: 
+          back_to_quiz_page: "Powrót do Strony testu"
+      refresh_quiz_after_popup: 
+        headers: 
+          loading_in_lockdown: "Trwa ładowanie testu w programie Respondus LockDown Browser"
+      show: 
+        buttons: 
+          lock_quiz: "Zablokuj teraz ten test"
+          lock_survey: "Zablokuj teraz tę ankietę"
+          publish: Publikuj
+          republish: "Opublikuj ponownie"
+          unlock_quiz: "Pozwól uczestnikom rozpocząć teraz ten test"
+          unlock_survey: "Pozwól uczestnikom rozpocząć teraz tę ankietę"
+        labels: 
+          available_until: Do
+          no_time_limit: "Brak limitu czasu"
+          warning_icon: Ostrzeżenie
+        links: 
+          edit: Edytuj
+          keep_editing_this_quiz: "Kontynuuj edycję tego testu"
+          keep_editing_this_survey: "Kontynuuj edycję tej ankiety"
+          message_students_who: "Wyślij wiadomość do uczestników, którzy..."
+          moderate_this_quiz: "Zarządzaj tym testem"
+          moderate_this_survey: "Zarządzaj tą ankietą"
+          preview: Podgląd
+          quiz_statistics: "Statystyki testu"
+          see_full_quiz: "Zobacz cały test"
+          show_assignment_rubric: "Wyświetl kryteria ocen"
+          show_student_quiz_results: "Wyświetl wyniki testu uczestnika"
+          show_student_survey_results: "Wyświetl wyniki ankiety uczestnika"
+          survey_statistics: "Statystyki ankiety"
+        manage: Zarządzaj
+        only_registered_users: "Tylko zarejestrowani, zapisani użytkownicy mogą podejść do ocenianych testów"
+        quiz_regraded_your_score_affected: 
+          few: "Test został oceniony ponownie; nowy wynik odzwierciedla %{count} pytania, które zostały zmienione."
+          one: "Test został oceniony ponownie; nowy wynik odzwierciedla 1 pytanie, które zostało zmienione."
+          other: "Test został oceniony ponownie; nowy wynik odzwierciedla %{count} pytań, które zostały zmienione."
+        quiz_regraded_your_score_not_affected: "Test został ponownie oceniony; wynik nie został zmieniony."
+        speed_grader: SpeedGrader™
+        students_submitted_so_far: 
+          few: "%{count} uczestników wysłało dotychczas"
+          one: "1 uczestnik wysłał dotychczas"
+          other: "%{count} uczestników wysłało dotychczas"
+        titles: 
+          delete: Usuń
+          related_items: "Powiązane elementy"
+          unlock_for_how_long: "Na jak długo chcesz odblokować test?"
+        warnings: 
+          draft_version: "Jest to podgląd wstępnej wersji testu"
+      single_answer: 
+        upload: Przekaż
+      statistics: 
+        class_too_large: "Ten kurs jest zbyt duży, żeby pokazać statystyki. Można je jednak pobrać z paska bocznego po prawej stronie."
+        headers: 
+          for_question: "Za %{question_name}"
+          quiz_statistics: "Statystyki testu"
+          survey_statistics: "Statystyki ankiety"
+          users_have_taken_this_quiz: "%{count} użytkowników napisało ten test"
+          users_have_taken_this_survey: "%{count} użytkowników wypełniło tę ankietę"
+        labels: 
+          average_correct: "Średnia liczba odpowiedzi poprawnych"
+          average_incorrect: "Średnia liczba odpowiedzi błędnych"
+          average_time: "Średni poświęcony czas"
+          high_score: "Wysoki wynik punktowy"
+          low_score: "Niski wynik punktowy"
+          mean_score: "Średni wynik punktowy"
+          standard_deviation: "Odchylenie standardowe"
+          users_selected_the_answer: "Użytkownicy, którzy zaznaczyli odpowiedź %{answer_text}"
+        links: 
+          count_all_attempts: "Policz **wszystkie** próby"
+          count_only_latest_attempts: "Policz tylko ostatnie próby uczestników"
+        page_title: Statystyki
+        quiz_all_version_disclaimer: "Raport przedstawia statystyki testów oparte na wszystkich próbach wszystkich uczestników."
+        quiz_latest_version_disclaimer: "Raport przedstawia statystyki testów oparte na ostatnich próbach każdego z uczestników."
+        student_n: "Uczestnik %{student_counter}"
+        survey_all_version_disclaimer: "Raport przedstawia statystyki ankiet oparte na wszystkich próbach wszystkich uczestników."
+        survey_latest_version_disclaimer: "Raport przedstawia statystyki ankiet oparte na ostatnich próbach każdego z uczestników."
+      statistics_crumb: Statystyki
+      submission_version: 
+        attempt_number: "Próba nr %{att_no}"
+        kept: ZACHOWANE
+        latest: OSTATNIE
+      submission_versions: 
+        attempt: Próba
+        attempt_history: "Historia prób"
+        quiz_attempt_history_description: "Tabela pokazująca historię prób napisania testu. Każda próba znajduje się po lewej stronie. Próba, czas i wynik znajdują się na górze."
+        regraded: "Ponownie oceniony"
+        score: "Wynik punktowy"
+        time: Godzina
+      take_quiz: 
+        buttons: 
+          next: Dalej
+          out_of_time_submit: "OK, w porządku"
+          previous: Wstecz
+          submit_quiz: "Prześlij test"
+        headers: 
+          draft_preview: "Jest to podgląd wstępnej wersji testu"
+        labels: 
+          started: Rozpoczęto
+          times_up: "Czas minął! Trwa przesyłanie wyników"
+        logged_out_of_canvas: "*Zostałeś wylogowany z systemu Canvas.* Aby kontynuować, zaloguj się"
+        login_required: "Wymagany identyfikator logowania"
+        not_saved: "Nie zapisano"
         quiz_instructions: "Instrukcje do testu"
-      links: 
-        back_to_quiz_page: "Powrót do Strony testu"
-    refresh_quiz_after_popup: 
-      headers: 
-        loading_in_lockdown: "Trwa ładowanie testu w programie Respondus LockDown Browser"
+      take_quiz_in_popup: 
+        headers: 
+          loading_in_lockdown: "Trwa ładowanie testu w programie Respondus LockDown Browser"
+        links: 
+          return_to_quiz_page: "[Kliknij tutaj] (%{url}), aby powrócić do poprzedniej strony."
+      take_quiz_right_side: 
+        labels: 
+          attempt_due: "Termin dostarczenia próby"
+          score: "Wynik punktowy"
+          time_elapsed: "Czas upłynął"
+          time_running: "Czas płynie"
+        links: 
+          hide_time_running: Ukryj
+          keep_editing_quiz: "Kontynuuj edycję tego testu"
+          keep_editing_survey: "Kontynuuj edycję tej ankiety"
     retrieving_filters: "Trwa pobieranie filtrów..."
     rubric: 
       loading: "Trwa ładowanie..."
@@ -11918,119 +12248,38 @@ pl:
         you_answered: Odpowiedziano
       buttons: 
         already_published: Opublikowano!
-        lock_quiz: "Zablokuj teraz ten test"
-        lock_survey: "Zablokuj teraz tę ankietę"
-        publish: Publikuj
         publishing: "Trwa publikowanie..."
-        republish: "Opublikuj ponownie"
-        unlock_quiz: "Pozwól uczestnikom rozpocząć teraz ten test"
-        unlock_survey: "Pozwól uczestnikom rozpocząć teraz tę ankietę"
       confirms: 
         delete_quiz: "Czy na pewno chcesz usunąć ten test?"
         delete_quiz_submissions_warning: 
           few: "Ostrzeżenie: %{count} uczestników rozwiązało ten quiz. Jeśli go usuniesz, wszystkie przekazane rozwiązania zostaną usunięte i nie będą dłużej widoczne  w dzienniku."
           one: "Ostrzeżenie: 1 uczestnik rozwiązał ten quiz. Jeśli go usuniesz, wszystkie przekazane rozwiązania zostaną usunięte i nie będą dłużej widoczne  w dzienniku."
           other: "Ostrzeżenie: %{count} uczestników rozwiązało ten test. Jeśli go usuniesz, wszystkie przekazane rozwiązania zostaną usunięte i nie będą dłużej widoczne  w dzienniku."
-      labels: 
-        available_until: Do
-        no_time_limit: "Brak limitu czasu"
-        warning_icon: Ostrzeżenie
       links: 
-        edit: Edytuj
         hide_student_quiz_results: "Ukryj rezultaty testu uczestnika"
         hide_student_survey_results: "Ukryj wyniki ankiety uczestnika"
-        keep_editing_this_quiz: "Kontynuuj edycję tego testu"
-        keep_editing_this_survey: "Kontynuuj edycję tej ankiety"
-        message_students_who: "Wyślij wiadomość do uczestników, którzy..."
-        moderate_this_quiz: "Zarządzaj tym testem"
-        moderate_this_survey: "Zarządzaj tą ankietą"
-        preview: Podgląd
-        quiz_statistics: "Statystyki testu"
-        see_full_quiz: "Zobacz cały test"
-        show_assignment_rubric: "Pokaż kryteria ocen dla zadania"
         show_student_quiz_results: "Wyświetl wyniki testu uczestnika"
         show_student_survey_results: "Wyświetl wyniki ankiety uczestnika"
-        survey_statistics: "Statystyki ankiety"
-      manage: Zarządzaj
-      only_registered_users: "Tylko zarejestrowani, zapisani użytkownicy mogą podejść do ocenianych testów"
-      quiz_regraded_your_score_affected: 
-        few: "Test został oceniony ponownie; nowy wynik odzwierciedla %{count} pytania, które zostały zmienione."
-        one: "Test został oceniony ponownie; nowy wynik odzwierciedla %{count} pytanie, które zostało zmienione."
-        other: "Test został oceniony ponownie; nowy wynik odzwierciedla %{count} pytań, które zostały zmienione."
-      quiz_regraded_your_score_not_affected: "Test został ponownie oceniony; wynik nie został zmieniony."
-      speed_grader: SpeedGrader™
-      students_submitted_so_far: 
-        few: "%{count} uczestników wysłało dotychczas"
-        one: "1 uczestnik wysłał dotychczas"
-        other: "%{count} uczestników wysłało dotychczas"
       students_who_have_not_taken_the_quiz: "Uczestnicy, którzy NIE napisali testu"
       students_who_have_taken_the_quiz: "Uczestnicy, którzy już napisali test"
-      titles: 
-        delete: Usuń
-        related_items: "Powiązane elementy"
-        unlock_for_how_long: "Na jak długo chcesz odblokować test?"
-      warnings: 
-        draft_version: "Jest to podgląd wstępnej wersji testu"
     show_and_hide_correct_answers: "Od %{from} do %{to}"
     show_correct_answers_after: "Po %{date}"
     show_correct_answers_immediately: Natychmiast
     show_correct_answers_until: "Do %{date} "
-    single_answer: 
-      upload: Przekaż
     statistics: 
-      class_too_large: "Ten kurs jest zbyt duży, żeby pokazać statystyki. Można je jednak pobrać z paska bocznego po prawej stronie."
       count_attempts: 
         few: "%{count} próby"
         one: " 1 próba"
         other: "%{count} prób"
-      headers: 
-        for_question: "Za %{question_name}"
-        quiz_statistics: "Statystyki testu"
-        survey_statistics: "Statystyki ankiety"
-        users_have_taken_this_quiz: "%{count} użytkowników napisało ten test"
-        users_have_taken_this_survey: "%{count} użytkowników wypełniło tę ankietę"
-      labels: 
-        average_correct: "Średnia liczba odpowiedzi poprawnych"
-        average_incorrect: "Średnia liczba odpowiedzi błędnych"
-        average_time: "Średni poświęcony czas"
-        high_score: "Wysoki wynik punktowy"
-        low_score: "Niski wynik punktowy"
-        mean_score: "Średni wynik punktowy"
-        standard_deviation: "Odchylenie standardowe"
-        users_selected_the_answer: "Użytkownicy, którzy zaznaczyli odpowiedź %{answer_text}"
-      links: 
-        count_all_attempts: "Policz **wszystkie** próby"
-        count_only_latest_attempts: "Policz tylko ostatnie próby uczestników"
-      page_title: Statystyki
-      quiz_all_version_disclaimer: "Raport przedstawia statystyki testów oparte na wszystkich próbach wszystkich uczestników."
-      quiz_latest_version_disclaimer: "Raport przedstawia statystyki testów oparte na ostatnich próbach każdego z uczestników."
-      survey_all_version_disclaimer: "Raport przedstawia statystyki ankiet oparte na wszystkich próbach wszystkich uczestników."
-      survey_latest_version_disclaimer: "Raport przedstawia statystyki ankiet oparte na ostatnich próbach każdego z uczestników."
       titles: 
         submitted_users_for_quesiton: "Przesłani użytkownicy dla użytkownika %{user}"
       uncounted_submissions: 
         few: "%{count} inne zadania"
         one: "1 inne zadanie"
         other: "%{count} innych zadań"
-    statistics_crumb: Statystyki
-    submission_version: 
-      attempt_number: "Próba nr %{att_no}"
-      kept: ZACHOWANE
-      latest: OSTATNIE
-    submission_versions: 
-      attempt: Próba
-      attempt_history: "Historia prób"
-      quiz_attempt_history_description: "Tabela pokazująca historię prób napisania testu. Każda próba znajduje się po lewej stronie. Próba, czas i wynik znajdują się na górze."
-      regraded: "Ponownie oceniony"
-      score: "Wynik punktowy"
-      time: Godzina
+    survey: Ankieta
     surveys_label: "Ankiety, przełącz wyświetlanie testu"
     take_quiz: 
-      buttons: 
-        next: Dalej
-        out_of_time_submit: "OK, w porządku"
-        previous: Wstecz
-        submit_quiz: "Prześlij test"
       confirms: 
         cant_go_back_blank: "Nie można powrócić do tego pytania po przejściu do następnego. Czy na pewno chcesz je pozostawić nieuzupełnione?"
         navigate_away: "Za chwilę opuścisz tę stronę.  Kontynuować mimo to?"
@@ -12050,19 +12299,15 @@ pl:
       errors: 
         connection_lost: "Utracono połączenie z %{host}.  Przed podjęciem dalszych czynności upewnij się, że masz połączenie z Internetem."
         only_numerical_values: "dozwolone są tylko wartości numeryczne"
-      headers: 
-        draft_preview: "Jest to podgląd wstępnej wersji testu"
       hide_time_link: Ukryj
       hours_count: 
         few: "%{count} Godziny"
         one: "1 Godzina"
         other: "%{count} Godzin"
       labels: 
-        started: Rozpoczęto
         time_elapsed: "Czas upłynął"
-        times_up: "Czas minął! Trwa przesyłanie wyników"
-      logged_out_of_canvas: "*Zostałeś wylogowany z systemu Canvas.* Aby kontynuować, zaloguj się"
-      login_required: "Wymagany identyfikator logowania"
+      login_failed: "Logowanie nie powiodło się."
+      login_successful: "Logowanie zakończone pomyślnie."
       minutes_count: 
         few: "%{count} Minuty"
         one: "1 Minuta"
@@ -12071,7 +12316,6 @@ pl:
         few: "%{count} Miesięcy"
         one: "1 Miesiąc"
         other: "%{count} Miesięcy"
-      not_saved: "Nie zapisany"
       notices: 
         extra_time: "Użytkownik otrzymał dodatkowy czas w tej próbie"
         five_minutes_left: "Pozostało pięć minut"
@@ -12081,7 +12325,6 @@ pl:
         twelve_hours_left: "Pozostało dwanaście godzin"
       question_answered: "Z udzieloną odpowiedzią"
       question_unanswered: "Nie udzielono jeszcze odpowiedzi"
-      quiz_instructions: "Instrukcje do testu"
       saved_at: "Test zapisano w %{t}"
       saving: "Trwa zapisywanie..."
       saving_not_needed: "Brak nowych danych do zapisania. Termin ostatniego sprawdzenia: %{t}"
@@ -12097,19 +12340,6 @@ pl:
         few: " %{count}  lata"
         one: "1 Rok"
         other: "%{count}  lat"
-    take_quiz_in_popup: 
-      headers: 
-        loading_in_lockdown: "Trwa ładowanie testu w programie Respondus LockDown Browser"
-    take_quiz_right_side: 
-      labels: 
-        attempt_due: "Termin dostarczenia próby"
-        score: "Wynik punktowy"
-        time_elapsed: "Czas upłynął"
-        time_running: "Czas płynie"
-      links: 
-        hide_time_running: Ukryj
-        keep_editing_quiz: "Kontynuuj edycję tego testu"
-        keep_editing_survey: "Kontynuuj edycję tej ankiety"
     timing: 
       labels: 
         time_elapsed: "Czas upłynął"
@@ -12131,21 +12361,9 @@ pl:
     : Prawda
     ungraded_survey: "Ankieta bez oceny"
     warnings: 
+      draft_state_unsaved_changes: "*Dokonano zmiany pytań w tym teście.* Zmiany te nie będą widoczne dla uczestników aż do zapisania testu."
       unpublished_changes: "*Dokonano nieopublikowanych zmian tego testu.* Zmiany te nie będą widoczne dla uczestników aż do opublikowania lub ponownego opublikowania testu."
       unpublished_quiz: "*Ten test jest nieopublikowany* Tylko instruktorzy będą widzieć ten kurs zanim zostanie opublikowany"
-  quizzes/quiz: 
-    current_filter: "Bieżący filtr"
-    default_question_input: "[ Wybierz ]"
-    default_text_only_question_name: Przekładka
-    default_title: "Test bez nazwy"
-    errors: 
-      invalid_hide_results: "Opcja Ukryj rezultaty jest nieprawidłowa"
-      invalid_ip_filter: "Filtr IP jest nieprawidłowy"
-      invalid_quiz_type: "Typ testu jest nieprawidłowy"
-    question_name_counter: "Pytanie nr %{question_number}"
-    types: 
-      quiz: Test
-      survey: Ankieta
   quizzes_model: 
     cant_unpublish_when_students_submit: "Nie można cofnąć publikowania, jeśli znajdują się przesłane zadania uczestnika"
     confirms: 
@@ -12231,6 +12449,7 @@ pl:
       create_accounts: "Utwórz nowe konta główne"
       create_collaborations: "Utwórz projekty współpracy uczestników"
       create_conferences: "Utwórz konferencję sieciową"
+      generate_data_exports: "Generuj eksport danych"
       manage_account_memberships: "Dodaj/usuń innych administratorów tego konta"
       manage_account_settings: "Zarządzaj ustawieniami konta"
       manage_admin_users: "Dodaj/usuń innych instruktorów, autorów lub pomocników instruktorów z tego kursu"
@@ -12390,7 +12609,6 @@ pl:
         are_you_sure_delete: "Czy na pewno chcesz usunąć te kryteria ocen?  Lokalizacje obecnie uzyskujące dostęp do kryteriów ocen nie stracą go, jednak nikt inny nie będzie mógł ich użyć."
         are_you_sure_remove: "Czy na pewno chcesz usunąć te kryteria ocen ze swojej listy?"
       remove_rubric: "Usuń te kryteria ocen z mojej listy"
-  screenreader_gradebook_description: "Dzienniczek czytnika ekranu jest wyposażony w interfejs do dzienniczka, który został stworzony w celu ułatwienia dostępu."
   scribd: 
     upgrade_flash: "Halo, posiadasz starą wersję Adobe Flash Player. Aby używać iPaper (i masę innych rzeczy w sieci) musisz %{link_tag}pobrać najnowszy Flash player%{end_link}."
   search: 
@@ -12482,6 +12700,8 @@ pl:
         current_enrollments: "Bieżące zapisy"
         decrosslist_section: "Nie udostępniaj tej sekcji"
   select_content: "Wybierz treść"
+  select_content_checkbox: 
+    select_content_error: "Należy wybrać opcję zawartości"
   select_content_dialog: 
     buttons: 
       add_item: "Dodaj element"
@@ -12562,16 +12782,6 @@ pl:
     accounts_right_side_shared: 
       buttons: 
         go: Przejdź
-      titles: 
-        find_user: "Wyszukaj użytkownika"
-    accounts_secondary_content: 
-      buttons: 
-        go: Przejdź
-      links: 
-        manage_permissions: "Zarządzaj uprawnieniami ról"
-        manage_subaccounts: "Zarządzaj podkontami"
-        manage_terms: "Zarządzaj terminami"
-        view_statistics: "Pokaż statystyki"
       titles: 
         find_user: "Wyszukaj użytkownika"
     add_assignment: 
@@ -12675,9 +12885,19 @@ pl:
         unenroll_user_section: "Usuń użytkownika z sekcji"
       titles: 
         course_section: "Sekcja kursu"
+    error_form: 
+      message_failed: "Nie wysłano raportu. Spróbuj ponownie."
+      message_sent: "Dziękujemy za Twoją pomoc! Zajmiemy się tym."
     errors: 
       400_message: 
         description: "Niestety. Wygląda na to, że wystąpił problem w czasie ładowania żądanej strony."
+        error: "Błąd:"
+        headings: 
+          page: "Błąd strony"
+        title: "Błąd strony"
+      403_message: 
+        description: "Hmm, wygląda na to, że nie powinno Ciebie tu być"
+        error: "Błąd:"
         headings: 
           page: "Błąd strony"
         title: "Błąd strony"
@@ -12701,8 +12921,6 @@ pl:
           submit: "Wyślij komentarze"
         labels: 
           email: "Adres e-mail (opcjonalne)"
-        message_failed: "Nie wysłano raportu. Spróbuj ponownie."
-        message_sent: "Dziękujemy za Twoją pomoc! Zajmiemy się tym."
     event_list: 
       at_least_more_events: "jeszcze co najmniej %{count_of_events}"
       at_least_more_events_one_week: "jeszcze co najmniej %{count_of_events} w przyszłym tygodniu"
@@ -12766,6 +12984,7 @@ pl:
       range_upper: "Wyższy limit zakresu"
       remove_row: "Usuń rząd"
       remove_scheme: "Usuń schemat oceniania"
+      select_another_scheme: "Wybierz inny schemat"
       some_standard: "Niektóre standardy"
       use_this_standard: "Użyj tego standardu oceniania"
     home_menu: 
@@ -12900,6 +13119,8 @@ pl:
       service_contact: "Skontaktuj się z %{user} za pomocą %{service}"
       social_instructions: "Sprawdź, które z metod kontaktu chciłabyś udostępnić innym w swoim profilu."
       title: Tytuł
+      titles: 
+        click_to_change_profile_pic: "Kliknij, aby zmienić zdjęcie profilu"
       user_has_no_bio: "%{user} użytkownik nie dodał biogramu"
       ways_to_contact_user: "Sposoby skontaktowania się z %{name}"
     recent_activity: 
@@ -13254,6 +13475,13 @@ pl:
     columns: 
       date: Data
       value: Wartość
+    domain_not_found: 
+      body_description: "Sprawdź adres URL Canvas i spróbuj ponownie. Jeśli nie znasz adresu URL Canvas, skontaktuj się z instytucją bądź nauczycielem."
+      body_reference: "Jeśli rozważasz założenie darmowego konta Canvas nie przypisanego do konkretnej instytucji, możesz zarejestrować się na"
+      links: 
+        canvas_instructure: canvas.instructure.com
+      page_title: "System Canvas niestety nie może odnaleźć strony logowania."
+      you_typed: Wpisano
     institution_suspended: 
       body: "Konto szkoły w Canvas zostało tymczasowo zawieszone. Skontaktuj się z administratorem Canvas."
       links: 
@@ -13284,8 +13512,22 @@ pl:
     assignment_order_assignment_groups: "Według grupy zadań i pozycji"
     assignment_order_due_date: "Według terminu dostarczenia"
     assignment_unmuted: "Kliknij, aby ukryć."
+    discussion_topic: "Temat dyskusji"
+    external_tool: "Narzędzie zewnętrzne"
+    invalid_group_warning: 
+      few: "Uwaga: wynik nie uwzględnia zadań z nazw grup %{list_of_group_names}, ponieważ nie można w nich zdobywać punktów."
+      one: "Uwaga: wynik nie uwzględnia zadań z nazwy grupy %{list_of_group_names}, ponieważ nie można w niej zdobywać punktów."
+      other: "Uwaga: wynik nie uwzględnia zadań z nazw grup %{list_of_group_names}, ponieważ nie można w nich zdobywać punktów."
+    media_recordin: "Nagranie multimedialne"
     no_assignment: "Brak wybranych zadań"
     no_student: "Brak wybranych uczestników"
+    none: Brak
+    notes: Uwagi
+    on_paper: "Na papierze"
+    online_quiz: "Test online"
+    online_text_entry: "Wpis online"
+    online_upload: "Przekazanie online"
+    online_url: "Adres URL online"
     student_hidden_name: "Uczestnik %{position}"
   statistics: 
     csv_columns: 
@@ -13312,6 +13554,14 @@ pl:
     not_available: "Termin dostępności:"
     pending: "Niedostępny do"
   step: Etap
+  student_id: "Identyfikator uczestnika"
+  student_name: "Nazwa uczestnika"
+  student_outcome_gradebook_description: |-
+      Dzienniczek wyników umożliwia uczestnikom szybki podgląd
+      postępu
+      w wynikach nauczania. Wyniki są przedstawiane w formacie podobnym do dzienniczka
+      , a postęp uczestników jest wyświetlony jako wynik numeryczny i przydzielony do kategorii biegły/
+      w okolicach biegłości/wymagający poprawy.
   sub_accounts: 
     alerts: 
       subaccount_has_courses: "Nie można usunąć podkonta, w którym znajdują się kursy"
@@ -13442,13 +13692,16 @@ pl:
       no_submission: "Brak przesłanych zadań"
       paper_view: "Widok strony"
       plain_view: "Widok zwykłego tekstu"
-      preview_document: "Wyświetl podgląd dokumentu"
+      preview_crocodoc_document: "Pokaż podgląd przesłanego zadania i wyświetl opinie instruktora, jęsli jest dostępna"
+      preview_scribd_document: "Pokaż podgląd przesłanego zadania"
       preview_title: "Podgląd %{title} "
       quiz_submission: "Zadanie wymaga przesłania testu. Trwa przekierowywanie do strony testu."
       show_entire_discussion: "Wyświetl całą dyskusję"
       student: Uczestnik
       url_preview: "Podgląd adresu URL"
+      view_feedback_button: "Wyświetl opinię"
       view_original_submission: "Pokaż oryginał zadania przesłanego przez użytkownika %{user}"
+      view_preview_button: Podgląd
     still_zipping: "Trwa kompresowanie pliku..."
     submission_download: 
       download_message: "**Trwa zbieranie przesłanych przez użytkownika zadań**i kompresowanie ich do formatu .zip. Zależnie od wielkości i liczby przesyłanych plików może to chwilę potrwać."
@@ -13555,6 +13808,10 @@ pl:
         term_start: "początek terminu"
         unspecified: kiedykolwiek
       timespan: "%{start_at} *do* %{end_at}"
+  text_helper: 
+    time: 
+      ranges: 
+        different_days: "%{start_date_and_time} do %{end_date_and_time}"
   time: 
     am: rano
     count_hours_ago: 

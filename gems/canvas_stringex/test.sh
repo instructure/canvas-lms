@@ -2,17 +2,20 @@
 result=0
 
 echo "################ Running tests against Rails 2 ################"
-unset  CANVAS_RAILS3
+export CANVAS_RAILS3=0
 bundle install
-bundle exec rake test
-result+=$?
+bundle exec rspec spec
+let result=$result+$?
+bundle exec rake refresh_db
 
 echo "################ Running tests against Rails 3 ################"
-rm -f Gemfile.lock
+mv Gemfile.lock Gemfile.lock.rails2
 export CANVAS_RAILS3=true
 bundle install
-bundle exec rake test
-result+=$?
+bundle exec rspec spec
+let result=$result+$?
+bundle exec rake refresh_db
+mv Gemfile.lock.rails2 Gemfile.lock
 
 
 if [ $result -eq 0 ]; then

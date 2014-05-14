@@ -33,7 +33,10 @@ describe GradebooksHelper do
     end
 
     context "when the user prefers gradebook1" do
-      before { user.stubs(:prefers_gradebook2? => false) }
+      before do
+        user.stubs(:prefers_gradebook2? => false)
+        context.stubs(:feature_enabled?).with(:screenreader_gradebook).returns(false)
+      end
 
       it { should match /#{"/courses/1/gradebook"}$/ }
 
@@ -60,6 +63,26 @@ describe GradebooksHelper do
     context "with a nil user" do
       let(:user) { nil }
       it { should match /#{"/courses/1/gradebook2"}$/ }
+    end
+
+    context "with screenreader_gradebook enabled" do
+      before do
+        context.stubs(:feature_enabled?).with(:screenreader_gradebook).returns(true)
+      end
+
+      context "when the user prefers srgb" do
+        before {
+          user.stubs(:prefers_gradebook2? => false)
+          user.stubs(:gradebook_preference => 'srgb')
+        }
+        it { should match /#{"/courses/1/screenreader_gradebook"}$/ }
+      end
+
+      context "when the user prefers gb2" do
+        before { user.stubs(:gradebook_preference => '2') }
+        it { should match /#{"/courses/1/gradebook2"}$/ }
+      end
+
     end
   end
 end

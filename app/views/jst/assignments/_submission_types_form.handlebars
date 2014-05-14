@@ -1,13 +1,16 @@
 <fieldset>
-
-  <div class="control-group" style="margin-bottom:9px">
-    <label for="assignment_submission_type" class="control-label">
+  <div class="form-column-left">
+    <label for="assignment_submission_type">
       {{#t "submission_type"}}Submission Type{{/t}}
     </label>
-    <div class="controls">
+  </div>
+  <div class="form-column-right">
+    <div class="border border-trbl border-round">
+
+      {{!-- Submission type accepted --}}
       <select id="assignment_submission_type"
         name="submission_type"
-        aria-controls="assignment_online_submission_types,assignment_external_tool_settings,assignment_group_selector,assignment_peer_reviews_fields"
+        aria-controls="assignment_online_submission_types,assignment_external_tool_settings,assignment_group_selector,  gnment_peer_reviews_fields"
         {{disabledIfIncludes frozenAttributes "submission_types"}}>
         <option value="none" {{selectedIf submissionType "none"}}>
           {{#t "submission_types.no_submission"}}No Submission{{/t}}
@@ -22,133 +25,131 @@
           {{#t "submission_types.external_tool"}}External Tool{{/t}}
         </option>
       </select>
-    </div>
-  </div>
 
-  <div id="assignment_online_submission_types"
-    class="control-group"
-    aria-enabled="{{isOnlineSubmission}}"
-    style="{{hiddenUnless isOnlineSubmission}}">
+      {{!-- Online submission types --}}
+      <div id="assignment_online_submission_types"
+        aria-enabled="{{isOnlineSubmission}}"
+        style="{{hiddenUnless isOnlineSubmission}}">
 
-    <div class="controls">
-      <label class="checkbox">
-        {{checkbox "acceptsOnlineTextEntries"
-          id="assignment_text_entry"
-          name="online_submission_types[online_text_entry]"
-          disabled=submissionTypesFrozen}}
-        {{#t "labels.allow_text_entry"}}Allow Text Entry{{/t}}
-      </label>
-    </div>
+        <div class="subtitle">
+          <strong>
+            {{#t 'online_entry_options'}}Online Entry Options{{/t}}
+          </strong>
+        </div>
 
-    <div class="controls">
-      <label class="checkbox">
-        {{checkbox "acceptsOnlineURL"
-          id="assignment_online_url"
-          name="online_submission_types[online_url]"
-          disabled=submissionTypesFrozen}}
-        {{#t "labels.allow_url"}}Allow Website URL{{/t}}
-      </label>
-    </div>
-
-    <div class="controls">
-      {{#if kalturaEnabled}}
         <label class="checkbox">
-          {{checkbox "acceptsMediaRecording"
-            id="assignment_media_recording"
-            name="online_submission_types[media_recording]"
+          {{checkbox "acceptsOnlineTextEntries"
+            id="assignment_text_entry"
+            name="online_submission_types[online_text_entry]"
             disabled=submissionTypesFrozen}}
-          {{#t "labels.allow_media_recordings"}}Allow Media Recordings{{/t}}
+          {{#t "labels.allow_text_entry"}}Text Entry{{/t}}
         </label>
-      {{/if}}
-    </div>
 
-    <div class="controls">
-      <label class="checkbox" for="assignment_online_upload">
-        {{checkbox "acceptsOnlineUpload"
-          id="assignment_online_upload"
-          name="online_submission_types[online_upload]"
-          aria-controls="restrict_file_extensions_container"
-          disabled=submissionTypesFrozen}}
-        {{#t "labels.allow_file_uploads"}}Allow File Uploads{{/t}}
-      </label>
-    </div>
-
-    <div id="restrict_file_extensions_container"
-      aria-expanded="{{acceptsOnlineUpload}}"
-      style="{{hiddenUnless acceptsOnlineUpload}}">
-      <div class="controls">
-        <label class="checkbox" for="assignment_restrict_file_extensions">
-          {{checkbox "restrictFileExtensions"
-            id="assignment_restrict_file_extensions"
-            name="restrict_file_extensions"
-            aria-controls="allowed_extensions_container"
+        <label class="checkbox">
+          {{checkbox "acceptsOnlineURL"
+            id="assignment_online_url"
+            name="online_submission_types[online_url]"
             disabled=submissionTypesFrozen}}
-          {{#t "labels.restrict_file_extensions"}}
-            Restrict Upload File Types
-          {{/t}}
+          {{#t "labels.allow_url"}}Website URL{{/t}}
         </label>
-      </div>
+        {{#if kalturaEnabled}}
+          <label class="checkbox">
+            {{checkbox "acceptsMediaRecording"
+              id="assignment_media_recording"
+              name="online_submission_types[media_recording]"
+              disabled=submissionTypesFrozen}}
+            {{#t "labels.allow_media_recordings"}}Media Recordings{{/t}}
+          </label>
+        {{/if}}
+        <label class="checkbox" for="assignment_online_upload">
+          {{checkbox "acceptsOnlineUpload"
+            id="assignment_online_upload"
+            name="online_submission_types[online_upload]"
+            aria-controls="restrict_file_extensions_container"
+            disabled=submissionTypesFrozen}}
+          {{#t "labels.allow_file_uploads"}}File Uploads{{/t}}
+        </label>
 
-      <div id="allowed_extensions_container"
-        aria-expanded="{{restrictFileExtensions}}"
-        style="{{hiddenUnless restrictFileExtensions}}">
-        <label for="assignment_allowed_extensions" class="hidden-readable">
-          {{#t "labels.allowed_extensions"}}Allowed File Extensions{{/t}}
-        </label>
-        <div class="controls">
-          <input id="assignment_allowed_extensions"
-            name="allowed_extensions"
-            type="text"
-            maxlength="254"
-            placeholder="{{#t "labels.allowed_extensions"}}Allowed File Extensions{{/t}}"
-            value="{{join allowedExtensions ","}}"
-            {{disabledIfIncludes frozenAttributes "submission_types"}}/>
-            <div class="explanation">
+        {{!-- Online submission restrict file types? --}}
+        <div id="restrict_file_extensions_container"
+          class="nested"
+          aria-expanded="{{acceptsOnlineUpload}}"
+          style="{{hiddenUnless acceptsOnlineUpload}}">
+
+          <label class="checkbox" for="assignment_restrict_file_extensions">
+            {{checkbox "restrictFileExtensions"
+              id="assignment_restrict_file_extensions"
+              name="restrict_file_extensions"
+              aria-controls="allowed_extensions_container"
+              disabled=submissionTypesFrozen}}
+            {{#t "labels.restrict_file_extensions"}}
+              Restrict Upload File Types
+            {{/t}}
+          </label>
+
+          {{!-- Online submission allowed extensions --}}
+          <div id="allowed_extensions_container"
+            aria-expanded="{{restrictFileExtensions}}"
+            style="{{hiddenUnless restrictFileExtensions}}"
+            class="nested">
+            <label for="assignment_allowed_extensions" class="hidden-readable">
+              {{#t "labels.allowed_extensions"}}Allowed File Extensions{{/t}}
+            </label>
+
+            <input id="assignment_allowed_extensions"
+              name="allowed_extensions"
+              type="text"
+              maxlength="254"
+              placeholder="{{#t "labels.allowed_extensions"}}Allowed File Extensions{{/t}}"
+              value="{{join allowedExtensions ","}}"
+              {{disabledIfIncludes frozenAttributes "submission_types"}}/>
+            <div class="explanation nest">
               {{#t "descriptions.allowed_extensions"}}
                 Enter a list of accepted extensions, for example: doc,xls,txt
               {{/t}}
             </div>
+          </div>
+        </div>
+
+        {{!-- Turnitin (online assignments only) --}}
+        <div style="{{hiddenUnless turnitinAvailable}}">
+          <label for="assignment_turnitin_enabled" class="checkbox">
+            {{checkbox "turnitinEnabled"
+              id="assignment_turnitin_enabled"
+              name="turnitin_enabled"
+              aria-controls="advanced_turnitin_settings_link"
+              disabled=submissionTypesFrozen}}
+            {{#t "label.turnitin_enabled"}}Enable Turnitin Submissions{{/t}}
+          </label>
+
+          <div class="nested">
+            <a href="#"
+              id="advanced_turnitin_settings_link"
+              aria-expanded="{{turnitinEnabled}}"
+              style="{{hiddenUnless turnitinEnabled}}">
+              {{#t "advanced_turnitin_settings"}}Advanced Turnitin Settings{{/t}}
+            </a>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="controls" style="{{hiddenUnless turnitinAvailable}}">
-      <label for="assignment_turnitin_enabled" class="checkbox">
-        {{checkbox "turnitinEnabled"
-          id="assignment_turnitin_enabled"
-          name="turnitin_enabled"
-          aria-controls="advanced_turnitin_settings_link"
-          disabled=submissionTypesFrozen}}
-        {{#t "label.turnitin_enabled"}}Enable Turnitin Submissions{{/t}}
-      </label>
-
-      <a href="#"
-        id="advanced_turnitin_settings_link"
-        aria-expanded="{{turnitinEnabled}}"
-        style="{{hiddenUnless turnitinEnabled}}">
-        {{#t "advanced_turnitin_settings"}}Advanced Turnitin Settings{{/t}}
-      </a>
-    </div>
-
-  </div>
-
-  <div id="assignment_external_tool_settings" style="{{hiddenUnless isExternalTool}}">
-
-    <div class="control-group" style="margin-bottom:9px">
-      <label for="assignment_external_tool_tag_attributes_url" class="control-label">
-        {{#t "label.external_tool_url"}}External Tool URL{{/t}}
-      </label>
-      <div class="controls">
-        <input id="assignment_external_tool_tag_attributes_url"
-          name="external_tool_tag_attributes[url]"
-          type="text"
-          value="{{externalToolUrl}}"
-          {{disabledIfIncludes frozenAttributes "submission_types"}}/>
-      </div>
-    </div>
-
-    <div class="control-group">
-      <div class="controls">
+      {{!-- External tool submissions --}}
+      <div id="assignment_external_tool_settings" style="{{hiddenUnless isExternalTool}}">
+        <div class="subtitle">
+          <strong>
+            {{#t 'external_tool_options'}}External Tool Options{{/t}}
+          </strong>
+        </div>
+        <label for="assignment_external_tool_tag_attributes_url">
+          {{#t "label.external_tool_url"}}External Tool URL{{/t}}
+        </label>
+        <div class="nested">
+          <input id="assignment_external_tool_tag_attributes_url"
+            name="external_tool_tag_attributes[url]"
+            type="text"
+            value="{{externalToolUrl}}"
+            {{disabledIfIncludes frozenAttributes "submission_types"}}/>
+        </div>
         <label for="assignment_external_tool_tag_attributes_new_tab" class="checkbox">
           {{checkbox "externalToolNewTab"
             id="assignment_external_tool_tag_attributes_new_tab"
@@ -158,7 +159,5 @@
         </label>
       </div>
     </div>
-
   </div>
-
 </fieldset>

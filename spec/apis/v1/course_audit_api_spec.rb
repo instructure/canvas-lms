@@ -136,9 +136,9 @@ describe "CourseAudit API", type: :request do
     end
 
     context "deleted entities" do
-      it "should 404 for inactive courses" do
+      it "should 200 for inactive courses" do
         @course.destroy
-        fetch_for_context(@course, expected_status: 404)
+        fetch_for_context(@course, expected_status: 200)
       end
     end
 

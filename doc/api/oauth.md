@@ -74,6 +74,18 @@ an authenticated request to the following endpoint:
 
 <h3 class="endpoint">DELETE /login/oauth2/token</h3>
 
+<h4>Parameters</h4>
+
+<ul class="argument">
+  <li>
+    <span class="name">expire_sessions</span>
+    <div class="inline">
+      optional.  Set this to '1' if you want to end all of the user's
+Canvas web sessions.  Without this argument, the endpoint will leave web sessions intact.
+    </div>
+  </li>
+</ul>
+
 </div>
 
 Oauth2 Based Identity Service
@@ -160,6 +172,15 @@ that domain.
       optional. This can be used to help the user identify which instance
       of an application this token is for. For example, a mobile device
       application could provide the name of the device.
+    </div>
+  </li>
+  <li>
+    <span class="name">force_login</span>
+    <div class="inline">
+      optional. Set to '1' if you want to force the user to enter their
+      credentials, even if they're already logged into Canvas. By default,
+      if a user already has an active Canvas web session, they will not be
+      asked to re-enter their credentials.
     </div>
   </li>
 </ul>

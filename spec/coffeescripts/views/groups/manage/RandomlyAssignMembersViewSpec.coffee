@@ -1,10 +1,11 @@
 define [
+  'jquery'
   'underscore'
   'compiled/views/groups/manage/GroupCategoryView'
   'compiled/views/groups/manage/RandomlyAssignMembersView'
   'compiled/models/GroupCategory'
   'helpers/fakeENV'
-], (_, GroupCategoryView, RandomlyAssignMembersView, GroupCategory) ->
+], ($, _, GroupCategoryView, RandomlyAssignMembersView, GroupCategory) ->
 
   server = null
   view = null

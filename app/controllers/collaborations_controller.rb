@@ -19,18 +19,36 @@
 # @API Collaborations
 # API for accessing course and group collaboration information.
 #
-# @object Collaborator
-#   {
-#     // The unique user or group identifier for the collaborator.
-#     "id": 12345,
+# @model Collaborator
+#     {
+#       "id": "Collaborator",
+#       "description": "",
+#       "required": ["id"],
+#       "properties": {
+#         "id": {
+#           "description": "The unique user or group identifier for the collaborator.",
+#           "example": 12345,
+#           "type": "integer"
+#         },
+#         "type": {
+#           "description": "The type of collaborator (e.g. 'user' or 'group').",
+#           "example": "user",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "user",
+#               "group"
+#             ]
+#           }
+#         },
+#         "name": {
+#           "description": "The name of the collaborator.",
+#           "example": "Don Draper",
+#           "type": "string"
+#         }
+#       }
+#     }
 #
-#     // The type of collaborator (e.g. "user" or "group").
-#     "type": "user",
-#
-#     // The name of the collaborator.
-#     "name": "Don Draper"
-#   }
-
 class CollaborationsController < ApplicationController
   before_filter :require_context, :except => [:members]
   before_filter :require_collaboration_and_context, :only => [:members]
@@ -38,7 +56,6 @@ class CollaborationsController < ApplicationController
   before_filter :reject_student_view_student
 
   include Api::V1::Collaborator
-  include GoogleDocs
 
   def index
     return unless authorized_action(@context, @current_user, :read) &&
@@ -46,7 +63,9 @@ class CollaborationsController < ApplicationController
 
     @collaborations = @context.collaborations.active
     log_asset_access("collaborations:#{@context.asset_string}", "collaborations", "other")
-    @google_docs = google_docs_verify_access_token rescue false
+
+    google_docs = GoogleDocs.new(google_docs_user, session)
+    @google_docs_authorized = google_docs.verify_access_token rescue false
     js_env :TITLE_MAX_LEN => Collaboration::TITLE_MAX_LENGTH,
            :collaboration_types => Collaboration.collaboration_types
   end

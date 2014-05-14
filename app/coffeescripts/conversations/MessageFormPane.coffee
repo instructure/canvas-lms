@@ -18,12 +18,13 @@
 
 define [
   'i18n!conversations'
+  'jquery'
   'underscore'
   'compiled/util/shortcut'
   'compiled/conversations/MessageForm'
   'compiled/conversations/MessageProgressTracker'
   'compiled/fn/preventDefault'
-], (I18n, _, shortcut, MessageForm, MessageProgressTracker, preventDefault) ->
+], (I18n, $, _, shortcut, MessageForm, MessageProgressTracker, preventDefault) ->
 
   class MessageFormPane
     shortcut this, 'form',
@@ -60,7 +61,7 @@ define [
       @$node.on 'click', '.action_media_comment', preventDefault =>
         @form.addMediaComment()
       @$node.on 'click', '.media_comment a.remove_link', preventDefault =>
-        @form.removeMediaComment
+        @form.removeMediaComment()
 
       @$node.on 'click', '.action_add_recipients', preventDefault (e) =>
         @app.addRecipients($(e.currentTarget))

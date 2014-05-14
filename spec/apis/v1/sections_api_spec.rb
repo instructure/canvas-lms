@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2012 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -45,7 +45,6 @@ describe SectionsController, type: :request do
       json = api_call(:get, "/api/v1/courses/#{@course2.id}/sections.json",
                       { :controller => 'sections', :action => 'index', :course_id => @course2.to_param, :format => 'json' }, { :include => ['students'] })
       json.size.should == 2
-      json.find { |s| s['name'] == section2.name }['sis_section_id'].should == 'sis-section'
       json.find { |s| s['name'] == section1.name }['students'].should == api_json_response([user1], :only => USER_API_FIELDS)
       json.find { |s| s['name'] == section2.name }['students'].should == api_json_response([user2], :only => USER_API_FIELDS)
     end
@@ -107,7 +106,6 @@ describe SectionsController, type: :request do
           'name' => @section.name,
           'course_id' => @course.id,
           'nonxlist_course_id' => nil,
-          'sis_section_id' => nil,
           'start_at' => nil,
           'end_at' => nil
         }
@@ -121,7 +119,6 @@ describe SectionsController, type: :request do
           'name' => @section.name,
           'course_id' => @course.id,
           'nonxlist_course_id' => nil,
-          'sis_section_id' => 'my_section',
           'start_at' => nil,
           'end_at' => nil
         }
@@ -148,7 +145,6 @@ describe SectionsController, type: :request do
           'name' => @section.name,
           'course_id' => @course.id,
           'nonxlist_course_id' => nil,
-          'sis_section_id' => nil,
           'start_at' => nil,
           'end_at' => nil
         }
@@ -162,7 +158,6 @@ describe SectionsController, type: :request do
           'name' => @section.name,
           'course_id' => @course.id,
           'nonxlist_course_id' => nil,
-          'sis_section_id' => 'my_section',
           'start_at' => nil,
           'end_at' => nil
         }
@@ -250,6 +245,7 @@ describe SectionsController, type: :request do
         section = @course.active_course_sections.find(json['id'].to_i)
         section.name.should == 'Name'
         section.sis_source_id.should == 'fail'
+        section.sis_batch_id.should == nil
       end
     end
   end
@@ -430,6 +426,10 @@ describe SectionsController, type: :request do
       it "should work with sis IDs" do
         @dest_course.update_attribute(:sis_source_id, "dest_course")
         @section.update_attribute(:sis_source_id, "the_section")
+        @sis_batch = @section.root_account.sis_batches.create
+        SisBatch.where(id: @sis_batch).update_all(workflow_state: 'imported')
+        @section.sis_batch_id = @sis_batch.id
+        @section.save!
 
         @course.active_course_sections.should be_include(@section)
         @dest_course.active_course_sections.should_not be_include(@section)
@@ -439,6 +439,7 @@ describe SectionsController, type: :request do
         json['id'].should == @section.id
         json['course_id'].should == @dest_course.id
         json['nonxlist_course_id'].should == @course.id
+        json['sis_import_id'].should == @sis_batch.id
 
         @course.reload.active_course_sections.should_not be_include(@section)
         @dest_course.reload.active_course_sections.should be_include(@section)

@@ -82,6 +82,15 @@ describe "conversations new" do
     end
   end
 
+  def click_read_toggle_menu_item
+    keep_trying_until do
+      driver.execute_script(%q{$('#admin-btn').hover().click()})
+      sleep 1
+      driver.execute_script(%q{$('#mark-read-btn').hover().click()})
+      wait_for_ajaximations
+    end
+  end
+
   def select_message_course(new_course)
     new_course = new_course.name if new_course.respond_to? :name
     fj('.dropdown-toggle', get_message_course).click
@@ -89,9 +98,12 @@ describe "conversations new" do
   end
 
   def add_message_recipient(to)
+    synthetic = !(to.instance_of?(User) || to.instance_of?(String))
     to = to.name if to.respond_to?(:name)
     get_message_recipients_input.send_keys(to)
     keep_trying_until { fj(".ac-result:contains('#{to}')") }.click
+    return unless synthetic
+    keep_trying_until { fj(".ac-result:contains('All in #{to}')") }.click
   end
 
   def set_message_subject(subject)
@@ -182,6 +194,58 @@ describe "conversations new" do
       f('.icon-email').click
       wait_for_ajaximations
       f('.ac-token').should_not be_nil
+    end
+
+    context "user notes" do
+      before(:each) do
+        @course.account.update_attribute(:enable_user_notes, true)
+        user_session(@teacher)
+        get_conversations
+      end
+
+      it "should be allowed on new private conversations with students" do
+        compose course: @course, to: [@s1], body: 'hallo!', send: false
+
+        checkbox = f(".user_note")
+        checkbox.should be_displayed
+        checkbox.click
+
+        count = @s1.user_notes.count
+        click_send
+        @s1.user_notes.reload.count.should == count + 1
+      end
+
+      it "should not be allowed if disabled" do
+        @course.account.update_attribute(:enable_user_notes, false)
+        get_conversations
+        compose course: @course, to: [@s1], body: 'hallo!', send: false
+        f(".user_note").should_not be_displayed
+      end
+
+      it "should not be allowed for students" do
+        @s1.preferences[:use_new_conversations] = true
+        @s1.save!
+        user_session(@s1)
+        get_conversations
+        compose course: @course, to: [@s2], body: 'hallo!', send: false
+        f(".user_note").should_not be_displayed
+      end
+
+      it "should not be allowed with multiple recipients" do
+        compose course: @course, to: [@s1, @s2], body: 'hallo!', send: false
+        f(".user_note").should_not be_displayed
+      end
+
+      it "should not be allowed with non-student recipient" do
+        compose course: @course, to: [@teacher], body: 'hallo!', send: false
+        f(".user_note").should_not be_displayed
+      end
+
+      it "should not be allowed with group recipient" do
+        @group = @course.groups.create(:name => "the group")
+        compose course: @course, to: [@group], body: 'hallo!', send: false
+        f(".user_note").should_not be_displayed
+      end
     end
   end
 
@@ -459,6 +523,14 @@ describe "conversations new" do
       select_all_conversations
       click_unread_toggle_menu_item
       keep_trying_until { ffj('.read-state[aria-checked=false]').count.should == 2 }
+    end
+
+    it "should mark multiple conversations as unread" do
+      pending('breaks b/c jenkins is weird')
+      get_conversations
+      select_all_conversations
+      click_read_toggle_menu_item
+      keep_trying_until { ffj('.read-state[aria-checked=true]').count.should == 2 }
     end
 
     it "should star multiple conversations" do

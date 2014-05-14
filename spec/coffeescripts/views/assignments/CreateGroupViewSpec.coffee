@@ -29,6 +29,18 @@ define [
     setup: -> fakeENV.setup()
     teardown: -> fakeENV.teardown()
 
+  test 'hides drop options for no assignments', ->
+    view = createView()
+    view.render()
+    ok view.$('[name="rules[drop_lowest]"]').length
+    ok view.$('[name="rules[drop_highest]"]').length
+
+    view.assignmentGroup.get('assignments').reset []
+    view.render()
+    equal view.$('[name="rules[drop_lowest]"]').length, 0
+    equal view.$('[name="rules[drop_highest]"]').length, 0
+
+
   test 'it should not add errors when never_drop rules are added', ->
     view = createView()
     data =
@@ -86,6 +98,7 @@ define [
   test 'it should only allow positive numbers for drop rules', ->
     view = createView()
     data =
+      name: "Assignments"
       rules:
         drop_lowest: "tree"
         drop_highest: -1
@@ -100,6 +113,7 @@ define [
     assignments = view.assignmentGroup.get('assignments')
 
     data =
+      name: "Assignments"
       rules:
         drop_highest: 5
 
@@ -117,7 +131,6 @@ define [
     errors = view.validateFormData(data)
     ok errors
     equal _.keys(errors).length, 1
-
 
   test 'it should trigger a render event on save success when editing', ->
     triggerSpy = sinon.spy(AssignmentGroupCollection::, 'trigger')

@@ -249,12 +249,10 @@ ul.messages, ul.conversations, div.conversations > ul {
       margin: 0;
       min-height: 30px;
     }
-    img.avatar {
-      width: 50px;
-      height: 50px;
+    .avatar {
       position: absolute;
-      left: 27px;
-      top: 13px;
+      left: 25px;
+      top: 11px;
     }
     span.date {
       color: #2571bd;
@@ -365,9 +363,9 @@ div.conversations > ul {
       background: transparent;
       margin: 0;
       padding: 7px 0 7px 64px;
-      img.avatar {
-        top: 7px;
-        left: 7px;
+      .avatar {
+        top: 5px;
+        left: 5px;
       }
     }
     input {
@@ -403,7 +401,7 @@ div.conversations > ul {
       min-height: 0;
       margin: 0;
     }
-    img.avatar, span.date, .audience, input, .actions {
+    .avatar, span.date, .audience, input, .actions {
       left: -10000px;
       position: absolute;
     }
@@ -423,9 +421,9 @@ ul.messages {
       top: 50%;
       margin-top: -5px;
     }
-    img.avatar {
-      top: 14px;
-      left: 14px;
+    .avatar {
+      top: 12px;
+      left: 12px;
     }
     .send_private_message { opacity: 0; }
     .send_private_message:focus { opacity: 1; }
@@ -916,7 +914,7 @@ form {
     li {
       padding: 14px 14px 14px 64px;
       margin: 0;
-      img.avatar {
+      .avatar {
         left: 0;
       }
       .actions {

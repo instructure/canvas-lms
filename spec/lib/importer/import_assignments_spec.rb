@@ -27,13 +27,15 @@ describe "Importing assignments" do
         context = get_import_context(system)
 
         data[:assignments_to_import] = {}
-        Assignment.import_from_migration(data, context).should be_nil
-        Assignment.count.should == 0
+        expect {
+          Assignment.import_from_migration(data, context).should be_nil
+        }.to change(Assignment, :count).by(0)
 
         data[:assignments_to_import][data[:migration_id]] = true
-        Assignment.import_from_migration(data, context)
-        Assignment.import_from_migration(data, context)
-        Assignment.count.should == 1
+        expect {
+          Assignment.import_from_migration(data, context)
+          Assignment.import_from_migration(data, context)
+        }.to change(Assignment, :count).by(1)
         a = Assignment.find_by_migration_id(data[:migration_id])
         
         a.title.should == data[:title]

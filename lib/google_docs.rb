@@ -18,7 +18,7 @@
 
 # See Google Docs API documentation here:
 # http://code.google.com/apis/documents/docs/2.0/developers_guide_protocol.html
-module GoogleDocs
+class GoogleDocs
 
   class NoTokenError < StandardError
     def initialize
@@ -26,44 +26,43 @@ module GoogleDocs
     end
   end
 
-  def google_docs_retrieve_access_token
-    consumer = google_consumer
+  def initialize(user, session)
+    @user = user
+    @session = session
+  end
+
+  def retrieve_access_token
+    consumer = GoogleDocs.consumer
     return nil unless consumer
-    if google_docs_user
-      service_token, service_secret = Rails.cache.fetch(['google_docs_tokens', google_docs_user].cache_key) do
-        service = google_docs_user.user_services.find_by_service("google_docs")
+    if @user
+      service_token, service_secret = Rails.cache.fetch(['google_docs_tokens', @user].cache_key) do
+        service = @user.user_services.find_by_service("google_docs")
         service && [service.token, service.secret]
       end
       raise NoTokenError unless service_token && service_secret
       access_token = OAuth::AccessToken.new(consumer, service_token, service_secret)
     else
-      access_token = OAuth::AccessToken.new(consumer, session[:oauth_gdocs_access_token_token], session[:oauth_gdocs_access_token_secret])
+      access_token = OAuth::AccessToken.new(consumer, @session[:oauth_gdocs_access_token_token], @session[:oauth_gdocs_access_token_secret])
     end
     access_token
   end
 
-  # @real_current_user first ensures that a masquerading user never sees the
-  # masqueradee's files, but in general you may want to block access to google
-  # docs for masqueraders earlier in the request
-  def google_docs_user
-    @real_current_user || @current_user || (self.respond_to?(:user) && self.user.is_a?(User) && self.user) || nil
-  end
-
-  def google_docs_get_service_user(access_token)
-    doc = google_docs_create_doc("Temp Doc", true, access_token)
-    google_docs_delete_doc(doc, access_token)
+  def get_service_user(access_token)
+    doc = create_doc("Temp Doc: #{Time.now.strftime("%d %b %Y, %I:%M %p")}", access_token)
+    delete_doc(doc, access_token)
     service_user_id = doc.entry.authors[0].email rescue nil
     service_user_name = doc.entry.authors[0].email rescue nil
     return service_user_id, service_user_name
   end
 
-  def google_docs_get_access_token(oauth_request, oauth_verifier)
-    consumer = google_consumer
+  def self.get_access_token(oauth_request, oauth_verifier, session, user)
+    consumer = GoogleDocs.consumer
     request_token = OAuth::RequestToken.new(consumer,
                                             session.delete(:oauth_google_docs_request_token_token),
                                             session.delete(:oauth_google_docs_request_token_secret))
     access_token = request_token.get_access_token(:oauth_verifier => oauth_verifier)
-    service_user_id, service_user_name = google_docs_get_service_user(access_token)
+    google_docs = GoogleDocs.new(user, session)
+    service_user_id, service_user_name = google_docs.get_service_user(access_token)
     session[:oauth_gdocs_access_token_token] = access_token.token
     session[:oauth_gdocs_access_token_secret] = access_token.secret
     if oauth_request.user
@@ -82,26 +81,27 @@ module GoogleDocs
     access_token
   end
 
-  def google_docs_request_token_url(return_to)
-    consumer = google_consumer
-    request_token = consumer.get_request_token({ :oauth_callback => oauth_success_url(:service => 'google_docs')}, {:scope => "https://docs.google.com/feeds/ https://spreadsheets.google.com/feeds/"})
+  def self.request_token_url(return_to, session, user, host_with_port, oauth_callback)
+    consumer = GoogleDocs.consumer
+    request_token = consumer.get_request_token({ :oauth_callback => oauth_callback}, {:scope => "https://docs.google.com/feeds/ https://spreadsheets.google.com/feeds/"})
     session[:oauth_google_docs_request_token_token] = request_token.token
     session[:oauth_google_docs_request_token_secret] = request_token.secret
     OauthRequest.create(
       :service => 'google_docs',
       :token => request_token.token,
       :secret => request_token.secret,
-      :user_secret => AutoHandle.generate(nil, 16),
+      :user_secret => CanvasUuid::Uuid.generate(nil, 16),
       :return_url => return_to,
-      :user => google_docs_user,
-      :original_host_with_port => request.host_with_port
+      :user => user,
+      :original_host_with_port => host_with_port
     )
     request_token.authorize_url
   end
 
-  def google_docs_download(document_id)
-    access_token = google_docs_retrieve_access_token
-    entry = google_doc_fetch_list(access_token).entries.map{|e| GoogleDocEntry.new(e) }.find{|e| e.document_id == document_id}
+
+  def download(document_id)
+    access_token = retrieve_access_token
+    entry = fetch_list(access_token).entries.map{|e| GoogleDocEntry.new(e) }.find{|e| e.document_id == document_id}
     if entry
       response = access_token.get(entry.download_url)
       response = access_token.get(response['Location']) if response.is_a?(Net::HTTPFound)
@@ -148,12 +148,13 @@ module GoogleDocs
     end
   end
 
-  def google_doc_fetch_list(access_token)
+  def fetch_list(access_token)
     response = access_token.get('https://docs.google.com/feeds/documents/private/full')
     Atom::Feed.load_feed(response.body)
   end
+  private :fetch_list
 
-  def google_doc_folderize_list(docs)
+  def folderize_list(docs)
     root = Folder.new('/')
     folders = { nil => root }
 
@@ -171,22 +172,24 @@ module GoogleDocs
 
     return root
   end
+  private :folderize_list
 
-  def google_docs_list(access_token=nil)
-    access_token ||= google_docs_retrieve_access_token
-    google_doc_folderize_list(google_doc_fetch_list(access_token))
+  def list(access_token=nil)
+    access_token ||= retrieve_access_token
+    folderize_list(fetch_list(access_token))
   end
+  private :list
 
-  def google_docs_list_with_extension_filter(extensions, access_token=nil)
-    access_token ||= google_docs_retrieve_access_token
-    list = google_docs_list(access_token)
-    if extensions.present?
-      list = list.select{ |e| extensions.include?(e.extension) }
+  def list_with_extension_filter(extensions, access_token=nil)
+    access_token ||= retrieve_access_token
+    docs = list(access_token)
+    if extensions && extensions.length > 0
+      docs = docs.select{ |e| extensions.include?(e.extension) }
     end
-    list
+    docs
   end
 
-  def google_consumer(key = nil, secret = nil)
+  def self.consumer(key = nil, secret = nil)
     if key.nil? || secret.nil?
       return nil if GoogleDocs.config.nil?
       key ||= GoogleDocs.config['api_key']
@@ -273,11 +276,8 @@ module GoogleDocs
     add_extension_namespace :gAcl, 'http://schemas.google.com/acl/2007'
   end
 
-  def google_docs_create_doc(name=nil, include_time=false, access_token=nil)
-    name = nil if name && name.empty?
-    name ||= I18n.t('lib.google_docs.default_document_name', "Instructure Doc")
-    name += ": #{Time.now.strftime("%d %b %Y, %I:%M %p")}" if include_time
-    access_token ||= google_docs_retrieve_access_token
+  def create_doc(name, access_token=nil)
+    access_token ||= retrieve_access_token
     url = "https://docs.google.com/feeds/documents/private/full"
     entry = Atom::Entry.new do |entry|
       entry.title = name
@@ -295,19 +295,19 @@ module GoogleDocs
             "\n\n(" + e.to_s + ")\n"
     end
     begin
-      entry = GoogleDocEntry.new(Atom::Entry.load_entry(response.body))
+      GoogleDocEntry.new(Atom::Entry.load_entry(response.body))
     rescue => e
       raise "Unable to load GoogleDocEntry from response: \n" + response.body + 
             "\n\n(" + e.to_s + ")\n"
     end
   end
 
-  def google_docs_delete_doc(entry, access_token = google_docs_retrieve_access_token)
+  def delete_doc(entry, access_token = retrieve_access_token)
     access_token.delete(entry.edit_url, { 'GData-Version' => '2', 'If-Match' => '*' })
   end
 
-  def google_docs_acl_remove(document_id, users)
-    access_token = google_docs_retrieve_access_token
+  def acl_remove(document_id, users)
+    access_token = retrieve_access_token
     url          = "https://docs.google.com/feeds/acl/private/full/#{document_id}/batch"
 
     Struct.new('UserStruct', :id, :gmail, :google_docs_address)
@@ -333,8 +333,7 @@ module GoogleDocs
         end
       end
     end
-
-    response = post_for_removal(access_token, url, request_feed.to_xml)
+    response = access_token.post(url, request_feed.to_xml, {'Content-Type' => 'application/atom+xml'})
     feed     = Atom::Feed.load_feed(response.body)
     res      = []
 
@@ -346,10 +345,6 @@ module GoogleDocs
     res
   end
 
-  # method added to allow tests to mock properly
-  def post_for_removal(access_token, url, xml)
-    access_token.post(url, xml, {'Content-Type' => 'application/atom+xml'})
-  end
 
   # Public: Add users to a Google Doc ACL list.
   #
@@ -359,12 +354,13 @@ module GoogleDocs
   #   Accounts not on this domain will be ignored.
   #
   # Returns nothing.
-  def google_docs_acl_add(document_id, users, domain = nil)
-    access_token  = google_docs_retrieve_access_token
+  def acl_add(document_id, users, domain = nil)
+    access_token  = retrieve_access_token
     url           = "https://docs.google.com/feeds/acl/private/full/#{document_id}/batch"
     domain_regex  = domain ? %r{@#{domain}$} : /./
     allowed_users = []
 
+    user_added = false
     request_feed = Feed.new do |feed|
       feed.categories << Atom::Category.new do |category|
         category.scheme = "http://schemas.google.com/g/2005#kind"
@@ -377,11 +373,15 @@ module GoogleDocs
       end
 
       allowed_users.each do |user|
+        user_added = true
         feed.entries << user_feed_entry(user)
       end
     end
 
-    feed = send_feed(access_token, url, request_feed)
+    return unless user_added
+
+    response = access_token.post(url, request_feed.to_xml, {'Content-Type' => 'application/atom+xml' })
+    feed = Atom::Feed.load_feed(response.body)
     feed.entries.inject([]) do |response, entry|
       user = allowed_users.find do |u|
         u.id == entry['http://schemas.google.com/gdata/batch', 'id'][0].to_i
@@ -399,22 +399,15 @@ module GoogleDocs
       entry.gAcl_scope      = Google::GAcl::Scope.new(user.google_docs_address || user.gmail)
     end
   end
+  private :user_feed_entry
 
-  def send_feed(access_token, url, feed)
-    response = access_token.post(url, feed.to_xml,
-      {'Content-Type' => 'application/atom+xml' })
-    Atom::Feed.load_feed(response.body)
-  end
-
-  def google_docs_verify_access_token
-    access_token = google_docs_retrieve_access_token
+  def verify_access_token
+    access_token = retrieve_access_token
     access_token.head("https://www.google.com/accounts/AuthSubTokenInfo").is_a? Net::HTTPSuccess
   end
 
   def self.config_check(settings)
-    o = Object.new
-    o.extend(GoogleDocs)
-    consumer = o.google_consumer(settings[:api_key], settings[:secret_key])
+    consumer = GoogleDocs.consumer(settings[:api_key], settings[:secret_key])
     token = consumer.get_request_token({}, {:scope => "https://docs.google.com/feeds/"}) rescue nil
     token ? nil : "Configuration check failed, please check your settings"
   end

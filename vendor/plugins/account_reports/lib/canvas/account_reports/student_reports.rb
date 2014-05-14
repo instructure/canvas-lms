@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'csv'
+
 module Canvas::AccountReports
 
   class StudentReports
@@ -24,6 +26,7 @@ module Canvas::AccountReports
 
     def initialize(account_report)
       @account_report = account_report
+      @account_report.parameters ||= {}
     end
 
     def start_and_end_times

@@ -20,6 +20,76 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/../lib/validates_as_url.rb')
 
 describe ContentTag do
+
+  describe "::asset_workflow_state" do
+    context "respond_to?(:published?)" do
+      mock_asset = Class.new do
+        def initialize(opts={})
+          opts = {published: true, deleted: false}.merge(opts)
+          @published = opts[:published]
+          @deleted = opts[:deleted]
+        end
+
+        def published?; !!@published; end
+        def unpublished?; !@published; end
+        def deleted?; @deleted; end
+      end
+
+      it "returns 'deleted' for deleted assets" do
+        a = mock_asset.new(deleted: true)
+        ContentTag.asset_workflow_state(a).should == 'deleted'
+      end
+
+      it "returns 'active' for published assets" do
+        a = mock_asset.new(published: true)
+        ContentTag.asset_workflow_state(a).should == 'active'
+      end
+
+      it "returns 'unpublished' for unpublished assets" do
+        a = mock_asset.new(published: false)
+        ContentTag.asset_workflow_state(a).should == 'unpublished'
+      end
+    end
+
+    context "respond_to?(:workflow_state)" do
+      mock_asset = Class.new do
+        attr_reader :workflow_state
+        def initialize(workflow_state)
+          @workflow_state = workflow_state
+        end
+      end
+
+      it "returns 'active' for 'active' workflow_state" do
+        a = mock_asset.new('active')
+        ContentTag.asset_workflow_state(a).should == 'active'
+      end
+
+      it "returns 'active' for 'available' workflow_state" do
+        a = mock_asset.new('available')
+        ContentTag.asset_workflow_state(a).should == 'active'
+      end
+
+      it "returns 'active' for 'published' workflow_state" do
+        a = mock_asset.new('published')
+        ContentTag.asset_workflow_state(a).should == 'active'
+      end
+
+      it "returns 'unpublished' for 'unpublished' workflow_state" do
+        a = mock_asset.new('unpublished')
+        ContentTag.asset_workflow_state(a).should == 'unpublished'
+      end
+
+      it "returns 'deleted' for 'deleted' workflow_state" do
+        a = mock_asset.new('deleted')
+        ContentTag.asset_workflow_state(a).should == 'deleted'
+      end
+
+      it "returns nil for other workflow_state" do
+        a = mock_asset.new('terrified')
+        ContentTag.asset_workflow_state(a).should == nil
+      end
+    end
+  end
   
   describe "#sync_workflow_state_to_asset?" do
     it "true when content_type is Quiz" do
@@ -40,6 +110,10 @@ describe ContentTag do
     it "true when content_type is WikiPage" do
       content_tag = ContentTag.new(:content_type => "WikiPage")
       content_tag.sync_workflow_state_to_asset?.should be_true
+    end
+
+    it "true when content_type is DiscussionTopic" do
+      ContentTag.new(content_type: "DiscussionTopic").should be_sync_workflow_state_to_asset
     end
   end
 
@@ -417,6 +491,28 @@ describe ContentTag do
       content_tag = ContentTag.create! content: assignment_model, context: course_model
 
       content_tag.content_type.should == 'Assignment'
+    end
+  end
+
+  describe "destroy" do
+    it "updates completion requirements on its associated ContextModule" do
+      course_with_teacher(:active_all => true)
+
+      @module = @course.context_modules.create!(:name => "some module")
+      @assignment = @course.assignments.create!(:title => "some assignment")
+      @assignment2 = @course.assignments.create!(:title => "some assignment2")
+
+      @tag = @module.add_item({:id => @assignment.id, :type => 'assignment'})
+      @tag2 = @module.add_item({:id => @assignment2.id, :type => 'assignment'})
+
+      @module.completion_requirements = [{id: @tag.id, type: 'must_submit'},
+                                         {id: @tag2.id, type: 'must_submit'}]
+
+      @module.save
+
+      @tag.destroy
+
+      @module.reload.completion_requirements.should == [{id: @tag2.id, type: 'must_submit'}]
     end
   end
 end

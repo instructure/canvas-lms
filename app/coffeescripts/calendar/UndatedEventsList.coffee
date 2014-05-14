@@ -1,12 +1,13 @@
 define [
   'i18n!calendar'
+  'jquery'
   'jst/calendar/undatedEvents'
   'compiled/calendar/EventDataSource'
   'compiled/calendar/ShowEventDetailsDialog'
   'jqueryui/draggable'
   'jquery.disableWhileLoading'
   'vendor/jquery.ba-tinypubsub'
-], (I18n, undatedEventsTemplate, EventDataSource, ShowEventDetailsDialog) ->
+], (I18n, $, undatedEventsTemplate, EventDataSource, ShowEventDetailsDialog) ->
 
   class UndatedEventsList
     constructor: (selector, @dataSource, @calendar) ->

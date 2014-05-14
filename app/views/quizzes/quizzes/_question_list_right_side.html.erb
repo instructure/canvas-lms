@@ -1,0 +1,30 @@
+<h3 style="margin: 0px;"><%= t('headers.questions', "Questions") %></h3>
+<ul id="question_list" style="max-height: 200px; overflow: auto;" class="<%= 'read_only' if @quiz_presenter.cant_go_back? %>">
+  <% @quiz_presenter.all_questions.each do |q| %>
+    <% icon   = @quiz_presenter.answered_icon(q) %>
+    <% text   = @quiz_presenter.answered_text(q) %>
+    <% marked = @quiz_presenter.marked_text(q) %>
+
+    <li id="list_question_<%= q[:id] %>" class="<%= @quiz_presenter.question_class(q) %>">
+      <% if @quiz_presenter.one_question_at_a_time? %>
+        <% if @quiz_presenter.cant_go_back? %>
+          <span>
+            <i class="placeholder <%= icon %>"><span class="screenreader-only icon-text"><%= text %></span></i><%= q[:question_name] %>
+            <span class="screenreader-only marked-status"><%= marked %></span>
+          <span>
+        <% else %>
+          <%= link_to @quiz_presenter.question_path(q[:id]), :class => "no-warning" do %>
+            <i class="placeholder <%= icon %>"><span class="screenreader-only icon-text"><%= text %></span></i><%= q[:question_name] %>
+            <span class="screenreader-only marked-status"><%= marked %></span>
+          <% end %>
+        <% end %>
+
+      <% else %>
+        <a class="jump_to_question_link" href="#question_<%= q[:id] %>">
+          <i class="placeholder <%= icon %>"><span class="screenreader-only icon-text"><%= text %></span></i><%= q[:question_name] %>
+          <span class="screenreader-only marked-status"><%= marked %></span>
+        </a>
+      <% end %>
+    </li>
+  <% end %>
+</ul>

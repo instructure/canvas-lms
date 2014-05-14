@@ -1,5 +1,6 @@
 class QuizSerializer < Canvas::APISerializer
   include LockedSerializer
+  include PermissionsSerializer
 
   root :quiz
 
@@ -12,11 +13,41 @@ class QuizSerializer < Canvas::APISerializer
               :lock_explanation, :hide_results, :show_correct_answers_at,
               :hide_correct_answers_at, :all_dates, :can_unpublish, :can_update,
               :require_lockdown_browser, :require_lockdown_browser_for_results,
-              :require_lockdown_browser_monitor, :lockdown_browser_monitor_data
+              :require_lockdown_browser_monitor, :lockdown_browser_monitor_data,
+              :speed_grader_url, :permissions
 
-  def_delegators :@controller, :api_v1_course_assignment_group_url
+  def_delegators :@controller,
+    :api_v1_course_assignment_group_url,
+    :speed_grader_course_gradebook_url,
+    :api_v1_course_quiz_submission_url,
+    :api_v1_course_quiz_submissions_url
 
   has_one :assignment_group, embed: :ids, key: :assignment_group
+  #has_many :quiz_submissions, embed: :ids, key: :quiz_submissions
+
+  def speed_grader_url
+    return nil unless show_speedgrader?
+    speed_grader_course_gradebook_url(quiz.context, assignment_id: quiz.assignment.id)
+  end
+
+  def quiz_submissions
+    # this was previously loading too many quiz submissions into memory.
+    # temporary fix until we figure out how to do stuff without loading
+    # models into memory.
+  end
+
+  def quiz_submissions_url
+    if user_may_grade?
+      api_v1_course_quiz_submissions_url(quiz.context, quiz)
+    else
+      quiz_submission = quiz.quiz_submissions.where(user_id: current_user).first
+      if quiz_submission
+        api_v1_course_quiz_submission_url(quiz.context, quiz, quiz_submission)
+      else
+        nil
+      end
+    end
+  end
 
   def html_url
     controller.send(:course_quiz_url, context, quiz)
@@ -27,17 +58,14 @@ class QuizSerializer < Canvas::APISerializer
   end
 
   def all_dates
-    quiz.dates_hash_visible_to user
+    quiz.formatted_dates_hash(due_dates[1])
   end
 
   def locked_for_json_type; 'quiz' end
 
+  # Teacher or Observer?
   def include_all_dates?
-    quiz.grants_right?(current_user, session, :update)
-  end
-
-  def include_access_code?
-    quiz.grants_right?(current_user, session, :grade)
+    due_dates[1].present?
   end
 
   def include_unpublishable?
@@ -48,7 +76,7 @@ class QuizSerializer < Canvas::APISerializer
     super(keys).select do |key|
       case key
       when :all_dates then include_all_dates?
-      when :access_code then include_access_code?
+      when :access_code, :speed_grader_url then user_may_grade?
       when :unpublishable then include_unpublishable?
       else true
       end
@@ -100,6 +128,41 @@ class QuizSerializer < Canvas::APISerializer
 
   def stringify_ids?
     !!(accepts_jsonapi? || stringify_json_ids?)
+  end
+
+  private
+
+  def show_speedgrader?
+    quiz.assignment.present? && quiz.published? && quiz.context.allows_speed_grader?
+  end
+
+  def due_dates
+    @due_dates ||= quiz.due_dates_for(current_user)
+  end
+
+  # If the current user is a student and is in a course section which has
+  # an assignment override, the date will be that of the section's, otherwise
+  # we will use the Quiz's.
+  #
+  # @param [:due_at|:lock_at|:unlock_at] domain
+  def overridden_date(domain)
+    due_dates[0] ? due_dates[0][domain] : quiz.send(domain)
+  end
+
+  def due_at
+    overridden_date :due_at
+  end
+
+  def lock_at
+    overridden_date :lock_at
+  end
+
+  def unlock_at
+    overridden_date :unlock_at
+  end
+
+  def user_may_grade?
+    quiz.grants_right?(current_user, session, :grade)
   end
 
 end

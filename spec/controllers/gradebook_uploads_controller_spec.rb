@@ -18,6 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
+require 'csv'
+
 describe GradebookUploadsController do
 
   describe "POST 'create'" do
@@ -87,8 +89,7 @@ describe GradebookUploadsController do
       a2_sub.grader_id.should_not be_nil
       a2_sub.version_number.should == 2
 
-      response.should be_redirect
-      response.redirected_to.should =~ %r|/courses/#{@course.id}/gradebook2|
+      response.should redirect_to(course_gradebook2_url(@course))
     end
     
     it "should create new assignments" do

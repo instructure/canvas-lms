@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011-12 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -1406,14 +1406,15 @@ describe CalendarEventsApiController, type: :request do
 
             context 'when in same course section' do
               before :each do
-                @student_enrollment2 = @course.enroll_user(@student2, 'StudentEnrollment', :enrollment_state => 'active', :section => @section1)
-                @observer_enrollment2 = ObserverEnrollment.create!(:user => @observer,
-                                                                   :course => @course,
-                                                                   :course_section => @section1,
-                                                                   :workflow_state => 'active')
+                @student_enrollment2 = @course.enroll_user(@student2, 'StudentEnrollment', enrollment_state: 'active', section: @section1)
+                @observer_enrollment2 = ObserverEnrollment.new(user: @observer,
+                                                               course: @course,
+                                                               course_section: @section1,
+                                                               workflow_state: 'active')
 
                 @observer_enrollment.update_attribute(:associated_user_id, @student.id)
-                @observer_enrollment2.update_attribute(:associated_user_id, @student2.id)
+                @observer_enrollment2.associated_user_id = @student2.id
+                @observer_enrollment2.save!
               end
 
               it 'should return a single assignment event' do

@@ -2,12 +2,13 @@ define [
   'i18n!assignments'
   'compiled/views/KeyboardNavDialog'
   'jst/KeyboardNavDialog'
+  'jquery'
   'underscore'
   'Backbone'
   'jst/assignments/IndexView'
   'jst/assignments/NoAssignmentsSearch'
   'compiled/views/assignments/AssignmentKeyBindingsMixin'
-], (I18n, KeyboardNavDialog, keyboardNavTemplate, _, Backbone, template, NoAssignments, AssignmentKeyBindingsMixin) ->
+], (I18n, KeyboardNavDialog, keyboardNavTemplate, $, _, Backbone, template, NoAssignments, AssignmentKeyBindingsMixin) ->
 
   class IndexView extends Backbone.View
     @mixin AssignmentKeyBindingsMixin

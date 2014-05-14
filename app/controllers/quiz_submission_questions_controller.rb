@@ -45,8 +45,7 @@
 #
 class QuizSubmissionQuestionsController < ApplicationController
   include Api::V1::QuizSubmissionQuestion
-  include Api::V1::Helpers::QuizzesApiHelper
-  include Api::V1::Helpers::QuizSubmissionsApiHelper
+  include Filters::QuizSubmissions
 
   before_filter :require_user, :require_quiz_submission, :export_scopes
   before_filter :require_question, except: [ :index ]
@@ -68,8 +67,8 @@ class QuizSubmissionQuestionsController < ApplicationController
   #    "quiz_submission_questions": [QuizSubmissionQuestion]
   #  }
   def index
-    if authorized_action(@quiz_submission, @current_user, :read)
-      render json: quiz_submission_questions_json(@quiz.quiz_questions,
+    if authorized_action(@quiz, @current_user, :update)
+      render json: quiz_submission_questions_json(@quiz.active_quiz_questions,
         @quiz_submission.submission_data,
         {
           user: @current_user,
@@ -94,7 +93,7 @@ class QuizSubmissionQuestionsController < ApplicationController
   #    "quiz_submission_questions": [QuizSubmissionQuestion]
   #  }
   def show
-    if authorized_action(@quiz_submission, @current_user, :read)
+    if authorized_action(@quiz, @current_user, :update)
       render json: quiz_submission_questions_json(@question,
         @quiz_submission.submission_data,
         {
@@ -141,7 +140,7 @@ class QuizSubmissionQuestionsController < ApplicationController
       reject! 'missing required parameter :answer', 400
     end
 
-    serializer = QuizQuestion::AnswerSerializers.serializer_for @question
+    serializer = Quizzes::QuizQuestion::AnswerSerializers.serializer_for @question
     serialization_rc = serializer.serialize(params[:answer])
 
     unless serialization_rc.valid?

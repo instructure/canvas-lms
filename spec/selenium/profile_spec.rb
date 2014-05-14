@@ -279,7 +279,11 @@ describe "profile" do
       new_image = dialog.find_elements(:css, ".profile_pic_list span.img img").last
       new_image.attribute('src').should_not =~ %r{/images/thumbnails/}
 
-      FilesController.filter_chain.pop
+      if CANVAS_RAILS2
+        FilesController.filter_chain.pop
+      else
+        FilesController._process_action_callbacks.pop
+      end
 
       keep_trying_until do
         spans = ffj("#profile_pic_dialog .profile_pic_list span.img")
@@ -310,10 +314,9 @@ describe "profile" do
       wait_for_ajaximations
 
       f('.profile-link').click
-
       wait_for_ajaximations
 
-      f('#profile_pic_dialog').should_not be_nil
+      ff('.avatar-content').length.should == 1
     end
   end
 
@@ -345,7 +348,11 @@ describe "profile" do
       new_image = dialog.find_elements(:css, ".profile_pic_list span.img img").last
       new_image.attribute('src').should_not =~ %r{/images/thumbnails/}
 
-      FilesController.filter_chain.pop
+      if CANVAS_RAILS2
+        FilesController.filter_chain.pop
+      else
+        FilesController._process_action_callbacks.pop
+      end
 
       keep_trying_until do
         spans = ffj("#profile_pic_dialog .profile_pic_list span.img")

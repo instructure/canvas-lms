@@ -1,8 +1,9 @@
 define [
+  'jquery'
   'Backbone'
   'compiled/views/accounts/admin_tools/CourseSearchResultsView'
   'compiled/models/CourseRestore'
-], (Backbone, CourseSearchResultsView, CourseRestore) -> 
+], ($, Backbone, CourseSearchResultsView, CourseRestore) -> 
   errorMessageJSON = 
     status: "not_found"
     message: "There was no foo bar in the baz"

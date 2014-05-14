@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -110,12 +110,16 @@ class Pseudonym < ActiveRecord::Base
   end
 
   scope :by_unique_id, lambda { |unique_id|
-    if %w{mysql mysql2}.include?(connection_pool.spec.config[:adapter])
-      where(:unique_id => unique_id)
-    else
-      where("LOWER(#{quoted_table_name}.unique_id)=LOWER(?)", unique_id)
-    end
+    where("#{to_lower_column(:unique_id)}=#{to_lower_column('?')}", unique_id)
   }
+
+  def self.to_lower_column(column)
+    if %w{mysql mysql2}.include?(connection_pool.spec.config[:adapter])
+      column
+    else
+      "LOWER(#{column})"
+    end
+  end
 
   def self.custom_find_by_unique_id(unique_id, which = :first)
     return nil unless unique_id
@@ -155,7 +159,7 @@ class Pseudonym < ActiveRecord::Base
     if !self.persistence_token || self.persistence_token == ''
       # Some pseudonyms can end up without a persistence token if they were created
       # using the SIS, for example.
-      self.persistence_token = AutoHandle.generate('pseudo', 15)
+      self.persistence_token = CanvasUuid::Uuid.generate('pseudo', 15)
       self.save
     end
     
@@ -418,15 +422,6 @@ class Pseudonym < ActiveRecord::Base
       Canvas::Security.failed_login!(self, remote_ip)
     end
     nil
-  end
-
-  def mfa_settings
-    case self.account.mfa_settings
-    when :required_for_admins
-      self.account.all_account_users_for(self.user).empty? ? :optional : :required
-    else
-      self.account.mfa_settings
-    end
   end
 
   def claim_cas_ticket(ticket)

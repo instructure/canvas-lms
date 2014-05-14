@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../locked_spec')
 describe "Pages API", type: :request do
   include Api::V1::User
   def avatar_url_for_user(user, *a)
-    "http://www.example.com/images/messages/avatar-50.png"
+    User.avatar_fallback_url
   end
   def blank_fallback
     nil
@@ -462,6 +462,18 @@ describe "Pages API", type: :request do
         page.user_id.should == @teacher.id
       end
 
+      it 'should process body with process_incoming_html_content' do
+        WikiPagesApiController.any_instance.stubs(:process_incoming_html_content).returns('processed content')
+
+        json = api_call(:post, "/api/v1/courses/#{@course.id}/pages",
+                 { :controller => 'wiki_pages_api', :action => 'create', :format => 'json', :course_id => @course.to_param },
+                 { :wiki_page => { :title => 'New Wiki Page', :body => 'content to process' } })
+        page = @course.wiki.wiki_pages.find_by_url!(json['url'])
+        page.title.should == 'New Wiki Page'
+        page.url.should == 'new-wiki-page'
+        page.body.should == 'processed content'
+      end
+
       it "should set as front page" do
         json = api_call(:post, "/api/v1/courses/#{@course.id}/pages",
                         { :controller => 'wiki_pages_api', :action => 'create', :format => 'json', :course_id => @course.to_param },
@@ -598,6 +610,32 @@ describe "Pages API", type: :request do
         wiki.front_page.should be_new_record
 
         json['front_page'].should == false
+      end
+
+      it "should not change the front page unless set differently" do
+        set_course_draft_state true
+
+        # make sure we don't catch the default 'front-page'
+        @front_page.title = 'Different Front Page'
+        @front_page.save!
+
+        wiki = @course.wiki.reload
+        wiki.set_front_page_url!(@front_page.url)
+
+        # create and update another page
+        other_page = @wiki.wiki_pages.create!(:title => "Other Page", :body => "Body of other page")
+        other_page.workflow_state = 'active'
+        other_page.save!
+
+        json = api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{other_page.url}",
+                        { :controller => 'wiki_pages_api', :action => 'update', :format => 'json',
+                          :course_id => @course.to_param, :url => other_page.url },
+                        { :wiki_page =>
+                          { :title => 'Another Page', :body => 'Another page body', :front_page => false }
+                        })
+
+        # the front page url should remain unchanged
+        wiki.reload.get_front_page_url.should == @front_page.url
       end
 
       it "should update wiki front page url if page url is updated" do
@@ -754,6 +792,17 @@ describe "Pages API", type: :request do
                  { :wiki_page => { :body => "<p>lolcats</p><script>alert('what')</script>" }})
         @hidden_page.reload
         @hidden_page.body.should == "<p>lolcats</p>alert('what')"
+      end
+
+      it 'should process body with process_incoming_html_content' do
+        WikiPagesApiController.any_instance.stubs(:process_incoming_html_content).returns('processed content')
+
+        api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@hidden_page.url}",
+                 { :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param,
+                   :url => @hidden_page.url },
+                 { :wiki_page => { :body => 'content to process' } })
+        @hidden_page.reload
+        @hidden_page.body.should == 'processed content'
       end
       
       it "should not allow invalid editing_roles" do

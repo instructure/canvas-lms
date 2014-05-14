@@ -24,8 +24,13 @@ describe PolymorphicTypeOverride do
     it 'overrides multiple old polymorphic types with a new one' do
       class ContentTag
         include PolymorphicTypeOverride
+<<<<<<< HEAD
         override_polymorphic_types content_type: {from: 'OldClassInDatabase', to: 'Quizzes::Quiz'},
                                    context_type: {from: 'AnotherOldClassInDatabase', to: 'Quizzes::Quiz'}
+=======
+        override_polymorphic_types content_type: {'OldClassInDatabase' => 'Quizzes::Quiz'},
+                                   context_type: {'AnotherOldClassInDatabase' => 'Quizzes::Quiz'}
+>>>>>>> refs/heads/2014-03-22
       end
 
       fizz_buzz = ContentTag.create! content: quiz_model, context: quiz_model
@@ -46,7 +51,11 @@ describe PolymorphicTypeOverride do
     it 'overrides a single old polymorphic type with a new one' do
       class ContentTag
         include PolymorphicTypeOverride
+<<<<<<< HEAD
         override_polymorphic_types content_type: {from: 'OldClassInDatabase', to: 'Quizzes::Quiz'}
+=======
+        override_polymorphic_types content_type: {'OldClassInDatabase' => 'Quizzes::Quiz'}
+>>>>>>> refs/heads/2014-03-22
       end
 
       fizz_buzz = ContentTag.create! content: quiz_model, context: course_model

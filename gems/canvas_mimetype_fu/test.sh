@@ -4,8 +4,7 @@ result=0
 
 bundle install
 bundle exec rspec spec
-result+=$?
-
+let result=$result+$?
 
 if [ $result -eq 0 ]; then
 	echo "SUCCESS"

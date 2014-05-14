@@ -1,4 +1,5 @@
 require [
+  'jquery'
   'underscore'
   'Backbone'
   'compiled/views/course_settings/NavigationView'
@@ -7,7 +8,7 @@ require [
   'vendor/jquery.cookie'
   'course_settings'
   'grading_standards'
-], (_, Backbone, NavigationView, UserCollection, FeatureFlagAdminView) ->
+], ($, _, Backbone, NavigationView, UserCollection, FeatureFlagAdminView) ->
   nav_view = new NavigationView
     el: $('#tab-navigation')
 

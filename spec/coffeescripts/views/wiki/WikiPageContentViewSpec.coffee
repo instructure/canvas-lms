@@ -1,7 +1,8 @@
 define [
+  'jquery'
   'compiled/models/WikiPage'
   'compiled/views/wiki/WikiPageContentView'
-], (WikiPage, WikiPageContentView) ->
+], ($, WikiPage, WikiPageContentView) ->
 
   module 'WikiPageContentView'
 

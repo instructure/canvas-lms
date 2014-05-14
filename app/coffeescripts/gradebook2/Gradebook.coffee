@@ -11,6 +11,7 @@ define [
   'compiled/gradebook2/GRADEBOOK_TRANSLATIONS'
   'jquery'
   'underscore'
+  'timezone'
   'compiled/grade_calculator'
   'compiled/userSettings'
   'vendor/spin'
@@ -18,6 +19,7 @@ define [
   'compiled/gradebook2/AssignmentGroupWeightsDialog'
   'compiled/gradebook2/SubmissionCell'
   'compiled/gradebook2/GradebookHeaderMenu'
+  'compiled/util/NumberCompare'
   'str/htmlEscape'
   'compiled/gradebook2/UploadDialog'
   'jst/gradebook2/column_header'
@@ -36,7 +38,7 @@ define [
   'jqueryui/sortable'
   'compiled/jquery.kylemenu'
   'compiled/jquery/fixDialogButtons'
-], (LongTextEditor, KeyboardNavDialog, keyboardNavTemplate, Slick, TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, $, _, GradeCalculator, userSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, SubmissionCell, GradebookHeaderMenu, htmlEscape, UploadDialog, columnHeaderTemplate, groupTotalCellTemplate, rowStudentNameTemplate, SectionMenuView) ->
+], (LongTextEditor, KeyboardNavDialog, keyboardNavTemplate, Slick, TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, $, _, tz, GradeCalculator, userSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, SubmissionCell, GradebookHeaderMenu, numberCompare, htmlEscape, UploadDialog, columnHeaderTemplate, groupTotalCellTemplate, rowStudentNameTemplate, SectionMenuView) ->
 
   class Gradebook
     columnWidths =
@@ -118,21 +120,27 @@ define [
           gotAllStudents.resolve()
 
       gotCustomColumns = @getCustomColumns()
-      $.when(gotCustomColumns, gotAllStudents).done @doSlickgridStuff
+      @gotAllData = $.when(gotCustomColumns, gotAllStudents)
 
       @allSubmissionsLoaded.done =>
         for c in @customColumns
           url = @options.custom_column_data_url.replace /:id/, c.id
           @getCustomColumnData(c.id)
 
-      @spinner = new Spinner()
+      @showCustomColumnDropdownOption()
+
+    onShow: ->
+      return if @startedInitializing
+      @startedInitializing = true
+
+      @spinner = new Spinner() unless @spinner
       $(@spinner.spin().el).css(
         opacity: 0.5
         top: '55px'
         left: '50%'
       ).addClass('use-css-transitions-for-show-hide').appendTo('#main')
-
-      @showCustomColumnDropdownOption()
+      $('#gradebook-grid-wrapper').hide()
+      @gotAllData.done @doSlickgridStuff
 
     getCustomColumns: ->
       # not going to support pagination because that would be crazy
@@ -176,7 +184,7 @@ define [
         for assignment in group.assignments
           htmlEscape(assignment)
           assignment.assignment_group = group
-          assignment.due_at = $.parseFromISO(assignment.due_at) if assignment.due_at
+          assignment.due_at = tz.parse(assignment.due_at)
           @assignments[assignment.id] = assignment
 
     gotSections: (sections) =>
@@ -213,9 +221,9 @@ define [
             mySections = (@sections[sectionId].name for sectionId in student.sections when @sections[sectionId])
             sectionNames = $.toSentence(mySections.sort())
           student.display_name = rowStudentNameTemplate
-            avatar_image_url: student.avatar_url
+            avatar_url: student.avatar_url
             display_name: student.name
-            url: student.enrollment.grades.html_url
+            url: student.enrollment.grades.html_url+'#tab-assignments'
             sectionNames: sectionNames
             alreadyEscaped: true
 
@@ -299,8 +307,8 @@ define [
       return (diffOfAssignmentGroupPosition * 1000000) + diffOfAssignmentPosition
 
     compareAssignmentDueDates: (a, b) =>
-      aDate = a.object.due_at?.timestamp or Number.MAX_VALUE
-      bDate = b.object.due_at?.timestamp or Number.MAX_VALUE
+      aDate = if a.object.due_at then (+a.object.due_at / 1000) else Number.MAX_VALUE
+      bDate = if b.object.due_at then (+b.object.due_at / 1000) else Number.MAX_VALUE
       if aDate is bDate
         return 0 if a.object.name is b.object.name
         return (if a.object.name > b.object.name then 1 else -1)
@@ -434,7 +442,7 @@ define [
 
     updateSubmission: (submission) =>
       student = @student(submission.user_id)
-      submission.submitted_at = $.parseFromISO(submission.submitted_at) if submission.submitted_at
+      submission.submitted_at = tz.parse(submission.submitted_at)
       student["assignment_#{submission.assignment_id}"] = submission
 
     # this is used after the CurveGradesDialog submit xhr comes back.  it does not use the api
@@ -488,6 +496,7 @@ define [
       # rounds percentage to one decimal place
       percentage = Math.round((val.score / val.possible) * 1000) / 10
       percentage = 0 if isNaN(percentage)
+
 
       if val.possible and @options.grading_standard and columnDef.type is 'total_grade'
         letterGrade = GradeCalculator.letter_grade(@options.grading_standard, percentage)
@@ -666,7 +675,7 @@ define [
     onGridInit: () ->
       tooltipTexts = {}
       $(@spinner.el).remove()
-      $('#gradebook_wrapper').show()
+      $('#gradebook-grid-wrapper').show()
       @uid = @grid.getUID()
       @$grid = grid = $('#gradebook_grid')
         .fillWindowWithMe({
@@ -796,7 +805,7 @@ define [
     updateCurrentSection: (section, author) =>
       @sectionToShow = section
       userSettings[if @sectionToShow then 'contextSet' else 'contextRemove']('grading_show_only_section', @sectionToShow)
-      @buildRows()
+      @buildRows() if @grid
 
     initHeader: =>
       @drawSectionSelectButton() if @sections_enabled
@@ -830,19 +839,22 @@ define [
         event.preventDefault()
         new UploadDialog(@options.context_url)
 
-      $settingsMenu.find('.student_names_toggle').click (e) ->
-        $wrapper = $('.grid-canvas')
-        $wrapper.toggleClass('hide-students')
-
-        if $wrapper.hasClass('hide-students')
-          $(this).text I18n.t('show_student_names', 'Show Student Names')
-        else
-          $(this).text I18n.t('hide_student_names', 'Hide Student Names')
+      $settingsMenu.find('.student_names_toggle').click(@studentNamesToggle)
 
       @userFilter = new InputFilterView el: '.gradebook_filter input'
       @userFilter.on 'input', @onUserFilterInput
 
       @renderTotalHeader()
+
+    studentNamesToggle: (e) =>
+      e.preventDefault()
+      $wrapper = @$grid.find('.grid-canvas')
+      $wrapper.toggleClass('hide-students')
+
+      if $wrapper.hasClass('hide-students')
+        $(e.currentTarget).text I18n.t('show_student_names', 'Show Student Names')
+      else
+        $(e.currentTarget).text I18n.t('hide_student_names', 'Hide Student Names')
 
     weightedGroups: =>
       @options.group_weighting_scheme == "percent"
@@ -921,6 +933,7 @@ define [
         sortable: true
         editor: LongTextEditor
         autoEdit: false
+        maxLength: 255
 
     initGrid: =>
       #this is used to figure out how wide to make each column
@@ -1070,9 +1083,7 @@ define [
           @sortRowsBy (a, b) ->
             aScore = a[data.sortCol.field]?.score
             bScore = b[data.sortCol.field]?.score
-            aScore = -99999999999 if not aScore and aScore != 0
-            bScore = -99999999999 if not bScore and bScore != 0
-            if data.sortAsc then aScore - bScore else bScore - aScore
+            numberCompare(aScore, bScore, descending: !data.sortAsc)
 
       @grid.onKeyDown.subscribe ->
         # TODO: start editing automatically when a number or letter is typed

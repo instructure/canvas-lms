@@ -52,7 +52,7 @@ class SSLCommon
     end
 
     def post_multipart_form(url, form_data, headers={}, field_priority=[])
-      payload, mp_headers = Multipart::MultipartPost.new.prepare_query(form_data, field_priority)
+      payload, mp_headers = Multipart::Post.new.prepare_query(form_data, field_priority)
       self.raw_post(url, payload, mp_headers.merge(headers))
     end
 

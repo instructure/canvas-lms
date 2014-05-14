@@ -1,7 +1,8 @@
 define [
+  'jquery'
   'compiled/util/hsvToRgb'
   'vendor/murmurhash'
-], (hsvToRgb, murmurhash) ->
+], ($, hsvToRgb, murmurhash) ->
 
   seed = 1
   [bgSaturation, bgBrightness]         = [30, 96]

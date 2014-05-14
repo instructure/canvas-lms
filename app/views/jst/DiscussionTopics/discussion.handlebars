@@ -9,13 +9,25 @@
     <div class="discussion-type">
       {{#if assignment}}
         <i class="icon-assignment" aria-hidden="true"></i>
-        <span class="screenreader-only">{{#t "graded_discussion"}}Graded discussion{{/t}}</span>
       {{/if}}
     </div>
 
     <div class="discussion-title">
-      <a href="{{html_url}}" class="title">{{title}}</a>
+      <div role="heading">
+        {{#if assignment}}
+          <span class="screenreader-only">{{#t "graded_discussion"}}Graded discussion: {{/t}}</span>
+        {{/if}}
+        <a href="{{html_url}}" class="title">{{title}}</a>
+      </div>
       <small>{{#t "last_post_date"}}Last post {{display_last_reply_at}}{{/t}}</small>
+    </div>
+
+    <div class="discussion-date-available">
+      {{#with defaultDates}}
+        {{#unless closed}}
+          {{>[assignments/available_date_description]}}
+        {{/unless}}
+      {{/with}}
     </div>
 
     <div class="discussion-due-date">
@@ -46,16 +58,22 @@
       <div class="new-and-total-badge pull-right">
         <span class="new-items"
               title="{{unread_count_tooltip}}"
-              aria-label="{{unread_count_tooltip}}"
+              aria-hidden="true"
               data-tooltip>
           {{unread_count}}
+        </span>
+        <span class="screenreader-only">
+          {{unread_count_tooltip}}
         </span>
 
         <div class="total-items"
              title="{{reply_count_tooltip}}"
-             aria-label="{{reply_count_tooltip}}"
+             aria-hidden="true"
              data-tooltip>
           {{discussion_subentry_count}}
+        </div>
+        <div class="screenreader-only">
+          {{reply_count_tooltip}}
         </div>
       </div>
     </div>
@@ -91,6 +109,13 @@
                 {{/if}}
               </a>
             </li>
+            {{#if pinned}}
+              <li>
+                <a href="#"
+                  class="move_item icon-updown"
+                >{{#t "move"}}Move To&hellip;{{/t}}</a>
+              </li>
+            {{/if}}
           {{/if}}
         </ul>
       {{/if}}

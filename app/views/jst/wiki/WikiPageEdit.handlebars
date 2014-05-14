@@ -16,7 +16,7 @@
     </div>
   </div>
 
-  <textarea rows="20" cols="40" name="body" class="body" aria-hidden="true"{{#unless PAGE_RIGHTS.update}} autofocus{{/unless}}>{{body}}</textarea>
+  <textarea rows="20" cols="40" name="body" class="body" aria-hidden="true"{{#unless PAGE_RIGHTS.update}} autofocus{{/unless}}>{{convertApiUserContent body forEditing=1}}</textarea>
 
   {{#if CAN.EDIT_ROLES}}
     <div class="control-group options">

@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'csv'
+
 class MediaObject < ActiveRecord::Base
   include Workflow
   belongs_to :user

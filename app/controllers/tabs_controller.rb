@@ -17,17 +17,45 @@
 #
 
 # @API Tabs
-# @object Tab
-#       {
-#         "html_url": "/courses/1/external_tools/4",
-#         "id": "context_external_tool_4",
-#         "label": "WordPress",
-#         "hidden": true, //only included if true.
-#         "visibility": "public", //possible values are: public, members, admins, and none
-#         "position": 2, // 1 based
-#         "type": "external"
+# @model Tab
+#     {
+#       "id": "Tab",
+#       "description": "",
+#       "properties": {
+#         "html_url": {
+#           "example": "/courses/1/external_tools/4",
+#           "type": "string"
+#         },
+#         "id": {
+#           "example": "context_external_tool_4",
+#           "type": "string"
+#         },
+#         "label": {
+#           "example": "WordPress",
+#           "type": "string"
+#         },
+#         "type": {
+#           "example": "external",
+#           "type": "string"
+#         },
+#         "hidden": {
+#           "description": "only included if true",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "visibility": {
+#           "description": "possible values are: public, members, admins, and none",
+#           "example": "public",
+#           "type": "string"
+#         },
+#         "position": {
+#           "description": "1 based",
+#           "example": 2,
+#           "type": "integer"
+#         }
 #       }
-
+#     }
+#
 class TabsController < ApplicationController
   include Api::V1::Tab
 

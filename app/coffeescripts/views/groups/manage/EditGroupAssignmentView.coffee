@@ -1,11 +1,12 @@
 define [
+  'jquery'
   'underscore'
   'i18n!EditGroupAssignmentView'
   'compiled/views/DialogFormView'
   'compiled/collections/GroupCollection'
   'jst/groups/manage/editGroupAssignment'
   'jst/EmptyDialogFormWrapper'
-], (_, I18n, DialogFormView, GroupCollection, template, wrapper) ->
+], ($, _, I18n, DialogFormView, GroupCollection, template, wrapper) ->
 
   class EditGroupAssignmentView extends DialogFormView
 

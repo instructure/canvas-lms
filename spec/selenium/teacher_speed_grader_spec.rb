@@ -127,7 +127,7 @@ describe "speed grader" do
     student_in_course
     2.times do |i|
       qs = @quiz.generate_submission(@student)
-      opts = i == 0 ? {finished_at: Date.today - 7} : {}
+      opts = i == 0 ? {finished_at: (Date.today - 7) + 30.minutes} : {}
       qs.grade_submission(opts)
     end
 
@@ -419,7 +419,7 @@ describe "speed grader" do
   end
 
   it "should be able to change sorting and hide student names" do
-    student_submission
+    student_submission(name: 'student@example.com')
 
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     wait_for_ajaximations

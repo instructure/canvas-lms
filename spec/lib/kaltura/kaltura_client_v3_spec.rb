@@ -161,6 +161,22 @@ describe "Kaltura::ClientV3" do
               {:fileExt => 'mp4', :bitrate => '100', :isOriginal => '0', :hasWarnings => true},
           ]).first[:isOriginal].should_not == '1'
     end
+
+    it "should sort by descending bitrate but deprioritize sources with suspiciously high bitrates" do
+      @kaltura.sort_source_list(
+          [
+              {:fileExt => 'mp4', :bitrate => '180', :isOriginal => '1'},
+              {:fileExt => 'mp4', :bitrate => '120', :isOriginal => '0'},
+              {:fileExt => 'mp4', :bitrate => '5000', :isOriginal => '0'},
+              {:fileExt => 'mp4', :bitrate => '200', :isOriginal => '0'},
+          ]).should ==
+          [
+              {:fileExt => 'mp4', :bitrate => '200', :isOriginal => '0'},
+              {:fileExt => 'mp4', :bitrate => '120', :isOriginal => '0'},
+              {:fileExt => 'mp4', :bitrate => '5000', :isOriginal => '0'},
+              {:fileExt => 'mp4', :bitrate => '180', :isOriginal => '1'},
+          ]
+    end
   end
 
   describe 'media_sources' do
@@ -384,6 +400,7 @@ describe "Kaltura::ClientV3" do
       log_file_url = "https://www.instructuremedia.com/bulk_uploads/12345.log"
       bulk_upload_add_stub = stub_request(:post, "https://www.instructuremedia.com/api_v3/").
         with(:query => hash_including(:service => 'bulkUpload', :action => 'add')).
+        with{ |request| request.headers['Content-Type'] =~ /\Amultipart\/form-data/ }.
         to_return(:body => <<-XML)
           <result>
             <id>batch_job_12345</id>

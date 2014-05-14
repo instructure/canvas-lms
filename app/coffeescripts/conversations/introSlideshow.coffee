@@ -1,8 +1,9 @@
 define [
   'i18n!conversations_intro'
+  'jquery'
   'compiled/widget/slideshow'
   'jquery.ajaxJSON'
-], (I18n, Slideshow) ->
+], (I18n, $, Slideshow) ->
 
   ->
     introSlideshow = new Slideshow('conversations_intro')

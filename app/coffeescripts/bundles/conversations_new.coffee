@@ -1,5 +1,6 @@
 require [
   'i18n!conversations'
+  'jquery'
   'underscore'
   'Backbone'
   'compiled/models/Message'
@@ -13,7 +14,7 @@ require [
   'compiled/collections/CourseCollection'
   'compiled/collections/FavoriteCourseCollection'
   'jquery.disableWhileLoading'
-], (I18n, _, Backbone, Message, MessageCollection, MessageView, MessageListView, MessageDetailView, MessageFormDialog,
+], (I18n, $, _, Backbone, Message, MessageCollection, MessageView, MessageListView, MessageDetailView, MessageFormDialog,
  InboxHeaderView, deparam, CourseCollection, FavoriteCourseCollection) ->
 
   class ConversationsRouter extends Backbone.Router
@@ -145,7 +146,9 @@ require [
 
     onMarkUnread: =>
       @batchUpdate('mark_as_unread', (m) -> m.toggleReadState(false))
-      @header.onReadStateChange()
+
+    onMarkRead: =>
+      @batchUpdate('mark_as_read', (m) -> m.toggleReadState(true))
 
     onForward: (message) =>
       model = if message
@@ -212,6 +215,7 @@ require [
       @header.on('filter',      @onFilter)
       @header.on('course',      @onCourse)
       @header.on('mark-unread', @onMarkUnread)
+      @header.on('mark-read', @onMarkRead)
       @header.on('forward',     @onForward)
       @header.on('star-toggle', @onStarToggle)
       @header.on('search',      @onSearch)

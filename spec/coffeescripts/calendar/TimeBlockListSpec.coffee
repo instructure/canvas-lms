@@ -1,7 +1,8 @@
 # requires jquery and date.js
 require [
+  'jquery'
   'compiled/calendar/TimeBlockList'
-], (TimeBlockList) ->
+], ($, TimeBlockList) ->
 
   module "TimeBlockList",
     setup: ->

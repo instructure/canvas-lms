@@ -22,5 +22,5 @@ define [
       if @progressModel.id
         data.progress = @progressModel.toJSON()
       if data.file
-        data.dateAndTime = $.parseFromISO(data.file.created_at).datetime_formatted
+        data.dateAndTime = $.datetimeString(data.file.created_at)
       data

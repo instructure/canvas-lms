@@ -18,7 +18,7 @@
 
 # On click of the given element, display the profile picture picker dialog.
 
-define ['compiled/util/ProximityLoader'], (ProximityLoader) ->
+define ['jquery', 'compiled/util/ProximityLoader'], ($, ProximityLoader) ->
 
   class AvatarWidget
 

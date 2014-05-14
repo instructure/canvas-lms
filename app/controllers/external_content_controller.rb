@@ -61,7 +61,7 @@ class ExternalContentController < ApplicationController
     endpoint = params[:endpoint]
     url = params[:url]
     uri = URI.parse(endpoint + (endpoint.match(/\?/) ? '&url=' : '?url=') + CGI.escape(url) + '&format=json')
-    res = Canvas::HTTP.get(uri.to_s) rescue '{}'
+    res = CanvasHttp.get(uri.to_s) rescue '{}'
     data = JSON.parse(res.body) rescue {}
     if data['type']
       if data['type'] == 'photo' && data['url'].try(:match, /^http/)
@@ -111,5 +111,6 @@ class ExternalContentController < ApplicationController
 
   def cancel
     @headers = false
+    js_env(service: params[:service])
   end
 end

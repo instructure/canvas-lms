@@ -47,7 +47,7 @@ module ContextModuleItem
     preferred_id = preferred_id[Api::ID_REGEX] if preferred_id.is_a?(String)
     objs_to_search.each do |obj|
       next unless obj.present?
-      tag = obj.context_module_tags.find_by_id(preferred_id)
+      tag = obj.context_module_tags.where(:id => preferred_id).first
       return tag if tag
     end
     objs_to_search.each do |obj|

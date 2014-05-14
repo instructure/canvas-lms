@@ -3,9 +3,10 @@ define [
   'compiled/views/groups/manage/AddUnassignedUsersView'
   'compiled/views/InputFilterView'
   'jst/groups/manage/addUnassignedMenu'
+  'jquery'
   'underscore'
   'compiled/jquery/outerclick'
-], (PopoverMenuView, AddUnassignedUsersView, InputFilterView, template, _) ->
+], (PopoverMenuView, AddUnassignedUsersView, InputFilterView, template, $, _) ->
 
   class AddUnassignedMenu extends PopoverMenuView
 

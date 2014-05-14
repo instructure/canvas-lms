@@ -1,0 +1,19 @@
+<div class="webcam-preview-wrapper">
+  <img src="{{previewURL}}" alt="" class="webcam-preview" />
+
+  <button type="button" class="btn retry-snapshot-btn">
+    {{#t "retry"}}Retry{{/t}}
+  </button>
+</div>
+
+<div class="webcam-capture-wrapper">
+  <div class="webcam-clip">
+    <video autoplay class="webcam-live-preview pending"></video>
+  </div>
+
+  <button type="button" class="btn take-snapshot-btn">
+    {{#t "take_picture"}}Take Picture{{/t}}
+  </button>
+</div>
+
+<canvas class="webcam-preview-staging-area hidden"></canvas>

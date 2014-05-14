@@ -26,7 +26,7 @@ class RubricsController < ApplicationController
     return unless authorized_action(@context, @current_user, :manage)
     js_env :ROOT_OUTCOME_GROUP => get_root_outcome
     @rubric_associations = @context.rubric_associations.bookmarked.include_rubric.to_a
-    @rubric_associations = Canvas::ICU.collate_by(@rubric_associations.select(&:rubric_id).once_per(&:rubric_id)) { |r| r.rubric.title }
+    @rubric_associations = Canvas::ICU.collate_by(@rubric_associations.select(&:rubric_id).uniq(&:rubric_id)) { |r| r.rubric.title }
     @rubrics = @rubric_associations.map(&:rubric)
     @context.is_a?(User) ? render(:action => 'user_index') : render
   end

@@ -17,29 +17,6 @@
  */
 define(['vendor/jquery-1.7.2'], function($) {
 
-  // This is so that if you disable an element, that it also gives it the class disabled.
-  // that way you can add css classes for our friend IE6. so rather than using selector:disabled,
-  // you can do selector.disabled.
-  // works on both $(elem).attr('disabled', ...) AND $(elem).prop('disabled', ...)
-  $.each([ "prop", "attr" ], function(i, propOrAttr ) {
-    // set the `disabled.set` hook like this so we don't override any existing `get` hook
-    $[propOrAttr+'Hooks'].disabled = $.extend( $[propOrAttr+'Hooks'].disabled, {
-      set: function( elem, value, name ) {
-        $(elem).toggleClass('disabled', !!value);
-
-        // have to replicate wat jQuery's boolHook does because once you define your own hook
-        // for an attribute/property it wont fall back to boolHook. and it is not exposed externally.
-        elem[value ? 'setAttribute' : 'removeAttribute' ]('disabled', 'disabled');
-        if ( 'disabled' in elem ) {
-          // Only set the IDL specifically if it already exists on the element
-          // ie for an <input> but not a <div>
-          elem.disabled = !!value;
-        }
-        return value;
-      }
-    });
-  });
-
   // monkey patch jquery's JSON parsing so we can have all of our ajax responses return with
   // 'while(1);' prepended to them to protect against a CSRF attack vector.
   var _parseJSON = $.parseJSON;
@@ -85,6 +62,35 @@ define(['vendor/jquery-1.7.2'], function($) {
   $.windowScrollTop = function() {
     return ($.browser.safari ? $("body") : $("html")).scrollTop();
   };
+
+  // indicate we want stringified IDs for JSON responses
+  $.ajaxPrefilter("json", function( options, originalOptions, jqXHR ) {
+    if (options.accepts.json)
+      options.accepts.json = options.accepts.json + ', application/json+canvas-string-ids';
+    else
+      options.accepts.json = 'application/json+canvas-string-ids';
+  });
+
+  // see: https://github.com/rails/jquery-ujs/blob/master/src/rails.js#L80
+  var CSRFProtection =  function(xhr) {
+    if (ENV.AUTHENTICITY_TOKEN) xhr.setRequestHeader('X-CSRF-Token', ENV.AUTHENTICITY_TOKEN);
+  }
+
+  $.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
+    if ( !options.crossDomain ) CSRFProtection(jqXHR);
+
+    // sends timing info of XHRs to google analytics so we can track ajax speed.
+    // (ONLY for ajax requests that took longer than a second)
+    var urlWithoutPageViewParam = options.url;
+    var start = new Date().getTime();
+    jqXHR.done(function(data, textStatus, jqXHR){
+      var duration = new Date().getTime() - start;
+      if (duration > 1000) {
+        var label = '{"requestingPage": "' + window.location + '," "status": "' + textStatus + '", "X-Request-Context-Id" : "' + jqXHR.getResponseHeader('X-Request-Context-Id') + '", "X-Runtime": ' + jqXHR.getResponseHeader('X-Runtime') + '}';
+        $.trackEvent('XHRs', urlWithoutPageViewParam, label, duration );
+      }
+    });
+  });
 
   return $;
 });

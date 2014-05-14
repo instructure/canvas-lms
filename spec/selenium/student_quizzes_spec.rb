@@ -16,16 +16,82 @@ describe "quizzes" do
   end
 
   context "as a student" do
-    before (:each) do
+    before(:each) do
       course_with_student_logged_in
       @qsub = quiz_with_submission(false)
+    end
+
+    context "taking a timed quiz" do
+      it "should warn the student before the due date is exceeded" do
+        @context = @course
+        bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
+        q = quiz_model
+        a = bank.assessment_questions.create!
+        b = bank.assessment_questions.create!
+        answers = [{id: 1, answer_text: 'A', weight: 100}, {id: 2, answer_text: 'B', weight: 0}]
+        question = q.quiz_questions.create!(:question_data => {
+          :name => "first question",
+          'question_type' => 'multiple_choice_question',
+          'answers' => answers,
+          :points_possible => 1
+        }, :assessment_question => a)
+
+        q.generate_quiz_data
+        q.due_at = Time.now.utc + 20.seconds
+        q.save!
+
+        get "/courses/#{@course.id}/quizzes/#{q.id}/take?user_id=#{@student.id}"
+        f("#take_quiz_link").click
+        answer_one = f("#question_#{question.id}_answer_1")
+        answer_two = f("#question_#{question.id}_answer_2")
+
+        # force a save to create a submission
+        answer_one.click
+        wait_for_ajaximations
+
+        keep_trying_until do
+          submission = Quizzes::QuizSubmission.last
+          fj('#times_up_dialog:visible').should be_present
+        end
+      end
+
+      it "should warn the student before the lock date is exceeded" do
+        @context = @course
+        bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
+        q = quiz_model
+        a = bank.assessment_questions.create!
+        b = bank.assessment_questions.create!
+        answers = [{id: 1, answer_text: 'A', weight: 100}, {id: 2, answer_text: 'B', weight: 0}]
+        question = q.quiz_questions.create!(:question_data => {
+          :name => "first question",
+          'question_type' => 'multiple_choice_question',
+          'answers' => answers,
+          :points_possible => 1
+        }, :assessment_question => a)
+
+        q.generate_quiz_data
+        q.lock_at = Time.now.utc + 20.seconds
+        q.save!
+
+        get "/courses/#{@course.id}/quizzes/#{q.id}/take?user_id=#{@student.id}"
+        f("#take_quiz_link").click
+        answer_one = f("#question_#{question.id}_answer_1")
+        answer_two = f("#question_#{question.id}_answer_2")
+
+        # force a save to create a submission
+        answer_one.click
+        wait_for_ajaximations
+
+        keep_trying_until do
+          submission = Quizzes::QuizSubmission.last
+          fj('#times_up_dialog:visible').should be_present
+        end
+      end
     end
 
     context "resume functionality" do
       def update_quiz_lock(lock_at, unlock_at)
         @quiz.update_attributes(:lock_at => lock_at, :unlock_at => unlock_at)
-        @quiz.reload
-        @quiz.save!
       end
 
       # This feature doesn't exist for draft state yet
@@ -45,19 +111,19 @@ describe "quizzes" do
         end
 
         it "should show the resume quiz link if quiz unlock_at date is < now" do
-          update_quiz_lock(Time.now - 1.day.ago, Time.now - 10.minutes.ago)
+          update_quiz_lock(nil, 10.minutes.ago)
           get "/courses/#{@course.id}/quizzes"
           f('.description').should include_text('Resume Quiz')
         end
 
         it "should not show the resume link if the quiz is locked" do
-          update_quiz_lock(Time.now - 5.minutes, nil)
+          update_quiz_lock(5.minutes.ago, nil)
           get "/courses/#{@course.id}/quizzes"
           f('.description').should_not include_text('Resume Quiz')
         end
 
         it "should grade any submission that needs grading" do
-          @qsub.end_at = Time.now - 5.minutes
+          @qsub.end_at = 5.minutes.ago
           @qsub.save!
           get "/courses/#{@course.id}/quizzes"
           f('.description').should_not include_text('Resume Quiz')
@@ -80,15 +146,13 @@ describe "quizzes" do
         end
 
         it "should show the resume quiz button if the quiz unlock_at date is < now" do
-          pending('193')
-          update_quiz_lock(Time.now - 1.day.ago, Time.now - 10.minutes.ago)
+          update_quiz_lock(nil, 10.minutes.ago)
           get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
           validate_resume_button_text(@resume_text)
         end
 
         it "should not show the resume quiz button if quiz is locked" do
-          pending('193')
-          update_quiz_lock(Time.now - 5.minutes, nil)
+          update_quiz_lock(5.minutes.ago, nil)
           get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
           f('#not_right_side .take_quiz_button').should_not be_present
         end
@@ -100,7 +164,7 @@ describe "quizzes" do
 
         it "should not see unpublished warning" do
           # set to unpublished state
-          @quiz.last_edited_at = Time.now
+          @quiz.last_edited_at = Time.now.utc
           @quiz.published_at   = 1.hour.ago
           @quiz.save!
 
@@ -154,7 +218,7 @@ describe "quizzes" do
     it "should automatically grade the submission when it becomes overdue" do
       pending('disabled because of regression')
 
-      job_tag = 'QuizSubmission#grade_if_untaken'
+      job_tag = 'Quizzes::QuizSubmission#grade_if_untaken'
 
       course_with_student_logged_in
       quiz = prepare_quiz

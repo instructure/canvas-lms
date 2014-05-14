@@ -124,13 +124,14 @@ describe ContentMigration do
       @copy_to.syllabus_body.should == nil
     end
 
-    def make_grading_standard(context)
+    def make_grading_standard(context, opts = {})
       gs = context.grading_standards.new
-      gs.title = "Standard eh"
+      gs.title = opts[:title] || "Standard eh"
       gs.data = [["A", 0.93], ["A-", 0.89], ["B+", 0.85], ["B", 0.83], ["B!-", 0.80], ["C+", 0.77], ["C", 0.74], ["C-", 0.70], ["D+", 0.67], ["D", 0.64], ["D-", 0.61], ["F", 0]]
       gs.save!
       gs
     end
+
     it "should copy course attributes" do
       #set all the possible values to non-default values
       @copy_from.start_at = 5.minutes.ago
@@ -180,56 +181,87 @@ describe ContentMigration do
       @copy_to.tab_configuration.should == @copy_from.tab_configuration
      end
 
-    it "should retain reference to account grading standard" do
-      gs = make_grading_standard(@copy_from.root_account)
-      @copy_from.grading_standard = gs
-      @copy_from.grading_standard_enabled = true
-      @copy_from.save!
+    describe "grading standards" do
+      it "should retain reference to account grading standard" do
+        gs = make_grading_standard(@copy_from.root_account)
+        @copy_from.grading_standard = gs
+        @copy_from.grading_standard_enabled = true
+        @copy_from.save!
 
-      run_course_copy
+        run_course_copy
 
-      @copy_to.grading_standard.should == gs
+        @copy_to.grading_standard.should == gs
+      end
+
+      it "should copy a course grading standard not owned by the copy_from course" do
+        @other_course = course_model
+        gs = make_grading_standard(@other_course)
+        @copy_from.grading_standard = gs
+        @copy_from.grading_standard_enabled = true
+        @copy_from.save!
+
+        run_course_copy
+
+        @copy_to.grading_standard_enabled.should be_true
+        @copy_to.grading_standard.data.should == gs.data
+      end
+
+      it "should create a warning if an account grading standard can't be found" do
+        gs = make_grading_standard(@copy_from.root_account)
+        @copy_from.grading_standard = gs
+        @copy_from.grading_standard_enabled = true
+        @copy_from.save!
+
+        gs.delete
+
+        run_course_copy(["Couldn't find account grading standard for the course."])
+
+        @copy_to.grading_standard.should == nil
+      end
+
+      it "should not copy deleted grading standards" do
+        gs = make_grading_standard(@copy_from)
+        @copy_from.grading_standard_enabled = true
+        @copy_from.save!
+
+        gs.destroy
+        @copy_from.reload
+
+        run_course_copy
+
+        @copy_to.grading_standards.should be_empty
+      end
+
+      it "should not copy grading standards if nothing is selected" do
+        gs = make_grading_standard(@copy_from)
+        @copy_from.update_attribute(:grading_standard, gs)
+        @cm.copy_options = { 'everything' => '0' }
+        @cm.save!
+        run_course_copy
+        @copy_to.grading_standards.should be_empty
+      end
+
+      it "should copy the course's grading standard (once) if course_settings are selected" do
+        gs = make_grading_standard(@copy_from, title: 'What')
+        @copy_from.update_attribute(:grading_standard, gs)
+        @cm.copy_options = { 'everything' => '0', 'all_course_settings' => '1' }
+        @cm.save!
+        run_course_copy
+        @copy_to.grading_standards.count.should eql 1 # no dupes
+        @copy_to.grading_standard.title.should eql gs.title
+      end
+
+      it "should copy grading standards referenced by exported assignments" do
+        gs1, gs2 = make_grading_standard(@copy_from, title: 'One'), make_grading_standard(@copy_from, title: 'Two')
+        assign = @copy_from.assignments.build
+        assign.grading_standard = gs2
+        assign.save!
+        @cm.copy_options = { 'everything' => '0', 'assignments' => { mig_id(assign) => "1" } }
+        run_course_copy
+        @copy_to.grading_standards.map(&:title).should eql %w(Two)
+        @copy_to.assignments.first.grading_standard.title.should eql 'Two'
+      end
     end
-
-    it "should copy a course grading standard not owned by the copy_from course" do
-      @other_course = course_model
-      gs = make_grading_standard(@other_course)
-      @copy_from.grading_standard = gs
-      @copy_from.grading_standard_enabled = true
-      @copy_from.save!
-
-      run_course_copy
-
-      @copy_to.grading_standard_enabled.should be_true
-      @copy_to.grading_standard.data.should == gs.data
-    end
-
-    it "should create a warning if an account grading standard can't be found" do
-      gs = make_grading_standard(@copy_from.root_account)
-      @copy_from.grading_standard = gs
-      @copy_from.grading_standard_enabled = true
-      @copy_from.save!
-
-      gs.delete
-
-      run_course_copy(["Couldn't find account grading standard for the course."])
-
-      @copy_to.grading_standard.should == nil
-    end
-
-    it "should not copy deleted grading standards" do
-      gs = make_grading_standard(@copy_from)
-      @copy_from.grading_standard_enabled = true
-      @copy_from.save!
-
-      gs.destroy
-      @copy_from.reload
-
-      run_course_copy
-
-      @copy_to.grading_standards.should be_empty
-    end
-
 
     def mig_id(obj)
       CC::CCHelper.create_key(obj)
@@ -1055,6 +1087,33 @@ describe ContentMigration do
       end
     end
 
+    it "should copy assignment attributes" do
+      assignment_model(:course => @copy_from, :points_possible => 40, :submission_types => 'file_upload', :grading_type => 'points')
+      @assignment.turnitin_enabled = true
+      @assignment.peer_reviews_assigned = true
+      @assignment.peer_reviews = true
+      @assignment.peer_review_count = 2
+      @assignment.automatic_peer_reviews = true
+      @assignment.anonymous_peer_reviews = true
+      @assignment.allowed_extensions = ["doc", "xls"]
+      @assignment.position = 2
+      @assignment.muted = true
+
+      @assignment.save!
+
+      attrs = [:turnitin_enabled, :peer_reviews_assigned, :peer_reviews,
+          :automatic_peer_reviews, :anonymous_peer_reviews,
+          :grade_group_students_individually, :allowed_extensions,
+          :position, :peer_review_count, :muted]
+
+      run_course_copy
+
+      new_assignment = @copy_to.assignments.find_by_migration_id(mig_id(@assignment))
+      attrs.each do |attr|
+        @assignment[attr].should == new_assignment[attr]
+      end
+    end
+
     it "should copy discussion topic attributes" do
       topic = @copy_from.discussion_topics.create!(:title => "topic", :message => "<p>bloop</p>",
                                                    :pinned => true, :discussion_type => "threaded",
@@ -1082,6 +1141,9 @@ describe ContentMigration do
       assignment.saved_by = :discussion_topic
       topic.assignment = assignment
       topic.save
+
+      # Should not fail if the destination has a group
+      @copy_to.groups.create!(:name => 'some random group of people')
 
       @cm.copy_options = {
               :assignments => {mig_id(assignment) => "1"},
@@ -1271,6 +1333,18 @@ describe ContentMigration do
       att.should_not be_valid
 
       run_course_copy(["Couldn't copy file \"dummy.txt\""])
+    end
+
+    it "should convert domains in imported urls if specified in account settings" do
+      account = @copy_to.root_account
+      account.settings[:default_migration_settings] = {:domain_substitution_map => {"http://derp.derp" => "https://derp.derp"}}
+      account.save!
+
+      @copy_from.syllabus_body = "<p><a href=\"http://derp.derp/stuff\">this is a link to an insecure domain that could cause problems</a></p>"
+
+      run_course_copy
+
+      @copy_to.syllabus_body.should == @copy_from.syllabus_body.sub("http://derp.derp", "https://derp.derp")
     end
 
     it "should preserve media comment links" do

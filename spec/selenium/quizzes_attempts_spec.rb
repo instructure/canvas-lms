@@ -86,6 +86,8 @@ describe "quizzes attempts" do
     # all arrows should have an @id attribute node
     ffj('.answer_arrow:not([id])').length.should == 0
 
+    # the following test cases are intermittent and broken:
+
     # there should be 5x <input /> nodes with an @aria-describedby attribute node
     ffj('.answer input[aria-describedby]').length.should == 5
 

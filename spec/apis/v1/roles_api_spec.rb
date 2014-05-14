@@ -549,7 +549,7 @@ describe "Roles API", type: :request do
                  { :controller => 'role_overrides', :action => 'add_role', :format => 'json', :account_id => @account.id.to_s },
                  {:role => role_name, :base_role_type => 'StudentEnrollment'})
 
-        @path = @path.sub(/TeacherEnrollment/, role_name)
+        @path = @path.sub(/TeacherEnrollment/, URI.escape(role_name))
         @path_options[:role] = role_name
         @permissions[:permissions][:read_question_banks][:enabled] = 1
 

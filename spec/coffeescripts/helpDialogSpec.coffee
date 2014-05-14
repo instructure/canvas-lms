@@ -1,8 +1,9 @@
 require [
+  'jquery'
   'compiled/helpDialog'
   'helpers/fakeENV'
   'vendor/jquery.ba-tinypubsub'
-], (helpDialog,fakeENV)->
+], ($,helpDialog,fakeENV)->
   # more tests are in spec/selenium/help_dialog_spec.rb
 
   # mock INST.browser for test to work

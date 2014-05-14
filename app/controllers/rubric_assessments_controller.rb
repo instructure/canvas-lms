@@ -19,44 +19,6 @@
 class RubricAssessmentsController < ApplicationController
   before_filter :require_context
   
-  def index
-    @association = @context.rubric_associations.find(params[:rubric_association_id]) #Rubric.find(params[:rubric_id])
-    @assessments = @association.rubric_assessments
-    if authorized_action(@context, @current_user, :read)
-      @headers = false
-      render :action => "index"
-    end
-  end
-  
-  def show
-    @association = @context.rubric_associations.find(params[:rubric_association_id]) #Rubric.find(params[:rubric_id])
-    @assessment = @association.rubric_assessments.find(params[:id]) rescue nil
-    @assessment_request = @association.assessment_requests.find_by_uuid(params[:id])
-    if @assessment_request && @association.purpose == "grading" && @association.association_type == 'Assignment'
-      redirect_to named_context_url(@context, :context_assignment_submission_url, @association.association_id, @assessment_request.user_id)
-      return
-    end
-    if @assessment_request || authorized_action(@context, @current_user, :read)    
-      unless @assessment
-        raise "Assessment Request required" unless @assessment_request
-        @assessment = @assessment_request.rubric_assessment
-        @user = @assessment_request.asset.user rescue nil
-        @assessment ||= @association.assess(:assessor => (@current_user || @assessment_request.user), :user => @user, :artifact => @assessment_request.asset, :assessment => {:assessment_type => 'invited_assessment'})
-        session[:rubric_assessment_ids] = ((session[:rubric_assessment_ids] || []) + [@assessment.id]).uniq
-        @assessment_request.attributes = {:rubric_assessment => @assessment, :user => @assessment.assessor}
-        @assessment_request.complete
-        @assessing = true
-      end
-      @assessments = [@assessment]
-      if @assessment.artifact && @assessment.artifact.is_a?(Submission)
-        redirect_to named_context_url(@assessment.artifact.context, :context_assignment_submission_url, @assessment.artifact.assignment_id, @assessment.artifact.user_id)
-      else
-        @headers = false
-        render :action => "index"
-      end
-    end
-  end
-  
   def create
     update
   end

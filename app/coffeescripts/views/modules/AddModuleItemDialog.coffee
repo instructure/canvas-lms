@@ -1,11 +1,12 @@
 define [
   'i18n!modules'
+  'jquery'
   'underscore'
   'compiled/views/DialogFormView'
   'jst/modules/AddModuleItemDialogWrapper'
   'jst/modules/AddModuleItemDialog'
   'compiled/views/modules/ModuleItemViewRegister'
-], (I18n, _, DialogFormView, wrapperTemplate, template, ModuleItemViewRegister) ->
+], (I18n, $, _, DialogFormView, wrapperTemplate, template, ModuleItemViewRegister) ->
   class AddModuleItemDialog extends DialogFormView
     wrapperTemplate: wrapperTemplate
     template: template

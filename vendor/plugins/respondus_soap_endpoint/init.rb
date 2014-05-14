@@ -22,7 +22,11 @@ Rails.configuration.to_prepare do
   # cache.
   if CANVAS_RAILS2
     Rails.configuration.middleware.insert_before 'ActionController::ParamsParser', 'RespondusAPIMiddleware'
-  else
-    Rails.configuration.middleware.insert_before 'ActionDispatch::ParamsParser', 'RespondusAPIMiddleware'
+  end
+end
+
+unless CANVAS_RAILS2
+  class RespondusRailtie < Rails::Railtie
+    config.app_middleware.insert_before 'ActionDispatch::ParamsParser', 'RespondusAPIMiddleware'
   end
 end

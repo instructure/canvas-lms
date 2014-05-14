@@ -1,4 +1,5 @@
 define [
+  'jquery'
   'underscore'
   'i18n!registration'
   'compiled/fn/preventDefault'
@@ -10,7 +11,7 @@ define [
   'compiled/jquery/validate'
   'jquery.instructure_forms'
   'jquery.instructure_date_and_time'
-], (_, I18n, preventDefault, registrationErrors, teacherDialog, studentDialog, parentDialog, addPrivacyLinkToDialog) ->
+], ($, _, I18n, preventDefault, registrationErrors, teacherDialog, studentDialog, parentDialog, addPrivacyLinkToDialog) ->
 
   $nodes = {}
   templates = {teacherDialog, studentDialog, parentDialog}
@@ -49,7 +50,10 @@ define [
       open: ->
         $(this).find('a').eq(0).blur()
         $(this).find(':input').eq(0).focus()
-      close: -> $('.error_box').filter(':visible').remove()
+        signupDialog.afterRender?()
+      close: ->
+        signupDialog.teardown?()
+        $('.error_box').filter(':visible').remove()
     $node.fixDialogButtons()
     unless ENV.ACCOUNT.terms_required # term verbiage has a link to PP, so this would be redundant
       addPrivacyLinkToDialog($node)

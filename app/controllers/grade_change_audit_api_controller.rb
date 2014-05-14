@@ -29,45 +29,82 @@
 # are also included. Refer to the Assignment, Courses, and Users APIs for
 # descriptions of the objects in those collections.
 #
-# @object GradeChangeEvent
+# @model GradeChangeEventLinks
 #     {
-#       // ID of the event.
-#       "id": "e2b76430-27a5-0131-3ca1-48e0eb13f29b",
+#       "id": "GradeChangeEventLinks",
+#       "description": "",
+#       "properties": {
+#         "assignment": {
+#           "description": "ID of the assignment associated with the event",
+#           "example": 2319,
+#           "type": "integer"
+#         },
+#         "course": {
+#           "description": "ID of the course associated with the event. will match the context_id in the associated assignment if the context type for the assignment is a course",
+#           "example": 2319,
+#           "type": "integer"
+#         },
+#         "student": {
+#           "description": "ID of the student associated with the event. will match the user_id in the associated submission.",
+#           "example": 2319,
+#           "type": "integer"
+#         },
+#         "grader": {
+#           "description": "ID of the grader associated with the event. will match the grader_id in the associated submission.",
+#           "example": 2319,
+#           "type": "integer"
+#         },
+#         "page_view": {
+#           "description": "ID of the page view during the event if it exists.",
+#           "example": "e2b76430-27a5-0131-3ca1-48e0eb13f29b",
+#           "type": "string"
+#         }
+#       }
+#     }
 #
-#       // timestamp of the event
-#       "created_at": "2012-07-19T15:00:00-06:00",
-#
-#       // GradeChange event type
-#       "event_type": "grade_change",
-#
-#       // The grade after the change.
-#       "grade_after": "8",
-#
-#       // The grade before the change.
-#       "grade_before": "8",
-#
-#       // Version Number of the grade change submission.
-#       "version_number": "1",
-#
-#       "links": {
-#          // ID of the assignment associated with the event.
-#          "assignment": 2319,
-#
-#          // ID of the course associated with the event. will match the
-#          // context_id in the associated assignment if the context type
-#          // for the assignment is a course.
-#          "course": 2319,
-#
-#          // ID of the student associated with the event. will match the
-#          // user_id in the associated submission.
-#          "student": 2319,
-#
-#          // ID of the grader associated with the event. will match the
-#          // grader_id in the associated submission.
-#          "grader": 2319,
-#
-#          // ID of the page view during the event if it exists.
-#          "page_view": "e2b76430-27a5-0131-3ca1-48e0eb13f29b"
+# @model GradeChangeEvent
+#     {
+#       "id": "GradeChangeEvent",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "ID of the event.",
+#           "example": "e2b76430-27a5-0131-3ca1-48e0eb13f29b",
+#           "type": "string"
+#         },
+#         "created_at": {
+#           "description": "timestamp of the event",
+#           "example": "2012-07-19T15:00:00-06:00",
+#           "type": "datetime"
+#         },
+#         "event_type": {
+#           "description": "GradeChange event type",
+#           "example": "grade_change",
+#           "type": "string"
+#         },
+#         "grade_after": {
+#           "description": "The grade after the change.",
+#           "example": "8",
+#           "type": "string"
+#         },
+#         "grade_before": {
+#           "description": "The grade before the change.",
+#           "example": "8",
+#           "type": "string"
+#         },
+#         "version_number": {
+#           "description": "Version Number of the grade change submission.",
+#           "example": "1",
+#           "type": "string"
+#         },
+#         "request_id": {
+#           "description": "The unique request id of the request during the grade change.",
+#           "example": "e2b76430-27a5-0131-3ca1-48e0eb13f29b",
+#           "type": "string"
+#         },
+#         "links": {
+#           "$ref": "GradeChangeEventLinks"
+#         }
 #       }
 #     }
 #

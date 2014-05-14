@@ -1,11 +1,11 @@
 module LtiOutbound
-  class LTITool
+  class LTITool < LTIModel
     PRIVACY_LEVEL_PUBLIC = :public
     PRIVACY_LEVEL_NAME_ONLY = :name_only
     PRIVACY_LEVEL_EMAIL_ONLY = :email_only
     PRIVACY_LEVEL_ANONYMOUS  = :anonymous
 
-    attr_accessor :consumer_key, :privacy_level, :name, :settings, :shared_secret
+    proc_accessor :consumer_key, :privacy_level, :name, :settings, :shared_secret
 
     def include_name?
       [PRIVACY_LEVEL_PUBLIC, PRIVACY_LEVEL_NAME_ONLY].include? privacy_level

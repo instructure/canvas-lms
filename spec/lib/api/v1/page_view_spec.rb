@@ -48,7 +48,6 @@ describe Api::V1::PageView do
           :participated => false,
           :user_request => true,
           :interaction_seconds => 7.21,
-          :contributed => false,
           :action => "index",
           :controller => "controller",
           :account_id => @domain_root_account.id
@@ -76,7 +75,7 @@ describe Api::V1::PageView do
     page_view[:participated].should == @page_view.participated
     page_view[:user_request].should == @page_view.user_request
     page_view[:interaction_seconds].should == @page_view.interaction_seconds
-    page_view[:contributed].should == @page_view.contributed
+    page_view[:contributed].should == false
     page_view[:action].should == @page_view.action
     page_view[:controller].should == @page_view.controller
 

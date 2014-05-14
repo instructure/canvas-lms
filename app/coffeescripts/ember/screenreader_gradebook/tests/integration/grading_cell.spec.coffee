@@ -11,14 +11,15 @@ define [
   module 'grading_cell_component integration test for isPoints',
     setup: ->
       App = startApp()
-      visit('/')
-      @controller = App.__container__.lookup('controller:screenreader_gradebook')
-      @assignment = @controller.get('assignments').findBy('id', '6')
-      @student = @controller.get('students').findBy('id', '1')
-      Ember.run =>
-        @controller.set('selectedAssignment', @assignment)
-        @controller.set('selectedStudent', @student)
-        console.log @controller.get('submissions.length')
+      visit('/').then =>
+        @controller = App.__container__.lookup('controller:screenreader_gradebook')
+        @assignment = @controller.get('assignments').findBy('id', '6')
+        @student = @controller.get('students').findBy('id', '1')
+        Ember.run =>
+          @controller.setProperties
+            submissions: Ember.copy(fixtures.submissions, true)
+            selectedAssignment: @assignment
+            selectedStudent: @student
 
     teardown: ->
       Ember.run App, 'destroy'

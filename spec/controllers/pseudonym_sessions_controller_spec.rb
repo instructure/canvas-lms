@@ -42,7 +42,7 @@ describe PseudonymSessionsController do
 
     it "should render normal layout if not iphone/ipod" do
       get 'new'
-      response.should render_template("pseudonym_sessions/new.html.erb")
+      response.should render_template('new')
     end
 
     it "should render special iPhone/iPod layout if coming from one of those" do
@@ -236,10 +236,10 @@ describe PseudonymSessionsController do
       get 'saml_consume', :SAMLResponse => "foo"
       response.should redirect_to(dashboard_url(:login_success => 1))
       session[:saml_unique_id].should == unique_id
-      Pseudonym.find(session[:pseudonym_credentials_id]).should == user1.pseudonyms.first
+      Pseudonym.find(session['pseudonym_credentials_id']).should == user1.pseudonyms.first
 
       (controller.instance_variables.grep(/@[^_]/) - ['@mock_proxy']).each{ |var| controller.send :remove_instance_variable, var }
-      session.reset
+      CANVAS_RAILS2 ? session.reset : session.clear
 
       controller.stubs(:saml_response).returns(
         stub('response', :is_valid? => true, :success_status? => true, :name_id => unique_id, :name_qualifier => nil, :session_index => nil, :process => nil)
@@ -249,7 +249,7 @@ describe PseudonymSessionsController do
       get 'saml_consume', :SAMLResponse => "bar"
       response.should redirect_to(dashboard_url(:login_success => 1))
       session[:saml_unique_id].should == unique_id
-      Pseudonym.find(session[:pseudonym_credentials_id]).should == user2.pseudonyms.first
+      Pseudonym.find(session['pseudonym_credentials_id']).should == user2.pseudonyms.first
 
       Setting.set_config("saml", nil)
     end
@@ -701,10 +701,10 @@ describe PseudonymSessionsController do
       get 'new', :ticket => 'ST-abcd'
       response.should redirect_to(dashboard_url(:login_success => 1))
       session[:cas_session].should == 'ST-abcd'
-      Pseudonym.find(session[:pseudonym_credentials_id]).should == user1.pseudonyms.first
+      Pseudonym.find(session['pseudonym_credentials_id']).should == user1.pseudonyms.first
 
       (controller.instance_variables.grep(/@[^_]/) - ['@mock_proxy']).each{ |var| controller.send :remove_instance_variable, var }
-      session.reset
+      CANVAS_RAILS2 ? session.reset : session.clear
 
       stubby("yes\n#{unique_id}\n")
 
@@ -712,7 +712,7 @@ describe PseudonymSessionsController do
       get 'new', :ticket => 'ST-efgh'
       response.should redirect_to(dashboard_url(:login_success => 1))
       session[:cas_session].should == 'ST-efgh'
-      Pseudonym.find(session[:pseudonym_credentials_id]).should == user2.pseudonyms.first
+      Pseudonym.find(session['pseudonym_credentials_id']).should == user2.pseudonyms.first
     end
   end
 
@@ -805,6 +805,55 @@ describe PseudonymSessionsController do
         response.should render_template('otp_login')
         session[:pending_otp_secret_key].should be_nil
         assigns[:cc].should == cc
+      end
+    end
+
+    context "oauth" do
+      before do
+        user_with_pseudonym(:active_all => 1, :password => 'qwerty')
+
+        redis = stub('Redis')
+        redis.stubs(:setex)
+        redis.stubs(:hmget)
+        redis.stubs(:del)
+        Canvas.stubs(:redis => redis)
+      end
+
+      let(:key) { DeveloperKey.create! :redirect_uri => 'https://example.com' }
+      let(:params) { {:pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwerty' } } }
+
+      it 'should redirect to the confirm url if the user has no token' do
+        provider = Canvas::Oauth::Provider.new(key.id, key.redirect_uri, [], nil)
+
+        post :create, params, :oauth2 => provider.session_hash
+        response.should redirect_to(oauth2_auth_confirm_url)
+      end
+
+      it 'should redirect to the redirect uri if the user already has remember-me token' do
+        @user.access_tokens.create!({:developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil})
+        provider = Canvas::Oauth::Provider.new(key.id, key.redirect_uri, ['/auth/userinfo'], nil)
+
+        post :create, params, :oauth2 => provider.session_hash
+        response.should be_redirect
+        response.location.should match(/https:\/\/example.com/)
+      end
+
+      it 'should not reuse userinfo tokens for other scopes' do
+        @user.access_tokens.create!({:developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil})
+        provider = Canvas::Oauth::Provider.new(key.id, key.redirect_uri, [], nil)
+
+        post :create, params, :oauth2 => provider.session_hash
+        response.should redirect_to(oauth2_auth_confirm_url)
+      end
+
+      it 'should redirect to the redirect uri if the developer key is trusted' do
+        key.trusted = true
+        key.save!
+        provider = Canvas::Oauth::Provider.new(key.id, key.redirect_uri, [], nil)
+
+        post :create, params, :oauth2 => provider.session_hash
+        response.should be_redirect
+        response.location.should match(/https:\/\/example.com/)
       end
     end
   end
@@ -964,8 +1013,8 @@ describe PseudonymSessionsController do
           session[:pending_otp_communication_channel_id] = @cc.id
           code = ROTP::TOTP.new(@secret_key).now
           # make sure we get 5 minutes of drift
-          ROTP::TOTP.any_instance.expects(:verify_with_drift).with(code, 300).once.returns(true)
-          post 'otp_login', :otp_login => { :verification_code => code }
+          ROTP::TOTP.any_instance.expects(:verify_with_drift).with(code.to_s, 300).once.returns(true)
+          post 'otp_login', :otp_login => { :verification_code => code.to_s }
           response.should redirect_to settings_profile_url
           @user.reload.otp_secret_key.should == @secret_key
           @user.otp_communication_channel.should == @cc
@@ -1062,7 +1111,6 @@ describe PseudonymSessionsController do
 
   describe 'GET oauth2_auth' do
     let(:key) { DeveloperKey.create! :redirect_uri => 'https://example.com' }
-    let(:user) { User.create! }
 
     it 'renders a 400 when there is no client_id' do
       get :oauth2_auth
@@ -1084,6 +1132,48 @@ describe PseudonymSessionsController do
     it 'passes on canvas_login if provided' do
       get :oauth2_auth, :client_id => key.id, :redirect_uri => Canvas::Oauth::Provider::OAUTH2_OOB_URI, :canvas_login => 1
       response.should redirect_to(login_url(:canvas_login => 1))
+    end
+
+    context 'with a user logged in' do
+      before do
+        user_with_pseudonym(:active_all => 1, :password => 'qwerty')
+        user_session(@user)
+
+        redis = stub('Redis')
+        redis.stubs(:setex)
+        Canvas.stubs(:redis => redis)
+      end
+
+      it 'should redirect to the confirm url if the user has no token' do
+        get :oauth2_auth, :client_id => key.id, :redirect_uri => Canvas::Oauth::Provider::OAUTH2_OOB_URI
+        response.should redirect_to(oauth2_auth_confirm_url)
+      end
+
+      it 'redirects to login_url with ?force_login=1' do
+        get :oauth2_auth, :client_id => key.id, :redirect_uri => Canvas::Oauth::Provider::OAUTH2_OOB_URI, :force_login => 1
+        response.should redirect_to(login_url(:force_login => 1))
+      end
+
+      it 'should redirect to the redirect uri if the user already has remember-me token' do
+        @user.access_tokens.create!({:developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil})
+        get :oauth2_auth, :client_id => key.id, :redirect_uri => 'https://example.com', :scopes => '/auth/userinfo'
+        response.should be_redirect
+        response.location.should match(/https:\/\/example.com/)
+      end
+
+      it 'should not reuse userinfo tokens for other scopes' do
+        @user.access_tokens.create!({:developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil})
+        get :oauth2_auth, :client_id => key.id, :redirect_uri => 'https://example.com'
+        response.should redirect_to(oauth2_auth_confirm_url)
+      end
+
+      it 'should redirect to the redirect uri if the developer key is trusted' do
+        key.trusted = true
+        key.save!
+        get :oauth2_auth, :client_id => key.id, :redirect_uri => 'https://example.com', :scopes => '/auth/userinfo'
+        response.should be_redirect
+        response.location.should match(/https:\/\/example.com/)
+      end
     end
   end
 

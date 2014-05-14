@@ -19,7 +19,7 @@
 class AssessmentQuestion < ActiveRecord::Base
   include Workflow
   attr_accessible :name, :question_data, :form_question_data
-  has_many :quiz_questions
+  has_many :quiz_questions, :class_name => 'Quizzes::QuizQuestion'
   has_many :attachments, :as => :context
   delegate :context, :context_id, :context_type, :to => :assessment_question_bank
   attr_accessor :initial_context
@@ -219,7 +219,7 @@ class AssessmentQuestion < ActiveRecord::Base
     previous_data = assessment_question.question_data rescue {}
     previous_data ||= {}
 
-    question = QuizQuestion::QuestionData.generate(
+    question = Quizzes::QuizQuestion::QuestionData.generate(
       id: qdata[:id] || previous_data[:id],
       regrade_option: qdata[:regrade_option] || previous_data[:regrade_option],
       points_possible: qdata[:points_possible] || previous_data[:points_possible],

@@ -1,6 +1,7 @@
 define [
   'compiled/util/round'
   'i18n!assignments'
+  'jquery'
   'underscore'
   'compiled/models/AssignmentGroup'
   'compiled/collections/NeverDropCollection'
@@ -8,7 +9,9 @@ define [
   'compiled/views/DialogFormView'
   'jst/assignments/CreateGroup'
   'jst/EmptyDialogFormWrapper'
-], (round, I18n, _, AssignmentGroup, NeverDropCollection, NeverDropCollectionView, DialogFormView, template, wrapper) ->
+], (round, I18n, $, _, AssignmentGroup, NeverDropCollection, NeverDropCollectionView, DialogFormView, template, wrapper) ->
+
+  SHORT_HEIGHT = 250
 
   class CreateGroupView extends DialogFormView
     defaults:
@@ -35,12 +38,12 @@ define [
       positive_number: I18n.t('positive_number', 'You must use a positive number')
       max_number: I18n.t('higher_than_max', 'You cannot use a number greater than the number of assignments')
       no_name_error: I18n.t('no_name_error', 'A name is required')
+      name_too_long_error: I18n.t('name_too_long_error', 'Name is too long')
 
     initialize: ->
       super
       #@assignmentGroup will be defined when editing
       @model = @assignmentGroup or new AssignmentGroup(assignments: [])
-
 
     onSaveSuccess: ->
       super
@@ -57,9 +60,10 @@ define [
 
     getFormData: ->
       data = super
-      delete data.rules.drop_lowest if _.contains(["", "0"], data.rules.drop_lowest)
-      delete data.rules.drop_highest if _.contains(["", "0"], data.rules.drop_highest)
-      delete data.rules.never_drop if data.rules.never_drop?.length == 0
+      if data.rules
+        delete data.rules.drop_lowest if _.contains(["", "0"], data.rules.drop_lowest)
+        delete data.rules.drop_highest if _.contains(["", "0"], data.rules.drop_highest)
+        delete data.rules.never_drop if data.rules.never_drop?.length == 0
       data
 
     validateFormData: (data) ->
@@ -68,6 +72,8 @@ define [
         as = @assignmentGroup.get('assignments')
         max = as.size() if as?
       errors = {}
+      if data.name.length > 255
+        errors["name"] = [{type: 'name_too_long_error', message: @messages.name_too_long_error}]
       if data.name == ""
         errors["name"] = [{type: 'no_name_error', message: @messages.no_name_error}]
       _.each data.rules, (value, name) =>
@@ -121,10 +127,13 @@ define [
         label_id: @model.get('id') or 'new'
         drop_lowest: @model.rules()?.drop_lowest or 0
         drop_highest: @model.rules()?.drop_highest or 0
-        editable_never_drop: @model.get('assignments').length > 0
+        editable_drop: @model.get('assignments').length > 0
       })
 
     openAgain: ->
+      if @model.get('assignments').length == 0
+        @setDimensions(this.defaults.width, SHORT_HEIGHT)
+
       super
       @checkGroupWeight()
       @getNeverDrops()

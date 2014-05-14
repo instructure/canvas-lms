@@ -6,13 +6,13 @@ class StatsTiming
   def call(env)
     result = nil
     ms = Benchmark.ms { result = @app.call(env) }
-
-    path_parameters = env["action_controller.request.path_parameters"]
+    namespace = CANVAS_RAILS2 ? "action_controller" : "action_dispatch"
+    path_parameters = env["#{namespace}.request.path_parameters"]
     controller = path_parameters.try(:[], :controller)
     action = path_parameters.try(:[], :action)
 
     if controller && action
-      Canvas::Statsd.timing("request.#{controller}.#{action}", ms)
+      CanvasStatsd::Statsd.timing("request.#{controller}.#{action}", ms)
     end
 
     result

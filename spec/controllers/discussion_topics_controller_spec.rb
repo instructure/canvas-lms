@@ -20,9 +20,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe DiscussionTopicsController do
   def course_topic(opts={})
-    @topic = @course.discussion_topics.build(:title => "some topic")
-    if @user && !opts[:skip_set_user]
-      @topic.user = @user
+    @topic = @course.discussion_topics.build(:title => "some topic", :pinned => opts[:pinned])
+    user = @user || opts[:user]
+    if user && !opts[:skip_set_user]
+      @topic.user = user
     end
 
     if opts[:with_assignment]
@@ -76,8 +77,8 @@ describe DiscussionTopicsController do
       integrate_views
 
       before do
-        course(:course_name => "I <3 Discussions")
-        course_topic(:with_assignment => true)
+        course(:course_name => "I <3 Discussions", :active_all => 1)
+        course_topic(:with_assignment => true, :user => @teacher)
         @section = @course.course_sections.create!(:name => "I <3 Discusions")
         @override = assignment_override_model(:assignment => @topic.assignment,
                                   :due_at => Time.now,
@@ -388,6 +389,24 @@ describe DiscussionTopicsController do
 
       @topic.reload.attachment.should be_nil
       attachment.reload.should be_deleted
+    end
+  end
+
+  describe "POST 'reorder'" do
+    it "should reorder pinned topics" do
+      course_with_teacher_logged_in(:active_all => true)
+
+      # add noise
+      @course.announcements.create!(message: 'asdf')
+      course_topic
+
+      topics = 3.times.map { course_topic(pinned: true) }
+      topics.map(&:position).should == [1, 2, 3]
+      t1, t2, _ = topics
+      post 'reorder', :course_id => @course.id, :order => "#{t2.id},#{t1.id}", :format => 'json'
+      response.should be_success
+      topics.each &:reload
+      topics.map(&:position).should == [2, 1, 3]
     end
   end
 end

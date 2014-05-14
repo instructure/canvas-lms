@@ -6,6 +6,7 @@ define [
 
   AssignmentGroupGradesComponent = Ember.Component.extend
 
+    tagName: ''
     ag: null
     student: null
     weightingScheme: null

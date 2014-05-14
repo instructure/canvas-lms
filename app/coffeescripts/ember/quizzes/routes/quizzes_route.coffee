@@ -1,13 +1,14 @@
 define [
-  'ember',
-  '../shared/fetch_all_jsonapi',
+  'ember'
   '../shared/environment'
-], (Ember, fetchAll, environment) ->
+], (Ember, env) ->
 
   QuizzesRoute = Ember.Route.extend
 
     model: (params) ->
-      environment.setEnv(ENV)
-      id = environment.get('courseId')
+      @store.find('quiz').then (quizzes) =>
+        perms = env.get 'env.PERMISSIONS'
+        perms.create = @store.metadataFor('quiz').permissions.quizzes.create
+        env.set 'env.PERMISSIONS', perms
+        quizzes
 
-      fetchAll("/api/v1/courses/#{id}/quizzes")

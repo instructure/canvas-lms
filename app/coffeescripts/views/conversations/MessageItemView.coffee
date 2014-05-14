@@ -1,9 +1,11 @@
 define [
   'i18n!conversations'
+  'jquery'
   'underscore'
   'Backbone'
   'jst/conversations/messageItem'
-], (I18n, _, {View}, template) ->
+  'jst/_avatar' # needed by messageItem template
+], (I18n, $, _, {View}, template) ->
 
   class MessageItemView extends View
 

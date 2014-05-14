@@ -214,7 +214,7 @@ describe CoursesController do
       course_with_student_logged_in(:active_course => true, :active_user => true)
       @e2 = @course.enroll_user(@u2)
       post 'enrollment_invitation', :course_id => @course.id, :accept => '1', :invitation => @e2.uuid
-      response.should redirect_to(login_url(:re_login => 1))
+      response.should redirect_to(login_url(:force_login => 1))
     end
 
     it "should accept an enrollment for a restricted by dates course" do
@@ -998,13 +998,12 @@ describe CoursesController do
         enrollment.save!
       end
 
-      server, server_thread, post_lines = start_test_http_server
       @plugin = Canvas::Plugin.find!('grade_export')
       @ps = PluginSetting.new(:name => @plugin.id, :settings => @plugin.default_settings)
       @ps.posted_settings = @plugin.default_settings.merge({
           :format_type => "instructure_csv",
           :wait_for_success => "no",
-          :publish_endpoint => "http://localhost:#{server.addr[1]}/endpoint"
+          :publish_endpoint => "http://localhost/endpoint"
         })
       @ps.save!
 
@@ -1018,9 +1017,8 @@ describe CoursesController do
       a1.grade_student(students[1].user, { :grade => "6", :grader => @teacher })
       a2.grade_student(students[1].user, { :grade => "7", :grader => @teacher })
 
+      SSLCommon.expects(:post_data).once
       post "publish_to_sis", :course_id => @course.id
-
-      server_thread.join
 
       response.should be_success
       response_body = json_parse(response.body)

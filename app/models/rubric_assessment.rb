@@ -126,11 +126,11 @@ class RubricAssessment < ActiveRecord::Base
     }
   end
   protected :update_assessment_requests
-  
+
   def attempt
     self.artifact_type == 'Submission' ? self.artifact.attempt : nil
   end
-  
+
   def update_artifact
     if self.artifact_type == 'Submission' && self.artifact
       Submission.where(:id => self.artifact).update_all(:has_rubric_assessment => true)

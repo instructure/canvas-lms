@@ -22,32 +22,49 @@
 # in order to automatically create announcements for each new item in
 # the feed.
 #
-# @object ExternalFeed
+# @model ExternalFeed
 #     {
-#       // The ID of the feed
-#       "id": 5,
-#
-#       // The title of the feed, pulled from the feed itself
-#       // If the feed hasn't yet been pulled, a temporary name will be
-#       // synthesized based on the URL
-#       "display_name": "My Blog",
-#
-#       // The HTTP/HTTPS URL to the feed
-#       "url": "http://example.com/myblog.rss",
-#
-#       // If not null, only feed entries whose title contains this string will
-#       // trigger new posts in Canvas
-#       "header_match": "pattern",
-#
-#       // When this external feed was added to Canvas
-#       "created_at": "2012-06-01T00:00:00-06:00",
-#
-#       // The verbosity setting determines how much of the feed's content is
-#       // imported into Canvas as part of the posting.
-#       // "link_only" means that only the title and a link to the item.
-#       // "truncate" means that a summary of the first portion of the item body will be used.
-#       // "full" means that the full item body will be used.
-#       "verbosity": "truncate"
+#       "id": "ExternalFeed",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "The ID of the feed",
+#           "example": 5,
+#           "type": "integer"
+#         },
+#         "display_name": {
+#           "description": "The title of the feed, pulled from the feed itself. If the feed hasn't yet been pulled, a temporary name will be synthesized based on the URL",
+#           "example": "My Blog",
+#           "type": "string"
+#         },
+#         "url": {
+#           "description": "The HTTP/HTTPS URL to the feed",
+#           "example": "http://example.com/myblog.rss",
+#           "type": "string"
+#         },
+#         "header_match": {
+#           "description": "If not null, only feed entries whose title contains this string will trigger new posts in Canvas",
+#           "example": "pattern",
+#           "type": "string"
+#         },
+#         "created_at": {
+#           "description": "When this external feed was added to Canvas",
+#           "example": "2012-06-01T00:00:00-06:00",
+#           "type": "datetime"
+#         },
+#         "verbosity": {
+#           "description": "The verbosity setting determines how much of the feed's content is imported into Canvas as part of the posting. 'link_only' means that only the title and a link to the item. 'truncate' means that a summary of the first portion of the item body will be used. 'full' means that the full item body will be used.",
+#           "example": "truncate",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "link_only",
+#               "truncate",
+#               "full"
+#             ]
+#           }
+#         }
+#       }
 #     }
 #
 class ExternalFeedsController < ApplicationController
@@ -65,7 +82,7 @@ class ExternalFeedsController < ApplicationController
   #
   # @returns [ExternalFeed]
   def index
-    if authorized_action(@context.announcements.new, @current_user, :create)
+    if authorized_action(@context.announcements.scoped.new, @current_user, :create)
       api_route = polymorphic_url([:api, :v1, @context, :external_feeds])
       @feeds = Api.paginate(@context.external_feeds.for('announcements').order(:id), self, api_route)
       render :json => external_feeds_api_json(@feeds, @context, @current_user, session)
@@ -93,7 +110,7 @@ class ExternalFeedsController < ApplicationController
   #
   # @returns ExternalFeed
   def create
-    if authorized_action(@context.announcements.new, @current_user, :create)
+    if authorized_action(@context.announcements.scoped.new, @current_user, :create)
       @feed = create_api_external_feed(@context, params, @current_user)
       if @feed.save
         render :json => external_feed_api_json(@feed, @context, @current_user, session)
@@ -113,7 +130,7 @@ class ExternalFeedsController < ApplicationController
   #
   # @returns ExternalFeed
   def destroy
-    if authorized_action(@context.announcements.new, @current_user, :create)
+    if authorized_action(@context.announcements.scoped.new, @current_user, :create)
       @feed = @context.external_feeds.find(params[:external_feed_id])
       if @feed.destroy
         render :json => external_feed_api_json(@feed, @context, @current_user, session)

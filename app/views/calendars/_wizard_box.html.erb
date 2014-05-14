@@ -24,7 +24,7 @@
         and delete the event, or drag and drop it to a new day to change its date." %>
       </div>
     </li>
-    <% if @contexts.any?{|c| c.respond_to?(:assignments) && can_do(c.assignments.new, @current_user, :create)} %>
+    <% if @contexts.any?{|c| c.respond_to?(:assignments) && can_do(c.assignments.scoped.new, @current_user, :create)} %>
       <li class="option create_assignment_option add_step">
         <a href="#" class="icon-assignment"><%= t 'links.create_assignment', "Create a New Assignment" %></a>
         <div class="details" style="display: none;">

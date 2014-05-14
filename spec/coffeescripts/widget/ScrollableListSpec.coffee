@@ -17,8 +17,9 @@
 #
 
 define [
+  'jquery'
   'compiled/widget/ScrollableList'
-], (ScrollableList) ->
+], ($, ScrollableList) ->
   scrollableListFixture = """
     <h3>Scrollable List Spec</h3>
     <style>

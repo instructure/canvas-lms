@@ -12115,7 +12115,7 @@ tinymce.create('tinymce.ui.Toolbar:tinymce.ui.Container', {
 				plugins : '',
 				document_base_url : tinymce.documentBaseURL,
 				add_form_submit_trigger : TRUE,
-				submit_patch : false, // This was for JavaScript errors in IE7
+				submit_patch : TRUE,
 				add_unload_trigger : TRUE,
 				convert_urls : TRUE,
 				relative_urls : TRUE,
@@ -12935,6 +12935,22 @@ tinymce.create('tinymce.ui.Toolbar:tinymce.ui.Container', {
 						case 'ctrl':
 						case 'shift':
 							o[v] = true;
+							break;
+
+						// Instructure: Added handling of F1-F12 keys.
+						case 'f1':
+						case 'f2':
+						case 'f3':
+						case 'f4':
+						case 'f5':
+						case 'f6':
+						case 'f7':
+						case 'f8':
+						case 'f9':
+						case 'f10':
+						case 'f11':
+						case 'f12':
+							o.keyCode = 111 + parseInt(v.substr(1), 10);
 							break;
 
 						default:

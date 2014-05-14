@@ -1,10 +1,11 @@
 define [
+  'jquery'
   'compiled/views/groups/manage/AssignToGroupMenu'
   'compiled/collections/GroupCollection'
   'compiled/models/Group'
   'compiled/models/GroupUser'
   'compiled/models/GroupCategory'
-], (AssignToGroupMenu, GroupCollection, Group, GroupUser, GroupCategory) ->
+], ($, AssignToGroupMenu, GroupCollection, Group, GroupUser, GroupCategory) ->
 
   view = null
   user = null

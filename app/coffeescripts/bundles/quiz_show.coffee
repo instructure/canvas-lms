@@ -1,11 +1,12 @@
 require [
+  'jquery'
   'quiz_inputs'
   'quiz_show'
   'quiz_rubric'
   'message_students'
   'jquery.disableWhileLoading'
   'compiled/jquery/ModuleSequenceFooter'
-], (inputMethods) ->
+], ($, inputMethods) ->
   $ ->
     inputMethods.setWidths()
     $('.answer input[type=text]').each ->

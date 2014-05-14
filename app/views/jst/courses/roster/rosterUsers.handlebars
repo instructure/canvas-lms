@@ -10,6 +10,9 @@
       {{/if}}
       <th>{{#t "section"}}Section{{/t}}</th>
       <th>{{#t "role"}}Role{{/t}}</th>
+      {{#if canViewLoginIdColumn}}
+      <th>{{#t "last_activity"}}Last Activity{{/t}}</th>
+      {{/if}}
       <th></th>
     </tr>
   </thead>

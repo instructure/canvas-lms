@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+
+require 'csv'
 
 class Course < ActiveRecord::Base
 
@@ -76,6 +78,7 @@ class Course < ActiveRecord::Base
   has_many :course_sections
   has_many :active_course_sections, :class_name => 'CourseSection', :conditions => {:workflow_state => 'active'}
   has_many :enrollments, :include => [:user, :course], :conditions => ['enrollments.workflow_state != ?', 'deleted'], :dependent => :destroy
+  has_many :all_enrollments, :class_name => 'Enrollment'
   has_many :current_enrollments, :class_name => 'Enrollment', :conditions => "enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')", :include => :user
   has_many :typical_current_enrollments, :class_name => 'Enrollment', :conditions => "enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive') AND enrollments.type NOT IN ('StudentViewEnrollment', 'ObserverEnrollment', 'DesignerEnrollment')", :include => :user
   has_many :prior_enrollments, :class_name => 'Enrollment', :include => [:user, :course], :conditions => "enrollments.workflow_state = 'completed'"
@@ -89,7 +92,7 @@ class Course < ActiveRecord::Base
   has_many :all_real_users, :through => :all_real_enrollments, :source => :user
   has_many :all_real_enrollments, :class_name => 'Enrollment', :conditions => ["enrollments.workflow_state != 'deleted' AND enrollments.type <> 'StudentViewEnrollment'"], :include => :user
   has_many :all_real_students, :through => :all_real_student_enrollments, :source => :user
-  has_many :all_real_student_enrollments, :class_name => 'StudentEnrollment', :conditions => ["enrollments.workflow_state != ?", 'deleted'], :include => :user
+  has_many :all_real_student_enrollments, :class_name => 'StudentEnrollment', :conditions => [ "enrollments.type = 'StudentEnrollment'", "enrollments.workflow_state != ?", 'deleted'], :include => :user
   has_many :teachers, :through => :teacher_enrollments, :source => :user
   has_many :teacher_enrollments, :class_name => 'TeacherEnrollment', :conditions => ["enrollments.workflow_state != 'deleted' AND enrollments.type = 'TeacherEnrollment'"], :include => :user
   has_many :tas, :through => :ta_enrollments, :source => :user
@@ -124,7 +127,7 @@ class Course < ActiveRecord::Base
   has_many :assignment_groups, :as => :context, :dependent => :destroy, :order => 'assignment_groups.position, assignment_groups.name'
   has_many :assignments, :as => :context, :dependent => :destroy, :order => 'assignments.created_at'
   has_many :calendar_events, :as => :context, :conditions => ['calendar_events.workflow_state != ?', 'cancelled'], :dependent => :destroy
-  has_many :submissions, :through => :assignments, :order => 'submissions.updated_at DESC', :include => :quiz_submission, :dependent => :destroy
+  has_many :submissions, :through => :assignments, :order => 'submissions.updated_at DESC', :dependent => :destroy
   has_many :discussion_topics, :as => :context, :conditions => ['discussion_topics.workflow_state != ?', 'deleted'], :include => :user, :dependent => :destroy, :order => 'discussion_topics.position DESC, discussion_topics.created_at DESC'
   has_many :active_discussion_topics, :as => :context, :class_name => 'DiscussionTopic', :conditions => ['discussion_topics.workflow_state != ?', 'deleted'], :include => :user
   has_many :all_discussion_topics, :as => :context, :class_name => "DiscussionTopic", :include => :user, :dependent => :destroy
@@ -907,7 +910,7 @@ class Course < ActiveRecord::Base
   end
 
   def self.create_unique(uuid=nil, account_id=nil, root_account_id=nil)
-    uuid ||= AutoHandle.generate_securish_uuid
+    uuid ||= CanvasUuid::Uuid.generate_securish_uuid
     course = find_or_initialize_by_uuid(uuid)
     course = Course.new if course.deleted?
     course.name = self.default_name if course.new_record?
@@ -952,7 +955,7 @@ class Course < ActiveRecord::Base
   end
 
   def assign_uuid
-    self.uuid ||= AutoHandle.generate_securish_uuid
+    self.uuid ||= CanvasUuid::Uuid.generate_securish_uuid
   end
   protected :assign_uuid
 
@@ -1194,15 +1197,15 @@ class Course < ActiveRecord::Base
     return [] unless user
     @associated_account_ids ||= (self.associated_accounts + [Account.site_admin]).map { |a| a.active? ? a.id : nil }.compact
     @account_users ||= {}
-    @account_users[user] ||= Shard.partition_by_shard(@associated_account_ids) do |account_chain_ids|
+    @account_users[user.global_id] ||= Shard.partition_by_shard(@associated_account_ids) do |account_chain_ids|
       if account_chain_ids == [Account.site_admin.id]
         Account.site_admin.account_users_for(user)
       else
         AccountUser.where(:account_id => account_chain_ids, :user_id => user).all
       end
     end
-    @account_users[user] ||= []
-    @account_users[user]
+    @account_users[user.global_id] ||= []
+    @account_users[user.global_id]
   end
 
   def account_membership_allows(user, session, permission = nil)
@@ -1419,7 +1422,7 @@ class Course < ActiveRecord::Base
     includes = {:user => {:pseudonyms => :account}, :course_section => []} if options[:include_sis_id]
     scope = options[:user] ? self.enrollments_visible_to(options[:user]) : self.student_enrollments
     student_enrollments = scope.includes(includes).order_by_sortable_name # remove duplicate enrollments for students enrolled in multiple sections
-    student_enrollments = student_enrollments.all.uniq_by(&:user_id)
+    student_enrollments = student_enrollments.all.uniq(&:user_id)
     student_enrollments.partition{|enrollment| enrollment.type != "StudentViewEnrollment"}.flatten
   end
   private :enrollments_for_csv
@@ -1539,9 +1542,11 @@ class Course < ActiveRecord::Base
 
   def score_to_grade(score)
     return nil unless self.grading_standard_enabled? && score
-    @scheme ||= self.grading_standard.try(:data) ||
-                GradingStandard.default_grading_standard
-    GradingStandard.score_to_grade(@scheme, score)
+    if grading_standard
+      grading_standard.score_to_grade(score)
+    else
+      GradingStandard.default_instance.score_to_grade(score)
+    end
   end
 
   def participants(include_observers=false)
@@ -1554,6 +1559,8 @@ class Course < ActiveRecord::Base
     limit_privileges_to_course_section = opts[:limit_privileges_to_course_section]
     associated_user_id = opts[:associated_user_id]
     role_name = opts[:role_name]
+    start_at = opts[:start_at]
+    end_at = opts[:end_at]
     self_enrolled = opts[:self_enrolled]
     section ||= self.default_section
     enrollment_state ||= self.available? ? "invited" : "creation_pending"
@@ -1562,19 +1569,21 @@ class Course < ActiveRecord::Base
     else
       enrollment_state = 'creation_pending' if enrollment_state == 'invited' && !self.available?
     end
-    if opts[:allow_multiple_enrollments] && associated_user_id
-      e = self.enrollments.find_by_user_id_and_type_and_role_name_and_course_section_id_and_associated_user_id(user.id, type, role_name, section.id, associated_user_id)
-    elsif opts[:allow_multiple_enrollments]
-      e = self.enrollments.find_by_user_id_and_type_and_role_name_and_course_section_id(user.id, type, role_name, section.id)
+    if opts[:allow_multiple_enrollments]
+      e = self.all_enrollments.where(user_id: user, type: type, role_name: role_name, associated_user_id: associated_user_id, course_section_id: section.id).first
     else
-      e = self.enrollments.find_by_user_id_and_type_and_role_name(user.id, type, role_name)
+      # order by course_section_id<>section.id so that if there *is* an existing enrollment for this section, we get it (false orders before true)
+      e = self.all_enrollments.
+          where(user_id: user, type: type, role_name: role_name, associated_user_id: associated_user_id).
+          order("course_section_id<>#{section.id}").
+          first
     end
     if e
       e.already_enrolled = true
       e.attributes = {
         :course_section => section,
         :workflow_state => 'invited',
-        :limit_privileges_to_course_section => limit_privileges_to_course_section } if e.completed? || e.rejected?
+        :limit_privileges_to_course_section => limit_privileges_to_course_section } if e.completed? || e.rejected? || e.deleted?
     end
     # if we're creating a new enrollment, we want to return it as the correct
     # subclass, but without using associations, we need to manually activate
@@ -1591,6 +1600,8 @@ class Course < ActiveRecord::Base
     e.associated_user_id = associated_user_id
     e.role_name = role_name
     e.self_enrolled = self_enrolled
+    e.start_at = start_at
+    e.end_at = end_at
     if e.changed?
       transaction do
         if connection.adapter_name == 'PostgreSQL' && connection.send(:postgresql_version) < 90300
@@ -1611,9 +1622,9 @@ class Course < ActiveRecord::Base
     self.claim if self.created? && e && e.admin?
     unless opts[:skip_touch_user]
       e.associated_user.try(:touch)
-      user.try(:touch)
+      user.touch
     end
-    user.try(:reload)
+    user.reload
     e
   end
 
@@ -1631,16 +1642,16 @@ class Course < ActiveRecord::Base
     enrollment
   end
 
-  def enroll_ta(user)
-    enroll_user(user, 'TaEnrollment')
+  def enroll_ta(user, opts={})
+    enroll_user(user, 'TaEnrollment', opts)
   end
 
-  def enroll_designer(user)
-    enroll_user(user, 'DesignerEnrollment')
+  def enroll_designer(user, opts={})
+    enroll_user(user, 'DesignerEnrollment', opts)
   end
 
-  def enroll_teacher(user)
-    enroll_user(user, 'TeacherEnrollment')
+  def enroll_teacher(user, opts={})
+    enroll_user(user, 'TeacherEnrollment', opts)
   end
 
   def resubmission_for(asset)
@@ -1917,7 +1928,7 @@ class Course < ActiveRecord::Base
   private :process_migration_files
 
   def import_media_objects(mo_attachments, migration)
-    wait_for_completion = (migration && migration.migration_settings[:worker_class] == CC::Importer::Canvas::Converter.name)
+    wait_for_completion = migration && migration.canvas_import?
     unless mo_attachments.blank?
       MediaObject.add_media_files(mo_attachments, wait_for_completion)
     end
@@ -1942,7 +1953,16 @@ class Course < ActiveRecord::Base
         process_migration_files(data, migration); migration.update_import_progress(18)
         Attachment.process_migration(data, migration); migration.update_import_progress(20)
         mo_attachments = self.imported_migration_items.find_all { |i| i.is_a?(Attachment) && i.media_entry_id.present? }
-        import_media_objects(mo_attachments, migration)
+        begin
+          import_media_objects(mo_attachments, migration)
+        rescue => e
+          er = ErrorReport.log_exception(:import_media_objects, e)
+          migration.add_error(t(:failed_import_media_objects, %{Failed to import media objects}), error_report_id: er.id)
+        end
+      end
+      if migration.canvas_import?
+        migration.update_import_progress(30)
+        MigrationImport::MediaTrack.process_migration(data[:media_tracks], migration)
       end
     end
 
@@ -2233,7 +2253,7 @@ class Course < ActiveRecord::Base
     result[:new_end_date] = Date.parse(options[:new_end_date]) rescue self.real_end_date
     result[:day_substitutions] = options[:day_substitutions]
     result[:time_zone] = options[:time_zone]
-    result[:time_zone] ||= course.account.default_time_zone unless course.account.nil?
+    result[:time_zone] ||= course.root_account.default_time_zone unless course.root_account.nil?
 
     result[:default_start_at] = DateTime.parse(options[:new_start_date]) rescue self.real_start_date
     result[:default_conclude_at] = DateTime.parse(options[:new_end_date]) rescue self.real_end_date
@@ -2726,7 +2746,7 @@ class Course < ActiveRecord::Base
   end
 
   def filter_attributes_for_user(hash, user, session)
-    hash.delete(:hide_final_grades) unless grants_right? user, :update
+    hash.delete('hide_final_grades') unless grants_right? user, :update
     hash
   end
 
@@ -2840,7 +2860,7 @@ class Course < ActiveRecord::Base
   # sections of the course, so that a section limited teacher can grade them.
   def sync_enrollments(fake_student)
     self.default_section unless course_sections.active.any?
-    Enrollment.skip_callback(:update_cached_due_dates) do
+    Enrollment.suspend_callbacks(:update_cached_due_dates) do
       self.course_sections.active.each do |section|
         # enroll fake_student will only create the enrollment if it doesn't already exist
         self.enroll_user(fake_student, 'StudentViewEnrollment',

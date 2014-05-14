@@ -2,8 +2,7 @@ define [
   '../start_app'
   'ember'
   '../shared_ajax_fixtures'
-  'jquery'
-], (startApp, Ember, fixtures, $) ->
+], (startApp, Ember, fixtures) ->
 
   App = null
 
@@ -11,18 +10,20 @@ define [
 
   buttonDisabled = (trigger, expectedBoolean) ->
     equal find(trigger).prop('disabled'), expectedBoolean
-    equal find(trigger).attr('aria-disabled'), expectedBoolean.toString()
 
   checkSelection = (id, selection) ->
     equal id, find(selection).val()
 
-  checkText = (text, selection) ->
+  checkSelectedText = (text, selection) ->
     equal text, find(selection).find('option:selected').text()
+
+  checkText = (selector, expectedText) ->
+    equal Ember.$.trim(find(selector).text()), expectedText
 
   studentSectionAssertions = (selected, currentIndex, expectedIndex) ->
     equal currentIndex, expectedIndex
     checkSelection(selected.id, '#student_select')
-    checkText(selected.name, '#student_select')
+    checkSelectedText(selected.name, '#student_select')
 
 
   module 'screenreader_gradebook student/assignment navigation: on page load',
@@ -45,6 +46,10 @@ define [
   test 'Next Assignment button is active', ->
     buttonDisabled('#next_assignment', false)
 
+  test 'no student or assignment is loaded', ->
+    checkText('.student_selection', 'Select a student to view additional information here.')
+    checkText('.assignment_selection', 'Select an assignment to view additional information here.')
+
 
   module 'screenreader_gradebook student/assignment navigation: with first item selected',
     setup: ->
@@ -57,11 +62,11 @@ define [
     teardown: ->
       Ember.run App, 'destroy'
 
-  test 'Previous Student button is disabled', ->
+  test 'Previous buttons are disabled', ->
     buttonDisabled('#prev_student', true)
-
-  test 'Previous Assignment button is disabled', ->
     buttonDisabled('#prev_assignment', true)
+    checkText('.student_selection', 'Bob')
+    checkText('.assignment_selection', 'Z Eats Soup')
 
   # compares & checks before/after objects
   test 'clicking Next Student button displays next student', ->
@@ -85,6 +90,15 @@ define [
       next = @controller.get('assignments').indexOf(before) + 1
       equal(next, @controller.get('assignments').indexOf(after))
 
+  test 'clicking next then previous will refocus on next student', ->
+    click('#next_student').then =>
+      click('#prev_student').then =>
+        equal($("#next_student")[0],document.activeElement)
+
+  test 'clicking next then previous will refocus on next assignment', ->
+    click('#next_assignment').then =>
+      click('#prev_assignment').then =>
+        equal($("#next_assignment")[0],document.activeElement)
 
   module 'screenreader_gradebook student/assignment navigation: with second item selected',
     setup: ->
@@ -151,6 +165,15 @@ define [
       previous = @controller.get('assignments').indexOf(before) - 1
       equal(previous, @controller.get('assignments').indexOf(after))
 
+  test 'clicking previous then next will reset the focus for students', ->
+    click('#prev_student').then =>
+      click('#next_student').then =>
+        equal($("#prev_student")[0],document.activeElement)
+
+  test 'clicking previous then next will reset the focus for assignments', ->
+    click('#prev_assignment').then =>
+      click('#next_assignment').then =>
+        equal($("#prev_assignment")[0],document.activeElement)
 
   module 'screenreader_gradebook assignment navigation: assignment sorting',
     setup: ->
@@ -279,8 +302,8 @@ define [
       buttonDisabled('#next_student', false)
 
       selected = @controller.get('selectedStudent')
-      checkText(selected.name, '#student_select')
-      checkText(@controller.get('selectedSection.name'), '#section_select')
+      checkSelectedText(selected.name, '#student_select')
+      checkSelectedText(@controller.get('selectedSection.name'), '#section_select')
 
       # position in selected dropdown
       position = @controller.get('studentsInSelectedSection').indexOf(selected)
@@ -294,11 +317,39 @@ define [
       buttonDisabled('#next_student', false)
 
       newSelected = @controller.get('selectedStudent')
-      checkText(newSelected.name, '#student_select')
-      checkText(@controller.get('selectedSection.name'), '#section_select')
+      checkSelectedText(newSelected.name, '#student_select')
+      checkSelectedText(@controller.get('selectedSection.name'), '#section_select')
       equal(selected, newSelected)
 
       # position in selected dropdown
       position = @controller.get('studentsInSelectedSection').indexOf(selected)
       equal(position, 3)
       equal(@controller.get('studentIndex'), position)
+
+
+  module 'screenreader_gradebook student/assignment navigation: announcing selection with aria-live',
+    setup: ->
+      App = startApp()
+      visit('/').then =>
+        @controller = App.__container__.lookup('controller:screenreader_gradebook')
+        Ember.run =>
+          @controller.set('selectedStudent', @controller.get('students.firstObject'))
+          @controller.set('selectedAssignment', @controller.get('assignments.firstObject'))
+    teardown: ->
+      Ember.run App, 'destroy'
+
+  test 'aria-announcer', ->
+    checkText '.aria-announcer', ''
+
+    click('#next_student').then =>
+      expected = @controller.get('selectedStudent.name')
+      checkText '.aria-announcer', expected
+
+
+    click('#next_assignment').then =>
+      expected = @controller.get('selectedAssignment.name')
+      checkText '.aria-announcer', expected
+
+    click('#hide_names_checkbox').then =>
+      Ember.run ->
+        checkText '.aria-announcer', ''

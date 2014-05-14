@@ -15,7 +15,7 @@ define(['jquery', 'i18n!LongTextEditor'], function($, I18n) {
       $wrapper = $("<DIV class=dontblur style='z-index:10000;position:absolute;background:white;padding:5px;border:3px solid gray; -moz-border-radius:10px; border-radius:10px;'/>")
           .appendTo($container);
 
-      $input = $("<TEXTAREA hidefocus rows=5 style='backround:white;width:250px;height:80px;border:0;outline:0'>")
+      $input = $("<TEXTAREA hidefocus maxlength="+args.maxLength+" rows=5 style='backround:white;width:250px;height:80px;border:0;outline:0'>")
           .appendTo($wrapper);
 
       var saveText = I18n.t("save", "Save");

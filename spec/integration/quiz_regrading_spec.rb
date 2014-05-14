@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'lib/quiz_regrading'
+
 describe "QuizRegrading" do
 
   def create_quiz_question!(data)
@@ -77,7 +77,7 @@ describe "QuizRegrading" do
 
   it 'succesfully regrades the submissions and updates the scores' do
     set_regrade_option!('full_credit')
-    QuizRegrader.regrade!(quiz: @quiz)
+    Quizzes::QuizRegrader::Regrader.regrade!(quiz: @quiz)
     @submission.reload.score.should == 3
 
     set_regrade_option!('current_correct_only')
@@ -97,7 +97,7 @@ describe "QuizRegrading" do
     @multiple_answers_question.save!
     @quiz.reload
 
-    QuizRegrader.regrade!(quiz: @quiz)
+    Quizzes::QuizRegrader::Regrader.regrade!(quiz: @quiz)
     @submission.reload.score.should == 3
   end
 

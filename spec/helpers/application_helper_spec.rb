@@ -21,7 +21,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe ApplicationHelper do
   include ApplicationHelper
-  
+  include ERB::Util
+
   context "folders_as_options" do
     before(:each) do
       course_model
@@ -290,7 +291,7 @@ describe ApplicationHelper do
 
         output = include_account_js
         output.should have_tag 'script'
-        output.should match %r{/path/to/js}
+        output.should match %r{\\?/path\\?/to\\?/js}
       end
 
       it "should include site admin javascript" do
@@ -300,7 +301,7 @@ describe ApplicationHelper do
 
         output = include_account_js
         output.should have_tag 'script'
-        output.should match %r{/path/to/js}
+        output.should match %r{\\?/path\\?/to\\?/js}
       end
 
       it "should include both site admin and root account javascript, site admin first" do
@@ -314,7 +315,7 @@ describe ApplicationHelper do
 
         output = include_account_js
         output.should have_tag 'script'
-        output.scan(%r{/path/to/(admin/|root/)?js}).should eql [['admin/'], ['root/']]
+        output.scan(%r{\\?/path\\?/to\\?/(admin|root)?\\?/?js}).should eql [['admin'], ['root']]
       end
     end
   end
@@ -324,7 +325,7 @@ describe ApplicationHelper do
       @site_admin = Account.site_admin
       @site_admin.expects(:global_includes_hash).once.returns({:css => "/path/to/css", :js => "/path/to/js"})
       include_account_css.should match %r{/path/to/css}
-      include_account_js.should match %r{/path/to/js}
+      include_account_js.should match %r{\\?/path\\?/to\\?/js}
     end
 
     it "should only compute includes once, with includes" do
@@ -387,28 +388,28 @@ describe ApplicationHelper do
     end
   end
 
-  describe "avatar_image" do
+  describe "square_avatar_image" do
     before do
       user_model(:short_name => 'test guy')
     end
 
     it "should accept a user id" do
       self.expects(:avatar_url_for_user).with(@user).returns("http://www.example.com/test/url")
-      img = Nokogiri::HTML::DocumentFragment.parse(avatar_image(@user)).children.first
+      img = Nokogiri::HTML::DocumentFragment.parse(square_avatar_image(@user)).children.first
       img['alt'].should == 'test guy'
       img['src'].should == "http://www.example.com/test/url"
       img['style'].should match %r"width: 50px"
     end
 
     it "should short-circuit user id 0" do
-      img = Nokogiri::HTML::DocumentFragment.parse(avatar_image(0)).children.first
+      img = Nokogiri::HTML::DocumentFragment.parse(square_avatar_image(0)).children.first
       img['alt'].should == ''
       img['src'].should match %r"/images/messages/avatar-50.png"
     end
 
     it "should accept a user" do
       self.expects(:avatar_url_for_user).with(@user).returns("http://www.example.com/test/url")
-      img = Nokogiri::HTML::DocumentFragment.parse(avatar_image(@user, 30)).children.first
+      img = Nokogiri::HTML::DocumentFragment.parse(square_avatar_image(@user, 30)).children.first
       img['alt'].should == 'test guy'
       img['src'].should == "http://www.example.com/test/url"
       img['style'].should match %r"width: 30px"
@@ -431,6 +432,27 @@ describe ApplicationHelper do
         # and absolute
         jt("#date.days.today", nil).should include expected
       end
+    end
+  end
+
+  describe "dashboard_url" do
+    it "should return a regular canvas dashboard url" do
+      @controller.expects(:dashboard_url).with({}).returns("frd")
+      @domain_root_account = Account.default
+      dashboard_url.should == "frd"
+    end
+
+    it "should return the account's custom dashboard_url" do
+      @domain_root_account = Account.default
+      @domain_root_account.settings[:dashboard_url] = "http://foo.bar"
+      dashboard_url.should == "http://foo.bar"
+    end
+
+    it "should return the account's custom dashboard_url with the current user's id" do
+      @domain_root_account = Account.default
+      @domain_root_account.settings[:dashboard_url] = "http://foo.bar"
+      @current_user = user
+      dashboard_url.should == "http://foo.bar?current_user_id=#{@current_user.id}"
     end
   end
 end

@@ -901,7 +901,9 @@ define([
 
       $pickers.each(function() {
         var $field = $(this);
-        var formattedDate = Handlebars.helpers.datetimeFormatted($field.val() || '');
+        // remove the second 'false' argument once the pickers know how to
+        // parse localized datetimes
+        var formattedDate = Handlebars.helpers.datetimeFormatted($field.val() || '', false);
 
         $field.val(formattedDate);
         $field.datetime_field();
@@ -1019,9 +1021,7 @@ define([
 
         if ($field.val().length) {
           date = $field.data().date;
-          data['quiz[' + key + ']'] = $.dateToISO8601UTC(
-            $.unfudgeDateForProfileTimezone(date)
-          );
+          data['quiz[' + key + ']'] = $.unfudgeDateForProfileTimezone(date).toISOString();
         } else {
           resetField(key);
         }
@@ -1736,7 +1736,9 @@ define([
       if (isNaN(question.question_points)) { question.question_points = 0; }
       var $form = $("#question_form_template").clone(true).attr('id', '');
       var $formQuestion = $form.find(".question");
+      $formQuestion.addClass('initialLoad');
       $form.fillFormData(question);
+      $formQuestion.removeClass('initialLoad');
       addHTMLFeedback($form.find(".question_correct_comment"), question, 'correct_comments');
       addHTMLFeedback($form.find(".question_incorrect_comment"), question, 'incorrect_comments');
       addHTMLFeedback($form.find(".question_neutral_comment"), question, 'neutral_comments');
@@ -1847,6 +1849,14 @@ define([
 
     $(".question_form :input[name='question_type']").change(function() {
       quiz.updateFormQuestion($(this).parents(".question_form"));
+
+      // is this the initial loado of the question type
+      var loading = $(this).parents(".question.initialLoad").length > 0;
+      var holder = $(this).parents('.question_holder');
+      var isNew = $(holder).find("#question_new").length > 0;
+      if ($("#student_submissions_warning").length > 0 && !loading && !isNew) {
+        disableRegrade(holder);
+      }
     });
 
     $("#question_form_template .cancel_link").click(function(event) {
@@ -1924,6 +1934,12 @@ define([
     });
 
     function showRegradeOptions($el,questionID) {
+      var holder = $el.parents('.question_holder');
+      var isNew = holder.find("#question_new").length > 0;
+      if (isNew) {
+        return;
+      }
+
       if (!canRegradeQuestion($el)) {
         return;
       }
@@ -1944,7 +1960,6 @@ define([
         var questionType = $el.find(".question_type").val();
 
         // regrade disabled if they remove an answer after submissions made
-        var holder = $el.parents('.question_holder');
         var disabled = holder.find('input[name="regrade_disabled"]').val() == '1';
 
         $el.find('.button-container').before(regradeTemplate({
@@ -1967,6 +1982,14 @@ define([
     }
 
     $(document).delegate(".regrade-options", 'click', clickRegradeOptions);
+
+    function disableRegrade(holder) {
+      holder.find('.regrade_enabled').hide();
+      holder.find('.regrade_disabled').show();
+      holder.find('input[name="regrade_option"]').attr('disabled', true);
+      holder.find('input[name="regrade_option"]').attr('checked', false);
+      holder.find('input[name="regrade_disabled"]').val('1');
+    }
 
     function clickRegradeOptions(event, disabled) {
       var checked = $('input[name="regrade_option"]:checked').length > 0;
@@ -2039,18 +2062,15 @@ define([
 
       // warn they can't regrade if there are submissions
       var disabled = regradeOpt.text() == 'disabled';
-      if ($("#student_submissions_warning").length > 0 && !disabled) {
+      var isNew = holder.find("#question_new").length > 0;
+      if ($("#student_submissions_warning").length > 0 && !disabled && !isNew) {
         var msg = I18n.t('confirms.delete_answer',
           "Are you sure? Deleting answers from a question with submissions " +
           "disables the option to regrade this question.")
         if (!confirm(msg)) { return; }
 
         // disabled regrade if they've chosen already
-        holder.find('.regrade_enabled').hide();
-        holder.find('.regrade_disabled').show();
-        holder.find('input[name="regrade_option"]').attr('disabled', true);
-        holder.find('input[name="regrade_option"]').attr('checked', false);
-        holder.find('input[name="regrade_disabled"]').val('1');
+        disableRegrade(holder);
         enableQuestionForm();
       }
 
@@ -2593,7 +2613,10 @@ define([
         data.answer_text = $answer.find("input[name='answer_text']:visible").val();
         data.answer_html = $answer.find(".answer_html").html();
         if (questionData.question_type == "true_false_question") {
-          data.answer_text = (i == 0) ? I18n.t('true', "True") : I18n.t('false', "False");
+          data.answer_text = $answer.find(".fixed_answer .answer_text").text();
+          if (data.answer_text.length == 0) {
+            data.answer_text = (i == 0) ? I18n.t('true', "True") : I18n.t('false', "False");
+          }
         }
         if ($answer.hasClass('correct_answer')) {
           data.answer_weight = 100;
@@ -3023,7 +3046,7 @@ define([
       if ($(this).closest('.group_top').length == 0) { return; }
       event.preventDefault();
       $(this).parents(".group_top").find(".collapse_link").addClass('hidden').end()
-        .find(".expand_link").removeClass('hidden');
+        .find(".expand_link").removeClass('hidden').focus();
       var $obj = $(this).parents(".group_top").next();
       while($obj.length > 0 && $obj.hasClass('question_holder')) {
         $obj.hide();
@@ -3032,7 +3055,7 @@ define([
     }).delegate(".expand_link", 'click', function(event) {
       if ($(this).closest('.group_top').length == 0) { return; }
       event.preventDefault();
-      $(this).parents(".group_top").find(".collapse_link").removeClass('hidden').end()
+      $(this).parents(".group_top").find(".collapse_link").removeClass('hidden').focus().end()
         .find(".expand_link").addClass('hidden');
       var $obj = $(this).parents(".group_top").next();
       while($obj.length > 0 && $obj.hasClass('question_holder')) {
@@ -3240,8 +3263,8 @@ define([
       var cnt = parseInt($question.find(".combination_count").val(), 10) || 10;
       if (cnt < 0) {
         cnt = 10;
-      } else if (cnt > maxCombinations) {
-        cnt = maxCombinations;
+      } else if (cnt > ENV.quiz_max_combination_count) {
+        cnt = ENV.quiz_max_combination_count;
       }
       $question.find(".combination_count").val(cnt);
       var succeeded = 0;

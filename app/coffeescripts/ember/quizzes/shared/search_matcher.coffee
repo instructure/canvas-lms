@@ -2,7 +2,7 @@ define [], () ->
   # matches a key against a string
   # returns true if target is a blank string
   (target, key, ignoreCase=true) ->
-    return true if !target or target is ''
+    return true unless target
     if !!ignoreCase
       target = target.toLowerCase()
       key = key.toLowerCase()

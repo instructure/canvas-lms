@@ -8,10 +8,6 @@ module AssignmentOverridesSeleniumHelper
     replace_content(f('#assignment_name'), title.to_s)
   end
 
-  def toggle_advanced_options
-    f('#assignment_toggle_advanced_options').click
-  end
-
   def fill_assignment_overrides
       f('.due-date-overrides [name="due_at"]').
         send_keys(due_at.strftime('%b %-d, %y'))
@@ -89,7 +85,7 @@ module AssignmentOverridesSeleniumHelper
     new_section = @course.course_sections.create!(:name => 'New Section')
     override = assignment.assignment_overrides.build
     override.set = new_section
-    override.due_at = Time.zone.now + 1.day
+    override.due_at = Time.zone.now.advance(days:1)
     override.due_at_overridden = true
     override.save!
   end

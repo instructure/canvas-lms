@@ -30,8 +30,8 @@ describe "/shared/_select_content_dialog" do
     response.should_not be_nil
     page = Nokogiri(response.body)
     options = page.css("#attachments_select .module_item_select option")
-    options[0].text.should == "a"
-    options[1].text.should == "b"
+    options[1].text.should == "a"
+    options[2].text.should == "b"
   end
 
   it "should include unpublished wiki pages" do
@@ -61,6 +61,15 @@ describe "/shared/_select_content_dialog" do
     page.css(%Q{#quizs_select .module_item_select option[value="#{existing_quiz.id}"]}).should_not be_empty
     page.css(%Q{#quizs_select .module_item_select option[value="new"]}).should be_empty
     page.css(%Q{#assignments_select .module_item_select option[value="new"]}).should be_empty
+  end
+
+  it "should offer to create assigments if the user has permission" do
+    @account = Account.default
+    course_with_ta account: @account, active_all: true
+    view_context
+    render partial: 'shared/select_content_dialog'
+    page = Nokogiri(response.body)
+    page.css(%Q{#assignments_select .module_item_select option[value="new"]}).should_not be_empty
   end
 
   it "should create new topics in unpublished state if draft state is enabled" do

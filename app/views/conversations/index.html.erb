@@ -52,16 +52,11 @@
                   data-track-action="Select_Folder"
                   data-track-label="Sent"><%= link_to t('inbox_views.sent_messages', "Sent"), '#' %></li>
             </ul>
-            <ul>
+            <ul class="last">
               <li data-scope="archived"
                   data-track-category="Combo_Box"
                   data-track-action="Select_Folder"
                   data-track-label="Archived"><%= link_to t('inbox_views.archived_messages', "Archived"), '#' %></li>
-            </ul>
-            <ul class="last">
-              <li data-track-category="Combo_Box"
-                  data-track-action="Select_Folder"
-                  data-track-label="Discussion_Replies"><%= link_to t('inbox_views.discussion_replies', "Discussion Replies"), discussion_replies_url %></li>
             </ul>
           </div>
         </li>

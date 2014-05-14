@@ -42,6 +42,6 @@ define [
 
     getDisplayDateText: (dateInfo, fallbackText) =>
       if dateInfo
-        $.parseFromISO($.dateToISO8601UTC($.unfudgeDateForProfileTimezone(dateInfo))).datetime_formatted
+        $.datetimeString($.unfudgeDateForProfileTimezone(dateInfo))
       else
         fallbackText

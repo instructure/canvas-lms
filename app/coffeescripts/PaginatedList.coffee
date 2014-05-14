@@ -31,7 +31,7 @@
 # PaginatedList expects an empty <ul> wrapped in a <div>. The element
 # passed to the constructor should be the <div>.
 
-define ['i18n!paginated_list', 'vendor/spin'], (I18n, Spinner) ->
+define ['jquery', 'i18n!paginated_list', 'vendor/spin'], ($, I18n, Spinner) ->
   class PaginatedList
     ##
     # I18n keys used by class

@@ -29,16 +29,13 @@ describe "site-wide" do
 
   it "should render 404 when user isn't logged in" do
     Setting.set 'show_feedback_link', 'true'
-    expect {
-      get "/dashbo"
-    }.to change(ErrorReport, :count).by +1
+    get "/dashbo"
     assert_status(404)
-    ErrorReport.last.category.should == "404"
   end
 
   it "should set the x-ua-compatible http header" do
     get "/login"
-    response['x-ua-compatible'].should == "IE=edge,chrome=1"
+    response['x-ua-compatible'].should == "IE=Edge,chrome=1"
   end
 
   it "should set no-cache headers for html requests" do

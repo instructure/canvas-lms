@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -68,6 +68,7 @@ module Api::V1::Assignment
     hash['course_id'] = assignment.context_id
     hash['name'] = assignment.title
     hash['submission_types'] = assignment.submission_types_array
+    hash['has_submitted_submissions'] = assignment.has_submitted_submissions?
 
     if assignment.context && assignment.context.turnitin_enabled?
       hash['turnitin_enabled'] = assignment.turnitin_enabled
@@ -156,7 +157,7 @@ module Api::V1::Assignment
         assignment.discussion_topic.context,
         user,
         session,
-        !:include_assignment)
+        include_assignment: false)
     end
 
     if opts[:include_all_dates] && assignment.assignment_overrides
@@ -176,6 +177,10 @@ module Api::V1::Assignment
     if assignment.context.feature_enabled?(:draft_state)
       hash['published'] = ! assignment.unpublished?
       hash['unpublishable'] = assignment.can_unpublish?
+    end
+
+    if assignment.context.feature_enabled?(:differentiated_assignments)
+      hash['only_visible_to_overrides'] = value_to_boolean(assignment.only_visible_to_overrides)
     end
 
     if submission = opts[:submission]
@@ -287,6 +292,7 @@ module Api::V1::Assignment
 
     if update_params.has_key?('peer_reviews_assign_at')
       update_params['peer_reviews_due_at'] = update_params['peer_reviews_assign_at']
+      update_params.delete('peer_reviews_assign_at')
     end
 
     if update_params["submission_types"].is_a? Array
@@ -307,15 +313,54 @@ module Api::V1::Assignment
       assignment.group_category = assignment.context.group_categories.find_by_id(gc_id)
     end
 
-    #TODO: validate grading_standard_id (it's permissions are currently useless)
+    if update_params.has_key?("grading_standard_id")
+      standard_id = update_params.delete("grading_standard_id")
+      if standard_id.present?
+        grading_standard = GradingStandard.standards_for(context).find_by_id(standard_id)
+        assignment.grading_standard = grading_standard if grading_standard
+      else
+        assignment.grading_standard = nil
+      end
+    end
 
     if assignment_params.key? "muted"
       assignment.muted = value_to_boolean(assignment_params.delete("muted"))
     end
 
+    exception_message = ["invalid due_at",
+                         "assignment_params: #{assignment_params}",
+                         "user: #{@current_user.attributes}",
+                         "account: #{assignment.context.root_account.attributes}",
+                         "course: #{assignment.context.attributes}",
+                         "assignment: #{assignment.attributes}"].join(",\n")
+
     # do some fiddling with due_at for fancy midnight and add to update_params
-    if update_params.has_key?("due_at")
-      update_params["time_zone_edited"] = Time.zone.name
+    # validate that date and times are iso8601 otherwise ignore them, but still
+    # allow clearing them when set to nil
+    if update_params['due_at'].present? && update_params['due_at'] !~ Api::ISO8601_REGEX
+      Api.invalid_time_stamp_error('due_at', exception_message)
+      # todo stop logging and delete invalid dates
+      # update_params.delete(:due_at)
+    elsif update_params.has_key?('due_at')
+      update_params['time_zone_edited'] = Time.zone.name
+    end
+
+    if update_params['lock_at'].present? && update_params['lock_at'] !~ Api::ISO8601_REGEX
+      Api.invalid_time_stamp_error('lock_at', exception_message)
+      # todo stop logging and delete invalid dates
+      # update_params.delete(:lock_at)
+    end
+
+    if update_params['unlock_at'].present? && update_params['unlock_at'] !~ Api::ISO8601_REGEX
+      Api.invalid_time_stamp_error('unlock_at', exception_message)
+      # todo stop logging and delete invalid dates
+      # update_params.delete(:unlock_at)
+    end
+
+    if update_params['peer_reviews_due_at'].present? && update_params['peer_reviews_due_at'] !~ Api::ISO8601_REGEX
+      Api.invalid_time_stamp_error('peer_reviews_due_at', exception_message)
+      # todo stop logging and delete invalid dates
+      # update_params.delete(:peer_reviews_due_at)
     end
 
     if !assignment.context.try(:turnitin_enabled?)
@@ -346,6 +391,12 @@ module Api::V1::Assignment
       if assignment_params.has_key? "published"
         published = value_to_boolean(assignment_params['published'])
         assignment.workflow_state = published ? 'published' : 'unpublished'
+      end
+    end
+
+    if assignment.context.feature_enabled?(:differentiated_assignments)
+      if assignment_params.has_key? "only_visible_to_overrides"
+        assignment.only_visible_to_overrides = value_to_boolean(assignment_params['only_visible_to_overrides'])
       end
     end
 

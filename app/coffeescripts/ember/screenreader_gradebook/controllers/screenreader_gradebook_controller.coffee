@@ -1,14 +1,17 @@
 define [
+  'ic-ajax'
   'compiled/util/round'
   'compiled/userSettings'
   '../../shared/xhr/fetch_all_pages'
+  '../../shared/xhr/parse_link_header'
   'i18n!sr_gradebook'
   'ember'
   'underscore'
+  'timezone'
   'compiled/AssignmentDetailsDialog'
   'compiled/AssignmentMuter'
   'compiled/grade_calculator'
-  ], (round, userSettings, fetchAllPages, I18n, Ember, _,  AssignmentDetailsDialog, AssignmentMuter, GradeCalculator ) ->
+  ], (ajax, round, userSettings, fetchAllPages, parseLinkHeader, I18n, Ember, _, tz, AssignmentDetailsDialog, AssignmentMuter, GradeCalculator ) ->
 
   {get, set, setProperties} = Ember
 
@@ -30,6 +33,7 @@ define [
           hiddenNameCounter += 1
         student.sections ||= []
         student.sections.push(enrollment.course_section_id)
+        student.role ||= enrollment.role
         return array if iMeta.students[student.id]
         iMeta.students[student.id] = student
         array.pushObject(student)
@@ -48,10 +52,48 @@ define [
 
   ScreenreaderGradebookController = Ember.ObjectController.extend
 
-    downloadUrl: "#{get(window, 'ENV.GRADEBOOK_OPTIONS.context_url')}/gradebook.csv"
-    gradingHistoryUrl: "#{get(window, 'ENV.GRADEBOOK_OPTIONS.context_url')}/history"
+    contextUrl: get(window, 'ENV.GRADEBOOK_OPTIONS.context_url')
+
+    downloadCsvUrl: (->
+      "#{@get('contextUrl')}/gradebook.csv"
+    ).property()
+
+    gradingHistoryUrl:(->
+      "#{@get('contextUrl')}/gradebook/history"
+    ).property()
+
+    speedGraderUrl: (->
+      "#{@get('contextUrl')}/gradebook/speed_grader?assignment_id=#{@get('selectedAssignment.id')}"
+    ).property('selectedAssignment')
+
+    studentUrl: (->
+      "#{@get('contextUrl')}/grades/#{@get('selectedStudent.id')}"
+    ).property('selectedStudent')
+
+    showTotalAsPoints: (->
+      ENV.GRADEBOOK_OPTIONS.show_total_grade_as_points
+    ).property()
+
+    changeGradebookVersionUrl: (->
+      "#{get(window, 'ENV.GRADEBOOK_OPTIONS.change_gradebook_version_url')}"
+    ).property()
+
+    showDownloadSubmissionsButton: (->
+      @get('selectedAssignment.has_submitted_submissions') and
+      @get('selectedAssignment.submission_types').match(/(online_upload|online_text_entry|online_url)/)
+    ).property('selectedAssignment')
+
     hideStudentNames: false
-    showConcludedEnrollments: false
+
+    showConcludedEnrollments: (->
+      userSettings.contextGet('show_concluded_enrollments') or false
+    ).property().volatile()
+
+    updateshowConcludedEnrollmentsSetting: ( ->
+      isChecked = @get('showConcludedEnrollments')
+      if isChecked?
+        userSettings.contextSet 'show_concluded_enrollments', isChecked
+    ).observes('showConcludedEnrollments')
 
     selectedStudent: null
 
@@ -61,30 +103,56 @@ define [
 
     weightingScheme: null
 
+    ariaAnnounced: null
+
     actions:
+
+      columnUpdated: (columnData, columnID) ->
+        @updateColumnData columnData, columnID
 
       gradeUpdated: (submissions) ->
         @updateSubmissionsFromExternal submissions
 
       selectItem: (property, goTo) ->
-        list = @getListFor(property)
+        list = @getList(property)
         currentIndex = list.indexOf(@get(property))
-        item = list.objectAt(currentIndex - 1) if goTo == 'previous'
-        item = list.objectAt(currentIndex + 1) if goTo == 'next'
-        @set(property, item)
+
+        if goTo == 'previous'
+          item = list.objectAt(currentIndex - 1)
+          unless list.objectAt(currentIndex - 2)
+            $("#next_#{@getButton(property)}").focus()
+        if goTo == 'next'
+          item = list.objectAt(currentIndex + 1)
+          unless list.objectAt(currentIndex + 2)
+            $("#prev_#{@getButton(property)}").focus()
+
+        @announce property, item
+        @set property, item
+
+    announce: (prop, item) ->
+      Ember.run.next =>
+        if prop is 'selectedStudent' and @get('hideStudentNames')
+          text_to_announce = get item, 'hiddenName'
+        else
+          text_to_announce = get item, 'name'
+        @set 'ariaAnnounced', text_to_announce
+
+    hideStudentNamesChanged: (->
+      @set 'ariaAnnounced', null
+    ).observes('hideStudentNames')
 
     setupSubmissionCallback: (->
-      $.subscribe 'submissions_updated', _.bind(@updateSubmissionsFromExternal, this)
+      Ember.$.subscribe 'submissions_updated', _.bind(@updateSubmissionsFromExternal, this)
     ).on('init')
 
     setupAssignmentGroupsChange: (->
-      $.subscribe 'assignment_group_weights_changed', _.bind(@checkWeightingScheme, this)
+      Ember.$.subscribe 'assignment_group_weights_changed', _.bind(@checkWeightingScheme, this)
       @set 'weightingScheme', ENV.GRADEBOOK_OPTIONS.group_weighting_scheme
     ).on('init')
 
     willDestroy: ->
-      $.unsubscribe 'submissions_updated'
-      $.unsubscribe 'assignment_group_weights_changed'
+      Ember.$.unsubscribe 'submissions_updated'
+      Ember.$.unsubscribe 'assignment_group_weights_changed'
       @_super()
 
     checkWeightingScheme: ({assignmentGroups})->
@@ -132,7 +200,18 @@ define [
 
     calculateAllGrades: (->
       @get('students').forEach (student) => @calculateStudentGrade student
-    ).observes('includeUngradedAssignments')
+    ).observes('includeUngradedAssignments','groupsAreWeighted', 'assignment_groups.@each.group_weight')
+
+    setFinalGradeDisplay: (->
+      @get('students').forEach (student) =>
+        set(student, "final_grade_point_ratio", @pointRatioDisplay(student, @get('groupsAreWeighted')))
+    ).observes('students.@each.total_grade','groupsAreWeighted')
+
+    pointRatioDisplay: (student, weighted_groups) ->
+      if weighted_groups or not student.total_grade
+        null
+      else
+        "#{student.total_grade.score} / #{student.total_grade.possible}"
 
     sectionSelectDefaultLabel: I18n.t "all_sections", "All Sections"
     studentSelectDefaultLabel: I18n.t "no_student", "No Student Selected"
@@ -143,7 +222,8 @@ define [
     studentsHash: ->
       students = {}
       @get('students').forEach (s) ->
-        students[s.id] = s
+        unless s.role == "StudentViewEnrollment"
+          students[s.id] = s
       students
 
     fetchStudentSubmissions: (->
@@ -157,6 +237,146 @@ define [
         student_ids = notYetLoaded.mapBy('id')
         fetchAllPages(ENV.GRADEBOOK_OPTIONS.submissions_url, student_ids: student_ids,  @get('submissions'))
     ).observes('students.@each').on('init')
+
+    publishToSisEnabled: (->
+      ENV.GRADEBOOK_OPTIONS.publish_to_sis_enabled
+      ).property()
+
+    publishToSisURL:(->
+      ENV.GRADEBOOK_OPTIONS.publish_to_sis_url
+      ).property()
+
+    teacherNotes: (->
+      ENV.GRADEBOOK_OPTIONS.teacher_notes
+    ).property().volatile()
+
+    showNotesColumn: (->
+      notes = @get('teacherNotes')
+      if notes
+        !notes.hidden
+      else
+        false
+    ).property().volatile()
+
+    shouldCreateNotes: (->
+      !@get('teacherNotes') and @get('showNotesColumn')
+    ).property('teacherNotes', 'showNotesColumn', 'custom_columns.@each')
+
+    notesURL: (->
+      if @get('shouldCreateNotes')
+        ENV.GRADEBOOK_OPTIONS.custom_columns_url
+      else
+        notesID = @get('teacherNotes')?.id
+        ENV.GRADEBOOK_OPTIONS.custom_column_url.replace(/:id/, notesID)
+    ).property('shouldCreateNotes', 'custom_columns.@each')
+
+    notesParams: (->
+      if @get('shouldCreateNotes')
+        "column[title]": I18n.t("notes", "Notes")
+        "column[position]": 1
+        "column[teacher_notes]": true
+      else
+        "column[hidden]": !@get('showNotesColumn')
+    ).property('shouldCreateNotes', 'showNotesColumn')
+
+    notesVerb: (->
+      if @get('shouldCreateNotes') then "POST" else "PUT"
+    ).property('shouldCreateNotes')
+
+    updateOrCreateNotesColumn: (->
+      ajax(
+        dataType: "json"
+        type: @get('notesVerb')
+        url: @get('notesURL')
+        data: @get('notesParams')
+      ).then @boundNotesSuccess
+    ).observes('showNotesColumn')
+
+    bindNotesSuccess:(->
+      @boundNotesSuccess = _.bind(@onNotesUpdateSuccess, this)
+    ).on('init')
+
+    onNotesUpdateSuccess: (col) ->
+      customColumns = @get('custom_columns')
+      method = if col.hidden then 'removeObject' else 'unshiftObject'
+      column = customColumns.findBy('id', col.id) or col
+      customColumns[method] column
+
+      if col.teacher_notes
+        @set 'teacherNotes', col
+
+      unless col.hidden
+        ajax(
+          url: ENV.GRADEBOOK_OPTIONS.reorder_custom_columns_url
+          type:"POST"
+          data:
+            order: customColumns.mapBy('id')
+        )
+
+    displayPointTotals: (->
+      if @get("groupsAreWeighted")
+        false
+      else
+        @get("showTotalAsPoints")
+    ).property('groupsAreWeighted', 'showTotalAsPoints')
+
+    groupsAreWeighted: (->
+      @get("weightingScheme") == "percent"
+    ).property("weightingScheme")
+
+    updateShowTotalAs: (->
+      @set "showTotalAsPoints", @get("displayPointTotals")
+      ajax(
+        dataType: "json"
+        type: "PUT"
+        url: ENV.GRADEBOOK_OPTIONS.setting_update_url
+        data:
+          show_total_grade_as_points: @get("displayPointTotals"))
+    ).observes('showTotalAsPoints', 'groupsAreWeighted')
+
+    studentColumnData: {}
+
+    updateColumnData: (columnDatum, columnID) ->
+      studentData = @get('studentColumnData')
+      dataForStudent = studentData[columnDatum.user_id] or Ember.A()
+
+      columnForStudent = dataForStudent.findBy('column_id', columnID)
+      if columnForStudent
+        columnForStudent.set 'content', columnDatum.content
+      else
+        dataForStudent.push Ember.Object.create
+                              column_id: columnID
+                              content: columnDatum.content
+      studentData[columnDatum.user_id] = dataForStudent
+
+    fetchColumnData: (col, url) ->
+      url ||= ENV.GRADEBOOK_OPTIONS.custom_column_data_url.replace /:id/, col.id
+      ajax.raw(url, {dataType:"json"}).then (result) =>
+        for datum in result.response
+          @updateColumnData datum, col.id
+        meta = parseLinkHeader result.jqXHR
+        if meta.next
+          @fetchColumnData col, meta.next
+        else
+          setProperties col,
+            'isLoading': false
+            'isLoaded': true
+
+    dataForStudent: (->
+      selectedStudent = @get('selectedStudent')
+      return unless selectedStudent?
+      @get('studentColumnData')[selectedStudent.id]
+    ).property('selectedStudent', 'custom_columns.@each.isLoaded')
+
+    loadCustomColumnData: (->
+      return unless (@get('enrollments.isLoaded'))
+      @get('custom_columns').filter((col) ->
+        return false if get(col, 'isLoaded') or get(col, 'isLoading')
+        set col, 'isLoading', true
+        col
+      ).forEach (col) =>
+        @fetchColumnData col
+    ).observes('enrollments.isLoaded', 'custom_columns.@each')
 
     studentsInSelectedSection: (->
       students = @get('students')
@@ -174,14 +394,15 @@ define [
           submission.submissions.forEach ((s) ->
             @updateSubmission(s, student)
           ), this
-          set(student, 'isLoading', false)
-          set(student, 'isLoaded', true)
+          setProperties student,
+            'isLoading': false
+            'isLoaded': true
           @calculateStudentGrade student
       ), this
     ).observes('submissions.@each')
 
     updateSubmission: (submission, student) ->
-      submission.submitted_at = $.parseFromISO(submission.submitted_at) if submission.submitted_at
+      submission.submitted_at = tz.parse(submission.submitted_at)
       set(student, "assignment_#{submission.assignment_id}", submission)
 
     assignments: Ember.ArrayProxy.createWithMixins(Ember.SortableMixin,
@@ -193,13 +414,47 @@ define [
       ENV.GRADEBOOK_OPTIONS.draft_state_enabled
 
     processAssignment: (as, assignmentGroups) ->
+      assignmentGroup = assignmentGroups.findBy('id', as.assignment_group_id)
       set as, 'sortable_name', as.name.toLowerCase()
-      set as, 'ag_position', assignmentGroups.findBy('id', as.assignment_group_id).position
+      set as, 'ag_position', assignmentGroup.position
+      set as, 'noPointsPossibleWarning', assignmentGroup.invalid
       if as.due_at
-        set as, 'due_at', $.parseFromISO(as.due_at)
-        set as, 'sortable_date', as.due_at.timestamp
+        due_at = tz.parse(as.due_at)
+        set as, 'due_at', due_at
+        set as, 'sortable_date', +due_at / 1000
       else
         set as, 'sortable_date', Number.MAX_VALUE
+
+    checkForNoPointsWarning: (ag) ->
+      pointsPossible = _.inject ag.assignments
+      , ((sum, a) -> sum + (a.points_possible || 0))
+      , 0
+      pointsPossible == 0
+
+    checkForInvalidGroups: (->
+      @get('assignment_groups').forEach (ag) =>
+        set ag, "invalid", @checkForNoPointsWarning(ag)
+    ).observes('assignment_groups.@each')
+
+    invalidAssignmentGroups: (->
+      @get('assignment_groups').filterProperty('invalid',true)
+    ).property('assignment_groups.@each.invalid')
+
+    showInvalidGroupWarning: (->
+      @get("invalidAssignmentGroups").length > 0 && @get('weightingScheme') == "percent"
+    ).property("invalidAssignmentGroups", "weightingScheme")
+
+    invalidGroupNames: (->
+      names = @get("invalidAssignmentGroups").map (group) ->
+        group.name
+    ).property("invalidAssignmentGroups").readOnly()
+
+    invalidGroupsWarningPhrases:(->
+      I18n.t("invalid_group_warning",
+        {one: "Note: Score does not include assignments from the group %{list_of_group_names} because it has no points possible.",
+        other:"Note: Score does not include assignments from the groups %{list_of_group_names} because they have no points possible."}
+        {count: @get('invalidGroupNames').length, list_of_group_names: @get('invalidGroupNames').join(" or ")})
+    ).property('invalidGroupNames')
 
     populateAssignments: (->
       assignmentGroups = @get('assignment_groups')
@@ -282,6 +537,10 @@ define [
         }
     ).property('selectedStudent', 'selectedAssignment')
 
+    showAssignmentPointsWarning: (->
+      @get("selectedAssignment.noPointsPossibleWarning") and @get('groupsAreWeighted')
+    ).property('selectedAssignment', 'groupsAreWeighted')
+
     selectedStudentSections: (->
       student = @get('selectedStudent')
       sections = @get('sections')
@@ -299,11 +558,40 @@ define [
       locals
     ).property('selectedAssignment', 'students.@each.total_grade')
 
+    assignmentSubmissionTypes: (->
+      types = @get('selectedAssignment.submission_types')
+      submissionTypes = @get('submissionTypes')
+      if types == undefined || types.length == 0
+        submissionTypes['none']
+      else if types.length == 1
+        submissionTypes[types[0]]
+      else
+        result = []
+        types.forEach (type) -> result.push(submissionTypes[type])
+        result.join(', ')
+    ).property('selectedAssignment')
+
+    submissionTypes: {
+      'discussion_topic': I18n.t 'discussion_topic', 'Discussion topic'
+      'online_quiz': I18n.t 'online_quiz', 'Online quiz'
+      'on_paper': I18n.t 'on_paper', 'On paper'
+      'none': I18n.t 'none', 'None'
+      'external_tool': I18n.t 'external_tool', 'External tool'
+      'online_text_entry': I18n.t 'online_text_entry', 'Online text entry'
+      'online_url': I18n.t 'online_url', 'Online URL'
+      'online_upload': I18n.t 'online_upload', 'Online upload'
+      'media_recording': I18n.t 'media_recordin', 'Media recording'
+    }
+
     # Next/Previous Student/Assignment
 
-    getListFor: (property) ->
+    getList: (property) ->
       return @get('studentsInSelectedSection') if property == 'selectedStudent'
       return @get('assignments') if property == 'selectedAssignment'
+
+    getButton: (property) ->
+      return 'student' if property == 'selectedStudent'
+      return 'assignment' if property == 'selectedAssignment'
 
     assignmentIndex: (->
       selected = @get('selectedAssignment')
@@ -327,22 +615,6 @@ define [
       next = @get('studentsInSelectedSection').objectAt(@get('studentIndex') + 1)
       !(@get('studentsInSelectedSection.length') and next)
     ).property('selectedStudent', 'studentsInSelectedSection', 'selectedSection')
-
-    ariaDisabledPrevAssignment: (->
-      new Boolean(@get('disablePrevAssignmentButton'))?.toString()
-    ).property('disablePrevAssignmentButton')
-
-    ariaDisabledPrevStudent: (->
-      new Boolean(@get('disablePrevStudentButton'))?.toString()
-    ).property('disablePrevStudentButton')
-
-    ariaDisabledNextAssignment: (->
-      new Boolean(@get('disableNextAssignmentButton'))?.toString()
-    ).property('disableNextAssignmentButton')
-
-    ariaDisabledNextStudent: (->
-      new Boolean(@get('disableNextStudentButton'))?.toString()
-    ).property('disableNextStudentButton')
 
     displayName: (->
       if @get('hideStudentNames')

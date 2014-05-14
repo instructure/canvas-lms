@@ -88,7 +88,7 @@ class AccountUser < ActiveRecord::Base
 
   def enabled_for?(context, action)
     @permission_lookup ||= {}
-    @permission_lookup[[context, action]] ||= RoleOverride.enabled_for?(account, context, action, base_role_name, membership_type)
+    @permission_lookup[[context.class, context.global_id, action]] ||= RoleOverride.enabled_for?(account, context, action, base_role_name, membership_type)
   end
 
   def has_permission_to?(context, action)

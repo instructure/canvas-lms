@@ -190,6 +190,7 @@ class AssignmentOverride < ActiveRecord::Base
   def as_hash
     { :title => title,
       :due_at => due_at,
+      :id => id,
       :all_day => all_day,
       :set_type => set_type,
       :set_id => set_id,

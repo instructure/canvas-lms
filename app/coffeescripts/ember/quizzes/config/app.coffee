@@ -1,8 +1,16 @@
 define [
-  'ember',
+  'ember'
+  '../shared/environment'
   '../../shared/components/ic_actions_component'
   '../../shared/components/ic_publish_icon_component'
-], (Ember) ->
+  './date_transform'
+], (Ember, env) ->
+
+  Ember.onLoad 'Ember.Application', (Application) ->
+    Application.initializer
+      name: 'env'
+      initialize: (container, application) ->
+        env.setEnv(window.ENV)
 
   Ember.$.ajaxPrefilter (options, originalOptions, xhr) ->
     options.dataType = 'json'

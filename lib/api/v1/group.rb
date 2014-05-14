@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -48,6 +48,7 @@ module Api::V1::Group
     end
     hash['html_url'] = group_url(group) if includes.include? 'html_url'
     hash['sis_group_id'] = group.sis_source_id if group.context_type == 'Account' && group.root_account.grants_rights?(user, session, :read_sis, :manage_sis).values.any?
+    hash['sis_import_id'] = group.sis_batch_id if group.context_type == 'Account' && group.root_account.grants_right?(user, session, :manage_sis)
     hash
   end
 
@@ -56,6 +57,9 @@ module Api::V1::Group
     hash = api_json(membership, user, session, API_GROUP_MEMBERSHIP_JSON_OPTS)
     if includes.include?('just_created')
       hash['just_created'] = membership.just_created || false
+    end
+    if membership.group.context_type == 'Account' && membership.group.root_account.grants_right?(user, session, :manage_sis)
+      hash['sis_import_id'] = membership.sis_batch_id
     end
     hash
   end

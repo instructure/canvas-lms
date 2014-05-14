@@ -52,6 +52,21 @@ describe LearningOutcomeResult do
     end
   end
 
+  describe '.artifact_type' do
+    it 'returns the correct representation of a quiz submission' do
+      learning_outcome_result = create_learning_outcome_result
+      sub = learning_outcome_result.association_object.quiz_submissions.create!
+
+      learning_outcome_result.artifact = sub
+      learning_outcome_result.save
+      learning_outcome_result.artifact_type.should == 'Quizzes::QuizSubmission'
+
+      LearningOutcomeResult.where(id: learning_outcome_result).update_all(association_type: 'QuizSubmission')
+
+      LearningOutcomeResult.find(learning_outcome_result.id).artifact_type.should == 'Quizzes::QuizSubmission'
+    end
+  end
+
   describe '.associated_asset_type' do
     it 'returns the correct representation of a quiz' do
       learning_outcome_result = create_learning_outcome_result

@@ -416,7 +416,7 @@ module MigratorHelper
         tool[:title] = ct[:title]
       end
     end
-    
+
     if dates.length > 0
       @overview[:start_timestamp] ||= dates.min
       @overview[:end_timestamp] ||= dates.max

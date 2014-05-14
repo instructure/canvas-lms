@@ -48,6 +48,18 @@ describe ConversationMessage do
       @conversation.add_participants([@last_student])
     end
 
+    it "should format an author line with shared contexts" do
+      message = add_message
+      message.author_short_name_with_shared_contexts(@first_student).should == "#{message.author.short_name} (#{@course.name})"
+    end
+
+    it "should format an author line without shared contexts" do
+      user
+      @conversation = @teacher.initiate_conversation([@user])
+      message = add_message
+      message.author_short_name_with_shared_contexts(@user).should == "#{message.author.short_name}"
+    end
+
     it "should create appropriate notifications on new message" do
       message = add_message
       message.messages_sent.should be_include("Conversation Message")
@@ -123,12 +135,11 @@ describe ConversationMessage do
       course_with_teacher
       student = student_in_course.user
       conversation = @teacher.initiate_conversation([student])
-      ConversationMessage.any_instance.stubs(:current_time_from_proper_timezone).returns(Time.at(0))
       conversation.add_message("reprimanded!", :generate_user_note => true)
       student.user_notes.size.should be(1)
       note = student.user_notes.first
       note.creator.should eql(@teacher)
-      note.title.should eql("Private message, Jan 1, 1970")
+      note.title.should eql("Private message")
       note.note.should eql("reprimanded!")
     end
 
@@ -288,7 +299,7 @@ describe ConversationMessage do
       conversation = Conversation.initiate(users, false, :context_type => 'Course', :context_id => @course.id)
       cm1 = conversation.add_message(users[0], "initial message", :root_account_id => Account.default.id)
       cm2 = conversation.add_message(users[1], "subsequent message", :root_account_id => Account.default.id)
-      cm2.recipients.size.should == 2
+      cm2.conversation_message_participants.size.should == 3
       cm3 = cm2.reply_from({
         :purpose => 'general',
         :user => users[2],
@@ -296,8 +307,8 @@ describe ConversationMessage do
         :html => "body",
         :text => "body"
       })
-      cm3.conversation_message_participants.size.should == 1
-      cm3.conversation_message_participants[0].user.should == users[1]
+      cm3.conversation_message_participants.size.should == 2
+      cm3.conversation_message_participants.map{|x| x.user_id}.sort.should == [users[1].id, users[2].id].sort
     end
   end
 end

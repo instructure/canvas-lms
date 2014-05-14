@@ -88,11 +88,11 @@ module YARD::Templates::Helpers::BaseHelper
   alias_method :linkify_without_api, :linkify
   alias_method :linkify, :linkify_with_api
 
-  def lookup_topic(controller_name)
+  def lookup_topic(controller_path)
     controller = nil
     topic = options[:resources].find { |r,cs|
       cs.any? { |c|
-        controller = c if c.name.to_s == controller_name
+        controller = c if c.path.to_s == controller_path
         !controller.nil?
       }
     }

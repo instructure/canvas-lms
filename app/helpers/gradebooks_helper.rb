@@ -35,10 +35,15 @@ module GradebooksHelper
   end
 
   def get_gradebook_version(user, context)
-    if !context.old_gradebook_visible? || user.nil? || user.prefers_gradebook2?
+    if user.nil? || user.prefers_gradebook2?(context)
       'gradebook2'
-    else
+    elsif context.feature_enabled?(:screenreader_gradebook) && user.gradebook_preference == 'srgb'
+      'screenreader_gradebook'
+    elsif context.old_gradebook_visible?
       'gradebook'
+    else
+      'gradebook2'
     end
   end
+
 end

@@ -184,7 +184,7 @@ class OutcomesController < ApplicationController
         elsif @result.artifact.is_a?(RubricAssessment) && @result.artifact.artifact && @result.artifact.artifact.is_a?(Submission)
           @submission = @result.artifact.artifact
           redirect_to named_context_url(@result.context, :context_assignment_submission_url, @submission.assignment_id, @submission.user_id)
-        elsif @result.artifact.is_a?(QuizSubmission) && @result.associated_asset
+        elsif @result.artifact.is_a?(Quizzes::QuizSubmission) && @result.associated_asset
           @submission = @result.artifact
           @question = @result.associated_asset
           if @submission.attempt <= @result.attempt

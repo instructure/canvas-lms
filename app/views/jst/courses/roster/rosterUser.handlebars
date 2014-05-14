@@ -1,5 +1,5 @@
 <td class="center">
-  <a href="{{html_url}}" class="avatar" title="{{name}}"><img src="{{avatar_url}}" alt="{{name}}"></a>
+  {{>avatar}}
 </td>
 <td>
   <a href="{{html_url}}" class="roster_user_name">{{name}}</a>
@@ -22,6 +22,13 @@
   <div>{{enrollmentName role}}</div>
   {{/each}}
 </td>
+{{#if canViewLoginIdColumn}}
+<td>
+  {{#each enrollments}}
+  <div>{{datetimeFormatted last_activity_at}}</div>
+  {{/each}}
+</td>
+{{/if}}
 <td class="right">
   {{#if canManage}}
   <div class="admin-links">

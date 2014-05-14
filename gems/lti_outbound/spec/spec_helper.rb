@@ -5,6 +5,19 @@
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 
+require 'simplecov'
+require 'simplecov-rcov'
+
+SimpleCov.use_merging
+SimpleCov.merge_timeout(10000)
+SimpleCov.command_name('lti_outbound-gem')
+ SimpleCov.start('test_frameworks') do
+  SimpleCov.coverage_dir('../../coverage')
+  SimpleCov.at_exit {
+    SimpleCov.result
+  }
+end
+
 require 'lti_outbound'
 
 Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/shared_examples/*.rb").each { |file| require file }

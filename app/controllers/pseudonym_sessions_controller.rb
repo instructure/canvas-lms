@@ -24,7 +24,7 @@ class PseudonymSessionsController < ApplicationController
   skip_before_filter :require_reacceptance_of_terms
 
   def new
-    if @current_user && !params[:re_login] && !params[:confirm] && !params[:expected_user_id] && !session[:used_remember_me_token]
+    if @current_user && !params[:force_login] && !params[:confirm] && !params[:expected_user_id] && !session[:used_remember_me_token]
       redirect_to dashboard_url
       return
     end
@@ -455,11 +455,11 @@ class PseudonymSessionsController < ApplicationController
   end
 
   def otp_remember_me_cookie_domain
-    ActionController::Base.session_options[:domain]
+    CANVAS_RAILS2 ? ActionController::Base.session_options[:domain] : CanvasRails::Application.config.session_options[:domain]
   end
 
   def otp_login(send_otp = false)
-    if !@current_user.otp_secret_key || request.method == :get
+    if !@current_user.otp_secret_key || request.get?
       session[:pending_otp_secret_key] ||= ROTP::Base32.random_base32
     end
     if session[:pending_otp_secret_key] && params[:otp_login].try(:[], :otp_communication_channel_id)
@@ -511,12 +511,12 @@ class PseudonymSessionsController < ApplicationController
 
       if params[:otp_login][:remember_me] == '1'
         now = Time.now.utc
-        self.cookies['canvas_otp_remember_me'] = {
+        cookies['canvas_otp_remember_me'] = {
               :value => @current_user.otp_secret_key_remember_me_cookie(now),
               :expires => now + 30.days,
               :domain => otp_remember_me_cookie_domain,
               :httponly => true,
-              :secure => ActionController::Base.session_options[:secure],
+              :secure => CANVAS_RAILS2 ? ActionController::Base.session_options[:secure] : CanvasRails::Application.config.session_options[:secure],
               :path => '/login'
             }
       end
@@ -556,7 +556,7 @@ class PseudonymSessionsController < ApplicationController
     otp_passed ||= cookies['canvas_otp_remember_me'] &&
         @current_user.validate_otp_secret_key_remember_me_cookie(cookies['canvas_otp_remember_me'])
     if !otp_passed
-      mfa_settings = @current_pseudonym.mfa_settings
+      mfa_settings = @current_user.mfa_settings
       if (@current_user.otp_secret_key && mfa_settings == :optional) ||
           mfa_settings == :required
         session[:pending_otp] = true
@@ -567,8 +567,9 @@ class PseudonymSessionsController < ApplicationController
     session[:require_terms] = true if @domain_root_account.require_acceptance_of_terms?(@current_user)
 
     respond_to do |format|
-      if session[:oauth2]
-        return redirect_to(oauth2_auth_confirm_url)
+      if oauth = session[:oauth2]
+        provider = Canvas::Oauth::Provider.new(oauth[:client_id], oauth[:redirect_uri], oauth[:scopes], oauth[:purpose])
+        return oauth2_confirmation_redirect(provider)
       elsif session[:course_uuid] && user && (course = Course.find_by_uuid_and_workflow_state(session[:course_uuid], "created"))
         claim_session_course(course, user)
         format.html { redirect_to(course_url(course, :login_success => '1')) }
@@ -628,14 +629,10 @@ class PseudonymSessionsController < ApplicationController
     session[:oauth2] = provider.session_hash
     session[:oauth2][:state] = params[:state] if params.key?(:state)
 
-    if @current_pseudonym
-      if provider.authorized_token? @current_user
-        final_oauth2_redirect(session[:oauth2][:redirect_uri], final_oauth2_redirect_params)
-      elsif
-        redirect_to oauth2_auth_confirm_url
-      end
+    if @current_pseudonym && !params[:force_login]
+      oauth2_confirmation_redirect(provider)
     else
-      redirect_to login_url(:canvas_login => params[:canvas_login])
+      redirect_to login_url(params.slice(:canvas_login, :pseudonym_session, :force_login))
     end
   end
 
@@ -659,7 +656,11 @@ class PseudonymSessionsController < ApplicationController
   end
 
   def oauth2_token
-    basic_user, basic_pass = ActionController::HttpAuthentication::Basic.user_name_and_password(request) if ActionController::HttpAuthentication::Basic.authorization(request)
+    if CANVAS_RAILS2
+      basic_user, basic_pass = ActionController::HttpAuthentication::Basic.user_name_and_password(request) if ActionController::HttpAuthentication::Basic.authorization(request)
+    else
+      basic_user, basic_pass = ActionController::HttpAuthentication::Basic.user_name_and_password(request) if request.authorization
+    end
 
     client_id = params[:client_id].presence || basic_user
     secret = params[:client_secret].presence || basic_pass
@@ -677,9 +678,19 @@ class PseudonymSessionsController < ApplicationController
   end
 
   def oauth2_logout
+    logout_current_user if params[:expire_sessions]
     return render :json => { :message => "can't delete OAuth access token when not using an OAuth access token" }, :status => 400 unless @access_token
     @access_token.destroy
     render :json => {}
+  end
+
+  def oauth2_confirmation_redirect(provider)
+    # skip the confirmation page if access is already (or automatically) granted
+    if provider.authorized_token?(@current_user)
+      final_oauth2_redirect(session[:oauth2][:redirect_uri], final_oauth2_redirect_params)
+    else
+      redirect_to oauth2_auth_confirm_url
+    end
   end
 
   def final_oauth2_redirect_params(options = {})

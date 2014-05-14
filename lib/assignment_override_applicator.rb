@@ -154,10 +154,11 @@ module AssignmentOverrideApplicator
   def self.setup_overridden_clone(assignment, overrides = [])
     clone = assignment.clone
 
-    # ActiveRecord::Base#clone nils out the primary key; put it back
-    clone.id = assignment.id
-    self.copy_preloaded_associations_to_clone(assignment,
-                                              clone)
+    # ActiveRecord::Base#clone wipes out some important crap; put it back
+    [:id, :updated_at, :created_at].each { |attr|
+      clone[attr] = assignment.send(attr)
+    }
+    self.copy_preloaded_associations_to_clone(assignment, clone)
     yield(clone) if block_given?
 
     clone.applied_overrides = overrides

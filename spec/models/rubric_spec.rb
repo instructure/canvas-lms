@@ -290,4 +290,52 @@ describe Rubric do
     r3.save!
     r3.title.should eql "rubric"
   end
+
+  context "#update_with_association" do
+    before do
+      course_with_teacher
+      @assignment = @course.assignments.create! title: "aaaaah",
+                                                points_possible: 20
+      @rubric = Rubric.new title: "r", context: @course
+    end
+
+    def test_rubric_associations(opts)
+      @rubric.should be_new_record
+      # need to run the test 2x because the code path is different for new rubrics
+      2.times do
+        @rubric.update_with_association(@teacher, {
+          id: @rubric.id,
+          title: @rubric.title,
+          criteria: {
+            "0" => {
+              description: "correctness",
+              points: 15,
+              ratings: {"0" => {points: 15, description: "asdf"}},
+            },
+          },
+        }, @course, {
+          association_object: @assignment,
+          update_if_existing: true,
+          use_for_grading: "1",
+          purpose: "grading",
+          skip_updating_points_possible: opts[:leave_different]
+        })
+        yield
+      end
+    end
+
+    it "doesn't accidentally update assignment points" do
+      test_rubric_associations(leave_different: true) do
+        @rubric.points_possible.should == 15
+        @assignment.reload.points_possible.should == 20
+      end
+    end
+
+    it "does update assignment points if you want it to" do
+      test_rubric_associations(leave_different: false) do
+        @rubric.points_possible.should == 15
+        @assignment.reload.points_possible.should == 15
+      end
+    end
+  end
 end

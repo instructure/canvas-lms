@@ -3,14 +3,16 @@
   @body_classes << "gradebook2 full-width"
   @show_left_side = false
   @show_embedded_chat = false
-  if @context.old_gradebook_visible?
+  if @context.feature_enabled?(:screenreader_gradebook)
+    add_crumb t(:srgb_gradebook, "switch gradebooks"), context_url(@context, :change_gradebook_version_context_gradebook_url, :version => "srgb"), :id => 'change_gradebook_version_link_holder'
+  elsif @context.old_gradebook_visible?
     add_crumb t(:old_gradebook, "old gradebook", :version => 1), context_url(@context, :change_gradebook_version_context_gradebook_url, :reset => true), :id => 'change_gradebook_version_link_holder'
   end
   jammit_css :slickgrid, :gradebook2
   js_bundle :gradebook2
 %>
 <div id="keyboard_navigation"></div>
-<div id="gradebook_wrapper" class="use-css-transitions-for-show-hide" style="display:none;">
+<div id="gradebook_wrapper">
 
   <% if @context.feature_enabled?(:outcome_gradebook) %>
     <div class="gradebook-header">
@@ -18,11 +20,11 @@
         <ul class="nav nav-pills gradebook-navigation-pills">
           <li class="active">
             <a href="#"
-               data-id="gradebook"><%= t(:grades, "Grades") %></a>
+               data-id="assignment"><%= t(:grades, "Grades") %></a>
           </li>
           <li>
             <a href="#"
-               data-id="outcome-gradebook"><%= t(:learning_mastery, "Learning Mastery") %></a>
+               data-id="outcome"><%= t(:learning_mastery, "Learning Mastery") %></a>
           </li>
         </ul>
       </nav>
@@ -31,7 +33,7 @@
     </div>
   <% end %>
 
-  <div class="gradebook-container">
+  <div class="assignment-gradebook-container hidden">
     <div id="gradebook-toolbar" class="toolbar">
       <% if !@context.feature_enabled?(:outcome_gradebook) %>
         <span class="section-button-placeholder"></span>
@@ -64,7 +66,7 @@
         <input type="text" class="search-query" placeholder="<%= placeholder %>" aria-label="<%= placeholder %>">
       </div>
     </div>
-    <div id="gradebook-grid-wrapper">
+    <div id="gradebook-grid-wrapper" class="use-css-transitions-for-show-hide" style="display:none;">
       <div id="gradebook_grid"></div>
     </div>
     <div style="display:none;">

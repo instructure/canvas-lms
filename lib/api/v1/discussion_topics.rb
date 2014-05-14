@@ -58,7 +58,12 @@ module Api::V1::DiscussionTopics
   # include_assignment - Optionally include the topic's assignment, if any (default: true).
   #
   # Returns a hash.
-  def discussion_topic_api_json(topic, context, user, session, include_assignment = true)
+  def discussion_topic_api_json(topic, context, user, session, opts = {})
+    opts.reverse_merge!(
+      include_assignment: true,
+      override_dates: true
+    )
+
     json = api_json(topic, user, session, {only: ALLOWED_TOPIC_FIELDS, methods: ALLOWED_TOPIC_METHODS }, [:attach, :update, :delete])
     json.merge!(serialize_additional_topic_fields(topic, context, user))
 
@@ -67,8 +72,9 @@ module Api::V1::DiscussionTopics
     end
 
     locked_json(json, topic, user, session)
-    if include_assignment && topic.assignment
-      json[:assignment] = assignment_json(topic.assignment, user, session, include_discussion_topic: false, override_dates: false)
+    if opts[:include_assignment] && topic.assignment
+      json[:assignment] = assignment_json(topic.assignment, user, session,
+        include_discussion_topic: false, override_dates: opts[:override_dates])
     end
 
     json

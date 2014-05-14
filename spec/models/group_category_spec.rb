@@ -444,6 +444,7 @@ describe GroupCategory do
       category.current_progress.should be_nil
       category.send :start_progress
       category.send :complete_progress
+      category.reload
       category.progresses.count.should == 1
       category.current_progress.should be_nil
       # expect new progress

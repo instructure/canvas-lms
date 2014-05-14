@@ -66,7 +66,7 @@ describe StreamItemsHelper do
       # this discussion topic will not be shown since it is a graded discussion with a
       # future unlock at date
       @group_assignment_discussion = group_assignment_discussion({ :course => @course })
-      @group_assignment_discussion.update_attribute(:user_id, @teacher.id)
+      @group_assignment_discussion.update_attribute(:user, @teacher)
       assignment = @group_assignment_discussion.assignment
       assignment.update_attributes({
         :due_at => 30.days.from_now,

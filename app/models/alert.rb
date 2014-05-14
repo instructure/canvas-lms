@@ -110,7 +110,7 @@ class Alert < ActiveRecord::Base
   def self.evaluate_for_course(course, account_alerts = nil, include_user_notes = nil)
     return unless course.available?
 
-    alerts = Array(account_alerts)
+    alerts = Array.new(account_alerts || [])
     alerts.concat course.alerts.all
     return if alerts.empty?
 
@@ -170,6 +170,7 @@ class Alert < ActiveRecord::Base
           group("submissions.user_id").
           where(:user_id => student_ids).
           where(Submission.needs_grading_conditions).
+          except(:order).
           count
       ungraded_counts.each do |user_id, count|
         student = data[user_id]
@@ -181,6 +182,7 @@ class Alert < ActiveRecord::Base
           group("submissions.user_id").
           where(:user_id => student_ids).
           where(Submission.needs_grading_conditions).
+          except(:order).
           minimum(:submitted_at)
       ungraded_timespans.each do |user_id, timespan|
         student = data[user_id]

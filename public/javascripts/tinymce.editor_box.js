@@ -125,7 +125,7 @@ define([
         instructure_buttons = instructure_buttons + ",instructure_external_button_clump";
       }
     }
-    if(INST && INST.allowMediaComments) {
+    if(INST && INST.allowMediaComments && (INST.kalturaSettings && !INST.kalturaSettings.hide_rte_button)) {
       instructure_buttons = instructure_buttons + ",instructure_record";
     }
     var equella_button = INST && INST.equellaEnabled ? ",instructure_equella" : "";

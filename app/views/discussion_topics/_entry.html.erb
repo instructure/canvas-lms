@@ -51,12 +51,12 @@
         </span>
       </div>
       <% end %>
-      <div class="post_date time_ago_date"><%= entry.try_rescue(:created_at).tap{|time| time && datetime_string(time)} %></div>
+      <div class="post_date time_ago_date" data-timestamp="<%= entry.try_rescue(:created_at).try_rescue(:iso8601) %>"><%= datetime_string(entry.try_rescue(:created_at)) || nbsp %></div>
       <div class="clear"></div>
     <% end %>
   </div>
   <div class="content">
-    <div style="float: left; margin: 0 5px 0 -10px;"><%= avatar((entry.try_rescue(:user_id)), entry_context.asset_string) %></div>
+    <div style="float: left; margin: 0 5px 0 -10px;"><%= avatar((entry.try_rescue(:user_id)), context_code: entry_context.asset_string) %></div>
     <div class="course_id" style="display: none;"><%= entry_context.id if entry_context && entry_context.is_a?(Course) %></div>
     <div class="message user_content"><%= user_content(entry.try_rescue(:message)) || nbsp %></div>
     <textarea class="message_html" style="display: none;"><%= h(entry.try_rescue(:message)) %></textarea>

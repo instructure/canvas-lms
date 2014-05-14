@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -24,7 +24,9 @@ describe "Accounts API", type: :request do
     user_with_pseudonym(:active_all => true)
     @a1 = account_model(:name => 'root', :default_time_zone => 'UTC', :default_storage_quota_mb => 123, :default_user_storage_quota_mb => 45, :default_group_storage_quota_mb => 42)
     @a1.add_user(@user)
-    @a2 = account_model(:name => 'subby', :parent_account => @a1, :root_account => @a1, :sis_source_id => 'sis1', :default_time_zone => 'Alaska', :default_storage_quota_mb => 321, :default_user_storage_quota_mb => 54, :default_group_storage_quota_mb => 41)
+    @sis_batch = @a1.sis_batches.create
+    SisBatch.where(id: @sis_batch).update_all(workflow_state: 'imported')
+    @a2 = account_model(:name => 'subby', :parent_account => @a1, :root_account => @a1, :sis_source_id => 'sis1',  :sis_batch_id => @sis_batch.id, :default_time_zone => 'Alaska', :default_storage_quota_mb => 321, :default_user_storage_quota_mb => 54, :default_group_storage_quota_mb => 41)
     @a2.add_user(@user)
     @a3 = account_model(:name => 'no-access')
     # even if we have access to it implicitly, it's not listed
@@ -45,6 +47,7 @@ describe "Accounts API", type: :request do
           'default_storage_quota_mb' => 123,
           'default_user_storage_quota_mb' => 45,
           'default_group_storage_quota_mb' => 42,
+          'workflow_state' => 'active',
         },
         {
           'id' => @a2.id,
@@ -52,10 +55,12 @@ describe "Accounts API", type: :request do
           'root_account_id' => @a1.id,
           'parent_account_id' => @a1.id,
           'sis_account_id' => 'sis1',
+          'sis_import_id' => @sis_batch.id,
           'default_time_zone' => 'America/Juneau',
           'default_storage_quota_mb' => 321,
           'default_user_storage_quota_mb' => 54,
           'default_group_storage_quota_mb' => 41,
+          'workflow_state' => 'active',
         },
       ]
     end
@@ -147,6 +152,7 @@ describe "Accounts API", type: :request do
           'default_storage_quota_mb' => 123,
           'default_user_storage_quota_mb' => 45,
           'default_group_storage_quota_mb' => 42,
+          'workflow_state' => 'active',
         }
     end
   end
@@ -379,19 +385,39 @@ describe "Accounts API", type: :request do
       end
     end
 
-    it "should return courses filtered by state[]" do
-      @me = @user
-      [:c1, :c2].each do |course|
-        instance_variable_set("@#{course}".to_sym, course_model(:name => course.to_s, :account => @a1))
+    describe "courses filtered by state[]" do
+      before do
+        @me = @user
+        [:c1, :c2, :c3, :c4].each do |course|
+          instance_variable_set("@#{course}".to_sym, course_model(:name => course.to_s, :account => @a1))
+        end
+        @c2.destroy
+        Course.where(id: @c1).update_all(workflow_state: 'claimed')
+        Course.where(id: @c3).update_all(workflow_state: 'available')
+        Course.where(id: @c4).update_all(workflow_state: 'completed')
+        @user = @me
       end
-      @c2.destroy
-      @user = @me
 
-      json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?state[]=deleted",
-        { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param, :format => 'json', :state => %w[deleted] })
+      it "should return courses filtered by state[]='deleted'" do
+        json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?state[]=deleted",
+                        { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param, :format => 'json', :state => %w[deleted] })
+        json.length.should eql 1
+        json.first['name'].should eql 'c2'
+      end
 
-      json.length.should eql 1
-      json.first['name'].should eql 'c2'
+      it "should return courses filtered by state[]=nil" do
+        json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses",
+                        { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param, :format => 'json' })
+        json.length.should eql 3
+        json.collect{ |c| c['id'].to_i }.sort.should == [@c1.id, @c3.id, @c4.id].sort
+      end
+
+      it "should return courses filtered by state[]='all'" do
+        json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?state[]=all",
+                        { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param, :format => 'json', :state => %w[all] })
+        json.length.should eql 4
+        json.collect{ |c| c['id'].to_i }.sort.should == [@c1.id, @c2.id, @c3.id, @c4.id].sort
+      end
     end
 
     it "should return courses filtered by enrollment_term" do

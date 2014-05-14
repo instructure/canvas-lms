@@ -341,7 +341,7 @@ define([
     var width = tool.homework_submission.selection_width || tool.selection_width;
     var height = tool.homework_submission.selection_height || tool.selection_height;
     var title = tool.display_text;
-    var $div = $("<div/>", {id: "homework_selection_dialog"}).appendTo($("body"));
+    var $div = $("<div/>", {id: "homework_selection_dialog", style: "padding: 0; overflow-y: hidden;"}).appendTo($("body"));
     function invalidToolReturn(message) {
       $.flashError(I18n.t("invalid_tool_return", "The launched tool returned an invalid resource for this assignment"));
       console.log(message);

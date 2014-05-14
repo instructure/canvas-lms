@@ -1,13 +1,16 @@
 define [
+  'jquery'
   'underscore'
   'compiled/views/DialogFormView'
   'compiled/views/MoveDialogSelect'
   'jst/MoveDialog'
   'jst/EmptyDialogFormWrapper'
-], (_, DialogFormView, MoveDialogSelect, template, wrapper) ->
+], ($, _, DialogFormView, MoveDialogSelect, template, wrapper) ->
 
   class MoveDialogView extends DialogFormView
     setViewProperties: false
+
+    className: 'form-dialog'
 
     defaults:
       width: 450

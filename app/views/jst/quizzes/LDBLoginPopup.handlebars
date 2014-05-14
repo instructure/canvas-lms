@@ -1,0 +1,28 @@
+<form id="ldb_deauthorized_dialog" class="hide">
+  <div id="unauthorized_message" class="ui-state-error">
+    <h2 class="">{{#t "titles.log_in"}}Please Log In{{/t}}</h2>
+    <p>{{#t "logged_out_of_canvas"}}
+          <strong>You have been logged out of canvas.</strong>
+          To continue please log in.
+       {{/t}}
+    </p>
+  </div>
+
+  <h1>Canvas</h1>
+
+  <div>
+    <span class="field">
+      <label for="pseudonym_session_unique_id">{{#t "email"}}Email{{/t}}</label>
+      <input id="pseudonym_session_unique_id" type="text" name="pseudonym_session[unique_id]" class="text" placeholder="{{#t 'email'}}Email{{/t}}" autocomplete="off" />
+    </span>
+
+    <span class="field">
+      <label for="pseudonym_session_password">{{#t 'password'}}Password{{/t}}</label>
+      <input id="pseudonym_session_password" type="password" name="pseudonym_session[password]" class="text" placeholder="{{#t 'password'}}Password{{/t}}" autocomplete="off" />
+    </span>
+  </div>
+
+  <div class="dialog-actions">
+    <span class="btn btn-primary">{{#t 'log_in'}}Log In{{/t}}</span>
+  </div>
+</form>

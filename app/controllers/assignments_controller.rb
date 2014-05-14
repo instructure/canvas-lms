@@ -24,7 +24,6 @@ class AssignmentsController < ApplicationController
   include Api::V1::AssignmentGroup
   include Api::V1::Outcome
 
-  include GoogleDocs
   include KalturaHelper
   before_filter :require_context
   add_crumb(proc { t '#crumbs.assignments', "Assignments" }, :except => [:destroy, :syllabus, :index]) { |c| c.send :course_assignments_path, c.instance_variable_get("@context") }
@@ -36,6 +35,7 @@ class AssignmentsController < ApplicationController
 
     if authorized_action(@context, @current_user, :read)
       return unless tab_enabled?(@context.class::TAB_ASSIGNMENTS)
+      add_crumb(t('#crumbs.assignments', "Assignments"), named_context_url(@context, :context_assignments_url))
 
       # It'd be nice to do this as an after_create, but it's not that simple
       # because of course import/copy.
@@ -79,7 +79,7 @@ class AssignmentsController < ApplicationController
           else
             format.html { redirect_to root_url }
           end
-        elsif @just_viewing_one_course && @context.assignments.new.grants_right?(@current_user, session, :update)
+        elsif @just_viewing_one_course && @context.assignments.scoped.new.grants_right?(@current_user, session, :update)
           format.html {
             render :action => :index
           }
@@ -133,8 +133,9 @@ class AssignmentsController < ApplicationController
       end
 
       begin
-        @google_docs_token = google_docs_retrieve_access_token
-      rescue NoTokenError
+        google_docs = GoogleDocs.new(google_docs_user, session)
+        @google_docs_token = google_docs.retrieve_access_token
+      rescue GoogleDocs::NoTokenError
         #do nothing
       end
 
@@ -164,7 +165,8 @@ class AssignmentsController < ApplicationController
     if assignment.allow_google_docs_submission? && @real_current_user.blank?
       docs = {}
       begin
-        docs = google_docs_list_with_extension_filter(assignment.allowed_extensions)
+        google_docs = GoogleDocs.new(google_docs_user, session)
+        docs = google_docs.list_with_extension_filter(assignment.allowed_extensions)
       rescue NoTokenError
         #do nothing
       rescue => e
@@ -330,7 +332,7 @@ class AssignmentsController < ApplicationController
   end
 
   def new
-    @assignment ||= @context.assignments.new
+    @assignment ||= @context.assignments.scoped.new
     @assignment.workflow_state = 'unpublished' if @context.feature_enabled?(:draft_state)
     add_crumb t :create_new_crumb, "Create new"
 

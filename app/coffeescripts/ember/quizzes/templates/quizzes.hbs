@@ -51,8 +51,8 @@
       </div>
         <ul id='assignment-quizzes' class='ig-list collectionViewItems'>
           {{#if assignments.length }}
-            {{#each assignments }}
-              {{render 'quiz' this}}
+            {{#each assignments}}
+              {{render 'quiz_index_row' this}}
             {{/each}}
           {{else}}
             <li>
@@ -81,8 +81,8 @@
       </div>
       <ul id='practice-quizzes' class='ig-list collectionViewItems'>
         {{#if practices.length}}
-          {{#each practices }}
-            {{render 'quiz' this}}
+          {{#each practices}}
+            {{render 'quiz_index_row' this}}
           {{/each}}
         {{else}}
           <li>
@@ -111,8 +111,8 @@
       </div>
       <ul id='surveys-quizzes' class='ig-list collectionViewItems'>
         {{#if surveys.length}}
-          {{#each surveys }}
-            {{render 'quiz' this}}
+          {{#each surveys}}
+            {{render 'quiz_index_row' this}}
           {{/each}}
         {{else}}
           <li>

@@ -1,10 +1,11 @@
 define [
   'i18n!discussions'
+  'jquery'
   'compiled/views/DialogFormView'
   'compiled/models/DiscussionsSettings'
   'compiled/models/UserSettings'
   'jst/DiscussionTopics/DiscussionsSettingsView'
-], (I18n, DialogFormView, DiscussionsSettings, UserSettings, template) ->
+], (I18n, $, DialogFormView, DiscussionsSettings, UserSettings, template) ->
 
   class DiscussionsSettingsView extends DialogFormView
 

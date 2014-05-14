@@ -1,4 +1,5 @@
 @import "environment";
+@import "move_dialog";
 
 // min width to ensure toolbar doesn't stagger
 #main { min-width: 700px; }
@@ -186,7 +187,7 @@
     }
     &.discussion-published {
       .discussion-type, .discussion-title a {
-        color: #34832B;
+        color: #33802a;
       }
     }
   }
@@ -200,6 +201,14 @@
   .discussion-type {
     text-align: center;
     width: 36px;
+  }
+
+  .discussion-date-available {
+    width: 200px;
+
+    .status-description {
+      font-weight: bold;
+    }
   }
 
   .discussion-due-date {

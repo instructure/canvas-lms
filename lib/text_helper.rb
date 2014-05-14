@@ -145,6 +145,15 @@ def self.date_component(start_date, style=:normal)
     end
   end
 
+  def unlocalized_datetime_string(start_datetime, datetime_type=:event)
+    start_datetime = start_datetime.in_time_zone rescue start_datetime
+    return nil unless start_datetime
+
+    date_format = (datetime_type == :verbose || start_datetime.year != Time.zone.today.year) ? "%b %-d, %Y" : "%b %-d"
+    time_format = start_datetime.min == 0 ?  "%l%P" : "%l:%M%P"
+    return start_datetime.strftime("#{date_format} at #{time_format}")
+  end
+
   def time_ago_in_words_with_ago(time)
     I18n.t('#time.with_ago', '%{time} ago', :time => (time_ago_in_words time rescue ''))
   end
@@ -309,40 +318,5 @@ def self.date_component(start_date, style=:normal)
     # Strip wrapping <p></p> if inlinify == :auto && they completely wrap the result && there are not multiple <p>'s
     result.gsub!(/<\/?p>/, '') if inlinify == :auto && result =~ /\A<p>.*<\/p>\z/m && !(result =~ /.*<p>.*<p>.*/m)
     result.strip.html_safe
-  end
-
-  # This doesn't make any attempt to convert other encodings to utf-8, it just
-  # removes invalid bytes from otherwise valid utf-8 strings.
-  # Basically, this is a last ditch effort, you probably don't want to use it
-  # as part of normal request processing.
-  # It's used for things like filtering out ErrorReport data so that we can
-  # make sure we won't get an invalid utf-8 error trying to save the error
-  # report to the db.
-  def self.strip_invalid_utf8(string)
-    return string if string.nil?
-    # add four spaces to the end of the string, because iconv with the //IGNORE
-    # option will still fail on incomplete byte sequences at the end of the input
-    # we force_encoding on the returned string because Iconv.conv returns binary.
-    string = Iconv.conv('UTF-8//IGNORE', 'UTF-8', string + '    ')[0...-4]
-    if string.respond_to?(:force_encoding)
-      string.force_encoding(Encoding::UTF_8)
-    end
-    string
-  end
-
-  def self.recursively_strip_invalid_utf8!(object, force_utf8 = false)
-    case object
-    when Hash
-      object.each_value { |o| self.recursively_strip_invalid_utf8!(o, force_utf8) }
-    when Array
-      object.each { |o| self.recursively_strip_invalid_utf8!(o, force_utf8) }
-    when String
-      if object.encoding == Encoding::ASCII_8BIT && force_utf8
-        object.force_encoding(Encoding::UTF_8)
-      end
-      if !object.valid_encoding?
-        object.replace(self.strip_invalid_utf8(object))
-      end
-    end
   end
 end

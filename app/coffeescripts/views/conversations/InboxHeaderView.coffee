@@ -4,8 +4,8 @@ define [
   'Backbone'
   'compiled/views/conversations/CourseSelectionView'
   'compiled/views/conversations/SearchView'
-  'use!vendor/bootstrap/bootstrap-dropdown'
-  'use!vendor/bootstrap-select/bootstrap-select'
+  'vendor/bootstrap/bootstrap-dropdown'
+  'vendor/bootstrap-select/bootstrap-select'
 ], (I18n, _, {View}, CourseSelectionView, SearchView) ->
 
   class InboxHeaderView extends View
@@ -20,6 +20,7 @@ define [
       '#course-filter'   : '$courseFilter'
       '#admin-btn'       : '$adminBtn'
       '#mark-unread-btn' : '$markUnreadBtn'
+      '#mark-read-btn'   : '$markReadBtn'
       '#forward-btn'     : '$forwardBtn'
       '#star-toggle-btn' : '$starToggleBtn'
       '#admin-menu'      : '$adminMenu'
@@ -36,6 +37,7 @@ define [
       'change #type-filter':      'onFilterChange'
       'change #course-filter':    'onFilterChange'
       'click #mark-unread-btn':   'onMarkUnread'
+      'click #mark-read-btn':   'onMarkRead'
       'click #forward-btn':       'onForward'
       'click #star-toggle-btn':   'onStarToggle'
 
@@ -81,6 +83,10 @@ define [
       e.preventDefault()
       @trigger('mark-unread')
 
+    onMarkRead: (e) ->
+      e.preventDefault()
+      @trigger('mark-read')
+
     onForward: (e) ->
       e.preventDefault()
       @trigger('forward')
@@ -109,13 +115,15 @@ define [
         newModel.on('change:starred', @onStarStateChange, this)
 
     onReadStateChange: (msg) ->
-      @hideForwardBtn(!msg)
       @hideMarkUnreadBtn(!msg || msg.unread())
+      @hideMarkReadBtn(!msg || !msg.unread())
+      @refreshMenu()
 
     onStarStateChange: (msg) ->
       if msg
         key = if msg.starred() then 'unstar' else 'star'
         @$starToggleBtn.text(@messages[key])
+      @refreshMenu()
 
     onArchivedStateChange: (msg) ->
       return if !msg
@@ -124,6 +132,10 @@ define [
       @$archiveBtn.attr('title', if archived then @messages['unarchive'] else @messages['archive'])
       @$archiveBtn.find('.screenreader-only')
         .text(if archived then @messages['unarchive_conversation'] else @messages['archive_conversation'])
+      @refreshMenu()
+
+    refreshMenu: ->
+      @$adminMenu.menu('refresh') if @$adminMenu.is('.ui-menu')
 
     filterObj: (obj) -> _.object(_.filter(_.pairs(obj), (x) -> !!x[1]))
 
@@ -142,6 +154,7 @@ define [
       @toggleArchiveBtn(value)
       @toggleDeleteBtn(value)
       @toggleAdminBtn(value)
+      @hideForwardBtn(value)
 
     toggleReplyBtn:    (value) -> @_toggleBtn(@$replyBtn, value)
 
@@ -155,11 +168,9 @@ define [
 
     hideMarkUnreadBtn: (hide) -> if hide then @$markUnreadBtn.parent().detach() else @$adminMenu.prepend(@$markUnreadBtn.parent())
 
-    hideForwardBtn:    (hide) -> if hide then @$forwardBtn.parent().detach() else @$adminMenu.prepend(@$forwardBtn.parent())
+    hideMarkReadBtn: (hide) -> if hide then @$markReadBtn.parent().detach() else @$adminMenu.prepend(@$markReadBtn.parent())
 
-    updateAdminMenu: (messages) ->
-      @hideMarkUnreadBtn(!messages.length)
-      @hideForwardBtn(messages.length > 1)
+    hideForwardBtn:    (hide) -> if hide then @$forwardBtn.parent().detach() else @$adminMenu.prepend(@$forwardBtn.parent())
 
     focusCompose: ->
       @$composeBtn.focus()

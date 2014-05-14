@@ -18,15 +18,20 @@
 
 class DelayedNotification < ActiveRecord::Base
   include Workflow
+
   belongs_to :asset, :polymorphic => true
   belongs_to :notification
   belongs_to :asset_context, :polymorphic => true
+
   attr_accessible :asset, :notification, :recipient_keys, :asset_context, :data
   attr_accessor :data
   validates_presence_of :notification_id, :asset_id, :asset_type, :workflow_state
-  
+
   serialize :recipient_keys
-  
+
+  include PolymorphicTypeOverride
+  override_polymorphic_types asset_type: {'QuizSubmission' => 'Quizzes::QuizSubmission'}
+
   workflow do
     state :to_be_processed do
       event :do_process, :transitions_to => :processed
@@ -34,13 +39,13 @@ class DelayedNotification < ActiveRecord::Base
     state :processed
     state :errored
   end
-  
+
   def self.process(asset, notification, recipient_keys, asset_context, data)
     dn = DelayedNotification.new(:asset => asset, :notification => notification, :recipient_keys => recipient_keys,
       :asset_context => asset_context, :data => data)
     dn.process
   end
-  
+
   def process
     tos = self.to_list
     if self.asset && !tos.empty?
@@ -57,7 +62,7 @@ class DelayedNotification < ActiveRecord::Base
     self.save
     []
   end
-  
+
   def to_list
     return @to_list if @to_list
     lookups = {}

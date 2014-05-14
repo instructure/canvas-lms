@@ -1,7 +1,8 @@
 require [
+  'jquery'
   'compiled/views/groups/manage/GroupCategoriesView'
   'compiled/collections/GroupCategoryCollection'
-], (GroupCategoriesView, GroupCategoryCollection) ->
+], ($, GroupCategoriesView, GroupCategoryCollection) ->
 
   groupCategories = new GroupCategoryCollection(ENV.group_categories)
 

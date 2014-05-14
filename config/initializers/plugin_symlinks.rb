@@ -27,7 +27,6 @@ File.open(__FILE__) do |f|
   maintain_plugin_symlinks('public')
   # our new unified build.js and friends require these two symlinks
   maintain_plugin_symlinks('public/javascripts')
-  maintain_plugin_symlinks('public/optimized')
   maintain_plugin_symlinks('app/coffeescripts')
   maintain_plugin_symlinks('app/views/jst')
   maintain_plugin_symlinks('app/stylesheets')

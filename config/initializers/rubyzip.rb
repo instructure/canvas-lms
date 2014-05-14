@@ -5,6 +5,8 @@
 
 require 'zip'
 
+Zip.write_zip64_support = true
+
 Zip::Entry::class_eval do
   def fix_name_encoding
     @name.force_encoding('UTF-8')

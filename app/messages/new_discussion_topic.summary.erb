@@ -6,4 +6,4 @@
     <%= t :subject, "New Discussion - %{discussion_topic}: %{course}", :discussion_topic => asset.title, :course => asset.context.name %>
 <% end %>
 
-<%= truncate_text(html_to_simple_text(asset.message, :base_url => "#{HostUrl.protocol}://#{HostUrl.context_host(asset.context)}"), :max_length => 200) %> 
+<%= truncate_text(html_to_text(asset.message, :base_url => "#{HostUrl.protocol}://#{HostUrl.context_host(asset.context)}"), :max_length => 200) %>

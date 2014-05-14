@@ -1,9 +1,10 @@
 define [
   'i18n!conferences'
+  'jquery'
   'Backbone'
   'jst/conferences/newConference'
   'jquery.google-analytics'
-], (I18n, {View}, template) ->
+], (I18n, $, {View}, template) ->
 
   class ConferenceView extends View
 

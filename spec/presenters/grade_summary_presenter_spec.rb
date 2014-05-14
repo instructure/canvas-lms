@@ -73,6 +73,60 @@ describe GradeSummaryPresenter do
       assignment_stats.min.to_f.should == 0
       assignment_stats.avg.to_f.should == 5
     end
+
+    it 'filters out test students and inactive enrollments' do
+      @course = Course.create!
+      teacher_in_course({:course => @course})
+      s1, s2, s3, removed_student = n_students_in_course(4, {:course => @course})
+
+      fake_student = course_with_user('StudentViewEnrollment', {:course => @course}).user
+      fake_student.preferences[:fake_student] = true
+
+      a = @course.assignments.create! points_possible: 10
+      a.grade_student s1, grade:  0
+      a.grade_student s2, grade:  5
+      a.grade_student s3, grade: 10
+      a.grade_student removed_student, grade: 20
+      a.grade_student fake_student, grade: 100
+
+      removed_student.enrollments.each do |enrollment|
+        enrollment.workflow_state = 'inactive'
+        enrollment.save!
+      end
+
+      p = GradeSummaryPresenter.new(@course, @teacher, nil)
+      stats = p.assignment_stats
+      assignment_stats = stats[a.id]
+      assignment_stats.max.to_f.should == 10
+      assignment_stats.min.to_f.should == 0
+      assignment_stats.avg.to_f.should == 5
+    end
+  end
+
+  describe '#submission count' do
+    it 'filters out test students and inactive enrollments' do
+      @course = Course.create!
+      teacher_in_course
+      s1, s2, s3, removed_student = n_students_in_course(4, {:course => @course})
+
+      fake_student = course_with_user('StudentViewEnrollment', {:course => @course}).user
+      fake_student.preferences[:fake_student] = true
+
+      a = @course.assignments.create! points_possible: 10
+      a.grade_student s1, grade:  0
+      a.grade_student s2, grade:  5
+      a.grade_student s3, grade: 10
+      a.grade_student removed_student, grade: 20
+      a.grade_student fake_student, grade: 100
+
+      removed_student.enrollments.each do |enrollment|
+        enrollment.workflow_state = 'inactive'
+        enrollment.save!
+      end
+
+      p = GradeSummaryPresenter.new(@course, @teacher, nil)
+      p.submission_counts.values[0].should == 3
+    end
   end
 
   describe '#submissions' do

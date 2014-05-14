@@ -70,12 +70,12 @@ describe LtiOutbound::ToolLaunch do
       assignment.allowed_extensions = ['jpg', 'pdf']
     end
     @tool_launch = LtiOutbound::ToolLaunch.new(:url => 'http://www.yahoo.com',
-                                                    :tool => @tool,
-                                                    :user => @user,
-                                                    :context => @course,
-                                                    :link_code => '123456',
-                                                    :return_url => 'http://www.google.com',
-                                                    :outgoing_email_address => 'outgoing_email_address')
+                                               :tool => @tool,
+                                               :user => @user,
+                                               :context => @course,
+                                               :link_code => '123456',
+                                               :return_url => 'http://www.google.com',
+                                               :outgoing_email_address => 'outgoing_email_address')
   end
 
   describe '#generate' do
@@ -113,6 +113,37 @@ describe LtiOutbound::ToolLaunch do
       expect(hash['oauth_callback']).to eq 'about:blank'
     end
 
+    describe 'selected_html' do
+      it 'gets escaped and assigned to the key text if passed in' do
+        tool_launch = LtiOutbound::ToolLaunch.new(:url => 'http://www.yahoo.com',
+                                                  :tool => @tool,
+                                                  :user => @user,
+                                                  :context => @course,
+                                                  :context => @course,
+                                                  :link_code => '123456',
+                                                  :return_url => 'http://www.google.com',
+                                                  :selected_html => '<div>something</div>')
+
+        hash = tool_launch.generate
+
+        expect(hash['text']).to eq '%3Cdiv%3Esomething%3C%2Fdiv%3E'
+      end
+
+      it 'does not include the key if missing' do
+        tool_launch = LtiOutbound::ToolLaunch.new(:url => 'http://www.yahoo.com',
+                                                  :tool => @tool,
+                                                  :user => @user,
+                                                  :context => @course,
+                                                  :link_code => '123456',
+                                                  :return_url => 'http://www.google.com')
+
+        hash = tool_launch.generate
+
+        expect(hash.keys).to_not include('text')
+
+      end
+    end
+
     it 'sets the locale if I18n.localizer exists' do
       I18n.localizer = lambda { :es }
       hash = @tool_launch.generate
@@ -123,11 +154,11 @@ describe LtiOutbound::ToolLaunch do
 
     it 'adds account info in launch data for account navigation' do
       hash = LtiOutbound::ToolLaunch.new(:url => 'http://www.yahoo.com',
-                                              :tool => @tool,
-                                              :user => @user,
-                                              :context => @account,
-                                              :link_code => '123456',
-                                              :return_url => 'http://www.google.com').generate
+                                         :tool => @tool,
+                                         :user => @user,
+                                         :context => @account,
+                                         :link_code => '123456',
+                                         :return_url => 'http://www.google.com').generate
       expect(hash['custom_canvas_account_id']).to eq 'account_id'
       expect(hash['custom_canvas_account_sis_id']).to eq 'account_sis_source_id'
       expect(hash['custom_canvas_user_login_id']).to eq 'user_login_id'
@@ -135,11 +166,11 @@ describe LtiOutbound::ToolLaunch do
 
     it 'adds account and user info in launch data for user profile launch' do
       hash = LtiOutbound::ToolLaunch.new(:url => 'http://www.yahoo.com',
-                                              :tool => @tool,
-                                              :user => @user,
-                                              :context => @user,
-                                              :link_code => '123456',
-                                              :return_url => 'http://www.google.com').generate
+                                         :tool => @tool,
+                                         :user => @user,
+                                         :context => @user,
+                                         :link_code => '123456',
+                                         :return_url => 'http://www.google.com').generate
       expect(hash['custom_canvas_account_id']).to eq 'root_account_id'
       expect(hash['custom_canvas_account_sis_id']).to eq 'root_account_sis_source_id'
       expect(hash['lis_person_sourcedid']).to eq 'sis_user_id'
@@ -149,22 +180,22 @@ describe LtiOutbound::ToolLaunch do
 
     it 'includes URI query parameters' do
       hash = LtiOutbound::ToolLaunch.new(:url => 'http://www.yahoo.com?paramater_a=value_a&parameter_b=value_b',
-                                              :tool => @tool,
-                                              :user => @user,
-                                              :context => @course,
-                                              :link_code => '123456',
-                                              :return_url => 'http://www.google.com').generate
+                                         :tool => @tool,
+                                         :user => @user,
+                                         :context => @course,
+                                         :link_code => '123456',
+                                         :return_url => 'http://www.google.com').generate
       expect(hash['paramater_a']).to eq 'value_a'
       expect(hash['parameter_b']).to eq 'value_b'
     end
 
     it 'does not allow overwriting other parameters from the URI query string' do
       hash = LtiOutbound::ToolLaunch.new(:url => 'http://www.yahoo.com?user_id=ATTEMPT_TO_SET_DATA&oauth_callback=ATTEMPT_TO_SET_DATA',
-                                              :tool => @tool,
-                                              :user => @user,
-                                              :context => @course,
-                                              :link_code => '123456',
-                                              :return_url => 'http://www.google.com').generate
+                                         :tool => @tool,
+                                         :user => @user,
+                                         :context => @course,
+                                         :link_code => '123456',
+                                         :return_url => 'http://www.google.com').generate
       expect(hash['user_id']).to eq 'user_opaque_identifier'
       expect(hash['oauth_callback']).to eq 'about:blank'
     end
@@ -223,28 +254,15 @@ describe LtiOutbound::ToolLaunch do
       expect(hash['lis_person_contact_email_primary']).to eq 'nobody@example.com'
     end
 
-    it 'includes text if set' do
-      @launch = LtiOutbound::ToolLaunch.new(:url => 'http://www.yahoo.com',
-                                                 :tool => @tool,
-                                                 :user => @user,
-                                                 :context => @course,
-                                                 :link_code => '123456',
-                                                 :return_url => 'http://www.yahoo.com')
-      html = '<p>this has <a href='#'>a link</a></p>'
-      @launch.has_selection_html!(html)
-      hash = @launch.generate
-      expect(hash['text']).to eq CGI::escape(html)
-    end
-
     it 'gets the correct width and height based on resource type' do
       @tool.settings = {editor_button: {:selection_width => 1000, :selection_height => 300, :icon_url => 'www.example.com/icon', :url => 'www.example.com'}}
       hash = LtiOutbound::ToolLaunch.new(:url => 'http://www.yahoo.com',
-                                              :tool => @tool,
-                                              :user => @user,
-                                              :context => @course,
-                                              :link_code => '123456',
-                                              :return_url => 'http://www.yahoo.com',
-                                              :resource_type => 'editor_button').generate
+                                         :tool => @tool,
+                                         :user => @user,
+                                         :context => @course,
+                                         :link_code => '123456',
+                                         :return_url => 'http://www.yahoo.com',
+                                         :resource_type => 'editor_button').generate
       expect(hash['launch_presentation_width']).to eq '1000'
       expect(hash['launch_presentation_height']).to eq '300'
     end
@@ -270,12 +288,12 @@ describe LtiOutbound::ToolLaunch do
 
       it 'substitutes account if context is account' do
         tool_launch = LtiOutbound::ToolLaunch.new(:url => 'http://www.yahoo.com',
-                                                       :tool => @tool,
-                                                       :user => @user,
-                                                       :context => @account,
-                                                       :link_code => '123456',
-                                                       :return_url => 'http://www.google.com',
-                                                       :outgoing_email_address => 'outgoing_email_address')
+                                                  :tool => @tool,
+                                                  :user => @user,
+                                                  :context => @account,
+                                                  :link_code => '123456',
+                                                  :return_url => 'http://www.google.com',
+                                                  :outgoing_email_address => 'outgoing_email_address')
         tool_launch.generate
 
         expect(@substitutor).to have_received(:substitute_all!).with(anything, @user, nil, @account, @consumer_instance)

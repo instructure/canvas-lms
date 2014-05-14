@@ -91,7 +91,7 @@
 <h3 class="service_type"><%= image_tag "#{service_type}_icon.png", :alt => "" %><%= service_type.titleize %></h3>
 <div class="short_description"><%= UserService.short_description(service_type) %></div>
 <ul class="user_list">
-<% services.once_per(&:user_id).each do |service| %>
+<% services.uniq(&:user_id).each do |service| %>
   <li class="<%= 'current_user' if @current_user && service.user_id == @current_user.id %>">
     <% if service.has_profile_link? %>
       <a href="<%= service.service_user_link %>">

@@ -67,7 +67,7 @@ describe Api::V1::DiscussionTopics do
     @topic.assignment = assignment_model(:course => @course)
     @topic.save!
 
-    data = @test_api.discussion_topic_api_json(@topic, @topic.context, @me, nil, true)
+    data = @test_api.discussion_topic_api_json(@topic, @topic.context, @me, nil, include_assignment: true)
     data[:assignment].should_not be_nil
   end
 end
@@ -99,7 +99,7 @@ describe DiscussionTopicsController, type: :request do
 
   # needed for user_display_json
   def avatar_url_for_user(user, *a)
-    "http://www.example.com/images/messages/avatar-50.png"
+    User.avatar_fallback_url
   end
   def blank_fallback
     nil
@@ -1845,8 +1845,8 @@ describe DiscussionTopicsController, type: :request do
       json['unread_entries'].sort.should == (@topic.discussion_entries - [@root2, @reply3] - @topic.discussion_entries.select { |e| e.user == @user }).map(&:id).sort
 
       json['participants'].sort_by { |h| h['id'] }.should == [
-        { 'id' => @student.id, 'display_name' => @student.short_name, 'avatar_image_url' => "http://www.example.com/images/messages/avatar-50.png", "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@student.id}" },
-        { 'id' => @teacher.id, 'display_name' => @teacher.short_name, 'avatar_image_url' => "http://www.example.com/images/messages/avatar-50.png", "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}" },
+        { 'id' => @student.id, 'display_name' => @student.short_name, 'avatar_image_url' => User.avatar_fallback_url, "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@student.id}" },
+        { 'id' => @teacher.id, 'display_name' => @teacher.short_name, 'avatar_image_url' => User.avatar_fallback_url, "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}" },
       ].sort_by { |h| h['id'] }
 
       reply_reply1_attachment_json = {
@@ -1977,6 +1977,34 @@ describe DiscussionTopicsController, type: :request do
         },
       ]
     end
+  end
+
+  it "returns due dates as they apply to the user" do
+    course_with_student(:active_all => true)
+    @user = @student
+    @student.enrollments.map(&:destroy!)
+    @section = @course.course_sections.create! :name => "afternoon delight"
+    @course.enroll_user(@student,'StudentEnrollment',
+                        :section => @section,
+                        :enrollment_state => :active)
+
+    @topic = @course.discussion_topics.create!(:title => "title", :message => "message", :user => @teacher, :discussion_type => 'threaded')
+    @assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title, :due_at => 1.day.from_now)
+    @assignment.saved_by = :discussion_topic
+    @topic.assignment = @assignment
+    @topic.save
+
+    override = @assignment.assignment_overrides.build
+    override.set = @section
+    override.title = "extension"
+    override.due_at = 2.day.from_now
+    override.due_at_overridden = true
+    override.save!
+
+    json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+              { :controller => "discussion_topics_api", :action => "show", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
+    json['assignment'].should_not be_nil
+    json['assignment']['due_at'].should == override.due_at.iso8601.to_s
   end
 end
 

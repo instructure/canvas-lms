@@ -19,6 +19,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../cassandra_spec_helper')
 
+require 'csv'
+
 describe PageViewsController do
 
   # Factory-like thing for page views.

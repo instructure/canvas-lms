@@ -1,11 +1,12 @@
 # does Rails-style flash message/error boxes that drop down from the top of the screen
 define [
   'i18n!shared.flash_notices'
+  'jquery'
   'underscore'
   'compiled/fn/preventDefault'
   'jqueryui/effects/drop'
   'vendor/jquery.cookie'
-], (I18n, _, preventDefault) ->
+], (I18n, $, _, preventDefault) ->
 
   $buffer = $("#flash_message_buffer")
   $holder = $("#flash_message_holder")

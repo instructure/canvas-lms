@@ -48,12 +48,18 @@
 #         },
 #         "short_name": {
 #           "description": "A short name the user has selected, for use in conversations or other less formal places through the site.",
+#           "example": "Shelly",
 #           "type": "string"
 #         },
 #         "sis_user_id": {
-#           "description": "The SIS ID associated with the user.  This field is only included if the user came from a SIS import.",
+#           "description": "The SIS ID associated with the user.  This field is only included if the user came from a SIS import and has permissions to view SIS information.",
 #           "example": "SHEL93921",
 #           "type": "string"
+#         },
+#         "sis_import_id": {
+#           "description": "The id of the SIS import.  This field is only included if the user came from a SIS import and has permissions to manage SIS information.",
+#           "example": "18",
+#           "type": "int64"
 #         },
 #         "sis_login_id": {
 #           "description": "DEPRECATED: The SIS login ID associated with the user. Please use the sis_user_id or login_id. This field will be removed in a future version of the API.",
@@ -98,9 +104,6 @@
 #       }
 #     }
 class UsersController < ApplicationController
-
-
-  include GoogleDocs
   include Twitter
   include LinkedIn
   include DeliciousDiigo
@@ -141,7 +144,7 @@ class UsersController < ApplicationController
     end
     return_to_url = params[:return_to] || user_profile_url(@current_user)
     if params[:service] == "google_docs"
-      redirect_to google_docs_request_token_url(return_to_url)
+      redirect_to GoogleDocs.request_token_url(return_to_url, session, google_docs_user, request.host_with_port, oauth_success_url(:service => 'google_docs'))
     elsif params[:service] == "twitter"
       redirect_to twitter_request_token_url(return_to_url)
     elsif params[:service] == "linked_in"
@@ -149,7 +152,7 @@ class UsersController < ApplicationController
     elsif params[:service] == "facebook"
       oauth_request = OauthRequest.create(
         :service => 'facebook',
-        :secret => AutoHandle.generate("fb", 10),
+        :secret => CanvasUuid::Uuid.generate("fb", 10),
         :return_url => return_to_url,
         :user => @current_user,
         :original_host_with_port => request.host_with_port
@@ -182,7 +185,7 @@ class UsersController < ApplicationController
         end
       elsif params[:service] == "google_docs"
         begin
-          google_docs_get_access_token(oauth_request, params[:oauth_verifier])
+          GoogleDocs.get_access_token(oauth_request, params[:oauth_verifier], session, google_docs_user)
           flash[:notice] = t('google_docs_added', "Google Docs access authorized!")
         rescue => e
           ErrorReport.log_exception(:oauth, e)
@@ -227,10 +230,11 @@ class UsersController < ApplicationController
         if @context && @context.is_a?(Account) && @query
           @users = @context.users_name_like(@query)
         elsif params[:enrollment_term_id].present? && @root_account == @context
-          # fast_all_users already specifies a select for the distinct to work on
-          @users = @context.fast_all_users.joins(:courses).
-              where(:courses => { :enrollment_term_id => params[:enrollment_term_id] })
-          @users = @users.uniq
+          @users = @context.fast_all_users.
+              where("EXISTS (?)", Enrollment.where("enrollments.user_id=users.id").
+                joins(:course).
+                where(User.enrollment_conditions(:active)).
+                where(courses: { enrollment_term_id: params[:enrollment_term_id]}))
         elsif !api_request?
           @users = @context.fast_all_users
         end
@@ -249,7 +253,7 @@ class UsersController < ApplicationController
           return render :json => users.map { |u| user_json(u, @current_user, session) }
         else
           @users ||= []
-          @users = @users.paginate(:page => params[:page], :per_page => @per_page, :total_entries => @users.size)
+          @users = @users.paginate(:page => params[:page])
         end
 
         respond_to do |format|
@@ -277,7 +281,7 @@ class UsersController < ApplicationController
 
   before_filter :require_password_session, :only => [:masquerade]
   def masquerade
-    @user = User.find_by_id(params[:user_id])
+    @user = api_find(User, params[:user_id])
     return render_unauthorized_action unless @user.can_masquerade?(@real_current_user || @current_user, @domain_root_account)
     if request.post?
       if @user == @real_current_user
@@ -293,6 +297,9 @@ class UsersController < ApplicationController
   end
 
   def user_dashboard
+    if custom_dashboard_url
+      return redirect_to custom_dashboard_url
+    end
     check_incomplete_registration
     get_context
 
@@ -795,8 +802,11 @@ class UsersController < ApplicationController
     @opaque_id = @tool.opaque_identifier_for(@current_user)
     @resource_type = 'user_navigation'
     @return_url = user_profile_url(@current_user, :include_host => true)
-    @launch = BasicLTI::ToolLaunch.new(:url => @resource_url, :tool => @tool, :user => @current_user, :context => @domain_root_account, :link_code => @opaque_id, :return_url => @return_url, :resource_type => @resource_type)
-    @tool_settings = @launch.generate
+
+    adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @domain_root_account)
+    adapter.prepare_tool_launch(@return_url, resource_type: @resource_type, link_code: @opaque_id)
+    @tool_settings = adapter.generate_post_payload
+
     @active_tab = @tool.asset_string
     add_crumb(@current_user.short_name, user_profile_path(@current_user))
     render :template => 'external_tools/tool_show'
@@ -868,6 +878,12 @@ class UsersController < ApplicationController
   # @argument communication_channel[address] [Optional, String]
   #   The communication channel address, e.g. the user's email address.
   #
+  # @argument communication_channel[skip_confirmation] [Optional, Boolean]
+  #   Only valid for site admins and account admins making requests; If true, the channel is
+  #   automatically validated and no confirmation email or SMS is sent.
+  #   Otherwise, the user must respond to a confirmation message to confirm the
+  #   channel.
+  #
   # @returns User
   def create
     # Look for an incomplete registration with this pseudonym
@@ -887,6 +903,8 @@ class UsersController < ApplicationController
     if params[:communication_channel]
       cc_type = params[:communication_channel][:type] || CommunicationChannel::TYPE_EMAIL
       cc_addr = params[:communication_channel][:address]
+      skip_confirmation = value_to_boolean(params[:communication_channel][:skip_confirmation]) &&
+        (Account.site_admin.grants_right?(@current_user, :manage_students) || @context.grants_right?(@current_user, :manage_students))
     else
       cc_type = CommunicationChannel::TYPE_EMAIL
       cc_addr = params[:pseudonym].delete(:path) || params[:pseudonym][:unique_id]
@@ -919,7 +937,7 @@ class UsersController < ApplicationController
       @user.require_self_enrollment_code = self_enrollment
       @user.validation_root_account = @domain_root_account
     end
-    
+
     @observee = nil
     if @user.initial_enrollment_type == 'observer'
       # TODO: SAML/CAS support
@@ -954,7 +972,7 @@ class UsersController < ApplicationController
       @user.communication_channels.where(:path_type => cc_type).by_path(cc_addr).first ||
       @user.communication_channels.build(:path_type => cc_type, :path => cc_addr)
     @cc.user = @user
-    @cc.workflow_state = 'unconfirmed' unless @cc.workflow_state == 'confirmed'
+    @cc.workflow_state = skip_confirmation ? 'active' : 'unconfirmed' unless @cc.workflow_state == 'confirmed'
 
     if @user.valid? && @pseudonym.valid? && @observee.nil?
       # saving the user takes care of the @pseudonym and @cc, so we can't call
@@ -1010,17 +1028,17 @@ class UsersController < ApplicationController
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/users/<user_id>/settings \
-  #     -X PUT \ 
+  #     -X PUT \
   #     -F 'manual_mark_as_read=true'
   #     -H 'Authorization: Bearer <token>'
   def settings
     user = api_find(User, params[:id])
 
-    case request.request_method
-    when :get
+    case
+    when request.get?
       return unless authorized_action(user, @current_user, :read)
       render(json: { manual_mark_as_read: @current_user.manual_mark_as_read? })
-    when :put
+    when request.put?
       return unless authorized_action(user, @current_user, [:manage, :manage_user_details])
       unless params[:manual_mark_as_read].nil?
         mark_as_read = value_to_boolean(params[:manual_mark_as_read])
@@ -1076,11 +1094,11 @@ class UsersController < ApplicationController
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/users/133.json' \
-  #        -X PUT \ 
-  #        -F 'user[name]=Sheldon Cooper' \ 
-  #        -F 'user[short_name]=Shelly' \ 
-  #        -F 'user[time_zone]=Pacific Time (US & Canada)' \ 
-  #        -F 'user[avatar][token]=<opaque_token>' \ 
+  #        -X PUT \
+  #        -F 'user[name]=Sheldon Cooper' \
+  #        -F 'user[short_name]=Shelly' \
+  #        -F 'user[time_zone]=Pacific Time (US & Canada)' \
+  #        -F 'user[avatar][token]=<opaque_token>' \
   #        -H "Authorization: Bearer <token>"
   #
   # @returns User
@@ -1088,7 +1106,7 @@ class UsersController < ApplicationController
     params[:user] ||= {}
     @user = api_request? ?
       api_find(User, params[:id]) :
-      params[:id] ? User.find(params[:id]) : @current_user
+      params[:id] ? api_find(User, params[:id]) : @current_user
 
     if params[:default_pseudonym_id] && authorized_action(@user, @current_user, :manage)
       @default_pseudonym = @user.pseudonyms.find(params[:default_pseudonym_id])
@@ -1294,13 +1312,13 @@ class UsersController < ApplicationController
   # you won't be able to make API calls or log into Canvas.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/users/5 \ 
-  #       -H 'Authorization: Bearer <ACCESS_TOKEN>' \ 
+  #     curl https://<canvas>/api/v1/users/5 \
+  #       -H 'Authorization: Bearer <ACCESS_TOKEN>' \
   #       -X DELETE
   #
   # @returns User
   def destroy
-    @user = api_request? ? api_find(User, params[:id]) : User.find(params[:id])
+    @user = api_find(User, params[:id])
     if authorized_action(@user, @current_user, [:manage, :manage_logins])
       @user.destroy(@user.grants_right?(@current_user, session, :manage_logins))
       if @user == @current_user
@@ -1396,7 +1414,7 @@ class UsersController < ApplicationController
         student = User.find(params[:student_id])
         enrollments = student.student_enrollments.active.includes(:course).all
         enrollments.each do |enrollment|
-          should_include = enrollment.course.user_has_been_instructor?(@teacher) && 
+          should_include = enrollment.course.user_has_been_instructor?(@teacher) &&
                            enrollment.course.enrollments_visible_to(@teacher, :include_priors => true).find_by_id(enrollment.id) &&
                            enrollment.course.grants_right?(@current_user, :read_reports)
           if should_include
@@ -1436,12 +1454,16 @@ class UsersController < ApplicationController
       user_id = User.user_id_from_avatar_key(params[:user_id])
     end
     account_avatar_setting = service_enabled?(:avatars) ? @domain_root_account.settings[:avatars] || 'enabled' : 'disabled'
-    url = Rails.cache.fetch(Cacher.avatar_cache_key(user_id, account_avatar_setting)) do
-      user = User.find_by_id(user_id) if user_id.present?
-      if user
-        user.avatar_url(nil, account_avatar_setting, "%{fallback}")
-      else
-        '%{fallback}'
+    user_id, user_shard = Shard.local_id_for(user_id)
+    user_shard ||= Shard.current
+    url = user_shard.activate do
+      Rails.cache.fetch(Cacher.avatar_cache_key(user_id, account_avatar_setting)) do
+        user = User.find_by_id(user_id) if user_id.present?
+        if user
+          user.avatar_url(nil, account_avatar_setting, "%{fallback}")
+        else
+          '%{fallback}'
+        end
       end
     end
     fallback = User.avatar_fallback_url(params[:fallback], request)

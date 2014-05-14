@@ -312,7 +312,7 @@ define [
       @_eventDrop(event, minuteDelta, allDay, revertFunc)
 
     _eventDrop: (event, minuteDelta, allDay, revertFunc) ->
-      if event.eventType == "assignment" && allDay
+      if @currentView == 'week' && allDay && event.eventType == "assignment"
         revertFunc()
         return
 
@@ -376,7 +376,10 @@ define [
       changed = false
       for k, v of opts
         changed = true if data[k] != v
-        data[k] = v
+        if v
+          data[k] = v
+        else
+          delete data[k]
       location.href = "#" + $.param(data) if changed
 
     viewDisplay: (view) =>
@@ -555,7 +558,7 @@ define [
       @setCurrentDate(start)
 
     setCurrentDate: (d) ->
-      @updateFragment view_start: $.dateToISO8601UTC(d)
+      @updateFragment view_start: d.toISOString()
       $.publish('Calendar/currentDate', d)
 
     getCurrentDate: () ->
@@ -648,16 +651,8 @@ define [
     # <style> node in ie8
     $styleContainer = $('<div />').appendTo('body')
 
-    # these represent a base hue to get color values from
-    # they are combined with standard saturations and brigness to color-code events for each contex
-    hues = [43, 5, 205, 85, 289, 63, 230, 186, 115, 330]
-
-    cssColor = (h,s,b) ->
-      rgbArray = hsvToRgb(h,s,b)
-      "rgb(#{rgbArray.join ' ,'})"
-
     colorizeContexts: =>
-      colors = colorSlicer.getColors(@contextCodes.length)
+      colors = colorSlicer.getColors(@contextCodes.length, 275)
       html = for contextCode, index in @contextCodes
         color = colors[index]
         ".group_#{contextCode}{

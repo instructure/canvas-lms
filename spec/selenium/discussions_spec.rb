@@ -333,17 +333,6 @@ describe "discussions" do
       end
 
       describe "gear menu" do
-        it "should delete a topic" do
-          topic
-          get url
-
-          f('.al-trigger').click
-          fj('.icon-trash:visible').click
-          driver.switch_to.alert.accept
-          wait_for_ajaximations
-          topic.reload.workflow_state.should == 'deleted'
-          f('.discussion-list li.discussion').should be_nil
-        end
 
         it "should give the teacher delete/lock permissions on all topics" do
           student_topic
@@ -359,19 +348,20 @@ describe "discussions" do
           fj('.icon-pin:visible').click
           wait_for_ajaximations
           topic.reload.should be_pinned
+          topic.position.should_not be_nil
           ffj('.pinned.discussion-list li.discussion:visible').length.should == 1
         end
 
         it "should allow a teacher to unpin a topic" do
-          topic.pinned = true
-          topic.save!
+          assignment_topic.pinned = true
+          assignment_topic.save!
           get(url)
           wait_for_ajaximations
 
           f('.pinned.discussion-list .al-trigger').click
           fj('.icon-pin:visible').click
           wait_for_ajaximations
-          topic.reload.should_not be_pinned
+          assignment_topic.reload.should_not be_pinned
           ffj('.open.discussion-list li.discussion:visible').length.should == 1
         end
 
@@ -398,7 +388,10 @@ describe "discussions" do
           wait_for_ajaximations
 
           f('.pinned.discussion-list .al-trigger').click
-          ffj('.icon-lock:visible').length.should == 1
+          fj('.icon-lock:visible').click
+          wait_for_ajaximations
+          f('.locked.discussion-list .al-trigger').click
+          fj('.icon-pin:visible').should include_text('Pin')
         end
 
         it "should allow pinning a locked topic" do
@@ -407,7 +400,44 @@ describe "discussions" do
           wait_for_ajaximations
 
           f('.locked.discussion-list .al-trigger').click
-          ffj('.icon-pin:visible').length.should == 1
+          fj('.icon-pin:visible').click
+          wait_for_ajaximations
+          f('.pinned.discussion-list .al-trigger').click
+          fj('.icon-lock:visible').should include_text('Open')
+          fj('.icon-lock:visible').click
+          wait_for_ajaximations
+          f('.pinned.discussion-list .al-trigger').click
+          fj('.icon-lock:visible').should include_text('Close')
+        end
+
+        it "should delete a topic" do
+          topic
+          get url
+
+          f('.al-trigger').click
+          fj('.icon-trash:visible').click
+          driver.switch_to.alert.accept
+          wait_for_ajaximations
+          topic.reload.workflow_state.should == 'deleted'
+          f('.discussion-list li.discussion').should be_nil
+        end
+
+        it "should allow moving a topic" do
+          topics = 3.times.map do |n|
+            DiscussionTopic.create!(context: course, user: teacher,
+              title: "Discussion Topic #{n+1}", pinned: true)
+          end
+          topics.map(&:position).should == [1, 2, 3]
+          topic = topics[0]
+          get url
+
+          fj("[data-id=#{topic.id}] .al-trigger").click
+          fj('.icon-updown:visible').click
+          click_option '.ui-dialog:visible select', topics[2].title
+          fj('.ui-dialog:visible .btn-primary').click
+          wait_for_ajaximations
+          topics.each &:reload
+          topics.map(&:position).should == [2, 1, 3]
         end
       end
     end
@@ -558,7 +588,7 @@ describe "discussions" do
 
       it "should validate a group assignment discussion" do
         get "/courses/#{course.id}/discussion_topics/#{assignment_topic.id}"
-        f('.entry_content').should include_text('This is a graded discussion')
+        f('.entry-content').should include_text('This is a graded discussion')
       end
 
       context "teacher topic" do
@@ -762,7 +792,7 @@ describe "discussions" do
           f('.new-and-total-badge .new-items').text.should == reply_count.to_s
 
           #wait for the discussionEntryReadMarker to run, make sure it marks everything as .just_read
-          driver.execute_script("$('.entry_content').last().get(0).scrollIntoView()")
+          driver.execute_script("$('.entry-content').last().get(0).scrollIntoView()")
           keep_trying_until { ff('.discussion_entry.unread').should be_empty }
           ff('.discussion_entry.read').length.should == reply_count + 1 # +1 because the topic also has the .discussion_entry class
 
@@ -782,7 +812,7 @@ describe "discussions" do
           ff(".discussion_entry.unread").size.should == 2
           f('.new-and-total-badge .new-items').text.should == '2'
 
-          driver.execute_script("$('.entry_content').last().get(0).scrollIntoView()")
+          driver.execute_script("$('.entry-content').last().get(0).scrollIntoView()")
           keep_trying_until { ff('.discussion_entry.unread').size < 2 }
           wait_for_ajaximations
           ff(".discussion_entry.unread").size.should == 1

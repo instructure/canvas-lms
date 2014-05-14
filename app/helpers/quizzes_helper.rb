@@ -52,6 +52,30 @@ module QuizzesHelper
       :wrapper => '<strong class=unpublished_quiz_warning>\1</strong>')
   end
 
+  def draft_state_unsaved_changes_warning
+    I18n.t("#quizzes.warnings.draft_state_unsaved_changes",
+      '*You have made changes to the questions in this quiz.* '+
+      'These changes will not appear for students until you ' +
+      'save the quiz.',
+      :wrapper => '<strong class=unsaved_quiz_warning>\1</strong>')
+  end
+
+  def quiz_published_state_warning(quiz=@quiz)
+    if !quiz.available?
+      unpublished_quiz_warning
+    else
+      if quiz.feature_enabled? :draft_state
+        draft_state_unsaved_changes_warning
+      else
+        unpublished_changes_warning
+      end
+    end
+  end
+
+  def display_save_button?(quiz=@quiz)
+    quiz.available? && quiz.feature_enabled?(:draft_state) && can_publish(quiz)
+  end
+
   def render_score(score, precision=2)
     if score.nil?
       '_'

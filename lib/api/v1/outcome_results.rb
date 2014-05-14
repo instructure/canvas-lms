@@ -16,12 +16,35 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'csv'
+
 module Api::V1::OutcomeResults
   include Api::V1::Outcome
 
+  # Public: Serializes OutcomeResults
+  #
+  # results - The OutcomeResults to serialize
+  #
+  # Returns a hash that can be converted into json
+  def outcome_results_json(results)
+    {
+      outcome_results: results.map{|r| outcome_result_json(r)}
+    }
+  end
+
+  def outcome_result_json(result)
+    hash = api_json(result, @current_user, session, only: %w(id score))
+    hash[:links] = {
+      user: result.user.id.to_s,
+      learning_outcome: result.learning_outcome_id.to_s,
+      alignment: result.alignment.content.asset_string
+    }
+    Api.recursively_stringify_json_ids(hash)
+  end
+
   # Public: Serializes the rollups produced by Outcomes::ResultAnalytics.
   #
-  # rollups - The rollups from Outcomes::ResultAnalytics to seralize
+  # rollups - The rollups from Outcomes::ResultAnalytics to serialize
   #
   # Returns a hash that can be converted into json.
   def outcome_results_rollups_json(rollups)
@@ -34,7 +57,11 @@ module Api::V1::OutcomeResults
   #
   # Returns a Hash containing serialized outcomes.
   def outcome_results_include_outcomes_json(outcomes)
-    outcomes.map { |o| Api.recursively_stringify_json_ids(outcome_json(o, @current_user, session)) }
+    outcomes.map do |o|
+      hash = outcome_json(o, @current_user, session)
+      hash.merge!(alignments: o.alignments.map(&:content).map(&:asset_string))
+      Api.recursively_stringify_json_ids(hash)
+    end
   end
 
   # Public: Serializes outcome groups in a hash that can be added to the linked hash.
@@ -65,7 +92,17 @@ module Api::V1::OutcomeResults
         display_name: u.short_name,
         sortable_name: u.sortable_name
       }
-      hash[:avatar_image_url] = avatar_url_for_user(u, blank_fallback) if service_enabled?(:avatars)
+      hash[:avatar_url] = avatar_url_for_user(u, blank_fallback) if service_enabled?(:avatars)
+      hash
+    end
+  end
+
+  # Public: Returns an Array of serialized Alignment objects for the linked hash.
+  def outcome_results_include_alignments_json(alignments)
+    alignments.map do |alignment|
+      hash = {id: alignment.asset_string, name: alignment.title}
+      html_url = polymorphic_url([alignment.context, alignment]) rescue nil
+      hash[:html_url] = html_url if html_url
       hash
     end
   end
@@ -134,5 +171,30 @@ module Api::V1::OutcomeResults
       score: score.score,
       links: {outcome: score.outcome.id.to_s},
     }
+  end
+
+  def outcome_results_rollups_csv(rollups, outcomes, outcome_paths)
+    CSV.generate do |csv|
+      row = []
+      row << I18n.t(:student_name, 'Student name')
+      row << I18n.t(:student_id, 'Student ID')
+      outcomes.each do |outcome|
+        pathParts = outcome_paths.find{|x| x[:id] == outcome.id}[:parts]
+        path = pathParts.map{|x| x[:name]}.join(' > ')
+        row << I18n.t(:outcome_path_result, "%{path} result", :path => path)
+        row << I18n.t(:outcome_path_mastery_points, "%{path} mastery points", :path => path)
+      end
+      csv << row
+      rollups.each do |rollup|
+        row = [rollup.context.name, rollup.context.id]
+        outcomes.each do |outcome|
+          score = rollup.scores.find{|x| x.outcome == outcome}
+          criterion = outcome.data && outcome.data[:rubric_criterion]
+          row << (score ? score.score : nil)
+          row << (criterion ? criterion[:mastery_points] : nil)
+        end
+        csv << row
+      end
+    end
   end
 end

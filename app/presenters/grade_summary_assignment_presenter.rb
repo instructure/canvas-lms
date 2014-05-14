@@ -25,6 +25,14 @@ class GradeSummaryAssignmentPresenter
     assignment.grading_type == 'letter_grade'
   end
 
+  def is_gpa_scaled?
+    assignment.grading_type == 'gpa_scale'
+  end
+
+  def is_letter_graded_or_gpa_scaled?
+    is_letter_graded? || is_gpa_scaled?
+  end
+
   def is_assignment?
     assignment.class.to_s == "Assignment"
   end
@@ -74,7 +82,7 @@ class GradeSummaryAssignmentPresenter
   end
 
   def published_grade
-    is_letter_graded? ? "(#{submission.published_grade})" : ''
+    is_letter_graded_or_gpa_scaled? ? "(#{submission.published_grade})" : ''
   end
 
   def display_score
@@ -125,7 +133,7 @@ class GradeSummaryAssignmentPresenter
     @visible_rubric_assessments ||= begin
       if submission && !assignment.muted?
         assessments = submission.rubric_assessments.select { |a| a.grants_rights?(@current_user, :read)[:read] }
-        assessments.sort_by { |a| [a.assessment_type == 'grading' ? SortFirst : SortLast, a.assessor_name] }
+        assessments.sort_by { |a| [a.assessment_type == 'grading' ? CanvasSort::First : CanvasSort::Last, a.assessor_name] }
       else
         []
       end

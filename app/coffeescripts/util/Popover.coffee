@@ -1,7 +1,7 @@
 
 define [
-  # 'jquery'
-], () ->
+  'jquery'
+], ($) ->
 
 
   # you can provide a 'using' option to jqueryUI position

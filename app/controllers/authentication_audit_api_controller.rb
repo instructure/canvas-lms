@@ -29,31 +29,42 @@
 # are also included. Refer to the Logins, Accounts, Page Views, and Users APIs
 # for descriptions of the objects in those collections.
 #
-# @object AuthenticationEvent
+# @model AuthenticationEvent
 #     {
-#       // ID of the event.
-#       "id": "e2b76430-27a5-0131-3ca1-48e0eb13f29b",
-#
-#       // timestamp of the event
-#       "created_at": "2012-07-19T15:00:00-06:00",
-#
-#       // authentication event type ('login' or 'logout')
-#       "event_type": "login",
-#
-#       "links": {
-#          // ID of the login associated with the event
-#          "login_id": 9478,
-#
-#          // ID of the account associated with the event. will match the
-#          // account_id in the associated login.
-#          "account_id": 2319,
-#
-#          // ID of the user associated with the event will match the user_id in
-#          // the associated login.
-#          "user_id": 362,
-#
-#          // ID of the page view during the event if it exists.
-#          "page_view_id": "e2b76430-27a5-0131-3ca1-48e0eb13f29b"
+#       "id": "AuthenticationEvent",
+#       "description": "",
+#       "properties": {
+#         "created_at": {
+#           "description": "timestamp of the event",
+#           "example": "2012-07-19T15:00:00-06:00",
+#           "type": "datetime"
+#         },
+#         "event_type": {
+#           "description": "authentication event type ('login' or 'logout')",
+#           "example": "login",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "login",
+#               "logout"
+#             ]
+#           }
+#         },
+#         "pseudonym_id": {
+#           "description": "ID of the pseudonym (login) associated with the event",
+#           "example": 9478,
+#           "type": "integer"
+#         },
+#         "account_id": {
+#           "description": "ID of the account associated with the event. will match the account_id in the associated pseudonym.",
+#           "example": 2319,
+#           "type": "integer"
+#         },
+#         "user_id": {
+#           "description": "ID of the user associated with the event will match the user_id in the associated pseudonym.",
+#           "example": 362,
+#           "type": "integer"
+#         }
 #       }
 #     }
 #

@@ -259,7 +259,7 @@ describe PageView do
   describe '.generate' do
     let(:params) { {'action' => 'path', 'controller' => 'some'} }
     let(:session) { {:id => '42'} }
-    let(:request) { stub(:url => (@url || 'host.com/some/path'), :path_parameters => params, :user_agent => 'Mozilla', :session_options => session, :method => :get, :remote_ip => '0.0.0.0') }
+    let(:request) { stub(:url => (@url || 'host.com/some/path'), :path_parameters => params, :user_agent => 'Mozilla', :session_options => session, :method => :get, :remote_ip => '0.0.0.0', :request_method => 'GET') }
     let(:user) { User.new }
     let(:attributes) { {:real_user => user, :user => user } }
 
@@ -295,7 +295,7 @@ describe PageView do
     end
 
     it "should force encoding on string fields" do
-      request = stub(:url => (@url || 'host.com/some/path'), :path_parameters => params, :user_agent => 'Mozilla', :session_options => session, :method => :get, :remote_ip => '0.0.0.0'.encode(Encoding::US_ASCII))
+      request = stub(:url => (@url || 'host.com/some/path'), :path_parameters => params, :user_agent => 'Mozilla', :session_options => session, :method => :get, :remote_ip => '0.0.0.0'.encode(Encoding::US_ASCII), :request_method => 'GET')
       pv = PageView.generate(request,attributes)
 
       pv.remote_ip.encoding.should == Encoding::UTF_8
@@ -336,38 +336,40 @@ describe PageView do
     end
   end
 
-  describe ".find_some" do
-    context "db-backed" do
-      before do
-        Setting.set('enable_page_views', 'db')
+  if CANVAS_RAILS2
+    describe ".find_some" do
+      context "db-backed" do
+        before do
+          Setting.set('enable_page_views', 'db')
+        end
+
+        it "should return the existing page view" do
+          page_views = (0..3).map { |index| page_view_model }
+          page_view_ids = page_views.map { |page_view| page_view.request_id }
+
+          PageView.find_some(page_view_ids).should == page_views
+        end
+
+        it "should raise ActiveRecord::RecordNotFound with unknown request id" do
+          pv = page_view_model
+          expect { PageView.find_some([pv.request_id, 'unknown']) }.to raise_error(ActiveRecord::RecordNotFound)
+        end
       end
 
-      it "should return the existing page view" do
-        page_views = (0..3).map { |index| page_view_model }
-        page_view_ids = page_views.map { |page_view| page_view.request_id }
+      context "cassandra-backed" do
+        include_examples "cassandra page views"
 
-        PageView.find_some(page_view_ids).should == page_views
-      end
+        it "should return the existing page view" do
+          page_views = (0..3).map { |index| page_view_model }
+          page_view_ids = page_views.map { |page_view| page_view.request_id }
 
-      it "should raise ActiveRecord::RecordNotFound with unknown request id" do
-        pv = page_view_model
-        expect { PageView.find_some([pv.request_id, 'unknown']) }.to raise_error(ActiveRecord::RecordNotFound)
-      end
-    end
+          PageView.find_some(page_view_ids).should == page_views
+        end
 
-    context "cassandra-backed" do
-      include_examples "cassandra page views"
-
-      it "should return the existing page view" do
-        page_views = (0..3).map { |index| page_view_model }
-        page_view_ids = page_views.map { |page_view| page_view.request_id }
-
-        PageView.find_some(page_view_ids).should == page_views
-      end
-
-      it "should raise ActiveRecord::RecordNotFound with unknown request id" do
-        pv = page_view_model
-        expect { PageView.find_some([pv.request_id, 'unknown']) }.to raise_error(ActiveRecord::RecordNotFound)
+        it "should raise ActiveRecord::RecordNotFound with unknown request id" do
+          pv = page_view_model
+          expect { PageView.find_some([pv.request_id, 'unknown']) }.to raise_error(ActiveRecord::RecordNotFound)
+        end
       end
     end
   end
@@ -410,11 +412,11 @@ describe PageView do
 
       it "should return the existing page view" do
         pv = page_view_model
-        PageView.find_one(pv.request_id).should == pv
+        PageView.find(pv.request_id).should == pv
       end
 
       it "should raise ActiveRecord::RecordNotFound with unknown request id" do
-        expect { PageView.find_one('unknown') }.to raise_error(ActiveRecord::RecordNotFound)
+        expect { PageView.find('unknown') }.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
 
@@ -423,11 +425,11 @@ describe PageView do
 
       it "should return the existing page view" do
         pv = page_view_model
-        PageView.find_one(pv.request_id).should == pv
+        PageView.find(pv.request_id).should == pv
       end
 
       it "should raise ActiveRecord::RecordNotFound with unknown request id" do
-        expect { PageView.find_one('unknown') }.to raise_error(ActiveRecord::RecordNotFound)
+        expect { PageView.find('unknown') }.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
   end

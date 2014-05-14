@@ -1,9 +1,10 @@
 define [
   'i18n!GroupUserCollection'
+  'jquery'
   'compiled/collections/PaginatedCollection'
   'compiled/models/GroupUser'
   'str/htmlEscape'
-], (I18n, PaginatedCollection, GroupUser, h) ->
+], (I18n, $, PaginatedCollection, GroupUser, h) ->
 
   class GroupUserCollection extends PaginatedCollection
 

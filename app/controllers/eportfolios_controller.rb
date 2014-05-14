@@ -121,9 +121,7 @@ class EportfoliosController < ApplicationController
     @portfolio = Eportfolio.find(params[:eportfolio_id])
     if authorized_action(@portfolio, @current_user, :update)
       @portfolio.eportfolio_categories.build.update_order(params[:order].split(","))
-      respond_to do |format|
-        format.json { render :json => @portfolio.eportfolio_categories.map{|c| [c.id, c.position]}, :status => :ok }
-      end
+      render :json => @portfolio.eportfolio_categories.map{|c| [c.id, c.position]}, :status => :ok
     end
   end
   
@@ -132,9 +130,7 @@ class EportfoliosController < ApplicationController
     if authorized_action(@portfolio, @current_user, :update)
       @category = @portfolio.eportfolio_categories.find(params[:eportfolio_category_id])
       @category.eportfolio_entries.build.update_order(params[:order].split(","))
-      respond_to do |format|
-        format.json { render :json => @portfolio.eportfolio_entries.map{|c| [c.id, c.position]}, :status => :ok }
-      end
+      render :json => @portfolio.eportfolio_entries.map{|c| [c.id, c.position]}, :status => :ok
     end
   end
   

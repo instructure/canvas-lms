@@ -1,46 +1,47 @@
-<li class='quiz'>
-<div {{bind-attr class=':ig-row :ig-editable publishable:ig-publishable isPublishedStatusVisible:ig-published' }}>
-    <a {{bind-attr href='html_url'}} class='ig-title ellipses'>
-      <i class='icon-quiz'></i>
-      {{title}}
-    </a>
-    <div class='ig-details row-fluid'>
-      <div class='span4 ellipses date-available'>
-        {{ic-dates-available allDates=allDates linkHref=html_url}}
-      </div>
-      <div class='span4 ellipses date-due'>
-        {{ic-dates-available allDates=allDates linkHref=html_url showDueDates=true}}
-      </div>
-      <div class='span2 ellipses'>
-        {{pointsPossible}}
-      </div>
-      <div class='span2 ellipses'>
-        {{questionCountLabel}}
-      </div>
+<div class="container-fluid" id="quiz-show">
+  <div class="row edit-header">
+    <div class="span7">
+      <label class="screenreader-only">
+        {{#t "quiz_title"}}Quiz Title{{/t}}
+      </label>
+      <h1>{{title}}</h1>
     </div>
-    {{#if canUpdate}}
-      <div class="ig-admin">
 
-        {{ic-publish-icon
-          disabled=disabled
-          disabled-message=disabledMessage
-          is-published=published
-          on-publish='publish'
-          on-unpublish='unpublish'
-        }}
+    <div class="span3 teacher-action-buttons pull-right">
+      {{ic-publish-button
+        published=published
+        disabled=canNotUnpublish
+        on-publish='publish'
+        on-unpublish='unpublish'
+      }}
 
-        {{#ic-actions title='settings'}}
-          {{#ic-menu-item on-select='edit'}}
-            <i class='icon-edit'></i>
-            {{#t 'edit'}}Edit{{/t}}
-          {{/ic-menu-item}}
-          {{#ic-menu-item on-select='delete'}}
-            <i class='icon-trash'></i>
-            {{#t 'delete'}}Delete{{/t}}
-          {{/ic-menu-item}}
-        {{/ic-actions}}
-
-      </div>
-    {{/if}}
+      <a href="#" class="btn">
+        <i class="icon-edit"></i>{{#t 'edit'}}Edit{{/t}}
+      </a>
+      {{#ic-menu}}
+        {{#ic-menu-trigger}}
+          <button class="btn">
+            <i class="icon-settings"></i>
+          </button>
+        {{/ic-menu-trigger}}
+      {{/ic-menu}}
+    </div>
   </div>
-</li>
+
+  <div class="row" id="quiz-show-tabs">
+    <ol>
+      {{#link-to 'quiz.show' this tagName='li'}}
+        {{#link-to 'quiz.show' this.id}}
+          {{#t 'overview'}}Overview{{/t}}
+        {{/link-to}}
+      {{/link-to}}
+      <li><a href="#">Moderate</li></a>
+      <li><a href="#">Statistics</li></a>
+      <li><a href="#">Rubric</li></a>
+    </ol>
+  </div>
+
+  <div class="tabs-content">
+    {{outlet}}
+  </div>
+</div>

@@ -27,7 +27,7 @@ describe "communication_channels/confirm.html.erb" do
     assigns[:nonce] = @cc.confirmation_code
     assigns[:body_classes] = []
     assigns[:domain_root_account] = assigns[:root_account] = Account.default
-    @controller.template.stubs(:require_terms?).returns(nil) # since controller-defined helper methods don't get plumbed down here
+    view.stubs(:require_terms?).returns(nil) # since controller-defined helper methods don't get plumbed down here
   end
 
   shared_examples_for "user registration" do

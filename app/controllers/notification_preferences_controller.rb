@@ -20,21 +20,39 @@
 #
 # API for managing notification preferences
 #
-# @object NotificationPreference
+# @model NotificationPreference
 #     {
-#       "href": "https://canvas.instructure.com/users/1/communication_channels/email/student@example.edu/notification_preferences/new_announcement",
-#
-#       // The notification this preference belongs to
-#       "notification": "new_announcement",
-#
-#       // The category of that notification
-#       "category": "announcement",
-#
-#       // How often to send notifications to this communication channel
-#       // for the given notification. Possible values are "immediately",
-#       // "daily", "weekly", and "never"
-#       "frequency": "daily"
-#
+#       "id": "NotificationPreference",
+#       "description": "",
+#       "properties": {
+#         "href": {
+#           "example": "https://canvas.instructure.com/users/1/communication_channels/email/student@example.edu/notification_preferences/new_announcement",
+#           "type": "string"
+#         },
+#         "notification": {
+#           "description": "The notification this preference belongs to",
+#           "example": "new_announcement",
+#           "type": "string"
+#         },
+#         "category": {
+#           "description": "The category of that notification",
+#           "example": "announcement",
+#           "type": "string"
+#         },
+#         "frequency": {
+#           "description": "How often to send notifications to this communication channel for the given notification. Possible values are 'immediately', 'daily', 'weekly', and 'never'",
+#           "example": "daily",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "immediately",
+#               "daily",
+#               "weekly",
+#               "never"
+#             ]
+#           }
+#         }
+#       }
 #     }
 #
 class NotificationPreferencesController < ApplicationController
