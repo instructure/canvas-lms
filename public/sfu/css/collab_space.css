@@ -1,3 +1,7 @@
 #section-tabs li.section-tab-hidden {
      display: none;
 }
+
+#wiki_edit_view_main #below_editor div:nth-child(-n+2) {
+    display: none;
+}
