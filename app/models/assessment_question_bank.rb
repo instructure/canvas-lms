@@ -29,6 +29,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
   has_many :learning_outcome_alignments, :as => :content, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome', 'deleted'], :include => :learning_outcome
   has_many :quiz_groups, class_name: 'Quizzes::QuizGroup'
   before_save :infer_defaults
+  after_save :update_alignments
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
   
   workflow do
@@ -99,6 +100,11 @@ class AssessmentQuestionBank < ActiveRecord::Base
         outcome.align(self, context, :mastery_score => mastery_score)
       end
     end
+  end
+
+  def update_alignments
+    return unless workflow_state_changed? && deleted?
+    LearningOutcome.update_alignments(self, context, [])
   end
 
   def bookmark_for(user, do_bookmark=true)
