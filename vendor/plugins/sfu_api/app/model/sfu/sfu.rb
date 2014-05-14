@@ -8,8 +8,10 @@ module SFU
     class << self
       def terms(sfuid)
         terms = REST.json REST.terms_url, "&username=#{sfuid}"
-        if terms.empty? || terms["teachingSemester"].nil?
-          {}
+        if terms == 404
+          404
+        elsif terms == 500
+          500
         else
           terms["teachingSemester"]
         end
@@ -41,19 +43,20 @@ module SFU
         has_no_child_sections = true
         section_exists = false
 
-	unless details == "[]"
-            details.each do |info|
-              section = info["course"]["section"].downcase
-              section_exists = true if section.eql? section_code.downcase
-        
-	      if section_code.end_with?("00")
-                code = info["course"]["name"] + info["course"]["number"]
-	        if code.downcase == course_code.downcase && section.start_with?(main_section) && section.downcase != section_code.downcase
-                  sections << info["course"]["section"]
-                  has_no_child_sections = false
-                end
+	      unless details == "[]"
+          details.each do |info|
+            section = info["course"]["section"].downcase
+            section_exists = true if section.eql? section_code.downcase
+
+	          if section_code.end_with?("00")
+              code = info["course"]["name"] + info["course"]["number"]
+
+	            if code.downcase == course_code.downcase && section.start_with?(main_section) && section.downcase != section_code.downcase
+                sections << info["course"]["section"]
+                has_no_child_sections = false
               end
-	  end
+            end
+	        end
         end
 
         # Return main section e.g. d100 only for courses with no tutorial/lab sections
@@ -65,14 +68,15 @@ module SFU
       def title(course_code, term_code, section_code)
         details = info(course_code, term_code)
         title = nil
-        unless details == "[]"
+        if details == 500
+          title = 500
+        elsif details != "[]"
           details.each do |info|
             section = info["course"]["section"].downcase
             title = info["course"]["title"] if section.eql? section_code.downcase
           end
         end
-
-	title
+	      title
       end
 
     end
@@ -82,7 +86,14 @@ module SFU
     class << self
       def roles(sfuid)
         account = REST.json REST.account_url, "&username=#{sfuid}"
-        account != "[]" ? account["roles"] : account
+        if account == 500
+          roles = 500
+        elsif account == 404 || account.nil?
+          roles = 404
+        else
+          roles = account["roles"]
+        end
+        roles
       end
 
       def info(sfuid)
