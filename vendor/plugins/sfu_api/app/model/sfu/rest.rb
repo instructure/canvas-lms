@@ -52,6 +52,7 @@ module SFU
           when /500/ then 500
         end
 
+        # If REST server app is unavailable, its webserver returns a 404. Therefore, should be returning a 500 instead
         if e.to_s.eql? "404 Resource Not Found: <html><body><strong>The requested application was not found on this server.</strong></body></html>\n"
           500
         end

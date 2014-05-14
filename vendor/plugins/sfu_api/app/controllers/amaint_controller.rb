@@ -7,7 +7,7 @@ class AmaintController < ApplicationController
   def course_info
     course_hash = amaint_course_info(params[:sis_id], params[:property])
 
-    if course_hash.empty?
+    if course_hash == 404
       raise(ActiveRecord::RecordNotFound)
     elsif course_hash == 500
       raise(RuntimeError)
@@ -75,7 +75,7 @@ class AmaintController < ApplicationController
 
     if course_title.nil?
       # If course section doesn't exist in Amaint, then return 404
-      course_hash = {}
+      course_hash = 404
     elsif course_title == 500 || course_title == 404
       # If REST server app is unavailable, its webserver returns a 404.
       # Therefore return 500 so client will know something is wrong with REST server and not a false 404 (i.e. section doesn't exists)

@@ -70,6 +70,8 @@ module SFU
         title = nil
         if details == 500
           title = 500
+        elsif details == 404
+          title == 404
         elsif details != "[]"
           details.each do |info|
             section = info["course"]["section"].downcase
