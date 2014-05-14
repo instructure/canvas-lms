@@ -215,7 +215,6 @@ class ProfileController < ApplicationController
 
   def communication
     @user = @current_user
-    @user = User.find(params[:id]) if params[:id]
     @current_user.used_feature(:cc_prefs)
     @context = @user.profile
     @active_tab = 'notifications'
