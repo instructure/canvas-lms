@@ -32,12 +32,6 @@
             <i class="icon-discussion"></i>
             {{#t 'Message Students'}}Message Students{{/t}}
           {{/ic-menu-item}}
-
-          {{#ic-menu-item class="js-delete" on-select="confirmDeletion"}}
-            <i class="icon-trash"></i>
-            {{#t "delete"}}Delete{{/t}}
-          {{/ic-menu-item}}
-
           {{#ic-menu-item}}
             <i class="icon-mark-as-read"></i>
             {{#t 'preview'}}Preview{{/t}}
@@ -48,19 +42,24 @@
             {{#t 'show_quiz_results'}}Show Student Quiz Results{{/t}}
           {{/ic-menu-item}}
 
-          {{#if lockAt}}
-            {{#ic-menu-item class="js-due-date-toggler" on-select="unlock"}}
+          {{! reuse existing ic-menu-item or order issues arise }}
+          {{#ic-menu-item class="js-due-date-toggler" on-select="toggleLock"}}
+            {{#if lockAt}}
               <i class="icon-unlock"></i>
               {{#t 'unlock_this_quiz_now'}}Unlock This Quiz Now{{/t}}
-            {{/ic-menu-item}}
-          {{else}}
-            {{#ic-menu-item class="js-due-date-toggler" on-select="lock"}}
+            {{else}}
               <i class="icon-lock"></i>
               {{#t 'lock_this_quiz_now'}}
                 Lock This Quiz Now
               {{/t}}
-            {{/ic-menu-item}}
-          {{/if}}
+            {{/if}}
+          {{/ic-menu-item}}
+
+          {{#ic-menu-item class="js-delete" on-select="confirmDeletion"}}
+            <i class="icon-trash"></i>
+            {{#t "delete"}}Delete{{/t}}
+          {{/ic-menu-item}}
+
         {{/ic-actions}}
       </div>
 

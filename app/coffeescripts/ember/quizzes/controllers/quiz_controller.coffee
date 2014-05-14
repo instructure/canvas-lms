@@ -72,6 +72,12 @@ define [
         @replaceRoute 'quiz.moderate'
         $.flashMessage I18n.t('now_on_moderate', 'This information is now found on the Moderate tab.')
 
+      toggleLock: ->
+        if @get('lockAt')
+          @send('unlock')
+        else
+          @send('lock')
+
       lock: ->
         updateAllDates.call(this, 'lockAt').then ->
           $.flashMessage I18n.t('quiz_successfully_updated', 'Quiz Successfully Updated!')
