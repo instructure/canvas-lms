@@ -688,6 +688,45 @@ describe "external tools" do
 
   end
 
+  describe 'showing external tools' do
+    before do
+      course_with_teacher_logged_in(active_all: true)
+      @tool = @course.context_external_tools.create!(
+        name: "new tool",
+        consumer_key: "key",
+        shared_secret: "secret",
+        url: "http://#{HostUrl.default_host}/selection_test",
+      )
+
+    end
+
+    it "assumes course navigation launch type" do
+      @tool.course_navigation = {}
+      @tool.save!
+      get "/courses/#{@course.id}/external_tools/#{@tool.id}"
+      in_frame('tool_content') do
+        keep_trying_until { ff("#basic_lti_link").size.should > 0 }
+      end
+    end
+
+    it "accepts an explicit launch type" do
+      @tool.migration_selection = {}
+      @tool.save!
+      get "/courses/#{@course.id}/external_tools/#{@tool.id}?launch_type=migration_selection"
+      in_frame('tool_content') do
+        keep_trying_until { ff("#basic_lti_link").size.should > 0 }
+      end
+    end
+
+    it "validates the launch type" do
+      @tool.course_navigation = {}
+      @tool.save!
+      get "/courses/#{@course.id}/external_tools/#{@tool.id}?launch_type=bad_type"
+      assert_flash_error_message(/couldn't find valid settings/i)
+    end
+
+  end
+
   private
 
   def enable_app_center_plugin

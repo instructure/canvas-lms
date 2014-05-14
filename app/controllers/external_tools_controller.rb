@@ -292,9 +292,7 @@ class ExternalToolsController < ApplicationController
         raise(ActiveRecord::RecordNotFound, "Couldn't find external tool with API id '#{params[:external_tool_id]}'")
       end
     else
-      # this is coming from a content tag redirect that set @tool
-      selection_type = "#{@context.class.base_ar_class.to_s.downcase}_navigation"
-
+      selection_type = params[:launch_type] || "#{@context.class.base_ar_class.to_s.downcase}_navigation"
       find_tool(params[:id], selection_type)
       @active_tab = @tool.asset_string if @tool
       @show_embedded_chat = false if @tool.try(:tool_id) == 'chat'
@@ -320,10 +318,13 @@ class ExternalToolsController < ApplicationController
   end
 
   def find_tool(id, selection_type)
-    begin
-      @tool = ContextExternalTool.find_for(id, @context, selection_type)
-    rescue ActiveRecord::RecordNotFound;
+    if selection_type.nil? || ContextExternalTool::EXTENSION_TYPES.include?(selection_type.to_sym)
+      begin
+        @tool = ContextExternalTool.find_for(id, @context, selection_type)
+      rescue ActiveRecord::RecordNotFound
+      end
     end
+
     if !@tool
       flash[:error] = t "#application.errors.invalid_external_tool_id", "Couldn't find valid settings for this tool"
       redirect_to named_context_url(@context, :context_url)
