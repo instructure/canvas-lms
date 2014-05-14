@@ -594,6 +594,7 @@ describe ContentMigration do
     end
 
     it "should copy learning outcome alignments with question banks" do
+      pending unless Qti.qti_enabled?
       default = @copy_from.root_outcome_group
       lo = @copy_from.created_learning_outcomes.new
       lo.context = @copy_from
