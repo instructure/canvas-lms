@@ -95,6 +95,63 @@ describe EventStream::Stream do
     end
   end
 
+  context "#available?" do
+    it "returns true when available and configured" do
+      # can't access spec ivars inside instance_exec
+      database, table = self.database, @table
+      id_column = double(:to_s => double('id_column'))
+      record_type = double('record_type')
+
+      stream = EventStream::Stream.new do
+        self.database -> { database }
+        self.table table
+        self.id_column id_column
+        self.record_type record_type
+        self.read_consistency_level 'ALL'
+      end
+
+      expect(stream.database).to be database
+      expect(stream.available?).to be true
+    end
+
+    it "returns false when not available" do
+      # can't access spec ivars inside instance_exec
+      database, table = self.database, @table
+      database.stub(:available?).and_return(false)
+      id_column = double(:to_s => double('id_column'))
+      record_type = double('record_type')
+
+      stream = EventStream::Stream.new do
+        self.database database
+        self.table table
+        self.id_column id_column
+        self.record_type record_type
+        self.read_consistency_level 'ALL'
+      end
+
+      expect(stream.database).to be database
+      expect(stream.available?).to be false
+    end
+
+    it "returns false when not configured" do
+      # can't access spec ivars inside instance_exec
+      table = @table
+      id_column = double(:to_s => double('id_column'))
+      record_type = double('record_type')
+
+      stream = EventStream::Stream.new do
+        self.database -> { nil }
+        self.table table
+        self.id_column id_column
+        self.record_type record_type
+        self.read_consistency_level 'ALL'
+      end
+
+      expect(stream.database).to be nil
+      expect(stream.available?).to be false
+    end
+  end
+
   context "usage" do
     before do
       @table = double(:to_s => "expected_table")

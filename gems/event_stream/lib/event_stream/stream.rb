@@ -19,7 +19,7 @@
 class EventStream::Stream
   include EventStream::AttrConfig
 
-  attr_config :database
+  attr_config :database, :default => nil
   attr_config :table, :type => String
   attr_config :id_column, :type => String, :default => 'id'
   attr_config :record_type, :default => EventStream::Record
@@ -32,7 +32,7 @@ class EventStream::Stream
   end
 
   def available?
-    database && database.available?
+    !!database && database.available?
   end
 
   def database_name
