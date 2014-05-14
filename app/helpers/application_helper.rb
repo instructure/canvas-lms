@@ -338,7 +338,14 @@ module ApplicationHelper
           hide = tab[:hidden] || tab[:hidden_unused]
           class_name = tab[:css_class].downcase.replace_whitespace("-")
           class_name += ' active' if @active_tab == tab[:css_class]
-          html << "<li class='section #{"section-tab-hidden" if hide }'>" + link_to(tab[:label], path, :class => class_name) + "</li>" if tab[:href]
+
+          if tab[:screenreader]
+            link = link_to(tab[:label], path, :class => class_name, "aria-label" => tab[:screenreader])
+          else
+            link = link_to(tab[:label], path, :class => class_name)
+          end
+
+          html << "<li class='section #{"section-tab-hidden" if hide }'>" + link + "</li>" if tab[:href]
         end
         html << "</ul></nav>"
         html.join("")
