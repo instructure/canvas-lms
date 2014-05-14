@@ -6,7 +6,7 @@ class Browser < Struct.new(:browser, :version)
   end
 
   def self.configuration
-    @configuration ||= YAML.load_file(Rails.root.join("config/browsers.yml"))
+    @configuration ||= YAML.load_file(File.expand_path('../../config/browsers.yml', __FILE__))
   end
 
   def self.minimum_browsers
