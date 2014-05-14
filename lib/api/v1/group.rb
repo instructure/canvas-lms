@@ -41,6 +41,8 @@ module Api::V1::Group
     image = group.avatar_attachment
     hash['avatar_url'] = image && thumbnail_image_url(image, image.uuid)
     hash['role'] = group.group_category.role if group.group_category
+    #hash['leader_id'] = group.leader_id
+    hash['leader'] = group.leader ? user_display_json(group.leader, group) : nil
 
     if includes.include?('users')
       # TODO: this should be switched to user_display_json

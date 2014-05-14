@@ -51,22 +51,43 @@
   }
 }
 
+.group-leader {
+  color: #555;
+
+  a {
+    font-size: 0.85em;
+  }
+}
+
+.group-header {
+  .group-summary {
+    font-size: 0.85em;
+  }
+}
+
 .group .group-user {
   float: left;
   width: 31%;
   margin: 0 2% 3px 0;
+  box-sizing: border-box;
+
   .group-category-contents-condensed & {
     width: 23.5%;
     margin: 0 1% 3px 0;
   }
-  box-sizing: border-box;
+  
   .group-user-name {
     margin-right: 0;
+  }
+
+  .group-leader {
+    float: right;
+    line-height: 28px;
   }
 }
 
 .group-user-name {
-  max-width: 85%;
+  max-width: 90%;
   overflow: hidden;
   white-space: nowrap;
   margin-right: 10px;

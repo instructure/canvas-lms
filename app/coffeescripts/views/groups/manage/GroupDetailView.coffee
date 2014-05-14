@@ -58,6 +58,7 @@ define [
 
     toJSON: ->
       json = @model.toJSON()
+      json.leader = @model.get('leader')
       json.canAssignUsers = ENV.IS_LARGE_ROSTER and not @model.isLocked()
       json.canEdit = not @model.isLocked()
       json.summary = @summary()

@@ -21,7 +21,7 @@ class Group < ActiveRecord::Base
   include Workflow
   include CustomValidations
 
-  attr_accessible :name, :context, :max_membership, :group_category, :join_level, :default_view, :description, :is_public, :avatar_attachment, :storage_quota_mb
+  attr_accessible :name, :context, :max_membership, :group_category, :join_level, :default_view, :description, :is_public, :avatar_attachment, :storage_quota_mb, :leader
   validates_presence_of :context_id, :context_type, :account_id, :root_account_id, :workflow_state
   validates_allowed_transitions :is_public, false => true
 
@@ -61,6 +61,7 @@ class Group < ActiveRecord::Base
   has_many :zip_file_imports, :as => :context
   has_many :content_migrations, :as => :context
   belongs_to :avatar_attachment, :class_name => "Attachment"
+  belongs_to :leader, :class_name => "User"
 
   EXPORTABLE_ATTRIBUTES = [
     :id, :name, :workflow_state, :created_at, :updated_at, :context_id, :context_type, :category, :max_membership, :hashtag, :show_public_context_messages, :is_public,
@@ -430,6 +431,9 @@ class Group < ActiveRecord::Base
     can :manage_admin_users and
     can :manage_students and
     can :moderate_forum and
+    can :update
+
+    given { |user| user && self.leader == user }
     can :update
 
     given { |user| self.group_category.try(:communities?) }

@@ -139,7 +139,7 @@ class GroupsController < ApplicationController
   include Api::V1::Group
   include Api::V1::GroupCategory
 
-  SETTABLE_GROUP_ATTRIBUTES = %w(name description join_level is_public group_category avatar_attachment storage_quota_mb max_membership)
+  SETTABLE_GROUP_ATTRIBUTES = %w(name description join_level is_public group_category avatar_attachment storage_quota_mb max_membership leader)
 
   include TextHelper
 
@@ -492,6 +492,14 @@ class GroupsController < ApplicationController
 
     if avatar_id = (params[:avatar_id] || (params[:group] && params[:group][:avatar_id]))
       attrs[:avatar_attachment] = @group.active_images.find_by_id(avatar_id)
+    end
+
+    if attrs[:leader]
+      membership = @group.group_memberships.find_by_user_id(attrs[:leader][:id])
+      return render :json => {}, :status => :bad_request unless membership
+      attrs[:leader] = membership.user
+    else
+      attrs[:leader] = nil
     end
 
     if authorized_action(@group, @current_user, :update)

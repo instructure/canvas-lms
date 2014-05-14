@@ -38,6 +38,7 @@ define [
 
     attach: ->
       @model.on 'change:members_count', @render
+      @model.on 'change:leader', @render
       @collection.on 'moved', @highlightUser
 
     highlightUser: (user) ->
@@ -49,13 +50,26 @@ define [
 
     events:
       'click .remove-from-group': 'removeUserFromGroup'
+      'click .remove-as-leader': 'removeLeader'
+      'click .set-as-leader': 'setLeader'
       'click .edit-group-assignment': 'editGroupAssignment'
 
     removeUserFromGroup: (e) ->
       e.preventDefault()
       e.stopPropagation()
       $target = $(e.currentTarget)
-      @collection.get($target.data('user-id')).save 'groupId', null
+      @collection.get($target.data('user-id')).save 'group', null
+
+    removeLeader: (e) ->
+      e.preventDefault()
+      e.stopPropagation()
+      @model.save(leader: null)
+
+    setLeader: (e) ->
+      e.preventDefault()
+      e.stopPropagation()
+      $target = $(e.currentTarget)
+      @model.save(leader: {id: $target.data('user-id').toString()})
 
     editGroupAssignment: (e) ->
       e.preventDefault()

@@ -34,7 +34,8 @@ describe "Groups API", type: :request do
       "#{group.context_type.downcase}_id" => group.context_id,
       'role' => group.group_category.role,
       'group_category_id' => group.group_category_id,
-      'storage_quota_mb' => group.storage_quota_mb
+      'storage_quota_mb' => group.storage_quota_mb,
+      'leader' => group.leader
     }
     if group.context_type == 'Account' && is_admin == true
       json['sis_import_id'] = group.sis_batch_id

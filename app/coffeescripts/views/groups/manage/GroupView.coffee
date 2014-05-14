@@ -73,7 +73,7 @@ define [
       e.preventDefault()
       e.stopPropagation()
       $target = $(e.currentTarget)
-      @addUnassignedMenu.groupId = @model.id
+      @addUnassignedMenu.group = @model
       @addUnassignedMenu.showBy $target, e.type is 'click'
 
     hideAddUser: (e) ->
@@ -93,4 +93,4 @@ define [
       user = ui.draggable.data('model')
       newGroupId = $(e.currentTarget).data('id')
       setTimeout =>
-        @model.collection.category.reassignUser(user, newGroupId)
+        @model.collection.category.reassignUser(user, @model.collection.get(newGroupId))

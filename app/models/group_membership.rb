@@ -36,9 +36,11 @@ class GroupMembership < ActiveRecord::Base
   before_validation :verify_section_homogeneity_if_necessary
   validate :validate_within_group_limit
 
+  after_save :revoke_leadership_if_necessary
   after_save :ensure_mutually_exclusive_membership
   after_save :touch_groups
   after_save :update_cached_due_dates
+  after_destroy :revoke_leadership
   after_destroy :touch_groups
 
   has_a_broadcast_policy
@@ -103,6 +105,21 @@ class GroupMembership < ActiveRecord::Base
     true
   end
   protected :auto_join
+
+  def revoke_leadership
+    self.group.update_attribute(:leader, nil) if self.group && self.group.leader == self.user
+  end
+  protected :revoke_leadership
+
+  def revoke_leadership_if_necessary
+    if self.old_group_id # moved to new group
+      old_group = Group.find(self.old_group_id)
+      old_group.update_attribute(:leader, nil) if old_group && old_group.leader == self.user
+    elsif self.deleted? && self.group && self.group.leader == self.user # deleted
+      self.group.update_attribute(:leader, nil)
+    end
+  end
+  protected :revoke_leadership_if_necessary
 
   def ensure_mutually_exclusive_membership
     return unless self.group
