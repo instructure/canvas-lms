@@ -50,6 +50,7 @@ module SFU
         case e.message
           when /404/ then 404
           when /500/ then 500
+          else 500
         end
 
         # If REST server app is unavailable, its webserver returns a 404. Therefore, should be returning a 500 instead
