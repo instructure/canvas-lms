@@ -860,21 +860,24 @@ class Enrollment < ActiveRecord::Base
   end
 
   set_policy do
+    given {|user, session| self.course.grants_rights?(user, session, :manage_students, :manage_admin_users).values.any? }
+    can :read
+
     given { |user| self.user == user }
+    can :read and can :read_grades
+
+    given { |user, session| self.course.students_visible_to(user, true).map(&:id).include?(self.user_id) && self.course.grants_rights?(user, session, :manage_grades, :view_all_grades).values.any? }
+    can :read and can :read_grades
+
+    given { |user| course.observer_enrollments.find_by_user_id_and_associated_user_id(user.id, self.user_id).present? }
     can :read and can :read_grades
 
     given {|user, session| self.course.grants_right?(user, session, :participate_as_student) && self.user.show_user_services }
     can :read_services
 
     # read_services says this person has permission to see what web services this enrollment has linked to their account
-    given {|user, session| self.course.grants_right?(user, session, :manage_students) && self.user.show_user_services }
-    can :read and can :read_services
-
-    given { |user, session| self.course.students_visible_to(user, true).map(&:id).include?(self.user_id) && self.course.grants_rights?(user, session, :manage_grades, :view_all_grades).values.any? }
-    can :read and can :read_grades
-
-    given { |user| course.observer_enrollments.find_by_user_id_and_associated_user_id(user.id, self.user_id).present? }
-    can :read and can :read_grades and can :read_services
+    given {|user, session| self.grants_right?(user, session, :read) && self.user.show_user_services }
+    can :read_services
   end
 
   scope :before, lambda{ |date|

@@ -748,7 +748,23 @@ describe UsersController do
     context "sharding" do
       specs_require_sharding
 
-      it "should include enrollments from all shards" do
+      it "should include enrollments from all shards for the actual user" do
+        course_with_teacher(:active_all => 1)
+        @shard1.activate do
+          account = Account.create!
+          course = account.courses.create!
+          @e2 = course.enroll_teacher(@teacher)
+        end
+        account_admin_user(:user => @teacher)
+        user_session(@teacher)
+
+        get 'show', :id => @teacher.id
+        response.should be_success
+        assigns[:enrollments].sort_by(&:id).should == [@enrollment, @e2]
+      end
+
+      it "should include enrollments from all shards for trusted account admins" do
+        pending "granting read permissions to trusted accounts"
         course_with_teacher(:active_all => 1)
         @shard1.activate do
           account = Account.create!
@@ -756,12 +772,27 @@ describe UsersController do
           @e2 = course.enroll_teacher(@teacher)
         end
         account_admin_user
-        user_session(@admin)
+        user_session(@user)
 
         get 'show', :id => @teacher.id
         response.should be_success
         assigns[:enrollments].sort_by(&:id).should == [@enrollment, @e2]
       end
+    end
+
+    it "should not let admins see enrollments from other accounts" do
+      @enrollment1 = course_with_teacher(:active_all => 1)
+      @enrollment2 = course_with_teacher(:active_all => 1, :user => @user)
+
+      other_root_account = Account.create!(:name => 'other')
+      @enrollment3 = course_with_teacher(:active_all => 1, :user => @user, :account => other_root_account)
+
+      account_admin_user
+      user_session(@admin)
+
+      get 'show', :id => @teacher.id
+      response.should be_success
+      assigns[:enrollments].sort_by(&:id).should == [@enrollment1, @enrollment2]
     end
 
     it "should respond to JSON request" do
