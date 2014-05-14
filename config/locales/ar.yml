@@ -1887,7 +1887,7 @@ ar:
       additional_comments: "تعليقات إضافية"
       buttons: 
         submit_assignment: "إرسال المهمة"
-      group_assignment_header: تعليقات
+      group_assignment_header: تعليقات...
     external_grader_sidebar: 
       edit_assignment_settings: "تحرير إعدادات المهام"
       speed_grader: "تقييم سريع"
@@ -2432,7 +2432,7 @@ ar:
       user_name_description: "اسم المستخدم للمستخدم الذي لديه وصول مدرس/مصمم إلى المساق للصف. ويجب أن يطابق أحد أسماء المستخدمين المدرجين في بيانات اعتماد تسجيل الدخول إلى Blackboard أعلاه."
     only_one_bulk_migration: "يمكن تشغيل عملية واحدة فقط في كل مرة للترحيل المجمع للمساقات."
   button: 
-    go_back: عودة
+    go_back: "عودة للخلف"
     post: "نشر الدرجات"
     submit_assignment: "إرسال المهمة"
   buttons: 
@@ -4991,7 +4991,7 @@ ar:
         confirm_unenroll: "هل ترغب بالتأكيد في إلغاء التسجيل في هذا المساق؟ لن يعود بإمكانك مشاهدة كشف المساق أو الاتصال مباشرة بالمعلمين، ولن تعود قادرًا على مشاهدة أحداث المساق في التدفق وكإعلامات."
         custom_page: "يمكنك **تصميم الصفحة الرئيسية للمساق** وتضمين أي ارتباطات أو صور أو وسائط تريدها."
         modules: |-
-            يمكنك تنظيم المساق في **وحدات أو أقسام**، حيث يحتوي كل قسم على مجموعة ذات صلة من الملفات والمهام والصفحات إلخ. ويمكنك، إن أردت، ترتيب الوحدات عن طريق تحديد المعايير والمتطلبات الأساسية التي تحتاج للاستكمال قبل إلغاء تأمين كل وحدة.
+            يمكنك تنظيم المساق في **وحدات أو أقسام**، حيث يحتوي كل قسم على مجموعة ذات صلة من الملفات والمهام والصفحات إلخ. ويمكنك، إن أردت، ترتيب الوحدات عن طريق تحديد المعايير والمتطلبات الأساسية التي تحتاج إلى استيفائها قبل إلغاء تأمين كل وحدة.
             
             -هذا المخطط على الأرجح هو الأفضل للمساقات التي لا تعتمد على جدول زمني معين مثل فصل دراسي أو نصف سنة دراسية.
         recent_activity_dashboard: "تسمح **لوحة معلومات النشاط الأخير**  للمشاركين بالاطلاع على أحدث المحادثات، والإعلانات والمناقشات والتفاعلات لهذه الدورة. إنها تشبه إلى حد بعيد صفحة لوحة المعلومات التي يشاهدها المستخدمون عند تسجيل الدخول لأول مرة، لكنها تعرض فقط محتوى هذه الدورة التدريبية المحددة."
@@ -5439,7 +5439,7 @@ ar:
     _register: 
       add_site: "إضافة موقع"
       invalid_email: "عنوان بريد إلكتروني غير صالح"
-      personalizing: "جارِ التخصيص..."
+      personalizing: "جارِ التشخيص..."
       ready: جاهز!
       registered_successfully: "تم التسجيل بنجاح!"
       specify_location: "يرجى تحديد موقعك الجغرافي"
@@ -5453,10 +5453,10 @@ ar:
       africa: أفريقيا
       agree_to_terms: "أوافق على *شروط الاستخدام* وتقر **بسياسة الخصوصية**."
       asia_and_middle_east: "آسيا والشرق الأوسط"
-      assistant_superintendent: "المشرف المساعد"
+      assistant_superintendent: "مشرف مساعد"
       australia_new_zealand_and_oceania: "أستراليا ونيوزيلندا وأوقيانوسيا"
       begin_trial: "بدء المحاولة"
-      bus_finance_purchasing_director: "دليل شراء/تمويل/نقل"
+      bus_finance_purchasing_director: "مسؤول شراء/تمويل/نقل"
       c_level: "المستوى C"
       choose: "اختيار واحد"
       cio: CIO
@@ -5467,7 +5467,7 @@ ar:
       employee: موظف
       europe_other: "أوروبا - أخرى"
       europe_uk: "أوروبا - المملكة المتحدة"
-      executive_officer: "المسؤول التنفيذي"
+      executive_officer: "مسؤول تنفيذي"
       government: الحكومة
       gs_11_15: "GS 11-15"
       gs_1_7: "GS 1-7"
@@ -5476,7 +5476,7 @@ ar:
       higher_education_for_profit: "التعليم العالي الربحي"
       incorrect: "غير صحيح. حاول مرة أخرى."
       instructional_designer: "مصمم الإرشادات"
-      instructional_media_svcs_dir: "دليل خدمات الوسائط التعليمية"
+      instructional_media_svcs_dir: "مسؤول خدمات الوسائط التعليمية"
       k12: K12
       k12_for_profit: "مدارس K12 الربحية"
       labels: 
@@ -5496,19 +5496,19 @@ ar:
       one: أخرى
       other: أخرى
       personalize_demo: "تخصيص العرض التجريبي"
-      principal: رئيسي
+      principal: الرئيس
       provost: الرئيس
       school_administrator: "مسؤول المدرسة"
-      school_technology_coordinator: "منسق تقني في المدرسة"
+      school_technology_coordinator: "منسق التقنية في المدرسة"
       sign_up_to_canvas: "قم بتسجيل الدخول لتجربة Canvas"
-      south_america_central_america_and_caribbean: "أمريكا الشمالية ووسط أمريكا ومنطقة الكاريبي"
+      south_america_central_america_and_caribbean: "أمريكا الشمالية وأمريكا الوسطى ومنطقة الكاريبي"
       student: الطالب
       subscribe: "أودّ أن أتلقى معلومات وأخبارًا وتلميحات عن Instructure"
       superintendent: مشرف
       support: الدعم
-      teacher_instructor: المدرس/المعلم
+      teacher_instructor: مدرس/معلم
       technologist: "الخبير بالتكنولوجيا"
-      technology_computer_coord: "منسق الكمبيوتر/منسق تقني"
+      technology_computer_coord: "منسق كمبيوتر/منسق تقني"
       technology_education_director: "مدير التعليم التقني"
       united_states_and_canada: "الولايات المتحدة وكندا"
       vp: "نائب المدير"
@@ -7175,7 +7175,7 @@ ar:
       weight_final: "الدرجة النهائية للتقييم استنادًا إلى المجموعات"
     gradebook2: 
       arrange_columns_by_due_date: "ترتيب الأعمدة حسب موعد الاستحقاق"
-      arrange_columns_by_group: "ترتيب الأعمدة حسب مجموعات المهام"
+      arrange_columns_by_group: "ترتيب الأعمدة حسب مجموعة المهام"
       download_scores: "تنزيل الدرجات (csv.)"
       filter_by_student: "التصفية حسب اسم الطالب أو المعرف الثانوي"
       grades: الدرجات
@@ -7184,7 +7184,7 @@ ar:
       learning_mastery: "إتقان التعلم"
       old_gradebook: "دفتر الدرجات القديم"
       post_grades: "نشر الدرجات"
-      publish_to_sis: "نشر الدرجات على SIS"
+      publish_to_sis: "نشر الدرجات في SIS"
       set_group_weights: "ضبط تقييمات المجموعة"
       show_attendance_columns: "إظهار أعمدة الحضور"
       show_concluded_enrollments: "عرض التسجيلات المنتهية"
@@ -7868,12 +7868,12 @@ ar:
   importers/course_content_importer: 
     failed_import_media_objects: "فشل استيراد كائنات الوسائط"
   importers/learning_outcome_group_importer: 
-    no_global_permission: "غير مسموح لك بإدارة النتائج العالمية، لا يمكن إضافة  \"%{title}\"\n"
+    no_global_permission: "غير مسموح لك بإدارة النتائج العامة، لا يمكن إضافة \"%{title}\""
   importers/learning_outcome_importer: 
-    no_context_found: "لا يمكن العثور على نتيجة التعلم الخارجية لـ \"%{title}\"، لإنشاء نسخة."
-    no_global_permission: "غير مسموح لك بإدارة النتائج العالمية، لا يمكن إضافة  \"%{title}\"\n"
+    no_context_found: "لا يمكن العثور على نتيجة التعلم الخارجية لـ \"%{title}\"، إنشاء نسخة."
+    no_global_permission: "غير مسموح لك بإدارة النتائج العامة، لا يمكن إضافة \"%{title}\""
   importers/rubric_importer: 
-    no_context_found: "لا يمكن العثور على العنوان الخارجي لـ \"%{title}\"، يتم إنشاء نسخة."
+    no_context_found: "لا يمكن العثور على العنوان الخارجي لـ \"%{title}\"، إنشاء نسخة."
   importers/wiki_page_importer: 
     title_for_topics_category: "موضوعات %{category}"
     warnings: 
@@ -11458,16 +11458,16 @@ ar:
       module: الوحدة
       multiple_modules: "وحدات متعددة"
       no_points_possible: "لا توجد نقاط ممكنة"
-      points_possible: "%{pointsPossible} نقاط"
-      points_possible_screen_reader: "%{pointsPossible} نقطة/نقاط ممكنة"
+      points_possible: "%{pointsPossible} من النقاط"
+      points_possible_screen_reader: "%{pointsPossible} من النقاط الممكنة"
       settings: "تحرير المهمة"
     assignment_list_item_score: 
       assignment_grading_type_is_not_graded: "لن يتم تعيين درجة لهذه المهمة."
-      assignment_not_yet_graded_screenreader: "لم يتم تقييم المهمة حتى الآن. %{pointsPossible} نقطة/نقاط ممكنة."
+      assignment_not_yet_graded_screenreader: "لم يتم تقييم المهمة حتى الآن. %{pointsPossible} من النقاط الممكنة."
       empty_points_possible: "-/%{pointsPossible} من النقاط"
       no_submission: "لا يوجد إرسال"
-      no_submission_for_assignment_screenreader: "لا يوجد إرسال لهذه المهمة. %{pointsPossible} نقطة/نقاط ممكنة."
-      not_yet_graded: "*لم يتم منح درجة بعد*"
+      no_submission_for_assignment_screenreader: "لا يوجد إرسال لهذه المهمة. %{pointsPossible} من النقاط الممكنة."
+      not_yet_graded: "*لم يتم تقييم الدرجة حتى الآن*"
       score_with_points_possible: "*%{score}*/%{pointsPossible} من النقاط"
       score_with_points_possible_screenreader: "الدرجة: %{score} من %{pointsPossible} من النقاط."
     assignment_settings: 
@@ -11490,7 +11490,7 @@ ar:
       external_tool_type: "الأداة الخارجية"
       more: "انتقال إلى %{objectType}"
       multiple_due_dates: "تواريخ استحقاق عديدة"
-      not_graded_type: "لم يتم تقييم درجات"
+      not_graded_type: "لم يتم تقييم الدرجة"
       quiz_type: اختبار
       save: حفظ
       saving: "جارٍ الحفظ..."
@@ -11503,7 +11503,7 @@ ar:
       multiple_dates: "تواريخ متعددة"
     due_date_view: 
       overrides: 
-        remove_these_dates: "حذف هذه التواريخ"
+        remove_these_dates: "إزالة هذه التواريخ"
     edit_header_view: 
       buttons: 
         not_published: "لم يتم النشر"
@@ -11513,23 +11513,23 @@ ar:
         delete: حذف
     group_category_selector: 
       grade_group_students_individually: "تعيين الدرجات لكل طالب على حدة"
-      group_assignment_header: "تعيين المجموعة"
+      group_assignment_header: "مهمة المجموعة"
       group_category_options: "فئة مجموعة جديدة"
       group_set: "مجموعة المجموعات"
-      is_group_assignment: "هذا هو تعيين المجموعة"
-      students_already_submitted_warning: "لن يتم احتساب عمليات الإرسال المنفردة كعمليات إرسال الجماعية وسوف تظهر بشكل غير صحيح في speedgrader."
+      is_group_assignment: "هذا عبارة عن مهمة مجموعة"
+      students_already_submitted_warning: "لن يتم احتساب عمليات الإرسال السابقة كعمليات إرسال جماعية وسوف تظهر بشكل غير صحيح في speedgrader."
     index_view: 
       add_group: "نشر درجات المهام"
       assignments: المهام
       search_for_assignment: "البحث عن مهمة"
-      title_add_group: "إضافة مجموعة المهام"
+      title_add_group: "إضافة مجموعة مهام"
     never_drop: 
       remove_rule: "إزالة القاعدة"
     never_drop_collection: 
       add_another_assignment: "إضافة مهمة أخرى"
       add_first_assignment: "إضافة مهمة"
     no_assignments_list_item: 
-      no_assignments_in_this_group: "لا توجد تعيينات في هذه المجموعة"
+      no_assignments_in_this_group: "لا توجد مهام في هذه المجموعة"
     no_assignments_search: 
       aria_assignments: المهام
       assignments: المهام
@@ -12888,7 +12888,7 @@ ar:
       two: "%{count} سؤال"
       zero: "%{count} سؤال"
   quizzes_redirects: 
-    no_access: "تم رفض الوصول. تم التوجيه إلى صفحة لديك صلاحية الوصول إليها."
+    no_access: "تم رفض الوصول. وتم التوجيه إلى صفحة لديك صلاحية الوصول إليها."
   re_upload_submissions_form: 
     buttons: 
       upload: "تحميل الملفات"
@@ -14196,7 +14196,7 @@ ar:
     click_to_download: "انقر هنا لتنزيل %{size_of_file}"
     creating_zip: "جارٍ إنشاء الملف المضغوط..."
     download_submissions: "تنزيل إرسالات المهمة"
-    download_submissions_title: "تنزيل إرسالات المهمة"
+    download_submissions_title: "تنزيل عمليات إرسال المهمة"
     errors: 
       assignment_submit_fail: "فشل إرسال المهمة"
       can_not_submit_locked_assignment: "لا يمكنك إرسال تعيين عندما يتم تأمينه"
@@ -14209,7 +14209,7 @@ ar:
       student_not_enrolled_id: "المستخدم المحدد (%{id}) ليس طالبًا في هذا المساق"
     errors_update_failed: "فشل التحديث"
     finished_redirecting: "انتهى!  جارٍ إعادة التوجيه إلى الملف..."
-    gathering_files: "يجري تجميع الملفات (%{progress})..."
+    gathering_files: "جارٍ تجميع الملفات (%{progress})..."
     gathering_files_progress: "يجري تجميع الملفات (%{progress})..."
     resubmitted_to_turnitin: "تمت إعادة الإرسال إلى turnitin بنجاح."
     see_attached_files: "انظر الملفات المرفقة"
