@@ -28,7 +28,7 @@ class ControllerListView < HashView
   end
 
   def domain
-    ENV["CANVAS_DOMAIN"] || config_domain_yaml ? canvas_url : "https://canvas.instructure.com"
+    ENV["CANVAS_DOMAIN"] || (config_domain_yaml ? canvas_url : "https://canvas.instructure.com")
   end
 
   def swagger_file

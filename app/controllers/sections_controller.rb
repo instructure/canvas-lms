@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -51,7 +51,12 @@
 #           "type": "integer"
 #         },
 #         "course_id": {
-#           "description": "The unique identifier for the course the section belongs to",
+#           "description": "The unique Canvas identifier for the course in which the section belongs",
+#           "example": 7,
+#           "type": "integer"
+#         },
+#         "sis_course_id": {
+#           "description": "The unique SIS identifier for the course in which the section belongs",
 #           "example": 7,
 #           "type": "integer"
 #         },
