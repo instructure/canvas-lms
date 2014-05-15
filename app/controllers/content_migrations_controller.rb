@@ -280,10 +280,6 @@ class ContentMigrationsController < ApplicationController
   #   Move anything scheduled for day 'X' to the specified day. (0-Sunday,
   #   1-Monday, 2-Tuesday, 3-Wednesday, 4-Thursday, 5-Friday, 6-Saturday)
   #
-  # @argument settings[file_url] [string] (optional) A URL to download the file from. Must not require authentication.
-  #
-  # @argument settings[source_course_id] [string] (optional) The course to copy from for a course copy migration. (required if doing course copy)
-  #
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/courses/<course_id>/content_migrations' \
