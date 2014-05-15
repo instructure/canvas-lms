@@ -97,7 +97,7 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def show
-    if @context.root_account.enable_fabulous_quizzes? && @context.feature_enabled?(:draft_state)
+    if @context.root_account.enable_fabulous_quizzes? && @context.feature_enabled?(:draft_state) && !params.key?(:take)
       redirect_to ember_urls.course_quiz_url(@quiz.id)
       return
     end

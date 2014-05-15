@@ -105,6 +105,14 @@ define [
       server.restore()
       $.ajax.restore()
 
+  testShowPage 'shows a link to take the quiz in the dropdown', ->
+    click('ic-menu-trigger').then ->
+      stop()
+      store.find('quiz', 1)
+    .then (quiz) ->
+      start()
+      equal $(find('.js-take-quiz')).attr('href'), quiz.get('takeQuizUrl')
+
   module "Quiz Show Integration for Students",
     setup: ->
       App = startApp()

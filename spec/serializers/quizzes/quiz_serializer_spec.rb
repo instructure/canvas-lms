@@ -168,6 +168,44 @@ describe Quizzes::QuizSerializer do
     end
   end
 
+  describe "takeable" do
+
+    before do
+      course_with_teacher_logged_in(active_all: true)
+      course_quiz(true)
+      quiz_with_graded_submission([], user: @teacher, quiz: @quiz)
+      @serializer = quiz_serializer(quiz_submissions: { @quiz.id => @quiz_submission })
+    end
+
+    it "is true when there is no quiz submision" do
+      Quizzes::QuizSubmission.delete_all
+      quiz_serializer.as_json[:quiz][:takeable].should == true
+    end
+
+    it "is true when quiz_submission is present but not completed" do
+      @quiz_submission.workflow_state = "settings_only"
+      @serializer.as_json[:quiz][:takeable].should == true
+    end
+
+    it "is true when the quiz submission is completed but quiz has unlimited attempts" do
+      @quiz_submission.workflow_state = "complete"
+      @quiz.allowed_attempts = -1
+      @serializer.as_json[:quiz][:takeable].should == true
+    end
+
+    it "is true when quiz submission is completed, !quiz.unlimited_attempts" do
+      @quiz_submission.workflow_state = "complete"
+      @quiz.allowed_attempts = 2
+      # false when attempts left attempts is 0
+      @quiz_submission.expects(:attempts_left).at_least_once.returns 0
+      @serializer.as_json[:quiz][:takeable].should == false
+      # true when than attempts left greater than 0
+      @quiz_submission.expects(:attempts_left).at_least_once.returns 1
+      @serializer.as_json[:quiz][:takeable].should == true
+    end
+
+  end
+
   describe "links" do
 
     describe "assignment_group" do

@@ -122,6 +122,8 @@ define [
     messageStudentsUrl: attr()
     quizSubmission: belongsTo 'quiz_submission'
     quizSubmissions: alias('studentQuizSubmissions')
+    takeable: attr()
+    takeQuizUrl: attr()
 
   Quiz.SORT_LAST = 'ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ'
 

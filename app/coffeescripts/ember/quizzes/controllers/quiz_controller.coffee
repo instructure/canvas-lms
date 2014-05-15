@@ -31,6 +31,19 @@ define [
       @set('showAsPublished', @get('published'))
     ).observes('model')
 
+    takeOrResumeMessage: (->
+      if @get('quizSubmission.isUntaken')
+        if @get('isSurvey')
+          I18n.t 'resume_the_survey', 'Resume the Survey'
+        else
+          I18n.t 'resume_the_quiz', 'Resume the Quiz'
+      else
+        if @get('isSurvey')
+          I18n.t 'take_the_survey', 'Take the Survey'
+        else
+          I18n.t 'take_the_quiz', 'Take the Quiz'
+    ).property('isSurvey', 'quizSubmisison.isUntaken')
+
     updatePublished: (publishStatus) ->
       success = (=> @displayPublished())
 
@@ -85,7 +98,12 @@ define [
 
     actions:
       takeQuiz: ->
-        console.log 'take it!'
+        url = "#{@get 'takeQuizUrl'}&authenticity_token=#{ENV.AUTHENTICITY_TOKEN}"
+        $('<form></form>').
+          prop('action', url).
+          prop('method', 'POST').
+          appendTo("body").
+          submit()
 
       speedGrader: ->
         window.location = @get 'speedGraderUrl'

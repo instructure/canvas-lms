@@ -28,6 +28,13 @@
             </a>
           {{/ic-menu-item}}
 
+          {{#if takeable}}
+            {{#ic-menu-item on-select="takeQuiz" class="js-take-quiz"}}
+              <i class="icon-mark-as-read"></i>
+              <a {{bind-attr href="takeQuizUrl"}}>{{takeOrResumeMessage}}</a>
+            {{/ic-menu-item}}
+          {{/if}}
+
           {{#ic-menu-item on-select="messageStudents" class="js-message-students"}}
             <i class="icon-discussion"></i>
             {{#t 'Message Students'}}Message Students{{/t}}
@@ -66,9 +73,16 @@
 
     {{else}}
       <div class="span4 student-action-buttons pull-right">
-        <button {{action "takeQuiz"}} class="btn btn-primary">
-          {{#t 'take_quiz'}}Take Quiz{{/t}}
-        </button>
+        {{#if takeable}}
+          {{#if lockedForUser}}
+            {{lockExplanation}}
+          {{else}}
+          <a {{bind-attr href="takeQuizUrl"}} {{action "takeQuiz"}} class="btn btn-primary">
+              {{takeOrResumeMessage}}
+            </a>
+          {{/if}}
+
+        {{/if}}
       </div>
     {{/if}}
   </div>

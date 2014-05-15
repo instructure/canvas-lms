@@ -16,7 +16,8 @@ module Quizzes
                 :require_lockdown_browser, :require_lockdown_browser_for_results,
                 :require_lockdown_browser_monitor, :lockdown_browser_monitor_data,
                 :speed_grader_url, :permissions, :quiz_reports_url, :quiz_statistics_url,
-                :message_students_url, :quiz_submission_html_url, :section_count
+                :message_students_url, :quiz_submission_html_url, :section_count,
+                :take_quiz_url, :takeable
 
     def_delegators :@controller,
       :api_v1_course_assignment_group_url,
@@ -27,7 +28,8 @@ module Quizzes
       :api_v1_course_quiz_statistics_url,
       :course_quiz_submission_html_url,
       :api_v1_course_quiz_submission_users_url,
-      :api_v1_course_quiz_submission_users_message_url
+      :api_v1_course_quiz_submission_users_message_url,
+      :course_quiz_take_url
 
    def_delegators :@object,
      :context,
@@ -41,11 +43,22 @@ module Quizzes
     has_many :unsubmitted_students, embed: :ids, root: :unsubmitted_students
 
     def quiz_submission
-      if @self_quiz_submissions
+      @quiz_submission ||= if @self_quiz_submissions
         @self_quiz_submissions[quiz.id]
       else
         quiz.quiz_submissions.where(user_id: current_user).first
       end
+    end
+
+    def takeable
+      return true if !quiz_submission
+      return true if !quiz_submission.completed?
+      return true if quiz.unlimited_attempts?
+      (quiz_submission.completed? && quiz_submission.attempts_left > 0)
+    end
+
+    def take_quiz_url
+      course_quiz_take_url(context, quiz, user_id: current_user.id)
     end
 
     def initialize(object, options={})
@@ -124,6 +137,7 @@ module Quizzes
     def filter(keys)
       super(keys).select do |key|
         case key
+        when :take_quiz_url then accepts_jsonapi?
         when :all_dates then include_all_dates?
         when :section_count then user_may_grade?
         when :access_code, :speed_grader_url, :message_students_url then user_may_grade?

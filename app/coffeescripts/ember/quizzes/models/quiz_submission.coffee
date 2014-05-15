@@ -4,6 +4,7 @@ define [
 ], (Em, DS, ajax) ->
 
   {alias, equal, any} = Em.computed
+  computed = Em.computed
   {belongsTo, hasMany, Model, attr} = DS
 
   QuizSubmission = Model.extend
@@ -25,3 +26,8 @@ define [
     timeSpent: attr()
     validationToken: attr()
     workflowState: attr()
+    isCompleted: computed.or 'isPendingReview', 'isComplete'
+    isComplete: equal 'workflowState', 'complete'
+    isPendingReview: equal 'workflowState', 'pending_review'
+    isUntaken: equal 'workflowState', 'untaken'
+    attemptsLeft: attr()

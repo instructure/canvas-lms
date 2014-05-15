@@ -15,14 +15,21 @@ define [
 
     payload.assignment_overrides = overrides
 
+  mungeQuizSubmissions = (payload) ->
+    (payload.quizzes || []).forEach (quiz) ->
+      quiz.quiz_submission_id = quiz.links.quiz_submission
+      delete quiz.links.quiz_submission
+
   QuizSerializer = DS.ActiveModelSerializer.extend
 
     extractArray: (store, primaryType, payload) ->
       mungeOverrides payload
+      mungeQuizSubmissions payload
       this._super store, primaryType, payload
 
     extractSingle: (store, type, payload, id, requestType) ->
       mungeOverrides payload
+      mungeQuizSubmissions payload
       this._super store, type, payload, id, requestType
 
     normalizePayload: (type, hash, prop) ->
