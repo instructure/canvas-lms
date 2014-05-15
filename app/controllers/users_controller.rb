@@ -334,7 +334,7 @@ class UsersController < ApplicationController
           @users = @context.fast_all_users.
               where("EXISTS (?)", Enrollment.where("enrollments.user_id=users.id").
                 joins(:course).
-                where(User.enrollment_conditions(:active)).
+                where(Enrollment::QueryBuilder.new(:active).conditions).
                 where(courses: { enrollment_term_id: params[:enrollment_term_id]}))
         elsif !api_request?
           @users = @context.fast_all_users

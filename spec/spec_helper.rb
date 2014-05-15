@@ -1443,6 +1443,31 @@ end
     @page_view.save!
     @page_view
   end
+
+  # a fast way to create a record, especially if you don't need the actual
+  # ruby object. since it just does a straight up insert, you need to
+  # provide any non-null attributes or things that would normally be
+  # inferred/defaulted prior to saving
+  def create_record(klass, attributes, return_type = :id)
+    create_records(klass, [attributes], return_type)[0]
+  end
+
+  # a little wrapper around bulk_insert that gives you back records or ids
+  # in order
+  # NOTE: if you decide you want to go add something like this to canvas
+  # proper, make sure you have it handle concurrent inserts (this does
+  # not, because READ COMMITTED is the default transaction isolation
+  # level)
+  def create_records(klass, records, return_type = :id)
+    return [] if records.empty?
+    klass.transaction do
+      klass.connection.bulk_insert klass.table_name, records
+      scope = klass.order("id DESC").limit(records.size)
+      return_type == :record ?
+        scope.all.reverse :
+        scope.pluck(:id).reverse
+    end
+  end
 end
 
 class String

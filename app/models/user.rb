@@ -53,103 +53,8 @@ class User < ActiveRecord::Base
   time_zone_attribute :time_zone
   include Workflow
 
-  # Internal: SQL fragments used to return enrollments in their respective workflow
-  # states. Where needed, these consider the state of the course to ensure that
-  # students do not see their enrollments on unpublished courses.
-  #
-  # strict_course_state can be used to bypass the course state checks. This is
-  # useful in places like the course settings UI, where we use these conditions
-  # to search users in the course (rather than as an association on a
-  # particular user)
-  #
-  # the course_workflow_state parameter can be used to simplify the query when
-  # the enrollments are all known to come from one course whose workflow state
-  # is already known. when provided, the method may return nil, in which case
-  # the condition should be treated as 'always false'.
-  def self.enrollment_conditions(state, strict_course_state=true, course_workflow_state=nil)
-    #strict_course_state = true
-    case state
-      when :active
-        if strict_course_state
-          case course_workflow_state
-          when 'available'
-            # all active enrollments in a published and active course count
-            "enrollments.workflow_state='active'"
-          when 'claimed'
-            # student and observer enrollments don't count as active if the
-            # course is unpublished
-            "enrollments.workflow_state='active' AND enrollments.type IN ('TeacherEnrollment','TaEnrollment','DesignerEnrollment','StudentViewEnrollment')"
-          when nil
-            # combine the other branches dynamically based on joined course's
-            # workflow_state
-            "enrollments.workflow_state='active' AND (courses.workflow_state='available' OR courses.workflow_state='claimed' AND enrollments.type IN ('TeacherEnrollment','TaEnrollment','DesignerEnrollment','StudentViewEnrollment'))"
-          else
-            # never include enrollments from unclaimed/completed/deleted
-            # courses
-            nil
-          end
-        else
-          case course_workflow_state
-          when 'deleted'
-            # never include enrollments from deleted courses, even without
-            # strict checks
-            nil
-          when nil
-            # combine the other branches dynamically based on joined course's
-            # workflow_state
-            "enrollments.workflow_state='active' AND courses.workflow_state<>'deleted'"
-          else
-            # all active enrollments in a non-deleted course count
-            "enrollments.workflow_state='active'"
-          end
-        end
-      when :invited
-        if strict_course_state
-          case course_workflow_state
-          when 'available'
-            # all invited enrollments in a published and active course count
-            "enrollments.workflow_state='invited'"
-          when 'deleted'
-            # never include enrollments from deleted courses
-            nil
-          when nil
-            # combine the other branches dynamically based on joined course's
-            # workflow_state
-            "enrollments.workflow_state='invited' AND (courses.workflow_state='available' OR courses.workflow_state<>'deleted' AND enrollments.type IN ('TeacherEnrollment','TaEnrollment','DesignerEnrollment','StudentViewEnrollment'))"
-          else
-            # student and observer enrollments don't count as invited if
-            # the course is unclaimed/unpublished/completed
-            "enrollments.workflow_state='invited' AND enrollments.type IN ('TeacherEnrollment','TaEnrollment','DesignerEnrollment','StudentViewEnrollment')"
-          end
-        else
-          case course_workflow_state
-          when 'deleted'
-            # never include enrollments from deleted courses
-            nil
-          when nil
-            # combine the other branches dynamically based on joined course's
-            # workflow_state
-            "enrollments.workflow_state IN ('invited','creation_pending') AND courses.workflow_state<>'deleted'"
-          else
-            # all invited and creation_pending enrollments in a non-deleted
-            # course count
-            "enrollments.workflow_state IN ('invited','creation_pending')"
-          end
-        end
-      when :deleted;          "enrollments.workflow_state = 'deleted'"
-      when :rejected;         "enrollments.workflow_state = 'rejected'"
-      when :completed;        "enrollments.workflow_state = 'completed'"
-      when :creation_pending; "enrollments.workflow_state = 'creation_pending'"
-      when :inactive;         "enrollments.workflow_state = 'inactive'"
-      when :current_and_invited
-        enrollment_conditions(:active, strict_course_state, course_workflow_state) +
-        " OR " +
-        enrollment_conditions(:invited, strict_course_state, course_workflow_state)
-      when :current_and_concluded
-        enrollment_conditions(:active, strict_course_state, course_workflow_state) +
-        " OR " +
-        enrollment_conditions(:completed, strict_course_state, course_workflow_state)
-    end
+  def self.enrollment_conditions(state, options = {})
+    Enrollment::QueryBuilder.new(state, options).conditions
   end
 
   has_many :communication_channels, :order => 'communication_channels.position ASC', :dependent => :destroy
@@ -163,7 +68,7 @@ class User < ActiveRecord::Base
     has_many :current_and_invited_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :order => 'enrollments.created_at',
             :conditions => enrollment_conditions(:current_and_invited)
     has_many :current_and_future_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :order => 'enrollments.created_at',
-            :conditions => enrollment_conditions(:current_and_invited, false)
+            :conditions => enrollment_conditions(:current_and_invited, strict_checks: false)
     has_many :concluded_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => enrollment_conditions(:completed), :order => 'enrollments.created_at'
     has_many :current_and_concluded_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section],
             :conditions => enrollment_conditions(:current_and_concluded), :order => 'enrollments.created_at'
@@ -173,7 +78,7 @@ class User < ActiveRecord::Base
     has_many :current_and_invited_enrollments, :class_name => 'Enrollment', :joins => [:course], :order => 'enrollments.created_at',
             :conditions => enrollment_conditions(:current_and_invited), :readonly => false
     has_many :current_and_future_enrollments, :class_name => 'Enrollment', :joins => [:course], :order => 'enrollments.created_at',
-            :conditions => enrollment_conditions(:current_and_invited, false), :readonly => false
+            :conditions => enrollment_conditions(:current_and_invited, strict_checks: false), :readonly => false
     has_many :concluded_enrollments, :class_name => 'Enrollment', :joins => [:course], :conditions => enrollment_conditions(:completed), :order => 'enrollments.created_at', :readonly => false
     has_many :current_and_concluded_enrollments, :class_name => 'Enrollment', :joins => [:course],
             :conditions => enrollment_conditions(:current_and_concluded), :order => 'enrollments.created_at', :readonly => false

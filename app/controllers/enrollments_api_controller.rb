@@ -490,7 +490,7 @@ class EnrollmentsApiController < ApplicationController
 
     if state.present?
       if use_course_state
-        clauses << "(#{state.map{|s| "(#{User.enrollment_conditions(s.to_sym)})" }.join(' OR ')})"
+        clauses << "(#{state.map{|s| "(#{Enrollment::QueryBuilder.new(s.to_sym).conditions})" }.join(' OR ')})"
       else
         clauses << 'enrollments.workflow_state IN (:workflow_state)'
         replacements[:workflow_state] = Array(state)
