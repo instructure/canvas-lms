@@ -2358,7 +2358,8 @@ define([
         'attachment[filename]': file.name,
         'attachment[context_code]': folder.context_string,
         'no_redirect': true,
-        'attachment[duplicate_handling]': file.duplicate_handling
+        'attachment[duplicate_handling]': file.duplicate_handling,
+        'default_content_type': 'application/octet-stream'
       };
       fileUpload.updateUploadCount();
       $.ajaxJSON('/files/pending', 'POST', post_params, function(data) {
