@@ -30,6 +30,7 @@ define [
   'jst/gradebook2/group_total_cell'
   'jst/gradebook2/row_student_name'
   'compiled/views/gradebook/SectionMenuView'
+  'compiled/gradebook2/GradebookKeyboardNav'
   'jst/_avatar' #needed by row_student_name
   'jquery.ajaxJSON'
   'jquery.instructure_date_and_time'
@@ -42,7 +43,7 @@ define [
   'jqueryui/sortable'
   'compiled/jquery.kylemenu'
   'compiled/jquery/fixDialogButtons'
-], (LongTextEditor, KeyboardNavDialog, keyboardNavTemplate, Slick, TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, $, _, Backbone, tz, GradeCalculator, userSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, SubmissionCell, GradebookHeaderMenu, numberCompare, htmlEscape, UploadDialog, PostGradesDialog, PostGradesModel, columnHeaderTemplate, groupTotalCellTemplate, rowStudentNameTemplate, SectionMenuView) ->
+], (LongTextEditor, KeyboardNavDialog, keyboardNavTemplate, Slick, TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, $, _, Backbone, tz, GradeCalculator, userSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, SubmissionCell, GradebookHeaderMenu, numberCompare, htmlEscape, UploadDialog, PostGradesDialog, PostGradesModel, columnHeaderTemplate, groupTotalCellTemplate, rowStudentNameTemplate, SectionMenuView, GradebookKeyboardNav) ->
 
   class Gradebook
     columnWidths =
@@ -734,9 +735,10 @@ define [
           else if columnDef.minimized
             @unminimizeColumn($columnHeader)
 
-      @$grid.on('keydown', @handleKeys)
-
-      @kbDialog = new KeyboardNavDialog().render(keyboardNavTemplate({@keyBindings}))
+      @keyboardNav = new GradebookKeyboardNav(@grid, @$grid)
+      @keyboardNav.init()
+      keyBindings = @keyboardNav.keyBindings
+      @kbDialog = new KeyboardNavDialog().render(keyboardNavTemplate({keyBindings}))
       # when we close a dialog we want to return focus to the grid
       $(document).on('dialogclose', (e) =>
         setTimeout(( =>
@@ -744,87 +746,6 @@ define [
         ), 0)
       )
       $(document).trigger('gridready')
-
-    keyBindings:
-      #   keyCode:
-      #   handler: function
-      #   key: the string representation of the key pressed - for use in the help dialog
-      #   desc: string describing what the shortcut does - for use in the help dialog
-      [
-        {
-        keyCode: 83
-        handler: 'sortOnHeader'
-        key: I18n.t 'keycodes.sort', 's'
-        desc: I18n.t 'keyboard_sort_desc', 'Sort the grid on the current active column'
-        }
-        {
-        keyCode: 77
-        handler: 'showAssignmentMenu'
-        key: I18n.t 'keycodes.menu', 'm'
-        desc: I18n.t 'keyboard_menu_desc', 'Open the menu for active column\'s assignment'
-        }
-         # this one is just for display in the dialog, the menu will take care of itself
-        {
-        keyCode: null
-        key: I18n.t 'keycodes.close_menu', 'esc'
-        desc: I18n.t 'keyboard_close_menu', 'Close the currently active assignment menu'
-        }
-
-        {
-        keyCode: 71
-        handler: 'gotoAssignment'
-        key: I18n.t 'keycodes.goto_assignment', 'g'
-        desc: I18n.t 'keyboard_assignment_desc', 'Go to the current assignment\'s detail page'
-        }
-        {
-        keyCode: 67
-        handler: 'showCommentDialog'
-        key: I18n.t 'keycodes.comment', 'c'
-        desc: I18n.t 'keyboard_comment_desc', 'Comment on the active submission'
-        }
-        {
-        keyCode: 84
-        handler: 'showToolTip'
-        key: I18n.t 'keycodes.tooltip', 't'
-        desc: I18n.t 'keyboard_tooltip_desc', 'Show the submission type of the active submission'
-        }
-      ]
-
-    getHeaderFromActiveCell: =>
-      coords = @grid.getActiveCell()
-      @$grid.find('.slick-header-column').eq(coords.cell)
-
-    showAssignmentMenu: =>
-      @getHeaderFromActiveCell().find('.gradebook-header-drop').click()
-      $('.gradebook-header-menu:visible').focus()
-
-    sortOnHeader: =>
-      @getHeaderFromActiveCell().click()
-
-    gotoAssignment: =>
-      url = @getHeaderFromActiveCell().find('.assignment-name').attr('href')
-      window.location = url
-
-    showCommentDialog: =>
-      $(@grid.getActiveCellNode()).find('.gradebook-cell-comment').click()
-
-    showToolTip: =>
-      node = $(@grid.getActiveCellNode())
-      if node.parent().css('top') == '0px'
-        node.find('div.gradebook-tooltip').addClass('first-row')
-      else
-        node.find('div.gradebook-tooltip').removeClass('first-row')
-      node.toggleClass("hover")
-
-    handleKeys: (e) =>
-      # makes sure the focus sink elements are currently active
-      return unless $(document.activeElement).is('[hidefocus]')
-      modifiers = ['shiftKey', 'altKey', 'ctrlKey']
-      return if _.any(e[mod] for mod in modifiers)
-      b = _.find(@keyBindings, (binding) ->
-        binding.keyCode == e.keyCode
-      )
-      b?.handler and @[b.handler]?(e)
 
     sectionList: ->
       _.map @sections, (section, id) =>
