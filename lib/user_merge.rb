@@ -32,13 +32,7 @@ class UserMerge
     from_user.communication_channels.each do |cc|
       source_cc = cc
       # have to find conflicting CCs, and make sure we don't have conflicts
-      # To avoid the case where a user has duplicate CCs and one of them is retired, don't look for retired ccs
-      # it's okay to do that even if the only matching CC is a retired CC, because it would end up on the no-op
-      # case below anyway.
-      # Behavior is undefined if a user has both an active and an unconfirmed CC; it's not allowed with current
-      # validations, but could be there due to older code that didn't enforce the uniqueness.  The results would
-      # simply be that they'll continue to have duplicate unretired CCs
-      target_cc = target_user.communication_channels.detect { |cc| cc.path.downcase == source_cc.path.downcase && cc.path_type == source_cc.path_type && !cc.retired? }
+      target_cc = target_user.communication_channels.detect { |cc| cc.path.downcase == source_cc.path.downcase && cc.path_type == source_cc.path_type }
 
       if !target_cc && from_user.shard != target_user.shard
         User.clone_communication_channel(source_cc, target_user, max_position)
@@ -57,24 +51,26 @@ class UserMerge
       elsif source_cc.active?
         # active, unconfirmed*
         # active, retired
-        to_retire = target_cc
+        target_cc.destroy!
         if from_user.shard != target_user.shard
-          target_cc.retire unless target_cc.retired?
           User.clone_communication_channel(source_cc, target_user, max_position)
         end
       elsif target_cc.unconfirmed?
         # unconfirmed*, unconfirmed
         # retired, unconfirmed
         to_retire = source_cc
-      elsif source_cc.unconfirmed? && from_user.shard != target_user.shard
+      elsif source_cc.unconfirmed?
         # unconfirmed, retired
-        User.clone_communication_channel(source_cc, target_user, max_position)
+        target_cc.destroy!
+        if from_user.shard != target_user.shard
+          User.clone_communication_channel(source_cc, target_user, max_position)
+        end
+      elsif
+        # retired, retired
+        to_retire = source_cc
       end
-      #elsif
-      # retired, retired
-      #end
 
-      if to_retire && !to_retire.retired?
+      if to_retire
         to_retire_ids << to_retire.id
       end
     end
@@ -91,9 +87,11 @@ class UserMerge
       from_user.user_services.delete_all
     else
       from_user.shard.activate do
-        CommunicationChannel.where(:id => to_retire_ids).update_all(:workflow_state => 'retired') unless to_retire_ids.empty?
+        CommunicationChannel.where(:id => to_retire_ids).where("workflow_state<>'retired'").update_all(:workflow_state => 'retired') unless to_retire_ids.empty?
       end
-      from_user.communication_channels.update_all(["user_id=?, position=position+?", target_user, max_position]) unless from_user.communication_channels.empty?
+      scope = from_user.communication_channels
+      scope = scope.where("id NOT IN (?)", to_retire_ids) unless to_retire_ids.empty?
+      scope.update_all(["user_id=?, position=position+?", target_user, max_position]) unless from_user.communication_channels.empty?
     end
 
     destroy_conflicting_module_progressions(@from_user, target_user)

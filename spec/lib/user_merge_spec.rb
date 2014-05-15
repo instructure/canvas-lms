@@ -180,23 +180,14 @@ describe UserMerge do
       user2.reload
       user2.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort.should == [
           ['A@instructure.com', 'active'],
-          ['B@instructure.com', 'retired'],
           ['C@instructure.com', 'active'],
           ['D@instructure.com', 'unconfirmed'],
           ['E@instructure.com', 'unconfirmed'],
-          ['F@instructure.com', 'retired'],
           ['G@instructure.com', 'active'],
-          ['H@instructure.com', 'retired'],
           ['I@instructure.com', 'retired'],
-          ['a@instructure.com', 'retired'],
           ['b@instructure.com', 'active'],
-          ['c@instructure.com', 'retired'],
-          ['d@instructure.com', 'retired'],
-          ['e@instructure.com', 'retired'],
           ['f@instructure.com', 'unconfirmed'],
-          ['g@instructure.com', 'retired'],
           ['h@instructure.com', 'active'],
-          ['i@instructure.com', 'retired'],
           ['j@instructure.com', 'active'],
           ['k@instructure.com', 'active'],
           ['l@instructure.com', 'unconfirmed'],
@@ -204,7 +195,17 @@ describe UserMerge do
           ['n@instructure.com', 'retired'],
           ['o@instructure.com', 'retired']
       ]
-      user1.communication_channels.should be_empty
+      user1.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort.should == [
+          ['a@instructure.com', 'retired'],
+          ['c@instructure.com', 'retired'],
+          ['d@instructure.com', 'retired'],
+          ['e@instructure.com', 'retired'],
+          ['g@instructure.com', 'retired'],
+          ['i@instructure.com', 'retired'],
+      ]
+      %w{B@instructure.com F@instructure.com H@instructure.com}.each do |path|
+        CommunicationChannel.where(user_id: [user1, user2]).by_path(path).detect { |cc| cc.path == path }.should be_nil
+      end
     end
 
     it "should move and uniquify enrollments" do
@@ -612,18 +613,14 @@ describe UserMerge do
       @user2.reload
       @user2.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort.should == [
           ['A@instructure.com', 'active'],
-          ['B@instructure.com', 'retired'],
           ['C@instructure.com', 'active'],
           ['D@instructure.com', 'unconfirmed'],
           ['E@instructure.com', 'unconfirmed'],
-          ['F@instructure.com', 'retired'],
           ['G@instructure.com', 'active'],
-          ['H@instructure.com', 'retired'],
           ['I@instructure.com', 'retired'],
           ['b@instructure.com', 'active'],
           ['f@instructure.com', 'unconfirmed'],
           ['h@instructure.com', 'active'],
-          ['i@instructure.com', 'retired'],
           ['j@instructure.com', 'active'],
           ['k@instructure.com', 'active'],
           ['l@instructure.com', 'unconfirmed'],

@@ -23,8 +23,10 @@ def generate_message(notification_name, path_type, asset, options = {})
   asset_context = options[:asset_context]
   data = options[:data] || {}
   user ||= User.create!(:name => "some user")
-  
-  @cc = user.communication_channels.create!(:path_type => path_type.to_s, :path => 'generate_message@example.com')
+
+  cc_path_type = path_type == :summary ? :email : path_type
+  @cc = user.communication_channels.of_type(cc_path_type.to_s).first
+  @cc ||= user.communication_channels.create!(:path_type => cc_path_type.to_s, :path => 'generate_message@example.com')
   @message = Message.new(:notification => @notification, :context => asset, :user => user, :communication_channel => @cc, :asset_context => asset_context, :data => data)
   @message.delayed_messages = []
   @message.parse!(path_type.to_s)

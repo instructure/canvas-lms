@@ -128,12 +128,11 @@ class CommunicationChannel < ActiveRecord::Base
     return if path.nil?
     return if retired?
     return unless user_id
-    conditions = ["LOWER(path)=LOWER(?) AND user_id=? AND path_type=? AND workflow_state IN('unconfirmed', 'active')", path, user_id, path_type]
+    scope = self.class.by_path(path).where(user_id: user_id, path_type: path_type, workflow_state: ['unconfirmed', 'active'])
     unless new_record?
-      conditions.first << " AND id<>?"
-      conditions << id
+      scope = scope.where("id<>?", id)
     end
-    if self.class.where(conditions).exists?
+    if scope.exists?
       self.errors.add(:path, :taken, :value => path)
     end
   end
@@ -225,12 +224,15 @@ class CommunicationChannel < ActiveRecord::Base
     end
   }
 
-  scope :by_path, lambda { |path|
+  def self.by_path_condition(path)
     if %{mysql mysql2}.include?(connection_pool.spec.config[:adapter])
-      where(:path => path)
+      path
     else
-      where("LOWER(communication_channels.path)=LOWER(?)", path)
+      "LOWER(#{path})"
     end
+  end
+  scope :by_path, lambda { |path|
+    where("#{by_path_condition("communication_channels.path")}=#{by_path_condition("?")}", path)
   }
 
   scope :email, where(:path_type => TYPE_EMAIL)

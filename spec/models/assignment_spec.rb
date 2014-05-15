@@ -1512,17 +1512,13 @@ describe Assignment do
         @teacher.communication_channels.create(:path => "teacher@instructure.com").confirm!
 
         @studentA = user_with_pseudonym(:active_all => true, :name => 'StudentA', :username => 'studentA@instructure.com')
-        @studentA.communication_channels.create(:path => "studentA@instructure.com").confirm!
         @ta = user_with_pseudonym(:active_all => true, :name => 'TA1', :username => 'ta1@instructure.com')
-        @ta.communication_channels.create(:path => "ta1@instructure.com").confirm!
         @course.enroll_student(@studentA).update_attribute(:workflow_state, 'active')
         @course.enroll_user(@ta, 'TaEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
 
         @section2 = @course.course_sections.create!(:name => 'section 2')
         @studentB = user_with_pseudonym(:active_all => true, :name => 'StudentB', :username => 'studentB@instructure.com')
-        @studentB.communication_channels.create(:path => "studentB@instructure.com").confirm!
         @ta2 = user_with_pseudonym(:active_all => true, :name => 'TA2', :username => 'ta2@instructure.com')
-        @ta2.communication_channels.create(:path => "ta2@instructure.com").confirm!
         @section2.enroll_user(@studentB, 'StudentEnrollment', 'active')
         @course.enroll_user(@ta2, 'TaEnrollment', :section => @section2, :enrollment_state => 'active', :limit_privileges_to_course_section => true)
 
