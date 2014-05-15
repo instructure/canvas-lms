@@ -13,7 +13,14 @@ class UserMerge
   def into(target_user)
     return unless target_user
     return if target_user == from_user
+
+    if target_user.avatar_state == :none && from_user.avatar_state != :none
+      [:avatar_image_source, :avatar_image_url, :avatar_image_updated_at, :avatar_state].each do |attr|
+        target_user[attr] = from_user[attr]
+      end
+    end
     target_user.save if target_user.changed?
+
     [:strong, :weak, :shadow].each do |strength|
       from_user.associated_shards(strength).each do |shard|
         target_user.associate_with_shard(shard, strength)
