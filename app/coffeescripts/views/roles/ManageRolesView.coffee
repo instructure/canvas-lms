@@ -1,11 +1,12 @@
 define [
+  'i18n!roles'
   'jquery'
   'underscore'
   'Backbone'
   'jst/roles/manageRoles'
   'compiled/views/roles/PermissionButtonView'
   'compiled/views/roles/RoleHeaderView'
-], ($, _, Backbone, template, PermissionButtonView, RoleHeaderView) -> 
+], (I18n, $, _, Backbone, template, PermissionButtonView, RoleHeaderView) ->
   class ManageRolesView extends Backbone.View
     template: template
     className: 'manage-roles-table'
@@ -37,7 +38,7 @@ define [
     #   called, which should get called when role is added or removed.
     # @api private
     renderHeader: -> 
-      @$el.find('thead tr').html "<th>Permissions</th>"
+      @$el.find('thead tr').html "<th>#{I18n.t('permissions', 'Permissions')}</th>"
 
       @collection.each (role) => 
         roleHeaderView = new RoleHeaderView
