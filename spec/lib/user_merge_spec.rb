@@ -25,6 +25,31 @@ describe UserMerge do
       user1.pseudonyms.map(&:unique_id).should be_include('sam@yahoo.com')
     end
 
+    it "should use avatar information from merged user if none exists" do
+      user2.avatar_image = {'type' => 'external', 'url' => 'https://example.com/image.png'}
+      user2.save!
+
+      UserMerge.from(user2).into(user1)
+      user1.reload
+      user2.reload
+
+      [:avatar_image_source, :avatar_image_url, :avatar_image_updated_at, :avatar_state].each do |attr|
+        user1[attr].should == user2[attr]
+      end
+    end
+
+    it "should not overwrite avatar information already in place" do
+      user1.avatar_state = 'locked'
+      user1.save!
+      user2.avatar_image = {'type' => 'external', 'url' => 'https://example.com/image.png'}
+      user2.save!
+
+      UserMerge.from(user2).into(user1)
+      user1.reload
+      user2.reload
+      user1.avatar_state.should_not == user2.avatar_state
+    end
+
     it "should move access tokens to the new user" do
       at = AccessToken.create!(:user => user2, :developer_key => DeveloperKey.default)
       UserMerge.from(user2).into(user1)
