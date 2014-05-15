@@ -106,7 +106,7 @@ $cell_height: 33px
     font-weight: normal
     text-shadow: #84848a 0 0 1px
     font-size: 10px
-    +opacity(0.5)
+    opacity: 0.5
     color: #2f2a34
     margin:
       left: 10px
@@ -121,16 +121,16 @@ $cell_height: 33px
     bottom: 3px
     right: 3px
     text-indent: 999px
-    +opacity(0)
+    opacity: 0
 
     //override jqueryui blue border
     border: 0 none
 
     &:hover, &.ui-menu-trigger-menu-is-open
       background-position: bottom left
-      +opacity(1)
+      opacity: 1
   &:hover .gradebook-header-drop
-    +opacity(1)
+    opacity: 1
 
 
 .odd .slick-cell
@@ -175,7 +175,7 @@ $cell_height: 33px
   display: none
   background-color: #444
   color: #fff
-  +border-radius(3px)
+  border-radius: 3px
   padding: 5px 10px
   z-index: 7
   position: absolute
@@ -442,7 +442,7 @@ $gradebook_checkbox_width: 16px
 
 .letter-grade-points,
 .gpa-scale-points
-  +opacity(0.4)
+  opacity: 0.4
   position: absolute
   font-size: 11px
   padding-left: 8px

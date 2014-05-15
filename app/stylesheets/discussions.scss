@@ -125,7 +125,6 @@ body.with-right-side.with-left-side {
 .reply-textarea {
   border-radius: 5px 5px 0 0;
   box-sizing: border-box;
-  -moz-box-sizing: border-box;
   min-height: 155px;
   width: 100%;
 
@@ -201,17 +200,12 @@ body.with-right-side.with-left-side {
 }
 
 .discussion-read-state {
-  -moz-box-sizing: border-box;
   box-sizing: border-box;
   border: 1px solid #2e89cc;
   border-radius: 5px;
   width: 10px;
   height: 10px;
   background: #46aaf9;
-  background: -moz-linear-gradient(top, #73d6fc, #2489f7);
-  background: -ms-linear-gradient(top, #73d6fc, #2489f7);
-  background: -o-linear-gradient(top, #73d6fc, #2489f7);
-  background: -webkit-linear-gradient(top, #73d6fc, #2489f7);
   background: linear-gradient(top, #73d6fc, #2489f7);
 }
 
@@ -604,7 +598,6 @@ body.with-right-side.with-left-side {
     min-height: 53px;
     overflow: visible;
     box-sizing: border-box;
-    -moz-box-sizing: border-box;
   }
   .headerBar:after {
     clear: both;

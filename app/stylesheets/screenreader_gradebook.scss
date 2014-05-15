@@ -10,7 +10,7 @@ div.checkbox {
   padding: 12px;
   margin: 10px 0px;
   background: $grayLighter;
-  @include border-radius(5px);
+  border-radius: 5px;
   &:hover {
     background: $infoBackground;
   }

@@ -137,7 +137,7 @@
   margin: 0
 .reminder,.reminder-content
   :border 1px solid #aaa
-  +border-radius(5px)
+  border-radius: 5px
   :margin 5px 20px
   :clear both
   :font-size 0.9em
@@ -163,7 +163,7 @@
   :left 0px
   :background-color #fe8
   :border 2px solid #FBAD00
-  +border-radius(5px)
+  border-radius: 5px
   :width 300px
   :z-index 2
   a
@@ -346,7 +346,7 @@
     :margin 5px
     :padding 5px 10px
     :border 1px solid #888
-    +border-radius(5px)
+    border-radius: 5px
 
     .header
       :color #444
@@ -357,7 +357,7 @@
       :padding 5px
       :border 1px solid #aaa
       :text-align center
-      +border-radius(5px)
+      border-radius: 5px
 
     .links
       :margin 10px 0
@@ -436,7 +436,7 @@ span.hint
   :font-size 0.8em
 
 .event_pending
-  +opacity(0.4)
+  opacity: 0.4
 
 .error_message
   :color #ED002F
@@ -483,7 +483,7 @@ body .disabled_link
     :margin-bottom 10px
     :background-color #edd
     :border 2px solid #a44
-    +border-radius(5px)
+    border-radius: 5px
     :padding 5px
   .error_bottom
     :position absolute
@@ -553,7 +553,7 @@ ul.group_list
       :width 43%
       :display none
       :border 1px solid #aaa
-      +border-radius(5px)
+      border-radius: 5px
       :padding 10px
       :margin 0px 20px
       :color #444
@@ -578,7 +578,7 @@ ul.group_list
         :cursor pointer
         :font-weight bold
         :color #444
-        +border-radius(3px)
+        border-radius: 3px
 
         &:hover
           :background-color #ddd
@@ -611,7 +611,7 @@ ul.group_list
       :display block
       :float left
       :border 1px solid #ccc
-      +border-radius(3px)
+      border-radius: 3px
       :background-color #cdf
       :padding 1px 4px
       :margin 2px 3px
@@ -733,9 +733,9 @@ ul.group_list
         :min-height 10px
         :margin-right 5px
         a
-          +opacity(0)
+          opacity: 0
           &:hover, &:focus
-            +opacity(1)
+            opacity: 1
 
     &.content
       :padding 5px 5px 1px 50px
@@ -817,7 +817,7 @@ ul.group_list
       .podcast
         display: block
         float: right
-        +opacity(.7)
+        opacity: 0.7
   a.disable_item_link
     visibility: hidden
     float: right
@@ -832,12 +832,12 @@ ul.group_list
   div.header
     .link_box
       a
-        +opacity(0.5)
+        opacity: 0.5
   a.disable_item_link
     visibility: visible
-    +opacity(0.5)
+    opacity: 0.5
     &:hover
-      +opacity(1.0)
+      opacity: 1
 
 .brief_communication_message
   div.header
@@ -928,7 +928,7 @@ ul.group_list
         padding-right: 20px
       a.textarea
         display: block
-        +border-radius(4px)
+        border-radius: 4px
         border: 1px solid #aaa
         background-color: #fff
         text-decoration: none
@@ -936,7 +936,7 @@ ul.group_list
         width: 94%
       textarea
         border: 1px solid #aaa
-        +border-radius(4px)
+        border-radius: 4px
         padding: 2px
         font-size: 1.1em
         font-family: Arial, sans-serif
@@ -977,14 +977,14 @@ html > body .communication_sub_message .content a.textarea
 
 // hide the '.under_links' untill you hover to message, but only if its not IE6, since it can't do :hover on a <div>
 html > body .communication_message div.header .under_links
-  +opacity(0)
+  opacity: 0
 html > body .communication_message:hover div.header .under_links
-  +opacity(1)
+  opacity: 1
 
 .new_activity_message
   a.textarea
     display: block
-    +border-radius(4px)
+    border-radius: 4px
     border: 1px solid #aaa
     color: #888
     text-decoration: none
@@ -994,7 +994,7 @@ html > body .communication_message:hover div.header .under_links
     width: 94%
   .message_type
     img
-      +border-radius(2px)
+      border-radius: 2px
       padding: 0 5px
       cursor: pointer
       border: 1px solid #fff
@@ -1007,7 +1007,7 @@ html > body .communication_message:hover div.header .under_links
     textarea
       height: 4.8em
       border: 1px solid #aaa
-      +border-radius(4px)
+      border-radius: 4px
       padding: 2px
       font-size: 1.1em
       font-family: Arial, sans-serif
@@ -1116,9 +1116,7 @@ html > body .new_activity_message form textarea
       padding: 4px
       font-size: 11px
       min-height: 21px
-      -webkit-box-shadow: inset 33px 0 0 #F7F7F7, inset 34px 0 0 #CCC
-      -moz-box-shadow:    inset 33px 0 0 #F7F7F7, inset 34px 0 0 #CCC
-      box-shadow:         inset 33px 0 0 #F7F7F7, inset 34px 0 0 #CCC
+      box-shadow: inset 33px 0 0 #F7F7F7, inset 34px 0 0 #CCC
       div
         margin: 2px 0 0 33px
       .name::after
@@ -1180,7 +1178,6 @@ table.side_tabs_table
     li
       padding: 2px 5px
       margin-bottom: 3px
-      -moz-border-radius: 3px
       cursor: pointer
       &:hover
         background-color: #eee
@@ -1296,7 +1293,6 @@ body.padless-content #content,#content.padless
       margin-bottom: 2px
       &.selected_outcome
         background-color: #eee
-        -moz-border-radius: 3px
 .custom_search_results_link
   font-size: 1.2em
 
@@ -1315,7 +1311,7 @@ h2.h-margin-top,h3.h-margin-top, .h2.h-margin-top, .h3.h-margin-top
       margin: 0 2px
       padding: 4px 2px
       border: 2px solid #444
-      +border-radius(5px)
+      border-radius: 5px
       &:hover
         background-color: #eee
       &.selected
@@ -1351,7 +1347,7 @@ form.user_content_post_form
 #change_gradebook_version_link_holder a, #change_calendar_version_link_holder a, .dashboard-toggle a
   margin-right: 10px
   padding: 1px 10px
-  +border-radius(3px)
+  border-radius: 3px
   +vertical-gradient(#0abdff, #008fd6)
   text-decoration: none !important
   &:hover
@@ -1431,7 +1427,7 @@ form.user_content_post_form
 
 .nav-badge
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25)
-  +border-radius(10px)
+  border-radius: 10px
   background-color: $highlight-color
   padding: 1px 7px
   font-size: 12px
@@ -1446,7 +1442,7 @@ form.user_content_post_form
   margin-top: 6px
   margin-left: -16px
   background-color: #06a9ee
-  +border-radius(4px)
+  border-radius: 4px
 
 .clear
   clear: both

@@ -240,7 +240,7 @@
   top: 0px
   border-left: 7px solid #bbb
   border-bottom: 7px solid #bbb
-  +border-bottom-left-radius(5px)
+  border-bottom-left-radius: 5px
   background-color: #E9E9E9
   z-index: 1000
 
@@ -320,7 +320,7 @@
         display: block
         border: 1px solid #F0F0F0
         padding: 2px 3px
-        +border-radius(2px)
+        border-radius: 2px
         img
           vertical-align: bottom
       a:hover .icon, a:focus .icon
@@ -352,7 +352,7 @@
       outline: none
   textarea
     border: 1px solid #aaa
-    +border-radius(4px)
+    border-radius: 4px
     padding: 2px
     width: 94% /*hack for IE6 */
     max-height: 200px
@@ -362,7 +362,7 @@ html > body #add_a_comment textarea
   width: 97% /* for everyone else */
 
 body .ui-selectmenu-dropdown
-  +border-radius(0)
+  border-radius: 0
   color: #222 !important
   height: 21px
   background-color: #fff
@@ -409,15 +409,15 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
       margin-top: -1px
       font-size: 10px
       line-height: 1em
-      +opacity(0)
+      opacity: 0
   .ui-selectmenu-item-focus .ui-selectmenu-item-footer
-    +opacity(0.9)
+    opacity: 0.9
 
 .ui-selectmenu-item-icon
   top: 2px !important
   margin-top: 0 !important
   left: -3px
-  // +opacity(0.8)
+  // opacity: 0.8
   background:  no-repeat
   background-image: url("/images/three_state_checkbox.gif") !important
 
@@ -475,7 +475,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
           font-size: 9px
       .submission-file-download
         display: block
-        +opacity(0.5)
+        opacity: 0.5
         background: url("/images/download.png") no-repeat top right
         width: 16px
         height: 16px
@@ -487,7 +487,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
         background-color: #DCECFB
         .submission-file-download
           display: block
-          +opacity(1.0)
+          opacity: 1
     .submission-file-selected
       background: #DCECFB url("/images/pass.png") no-repeat center left
       font-weight: bold
@@ -512,7 +512,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
     top: 0
     background-color: #fff
     padding: 0
-    +border-radius(0)
+    border-radius: 0
     li
       padding: 0
       margin: 0

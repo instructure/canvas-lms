@@ -129,7 +129,7 @@ thead th
           color: $gray
 
       select
-        +opacity(0)
+        opacity: 0
         outline: 0
         position: absolute
         top: 0px
@@ -143,9 +143,9 @@ thead th
 
   .no-touch &
     td.comm-event-option[data-selection='never'] .event-option-selection a.change-selection
-      +opacity(0)
+      opacity: 0
       &:hover, &:focus
-        +opacity(0.35)
+        opacity: 0.35
 
   .touch &
     td.comm-event-option .event-option-selection a.change-selection
@@ -153,7 +153,7 @@ thead th
         float: right
 
     td.comm-event-option[data-selection='never'] .event-option-selection a.change-selection span
-      +opacity(0.35)
+      opacity: 0.35
 
 h2, .h2
   position: relative

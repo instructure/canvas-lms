@@ -13,10 +13,10 @@ $context_module_bg_color: #f2f3f4
   margin-bottom: 15px
   
   .links a, .reorder_module_link, .move_item_link
-    +opacity(0.5)
+    opacity: 0.5
     text-decoration: none
     &:hover
-      +opacity(1)
+      opacity: 1
   .reorder_module_link, .move_item_link
     padding-left: 2px
   .links
@@ -126,7 +126,7 @@ $context_module_bg_color: #f2f3f4
         display: none
   &.locked_module
     .context_module_item
-      +opacity(0.5)
+      opacity: 0.5
       .title 
         display: none
       .locked_title 
@@ -294,7 +294,7 @@ $context_module_bg_color: #f2f3f4
       display: none
   &.after_current_position
     .item_name
-      +opacity(0.5)
+      opacity: 0.5
       .title
         display: none
       .locked_title
@@ -311,7 +311,7 @@ $context_module_bg_color: #f2f3f4
 #context_modules.editable
   .context_module_item
     &.after_current_position
-      +opacity(1)
+      opacity: 1
       .title 
         display: inline-block
       .locked_title 

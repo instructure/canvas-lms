@@ -224,23 +224,23 @@ div#content
         clear: both
         margin: 0 0 8px 0
         position: relative
-        +opacity(0.5)
+        opacity: 0.5
         &.correct_answer
           :background none
-          +opacity(1)
+          opacity: 1
         &.selected_answer
-          +opacity(1)
+          opacity: 1
         &.wrong_answer
-          +border-radius(6px)
+          border-radius: 6px
           border: 2px solid red
           padding-bottom: 8px
-          +opacity(1)
+          opacity: 1
 
           .ui-selectmenu-status
             :color red
 
         &.full-opacity
-          +opacity(1)
+          opacity: 1
         &.hide_right_arrow,&.selected_answer.hide_right_arrow
           :background-image none
 
@@ -260,9 +260,9 @@ div#content
     .question .answers .answer.wrong_answer
       border: none
       border-top: 1px solid #DDD
-      +border-radius(0)
+      border-radius: 0
       padding-bottom: 0
-      +opacity(1)
+      opacity: 1
       .ui-selectmenu-status
         color: inherit
   &.survey_results
@@ -334,7 +334,7 @@ div#content
     .group_edit
       :display none
     .links
-      +opacity(0.5)
+      opacity: 0.5
     .move
       :width 20px
       :height 20px
@@ -347,10 +347,10 @@ div#content
         :display inline
         :cursor move
       .links
-        +opacity(1.0)
+        opacity: 1
     &.editing
       .links
-        +opacity(1.0)
+        opacity: 1
       .group_edit
         :display inline
       div.group_edit
@@ -614,7 +614,7 @@ div#content
     .flag_question
       :background-color #fff
       .flag_icon
-        +opacity(0.2)
+        opacity: 0.2
         :display inline
 
 .question
@@ -806,7 +806,7 @@ form.question_form
       &.empty
         :width 50px
         :padding 0
-        +opacity(0.5)
+        opacity: 0.5
         .comment_focus
           :display block
           :text-align center
@@ -846,7 +846,7 @@ form.question_form
         :background-image url(/images/comment_top_correct.png)
     &.empty
       :width 50px
-      +opacity(0.5)
+      opacity: 0.5
       .comment_focus
         :display block
         :text-align center
@@ -1179,7 +1179,7 @@ ul#quiz_versions
     overflow: auto
     margin: 10px 0
   .bank
-    +border-radius(3px)
+    border-radius: 3px
     padding: 4px 5px
     cursor: pointer
     margin: 0 20px
@@ -1203,7 +1203,7 @@ ul#quiz_versions
   background: #f1f1f1
   +vertical-gradient(#eee, #f7f7f7)
   border: 1px solid #ccc
-  +border-radius(5px)
+  border-radius: 5px
   padding: 16px
   text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.75)
 
@@ -1304,8 +1304,8 @@ ul#quiz_versions
   +vertical-gradient(#fff, #f4f5f6)
   border: 1px solid #b5bfc7
   filter: none
-  +border-radius(5px)
-  +box-shadow(0 1px 2px rgba(#000, 0.2))
+  border-radius: 5px
+  box-shadow: 0 1px 2px rgba(#000, 0.2)
   font-size: 14px
   min-width: 100px
   padding: 14px
@@ -1457,7 +1457,7 @@ ul#quiz_versions
 .form-actions
   border: 1px solid #999
   margin: 18px 0 -1px
-  @include background-image(linear-gradient(#f3f3f3, #e3e3e3))
+  background-image: linear-gradient(#f3f3f3, #e3e3e3)
 
 #quiz_options_holder
   select
@@ -1535,7 +1535,7 @@ ul#quiz_versions
     z-index: 10
 
   &.drshadow
-    @include box-shadow(rgba(0,0,0, 0.3) 0px 0px 7px)
+    box-shadow: rgba(0,0,0, 0.3) 0px 0px 7px
     border-bottom: 1px solid #b5b5b5
 
   li
@@ -1545,7 +1545,7 @@ ul#quiz_versions
       padding: 0px
       line-height: 32px
     &.active a
-      @include box-shadow(#31b5ff 0px 2px 1px)
+      box-shadow: #31b5ff 0px 2px 1px
       background: white
       border: 1px solid $selectedBorderColor
       color: #0088cc
@@ -1668,8 +1668,7 @@ ul#quiz_versions
   right: 0
   bottom: 0
   background-color: #4b555d
-  background: url('/images/Money_Noise_tm.png'), -ms-radial-gradient(50% -100px, circle cover, rgba(255, 255, 255, 0.6) 0%, transparent 100%), -ms-linear-gradient(top, #59656e, #3e464c)
-  @include background(image-url("/images/Money_Noise_tm.png"), radial-gradient(50% -100px, circle cover, rgba(255, 255, 255, 0.6) 0%, transparent 100%), linear-gradient(top, #59656e, #3e464c))
+  background: image-url("/images/Money_Noise_tm.png"), radial-gradient(50% -100px, circle cover, rgba(255, 255, 255, 0.6) 0%, transparent 100%), linear-gradient(top, #59656e, #3e464c)
 
   padding: 0
   margin: 0
