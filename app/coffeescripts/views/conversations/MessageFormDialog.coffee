@@ -1,4 +1,4 @@
-#
+  #
 # Copyright (C) 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -204,7 +204,7 @@ define [
                 data: data[0]
 
       if @to && @to != 'forward' && @message
-        tokens = [] 
+        tokens = []
         tokens.push(@message.get('author'))
         if @to == 'replyAll' || ENV.current_user_id == @message.get('author').id
           tokens = tokens.concat(@message.get('participants'))
@@ -253,7 +253,7 @@ define [
 
       @$form.formSubmit
         fileUpload: => (@$fullDialog.find(".attachment_list").length > 0)
-        files: => (@$fullDialog.find(".file_input")) 
+        files: => (@$fullDialog.find(".file_input"))
         preparedFileUpload: true
         context_code: "user_" + ENV.current_user_id
         folder_id: @options.folderId
@@ -294,15 +294,16 @@ define [
               @trigger('newConversations', response)
 
     recipientIdsChanged: (recipientIds) =>
-      if recipientIds.length > 1 or recipientIds[0]?.match(/^(course|group)_/)
+      if (_.isEmpty(recipientIds) || _.contains(recipientIds, /(teachers|tas|observers)$/))
         @toggleUserNote(false)
       else
-        @toggleUserNote(@canAddNotesFor(@recipientView.tokenModels()[0]))
-      @resizeBody()
+        tokenModel = _.last(@recipientView.tokenModels())
+        @toggleUserNote(@canAddNotesFor(tokenModel))
 
     canAddNotesFor: (user) =>
       return false unless ENV.CONVERSATIONS.NOTES_ENABLED
       return false unless user?
+      return true if(user.id.match(/students$/) || user.id.match(/^group/))
       for id, roles of user.get('common_courses')
         return true if 'StudentEnrollment' in roles and
           (ENV.CONVERSATIONS.CAN_ADD_NOTES_FOR_ACCOUNT or ENV.CONVERSATIONS.CONTEXTS.courses[id]?.permissions?.manage_user_notes)
@@ -310,7 +311,8 @@ define [
 
     toggleUserNote: (state) ->
       @$userNoteInfo.toggle(state)
-      @$userNote.prop('checked', false)
+      @$userNote.prop('checked', false) if state == false
+      @resizeBody()
 
     resizeBody: =>
       @updateAttachmentOverflow()

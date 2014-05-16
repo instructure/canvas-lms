@@ -192,7 +192,7 @@ class ConversationMessage < ActiveRecord::Base
 
   def recipients
     return [] unless conversation
-    subscribed = subscribed_participants.reject{ |u| u.id == self.author_id }
+    subscribed = subscribed_participants.reject{ |u| u.id == self.author_id }.map{|x| x.becomes(User)}
     participants = conversation_message_participants.map(&:user)
     subscribed & participants
   end
@@ -235,17 +235,16 @@ class ConversationMessage < ActiveRecord::Base
   def generate_user_note!
     return if skip_broadcasts
     return unless @generate_user_note
-    return unless recipients.size == 1
-    recipient = recipients.first
-    return unless recipient.grants_right?(author, :create_user_notes) && recipient.associated_accounts.any?{|a| a.enable_user_notes }
-
-    title = if conversation.subject
-      t(:subject_specified, "Private message: %{subject}", subject: conversation.subject)
-    else
-      t(:subject, "Private message")
+    recipients.each do |recipient|
+      next unless recipient.grants_right?(author, :create_user_notes) && recipient.associated_accounts.any?{|a| a.enable_user_notes }
+      title = if conversation.subject
+        t(:subject_specified, "Private message: %{subject}", subject: conversation.subject)
+      else
+        t(:subject, "Private message")
+      end
+      note = format_message(body).first
+      recipient.user_notes.create(:creator => author, :title => title, :note => note)
     end
-    note = format_message(body).first
-    recipient.user_notes.create(:creator => author, :title => title, :note => note)
   end
 
   def author_short_name_with_shared_contexts(recipient)

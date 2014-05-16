@@ -269,9 +269,9 @@ describe "conversations new" do
         f(".user_note").should_not be_displayed
       end
 
-      it "should not be allowed with multiple recipients" do
+      it "should be allowed with multiple recipients" do
         compose course: @course, to: [@s1, @s2], body: 'hallo!', send: false
-        f(".user_note").should_not be_displayed
+        f(".user_note").should be_displayed
       end
 
       it "should not be allowed with non-student recipient" do
