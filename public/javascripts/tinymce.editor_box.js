@@ -616,6 +616,7 @@ define([
       if(anchor) {
         $(anchor).attr({
           href: url,
+          'data-mce-href': url,
           '_mce_href': url,
           title: title || '',
           id: link_id,
