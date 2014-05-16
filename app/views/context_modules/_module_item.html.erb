@@ -12,10 +12,8 @@
   'other' => image_tag("blank.png", :class => "image", :alt => '')
 }
  %>
-<% criterion = completion_criteria && completion_criteria.find{|c| c[:id] == tag.id}
-   item_class = "#{module_item.content_type}_#{module_item.content_id}" if module_item
-%>
-<table id="context_module_item_<%= tag ? tag.id : "blank" %>" tabindex="0" aria-label='<%= t('module.item_aria_label', "%{item_label} Module Item", :item_label => (tag ? tag.title : "")) %>' class="context_module_item <%= module_item.content_type_class if module_item %> <%= 'also_assignment' if module_item && module_item.graded? %> indent_<%= tag.try_rescue(:indent) || '0' %> <%= 'progression_requirement' if criterion %> <%= criterion[:type] if criterion %>_requirement <%= item_class %>" style="<%= hidden unless module_item %>">
+<% criterion = completion_criteria && completion_criteria.find{|c| c[:id] == tag.id} %>
+<table id="context_module_item_<%= tag ? tag.id : "blank" %>" tabindex="0" aria-label='<%= t('module.item_aria_label', "%{item_label} Module Item", :item_label => (tag ? tag.title : "")) %>' class="context_module_item <%= module_item.content_type_class if module_item %> <%= 'also_assignment' if module_item && module_item.graded? %> indent_<%= tag.try_rescue(:indent) || '0' %> <%= 'progression_requirement' if criterion %> <%= criterion[:type] if criterion %>_requirement <%= module_item.item_class if module_item %>" style="<%= hidden unless module_item %>">
   <tr>
     <td class="module_item_icons nobr">
       <span style="cursor: move;" aria-hidden="true" title="<%= t('drag_to_reorder', %{Drag to reorder or move item to another module}) %>" class="move_item_link"><%= image_tag "move.png" %></span>

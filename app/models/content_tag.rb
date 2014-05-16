@@ -183,6 +183,10 @@ class ContentTag < ActiveRecord::Base
     (self.content_type || "").underscore
   end
 
+  def item_class
+    (self.content_type || "").gsub(/\A[A-Za-z]+::/, '') + '_' + self.content_id.to_s
+  end
+
   def assignment
     return self.content if self.content_type == 'Assignment'
     return self.content.assignment if self.content.respond_to?(:assignment)

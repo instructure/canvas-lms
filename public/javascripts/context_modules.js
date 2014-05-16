@@ -239,7 +239,7 @@ define([
         });
       },
       itemClass: function(content_tag) {
-        return content_tag.content_type + "_" + content_tag.content_id;
+        return (content_tag.content_type || "").replace(/^[A-Za-z]+::/, '') + "_" + content_tag.content_id;
       },
       updateAllItemInstances: function(content_tag) {
         $(".context_module_item."+modules.itemClass(content_tag)+" .title").each(function() {
