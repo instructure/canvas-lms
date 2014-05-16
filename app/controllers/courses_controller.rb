@@ -335,11 +335,15 @@ class CoursesController < ApplicationController
 
       format.json {
         if params[:state]
-          params[:state] += %w(created claimed) if params[:state].include? 'unpublished'
-          enrollments = @current_user.enrollments
-          enrollments = enrollments.reject { |e| !params[:state].include?(e.course.workflow_state) || (%w(StudentEnrollment ObserverEnrollment).include?(e.type) && %w(created claimed).include?(e.course.workflow_state))}
+          states = Array(params[:state])
+          states += %w(created claimed) if states.include?('unpublished')
+          conditions = states.map{ |state|
+            Enrollment::QueryBuilder.new(nil, course_workflow_state: state, enforce_course_workflow_state: true).conditions
+          }.compact.join(" OR ")
+          enrollments = @current_user.enrollments.joins(:course).includes(:course).where(conditions)
         else
           enrollments = @current_user.cached_current_enrollments
+          Enrollment.send(:preload_associations, enrollments, [:course])
         end
 
         if params[:enrollment_role]

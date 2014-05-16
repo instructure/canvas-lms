@@ -11,13 +11,18 @@ class Enrollment
     # these conditions to search users in the course (rather than as an
     # association on a particular user)
     #
-    # the course_workflow_state option can be used to simplify the
+    # The course_workflow_state option can be used to simplify the
     # query when the enrollments are all known to come from one course
-    # whose workflow state is already known. when provided, the method may
+    # whose workflow state is already known. When provided, the method may
     # return nil, in which case the condition should be treated as 'always
     # false'
+    #
+    # The enforce_course_workflow_state option takes things a step
+    # further; if you are querying enrollments in *multiple* courses and
+    # want to ensure you only get ones from courses with a given
+    # workflow_state, set this to true
     def initialize(state, options = {})
-      @state = state
+      @state = state || COURSE_ENROLLMENT_STATE_MAP[options[:course_workflow_state]]
       @options = options.reverse_merge(strict_checks: true)
       @builders = infer_sub_builders
     end
@@ -27,6 +32,11 @@ class Enrollment
       when :current_and_invited
         [
           QueryBuilder.new(:active, @options),
+          QueryBuilder.new(:invited, @options)
+        ]
+      when :current_and_future
+        [
+          QueryBuilder.new(:active, @options.merge(strict_checks: false)),
           QueryBuilder.new(:invited, @options)
         ]
       when :current_and_concluded
@@ -43,7 +53,7 @@ class Enrollment
     def conditions
       return @builders.map(&:conditions).join(" OR ") if @builders
 
-      case @state
+      conditions = case @state
       when :active
         if @options[:strict_checks]
           case @options[:course_workflow_state]
@@ -117,6 +127,28 @@ class Enrollment
       when :creation_pending; "enrollments.workflow_state = 'creation_pending'"
       when :inactive;         "enrollments.workflow_state = 'inactive'"
       end
+
+      if conditions && @options[:course_workflow_state] && @options[:enforce_course_workflow_state]
+        conditions << sanitize_sql(
+          " AND courses.workflow_state = ?",
+          @options[:course_workflow_state]
+        )
+      end
+      conditions
     end
+
+    def sanitize_sql(sql, *args)
+      ActiveRecord::Base.send :sanitize_sql_array, [sql, *args]
+    end
+
+    # a map of Course#workflow_state <-> compatible #state arguments,
+    # i.e. infer a compatible value for the latter from the former
+    COURSE_ENROLLMENT_STATE_MAP = {
+      available: :current_and_invited,
+      completed: :completed,
+      deleted: :deleted,
+      created: :current_and_future,
+      claimed: :current_and_future
+    }.with_indifferent_access.freeze
   end
 end

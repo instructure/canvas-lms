@@ -209,7 +209,16 @@ class EnrollmentsApiController < ApplicationController
   #
   # @argument state[] [String, "active"|"invited"|"creation_pending"|"deleted"|"rejected"|"completed"|"inactive"]
   #   Filter by enrollment state. If omitted, 'active' and 'invited' enrollments
-  #   are returned.
+  #   are returned. When querying a user's enrollments (either via user_id
+  #   argument or via user enrollments endpoint), the following additional
+  #   synthetic states are supported: "current_and_invited"|"current_and_future"|"current_and_concluded"
+  #
+  # @argument user_id [String]
+  #   Filter by user_id (only valid for course or section enrollment
+  #   queries). If set to the current user's id, this is a way to
+  #   determine if the user has any enrollments in the course or section,
+  #   independent of whether the user has permission to view other people
+  #   on the roster.
   #
   # @returns [Enrollment]
   def index
@@ -420,6 +429,13 @@ class EnrollmentsApiController < ApplicationController
   #
   # Returns an ActiveRecord scope of enrollments on success, false on failure.
   def course_index_enrollments
+    if params[:user_id]
+      # if you pass in your own id, you can see if you are enrolled in the
+      # course, regardless of whether you have read_roster
+      scope = user_index_enrollments
+      return scope && scope.where(course_id: @context.id)
+    end
+
     if authorized_action(@context, @current_user, [:read_roster, :view_all_grades, :manage_grades])
       scope = @context.enrollments_visible_to(@current_user, :type => :all, :include_priors => true).where(enrollment_index_conditions)
       unless params[:state].present?
@@ -490,7 +506,8 @@ class EnrollmentsApiController < ApplicationController
 
     if state.present?
       if use_course_state
-        clauses << "(#{state.map{|s| "(#{Enrollment::QueryBuilder.new(s.to_sym).conditions})" }.join(' OR ')})"
+        conditions = state.map{ |s| Enrollment::QueryBuilder.new(s.to_sym).conditions }.compact
+        clauses << "(#{conditions.join(' OR ')})"
       else
         clauses << 'enrollments.workflow_state IN (:workflow_state)'
         replacements[:workflow_state] = Array(state)

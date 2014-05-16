@@ -856,8 +856,6 @@ describe EnrollmentsApiController, type: :request do
       end
 
       it "should not show enrollments for courses that aren't published" do
-        # Setup test with an unpublished course and an active enrollment in
-        # that course.
         course
         @course.claim
         enrollment = course.enroll_student(@user)
@@ -868,9 +866,20 @@ describe EnrollmentsApiController, type: :request do
         json.map { |e| e['id'] }.should_not include enrollment.id
 
         # Request w/ a state[] filter.
-        json = api_call(:get, "#{@user_path}?state[]=active&type[]=StudentEnrollment",
+        json = api_call(:get, @user_path,
                         @user_params.merge(:state => %w{active}, :type => %w{StudentEnrollment}))
         json.map { |e| e['id'] }.should_not include enrollment.id
+      end
+
+      it "should show enrollments for courses that aren't published if state[]=current_and_future" do
+        course
+        @course.claim
+        enrollment = course.enroll_student(@user)
+        enrollment.update_attribute(:workflow_state, 'active')
+
+        json = api_call(:get, @user_path,
+                        @user_params.merge(:state => %w{current_and_future}, :type => %w{StudentEnrollment}))
+        json.map { |e| e['id'] }.should include enrollment.id
       end
 
       it "should accept multiple state[] filters" do
@@ -879,7 +888,7 @@ describe EnrollmentsApiController, type: :request do
         enrollment = course.enroll_student(@user)
         enrollment.update_attribute(:workflow_state, 'completed')
 
-        json = api_call(:get, "#{@user_path}?state[]=active&state[]=completed",
+        json = api_call(:get, @user_path,
                         @user_params.merge(:state => %w{active completed}))
         json.map { |e| e['id'].to_i }.sort.should == @user.enrollments.map(&:id).sort
       end

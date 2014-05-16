@@ -57,6 +57,23 @@ describe "Enrollment::QueryBuilder" do
       scope
     end
 
+    shared_examples_for "enforce_course_workflow_state" do
+      let(:options){ {strict_checks: false} }
+
+      context "with :enforce_course_workflow_state=true" do
+        it "should reject enrollments in courses with a different workflow_state" do
+          create_enrollments(
+            [state.to_s, "available", "StudentEnrollment"]
+          )
+          options[:course_workflow_state] = 'unknown'
+          options[:enforce_course_workflow_state] = true
+
+          result = enrollments.where(conditions)
+          result.should be_empty
+        end
+      end
+    end
+
     context "with :active" do
       let(:state){ :active }
 
@@ -70,7 +87,7 @@ describe "Enrollment::QueryBuilder" do
         )
       end
 
-      context "with strict_checks=true" do
+      context "with strict_checks:true" do
         let(:options){ {strict_checks: true} }
 
         it "should return sensible defaults" do
@@ -105,7 +122,7 @@ describe "Enrollment::QueryBuilder" do
         end
       end
 
-      context "with strict_checks=false" do
+      context "with strict_checks:false" do
         let(:options){ {strict_checks: false} }
 
         it "should return sensible defaults" do
@@ -134,6 +151,8 @@ describe "Enrollment::QueryBuilder" do
           ]
         end
       end
+
+      it_should_behave_like "enforce_course_workflow_state"
     end
 
     context "with :invited" do
@@ -153,7 +172,7 @@ describe "Enrollment::QueryBuilder" do
         )
       end
 
-      context "with strict_checks=true" do
+      context "with strict_checks:true" do
         let(:options){ {strict_checks: true} }
 
         it "should return sensible defaults" do
@@ -188,7 +207,7 @@ describe "Enrollment::QueryBuilder" do
         end
       end
 
-      context "with strict_checks=false" do
+      context "with strict_checks:false" do
         let(:options){ {strict_checks: false} }
 
         it "should return sensible defaults" do
@@ -226,11 +245,14 @@ describe "Enrollment::QueryBuilder" do
           ]
         end
       end
+
+      it_should_behave_like "enforce_course_workflow_state"
     end
 
     [:deleted, :rejected, :completed, :creation_pending, :inactive].each do |state|
       context "with #{state.inspect}" do
         let(:state){ state }
+
         it "should only return #{state} enrollments" do
           create_enrollments(
             %w{active     available    StudentEnrollment},
@@ -243,6 +265,8 @@ describe "Enrollment::QueryBuilder" do
             [state.to_s, "available", "StudentEnrollment"]
           ]
         end
+
+        it_should_behave_like "enforce_course_workflow_state"
       end
     end
 
@@ -266,6 +290,35 @@ describe "Enrollment::QueryBuilder" do
         matches_for(result).should == [
           %w{active           available StudentEnrollment},
           %w{active           available TeacherEnrollment},
+          %w{active           claimed   TeacherEnrollment},
+          %w{invited          available StudentEnrollment},
+          %w{invited          available TeacherEnrollment},
+          %w{invited          claimed   TeacherEnrollment}
+        ]
+      end
+    end
+
+    context "with :current_and_future" do
+      let(:state) { :current_and_future }
+
+      it "should return sensible defaults" do
+        create_enrollments(
+          %w{active           available StudentEnrollment},
+          %w{active           available TeacherEnrollment},
+          %w{active           claimed   StudentEnrollment},
+          %w{active           claimed   TeacherEnrollment},
+          %w{invited          available StudentEnrollment},
+          %w{invited          available TeacherEnrollment},
+          %w{invited          claimed   StudentEnrollment},
+          %w{invited          claimed   TeacherEnrollment},
+          %w{creation_pending available StudentEnrollment}
+        )
+
+        result = enrollments.where(conditions)
+        matches_for(result).should == [
+          %w{active           available StudentEnrollment},
+          %w{active           available TeacherEnrollment},
+          %w{active           claimed   StudentEnrollment}, # students can see that they have an active enrollment in an unpublished course
           %w{active           claimed   TeacherEnrollment},
           %w{invited          available StudentEnrollment},
           %w{invited          available TeacherEnrollment},

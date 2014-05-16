@@ -1179,7 +1179,7 @@ describe CoursesController, type: :request do
       end
     end
 
-    it "should not return courses with StudentEnrollment or ObserverEnrollment when state[] param" do
+    it "should not return courses with invited StudentEnrollment or ObserverEnrollment when state[]=unpublished" do
       @course4.enrollments.each do |e|
         e.type = 'StudentEnrollment'
         e.save
@@ -1187,7 +1187,7 @@ describe CoursesController, type: :request do
       json = api_call(:get, "/api/v1/courses.json",
                       { :controller => 'courses', :action => 'index', :format => 'json' },
                       { :state => ['unpublished'] })
-      json.collect{ |c| c['id'].to_i }.sort.should ==[@course3.id]
+      json.collect{ |c| c['id'].to_i }.sort.should == [@course3.id]
 
       @course3.enrollments.each do |e|
         e.type = 'ObserverEnrollment'
@@ -1196,7 +1196,24 @@ describe CoursesController, type: :request do
       json = api_call(:get, "/api/v1/courses.json",
                       { :controller => 'courses', :action => 'index', :format => 'json' },
                       { :state => ['unpublished'] })
-      json.collect{ |c| c['id'].to_i }.should ==[]
+      json.collect{ |c| c['id'].to_i }.should == []
+    end
+
+    it "should return courses with active StudentEnrollment or ObserverEnrollment when state[]=unpublished" do
+      @course3.enrollments.each do |e|
+        e.type = 'ObserverEnrollment'
+        e.workflow_state = "active"
+        e.save
+      end
+      @course4.enrollments.each do |e|
+        e.type = 'StudentEnrollment'
+        e.workflow_state = "active"
+        e.save
+      end
+      json = api_call(:get, "/api/v1/courses.json",
+                      { :controller => 'courses', :action => 'index', :format => 'json' },
+                      { :state => ['unpublished'] })
+      json.collect{ |c| c['id'].to_i }.sort.should == [@course3.id, @course4.id]
     end
   end
 

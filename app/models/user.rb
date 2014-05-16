@@ -53,8 +53,8 @@ class User < ActiveRecord::Base
   time_zone_attribute :time_zone
   include Workflow
 
-  def self.enrollment_conditions(state, options = {})
-    Enrollment::QueryBuilder.new(state, options).conditions
+  def self.enrollment_conditions(state)
+    Enrollment::QueryBuilder.new(state).conditions or raise "invalid enrollment conditions"
   end
 
   has_many :communication_channels, :order => 'communication_channels.position ASC', :dependent => :destroy
@@ -68,7 +68,7 @@ class User < ActiveRecord::Base
     has_many :current_and_invited_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :order => 'enrollments.created_at',
             :conditions => enrollment_conditions(:current_and_invited)
     has_many :current_and_future_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :order => 'enrollments.created_at',
-            :conditions => enrollment_conditions(:current_and_invited, strict_checks: false)
+            :conditions => enrollment_conditions(:current_and_future)
     has_many :concluded_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => enrollment_conditions(:completed), :order => 'enrollments.created_at'
     has_many :current_and_concluded_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section],
             :conditions => enrollment_conditions(:current_and_concluded), :order => 'enrollments.created_at'
@@ -78,7 +78,7 @@ class User < ActiveRecord::Base
     has_many :current_and_invited_enrollments, :class_name => 'Enrollment', :joins => [:course], :order => 'enrollments.created_at',
             :conditions => enrollment_conditions(:current_and_invited), :readonly => false
     has_many :current_and_future_enrollments, :class_name => 'Enrollment', :joins => [:course], :order => 'enrollments.created_at',
-            :conditions => enrollment_conditions(:current_and_invited, strict_checks: false), :readonly => false
+            :conditions => enrollment_conditions(:current_and_future), :readonly => false
     has_many :concluded_enrollments, :class_name => 'Enrollment', :joins => [:course], :conditions => enrollment_conditions(:completed), :order => 'enrollments.created_at', :readonly => false
     has_many :current_and_concluded_enrollments, :class_name => 'Enrollment', :joins => [:course],
             :conditions => enrollment_conditions(:current_and_concluded), :order => 'enrollments.created_at', :readonly => false
