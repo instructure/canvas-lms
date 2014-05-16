@@ -17,6 +17,8 @@ define [
     title: attr()
     quizType: attr()
     links: attr()
+    #at some point we may need this as a relationship
+    assignmentId: attr()
     htmlURL: attr()
     # editURL is temporary until we have a real ember route for it
     editURL: (->

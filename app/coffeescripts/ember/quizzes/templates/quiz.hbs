@@ -1,3 +1,6 @@
+{{! HACK! this is here because edit_rubric.js expects there to be a #add_rubric_url on the page and sets it's <form action="..."> to it}}
+<a {{bind-attr href='rubricActionUrl'}} class="icon-rubric" id="add_rubric_url" style="display:none">&nbsp;</a>
+
 <div class="container-fluid" id="quiz-show">
   <div class="row-fluid edit-header">
     <div class="span7">
@@ -39,6 +42,11 @@
             {{/if}}
           {{/ic-menu-item}}
 
+          {{#ic-menu-item on-select="showRubric"}}
+            <i class="icon-rubric"></i>
+            {{#t 'show_rubric'}}Show Rubric{{/t}}
+          {{/ic-menu-item}}
+
           {{#ic-menu-item on-select="speedGrader" classBinding="speedGraderActive::disabled"}}
             <i class="icon-speed-grader"></i>
             {{#if speedGraderActive}}
@@ -69,7 +77,7 @@
               </span>
             {{/if}}
           {{/ic-menu-item}}
-          
+
           {{#ic-menu-item on-select="showStudentResults"}}
             <i class="icon-group"></i>
             {{#t 'show_quiz_results'}}Show Student Quiz Results{{/t}}

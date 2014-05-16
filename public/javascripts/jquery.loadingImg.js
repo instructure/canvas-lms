@@ -25,17 +25,17 @@ define(['jquery'], function($){
     }
     var $obj = this.filter(":first");
     var list;
-    if(options == "hide" || options == "remove") {
+    if(options === "hide" || options === "remove") {
       $obj.children(".loading_image").remove();
       list = $obj.data('loading_images') || [];
-      for(var idx in list) {
-        if(list[idx]) {
-          list[idx].remove();
+      list.forEach(function(item) {
+        if(item) {
+          item.remove();
         }
-      }
+      });
       $obj.data('loading_images', null);
       return this;
-    } else if(options == "remove_once") {
+    } else if(options === "remove_once") {
       $obj.children(".loading_image").remove();
       list = $obj.data('loading_images') || [];
       var img = list.pop();

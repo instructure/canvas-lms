@@ -118,6 +118,10 @@ define [
       start()
       equal $(find('.js-take-quiz')).attr('href'), quiz.get('takeQuizUrl')
 
+  testShowPage 'displays a rubric link in the dropdown', ->
+    click('ic-menu-trigger').then ->
+      equal find('ic-menu-item .icon-rubric').length, 1
+
   module "Quiz Show Integration for Students",
     setup: ->
       App = startApp()

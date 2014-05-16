@@ -19,7 +19,7 @@ define [
     promises.pushObject(@get('model').save())
     Ember.RSVP.all promises
 
-  QuizController = Ember.ObjectController.extend LegacySubmissions,
+  QuizController = Ember.ObjectController.extend LegacySubmissions, Ember.Evented,
     disabledMessage: I18n.t('cant_unpublish_when_students_submit', "Can't unpublish if there are student submissions")
 
     # preserve 'publishing' state by not directly binding to published attr
@@ -62,6 +62,7 @@ define [
         else
           I18n.t 'take_the_quiz', 'Take the Quiz'
     ).property('isSurvey', 'quizSubmisison.isUntaken')
+
 
     updatePublished: (publishStatus) ->
       success = (=> @displayPublished())
@@ -182,6 +183,21 @@ define [
         model.deleteRecord()
         model.save().then =>
           @transitionToRoute 'quizzes'
+
+      showRubric: ->
+        @trigger('rubricDisplayRequest')
+
+    # Temporary while we are bringing in existing non-ember rubrics
+    rubricActionUrl: (->
+      "/courses/#{env.get('courseId')}/rubrics"
+    ).property('env.courseId')
+
+    rubricUrl: ( ->
+      courseId = env.get('courseId')
+      quizId = @get('id')
+      assignmentId = @get('assignmentId')
+      "/courses/#{courseId}/assignments/#{assignmentId}/rubric"
+    ).property('env.courseId')
 
     # Kind of a gross hack so we can get quiz arrows in...
     addLegacyJS: (->
