@@ -188,11 +188,14 @@ class Enrollment < ActiveRecord::Base
   scope :future, lambda {
     joins(:course).
         where("(courses.start_at>?
-              AND courses.workflow_state='available'
-              AND courses.restrict_enrollments_to_course_dates=?
-              AND enrollments.workflow_state IN ('invited', 'active', 'completed'))
-              OR (courses.workflow_state IN ('created', 'claimed')
-              AND enrollments.workflow_state IN ('invited', 'active', 'completed', 'creation_pending'))", Time.now.utc, true)
+                AND courses.workflow_state='available'
+                AND courses.restrict_enrollments_to_course_dates=?
+                AND enrollments.workflow_state IN ('invited', 'active')
+              ) OR (
+                courses.workflow_state IN ('created', 'claimed')
+                AND enrollments.type IN ('TeacherEnrollment','TaEnrollment', 'DesignerEnrollment')
+                AND enrollments.workflow_state IN ('invited', 'active', 'creation_pending')
+              )", Time.now.utc, true)
   }
 
   scope :past,
