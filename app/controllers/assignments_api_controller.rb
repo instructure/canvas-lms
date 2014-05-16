@@ -312,6 +312,16 @@
 #           "type" : "boolean",
 #           "description" : "(optional, present if Post Grades to SIS feature is enabled)"
 #         },
+#         "integration_id": {
+#           "example": "12341234",
+#           "type" : "string",
+#           "description" : "(optional, Third Party unique identifier for Assignment)"
+#         },
+#         "integration_data": {
+#           "example": "12341234",
+#           "type" : "string",
+#           "description" : "(optional, Third Party integration data for assignment)"
+#         },
 #         "muted": {
 #           "description": "whether the assignment is muted",
 #           "type": "boolean"
@@ -576,6 +586,12 @@ class AssignmentsApiController < ApplicationController
   #   Toggles Turnitin submissions for the assignment.
   #   Will be ignored if Turnitin is not available for the course.
   #
+  # @argument assignment[integration_data] [Optional]
+  #   Data related to third party integrations, JSON string required.
+  #
+  # @argument assignment[integration_id] [Optional]
+  #   Unique ID from third party integrations
+  #
   # @argument assignment[turnitin_settings] [Optional]
   #   Settings to send along to turnitin. See Assignment object definition for
   #   format.
@@ -818,7 +834,7 @@ class AssignmentsApiController < ApplicationController
 
   def save_and_render_response
     @assignment.content_being_saved_by(@current_user)
-    if update_api_assignment(@assignment, params[:assignment])
+    if update_api_assignment(@assignment, params[:assignment], @current_user)
       render :json => assignment_json(@assignment, @current_user, session), :status => 201
     else
       errors = @assignment.errors.as_json[:errors]

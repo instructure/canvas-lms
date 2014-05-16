@@ -33,7 +33,6 @@ module Api::V1::Assignment
       lock_at
       unlock_at
       assignment_group_id
-      integration_id
       peer_reviews
       automatic_peer_reviews
       post_to_sis
@@ -70,7 +69,6 @@ module Api::V1::Assignment
     hash = api_json(assignment, user, session, fields)
     hash['course_id'] = assignment.context_id
     hash['name'] = assignment.title
-
     hash['post_to_sis'] = assignment.post_to_sis
     hash['submission_types'] = assignment.submission_types_array
     hash['has_submitted_submissions'] = assignment.has_submitted_submissions?
@@ -116,6 +114,11 @@ module Api::V1::Assignment
 
     if assignment.grants_right?(user, :grade)
       hash['needs_grading_count'] = assignment.needs_grading_count_for_user user
+    end
+
+    if assignment.context.grants_rights?(user, :read_sis, :manage_sis).values.any?
+      hash['integration_id'] = assignment.integration_id
+      hash['integration_data'] = assignment.integration_data
     end
 
     if assignment.quiz
@@ -240,6 +243,8 @@ module Api::V1::Assignment
     grading_standard_id
     freeze_on_copy
     notify_of_update
+    integration_id
+    integration_data
   )
 
   API_ALLOWED_TURNITIN_SETTINGS = %w(
@@ -253,7 +258,7 @@ module Api::V1::Assignment
     exclude_small_matches_value
   )
 
-  def update_api_assignment(assignment, assignment_params)
+  def update_api_assignment(assignment, assignment_params, user)
     return nil unless assignment_params.is_a?(Hash)
 
     old_assignment = assignment.new_record? ? nil : assignment.clone
@@ -267,7 +272,7 @@ module Api::V1::Assignment
     return false unless valid_assignment_group_id?(assignment, assignment_params)
     return false unless valid_assignment_dates?(assignment, assignment_params)
 
-    assignment = update_from_params(assignment, assignment_params)
+    assignment = update_from_params(assignment, assignment_params, user)
 
     if overrides
       assignment.transaction do
@@ -309,7 +314,7 @@ module Api::V1::Assignment
     end
   end
 
-  def update_from_params(assignment, assignment_params)
+  def update_from_params(assignment, assignment_params, user)
     update_params = assignment_params.slice(*API_ALLOWED_ASSIGNMENT_INPUT_FIELDS)
 
     if update_params.has_key?('peer_reviews_assign_at')
@@ -347,6 +352,15 @@ module Api::V1::Assignment
 
     if assignment_params.key? "muted"
       assignment.muted = value_to_boolean(assignment_params.delete("muted"))
+    end
+
+    if assignment.context.grants_right?(user, :manage_sis)
+      if update_params['integration_data']
+        update_params['integration_data'] = JSON.parse(update_params['integration_data'])
+      end
+    else
+      update_params.delete('integration_id')
+      update_params.delete('integration_data')
     end
 
     # do some fiddling with due_at for fancy midnight and add to update_params
@@ -396,7 +410,7 @@ module Api::V1::Assignment
         assignment.post_to_sis = value_to_boolean(assignment_params['post_to_sis'])
       end
     end
-    assignment.updating_user = @current_user
+    assignment.updating_user = user
     assignment.attributes = update_params
     assignment.infer_times
 
