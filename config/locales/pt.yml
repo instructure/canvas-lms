@@ -39,6 +39,17 @@ pt:
   accont: 
     feedback_pricing_sub: "Obter os números para a sua instituição"
   account: 
+    account_settings: 
+      account_surveys: "Questionários da conta"
+      avatars: "Avatars do utilizador"
+      delicious: Delicious
+      diigo: Diigo
+      facebook: Facebook
+      google_docs: "Google Docs"
+      google_docs_preview: "Pré-visualização do Google Docs"
+      linked_in: LinkedIn
+      skype: Skype
+      twitter: Twitter
     ask_canvas_network: "Perguntar à Comunidade da Rede Canvas"
     default_account_name: "Conta padrão"
     default_site_administrator_account_name: "Administrador do site"
@@ -267,6 +278,8 @@ pt:
       no_term: "É necessário um período específico, selecione um período"
     grades: 
       deleted: "Incluir objetos eliminados: verdadeiro;"
+    granite: 
+      invalid_date_range: "As datas foram ajustadas para intervalo de 1 semana;"
     mississippi: 
       reports: "Relatórios: %{files}"
     outcomes: 
@@ -336,6 +349,14 @@ pt:
     add_user_dialog_title: "Adicionar um novo utilizador"
     adding_course_message: "A adicionar disciplina..."
     adding_user_message: "A adicionar utilizador..."
+    additional_settings: 
+      account_domains: "Domínios da conta"
+      account_status: "Estado da conta"
+      add_new_domain: "Adicionar novo domínio"
+      external_status: "Estado externo"
+      license: Licença
+      license_type: "Tipo de licença"
+      new_account_domain_title: "Novo domínio da conta"
     additional_settings_right_side: 
       links: 
         suspend: "Suspender conta"
@@ -477,6 +498,13 @@ pt:
             check_box: Relatórios
           tests: 
             check_box: Testes
+    assignment_score_summary_csv_description: 
+      account_reports: 
+        granite: 
+          assignme_score_summary: 
+            text: "Este relatório mostra a pontuação de todas as tarefas avaliadas entre as datas selecionadas"
+          description: 
+            header: Exemplo
     avatars: 
       all_link: 
         one: "Todos %{count}"
@@ -797,9 +825,18 @@ pt:
             field: "ID de secção"
     settings: 
       about_google_docs: |-
-          Para facilitar o trabalho dos utilizadores, em vez de os forçar a transferir itens como documentos em Word, ficheiros PDF, folhas de cálculo em Excel e documentos do Open Office (além de exigir que estes programas sejam instalados nos seus computadores), em muitas áreas por todo o Canvas é possível pré-visualizar um documento em linha.
+          As Pré-visualizações do Google Docs permitem aos utilizadores
+          ver documentos dentro do Canvas, sem ser necessário transferi-los
+          e abrir o programa correspondente (ex.: Word ou Excel).
           
-          Se o Scribd tiver sido ativado nesta conta, tentará utilizá-lo para mostrar a pré-visualização. No entanto, como o Scribd utiliza Flash Paper para apresentar os documentos e muitos utilizadores (que usam iPad/iPhone) não têm o Flash Player instalado, essa pré-visualização não vai funcionar.  Deixando a pré-visualização do Google Docs ativada, quando um browser não tiver Flash ativado, ou se o Scribd não estiver ativado, utilizará a pré-visualização fornecida pelo Google Docs. A utilização deste serviço está sujeita aos [termos de serviço](%{terms_url}) do visualizador do Google.
+          Se o Scribd tiver sido ativado nesta conta, o Canvas tentará
+          utilizá-lo para mostrar a pré-visualização. Se não for possível
+          pré-visualizar o documento no Scribd ou se o utilizador não
+          tiver o Flash Player instalado (ex.: iPad/iPhone),
+          o Canvas utilizará as Pré-visualizações do Google Docs
+          se estiverem ativadas. Ao utilizar este serviço,
+          o utilizador reconhece que leu e aceitou os
+          [Termos de Serviço do Visualizador do Google Docs](%{terms_url}).
       about_google_docs_tooltip: "Sobre as visualizações do Google Docs"
       account_admins_title: "Administradores de conta"
       account_quotas: 
@@ -1483,14 +1520,11 @@ pt:
       other: "Consultar arquivos anexos"
     errors: 
       cannot_save_att: "Não tem permissão para editar o atributo bloqueado %{att_name}"
-      import: 
-        external_tool_url: "O URL para a tarefa da ferramenta externa \"%{assignment_name}\" era inválido."
       upload_as_zip: "Carregue os ficheiros como um .zip"
     feed_entry_title: "Tarefa: %{assignment}"
     feed_entry_title_with_course: "Tarefa, %{course}: %{assignment}"
     gpa_scale_explainer: "O que é a Avaliação em Escala GPA?"
     group_assignment_must_have_group_set: "Selecione um grupo para esta tarefa"
-    imported_assignments_group: "Tarefas importadas"
     labels: 
       due: Prazo
     name_is_required: "É necessário o nome!"
@@ -1794,6 +1828,7 @@ pt:
       freeze_properties: "Bloquear propriedades de tarefas ao copiar"
       notify_content_change: "Notificar os utilizadores de que este conteúdo foi alterado"
       points_possible: Pontos
+      post_to_sis: "Publicar em SIS"
       warnings: 
         assignment_is_frozen: "Algumas definições foram bloqueadas administrativamente."
     errors: 
@@ -1802,6 +1837,11 @@ pt:
       google_docs_masquerade_rejected: "Não é possível estabelecer ligação a Google Docs como utilizador disfarçado."
       reminder_failed: "Falha no lembrete"
     everyone_else: "Todos os outros"
+    external_content_homework_submission_view: 
+      additional_comments: "Comentários adicionais"
+      buttons: 
+        submit_assignment: "Enviar tarefa"
+      group_assignment_header: Comentários...
     external_grader_sidebar: 
       edit_assignment_settings: "Editar configurações de tarefa"
       speed_grader: SpeedGrader
@@ -1918,7 +1958,6 @@ pt:
     labels: 
       assignment_group_move_label: "Grupo de tarefa"
       label_place_before: "Colocar antes"
-    loading_tools_failed: "Falha ao carregar as ferramentas"
     messages: 
       adding_group: "A adicionar grupo..."
       agree_to_pledge: "Tem de aceitar o compromisso de envio antes de enviar esta tarefa."
@@ -2053,7 +2092,6 @@ pt:
         submission: 
           details: "Detalhes do envio"
           download_attachment: "Download %{attachment_display_name}"
-          view_original_entry: "Ver a entrada original"
           view_original_page: "Ver a página original"
           view_quiz: "Ver o teste enviado"
           view_survey: "Ver o questionário enviado"
@@ -2230,6 +2268,8 @@ pt:
         edit_assignment_in_detail: "(permitir uploads, editar descrições, etc.)"
       titles: 
         wizard_box: "Eu gostaria de:"
+  assignments_api: 
+    invalid_date_time: "Data/hora inválida para %{attribute}"
   attachment: 
     default_filename: Arquivo
     errors: 
@@ -2334,6 +2374,8 @@ pt:
       user_name_description: "O nome de utilizador com permissões de professor/desenhador para aceder à disciplina para a linha. Tem de coincidir com um nome de utilizador listado nas credencais de início de sessão do Blackboard mencionadas acima."
     only_one_bulk_migration: "Só é possível executar uma migração em massa de disciplinas de cada vez."
   button: 
+    go_back: Retroceder
+    post: "Publicar notas"
     submit_assignment: "Enviar tarefa"
   buttons: 
     add_item: "Adicionar item"
@@ -2346,6 +2388,7 @@ pt:
     done: Concluir
     filter: Filtro
     find_user: "Localizar utilizador"
+    ignore_all: "Ignorar tudo"
     import: Importar
     login: "Iniciar sessão"
     manage_rubrics: "Gerenciar protocolos"
@@ -2690,6 +2733,7 @@ pt:
     ics_description_group: "Eventos do calendário para o grupo, %{group_name}"
     ics_description_user: "Eventos do calendário para o utilizador, %{user_name}"
     ics_title: "%{course_or_group_name} Calendário (Canvas)"
+    invalid_date_or_time: "Data inválida ou data/hora inválida para %{attr}"
   calendars: 
     assignment_details: "Detalhes da tarefa"
     calendar: 
@@ -3191,6 +3235,8 @@ pt:
     d2_l_export: 
       content: Conteúdo
       options: Opções
+    external_tool_content: 
+      content: Conteúdo
     file_required: "Tem de selecionar um ficheiro para importação de conteúdo"
     file_too_large: "A migração não pode exceder %{file_size}"
     hide_issues: "Ocultar problemas"
@@ -3263,6 +3309,9 @@ pt:
         remove_day_substitution_link: "Remover substituição de dia"
         remove_day_substitution_link_label: "Remover substituição de dia"
         to_happen_on: para
+      external_tool_launch: 
+        course: Disciplina
+        find_a_course: "Localizar uma disciplina"
       folder_picker: 
         default_select_folder: "Selecionar pasta"
         upload_to: "Carregar para"
@@ -3283,6 +3332,7 @@ pt:
       select_content_checkbox: 
         select_all_content: "Todo o conteúdo"
         select_specific_content: "Selecionar conteúdo específico"
+    unsupported_migration_type: "Tipo de migração não suportado para o contexto"
     upload_warning: "A saída desta página irá cancelar o processo de carregamento."
     uploading: "A carregar..."
     web_ct: 
@@ -3310,8 +3360,6 @@ pt:
     titles: 
       tag_external_web_page: "Marcar (tag) uma página web externa"
   context: 
-    all_marked_read: "Todas as mensagens de entrada marcadas como lidas"
-    bad_message: "Esta mensagem não pode ser exibida"
     communication: 
       headings: 
         discussions: Discussões
@@ -3328,38 +3376,10 @@ pt:
       last_updated: "última atualização"
       links: 
         restore: restaurar
-    inbox: 
-      buttons: 
-        mark_all_as_read: "Marcar todas as mensagens como lidas"
-      errors: 
-        mark_as_read_failed: "Falha na marcação, tente novamente"
-      inbox: 
-        discussion_replies: "Respostas da discussão"
-      status: 
-        marking_all_as_read: "Marcar todas como lidas..."
-    inbox_item: 
-      images: 
-        alt: 
-          topic: tópico
-        title: 
-          topic: 
-            read: "Mensagem da discussão - lida"
-            unread: "Mensagens da discussão"
-      links: 
-        remove: Remover
-        title: 
-          remove_message: "Remover esta mensagem"
-      no_title: "Sem título"
-    inbox_items: 
-      inbox_delete_confirm: "Tem certeza que deseja excluir este item da caixa de entrada?"
-      loading_results: "Carregando mais resultados"
-      no_messages: "Desculpe, não há mensagens ainda."
     media_object_inline: 
       titles: 
         media_playback: "Reprodução de mídia"
     media_objects_not_configured: "Objetos de mídia não configurados"
-    message_deleted: "Esta mensagem foi excluída"
-    message_removed: "A mensagem que estava a tentar ver foi removida"
     new_roster_user: 
       completed_enrollment: "concluído *%{completed_at}*"
       confirm: 
@@ -3493,10 +3513,8 @@ pt:
       restore_failed: "falha ao restaurar"
       restoring: "a restaurar..."
   context_external_tool: 
-    external_tool_attention_needed: "Os parâmetros de segurança da ferramenta externa \"%{tool_name}\" precisam de ser definidos em Definições de disciplina."
     url_or_domain_required: "Deve definir o url ou o domínio."
   context_module: 
-    migration_module_item_type: "Item de módulo"
     requirements: 
       max_score: "deve pontuar não mais que %{score}"
       min_score: "deve pontuar ao menos %{score}"
@@ -4256,7 +4274,6 @@ pt:
     default_short_name: Disciplina-101
     errors: 
       sis_in_use: "ID do SIS \"%{sis_id}\" já está em uso"
-    failed_import_media_objects: "Falha ao importar objetos multimédia"
     file_copy_error: "Não foi possível copiar o ficheiro \"%{name}\""
     grade_export_types: 
       instructure_csv: "CSV formatado pela Instructure"
@@ -4693,12 +4710,13 @@ pt:
       edit_sections_view: 
         edit_sections_desc: "As secções são uma forma adicional de organizar utilizadores. Isso pode permitir ensinar em várias turmas da mesma disciplina, para poder ter o conteúdo da disciplina num só lugar. Abaixo, pode mover um utilizador para uma secção diferente ou adicionar/remover matrículas na secção. Os utilizadores devem estar em pelo menos uma secção."
       index: 
-        add_people: "Adicionar pessoas"
         cannot_add_users: "Não é possível adicionar novos utilizadores porque esta disciplina está concluída"
         filter_field_description: "À medida que escreve neste campo, a lista de pessoas será filtrada automaticamente para incluir apenas as pessoas cujos nomes correspondam ao conteúdo introduzido."
         filter_list_of_people: "Filtrar lista de pessoas"
+        people: Pessoas
         role_to_search: "Limitar pesquisa a função"
         search_people: "Procurar pessoas"
+        title_add_people: "Adicionar pessoas"
       invitations_view: 
         accepted_invitation: "%{name} já recebeu e aceitou o convite para aderir à disciplina, mas pode reenviar o convite se for necessário."
         admin_invitation_unaccepted: "%{name} ainda não aceitou o convite para aderir à disciplina. O convite foi enviado: %{time}"
@@ -4874,6 +4892,10 @@ pt:
         assignments: "Esta vista mostra a **lista de tarefas** da disciplina, com as tarefas futuras e recentes na parte superior."
         confirm_unenroll: "Tem a certeza de que pretende cancelar a inscrição na disciplina? Deixará de poder ver o rol da disciplina ou comunicar diretamente com os professores e não poderá ver os eventos da disciplina no seu mural e como notificações."
         custom_page: "Pode **elaborar a sua própria página inicial da disciplina** e incluir quaisquer ligações, imagens ou rich media que desejar."
+        modules: |-
+            Pode organizar a sua disciplina em **módulos ou secções**, sendo que cada secção contém um conjunto relacionado de ficheiros, tarefas, páginas, etc. Se quiser, também pode sequenciar os módulos definindo critérios e pré-requisitos que é necessário concluir antes de cada módulo ser desbloqueado.
+            
+                        -Este esquema é provavelmente mais adequado a disciplinas que não sejam baseadas numa calendarização específica, como um período ou um semestre.
         recent_activity_dashboard: "O **painel de atividades recentes** permite aos participantes verem as conversas, os anúncios, as discussões e as interações mais recentes referentes a esta disciplina. É muito semelhante à página de painel que os utilizadores veem quando iniciam sessão pela primeira vez, mas mostra apenas conteúdo relativo a esta disciplina específica."
         syllabus: "A **vista de programa** permite escrever uma descrição das expetativas da disciplina ou apresentar a disciplina com ligações, imagens, etc., e mostra também uma vista de calendário com todas as tarefas e eventos da disciplina."
       draft_state: 
@@ -4991,9 +5013,6 @@ pt:
       invalid_link: "A ligação de inscrição utilizada parece já não ser válida.  Contacte o instrutor da disciplina e verifique se ainda está inscrito corretamente."
   create_users_view: 
     required: "Introduza alguns endereços de e-mail"
-  crumb: 
-    conversations: Conversas
-    discussion_replies: "Respostas da discussão"
   crumbs: 
     access_report: "Acessar relatório"
     announcements: Anúncios
@@ -5007,7 +5026,6 @@ pt:
     eportfolio_welcome: "Bem-vindo ao seu ePortfolio"
     error_reports: "Relatórios de erros"
     files: Arquivos
-    gradebook: "Livro de notas"
     grades: Notas
     grading_schemes: "Esquemas de avaliação"
     groups: grupos
@@ -5238,58 +5256,82 @@ pt:
   default_question_name: Pergunta
   default_question_text: "Texto da pergunta"
   demos: 
+    _register: 
+      add_site: "Adicionar site"
+      invalid_email: "Endereço de e-mail inválido"
+      personalizing: "A personalizar..."
+      ready: Pronto!
+      registered_successfully: "Registado com sucesso"
+      specify_location: "Especifique a sua localização geográfica"
+      try_again: "Tentar novamente"
+      you_must_agree_to_terms: "Tem de aceitar os termos de utilização"
     demos_add: 
       labels: 
         school_name: "Nome da escola"
         username: "Endereço de e-mail"
     register: 
-      add_site: "Adicionar site"
+      africa: África
       agree_to_terms: "Aceito os *termos de utilização* e reconheço a **política de privacidade**."
+      asia_and_middle_east: "Ásia e Médio Oriente"
+      assistant_superintendent: "Administrador adjunto"
+      australia_new_zealand_and_oceania: "Austrália, Nova Zelândia e Oceânia"
       begin_trial: "Iniciar versão de teste"
-      choose: Escolher
+      bus_finance_purchasing_director: "Diretor negócios/finanças/aquisição"
+      c_level: "Nível C"
+      choose: "Escolher um"
       cio: CIO
       corporate: Corporativo
       dean: Reitor
       director: Diretor
+      e_rate_administrator: "Administrador de ERate"
+      employee: Funcionário
+      europe_other: "Europa - Outro"
+      europe_uk: "Europa - Reino Unido"
+      executive_officer: Executivo
+      government: Governo
+      gs_11_15: "GS 11-15"
+      gs_1_7: "GS 1-7"
+      gs_8_10: "GS 8-10"
       higher_education: "Ensino superior"
+      higher_education_for_profit: "Ensino superior com fins lucrativos"
       incorrect: "Incorreto. Tente novamente."
       instructional_designer: "Designer instrutivo"
-      invalid_email: "Endereço de e-mail inválido"
+      instructional_media_svcs_dir: "Diretor de serviços multimédia instrutivos"
       k12: K12
+      k12_for_profit: "K12 com fins lucrativos"
       labels: 
-        current_lms: "LMS atual"
+        location: Localização
         name: Nome
-        organization_size: "Tamanho da organização"
         organization_type: "Tipo de organização"
         phone: "Número de telefone"
-        school_name: "Escola / organização"
+        school_name: Escola/Organização
         school_position: Título
         type_what_you_hear: "Digite o que ouve"
         type_what_you_see: "Digite o que vê"
         username: E-mail
-      lms_admin: "Administrador LMS"
-      no_lms: Nenhum
+      library_media_specialist: "Especialista em biblioteca/multimédia"
+      lms_administrator: "Administrador LMS"
+      manager: Chefe
+      network_system_administrator: "Administrador de sistemas de rede"
       one: Outro
       other: Outro
-      other_lms: Outro
-      other_title: Outro
       personalize_demo: "Personalizar a demonstração"
-      personalizing: "A personalizar..."
-      proprietary_lms: Doméstico/Exclusivo
+      principal: Reitor
       provost: Provost
-      ready: Pronto!
-      school_admin: "Administrador de escola"
+      school_administrator: "Administrador de escola"
+      school_technology_coordinator: "Coordenador de tecnologia escolar"
       sign_up_to_canvas: "Registe-se para experimentar o Canvas"
-      specify_lms: "Especifique o seu LMS atual ou selecione 'nenhum'"
-      specify_size: "Especifique o tamanho da sua organização"
+      south_america_central_america_and_caribbean: "América do Sul, América Central e Caraíbas"
       student: Aluno
       subscribe: "Quero receber notícias, sugestões e informações da Instructure"
+      superintendent: Administrador
       support: Suporte
-      teacher: Professor/Instrutor
+      teacher_instructor: Professor/Instrutor
       technologist: Técnico
-      try_again: "Tentar novamente"
-      vice_president: Vice-presidente
-      you_must_agree_to_terms: "Tem de aceitar os termos de utilização"
+      technology_computer_coord: "Coordenador de tecnologia/informática"
+      technology_education_director: "Diretor de educação tecnológica"
+      united_states_and_canada: "Estados Unidos e Canadá"
+      vp: Vice-presidente
   developer_key: 
     api_key: "Chave: *%{api_key}*"
     created: "Criado:"
@@ -6107,6 +6149,7 @@ pt:
       search_filter: "Filtrar por nome"
       view_app_center: "Ver Centro de Aplicativos"
       view_installed_tools: "Ver configurações de aplicação"
+    migration_selection_configured: "Seleção de migração configurada"
     missing_stars: "Tem de selecionar uma classificação em estrelas"
     rate_tool_view: 
       rate_tool: "Como classifica esta ferramenta?"
@@ -6194,8 +6237,11 @@ pt:
         desativação desta funcionalidade, contacte o Administrador de Sucesso do Canvas.
     draft_state_course_disable_warning: "A desativação desta funcionalidade irá publicar TODOS os objetos existentes na disciplina. Certifique-se de que todo o conteúdo em rascunho está pronto para publicação e disponível para todos os utilizadores da disciplina antes de continuar."
     google_docs_domain_restriction: "Restrição de domínio de Google Docs"
+    high_contrast: "Utilizar estilos de contraste alto"
     individual_gradebook: "Vista de livro de notas individual"
-    outcome_gradebook: "Livro de notas de resultados"
+    learning_mastery_gradebook: "Livro de notas de domínio de aprendizagem"
+    new_styles: "Utilizar novos estilos"
+    post_grades: "Publicar notas no SIS"
     student_outcome_gradebook: "Livro de notas de resultados de alunos"
   file_browser_view: 
     folder_tree_instructions: "Utilize as teclas de seta para cima e para baixo para navegar na árvore. Prima a tecla direita para expandir as pastas, a tecla esquerda para fechar e Enter para escolher uma imagem."
@@ -6405,6 +6451,10 @@ pt:
       de Google Docs a um único domínio. Os alunos que tentem enviar tarefas ou
       juntar-se a colaborações num domínio não aprovado recebem uma mensagem de erro
       a avisar que é necessário atualizar a integração de Google Docs.
+  grade_display_warning_dialog: 
+    grade_display_warning: 
+      checkbox: "Não mostrar novamente para esta disciplina"
+      warning: Aviso
   gradebook: 
     alerts: 
       no_active_students: "Não há alunos ativos na disciplina ou nenhum deles pode ser avaliado por si."
@@ -6447,7 +6497,6 @@ pt:
       none_to_update: "Nada a atualizar"
       select_an_option: "Selecione uma opção"
       upload_as_zip: "Faça upload dos arquivos como um .zip"
-    grade: "nota: %{grade}"
     graded_by_me: "%{graded_time} por mim"
     graded_then_resubmitted: "avaliado, depois reenviado (%{when})"
     gradee_index_of_total: "%{gradee} %{x} de %{y}"
@@ -6467,7 +6516,6 @@ pt:
       submission_details: "Detalhes do envio"
       view_quiz: "Exibir este teste"
       view_submission: "Exibir o envio"
-    loud_late: ATRASADA
     message_students_who: "Enviar mensagem aos alunos que..."
     mute_assignment: "Silenciar tarefa"
     new_assessment: "[Nova avaliação]"
@@ -6546,6 +6594,11 @@ pt:
     errors: 
       none_to_update: "Nada a atualizar"
       upload_as_zip: "Faça upload dos arquivos como um .zip"
+    grade_display_warning: 
+      cancel: Cancelar
+      continue: Continuar
+      percent_text: "Os alunos também verão as respetivas notas finais como percentagem. Tem a certeza de que pretende continuar?"
+      points_text: "Os alunos também verão as respetivas notas finais como pontos. Tem a certeza de que pretende continuar?"
     gradebook_header_menu: 
       assignment_details: "Detalhes da tarefa"
       curve_grades: "Relativizar as notas de acordo com a curva"
@@ -6568,12 +6621,14 @@ pt:
     keyboard_comment_desc: "Comentar o envio ativo"
     keyboard_menu_desc: "Abrir o menu da tarefa da coluna ativa"
     keyboard_sort_desc: "Ordenar a grelha na coluna ativa atual"
+    keyboard_tooltip_desc: "Mostrar o tipo de envio do envio ativo"
     keycodes: 
       close_menu: esc
       comment: c
       goto_assignment: g
       menu: m
       sort: s
+      tooltip: t
     learning_outcome: "Resultado de aprendizagem"
     mastery: domínio
     near_mastery: "próximo do domínio"
@@ -6592,29 +6647,10 @@ pt:
     resubmitted: "Reenviado desde a última avaliação"
     row_student_name: 
       student_placeholder: Aluno
-    screenreader: 
-      page_titles: "Livro de notas com leitor de ecrã"
     secondary_id: "ID secundário"
     section_to_show_menu: 
       choose_a_section_to_show: "Escolher uma seção para exibir"
       showing_sections: "A mostrar *%{currentSection}*"
-    show: 
-      arrange_columns_by_due_date: "Organizar colunas por data de entrega"
-      arrange_columns_by_group: "Organizar colunas por grupo de tarefa"
-      download_scores: "Baixar pontuação (.csv)"
-      filter_by_student: "Filtrar por nome do aluno ou ID secundário"
-      grades: Notas
-      hide_student_names: "Ocultar nomes dos alunos"
-      include_ungraded: "Tarefas sem nota como 0"
-      learning_mastery: "Domínio de aprendizagem"
-      old_gradebook: "livro de notas antigo"
-      publish_to_sis: "Publicar notas no SIS"
-      set_group_weights: "Definir ponderação de grupo"
-      show_attendance_columns: "Exibir colunas de presença"
-      show_concluded_enrollments: "Mostrar inscrições concluídas"
-      srgb_gradebook: "mudar de livro de notas"
-      upload_scores: "Atualizar pontuações (de .csv)"
-      view_grading_history: "Exibir histórico de avaliação"
     show_notes: "Mostrar coluna de notas"
     show_student_names: "Exibir nomes de alunos"
     student_name: "Nome do aluno"
@@ -6635,6 +6671,7 @@ pt:
     titles: 
       discussion: "Envio de discussão"
       media: "Envio de comentário em mídia"
+      media_recording: "Envio de gravação de multimédia"
       quiz_review: "Este teste precisa ser revisado"
       text: "Envio de entrada de texto"
       upload: "Envio de upload de arquivo"
@@ -6891,6 +6928,24 @@ pt:
       upload_info: "Se tiver efetuado alterações nos ficheiros enviados do aluno descarregados anteriormente, é só fazer novamente o zip e enviar o ficheiro zip com o formulário abaixo. Os alunos verão os ficheiros modificados nos seus comentários para o envio."
       upload_warning: "Certifique-se de não alterar os nomes dos arquivos enviados, para que possamos reconhecê-los."
       weight_final: "Ponderar nota final baseado nos grupos"
+    gradebook2: 
+      arrange_columns_by_due_date: "Organizar colunas por data de entrega"
+      arrange_columns_by_group: "Organizar colunas por grupo de tarefa"
+      download_scores: "Baixar pontuação (.csv)"
+      filter_by_student: "Filtrar por nome do aluno ou ID secundário"
+      grades: Notas
+      hide_student_names: "Ocultar nomes dos alunos"
+      include_ungraded: "Tarefas sem nota como 0"
+      learning_mastery: "Domínio de aprendizagem"
+      old_gradebook: "livro de notas antigo"
+      post_grades: "Publicar notas"
+      publish_to_sis: "Publicar notas no SIS"
+      set_group_weights: "Definir ponderação de grupo"
+      show_attendance_columns: "Exibir colunas de presença"
+      show_concluded_enrollments: "Mostrar inscrições concluídas"
+      srgb_gradebook: "mudar de livro de notas"
+      upload_scores: "Atualizar pontuações (de .csv)"
+      view_grading_history: "Exibir histórico de avaliação"
     grades: 
       complete: Completo
       incomplete: Incompleto
@@ -6923,6 +6978,8 @@ pt:
         other: "Ficheiros e comentários criados para %{count} envios"
     out_of_final: "%{weight} do final"
     out_of_points_possible: "de %{points_possible}"
+    screenreader: 
+      page_titles: "Livro de notas com leitor de ecrã"
     show: 
       keycode_descriptions: 
         edit_cell: "Editar célula"
@@ -6986,8 +7043,6 @@ pt:
         show_assessment_by: "Exibir avaliação por"
         showing: Exibindo
         sort_by: "Ordenar lista de alunos"
-        submission_to_view: "Envio para exibir"
-        submitted: Enviado
       late_notice: "Observação: Isto foi enviado ATRASADO"
       links: 
         click_to_view: "clique aqui para exibir"
@@ -7501,6 +7556,9 @@ pt:
       x_new_in_discussions: 
         one: "*1* discussão"
         other: "*%{count}* discussões"
+  high_contrast_description: |-
+      Ative esta opção se preferir uma versão com contraste mais alto da interface do Canvas.
+      Poderá ser útil para pessoas com deficiências visuais ou dificuldade de leitura.
   ic_actions: 
     manage: gerir
   images: 
@@ -7510,6 +7568,28 @@ pt:
     invalid_file_size: "O tamanho de ficheiro da imagem é demasiado grande (máx.: %{max} bytes, obtido: %{actual})"
     invalid_file_type: "Tipo de ficheiro inválido %{type}. Os tipos permitidos incluem: %{type_list}"
     not_an_image: "O ficheiro selecionado não é uma imagem"
+  importers/assignment_importer: 
+    errors: 
+      import: 
+        external_tool_url: "O URL para a tarefa da ferramenta externa \"%{assignment_name}\" era inválido."
+    imported_assignments_group: "Tarefas importadas"
+  importers/context_external_tool_importer: 
+    external_tool_attention_needed: "Os parâmetros de segurança da ferramenta externa \"%{tool_name}\" precisam de ser definidos em Definições de disciplina."
+  importers/context_module_importer: 
+    migration_module_item_type: "Item de módulo"
+  importers/course_content_importer: 
+    failed_import_media_objects: "Falha ao importar objetos multimédia"
+  importers/learning_outcome_group_importer: 
+    no_global_permission: "Não tem permissão para gerir resultados globais, não é possível adicionar \"%{title}\""
+  importers/learning_outcome_importer: 
+    no_context_found: "Não foi encontrado o resultado de aprendizagem externo para \"%{title}\", a criar uma cópia."
+    no_global_permission: "Não tem permissão para gerir resultados globais, não é possível adicionar \"%{title}\""
+  importers/rubric_importer: 
+    no_context_found: "Não foi encontrado o protocolo externo para \"%{title}\", a criar uma cópia."
+  importers/wiki_page_importer: 
+    title_for_topics_category: "%{category} Tópicos"
+    warnings: 
+      truncated_wiki_title: "O título da página do wiki a seguir foi truncada: %{title}"
   individual_gradebook_description: "A Vista de livro de notas individual fornece uma vista de livro de notas concebida para acessibilidade."
   info: 
     notices: 
@@ -7630,6 +7710,7 @@ pt:
         locked_by: "Bloqueado por"
         max_attempts: "Máximo de tentativas"
         num_attempts: Tentativas
+        original_id: "ID original"
         priority: Prioridade
         run_at: "Executar em"
         strand: parte
@@ -7686,13 +7767,14 @@ pt:
       view_all_groups: "Exibir todos os grupos"
     mobile_auth: 
       log_in_to_canvas: "Iniciar sessão no Canvas"
+  learning_mastery_gradebook_description: |-
+      O livro de notas de domínio de aprendizagem fornece aos professores uma forma de verem
+      o progresso dos alunos e da disciplina em resultados de aprendizagem. Os resultados
+      são apresentados num formato semelhante a um livro de notas e o progresso dos alunos é
+      visualizado como uma pontuação numérica e como dominado/próximo do domínio/melhoria.
   learning_outcome: 
     no_comment: "Nenhum comentário"
-    no_context_found: "Não foi encontrado o resultado de aprendizagem externo para \"%{title}\", a criar uma cópia."
     no_description: "Nenhuma descrição"
-    no_global_permission: "Não tem permissão para gerir resultados globais, não é possível adicionar \"%{title}\""
-  learning_outcome_group: 
-    no_global_permission: "Não tem permissão para gerir resultados globais, não é possível adicionar \"%{title}\""
   lib: 
     angel: 
       failed_import_link: "A ligação de importação falhou"
@@ -8560,13 +8642,11 @@ pt:
         subject: "Confirmar e-mail: Canvas"
     confirm_registration: 
       email: 
-        body: "Obrigado por se registar no Canvas!  Este e-mail é uma confirmação de que %{user} está a registar-se para uma nova conta em %{website}."
         details: "Para concluir o processo de registro, acesse o seguinte url:"
         html: 
-          body: "Obrigado por se registar no Canvas!  Este e-mail é uma confirmação de que %{user} está a registar-se para uma nova conta em %{website}."
+          body: "Obrigado pelo seu registo no %{product_name}! Este e-mail é a confirmação de que o utilizador %{user} está a registar-se para uma nova conta em %{website}."
           details: "Clique aqui para finalizar o processo de registo"
-          subject: "Confirmar registo: Canvas"
-        subject: "Confirmar registro: Canvas"
+          subject: "Confirmar registo: %{product_name}"
     confirm_sms_communication_channel: 
       sms: 
         body: |-
@@ -9818,6 +9898,7 @@ pt:
       module: 
         prerequisites: Pré-requisitos
         published: Publicado
+    post_grades_dialog_title: "Publicar notas no SIS"
     progression_module_collection: 
       module_progress_for: "Progresso do módulo para %h{student_link}"
       module_progress_for_student: "Progresso do módulo para %{student.name}"
@@ -9831,7 +9912,10 @@ pt:
       back_to_modules: "Voltar à página de módulos"
       no_students_found: "Não foram encontrados alunos"
       student_progress: "Progresso do aluno"
+  moodle_dropdown_many_warning_title: "Existem %{count} perguntas de várias listas pendentes neste banco que podem ter sido importadas incorretamente"
   moodle_dropdown_warning_title: "Pergunta de várias listas pendentes pode ter sido importada incorretamente"
+  moodle_formula_many_warning_title: "Existem %{count} perguntas de fórmulas neste banco para as quais será necessário gerar de novas as respostas possíveis"
+  moodle_formula_warning_title: "Será necessário gerar de novo as respostas possíveis para a pergunta de fórmula"
   move_dialog: 
     cancel: Cancelar
     save: Guardar
@@ -9851,6 +9935,9 @@ pt:
     sure_you_want_to_mute: "Tem certeza que deseja silenciar esta tarefa? Enquanto esta tarefa estiver silenciada, os alunos não receberão novas notificações sobre ela, nem poderão ver:"
   name: "Importador de referências académicas"
   new_facebook_message: "Tem uma nova mensagem do Canvas."
+  new_styles_description: |-
+      Estamos a preparar uma remodelação da interface do Canvas. Ative esta opção para
+      escolher a possibilidade de ver o aspeto simplificado e atualizado da interface do Canvas.
   no_migration_file: "Ficheiro necessário para migração de conteúdo."
   not_a_number: "tem de ser um número positivo"
   not_applicable: ND
@@ -10057,11 +10144,6 @@ pt:
     : Não
     ? "yes"
     : Sim
-  outcome_gradebook_description: |-
-      O livro de notas de resultados fornece aos professores uma forma de verem rapidamente
-      o progresso dos alunos e da disciplina em resultados de aprendizagem. Os resultados são
-      apresentados num formato semelhante a um livro de notas e o progresso dos alunos é visualizado
-      como uma pontuação numérica e como dominado/próximo do domínio/melhoria.
   outcome_groups: 
     invalid_file: "Arquivo de grupo de resultado inválido"
   outcome_groups_api: 
@@ -10588,11 +10670,16 @@ pt:
         access_key: "Chave de acesso"
         api_url: "Url de Api"
         secret_key: "Chave secreta"
+  post_grades_description: |-
+      Publicar notas permite aos professores publicarem notas em sistemas SIS ativados: Powerschool,
+      Aspire (SIS2000), JMC e qualquer SIS compatível com SIF que aceita os elementos SIF GradingCategory,
+       GradingAssignment, GradingAssignmentScore.
   prerequisites_lookup: 
     headers: 
       completion_prerequisites: "Prerrequisitos de conclusão"
     labels: 
       requirements_must_be_completed: "Os seguintes prerrequisitos devem ser concluídos antes desta página ser destravada"
+  product_name: Canvas
   profile: 
     access_token: 
       default_app_name: "Sem aplicativo"
@@ -10714,7 +10801,6 @@ pt:
         change_password: "Alterar senha"
         confirm_password: "Confirmar senha"
         default_email: "Email padrão"
-        enabled_theme: "Tema ativado"
         expires_at: "Expira em"
         headers: 
           approved_integrations: "Integrações aprovadas"
@@ -11016,6 +11102,93 @@ pt:
       publishing: "A publicar..."
       unpublish: "Anular publicação"
       unpublishing: "A anular a publicação..."
+  publish_grades: 
+    assignment_group_list: 
+      no_assignment_groups: "Não foram encontrados grupos de tarefa"
+    assignment_group_list_item: 
+      group_weight: "%{groupWeight}% do total"
+      manage: Gerir
+    assignment_list_item: 
+      assignment_edit: "Editar tarefa"
+      module: Módulo
+      multiple_modules: "Vários módulos"
+      no_points_possible: "Nenhum ponto possível"
+      points_possible: "%{pointsPossible} pts"
+      points_possible_screen_reader: "%{pointsPossible} pontos possíveis"
+      settings: "Editar tarefa"
+    assignment_list_item_score: 
+      assignment_grading_type_is_not_graded: "Não será atribuída uma nota a esta tarefa."
+      assignment_not_yet_graded_screenreader: "Tarefa ainda não avaliada. %{pointsPossible} pontos possíveis."
+      empty_points_possible: "-/%{pointsPossible} pts"
+      no_submission: "Nenhum envio"
+      no_submission_for_assignment_screenreader: "Nenhum envio para esta tarefa. %{pointsPossible} pontos possíveis."
+      not_yet_graded: "*Ainda sem nota*"
+      score_with_points_possible: "*%{score}*/%{pointsPossible} pts"
+      score_with_points_possible_screenreader: "Pontuação: %{score} em %{pointsPossible} pontos."
+    assignment_settings: 
+      cancel: Cancelar
+      save: Guardar
+      validating: "A guardar..."
+      weight_groups: "Ponderar nota final com base nos grupos de tarefa"
+    available_date_description: 
+      available_until: "Disponível até"
+      closed: Fechado
+      not_available_until: "Não disponível até"
+    create_assignment: 
+      assignment: Tarefa
+      assignment_due_at: "Prazo:"
+      assignment_name: "Nome:"
+      assignment_points: "Pontos:"
+      assignment_type: "Tipo:"
+      cancel: Cancelar
+      discussion_type: Discussão
+      external_tool_type: "Ferramenta externa"
+      more: "Ir para %{objectType}"
+      multiple_due_dates: "Várias datas de entrega"
+      not_graded_type: "Sem nota"
+      quiz_type: Teste
+      save: Guardar
+      saving: "A guardar..."
+    date_available_column_view: 
+      available: Disponível
+      multiple_dates: "Várias datas"
+    date_due_column_view: 
+      due: Prazo
+      due_date: Prazo
+      multiple_dates: "Várias datas"
+    due_date_view: 
+      overrides: 
+        remove_these_dates: "Remover estas datas"
+    edit_header_view: 
+      buttons: 
+        not_published: "Não publicado"
+        published: Publicado
+      manage: Gerir
+      titles: 
+        delete: Eliminar
+    group_category_selector: 
+      grade_group_students_individually: "Atribuir notas a cada aluno individualmente"
+      group_assignment_header: "Tarefa de grupo"
+      group_category_options: "Nova categoria de grupo"
+      group_set: "Conjunto de grupos"
+      is_group_assignment: "Esta é uma tarefa em grupo"
+      students_already_submitted_warning: "Envios individuais anteriores não serão contados como envios de grupo e não serão mostrados corretamente no SpeedGrader."
+    index_view: 
+      add_group: "Publicar notas de tarefas"
+      assignments: Tarefas
+      search_for_assignment: "Procurar tarefa"
+      title_add_group: "Adicionar grupo de tarefa"
+    never_drop: 
+      remove_rule: "Remover regra"
+    never_drop_collection: 
+      add_another_assignment: "Adicionar outra tarefa"
+      add_first_assignment: "Adicionar uma tarefa"
+    no_assignments_list_item: 
+      no_assignments_in_this_group: "Não existem tarefas neste grupo"
+    no_assignments_search: 
+      aria_assignments: Tarefas
+      assignments: Tarefas
+      no_assignments_found: "Não foram encontradas tarefas"
   publish_icon_component: 
     publish: Publicar
     publish_click: "publicado, clique para anular a publicação"
@@ -11400,6 +11573,7 @@ pt:
     quiz_question: 
       defaults: 
         question_name: Pergunta
+    quiz_short_answer_length_error: "As respostas a perguntas de preenchimento de espaço em branco têm de ter menos de 80 caracteres"
     quiz_statistics: 
       statistics_filename: "Relatório %{report_type} %{quiz_type} %{quiz_title}"
       types: 
@@ -11410,6 +11584,8 @@ pt:
         this_is_an_external_element: "Este é um elemento externo, não texto, e pode ter sido alterado desde o envio do aluno"
         this_is_an_external_frame: "Este é um quadro externo, não texto, e pode ter sido alterado desde o envio do aluno"
         this_is_an_image: "Esta é uma imagem, não texto, e pode ter sido alterada desde o envio do aluno"
+    quiz_submission_users: 
+      created: criado
     quiz_submissions: 
       errors: 
         invalid_submissions: "Não foi possível confirmar que este envio de teste pertence a si. Tente novamente."
@@ -11459,7 +11635,6 @@ pt:
         not_yet_graded: "Ainda sem nota"
         original_score: "Pontuação original:"
         points_possible: "%{points_possible} pts"
-        question_number: "Pergunta %{question_number}"
         regraded_score: "Pontuação reavaliada:"
         show_ansers_for_variable: "Mostrar respostas de %{variable}"
         skip_question_text: "Saltar para o texto da pergunta."
@@ -12235,6 +12410,8 @@ pt:
     questions: 
       one: "1 pergunta"
       other: "%{count} perguntas"
+  quizzes_redirects: 
+    no_access: "Acesso negado. Reencaminhado para uma página à qual tem acesso."
   re_upload_submissions_form: 
     buttons: 
       upload: "Enviar arquivos (upload)"
@@ -12297,13 +12474,13 @@ pt:
     permission: 
       read_sis: "Ler dados SIS"
     permissions: 
+      app_profiling: "Perfil de aplicação"
       become_user: "Tornar-se outros utilizadores"
       change_course_state: "Alterar o estado da disciplina"
       comment_on_others_submissions: "Exibir todos os envios de alunos e fazer comentários sobre eles"
       create_accounts: "Criar novas contas raiz"
       create_collaborations: "Criar colaborações de aluno"
       create_conferences: "Criar webconferências"
-      generate_data_exports: "Gerar exportações de dados"
       manage_account_memberships: "Adicionar/Remover outros administradores da conta"
       manage_account_settings: "Gerenciar configurações no nível de conta"
       manage_admin_users: "Adicionar/remover outros professores, designers da disciplina ou assistentes na disciplina"
@@ -12411,7 +12588,6 @@ pt:
     updating: "A atualizar..."
   rubric: 
     context_name_rubric: "%{course_name} Protocolo"
-    no_context_found: "Não foi encontrado o protocolo externo para \"%{title}\", a criar uma cópia."
     no_description: "Nenhuma descrição"
     unknown_details: "Detalhes desconhecidos"
   rubric_assessment: 
@@ -13349,6 +13525,13 @@ pt:
       back: Voltar
       close: Fechar
       forward: Encaminhar
+  speed_grader: 
+    submissions_dropdown: 
+      grade: "(nota: %{grade})"
+      loud_late: ATRASADA
+      see_all_quiz_attempts: "Ver todas as tentativas de teste"
+      submission_to_view: "Envio para ver:"
+      submitted: "*Enviado:* %{submittedAt}"
   sr_gradebook: 
     all_sections: "Todas as secções"
     assignment_muted: "Clique para ativar."
@@ -13468,6 +13651,7 @@ pt:
     click_to_download: "Clique aqui para baixar %{size_of_file}"
     creating_zip: "Criando arquivo zip..."
     download_submissions: "Baixar tarefas enviadas"
+    download_submissions_title: "Baixar tarefas enviadas"
     errors: 
       assignment_submit_fail: "Falha no envio da tarefa"
       can_not_submit_locked_assignment: "Não é possível enviar uma tarefa quando ela estiver travada"
@@ -13480,6 +13664,7 @@ pt:
       student_not_enrolled_id: "O utilizador especificado (%{id}) não é aluno desta disciplina"
     errors_update_failed: "Falha ao atualizar"
     finished_redirecting: "finalizado  Redirecionando para o arquivo..."
+    gathering_files: "A reunir os ficheiros (%{progress})..."
     gathering_files_progress: "A reunir os ficheiros (%{progress})..."
     resubmitted_to_turnitin: "Reenviado com sucesso para Turnitin."
     see_attached_files: "Consultar arquivos anexos"
@@ -13647,7 +13832,7 @@ pt:
   text_helper: 
     time: 
       ranges: 
-        different_days: "%{start_date_and_time} a %{end_date_and_time}"
+        different_days: "%{start_date_and_time} *a* %{end_date_and_time}"
   time: 
     am: am
     count_hours_ago: 
@@ -13889,6 +14074,7 @@ pt:
         find_user: "Localizar um utilizador"
         merge_users: "Juntar contas de utilizador"
         really_merge: "Tem a certeza de que pretende juntar contas de utilizador?"
+    birthdate_invalid: "Data inválida ou data/hora inválida para data de nascimento"
     cant_self_merge: "Não pode juntar uma conta a ela mesma."
     cc_prefs: 
       buttons: 
@@ -14272,10 +14458,7 @@ pt:
       blank_title: "O título não pode ficar em branco"
       title_characters: "O título deve conter pelo menos uma letra ou número"
       title_too_long: "O título não pode exceder %{max_characters} caracteres"
-    title_for_topics_category: "%{category} Tópicos"
     unknown_user_name: Desconhecido
-    warnings: 
-      truncated_wiki_title: "O título da página do wiki a seguir foi truncada: %{title}"
   wiki_page_revisions: 
     index: 
       links: 
@@ -14385,7 +14568,7 @@ pt:
       archive: Arquivar
       archive_link: "Exibir arquivo(s)"
   zip_argument_error: "É necessária uma pasta para fazer o carregamento de um ficheiro .zip."
-  zip_file_description: "Plug-in de migração para descompactar ficheiros .zip simples para uma disciplina"
+  zip_file_description: "Plug-in de migração para descompactar arquivos .zip para disciplina, grupo ou ficheiros de utilizador"
   zip_file_display: "Importação de ficheiro"
   zip_file_file_description: "Descompactar ficheiro .zip para pasta"
   zip_file_imports: 
