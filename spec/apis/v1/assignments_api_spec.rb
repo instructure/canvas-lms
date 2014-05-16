@@ -665,6 +665,29 @@ describe AssignmentsApiController, type: :request do
         should == "must be a positive number"
     end
 
+    context "discussion topic assignments" do
+      it "should prevent creating assignments with group category IDs and discussions" do
+        course_with_teacher(:active_all => true)
+        group_category = @course.group_categories.create!(name: "foo")
+        raw_api_call(:post, "/api/v1/courses/#{@course.id}/assignments",
+          { :controller => 'assignments_api',
+            :action => 'create',
+            :format => 'json',
+            :course_id => @course.id.to_s },
+          { :assignment => {
+              'name' => 'some assignment',
+              'group_category_id' => group_category.id,
+              'submission_types' => [
+                 'discussion_topic'
+              ],
+              'discussion_topic' => {
+                'title' => 'some assignment'
+              }
+            }
+          })
+        response.code.should eql '400'
+      end
+    end
   end
 
   describe "PUT /courses/:course_id/assignments/:id (#update)" do
@@ -1272,6 +1295,26 @@ describe AssignmentsApiController, type: :request do
         )
         @assignment.reload
         @assignment.grading_standard.should == nil
+      end
+    end
+
+    context "discussion topic assignments" do
+      it "should prevent setting group category ID on assignments with discussions" do
+        course_with_teacher(:active_all => true)
+        group_category = @course.group_categories.create!(name: "foo")
+        @assignment = factory_with_protected_attributes(
+          @course.assignments,
+          {
+            :title => 'assignment1',
+          })
+        @topic = @course.discussion_topics.build(assignment: @assignment, title: 'asdf')
+        @topic.save
+        raw_api_update_assignment(@course, @assignment, {
+          :group_category_id => group_category.id
+        })
+        @assignment.reload
+        @assignment.group_category.should be_nil
+        response.code.should eql '400'
       end
     end
   end

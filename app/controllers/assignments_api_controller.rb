@@ -303,7 +303,7 @@
 #           "type": "datetime"
 #         },
 #         "group_category_id": {
-#           "description": "the ID of the assignment’s group set (if this is a group assignment)",
+#           "description": "The ID of the assignment’s group set, if this is a group assignment. For group discussions, set group_category_id on the discussion topic, not the linked assignment.",
 #           "example": 1,
 #           "type": "integer"
 #         },

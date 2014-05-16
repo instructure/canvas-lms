@@ -267,7 +267,7 @@ describe SubmissionsController do
       @u1 = @user
       student_in_course(:course => @course)
       @u2 = @user
-      @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "discussion_topic", :group_category => GroupCategory.create!(:name => "groups", :context => @course), :grade_group_students_individually => true)
+      @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload", :group_category => GroupCategory.create!(:name => "groups", :context => @course), :grade_group_students_individually => true)
       @group = @assignment.group_category.groups.create!(:name => 'g1', :context => @course)
       @group.users << @u1
       @group.users << @user

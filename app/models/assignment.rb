@@ -76,6 +76,7 @@ class Assignment < ActiveRecord::Base
   has_one :external_tool_tag, :class_name => 'ContentTag', :as => :context, :dependent => :destroy
   validates_associated :external_tool_tag, :if => :external_tool?
   validate :group_category_changes_ok?
+  validate :discussion_group_ok?
   validate :positive_points_possible?
 
   accepts_nested_attributes_for :external_tool_tag, :update_only => true, :reject_if => proc { |attrs|
@@ -117,6 +118,13 @@ class Assignment < ActiveRecord::Base
       errors.add :group_category_id, I18n.t("group_category_locked",
                                             "The group category can't be changed because students have already submitted on this assignment")
     end
+  end
+
+  def discussion_group_ok?
+    return unless new_record? || group_category_id_changed?
+    return unless group_category_id && submission_types == 'discussion_topic'
+    errors.add :group_category_id, I18n.t("discussion_group_category_locked",
+      "Group categories cannot be set directly on a discussion assignment, but should be set on the discussion instead")
   end
 
   API_NEEDED_FIELDS = %w(
