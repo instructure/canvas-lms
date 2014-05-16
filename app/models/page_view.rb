@@ -344,7 +344,22 @@ class PageView < ActiveRecord::Base
   class << self
     def transaction_with_cassandra_check(*args)
       if PageView.cassandra?
-        yield
+        if CANVAS_RAILS2
+          yield
+        else
+          # Rails 3 autosave associations re-assign the attributes;
+          # for sharding to work, the page view's shard has to be
+          # active at that point, but it's not cause it's normally
+          # done by the transaction, which we're skipping. so
+          # manually do that here
+          if current_scope
+            current_scope.activate do
+              yield
+            end
+          else
+            yield
+          end
+        end
       else
         self.transaction_without_cassandra_check(*args) { yield }
       end
