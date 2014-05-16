@@ -425,11 +425,13 @@ end
     # in g/24755
   end
 
+  # UTC for tests, cuz it's easier :P
+  Account.time_zone_attribute_defaults[:default_time_zone] = 'UTC'
+
   config.before :each do
     I18n.locale = :en
     Time.zone = 'UTC'
     Account.clear_special_account_cache!
-    Account.default.update_attribute(:default_time_zone, 'UTC')
     Setting.reset_cache!
     HostUrl.reset_cache!
     Notification.reset_cache!

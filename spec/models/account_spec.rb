@@ -1047,8 +1047,8 @@ describe Account do
         @account.default_time_zone.should == ActiveSupport::TimeZone['Eastern Time (US & Canada)']
       end
 
-      it "should default to Mountain if not set" do
-        @account.default_time_zone.should == ActiveSupport::TimeZone['Mountain Time (US & Canada)']
+      it "should have a sensible default if not set" do
+        @account.default_time_zone.should == ActiveSupport::TimeZone[Account.time_zone_attribute_defaults[:default_time_zone]]
       end
     end
 
@@ -1070,8 +1070,8 @@ describe Account do
         @account.default_time_zone.should == ActiveSupport::TimeZone['Central Time (US & Canada)']
       end
 
-      it "should default to Mountain if neither is set" do
-        @account.default_time_zone.should == ActiveSupport::TimeZone['Mountain Time (US & Canada)']
+      it "should have a sensible default if neither is set" do
+        @account.default_time_zone.should == ActiveSupport::TimeZone[Account.time_zone_attribute_defaults[:default_time_zone]]
       end
     end
   end
