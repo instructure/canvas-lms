@@ -482,7 +482,7 @@ class ContentMigration < ActiveRecord::Base
 
   def download_exported_data
     raise "No exported data to import" unless self.exported_attachment
-    config = Setting.from_config('external_migration') || {}
+    config = ConfigFile.load('external_migration') || {}
     @exported_data_zip = self.exported_attachment.open(
       :need_local_file => true,
       :temp_folder => config[:data_folder])

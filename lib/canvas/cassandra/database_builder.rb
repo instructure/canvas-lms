@@ -3,7 +3,7 @@ module Canvas
     module DatabaseBuilder
       def self.configured?(config_name, environment = :current)
         raise ArgumentError, "config name required" if config_name.blank?
-        config = Setting.from_config('cassandra', environment)
+        config = ConfigFile.load('cassandra', environment)
         config = config && config[config_name]
         config && config['servers'] && config['keyspace']
       end
@@ -13,7 +13,7 @@ module Canvas
         environment = Rails.env if environment == :current
         key = [config_name, environment]
         @connections.fetch(key) do
-          config = Setting.from_config('cassandra', environment)
+          config = ConfigFile.load('cassandra', environment)
           config = config && config[config_name]
           unless config
             @connections[key] = nil
@@ -34,7 +34,7 @@ module Canvas
       end
 
       def self.config_names
-        Setting.from_config('cassandra').try(:keys) || []
+        ConfigFile.load('cassandra').try(:keys) || []
       end
 
       def self.read_consistency_setting(database_name = nil)

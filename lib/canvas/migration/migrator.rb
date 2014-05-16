@@ -43,7 +43,7 @@ class Migrator
       end
     end
     
-    config = Setting.from_config('external_migration') || {}
+    config = ConfigFile.load('external_migration') || {}
     @unzipped_file_path = Dir.mktmpdir(migration_type.to_s, config[:data_folder].presence)
     @base_export_dir = @settings[:base_download_dir] || find_export_dir
     @course[:export_folder_path] = File.expand_path(@base_export_dir)

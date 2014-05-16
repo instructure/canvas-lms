@@ -11,7 +11,7 @@
 
 session_store = CANVAS_RAILS2 ? ActionController::Base.session_store : Rails.configuration.session_store
 if session_store == ActiveRecord::SessionStore
-  expire_after = (Setting.from_config("session_store") || {})[:expire_after]
+  expire_after = (ConfigFile.load("session_store") || {})[:expire_after]
   expire_after ||= 1.day
 
   Delayed::Periodic.cron 'ActiveRecord::SessionStore::Session.delete_all', '*/5 * * * *' do
@@ -21,7 +21,7 @@ if session_store == ActiveRecord::SessionStore
   end
 end
 
-persistence_token_expire_after = (Setting.from_config("session_store") || {})[:expire_remember_me_after]
+persistence_token_expire_after = (ConfigFile.load("session_store") || {})[:expire_remember_me_after]
 persistence_token_expire_after ||= 1.month
 Delayed::Periodic.cron 'SessionPersistenceToken.delete_all', '35 11 * * *' do
   Shard.with_each_shard(exception: -> { ErrorReport.log_exception(:periodic_job, $!) }) do

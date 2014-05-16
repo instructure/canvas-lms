@@ -433,6 +433,7 @@ end
     Time.zone = 'UTC'
     Account.clear_special_account_cache!
     Setting.reset_cache!
+    ConfigFile.unstub
     HostUrl.reset_cache!
     Notification.reset_cache!
     ActiveRecord::Base.reset_any_instantiation!

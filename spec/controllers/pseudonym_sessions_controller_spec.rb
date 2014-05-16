@@ -215,7 +215,7 @@ describe PseudonymSessionsController do
     end
 
     it "should scope logins to the correct domain root account" do
-      Setting.set_config("saml", {})
+      ConfigFile.stub('saml', {})
       unique_id = 'foo@example.com'
 
       account1 = account_with_saml
@@ -250,8 +250,6 @@ describe PseudonymSessionsController do
       response.should redirect_to(dashboard_url(:login_success => 1))
       session[:saml_unique_id].should == unique_id
       Pseudonym.find(session['pseudonym_credentials_id']).should == user2.pseudonyms.first
-
-      Setting.set_config("saml", nil)
     end
 
     context "multiple authorization configs" do
@@ -461,7 +459,7 @@ describe PseudonymSessionsController do
 
     context "login attributes" do
       before(:each) do
-        Setting.set_config("saml", {})
+        ConfigFile.stub('saml', {})
         @unique_id = 'foo'
 
         @account = account_with_saml
@@ -505,7 +503,7 @@ describe PseudonymSessionsController do
     end
     
     it "should use the eppn saml attribute if configured" do
-      Setting.set_config("saml", {})
+      ConfigFile.stub('saml', {})
       unique_id = 'foo'
 
       account = account_with_saml
@@ -531,7 +529,7 @@ describe PseudonymSessionsController do
     end
 
     it "should redirect to RelayState relative urls" do
-      Setting.set_config("saml", {})
+      ConfigFile.stub('saml', {})
       unique_id = 'foo@example.com'
 
       account = account_with_saml
@@ -550,7 +548,7 @@ describe PseudonymSessionsController do
     end
 
     it "should decode an actual saml response" do
-      Setting.set_config("saml", {})
+      ConfigFile.stub('saml', {})
       unique_id = 'student@example.edu'
 
       account_with_saml

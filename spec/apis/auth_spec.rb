@@ -247,7 +247,7 @@ describe "API Authentication", type: :request do
 
       it "should execute for saml login" do
         pending("requires SAML extension") unless AccountAuthorizationConfig.saml_enabled
-        Setting.set_config("saml", {})
+        ConfigFile.stub('saml', {})
         account = account_with_saml(:account => Account.default)
         flow do
           Onelogin::Saml::Response.any_instance.stubs(:settings=)

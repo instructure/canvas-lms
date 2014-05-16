@@ -1,6 +1,6 @@
 config = {
   :backend => 'active_record',
-}.merge((Setting.from_config('delayed_jobs') || {}).symbolize_keys)
+}.merge((ConfigFile.load('delayed_jobs') || {}).symbolize_keys)
 
 case config[:backend]
 when 'active_record'

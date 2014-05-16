@@ -62,7 +62,7 @@ class CommunicationChannel < ActiveRecord::Base
   RETIRE_THRESHOLD = 5
 
   def self.sms_carriers
-    @sms_carriers ||= Canvas::ICU.collate_by((Setting.from_config('sms', false) ||
+    @sms_carriers ||= Canvas::ICU.collate_by((ConfigFile.load('sms', false) ||
         { 'AT&T' => 'txt.att.net',
           'Alltel' => 'message.alltel.com',
           'Boost' => 'myboostmobile.com',
