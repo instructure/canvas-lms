@@ -1720,6 +1720,30 @@ describe AssignmentsApiController, type: :request do
       end
     end
   end
+
+  context "update_from_params" do
+    before do
+      course_with_teacher(:active_all => true)
+      @assignment = @course.assignments.create!(:title => "some assignment")
+    end
+
+    it "does not update integration_data when lacking permission" do
+      json = %{{"key": "value"}}
+      params = {"integration_data" => json}
+
+      update_from_params(@assignment, params, @user)
+      @assignment.integration_data.should == nil
+    end
+
+    it "updates integration_data with permission" do
+      json = %{{"key": "value"}}
+      params = {"integration_data" => json}
+      account_admin_user_with_role_changes(
+        :role_changes => {:manage_sis => true})
+      update_from_params(@assignment, params, @admin)
+      @assignment.integration_data.should == {"key" => "value"}
+    end
+  end
 end
 
 def api_get_assignments_index_from_course(course)
