@@ -138,6 +138,7 @@ class Assignment < ActiveRecord::Base
     created_at
     updated_at
     post_to_sis
+    integration_data
   )
 
   def external_tool?
@@ -166,6 +167,8 @@ class Assignment < ActiveRecord::Base
   def name=(val)
     self.title = val
   end
+
+  serialize :integration_data, Hash
 
   serialize :turnitin_settings, Hash
   # file extensions allowed for online_upload submission
