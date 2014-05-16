@@ -341,7 +341,7 @@ class ConversationsController < ApplicationController
       visibility_map = infer_visibility(conversations)
       render :json => conversations.map{ |c| conversation_json(c, @current_user, session, :include_participant_avatars => false, :include_participant_contexts => false, :visible => visibility_map[c.conversation_id]) }, :status => :created
     else
-      @conversation = @current_user.initiate_conversation(@recipients, !value_to_boolean(params[:group_conversation]), :subject => params[:subject], :context_type => context_type, :context_id => context_id)
+      @conversation = @current_user.initiate_conversation(@recipients, !group_conversation, :subject => params[:subject], :context_type => context_type, :context_id => context_id)
       @conversation.add_message(message, :tags => @tags, :update_for_sender => false)
       render :json => [conversation_json(@conversation.reload, @current_user, session, :include_indirect_participants => true, :messages => [message])], :status => :created
     end
@@ -678,6 +678,11 @@ class ConversationsController < ApplicationController
   # An array of message ids from this conversation to send to recipients
   # of the new message. Recipients who already had a copy of included
   # messages will not be affected.
+  #
+  # @argument user_note [Optional, Boolean]
+  #   Will add a faculty journal entry for each recipient as long as the user
+  #   making the api call has permission, the recipient is a student and
+  #   faculty journals are enabled in the account.
   #
   # @example_response
   #   {

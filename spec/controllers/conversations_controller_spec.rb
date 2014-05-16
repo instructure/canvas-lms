@@ -364,6 +364,26 @@ describe ConversationsController do
         c["subject"].should_not be_nil
       }
     end
+
+    context "user_notes" do
+      before :each do
+        Account.default.update_attribute :enable_user_notes, true
+        course_with_teacher_logged_in(:active_all => true)
+
+        @students = (1..2).map{
+          student = User.create
+          enrollment = @course.enroll_student(student)
+          enrollment.workflow_state = 'active'
+          enrollment.save
+          student
+        }
+      end
+
+      it "should create user notes" do
+        post 'create', :recipients => @students.map(&:id), :body => "yo", :subject => "greetings", :user_note => '1'
+        @students.each{|x| x.user_notes.size.should be(1)}
+      end
+    end
   end
 
   describe "POST 'update'" do
