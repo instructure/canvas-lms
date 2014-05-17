@@ -1,4 +1,4 @@
-define [ 'ember', 'underscore', 'vendor/d3.v3' ], (Ember, _, d3) ->
+define [ 'ember', 'vendor/d3.v3' ], (Ember, d3) ->
   Ember.View.extend
     chartOptions:
       marginTop: 0
@@ -13,7 +13,7 @@ define [ 'ember', 'underscore', 'vendor/d3.v3' ], (Ember, _, d3) ->
     generateScoreChart: (->
       data = @get('controller.scoreChartData')
       sz = data.length
-      highest = _.max(data)
+      highest = d3.max(data)
       {marginTop, marginRight, marginBottom, marginLeft} = @chartOptions
       width = @chartOptions.w - marginLeft - marginRight
       height = @chartOptions.h - marginTop - marginBottom
@@ -25,13 +25,13 @@ define [ 'ember', 'underscore', 'vendor/d3.v3' ], (Ember, _, d3) ->
         .range([ 0, highest ])
         .rangeRound([ height, 0 ])
 
-      x.domain _.map data, (d, i) -> i
+      x.domain data.map (d, i) -> i
       y.domain [ 0, highest ]
 
       xAxis = d3.svg.axis()
         .scale(x)
         .orient("bottom")
-        .tickValues(d3.range(0, 100, 10))
+        .tickValues(d3.range(0, 101, 10))
         .tickFormat((d) -> d+'%')
 
       svg = d3.select(@$('svg')[0])
@@ -69,14 +69,17 @@ define [ 'ember', 'underscore', 'vendor/d3.v3' ], (Ember, _, d3) ->
             .attr('height', (d) -> h - y(d + visibilityThreshold));
 
     _renderMedianDistGraph: (svg, percentileData, x, y) ->
-      data = _.map _.range(0, 100, 10), (percentile) ->
+      data = d3.range(0, 101, 10).map (percentile) ->
         entries = percentileData.slice(percentile, percentile+10)
-        point = _.max(entries)
+        point = d3.max(entries)
 
-        { y: point, percentile: percentile + _.indexOf(entries, point) }
+        { y: point, percentile: percentile + entries.indexOf(point) }
+
+      # make it so that the line starts and ends on any bar's center, looks better
+      paddingToCenter = x.rangeBand() / 2 - @get('chartOptions.barMargin')
 
       line = d3.svg.line()
-        .x((d, i) -> x(d.percentile))
+        .x((d, i) -> x(d.percentile) + paddingToCenter)
         .y((d) -> y(d.y))
         .interpolate('basis')
 

@@ -39,6 +39,19 @@ define [
     equal data[88], 12
     equal data[100], 1
 
+  emq.test '#scoreChartData: it considers scores over 100% as 100%', ->
+    @model.set('submissionStatistics', {
+      scores: {
+        100: 1,
+        101: 2,
+        105: 2
+      }
+    })
+
+    data = @subject.get('scoreChartData')
+    equal data.length, 101
+    equal data[100], 5
+
   emq.test '#formattedAvgDuration: pads durations with leading zeros', ->
     @model.set('avgDuration', 42)
     equal @subject.get('formattedAvgDuration'), '00:42'
@@ -53,12 +66,12 @@ define [
     @model.set('quiz', { pointsPossible: 32 })
     @model.set('avgScore', 17)
     equal @subject.get('avgScoreRatio'), 53
-  
+
   emq.test '#highScoreRatio', ->
     @model.set('quiz', { pointsPossible: 32 })
     @model.set('highScore', 30)
     equal @subject.get('highScoreRatio'), 94
-  
+
   emq.test '#lowScoreRatio', ->
     @model.set('quiz', { pointsPossible: 32 })
     @model.set('lowScore', 4)

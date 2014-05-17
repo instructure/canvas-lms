@@ -1,4 +1,4 @@
-define [ 'ember' ], (Em) ->
+define [ 'ember', 'vendor/d3.v3' ], (Em, {max, sum}) ->
   Em.ObjectController.extend
     ratioFor: (score) ->
       quizPoints = parseFloat(@get('quiz.pointsPossible'))
@@ -30,7 +30,7 @@ define [ 'ember' ], (Em) ->
     #
     formattedAvgDuration: (->
       floor = Math.floor
-      seconds = @get('model.avgDuration')
+      seconds = @get('avgDuration')
       pad = (duration) ->
         ('00' + duration).slice(-2)
 
@@ -83,11 +83,15 @@ define [ 'ember' ], (Em) ->
     #     0 // 100
     #   ]
     scoreChartData: (->
-      set = []
-      scores = @get('model.submissionStatistics.scores') || {}
+      set = Em.A()
+      scores = @get('submissionStatistics.scores') || {}
+      highest = max(Em.keys(scores).map (d) -> parseInt(d, 10))
 
-      for percentile in [0..100]
+      for percentile in [0..max([100, highest])]
         set[percentile] = scores["#{percentile}"] || 0
 
+      # merge right outliers with 100%
+      set[100] = sum(set.splice(100, set.length));
+
       set
-    ).property('model.submissionStatistics')
+    ).property('submissionStatistics')
