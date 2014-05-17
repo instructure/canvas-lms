@@ -1,5 +1,6 @@
 module CanvasQuizStatistics
   require 'canvas_quiz_statistics/version'
+  require 'canvas_quiz_statistics/util'
   require 'canvas_quiz_statistics/analyzers'
 
   def self.can_analyze?(question_data)

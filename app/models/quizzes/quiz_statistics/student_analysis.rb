@@ -360,6 +360,10 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
   #   "multiple_responses"=>false}],
   def stats_for_question(question, responses)
     if CQS.can_analyze?(question)
+      # the gem expects all hash keys to be symbols:
+      question = CQS::Util.deep_symbolize_keys(question)
+      responses = responses.map(&CQS::Util.method(:deep_symbolize_keys))
+
       analysis = CQS.analyze(question, responses)
 
       return question.to_hash.merge(analysis).with_indifferent_access
