@@ -17,6 +17,11 @@ define [ 'ember', 'ember-data' ], (Em, DS) ->
         delete answer.weight
 
   decorateAnswerSet = (answerSet) ->
+    # TODO: remove once the API output is consistent
+    if answerSet.answers
+      answerSet.answer_matches = answerSet.answers
+      delete answerSet.answers
+
     (answerSet.answer_matches || []).forEach (answer, i) ->
       answer.id = "#{answerSet.id}_#{i}"
       answer.ratio = calculateResponseRatio(answer)

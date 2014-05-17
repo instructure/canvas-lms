@@ -101,10 +101,59 @@ may include extra metrics. You can find these metrics below.
 
 ```javascript
 {
-  // TODO
-  "multiple_responses": null,
-  // TODO
-  "answer_sets": null
+  // Number of students who have filled at least one blank.
+  "responses": 2,
+
+  // Number of students who have filled every blank.
+  "answered": 2,
+
+  // Number of students who filled all blanks correctly.
+  "correct": 1,
+
+  // Number of students who filled one or more blanks correctly.
+  "partially_correct": 0,
+
+  // Number of students who didn't fill any blank correctly.
+  "incorrect": 1,
+
+  // Each entry in the answer set represents a blank and responses to
+  // its pre-defined answers:
+  "answer_sets": [
+    {
+      "id": "70dda5dfb8053dc6d1c492574bce9bfd", // md5sum of the blank
+      "text": "color", // the blank_id
+      "answers": [
+        // Students who filled in this blank with this correct answer:
+        {
+          "id": "9711",
+          "text": "Red",
+          "responses": 3,
+          "correct": true
+        },
+        // Students who filled in this blank with this other correct answer:
+        {
+          "id": "2700",
+          "text": "Blue",
+          "responses": 0,
+          "correct": true
+        },
+        // Students who filled in this blank with something else:
+        {
+          "id": "other",
+          "text": "Other",
+          "responses": 1,
+          "correct": false
+        },
+        // Students who left this blank empty:
+        {
+          "id": "none",
+          "text": "No Answer",
+          "responses": 1,
+          "correct": false
+        }
+      ]
+    }
+  ]
 }
 ```
 
@@ -129,6 +178,9 @@ may include extra metrics. You can find these metrics below.
 
    // The number of students who got graded with a full score.
    "full_credit": 4,
+
+   // Number of students who wrote any kind of answer.
+   "resposes": 5,
 
    // A set of maps of scores and the number of students who received
    // each score.
