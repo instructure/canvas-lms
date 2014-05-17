@@ -6241,7 +6241,7 @@ pt:
     individual_gradebook: "Vista de livro de notas individual"
     learning_mastery_gradebook: "Livro de notas de domínio de aprendizagem"
     new_styles: "Utilizar novos estilos"
-    post_grades: "Publicar notas no SIS"
+    post_grades: "Publicar notas em SIS"
     student_outcome_gradebook: "Livro de notas de resultados de alunos"
   file_browser_view: 
     folder_tree_instructions: "Utilize as teclas de seta para cima e para baixo para navegar na árvore. Prima a tecla direita para expandir as pastas, a tecla esquerda para fechar e Enter para escolher uma imagem."
@@ -6931,7 +6931,7 @@ pt:
     gradebook2: 
       arrange_columns_by_due_date: "Organizar colunas por data de entrega"
       arrange_columns_by_group: "Organizar colunas por grupo de tarefa"
-      download_scores: "Baixar pontuação (.csv)"
+      download_scores: "Descarregar pontuações (.csv)"
       filter_by_student: "Filtrar por nome do aluno ou ID secundário"
       grades: Notas
       hide_student_names: "Ocultar nomes dos alunos"
@@ -6939,13 +6939,13 @@ pt:
       learning_mastery: "Domínio de aprendizagem"
       old_gradebook: "livro de notas antigo"
       post_grades: "Publicar notas"
-      publish_to_sis: "Publicar notas no SIS"
+      publish_to_sis: "Publicar notas em SIS"
       set_group_weights: "Definir ponderação de grupo"
-      show_attendance_columns: "Exibir colunas de presença"
+      show_attendance_columns: "Mostrar colunas de presença"
       show_concluded_enrollments: "Mostrar inscrições concluídas"
       srgb_gradebook: "mudar de livro de notas"
-      upload_scores: "Atualizar pontuações (de .csv)"
-      view_grading_history: "Exibir histórico de avaliação"
+      upload_scores: "Carregar pontuações (de .csv)"
+      view_grading_history: "Ver histórico de avaliação"
     grades: 
       complete: Completo
       incomplete: Incompleto
@@ -7571,7 +7571,7 @@ pt:
   importers/assignment_importer: 
     errors: 
       import: 
-        external_tool_url: "O URL para a tarefa da ferramenta externa \"%{assignment_name}\" era inválido."
+        external_tool_url: "O URL da tarefa de ferramenta externa \"%{assignment_name}\" não era válido."
     imported_assignments_group: "Tarefas importadas"
   importers/context_external_tool_importer: 
     external_tool_attention_needed: "Os parâmetros de segurança da ferramenta externa \"%{tool_name}\" precisam de ser definidos em Definições de disciplina."
@@ -7587,9 +7587,9 @@ pt:
   importers/rubric_importer: 
     no_context_found: "Não foi encontrado o protocolo externo para \"%{title}\", a criar uma cópia."
   importers/wiki_page_importer: 
-    title_for_topics_category: "%{category} Tópicos"
+    title_for_topics_category: "Tópicos de %{category}"
     warnings: 
-      truncated_wiki_title: "O título da página do wiki a seguir foi truncada: %{title}"
+      truncated_wiki_title: "O título da página wiki que se segue foi truncado: %{title}"
   individual_gradebook_description: "A Vista de livro de notas individual fornece uma vista de livro de notas concebida para acessibilidade."
   info: 
     notices: 
@@ -9898,7 +9898,7 @@ pt:
       module: 
         prerequisites: Pré-requisitos
         published: Publicado
-    post_grades_dialog_title: "Publicar notas no SIS"
+    post_grades_dialog_title: "Publicar notas em SIS"
     progression_module_collection: 
       module_progress_for: "Progresso do módulo para %h{student_link}"
       module_progress_for_student: "Progresso do módulo para %{student.name}"
@@ -9914,7 +9914,7 @@ pt:
       student_progress: "Progresso do aluno"
   moodle_dropdown_many_warning_title: "Existem %{count} perguntas de várias listas pendentes neste banco que podem ter sido importadas incorretamente"
   moodle_dropdown_warning_title: "Pergunta de várias listas pendentes pode ter sido importada incorretamente"
-  moodle_formula_many_warning_title: "Existem %{count} perguntas de fórmulas neste banco para as quais será necessário gerar de novas as respostas possíveis"
+  moodle_formula_many_warning_title: "Existem %{count} perguntas de fórmulas neste banco para as quais será necessário gerar de novo as respostas possíveis"
   moodle_formula_warning_title: "Será necessário gerar de novo as respostas possíveis para a pergunta de fórmula"
   move_dialog: 
     cancel: Cancelar
@@ -10672,7 +10672,7 @@ pt:
         secret_key: "Chave secreta"
   post_grades_description: |-
       Publicar notas permite aos professores publicarem notas em sistemas SIS ativados: Powerschool,
-      Aspire (SIS2000), JMC e qualquer SIS compatível com SIF que aceita os elementos SIF GradingCategory,
+      Aspire (SIS2000), JMC e qualquer SIS compatível com SIF que aceite os elementos SIF GradingCategory,
        GradingAssignment, GradingAssignmentScore.
   prerequisites_lookup: 
     headers: 
@@ -11171,7 +11171,7 @@ pt:
       group_assignment_header: "Tarefa de grupo"
       group_category_options: "Nova categoria de grupo"
       group_set: "Conjunto de grupos"
-      is_group_assignment: "Esta é uma tarefa em grupo"
+      is_group_assignment: "Esta é uma tarefa de grupo"
       students_already_submitted_warning: "Envios individuais anteriores não serão contados como envios de grupo e não serão mostrados corretamente no SpeedGrader."
     index_view: 
       add_group: "Publicar notas de tarefas"
@@ -12411,7 +12411,7 @@ pt:
       one: "1 pergunta"
       other: "%{count} perguntas"
   quizzes_redirects: 
-    no_access: "Acesso negado. Reencaminhado para uma página à qual tem acesso."
+    no_access: "Acesso negado. Redirecionado para uma página à qual tem acesso."
   re_upload_submissions_form: 
     buttons: 
       upload: "Enviar arquivos (upload)"
@@ -13528,7 +13528,7 @@ pt:
   speed_grader: 
     submissions_dropdown: 
       grade: "(nota: %{grade})"
-      loud_late: ATRASADA
+      loud_late: ATRASADO
       see_all_quiz_attempts: "Ver todas as tentativas de teste"
       submission_to_view: "Envio para ver:"
       submitted: "*Enviado:* %{submittedAt}"
@@ -13651,7 +13651,7 @@ pt:
     click_to_download: "Clique aqui para baixar %{size_of_file}"
     creating_zip: "Criando arquivo zip..."
     download_submissions: "Baixar tarefas enviadas"
-    download_submissions_title: "Baixar tarefas enviadas"
+    download_submissions_title: "Descarregar envios de tarefas"
     errors: 
       assignment_submit_fail: "Falha no envio da tarefa"
       can_not_submit_locked_assignment: "Não é possível enviar uma tarefa quando ela estiver travada"
