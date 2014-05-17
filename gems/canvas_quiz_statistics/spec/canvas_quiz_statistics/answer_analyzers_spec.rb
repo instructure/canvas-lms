@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-describe CanvasQuizStatistics::AnswerAnalyzers do
-  Analyzers = CanvasQuizStatistics::AnswerAnalyzers
+describe CanvasQuizStatistics::Analyzers do
+  Analyzers = CanvasQuizStatistics::Analyzers
 
   describe '[]' do
     it 'should locate an analyzer' do

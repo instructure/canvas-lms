@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-module CanvasQuizStatistics::AnswerAnalyzers
+module CanvasQuizStatistics::Analyzers
   # Generates statistics for a set of student responses to an essay question.
   class Essay < Base
     # @param [Array<Hash>] responses
@@ -30,6 +30,9 @@ module CanvasQuizStatistics::AnswerAnalyzers
     #
     # @example output
     # {
+    #   // Number of students who have answered this question.
+    #   "responses": 2,
+    #
     #   // The number of students whose responses were graded by the teacher so
     #   // far.
     #   "graded": 1,
@@ -44,8 +47,8 @@ module CanvasQuizStatistics::AnswerAnalyzers
     #     { "score": 3, "count": 1 }
     #   ]
     # }
-    def run(question_data, responses)
-      full_credit = question_data[:points_possible].to_f
+    def run(responses)
+      full_credit = @question_data[:points_possible].to_f
 
       stats = {}
       stats[:graded] = responses.select { |r| r[:correct] == 'defined' }.length
@@ -60,11 +63,20 @@ module CanvasQuizStatistics::AnswerAnalyzers
 
       stats[:point_distribution] = point_distribution.keys.map do |score|
         { score: score, count: point_distribution[score] }
-      end
+      end.sort_by { |v| v[:score] || -1 }
 
-      stats[:point_distribution].sort_by! { |v| v[:score] || -1 }
+      stats[:responses] = responses.select(&method(:answer_present?)).length
 
       stats
+    end
+
+    private
+
+    # Test whether the response contains an answer to the question.
+    #
+    # Default behavior is to text whether the "text" field is populated.
+    def answer_present?(response)
+      response[:text].present?
     end
   end
 end

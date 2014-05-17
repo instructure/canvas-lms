@@ -19,6 +19,8 @@
 require 'csv'
 
 class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
+  CQS = CanvasQuizStatistics
+
   include HtmlTextHelper
 
   def readable_type
@@ -357,9 +359,9 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
   #   "user_ids"=>[1,2,3],
   #   "multiple_responses"=>false}],
   def stats_for_question(question, responses)
-    if [ 'essay_question' ].include?(question[:question_type].to_s)
-      analyzer = CanvasQuizStatistics::QuestionAnalyzer.new(question)
-      analysis = analyzer.run(responses)
+    if CQS.can_analyze?(question)
+      analysis = CQS.analyze(question, responses)
+
       return question.to_hash.merge(analysis).with_indifferent_access
     end
 

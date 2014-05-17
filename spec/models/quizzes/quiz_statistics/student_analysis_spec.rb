@@ -319,21 +319,19 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
   describe 'question statistics' do
     subject { Quizzes::QuizStatistics::StudentAnalysis.new({}) }
 
-    it 'should proxy to the gem for Essay question stats' do
+    it 'should proxy to CanvasQuizStatistics for supported questions' do
       question_data = { question_type: 'essay_question' }
       responses = []
-      stats = { foo: 'bar' }
-      analyzer = stub
 
-      CanvasQuizStatistics::QuestionAnalyzer.
-        expects(:new).with(question_data).
-        returns(analyzer)
+      CanvasQuizStatistics.
+        expects(:analyze).
+          with(question_data, responses).
+          returns({ some_metric: 5 })
 
-      analyzer.expects(:run).with(responses).returns(stats)
       output = subject.send(:stats_for_question, question_data, responses)
       output.should == {
         question_type: 'essay_question',
-        foo: 'bar'
+        some_metric: 5
       }.with_indifferent_access
     end
   end
