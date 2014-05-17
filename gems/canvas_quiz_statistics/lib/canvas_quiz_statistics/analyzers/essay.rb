@@ -17,57 +17,62 @@
 #
 module CanvasQuizStatistics::Analyzers
   # Generates statistics for a set of student responses to an essay question.
+  #
+  # Response is expected to look something like this:
+  #
+  # ```javascript
+  # {
+  #   "correct": "undefined",
+  #   "points": 0,
+  #   "question_id": 18,
+  #   "text": "<p>*grunts*</p>",
+  #   "user_id": 4
+  # }
+  # ```
   class Essay < Base
-    # @param [Array<Hash>] responses
-    #   Set of student responses. Entry is expected to look something like this:
-    #   {
-    #     "correct": "undefined",
-    #     "points": 0,
-    #     "question_id": 18,
-    #     "text": "<p>*grunts*</p>",
-    #     "user_id": 4
-    #   }
+    # Number of students who have answered this question.
     #
-    # @example output
+    # @return [Integer]
+    metric :responses do |responses|
+      responses.select(&method(:answer_present?)).length
+    end
+
+    # The number of students whose responses were graded by the teacher so far.
+    #
+    # @return [Integer]
+    metric :graded do |responses|
+      responses.select { |r| r[:correct] == 'defined' }.length
+    end
+
+    # The number of students who got graded with a full score.
+    #
+    # @return [Integer]
+    metric :full_credit do |responses|
+      full_credit = @question_data[:points_possible].to_f
+
+      responses.select { |response| response[:points].to_f >= full_credit }.length
+    end
+
+    # A set of scores and the number of students who received them.
+    #
+    # @return [Hash]
+    #
+    # ```javascript
     # {
-    #   // Number of students who have answered this question.
-    #   "responses": 2,
-    #
-    #   // The number of students whose responses were graded by the teacher so
-    #   // far.
-    #   "graded": 1,
-    #
-    #   // The number of students who got graded with a full score.
-    #   "full_credit": 1,
-    #
-    #   // A set of vectors of scores and the number of students who received
-    #   // each score.
     #   "point_distribution": [
     #     { "score": 0, "count": 1 },
     #     { "score": 3, "count": 1 }
     #   ]
     # }
-    def run(responses)
-      full_credit = @question_data[:points_possible].to_f
+    # ```
+    metric :point_distribution do |responses|
+      point_distribution = Hash.new(0)
 
-      stats = {}
-      stats[:graded] = responses.select { |r| r[:correct] == 'defined' }.length
+      responses.each { |response| point_distribution[response[:points]] += 1 }
 
-      stats[:full_credit] = responses.select do |response|
-        response[:points].to_f >= full_credit
-      end.length
-
-      point_distribution = Hash.new(0).tap do |vector|
-        responses.each { |response| vector[response[:points]] += 1 }
-      end
-
-      stats[:point_distribution] = point_distribution.keys.map do |score|
+      point_distribution.keys.map do |score|
         { score: score, count: point_distribution[score] }
       end.sort_by { |v| v[:score] || -1 }
-
-      stats[:responses] = responses.select(&method(:answer_present?)).length
-
-      stats
     end
 
     private
