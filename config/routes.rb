@@ -1431,6 +1431,22 @@ routes.draw do
       get "polls/:poll_id/poll_sessions/:poll_session_id/poll_submissions/:id", :action => :show, :path_name => 'poll_submission'
     end
 
+    scope(:controller => 'live_assessments/assessments') do
+      %w(course).each do |context|
+        prefix = "#{context}s/:#{context}_id"
+        get "#{prefix}/live_assessments", :action => :index, :path_name => "#{context}_live_assessments"
+        post "#{prefix}/live_assessments", :action => :create, :path_name => "#{context}_live_assessment_create"
+      end
+    end
+
+    scope(:controller => 'live_assessments/results') do
+      %w(course).each do |context|
+        prefix = "#{context}s/:#{context}_id"
+        get "#{prefix}/live_assessments/:assessment_id/results", :action => :index, :path_name => "#{context}_live_assessment_results"
+        post "#{prefix}/live_assessments/:assessment_id/results", :action => :create, :path_name => "#{context}_live_assessment_result_create"
+      end
+    end
+
     scope(:controller => :outcome_groups_api) do
       def og_routes(context)
         prefix = (context == "global" ? context : "#{context}s/:#{context}_id")

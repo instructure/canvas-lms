@@ -26,11 +26,11 @@ class LearningOutcomeResult < ActiveRecord::Base
   belongs_to :learning_outcome
   belongs_to :alignment, :class_name => 'ContentTag', :foreign_key => :content_tag_id
   belongs_to :association_object, :polymorphic => true, :foreign_type => :association_type, :foreign_key => :association_id
-  validates_inclusion_of :association_type, :allow_nil => true, :in => ['Quizzes::Quiz', 'RubricAssociation', 'Assignment']
+  validates_inclusion_of :association_type, :allow_nil => true, :in => ['Quizzes::Quiz', 'RubricAssociation', 'Assignment', 'LiveAssessments::Assessment']
   belongs_to :artifact, :polymorphic => true
-  validates_inclusion_of :artifact_type, :allow_nil => true, :in => ['Quizzes::QuizSubmission', 'RubricAssessment', 'Submission']
+  validates_inclusion_of :artifact_type, :allow_nil => true, :in => ['Quizzes::QuizSubmission', 'RubricAssessment', 'Submission', 'LiveAssessments::Submission']
   belongs_to :associated_asset, :polymorphic => true
-  validates_inclusion_of :associated_asset_type, :allow_nil => true, :in => ['AssessmentQuestion', 'Quizzes::Quiz']
+  validates_inclusion_of :associated_asset_type, :allow_nil => true, :in => ['AssessmentQuestion', 'Quizzes::Quiz', 'LiveAssessments::Assessment']
   belongs_to :context, :polymorphic => true
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course']
   simply_versioned
