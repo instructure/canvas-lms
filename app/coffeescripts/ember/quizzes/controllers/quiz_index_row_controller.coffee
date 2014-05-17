@@ -1,6 +1,6 @@
 define [
   'ember',
-  'i18n!quizzes_model',
+  'i18n!quiz_index_row',
   '../shared/environment'
 ], (Ember, I18n, environment) ->
 

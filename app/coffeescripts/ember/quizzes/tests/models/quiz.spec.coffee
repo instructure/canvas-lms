@@ -49,10 +49,10 @@ define [
   test "tScoringPolicy", ->
 
     run -> quiz.set 'scoringPolicy', 'keep_highest'
-    equal quiz.get('tScoringPolicy'), I18n.t('highest', 'highest')
+    equal quiz.get('tScoringPolicy'), I18n.t('keep_highest', 'Highest')
 
     run -> quiz.set 'scoringPolicy', 'keep_latest'
-    equal quiz.get('tScoringPolicy'), I18n.t('latest', 'latest')
+    equal quiz.get('tScoringPolicy'), I18n.t('keep_latest', 'Latest')
 
   test "tQuizType", ->
 

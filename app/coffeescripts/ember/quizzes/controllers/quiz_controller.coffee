@@ -1,6 +1,6 @@
 define [
   'ember'
-  'i18n!quizzes'
+  'i18n!quiz'
   'jquery'
   '../shared/environment'
   'compiled/jquery.rails_flash_notifications'

@@ -1,7 +1,7 @@
 define [
   'ember'
   'ember-data'
-  'i18n!quizzes'
+  'i18n!quiz_model'
   '../shared/ic-ajax-jsonapi'
 ], (Em, DS, I18n, ajax) ->
 
@@ -65,8 +65,8 @@ define [
     assignmentGroup: belongsTo 'assignment_group', async: true
     tScoringPolicy: (->
       switch @get('scoringPolicy')
-        when 'keep_highest' then I18n.t('highest', 'highest')
-        when 'keep_latest' then I18n.t('latest', 'latest')
+        when 'keep_highest' then I18n.t('keep_highest', 'Highest')
+        when 'keep_latest' then I18n.t('keep_latest', 'Latest')
     ).property('scoringPolicy')
     tQuizType: (->
       switch @get('quizType')
