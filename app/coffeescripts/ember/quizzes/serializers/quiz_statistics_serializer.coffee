@@ -1,8 +1,26 @@
-define [ 'ember', 'ember-data' ], (Em, DS) ->
-  respondentCount = 0
+define [ 'ember', 'ember-data', 'i18n!quiz_statistics' ], (Em, DS, I18n) ->
+  participantCount = 0
 
   calculateResponseRatio = (answer) ->
-    Em.Util.round(answer.responses / respondentCount * 100)
+    Em.Util.round(answer.responses / participantCount * 100)
+
+  decorate = (quiz_statistics) ->
+    participantCount = quiz_statistics.submission_statistics.unique_count
+
+    quiz_statistics.question_statistics.forEach (question_statistics) ->
+      question_statistics.id = "#{question_statistics.id}"
+
+      # assign a FK between question and quiz statistics
+      question_statistics.quiz_statistics_id = quiz_statistics.id
+
+      decorateAnswers(question_statistics.answers)
+
+      if question_statistics.answer_sets
+        question_statistics.answer_sets.forEach(decorateAnswerSet)
+
+    # set of FKs between quiz and question stats
+    quiz_statistics.question_statistic_ids =
+      Em.A(quiz_statistics.question_statistics).mapBy('id')
 
   decorateAnswers = (answers) ->
     (answers || []).forEach (answer) ->
@@ -17,42 +35,21 @@ define [ 'ember', 'ember-data' ], (Em, DS) ->
         delete answer.weight
 
   decorateAnswerSet = (answerSet) ->
-    # TODO: remove once the API output is consistent
-    if answerSet.answers
-      answerSet.answer_matches = answerSet.answers
-      delete answerSet.answers
-
-    (answerSet.answer_matches || []).forEach (answer, i) ->
-      answer.id = "#{answerSet.id}_#{i}"
+    (answerSet.answers || []).forEach (answer, i) ->
       answer.ratio = calculateResponseRatio(answer)
+
+      if answer.id == 'none'
+        answer.text = I18n.t('no_answer', 'No Answer')
+      else if answer.id == 'other'
+        answer.text = I18n.t('unknown_answer', 'Something Else')
 
   DS.ActiveModelSerializer.extend
     extractArray: (store, type, payload, id, requestType) ->
+      decorate(payload.quiz_statistics[0])
+
       data = {
         quizStatistics: payload.quiz_statistics
         questionStatistics: payload.quiz_statistics[0].question_statistics
       }
 
-      data.questionStatistics.forEach (questionStatistics) ->
-        questionStatistics.id = "#{questionStatistics.id}"
-
-        # assign a FK between question and quiz statistics
-        questionStatistics.quiz_statistics_id = data.quizStatistics[0].id
-
-      @decorate(payload.quiz_statistics[0])
-
-      # set of FKs between quiz and question stats
-      data.quizStatistics[0].question_statistic_ids = Em.A(data.questionStatistics).mapBy('id')
-
       @_super(store, type, data, id, requestType)
-
-    # TODO: remove once deprecated (the new stats API will expose these items)
-    decorate: (quiz_statistics) ->
-      participantCount = quiz_statistics.submission_statistics.unique_count
-
-      quiz_statistics.question_statistics.forEach (questionStatistics) ->
-        respondentCount = questionStatistics.responses || participantCount
-        decorateAnswers(questionStatistics.answers)
-
-        if questionStatistics.answer_sets
-          questionStatistics.answer_sets.forEach(decorateAnswerSet)

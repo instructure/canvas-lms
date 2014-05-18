@@ -35,15 +35,6 @@
   </div>
 </div>
 
-<ol class="answer-drilldown detail-section">
-  {{#if activeAnswer}}
-    {{#each answer in activeAnswer.answer_matches}}
-      <li {{bind-attr class="answer.correct"}}>
-        <span class="answer-response-ratio">{{answer.ratio}}<sup>%</sup></span>
-        <div class="answer-text">
-          {{{answer.text}}}
-        </div>
-      </li>
-    {{/each}}
-  {{/if}}
-</ol>
+{{#if activeAnswer}}
+  {{partial "quiz/statistics/questions/multiple_choice/answers"}}
+{{/if}}

@@ -1,16 +1,15 @@
 define [
   'ember'
-  'underscore'
   'vendor/d3.v3'
   '../../../../../mixins/views/chart_inspector'
   'compiled/behaviors/tooltip'
-], ({View}, _, d3, ChartInspectorMixin) ->
+], (Em, d3, ChartInspectorMixin) ->
   # This view renders a bar chart that plots each question answer versus the
   # amount of responses each answer has received.
   #
   # Also, each bar that represents an answer provides a tooltip on hover that
   # displays more information.
-  View.extend ChartInspectorMixin,
+  Em.View.extend ChartInspectorMixin,
     # @config [Integer] [barWidth=30]
     #   Width of the bars in the chart in pixels.
     barWidth: 30
@@ -30,12 +29,11 @@ define [
         at: 'center top-8'
 
     renderChart: (->
-      data = @get('controller.chartData')
-      $container = @$().parent()
+      data = Em.A(@get('controller.chartData'))
 
-      sz = _.reduce data, ((sum, item) -> sum + item.y), 0
+      sz = data.reduce(((sum, item) -> sum + item.y), 0)
 
-      highest = Math.max.apply(Math, _.pluck(data, 'y'))
+      highest = Math.max.apply(Math, data.mapBy('y'))
 
       margin = { top: 0, right: 0, bottom: 0, left: 0 }
       width = @get('w') - margin.left - margin.right
@@ -43,13 +41,14 @@ define [
       barWidth = @get('barWidth')
       barMargin = @get('barMargin')
       xOffset = @get('xOffset')
-      visibilityThreshold = Math.min(1.0, highest / 100.0)
 
       x = d3.scale.ordinal()
         .rangeRoundBands([0, @get('barWidth') * sz], .025)
 
       y = d3.scale.linear()
-        .range([height + visibilityThreshold, 0])
+        .range([height, 0])
+
+      visibilityThreshold = Math.max(5, y(highest) / 100.0)
 
       svg = d3.select(@$('svg')[0])
           .attr("width", width + margin.left + margin.right)
@@ -57,8 +56,7 @@ define [
         .append("g")
           .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-      x.domain _.map data, (d, i) ->
-        d.label || i
+      x.domain data.map (d, i) -> d.label || i
       y.domain [ 0, sz ]
 
       svg.selectAll('.bar')
@@ -67,19 +65,23 @@ define [
           .attr("class", (d) => @classifyChartBar(d))
           .attr("x", (d, i) -> i*(barWidth + barMargin) + xOffset)
           .attr("width", barWidth)
-          .attr("y", (d) -> y(d.y + visibilityThreshold))
-          .attr("height", (d) -> height - y(d.y + visibilityThreshold))
+          .attr("y", (d) -> y(d.y) - visibilityThreshold)
+          .attr("height", (d) -> height - y(d.y) + visibilityThreshold)
           .inspectable(this)
 
       # If the special "No Answer" is present, we represent it as a diagonally-
       # striped bar, but to do that we need to render the <svg:pattern> that
       # generates the stripes and use that as a fill pattern, and we also need
       # to create the <svg:rect> that will be filled with that pattern.
-      if noAnswer = _.where(data, { id: 'none' })[0]
+      otherAnswers = Em.A([
+        data.findBy('id', 'other')
+        data.findBy('id', 'none')
+      ]).compact()
+
+      if otherAnswers.length
         @renderStripePattern(svg)
-        index = data.indexOf(noAnswer)
         svg.selectAll('.bar.bar-striped')
-          .data([ noAnswer ])
+          .data(otherAnswers)
           .enter().append('rect')
             .attr('class', 'bar bar-striped')
             # We need to inline the fill style because we are referencing an
@@ -90,7 +92,7 @@ define [
             .attr('style', 'fill: url(#diagonalStripes);')
             # remove 2 pixels from width and height, and offset it by {1,1} on
             # both axes to "contain" it inside the margins of the bg rect
-            .attr('x', (d) -> index*(barWidth + barMargin) + xOffset + 1)
+            .attr('x', (d) -> data.indexOf(d) * (barWidth + barMargin) + xOffset + 1)
             .attr('width', barWidth-2)
             .attr('y', (d) -> y(d.y + visibilityThreshold) + 1)
             .attr('height', (d) -> height - y(d.y + visibilityThreshold) - 2)
@@ -99,8 +101,7 @@ define [
     ).on('didInsertElement')
 
     removeChart: (->
-      if @svg
-        @svg.remove()
+      @svg.remove() if @svg
     ).on('willDestroyElement')
 
     renderStripePattern: (svg) ->
