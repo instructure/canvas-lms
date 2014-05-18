@@ -97,6 +97,8 @@ may include extra metrics. You can find these metrics below.
 }
 ```
 
+<a class="bookmark" id="fimb-question-stats"></a>
+
 #### Fill in Multiple Blanks
 
 ```javascript
@@ -159,14 +161,7 @@ may include extra metrics. You can find these metrics below.
 
 #### Multiple Dropdowns
 
-```javascript
-{
-  // TODO
-  "multiple_responses": null,
-  // TODO
-  "answer_sets": null
-}
-```
+Multiple Dropdown question statistics look just like the statistics for [Fill In Multiple Blanks](#fimb-question-stats).
 
 #### Essay
 

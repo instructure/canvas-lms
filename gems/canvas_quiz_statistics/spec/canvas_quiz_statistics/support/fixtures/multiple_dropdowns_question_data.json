@@ -1,0 +1,46 @@
+{
+  "id": 19,
+  "regrade_option": false,
+  "points_possible": 1,
+  "correct_comments": "",
+  "incorrect_comments": "",
+  "neutral_comments": "",
+  "question_type": "multiple_dropdowns_question",
+  "question_name": "Question",
+  "name": "Question",
+  "question_text": "<p>Alligators are [color], zombies dig [organ].</p>",
+  "answers": [
+    {
+      "id": 3208,
+      "text": "brains",
+      "comments": "",
+      "weight": 100,
+      "blank_id": "organ"
+    },
+    {
+      "id": 8331,
+      "text": "eyes",
+      "comments": "",
+      "weight": 0,
+      "blank_id": "organ"
+    },
+    {
+      "id": 1381,
+      "text": "green",
+      "comments": "",
+      "weight": 100,
+      "blank_id": "color"
+    },
+    {
+      "id": 1638,
+      "text": "blue",
+      "comments": "",
+      "weight": 0,
+      "blank_id": "color"
+    }
+  ],
+  "text_after_answers": "",
+  "assessment_question_id": 21,
+  "position": 9,
+  "published_at": "2014-04-01T11:47:17Z"
+}

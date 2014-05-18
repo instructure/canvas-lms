@@ -44,4 +44,5 @@ module CanvasQuizStatistics::Analyzers
   require 'canvas_quiz_statistics/analyzers/base'
   require 'canvas_quiz_statistics/analyzers/essay'
   require 'canvas_quiz_statistics/analyzers/fill_in_multiple_blanks'
+  require 'canvas_quiz_statistics/analyzers/multiple_dropdowns'
 end
