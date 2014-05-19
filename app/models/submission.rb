@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -302,6 +302,7 @@ class Submission < ActiveRecord::Base
           end
         else
           data[:status] = 'error'
+          data[:public_error_message] = I18n.t('turnitin.no_score_after_retries', 'Turnitin has not returned a score after %{max_tries} attempts to retrieve one.', max_tries: TURNITIN_RETRY)
         end
       else
         data[:status] = 'scored'
@@ -355,17 +356,18 @@ class Submission < ActiveRecord::Base
     reset_turnitin_assets
 
     # Make sure the assignment exists and user is enrolled
-    assign_status = self.assignment.create_in_turnitin
-    enroll_status = turnitin.enrollStudent(self.context, self.user)
-    unless assign_status && enroll_status
+    assignment_created = self.assignment.create_in_turnitin
+    turnitin_enrollment = turnitin.enrollStudent(self.context, self.user)
+    if assignment_created && turnitin_enrollment.success?
+      delete_turnitin_errors
+    else
       if attempt < TURNITIN_RETRY
         send_later_enqueue_args(:submit_to_turnitin, { :run_at => 5.minutes.from_now }.merge(TURNITIN_JOB_OPTS), attempt + 1)
       else
-        assign_error = self.assignment.turnitin_settings[:error]
-        turnitin_assets.each do |a|
-          self.turnitin_data[a.asset_string][:status] = 'error'
-          self.turnitin_data[a.asset_string].merge!(assign_error) if assign_error.present?
-        end
+        assignment_error = assignment.turnitin_settings[:error]
+        self.turnitin_data[:status] = 'error'
+        self.turnitin_data[:assignment_error] = assignment_error if assignment_error.present?
+        self.turnitin_data[:student_error] = turnitin_enrollment.error_hash if turnitin_enrollment.error?
         self.turnitin_data_changed!
         self.save
       end
@@ -405,8 +407,16 @@ class Submission < ActiveRecord::Base
     end
   end
 
+  def delete_turnitin_errors
+    self.turnitin_data.delete(:status)
+    self.turnitin_data.delete(:assignment_error)
+    self.turnitin_data.delete(:student_error)
+  end
+  private :delete_turnitin_errors
+
   def reset_turnitin_assets
     self.turnitin_data ||= {}
+    delete_turnitin_errors
     turnitin_assets.each do |a|
       asset_data = self.turnitin_data[a.asset_string] || {}
       asset_data[:status] = 'pending'
