@@ -206,8 +206,8 @@ describe Group do
     group.grants_right?(@student, nil, :read_roster).should be_true
 
     # category is self-signup
-    category = @course.group_categories.build
-    category.configure_self_signup(true, false)
+    category = @course.group_categories.build(name: 'category name')
+    category.self_signup = 'enabled'
     category.save
     group = @course.groups.create(:group_category => category)
     group.grants_right?(@student, nil, :read_roster).should be_true

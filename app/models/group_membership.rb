@@ -17,9 +17,9 @@
 #
 
 class GroupMembership < ActiveRecord::Base
-  
+
   include Workflow
-  
+
   belongs_to :group
   belongs_to :user
 
@@ -36,12 +36,12 @@ class GroupMembership < ActiveRecord::Base
   before_validation :verify_section_homogeneity_if_necessary
   validate :validate_within_group_limit
 
-  after_save :revoke_leadership_if_necessary
   after_save :ensure_mutually_exclusive_membership
   after_save :touch_groups
   after_save :update_cached_due_dates
-  after_destroy :revoke_leadership
+  after_save :update_group_leadership
   after_destroy :touch_groups
+  after_destroy :update_group_leadership
 
   has_a_broadcast_policy
 
@@ -84,8 +84,8 @@ class GroupMembership < ActiveRecord::Base
     p.dispatch :new_student_organized_group
     p.to { self.group.context.admins }
     p.whenever {|record|
-      record.group.context && 
-      record.group.context.is_a?(Course) && 
+      record.group.context &&
+      record.group.context.is_a?(Course) &&
       record.just_created &&
       record.group.group_memberships.count == 1 &&
       record.group.student_organized?
@@ -106,20 +106,10 @@ class GroupMembership < ActiveRecord::Base
   end
   protected :auto_join
 
-  def revoke_leadership
-    self.group.update_attribute(:leader, nil) if self.group && self.group.leader == self.user
+  def update_group_leadership
+    GroupLeadership.new(Group.find(self.group_id)).member_changed_event(self)
   end
-  protected :revoke_leadership
-
-  def revoke_leadership_if_necessary
-    if self.old_group_id # moved to new group
-      old_group = Group.find(self.old_group_id)
-      old_group.update_attribute(:leader, nil) if old_group && old_group.leader == self.user
-    elsif self.deleted? && self.group && self.group.leader == self.user # deleted
-      self.group.update_attribute(:leader, nil)
-    end
-  end
-  protected :revoke_leadership_if_necessary
+  protected :update_group_leadership
 
   def ensure_mutually_exclusive_membership
     return unless self.group
@@ -128,7 +118,7 @@ class GroupMembership < ActiveRecord::Base
     GroupMembership.active.where(:group_id => peer_groups, :user_id => self.user_id).destroy_all
   end
   protected :ensure_mutually_exclusive_membership
-  
+
   def restricted_self_signup?
     self.group.group_category && self.group.group_category.restricted_self_signup?
   end
@@ -153,7 +143,7 @@ class GroupMembership < ActiveRecord::Base
     end
   end
   protected :validate_within_group_limit
-  
+
   attr_accessor :old_group_id
   def capture_old_group_id
     self.old_group_id = self.group_id_was if self.group_id_changed?
@@ -166,14 +156,14 @@ class GroupMembership < ActiveRecord::Base
       DueDateCacher.recompute_course(group.context_id, Assignment.where(context_type: group.context_type, context_id: group.context_id, group_category_id: group.group_category_id).pluck(:id))
     end
   end
-  
+
   def touch_groups
     groups_to_touch = [ self.group_id ]
     groups_to_touch << self.old_group_id if self.old_group_id
     Group.where(:id => groups_to_touch).update_all(:updated_at => Time.now.utc)
   end
   protected :touch_groups
-  
+
   workflow do
     state :accepted
     state :invited do
@@ -185,7 +175,7 @@ class GroupMembership < ActiveRecord::Base
     state :deleted
   end
   alias_method :active?, :accepted?
-  
+
   def self.serialization_excludes; [:uuid]; end
 
   # true iff 'active' and the pair of user and group's course match one of the

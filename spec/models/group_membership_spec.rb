@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe GroupMembership do
-  
+
   it "should ensure a mutually exclusive relationship" do
     category = Account.default.group_categories.create!(:name => "blah")
     group1 = category.groups.create!(:context => Account.default)
@@ -85,7 +85,7 @@ describe GroupMembership do
     it "should pass validation on update" do
       lambda {
         group_membership.save!
-      }.should_not raise_error(ActiveRecord::RecordInvalid)
+      }.should_not raise_error
     end
   end
 
@@ -249,56 +249,16 @@ describe GroupMembership do
     end
   end
 
-  describe "group leadership revocation" do
-    before(:each) do
-      course
-      @category = @course.group_categories.build(:name => "category 1")
-      @category.save!
-      @group = @category.groups.create!(:context => @course)
-      @leader = user_model
-      @leader_membership = @group.group_memberships.create!(:user => @leader, :workflow_state => 'accepted')
-      @group.leader = @leader
-      @group.save!
-      @membership = @group.group_memberships.create!(:user => user_model, :workflow_state => 'accepted')
-      @group.reload
-      @leader_membership.reload
-    end
-
-    context "leader membership" do
-      it "should revoke when deleted" do
-        @group.leader.should_not be_nil
-        @leader_membership.destroy!
-        @group.reload.leader.should be_nil
-      end
-
-      it "should revoke when soft deleted" do
-        @group.leader.should_not be_nil
-        @leader_membership.destroy
-        @group.reload.leader.should be_nil
-      end
-
-      it "should revoke when group is changed" do
-        @group.leader.should_not be_nil
-        group2 = @category.groups.create!(:context => @course)
-        @leader_membership.update_attribute(:group_id, group2.id)
-        @group.reload.leader.should be_nil
-      end
-    end
-
-    context "non-leader membership" do
-      it "should not revoke when deleted" do
-        @group.leader.should_not be_nil
-        @membership.destroy!
-        @group.reload.leader.should_not be_nil
-     end
-
-      it "should not revoke when group is changed" do
-        @group.leader.should_not be_nil
-        group2 = @category.groups.create!(:context => @course)
-        @membership.update_attribute(:group_id, group2.id)
-        @group.reload.leader.should_not be_nil
-      end
-    end
+  it 'updates group leadership as membership changes' do
+    course
+    @category = @course.group_categories.build(:name => "category 1")
+    @category.save!
+    @group = @category.groups.create!(:context => @course)
+    @category.auto_leader = "first"
+    @category.save!
+    leader = user_model
+    @group.group_memberships.create!(:user => leader, :workflow_state => 'accepted')
+    @group.reload.leader.should == leader
   end
 
   describe "updating cached due dates" do

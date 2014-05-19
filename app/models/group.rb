@@ -133,11 +133,11 @@ class Group < ActiveRecord::Base
   def group_category_limit_met?
     group_category && group_category.group_limit && participating_users.size >= group_category.group_limit
   end
+  private :group_category_limit_met?
 
   def student_organized?
     group_category && group_category.student_organized?
   end
-  private :group_category_limit_met?
 
   def update_max_membership_from_group_category
     if group_category && group_category.group_limit && (!max_membership || max_membership == 0)

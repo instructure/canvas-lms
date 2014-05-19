@@ -27,7 +27,10 @@ class GroupCategory < ActiveRecord::Base
   has_many :progresses, :as => 'context', :dependent => :destroy
   has_one :current_progress, :as => 'context', :class_name => 'Progress', :conditions => "workflow_state IN ('queued','running')", :order => 'created_at'
 
-  EXPORTABLE_ATTRIBUTES = [:id, :context_id, :context_type, :name, :role, :deleted_at, :self_signup, :group_limit]
+  EXPORTABLE_ATTRIBUTES = [ :id, :context_id, :context_type, :name, :role,
+    :deleted_at, :self_signup, :group_limit, :auto_leader
+  ]
+
   EXPORTABLE_ASSOCIATIONS = [:context, :groups, :assignments]
 
   after_save :auto_create_groups
@@ -63,6 +66,14 @@ class GroupCategory < ActiveRecord::Base
       record.errors.add attr, t(:invalid_self_signup, "Self-signup needs to be one of the following values: %{values}", values: "null, 'enabled', 'restricted'")
     elsif record.restricted_self_signup? && record.has_heterogenous_group?
       record.errors.add :restrict_self_signup, t(:cant_restrict_self_signup, "Can't restrict self-signup while a mixed-section group exists in the category")
+    end
+  end
+
+  validates_each :auto_leader do |record, attr, value|
+    next unless record.auto_leader_changed?
+    next if value.blank?
+    unless ['first', 'random'].include?(value)
+      record.errors.add attr, t(:invalid_auto_leader, "AutoLeader type needs to be one of the following values: %{values}", values: "null, 'first', 'random'")
     end
   end
 
@@ -150,13 +161,14 @@ class GroupCategory < ActiveRecord::Base
   # self_signup directly to anything other than nil (or ''), 'restricted', or
   # 'enabled', it will behave as if you used 'enabled'.
   def configure_self_signup(enabled, restricted)
-    if !enabled
-      self.self_signup = nil
-    elsif restricted
-      self.self_signup = 'restricted'
-    else
-      self.self_signup = 'enabled'
-    end
+    args = {enable_self_signup: enabled, restrict_self_signup: restricted}
+    self.self_signup = GroupCategories::Params.new(args).self_signup
+    self.save!
+  end
+
+  def configure_auto_leader(enabled, auto_leader_type)
+    args = {enable_auto_leader: enabled, auto_leader_type: auto_leader_type}
+    self.auto_leader = GroupCategories::Params.new(args).auto_leader
   end
 
   def self_signup?
@@ -335,6 +347,10 @@ class GroupCategory < ActiveRecord::Base
       update_progress(members_assigned_count, member_count)
       break if members.empty?
       sprinkle_count -= 1
+    end
+
+    if self.auto_leader
+      groups.each{|group| GroupLeadership.new(group).auto_assign!(auto_leader) }
     end
 
     if !groups.empty?
