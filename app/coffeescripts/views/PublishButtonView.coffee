@@ -53,7 +53,10 @@ define [
         @unpublish()
 
     addAriaLabel: (label) ->
-      $('<span class="screenreader-only accessible_label"></span>').text(label).appendTo @$el
+      $label = @$el.find('span.screenreader-only.accessible_label')
+      $('<span class="screenreader-only accessible_label"></span>').appendTo(@$el) unless $label.length
+
+      $label.text label
       @$el.attr 'aria-label', label
 
     # calling publish/unpublish on the model expects a deferred object
