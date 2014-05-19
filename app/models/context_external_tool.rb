@@ -9,6 +9,7 @@ class ContextExternalTool < ActiveRecord::Base
                   :name, :description, :custom_fields, :custom_fields_string,
                   :course_navigation, :account_navigation, :user_navigation,
                   :resource_selection, :editor_button, :homework_submission,
+                  :course_home_sub_navigation,
                   :config_type, :config_url, :config_xml, :tool_id
 
   validates_presence_of :context_id, :context_type, :workflow_state
@@ -38,7 +39,7 @@ class ContextExternalTool < ActiveRecord::Base
     can :read and can :update and can :delete
   end
   
-  EXTENSION_TYPES = [:user_navigation, :course_navigation, :account_navigation, :resource_selection, :editor_button, :homework_submission, :migration_selection]
+  EXTENSION_TYPES = [:user_navigation, :course_navigation, :account_navigation, :resource_selection, :editor_button, :homework_submission, :migration_selection, :course_home_sub_navigation]
   def url_or_domain_is_set
     setting_types = EXTENSION_TYPES
     # url or domain (or url on canvas lti extension) is required
@@ -240,6 +241,18 @@ class ContextExternalTool < ActiveRecord::Base
 
   def migration_selection(setting = nil)
     extension_setting(:migration_selection, setting)
+  end
+
+  def course_home_sub_navigation=(hash)
+    tool_setting(:course_home_sub_navigation, hash, :icon_url) do |tool_settings|
+      if %w(members admins).include?(hash[:visibility])
+        tool_settings[:visibility] = hash[:visibility]
+      end
+    end
+  end
+
+  def course_home_sub_navigation(setting = nil)
+    extension_setting(:course_home_sub_navigation, setting)
   end
 
   def icon_url=(i_url)

@@ -23,6 +23,7 @@ define [
         {extension_type: 'user_navigation', text: I18n.t 'user_navigation_configured', 'User navigation configured'}
         {extension_type: 'homework_submission', text: I18n.t 'homework_submission_configured', 'Homework submission configured'}
         {extension_type: 'migration_selection', text: I18n.t 'migration_selection_configured', 'Migration selection configured'}
+        {extension_type: 'course_home_sub_navigation', text: I18n.t 'course_home_sub_navigation_configured', 'Course home sub navigation configured'}
       ]
 
       json = super

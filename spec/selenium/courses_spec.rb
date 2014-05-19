@@ -210,6 +210,74 @@ describe "courses" do
         roles_to_sections[role_name].should == sections.first.text
       end
     end
+
+    context "course_home_sub_navigation lti apps" do
+      def create_course_home_sub_navigation_tool(options = {})
+        defaults = {
+          name: options[:name] || "external tool",
+          consumer_key: 'test',
+          shared_secret: 'asdf',
+          url: 'http://example.com/ims/lti',
+          course_home_sub_navigation: { icon_url: '/images/delete.png' },
+        }
+        @course.context_external_tools.create!(defaults.merge(options))
+      end
+
+      it "should display course_home_sub_navigation lti apps (draft state off)" do
+        course_with_teacher_logged_in(active_all: true)
+        num_tools = 3
+        num_tools.times { |index| create_course_home_sub_navigation_tool(name: "external tool #{index}") }
+        get "/courses/#{@course.id}"
+        ff(".course-home-sub-navigation-lti").size.should == num_tools
+      end
+
+      it "should display course_home_sub_navigation lti apps (draft state on)" do
+        course_with_teacher_logged_in(active_all: true)
+        @course.account.enable_feature!(:draft_state)
+        num_tools = 2
+        num_tools.times { |index| create_course_home_sub_navigation_tool(name: "external tool #{index}") }
+        get "/courses/#{@course.id}"
+        ff(".course-home-sub-navigation-lti").size.should == num_tools
+      end
+
+      it "should include launch type parameter (draft state off)" do
+        course_with_teacher_logged_in(active_all: true)
+        create_course_home_sub_navigation_tool
+        get "/courses/#{@course.id}"
+        f('.course-home-sub-navigation-lti').attribute("href").should match(/launch_type=course_home_sub_navigation/)
+      end
+
+      it "should include launch type parameter (draft state on)" do
+        course_with_teacher_logged_in(active_all: true)
+        @course.account.enable_feature!(:draft_state)
+        create_course_home_sub_navigation_tool
+        get "/courses/#{@course.id}"
+        f('.course-home-sub-navigation-lti').attribute("href").should match(/launch_type=course_home_sub_navigation/)
+      end
+
+      it "should only display active tools" do
+        course_with_teacher_logged_in(active_all: true)
+        tool = create_course_home_sub_navigation_tool
+        tool.workflow_state = 'deleted'
+        tool.save!
+        get "/courses/#{@course.id}"
+        ff(".course-home-sub-navigation-lti").size.should == 0
+      end
+
+      it "should not display admin tools to students" do
+        course_with_teacher_logged_in(active_all: true)
+        tool = create_course_home_sub_navigation_tool
+        tool.course_home_sub_navigation['visibility'] = 'admins'
+        tool.save!
+        get "/courses/#{@course.id}"
+        ff(".course-home-sub-navigation-lti").size.should == 1
+
+        course_with_student_logged_in(course: @course, active_all: true)
+        get "/courses/#{@course.id}"
+        ff(".course-home-sub-navigation-lti").size.should == 0
+      end
+    end
+
   end
 
   context "course as a student" do

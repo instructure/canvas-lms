@@ -17,8 +17,15 @@
     <% @can_manage_content = can_do(@context, @current_user, :manage_content) %>
     <% if @context.feature_enabled?(:draft_state) %>
 
-      <% if @can_manage_content || @course_home_view != 'feed' %>
+      <% if @can_manage_content || @course_home_view != 'feed' || @course_home_sub_navigation_tools.present? %>
         <div class="course-options">
+          <% @course_home_sub_navigation_tools.each do |tool| %>
+            <a class="button-sidebar-wide course-home-sub-navigation-lti"
+               href="<%= course_external_tool_path(@context, tool, launch_type: 'course_home_sub_navigation') %>">
+              <img class="icon" src="<%= tool.course_home_sub_navigation(:icon_url) %>" />
+              <%= tool.label_for(:course_home_sub_navigation) %>
+            </a>
+          <% end %>
           <% if @can_manage_content %>
             <a class="button-sidebar-wide element_toggler" aria-controls="edit_course_home_content_form" href="<%= context_url(@context, :context_details_url) %>">
               <i class="icon-target"></i>
@@ -45,10 +52,19 @@
       <% end %>
 
     <% else %>
-      <% if @can_manage_content %>
+      <% if @can_manage_content || @course_home_sub_navigation_tools.present? %>
         <div class="secondary-button-group rs-margin-lr rs-margin-top rs-margin-bottom">
-          <a href="#" class="btn button-sidebar-wide wizard_popup_link  <%= 'auto_open' if @context.created? || @context.claimed? %>"><i class="icon-question"></i> <%= t('links.course_setup', %{Course Setup Checklist}) %></a>
-          <a class="btn button-sidebar-wide" href="<%= context_url(@context, :new_context_discussion_topic_url, :is_announcement => true) %>"><i class="icon-announcement"></i> <%= t('links.new_announcement', %{New Announcement}) %></a>
+        <% @course_home_sub_navigation_tools.each do |tool| %>
+          <a class="btn button-sidebar-wide course-home-sub-navigation-lti"
+             href="<%= course_external_tool_path(@context, tool, launch_type: 'course_home_sub_navigation') %>">
+            <img class="icon" src="<%= tool.course_home_sub_navigation(:icon_url) %>" />
+            <%= tool.label_for(:course_home_sub_navigation) %>
+          </a>
+        <% end %>
+        <% if @can_manage_content %>
+            <a href="#" class="btn button-sidebar-wide wizard_popup_link  <%= 'auto_open' if @context.created? || @context.claimed? %>"><i class="icon-question"></i> <%= t('links.course_setup', %{Course Setup Checklist}) %></a>
+            <a class="btn button-sidebar-wide" href="<%= context_url(@context, :new_context_discussion_topic_url, :is_announcement => true) %>"><i class="icon-announcement"></i> <%= t('links.new_announcement', %{New Announcement}) %></a>
+        <% end %>
         </div>
       <% end %>
     <% end %>

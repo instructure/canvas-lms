@@ -1368,6 +1368,11 @@ class CoursesController < ApplicationController
       if @current_user and (@show_recent_feedback = @context.user_is_student?(@current_user))
         @recent_feedback = (@current_user && @current_user.recent_feedback(:contexts => @contexts)) || []
       end
+
+      @course_home_sub_navigation_tools = ContextExternalTool.all_tools_for(@context).select(&:has_course_home_sub_navigation?)
+      unless @context.grants_right?(@current_user, session, :manage_content)
+        @course_home_sub_navigation_tools.reject! { |tool| tool.course_home_sub_navigation(:visibility) == 'admins' }
+      end
     else
       # clear notices that would have been displayed as a result of processing
       # an enrollment invitation, since we're giving an error
