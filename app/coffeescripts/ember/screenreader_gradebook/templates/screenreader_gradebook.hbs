@@ -11,10 +11,12 @@
 </div>
 
 {{#ic-tabs}}
-  {{#ic-tab-list}}
-    {{#ic-tab}}{{#t 'assignments'}}Assignments{{/t}}{{/ic-tab}}
-    {{#ic-tab}}{{#t 'learning_mastery'}}Learning Mastery{{/t}}{{/ic-tab}}
-  {{/ic-tab-list}}
+  <div {{bind-attr class="hideOutcomes"}}>
+    {{#ic-tab-list}}
+      {{#ic-tab}}{{#t 'assignments'}}Assignments{{/t}}{{/ic-tab}}
+      {{#ic-tab}}{{#t 'learning_mastery'}}Learning Mastery{{/t}}{{/ic-tab}}
+    {{/ic-tab-list}}
+  </div>
   {{#ic-tab-panel class="assignmentsPanel"}}
     {{view App.AssignmentsView controller=controller}}
   {{/ic-tab-panel}}

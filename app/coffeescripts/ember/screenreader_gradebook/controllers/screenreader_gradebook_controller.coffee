@@ -90,6 +90,10 @@ define [
       "#{get(window, 'ENV.GRADEBOOK_OPTIONS.change_gradebook_version_url')}"
     ).property()
 
+    hideOutcomes: (->
+      !get(window, 'ENV.GRADEBOOK_OPTIONS.outcome_gradebook_enabled')
+    ).property()
+
     showDownloadSubmissionsButton: (->
       @get('selectedAssignment.has_submitted_submissions') and
       _.intersection(@get('selectedAssignment.submission_types'), ['online_upload','online_text_entry','online_url']) != []

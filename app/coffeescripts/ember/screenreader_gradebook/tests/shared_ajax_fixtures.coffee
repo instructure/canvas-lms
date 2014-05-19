@@ -577,6 +577,7 @@ define [
           custom_columns_url: 'api/v1/courses/1/custom_gradebook_columns'
           custom_column_data_url: 'api/v1/courses/1/custom_gradebook_columns/:id'
           setting_update_url: 'api/v1/courses/1/settings'
+          outcome_gradebook_enabled: true
           outcome_links_url: 'api/v1/courses/1/outcome_group_links'
           outcome_rollups_url: 'api/v1/courses/1/outcome_rollups'
         }

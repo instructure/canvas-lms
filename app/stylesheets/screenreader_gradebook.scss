@@ -85,3 +85,7 @@ ic-tab {
     color: $white;
   }
 }
+
+.hide-outcomes ic-tab-list {
+  display: none;
+}
