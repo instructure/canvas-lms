@@ -86,6 +86,11 @@
 #           "type": "integer",
 #           "format": "int64"
 #         },
+#         "manually_unlocked": {
+#           "description": "The student can take the quiz even if it's locked for everyone else",
+#           "example": true,
+#           "type": "boolean"
+#         },
 #         "time_spent": {
 #           "description": "Amount of time spent, in seconds.",
 #           "example": 300,

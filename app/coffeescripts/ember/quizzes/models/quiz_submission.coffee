@@ -14,6 +14,7 @@ define [
     endAt: attr()
     extraAttempts: attr('number')
     extraTime: attr()
+    manuallyUnlocked: attr()
     finishedAt: attr()
     fudgePoints: attr()
     htmlUrl: attr()
