@@ -67,6 +67,12 @@
             <td><label for="content_tag_create_title"><%= before_label :page_name, "Page Name" %></label></td>
             <td><input type="text" name="title" id="content_tag_create_title" style="width: 120px;"/></td>
           </tr>
+          <tr>
+            <td colspan="2">
+              <input type="checkbox" name="new_tab" id="external_url_create_new_tab"/>
+              <label for="external_url_create_new_tab"><%= t :new_tab, "Load in a new tab" %></label>
+            </td>
+          </tr>
         </table>
       </div>
       <% end %>
@@ -105,7 +111,7 @@
           <tr>
               <td colspan="2">
               <input type="checkbox" name="new_tab" id="external_tool_create_new_tab"/>
-              <label for="external_tool_create_new_tab"><%= t :new_tab, "Load this tool in a new tab" %></label>
+              <label for="external_tool_create_new_tab"><%= t :new_tab, "Load in a new tab" %></label>
             </td>
           </tr>
         </table>

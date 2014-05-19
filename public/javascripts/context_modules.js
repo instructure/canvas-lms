@@ -755,8 +755,7 @@ define([
       var $item = $(this).parents(".context_module_item");
       var data = $item.getTemplateData({textValues: ['title', 'url', 'indent', 'new_tab']});
       data.indent = modules.currentIndent($item);
-      $("#edit_item_form").find(".external_url").showIf($item.hasClass('external_url') || $item.hasClass('context_external_tool'));
-      $("#edit_item_form").find(".external_tool").showIf($item.hasClass('context_external_tool'));
+      $("#edit_item_form").find(".external").showIf($item.hasClass('external_url') || $item.hasClass('context_external_tool'));
       $("#edit_item_form").attr('action', $(this).attr('href'));
       $("#edit_item_form").fillFormData(data, {object_name: 'content_tag'});
       $("#edit_item_form").dialog({
@@ -1092,6 +1091,10 @@ define([
         overrideModel(view.model, view);
       });
     }
+
+    $('.external_url_link').click(function() {
+      window.location = $(this).attr('data-item-href');
+    });
 
     $(".datetime_field").datetime_field();
 

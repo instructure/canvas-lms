@@ -138,6 +138,7 @@ $(document).ready(function() {
       var item_data = {
         'item[type]': $("#add_module_item_select").val(),
         'item[id]': $("#select_context_content_dialog .module_item_option:visible:first .module_item_select").val(),
+        'item[new_tab]': $("#external_url_create_new_tab").attr('checked') ? '1' : '0',
         'item[indent]': $("#content_tag_indent").val()
       }
       item_data['item[url]'] = $("#content_tag_create_url").val();

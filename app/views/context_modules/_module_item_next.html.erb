@@ -48,7 +48,13 @@
       </span>
 
       <span class="item_name">
-        <a title="<%= tag && tag.title %>" class="title <%= '_explicit_external_link' if tag && tag.content_type == 'ExternalUrl' %>" href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>"><%= tag && tag.title %></a>
+        <% if tag && tag.content_type == 'ExternalUrl' && tag.new_tab %>
+          <a aria-label='<%= tag.title %>' class="title external_url_link" target="_blank" href="<%= tag.url %>"
+             data-item-href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag.id %>"><%= tag.title %></a>
+        <% else %>
+          <a title="<%= tag && tag.title %>" class="title"
+             href="<%= context_url(@context, :context_url) %>/modules/items/<%= tag ? tag.id : "{{ id }}" %>"><%= tag && tag.title %></a>
+        <% end %>
         <span title="<%= tag && tag.title %>" class="title locked_title"><%= tag && tag.title %></span>
         <span class="points_possible" style="display: none;"><%= tag.try_rescue(:assignment).try_rescue(:points_possible) || nbsp %></span>
         <span class="requirement" style="display: none;">&nbsp;</span>
