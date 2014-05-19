@@ -4,7 +4,8 @@
 %>
 
 <% if @locked && !@locked[:due_at] %>
-
+  <% js_bundle :module_sequence_footer %>
+    
   <h2><%= @assignment.title %></h2>
   <%= @locked.is_a?(Hash) ? lock_explanation(@locked, 'assignment', @context) : t(:assignment_locked, "This assignment is currently locked.") %>
 
