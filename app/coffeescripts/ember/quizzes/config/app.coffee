@@ -6,12 +6,12 @@ define [
   '../../shared/components/ic_actions_component'
   '../../shared/components/ic_publish_icon_component'
   './date_transform'
-], (Ember, env, Util, FastSelectComponent) ->
+], (Ember, env, Util, FastSelectComponent, ConfirmDialogComponent, FormDialogComponent) ->
   Ember.Util = Util
 
   Ember.onLoad 'Ember.Application', (Application) ->
     Application.initializer
-      name: 'FastSelectComponent'
+      name: 'SharedComponents'
       initialize: (container, application) ->
         container.register 'component:fast-select', FastSelectComponent
     Application.initializer

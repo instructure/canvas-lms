@@ -1,0 +1,12 @@
+<li class="static ui-state-default ui-corner-top ui-tabs-active ui-state-active" >
+<a href="/courses/1/users" class="ui-tabs-anchor" >{{#t 'everyone_tab'}}Everyone{{/t}}</a>
+</li>
+{{#each collection}}
+  <li class="ui-state-default ui-corner-top" >
+    <a href="/courses/{{course_id}}/groups#tab-{{id}}" class="group-category-tab-link ui-tabs-anchor">
+      {{name}}
+    </a>
+  </li>
+{{else}}
+  <li class="static ui-state-default ui-corner-top" ><a href="/courses/{{course.id}}/groups" class="ui-tabs-anchor" >{{#t 'groups'}}Groups{{/t}}</a></li>
+{{/each}}

@@ -288,8 +288,8 @@ class GroupsController < ApplicationController
 
       format.json do
         path = send("api_v1_#{@context.class.to_s.downcase}_user_groups_url")
-        paginated_groups = Api.paginate(@groups, self, path)
-        render :json => paginated_groups.map { |g| group_json(g, @current_user, session) }
+        paginated_groups = Api.paginate(all_groups, self, path)
+        render :json => paginated_groups.map { |g| group_json(g, @current_user, session, :include => Array(params[:include])) }
       end
     end
   end

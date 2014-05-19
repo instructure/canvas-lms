@@ -1,0 +1,76 @@
+define [
+  'i18n!student_groups'
+  'ember'
+  'ic-ajax'
+], (I18n, Ember, ajax) ->
+
+  GroupController = Ember.ObjectController.extend
+
+    currentUser: {}
+    groupUrl: (->
+      "/groups/#{@get('id')}"
+    ).property('id')
+
+    usersUrl: (->
+      "/api/v1/groups/#{@get('id')}/memberships"
+    ).property('id')
+
+    i18nStudentsCount: (->
+      I18n.t('students_count', 'student', count: @get('memberCount'))
+    ).property('memberCount')
+
+    showWhileSearching: (->
+      if @get('parentController.filterText').length > 0
+        @set('showBody', true)
+      else
+        @set('showBody', false)
+    ).observes('parentController.filterText').on('init')
+
+    memberCount: Ember.computed.alias('users.length')
+
+    hasMultipleMembers: Ember.computed.not('memberCount',1)
+    actions:
+      visitGroup: ->
+        if @get('isMember')
+          window.location.href = @get('groupUrl')
+      toggleBody: ->
+        if @.get('memberCount') > 0
+          @toggleProperty('showBody')
+        else
+          @set('showBody', false)
+      join: (group) ->
+        membership = @store.createRecord('membership', {
+          user_id: ENV.current_user_id
+          group_id: @get('id')
+        })
+        controller = this
+        membership.save().then (membership)->
+          controller.parentController.removeFromCategory(controller.get('group_category_id'))
+          controller.get('users').addObject(ENV.current_user)
+          controller.parentController.set('noticeMessage', "Joined Group")
+      leave: (group) ->
+        controller = this
+        Ember.run =>
+          ajax("#{@get('usersUrl')}/self",{type: "DELETE"}).then (response) ->
+            user = controller.get('users').findBy('id', ENV.current_user_id)
+            controller.get('users').removeObject(user)
+            controller.parentController.set('noticeMessage', "Left Group")
+            if controller.get('memberCount') == 0
+              controller.set('showBody', false)
+
+    isMember: (->
+      @get('model').users.findBy('id', ENV.current_user_id)?
+    ).property('users.@each.id')
+
+    canSignup: (->
+      @get('group_category.self_signup') == "enabled"
+    ).property('group_category.self_signup')
+
+
+    isFull: (->
+      @get('max_membership')? and @get('memberCount') >= @get('max_membership')
+    ).property('memberCount')
+
+    isMemberOfCategory: (->
+      @parentController.isMemberOfCategory(@get('group_category_id'))
+    ).property('users.@each.id')

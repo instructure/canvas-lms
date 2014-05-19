@@ -205,6 +205,18 @@ END
       state: 'hidden',
       root_opt_in: true,
       development: true
+    },
+    'student_groups_next' =>
+    {
+      display_name: -> { I18n.t('features.student_groups', 'New Student Groups Page') },
+      description:  -> { I18n.t('student_groups_desc', <<-END) },
+This enables the new student group page for an account. The new page was build to provide a more dynamic group signup
+experience.
+END
+      applies_to: 'RootAccount',
+      state: 'allowed',
+      root_opt_in: true,
+      development: true
     }
   )
 

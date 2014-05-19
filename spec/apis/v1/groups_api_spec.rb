@@ -134,7 +134,7 @@ describe "Groups API", type: :request do
     response.code.should == '401'
   end
 
-  it "should limit students to their own groups" do
+  it "should show students all groups" do
     course_with_student(:active_all => true)
     @group_1 = @course.groups.create!(:name => 'Group 1')
     @group_2 = @course.groups.create!(:name => 'Group 2')
@@ -143,7 +143,7 @@ describe "Groups API", type: :request do
     json = api_call(:get, "/api/v1/courses/#{@course.to_param}/groups.json",
                     @category_path_options.merge(:action => 'context_index',
                                                   :course_id => @course.to_param))
-    json.count.should == 1
+    json.count.should == 2
     json.first['id'].should == @group_1.id
   end
 
@@ -151,6 +151,12 @@ describe "Groups API", type: :request do
     @user = @member
     json = api_call(:get, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "show"))
     json.should == group_json(@community)
+  end
+
+  it "should include the group category" do
+    @user = @member
+    json = api_call(:get, "#{@community_path}.json?include[]=group_category", @category_path_options.merge(:group_id => @community.to_param, :action => "show", :include => [ "group_category" ]))
+    json.has_key?("group_category").should be_true
   end
 
   it 'should include permissions' do

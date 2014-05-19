@@ -1,23 +1,29 @@
-<div class="form-inline clearfix">
-  <div class="screenreader-only" id="filter_description">
-    {{#t "filter_field_description"}}As you type in this field, the list of people will be automatically filtered to only include those whose names match your input.{{/t}}
-  </div>
-  <input
+{{#if canAddCategories}}
+<div class='pull-right group-categories-actions'>
+  <a href="/courses/{{course_id}}/groups#new" class="btn btn-primary">
+    <i class='icon-plus'></i> {{#t 'group_set'}}Group Set{{/t}}
+  </a>
+</div>
+{{/if}}
+
+<div id="group_categories_tabs" class="ui-tabs-minimal ui-tabs ui-widget ui-widget-content ui-corner-all" style="display: block;">
+  <ul class="collectionViewItems ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all" role="tablist" data-view="rosterTabs"></ul>
+  <div class="roster-tab tab-panel ui-tabs-panel form-inline" style="height:800px">
+    <input
     type="text"
     name="search_term"
     data-view="inputFilter"
     placeholder='{{#t "search_people"}}Search people{{/t}}'
-    aria-label='{{#t "filter_list_of_people"}}Filter list of people{{/t}}'
-    aria-describedby="filter_description"
-  >
+    aria-label='{{#t "filter_field_description"}}As you type in this field, the list of people will be automatically filtered to only include those whose names match your input.{{/t}}'
+    >
 
-  <select
-    name="enrollment_role"
-    data-view="roleSelect"
-    aria-label='{{#t "role_to_search"}}Limit search to role{{/t}}'
-  ></select>
+    <select
+      name="enrollment_role"
+      data-view="roleSelect"
+      aria-label='{{#t "role_to_search"}}Limit search to role{{/t}}'
+      ></select>
 
-  {{#if permissions.add_users}}
+    {{#if permissions.add_users}}
     {{#if course.concluded}}
     <a
       href="#"
@@ -27,8 +33,8 @@
       title='{{#t "cannot_add_users"}}New users can not be added because this course is concluded{{/t}}'
       aria-label='{{#t "cannot_add_users"}}New users can not be added because this course is concluded{{/t}}'
       disabled data-tooltip>
-       {{#t "people"}}People{{/t}}
-     </a>
+      {{#t "people"}}People{{/t}}
+    </a>
     {{else}}
     <a
       href="#"
@@ -37,15 +43,16 @@
       role="button"
       title='{{#t "title_add_people"}}Add People{{/t}}'
       aria-label='{{#t "title_add_people"}}Add People{{/t}}'
-    >{{#t "people"}}People{{/t}}</a>
+      >{{#t "people"}}People{{/t}}</a>
     {{/if}}
-  {{/if}}
-</div>
+    {{/if}}
+    <form data-view="createUsers" class="form-dialog"></form>
 
-<form data-view="createUsers" class="form-dialog"></form>
+    <div class="v-gutter">
+      <div data-view="resendInvitations"></div>
+      <div data-view="users"></div>
+    </div>
 
-<div class="v-gutter">
-  <div data-view="resendInvitations"></div>
-  <div data-view="users"></div>
+  </div>
 </div>
 

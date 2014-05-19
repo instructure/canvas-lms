@@ -134,6 +134,17 @@
         <% if @context.try(:short_name) %>
           <div class='h1' id="section-tabs-header">
             <%= @context.short_name %>
+            <% if @context && @context.is_a?(Group) && can_do(@context, @current_user, :manage)%>
+              <a  class="al-trigger" href="#" style="display:inline-block; float:right" data-popup-within="#wrapper">
+                <i class="icon-mini-arrow-down"></i>
+                <span class="screenreader-only"><%= t("group_switch","Switch")%></span>
+              </a>
+              <ul class="al-options">
+                <% @context.group_category.groups.active.by_name.each do |group| %>
+                  <li><%= link_to group.short_name, group_path(group) %></li>
+                <% end %>
+              </ul>
+            <% end %>
             <% if @context && @context.respond_to?(:context)  %>
               <a href="<%= url_for(@context.context) %>" id="section-tabs-header-subtitle" class="ellipsis"><%= @context.context.name %></a>
             <% elsif @context && @context.respond_to?(:enrollment_term) && !@context.enrollment_term.default_term? %>

@@ -123,4 +123,30 @@ describe "groups" do
     new_group_el.find_elements(:css, ".student").length.should == 2
   end
 
+  describe "new groups page" do
+    it "should allow a student to create a group" do
+      course_with_student_logged_in(:active_all => true)
+      @course.root_account.enable_feature!(:student_groups_next)
+      student_in_course
+      student_in_course
+
+      get "/courses/#{@course.id}/groups"
+      wait_for_ajaximations
+
+      keep_trying_until do
+        f(".add_group_link").click
+        wait_for_animations
+      end
+
+      f("#group_name").send_keys("My Group")
+      ff("#group_join_level option").length.should == 2
+      f("#invitees_#{@student.id}").click
+      fj('button.confirm-dialog-confirm-btn').click
+      wait_for_ajaximations
+
+      new_group_el = fj(".student-group-header:first").text
+      new_group_el.should include "My Group"
+      new_group_el.should include "1 student"
+    end
+  end
 end
