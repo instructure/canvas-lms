@@ -31,7 +31,8 @@ define [
     correctMiddleStudentCount: attr()
     correctBottomStudentCount: attr()
 
-    speedGraderUrl: Em.computed.alias('quizStatistics.quiz.speedGraderUrl').readOnly()
+    speedGraderUrl: alias('quizStatistics.quiz.speedGraderUrl').readOnly()
+    quizSubmissionsZipUrl: alias('quizStatistics.quiz.quizSubmissionsZipUrl').readOnly()
 
     # Helper for calculating the ratio of correct responses for this question.
     #
@@ -61,6 +62,10 @@ define [
           'fill_in_multiple_blanks'
         when 'essay_question'
           'essay'
+        when 'file_upload_question'
+          'file_upload'
+        when 'calculated_question'
+          'calculated'
         else
           'generic'
     ).property('questionType')

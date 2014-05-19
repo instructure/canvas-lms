@@ -12,6 +12,7 @@ describe CanvasQuizStatistics::Analyzers::FileUpload do
     it 'should count students who have uploaded an attachment' do
       subject.run([
         {},
+        { attachment_ids: nil },
         { attachment_ids: [] },
         { attachment_ids: ['1'] }
       ])[:responses].should == 1

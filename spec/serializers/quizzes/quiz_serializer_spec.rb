@@ -354,6 +354,35 @@ describe Quizzes::QuizSerializer do
     end
   end
 
+  describe "quiz_submissions_zip_url" do
+    it "includes a url to download all files" do
+      controller.expects(:accepts_jsonapi?).at_least_once.returns true
+      serializer.expects(:user_may_grade?).at_least_once.returns true
+      serializer.expects(:has_file_uploads?).at_least_once.returns true
+      serializer.as_json[:quiz][:quiz_submissions_zip_url].should ==
+        'http://example.com/courses/1/quizzes/1/submissions?zip=1'
+    end
+
+    it "doesn't if it's not a JSON-API request" do
+      controller.expects(:accepts_jsonapi?).at_least_once.returns false
+      serializer.expects(:user_may_grade?).at_least_once.returns true
+      serializer.as_json[:quiz].should_not have_key :quiz_submissions_zip_url
+    end
+
+    it "doesn't if the user may not grade" do
+      controller.expects(:accepts_jsonapi?).at_least_once.returns true
+      serializer.expects(:user_may_grade?).at_least_once.returns false
+      serializer.as_json[:quiz].should_not have_key :quiz_submissions_zip_url
+    end
+
+    it "doesn't if the quiz has no file upload questions" do
+      controller.expects(:accepts_jsonapi?).at_least_once.returns true
+      serializer.expects(:user_may_grade?).at_least_once.returns true
+      serializer.expects(:has_file_uploads?).at_least_once.returns false
+      serializer.as_json[:quiz].should_not have_key :quiz_submissions_zip_url
+    end
+  end
+
   describe "permissions" do
     it "serializes permissions" do
       serializer.as_json[:quiz][:permissions].should == {

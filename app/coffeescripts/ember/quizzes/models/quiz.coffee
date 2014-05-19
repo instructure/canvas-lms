@@ -124,6 +124,7 @@ define [
     quizSubmissions: alias('studentQuizSubmissions')
     takeable: attr()
     takeQuizUrl: attr()
+    quizSubmissionsZipUrl: attr()
 
   Quiz.SORT_LAST = 'ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ'
 

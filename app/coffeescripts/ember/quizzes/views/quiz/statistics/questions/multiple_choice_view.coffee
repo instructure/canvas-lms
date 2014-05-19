@@ -1,2 +1,2 @@
-define [ '../questions_view' ], (BaseView) ->
-  BaseView
+define [ '../questions_view' ], (Base) ->
+  Base

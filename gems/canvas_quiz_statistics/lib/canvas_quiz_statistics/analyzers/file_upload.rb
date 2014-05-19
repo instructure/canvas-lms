@@ -22,7 +22,7 @@ module CanvasQuizStatistics::Analyzers
     private
 
     def answer_present?(response)
-      response.has_key?(:attachment_ids) && response[:attachment_ids].any?
+      (response[:attachment_ids] || []).any?
     end
   end
 end

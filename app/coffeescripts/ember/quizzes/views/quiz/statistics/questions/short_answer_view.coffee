@@ -1,2 +1,2 @@
-define [ '../questions_view' ], (BaseView) ->
-  BaseView.extend {}
+define [ '../questions_view' ], (Base) ->
+  Base

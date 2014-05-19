@@ -17,7 +17,7 @@ module Quizzes
                 :require_lockdown_browser_monitor, :lockdown_browser_monitor_data,
                 :speed_grader_url, :permissions, :quiz_reports_url, :quiz_statistics_url,
                 :message_students_url, :quiz_submission_html_url, :section_count,
-                :take_quiz_url, :takeable
+                :take_quiz_url, :takeable, :quiz_submissions_zip_url
 
     def_delegators :@controller,
       :api_v1_course_assignment_group_url,
@@ -29,7 +29,8 @@ module Quizzes
       :course_quiz_submission_html_url,
       :api_v1_course_quiz_submission_users_url,
       :api_v1_course_quiz_submission_users_message_url,
-      :course_quiz_take_url
+      :course_quiz_take_url,
+      :course_quiz_quiz_submissions_url
 
    def_delegators :@object,
      :context,
@@ -145,6 +146,8 @@ module Quizzes
         when :submitted_students, :unsubmitted_students then user_may_grade?
         when :quiz_submission then accepts_jsonapi?
         when :quiz_submission_html_url then accepts_jsonapi?
+        when :quiz_submissions_zip_url then
+          accepts_jsonapi? && user_may_grade? && has_file_uploads?
         else true
         end
       end
@@ -211,6 +214,10 @@ module Quizzes
       !!(accepts_jsonapi? || stringify_json_ids?)
     end
 
+    def quiz_submissions_zip_url
+      course_quiz_quiz_submissions_url(quiz.context, quiz.id, zip: 1)
+    end
+
     private
 
     def show_speedgrader?
@@ -260,5 +267,8 @@ module Quizzes
       !!submission_for_current_user
     end
 
+    def has_file_uploads?
+      quiz.has_file_upload_question?
+    end
   end
 end
