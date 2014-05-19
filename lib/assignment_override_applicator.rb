@@ -84,8 +84,10 @@ module AssignmentOverrideApplicator
       overrides = []
 
       if context.account_membership_allows(user, nil, :manage_courses) || context.user_has_been_admin?(user)
-        overrides = assignment_or_quiz.assignment_overrides.active.to_a
-        unless assignment_or_quiz.current_version?
+        overrides = assignment_or_quiz.assignment_overrides
+        if assignment_or_quiz.current_version?
+          overrides = overrides.active.to_a
+        else
           overrides = current_override_version(assignment_or_quiz, overrides)
         end
         return overrides

@@ -569,6 +569,23 @@ describe AssignmentOverrideApplicator do
         overrides.first.should_not be_deleted
       end
 
+      it "should include now-deleted overrides that weren't deleted yet as of the assignment version (with manage_courses permission)" do
+        account_admin_user
+
+        @override = assignment_override_model(:assignment => @assignment)
+        @override.set = @course.default_section
+        @override.save!
+
+        @assignment.due_at = 3.days.from_now
+        @assignment.save!
+
+        @override.destroy
+
+        overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment.versions.first.model, @admin)
+        overrides.should == [@override]
+        overrides.first.should_not be_deleted
+      end
+
       context "overrides for an assignment for a quiz, where the overrides were created before the quiz was published" do
         context "without draft states" do
           it "skips versions of the override that have nil for an assignment version" do
