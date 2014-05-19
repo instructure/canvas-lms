@@ -4,7 +4,7 @@ Permissions.register :app_profiling,
   :label => lambda { I18n.t('#role_override.permissions.app_profiling', "Application Profiling") },
   :account_only => :site_admin,
   :available_to => %w(AccountAdmin AccountMembership),
-  :true_for => %w(AccountAdmin)
+  :true_for => %w(AccountAdmin AccountMembership)
 
 Rack::MiniProfiler.config.tap do |c|
   c.pre_authorize_cb = lambda { |env| !Rails.env.test? }
