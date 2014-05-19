@@ -361,12 +361,12 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
   def stats_for_question(question, responses, legacy=true)
     if !legacy && CQS.can_analyze?(question)
       # the gem expects all hash keys to be symbols:
-      question = CQS::Util.deep_symbolize_keys(question)
+      question = CQS::Util.deep_symbolize_keys(question.to_hash)
       responses = responses.map(&CQS::Util.method(:deep_symbolize_keys))
 
       analysis = CQS.analyze(question, responses)
 
-      return question.to_hash.merge(analysis).with_indifferent_access
+      return question.merge(analysis).with_indifferent_access
     end
 
     question[:responses] = 0

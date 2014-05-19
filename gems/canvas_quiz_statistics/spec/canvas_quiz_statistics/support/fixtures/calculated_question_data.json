@@ -1,0 +1,77 @@
+{
+  "id": 53,
+  "regrade_option": "",
+  "points_possible": 1,
+  "correct_comments": "",
+  "incorrect_comments": "",
+  "neutral_comments": "",
+  "question_type": "calculated_question",
+  "question_name": "FQuestion",
+  "name": "FQuestion",
+  "question_text": "<p>Formula: what is 5 plus [x]?</p>",
+  "answers": [
+    {
+      "weight": 100,
+      "variables": [
+        {
+          "name": "x",
+          "value": 4
+        }
+      ],
+      "answer": 9,
+      "id": 5842
+    },
+    {
+      "weight": 100,
+      "variables": [
+        {
+          "name": "x",
+          "value": 9
+        }
+      ],
+      "answer": 14,
+      "id": 771
+    },
+    {
+      "weight": 100,
+      "variables": [
+        {
+          "name": "x",
+          "value": 4
+        }
+      ],
+      "answer": 9,
+      "id": 2705
+    },
+    {
+      "weight": 100,
+      "variables": [
+        {
+          "name": "x",
+          "value": 10
+        }
+      ],
+      "answer": 15,
+      "id": 9184
+    }
+  ],
+  "text_after_answers": "",
+  "formulas": [
+    {
+      "formula": "x + 5"
+    }
+  ],
+  "variables": [
+    {
+      "name": "x",
+      "min": 1,
+      "max": 10,
+      "scale": 0
+    }
+  ],
+  "answer_tolerance": "1",
+  "formula_decimal_places": 0,
+  "assessment_question_id": 50,
+  "position": 12,
+  "published_at": "2014-05-17T08:47:21Z"
+}

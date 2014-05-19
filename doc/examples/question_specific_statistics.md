@@ -163,6 +163,8 @@ may include extra metrics. You can find these metrics below.
 
 Multiple Dropdown question statistics look just like the statistics for [Fill In Multiple Blanks](#fimb-question-stats).
 
+<a class="bookmark" id="essay-question-stats"></a>
+
 #### Essay
 
 ```javascript
@@ -199,3 +201,12 @@ Multiple Dropdown question statistics look just like the statistics for [Fill In
   "multiple_answers": null
 }
 ```
+
+#### File Upload
+
+File Upload question statistics look just like the statistics for [Essays](#essay-question-stats).
+
+
+#### Formula
+
+Formula question statistics look just like the statistics for [Essays](#essay-question-stats).
