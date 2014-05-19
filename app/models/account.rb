@@ -38,6 +38,8 @@ class Account < ActiveRecord::Base
     :roles, :announcements, :alerts, :course_account_associations, :user_account_associations
   ]
 
+  INSTANCE_GUID_SUFFIX = 'canvas-lms'
+
   include Workflow
   belongs_to :parent_account, :class_name => 'Account'
   belongs_to :root_account, :class_name => 'Account'
@@ -321,7 +323,7 @@ class Account < ActiveRecord::Base
 
   def ensure_defaults
     self.uuid ||= CanvasSlug.generate_securish_uuid
-    self.lti_guid ||= self.uuid if self.respond_to?(:lti_guid)
+    self.lti_guid ||= "#{self.uuid}:#{INSTANCE_GUID_SUFFIX}" if self.respond_to?(:lti_guid)
   end
 
   def verify_unique_sis_source_id

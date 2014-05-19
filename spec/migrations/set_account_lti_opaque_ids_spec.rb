@@ -23,12 +23,13 @@ describe 'DataFixup::SetAccountLtiOpaqueIds' do
   describe "up" do
     it "should work" do
       root_account = Account.default
-      root_account.lti_guid.should == root_account.uuid
+      original_guid = root_account.lti_guid
+      original_guid.should_not be_empty
 
       DataFixup::SetAccountLtiOpaqueIds.run
 
       root_account.reload
-      root_account.lti_guid.should_not == root_account.uuid
+      root_account.lti_guid.should_not == original_guid
     end
   end
 end
