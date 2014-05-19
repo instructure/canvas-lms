@@ -30,7 +30,7 @@
 			},
 			"properties": {
 				"id": 18,
-				"order": 2,
+				"order": 3,
 				"prevSize": 32,
 				"code": 57361,
 				"name": "uniE011",
@@ -49,7 +49,7 @@
 			},
 			"properties": {
 				"id": 19,
-				"order": 3,
+				"order": 2,
 				"prevSize": 32,
 				"code": 57362,
 				"name": "uniE012",
@@ -68,7 +68,7 @@
 			},
 			"properties": {
 				"id": 20,
-				"order": 4,
+				"order": 5,
 				"prevSize": 32,
 				"code": 57363,
 				"name": "uniE013",
@@ -87,7 +87,7 @@
 			},
 			"properties": {
 				"id": 21,
-				"order": 5,
+				"order": 6,
 				"prevSize": 32,
 				"code": 57364,
 				"name": "uniE014",
@@ -106,7 +106,7 @@
 			},
 			"properties": {
 				"id": 22,
-				"order": 6,
+				"order": 7,
 				"prevSize": 32,
 				"code": 57365,
 				"name": "uniE015",
@@ -125,7 +125,7 @@
 			},
 			"properties": {
 				"id": 23,
-				"order": 7,
+				"order": 8,
 				"prevSize": 32,
 				"code": 57366,
 				"name": "uniE016",
@@ -144,7 +144,7 @@
 			},
 			"properties": {
 				"id": 24,
-				"order": 8,
+				"order": 9,
 				"prevSize": 32,
 				"code": 57367,
 				"name": "uniE017",
@@ -163,7 +163,7 @@
 			},
 			"properties": {
 				"id": 25,
-				"order": 9,
+				"order": 10,
 				"prevSize": 32,
 				"code": 57368,
 				"name": "uniE018",
@@ -182,7 +182,7 @@
 			},
 			"properties": {
 				"id": 26,
-				"order": 10,
+				"order": 11,
 				"prevSize": 32,
 				"code": 57369,
 				"name": "uniE019",
@@ -201,7 +201,7 @@
 			},
 			"properties": {
 				"id": 27,
-				"order": 11,
+				"order": 12,
 				"prevSize": 32,
 				"code": 57370,
 				"name": "uniE01A",
@@ -220,7 +220,7 @@
 			},
 			"properties": {
 				"id": 28,
-				"order": 12,
+				"order": 13,
 				"prevSize": 32,
 				"code": 57371,
 				"name": "uniE01B",
@@ -239,7 +239,7 @@
 			},
 			"properties": {
 				"id": 29,
-				"order": 13,
+				"order": 14,
 				"prevSize": 32,
 				"code": 57372,
 				"name": "uniE01C",
@@ -258,7 +258,7 @@
 			},
 			"properties": {
 				"id": 30,
-				"order": 14,
+				"order": 4,
 				"prevSize": 32,
 				"code": 57373,
 				"name": "uniE01D",
@@ -2955,10 +2955,10 @@
 				"paths": [
 					"M0 192h1024v128h-1024v-128zM0 832v-128h1024v128h-1024zM0 576v-128h1024v128h-1024z"
 				],
-				"grid": 32,
 				"tags": [
 					"ico_hamburger"
-				]
+				],
+				"grid": 32
 			},
 			"properties": {
 				"order": 156,
@@ -2977,10 +2977,10 @@
 					"M640 576v-256h-256v256h-256l389.7 428.4 378.3-428.4z",
 					"M0 0h1024v170.7h-1024v-170.7z"
 				],
-				"grid": 32,
 				"tags": [
 					"icon_expand_items"
-				]
+				],
+				"grid": 32
 			},
 			"properties": {
 				"order": 157,
@@ -2998,10 +2998,10 @@
 				"paths": [
 					"M575.9 248.4c-448 0-563.5 472.2-282.8 775.6-113.7-206-163.9-520.3 282.8-509.8v253.8l384-384-384-384v248.4z"
 				],
-				"grid": 32,
 				"tags": [
 					"icon_forward"
-				]
+				],
+				"grid": 32
 			},
 			"properties": {
 				"order": 158,
@@ -3019,10 +3019,10 @@
 				"paths": [
 					"M512 64c-251.3 0-455 203.7-455 455s203.7 455 455 455 455-203.7 455-455-203.7-455-455-455zM557.4 879.8v-133.4h-91v133.4c-164.2-20.5-294.5-151-315.2-315.4h133.4v-91h-133.4c20.7-164.4 151-294.7 315.4-315.4v133.4h90.8v-133.2c164.4 20.7 294.7 151 315.4 315.4h-133.4v90.8h133.4c-20.7 164.4-151 294.9-315.4 315.4z"
 				],
-				"grid": 32,
 				"tags": [
 					"icon_target"
-				]
+				],
+				"grid": 32
 			},
 			"properties": {
 				"order": 159,
@@ -3034,6 +3034,116 @@
 			},
 			"setIdx": 0,
 			"iconIdx": 158
+		},
+		{
+			"icon": {
+				"paths": [
+					"M512 52.8c-253.6 0-459.2 206.6-459.2 461.2s205.6 461.2 459.2 461.2c253.6 0 459.2-206.5 459.2-461.2s-205.6-461.2-459.2-461.2zM512 876.4c-199.3 0-360.8-162.4-360.8-362.4s161.5-362.3 360.8-362.3c199.3 0 360.8 162.3 360.8 362.4s-161.5 362.3-360.8 362.3z",
+					"M309.4 463.2h405.2v101.6h-405.2v-101.6z"
+				],
+				"grid": 32,
+				"tags": [
+					"icon-quiz-stats-avg"
+				]
+			},
+			"properties": {
+				"order": 160,
+				"id": 159,
+				"prevSize": 32,
+				"code": 57620,
+				"name": "icon-quiz-stats-avg",
+				"ligatures": ""
+			},
+			"setIdx": 0,
+			"iconIdx": 159
+		},
+		{
+			"icon": {
+				"paths": [
+					"M510.9 51.8c-253.5 0-459.1 205.7-459.1 459.2s205.6 459.2 459.2 459.2c253.6 0 459.2-205.6 459.2-459.2s-205.7-459.2-459.3-459.2zM510.9 871.8c-199.3 0-360.8-161.6-360.8-360.8s161.5-360.8 360.8-360.8c199.3 0 360.8 161.6 360.8 360.8s-161.5 360.8-360.8 360.8z",
+					"M569 439.4l-58.1-178.6-58 178.6h-187.7l151.9 110.4-58.1 178.6 151.9-110.4 152 110.4-58.1-178.6 151.9-110.4z"
+				],
+				"grid": 32,
+				"tags": [
+					"icon-quiz-stats-deviation"
+				]
+			},
+			"properties": {
+				"order": 161,
+				"id": 160,
+				"prevSize": 32,
+				"code": 57621,
+				"name": "icon-quiz-stats-deviation",
+				"ligatures": ""
+			},
+			"setIdx": 0,
+			"iconIdx": 160
+		},
+		{
+			"icon": {
+				"paths": [
+					"M510.9 51.8c-253.5 0-459.1 205.7-459.1 459.2s205.6 459.2 459.2 459.2c253.6 0 459.2-205.6 459.2-459.2s-205.7-459.2-459.3-459.2zM510.9 871.8c-199.3 0-360.8-161.6-360.8-360.8s161.5-360.8 360.8-360.8c199.3 0 360.8 161.6 360.8 360.8s-161.5 360.8-360.8 360.8z",
+					"M688.1 534.5h-118.1v159.3h-118.1v-159.3h-118.1l177.1-220.3 177.2 220.3z"
+				],
+				"grid": 32,
+				"tags": [
+					"icon-quiz-stats-high"
+				]
+			},
+			"properties": {
+				"order": 162,
+				"id": 161,
+				"prevSize": 32,
+				"code": 57622,
+				"name": "icon-quiz-stats-high",
+				"ligatures": ""
+			},
+			"setIdx": 0,
+			"iconIdx": 161
+		},
+		{
+			"icon": {
+				"paths": [
+					"M510.9 51.8c-253.5 0-459.1 205.7-459.1 459.2s205.6 459.2 459.2 459.2c253.6 0 459.2-205.6 459.2-459.2s-205.7-459.2-459.3-459.2zM510.9 871.8c-199.3 0-360.8-161.6-360.8-360.8s161.5-360.8 360.8-360.8c199.3 0 360.8 161.6 360.8 360.8s-161.5 360.8-360.8 360.8z",
+					"M688.1 480.5h-118.1v-159.3h-118.1v159.3h-118.1l177.1 220.3 177.2-220.3z"
+				],
+				"grid": 32,
+				"tags": [
+					"icon-quiz-stats-low"
+				]
+			},
+			"properties": {
+				"order": 163,
+				"id": 162,
+				"prevSize": 32,
+				"code": 57623,
+				"name": "icon-quiz-stats-low",
+				"ligatures": ""
+			},
+			"setIdx": 0,
+			"iconIdx": 162
+		},
+		{
+			"icon": {
+				"paths": [
+					"M510.9 51.8c-253.5 0-459.1 205.7-459.1 459.2s205.6 459.2 459.2 459.2c253.6 0 459.2-205.6 459.2-459.2s-205.7-459.2-459.3-459.2zM510.9 871.8c-199.3 0-360.8-161.6-360.8-360.8s161.5-360.8 360.8-360.8c199.3 0 360.8 161.6 360.8 360.8s-161.5 360.8-360.8 360.8z",
+					"M668.6 462.6h-110.7v-151.3c0-25-20.2-45.2-45.2-45.2s-45.2 20.2-45.2 45.2v188.7c0 1.4 0 6.5 0 7.9 0 25 20.2 45.2 45.2 45.2h155.9c25 0 45.2-20.2 45.2-45.2 0-25-20.2-45.3-45.2-45.3z"
+				],
+				"grid": 32,
+				"tags": [
+					"icon-quiz-stats-time"
+				]
+			},
+			"properties": {
+				"order": 164,
+				"id": 163,
+				"prevSize": 32,
+				"code": 57624,
+				"name": "icon-quiz-stats-time",
+				"ligatures": ""
+			},
+			"setIdx": 0,
+			"iconIdx": 163
 		}
 	],
 	"height": 1024,
@@ -3059,7 +3169,6 @@
 			"quickUsageToken": false,
 			"showMetrics": true,
 			"showMetadata": false,
-			"embed": false,
 			"showVersion": false
 		},
 		"imagePref": {
@@ -3071,9 +3180,9 @@
 			"sprites": true
 		},
 		"historySize": 100,
-		"showCodes": false,
+		"showCodes": true,
 		"gridSize": 16,
-		"showLiga": true,
+		"showLiga": false,
 		"showGrid": true,
 		"showGlyphs": true,
 		"showQuickUse": true,
