@@ -120,6 +120,7 @@ define [
           model: @model
         @moveGroupView = new MoveDialogView
           model: @model
+          closeTarget: @$el.find('a[id*=manage_link]')
           saveURL: -> ENV.URLS.sort_url
 
     initCache: ->

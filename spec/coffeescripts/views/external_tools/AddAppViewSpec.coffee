@@ -120,6 +120,7 @@ define [
 
     teardown: ->
       view.remove()
+      server.restore()
 
   test 'AddAppView: render', ->
     equal $.trim($('.ui-dialog-title:visible').text()), "Add App",
