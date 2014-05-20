@@ -83,7 +83,7 @@ module AssignmentOverrideApplicator
       context = assignment_or_quiz.context
       overrides = []
 
-      if context.account_membership_allows(user, nil, :manage_courses)
+      if context.account_membership_allows(user, nil, :manage_courses) || context.user_has_been_admin?(user)
         overrides = assignment_or_quiz.assignment_overrides.active.to_a
         unless assignment_or_quiz.current_version?
           overrides = current_override_version(assignment_or_quiz, overrides)
@@ -92,13 +92,8 @@ module AssignmentOverrideApplicator
       end
 
       # priority: adhoc, group, section (do not exclude deleted)
-      if context.user_has_been_admin?(user)
-        adhoc = adhoc_admin_overrides(assignment_or_quiz, user, context)
-        overrides += adhoc if adhoc
-      else
-        adhoc = adhoc_override(assignment_or_quiz, user)
-        overrides << adhoc.assignment_override if adhoc
-      end
+      adhoc = adhoc_override(assignment_or_quiz, user)
+      overrides << adhoc.assignment_override if adhoc
 
       if ObserverEnrollment.observed_students(context, user).empty?
         group = group_override(assignment_or_quiz, user)
@@ -125,13 +120,6 @@ module AssignmentOverrideApplicator
   def self.adhoc_override(assignment_or_quiz, user)
     key = assignment_or_quiz.is_a?(Quizzes::Quiz) ? :quiz_id : :assignment_id
     AssignmentOverrideStudent.where(key => assignment_or_quiz, :user_id => user).first
-  end
-
-  def self.adhoc_admin_overrides(assignment_or_quiz, user, course)
-    key = assignment_or_quiz.is_a?(Quizzes::Quiz) ? :quiz_id : :assignment_id
-    students = course.enrollments_visible_to(user).pluck(:user_id)
-    adhoc = AssignmentOverrideStudent.where(:user_id => students, key => assignment_or_quiz)
-    adhoc.map(&:assignment_override)
   end
 
   def self.group_override(assignment_or_quiz, user)

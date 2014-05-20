@@ -101,7 +101,7 @@ describe AssignmentOverridesController, type: :request do
       json.size.should == 0
     end
 
-    it "should exclude overrides outside the user's visibility" do
+    it "should include overrides outside the user's sections if user is admin" do
       Enrollment.limit_privileges_to_course_section!(@course, @teacher, true)
 
       @override.set = @course.course_sections.create!
@@ -113,7 +113,7 @@ describe AssignmentOverridesController, type: :request do
                       :course_id => @course.id.to_s,
                       :assignment_id => @assignment.id.to_s)
 
-      json.size.should == 0
+      json.size.should == 1
     end
 
     it "should have formatted overrides" do
@@ -164,11 +164,7 @@ describe AssignmentOverridesController, type: :request do
     end
 
     it "should 404 for non-visible override" do
-      Enrollment.limit_privileges_to_course_section!(@course, @teacher, true)
-
-      @override.set = @course.course_sections.create!
-      @override.save!
-
+      @override.destroy
       raw_api_show_override(@course, @assignment, @override)
       assert_status(404)
     end
@@ -951,11 +947,7 @@ describe AssignmentOverridesController, type: :request do
     end
 
     it "should 404 for non-visible override" do
-      Enrollment.limit_privileges_to_course_section!(@course, @teacher, true)
-
-      @override.set = @course.course_sections.create!
-      @override.save!
-
+      @override.destroy
       raw_api_call(:delete, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/overrides/#{@override.id}.json",
                    :controller => 'assignment_overrides', :action => 'destroy', :format => 'json',
                    :course_id => @course.id.to_s, :assignment_id => @assignment.id.to_s, :id => @override.id.to_s)
