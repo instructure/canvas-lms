@@ -19,10 +19,9 @@ define [
     okayToReload: Ember.computed.bool('controllers.quiz_moderate.okayToReload')
 
     selected: false
-    missingIndicator: '--'
 
     attempts: ( ->
-      return @get('missingIndicator') if !@get('hasActiveSubmission')
+      return if !@get('hasActiveSubmission')
       @get('quizSubmission.attempt')
     ).property('quizSubmission.attempt')
 

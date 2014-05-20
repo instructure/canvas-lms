@@ -21,6 +21,9 @@
         {{#t 'time'}}Time{{/t}}
       </th>
       <th>
+        {{#t 'ends_at'}}End Date{{/t}}
+      </th>
+      <th>
         {{#t 'attempts_left'}}Attempts Left{{/t}}
       </th>
       <th>
@@ -53,16 +56,39 @@
             <div class="extra-time">{{extraTimeOnAttempt}}</div>
           {{/if}}
         </td>
-        <td>{{attempts}}</td>
-
-        {{#if isActive}}
-          <td>
+        <td>
+          {{#if attempts}}
+            {{attempts}}
+          {{else}}
+            <span aria-hidden="true">
+              --
+            </span>
+            <span class='screenreader-only'>
+              {{#t 'no_attempts'}}No Attempts{{/t}}
+            </span>
+          {{/if}}
+        </td>
+        <td>
+          {{#if isActive}}
             <i class="icon-clock"></i>
             {{runningTime}}
-          </td>
-        {{else}}
-          <td>{{friendlyTime}}</td>
-        {{/if}}
+          {{else}}
+            {{friendlyTime}}
+          {{/if}}
+        </td>
+
+        <td>
+          {{#if friendlyEndsAt}}
+            {{friendlyEndsAt}}
+          {{else}}
+            <span aria-hidden="true">
+              --
+            </span>
+            <span class='screenreader-only'>
+              {{#t 'no_ends_at'}}No Modified End At Date{{/t}}
+            </span>
+          {{/if}}
+        </td>
 
         <td>{{remainingStatusLabel}}{{remainingAttempts}}</td>
         <td>{{user.friendlyScore}}</td>

@@ -84,9 +84,10 @@ define [
     equal(Math.round(res), 120)
 
   test 'isTimeExpired correctly determines if endAt has passed', ->
-    twoAgo = minutesFromNow(-2)
-    oneMinuteAgo = minutesFromNow(-1)
-    subject = buildMixinUser(twoAgo, oneMinuteAgo)
+    threeAgo = minutesFromNow(-3)
+    twoFromNow = minutesFromNow(-2)
+    oneAgo = minutesFromNow(-1)
+    subject = buildMixinUser(threeAgo, twoFromNow)
     subject.set('hasActiveSubmission', true)
-    subject.set('quizSubmission.endAt', oneMinuteAgo)
+    subject.set('quizSubmission.endAt', oneAgo)
     ok subject.isTimeExpired()
