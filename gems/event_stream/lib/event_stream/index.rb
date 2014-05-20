@@ -89,7 +89,7 @@ class EventStream::Index
   end
 
   def select_cql
-    "SELECT ordered_id, #{id_column} FROM #{table} #{event_stream.read_consistency_clause}WHERE #{key_column} = ?"
+    "SELECT ordered_id, #{id_column} FROM #{table} %CONSISTENCY% WHERE #{key_column} = ?"
   end
 
   def insert_cql
@@ -145,7 +145,7 @@ class EventStream::Index
 
       # execute the query collecting the results. set the bookmark iff there
       # was a result after the full page
-      database.execute(qs, *args).fetch do |row|
+      database.execute(qs, *args, consistency: event_stream.read_consistency_level).fetch do |row|
         if pager.size == pager.per_page
           pager.has_more!
         else

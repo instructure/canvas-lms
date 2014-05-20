@@ -42,7 +42,7 @@ describe EventStream::Index do
                      :database => @database,
                      :record_type => EventStream::Record,
                      :ttl_seconds => 1.year,
-                     :read_consistency_clause => nil)
+                     :read_consistency_level => nil)
   end
 
   context "setup block" do
@@ -247,8 +247,12 @@ describe EventStream::Index do
 
         allow(@raw_results).to stub_with_multiple_yields
 
-        expect(@database).to receive(:execute).once.and_return(@raw_results)
         expect(@stream).to receive(:fetch).once.with(@ids[start, requested]).and_return(@typed_results[start, requested])
+      end
+
+      def setup_execute(start, requested)
+        setup_fetch(start, requested)
+        expect(@database).to receive(:execute).once.and_return(@raw_results)
       end
 
       it "return a bookmarked collection" do
@@ -256,14 +260,25 @@ describe EventStream::Index do
       end
 
       it "is able to get bookmark from a typed item" do
-        setup_fetch(0, 2)
+        setup_execute(0, 2)
         page = @pager.paginate(:per_page => 2)
         expect(page.bookmark_for(page.last)).to eq page.next_bookmark
       end
 
+      it "uses the configured read_consistency_level" do
+        setup_fetch(0, 2)
+        expect(@database).to receive(:execute).with(/%CONSISTENCY% WHERE/, anything, anything, consistency: nil).and_return(@raw_results)
+        page = @pager.paginate(:per_page => 2)
+
+        setup_fetch(0, 2)
+        @stream.stub(:read_consistency_level).and_return('ALL')
+        expect(@database).to receive(:execute).with(/%CONSISTENCY% WHERE/, anything, anything, consistency: 'ALL').and_return(@raw_results)
+        page = @pager.paginate(:per_page => 2)
+      end
+
       context "one page of results" do
         before do
-          setup_fetch(0, 4)
+          setup_execute(0, 4)
           @page = @pager.paginate(:per_page => 4)
         end
 
@@ -278,7 +293,7 @@ describe EventStream::Index do
 
       context "first of multiple pages of results" do
         before do
-          setup_fetch(0, 2)
+          setup_execute(0, 2)
           @page = @pager.paginate(:per_page => 2)
         end
 
@@ -293,10 +308,10 @@ describe EventStream::Index do
 
       context "last of multiple pages of results" do
         before do
-          setup_fetch(0, 2)
+          setup_execute(0, 2)
           page = @pager.paginate(:per_page => 2)
 
-          setup_fetch(2, 2)
+          setup_execute(2, 2)
           @page = @pager.paginate(:per_page => 2, :page => page.next_page)
         end
 
@@ -323,14 +338,14 @@ describe EventStream::Index do
           @index.scrollback_limit Time.now - @newest
           bucket = @index.bucket_for_time(@newest)
           expect(@database).to receive(:execute).once.
-                                   with(/WHERE #{@index.key_column} = \?/, "key/#{bucket}", anything, anything).
+                                   with(/WHERE #{@index.key_column} = \?/, "key/#{bucket}", anything, anything, anything).
                                    and_return(@query)
           @pager.paginate(:per_page => 1)
         end
 
         it "skips results newer than newest in starting bucket" do
           expect(@database).to receive(:execute).once.
-                                   with(/AND ordered_id < \?/, anything, anything, "#{@newest.to_i + 1}/").
+                                   with(/AND ordered_id < \?/, anything, anything, "#{@newest.to_i + 1}/", anything).
                                    and_return(@query)
           @pager.paginate(:per_page => 1)
         end
@@ -341,7 +356,7 @@ describe EventStream::Index do
           page, bookmark = page.next_page, page.next_bookmark
 
           expect(@database).to receive(:execute).once.
-                                   with(/AND ordered_id < \?/, anything, anything, bookmark[1]).
+                                   with(/AND ordered_id < \?/, anything, anything, bookmark[1], anything).
                                    and_return(@query)
           @pager.paginate(:per_page => 1, :page => page)
         end
@@ -362,14 +377,14 @@ describe EventStream::Index do
           @index.scrollback_limit 1.day
           bucket = @index.bucket_for_time(@oldest)
           expect(@database).to receive(:execute).once.
-                                   with(/WHERE #{@index.key_column} = \?/, "key/#{bucket}", anything).
+                                   with(/WHERE #{@index.key_column} = \?/, "key/#{bucket}", anything, anything).
                                    and_return(@query)
           @pager.paginate(:per_page => 1)
         end
 
         it "skips results older than oldest in any bucket" do
           expect(@database).to receive(:execute).once.
-                                   with(/AND ordered_id >= \?/, anything, "#{@oldest.to_i}/").
+                                   with(/AND ordered_id >= \?/, anything, "#{@oldest.to_i}/", anything).
                                    and_return(@query)
           @pager.paginate(:per_page => 1)
         end
@@ -383,7 +398,7 @@ describe EventStream::Index do
           bucket = @index.bucket_for_time(scrollback_limit)
 
           expect(@database).to receive(:execute).once.
-                                   with(/WHERE #{@index.key_column} = \?/, "key/#{bucket}", anything).
+                                   with(/WHERE #{@index.key_column} = \?/, "key/#{bucket}", anything, anything).
                                    and_return(@query)
           @pager.paginate(:per_page => 1)
         end

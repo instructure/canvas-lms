@@ -19,6 +19,8 @@
 module CanvasCassandra
 
   class Database
+    CONSISTENCY_CLAUSE = %r{%CONSISTENCY% ?}
+
     def initialize(fingerprint, servers, opts, logger)
       thrift_opts = {}
       thrift_opts[:retries] = opts.delete(:retries) if opts.has_key?(:retries)
@@ -38,11 +40,26 @@ module CanvasCassandra
     # or arel is flexible enough for this, rather than rolling our own.
     def execute(query, *args)
       result = nil
+      opts = (args.last.is_a?(Hash) && args.pop) || {}
+
       ms = 1000 * Benchmark.realtime do
-        result = @db.execute(query, *args)
+        consistency_text = opts[:consistency]
+        consistency = CanvasCassandra.consistency_level(consistency_text) if consistency_text
+
+        if @db.use_cql3? || !consistency
+          query = query.sub(CONSISTENCY_CLAUSE, '')
+        elsif !@db.use_cql3?
+          query = query.sub(CONSISTENCY_CLAUSE, "USING CONSISTENCY #{consistency_text} ")
+        end
+
+        if @db.use_cql3? && consistency
+          result = @db.execute_with_consistency(query, consistency, *args)
+        else
+          result = @db.execute(query, *args)
+        end
       end
 
-      @logger.debug("  #{"CQL (%.2fms)" % [ms]}  #{sanitize(query, args)} [#{fingerprint}]")
+      @logger.debug("  #{"CQL (%.2fms)" % [ms]}  #{sanitize(query, args)} #{opts.inspect} [#{fingerprint}]")
       result
     end
 

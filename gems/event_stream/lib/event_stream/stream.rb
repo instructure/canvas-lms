@@ -68,7 +68,7 @@ class EventStream::Stream
   def fetch(ids)
     rows = []
     if available? && ids.present?
-      database.execute(fetch_cql, ids).fetch do |row|
+      database.execute(fetch_cql, ids, consistency: read_consistency_level).fetch do |row|
         rows << record_type.from_attributes(row.to_hash)
       end
     end
@@ -115,13 +115,7 @@ class EventStream::Stream
   end
 
   def fetch_cql
-    "SELECT * FROM #{table} #{read_consistency_clause} WHERE #{id_column} IN (?)"
-  end
-
-  def read_consistency_clause
-    unless read_consistency_level.nil? || read_consistency_level.empty?
-      "USING CONSISTENCY #{read_consistency_level}"
-    end
+    "SELECT * FROM #{table} %CONSISTENCY% WHERE #{id_column} IN (?)"
   end
 
   private

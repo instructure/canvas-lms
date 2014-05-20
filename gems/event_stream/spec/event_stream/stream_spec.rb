@@ -55,7 +55,7 @@ describe EventStream::Stream do
       expect(stream.table).to eq table.to_s
       expect(stream.id_column).to eq id_column.to_s
       expect(stream.record_type).to eq record_type
-      expect(stream.read_consistency_clause).to eq 'USING CONSISTENCY ALL'
+      expect(stream.read_consistency_level).to eq 'ALL'
     end
 
     it "requires database_name and table" do
@@ -159,18 +159,6 @@ describe EventStream::Stream do
       @stream = EventStream::Stream.new do
         self.database database
         self.table table
-      end
-    end
-
-    describe "read_consistency_clause" do
-      it "returns clause if read_consistency_level is set" do
-        expect(@stream.read_consistency_clause).to be_nil
-
-        @stream.read_consistency_level ''
-        expect(@stream.read_consistency_clause).to be_nil
-
-        @stream.read_consistency_level 'ALL'
-        expect(@stream.read_consistency_clause).to eq 'USING CONSISTENCY ALL'
       end
     end
 
@@ -329,20 +317,20 @@ describe EventStream::Stream do
       end
 
       it "uses the configured table" do
-        expect(database).to receive(:execute).once.with(/ FROM #{@table} /, anything).and_return(@results)
+        expect(database).to receive(:execute).once.with(/ FROM #{@table} /, anything, anything).and_return(@results)
         @stream.fetch([1])
       end
 
       it "uses the configured id column" do
         id_column = double(:to_s => "expected_id_column")
         @stream.id_column id_column
-        expect(database).to receive(:execute).once.with(/ WHERE #{id_column}/, anything).and_return(@results)
+        expect(database).to receive(:execute).once.with(/ WHERE #{id_column}/, anything, anything).and_return(@results)
         @stream.fetch([1])
       end
 
       it "passes the given ids to the execute" do
         ids = double('ids', :empty? => false)
-        expect(database).to receive(:execute).once.with(anything, ids).and_return(@results)
+        expect(database).to receive(:execute).once.with(anything, ids, anything).and_return(@results)
         @stream.fetch(ids)
       end
 
@@ -366,11 +354,11 @@ describe EventStream::Stream do
       end
 
       it "uses the configured consistency level" do
-        expect(database).to receive(:execute).once.with(/^[USING CONSISTENCY ALL]/, anything).and_return(@results)
+        expect(database).to receive(:execute).once.with(/%CONSISTENCY% WHERE/, anything, consistency: nil).and_return(@results)
         @stream.fetch([1])
 
         @stream.read_consistency_level 'ALL'
-        expect(database).to receive(:execute).once.with(/USING CONSISTENCY ALL/, anything).and_return(@results)
+        expect(database).to receive(:execute).once.with(/%CONSISTENCY% WHERE/, anything, consistency: "ALL").and_return(@results)
         @stream.fetch([1])
       end
     end
