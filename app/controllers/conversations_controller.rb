@@ -279,6 +279,11 @@ class ConversationsController < ApplicationController
   # @argument media_comment_type [String, "audio"|"video"]
   #   Type of the associated media file
   #
+  # @argument user_note [Optional, Boolean]
+  #   Will add a faculty journal entry for each recipient as long as the user
+  #   making the api call has permission, the recipient is a student and
+  #   faculty journals are enabled in the account.
+  #
   # @argument mode [String, "sync"|"async"]
   #   Determines whether the messages will be created/sent synchronously or
   #   asynchronously. Defaults to sync, and this option is ignored if this is a
@@ -584,8 +589,8 @@ class ConversationsController < ApplicationController
 
   # internal api
   # @example_request
-  #     curl https://<canvas>/api/v1/conversations/:id/delete_for_all \ 
-  #       -X DELETE \ 
+  #     curl https://<canvas>/api/v1/conversations/:id/delete_for_all \
+  #       -X DELETE \
   #       -H 'Authorization: Bearer <token>'
   def delete_for_all
     return unless authorized_action(Account.site_admin, @current_user, :become_user)
@@ -783,11 +788,11 @@ class ConversationsController < ApplicationController
   #   The action to take on each conversation.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/conversations \ 
-  #       -X PUT \ 
-  #       -H 'Authorization: Bearer <token>' \ 
-  #       -d 'event=mark_as_read' \ 
-  #       -d 'conversation_ids[]=1' \ 
+  #     curl https://<canvas>/api/v1/conversations \
+  #       -X PUT \
+  #       -H 'Authorization: Bearer <token>' \
+  #       -d 'event=mark_as_read' \
+  #       -d 'conversation_ids[]=1' \
   #       -d 'conversation_ids[]=2'
   #
   # @returns Progress
@@ -821,7 +826,7 @@ class ConversationsController < ApplicationController
     # but for backwards API compatibility we need to leave it a string.
     render :json => {'unread_count' => @current_user.unread_conversations_count.to_s}
   end
-  
+
   def public_feed
     return unless get_feed_context(:only => [:user])
     @current_user = @context
