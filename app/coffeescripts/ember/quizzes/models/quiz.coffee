@@ -126,6 +126,7 @@ define [
     takeable: attr()
     takeQuizUrl: attr()
     quizSubmissionsZipUrl: attr()
+    previewUrl: attr()
 
   Quiz.SORT_LAST = 'ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ'
 

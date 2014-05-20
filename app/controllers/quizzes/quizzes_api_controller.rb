@@ -43,6 +43,11 @@
 #           "example": "http://canvas.example.edu/courses/1/quizzes/2?persist_healdess=1&force_user=1",
 #           "type": "string"
 #         },
+#         "preview_url": {
+#           "description": "A url that can be visited in the browser with a POST request to preview a quiz as the teacher. Only present when the user may grade",
+#           "example": "http://canvas.example.edu/courses/1/quizzes/2/take?preview=1",
+#           "type": "string"
+#         },
 #         "description": {
 #           "description": "the description of the quiz",
 #           "example": "This is a quiz on Act 3 of Hamlet",

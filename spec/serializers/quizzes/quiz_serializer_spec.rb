@@ -204,7 +204,18 @@ describe Quizzes::QuizSerializer do
       @quiz_submission.expects(:attempts_left).at_least_once.returns 1
       @serializer.as_json[:quiz][:takeable].should == true
     end
+  end
 
+  describe "preview_url" do
+
+    it "is only present when the user can grade the quiz" do
+      course_with_teacher_logged_in(active_all: true)
+      course_quiz(true)
+      quiz_serializer(scope: @teacher).as_json[:quiz][:preview_url].
+        should == controller.send(:course_quiz_take_url, @quiz.context, @quiz, preview: '1')
+      course_with_student_logged_in(active_all: true, course: @course)
+      quiz_serializer(scope: @student).as_json[:quiz].should_not have_key :preview_url
+    end
   end
 
   describe "links" do

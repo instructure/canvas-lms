@@ -122,6 +122,13 @@ define [
         else
           @send('lock')
 
+      preview: ->
+        $('<form/>').
+          attr('action', "#{@get('previewUrl')}&authenticity_token=#{ENV.AUTHENTICITY_TOKEN}").
+          attr('method', 'POST').
+          appendTo('body').
+          submit()
+
       lock: ->
         updateAllDates.call(this, 'lockAt').then ->
           $.flashMessage I18n.t('quiz_successfully_updated', 'Quiz Successfully Updated!')

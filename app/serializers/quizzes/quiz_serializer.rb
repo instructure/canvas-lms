@@ -18,7 +18,7 @@ module Quizzes
                 :speed_grader_url, :permissions, :quiz_reports_url, :quiz_statistics_url,
                 :message_students_url, :quiz_submission_html_url, :section_count,
                 :take_quiz_url, :quiz_extensions_url, :takeable,
-                :quiz_submissions_zip_url
+                :quiz_submissions_zip_url, :preview_url
 
     def_delegators :@controller,
       :api_v1_course_assignment_group_url,
@@ -71,6 +71,10 @@ module Quizzes
 
     def submitted_students
       user_finder.submitted_students
+    end
+
+    def preview_url
+      course_quiz_take_url(context, quiz, preview: '1')
     end
 
     def unsubmitted_students
@@ -151,6 +155,7 @@ module Quizzes
         when :quiz_submission_html_url then accepts_jsonapi?
         when :quiz_submissions_zip_url then
           accepts_jsonapi? && user_may_grade? && has_file_uploads?
+        when :preview_url then user_may_grade? && user_may_manage?
         else true
         end
       end

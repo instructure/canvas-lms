@@ -20,6 +20,10 @@
         <a {{bind-attr href="editURL"}} class="btn">
           <i class="icon-edit"></i>{{#t 'edit'}}Edit{{/t}}
         </a>
+
+        <a {{bind-attr href="previewUrl"}} {{action "preview"}} class="btn">
+          {{#t "preview"}}Preview{{/t}}
+        </a>
         {{#ic-actions}}
           {{#ic-menu-item on-select="speedGrader"}}
             <i class="icon-speed-grader"></i>
@@ -39,12 +43,7 @@
             <i class="icon-discussion"></i>
             {{#t 'Message Students'}}Message Students{{/t}}
           {{/ic-menu-item}}
-
-          {{#ic-menu-item}}
-            <i class="icon-mark-as-read"></i>
-            {{#t 'preview'}}Preview{{/t}}
-          {{/ic-menu-item}}
-
+          
           {{#ic-menu-item on-select="showStudentResults"}}
             <i class="icon-group"></i>
             {{#t 'show_quiz_results'}}Show Student Quiz Results{{/t}}
