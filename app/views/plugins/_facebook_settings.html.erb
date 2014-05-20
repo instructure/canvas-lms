@@ -1,17 +1,14 @@
 <%= fields_for :settings, OpenObject.new(settings) do |f| %>
-  <table style="width: 500px;" class="formtable">
+  <table style="width: 600px;" class="formtable">
     <tr>
       <td colspan="2"><%= mt(:description, <<-TEXT, :site_url => raw('<span class="nobr">https://&lt; ' + t(:domain_name, 'domain') + ' &gt;/</span>'), :canvas_url => raw('<span class="nobr">https://&lt; ' + t(:domain_name, 'domain') + ' &gt;/facebook</span>'), :facebook_url => "http://www.facebook.com/developers")
-You will need to create a [new app on facebook.com](%{facebook_url}).
+You will need to create a [new app on facebook.com](%{facebook_url}), and add 'App on Facebook' as a platform.
 Set the following configuration options to ensure your Facebook app
 works correctly:
 
-* **Web Site -- Site URL:** set to %{site_url}
-* **Web Site -- Site Domain:** domain of your main Canvas site.  This must match the Site URL setting
-* **Facebook Integration -- Canvas Page:** make a note of whatever you choose and enter in the form below
-* **Facebook Integration -- Canvas URL:** set to %{canvas_url}
-* Make sure **Advanced -- OAuth 2.0 for Canvas** is enabled
-* After you save your app, make a note of the App ID, API Key and App Secret
+* **Settings -- App on Facebook -- Canvas Page:** make a note of whatever you choose (the part after apps.facebook.com) and enter in the form below
+* **Settings -- App on Facebook -- Canvas URL:** set to %{canvas_url}
+* After you save your app, make a note of the App ID, Client Token and App Secret
 TEXT
       %></td>
     </tr>
@@ -30,6 +27,7 @@ TEXT
       <td><%= f.blabel :api_key, :en => "API Key" %></td>
       <td>
         <%= f.text_field :api_key %>
+        <span class="hint"><%= t('hints.api_key', "Also referred to as Client Token") %></span>
       </td>
     </tr>
     <tr>
@@ -42,14 +40,14 @@ TEXT
       <td><%= f.blabel :canvas_name, :en => "Canvas Name" %></td>
       <td>
         <%= f.text_field :canvas_name %>
-        <div class="hint"><%= t('hints.canvas_name', 'this is the path specified in "Canvas Page"') %></div>
+        <span class="hint"><%= t('hints.canvas_name', 'this is the path specified in "Canvas Page"') %></span>
       </td>
     </tr>
     <tr>
       <td><%= f.blabel :canvas_domain, :en => "Canvas Domain" %></td>
       <td>
         <%= f.text_field :canvas_domain %>
-        <div class="hint"><%= t('hints.canvas_domain', 'this is the domain specified in "Canvas URL"') %></div>
+        <span class="hint"><%= t('hints.canvas_domain', 'this is the domain specified in "Canvas URL"') %></span>
       </td>
     </tr>
     <tr>
