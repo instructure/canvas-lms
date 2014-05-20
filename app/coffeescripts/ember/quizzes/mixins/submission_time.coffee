@@ -1,7 +1,8 @@
 define [
   'ember'
   '../shared/seconds_to_time'
-], (Ember, formatSeconds) ->
+  'i18nObj'
+], (Ember, formatSeconds, I18n) ->
 
   MS_PER_SECOND = 1000
   MS_PER_MINUTE = 60 * MS_PER_SECOND
@@ -30,6 +31,12 @@ define [
     isActive: ( ->
       @get('quizSubmission.startedAt') && !@get('quizSubmission.finishedAt')
     ).property('quizSubmission.startedAt', 'quizSubmission.finishedAt')
+
+    friendlyEndsAt: ( ->
+      date = @get('endAt')
+      return unless date
+      I18n.l('date.formats.date_at_time', date)
+    ).property('endAt')
 
     startStopRunningTime: (  ->
       if @get('isActive') && @get('okayToReload')
