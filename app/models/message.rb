@@ -53,13 +53,6 @@ class Message < ActiveRecord::Base
   attr_writer :delayed_messages
   attr_accessor :output_buffer
 
-  EXPORTABLE_ATTRIBUTES = [
-    :id, :to, :from, :cc, :bcc, :subject, :body, :delay_for, :dispatch_at, :sent_at, :workflow_state, :transmission_errors, :is_bounced, :notification_id,
-    :communication_channel_id, :context_id, :context_type, :asset_context_id, :asset_context_type, :user_id, :created_at, :updated_at, :notification_name, :url, :path_type,
-    :from_name, :asset_context_code, :notification_category, :to_email, :html_body, :root_account_id
-  ]
-
-  EXPORTABLE_ASSOCIATIONS = [:asset_context, :communication_channel, :context, :notification, :user, :attachments]
   # Callbacks
   after_save  :stage_message
   before_save :infer_defaults

@@ -22,13 +22,6 @@ class ExternalFeed < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   has_many :external_feed_entries, :dependent => :destroy
 
-  EXPORTABLE_ATTRIBUTES = [
-    :id, :user_id, :context_id, :context_type, :consecutive_failures, :failures, :refresh_at, :title, :feed_type, :feed_purpose, :url, :header_match,
-    :body_match, :created_at, :updated_at, :verbosity
-  ]
-
-  EXPORTABLE_ASSOCIATIONS = [:user, :context, :external_feed_entries]
-
   before_validation :infer_defaults
 
   include CustomValidations

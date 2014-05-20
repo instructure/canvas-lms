@@ -71,7 +71,7 @@ class Group < ActiveRecord::Base
 
   EXPORTABLE_ASSOCIATIONS = [
     :users, :group_memberships, :users, :context, :group_category, :account, :root_account, :calendar_events, :discussion_topics, :discussion_entries, :announcements,
-    :attachments, :folders, :collaborators, :external_feeds, :messages, :wiki, :web_conferences, :collaborations, :media_objects, :avatar_attachment
+    :attachments, :folders, :collaborators, :wiki, :web_conferences, :collaborations, :media_objects, :avatar_attachment
   ]
 
   before_validation :ensure_defaults

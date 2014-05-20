@@ -52,9 +52,6 @@ class Notification < ActiveRecord::Base
 
   attr_accessible  :name, :subject, :main_link, :delay_for, :category
 
-  EXPORTABLE_ATTRIBUTES = [:id, :workflow_state, :name, :subject, :category, :delay_for, :created_at, :updated_at, :main_link]
-  EXPORTABLE_ASSOCIATIONS = [:messages, :notification_policies]
-
   scope :to_show_in_feed, where("messages.category='TestImmediately' OR messages.notification_name IN (?)", TYPES_TO_SHOW_IN_FEED)
 
   validates_uniqueness_of :name

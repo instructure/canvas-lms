@@ -36,7 +36,7 @@ class CommunicationChannel < ActiveRecord::Base
     :created_at, :updated_at, :build_pseudonym_on_confirm
   ]
 
-  EXPORTABLE_ASSOCIATIONS = [:pseudonyms, :pseudonym, :user, :notification_policies, :delayed_mesasge, :messages]
+  EXPORTABLE_ASSOCIATIONS = [:pseudonyms, :pseudonym, :user]
 
   before_save :consider_retiring, :assert_path_type, :set_confirmation_code
   before_save :consider_building_pseudonym

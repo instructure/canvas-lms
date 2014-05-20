@@ -24,9 +24,6 @@ class NotificationPolicy < ActiveRecord::Base
 
   attr_accessible :notification, :communication_channel, :frequency, :notification_id, :communication_channel_id
 
-  EXPORTABLE_ATTRIBUTES = [:id, :notification_id, :communication_channel_id, :broadcast, :frequency, :created_at, :updated_at]
-  EXPORTABLE_ASSOCIATIONS = [:notification, :communication_channel, :delayed_messages]
-
   validates_presence_of :communication_channel_id, :frequency
   validates_inclusion_of :broadcast, in: [true, false]
   validates_inclusion_of :frequency, in: [Notification::FREQ_IMMEDIATELY,

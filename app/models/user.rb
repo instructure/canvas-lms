@@ -37,7 +37,7 @@ class User < ActiveRecord::Base
   ]
 
   EXPORTABLE_ASSOCIATIONS = [
-    :communication_channels, :notification_policies, :communication_channel, :enrollments, :observer_enrollments, :observee_enrollments, :observers, :user_observers,
+    :communication_channels, :communication_channel, :enrollments, :observer_enrollments, :observee_enrollments, :observers, :user_observers,
     :user_observees, :observed_users, :courses, :group_memberships, :groups, :associated_accounts, :associated_root_accounts, :context_external_tools, :submissions,
     :pseudonyms, :pseudonym_accounts, :pseudonym, :attachments, :folders, :calendar_events, :quiz_submissions, :eportfolios, :collaborations, :user_services,
     :rubric_associations, :rubrics, :context_rubrics, :grading_standards, :context_module_progressions, :assessment_question_bank_users, :assessment_question_banks,
