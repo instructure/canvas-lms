@@ -548,3 +548,52 @@ describe "non-ASCII attachment names" do
     end
   end
 end
+
+describe "LTI tool combination" do
+  before(:all) do
+    archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/cc_lti_combine_test.zip")
+    unzipped_file_path = File.join(File.dirname(archive_file_path), "cc_#{File.basename(archive_file_path, '.zip')}", 'oi')
+    @export_folder = File.join(File.dirname(archive_file_path), "cc_cc_lti_combine_test.")
+    @converter = CC::Importer::Standard::Converter.new(:export_archive_path=>archive_file_path, :course_name=>'oi', :base_download_dir=>unzipped_file_path)
+    @converter.export
+    @course_data = @converter.course.with_indifferent_access
+    @course_data['all_files_export'] ||= {}
+    @course_data['all_files_export']['file_path'] = @course_data['all_files_zip']
+
+    @course = course
+    @migration = ContentMigration.create(:context => @course)
+    @migration.migration_type = "common_cartridge_importer"
+    @migration.migration_settings[:migration_ids_to_import] = {:copy => {}}
+    enable_cache do
+      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
+    end
+  end
+
+  after(:all) do
+    @converter.delete_unzipped_archive
+    if File.exists?(@export_folder)
+      FileUtils::rm_rf(@export_folder)
+    end
+    truncate_all_tables
+  end
+
+  it "should combine lti tools in cc packages when possible" do
+    @course.context_external_tools.count.should == 2
+    @course.context_external_tools.map(&:migration_id).sort.should == ["TOOL_1", "TOOL_3"]
+
+    combined_tool = @course.context_external_tools.find_by_migration_id("TOOL_1")
+    combined_tool.domain.should == "www.example.com"
+    other_tool = @course.context_external_tools.find_by_migration_id("TOOL_3")
+    @course.context_module_tags.count.should == 5
+
+    combined_tags = @course.context_module_tags.select{|ct| ct.url.start_with?("https://www.example.com")}
+    combined_tags.count.should == 4
+    combined_tags.each do |tag|
+      tag.content.should == combined_tool
+    end
+
+    other_tag = (@course.context_module_tags.to_a - combined_tags).first
+    other_tag.url.start_with?("https://www.differentdomainexample.com").should be_true
+    other_tag.content.should == other_tool
+  end
+end

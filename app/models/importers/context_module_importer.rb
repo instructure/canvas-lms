@@ -3,6 +3,8 @@ module Importers
 
     self.item_class = ContextModule
 
+    MAX_URL_LENGTH = 2000
+
     def self.process_migration(data, migration)
       modules = data['modules'] ? data['modules'] : []
       modules.each do |mod|
@@ -153,17 +155,26 @@ module Importers
       elsif hash[:linked_resource_type] =~ /contextexternaltool/i
         # external tool
         external_tool_id = nil
+        external_tool_url = hash[:url]
+
         if hash[:linked_resource_global_id]
           external_tool_id = hash[:linked_resource_global_id]
+        elsif migration && arr = migration.find_external_tool_translation(hash[:linked_resource_id])
+          external_tool_id = arr[0]
+          custom_fields = arr[1]
+          if custom_fields.present?
+            external_tool_url = add_custom_fields_to_url(hash[:url], custom_fields) || hash[:url]
+          end
         elsif hash[:linked_resource_id] && et = context_module.context.context_external_tools.active.find_by_migration_id(hash[:linked_resource_id])
           external_tool_id = et.id
         end
-        if hash['url']
+
+        if external_tool_url
           item = context_module.add_item({
             :title => hash[:title] || hash[:linked_resource_title] || hash['description'],
             :type => 'context_external_tool',
             :indent => hash[:indent].to_i,
-            :url => hash['url'],
+            :url => external_tool_url,
             :id => external_tool_id
           }, existing_item, :position => context_module.migration_position)
         end
@@ -207,6 +218,20 @@ module Importers
         end
       end
       item
+    end
+
+    def self.add_custom_fields_to_url(original_url, custom_fields)
+      return nil unless uri = URI.parse(original_url)
+
+      custom_fields_query = custom_fields.map{|k, v| "#{CGI.escape(k)}=#{CGI.escape(v)}"}.join("&")
+      uri.query = uri.query.present? ? ([uri.query, custom_fields_query].join("&")) : custom_fields_query
+      new_url = uri.to_s
+
+      if new_url.length < MAX_URL_LENGTH
+        return new_url
+      else
+        return nil
+      end
     end
 
   end

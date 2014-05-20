@@ -76,7 +76,7 @@ module Importers
         Attachment.skip_media_object_creation do
           self.process_migration_files(course, data, migration); migration.update_import_progress(18)
           Importers::AttachmentImporter.process_migration(data, migration); migration.update_import_progress(20)
-          mo_attachments = migration.imported_migration_items.find_all { |i| i.is_a?(Attachment) && i.media_entry_id.present? }
+          mo_attachments = migration.imported_migration_items_by_class(Attachment).find_all { |i| i.media_entry_id.present? }
           begin
             self.import_media_objects(mo_attachments, migration)
           rescue => e
@@ -147,33 +147,40 @@ module Importers
         #Adjust dates
         if shift_options = migration.date_shift_options
           shift_options = self.shift_date_options(course, shift_options)
-          migration.imported_migration_items.each do |event|
-            if event.is_a?(Assignment)
-              event.due_at = shift_date(event.due_at, shift_options)
-              event.lock_at = shift_date(event.lock_at, shift_options)
-              event.unlock_at = shift_date(event.unlock_at, shift_options)
-              event.peer_reviews_due_at = shift_date(event.peer_reviews_due_at, shift_options)
-              event.save_without_broadcasting!
-            elsif event.is_a?(DiscussionTopic)
-              event.delayed_post_at = shift_date(event.delayed_post_at, shift_options)
-              event.save_without_broadcasting!
-            elsif event.is_a?(CalendarEvent)
-              event.start_at = shift_date(event.start_at, shift_options)
-              event.end_at = shift_date(event.end_at, shift_options)
-              event.save_without_broadcasting!
-            elsif event.is_a?(Quizzes::Quiz)
-              event.due_at = shift_date(event.due_at, shift_options)
-              event.lock_at = shift_date(event.lock_at, shift_options)
-              event.unlock_at = shift_date(event.unlock_at, shift_options)
-              event.show_correct_answers_at = shift_date(event.show_correct_answers_at, shift_options)
-              event.hide_correct_answers_at = shift_date(event.hide_correct_answers_at, shift_options)
-              event.save!
-            elsif event.is_a?(ContextModule)
-              event.unlock_at = shift_date(event.unlock_at, shift_options)
-              event.start_at = shift_date(event.start_at, shift_options)
-              event.end_at = shift_date(event.end_at, shift_options)
-              event.save!
-            end
+
+          migration.imported_migration_items_by_class(Assignment).each do |event|
+            event.due_at = shift_date(event.due_at, shift_options)
+            event.lock_at = shift_date(event.lock_at, shift_options)
+            event.unlock_at = shift_date(event.unlock_at, shift_options)
+            event.peer_reviews_due_at = shift_date(event.peer_reviews_due_at, shift_options)
+            event.save_without_broadcasting!
+          end
+
+          migration.imported_migration_items_by_class(DiscussionTopic).each do |event|
+            event.delayed_post_at = shift_date(event.delayed_post_at, shift_options)
+            event.save_without_broadcasting!
+          end
+
+          migration.imported_migration_items_by_class(CalendarEvent).each do |event|
+            event.start_at = shift_date(event.start_at, shift_options)
+            event.end_at = shift_date(event.end_at, shift_options)
+            event.save_without_broadcasting!
+          end
+
+          migration.imported_migration_items_by_class(Quizzes::Quiz).each do |event|
+            event.due_at = shift_date(event.due_at, shift_options)
+            event.lock_at = shift_date(event.lock_at, shift_options)
+            event.unlock_at = shift_date(event.unlock_at, shift_options)
+            event.show_correct_answers_at = shift_date(event.show_correct_answers_at, shift_options)
+            event.hide_correct_answers_at = shift_date(event.hide_correct_answers_at, shift_options)
+            event.save!
+          end
+
+          migration.imported_migration_items_by_class(ContextModule).each do |event|
+            event.unlock_at = shift_date(event.unlock_at, shift_options)
+            event.start_at = shift_date(event.start_at, shift_options)
+            event.end_at = shift_date(event.end_at, shift_options)
+            event.save!
           end
 
           course.set_course_dates_if_blank(shift_options)

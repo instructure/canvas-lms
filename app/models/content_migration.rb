@@ -611,10 +611,26 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def imported_migration_items
-    @imported_migration_items ||= []
+    @imported_migration_items_hash ||= {}
+    @imported_migration_items_hash.values.flatten
+  end
+
+  def imported_migration_items_by_class(klass)
+    @imported_migration_items_hash ||= {}
+    @imported_migration_items_hash[klass.name] ||= []
   end
 
   def add_imported_item(item)
-    self.imported_migration_items << item unless self.imported_migration_items.include?(item)
+    arr = imported_migration_items_by_class(item.class)
+    arr << item unless arr.include?(item)
+  end
+
+  def add_external_tool_translation(migration_id, target_tool, custom_fields)
+    @external_tool_translation_map ||= {}
+    @external_tool_translation_map[migration_id] = [target_tool.id, custom_fields]
+  end
+
+  def find_external_tool_translation(migration_id)
+    @external_tool_translation_map && migration_id && @external_tool_translation_map[migration_id]
   end
 end
