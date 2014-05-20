@@ -45,7 +45,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
   #   :submission_correct_count_average=>1,
   #   :questions=>
   #     [output of stats_for_question for every question in submission_data]
-  def generate
+  def generate(legacy=true)
     submissions = submissions_for_statistics
     # questions: questions from quiz#quiz_data
     #{1022=>
@@ -144,7 +144,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
         end
       end
       if obj[:answers] && obj[:question_type] != 'text_only_question'
-        stat = stats_for_question(obj, responses_for_question[obj[:id]])
+        stat = stats_for_question(obj, responses_for_question[obj[:id]], legacy)
         stats[:questions] << ['question', stat]
       end
     end
@@ -358,8 +358,8 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
   #   "unexpected_response_values"=>[],
   #   "user_ids"=>[1,2,3],
   #   "multiple_responses"=>false}],
-  def stats_for_question(question, responses)
-    if CQS.can_analyze?(question)
+  def stats_for_question(question, responses, legacy=true)
+    if !legacy && CQS.can_analyze?(question)
       # the gem expects all hash keys to be symbols:
       question = CQS::Util.deep_symbolize_keys(question)
       responses = responses.map(&CQS::Util.method(:deep_symbolize_keys))

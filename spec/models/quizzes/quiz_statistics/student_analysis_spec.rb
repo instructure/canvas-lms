@@ -328,11 +328,22 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
           with(question_data, responses).
           returns({ some_metric: 5 })
 
-      output = subject.send(:stats_for_question, question_data, responses)
+      output = subject.send(:stats_for_question, question_data, responses, false)
       output.should == {
         question_type: 'essay_question',
         some_metric: 5
       }.with_indifferent_access
+    end
+
+    it "shouldn't proxy if the legacy flag is on" do
+      question_data = {
+        question_type: 'essay_question',
+        answers: []
+      }
+
+      CanvasQuizStatistics.expects(:analyze).never
+
+      subject.send(:stats_for_question, question_data, [])
     end
   end
 end

@@ -26,4 +26,17 @@ class Quizzes::QuizQuestion::EssayQuestion < Quizzes::QuizQuestion::Base
     user_answer.answer_details[:text] = Sanitize.clean(user_answer.answer_text, config) || ""
     nil
   end
+
+  def stats(responses)
+    stats = {:essay_responses => []}
+
+    responses.each do |response|
+      stats[:essay_responses] << {
+        :user_id => response[:user_id],
+        :text => response[:text].to_s.strip
+      }
+    end
+
+    @question_data.merge stats
+  end
 end
