@@ -1,5 +1,5 @@
 class PopulateLockVersionOnContextModuleProgressions < ActiveRecord::Migration
-  tag :postdeploy
+  tag :predeploy
 
   def self.up
     DataFixup::PopulateLockVersionOnContextModuleProgressions.run
