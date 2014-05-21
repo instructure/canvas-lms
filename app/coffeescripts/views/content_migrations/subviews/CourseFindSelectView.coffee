@@ -35,6 +35,15 @@ define [
       @$courseSearchField.data('ui-autocomplete')._renderItem = (ul, item) ->
         $(autocompleteItemTemplate(item)).appendTo(ul)
 
+      # Accessiblity Hack. If you find a better solution please fix this. This makes it so the whole form isn't read
+      # by the screen reader every time a user selects an auto completed item.
+      $converterDiv = $('#converter')
+      @$courseSearchField.on 'focus', -> $converterDiv.attr('aria-atomic', false)
+      @$courseSearchField.on 'blur', -> $converterDiv.attr('aria-atomic', true)
+      @$courseSelect.on 'focus', -> $converterDiv.attr('aria-atomic', false)
+      @$courseSelect.on 'blur', -> $converterDiv.attr('aria-atomic', true)
+      ## hack finished ##
+
     toJSON: -> 
       json = super
       json.terms = @coursesByTerms
