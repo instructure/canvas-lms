@@ -159,5 +159,18 @@ describe Quizzes::QuizExtension do
       extension.extra_attempts.should == 1000
       extension.extra_time.should == 10080
     end
+
+    it "should only allow numbers or bool for input" do
+      extension = Quizzes::QuizExtension.new(@qs,
+        extra_attempts: "abc",
+        extra_time: "abc",
+        manually_unlocked: "abc")
+
+      extension.extend_submission!
+
+      extension.extra_attempts.should == 0
+      extension.extra_time.should == 0
+      extension.manually_unlocked.should == false
+    end
   end
 end

@@ -15,10 +15,13 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+
 # @API Quiz Extensions
 # @beta
 #
-# @model QuizExtensions
+# API for setting extensions on student quiz submissions
+#
+# @model QuizExtension
 #     {
 #       "id": "QuizExtension",
 #       "required": ["quiz_id", "user_id"],
@@ -36,7 +39,7 @@
 #           "format": "int64"
 #         },
 #         "extra_attempts": {
-#           "description": "Number of times the student was allowed to re-take the quiz over the multiple-attempt limit.",
+#           "description": "Number of times the student is allowed to re-take the quiz over the multiple-attempt limit.",
 #           "example": 1,
 #           "type": "integer",
 #           "format": "int64"
@@ -52,17 +55,11 @@
 #           "example": true,
 #           "type": "boolean"
 #         },
-#         "extend_from_now": {
-#           "description": "The number of extra minutes from now to extend the quiz",
-#           "example": 60,
-#           "type": "integer",
-#           "format": "int64"
-#         },
-#         "extend_from_end_at": {
-#           "description": "The number of extra minutes from the quiz's current end time to extend the quiz",
-#           "example": 60,
-#           "type": "integer",
-#           "format": "int64"
+#         "end_at": {
+#           "description": "The time at which the quiz submission will be overdue, and be flagged as a late submission.",
+#           "example": "2013-11-07T13:16:18Z",
+#           "type": "string",
+#           "format": "date-time"
 #         }
 #       }
 #     }
@@ -71,16 +68,15 @@ class Quizzes::QuizExtensionsController < ApplicationController
 
   before_filter :require_user, :require_context, :require_quiz
 
-  # @API Update student question scores and comments or add extensions
+  # @API Set extensions for student quiz submissions
   # @beta
   #
-  # @argument user_id [Optional, Integer]
+  # @argument user_id [Required, Integer]
   #   The ID of the user we want to add quiz extensions for.
   #
   # @argument extra_attempts [Optional, Integer]
-  #   The number of extra attempts to allow for the submission. This will
-  #   add to the existing number of allowed attempts. This is limited to
-  #   1000 attempts or less.
+  #   Number of times the student is allowed to re-take the quiz over the
+  #   multiple-attempt limit. This is limited to 1000 attempts or less.
   #
   # @argument extra_time [Optional, Integer]
   #   The number of extra minutes to allow for all attempts. This will
@@ -110,12 +106,12 @@ class Quizzes::QuizExtensionsController < ApplicationController
   #  {
   #    "quiz_extensions": [{
   #      "user_id": 3,
-  #      "extra_atempts": 2,
+  #      "extra_attempts": 2,
   #      "extra_time": 20,
   #      "manually_unlocked": true
   #    },{
   #      "user_id": 2,
-  #      "extra_atempts": 2,
+  #      "extra_attempts": 2,
   #      "extra_time": 20,
   #      "manually_unlocked": false
   #    }]
@@ -131,7 +127,7 @@ class Quizzes::QuizExtensionsController < ApplicationController
   #
   # @example_response
   #  {
-  #    "quiz_submissions": [QuizSubmission]
+  #    "quiz_extensions": [QuizExtension]
   #  }
   #
   def create

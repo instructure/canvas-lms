@@ -81,7 +81,7 @@
 #           "format": "int64"
 #         },
 #         "extra_time": {
-#           "description": "Amount of extra time allowed for the quiz submission, in seconds.",
+#           "description": "Amount of extra time allowed for the quiz submission, in minutes.",
 #           "example": 60,
 #           "type": "integer",
 #           "format": "int64"
