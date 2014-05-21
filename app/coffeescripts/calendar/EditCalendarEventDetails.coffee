@@ -130,7 +130,7 @@ define [
       if data.location_name
         location_name = data.location_name
       else
-        location_name = null
+        location_name = ''
 
       params = {
         'calendar_event[title]': data.title ? @event.title
