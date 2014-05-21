@@ -14,7 +14,7 @@ define [
     multipleAttemptsAllowed: Ember.computed.alias('quizSubmission.quiz.multipleAttemptsAllowed')
     keptScore: Ember.computed.alias('quizSubmission.keptScore')
     quizPointsPossible: Ember.computed.alias('quizSubmission.quizPointsPossible')
-    hasSubmission: Ember.computed.bool('quizSubmission.id')
+    hasActiveSubmission: Ember.computed.bool('quizSubmission.startedAt')
     quiz: Ember.computed.alias('controllers.quiz.model')
     okayToReload: Ember.computed.bool('controllers.quiz_moderate.okayToReload')
 
@@ -22,7 +22,7 @@ define [
     missingIndicator: '--'
 
     attempts: ( ->
-      return @get('missingIndicator') if !@get('hasSubmission')
+      return @get('missingIndicator') if !@get('hasActiveSubmission')
       @get('quizSubmission.attempt')
     ).property('quizSubmission.attempt')
 
@@ -33,12 +33,15 @@ define [
 
     remainingAttempts: ( ->
       return if @get('unlimitedAttempts')
-      if !@get('hasSubmission')
+      if !@get('hasActiveSubmission')
         remaining = @get('quiz.allowedAttempts')
       else
         remaining = parseInt(@get('allowedAttempts'), 10) - parseInt(@get('attempts'), 10)
+      extra = @get('quizSubmission.extraAttempts')
+      remaining += parseInt(extra, 10) if extra
       Math.max(remaining, 0)
-    ).property('attempts', 'allowedAttempts', 'mulitpleAttemptsAllowed', 'unlimitedAttempts')
+    ).property('attempts', 'allowedAttempts', 'mulitpleAttemptsAllowed',
+               'unlimitedAttempts', 'quizSubmission.extraAttempts')
 
     remainingStatusLabel: ( ->
       if @get('unlimitedAttempts')
@@ -46,6 +49,14 @@ define [
       else
         ''
     ).property('unlimitedAttempts')
+
+    extraTimeAllowed: ( ->
+      @get('quizSubmission.extraTime') && @get('quizSubmission.extraTime') > 0
+    ).property('quizSubmission.extraTime')
+
+    extraTimeOnAttempt: ( ->
+      I18n.t('gets_extra_minutes', 'gets %{num} extra minutes on each attempt', num: @get('quizSubmission.extraTime'))
+    ).property('quizSubmission.extraTime')
 
     unlimitedAttempts: ( ->
       @get('quiz.multipleAttemptsAllowed') && @get('quiz.allowedAttempts') == -1

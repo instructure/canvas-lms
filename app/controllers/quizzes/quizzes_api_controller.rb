@@ -191,6 +191,11 @@
 #           "example": "http://canvas.instructure.com/courses/1/speed_grader?assignment_id=1",
 #           "type": "string"
 #         },
+#         "quiz_extensions_url": {
+#           "description": "Link to endpoint to send extensions for this quiz.",
+#           "example": "http://canvas.instructure.com/courses/1/quizzes/2/quiz_extensions",
+#           "type": "string"
+#         },
 #         "permissions": {
 #           "$ref": "QuizPermissions",
 #           "description": "Permissions the user has for the quiz"

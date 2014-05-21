@@ -1,0 +1,51 @@
+#student-extension-dialog {
+  h2 {
+    margin: 0 0 1.5em 0;
+    font-size: 140%;
+    line-height: 1em;
+  }
+
+  .field {
+    float: left;
+    margin-bottom: 13px;
+
+    label {
+      float: left;
+      width: 260px;
+      font-size: 115%;
+
+      .note {
+        display: block;
+        font-style: normal;
+        font-size: 80%;
+        font-weight: 300;
+        color: #888;
+      }
+    }
+    .input {
+      float: right;
+      width: 160px;
+      margin-top: 6px;
+
+      .text {
+        float: left;
+        width: 50px;
+      }
+      .units {
+        line-height: 30px;
+        margin-left: 8px;
+        font-size: 90%;
+      }
+    }
+  }
+  .manually-unlock {
+    input {
+      float: left;
+      margin-right: 10px;
+    }
+
+    label {
+      width: 400px;
+    }
+  }
+}

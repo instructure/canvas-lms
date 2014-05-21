@@ -17,7 +17,8 @@ module Quizzes
                 :require_lockdown_browser_monitor, :lockdown_browser_monitor_data,
                 :speed_grader_url, :permissions, :quiz_reports_url, :quiz_statistics_url,
                 :message_students_url, :quiz_submission_html_url, :section_count,
-                :take_quiz_url, :takeable, :quiz_submissions_zip_url
+                :take_quiz_url, :quiz_extensions_url, :takeable,
+                :quiz_submissions_zip_url
 
     def_delegators :@controller,
       :api_v1_course_assignment_group_url,
@@ -29,6 +30,7 @@ module Quizzes
       :course_quiz_submission_html_url,
       :api_v1_course_quiz_submission_users_url,
       :api_v1_course_quiz_submission_users_message_url,
+      :api_v1_course_quiz_extensions_create_url,
       :course_quiz_take_url,
       :course_quiz_quiz_submissions_url
 
@@ -142,6 +144,7 @@ module Quizzes
         when :all_dates then include_all_dates?
         when :section_count then user_may_grade?
         when :access_code, :speed_grader_url, :message_students_url then user_may_grade?
+        when :quiz_extensions_url then user_may_manage?
         when :unpublishable then include_unpublishable?
         when :submitted_students, :unsubmitted_students then user_may_grade?
         when :quiz_submission then accepts_jsonapi?
@@ -210,6 +213,10 @@ module Quizzes
       api_v1_course_quiz_statistics_url(quiz.context, quiz)
     end
 
+    def quiz_extensions_url
+      api_v1_course_quiz_extensions_create_url(quiz.context, quiz)
+    end
+
     def stringify_ids?
       !!(accepts_jsonapi? || stringify_json_ids?)
     end
@@ -251,6 +258,10 @@ module Quizzes
 
     def user_may_grade?
       quiz.grants_right?(current_user, session, :grade)
+    end
+
+    def user_may_manage?
+      quiz.grants_right?(current_user, session, :manage)
     end
 
     def user_finder

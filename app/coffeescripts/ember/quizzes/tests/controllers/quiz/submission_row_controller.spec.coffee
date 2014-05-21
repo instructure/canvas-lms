@@ -24,6 +24,8 @@ define [
         user: user
         quizSubmission:
           id: 1
+          startedAt: new Date().getTime()
+          finishedAt: new Date().getTime()
           attempt: 2
           keptScore: 5
           quizPointsPossible: 8

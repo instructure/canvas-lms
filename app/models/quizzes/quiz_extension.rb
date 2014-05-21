@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 class Quizzes::QuizExtension
+  include ActiveModel::SerializerSupport
+
   attr_accessor :quiz_submission, :ext_params
 
   delegate :quiz_id, :user_id, :extra_attempts, :extra_time,
@@ -44,22 +46,17 @@ class Quizzes::QuizExtension
     end
   end
 
-  # for serialization
-  def read_attribute_for_serialization(n)
-    self.send(n)
-  end
-
   private
 
   def extend_attempts_or_time_limit
     if ext_params[:extra_attempts]
       # limit to a 1000
-      quiz_submission.extra_attempts = [ext_params[:extra_attempts].to_i, 1000].min
+      quiz_submission.extra_attempts = [ext_params[:extra_attempts].to_i.abs, 1000].min
     end
 
     if ext_params[:extra_time]
       # limit to a week
-      quiz_submission.extra_time = [ext_params[:extra_time].to_i, 10080].min
+      quiz_submission.extra_time = [ext_params[:extra_time].to_i.abs, 10080].min
     end
 
     # false is a valid value, so explicitly check nil
@@ -75,7 +72,7 @@ class Quizzes::QuizExtension
       if ext_params[:extend_from_now].to_i > 0
         from_now = [ext_params[:extend_from_now].to_i, 10080].min
         quiz_submission.end_at = Time.now + from_now.minutes
-      else
+      elsif ext_params[:extend_from_end_at].to_i > 0
         from_end_at = [ext_params[:extend_from_end_at].to_i, 10080].min
         quiz_submission.end_at += from_end_at.minutes
       end

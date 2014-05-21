@@ -72,6 +72,8 @@ define [
       I18n.t('time_limit_minutes', "%{limit} minutes", {limit: @get("timeLimit")})
     ).property('timeLimit')
 
+    # message students modal
+
     recipientGroups: (->
       [
         Ember.Object.create({
@@ -95,6 +97,8 @@ define [
     showUnsubmitted: equal 'selectedRecipientGroup', 'unsubmitted'
 
     noRecipients: equal 'recipients.length', 0
+
+    # /message students modal
 
     actions:
       takeQuiz: ->
@@ -141,6 +145,8 @@ define [
         model.save().then =>
           @transitionToRoute 'quizzes'
 
+      # message students modal
+
       sendMessageToStudents: ->
         $.ajax
           url: @get('messageStudentsUrl')
@@ -157,6 +163,7 @@ define [
 
       # For modal, just do nothing.
       cancel: K
+      # /message students modal
 
     # Kind of a gross hack so we can get quiz arrows in...
     addLegacyJS: (->

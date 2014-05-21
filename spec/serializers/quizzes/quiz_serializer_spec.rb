@@ -161,6 +161,7 @@ describe Quizzes::QuizSerializer do
     it "is not present unless the user can manage the quiz's assignments" do
       quiz.expects(:grants_right?).with(@user, session, :manage).returns true
       serializer.filter(serializer.class._attributes).should include :unpublishable
+
       quiz.unstub(:grants_right?)
       quiz.expects(:grants_right?).with(@user, session, :grade).at_least_once.returns false
       quiz.expects(:grants_right?).with(@user, session, :manage).at_least_once.returns false

@@ -42,7 +42,7 @@ define [
     ).observes('isActive', 'okayToReload').on('init')
 
     friendlyTime: ( ->
-      return if !@get('hasSubmission')
+      return if !@get('hasActiveSubmission')
       timeLimit = @get('timeLimit')
       timeSpent = @get('timeSpent')
       #actual timeSpent can be a few seconds over limit when auto submit modal

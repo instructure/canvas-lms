@@ -120,6 +120,7 @@ define [
     submittedStudents: hasMany 'user', polymporphic: true, async: true
     unsubmittedStudents: hasMany 'user', polymorphic: true, async: true
     messageStudentsUrl: attr()
+    quizExtensionsUrl: attr()
     quizSubmission: belongsTo 'quiz_submission'
     quizSubmissions: alias('studentQuizSubmissions')
     takeable: attr()

@@ -61,7 +61,7 @@ define [
   test 'friendlySubmissionTime returns if there isnt a started submission', ->
     twoAgo = minutesFromNow(-2)
     subject = buildMixinUser(twoAgo)
-    subject.set('hasSubmission', false)
+    subject.set('hasActiveSubmission', false)
     ok(!subject.get('friendlyTime'))
 
   test 'friendlySubmissionTime returns the lesser of time limit, and time spent', ->
@@ -69,7 +69,7 @@ define [
     # seconds can pass. making sure to only display timeSpent <= timeLimit
     twoAgo = minutesFromNow(-2)
     subject = buildMixinUser(twoAgo, undefined, 2) #2 minute time limit
-    subject.set('hasSubmission', true)
+    subject.set('hasActiveSubmission', true)
     subject.set('quizSubmission.timeSpent', 180) #180 seconds == 3 min
     res = subject.get('friendlyTime')
     equal(res, '02:00')
@@ -78,7 +78,7 @@ define [
     twoAgo = minutesFromNow(-2)
     twoFromNow = minutesFromNow(2)
     subject = buildMixinUser(twoAgo)
-    subject.set('hasSubmission', true)
+    subject.set('hasActiveSubmission', true)
     subject.set('quizSubmission.endAt', twoFromNow)
     res = subject.calcRemainingSeconds()
     equal(Math.round(res), 120)
@@ -87,6 +87,6 @@ define [
     twoAgo = minutesFromNow(-2)
     oneMinuteAgo = minutesFromNow(-1)
     subject = buildMixinUser(twoAgo, oneMinuteAgo)
-    subject.set('hasSubmission', true)
+    subject.set('hasActiveSubmission', true)
     subject.set('quizSubmission.endAt', oneMinuteAgo)
     ok subject.isTimeExpired()

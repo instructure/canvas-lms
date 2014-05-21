@@ -33,12 +33,15 @@
       <tr class='moderate-submission-row'>
         <td class="check">{{input type='checkbox' checked=selected}}</td>
         <td class="name">
-          {{#if hasSubmission}}
-          <a {{bind-attr href='historyLink'}}>
+          {{#if hasActiveSubmission}}
+            <a {{bind-attr href='historyLink'}}>
               {{user.sortableName}}
             </a>
           {{else}}
             {{user.sortableName}}
+          {{/if}}
+          {{#if extraTimeAllowed}}
+            <div class="extra-time">{{extraTimeOnAttempt}}</div>
           {{/if}}
         </td>
         <td>{{attempts}}</td>
@@ -55,7 +58,7 @@
         <td>{{remainingStatusLabel}}{{remainingAttempts}}</td>
         <td>{{user.friendlyScore}}</td>
         <td>
-          <a class="icon-edit" href="#" {{action 'editSubmissionUser' user}}>
+          <a class="icon-edit" href="#" {{action 'studentExtension' user}}>
             <span class="screenreader-only">{{#t 'edit'}}Edit{{/t}}</span>
           </a>
         </td>
