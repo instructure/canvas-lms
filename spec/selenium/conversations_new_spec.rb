@@ -139,6 +139,14 @@ describe "conversations new" do
     job.invoke_job
   end
 
+  let :modifier do
+    if driver.execute_script('return !!window.navigator.userAgent.match(/Macintosh/)')
+      :meta
+    else
+      :control
+    end
+  end
+
   before do
     conversation_setup
     @s1 = user(name: "first student")
@@ -204,6 +212,28 @@ describe "conversations new" do
       f('.icon-email').click
       wait_for_ajaximations
       f('.ac-token').should_not be_nil
+    end
+
+    it "should allow selecting multiple recipients in one search" do
+      get_conversations
+      fj('#compose-btn').click
+      wait_for_ajaximations
+      select_message_course(@course)
+      get_message_recipients_input.send_keys('student')
+      driver.action.key_down(modifier).perform
+      keep_trying_until { fj(".ac-result:contains('first student')") }.click
+      driver.action.key_up(modifier).perform
+      fj(".ac-result:contains('second student')").click
+      ff('.ac-token').count.should == 2
+    end
+
+    it "should not send the message on shift-enter" do
+      get_conversations
+      compose course: @course, to: [@s1], subject: 'context-free', body: 'hallo!', send: false
+      driver.action.key_down(:shift).perform
+      get_message_body_input.send_keys(:enter)
+      driver.action.key_up(:shift).perform
+      fj('#compose-new-message:visible').should_not be_nil
     end
 
     context "user notes" do
@@ -473,14 +503,6 @@ describe "conversations new" do
     before(:each) do
       @conversations = [conversation(@teacher, @s1, @s2, workflow_state: 'read'),
                         conversation(@teacher, @s1, @s2, workflow_state: 'read')]
-    end
-
-    let :modifier do
-      if driver.execute_script('return !!window.navigator.userAgent.match(/Macintosh/)')
-        :meta
-      else
-        :control
-      end
     end
 
     def select_all_conversations

@@ -149,10 +149,6 @@ define [
 
     prepareTextarea: ($scope) ->
       $textArea = $scope.find('textarea')
-      $textArea.keypress (e) =>
-        if e.which is 13 and e.shiftKey
-          $(e.target).closest('form').submit()
-          false
       $textArea.elastic()
 
     onCourse: (course) =>
