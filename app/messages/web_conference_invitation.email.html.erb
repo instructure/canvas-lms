@@ -6,6 +6,10 @@
   <%= t :subject, "Web Conference Invitation: %{name}", :name => asset.context.name %>
 <% end %>
 
-<p><%= t :body, "You've been invited to participate in a web conference, %{title} for %{name}.", :title => asset.title, :name => asset.context.name %></p>
+<% define_content :footer_link do %>
+  <a href="<%= content(:link) %>">
+    <%= t :details_link, "Click here to see the details"%>
+  </a>
+<% end %>
 
-<p><a href="<%= content :link %>"><%= t :details_link, "Click here to see the details", :link => content(:link) %></a></p>
+<p><%= t :body, "You've been invited to participate in a web conference, %{title} for %{name}.", :title => asset.title, :name => asset.context.name %></p>

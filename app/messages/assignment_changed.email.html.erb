@@ -1,11 +1,15 @@
 <% define_content :link do %>
   <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/assignments/<%= asset.id %>
 <% end %>
+
+<% define_content :footer_link do %>
+  <a href="<%= content(:link) %>">
+    <%= t :link, "Click here to view the assignment" %>
+  </a>
+<% end %>
   
 <% define_content :subject do %>
   <%= t :subject, "Assignment Changed: %{title}, %{course}", :title => asset.title, :course => asset.context.name %>
 <% end %>
 
 <p><%= t :body, 'The assignment "%{title}" for %{course} has changed.', :title => asset.title, :course => asset.context.name %></p>
-
-<p><a href="<%= content :link %>"><%= t :link, "Click here to view the assignment" %></a></p>

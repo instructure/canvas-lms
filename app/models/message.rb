@@ -167,6 +167,44 @@ class Message < ActiveRecord::Base
 
   scope :in_state, lambda { |state| where(:workflow_state => Array(state).map(&:to_s)) }
 
+  #Public: Helper methods for grabbing a user via the "from" field and using it to
+  #populate the avatar, name, and email in the conversation email notification
+
+  def author
+    @_author ||= begin
+      if context.has_attribute?(:user_id)
+        User.find(context.user_id)
+      elsif context.has_attribute?(:author_id)
+        User.find(context.author_id)
+      else
+        nil
+      end
+    end
+  end
+
+  def avatar_enabled?
+    return false unless author_account.present?
+    author_account.service_enabled?(:avatars)
+  end
+
+  def author_account
+    # Root account is populated during save
+    return nil unless author.present?
+    root_account_id ? Account.find(root_account_id) : author.account
+  end
+
+  def author_avatar_url
+    author.try(:avatar_url)
+  end
+
+  def author_short_name
+    author.try(:short_name)
+  end
+
+  def author_email_address
+    author.try(:email)
+  end
+
   # Public: Helper to generate a URI for the given subject. Overrides Rails'
   # built-in ActionController::PolymorphicRoutes#polymorphic_url method because
   # it forces option defaults for protocol and host.

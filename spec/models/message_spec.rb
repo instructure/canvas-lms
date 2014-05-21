@@ -254,4 +254,74 @@ describe Message do
 
   end
 
+  describe "author interface" do
+    let(:user) { user_model(short_name: "Jon Stewart") }
+    let(:authorless_message) { message_model(context: course_model) }
+    let(:conversation) { user.initiate_conversation([user_model]) }
+    let(:convo_message) { conversation.add_message("Message!!!") }
+
+    before(:each) do
+      user.email = "jon@dailyshow.com"
+    end
+
+    it 'loads attributes from a user owned asset' do
+      submission = Submission.new(user: user)
+      message = Message.new(context: submission)
+      message.author_short_name.should == user.short_name
+      message.author_email_address.should == user.email
+      message.author_avatar_url.should =~ /secure.gravatar.com/
+    end
+
+    it 'loads attributes from an author owned asset' do
+      message = Message.new(context: convo_message)
+      message.author_short_name.should == user.short_name
+      message.author_email_address.should == user.email
+      message.author_avatar_url.should =~ /secure.gravatar.com/
+    end
+
+    it 'doesnt break when there is no author' do
+      authorless_message.author_short_name.should be_nil
+      authorless_message.author_email_address.should be_nil
+      authorless_message.author_avatar_url.should be_nil
+    end
+
+    describe 'author_account' do
+      it 'is nil if there is no author' do
+        authorless_message.author_account.should be_nil
+      end
+
+      it 'uses the root account if there is one' do
+        message = Message.new(context: convo_message)
+        message.root_account_id = Account.default.id
+        message.author_account.should == Account.default
+      end
+
+      it 'uses the authors account if there is no root account' do
+        acct = Account.new
+        User.stubs(find: user)
+        user.stubs(account: acct)
+        conversation_message = ConversationMessage.new
+        conversation_message.author_id = user.id
+        message = Message.new(context: conversation_message)
+        message.author_account.should == acct
+      end
+    end
+
+    describe 'avatar_enabled?' do
+      it 'is false when there is no author' do
+        authorless_message.avatar_enabled?.should be_false
+      end
+
+      it 'is true when the avatars service is enabled' do
+        message = Message.new(context: convo_message)
+        message.root_account_id = Account.default.id
+        acct = Account.default
+        Account.stubs(find: acct)
+        acct.stubs(service_enabled?: true)
+        message.root_account_id = Account.default.id
+        message.avatar_enabled?.should be_true
+      end
+    end
+  end
+
 end

@@ -8,6 +8,12 @@
         :course => asset.contexts_for_user(user).map(&:name).join(", ")) %>
 <% end %>
 
+<% define_content :footer_link do %>
+  <a href="<%= content(:link) %>">
+    <%= t :link_text, 'Sign up for a time slot' %>
+  </a>
+<% end %>
+
 <p><%= t :message, 'Time slots for "%{appointment_name}" are now available for signup.', :appointment_name => asset.title %></p>
 
 <p><strong><%= t :details, 'Appointment Details' %>:</strong></p>
@@ -37,13 +43,3 @@
       </tr>
     <% end %>
 </table>
-
-<hr style="border: 0;
-    height: 1px;
-    background: #333;
-    background-image: -webkit-linear-gradient(left, #ddd, #aaa, #eee);
-    background-image:    -moz-linear-gradient(left, #ddd, #aaa, #eee);
-    background-image:     -ms-linear-gradient(left, #ddd, #aaa, #eee);
-    background-image:      -o-linear-gradient(left, #ddd, #aaa, #eee);" />
-
-<p><a href="<%= content :link %>"><%= t :link_text, 'Sign up for a time slot' %></a></p>

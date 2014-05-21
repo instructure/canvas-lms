@@ -5,6 +5,13 @@
 <% define_content :subject do %>
   <%= t :subject, "Canvas Account Admin Invitation" %>
 <% end %>
+
+<% define_content :footer_link do %>
+  <a href="<%= content(:link) %>">
+    <%= t(:click_to_finish_registration, "Click here to finish the registration process") %>
+  </a>
+<% end %>
+
 <% email = asset.user.email; login = (asset.user.pseudonym.unique_id rescue "none") %>
 
 <p>
@@ -35,4 +42,3 @@
 
 <p><%= t(:url_info_label, "You'll need to register with Canvas before you can participate as an account admin.") %></p>
 
-<p><a href="<%= content(:link) %>"><%= t(:click_to_finish_registration, "Click here to finish the registration process") %></a></p>

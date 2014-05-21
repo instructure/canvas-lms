@@ -6,8 +6,12 @@
   <%= t :subject, "Reminder to Assess: %{rubric}, %{context}", :rubric => asset.rubric_association.title, :context => asset.rubric_association.context.name %>
 <% end %>
 
+<% define_content :footer_link do %>
+  <a href="<%= content(:link) %>">
+    <%= t :link_message, "Click here to review the assessment and submit your entry" %>
+  </a>
+<% end %>
+
 <p><%= t :body, "You've been reminded to assess %{rubric}, %{context}:", :rubric => asset.rubric_association.title, :context => asset.rubric_association.context.name %></p>
 
 <p><strong><%= asset.rubric_association.description %></strong></p>
-
-<p><a href="<%= content :link %>"><%= t :link_message, "Click here to review the assessment and submit your entry" %></a></p>

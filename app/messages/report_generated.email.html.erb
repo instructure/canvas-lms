@@ -6,8 +6,12 @@
   <%= t :subject, "Report Generated" %>
 <% end %>
 
+<% define_content :footer_link do %>
+  <a href="<%= content(:link) %>">
+    <%= t :link_message, "Click here to download the report" %>
+  </a>
+<% end %>
+
 <p><strong><%= t :subject, "Report Generated" %></strong></p>
 
 <p><%= asset.message %></p>
-
-<p><a href="<%= content :link %>"><%= t :link_message, "Click here to download the report" %></a></p>

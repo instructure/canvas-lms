@@ -37,11 +37,13 @@ describe ConversationMessage do
       end
 
       @conversation = @teacher.initiate_conversation(@initial_students)
+      user = User.find(@conversation.user_id)
+      @account = Account.find(user.account)
       add_message # need initial message for add_participants to not barf
     end
 
     def add_message(options = {})
-      @conversation.add_message("message", options)
+      @conversation.add_message("message", options.merge(:root_account_id => @account.id))
     end
 
     def add_last_student

@@ -4,29 +4,19 @@
 
 <% define_content :subject do %>
   <%= t :subject, "New Discussion - %{discussion_topic}: %{course}", :discussion_topic => asset.title, :course => asset.context.name %>
+<%end%>
+
+<% define_content :footer_link do %>
+  <a href="<%= content(:link) %>">
+    <%= t :link, "Click here to join the conversation" %>
+  </a>
 <% end %>
 
 <p><%= t :body, "A new discussion has been started that may be interesting to you:" %></p>
 
-<hr style="border: 0;
-    height: 1px;
-    background: #333;
-    background-image: -webkit-linear-gradient(left, #ddd, #aaa, #eee);
-    background-image:    -moz-linear-gradient(left, #ddd, #aaa, #eee);
-    background-image:     -ms-linear-gradient(left, #ddd, #aaa, #eee);
-    background-image:      -o-linear-gradient(left, #ddd, #aaa, #eee);" />
-
 <p><strong><%= asset.title %></strong></p>
 
 <%= html_to_simple_html(asset.message, :base_url => "#{HostUrl.protocol}://#{HostUrl.context_host(asset.context)}") %>
-
-<hr style="border: 0;
-    height: 1px;
-    background: #333;
-    background-image: -webkit-linear-gradient(left, #ddd, #aaa, #eee);
-    background-image:    -moz-linear-gradient(left, #ddd, #aaa, #eee);
-    background-image:     -ms-linear-gradient(left, #ddd, #aaa, #eee);
-    background-image:      -o-linear-gradient(left, #ddd, #aaa, #eee);" />
 
 <% if asset.attachment %>
   <div style="margin-top: 20px; padding: 10px; border: 1px solid #f1f1f1; background-color: #f3f3f3;">
@@ -37,6 +27,3 @@
       </ul>
   </div>
 <% end %>
-
-<p><a href="<%= content :link %>"><%= t :details, "Join the conversation here" %></a></p>
-
