@@ -723,7 +723,6 @@ describe AssignmentsApiController, type: :request do
       @assignment.unlock_at = the_date
       @assignment.peer_reviews_assign_at = the_date
       @assignment.save!
-
       raw_api_update_assignment(@course, @assignment,
                                 {'peer_reviews_assign_at' => '1/1/2013' })
       response.should_not be_success
@@ -899,48 +898,70 @@ describe AssignmentsApiController, type: :request do
       end
     end
 
-    context "when updating assignment overrides on the assignment" do
-      before do
-        course_with_teacher(:active_all => true)
-        student_in_course(:course => @course, :active_enrollment => true)
-        @assignment = @course.assignments.create!
-        @adhoc_due_at = 5.days.from_now
-        @section_due_at = 7.days.from_now
-        @user = @teacher
-        api_update_assignment_call(@course,@assignment,{
-          'name' => 'Assignment With Overrides',
-          'assignment_overrides' => {
-            '0' => {
-              'student_ids' => [@student.id],
-              'title' => 'adhoc override',
-              'due_at' => @adhoc_due_at.iso8601
-            },
-            '1' => {
-              'course_section_id' => @course.default_section.id,
-              'due_at' => @section_due_at.iso8601
+    context "with assignment overrides on the assignment" do
+      describe 'updating assignment overrides' do
+        before do
+          course_with_teacher(:active_all => true)
+          student_in_course(:course => @course, :active_enrollment => true)
+          @assignment = @course.assignments.create!
+          @adhoc_due_at = 5.days.from_now
+          @section_due_at = 7.days.from_now
+          @user = @teacher
+          api_update_assignment_call(@course,@assignment,{
+            'name' => 'Assignment With Overrides',
+            'assignment_overrides' => {
+              '0' => {
+                'student_ids' => [@student.id],
+                'title' => 'adhoc override',
+                'due_at' => @adhoc_due_at.iso8601
+              },
+              '1' => {
+                'course_section_id' => @course.default_section.id,
+                'due_at' => @section_due_at.iso8601
+              }
             }
+          })
+          @assignment.reload
+        end
+
+        it "updates any ADHOC overrides" do
+          @assignment.assignment_overrides.count.should == 2
+          @adhoc_override = @assignment.assignment_overrides.
+            find_by_set_type('ADHOC')
+          @adhoc_override.should_not be_nil
+          @adhoc_override.set.should == [@student]
+          @adhoc_override.due_at_overridden.should be_true
+          @adhoc_override.due_at.to_i.should == @adhoc_due_at.to_i
+        end
+
+        it "updates any CourseSection overrides" do
+          @section_override = @assignment.assignment_overrides.
+            find_by_set_type('CourseSection')
+          @section_override.should_not be_nil
+          @section_override.set.should == @course.default_section
+          @section_override.due_at_overridden.should be_true
+          @section_override.due_at.to_i.should == @section_due_at.to_i
+        end
+      end
+
+      describe "deleting all CourseSection overrides from assignment" do
+        it "works when :assignment_overrides key is nil" do
+          course_with_teacher(:active_all => true)
+          student_in_course(:course => @course, :active_all => true)
+          @assignment = @course.assignments.create!
+          Assignment.where(:id => @assignment).update_all(:created_at => Time.zone.now - 1.day)
+          @section_due_at = 7.days.from_now
+          @params = {
+            'name' => 'Assignment With Overrides',
+            'assignment_overrides' => {}
           }
-        })
-        @assignment.reload
-      end
+          @user = @teacher
 
-      it "updates any ADHOC overrides" do
-        @assignment.assignment_overrides.count.should == 2
-        @adhoc_override = @assignment.assignment_overrides.
-          find_by_set_type('ADHOC')
-        @adhoc_override.should_not be_nil
-        @adhoc_override.set.should == [@student]
-        @adhoc_override.due_at_overridden.should be_true
-        @adhoc_override.due_at.to_i.should == @adhoc_due_at.to_i
-      end
+          @params.has_key?('assignment_overrides').should be_true
 
-      it "updates any CourseSection overrides" do
-        @section_override = @assignment.assignment_overrides.
-          find_by_set_type('CourseSection')
-        @section_override.should_not be_nil
-        @section_override.set.should == @course.default_section
-        @section_override.due_at_overridden.should be_true
-        @section_override.due_at.to_i.should == @section_due_at.to_i
+          api_update_assignment_call(@course, @assignment, @params)
+          @assignment.assignment_overrides.active.count.should == 0
+        end
       end
     end
 

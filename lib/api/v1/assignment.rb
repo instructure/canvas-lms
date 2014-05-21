@@ -259,9 +259,11 @@ module Api::V1::Assignment
     old_assignment = assignment.new_record? ? nil : assignment.clone
     old_assignment.id = assignment.id if old_assignment.present?
 
-    overrides = deserialize_overrides(assignment_params.delete(:assignment_overrides))
-    return if overrides && !overrides.is_a?(Array)
+    overrides = deserialize_overrides(assignment_params[:assignment_overrides])
+    overrides = [] if !overrides && assignment_params.has_key?(:assignment_overrides)
+    assignment_params.delete(:assignment_overrides)
 
+    return if overrides && !overrides.is_a?(Array)
     return false unless valid_assignment_group_id?(assignment, assignment_params)
     return false unless valid_assignment_dates?(assignment, assignment_params)
 
