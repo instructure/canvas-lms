@@ -144,57 +144,134 @@ describe Message do
         end
       end
     end
+  end
 
-    it "should go back to the staged state if sending fails" do
-      message_model(:dispatch_at => Time.now - 1, :workflow_state => 'sending', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user)
-      @message.errored_dispatch
-      @message.workflow_state.should == 'staged'
-      @message.dispatch_at.should > Time.now + 4.minutes
+  it "should go back to the staged state if sending fails" do
+    message_model(:dispatch_at => Time.now - 1, :workflow_state => 'sending', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user)
+    @message.errored_dispatch
+    @message.workflow_state.should == 'staged'
+    @message.dispatch_at.should > Time.now + 4.minutes
+  end
+
+  describe "#deliver" do
+    it "should not deliver if canceled" do
+      message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user, :path_type => 'email')
+      @message.cancel
+      @message.expects(:deliver_via_email).never
+      Mailer.expects(:create_message).never
+      @message.deliver.should be_nil
+      @message.reload.state.should == :cancelled
     end
 
-    describe "#deliver" do
-      it "should not deliver if canceled" do
-        message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user, :path_type => 'email')
-        @message.cancel
-        @message.expects(:deliver_via_email).never
-        Mailer.expects(:create_message).never
-        @message.deliver.should be_nil
-        @message.reload.state.should == :cancelled
-      end
+    it "should log errors and raise based on error type" do
+      message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user, :path_type => 'email')
+      Mailer.expects(:create_message).raises("something went wrong")
+      ErrorReport.expects(:log_exception)
+      expect { @message.deliver }.to raise_exception("something went wrong")
 
-      it "should log errors and raise based on error type" do
-        message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user, :path_type => 'email')
-        Mailer.expects(:create_message).raises("something went wrong")
-        ErrorReport.expects(:log_exception)
-        expect { @message.deliver }.to raise_exception("something went wrong")
+      message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user, :path_type => 'email')
+      Mailer.expects(:create_message).raises(Timeout::Error.new)
+      ErrorReport.expects(:log_exception).never
+      expect { @message.deliver }.to raise_exception(Timeout::Error)
 
-        message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user, :path_type => 'email')
-        Mailer.expects(:create_message).raises(Timeout::Error.new)
-        ErrorReport.expects(:log_exception).never
-        expect { @message.deliver }.to raise_exception(Timeout::Error)
+      message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user, :path_type => 'email')
+      Mailer.expects(:create_message).raises("450 recipient address rejected")
+      ErrorReport.expects(:log_exception).never
+      @message.deliver.should == false
+    end
+  end
 
-        message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user, :path_type => 'email')
-        Mailer.expects(:create_message).raises("450 recipient address rejected")
-        ErrorReport.expects(:log_exception).never
-        @message.deliver.should == false
-      end
+  describe 'contextual messages' do
+    let(:user1){ user_model(short_name: "David Brin") }
+    let(:user2){ user_model(short_name: "Gareth Cutestory") }
+    let(:course){ course_model }
+
+    def build_conversation_message
+      conversation = user1.initiate_conversation([user2])
+      conversation.add_message("Some Long Message")
+    end
+
+    def build_submission
+      assignment = course.assignments.new(:title => "some assignment")
+      assignment.workflow_state = "published"
+      assignment.save
+      valid_attributes = {
+        :assignment_id => assignment.id,
+        :user_id => user1.id,
+        :grade => "1.5",
+        :url => "www.instructure.com"
+      }
+      Submission.create!(valid_attributes)
+    end
+
+    it 'can pull the short_name from the author' do
+      submission = build_submission
+      message = message_model(context: submission)
+      message.author_short_name.should == user1.short_name
     end
 
     describe "infer_defaults" do
       it "should not break if there is no context" do
-        message_model.root_account_id.should be_nil
+        message = message_model
+        message.root_account_id.should be_nil
+        message.root_account.should be_nil
+        message.reply_to_name.should be_nil
       end
 
       it "should not break if the context does not have an account" do
         user_model
-        message_model(:context => @user).root_account_id.should be_nil
+        message = message_model(:context => @user)
+        message.root_account_id.should be_nil
+        message.reply_to_name.should be_nil
       end
 
       it "should populate root_account_id if the context can chain back to a root account" do
-        message_model(:context => course_model).root_account_id.should == Account.default.id
+        message = message_model(:context => course_model)
+        message.root_account.should == Account.default
+      end
+
+      it 'pulls the reply_to_name from the asset_context if there is one' do
+        with_reply_to_name = build_conversation_message
+        without_reply_to_name = course_model
+        message_model(asset_context: without_reply_to_name, context: without_reply_to_name).
+          reply_to_name.should be_nil
+        reply_to_message = message_model(asset_context: with_reply_to_name,
+                                         context: with_reply_to_name,
+                                         notification_name: "Conversation Message")
+        reply_to_message.reply_to_name.should == "#{user1.short_name} via Canvas Notifications"
+      end
+
+      describe ":from_name" do
+        it 'pulls from the asset_context if there is one' do
+          convo_message = build_conversation_message
+          message = message_model(:context => convo_message,
+            :asset_context => convo_message, notification_name: "Conversation Message")
+          message.from_name.should == user1.short_name
+        end
+
+        it "can differentiate when the context and asset_context are different" do
+          submission = build_submission
+          message = message_model(context: submission,
+            asset_context: submission.context, notification_name: "Assignment Submitted")
+          message.from_name.should == submission.user.short_name
+        end
+
+        it 'uses the default host url if the asset context wont override it' do
+          message = message_model()
+          message.from_name.should == HostUrl.outgoing_email_default_name
+        end
+
+        it 'uses the root_account override if there is one' do
+          account = Account.default
+          account.settings[:outgoing_email_default_name] = "OutgoingName"
+          account.save!
+          account.reload.settings[:outgoing_email_default_name].should == "OutgoingName"
+          mesage = message_model(:context => course_model)
+          message.from_name.should == "OutgoingName"
+        end
+
       end
     end
-
   end
 
   describe '.context_type' do

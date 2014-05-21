@@ -17,22 +17,12 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
+require_relative "./messages_helper"
 
 describe 'new_discussion_entry.email' do
-  before do
-    discussion_topic_model
-    @object = @topic.discussion_entries.create!(:user => user_model)
-  end
-  
   it "should render" do
+    discussion_topic_model
+    @object = @topic.discussion_entries.create!(user: user_model)
     generate_message(:new_discussion_entry, :email, @object)
-  end
-
-  it "should use the custom From: setting" do
-    @object.context.root_account.settings[:outgoing_email_default_name] = "Custom From"
-    msg = generate_message(:new_discussion_entry, :email, @object)
-    msg.save
-    msg.from_name.should == "Custom From"
   end
 end

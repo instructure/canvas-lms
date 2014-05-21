@@ -44,10 +44,11 @@ class Message < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   belongs_to :notification
   belongs_to :user
+  belongs_to :root_account, :class_name => 'Account'
   has_many   :attachments, :as => :context
 
   attr_accessible :to, :from, :subject, :body, :delay_for, :context, :path_type,
-    :from_name, :sent_at, :notification, :user, :communication_channel,
+    :from_name, :reply_to_name, :sent_at, :notification, :user, :communication_channel,
     :notification_name, :asset_context, :data, :root_account_id
 
   attr_writer :delayed_messages
@@ -586,12 +587,8 @@ class Message < ActiveRecord::Base
     root_account = context_root_account
     self.root_account_id ||= root_account.try(:id)
 
-    self.from_name = root_account.settings[:outgoing_email_default_name] rescue nil
-    self.from_name = HostUrl.outgoing_email_default_name if from_name.blank?
-    self.from_name = asset_context.name if (asset_context &&
-      !asset_context.is_a?(Account) && asset_context.name &&
-      notification.dashboard? rescue false)
-    self.from_name = from_name if respond_to?(:from_name)
+    self.from_name = infer_from_name
+    self.reply_to_name = message_context.reply_to_name
 
     true
   end
@@ -732,4 +729,27 @@ class Message < ActiveRecord::Base
   def deliver_via_sms
     deliver_via_email
   end
+
+  private
+  def infer_from_name
+    if asset_context
+      return message_context.from_name if message_context.from_name.present?
+      return asset_context.name if can_use_asset_name_for_from?
+    end
+
+    if root_account && root_account.settings[:outgoing_email_default_name]
+      return root_account.settings[:outgoing_email_default_name]
+    end
+
+    HostUrl.outgoing_email_default_name
+  end
+
+  def can_use_asset_name_for_from?
+    !asset_context.is_a?(Account) && asset_context.name && notification.dashboard? rescue false
+  end
+
+  def message_context
+    @_message_context ||= Messages::AssetContext.new(context, notification_name)
+  end
+
 end

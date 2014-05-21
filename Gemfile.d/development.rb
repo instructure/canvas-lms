@@ -5,6 +5,12 @@ group :development do
   gem 'rb-fsevent', :require => false
   gem 'rb-fchange', :require => false
 
+  if CANVAS_RAILS3
+    gem "letter_opener"
+  else
+    gem "letter_opener", :git => 'git://github.com/cavi21/letter_opener.git'
+  end
+
   # Option to DISABLE_RUBY_DEBUGGING is helpful IDE-based debugging.
   # The ruby debug gems conflict with the IDE-based debugger gem.
   # Set this option in your dev environment to disable.
