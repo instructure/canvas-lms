@@ -82,7 +82,9 @@ define([
     var $group = $assignment.parents(".assignment_group");
     var group_data = $group.getTemplateData({textValues: ['default_assignment_name', 'assignment_group_id']});
     var title = group_data.default_assignment_name;
-    title += " " + $group.find(".group_assignment").length;
+    if(title.length <= 251){
+      title += " " + $group.find(".group_assignment").length;
+    }
     var $form = $assignment.find("#add_assignment_form");
     var buttonMsg = "Update";
     var url = $assignment.find(".edit_assignment_link").attr('href');
