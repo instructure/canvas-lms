@@ -581,7 +581,7 @@ class Quizzes::QuizzesController < ApplicationController
   def submission_versions
     if authorized_action(@quiz, @current_user, :read)
       @submission = get_submission
-      @versions   = get_versions
+      @versions   = @submission ? get_versions : []
 
       if @versions.size > 0 && !@quiz.muted?
         render :layout => false

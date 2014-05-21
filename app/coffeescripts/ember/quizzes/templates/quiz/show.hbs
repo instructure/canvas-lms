@@ -91,20 +91,5 @@
     </tbody>
   </table>
 
-  <table class="quiz-table table" id="quiz-attempt-table">
-  </table>
-
-  {{! this is only here for legacy styling to pull in
-    quiz submissions from the server! Confusing id-show above vs
-    id_show should be removed soon! }}
-  <div id="quiz_show">
-    {{#if didLoadQuizSubmissionHTML}}
-      {{{quizSubmissionHTML.html}}}
-    {{else}}
-      <div id='ember-loading'>
-        <img src='/images/ajax-loader-medium-444.gif' />
-        {{#t 'loading'}}Loading{{/t}}
-      </div>
-    {{/if}}
-  </div>
+  {{partial "quiz/legacy_submissions"}}
 </div>

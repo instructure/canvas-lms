@@ -22,6 +22,8 @@ define [
     RSVP.all promises
 
   QuizController = Ember.ObjectController.extend
+    legacyQuizSubmissionVersionsReady: Ember.computed.and('quizSubmissionVersionsHtml', 'didLoadQuizSubmissionVersionsHtml')
+
     disabledMessage: I18n.t('cant_unpublish_when_students_submit', "Can't unpublish if there are student submissions")
 
     # preserve 'publishing' state by not directly binding to published attr
