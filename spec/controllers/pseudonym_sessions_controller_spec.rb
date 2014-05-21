@@ -745,6 +745,7 @@ describe PseudonymSessionsController do
       user_with_pseudonym(account: Account.site_admin)
       stubby("yes\n#{@pseudonym.unique_id}\n")
       account_with_cas(account: Account.site_admin)
+      controller.cas_client.expects(:add_service_to_login_url).returns('someurl')
 
       cookies['canvas_sa_delegated'] = '1'
       # *don't* stub domain_root_account
