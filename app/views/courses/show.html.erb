@@ -140,20 +140,28 @@
   <%= render :partial => 'shared/dashboard_invitation', :object => @pending_enrollment %>
 <% end %>
 
-<% if @context.feature_enabled?(:draft_state) %>
+<% if @context.feature_enabled?(:draft_state)
+     has_front_page = @context.wiki && @context.wiki.has_front_page? %>
   <% content_for :right_side do %>
     <div id="edit_course_home_content" style="display: none;">
       <h2><%= t('draft_state.headings.set_layout', %{Set Home Page Layout}) %></h2>
       <%= form_for :course, :url => context_url(@context, :context_url), :html => {:tabindex=>"0", :'data-turn-into-dialog'=>'{"height": 300, "width":500,"modal":true}', :title=>t('headings.choose_home_page_title', %{Choose Home Page}), :style => "display:none", :id => "edit_course_home_content_form", :method => :put} do |f| %>
-        <label for="edit_course_home_content_select"><%= t('draft_state.labels.select_content', %{Select what you'd like to display on the homepage.}) %></label>
-        <br>
-        <select name="course[default_view]" id="edit_course_home_content_select">
-          <option value="feed" <%= 'selected' if @context.default_view == 'feed' %>><%= t('draft_state.options.recent_activity_dashboard', %{Recent Activity Dashboard}) %></option>
-          <option value="wiki" <%= 'selected' if @context.default_view == 'wiki' %>><%= t('draft_state.options.custom_page', %{Pages Front Page}) %></option>
-          <option value="modules" <%= 'selected' if @context.default_view == 'modules' %>><%= t('draft_state.options.modules', %{Course Modules}) %></option>
-          <option value="assignments" <%= 'selected' if @context.default_view == 'assignments' %>><%= t('draft_state.options.assignments', %{Assignments List}) %></option>
-          <option value="syllabus" <%= 'selected' if @context.default_view == 'syllabus' %>><%= t('draft_state.options.syllabus', %{Syllabus}) %></option>
-        </select>
+        <label for="edit_course_home_content_select"><%= t('draft_state.labels.select_content', %{Select what you'd like to display on the home page.}) %></label>
+
+        <div class="form_group"><label class="radio"><input type="radio" name="course[default_view]" value="feed" <%= 'checked' if @context.default_view == 'feed' || (!has_front_page && @context.default_view == 'wiki') %>><%= t('draft_state.options.recent_activity_dashboard', %{Recent Activity Dashboard}) %></label></div>
+        <div class="form_group">
+          <label class="radio"><input type="radio" name="course[default_view]" value="wiki" <%= 'checked' if has_front_page && @context.default_view == 'wiki' %><%= 'disabled' unless has_front_page %>>
+            <span class="<%= 'ui-state-disabled' unless has_front_page %>"><%= t('draft_state.options.custom_page', %{Pages Front Page}) %></span></label>
+          <% if has_front_page %>
+            <small>&emsp;<%= @context.wiki.front_page.title %>&emsp;[ <%= link_to t('change_home_page', 'Change'), context_url(@context, :context_pages_url) %> ]</small>
+          <% else %>
+            <small>&emsp;[ <%= link_to t('front_page_not_set', 'Front page must be set first'), context_url(@context, :context_pages_url) %> ]</small>
+          <% end %>
+        </div>
+        <div class="form_group"><label class="radio"><input type="radio" name="course[default_view]" value="modules" <%= 'checked' if @context.default_view == 'modules' %>><%= t('draft_state.options.modules', %{Course Modules}) %></label></div>
+        <div class="form_group"><label class="radio"><input type="radio" name="course[default_view]" value="assignments" <%= 'checked' if @context.default_view == 'assignments' %>><%= t('draft_state.options.assignments', %{Assignments List}) %></label></div>
+        <div class="form_group"><label class="radio"><input type="radio" name="course[default_view]" value="syllabus" <%= 'checked' if @context.default_view == 'syllabus' %>><%= t('draft_state.options.syllabus', %{Syllabus}) %></label></div>
+
         <div class="button-container">
           <a type="button" class="btn button-secondary dialog_closer"><%= t('draft_state.buttons.cancel', %{Cancel}) %></a>
           <button type="submit" class="btn btn-primary"><%= t('draft_state.buttons.update_layout', %{Save}) %></button>
