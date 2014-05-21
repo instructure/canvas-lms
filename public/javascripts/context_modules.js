@@ -266,7 +266,7 @@ define([
           $form.attr('method', 'PUT');
           $form.find(".submit_button").text(I18n.t('buttons.update', "Update Module"));
         }
-        $form.find("#unlock_module_at").prop('checked', data.unlock_at);
+        $form.find("#unlock_module_at").prop('checked', data.unlock_at).change()
         $form.find("#require_sequential_progress").attr('checked', data.require_sequential_progress == "true" || data.require_sequential_progress == "1");
         $form.find("#publish_final_grade").attr('checked', data.publish_final_grade == "true" || data.publish_final_grade == "1");
         $form.find(".prerequisites_entry").showIf($("#context_modules .context_module").length > 1);
@@ -489,13 +489,20 @@ define([
       modules: modules
     });
 
+    var $context_module_unlocked_at = $("#context_module_unlock_at");
+    var valCache = '';
     $("#unlock_module_at").change(function() {
       $this = $(this);
-      $unlock_module_at_details = $(".unlock_module_at_details");
-      $unlock_module_at_details.showIf($this.attr('checked'))
+      var $unlock_module_at_details = $(".unlock_module_at_details");
+      $unlock_module_at_details.showIf($this.attr('checked'));
 
-      if (!$this.attr('checked')) {
-        $("#context_module_unlock_at").val('').triggerHandler('change');
+      if ($this.attr('checked')) {
+        if(!$context_module_unlocked_at.val()){
+          $context_module_unlocked_at.val(valCache);
+        }
+      }else{
+        valCache = $context_module_unlocked_at.val();
+        $context_module_unlocked_at.val('').triggerHandler('change');
       }
     }).triggerHandler('change');
 
