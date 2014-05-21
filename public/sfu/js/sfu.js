@@ -149,6 +149,7 @@
     utils.onPage(/^\/(courses)?$/, function () {
         // Add the button right after the existing Start a New Course button
         var addAdHocButton = function () {
+            return; // TODO: Remove this line when Ad Hoc Spaces are ready
             var $courseButton = $('#start_new_course');
             var $adhocButton = $courseButton.clone();
             $adhocButton
