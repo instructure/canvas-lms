@@ -1834,7 +1834,7 @@ class Attachment < ActiveRecord::Base
 
         new_attachment = Attachment.new
         new_attachment.assign_attributes(attachment.attributes.except(*EXCLUDED_COPY_ATTRIBUTES), :without_protection => true)
-        
+
         new_attachment.context = to_context
         new_attachment.folder = Folder.assert_path(attachment.folder_path, to_context)
         new_attachment.namespace = new_attachment.infer_namespace
@@ -1844,6 +1844,8 @@ class Attachment < ActiveRecord::Base
           new_attachment.write_attribute(:filename, attachment.filename)
           new_attachment.uploaded_data = attachment.open
         end
+
+        new_attachment.content_type = attachment.content_type
 
         new_attachment.save_without_broadcasting!
         if match

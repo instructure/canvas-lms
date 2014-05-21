@@ -681,6 +681,8 @@ describe UserMerge do
       # should copy as a root_attachment (even though it isn't one currently)
       user1_attachment3 = Attachment.create!(:user => user1, :context => user1, :filename => "unique_name2.txt",
                                              :uploaded_data => StringIO.new("root_attachment_data"))
+      user1_attachment3.content_type = "text/plain"
+      user1_attachment3.save!
       user1_attachment3.root_attachment.should == root_attachment
 
       @shard1.activate do
@@ -709,6 +711,7 @@ describe UserMerge do
 
       new_user2_attachment2 = @user2.attachments.not_deleted.detect{|a| a.md5 == user1_attachment3.md5}
       new_user2_attachment2.root_attachment.should be_nil
+      new_user2_attachment2.content_type.should == "text/plain"
     end
 
     context "manual invitation" do
