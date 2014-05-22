@@ -29,7 +29,7 @@ class Account < ActiveRecord::Base
     :enable_user_notes, :allowed_services, :turnitin_pledge, :turnitin_comments,
     :turnitin_account_id, :allow_sis_import, :sis_source_id, :equella_endpoint,
     :settings, :uuid, :default_locale, :default_user_storage_quota, :turnitin_host,
-    :created_by_id, :lti_guid, :default_group_storage_quota
+    :created_by_id, :lti_guid, :default_group_storage_quota, :lti_context_id
   ]
 
   EXPORTABLE_ASSOCIATIONS = [

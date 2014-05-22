@@ -152,6 +152,26 @@ describe Api do
         end
       end
     end
+
+    it "should find user by lti_context_id" do
+      @user.lti_context_id = Canvas::Security.hmac_sha1(@user.asset_string.to_s, 'key')
+      @user.save!
+      @api.api_find(User, "lti_context_id:#{@user.lti_context_id}").should == @user
+    end
+
+    it "should find course by lti_context_id" do
+      lti_course = course
+      lti_course.lti_context_id = Canvas::Security.hmac_sha1(lti_course.asset_string.to_s, 'key')
+      lti_course.save!
+      @api.api_find(Course, "lti_context_id:#{lti_course.lti_context_id}").should == lti_course
+    end
+
+    it "should find account by lti_context_id" do
+      account = Account.create!(name: 'account')
+      account.lti_context_id = Canvas::Security.hmac_sha1(account.asset_string.to_s, 'key')
+      account.save!
+      @api.api_find(Account, "lti_context_id:#{account.lti_context_id}").should == account
+    end
   end
 
   context 'api_find_all' do

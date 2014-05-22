@@ -689,4 +689,23 @@ describe ContextExternalTool do
       expect { ContextExternalTool.find_for("horseshoes", @course, :course_navigation) }.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
+
+  describe "opaque_identifier_for" do
+    it "should create lti_context_id for asset" do
+      @course.lti_context_id.should == nil
+      @tool = @course.context_external_tools.create!(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+      context_id = @tool.opaque_identifier_for(@course)
+      @course.reload
+      @course.lti_context_id.should == context_id
+    end
+
+    it "should not create new lti_context for asset if exists" do
+      @course.lti_context_id =  'dummy_context_id'
+      @course.save!
+      @tool = @course.context_external_tools.create!(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+      context_id = @tool.opaque_identifier_for(@course)
+      @course.reload
+      @course.lti_context_id.should == 'dummy_context_id'
+    end
+  end
 end

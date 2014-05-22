@@ -541,13 +541,35 @@ class ContextExternalTool < ActiveRecord::Base
 
   def self.opaque_identifier_for(asset, shard)
     shard.activate do
-      str = asset.asset_string.to_s
-      raise "Empty value" if str.blank?
-      Canvas::Security.hmac_sha1(str, shard.settings[:encryption_key])
+      lti_context_id = context_id_for(asset, shard)
+      set_asset_context_id(asset, lti_context_id)
     end
   end
 
   private
+
+  def self.set_asset_context_id(asset, context_id)
+    lti_context_id = context_id
+    if asset.respond_to?('lti_context_id')
+      if asset.new_record?
+        asset.lti_context_id = context_id
+      else
+        asset.reload unless asset.lti_context_id?
+        unless asset.lti_context_id
+          asset.lti_context_id = context_id
+          asset.save!
+        end
+        lti_context_id = asset.lti_context_id
+      end
+    end
+    lti_context_id
+  end
+
+  def self.context_id_for(asset, shard)
+    str = asset.asset_string.to_s
+    raise "Empty value" if str.blank?
+    Canvas::Security.hmac_sha1(str, shard.settings[:encryption_key])
+  end
 
   def tool_setting(setting, hash, *keys)
     if !hash || !hash.is_a?(Hash)
