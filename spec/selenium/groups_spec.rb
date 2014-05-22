@@ -24,6 +24,30 @@ describe "groups" do
     @student.group_memberships.first.should be_accepted
   end
 
+  it "should allow student group leaders to edit the group name" do
+    course_with_student_logged_in(:active_all => true)
+    category1 = @course.group_categories.create!(:name => "category 1")
+    category1.configure_self_signup(true, false)
+    category1.save!
+    g1 = @course.groups.create!(:name => "some group", :group_category => category1)
+
+    g1.add_user @student
+    g1.leader = @student
+    g1.save!
+
+    get "/groups/#{g1.id}"
+    wait_for_ajaximations
+
+    keep_trying_until do
+      f('#edit_group').click
+      set_value f('#group_name'), "new group name"
+      f('#ui-id-2').find_element(:css, 'button[type=submit]').click
+      wait_for_ajaximations
+    end
+
+    g1.reload.name.should == "new group name"
+  end
+
   it "should allow students to join student organized open groups" do
     course_with_student_logged_in(:active_all => true)
     g1 = @course.groups.create!(:name => "my group", :join_level => "parent_context_auto_join")

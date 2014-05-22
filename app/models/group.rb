@@ -629,4 +629,5 @@ class Group < ActiveRecord::Base
       create_discussion_topic: DiscussionTopic.context_allows_user_to_create?(self, user, session)
     )
   end
+
 end

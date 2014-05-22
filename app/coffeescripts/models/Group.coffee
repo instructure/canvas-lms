@@ -67,6 +67,9 @@ define [
       @collection?.category?.isLocked()
 
     toJSON: ->
-      json = super
-      json.isFull = @isFull()
-      json
+      if ENV.student_mode
+        {name: @get('name')}
+      else
+        json = super
+        json.isFull = @isFull()
+        json
