@@ -31,7 +31,7 @@ module Polling
       given do |user, session|
         self.poll.grants_right?(user, session, :update)
       end
-      can :create and can :delete and can :publish
+      can :read and can :create and can :delete and can :publish
 
       given do |user, session|
         self.cached_context_grants_right?(user, session, :read) &&

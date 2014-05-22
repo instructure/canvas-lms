@@ -112,6 +112,7 @@ module Polling
       if params[:poll_session] && course_id = params[:poll_session].delete(:course_id)
         @course = Course.find(course_id)
       end
+
       raise ActiveRecord::RecordNotFound.new(I18n.t("polling.poll_sessions.errors.course_required", "Course is required.")) unless @course
 
       @poll_session = @poll.poll_sessions.new(params[:poll_session])

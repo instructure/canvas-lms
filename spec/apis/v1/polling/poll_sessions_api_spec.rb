@@ -90,6 +90,13 @@ describe Polling::PollSessionsController, type: :request do
     end
 
     context "as a teacher" do
+      it "retrieves the poll session specified even if closed" do
+        @poll_session.close!
+        json = get_show
+        json['id'].should == @poll_session.id.to_s
+        json['is_published'].should be_false
+      end
+
       it "shows the results of a current poll session" do
         choice1 = @poll.poll_choices.create!(text: 'Choice A', is_correct: true)
         choice2 = @poll.poll_choices.create!(text: 'Choice B', is_correct: false)
@@ -162,9 +169,10 @@ describe Polling::PollSessionsController, type: :request do
 
     context "as a teacher" do
       it "creates a poll session successfully" do
-        post_create(course_section_id: @section.id, course_id: @course.id)
+        post_create(course_section_id: @section.id, course_id: @course.id, has_public_results: true)
         @poll.poll_sessions.size.should == 1
         @poll.poll_sessions.first.course_section.should == @section
+        @poll.poll_sessions.first.has_public_results.should be_true
       end
     end
   end
