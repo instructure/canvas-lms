@@ -45,6 +45,14 @@ module Quizzes
     has_many :submitted_students, embed: :ids, root: :submitted_students
     has_many :unsubmitted_students, embed: :ids, root: :unsubmitted_students
 
+    def serialize_ids(association)
+      if (association.name == 'student_quiz_submissions')
+        send(:student_quiz_submissions_url)
+      else
+        super association
+      end
+    end
+
     def quiz_submission
       @quiz_submission ||= if @self_quiz_submissions
         @self_quiz_submissions[quiz.id]

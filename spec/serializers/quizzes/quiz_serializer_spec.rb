@@ -254,20 +254,36 @@ describe Quizzes::QuizSerializer do
 
     describe "student_quiz_submissions" do
 
-      it "sends the url for all submissions when user may grade" do
-        course_with_teacher_logged_in(active_all: true)
-        quiz_with_graded_submission([], course: @course)
-        serializer = quiz_serializer(scope: @teacher)
-        serializer.as_json[:quiz]['links']['student_quiz_submissions'].should ==
-          controller.send(:api_v1_course_quiz_submissions_url, @quiz.context.id, @quiz.id)
+      context "when user may grade" do
+
+        it "sends the url for all submissions" do
+          course_with_teacher_logged_in(active_all: true)
+          quiz_with_graded_submission([], course: @course)
+          serializer = quiz_serializer(scope: @teacher)
+          serializer.as_json[:quiz]['links']['student_quiz_submissions'].should ==
+            controller.send(:api_v1_course_quiz_submissions_url, @quiz.context.id, @quiz.id)
+        end
+
+        it "sends the url when no student_quiz_submissions are present" do
+          course_with_teacher_logged_in(active_all: true)
+          serializer = quiz_serializer(scope: @teacher)
+          serializer.as_json[:quiz]['links']['student_quiz_submissions'].should ==
+            controller.send(:api_v1_course_quiz_submissions_url, @quiz.context.id, @quiz.id)
+        end
+
       end
 
-      it "sends nil unless the user can grade" do
-        course_with_student_logged_in(active_all: true)
-        quiz_with_graded_submission([], user: @student, course: @course)
-        serializer = quiz_serializer(scope: @student)
-        serializer.as_json[:quiz]['links']['student_quiz_submissions'].should be_nil
+      context "when user may not grade" do
+
+        it "sends nil" do
+          course_with_student_logged_in(active_all: true)
+          quiz_with_graded_submission([], user: @student, course: @course)
+          serializer = quiz_serializer(scope: @student)
+          serializer.as_json[:quiz]['links']['student_quiz_submissions'].should be_nil
+        end
+
       end
+
     end
 
     describe "quiz_submission" do
