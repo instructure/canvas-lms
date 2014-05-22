@@ -12,3 +12,9 @@ define [ 'ember', '../mixins/redirect' ], (Ember, Redirect) ->
         # load the reports, we need these to be able to generate if requested
         quiz.get('quizReports').then ->
           latestStatistics
+
+    actions:
+      showDiscriminationIndexHelp: ->
+        @render 'quiz/statistics/questions/multiple_choice/discrimination_index_help',
+          into: 'application'
+          outlet: 'modal'

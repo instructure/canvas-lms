@@ -27,6 +27,11 @@ define [
       @set('questionStatistics.sortProperties', properties)
       @set('questionStatistics.sortAscending', asc)
 
+    discriminationIndexHelpDialogTitle: (->
+      I18n.t('discrimination_index_help_dialog_title',
+        'The Discrimination Index Chart')
+    ).property()
+
     actions:
       showAllDetails: ->
         @set('allDetailsVisible', !@get('allDetailsVisible'))
