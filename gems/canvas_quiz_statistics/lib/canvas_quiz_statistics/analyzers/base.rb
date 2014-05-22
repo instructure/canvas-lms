@@ -16,6 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 require 'canvas_quiz_statistics/analyzers/base/dsl'
+require 'canvas_quiz_statistics/analyzers/base/constants'
 
 module CanvasQuizStatistics::Analyzers
   class Base

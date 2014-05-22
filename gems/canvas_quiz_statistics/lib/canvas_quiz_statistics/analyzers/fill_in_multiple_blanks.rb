@@ -36,11 +36,7 @@ module CanvasQuizStatistics::Analyzers
   # }
   # ```
   class FillInMultipleBlanks < Base
-    UnknownAnswerKey = 'other'
-    UnknownAnswerText = 'Other'
-    MissingAnswerKey = 'none'
-    MissingAnswerText = 'No Answer'
-    FalseLike = [ 'nil', 'null', 'false', '' ]
+    include Base::Constants
 
     # Number of students who have filled at least one blank.
     #
