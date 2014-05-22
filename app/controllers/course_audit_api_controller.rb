@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013 Instructure, Inc.
+# Copyright (C) 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -29,9 +29,9 @@
 # are also included.
 #
 # The event data for `ConcludedEventData`, `UnconcludedEventData`, `PublishedEventData`,
-# `UnpublishedEventData`, `DeletedEventData`, `RestoredEventData`, `CopiedFromEventData`,
-# and `CopiedToEventData` objects will return a empty objects as these do not have
-# any additional log data associated.
+# `UnpublishedEventData`, `DeletedEventData`, `RestoredEventData`, `ResetFromEventData`,
+# `ResetToEventData`, `CopiedFromEventData`, and `CopiedToEventData` objects will
+# return a empty objects as these do not have any additional log data associated.
 #
 # @model CourseEventLink
 #     {
