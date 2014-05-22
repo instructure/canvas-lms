@@ -193,19 +193,66 @@ Multiple Dropdown question statistics look just like the statistics for [Fill In
 
 ```javascript
 {
-  // TODO
-  "matching_answer_incorrect_matches": null,
-  // TODO
-  "matches": null,
-  // TODO
-  "multiple_answers": null
+  // Number of students who have matched at least one answer.
+  "responses": 2,
+
+  // Number of students who have matched all answers.
+  "answered": 2,
+
+  // Number of students who have matched all answers correctly with their
+  // right-hand sides.
+  "correct": 1,
+
+  // Number of students who have matched one or more answers correctly
+  // with their right-hand sides.
+  "partially_correct": 0,
+
+  // Number of students who have not matched any answer with their correct
+  // right-hand side.
+  "incorrect": 1,
+
+  // Each entry in the answer set represents the left-hand side of the match
+  // along with all the possible matches on the right-side
+  "answer_sets": [
+    {
+      // id of the answer
+      "id": "1",
+      // the left-hand side of the match
+      "text": "What does the color red look like?",
+      // the available matches
+      "answers": [
+        // Students who chose this match for this answer set:
+        {
+          // match_id
+          "id": "9711",
+          // right-hand side of the match
+          "text": "Red",
+          "responses": 3,
+          "correct": true
+        },
+        // Students who chose an incorrect match:
+        {
+          "id": "2700",
+          "text": "Blue",
+          "responses": 0,
+          "correct": false
+        },
+        // Students who did not make any match:
+        {
+          "id": "none",
+          "text": "No Answer",
+          "responses": 1,
+          "correct": false
+        }
+      ]
+    }
+  ]
 }
 ```
 
 #### File Upload
 
 File Upload question statistics look just like the statistics for [Essays](#essay-question-stats).
-
 
 #### Formula
 

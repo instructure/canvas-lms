@@ -15,26 +15,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-module CanvasQuizStatistics::Analyzers
-  class MultipleDropdowns < FillInMultipleBlanks
-    inherit_metrics :fill_in_multiple_blanks
-
-    private
-
-    def analyze_response_for_blank(response, blank, answer_set)
-      answer_id = response.fetch(answer_key(blank), nil).to_s
-
-      answer = if answer_id.present?
-        answer_set[:answers].detect { |a| "#{a[:id]}" == answer_id }
-      end
-
-      answer ||= generate_incorrect_answer({
-        id: MissingAnswerKey,
-        text: MissingAnswerText,
-        in: answer_set
-      })
-
-      answer[:responses] += 1 if answer.present?
-    end
-  end
+module CanvasQuizStatistics::Analyzers::Base::Constants
+  UnknownAnswerKey = 'other'
+  UnknownAnswerText = 'Other'
+  MissingAnswerKey = 'none'
+  MissingAnswerText = 'No Answer'
+  FalseLike = [ 'nil', 'null', 'false', '' ]
 end

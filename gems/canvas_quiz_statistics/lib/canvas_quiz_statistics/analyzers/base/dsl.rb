@@ -76,10 +76,51 @@ module CanvasQuizStatistics::Analyzers::Base::DSL
   #   end
   #
   def inherit_metrics(question_type)
-    self.metrics[self.question_type] += self.metrics[question_type].clone
+    self.metrics[self.question_type] += self.metrics_for(question_type).clone
+  end
+
+  # Inherit one or more metrics from another question type.
+  #
+  # @param [Array<Symbol>] metric_keys
+  # The keys of the metrics as they were defined in the origin question.
+  #
+  # @param [Hash] options
+  # @param [Symbol] options[:from]
+  # The origin analyzer class you want to inherit from.
+  #
+  # Example:
+  #
+  #   module CanvasQuizStatistics::Analyzers
+  #     class Matching < Base
+  #       inherit :correct, :incorrect, from: :fill_in_multiple_blanks
+  #     end
+  #   end
+  #
+  def inherit(*metric_keys, options)
+    metrics = self.metrics_for(options[:from])
+    metric_keys.each do |metric_key|
+      metric = metrics.detect do |metric|
+        metric[:key] == metric_key
+      end
+
+      unless metric.present?
+        raise "Metric #{metric_key} could not be found in #{options[:from]}"
+      end
+
+      self.metrics[self.question_type] << metric
+    end
   end
 
   def metrics
     @@metrics ||= Hash.new { |hsh, key| hsh[key] = [] }
+  end
+
+  protected
+
+  def metrics_for(question_type)
+    target = question_type.to_s
+    target = "#{target}_question" unless target =~ /_question$/
+
+    self.metrics[target.to_sym]
   end
 end

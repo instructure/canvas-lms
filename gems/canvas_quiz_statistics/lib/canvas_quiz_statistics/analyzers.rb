@@ -47,4 +47,5 @@ module CanvasQuizStatistics::Analyzers
   require 'canvas_quiz_statistics/analyzers/multiple_dropdowns'
   require 'canvas_quiz_statistics/analyzers/file_upload'
   require 'canvas_quiz_statistics/analyzers/calculated'
+  require 'canvas_quiz_statistics/analyzers/matching'
 end

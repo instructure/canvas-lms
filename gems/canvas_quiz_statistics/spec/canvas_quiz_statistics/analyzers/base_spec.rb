@@ -87,5 +87,29 @@ describe CanvasQuizStatistics::Analyzers::Base do
         unset Apple, Orange
       end
     end
+
+    describe '#inherit' do
+      it 'should inherit a metric from another question type' do
+        class Apple < Base
+          metric :something do |responses|
+            responses.size
+          end
+        end
+
+        class Orange < Apple
+          inherit :something, from: :apple
+
+          metric :something_else do |responses|
+            responses.size
+          end
+        end
+
+        Apple.new({}).run([{}]).should == { something: 1 }
+        Orange.new({}).run([{}]).should == { something: 1, something_else: 1 }
+
+        unset Apple, Orange
+      end
+    end
+
   end
 end
