@@ -161,7 +161,7 @@ ja:
         pass: パスワード
         user: ユーザ名
       ldap_test_login_button: "テスト ログイン"
-      test_ldap_bind_help_body: "LDAP サーバによってバインドの試みが拒否されました。考慮事項は、次のとおりです。"
+      test_ldap_bind_help_body: "LDAP サーバによってバインドの試みが拒否されました。次の点を検討してください。"
       test_ldap_bind_help_fixes_1: "提供されたフィルタ文字列 (つまり、'(sAMAccountName={{login}})') を確認します。"
       test_ldap_bind_help_fixes_2: "ユーザ名に、その他のスコープ情報が必要ですか?(つまり、'cn=Canvas,ou=people,dc=example,dc=com')。"
       test_ldap_bind_help_header: "Canvas が LDAP サーバにバインド (ログイン) できません"
@@ -505,7 +505,7 @@ ja:
       account_reports: 
         granite: 
           assignme_score_summary: 
-            text: このレポートでは、選択された日付の間に採点されたすべての課題のスコアが示されます
+            text: このレポートには、選択された日付の間に採点されたすべての課題のスコアが表示されます
           description: 
             header: 例
     avatars: 
@@ -4879,9 +4879,9 @@ ja:
         confirm_unenroll: "このコースへの登録を解除してもよろしいですか?コース名簿の表示や、講師との直接の通信はできなくなります。また、コース イベントをストリームに表示したり、お知らせを受け取ったりすることもできなくなります。"
         custom_page: "**ご自身のコースのホーム ページを設計** して、リンク、画像、リッチ メディアなど、好きなものを何でも含めることができます。"
         modules: |-
-            ご自分のコースは **モジュールまたはセクション** に編成できます。それぞれのセクションには、関連するファイル、課題、ページなどをセットにして含めます。必要であれば、それぞれのモジュールをロック解除するにあたって満たさなければならない基準や前提条件を定義して、モジュールを連続ものに仕立てることもできます。
+            コースを **モジュールまたはセクション** に編成できます。それぞれのセクションには、関連するファイル、課題、ページなどをセットにして含めます。必要であれば、それぞれのモジュールをロック解除するための基準や前提条件を定義して、モジュールの順序を制御することもできます。
             
-            -このレイアウトはおそらく、期間や学期などの特定のスケジュールに基づいていないコースに最適です。
+            -このレイアウトは、多くの場合、期間や学期などの特定のスケジュールに基づいていないコースに最適です。
         recent_activity_dashboard: "**最近のアクティビティ ダッシュボード** には、このコースでの最近の会話、アナウンス、ディスカッション、交流などが表示されます。ユーザが最初にログインしたときに表示されるダッシュボード ページと非常によく似ていますが、ここで表示されるのはこのコースのコンテンツのみです。"
         syllabus: "**要綱ビュー** には、リンクや画像などを使用してコースの前提やコースの紹介を記述できます。また、課題やコース イベントを網羅したカレンダー ビューを表示するもできます。"
       draft_state: 
@@ -6234,7 +6234,7 @@ ja:
     google_docs_domain_restriction: "Google ドキュメントのドメイン制限"
     high_contrast: "ハイ コントラスト スタイルを使用"
     individual_gradebook: 個別の成績表ビュー
-    learning_mastery_gradebook: 学習の達成度の成績表
+    learning_mastery_gradebook: 学習達成度の成績表
     new_styles: 新しいスタイルの使用
     post_grades: "成績表を SIS に投稿"
     student_outcome_gradebook: 受講生成果成績表
@@ -7758,10 +7758,7 @@ ja:
       view_all_groups: すべてのグループを表示
     mobile_auth: 
       log_in_to_canvas: "Canvas へのログイン"
-  learning_mastery_gradebook_description: |-
-      講師は、学習の達成度の成績表を使用して、コース学習成果の受講生およびコース進捗を簡単に表示
-      できます。成果は成績表のような形式で表示され、受講生の進捗が数字のスコアおよび達成/ほぼ
-      達成/補習として表示されます。
+  learning_mastery_gradebook_description: 講師は、学習の達成度の成績表を使用して、コース学習成果における受講生およびコースの進捗を簡単に表示できます。成果は成績表のような形式で表示され、受講生の進捗が、数字のスコアや達成/ほぼ達成/補習として表示されます。
   learning_outcome: 
     no_comment: コメントなし
     no_description: 説明なし
@@ -8626,7 +8623,7 @@ ja:
       email: 
         details: "登録のプロセスを完了するには、次の URL にアクセスしてください:"
         html: 
-          body: "%{product_name} にご登録いただき誠にありがとうございます!この電子メールは、「%{user}」さんが %{website} で新しいアカウントを登録中であることの確認です。"
+          body: "%{product_name} にご登録いただき誠にありがとうございます! この電子メールは、「%{user}」さんが %{website} で新しいアカウントを登録中であることの確認です。"
           details: 登録プロセスを完了するにはここをクリック
           subject: "登録の確認: %{product_name}"
     confirm_sms_communication_channel: 
@@ -9889,10 +9886,10 @@ ja:
       back_to_modules: "モジュール ページに戻る"
       no_students_found: 受講生が見つかりませんでした
       student_progress: 受講生の進捗
-  moodle_dropdown_many_warning_title: "このバンクの %{count} 件の複数ドロップダウン問題が正しくインポートされていない可能性があります"
+  moodle_dropdown_many_warning_title: "このバンクの %{count} 件の複数ドロップダウン問題が、正しくインポートされていない可能性があります"
   moodle_dropdown_warning_title: 複数のドロップダウン問題が正しくインポートされていない可能性があります
-  moodle_formula_many_warning_title: "このバンクの %{count} 件の数式問題は、考えられる解答を再生成する必要があります"
-  moodle_formula_warning_title: 数式問題の考えられる解答を再生成する必要があります
+  moodle_formula_many_warning_title: "このバンクの %{count} 件の数式問題について、考えられる解答を再生成する必要があります"
+  moodle_formula_warning_title: 数式問題について、考えられる解答を再生成する必要があります
   move_dialog: 
     cancel: キャンセル
     save: 保存
@@ -9914,7 +9911,7 @@ ja:
   new_facebook_message: "Canvas からの新しいメッセージがあります"
   new_styles_description: |-
       現在、Canvas の UI の改善に取り組んでいます。シンプルな外観の新しい
-      Canvas インターフェイスがリリースされたときに通知をご希望の場合は、これをオンにします。
+      Canvas インターフェイスがリリースされたときに通知をご希望の場合は、これをオンにしてください。
   no_migration_file: コンテンツ移行にはファイルが必要です。
   not_a_number: 正の数字を使用する必要があります
   not_applicable: N/A
@@ -10642,9 +10639,9 @@ ja:
         api_url: "API の URL"
         secret_key: シークレット鍵
   post_grades_description: |-
-      講師は、成績表を投稿することにより、Powerschool、Aspire (SIS2000)、JMC、および GradingCategory、
-      GradingAssignment、GradingAssignmentScore の各 SIF 要素を受け入れるその他任意の SIF 対応 SIS システムに
-      成績を戻すことができます。
+      講師は成績表を投稿することで、有効な SIS システムに
+      成績を戻すことができます (Powerschool、Aspire (SIS2000)、JMC など、GradingCategory、
+      GradingAssignment、GradingAssignmentScore といった各 SIF 要素を受け入れる任意の SIF 対応 SIS システムを使用できます)。
   prerequisites_lookup: 
     headers: 
       completion_prerequisites: 完了の前提条件
@@ -11086,7 +11083,7 @@ ja:
       points_possible_screen_reader: "配点 %{pointsPossible}"
       settings: 課題の編集
     assignment_list_item_score: 
-      assignment_grading_type_is_not_graded: この課題には成績は割り当てられません。
+      assignment_grading_type_is_not_graded: この課題には成績を割り当てられません。
       assignment_not_yet_graded_screenreader: "課題はまだ採点されていません。配点は %{pointsPossible} です。"
       empty_points_possible: "-/%{pointsPossible} 点"
       no_submission: 提出なし
