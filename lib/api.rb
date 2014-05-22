@@ -63,7 +63,6 @@ module Api
         end
       end
     end
-
     find_params = Api.sis_find_params_for_collection(collection, ids, options[:account] || @domain_root_account, @current_user)
     return [] if find_params == :not_found
     find_params[:limit] = options[:limit] unless options[:limit].nil?
@@ -91,7 +90,7 @@ module Api
 
   SIS_MAPPINGS = {
     'courses' =>
-      { :lookups => { 'sis_course_id' => 'sis_source_id', 'id' => 'id', 'sis_integration_id' => 'integration_id' },
+      { :lookups => { 'sis_course_id' => 'sis_source_id', 'id' => 'id', 'sis_integration_id' => 'integration_id', 'lti_context_id' => 'lti_context_id' },
         :is_not_scoped_to_account => ['id'].to_set,
         :scope => 'root_account_id' },
     'enrollment_terms' =>
@@ -99,13 +98,13 @@ module Api
         :is_not_scoped_to_account => ['id'].to_set,
         :scope => 'root_account_id' },
     'users' =>
-      { :lookups => { 'sis_user_id' => 'pseudonyms.sis_user_id', 'sis_login_id' => 'pseudonyms.unique_id', 'id' => 'users.id', 'sis_integration_id' => 'pseudonyms.integration_id' },
-        :is_not_scoped_to_account => ['users.id'].to_set,
+      { :lookups => { 'sis_user_id' => 'pseudonyms.sis_user_id', 'sis_login_id' => 'pseudonyms.unique_id', 'id' => 'users.id', 'sis_integration_id' => 'pseudonyms.integration_id', 'lti_context_id' => 'users.lti_context_id', 'lti_user_id' => 'users.lti_context_id' },
+        :is_not_scoped_to_account => ['users.id', 'users.lti_context_id'].to_set,
         :scope => 'pseudonyms.account_id',
         :joins => [:pseudonym] },
     'accounts' =>
-      { :lookups => { 'sis_account_id' => 'sis_source_id', 'id' => 'id', 'sis_integration_id' => 'integration_id' },
-        :is_not_scoped_to_account => ['id'].to_set,
+      { :lookups => { 'sis_account_id' => 'sis_source_id', 'id' => 'id', 'sis_integration_id' => 'integration_id', 'lti_context_id' => 'lti_context_id' },
+        :is_not_scoped_to_account => ['id', 'lti_context_id'].to_set,
         :scope => 'root_account_id' },
     'course_sections' =>
       { :lookups => { 'sis_section_id' => 'sis_source_id', 'id' => 'id' , 'sis_integration_id' => 'integration_id' },
@@ -127,10 +126,10 @@ module Api
     # returns column_name, column_value
     return lookups['id'], id if id.is_a?(Numeric) || id.is_a?(ActiveRecord::Base)
     id = id.to_s.strip
-    if id =~ %r{\Ahex:(sis_[\w_]+):(([0-9A-Fa-f]{2})+)\z}
+    if id =~ %r{\Ahex:(lti_[\w_]+|sis_[\w_]+):(([0-9A-Fa-f]{2})+)\z}
       sis_column = $1
       sis_id = [$2].pack('H*')
-    elsif id =~ %r{\A(sis_[\w_]+):(.+)\z}
+    elsif id =~ %r{\A(lti_[\w_]+|sis_[\w_]+):(.+)\z}
       sis_column = $1
       sis_id = $2
     elsif id =~ ID_REGEX
