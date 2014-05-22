@@ -374,11 +374,8 @@ class Folder < ActiveRecord::Base
   end
 
   def self.resolve_path(context, path, include_hidden_and_locked = true)
-    path_components = path.is_a?(Array) ? path : path.split('/')
-    root_name = path_components.shift
-    scope = context.folders.where(parent_folder_id: nil, name: root_name)
-    scope = scope.not_hidden.not_locked unless include_hidden_and_locked
-    scope.each do |root_folder|
+    path_components = path ? (path.is_a?(Array) ? path : path.split('/')) : []
+    Folder.root_folders(context).each do |root_folder|
       folders = root_folder.get_folders_by_component(path_components, include_hidden_and_locked)
       return folders if folders
     end

@@ -841,6 +841,7 @@ routes.draw do
       post 'courses/:course_id/files', :action => :create_file, :path_name => 'course_create_file'
       post 'courses/:course_id/folders', :controller => :folders, :action => :create
       get 'courses/:course_id/folders/by_path/*full_path', :controller => :folders, :action => :resolve_path
+      get 'courses/:course_id/folders/by_path', :controller => :folders, :action => :resolve_path
       get  'courses/:course_id/folders/:id', :controller => :folders, :action => :show, :path_name => 'course_folder'
       put  'accounts/:account_id/courses', :action => :batch_update
     end
@@ -1053,6 +1054,7 @@ routes.draw do
 
       post 'users/:user_id/folders', :controller => :folders, :action => :create
       get 'users/:user_id/folders/by_path/*full_path', :controller => :folders, :action => :resolve_path
+      get 'users/:user_id/folders/by_path', :controller => :folders, :action => :resolve_path
       get 'users/:user_id/folders/:id', :controller => :folders, :action => :show, :path_name => 'user_folder'
 
       get 'users/:id/settings', controller: 'users', action: 'settings'
@@ -1218,6 +1220,7 @@ routes.draw do
 
       post 'groups/:group_id/folders', :controller => :folders, :action => :create
       get 'groups/:group_id/folders/by_path/*full_path', :controller => :folders, :action => :resolve_path
+      get 'groups/:group_id/folders/by_path', :controller => :folders, :action => :resolve_path
       get 'groups/:group_id/folders/:id', :controller => :folders, :action => :show, :path_name => 'group_folder'
     end
 
