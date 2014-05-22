@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -139,7 +139,7 @@ class ConversationsController < ApplicationController
   #   "course_456". Can be an array (by setting "filter[]") or single value
   #   (by setting "filter")
   #
-  # @argument filter_mode [optional, "and"|"or", default "or"]
+  # @argument filter_mode [Optional, "and"|"or", default "or"]
   #   When filter[] contains multiple filters, combine them with this mode,
   #   filtering conversations that at have at least all of the contexts ("and")
   #   or at least one of the contexts ("or")
@@ -252,7 +252,7 @@ class ConversationsController < ApplicationController
   # reused.
   #
   # @argument recipients[] [String]
-  #   An array of recipient ids. These may beuser ids or course/group ids
+  #   An array of recipient ids. These may be user ids or course/group ids
   #   prefixed with "course_" or "group_" respectively, e.g.
   #   recipients[]=1&recipients[]=2&recipients[]=course_3
   #
@@ -292,7 +292,7 @@ class ConversationsController < ApplicationController
   # @argument filter[] [Optional, String, course_id|group_id|user_id]
   #   Used when generating "visible" in the API response. See the explanation
   #   under the {api:ConversationsController#index index API action}
-  # @argument filter_mode [optional, "and"|"or", default "or"]
+  # @argument filter_mode [Optional, "and"|"or", default "or"]
   #   Used when generating "visible" in the API response. See the explanation
   #   under the {api:ConversationsController#index index API action}
   #
@@ -391,7 +391,7 @@ class ConversationsController < ApplicationController
   # @argument filter[] [Optional, String, course_id|group_id|user_id]
   #   Used when generating "visible" in the API response. See the explanation
   #   under the {api:ConversationsController#index index API action}
-  # @argument filter_mode [optional, "and"|"or", default "or"]
+  # @argument filter_mode [Optional, "and"|"or", default "or"]
   #   Used when generating "visible" in the API response. See the explanation
   #   under the {api:ConversationsController#index index API action}
   #
@@ -522,7 +522,7 @@ class ConversationsController < ApplicationController
   # @argument filter[] [Optional, String, course_id|group_id|user_id]
   #   Used when generating "visible" in the API response. See the explanation
   #   under the {api:ConversationsController#index index API action}
-  # @argument filter_mode [optional, "and"|"or", default "or"]
+  # @argument filter_mode [Optional, "and"|"or", default "or"]
   #   Used when generating "visible" in the API response. See the explanation
   #   under the {api:ConversationsController#index index API action}
   #
