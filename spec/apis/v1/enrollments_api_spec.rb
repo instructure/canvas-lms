@@ -69,6 +69,7 @@ describe EnrollmentsApiController, type: :request do
           'updated_at'                         => new_enrollment.updated_at.xmlschema,
           'created_at'                         => new_enrollment.created_at.xmlschema,
           'last_activity_at'                   => nil,
+          'total_activity_time'                => 0,
           'sis_course_id'                      => @course.sis_source_id,
           'course_integration_id'              => @course.integration_id,
           'sis_section_id'                     => @section.sis_source_id,
@@ -419,6 +420,7 @@ describe EnrollmentsApiController, type: :request do
           'updated_at'                         => new_enrollment.updated_at.xmlschema,
           'created_at'                         => new_enrollment.created_at.xmlschema,
           'last_activity_at'                   => nil,
+          'total_activity_time'                => 0,
           'sis_course_id'                      => @course.sis_source_id,
           'course_integration_id'              => @course.integration_id,
           'sis_section_id'                     => @section.sis_source_id,
@@ -583,13 +585,15 @@ describe EnrollmentsApiController, type: :request do
             'created_at'  => e.created_at.xmlschema,
             'start_at'  => nil,
             'end_at'  => nil,
-            'last_activity_at' => nil
+            'last_activity_at' => nil,
+            'total_activity_time' => 0
           }
         }
       end
 
-      it "should show last_activity_at for student enrollment" do
+      it "should show last_activity_at and total_activity_time for student enrollment" do
         enrollment = @course.student_enrollments.first
+        enrollment.record_recent_activity(Time.zone.now - 5.minutes)
         enrollment.record_recent_activity(Time.zone.now)
         json = api_call(:get, @user_path, @user_params)
         enrollments = @student.current_enrollments.includes(:user).order("users.sortable_name ASC")
@@ -629,7 +633,8 @@ describe EnrollmentsApiController, type: :request do
             'created_at'         => e.created_at.xmlschema,
             'start_at'           => nil,
             'end_at'             => nil,
-            'last_activity_at'   => e.last_activity_at.xmlschema
+            'last_activity_at'   => e.last_activity_at.xmlschema,
+            'total_activity_time' => e.total_activity_time
           }
         }
       end
@@ -774,6 +779,7 @@ describe EnrollmentsApiController, type: :request do
             'start_at' => nil,
             'end_at' => nil,
             'last_activity_at' => nil,
+            'total_activity_time' => 0,
             'user' => {
               'name' => e.user.name,
               'sortable_name' => e.user.sortable_name,
@@ -842,7 +848,8 @@ describe EnrollmentsApiController, type: :request do
             'created_at'         => e.created_at.xmlschema,
             'start_at'           => nil,
             'end_at'             => nil,
-            'last_activity_at'   => nil
+            'last_activity_at'   => nil,
+            'total_activity_time' => 0
           }
         }
       end
@@ -944,7 +951,8 @@ describe EnrollmentsApiController, type: :request do
             'created_at' => e.created_at.xmlschema,
             'start_at' => nil,
             'end_at' => nil,
-            'last_activity_at' => nil
+            'last_activity_at' => nil,
+            'total_activity_time' => 0
           }
           h['grades'] = {
             'html_url' => course_student_grades_url(@course, e.user),
@@ -1006,7 +1014,8 @@ describe EnrollmentsApiController, type: :request do
             'created_at' => e.created_at.xmlschema,
             'start_at' => nil,
             'end_at' => nil,
-            'last_activity_at' => nil
+            'last_activity_at' => nil,
+            'total_activity_time' => 0
           }
           h['grades'] = {
             'html_url' => course_student_grades_url(@course, e.user),
@@ -1083,7 +1092,8 @@ describe EnrollmentsApiController, type: :request do
             'created_at'                         => @enrollment.created_at.xmlschema,
             'start_at'                           => nil,
             'end_at'                             => nil,
-            'last_activity_at'                   => nil
+            'last_activity_at'                   => nil,
+            'total_activity_time'                => 0
           }
         end
 
@@ -1136,7 +1146,8 @@ describe EnrollmentsApiController, type: :request do
             'created_at'                         => @enrollment.created_at.xmlschema,
             'start_at'                           => nil,
             'end_at'                             => nil,
-            'last_activity_at'                   => nil
+            'last_activity_at'                   => nil,
+            'total_activity_time'                => 0
           }
         end
 
@@ -1200,6 +1211,7 @@ describe EnrollmentsApiController, type: :request do
             'start_at'   => nil,
             'end_at'     => nil,
             'last_activity_at' => nil,
+            'total_activity_time' => 0,
             'user' => {
               'name' => e.user.name,
               'sortable_name' => e.user.sortable_name,
@@ -1240,6 +1252,7 @@ describe EnrollmentsApiController, type: :request do
             'start_at'   => nil,
             'end_at'     => nil,
             'last_activity_at' => nil,
+            'total_activity_time' => 0,
             'user' => {
               'name' => e.user.name,
               'sortable_name' => e.user.sortable_name,

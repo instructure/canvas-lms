@@ -153,6 +153,11 @@
 #             "example": "2012-04-18T23:08:51Z",
 #             "type": "datetime"
 #           },
+#           "total_activity_time": {
+#             "description": "The total activity time of the user for the enrollment, in seconds.",
+#             "example": 260,
+#             "type": "integer"
+#           },
 #           "html_url": {
 #             "description": "The URL to the Canvas web UI page for this course enrollment.",
 #             "example":  "https://...",

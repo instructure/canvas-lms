@@ -1578,7 +1578,7 @@ describe Enrollment do
       @enrollment.last_activity_at.should be_nil
       now = Time.zone.now
       @enrollment.record_recent_activity(now)
-      @enrollment.record_recent_activity(now + 5.minutes)
+      @enrollment.record_recent_activity(now + 1.minutes)
       @enrollment.last_activity_at.to_s.should == now.to_s
     end
 
@@ -1589,6 +1589,19 @@ describe Enrollment do
       @enrollment.record_recent_activity(now)
       @enrollment.record_recent_activity(now + 11.minutes)
       @enrollment.last_activity_at.should.to_s == (now + 11.minutes).to_s
+    end
+
+    it "should update total_activity_time within the time threshold" do
+      course_with_student(:active_all => 1)
+      @enrollment.total_activity_time.should == 0
+      now = Time.zone.now
+      @enrollment.record_recent_activity(now)
+      @enrollment.record_recent_activity(now + 1.minutes)
+      @enrollment.total_activity_time.should == 0
+      @enrollment.record_recent_activity(now + 3.minutes)
+      @enrollment.total_activity_time.should == 3.minutes.to_i
+      @enrollment.record_recent_activity(now + 30.minutes)
+      @enrollment.total_activity_time.should == 3.minutes.to_i
     end
   end
 
