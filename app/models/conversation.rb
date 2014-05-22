@@ -481,12 +481,14 @@ class Conversation < ActiveRecord::Base
   def reply_from(opts)
     user = opts.delete(:user)
     message = opts.delete(:text).to_s.strip
-    user = nil unless user && self.conversation_participants.find_by_user_id(user.id)
+    participant = self.conversation_participants.find_by_user_id(user.id)
+    user = nil unless user && participant
     if !user
       raise "Only message participants may reply to messages"
     elsif message.blank?
       raise "Message body cannot be blank"
     else
+      participant.update_attribute(:workflow_state, 'read') if participant.workflow_state == 'unread'
       add_message(user, message, opts)
     end
   end

@@ -310,5 +310,24 @@ describe ConversationMessage do
       cm3.conversation_message_participants.size.should == 2
       cm3.conversation_message_participants.map{|x| x.user_id}.sort.should == [users[1].id, users[2].id].sort
     end
+
+    it "should mark conversations as read for the replying author" do
+      course_with_teacher
+      student_in_course
+      cp = @teacher.initiate_conversation([@user])
+      cm = cp.add_message("initial message", :root_account_id => Account.default.id)
+
+      cp2 = cp.conversation.conversation_participants.find_by_user_id(@user.id)
+      cp2.workflow_state.should == 'unread'
+      cm.reply_from({
+        :purpose => 'general',
+        :user => @user,
+        :subject => "an email reply",
+        :html => "body",
+        :text => "body"
+      })
+      cp2.reload
+      cp2.workflow_state.should == 'read'
+    end
   end
 end
