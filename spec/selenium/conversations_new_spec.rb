@@ -91,9 +91,13 @@ describe "conversations new" do
     end
   end
 
-  def select_message_course(new_course)
+  def select_message_course(new_course, is_group = false)
     new_course = new_course.name if new_course.respond_to? :name
     fj('.dropdown-toggle', get_message_course).click
+    if is_group
+      wait_for_ajaximations
+      fj("a:contains('Groups')", get_message_course).click
+    end
     fj("a:contains('#{new_course}')", get_message_course).click
   end
 
@@ -175,6 +179,19 @@ describe "conversations new" do
       fj('#compose-btn').click
       wait_for_animations
       fj('#compose-new-message .ac-input').should have_attribute(:disabled, 'true')
+    end
+
+    it "should allow non-admins to send a message to an account-level group" do
+      @group = Account.default.groups.create(:name => "the group")
+      @group.add_user(@s1)
+      @group.add_user(@s2)
+      @group.save
+      user_logged_in({:user => @s1})
+      get_conversations
+      fj('#compose-btn').click
+      wait_for_ajaximations
+      select_message_course(@group, true)
+      add_message_recipient @s2
     end
 
     it "should allow admins to message users from their profiles" do

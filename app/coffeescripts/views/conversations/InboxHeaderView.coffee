@@ -140,13 +140,13 @@ define [
     filterObj: (obj) -> _.object(_.filter(_.pairs(obj), (x) -> !!x[1]))
 
     onFilterChange: (e) =>
-      @searchView?.autocompleteView.setContext(@courseView.getCurrentCourse())
+      @searchView?.autocompleteView.setContext(@courseView.getCurrentContext())
       @trigger('filter', @filterObj({type: @$typeFilter.val(), course: @$courseFilter.val()}))
 
     displayState: (state) ->
       @$typeFilter.selectpicker('val', state.type)
       @courseView.setValue(state.course)
-      @trigger('course', @courseView.getCurrentCourse())
+      @trigger('course', @courseView.getCurrentContext())
 
     toggleMessageBtns: (value) ->
       @toggleReplyBtn(value)
