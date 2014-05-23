@@ -71,6 +71,16 @@ class Migrator
     end
   end
 
+  # If the file is a zip file, unzip it, if it's an xml file, copy
+  # it into the directory with the given file name
+  def prepare_cartridge_file(file_name='imsmanifest.xml')
+    if @archive_file_path.ends_with?('xml')
+      FileUtils::cp(@archive_file_path, File.join(@unzipped_file_path, file_name))
+    else
+      unzip_archive
+    end
+  end
+
   def delete_unzipped_archive
     delete_file(@unzipped_file_path)
   end

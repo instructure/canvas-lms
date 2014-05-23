@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest identifier="cctd0001"
+          xmlns="http://www.imsglobal.org/xsd/imsccv1p3/imscp_v1p1"
+          xmlns:lom="http://ltsc.ieee.org/xsd/imsccv1p3/LOM/resource"
+          xmlns:lomimscc="http://ltsc.ieee.org/xsd/imsccv1p3/LOM/manifest"
+          xmlns:cpx="http://www.imsglobal.org/xsd/imsccv1p3/imscp_extensionv1p2"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://ltsc.ieee.org/xsd/imsccv1p3/LOM/resource http://www.imsglobal.org/profile/cc/ccv1p3/LOM/ccv1p3_lomresource_v1p0.xsd
+                      http://www.imsglobal.org/xsd/imsccv1p3/imscp_v1p1 http://www.imsglobal.org/profile/cc/ccv1p3/ccv1p3_imscp_v1p2_v1p0.xsd 
+                      http://ltsc.ieee.org/xsd/imsccv1p3/LOM/manifest http://www.imsglobal.org/profile/cc/ccv1p3/LOM/ccv1p3_lommanifest_v1p0.xsd
+                      http://www.imsglobal.org/xsd/imsccv1p3/imscp_extensionv1p2 http://www.imsglobal.org/profile/cc/ccv1p3/ccv1p3_cpextensionv1p2_v1p0.xsd">
+  <metadata>
+    <schema>IMS Common Cartridge</schema>
+    <schemaversion>1.3.0</schemaversion>
+    <lomimscc:lom>
+      <lomimscc:general>
+        <lomimscc:title>
+          <lomimscc:string language="en-US">Common Cartridge Test
+          </lomimscc:string>
+        </lomimscc:title>
+        <lomimscc:description>
+          <lomimscc:string language="en-US">CC 1.3 test with extension
+          </lomimscc:string>
+        </lomimscc:description>
+      </lomimscc:general>
+    </lomimscc:lom>
+  </metadata>
+  <organizations>
+    <organization identifier="O_1" structure="rooted-hierarchy">
+      <item identifier="I_1">
+        <item identifier="I_00000">
+          <title>CCv1.3 With Assignment</title>
+          <item identifier="I_00001" identifierref="Resource1">
+            <title>Cool Assignment</title>
+          </item>
+          <item identifier="I_00002" identifierref="Resource2">
+            <title>Assignment Discussions</title>
+          </item>
+          <item identifier="I_00003" identifierref="Resource3">
+            <title>Open2.net</title>
+          </item>
+          <item identifier="I_00004" identifierref="Resource4">
+            <title>LTI Launch</title>
+          </item>
+        </item>
+      </item>
+    </organization>
+  </organizations>
+  <resources>
+
+    <resource identifier="Resource1" type="assignment_xmlv1p0">
+      <assignment xmlns="http://www.imsglobal.org/xsd/imscc_extensions/assignment"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://www.imsglobal.org/xsd/imscc_extensions/assignment http://www.imsglobal.org/profile/cc/cc_extensions/cc_extresource_assignmentv1p0_v1p0.xsd http://www.imsglobal.org/xsd/imscc_extensions/assignment "
+                  identifier="AssigmentId">
+        <title>Cool Assignment</title>
+        <text texttype="text/plain">You should turn this in for points.</text>
+        <instructor_text texttype="text/plain">Super Secret</instructor_text>
+        <gradable>true</gradable>
+      </assignment>
+    </resource>
+
+    <resource identifier="Resource2" type="imsdt_xmlv1p3">
+      <topic xmlns="http://www.imsglobal.org/xsd/imsccv1p3/imsdt_v1p3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imsccv1p3/imsdt_v1p3 http://www.imsglobal.org/profile/cc/ccv1p3/ccv1p3_imsdt_v1p3.xsd">
+        <title>Assignment Discussions</title>
+        <text texttype="text/html">Discuss your results from the first
+          assignment.
+        </text>
+      </topic>
+    </resource>
+
+    <resource identifier="Resource3" type="imswl_xmlv1p3">
+      <webLink xmlns="http://www.imsglobal.org/xsd/imsccv1p3/imswl_v1p3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imsccv1p3/imswl_v1p3 http://www.imsglobal.org/profile/cc/ccv1p3/ccv1p3_imswl_v1p3.xsd">
+        <title>Open2.net: Science and Nature</title>
+        <url href="http://www.open2.net/sciencetechnologynature/"/>
+      </webLink>
+    </resource>
+
+    <resource identifier="Resource4" type="imsbasiclti_xmlv1p3">
+      <cartridge_basiclti_link
+              xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0"
+              xmlns:blti="http://www.imsglobal.org/xsd/imsbasiclti_v1p0"
+              xmlns:lticm="http://www.imsglobal.org/xsd/imslticm_v1p0"
+              xmlns:lticp="http://www.imsglobal.org/xsd/imslticp_v1p0"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imslticc_v1p3 http://www.imsglobal.org/xsd/lti/ltiv1p3/imslticc_v1p3.xsd http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0p1.xsd">
+        <blti:title>BLTI Test</blti:title>
+        <blti:description>Test a BLTI Link</blti:description>
+        <blti:launch_url>http://www.imsglobal.org/developers/BLTI/tool.php</blti:launch_url>
+        <blti:secure_launch_url>http://www.imsglobal.org/developers/BLTI/tool.php</blti:secure_launch_url>
+      </cartridge_basiclti_link>
+    </resource>
+
+  </resources>
+</manifest>

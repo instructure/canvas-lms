@@ -544,7 +544,7 @@ describe ContentMigrationsController, type: :request do
       json.should == [{
                               "type" => "common_cartridge_importer",
                               "requires_file_upload" => true,
-                              "name" => "Common Cartridge 1.0/1.1/1.2 Package",
+                              "name" => "Common Cartridge 1.x Package",
                               "required_settings" => []
                       }]
     end

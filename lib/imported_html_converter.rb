@@ -39,7 +39,7 @@ class ImportedHtmlConverter
 
     doc.search("*").each do |node|
       attrs.each do |attr|
-        if node[attr]
+        if node[attr].present?
           if attr == 'value'
             next unless node['name'] && node['name'] == 'src'
           end

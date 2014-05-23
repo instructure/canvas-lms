@@ -167,7 +167,7 @@ Canvas::Plugin.register 'common_cartridge_importer', :export_system, {
   :author_website => 'http://www.instructure.com',
   :description => lambda{ I18n.t :common_cartridge_description, 'This enables converting a Common Cartridge packages in the intermediary json format to be imported' },
   :version => '1.0.0',
-  :select_text => lambda{ I18n.t :common_cartridge_file_description, "Common Cartridge 1.0/1.1/1.2 Package" },
+  :select_text => lambda{ I18n.t :common_cartridge_file_description, "Common Cartridge 1.x Package" },
   :settings => {
     :worker => 'CCWorker',
     :migration_partial => 'cc_config',
@@ -175,7 +175,8 @@ Canvas::Plugin.register 'common_cartridge_importer', :export_system, {
     :provides =>{:common_cartridge=>CC::Importer::Standard::Converter, 
                  :common_cartridge_1_0=>CC::Importer::Standard::Converter, 
                  :common_cartridge_1_1=>CC::Importer::Standard::Converter, 
-                 :common_cartridge_1_2=>CC::Importer::Standard::Converter},
+                 :common_cartridge_1_2=>CC::Importer::Standard::Converter,
+                 :common_cartridge_1_3=>CC::Importer::Standard::Converter},
     :valid_contexts => %w{Account Course}
   },
 }

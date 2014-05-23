@@ -7,9 +7,13 @@ module Importers
       tools = data['external_tools'] ? data['external_tools']: []
       tools.each do |tool|
         if migration.import_object?("context_external_tools", tool['migration_id']) || migration.import_object?("external_tools", tool['migration_id'])
-          item = import_from_migration(tool, migration.context, migration)
-          if item.consumer_key == 'fake' || item.shared_secret == 'fake'
-            migration.add_warning(t('external_tool_attention_needed', 'The security parameters for the external tool "%{tool_name}" need to be set in Course Settings.', :tool_name => item.name))
+          begin
+            item = import_from_migration(tool, migration.context, migration)
+            if item.consumer_key == 'fake' || item.shared_secret == 'fake'
+              migration.add_warning(t('external_tool_attention_needed', 'The security parameters for the external tool "%{tool_name}" need to be set in Course Settings.', :tool_name => item.name))
+            end
+          rescue
+            migration.add_import_warning(t('#migration.external_tool_type', "External Tool"), tool[:title], $!)
           end
         end
       end
