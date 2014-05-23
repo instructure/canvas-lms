@@ -47,10 +47,15 @@ module SFU
         json_out = RestClient.get rest_url
         JSON.parse json_out
       rescue Exception => e
-        if url == course_info_url
-          "[]"
-        else
-          "[ teachingSemester => {}, teachingCourse => {} ]"
+        case e.message
+          when /404/ then 404
+          when /500/ then 500
+          else 500
+        end
+
+        # If REST server app is unavailable, its webserver returns a 404. Therefore, should be returning a 500 instead
+        if e.to_s.eql? "404 Resource Not Found: <html><body><strong>The requested application was not found on this server.</strong></body></html>\n"
+          500
         end
       end
     end

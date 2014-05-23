@@ -7,7 +7,11 @@ class AmaintController < ApplicationController
   def course_info
     course_hash = amaint_course_info(params[:sis_id], params[:property])
 
-    raise(ActiveRecord::RecordNotFound) if course_hash.empty?
+    if course_hash == 404
+      raise(ActiveRecord::RecordNotFound)
+    elsif course_hash == 500
+      raise(RuntimeError)
+    end
 
     respond_to do |format|
       format.json { render :json => course_hash }
@@ -17,20 +21,30 @@ class AmaintController < ApplicationController
   def user_info
     user_array =[]
     sfu_id = params[:sfu_id]
-    if params[:property].nil?
-      user_hash = {}
-	    user_hash["sfu_id"] = sfu_id
-      user_hash["roles"] = SFU::User.roles sfu_id
-	    user_array = user_hash
-    elsif params[:property].to_s.eql? "roles"
-      user_array = SFU::User.roles sfu_id
-    elsif params[:filter].nil? && params[:property].to_s.start_with?("term")
-      user_array = teaching_terms_for sfu_id
-    elsif params[:property].to_s.start_with?("term")
-	    user_array = courses_for_user(sfu_id, params[:filter])
+    roles = SFU::User.roles sfu_id
+
+    if roles == 500 || roles == 404
+      user_array = roles
+    else
+      if params[:property].nil?
+        user_hash = {}
+        user_hash["sfu_id"] = sfu_id
+        user_hash["roles"] = roles
+        user_array = user_hash
+      elsif params[:property].to_s.eql? "roles"
+        user_array = roles
+      elsif params[:filter].nil? && params[:property].to_s.start_with?("term")
+        user_array = teaching_terms_for sfu_id
+      elsif params[:property].to_s.start_with?("term")
+        user_array = courses_for_user(sfu_id, params[:filter])
+      end
     end
 
-    raise(ActiveRecord::RecordNotFound) if user_array.empty?
+    if user_array == 500
+      raise(RuntimeError)
+    elsif user_array == 404
+      raise(ActiveRecord::RecordNotFound)
+    end
 
     respond_to do |format|
       format.json { render :json => user_array }
@@ -59,8 +73,14 @@ class AmaintController < ApplicationController
     course_title = SFU::Course.title(course_info[1] + course_info[2], course_info.first, course_info[3]) #if property.nil? || property.downcase.eql?("title")
     course_hash["title"] = course_title if property.nil? || property.downcase.eql?("title")
 
-    # If course section doesn't exist in Amaint, then return 404
-    course_hash = {} if course_title.nil?
+    if course_title.nil?
+      # If course section doesn't exist in Amaint, then return 404
+      course_hash = 404
+    elsif course_title == 500 || course_title == 404
+      # If REST server app is unavailable, its webserver returns a 404.
+      # Therefore return 500 so client will know something is wrong with REST server and not a false 404 (i.e. section doesn't exists)
+      course_hash = 500
+    end
 
     course_hash
   end
@@ -115,10 +135,14 @@ class AmaintController < ApplicationController
   end
 
   def teaching_terms_for(sfu_id)
-    terms = SFU::Course.terms sfu_id
     term_array = []
-    terms.each do |term|
-      term_array.push term
+    terms = SFU::Course.terms sfu_id
+    if terms == 500 || terms == 404
+      term_array = terms
+    else
+      terms.each do |term|
+        term_array.push term
+      end
     end
     term_array
   end
