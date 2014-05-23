@@ -29,7 +29,7 @@
           if (el.length) return cb(el);
           if (_attempts == 60) return;
           setTimeout(function() {
-            onElementRendered(selector, cb, _attempts);
+            utils.onElementRendered(selector, cb, _attempts);
           }, 250);
         }
 
