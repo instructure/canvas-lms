@@ -42,9 +42,10 @@ describe Polling::PollChoicesController, type: :request do
 
     it "returns all existing poll choices" do
       json = get_index
-      json.size.should == 5
+      poll_choices_json = json['poll_choices']
+      poll_choices_json.size.should == 5
 
-      json.each_with_index do |pc, i|
+      poll_choices_json.each_with_index do |pc, i|
         pc['text'].should == "Poll Choice #{5-i}"
       end
     end
@@ -64,7 +65,9 @@ describe Polling::PollChoicesController, type: :request do
         session.publish!
 
         json = get_index
-        json.each do |poll_choice|
+        poll_choices_json = json['poll_choices']
+
+        poll_choices_json.each do |poll_choice|
           poll_choice.should_not have_key('is_correct')
         end
       end
@@ -89,8 +92,10 @@ describe Polling::PollChoicesController, type: :request do
 
     it "retrieves the poll specified" do
       json = get_show
-      json['text'].should == 'A Poll Choice'
-      json['is_correct'].should be_true
+      poll_choice_json = json['poll_choices'].first
+
+      poll_choice_json['text'].should == 'A Poll Choice'
+      poll_choice_json['is_correct'].should be_true
     end
 
     context "as a student" do
@@ -108,7 +113,9 @@ describe Polling::PollChoicesController, type: :request do
         session.publish!
 
         json = get_show
-        json.should_not have_key('is_correct')
+        poll_choice_json = json['poll_choices'].first
+
+        poll_choice_json.should_not have_key('is_correct')
       end
     end
   end
@@ -125,7 +132,7 @@ describe Polling::PollChoicesController, type: :request do
                   { controller: 'polling/poll_choices', action: 'create', format: 'json',
                     poll_id: @poll.id.to_s
                   },
-                  { poll_choice: params }, {}, {})
+                  { poll_choices: [params] }, {}, {})
     end
 
     context "as a teacher" do
@@ -165,8 +172,7 @@ describe Polling::PollChoicesController, type: :request do
                  poll_id: @poll.id.to_s,
                  id: @poll_choice.id.to_s
                },
-               { poll_choice: params }, {}, {})
-
+               { poll_choices: [params] }, {}, {})
     end
 
     context "as a teacher" do

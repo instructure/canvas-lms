@@ -54,6 +54,12 @@ module Polling
   #         "description": "Specifies whether the results are viewable by students.",
   #         "example": "true",
   #         "type": "boolean"
+  #       },
+  #       "created_at": {
+  #         "description": "The time at which the poll session was created.",
+  #         "example": "2014-01-07T15:16:18Z",
+  #         "type": "string",
+  #         "format": "date-time"
   #       }
   #     }
   #   }
@@ -69,13 +75,17 @@ module Polling
     #
     # Returns the list of PollSessions in this poll.
     #
-    # @returns [PollSession]
+    # @example_response
+    #   {
+    #     "poll_sessions": [PollSession]
+    #   }
+    #
     def index
       if authorized_action(@poll, @current_user, :update)
         @poll_sessions = @poll.poll_sessions
         @poll_sessions = Api.paginate(@poll_sessions, self, api_v1_poll_sessions_url(@poll))
 
-        render json: serialize_json(@poll_sessions)
+        render json: serialize_jsonapi(@poll_sessions)
       end
     end
 
@@ -84,12 +94,16 @@ module Polling
     #
     # Returns the poll session with the given id
     #
-    # @returns PollSession
+    # @example_response
+    #   {
+    #     "poll_sessions": [PollSession]
+    #   }
+    #
     def show
       @poll_session = @poll.poll_sessions.find(params[:id])
 
       if authorized_action(@poll_session, @current_user, :read)
-        render json: serialize_json(@poll_session, true)
+        render json: serialize_jsonapi(@poll_session)
       end
     end
 
@@ -98,29 +112,35 @@ module Polling
     #
     # Create a new poll session for this poll
     #
-    # @argument poll_session[course_id] [Required, Integer]
+    # @argument poll_sessions[][course_id] [Required, Integer]
     #   The id of the course this session is associated with.
     #
-    # @argument poll_session[course_section_id] [Required, Integer]
+    # @argument poll_sessions[][course_section_id] [Required, Integer]
     #   The id of the course section this session is associated with.
     #
-    # @argument poll_session[has_public_results] [Optional, Boolean]
+    # @argument poll_sessions[][has_public_results] [Optional, Boolean]
     #   Whether or not results are viewable by students.
     #
-    # @returns PollSession
+    # @example_response
+    #   {
+    #     "poll_sessions": [PollSession]
+    #   }
+    #
     def create
-      if params[:poll_session] && course_id = params[:poll_session].delete(:course_id)
+      poll_session_params = params[:poll_sessions][0]
+
+      if course_id = poll_session_params.delete(:course_id)
         @course = Course.find(course_id)
       end
 
       raise ActiveRecord::RecordNotFound.new(I18n.t("polling.poll_sessions.errors.course_required", "Course is required.")) unless @course
 
-      @poll_session = @poll.poll_sessions.new(params[:poll_session])
+      @poll_session = @poll.poll_sessions.new(poll_session_params)
       @poll_session.course = @course
 
       if authorized_action(@poll, @current_user, :create) && authorized_action(@course, @current_user, :update)
         if @poll_session.save
-          render json: serialize_json(@poll_session)
+          render json: serialize_jsonapi(@poll_session)
         else
           render json: @poll_session.errors, status: :bad_request
         end
@@ -132,22 +152,26 @@ module Polling
     #
     # Update an existing poll session for this poll
     #
-    # @argument poll_session[course_id] [Required, Integer]
+    # @argument poll_sessions[][course_id] [Required, Integer]
     #   The id of the course this session is associated with.
     #
-    # @argument poll_session[course_section_id] [Required, Integer]
+    # @argument poll_sessions[][course_section_id] [Required, Integer]
     #   The id of the course section this session is associated with.
     #
-    # @argument poll_session[has_public_results] [Optional, Boolean]
+    # @argument poll_sessions[][has_public_results] [Optional, Boolean]
     #   Whether or not results are viewable by students.
     #
-    # @returns PollSession
+    # @example_response
+    #   {
+    #     "poll_sessions": [PollSession]
+    #   }
+    #
     def update
       @poll_session = @poll.poll_sessions.find(params[:id])
-
+      poll_session_params = params[:poll_sessions][0]
       if authorized_action(@poll, @current_user, :update)
-        if @poll_session.update_attributes(params[:poll_session])
-          render json: serialize_json(@poll_session)
+        if @poll_session.update_attributes(poll_session_params)
+          render json: serialize_jsonapi(@poll_session)
         else
           render json: @poll_session.errors, status: :bad_request
         end
@@ -170,42 +194,50 @@ module Polling
     # @API Publish a poll session
     # @beta
     #
-    # @returns PollSession
+    # @example_response
+    #   {
+    #     "poll_sessions": [PollSession]
+    #   }
+    #
     def publish
       @poll_session = @poll.poll_sessions.find(params[:id])
 
       if authorized_action(@poll_session, @current_user, :publish)
         @poll_session.publish!
-        render json: serialize_json(@poll_session)
+        render json: serialize_jsonapi(@poll_session)
       end
     end
 
     # @API Close a published poll session
     # @beta
     #
-    # @returns PollSession
+    # @example_response
+    #   {
+    #     "poll_sessions": [PollSession]
+    #   }
+    #
     def close
       @poll_session = @poll.poll_sessions.find(params[:id])
 
       if authorized_action(@poll_session, @current_user, :publish)
         @poll_session.close!
-        render json: serialize_json(@poll_session)
+        render json: serialize_jsonapi(@poll_session)
       end
     end
 
     protected
-    def serialize_json(poll_sessions, single=false)
-      poll_sessions = Array(poll_sessions)
+    def serialize_jsonapi(poll_sessions)
+      poll_sessions = Array.wrap(poll_sessions)
 
-      serialized_set = poll_sessions.map do |poll_session|
-        Polling::PollSessionSerializer.new(poll_session, {
-          controller: self,
-          root: false,
-          include_root: false,
-          scope: @current_user
-        }).as_json
-      end
-      single ? serialized_set.first : serialized_set
+      serialized_set = Canvas::APIArraySerializer.new(poll_sessions, {
+        each_serializer: Polling::PollSessionSerializer,
+        controller: self,
+        root: false,
+        scope: @current_user,
+        include_root: false
+      }).as_json
+
+      { poll_sessions: serialized_set }
     end
 
   end

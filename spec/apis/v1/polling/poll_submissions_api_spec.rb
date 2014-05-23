@@ -62,8 +62,9 @@ describe Polling::PollSubmissionsController, type: :request do
     it "retrieves the poll submission specified" do
       user_session(@student)
       json = get_show
-      json['id'].should == @submission.id.to_s
-      json['poll_choice_id'].should == @selected.id.to_s
+      poll_submission_json = json['poll_submissions'].first
+      poll_submission_json['id'].should == @submission.id.to_s
+      poll_submission_json['poll_choice_id'].should == @selected.id.to_s
     end
   end
 
@@ -80,7 +81,7 @@ describe Polling::PollSubmissionsController, type: :request do
                     poll_id: @poll.id.to_s,
                     poll_session_id: @session.id.to_s
                   },
-                  { poll_submission: params }, {}, {})
+                  { poll_submissions: [params] }, {}, {})
     end
 
     context "as a student" do

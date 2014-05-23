@@ -43,10 +43,11 @@ describe Polling::PollSessionsController, type: :request do
 
     it "returns all existing poll sessions" do
       json = get_index
+      poll_sessions_json = json['poll_sessions']
       session_ids = @poll.poll_sessions.map(&:id)
-      json.size.should == 3
+      poll_sessions_json.size.should == 3
 
-      json.each_with_index do |session, i|
+      poll_sessions_json.each_with_index do |session, i|
         session_ids.should include(session['id'].to_i)
         session['is_published'].should be_false
       end
@@ -85,16 +86,19 @@ describe Polling::PollSessionsController, type: :request do
 
     it "retrieves the poll session specified" do
       json = get_show
-      json['id'].should == @poll_session.id.to_s
-      json['is_published'].should be_true
+      poll_session_json = json['poll_sessions'].first
+
+      poll_session_json['id'].should == @poll_session.id.to_s
+      poll_session_json['is_published'].should be_true
     end
 
     context "as a teacher" do
       it "retrieves the poll session specified even if closed" do
         @poll_session.close!
         json = get_show
-        json['id'].should == @poll_session.id.to_s
-        json['is_published'].should be_false
+        poll_json = json['poll_sessions'].first
+        poll_json['id'].should == @poll_session.id.to_s
+        poll_json['is_published'].should be_false
       end
 
       it "shows the results of a current poll session" do
@@ -106,10 +110,11 @@ describe Polling::PollSessionsController, type: :request do
 
         @user = @teacher
         json = get_show
+        poll_session_json = json['poll_sessions'].first
 
-        json.should have_key('results')
-        json['results'][choice1.id.to_s].should == 3
-        json['results'][choice2.id.to_s].should == 2
+        poll_session_json.should have_key('results')
+        poll_session_json['results'][choice1.id.to_s].should == 3
+        poll_session_json['results'][choice2.id.to_s].should == 2
       end
     end
 
@@ -126,8 +131,9 @@ describe Polling::PollSessionsController, type: :request do
 
           @user = student
           json = get_show
+          poll_session_json = json['poll_sessions'].first
 
-          json.should_not have_key('results')
+          poll_session_json.should_not have_key('results')
         end
       end
 
@@ -145,8 +151,9 @@ describe Polling::PollSessionsController, type: :request do
 
           @user = student
           json = get_show
+          poll_session_json = json['poll_sessions'].first
 
-          json.should have_key('results')
+          poll_session_json.should have_key('results')
         end
       end
     end
@@ -164,7 +171,7 @@ describe Polling::PollSessionsController, type: :request do
                   { controller: 'polling/poll_sessions', action: 'create', format: 'json',
                     poll_id: @poll.id.to_s
                   },
-                  { poll_session: params }, {}, {})
+                  { poll_sessions: [params] }, {}, {})
     end
 
     context "as a teacher" do
@@ -192,7 +199,7 @@ describe Polling::PollSessionsController, type: :request do
                  poll_id: @poll.id.to_s,
                  id: @poll_session.id.to_s
                },
-               { poll_session: params }, {}, {})
+               { poll_sessions: [params] }, {}, {})
     end
 
     context "as a teacher" do
