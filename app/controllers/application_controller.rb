@@ -1075,9 +1075,10 @@ class ApplicationController < ActionController::Base
   end
 
   API_REQUEST_REGEX = %r{\A/api/v\d}
+  LTI_API_REQUEST_REGEX = %r{\A/api/lti/}
 
   def api_request?
-    @api_request ||= !!request.path.match(API_REQUEST_REGEX)
+    @api_request ||= !!request.path.match(API_REQUEST_REGEX) || !!request.path.match(LTI_API_REQUEST_REGEX)
   end
 
   def session_loaded?

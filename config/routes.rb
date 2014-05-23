@@ -289,6 +289,7 @@ routes.draw do
       match 'homework_submission' => 'external_tools#homework_submission', :as => :homework_submission
       match 'finished' => 'external_tools#finished', :as => :finished
       collection do
+        get :tool_proxy_registration, controller: 'lti/tool_proxy', action: 'register', :as => :tool_proxy_registration
         get :retrieve
         get :homework_submissions
       end
@@ -551,6 +552,9 @@ routes.draw do
     resources :external_tools do
       match 'finished' => 'external_tools#finished', :as => :finished
       match 'resource_selection' => 'external_tools#resource_selection', :as => :resource_selection
+      collection do
+        get  :tool_proxy_registration, controller: 'lti/tool_proxy', action: 'register', :as => :tool_proxy_registration
+      end
     end
 
     match 'outcomes/users/:user_id' => 'outcomes#user_outcome_results', :as => :user_outcomes_results
@@ -1565,6 +1569,15 @@ routes.draw do
   ApiRouteSet.draw(self, "/api/lti/v1") do
     post "tools/:tool_id/grade_passback", :controller => :lti_api, :action => :grade_passback, :path_name => "lti_grade_passback_api"
     post "tools/:tool_id/ext_grade_passback", :controller => :lti_api, :action => :legacy_grade_passback, :path_name => "blti_legacy_grade_passback_api"
+  end
+
+  ApiRouteSet.draw(self, "/api/lti") do
+    ['course', 'account'].each do |context|
+      prefix = "#{context}s/:#{context}_id"
+      get  "#{prefix}/tool_consumer_profile/:tool_consumer_profile_id", controller: 'lti/tool_consumer_profile', action: 'show', :as => "#{context}_tool_consumer_profile"
+      post "#{prefix}/tool_proxy", :controller => 'lti/tool_proxy', :action => :create, :path_name => "create_#{context}_lti_tool_proxy"
+    end
+    get  "tool_proxy/:tool_proxy_guid", :controller => 'lti/tool_proxy', :action => :show, :path_name => "show_lti_tool_proxy"
   end
 
   match '/assets/:package.:extension' => 'jammit#package', :as => :jammit if defined?(Jammit)
