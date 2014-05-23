@@ -235,28 +235,28 @@
       <% if assignment_presenter.should_display_details? %>
         <td colspan="5" style="padding-bottom: 20px;">
           <% if assignment_presenter.has_grade_distribution? && can_view_distribution %>
-            <% high, low, mean = assignment_presenter.grade_distribution  %>
-            <% title = "" %>
-            <% title += " " + before_label(:mean_score, "Mean") + " " + (mean.round(1) rescue 0).to_s %>
-            <% title += " " + before_label(:high_score, "High") + " " + high.to_s %>
-            <% title += " " + before_label(:low_score, "Low") + " " + low.to_s %>
-            <% if mean && high && low %>
-              <table id="score_details_<%= assignment.id %>" class="score_details_table">
-                <thead>
-                  <tr>
-                    <th colspan="3">
-                      Score Details
-                    </th>
-                    <th>
-                      <a href="#" data-aria="grade_info_<%= assignment.id %>" aria-label="<%= t(:close_score_screenreader, 'Close score details') %>" class="screenreader-toggle pull-right"><%= t(:close_score, "Close") %></a>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
+            <table id="score_details_<%= assignment.id %>" class="score_details_table">
+              <thead>
+                <tr>
+                  <th colspan="3">
+                    <%= t(:score_details, "Score Details") %>
+                  </th>
+                  <th>
+                    <a href="#" data-aria="grade_info_<%= assignment.id %>" aria-label="<%= t(:close_score_screenreader, 'Close score details') %>" class="screenreader-toggle pull-right"><%= t(:close_score, "Close") %></a>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <% if assignment_presenter.viewing_fake_student? %>
+                    <td colspan="4">
+                      <%= t(:disabled_for_student_view, "Test Student scores are not included in grade statistics.") %>
+                    </td>
+                  <% else %>
+                    <% high, low, mean = assignment_presenter.grade_distribution %>
                     <td>
                       <%= before_label(:mean, "Mean") %>
-                      <%= mean.round(1) %>
+                      <%= mean %>
                     </td>
                     <td>
                       <%= before_label(:high, "High") %>
@@ -267,8 +267,8 @@
                       <%= low %>
                     </td>
                     <td>
-                      <div style="cursor: pointer; float: right; height: 30px; margin-left: 20px; width: 160px; position: relative; margin-right: 30px;" title="<%= title %>">
-                        <% graph = assignment_presenter.graph %>
+                      <% graph = assignment_presenter.graph %>
+                      <div style="cursor: pointer; float: right; height: 30px; margin-left: 20px; width: 160px; position: relative; margin-right: 30px;" title="<%= graph.title %>">
                         <div style="position: absolute; top: 0; left: 0; width: 0px; height: 10px; margin: 5px 0px; border: 2px solid #aaa; overflow: hidden; border-right-width: 0;">&nbsp;</div>
                         <div style="position: absolute; top: 0; left: 0px; width: <%= graph.low_width %>px; height: 0px; margin-top: 10px; border-bottom: 2px solid #aaa; overflow: hidden; border-top-width: 0;">&nbsp;</div>
                         <div style="position: absolute; top: 0; left: <%= graph.high_left %>px; width: <%= graph.high_width %>px; height: 0px; margin-top: 10px; border-bottom: 2px solid #aaa; overflow: hidden;">&nbsp;</div>
@@ -282,10 +282,10 @@
                         <% end %>
                       </div>
                     </td>
-                  </tr>
-                </tbody>
-              </table>
-            <% end %>
+                  <% end %>
+                </tr>
+              </tbody>
+            </table>
           <% end %>
         </tr>
     <tr id="comments_thread_<%= assignment.id %>" class="comments comments_thread <%= 'assignment_graded' if assignment_presenter.graded? %>" style="display: none;">
@@ -294,7 +294,7 @@
             <table class="score_details_table">
               <thead>
                 <tr>
-                  <th>Comments</th>
+                  <th><%= t(:comments, "Comments") %></th>
                   <th>
                     <a href="#" data-aria="comments_thread_<%= assignment.id %>" aria-label="<%= t(:close_comments_label, 'Close comments') %>" class="screenreader-toggle pull-right"><%= t(:close_comments, "Close") %></a>
                   </th>
