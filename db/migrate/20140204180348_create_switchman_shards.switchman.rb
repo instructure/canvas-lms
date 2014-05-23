@@ -2,7 +2,11 @@
 class CreateSwitchmanShards < ActiveRecord::Migration
   tag :predeploy
 
-  def up
+  def self.runnable?
+    CANVAS_RAILS3
+  end
+
+  def self.up
     unless table_exists?('switchman_shards')
       create_table :switchman_shards do |t|
         t.string :name
@@ -13,7 +17,7 @@ class CreateSwitchmanShards < ActiveRecord::Migration
     add_column :switchman_shards, :settings, :text
   end
 
-  def down
+  def self.down
     drop_table :switchman_shards
   end
 end
