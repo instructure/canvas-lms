@@ -1,6 +1,8 @@
 module Polling
   class PollSessionSerializer < Canvas::APISerializer
-    attributes :id, :is_published, :has_public_results, :results, :course_id, :course_section_id
+    root :poll_session
+
+    attributes :id, :is_published, :has_public_results, :results, :course_id, :course_section_id, :created_at
 
     def_delegators :object, :results, :poll
 
@@ -19,7 +21,7 @@ module Polling
     end
 
     def student_keys
-      [:id, :is_published, :course_id, :course_section_id]
+      [:id, :is_published, :course_id, :course_section_id, :created_at]
     end
   end
 end

@@ -1,6 +1,8 @@
 module Polling
   class PollSerializer < Canvas::APISerializer
-    attributes :id, :question, :description, :total_results
+    root :poll
+
+    attributes :id, :question, :description, :total_results, :created_at
 
     has_many :poll_choices, embed: :ids
 
@@ -26,7 +28,7 @@ module Polling
     end
 
     def student_keys
-      [:id, :question, :description]
+      [:id, :question, :description, :created_at]
     end
   end
 end

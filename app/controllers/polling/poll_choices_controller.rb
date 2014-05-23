@@ -59,13 +59,17 @@ module Polling
     #
     # Returns the list of PollChoices in this poll.
     #
-    # @returns [PollChoice]
+    # @example_response
+    #   {
+    #     "poll_choices": [PollChoice]
+    #   }
+    #
     def index
       if authorized_action(@poll, @current_user, :read)
         @poll_choices = @poll.poll_choices
         @poll_choices = Api.paginate(@poll_choices, self, api_v1_poll_choices_url(@poll))
 
-        render json: serialize_json(@poll_choices)
+        render json: serialize_jsonapi(@poll_choices)
       end
     end
 
@@ -74,12 +78,16 @@ module Polling
     #
     # Returns the poll choice with the given id
     #
-    # @returns PollChoice
+    # @example_response
+    #   {
+    #     "poll_choices": [PollChoice]
+    #   }
+    #
     def show
       @poll_choice = @poll.poll_choices.find(params[:id])
 
       if authorized_action(@poll, @current_user, :read)
-        render json: serialize_json(@poll_choice, true)
+        render json: serialize_jsonapi(@poll_choice)
       end
     end
 
@@ -88,20 +96,25 @@ module Polling
     #
     # Create a new poll choice for this poll
     #
-    # @argument poll_choice[text] [Required, String]
+    # @argument poll_choices[][text] [Required, String]
     #   The descriptive text of the poll choice.
     #
-    # @argument poll_choice[is_correct] [Optional, Boolean]
+    # @argument poll_choices[][is_correct] [Optional, Boolean]
     #   Whether this poll choice is considered correct or not. Defaults to false.
     #
-    # @returns PollChoice
+    # @example_response
+    #   {
+    #     "poll_choices": [PollChoice]
+    #   }
+    #
     def create
-      @poll_choice = @poll.poll_choices.new(params[:poll_choice])
-      @poll_choice.is_correct = false if params[:poll_choice] && params[:poll_choice][:is_correct].blank?
+      poll_choice_params = params[:poll_choices][0]
+      @poll_choice = @poll.poll_choices.new(poll_choice_params)
+      @poll_choice.is_correct = false if poll_choice_params && poll_choice_params[:is_correct].blank?
 
       if authorized_action(@poll, @current_user, :update)
         if @poll_choice.save
-          render json: serialize_json(@poll_choice)
+          render json: serialize_jsonapi(@poll_choice)
         else
           render json: @poll_choice.errors, status: :bad_request
         end
@@ -113,23 +126,28 @@ module Polling
     #
     # Update an existing poll choice for this poll
     #
-    # @argument poll_choice[text] [Required, String]
+    # @argument poll_choices[][text] [Required, String]
     #   The descriptive text of the poll choice.
     #
-    # @argument poll_choice[is_correct] [Optional, Boolean]
+    # @argument poll_choices[][is_correct] [Optional, Boolean]
     #   Whether this poll choice is considered correct or not.  Defaults to false.
     #
-    # @returns Poll
+    # @example_response
+    #   {
+    #     "poll_choices": [PollChoice]
+    #   }
+    #
     def update
+      poll_choice_params = params[:poll_choices][0]
       @poll_choice = @poll.poll_choices.find(params[:id])
 
-      if params[:poll_choice] && params[:poll_choice][:is_correct].blank?
-        params[:poll_choice][:is_correct] = @poll_choice.is_correct
+      if poll_choice_params && poll_choice_params[:is_correct].blank?
+        poll_choice_params[:is_correct] = @poll_choice.is_correct
       end
 
       if authorized_action(@poll, @current_user, :update)
-        if @poll_choice.update_attributes(params[:poll_choice])
-          render json: serialize_json(@poll_choice)
+        if @poll_choice.update_attributes(poll_choice_params)
+          render json: serialize_jsonapi(@poll_choice)
         else
           render json: @poll_choice.errors, status: :bad_request
         end
@@ -150,18 +168,18 @@ module Polling
     end
 
     protected
-    def serialize_json(poll_choices, single=false)
-      poll_choices = Array(poll_choices)
+    def serialize_jsonapi(poll_choices)
+      poll_choices = Array.wrap(poll_choices)
 
-      serialized_set = poll_choices.map do |poll_choice|
-        Polling::PollChoiceSerializer.new(poll_choice, {
-          controller: self,
-          root: false,
-          include_root: false,
-          scope: @current_user
-        }).as_json
-      end
-      single ? serialized_set.first : serialized_set
+      serialized_set = Canvas::APIArraySerializer.new(poll_choices, {
+        each_serializer: Polling::PollChoiceSerializer,
+        controller: self,
+        root: false,
+        scope: @current_user,
+        include_root: false
+      }).as_json
+
+      { poll_choices: serialized_set }
     end
 
   end

@@ -40,9 +40,10 @@ describe Polling::PollsController, type: :request do
 
     it "returns all existing polls" do
       json = get_index
-      json.size.should == 5
+      poll_json = json['polls']
+      poll_json.size.should == 5
 
-      json.each_with_index do |poll, i|
+      poll_json.each_with_index do |poll, i|
         poll['question'].should == "Example Poll #{5-i}"
       end
     end
@@ -69,13 +70,15 @@ describe Polling::PollsController, type: :request do
 
     it "retrieves the poll specified" do
       json = get_show
-      json['question'].should == 'An Example Poll'
+      poll_json = json['polls'].first
+      poll_json['question'].should == 'An Example Poll'
     end
 
     context "as a teacher" do
       it "displays the total results of all sessions" do
         json = get_show
-        json.should have_key("total_results")
+        poll_json = json['polls'].first
+        poll_json.should have_key("total_results")
       end
     end
 
@@ -87,7 +90,8 @@ describe Polling::PollsController, type: :request do
         session.publish!
 
         json = get_show
-        json.should_not have_key("total_results")
+        poll_json = json['polls'].first
+        poll_json.should_not have_key("total_results")
       end
 
       it "is unauthorized if there are no published sessions" do
@@ -109,7 +113,7 @@ describe Polling::PollsController, type: :request do
       helper.call(:post,
                   "/api/v1/polls",
                   { controller: 'polling/polls', action: 'create', format: 'json' },
-                  { poll: params }, {}, {})
+                  { polls: [params] }, {}, {})
     end
 
     context "as a teacher" do
@@ -142,7 +146,7 @@ describe Polling::PollsController, type: :request do
                "/api/v1/polls/#{@poll.id}",
                { controller: 'polling/polls', action: 'update', format: 'json',
                  id: @poll.id.to_s },
-               { poll: params }, {}, {})
+               { polls: [params] }, {}, {})
 
     end
 

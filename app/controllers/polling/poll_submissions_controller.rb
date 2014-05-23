@@ -30,12 +30,14 @@ module Polling
   #           "example": 1023,
   #           "type": "integer"
   #         },
-  #         "poll_choice": {
-  #           "description": "The chosen poll choice for this submission.  See the Poll Choice API for details.",
-  #           "$ref": "PollChoice"
+  #         "poll_choice_id": {
+  #           "description": "The id of the chosen poll choice for this submission.",
+  #           "example": 55,
+  #           "type": "integer"
   #         }
   #       }
   #    }
+  #
   class PollSubmissionsController < ApplicationController
     include Filters::Polling
 
@@ -48,11 +50,15 @@ module Polling
     #
     # Returns the poll submission with the given id
     #
-    # @returns PollSubmission
+    # @example_response
+    #   {
+    #     "poll_submissions": [PollSubmission]
+    #   }
+    #
     def show
       @poll_submission = @poll_session.poll_submissions.find(params[:id])
       if authorized_action(@poll_submission, @current_user, :read)
-        render json: serialize_json(@poll_submission, true)
+        render json: serialize_jsonapi(@poll_submission)
       end
     end
 
@@ -61,19 +67,24 @@ module Polling
     #
     # Create a new poll submission for this poll session
     #
-    # @argument poll_submission[poll_choice_id] [Required, Integer]
+    # @argument poll_submissions[][poll_choice_id] [Required, Integer]
     #   The chosen poll choice for this submission.
     #
-    # @returns PollSubmission
+    # @example_response
+    #   {
+    #     "poll_submissions": [PollSubmission]
+    #   }
+    #
     def create
+      poll_submission_params = params[:poll_submissions][0]
       @poll_submission = @poll_session.poll_submissions.new
       @poll_submission.poll = @poll
       @poll_submission.user = @current_user
-      @poll_submission.poll_choice = @poll.poll_choices.find(params[:poll_submission][:poll_choice_id])
+      @poll_submission.poll_choice = @poll.poll_choices.find(poll_submission_params[:poll_choice_id])
 
       if authorized_action(@poll_submission, @current_user, :submit)
         if @poll_submission.save
-          render json: serialize_json(@poll_submission)
+          render json: serialize_jsonapi(@poll_submission)
         else
           render json: @poll_submission.errors, status: :bad_request
         end
@@ -81,18 +92,18 @@ module Polling
     end
 
     protected
-    def serialize_json(poll_submissions, single=false)
-      poll_submissions = Array(poll_submissions)
+    def serialize_jsonapi(poll_submissions)
+      poll_submissions = Array.wrap(poll_submissions)
 
-      serialized_set = poll_submissions.map do |poll_submission|
-        Polling::PollSubmissionSerializer.new(poll_submission, {
-          controller: self,
-          root: false,
-          include_root: false,
-          scope: @current_user
-        }).as_json
-      end
-      single ? serialized_set.first : serialized_set
+      serialized_set = Canvas::APIArraySerializer.new(poll_submissions, {
+        each_serializer: Polling::PollSubmissionSerializer,
+        controller: self,
+        root: false,
+        scope: @current_user,
+        include_root: false
+      }).as_json
+
+      { poll_submissions: serialized_set }
     end
 
   end

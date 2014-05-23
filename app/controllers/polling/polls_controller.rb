@@ -39,6 +39,12 @@ module Polling
   #           "description": "A short description of the poll.",
   #           "type": "string",
   #           "example": "This poll is to determine what priorities the students in the course have."
+  #         },
+  #         "created_at": {
+  #           "description": "The time at which the poll was created.",
+  #           "example": "2014-01-07T15:16:18Z",
+  #           "type": "string",
+  #           "format": "date-time"
   #         }
   #       }
   #    }
@@ -53,12 +59,16 @@ module Polling
     #
     # Returns the list of polls for the current user.
     #
-    # @returns [Poll]
+    # @example_response
+    #   {
+    #     "polls": [Poll]
+    #   }
+    #
     def index
       @polls = @current_user.polls
       @polls = Api.paginate(@polls, self, api_v1_polls_url)
 
-      render json: serialize_json(@polls)
+      render json: serialize_jsonapi(@polls)
     end
 
     # @API Get a single poll
@@ -66,12 +76,16 @@ module Polling
     #
     # Returns the poll with the given id
     #
-    # @returns Poll
+    # @example_response
+    #   {
+    #     "polls": [Poll]
+    #   }
+    #
     def show
       @poll = Polling::Poll.find(params[:id])
 
       if authorized_action(@poll, @current_user, :read)
-        render json: serialize_json(@poll, true)
+        render json: serialize_jsonapi(@poll)
       end
     end
 
@@ -80,18 +94,23 @@ module Polling
     #
     # Create a new poll for the current user
     #
-    # @argument poll[title] [Required, String]
+    # @argument polls[][title] [Required, String]
     #   The title of the poll.
     #
-    # @argument poll[description] [Optional, String]
+    # @argument polls[][description] [Optional, String]
     #   A brief description or instructions for the poll.
     #
-    # @returns Poll
+    # @example_response
+    #   {
+    #     "polls": [Poll]
+    #   }
+    #
     def create
-      @poll = @current_user.polls.new(params[:poll])
+      poll_params = params[:polls][0]
+      @poll = @current_user.polls.new(poll_params)
       if authorized_action(@poll, @current_user, :create)
         if @poll.save
-          render json: serialize_json(@poll)
+          render json: serialize_jsonapi(@poll)
         else
           render json: @poll.errors, status: :bad_request
         end
@@ -103,21 +122,26 @@ module Polling
     #
     # Update an existing poll belonging to the current user
     #
-    # @argument poll[title] [Required, String]
+    # @argument polls[][title] [Required, String]
     #   The title of the poll.
     #
-    # @argument poll[description] [Optional, String]
+    # @argument polls[][description] [Optional, String]
     #   A brief description or instructions for the poll.
     #
-    # @returns Poll
+    # @example_response
+    #   {
+    #     "polls": [Poll]
+    #   }
+    #
     def update
       @poll = Polling::Poll.find(params[:id])
+      poll_params = params[:polls][0]
 
       if authorized_action(@poll, @current_user, :update)
-        params[:poll].delete(:is_correct) if params[:poll] && params[:poll][:is_correct].blank?
+        poll_params.delete(:is_correct) if poll_params && poll_params[:is_correct].blank?
 
-        if @poll.update_attributes(params[:poll])
-          render json: serialize_json(@poll)
+        if @poll.update_attributes(poll_params)
+          render json: serialize_jsonapi(@poll)
         else
           render json: @poll.errors, status: :bad_request
         end
@@ -137,19 +161,18 @@ module Polling
     end
 
     protected
-    def serialize_json(polls, single=false)
-      polls = Array(polls)
+    def serialize_jsonapi(polls)
+      polls = Array.wrap(polls)
 
-      serialized_set = polls.map do |poll|
-        Polling::PollSerializer.new(poll, {
-          controller: self,
-          root: false,
-          include_root: false,
-          scope: @current_user
-        }).as_json
-      end
+      serialized_set = Canvas::APIArraySerializer.new(polls, {
+        each_serializer: Polling::PollSerializer,
+        controller: self,
+        root: false,
+        scope: @current_user,
+        include_root: false
+      }).as_json
 
-      single ? serialized_set.first : serialized_set
+      { polls: serialized_set }
     end
 
   end

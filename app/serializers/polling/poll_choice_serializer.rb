@@ -1,5 +1,7 @@
 module Polling
   class PollChoiceSerializer < Canvas::APISerializer
+    root :poll_choice
+
     attributes :id, :text, :is_correct
 
     has_one :poll, embed: :id
