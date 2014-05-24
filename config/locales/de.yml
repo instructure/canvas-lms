@@ -90,6 +90,7 @@ de:
     default_delegated_login_handle_name: Zugangskennung
     default_login_handle_name: E-mail
     saml_eppn_domain_stripped: "%{eppn} (Domain entfernt)"
+    test_bind_failed: "Verbindung fehlgeschlagen, Fehler: %{error}"
     test_connection_timeout: "Timeout bei Verbindungsherstellung"
     test_host_unknown: "Unbekannter Host: %{host}"
     test_login_auth_exception: "Ausnahmefall bei Anmeldung: %{error}"
@@ -1264,8 +1265,6 @@ de:
       ta: Lehrassistent-Einschreibungen
       teachers: Dozenten-Einschreibungen
     user_add_failed_message: "Hinzufügen des Nutzers fehlgeschlagen, bitte erneut versuchen"
-    user_added_message: "%{user} erfolgreich hinzugefügt!"
-    user_added_message_sent_message: "%{user} erfolgreich hinzugefügt! In Kürze erhält der Benutzer eine E-Mail-Bestätigung."
     user_deleted_message: "%{username} erfolgreich gelöscht"
     user_inactivity_csv_description: 
       account_reports: 
@@ -1609,6 +1608,7 @@ de:
         never_drop: "Nie ausblenden"
         no_assignments: "[Keine Aufgaben vorhanden]"
         weighted_by_points: "Gewichtet nach Punktzahl"
+      percent_of_total_grade: "% der Gesamtnote"
     assignment_count: 
       one: "1 Aufgabe"
       other: "%{count} Aufgaben"
@@ -2497,6 +2497,9 @@ de:
       scheduler_explanation_teacher_paragraph_1: "Dies ist das  Terminplanertool. Sie können es nutzen, um Termingruppen zu erstellen, für die sich Ihre Studenten anmelden können"
       scheduler_explanation_teacher_paragraph_2: "Nehmen wir beispielsweise an, Sie wollen sich eine Aufsatzaufgabe mit jedem der Studenten Ihres Kurses genauer ansehen. Sie erstellen also eine neue Termingruppe, geben Tage und Uhrzeiten an, zu denen Sie verfügbar sind, lassen diese vom Programm in 15-minütige Blöcke aufteilen und lassen einen Studenten je Zeitblock zur Anmeldung zu."
       scheduler_explanation_teacher_paragraph_3: "Anschließend erhalten die Studenten eine Benachrichtigung darüber, dass sie sich für einen der Zeitblöcke anmelden sollen. Ihnen wird ein Kalender mit den verfügbaren Zeitblöcken über den restlichen Kalendern angezeigt, so dass sie eine für sich günstige Zeit auswählen können."
+      scheduler_explanation_teacher_paragraph_4: "*Fangen Sie gleich an, indem Sie rechts auf die Schaltfläche \"Termingruppe erstellen\" klicken. *"
+      x_groups_have_signed_up: "%{participant_count} Gruppen haben sich registriert"
+      x_people_have_signed_up: "%{participant_count} Personen haben sich registriert"
     buttons: 
       cancel: Abbrechen
       send_message: Senden
@@ -2572,6 +2575,7 @@ de:
       from: "Von:"
       links: 
         more_options: "Weitere Optionen"
+      timespan_separator: bis
       title: "Titel:"
     edit_calendar_event_full: 
       buttons: 
@@ -2931,6 +2935,10 @@ de:
         update: "Kollaboration aktualisieren"
       collaboration_name: "%{course_or_group_name}-kollaboration"
       descriptions: 
+        etherpad: |-
+            EtherPad ist ein Open Source-Projekt, mit dem Sie schnell gemeinsam verwendete Dokumente einrichten können. Das Programm ist so schnell, dass Sie sehen können, was andere Benutzer schreiben, während diese den Text eingeben. Allerdings sind die "Pads" nicht passwortgeschützt, sodass alle Benutzer, die über einen Link zu diesen verfügen, die Pads bearbeiten können. EtherPad ist besser geeignet als Google Docs, wenn Sie die Anonymität der Benutzer aufrechterhalten und/oder Benutzern ohne Google-Konten die Teilnahme ermöglichen möchten.  ⏎
+              
+            **Warnung**: Stellen Sie sicher, dass Sie mit der [EtherPad's deletion policy](%{etherpad_deletion_policy_url}) vertraut sind, damit Ihre Arbeit nicht verloren geht.
         google_docs: |-
             Google Docs ist eine hervorragende Möglichkeit, gemeinsam an einem Gruppenprojekt zu arbeiten.  Google Docs ist Microsoft Word sehr ähnlich, erlaubt aber die gemeinsame, gleichzeitige Bearbeitung derselben Datei, ohne diese per E-mail an die übrigen Gruppenmitglieder verschicken zu müssen.  
               
@@ -3357,7 +3365,6 @@ de:
         conclude_student: "Möchten Sie diese Studenteneinschreibung wirklich abschließen?"
         delete_enrollment: "Möchten Sie diese Studenteneinschreibung wirklich löschen?"
       enrolled_as: "Eingeschrieben als ein %{enrollment_type}"
-      enrollment_linked_to: "verlinkt mit %{linked_user}"
       error: 
         enrollment_change_failed: "Änderung der Einschreibungsberechtigung fehlgeschlagen. Versuchen Sie es erneut."
       labels: 
@@ -3414,6 +3421,7 @@ de:
       enrollment_change_failed: "Änderung der Einschreibungsberechtigung fehlgeschlagen, bitte erneut versuchen"
       headings: 
         recent_messages: "Zuletzt eingegangene Nachrichten"
+        user_services: "Registrierte Webdienste"
       help: 
         list_services: "Sie haben Ihre Liste der registrierten Dienste nicht aktiviert. Durch die Aktivierung dieser Liste können Kurs- und Gruppenmitglieder außerhalb des Unterrichts leichter mit Ihnen Kontakt aufnehmen."
         services: "Sie haben Ihr Benutzerprofil mit keinem externen Service verknüpft. Sie können Ihr Canvas-konto mit Diensten wie Facebook und Twitter verknüpfen. Auf diese Weise können Kurs- und Gruppenmitglieder auch außerhalb des Unterrichts leichter mit Ihnen in Kontakt bleiben."
@@ -3423,20 +3431,27 @@ de:
       legends: 
         memberships: Mitgliedschaft(en)
       links: 
+        access_report: Zugriffsbericht
         cant_delete: "Kann nicht gelöscht werden"
         conclude_enrollment: "Diese Einschreibung abschließen"
         delete_enrollment: "Diese Einschreibung löschen"
+        faculty_journal: Fakultätsjournal
         link_enrollment: "Diese Einschreibung verknüpfen"
         link_services: "Webdienste mit meinem Benutzerkonto verknüpfen"
+        message_user: "Nachricht senden"
         more_about_this_user: "Weitere Informationen zu diesem Benutzer"
         more_user_details: "Weitere Benutzerdaten..."
         remove_avatar: "Profilbild entfernen"
         report_avatar: "Anstößiges Bild melden"
         restore_enrollment: "Diese Einschreibung wiederherstellen"
+        student_teacher_activity: "Interaktionen mit Ihnen"
+        teacher_activity: Studenten-Interaktionsbericht
         title: 
           enrollment_sis_defined: "Diese Einschreibung wurde von der Universität vorgenommen und kann nicht gelöscht werden"
         user_account_details: Nutzerkontodetails
+        user_grades: Noten
         user_only_view_section: "für diesen Benutzer nur Mitglieder desselben Kursabschnitts anzeigen"
+        user_outcomes: Ergebnisse
         user_view_all_sections: "für diesen Benutzer alle Kursmitglieder anzeigen"
       no_messages: "Keine Nachrichten"
       no_services: "%{user} hat noch keine externen Dienste mit seinem Konto verknüpft."
@@ -3921,6 +3936,7 @@ de:
     no_course: "Kein Kurs"
     select_course: "Kurs auswählen"
   conversation_message: 
+    subject: "Private Nachricht"
     subject_specified: "Private Nachricht: %{subject}"
     users_added: 
       one: "%{user} wurde von %{current_user} zur Konversation hinzugefügt"
@@ -4466,6 +4482,7 @@ de:
         delete_course: "Kurs löschen"
       details: 
         conclude_alt_text: "Wenn Sie auch weiterhin in der Lage sein möchten, Noten zu ändern und gleichzeitig den Zugriff der Studenten auf den Kurs zu beschränken, verwenden Sie die Einstellungen für die Kursdaten. Weitere Informationen zu den Einstellungen für die Kursdaten erhalten Sie in unseren Leitfäden, die Sie *hier* finden."
+        confirm_conclude: "Warnung: Wenn Sie den Kurs abschließen, können Sie keine Noten mehr ändern und nicht mehr auf den Kursinhalt zugreifen."
         confirm_delete: "Möchten Sie diesen Kurs wirklich löschen? Nach dem Löschen haben die Studenten und Dozenten keinen Zugriff mehr auf den Kurs. Wenn Sie ihn lediglich aus dem Kurs-Dropdown-Menü entfernen möchten, sollten Sie *den Kurs stattdessen abschließen*."
         confirm_delete_addendum: "Wenn Sie nicht über die Berechtigung zum Abschließen des Kurses verfügen, können Sie *das Enddatum des Kurses ändern* oder den Administrator bitten, den Kurs abzuschließen."
       headings: 
@@ -4732,7 +4749,6 @@ de:
         add_section: "Abschnitt hinzufügen"
         move_course: "Kurs verschieben"
         update_course: "Kursdetails aktualisieren"
-      course_open_enrollment: "Dieser Kurs ist auf offene Einschreibung konfiguriert. Studenten können sich selbst in den Kurs einschreiben, nachdem Sie ihnen diese URL schicken: *%{url}*."
       course_open_enrollment_without_code: "Für diesen Kurs sind offene Einschreibungen aktiviert. Die Studenten können sich selbständig für den Kurs einschreiben, wenn Sie die folgende URL an sie weiterleiten: *%{url}*"
       course_overrides_term: "Hierdurch werden alle Verfügbarkeitseinstellungen außer Kraft gesetzt."
       date_restricted: "Die Benutzer können nur innerhalb dieses Zeitraums am Kurs teilnehmen"
@@ -5471,7 +5487,7 @@ de:
         other: "%{count} Antworten."
         zero: "Keine Antworten."
       unread_count_tooltip: 
-        one: "%{count} ungelesene Antworten."
+        one: "1 ungelesene Antwort."
         other: "%{count} ungelesene Antworten."
         zero: "Keine ungelesenen Antworten."
     page_nav: 
@@ -5555,6 +5571,8 @@ de:
     closed_for_comments: "Für Kommentare geschlossen"
     confirm_delete_discussion_topic: "Möchten Sie dieses Diskussionsthema wirklich löschen?"
     delete: Löschen
+    deleted_entry: 
+      deleted: "Gelöscht von *%{editor_name}* am %{edited_at}"
     discussions: Diskussionen
     edit_settings: "Diskussionseinstellungen bearbeiten"
     entry_collection_view: 
@@ -8432,7 +8450,6 @@ de:
           click_to_see_assignment: "Klicken Sie hier, um die Aufgabe anzuzeigen"
         no_due_date: "Kein Abgabetermin"
       facebook: 
-        assignment_due_date_changed_sentence: "Der Abgabetermin für die Aufgabe %{assignment_name} für den Kurs %{course_name} (%{override}) wurde verlegt auf:"
         no_due_date: "Kein Abgabetermin "
       sms: 
         assignment_due_date_changed: "%{assignment_name}, %{course_name} (%{override}) ist jetzt fällig:"
@@ -8588,11 +8605,13 @@ de:
         subject: "Bestätigung der E-mailadresse: Canvas"
     confirm_registration: 
       email: 
+        body: "Vielen Dank, dass Sie sich bei %{product_name} registriert haben. Diese E-Mail dient zur Bestätigung, dass sich der Benutzer %{user} für ein neues Konto bei %{website} registriert."
         details: "Um den Registrierungsprozess abzuschließen, rufen Sie bitte folgende URL auf:"
         html: 
           body: "Vielen Dank, dass Sie sich bei %{product_name} registriert haben. Diese E-Mail dient zur Bestätigung, dass sich der Benutzer %{user} für ein neues Konto bei %{website} registriert."
           details: "Klicken Sie hier, um die Registrierung abzuschließen"
           subject: "Registrierung bestätigen: %{product_name}"
+        subject: "Registrierung bestätigen: %{product_name}"
     confirm_sms_communication_channel: 
       sms: 
         body: |-
@@ -8605,7 +8624,6 @@ de:
             Beim Exportieren von Kurs "%{course}" ist ein Fehler aufgetreten.
             Bitte benachrichtigen Sie Ihren Systemadministrator und geben Sie folgenden Export-identifier an: %{id}.
         html: 
-          body2: "Beim Exportieren des Kurses *%{course}Ü ist ein Fehler aufgetreten. Benachrichtigen Sie Ihren Systemadministrator, und geben Sie folgenden Export-Identifier an:"
           link: "Zum Anzeigen von Exporten klicken"
           subject: "Kursexport fehlgeschlagen: %{course}"
         subject: "Kursexport fehlgeschlagen: %{course}"
@@ -9101,6 +9119,7 @@ de:
           click_to_preferences: "Klicken Sie hier, um Ihre Benachrichtigungseinstellungen zu bearbeiten"
     merge_email_communication_channel: 
       email: 
+        body: "Für Sie wurde auf %{host} ein Konto eingerichtet, Sie verfügen jedoch bereits über ein Canvas-Konto.  Wenn Sie die Konten zusammenführen möchten, rufen Sie folgende URL auf:"
         html: 
           account_created: "Für Sie wurde auf %{host} ein Konto eingerichtet, Sie verfügen jedoch bereits über ein Canvas-Konto."
           merge2: "Wenn Sie sie zusammenführen möchten, *klicken Sie hier*"
@@ -9470,10 +9489,8 @@ de:
       facebook: 
         body: "Neubenotung für Quiz durchgeführt: %{title}"
       sms: 
-        body_sms: "Neubenotung für Quiz durchgeführt für %{quiz}, %{context}"
         more_info: "Weitere Informationen finden Sie unter %{url}"
       summary: 
-        body: "Für Ihr Quiz %{quiz} wurde eine Neubenotung durchgeführt."
         subject: "Quiz neu benotet: %{quiz}, %{context}"
       twitter: 
         body: "Canvas-Benachrichtigung – Quiz neu benotet : %{quiz}"
@@ -9886,9 +9903,17 @@ de:
   notification: 
     added_to_conversation_description: "Sie werden zu einer Konversation hinzugefügt"
     added_to_conversation_display: "Zur Konversation hinzugefügt"
+    all_submissions_description: |-
+        *Nur Dozent und Administrator:*
+        
+        Einsendung/Erneute Einsendung der Aufgabe
     all_submissions_display: "Alle Einsendungen"
     announcement_description: "Neue Ankündigung in Ihrem Kurs"
     announcement_display: Ankündigung
+    appointment_availability_description: |-
+        *Nur Dozent und Administrator:*
+        
+        Änderung der Zeitblöcke für den Termin
     appointment_availability_display: Terminverfügbarkeit
     appointment_cancelations_description: "Stornierung des Termins"
     appointment_cancelations_display: Terminstornierungen
@@ -9922,6 +9947,12 @@ de:
       submission_comment: Einsendungskommentar
     conversation_message_description: "Neue Nachrichten im Posteingang"
     conversation_message_display: Konversationsnachricht
+    course_content_description: |-
+        Änderung der Kursinhalte:
+        
+        * Wiki-Seite
+        * Quiz-Inhalt
+        * Aufgabeninhalt
     course_content_display: Kursinhalt
     discussion_description: "Neues Diskussionsthema in Ihrem Kurs"
     discussion_display: Diskussion
@@ -9931,11 +9962,34 @@ de:
     due_date_display: Abgabefrist
     files_description: "Neue Datei zu Ihrem Kurs hinzugefügt"
     files_display: Dateien
+    grading_description: |-
+        Enthält:
+        
+        * Note für Aufgabe/Einsendung eingegeben/geändert
+        * Stummschaltung der Aufgabennote aufgehoben
+        * Notengewichtung geändert
+        
+        &nbsp;
+        
+        Wenn Sie Ihre Noten in den Benachrichtigungen sehen möchten, aktivieren Sie die Option 'Bei Benachrichtigungen über Notenänderungen Punktzahlen einfügen'.
+        Wenn es sich bei Ihrer E-Mail-Adresse nicht um eine von der Institution bereitgestellte E-Mail-Adresse handelt, werden vertrauliche Inhalte an Empfänger außerhalb der Institution gesendet.
     grading_display: Benotung
     grading_notify_include_grade: "Bei Benachrichtigungen über Notenänderungen Punktzahlen einfügen"
     grading_policies_description: "Änderung der Benotungsrichtlinien für den Kurs"
     grading_policies_display: Benotungsrichtlinien
+    invitation_description: |-
+        Einladung für:
+        
+        * Webkonferenz
+        * Gruppe
+        * Zusammenarbeit
+        * Kurs
+        * Peer Review und Erinnerung
     invitation_display: Einladung
+    late_grading_description: |-
+        *Nur Dozent und Administrator:*
+        
+        Verspätete Einsendung der Aufgabe
     late_grading_display: "Verspätete Benotung"
     membership_update_description: |-
         *Nur Administrator: ausstehende Einschreibung aktiviert*
@@ -10014,8 +10068,22 @@ de:
       updated_wiki_page: "Aktualisierte Wikiseite"
       web_conference_invitation: "Einladung zur Webkonferenz"
     no_subject: "Kein Betreff"
+    other_description: |-
+        *Nur Dozent und Administrator:*
+        
+        * Kurseinschreibung
+        * Bericht erstellt
+        * Inhaltsexport
+        * Migrationsbericht
+        * Neuer Kontobenutzer
+        * Registrierung von neuem Dozenten
+        * Neue Studentengruppe
     other_display: Verwaltungsbenachrichtigungen
     reminder_display: Erinnerung
+    student_appointment_description: |-
+        *Nur Dozent und Administrator:*
+        
+        Studentenanmeldung für Termin
     student_appointment_display: "Terminanmeldungen von Studenten"
     submission_comment_description: |-
         Kommentare zur Aufgabeneinsendung
@@ -10280,7 +10348,6 @@ de:
     academic_benchmark_settings: 
       api_url_description: "(z. B. %{url})"
       common_core_guid: "(z. B. %{guid})"
-      description: "Sie müssen Zugriff auf ein [Academic Benchmark]-Konto (%{url}) haben."
       labels: 
         api_key: API-Key
         api_url: API-Url
@@ -10372,15 +10439,6 @@ de:
       description: Canvas-facebook-applikation
       name: Facebook
     facebook_settings: 
-      description: |-
-          Sie müssen eine [neue Applikation auf facebook.com](%{facebook_url}) erstellen. Nehmen Sie die folgenden Einstellungen vor, um sicherzustellen, dass Ihre Facebook-applikation einwandfrei funktioniert:
-          
-          * **Web Site -- Site URL:** gesetzt auf %{site_url}
-          * **Web Site -- Site Domain:** Domain Ihrer primären Canvas-Site.  Diese Einstellung muss mit der Site URL identisch sein
-          * **Facebook Integration -- Canvas Page:** notieren Sie sich Ihre Einstellung und geben Sie diese in unten stehendes Formular ein.
-          * **Facebook Integration -- Canvas URL:** gesetzt auf %{canvas_url}
-          * Vergewissern Sie sich, dass **Advanced -- OAuth 2.0 for Canvas** aktiviert ist
-          * Nachdem Sie Ihre Applikation gespeichert haben, notieren Sie App ID, API Key und App Secret
       domain_name: Domain
       headers: 
         domain_settings: Domaineinstellungen
@@ -13059,13 +13117,12 @@ de:
       recent_activity_in_course: "Aktuelle Aktivität in %{course_or_group}"
       unread_column: Ungelesen
       unread_count_badge: 
-        one: "1 ungelesenes Element"
+        one: "%{count} *ungelesene Elemente*"
         other: "%{count} *ungelesene Elemente*"
     recent_activity_item: 
       close: schließen
       unread: Ungelesen
     registration_incomplete: 
-      confirm_email_instructions: "Bevor Sie diese Seite aufrufen können, müssen Sie *Ihre E-mailadresse bestätigen* (%{email}). Klicken Sie auf den Link in der E-mail, um die Erstellung Ihres Kontos abzuschließen. Falls Sie diese E-mail nicht erhalten haben, *Klicken sie hier zum Neuversenden* und überprüfen Sie Ihren Spamordner."
       headings: 
         confirm_email: "Bestätigen Sie Ihre E-mailadresse"
     right_side: 
