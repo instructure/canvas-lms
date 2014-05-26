@@ -8,7 +8,7 @@ module SFU
     class << self
       def terms(sfuid)
         terms = REST.json REST.terms_url, "&username=#{sfuid}"
-        if terms == 404
+        if terms == 404 || terms.empty?
           404
         elsif terms == 500
           500
