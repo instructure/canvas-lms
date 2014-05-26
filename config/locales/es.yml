@@ -827,7 +827,7 @@ es:
       about_google_docs: |-
           La vista previa de Google Docs permite a los usuarios ver documentos desde dentro de Canvas, en vez de tener que descargarlos y abrirlos en el programa correspondiente (p. ej. Word o Excel).
           
-          Si se ha habilitado Scribid para esta cuenta, Canvas intentará utilizarlo para mostrar la vista previa. Si el documento no puede previsualizarse en Scribid o el usuario no tiene instalado el Flash Player (p. ej. en un iPad o un iPhone), Canvas utilizará la vista previa de Google Docs, en caso de que esté habilitada. Al usar este servicio, usted reconoce que ha leído y está de acuerdo con las [Condiciones de servicio de la vista previa de Google Docs](%{terms_url}).
+          Si se ha habilitado Scribid para esta cuenta, Canvas intentará utilizarlo para mostrar la vista previa. Si el documento no puede previsualizarse en Scribid o el usuario no tiene instalado Flash Player (p. ej. en un iPad o un iPhone), Canvas utilizará la vista previa de Google Docs, siempre que esté habilitada. Al usar este servicio, usted reconoce que ha leído y que está de acuerdo con las [Condiciones de servicio de la vista previa de Google Docs](%{terms_url}).
       about_google_docs_tooltip: "Acerca de vista previa en Google Docs"
       account_admins_title: "Administradores de Cuenta"
       account_quotas: 
@@ -1501,7 +1501,7 @@ es:
     default_title: "Sin Nombre - %{course}"
     default_unfiled_title: "Preguntas sin archivar"
   assignment: 
-    assignment_group_must_have_group: "Seleccione un grupo de tareas para esta tarea"
+    assignment_group_must_have_group: "Seleccione un grupo de trabajo para esta tarea"
     at_least_one_file_type: "Especifique al menos un tipo de archivo permitido"
     at_least_one_submission_type: "Escoja al menos un tipo de envío"
     atom_no_author: "Sin autor"
@@ -1720,7 +1720,7 @@ es:
       add_assignment_to_group: "*Agregar la Tarea* a %{group}"
       assignment_groups_wrapper: "( en %{number_of_groups})"
       links: 
-        add_assignment_group: "Agregar un Grupo de trabajo"
+        add_assignment_group: "Agregar un grupo de trabajo"
     available_date_description: 
       available_until: "Disponible hasta"
       closed: Cerrado
@@ -1833,7 +1833,7 @@ es:
     external_content_homework_submission_view: 
       additional_comments: "Comentarios adicionales"
       buttons: 
-        submit_assignment: "Enviar Tarea"
+        submit_assignment: "Enviar tarea"
       group_assignment_header: Comentarios...
     external_grader_sidebar: 
       edit_assignment_settings: "Editar Configuraciones de la Tarea"
@@ -3305,7 +3305,7 @@ es:
         to_happen_on: para
       external_tool_launch: 
         course: Curso
-        find_a_course: "Encontrar un Curso"
+        find_a_course: "Encontrar un curso"
       folder_picker: 
         default_select_folder: "Seleccionar carpeta"
         upload_to: "Cargar a"
@@ -5299,23 +5299,23 @@ es:
       higher_education_for_profit: "Educación superior con ánimo de lucro"
       incorrect: "Incorrecto. Inténtelo de nuevo."
       instructional_designer: "Diseñador del curso"
-      instructional_media_svcs_dir: "Director de Servicios de Medios de Comunicación e Instrucción"
+      instructional_media_svcs_dir: "Director de servicios de medios de comunicación e instrucción"
       k12: K12
       k12_for_profit: "K12 con ánimo de lucro"
       labels: 
         location: Ubicación
         name: Nombre
         organization_type: "Tipo de organización"
-        phone: "Número de Telefono"
+        phone: "Número de teléfono"
         school_name: Escuela/Organización
         school_position: Título
         type_what_you_hear: "Teclee lo que oye"
         type_what_you_see: "Teclee lo que ve"
         username: "Correo electrónico"
-      library_media_specialist: "Especialista de Biblioteca/Multimedia"
+      library_media_specialist: "Especialista de biblioteca/multimedia"
       lms_administrator: "Administrador LMS"
       manager: Gestor
-      network_system_administrator: "Administrador del Sistema de Redes"
+      network_system_administrator: "Administrador de sistemas de redes"
       one: Otro
       other: Otro
       personalize_demo: "Personalice su demo"
@@ -5334,7 +5334,7 @@ es:
       technology_computer_coord: "Coordinador informático/tecnológico"
       technology_education_director: "Director de educación tecnológica"
       united_states_and_canada: "Estados Unidos y Canadá"
-      vp: VP
+      vp: Vicepresidente
   developer_key: 
     api_key: "Clave: *%{api_key}*"
     created: "Creado:"
@@ -6923,23 +6923,23 @@ es:
       upload_warning: "Asegúrese de no cambiar los nombres de los archivos enviados para que podamos reconocerlos."
       weight_final: "Designar peso a la calificación final basado en grupos"
     gradebook2: 
-      arrange_columns_by_due_date: "Arreglar las columnas por fecha límite"
-      arrange_columns_by_group: "Arreglar columnas por grupo de trabajo"
-      download_scores: "Descargar Calificaciones (.csv)"
+      arrange_columns_by_due_date: "Ordenar las columnas por fecha límite"
+      arrange_columns_by_group: "Ordenar las columnas por grupo de tareas"
+      download_scores: "Descargar calificaciones (.csv)"
       filter_by_student: "Filtrado por nombre de alumno o ID secundario"
       grades: Calificaciones
-      hide_student_names: "Esconder los Nombres de Estudiantes"
+      hide_student_names: "Ocultar los nombres de los alumnos"
       include_ungraded: "Considerar lo no calificado como 0"
       learning_mastery: "Dominio de aprendizaje"
-      old_gradebook: "antiguo libro de calificaciones"
+      old_gradebook: "anterior libro de calificaciones"
       post_grades: "Publicar calificaciones"
-      publish_to_sis: "Publicar las calificaciones a SIS"
-      set_group_weights: "Establezca Peso por Grupo"
-      show_attendance_columns: "Ver Columnas de Asistencia"
+      publish_to_sis: "Publicar las calificaciones en SIS"
+      set_group_weights: "Establezca la ponderación del grupo"
+      show_attendance_columns: "Ver columnas de asistencia"
       show_concluded_enrollments: "Mostrar matrículas concluidas"
       srgb_gradebook: "alternar libros de calificaciones"
-      upload_scores: "Actualizar Calificaciones (desde .csv)"
-      view_grading_history: "Ver el Historial de Calificación"
+      upload_scores: "Actualizar calificaciones (desde .csv)"
+      view_grading_history: "Ver el historial de calificación"
     grades: 
       complete: Completo
       incomplete: Incompleto
@@ -7569,7 +7569,7 @@ es:
         external_tool_url: "La URL para la asignación de una herramienta externa \"%{assignment_name}\" no era válida."
     imported_assignments_group: "Tareas Importadas"
   importers/context_external_tool_importer: 
-    external_tool_attention_needed: "Los parámetros de seguridad para la herramienta externa \"%{tool_name}\" deben establecerse en las Configuraciones del Curso."
+    external_tool_attention_needed: "Los parámetros de seguridad para la herramienta externa \"%{tool_name}\" deben establecerse en la configuración del curso."
   importers/context_module_importer: 
     migration_module_item_type: "Elemento de módulo"
   importers/course_content_importer: 
@@ -7577,14 +7577,14 @@ es:
   importers/learning_outcome_group_importer: 
     no_global_permission: "No se le permite gestionar resultados globales, no puede añadir \"%{title}\""
   importers/learning_outcome_importer: 
-    no_context_found: "No se ha podido encontrar el resultado de aprendizaje externo para \"%{title}\", creando una copia."
+    no_context_found: "No se ha podido encontrar el resultado de aprendizaje externo para \"%{title}\". Se está creando una copia."
     no_global_permission: "No se le permite gestionar resultados globales, no puede añadir \"%{title}\""
   importers/rubric_importer: 
     no_context_found: "No se ha podido encontrar la rúbrica externa para \"%{title}\". Se está creando una copia."
   importers/wiki_page_importer: 
-    title_for_topics_category: "Temas %{category}"
+    title_for_topics_category: "Temas de %{category}"
     warnings: 
-      truncated_wiki_title: "El título de la siguiente página wiki fue truncado: %{title}"
+      truncated_wiki_title: "Se truncó el título de la siguiente página wiki: %{title}"
   individual_gradebook_description: "La vista del libro de calificaciones individual ofrece una vista del libro de calificaciones diseñada para la accesibilidad."
   info: 
     notices: 
@@ -9901,9 +9901,9 @@ es:
       back_to_modules: "Volver a la página de módulos"
       no_students_found: "No se han encontrado alumnos"
       student_progress: "Progreso del alumno"
-  moodle_dropdown_many_warning_title: "Es posible que haya %{count} preguntas con menús desplegables en este grupo que se hayan importado de manera incorrecta."
+  moodle_dropdown_many_warning_title: "Hay %{count} preguntas con menús desplegables en este grupo que es posible que se hayan importado de mandera incorrecta"
   moodle_dropdown_warning_title: "Es posible que las preguntas con varios menús desplegables se hayan importado de manera incorrecta"
-  moodle_formula_many_warning_title: "Es posible que haya %{count} preguntas con fórmulas en este grupo que se hayan importado de manera incorrecta."
+  moodle_formula_many_warning_title: "Hay %{count} preguntas con fórmulas en este grupo cuyas posibles respuestas deben volverse a generar."
   moodle_formula_warning_title: "Es necesario volver a generar las respuestas posibles a las preguntas con fórmula"
   move_dialog: 
     cancel: Cancelar
@@ -10690,7 +10690,7 @@ es:
         api_url: "URL Api"
         secret_key: "Código Secreto"
   post_grades_description: |-
-      La opción de Publicar calificaciones permite a los profesores publicar las calificaciones en sistemas preparados para SIS: Powerschool,
+      La opción Publicar calificaciones permite a los profesores publicar las calificaciones en sistemas preparados para SIS: Powerschool,
       Aspire (SIS2000), JMC y cualquier otro SIS compatible con SIF que acepte los elementos SIF GradingCategory,
       GradingAssignment, GradingAssignmentScore.
   prerequisites_lookup: 
@@ -11115,7 +11115,7 @@ es:
       unpublishing: Ocultando...
   publish_grades: 
     assignment_group_list: 
-      no_assignment_groups: "No se encontraron grupos de trabajo"
+      no_assignment_groups: "No se encontraron grupos de tareas"
     assignment_group_list_item: 
       group_weight: "%{groupWeight}% del total"
       manage: Gestionar
@@ -13535,7 +13535,7 @@ es:
       grade: "(calificación: %{grade})"
       loud_late: TARDE
       see_all_quiz_attempts: "Ver todos los intentos de evaluación"
-      submission_to_view: "Envío para ver"
+      submission_to_view: "Envío para ver:"
       submitted: "*Enviado:* %{submittedAt}"
   sr_gradebook: 
     all_sections: "Todas las secciones"
@@ -13652,7 +13652,7 @@ es:
     click_to_download: "Hacer click aquí para descargar %{size_of_file}"
     creating_zip: "Creando un archivo comprimido zip..."
     download_submissions: "Descargar los Envíos de Tareas"
-    download_submissions_title: "Descargar los Envíos de Tareas"
+    download_submissions_title: "Descargar los envíos de tareas"
     errors: 
       assignment_submit_fail: "No se puedo enviar la tarea"
       can_not_submit_locked_assignment: "No puede enviar una tarea cuando está bloqueada"
