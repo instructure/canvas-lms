@@ -66,4 +66,40 @@ describe Polling::PollSession do
       @session.should be_valid
     end
   end
+
+  describe ".available_for" do
+    before(:each) do
+      @course1 = course_model
+      @course2 = course_model
+      @teacher1 = teacher_in_course(course: @course1).user
+      @teacher2 = teacher_in_course(course: @course2).user
+      @student1 = student_in_course(course: @course1).user
+      @student2 = student_in_course(course: @course2).user
+      @unenrolled_student = user_model
+      @poll1 = Polling::Poll.create!(user: @teacher1, question: 'A Test Poll')
+      @poll2 = Polling::Poll.create!(user: @teacher2, question: 'Another Test Poll')
+    end
+
+      it "returns the poll sessions available for a user" do
+        student1_sessions = []
+        student2_sessions = []
+
+        3.times do |n|
+          student1_sessions << Polling::PollSession.create(poll: @poll1, course: @course1)
+        end
+
+        Polling::PollSession.available_for(@student1).size.should == 3
+        Polling::PollSession.available_for(@student2).size.should == 0
+        Polling::PollSession.available_for(@student1).should == student1_sessions
+
+        2.times do |n|
+          student2_sessions << Polling::PollSession.create(poll: @poll2, course: @course2)
+        end
+
+        Polling::PollSession.available_for(@student1).size.should == 3
+        Polling::PollSession.available_for(@student2).size.should == 2
+        Polling::PollSession.available_for(@student2).should == student2_sessions
+    end
+  end
+
 end

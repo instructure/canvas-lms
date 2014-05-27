@@ -45,7 +45,6 @@ module Polling
       can :read
     end
 
-
     def total_results
       poll_sessions.reduce(Hash.new(0)) do |poll_results, session|
         poll_results = poll_results.merge(session.results) do |key, poll_result_value, session_result_value|

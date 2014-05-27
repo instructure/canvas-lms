@@ -94,7 +94,7 @@ module Polling
     #
     # Create a new poll for the current user
     #
-    # @argument polls[][title] [Required, String]
+    # @argument polls[][question] [Required, String]
     #   The title of the poll.
     #
     # @argument polls[][description] [Optional, String]
@@ -122,7 +122,7 @@ module Polling
     #
     # Update an existing poll belonging to the current user
     #
-    # @argument polls[][title] [Required, String]
+    # @argument polls[][question] [Required, String]
     #   The title of the poll.
     #
     # @argument polls[][description] [Optional, String]

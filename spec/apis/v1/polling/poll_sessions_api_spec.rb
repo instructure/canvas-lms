@@ -261,16 +261,16 @@ describe Polling::PollSessionsController, type: :request do
     end
   end
 
-  describe 'GET publish' do
+  describe 'GET open' do
     before :each do
       @poll = @teacher.polls.create!(question: 'An Old Title')
       @poll_session = @poll.poll_sessions.create!(course: @course, course_section: @section)
     end
 
-    def get_publish
+    def get_open
       raw_api_call(:get,
-               "/api/v1/polls/#{@poll.id}/poll_sessions/#{@poll_session.id}/publish",
-               { controller: 'polling/poll_sessions', action: 'publish', format: 'json',
+               "/api/v1/polls/#{@poll.id}/poll_sessions/#{@poll_session.id}/open",
+               { controller: 'polling/poll_sessions', action: 'open', format: 'json',
                  poll_id: @poll.id.to_s,
                  id: @poll_session.id.to_s
                },
@@ -283,7 +283,7 @@ describe Polling::PollSessionsController, type: :request do
         @poll_session.reload
         @poll_session.is_published.should be_false
 
-        get_publish
+        get_open
 
         @poll_session.reload
         @poll_session.is_published.should be_true
@@ -296,7 +296,7 @@ describe Polling::PollSessionsController, type: :request do
           @poll_session.reload
           @poll_session.is_published.should be_false
 
-          get_publish
+          get_open
 
           response.code.should == '401'
           @poll_session.reload
@@ -312,7 +312,7 @@ describe Polling::PollSessionsController, type: :request do
         @poll_session.reload
         @poll_session.is_published.should be_false
 
-        get_publish
+        get_open
 
         @poll_session.reload
         response.code.should == '401'
@@ -364,7 +364,7 @@ describe Polling::PollSessionsController, type: :request do
 
     context "as a student" do
       it "is unauthorized" do
-        student_in_course(:active_all => true, :course => @course)
+        student_in_course(active_all: true, course: @course)
 
         get_close
 
@@ -374,4 +374,76 @@ describe Polling::PollSessionsController, type: :request do
       end
     end
   end
+
+  describe 'GET opened' do
+    before :each do
+      @course1 = course_model
+      @course2 = course_model
+      @teacher1 = teacher_in_course(course: @course1).user
+      @teacher2 = teacher_in_course(course: @course2).user
+      @poll1 = Polling::Poll.create!(user: @teacher1, question: 'A Test Poll')
+      @poll2 = Polling::Poll.create!(user: @teacher2, question: 'Another Test Poll')
+    end
+
+    def get_opened
+      api_call(:get,
+               "/api/v1/poll_sessions/opened",
+               { controller: 'polling/poll_sessions', action: 'opened', format: 'json' },
+               {}, {}, {})
+    end
+
+    it "returns all poll sessions available to the current user that are published" do
+      @published = @poll1.poll_sessions.create!(course: @course1)
+      @published.publish!
+      @unenrolled = @poll2.poll_sessions.create!(course: @course2)
+      @unenrolled.publish!
+      @not_published = @poll1.poll_sessions.create!(course: @course1)
+
+      student_in_course(active_all: true, course: @course1)
+      json = get_opened['poll_sessions']
+
+      session_ids = json.map { |session| session["id"].to_i }
+
+      session_ids.should include(@published.id)
+      session_ids.should_not include(@unenrolled.id)
+      session_ids.should_not include(@not_published.id)
+    end
+  end
+
+  describe 'GET closed' do
+    before :each do
+      @course1 = course_model
+      @course2 = course_model
+      @teacher1 = teacher_in_course(course: @course1).user
+      @teacher2 = teacher_in_course(course: @course2).user
+      @poll1 = Polling::Poll.create!(user: @teacher1, question: 'A Test Poll')
+      @poll2 = Polling::Poll.create!(user: @teacher2, question: 'Another Test Poll')
+    end
+
+    def get_closed
+      api_call(:get,
+               "/api/v1/poll_sessions/closed",
+               { controller: 'polling/poll_sessions', action: 'closed', format: 'json' },
+               {}, {}, {})
+    end
+
+    it "returns all poll sessions available to the current user that are closed" do
+      @published = @poll1.poll_sessions.create!(course: @course1)
+      @published.publish!
+      @unenrolled = @poll2.poll_sessions.create!(course: @course2)
+      @unenrolled.close!
+      @not_published = @poll1.poll_sessions.create!(course: @course1)
+      @not_published.close!
+
+      student_in_course(active_all: true, course: @course1)
+      json = get_closed['poll_sessions']
+
+      session_ids = json.map { |session| session["id"].to_i }
+
+      session_ids.should include(@not_published.id)
+      session_ids.should_not include(@unenrolled.id)
+      session_ids.should_not include(@published.id)
+    end
+  end
+
 end
