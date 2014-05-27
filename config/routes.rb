@@ -1265,6 +1265,7 @@ routes.draw do
       delete 'files/:id', :action => :destroy
       put 'files/:id', :action => :api_update
       get 'files/:id/:uuid/status', :action => :api_file_status, :path_name => 'file_status'
+      get 'files/:id/public_url', :action => :public_url
       %w(course group user).each do |context|
         get "#{context}s/:#{context}_id/files/quota", :action => :api_quota
       end
