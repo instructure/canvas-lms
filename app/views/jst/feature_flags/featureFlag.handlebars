@@ -38,27 +38,33 @@
     {{else}}
       <div class="btn-group" role="radiogroup">
         {{#unless isSiteAdmin}}
-          <button type="button"
-                  class="btn {{#if isOn}}active{{/if}}"
-                  data-action="on"
-                  data-name="{{id}}"
-                  role="radio"
-                  aria-checked="{{#if isOn}}true{{else}}false{{/if}}">{{#t "on"}}On{{/t}}</button>
+          {{#unless disableOn}}
+            <button type="button"
+                    class="btn {{#if isOn}}active{{/if}}"
+                    data-action="on"
+                    data-name="{{id}}"
+                    role="radio"
+                    aria-checked="{{#if isOn}}true{{else}}false{{/if}}">{{#t "on"}}On{{/t}}</button>
+          {{/unless}}
         {{/unless}}
         {{#if currentContextIsAccount}}
+          {{#unless disableAllow}}
+            <button type="button"
+                    class="btn {{#if isAllowed}}active{{/if}}"
+                    data-action="allowed"
+                    data-name="{{id}}"
+                    role="radio"
+                    aria-checked="{{#if isAllowed}}true{{else}}false{{/if}}">{{#t "allow"}}Allow{{/t}}</button>
+          {{/unless}}
+        {{/if}}
+        {{#unless disableOff}}
           <button type="button"
-                  class="btn {{#if isAllowed}}active{{/if}}"
-                  data-action="allowed"
+                  class="btn {{#if isOff}}active{{/if}}"
+                  data-action="off"
                   data-name="{{id}}"
                   role="radio"
-                  aria-checked="{{#if isAllowed}}true{{else}}false{{/if}}">{{#t "allow"}}Allow{{/t}}</button>
-        {{/if}}
-        <button type="button"
-                class="btn {{#if isOff}}active{{/if}}"
-                data-action="off"
-                data-name="{{id}}"
-                role="radio"
-                aria-checked="{{#if isOff}}true{{else}}false{{/if}}">{{#t "off"}}Off{{/t}}</button>
+                  aria-checked="{{#if isOff}}true{{else}}false{{/if}}">{{#t "off"}}Off{{/t}}</button>
+        {{/unless}}
       </div>
     {{/if}}
   </div>

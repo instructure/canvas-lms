@@ -27,6 +27,8 @@ class Feature
       next if key == :state && !%w(hidden off allowed on).include?(val)
       instance_variable_set "@#{key}", val
     end
+    # for RootAccount features, "allowed" state is redundant; show "off" instead
+    @root_opt_in = true if @applies_to == 'RootAccount'
   end
 
   def default?
@@ -248,22 +250,28 @@ END
     definitions.values.select{ |fd| applicable_types.include?(fd.applies_to) }
   end
 
-  def self.default_transitions(context, orig_state)
+  def default_transitions(context, orig_state)
     valid_states = %w(off on)
     valid_states << 'allowed' if context.is_a?(Account)
     (valid_states - [orig_state]).inject({}) do |transitions, state|
-      transitions[state] = { 'locked' => false }
+      transitions[state] = { 'locked' => (state == 'allowed' && @applies_to == 'RootAccount' &&
+          context.is_a?(Account) && context.root_account? && !context.site_admin?) }
       transitions
     end
   end
 
-  def self.transitions(feature, user, context, orig_state)
-    h = Feature.default_transitions(context, orig_state)
-    fd = definitions[feature.to_s]
-    if fd.custom_transition_proc.is_a?(Proc)
-      fd.custom_transition_proc.call(user, context, orig_state, h)
+  def transitions(user, context, orig_state)
+    h = default_transitions(context, orig_state)
+    if @custom_transition_proc.is_a?(Proc)
+      @custom_transition_proc.call(user, context, orig_state, h)
     end
     h
+  end
+
+  def self.transitions(feature_name, user, context, orig_state)
+    fd = definitions[feature_name.to_s]
+    return nil unless fd
+    fd.transitions(user, context, orig_state)
   end
 end
 
