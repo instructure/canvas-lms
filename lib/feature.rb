@@ -187,9 +187,9 @@ END
 Individual Gradebook View provides a gradebook view that is designed for accessibility.
 END
       applies_to: 'Course',
-      state: 'hidden',
+      state: 'on',
       root_opt_in: true,
-      development: true
+      development: false
     },
     'differentiated_assignments' =>
     {
