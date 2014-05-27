@@ -68,7 +68,7 @@ module Polling
     include Filters::Polling
 
     before_filter :require_user
-    before_filter :require_poll
+    before_filter :require_poll, except: [:opened, :closed]
 
     # @API List poll sessions for a poll
     # @beta
@@ -191,7 +191,7 @@ module Polling
       end
     end
 
-    # @API Publish a poll session
+    # @API Open a poll session
     # @beta
     #
     # @example_response
@@ -199,7 +199,7 @@ module Polling
     #     "poll_sessions": [PollSession]
     #   }
     #
-    def publish
+    def open
       @poll_session = @poll.poll_sessions.find(params[:id])
 
       if authorized_action(@poll_session, @current_user, :publish)
@@ -208,7 +208,7 @@ module Polling
       end
     end
 
-    # @API Close a published poll session
+    # @API Close an opened poll session
     # @beta
     #
     # @example_response
@@ -223,6 +223,36 @@ module Polling
         @poll_session.close!
         render json: serialize_jsonapi(@poll_session)
       end
+    end
+
+    # @API List opened poll sessions
+    # @beta
+    #
+    # Lists all opened poll sessions available to the current user.
+    #
+    # @example_response
+    #   {
+    #     "poll_sessions": [PollSession]
+    #   }
+    #
+    def opened
+      @poll_sessions = Polling::PollSession.available_for(@current_user).where(is_published: true)
+      render json: serialize_jsonapi(@poll_sessions)
+    end
+
+    # @API List closed poll sessions
+    # @beta
+    #
+    # Lists all closed poll sessions available to the current user.
+    # 
+    # @example_response
+    #   {
+    #     "poll_sessions": [PollSession]
+    #   }
+    #
+    def closed
+      @poll_sessions = Polling::PollSession.available_for(@current_user).where(is_published: false)
+      render json: serialize_jsonapi(@poll_sessions)
     end
 
     protected

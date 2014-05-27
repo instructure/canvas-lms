@@ -41,6 +41,12 @@ module Polling
       can :read and can :submit
     end
 
+    def self.available_for(user)
+      PollSession.where("course_id IN (?) OR course_section_id IN (?)",
+                        user.enrollments.map(&:course_id).compact,
+                        user.enrollments.map(&:course_section_id).compact)
+    end
+
     def results
       poll_submissions.each_with_object(Hash.new(0)) do |submission, poll_results|
         poll_results[submission.poll_choice.id] += 1

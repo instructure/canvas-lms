@@ -1421,8 +1421,11 @@ routes.draw do
       get "polls/:poll_id/poll_sessions/:id", :action => :show, :path_name => 'poll_session'
       put "polls/:poll_id/poll_sessions/:id", :action => :update, :path_name => 'poll_session_update'
       delete "polls/:poll_id/poll_sessions/:id", :action => :destroy, :path_name => 'poll_session_destroy'
-      get "polls/:poll_id/poll_sessions/:id/publish", :action => :publish, :path_name => 'poll_session_publish'
+      get "polls/:poll_id/poll_sessions/:id/open", :action => :open, :path_name => 'poll_session_publish'
       get "polls/:poll_id/poll_sessions/:id/close", :action => :close, :path_name => 'poll_session_close'
+
+      get "poll_sessions/opened", :action => :opened, :path_name => 'poll_sessions_opened'
+      get "poll_sessions/closed", :action => :closed, :path_name => 'poll_sessions_closed'
     end
 
     scope(:controller => 'polling/poll_submissions') do
