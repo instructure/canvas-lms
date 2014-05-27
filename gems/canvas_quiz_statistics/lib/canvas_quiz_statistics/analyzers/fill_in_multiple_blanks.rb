@@ -36,20 +36,24 @@ module CanvasQuizStatistics::Analyzers
   # }
   # ```
   class FillInMultipleBlanks < Base
-    include Base::Constants
+    include Concerns::HasAnswers
 
     # Number of students who have filled at least one blank.
     #
     # @return [Integer]
-    metric :responses do |responses|
-      responses.select { |r| answer_present?(r) }.length
+    metric :responses => [ :blanks ] do |responses, blanks|
+      responses.select do |response|
+        blanks.any? do |blank|
+          answer_present_for_blank?(response, blank)
+        end
+      end.length
     end
 
     # Number of students who have filled every blank.
     #
     # @return [Integer]
     metric :answered do |responses|
-      responses.select { |r| answer_present?(r, true) }.length
+      responses.select { |r| answer_present?(r) }.length
     end
 
     # Number of students who filled all blanks correctly.
@@ -70,7 +74,7 @@ module CanvasQuizStatistics::Analyzers
     #
     # @return [Integer]
     metric :incorrect => [ :grades ] do |responses, grades|
-      grades.select { |r| FalseLike.include?(r) }.length
+      grades.select { |r| Base::Constants::FalseLike.include?(r) }.length
     end
 
     # Statistics for the answer sets (blanks).
@@ -122,12 +126,32 @@ module CanvasQuizStatistics::Analyzers
     #   ]
     # }
     metric :answer_sets => [ :blanks ] do |responses, blanks|
-      build_answer_sets(blanks).tap do |sets|
-        calculate_answer_responses(responses, blanks, sets)
+      answer_sets = blanks.map do |blank|
+        answers_for_blank = @question_data[:answers].select do |answer|
+          answer[:blank_id] == blank
+        end
+
+        {
+          id: CanvasQuizStatistics::Util.digest(blank),
+          text: blank,
+          answers: parse_answers(answers_for_blank)
+        }
       end
+
+      blanks.each do |blank|
+        answer_sets.detect { |set| set[:text] == blank }.tap do |answer_set|
+          calculate_responses(responses, answer_set[:answers], blank)
+        end
+      end
+
+      answer_sets
     end
 
     private
+
+    def question_blanks
+      @question_data[:answers].map { |a| a[:blank_id] }.uniq
+    end
 
     def build_context(responses)
       {}.tap do |ctx|
@@ -136,105 +160,32 @@ module CanvasQuizStatistics::Analyzers
       end
     end
 
-    def answer_present?(response, answered_all_blanks=false)
-      !question_blanks.send(answered_all_blanks ? 'any?' : 'all?') do |blank|
-        answer_id = response[answer_key(blank, true)]
-        answer_text = response[answer_key(blank, false)]
-
-        answer_id.blank? && answer_text.blank?
-      end
+    def answer_present?(response)
+      question_blanks.all? { |blank| answer_present_for_blank?(response, blank) }
     end
 
-    def question_blanks
-      @question_data[:answers].map { |a| a[:blank_id] }.uniq
+    def answer_present_for_blank?(response, blank)
+      response[key_for_answer_id(blank)].present? ||
+      response[key_for_answer_text(blank)].present?
     end
 
-    def build_answer_sets(blanks)
-      blanks.map do |blank|
-        answers_for_blank = @question_data[:answers].select do |answer|
-          answer[:blank_id] == blank
-        end
-
-        answers = answers_for_blank.map do |answer|
-          build_answer(answer[:id], answer[:text], answer[:weight] == 100)
-        end
-
-        {
-          id: CanvasQuizStatistics::Util.digest(blank),
-          text: blank,
-          answers: answers
-        }
-      end
+    def locate_answer(response, answers, blank)
+      answer_id = response[key_for_answer_id(blank)].to_s
+      answers.detect { |answer| answer[:id] == answer_id }
     end
 
-    def build_answer(id, text, correct=false)
-      {
-        id: "#{id}",
-        text: text.to_s,
-        correct: correct,
-        responses: 0
-      }
+    def answer_present_but_unknown?(response, blank)
+      response[key_for_answer_text(blank)].present?
     end
 
-    def calculate_answer_responses(responses, blanks, answer_sets)
-      blanks.each do |blank|
-        answer_set = answer_sets.detect { |set| set[:text] == blank }
-
-        responses.each do |response|
-          analyze_response_for_blank(response, blank, answer_set)
-        end
-      end
+    # The key to use to lookup the _resolved_ answer ID.
+    def key_for_answer_id(blank)
+      :"answer_id_for_#{blank}"
     end
 
-    def analyze_response_for_blank(response, blank, answer_set)
-      answer_id = response.fetch(answer_key(blank), nil).to_s
-      answer_text = response.fetch(answer_key(blank, false), nil)
-
-      answer = if answer_id.present?
-        answer_set[:answers].detect { |a| "#{a[:id]}" == answer_id }
-      elsif answer_text.present?
-        generate_incorrect_answer({
-          id: UnknownAnswerKey,
-          text: UnknownAnswerText,
-          in: answer_set
-        })
-      else
-        generate_incorrect_answer({
-          id: MissingAnswerKey,
-          text: MissingAnswerText,
-          in: answer_set
-        })
-      end
-
-      answer[:responses] += 1
-    end
-
-    # The key to use to lookup the response in the input submission_data fragment
-    #
-    # The key will be "answer_id_for_blank" or "answer_for_blank" based on
-    # @resolved, use the former if you're looking for a resolved answer (a
-    # correct one that maps to an ID), and the second to query the text they
-    # wrote.
-    def answer_key(blank, resolved=true)
-      [
-        'answer',
-        resolved ? 'id' : nil,
-        'for',
-        blank
-      ].compact.join('_').to_sym
-    end
-
-    def generate_incorrect_answer(props)
-      id, text, answer_set = *[ props[:id], props[:text], props[:in] ]
-
-      answer = answer_set[:answers].detect { |a| a[:id] == id }
-
-      unless answer.present?
-        answer = build_answer(id, text)
-        answer_set[:answers] << answer
-      end
-
-      answer
+    # The key to use to lookup the text the student wrote.
+    def key_for_answer_text(blank)
+      :"answer_for_#{blank}"
     end
   end
 end

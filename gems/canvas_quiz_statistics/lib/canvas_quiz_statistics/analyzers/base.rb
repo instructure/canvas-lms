@@ -58,5 +58,12 @@ module CanvasQuizStatistics::Analyzers
     def build_context(responses)
       {}
     end
+
+    # Test whether the response contains an answer to the question.
+    #
+    # Default behavior is to text whether the "text" field is populated.
+    def answer_present?(response)
+      response[:text].present?
+    end
   end
 end

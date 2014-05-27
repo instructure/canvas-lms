@@ -74,14 +74,5 @@ module CanvasQuizStatistics::Analyzers
         { score: score, count: point_distribution[score] }
       end.sort_by { |v| v[:score] || -1 }
     end
-
-    private
-
-    # Test whether the response contains an answer to the question.
-    #
-    # Default behavior is to text whether the "text" field is populated.
-    def answer_present?(response)
-      response[:text].present?
-    end
   end
 end

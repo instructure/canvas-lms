@@ -10,6 +10,8 @@ describe CanvasQuizStatistics::Analyzers::Essay do
     }.to_not raise_error
   end
 
+  it_behaves_like 'essay [:responses]'
+
   describe 'output [#run]' do
     describe '[:responses]' do
       it 'should count students who have written anything' do

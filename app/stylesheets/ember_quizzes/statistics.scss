@@ -171,6 +171,10 @@ $muteTextColor: #949494;
     }
   }
 
+  &.stretched-answer-distribution .answer-distribution-section {
+    width: 580px;
+  }
+
   .discrimination-index-section {
     width: 270px;
     position: relative;

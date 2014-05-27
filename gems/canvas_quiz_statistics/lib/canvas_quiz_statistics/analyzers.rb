@@ -42,10 +42,12 @@ module CanvasQuizStatistics::Analyzers
   end
 
   require 'canvas_quiz_statistics/analyzers/base'
+  require 'canvas_quiz_statistics/analyzers/concerns/has_answers'
   require 'canvas_quiz_statistics/analyzers/essay'
   require 'canvas_quiz_statistics/analyzers/fill_in_multiple_blanks'
   require 'canvas_quiz_statistics/analyzers/multiple_dropdowns'
   require 'canvas_quiz_statistics/analyzers/file_upload'
   require 'canvas_quiz_statistics/analyzers/calculated'
   require 'canvas_quiz_statistics/analyzers/matching'
+  require 'canvas_quiz_statistics/analyzers/numerical'
 end

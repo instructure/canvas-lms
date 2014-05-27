@@ -35,7 +35,7 @@ module CanvasQuizStatistics::Analyzers
   # }
   # ```
   class Matching < Base
-    include Base::Constants
+    include Concerns::HasAnswers
 
     inherit :correct, :partially_correct, :incorrect, {
       from: :fill_in_multiple_blanks
@@ -110,27 +110,16 @@ module CanvasQuizStatistics::Analyzers
     #   ]
     # }
     metric :answer_sets => [ :answers, :matches ] do |responses, answers, matches|
-      answer_sets = answers.map do |answer|
-        {
-          id: answer[:id].to_s,
-          text: answer[:text].to_s,
-          responses: 0,
-          answers: matches.map do |match|
-            build_answer(match[:match_id],
-              match[:text],
-              answer[:match_id].to_s == match[:match_id].to_s)
-          end
-        }
+      answer_sets = parse_answers do |answer, stats|
+        stats[:answers] = matches.map do |match|
+          build_answer(match[:match_id],
+            match[:text],
+            answer[:match_id].to_s == match[:match_id].to_s)
+        end
       end
 
       answer_sets.each do |set|
-        responses.each do |response|
-          match_id = response[answer_key(set[:id])].to_s
-          match = set[:answers].detect { |a| a[:id] == match_id }
-          match ||= generate_missing_answer(set)
-
-          match[:responses] += 1
-        end
+        calculate_responses(responses, set[:answers], set[:id])
       end
     end
 
@@ -161,24 +150,13 @@ module CanvasQuizStatistics::Analyzers
       answer_ids.include?(id.to_s) && match_ids.include?(match_id)
     end
 
-    def build_answer(id, text, correct=false)
-      {
-        id: "#{id}",
-        text: text.to_s,
-        correct: correct,
-        responses: 0
-      }
+    def locate_answer(response, answers, set_id)
+      match_id = response[answer_key(set_id)].to_s
+      answers.detect { |a| a[:id] == match_id }
     end
 
-    def generate_missing_answer(answer_set)
-      answer = answer_set[:answers].detect { |a| a[:id] == MissingAnswerKey }
-
-      unless answer.present?
-        answer = build_answer(MissingAnswerKey, MissingAnswerText)
-        answer_set[:answers] << answer
-      end
-
-      answer
+    def answer_present_but_unknown?(*args)
+      false
     end
   end
 end

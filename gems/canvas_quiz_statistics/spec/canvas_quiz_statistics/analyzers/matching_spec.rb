@@ -103,4 +103,8 @@ describe CanvasQuizStatistics::Analyzers::Matching do
       lhs[:responses].should == 1
     end
   end
+
+  it_behaves_like '[:correct]'
+  it_behaves_like '[:partially_correct]'
+  it_behaves_like '[:incorrect]'
 end
