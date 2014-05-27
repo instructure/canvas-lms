@@ -370,7 +370,7 @@ class ContextModulesController < ApplicationController
               @progressions = []
             else
               context_module_ids = @context.context_modules.active.pluck(:id)
-              @progressions = ContextModuleProgression.where(:context_module_id => context_module_ids)
+              @progressions = ContextModuleProgression.where(:context_module_id => context_module_ids).each{|p| p.evaluate }
             end
           end
           render :json => @progressions
