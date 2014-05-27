@@ -113,13 +113,15 @@ Delayed::Periodic.cron 'Ignore.cleanup', '45 23 * * *' do
 end
 
 Delayed::Periodic.cron 'MessageScrubber.scrub_all', '0 0 * * *' do
-  scrubber = MessageScrubber.new
-  scrubber.scrub_all
+  Shard.with_each_shard(exception: -> { ErrorReport.log_exception(:periodic_job, $!) }) do
+    MessageScrubber.new.scrub
+  end
 end
 
 Delayed::Periodic.cron 'DelayedMessageScrubber.scrub_all', '0 1 * * *' do
-  scrubber = DelayedMessageScrubber.new
-  scrubber.scrub_all
+  Shard.with_each_shard(exception: -> { ErrorReport.log_exception(:periodic_job, $!) }) do
+    DelayedMessageScrubber.new.scrub
+  end
 end
 
 
