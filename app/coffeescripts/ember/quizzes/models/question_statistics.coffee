@@ -58,7 +58,7 @@ define [
           'multiple_choice'
         when 'short_answer_question', 'multiple_answers_question'
           'short_answer'
-        when 'fill_in_multiple_blanks_question', 'multiple_dropdowns_question'
+        when 'fill_in_multiple_blanks_question', 'multiple_dropdowns_question', 'matching_question'
           'fill_in_multiple_blanks'
         when 'essay_question'
           'essay'
