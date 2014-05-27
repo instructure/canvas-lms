@@ -19,7 +19,7 @@
 class InfoController < ApplicationController
   skip_before_filter :verify_authenticity_token, :only => :record_error
   skip_before_filter :load_account, :only => :health_check
-  skip_before_filter :load_user, :only => [:health_check, :help_links]
+  skip_before_filter :load_user, :only => [:health_check]
 
   def styleguide
     js_bundle :styleguide

@@ -76,7 +76,7 @@ class ContextModulesController < ApplicationController
     if tag.content && tag.content.respond_to?(:locked_for?)
       locked = tag.content.locked_for?(@current_user, :context => @context)
       if locked
-        @context.context_modules.active.each { |m| m.evaluate_for(@current_user, true) }
+        @context.context_modules.active.each { |m| m.evaluate_for(@current_user) }
         if tag.content.respond_to?(:clear_locked_cache)
           tag.content.clear_locked_cache(@current_user)
         end
@@ -255,7 +255,7 @@ class ContextModulesController < ApplicationController
     if authorized_action(@module, @current_user, :update)
       order = params[:order].split(",").map{|id| id.to_i}
       tags = @context.context_module_tags.not_deleted.find_all_by_id(order).compact
-      affected_module_ids = tags.map(&:context_module_id).uniq.compact
+      affected_module_ids = (tags.map(&:context_module_id) + [@module.id]).uniq.compact
       affected_items = []
       items = order.map{|id| tags.detect{|t| t.id == id.to_i } }.compact.uniq
       items.each_with_index do |item, idx|
@@ -331,6 +331,7 @@ class ContextModulesController < ApplicationController
       @tag[:published] = module_item_published?(@tag)
       @tag[:publishable_id] = module_item_publishable_id(@tag)
       @tag[:unpublishable] = module_item_unpublishable?(@tag)
+      @tag[:graded] = @tag.graded?
       render :json => @tag
     end
   end
@@ -360,9 +361,9 @@ class ContextModulesController < ApplicationController
   def progressions
     if authorized_action(@context, @current_user, :read)
       if request.format == :json
-        if @context.context_modules.scoped.new.grants_right?(@current_user, session, :update)
+        if @context.grants_right?(@current_user, session, :view_all_grades)
           if params[:user_id] && @user = @context.students.find(params[:user_id])
-            @progressions = @context.context_modules.active.map{|m| m.evaluate_for(@user, true) }
+            @progressions = @context.context_modules.active.map{|m| m.evaluate_for(@user) }
           else
             if @context.large_roster
               @progressions = []
@@ -373,12 +374,12 @@ class ContextModulesController < ApplicationController
           end
           render :json => @progressions
         else
-          @progressions = @context.context_modules.active.order(:id).map{|m| m.evaluate_for(@current_user, true) }
+          @progressions = @context.context_modules.active.order(:id).map{|m| m.evaluate_for(@current_user) }
           render :json => @progressions
         end
       elsif !@context.feature_enabled?(:draft_state)
         redirect_to named_context_url(@context, :context_context_modules_url, :anchor => "student_progressions")
-      elsif !@context.grants_right?(@current_user, session, :manage_students)
+      elsif !@context.grants_right?(@current_user, session, :view_all_grades)
         @restrict_student_list = true
         student_ids = @context.observer_enrollments.for_user(@current_user).map(&:associated_user_id)
         student_ids << @current_user.id if @context.user_is_student?(@current_user)

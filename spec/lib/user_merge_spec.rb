@@ -25,6 +25,38 @@ describe UserMerge do
       user1.pseudonyms.map(&:unique_id).should be_include('sam@yahoo.com')
     end
 
+    it "should use avatar information from merged user if none exists" do
+      user2.avatar_image = {'type' => 'external', 'url' => 'https://example.com/image.png'}
+      user2.save!
+
+      UserMerge.from(user2).into(user1)
+      user1.reload
+      user2.reload
+
+      [:avatar_image_source, :avatar_image_url, :avatar_image_updated_at, :avatar_state].each do |attr|
+        user1[attr].should == user2[attr]
+      end
+    end
+
+    it "should not overwrite avatar information already in place" do
+      user1.avatar_state = 'locked'
+      user1.save!
+      user2.avatar_image = {'type' => 'external', 'url' => 'https://example.com/image.png'}
+      user2.save!
+
+      UserMerge.from(user2).into(user1)
+      user1.reload
+      user2.reload
+      user1.avatar_state.should_not == user2.avatar_state
+    end
+
+    it "should move access tokens to the new user" do
+      at = AccessToken.create!(:user => user2, :developer_key => DeveloperKey.default)
+      UserMerge.from(user2).into(user1)
+      at.reload
+      at.user_id.should == user1.id
+    end
+
     it "should move submissions to the new user (but only if they don't already exist)" do
       a1 = assignment_model
       s1 = a1.find_or_create_submission(user1)
@@ -345,6 +377,35 @@ describe UserMerge do
       new_attachment = user2.attachments.not_deleted.detect{|a| a.md5 == attachment2.md5}
       new_attachment.display_name.should_not == "test.txt" # attachment2 should be copied and renamed because it has unique file data
     end
+
+    it "should move discussion topics and entries" do
+      topic = course1.discussion_topics.create!(user: user2)
+      entry = topic.discussion_entries.create!(user: user2)
+
+      UserMerge.from(user2).into(user1)
+
+      topic.reload.user.should == user1
+      entry.reload.user.should == user1
+    end
+
+    it "should freshen moved topics" do
+      topic = course1.discussion_topics.create!(user: user2)
+      now = Time.at(5.minutes.from_now.to_i) # truncate milliseconds
+      Timecop.freeze(now) do
+        UserMerge.from(user2).into(user1)
+        topic.reload.updated_at.should == now
+      end
+    end
+
+    it "should freshen topics with moved entries" do
+      topic = course1.discussion_topics.create!(user: user1)
+      entry = topic.discussion_entries.create!(user: user2)
+      now = Time.at(5.minutes.from_now.to_i) # truncate milliseconds
+      Timecop.freeze(now) do
+        UserMerge.from(user2).into(user1)
+        topic.reload.updated_at.should == now
+      end
+    end
   end
 
   it "should update account associations" do
@@ -373,6 +434,83 @@ describe UserMerge do
 
     user1.associated_accounts.map(&:id).sort.should == []
     user2.associated_accounts.map(&:id).sort.should == [account1, account2, subaccount1, subaccount2, subsubaccount1, subsubaccount2].map(&:id).sort
+  end
+
+  context "versions" do
+    let!(:user1) { user_model }
+    let!(:user2) { user_model }
+
+    it "should update submission versions" do
+      other_user = user_model
+
+      a1 = assignment_model(:submission_types => 'online_text_entry')
+      a1.submit_homework(user2, {
+        :submission_type => 'online_text_entry',
+        :body => 'hi'
+      })
+      s1 = a1.submit_homework(user2, {
+        :submission_type => 'online_text_entry',
+        :body => 'hi again'
+      })
+      s_other = a1.submit_homework(other_user, {
+        :submission_type => 'online_text_entry',
+        :body => 'hi again'
+      })
+
+      s1.versions.count.should eql(2)
+      s1.versions.each{ |v| v.model.user_id.should eql(user2.id) }
+      s_other.versions.first.model.user_id.should eql(other_user.id)
+
+      UserMerge.from(user2).into(user1)
+      s1 = Submission.find(s1.id)
+      s_other.reload
+
+      s1.versions.count.should eql(2)
+      s1.versions.each{ |v| v.model.user_id.should eql(user1.id) }
+      s_other.versions.first.model.user_id.should eql(other_user.id)
+    end
+
+    it "should update quiz submissions" do
+      quiz_with_graded_submission([], user: user2)
+      qs1 = @quiz_submission
+      quiz_with_graded_submission([], user: user2)
+      qs2 = @quiz_submission
+      Version.where(:versionable_type => "Quizzes::QuizSubmission", :versionable_id => qs2).update_all(:versionable_type => "QuizSubmission")
+
+      qs1.versions.should be_present
+      qs1.versions.each{ |v| v.model.user_id.should eql(user2.id) }
+      qs2.versions.should be_present
+      qs2.versions.each{ |v| v.model.user_id.should eql(user2.id) }
+
+      UserMerge.from(user2).into(user1)
+      qs1.reload
+      qs2.reload
+
+      qs1.versions.should be_present
+      qs1.versions.each{ |v| v.model.user_id.should eql(user1.id) }
+      qs2.versions.should be_present
+      qs2.versions.each{ |v| v.model.user_id.should eql(user1.id) }
+    end
+
+    it "should update other appropriate versions" do
+      course(:active_all => true)
+      wiki_page = @course.wiki.wiki_pages.create(:title => "Hi", :user_id => user2.id)
+      ra = rubric_assessment_model(:context => @course, :user => user2)
+
+      wiki_page.versions.should be_present
+      wiki_page.versions.each{ |v| v.model.user_id.should eql(user2.id) }
+      ra.versions.should be_present
+      ra.versions.each{ |v| v.model.user_id.should eql(user2.id) }
+
+      UserMerge.from(user2).into(user1)
+      wiki_page.reload
+      ra.reload
+
+      wiki_page.versions.should be_present
+      wiki_page.versions.each{ |v| v.model.user_id.should eql(user1.id) }
+      ra.versions.should be_present
+      ra.versions.each{ |v| v.model.user_id.should eql(user1.id) }
+    end
   end
 
   context "sharding" do

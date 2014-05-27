@@ -6,11 +6,11 @@
                       end_at_option: true} %>
   <tr>
     <td>
-      <%= check_box_tag 'parameters[include_enrollment_state]' %>
-      <%= label_tag(:include_enrollment_state,
-                    t('account_reports.default.include_enrollment_state.check_box',
-                      'Include Enrollment State'),
-                    "for" => 'include_enrollment_state') %>
+      <label class="checkbox">
+        <%= check_box_tag 'parameters[include_enrollment_state]' %>
+        <%= t('account_reports.default.include_enrollment_state.check_box',
+                        'Include Enrollment State') %>
+      </label>
     </td>
   </tr>
   <tr>

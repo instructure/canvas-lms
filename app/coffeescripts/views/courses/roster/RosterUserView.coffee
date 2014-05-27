@@ -51,6 +51,7 @@ define [
       json.isObserver = @model.hasEnrollmentType('ObserverEnrollment')
       json.isPending = @model.pending(@model.currentRole)
       json.canEditSections = not _.isEmpty @model.sectionEditableEnrollments()
+      json.canLinkStudents = json.isObserver && !ENV.course.concluded
       json.canViewLoginIdColumn = ENV.permissions.manage_admin_users or ENV.permissions.manage_students
       json.canViewLoginId =
       json.canManage =

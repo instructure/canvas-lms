@@ -31,3 +31,6 @@ define [
       url = "/#{@_contextPath()}/external_tools/#{@id}/resource_selection?launch_type=#{launchType}"
       url = "#{url}&#{params.join('&')}" if params.length > 0
       url
+
+    assetString: () ->
+      "context_external_tool_#{@id}"

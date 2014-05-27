@@ -1,5 +1,4 @@
 <%
-  jammit_css :group_settings
   js_bundle :group_settings
 %>
 <% content_for :page_title do %><%= join_title t(:group_settings_title, "%{group_name} Settings", :group_name => @group.name), @context.full_name %><% end %>

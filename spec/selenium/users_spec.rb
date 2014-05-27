@@ -255,10 +255,11 @@ describe "users" do
 
       # if instructure_misc_plugin is installed, number of registration fields increase
       if (Dir.exists?('./vendor/plugins/instructure_misc_plugin'))
-        f('#teacher_school_position').send_keys('Dean')
+        set_value f('#teacher_organization_type'), 'Higher Ed'
+        set_value f('#teacher_school_position'), 'Dean'
         f('#teacher_phone').send_keys('1231231234')
         f('#teacher_school_name').send_keys('example org')
-        f('#teacher_organization_type').send_keys('Higher Ed')
+        set_value f('#location'), 'United States and Canada'
       end
 
       f('input[name="user[terms_of_use]"]', form).click

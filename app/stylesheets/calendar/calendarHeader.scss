@@ -86,7 +86,7 @@
 }
 
 .counter-badge {
-  @include border-radius(8px);
+  border-radius: 8px;
   background-color: #3cb5fb;
   color: white;
   text-shadow: 1px 0px 1px rgba(0, 0, 0, 0.3);

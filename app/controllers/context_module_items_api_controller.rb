@@ -70,6 +70,18 @@
 #         "lock_at": {
 #           "example": "2012-12-31T06:00:00-06:00",
 #           "type": "datetime"
+#         },
+#         "locked_for_user": {
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "lock_explanation": {
+#           "example": "This quiz is part of an unpublished module and is not available yet.",
+#           "type": "string"
+#         },
+#         "lock_info": {
+#           "example": {"asset_string": "assignment_4", "unlock_at": "2012-12-31T06:00:00-06:00", "lock_at": "2012-12-31T06:00:00-06:00", "context_module": {}},
+#           "$ref": "LockInfo"
 #         }
 #       }
 #     }
@@ -195,6 +207,7 @@ class ContextModuleItemsApiController < ApplicationController
   #   If included, will return additional details specific to the content
   #   associated with each item. Refer to the {api:Modules:Module%20Item Module
   #   Item specification} for more details.
+  #   Includes standard lock information for each item.
   #
   # @argument search_term [Optional, String]
   #   The partial title of the items to match and return.
@@ -228,6 +241,7 @@ class ContextModuleItemsApiController < ApplicationController
   #   If included, will return additional details specific to the content
   #   associated with this item. Refer to the {api:Modules:Module%20Item Module
   #   Item specification} for more details.
+  #   Includes standard lock information for each item.
   #
   # @argument student_id [Optional]
   #   Returns module completion information for the student with this id.

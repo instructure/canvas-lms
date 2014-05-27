@@ -109,3 +109,22 @@ define [
     run -> quiz.set "hideResults", 'until_after_last_attempt'
     ok quiz.get("showResultsAfterLastAttempt")
 
+  test "sortSlug", ->
+    date = new Date()
+    run ->
+      quiz.set 'quizType', 'assignment'
+      quiz.set 'dueAt', date
+      quiz.set 'title', 'ohi'
+    equal quiz.get('sortSlug'), date.toISOString() + 'ohi', 'uses dueAt when isAssignment'
+
+    date = new Date()
+    run ->
+      quiz.set 'lockAt', date
+      quiz.set 'quizType', 'graded_survey'
+
+    equal quiz.get('sortSlug'), date.toISOString() + 'ohi', 'uses lockAt when not isAssignment'
+
+    run -> quiz.set 'lockAt', null
+
+    equal quiz.get('sortSlug'), App.Quiz.SORT_LAST + 'ohi', 'uses a sort_last token when no date'
+

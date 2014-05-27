@@ -237,6 +237,7 @@ module Canvas::Migration::Helpers
     end
 
     def add_url!(hash, type)
+      return if type == 'learning_outcomes' # TODO: remove this when learning outcomes selection ui is finished
       if @base_url
         hash[:sub_items_url] = @base_url + "?type=#{type}"
       end

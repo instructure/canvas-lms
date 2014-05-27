@@ -105,7 +105,6 @@
 #     }
 class UsersController < ApplicationController
   include Twitter
-  include LinkedIn
   include DeliciousDiigo
   include SearchHelper
   include I18nUtilities
@@ -144,11 +143,36 @@ class UsersController < ApplicationController
     end
     return_to_url = params[:return_to] || user_profile_url(@current_user)
     if params[:service] == "google_docs"
-      redirect_to GoogleDocs.request_token_url(return_to_url, session, google_docs_user, request.host_with_port, oauth_success_url(:service => 'google_docs'))
+      request_token = GoogleDocs::Connection.request_token(oauth_success_url(:service => 'google_docs'))
+      OauthRequest.create(
+        :service => 'google_docs',
+        :token => request_token.token,
+        :secret => request_token.secret,
+        :user_secret => CanvasUuid::Uuid.generate(nil, 16),
+        :return_url => return_to_url,
+        :user => @real_current_user || @current_user,
+        :original_host_with_port => request.host_with_port
+      )
+      redirect_to request_token.authorize_url
     elsif params[:service] == "twitter"
       redirect_to twitter_request_token_url(return_to_url)
     elsif params[:service] == "linked_in"
-      redirect_to linked_in_request_token_url(return_to_url)
+      linkedin_connection = LinkedIn::Connection.new
+
+      request_token = linkedin_connection.request_token(oauth_success_url(:service => 'linked_in'))
+
+      session[:oauth_linked_in_request_token_token] = request_token.token
+      session[:oauth_linked_in_request_token_secret] = request_token.secret
+      OauthRequest.create(
+        :service => 'linked_in',
+        :token => request_token.token,
+        :secret => request_token.secret,
+        :return_url => return_to_url,
+        :user => @current_user,
+        :original_host_with_port => request.host_with_port
+      )
+
+      redirect_to request_token.authorize_url
     elsif params[:service] == "facebook"
       oauth_request = OauthRequest.create(
         :service => 'facebook',
@@ -185,7 +209,24 @@ class UsersController < ApplicationController
         end
       elsif params[:service] == "google_docs"
         begin
-          GoogleDocs.get_access_token(oauth_request, params[:oauth_verifier], session, google_docs_user)
+          access_token = GoogleDocs::Connection.get_access_token(oauth_request.token, oauth_request.secret, params[:oauth_verifier])
+          google_docs = GoogleDocs::Connection.new(oauth_request.token, oauth_request.secret)
+          service_user_id, service_user_name = google_docs.get_service_user_info access_token
+          if oauth_request.user
+            UserService.register(
+              :service => "google_docs",
+              :access_token => access_token,
+              :user => oauth_request.user,
+              :service_domain => "google.com",
+              :service_user_id => service_user_id,
+              :service_user_name => service_user_name
+            )
+            oauth_request.destroy
+          else
+            session[:oauth_gdocs_access_token_token] = access_token.token
+            session[:oauth_gdocs_access_token_secret] = access_token.secret
+          end
+
           flash[:notice] = t('google_docs_added', "Google Docs access authorized!")
         rescue => e
           ErrorReport.log_exception(:oauth, e)
@@ -193,7 +234,27 @@ class UsersController < ApplicationController
         end
       elsif params[:service] == "linked_in"
         begin
-          linked_in_get_access_token(oauth_request, params[:oauth_verifier])
+          linkedin_connection = LinkedIn::Connection.new
+          token = session.delete(:oauth_linked_in_request_token_token)
+          secret = session.delete(:oauth_linked_in_request_token_secret)
+          access_token = linkedin_connection.get_access_token(token, secret, params[:oauth_verifier])
+          service_user_id, service_user_name, service_user_url = linkedin_connection.get_service_user_info(access_token)
+
+          if oauth_request.user
+            UserService.register(
+              :service => "linked_in",
+              :access_token => access_token,
+              :user => oauth_request.user,
+              :service_domain => "linked_in.com",
+              :service_user_id => service_user_id,
+              :service_user_name => service_user_name,
+              :service_user_url => service_user_url
+            )
+          else
+            session[:oauth_linked_in_access_token_token] = access_token.token
+            session[:oauth_linked_in_access_token_secret] = access_token.secret
+          end
+
           flash[:notice] = t('linkedin_added', "LinkedIn account successfully added!")
         rescue => e
           ErrorReport.log_exception(:oauth, e)
@@ -904,7 +965,7 @@ class UsersController < ApplicationController
       cc_type = params[:communication_channel][:type] || CommunicationChannel::TYPE_EMAIL
       cc_addr = params[:communication_channel][:address]
       skip_confirmation = value_to_boolean(params[:communication_channel][:skip_confirmation]) &&
-        (Account.site_admin.grants_right?(@current_user, :manage_students) || @context.grants_right?(@current_user, :manage_students))
+          (Account.site_admin.grants_right?(@current_user, :manage_students) || @context.grants_right?(@current_user, :manage_students))
     else
       cc_type = CommunicationChannel::TYPE_EMAIL
       cc_addr = params[:pseudonym].delete(:path) || params[:pseudonym][:unique_id]
@@ -917,6 +978,12 @@ class UsersController < ApplicationController
     @user ||= User.new
     if params[:user]
       params[:user].delete(:self_enrollment_code) unless self_enrollment
+      if params[:user][:birthdate].present? && params[:user][:birthdate] !~ Api::ISO8601_REGEX &&
+          params[:user][:birthdate] !~ Api::DATE_REGEX
+        return render(:json => {:errors => {:birthdate => t(:birthdate_invalid,
+          'Invalid date or invalid datetime for birthdate')}}, :status => 400)
+      end
+
       @user.attributes = params[:user]
     end
     @user.name ||= params[:pseudonym][:unique_id]
@@ -1114,7 +1181,7 @@ class UsersController < ApplicationController
     end
 
     managed_attributes = []
-    managed_attributes.concat [:name, :short_name, :sortable_name] if @user.grants_right?(@current_user, nil, :rename)
+    managed_attributes.concat [:name, :short_name, :sortable_name, :birthdate] if @user.grants_right?(@current_user, nil, :rename)
     managed_attributes << :terms_of_use if @user == (@real_current_user || @current_user)
     if @user.grants_right?(@current_user, nil, :manage_user_details)
       managed_attributes.concat([:time_zone, :locale])
@@ -1155,6 +1222,12 @@ class UsersController < ApplicationController
         @user.require_acceptance_of_terms = true
       end
 
+      if user_params[:birthdate].present? && user_params[:birthdate] !~ Api::ISO8601_REGEX &&
+          params[:user][:birthdate] !~ Api::DATE_REGEX
+        return render(:json => {:errors => {:birthdate => t(:birthdate_invalid,
+          'Invalid date or invalid datetime for birthdate')}}, :status => 400)
+      end
+
       respond_to do |format|
         if @user.update_attributes(user_params)
           if admin_avatar_update
@@ -1178,8 +1251,12 @@ class UsersController < ApplicationController
   end
 
   def media_download
-    asset = Kaltura::ClientV3.new.media_sources(params[:entryId]).find{|a| a[:fileExt] == params[:type] }
-    url = asset && asset[:url]
+    fetcher = MediaSourceFetcher.new(CanvasKaltura::ClientV3.new)
+    url = fetcher.fetch_preferred_source_url(
+       media_id: params[:entryId],
+       file_extension: params[:type],
+       media_type: params[:media_type]
+    )
     if url
       if params[:redirect] == '1'
         redirect_to url

@@ -412,6 +412,7 @@ class Quizzes::Quiz < ActiveRecord::Base
         if context.feature_enabled?(:draft_state) && !deleted?
           a.workflow_state = self.published? ? 'published' : 'unpublished'
         end
+        @notify_of_update ||= a.workflow_state_changed? && a.published?
         a.notify_of_update = @notify_of_update
         a.with_versioning(false) do
           @notify_of_update ? a.save : a.save_without_broadcasting!
@@ -632,33 +633,10 @@ class Quizzes::Quiz < ActiveRecord::Base
     q
   end
 
-  def find_or_create_submission(user, temporary=false, state=nil)
-    s = nil
-    state ||= 'untaken'
-    shard.activate do
-      Quizzes::QuizSubmission.unique_constraint_retry do
-        if temporary || !user.is_a?(::User)
-          user_code = "#{user.to_s}"
-          user_code = "user_#{user.id}" if user.is_a?(::User)
-          s = quiz_submissions.where(temporary_user_code: user_code).first
-          s ||= quiz_submissions.build(temporary_user_code: user_code)
-          s.workflow_state ||= state
-          s.save! if s.changed?
-        else
-          s = quiz_submissions.where(user_id: user).first
-          s ||= quiz_submissions.build(user: user)
-          s.workflow_state ||= state
-          s.save! if s.changed?
-        end
-      end
-    end
-    s
-  end
-
   # Generates a submission for the specified user on this quiz, based
   # on the SAVED version of the quiz.  Does not consider permissions.
   def generate_submission(user, preview=false)
-    submission = self.find_or_create_submission(user, preview)
+    submission = Quizzes::SubmissionManager.new(self).find_or_create_submission(user, preview)
     submission.retake
     submission.attempt = (submission.attempt + 1) rescue 1
     user_questions = []
@@ -980,7 +958,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     ).report.generate
   end
 
-  # finds or initializes a QuizStatistics for the given report_type and
+  # finds or creates a QuizStatistics for the given report_type and
   # options
   def current_statistics_for(report_type, options = {})
     # item analysis always takes the first attempt (not necessarily the
@@ -1001,20 +979,31 @@ class Quizzes::Quiz < ActiveRecord::Base
     candidate_stats = quiz_statistics.report_type(report_type).where(quiz_stats_opts).last
 
     if candidate_stats.nil? || candidate_stats.created_at < last_quiz_activity
-      quiz_statistics.build(quiz_stats_opts)
+      quiz_statistics.create(quiz_stats_opts)
     else
       candidate_stats
     end
   end
 
-  # returns the QuizStatistics object that will ultimately contain the csv
-  # (it may be generating in the background)
+  # Generate the CSV attachment of the current statistics for a given report
+  # type.
+  #
+  # @param [Hash] options
+  #   Options to pass to Quiz#current_statistics_for.
+  #
+  # @param [Boolean] [options.async=false]
+  #   Pass true to generate the CSV in the background, otherwise this blocks.
+  #
+  # @return [Quizzes::QuizStatistics::Report]
+  #   The QuizStatistics object that will ultimately contain the csv.
   def statistics_csv(report_type, options = {})
-    stats = current_statistics_for(report_type, options)
-    return stats unless stats.new_record?
-    stats.save!
-    options[:async] ? stats.generate_csv_in_background : stats.generate_csv
-    stats
+    current_statistics_for(report_type, options).tap do |stats|
+      if options[:async]
+        stats.generate_csv_in_background
+      else
+        stats.generate_csv
+      end
+    end
   end
 
   def unpublished_changes?
@@ -1040,182 +1029,9 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def self.process_migration(data, migration, question_data)
-    assessments = data['assessments'] ? data['assessments']['assessments'] : []
-    assessments ||= []
-    assessments.each do |assessment|
-      migration_id = assessment['migration_id'] || assessment['assessment_id']
-      if migration.import_object?("quizzes", migration_id)
-        allow_update = false
-        # allow update if we find an existing item based on this migration setting
-        if item_id = migration.migration_settings[:quiz_id_to_update]
-          allow_update = true
-          assessment[:id] = item_id.to_i
-          if assessment[:assignment]
-            assessment[:assignment][:id] = Quizzes::Quiz.find(item_id.to_i).try(:assignment_id)
-          end
-        end
-        if assessment['assignment_migration_id']
-          if assignment = data['assignments'].find { |a| a['migration_id'] == assessment['assignment_migration_id'] }
-            assignment['quiz_migration_id'] = migration_id
-          end
-        end
-        begin
-          assessment[:migration] = migration
-          Quizzes::Quiz.import_from_migration(assessment, migration.context, question_data, nil, allow_update)
-        rescue
-          migration.add_import_warning(t('#migration.quiz_type', "Quiz"), assessment[:title], $!)
-        end
-      end
-    end
-  end
-
-  # Import a quiz from a hash.
-  # It assumes that all the referenced questions are already in the database
-  def self.import_from_migration(hash, context, question_data, item=nil, allow_update = false)
-    hash = hash.with_indifferent_access
-    # there might not be an import id if it's just a text-only type...
-    item ||= find_by_context_type_and_context_id_and_id(context.class.to_s, context.id, hash[:id]) if hash[:id]
-    item ||= find_by_context_type_and_context_id_and_migration_id(context.class.to_s, context.id, hash[:migration_id]) if hash[:migration_id]
-    if item && !allow_update
-      if item.deleted?
-        item.workflow_state = hash[:available] ? 'available' : 'created'
-        item.save
-      end
-    end
-    item ||= context.quizzes.new
-
-    hash[:due_at] ||= hash[:due_date]
-    hash[:due_at] ||= hash[:grading][:due_date] if hash[:grading]
-    item.lock_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:lock_at]) if hash[:lock_at]
-    item.unlock_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:unlock_at]) if hash[:unlock_at]
-    item.due_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:due_at]) if hash[:due_at]
-    item.show_correct_answers_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:show_correct_answers_at]) if hash[:show_correct_answers_at]
-    item.hide_correct_answers_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:hide_correct_answers_at]) if hash[:hide_correct_answers_at]
-    item.scoring_policy = hash[:which_attempt_to_keep] if hash[:which_attempt_to_keep]
-    hash[:missing_links] = []
-    item.description = ImportedHtmlConverter.convert(hash[:description], context, {:missing_links => hash[:missing_links]})
-
-
-    %w[
-      migration_id
-      title
-      allowed_attempts
-      time_limit
-      shuffle_answers
-      show_correct_answers
-      points_possible
-      hide_results
-      access_code
-      ip_filter
-      scoring_policy
-      require_lockdown_browser
-      require_lockdown_browser_for_results
-      anonymous_submissions
-      could_be_locked
-      quiz_type
-      one_question_at_a_time
-      cant_go_back
-      require_lockdown_browser_monitor
-      lockdown_browser_monitor_data
-    ].each do |attr|
-      attr = attr.to_sym
-      item.send("#{attr}=", hash[attr]) if hash.key?(attr)
-    end
-
-    item.save!
-
-    if context.respond_to?(:content_migration) && context.content_migration
-      context.content_migration.add_missing_content_links(
-        :class => item.class.to_s,
-        :id => item.id, :missing_links => hash[:missing_links],
-        :url => "/#{context.class.to_s.demodulize.underscore.pluralize}/#{context.id}/#{item.class.to_s.demodulize.underscore.pluralize}/#{item.id}"
-      )
-    end
-
-    if question_data
-      hash[:questions] ||= []
-
-      if question_data[:qq_data] || question_data[:aq_data]
-        existing_questions = item.quiz_questions.active.where("migration_id IS NOT NULL").select([:id, :migration_id]).index_by(&:migration_id)
-      end
-
-      if question_data[:qq_data]
-        question_data[:qq_data].values.each do |q|
-          existing_question = existing_questions[q['migration_id']]
-          q['quiz_question_id'] = existing_question.id if existing_question
-        end
-      end
-
-      if question_data[:aq_data]
-        question_data[:aq_data].values.each do |q|
-          existing_question = existing_questions[q['migration_id']]
-          q['quiz_question_id'] = existing_question.id if existing_question
-        end
-      end
-
-      hash[:questions].each_with_index do |question, i|
-        case question[:question_type]
-        when "question_reference"
-          if qq = question_data[:qq_data][question[:migration_id]]
-            qq[:position] = i + 1
-            if qq[:assessment_question_migration_id]
-              if aq = question_data[:aq_data][qq[:assessment_question_migration_id]]
-                qq['assessment_question_id'] = aq['assessment_question_id']
-                aq_hash = ::AssessmentQuestion.prep_for_import(qq, context)
-                Quizzes::QuizQuestion.import_from_migration(aq_hash, context, item)
-              else
-                aq_hash = ::AssessmentQuestion.import_from_migration(qq, context)
-                qq['assessment_question_id'] = aq_hash['assessment_question_id']
-                Quizzes::QuizQuestion.import_from_migration(aq_hash, context, item)
-              end
-            end
-          elsif aq = question_data[:aq_data][question[:migration_id]]
-            aq[:position] = i + 1
-            aq[:points_possible] = question[:points_possible] if question[:points_possible]
-            Quizzes::QuizQuestion.import_from_migration(aq, context, item)
-          end
-        when "question_group"
-          Quizzes::QuizGroup.import_from_migration(question, context, item, question_data, i + 1, hash[:migration])
-        when "text_only_question"
-          qq = item.quiz_questions.new
-          qq.question_data = question
-          qq.position = i + 1
-          qq.save!
-        end
-      end
-    end
-    item.reload # reload to catch question additions
-
-    if hash[:assignment] && hash[:available]
-      if hash[:assignment][:migration_id]
-        item.assignment ||= find_by_context_type_and_context_id_and_migration_id(context.class.to_s, context.id, hash[:assignment][:migration_id])
-      end
-      item.assignment = nil if item.assignment && item.assignment.quiz && item.assignment.quiz.id != item.id
-      item.assignment ||= context.assignments.new
-
-      item.assignment = ::Assignment.import_from_migration(hash[:assignment], context, item.assignment, item)
-    elsif !item.assignment && grading = hash[:grading]
-      # The actual assignment will be created when the quiz is published
-      item.quiz_type = 'assignment'
-      hash[:assignment_group_migration_id] ||= grading[:assignment_group_migration_id]
-    end
-
-    if hash[:available]
-      item.generate_quiz_data
-      item.workflow_state = 'available'
-      item.published_at = Time.now
-    end
-
-    if hash[:assignment_group_migration_id]
-      if g = context.assignment_groups.find_by_migration_id(hash[:assignment_group_migration_id])
-        item.assignment_group_id = g.id
-      end
-    end
-
-    item.save
-
-    context.imported_migration_items << item if context.imported_migration_items
-    item
+    # TODO: use Importers::QuizImporter directly. this class method
+    # will eventually get removed. leaving here while plugins get updated
+    Importers::QuizImporter.process_migration(data, migration, question_data)
   end
 
   def self.serialization_excludes
@@ -1457,4 +1273,5 @@ class Quizzes::Quiz < ActiveRecord::Base
   def self.reflection_type_name
     'quizzes:quiz'
   end
+
 end

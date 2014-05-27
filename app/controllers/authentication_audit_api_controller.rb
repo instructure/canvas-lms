@@ -102,7 +102,7 @@ class AuthenticationAuditApiController < AuditorApiController
   #   The end of the time range from which you want events.
   #
   def for_account
-    @account = api_find(Account.active, params[:account_id])
+    @account = api_find(Account.root_accounts.active, params[:account_id])
     if account_visible(@account) || account_visible(Account.site_admin)
       events = Auditors::Authentication.for_account(@account, query_options)
       render_events(events, @account)

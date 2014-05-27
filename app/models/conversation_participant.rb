@@ -194,9 +194,9 @@ class ConversationParticipant < ActiveRecord::Base
       :id => conversation_id,
       :subject => subject,
       :workflow_state => workflow_state,
-      :last_message => latest ? truncate_text(latest.body, :max_length => 100) : nil,
+      :last_message => latest ? CanvasTextHelper.truncate_text(latest.body, :max_length => 100) : nil,
       :last_message_at => last_message_at,
-      :last_authored_message => latest_authored ? truncate_text(latest_authored.body, :max_length => 100) : nil,
+      :last_authored_message => latest_authored ? CanvasTextHelper.truncate_text(latest_authored.body, :max_length => 100) : nil,
       :last_authored_message_at => latest_authored ? latest_authored.created_at : visible_last_authored_at,
       :message_count => message_count,
       :subscribed => subscribed?,
@@ -240,11 +240,7 @@ class ConversationParticipant < ActiveRecord::Base
       Rails.cache.fetch([conversation, user, 'participants', options].cache_key) do
         participants = conversation.participants
         if options[:include_indirect_participants]
-          user_ids =
-            messages.map(&:all_forwarded_messages).flatten.map(&:author_id) |
-            messages.map{
-              |m| m.submission.submission_comments.map(&:author_id) if m.submission
-            }.compact.flatten
+          user_ids = messages.map(&:all_forwarded_messages).flatten.map(&:author_id)
           user_ids -= participants.map(&:id)
           participants += Shackles.activate(:slave) { MessageableUser.available.where(:id => user_ids).all }
         end

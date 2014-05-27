@@ -209,11 +209,11 @@ class GroupsController < ApplicationController
       end
 
       format.json do
-        @groups = BookmarkedCollection.with_each_shard(
-          Group::Bookmarker, groups_scope) { |scope|
+        @groups = ShardedBookmarkedCollection.build(Group::Bookmarker, groups_scope) do |scope|
           scope = scope.scoped
           scope = scope.where(:context_type => params[:context_type]) if params[:context_type]
-          scope.includes(:group_category) }
+          scope.includes(:group_category)
+        end
         @groups = Api.paginate(@groups, self, api_v1_current_user_groups_url)
         render :json => (@groups.map { |g| group_json(g, @current_user, session) })
       end

@@ -34,7 +34,7 @@ describe "/quizzes/quizzes/_display_question" do
 
     @submission = @quiz.generate_submission(@student)
     @submission.submission_data = { "question_#{@quiz.quiz_data[0][:id]}" => "42.0" }
-    @submission.grade_submission
+    Quizzes::SubmissionGrader.new(@submission).grade_submission
 
     assigns[:quiz] = @quiz
     q = @quiz.stored_questions.first

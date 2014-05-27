@@ -58,6 +58,10 @@ module Canvas::Security
     )
   end
 
+  def self.verify_hmac_sha1(hmac, str)
+    hmac == hmac_sha1(str)
+  end
+
   def self.validate_encryption_key(overwrite = false)
     config_hash = Digest::SHA1.hexdigest(Canvas::Security.encryption_key)
     db_hash = Setting.get('encryption_key_hash', nil) rescue return # in places like rake db:test:reset, we don't care that the db/table doesn't exist

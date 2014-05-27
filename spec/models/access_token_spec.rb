@@ -1,4 +1,4 @@
-#
+ #
 # Copyright (C) 2012 Instructure, Inc.
 #
 # This file is part of Canvas.

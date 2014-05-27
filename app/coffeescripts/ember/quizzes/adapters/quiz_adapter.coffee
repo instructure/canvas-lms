@@ -1,6 +1,6 @@
 define [
   'ember'
-  'ic-ajax'
+  '../shared/ic-ajax-jsonapi'
   'ember-data'
   'underscore' # which is really lodash trolololo
   './jsonapi_adapter'

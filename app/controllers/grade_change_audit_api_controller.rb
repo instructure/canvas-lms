@@ -125,6 +125,9 @@ class GradeChangeAuditApiController < AuditorApiController
   #
   def for_assignment
     @assignment = Assignment.active.find(params[:assignment_id])
+    unless @assignment.context.root_account == @domain_root_account
+      raise ActiveRecord::RecordNotFound, "Couldn't find assignment with API id '#{params[:assignment_id]}'"
+    end
     if authorize
       events = Auditors::GradeChange.for_assignment(@assignment, query_options)
       render_events(events, polymorphic_url([:api_v1, :audit_grade_change, @assignment]))
@@ -146,7 +149,7 @@ class GradeChangeAuditApiController < AuditorApiController
   # @returns [GradeChangeEvent]
   #
   def for_course
-    @course = Course.active.find(params[:course_id])
+    @course = @domain_root_account.all_courses.active.find(params[:course_id])
     if authorize
       events = Auditors::GradeChange.for_course(@course, query_options)
       render_events(events, polymorphic_url([:api_v1, :audit_grade_change, @course]))
@@ -169,6 +172,9 @@ class GradeChangeAuditApiController < AuditorApiController
   #
   def for_student
     @student = User.active.find(params[:student_id])
+    unless @student.associated_accounts.to_a.include?(@domain_root_account)
+      raise ActiveRecord::RecordNotFound, "Couldn't find user with API id '#{params[:student_id]}'"
+    end
     if authorize
       events = Auditors::GradeChange.for_root_account_student(@domain_root_account, @student, query_options)
       render_events(events, api_v1_audit_grade_change_student_url(@student))
@@ -191,6 +197,9 @@ class GradeChangeAuditApiController < AuditorApiController
   #
   def for_grader
     @grader = User.active.find(params[:grader_id])
+    unless @grader.associated_accounts.to_a.include?(@domain_root_account)
+      raise ActiveRecord::RecordNotFound, "Couldn't find user with API id '#{params[:grader_id]}'"
+    end
     if authorize
       events = Auditors::GradeChange.for_root_account_grader(@domain_root_account, @grader, query_options)
       render_events(events, api_v1_audit_grade_change_grader_url(@grader))

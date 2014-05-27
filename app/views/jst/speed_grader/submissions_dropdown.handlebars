@@ -1,0 +1,30 @@
+{{#if singleSubmission}}
+  {{#each submissions}}
+    {{#t "submitted"}}<label>Submitted:</label> {{submittedAt}}{{/t}}
+  {{/each}}
+{{else}}
+  <label for="submission_to_view">
+    {{#t "submission_to_view"}}Submission to view:{{/t}}
+  </label>
+  <select id="submission_to_view">
+  {{#each submissions}}
+    <option value="{{value}}"
+            {{#if late}}class=late{{/if}}
+            {{#if selected}}selected{{/if}}>
+      {{submittedAt}}
+      {{#if late}}
+        {{#t "loud_late"}}LATE{{/t}}
+      {{/if}}
+      {{#if grade}}
+        {{#t "grade"}}(grade: {{grade}}){{/t}}
+      {{/if}}
+    </option>
+  {{/each}}
+  </select>
+{{/if}}
+
+{{#if linkToQuizHistory}}
+  <a href="{{quizHistoryHref}}" class=see-all-attempts>
+    {{#t "see_all_quiz_attempts"}}See all quiz attempts{{/t}}
+  </a>
+{{/if}}

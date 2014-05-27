@@ -45,6 +45,7 @@ class ApplicationController < ActionController::Base
   # load_user checks masquerading permissions, so this needs to be cleared first
   before_filter :clear_cached_contexts
   before_filter :load_account, :load_user
+  before_filter Filters::AllowAppProfiling
   before_filter :check_pending_otp
   before_filter :set_user_id_header
   before_filter :set_time_zone
@@ -135,6 +136,22 @@ class ApplicationController < ActionController::Base
   #   HTTP status code or symbol.
   def reject!(cause, status=:bad_request)
     raise RequestError.new(cause, status)
+  end
+
+  # returns the user actually logged into canvas, even if they're currently masquerading
+  #
+  # This is used by the google docs integration, among other things --
+  # having @real_current_user first ensures that a masquerading user never sees the
+  # masqueradee's files, but in general you may want to block access to google
+  # docs for masqueraders earlier in the request
+  def logged_in_user
+    @real_current_user || @current_user
+  end
+
+  unless CANVAS_RAILS2
+    def rescue_action_dispatch_exception
+      rescue_action_in_public(request.env['action_dispatch.exception'])
+    end
   end
 
   protected
@@ -468,7 +485,7 @@ class ApplicationController < ActionController::Base
       # again.
       courses = @context.current_enrollments.with_each_shard.select { |e| e.state_based_on_date == :active }.map(&:course).uniq
       groups = opts[:include_groups] ? @context.current_groups.with_each_shard.reject{|g| g.context_type == "Course" &&
-          (g.context.completed? || g.context.soft_concluded?)} : []
+          g.context.concluded?} : []
       if only_contexts.present?
         # find only those courses and groups passed in the only_contexts
         # parameter, but still scoped by user so we know they have rights to
@@ -822,6 +839,10 @@ class ApplicationController < ActionController::Base
         access_context = @context.is_a?(UserProfile) ? @context.user : @context
         @access.log access_context, @accessed_asset
 
+        if @page_view.nil? && page_views_enabled? && %w{participate submit}.include?(@accessed_asset[:level])
+          generate_page_view
+        end
+
         if @page_view
           @page_view.participated = %w{participate submit}.include?(@accessed_asset[:level])
           @page_view.asset_user_access = @access
@@ -1072,20 +1093,27 @@ class ApplicationController < ActionController::Base
     @wiki = @context.wiki
     @wiki.check_has_front_page
 
-    page_name = params[:wiki_page_id] || params[:id] || (params[:wiki_page] && params[:wiki_page][:title])
-    page_name ||= (@wiki.get_front_page_url || Wiki::DEFAULT_FRONT_PAGE_URL) unless @context.feature_enabled?(:draft_state)
+    @page_name = params[:wiki_page_id] || params[:id] || (params[:wiki_page] && params[:wiki_page][:title])
+    @page_name ||= (@wiki.get_front_page_url || Wiki::DEFAULT_FRONT_PAGE_URL) unless @context.feature_enabled?(:draft_state)
     if(params[:format] && !['json', 'html'].include?(params[:format]))
-      page_name += ".#{params[:format]}"
+      @page_name += ".#{params[:format]}"
       params[:format] = 'html'
     end
-    return if @page || !page_name
+    return if @page || !@page_name
 
     if params[:action] != 'create'
-      @page = @wiki.wiki_pages.not_deleted.find_by_url(page_name.to_s) ||
-              @wiki.wiki_pages.not_deleted.find_by_url(page_name.to_s.to_url) ||
-              @wiki.wiki_pages.not_deleted.find_by_id(page_name.to_i)
+      @page = @wiki.wiki_pages.not_deleted.find_by_url(@page_name.to_s) ||
+              @wiki.wiki_pages.not_deleted.find_by_url(@page_name.to_s.to_url) ||
+              @wiki.wiki_pages.not_deleted.find_by_id(@page_name.to_i)
     end
-    @page ||= @wiki.build_wiki_page(@current_user, :url => page_name)
+
+    unless @page
+      if params[:titleize].present? && !value_to_boolean(params[:titleize])
+        @page = @wiki.build_wiki_page(@current_user, :title => @page_name)
+      else
+        @page = @wiki.build_wiki_page(@current_user, :url => @page_name)
+      end
+    end
   end
 
   def context_wiki_page_url
@@ -1131,7 +1159,7 @@ class ApplicationController < ActionController::Base
         @return_url = named_context_url(@context, :context_external_tool_finished_url, @tool.id, :include_host => true)
         @opaque_id = @tool.opaque_identifier_for(@tag)
 
-        adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @context).prepare_tool_launch(@return_url, launch_url: @resource_url, link_code: @opaque_id)
+        adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @context).prepare_tool_launch(@return_url, launch_url: @resource_url, link_code: @opaque_id, overrides: {'resource_link_title' => @resource_title})
         if @assignment
           @tool_settings = adapter.generate_post_payload_for_assignment(@assignment, lti_grade_passback_api_url(@tool), blti_legacy_grade_passback_api_url(@tool))
         else
@@ -1192,7 +1220,7 @@ class ApplicationController < ActionController::Base
   helper_method :calendar_url_for, :files_url_for
 
   def conversations_path(params={})
-    if @current_user and @current_user.preferences[:use_new_conversations]
+    if @current_user and @current_user.use_new_conversations?
       query_string = params.slice(:context_id, :user_id, :user_name).inject([]) do |res, (k, v)|
         res << "#{k}=#{v}"
         res
@@ -1266,13 +1294,13 @@ class ApplicationController < ActionController::Base
       elsif feature == :facebook
         !!Facebook.config
       elsif feature == :linked_in
-        !!LinkedIn.config
+        !!LinkedIn::Connection.config
       elsif feature == :google_docs
-        !!GoogleDocs.config
+        !!GoogleDocs::Connection.config
       elsif feature == :etherpad
         !!EtherpadCollaboration.config
       elsif feature == :kaltura
-        !!Kaltura::ClientV3.config
+        !!CanvasKaltura::ClientV3.config
       elsif feature == :web_conferences
         !!WebConference.config
       elsif feature == :scribd
@@ -1327,11 +1355,18 @@ class ApplicationController < ActionController::Base
 
   def require_site_admin_with_permission(permission)
     unless Account.site_admin.grants_right?(@current_user, permission)
-      if @current_user
-        flash[:error] = t "#application.errors.permission_denied", "You don't have permission to access that page"
-        redirect_to root_url
-      else
-        redirect_to_login
+      respond_to do |format|
+        format.html do
+          if @current_user
+            flash[:error] = t "#application.errors.permission_denied", "You don't have permission to access that page"
+            redirect_to root_url
+          else
+            redirect_to_login
+          end
+        end
+        format.json do
+          render_json_unauthorized
+        end
       end
       return false
     end
@@ -1399,11 +1434,9 @@ class ApplicationController < ActionController::Base
     bank
   end
 
-  # refs #6632 -- once the speed grader ipad app is upgraded, we can remove these exceptions
-  SKIP_JSON_CSRF_REGEX = %r{\A(?:/login|/logout|/dashboard/comment_session)}
   def prepend_json_csrf?
     requested_json = request.headers['Accept'] =~ %r{application/json}
-    request.get? && !requested_json && in_app? && !request.path.match(SKIP_JSON_CSRF_REGEX)
+    request.get? && !requested_json && in_app?
   end
 
   def in_app?
@@ -1609,6 +1642,7 @@ class ApplicationController < ActionController::Base
     includes ||= []
     data = user_profile_json(profile, viewer, session, includes, profile)
     data[:can_edit] = viewer == profile.user
+    data[:can_edit_name] = data[:can_edit] && profile.user.user_can_edit_name?
     known_user = viewer.load_messageable_user(profile.user)
     common_courses = []
     common_groups = []
@@ -1705,12 +1739,20 @@ class ApplicationController < ActionController::Base
     js_env hash
   end
 
-  ## @real_current_user first ensures that a masquerading user never sees the
-  ## masqueradee's files, but in general you may want to block access to google
-  ## docs for masqueraders earlier in the request
-  def google_docs_user
-    @real_current_user || @current_user || (self.respond_to?(:user) && self.user.is_a?(User) && self.user) || nil
+  def google_docs_connection
+    ## @real_current_user first ensures that a masquerading user never sees the
+    ## masqueradee's files, but in general you may want to block access to google
+    ## docs for masqueraders earlier in the request
+    if logged_in_user
+      service_token, service_secret = Rails.cache.fetch(['google_docs_tokens', logged_in_user].cache_key) do
+        service = logged_in_user.user_services.find_by_service("google_docs")
+        service && [service.token, service.secret]
+      end
+      raise GoogleDocs::NoTokenError unless service_token && service_secret
+      google_docs = GoogleDocs::Connection.new(service_token, service_secret)
+    else
+      google_docs = GoogleDocs::Connection.new(session[:oauth_gdocs_access_token_token], session[:oauth_gdocs_access_token_secret])
+    end
+    google_docs
   end
-
-
 end

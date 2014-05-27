@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -306,6 +306,11 @@
 #           "description": "the sorting order of the assignment in the group",
 #           "example": 1,
 #           "type": "integer"
+#         },
+#         "post_to_sis": {
+#           "example": true,
+#           "type" : "boolean",
+#           "description" : "(optional, present if Post Grades to SIS feature is enabled)"
 #         },
 #         "muted": {
 #           "description": "whether the assignment is muted",
@@ -618,15 +623,15 @@ class AssignmentsApiController < ApplicationController
   #
   # @argument assignment[due_at] [Timestamp]
   #   The day/time the assignment is due.
-  #   Accepts times in ISO 8601 format, e.g. 2011-10-21T18:48Z.
+  #   Accepts times in ISO 8601 format, e.g. 2014-10-21T18:48:00Z.
   #
   # @argument assignment[lock_at] [Timestamp]
   #   The day/time the assignment is locked after.
-  #   Accepts times in ISO 8601 format, e.g. 2011-10-21T18:48Z.
+  #   Accepts times in ISO 8601 format, e.g. 2014-10-21T18:48:00Z.
   #
   # @argument assignment[unlock_at] [Timestamp]
   #   The day/time the assignment is unlocked.
-  #   Accepts times in ISO 8601 format, e.g. 2011-10-21T18:48Z.
+  #   Accepts times in ISO 8601 format, e.g. 2014-10-21T18:48:00Z.
   #
   # @argument assignment[description] [String]
   #   The assignment's description, supports HTML.
@@ -658,7 +663,6 @@ class AssignmentsApiController < ApplicationController
   def create
     @assignment = @context.assignments.build
     @assignment.workflow_state = 'unpublished' if @context.feature_enabled?(:draft_state)
-
     if authorized_action(@assignment, @current_user, :create)
       save_and_render_response
     end
@@ -682,7 +686,6 @@ class AssignmentsApiController < ApplicationController
   # @returns Assignment
   def update
     @assignment = @context.assignments.find(params[:id])
-
     if authorized_action(@assignment, @current_user, :update)
       save_and_render_response
     end

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 - 2013 Instructure, Inc.
+# Copyright (C) 2012 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -41,9 +41,9 @@ module Canvas::AccountReports::ReportHelper
   end
 
   # This function will take a datetime or a datetime string and convert into
-  # iso8601 for the root_account's timezone
+  # strftime for the root_account's timezone
   # it will then format the datetime using the given format string
-  def timezone_strftime(datetime, format)
+  def timezone_strftime(datetime, format, account=root_account)
     if datetime = parse_utc_string(datetime)
       (datetime.in_time_zone(account.default_time_zone)).strftime(format)
     end

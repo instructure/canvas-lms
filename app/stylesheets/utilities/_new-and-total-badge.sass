@@ -43,7 +43,10 @@ $new-total-border-radius: 3px
     float: left
     color: white
   .new-items
-    background-color: $highlight-color
+    @if $use_high_contrast
+      background-color: #0088cc
+    @else
+      background-color: $highlight-color
     margin-right: -$new-total-border-radius
     padding-right: $new-total-padding + $new-total-border-radius
   .total-items

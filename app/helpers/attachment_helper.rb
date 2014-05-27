@@ -27,6 +27,13 @@ module AttachmentHelper
       rescue => e
         ErrorReport.log_exception('crocodoc', e)
       end
+    elsif attachment.canvadocable?
+      blob = {
+        user_id: @current_user.global_id,
+        attachment_id: attachment.global_id,
+      }.to_json
+      hmac = Canvas::Security.hmac_sha1(blob)
+      attrs[:canvadoc_session_url] = canvadoc_session_path(blob: blob, hmac: hmac)
     elsif attachment.scribdable? && scribd_doc = attachment.scribd_doc
       begin
         attrs[:scribd_doc_id] = scribd_doc.doc_id

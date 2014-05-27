@@ -145,7 +145,7 @@ Canvas::Plugin.register 'zip_file_importer', :export_system, {
         :display_name => lambda { I18n.t :zip_file_display, 'File Import' },
         :author => 'Instructure',
         :author_website => 'http://www.instructure.com',
-        :description => lambda { I18n.t :zip_file_description, 'Migration plugin for unpacking plain .zip files into a course' },
+        :description => lambda { I18n.t :zip_file_description, 'Migration plugin for unpacking .zip archives into course, group, or user files' },
         :version => '1.0.0',
         :select_text => lambda { I18n.t :zip_file_file_description, "Unzip .zip file into folder" },
         :sort_order => 2,
@@ -154,7 +154,8 @@ Canvas::Plugin.register 'zip_file_importer', :export_system, {
                 :requires_file_upload => true,
                 :no_selective_import => true,
                 :required_options_validator => Canvas::Migration::Validators::ZipImporterValidator,
-                :required_settings => [:source_folder_id]
+                :required_settings => [:source_folder_id],
+                :additional_contexts => %w(User Group)
         },
 }
 Canvas::Plugin.register 'common_cartridge_importer', :export_system, {
@@ -226,7 +227,7 @@ Canvas::Plugin.register('assignment_freezer', nil, {
 
 Canvas::Plugin.register('crocodoc', :previews, {
   :name => lambda { t :name, 'Crocodoc' },
-  :description => lambda { t :description, 'Enabled Crocodoc as a document preview option' },
+  :description => lambda { t :description, 'Enable Crocodoc as a document preview option' },
   :website => 'https://crocodoc.com/',
   :author => 'Instructure',
   :author_website => 'http://www.instructure.com',
@@ -234,6 +235,17 @@ Canvas::Plugin.register('crocodoc', :previews, {
   :settings_partial => 'plugins/crocodoc_settings',
   :settings => nil
 })
+
+Canvas::Plugin.register('canvadocs', :previews, {
+  :name => lambda { t :name, 'Canvadocs' },
+  :description => lambda { t :description, 'Enable Canvadocs (compatible with Box View) as a document preview option' },
+  :author => 'Instructure',
+  :author_website => 'http://www.instructure.com',
+  :version => '1.0.0',
+  :settings_partial => 'plugins/canvadocs_settings',
+  :settings => nil
+})
+
 Canvas::Plugin.register('account_reports', nil, {
   :name => lambda{ t :name, 'Account Reports' },
   :description => lambda{ t :description, 'Select account reports' },

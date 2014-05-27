@@ -264,7 +264,6 @@ class ConferencesController < ApplicationController
         @conference.add_attendee(@current_user)
         @conference.restart if @conference.ended_at && @conference.grants_right?(@current_user, session, :initiate)
         log_asset_access(@conference, "conferences", "conferences", 'participate')
-        generate_new_page_view
         if url = @conference.craft_url(@current_user, session, named_context_url(@context, :context_url, :include_host => true))
           redirect_to url
         else

@@ -593,6 +593,28 @@ describe Api do
     end
   end
 
+  context 'ISO8601 regex' do
+    it 'should not allow invalid dates' do
+      !!('10/01/2014' =~ Api::ISO8601_REGEX).should == false
+    end
+
+    it 'should not allow non ISO8601 dates' do
+      !!('2014-10-01' =~ Api::ISO8601_REGEX).should == false
+    end
+
+    it 'should not allow garbage dates' do
+      !!('bad_data' =~ Api::ISO8601_REGEX).should == false
+    end
+
+    it 'should allow valid dates' do
+      !!('2014-10-01T00:00:00-06:00' =~ Api::ISO8601_REGEX).should == true
+    end
+
+    it 'should not allow valid dates BC' do
+      !!('-2014-10-01T00:00:00-06:00' =~ Api::ISO8601_REGEX).should == false
+    end
+  end
+
   context ".api_user_content" do
     class T
       extend Api

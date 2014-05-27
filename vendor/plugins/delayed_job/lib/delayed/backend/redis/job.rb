@@ -230,7 +230,7 @@ class Job
     end
 
     def ==(other)
-      id == other.id
+      other.is_a?(self.class) && id == other.id
     end
 
     def hash
@@ -551,9 +551,10 @@ class Job
       Keys::FAILED_JOB[job_id]
     end
 
-    def original_id
+    def original_job_id
       id
     end
+    alias_method :original_id, :original_job_id
   end
 end
 end

@@ -124,6 +124,11 @@ describe WikiPagesController do
         response.should redirect_to(course_named_page_url(@course, "a-page"))
       end
 
+      it "should forward module_item_id parameter" do
+        get @base_url + "wiki/a-page?module_item_id=123"
+        response.should redirect_to(course_named_page_url(@course, "a-page") + "?module_item_id=123")
+      end
+
       it "should forward /wiki/name/revisions to /pages/name/revisions" do
         get @base_url + "wiki/a-page/revisions"
         response.should redirect_to(course_named_page_revisions_url(@course, "a-page"))

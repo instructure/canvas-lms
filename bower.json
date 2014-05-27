@@ -9,7 +9,8 @@
     "ic-ajax": "~0.2.0",
     "ic-menu": "~0.1.0",
     "ic-styled": "~1.1.3",
-    "color-slicer": "~0.7.0",
-    "k5uploader": "0.0.2"
+    "color-slicer": "~0.4.0",
+    "k5uploader": "0.0.2",
+    "ember-qunit": "~0.1.7"
   }
 }

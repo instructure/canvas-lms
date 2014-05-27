@@ -4,8 +4,8 @@ require File.expand_path(File.dirname(__FILE__) + '/cc_spec_helper')
 describe CC::CCHelper do
   describe CC::CCHelper::HtmlContentExporter do
     before do
-      @kaltura = mock('Kaltura::ClientV3')
-      Kaltura::ClientV3.stubs(:new).returns(@kaltura)
+      @kaltura = mock('CanvasKaltura::ClientV3')
+      CanvasKaltura::ClientV3.stubs(:new).returns(@kaltura)
       @kaltura.stubs(:startSession)
       @kaltura.stubs(:flavorAssetGetByEntryId).with('abcde').returns([
       {
@@ -65,6 +65,15 @@ describe CC::CCHelper do
       html = %{<a class="youtubed instructure_inline_media_comment" href="http://www.youtube.com/watch?v=dCIP3x5mFmw">McDerp Enterprises</a>}
       translated = @exporter.html_content(html)
       translated.should == html
+    end
+
+    it "should find media objects outside the context (because course copy)" do
+      other_course = course
+      @exporter = CC::CCHelper::HtmlContentExporter.new(other_course, @user)
+      @exporter.html_content(<<-HTML)
+      <p><a id='media_comment_abcde' class='instructure_inline_media_comment'>this is a media comment</a></p>
+      HTML
+      @exporter.used_media_objects.map(&:media_id).should eql(['abcde'])
     end
 
     it "should export html with a utf-8 charset" do

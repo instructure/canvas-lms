@@ -2,62 +2,82 @@
   <%=  render :partial => 'terms_parameters', :locals => { :all_terms_option => true } %>
   <tr>
     <td>
-      <%= check_box_tag "parameters[users]"   %>
-      <%= label_tag(:users, t('account_reports.default.users.check_box','Users CSV'), "for" => 'parameters_users') %>
+      <label class="checkbox">
+        <%= check_box_tag "parameters[users]"   %>
+        <%= t('account_reports.default.users.check_box','Users CSV') %>
+      </label>
     </td>
   </tr>
   <tr>
     <td>
-      <%= check_box_tag "parameters[accounts]"   %>
-      <%= label_tag(:accounts, t('account_reports.default.accounts.check_box','Accounts CSV'), "for" => 'parameters_accounts') %>
+      <label class="checkbox">
+        <%= check_box_tag "parameters[accounts]"   %>
+        <%= t('account_reports.default.accounts.check_box','Accounts CSV') %>
+      </label>
     </td>
   </tr>
   <tr>
     <td>
-      <%= check_box_tag "parameters[terms]"   %>
-      <%= label_tag(:terms, t('account_reports.default.terms.check_box','Terms CSV'), "for" => 'parameters_terms') %>
+      <label class="checkbox">
+        <%= check_box_tag "parameters[terms]"   %>
+        <%= t('account_reports.default.terms.check_box','Terms CSV') %>
+      </label>
     </td>
   </tr>
   <tr>
     <td>
-      <%= check_box_tag "parameters[courses]"   %>
-      <%= label_tag(:courses, t('account_reports.default.courses.check_box','Courses CSV'), "for" => 'parameters_courses') %>
+      <label class="checkbox">
+        <%= check_box_tag "parameters[courses]"   %>
+        <%= t('account_reports.default.courses.check_box','Courses CSV') %>
+      </label>
     </td>
   </tr>
   <tr>
     <td>
-      <%= check_box_tag "parameters[sections]"   %>
-      <%= label_tag(:sections, t('account_reports.default.sections.check_box','Sections CSV'), "for" => 'parameters_sections') %>
+      <label class="checkbox">
+        <%= check_box_tag "parameters[sections]"   %>
+        <%= t('account_reports.default.sections.check_box','Sections CSV') %>
+      </label>
     </td>
   </tr>
   <tr>
     <td>
-      <%= check_box_tag "parameters[enrollments]"   %>
-      <%= label_tag(:enrollments, t('account_reports.default.enrollments.check_box','Enrollments CSV'), "for" => 'parameters_enrollments') %>
+      <label class="checkbox">
+        <%= check_box_tag "parameters[enrollments]"   %>
+        <%= t('account_reports.default.enrollments.check_box','Enrollments CSV') %>
+      </label>
     </td>
   </tr>
   <tr>
     <td>
-      <%= check_box_tag "parameters[groups]"   %>
-      <%= label_tag(:groups, t('account_reports.default.groups.check_box','Groups CSV'), "for" => 'parameters_groups') %>
+      <label class="checkbox">
+        <%= check_box_tag "parameters[groups]"   %>
+        <%= t('account_reports.default.groups.check_box','Groups CSV') %>
+      </label>
     </td>
   </tr>
   <tr>
     <td>
-      <%= check_box_tag "parameters[group_membership]"   %>
-      <%= label_tag(:group_membership, t('account_reports.default.group_membership.login.check_box','Group Membership CSV'), "for" => 'parameters_group_membership') %>
+      <label class="checkbox">
+        <%= check_box_tag "parameters[group_membership]"   %>
+        <%= t('account_reports.default.group_membership.login.check_box','Group Membership CSV') %>
+      </label>
     </td>
   </tr>
   <tr>
     <td>
-      <%= check_box_tag "parameters[xlist]"   %>
-      <%= label_tag(:xlist, t('account_reports.default.xlist.check_box','X list CSV'), "for" => 'parameters_xlist') %>
+      <label class="checkbox">
+        <%= check_box_tag "parameters[xlist]"   %>
+        <%= t('account_reports.default.xlist.check_box','X list CSV') %>
+      </label>
     </td>
   </tr>
   <tr>
     <td>
-      <%= t('account_reports.sis_default.parameters.note', %{*Term settings only impact Courses, Sections, Enrollments, and X list CSV files.}) %>
+      <label>
+        <%= t('account_reports.sis_default.parameters.note', %{*Term settings only impact Courses, Sections, Enrollments, and X list CSV files.}) %>
+      </label>
     </td>
   </tr>
-  <%=  render :partial => 'include_deleted_parameter' %>
+    <%=  render :partial => 'include_deleted_parameter' %>
 </table>

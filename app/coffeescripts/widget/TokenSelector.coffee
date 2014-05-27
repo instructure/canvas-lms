@@ -289,7 +289,7 @@ define [
         else
           null
       else
-        @list.first()
+        @list?.first()
       , preserveMode)
       @selectNext(preserveMode) if @selection?.hasClass('message')
 
@@ -302,7 +302,7 @@ define [
         else
           null
       else
-        @list.last()
+        @list?.last()
       )
       @selectPrev() if @selection?.hasClass('message')
 

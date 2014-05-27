@@ -6,6 +6,7 @@ require [
   'compiled/views/gradebook/NavigationPillView'
   'compiled/views/gradebook/OutcomeGradebookView'
 ], ($, Backbone, userSettings, Gradebook, NavigationPillView, OutcomeGradebookView) ->
+
   class GradebookRouter extends Backbone.Router
     routes:
       '': 'tab'
@@ -32,6 +33,7 @@ require [
 
     tab: (viewName) ->
       viewName ||= userSettings.contextGet 'gradebook_tab'
+      window.tab = viewName
       viewName = 'assignment' if viewName != 'outcome' || !@views.outcome
       @navigation.setActiveView(viewName) if @navigation
       $('.assignment-gradebook-container, .outcome-gradebook-container').addClass('hidden')

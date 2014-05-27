@@ -123,6 +123,26 @@ describe ProfileController do
       @user.profile.title.should eql '!!!'
     end
 
+    it "should not let you change your short_name information if you are not allowed" do
+      account = Account.default
+      account.settings = { :users_can_edit_name => false }
+      account.save!
+
+      old_name = @user.short_name
+      old_title = @user.profile.title
+      put 'update_profile',
+          :user => {:short_name => 'Monsturd', :name => 'Jenkins'},
+          :user_profile => {:bio => '...', :title => '!!!'},
+          :format => 'json'
+      response.should be_success
+
+      @user.reload
+      @user.short_name.should eql old_name
+      @user.name.should_not eql 'Jenkins'
+      @user.profile.bio.should eql '...'
+      @user.profile.title.should eql old_title
+    end
+
     it "should let you set visibility on user_services" do
       @user.user_services.create! :service => 'skype', :service_user_name => 'user', :service_user_id => 'user', :visible => true
       @user.user_services.create! :service => 'twitter', :service_user_name => 'user', :service_user_id => 'user', :visible => false

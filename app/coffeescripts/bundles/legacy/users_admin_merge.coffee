@@ -1,4 +1,7 @@
-jQuery ->
+require [
+  "jquery",
+  'compiled/behaviors/autocomplete'
+], ($) ->
   $select_name = $("#select_name")
   $selected_name = $("#selected_name")
   $("#account_select").change(->
@@ -10,7 +13,6 @@ jQuery ->
     $input.autocomplete
       minLength: 4
       source: $input.data("autocompleteSource")
-
     $input.bind "autocompleteselect autocompletechange", (event, ui) ->
       if ui.item
         $selected_name.text ui.item.label

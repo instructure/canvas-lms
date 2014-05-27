@@ -36,7 +36,7 @@
     float: right;
 
     &.label-sent, &.label-dashboard {
-      background-color: #468847;
+      background-color: $successText;
     }
 
     &.label-created, &.label-staged, &.label-sending {

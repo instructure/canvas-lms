@@ -1,0 +1,17 @@
+{{#if collection.length }}
+  <ul class="collectionViewItems ig-list"></ul>
+{{else}}
+  {{#if firstResetLanded}}
+    <ul class="collectionViewItems ig-list">
+      <li>
+        <div class="ig-row ig-row-empty">
+          <div class="ig-empty-msg">
+            {{#t "no_assignment_groups"}}No Assignment Groups found{{/t}}
+          </div>
+        </div>
+      </li>
+    </ul>
+  {{else}}
+    <div class="loadingIndicator"></div>
+  {{/if}}
+{{/if}}

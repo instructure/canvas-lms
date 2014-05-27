@@ -1,6 +1,7 @@
 #!/bin/bash
 result=0
 
+echo "################ json_token ################"
 bundle install
 bundle exec rspec spec
 let result=$result+$?

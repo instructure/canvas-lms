@@ -61,5 +61,49 @@ describe Quizzes::QuizQuestion::AnswerParsers::Matching do
 
     include_examples "All answer parsers"
 
+
+    let(:raw_dupe_answers) do
+      [
+        {
+          answer_text: "Salt Lake City",
+          answer_match_left: "Salt Lake City",
+          answer_match_right: "Utah",
+          answer_comment: "This is answer 1",
+          answer_weight: 0,
+          text_after_answers: "Text after Answer 1"
+        },
+        {
+          answer_text: "San Diego",
+          answer_match_left: "San Diego",
+          answer_match_right: "California",
+          answer_comment: "This is answer 2",
+          answer_weight: 100,
+          text_after_answers: "Text after Answer 2"
+        },
+        {
+          answer_text: "Los Angeles",
+          answer_match_left: "Los Angeles",
+          answer_match_right: "California",
+          answer_comment: "This is answer 3",
+          answer_weight: 0,
+          text_after_answers: "Text after Answer 3"
+        }
+      ]
+    end
+
+    it "reuses match_id for duplicate answer_match_right" do
+      question = Quizzes::QuizQuestion::QuestionData.new(question_params)
+      question.answers = Quizzes::QuizQuestion::AnswerGroup.new(raw_dupe_answers)
+      parser = parser_class.new(question.answers)
+      question = parser.parse(question)
+      @answer_data = question.answers
+
+      # usually match_ids are different
+      @answer_data[0][:match_id].should_not eql @answer_data[1][:match_id]
+
+      # but 2nd & 3rd are both "California" and should have the same :match_id
+      @answer_data[1][:match_id].should eql @answer_data[2][:match_id]
+    end
+
   end
 end

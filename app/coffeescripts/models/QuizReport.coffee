@@ -9,8 +9,12 @@ define [
   class QuizReport extends Model
     @mixin progressable
 
-    urlRoot: ->
-      "/api/v1/courses/#{@get('course_id')}/quizzes/#{@get('quiz_id')}/reports"
+    url: ->
+      @get('url')
+
+    # You can use this endpoint to generate the CSV attachment by POSTing to it.
+    baseUrl: ->
+      @url().replace(RegExp("/#{@get('id')}$"), '')
 
     toJSON: ->
       quiz_report: _.pick super,

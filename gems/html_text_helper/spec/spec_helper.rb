@@ -17,6 +17,7 @@ SimpleCov.start('test_frameworks') do
   }
 end
 
+require 'canvas_text_helper'
 require 'html_text_helper'
 
 RSpec.configure do |config|

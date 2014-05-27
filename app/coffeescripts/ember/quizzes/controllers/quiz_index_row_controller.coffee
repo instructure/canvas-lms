@@ -1,9 +1,8 @@
 define [
   'ember',
   'i18n!quizzes_model',
-  'ic-ajax',
   '../shared/environment'
-], (Ember, I18n, ajax, environment) ->
+], (Ember, I18n, environment) ->
 
   # http://emberjs.com/guides/controllers/
   # http://emberjs.com/api/classes/Ember.Controller.html

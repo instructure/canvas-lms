@@ -83,7 +83,7 @@ define [
       @start && (@midnightFudged || (@start.getHours() == 23 && @start.getMinutes() > 30))
 
     copyDataFromObject: (data) ->
-      @originalStart = new Date(@start) if @start
+      @originalStart = (new Date(@start) if @start)
       @midnightFudged = false # clear out cached value because now we have new data
       if @isDueAtMidnight()
         @midnightFudged = true

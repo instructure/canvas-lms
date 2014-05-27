@@ -53,14 +53,6 @@ describe "settings tabs" do
       get "/accounts/#{Account.site_admin.id}/settings"
     end
 
-    context "settings tab" do
-      it "cal2 checkbox should toggle visibility of enable scheduler checkbox" do
-        f("#show_scheduler_checkbox").should_not be_displayed
-        f("#account_settings_enable_scheduler").click
-        f("#show_scheduler_checkbox").should be_displayed
-      end
-    end
-
     #context "announcements tab" do
     #  it "should require confirmation" do
     #    add_announcement do

@@ -233,7 +233,7 @@ end
 def generate_assets
   require 'pathname'
   asset_root = Pathname.new(File.dirname(__FILE__))
-  (Dir[asset_root + "css/**/*.css"] + Dir[asset_root + "js/**/*.js"]).each do |file|
+  (Dir[asset_root + "css/**/*.css"] + Dir[asset_root + "js/**/*.js"] + [asset_root + "live.html"]).each do |file|
     file = Pathname.new(file).relative_path_from(asset_root).to_s
     asset(file, file(file, true))
   end

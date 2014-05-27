@@ -51,7 +51,7 @@
     </h5>
     <div class="control-group">
       <div class="controls">
-        <label class="checkbox">
+        <label class="checkbox" for="s_paper_check">
           {{checkbox "s_paper_check" checked=sPaperCheck}}
           {{#t "turnitin_settings.labels.student_paper_check"}}
             Other Student Papers
@@ -60,7 +60,7 @@
       </div>
 
       <div class="controls">
-        <label class="checkbox">
+        <label class="checkbox" for="internet_check">
           {{checkbox "internet_check" checked=internetCheck}}
           {{#t "turnitin_settings.labels.internet_check"}}
             Internet Database
@@ -69,7 +69,7 @@
       </div>
 
       <div class="controls">
-        <label class="checkbox">
+        <label class="checkbox" for="journal_check">
           {{checkbox "journal_check" checked=journalCheck}}
           {{#t "turnitin_settings.labels.journal_check"}}
             Journals, Periodicals, and Publications
@@ -87,7 +87,7 @@
     </h5>
     <div class="control-group">
       <div class="controls">
-        <label class="checkbox">
+        <label class="checkbox" for="exclude_biblio">
           {{checkbox "exclude_biblio" checked=excludeBiblio}}
           {{#t "turnitin_settings.labels.exclude_biblio"}}
             Bibliographic Material
@@ -95,7 +95,7 @@
         </label>
       </div>
       <div class="controls">
-        <label class="checkbox">
+        <label class="checkbox" for="exclude_quoted">
           {{checkbox "exclude_quoted" checked=excludeQuoted}}
           {{#t "turnitin_settings.labels.exclude_quoted"}}
             Quoted Material
@@ -104,7 +104,7 @@
       </div>
 
       <div class="controls">
-        <label class="checkbox">
+        <label class="checkbox" for="exclude_small_matches">
           {{checkbox "exclude_small_matches" checked=excludesSmallMatches}}
           {{#t "assignments.turnitin_settings.labels.exclude_small_matches"}}
             Small Matches
