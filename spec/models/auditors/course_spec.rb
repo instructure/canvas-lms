@@ -62,9 +62,10 @@ describe Auditors::Course do
     end
 
     it "should log event with sis_batch_id and event source of sis" do
-      @event = Auditors::Course.record_created(@course, @teacher, @course.changes, source: :sis, sis_batch_id: 42)
+      sis_batch = @account.root_account.sis_batches.create
+      @event = Auditors::Course.record_created(@course, @teacher, @course.changes, source: :sis, sis_batch: sis_batch)
       @event.event_source.should == :sis
-      @event.sis_batch_id.should == 42
+      @event.sis_batch_id.should == sis_batch.id
     end
   end
 

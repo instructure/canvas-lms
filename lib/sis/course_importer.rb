@@ -174,7 +174,7 @@ module SIS
               Auditors::Course.record_updated(templated_course, @batch_user, changes, source: :sis, sis_batch_id: @batch_id)
             else
               msg = "A (templated) course did not pass validation "
-              msg += "(" + "course: #{course_id} / #{short_name}, error: " + 
+              msg += "(" + "course: #{course_id} / #{short_name}, error: " +
               msg += templated_course.errors.full_messages.join(",") + ")"
               raise ImportError, msg
             end
@@ -186,7 +186,7 @@ module SIS
             auditor_state_changes(course, state_changes, course_changes)
           else
             msg = "A course did not pass validation "
-            msg += "(" + "course: #{course_id} / #{short_name}, error: " + 
+            msg += "(" + "course: #{course_id} / #{short_name}, error: " +
             msg += course.errors.full_messages.join(",") + ")"
             raise ImportError, msg
           end
@@ -201,8 +201,8 @@ module SIS
 
       def auditor_state_changes(course, state_changes, changes = {})
         options = {
-            source: :sis,
-            sis_batch_id: @batch_id
+          source: :sis,
+          sis_batch: @batch
         }
 
         state_changes.each do |state_change|

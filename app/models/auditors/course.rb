@@ -28,8 +28,7 @@ class Auditors::Course
     def self.generate(course, user, event_type, event_data = {}, opts = {})
       event_source = opts[:source] || :manual
       sis_batch_id = opts[:sis_batch_id]
-
-      new(
+      event = new(
         'course' => course,
         'user' => user,
         'event_type' => event_type,
@@ -37,6 +36,8 @@ class Auditors::Course
         'event_source' => event_source.to_s,
         'sis_batch_id' => sis_batch_id
       )
+      event.sis_batch = opts[:sis_batch] if opts[:sis_batch]
+      event
     end
 
     def initialize(*args)

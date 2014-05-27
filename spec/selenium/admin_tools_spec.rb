@@ -460,11 +460,28 @@ describe "admin_tools" do
       @event = Auditors::Course.record_updated(@course, @teacher, @course.changes)
 
       show_event_details("Updated", old_name)
+      items = ffj('.ui-dialog dl > dd')
+      items[4].text.should == "Manual"
+      items[5].text.should == "Updated"
+
       cols = ffj('.ui-dialog table:first tbody tr:first td')
       cols.size.should == 3
       cols[0].text.should == "Name"
       cols[1].text.should == old_name
       cols[2].text.should == @course.name
+    end
+
+    it "should show sis batch id if source is sis" do
+      old_name = @course.name
+      @course.name = "Course Updated"
+
+      sis_batch = @account.root_account.sis_batches.create
+      @event = Auditors::Course.record_updated(@course, @teacher, @course.changes, source: :sis, sis_batch: sis_batch)
+
+      show_event_details("Updated", old_name)
+      items = ffj('.ui-dialog dl > dd')
+      items[4].text.should == "SIS"
+      items[5].text.should == sis_batch.id.to_s
     end
 
     it "should show concluded event details" do
