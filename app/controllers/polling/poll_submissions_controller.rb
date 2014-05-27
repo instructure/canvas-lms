@@ -26,14 +26,25 @@ module Polling
   #       "required": ["id", "poll_choice"],
   #       "properties": {
   #         "id": {
-  #           "description": "The unique identifier for the account role/user assignment.",
+  #           "description": "The unique identifier for the poll submission.",
   #           "example": 1023,
   #           "type": "integer"
   #         },
   #         "poll_choice_id": {
-  #           "description": "The id of the chosen poll choice for this submission.",
-  #           "example": 55,
+  #           "description": "The unique identifier of the poll choice chosen for this submission.",
+  #           "example": 155,
   #           "type": "integer"
+  #         },
+  #         "user_id": {
+  #           "description": "the unique identifier of the user who submitted this poll submission.",
+  #           "example": 4555,
+  #           "type": "integer"
+  #         },
+  #         "created_at": {
+  #           "description": "The date and time the poll submission was submitted.",
+  #           "example": "2013-11-07T13:16:18Z",
+  #           "type": "string",
+  #           "format": "date-time"
   #         }
   #       }
   #    }
