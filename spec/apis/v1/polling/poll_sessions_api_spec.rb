@@ -95,10 +95,27 @@ describe Polling::PollSessionsController, type: :request do
     context "as a teacher" do
       it "retrieves the poll session specified even if closed" do
         @poll_session.close!
+
+        @user = @teacher
         json = get_show
         poll_json = json['poll_sessions'].first
         poll_json['id'].should == @poll_session.id.to_s
         poll_json['is_published'].should be_false
+      end
+
+      it "embeds the associated poll submissions" do
+        choice1 = @poll.poll_choices.create!(text: 'Choice A', is_correct: true)
+        choice2 = @poll.poll_choices.create!(text: 'Choice B', is_correct: false)
+
+        2.times { create_submission(choice1) }
+        1.times { create_submission(choice2) }
+
+        @user = @teacher
+        json = get_show
+        poll_session_json = json['poll_sessions'].first
+
+        poll_session_json.should have_key('poll_submissions')
+        poll_session_json['poll_submissions'].size.should == 3
       end
 
       it "shows the results of a current poll session" do
@@ -119,6 +136,21 @@ describe Polling::PollSessionsController, type: :request do
     end
 
     context "as a student" do
+      it "doesn't embed the associated poll submissions" do
+        choice1 = @poll.poll_choices.create!(text: 'Choice A', is_correct: true)
+        choice2 = @poll.poll_choices.create!(text: 'Choice B', is_correct: false)
+
+        2.times { create_submission(choice1) }
+        1.times { create_submission(choice2) }
+
+        student = student_in_course(active_user:true).user
+        @user = student
+
+        json = get_show
+
+        json.should_not have_key('poll_submissions')
+      end
+
       context "when has_public_results is false" do
         it "doesn't show the results of a current poll session" do
           choice1 = @poll.poll_choices.create!(text: 'Choice A', is_correct: true)
@@ -342,6 +374,4 @@ describe Polling::PollSessionsController, type: :request do
       end
     end
   end
-
-
 end

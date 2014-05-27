@@ -170,6 +170,16 @@ describe Polling::PollsController, type: :request do
   describe 'DELETE destroy' do
     before(:each) do
       @poll = @teacher.polls.create!(question: 'An Old Title')
+      @choice = @poll.poll_choices.create!(text: 'Blah')
+      @session = @poll.poll_sessions.create!(course: @course)
+      @session.publish!
+
+      @student = student_in_course(active_user: true).user
+      @submission = @session.poll_submissions.create!(
+        user: @student,
+        poll: @poll,
+        poll_choice: @choice
+      )
     end
 
     def delete_destroy
@@ -183,6 +193,7 @@ describe Polling::PollsController, type: :request do
 
     context "as a teacher" do
       it "deletes a poll successfully" do
+        @user = @teacher
         delete_destroy
 
         response.code.should == '204'
@@ -193,6 +204,7 @@ describe Polling::PollsController, type: :request do
         choice_a = @poll.poll_choices.create!(text: 'choice a')
         choice_b = @poll.poll_choices.create!(text: 'choice b')
 
+        @user = @teacher
         delete_destroy
         response.code.should == '204'
         Polling::PollChoice.find_by_id(choice_a.id).should be_nil

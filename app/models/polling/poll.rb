@@ -22,8 +22,8 @@ module Polling
 
     belongs_to :user
     has_many :poll_choices, class_name: 'Polling::PollChoice', dependent: :destroy
-    has_many :poll_submissions, class_name: 'Polling::PollSubmission'
-    has_many :poll_sessions, class_name: 'Polling::PollSession'
+    has_many :poll_submissions, class_name: 'Polling::PollSubmission', dependent: :destroy
+    has_many :poll_sessions, class_name: 'Polling::PollSession', dependent: :destroy
 
     validates_presence_of :question, :user
     validates_length_of :question, maximum: 255, allow_nil: true
