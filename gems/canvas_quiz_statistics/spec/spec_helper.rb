@@ -17,13 +17,15 @@ RSpec.configure do |config|
   config.color = true
   config.order = 'random'
 
-  support_files = File.join(
-    File.dirname(__FILE__),
-    'canvas_quiz_statistics',
-    'support',
-    '**',
-    '*.rb'
-  )
+  File.join(File.dirname(__FILE__), 'canvas_quiz_statistics').tap do |cwd|
+    # spec support in support/
+    Dir.glob(File.join([
+      cwd, 'support', '**', '*.rb'
+    ])).each { |file| require file }
 
-  Dir.glob(support_files).each { |file| require file }
+    # specs for shared metrics in analyzers/shared_metrics
+    Dir.glob(File.join([
+      cwd, 'analyzers', 'shared_metrics', '**', '*.rb'
+    ])).each { |file| require file }
+  end
 end

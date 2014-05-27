@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe CanvasQuizStatistics::Analyzers::FillInMultipleBlanks do
-  FIMB = CanvasQuizStatistics::Analyzers::FillInMultipleBlanks
+  Constants = CanvasQuizStatistics::Analyzers::Base::Constants
 
   let(:question_data) { QuestionHelpers.fixture('fill_in_multiple_blanks_question') }
   subject { described_class.new(question_data) }
@@ -49,7 +49,7 @@ describe CanvasQuizStatistics::Analyzers::FillInMultipleBlanks do
         ])
 
         answer_set = stats[:answer_sets].detect { |as| as[:text] == 'color1' }
-        answer = answer_set[:answers].detect { |a| a[:id] == FIMB::UnknownAnswerKey }
+        answer = answer_set[:answers].detect { |a| a[:id] == Constants::UnknownAnswerKey }
         answer.should be_present
         answer[:responses].should == 1
       end
@@ -63,7 +63,7 @@ describe CanvasQuizStatistics::Analyzers::FillInMultipleBlanks do
         ])
 
         answer_set = stats[:answer_sets].detect { |as| as[:text] == 'color1' }
-        answer = answer_set[:answers].detect { |a| a[:id] == FIMB::MissingAnswerKey }
+        answer = answer_set[:answers].detect { |a| a[:id] == Constants::MissingAnswerKey }
         answer.should be_present
         answer[:responses].should == 1
       end
@@ -75,18 +75,19 @@ describe CanvasQuizStatistics::Analyzers::FillInMultipleBlanks do
             answer_id_for_color1: "9711"
           }
         ])
+        puts stats.to_json
 
         stats[:answer_sets].detect { |as| as[:text] == 'color1' }.tap do |answer_set|
-          unknown_answer = answer_set[:answers].detect { |a| a[:id] == FIMB::UnknownAnswerKey }
-          missing_answer = answer_set[:answers].detect { |a| a[:id] == FIMB::MissingAnswerKey }
+          unknown_answer = answer_set[:answers].detect { |a| a[:id] == Constants::UnknownAnswerKey }
+          missing_answer = answer_set[:answers].detect { |a| a[:id] == Constants::MissingAnswerKey }
 
           unknown_answer.should_not be_present
           missing_answer.should_not be_present
         end
 
         stats[:answer_sets].detect { |as| as[:text] == 'color2' }.tap do |answer_set|
-          unknown_answer = answer_set[:answers].detect { |a| a[:id] == FIMB::UnknownAnswerKey }
-          missing_answer = answer_set[:answers].detect { |a| a[:id] == FIMB::MissingAnswerKey }
+          unknown_answer = answer_set[:answers].detect { |a| a[:id] == Constants::UnknownAnswerKey }
+          missing_answer = answer_set[:answers].detect { |a| a[:id] == Constants::MissingAnswerKey }
 
           unknown_answer.should_not be_present
           missing_answer.should be_present
@@ -96,38 +97,9 @@ describe CanvasQuizStatistics::Analyzers::FillInMultipleBlanks do
     end
   end
 
-  describe '[:correct]' do
-    it 'should count all fully correct responses' do
-      stats = subject.run([
-        { correct: "true" },
-        { correct: true }
-      ])
-
-      stats[:correct].should == 2
-    end
-  end
-
-  describe '[:partial]' do
-    it 'should count all partially correct responses' do
-      stats = subject.run([
-        { correct: "true" },
-        { correct: "partial" }
-      ])
-
-      stats[:partially_correct].should == 1
-    end
-  end
-
-  describe '[:incorrect]' do
-    it 'should count all incorrect responses' do
-      stats = subject.run([
-        { correct: nil },
-        { correct: false }
-      ])
-
-      stats[:incorrect].should == 2
-    end
-  end
+  it_behaves_like '[:correct]'
+  it_behaves_like '[:partially_correct]'
+  it_behaves_like '[:incorrect]'
 
   describe '[:responses]' do
     it 'should count all students who have filled any blank' do

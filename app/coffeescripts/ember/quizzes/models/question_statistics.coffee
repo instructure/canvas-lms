@@ -56,7 +56,7 @@ define [
       switch @get('questionType')
         when 'multiple_choice_question', 'true_false_question'
           'multiple_choice'
-        when 'short_answer_question', 'multiple_answers_question'
+        when 'short_answer_question', 'multiple_answers_question', 'numerical_question'
           'short_answer'
         when 'fill_in_multiple_blanks_question', 'multiple_dropdowns_question', 'matching_question'
           'fill_in_multiple_blanks'

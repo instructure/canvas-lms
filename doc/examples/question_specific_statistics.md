@@ -257,3 +257,73 @@ File Upload question statistics look just like the statistics for [Essays](#essa
 #### Formula
 
 Formula question statistics look just like the statistics for [Essays](#essay-question-stats).
+
+
+#### Numerical
+
+```javascript
+{
+  // Number of students who have provided any kind of answer.
+  "responses": 2,
+
+  // Number of students who have provided a correct answer.
+  "correct": 1,
+
+  // Number of students who have provided a correct answer and received full
+  // credit or higher.
+  "full_credit": 2,
+
+  // Number of students who have provided an answer which was not correct.
+  "incorrect": 1,
+
+  "answers": [
+    {
+      // Unique ID of this answer.
+      "id": "9711",
+
+      // This metric contains a formatted version of the correct answer
+      // ready for display.
+      "text": "15.00",
+
+      // Number of students who provided this answer.
+      "responses": 3,
+
+      // Whether this answer is a correct one.
+      "correct": true,
+
+      // Lower and upper boundaries of the answer range. This is consistent
+      // regardless of the answer type (e.g., exact vs range).
+      //
+      // In the case of exact answers, the range will be the exact value
+      // minus plus the defined margin.
+      "value": [ 13.5, 16.5 ],
+
+      // Margin of error tolerance. This is always zero for range answers.
+      "margin": 1.5
+    },
+
+    // "Other" answers:
+    //
+    // This is an auto-generated answer that will be present if any student
+    // provides a number for an answer that is incorrect (doesn't map to
+    // any of the pre-defined answers.)
+    {
+      "id": "other",
+      "text": "Other",
+      "responses": 0,
+      "correct": false
+    },
+
+    // "Missing" answers:
+    //
+    // This is an auto-generated answer to account for all students who
+    // left this question unanswered.
+    {
+      "id": "none",
+      "text": "No Answer",
+      "responses": 0,
+      "correct": false
+    }
+  ]
+}
+```

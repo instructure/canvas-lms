@@ -20,8 +20,10 @@ define [
     yAxisLabel: ''
     xAxisLabels: false
     linearScale: true
-    w: 220
-    h: 120
+    width: (->
+      @$().width()
+    ).property()
+    height: 120
 
     tooltipOptions:
       position:
@@ -36,8 +38,8 @@ define [
       highest = Math.max.apply(Math, data.mapBy('y'))
 
       margin = { top: 0, right: 0, bottom: 0, left: 0 }
-      width = @get('w') - margin.left - margin.right
-      height = @get('h') - margin.top - margin.bottom
+      width = @get('width') - margin.left - margin.right
+      height = @get('height') - margin.top - margin.bottom
       barWidth = @get('barWidth')
       barMargin = @get('barMargin')
       xOffset = @get('xOffset')

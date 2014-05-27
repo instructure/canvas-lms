@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe CanvasQuizStatistics::Analyzers::MultipleDropdowns do
-  MD = CanvasQuizStatistics::Analyzers::MultipleDropdowns
+  Constants = CanvasQuizStatistics::Analyzers::Base::Constants
 
   let(:question_data) { QuestionHelpers.fixture('multiple_dropdowns_question') }
   subject { described_class.new(question_data) }
@@ -44,7 +44,7 @@ describe CanvasQuizStatistics::Analyzers::MultipleDropdowns do
         ])
 
         answer_set = stats[:answer_sets].detect { |as| as[:text] == 'organ' }
-        answer = answer_set[:answers].detect { |a| a[:id] == MD::MissingAnswerKey }
+        answer = answer_set[:answers].detect { |a| a[:id] == Constants::MissingAnswerKey }
         answer.should be_present
         answer[:responses].should == 1
       end
@@ -57,7 +57,7 @@ describe CanvasQuizStatistics::Analyzers::MultipleDropdowns do
         ])
 
         answer_set = stats[:answer_sets].detect { |as| as[:text] == 'organ' }
-        answer = answer_set[:answers].detect { |a| a[:id] == MD::MissingAnswerKey }
+        answer = answer_set[:answers].detect { |a| a[:id] == Constants::MissingAnswerKey }
         answer.should be_present
         answer[:responses].should == 1
       end
@@ -68,16 +68,16 @@ describe CanvasQuizStatistics::Analyzers::MultipleDropdowns do
         ])
 
         stats[:answer_sets].detect { |as| as[:text] == 'organ' }.tap do |answer_set|
-          unknown_answer = answer_set[:answers].detect { |a| a[:id] == MD::UnknownAnswerKey }
-          missing_answer = answer_set[:answers].detect { |a| a[:id] == MD::MissingAnswerKey }
+          unknown_answer = answer_set[:answers].detect { |a| a[:id] == Constants::UnknownAnswerKey }
+          missing_answer = answer_set[:answers].detect { |a| a[:id] == Constants::MissingAnswerKey }
 
           unknown_answer.should_not be_present
           missing_answer.should_not be_present
         end
 
         stats[:answer_sets].detect { |as| as[:text] == 'color' }.tap do |answer_set|
-          unknown_answer = answer_set[:answers].detect { |a| a[:id] == MD::UnknownAnswerKey }
-          missing_answer = answer_set[:answers].detect { |a| a[:id] == MD::MissingAnswerKey }
+          unknown_answer = answer_set[:answers].detect { |a| a[:id] == Constants::UnknownAnswerKey }
+          missing_answer = answer_set[:answers].detect { |a| a[:id] == Constants::MissingAnswerKey }
 
           unknown_answer.should_not be_present
           missing_answer.should be_present

@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 module CanvasQuizStatistics::Analyzers
-  class Calculated < Essay
+  class Calculated < Base
     inherit_metrics :essay_question
 
     metric :graded do |responses|
