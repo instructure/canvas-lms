@@ -311,16 +311,16 @@ describe CourseSection, "moving to new course" do
         @ta.reload
 
         # make sure other ways to get :read are false
-        @other_section.cached_context_grants_right?(@ta, :manage_sections).should be_false
-        @other_section.cached_context_grants_right?(@ta, :manage_students).should be_false
+        @other_section.course.grants_right?(@ta, :manage_sections).should be_false
+        @other_section.course.grants_right?(@ta, :manage_students).should be_false
 
         @other_section.grants_right?(@ta, :read).should be_false
       end
 
       it "should work with section_limited false" do
         # make sure other ways to get :read are false
-        @other_section.cached_context_grants_right?(@ta, :manage_sections).should be_false
-        @other_section.cached_context_grants_right?(@ta, :manage_students).should be_false
+        @other_section.course.grants_right?(@ta, :manage_sections).should be_false
+        @other_section.course.grants_right?(@ta, :manage_students).should be_false
 
         @other_section.grants_right?(@ta, :read).should be_true
       end

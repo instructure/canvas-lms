@@ -25,7 +25,6 @@ describe "/quizzes/quizzes/submission_versions" do
     course_quiz
 
     view_context
-    ActiveRecord::Base.clear_cached_contexts
     assigns[:quiz] = @quiz
     assigns[:versions] = []
 

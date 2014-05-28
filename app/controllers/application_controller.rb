@@ -743,7 +743,6 @@ class ApplicationController < ActionController::Base
   end
 
   def clear_cached_contexts
-    ActiveRecord::Base.clear_cached_contexts
     RoleOverride.clear_cached_contexts
   end
 

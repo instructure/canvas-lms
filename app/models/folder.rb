@@ -47,7 +47,7 @@ class Folder < ActiveRecord::Base
   ]
 
   EXPORTABLE_ASSOCIATIONS = [:context, :cloned_item, :parent_folder, :file_attachments, :sub_folders]
-  
+
   acts_as_list :scope => :parent_folder
 
   before_save :infer_full_name

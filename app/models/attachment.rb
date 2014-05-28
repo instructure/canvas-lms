@@ -1130,7 +1130,7 @@ class Attachment < ActiveRecord::Base
     }
     can :download
 
-    given { |user, session| self.context_type == 'Submission' && self.context.grant_rights?(user, session, :comment) }
+    given { |user, session| self.context_type == 'Submission' && self.context.grant_right?(user, session, :comment) }
     can :create
 
     given { |user, session|
