@@ -113,8 +113,8 @@ class CommMessagesApiController < ApplicationController
   # @returns [CommMessage]
   def index
     user = api_find(User, params[:user_id])
-    start_time = TimeHelper.try_parse(params[:start_time])
-    end_time = TimeHelper.try_parse(params[:end_time])
+    start_time = CanvasTime.try_parse(params[:start_time])
+    end_time = CanvasTime.try_parse(params[:end_time])
 
     query = user.messages.order('created_at DESC')
 

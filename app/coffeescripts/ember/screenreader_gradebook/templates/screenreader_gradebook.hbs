@@ -5,7 +5,7 @@
       {{#t 'save_instructions'}}Note: Grades and notes will be saved automatically after moving out of the field.{{/t}}
     </em>
     <p>
-      <a href="{{ unbound changeGradebookVersionUrl }}">{{#t "switch_to_gradebook2"}}Switch gradebooks{{/t}}</a>
+      <a href="{{ unbound changeGradebookVersionUrl }}">{{#t "switch_to_grid_view"}}Switch to Grid View{{/t}}</a>
     </p>
   </div>
 </div>
@@ -51,6 +51,7 @@
       id="arrange_assignments"
       items=assignmentSortOptions
       selected=assignmentSort
+      value=assignmentSort.value
     }}
   </div>
 </div>
@@ -119,7 +120,7 @@
           name="show_total_as_points"
           checked=showTotalAsPoints
         }}
-        {{#t "show_total_as_points"}}Show Student Grade Totals as Points {{/t}}
+        {{#t "show_total_as_points"}}Show Totals as Points on Student Grade Page{{/t}}
         </label>
       </div>
     {{/unless}}
@@ -222,7 +223,6 @@
   </div>
 </div>
 
-
 <div class="row pad-box bottom-only">
   <div class="span4 text-right-responsive">
     <label for="assignment_select">
@@ -230,15 +230,21 @@
     </label>
   </div>
   <div class="span8">
-     {{
-      fast-select id="assignment_select"
-      class="assignment_select"
-      items=assignments
-      valuePath="id"
-      labelPath="name"
-      labelDefault=assignmentSelectDefaultLabel
-      selected=selectedAssignment
-    }}
+    {{! sad hack until fast select is fixed }}
+    {{! prevents assignments from loading in the wrong order }}
+    {{#if assignments.length}}
+      {{
+        fast-select id="assignment_select"
+        class="assignment_select"
+        items=assignments
+        valuePath="id"
+        labelPath="name"
+        labelDefault=assignmentSelectDefaultLabel
+        selected=selectedAssignment
+      }}
+    {{else}}
+      <select disabled></select>
+    {{/if}}
 
     <div id="assignment_navigation" class="row pad-box bottom-only">
       <div class="span3">
@@ -277,7 +283,9 @@
       {{#if selectedSubmission}}
         <div class="pad-box bottom-only">
           <label for="student_and_assignment_grade">
-            <strong>{{#t 'grade_for'}}Grade for: {{selectedAssignment.name}}{{/t}}</strong>
+            {{#with selectedAssignment}}
+              <strong>{{#t 'grade_for'}}Grade for: {{name}}{{/t}}</strong>
+            {{/with}}
           </label>
         </div>
         {{
@@ -403,7 +411,12 @@
               {{#if selectedStudent.total_grade.possible}}
                 {{selectedStudent.total_percent}}%
                 {{#if selectedStudent.final_grade_point_ratio}}
-                  ({{#t 'pts'}}{{selectedStudent.final_grade_point_ratio}} points{{/t}})
+                {{#with selectedStudent}}
+                  ({{#t 'pts'}}{{final_grade_point_ratio}} points{{/t}})
+                {{/with}}
+                {{/if}}
+                {{#if showLetterGrades}}
+                  - {{selectedStudent.final_letter_grade}}
                 {{/if}}
               {{else}}
                 -
@@ -450,6 +463,14 @@
         <div>
           <a {{bind-attr href="speedGraderUrl"}}>{{#t 'assignment_in_speedgrader'}}See this assignment in speedgrader{{/t}}</a>
         </div>
+        {{#if showDownloadSubmissionsButton}}
+          <div class="pad-box no-sides">
+            {{
+              ic-submission-download-dialog
+              assignmentUrl=selectedAssignment.html_url
+            }}
+          </div>
+        {{/if}}
         <div class="pad-box no-sides">
           <p><strong>
             {{#t 'submission_types'}}Submission types: {{/t}} {{assignmentSubmissionTypes}}
@@ -526,13 +547,15 @@
           >
             {{#t 'set_default_grade'}}Set default grade{{/t}}
           </button>
-          <button
-            id="curve_grades"
-            class="btn"
-            {{ action 'openDialog' 'curve_grades' target=view }}
-          >
-            {{#t 'curve_grades'}}Curve Grades{{/t}}
-          </button>
+          {{#if selectedAssignment.points_possible}}
+            <button
+              id="curve_grades"
+              class="btn"
+              {{ action 'openDialog' 'curve_grades' target=view }}
+            >
+              {{#t 'curve_grades'}}Curve Grades{{/t}}
+            </button>
+          {{/if}}
         </div>
       {{else}}
         <p class="assignment_selection pad-box top-only">

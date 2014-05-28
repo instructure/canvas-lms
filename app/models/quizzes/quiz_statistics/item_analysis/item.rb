@@ -19,6 +19,9 @@
 class Quizzes::QuizStatistics::ItemAnalysis::Item
   include HtmlTextHelper
 
+  # set of IDs of sorted answers, the first would be the correct answer
+  attr_reader :answers
+
   def self.from(summary, question)
     return unless allowed_types.include?(question[:question_type])
     new summary, question
@@ -94,7 +97,8 @@ class Quizzes::QuizStatistics::ItemAnalysis::Item
   end
 
   def ratio_for(answer)
-    respondents_for(answer).size.to_f / all_respondents.size
+    ratio = respondents_for(answer).size.to_f / all_respondents.size
+    ratio.nan? ? 0 : ratio
   end
 
   def <=>(other)

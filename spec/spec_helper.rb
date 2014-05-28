@@ -25,10 +25,10 @@ if CANVAS_RAILS2
   end
 end
 
-unless CANVAS_RAILS2 || ENV['NO_RERUN']
+unless CANVAS_RAILS2
   Spec.configure do |c|
    c.treat_symbols_as_metadata_keys_with_true_values = true
-  end 
+  end
 
   RSpec.configure do |c|
     c.around(:each) do |example|
@@ -37,14 +37,16 @@ unless CANVAS_RAILS2 || ENV['NO_RERUN']
         Timeout::timeout(180) {
           example.run
         }
-        e = @example.instance_variable_get('@exception')
-        if !e.nil? && (attempts += 1) < 2
-          puts "FAILURE: #{@example.description} \n #{e}".red
-          puts "RETRYING: #{@example.description}".yellow
-          @example.instance_variable_set('@exception', nil)
-          redo
-        elsif e.nil? && attempts != 0
-          puts "SUCCESS: retry passed for \n #{@example.description}".green
+        if ENV['AUTORERUN']
+          e = @example.instance_variable_get('@exception')
+          if !e.nil? && (attempts += 1) < 2 && !example.metadata[:no_retry]
+            puts "FAILURE: #{@example.description} \n #{e}".red
+            puts "RETRYING: #{@example.description}".yellow
+            @example.instance_variable_set('@exception', nil)
+            redo
+          elsif e.nil? && attempts != 0
+            puts "SUCCESS: retry passed for \n #{@example.description}".green
+          end
         end
       end until true
     end
@@ -119,6 +121,7 @@ else
         def render_with_helpers(*args)
           controller_class = ("#{@controller.controller_path.camelize}Controller".constantize rescue nil) || ApplicationController
 
+          controller_class.instance_variable_set(:@js_env, nil)
           # this extends the controller's helper methods to the view
           # however, these methods are delegated to the test controller
           view.singleton_class.class_eval do
@@ -192,6 +195,9 @@ require 'action_controller_test_process'
 require File.expand_path(File.dirname(__FILE__) + '/mocha_rspec_adapter')
 require File.expand_path(File.dirname(__FILE__) + '/mocha_extensions')
 require File.expand_path(File.dirname(__FILE__) + '/ams_spec_helper')
+
+require 'i18n_tasks'
+require 'handlebars_tasks'
 
 # if mocha was initialized before rails (say by another spec), CollectionProxy would have
 # undef_method'd them; we need to restore them
@@ -636,12 +642,12 @@ end
   end
 
   def student_in_section(section, opts={})
-    user
-    enrollment = section.course.enroll_user(@user, 'StudentEnrollment', :section => section)
-    @user.save!
+    student = opts.fetch(:user) { user }
+    enrollment = section.course.enroll_user(student, 'StudentEnrollment', :section => section)
+    student.save!
     enrollment.workflow_state = 'active'
     enrollment.save!
-    @user
+    student
   end
 
   def teacher_in_course(opts={})
@@ -776,14 +782,14 @@ end
 
   def user_session(user, pseudonym=nil)
     unless pseudonym
-      pseudonym = stub(:record => user, :user_id => user.id, :user => user, :login_count => 1)
+      pseudonym = stub('Pseudonym', :record => user, :user_id => user.id, :user => user, :login_count => 1)
       # at least one thing cares about the id of the pseudonym... using the
       # object_id should make it unique (but obviously things will fail if
       # it tries to load it from the db.)
       pseudonym.stubs(:id).returns(pseudonym.object_id)
     end
 
-    session = stub(:record => pseudonym, :session_credentials => nil, :used_basic_auth? => false)
+    session = stub('PseudonymSession', :record => pseudonym, :session_credentials => nil, :used_basic_auth? => false)
 
     PseudonymSession.stubs(:find).returns(session)
   end
@@ -824,7 +830,7 @@ end
     @quiz_submission = @quiz.generate_submission(@user)
     @quiz_submission.mark_completed
     @quiz_submission.submission_data = yield if block_given?
-    @quiz_submission.grade_submission
+    Quizzes::SubmissionGrader.new(@quiz_submission).grade_submission
   end
 
   def survey_with_submission(questions, &block)
@@ -1108,7 +1114,7 @@ end
 
   def stub_kaltura
     # trick kaltura into being activated
-    Kaltura::ClientV3.stubs(:config).returns({
+    CanvasKaltura::ClientV3.stubs(:config).returns({
                                                  'domain' => 'kaltura.example.com',
                                                  'resource_domain' => 'kaltura.example.com',
                                                  'partner_id' => '100',

@@ -256,13 +256,10 @@ module ActiveRecord
             done_ids = done_ids.to_a
             moving_positions = list_scope.where(self.class.primary_key => done_ids).pluck(self.class.position_column.to_sym)
             moving_positions.each_with_index do |position, index|
-              # the last block is covered by the else in the CASE statement below; it generates
-              # slightly shorter SQL
-              next if index == moving_positions.length - 1
+              next unless position
               updates << "WHEN #{self.class.position_column}<=#{position} THEN #{self.class.position_column}+#{moving_positions.length - index}"
             end
-            list_scope.where("#{self.class.position_column}<=?", moving_positions.last).
-                update_all("#{self.class.position_column}=CASE #{updates.join(" ")} ELSE position+1 END")
+            list_scope.update_all("#{self.class.position_column}=CASE #{updates.join(" ")} ELSE position END")
           end
         end
 

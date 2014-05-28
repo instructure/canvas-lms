@@ -2,14 +2,9 @@ require 'spec_helper'
 
 describe Canvas::APISerializer do
 
-  attr_reader :serializer, :options
-
   let(:controller) { ActiveModel::FakeController.new }
-
-  before do
-    @options = {scope: {}, controller: controller}
-    @serializer = Canvas::APISerializer.new({}, options)
-  end
+  let(:options) { { scope: {}, controller: controller } }
+  let(:serializer) { Canvas::APISerializer.new({}, options) }
 
   it "aliases user to options[:scope]" do
     serializer.user.should == options[:scope]
@@ -103,6 +98,81 @@ describe Canvas::APISerializer do
       serializer.as_json(root: nil)['links']['bar'].should == "1"
       Object.send(:remove_const, :BarSerializer)
     end
-  end
 
+    context 'embedding objects in root' do
+      before do
+        Bar = Struct.new(:id, :name) do
+          def read_attribute_for_serialization(attr)
+            send(attr)
+          end
+        end
+
+        class BarSerializer < Canvas::APISerializer
+          attributes :id, :name
+        end
+      end
+
+      after do
+        Object.send(:remove_const, :Bar)
+        Object.send(:remove_const, :BarSerializer)
+      end
+
+      let :object do
+        Foo.new(1, 'Bob').tap do |object|
+          object.expects(:bar).returns Bar.new(1, 'Alice')
+        end
+      end
+
+      let :controller do
+        ActiveModel::FakeController.new({
+          accepts_jsonapi: true,
+          stringify_json_ids: true
+        })
+      end
+
+      subject do
+        FooSerializer.new(object, {
+          controller: controller,
+          root: nil
+        })
+      end
+
+      it "uses objects for embed: :object, embed_in_root: true" do
+        class FooSerializer
+          has_one :bar, embed: :object, embed_in_root: true
+        end
+
+        subject.as_json(root: nil).stringify_keys.tap do |json|
+          json['links'].should_not be_present
+          json['bar'].should be_present
+          json['bar'].should == [{ id: 1, name: 'Alice' }]
+        end
+      end
+
+      it "uses objects for embed: :object, embed_in_root: true and uses a custom key" do
+        class FooSerializer
+          has_one :bar, embed: :object, embed_in_root: true, root: 'adooken'
+        end
+
+        subject.as_json(root: nil).stringify_keys.tap do |json|
+          json['links'].should_not be_present
+          json['bar'].should_not be_present
+          json['adooken'].should be_present
+          json['adooken'].should == [{ id: 1, name: 'Alice' }]
+        end
+      end
+
+      it "respects the :wrap_in_array custom option" do
+        class FooSerializer
+          has_one :bar, embed: :object, embed_in_root: true, wrap_in_array: false
+        end
+
+        subject.as_json(root: nil).stringify_keys.tap do |json|
+          json['links'].should_not be_present
+          json['bar'].should be_present
+          json['bar'].should == { id: 1, name: 'Alice' }
+        end
+      end
+    end
+  end
 end

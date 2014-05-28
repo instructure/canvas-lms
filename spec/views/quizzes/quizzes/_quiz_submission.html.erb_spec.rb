@@ -25,7 +25,7 @@ describe "/quizzes/quizzes/_quiz_submission" do
     view_context
     assigns[:quiz] = @course.quizzes.create!
     assigns[:submission] = assigns[:quiz].generate_submission(@user)
-    assigns[:submission].grade_submission
+    Quizzes::SubmissionGrader.new(assigns[:submission]).grade_submission
     render :partial => "quizzes/quizzes/quiz_submission"
     response.should_not be_nil
   end
@@ -39,7 +39,7 @@ describe "/quizzes/quizzes/_quiz_submission" do
 
     assigns[:quiz] = quiz
     assigns[:submission] = assigns[:quiz].generate_submission(@user)
-    assigns[:submission].grade_submission
+    Quizzes::SubmissionGrader.new(assigns[:submission]).grade_submission
     render :partial => "quizzes/quizzes/quiz_submission"
     response.should_not be_nil
   end

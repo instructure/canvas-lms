@@ -23,11 +23,44 @@ require [
   'compiled/views/content_migrations/subviews/DateShiftView'
   'compiled/views/content_migrations/subviews/DaySubstitutionView'
   'jst/content_migrations/ProgressingContentMigrationCollection'
+  'compiled/views/content_migrations/ExternalToolContentView'
+  'compiled/views/content_migrations/subviews/ExternalToolLaunchView'
+  'compiled/views/ExternalTools/ExternalContentReturnView'
+  'compiled/models/ExternalTool'
   'vendor/jquery.ba-tinypubsub'
   'jst/content_migrations/subviews/DaySubstitutionCollection'
   'compiled/views/content_migrations/subviews/OverwriteAssessmentContentView'
-], (I18n, $, ProgressingContentMigrationCollection, ContentMigrationModel, DaySubstitutionCollection, CollectionView, PaginatedCollectionView, ProgressingContentMigrationView, MigrationConverterView, CommonCartridgeView, ConverterViewControl, ZipFilesView, CopyCourseView, MoodleZipView, CanvasExportView, QTIZipView, ChooseMigrationFileView, FolderPickerView, SelectContentCheckboxView, QuestionBankView, CourseFindSelectView, DateShiftView, DaySubView, progressingMigrationCollectionTemplate, pubsub, daySubCollectionTemplate, OverwriteAssessmentContentView) ->
-  ConverterViewControl.setModel new ContentMigrationModel 
+], (I18n, $,
+    ProgressingContentMigrationCollection,
+    ContentMigrationModel,
+    DaySubstitutionCollection,
+    CollectionView,
+    PaginatedCollectionView,
+    ProgressingContentMigrationView,
+    MigrationConverterView,
+    CommonCartridgeView,
+    ConverterViewControl,
+    ZipFilesView,
+    CopyCourseView,
+    MoodleZipView,
+    CanvasExportView,
+    QTIZipView,
+    ChooseMigrationFileView,
+    FolderPickerView,
+    SelectContentCheckboxView,
+    QuestionBankView,
+    CourseFindSelectView,
+    DateShiftView,
+    DaySubView,
+    progressingMigrationCollectionTemplate,
+    ExternalToolContentView,
+    ExternalToolLaunchView,
+    ExternalContentReturnView,
+    ExternalTool,
+    pubsub,
+    daySubCollectionTemplate,
+    OverwriteAssessmentContentView) ->
+  ConverterViewControl.setModel new ContentMigrationModel
                                  course_id: ENV.COURSE_ID
                                  daySubCollection: daySubCollection
   
@@ -74,7 +107,7 @@ require [
   #
   # ie   ConverterChange.register key: 'some_dropdown_value', view: new BackboneView
 
-  ConverterViewControl.register 
+  ConverterViewControl.register
     key: 'zip_file_importer'
     view: new ZipFilesView
             chooseMigrationFile: new ChooseMigrationFileView
@@ -169,3 +202,27 @@ require [
             overwriteAssessmentContent: new OverwriteAssessmentContentView(model: ConverterViewControl.getModel())
             questionBank:        new QuestionBankView(questionBanks: ENV.QUESTION_BANKS)
 
+
+  registerExternalTool = (et) ->
+    toolModel = new ExternalTool(et)
+    returnView = new ExternalContentReturnView
+      model: toolModel
+      launchType: 'migration_selection'
+
+    launchView = new ExternalToolLaunchView
+      model: ConverterViewControl.getModel()
+      contentReturnView: returnView
+
+    selectContentView = new SelectContentCheckboxView
+      model: ConverterViewControl.getModel()
+
+    contentView = new ExternalToolContentView
+      selectContent: selectContentView
+      externalToolLaunch: launchView
+
+    ConverterViewControl.register
+      key: toolModel.assetString()
+      view: contentView
+
+  for et in ENV.EXTERNAL_TOOLS
+    registerExternalTool(et)

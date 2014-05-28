@@ -23,7 +23,12 @@
       <input tabindex="-1" type="checkbox" name="{{property}}" value="1" id="checkbox-{{cid}}" />
       {{#if isTopLevel}}<i aria-hidden="true" class="{{iconClass}}"></i>{{/if}}
       <span data-bind="title" class="checkbox-title">{{title}}</span>
+
       {{#if screenreaderType}}<span class="screenreader-only">({{screenreaderType}})</span>{{/if}}
+
+      {{#if count}}
+      <span data-bind="count">({{count}})</span>
+      {{/if}}
     </label>
   </div>
 {{/if}}

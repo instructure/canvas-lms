@@ -385,4 +385,70 @@ describe "Folders API", type: :request do
       attachment.folder_id.should == @root_folder.id
     end
   end
+
+  describe "#resolve_path" do
+    before do
+      @params_hash = { controller: 'folders', action: 'resolve_path', format: 'json' }
+    end
+
+    context "course" do
+      before do
+        course active_all: true
+        @root_folder = Folder.root_folders(@course).first
+        @sub_folder = @course.folders.create! parent_folder: @root_folder, name: 'locked subfolder', locked: true
+        @request_path = "/api/v1/courses/#{@course.id}/folders/by_path/#{URI.encode(@root_folder.name)}/#{URI.encode(@sub_folder.name)}"
+        @params_hash.merge!(course_id: @course.to_param, full_path: @sub_folder.full_name)
+      end
+
+      it "should check permissions" do
+        user
+        api_call(:get, @request_path, @params_hash, {}, {}, { expected_status: 401 })
+      end
+
+      it "should return a list of path components" do
+        teacher_in_course
+        json = api_call(:get, @request_path, @params_hash)
+        json.map { |folder| folder['id'] }.should eql [@root_folder.id, @sub_folder.id]
+      end
+
+      it "should 404 on an invalid path" do
+        teacher_in_course
+        json = api_call(:get, @request_path + "/nonexistent", @params_hash.merge(full_path: @sub_folder.full_name + "/nonexistent"),
+                        {}, {}, { expected_status: 404 })
+      end
+
+      it "should not traverse hidden or locked paths for students" do
+        student_in_course
+        api_call(:get, @request_path, @params_hash, {}, {}, { expected_status: 404 })
+      end
+    end
+
+    context "group" do
+      before do
+        group_with_user
+        @root_folder = Folder.root_folders(@group).first
+        @params_hash.merge!(group_id: @group.id)
+      end
+
+      it "should operate in group context" do
+        json = api_call(:get, "/api/v1/groups/#{@group.id}/folders/by_path/#{URI.encode(@root_folder.name)}",
+                        @params_hash.merge(full_path: @root_folder.name))
+        json.map { |folder| folder['id'] }.should eql [@root_folder.id]
+      end
+    end
+
+    context "user" do
+      before do
+        user active_all: true
+        @root_folder = Folder.root_folders(@user).first
+        @params_hash.merge!(user_id: @user.id)
+      end
+
+      it "should operate in user context" do
+        json = api_call(:get, "/api/v1/users/#{@user.id}/folders/by_path/#{URI.encode(@root_folder.name)}",
+                 @params_hash.merge(full_path: @root_folder.name))
+        json.map { |folder| folder['id'] }.should eql [@root_folder.id]
+      end
+    end
+  end
 end

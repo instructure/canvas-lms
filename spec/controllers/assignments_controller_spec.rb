@@ -219,11 +219,11 @@ describe AssignmentsController do
     end
 
     it 'should not error out when google docs is not configured' do
-      GoogleDocs.stubs(:config).returns nil
+      GoogleDocs::Connection.stubs(:config).returns nil
       course_with_student_logged_in(:active_all => true)
       a = @course.assignments.create(:title => "some assignment")
       get 'show', :course_id => @course.id, :id => a.id
-      GoogleDocs.unstub(:config)
+      GoogleDocs::Connection.unstub(:config)
     end
   end
 

@@ -473,7 +473,6 @@ class SubmissionsController < ApplicationController
       respond_to do |format|
         if @submission.save
           log_asset_access(@assignment, "assignments", @assignment_group, 'submit')
-          generate_new_page_view
           format.html {
             flash[:notice] = t('assignment_submit_success', 'Assignment successfully submitted.')
             redirect_to course_assignment_url(@context, @assignment)
@@ -499,7 +498,7 @@ class SubmissionsController < ApplicationController
   # Internal: Submit a Google Doc.
   def submit_google_doc(document_id)
     # fetch document from google
-    google_docs = GoogleDocs.new(google_docs_user, session)
+    google_docs = google_docs_connection
     document_response, display_name, file_extension = google_docs.download(document_id)
 
     # error handling

@@ -143,7 +143,16 @@ class FoldersController < ApplicationController
       render :json => folders_json(@folders, @current_user, session, :can_manage_files => can_manage_files)
     end
   end
-  
+
+  def resolve_path
+    if authorized_action(@context, @current_user, :read)
+      can_manage_files = @context.grants_right?(@current_user, session, :manage_files)
+      folders = Folder.resolve_path(@context, params[:full_path], can_manage_files)
+      raise ActiveRecord::RecordNotFound if folders.blank?
+      render json: folders_json(folders, @current_user, session, :can_manage_files => can_manage_files)
+    end
+  end
+
   # @API Get folder
   # @subtopic Folders
   # Returns the details for a folder
@@ -200,7 +209,11 @@ class FoldersController < ApplicationController
           res = {
             :actual_folder => @folder.as_json(folders_options),
             :sub_folders => sub_folders_scope.by_position.map { |f| f.as_json(folders_options) },
-            :files => files.map { |f| f.as_json(files_options)}
+            :files => files.map { |f|
+              f.as_json(files_options).tap { |json|
+                json['attachment']['canvadoc_session_url'] = f.canvadoc_url(@current_user)
+              }
+            }
           }
           format.json { render :json => res }
         end

@@ -11,7 +11,7 @@ I18n.backend.init_translations
 
 I18n.enforce_available_locales = true
 
-I18n.send :extend, I18n::Lolcalize if ENV['LOLCALIZE']
+I18n.send :extend, I18nTasks::Lolcalize if ENV['LOLCALIZE']
 
 module I18nUtilities
   def before_label(text_or_key, default_value = nil, *args)
@@ -214,9 +214,19 @@ else
 end
 
 ActionView::Base.class_eval do
-  def translate(key, default, options = {})
+  # can accept either translate(key, default: "default text", option: ...) or
+  # translate(key, "default text", option: ...). when using the former (default
+  # in the options), it's treated as if prepended with a # anchor.
+  def translate(key, *rest)
+    options = rest.extract_options!
+    default_in_options = options.has_key?(:default)
+    default_in_args = !rest.empty?
+    raise ArgumentError, "wrong arity" if rest.size > 1
+    raise ArgumentError, "didn't provide default in args or options" if !default_in_args && !default_in_options
+    raise ArgumentError, "can't provide default in both args and options" if default_in_args && default_in_options
+    default = default_in_options ? options[:default] : rest.first
     key = key.to_s
-    key = "#{i18n_scope}.#{key}" unless key.sub!(/\A#/, '')
+    key = "#{i18n_scope}.#{key}" unless default_in_options || key.sub!(/\A#/, '')
     I18n.translate(key, default, options)
   end
   alias :t :translate

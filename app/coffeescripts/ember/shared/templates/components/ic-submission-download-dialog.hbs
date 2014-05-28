@@ -1,0 +1,29 @@
+<button class="btn" id="submissions_download_button" {{action 'openDialog'}}>
+  {{#t 'download_submissions'}}Download all submissions{{/t}}
+</button>
+<div id="submissions_download_dialog" {{bind-attr class="isOpened::hidden"}} >
+  <div class="ui-dialog ui-widget ui-widget-content ui-corner-all" role="dialog" tabindex="-1" style="position: fixed; z-index: 1002; height: 260px;">
+    <div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix">
+      <span class="ui-dialog-title" role="heading">Download Assignment Submissions</span>
+      <a href="#" class="ui-dialog-titlebar-close ui-corner-all" role="button" tabindex="0" {{action 'closeDialog'}}>
+        <span class="ui-icon ui-icon-closethick">close</span>
+      </a>
+    </div>
+    <form class="ui-dialog-content ui-widget-content">
+      <p>
+        <a class="icon-download"></a>
+        <strong>{{#t 'download_message_intro'}}Your student submissions are being gathered.{{/t}}</strong>
+      </p>
+      <p>{{#t 'download_message'}}The submissions will be compressed into a zip file for download. This may take some time, depending on the size and number of submission files.{{/t}}</p>
+      <div id="progressbar" {{bind-attr class="showFileLink:hidden" }} style="width: 100%;"></div>
+      <div {{bind-attr class=":text-center :status_box showFileLink:pad-box" }} >
+        <div class="status">
+          <div>{{statusText}}</div>
+          <a {{bind-attr href="url" class="showFileLink::hidden" }} ><strong>{{#t 'click_to_download'}}Click here to download{{/t}} {{sizeOfFile}}</strong></a>
+        </div>
+        <div {{bind-attr class=":loadingIndicator hideIndicator:hidden" }} ></div>
+      </div>
+    </form>
+  </div>
+  <div class="ui-widget-overlay" style="position: fixed; z-index: 1001;"></div>
+</div>

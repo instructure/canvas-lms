@@ -347,6 +347,30 @@ describe "quizzes question creation" do
     quiz.quiz_questions.first.question_data["answers"].detect{|a| a["text"] == ""}.should be_nil
   end
 
+  it "respects character limits on short answer questions" do
+    quiz = @last_quiz
+    question = fj(".question_form:visible")
+    click_option('.question_form:visible .question_type', 'Fill In the Blank')
+
+    replace_content(question.find_element(:css, "input[name='question_points']"), '4')
+
+    answers = question.find_elements(:css, ".form_answers > .answer")
+    answer = answers[0].find_element(:css, ".short_answer input")
+
+    short_answer_field = lambda {
+      replace_content(answer, 'a'*100)
+      driver.execute_script(%{$('.short_answer input:focus').blur();}) unless alert_present?
+    }
+
+    keep_trying_until do
+      short_answer_field.call
+      alert_present?
+    end
+    alert = driver.switch_to.alert
+    alert.text.should =~ /Answers for fill in the blank questions must be under 80 characters long/
+    alert.dismiss
+  end
+
   context "drag and drop reordering" do
 
     before(:each) do

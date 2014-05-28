@@ -416,7 +416,7 @@ describe Group do
       course_with_teacher
       group = @course.groups.build
       @course.imported_migration_items = []
-      Group.import_from_migration({:group_category => "random category"}, @course, group)
+      Importers::GroupImporter.import_from_migration({:group_category => "random category"}, @course, group)
       group.group_category.name.should == "random category"
     end
 
@@ -424,7 +424,7 @@ describe Group do
       course_with_teacher
       group = @course.groups.build
       @course.imported_migration_items = []
-      Group.import_from_migration({}, @course, group)
+      Importers::GroupImporter.import_from_migration({}, @course, group)
       group.group_category.should == GroupCategory.imported_for(@course)
     end
   end

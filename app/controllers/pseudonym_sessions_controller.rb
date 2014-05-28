@@ -43,6 +43,10 @@ class PseudonymSessionsController < ApplicationController
       params[:pseudonym_session][:unique_id] ||= @current_pseudonym.unique_id
     end
 
+    if cookies['canvas_sa_delegated'] && !params['canvas_login']
+      @domain_root_account = Account.site_admin
+    end
+
     @pseudonym_session = PseudonymSession.new
     @headers = false
     @is_delegated = delegated_authentication_url?
@@ -201,11 +205,19 @@ class PseudonymSessionsController < ApplicationController
     # the saml message has to survive a couple redirects and reset_session calls
     message = session[:delegated_message]
 
-    if @domain_root_account.saml_authentication? and session[:saml_unique_id]
+    if @domain_root_account == Account.site_admin && cookies['canvas_sa_delegated']
+      cookies.delete('canvas_sa_delegated',
+                     domain: otp_remember_me_cookie_domain,
+                     httponly: true,
+                     secure: CANVAS_RAILS2 ? ActionController::Base.session_options[:secure] : CanvasRails::Application.config.session_options[:secure])
+    end
+
+    account = @current_pseudonym.try(:account) || @domain_root_account
+    if account.saml_authentication? and session[:saml_unique_id]
       increment_saml_stat("logout_attempt")
       # logout at the saml identity provider
       # once logged out it'll be redirected to here again
-      if aac = @domain_root_account.account_authorization_configs.find_by_id(session[:saml_aac_id])
+      if aac = account.account_authorization_configs.find_by_id(session[:saml_aac_id])
         settings = aac.saml_settings(request.host_with_port)
         request = Onelogin::Saml::LogOutRequest.new(settings, session)
         forward_url = request.generate_request
@@ -225,10 +237,10 @@ class PseudonymSessionsController < ApplicationController
         logout_current_user
         flash[:message] = t('errors.logout_errors.no_idp_found', "Canvas was unable to log you out at your identity provider")
       end
-    elsif @domain_root_account.cas_authentication? and session[:cas_session]
+    elsif account.cas_authentication? and session[:cas_session]
       logout_current_user
       session[:delegated_message] = message if message
-      redirect_to(cas_client.logout_url(cas_login_url))
+      redirect_to(cas_client(account).logout_url(cas_login_url))
       return
     else
       logout_current_user
@@ -428,9 +440,9 @@ class PseudonymSessionsController < ApplicationController
     redirect_to :action => :destroy
   end
 
-  def cas_client
+  def cas_client(account = @domain_root_account)
     return @cas_client if @cas_client
-    config = { :cas_base_url => @domain_root_account.account_authorization_config.auth_base }
+    config = { :cas_base_url => account.account_authorization_config.auth_base }
     @cas_client = CASClient::Client.new(config)
   end
 
@@ -564,6 +576,14 @@ class PseudonymSessionsController < ApplicationController
       end
     end
 
+    if pseudonym.account_id == Account.site_admin.id && Account.site_admin.account_authorization_config.try(:delegated_authentication?)
+      cookies['canvas_sa_delegated'] = {
+          :value => '1',
+          :domain => otp_remember_me_cookie_domain,
+          :httponly => true,
+          :secure => CANVAS_RAILS2 ? ActionController::Base.session_options[:secure] : CanvasRails::Application.config.session_options[:secure]
+      }
+    end
     session[:require_terms] = true if @domain_root_account.require_acceptance_of_terms?(@current_user)
 
     respond_to do |format|
@@ -647,7 +667,6 @@ class PseudonymSessionsController < ApplicationController
 
   def oauth2_accept
     redirect_params = final_oauth2_redirect_params(:remember_access => params[:remember_access])
-    redirect_params[:state] = session[:oauth2][:state] if session[:oauth2][:state]
     final_oauth2_redirect(session[:oauth2][:redirect_uri], redirect_params)
   end
 
@@ -697,6 +716,8 @@ class PseudonymSessionsController < ApplicationController
     options = {:scopes => session[:oauth2][:scopes], :remember_access => options[:remember_access], :purpose => session[:oauth2][:purpose]}
     code = Canvas::Oauth::Token.generate_code_for(@current_user.global_id, session[:oauth2][:client_id], options)
     redirect_params = { :code => code }
+    redirect_params[:state] = session[:oauth2][:state] if session[:oauth2][:state]
+    redirect_params
   end
 
   def final_oauth2_redirect(redirect_uri, opts = {})

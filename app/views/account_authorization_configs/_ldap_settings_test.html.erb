@@ -16,7 +16,7 @@ ldap_tests << OpenStruct.new(
   :test_type => :bind,
   :label => t(:test_ldap_bind_label, "Testing LDAP bind..."),
   :help_header => t(:test_ldap_bind_help_header, "Canvas can't bind (login) to your LDAP server"),
-  :help_body => t(:test_ldap_bind_help_body, "Your LDAP server server rejected the bind attempt. Things to consider:"),
+  :help_body => t(:test_ldap_bind_help_body, "Your LDAP server rejected the bind attempt. Things to consider:"),
   :help => [
     t(:test_ldap_bind_help_fixes_1, "Verify the provided filter string (i.e. '(sAMAccountName={{login}})')."),
     t(:test_ldap_bind_help_fixes_2, "Does the username require more scoping information? (i.e. 'cn=Canvas,ou=people,dc=example,dc=com').")

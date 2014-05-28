@@ -8,7 +8,7 @@
   {{#if ENV.allow_self_signup}}
   <fieldset class="pad-box">
     <div class="control-group">
-      <label class="checkbox">
+      <label class="checkbox" for="enable_self_signup">
         {{checkbox "enable_self_signup" class="self-signup-toggle"}}
         {{#t "allow_self_signup"}}Allow self sign-up{{/t}}
       </label>
@@ -17,7 +17,7 @@
     <input name="group_limit" type="hidden" value="">
     <div class="self-signup-controls">
       <div class="control-group">
-        <label class="checkbox">
+        <label class="checkbox" for="restrict_self_signup">
           {{checkbox "restrict_self_signup"}}
           {{#t "require_same_section"}}Require group members to be in the same section{{/t}}
         </label>

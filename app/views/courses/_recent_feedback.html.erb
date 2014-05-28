@@ -60,7 +60,7 @@
     </span>
     <div style="border-bottom: 1px dotted #aaa;">
       <% if comment && comment.media_comment? %>
-        <% kaltura_thumbnail_url = Kaltura::ClientV3.new.thumbnail_url(comment.media_comment_id, :width => 50, :height => 35, :bgcolor => "F3F4F5") %>
+        <% kaltura_thumbnail_url = CanvasKaltura::ClientV3.new.thumbnail_url(comment.media_comment_id, :width => 50, :height => 35, :bgcolor => "F3F4F5") %>
         <img src="<%= kaltura_thumbnail_url %>" style="float: right; padding-left: 3px;" alt=""/>
       <% end %>
       <b class="ellipsis"><%= recent_feedback.assignment.title %></b>

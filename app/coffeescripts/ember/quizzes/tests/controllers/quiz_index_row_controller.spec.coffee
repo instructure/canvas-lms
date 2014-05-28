@@ -1,46 +1,49 @@
 define [
-  '../start_app',
-  'ember',
-  'ic-ajax',
-  '../../controllers/quiz_index_row_controller',
-  '../environment_setup',
-], (startApp, Ember, ajax, QuizIndexRowController) ->
+  '../start_app'
+  'ember'
+  '../../controllers/quiz_index_row_controller'
+  'ember-qunit'
+  '../environment_setup'
+], (startApp, Ember, QuizIndexRowController, emq) ->
 
-  App = null
   {run} = Ember
 
-  module 'quizzes_controller',
+  App = startApp()
+  emq.setResolver(Ember.DefaultResolver.create({namespace: App}))
+
+  emq.moduleFor('controller:quiz_index_row', 'QuizIndexRowController', {
+    needs: ['controller:quizzes']
     setup: ->
       App = startApp()
-      cont = App.__container__
-      store = cont.lookup('store:main')
-      run =>
-        @qc = QuizIndexRowController.create
-          controllers:
-            quizzes: Em.ObjectController
-        @model = store.createRecord 'quiz',
-          pointsPossible: 1
-          title: 'Assignment test'
-          htmlURL: 'foo/bar'
-        @qc.set('model', @model)
-
+      emq.setResolver(Ember.DefaultResolver.create({namespace: App}))
+      @model = Ember.Object.create
+        pointsPossible: 1
+        title: 'Assignment test'
+        htmlURL: 'foo/bar'
+      @qc = this.subject()
+      @qc.set('model', @model)
     teardown: ->
-      Ember.run App, 'destroy'
+      run App, 'destroy'
+    }
+  )
 
-  test 'display singular points possible', ->
+  emq.test 'sanity', ->
+    ok(@qc)
+
+  emq.test 'display singular points possible', ->
     equal(@qc.get('pointsPossible'), '1 pt')
 
-  test 'display mulitple points possible', ->
+  emq.test 'display mulitple points possible', ->
     run => @model.set('pointsPossible', 2)
     equal(@qc.get('pointsPossible'), '2 pts')
 
-  test 'doesnt display when zero points possible', ->
+  emq.test 'doesnt display when zero points possible', ->
     run => @model.set('pointsPossible', 0)
     equal(@qc.get('pointsPossible'), '')
 
-  test 'doesnt display when undefined points possible', ->
+  emq.test 'doesnt display when undefined points possible', ->
     run => @model.set('pointsPossible', undefined)
     equal(@qc.get('pointsPossible'), '')
 
-  test 'correctly creates edit url for quiz', ->
+  emq.test 'correctly creates edit url for quiz', ->
     equal(@qc.get('editUrl'), 'foo/bar/edit')

@@ -22,7 +22,8 @@ define [
 
     friendlyDateRangeString: (->
       I18n.t 'time.ranges.different_days',
-        "%{start_date_and_time} to %{end_date_and_time}",
+        "%{start_date_and_time} *to* %{end_date_and_time}",
+        wrapper: '<span>$1</span>'
         start_date_and_time: @get('friendlyUnlockAt')
         end_date_and_time: @get('friendlyLockAt')
     ).property 'hasLockDateRange'

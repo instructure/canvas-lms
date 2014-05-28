@@ -1,0 +1,49 @@
+<div id="assignment_group_{{id}}" data-id="{{id}}" class="assignment_group">
+  <div class="ig-header" style="position:relative;">
+
+    <h2
+      class="ig-header-title element_toggler"
+      aria-controls="assignment_group_{{id}}_assignments"
+      aria-expanded="true"
+      aria-label="{{name}} {{toggleMessage}}"
+      role="button"
+    >
+      <i class="icon-mini-arrow-down"></i>
+      {{name}}
+    </h2>
+
+    <div class="ag-header-controls" style="position: absolute; top: 0; right: 0;">
+      {{#ifAny showWeight showRules}}
+        <ul class="pill">
+          {{#if showWeight}}
+            <li>{{#t "group_weight"}}{{groupWeight}}% of Total{{/t}}</li>
+          {{/if}}
+          {{#if showRules}}
+            <li>
+              <a
+                href='#'
+                title='{{#toSentence displayableRules}}{{this}}{{/toSentence}}'
+                class="tooltip_link"
+                data-tooltip-selector="#ag_{{id}}_rules_tooltip"
+              >{{rulesText}}<i class="icon-mini-arrow-down"></i></a>
+              <div id="ag_{{id}}_rules_tooltip" style="display:none;">
+                {{#each displayableRules}}
+                  <span>{{this}}</span><br/>
+                {{/each}}
+              </div>
+            </li>
+          {{/if}}
+        </ul>
+      {{/ifAny}}
+        <a id="ag_{{id}}_manage_link" class="al-trigger btn" href="#" tabindex="0">
+          <span class="screenreader-only">{{#t "manage"}}Manage{{/t}}</span>
+          <i class="icon-publish"></i>
+        </a>
+    </div>
+
+  </div>
+
+  <div id="assignment_group_{{id}}_assignments" >
+    <ul class="collectionViewItems ig-list draggable"></ul>
+  </div>
+</div>

@@ -178,8 +178,8 @@ define [
       }).then(_.partial(@updateDomAvatar, url))
 
     updateDomAvatar: (url) =>
-      $('.profile_pic_link img, .profile-link img')
-        .attr('src', url)
+      $('.profile_pic_link, .profile-link')
+        .css('background-image', "url('#{url}')")
       @close()
 
     onNav: (e) ->

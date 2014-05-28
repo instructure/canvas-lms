@@ -1,6 +1,6 @@
 require 'guard'
 require 'guard/guard'
-require 'lib/handlebars/ember'
+require 'handlebars_tasks'
 
 module Guard
   class EmberTemplates < Guard
@@ -22,7 +22,7 @@ module Guard
       paths.each do |path|
         begin
           UI.info "Compiling Ember template: #{path}"
-          EmberHbs.compile_file path
+          HandlebarsTasks::EmberHbs.compile_file path
         rescue Exception => e
           ::Guard::Notifier.notify(e.to_s, :title => path, :image => :failed)
           UI.error "Error compiling: #{path}\n#{e}"
@@ -38,7 +38,7 @@ module Guard
       UI.info "Compiling all Ember templates"
       files = Dir.glob("app/coffeescripts/**/*.hbs")
       files.each do |file|
-        EmberHbs::compile_file(file)
+        HandlebarsTasks::EmberHbs.compile_file(file)
       end
     end
 

@@ -28,7 +28,7 @@ describe "Converting Blackboard Vista qti" do
     @course = course
     @migration = ContentMigration.create(:context => @course)
     @migration.migration_settings[:migration_ids_to_import] = {:copy=>{:everything => true}}
-    @course.import_from_migration(@course_data, nil, @migration)
+    Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
   end
 
   def get_question(id, clear_ids=true)

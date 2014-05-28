@@ -73,9 +73,9 @@ Delayed::Periodic.cron 'StreamItem.destroy_stream_items', '45 11 * * *' do
   end
 end
 
-if IncomingMail::IncomingMessageProcessor.run_periodically?
-  Delayed::Periodic.cron 'IncomingMessageProcessor.process', '*/1 * * * *' do
-    IncomingMail::IncomingMessageProcessor.process
+if IncomingMailProcessor::IncomingMessageProcessor.run_periodically?
+  Delayed::Periodic.cron 'IncomingMailProcessor::IncomingMessageProcessor.process', '*/1 * * * *' do
+    IncomingMailProcessor::IncomingMessageProcessor.new(IncomingMail::MessageHandler.new, ErrorReport::Reporter.new).process
   end
 end
 
@@ -94,9 +94,9 @@ if Delayed::Stats.enabled?
   end
 end
 
-Delayed::Periodic.cron 'Alert.process', '30 11 * * *', :priority => Delayed::LOW_PRIORITY do
+Delayed::Periodic.cron 'Alerts::DelayedAlertSender.process', '30 11 * * *', :priority => Delayed::LOW_PRIORITY do
   Shard.with_each_shard do
-    Alert.process
+    Alerts::DelayedAlertSender.process
   end
 end
 

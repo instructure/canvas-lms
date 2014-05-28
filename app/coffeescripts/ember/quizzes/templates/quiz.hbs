@@ -1,5 +1,5 @@
 <div class="container-fluid" id="quiz-show">
-  <div class="row edit-header">
+  <div class="row-fluid edit-header">
     <div class="span7">
       <label class="screenreader-only">
         {{#t "quiz_title"}}Quiz Title{{/t}}
@@ -15,7 +15,7 @@
         on-unpublish='unpublish'
       }}
 
-      <a href="#" class="btn">
+      <a {{bind-attr href="editURL"}} class="btn">
         <i class="icon-edit"></i>{{#t 'edit'}}Edit{{/t}}
       </a>
       {{#ic-menu}}
@@ -28,16 +28,25 @@
     </div>
   </div>
 
-  <div class="row" id="quiz-show-tabs">
+  <div class="row-fluid" id="quiz-show-tabs">
     <ol>
-      {{#link-to 'quiz.show' this tagName='li'}}
-        {{#link-to 'quiz.show' this.id}}
+      {{#link-to 'quiz.show' this tagName='li' replace=true}}
+        {{#link-to 'quiz.show' this.id replace=true}}
           {{#t 'overview'}}Overview{{/t}}
         {{/link-to}}
       {{/link-to}}
-      <li><a href="#">Moderate</li></a>
-      <li><a href="#">Statistics</li></a>
-      <li><a href="#">Rubric</li></a>
+
+      {{#link-to 'quiz.moderate' this tagName='li' replace=true}}
+        {{#link-to 'quiz.moderate' this.id replace=true}}
+          {{#t 'moderate'}}Moderate{{/t}}
+        {{/link-to}}
+      {{/link-to}}
+
+      {{#link-to 'quiz.statistics' this tagName='li' replace=true}}
+        {{#link-to 'quiz.statistics' this.id replace=true}}
+          {{#t 'statistics'}}Statistics{{/t}}
+        {{/link-to}}
+      {{/link-to}}
     </ol>
   </div>
 

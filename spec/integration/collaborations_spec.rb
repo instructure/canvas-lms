@@ -23,6 +23,17 @@ describe CollaborationsController, type: :request do
   it 'should properly link to the user who posted the collaboration' do
     PluginSetting.create!(:name => 'etherpad', :settings => {})
     course_with_teacher_logged_in :active_all => true, :name => "teacher 1"
+
+    UserService.register(
+      :service => "google_docs",
+      :token => "token",
+      :secret => "secret",
+      :user => @user,
+      :service_domain => "google.com",
+      :service_user_id => "service_user_id",
+      :service_user_name => "service_user_name"
+    )
+
     get "/courses/#{@course.id}/collaborations/"
     response.should be_success
 

@@ -65,6 +65,16 @@ define [
             # Only show the element after the drag stops if it doesn't have a start date now
             # (meaning it wasn't dropped on the calendar)
             $(this).show() unless $(this).data('calendarEvent').start
+
+        @div.droppable
+          hoverClass: 'droppable-hover'
+          accept: '.fc-event'
+          drop: (e, ui) =>
+            return unless event = @calendar.lastEventDragged
+            event.start = null
+            event.end = null
+            event.saveDates()
+
         @div.find('.undated_event_title:first').focus() if setFocus
 
     show: (event) =>

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2014 Instructure, Inc.
+# Copyright (C) 2011 - 2013 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -84,6 +84,10 @@ require 'set'
 #         },
 #         "sis_course_id": {
 #           "description": "the SIS identifier for the course, if defined",
+#           "type": "string"
+#         },
+#         "integration_id": {
+#           "description": "the integration identifier for the course, if defined",
 #           "type": "string"
 #         },
 #         "name": {
@@ -230,6 +234,19 @@ require 'set'
 #           "example": false,
 #           "type": "boolean"
 #         }
+#       }
+#     }
+#
+# @model CalendarLink
+#     {
+#       "id": "CalendarLink",
+#       "description": "",
+#       "properties": {
+#         "ics": {
+#           "description": "The URL of the calendar in ICS format",
+#           "example": "https://canvas.instructure.com/feeds/calendars/course_abcdef.ics",
+#           "type": "string"
+#          }
 #       }
 #     }
 #
@@ -414,6 +431,9 @@ class CoursesController < ApplicationController
   #
   # @argument course[sis_course_id] [Optional, String]
   #   The unique SIS identifier.
+  #
+  # @argument course[integration_id] [Optional, String]
+  #   The unique Integration identifier.
   #
   # @argument course[hide_final_grades] [Optional, Boolean]
   #   If this option is set to true, the totals in student grades summary will
@@ -1307,6 +1327,7 @@ class CoursesController < ApplicationController
         end
       when 'assignments'
         add_crumb(t('#crumbs.assignments', "Assignments"))
+        set_urls_and_permissions_for_assignment_index
         get_sorted_assignments
       when 'modules'
         add_crumb(t('#crumbs.modules', "Modules"))
@@ -1468,7 +1489,7 @@ class CoursesController < ApplicationController
                           :root_account => @context.root_account,
                           :search_method => @context.user_list_search_mode_for(@current_user),
                           :initial_type => params[:enrollment_type])
-      if !(@context.completed? || @context.soft_concluded?) && (@enrollments = EnrollmentsFromUserList.process(list, @context, enrollment_options))
+      if !@context.concluded? && (@enrollments = EnrollmentsFromUserList.process(list, @context, enrollment_options))
         Enrollment.send(:preload_associations, @enrollments, [:course_section, {:user => [:communication_channel, :pseudonym]}])
         json = @enrollments.map { |e|
           { 'enrollment' =>
@@ -1630,22 +1651,26 @@ class CoursesController < ApplicationController
       if params[:course].has_key?(:syllabus_body)
         params[:course][:syllabus_body] = process_incoming_html_content(params[:course][:syllabus_body])
       end
+
+      account_id = params[:course].delete :account_id
+      if account_id && @course.account.grants_right?(@current_user, session, :manage_courses)
+        account = api_find(Account, account_id)
+        if account && account != @course.account && account.grants_right?(@current_user, session, :manage_courses)
+          @course.account = account
+        end
+      end
+
       root_account_id = params[:course].delete :root_account_id
       if root_account_id && Account.site_admin.grants_right?(@current_user, session, :manage_courses)
         @course.root_account = Account.root_accounts.find(root_account_id)
+        @course.account = @course.root_account if @course.account.root_account != @course.root_account
       end
-      if @course.root_account.grants_right?(@current_user, session, :manage_courses)
-        if params[:course][:account_id]
-          account = api_find(Account, params[:course].delete(:account_id))
-          @course.account = account if account != @course.account && account.grants_right?(@current_user, session, :manage)
-        end
-        enrollment_term_id = params[:course].delete(:term_id).presence || params[:course].delete(:enrollment_term_id).presence
-        enrollment_term = api_find(@course.root_account.enrollment_terms, enrollment_term_id) if enrollment_term_id
+
+      term_id = params[:course].delete(:term_id)
+      enrollment_term_id = params[:course].delete(:enrollment_term_id) || term_id
+      if enrollment_term_id && @course.root_account.grants_right?(@current_user, session, :manage_courses)
+        enrollment_term = api_find(@course.root_account.enrollment_terms, enrollment_term_id)
         @course.enrollment_term = enrollment_term if enrollment_term && enrollment_term != @course.enrollment_term
-      else
-        params[:course].delete :account_id
-        params[:course].delete :term_id
-        params[:course].delete :enrollment_term_id
       end
 
       if params[:course].has_key? :grading_standard_id
@@ -1910,4 +1935,16 @@ class CoursesController < ApplicationController
     changes
   end
 
+  def set_urls_and_permissions_for_assignment_index
+    permissions = {manage: false}
+    js_env({
+      :URLS => {
+        :new_assignment_url => new_polymorphic_url([@context, :assignment]),
+        :course_url => api_v1_course_url(@context),
+        :context_modules_url => api_v1_course_context_modules_path(@context),
+        :course_student_submissions_url => api_v1_course_student_submissions_url(@context)
+      },
+      :PERMISSIONS => permissions,
+    })
+  end
 end

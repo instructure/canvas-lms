@@ -41,6 +41,8 @@ class ControllerView < HashView
     @controller.children.select do |method|
       method.tags.find do |tag|
         tag.tag_name.downcase == "api"
+      end && !method.tags.any? do |tag|
+        tag.tag_name.downcase == "internal"
       end
     end
   end

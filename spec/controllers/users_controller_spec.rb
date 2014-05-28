@@ -794,4 +794,86 @@ describe UsersController do
       end
     end
   end
+
+  describe "oauth_success" do
+    it "should use the access token to get user info" do
+
+      user_with_pseudonym
+      admin = @user
+      user_session(admin)
+
+      mock_oauth_request = stub(token: 'token', secret: 'secret', original_host_with_port: 'test.host', user: @user, return_url: '/')
+      OauthRequest.expects(:find_by_token_and_service).with('token', 'google_docs').returns(mock_oauth_request)
+
+      mock_access_token = stub(token: '123', secret: 'abc')
+      GoogleDocs::Connection.expects(:get_access_token).with('token', 'secret', 'oauth_verifier').returns(mock_access_token)
+      mock_google_docs = stub()
+      GoogleDocs::Connection.expects(:new).with('token', 'secret').returns(mock_google_docs)
+      mock_google_docs.expects(:get_service_user_info).with(mock_access_token)
+
+      get 'oauth_success', {oauth_token: 'token', service: 'google_docs', oauth_verifier: 'oauth_verifier'}, {host_with_port: 'test.host'}
+    end
+  end
+
+  describe 'GET media_download' do
+    let(:kaltura_client) do
+      kaltura_client = mock('CanvasKaltura::ClientV3').responds_like_instance_of(CanvasKaltura::ClientV3)
+      CanvasKaltura::ClientV3.stubs(:new).returns(kaltura_client)
+      kaltura_client
+    end
+
+    let(:media_source_fetcher) {
+      media_source_fetcher = mock('MediaSourceFetcher').responds_like_instance_of(MediaSourceFetcher)
+      MediaSourceFetcher.expects(:new).with(kaltura_client).returns(media_source_fetcher)
+      media_source_fetcher
+    }
+
+    before do
+      account = Account.create!
+      course_with_student(:active_all => true, :account => account)
+      user_session(@student)
+    end
+
+    it 'should pass type and media_type params down to the media fetcher' do
+      media_source_fetcher.expects(:fetch_preferred_source_url).
+        with(media_id: 'someMediaId', file_extension: 'mp4', media_type: 'video').
+        returns('http://example.com/media.mp4')
+
+      get 'media_download', user_id: @student.id, entryId: 'someMediaId', type: 'mp4', media_type: 'video'
+    end
+
+    context 'when redirect is set to 1' do
+      it 'should redirect to the url' do
+        media_source_fetcher.stubs(:fetch_preferred_source_url).
+          returns('http://example.com/media.mp4')
+
+        get 'media_download', user_id: @student.id, entryId: 'someMediaId', type: 'mp4', redirect: '1'
+
+        response.should redirect_to 'http://example.com/media.mp4'
+      end
+    end
+
+    context 'when redirect does not equal 1' do
+      it 'should render the url in json' do
+        media_source_fetcher.stubs(:fetch_preferred_source_url).
+          returns('http://example.com/media.mp4')
+
+        get 'media_download', user_id: @student.id, entryId: 'someMediaId', type: 'mp4'
+
+        json_parse['url'].should == 'http://example.com/media.mp4'
+      end
+    end
+
+    context 'when asset is not found' do
+      it 'should render a 404 and error message' do
+        media_source_fetcher.stubs(:fetch_preferred_source_url).
+          returns(nil)
+
+        get 'media_download', user_id: @student.id, entryId: 'someMediaId', type: 'mp4'
+
+        response.code.should == '404'
+        response.body.should == 'Could not find download URL'
+      end
+    end
+  end
 end

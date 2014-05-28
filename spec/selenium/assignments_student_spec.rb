@@ -97,7 +97,7 @@ describe "assignments" do
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
-      ffj('.formtable input[name="submission[group_comment]"]').size.should == 4
+      ffj('.formtable input[name="submission[group_comment]"]').size.should == 3
     end
 
     it "should not show assignments in an unpublished course" do

@@ -137,7 +137,7 @@ module CC
     end
 
     def create_zip_file
-      name = truncate_text(@course.name.to_url, {:max_length => 200, :ellipsis => ''})
+      name = CanvasTextHelper.truncate_text(@course.name.to_url, {:max_length => 200, :ellipsis => ''})
       if @qti_only_export
         @zip_name = "#{name}-quiz-export.zip"
       else

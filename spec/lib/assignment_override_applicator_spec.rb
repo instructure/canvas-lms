@@ -191,7 +191,7 @@ describe AssignmentOverrideApplicator do
 
         @fake_student = @course.student_view_student
         overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @fake_student)
-        overrides.should == [override1, override2]
+        overrides.sort_by(&:set_id).should == [override1, override2]
         AssignmentOverrideApplicator.collapsed_overrides(@assignment, overrides)[:due_at].to_i.should == due_at.to_i
       end
 

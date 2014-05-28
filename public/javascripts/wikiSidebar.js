@@ -115,7 +115,7 @@ define([
           .attr('aria-level', children.data('level'))
           .attr('id', this.generateTreeItemID('file'))
           .addClass(file.mime_class)
-          .toggleClass('scribdable', file['scribdable?']);
+          .toggleClass('scribdable', !!(file['scribdable?'] || file.canvadoc_session_url));
         if(file.media_entry_id) {
           $file
             .addClass('kalturable')
@@ -352,10 +352,10 @@ define([
 
       $("#new_page_drop_down").submit(function(event){
         event.preventDefault();
-        var pageName = $.trim($("#new_page_name").val()).replace(/\s/g, '-').toLowerCase();
+        var pageName = encodeURIComponent($("#new_page_name").val());
         wikiSidebar.editor.editorBox('create_link', {
-          title: $("#new_page_name").val(),
-          url: $("#new_page_url_prefix").val()+ "/" + pageName
+          title: htmlEscape($("#new_page_name").val()),
+          url: $("#new_page_url_prefix").val()+ "/" + pageName + "?titleize=0"
         });
         $('#new_page_drop_down').slideUp("fast");
         $("#new_page_name").val("");

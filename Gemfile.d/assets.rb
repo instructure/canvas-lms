@@ -1,8 +1,8 @@
 group :assets do
-  gem 'compass-rails', '1.0.3'
-    gem 'compass', '0.12.2'
-      gem 'chunky_png', '1.2.9'
-      gem 'fssm', '0.2.10'
+  gem 'compass', '0.12.4'
+    gem 'chunky_png', '1.3.0'
+    gem 'fssm', '0.2.10'
+    gem 'sass', '3.2.18'
   gem 'dress_code', '1.0.2'
     gem 'colored', '1.2'
     gem 'mustache', '0.99.5'

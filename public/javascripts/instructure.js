@@ -64,9 +64,7 @@ define([
     if (window._earlyClick) {
 
       // unset the onclick handler we were using to capture the events
-      document.removeEventListener ?
-        document.removeEventListener('click', _earlyClick, false) :
-        document.detachEvent('onclick', _earlyClick);
+      document.removeEventListener('click', _earlyClick);
 
       if (_earlyClick.clicks) {
         // wait to fire the "click" events till after all of the event hanlders loaded at dom ready are initialized
@@ -120,14 +118,6 @@ define([
       .delegate('.menu-item', 'mouseenter focusin', hoverMenuItem )
       .delegate('.menu-item', 'mouseleave focusout', unhoverMenuItem );
 
-    // ie7 needs some help forcing the columns to be as wide as (width_of_one_column * #_of_columns_in_this_dropdown)
-    if (INST.browser.ie7) {
-      $(".menu-item-drop")
-        .width(function(){
-          var $columns = $(this).find(".menu-item-drop-column");
-          return $columns.length * $columns.css('width').replace('px', '');
-        });
-    }
 
     // this stuff is for the ipad, it needs a little help getting the drop menus to show up
     $menu_items.live('touchstart', function(){
@@ -404,10 +394,14 @@ define([
           var attachment = data && data.attachment,
               scribdDocAttributes = attachment && attachment.scribd_doc && attachment.scribd_doc.attributes;
           $link.loadingImage('remove');
-          if (attachment && (attachment['scribdable?'] || $.isPreviewable(attachment.content_type, 'google'))) {
+          if (attachment &&
+                (attachment['scribdable?'] ||
+                 $.isPreviewable(attachment.content_type, 'google') ||
+                 attachment.canvadoc_session_url)) {
             var $div = $("<span><br /></span>")
               .insertAfter($link.parents(".link_holder:last"))
               .loadDocPreview({
+                canvadoc_session_url: attachment.canvadoc_session_url,
                 scribd_doc_id: scribdDocAttributes && scribdDocAttributes.doc_id,
                 scribd_access_key: scribdDocAttributes && scribdDocAttributes.access_key,
                 mimeType: attachment.content_type,

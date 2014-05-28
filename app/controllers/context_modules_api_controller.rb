@@ -65,6 +65,18 @@
 #         "lock_at": {
 #           "example": "2012-12-31T06:00:00-06:00",
 #           "type": "datetime"
+#         },
+#         "locked_for_user": {
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "lock_explanation": {
+#           "example": "This quiz is part of an unpublished module and is not available yet.",
+#           "type": "string"
+#         },
+#         "lock_info": {
+#           "example": {"asset_string": "assignment_4", "unlock_at": "2012-12-31T06:00:00-06:00", "lock_at": "2012-12-31T06:00:00-06:00", "context_module": {}},
+#           "$ref": "LockInfo"
 #         }
 #       }
 #     }
@@ -323,6 +335,7 @@ class ContextModulesApiController < ApplicationController
   #      if items are not returned.
   #    - "content_details": Requires include['items']. Returns additional
   #      details with module items specific to their associated content items.
+  #      Includes standard lock information for each item.
   #
   # @argument search_term [Optional, String]
   #   The partial name of the modules (and module items, if include['items'] is
@@ -348,7 +361,7 @@ class ContextModulesApiController < ApplicationController
       ContextModule.send(:preload_associations, modules, {:content_tags => :content}) if includes.include?('items')
 
       if @student
-        modules_and_progressions = modules.map { |m| [m, m.evaluate_for(@student, true)] }
+        modules_and_progressions = modules.map { |m| [m, m.evaluate_for(@student)] }
       else
         modules_and_progressions = modules.map { |m| [m, nil] }
       end
@@ -376,6 +389,7 @@ class ContextModulesApiController < ApplicationController
   #      if items are not returned.
   #    - "content_details": Requires include['items']. Returns additional
   #      details with module items specific to their associated content items.
+  #      Includes standard lock information for each item.
   #
   # @argument student_id [Optional]
   #   Returns module completion information for the student with this id.
@@ -390,7 +404,7 @@ class ContextModulesApiController < ApplicationController
       mod = @context.modules_visible_to(@student || @current_user).find(params[:id])
       includes = Array(params[:include])
       ContextModule.send(:preload_associations, mod, {:content_tags => :content}) if includes.include?('items')
-      prog = @student ? mod.evaluate_for(@student, true) : nil
+      prog = @student ? mod.evaluate_for(@student) : nil
       render :json => module_json(mod, @student || @current_user, session, prog, includes)
     end
   end

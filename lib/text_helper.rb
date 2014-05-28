@@ -16,38 +16,6 @@
 # based on http://henrik.nyh.se/2008/01/rails-truncate-html-helper
 
 module TextHelper
-  def strip_and_truncate(text, options={})
-    truncate_text(HtmlTextHelper.strip_tags(text), options)
-  end
-  module_function :strip_and_truncate
-
-  def truncate_text(text, options={})
-    truncated = text || ""
-
-    # truncate words
-    if options[:max_words]
-      word_separator = options[:word_separator] || I18n.t('lib.text_helper.word_separator', ' ')
-      truncated = truncated.split(word_separator)[0,options[:max_words]].join(word_separator)
-    end
-
-    max_length = options[:max_length] || 30
-    return truncated if truncated.length <= max_length
-
-    ellipsis = options[:ellipsis] || I18n.t('lib.text_helper.ellipsis', '...')
-    actual_length = max_length - ellipsis.length
-
-    # First truncate the text down to the bytes max, then lop off any invalid
-    # unicode characters at the end.
-    truncated = truncated[0,actual_length][/.{0,#{actual_length}}/mu]
-    truncated + ellipsis
-  end
-
-  def indent(text, spaces=2)
-    text = text.to_s rescue ""
-    indentation = " " * spaces
-    text.gsub(/\n/, "\n#{indentation}")
-  end
-
   def force_zone(time)
     (time.in_time_zone(@time_zone || Time.zone) rescue nil) || time
   end

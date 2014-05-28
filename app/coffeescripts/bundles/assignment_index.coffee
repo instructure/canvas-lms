@@ -57,6 +57,10 @@ require [
   assignmentSettingsView = false
   createGroupView = false
   showByView = false
+  indexEl = if window.location.href.indexOf('assignments') == -1
+    '#course_home_content'
+  else
+    "#content"
 
   if ENV.PERMISSIONS.manage
     assignmentSettingsView = new AssignmentSettingsView
@@ -72,7 +76,9 @@ require [
       course: course
       assignmentGroups: assignmentGroups
 
+
   app = new IndexView
+    el: indexEl
     assignmentGroupsView: assignmentGroupsView
     assignmentSettingsView: assignmentSettingsView
     createGroupView: createGroupView

@@ -5,6 +5,12 @@ define [
 
   QuizzesRoute = Ember.Route.extend
 
+    activate: ->
+      $("body").addClass("with_item_groups")
+
+    deactivate: ->
+      $("body").removeClass("with_item_groups")
+
     model: (params) ->
       @store.find('quiz').then (quizzes) =>
         perms = env.get 'env.PERMISSIONS'

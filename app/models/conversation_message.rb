@@ -33,7 +33,9 @@ class ConversationMessage < ActiveRecord::Base
   has_many :conversation_message_participants
   has_many :attachment_associations, :as => :context
   has_many :attachments, :through => :attachment_associations, :order => 'attachments.created_at, attachments.id'
-  belongs_to :asset, :polymorphic => true, :types => :submission # TODO: move media comments into this
+  # we used to attach submission comments to conversations via this asset
+  # TODO: remove this column when we're sure we don't want this relation anymore
+  belongs_to :asset, :polymorphic => true, :types => :submission
   delegate :participants, :to => :conversation
   delegate :subscribed_participants, :to => :conversation
   attr_accessible
@@ -264,7 +266,7 @@ class ConversationMessage < ActiveRecord::Base
   end
 
   def reply_from(opts)
-    raise IncomingMail::IncomingMessageProcessor::UnknownAddressError if self.context.try(:root_account).try(:deleted?)
+    raise IncomingMail::Errors::UnknownAddress if self.context.try(:root_account).try(:deleted?)
     # If this is from conversations 2, only reply to the author.
     recipients = conversation.context ? [author] : nil
     conversation.reply_from(opts.merge(:root_account_id => self.root_account_id, :only_users => recipients))
@@ -297,7 +299,7 @@ class ConversationMessage < ActiveRecord::Base
     extend ApplicationHelper
     extend ConversationsHelper
 
-    title = ERB::Util.h(truncate_text(self.body, :max_words => 8, :max_length => 80))
+    title = ERB::Util.h(CanvasTextHelper.truncate_text(self.body, :max_words => 8, :max_length => 80))
 
     # build content, should be:
     # message body

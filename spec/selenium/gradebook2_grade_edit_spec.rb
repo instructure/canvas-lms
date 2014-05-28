@@ -30,7 +30,7 @@ describe "edititing grades" do
     q = factory_with_protected_attributes(@course.quizzes, :title => "new quiz", :points_possible => points, :quiz_type => 'assignment', :workflow_state => 'available')
     q.save!
     qs = q.generate_submission(@student_1)
-    qs.grade_submission
+    Quizzes::SubmissionGrader.new(qs).grade_submission
     q.reload
 
     get "/courses/#{@course.id}/gradebook2"

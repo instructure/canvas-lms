@@ -25,6 +25,7 @@ module Lti
       selected_html = opts[:selected_html]
       launch_url = opts[:launch_url] || default_launch_url(resource_type)
       link_code = opts[:link_code] || default_link_code
+      @overrides = opts[:overrides] || {}
 
       lti_context = Lti::LtiContextCreator.new(@context, @tool).convert
       lti_user = Lti::LtiUserCreator.new(@user, @root_account, @tool, @context).convert
@@ -46,7 +47,7 @@ module Lti
 
     def generate_post_payload
       raise('Called generate_post_payload before calling prepared_tool_launch') unless @tool_launch
-      @tool_launch.generate
+      @tool_launch.generate(@overrides)
     end
 
     def generate_post_payload_for_assignment(assignment, outcome_service_url, legacy_outcome_service_url)

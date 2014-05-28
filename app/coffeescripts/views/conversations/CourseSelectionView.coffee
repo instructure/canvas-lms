@@ -23,6 +23,7 @@ define [
         .find('.dropdown-toggle').on('focus', @loadAll)
       @options.courses.favorites.on('reset', @render)
       @options.courses.all.on('reset', @render)
+      @options.courses.all.on('add', @render)
       @render()
 
     render: () =>

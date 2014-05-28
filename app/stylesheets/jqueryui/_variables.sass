@@ -19,7 +19,10 @@ $fcHover: #313131
 $borderColorActive: hsl(207, 74%, 45%)
 $bgColorActive: hsl(198, 96%, 47%)
 $gradientTopActive: hsl(196, 100%, 52%)
-$gradientBottomActive: hsl(200, 100%, 42%)
+@if $use_high_contrast
+  $gradientTopActive: $linkColor
+$gradientBottomActive: adjust-hue($gradientTopActive, 10%)
+
 $fcActive: #fff
 
 //TODO REMOVE

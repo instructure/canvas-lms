@@ -4,7 +4,8 @@
   "dependencies": {
     "requirejs": "~2.1.10",
     "uglify-js": "~2.4.12",
-    "glob": "~3.2.9"
+    "glob": "~3.2.9",
+    "compute-cluster": "0.0.7"
   },
   "devDependencies": {
     "loom": "~2.0.0",

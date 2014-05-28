@@ -66,7 +66,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
         params_hash = hash.deep_merge(sanitized_params) rescue sanitized_params
         @submission.submission_data = params_hash unless @submission.overdue?
         flash[:notice] = t('errors.late_quiz', "You submitted this quiz late, and your answers may not have been recorded.") if @submission.overdue?
-        @submission.grade_submission
+        Quizzes::SubmissionGrader.new(@submission).grade_submission
       end
     end
     if session.delete('lockdown_browser_popup')
@@ -133,7 +133,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
 
   def extensions
     @student = @context.students.find(params[:user_id])
-    @submission = @quiz.find_or_create_submission(@student || @current_user, nil, 'settings_only')
+    @submission = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@student || @current_user, nil, 'settings_only')
     if authorized_action(@submission, @current_user, :add_attempts)
       @submission.extra_attempts ||= 0
       @submission.extra_attempts = params[:extra_attempts].to_i if params[:extra_attempts]

@@ -352,6 +352,24 @@ describe Quizzes::Quiz do
       q.publish!
       q.assignment.published?.should be true
     end
+
+    it "should send a message when quiz is published" do
+      Notification.create!(:name => 'Assignment Created')
+      @course.offer
+
+      q = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment")
+      q.save!
+      q.should_not be_available
+
+      q.assignment_id.should_not be_nil
+      q.assignment.published?.should be false
+      q.assignment.expects(:save_without_broadcasting!).never
+
+      q.publish!
+
+      q.assignment.published?.should be true
+      q.assignment.messages_sent.should include('Assignment Created')
+    end
   end
 
   it "should create the assignment if created in published state" do
@@ -598,7 +616,7 @@ describe Quizzes::Quiz do
       lock_at = 1.day.ago
       u = User.create!(:name => "Fred Colon")
       q = @course.quizzes.create!(:title => "locked yesterday", :lock_at => lock_at)
-      sub = q.find_or_create_submission(u, nil, 'settings_only')
+      sub = Quizzes::SubmissionManager.new(q).find_or_create_submission(u, nil, 'settings_only')
       sub.manually_unlocked = true
       sub.save!
       sub2 = q.generate_submission(u)
@@ -677,7 +695,7 @@ describe Quizzes::Quiz do
     q.quiz_submissions.size.should == 0
 
     # create a graded submission
-    q.generate_submission(User.create!(:name => "some_user")).grade_submission
+    Quizzes::SubmissionGrader.new(q.generate_submission(User.create!(:name => "some_user"))).grade_submission
     q.reload
 
     q.quiz_submissions.size.should == 1

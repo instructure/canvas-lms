@@ -388,34 +388,6 @@ describe ApplicationHelper do
     end
   end
 
-  describe "square_avatar_image" do
-    before do
-      user_model(:short_name => 'test guy')
-    end
-
-    it "should accept a user id" do
-      self.expects(:avatar_url_for_user).with(@user).returns("http://www.example.com/test/url")
-      img = Nokogiri::HTML::DocumentFragment.parse(square_avatar_image(@user)).children.first
-      img['alt'].should == 'test guy'
-      img['src'].should == "http://www.example.com/test/url"
-      img['style'].should match %r"width: 50px"
-    end
-
-    it "should short-circuit user id 0" do
-      img = Nokogiri::HTML::DocumentFragment.parse(square_avatar_image(0)).children.first
-      img['alt'].should == ''
-      img['src'].should match %r"/images/messages/avatar-50.png"
-    end
-
-    it "should accept a user" do
-      self.expects(:avatar_url_for_user).with(@user).returns("http://www.example.com/test/url")
-      img = Nokogiri::HTML::DocumentFragment.parse(square_avatar_image(@user, 30)).children.first
-      img['alt'].should == 'test guy'
-      img['src'].should == "http://www.example.com/test/url"
-      img['style'].should match %r"width: 30px"
-    end
-  end
-
   describe "jt" do
     after do
       I18n.locale = I18n.default_locale

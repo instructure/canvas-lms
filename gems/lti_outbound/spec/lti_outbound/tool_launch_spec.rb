@@ -113,6 +113,11 @@ describe LtiOutbound::ToolLaunch do
       expect(hash['oauth_callback']).to eq 'about:blank'
     end
 
+    it 'allows resource_link_title to be overrriden' do
+      hash = @tool_launch.generate('resource_link_title' => 'new tool name')
+      expect(hash['resource_link_title']).to eq 'new tool name'
+    end
+
     describe 'selected_html' do
       it 'gets escaped and assigned to the key text if passed in' do
         tool_launch = LtiOutbound::ToolLaunch.new(:url => 'http://www.yahoo.com',

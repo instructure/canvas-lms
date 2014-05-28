@@ -46,7 +46,10 @@
 #header
   position: relative
   z-index: 11 /* IE7 needs this o so the menu-item-drops get stuck above #main */
-  +bg-image('canvas/header_bg', 'png', repeat-x, left, bottom, transparent, 28px, 70px)
+  @if $use_high_contrast
+    background-color: #333
+  @else
+    +bg-image('canvas/header_bg', 'png', repeat-x, left, bottom, transparent, 28px, 70px)
   &.no-user
     background-position: 0 -25px
     min-height: 45px
@@ -70,7 +73,10 @@
   margin-right: $right_side_margin
   margin-bottom: 4px /*make room for the drop shadow*/
   padding: 0 11px
-  +bg-image('canvas/top_bar_bg', 'png', repeat-x, left, top, transparent, 22px, 23px)
+  @if $use_high_contrast
+    background-color: #555
+  @else
+    +bg-image('canvas/top_bar_bg', 'png', repeat-x, left, top, transparent, 22px, 23px)
   box-shadow: rgba(0, 0, 0, 0.3) 1px 1px 1px
   border-bottom-left-radius: 6px
   border-bottom-right-radius: 5px
@@ -191,7 +197,10 @@
         color: #555
       .subtitle
         display: block
-        color: #bcbcbc
+        @if $use_high_contrast
+          color: $menu-text-color
+        @else
+          color: #bcbcbc
         font-size: 9px
       .menu-item-drop-float-right
         float: right

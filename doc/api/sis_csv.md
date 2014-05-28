@@ -79,6 +79,11 @@ otherwise) it will <em>not</em> be overwritten</p></td>
 <td>Last name of the user.</td>
 </tr>
 <tr>
+<td>short_name</td>
+<td>text</td>
+<td>Display name of the user.</td>
+</tr>
+<tr>
 <td>email</td>
 <td>text</td>
 <td>The email address of the user. This might be the same as login_id, but should
@@ -99,10 +104,10 @@ student to be able to log in but just not participate, leave the student
 Sample:
 
 <pre>
-user_id,login_id,password,first_name,last_name,email,status
-01103,bsmith01,,Bob,Smith,bob.smith@myschool.edu,active
-13834,jdoe03,,John,Doe,john.doe@myschool.edu,active
-13aa3,psue01,,Peggy,Sue,peggy.sue@myschool.edu,active
+user_id,login_id,password,first_name,last_name,short_name,email,status
+01103,bsmith01,,Bob,Smith,Bobby Smith,bob.smith@myschool.edu,active
+13834,jdoe03,,John,Doe,,john.doe@myschool.edu,active
+13aa3,psue01,,Peggy,Sue,,peggy.sue@myschool.edu,active
 </pre>
 
 accounts.csv

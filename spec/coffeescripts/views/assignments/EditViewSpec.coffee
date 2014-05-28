@@ -13,10 +13,11 @@ define [
   'compiled/views/assignments/GroupCategorySelector'
   'compiled/views/assignments/PeerReviewsSelector'
   'helpers/fakeENV'
+  'compiled/userSettings'
   'helpers/jquery.simulate'
 ], ($, _, SectionCollection, Assignment, DueDateList, Section,
   AssignmentGroupSelector, DueDateListView, DueDateOverrideView, EditView,
-  GradingTypeSelector, GroupCategorySelector, PeerReviewsSelector, fakeENV) ->
+  GradingTypeSelector, GroupCategorySelector, PeerReviewsSelector, fakeENV, userSettings) ->
 
   defaultAssignmentOpts =
     name: 'Test Assignment'
@@ -122,3 +123,59 @@ define [
     ok !view.$("#assignment_has_group_category").prop("disabled")
     ok !view.$("#assignment_group_category_id").prop("disabled")
     ok !view.$("[type=checkbox][name=grade_group_students_individually]").prop("disabled")
+
+  module 'EditView: setDefaultsIfNew',
+    setup: ->
+      fakeENV.setup()
+      sinon.stub(userSettings, 'contextGet').returns {submission_types: "foo", peer_reviews: "1"}
+    teardown: ->
+      userSettings.contextGet.restore()
+      fakeENV.teardown()
+
+  test 'returns values from localstorage', ->
+    view = editView()
+    view.setDefaultsIfNew()
+
+    equal view.assignment.get('submission_types'), "foo"
+
+  test 'returns string booleans as integers', ->
+    view = editView()
+    view.setDefaultsIfNew()
+
+    equal view.assignment.get('peer_reviews'), 1
+
+  module 'EditView: setDefaultsIfNew: no localStorage',
+    setup: ->
+      fakeENV.setup()
+      sinon.stub(userSettings, 'contextGet').returns null
+    teardown: ->
+      userSettings.contextGet.restore()
+      fakeENV.teardown()
+
+  test 'submission_type is online if no cache', ->
+    view = editView()
+    view.setDefaultsIfNew()
+
+    equal view.assignment.get('submission_type'), "online"
+
+  module 'EditView: cacheAssignmentSettings',
+    setup: ->
+      fakeENV.setup()
+    teardown: ->
+      fakeENV.teardown()
+
+  test 'saves valid attributes to localstorage', ->
+    view = editView()
+    sinon.stub(view, 'getFormData').returns {points_possible: 34}
+    userSettings.contextSet("new_assignment_settings", {})
+    view.cacheAssignmentSettings()
+
+    equal 34, userSettings.contextGet("new_assignment_settings")["points_possible"]
+
+  test 'rejects invalid attributes when caching', ->
+    view = editView()
+    sinon.stub(view, 'getFormData').returns {invalid_attribute_example: 30}
+    userSettings.contextSet("new_assignment_settings", {})
+    view.cacheAssignmentSettings()
+
+    equal null, userSettings.contextGet("new_assignment_settings")["invalid_attribute_example"]

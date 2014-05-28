@@ -77,4 +77,18 @@ describe InfoController do
       JSON.parse(response.body).should == { "status" => "canvas ok", "revision" => "Test Proc" }
     end
   end
+
+  describe "GET 'help_links'" do
+    it "should work" do
+      get 'help_links'
+      response.should be_success
+    end
+
+    it "should set the locale for translated help link text from the current user" do
+      user = User.create!(locale: 'es')
+      user_session(user)
+      get 'help_links'
+      (I18n.locale.to_s).should == 'es'
+    end
+  end
 end

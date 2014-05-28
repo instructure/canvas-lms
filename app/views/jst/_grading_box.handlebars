@@ -1,5 +1,5 @@
 {{#if assignment_grading_type_is_points}}
-  <input name="default_grade" type="number" value="{{ submission.grade }}" class="grading_value grading_box" id="student_grading_{{assignment.id}} %>" style="text-align: center; width: 50px;"/>
+  <input name="default_grade" type="number" step="any" value="{{ submission.grade }}" class="grading_value grading_box" id="student_grading_{{assignment.id}} %>" style="text-align: center; width: 50px;"/>
 {{/if}}
 {{#if assignment_grading_type_is_percent}}
   <span name="default_grade" class="grading_box" id="student_grading_{{assignment.id}}">

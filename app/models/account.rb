@@ -22,7 +22,7 @@ class Account < ActiveRecord::Base
     :turnitin_host, :turnitin_comments, :turnitin_pledge,
     :default_time_zone, :parent_account, :settings, :default_storage_quota,
     :default_storage_quota_mb, :storage_quota, :ip_filters, :default_locale,
-    :default_user_storage_quota_mb, :default_group_storage_quota_mb
+    :default_user_storage_quota_mb, :default_group_storage_quota_mb, :integration_id
 
   include Workflow
   belongs_to :parent_account, :class_name => 'Account'
@@ -93,7 +93,16 @@ class Account < ActiveRecord::Base
   
   serialize :settings, Hash
   include TimeZoneHelper
+
   time_zone_attribute :default_time_zone, default: "America/Denver"
+  def default_time_zone_with_root_account
+    if read_attribute(:default_time_zone) || root_account?
+      default_time_zone_without_root_account
+    else
+      root_account.default_time_zone
+    end
+  end
+  alias_method_chain :default_time_zone, :root_account
 
   validates_locale :default_locale, :allow_nil => true
   validates_length_of :name, :maximum => maximum_string_length, :allow_blank => true
@@ -152,8 +161,6 @@ class Account < ActiveRecord::Base
   add_setting :enable_eportfolios, :boolean => true, :root_only => true
   add_setting :users_can_edit_name, :boolean => true, :root_only => true
   add_setting :open_registration, :boolean => true, :root_only => true
-  add_setting :enable_scheduler, :boolean => true, :root_only => true, :default => false
-  add_setting :calendar2_only, :boolean => true, :root_only => true, :default => false
   add_setting :show_scheduler, :boolean => true, :root_only => true, :default => false
   add_setting :enable_profiles, :boolean => true, :root_only => true, :default => false
   add_setting :enable_manage_groups2, :boolean => true, :root_only => true, :default => true
@@ -1124,42 +1131,42 @@ class Account < ActiveRecord::Base
   def self.allowable_services
     {
       :google_docs => {
-        :name => "Google Docs", 
+        :name => t("account_settings.google_docs", "Google Docs"), 
         :description => "",
-        :expose_to_ui => (GoogleDocs.config ? :service : false)
+        :expose_to_ui => (GoogleDocs::Connection.config ? :service : false)
       },
       :google_docs_previews => {
-        :name => "Google Docs Previews", 
+        :name => t("account_settings.google_docs_preview", "Google Docs Preview"), 
         :description => "",
         :expose_to_ui => :service
       },
       :facebook => {
-        :name => "Facebook", 
+        :name => t("account_settings.facebook", "Facebook"), 
         :description => "",
         :expose_to_ui => (Facebook.config ? :service : false)
       },
       :skype => {
-        :name => "Skype", 
+        :name => t("account_settings.skype", "Skype"), 
         :description => "",
         :expose_to_ui => :service
       },
       :linked_in => {
-        :name => "LinkedIn", 
+        :name => t("account_settings.linked_in", "LinkedIn"), 
         :description => "",
-        :expose_to_ui => (LinkedIn.config ? :service : false)
+        :expose_to_ui => (LinkedIn::Connection.config ? :service : false)
       },
       :twitter => {
-        :name => "Twitter", 
+        :name => t("account_settings.twitter", "Twitter"), 
         :description => "",
         :expose_to_ui => (Twitter.config ? :service : false)
       },
       :delicious => {
-        :name => "Delicious", 
+        :name => t("account_settings.delicious", "Delicious"), 
         :description => "",
         :expose_to_ui => :service
       },
       :diigo => {
-        :name => "Diigo", 
+        :name => t("account_settings.diigo", "Diigo"), 
         :description => "",
         :expose_to_ui => :service
       },
@@ -1167,13 +1174,13 @@ class Account < ActiveRecord::Base
       # In the meantime, we leave it as a service but expose it in the
       # "Features" (settings) portion of the account admin UI
       :avatars => {
-        :name => "User Avatars",
+        :name => t("account_settings.avatars", "User Avatars"),
         :description => "",
         :default => false,
         :expose_to_ui => :setting
       },
       :account_survey_notifications => {
-        :name => "Account Surveys",
+        :name => t("account_settings.account_surveys", "Account Surveys"),
         :description => "",
         :default => false,
         :expose_to_ui => :setting,
@@ -1347,20 +1354,24 @@ class Account < ActiveRecord::Base
   end
 
   def import_from_migration(data, params, migration)
-
-    LearningOutcome.process_migration(data, migration)
-
-    migration.progress=100
-    migration.workflow_state = :imported
-    migration.save
+    Importers::AccountContentImporter.import_content(self, data, params, migration)
   end
 
   def enable_fabulous_quizzes!
+    root_account.enable_feature! :draft_state
     change_root_account_setting!(:enable_fabulous_quizzes, true)
   end
 
   def disable_fabulous_quizzes!
     change_root_account_setting!(:enable_fabulous_quizzes, false)
+  end
+
+  def calendar2_only?
+    true
+  end
+
+  def enable_scheduler?
+    true
   end
 
   def change_root_account_setting!(setting_name, new_value)

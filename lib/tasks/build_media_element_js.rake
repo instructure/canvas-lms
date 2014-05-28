@@ -3,6 +3,10 @@ desc "Builds mediaelementjs from it's git repo into a form canvas_lms can use wi
 task :build_media_element_js do
   require 'fileutils'
 
+  def remove_console(text)
+    text.gsub(/console.(log|debug)\((.*)\);?/, '')
+  end
+
   repo_path = '../mediaelement'
   public_path = 'public'
   repo_location = "https://github.com/johndyer/mediaelement.git"
@@ -29,7 +33,8 @@ task :build_media_element_js do
     'me-plugindetector.js',
     'me-featuredetection.js',
     'me-mediaelements.js',
-    'me-shim.js'
+    'me-shim.js',
+    'me-i18n.js'
   ]
   me_chunks = me_files.map { |file| File.read "#{repo_path}/src/js/#{file}" }
 
@@ -54,7 +59,9 @@ task :build_media_element_js do
   puts "Combining scripts"
 
   chunks = [rev_msg, "define(['jquery'], function (jQuery){"] + me_chunks + mep_chunks + ["return mejs;\n});\n"]
-  File.open("#{public_path}/javascripts/vendor/mediaelement-and-player.js", 'w') {|f| f.write(chunks.join("\n")) }
+  File.open("#{public_path}/javascripts/vendor/mediaelement-and-player.js", 'w') {|f|
+    f.write(remove_console(chunks.join("\n")))
+  }
 
   puts "Copying CSS"
   css = File.read "#{repo_path}/src/css/mediaelementplayer.css"
@@ -66,7 +73,9 @@ task :build_media_element_js do
   img_path = "#{public_path}/images/mediaelement"
   FileUtils.mkdir_p img_path
   [ 'src/css/controls.png',
+    'src/css/controls.svg',
     'src/css/bigplay.png',
+    'src/css/bigplay.svg',
     'src/css/loading.gif',
     'build/flashmediaelement.swf',
     'build/silverlightmediaelement.xap'

@@ -10,6 +10,6 @@
 
 <p><strong><%= html_to_text(asset.title).titleize %></strong></p>
 
-<p><%= truncate_text(html_to_text(asset.body, :base_url => "#{HostUrl.protocol}://#{HostUrl.context_host(asset.context)}"), :max_length => 200) %></p>
+<p><%= CanvasTextHelper.truncate_text(html_to_text(asset.body, :base_url => "#{HostUrl.protocol}://#{HostUrl.context_host(asset.context)}"), :max_length => 200) %></p>
 
 <p><a href="<%= content :link %>"><%= t :link_message, "Click here to review it" %></a></p>
