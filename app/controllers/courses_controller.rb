@@ -254,7 +254,7 @@ class CoursesController < ApplicationController
   include SearchHelper
 
   before_filter :require_user, :only => [:index]
-  before_filter :require_context, :only => [:roster, :locks, :switch_role, :create_file]
+  before_filter :require_context, :only => [:roster, :locks, :switch_role, :create_file, :ping]
 
   include Api::V1::Course
   include Api::V1::Progress
@@ -1965,5 +1965,9 @@ class CoursesController < ApplicationController
       },
       :PERMISSIONS => permissions,
     })
+  end
+
+  def ping
+    render json: {success: true}
   end
 end

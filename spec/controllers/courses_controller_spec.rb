@@ -406,6 +406,11 @@ describe CoursesController do
         controller.js_env[:PERMISSIONS][:manage].should be_false
       end
 
+      it "should set ping_url" do
+        get 'show', :id => @course1.id
+        controller.js_env[:ping_url].should_not be_nil
+      end
+
       it "should not show unpublished assignments to students" do
         @course1.default_view = "assignments"
         @course1.save!

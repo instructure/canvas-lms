@@ -2118,6 +2118,16 @@ describe CoursesController, type: :request do
                     { controller: "courses", course_id: @course.id.to_s, action: "activity_stream_summary", format: 'json' })
     json.should == [{"type" => "DiscussionTopic", "count" => 1, "unread_count" => 1, "notification_category" => nil}]
   end
+
+  it "should update activity time" do
+    course_with_teacher(:active_all => true, :user => user_with_pseudonym)
+    @context = @course
+    @enrollment.last_activity_at.should be_nil
+    api_call(:post, "/api/v1/courses/#{@course.id}/ping",
+                    { controller: "courses", course_id: @course.id.to_s, action: "ping", format: 'json' })
+    @enrollment.reload
+    @enrollment.last_activity_at.should_not be_nil
+  end
 end
 
 def each_copy_option

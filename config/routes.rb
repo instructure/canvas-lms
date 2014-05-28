@@ -840,6 +840,7 @@ routes.draw do
       get 'courses/:course_id/folders/by_path', :controller => :folders, :action => :resolve_path
       get  'courses/:course_id/folders/:id', :controller => :folders, :action => :show, :path_name => 'course_folder'
       put  'accounts/:account_id/courses', :action => :batch_update
+      post 'courses/:course_id/ping', :action => :ping, :path_name => 'course_ping'
     end
 
     scope(:controller => :tabs) do
