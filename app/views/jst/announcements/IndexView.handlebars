@@ -10,10 +10,10 @@
            <i class="icon-rss"></i>
         </a>
       {{/if}}
-      <span id="actionsForSelectedDiscussions" style="display:none;">
-        <input type="checkbox" id="lock" />
+      <span id="actionsForSelectedDiscussions" class="screenreader-only">
+        <input type="checkbox" id="lock" disabled="disabled"/>
         <label for="lock" data-tooltip>{{#t "lock_for_comments"}}Lock for comments{{/t}}</label>
-        <button id="delete" data-tooltip>{{#t "delete"}}Delete{{/t}}</button>
+        <button id="delete" data-tooltip disabled="disabled">{{#t "delete"}}Delete{{/t}}</button>
       </span>
 
       {{#if options.permissions.create}}
