@@ -2012,7 +2012,7 @@ class User < ActiveRecord::Base
       self.class.default_storage_quota :
       accounts.sum(&:default_user_storage_quota)
   end
-  
+
   def self.default_storage_quota
     Setting.get('user_default_quota', 50.megabytes.to_s).to_i
   end
@@ -2487,13 +2487,8 @@ class User < ActiveRecord::Base
     @all_active_pseudonyms ||= self.pseudonyms.with_each_shard { |scope| scope.active }
   end
 
-  # when we turn GB1 off, we can remove context from this function
-  def preferred_gradebook_version(context)
-    if context.feature_enabled?(:screenreader_gradebook)
-      preferences[:gradebook_version] || '2'
-    else
-      preferences[:use_gradebook2] == false ? '1' : '2'
-    end
+  def preferred_gradebook_version
+    preferences[:gradebook_version] || '2'
   end
 
   def stamp_logout_time!

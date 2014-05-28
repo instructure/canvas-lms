@@ -1138,13 +1138,6 @@ class Course < ActiveRecord::Base
     !large_roster?
   end
 
-  def old_gradebook_visible?
-    !(large_roster? || (
-      student_count = Rails.cache.fetch(['student_count', self].cache_key) { students.count }
-      student_count > Setting.get('gb1_max', '250').to_i)
-    )
-  end
-
   def enrollment_allows(user, permission)
     return false unless user && permission
 

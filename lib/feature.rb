@@ -182,17 +182,6 @@ Aspire (SIS2000), JMC, and any other SIF-enabled SIS that accepts the SIF elemen
           root_opt_in: true,
           development: true
       },
-    'screenreader_gradebook' =>
-    {
-      display_name: -> { I18n.t('features.individual_gradebook', 'Individual Gradebook View') },
-      description:  -> { I18n.t('individual_gradebook_description', <<-END) },
-Individual Gradebook View provides a gradebook view that is designed for accessibility.
-END
-      applies_to: 'Course',
-      state: 'on',
-      root_opt_in: true,
-      development: false
-    },
     'differentiated_assignments' =>
     {
       display_name: -> { I18n.t('features.differentiated_assignments', 'Differentiated Assignments') },

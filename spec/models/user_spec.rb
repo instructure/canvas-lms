@@ -2289,52 +2289,21 @@ describe User do
   describe "preferred_gradebook_version" do
     let(:user) { User.new }
     let(:course) { mock('course') }
-    subject { user.preferred_gradebook_version(course) }
+    subject { user.preferred_gradebook_version }
 
-    context "with screenreader_gradebook disabled" do
-      before {
-        course.stubs(:feature_enabled?).with(:screenreader_gradebook).returns(false)
-      }
-
-      context "by default" do
-        it { should == '2' }
-      end
-
-      context "with an explicit preference for gradebook 2" do
-        before { user.stubs(:preferences => { :use_gradebook2 => true }) }
-        it { should == '2' }
-      end
-
-      context "with an truthy preference for gradebook 2" do
-        before { user.stubs(:preferences => { :use_gradebook2 => '1' }) }
-        it { should == '2' }
-      end
-
-      context "with an explicit preference for gradebook 1" do
-        before { user.stubs(:preferences => { :use_gradebook2 => false }) }
-        it { should == '1' }
-      end
+    context "prefers gb2" do
+      before { user.stubs(:preferences => { :gradebook_version => '2' }) }
+      it { should == '2' }
     end
 
-    context "with screenreader_gradebook enabled" do
-      before {
-        course.stubs(:feature_enabled?).with(:screenreader_gradebook).returns(true)
-      }
+    context "prefers srgb" do
+      before { user.stubs(:preferences => { :gradebook_version => 'srgb' }) }
+      it { should == 'srgb' }
+    end
 
-      context "prefers gb2" do
-        before { user.stubs(:preferences => { :gradebook_version => '2' }) }
-        it { should == '2' }
-      end
-
-      context "prefers srgb" do
-        before { user.stubs(:preferences => { :gradebook_version => 'srgb' }) }
-        it { should == 'srgb' }
-      end
-
-      context "nil preference" do
-        before { user.stubs(:preferences => { :gradebook_version => nil }) }
-        it { should == '2' }
-      end
+    context "nil preference" do
+      before { user.stubs(:preferences => { :gradebook_version => nil }) }
+      it { should == '2' }
     end
   end
 

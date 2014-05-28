@@ -27,7 +27,7 @@ describe "editing grades" do
 
   context 'submission details dialog' do
     it 'successfully grades a submission' do
-      get "/courses/#{@course.id}/gradebook2"
+      get "/courses/#{@course.id}/gradebook"
       wait_for_ajaximations
       open_comment_dialog(0, 0)
       grade_box = f("form.submission_details_grade_form input.grading_value")
@@ -48,7 +48,7 @@ describe "editing grades" do
     Quizzes::SubmissionGrader.new(qs).grade_submission
     q.reload
 
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     wait_for_ajaximations
     edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l5', points.to_s)
 
@@ -58,7 +58,7 @@ describe "editing grades" do
   end
 
   it "should treat ungraded as 0s when asked, and ignore when not" do
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     wait_for_ajaximations
 
     # make sure it shows like it is not treating ungraded as 0's by default
@@ -75,7 +75,7 @@ describe "editing grades" do
     final_score_for_row(1).should == STUDENT_2_TOTAL_TREATING_UNGRADED_AS_ZEROS
 
     # reload the page and make sure it remembered the setting
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     wait_for_ajaximations
     is_checked('#include_ungraded_assignments').should be_true
     final_score_for_row(0).should == STUDENT_1_TOTAL_TREATING_UNGRADED_AS_ZEROS
@@ -88,7 +88,7 @@ describe "editing grades" do
   end
 
   it "should validate initial grade totals are correct" do
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     wait_for_ajaximations
 
     final_score_for_row(0).should == STUDENT_1_TOTAL_IGNORING_UNGRADED
@@ -96,9 +96,8 @@ describe "editing grades" do
   end
 
   it "should change grades and validate course total is correct" do
-    Course.any_instance.stubs(:feature_enabled?).returns(false)
     expected_edited_total = "33.3%"
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
 
     #editing grade for first row, first cell
     edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2', 0)
@@ -107,21 +106,15 @@ describe "editing grades" do
     edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(2) .l2', 0)
 
     #refresh page and make sure the grade sticks
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     wait_for_ajaximations
     final_score_for_row(0).should == expected_edited_total
     final_score_for_row(1).should == expected_edited_total
-
-    #go back to gradebook1 and compare to make sure they match
-    check_gradebook_1_totals({
-                                 @student_1.id => expected_edited_total,
-                                 @student_2.id => expected_edited_total
-                             })
   end
 
   it "should allow setting a letter grade on a no-points assignment" do
     assignment_model(:course => @course, :grading_type => 'letter_grade', :points_possible => nil, :title => 'no-points')
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     wait_for_ajaximations
 
     edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l5', 'A-')
@@ -136,7 +129,7 @@ describe "editing grades" do
   it "should not update default grades for users not in this section" do
     # create new user and section
 
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     wait_for_ajaximations
 
     driver.execute_script "$('#section_option_#{@other_section.id}').click()"
@@ -147,7 +140,7 @@ describe "editing grades" do
   end
 
   it "should edit a grade, move to the next cell and validate focus is not lost" do
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     wait_for_ajaximations
 
     first_cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')
@@ -163,7 +156,7 @@ describe "editing grades" do
 
   it "should display dropped grades correctly after editing a grade" do
     @course.assignment_groups.first.update_attribute :rules, 'drop_lowest:1'
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     wait_for_ajaximations
 
     assignment_1_sel = '#gradebook_grid .container_1 .slick-row:nth-child(1) .l3'
@@ -185,7 +178,7 @@ describe "editing grades" do
   end
 
   it "should update a grade when clicking outside of slickgrid" do
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     wait_for_ajaximations
 
     first_cell = f('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2')
@@ -202,7 +195,7 @@ describe "editing grades" do
   it "should validate curving grades option" do
     curved_grade_text = "8"
 
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     wait_for_ajaximations
 
     open_assignment_options(0)
@@ -220,7 +213,7 @@ describe "editing grades" do
   end
 
   it "should optionally assign zeroes to unsubmitted assignments during curving" do
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
 
     wait_for_ajaximations
 
@@ -253,7 +246,7 @@ describe "editing grades" do
 
       expected_grade = "45"
       gradebook_row_1 = '#gradebook_grid .container_1 .slick-row:nth-child(2)'
-      get "/courses/#{@course.id}/gradebook2"
+      get "/courses/#{@course.id}/gradebook"
       wait_for_ajaximations
 
       open_section_menu_and_click('#section-to-show-menu-1')
@@ -268,7 +261,7 @@ describe "editing grades" do
     ungraded_submission = @ungraded_assignment.submit_homework(@student_1, :body => 'student 1 submission ungraded assignment')
     @ungraded_assignment.grade_student(@student_1, :grade => 20)
     ungraded_submission.save!
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     wait_for_ajaximations
     assignment_group_cells = ff('.assignment-group-cell')
     expected_totals.zip(assignment_group_cells) do |expected, cell|
@@ -278,7 +271,7 @@ describe "editing grades" do
 
   it "should validate setting default grade for an assignment" do
     expected_grade = "45"
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     wait_for_ajaximations
     set_default_grade(2, expected_grade)
     grade_grid = f('#gradebook_grid .container_1')
@@ -289,7 +282,7 @@ describe "editing grades" do
 
   it "should display an error on failed updates" do
     SubmissionsApiController.any_instance.expects(:update).returns('bad response')
-    get "/courses/#{@course.id}/gradebook2"
+    get "/courses/#{@course.id}/gradebook"
     wait_for_ajaximations
     edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2', 0)
     keep_trying_until do

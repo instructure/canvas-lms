@@ -29,7 +29,7 @@
       <a href="#" class="next"><%= t('links.next', "Next") %></a>
       <div id='x_of_x_students'>
         <span id='x_of_x_students_frd'></span><br>
-        <a href="<%= gradebook_url_for(@current_user, @context, @assignment) %>" id="speed_grader_gradebook_link">
+        <a href="<%= polymorphic_url([@context, 'gradebook']) %>" id="speed_grader_gradebook_link">
           <%= t('links.gradebook', "Gradebook") %>
         </a>
         <a href="<%= context_url(@context, :context_url) %>"><%= t('links.course_home', "Course Home") %></a>
@@ -255,8 +255,8 @@
 <form id="settings_form" style="display:none; width:400px;" title="<%= t('titles.speedgrader_options', "Speedgrader Options") %>">
   <p>
     <label for="eg_sort_by"><%= t('labels.sort_by', "Sort student list") %></label>
-    <%= select_tag 'eg_sort_by', options_for_select([ 
-      [t('sort_by.student_name', "by student name (alphabetically)"), "alphabetically"], 
+    <%= select_tag 'eg_sort_by', options_for_select([
+      [t('sort_by.student_name', "by student name (alphabetically)"), "alphabetically"],
       [t('sort_by.submitted_at', "the date they submitted the assignment"), "submitted_at"],
       [t('sort_by.status', "by submission status (needs grading, not submitted, etc)"), "submission_status"]], cookies[:eg_sort_by]) %>
   </p>
@@ -285,7 +285,7 @@
     </a>
     <ul>
       <li style="border-bottom: 1px dotted #ccc"><a class="selected" style="font-size: 1.1em;" data-section-id="all" href="#"><%= t('links.show_all_sections', "Show all sections") %></a></li>
-    </ul> 
+    </ul>
   </li>
 </ul>
 
