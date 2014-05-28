@@ -75,16 +75,18 @@ module Api::V1::Outcome
     end
   end
 
-  def outcome_link_json(outcome_link, user, session)
+  def outcome_link_json(outcome_link, user, session, opts={})
+    opts[:outcome_style] ||= :abbrev
+    opts[:outcome_group_style] ||= :abbrev
     api_json(outcome_link, user, session, :only => %w(context_type context_id)).tap do |hash|
       hash['url'] = polymorphic_path [:api_v1, outcome_link.context || :global, :outcome_link],
         :id => outcome_link.associated_asset_id,
         :outcome_id => outcome_link.content_id
-      hash['outcome_group'] = outcome_group_json(outcome_link.associated_asset, user, session, :abbrev)
+      hash['outcome_group'] = outcome_group_json(outcome_link.associated_asset, user, session, opts[:outcome_group_style])
       # use learning_outcome_content vs. content in case
       # learning_outcome_content has been preloaded (e.g. by
       # ContentTag.order_by_outcome_title)
-      hash['outcome'] = outcome_json(outcome_link.learning_outcome_content, user, session, :abbrev)
+      hash['outcome'] = outcome_json(outcome_link.learning_outcome_content, user, session, opts[:outcome_style])
     end
   end
 end

@@ -1,10 +1,11 @@
 define [
   'underscore'
   'Backbone'
-  'jst/gradebook2/student_outcome_view'
+  'jst/grade_summary/outcome'
 ], (_, Backbone, template) ->
-  class StudentOutcomesView extends Backbone.View
+  class OutcomeView extends Backbone.View
     tagName: 'li'
+    className: 'outcome'
     template: template
     toJSON: ->
       json = super

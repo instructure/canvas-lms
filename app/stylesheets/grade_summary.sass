@@ -295,32 +295,54 @@ div.rubric-toggle
 
 $outcome-border: 1px solid #BCC2CA
 
-#outcomes ul
-  background-color: #f4f4f4
-  border: $outcome-border
-  border-radius: 3px
-  overflow: hidden
+#outcomes
+  h2
+    font-size: 1.4em
+    font-weight: bold
 
-#outcomes li
-  list-style-type: none
-  overflow: hidden
-  border-top: $outcome-border
+  .group
+    border: $outcome-border
+    border-radius: 3px
+    margin-top: 1em
 
-  &:first-child
-    border-top: none
-
-  .outcome
+  h3
+    font-size: 1.2em
+    margin-left: 1em
     float: left
-    width: 80%
-    padding: 1em
-    border-right: $outcome-border
-    box-sizing: border-box
 
-  .description
-    color: #b4b4b4
+  .group-description
+    overflow: hidden
+    .status
+      float: right
+      margin: 1em
 
-  .score
-    float: right
-    width: 20%
-    padding: 1em
-    box-sizing: border-box
+  .outcomes
+    background-color: #f7f7f7
+
+  ul
+    margin-left: 0
+
+  li
+    list-style-type: none
+    overflow: hidden
+
+  li.outcome
+    border-top: $outcome-border
+
+    .outcome-properties
+      float: left
+      width: 80%
+      padding: 1em
+      box-sizing: border-box
+
+    .description
+      color: #b4b4b4
+
+    .title
+      font-weight: bold
+
+    .score
+      float: right
+      width: 20%
+      padding: 1em
+      box-sizing: border-box

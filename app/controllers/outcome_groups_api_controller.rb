@@ -122,7 +122,7 @@
 #         },
 #         "outcome": {
 #           "description": "an abbreviated Outcome object representing the outcome linked into the containing outcome group.",
-#           "$ref": "OutcomeGroup"
+#           "$ref": "Outcome"
 #         }
 #       }
 #     }
@@ -162,13 +162,23 @@ class OutcomeGroupsApiController < ApplicationController
   # @API Get all outcome links for context
   # @beta
   #
+  # @argument outcome_style [Optional, String]
+  #   The detail level of the outcomes. Defaults to "abbrev".
+  #   Specify "full" for more information.
+  #
+  # @argument outcome_group_style [Optional, String]
+  #   The detail level of the outcome groups. Defaults to "abbrev".
+  #   Specify "full" for more information.
+  #
   # @returns [OutcomeLink]
   def link_index
     return unless can_read_outcomes
 
     url = polymorphic_url [:api_v1, @context || :global, :outcome_group_links]
     links = Api.paginate(context_outcome_links, self, url)
-    render json: links.map { |link| outcome_link_json(link, @current_user, session) }
+    render json: links.map { |link|
+      outcome_link_json(link, @current_user, session, params.slice(:outcome_style, :outcome_group_style))
+    }
   end
 
   # @API Show an outcome group

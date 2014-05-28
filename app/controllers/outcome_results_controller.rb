@@ -432,7 +432,7 @@ class OutcomeResultsController < ApplicationController
 
     if params[:user_ids]
       user_ids = Api.value_to_array(params[:user_ids]).map(&:to_i).uniq
-      @users = users_for_outcome_context.where(id: user_ids)
+      @users = users_for_outcome_context.where(id: user_ids).uniq
       reject!( "can only include id's of users in the outcome context") if @users.count != user_ids.count
     elsif params[:section_id]
       @section = @context.course_sections.where(id: params[:section_id].to_i).first

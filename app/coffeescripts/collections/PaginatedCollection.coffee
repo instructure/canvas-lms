@@ -66,6 +66,7 @@ define [
         @_setStateAfterFetch(xhr, options)
         data
 
+      dfd = options.dfd || $.Deferred()
       xhr = super(options).done (response, text, xhr) =>
         @trigger 'fetch', this, response, options
         @trigger "fetch:#{options.page}", this, response, options if options.page?
@@ -74,7 +75,13 @@ define [
           @loadedAll = true
         if @loadAll and @urls.next?
           setTimeout =>
-            @fetch page: 'next' # next tick so we can show loading indicator, etc.
+            @fetch page: 'next', dfd: dfd # next tick so we can show loading indicator, etc.
+        else
+          dfd.resolve(response, text, xhr)
+      dfd.abort = xhr.abort
+      dfd.success = dfd.done
+      dfd.error = dfd.fail
+      dfd
 
     canFetch: (page) ->
       @urls? and @urls[page]?
