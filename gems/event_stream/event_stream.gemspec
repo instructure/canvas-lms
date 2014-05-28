@@ -24,7 +24,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'canvas_uuid'
   spec.add_dependency 'json_token'
   spec.add_dependency 'paginated_collection'
-  spec.add_dependency 'rails'
 
   if CANVAS_RAILS3
     spec.add_dependency 'rails', '~>3.2'
