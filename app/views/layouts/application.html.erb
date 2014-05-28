@@ -39,7 +39,7 @@
     <a href="#content" id="skip_navigation_link"><%= t 'links.skip_to_content', "Skip To Content" %></a>
     <a id="header-logo" href="<%= dashboard_url %>"><%= t 'links.dashboard', "My Dashboard" %></a>
     <b id="header-logo-secondary"></b>
-    <div id="topbar">
+    <div id="topbar" role="navigation" aria-label="<%= t('navigation.user_menu', 'User Menu') %>">
       <% if (identity = (yield :identity).presence) %>
         <%= identity %>
       <% else %>
