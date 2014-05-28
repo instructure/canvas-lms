@@ -116,6 +116,8 @@ module DatesOverridable
   end
 
   def formatted_dates_hash(dates)
+    return [] unless dates.present?
+
     dates = dates.sort_by do |date|
       due_at = date[:due_at]
       [ due_at.present? ? CanvasSort::First : CanvasSort::Last, due_at.presence || CanvasSort::First ]
