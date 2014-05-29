@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 - 2013 Instructure, Inc.
+# Copyright (C) 2012 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -34,7 +34,7 @@ module ReportSpecHelper
                                        :report_type => type)
     account_report.parameters = parameters
     account_report.save
-    Canvas::AccountReports.for_account(account)[type][:proc].call(account_report)
+    Canvas::AccountReports.available_reports[type].proc.call(account_report)
     account_report
   end
 

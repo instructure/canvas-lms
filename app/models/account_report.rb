@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -57,7 +57,7 @@ class AccountReport < ActiveRecord::Base
 
   def run_report(type=nil)
     self.report_type ||= type
-    if AccountReport.available_reports(self.account)[self.report_type]
+    if AccountReport.available_reports[self.report_type]
       begin
         Canvas::AccountReports.generate_report(self)
       rescue
@@ -75,9 +75,9 @@ class AccountReport < ActiveRecord::Base
     self.parameters.is_a?(Hash) && self.parameters[key].presence
   end
 
-  def self.available_reports(account)
+  def self.available_reports
     # check if there is a reports plugin for this account
-    Canvas::AccountReports.for_account(account.root_account.id)
+    Canvas::AccountReports.available_reports
   end
 
 end

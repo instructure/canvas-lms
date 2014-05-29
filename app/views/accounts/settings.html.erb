@@ -785,7 +785,7 @@ acknowledge that you have read and agreed to the
                           <%= r[:plural_label][] %>
                         </label>
                       </li>
-                    <% end %>  
+                    <% end %>
                     <% # NilEnrollment is a special case, because it's not actually a role, just a status reflecting that the user is not part of any course %>
                     <li id="account_notification_role_NilEnrollment">
                       <label>
@@ -840,9 +840,8 @@ acknowledge that you have read and agreed to the
           <th class="reports"><%= t 'headers.report_last_run', 'Last Run' %></th>
           <th class="reports"></th>
         </tr>
-        <% @available_reports.sort_by {|_, details| details[:title]}.each do |report, details|
-           title = details[:title] || details
-           description = details[:description]
+        <% @available_reports.sort_by {|_, details| details.title}.each do |report, details|
+           title = details.title || details
            description_partial = details[:description_partial]
            description_partial = report + '_description' if description_partial == true
            parameters_partial = details[:parameters_partial]
@@ -856,10 +855,10 @@ acknowledge that you have read and agreed to the
           <tr id="<%= report %>" class="reports">
             <td class="title reports">
               <span class="title"><%= title %></span>
-              <% if description || description_partial %>
+              <% if description_partial %>
                 <a href="#" class="open_report_description_link"><i class="icon-question standalone-icon"></i></a>
                 <div style="display: none" class="report_description">
-                  <%= description_partial ? render(:partial => description_partial) : description %>
+                  <%= render(:partial => description_partial) %>
                 </div>
               <% end %>
             </td>
