@@ -43,4 +43,4 @@ define [
   test 'it shows up empty if there are no submissions', ->
     env.setUserPermissions(true, true)
     visit('/3/statistics').then ->
-      equal find('.empty-statistics').length, 1
+      equal find('.erratic-statistics').length, 1

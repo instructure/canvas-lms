@@ -1,6 +1,6 @@
 <div id="quiz-statistics">
-  {{#if emptyStatistics}}
-    {{partial "quiz/statistics/empty"}}
+  {{#if hasError}}
+    {{partial "quiz/statistics/error"}}
   {{else}}
     {{! Summary Statistics section}}
     <section>

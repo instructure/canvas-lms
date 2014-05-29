@@ -17,6 +17,9 @@
 #
 
 class Quizzes::QuizStatistics < ActiveRecord::Base
+  DefaultMaxQuestions = 100
+  DefaultMaxSubmissions = 1000
+
   self.table_name = :quiz_statistics
 
   attr_accessible :includes_all_versions, :anonymous, :report_type
@@ -34,6 +37,20 @@ class Quizzes::QuizStatistics < ActiveRecord::Base
   REPORTS = %w[student_analysis item_analysis].freeze
 
   validates_inclusion_of :report_type, :in => REPORTS
+
+  # Test a given quiz if it's within the sanity limits for generating stats.
+  # You should not generate stats for this quiz if this returns true.
+  #
+  # Defaults for the limits are set in the constants in this module, but you
+  # can configure them via the Setting interface using the console, or by
+  # directly modifying the setting records in the database (note that you will
+  # still have to restart your Canvas instance for the settings to take effect.)
+  def self.large_quiz?(quiz)
+    (quiz.quiz_questions.size >
+      Setting.get('quiz_statistics_max_questions', DefaultMaxQuestions).to_i) ||
+    (quiz.quiz_submissions.size >
+      Setting.get('quiz_statistics_max_submissions', DefaultMaxSubmissions).to_i)
+  end
 
   def report
     report_klass = report_type.to_s.camelize

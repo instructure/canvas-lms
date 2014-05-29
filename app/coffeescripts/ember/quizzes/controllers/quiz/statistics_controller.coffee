@@ -25,7 +25,7 @@ define [
     ).property('questionStatistics.sortProperties')
 
     imageAltLabel: (->
-      I18n.t('empty_stats.image_alt', 'Quiz statistics not available yet.')
+      I18n.t('stats_error.image_alt', 'Quiz statistics not available yet.')
     ).property()
 
     discriminationIndexHelpDialogTitle: (->
@@ -33,9 +33,31 @@ define [
         'The Discrimination Index Chart')
     ).property()
 
-    emptyStatistics: (->
-      @get('uniqueCount') < 1
-    ).property('uniqueCount')
+    hasError: (->
+      !!@get('error')
+    ).property('error')
+
+    errorHeaderLabel: (->
+      switch @get('error')
+        when 'stats_empty'
+          I18n.t('errors.stats_empty.header', 'Nothing to see here folks.')
+        when 'stats_too_large'
+          I18n.t('errors.stats_too_large.header', 'Too much going on here folks.')
+        else
+          I18n.t('unknown.header', 'Something went wrong.')
+    ).property('error')
+
+    errorInfoLabel: (->
+      switch @get('error')
+        when 'stats_empty'
+          I18n.t('errors.stats_empty.info',
+            'None of your students have taken this quiz yet.')
+        when 'stats_too_large'
+          I18n.t('errors.stats_too_large.info',
+            'This quiz is too large to display.')
+        else
+          I18n.t('unknown.info', 'An unexpected error has occurred.')
+    ).property('error')
 
     populateQuestionStatistics: (->
       @set('questionStatistics.content', @get('model.questionStatistics'))
