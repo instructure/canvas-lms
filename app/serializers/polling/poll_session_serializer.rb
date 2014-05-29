@@ -1,6 +1,7 @@
 module Polling
   class PollSessionSerializer < Canvas::APISerializer
-    attributes :id, :is_published, :has_public_results, :results, :course_id, :course_section_id, :created_at, :poll_id, :poll_submissions
+    attributes :id, :is_published, :has_public_results, :results, :course_id,
+      :course_section_id, :created_at, :poll_id, :poll_submissions, :has_submitted
 
     def_delegators :object, :results, :poll
 
@@ -9,6 +10,10 @@ module Polling
       @poll_submissions ||= object.poll_submissions.map do |submission|
         Polling::PollSubmissionSerializer.new(submission, controller: @controller, scope: @scope, root: false)
       end
+    end
+
+    def has_submitted
+      object.has_submission_from?(current_user)
     end
 
     def filter(keys)
@@ -26,7 +31,7 @@ module Polling
     end
 
     def student_keys
-      [:id, :is_published, :course_id, :course_section_id, :created_at, :poll_id]
+      [:id, :is_published, :course_id, :course_section_id, :created_at, :poll_id, :has_submitted]
     end
   end
 end

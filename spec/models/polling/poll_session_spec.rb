@@ -26,6 +26,7 @@ describe Polling::PollSession do
     teacher_in_course(course: @course, active_all: true)
 
     @poll = Polling::Poll.create!(user: @teacher, question: 'A Test Poll')
+    @choice = @poll.poll_choices.create(text: 'A Poll Choice')
   end
 
   context "creating a poll session" do
@@ -102,4 +103,24 @@ describe Polling::PollSession do
     end
   end
 
+  describe "#has_submission_from?" do
+    before(:each) do
+      @session = Polling::PollSession.create(poll: @poll, course: @course)
+      @session.publish!
+    end
+
+    it "returns true if the provided user has submitted to the session" do
+      student_in_course(active_all: true, course: @course)
+
+      @session.poll_submissions.create!(poll: @poll, poll_choice: @choice, user: @student)
+
+      @session.has_submission_from?(@student).should be_true
+    end
+
+    it "returns false if the provided user hasn't submitted to the session" do
+      student_in_course(active_all: true, course: @course)
+
+      @session.has_submission_from?(@student).should be_false
+    end
+  end
 end

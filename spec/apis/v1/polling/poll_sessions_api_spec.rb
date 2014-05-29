@@ -136,6 +136,17 @@ describe Polling::PollSessionsController, type: :request do
     end
 
     context "as a student" do
+      it "returns has_submitted as true if the student has made a submission" do
+        choice = @poll.poll_choices.create!(text: 'Choice A', is_correct: true)
+        submission = create_submission(choice)
+
+        @user = submission.user
+        json = get_show['poll_sessions'].first
+
+        json.should have_key('has_submitted')
+        json['has_submitted'].should be_true
+      end
+
       it "doesn't embed the associated poll submissions" do
         choice1 = @poll.poll_choices.create!(text: 'Choice A', is_correct: true)
         choice2 = @poll.poll_choices.create!(text: 'Choice B', is_correct: false)
@@ -146,7 +157,7 @@ describe Polling::PollSessionsController, type: :request do
         student = student_in_course(active_user:true).user
         @user = student
 
-        json = get_show
+        json = get_show['poll_sessions'].first
 
         json.should_not have_key('poll_submissions')
       end
