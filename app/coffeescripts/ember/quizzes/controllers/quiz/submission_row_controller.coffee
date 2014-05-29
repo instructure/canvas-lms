@@ -27,7 +27,7 @@ define [
     ).property('quizSubmission.attempt')
 
     friendlyScore: ( ->
-      return if @get('isActive') || !@get('keptScore')
+      return if @get('isActive') || (!@get('keptScore') && @get('keptScore') != 0)
       "#{@get('keptScore')} / #{@get('quizPointsPossible')}"
     ).property('keptScore', 'quizPointsPossible', 'isActive')
 

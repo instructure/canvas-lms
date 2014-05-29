@@ -61,7 +61,10 @@ define [
     equal @get('attempt', '--')
 
   emq.test 'friendlyScore converted correctly', ->
+    expect(3)
     equal @get('friendlyScore'), '5 / 8'
+    @subCtr.set('keptScore', 0)
+    equal @get('friendlyScore'), '0 / 8'
     @subCtr.set('model', @blankSub)
     equal @get('friendlyScore'), undefined
 
@@ -76,5 +79,3 @@ define [
   emq.test 'remainingAttempts uses quiz value when no user submission', ->
     @subCtr.set('model', @blankSub)
     equal @get('remainingAttempts'), '10'
-
-
