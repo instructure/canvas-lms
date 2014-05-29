@@ -2,6 +2,11 @@ define [
   'ember'
   'i18n!quiz_statistics'
 ], (Ember, I18n) ->
+
+  sortQuestionsBy = (controller, properties, asc) ->
+    controller.set('questionStatistics.sortProperties', properties)
+    controller.set('questionStatistics.sortAscending', asc)
+
   # This is the top-level statistics controller. It's mainly concerned with
   # keeping a sortable set of question statistics and accepts actions that are
   # not question-type-specific (like toggling the question details).
@@ -11,10 +16,6 @@ define [
       content: []
     })
 
-    populateQuestionStatistics: (->
-      @set('questionStatistics.content', @get('model.questionStatistics'))
-    ).observes('model.questionStatistics.@each')
-
     sortLabel: (->
       switch @get('questionStatistics.sortProperties')[0]
         when 'position'
@@ -23,21 +24,24 @@ define [
           I18n.t('sort_by_discrimination_index', 'Sort By Discrimination')
     ).property('questionStatistics.sortProperties')
 
-    sortQuestionsBy: (properties, asc) ->
-      @set('questionStatistics.sortProperties', properties)
-      @set('questionStatistics.sortAscending', asc)
-
     discriminationIndexHelpDialogTitle: (->
       I18n.t('discrimination_index_help_dialog_title',
         'The Discrimination Index Chart')
     ).property()
 
+    populateQuestionStatistics: (->
+      @set('questionStatistics.content', @get('model.questionStatistics'))
+    ).observes('model.questionStatistics.@each')
+
     actions:
       showAllDetails: ->
-        @set('allDetailsVisible', !@get('allDetailsVisible'))
+        @toggleProperty('allDetailsVisible')
+        null
 
       sortByDiscriminationIndex: ->
-        @sortQuestionsBy ['discriminationIndex', 'position'], false
+        sortQuestionsBy(this, ['discriminationIndex', 'position'], false)
+        null
 
       sortByPosition: ->
-        @sortQuestionsBy ['position'], true
+        sortQuestionsBy(this, ['position'], true)
+        null

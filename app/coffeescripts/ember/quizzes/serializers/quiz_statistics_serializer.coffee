@@ -1,8 +1,17 @@
-define [ 'ember', 'ember-data', 'i18n!quiz_statistics' ], (Em, DS, I18n) ->
+define [
+  'ember'
+  'ember-data'
+  'i18n!quiz_statistics'
+  '../shared/util'
+], (Ember, DS, I18n, Util) ->
+  {round} = Util
   participantCount = 0
 
   calculateResponseRatio = (answer) ->
-    Em.Util.round(answer.responses / participantCount * 100)
+    if participantCount > 0 # guard against div by zero
+      round(answer.responses / participantCount * 100)
+    else
+      0
 
   decorate = (quiz_statistics) ->
     participantCount = quiz_statistics.submission_statistics.unique_count
@@ -19,8 +28,8 @@ define [ 'ember', 'ember-data', 'i18n!quiz_statistics' ], (Em, DS, I18n) ->
         question_statistics.answer_sets.forEach(decorateAnswerSet)
 
     # set of FKs between quiz and question stats
-    quiz_statistics.question_statistic_ids =
-      Em.A(quiz_statistics.question_statistics).mapBy('id')
+    quiz_statistics.question_statistics_ids =
+      Ember.A(quiz_statistics.question_statistics).mapBy('id')
 
   decorateAnswers = (answers) ->
     (answers || []).forEach (answer) ->
@@ -48,8 +57,8 @@ define [ 'ember', 'ember-data', 'i18n!quiz_statistics' ], (Em, DS, I18n) ->
       decorate(payload.quiz_statistics[0])
 
       data = {
-        quizStatistics: payload.quiz_statistics
-        questionStatistics: payload.quiz_statistics[0].question_statistics
+        quiz_statistics: payload.quiz_statistics
+        question_statistics: payload.quiz_statistics[0].question_statistics
       }
 
       @_super(store, type, data, id, requestType)

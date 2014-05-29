@@ -5,10 +5,11 @@ define [
 ], (Em, DS, ResponseRatioCalculator) ->
 
   {alias} = Em.computed
-  {Model, attr, belongsTo} = DS
+  {attr} = DS
 
-  Model.extend
-    quizStatistics: belongsTo 'quiz_statistics', async: false
+  DS.Model.extend
+    quizStatistics: DS.belongsTo 'quiz_statistics', async: false
+
     questionType: attr()
     questionName: attr()
     questionText: attr()
@@ -31,6 +32,11 @@ define [
     correctMiddleStudentCount: attr()
     correctBottomStudentCount: attr()
 
+    # Essay stats
+    fullCredit: attr()
+    graded: attr()
+    pointDistribution: attr()
+
     speedGraderUrl: alias('quizStatistics.quiz.speedGraderUrl').readOnly()
     quizSubmissionsZipUrl: alias('quizStatistics.quiz.quizSubmissionsZipUrl').readOnly()
 
@@ -46,11 +52,6 @@ define [
       sets.map (set) ->
         Em.Object.create(set)
     ).property('_data.answer_sets')
-
-    # Essay stats
-    fullCredit: attr()
-    graded: attr()
-    pointDistribution: attr()
 
     renderableType: (->
       switch @get('questionType')

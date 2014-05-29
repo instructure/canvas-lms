@@ -1,9 +1,10 @@
 define [
+  'ember'
   '../questions_controller'
   'i18n!quiz_statistics'
-], (Base, I18n) ->
+], (Ember, Base, I18n) ->
   Base.extend
-    answers: Em.computed.alias('ratioCalculator.answerPool')
+    answers: Ember.computed.alias('ratioCalculator.answerPool')
 
     # @property [Object] activeAnswer
     #

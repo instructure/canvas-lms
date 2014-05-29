@@ -3,13 +3,13 @@ define [
   'vendor/d3.v3'
   '../../../../../mixins/views/chart_inspector'
   'compiled/behaviors/tooltip'
-], (Em, d3, ChartInspectorMixin) ->
+], (Ember, d3, ChartInspectorMixin) ->
   # This view renders a bar chart that plots each question answer versus the
   # amount of responses each answer has received.
   #
   # Also, each bar that represents an answer provides a tooltip on hover that
   # displays more information.
-  Em.View.extend ChartInspectorMixin,
+  Ember.View.extend ChartInspectorMixin,
     # @config [Integer] [barWidth=30]
     #   Width of the bars in the chart in pixels.
     barWidth: 30
@@ -31,11 +31,11 @@ define [
         at: 'center top-8'
 
     renderChart: (->
-      data = Em.A(@get('controller.chartData'))
+      data = Ember.A(@get('controller.chartData'))
 
       sz = data.reduce(((sum, item) -> sum + item.y), 0)
 
-      highest = Math.max.apply(Math, data.mapBy('y'))
+      highest = d3.max(data.mapBy('y'))
 
       margin = { top: 0, right: 0, bottom: 0, left: 0 }
       width = @get('width') - margin.left - margin.right
@@ -75,7 +75,7 @@ define [
       # striped bar, but to do that we need to render the <svg:pattern> that
       # generates the stripes and use that as a fill pattern, and we also need
       # to create the <svg:rect> that will be filled with that pattern.
-      otherAnswers = Em.A([
+      otherAnswers = Ember.A([
         data.findBy('id', 'other')
         data.findBy('id', 'none')
       ]).compact()

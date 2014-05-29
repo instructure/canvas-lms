@@ -1,12 +1,11 @@
 define [
   'ember'
-  'ember-qunit'
   '../../start_app'
   '../../environment_setup'
   '../../../models/question_statistics/response_ratio_calculator'
-], (Em, emq, startApp, env, ResponseRatioCalculator) ->
+], (Ember, startApp, env, ResponseRatioCalculator) ->
 
-  {run} = Em
+  {run} = Ember
   App = null
   subject = null
 
@@ -46,7 +45,7 @@ define [
 
   test '#correctMultipleResponseRatio', ->
     run ->
-      sinon.stub(subject, '__hasMultipleAnswers').returns(true)
+      subject.set 'questionType', 'multiple_answers_question'
       subject.set 'participantCount', 10
       subject.set 'answerPool', [
         { user_ids: [3], correct: true },

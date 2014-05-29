@@ -1,5 +1,5 @@
 define [ 'ember', 'compiled/behaviors/tooltip' ], (Ember) ->
-  {$} = Ember
+  {$, run} = Ember
 
   # This view takes care of stuffing data inside the .auxiliary blocks inside
   # a tooltip as well as managing the report generation progress bar visuals.
@@ -30,16 +30,16 @@ define [ 'ember', 'compiled/behaviors/tooltip' ], (Ember) ->
         # whenever the tooltip is closed so that Ember doesn't choke when
         # trying to sync the contents (element has to be in the DOM)
         close: (evt, ui) =>
-          Ember.run.schedule 'actions', this, ->
+          run.schedule 'actions', this, ->
             $tooltipContent.appendTo $view
         # and put it back into the tooltip...
         open: =>
-          Ember.run.schedule 'actions', this, ->
+          run.schedule 'actions', this, ->
             $tooltipContent.appendTo $tooltipContainer
       }).data('tooltip')
 
     createOrUpdateTooltip: (->
-      Ember.run.schedule 'afterRender', this, ->
+      run.schedule 'afterRender', this, ->
         if @tooltip
           @tooltip.options.content().remove()
           @tooltip.destroy()
@@ -63,7 +63,7 @@ define [ 'ember', 'compiled/behaviors/tooltip' ], (Ember) ->
         })
 
     tickProgressBar: (->
-      Ember.run.schedule 'afterRender', this, ->
+      run.schedule 'afterRender', this, ->
         @repositionTooltip()
         @$progressBar.css {
           width: "#{@get('controller.progress.completion')}%"

@@ -1,4 +1,6 @@
-define [ 'ember' ], ({$}) ->
+define [ 'ember' ], (Ember) ->
+  {$} = Ember
+
   EXTRACTOR = /[\?|\&]([\w|\[|\]]+\=([^\?\&]+))/g
 
   # A group of helpers for dealing with query parameters in URLs.

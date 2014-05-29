@@ -1,4 +1,6 @@
 define [ 'ember', 'underscore' ], (Em, _) ->
+  {intersection, flatten, difference} = _
+
   # A utility class for calculating response ratios for a given question
   # statistics object.
   #
@@ -9,7 +11,7 @@ define [ 'ember', 'underscore' ], (Em, _) ->
   # Usage: see QuestionStatistics#ratioCalculator.
   #
   # TODO: this *may* be better done on the API, investigate
-  Em.ObjectProxy.extend
+  Calculator = Em.ObjectProxy.extend
     participantCount: Em.computed.alias('quizStatistics.uniqueCount')
 
     # @property [Array<Object>] answerPool
@@ -40,7 +42,9 @@ define [ 'ember', 'underscore' ], (Em, _) ->
       participantCount = @get('participantCount') || 0
 
       return 0 if participantCount <= 0
-      return @__ratioForMultipleAnswers() if @__hasMultipleAnswers()
+
+      if hasMultipleAnswers(@get('questionType'))
+        return ratioForMultipleAnswers.call(this)
 
       correctResponses = @get('answerPool').reduce (sum, answer) ->
         sum += answer.responses if answer.correct
@@ -50,30 +54,33 @@ define [ 'ember', 'underscore' ], (Em, _) ->
       correctResponses / participantCount
     ).property('answerPool', 'participantCount')
 
-    __hasMultipleAnswers: ->
-      Em.A([
-        'multiple_answers_question'
-      ]).contains(@get('questionType'))
+  # @private
+  hasMultipleAnswers = (questionType) ->
+    Em.A([
+      'multiple_answers_question'
+    ]).contains(questionType)
 
-    # @private
-    #
-    # Calculates a similar ratio to #ratio but for questions that require a
-    # student to choose more than one answer for their response to be considered
-    # correct. As such, a "partially" correct response does not count towards
-    # the correct response ratio.
-    __ratioForMultipleAnswers: ->
-      respondentsFor = (answers) ->
-        respondents = Em.A(answers).mapBy('user_ids')
+  # @private
+  #
+  # Calculates a similar ratio to #ratio but for questions that require a
+  # student to choose more than one answer for their response to be considered
+  # correct. As such, a "partially" correct response does not count towards
+  # the correct response ratio.
+  ratioForMultipleAnswers = () ->
+    respondentsFor = (answers) ->
+      respondents = Em.A(answers).mapBy('user_ids')
 
-      participantCount = @get('participantCount')
-      correctAnswers = @get('answerPool').filterBy 'correct', true
-      distractors = @get('answerPool').filterBy 'correct', false
+    participantCount = @get('participantCount')
+    correctAnswers = @get('answerPool').filterBy 'correct', true
+    distractors = @get('answerPool').filterBy 'correct', false
 
-      # we need students who have picked all correct answers:
-      correctRespondents = _.intersection.apply(_, respondentsFor(correctAnswers))
+    # we need students who have picked all correct answers:
+    correctRespondents = intersection.apply(_, respondentsFor(correctAnswers))
 
-      # and none of the wrong ones:
-      correctRespondents = _.difference(correctRespondents,
-        _.flatten(respondentsFor(distractors)))
+    # and none of the wrong ones:
+    correctRespondents = difference(correctRespondents,
+      flatten(respondentsFor(distractors)))
 
-      correctRespondents.length / participantCount
+    correctRespondents.length / participantCount
+
+  Calculator
