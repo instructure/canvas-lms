@@ -50,6 +50,7 @@ define [
     actions:
       refreshData: ->
         quiz = @modelFor('quiz')
+        @controllerFor('quiz.moderate').set('reloading', true)
         @forceReload(quiz)
 
       studentExtension: (model) ->

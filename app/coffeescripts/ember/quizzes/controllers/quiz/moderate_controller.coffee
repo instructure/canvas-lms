@@ -41,9 +41,4 @@ define [
       I18n.t('students_have_taken', '%{complete} of %{total} students have completed this quiz', complete: complete, total: total)
     ).property('@each.quizSubmission.isComplete')
 
-    actions:
-      refreshData: ->
-        @set('reloading', true)
-        true
-
   QuizModerateController

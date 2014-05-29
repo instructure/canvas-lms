@@ -43,7 +43,7 @@ define [
         if !@get('runningTime')
           Ember.run.next this, @updateRunningTime
         else
-          Ember.run.later this, @updateRunningTime, REFRESH_DELAY
+          Ember.run.debounce this, @updateRunningTime, REFRESH_DELAY
       else
         @set('runningTime', undefined)
     ).observes('isActive', 'okayToReload').on('init')
@@ -76,7 +76,8 @@ define [
       @set('quizSubmission.timeSpent', @calcCurrentSeconds())
 
     calcRemainingSeconds: () ->
-      (new Date(@get('endAt')).getTime() - new Date().getTime()) / MS_PER_SECOND
+      seconds = (new Date(@get('endAt')).getTime() - new Date().getTime()) / MS_PER_SECOND
+      Math.round seconds
 
     calcCurrentSeconds: ->
       started = new Date(@get('quizSubmission.startedAt'))
