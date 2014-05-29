@@ -41,7 +41,7 @@ define [
     startStopRunningTime: (  ->
       if @get('isActive') && @get('okayToReload')
         if !@get('runningTime')
-          @updateRunningTime()
+          Ember.run.next this, @updateRunningTime
         else
           Ember.run.later this, @updateRunningTime, REFRESH_DELAY
       else
