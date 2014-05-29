@@ -156,6 +156,12 @@ class MessageableUser < User
     combine_common_contexts(self.global_common_groups, other.global_common_groups)
   end
 
+  def serializable_hash(options={})
+    options[:except] ||= []
+    options[:except] << :bookmark
+    super(options)
+  end
+
   private
 
   def common_contexts_on_current_shard(common_contexts)
