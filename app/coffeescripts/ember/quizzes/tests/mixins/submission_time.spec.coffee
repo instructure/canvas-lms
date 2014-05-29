@@ -81,7 +81,7 @@ define [
     subject.set('hasActiveSubmission', true)
     subject.set('quizSubmission.endAt', twoFromNow)
     res = subject.calcRemainingSeconds()
-    equal(Math.round(res), 120)
+    equal res, 120
 
   test 'isTimeExpired correctly determines if endAt has passed', ->
     threeAgo = minutesFromNow(-3)
