@@ -191,7 +191,7 @@ class ContentMigrationsController < ApplicationController
   end
 
   def migration_plugin_supported?(plugin)
-    Array(plugin.settings && plugin.settings[:valid_contexts]).include?(@context.class.to_s)
+    Array(plugin.default_settings && plugin.default_settings[:valid_contexts]).include?(@context.class.to_s)
   end
   private :migration_plugin_supported?
 
