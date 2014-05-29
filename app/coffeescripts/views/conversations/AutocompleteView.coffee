@@ -471,7 +471,7 @@ define [
       return unless e.button == 0
       e.preventDefault() && e.stopPropagation()
       $target = $(e.currentTarget)
-      @selectedModel = @_getModel($target.data('id'))
+      @selectedModel = @resultCollection.get($target.data('id'))
       @_activateSelected(e.metaKey or e.ctrlKey)
 
     # Internal: Clear the current token.
