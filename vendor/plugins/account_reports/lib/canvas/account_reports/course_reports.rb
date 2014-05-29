@@ -29,20 +29,23 @@ module Canvas::AccountReports
       extra_text_term(@account_report)
     end
 
-    def recently_deleted
-      courses = root_account.all_courses.
+    def default_courses
+      root_account.all_courses.
         select([:id, :sis_source_id, :name, :course_code, :start_at,
-                :conclude_at, :restrict_enrollments_to_course_dates]).
-        where("workflow_state = 'deleted' AND updated_at > ?", 30.days.ago)
-      csv(courses)
+                :conclude_at, :restrict_enrollments_to_course_dates])
+    end
+
+    def recently_deleted
+      csv(default_courses.where("workflow_state = 'deleted' AND updated_at > ?",
+                                30.days.ago))
+    end
+
+    def public_courses
+      csv(default_courses.active.where(is_public: true))
     end
 
     def unpublished_courses
-      courses = root_account.all_courses.
-        select([:id, :sis_source_id, :name, :course_code, :start_at,
-                :conclude_at, :restrict_enrollments_to_course_dates]).
-        where(:workflow_state => ['claimed', 'created'])
-      csv(courses)
+      csv(default_courses.where(:workflow_state => ['claimed', 'created']))
     end
 
     def csv(courses)

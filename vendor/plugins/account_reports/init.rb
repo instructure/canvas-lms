@@ -216,7 +216,18 @@ Rails.configuration.to_prepare do
       :parameters => {
         :enrollment_term_id => {
           :required => false,
-          :description => 'The canvas id of the term to get grades from'
+          :description => 'The canvas id of the term to get unpublished courses from'
+        }
+      }
+    },
+    'public_courses_csv'=> {
+      :title => 'Public Courses',
+      :description_partial => true,
+      :parameters_partial => 'term_selector_parameters',
+      :parameters => {
+        :enrollment_term_id => {
+          :required => false,
+          :description => 'The canvas id of the term to get public courses from'
         }
       }
     },
