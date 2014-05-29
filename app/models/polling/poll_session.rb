@@ -53,6 +53,10 @@ module Polling
       end
     end
 
+    def has_submission_from?(user)
+      !!poll_submissions.find_by_user_id(user.id)
+    end
+
     def publish!
       self.is_published = true
       save!
