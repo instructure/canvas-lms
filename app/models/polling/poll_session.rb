@@ -42,7 +42,7 @@ module Polling
     end
 
     def self.available_for(user)
-      PollSession.where("course_id IN (?) OR course_section_id IN (?)",
+      PollSession.where("course_id IN (?) AND (course_section_id IS NULL OR course_section_id IN (?))",
                         user.enrollments.map(&:course_id).compact,
                         user.enrollments.map(&:course_section_id).compact)
     end
