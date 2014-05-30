@@ -1223,7 +1223,7 @@ describe DiscussionTopic do
       @context = @course
       discussion_topic_model(:user => @teacher)
       account.destroy
-      lambda { @topic.reply_from(:user => @teacher, :text => "entry") }.should raise_error(IncomingMail::IncomingMessageProcessor::UnknownAddressError)
+      lambda { @topic.reply_from(:user => @teacher, :text => "entry") }.should raise_error(IncomingMail::Errors::UnknownAddress)
     end
 
     it "should prefer html to text" do
@@ -1238,7 +1238,7 @@ describe DiscussionTopic do
       course_with_teacher
       discussion_topic_model
       @topic.lock!
-      lambda { @topic.reply_from(:user => @teacher, :text => "reply") }.should raise_error(IncomingMail::IncomingMessageProcessor::ReplyToLockedTopicError)
+      lambda { @topic.reply_from(:user => @teacher, :text => "reply") }.should raise_error(IncomingMail::Errors::ReplyToLockedTopic)
     end
 
   end
@@ -1272,6 +1272,18 @@ describe DiscussionTopic do
       @topic.unlock!
       @topic.workflow_state.should eql 'active'
       @topic.locked?.should be_false
+    end
+  end
+
+  describe "update_order" do
+    it "should handle existing null positions" do
+      topics = (1..4).map{discussion_topic_model(pinned: true)}
+      topics.each {|x| x.position = nil; x.save}
+
+      new_order = [2, 3, 4, 1]
+      ids = new_order.map {|x| topics[x-1].id}
+      topics[0].update_order(ids)
+      topics.first.list_scope.map(&:id).should == ids
     end
   end
 end

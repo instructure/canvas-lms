@@ -82,12 +82,14 @@ describe Quizzes::QuizSubmissionZipper do
         :question_type => 'file_upload_question',
         :question_text => 'ohai mark'
       }
-      quiz.generate_quiz_data; quiz.save!
+      quiz.generate_quiz_data
+      quiz.save!
       submission = quiz.generate_submission @student
       attach = create_attachment_for_file_upload_submission!(submission)
       submission.submission_data["question_#{question.id}".to_sym] = [ attach.id.to_s ]
       submission.save!
-      submission.grade_submission; quiz.reload
+      Quizzes::SubmissionGrader.new(submission).grade_submission
+      quiz.reload
       attachment = quiz.attachments.build(:filename => 'submissions.zip',
                                   :display_name => 'submissions.zip')
       attachment.workflow_state = 'to_be_zipped'; attachment.save!

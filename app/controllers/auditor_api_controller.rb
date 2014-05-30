@@ -26,8 +26,8 @@ class AuditorApiController < ApplicationController
   end
 
   def query_options
-    start_time = TimeHelper.try_parse(params[:start_time])
-    end_time = TimeHelper.try_parse(params[:end_time])
+    start_time = CanvasTime.try_parse(params[:start_time])
+    end_time = CanvasTime.try_parse(params[:end_time])
 
     options = {}
     options[:oldest] = start_time if start_time

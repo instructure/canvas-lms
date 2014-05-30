@@ -61,16 +61,16 @@ class MediaObject < ActiveRecord::Base
   # upload to complete. Wrap it in a timeout if you ever want it to give up
   # waiting.
   def self.add_media_files(attachments, wait_for_completion)
-    return unless Kaltura::ClientV3.config
+    return unless CanvasKaltura::ClientV3.config
     attachments = Array(attachments)
-    client = Kaltura::ClientV3.new
-    client.startSession(Kaltura::SessionType::ADMIN)
+    client = CanvasKaltura::ClientV3.new
+    client.startSession(CanvasKaltura::SessionType::ADMIN)
     files = []
     root_account_id = attachments.map{|a| a.root_account_id }.compact.first
     attachments.select{|a| !a.media_object }.each do |attachment|
       pseudonym = attachment.user.sis_pseudonym_for(attachment.context) if attachment.user && attachment.context.respond_to?(:root_account)
       sis_source_id, sis_user_id = "", ""
-      if Kaltura::ClientV3.config['kaltura_sis'].present? && Kaltura::ClientV3.config['kaltura_sis'] == "1"
+      if CanvasKaltura::ClientV3.config['kaltura_sis'].present? && CanvasKaltura::ClientV3.config['kaltura_sis'] == "1"
         sis_source_id = %Q[,"sis_source_id":"#{attachment.context.sis_source_id}"] if attachment.context.respond_to?('sis_source_id') && attachment.context.sis_source_id
         sis_user_id = %Q[,"sis_user_id":"#{pseudonym ? pseudonym.sis_user_id : ''}"] if pseudonym
         context_code = %Q[,"context_code":"#{[attachment.context_type, attachment.context_id].join('_').underscore}"]
@@ -110,8 +110,8 @@ class MediaObject < ActiveRecord::Base
   end
 
   def self.bulk_migration(csv, root_account_id)
-    client = Kaltura::ClientV3.new
-    client.startSession(Kaltura::SessionType::ADMIN)
+    client = CanvasKaltura::ClientV3.new
+    client.startSession(CanvasKaltura::SessionType::ADMIN)
     res = client.bulkUploadCsv(csv)
     if !res[:ready]
       MediaObject.send_later_enqueue_args(:refresh_media_files, {:run_at => 1.minute.from_now, :priority => Delayed::LOW_PRIORITY}, res[:id], [], root_account_id)
@@ -173,8 +173,8 @@ class MediaObject < ActiveRecord::Base
   end
 
   def self.refresh_media_files(bulk_upload_id, attachment_ids, root_account_id, attempt=0)
-    client = Kaltura::ClientV3.new
-    client.startSession(Kaltura::SessionType::ADMIN)
+    client = CanvasKaltura::ClientV3.new
+    client.startSession(CanvasKaltura::SessionType::ADMIN)
     res = client.bulkUploadGet(bulk_upload_id)
     if !res[:ready]
       if attempt < Setting.get('media_object_bulk_refresh_max_attempts', '5').to_i
@@ -191,8 +191,8 @@ class MediaObject < ActiveRecord::Base
   end
 
   def self.media_id_exists?(media_id)
-    client = Kaltura::ClientV3.new
-    client.startSession(Kaltura::SessionType::ADMIN)
+    client = CanvasKaltura::ClientV3.new
+    client.startSession(CanvasKaltura::SessionType::ADMIN)
     info = client.mediaGet(media_id)
     return !!info[:id]
   end
@@ -211,8 +211,8 @@ class MediaObject < ActiveRecord::Base
   end
 
   def update_title_on_kaltura
-    client = Kaltura::ClientV3.new
-    client.startSession(Kaltura::SessionType::ADMIN)
+    client = CanvasKaltura::ClientV3.new
+    client.startSession(CanvasKaltura::SessionType::ADMIN)
     res = client.mediaUpdate(self.media_id, :name => self.user_entered_title)
     if !res[:error]
       self.title = self.user_entered_title
@@ -226,7 +226,7 @@ class MediaObject < ActiveRecord::Base
   end
 
   def media_sources
-    Kaltura::ClientV3.new.media_sources(self.media_id)
+    CanvasKaltura::ClientV3.new.media_sources(self.media_id)
   end
   
   def retrieve_details_ensure_codecs(attempt=0)
@@ -252,8 +252,8 @@ class MediaObject < ActiveRecord::Base
     # From Kaltura, retrieve the title (if it's not already set)
     # and the list of valid flavors along with their id's.
     # Might as well confirm the media type while you're at it.
-    client = Kaltura::ClientV3.new
-    client.startSession(Kaltura::SessionType::ADMIN)
+    client = CanvasKaltura::ClientV3.new
+    client.startSession(CanvasKaltura::SessionType::ADMIN)
     self.data ||= {}
     entry = client.mediaGet(self.media_id)
     if entry
@@ -294,8 +294,8 @@ class MediaObject < ActiveRecord::Base
   def delete_from_remote
     return unless self.media_id
 
-    client = Kaltura::ClientV3.new
-    client.startSession(Kaltura::SessionType::ADMIN)
+    client = CanvasKaltura::ClientV3.new
+    client.startSession(CanvasKaltura::SessionType::ADMIN)
     client.mediaDelete(self.media_id)
   end
 

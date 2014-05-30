@@ -59,6 +59,7 @@ class Attachment < ActiveRecord::Base
   has_one :thumbnail, :foreign_key => "parent_id", :conditions => {:thumbnail => "thumb"}
   has_many :thumbnails, :foreign_key => "parent_id"
   has_one :crocodoc_document
+  has_one :canvadoc
 
   before_save :infer_display_name
   before_save :default_values
@@ -288,58 +289,6 @@ class Attachment < ActiveRecord::Base
       delay = Setting.get('attachment_build_media_object_delay_seconds', 10.to_s).to_i
       MediaObject.send_later_enqueue_args(:add_media_files, { :run_at => delay.seconds.from_now, :priority => Delayed::LOWER_PRIORITY }, self, false)
     end
-  end
-
-  def self.process_migration(data, migration)
-    attachments = data['file_map'] ? data['file_map']: {}
-    # TODO i18n
-    attachments.values.each do |att|
-      if !att['is_folder'] && (migration.import_object?("attachments", att['migration_id']) || migration.import_object?("files", att['migration_id']))
-        begin
-          import_from_migration(att, migration.context)
-        rescue
-          migration.add_import_warning(t('#migration.file_type', "File"), (att[:display_name] || att[:path_name]), $!)
-        end
-      end
-    end
-
-    if data[:locked_folders]
-      data[:locked_folders].each do |path|
-        # TODO i18n
-        if f = migration.context.active_folders.find_by_full_name("course files/#{path}")
-          f.locked = true
-          f.save
-        end
-      end
-    end
-    if data[:hidden_folders]
-      data[:hidden_folders].each do |path|
-        # TODO i18n
-        if f = migration.context.active_folders.find_by_full_name("course files/#{path}")
-          f.workflow_state = 'hidden'
-          f.save
-        end
-      end
-    end
-  end
-
-  def self.import_from_migration(hash, context, item=nil)
-    hash = hash.with_indifferent_access
-    hash[:migration_id] ||= hash[:attachment_id] || hash[:file_id]
-    return nil if hash[:migration_id] && hash[:files_to_import] && !hash[:files_to_import][hash[:migration_id]]
-    item ||= find_by_context_type_and_context_id_and_id(context.class.to_s, context.id, hash[:id])
-    item ||= find_by_context_type_and_context_id_and_migration_id(context.class.to_s, context.id, hash[:migration_id]) if hash[:migration_id]
-    item ||= Attachment.find_from_path(hash[:path_name], context)
-    if item
-      item.context = context
-      item.migration_id = hash[:migration_id]
-      item.locked = true if hash[:locked]
-      item.file_state = 'hidden' if hash[:hidden]
-      item.display_name = hash[:display_name] if hash[:display_name]
-      item.save_without_broadcasting!
-      context.imported_migration_items << item if context.imported_migration_items
-    end
-    item
   end
 
   def assert_attachment
@@ -837,7 +786,7 @@ class Attachment < ActiveRecord::Base
       to_use = thumbnail_for_size(geometry) || self.thumbnail
       to_use.cached_s3_url
     elsif self.media_object && self.media_object.media_id
-      Kaltura::ClientV3.new.thumbnail_url(self.media_object.media_id,
+      CanvasKaltura::ClientV3.new.thumbnail_url(self.media_object.media_id,
                                           :width => options[:width] || 140,
                                           :height => options[:height] || 100,
                                           :vid_sec => options[:video_seconds] || 5)
@@ -1328,9 +1277,19 @@ class Attachment < ActiveRecord::Base
       CrocodocDocument::MIME_TYPES.include?(content_type)
   end
 
+  def canvadocable?
+    Canvadocs.enabled? && Canvadoc.mime_types.include?(content_type)
+  end
+
   def self.submit_to_scribd(ids)
     Attachment.find_all_by_id(ids).compact.each do |attachment|
       attachment.submit_to_scribd! rescue nil
+    end
+  end
+
+  def self.submit_to_canvadocs(ids)
+    Attachment.find_each(ids).each do |a|
+      a.submit_to_canvadocs
     end
   end
 
@@ -1353,11 +1312,12 @@ class Attachment < ActiveRecord::Base
   end
 
   def needs_scribd_doc?
-    if self.scribd_attempts >= MAX_SCRIBD_ATTEMPTS
+    if Canvadocs.enabled?
+      return false
+    elsif self.scribd_attempts >= MAX_SCRIBD_ATTEMPTS
       self.mark_errored
       false
-    end
-    if self.scribd_doc?
+    elsif self.scribd_doc?
       Scribd::API.instance.user = scribd_user
       begin
         status = self.scribd_doc.conversion_status
@@ -1427,6 +1387,31 @@ class Attachment < ActiveRecord::Base
       return true
     else
       return false
+    end
+  end
+
+  def submit_to_canvadocs(attempt = 1, opts = {})
+    # ... or crocodoc (this will go away soon)
+    return if Attachment.skip_3rd_party_submits?
+
+    if opts[:wants_annotation] && crocodocable?
+      submit_to_crocodoc(attempt)
+    elsif canvadocable?
+      doc = canvadoc || create_canvadoc
+      doc.upload
+      update_attribute(:workflow_state, 'processing')
+    end
+  rescue => e
+    update_attribute(:workflow_state, 'errored')
+    ErrorReport.log_exception(:canvadocs, e, :attachment_id => id)
+
+    if attempt <= Setting.get('max_canvadocs_attempts', '5').to_i
+      send_later_enqueue_args :submit_to_canvadocs, {
+        :n_strand => 'canvadocs_retries',
+        :run_at => (5 * attempt).minutes.from_now,
+        :max_attempts => 1,
+        :priority => Delayed::LOW_PRIORITY,
+      }, attempt + 1, opts
     end
   end
 
@@ -1740,6 +1725,10 @@ class Attachment < ActiveRecord::Base
     crocodoc_document.try(:available?)
   end
 
+  def canvadoc_available?
+    canvadoc.try(:available?)
+  end
+
   def view_inline_ping_url
     "/#{context_url_prefix}/files/#{self.id}/inline_view"
   end
@@ -1759,6 +1748,16 @@ class Attachment < ActiveRecord::Base
     else
       nil
     end
+  end
+
+  def canvadoc_url(user)
+    return unless canvadocable?
+    blob = {
+      user_id: user.global_id,
+      attachment_id: id,
+    }.to_json
+    hmac = Canvas::Security.hmac_sha1(blob)
+    "/canvadoc_session?blob=#{URI.encode blob}&hmac=#{URI.encode hmac}"
   end
 
   def check_rerender_scribd_doc

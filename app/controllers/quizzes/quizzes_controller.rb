@@ -18,7 +18,6 @@
 
 class Quizzes::QuizzesController < ApplicationController
   include Api::V1::Quiz
-  include Api::V1::QuizReport
   include Api::V1::AssignmentOverride
   include KalturaHelper
   include Filters::Quizzes
@@ -26,7 +25,7 @@ class Quizzes::QuizzesController < ApplicationController
   before_filter :require_context
   add_crumb(proc { t('#crumbs.quizzes', "Quizzes") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_quizzes_url }
   before_filter { |c| c.active_tab = "quizzes" }
-  before_filter :require_quiz, :only => [:statistics, :edit, :show, :history, :update, :destroy, :moderate, :read_only, :managed_quiz_data, :submission_versions]
+  before_filter :require_quiz, :only => [:statistics, :edit, :show, :history, :update, :destroy, :moderate, :read_only, :managed_quiz_data, :submission_versions, :submission_html]
   before_filter :set_download_submission_dialog_title , only: [:show,:statistics]
   # The number of questions that can display "details". After this number, the "Show details" option is disabled
   # and the data is not even loaded.
@@ -35,8 +34,8 @@ class Quizzes::QuizzesController < ApplicationController
 
   def index
     if authorized_action(@context, @current_user, :read)
-      if @context.root_account.enable_fabulous_quizzes?
-        redirect_to fabulous_quizzes_course_quizzes_path
+      if @context.root_account.enable_fabulous_quizzes? && @context.feature_enabled?(:draft_state)
+        redirect_to ember_urls.course_quizzes_url
       end
       return unless tab_enabled?(@context.class::TAB_QUIZZES)
       @quizzes = @context.quizzes.active.include_assignment.sort_by{|q| [(q.assignment ? q.assignment.due_at : q.lock_at) || CanvasSort::Last, Canvas::ICU.collation_key(q.title || CanvasSort::First)]}
@@ -74,7 +73,7 @@ class Quizzes::QuizzesController < ApplicationController
       @submissions_hash = {}
       @current_user && @current_user.quiz_submissions.where('quizzes.context_id=? AND quizzes.context_type=?', @context, @context.class.to_s).includes(:quiz).each do |s|
         if s.needs_grading?
-          s.grade_submission(:finished_at => s.end_at)
+          Quizzes::SubmissionGrader.new(s).grade_submission(:finished_at => s.end_at)
           s.reload
         end
         @submissions_hash[s.quiz_id] = s
@@ -87,7 +86,6 @@ class Quizzes::QuizzesController < ApplicationController
     if !@context.root_account.enable_fabulous_quizzes? || !authorized_action(@context, @current_user, :read)
       redirect_to course_quizzes_path
     end
-    @body_classes << 'with_item_groups'
     js_env(:PERMISSIONS => {
       :create  => can_do(@context.quizzes.scoped.new, @current_user, :create),
       :manage  => can_do(@context, @current_user, :manage_assignments)
@@ -99,11 +97,17 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def show
+    if @context.root_account.enable_fabulous_quizzes? && @context.feature_enabled?(:draft_state)
+      redirect_to ember_urls.course_quiz_url(@quiz.id)
+      return
+    end
+
     if @quiz.deleted?
       flash[:error] = t('errors.quiz_deleted', "That quiz has been deleted")
       redirect_to named_context_url(@context, :context_quizzes_url)
       return
     end
+
     if authorized_action(@quiz, @current_user, :read)
       # optionally force auth even for public courses
       return if value_to_boolean(params[:force_user]) && !force_user
@@ -139,7 +143,7 @@ class Quizzes::QuizzesController < ApplicationController
 
       @just_graded = false
       if @submission && @submission.needs_grading?(!!params[:take])
-        @submission.grade_submission(:finished_at => @submission.end_at)
+        Quizzes::SubmissionGrader.new(@submission).grade_submission(:finished_at => @submission.end_at)
         @submission.reload
         @just_graded = true
       end
@@ -398,6 +402,11 @@ class Quizzes::QuizzesController < ApplicationController
 
   # student_analysis report
   def statistics
+    if @context.root_account.enable_fabulous_quizzes? && @context.feature_enabled?(:draft_state)
+      redirect_to ember_urls.course_quiz_statistics_url(@quiz.id)
+      return
+    end
+
     if authorized_action(@quiz, @current_user, :read_statistics)
         respond_to do |format|
           format.html {
@@ -416,14 +425,17 @@ class Quizzes::QuizzesController < ApplicationController
               ]
             end
 
-            js_env :quiz_reports => Quizzes::QuizStatistics::REPORTS.map { |report_type|
-              report = @quiz.current_statistics_for(report_type, :includes_all_versions => all_versions)
-              json = quiz_report_json(report, @current_user, session, :include => ['file'])
-              json[:course_id] = @context.id
-              json[:report_disabled] = @quiz.survey? && report_type == "item_analysis"
-              json[:report_name] = report.readable_type
-              json[:progress] = progress_json(report.progress, @current_user, session) if report.progress
-              json
+            js_env quiz_reports: Quizzes::QuizStatistics::REPORTS.map { |report_type|
+              report = @quiz.current_statistics_for(report_type, {
+                includes_all_versions: all_versions
+              })
+
+              Quizzes::QuizReportSerializer.new(report, {
+                controller: self,
+                scope: @current_user,
+                root: false,
+                includes: %w[ file progress ]
+              }).as_json
             }
           }
         end
@@ -487,7 +499,7 @@ class Quizzes::QuizzesController < ApplicationController
       @submission = nil if @submission && @submission.settings_only?
       @user = @submission && @submission.user
       if @submission && @submission.needs_grading?
-        @submission.grade_submission(:finished_at => @submission.end_at)
+        Quizzes::SubmissionGrader.new(@submission).grade_submission(:finished_at => @submission.end_at)
         @submission.reload
       end
       setup_attachments
@@ -541,6 +553,11 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def moderate
+    if @context.root_account.enable_fabulous_quizzes? && @context.feature_enabled?(:draft_state)
+      redirect_to ember_urls.course_quiz_moderate_url(@quiz.id)
+      return
+    end
+
     if authorized_action(@quiz, @current_user, :grade)
       @all_students = @context.students_visible_to(@current_user).order_by_sortable_name
       @students = @all_students
@@ -579,6 +596,16 @@ class Quizzes::QuizzesController < ApplicationController
       add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
       js_env(quiz_max_combination_count: QUIZ_MAX_COMBINATION_COUNT)
       render
+    end
+  end
+
+  def submission_html
+    @submission = get_submission
+    setup_attachments
+    if @submission && @submission.completed?
+      render layout: false
+    else
+      render nothing: true
     end
   end
 
@@ -748,5 +775,12 @@ class Quizzes::QuizzesController < ApplicationController
   def set_download_submission_dialog_title
     js_env SUBMISSION_DOWNLOAD_DIALOG_TITLE: I18n.t('#quizzes.download_all_quiz_file_upload_submissions',
                                                     'Download All Quiz File Upload Submissions')
+  end
+
+  # give us some helper methods for linking to the ember pages
+  def ember_urls
+    @ember_urls ||= CanvasEmberUrl::UrlMappings.new(
+      :course_quizzes => fabulous_quizzes_course_quizzes_url
+    )
   end
 end

@@ -324,7 +324,13 @@ a[class*=icon-], a[class^=icon-] {
 
 .standalone-icon {
   // use to make standalone icons within links display as dark gray, not default link blue
-  &:before { color: #555; }
+  &:before {
+    @if $use_high_contrast {
+      color: #444;
+    } @else {
+      color: #555;
+    }
+  }
 }
 
 // change vertical alignment of icons used with common typographic elements to line them up better

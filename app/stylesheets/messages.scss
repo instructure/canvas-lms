@@ -87,7 +87,7 @@ table.grid tr:first-child td {
   white-space: nowrap;
 
   &.label-sent, &.label-dashboard {
-    background-color: #468847;
+    background-color: $successText;
   }
 
   &.label-created, &.label-staged, &.label-sending {

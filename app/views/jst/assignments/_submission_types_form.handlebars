@@ -37,7 +37,7 @@
           </strong>
         </div>
 
-        <label class="checkbox">
+        <label class="checkbox" for="assignment_text_entry">
           {{checkbox "acceptsOnlineTextEntries"
             id="assignment_text_entry"
             name="online_submission_types[online_text_entry]"
@@ -45,7 +45,7 @@
           {{#t "labels.allow_text_entry"}}Text Entry{{/t}}
         </label>
 
-        <label class="checkbox">
+        <label class="checkbox" for="assignment_online_url">
           {{checkbox "acceptsOnlineURL"
             id="assignment_online_url"
             name="online_submission_types[online_url]"
@@ -53,7 +53,7 @@
           {{#t "labels.allow_url"}}Website URL{{/t}}
         </label>
         {{#if kalturaEnabled}}
-          <label class="checkbox">
+          <label class="checkbox" for="assignment_media_recording">
             {{checkbox "acceptsMediaRecording"
               id="assignment_media_recording"
               name="online_submission_types[media_recording]"

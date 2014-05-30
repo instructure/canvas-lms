@@ -900,39 +900,22 @@ describe "context_modules" do
     end
 
     it "should preserve completion criteria after indent change" do
+      mod = @course.context_modules.create! name: 'Test Module'
+      tag = mod.add_item(type: 'assignment', id: @assignment2.id)
+      mod.completion_requirements = {tag.id => {type: 'must_submit'}}
+      mod.save!
+
       get "/courses/#{@course.id}/modules"
 
-      add_existing_module_item('#assignments_select', 'Assignment', @assignment2.title)
-      tag = ContentTag.last
-
-      # add completion criterion
-      context_module = f('.context_module')
-      driver.action.move_to(context_module).perform
-      f('.admin-links.al-trigger').click
-      f('.edit_module_link').click
-      edit_form = f('#add_context_module_form')
-      f('.add_completion_criterion_link', edit_form).click
-      wait_for_ajaximations
-      click_option('#add_context_module_form .assignment_picker', @assignment2.title, :text)
-      click_option('#add_context_module_form .assignment_requirement_picker', 'must_contribute', :value)
-      submit_form(edit_form)
-      wait_for_ajax_requests
-
-      # verify it shows up (both visually and in the template data)
-      module_item = f("#context_module_item_#{tag.id}")
-      module_item.attribute('class').split.should include 'must_contribute_requirement'
-      f('.criterion', module_item).attribute('class').split.should include 'defined'
-      driver.execute_script("return $('#context_module_item_#{tag.id} .criterion_type').text()").should == "must_contribute"
-
-      # now indent the item
+      # indent the item
       driver.execute_script("$('#context_module_item_#{tag.id} .indent_item_link').hover().click()")
       wait_for_ajaximations
 
       # make sure the completion criterion was preserved
       module_item = f("#context_module_item_#{tag.id}")
-      module_item.attribute('class').split.should include 'must_contribute_requirement'
+      module_item.attribute('class').split.should include 'must_submit_requirement'
       f('.criterion', module_item).attribute('class').split.should include 'defined'
-      driver.execute_script("return $('#context_module_item_#{tag.id} .criterion_type').text()").should == "must_contribute"
+      driver.execute_script("return $('#context_module_item_#{tag.id} .criterion_type').text()").should == "must_submit"
     end
 
     it "should show a vdd tooltip summary for assignments with multiple due dates" do

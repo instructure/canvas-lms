@@ -1586,6 +1586,7 @@ define([
                       attachment_id: data.id,
                       height: '100%',
                       crocodoc_session_url: data.crocodocSession,
+                      canvadoc_session_url: data.canvadoc_session_url,
                       scribd_doc_id: data.scribd_doc && data.scribd_doc.attributes && data.scribd_doc.attributes.doc_id,
                       scribd_access_key: data.scribd_doc && data.scribd_doc.attributes && data.scribd_doc.attributes.access_key,
                       attachment_view_inline_ping_url: files.viewInlinePingUrl(data.context_string, data.id),
@@ -1593,7 +1594,10 @@ define([
                       attachment_preview_processing: data.workflow_state == 'pending_upload' || data.workflow_state == 'processing'
                     });
                   };
-                  if (data.permissions && data.permissions.download && $.isPreviewable(data.content_type)) {
+                  if (data.canvadoc_session_url) {
+                    showPreview();
+                  }
+                  else if (data.permissions && data.permissions.download && $.isPreviewable(data.content_type)) {
                     if (data['crocodoc_available?'] && !data.crocodocSession) {
                       $preview.disableWhileLoading(
                         $.ajaxJSON(

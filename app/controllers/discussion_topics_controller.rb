@@ -683,7 +683,6 @@ class DiscussionTopicsController < ApplicationController
       end
       if !@topic.errors.any? && !@topic.root_topic.try(:errors).try(:any?)
         log_asset_access(@topic, 'topics', 'topics', 'participate')
-        generate_new_page_view
 
         apply_positioning_parameters
         apply_attachment_parameters

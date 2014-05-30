@@ -16,12 +16,8 @@ end
 routes.draw do
   resources :submission_comments, :only => :destroy
 
-  match 'inbox' => 'context#mark_inbox_as_read', :as => :mark_inbox_as_read, :via => :delete
   match 'inbox' => 'context#inbox', :as => :inbox
-  match 'inbox/:id' => 'context#destroy_inbox_item', :as => :destroy_inbox_item, :via => :delete
-  match 'inbox/:id' => 'context#inbox_item', :as => :inbox_item
 
-  match 'conversations/discussion_replies' => 'context#discussion_replies', :as => :discussion_replies
   match 'conversations/unread' => 'conversations#index', :as => :conversations_unread, :redirect_scope => 'unread'
   match 'conversations/starred' => 'conversations#index', :as => :conversations_starred, :redirect_scope => 'starred'
   match 'conversations/sent' => 'conversations#index', :as => :conversations_sent, :redirect_scope => 'sent'
@@ -232,8 +228,7 @@ routes.draw do
       end
     end
 
-    resource :gradebook2, :controller => :gradebook2
-    match 'screenreader_gradebook' => 'gradebook2#screenreader'
+    match 'gradebook2' => "gradebooks#gradebook2"
 
     match 'attendance' => 'gradebooks#attendance', :as => :attendance
     match 'attendance/:user_id' => 'gradebooks#attendance', :as => :attendance_user
@@ -314,6 +309,7 @@ routes.draw do
       match 'history' => 'quizzes/quizzes#history', :as => :history
       match 'statistics' => 'quizzes/quizzes#statistics', :as => :statistics
       match 'read_only' => 'quizzes/quizzes#read_only', :as => :read_only
+      match 'submission_html' => 'quizzes/quizzes#submission_html', :as => :submission_html
 
       collection do
         get :fabulous_quizzes
@@ -410,6 +406,7 @@ routes.draw do
 
   match '/submissions/:submission_id/attachments/:attachment_id/crocodoc_sessions' => 'crocodoc_sessions#create', :via => :post
   match '/attachments/:attachment_id/crocodoc_sessions' => 'crocodoc_sessions#create', :via => :post
+  match '/canvadoc_session' => 'canvadoc_sessions#show', :via => :get, :as => :canvadoc_session
 
   resources :page_views, :only => [:update]
   match 'media_objects' => 'context#create_media_object', :as => :create_media_object, :via => :post
@@ -843,6 +840,7 @@ routes.draw do
       get  'courses/:course_id/files', :controller => :files, :action => :api_index, :path_name => 'course_files'
       post 'courses/:course_id/files', :action => :create_file, :path_name => 'course_create_file'
       post 'courses/:course_id/folders', :controller => :folders, :action => :create
+      get 'courses/:course_id/folders/by_path/*full_path', :controller => :folders, :action => :resolve_path
       get  'courses/:course_id/folders/:id', :controller => :folders, :action => :show, :path_name => 'course_folder'
       put  'accounts/:account_id/courses', :action => :batch_update
     end
@@ -948,19 +946,23 @@ routes.draw do
     end
 
     scope(:controller => :content_migrations) do
-      get 'courses/:course_id/content_migrations/migrators', :action => :available_migrators, :path_name => 'course_content_migration_migrators_list'
-      get 'courses/:course_id/content_migrations/:id', :action => :show, :path_name => 'course_content_migration'
-      get 'courses/:course_id/content_migrations', :action => :index, :path_name => 'course_content_migration_list'
-      post 'courses/:course_id/content_migrations', :action => :create, :path_name => 'course_content_migration_create'
-      put 'courses/:course_id/content_migrations/:id', :action => :update, :path_name => 'course_content_migration_update'
-      get 'courses/:course_id/content_migrations/:id/selective_data', :action => :content_list, :path_name => 'course_content_migration_selective_data'
+      %w(course group user).each do |context|
+        get "#{context.pluralize}/:#{context}_id/content_migrations/migrators", :action => :available_migrators, :path_name => "#{context}_content_migration_migrators_list"
+        get "#{context.pluralize}/:#{context}_id/content_migrations/:id", :action => :show, :path_name => "#{context}_content_migration"
+        get "#{context.pluralize}/:#{context}_id/content_migrations", :action => :index, :path_name => "#{context}_content_migration_list"
+        post "#{context.pluralize}/:#{context}_id/content_migrations", :action => :create, :path_name => "#{context}_content_migration_create"
+        put "#{context.pluralize}/:#{context}_id/content_migrations/:id", :action => :update, :path_name => "#{context}_content_migration_update"
+        get "#{context.pluralize}/:#{context}_id/content_migrations/:id/selective_data", :action => :content_list, :path_name => "#{context}_content_migration_selective_data"
+      end
     end
 
     scope(:controller => :migration_issues) do
-      get 'courses/:course_id/content_migrations/:content_migration_id/migration_issues/:id', :action => :show, :path_name => 'course_content_migration_migration_issue'
-      get 'courses/:course_id/content_migrations/:content_migration_id/migration_issues', :action => :index, :path_name => 'course_content_migration_migration_issue_list'
-      post 'courses/:course_id/content_migrations/:content_migration_id/migration_issues', :action => :create, :path_name => 'course_content_migration_migration_issue_create'
-      put 'courses/:course_id/content_migrations/:content_migration_id/migration_issues/:id', :action => :update, :path_name => 'course_content_migration_migration_issue_update'
+      %w(course group user).each do |context|
+        get "#{context.pluralize}/:#{context}_id/content_migrations/:content_migration_id/migration_issues/:id", :action => :show, :path_name => "#{context}_content_migration_migration_issue"
+        get "#{context.pluralize}/:#{context}_id/content_migrations/:content_migration_id/migration_issues", :action => :index, :path_name => "#{context}_content_migration_migration_issue_list"
+        post "#{context.pluralize}/:#{context}_id/content_migrations/:content_migration_id/migration_issues", :action => :create, :path_name => "#{context}_content_migration_migration_issue_create"
+        put "#{context.pluralize}/:#{context}_id/content_migrations/:content_migration_id/migration_issues/:id", :action => :update, :path_name => "#{context}_content_migration_migration_issue_update"
+      end
     end
 
     scope(:controller => :discussion_topics_api) do
@@ -1050,6 +1052,7 @@ routes.draw do
       post 'users/:user_id/files', :action => :create_file
 
       post 'users/:user_id/folders', :controller => :folders, :action => :create
+      get 'users/:user_id/folders/by_path/*full_path', :controller => :folders, :action => :resolve_path
       get 'users/:user_id/folders/:id', :controller => :folders, :action => :show, :path_name => 'user_folder'
 
       get 'users/:id/settings', controller: 'users', action: 'settings'
@@ -1214,6 +1217,7 @@ routes.draw do
       end
 
       post 'groups/:group_id/folders', :controller => :folders, :action => :create
+      get 'groups/:group_id/folders/by_path/*full_path', :controller => :folders, :action => :resolve_path
       get 'groups/:group_id/folders/:id', :controller => :folders, :action => :show, :path_name => 'group_folder'
     end
 
@@ -1334,6 +1338,11 @@ routes.draw do
       post "courses/:course_id/quizzes/:id/reorder", :action => :reorder, :path_name => 'course_quiz_reorder'
     end
 
+    scope(:controller => 'quizzes/quiz_submission_users') do
+      get "courses/:course_id/quizzes/:id/submission_users", :action => :index, :path_name => 'course_quiz_submission_users'
+      post "courses/:course_id/quizzes/:id/submission_users/message", :action => :message, :path_name => 'course_quiz_submission_users_message'
+    end
+
     scope(:controller => 'quizzes/quiz_groups') do
       post "courses/:course_id/quizzes/:quiz_id/groups", :action => :create, :path_name => 'course_quiz_group_create'
       put "courses/:course_id/quizzes/:quiz_id/groups/:id", :action => :update, :path_name => 'course_quiz_group_update'
@@ -1351,6 +1360,7 @@ routes.draw do
 
     scope(:controller => 'quizzes/quiz_reports') do
       post "courses/:course_id/quizzes/:quiz_id/reports", :action => :create, :path_name => 'course_quiz_reports_create'
+      get "courses/:course_id/quizzes/:quiz_id/reports", :action => :index, :path_name => 'course_quiz_reports'
       get "courses/:course_id/quizzes/:quiz_id/reports/:id", :action => :show, :path_name => 'course_quiz_report'
     end
 
@@ -1366,7 +1376,7 @@ routes.draw do
       post 'courses/:course_id/quizzes/:quiz_id/submissions/:id/complete', :action => :complete, :path_name => 'course_quiz_submission_complete'
     end
 
-    scope(:controller => :quiz_submission_questions) do
+    scope(:controller => 'quizzes/quiz_submission_questions') do
       get '/quiz_submissions/:quiz_submission_id/questions', :action => :index, :path_name => 'quiz_submission_questions'
       get '/quiz_submissions/:quiz_submission_id/questions/:id', :action => :show, :path_name => 'quiz_submission_question'
       put '/quiz_submissions/:quiz_submission_id/questions/:id', :action => :answer, :path_name => 'quiz_submission_question_answer'
@@ -1376,6 +1386,9 @@ routes.draw do
 
     scope(:controller => 'quizzes/quiz_ip_filters') do
       get 'courses/:course_id/quizzes/:quiz_id/ip_filters', :action => :index, :path_name => 'course_quiz_ip_filters'
+    end
+    scope(:controller => 'quizzes/quiz_statistics') do
+      get 'courses/:course_id/quizzes/:quiz_id/statistics', :action => :index, :path_name => 'course_quiz_statistics'
     end
 
     scope(:controller => :outcome_groups_api) do

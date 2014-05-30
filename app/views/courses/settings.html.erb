@@ -84,20 +84,31 @@
         <td class="form-label"><%= f.blabel :account_id, :en => "Department" %></td>
         <td>
           <span class="course_form">
-            <% if can_do(@context.root_account, @current_user, :manage_courses) %>
-              <% if @context.root_account.all_accounts.count > 500 %>
-                <a href="<%= context_url(@context.root_account, :context_sub_accounts_url, :format => :json) %>" id="course_account_id_url" style="display: none;">&nbsp;</a>
-                <input type="hidden" name="course[account_id]" id="course_account_id" value="<%= @context.account_id %>"/>
-                <input type="text" name="account[name]" id="course_account_id_lookup" value="<%= @context.account.name %>" style="width: 150px;"/>
-              <% else %>
-                <select name="course[account_id]" id="course_account_id">
-                  <%= render :partial => "shared/account_options", :locals => {:account => @context.root_account} %>
-                </select>
+            <% can_edit_account = false %>
+            <% account_chain = @context.account.account_chain.reverse %>
+            <% account_chain.each do |account| %>
+              <% if can_do(account, @current_user, :manage_courses) %>
+                <% if account.root_account? && account.all_accounts.count > 500 %>
+                  <a href="<%= context_url(account, :context_sub_accounts_url, :format => :json) %>" id="course_account_id_url" style="display: none;">&nbsp;</a>
+                  <input type="hidden" name="course[account_id]" id="course_account_id" value="<%= @context.account_id %>"/>
+                  <input type="text" name="account[name]" id="course_account_id_lookup" value="<%= @context.account.name %>" style="width: 150px;"/>
+                <% else %>
+                  <select name="course[account_id]" id="course_account_id">
+                    <%= render :partial => "shared/account_options", :locals => {:account => account} %>
+                  </select>
+                <% end %>
+
+                <% can_edit_account = true %>
+                <% break %>
               <% end %>
-            <% elsif can_do(@context.account, @current_user, :read) %>
-              <%= link_to @context.account.name, account_url(@context.account.id) %>
-            <% else %>
-              <%= @context.account.name %>
+            <% end %>
+
+            <% unless can_edit_account %>
+              <% if can_do(@context.account, @current_user, :read) %>
+                <%= link_to @context.account.name, account_url(@context.account.id) %>
+              <% else %>
+                <%= @context.account.name %>
+              <% end %>
             <% end %>
           </span>
           <span class="course_info account_name">

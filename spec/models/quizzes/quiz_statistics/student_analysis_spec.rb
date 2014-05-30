@@ -25,7 +25,17 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
 
   it 'should calculate mean/stddev as expected with a few submissions' do
     q = @course.quizzes.create!
+    question = q.quiz_questions.create!({
+      question_data: {
+        name: 'q1',
+        points_possible: 30,
+        question_type: 'essay_question',
+        question_text: 'ohai mark'
+      }
+    })
+    q.generate_quiz_data
     q.save!
+
     @user1 = User.create! :name => "some_user 1"
     @user2 = User.create! :name => "some_user 2"
     @user3 = User.create! :name => "some_user 2"
@@ -34,31 +44,37 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     student_in_course :course => @course, :user => @user3
     sub = q.generate_submission(@user1)
     sub.workflow_state = 'complete'
-    sub.submission_data = [{ :points => 15, :text => "", :correct => "undefined", :question_id => -1 }]
+    sub.submission_data = [{ :points => 15, :text => "", :correct => "undefined", :question_id => question.id }]
+    sub.score = 15
     sub.with_versioning(true, &:save!)
     stats = q.statistics
     stats[:submission_score_average].should == 15
     stats[:submission_score_high].should == 15
     stats[:submission_score_low].should == 15
     stats[:submission_score_stdev].should == 0
+    stats[:submission_scores].should == { 50 => 1 }
     sub = q.generate_submission(@user2)
     sub.workflow_state = 'complete'
-    sub.submission_data = [{ :points => 17, :text => "", :correct => "undefined", :question_id => -1 }]
+    sub.submission_data = [{ :points => 17, :text => "", :correct => "undefined", :question_id => question.id }]
+    sub.score = 17
     sub.with_versioning(true, &:save!)
     stats = q.statistics
     stats[:submission_score_average].should == 16
     stats[:submission_score_high].should == 17
     stats[:submission_score_low].should == 15
     stats[:submission_score_stdev].should == 1
+    stats[:submission_scores].should == { 50 => 1, 57 => 1 }
     sub = q.generate_submission(@user3)
     sub.workflow_state = 'complete'
-    sub.submission_data = [{ :points => 20, :text => "", :correct => "undefined", :question_id => -1 }]
+    sub.submission_data = [{ :points => 20, :text => "", :correct => "undefined", :question_id => question.id }]
+    sub.score = 20
     sub.with_versioning(true, &:save!)
     stats = q.statistics
     stats[:submission_score_average].should be_close(17 + 1.0/3, 0.0000000001)
     stats[:submission_score_high].should == 20
     stats[:submission_score_low].should == 15
     stats[:submission_score_stdev].should be_close(Math::sqrt(4 + 2.0/9), 0.0000000001)
+    stats[:submission_scores].should == { 50 => 1, 57 => 1, 67 => 1 }
   end
 
   context "csv" do
@@ -90,7 +106,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
 
       @quiz_submission = @quiz.generate_submission(temporary_user_code)
       @quiz_submission.mark_completed
-      @quiz_submission.grade_submission
+      Quizzes::SubmissionGrader.new(@quiz_submission).grade_submission
       @quiz_submission.save!
     end
 
@@ -107,7 +123,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       @quiz.update_attribute :anonymous_submissions, true
       # one complete submission
       qs = @quiz.generate_submission(@student)
-      qs.grade_submission
+      Quizzes::SubmissionGrader.new(qs).grade_submission
 
       # and one in progress
       @quiz.generate_submission(@student)
@@ -139,7 +155,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       @student.save!
       # one complete submission
       qs = @quiz.generate_submission(@student)
-      qs.grade_submission
+      Quizzes::SubmissionGrader.new(qs).grade_submission
 
       stats = CSV.parse(csv(:include_all_versions => true))
       stats.last[0].should == "nobody@example.com"
@@ -180,7 +196,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       qs.submission_data = {
           "question_#{@quiz.quiz_questions[2].id}_#{AssessmentQuestion.variable_id('ans1')}" => 'baz'
       }
-      qs.grade_submission
+      Quizzes::SubmissionGrader.new(qs).grade_submission
       stats = CSV.parse(csv)
       stats.last.size.should == 16 # 3 questions * 2 lines + ten more (name, id, sis_id, section, section_id, section_sis_id, submitted, correct, incorrect, score)
       stats.last[11].should == ',baz'
@@ -201,7 +217,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       qs.submission_data = {
         "question_#{@quiz.quiz_questions[1].id}" => 5
       }
-      qs.grade_submission
+      Quizzes::SubmissionGrader.new(qs).grade_submission
 
       stats = CSV.parse(csv)
       stats.last[9].should == '5'
@@ -233,11 +249,11 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       :uploaded_data => io
     qs.submission_data["question_#{question.id}".to_sym] = [ attach.id.to_s ]
     qs.save!
-    qs.grade_submission
+    Quizzes::SubmissionGrader.new(qs).grade_submission
     qs = q.generate_submission student2
     qs.submission_data["question_#{question.id}".to_sym] = nil
     qs.save!
-    qs.grade_submission
+    Quizzes::SubmissionGrader.new(qs).grade_submission
     # make student2's submission first
     qs.updated_at = 3.days.ago
     qs.save!
@@ -260,7 +276,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
         "question_#{q.quiz_data[1][:id]}_answer_#{q.quiz_data[1][:answers][0][:id]}" => "1",
         "question_#{q.quiz_data[1][:id]}_answer_#{q.quiz_data[1][:answers][1][:id]}" => "1"
     }
-    qs.grade_submission
+    Quizzes::SubmissionGrader.new(qs).grade_submission
 
     # visual statistics
     stats = q.statistics

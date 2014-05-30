@@ -169,6 +169,7 @@ describe "AuthenticationAudit API", type: :request do
         it "should be formatted as an array of Account objects" do
           @json.should == [{
             "id" => @account.id,
+            "integration_id" => @account.integration_id,
             "name" => @account.name,
             "parent_account_id" => nil,
             "root_account_id" => nil,
@@ -324,6 +325,16 @@ describe "AuthenticationAudit API", type: :request do
     describe "permissions" do
       before do
         @user, @viewing_user = @user, user_model
+      end
+
+      it "should not allow other account models" do
+        new_root_account = Account.create!(name: 'New Account')
+        LoadAccount.stubs(:default_domain_root_account).returns(new_root_account)
+        @user, @pseudonym, @viewing_user = @user, @pseudonym, user_with_pseudonym(account: new_root_account)
+
+        fetch_for_context(@pseudonym, expected_status: 401, type: 'login')
+        fetch_for_context(@account, expected_status: 401)
+        fetch_for_context(@user, expected_status: 401)
       end
 
       context "no permission on account" do

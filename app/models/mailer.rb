@@ -102,7 +102,7 @@ class Mailer < ActionMailer::Base
 
     params = {
       from: "#{m.from_name || HostUrl.outgoing_email_default_name} <" + HostUrl.outgoing_email_address + ">",
-      reply_to: ReplyToAddress.new(m).address,
+      reply_to: IncomingMail::ReplyToAddress.new(m).address,
       to: m.to,
       subject: m.subject
     }

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2014 Instructure, Inc.
+# Copyright (C) 2011 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -38,6 +38,11 @@
 #         "sis_section_id": {
 #           "description": "The sis id of the section. This field is only included if the user has permission to view SIS information.",
 #           "example": "s34643",
+#           "type": "string"
+#         },
+#         "integration_id": {
+#           "description": "Optional: The integration ID of the section.",
+#           "example": "3452342345",
 #           "type": "string"
 #         },
 #         "sis_import_id": {

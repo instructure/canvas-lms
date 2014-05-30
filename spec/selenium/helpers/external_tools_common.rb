@@ -154,6 +154,12 @@ shared_examples_for "external tools tests" do
         <lticm:property name="url">https://example.com/attendance</lticm:property>
         <lticm:property name="text">Attendance</lticm:property>
       </lticm:options>
+      <lticm:options name="migration_selection">
+        <lticm:property name="url">https://example.com/wiki</lticm:property>
+        <lticm:property name="text">Build/Link to Wiki Page</lticm:property>
+        <lticm:property name="selection_width">500</lticm:property>
+        <lticm:property name="selection_height">300</lticm:property>
+      </lticm:options>
     XML
     f("#external_tool_config_xml").send_keys <<-XML
       <lticm:options name="user_navigation">

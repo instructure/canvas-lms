@@ -255,18 +255,18 @@ shared_examples_for 'a backend' do
     end
 
     it "should not interfere with jobs with no strand" do
-      job1 = create_job(:strand => nil)
-      job2 = create_job(:strand => 'myjobs')
-      Delayed::Job.get_and_lock_next_available('w1').should == job1
-      Delayed::Job.get_and_lock_next_available('w2').should == job2
+      jobs = [create_job(:strand => nil), create_job(:strand => 'myjobs')]
+      locked = [Delayed::Job.get_and_lock_next_available('w1'),
+                Delayed::Job.get_and_lock_next_available('w2')]
+      jobs.should =~ locked
       Delayed::Job.get_and_lock_next_available('w3').should == nil
     end
 
     it "should not interfere with jobs in other strands" do
-      job1 = create_job(:strand => 'strand1')
-      job2 = create_job(:strand => 'strand2')
-      Delayed::Job.get_and_lock_next_available('w1').should == job1
-      Delayed::Job.get_and_lock_next_available('w2').should == job2
+      jobs = [create_job(:strand => 'strand1'), create_job(:strand => 'strand2')]
+      locked = [Delayed::Job.get_and_lock_next_available('w1'),
+                Delayed::Job.get_and_lock_next_available('w2')]
+      jobs.should =~ locked
       Delayed::Job.get_and_lock_next_available('w3').should == nil
     end
 
@@ -604,8 +604,8 @@ shared_examples_for 'a backend' do
       jobs[1].fail!
       failed = (Delayed::Job.list_jobs(:failed, 1, 0) + Delayed::Job.list_jobs(:failed, 1, 1)).sort_by { |j| j.id }
       failed.size.should == 2
-      failed[0].original_id.should == jobs[0].id
-      failed[1].original_id.should == jobs[1].id
+      failed[0].original_job_id.should == jobs[0].id
+      failed[1].original_job_id.should == jobs[1].id
     end
   end
 

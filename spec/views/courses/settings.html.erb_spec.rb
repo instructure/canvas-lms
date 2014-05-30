@@ -103,5 +103,53 @@ describe "courses/settings.html.erb" do
       end
     end
   end
-    
+
+  context "account_id selection" do
+    it "should let sub-account admins see other accounts within their sub-account as options" do
+      root_account = Account.create!(:name => 'root')
+      subaccount = account_model(:parent_account => root_account)
+      other_subaccount = account_model(:parent_account => root_account) # should not include
+      sub_subaccount1 = account_model(:parent_account => subaccount)
+      sub_subaccount2 = account_model(:parent_account => subaccount)
+
+      @course.account = sub_subaccount1
+      @course.save!
+
+      @user = account_admin_user(:account => subaccount, :active_user => true)
+      root_account.grants_right?(@user, nil, :manage_courses).should be_false
+      view_context(@course, @user)
+
+      render
+      doc = Nokogiri::HTML(response.body)
+      select = doc.at_css("select#course_account_id")
+      select.should_not be_nil
+      #select.children.count.should == 3
+
+      option_ids = select.search("option").map{|c| c.attributes["value"].value.to_i rescue c.to_s}
+      option_ids.sort.should == [subaccount.id, sub_subaccount1.id, sub_subaccount2.id].sort
+    end
+
+    it "should let site admins see all accounts within their root account as options" do
+      root_account = Account.create!(:name => 'root')
+      subaccount = account_model(:parent_account => root_account)
+      other_subaccount = account_model(:parent_account => root_account)
+      sub_subaccount1 = account_model(:parent_account => subaccount)
+      sub_subaccount2 = account_model(:parent_account => subaccount)
+
+      @course.account = sub_subaccount1
+      @course.save!
+
+      @user = site_admin_user
+      view_context(@course, @user)
+
+      render
+      doc = Nokogiri::HTML(response.body)
+      select = doc.at_css("select#course_account_id")
+      select.should_not be_nil
+      all_accounts = [root_account] + root_account.all_accounts
+
+      option_ids = select.search("option").map{|c| c.attributes["value"].value.to_i}
+      option_ids.sort.should == all_accounts.map(&:id).sort
+    end
+  end
 end

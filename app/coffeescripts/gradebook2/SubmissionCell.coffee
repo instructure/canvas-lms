@@ -15,7 +15,7 @@ define [
 
     init: () ->
       submission = @opts.item[@opts.column.field]
-      @$wrapper = $(@cellWrapper('<input class="grade"/>')).appendTo(@opts.container)
+      @$wrapper = $(@cellWrapper("<input #{@ariaLabel(submission.submission_type)} class='grade'/>")).appendTo(@opts.container)
       @$input = @$wrapper.find('input').focus().select()
 
     destroy: () ->
@@ -72,10 +72,11 @@ define [
       }, options)
       opts.submission ||= @opts.item[@opts.column.field]
       opts.assignment ||= @opts.column.object
+      submission_type = opts.submission.submission_type if opts.submission?.submission_type || null
       specialClasses = SubmissionCell.classesBasedOnSubmission(opts.submission, opts.assignment)
 
       opts.classes += ' no_grade_yet ' unless opts.submission.grade
-      innerContents ?= if opts.submission?.submission_type then '<span class="submission_type_icon" />' else '-'
+      innerContents ?= if submission_type then SubmissionCell.submissionIcon(submission_type) else '-'
 
       if turnitin = extractData(opts.submission)
         specialClasses.push('turnitin')
@@ -91,6 +92,13 @@ define [
       </div>
       """
 
+    ariaLabel: (submission_type) ->
+      label = GRADEBOOK_TRANSLATIONS["submission_tooltip_#{submission_type}"]
+      if label?
+        "aria-label='#{label}'"
+      else
+        ""
+
     @classesBasedOnSubmission: (submission={}, assignment={}) ->
       classes = []
       classes.push('resubmitted') if submission.grade_matches_current_submission == false
@@ -100,13 +108,32 @@ define [
       classes.push(submission.submission_type) if submission.submission_type
       classes
 
+    @submissionIcon: (submission_type) ->
+      klass = SubmissionCell.iconFromSubmissionType(submission_type)
+      "<i class='icon-#{klass}' ></i>"
+
+    @iconFromSubmissionType: (submission_type) ->
+      switch submission_type
+        when "online_upload"
+          "document"
+        when "discussion_topic"
+          "discussion"
+        when "online_text_entry"
+          "text"
+        when "online_url"
+          "link"
+        when "media_recording"
+          "filmstrip"
+        when "online_quiz"
+          "quiz"
+
   class SubmissionCell.out_of extends SubmissionCell
     init: () ->
       submission = @opts.item[@opts.column.field]
       @$wrapper = $(@cellWrapper("""
         <div class="overflow-wrapper">
           <div class="grade-and-outof-wrapper">
-            <input type="number" class="grade"/><span class="outof"><span class="divider">/</span>#{@opts.column.object.points_possible}</span>
+            <input type="number" #{@ariaLabel(submission.submission_type)} class="grade"/><span class="outof"><span class="divider">/</span>#{@opts.column.object.points_possible}</span>
           </div>
         </div>
       """, { classes: 'gradebook-cell-out-of-formatter' })).appendTo(@opts.container)

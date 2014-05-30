@@ -86,7 +86,7 @@ def simple_quiz_with_submissions(answer_key, *submissions)
       matched_answer = @questions[i].question_data[:answers].detect{ |a| a[:text] == answer}
       ["question_#{@questions[i].id}", matched_answer ? matched_answer[:id].to_s : nil]
     }]
-    sub.grade_submission
+    Quizzes::SubmissionGrader.new(sub).grade_submission
   end
   @quiz.reload
 end
@@ -116,7 +116,7 @@ def simple_quiz_with_shuffled_answers(answer_key, *submissions)
       matched_answer = @questions[i].question_data[:answers].detect{ |a| a[:text] == answer}
       ["question_#{@questions[i].id}", matched_answer ? matched_answer[:id].to_s : nil]
     }]
-    sub.grade_submission
+    Quizzes::SubmissionGrader.new(sub).grade_submission
   end
   @quiz.reload
 end

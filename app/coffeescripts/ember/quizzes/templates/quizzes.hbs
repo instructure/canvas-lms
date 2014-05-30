@@ -7,7 +7,8 @@
   </div>
   <div class='header-bar-right form-inline'>
     {{#if canManage}}
-      <a {{bind-attr href='newQuizLink'}}
+    <a id='new-quiz'
+        {{bind-attr href='newQuizLink'}}
         {{bind-attr title=addQuiz }}
         {{bind-attr aria-label=addQuiz }}
         class='btn btn-primary new-quiz-link icon-plus' role='button'>

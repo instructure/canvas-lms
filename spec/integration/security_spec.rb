@@ -171,7 +171,7 @@ describe "security" do
     end
   end
 
-  it "should not prepend exceptional json responses with protection" do
+  it "should not prepend login json responses with protection" do
     u = user_with_pseudonym :active_user => true,
       :username => "nobody@example.com",
       :password => "asdfasdf"
@@ -184,16 +184,6 @@ describe "security" do
     response.body.should_not match(%r{^while\(1\);})
     json = JSON.parse response.body
     json['pseudonym']['unique_id'].should == "nobody@example.com"
-
-    stub_kaltura
-    Kaltura::ClientV3.any_instance.expects(:startSession).returns("true")
-    get "/dashboard/comment_session"
-    response.should be_success
-    response.body.should_not match(%r{^while\(1\);})
-
-    get "/logout", {}, { 'HTTP_ACCEPT' => 'application/json' }
-    response.should be_success
-    response.body.should_not match(%r{^while\(1\);})
   end
 
   it "should prepend GET JSON responses with protection" do

@@ -60,7 +60,11 @@
         border-top: 1px solid $white;
         border-bottom: 1px solid lighten($borderColor, 22%);
         padding: 4px 12px;
-        color: $gray;
+        @if $use_high_contrast {
+          color: black
+        } @else {
+          color: $gray
+        }
 
         & > span {
           white-space: nowrap;

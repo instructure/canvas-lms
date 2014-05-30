@@ -16,7 +16,7 @@ describe "Standard Common Cartridge importing" do
     @migration = ContentMigration.create(:context => @course)
     @migration.migration_settings[:migration_ids_to_import] = {:copy => {}}
     enable_cache do
-      @course.import_from_migration(@course_data, nil, @migration)
+      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
     end
   end
   
@@ -182,7 +182,7 @@ describe "Standard Common Cartridge importing" do
 
       @migration = ContentMigration.create(:context => @course)
       @migration.migration_settings[:migration_ids_to_import] = {:copy => {}}
-      @course.import_from_migration(@course_data, nil, @migration)
+      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
 
       bank = @course.assessment_question_banks.active.find_by_migration_id("I_00004_R_QDB_1")
       bank.should_not be_nil
@@ -210,7 +210,7 @@ describe "Standard Common Cartridge importing" do
     append_before do
       @migration2 = ContentMigration.create(:context => @course)
       @migration2.migration_settings[:migration_ids_to_import] = {:copy=>{}}
-      @course.import_from_migration(@course_data, nil, @migration2)
+      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration2)
     end
     
     it "should import webcontent" do
@@ -271,7 +271,7 @@ describe "Standard Common Cartridge importing" do
                         "context_modules" => {"I_00000" => true},
                         "all_assignment_groups" => "0"}}.with_indifferent_access
 
-      @course.import_from_migration(@course_data, nil, @migration)
+      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
 
       @course.attachments.count.should == 5
       @course.context_external_tools.count.should == 1
@@ -289,7 +289,7 @@ describe "Standard Common Cartridge importing" do
       @migration.migration_settings[:migration_ids_to_import] = {
           :copy => {"everything" => "0"}}.with_indifferent_access
 
-      @course.import_from_migration(@course_data, nil, @migration)
+      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
 
       @course.attachments.count.should == 0
     end
@@ -302,7 +302,7 @@ describe "Standard Common Cartridge importing" do
 
       @course_data['discussion_topics'].find{|topic| topic['migration_id'] == 'I_00006_R'}['type'] = 'announcement'
 
-      @course.import_from_migration(@course_data, nil, @migration)
+      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
 
       @course.announcements.count.should == 1
     end
@@ -369,7 +369,7 @@ describe "Standard Common Cartridge importing" do
               "all_context_modules" => "1"
           }
       }
-      @course.import_from_migration(@import_json, nil, @migration)
+      Importers::CourseContentImporter.import_content(@course, @import_json, nil, @migration)
 
       mods = @course.context_modules.to_a
       mods.map(&:position).should eql [1, 2, 3, 4]
@@ -396,7 +396,7 @@ describe "Standard Common Cartridge importing" do
               "all_assignment_groups" => "1"
           }
       }
-      @course.import_from_migration(@import_json, nil, @migration)
+      Importers::CourseContentImporter.import_content(@course, @import_json, nil, @migration)
 
       ags = @course.assignment_groups.to_a
       ags.map(&:position).should eql [1, 2, 3, 4]
@@ -466,7 +466,7 @@ describe "More Standard Common Cartridge importing" do
 
     #import json into new course
     hash = hash.map { |h| h.with_indifferent_access }
-    ContextModule.process_migration({'modules' =>hash}, @migration)
+    Importers::ContextModuleImporter.process_migration({'modules' =>hash}, @migration)
     @copy_to.save!
 
     @copy_to.context_modules.count.should == 3

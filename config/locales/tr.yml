@@ -2351,7 +2351,7 @@ tr:
     import: "İçeri Aktar"
     login: "Oturum Aç"
     manage_rubrics: "Değerlendirme Listelerini Yönet"
-    masquerade: "Kullanıcı olarak taklit et"
+    masquerade: "Kullanıcı olarak oturum aç"
     ok: Tamam
     okay: Tamam
     refresh: yenile
@@ -2363,7 +2363,7 @@ tr:
     sent: Gönder!
     show_all_artifacts: "Tüm Eserleri Göster"
     submit: Gönder
-    unmasquerade: "Taklit Etmeyi Durdur"
+    unmasquerade: "Rolüme Geri Dön"
     update: Güncelle
     view_account_roster: "Hesap Listesini Göster"
     view_course_roster: "Ders Listesini Göster"
@@ -7694,8 +7694,8 @@ tr:
       title: "Facebook Sayfası"
     fixed_bottom: 
       masquerading: 
-        stop: "Taklit Etmeyi Durdur"
-        warning_title: "%{user_name} kullanıcısı taklit ediliyor"
+        stop: "Rolüme Geri Dön"
+        warning_title: "%{user_name} kullanıcısı görünümündesiniz"
       student_view: 
         leave: "Öğrenci Görünümünden Çık"
         reset: "Öğrenciyi Sıfırla"
@@ -10822,7 +10822,7 @@ tr:
         user_settings: "Kullanıcı Ayarları"
     show: 
       administration: Yönetici
-      become: Olmak
+      become: "Kullanıcının Yerine Geç"
       cancel_editing: "Düzenlemeyi İptal et"
       edit_profile: "Profili Düzenle"
       links: 
@@ -13346,7 +13346,7 @@ tr:
       body: "Okulunuzun Canvas hesabı geçici olarak donduruldu. Lütfen Canvas yöneticisi ile iletişime geçiniz."
       links: 
         logout: Çıkış
-        stop_masquerading: "[Taklit Etmeyi Durdur]"
+        stop_masquerading: "[Rolüme Geri Dön]"
       page_title: "Enstitü Askıya Alınmıştır"
     links: 
       over_time: zamanla
@@ -14014,14 +14014,14 @@ tr:
       titles: 
         logins: "Oturum Bilgileri"
     masquerade: 
-      are_you_sure_start: "Bu kullanıcıyı taklit etmek istediğinize emin misiniz?"
-      are_you_sure_stop: "Taklit etmeyi sonlandırmak istediğinize emin misiniz?"
+      are_you_sure_start: "Bu kullanıcının yerine geçmek istediğinize emin misiniz?"
+      are_you_sure_stop: "Rolünüze dönmek istediğinize emin misiniz?"
       details: |-
           Başkası olarak giriş yapma aslında şifreye ihtiyaç olmadan bir başka kullanıcı 
           olarak giriş yapmadır. Bu kullanıcıymış gibi herşeyi yapabilirsiniz ve başkaları yapılan herşeyi sanki 
           o kullanıcı yapmış gibi görürler. Fakat, hesap inceleme kayıtlarında, o kullanıcı adına 
           etkinlikleri yapanın aslında **siz** olduğu gerçeği kayıtlıdır.
-      masquerade_as: "%{user_name} kullanıcısını taklit et"
+      masquerade_as: "%{user_name} kullanıcısının yerine geç"
     merge: 
       login_to_merge_different_account: "Birleştirmek istediğiniz hesap, %{current_user_name} (%{current_user_email}) farklı bir hesaptadır, lütfen yeni hesap için oturum açınız:"
       merge_definition: "Bir şekilde, bir tane yerine iki tane oturum kimliğiniz olabilir. Bu durumda iki hesabı birleştirip bu hesapların bilgilerini bir yerde toplayabilirsiniz."
@@ -14039,7 +14039,7 @@ tr:
       will_be_deleted: silindi
       will_be_kept: tutulacaktır
     name: 
-      become: Olmak
+      become: "Kullanıcının Yerine Geç"
       buttons: 
         update_details: "Ayrıntıları Güncelle"
       delete_from_account: "%{account}'den sil."

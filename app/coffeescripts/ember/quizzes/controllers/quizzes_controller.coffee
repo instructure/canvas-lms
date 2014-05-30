@@ -21,6 +21,8 @@ define [
     practicesLabel: I18n.t('practices_label', 'Practice Quizzes toggle quiz visibility')
     surveysLabel: I18n.t('surveys_label', 'Surveys toggle quiz visibility')
 
+    environment: environment
+
     canManage: alias 'environment.canManage'
 
     newQuizLink: (->
@@ -51,11 +53,9 @@ define [
 
     rawSurveys: filterBy 'model', 'isSurvey'
 
-    sortProperties: ['due_at']
+    sortProperties: [ 'sortSlug' ]
 
-    sortFunction: (x, y) ->
-      return 1 unless x
-      compare x, y
+    sortAscending: true
 
     disabledMessage: I18n.t('cant_unpublish_when_students_submit', "Can't unpublish if there are student submissions")
     actions:

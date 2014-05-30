@@ -1,9 +1,5 @@
-require 'folio/rails'
-require 'folio/will_paginate/active_record' if defined?(CANVAS_RAILS3) && CANVAS_RAILS3
-
 require 'paginated_collection'
-
-require 'support/active_record'
+require 'will_paginate/array'
 
 RSpec.configure do |config|
   config.treat_symbols_as_metadata_keys_with_true_values = true

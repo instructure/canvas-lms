@@ -144,9 +144,8 @@ class ConversationsController < ApplicationController
   #   filtering conversations that at have at least all of the contexts ("and")
   #   or at least one of the contexts ("or")
   #
-  # @argument interleave_submissions [Boolean] Default is false. If true, the
-  #   message_count will also include these submission-based messages in the
-  #   total. See the show action for more information.
+  # @argument interleave_submissions [Boolean] (Obsolete) Submissions are no
+  #   longer linked to conversations. This parameter is ignored.
   #
   # @argument include_all_conversation_ids [Boolean] Default is false. If true,
   #   the top-level element of the response will be an object rather than
@@ -232,37 +231,18 @@ class ConversationsController < ApplicationController
       load_all_contexts :permissions => [:manage_user_notes]
       notes_enabled = @current_user.associated_accounts.any?{|a| a.enable_user_notes }
       can_add_notes_for_account = notes_enabled && @current_user.associated_accounts.any?{|a| a.grants_right?(@current_user, nil, :manage_students) }
-      if @current_user.use_new_conversations?
-        js_env(:CONVERSATIONS => {
-                 :ATTACHMENTS_FOLDER_ID => @current_user.conversation_attachments_folder.id,
-                 :ACCOUNT_CONTEXT_CODE => "account_#{@domain_root_account.id}",
-                 :CONTEXTS => @contexts,
-                 :NOTES_ENABLED => notes_enabled,
-                 :CAN_ADD_NOTES_FOR_ACCOUNT => can_add_notes_for_account,
-               })
-        return render :template => 'conversations/index_new'
-      else
-        @current_user.reset_unread_conversations_counter
-        current_user_json = conversation_user_json(@current_user, @current_user, session, :include_participant_avatars => true)
-        current_user_json[:id] = current_user_json[:id].to_s
-        hash = {:CONVERSATIONS => {
-            :USER => current_user_json,
-            :CONTEXTS => @contexts,
-            :NOTES_ENABLED => notes_enabled,
-            :CAN_ADD_NOTES_FOR_ACCOUNT => can_add_notes_for_account,
-            :SHOW_INTRO => !@current_user.watched_conversations_intro?,
-            :FOLDER_ID => @current_user.conversation_attachments_folder.id,
-            :MEDIA_COMMENTS_ENABLED => feature_enabled?(:kaltura),
-          }, :CONTEXT_ACTION_SOURCE => :conversation}
-        append_sis_data(hash)
-        js_env(hash)
-      end
+      js_env(:CONVERSATIONS => {
+               :ATTACHMENTS_FOLDER_ID => @current_user.conversation_attachments_folder.id,
+               :ACCOUNT_CONTEXT_CODE => "account_#{@domain_root_account.id}",
+               :CONTEXTS => @contexts,
+               :NOTES_ENABLED => notes_enabled,
+               :CAN_ADD_NOTES_FOR_ACCOUNT => can_add_notes_for_account,
+             })
+      return render :template => 'conversations/index_new'
     end
   end
 
   def toggle_new_conversations
-    @current_user.preferences[:use_new_conversations] = value_to_boolean(params[:use_new_conversations])
-    @current_user.save!
     redirect_to action: 'index'
   end
 
@@ -399,14 +379,11 @@ class ConversationsController < ApplicationController
 
   # @API Get a single conversation
   # Returns information for a single conversation. Response includes all
-  # fields that are present in the list/index action, as well as messages,
-  # submissions, and extended participant information.
+  # fields that are present in the list/index action as well as messages
+  # and extended participant information.
   #
-  # @argument interleave_submissions [Boolean] Default false. If true,
-  #   submission data will be returned as first class messages interleaved
-  #   with other messages. The submission details (comments, assignment, etc.)
-  #   will be stored as the submission property on the message. Note that if
-  #   set, the message_count will also include these messages in the total.
+  # @argument interleave_submissions [Boolean] (Obsolete) Submissions are no
+  #   longer linked to conversations. This parameter is ignored.
   #
   # @argument scope [Optional, String, "unread"|"starred"|"archived"]
   #   Used when generating "visible" in the API response. See the explanation
@@ -436,11 +413,9 @@ class ConversationsController < ApplicationController
   #   media_comment:: Audio/video comment data for this message (if applicable). Fields include: display_name, content-type, media_id, media_type, url
   #   forwarded_messages:: If this message contains forwarded messages, they will be included here (same format as this list). Note that those messages may have forwarded messages of their own, etc.
   #   attachments:: Array of attachments for this message. Fields include: display_name, content-type, filename, url
-  # @response_field submissions Array of assignment submissions having
-  #   comments relevant to this conversation. These should be interleaved with
-  #   the messages when displaying to the user. See the {api:SubmissionsApiController#index Submissions API documentation}
-  #   for details on the fields included. This response includes
-  #   the submission_comments and assignment associations.
+  # @response_field submissions (Obsolete) Array of assignment submissions having
+  #   comments relevant to this conversation. Submissions are no longer linked to conversations.
+  #   This field will always be nil or empty.
   #
   # @example_response
   #   {
@@ -508,24 +483,17 @@ class ConversationsController < ApplicationController
     end
 
     @conversation.update_attribute(:workflow_state, "read") if @conversation.unread? && auto_mark_as_read?
-    messages = submissions = nil
+    messages = nil
     Shackles.activate(:slave) do
       messages = @conversation.messages
       ConversationMessage.send(:preload_associations, messages, :asset)
-      submissions = messages.map(&:submission).compact
-      Submission.send(:preload_associations, submissions, [:assignment, :submission_comments])
-      if interleave_submissions
-        submissions = nil
-      else
-        messages = messages.select{ |message| message.submission.nil? }
-      end
     end
     render :json => conversation_json(@conversation,
                                       @current_user,
                                       session,
                                       include_indirect_participants: true,
                                       messages: messages,
-                                      submissions: submissions,
+                                      submissions: [],
                                       include_beta: params[:include_beta],
                                       include_context_name: true)
   end
@@ -629,7 +597,7 @@ class ConversationsController < ApplicationController
 
   # @API Add recipients
   # Add recipients to an existing group conversation. Response is similar to
-  # the GET/show action, except that omits submissions and only includes the
+  # the GET/show action, except that only includes the
   # latest message (e.g. "joe was added to the conversation by bob")
   #
   # @argument recipients[] [String]
@@ -679,7 +647,7 @@ class ConversationsController < ApplicationController
 
   # @API Add a message
   # Add a message to an existing conversation. Response is similar to the
-  # GET/show action, except that omits submissions and only includes the
+  # GET/show action, except that only includes the
   # latest message (i.e. what we just sent)
   #
   # @argument body [String]
@@ -1028,9 +996,9 @@ class ConversationsController < ApplicationController
     end
   end
 
-  # TODO API v2: default to true, like we do in the UI
+  # Obsolete. Forced to false until we go through and clean it up thoroughly
   def interleave_submissions
-    value_to_boolean(params[:interleave_submissions]) || !api_request?
+    false
   end
 
   def include_private_conversation_enrollments

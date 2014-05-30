@@ -91,24 +91,24 @@ module Api
 
   SIS_MAPPINGS = {
     'courses' =>
-      { :lookups => { 'sis_course_id' => 'sis_source_id', 'id' => 'id' },
+      { :lookups => { 'sis_course_id' => 'sis_source_id', 'id' => 'id', 'sis_integration_id' => 'integration_id' },
         :is_not_scoped_to_account => ['id'].to_set,
         :scope => 'root_account_id' },
     'enrollment_terms' =>
-      { :lookups => { 'sis_term_id' => 'sis_source_id', 'id' => 'id' },
+      { :lookups => { 'sis_term_id' => 'sis_source_id', 'id' => 'id', 'sis_integration_id' => 'integration_id' },
         :is_not_scoped_to_account => ['id'].to_set,
         :scope => 'root_account_id' },
     'users' =>
-      { :lookups => { 'sis_user_id' => 'pseudonyms.sis_user_id', 'sis_login_id' => 'pseudonyms.unique_id', 'id' => 'users.id' },
+      { :lookups => { 'sis_user_id' => 'pseudonyms.sis_user_id', 'sis_login_id' => 'pseudonyms.unique_id', 'id' => 'users.id', 'sis_integration_id' => 'pseudonyms.integration_id' },
         :is_not_scoped_to_account => ['users.id'].to_set,
         :scope => 'pseudonyms.account_id',
         :joins => [:pseudonym] },
     'accounts' =>
-      { :lookups => { 'sis_account_id' => 'sis_source_id', 'id' => 'id' },
+      { :lookups => { 'sis_account_id' => 'sis_source_id', 'id' => 'id', 'sis_integration_id' => 'integration_id' },
         :is_not_scoped_to_account => ['id'].to_set,
         :scope => 'root_account_id' },
     'course_sections' =>
-      { :lookups => { 'sis_section_id' => 'sis_source_id', 'id' => 'id' },
+      { :lookups => { 'sis_section_id' => 'sis_source_id', 'id' => 'id' , 'sis_integration_id' => 'integration_id' },
         :is_not_scoped_to_account => ['id'].to_set,
         :scope => 'root_account_id' },
     'groups' =>
@@ -413,20 +413,16 @@ module Api
       media_id = anchor['id'].try(:sub, /^media_comment_/, '')
       next if media_id.blank?
 
-      if anchor['class'].try(:match, /\baudio_comment\b/)
-        node = Nokogiri::XML::Node.new('audio', doc)
-        node['data-media_comment_type'] = 'audio'
-      else
-        node = Nokogiri::XML::Node.new('video', doc)
-        thumbnail = media_object_thumbnail_url(media_id, :width => 550, :height => 448, :type => 3, :host => host, :protocol => protocol)
-        node['poster'] = thumbnail
-        node['data-media_comment_type'] = 'video'
+      media_type = anchor['class'].try(:match, /\baudio_comment\b/) ? 'audio' : 'video'
+      node = Nokogiri::XML::Node.new(media_type, doc)
+      node['data-media_comment_type'] = media_type
+      if media_type == 'video'
+        node['poster'] = media_object_thumbnail_url(media_id, :width => 550, :height => 448, :type => 3, :host => host, :protocol => protocol)
       end
-
       node['preload'] = 'none'
       node['class'] = 'instructure_inline_media_comment'
       node['data-media_comment_id'] = media_id
-      media_redirect = polymorphic_url([context, :media_download], :entryId => media_id, :type => 'mp4', :redirect => '1', :host => host, :protocol => protocol)
+      media_redirect = polymorphic_url([context, :media_download], :entryId => media_id, :media_type => media_type, :redirect => '1', :host => host, :protocol => protocol)
       node['controls'] = 'controls'
       node['src'] = media_redirect
       node.inner_html = anchor.inner_html
@@ -555,7 +551,7 @@ module Api
   end
 
   # regex for valid iso8601 dates
-  ISO8601_REGEX = /^(?<year>-?[0-9]{4})-
+  ISO8601_REGEX = /^(?<year>[0-9]{4})-
                     (?<month>1[0-2]|0[1-9])-
                     (?<day>3[0-1]|0[1-9]|[1-2][0-9])T
                     (?<hour>2[0-3]|[0-1][0-9]):

@@ -55,6 +55,10 @@ define [
   $.flashError = (content, timeout) ->
     flashBox("error", content, timeout)
 
+  # Pops up a small warning box at the top of the screen.
+  $.flashWarning = (content, timeout = 3000) ->
+    flashBox("warning", content, timeout)
+
   $.screenReaderFlashMessage = (content) ->
     screenReaderFlashBox('success', content)
 

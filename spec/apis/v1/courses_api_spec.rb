@@ -276,6 +276,7 @@ describe CoursesController, type: :request do
         course_response = post_params['course'].merge({
           'account_id' => @account.id,
           'root_account_id' => @account.id,
+          'integration_id' => nil,
           'start_at' => '2011-01-01T07:00:00Z',
           'end_at' => '2011-05-01T07:00:00Z',
           'workflow_state' => 'available',
@@ -332,6 +333,7 @@ describe CoursesController, type: :request do
         course_response = post_params['course'].merge({
           'account_id' => @account.id,
           'root_account_id' => @account.id,
+          'integration_id' => nil,
           'start_at' => '2011-01-01T07:00:00Z',
           'end_at' => '2011-05-01T07:00:00Z',
           'workflow_state' => 'available',
@@ -455,6 +457,7 @@ describe CoursesController, type: :request do
         'name' => 'New Name',
         'course_code' => 'NEW-001',
         'sis_course_id' => 'NEW12345',
+        'integration_id' => nil,
         'start_at' => '2012-03-01T00:00:00Z',
         'end_at' => '2012-03-30T23:59:59Z',
         'license' => 'public_domain',
@@ -1762,6 +1765,7 @@ describe CoursesController, type: :request do
         'course_code' => @course1.course_code,
         'enrollments' => [{'type' => 'teacher', 'role' => 'TeacherEnrollment', 'enrollment_state' => 'active'}],
         'sis_course_id' => @course1.sis_course_id,
+        'integration_id' => nil,
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{@course1.uuid}.ics" },
         'hide_final_grades' => @course1.hide_final_grades,
         'start_at' => @course1.start_at,
