@@ -62,9 +62,14 @@
 #       "description": "",
 #       "properties": {
 #         "score": {
-#           "description": "The rollup score for the outcome, based on the student assessment scores related to the outcome. This could be null if the student has no related scores.",
+#           "description": "The rollup score for the outcome, based on the student alignment scores related to the outcome. This could be null if the student has no related scores.",
 #           "example": 3,
 #           "type": "integer"
+#         },
+#         "count": {
+#           "example": 6,
+#           "type": "integer",
+#           "description": "The number of alignment scores included in this rollup."
 #         },
 #         "links": {
 #           "example": "{\"outcome\"=>\"42\"}",
