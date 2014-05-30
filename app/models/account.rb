@@ -656,10 +656,13 @@ class Account < ActiveRecord::Base
     account_roles
   end
 
-  def available_account_roles
+  def available_account_roles(user = nil)
     account_roles = roles.for_accounts.active.map(&:name)
     account_roles |= ['AccountAdmin']
     account_roles |= self.parent_account.available_account_roles if self.parent_account
+    if user
+      account_roles.select! { |role| account_users.new.grants_right?(user, :create) }
+    end
     account_roles
   end
 
@@ -814,13 +817,6 @@ class Account < ActiveRecord::Base
     if self.root_account?
       @default_enrollment_term = self.enrollment_terms.active.find_or_create_by_name(EnrollmentTerm::DEFAULT_TERM_NAME)
     end
-  end
-
-  def add_user(user, membership_type = nil)
-    return nil unless user && user.is_a?(User)
-    membership_type ||= 'AccountAdmin'
-    au = self.account_users.find_by_user_id_and_membership_type(user.id, membership_type)
-    au ||= self.account_users.create(:user => user, :membership_type => membership_type)
   end
 
   def context_code

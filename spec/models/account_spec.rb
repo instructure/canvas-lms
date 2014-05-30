@@ -534,7 +534,7 @@ describe Account do
     a.user_count.should == 0
 
     u = User.create!
-    a.add_user(u)
+    a.account_users.create!(user: u)
     a.all_users.count.should == a.user_count
     a.user_count.should == 1
 
@@ -741,7 +741,7 @@ describe Account do
       account.user_list_search_mode_for(nil).should == :closed
       account.user_list_search_mode_for(user).should == :closed
       user
-      account.add_user(@user)
+      account.account_users.create!(user: @user)
       account.user_list_search_mode_for(@user).should == :preferred
     end
   end
@@ -767,7 +767,7 @@ describe Account do
       enable_cache do
         user
         site_admin = Account.site_admin
-        site_admin.add_user(@user)
+        site_admin.account_users.create!(user: @user)
 
         @shard1.activate do
           site_admin.grants_right?(@user, :manage_site_settings).should be_true
@@ -882,7 +882,7 @@ describe Account do
         sa = Account.site_admin
         sa.account_users_for(@user).should == []
 
-        au = sa.add_user(@user)
+        au = sa.account_users.create!(user: @user)
         # out-of-proc cache should clear, but we have to manually clear
         # the in-proc cache
         sa = Account.find(sa)
@@ -905,7 +905,7 @@ describe Account do
           @shard1.activate do
             sa.account_users_for(@user).should == []
 
-            au = sa.add_user(@user)
+            au = sa.account_users.create!(user: @user)
             # out-of-proc cache should clear, but we have to manually clear
             # the in-proc cache
             sa = Account.find(sa)

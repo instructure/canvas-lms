@@ -26,7 +26,7 @@ describe AccountUser do
         @user.shard.activate { User.update_all(:updated_at => 1.month.ago) }
         @user.reload
         @account.grants_right?(@user, :read).should be_false
-        @account.add_user(@user)
+        @account.account_users.create!(user: @user)
         @user.reload
         RoleOverride.clear_cached_contexts
         @account.instance_variable_set(:@account_users_cache, {})
@@ -36,7 +36,7 @@ describe AccountUser do
 
     it "should recache permissions when deleted" do
       enable_cache do
-        au = @account.add_user(@user)
+        au = @account.account_users.create!(user: @user)
         @user.shard.activate { User.update_all(:updated_at => 1.month.ago) }
         @user.reload
         @account.grants_right?(@user, :read).should be_true
@@ -87,8 +87,8 @@ describe AccountUser do
       @user2 = User.create!
       @ro1 = Account.default.role_overrides.create!(:enrollment_type => 'role1', :permission => 'manage_sis', :enabled => true)
       @ro2 = Account.default.role_overrides.create!(:enrollment_type => 'role2', :permission => 'manage_sis', :enabled => true)
-      @au1 = Account.default.add_user(@user1, 'role1')
-      @au2 = Account.default.add_user(@user2, 'role2')
+      @au1 = Account.default.account_users.create!(user: @user1, membership_type: 'role1')
+      @au2 = Account.default.account_users.create!(user: @user2, membership_type: 'role2')
     end
 
     it "should be symmetric for applies_to everything" do
@@ -135,6 +135,18 @@ describe AccountUser do
       @ro2.save!
       @au1.is_subset_of?(@user2).should be_false
       @au2.is_subset_of?(@user1).should be_false
+    end
+  end
+
+  describe "set_policy" do
+    it "should not allow a lesser admin to create" do
+      account_admin_user_with_role_changes(membership_type: 'lesser', role_changes: { manage_account_memberships: true })
+      au = Account.default.account_users.build(user: @user, membership_type: 'AccountAdmin')
+      au.grants_right?(@user, :create).should be_false
+      u2 = User.create!
+      au = Account.default.account_users.build(user: u2, membership_type: 'lesser')
+      au.grants_right?(@user, :create).should be_true
+
     end
   end
 end

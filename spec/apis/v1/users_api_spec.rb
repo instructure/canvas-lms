@@ -318,7 +318,7 @@ describe "Users API", type: :request do
 
   it "shouldn't find users in other root accounts by sis id" do
     acct = account_model(:name => 'other root')
-    acct.add_user(@user)
+    acct.account_users.create!(user: @user)
     @me = @user
     course_with_student(:account => acct, :active_all => true, :user => user_with_pseudonym(:name => 's2', :username => 'other@example.com'))
     @other_user = @user
@@ -444,7 +444,7 @@ describe "Users API", type: :request do
     context 'as a site admin' do
       before do
         @site_admin = user_with_pseudonym
-        Account.site_admin.add_user(@site_admin)
+        Account.site_admin.account_users.create!(user: @site_admin)
       end
 
       it "should allow site admins to create users" do

@@ -200,7 +200,7 @@ describe PseudonymsController do
     it "should destroy if authorized to delete pseudonyms" do
       rescue_action_in_public! if CANVAS_RAILS2
       user_with_pseudonym(:active_all => true)
-      Account.site_admin.add_user(@user)
+      Account.site_admin.account_users.create!(user: @user)
       user_session(@user, @pseudonym)
       @p2 = @user.pseudonyms.build(:unique_id => "another_one@test.com",:password => 'password', :password_confirmation => 'password')
       @p2.sis_user_id = 'another_one@test.com'
@@ -218,7 +218,7 @@ describe PseudonymsController do
     context "with site admin permissions" do
       before :each do
         user_with_pseudonym(:active_all => true)
-        Account.site_admin.add_user(@user)
+        Account.site_admin.account_users.create!(user: @user)
         user_session(@user, @pseudonym)
       end
 
@@ -231,7 +231,7 @@ describe PseudonymsController do
     context 'with default admin permissions' do
       before do
         user_with_pseudonym(:active_all => true)
-        Account.default.add_user(@user)
+        Account.default.account_users.create!(user: @user)
         user_session(@user, @pseudonym)
       end
 
@@ -243,8 +243,8 @@ describe PseudonymsController do
 
       it 'will not allow default admin to create pseudonym for site admin' do
         siteadmin = User.create!(:name => 'siteadmin')
-        Account.site_admin.add_user(siteadmin)
-        Account.default.add_user(siteadmin)
+        Account.site_admin.account_users.create!(user: siteadmin)
+        Account.default.account_users.create!(user: siteadmin)
         post 'create', :user_id => siteadmin.id, :pseudonym => { :account_id => Account.site_admin.id, :unique_id => 'a_new_unique_name' }
         assert_unauthorized
       end
@@ -262,7 +262,7 @@ describe PseudonymsController do
       it 'will not allow default admin to create pseudonym in site admin' do
         user2 = User.create!
         Account.default.pseudonyms.create!(unique_id: 'user', user: user2)
-        Account.site_admin.add_user(user2)
+        Account.site_admin.account_users.create!(user: user2)
 
         LoadAccount.stubs(:default_domain_root_account).returns(Account.site_admin)
         post 'create', user_id: user2.id, pseudonym: { unique_id: 'user' }
@@ -281,7 +281,7 @@ describe PseudonymsController do
         @account = Account.create!
         user_with_pseudonym(:active_all => true, :account => @account)
         LoadAccount.stubs(:default_domain_root_account).returns(@account)
-        @account.add_user(@user)
+        @account.account_users.create!(user: @user)
         user_session(@user, @pseudonym)
       end
 
@@ -330,7 +330,7 @@ describe PseudonymsController do
         :account  => account)
       account.settings[:admins_can_change_passwords] = true
       account.save!
-      Account.site_admin.add_user(@user)
+      Account.site_admin.account_users.create!(user: @user)
       user_session(@user, @pseudonym)
       put 'update', {
         :id        => @test_user.pseudonym.id,
@@ -355,7 +355,7 @@ describe PseudonymsController do
       @user.pseudonyms.create!(:unique_id => 'user1@example.com', :account => Account.default)
 
       user_with_pseudonym(:active_all => 1, :username => 'user2@example.com', :password => 'qwerty2')
-      Account.default.add_user(@user)
+      Account.default.account_users.create!(user: @user)
       user_session(@user, @pseudonym)
       # not logged in!
 
@@ -373,7 +373,7 @@ describe PseudonymsController do
     before do
       user_with_pseudonym(:active_all => 1)
       @admin = @user
-      Account.site_admin.add_user(@admin)
+      Account.site_admin.account_users.create!(user: @admin)
       user_session(@admin, @pseudonym)
 
       @shard1.activate do

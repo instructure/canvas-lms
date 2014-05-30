@@ -734,34 +734,49 @@ class AccountsController < ApplicationController
   # TODO Refactor add_account_user and remove_account_user actions into
   # AdminsController. see https://redmine.instructure.com/issues/6634
   def add_account_user
-    if authorized_action(@context, @current_user, :manage_account_memberships)
-      list = UserList.new(params[:user_list],
-                          :root_account => @context.root_account,
-                          :search_method => @context.user_list_search_mode_for(@current_user))
-      users = list.users
-      account_users = users.map do |user|
-        admin = user.flag_as_admin(@context, params[:membership_type])
-        { :enrollment => {
+    role = params[:membership_type] || 'AccountAdmin'
+
+    list = UserList.new(params[:user_list],
+                        :root_account => @context.root_account,
+                        :search_method => @context.user_list_search_mode_for(@current_user))
+    users = list.users
+    admins = users.map do |user|
+      admin = @context.account_users.where(user_id: user.id, membership_type: role).first_or_initialize
+      admin.user = user
+      return unless authorized_action(admin, @current_user, :create)
+      admin
+    end
+
+    account_users = admins.map do |admin|
+      admin.save! if admin.new_record?
+      if admin.new_record?
+        if admin.user.registed?
+          admin.account_user_notification!
+        else
+          admin.account_user_registration!
+        end
+      end
+
+      { :enrollment => {
           :id => admin.id,
-          :name => user.name,
+          :name => admin.user.name,
           :membership_type => admin.membership_type,
           :workflow_state => 'active',
-          :user_id => user.id,
+          :user_id => admin.user.id,
           :type => 'admin',
-          :email => user.email
-        }}
-      end
-      render :json => account_users
+          :email => admin.user.email
+      }}
     end
+    render :json => account_users
   end
 
   def remove_account_user
-    if authorized_action(@context, @current_user, :manage_account_memberships)
-      @account_user = @context.account_users.find(params[:id])
-      @account_user.destroy
+    admin = @context.account_users.find(params[:id])
+    if authorized_action(admin, @current_user, :destroy)
+      admin.destroy
       respond_to do |format|
         format.html { redirect_to account_settings_url(@context, :anchor => "tab-users") }
-        format.json { render :json => @account_user }
+        format.json { render :json => admin }
       end
     end
   end

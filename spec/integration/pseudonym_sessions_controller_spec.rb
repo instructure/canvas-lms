@@ -208,7 +208,7 @@ describe PseudonymSessionsController do
 
   it "should redirect back for jobs controller" do
     user_with_pseudonym(:password => 'qwerty', :active_all => 1)
-    Account.site_admin.add_user(@user)
+    Account.site_admin.account_users.create!(user: @user)
 
     get jobs_url
     response.should redirect_to login_url

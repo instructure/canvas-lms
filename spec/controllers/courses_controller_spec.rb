@@ -643,7 +643,7 @@ describe CoursesController do
       # defaults to false for everyone except those with the AccountAdmin role
       course(:active_all => true)
       user(:active_all => true)
-      Account.site_admin.add_user(@user, 'LimitedAccess')
+      Account.site_admin.account_users.create!(user: @user, membership_type: 'LimitedAccess')
       user_session(@user)
 
       get 'show', :id => @course.id
@@ -654,7 +654,7 @@ describe CoursesController do
     it "should not redirect xhr to settings page when user can :read_as_admin, but not :read" do
       course(:active_all => true)
       user(:active_all => true)
-      Account.site_admin.add_user(@user, 'LimitedAccess')
+      Account.site_admin.account_users.create!(user: @user, membership_type: 'LimitedAccess')
       user_session(@user)
 
       xhr :get, 'show', :id => @course.id
@@ -703,7 +703,7 @@ describe CoursesController do
 
     it "should allow admins to unenroll themselves" do
       course_with_teacher_logged_in(:active_all => true)
-      @course.account.add_user(@teacher)
+      @course.account.account_users.create!(user: @teacher)
       post 'unenroll_user', :course_id => @course.id, :id => @enrollment.id
       @course.reload
       response.should be_success
@@ -804,7 +804,7 @@ describe CoursesController do
       @account.role_overrides.create! :permission => 'manage_courses', :enabled => true,
                                       :enrollment_type => 'lamer'
       user
-      @account.add_user @user, 'lamer'
+      @account.account_users.create!(user: @user, membership_type: 'lamer')
       user_session @user
     end
 
@@ -1329,7 +1329,7 @@ describe CoursesController do
           @account.role_overrides.create! :permission => 'manage_courses', :enabled => true,
                                           :enrollment_type => 'lamer'
           user
-          @account.add_user @user, 'lamer'
+          @account.account_users.create!(user: @user, membership_type: 'lamer')
           user_session @user
         end
 

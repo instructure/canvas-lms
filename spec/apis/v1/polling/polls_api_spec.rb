@@ -65,7 +65,7 @@ describe Polling::PollsController, type: :request do
 
     context "as a site admin" do
       it "you can view polls you have created" do
-        Account.site_admin.add_user(@teacher)
+        Account.site_admin.account_users.create!(user: @teacher)
 
         json = get_index
         poll_json = json['polls']

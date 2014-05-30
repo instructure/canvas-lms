@@ -299,5 +299,13 @@ end
     def shard_value
       scope(:find, :shard)
     end
+
+    def first_or_initialize
+      first || build
+    end
+
+    def first!
+      first or raise ActiveRecord::RecordNotFound
+    end
   end
 end

@@ -2516,7 +2516,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
 
       account = Account.create!(:name => 'account')
       @user = user
-      account.add_user(@user)
+      account.account_users.create!(user: @user)
       cm = ContentMigration.new(:context => account, :user => @user)
       cm.migration_type = 'qti_converter'
       cm.migration_settings['import_immediately'] = true
@@ -2551,7 +2551,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
 
       account = Account.create!(:name => 'account')
       @user = user
-      account.add_user(@user)
+      account.account_users.create!(user: @user)
       cm = ContentMigration.new(:context => account, :user => @user)
       cm.migration_type = 'qti_converter'
       cm.migration_settings['import_immediately'] = true

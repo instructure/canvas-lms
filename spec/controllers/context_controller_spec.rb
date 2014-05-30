@@ -74,7 +74,7 @@ describe ContextController do
         UserMerge.from(user1).into(@user2)
 
         admin = user_model
-        Account.site_admin.add_user(admin)
+        Account.site_admin.account_users.create!(user: admin)
         user_session(admin)
 
         get 'roster_user', :course_id => course1.id, :id => @user2.id

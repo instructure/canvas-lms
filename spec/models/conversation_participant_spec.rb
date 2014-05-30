@@ -182,8 +182,8 @@ describe ConversationParticipant do
       @a2 = Account.create
       @a3 = Account.create
       @admin_user = user
-      @a1.add_user(@admin_user)
-      @a2.add_user(@admin_user)
+      @a1.account_users.create!(user: @admin_user)
+      @a2.account_users.create!(user: @admin_user)
       @a3.pseudonyms.create!(:user => @admin_user, :unique_id => 'a3') # in the account, but not an admin
 
       @target_user = user
@@ -202,7 +202,7 @@ describe ConversationParticipant do
     end
 
     it "should let site admins see everything" do
-      Account.site_admin.add_user(@admin_user)
+      Account.site_admin.account_users.create!(user: @admin_user)
       Account.site_admin.stubs(:grants_right?).with(@admin_user, :become_user).returns(false)
       convos = @target_user.conversations.for_masquerading_user(@admin_user)
       convos.size.should eql 4

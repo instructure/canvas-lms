@@ -3232,7 +3232,7 @@ describe Course do
       @course.user_list_search_mode_for(nil).should == :closed
       @course.user_list_search_mode_for(user).should == :closed
       user
-      account.add_user(@user)
+      account.account_users.create!(user: @user)
       @course.user_list_search_mode_for(@user).should == :preferred
     end
 
@@ -3389,7 +3389,7 @@ describe Course do
         end
         @site_admin = user
         site_admin = Account.site_admin
-        site_admin.add_user(@user)
+        site_admin.account_users.create!(user: @user)
 
         @shard1.activate do
           @course.grants_right?(@site_admin, :manage_content).should be_true

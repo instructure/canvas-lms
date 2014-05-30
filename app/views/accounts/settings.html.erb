@@ -648,7 +648,7 @@ acknowledge that you have read and agreed to the
           <div>
             <%= label_tag :membership_type, :en => "Add More" %>
             <select name="membership_type" id="admin_membership_type">
-            <% @context.available_account_roles.each do |type| %>
+            <% @context.available_account_roles(@current_user).each do |type| %>
               <option value="<%= type %>"><%= AccountUser.readable_type(type) %></option>
             <% end %>
             </select>

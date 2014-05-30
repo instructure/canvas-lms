@@ -386,12 +386,12 @@ describe RoleOverride do
     context "account_only" do
       before do
         @site_admin = User.create!
-        Account.site_admin.add_user(@site_admin)
+        Account.site_admin.account_users.create!(user: @site_admin)
         @root_admin = User.create!
-        Account.default.add_user(@root_admin)
+        Account.default.account_users.create!(user: @root_admin)
         @sub_admin = User.create!
         @sub_account = Account.default.sub_accounts.create!
-        @sub_account.add_user(@sub_admin)
+        @sub_account.account_users.create!(user: @sub_admin)
       end
 
       it "should not grant site admin permissions to normal account admins" do

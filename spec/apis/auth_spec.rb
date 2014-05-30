@@ -495,7 +495,7 @@ describe "API Authentication", type: :request do
 
     it "should allow passing the access token in the post body" do
       @me = @user
-      Account.default.add_user(@user)
+      Account.default.account_users.create!(user: @user)
       u2 = user
       Account.default.pseudonyms.create!(unique_id: 'user', user: u2)
       @user = @me

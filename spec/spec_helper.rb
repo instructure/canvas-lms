@@ -523,17 +523,12 @@ end
     account = opts[:account] || Account.default
     @user = opts[:user] || account.shard.activate { user(opts) }
     @admin = @user
-    account_user = @user.account_users.build(:account => account, :membership_type => opts[:membership_type] || 'AccountAdmin')
-    account_user.shard = account.shard
-    account_user.save!
+    account.account_users.create!(:user => @user, :membership_type => opts[:membership_type])
     @user
   end
 
   def site_admin_user(opts={})
-    @user = opts[:user] || user(opts)
-    @admin = @user
-    Account.site_admin.add_user(@user, opts[:membership_type] || 'AccountAdmin')
-    @user
+    account_admin_user(opts.merge(account: Account.site_admin))
   end
 
   def user(opts={})

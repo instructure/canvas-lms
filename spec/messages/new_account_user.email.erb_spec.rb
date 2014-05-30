@@ -23,7 +23,7 @@ describe 'new_account_user.email' do
   before do
     @account = Account.create!(:name => "some account", :settings => {:outgoing_email_default_name => "Custom From"})
     user_model
-    account_user = @account.add_user(@user)
+    account_user = @account.account_users.create!(user: @user)
     account_user.account.should eql(@account)
     account_user.user.should eql(@user)
     @object = account_user

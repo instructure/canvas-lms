@@ -408,7 +408,7 @@ describe CoursesController, type: :request do
           @account.role_overrides.create! :permission => 'manage_courses', :enabled => true,
                                           :enrollment_type => 'lamer'
           user
-          @account.add_user @user, 'lamer'
+          @account.account_users.create!(user: @user, membership_type: 'lamer')
           user_session @user
         end
 
@@ -1286,7 +1286,7 @@ describe CoursesController, type: :request do
     end
 
     it "should include user sis id and login id if account admin" do
-      @course2.account.add_user(@me)
+      @course2.account.account_users.create!(user: @me)
       first_user = @user
       new_user = user_with_pseudonym(:name => 'Zombo', :username => 'nobody2@example.com')
       @course2.enroll_student(new_user).accept!
@@ -1318,7 +1318,7 @@ describe CoursesController, type: :request do
     end
 
     it "should include user sis id and login id if site admin" do
-      Account.site_admin.add_user(@me)
+      Account.site_admin.account_users.create!(user: @me)
       first_user = @user
       new_user = user_with_pseudonym(:name => 'Zombo', :username => 'nobody2@example.com')
       @course2.enroll_student(new_user).accept!
@@ -1642,7 +1642,7 @@ describe CoursesController, type: :request do
       end
 
       it "should include user sis id and login id if account admin" do
-        @course2.account.add_user(@me)
+        @course2.account.account_users.create!(user: @me)
         first_user = @user
         new_user = user_with_pseudonym(:name => 'Zombo', :username => 'nobody2@example.com')
         @course2.enroll_student(new_user).accept!
@@ -1676,7 +1676,7 @@ describe CoursesController, type: :request do
       end
 
       it "should include user sis id and login id if site admin" do
-        Account.site_admin.add_user(@me)
+        Account.site_admin.account_users.create!(user: @me)
         first_user = @user
         new_user = user_with_pseudonym(:name => 'Zombo', :username => 'nobody2@example.com')
         @course2.enroll_student(new_user).accept!
@@ -1924,7 +1924,7 @@ describe CoursesController, type: :request do
 
     it "should not find courses in other root accounts" do
       acct = account_model(:name => 'root')
-      acct.add_user(@user)
+      acct.account_users.create!(user: @user)
       course(:account => acct)
       @course.update_attribute('sis_source_id', 'OTHER-SIS')
       raw_api_call(:get, "/api/v1/courses/sis_course_id:OTHER-SIS",

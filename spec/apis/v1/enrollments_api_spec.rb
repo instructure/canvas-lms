@@ -538,7 +538,7 @@ describe EnrollmentsApiController, type: :request do
     context "an account admin" do
       before do
         @user = user_with_pseudonym(:username => 'admin@example.com')
-        Account.default.add_user(@user)
+        Account.default.account_users.create!(user: @user)
       end
 
       it "should list all of a user's enrollments in an account" do
@@ -1082,7 +1082,7 @@ describe EnrollmentsApiController, type: :request do
           @sub_account = Account.create(:parent_account => @account,:name => 'English')
           @sub_account.save!
           @user = user_with_pseudonym(:username => 'sub_admin@example.com')
-          @sub_account.add_user(@user)
+          @sub_account.account_users.create!(user: @user)
           @course = @sub_account.courses.create(name: 'sub')
           @course.account_id = @sub_account.id
           @course.save!

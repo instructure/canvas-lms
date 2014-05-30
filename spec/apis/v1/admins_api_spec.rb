@@ -123,6 +123,7 @@ describe "Admins API", type: :request do
 
     context "unauthorized caller" do
       before do
+        @au = @account.account_users.create! :user => @new_user
         @user = user :account => @account
       end
 

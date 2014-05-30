@@ -1181,7 +1181,7 @@ describe PseudonymSessionsController do
 
       @other_user = @user
       @admin = user_with_pseudonym(:active_all => 1, :unique_id => 'user2')
-      Account.default.add_user(@admin)
+      Account.default.account_users.create!(user: @admin)
       user_session(@admin)
       post 'disable_otp_login', :user_id => @other_user.id
       response.should be_success
