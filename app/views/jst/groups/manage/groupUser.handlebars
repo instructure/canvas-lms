@@ -1,4 +1,10 @@
-<div class="group-user-name ellipsis" title="{{name}}"><i class="icon-drag-handle"></i>{{#if isLeader}}<i class="icon-user group-leader"></i>{{/if}}{{name}}</div>
+<div class="group-user-name ellipsis" title="{{name}}">
+  <i class="icon-drag-handle"></i>
+  {{name}}
+</div>
+{{#if isLeader}}<i class="icon-user group-leader"
+  aria-label="{{#t 'group_leader'}}Group Leader{{/t}}"
+  title="{{#t 'group_leader'}}Group Leader{{/t}}"></i>{{/if}}
 {{#if canAssignToGroup}}
   <a href="#"
      data-user-id="{{id}}"

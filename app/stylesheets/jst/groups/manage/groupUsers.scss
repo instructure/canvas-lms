@@ -81,13 +81,14 @@
   }
 
   .group-leader {
-    float: right;
-    line-height: 28px;
+    position: absolute;
+    right: 36px;
+    top: 7px;
   }
 }
 
 .group-user-name {
-  max-width: 90%;
+  max-width: 80%;
   overflow: hidden;
   white-space: nowrap;
   margin-right: 10px;
