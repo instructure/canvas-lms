@@ -124,7 +124,7 @@ module StreamItemsHelper
     when "Announcement", "DiscussionTopic"
       asset.title
     when "Conversation"
-      truncate_text(asset.last_message.body, :max_length => 250)
+      CanvasTextHelper.truncate_text(asset.last_message.body, :max_length => 250)
     when "Assignment"
       asset.subject
     else

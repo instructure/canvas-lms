@@ -72,6 +72,11 @@ require 'csv'
 #           "example": "123xyz",
 #           "type": "string"
 #         },
+#         "integration_id": {
+#           "description": "The account's identifier in the Student Information System. Only included if the user has permission to view SIS information.",
+#           "example": "123xyz",
+#           "type": "string"
+#         },
 #         "sis_import_id": {
 #           "description": "The id of the SIS import if created through SIS. Only included if the user has permission to manage SIS information.",
 #           "example": "12",
@@ -424,7 +429,6 @@ class AccountsController < ApplicationController
             :enable_alerts,
             :enable_eportfolios,
             :enable_profiles,
-            :enable_scheduler,
             :show_scheduler,
             :global_includes,
             :gmail_domain
@@ -697,7 +701,7 @@ class AccountsController < ApplicationController
         format.json  {
           cancel_cache_buster
           expires_in 30.minutes
-          render :json => @courses.map{ |c| {:label => c.name, :id => c.id} }
+          render :json => @courses.map{ |c| {:label => c.name, :id => c.id, :term => c.enrollment_term.name} }
         }
       end
     end
@@ -753,7 +757,7 @@ class AccountsController < ApplicationController
 
   def remove_account_user
     if authorized_action(@context, @current_user, :manage_account_memberships)
-      @account_user = AccountUser.find(params[:id])
+      @account_user = @context.account_users.find(params[:id])
       @account_user.destroy
       respond_to do |format|
         format.html { redirect_to account_settings_url(@context, :anchor => "tab-users") }

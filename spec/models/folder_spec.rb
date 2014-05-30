@@ -137,4 +137,59 @@ describe Folder do
       end
     end
   end
+
+  describe "resolve_path" do
+    before do
+      @root_folder = Folder.root_folders(@course).first
+    end
+
+    it "should return all a sequence of Folders" do
+      foo = @course.folders.create! name: 'foo', parent_folder: @root_folder
+      bar = @course.folders.create! name: 'bar', parent_folder: foo
+      Folder.resolve_path(@course, "#{@root_folder.name}/foo/bar").should eql [@root_folder, foo, bar]
+    end
+
+    it "should deal with root folder alone" do
+      Folder.resolve_path(@course, @root_folder.name).should eql [@root_folder]
+    end
+
+    it "should deal with incorrect root name" do
+      Folder.resolve_path(@course, 'curse files').should be_nil
+    end
+
+    it "should return nil on incomplete match" do
+      foo = @course.folders.create! name: 'foo', parent_folder: @root_folder
+      Folder.resolve_path(@course, "#{@root_folder.name}/foo/bar").should be_nil
+    end
+
+    it "should search duplicate paths" do
+      foo1 = @course.folders.create! name: 'foo', parent_folder: @root_folder
+      foo2 = @course.folders.create! name: 'foo', parent_folder: @root_folder
+      bar = @course.folders.create! name: 'bar', parent_folder: foo1
+      baz = @course.folders.create! name: 'baz', parent_folder: foo2
+      Folder.resolve_path(@course, "#{@root_folder.name}/foo/bar").should eql [@root_folder, foo1, bar]
+      Folder.resolve_path(@course, "#{@root_folder.name}/foo/baz").should eql [@root_folder, foo2, baz]
+    end
+
+    it "should exclude hidden if specified" do
+      foo = @course.folders.create! name: 'foo', parent_folder: @root_folder
+      foo.update_attribute(:workflow_state, 'hidden')
+      bar = @course.folders.create! name: 'bar', parent_folder: foo
+      Folder.resolve_path(@course, "#{@root_folder.name}/foo/bar", true).should eql [@root_folder, foo, bar]
+      Folder.resolve_path(@course, "#{@root_folder.name}/foo/bar", false).should be_nil
+    end
+
+    it "should exclude locked if specified" do
+      foo = @course.folders.create! name: 'foo', parent_folder: @root_folder, locked: true
+      bar = @course.folders.create! name: 'bar', parent_folder: foo
+      Folder.resolve_path(@course, "#{@root_folder.name}/foo/bar", true).should eql [@root_folder, foo, bar]
+      Folder.resolve_path(@course, "#{@root_folder.name}/foo/bar", false).should be_nil
+    end
+
+    it "should accept an array" do
+      foo = @course.folders.create! name: 'foo', parent_folder: @root_folder
+      bar = @course.folders.create! name: 'bar', parent_folder: foo
+      Folder.resolve_path(@course, [@root_folder.name, 'foo', 'bar']).should eql [@root_folder, foo, bar]
+    end
+  end
 end

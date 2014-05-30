@@ -46,7 +46,7 @@ define [
           browser:
             data:
               per_page: 100
-              type: 'section'
+              types: ['section']
               search_all_contexts: true
       @input = @$('#section_input').data('token_input')
       @input.$fakeInput.css('width', '100%')

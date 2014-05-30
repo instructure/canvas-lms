@@ -32,57 +32,63 @@ describe GradebooksHelper do
       context.stubs(:id => 1)
     end
 
-    context "when the user prefers gradebook1" do
-      before do
-        user.stubs(:prefers_gradebook2? => false)
+    context "with screenreader_gradebook disabled" do
+      before {
         context.stubs(:feature_enabled?).with(:screenreader_gradebook).returns(false)
+      }
+
+      context "when the user prefers gradebook1" do
+        before do
+          user.stubs(:preferred_gradebook_version => "1")
+        end
+
+        it { should match /#{"/courses/1/gradebook"}$/ }
+
+        context "with an assignment" do
+          let(:assignment) { mock(:id => 2) }
+          it { should match /#{"/courses/1/gradebook#assignment/2"}$/ }
+        end
+
+        context "with an large roster" do
+          before { context.stubs(:old_gradebook_visible?).returns(false) }
+
+          it { should match /#{"/courses/1/gradebook2"}$/ }
+        end
       end
 
-      it { should match /#{"/courses/1/gradebook"}$/ }
+      context "when the user prefers gradebook2" do
+        before { user.stubs(:preferred_gradebook_version => "2") }
 
-      context "with an assignment" do
-        let(:assignment) { mock(:id => 2) }
+        it { should match /#{"/courses/1/gradebook2"}$/ }
 
-        it { should match /#{"/courses/1/gradebook#assignment/2"}$/ }
+        context "with an assignment" do
+          let(:assignment) { stubs(:id => 2) }
+
+          # Doesn't include the assignment
+          it { should match /#{"/courses/1/gradebook2"}$/ }
+        end
       end
-    end
 
-    context "when the user prefers gradebook2" do
-      before { user.stubs(:prefers_gradebook2? => true) }
-
-      it { should match /#{"/courses/1/gradebook2"}$/ }
-
-      context "with an assignment" do
-        let(:assignment) { stubs(:id => 2) }
-
-        # Doesn't include the assignment
+      context "with a nil user" do
+        let(:user) { nil }
         it { should match /#{"/courses/1/gradebook2"}$/ }
       end
-    end
-
-    context "with a nil user" do
-      let(:user) { nil }
-      it { should match /#{"/courses/1/gradebook2"}$/ }
     end
 
     context "with screenreader_gradebook enabled" do
-      before do
+      before {
         context.stubs(:feature_enabled?).with(:screenreader_gradebook).returns(true)
-      end
+      }
 
       context "when the user prefers srgb" do
-        before {
-          user.stubs(:prefers_gradebook2? => false)
-          user.stubs(:gradebook_preference => 'srgb')
-        }
-        it { should match /#{"/courses/1/screenreader_gradebook"}$/ }
+        before { user.stubs(:preferred_gradebook_version => "srgb") }
+        it { should match /#{"/courses/1/gradebook"}$/ }
       end
 
       context "when the user prefers gb2" do
-        before { user.stubs(:gradebook_preference => '2') }
-        it { should match /#{"/courses/1/gradebook2"}$/ }
+        before { user.stubs(:preferred_gradebook_version => "2") }
+        it { should match /#{"/courses/1/gradebook"}$/ }
       end
-
     end
   end
 end

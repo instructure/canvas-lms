@@ -39,6 +39,17 @@ en:
   accont: 
     feedback_pricing_sub: "Get the numbers for your institution"
   account: 
+    account_settings: 
+      account_surveys: "Account Surveys"
+      avatars: "User Avatars"
+      delicious: Delicious
+      diigo: Diigo
+      facebook: Facebook
+      google_docs: "Google Docs"
+      google_docs_preview: "Google Docs Preview"
+      linked_in: LinkedIn
+      skype: Skype
+      twitter: Twitter
     ask_canvas_network: "Ask the Canvas Network Community"
     default_account_name: "Default Account"
     default_site_administrator_account_name: "Site Admin"
@@ -150,7 +161,7 @@ en:
         pass: Password
         user: Username
       ldap_test_login_button: "Test Login"
-      test_ldap_bind_help_body: "Your LDAP server server rejected the bind attempt. Things to consider:"
+      test_ldap_bind_help_body: "Your LDAP server rejected the bind attempt. Things to consider:"
       test_ldap_bind_help_fixes_1: "Verify the provided filter string (i.e. '(sAMAccountName={{login}})')."
       test_ldap_bind_help_fixes_2: "Does the username require more scoping information? (i.e. 'cn=Canvas,ou=people,dc=example,dc=com')."
       test_ldap_bind_help_header: "Canvas can't bind (login) to your LDAP server"
@@ -270,6 +281,8 @@ en:
       no_term: "A specific term is required please select a term"
     grades: 
       deleted: "Include Deleted Objects: true;"
+    granite: 
+      invalid_date_range: "Dates were adjusted to 1 week range;"
     mississippi: 
       reports: "Reports: %{files}"
     outcomes: 
@@ -339,6 +352,14 @@ en:
     add_user_dialog_title: "Add a New User"
     adding_course_message: "Adding Course..."
     adding_user_message: "Adding User..."
+    additional_settings: 
+      account_domains: "Account Domains"
+      account_status: "Account Status"
+      add_new_domain: "Add New Domain"
+      external_status: "External Status"
+      license: License
+      license_type: "License Type"
+      new_account_domain_title: "New Account Domain"
     additional_settings_right_side: 
       links: 
         suspend: "Suspend Account"
@@ -480,6 +501,13 @@ en:
             check_box: Reports
           tests: 
             check_box: Tests
+    assignment_score_summary_csv_description: 
+      account_reports: 
+        granite: 
+          assignme_score_summary: 
+            text: "This report shows the score for all assignments graded between date selectec"
+          description: 
+            header: Example
     avatars: 
       all_link: 
         one: "All %{count}"
@@ -533,7 +561,7 @@ en:
           student_activity: 
             description: 
               header: Example
-            text: "This report shows student involvment in their courses. The resulting csv file will have one row per enrollment and will show the student sis id, student name, phone number, email address, course name, last submission, days since last submission(LDA), cuurent grade percentage, and their term start date."
+            text: "This report shows student involvment in their courses. The resulting csv file will have one row per enrollment and will show the student sis id, student name, phone number, email address, course name, last submission, days since last submission(LDA), current grade percentage, and their term start date."
     confirm_delete_user: 
       confirm_delete: "Are you sure you want to delete this user from the account %{account}? This will remove the user's data (including grades) from all courses and groups. This process cannot be undone."
       delete_button: "Delete %{user}"
@@ -773,7 +801,7 @@ en:
           description: 
             header: Example
           student_activity: 
-            text: "This report shows shows all of the assignments and info pertaining to those assignments that are in the specified assignment group or groups and in the specified date range. This report provides data for scheduling safety drills with a minimum of disruption to major in-class assessments."
+            text: "This report shows all of the assignments and info pertaining to those assignments that are in the specified assignment group or groups and in the specified date range. This report provides data for scheduling safety drills with a minimum of disruption to major in-class assessments."
     safety_drill_csv_parameters: 
       account_reports: 
         newark: 
@@ -800,9 +828,18 @@ en:
             field: "Section ID"
     settings: 
       about_google_docs: |-
-          In order to make it easier for users, rather than forcing them to download things like Word docs, PDFs, Excel spreadsheets, and open office documents (In addition to requiring that those programs be installed on their on their computer), in many areas throughout Canvas, it will allow you an inline preview of the document.
+          Google Docs Previews allow users to view documents from
+          within Canvas, rather than having to download them and
+          open the corresponding program (e.g. Word or Excel).
           
-          If Scribd has been enabled for this account, it will try to use it to show the preview. But because Scribd uses flash paper to display the documents, and many users (namely those using an iPad/iPhone) do not have Flash Player installed, that preview will not work.  By leaving Google Docs Previews enabled, when a browser does not have Flash enabled, or if Scribd is not enabled, it will use preview powered by Google Docs. Using this service is subject to Google's viewer [terms of service](%{terms_url})
+          If Scribd has been enabled on this account, Canvas will
+          try to use it to show the preview. If the document
+          cannot be previewed in Scribd, or if the user does not
+          have the Flash player installed (e.g. iPad/iPhone),
+          Canvas will fall back to using Google Docs Previews
+          if they are enabled. By using this service you
+          acknowledge that you have read and agreed to the
+          [Google Docs Viewer Terms of Service](%{terms_url}).
       about_google_docs_tooltip: "About Google Docs Previews"
       account_admins_title: "Account Admins"
       account_quotas: 
@@ -1487,14 +1524,11 @@ en:
       other: "See attached files"
     errors: 
       cannot_save_att: "You don't have permission to edit the locked attribute %{att_name}"
-      import: 
-        external_tool_url: "The url for the external tool assignment \"%{assignment_name}\" wasn't valid."
       upload_as_zip: "Please upload files as a .zip"
     feed_entry_title: "Assignment: %{assignment}"
     feed_entry_title_with_course: "Assignment, %{course}: %{assignment}"
     gpa_scale_explainer: "What is GPA Scale Grading?"
     group_assignment_must_have_group_set: "Please select a group set for this assignment"
-    imported_assignments_group: "Imported Assignments"
     labels: 
       due: Due
     name_is_required: "Name is required!"
@@ -1799,6 +1833,7 @@ en:
       freeze_properties: "Lock assignment properties when copied"
       notify_content_change: "Notify users that this content has changed"
       points_possible: Points
+      post_to_sis: "Post to SIS"
       warnings: 
         assignment_is_frozen: "Some settings have been administratively locked."
     errors: 
@@ -1807,6 +1842,11 @@ en:
       google_docs_masquerade_rejected: "Unable to connect to Google Docs as a masqueraded user."
       reminder_failed: "Reminder failed"
     everyone_else: "Everyone else"
+    external_content_homework_submission_view: 
+      additional_comments: "Additional comments"
+      buttons: 
+        submit_assignment: "Submit Assignment"
+      group_assignment_header: Comments...
     external_grader_sidebar: 
       edit_assignment_settings: "Edit Assignment Settings"
       speed_grader: "Speed Grader"
@@ -1923,7 +1963,6 @@ en:
     labels: 
       assignment_group_move_label: "Assignment Group"
       label_place_before: "Place before"
-    loading_tools_failed: "Loading tools failed"
     messages: 
       adding_group: "Adding Group..."
       agree_to_pledge: "You must agree to the submission pledge before you can submit this assignment."
@@ -2060,7 +2099,6 @@ en:
         submission: 
           details: "Submission Details"
           download_attachment: "Download %{attachment_display_name}"
-          view_original_entry: "View the Original Entry"
           view_original_page: "View the Original Page"
           view_quiz: "View the Quiz Submission"
           view_survey: "View the Survey Submission"
@@ -2237,6 +2275,8 @@ en:
         edit_assignment_in_detail: "(allow uploads, edit description, etc.)"
       titles: 
         wizard_box: "I would like to:"
+  assignments_api: 
+    invalid_date_time: "Invalid datetime for %{attribute}"
   attachment: 
     default_filename: File
     errors: 
@@ -2341,6 +2381,8 @@ en:
       user_name_description: "The user name of the user that has teacher/designer access to the course for the row. This must match one of the user name's listed in the Blackboard login credentials above."
     only_one_bulk_migration: "Only one bulk course migration can be run at a time."
   button: 
+    go_back: "Go Back"
+    post: "Post Grades"
     submit_assignment: "Submit Assignment"
   buttons: 
     add_item: "Add Item"
@@ -2353,6 +2395,7 @@ en:
     done: Done
     filter: Filter
     find_user: "Find User"
+    ignore_all: "Ignore All"
     import: Import
     login: Login
     manage_rubrics: "Manage Rubrics"
@@ -2701,6 +2744,7 @@ en:
     ics_description_group: "Calendar events for the group, %{group_name}"
     ics_description_user: "Calendar events for the user, %{user_name}"
     ics_title: "%{course_or_group_name} Calendar (Canvas)"
+    invalid_date_or_time: "Invalid date or invalid datetime for %{attr}"
   calendars: 
     assignment_details: "Assignment Details"
     calendar: 
@@ -3210,6 +3254,8 @@ en:
     d2_l_export: 
       content: Content
       options: Options
+    external_tool_content: 
+      content: Content
     file_required: "You must select a file to import content from"
     file_too_large: "Your migration cannot exceed %{file_size}"
     hide_issues: "Hide Issues"
@@ -3282,6 +3328,9 @@ en:
         remove_day_substitution_link: "Remove day substitution"
         remove_day_substitution_link_label: "Remove day substitution"
         to_happen_on: to
+      external_tool_launch: 
+        course: Course
+        find_a_course: "Find a Course"
       folder_picker: 
         default_select_folder: "Select Folder"
         upload_to: "Upload to"
@@ -3302,6 +3351,7 @@ en:
       select_content_checkbox: 
         select_all_content: "All content"
         select_specific_content: "Select specific content"
+    unsupported_migration_type: "Unsupported migration_type for context"
     upload_warning: "Navigating away from this page will cancel the upload process."
     uploading: Uploading...
     web_ct: 
@@ -3329,8 +3379,6 @@ en:
     titles: 
       tag_external_web_page: "Tag External Web Page"
   context: 
-    all_marked_read: "Inbox messages all marked as read"
-    bad_message: "This message could not be displayed"
     communication: 
       headings: 
         discussions: Discussions
@@ -3347,38 +3395,10 @@ en:
       last_updated: "last updated"
       links: 
         restore: restore
-    inbox: 
-      buttons: 
-        mark_all_as_read: "Mark All Messages as Read"
-      errors: 
-        mark_as_read_failed: "Marking failed, please try again"
-      inbox: 
-        discussion_replies: "Discussion Replies"
-      status: 
-        marking_all_as_read: "Marking All as Read..."
-    inbox_item: 
-      images: 
-        alt: 
-          topic: topic
-        title: 
-          topic: 
-            read: "Discussion Message - read"
-            unread: "Discussion Message"
-      links: 
-        remove: Remove
-        title: 
-          remove_message: "Remove this Message"
-      no_title: "No Title"
-    inbox_items: 
-      inbox_delete_confirm: "Are you sure you want to delete this item from your inbox?"
-      loading_results: "Loading more results"
-      no_messages: "Sorry, no messages yet."
     media_object_inline: 
       titles: 
         media_playback: "Media Playback"
     media_objects_not_configured: "Media Objects not configured"
-    message_deleted: "This message has been deleted"
-    message_removed: "The message you were trying to view has been removed"
     new_roster_user: 
       completed_enrollment: "completed *%{completed_at}*"
       confirm: 
@@ -3521,10 +3541,8 @@ en:
       restore_failed: "restore failed"
       restoring: restoring...
   context_external_tool: 
-    external_tool_attention_needed: "The security parameters for the external tool \"%{tool_name}\" need to be set in Course Settings."
     url_or_domain_required: "Either the url or domain should be set."
   context_module: 
-    migration_module_item_type: "Module Item"
     requirements: 
       max_score: "must score no more than a %{score}"
       min_score: "must score at least a %{score}"
@@ -4285,7 +4303,6 @@ en:
     default_short_name: Course-101
     errors: 
       sis_in_use: "SIS ID \"%{sis_id}\" is already in use"
-    failed_import_media_objects: "Failed to import media objects"
     file_copy_error: "Couldn't copy file \"%{name}\""
     grade_export_types: 
       instructure_csv: "Instructure formatted CSV"
@@ -4722,12 +4739,13 @@ en:
       edit_sections_view: 
         edit_sections_desc: "Sections are an additional way to organize users. This can allow you to teach multiple classes from the same course, so that you can have the course content all in one place. Below you can move a user to a different section, or add/remove section enrollments. Users must be in at least one section at all times."
       index: 
-        add_people: "Add People"
         cannot_add_users: "New users can not be added because this course is concluded"
         filter_field_description: "As you type in this field, the list of people will be automatically filtered to only include those whose names match your input."
         filter_list_of_people: "Filter list of people"
+        people: People
         role_to_search: "Limit search to role"
         search_people: "Search people"
+        title_add_people: "Add People"
       invitations_view: 
         accepted_invitation: "%{name} has already received and accepted the invitation to join the course, but you can still re-send the invitation if it is needed."
         admin_invitation_unaccepted: "%{name} hasn't yet accepted the invitation to join the course. The invitation was sent: %{time}"
@@ -4907,7 +4925,7 @@ en:
         modules: |-
             You can organize your course into **modules or sections**, where each section contains a related set of files, assignments, pages, etc.  If you want, you can also sequence modules by defining criteria and prerequisites that need to be completed before each module is unlocked.
             
-            -This layout is probably best for courses that aren't based on a specific schedule like a term or semester.
+                        -This layout is probably best for courses that aren't based on a specific schedule like a term or semester.
         recent_activity_dashboard: "The **recent activity dashboard** lets participants see the most recent conversations, announcements, discussions, and interactions for this course.  It's very similar to the dashboard page users see when they first log in, but only shows content for this specific course."
         syllabus: "The **syllabus view** lets you write up a description of course expectations or introduce the course with links, images, etc. and then also shows a calendar view of all assignments and course events."
       draft_state: 
@@ -5027,9 +5045,6 @@ en:
       invalid_link: "The enrollment link you used appears to no longer be valid.  Please contact the course instructor and make sure you're still correctly enrolled."
   create_users_view: 
     required: "Please enter some email addresses"
-  crumb: 
-    conversations: Conversations
-    discussion_replies: "Discussion Replies"
   crumbs: 
     access_report: "Access Report"
     announcements: Announcements
@@ -5043,7 +5058,6 @@ en:
     eportfolio_welcome: "Welcome to Your ePortfolio"
     error_reports: "Error Reports"
     files: Files
-    gradebook: Gradebook
     grades: Grades
     grading_schemes: "Grading Schemes"
     groups: Groups
@@ -5278,57 +5292,81 @@ en:
   default_question_name: Question
   default_question_text: "Question text"
   demos: 
+    _register: 
+      add_site: "Add Site"
+      invalid_email: "Invalid email address"
+      personalizing: Personalizing...
+      ready: Ready!
+      registered_successfully: "Registered successfully!"
+      specify_location: "Please specify your geographic location"
+      try_again: "Try Again"
+      you_must_agree_to_terms: "You must agree to the terms of use"
     demos_add: 
       labels: 
         school_name: "School Name"
         username: "Email Address"
     register: 
-      add_site: "Add Site"
+      africa: Africa
       agree_to_terms: "I agree to the *terms of use* and acknowledge the **privacy policy**."
+      asia_and_middle_east: "Asia and Middle East"
+      assistant_superintendent: "Assistant Superintendent"
+      australia_new_zealand_and_oceania: "Australia, New Zealand, and Oceania"
       begin_trial: "Begin Trial"
-      choose: Choose
+      bus_finance_purchasing_director: "Bus/Finance/Purchasing Dir"
+      c_level: C-Level
+      choose: "Choose One"
       cio: CIO
       corporate: Corporate
       dean: Dean
       director: Director
+      e_rate_administrator: "ERate Administrator"
+      employee: Employee
+      europe_other: "Europe - Other"
+      europe_uk: "Europe - UK"
+      executive_officer: "Executive Officer"
+      government: Government
+      gs_11_15: "GS 11-15"
+      gs_1_7: "GS 1-7"
+      gs_8_10: "GS 8-10"
       higher_education: "Higher Ed"
+      higher_education_for_profit: "Higher Ed For-Profit"
       incorrect: "Incorrect. Try again."
       instructional_designer: "Instructional Designer"
-      invalid_email: "Invalid email address"
+      instructional_media_svcs_dir: "Instructional Media Svcs Dir"
       k12: K12
+      k12_for_profit: "K12 For-Profit"
       labels: 
-        current_lms: "Current LMS"
+        location: Location
         name: Name
-        organization_size: "Organization Size"
-        organization_type: "Organization type"
-        phone: "Phone number"
-        school_name: "School / organization"
+        organization_type: "Organization Type"
+        phone: "Phone Number"
+        school_name: "School / Organization"
         school_position: Title
         type_what_you_hear: "Type what you hear"
         type_what_you_see: "Type what you see"
         username: Email
-      lms_admin: "LMS Administrator"
-      no_lms: None
+      library_media_specialist: "Library/Media Specialist"
+      lms_administrator: "LMS Administrator"
+      manager: Manager
+      network_system_administrator: "Network System Administrator"
       other: Other
-      other_lms: Other
-      other_title: Other
       personalize_demo: "Personalize Your Demo"
-      personalizing: Personalizing...
-      proprietary_lms: "Homegrown / Proprietary"
+      principal: Principal
       provost: Provost
-      ready: Ready!
-      school_admin: "School Administrator"
+      school_administrator: "School Administrator"
+      school_technology_coordinator: "School Technology Coordinator"
       sign_up_to_canvas: "Sign up to try Canvas"
-      specify_lms: "Please specify your current LMS or choose 'none'"
-      specify_size: "Please specify your organization's size"
+      south_america_central_america_and_caribbean: "South America, Central America, and Caribbean"
       student: Student
       subscribe: "I want to receive news, tips and info from Instructure"
+      superintendent: Superintendent
       support: Support
-      teacher: Teacher/Instructor
+      teacher_instructor: Teacher/Instructor
       technologist: Technologist
-      try_again: "Try Again"
-      vice_president: VP
-      you_must_agree_to_terms: "You must agree to the terms of use"
+      technology_computer_coord: "Technology/Computer Coord"
+      technology_education_director: "Technology Education Director"
+      united_states_and_canada: "United States and Canada"
+      vp: VP
   developer_key: 
     api_key: "Key: *%{api_key}*"
     created: "Created:"
@@ -6152,6 +6190,7 @@ en:
       search_filter: "Filter by name"
       view_app_center: "View App Center"
       view_installed_tools: "View App Configurations"
+    migration_selection_configured: "Migration selection configured"
     missing_stars: "You must select a star rating"
     rate_tool_view: 
       rate_tool: "How do you rate this tool?"
@@ -6241,8 +6280,11 @@ en:
         Turning this feature off will publish ALL existing objects in the course. Please make sure all draft content
         is ready to be published and available to all users in the course before continuing.
     google_docs_domain_restriction: "Google Docs Domain Restriction"
+    high_contrast: "Use High Contrast Styles"
     individual_gradebook: "Individual Gradebook View"
-    outcome_gradebook: "Outcome Gradebook"
+    learning_mastery_gradebook: "Learning Mastery Gradebook"
+    new_styles: "Use New Styles"
+    post_grades: "Post Grades to SIS"
     student_outcome_gradebook: "Student Outcome Gradebook"
   file_browser_view: 
     folder_tree_instructions: "Use the up and down arrow keys to navigate through the tree. Press right to expand folders, left to collapse, and enter to choose an image."
@@ -6452,6 +6494,10 @@ en:
       to be restricted to a single domain. Students attempting to submit assignments or
       join collaborations on an unapproved domain will receive an error message notifying them
       that they will need to update their Google Docs integration.
+  grade_display_warning_dialog: 
+    grade_display_warning: 
+      checkbox: "Don't show for this course again."
+      warning: Warning
   gradebook: 
     alerts: 
       no_active_students: "Sorry, there are either no active students in the course or none are gradable by you."
@@ -6494,7 +6540,6 @@ en:
       none_to_update: "None to Update"
       select_an_option: "Please select an option"
       upload_as_zip: "Please upload files as a .zip"
-    grade: "grade: %{grade}"
     graded_by_me: "%{graded_time} by me"
     graded_then_resubmitted: "graded, then resubmitted (%{when})"
     gradee_index_of_total: "%{gradee} %{x} of %{y}"
@@ -6514,7 +6559,6 @@ en:
       submission_details: "Submission Details"
       view_quiz: "View this Quiz"
       view_submission: "View Submission"
-    loud_late: LATE
     message_students_who: "Message Students Who..."
     mute_assignment: "Mute Assignment"
     new_assessment: "[New Assessment]"
@@ -6593,6 +6637,11 @@ en:
     errors: 
       none_to_update: "None to Update"
       upload_as_zip: "Please upload files as a .zip"
+    grade_display_warning: 
+      cancel: Cancel
+      continue: Continue
+      percent_text: "Students will also see their final grade as a percentage. Are you sure you want to continue?"
+      points_text: "Students will also see their final grade as points. Are you sure you want to continue?"
     gradebook_header_menu: 
       assignment_details: "Assignment Details"
       curve_grades: "Curve Grades"
@@ -6615,12 +6664,14 @@ en:
     keyboard_comment_desc: "Comment on the active submission"
     keyboard_menu_desc: "Open the menu for active column's assignment"
     keyboard_sort_desc: "Sort the grid on the current active column"
+    keyboard_tooltip_desc: "Show the submission type of the active submission"
     keycodes: 
       close_menu: esc
       comment: c
       goto_assignment: g
       menu: m
       sort: s
+      tooltip: t
     learning_outcome: "Learning Outcome"
     mastery: mastery
     near_mastery: "near mastery"
@@ -6639,29 +6690,10 @@ en:
     resubmitted: "Resubmitted since last graded"
     row_student_name: 
       student_placeholder: Student
-    screenreader: 
-      page_titles: "Screenreader Gradebook"
     secondary_id: "Secondary ID"
     section_to_show_menu: 
       choose_a_section_to_show: "Choose a section to show"
       showing_sections: "Showing *%{currentSection}*"
-    show: 
-      arrange_columns_by_due_date: "Arrange columns by due date"
-      arrange_columns_by_group: "Arrange columns by assignment group"
-      download_scores: "Download Scores (.csv)"
-      filter_by_student: "Filter by student name or secondary ID"
-      grades: Grades
-      hide_student_names: "Hide Student Names"
-      include_ungraded: "Treat Ungraded as 0"
-      learning_mastery: "Learning Mastery"
-      old_gradebook: "old gradebook"
-      publish_to_sis: "Publish grades to SIS"
-      set_group_weights: "Set Group Weights"
-      show_attendance_columns: "Show Attendance Columns"
-      show_concluded_enrollments: "Show Concluded Enrollments"
-      srgb_gradebook: "switch gradebooks"
-      upload_scores: "Upload Scores (from .csv)"
-      view_grading_history: "View Grading History"
     show_notes: "Show Notes Column"
     show_student_names: "Show Student Names"
     student_name: "Student Name"
@@ -6682,6 +6714,7 @@ en:
     titles: 
       discussion: "Discussion Submission"
       media: "Media Comment Submission"
+      media_recording: "Media Recording Submission"
       quiz_review: "This quiz needs review"
       text: "Text Entry Submission"
       upload: "File Upload Submission"
@@ -6938,6 +6971,24 @@ en:
       upload_info: "If you made changes to the student submission files you downloaded before, just zip them back up and upload the zip with the form below. Students will see the modified files in their comments for the submission."
       upload_warning: "Make sure you don't change the names of the submission files so we can recognize them."
       weight_final: "Weight final grade based on groups"
+    gradebook2: 
+      arrange_columns_by_due_date: "Arrange columns by due date"
+      arrange_columns_by_group: "Arrange columns by assignment group"
+      download_scores: "Download Scores (.csv)"
+      filter_by_student: "Filter by student name or secondary ID"
+      grades: Grades
+      hide_student_names: "Hide Student Names"
+      include_ungraded: "Treat Ungraded as 0"
+      learning_mastery: "Learning Mastery"
+      old_gradebook: "old gradebook"
+      post_grades: "Post Grades"
+      publish_to_sis: "Publish grades to SIS"
+      set_group_weights: "Set Group Weights"
+      show_attendance_columns: "Show Attendance Columns"
+      show_concluded_enrollments: "Show Concluded Enrollments"
+      srgb_gradebook: "switch gradebooks"
+      upload_scores: "Upload Scores (from .csv)"
+      view_grading_history: "View Grading History"
     grades: 
       complete: Complete
       incomplete: Incomplete
@@ -6970,6 +7021,8 @@ en:
         other: "Files and comments created for %{count} submissions"
     out_of_final: "%{weight} of Final"
     out_of_points_possible: "out of %{points_possible}"
+    screenreader: 
+      page_titles: "Screenreader Gradebook"
     show: 
       keycode_descriptions: 
         edit_cell: "Edit Cell"
@@ -7033,8 +7086,6 @@ en:
         show_assessment_by: "Show Assessment By"
         showing: Showing
         sort_by: "Sort student list"
-        submission_to_view: "Submission to view"
-        submitted: Submitted
       late_notice: "Note: This submission was LATE"
       links: 
         click_to_view: "click here to view"
@@ -7553,6 +7604,9 @@ en:
       x_new_in_discussions: 
         one: "*1* Discussion"
         other: "*%{count}* Discussions"
+  high_contrast_description: |-
+      If you would prefer a higher-contrast version of the Canvas user interface, enable this.
+      This might be useful for people with impaired vision or dificulty reading.
   ic_actions: 
     manage: manage
   images: 
@@ -7562,6 +7616,28 @@ en:
     invalid_file_size: "Image file size is too large (max %{max} bytes, got %{actual})"
     invalid_file_type: "Invalid file type %{type}. Allowed types include: %{type_list}"
     not_an_image: "Selected file is not an image"
+  importers/assignment_importer: 
+    errors: 
+      import: 
+        external_tool_url: "The url for the external tool assignment \"%{assignment_name}\" wasn't valid."
+    imported_assignments_group: "Imported Assignments"
+  importers/context_external_tool_importer: 
+    external_tool_attention_needed: "The security parameters for the external tool \"%{tool_name}\" need to be set in Course Settings."
+  importers/context_module_importer: 
+    migration_module_item_type: "Module Item"
+  importers/course_content_importer: 
+    failed_import_media_objects: "Failed to import media objects"
+  importers/learning_outcome_group_importer: 
+    no_global_permission: "You're not allowed to manage global outcomes, can't add \"%{title}\""
+  importers/learning_outcome_importer: 
+    no_context_found: "The external Learning Outcome couldn't be found for \"%{title}\", creating a copy."
+    no_global_permission: "You're not allowed to manage global outcomes, can't add \"%{title}\""
+  importers/rubric_importer: 
+    no_context_found: "The external Rubric couldn't be found for \"%{title}\", creating a copy."
+  importers/wiki_page_importer: 
+    title_for_topics_category: "%{category} Topics"
+    warnings: 
+      truncated_wiki_title: "The title of the following wiki page was truncated: %{title}"
   individual_gradebook_description: "Individual Gradebook View provides a gradebook view that is designed for accessibility."
   info: 
     notices: 
@@ -7682,6 +7758,7 @@ en:
         locked_by: "Locked By"
         max_attempts: "Max Attempts"
         num_attempts: Attempts
+        original_id: "Original ID"
         priority: Priority
         run_at: "Run At"
         strand: strand
@@ -7738,13 +7815,14 @@ en:
       view_all_groups: "View all groups"
     mobile_auth: 
       log_in_to_canvas: "Log In To Canvas"
+  learning_mastery_gradebook_description: |-
+      Learning Mastery Gradebook provides a way for teachers to quickly view student and course
+      progress on course learning outcomes. Outcomes are presented in a Gradebook-like
+      format and student progress is displayed both as a numerical score and as mastered/near
+      mastery/remedial.
   learning_outcome: 
     no_comment: "No Comment"
-    no_context_found: "The external Learning Outcome couldn't be found for \"%{title}\", creating a copy."
     no_description: "No Description"
-    no_global_permission: "You're not allowed to manage global outcomes, can't add \"%{title}\""
-  learning_outcome_group: 
-    no_global_permission: "You're not allowed to manage global outcomes, can't add \"%{title}\""
   lib: 
     angel: 
       failed_import_link: "Failed import link"
@@ -8617,13 +8695,13 @@ en:
         subject: "Confirm Email: Canvas"
     confirm_registration: 
       email: 
-        body: "Thank you for registering with Canvas!  This email is confirmation that the user %{user} is registering for a new account at %{website}."
+        body: "Thank you for registering with %{product_name}!  This email is confirmation that the user %{user} is registering for a new account at %{website}."
         details: "To finish the registration process, please visit the following url:"
         html: 
-          body: "Thank you for registering with Canvas! This email is confirmation that the user %{user} is registering for a new account at %{website}."
+          body: "Thank you for registering with %{product_name}! This email is confirmation that the user %{user} is registering for a new account at %{website}."
           details: "Click here to finish the registration process"
-          subject: "Confirm Registration: Canvas"
-        subject: "Confirm Registration: Canvas"
+          subject: "Confirm Registration: %{product_name}"
+        subject: "Confirm Registration: %{product_name}"
     confirm_sms_communication_channel: 
       sms: 
         body: |-
@@ -9877,6 +9955,7 @@ en:
       module: 
         prerequisites: Prerequisites
         published: Published
+    post_grades_dialog_title: "Post Grades to SIS"
     progression_module_collection: 
       module_progress_for: "Module Progress for %h{student_link}"
       module_progress_for_student: "Module Progress for %{student.name}"
@@ -9890,7 +9969,10 @@ en:
       back_to_modules: "Back to Modules Page"
       no_students_found: "No students were found"
       student_progress: "Student Progress"
+  moodle_dropdown_many_warning_title: "There are %{count} Multiple Dropdowns questions in this bank that may have been imported incorrectly"
   moodle_dropdown_warning_title: "Multiple Dropdowns question may have been imported incorrectly"
+  moodle_formula_many_warning_title: "There are %{count} Formula questions in this bank that will need to have their possible answers regenerated"
+  moodle_formula_warning_title: "Possible answers will need to be regenerated for Formula question"
   move_dialog: 
     cancel: Cancel
     save: Save
@@ -9910,6 +9992,9 @@ en:
     sure_you_want_to_mute: "Are you sure you want to mute this assignment? While this assignment is muted, students will not receive new notifications about or be able to see:"
   name: "Academic Benchmark Importer"
   new_facebook_message: "You have a new message from Canvas"
+  new_styles_description: |-
+      We are working on a UI facelift to Canvas. Turn this on to opt-in to seeing the
+      updated, simplified look and feel of the Canvas interface.
   no_migration_file: "File required for content migration."
   not_a_number: "must be a positive number"
   not_applicable: N/A
@@ -10176,11 +10261,6 @@ en:
     : "No"
     ? "yes"
     : "Yes"
-  outcome_gradebook_description: |-
-      Outcome Gradebook provides a way for teachers to quickly view student and course
-      progress on course learning outcomes. Outcomes are presented in a Gradebook-like
-      format and student progress is displayed both as a numerical score and as mastered/near
-      mastery/remedial.
   outcome_groups: 
     invalid_file: "Invalid outcome group file"
   outcome_groups_api: 
@@ -10709,11 +10789,16 @@ en:
         access_key: "Access Key"
         api_url: "Api Url"
         secret_key: "Secret Key"
+  post_grades_description: |-
+      Post Grades allows teachers to post grades back to enabled SIS systems: Powerschool,
+      Aspire (SIS2000), JMC, and any other SIF-enabled SIS that accepts the SIF elements GradingCategory,
+       GradingAssignment, GradingAssignmentScore.
   prerequisites_lookup: 
     headers: 
       completion_prerequisites: "Completion Prerequisites"
     labels: 
       requirements_must_be_completed: "The following requirements need to be completed before this page will be unlocked"
+  product_name: Canvas
   profile: 
     access_token: 
       default_app_name: "No App"
@@ -10836,7 +10921,6 @@ en:
         change_password: "Change Password"
         confirm_password: "Confirm Password"
         default_email: "Default Email"
-        enabled_theme: "Enabled Theme"
         expires_at: Expires
         headers: 
           approved_integrations: "Approved Integrations"
@@ -11139,6 +11223,93 @@ en:
       publishing: Publishing...
       unpublish: Unpublish
       unpublishing: Unpublishing...
+  publish_grades: 
+    assignment_group_list: 
+      no_assignment_groups: "No Assignment Groups found"
+    assignment_group_list_item: 
+      group_weight: "%{groupWeight}% of Total"
+      manage: Manage
+    assignment_list_item: 
+      assignment_edit: "Edit Assignment"
+      module: Module
+      multiple_modules: "Multiple Modules"
+      no_points_possible: "No Points Possible"
+      points_possible: "%{pointsPossible} pts"
+      points_possible_screen_reader: "%{pointsPossible} Points Possible"
+      settings: "Edit Assignment"
+    assignment_list_item_score: 
+      assignment_grading_type_is_not_graded: "This assignment will not be assigned a grade."
+      assignment_not_yet_graded_screenreader: "Assignment not yet graded. %{pointsPossible} points possible."
+      empty_points_possible: "-/%{pointsPossible} pts"
+      no_submission: "No Submission"
+      no_submission_for_assignment_screenreader: "No submission for this assignment. %{pointsPossible} points possible."
+      not_yet_graded: "*Not Yet Graded*"
+      score_with_points_possible: "*%{score}*/%{pointsPossible} pts"
+      score_with_points_possible_screenreader: "Score: %{score} out of %{pointsPossible} points."
+    assignment_settings: 
+      cancel: Cancel
+      save: Save
+      validating: Saving...
+      weight_groups: "Weight final grade based on assignment groups"
+    available_date_description: 
+      available_until: "Available until"
+      closed: Closed
+      not_available_until: "Not available until"
+    create_assignment: 
+      assignment: Assignment
+      assignment_due_at: "Due:"
+      assignment_name: "Name:"
+      assignment_points: "Points:"
+      assignment_type: "Type:"
+      cancel: Cancel
+      discussion_type: Discussion
+      external_tool_type: "External Tool"
+      more: "Go To %{objectType}"
+      multiple_due_dates: "Multiple due dates"
+      not_graded_type: "Not Graded"
+      quiz_type: Quiz
+      save: Save
+      saving: Saving...
+    date_available_column_view: 
+      available: Available
+      multiple_dates: "Multiple Dates"
+    date_due_column_view: 
+      due: Due
+      due_date: Due
+      multiple_dates: "Multiple Dates"
+    due_date_view: 
+      overrides: 
+        remove_these_dates: "Remove These Dates"
+    edit_header_view: 
+      buttons: 
+        not_published: "Not Published"
+        published: Published
+      manage: Manage
+      titles: 
+        delete: Delete
+    group_category_selector: 
+      grade_group_students_individually: "Assign Grades to Each Student Individually"
+      group_assignment_header: "Group Assignment"
+      group_category_options: "New Group Category"
+      group_set: "Group Set"
+      is_group_assignment: "This is a Group Assignment"
+      students_already_submitted_warning: "Prior individual submissions will not be counted as group submissions and will show incorrectly in speedgrader."
+    index_view: 
+      add_group: "Publish Assignment Grades"
+      assignments: Assignments
+      search_for_assignment: "Search for Assignment"
+      title_add_group: "Add Assignment Group"
+    never_drop: 
+      remove_rule: "Remove Rule"
+    never_drop_collection: 
+      add_another_assignment: "Add another assignment"
+      add_first_assignment: "Add an assignment"
+    no_assignments_list_item: 
+      no_assignments_in_this_group: "No assignments in this group"
+    no_assignments_search: 
+      aria_assignments: Assignments
+      assignments: Assignments
+      no_assignments_found: "No assignments found"
   publish_icon_component: 
     publish: Publish
     publish_click: "published, click to unpublish"
@@ -11523,6 +11694,7 @@ en:
     quiz_question: 
       defaults: 
         question_name: Question
+    quiz_short_answer_length_error: "Answers for fill in the blank questions must be under 80 characters long"
     quiz_statistics: 
       statistics_filename: "%{quiz_title} %{quiz_type} %{report_type} Report"
       types: 
@@ -11533,6 +11705,8 @@ en:
         this_is_an_external_element: "This is an external element, not text, and could have changed since the student submitted"
         this_is_an_external_frame: "This is an external frame, not text, and could have changed since the student submitted"
         this_is_an_image: "This is an image, not text, and could have changed since the student submitted"
+    quiz_submission_users: 
+      created: created
     quiz_submissions: 
       errors: 
         invalid_submissions: "This quiz submission could not be verified as belonging to you.  Please try again."
@@ -11582,7 +11756,6 @@ en:
         not_yet_graded: "Not yet graded"
         original_score: "Original Score:"
         points_possible: "%{points_possible} pts"
-        question_number: "Question %{question_number}"
         regraded_score: "Regraded Score:"
         show_ansers_for_variable: "Show Answers for %{variable}"
         skip_question_text: "Skip to question text."
@@ -12346,6 +12519,8 @@ en:
     questions: 
       one: "1 Question"
       other: "%{count} Questions"
+  quizzes_redirects: 
+    no_access: "Access denied. Redirected to a page you have access to."
   re_upload_submissions_form: 
     buttons: 
       upload: "Upload Files"
@@ -12408,13 +12583,13 @@ en:
     permission: 
       read_sis: "Read SIS data"
     permissions: 
+      app_profiling: "Application Profiling"
       become_user: "Become other users"
       change_course_state: "Change course state"
       comment_on_others_submissions: "View all students' submissions and make comments on them"
       create_accounts: "Create new root accounts"
       create_collaborations: "Create student collaborations"
       create_conferences: "Create web conferences"
-      generate_data_exports: "Generate Data Exports"
       manage_account_memberships: "Add/remove other admins for the account"
       manage_account_settings: "Manage account-level settings"
       manage_admin_users: "Add/remove other teachers, course designers or TAs to the course"
@@ -12522,7 +12697,6 @@ en:
     updating: Updating...
   rubric: 
     context_name_rubric: "%{course_name} Rubric"
-    no_context_found: "The external Rubric couldn't be found for \"%{title}\", creating a copy."
     no_description: "No Description"
     unknown_details: "Unknown Details"
   rubric_assessment: 
@@ -13461,6 +13635,13 @@ en:
       back: Back
       close: Close
       forward: Forward
+  speed_grader: 
+    submissions_dropdown: 
+      grade: "(grade: %{grade})"
+      loud_late: LATE
+      see_all_quiz_attempts: "See all quiz attempts"
+      submission_to_view: "Submission to view:"
+      submitted: "*Submitted:* %{submittedAt}"
   sr_gradebook: 
     all_sections: "All Sections"
     assignment_muted: "Click to unmute."
@@ -13580,6 +13761,7 @@ en:
     click_to_download: "Click here to download %{size_of_file}"
     creating_zip: "Creating zip file..."
     download_submissions: "Download Assignment Submissions"
+    download_submissions_title: "Download Assignment Submissions"
     errors: 
       assignment_submit_fail: "Assignment failed to submit"
       can_not_submit_locked_assignment: "You can't submit an assignment when it is locked"
@@ -13592,6 +13774,7 @@ en:
       student_not_enrolled_id: "The specified user (%{id}) is not a student in this course"
     errors_update_failed: "Update Failed"
     finished_redirecting: "Finished!  Redirecting to File..."
+    gathering_files: "Gathering Files (%{progress})..."
     gathering_files_progress: "Gathering Files (%{progress})..."
     resubmitted_to_turnitin: "Successfully resubmitted to turnitin."
     see_attached_files: "See attached files"
@@ -13759,7 +13942,7 @@ en:
   text_helper: 
     time: 
       ranges: 
-        different_days: "%{start_date_and_time} to %{end_date_and_time}"
+        different_days: "%{start_date_and_time} *to* %{end_date_and_time}"
   time: 
     am: am
     count_hours_ago: 
@@ -14001,6 +14184,7 @@ en:
         find_user: "Find a User"
         merge_users: "Merge User Accounts"
         really_merge: "Really Merge User Accounts?"
+    birthdate_invalid: "Invalid date or invalid datetime for birthdate"
     cant_self_merge: "You can't merge an account with itself."
     cc_prefs: 
       buttons: 
@@ -14387,10 +14571,7 @@ en:
       blank_title: "Title can't be blank"
       title_characters: "Title must contain at least one letter or number"
       title_too_long: "Title can't exceed %{max_characters} characters"
-    title_for_topics_category: "%{category} Topics"
     unknown_user_name: Unknown
-    warnings: 
-      truncated_wiki_title: "The title of the following wiki page was truncated: %{title}"
   wiki_page_revisions: 
     index: 
       links: 
@@ -14500,7 +14681,7 @@ en:
       archive: Archive
       archive_link: "View archive(s)"
   zip_argument_error: "A .zip upload requires a folder to upload to."
-  zip_file_description: "Migration plugin for unpacking plain .zip files into a course"
+  zip_file_description: "Migration plugin for unpacking .zip archives into course, group, or user files"
   zip_file_display: "File Import"
   zip_file_file_description: "Unzip .zip file into folder"
   zip_file_imports: 

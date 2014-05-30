@@ -81,9 +81,7 @@ module CC::Importer::Canvas
           # Validate the format a little bit
           # Should be something like [{"id"=>0},{"id"=>5},{"id"=>4}]
           if nav.present? && nav.is_a?(Array)
-            if nav.all?{|i|i.is_a?(Hash) && i["id"]}
-              course[:tab_configuration] = nav.reject{|i|!i["id"].is_a?(Integer)}
-            end
+            course[:tab_configuration] = nav.select{|i| i.is_a?(Hash) && i["id"] }
           end
         rescue
           add_warning(I18n.t('errors.bad_navigation_config', "Invalid course tab configuration"), $!)

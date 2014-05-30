@@ -89,12 +89,12 @@
                   <% preview_document = t('preview_crocodoc_document', 'Preview your submission and view teacher feedback, if available')
                      button_text = t('view_feedback_button', 'View Feedback')
                   %>
-                <% elsif attachment.scribdable? %>
-                  <% preview_document = t('preview_scribd_document', 'Preview your submission')
+                <% elsif attachment.scribdable? || attachment.canvadocable? %>
+                  <% preview_document = t('preview_submission', 'Preview your submission')
                      button_text = t('view_preview_button', 'Preview')
                   %>
                 <% end %>
-                <% if attachment.crocodoc_available? || attachment.scribdable? %>
+                <% if attachment.crocodoc_available? || attachment.scribdable? || attachment.canvadocable? %>
                   <div class="ui-listview-text ui-listview-right" style="padding: 4px 5px 0px 5px;">
                     <a href=<%= preview_url %> data-tooltip title="<%= preview_document %>" class="modal_preview_link btn" role="button" aria-hidden="true" tabindex="-1" data-attachment_id="<%= attachment.id %>" data-submission_id="<%= @submission.id %>" data-dialog-title="<%= attachment.display_name %>" <%= doc_preview_attributes(attachment) %>><%= button_text %></a>
                   </div>

@@ -1,7 +1,7 @@
 require 'active_support'
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
-class Quizzes::QuizSubmission; end
+class Quizzes::SubmissionGrader; end
 
 describe Quizzes::QuizRegrader::Answer do
 
@@ -59,7 +59,7 @@ describe Quizzes::QuizRegrader::Answer do
     end
 
     sent_params = {}
-    Quizzes::QuizSubmission.expects(:score_question).with do |*args|
+    Quizzes::SubmissionGrader.expects(:score_question).with do |*args|
       sent_params, sent_answer_data = args
       if question.question_data[:question_type] == 'multiple_answers_question'
         answer.each do |k,v|

@@ -18,8 +18,9 @@ Rails.configuration.to_prepare do
   HostUrl.outgoing_email_domain = config[:domain]
   HostUrl.outgoing_email_default_name = config[:default_name]
 
-  ReplyToAddress.address_pool = config[:reply_to_addresses] ||
+  IncomingMail::ReplyToAddress.address_pool = config[:reply_to_addresses] ||
     Array(HostUrl.outgoing_email_address)
+  IncomingMailProcessor::MailboxAccount.default_outgoing_email = HostUrl.outgoing_email_address
 end
 
 # delivery_method can be :smtp, :sendmail or :test
@@ -32,4 +33,3 @@ when :smtp
 when :sendmail
   ActionMailer::Base.sendmail_settings.merge!(config)
 end
-

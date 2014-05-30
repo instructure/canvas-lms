@@ -256,7 +256,11 @@
     width: 45px;
 
     a {
-      color: #bbb;
+      @if $use_high_contrast {
+        color: #444;
+      } @else {
+        color: #bbb;
+      }
     }
 
     .al-options a {
@@ -278,7 +282,11 @@
 
   &.no-content {
     border-style: dashed;
-    color: #878d92;
+    @if $use_high_contrast {
+      color: #444;
+    } @else {
+      color: #878d92;
+    }
     display: none;
     margin: 5px;
     padding: 8px;

@@ -247,6 +247,18 @@ module MigratorHelper
     end
   end
 
+  def add_learning_outcome_to_overview(overview, outcome)
+    unless outcome[:type] == "learning_outcome_group"
+      overview[:learning_outcomes] << {:migration_id => outcome[:migration_id], :title => outcome[:title]}
+    end
+    if outcome[:outcomes]
+      outcome[:outcomes].each do |sub_outcome|
+        overview = add_learning_outcome_to_overview(overview, sub_outcome)
+      end
+    end
+    overview
+  end
+
   def overview
     return @overview if @overview
     logger.debug "Creating the overview hash."
@@ -414,6 +426,14 @@ module MigratorHelper
         @overview[:external_tools] << tool
         tool[:migration_id] = ct[:migration_id]
         tool[:title] = ct[:title]
+      end
+    end
+
+    if @course[:learning_outcomes]
+      @overview[:learning_outcomes] = []
+      @course[:learning_outcomes].each do |outcome|
+        next unless outcome
+        add_learning_outcome_to_overview(@overview, outcome)
       end
     end
 

@@ -124,6 +124,7 @@
 #
 class ContentMigrationsController < ApplicationController
   include Api::V1::ContentMigration
+  include Api::V1::ExternalTools
 
   before_filter :require_context
   before_filter :require_auth
@@ -154,6 +155,15 @@ class ContentMigrationsController < ApplicationController
 
       options = @plugins.map{|p| {:label => p.metadata(:select_text), :id => p.id}}
 
+      external_tools = ContextExternalTool.all_tools_for(@context).select(&:has_migration_selection?)
+      options.concat(external_tools.map do |et|
+        {
+          id: et.asset_string,
+          label: et.label_for('migration_selection', I18n.locale)
+        }
+      end)
+
+      js_env :EXTERNAL_TOOLS => external_tools_json(external_tools, @context, @current_user, session)
       js_env :UPLOAD_LIMIT => @context.storage_quota
       js_env :SELECT_OPTIONS => options
       js_env :QUESTION_BANKS => @context.assessment_question_banks.except(:includes).select([:title, :id]).active
@@ -179,6 +189,13 @@ class ContentMigrationsController < ApplicationController
     @content_migration.check_for_pre_processing_timeout
     render :json => content_migration_json(@content_migration, @current_user, session)
   end
+
+  def migration_plugin_supported?(plugin)
+    # FIXME most migration types don't support Account either, but plugins that do would have to set additional_contexts
+    # in order to not be broken by this
+    @context.is_a?(Course) || @context.is_a?(Account) || Array(plugin.settings[:additional_contexts]).include?(@context.class.to_s)
+  end
+  private :migration_plugin_supported?
 
   # @API Create a content migration
   #
@@ -265,6 +282,10 @@ class ContentMigrationsController < ApplicationController
   #   Move anything scheduled for day 'X' to the specified day. (0-Sunday,
   #   1-Monday, 2-Tuesday, 3-Wednesday, 4-Thursday, 5-Friday, 6-Saturday)
   #
+  # @argument settings[file_url] [string] (optional) A URL to download the file from. Must not require authentication.
+  #
+  # @argument settings[source_course_id] [string] (optional) The course to copy from for a course copy migration. (required if doing course copy)
+  #
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/courses/<course_id>/content_migrations' \ 
@@ -283,10 +304,15 @@ class ContentMigrationsController < ApplicationController
   # 
   # @returns ContentMigration
   def create
-    @plugin = Canvas::Plugin.find(params[:migration_type])
+    @plugin = find_migration_plugin params[:migration_type]
+
     if !@plugin
       return render(:json => { :message => t('bad_migration_type', "Invalid migration_type") }, :status => :bad_request)
     end
+    unless migration_plugin_supported?(@plugin)
+      return render(:json => { :message => t('unsupported_migration_type', "Unsupported migration_type for context") }, :status => :bad_request)
+    end
+
     settings = @plugin.settings || {}
     if settings[:requires_file_upload]
       if !(params[:pre_attachment] && params[:pre_attachment][:name].present?) && !(params[:settings] && params[:settings][:file_url].present?)
@@ -319,7 +345,7 @@ class ContentMigrationsController < ApplicationController
   def update
     @content_migration = @context.content_migrations.find(params[:id])
     @content_migration.check_for_pre_processing_timeout
-    @plugin = Canvas::Plugin.find(@content_migration.migration_type)
+    @plugin = find_migration_plugin @content_migration.migration_type
     lookup_sis_source_course_id
     update_migration
   end
@@ -338,7 +364,7 @@ class ContentMigrationsController < ApplicationController
   #
   # @returns [Migrator]
   def available_migrators
-    systems = ContentMigration.migration_plugins(true)
+    systems = ContentMigration.migration_plugins(true).select{|sys| migration_plugin_supported?(sys)}
     json = systems.map{|p| {
             :type => p.id,
             :requires_file_upload => !!p.settings[:requires_file_upload],
@@ -409,6 +435,16 @@ class ContentMigrationsController < ApplicationController
     authorized_action(@context, @current_user, :manage_content)
   end
 
+  def find_migration_plugin(name)
+    if name =~ /context_external_tool/
+      plugin = Canvas::Plugin.new(name)
+      plugin.meta[:settings] = {requires_file_upload: true, worker: 'CCWorker'}.with_indifferent_access
+      plugin
+    else
+      Canvas::Plugin.find(name)
+    end
+  end
+
   def update_migration
     @content_migration.update_migration_settings(params[:settings]) if params[:settings]
     @content_migration.set_date_shift_options(params[:date_shift_options])
@@ -443,7 +479,7 @@ class ContentMigrationsController < ApplicationController
         end
         @content_migration.save!
       elsif !params.has_key?(:do_not_run) || !Canvas::Plugin.value_to_boolean(params[:do_not_run])
-        @content_migration.queue_migration
+        @content_migration.queue_migration(@plugin)
       end
 
       render :json => content_migration_json(@content_migration, @current_user, session, preflight_json)

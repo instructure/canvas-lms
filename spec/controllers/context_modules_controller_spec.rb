@@ -248,7 +248,7 @@ describe ContextModulesController do
       tag = @module.add_item :type => 'external_url', :url => 'http://lolcats', :title => 'lol'
       @module.completion_requirements = { tag.id => { :type => 'must_view' }}
       @module.save!
-      @module.evaluate_for(@user, true).should be_unlocked
+      @module.evaluate_for(@user).should be_unlocked
       get 'item_redirect', :course_id => @course.id, :id => tag.id
       requirements_met = @module.evaluate_for(@user).requirements_met
       requirements_met[0][:type].should == 'must_view'

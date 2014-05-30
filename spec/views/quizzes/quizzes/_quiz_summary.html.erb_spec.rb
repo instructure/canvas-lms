@@ -41,7 +41,7 @@ describe "/quizzes/quizzes/_quiz_summary" do
     @quiz.assignment.should_not be_nil
     @quiz.assignment.mute!
     @submission = @quiz.generate_submission(@user)
-    @submission.grade_submission
+    Quizzes::SubmissionGrader.new(@submission).grade_submission
 
     view_context
     assigns[:quiz] = @quiz

@@ -65,44 +65,6 @@ module ApplicationHelper
     end
   end
 
-  # don't use this anymore. circular avatars are the new hotness
-  def square_avatar_image(user_or_id, width=50, opts = {})
-    user_id = user_or_id.is_a?(User) ? user_or_id.id : user_or_id
-    user = user_or_id.is_a?(User) && user_or_id
-    if session["reported_#{user_id}"]
-      image_tag "messages/avatar-50.png"
-    else
-      avatar_settings = @domain_root_account && @domain_root_account.settings[:avatars] || 'enabled'
-      user_id, user_shard = Shard.local_id_for(user_id)
-      user_shard ||= Shard.current
-      image_url, alt_tag = user_shard.activate do
-        Rails.cache.fetch(Cacher.inline_avatar_cache_key(user_id, avatar_settings)) do
-          if !user && user_id.to_i > 0
-            user = User.find(user_id)
-          end
-          if user
-            url = avatar_url_for_user(user)
-          else
-            url = "messages/avatar-50.png"
-          end
-          alt = user ? user.short_name : ''
-          [url, alt]
-        end
-      end
-      image_tag(image_url,
-        :style => "width: #{width}px; min-height: #{(width/1.6).to_i}px; max-height: #{(width*1.6).to_i}px",
-        :alt => alt_tag,
-        :class => Array(opts[:image_class]).join(' '))
-    end
-  end
-
-  def square_avatar(user_or_id, context_code, width=50, opts = {})
-    user_id = user_or_id.is_a?(User) ? user_or_id.id : user_or_id
-    if service_enabled?(:avatars)
-      link_to(square_avatar_image(user_or_id, width, opts), "#{context_prefix(context_code)}/users/#{user_id}", :style => 'z-index: 2; position: relative;', :class => 'avatar')
-    end
-  end
-
   def slugify(text="")
     text.gsub(/[^\w]/, "_").downcase
   end
@@ -322,21 +284,32 @@ module ApplicationHelper
 
   def include_css_bundles
     unless jammit_css_bundles.empty?
-      bundles = jammit_css_bundles.map{ |(bundle,plugin)| plugin ? "plugins_#{plugin}_#{bundle}" : bundle }
+      bundles = jammit_css_bundles.map do |(bundle,plugin)|
+        bundle = variant_name_for(bundle)
+        plugin ? "plugins_#{plugin}_#{bundle}" : bundle
+      end
       bundles << {:media => 'all'}
       include_stylesheets(*bundles)
     end
   end
 
+  def variant_name_for(bundle_name)
+    use_new_styles = @domain_root_account.feature_enabled?(:new_styles)
+    use_high_contrast = @current_user && @current_user.prefers_high_contrast?
+    variant = use_new_styles ? '_new_styles' : '_legacy'
+    variant += use_high_contrast ? '_high_contrast' : '_normal_contrast'
+    "#{bundle_name}#{variant}"
+  end
+
   def include_common_stylesheets
-    include_stylesheets :vendor, :common, media: "all"
+    include_stylesheets variant_name_for(:vendor), variant_name_for(:common), media: "all"
   end
 
   def section_tabs
     @section_tabs ||= begin
       if @context
         html = []
-        tabs = Rails.cache.fetch([@context, @current_user, @domain_root_account, "section_tabs_hash", I18n.locale].cache_key) do
+        tabs = Rails.cache.fetch([@context, @current_user, @domain_root_account, Lti::NavigationCache.new(@domain_root_account),  "section_tabs_hash", I18n.locale].cache_key) do
           if @context.respond_to?(:tabs_available) && !(tabs = @context.tabs_available(@current_user, :session => session, :root_account => @domain_root_account)).empty?
             tabs.select do |tab|
               if (tab[:id] == @context.class::TAB_COLLABORATIONS rescue false)
@@ -494,8 +467,8 @@ module ApplicationHelper
   def inst_env
     global_inst_object = { :environment =>  Rails.env }
     {
-      :allowMediaComments       => Kaltura::ClientV3.config && @context.try_rescue(:allow_media_comments?),
-      :kalturaSettings          => Kaltura::ClientV3.config.try(:slice, 'domain', 'resource_domain', 'rtmp_domain', 'partner_id', 'subpartner_id', 'player_ui_conf', 'player_cache_st', 'kcw_ui_conf', 'upload_ui_conf', 'max_file_size_bytes', 'do_analytics', 'use_alt_record_widget', 'hide_rte_button', 'js_uploader'),
+      :allowMediaComments       => CanvasKaltura::ClientV3.config && @context.try_rescue(:allow_media_comments?),
+      :kalturaSettings          => CanvasKaltura::ClientV3.config.try(:slice, 'domain', 'resource_domain', 'rtmp_domain', 'partner_id', 'subpartner_id', 'player_ui_conf', 'player_cache_st', 'kcw_ui_conf', 'upload_ui_conf', 'max_file_size_bytes', 'do_analytics', 'use_alt_record_widget', 'hide_rte_button', 'js_uploader'),
       :equellaEnabled           => !!equella_enabled?,
       :googleAnalyticsAccount   => Setting.get('google_analytics_key', nil),
       :http_status              => @status,
@@ -504,6 +477,7 @@ module ApplicationHelper
       :disableScribdPreviews    => !feature_enabled?(:scribd),
       :disableCrocodocPreviews  => !feature_enabled?(:crocodoc),
       :enableScribdHtml5        => feature_enabled?(:scribd_html5),
+      :enableHtml5FirstVideos   => @domain_root_account.feature_enabled?(:html5_first_videos),
       :logPageViews             => !@body_class_no_headers,
       :maxVisibleEditorButtons  => 3,
       :editorButtons            => editor_buttons,
@@ -734,11 +708,7 @@ module ApplicationHelper
 
   def get_global_includes
     return @global_includes if defined?(@global_includes)
-    @global_includes = []
-    if @current_user && @current_user.enabled_theme != "default"
-      @global_includes << {:css => "compiled/#{@current_user.enabled_theme}"}
-    end
-    @global_includes << Account.site_admin.global_includes_hash
+    @global_includes = [Account.site_admin.global_includes_hash]
     @global_includes << @domain_root_account.global_includes_hash if @domain_root_account.present?
     if @domain_root_account.try(:sub_account_includes?)
       # get the deepest account to start looking for branding

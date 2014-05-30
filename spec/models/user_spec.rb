@@ -156,6 +156,15 @@ describe User do
     @user.recent_stream_items.size.should == 0
   end
 
+  it "should ignore stream item instances from concluded courses" do
+    course_with_teacher(:active_all => true)
+    google_docs_collaboration_model(:user_id => @user.id)
+    @user.recent_stream_items.size.should == 1
+    @course.soft_conclude!
+    @course.save
+    @user.recent_stream_items.size.should == 0
+  end
+
   describe "#recent_stream_items" do
     it "should skip submission stream items" do
       course_with_teacher(:active_all => true)
@@ -2241,51 +2250,54 @@ describe User do
     end
   end
 
-  describe "prefers_gradebook2?" do
+  describe "preferred_gradebook_version" do
     let(:user) { User.new }
-    subject { user.prefers_gradebook2?(@ctx) }
-    before {
-      @ctx = mock()
-      @ctx.stubs(:feature_enabled?).with(:screenreader_gradebook).returns(false)
-    }
+    let(:course) { mock('course') }
+    subject { user.preferred_gradebook_version(course) }
 
-    context "by default" do
-      it { should be_true }
-    end
+    context "with screenreader_gradebook disabled" do
+      before {
+        course.stubs(:feature_enabled?).with(:screenreader_gradebook).returns(false)
+      }
 
-    context "with an explicit preference for gradebook 2" do
-      before { user.stubs(:preferences => { :use_gradebook2 => true }) }
-      it { should be_true }
-    end
+      context "by default" do
+        it { should == '2' }
+      end
 
-    context "with an truthy preference for gradebook 2" do
-      before { user.stubs(:preferences => { :use_gradebook2 => '1' }) }
-      it { should be_true }
-    end
+      context "with an explicit preference for gradebook 2" do
+        before { user.stubs(:preferences => { :use_gradebook2 => true }) }
+        it { should == '2' }
+      end
 
-    context "with an explicit preference for gradebook 1" do
-      before { user.stubs(:preferences => { :use_gradebook2 => false }) }
-      it { should be_false }
+      context "with an truthy preference for gradebook 2" do
+        before { user.stubs(:preferences => { :use_gradebook2 => '1' }) }
+        it { should == '2' }
+      end
+
+      context "with an explicit preference for gradebook 1" do
+        before { user.stubs(:preferences => { :use_gradebook2 => false }) }
+        it { should == '1' }
+      end
     end
 
     context "with screenreader_gradebook enabled" do
       before {
-        @ctx.stubs(:feature_enabled?).with(:screenreader_gradebook).returns(true)
+        course.stubs(:feature_enabled?).with(:screenreader_gradebook).returns(true)
       }
 
       context "prefers gb2" do
         before { user.stubs(:preferences => { :gradebook_version => '2' }) }
-        it {should be_true}
+        it { should == '2' }
       end
 
       context "prefers srgb" do
         before { user.stubs(:preferences => { :gradebook_version => 'srgb' }) }
-        it {should be_false}
+        it { should == 'srgb' }
       end
 
       context "nil preference" do
         before { user.stubs(:preferences => { :gradebook_version => nil }) }
-        it {should be_true}
+        it { should == '2' }
       end
     end
   end

@@ -20,6 +20,7 @@ describe "assignment groups" do
       visit_new_assignment_page
       fill_assignment_title 'vdd assignment'
       fill_assignment_overrides
+      click_option('#assignment_submission_type', 'No Submission')
       update_assignment!
       a = Assignment.find_by_title('vdd assignment')
       compare_assignment_times(a)

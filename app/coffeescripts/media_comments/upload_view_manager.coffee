@@ -28,7 +28,7 @@ define [
       @uploader.removeEventListener 'K5.uiconfError', @showConfigError
       @uploader.removeEventListener 'K5.error', @showConfigError
       @uploader.removeEventListener 'K5.fileError', @onFileTypeError
-      @uploader.removeEventListener 'K5.progress', @updatdProgBar
+      @uploader.removeEventListener 'K5.progress', @updateProgBar
 
     onFileTypeError: (error) =>
       if (error.maxFileSize > error.file.size)

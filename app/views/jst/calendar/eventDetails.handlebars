@@ -28,6 +28,12 @@
           <td>{{location_name}}</td>
         </tr>
       {{/if}}
+      {{#if location_address}}
+              <tr>
+                <th scope="row">{{#t "location_address"}}Address{{/t}}</th>
+                <td>{{location_address}}</td>
+              </tr>
+            {{/if}}
       {{#if description}}
         <tr>
           <th scope="row">{{#t "details"}}Details{{/t}}</th>

@@ -124,11 +124,16 @@ module ActiveSupport::Callbacks
         # [ActiveSupport 4.1]
         def run_callbacks(kind, &block)
           cbs = send("_#{kind}_callbacks").dup
-          cbs.delete_if{ |cb| suspended_callback?(cb.filter, kind, cb.kind) }
-          if cbs.empty?
+
+          # emulate cbs.delete_if{ ... } since CallbackChain doesn't proxy it
+          filtered = cbs.dup
+          filtered.clear
+          cbs.each{ |cb| filtered.insert(-1, cb) unless suspended_callback?(cb.filter, kind, cb.kind) }
+
+          if filtered.empty?
             yield if block_given?
           else
-            runner = cbs.compile
+            runner = filtered.compile
             e = Filters::Environment.new(self, false, nil, block)
             runner.call(e).value
           end

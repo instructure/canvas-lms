@@ -95,6 +95,19 @@ describe Attachment do
     @attachment.should be_scribdable
   end
 
+  describe "needs_scribd_doc?" do
+    it "normally needs a scribd doc" do
+      scribdable_attachment_model
+      @attachment.needs_scribd_doc?.should be_true
+    end
+
+    it "doesn't need a scribd doc when canvadocs are configured" do
+      Canvadocs.stubs(:config).returns(api_key: "asdf")
+      scribdable_attachment_model
+      @attachment.needs_scribd_doc?.should be_false
+    end
+  end
+
   context "authenticated_s3_url" do
     before do
       local_storage!
@@ -144,12 +157,14 @@ describe Attachment do
 
   end
 
+  def configure_crocodoc
+    PluginSetting.create! :name => 'crocodoc',
+                          :settings => { :api_key => "blahblahblahblahblah" }
+    Crocodoc::API.any_instance.stubs(:upload).returns 'uuid' => '1234567890'
+  end
+
   context "crocodoc" do
-    before do
-      PluginSetting.create! :name => 'crocodoc',
-                            :settings => { :api_key => "blahblahblahblahblah" }
-      Crocodoc::API.any_instance.stubs(:upload).returns 'uuid' => '1234567890'
-    end
+    before { configure_crocodoc }
 
     it "crocodocable?" do
       crocodocable_attachment_model
@@ -190,10 +205,13 @@ describe Attachment do
         # first attempt
         @attachment.submit_to_crocodoc
 
+        time = Time.now
         # nth attempt won't create more jobs
         attempts.times {
-          Timecop.freeze(1.hour.from_now)
-          run_jobs
+          time += 1.hour
+          Timecop.freeze(time) do
+            run_jobs
+          end
         }
       end
 
@@ -211,6 +229,53 @@ describe Attachment do
       expects_job_with_tag('Attachment.submit_to_scribd') {
         CrocodocDocument.update_process_states
       }
+    end
+  end
+
+  context "canvadocs" do
+    before do
+      PluginSetting.create! :name => 'canvadocs',
+        :settings => {"api_key" => "blahblahblahblahblah",
+                      "base_url" => "http://example.com"}
+      Canvadocs::API.any_instance.stubs(:upload).returns "id" => 1234
+    end
+
+    describe "submit_to_canvadocs" do
+      it "submits canvadocable documents" do
+        a = canvadocable_attachment_model
+        a.submit_to_canvadocs
+        a.canvadoc.document_id.should_not be_nil
+      end
+
+      it "doesn't submit non-canvadocable documents" do
+        a = attachment_model
+        a.submit_to_canvadocs
+        a.canvadoc.should be_nil
+      end
+
+      it "tries again later when upload fails" do
+        Canvadocs::API.any_instance.stubs(:upload).returns(nil)
+        expects_job_with_tag('Attachment#submit_to_canvadocs') {
+          canvadocable_attachment_model.submit_to_canvadocs
+        }
+      end
+
+      it "prefers crocodoc when annotation is requested" do
+        configure_crocodoc
+        Setting.set('canvadoc_mime_types',
+                    (Canvadoc.mime_types << "application/blah").to_json)
+
+        crocodocable = crocodocable_attachment_model
+        canvadocable = canvadocable_attachment_model content_type: "application/blah"
+
+        crocodocable.submit_to_canvadocs 1, wants_annotation: true
+        crocodocable.canvadoc.should be_nil
+        crocodocable.crocodoc_document.should_not be_nil
+
+        canvadocable.submit_to_canvadocs 1, wants_annotation: true
+        canvadocable.canvadoc.should_not be_nil
+        canvadocable.crocodoc_document.should be_nil
+      end
     end
   end
 

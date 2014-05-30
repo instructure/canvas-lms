@@ -11,17 +11,21 @@ define [
   'compiled/gradebook2/GRADEBOOK_TRANSLATIONS'
   'jquery'
   'underscore'
+  'Backbone'
   'timezone'
   'compiled/grade_calculator'
   'compiled/userSettings'
   'vendor/spin'
   'compiled/SubmissionDetailsDialog'
   'compiled/gradebook2/AssignmentGroupWeightsDialog'
+  'compiled/gradebook2/GradeDisplayWarningDialog'
   'compiled/gradebook2/SubmissionCell'
   'compiled/gradebook2/GradebookHeaderMenu'
   'compiled/util/NumberCompare'
   'str/htmlEscape'
   'compiled/gradebook2/UploadDialog'
+  'compiled/gradebook2/PostGradesDialog'
+  'compiled/gradebook2/PostGradesModel'
   'jst/gradebook2/column_header'
   'jst/gradebook2/group_total_cell'
   'jst/gradebook2/row_student_name'
@@ -38,7 +42,7 @@ define [
   'jqueryui/sortable'
   'compiled/jquery.kylemenu'
   'compiled/jquery/fixDialogButtons'
-], (LongTextEditor, KeyboardNavDialog, keyboardNavTemplate, Slick, TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, $, _, tz, GradeCalculator, userSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, SubmissionCell, GradebookHeaderMenu, numberCompare, htmlEscape, UploadDialog, columnHeaderTemplate, groupTotalCellTemplate, rowStudentNameTemplate, SectionMenuView) ->
+], (LongTextEditor, KeyboardNavDialog, keyboardNavTemplate, Slick, TotalColumnHeaderView, round, InputFilterView, I18n, GRADEBOOK_TRANSLATIONS, $, _, Backbone, tz, GradeCalculator, userSettings, Spinner, SubmissionDetailsDialog, AssignmentGroupWeightsDialog, GradeDisplayWarningDialog, SubmissionCell, GradebookHeaderMenu, numberCompare, htmlEscape, UploadDialog, PostGradesDialog, PostGradesModel, columnHeaderTemplate, groupTotalCellTemplate, rowStudentNameTemplate, SectionMenuView) ->
 
   class Gradebook
     columnWidths =
@@ -163,6 +167,16 @@ define [
         @grid.render()
 
 
+    initPostGrades: () ->
+      postGradesModel = new PostGradesModel({gradebook: ENV.GRADEBOOK_OPTIONS, assignments: @assignments, section_id: @sectionToShow})
+      postGradesDialog = new PostGradesDialog(postGradesModel)
+
+      $("#publish").click (event) =>
+        event.preventDefault()
+        postGradesModel.reset_ignored_assignments()
+        postGradesDialog.render().show()
+        open = $('#post-grades-container').dialog('isOpen')
+
     doSlickgridStuff: =>
       @initGrid()
       @buildRows()
@@ -186,6 +200,8 @@ define [
           assignment.assignment_group = group
           assignment.due_at = tz.parse(assignment.due_at)
           @assignments[assignment.id] = assignment
+
+      @initPostGrades()
 
     gotSections: (sections) =>
       @sections = {}
@@ -289,7 +305,7 @@ define [
 
     makeColumnSortFn: (sortOrder) =>
       fn = switch sortOrder.sortType
-        when 'assignment_group' then @compareAssignmentPositions
+        when 'assignment_group', 'alpha' then @compareAssignmentPositions
         when 'due_date' then @compareAssignmentDueDates
         when 'custom' then @makeCompareAssignmentCustomOrderFn(sortOrder)
         else throw "unhandled column sort condition"
@@ -362,11 +378,11 @@ define [
       @buildRows()
 
     renderTotalHeader: () =>
-      totalHeader = new TotalColumnHeaderView
+      @totalHeader = new TotalColumnHeaderView
         showingPoints: @displayPointTotals
         toggleShowingPoints: @togglePointsOrPercentTotals.bind(this)
         weightedGroups: @weightedGroups
-      totalHeader.render()
+      @totalHeader.render()
 
     assignmentGroupHtml: (group_name, group_weight) =>
       escaped_group_name = htmlEscape(group_name)
@@ -758,6 +774,12 @@ define [
         key: I18n.t 'keycodes.comment', 'c'
         desc: I18n.t 'keyboard_comment_desc', 'Comment on the active submission'
         }
+        {
+        keyCode: 84
+        handler: 'showToolTip'
+        key: I18n.t 'keycodes.tooltip', 't'
+        desc: I18n.t 'keyboard_tooltip_desc', 'Show the submission type of the active submission'
+        }
       ]
 
     getHeaderFromActiveCell: =>
@@ -777,6 +799,14 @@ define [
 
     showCommentDialog: =>
       $(@grid.getActiveCellNode()).find('.gradebook-cell-comment').click()
+
+    showToolTip: =>
+      node = $(@grid.getActiveCellNode())
+      if node.parent().css('top') == '0px'
+        node.find('div.gradebook-tooltip').addClass('first-row')
+      else
+        node.find('div.gradebook-tooltip').removeClass('first-row')
+      node.toggleClass("hover")
 
     handleKeys: (e) =>
       # makes sure the focus sink elements are currently active
@@ -862,10 +892,25 @@ define [
       else
         @options.show_total_grade_as_points
 
-    togglePointsOrPercentTotals: ->
+    switch_total_display: =>
       @options.show_total_grade_as_points = not @options.show_total_grade_as_points
       $.ajaxJSON @options.setting_update_url, "PUT", show_total_grade_as_points: @displayPointTotals()
       @grid.invalidate()
+      @totalHeader.render()
+
+    switch_total_display_and_mark_user_as_warned: =>
+      userSettings.contextSet('warned_about_totals_display', true)
+      @switch_total_display()
+
+    togglePointsOrPercentTotals: =>
+      if userSettings.contextGet('warned_about_totals_display')
+        @switch_total_display()
+      else
+        dialog_options =
+          showing_points: @options.show_total_grade_as_points
+          unchecked_save: @switch_total_display
+          checked_save: @switch_total_display_and_mark_user_as_warned
+        new GradeDisplayWarningDialog(dialog_options)
 
     onUserFilterInput: (term) =>
       # put rows back on the students for dropped assignments

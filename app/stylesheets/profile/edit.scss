@@ -65,10 +65,8 @@
 
 .profile_pic_link {
   position: relative;
-
-  img {
-    max-width: 50px;
-  }
+  float: left;
+  margin-right: 5px;
 
   .icon-edit {
     background: rgba(0, 0, 0, .75);
@@ -243,4 +241,12 @@
   height: 200px;
   width: 200px;
 
+}
+
+.jcrop-holder > div > div {
+  border-radius: 100%;
+  border: 2px solid #D3D9D9;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  margin: -2px;
 }

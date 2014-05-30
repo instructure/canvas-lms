@@ -286,7 +286,7 @@ describe "Outcome Reports" do
       question_2 = q2[:id]
       sub.submission_data["question_#{question_1}"] = answer_1
       sub.submission_data["question_#{question_2}"] = answer_2 + 1
-      sub.grade_submission
+      Quizzes::SubmissionGrader.new(sub).grade_submission
       outcome.reload
       outcome_group.add_outcome(outcome)
 

@@ -151,9 +151,9 @@ class CustomDataController < ApplicationController
   #
   # Responds with status code 409 if the requested scope caused a conflict and data was not stored.
   # This happens when storing data at the requested scope would cause data at an outer scope
-  # to be lost.  e.g., if /custom_data currently was {"fashion_app": {"hair": "blonde"}}, but
-  # you tried to PUT /custom_data/fashion_app/hair/style -F 'data=buzz', then for the request
-  # to succeed,the value of /custom_data/fashion_app/hair would have to become a hash, and its
+  # to be lost.  e.g., if +/custom_data+ was +{"fashion_app": {"hair": "blonde"}}+, but
+  # you tried to +`PUT /custom_data/fashion_app/hair/style -F data=buzz`+, then for the request
+  # to succeed,the value of +/custom_data/fashion_app/hair+ would have to become a hash, and its
   # old string value would be lost.  In this situation, an error object is returned with the
   # following format:
   #

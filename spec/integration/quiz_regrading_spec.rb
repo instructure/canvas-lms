@@ -18,7 +18,7 @@ describe "QuizRegrading" do
       "question_#{@multiple_answers_question.id}_answer_6" => "0",
       "question_#{@multiple_answers_question.id}_answer_7" => "0"
     }.with_indifferent_access
-    @submission.grade_submission
+    Quizzes::SubmissionGrader.new(@submission).grade_submission
     @submission.save!
   end
 

@@ -1,0 +1,40 @@
+$highlightColor: #3cb878;
+
+#quiz-statistics {
+  header {
+    line-height: 34px;
+  }
+
+  .inline {
+    display: inline-block;
+  }
+
+  .section-title {
+    line-height: 1;
+    font-weight: bold;
+  }
+ }
+
+.question-statistics {
+  border: 1px solid #CAD0D7;
+  border-radius: 6px;
+  padding: 10px 20px 0;
+  position: relative;
+  margin-bottom: 20px;
+
+  section {
+    display: inline-block;
+    vertical-align: top;
+    width: 320px;
+  }
+
+  .question-attempts {
+    font-size: 0.95em;
+  }
+
+  .question-text {
+    margin-top: -5px;
+    margin-bottom: 20px;
+    font-size: 1.25em;
+  }
+}

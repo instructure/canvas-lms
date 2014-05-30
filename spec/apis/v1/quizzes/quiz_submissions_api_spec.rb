@@ -61,7 +61,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
       @quiz_submission = @quiz.generate_submission(@student)
       @quiz_submission.submission_data = submission_data
       @quiz_submission.mark_completed
-      @quiz_submission.grade_submission
+      Quizzes::SubmissionGrader.new(@quiz_submission).grade_submission
       @quiz_submission.reload
     end
 
@@ -383,7 +383,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
 
       it 'should reject completing an already complete QS' do
         @quiz_submission.mark_completed
-        @quiz_submission.grade_submission
+        Quizzes::SubmissionGrader.new(@quiz_submission).grade_submission
 
         json = qs_api_complete true, {
           attempt: 1

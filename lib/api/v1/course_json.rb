@@ -34,6 +34,7 @@ module Api::V1
 
     def to_hash
       set_sis_course_id(@hash, @course, @user)
+      set_integration_id(@hash, @course, @user)
       @hash['enrollments'] = extract_enrollments( @enrollments )
       @hash['needs_grading_count'] = needs_grading_count(@enrollments, @course) 
       @hash['public_description'] = description(@course)
@@ -57,6 +58,12 @@ module Api::V1
     def set_sis_course_id(hash, course, user)
       if course.root_account.grants_rights?( user, :read_sis, :manage_sis).values.any?
         hash['sis_course_id'] = course.sis_source_id
+      end
+    end
+
+    def set_integration_id(hash, course, user)
+      if course.root_account.grants_rights?( user, :read_sis, :manage_sis).values.any?
+        hash['integration_id'] = course.integration_id
       end
     end
 

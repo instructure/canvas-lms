@@ -46,6 +46,8 @@ define [
 
       @filterKeyBindings() if @userIsStudent()
 
+      @ensureContentStyle()
+
       @kbDialog = new KeyboardNavDialog().render(keyboardNavTemplate({keyBindings:@keyBindings}))
       window.onkeydown = @focusOnAssignments
 
@@ -103,6 +105,11 @@ define [
 
     userIsStudent: ->
       _.include(ENV.current_user_roles, "student")
+
+    ensureContentStyle: ->
+      # when loaded from homepage, need to change content style
+      if window.location.href.indexOf('assignments') == -1
+        $("#content").css("padding", "0em")
 
     filterKeyBindings: =>
       @keyBindings = @keyBindings.filter (binding) ->

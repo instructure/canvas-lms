@@ -3,7 +3,7 @@
 <tr id="criterion_<%= criterion ? criterion.id : "blank" %>" class="criterion <%= "blank" unless criterion %> criterion_<%= criterion ? criterion.id : "blank" %> <%= 'ignore_criterion_for_scoring' if criterion && criterion.ignore_for_scoring %> <%= 'learning_outcome_criterion' if criterion && criterion.learning_outcome_id %>">
   <td class="criterion_description">
     <%= image_tag "flagged_question.png", :class => "learning_outcome_flag", :title => t('titles.linked_to_learning_outcome', "This criterion is linked to a Learning Outcome") %>
-    <span class="description_title"><%= criterion ? truncate_text(criterion.description, :max_length => 50) : t('defaults.description', "Description of criterion") %></span>
+    <span class="description_title"><%= criterion ? CanvasTextHelper.truncate_text(criterion.description, :max_length => 50) : t('defaults.description', "Description of criterion") %></span>
     <span class="learning_outcome_id" style="display: none;"><%= criterion.learning_outcome_id rescue nbsp %></span>
     <span class="criterion_id" style="display: none;"><%= criterion && criterion.id %></span>
     <div class="long_description_holder editing <%= 'empty' if !criterion || !criterion.long_description || criterion.long_description.empty? %>">

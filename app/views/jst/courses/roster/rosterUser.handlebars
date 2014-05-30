@@ -37,7 +37,7 @@
       <span class="screenreader-only">{{#t "manage_user"}}Manage {{name}}{{/t}}</span></a>
     <ul class="al-options">
       <li><a href="#" data-event="resendInvitation"><i class="icon-email"></i> {{#t "links.resend_invitation"}}Resend Invitation{{/t}}</a></li>
-      {{#if isObserver}}
+      {{#if canLinkStudents }}
       <li><a href="#" data-event="linkToStudents"><i class="icon-link"></i> {{#t "links.link_to_students"}}Link to Students{{/t}}</a></li>
       {{/if}}
       {{#if canEditSections}}

@@ -10,7 +10,7 @@ define [
   'compiled/jquery.kylemenu'
   'jquery.instructure_misc_helpers'
   'vendor/jquery.ba-tinypubsub'
-], ($, {map}, userSettings, contextListTemplate, undatedEventsTemplate, commonEventFactory, EditEventDetailsDialog, EventDataSource) ->
+], ($, _, userSettings, contextListTemplate, undatedEventsTemplate, commonEventFactory, EditEventDetailsDialog, EventDataSource) ->
 
   class VisibleContextManager
     constructor: (contexts, selectedContexts, @$holder) ->
@@ -19,10 +19,14 @@ define [
              catch e
                {}
 
+      availableContexts = (c.asset_string for c in contexts)
       @contexts   = fragmentData.show.split(',') if fragmentData.show
       @contexts or= selectedContexts
       @contexts or= userSettings.get('checked_calendar_codes')
-      @contexts or= (c.asset_string for c in contexts[0...10])
+      @contexts or= availableContexts
+
+      @contexts = _.intersection(@contexts, availableContexts)
+      @contexts = @contexts.slice(0, 10)
 
       @notify()
 
@@ -73,7 +77,7 @@ define [
     $holder.on 'click keyclick', '.context_list_context', (event) ->
       visibleContexts.toggle $(this).data('context')
       userSettings.set('checked_calendar_codes',
-        map($(this).parent().children('.checked'), (c) -> $(c).data('context')))
+        _.map($(this).parent().children('.checked'), (c) -> $(c).data('context')))
 
     $skipLink.on 'click', (e) ->
       e.preventDefault()

@@ -482,7 +482,11 @@ body.with-right-side.with-left-side {
   display: block;
   background-color: #fdfdfd;
   font-size: 11px;
-  color: #aaa;
+  @if $use_high_contrast {
+    color: #444;
+  } @else {
+    color: #aaa;
+  }
   padding: 3px 10px;
   cursor: text;
   border: 1px solid #d4d5d7;

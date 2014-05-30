@@ -227,7 +227,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def add_import_warning(item_type, item_name, warning)
-    item_name = truncate_text(item_name || "", :max_length => 150)
+    item_name = CanvasTextHelper.truncate_text(item_name || "", :max_length => 150)
     add_warning(t('errors.import_error', "Import Error: ") + "#{item_type} - \"#{item_name}\"", warning)
   end
 
@@ -286,11 +286,11 @@ class ContentMigration < ActiveRecord::Base
     p
   end
 
-  def queue_migration
+  def queue_migration(plugin=nil)
     reset_job_progress
 
     set_default_settings
-    plugin = Canvas::Plugin.find(migration_type)
+    plugin ||= Canvas::Plugin.find(migration_type)
     if plugin
       queue_opts = {:priority => Delayed::LOW_PRIORITY, :max_attempts => 1}
       if self.strand
@@ -350,6 +350,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def check_quiz_id_prepender
+    return unless self.context.respond_to?(:assessment_questions)
     if !migration_settings[:id_prepender] && (!migration_settings[:overwrite_questions] || !migration_settings[:overwrite_quizzes])
       # only prepend an id if the course already has some migrated questions/quizzes
       if self.context.assessment_questions.where('assessment_questions.migration_id IS NOT NULL').exists? ||
@@ -404,6 +405,7 @@ class ContentMigration < ActiveRecord::Base
       @zip_file.close
 
       migration_settings[:migration_ids_to_import] ||= {:copy=>{}}
+
       self.context.import_from_migration(data, migration_settings[:migration_ids_to_import], self)
 
       if !self.import_immediately?

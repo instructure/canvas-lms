@@ -44,15 +44,12 @@ describe PaginatedCollection do
     end
 
     it 'uses the pager returned' do
-      example_klass = Class.new(ActiveRecord::Base) do
-        self.table_name = 'examples'
-      end
-
-      3.times { example_klass.create! }
+      # using WillPaginate Array to get WillPaginate style object
+      @simple = ('a' .. 'c').to_a
 
       proxy = PaginatedCollection.build do |pager|
-        result = example_klass.paginate(page: pager.current_page, per_page: pager.per_page)
-        result.map! { |example| example.id }
+        result = @simple.paginate(page: pager.current_page, per_page: pager.per_page)
+        result.map! { |example| example }
         result
       end
 
@@ -66,8 +63,8 @@ describe PaginatedCollection do
       expect(p2.next_page).to be_nil
       expect(p2.previous_page).to eq 1
 
-      expect(p1).to eq example_klass.all.map(&:id)[0, 2]
-      expect(p2).to eq example_klass.all.map(&:id)[2, 1]
+      expect(p1).to eq @simple[0, 2]
+      expect(p2).to eq @simple[2, 1]
     end
   end
 end

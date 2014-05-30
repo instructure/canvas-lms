@@ -3,6 +3,6 @@
 <% end %>
 <%= t :body, "%{user_name} just sent you a message in Canvas:", :user_name => content(:user_name) %>
 
-<%= strip_and_truncate(asset.body, :max_length => 50) %>
+<%= HtmlTextHelper.strip_and_truncate(asset.body, :max_length => 50) %>
 
 <%= t :more_info, "More info at %{url}", :url => HostUrl.context_host(asset.context) %>

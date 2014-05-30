@@ -5,7 +5,7 @@
 <div class="form-column-right">
   <div class="border border-trbl border-round">
     {{!-- Group Assignment selection --}}
-    <label class="checkbox flush">
+    <label class="checkbox flush" for="assignment_has_group_category">
       {{checkbox "has_group_category"
         id="assignment_has_group_category"
         prefix=prefix
@@ -17,9 +17,9 @@
     {{!-- Individual grading? --}}
     <div class="nested">
       <div id="group_category_options" style="{{hiddenUnless groupCategoryId}}">
-        <label class="checkbox" >
+        <label class="checkbox" for="assignment_grade_students_individually">
           {{checkbox "grade_group_students_individually"
-            id=null
+            id="assignment_grade_students_individually"
             prefix=prefix
             checked=gradeGroupStudentsIndividually
             disabled=gradeIndividuallyDisabled}}

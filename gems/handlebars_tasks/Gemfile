@@ -1,0 +1,5 @@
+source 'https://rubygems.org'
+
+gemspec
+
+gem "i18n_extraction", path: "../i18n_extraction"

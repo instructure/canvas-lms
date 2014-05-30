@@ -13,6 +13,17 @@
   position: relative;
 }
 
+#calendar_event_location_info {
+  #calendar_event_location_name {
+    width: 185px;
+    margin: 10px 0 10px 15px;
+  }
+  #calendar_event_location_address {
+    width: 250px;
+    margin-left: 17px;
+  }
+}
+
 .calendar, #calendar-drag-and-drop-container {
   .fc-content {
     background-color: white;
@@ -138,7 +149,7 @@
   padding: 10px;
   border-bottom: 1px solid #eeeeee;
   word-wrap: normal;
-  max-height: 225px;
+  max-height: 245px;
   &:last-child {
     border-bottom: none;
   }

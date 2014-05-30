@@ -12,12 +12,12 @@ define [
   class WikiPage extends Backbone.Model
     @mixin DefaultUrlMixin
     resourceName: 'pages'
+    idAttribute: 'url'
 
     initialize: (attributes, options) ->
       super
       _.extend(this, _.pick(options || {}, pageOptions))
       [@contextName, @contextId] = splitAssetString(@contextAssetString) if @contextAssetString
-      @set(id: attributes.url) if attributes?.url
 
       @on 'change:front_page', @setPublishable
       @on 'change:published', @setPublishable
@@ -55,20 +55,16 @@ define [
     parse: (response, options) ->
       if response.wiki_page
         response = _.extend _.omit(response, 'wiki_page'), response.wiki_page
-
-      response.id = response.url if response.url
       response
 
     # Gives a json representation of the model
-    #
-    # Specifically, the id is removed as the only reason for it's presense is to make Backbone happy
     toJSON: ->
       wiki_page:
-        _.omit super, 'id'
+        super
 
     # Returns a json representation suitable for presenting
     present: ->
-      _.extend _.omit(@attributes, 'id'), contextName: @contextName, contextId: @contextId, new_record: !@get('url')
+      _.extend {}, @attributes, contextName: @contextName, contextId: @contextId, new_record: !@get('url')
 
     # Uses the api to perform a publish on the page
     publish: ->

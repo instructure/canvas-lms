@@ -125,8 +125,20 @@ JOKE
         c.course_code @course.course_code
         c.start_at ims_datetime(@course.start_at) if @course.start_at
         c.conclude_at ims_datetime(@course.conclude_at) if @course.conclude_at
-        if for_course_copy
-          c.tab_configuration @course.tab_configuration.to_json if @course.tab_configuration.present?
+        if @course.tab_configuration.present?
+          tab_config = []
+          @course.tab_configuration.each do |t|
+            tab = t.dup
+            if tab['id'].is_a?(String)
+              # it's an external tool, so translate the id to a migration_id
+              tool_id = tab['id'].sub('context_external_tool_', '')
+              if tool = ContextExternalTool.find_for(tool_id, @course, :course_navigation)
+                tab['id'] = "context_external_tool_#{create_key(tool)}"
+              end
+            end
+            tab_config << tab
+          end
+          c.tab_configuration tab_config.to_json
         end
         atts = Course.clonable_attributes
         atts -= Canvas::Migration::MigratorHelper::COURSE_NO_COPY_ATTS

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -175,21 +175,21 @@ class AssignmentOverridesController < ApplicationController
   #
   # @argument assignment_override[due_at] [Optional, Timestamp] The day/time
   #   the overridden assignment is due. Accepts times in ISO 8601 format, e.g.
-  #   2011-10-21T18:48Z. If absent, this override will not affect due date. May
-  #   be present but null to indicate the override removes any previous due
+  #   2014-10-21T18:48:00Z. If absent, this override will not affect due date.
+  #   May be present but null to indicate the override removes any previous due
   #   date.
   #
   # @argument assignment_override[unlock_at] [Optional, Timestamp] The day/time
   #   the overridden assignment becomes unlocked. Accepts times in ISO 8601
-  #   format, e.g. 2011-10-21T18:48Z. If absent, this override will not affect
-  #   the unlock date. May be present but null to indicate the override removes
-  #   any previous unlock date.
+  #   format, e.g. 2014-10-21T18:48:00Z. If absent, this override will not
+  #   affect the unlock date. May be present but null to indicate the override
+  #   removes any previous unlock date.
   #
   # @argument assignment_override[lock_at] [Optional, Timestamp] The day/time
   #   the overridden assignment becomes locked. Accepts times in ISO 8601
-  #   format, e.g. 2011-10-21T18:48Z. If absent, this override will not affect
-  #   the lock date. May be present but null to indicate the override removes
-  #   any previous lock date.
+  #   format, e.g. 2014-10-21T18:48:00Z. If absent, this override will not
+  #   affect the lock date. May be present but null to indicate the override
+  #   removes any previous lock date.
   #
   # One of student_ids, group_id, or course_section_id must be present. At most
   # one should be present; if multiple are present only the most specific
@@ -234,21 +234,21 @@ class AssignmentOverridesController < ApplicationController
   #
   # @argument assignment_override[due_at] [Optional, Timestamp] The day/time
   #   the overridden assignment is due. Accepts times in ISO 8601 format, e.g.
-  #   2011-10-21T18:48Z. If absent, this override will not affect due date. May
-  #   be present but null to indicate the override removes any previous due
+  #   2014-10-21T18:48:00Z. If absent, this override will not affect due date.
+  #   May be present but null to indicate the override removes any previous due
   #   date.
   #
   # @argument assignment_override[unlock_at] [Optional, Timestamp] The day/time
   #   the overridden assignment becomes unlocked. Accepts times in ISO 8601
-  #   format, e.g. 2011-10-21T18:48Z. If absent, this override will not affect
-  #   the unlock date. May be present but null to indicate the override removes
-  #   any previous unlock date.
+  #   format, e.g. 2014-10-21T18:48:00Z. If absent, this override will not
+  #   affect the unlock date. May be present but null to indicate the override
+  #   removes any previous unlock date.
   #
   # @argument assignment_override[lock_at] [Optional, Timestamp] The day/time
   #   the overridden assignment becomes locked. Accepts times in ISO 8601
-  #   format, e.g. 2011-10-21T18:48Z. If absent, this override will not affect
-  #   the lock date. May be present but null to indicate the override removes
-  #   any previous lock date.
+  #   format, e.g. 2014-10-21T18:48:00Z. If absent, this override will not
+  #   affect the lock date. May be present but null to indicate the override
+  #   removes any previous lock date.
   #
   # All current overridden values must be supplied if they are to be retained;
   # e.g. if due_at was overridden, but this PUT omits a value for due_at,

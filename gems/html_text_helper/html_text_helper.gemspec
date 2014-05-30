@@ -13,21 +13,21 @@ Gem::Specification.new do |spec|
   spec.email         = ["zachp@instructure.com", "stephan@pivotallabs.com"]
   spec.summary       = %q{Html text helpers}
 
-  spec.files         = Dir.glob("{lib,spec}/**/*") + %w(Rakefile test.sh)
+  spec.files         = Dir.glob("{lib,spec}/**/*") + %w(test.sh)
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
   spec.add_dependency 'nokogiri', '1.5.6'
   spec.add_dependency 'sanitize', '2.0.3'
+  spec.add_dependency 'canvas_text_helper'
 
   if CANVAS_RAILS3
-    spec.add_dependency 'rails', '~>3.2'
+    spec.add_dependency 'activesupport', '~>3.2'
   else
-    spec.add_dependency 'rails', '~>2.3'
+    spec.add_dependency 'activesupport', '~>2.3'
   end
 
   spec.add_development_dependency "bundler", "~> 1.5"
-  spec.add_development_dependency "rake"
   spec.add_development_dependency "rspec", "2.14.1"
 end

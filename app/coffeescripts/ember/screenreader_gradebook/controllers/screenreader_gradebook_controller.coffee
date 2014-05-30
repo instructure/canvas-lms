@@ -11,7 +11,8 @@ define [
   'compiled/AssignmentDetailsDialog'
   'compiled/AssignmentMuter'
   'compiled/grade_calculator'
-  ], (ajax, round, userSettings, fetchAllPages, parseLinkHeader, I18n, Ember, _, tz, AssignmentDetailsDialog, AssignmentMuter, GradeCalculator ) ->
+  '../../shared/components/ic_submission_download_dialog_component'
+  ], (ajax, round, userSettings, fetchAllPages, parseLinkHeader, I18n, Ember, _, tz, AssignmentDetailsDialog, AssignmentMuter, GradeCalculator, ic_submission_download_dialog ) ->
 
   {get, set, setProperties} = Ember
 
@@ -52,6 +53,16 @@ define [
 
   ScreenreaderGradebookController = Ember.ObjectController.extend
 
+    errors: (->
+      # this is a sad, sad hack
+      # until we can get flash notifications working app-wide for screenreaders
+      if Ember.$('#flash_message_holder li').size() > 0
+        close = Ember.$('#flash_message_holder li a').text().trim()
+        message = Ember.$('#flash_message_holder li').text().replace(close,'').trim()
+        node = Ember.$("<span role='alert'>#{message}</span>")
+        Ember.$(node).appendTo(Ember.$('#flash_screenreader_holder'))
+    ).on('init')
+
     contextUrl: get(window, 'ENV.GRADEBOOK_OPTIONS.context_url')
 
     downloadCsvUrl: (->
@@ -80,7 +91,7 @@ define [
 
     showDownloadSubmissionsButton: (->
       @get('selectedAssignment.has_submitted_submissions') and
-      @get('selectedAssignment.submission_types').match(/(online_upload|online_text_entry|online_url)/)
+      _.intersection(@get('selectedAssignment.submission_types'), ['online_upload','online_text_entry','online_url']) != []
     ).property('selectedAssignment')
 
     hideStudentNames: false
@@ -205,6 +216,8 @@ define [
     setFinalGradeDisplay: (->
       @get('students').forEach (student) =>
         set(student, "final_grade_point_ratio", @pointRatioDisplay(student, @get('groupsAreWeighted')))
+        if @get('showLetterGrades')
+          set(student, "final_letter_grade", GradeCalculator.letter_grade(ENV.GRADEBOOK_OPTIONS.grading_standard, student.total_percent))
     ).observes('students.@each.total_grade','groupsAreWeighted')
 
     pointRatioDisplay: (student, weighted_groups) ->
@@ -240,11 +253,15 @@ define [
 
     publishToSisEnabled: (->
       ENV.GRADEBOOK_OPTIONS.publish_to_sis_enabled
-      ).property()
+    ).property()
 
     publishToSisURL:(->
       ENV.GRADEBOOK_OPTIONS.publish_to_sis_url
-      ).property()
+    ).property()
+
+    showLetterGrades:(->
+      !!ENV.GRADEBOOK_OPTIONS.grading_standard
+    ).property()
 
     teacherNotes: (->
       ENV.GRADEBOOK_OPTIONS.teacher_notes
@@ -470,8 +487,8 @@ define [
         if shouldRemoveAssignment
           assignmentGroups.findBy('id', as.assignment_group_id).assignments.removeObject as
         else
-          assignmentsProxy.pushObject as
-    ).observes('assignment_groups.@each')
+          assignmentsProxy.addObject as
+    ).observes('assignment_groups', 'assignment_groups.@each')
 
     includeUngradedAssignments: (->
       userSettings.contextGet('include_ungraded_assignments') or false
@@ -509,17 +526,29 @@ define [
         }
       ]
 
+    assignmentSort: ((key, value) ->
+      savedSortType = userSettings.contextGet('sort_grade_columns_by')
+      savedSortOption = @get('assignmentSortOptions').findBy('value', savedSortType?.sortType)
+      if value
+        userSettings.contextSet('sort_grade_columns_by', {sortType: value.value})
+        value
+      else if savedSortOption?
+        savedSortOption
+      else
+        # default to assignment group, but don't change saved setting
+        @get('assignmentSortOptions').findBy('value', 'assignment_group')
+    ).property()
+
     sortAssignments: (->
       sort = @get('assignmentSort')
       return unless sort
       sort_props = switch sort.value
-        when 'assignment_group' then ['ag_position', 'position']
+        when 'assignment_group', 'custom' then ['ag_position', 'position']
         when 'alpha' then ['sortable_name']
         when 'due_date' then ['sortable_date', 'sortable_name']
-
+        else ['ag_position', 'position']
       @get('assignments').set('sortProperties', sort_props)
-
-    ).observes('assignmentSort')
+    ).observes('assignmentSort').on('init')
 
     selectedSubmission: ((key, selectedSubmission) ->
       if arguments.length > 1

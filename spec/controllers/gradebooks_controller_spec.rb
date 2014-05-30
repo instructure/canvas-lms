@@ -34,8 +34,7 @@ describe GradebooksController do
     it "should redirect teacher to gradebook" do
       course_with_teacher_logged_in(:active_all => true)
       get 'grade_summary', :course_id => @course.id, :id => nil
-      response.should be_redirect
-      response.should redirect_to(:controller => 'gradebook2', :action => 'show')
+      response.should redirect_to(:action => 'gradebook2')
     end
 
     it "should render for current user" do
@@ -384,15 +383,49 @@ describe GradebooksController do
     end
 
     describe "csv" do
-      it "should not re-compute enrollment grades" do
+      before do
+        Course.any_instance.stubs(:feature_enabled?).with(:draft_state).returns(true)
+        Course.any_instance.stubs(:feature_enabled?).with(:outcome_gradebook).returns(false)
         course_with_teacher_logged_in(:active_all => true)
         student_in_course(:active_all => true)
         assignment1 = @course.assignments.create(:title => "Assignment 1")
         assignment2 = @course.assignments.create(:title => "Assignment 2")
-        Enrollment.expects(:recompute_final_score).never
-        get 'show', :course_id => @course.id, :init => 1, :assignments => 1, :format => 'csv'
-        response.should be_success
-        response.body.should match(/\AStudent,/)
+      end
+
+      shared_examples_for "working download" do
+        it "should successfully return data" do
+          get 'show', :course_id => @course.id, :init => 1, :assignments => 1, :format => 'csv'
+          response.should be_success
+          response.body.should match(/\AStudent,/)
+        end
+        it "should not recompute enrollment grades" do
+          Enrollment.expects(:recompute_final_score).never
+          get 'show', :course_id => @course.id, :init => 1, :assignments => 1, :format => 'csv'
+        end
+      end
+
+      context "with teacher that prefers gradebook2" do
+        before do
+          Course.any_instance.stubs(:feature_enabled?).with(:screenreader_gradebook).returns(true)
+          @user.preferences[:gradebook_version] = "2"
+        end
+        include_examples "working download"
+      end
+
+      context "with teacher that prefers screenreader gradebook" do
+        before do
+          Course.any_instance.stubs(:feature_enabled?).with(:screenreader_gradebook).returns(true)
+          @user.preferences[:gradebook_version] = "srgb"
+        end
+        include_examples "working download"
+      end
+
+      context "with teacher that prefers the old gradebook" do
+        before do
+          Course.any_instance.stubs(:feature_enabled?).with(:screenreader_gradebook).returns(false)
+          @user.preferences[:use_gradebook2] = false
+        end
+        include_examples "working download"
       end
     end
 
@@ -416,6 +449,61 @@ describe GradebooksController do
         ag_assign_ids.include?(assignment2.id).should be_true
       end
     end
+
+    context "with screenreader_gradebook enabled" do
+      before do
+        course_with_teacher_logged_in(:active_all => true)
+        Course.any_instance.stubs(:feature_enabled?).with(:screenreader_gradebook).returns(true)
+        Course.any_instance.stubs(:feature_enabled?).with(:draft_state).returns(true)
+        Course.any_instance.stubs(:feature_enabled?).with(:outcome_gradebook).returns(false)
+      end
+
+      context "teacher that prefers gradebook2" do
+        before do
+          @user.preferences[:gradebook_version] = "2"
+        end
+        it "redirects to gradebook2 with a friendly URL" do
+          get "show", :course_id => @course.id
+          response.should render_template("gradebook2")
+        end
+      end
+
+      context "teacher that prefers screenreader gradebook" do
+        before do
+          @user.preferences[:gradebook_version] = "srgb"
+        end
+        it "redirects to the screenreader gradebook with a friendly URL" do
+          get "show", :course_id => @course.id
+          response.should render_template("screenreader")
+        end
+      end
+    end
+
+    context "without gradebook authorization" do
+      before do
+        course_with_student(:active_all => true)
+      end
+
+      context "with screenreader feature flag on" do
+        before do
+          Course.any_instance.stubs(:feature_enabled?).with(:screenreader_gradebook).returns(true)
+        end
+        it "renders the unauthorized page" do
+          get "show", :course_id => @course.id
+          response.should render_template("shared/unauthorized")
+        end
+      end
+
+      context "with screenreader feature flag off" do
+        before do
+          Course.any_instance.stubs(:feature_enabled?).with(:screenreader_gradebook).returns(false)
+        end
+        it "renders the unauthorized page" do
+          get "show", :course_id => @course.id
+          response.should render_template("shared/unauthorized")
+        end
+      end
+    end
   end
 
   describe "GET 'change_gradebook_version'" do
@@ -423,8 +511,7 @@ describe GradebooksController do
       course_with_teacher_logged_in(:active_all => true)
       get 'grade_summary', :course_id => @course.id, :id => nil
 
-      response.should be_redirect
-      response.should redirect_to(:controller => 'gradebook2', :action => 'show')
+      response.should redirect_to(:action => 'gradebook2')
 
       # reset back to showing the old gradebook
       get 'change_gradebook_version', :course_id => @course.id, :version => 1
@@ -432,7 +519,7 @@ describe GradebooksController do
 
       # tell it to use gradebook 2
       get 'change_gradebook_version', :course_id => @course.id, :version => 2
-      response.should redirect_to(:controller => 'gradebook2', :action => 'show')
+      response.should redirect_to(:action => 'gradebook2')
     end
 
     context "large roster courses" do
@@ -440,7 +527,7 @@ describe GradebooksController do
         course_with_teacher_logged_in(:active_all => true)
         @user.preferences[:use_gradebook2] = false
         @user.save!
-        @user.prefers_gradebook2?(@course).should == false
+        @user.preferred_gradebook_version(@course).should == "1"
         @course.large_roster = true
         @course.save!
         @course.reload
@@ -449,8 +536,7 @@ describe GradebooksController do
 
       it 'should use gradebook2 always for large_roster courses even if user prefers gradebook 1' do
         get 'grade_summary', :course_id => @course.id, :id => nil
-        response.should be_redirect
-        response.should redirect_to(:controller => 'gradebook2', :action => 'show')
+        response.should redirect_to(:action => 'gradebook2')
       end
 
       it 'should not render gb1 json' do

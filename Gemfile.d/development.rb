@@ -10,6 +10,6 @@ group :development do
   # Set this option in your dev environment to disable.
   unless ENV['DISABLE_RUBY_DEBUGGING']
     gem 'byebug', '2.4.1', :platforms => [:ruby_20, :ruby_21]
-    gem 'debugger', '1.5.0', :platforms => :ruby_19
+    gem 'debugger', '1.6.6', :platforms => :ruby_19
   end
 end

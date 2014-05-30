@@ -28,9 +28,9 @@
   </div>
   <div class="details">
     <% if item.respond_to?(:description) %>
-      <%= strip_and_truncate(item.description, :max_length => 200) %>
+      <%= HtmlTextHelper.strip_and_truncate(item.description, :max_length => 200) %>
     <% elsif item.respond_to?(:message) %>
-      <%= strip_and_truncate(item.message, :max_length => 200) %>
+      <%= HtmlTextHelper.strip_and_truncate(item.message, :max_length => 200) %>
     <% end %>
   </div>
   <table class="dates">
