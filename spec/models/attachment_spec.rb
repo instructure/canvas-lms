@@ -1036,7 +1036,27 @@ describe Attachment do
       @a.file_state.should == 'available'
       @a1.reload
       @a1.file_state.should == 'deleted'
+      @a1.replacement_attachment.should eql @a
       deleted.should == [ @a1 ]
+    end
+
+    it "should update replacement pointers to replaced files" do
+      @a.update_attribute(:display_name, 'a1')
+      @a.handle_duplicates(:overwrite)
+      @a1.reload.replacement_attachment.should eql @a
+      again = attachment_with_context(@course, :display_name => 'a1')
+      again.handle_duplicates(:overwrite)
+      @a1.reload.replacement_attachment.should eql again
+    end
+
+    it "should update replacement pointers to replaced-then-renamed files" do
+      @a.update_attribute(:display_name, 'a1')
+      @a.handle_duplicates(:overwrite)
+      @a1.reload.replacement_attachment.should eql @a
+      @a.update_attribute(:display_name, 'renamed')
+      again = attachment_with_context(@course, :display_name => 'renamed')
+      again.handle_duplicates(:overwrite)
+      @a1.reload.replacement_attachment.should eql again
     end
 
     it "should handle renaming duplicates" do
@@ -1064,6 +1084,21 @@ describe Attachment do
       @a2.destroy
       tag2.reload
       tag2.should be_deleted
+    end
+
+    it "should find replacement file by id if name changes" do
+      @a.display_name = 'a1'
+      @a.handle_duplicates(:overwrite)
+      @a.display_name = 'renamed!!'
+      @a.save!
+      @course.attachments.find(@a1.id).should eql @a
+    end
+
+    it "should find replacement file by name if id isn't present" do
+      @a.display_name = 'a1'
+      @a.handle_duplicates(:overwrite)
+      @a1.update_attribute(:replacement_attachment_id, nil)
+      @course.attachments.find(@a1.id).should eql @a
     end
   end
 

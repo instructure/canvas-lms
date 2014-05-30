@@ -62,6 +62,7 @@ class Attachment < ActiveRecord::Base
   has_many :submissions
   has_many :attachment_associations
   belongs_to :root_attachment, :class_name => 'Attachment'
+  belongs_to :replacement_attachment, :class_name => 'Attachment'
   belongs_to :scribd_mime_type
   has_one :sis_batch
   has_one :thumbnail, :foreign_key => "parent_id", :conditions => {:thumbnail => "thumb"}
@@ -166,7 +167,9 @@ class Attachment < ActiveRecord::Base
       end
 
       if att.deleted? && owner
-        new_att = Folder.find_attachment_in_context_with_path(owner, att.full_display_path)
+        # intentionally not using find_by_id to avoid possible infinite recursion
+        new_att = owner.attachments.where(id: att.replacement_attachment_id).first if att.replacement_attachment_id
+        new_att ||= Folder.find_attachment_in_context_with_path(owner, att.full_display_path)
         new_att || att
       else
         att
@@ -713,10 +716,13 @@ class Attachment < ActiveRecord::Base
       self.display_name = Attachment.make_unique_filename(self.display_name, self.folder.active_file_attachments.reject {|a| a.id == self.id }.map(&:display_name))
       self.save
     elsif method == :overwrite
-      self.folder.active_file_attachments.find_all_by_display_name(self.display_name).reject {|a| a.id == self.id }.each do |a|
+      atts = self.folder.active_file_attachments.where("display_name=? AND id<>?", self.display_name, self.id)
+      atts.update_all(:replacement_attachment_id => self) # so we can find the new file in content links
+      atts.each do |a|
         # update content tags to refer to the new file
         ContentTag.where(:content_id => a, :content_type => 'Attachment').update_all(:content_id => self)
-
+        # update replacement pointers pointing at the overwritten file
+        context.attachments.where(:replacement_attachment_id => a).update_all(:replacement_attachment_id => self)
         # delete the overwritten file (unless the caller is queueing them up)
         a.destroy unless opts[:caller_will_destroy]
         deleted_attachments << a
