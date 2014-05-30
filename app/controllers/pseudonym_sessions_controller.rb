@@ -472,7 +472,7 @@ class PseudonymSessionsController < ApplicationController
   end
 
   def otp_login(send_otp = false)
-    if !@current_user.otp_secret_key || request.get?
+    if !@current_user.otp_secret_key || (params[:action] == 'otp_login' && request.get?)
       session[:pending_otp_secret_key] ||= ROTP::Base32.random_base32
     end
     if session[:pending_otp_secret_key] && params[:otp_login].try(:[], :otp_communication_channel_id)
