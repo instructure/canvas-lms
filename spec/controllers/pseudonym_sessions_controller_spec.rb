@@ -752,6 +752,23 @@ describe PseudonymSessionsController do
       get 'new'
       response.should be_redirect
     end
+
+    it "should not force otp reconfiguration on succesful login" do
+      Account.default.settings[:mfa_settings] = :required
+      Account.default.save!
+      account_with_cas(account: Account.default)
+
+      user_with_pseudonym(active_all: 1, username: 'user')
+      @user.otp_secret_key = ROTP::Base32.random_base32
+      @user.save!
+
+      stubby("yes\nuser\n")
+
+      get 'new', :ticket => 'ST-efgh'
+      response.should render_template('otp_login')
+      session[:cas_session].should == 'ST-efgh'
+      session[:pending_otp_secret_key].should be_nil
+    end
   end
 
   context "otp login cookie" do
