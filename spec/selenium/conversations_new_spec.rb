@@ -279,10 +279,10 @@ describe "conversations new" do
         f(".user_note").should_not be_displayed
       end
 
-      it "should not be allowed with group recipient" do
+      it "should be allowed with group recipient" do
         @group = @course.groups.create(:name => "the group")
         compose course: @course, to: [@group], body: 'hallo!', send: false
-        f(".user_note").should_not be_displayed
+        f(".user_note").should be_displayed
       end
     end
   end
