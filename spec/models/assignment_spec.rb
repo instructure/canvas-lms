@@ -2616,6 +2616,16 @@ describe Assignment do
       @assignment.title = 'short title'
       @assignment.title_slug.should == @assignment.title
     end
+
+    it "should not allow titles over 255 char" do
+      @assignment.title = 'qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm
+                           qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm
+                           qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm
+                           qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm
+                           qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm'
+
+      (lambda { @assignment.save! }).should raise_error("Validation failed: Title is too long (maximum is 255 characters), Title is too long (maximum is 255 characters)")
+    end
   end
 
   describe "external_tool_tag" do
