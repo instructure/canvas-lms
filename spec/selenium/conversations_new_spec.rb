@@ -152,6 +152,9 @@ describe "conversations new" do
     @s1 = user(name: "first student")
     @s2 = user(name: "second student")
     [@s1, @s2].each { |s| @course.enroll_student(s).update_attribute(:workflow_state, 'active') }
+    cat = @course.group_categories.create(:name => "the groups")
+    @group = cat.groups.create(:name => "the group", :context => @course)
+    @group.users = [@s1, @s2]
   end
 
   describe "message sending" do
@@ -244,15 +247,29 @@ describe "conversations new" do
       end
 
       it "should be allowed on new private conversations with students" do
-        compose course: @course, to: [@s1], body: 'hallo!', send: false
+        compose course: @course, to: [@s1, @s2], body: 'hallo!', send: false
 
         checkbox = f(".user_note")
         checkbox.should be_displayed
         checkbox.click
 
-        count = @s1.user_notes.count
+        count1 = @s1.user_notes.count
+        count2 = @s2.user_notes.count
         click_send
-        @s1.user_notes.reload.count.should == count + 1
+        @s1.user_notes.reload.count.should == count1 + 1
+        @s2.user_notes.reload.count.should == count2 + 1
+      end
+
+      it "should be allowed with student groups" do
+        compose course: @course, to: [@group], body: 'hallo!', send: false
+
+        checkbox = f(".user_note")
+        checkbox.should be_displayed
+        checkbox.click
+
+        count1 = @s1.user_notes.count
+        click_send
+        @s1.user_notes.reload.count.should == count1 + 1
       end
 
       it "should not be allowed if disabled" do
@@ -269,20 +286,9 @@ describe "conversations new" do
         f(".user_note").should_not be_displayed
       end
 
-      it "should be allowed with multiple recipients" do
-        compose course: @course, to: [@s1, @s2], body: 'hallo!', send: false
-        f(".user_note").should be_displayed
-      end
-
       it "should not be allowed with non-student recipient" do
         compose course: @course, to: [@teacher], body: 'hallo!', send: false
         f(".user_note").should_not be_displayed
-      end
-
-      it "should be allowed with group recipient" do
-        @group = @course.groups.create(:name => "the group")
-        compose course: @course, to: [@group], body: 'hallo!', send: false
-        f(".user_note").should be_displayed
       end
     end
   end
