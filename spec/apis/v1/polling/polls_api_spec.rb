@@ -80,6 +80,13 @@ describe Polling::PollsController, type: :request do
         poll_json = json['polls'].first
         poll_json.should have_key("total_results")
       end
+
+      it "returns the id of the user that created the poll" do
+        json = get_show
+        poll_json = json['polls'].first
+        poll_json.should have_key("user_id")
+        poll_json['user_id'].should == @teacher.id.to_s
+      end
     end
 
     context "as a student" do
@@ -92,6 +99,16 @@ describe Polling::PollsController, type: :request do
         json = get_show
         poll_json = json['polls'].first
         poll_json.should_not have_key("total_results")
+      end
+
+      it "shouldn't return the id of the user that created the poll" do
+        student_in_course(:active_all => true, :course => @course)
+        session = @poll.poll_sessions.create!(course: @course)
+        session.publish!
+
+        json = get_show
+        poll_json = json['polls'].first
+        poll_json.should_not have_key("user_id")
       end
 
       it "is unauthorized if there are no published sessions" do

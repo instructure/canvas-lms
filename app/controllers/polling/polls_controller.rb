@@ -45,6 +45,11 @@ module Polling
   #           "example": "2014-01-07T15:16:18Z",
   #           "type": "string",
   #           "format": "date-time"
+  #         },
+  #         "user_id": {
+  #           "description": "The unique identifier for the user that created the poll.",
+  #           "example": 105,
+  #           "type": "integer"
   #         }
   #       }
   #    }
