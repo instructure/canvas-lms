@@ -419,6 +419,21 @@ describe Polling::PollSessionsController, type: :request do
       session_ids.should_not include(@unenrolled.id)
       session_ids.should_not include(@not_published.id)
     end
+
+    it "doesn't return poll sessions for course sections the user is not enrolled in" do
+      @published = @poll1.poll_sessions.create!(course: @course1)
+      @published.publish!
+      @wrong_course_section = @poll1.poll_sessions.create!(course: @course1, course_section: @course1.course_sections.create!(name: 'blah'))
+      @wrong_course_section.close!
+
+      student_in_course(active_all: true, course: @course1)
+      json = get_opened['poll_sessions']
+
+      session_ids = json.map { |session| session["id"].to_i }
+
+      session_ids.should include(@published.id)
+      session_ids.should_not include(@wrong_course_section.id)
+    end
   end
 
   describe 'GET closed' do
@@ -454,6 +469,21 @@ describe Polling::PollSessionsController, type: :request do
       session_ids.should include(@not_published.id)
       session_ids.should_not include(@unenrolled.id)
       session_ids.should_not include(@published.id)
+    end
+
+    it "doesn't return poll sessions for course sections the user is not enrolled in" do
+      @not_published = @poll1.poll_sessions.create!(course: @course1)
+      @not_published.close!
+      @wrong_course_section = @poll1.poll_sessions.create!(course: @course1, course_section: @course1.course_sections.create!(name: 'blah'))
+      @wrong_course_section.close!
+
+      student_in_course(active_all: true, course: @course1)
+      json = get_closed['poll_sessions']
+
+      session_ids = json.map { |session| session["id"].to_i }
+
+      session_ids.should include(@not_published.id)
+      session_ids.should_not include(@wrong_course_section.id)
     end
   end
 
