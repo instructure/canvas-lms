@@ -3,7 +3,7 @@ result=0
 
 echo "################ google_docs ################"
 rm -f Gemfile.lock
-bundle install
+bundle check || bundle install
 bundle exec rspec spec
 let result=$result+$?
 
