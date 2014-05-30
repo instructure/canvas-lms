@@ -297,8 +297,9 @@ define [
       if (_.isEmpty(recipientIds) || _.contains(recipientIds, /(teachers|tas|observers)$/))
         @toggleUserNote(false)
       else
-        tokenModel = _.last(@recipientView.tokenModels())
-        @toggleUserNote(@canAddNotesFor(tokenModel))
+        canAddNotes = _.map @recipientView.tokenModels(), (tokenModel) =>
+          @canAddNotesFor(tokenModel)
+        @toggleUserNote(_.every(canAddNotes))
 
     canAddNotesFor: (user) =>
       return false unless ENV.CONVERSATIONS.NOTES_ENABLED
