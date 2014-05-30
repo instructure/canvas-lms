@@ -627,7 +627,10 @@ class Enrollment < ActiveRecord::Base
   def destroy
     self.workflow_state = 'deleted'
     result = self.save
-    self.user.try(:update_account_associations) if result
+    if result
+      self.user.try(:update_account_associations)
+      self.user.touch
+    end
     result
   end
 
