@@ -101,7 +101,7 @@
 
   //===== Overview Tab ===
   .submission-attempt-history {
-    margin: 30px 0 0 0;
+    margin: 30px 0 20px 0;
 
     .desc {
       width: 22%;
@@ -114,6 +114,7 @@
     table {
       width: 65%;
       float: left;
+      margin-bottom: 10px;
     }
     td {
       padding: 4px 8px;
@@ -127,6 +128,14 @@
     td.regraded {
       border-top: 1px solid #C4AE90;
       background-color: #fcf8e3;
+    }
+    .submission-pending-review {
+      width: 65%;
+      float: left;
+      margin-left: 24%;
+      margin-bottom: 0;
+      color: #777;
+      font-size: 90%;
     }
   }
 
