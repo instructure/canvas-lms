@@ -103,14 +103,19 @@ describe Polling::PollChoicesController, type: :request do
         student_in_course(:active_all => true, :course => @course)
       end
 
-      it "is unauthorized if there are no open sessions" do
+      it "is unauthorized if there are no existing sessions" do
         get_show(true)
         response.code.should == '401'
       end
 
+      it "is authorized if there are existing sessions" do
+        Polling::PollSession.create!(course: @course, poll: @poll)
+        get_show(true)
+        response.code.should == '200'
+      end
+
       it "doesn't display is_correct within poll choices" do
-        session = Polling::PollSession.create!(course: @course, poll: @poll)
-        session.publish!
+        Polling::PollSession.create!(course: @course, poll: @poll)
 
         json = get_show
         poll_choice_json = json['poll_choices'].first

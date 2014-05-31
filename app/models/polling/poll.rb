@@ -40,7 +40,7 @@ module Polling
       can :update and can :read and can :delete
 
       given do |user, session|
-        self.poll_sessions.any? { |poll_session| poll_session.grants_right?(user, session, :submit) }
+        self.poll_sessions.where(["course_id IN (?) AND (course_section_id IS NULL OR course_section_id IN (?))", user.enrollments.map(&:course_id).compact, user.enrollments.map(&:course_section_id).compact]).exists?
       end
       can :read
     end

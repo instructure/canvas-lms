@@ -92,9 +92,7 @@ describe Polling::PollsController, type: :request do
     context "as a student" do
       it "doesn't display the total results of all sessions" do
         student_in_course(:active_all => true, :course => @course)
-
-        session = @poll.poll_sessions.create!(course: @course)
-        session.publish!
+        @poll.poll_sessions.create!(course: @course)
 
         json = get_show
         poll_json = json['polls'].first
@@ -111,12 +109,27 @@ describe Polling::PollsController, type: :request do
         poll_json.should_not have_key("user_id")
       end
 
-      it "is unauthorized if there are no published sessions" do
+      it "shouldn't return the id of the user that created the poll" do
         student_in_course(:active_all => true, :course => @course)
-        section = @course.course_sections.create!(name: 'Section 2')
+        @poll.poll_sessions.create!(course: @course)
 
-        @poll.poll_sessions.create!(course: @course, course_section: section)
+        json = get_show
+        poll_json = json['polls'].first
+        poll_json.should_not have_key("user_id")
+      end
 
+      it "is authorized if there are sessions that belong to a course or course section the user is enrolled in" do
+        student_in_course(:active_all => true, :course => @course)
+        @poll.poll_sessions.create!(course: @course)
+
+        get_show(true)
+        response.code.should == '200'
+      end
+
+      it "is unauthorized if there are no sessions that belong to a course or course section the user is enrolled in" do
+        student_in_course(:active_all => true, :course => @course)
+        unenrolled = Course.create!(name: 'Unenrolled Course')
+        @poll.poll_sessions.create!(course: unenrolled)
         get_show(true)
         response.code.should == '401'
       end
