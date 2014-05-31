@@ -27,3 +27,9 @@
       <% end %>
     </tbody>
   </table>
+
+  <% if @versions.detect {|v| v.pending_review? } %>
+  <p class="submission-pending-review">
+    <em>*</em> <%= t 'questions_not_graded', 'Some questions not yet graded' %>
+  </p>
+  <% end %>
