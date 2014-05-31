@@ -89,13 +89,13 @@ class Quizzes::QuizExtensionsController < ApplicationController
   #
   # @argument extend_from_now [Optional, Integer]
   #   The number of minutes to extend the quiz from the current time. This is
-  #   mutually exclusive to extend_from_end_at. This is limited to 10080
-  #   minutes (1 week)
+  #   mutually exclusive to extend_from_end_at. This is limited to 1440
+  #   minutes (24 hours)
   #
   # @argument extend_from_end_at [Optional, Integer]
   #   The number of minutes to extend the quiz beyond the quiz's current
   #   ending time. This is mutually exclusive to extend_from_now. This is
-  #   limited to 10080 minutes (1 week)
+  #   limited to 1440 minutes (24 hours)
   #
   # <b>Responses</b>
   #

@@ -1,17 +1,17 @@
 {{#form-dialog
-  title=studentExtensionTitle
-  on-submit="submitStudentExtensions"
+  title=title
+  on-submit="submit"
   height=modalHeight
   width=490
 }}
-<div id="student-extension-dialog" class="clearfix">
+<div class="student-extension-dialog clearfix">
   <h2>{{extensionsFor}}</h2>
 
   {{#unless unlimitedAttempts}}
     <div class="field extra-attempts">
       <label for="extra_attempts">
         {{t 'extra_attempts' 'Extra attempts:'}}
-        <em class="note">{{quizExtraAttemptsNote}}</em>
+        <em class="note">{{extraAttemptsNote}}</em>
       </label>
       <span class="input">
         {{input type="text" id="extra_attempts" value=extension.extraAttempts class="text"}}
@@ -24,7 +24,7 @@
     <div class="field extra-time">
       <label for="extra_time">
         {{t 'extra_time_on_every_attempt' 'Extra time on every attempt:'}}
-        <em class="note">{{quizExtraTimeNote}}</em>
+        <em class="note">{{extraTimeNote}}</em>
       </label>
       <span class="input">
         {{input type="text" id="extra_time" value=extension.extraTime class="text"}}

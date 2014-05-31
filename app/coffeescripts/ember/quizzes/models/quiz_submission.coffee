@@ -11,7 +11,7 @@ define [
     user: belongsTo 'user', async: false
     quiz: belongsTo 'quiz', async: false
     attempt: attr('number')
-    endAt: attr()
+    endAt: attr('date')
     extraAttempts: attr('number')
     extraTime: attr()
     manuallyUnlocked: attr()
@@ -23,7 +23,7 @@ define [
     quizVersion: attr()
     score: attr()
     scoreBeforeRegrade: attr()
-    startedAt: attr()
+    startedAt: attr('date')
     timeSpent: attr()
     validationToken: attr()
     workflowState: attr()

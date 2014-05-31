@@ -9,8 +9,7 @@ define [
     quiz: Ember.computed.alias('controllers.quiz.model')
     extension: Ember.Object.create
 
-    studentExtensionTitle:
-      I18n.t 'student_extensions', 'Student Extensions'
+    title: I18n.t 'student_extensions', 'Student Extensions'
 
     extensionsFor: ( ->
       if @get("length") == 1
@@ -31,11 +30,11 @@ define [
       @get('quiz.multipleAttemptsAllowed') && @get('quiz.allowedAttempts') == -1
     ).property('quiz.multipleAttemptsAllowed', 'quiz.allowedAttempts')
 
-    quizExtraAttemptsNote: ( ->
+    extraAttemptsNote: ( ->
       I18n.t('everyone_gets_attempts', 'everyone already gets %{num}', num: @get('quiz.allowedAttempts'))
     ).property('quiz.allowedAttempts')
 
-    quizExtraTimeNote: ( ->
+    extraTimeNote: ( ->
       I18n.t('everyone_gets_time', 'everyone already gets %{num} minutes', num: @get('quiz.timeLimit'))
     ).property('quiz.timeLimit')
 
@@ -52,7 +51,7 @@ define [
     ).observes('model')
 
     actions:
-      submitStudentExtensions: ->
+      submit: ->
         quizExtensions = @get("model").map (student) =>
           user_id: student.get("id")
           extra_attempts: @get('extension.extraAttempts')

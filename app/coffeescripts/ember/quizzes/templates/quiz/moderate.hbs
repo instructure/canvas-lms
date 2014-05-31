@@ -70,8 +70,14 @@
         </td>
         <td>
           {{#if isActive}}
-            <i class="icon-clock"></i>
-            {{runningTime}}
+            {{#if extendable}}
+              <a class="icon-clock" href="#" {{action 'extendTime' user}}>
+                {{runningTime}}
+              </a>
+            {{else}}
+              <i class="icon-clock"></i>
+              {{runningTime}}
+            {{/if}}
           {{else}}
             {{friendlyTime}}
           {{/if}}
@@ -89,7 +95,6 @@
             </span>
           {{/if}}
         </td>
-
         <td>{{remainingStatusLabel}}{{remainingAttempts}}</td>
         <td>{{user.friendlyScore}}</td>
         <td class="unlocked">
