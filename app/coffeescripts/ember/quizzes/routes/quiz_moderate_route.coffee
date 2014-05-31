@@ -62,4 +62,13 @@ define [
           outlet: 'modal'
           controller: controller
 
+      extendTime: (model) ->
+        controller = @controllerFor('quiz.moderate.extend_time')
+        controller.set('model', model)
+
+        @render 'quiz/moderate/extend_time',
+          into: 'application'
+          outlet: 'modal'
+          controller: controller
+
   ModerateRoute

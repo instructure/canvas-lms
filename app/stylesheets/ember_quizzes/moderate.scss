@@ -59,7 +59,7 @@
   }
 }
 
-#student-extension-dialog {
+.student-extension-dialog {
   h2 {
     margin: 0 0 1.5em 0;
     font-size: 140%;
@@ -107,6 +107,41 @@
 
     label {
       width: 400px;
+    }
+  }
+  .invalid {
+    border: 1px solid #b94a48;
+  }
+  dl {
+    margin-bottom: 1.7em;
+  }
+  dt {
+    width: 75px;
+    float: left;
+    font-weight: bold;
+    text-align: right;
+  }
+  dd {
+    width: 330px;
+    float: left;
+  }
+  p {
+    margin-bottom: 1.5em;
+  }
+  p.note {
+    margin: 4px 0 0 0;
+    font-size: 80%;
+    font-weight: 300;
+    color: #888;
+  }
+  .relative-time {
+    input {
+      width: 50px;
+      margin: 0 5px;
+    }
+    select {
+      width: 120px;
+      margin: 0 5px;
     }
   }
 }

@@ -68,3 +68,10 @@ define [
       courseId = env.get('courseId')
       "/courses/#{courseId}/quizzes/#{quizId}/#{partial}"
     ).property('quizSubmission.id')
+
+    extendable: (->
+      endAt   = @get("quizSubmission.endAt")
+      now     = new Date()
+      hourAgo = now.setHours(now.getHours() - 1)
+      @get("quizSubmission.isUntaken") && @get("quiz.timeLimit") && endAt && endAt > hourAgo
+    ).property('quizSubmission.isUntaken', 'quiz.timeLimit', 'quizSubmission.endAt')

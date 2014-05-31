@@ -70,10 +70,10 @@ class Quizzes::QuizExtension
     time_params = ext_params[:extend_from_now] || ext_params[:extend_from_end_at]
     if quiz_submission.extendable? && time_params.to_i > 0
       if ext_params[:extend_from_now].to_i > 0
-        from_now = [ext_params[:extend_from_now].to_i, 10080].min
+        from_now = [ext_params[:extend_from_now].to_i, 1440].min
         quiz_submission.end_at = Time.now + from_now.minutes
       elsif ext_params[:extend_from_end_at].to_i > 0
-        from_end_at = [ext_params[:extend_from_end_at].to_i, 10080].min
+        from_end_at = [ext_params[:extend_from_end_at].to_i, 1440].min
         quiz_submission.end_at += from_end_at.minutes
       end
     end
