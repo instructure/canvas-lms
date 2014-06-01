@@ -12,13 +12,17 @@
       <tr>
         <td style="vertical-align: top; padding: 0.5em;"><%= before_label :self_signup, "Self Sign-Up" %></td>
         <td style="padding: 0.5em;">
-          <input type="checkbox" name="category[enable_self_signup]" id="category_enable_self_signup" value="1" />
-          <label for="category_enable_self_signup"><%= t :allow_self_signup, "Allow self sign-up" %></label>
+          <label class="checkbox">
+            <input type="checkbox" name="category[enable_self_signup]" id="category_enable_self_signup" value="1" />
+            <%= t :allow_self_signup, "Allow self sign-up" %>
+          </label>
           <%= link_to(image_tag('help.png'), '#', :class => 'self_signup_help_link no-hover',
                       :title => t(:self_signup_help_tooltip, "What Are Self Sign-Up Groups?")) %>
           <br/>
-          <input type="checkbox" name="category[restrict_self_signup]" id="category_restrict_self_signup" value="1" disabled />
-          <label for="category_restrict_self_signup"><%= t :restricted_self_signup, "Require group members to be in the same section" %></label>
+          <label class="checkbox">
+            <input type="checkbox" name="category[restrict_self_signup]" id="category_restrict_self_signup" value="1" disabled />
+            <%= t :restricted_self_signup, "Require group members to be in the same section" %>
+          </label>
         </td>
       </tr>
       <tr>

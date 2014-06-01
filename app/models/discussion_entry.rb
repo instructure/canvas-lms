@@ -122,7 +122,7 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   def reply_from(opts)
-    raise IncomingMail::IncomingMessageProcessor::UnknownAddressError if self.context.root_account.deleted?
+    raise IncomingMail::Errors::UnknownAddress if self.context.root_account.deleted?
     user = opts[:user]
     if opts[:html]
       message = opts[:html].strip
@@ -144,7 +144,7 @@ class DiscussionEntry < ActiveRecord::Base
         entry.save!
         entry
       else
-        raise IncomingMail::IncomingMessageProcessor::ReplyToLockedTopicError
+        raise IncomingMail::Errors::ReplyToLockedTopic
       end
     end
   end
@@ -166,7 +166,7 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   def summary(length=150)
-    strip_and_truncate(message, :max_length => length)
+    HtmlTextHelper.strip_and_truncate(message, :max_length => length)
   end
 
   def plaintext_message(length=250)

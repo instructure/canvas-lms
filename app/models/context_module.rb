@@ -31,7 +31,24 @@ class ContextModule < ActiveRecord::Base
   before_save :validate_prerequisites
   before_save :confirm_valid_requirements
   after_save :touch_context
+  after_save :invalidate_progressions
   validates_presence_of :workflow_state, :context_id, :context_type
+
+  def invalidate_progressions
+    connection.after_transaction_commit do
+      context_module_progressions.update_all(current: false)
+      send_later_if_production(:evaluate_all_progressions)
+    end
+  end
+  private :invalidate_progressions
+
+  def evaluate_all_progressions
+    current_column = 'context_module_progressions.current'
+    current_scope = context_module_progressions.where("#{current_column} IS NULL OR #{current_column} = ?", false)
+    current_scope.find_each(batch_size: 100) do |progression|
+      progression.evaluate!
+    end
+  end
 
   def self.module_positions(context)
     # Keep a cached hash of all modules for a given context and their
@@ -128,18 +145,6 @@ class ContextModule < ActiveRecord::Base
     end
   end
 
-  def update_student_progressions(user=nil)
-    # modules are ordered by position, so running through them in order will
-    # automatically handle issues with dependencies loading in the correct
-    # order
-    modules = ContextModule.order(:position).where(
-        :context_type => self.context_type, :context_id => self.context_id, :workflow_state => 'active')
-    students = user ? [user] : self.context.students
-    modules.each do |mod|
-      mod.re_evaluate_for(students)
-    end
-  end
-  
   set_policy do
     given {|user, session| self.cached_context_grants_right?(user, session, :manage_content) }
     can :read and can :create and can :update and can :delete
@@ -173,7 +178,7 @@ class ContextModule < ActiveRecord::Base
       res = progression && !progression.locked? && progression.current_position && progression.current_position >= tag.position
     end
     if !res && opts[:deep_check_if_needed]
-      progression = self.evaluate_for(user, true)
+      progression = self.evaluate_for(user)
       if tag && tag.context_module_id == self.id && self.require_sequential_progress
         res = progression && !progression.locked? && progression.current_position && progression.current_position >= tag.position
       end
@@ -372,29 +377,50 @@ class ContextModule < ActiveRecord::Base
   end
   
   def update_for(user, action, tag, points=nil)
-    return nil unless self.context.users.include?(user)
-    return nil unless ContextModuleProgression.prerequisites_satisfied?(user, self)
-    progression = self.find_or_create_progression(user)
-    return unless progression
-    progression.requirements_met ||= []
-    requirement = self.completion_requirements.to_a.find{|p| p[:id] == tag.local_id}
-    return if !requirement || progression.requirements_met.include?(requirement)
-    met = false
-    met = true if requirement[:type] == 'must_view' && (action == :read || action == :contributed)
-    met = true if requirement[:type] == 'must_contribute' && action == :contributed
-    met = true if requirement[:type] == 'must_submit' && action == :scored
-    met = true if requirement[:type] == 'must_submit' && action == :submitted
-    met = true if requirement[:type] == 'min_score' && action == :scored && points && points >= requirement[:min_score].to_f
-    met = true if requirement[:type] == 'max_score' && action == :scored && points && points <= requirement[:max_score].to_f
-    if met
-      progression.requirements_met << requirement
+    retry_count = 0
+    begin
+      return nil unless self.context.users.include?(user)
+      return nil unless ContextModuleProgression.prerequisites_satisfied?(user, self)
+      return nil unless progression = self.find_or_create_progression(user)
+
+      progression.requirements_met ||= []
+      if progression.update_requirement_met(action, tag, points)
+        # not sure if this save is necessary
+        # leaving it for now as it saves the default requirements_met (set above)
+        progression.save!
+        progression.send_later_if_production(:evaluate)
+      end
+
+      progression
+
+    rescue ActiveRecord::StaleObjectError
+      raise if retry_count > 10
+      retry_count += 1
+      retry
     end
-    progression.save!
-    User.module_progression_job_queued(user.id)
-    send_later_if_production :update_student_progressions, user
-    progression
   end
-  
+
+  def completion_requirement_for(action, tag)
+    self.completion_requirements.to_a.find do |requirement|
+      next false unless requirement[:id] == tag.local_id
+
+      case requirement[:type]
+      when 'must_view'
+        action == :read || action == :contributed
+      when 'must_contribute'
+        action == :contributed
+      when 'must_submit'
+        action == :scored || action == :submitted
+      when 'min_score'
+        action == :scored
+      when 'max_score'
+        action == :scored
+      else
+        false
+      end
+    end
+  end
+
   def self.requirement_description(req)
     case req[:type]
     when 'must_view'
@@ -430,16 +456,6 @@ class ContextModule < ActiveRecord::Base
 
   def cached_active_tags
     @cached_active_tags ||= self.content_tags.active
-  end
-  
-  def re_evaluate_for(users)
-    users = Array(users)
-    users.each{|u| u.clear_cached_lookups }
-    progressions = self.find_or_create_progressions(users)
-    progressions.each(&:mark_as_dirty)
-    progressions.each do |progression|
-      self.evaluate_for(progression, true)
-    end
   end
   
   def confirm_valid_requirements(do_save=false)
@@ -483,237 +499,37 @@ class ContextModule < ActiveRecord::Base
     progression
   end
   
-  def find_or_create_progression_with_multiple_lookups(user)
-    user.module_progression_for(self.id) || self.find_or_create_progression(user)
-  end
-
-  def evaluate_for(user_or_progression, force_evaluate_requirements=false)
+  def evaluate_for(user_or_progression)
     if user_or_progression.is_a?(ContextModuleProgression)
       progression, user = [user_or_progression, user_or_progression.user]
     else
-      progression, user = [self.find_or_create_progression_with_multiple_lookups(user_or_progression), user_or_progression] if user_or_progression
+      progression, user = [self.find_or_create_progression(user_or_progression), user_or_progression] if user_or_progression
     end
     return nil unless progression && user
 
     progression.context_module = self if progression.context_module_id == self.id
     progression.user = user if progression.user_id == user.id
-    progression.evaluate(force_evaluate_requirements)
-    progression
+
+    progression.evaluate!
   end
 
   def to_be_unlocked
     self.unlock_at && self.unlock_at > Time.now
   end
 
-  def self.process_migration(data, migration)
-    modules = data['modules'] ? data['modules'] : []
-    modules.each do |mod|
-      if migration.import_object?("context_modules", mod['migration_id']) || migration.import_object?("modules", mod['migration_id'])
-        begin
-          import_from_migration(mod, migration.context)
-        rescue
-          migration.add_import_warning(t('#migration.module_type', "Module"), mod[:title], $!)
-        end
-      end
-    end
-    migration.context.context_modules.first.try(:fix_position_conflicts)
-    migration.context.touch
+  def self.process_migration(*args)
+    Importers::ContextModuleImporter.process_migration(*args)
   end
-  
-  def self.import_from_migration(hash, context, item=nil)
-    hash = hash.with_indifferent_access
-    return nil if hash[:migration_id] && hash[:modules_to_import] && !hash[:modules_to_import][hash[:migration_id]]
-    item ||= find_by_context_type_and_context_id_and_id(context.class.to_s, context.id, hash[:id])
-    item ||= find_by_context_type_and_context_id_and_migration_id(context.class.to_s, context.id, hash[:migration_id]) if hash[:migration_id]
-    item ||= new(:context => context)
-    context.imported_migration_items << item if context.imported_migration_items && item.new_record?
-    item.name = hash[:title] || hash[:description]
-    item.migration_id = hash[:migration_id]
-    if hash[:workflow_state] == 'unpublished'
-      item.workflow_state = 'unpublished'
-    else
-      item.workflow_state = 'active'
-    end
 
-    item.position = hash[:position] || hash[:order]
-    item.context = context
-    item.unlock_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:unlock_at]) if hash[:unlock_at]
-    item.start_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:start_at]) if hash[:start_at]
-    item.end_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:end_at]) if hash[:end_at]
-    item.require_sequential_progress = hash[:require_sequential_progress] if hash[:require_sequential_progress]
-
-    if hash[:prerequisites]
-      preqs = []
-      hash[:prerequisites].each do |prereq|
-        if prereq[:module_migration_id]
-          if ref_mod = find_by_context_type_and_context_id_and_migration_id(context.class.to_s, context.id, prereq[:module_migration_id])
-            preqs << {:type=>"context_module", :name=>ref_mod.name, :id=>ref_mod.id}
-          end
-        end
-      end
-      item.prerequisites = preqs if preqs.length > 0
-    end
-    
-    # Clear the old tags to be replaced by new ones
-    item.content_tags.destroy_all
-    item.save!
-    
-    item_map = {}
-    @item_migration_position = item.content_tags.not_deleted.map(&:position).compact.max || 0
-    (hash[:items] || []).each do |tag_hash|
-      begin
-        item.add_item_from_migration(tag_hash, 0, context, item_map)
-      rescue
-        context.content_migration.add_import_warning(t(:migration_module_item_type, "Module Item"), tag_hash[:title], $!) if context.content_migration
-      end
-    end
-    
-    if hash[:completion_requirements]
-      c_reqs = []
-      hash[:completion_requirements].each do |req|
-        if item_ref = item_map[req[:item_migration_id]]
-          req[:id] = item_ref.id
-          req.delete :item_migration_id
-          c_reqs << req
-        end
-      end
-      if c_reqs.length > 0
-        item.completion_requirements = c_reqs
-        item.save
-      end
-    end
-
-    item
+  def self.import_from_migration(*args)
+    Importers::ContextModuleImporter.import_from_migration(*args)
   end
-  
+
   def migration_position
     @migration_position_counter ||= 0
     @migration_position_counter = @migration_position_counter + 1
   end
-  
-  def add_item_from_migration(hash, level, context, item_map)
-    hash = hash.with_indifferent_access
-    hash[:migration_id] ||= hash[:item_migration_id]
-    hash[:migration_id] ||= Digest::MD5.hexdigest(hash[:title]) if hash[:title]
-    existing_item = content_tags.find_by_id(hash[:id]) if hash[:id].present?
-    existing_item ||= content_tags.find_by_migration_id(hash[:migration_id]) if hash[:migration_id]
-    existing_item ||= content_tags.new(:context => context)
-    if hash[:workflow_state] == 'unpublished'
-      existing_item.workflow_state = 'unpublished'
-    else
-      existing_item.workflow_state = 'active'
-    end
-    context.imported_migration_items << existing_item if context.imported_migration_items && existing_item.new_record?
-    existing_item.migration_id = hash[:migration_id]
-    hash[:indent] = [hash[:indent] || 0, level].max
-    if hash[:linked_resource_type] =~ /wiki_type|wikipage/i
-      wiki = self.context.wiki.wiki_pages.find_by_migration_id(hash[:linked_resource_id]) if hash[:linked_resource_id]
-      if wiki
-        item = self.add_item({
-          :title => hash[:title] || hash[:linked_resource_title],
-          :type => 'wiki_page',
-          :id => wiki.id,
-          :indent => hash[:indent].to_i
-        }, existing_item, :wiki_page => wiki, :position => migration_position)
-      end
-    elsif hash[:linked_resource_type] =~ /page_type|file_type|attachment/i
-      # this is a file of some kind
-      file = self.context.attachments.active.find_by_migration_id(hash[:linked_resource_id]) if hash[:linked_resource_id]
-      if file
-        title = hash[:title] || hash[:linked_resource_title]
-        item = self.add_item({
-          :title => title,
-          :type => 'attachment',
-          :id => file.id,
-          :indent => hash[:indent].to_i
-        }, existing_item, :attachment => file, :position => migration_position)
-      end
-    elsif hash[:linked_resource_type] =~ /assignment|project/i
-      # this is a file of some kind
-      ass = self.context.assignments.find_by_migration_id(hash[:linked_resource_id]) if hash[:linked_resource_id]
-      if ass
-        item = self.add_item({
-          :title => hash[:title] || hash[:linked_resource_title],
-          :type => 'assignment',
-          :id => ass.id,
-          :indent => hash[:indent].to_i
-        }, existing_item, :assignment => ass, :position => migration_position)
-      end
-    elsif (hash[:linked_resource_type] || hash[:type]) =~ /folder|heading|contextmodulesubheader/i
-      # just a snippet of text
-      item = self.add_item({
-        :title => hash[:title] || hash[:linked_resource_title],
-        :type => 'context_module_sub_header',
-        :indent => hash[:indent].to_i
-      }, existing_item, :position => migration_position)
-    elsif hash[:linked_resource_type] =~ /url/i
-      # external url
-      if hash['url']
-        item = self.add_item({
-          :title => hash[:title] || hash[:linked_resource_title] || hash['description'],
-          :type => 'external_url',
-          :indent => hash[:indent].to_i,
-          :url => hash['url']
-        }, existing_item, :position => migration_position)
-      end
-    elsif hash[:linked_resource_type] =~ /contextexternaltool/i
-      # external tool
-      external_tool_id = nil
-      if hash[:linked_resource_global_id]
-        external_tool_id = hash[:linked_resource_global_id]
-      elsif hash[:linked_resource_id] && et = self.context.context_external_tools.active.find_by_migration_id(hash[:linked_resource_id])
-        external_tool_id = et.id
-      end
-      if hash['url']
-        item = self.add_item({
-          :title => hash[:title] || hash[:linked_resource_title] || hash['description'],
-          :type => 'context_external_tool',
-          :indent => hash[:indent].to_i,
-          :url => hash['url'],
-          :id => external_tool_id
-        }, existing_item, :position => migration_position)
-      end
-    elsif hash[:linked_resource_type] =~ /assessment|quiz/i
-      quiz = self.context.quizzes.find_by_migration_id(hash[:linked_resource_id]) if hash[:linked_resource_id]
-      if quiz
-        item = self.add_item({
-          :title => hash[:title] || hash[:linked_resource_title],
-          :type => 'quiz',
-          :indent => hash[:indent].to_i,
-          :id => quiz.id
-        }, existing_item, :quiz => quiz, :position => migration_position)
-      end
-    elsif hash[:linked_resource_type] =~ /discussion|topic/i
-      topic = self.context.discussion_topics.find_by_migration_id(hash[:linked_resource_id]) if hash[:linked_resource_id]
-      if topic
-        item = self.add_item({
-          :title => hash[:title] || hash[:linked_resource_title],
-          :type => 'discussion_topic',
-          :indent => hash[:indent].to_i,
-          :id => topic.id
-        }, existing_item, :discussion_topic => topic, :position => migration_position)
-      end
-    elsif hash[:linked_resource_type] == 'UNSUPPORTED_TYPE'
-      # We know what this is and that we don't support it
-    else
-      # We don't know what this is
-    end
-    if item
-      item_map[hash[:migration_id]] = item if hash[:migration_id]
-      item.migration_id = hash[:migration_id]
-      item.new_tab = hash[:new_tab]
-      item.position = (@item_migration_position ||= self.content_tags.not_deleted.map(&:position).compact.max || 0)
-      item.workflow_state = 'active'
-      @item_migration_position += 1
-      item.save!
-    end
-    if hash[:sub_items]
-      hash[:sub_items].each do |tag_hash|
-        self.add_item_from_migration(tag_hash, level + 1, context, item_map)
-      end
-    end
-    item
-  end
+  attr_accessor :item_migration_position
 
   VALID_COMPLETION_EVENTS = [:publish_final_grade].freeze
 

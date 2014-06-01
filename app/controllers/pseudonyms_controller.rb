@@ -53,7 +53,7 @@ class PseudonymsController < ApplicationController
         self, api_v1_account_pseudonyms_url)
     else
       bookmark = BookmarkedCollection::SimpleBookmarker.new(Pseudonym, :id)
-      @pseudonyms = BookmarkedCollection.with_each_shard(bookmark, @user.pseudonyms) { |scope| scope.active }
+      @pseudonyms = ShardedBookmarkedCollection.build(bookmark, @user.pseudonyms) { |scope| scope.active }
       @pseudonyms = Api.paginate(@pseudonyms, self, api_v1_user_pseudonyms_url)
     end
 

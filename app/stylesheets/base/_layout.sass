@@ -3,7 +3,8 @@
 body, html
   height: 100%
 body
-  +bg-image('blue/bg', 'jpg', repeat, left, top, transparent, 150px, 150px)
+  @if not $use_high_contrast
+    +bg-image('blue/bg', 'jpg', repeat, left, top, transparent, 150px, 150px)
   min-width: $min_main_width
 
   &.no-headers, &.embedded

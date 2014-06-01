@@ -415,7 +415,7 @@ describe "dashboard" do
       qs = q.generate_submission(@user)
       qs.mark_completed
       qs.submission_data = {"question_31" => "<p>abeawebawebae</p>", "question_text" => "qq1"}
-      qs.grade_submission
+      Quizzes::SubmissionGrader.new(qs).grade_submission
       get "/"
 
       todo_list = f('.to-do-list')

@@ -238,6 +238,7 @@ class User < ActiveRecord::Base
   has_many :zip_file_imports, :as => :context
   has_many :messages
   has_many :sis_batches
+  has_many :content_migrations, :as => :context
 
   has_one :profile, :class_name => 'UserProfile'
   alias :orig_profile :profile
@@ -1142,29 +1143,6 @@ class User < ActiveRecord::Base
     end
   end
 
-  # only used by ContextModuleProgression#evaluate_uncompleted_requirements
-  def submitted_submission_for(assignment_id)
-    @submissions ||= self.submissions.having_submission.except(:includes).select([:id, :score, :assignment_id]).all
-    @submissions.detect{|s| s.assignment_id == assignment_id }
-  end
-
-  # only used by ContextModuleProgression#evaluate_uncompleted_requirements
-  def attempted_quiz_submission_for(quiz_id)
-    @quiz_submissions ||= self.quiz_submissions.select([:id, :kept_score, :quiz_id, :workflow_state]).select{|s| !s.settings_only? }
-    @quiz_submissions.detect{|qs| qs.quiz_id == quiz_id }
-  end
-
-  def module_progression_for(module_id)
-    @module_progressions ||= self.context_module_progressions.to_a
-    @module_progressions.detect{|p| p.context_module_id == module_id }
-  end
-
-  def clear_cached_lookups
-    @module_progressions = nil
-    @quiz_submissions = nil
-    @submissions = nil
-  end
-
   def update_avatar_image(force_reload=false)
     if !self.avatar_image_url || force_reload
       if self.avatar_image_source == 'facebook'
@@ -1378,14 +1356,6 @@ class User < ActiveRecord::Base
     read_attribute(:preferences) || write_attribute(:preferences, {})
   end
 
-  def enabled_theme
-    preferences[:enabled_theme] ||= "default"
-  end
-
-  def enabled_theme=(value)
-    preferences[:enabled_theme] = value
-  end
-
   def watched_conversations_intro?
     preferences[:watched_conversations_intro] == true
   end
@@ -1408,12 +1378,16 @@ class User < ActiveRecord::Base
     save
   end
 
+  def prefers_high_contrast?
+    feature_enabled?(:high_contrast)
+  end
+
   def manual_mark_as_read?
     !!preferences[:manual_mark_as_read]
   end
 
   def use_new_conversations?
-    preferences[:use_new_conversations] == true
+    true
   end
 
   def ignore_item!(asset, purpose, permanent = false)
@@ -1719,19 +1693,6 @@ class User < ActiveRecord::Base
     @current_admin_enrollments.map(&:course_id)
   end
 
-  # TODO: this smells, I really don't get it (anymore... I wrote it :-( )
-  def self.module_progression_job_queued(user_id, time_string=nil)
-    time_string ||= Time.now.utc.iso8601
-    @@user_jobs ||= {}
-    @@user_jobs[user_id] ||= time_string
-  end
-
-  def self.module_progression_jobs_queued?(user_id)
-    recent = 1.minute.ago.utc.iso8601
-    @@user_jobs ||= {}
-    !!(@@user_jobs && @@user_jobs[user_id] && @@user_jobs[user_id] > recent)
-  end
-
   def submissions_for_context_codes(context_codes, opts={})
     return [] unless context_codes.present?
 
@@ -1841,12 +1802,13 @@ class User < ActiveRecord::Base
     self.shard.activate do
       Shackles.activate(:slave) do
         visible_instances = visible_stream_item_instances(opts).
-            includes(:stream_item).
+            includes(:stream_item => :context).
             limit(Setting.get('recent_stream_item_limit', 100))
         visible_instances.map do |sii|
           si = sii.stream_item
           next unless si.present?
           next if si.asset_type == 'Submission'
+          next if si.context_type == "Course" && si.context.concluded?
           si.data.write_attribute(:unread, sii.unread?)
           si
         end.compact
@@ -2545,7 +2507,7 @@ class User < ActiveRecord::Base
   end
 
   def all_paginatable_accounts
-    BookmarkedCollection.with_each_shard(Account::Bookmarker, self.accounts)
+    ShardedBookmarkedCollection.build(Account::Bookmarker, self.accounts)
   end
 
   def all_pseudonyms
@@ -2557,18 +2519,13 @@ class User < ActiveRecord::Base
     @all_active_pseudonyms ||= self.pseudonyms.with_each_shard { |scope| scope.active }
   end
 
-  #when screenreader_gradebook is enabled by default, we won't need to pass in context anymore
-  def prefers_gradebook2?(context)
+  # when we turn GB1 off, we can remove context from this function
+  def preferred_gradebook_version(context)
     if context.feature_enabled?(:screenreader_gradebook)
-      return true if preferences[:gradebook_version].nil?
-      preferences[:gradebook_version] == '2'
+      preferences[:gradebook_version] || '2'
     else
-      preferences[:use_gradebook2] != false
+      preferences[:use_gradebook2] == false ? '1' : '2'
     end
-  end
-
-  def gradebook_preference
-    preferences[:gradebook_version]
   end
 
   def stamp_logout_time!

@@ -1,6 +1,7 @@
 #!/bin/bash
 result=0
 
+echo "################ canvas_statsd ################"
 echo "################ Running tests against Rails 2 ################"
 unset  CANVAS_RAILS3
 bundle install

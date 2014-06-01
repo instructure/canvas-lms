@@ -1,10 +1,6 @@
-# Require any additional compass plugins here.
-project_type = :rails
-project_path = Rails.root.to_s if defined?(Rails)
 # Set this to the root of your project when deployed:
 http_path = "/"
-css_dir = "public/stylesheets/compiled"
-cache_dir = "/tmp/sassc"
+# css_dir is set dynamically in MultiVariantCompassCompiler#compile_all
 sass_dir = "app/stylesheets"
 images_dir = "public/images"
 javascripts_dir = "public/javascripts"

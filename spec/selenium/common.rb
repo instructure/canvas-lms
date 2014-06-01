@@ -695,7 +695,7 @@ shared_examples_for "all selenium tests" do
 
   def stub_kaltura
     # trick kaltura into being activated
-    Kaltura::ClientV3.stubs(:config).returns({
+    CanvasKaltura::ClientV3.stubs(:config).returns({
                                                  'domain' => 'www.instructuremedia.com',
                                                  'resource_domain' => 'www.instructuremedia.com',
                                                  'partner_id' => '100',
@@ -706,9 +706,9 @@ shared_examples_for "all selenium tests" do
                                                  'kcw_ui_conf' => '1',
                                                  'upload_ui_conf' => '1'
                                              })
-    kal = mock('Kaltura::ClientV3')
+    kal = mock('CanvasKaltura::ClientV3')
     kal.stubs(:startSession).returns "new_session_id_here"
-    Kaltura::ClientV3.stubs(:new).returns(kal)
+    CanvasKaltura::ClientV3.stubs(:new).returns(kal)
   end
 
   def page_view(opts={})

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Canvas Live API</title>
+  <link href='https://fonts.googleapis.com/css?family=Droid+Sans:400,700' rel='stylesheet' type='text/css'/>
+  <link href='css/highlight.default.css' media='screen' rel='stylesheet' type='text/css'/>
+  <link href='css/screen.css' media='screen' rel='stylesheet' type='text/css'/>
+  <script type="text/javascript" src="js/shred.bundle.js"></script>
+  <script src='js/jquery-1.8.0.min.js' type='text/javascript'></script>
+  <script src='js/jquery.slideto.min.js' type='text/javascript'></script>
+  <script src='js/jquery.wiggle.min.js' type='text/javascript'></script>
+  <script src='js/jquery.ba-bbq.min.js' type='text/javascript'></script>
+  <script src='js/handlebars-1.0.0.js' type='text/javascript'></script>
+  <script src='js/underscore-min.js' type='text/javascript'></script>
+  <script src='js/backbone-min.js' type='text/javascript'></script>
+  <script src='js/swagger.js' type='text/javascript'></script>
+  <script src='js/swagger-ui.js' type='text/javascript'></script>
+  <script src='js/highlight.7.3.pack.js' type='text/javascript'></script>
+  <script type="text/javascript">
+    $(function () {
+      window.swaggerUi = new SwaggerUi({
+      url: window.location.protocol+ "//" + window.location.host + "/doc/api/api-docs.json",
+      dom_id: "swagger-ui-container",
+      supportedSubmitMethods: ['get', 'post', 'put', 'delete'],
+      onComplete: function(swaggerApi, swaggerUi){
+        log("Loaded SwaggerUI")
+        $('pre code').each(function(i, e) {hljs.highlightBlock(e)});
+      },
+      onFailure: function(data) {
+        log("Unable to Load SwaggerUI");
+      },
+      docExpansion: "none"
+    });
+
+    $('#input_apiKey').change(function() {
+      var key = $('#input_apiKey')[0].value;
+      log("key: " + key);
+      if(key && key.trim() != "") {
+        log("added key " + key);
+          window.authorizations.add("key", new ApiKeyAuthorization("Authorization", "Bearer " + key, "header"));
+      }
+    })
+    window.swaggerUi.load();
+  });
+
+  </script>
+</head>
+
+<body>
+<div id='header'>
+  <div class="swagger-ui-wrap">
+    <a id="logo" href="http://canvas.instructure.com"></a>
+
+    <form id='api_selector'>
+      <div class='input'><input placeholder="https://canvas.instructure.com/api" id="input_baseUrl" name="baseUrl" type="text" disabled/></div>
+      <div class='input'><input placeholder="Access Token" id="input_apiKey" name="apiKey" type="text"/></div>
+      <div class='input'><a id="explore" href="#">Save Token</a></div>
+    </form>
+  </div>
+</div>
+
+<div id="message-bar" class="swagger-ui-wrap">
+  &nbsp;
+</div>
+
+<div id="swagger-ui-container" class="swagger-ui-wrap">
+
+</div>
+
+</body>
+
+</html>

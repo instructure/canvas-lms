@@ -19,15 +19,25 @@
 
   {{#if permissions.add_users}}
     {{#if course.concluded}}
-     <a class="btn pull-right icon-add" title='{{#t "cannot_add_users"}}New users can not be added because this course is concluded{{/t}}' disabled data-tooltip>
-       {{#t "add_people"}}Add People{{/t}}
+    <a
+      href="#"
+      class="btn pull-right icon-plus"
+      id="addUsers"
+      role="button"
+      title='{{#t "cannot_add_users"}}New users can not be added because this course is concluded{{/t}}'
+      aria-label='{{#t "cannot_add_users"}}New users can not be added because this course is concluded{{/t}}'
+      disabled data-tooltip>
+       {{#t "people"}}People{{/t}}
      </a>
     {{else}}
     <a
-      class="btn btn-primary pull-right icon-add"
+      href="#"
+      class="btn btn-primary pull-right icon-plus"
       id="addUsers"
-      title='{{#t "add_people"}}Add People{{/t}}'
-    >{{#t "add_people"}}Add People{{/t}}</a>
+      role="button"
+      title='{{#t "title_add_people"}}Add People{{/t}}'
+      aria-label='{{#t "title_add_people"}}Add People{{/t}}'
+    >{{#t "people"}}People{{/t}}</a>
     {{/if}}
   {{/if}}
 </div>

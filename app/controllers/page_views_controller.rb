@@ -177,11 +177,11 @@ class PageViewsController < ApplicationController
 
     date_options = {}
     url_options = {user_id: @user}
-    if start_time = TimeHelper.try_parse(params[:start_time])
+    if start_time = CanvasTime.try_parse(params[:start_time])
       date_options[:oldest] = start_time
       url_options[:start_time] = params[:start_time]
     end
-    if end_time = TimeHelper.try_parse(params[:end_time])
+    if end_time = CanvasTime.try_parse(params[:end_time])
       date_options[:newest] = end_time
       url_options[:end_time] = params[:end_time]
     end

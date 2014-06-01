@@ -3,7 +3,8 @@ define [
   '../start_app'
   '../shared_ajax_fixtures'
   '../environment_setup'
-], (Ember, startApp, fixtures) ->
+  'ic-ajax'
+], (Ember, startApp, fixtures, ajax) ->
   App = null
 
   QUIZ = fixtures.QUIZZES[0]
@@ -35,3 +36,8 @@ define [
   testShowPage 'shows assignment group', ->
     text = find('#quiz-show').text()
     ok text.match ASSIGNMENT_GROUP.name
+
+  testShowPage 'show page shows submission html', ->
+    text = find('#quiz-show').text()
+    ok text.match 'submission html!'
+

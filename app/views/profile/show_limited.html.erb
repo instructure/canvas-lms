@@ -4,7 +4,7 @@
 %>
 <div class="image-block">
   <div class="image-block-image profile-avatar-wrapper">
-    <%= square_avatar_image @user, 100 %>
+    <%= avatar(@user, size: 100) %>
   </div>
   <div class="image-block-content">
     <h1><%= @user.short_name %></h1>

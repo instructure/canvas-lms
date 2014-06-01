@@ -17,7 +17,9 @@ define [
     letterGrade:(->
       standard = @get('gradingStandard')
       return null unless standard and @get('hasGrade')
-      GradeCalculator.letter_grade standard, @get('percent')
+      # rounds percentage to one decimal place (consistent with GB2)
+      percentage = Math.round(parseInt(@get('percent'))*10)/10
+      GradeCalculator.letter_grade standard, percentage
     ).property('gradingStandard', 'hasGrade')
 
     values:(->

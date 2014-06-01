@@ -105,7 +105,7 @@ class Quizzes::QuizRegrader::Answer
                            end
 
     question_data.merge!(id: question_id, question_id: question_id)
-    newly_scored_data = Quizzes::QuizSubmission.score_question(question_data, fake_submission_data)
+    newly_scored_data = Quizzes::SubmissionGrader.score_question(question_data, fake_submission_data)
 
     # always give full credit
     if regrade_option == "full_credit"

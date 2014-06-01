@@ -43,18 +43,21 @@ define [
       autoOpen: false
       width: 420
       resizable: false
-      buttons: [
-        text: I18n.t '#buttons.cancel', 'Cancel'
-        'class' : 'cancel_button'
-        click: @cancel
-      ,
-        text: I18n.t '#buttons.update', 'Update'
-        'class' : 'btn-primary'
-        click: @update
-      ]
+      buttons: []
 
     initDialog: () ->
-      opts = _.extend {}, @defaultOptions(), _.result(this, 'dialogOptions')
+      opts = _.extend {}, @defaultOptions(),
+        buttons: [
+          text: I18n.t '#buttons.cancel', 'Cancel'
+          'class' : 'cancel_button'
+          click: @cancel
+        ,
+          text: I18n.t '#buttons.update', 'Update'
+          'class' : 'btn-primary'
+          click: @update
+        ],
+        _.result(this, 'dialogOptions')
+
       @dialog = $("<div id=\"#{ opts.id }\"></div>").appendTo('body').dialog opts
 
     ##

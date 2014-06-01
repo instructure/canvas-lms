@@ -42,8 +42,9 @@ describe 'Delayed::Backend::Redis::Job' do
       Delayed::Job.redis.llen(Delayed::Job::Keys::STRAND['s1']).should == 4
       jobs[-1].destroy
       Delayed::Job.redis.lrange(Delayed::Job::Keys::STRAND['s1'], 0, -1).should == [job.id]
-      Delayed::Job.get_and_lock_next_available('test worker').should == nil
-      Delayed::Job.get_and_lock_next_available('test worker').should == job
+      found = [Delayed::Job.get_and_lock_next_available('test worker'),
+               Delayed::Job.get_and_lock_next_available('test worker')]
+      found.should =~ [job, nil]
     end
   end
 
@@ -56,13 +57,15 @@ describe 'Delayed::Backend::Redis::Job' do
     end
 
     it "should discard when trying to lock" do
-      Delayed::Job.get_and_lock_next_available("test worker").should be_nil
-      Delayed::Job.get_and_lock_next_available("test worker").should == @job2
+      found = [Delayed::Job.get_and_lock_next_available("test worker"),
+               Delayed::Job.get_and_lock_next_available("test worker")]
+      found.should =~ [@job2, nil]
     end
 
     it "should filter for find_available" do
-      Delayed::Job.find_available(1).should == []
-      Delayed::Job.find_available(1).should == [@job2]
+      found = [Delayed::Job.find_available(1),
+               Delayed::Job.find_available(1)]
+      found.should be_include([@job2])
     end
   end
 

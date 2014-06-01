@@ -21,6 +21,7 @@ module Quizzes::QuizQuestion::AnswerParsers
     def parse(question)
       question[:matches] = []
 
+      match_ids = {}
       @answers.map_with_group! do |answer_group, answer|
         fields = Quizzes::QuizQuestion::RawFields.new(answer)
         a = {
@@ -37,7 +38,14 @@ module Quizzes::QuizQuestion::AnswerParsers
 
         answer = Quizzes::QuizQuestion::AnswerGroup::Answer.new(a)
 
-        answer_group.taken_ids << answer.set_id(answer_group.taken_ids, :match_id)
+        # duplicate text in options need the same match_id
+        right_text = a[:right]
+        if match_ids[right_text]
+          answer[:match_id] =  match_ids[right_text]
+        else
+          match_ids[right_text] = answer.set_id(answer_group.taken_ids, :match_id)
+          answer_group.taken_ids << match_ids[right_text]
+        end
         answer_group.taken_ids << answer.set_id(answer_group.taken_ids)
 
         question[:matches] << {match_id: a[:match_id], text: a[:right]}

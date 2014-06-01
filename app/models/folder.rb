@@ -352,6 +352,32 @@ class Folder < ActiveRecord::Base
     nil
   end
 
+  def get_folders_by_component(components, include_hidden_and_locked)
+    return [self] if components.empty?
+    components = components.dup
+    subfolder_name = components.shift
+    # search all subfolders with the given name (yes, there can be duplicates)
+    scope = active_sub_folders.where(name: subfolder_name)
+    scope = scope.not_hidden.not_locked unless include_hidden_and_locked
+    scope.each do |subfolder|
+      sub_components = subfolder.get_folders_by_component(components, include_hidden_and_locked)
+      return [self] + sub_components if sub_components
+    end
+    nil
+  end
+
+  def self.resolve_path(context, path, include_hidden_and_locked = true)
+    path_components = path.is_a?(Array) ? path : path.split('/')
+    root_name = path_components.shift
+    scope = context.folders.where(parent_folder_id: nil, name: root_name)
+    scope = scope.not_hidden.not_locked unless include_hidden_and_locked
+    scope.each do |root_folder|
+      folders = root_folder.get_folders_by_component(path_components, include_hidden_and_locked)
+      return folders if folders
+    end
+    nil
+  end
+
   def locked?
     return @locked if defined?(@locked)
     @locked = self.locked ||

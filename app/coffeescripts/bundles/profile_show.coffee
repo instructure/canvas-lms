@@ -98,7 +98,6 @@ require [
 
     validateForm: (event) ->
       validations =
-        required: ['user[short_name]']
         property_validations:
           'user_profile[title]': (value) ->
             if value && value.length > 255

@@ -140,33 +140,6 @@ describe TextHelper do
     end
   end
 
-  context "truncate_text" do
-    it "should not split if max_length is exact text length" do
-      str = "I am an exact length"
-      th.truncate_text(str, :max_length => str.length).should == str
-    end
-
-    it "should split on multi-byte character boundaries" do
-      str = "This\ntext\nhere\n获\nis\nutf-8"
-      
-      th.truncate_text(str, :max_length => 9).should ==  "This\nt..."
-      th.truncate_text(str, :max_length => 18).should == "This\ntext\nhere\n..."
-      th.truncate_text(str, :max_length => 19).should == "This\ntext\nhere\n获..."
-      th.truncate_text(str, :max_length => 20).should == "This\ntext\nhere\n获\n..."
-      th.truncate_text(str, :max_length => 21).should == "This\ntext\nhere\n获\ni..."
-      th.truncate_text(str, :max_length => 22).should == "This\ntext\nhere\n获\nis..."
-      th.truncate_text(str, :max_length => 23).should == "This\ntext\nhere\n获\nis\n..."
-      th.truncate_text(str, :max_length => 80).should == str
-    end
-
-    it "should split on words if specified" do
-      str = "I am a sentence with areallylongwordattheendthatcantbesplit and then a few more words"
-      th.truncate_text(str, :max_words => 4, :max_length => 30).should == "I am a sentence"
-      th.truncate_text(str, :max_words => 6, :max_length => 30).should == "I am a sentence with areall..."
-      th.truncate_text(str, :max_words => 5, :max_length => 20).should == "I am a sentence with"
-    end
-  end
-
   context "truncate_html" do
     it "should truncate in the middle of an element" do
       str = "<div>a b c d e</div>"

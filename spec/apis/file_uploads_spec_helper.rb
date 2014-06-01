@@ -89,6 +89,7 @@ shared_examples_for "file uploads api" do
     attachment.content_type.should == "application/msword"
     attachment.open.read.should == content
     attachment.display_name.should == filename
+    attachment.user.id.should == @user.id
     attachment
   end
 
@@ -123,6 +124,7 @@ shared_examples_for "file uploads api" do
     attachment.file_state.should == 'available'
     attachment.content_type.should == "application/msword"
     attachment.display_name.should == filename
+    attachment.user.id.should == @user.id
     attachment
   end
 
@@ -152,6 +154,7 @@ shared_examples_for "file uploads api" do
     }
     attachment.file_state.should == 'available'
     attachment.size.should == 4
+    attachment.user.id.should == @user.id
   end
   
   it "should fail gracefully with a malformed url" do

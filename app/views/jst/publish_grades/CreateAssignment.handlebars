@@ -1,0 +1,106 @@
+<div class="form-dialog-content create_assignment_dialog">
+  <div class="form-horizontal">
+
+    {{#if canChooseType}}
+    <div class="control-group">
+      <label class="control-label" for="{{uniqLabel}}_assignment_type">
+        {{#t "assignment_type"}}Type:{{/t}}
+      </label>
+      <div class="controls">
+        <select type="text" id="{{uniqLabel}}_assignment_type" name="submission_types">
+          <option value>{{#t "assignment"}}Assignment{{/t}}</option>
+          <option value="discussion_topic">{{#t "discussion_type"}}Discussion{{/t}}</option>
+          <option value="online_quiz">{{#t "quiz_type"}}Quiz{{/t}}</option>
+          <option value="external_tool">{{#t "external_tool_type"}}External Tool{{/t}}</option>
+          <option value="not_graded">{{#t "not_graded_type"}}Not Graded{{/t}}</option>
+        </select>
+      </div>
+    </div>
+    {{/if}}
+
+    <div class="control-group">
+      <label class="control-label" for="{{uniqLabel}}_assignment_name">
+        {{#t "assignment_name"}}Name:{{/t}}
+      </label>
+      <div class="controls">
+        <input
+          id="{{uniqLabel}}_assignment_name"
+          type="text"
+          name="name"
+          value="{{name}}"
+          {{disabledIfIncludes frozenAttributes "title"}}/>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <label class="control-label" for="{{uniqLabel}}_assignment_due_at">
+        {{#t "assignment_due_at"}}Due:{{/t}}
+      </label>
+      <div class="controls">
+      {{#if multipleDueDates}}
+        <span class="datetime_field multiple_due_dates" title
+              data-tooltip-selector="#vdd_tooltip_{{uniqLabel}}"
+              aria-labelledby="vdd_tooltip_{{uniqLabel}}">
+          <input
+            class="input-medium"
+            type="text"
+            value="{{#t 'multiple_due_dates'}}Multiple due dates{{/t}}"
+            disabled="disabled" />
+        </span>
+
+        <div id="vdd_tooltip_{{uniqLabel}}" style="display:none;">
+          <dl class="vdd_tooltip_content dl-horizontal">
+            {{#each allDates}}
+              <div class="clearfix">
+                <dt>{{dueFor}}</dt>
+                <dd>{{#if dueAt}} {{strftime dueAt "%b %-d"}} {{else}} - {{/if}}</dd>
+              </div>
+            {{/each}}
+          </dl>
+        </div>
+
+      {{else}}
+        <input
+          id="{{uniqLabel}}_assignment_due_at"
+          class="datetime_field input-medium"
+          type="text"
+          name="due_at"
+          value="{{datetimeFormatted dueAt}}"
+          {{disabledIfIncludes frozenAttributes "due_at"}}/>
+      {{/if}}
+      </div>
+    </div>
+
+    {{#unless isQuiz}}
+    <div class="control-group">
+      <label class="control-label" for="{{uniqLabel}}_assignment_points">
+        {{#t "assignment_points"}}Points:{{/t}}
+      </label>
+      <div class="controls">
+        <input
+          id="{{uniqLabel}}_assignment_points"
+          class="input-small"
+          type="text"
+          name="points_possible"
+          value="{{pointsPossible}}"
+          {{disabledIfIncludes frozenAttributes "points_possible"}}/>
+      </div>
+    </div>
+    {{/unless}}
+  </div>
+</div>
+<div class="form-controls">
+  <button
+    class="more_options btn pull-left"
+    type="button"
+  >{{#t "more"}}Go To {{objectType}}{{/t}}</button>
+  <button
+    class="cancel_button btn dialog_closer"
+    type="button"
+  >{{#t "cancel"}}Cancel{{/t}}</button>
+  <button
+    class="create_assignment btn btn-primary"
+    data-text-while-loading='{{#t "saving"}}Saving...{{/t}}'
+    type="submit"
+  >{{#t "save"}}Save{{/t}}</button>
+</div>

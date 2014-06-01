@@ -160,7 +160,7 @@ module CC
     MAX_MEDIA_OBJECT_SIZE = 4.gigabytes
     def add_media_objects(html_content_exporter)
       return if for_course_copy
-      return unless Kaltura::ClientV3.config
+      return unless CanvasKaltura::ClientV3.config
 
       # check to make sure we don't export more than 4 gigabytes of media objects
       total_size = 0
@@ -178,8 +178,8 @@ module CC
         return
       end
 
-      client = Kaltura::ClientV3.new
-      client.startSession(Kaltura::SessionType::ADMIN)
+      client = CanvasKaltura::ClientV3.new
+      client.startSession(CanvasKaltura::SessionType::ADMIN)
 
       tracks = {}
       html_content_exporter.used_media_objects.each do |obj|
@@ -189,8 +189,8 @@ module CC
           info = html_content_exporter.media_object_infos[obj.id]
           next unless info && info[:asset]
 
-          unless Kaltura::ClientV3::ASSET_STATUSES[info[:asset][:status]] == :READY &&
-              url = (client.flavorAssetGetPlaylistUrl(obj.media_id, info[:asset][:id]) || client.flavorAssetGetDownloadUrl(info[:asset][:id]))
+          unless CanvasKaltura::ClientV3::ASSET_STATUSES[info[:asset][:status]] == :READY &&
+            url = (client.flavorAssetGetPlaylistUrl(obj.media_id, info[:asset][:id]) || client.flavorAssetGetDownloadUrl(info[:asset][:id]))
             add_error(I18n.t('course_exports.errors.media_file', "A media file failed to export"))
             next
           end

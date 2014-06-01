@@ -27,13 +27,10 @@
     @body_classes << @active_tab
   end
 
+  jammit_css(:instructure_eportfolio) if @eportfolio_view === true
+  content_for :head, include_common_stylesheets
+
 -%>
-<% content_for :head do %>
-  <%= include_common_stylesheets %>
-  <% if @eportfolio_view === true %>
-    <%= stylesheet_link_tag "compiled/instructure_eportfolio.css" %>
-  <% end %>
-<% end %>
 <%= render :partial => "layouts/head" %>
 <%= render :partial => 'shared/flash_notices' %>
 

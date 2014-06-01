@@ -5,8 +5,9 @@ define [
   'ember'
   '../shared_ajax_fixtures'
   '../../controllers/screenreader_gradebook_controller'
+  'compiled/userSettings'
   'vendor/jquery.ba-tinypubsub'
-], ($, _, startApp, Ember, fixtures, SRGBController) ->
+], ($, _, startApp, Ember, fixtures, SRGBController, userSettings) ->
 
   App = null
   originalIsDraft = null
@@ -15,10 +16,15 @@ define [
   clone = (obj) ->
     Em.copy obj, true
 
+
   fixtures.create()
-  setup = (isDraftState=false) ->
+  setup = (isDraftState=false, sortOrder='assignment_group') ->
     window.ENV.GRADEBOOK_OPTIONS.draft_state_enabled = isDraftState
     originalWeightingScheme =  window.ENV.GRADEBOOK_OPTIONS.group_weighting_scheme
+    @contextGetStub = sinon.stub(userSettings, 'contextGet')
+    @contextSetStub = sinon.stub(userSettings, 'contextSet')
+    @contextGetStub.withArgs('sort_grade_columns_by').returns({sortType: sortOrder})
+    @contextSetStub.returns({sortType: sortOrder})
     App = startApp()
     Ember.run =>
       @srgb = SRGBController.create()
@@ -32,6 +38,8 @@ define [
   teardown = ->
     window.ENV.GRADEBOOK_OPTIONS.draft_state_enabled = false
     window.ENV.GRADEBOOK_OPTIONS.group_weighting_scheme = originalWeightingScheme
+    @contextGetStub.restore()
+    @contextSetStub.restore()
     Ember.run App, 'destroy'
 
   module 'screenreader_gradebook_controller',
@@ -97,18 +105,6 @@ define [
     equal @srgb.get('studentsInSelectedSection.length'), 6
     equal @srgb.get('studentsInSelectedSection.firstObject').name, 'Buffy'
 
-  test 'sorting assignments alphabetically', ->
-    Ember.run =>
-      @srgb.set('assignmentSort', @srgb.get('assignmentSortOptions').findBy('value', 'alpha'))
-    equal @srgb.get('assignments.firstObject.name'), 'Apples are good'
-    equal @srgb.get('assignments.lastObject.name'), 'Z Eats Soup'
-
-  test 'sorting assignments by due date', ->
-    Ember.run =>
-      @srgb.set('assignmentSort', @srgb.get('assignmentSortOptions').findBy('value', 'due_date'))
-    equal @srgb.get('assignments.firstObject.name'), 'Can You Eat Just One?'
-    equal @srgb.get('assignments.lastObject.name'), 'Drink Water'
-
   test 'sorting assignments by position', ->
     Ember.run =>
       @srgb.set('assignmentSort', @srgb.get('assignmentSortOptions').findBy('value', 'assignment_group'))
@@ -132,6 +128,35 @@ define [
 
     equal @srgb.get('weightingScheme'), 'whoa', 'weightingScheme was updated'
     equal @srgb.get('assignment_groups.length'), 1, 'assignment_groups was updated'
+
+
+  # Hacky setup and teardown (thanks, local storage). I invite you to make this better.
+  module 'screenreader_gradebook_controller: sorting alpha',
+    setup: ->
+      setup.call this, false, 'alpha'
+    teardown: ->
+      teardown.call this
+
+  test 'sorting assignments alphabetically', ->
+    Ember.run =>
+      @srgb.set('assignmentSort', @srgb.get('assignmentSortOptions').findBy('value', 'alpha'))
+    equal @srgb.get('assignments.firstObject.name'), 'Apples are good'
+    equal @srgb.get('assignments.lastObject.name'), 'Z Eats Soup'
+
+
+  # Hacky setup and teardown (thanks, local storage). I invite you to make this better.
+  module 'screenreader_gradebook_controller: sorting due_date',
+    setup: ->
+      setup.call this, false, 'due_date'
+    teardown: ->
+      teardown.call this
+
+  test 'sorting assignments by due date', ->
+    Ember.run =>
+      @srgb.set('assignmentSort', @srgb.get('assignmentSortOptions').findBy('value', 'due_date'))
+    equal @srgb.get('assignments.firstObject.name'), 'Can You Eat Just One?'
+    equal @srgb.get('assignments.lastObject.name'), 'Drink Water'
+
 
   module 'screenreader_gradebook_controller: with selected student',
     setup: ->
@@ -199,6 +224,8 @@ define [
         @srgb.set('selectedAssignment', @assignment)
 
     teardown: ->
+      @contextGetStub.restore()
+      @contextSetStub.restore()
       Ember.run App, 'destroy'
 
   test 'gets the submission types', ->

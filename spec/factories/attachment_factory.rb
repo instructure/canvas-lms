@@ -73,3 +73,5 @@ end
 def crocodocable_attachment_model(opts={})
   attachment_model({:content_type => 'application/pdf'}.merge(opts))
 end
+
+alias :canvadocable_attachment_model :crocodocable_attachment_model

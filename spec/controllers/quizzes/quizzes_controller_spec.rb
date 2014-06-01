@@ -60,8 +60,14 @@ describe Quizzes::QuizzesController do
     @quiz_submission = @quiz.generate_submission(user)
     @quiz_submission.mark_completed
     @quiz_submission.submission_data = yield if block_given?
-    @quiz_submission.grade_submission
+    Quizzes::SubmissionGrader.new(@quiz_submission).grade_submission
     @quiz_submission.save!
+  end
+
+  def ember_urls
+    CanvasEmberUrl::UrlMappings.new(
+      :course_quizzes => fabulous_quizzes_course_quizzes_url
+    )
   end
 
   describe "GET 'index'" do
@@ -168,7 +174,7 @@ describe Quizzes::QuizzesController do
       a = Account.default
       a.enable_fabulous_quizzes?.should eql true
       get 'index', :course_id => @course.id
-      assert_redirected_to(:controller => "quizzes", :action => "fabulous_quizzes")
+      assert_redirected_to ember_urls.course_quizzes_url
     end
   end
 
@@ -362,6 +368,25 @@ describe Quizzes::QuizzesController do
     end
   end
 
+  describe "GET 'show' with fabulous quizzes enabled" do
+    before :each do
+      a = Account.default
+      a.enable_feature! :draft_state
+      a.enable_fabulous_quizzes!
+      a.save!
+
+      course_with_teacher_logged_in(:active_all => true)
+      course_quiz
+    end
+
+    it "should redirect to fabulous quizzes app" do
+      a = Account.default
+      a.enable_fabulous_quizzes?.should eql true
+      get 'show', :course_id => @course.id, :id => @quiz.id
+      assert_redirected_to ember_urls.course_quiz_url(@quiz.id)
+    end
+  end
+
   describe "GET 'managed_quiz_data'" do
     it "should respect section privilege limitations" do
       course(:active_all => 1)
@@ -479,6 +504,25 @@ describe Quizzes::QuizzesController do
       get 'moderate', :course_id => @course.id, :quiz_id => @quiz.id
       assigns[:students].should == [@user1]
       assigns[:submissions].should == [@sub1]
+    end
+  end
+
+  describe "GET 'moderate' with fabulous quizzes enabled" do
+    before :each do
+      a = Account.default
+      a.enable_feature! :draft_state
+      a.enable_fabulous_quizzes!
+      a.save!
+
+      course_with_teacher_logged_in(:active_all => true)
+      course_quiz
+    end
+
+    it "should redirect to fabulous quizzes app" do
+      a = Account.default
+      a.enable_fabulous_quizzes?.should eql true
+      get 'moderate', :course_id => @course.id, :quiz_id => @quiz.id
+      assert_redirected_to ember_urls.course_quiz_moderate_url(@quiz.id)
     end
   end
 
@@ -601,7 +645,7 @@ describe Quizzes::QuizzesController do
       course_quiz(true)
       @quiz.locked = true
       @quiz.save!
-      @sub = @quiz.find_or_create_submission(@user, nil, 'settings_only')
+      @sub = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@user, nil, 'settings_only')
       @sub.manually_unlocked = true
       @sub.save!
       post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
@@ -625,7 +669,7 @@ describe Quizzes::QuizzesController do
       course_quiz(true)
       @quiz.time_limit = 60
       @quiz.save!
-      @sub = @quiz.find_or_create_submission(@user, nil, 'settings_only')
+      @sub = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@user, nil, 'settings_only')
       @sub.extra_time = 30
       @sub.save!
       post 'show', :course_id => @course, :quiz_id => @quiz.id, :take => '1'
@@ -1117,11 +1161,11 @@ describe Quizzes::QuizzesController do
         #non logged_out submissions
         @user1 = user_with_pseudonym(:active_all => true, :name => 'Student1', :username => 'student1@instructure.com')
         @quiz_submission1 = @quiz.generate_submission(@user1)
-        @quiz_submission1.grade_submission
+        Quizzes::SubmissionGrader.new(@quiz_submission1).grade_submission
 
         @user2 = user_with_pseudonym(:active_all => true, :name => 'Student2', :username => 'student2@instructure.com')
         @quiz_submission2 = @quiz.generate_submission(@user2)
-        @quiz_submission2.grade_submission
+        Quizzes::SubmissionGrader.new(@quiz_submission2).grade_submission
 
         @course.large_roster = false
         @course.save!
@@ -1142,6 +1186,25 @@ describe Quizzes::QuizzesController do
       get 'statistics', :course_id => @course.id, :quiz_id => @quiz.id
       response.should be_success
       response.should render_template('statistics')
+    end
+  end
+
+  describe "GET 'statistics' with fabulous quizzes enabled" do
+    before :each do
+      a = Account.default
+      a.enable_feature! :draft_state
+      a.enable_fabulous_quizzes!
+      a.save!
+
+      course_with_teacher_logged_in(:active_all => true)
+      course_quiz
+    end
+
+    it "should redirect to fabulous quizzes app" do
+      a = Account.default
+      a.enable_fabulous_quizzes?.should eql true
+      get 'statistics', :course_id => @course.id, :quiz_id => @quiz.id
+      assert_redirected_to ember_urls.course_quiz_statistics_url(@quiz.id)
     end
   end
 
@@ -1214,6 +1277,34 @@ describe Quizzes::QuizzesController do
       post 'publish', :course_id => @course.id, :quizzes => [@quiz.id]
 
       @quiz.reload.published?.should be_true
+    end
+  end
+
+  describe "GET 'submission_html'" do
+
+    before do
+      course_with_teacher_logged_in(active_all: true)
+      course_quiz(true)
+    end
+
+    it "renders nothing if there's no submission for current user" do
+      get 'submission_html', course_id: @course.id, quiz_id: @quiz.id
+      response.should be_success
+      response.body.strip.should be_empty
+    end
+
+    it "renders submission html if there is a submission" do
+      sub = @quiz.generate_submission(@teacher)
+      sub.mark_completed
+      sub.save!
+      get 'submission_html', course_id: @course.id, quiz_id: @quiz.id
+      response.should be_success
+      template = if CANVAS_RAILS2
+        "quizzes/quizzes/submission_html.html.erb"
+      else
+        "quizzes/submission_html"
+      end
+      response.should render_template(template)
     end
   end
 

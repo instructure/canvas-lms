@@ -298,22 +298,22 @@ class Quizzes::QuizzesApiController < ApplicationController
   # @argument quiz[title] [String]
   #   The quiz title.
   #
-  # @argument quiz[description] [String]
+  # @argument quiz[description] [Optional, String]
   #   A description of the quiz.
   #
   # @argument quiz[quiz_type] ["practice_quiz"|"assignment"|"graded_survey"|"survey"]
   #   The type of quiz.
   #
-  # @argument quiz[assignment_group_id] [Integer]
+  # @argument quiz[assignment_group_id] [Optional, Integer]
   #   The assignment group id to put the assignment in. Defaults to the top
   #   assignment group in the course. Only valid if the quiz is graded, i.e. if
   #   quiz_type is "assignment" or "graded_survey".
   #
-  # @argument quiz[time_limit] [Integer]
+  # @argument quiz[time_limit] [Optional, Integer]
   #   Time limit to take this quiz, in minutes. Set to null for no time limit.
   #   Defaults to null.
   #
-  # @argument quiz[shuffle_answers] [Boolean]
+  # @argument quiz[shuffle_answers] [Optional, Boolean]
   #   If true, quiz answers for multiple choice questions will be randomized for
   #   each student. Defaults to false.
   #
@@ -345,7 +345,7 @@ class Quizzes::QuizzesApiController < ApplicationController
   #   Set to -1 for unlimited attempts.
   #   Defaults to 1.
   #
-  # @argument quiz[scoring_policy] [String, "keep_highest"|"keep_latest"]
+  # @argument quiz[scoring_policy] [Optional, String, "keep_highest"|"keep_latest"]
   #   Required and only valid if allowed_attempts > 1.
   #   Scoring policy for a quiz that students can take multiple times.
   #   Defaults to "keep_highest".
@@ -376,19 +376,19 @@ class Quizzes::QuizzesApiController < ApplicationController
   #   For no IP filter restriction, set to null.
   #   Defaults to null.
   #
-  # @argument quiz[due_at] [Timestamp]
+  # @argument quiz[due_at] [Optional, Timestamp]
   #   The day/time the quiz is due.
   #   Accepts times in ISO 8601 format, e.g. 2011-10-21T18:48Z.
   #
-  # @argument quiz[lock_at] [Timestamp]
+  # @argument quiz[lock_at] [Optional, Timestamp]
   #   The day/time the quiz is locked for students.
   #   Accepts times in ISO 8601 format, e.g. 2011-10-21T18:48Z.
   #
-  # @argument quiz[unlock_at] [Timestamp]
+  # @argument quiz[unlock_at] [Optional, Timestamp]
   #   The day/time the quiz is unlocked for students.
   #   Accepts times in ISO 8601 format, e.g. 2011-10-21T18:48Z.
   #
-  # @argument quiz[published] [Boolean]
+  # @argument quiz[published] [Optional, Boolean]
   #   Whether the quiz should have a draft state of published or unpublished.
   #   NOTE: If students have started taking the quiz, or there are any
   #   submissions for the quiz, you may not unpublish a quiz and will recieve

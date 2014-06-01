@@ -43,7 +43,7 @@ def quiz_with_submission(complete_quiz = true)
   @quiz.quiz_data = test_data
   @quiz.save!
   @quiz
-  @qsub = @quiz.find_or_create_submission(@student)
+  @qsub = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@student)
   @qsub.quiz_data = test_data
   @qsub.submission_data = complete_quiz ? [{:points=>0, :text=>"7051", :question_id=>128, :correct=>false, :answer_id=>7051}] : test_data.first
   # {"context_id"=>"3", "text_after_answers"=>"", "context_type"=>"Course", "attempt"=>1, "user_id"=>"3", "controller"=>"quiz_submissions", "cnt"=>1, "course_id"=>"3", "quiz_id"=>"6", "question_text"=>"<p>true?</p>"}

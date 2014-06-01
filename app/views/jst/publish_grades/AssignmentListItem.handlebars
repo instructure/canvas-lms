@@ -1,0 +1,69 @@
+<div
+  id="assignment_{{id}}"
+  class="ig-row {{#ifAll canManage published}}ig-published{{/ifAll}}"
+  data-item-id="{{labelId}}"
+>
+  <a href="{{htmlUrl}}" class="ig-title ellipses">
+    <i class='icon-{{iconType}}'></i>
+    {{name}}
+  </a>
+  <div class="ig-details row-fluid">
+    {{#if canManage}}
+      <div class="{{spanWidth}} ellipses modules">
+        {{#if has_modules}}
+          {{#ifEqual module_count 1}}
+            {{module_name}} {{#t "module"}}Module{{/t}}
+          {{else}}
+            <a
+              href='#'
+              title='{{joined_names}}'
+              class="tooltip_link"
+              data-tooltip-selector="#module_tooltip_{{labelId}}"
+            >{{#t "multiple_modules"}}Multiple Modules{{/t}}</a>
+          {{/ifEqual}}
+          <div id="module_tooltip_{{labelId}}" style="display:none;">
+            {{#each modules}}
+              <span>{{this}}</span><br/>
+            {{/each}}
+          </div>
+        {{/if}}
+      </div>
+    {{/if}}
+
+    <div class="{{spanWidth}} ellipses" data-view="date-due"></div>
+
+    <div class="{{spanWidth}} ellipses js-score {{alignTextClass}}">
+      <span class="screenreader-only">
+        {{#if pointsPossible}}
+          {{#t "points_possible_screen_reader"}}{{pointsPossible}} Points Possible{{/t}}
+        {{else}}
+          {{#t "no_points_possible"}}No Points Possible{{/t}}
+        {{/if}}
+      </span>
+      <span class="non-screenreader" aria-hidden="true">
+        {{#if pointsPossible}}{{#t "points_possible"}}{{pointsPossible}} pts{{/t}}{{/if}}
+      </span>
+    </div>
+
+  </div>
+
+  {{#if canManage}}
+    <div class="ig-admin">
+      <span class="publish-icon" data-view="publish-icon"></span>
+      <span class="screenreader-only">{{#t "settings"}}Edit Assignment{{/t}}</span>
+      <a
+       href="#"
+       class="icon-edit edit_assignment"
+       id="assignment_{{id}}_settings_edit_item"
+       tabindex="0"
+       role="menuitem"
+       aria-label="{{#t 'assignment_edit'}}Edit Assignment{{/t}}"
+       data-focus-returns-to="assign_{{id}}_manage_link">
+      </a>
+
+    </div>
+
+    <form data-view="edit-assignment" class="form-dialog"></form>
+
+  {{/if}}
+</div>

@@ -7,14 +7,16 @@ define [
     template: template
     @optionProperty 'launchType'
     @optionProperty 'launchParams'
+    @optionProperty 'displayAsModal'
+
+    defaults:
+      displayAsModal: true
 
     els:
       'iframe.tool_launch': "$iframe"
 
     attach: ->
       @model.on 'change', => @render()
-      $(window).one 'externalContentReady', @_contentReady
-      $(window).one 'externalContentCancel', @_contentCancel
 
     toJSON: ->
       json = super
@@ -22,22 +24,34 @@ define [
       json
 
     afterRender: ->
-      #need to rework selection_height/width to be inclusive of cascading values
+      @attachLtiEvents()
       settings = @model.get(@launchType) || {}
-      @$iframe.width settings.selection_width
+      @$iframe.width '100%'
       @$iframe.height settings.selection_height
-      @$el.dialog
-        title: 'Tool name'
-        width: settings.selection_width
-        height: settings.selection_height
-        resizable: true
-        close: =>
-          @remove()
+      if @displayAsModal
+        @$el.dialog
+          title: @model.get(@launchType)?.label || ''
+          width: settings.selection_width
+          height: settings.selection_height
+          resizable: true
+          close: @removeDialog
+
+    attachLtiEvents: ->
+      $(window).on 'externalContentReady', @_contentReady
+      $(window).on 'externalContentCancel', @_contentCancel
+
+    detachLtiEvents: ->
+      $(window).off 'externalContentReady', @_contentReady
+      $(window).off 'externalContentCancel', @_contentCancel
+
+    removeDialog: =>
+      @detachLtiEvents()
+      @remove()
 
     _contentReady: (event, data) =>
       @trigger 'ready', data
-      @remove()
+      @removeDialog()
 
     _contentCancel: (event, data) =>
       @trigger 'cancel', data
-      @remove()
+      @removeDialog()

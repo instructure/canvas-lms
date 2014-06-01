@@ -5,41 +5,35 @@
   yield :pre_html
 
 -%><!DOCTYPE html>
-<!--[if IE 7 ]>    <html class="ie ie7 scripts-not-loaded" lang=<%= @locale %>> <![endif]-->
-<!--[if IE 8 ]>    <html class="ie ie8 scripts-not-loaded" lang=<%= @locale %>> <![endif]-->
 <!--[if gte IE 9 ]><html class="ie ie9 scripts-not-loaded" lang=<%= @locale %>> <![endif]-->
 <!--[if !(IE)]><!--> <html class="not-ie scripts-not-loaded" lang=<%= @locale %>> <!--<![endif]-->
 <head>
   <meta charset="utf-8">
   <title><%= yield :page_title || t('default_page_title', "Canvas LMS") %></title>
   <noscript> <h1>You need to have javascript enabled in order to access this site.</h1> </noscript>
-  <!--[if lte IE 6]> <meta http-equiv=refresh content="0; URL=/ie-6-is-not-supported.html" /> <![endif]-->
+  <!--[if lte IE 8]> <meta http-equiv=refresh content="0; URL=/ie-8-is-not-supported.html" /> <![endif]-->
 
   <%= yield :auto_discovery %>
   <%= yield :head %>
   <%= yield :meta_tags %>
   <%= include_css_bundles %>
-  <!--[if lte IE 8]> <%= javascript_include_tag "vendor/html5.js" %> <![endif]-->
   <%= yield :stylesheets %>
   <%= include_account_css %>
   <script>
     // listen for any clicks on links that have href="#" and queue them to be fired on dom ready.
-      _earlyClick = function(e){
-        e = e || window.event;
+      function _earlyClick(e){
         var cur = e.target || e.srcElement;
         while ( cur && cur.ownerDocument ) {
-          if ( cur.getAttribute('href') === '#' ) {
-            e.preventDefault ? e.preventDefault() : e.returnValue = false;
+          if ( cur.getAttribute('href') == '#' ) {
+            e.preventDefault();
             _earlyClick.clicks = _earlyClick.clicks || [];
             _earlyClick.clicks.push(cur);
             break;
           }
           cur = cur.parentNode;
         }
-      };
-      document.addEventListener ?
-        document.addEventListener('click', _earlyClick, false) :
-        document.attachEvent('onclick', _earlyClick);
+      }
+      document.addEventListener('click', _earlyClick);
   </script>
 </head>
 <body class="<%= (@body_classes).uniq.join(" ") %>">

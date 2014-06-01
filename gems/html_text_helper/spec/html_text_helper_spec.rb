@@ -225,4 +225,14 @@ EOS
       html.should match(%r{http://example.com/relative/link})
     end
   end
+
+  context "#strip_and_truncate" do
+    it "should strip and truncate text" do
+      HtmlTextHelper.stub(:strip_tags){"something else"}
+      CanvasTextHelper.stub(:truncate_text){true}
+      HtmlTextHelper.strip_and_truncate("some text").should be_true
+      expect(HtmlTextHelper).to have_received(:strip_tags).with('some text')
+      expect(CanvasTextHelper).to have_received(:truncate_text).with('something else', {})
+    end
+  end
 end

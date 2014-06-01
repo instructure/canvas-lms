@@ -77,7 +77,7 @@ describe DiscussionTopic::MaterializedView do
     html_message = json[0]['replies'][1]['message']
     html = Nokogiri::HTML::DocumentFragment.parse(html_message)
     html.at_css('a')['href'].should == "http://localhost/courses/#{@course.id}/files/#{@reply2_attachment.id}/download?verifier=#{@reply2_attachment.uuid}"
-    html.at_css('video')['src'].should == "http://localhost/courses/#{@course.id}/media_download?entryId=0_abcde&redirect=1&type=mp4"
+    html.at_css('video')['src'].should == "http://localhost/courses/#{@course.id}/media_download?entryId=0_abcde&media_type=video&redirect=1"
 
     # the deleted entry will be marked deleted and have no summary
     simple_json = map_to_ids_and_replies(json)

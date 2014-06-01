@@ -68,10 +68,30 @@
 #             "example": 1,
 #             "type": "integer"
 #           },
+#           "sis_course_id": {
+#             "description": "The SIS Course ID in which the enrollment is associated. Only displayed if present.",
+#             "example": "SHEL93921",
+#             "type": "string"
+#           },
+#           "course_integration_id": {
+#             "description": "The Course Integration ID in which the enrollment is associated.",
+#             "example": "SHEL93921",
+#             "type": "string"
+#           },
 #           "course_section_id": {
 #             "description": "The unique id of the user's section.",
 #             "example": 1,
 #             "type": "integer"
+#           },
+#           "section_integration_id": {
+#             "description": "The Section Integration ID in which the enrollment is associated.",
+#             "example": "SHEL93921",
+#             "type": "string"
+#           },
+#           "sis_section_id": {
+#             "description": "The SIS Section ID in which the enrollment is associated. Only displayed if present.",
+#             "example": "SHEL93921",
+#             "type": "string"
 #           },
 #           "enrollment_state": {
 #             "description": "The state of the user's enrollment in the course.",
@@ -313,7 +333,7 @@ class EnrollmentsApiController < ApplicationController
 
       errors << @@errors[:missing_user_id] unless params[:enrollment][:user_id].present?
     end
-    errors << @@errors[:concluded_course] if @context.completed? || @context.soft_concluded?
+    errors << @@errors[:concluded_course] if @context.concluded?
     return render_create_errors(errors) if errors.present?
 
     # create enrollment

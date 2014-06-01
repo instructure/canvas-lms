@@ -1,7 +1,7 @@
 require 'guard'
 require 'guard/guard'
-require 'lib/handlebars/handlebars'
 require 'fileutils'
+require 'handlebars_tasks'
 
 module Guard
   class JST < Guard
@@ -56,7 +56,7 @@ module Guard
       Parallel.each(paths, :in_threads => Parallel.processor_count) do |prefix, path|
         begin
           UI.info "Compiling: #{path}"
-          Handlebars.compile_file path, "#{prefix}app/views/jst", "#{prefix}#{@options[:output]}"
+          HandlebarsTasks::Handlebars.compile_file path, "#{prefix}app/views/jst", "#{prefix}#{@options[:output]}"
         rescue Exception => e
           ::Guard::UI.error(e.to_s, :title => path.sub('app/views/jst/', ''), :image => :failed)
         end
@@ -70,7 +70,7 @@ module Guard
     def run_all
       UI.info "Compiling all handlebars templates in #{@options[:input]} to #{@options[:output]}"
       FileUtils.rm_r @options[:output] if File.exists?(@options[:output])
-      Handlebars.compile @options[:input], @options[:output]
+      HandlebarsTasks::Handlebars.compile @options[:input], @options[:output]
       UI.info "Successfully compiled all handlebars templates in #{@options[:input]}"
     end
 

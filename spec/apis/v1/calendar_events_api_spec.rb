@@ -819,6 +819,16 @@ describe CalendarEventsApiController, type: :request do
       json.size.should eql 1
     end
 
+    it 'should 400 for bad dates' do
+      raw_api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=201-201-208&end_date=201-201-209&context_codes[]=course_#{@course.id}", {
+        controller: 'calendar_events_api', action: 'index', format: 'json', type: 'assignment',
+        context_codes: ["course_#{@course.id}"], start_date: '201-201-208', end_date: '201-201-209'})
+      response.code.should eql '400'
+      json = JSON.parse response.body
+      json['errors']['start_date'].should == 'Invalid date or invalid datetime for start_date'
+      json['errors']['end_date'].should == 'Invalid date or invalid datetime for end_date'
+    end
+
     it 'should return assignments from up to 10 contexts' do
       contexts = [@course.asset_string]
       contexts.concat 15.times.map { |i|

@@ -363,6 +363,15 @@ describe CoursesController do
         assigns(:recent_feedback).first.assignment_id.should == @a1.id
       end
 
+      it "should disable management and set env urls on assignment homepage" do
+        @course1.default_view = "assignments"
+        @course1.save!
+        @course1.account.enable_feature!(:draft_state)
+        get 'show', :id => @course1.id
+        controller.js_env[:URLS][:new_assignment_url].should_not be_nil
+        controller.js_env[:PERMISSIONS][:manage].should be_false
+      end
+
       it "should not show unpublished assignments to students" do
         @course1.default_view = "assignments"
         @course1.save!
@@ -831,6 +840,48 @@ describe CoursesController do
       @course.save!
       put 'update', :id => @course.id, :course => { :lock_all_announcements => 0 }
       assigns[:course].lock_all_announcements.should be_false
+    end
+
+    it "should let sub-account admins move courses to other accounts within their sub-account" do
+      subaccount = account_model(:parent_account => Account.default)
+      sub_subaccount1 = account_model(:parent_account => subaccount)
+      sub_subaccount2 = account_model(:parent_account => subaccount)
+      course(:account => sub_subaccount1)
+
+      @user = account_admin_user(:account => subaccount, :active_user => true)
+      user_session(@user)
+
+      put 'update', :id => @course.id, :course => { :account_id => sub_subaccount2.id }
+
+      @course.reload
+      @course.account_id.should == sub_subaccount2.id
+    end
+
+    it "should not let sub-account admins move courses to other accounts outside their sub-account" do
+      subaccount1 = account_model(:parent_account => Account.default)
+      subaccount2 = account_model(:parent_account => Account.default)
+      course(:account => subaccount1)
+
+      @user = account_admin_user(:account => subaccount1, :active_user => true)
+      user_session(@user)
+
+      put 'update', :id => @course.id, :course => { :account_id => subaccount2.id }
+
+      @course.reload
+      @course.account_id.should == subaccount1.id
+    end
+
+    it "should let site admins move courses to any account" do
+      account1 = Account.create!(:name => "account1")
+      account2 = Account.create!(:name => "account2")
+      course(:account => account1)
+
+      user_session(site_admin_user)
+
+      put 'update', :id => @course.id, :course => { :account_id => account2.id }
+
+      @course.reload
+      @course.account_id.should == account2.id
     end
   end
 

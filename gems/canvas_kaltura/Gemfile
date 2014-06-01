@@ -1,0 +1,8 @@
+source 'https://rubygems.org'
+
+gem 'canvas_sort', :path => '../canvas_sort'
+gem 'canvas_http', :path => '../canvas_http'
+gem 'canvas_uuid', :path => '../canvas_uuid'
+gem 'multipart', :path => '../multipart'
+
+gemspec

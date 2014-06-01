@@ -2,19 +2,25 @@ define [
   'ember'
   'ember-data'
   'i18n!quizzes'
-], (Em, DS, I18n) ->
+  '../shared/ic-ajax-jsonapi'
+], (Em, DS, I18n, ajax) ->
 
   {alias, equal, any} = Em.computed
-  {belongsTo} = DS
+  {belongsTo, PromiseObject, hasMany, Model, attr} = DS
 
   Em.onerror = (error) ->
     console.log 'ERR', error, error.stack
 
   {Model, attr} = DS
-  Model.extend
+  Quiz = Model.extend
     title: attr()
     quizType: attr()
+    links: attr()
     htmlURL: attr()
+    # editURL is temporary until we have a real ember route for it
+    editURL: (->
+      "#{@get('htmlURL')}/edit"
+    ).property('htmlURL')
     allDates: attr()
     mobileURL: attr()
     description: attr()
@@ -67,3 +73,29 @@ define [
         when 'graded_survey' then I18n.t 'graded_survey', 'Graded Survey'
         when 'practice_quiz' then I18n.t 'practice_quiz', 'Practice Quiz'
     ).property('quizType')
+    # temporary until we ship the show page with quiz submission info in ember
+    quizSubmissionHtmlURL: attr()
+    quizSubmissionHTML: (->
+      promise = ajax(
+        url: @get 'quizSubmissionHtmlURL'
+        dataType: 'html'
+        contentType: 'text/html'
+        headers:
+          Accept: 'text/html'
+      ).then (html) =>
+        @set 'didLoadQuizSubmissionHTML', true
+        { html: html }
+      PromiseObject.create promise: promise
+    ).property('quizSubmissionHtmlURL')
+    quizStatistics: hasMany 'quiz_statistics', async: true
+    quizReports: hasMany 'quiz_report', async: true
+    sortSlug: (->
+      dateField = if @get('isAssignment') then 'dueAt' else 'lockAt'
+      dueAt = @get(dateField)?.toISOString() or Quiz.SORT_LAST
+      title = @get('title') or ''
+      dueAt + title
+    ).property('isAssignment', 'dueAt', 'lockAt', 'title')
+
+  Quiz.SORT_LAST = 'ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ'
+
+  Quiz

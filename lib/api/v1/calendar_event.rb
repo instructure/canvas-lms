@@ -42,11 +42,13 @@ module Api::V1::CalendarEvent
     hash['title'] += " (#{context.name})" if event.context_type == "CourseSection"
     hash['description'] = api_user_content(event.description, context)
 
-    appointment_group_id = (options[:appointment_group_id] || event.appointment_group.try(:id))
+    appointment_group = options[:appointment_group]
+    appointment_group ||= AppointmentGroup.find(options[:appointment_group_id]) if options[:appointment_group_id]
+    appointment_group ||= event.appointment_group
 
     if event.effective_context_code
-      if appointment_group_id
-        codes_for_user = (options[:appointment_group] || AppointmentGroup.find(appointment_group_id)).context_codes_for_user(user)
+      if appointment_group
+        codes_for_user = appointment_group.context_codes_for_user(user)
         hash['context_code'] = (event.effective_context_code.split(',') & codes_for_user).first
         hash['effective_context_code'] = hash['context_code']
       else
@@ -60,7 +62,7 @@ module Api::V1::CalendarEvent
     if include_child_events
       hash["child_events_count"] = event.child_events.length
     else
-      hash["child_events_count"] = event.child_events.size
+      hash["child_events_count"] = options[:child_events_count] || event.child_events.size
     end
     hash['parent_event_id'] = event.parent_calendar_event_id
     # events are hidden when section-specific events override them
@@ -74,9 +76,9 @@ module Api::V1::CalendarEvent
         hash['group'] = group_json(event.context, user, session, :include => ['users'])
       end
     end
-    if appointment_group_id
-      hash['appointment_group_id'] = appointment_group_id
-      hash['appointment_group_url'] = api_v1_appointment_group_url(appointment_group_id)
+    if appointment_group
+      hash['appointment_group_id'] = appointment_group.id
+      hash['appointment_group_url'] = api_v1_appointment_group_url(appointment_group)
       if options[:current_participant] && event.has_asset?(options[:current_participant])
         hash['own_reservation'] = true
       end
@@ -100,9 +102,8 @@ module Api::V1::CalendarEvent
     if include_child_events && hash["child_events_count"] > 0
       can_read_child_events = event.grants_right?(user, session, :read_child_events)
       if can_read_child_events || hash['reserved']
-        events = can_read_child_events ? event.child_events : event.child_events_for(participant)
+        events = can_read_child_events ? event.child_events.to_a : event.child_events_for(participant)
 
-        appointment_group_id = event.context_id if event.context_type == 'AppointmentGroup'
         # do some preloads
         CalendarEvent.send(:preload_associations, events, :context)
         if events.first.context.is_a?(User) && user_json_is_admin?(@context, user)
@@ -110,21 +111,23 @@ module Api::V1::CalendarEvent
         end
         can_manage = event.grants_right?(user, session, :manage)
 
+
         hash["child_events"] = events.map{ |e|
           e.parent_event = event
           calendar_event_json(e, user, session,
-            :include => appointment_group_id ? ['participants'] : [],
-            :appointment_group => options[:appointment_group],
-            :appointment_group_id => appointment_group_id,
+            :include => appointment_group ? ['participants'] : [],
+            :appointment_group => appointment_group,
             :current_participant => participant,
-            :url_override => can_manage
+            :url_override => can_manage,
+            :child_events_count => 0,
+            :effective_context => options[:effective_context]
           )
         }
       end
     end
 
     hash['url'] = api_v1_calendar_event_url(event) if options.has_key?(:url_override) ? options[:url_override] || hash['own_reservation'] : event.grants_right?(user, session, :read)
-    hash['html_url'] = calendar_url_for(event.effective_context, :event => event)
+    hash['html_url'] = calendar_url_for(options[:effective_context] || event.effective_context, :event => event)
     hash
   end
 
@@ -162,7 +165,17 @@ module Api::V1::CalendarEvent
       hash['new_appointments'] = group.new_appointments.map{ |event| calendar_event_json(event, user, session, :skip_details => true, :appointment_group_id => group.id) }
     end
     if include.include?('appointments')
-      hash['appointments'] = group.appointments.map{ |event| calendar_event_json(event, user, session, :context => group, :appointment_group => group, :appointment_group_id => group.id, :include => include & ['child_events']) }
+      if include.include?('child_events')
+        all_child_events = group.appointments.map(&:child_events).flatten
+        CalendarEvent.send(:preload_associations, all_child_events, :context)
+        user_json_preloads(all_child_events.map(&:context)) if !all_child_events.empty? && all_child_events.first.context.is_a?(User) && user_json_is_admin?(@context, user)
+      end
+      hash['appointments'] = group.appointments.map { |event| calendar_event_json(event, user, session,
+                                                                                 :context => group,
+                                                                                 :appointment_group => group,
+                                                                                 :appointment_group_id => group.id,
+                                                                                 :include => include & ['child_events'],
+                                                                                 :effective_context => @context) }
     end
     hash['appointments_count'] = group.appointments.size
     hash['participant_type'] = group.participant_type

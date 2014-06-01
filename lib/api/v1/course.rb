@@ -70,7 +70,7 @@ module Api::V1::Course
   end
 
   def copy_status_json(import, course, user, session)
-    hash = api_json(import, user, session, :only => %w(id progress created_at workflow_state))
+    hash = api_json(import, user, session, :only => %w(id progress created_at workflow_state integration_id))
 
     # the type of object for course copy changed but we don't want the api to change
     # so map the workflow states to the old ones

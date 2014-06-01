@@ -1,7 +1,7 @@
 #!/bin/bash
 result=0
 
-
+echo "################ canvas_sort ################"
 bundle install
 bundle exec rspec spec
 let result=$result+$?
