@@ -50,7 +50,8 @@ Gemfile.lock3
 /public/plugins/
 /spec/coffeescripts/plugins/
 /spec/plugins/
-
 #remove this once we move jqeury into bower
 /public/javascripts/bower/jquery/
 
+.idea/
+vendor/bundle/

@@ -164,15 +164,15 @@
       </div>
     </div>
     <footer role="contentinfo" id="footer">
-      <a href="http://www.instructure.com" class="footer-logo">
+      <!--a href="http://www.instructure.com" class="footer-logo">
         <span class="screenreader-only">
-          <%= t(:instructure_description, 'Instructure, makers of the open source learning management system Canvas') %>
+          <%#= t(:instructure_description, 'Instructure, makers of the open source learning management system Canvas') %>
         </span>
-      </a>
+      </a-->
       <span id="footer-links">
-        <% if Setting.get("show_opensource_linkback", "false") == "true" %>
-          <a href="http://instructure.com"><%= t('open_source_learning_management_system', 'Open Source LMS') %></a>
-        <% end %>
+        <%# if Setting.get("show_opensource_linkback", "false") == "true" %>
+          <!--a href="http://instructure.com"><%#= t('open_source_learning_management_system', 'Open Source LMS') %></a-->
+        <%# end %>
         <%= help_link %>
         <%= render :partial => 'shared/footer_links' %>
       </span>
