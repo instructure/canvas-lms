@@ -246,15 +246,14 @@ describe "dashboard" do
       f('#courses_menu_item').should include_text('Current Groups')
     end
 
-    it "should go to /courses when the courses nav item is clicked" do
+    it "should present /courses as the href of the courses nav item" do
       @course.update_attributes(:start_at => 2.days.from_now, :conclude_at => 4.days.from_now, :restrict_enrollments_to_course_dates => false)
       Enrollment.update_all(:created_at => 1.minute.ago)
 
       get '/'
 
       keep_trying_until do
-        f('#courses_menu_item a').click
-        driver.current_url.should include('courses')
+        f('#courses_menu_item a').attribute('href').should include('courses')
       end
     end
 
