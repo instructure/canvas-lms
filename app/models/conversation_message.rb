@@ -275,8 +275,9 @@ class ConversationMessage < ActiveRecord::Base
 
   def reply_from(opts)
     raise IncomingMail::Errors::UnknownAddress if self.context.try(:root_account).try(:deleted?)
-    # If this is from conversations 2, only reply to the author.
-    recipients = conversation.context ? [author] : nil
+    # It would be nice to have group conversations via e-mail, but if so, we need to make it much more obvious
+    # that replies to the e-mail will be sent to multiple recipients.
+    recipients = [author]
     conversation.reply_from(opts.merge(:root_account_id => self.root_account_id, :only_users => recipients))
   end
 
