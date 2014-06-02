@@ -125,7 +125,6 @@ describe "groups" do
 
   describe "new groups page" do
     it "should allow a student to create a group" do
-      pending
       course_with_student_logged_in(:active_all => true)
       @course.root_account.enable_feature!(:student_groups_next)
       student_in_course
