@@ -1,0 +1,30 @@
+{
+  "id": 15,
+  "regrade_option": false,
+  "points_possible": 1,
+  "correct_comments": "",
+  "incorrect_comments": "",
+  "neutral_comments": "",
+  "question_type": "short_answer_question",
+  "question_name": "Question",
+  "name": "Question",
+  "question_text": "<p>Type something</p>",
+  "answers": [
+    {
+      "id": 4684,
+      "text": "Something",
+      "comments": "",
+      "weight": 100
+    },
+    {
+      "id": 1797,
+      "text": "Huh?",
+      "comments": "",
+      "weight": 100
+    }
+  ],
+  "text_after_answers": "",
+  "assessment_question_id": 17,
+  "position": 5,
+  "published_at": "2014-04-01T11:47:17Z"
+}

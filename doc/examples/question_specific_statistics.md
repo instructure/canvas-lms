@@ -365,6 +365,64 @@ Formula question statistics look just like the statistics for [Essays](#essay-qu
 }
 ```
 
+### Short Answer (aka Fill in The Blank)
+
+```javascript
+{
+  // Number of students who have written anything.
+  "responses": 2,
+
+  // Number of students who have written a correct answer.
+  "correct": 2,
+
+  "answers": [
+    {
+      // Unique ID of this answer.
+      "id": "4684",
+
+       // The readable answer text.
+      "text": "Something",
+
+       // Number of students who picked this answer.
+      "responses": 3,
+
+       // Whether this answer is a correct one.
+      "correct": true
+    },
+
+    // Another correct answer:
+    {
+      "id": "1797",
+      "text": "Very cool.",
+      "responses": 0,
+      "correct": true
+    },
+
+    // "Other" answers:
+    //
+    // This is an auto-generated answer that will be present if any student
+    // does write an answer, but is incorrect.
+    {
+      "id": "other",
+      "text": "Other",
+      "responses": 0,
+      "correct": false
+    },
+
+    // "Missing" answers:
+    //
+    // This is an auto-generated answer to account for all students who
+    // left this question unanswered.
+    {
+      "id": "none",
+      "text": "No Answer",
+      "responses": 0,
+      "correct": false
+    }
+  ]
+}
+```
+
 #### True/False
 
 True/False question statistics look just like the statistics for [Multiple-Choice](#multiple-choice-question-stats).

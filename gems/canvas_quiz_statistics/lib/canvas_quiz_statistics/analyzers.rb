@@ -51,5 +51,6 @@ module CanvasQuizStatistics::Analyzers
   require 'canvas_quiz_statistics/analyzers/calculated'
   require 'canvas_quiz_statistics/analyzers/matching'
   require 'canvas_quiz_statistics/analyzers/numerical'
+  require 'canvas_quiz_statistics/analyzers/short_answer'
   require 'canvas_quiz_statistics/analyzers/true_false'
 end
