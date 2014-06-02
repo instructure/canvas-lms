@@ -1,11 +1,11 @@
 {
   "name": "ic-menu",
-  "version": "0.1.3",
+  "version": "0.1.9",
   "authors": [
     "Ryan Florence <rpflorence@gmail.com>"
   ],
   "dependencies": {
-    "ember": "1.2.0",
+    "ember": ">= 1.4.0 <= 1.5.1",
     "ic-styled": "~1.1.0"
   },
   "license": "MIT",

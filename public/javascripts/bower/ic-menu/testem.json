@@ -1,7 +1,7 @@
 {
   "framework": "qunit",
   "src_files": [
-    "bower_components/jquery/jquery.js",
+    "bower_components/jquery/dist/jquery.js",
     "bower_components/handlebars/handlebars.js",
     "bower_components/ember/ember.js",
     "bower_components/ic-styled/main.js",

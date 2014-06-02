@@ -94,12 +94,45 @@
       item.focus();
     },
 
+    itemsAsHash: function() {
+      var items = this.get('items');
+      var itemsHash = {};
+      items.forEach(function(item){
+        var id = item.$().attr('id');
+        itemsHash[id] = item;
+      });
+      return itemsHash;
+    },
+
+    syncItemsWithChildViews: function() {
+      // this.get('childViews') doesn't seem to update as menu-items
+      // are added / removed. so resorting to pulling directly from DOM :/
+      if (!this.$()) {
+        return; // not in DOM
+      }
+      var cv = this.$().find('ic-menu-item').get();
+      var itemsHash = this.itemsAsHash();
+      if (!cv) {
+        return;
+      }
+      var items = [];
+      cv.forEach(function(child) {
+        var id = this.$(child).attr('id');
+        if (itemsHash[id]) {
+          items.push(itemsHash[id]);
+        }
+      });
+      this.set('items', items);
+    },
+
     registerItem: function(item) {
       this.get('items').addObject(item);
+      Ember.run.debounce(this, this.syncItemsWithChildViews, 1)
     },
 
     deregisterItem: function(item) {
       this.get('items').removeObject(item);
+      Ember.run.debounce(this, this.syncItemsWithChildViews, 1)
     },
 
     open: function() {

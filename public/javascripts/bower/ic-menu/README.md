@@ -3,6 +3,11 @@ ic-menu
 
 An accessible menu component for ember applications.
 
+Demo
+----
+
+http://instructure.github.io/ic-menu/
+
 Installation
 ------------
 
@@ -18,7 +23,11 @@ __application.hbs__
   {{#ic-menu-trigger}}Actions{{/ic-menu-trigger}}
   {{#ic-menu-list}}
     {{#ic-menu-item on-select="remove"}}Remove{{/ic-menu-item}}
-    {{#ic-menu-item on-select="save"}}Save{{/ic-menu-item}}
+    {{#ic-menu-item on-select="save"
+                    on-disabled-select="notifyDisabled"
+                    disabled=foo}}
+      Save
+    {{/ic-menu-item}}
   {{/ic-menu-list}}
 {{/ic-menu}}
 ```

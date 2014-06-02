@@ -49,18 +49,19 @@
             {{#t 'show_quiz_results'}}Show Student Quiz Results{{/t}}
           {{/ic-menu-item}}
 
-          {{! reuse existing ic-menu-item or order issues arise }}
-          {{#ic-menu-item class="js-due-date-toggler" on-select="toggleLock"}}
-            {{#if lockAt}}
+          {{#if lockAt}}
+            {{#ic-menu-item class="js-due-date-toggler" on-select="unlock"}}
               <i class="icon-unlock"></i>
               {{#t 'unlock_this_quiz_now'}}Unlock This Quiz Now{{/t}}
-            {{else}}
+            {{/ic-menu-item}}
+          {{else}}
+            {{#ic-menu-item class="js-due-date-toggler" on-select="lock"}}
               <i class="icon-lock"></i>
               {{#t 'lock_this_quiz_now'}}
                 Lock This Quiz Now
               {{/t}}
-            {{/if}}
-          {{/ic-menu-item}}
+            {{/ic-menu-item}}
+          {{/if}}
 
           {{#ic-menu-item class="js-delete" on-select="confirmDeletion"}}
             <i class="icon-trash"></i>

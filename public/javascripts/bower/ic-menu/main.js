@@ -39,10 +39,6 @@
     name: 'ic-menu',
 
     initialize: function(container, application) {
-      //application.IcMenuItemComponent = Item;
-      //application.IcMenuListComponent = List;
-      //application.IcMenuTriggerComponent = Trigger;
-      //application.IcMenuComponent = Menu;
       container.register('component:ic-menu-item', Item);
       container.register('component:ic-menu-list', List);
       container.register('component:ic-menu-trigger', Trigger);
