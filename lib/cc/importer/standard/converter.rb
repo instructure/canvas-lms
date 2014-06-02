@@ -46,15 +46,16 @@ module CC::Importer::Standard
 
       get_all_resources(@manifest)
       create_file_map
+
       @course[:discussion_topics] = convert_discussions
       lti_converter = CC::Importer::BLTIConverter.new
       @course[:external_tools] = convert_blti_links_with_flat(lti_converter)
       @course[:assignments] = lti_converter.create_assignments_from_lti_links(@course[:external_tools])
-      convert_assignments(@course[:assignments])
+      convert_cc_assignments(@course[:assignments])
       @course[:assessment_questions], @course[:assessments] = convert_quizzes if Qti.qti_enabled?
       @course[:modules] = convert_organizations(@manifest)
       @course[:all_files_zip] = package_course_files(@course[:file_map])
-      
+
       #close up shop
       save_to_file
       delete_unzipped_archive
@@ -62,14 +63,9 @@ module CC::Importer::Standard
     end
     alias_method :export, :convert
     
-    # Finds the resource object with the specified type(s)
-    # does a "start_with?" so that CC version can be ignored
-    def resources_by_type(*types)
-      @resources.values.find_all {|res| types.any?{|t| res[:type].start_with? t} }
-    end
-    
     def find_file_migration_id(path)
-      @file_path_migration_id[path] || @file_path_migration_id[path.gsub(%r{\$[^$]*\$|\.\./}, '')]
+      @file_path_migration_id[path] || @file_path_migration_id[path.gsub(%r{\$[^$]*\$|\.\./}, '')] ||
+        @file_path_migration_id[path.gsub(%r{\$[^$]*\$|\.\./}, '').sub(WEB_RESOURCES_FOLDER + '/', '')]
     end
     
     def get_canvas_att_replacement_url(path, resource_dir=nil)
@@ -87,6 +83,8 @@ module CC::Importer::Standard
     end
 
     def add_course_file(file, overwrite=false)
+      return unless file[:path_name]
+      file[:path_name].sub!(WEB_RESOURCES_FOLDER + '/', '')
       if @file_path_migration_id[file[:path_name]] && overwrite
         @course[:file_map].delete @file_path_migration_id[file[:path_name]]
       elsif @file_path_migration_id[file[:path_name]]
@@ -94,35 +92,6 @@ module CC::Importer::Standard
       end
       @file_path_migration_id[file[:path_name]] = file[:migration_id]
       add_file(file)
-    end
-    
-    def get_all_resources(manifest)
-      manifest.css('resource').each do |r_node|
-        id = r_node['identifier']
-        resource = @resources[id]
-        resource ||= {:migration_id=>id}
-        resource[:type] = r_node['type']
-        resource[:href] = r_node['href']
-        if resource[:href]
-          resource[:href] = resource[:href].gsub('\\', '/')
-        else
-          #it could be embedded in the manifest
-          @resource_nodes_for_flat_manifest[id] = r_node
-        end
-        # Should be "Learner", "Instructor", or "Mentor"
-        resource[:intended_user_role] = get_node_val(r_node, "intendedEndUserRole value", nil)
-        # Should be "assignment", "lessonplan", "syllabus", or "unspecified"
-        resource[:intended_use] = r_node['intendeduse']
-        resource[:files] = []
-        r_node.css('file').each do |file_node|
-          resource[:files] << {:href => file_node[:href].gsub('\\', '/')}
-        end
-        resource[:dependencies] = []
-        r_node.css('dependency').each do |d_node|
-          resource[:dependencies] << d_node[:identifierref]
-        end
-        @resources[id] = resource
-      end
     end
     
     FILEBASE_REGEX = /\$IMS[-_]CC[-_]FILEBASE\$/
@@ -159,32 +128,6 @@ module CC::Importer::Standard
 
     def find_assignment(migration_id)
       @course[:assignments].find{|a|a[:migration_id] == migration_id}
-    end
-
-    def get_node_or_open_file(resource, node_name=nil)
-      if resource[:href]
-        path = resource[:href]
-      elsif resource[:files].first
-        path = resource[:files].first[:href]
-      end
-      doc = nil
-
-      if path
-        path = get_full_path(path)
-        if File.exists?(path)
-          doc = open_file_xml(path)
-          doc.remove_namespaces! unless doc.namespaces['xmlns'] && doc.respond_to?('remove_namespaces!')
-        end
-      elsif node = @resource_nodes_for_flat_manifest[resource[:migration_id]]
-        #check for in-line node
-        if node_name
-          doc = node.children.find{|c| c.name == node_name}
-        else
-          doc = node
-        end
-      end
-
-      doc
     end
 
     def convert_blti_links_with_flat(lti_converter)

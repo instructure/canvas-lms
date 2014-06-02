@@ -17,7 +17,6 @@ describe "Canvas Cartridge importing" do
     @migration = ContentMigration.new
     @migration.context = @copy_to
     @migration.save
-    @copy_to.content_migration = @migration
   end
 
   it "should import assignment groups" do
@@ -704,11 +703,11 @@ describe "Canvas Cartridge importing" do
     #convert to json
     meta_doc = Nokogiri::XML(builder.target!)
     html_doc = Nokogiri::HTML(html)
-    hash = @converter.convert_assignment(meta_doc, html_doc)
+    hash = @converter.parse_canvas_assignment_data(meta_doc, html_doc)
     hash = hash.with_indifferent_access
     #import
     Importers::AssignmentImporter.import_from_migration(hash, @copy_to)
-    
+
     asmnt_2 = @copy_to.assignments.find_by_migration_id(migration_id)
     asmnt_2.title.should == asmnt.title
     asmnt_2.description.should == (body_with_link % @copy_to.id)
@@ -743,7 +742,7 @@ describe "Canvas Cartridge importing" do
     #convert to json
     meta_doc = Nokogiri::XML(builder.target!)
     html_doc = Nokogiri::HTML(html)
-    hash = @converter.convert_assignment(meta_doc, html_doc)
+    hash = @converter.parse_canvas_assignment_data(meta_doc, html_doc)
     hash = hash.with_indifferent_access
     #import
     Importers::AssignmentImporter.import_from_migration(hash, @copy_to)
@@ -772,10 +771,10 @@ XML
     #convert to json
     meta_doc = Nokogiri::XML(xml)
     html_doc = Nokogiri::HTML("<html><head><title>value for title</title></head><body>haha</body></html>")
-    hash = @converter.convert_assignment(meta_doc, html_doc)
+    hash = @converter.parse_canvas_assignment_data(meta_doc, html_doc)
     hash = hash.with_indifferent_access
     #import
-    Importers::AssignmentImporter.import_from_migration(hash, @copy_to)
+    Importers::AssignmentImporter.import_from_migration(hash, @copy_to, @migration)
 
     asmnt_2 = @copy_to.assignments.find_by_migration_id('ia24c092694901d2a5529c142accdaf0b')
     asmnt_2.submission_types.should == "external_tool"
@@ -1314,5 +1313,58 @@ XML
       warning.fix_issue_html_url.should == "/courses/#{@copy_to.id}/wiki/#{wiki.url}"
       warning.error_message.should include("body")
     end
+  end
+end
+
+describe "cc assignment extensions" do
+  before(:all) do
+    archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/cc_assignment_extension.zip")
+    unzipped_file_path = File.join(File.dirname(archive_file_path), "cc_#{File.basename(archive_file_path, '.zip')}", 'oi')
+    @export_folder = File.join(File.dirname(archive_file_path), "cc_cc_assignment_extension")
+    @converter = CC::Importer::Canvas::Converter.new(:export_archive_path=>archive_file_path, :course_name=>'oi', :base_download_dir=>unzipped_file_path)
+    @converter.export
+    @course_data = @converter.course.with_indifferent_access
+
+    @course = course
+    @migration = ContentMigration.create(:context => @course)
+    @migration.migration_type = "canvas_cartridge_importer"
+    @migration.migration_settings[:migration_ids_to_import] = {:copy => {}}
+    enable_cache do
+      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
+    end
+  end
+
+  after(:all) do
+    @converter.delete_unzipped_archive
+    if File.exists?(@export_folder)
+      FileUtils::rm_rf(@export_folder)
+    end
+    truncate_all_tables
+  end
+
+  it "should parse canvas data from cc extension" do
+    @migration.migration_issues.count.should == 0
+
+    att = @course.attachments.find_by_migration_id('ieee173de6109d169c627d07bedae0595')
+
+    # see common_cartridge_converter_spec
+    # should get all the cc assignments
+    @course.assignments.count.should == 3
+    assignment1 = @course.assignments.find_by_migration_id("icd613a5039d9a1539e100058efe44242")
+    assignment1.grading_type.should == 'pass_fail'
+    assignment1.points_possible.should == 20
+    assignment1.description.should include("<img src=\"/courses/#{@course.id}/files/#{att.id}/preview\" alt=\"dana_small.png\">")
+    assignment1.submission_types.should == "online_text_entry,online_url,media_recording,online_upload" # overridden
+
+    assignment2 = @course.assignments.find_by_migration_id("icd613a5039d9a1539e100058efe44242copy")
+    assignment2.grading_type.should == 'points'
+    assignment2.points_possible.should == 21
+    assignment2.description.should include('hi, the canvas meta stuff does not have submission types')
+    assignment2.submission_types.should == "online_upload,online_text_entry,online_url"
+
+    # and the canvas only one as well
+    assignment3 = @course.assignments.find_by_migration_id("ifb359e06083b6eb3a294a7ac2c69e451")
+    assignment3.description.should include("This is left to all custom canvas stuff.")
+    assignment3.workflow_state.should == 'unpublished'
   end
 end

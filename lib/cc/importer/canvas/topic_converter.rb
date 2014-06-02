@@ -59,7 +59,7 @@ module CC::Importer::Canvas
         topic['position'] = get_int_val(meta_doc, 'position')
 
         if asmnt_node = meta_doc.at_css('assignment')
-          topic['assignment'] = convert_assignment(asmnt_node)
+          topic['assignment'] = parse_canvas_assignment_data(asmnt_node)
         end
       end
 

@@ -32,6 +32,9 @@ module CC::Importer::Canvas
     def initialize(settings)
       super(settings, "cc")
       @course = @course.with_indifferent_access
+      @resources = {}
+      @resource_nodes_for_flat_manifest = {}
+      @canvas_converter = true
     end
 
     # exports the package into the intermediary json
@@ -41,11 +44,13 @@ module CC::Importer::Canvas
       set_progress(5)
       
       @manifest = open_file(File.join(@unzipped_file_path, MANIFEST_FILE))
+      get_all_resources(@manifest)
+
       convert_all_course_settings
       set_progress(10)
       @course[:wikis] = convert_wikis
       set_progress(20)
-      @course[:assignments] = convert_assignments
+      @course[:assignments] = convert_canvas_assignments
       set_progress(30)
       @course[:discussion_topics] = convert_topics
       set_progress(40)
@@ -55,7 +60,7 @@ module CC::Importer::Canvas
       set_progress(50)
       @course[:file_map] = create_file_map
       set_progress(60)
-      package_course_files
+      @course[:all_files_zip] = package_course_files
       set_progress(70)
       @course[:media_tracks] = convert_media_tracks(settings_doc(MEDIA_TRACKS))
       set_progress(71)

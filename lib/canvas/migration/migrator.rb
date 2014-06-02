@@ -126,6 +126,73 @@ class Migrator
 
     File.expand_path(zip_file)
   end
-  
+
+  def get_all_resources(manifest)
+    manifest.css('resource').each do |r_node|
+      id = r_node['identifier']
+      resource = @resources[id]
+      resource ||= {:migration_id=>id}
+      resource[:type] = r_node['type']
+      resource[:href] = r_node['href']
+      if resource[:href]
+        resource[:href] = resource[:href].gsub('\\', '/')
+      else
+        #it could be embedded in the manifest
+        @resource_nodes_for_flat_manifest[id] = r_node
+      end
+      # Should be "Learner", "Instructor", or "Mentor"
+      resource[:intended_user_role] = get_node_val(r_node, "intendedEndUserRole value", nil)
+      # Should be "assignment", "lessonplan", "syllabus", or "unspecified"
+      resource[:intended_use] = r_node['intendeduse']
+      resource[:files] = []
+      r_node.css('file').each do |file_node|
+        resource[:files] << {:href => file_node[:href].gsub('\\', '/')}
+      end
+      resource[:dependencies] = []
+      r_node.css('dependency').each do |d_node|
+        resource[:dependencies] << d_node[:identifierref]
+      end
+      @resources[id] = resource
+    end
+  end
+
+  # Finds the resource object with the specified type(s)
+  # does a "start_with?" so that CC version can be ignored
+  def resources_by_type(*types)
+    @resources.values.find_all {|res| types.any?{|t| res[:type].start_with? t} }
+  end
+
+  def open_rel_path(rel_path)
+    doc = nil
+    if rel_path
+      path = get_full_path(rel_path)
+      if File.exists?(path)
+        doc = open_file_xml(path)
+      end
+    end
+    doc
+  end
+
+  def get_node_or_open_file(resource, node_name=nil)
+    doc = open_rel_path(resource[:href])
+    if !doc && resource[:files]
+      resource[:files].each do |file|
+        break if doc = open_rel_path(file[:href])
+      end
+    end
+
+    if !doc && node = @resource_nodes_for_flat_manifest[resource[:migration_id]]
+      #check for in-line node
+      if node_name
+        doc = node.children.find{|c| c.name == node_name}
+      else
+        doc = node
+      end
+    end
+
+    doc.remove_namespaces! if doc.respond_to?('remove_namespaces!')
+    doc
+  end
+
 end
 end

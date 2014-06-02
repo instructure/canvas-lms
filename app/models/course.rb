@@ -1936,11 +1936,7 @@ class Course < ActiveRecord::Base
     Canvas::Plugin.value_to_boolean(val)
   end
 
-  def add_migration_warning(message, exception='')
-    self.content_migration.add_warning(message, exception) if self.content_migration
-  end
-
-  attr_accessor :full_migration_hash, :external_url_hash, :content_migration,
+  attr_accessor :full_migration_hash, :external_url_hash,
                 :folder_name_lookups, :attachment_path_id_lookup, :attachment_path_id_lookup_lower,
                 :assignment_group_no_drop_assignments, :migration_results
 
