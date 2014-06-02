@@ -72,37 +72,6 @@ module AdheresToPolicy
       end
     end
 
-    # Deprecated: Gets the requested granted rights and their status to a user.
-    #             Use rights_status if you need the right and their granted
-    #             status or granted_rights if you just need an array of all rights
-    #             that are granted.
-    #
-    # user - The user for which to get the rights.
-    # session - The session to use if the rights are dependend upon the session.
-    # args - The rights to get the status for.
-    #
-    # Examples
-    #
-    #   grants_rights?(user, :read)
-    #   # => { :read => true }
-    #
-    #   grants_rights?(user, session, :read, :update, :delete)
-    #   # => { :read => true, :update => true }
-    #
-    # Returns a hash with the requested granted rights and their status.
-    def grants_rights?(user, *args)
-      session, sought_rights = parse_args(args)
-      sought_rights ||= []
-      if all_rights = sought_rights.empty?
-        sought_rights = self.class.policy.available_rights
-      end
-      sought_rights.inject({}) do |h, r|
-        granted = check_right?(user, session, r)
-        h[r] = granted if granted || !all_rights
-        h
-      end
-    end
-
     # Public: Checks any of the rights passed in for a user.
     #
     # user - The user for which to determine the right.

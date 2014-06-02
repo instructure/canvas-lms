@@ -116,7 +116,7 @@ module Api::V1::Assignment
       hash['needs_grading_count'] = assignment.needs_grading_count_for_user user
     end
 
-    if assignment.context.grants_rights?(user, :read_sis, :manage_sis).values.any?
+    if assignment.context.grants_any_right?(user, :read_sis, :manage_sis)
       hash['integration_id'] = assignment.integration_id
       hash['integration_data'] = assignment.integration_data
     end

@@ -201,22 +201,6 @@ class ActiveRecord::Base
     false
   end
 
-  def self.clear_cached_contexts
-    @@cached_contexts = {}
-  end
-
-  def cached_context_grants_right?(user, session, *permissions)
-    permissions.flatten!
-    permissions.compact!
-    permissions.uniq!
-
-    if self.respond_to?(:context)
-      self.context.grants_any_right?(user, session, *permissions)
-    elsif self.respond_to?(:course)
-      self.course.grants_any_right?(user, session, *permissions)
-    end
-  end
-
   def cached_context_short_name
     if self.respond_to?(:context)
       code = self.respond_to?(:context_code) ? self.context_code : self.context.asset_string

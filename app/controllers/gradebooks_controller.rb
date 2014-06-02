@@ -156,7 +156,7 @@ class GradebooksController < ApplicationController
           cancel_cache_buster
           Shackles.activate(:slave) do
             send_data(
-              @context.gradebook_to_csv(:include_sis_id => @context.grants_rights?(@current_user, session, :read_sis, :manage_sis).values.any?, :user => @current_user),
+              @context.gradebook_to_csv(:include_sis_id => @context.grants_any_right?(@current_user, session, :read_sis, :manage_sis), :user => @current_user),
               :type => "text/csv",
               :filename => t('grades_filename', "Grades").gsub(/ /, "_") + "-" + @context.name.to_s.gsub(/ /, "_") + ".csv",
               :disposition => "attachment"

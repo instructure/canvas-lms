@@ -276,13 +276,15 @@ describe Enrollment do
   context "permissions" do
     it "should be able to read grades if the course grants management rights to the enrollment" do
       @new_user = user_model
-      @enrollment.grants_rights?(@new_user, :read_grades)[:read_grades].should be_false
+      @enrollment.save
+      @enrollment.grants_right?(@new_user, :read_grades).should be_false
       @course.enroll_teacher(@new_user)
-      @enrollment.grants_rights?(@user, :read_grades).should be_true
+      @enrollment.reload
+      @enrollment.grants_right?(@user, :read_grades).should be_true
     end
 
     it "should allow the user itself to read its own grades" do
-      @enrollment.grants_rights?(@user, :read_grades).should be_true
+      @enrollment.grants_right?(@user, :read_grades).should be_true
     end
   end
 
