@@ -162,6 +162,14 @@ class MessageableUser < User
     super(options)
   end
 
+  if CANVAS_RAILS2
+    def as_json(options={})
+      options[:except] ||= []
+      options[:except] << :bookmark
+      super(options)
+    end
+  end
+
   private
 
   def common_contexts_on_current_shard(common_contexts)
