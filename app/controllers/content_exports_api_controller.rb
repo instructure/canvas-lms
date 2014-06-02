@@ -127,8 +127,7 @@ class ContentExportsApiController < ApplicationController
   def create
     if authorized_action(@context, @current_user, :read_as_admin)
       return render json: { message: 'invalid export_type' }, status: :bad_request unless %w(qti common_cartridge).include?(params[:export_type])
-      export = ContentExport.new
-      export.course = @context
+      export = @context.content_exports.build
       export.user = @current_user
       export.workflow_state = 'created'
 

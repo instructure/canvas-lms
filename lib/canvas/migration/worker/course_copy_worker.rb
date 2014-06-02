@@ -27,11 +27,11 @@ class Canvas::Migration::Worker::CourseCopyWorker < Struct.new(:migration_id)
     cm.job_progress.start
 
     begin
+      source = cm.source_course || Course.find(cm.migration_settings[:source_course_id])
       ce = ContentExport.new
+      ce.context = source
       ce.content_migration = cm
       ce.selected_content = cm.copy_options
-      source = cm.source_course || Course.find(cm.migration_settings[:source_course_id])
-      ce.course = source
       ce.export_type = ContentExport::COURSE_COPY
       ce.user = cm.user
       ce.save!

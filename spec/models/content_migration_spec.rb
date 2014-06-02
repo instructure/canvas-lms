@@ -41,10 +41,9 @@ describe ContentMigration do
     end
 
     it "should show correct progress" do
-      ce = ContentExport.new
+      ce = @course.content_exports.build
       ce.export_type = ContentExport::COMMON_CARTRIDGE
       ce.content_migration = @cm
-      ce.course = @course
       @cm.content_export = ce
       ce.save!
 

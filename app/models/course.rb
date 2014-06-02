@@ -195,7 +195,7 @@ class Course < ActiveRecord::Base
   has_many :asset_user_accesses, :as => :context
   has_many :role_overrides, :as => :context
   has_many :content_migrations, :as => :context
-  has_many :content_exports
+  has_many :content_exports, :as => :context
   has_many :course_imports
   has_many :alerts, :as => :context, :include => :criteria
   has_many :appointment_group_contexts, :as => :context
