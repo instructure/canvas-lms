@@ -36,6 +36,7 @@ describe "/gradebooks/speed_grader" do
   end
 
   it "includes a link back to the gradebook (gradebook2 by default)" do
+    Course.any_instance.stubs(:feature_enabled?).returns(false)
     render "gradebooks/speed_grader"  
     course_id = @course.id
     response.body.should include "a href=\"http://test.host/courses/#{course_id}/gradebook2\""

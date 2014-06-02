@@ -8,6 +8,10 @@ module Moodle
       migrator = Moodle2CC::Migrator.new @archive_file.path, @unzipped_file_path, 'format' => 'canvas', 'logger' => self
       migrator.migrate
 
+      if migrator.last_error
+        raise migrator.last_error
+      end
+
       @settings[:archive_file] = File.open(migrator.imscc_path)
       cc_converter = CC::Importer::Canvas::Converter.new(@settings)
       cc_converter.export
