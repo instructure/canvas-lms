@@ -155,7 +155,7 @@ protected
         # There are at least two possible values for this segment. Handle each option.
         segments.each do |option, urls|
           # The path option forms part of the unique prefix, so add it to the prefix list.
-          p = option == :none ? prefix : prefix + [option.gsub(/\{|\}/i, '')]
+          p = option == :none ? prefix : prefix + [option.gsub(/\{|\}|\*/i, '')]
           if urls.length == 1
             # If there was only one URL with this value, we've found that URL's unique nickname.
             nickname_suffix[urls.join("/")] = p.join("_")
