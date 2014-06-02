@@ -61,6 +61,16 @@ describe Quizzes::Quiz do
       quiz.publish!
       quiz.workflow_state.should == 'available'
     end
+
+    it "regenerates quiz data when quiz published at date changes with draft state off" do
+      quiz = @course.quizzes.build :title => "hello"
+      quiz.workflow_state = 'available'
+      quiz.save!
+
+      quiz.expects(:generate_quiz_data).once
+      quiz.publish!
+      quiz.workflow_state.should == 'available'
+    end
   end
 
   describe "#unpublish!" do
