@@ -409,7 +409,9 @@ describe Quizzes::QuizzesApiController, type: :request do
         @quiz.reload.should be_published
       end
 
-      it "should not lose quiz question count when publishing" do
+      it "should not lose quiz question count when publishing with draft state" do
+        Account.default.enable_feature!(:draft_state)
+
         @quiz ||= @course.quizzes.create!(:title => 'title')
         @qq1 = @quiz.quiz_questions.create!(
           question_data: multiple_choice_question_data
