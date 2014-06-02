@@ -125,6 +125,7 @@ require [
       messages = @batchUpdate('destroy')
       delete @detail.model
       @list.collection.remove(messages)
+      @header.updateUi(null)
       @detail.render()
 
     onCompose: (e) =>

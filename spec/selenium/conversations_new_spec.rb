@@ -427,6 +427,7 @@ describe "conversations new" do
       wait_for_ajaximations
       conversation_elements.size.should == 0
       ffj('.message-list .paginatedLoadingIndicator:visible').length.should == 0
+      ffj('.actions .btn-group button:disabled').size.should == 4
     end
   end
 
