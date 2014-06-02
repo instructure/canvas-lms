@@ -20,6 +20,9 @@ define [
     responseValues: attr()
     unexpectedResponseValues: attr()
 
+    correct: attr('number')
+    partiallyCorrect: attr('number')
+
     # MC/TF stats
     topStudentCount: attr()
     middleStudentCount: attr()

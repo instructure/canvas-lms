@@ -43,27 +43,15 @@ define [
       equal subject.get('ratio'), 0
 
 
-  test '#correctMultipleResponseRatio', ->
+  test '#correctMultipleAnswerRatio', ->
     run ->
       subject.set 'questionType', 'multiple_answers_question'
-      subject.set 'participantCount', 10
-      subject.set 'answerPool', [
-        { user_ids: [3], correct: true },
-        { user_ids: [ ], correct: false },
-        { user_ids: [3], correct: true },
-      ]
 
-      equal subject.get('ratio'), 0.1,
-        'it counts only students who have picked all correct answers and nothing else'
+      subject.set 'correct', 1
+      subject.set 'participantCount', 5
 
-      subject.set 'answerPool', [
-        { user_ids: [3], correct: true },
-        { user_ids: [3], correct: false },
-        { user_ids: [3], correct: true },
-      ]
+      equal subject.get('ratio'), 0.2
 
-      equal subject.get('ratio'), 0,
-        "it doesn't count students who picked a wrong answer and a correct one"
+      subject.set 'participantCount', 0
 
-
-
+      equal subject.get('ratio'), 0

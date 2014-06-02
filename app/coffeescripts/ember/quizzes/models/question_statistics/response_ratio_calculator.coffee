@@ -1,5 +1,5 @@
-define [ 'ember', 'underscore' ], (Em, _) ->
-  {intersection, flatten, difference} = _
+define [ 'ember' ], (Em) ->
+  MULTIPLE_ANSWERS = 'multiple_answers_question'
 
   # A utility class for calculating response ratios for a given question
   # statistics object.
@@ -21,12 +21,11 @@ define [ 'ember', 'underscore' ], (Em, _) ->
     #
     #   {
     #     "responses": 0,
-    #     "correct": true,
-    #     "user_ids": []
+    #     "correct": true
     #   }
     #
     # Most question types will have these defined in the top-level "answers" set,
-    # but for some others that support multiple-answers, these could be found in
+    # but for some others that support answer sets, these could be found in
     # answer_sets.@each.answer_matches.
     #
     # @note
@@ -43,7 +42,7 @@ define [ 'ember', 'underscore' ], (Em, _) ->
 
       return 0 if participantCount <= 0
 
-      if hasMultipleAnswers(@get('questionType'))
+      if isMultipleAnswers(@get('questionType'))
         return ratioForMultipleAnswers.call(this)
 
       correctResponses = @get('answerPool').reduce (sum, answer) ->
@@ -55,10 +54,8 @@ define [ 'ember', 'underscore' ], (Em, _) ->
     ).property('answerPool', 'participantCount')
 
   # @private
-  hasMultipleAnswers = (questionType) ->
-    Em.A([
-      'multiple_answers_question'
-    ]).contains(questionType)
+  isMultipleAnswers = (questionType) ->
+    MULTIPLE_ANSWERS == questionType
 
   # @private
   #
@@ -67,20 +64,6 @@ define [ 'ember', 'underscore' ], (Em, _) ->
   # correct. As such, a "partially" correct response does not count towards
   # the correct response ratio.
   ratioForMultipleAnswers = () ->
-    respondentsFor = (answers) ->
-      respondents = Em.A(answers).mapBy('user_ids')
-
-    participantCount = @get('participantCount')
-    correctAnswers = @get('answerPool').filterBy 'correct', true
-    distractors = @get('answerPool').filterBy 'correct', false
-
-    # we need students who have picked all correct answers:
-    correctRespondents = intersection.apply(_, respondentsFor(correctAnswers))
-
-    # and none of the wrong ones:
-    correctRespondents = difference(correctRespondents,
-      flatten(respondentsFor(distractors)))
-
-    correctRespondents.length / participantCount
+    @get('correct') / @get('participantCount')
 
   Calculator
