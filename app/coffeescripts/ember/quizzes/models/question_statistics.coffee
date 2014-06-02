@@ -14,16 +14,14 @@ define [
     questionName: attr()
     questionText: attr()
     position: attr()
-    answers: attr()
-    pointBiserials: attr()
-    responses: attr()
-    responseValues: attr()
-    unexpectedResponseValues: attr()
 
+    # Shared
+    answers: attr()
+    responses: attr()
     correct: attr('number')
     partiallyCorrect: attr('number')
 
-    # MC/TF stats
+    # Multiple-Choice & True/False
     topStudentCount: attr()
     middleStudentCount: attr()
     bottomStudentCount: attr()
@@ -34,14 +32,29 @@ define [
     correctTopStudentCount: attr()
     correctMiddleStudentCount: attr()
     correctBottomStudentCount: attr()
+    pointBiserials: attr()
+    discriminationIndex: (->
+      if pointBiserials = @get('pointBiserials')
+        pointBiserials.findBy('correct', true).point_biserial
+    ).property('pointBiserials')
 
-    # Essay stats
-    fullCredit: attr()
+    # Essay
     graded: attr()
     pointDistribution: attr()
-
     speedGraderUrl: alias('quizStatistics.quiz.speedGraderUrl').readOnly()
+
+    # Essay & Numerical
+    fullCredit: attr()
+
+    # File Upload
     quizSubmissionsZipUrl: alias('quizStatistics.quiz.quizSubmissionsZipUrl').readOnly()
+
+    # Multiple-Dropdowns, FIMB, Matching
+    answerSets: (->
+      sets = @get('_data.answer_sets') || []
+      sets.map (set) ->
+        Em.Object.create(set)
+    ).property('_data.answer_sets')
 
     # Helper for calculating the ratio of correct responses for this question.
     #
@@ -50,12 +63,7 @@ define [
       ResponseRatioCalculator.create({ content: this })
     ).property('answers')
 
-    answerSets: (->
-      sets = @get('_data.answer_sets') || []
-      sets.map (set) ->
-        Em.Object.create(set)
-    ).property('_data.answer_sets')
-
+    # @internal
     renderableType: (->
       switch @get('questionType')
         when 'multiple_choice_question', 'true_false_question'
@@ -73,10 +81,3 @@ define [
         else
           'generic'
     ).property('questionType')
-
-    discriminationIndex: (->
-      if pointBiserials = @get('pointBiserials')
-        pointBiserials.findBy('correct', true).point_biserial
-      else
-        return undefined
-    ).property('pointBiserials')

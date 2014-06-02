@@ -332,7 +332,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       output.should == {
         question_type: 'essay_question',
         some_metric: 5
-      }.with_indifferent_access
+      }
     end
 
     it "shouldn't proxy if the legacy flag is on" do

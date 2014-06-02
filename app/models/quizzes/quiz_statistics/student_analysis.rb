@@ -21,6 +21,14 @@ require 'csv'
 class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
   CQS = CanvasQuizStatistics
 
+  # The question_data attributes that we'll expose with the question statistics
+  CQS_QuestionDataFields = %w[
+    id
+    question_type
+    question_text
+    position
+  ].map(&:to_sym).freeze
+
   include HtmlTextHelper
 
   def readable_type
@@ -360,13 +368,16 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
   #   "multiple_responses"=>false}],
   def stats_for_question(question, responses, legacy=true)
     if !legacy && CQS.can_analyze?(question)
+      output = {}
+
       # the gem expects all hash keys to be symbols:
       question = CQS::Util.deep_symbolize_keys(question.to_hash)
       responses = responses.map(&CQS::Util.method(:deep_symbolize_keys))
 
-      analysis = CQS.analyze(question, responses)
+      output.merge! question.slice(*CQS_QuestionDataFields)
+      output.merge! CQS.analyze(question, responses)
 
-      return question.merge(analysis).with_indifferent_access
+      return output
     end
 
     question[:responses] = 0

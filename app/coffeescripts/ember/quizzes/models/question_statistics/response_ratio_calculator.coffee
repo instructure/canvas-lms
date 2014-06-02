@@ -9,8 +9,6 @@ define [ 'ember' ], (Em) ->
   # from you.
   #
   # Usage: see QuestionStatistics#ratioCalculator.
-  #
-  # TODO: this *may* be better done on the API, investigate
   Calculator = Em.ObjectProxy.extend
     participantCount: Em.computed.alias('quizStatistics.uniqueCount')
 
