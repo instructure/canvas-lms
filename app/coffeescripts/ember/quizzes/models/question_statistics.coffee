@@ -74,5 +74,5 @@ define [
       if pointBiserials = @get('pointBiserials')
         pointBiserials.findBy('correct', true).point_biserial
       else
-        return 0
+        return undefined
     ).property('pointBiserials')
