@@ -4,10 +4,11 @@ require [
   'jquery'
   'compiled/models/Assignment',
   'compiled/views/PublishButtonView',
-  'compiled/views/assignments/SpeedgraderLinkView'
+  'compiled/views/assignments/SpeedgraderLinkView',
+  'compiled/util/vddTooltip',
   'compiled/jquery/ModuleSequenceFooter'
   'jquery.instructure_forms'
-], (INST, I18n, $, Assignment, PublishButtonView, SpeedgraderLinkView) ->
+], (INST, I18n, $, Assignment, PublishButtonView, SpeedgraderLinkView, vddTooltip) ->
 
   $ ->
     $el = $('#assignment_publish_button')
@@ -30,6 +31,8 @@ require [
         assetID: ENV.ASSIGNMENT_ID
         location: location
       )
+
+    vddTooltip()
 
   # -- This is all for the _grade_assignment sidebar partial
   $ ->
