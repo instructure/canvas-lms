@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -64,7 +64,7 @@ module Canvas::AccountReports
     filepath
   end
 
-  def self.report_attachment(account_report, csv=mil)
+  def self.report_attachment(account_report, csv=nil)
     attachment = nil
     if csv.is_a? Hash
       filename = generate_file_name(account_report, "zip")
