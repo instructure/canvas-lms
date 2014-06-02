@@ -1,10 +1,47 @@
 Based on the question type it represents, the `question_statistics` document
 may include extra metrics. You can find these metrics below.
 
-#### Multiple Choice & True/False
+<a class="bookmark" id="multiple-choice-question-stats"></a>
+
+#### Multiple Choice
 
 ```javascript
 {
+  // Number of students who have picked any choice.
+  "responses": 4,
+
+  "answers": [
+    {
+      // Unique ID of this answer.
+      "id": "3866",
+
+       // The readable answer text.
+      "text": "Red",
+
+       // Number of students who picked this answer.
+      "responses": 3,
+
+       // Whether this answer is a correct one.
+      "correct": true
+    },
+
+    // An incorrect choice:
+    {
+      "id": "2040",
+      "text": "Green",
+      "correct": false,
+      "responses": 1
+    },
+
+    // The "No Answer" - students who didn't make any choice:
+    {
+      "id": "none",
+      "text": "No Answer",
+      "responses": 2,
+      "correct": false
+    }
+  ],
+
   // Number of students who have answered this question.
   "answered_student_count": 0,
 
@@ -327,3 +364,7 @@ Formula question statistics look just like the statistics for [Essays](#essay-qu
   ]
 }
 ```
+
+#### True/False
+
+True/False question statistics look just like the statistics for [Multiple-Choice](#multiple-choice-question-stats).
