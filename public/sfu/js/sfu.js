@@ -133,20 +133,6 @@
             .appendTo('body');
     });
 
-    // CANVAS-244 1/2 Add enrollment term to course autocomplete
-    utils.onPage(/accounts\/\d+(\/courses)?$/, function () {
-        // Override the method that renders the autocomplete item
-        var autocompleteData = $('#course_name').data('ui-autocomplete');
-        if (autocompleteData) {
-            autocompleteData._renderItem = function (ul, item) {
-                return $('<li>')
-                    .append('<a><div>' + item.label + '</div><div><small><em>' + item.term + '</em></small></div></a>')
-                    .appendTo(ul);
-            };
-        }
-    });
-    // END CANVAS-244 1/2
-
     // Fixes for Import Content page only
     utils.onPage(/courses\/\d+\/content_migrations/, function() {
         // The fixes are for elements that are dynamically generated when a specific XHR call completes
@@ -160,18 +146,6 @@
                         .appendTo(termGroup);
                 });
                 // END Alphabetize course drop-down list
-
-                // CANVAS-244 2/2 Add enrollment term to course autocomplete
-                // Override the method that renders the autocomplete item
-                var autocompleteData = $('#courseSearchField').data('ui-autocomplete');
-                if (autocompleteData) {
-                    autocompleteData._renderItem = function (ul, item) {
-                        return $('<li>')
-                            .append('<a><div>' + item.label + '</div><div><small><em>' + item.term + '</em></small></div></a>')
-                            .appendTo(ul);
-                    };
-                }
-                // END CANVAS-244 2/2
             }
         });
     });
