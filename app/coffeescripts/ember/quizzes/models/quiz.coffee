@@ -137,8 +137,8 @@ define [
 
       Ember.A(dates.concat(overrides))
     ).property('lockAt', 'unlockAt', 'dueAt', 'sectionCount', 'assignmentOverrides.[]')
-    submittedStudents: hasMany 'user', polymporphic: true, async: true
-    unsubmittedStudents: hasMany 'user', polymorphic: true, async: true
+    submittedStudents: hasMany 'submitted_student', polymporphic: true, async: true
+    unsubmittedStudents: hasMany 'unsubmitted_student', polymorphic: true, async: true
     messageStudentsUrl: attr()
     quizExtensionsUrl: attr()
     quizSubmission: belongsTo 'quiz_submission'

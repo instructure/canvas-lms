@@ -58,9 +58,16 @@
             {{/ic-menu-item}}
           {{/unless}}
 
-          {{#ic-menu-item on-select="messageStudents" class="js-message-students"}}
+          {{#ic-menu-item on-select="messageStudents" classBinding=":js-message-students messageStudentsActive::disabled"}}
             <i class="icon-discussion"></i>
-            {{#t 'Message Students'}}Message Students{{/t}}
+            {{#if messageStudentsActive}}
+              {{#t 'message_students_who'}}Message Students Who...{{/t}}
+            {{else}}
+              <span class="disabled">
+                {{#t 'message_students_who'}}Message Students Who...{{/t}}
+                <span class="screenreader-only">{{#t "option_is_disabled"}}this option is disabled{{/t}}</span>
+              </span>
+            {{/if}}
           {{/ic-menu-item}}
           
           {{#ic-menu-item on-select="showStudentResults"}}

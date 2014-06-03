@@ -37,6 +37,6 @@ define [
           outlet: 'modal'
 
       messageStudents: ->
-        @render 'message_students',
+        @render 'quiz/message_students',
           into: 'application'
           outlet: 'modal'

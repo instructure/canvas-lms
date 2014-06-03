@@ -63,7 +63,7 @@ define [
           "mobile_url":"http://localhost:3000/courses/1/quizzes/1?force_user=1&persist_headless=1",
           "message_students_url": "http://localhost:3000/courses/1/quizzes/1/submission_users/message",
           "question_count":0,
-          "published":false,
+          "published":true,
           "unpublishable":true,
           "locked_for_user":false
           "permissions":

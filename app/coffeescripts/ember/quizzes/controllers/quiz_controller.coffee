@@ -6,9 +6,6 @@ define [
   'compiled/jquery.rails_flash_notifications'
 ], (Ember, I18n, $, env) ->
 
-  {RSVP, K} = Ember
-  {equal} = Ember.computed
-
   updateAllDates = (field) ->
     date = new Date()
     @set field, date
@@ -19,7 +16,7 @@ define [
     #  override.set field, date
     #  override.save()
     promises.pushObject(@get('model').save())
-    RSVP.all promises
+    Ember.RSVP.all promises
 
   QuizController = Ember.ObjectController.extend
     legacyQuizSubmissionVersionsReady: Ember.computed.and('quizSubmissionVersionsHtml', 'didLoadQuizSubmissionVersionsHtml')
@@ -44,6 +41,10 @@ define [
     takeQuizActive: (->
       @get('published') and @get('takeable') and !@get('lockedForUser')
     ).property('published', 'takeable', 'lockedForUser')
+
+    messageStudentsActive: (->
+      @get('published')
+    ).property('published')
 
     takeOrResumeMessage: (->
       if @get('quizSubmission.isCompleted')
@@ -112,34 +113,6 @@ define [
       I18n.t('time_limit_minutes', "%{limit} minutes", {limit: @get("timeLimit")})
     ).property('timeLimit')
 
-    # message students modal
-
-    recipientGroups: (->
-      [
-        Ember.Object.create({
-          id: 'submitted'
-          name: I18n.t('students_who_have_taken_the_quiz', 'Students Who Have Taken the Quiz'),
-        })
-        Ember.Object.create({
-          id: 'unsubmitted'
-          name: I18n.t('student_who_have_not_taken_the_quiz', 'Students Who Have Not Taken the Quiz')
-        })
-      ]
-    ).property('submittedStudents', 'unsubmittedStudents')
-
-    recipients: (->
-      if @get('selectedRecipientGroup') is 'submitted'
-        @get('submittedStudents')
-      else
-        @get('unsubmittedStudents')
-    ).property('selectedRecipientGroup', 'submittedStudents', 'unsubmittedStudents')
-
-    showUnsubmitted: equal 'selectedRecipientGroup', 'unsubmitted'
-
-    noRecipients: equal 'recipients.length', 0
-
-    # /message students modal
-
     actions:
       takeQuiz: ->
         if @get 'takeQuizActive'
@@ -161,6 +134,12 @@ define [
           window.location = @get 'speedGraderUrl'
         else
           $.flashWarning I18n.t('there_are_no_submissions_to_grade', 'There are no submissions to grade.')
+
+      messageStudents: ->
+        if !@get('messageStudentsActive')
+          $.flashWarning I18n.t('you_cannot_message_unpublished', 'You can not message students until this quiz is published.')
+        else
+          true
 
       moderateQuiz: ->
         window.location = @get 'moderateUrl'
@@ -204,26 +183,6 @@ define [
         model.deleteRecord()
         model.save().then =>
           @transitionToRoute 'quizzes'
-
-      # message students modal
-
-      sendMessageToStudents: ->
-        $.ajax
-          url: @get('messageStudentsUrl')
-          data: JSON.stringify(
-            conversations: [
-              recipients: @get('selectedRecipientGroup')
-              body: @get('messageBody')
-            ]
-          )
-          type: 'POST'
-          dataType: 'json'
-          contentType: 'application/json'
-        $.flashMessage I18n.t 'message_sent', 'Message Sent'
-
-      # For modal, just do nothing.
-      cancel: K
-      # /message students modal
 
     # Kind of a gross hack so we can get quiz arrows in...
     addLegacyJS: (->

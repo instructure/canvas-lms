@@ -1,7 +1,7 @@
 define [
   'ember'
   'ember-data'
-], (Em, DS, ajax) ->
+], (Em, DS) ->
 
   {alias, equal, any} = Em.computed
   computed = Em.computed

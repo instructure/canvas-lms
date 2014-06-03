@@ -249,12 +249,30 @@
 // Dialogs - Put outside the #quiz_show scope because jQueryUI puts
 // it in the body.
 
-#message-students-dialog {
+.message-students-who-dialog {
+  .field {
+    margin-bottom: 11px;
+  }
+  .recipients {
+    margin-bottom: 11px;
+  }
+  select {
+    margin-bottom: 0;
+    width: 300px;
+  }
+  .label {
+    margin: 2px 0;
+  }
+  .more-label {
+    font-size: 88%;
+    color: #666;
+  }
   textarea {
     box-sizing: border-box;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     width: 100%;
+    height: 90px;
   }
 }
 
