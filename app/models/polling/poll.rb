@@ -30,19 +30,31 @@ module Polling
     validates_length_of :description, maximum: 255, allow_nil: true
 
     set_policy do
-      given { |user| user.roles.include?("admin") }
-      can :create and can :update and can :read and can :delete and can :submit
+      given { |user| self.user.present? && self.user == user }
+      can :update and can :read and can :delete
 
       given { |user| user.roles.include?("teacher") }
       can :create
 
-      given { |user| self.user.present? && self.user == user }
-      can :update and can :read and can :delete
+      given do |user, http_session|
+        user.roles.include?("admin") && self.poll_sessions.with_each_shard do |scope|
+          scope.includes(:course).any? { |session| session.course.grants_right?(user, http_session, :read_as_admin) }
+        end.any?
+      end
+      can :create and can :update and can :read and can :delete and can :submit
 
       given do |user, session|
-        self.poll_sessions.where(["course_id IN (?) AND (course_section_id IS NULL OR course_section_id IN (?))", user.enrollments.map(&:course_id).compact, user.enrollments.map(&:course_section_id).compact]).exists?
+        self.poll_sessions.with_each_shard do |scope|
+          scope.where(["course_id IN (?) AND (course_section_id IS NULL OR course_section_id IN (?))",
+                       Enrollment.where(user_id: user).active.select(:course_id),
+                       Enrollment.where(user_id: user).active.select(:course_section_id)]).exists?
+        end.any?
       end
       can :read
+    end
+
+    def associated_shards
+      user.associated_shards
     end
 
     def closed_and_viewable_for?(user)
@@ -52,8 +64,8 @@ module Polling
         .where(["polling_poll_submissions.user_id = ? AND is_published=? AND course_id IN (?) AND (course_section_id IS NULL OR course_section_id IN (?))",
                 user,
                 false,
-                user.enrollments.map(&:course_id).compact,
-                user.enrollments.map(&:course_section_id).compact]
+                Enrollment.where(user_id: user).active.select(:course_id),
+                Enrollment.where(user_id: user).active.select(:course_section_id)]
               )
         .order('polling_poll_sessions.created_at DESC')
         .limit(1)
@@ -63,18 +75,9 @@ module Polling
        results.any?
     end
 
-    def associated_shards
-      user.associated_shards
-    end
-
     def total_results
-      poll_sessions.reduce(Hash.new(0)) do |poll_results, session|
-        poll_results = poll_results.merge(session.results) do |key, poll_result_value, session_result_value|
-          poll_result_value + session_result_value
-        end
-
-        poll_results
-      end
+      results = poll_submissions.with_each_shard { |scope| scope.group('poll_choice_id').count }
+      Hash[*results.flatten]
     end
   end
 end

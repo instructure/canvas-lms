@@ -204,6 +204,7 @@ class Course < ActiveRecord::Base
   attr_accessor :import_source
   has_many :zip_file_imports, :as => :context
   has_many :content_participation_counts, :as => :context, :dependent => :destroy
+  has_many :poll_sessions, class_name: 'Polling::PollSession', dependent: :destroy
 
   include Profile::Association
 

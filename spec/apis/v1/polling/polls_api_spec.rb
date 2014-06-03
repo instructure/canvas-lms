@@ -48,6 +48,19 @@ describe Polling::PollsController, type: :request do
       end
     end
 
+    context "as a site admin" do
+      it "you can view polls you have created" do
+        Account.site_admin.add_user(@teacher)
+
+        json = get_index
+        poll_json = json['polls']
+        poll_json.size.should == 5
+
+        poll_json.each_with_index do |poll, i|
+          poll['question'].should == "Example Poll #{5-i}"
+        end
+      end
+    end
   end
 
   describe 'GET show' do
@@ -97,16 +110,6 @@ describe Polling::PollsController, type: :request do
         json = get_show
         poll_json = json['polls'].first
         poll_json.should_not have_key("total_results")
-      end
-
-      it "shouldn't return the id of the user that created the poll" do
-        student_in_course(:active_all => true, :course => @course)
-        session = @poll.poll_sessions.create!(course: @course)
-        session.publish!
-
-        json = get_show
-        poll_json = json['polls'].first
-        poll_json.should_not have_key("user_id")
       end
 
       it "shouldn't return the id of the user that created the poll" do
