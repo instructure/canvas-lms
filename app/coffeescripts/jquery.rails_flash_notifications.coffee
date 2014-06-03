@@ -45,7 +45,7 @@ define [
       animate({'z-index': 1}, 0).
       fadeOut('slow', -> $(this).slideUp('fast', -> $(this).remove()))
 
-    screenReaderFlashBox(type, content)
+    setTimeout((-> screenReaderFlashBox(type, content)), 100)
 
   # Pops up a small notification box at the top of the screen.
   $.flashMessage = (content, timeout = 3000) ->
