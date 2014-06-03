@@ -3,7 +3,7 @@
   content_for :right_side, render(:partial => "assignment_sidebar")
 %>
 
-<% if @locked && !@locked[:due_at] %>
+<% if @locked && !@locked[:lock_at] %>
   <% js_bundle :module_sequence_footer %>
     
   <h2><%= @assignment.title %></h2>
