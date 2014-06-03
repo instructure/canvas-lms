@@ -471,6 +471,8 @@ describe ContentMigration do
       end
 
       it "should set retain default behavior if front page is missing and draft state is not enabled" do
+        @copy_to.wiki.front_page.save!
+
         @copy_from.default_view = 'wiki'
         @copy_from.save!
         @copy_from.wiki.set_front_page_url!('haha not here')
