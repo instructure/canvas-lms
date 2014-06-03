@@ -314,7 +314,7 @@
 #         },
 #         "muted": {
 #           "description": "whether the assignment is muted",
-#           "type": "integer"
+#           "type": "boolean"
 #         },
 #         "points_possible": {
 #           "description": "the maximum points possible for the assignment",
