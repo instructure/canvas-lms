@@ -5,3 +5,9 @@
 #wiki_edit_view_main #below_editor div:nth-child(-n+2) {
     display: none;
 }
+
+li.section > a.grades,
+li.section > a.syllabus,
+li.section > a.context_external_tool_159 {
+    display: none;
+}
