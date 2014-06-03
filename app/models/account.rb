@@ -201,7 +201,6 @@ class Account < ActiveRecord::Base
   add_setting :self_registration_type, :root_only => true
   add_setting :large_course_rosters, :boolean => true, :root_only => true, :default => false
   add_setting :edit_institution_email, :boolean => true, :root_only => true, :default => true
-  add_setting :enable_fabulous_quizzes, :boolean => true, :root_only => true, :default => false
   add_setting :js_kaltura_uploader, :boolean => true, :root_only => true, :default => false
   add_setting :google_docs_domain, root_only: true
   add_setting :dashboard_url, root_only: true
@@ -1372,15 +1371,6 @@ class Account < ActiveRecord::Base
 
   def canvas_network_enabled?
     false
-  end
-
-  def enable_fabulous_quizzes!
-    root_account.enable_feature! :draft_state
-    change_root_account_setting!(:enable_fabulous_quizzes, true)
-  end
-
-  def disable_fabulous_quizzes!
-    change_root_account_setting!(:enable_fabulous_quizzes, false)
   end
 
   def calendar2_only?

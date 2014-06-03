@@ -206,6 +206,26 @@ END
       root_opt_in: true,
       development: true
     },
+    'quiz_stats' =>
+    {
+      display_name: -> { I18n.t('features.new_quiz_statistics', 'New Quiz Statistics Page') },
+      description: -> { I18n.t('new_quiz_statistics_desc', <<-END) },
+When Draft State is allowed/on, this enables the new quiz statistics page for an account.
+END
+      applies_to: 'Course',
+      state: 'hidden',
+      development: true
+    },
+    'quiz_moderate' =>
+    {
+      display_name: -> { I18n.t('features.new_quiz_moderate', 'New Quiz Moderate Page') },
+      description: -> { I18n.t('new_quiz_moderate_desc', <<-END) },
+When Draft State and Quiz Statistics is allowed/on, this enables the new quiz moderate page for an account.
+END
+      applies_to: 'Course',
+      state: 'hidden',
+      development: true
+    },
     'student_groups_next' =>
     {
       display_name: -> { I18n.t('features.student_groups', 'New Student Groups Page') },

@@ -35,14 +35,16 @@ class Quizzes::QuizzesController < ApplicationController
   def index
     if authorized_action(@context, @current_user, :read)
       # fabulous quizzes
-      if @context.root_account.enable_fabulous_quizzes? && @context.feature_enabled?(:draft_state)
+      if @context.feature_enabled?(:quiz_stats) &&
+         @context.feature_enabled?(:draft_state)
         js_env(:PERMISSIONS => {
           :create  => can_do(@context.quizzes.scoped.new, @current_user, :create),
           :manage  => can_do(@context, @current_user, :manage_assignments)
         },
         :FLAGS => {
           :question_banks => feature_enabled?(:question_banks),
-          :fabulous_quizzes => true
+          :quiz_statistics => true,
+          :quiz_moderate   => @context.feature_enabled?(:quiz_moderate)
         })
         render action: "fabulous_quizzes"
 
@@ -94,7 +96,9 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def show
-    if @context.root_account.enable_fabulous_quizzes? && @context.feature_enabled?(:draft_state) && !params.key?(:take)
+    if @context.feature_enabled?(:quiz_stats) &&
+       @context.feature_enabled?(:draft_state) &&
+       !params.key?(:take)
       redirect_to ember_urls.course_quiz_url(@quiz.id)
       return
     end
@@ -399,7 +403,8 @@ class Quizzes::QuizzesController < ApplicationController
 
   # student_analysis report
   def statistics
-    if @context.root_account.enable_fabulous_quizzes? && @context.feature_enabled?(:draft_state)
+    if @context.feature_enabled?(:quiz_stats) &&
+       @context.feature_enabled?(:draft_state)
       redirect_to ember_urls.course_quiz_statistics_url(@quiz.id)
       return
     end
@@ -550,7 +555,9 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def moderate
-    if @context.root_account.enable_fabulous_quizzes? && @context.feature_enabled?(:draft_state)
+    if @context.feature_enabled?(:quiz_moderate) &&
+       @context.feature_enabled?(:quiz_stats) &&
+       @context.feature_enabled?(:draft_state)
       redirect_to ember_urls.course_quiz_moderate_url(@quiz.id)
       return
     end

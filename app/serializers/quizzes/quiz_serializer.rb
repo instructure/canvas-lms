@@ -17,7 +17,7 @@ module Quizzes
                 :require_lockdown_browser_monitor, :lockdown_browser_monitor_data,
                 :speed_grader_url, :permissions, :quiz_reports_url, :quiz_statistics_url,
                 :message_students_url, :quiz_submission_html_url, :section_count,
-                :take_quiz_url, :quiz_extensions_url, :takeable,
+                :moderate_url, :take_quiz_url, :quiz_extensions_url, :takeable,
                 :quiz_submissions_zip_url, :preview_url, :quiz_submission_versions_html_url
 
     def_delegators :@controller,
@@ -31,6 +31,7 @@ module Quizzes
       :api_v1_course_quiz_submission_users_url,
       :api_v1_course_quiz_submission_users_message_url,
       :api_v1_course_quiz_extensions_create_url,
+      :course_quiz_moderate_url,
       :course_quiz_take_url,
       :course_quiz_quiz_submissions_url,
       :course_quiz_submission_versions_url
@@ -107,6 +108,10 @@ module Quizzes
       speed_grader_course_gradebook_url(context, assignment_id: quiz.assignment.id)
     end
 
+    def moderate_url
+      course_quiz_moderate_url(context, quiz)
+    end
+
     def student_quiz_submissions_url
       if user_may_grade?
         api_v1_course_quiz_submissions_url(context, quiz)
@@ -172,6 +177,7 @@ module Quizzes
              :unsubmitted_students then user_may_grade?
 
         when :quiz_extensions_url,
+             :moderate_url,
              :deleted then accepts_jsonapi? && user_may_manage?
 
         when :quiz_submission,

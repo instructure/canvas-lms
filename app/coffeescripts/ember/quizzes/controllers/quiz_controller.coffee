@@ -33,6 +33,10 @@ define [
       @set('showAsPublished', @get('published'))
     ).observes('model')
 
+    moderateEnabled: (->
+      env.get("moderateEnabled")
+    ).property()
+
     speedGraderActive: (->
       @get('studentQuizSubmissions.length')
     ).property('studentQuizSubmissions.length')
@@ -157,6 +161,9 @@ define [
           window.location = @get 'speedGraderUrl'
         else
           $.flashWarning I18n.t('there_are_no_submissions_to_grade', 'There are no submissions to grade.')
+
+      moderateQuiz: ->
+        window.location = @get 'moderateUrl'
 
       showStudentResults: ->
         @replaceRoute 'quiz.moderate'

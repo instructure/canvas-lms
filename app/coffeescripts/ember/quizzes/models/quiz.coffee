@@ -40,6 +40,7 @@ define [
     published: attr()
     deleted: attr()
     speedGraderUrl: attr()
+    moderateUrl: attr()
     allowedAttempts: attr('number')
     unpublishable: attr()
     canNotUnpublish: equal 'unpublishable', false
