@@ -43,18 +43,16 @@ module Polling
 
     def self.available_for(user)
       PollSession.where("course_id IN (?) AND (course_section_id IS NULL OR course_section_id IN (?))",
-                        user.enrollments.map(&:course_id).compact,
-                        user.enrollments.map(&:course_section_id).compact)
+                        Enrollment.where(user_id: user).active.select(:course_id),
+                        Enrollment.where(user_id: user).active.select(:course_section_id))
     end
 
     def results
-      poll_submissions.each_with_object(Hash.new(0)) do |submission, poll_results|
-        poll_results[submission.poll_choice.id] += 1
-      end
+      poll_submissions.group('poll_choice_id').count
     end
 
     def has_submission_from?(user)
-      !!poll_submissions.find_by_user_id(user.id)
+      poll_submissions.where(user_id: user).exists?
     end
 
     def publish!

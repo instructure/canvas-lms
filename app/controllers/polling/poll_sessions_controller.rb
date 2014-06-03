@@ -139,10 +139,9 @@ module Polling
         @course_section = @course.course_sections.find(course_section_id)
       end
 
-      @poll_session = @poll.poll_sessions.new(poll_session_params)
+      @poll_session = @course.poll_sessions.build(poll_session_params.merge(poll: @poll,
+                                                                          course_section: @course_section))
 
-      @poll_session.course = @course
-      @poll_session.course_section = @course_section
       @poll_session.has_public_results = false if poll_session_params[:has_public_results].blank?
 
       if authorized_action(@poll, @current_user, :create) && authorized_action(@course, @current_user, :update)
