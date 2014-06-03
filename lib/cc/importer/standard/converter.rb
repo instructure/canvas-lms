@@ -62,19 +62,32 @@ module CC::Importer::Standard
       @course
     end
     alias_method :export, :convert
-    
+
     def find_file_migration_id(path)
       @file_path_migration_id[path] || @file_path_migration_id[path.gsub(%r{\$[^$]*\$|\.\./}, '')] ||
         @file_path_migration_id[path.gsub(%r{\$[^$]*\$|\.\./}, '').sub(WEB_RESOURCES_FOLDER + '/', '')]
     end
     
     def get_canvas_att_replacement_url(path, resource_dir=nil)
+      if path.start_with?('../')
+        if url = get_canvas_att_replacement_url(path.sub('../', ''), resource_dir)
+          return url
+        end
+      end
       mig_id = nil
       if resource_dir
         mig_id = find_file_migration_id(File.join(resource_dir, path))
         mig_id ||= find_file_migration_id(File.join(resource_dir, path.gsub(%r{\$[^$]*\$|\.\./}, '')))
       end
       mig_id ||= find_file_migration_id(path)
+
+      unless mig_id
+        path = path.gsub(%r{\$[^$]*\$|\.\./}, '')
+        if key = @file_path_migration_id.keys.detect{|k| k.end_with?(path)}
+          mig_id = @file_path_migration_id[key]
+        end
+      end
+
       mig_id ? "$CANVAS_OBJECT_REFERENCE$/attachments/#{mig_id}" : nil
     end
 

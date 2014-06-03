@@ -190,7 +190,7 @@ class Migrator
       end
     end
 
-    doc.remove_namespaces! if doc.respond_to?('remove_namespaces!')
+    doc.remove_namespaces! if doc && doc.respond_to?('remove_namespaces!')
     doc
   end
 
