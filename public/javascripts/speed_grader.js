@@ -1142,7 +1142,7 @@ define([
         $turnitinInfoContainer = $("#submission_files_container .turnitin_info_container").empty();
         $.each(submission.versioned_attachments || [], function(i,a){
           var attachment = a.attachment;
-          if (attachment['crocodoc_available?'] ||
+          if (attachment.crocodoc_url ||
               attachment.canvadoc_url ||
               (attachment.scribd_doc && attachment.scribd_doc.created) ||
               $.isPreviewable(attachment.content_type, 'google')) {
@@ -1312,7 +1312,6 @@ define([
         $iframe_holder.empty();
 
         if (attachment) {
-          var crocodocAvailable = attachment['crocodoc_available?'];
           var scribdDocAvailable = attachment.scribd_doc && attachment.scribd_doc.created && attachment.workflow_state != 'errored' && attachment.scribd_doc.attributes.doc_id;
           var previewOptions = {
             height: '100%',
@@ -1327,27 +1326,10 @@ define([
             }
           };
         }
-        if (crocodocAvailable) {
-          var currentStudentIDAsOfAjaxCall = this.currentStudent.id;
-          var that = this;
-          $iframe_holder.show();
-          $iframe_holder.disableWhileLoading($.ajaxJSON(
-            '/submissions/' + this.currentStudent.submission.id + '/attachments/' + attachment.id + '/crocodoc_sessions/',
-            'POST',
-            {version: this.currentStudent.submission.currentSelectedIndex},
-            function(response) {
-              if (currentStudentIDAsOfAjaxCall == that.currentStudent.id) {
-                $iframe_holder.loadDocPreview($.extend(previewOptions, {
-                  crocodoc_session_url: response.session_url
-                }));
-              }
-            },
-            function() {
-              // pretend there isn't a crocodoc and try again
-              attachment['crocodoc_available?'] = false;
-              EG.handleSubmissionSelectionChange();
-            }
-          ));
+        if (attachment && attachment.crocodoc_url) {
+          $iframe_holder.show().loadDocPreview($.extend(previewOptions, {
+            crocodoc_session_url: attachment.crocodoc_url
+          }));
         }
         else if (attachment && attachment.canvadoc_url) {
           $iframe_holder.show().loadDocPreview($.extend(previewOptions, {
@@ -1383,6 +1365,7 @@ define([
             '/assignments/' + this.currentStudent.submission.assignment_id +
             '/submissions/' + this.currentStudent.submission.user_id +
             '?preview=true' + (
+
               this.currentStudent.submission &&
               !isNaN(this.currentStudent.submission.currentSelectedIndex) &&
               this.currentStudent.submission.currentSelectedIndex != null ?

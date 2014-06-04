@@ -18,20 +18,12 @@
 
 class CanvadocSessionsController < ApplicationController
   before_filter :require_user
+  include HmacHelper
 
   def show
-    unless Canvas::Security.verify_hmac_sha1(params[:hmac], params[:blob])
-      render :text => 'unauthorized', :status => :unauthorized
-      return
-    end
-
-    blob = JSON.parse(params[:blob])
+    blob = extract_blob(params[:hmac], params[:blob],
+                        "user_id" => @current_user.global_id)
     attachment = Attachment.find(blob["attachment_id"])
-
-    unless @current_user.global_id == blob["user_id"]
-      render :text => 'unauthorized', :status => :unauthorized
-      return
-    end
 
     if attachment.canvadocable?
       attachment.submit_to_canvadocs unless attachment.canvadoc_available?
@@ -39,5 +31,8 @@ class CanvadocSessionsController < ApplicationController
     else
       render :text => "Not found", :status => :not_found
     end
+
+  rescue HmacHelper::Error
+    render :text => 'unauthorized', :status => :unauthorized
   end
 end
