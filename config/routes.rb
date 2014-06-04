@@ -1061,6 +1061,14 @@ routes.draw do
 
       put 'users/:id/merge_into/:destination_user_id', controller: 'users', action: 'merge_into'
       put 'users/:id/merge_into/accounts/:destination_account_id/users/:destination_user_id', controller: 'users', action: 'merge_into'
+
+      scope(:controller => :user_observees) do
+        get    'users/:user_id/observees', action: :index, path_name: 'user_observees'
+        post   'users/:user_id/observees', action: :create
+        get    'users/:user_id/observees/:observee_id', action: :show, path_name: 'user_observee'
+        put    'users/:user_id/observees/:observee_id', action: :update
+        delete 'users/:user_id/observees/:observee_id', action: :destroy
+      end
     end
 
     scope(:controller => :custom_data) do
