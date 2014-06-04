@@ -36,6 +36,14 @@ describe CanvasEmberUrl::UrlMappings do
       it "should build the base url passed in" do
         mappings.course_quiz_url(1).should == "#{course_quizzes}#/1"
       end
+
+      it "should build the base url with headless param present" do
+        mappings.course_quiz_url(1, headless: 1).should == "#{course_quizzes}?headless=1#/1"
+      end
+
+      it "should build the base url with headless param empty" do
+        mappings.course_quiz_url(1, headless: nil).should == "#{course_quizzes}#/1"
+      end
     end
 
     describe "#course_quiz_moderate_url" do

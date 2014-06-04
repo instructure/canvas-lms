@@ -46,6 +46,10 @@ class Quizzes::QuizzesController < ApplicationController
           :quiz_statistics => true,
           :quiz_moderate   => @context.feature_enabled?(:quiz_moderate)
         })
+
+        # headless prevents inception in submission preview
+        setup_headless if params[:headless]
+
         render action: "fabulous_quizzes"
 
       else
@@ -99,7 +103,7 @@ class Quizzes::QuizzesController < ApplicationController
     if @context.feature_enabled?(:quiz_stats) &&
        @context.feature_enabled?(:draft_state) &&
        !params.key?(:take)
-      redirect_to ember_urls.course_quiz_url(@quiz.id)
+      redirect_to ember_urls.course_quiz_url(@quiz.id, headless: params[:headless])
       return
     end
 

@@ -1,3 +1,6 @@
 <% jammit_css :quizzes_ember %>
 <% js_bundle :quizzes %>
 <% content_for :page_title, t(:page_titles, "Quizzes") %>
+<% content_for :head do %>
+  <base target="_top" />
+<% end %>
