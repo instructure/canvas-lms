@@ -384,6 +384,10 @@ class OutcomeGroupsApiController < ApplicationController
   # @argument title [Optional, String]
   #   The title of the new outcome. Required if outcome_id is absent.
   #
+  # @argument display_name [Optional, String]
+  #   A friendly name shown in reports for outcomes with cryptic titles,
+  #   such as common core standards names.
+  #
   # @argument description [Optional, String]
   #   The description of the new outcome.
   #
@@ -412,6 +416,7 @@ class OutcomeGroupsApiController < ApplicationController
   #   curl 'https://<canvas>/api/v1/accounts/1/outcome_groups/1/outcomes.json' \
   #        -X POST \ 
   #        -F 'title=Outcome Title' \ 
+  #        -F 'display_name=Title for reporting' \
   #        -F 'description=Outcome description' \
   #        -F 'vendor_guid=customid9000' \
   #        -F 'mastery_points=3' \ 
@@ -429,6 +434,7 @@ class OutcomeGroupsApiController < ApplicationController
   #        -X POST \ 
   #        --data-binary '{
   #              "title": "Outcome Title",
+  #              "display_name": "Title for reporting",
   #              "description": "Outcome description",
   #              "vendor_guid": "customid9000",
   #              "mastery_points": 3,
@@ -451,7 +457,7 @@ class OutcomeGroupsApiController < ApplicationController
           return
         end
       else
-        @outcome = context_create_outcome(params.slice(:title, :description, :ratings, :mastery_points, :vendor_guid))
+        @outcome = context_create_outcome(params.slice(:title, :description, :ratings, :mastery_points, :vendor_guid, :display_name))
         unless @outcome.valid?
           render :json => @outcome.errors, :status => :bad_request
           return
@@ -666,7 +672,7 @@ class OutcomeGroupsApiController < ApplicationController
 
   def context_create_outcome(data)
     scope = @context ? @context.created_learning_outcomes : LearningOutcome.global
-    outcome = scope.build(data.slice(:title, :description, :vendor_guid))
+    outcome = scope.build(data.slice(:title, :display_name, :description, :vendor_guid))
     if data[:ratings]
       outcome.rubric_criterion = data.slice(:ratings, :mastery_points)
     end

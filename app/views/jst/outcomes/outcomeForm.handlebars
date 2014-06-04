@@ -1,6 +1,12 @@
 <form action="{{url}}" class="learning_outcome" method="post">
-  <label for="title">{{#t "title"}}Name this outcome{{/t}}:</label>
-  <input class="outcome_title" name="title" id=title size="50" type="text" value="{{title}}">
+
+  <label class="span3" for="title">{{#t "title"}}Name this outcome{{/t}}:</label>
+  <input class="outcome_title span3" name="title" id=title size="50" type="text" value="{{title}}">
+
+  <label class="span3" for="display_name">{{#t "display_name"}}Friendly name (optional){{/t}}:</label>
+  <input class="outcome_display_name span3" name="display_name" id=display_name size="50" type="text" value="{{display_name}}">
+
+
   <label for="description">{{#t "description"}}Describe this outcome{{/t}}:</label>
   <textarea cols="40" name="description" id=description rows="20" style="width: 100%; height: 150px;">{{description}}</textarea>
   <div id="outcome_criterion_dialog" style="display: none;">

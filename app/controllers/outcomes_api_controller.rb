@@ -49,6 +49,11 @@
 #           "example": "Outcome title",
 #           "type": "string"
 #         },
+#         "display_name": {
+#           "description": "Optional friendly name for reporting",
+#           "example": "My Favorite Outocome",
+#           "type": "string"
+#         },
 #         "description": {
 #           "description": "description of the outcome. omitted in the abbreviated form.",
 #           "example": "Outcome description",
@@ -118,6 +123,10 @@ class OutcomesApiController < ApplicationController
   # @argument title [Optional, String]
   #   The new outcome title.
   #
+  # @argument display_name [Optional, String]
+  #   A friendly name shown in reports for outcomes with cryptic titles,
+  #   such as common core standards names.
+  #
   # @argument description [Optional, String]
   #   The new outcome description.
   #
@@ -141,6 +150,7 @@ class OutcomesApiController < ApplicationController
   #   curl 'https://<canvas>/api/v1/outcomes/1.json' \
   #        -X PUT \ 
   #        -F 'title=Outcome Title' \ 
+  #        -F 'display_name=Title for reporting' \
   #        -F 'description=Outcome description' \
   #        -F 'vendor_guid=customid9001' \
   #        -F 'mastery_points=3' \ 
@@ -158,6 +168,7 @@ class OutcomesApiController < ApplicationController
   #        -X PUT \ 
   #        --data-binary '{
   #              "title": "Outcome Title",
+  #              "display_name": "Title for reporting",
   #              "description": "Outcome description",
   #              "vendor_guid": "customid9001",
   #              "mastery_points": 3,
@@ -172,7 +183,7 @@ class OutcomesApiController < ApplicationController
   #
   def update
     if authorized_action(@outcome, @current_user, :update)
-      @outcome.update_attributes(params.slice(:title, :description, :vendor_guid))
+      @outcome.update_attributes(params.slice(:title, :display_name, :description, :vendor_guid))
       if params[:mastery_points] || params[:ratings]
         criterion = @outcome.data && @outcome.data[:rubric_criterion]
         criterion ||= {}

@@ -5,7 +5,7 @@ define [
 ], (_, {Model, Collection}, natcompare) ->
   class Group extends Model
     initialize: ->
-      @set('outcomes', new Collection([], comparator: natcompare.byGet('title')))
+      @set('outcomes', new Collection([], comparator: natcompare.byGet('friendly_name')))
 
     count: -> @get('outcomes').length
 

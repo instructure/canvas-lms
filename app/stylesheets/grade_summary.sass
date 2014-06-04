@@ -361,6 +361,9 @@ $outcome-border: 1px solid #BCC2CA
       color: #2a333b
       p
         margin: 0
+        white-space: nowrap
+        overflow: hidden
+        text-overflow: ellipsis
 
     .title
       font-weight: bold
@@ -445,3 +448,6 @@ $outcome-border: 1px solid #BCC2CA
         top: 13px
       .score
         font-size: 14px
+
+.ui-widget.ui-tooltip
+  max-width: 500px

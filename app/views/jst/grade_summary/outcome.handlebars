@@ -14,7 +14,9 @@
   {{/if}}
 </div>
 <div class="outcome-properties">
-  <div class="title" data-tooltip title="{{description}}">{{title}}</div>
+  <div class="title" data-tooltip title="{{#if hover_name}}{{hover_name}}: {{/if}}{{description}}">
+    {{friendly_name}}
+  </div>
   <div class="description">{{{description}}}</div>
 </div>
 <div class="outcome-score outcome-bar-wrapper">

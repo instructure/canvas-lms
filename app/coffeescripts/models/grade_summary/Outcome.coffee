@@ -3,6 +3,11 @@ define [
   'Backbone'
 ], (_, {Model, Collection}) ->
   class Outcome extends Model
+    initialize: ->
+      super
+      @set 'friendly_name', @get('display_name') || @get('title')
+      @set 'hover_name', (@get('title') if @get('display_name'))
+
     status: ->
       if @scoreDefined()
         score = @get('score')

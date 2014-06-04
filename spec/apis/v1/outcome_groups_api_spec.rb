@@ -623,6 +623,7 @@ describe "Outcome Groups API", type: :request do
             "context_type" => "Account",
             "context_id" => @account.id,
             "title" => outcome.title,
+            "display_name" => nil,
             "url" => api_v1_outcome_path(:id => outcome.id),
             "can_edit" => true
           }
@@ -772,6 +773,7 @@ describe "Outcome Groups API", type: :request do
           "context_type" => nil,
           "context_id" => nil,
           "title" => @outcome.title,
+          "display_name" => nil,
           "url" => api_v1_outcome_path(:id => @outcome.id),
           "can_edit" => false
         }
@@ -815,6 +817,7 @@ describe "Outcome Groups API", type: :request do
                  :id => @group.id.to_s,
                  :format => 'json' },
                { :title => "My Outcome",
+                 :display_name => "Friendly Name",
                  :description => "Description of my outcome",
                  :mastery_points => 5,
                  :ratings => [
@@ -826,6 +829,7 @@ describe "Outcome Groups API", type: :request do
       LearningOutcome.active.count.should == 1
       @outcome = LearningOutcome.active.first
       @outcome.title.should == "My Outcome"
+      @outcome.display_name.should == "Friendly Name"
       @outcome.description.should == "Description of my outcome"
       @outcome.data[:rubric_criterion].should == {
         :description => 'My Outcome',
@@ -955,6 +959,7 @@ describe "Outcome Groups API", type: :request do
           "vendor_guid" => @outcome.vendor_guid,
           "context_type" => nil,
           "context_id" => nil,
+          "display_name" => nil,
           "title" => @outcome.title,
           "url" => api_v1_outcome_path(:id => @outcome.id),
           "can_edit" => false

@@ -1,5 +1,7 @@
 <div class="outcome-modal">
-  <div class="title">{{title}}</div>
+  <div class="title"{{#if hover_name}} data-tooltip title="{{hover_name}}"{{/if}}>
+    {{friendly_name}}
+  </div>
   <div class="outcome-bar-wrapper">
 	  <div class="score"><strong>{{#if scoreDefined}}{{score}}{{else}}-{{/if}}</strong>/{{mastery_points}}</div>
 	  {{view progress}}
