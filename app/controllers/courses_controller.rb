@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -83,11 +83,11 @@ require 'set'
 #           "type": "integer"
 #         },
 #         "sis_course_id": {
-#           "description": "the SIS identifier for the course, if defined",
+#           "description": "the SIS identifier for the course, if defined. This field is only included if the user has permission to view SIS information.",
 #           "type": "string"
 #         },
 #         "integration_id": {
-#           "description": "the integration identifier for the course, if defined",
+#           "description": "the integration identifier for the course, if defined. This field is only included if the user has permission to view SIS information.",
 #           "type": "string"
 #         },
 #         "name": {

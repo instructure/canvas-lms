@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -41,7 +41,7 @@
 #           "type": "string"
 #         },
 #         "integration_id": {
-#           "description": "Optional: The integration ID of the section.",
+#           "description": "Optional: The integration ID of the section. This field is only included if the user has permission to view SIS information.",
 #           "example": "3452342345",
 #           "type": "string"
 #         },
@@ -56,7 +56,7 @@
 #           "type": "integer"
 #         },
 #         "sis_course_id": {
-#           "description": "The unique SIS identifier for the course in which the section belongs",
+#           "description": "The unique SIS identifier for the course in which the section belongs. This field is only included if the user has permission to view SIS information.",
 #           "example": 7,
 #           "type": "integer"
 #         },

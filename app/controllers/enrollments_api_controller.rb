@@ -69,12 +69,12 @@
 #             "type": "integer"
 #           },
 #           "sis_course_id": {
-#             "description": "The SIS Course ID in which the enrollment is associated. Only displayed if present.",
+#             "description": "The SIS Course ID in which the enrollment is associated. Only displayed if present. This field is only included if the user has permission to view SIS information.",
 #             "example": "SHEL93921",
 #             "type": "string"
 #           },
 #           "course_integration_id": {
-#             "description": "The Course Integration ID in which the enrollment is associated.",
+#             "description": "The Course Integration ID in which the enrollment is associated. This field is only included if the user has permission to view SIS information.",
 #             "example": "SHEL93921",
 #             "type": "string"
 #           },
@@ -84,12 +84,12 @@
 #             "type": "integer"
 #           },
 #           "section_integration_id": {
-#             "description": "The Section Integration ID in which the enrollment is associated.",
+#             "description": "The Section Integration ID in which the enrollment is associated. This field is only included if the user has permission to view SIS information.",
 #             "example": "SHEL93921",
 #             "type": "string"
 #           },
 #           "sis_section_id": {
-#             "description": "The SIS Section ID in which the enrollment is associated. Only displayed if present.",
+#             "description": "The SIS Section ID in which the enrollment is associated. Only displayed if present. This field is only included if the user has permission to view SIS information.",
 #             "example": "SHEL93921",
 #             "type": "string"
 #           },
