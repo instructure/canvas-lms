@@ -105,9 +105,6 @@ describe SectionsController, type: :request do
           'id' => @section.id,
           'name' => @section.name,
           'course_id' => @course.id,
-          'sis_course_id' => @course.sis_source_id,
-          'sis_section_id' => @section.sis_source_id,
-          'integration_id' => nil,
           'nonxlist_course_id' => nil,
           'start_at' => nil,
           'end_at' => nil
@@ -121,9 +118,6 @@ describe SectionsController, type: :request do
           'id' => @section.id,
           'name' => @section.name,
           'course_id' => @course.id,
-          'sis_course_id' => @course.sis_source_id,
-          'sis_section_id' => @section.sis_source_id,
-          'integration_id' => nil,
           'nonxlist_course_id' => nil,
           'start_at' => nil,
           'end_at' => nil
@@ -150,9 +144,6 @@ describe SectionsController, type: :request do
           'id' => @section.id,
           'name' => @section.name,
           'course_id' => @course.id,
-          'sis_course_id' => @course.sis_source_id,
-          'sis_section_id' => @section.sis_source_id,
-          'integration_id' => nil,
           'nonxlist_course_id' => nil,
           'start_at' => nil,
           'end_at' => nil
@@ -166,9 +157,6 @@ describe SectionsController, type: :request do
           'id' => @section.id,
           'name' => @section.name,
           'course_id' => @course.id,
-          'sis_course_id' => @course.sis_source_id,
-          'sis_section_id' => @section.sis_source_id,
-          'integration_id' => nil,
           'nonxlist_course_id' => nil,
           'start_at' => nil,
           'end_at' => nil
@@ -182,10 +170,7 @@ describe SectionsController, type: :request do
             'id' => @section.id,
             'name' => @section.name,
             'course_id' => @course.id,
-            'integration_id' => 'my_section',
-            'sis_course_id' => @course.sis_source_id,
             'nonxlist_course_id' => nil,
-            'sis_section_id' => nil,
             'start_at' => nil,
             'end_at' => nil
         }
@@ -194,6 +179,31 @@ describe SectionsController, type: :request do
       it "should not be accessible if the associated course is not accessible" do
         @course.destroy
         json = api_call(:get, "#{@path_prefix}/#{@section.id}", @path_params.merge({ :id => @section.to_param }), {}, {}, :expected_status => 404)
+      end
+    end
+
+    context "as an admin" do
+      before do
+        site_admin_user
+        @section = @course.default_section
+        @path_prefix = "/api/v1/courses/#{@course.id}/sections"
+        @path_params = { :controller => 'sections', :action => 'show', :course_id => @course.to_param, :format => 'json' }
+      end
+
+      it "should show sis information" do
+        json = api_call(:get, "#{@path_prefix}/#{@section.id}", @path_params.merge({ :id => @section.to_param }))
+        json.should == {
+          'id' => @section.id,
+          'name' => @section.name,
+          'course_id' => @course.id,
+          'sis_course_id' => @course.sis_source_id,
+          'sis_section_id' => @section.sis_source_id,
+          'sis_import_id' => @section.sis_batch_id,
+          'integration_id' => nil,
+          'nonxlist_course_id' => nil,
+          'start_at' => nil,
+          'end_at' => nil
+        }
       end
     end
   end
