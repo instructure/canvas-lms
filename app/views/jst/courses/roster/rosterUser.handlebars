@@ -22,7 +22,7 @@
   <div>{{enrollmentName role}}</div>
   {{/each}}
 </td>
-{{#if canViewLoginIdColumn}}
+{{#if ENV.permissions.read_reports}}
 <td>
   {{#each enrollments}}
     <div {{contextSensitiveDatetimeTitle last_activity_at }}>
