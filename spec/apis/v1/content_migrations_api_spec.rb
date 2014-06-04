@@ -307,13 +307,13 @@ describe ContentMigrationsController, type: :request do
     end
 
     it "should translate a sis source_course_id" do
-      other_course = course active_all: true
-      other_course.sis_source_id = "booga"
-      other_course.save!
+      course_with_teacher(:active_all => true, :user => @user)
+      @course.sis_source_id = "booga"
+      @course.save!
       json = api_call(:post, @migration_url + "?settings[source_course_id]=sis_course_id:booga&migration_type=course_copy_importer",
                       @params.merge(:migration_type => 'course_copy_importer', :settings => {'source_course_id' => 'sis_course_id:booga'}))
       migration = ContentMigration.find json['id']
-      migration.migration_settings[:source_course_id].should eql other_course.id
+      migration.migration_settings[:source_course_id].should eql @course.id
     end
 
     context "migration file upload" do
