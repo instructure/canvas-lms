@@ -199,7 +199,10 @@ define [
         model = @get 'model'
         model.deleteRecord()
         model.save().then =>
-          @transitionToRoute 'quizzes'
+          $.flashMessage I18n.t('quiz_successfully_deleted', 'Quiz Successfully Deleted!')
+
+        @transitionToRoute 'quizzes'
+        return # explicit return is necessary here
 
       showRubric: ->
         @trigger('rubricDisplayRequest')
