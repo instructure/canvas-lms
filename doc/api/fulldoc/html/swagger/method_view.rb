@@ -24,6 +24,7 @@ class MethodView < HashView
 
   def nickname
     summary.downcase.
+      gsub(/ the /, ' ').
       gsub(/ an? /, ' ').
       gsub(/[^a-z]+/, '_').
       gsub(/^_+|_+$/, '')
