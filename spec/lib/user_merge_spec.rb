@@ -271,8 +271,8 @@ describe UserMerge do
       course1.enroll_user(user1)
       course1.enroll_user(user2)
 
-      observer1 = user_model
-      observer2 = user_model
+      observer1 = user_with_pseudonym
+      observer2 = user_with_pseudonym
       user1.observers << observer1 << observer2
       user2.observers << observer2
       ObserverEnrollment.count.should eql 3

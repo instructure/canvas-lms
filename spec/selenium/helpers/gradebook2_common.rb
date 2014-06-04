@@ -124,7 +124,8 @@ def data_setup
 end
 
 def data_setup_as_observer
-  course_with_observer_logged_in
+  user_with_pseudonym
+  course_with_observer_logged_in user: @user
   @course.observers=[@observer]
   assignment_setup
   @all_students.each {|s| s.observers=[@observer]}

@@ -348,6 +348,7 @@ class Enrollment < ActiveRecord::Base
   def create_linked_enrollment_for(observer)
     # we don't want to create a new observer enrollment if one exists
     return true if linked_enrollment_for(observer)
+    return false unless observer.can_be_enrolled_in_course?(course)
     enrollment = observer.observer_enrollments.build
     enrollment.associated_user_id = user_id
     enrollment.update_from(self)

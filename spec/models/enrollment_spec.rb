@@ -1493,7 +1493,7 @@ describe Enrollment do
   describe 'observing users' do
     before do
       @student = user(:active_all => true)
-      @parent = user(:active_all => true)
+      @parent = user_with_pseudonym(:active_all => true)
       @student.observers << @parent
     end
 
