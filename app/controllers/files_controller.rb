@@ -98,6 +98,7 @@ class FilesController < ApplicationController
 
   include Api::V1::Attachment
   include Api::V1::Avatar
+  include AttachmentHelper
 
   before_filter { |c| c.active_tab = "files" }
 
@@ -533,8 +534,7 @@ class FilesController < ApplicationController
       end
       format.json {
         render :json => attachment.as_json(options).tap { |json|
-          canvadoc_url = attachment.canvadoc_url(@current_user)
-          json['attachment']['canvadoc_session_url'] = canvadoc_url
+          json['attachment'].merge! doc_preview_json(attachment, @current_user)
         }
       }
     end

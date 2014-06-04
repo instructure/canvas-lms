@@ -1175,8 +1175,8 @@ class Assignment < ActiveRecord::Base
                       :cached_attachments, :attachments]
 
     attachment_fields = [:id, :comment_id, :content_type, :context_id, :context_type,
-                         :crocodoc_available?, :display_name, :filename, :mime_class,
-                         :scribd_doc, :scribdable?, :size, :submitter_id, :workflow_state]
+                         :display_name, :filename, :mime_class, :scribd_doc,
+                         :scribdable?, :size, :submitter_id, :workflow_state]
 
     res = as_json(
       :include => {
@@ -1244,7 +1244,10 @@ class Assignment < ActiveRecord::Base
                                              a.as_json(
                                                :only => attachment_fields,
                                                :methods => [:view_inline_ping_url, :scribd_render_url]
-                                             ).tap { |json| json[:attachment][:canvadoc_url] = a.canvadoc_url(user) }
+                                             ).tap { |json|
+                                               json[:attachment][:canvadoc_url] = a.canvadoc_url(user)
+                                               json[:attachment][:crocodoc_url] = a.crocodoc_url(user)
+                                             }
                                            end
                                          end
                                        end
