@@ -79,6 +79,17 @@ describe Polling::PollSubmission do
                                                                                             /can only submit one choice per poll session/)
     end
 
+    it "allows multiple submissions across multiple sessions" do
+      submission1 = Polling::PollSubmission.create!(poll: @poll, user: @student, poll_choice: @poll_choice, poll_session: @session)
+      submission1.should be_valid
+
+      session2 = Polling::PollSession.create!(poll: @poll, course: @course, course_section: @section)
+      session2.publish!
+
+      submission2 = Polling::PollSubmission.create!(poll: @poll, user: @student, poll_choice: @poll_choice, poll_session: session2)
+      submission2.should be_valid
+    end
+
     it "insures the associated poll session is published" do
       @session.close!
       lambda { Polling::PollSubmission.create!(poll: @poll,

@@ -18,7 +18,7 @@
 
 module Polling
   class PollSession < ActiveRecord::Base
-    attr_accessible :poll, :course, :course_section, :course_section_id, :has_public_results
+    attr_accessible :poll, :course, :course_section, :course_id, :course_section_id, :has_public_results
 
     belongs_to :course
     belongs_to :course_section

@@ -115,7 +115,7 @@ module Polling
     # @argument poll_sessions[][course_id] [Required, Integer]
     #   The id of the course this session is associated with.
     #
-    # @argument poll_sessions[][course_section_id] [Required, Integer]
+    # @argument poll_sessions[][course_section_id] [Optional, Integer]
     #   The id of the course section this session is associated with.
     #
     # @argument poll_sessions[][has_public_results] [Optional, Boolean]
@@ -135,8 +135,15 @@ module Polling
 
       raise ActiveRecord::RecordNotFound.new(I18n.t("polling.poll_sessions.errors.course_required", "Course is required.")) unless @course
 
+      if course_section_id = poll_session_params.delete(:course_section_id)
+        @course_section = @course.course_sections.find(course_section_id)
+      end
+
       @poll_session = @poll.poll_sessions.new(poll_session_params)
+
       @poll_session.course = @course
+      @poll_session.course_section = @course_section
+      @poll_session.has_public_results = false if poll_session_params[:has_public_results].blank?
 
       if authorized_action(@poll, @current_user, :create) && authorized_action(@course, @current_user, :update)
         if @poll_session.save
@@ -244,7 +251,7 @@ module Polling
     # @beta
     #
     # Lists all closed poll sessions available to the current user.
-    # 
+    #
     # @example_response
     #   {
     #     "poll_sessions": [PollSession]
