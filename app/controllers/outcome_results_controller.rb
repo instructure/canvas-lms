@@ -295,7 +295,7 @@ class OutcomeResultsController < ApplicationController
   private
 
   def user_rollups(opts = {})
-    @results = find_outcome_results(users: @users, context: @context, outcomes: @outcomes)
+    @results = find_outcome_results(users: @users, context: @context, outcomes: @outcomes).includes(:user)
     outcome_results_rollups(@results, @users)
   end
 
@@ -351,12 +351,12 @@ class OutcomeResultsController < ApplicationController
   end
 
   def include_alignments
-    alignments = @results.map(&:alignment).map(&:content).uniq
+    alignments = ContentTag.where(id: @results.map(&:content_tag_id)).includes(:content).map(&:content).uniq
     outcome_results_include_alignments_json(alignments)
   end
 
   def include_outcomes_alignments
-    alignments = @outcomes.map(&:alignments).flatten.map(&:content).uniq
+    alignments = ContentTag.learning_outcome_alignments.not_deleted.where(learning_outcome_id: @outcomes).includes(:content).map(&:content).uniq
     outcome_results_include_alignments_json(alignments)
   end
 
@@ -398,25 +398,27 @@ class OutcomeResultsController < ApplicationController
   end
 
   def require_outcomes
-    @outcome_groups = @context.learning_outcome_groups.includes(:child_outcome_links => :content)
-    @outcome_links = @outcome_groups.map{|x| x.child_outcome_links.active}.flatten
-    @outcomes = @outcome_links.map(&:content)
+    @outcome_groups = @context.learning_outcome_groups
+    outcome_group_ids = @outcome_groups.pluck(:id)
+    @outcome_links = ContentTag.learning_outcome_links.active.where(associated_asset_id: outcome_group_ids).includes(:learning_outcome_content)
     reject! "can't filter by both outcome_ids and outcome_group_id" if params[:outcome_ids] && params[:outcome_group_id]
     if params[:outcome_ids]
       outcome_ids = Api.value_to_array(params[:outcome_ids]).map(&:to_i).uniq
-      @outcomes = @outcomes.select{|x| outcome_ids.include?(x.id)}
+      @outcomes = @outcome_links.map(&:learning_outcome_content).select{ |outcome| outcome_ids.include?(outcome.id) }
       reject! "can only include id's of outcomes in the outcome context" if @outcomes.count != outcome_ids.count
     elsif params[:outcome_group_id]
-      outcome_group = @outcome_groups.where(id: params[:outcome_group_id].to_i).first
-      reject! "can only include an outcome group id in the outcome context" unless outcome_group
-      @outcomes = outcome_group.child_outcome_links.active.map(&:content)
+      group_id = params[:outcome_group_id].to_i
+      reject! "can only include an outcome group id in the outcome context" unless outcome_group_ids.include?(group_id)
+      @outcomes = @outcome_links.where(associated_asset_id: group_id).map(&:learning_outcome_content)
+    else
+      @outcomes = @outcome_links.map(&:learning_outcome_content)
     end
   end
 
   def build_outcome_paths
     @outcome_paths = @outcome_links.map do |link|
-      parts = outcome_group_prefix(link.associated_asset).push({name: link.content.title})
-      {id: link.content.id, parts: parts}
+      parts = outcome_group_prefix(link.associated_asset).push({name: link.learning_outcome_content.title})
+      {id: link.learning_outcome_content.id, parts: parts}
     end
   end
 
