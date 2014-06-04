@@ -96,6 +96,14 @@ describe Polling::PollSubmissionsController, type: :request do
         submission.poll_choice.should == @selected
       end
 
+      it "is invalid if the poll choice does not exist" do
+        student_in_course(active_all: true, course: @course)
+        post_create({filler: true}, true)
+
+        response.code.should == "404"
+        response.body.should =~ /The specified resource does not exist/
+      end
+
       it "doesn't submit if the student isn't enrolled in the specified section" do
         section = @course.course_sections.create!(name: 'Some Course Section')
         @session.course_section = section

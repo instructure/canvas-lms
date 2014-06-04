@@ -224,6 +224,20 @@ describe Polling::PollSessionsController, type: :request do
         @poll.poll_sessions.first.course_section.should == @section
         @poll.poll_sessions.first.has_public_results.should be_true
       end
+
+      it "defaults has_public_results to false if has_public_results is blank" do
+        post_create(course_section_id: @section.id, course_id: @course.id, has_public_results: "")
+        @poll.poll_sessions.size.should == 1
+        @poll.poll_sessions.first.course_section.should == @section
+        @poll.poll_sessions.first.has_public_results.should be_false
+      end
+
+      it "returns an error if the supplied course section is invalid" do
+        post_create({course_section_id: @section.id + 666, course_id: @course.id}, true)
+
+        response.code.should == "404"
+        response.body.should =~ /The specified resource does not exist/
+      end
     end
   end
 
@@ -253,6 +267,19 @@ describe Polling::PollSessionsController, type: :request do
         @poll_session.reload
         @poll_session.course_section.id.should == section.id
         @poll_session.has_public_results.should be_true
+      end
+
+      it "updates courses and sections gracefully" do
+        new_course = Course.create!(name: 'New Course')
+        new_course.enroll_teacher(@teacher)
+        new_section = new_course.course_sections.create!(name: 'Another nother section')
+
+        new_course.should_not == @course
+
+        put_update(course_section_id: new_section.id, course_id: new_course.id)
+        @poll_session.reload
+        @poll_session.course.should == new_course
+        @poll_session.course_section.should == new_section
       end
     end
 

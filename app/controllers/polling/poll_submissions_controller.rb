@@ -91,7 +91,9 @@ module Polling
       @poll_submission = @poll_session.poll_submissions.new
       @poll_submission.poll = @poll
       @poll_submission.user = @current_user
-      @poll_submission.poll_choice = @poll.poll_choices.find(poll_submission_params[:poll_choice_id])
+
+      poll_choice = @poll.poll_choices.find(poll_submission_params[:poll_choice_id])
+      @poll_submission.poll_choice = poll_choice
 
       if authorized_action(@poll_submission, @current_user, :submit)
         if @poll_submission.save
