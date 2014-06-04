@@ -659,6 +659,10 @@ class AssignmentsApiController < ApplicationController
   #   (Only useful if 'draft state' account setting is on)
   #   Unpublished assignments are not visible to students.
   #
+  # @argument assignment[grading_standard_id] [Optional, Integer]
+  #   The grading standard id to set for the course.  If no value is provided for this argument the current grading_standard will be un-set from this course.
+  #   This will update the grading_type for the course to 'letter_grade' unless it is already 'gpa_scale'.
+  #
   # @returns Assignment
   def create
     @assignment = @context.assignments.build
@@ -669,8 +673,129 @@ class AssignmentsApiController < ApplicationController
   end
 
   # @API Edit an assignment
-  # Modify an existing assignment. See the documentation for assignment
-  # creation.
+  # Modify an existing assignment.
+  #
+  # @argument assignment[name] [Optional, String] The assignment name.
+  #
+  # @argument assignment[position] [Optional, Integer]
+  #   The position of this assignment in the group when displaying
+  #   assignment lists.
+  #
+  # @argument assignment[submission_types][] [Optional, String, "online_quiz"|"none"|"on_paper"|"online_quiz"|"discussion_topic"|"external_tool"|"online_upload"|"online_text_entry"|"online_url"|"media_recording"]
+  #   List of supported submission types for the assignment.
+  #   Unless the assignment is allowing online submissions, the array should
+  #   only have one element.
+  #
+  #   If not allowing online submissions, your options are:
+  #     "online_quiz"
+  #     "none"
+  #     "on_paper"
+  #     "online_quiz"
+  #     "discussion_topic"
+  #     "external_tool"
+  #
+  #   If you are allowing online submissions, you can have one or many
+  #   allowed submission types:
+  #
+  #     "online_upload"
+  #     "online_text_entry"
+  #     "online_url"
+  #     "media_recording" (Only valid when the Kaltura plugin is enabled)
+  #
+  # @argument assignment[allowed_extensions][] [Optional, String]
+  #   Allowed extensions if submission_types includes "online_upload"
+  #
+  #   Example:
+  #     allowed_extensions: ["docx","ppt"]
+  #
+  # @argument assignment[turnitin_enabled] [Optional, Boolean]
+  #   Only applies when the Turnitin plugin is enabled for a course and
+  #   the submission_types array includes "online_upload".
+  #   Toggles Turnitin submissions for the assignment.
+  #   Will be ignored if Turnitin is not available for the course.
+  #
+  # @argument assignment[turnitin_settings] [Optional]
+  #   Settings to send along to turnitin. See Assignment object definition for
+  #   format.
+  #
+  # @argument assignment[peer_reviews] [Optional, Boolean]
+  #   If submission_types does not include external_tool,discussion_topic,
+  #   online_quiz, or on_paper, determines whether or not peer reviews
+  #   will be turned on for the assignment.
+  #
+  # @argument assignment[automatic_peer_reviews] [Optional, Boolean]
+  #   Whether peer reviews will be assigned automatically by Canvas or if
+  #   teachers must manually assign peer reviews. Does not apply if peer reviews
+  #   are not enabled.
+  #
+  # @argument assignment[notify_of_update] [Optional, Boolean]
+  #   If true, Canvas will send a notification to students in the class
+  #   notifying them that the content has changed.
+  #
+  # @argument assignment[group_category_id] [Optional, Integer]
+  #   If present, the assignment will become a group assignment assigned
+  #   to the group.
+  #
+  # @argument assignment[grade_group_students_individually] [Optional, Integer]
+  #   If this is a group assignment, teachers have the options to grade
+  #   students individually. If false, Canvas will apply the assignment's
+  #   score to each member of the group. If true, the teacher can manually
+  #   assign scores to each member of the group.
+  #
+  # @argument assignment[external_tool_tag_attributes] [Optional]
+  #   Hash of attributes if submission_types is ["external_tool"]
+  #   Example:
+  #     external_tool_tag_attributes: {
+  #       // url to the external tool
+  #       url: "http://instructure.com",
+  #       // create a new tab for the module, defaults to false.
+  #       new_tab: false
+  #     }
+  #
+  # @argument assignment[points_possible] [Optional, Float]
+  #   The maximum points possible on the assignment.
+  #
+  # @argument assignment[grading_type] [Optional, "pass_fail"|"percent"|"letter_grade"|"gpa_scale"|"points"]
+  #  The strategy used for grading the assignment.
+  #  The assignment is ungraded if this field is omitted.
+  #
+  # @argument assignment[due_at] [Optional, Timestamp]
+  #   The day/time the assignment is due.
+  #   Accepts times in ISO 8601 format, e.g. 2014-10-21T18:48:00Z.
+  #
+  # @argument assignment[lock_at] [Optional, Timestamp]
+  #   The day/time the assignment is locked after.
+  #   Accepts times in ISO 8601 format, e.g. 2014-10-21T18:48:00Z.
+  #
+  # @argument assignment[unlock_at] [Optional, Timestamp]
+  #   The day/time the assignment is unlocked.
+  #   Accepts times in ISO 8601 format, e.g. 2014-10-21T18:48:00Z.
+  #
+  # @argument assignment[description] [Optional, String]
+  #   The assignment's description, supports HTML.
+  #
+  # @argument assignment[assignment_group_id] [Optional, Integer]
+  #   The assignment group id to put the assignment in.
+  #   Defaults to the top assignment group in the course.
+  #
+  # @argument assignment[muted] [Optional, Boolean]
+  #   Whether this assignment is muted.
+  #   A muted assignment does not send change notifications
+  #   and hides grades from students.
+  #   Defaults to false.
+  #
+  # @argument assignment[assignment_overrides][] [Optional, AssignmentOverride]
+  #   List of overrides for the assignment.
+  #   NOTE: The assignment overrides feature is in beta.
+  #
+  # @argument assignment[only_visible_to_overrides] [Optional, Boolean]
+  #   Whether this assignment is only visible to overrides
+  #   (Only useful if 'differentiated assignments' account setting is on)
+  #
+  # @argument assignment[published] [Optional, Boolean]
+  #   Whether this assignment is published.
+  #   (Only useful if 'draft state' account setting is on)
+  #   Unpublished assignments are not visible to students.
   #
   # @argument assignment[grading_standard_id] [Optional, Integer]
   #   The grading standard id to set for the course.  If no value is provided for this argument the current grading_standard will be un-set from this course.
