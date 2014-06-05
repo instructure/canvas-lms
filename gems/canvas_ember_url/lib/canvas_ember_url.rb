@@ -14,6 +14,10 @@ module CanvasEmberUrl
       "#{course_quizzes_url}#{headless}#/#{id}"
     end
 
+    def course_quiz_preview_url(id)
+      "#{course_quiz_url(id)}/preview"
+    end
+
     def course_quiz_moderate_url(id)
       "#{course_quiz_url(id)}/moderate"
     end

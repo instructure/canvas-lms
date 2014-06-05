@@ -1,10 +1,11 @@
 define [
   'ember'
+  '../mixins/legacy_submission_html'
   'i18n!quiz'
   'jquery'
   '../shared/environment'
   'compiled/jquery.rails_flash_notifications'
-], (Ember, I18n, $, env) ->
+], (Ember, LegacySubmissions, I18n, $, env) ->
 
   updateAllDates = (field) ->
     date = new Date()
@@ -18,9 +19,7 @@ define [
     promises.pushObject(@get('model').save())
     Ember.RSVP.all promises
 
-  QuizController = Ember.ObjectController.extend
-    legacyQuizSubmissionVersionsReady: Ember.computed.and('quizSubmissionVersionsHtml', 'didLoadQuizSubmissionVersionsHtml')
-
+  QuizController = Ember.ObjectController.extend LegacySubmissions,
     disabledMessage: I18n.t('cant_unpublish_when_students_submit', "Can't unpublish if there are student submissions")
 
     # preserve 'publishing' state by not directly binding to published attr
@@ -186,8 +185,8 @@ define [
 
     # Kind of a gross hack so we can get quiz arrows in...
     addLegacyJS: (->
-      return unless @get('quizSubmissionHTML.html')
+      return unless @get('quizSubmissionHtml.html')
       Ember.$(document.body).append """
         <script src="/javascripts/compiled/bundles/quiz_show.js"></script>
       """
-    ).observes('quizSubmissionHTML.html')
+    ).observes('quizSubmissionHtml.html')

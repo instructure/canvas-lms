@@ -1,10 +1,19 @@
 <div class="quiz-overview">
-  {{#if description}}
-  <div class="row-fluid">
-    <div class="span12 quiz-description user_content">
-      {{{description}}}
+  {{#if isPreview}}
+    <div class="quiz-preview">
+      <h3>
+        <i class="icon-warning" aria-label="Warning"></i>
+        {{#t 'preview_of_draft_version'}}This is a preview of the draft version of the quiz{{/t}}
+      </h3>
     </div>
-  </div>
+  {{/if}}
+
+  {{#if description}}
+    <div class="row-fluid">
+      <div class="span12 quiz-description user_content">
+        {{{description}}}
+      </div>
+    </div>
   {{/if}}
 
   <div class="row-fluid quiz-attributes quiz-attributes-teacher">

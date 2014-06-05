@@ -78,36 +78,8 @@ define [
         when 'practice_quiz' then I18n.t 'practice_quiz', 'Practice Quiz'
     ).property('quizType')
 
-    # temporary until we ship the show page with quiz submission info in ember
-    quizSubmissionHtmlURL: attr()
-    quizSubmissionHTML: (->
-      promise = ajax(
-        url: @get 'quizSubmissionHtmlURL'
-        dataType: 'html'
-        contentType: 'text/html'
-        headers:
-          Accept: 'text/html'
-      ).then (html) =>
-        @set 'didLoadQuizSubmissionHTML', true
-        { html: html }
-      PromiseObject.create promise: promise
-    ).property('quizSubmissionHtmlURL')
-
-    # temporary until we ship the quiz submission versions in ember
+    quizSubmissionHtmlUrl: attr()
     quizSubmissionVersionsHtmlUrl: attr()
-    quizSubmissionVersionsHtml: (->
-      return unless @get 'quizSubmissionVersionsHtmlUrl'
-      promise = ajax(
-        url: @get 'quizSubmissionVersionsHtmlUrl'
-        dataType: 'html'
-        contentType: 'text/html'
-        headers:
-          Accept: 'text/html'
-      ).then (html) =>
-        @set 'didLoadQuizSubmissionVersionsHtml', true
-        { html: html }
-      PromiseObject.create promise: promise
-    ).property('quizSubmissionVersionsHtmlUrl')
 
     quizStatistics: hasMany 'quiz_statistics', async: true
     quizReports: hasMany 'quiz_report', async: true

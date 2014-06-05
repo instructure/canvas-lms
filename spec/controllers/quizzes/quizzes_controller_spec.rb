@@ -382,6 +382,13 @@ describe Quizzes::QuizzesController do
       get 'show', :course_id => @course.id, :id => @quiz.id, :headless => 1
       assert_redirected_to ember_urls.course_quiz_url(@quiz.id, headless: 1)
     end
+
+    it "should redirect to preview ember quiz stats app" do
+      a = Account.default
+      a.feature_enabled?(:quiz_stats).should eql true
+      get 'show', :course_id => @course.id, :id => @quiz.id, :preview => 1
+      assert_redirected_to ember_urls.course_quiz_preview_url(@quiz.id)
+    end
   end
 
   describe "GET 'managed_quiz_data'" do

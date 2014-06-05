@@ -103,7 +103,14 @@ class Quizzes::QuizzesController < ApplicationController
     if @context.feature_enabled?(:quiz_stats) &&
        @context.feature_enabled?(:draft_state) &&
        !params.key?(:take)
-      redirect_to ember_urls.course_quiz_url(@quiz.id, headless: params[:headless])
+
+      ember_url = if params[:preview]
+        ember_urls.course_quiz_preview_url(@quiz.id)
+      else
+        ember_urls.course_quiz_url(@quiz.id, headless: params[:headless])
+      end
+
+      redirect_to ember_url
       return
     end
 

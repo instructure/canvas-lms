@@ -32,12 +32,19 @@
     margin-right: 25px;
   }
 
-  .lock-explanation {
-    background-color: #F8FAFB;
+  .lock-explanation,
+  .quiz-preview {
+    margin: 0 20px 25px;
     border: 1px solid #D1D3D7;
     border-radius: 7px;
-    margin: 0 20px 25px;
+    background-color: #F8FAFB;
     padding: 8px 20px;
+  }
+  .lock-explanation {
+  }
+  .quiz-preview {
+    margin: 0 0 25px 0;
+    padding: 0 20px;
   }
 
   //===== Tabs ===
@@ -48,7 +55,7 @@
 
     ol li {
       border: 1px solid transparent;
-      border-bottom-width: 0;
+      border-bottom: 1px solid #CAD0D7;
       background: white;
       position: relative;
       display: inline-block;

@@ -46,6 +46,12 @@ describe CanvasEmberUrl::UrlMappings do
       end
     end
 
+    describe "#course_quiz_preview_url" do
+      it "should build the base url passed in" do
+        mappings.course_quiz_preview_url(1).should == "#{course_quizzes}#/1/preview"
+      end
+    end
+
     describe "#course_quiz_moderate_url" do
       it "should build the base url passed in" do
         mappings.course_quiz_moderate_url(1).should == "#{course_quizzes}#/1/moderate"
