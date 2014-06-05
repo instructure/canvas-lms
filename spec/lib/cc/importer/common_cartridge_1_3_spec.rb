@@ -94,32 +94,36 @@ describe "Standard Common Cartridge importing" do
 
   context 'flat manifest with qti' do
     before(:all) do
-      pending unless Qti.qti_enabled?
+      if Qti.qti_enabled?
+        archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/cc_inline_qti.zip")
+        unzipped_file_path = File.join(File.dirname(archive_file_path), "cc_#{File.basename(archive_file_path, '.zip')}", 'oi')
+        @export_folder = File.join(File.dirname(archive_file_path), "cc_inline_qti")
+        @converter = CC::Importer::Standard::Converter.new(:export_archive_path=>archive_file_path, :course_name=>'oi', :base_download_dir=>unzipped_file_path)
+        @converter.export
+        @course_data = @converter.course.with_indifferent_access
+        @course_data['all_files_export'] ||= {}
+        @course_data['all_files_export']['file_path'] = @course_data['all_files_zip']
 
-      archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/cc_inline_qti.zip")
-      unzipped_file_path = File.join(File.dirname(archive_file_path), "cc_#{File.basename(archive_file_path, '.zip')}", 'oi')
-      @export_folder = File.join(File.dirname(archive_file_path), "cc_inline_qti")
-      @converter = CC::Importer::Standard::Converter.new(:export_archive_path=>archive_file_path, :course_name=>'oi', :base_download_dir=>unzipped_file_path)
-      @converter.export
-      @course_data = @converter.course.with_indifferent_access
-      @course_data['all_files_export'] ||= {}
-      @course_data['all_files_export']['file_path'] = @course_data['all_files_zip']
-
-      @course = course
-      @migration = ContentMigration.create(:context => @course)
-      @migration.migration_settings[:migration_ids_to_import] = {:copy => {}}
-      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
+        @course = course
+        @migration = ContentMigration.create(:context => @course)
+        @migration.migration_settings[:migration_ids_to_import] = {:copy => {}}
+        Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
+      end
     end
 
     after(:all) do
-      @converter.delete_unzipped_archive
-      if File.exists?(@export_folder)
-        FileUtils::rm_rf(@export_folder)
+      if @converter
+        @converter.delete_unzipped_archive
+        if File.exists?(@export_folder)
+          FileUtils::rm_rf(@export_folder)
+        end
+        truncate_all_tables
       end
-      truncate_all_tables
     end
 
     it "should import assessments from qti inside the manifest" do
+      pending unless Qti.qti_enabled?
+
       @migration.migration_issues.count.should == 0
 
       @course.quizzes.count.should == 1
