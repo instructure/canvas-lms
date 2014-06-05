@@ -4,7 +4,8 @@ define [
   '../environment_setup'
   '../shared_ajax_fixtures'
   '../test_redirection'
-], (Ember, startApp, env, fixtures, testRedirection) ->
+  '../test_title'
+], (Ember, startApp, env, fixtures, testRedirection, testTitle) ->
   App = null
 
   {$} = Ember

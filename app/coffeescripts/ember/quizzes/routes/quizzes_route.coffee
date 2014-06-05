@@ -1,7 +1,9 @@
 define [
   'ember'
-  '../shared/environment'
-], (Ember, env) ->
+  '../shared/environment',
+  'i18n!quizzes_route',
+  '../shared/title_builder'
+], (Ember, env, I18n, titleBuilder) ->
 
   QuizzesRoute = Ember.Route.extend
 
@@ -17,3 +19,7 @@ define [
         perms.create = @store.metadataFor('quiz').permissions.quizzes.create
         env.set 'env.PERMISSIONS', perms
         quizzes
+
+    afterModel: ->
+      title = I18n.t('quizzes_route_title', 'Quizzes')
+      titleBuilder([title])

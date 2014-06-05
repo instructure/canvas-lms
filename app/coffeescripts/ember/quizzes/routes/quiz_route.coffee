@@ -3,7 +3,8 @@ define [
   '../mixins/redirect'
   '../shared/environment'
   'i18n!quiz_route'
-], (Ember, Redirect, env, I18n) ->
+  '../shared/title_builder'
+], (Ember, Redirect, env, I18n, titleBuilder) ->
 
   QuizRoute = Ember.Route.extend Redirect,
 
@@ -11,6 +12,7 @@ define [
     afterModel: (quiz, transition) ->
       # set the quiz in the env so that we can use it for nested routes
       env.set("quizId", quiz.id)
+      titleBuilder([quiz.get('title')])
 
       if quiz.get("deleted")
         quiz.unloadRecord()

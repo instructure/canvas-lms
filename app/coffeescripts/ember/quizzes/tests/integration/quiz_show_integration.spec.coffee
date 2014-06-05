@@ -5,8 +5,9 @@ define [
   '../environment_setup'
   'ic-ajax'
   'jquery'
+  '../test_title'
   'jqueryui/dialog'
-], (Ember, startApp, fixtures, env, ajax, $) ->
+], (Ember, startApp, fixtures, env, ajax, $, testTitle) ->
   App = null
 
   QUIZ = fixtures.QUIZZES[0]
@@ -25,6 +26,10 @@ define [
   testShowPage = (desc, callback) ->
     test desc, ->
       visit('/1').then callback
+
+  testTitle
+    path: '/1',
+    title: 'Alt practice test: Overview'
 
   testShowPage 'shows attributes', ->
     html = find('#quiz-show').html()
@@ -147,4 +152,3 @@ define [
 
   testShowPage 'doesnt show tabs', ->
     ok !find('#quiz-show-tabs').length, "should not have tabs"
-
