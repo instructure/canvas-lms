@@ -74,7 +74,7 @@ define [
     ).property('scoringPolicy')
     tQuizType: (->
       switch @get('quizType')
-        when 'assignment' then I18n.t 'assignment', 'Assignment'
+        when 'assignment' then I18n.t 'graded_quiz', 'Graded Quiz'
         when 'survey' then I18n.t 'survey', 'Survey'
         when 'graded_survey' then I18n.t 'graded_survey', 'Graded Survey'
         when 'practice_quiz' then I18n.t 'practice_quiz', 'Practice Quiz'
