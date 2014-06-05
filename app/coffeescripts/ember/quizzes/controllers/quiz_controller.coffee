@@ -5,6 +5,7 @@ define [
   'jquery'
   '../shared/environment'
   'compiled/jquery.rails_flash_notifications'
+  'compiled/bundles/submission_download'
 ], (Ember, LegacySubmissions, I18n, $, env) ->
 
   updateAllDates = (field) ->
@@ -36,6 +37,10 @@ define [
     speedGraderActive: (->
       @get('studentQuizSubmissions.length')
     ).property('studentQuizSubmissions.length')
+
+    downloadActive: (->
+      !!@get('quizSubmissionsZipUrl')
+    ).property('quizSubmissionsZipUrl')
 
     takeQuizActive: (->
       @get('published') and @get('takeable') and !@get('lockedForUser')
@@ -143,6 +148,12 @@ define [
 
       moderateQuiz: ->
         window.location = @get 'moderateUrl'
+
+      downloadFiles: ->
+        if @get 'downloadActive'
+          INST.downloadSubmissions(@get('quizSubmissionsZipUrl'))
+        else
+          $.flashWarning I18n.t('there_are_no_files_to_download', 'There are no files to download.')
 
       showStudentResults: ->
         @replaceRoute 'quiz.moderate'

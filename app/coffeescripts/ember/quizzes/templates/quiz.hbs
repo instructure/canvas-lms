@@ -78,10 +78,24 @@
             {{/if}}
           {{/ic-menu-item}}
 
-          {{#ic-menu-item on-select="showStudentResults"}}
-            <i class="icon-group"></i>
-            {{#t 'show_quiz_results'}}Show Student Quiz Results{{/t}}
+          {{#ic-menu-item on-select="downloadFiles" classBinding="downloadActive::disabled"}}
+            <i class="icon-download"></i>
+            {{#if downloadActive}}
+              {{#t "download_all_files"}}Download All Files{{/t}}
+            {{else}}
+              <span class="disabled">
+                {{#t "download_all_files"}}Download All Files{{/t}}
+                <span class="screenreader-only">{{#t "option_is_disabled"}}this option is disabled{{/t}}</span>
+              </span>
+            {{/if}}
           {{/ic-menu-item}}
+
+          {{#unless moderateEnabled}}
+            {{#ic-menu-item on-select="showStudentResults"}}
+              <i class="icon-group"></i>
+              {{#t 'show_quiz_results'}}Show Student Quiz Results{{/t}}
+            {{/ic-menu-item}}
+          {{/unless}}
 
           {{#if lockAt}}
             {{#ic-menu-item class="js-due-date-toggler" on-select="unlock"}}
