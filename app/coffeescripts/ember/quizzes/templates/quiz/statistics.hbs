@@ -1,40 +1,44 @@
 <div id="quiz-statistics">
-  {{! Summary Statistics section}}
-  <section>
-    {{render "quiz/statistics/summary" controller}}
-  </section>
+  {{#if emptyStatistics}}
+    {{partial "quiz/statistics/empty"}}
+  {{else}}
+    {{! Summary Statistics section}}
+    <section>
+      {{render "quiz/statistics/summary" controller}}
+    </section>
 
-  {{! Question Statistics section}}
-  <section id="question-statistics-section">
-    <header class="padded">
-      <h3 class="section-title inline">{{t 'question_breakdown' 'Question Breakdown'}}</h3>
+    {{! Question Statistics section}}
+    <section id="question-statistics-section">
+      <header class="padded">
+        <h3 class="section-title inline">{{t 'question_breakdown' 'Question Breakdown'}}</h3>
 
-      <aside class="pull-right">
-        <button {{action "showAllDetails"}} class="btn">
-          <i {{bind-attr class="allDetailsVisible:icon-collapse:icon-expand"}}></i>
-        </button>
-        {{#ic-menu}}
-          {{#ic-menu-trigger}}
-            <button class="btn">
-              <span>{{controller.sortLabel}}</span>
-              <i class="icon-mini-arrow-down"></i>
-            </button>
-          {{/ic-menu-trigger}}
-          {{#ic-menu-list}}
-            {{#ic-menu-item on-select="sortByPosition"}}
-              {{#t "sort_by_position"}}By Position{{/t}}
-            {{/ic-menu-item}}
+        <aside class="pull-right">
+          <button {{action "showAllDetails"}} class="btn">
+            <i {{bind-attr class="allDetailsVisible:icon-collapse:icon-expand"}}></i>
+          </button>
+          {{#ic-menu}}
+            {{#ic-menu-trigger}}
+              <button class="btn">
+                <span>{{controller.sortLabel}}</span>
+                <i class="icon-mini-arrow-down"></i>
+              </button>
+            {{/ic-menu-trigger}}
+            {{#ic-menu-list}}
+              {{#ic-menu-item on-select="sortByPosition"}}
+                {{#t "sort_by_position"}}By Position{{/t}}
+              {{/ic-menu-item}}
 
-            {{#ic-menu-item on-select="sortByDiscriminationIndex"}}
-              {{#t "sort_by_discrimination_index"}}By Discrimination Index{{/t}}
-            {{/ic-menu-item}}
-          {{/ic-menu-list}}
-        {{/ic-menu}}
-      </aside>
-    </header>
+              {{#ic-menu-item on-select="sortByDiscriminationIndex"}}
+                {{#t "sort_by_discrimination_index"}}By Discrimination Index{{/t}}
+              {{/ic-menu-item}}
+            {{/ic-menu-list}}
+          {{/ic-menu}}
+        </aside>
+      </header>
 
-    {{#each item in questionStatistics}}
-      {{polyRender item.renderableType item prefix="quiz/statistics/questions/"}}
-    {{/each}}
-  </section>
+      {{#each item in questionStatistics}}
+        {{polyRender item.renderableType item prefix="quiz/statistics/questions/"}}
+      {{/each}}
+    </section>
+  {{/if}}
 </div>

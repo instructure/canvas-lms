@@ -39,3 +39,8 @@ define [
     path: '/1/statistics'
     defaultRoute: 'quiz.statistics'
     redirectRoute: 'quiz.show'
+
+  test 'it shows up empty if there are no submissions', ->
+    env.setUserPermissions(true, true)
+    visit('/3/statistics').then ->
+      equal find('.empty-statistics').length, 1

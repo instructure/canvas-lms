@@ -44,6 +44,8 @@ define [ 'ember', 'compiled/behaviors/tooltip' ], (Ember) ->
           @tooltip.options.content().remove()
           @tooltip.destroy()
 
+        return if @isDestroying
+
         @tooltip = @createTooltip()
         @$progressBar = @tooltip.options.content().find('.bar')
     ).observes('controller.file')
@@ -64,6 +66,8 @@ define [ 'ember', 'compiled/behaviors/tooltip' ], (Ember) ->
 
     tickProgressBar: (->
       run.schedule 'afterRender', this, ->
+        return if @isDestroying
+
         @repositionTooltip()
         @$progressBar.css {
           width: "#{@get('controller.progress.completion')}%"

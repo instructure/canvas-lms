@@ -24,10 +24,18 @@ define [
           I18n.t('sort_by_discrimination_index', 'Sort By Discrimination')
     ).property('questionStatistics.sortProperties')
 
+    imageAltLabel: (->
+      I18n.t('empty_stats.image_alt', 'Quiz statistics not available yet.')
+    ).property()
+
     discriminationIndexHelpDialogTitle: (->
       I18n.t('discrimination_index_help_dialog_title',
         'The Discrimination Index Chart')
     ).property()
+
+    emptyStatistics: (->
+      @get('uniqueCount') < 1
+    ).property('uniqueCount')
 
     populateQuestionStatistics: (->
       @set('questionStatistics.content', @get('model.questionStatistics'))

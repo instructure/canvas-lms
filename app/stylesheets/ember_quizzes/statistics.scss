@@ -38,6 +38,22 @@ $muteTextColor: #949494;
       }
     }
   }
+
+  .empty-statistics {
+    text-align: center;
+
+    img {
+      height: 35px;
+      width: 218px;
+    }
+
+    h3 {
+      font-weight: bold;
+      margin-bottom: 0;
+      line-height: 22px;
+      font-size: 14.5px;
+    }
+  }
 }
 
 #question-statistics-section {
