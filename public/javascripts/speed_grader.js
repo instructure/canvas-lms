@@ -296,7 +296,7 @@ define([
 
 
       $menu.find('ul').append($.map(jsonData.context.active_course_sections, function(section, i){
-        return '<li><a class="section_' + section.id + '" data-section-id="'+ section.id +'" href="#">'+ section.name  +'</a></li>';
+        return '<li><a class="section_' + section.id + '" data-section-id="'+ section.id +'" href="#">'+ htmlEscape(section.name) +'</a></li>';
       }).join(''));
 
       $menu.insertBefore($selectmenu_list).bind('mouseenter mouseleave', function(event){
@@ -1405,13 +1405,13 @@ define([
 
         $rubric_assessments_select.find("option").remove();
         $.each(this.currentStudent.rubric_assessments, function(){
-          $rubric_assessments_select.append('<option value="' + this.id + '">' + this.assessor_name + '</option>');
+          $rubric_assessments_select.append('<option value="' + this.id + '">' + htmlEscape(this.assessor_name) + '</option>');
         });
 
         // show a new option if there is not an assessment by me
         // or, if I can :manage_course, there is not an assessment already with assessment_type = 'grading'
         if( !assessmentsByMe.length || (ENV.RUBRIC_ASSESSMENT.assessment_type == 'grading' && !gradingAssessments.length) ) {
-          $rubric_assessments_select.append('<option value="new">' + I18n.t('new_assessment', '[New Assessment]') + '</option>');
+          $rubric_assessments_select.append('<option value="new">' + htmlEscape(I18n.t('new_assessment', '[New Assessment]')) + '</option>');
         }
 
         //select the assessment that meets these rules:
