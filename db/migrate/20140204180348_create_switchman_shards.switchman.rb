@@ -14,7 +14,10 @@ class CreateSwitchmanShards < ActiveRecord::Migration
         t.boolean :default, :default => false, :null => false
       end
     end
-    add_column :switchman_shards, :settings, :text
+
+    unless column_exists?(:switchman_shards, :settings)
+      add_column :switchman_shards, :settings, :text
+    end
   end
 
   def self.down
