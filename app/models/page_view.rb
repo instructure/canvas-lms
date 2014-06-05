@@ -28,7 +28,7 @@ class PageView < ActiveRecord::Base
   before_save :ensure_account
   before_save :cap_interaction_seconds
   belongs_to :context, :polymorphic => true
-  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account', 'Group', 'User']
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account', 'Group', 'User', 'UserProfile']
 
   EXPORTABLE_ATTRIBUTES = [
     :request_id, :session_id, :user_id, :url, :context_id, :context_type, :asset_id, :asset_type, :controller, :action, :interaction_seconds, :created_at, :updated_at,
