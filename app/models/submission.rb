@@ -70,6 +70,7 @@ class Submission < ActiveRecord::Base
   scope :before, lambda { |date| where("submissions.created_at<?", date) }
   scope :submitted_before, lambda { |date| where("submitted_at<?", date) }
   scope :submitted_after, lambda { |date| where("submitted_at>?", date) }
+  scope :with_point_data, where("submissions.score IS NOT NULL OR submissions.grade IS NOT NULL")
 
   scope :for_context_codes, lambda { |context_codes| where(:context_code => context_codes) }
 
@@ -1076,6 +1077,10 @@ class Submission < ActiveRecord::Base
         :workflow_state => "unread",
       })
     end
+  end
+
+  def point_data?
+    !!(self.score || self.grade)
   end
 
   def read_state(current_user)

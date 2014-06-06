@@ -19,6 +19,63 @@ describe "courses" do
       account.save!
     end
 
+    context 'draft state' do
+
+      before(:each) do
+        course_with_teacher_logged_in({draft_state: true})
+      end
+
+      def validate_action_button(postion, validation_text)
+        action_button = ff('#course_status_actions button').send(postion)
+        action_button.should have_class('disabled')
+        action_button.text.should == validation_text
+      end
+
+      it "should allow publishing of the course through the course status actions" do
+        @course.workflow_state = 'claimed'
+        @course.save!
+        get "/courses/#{@course.id}"
+        course_status_buttons = ff('#course_status_actions button')
+        f('.publish_course_in_wizard_link').should be_displayed
+        course_status_buttons.first.should have_class('disabled')
+        course_status_buttons.first.text.should == 'Unpublished'
+        course_status_buttons.last.should_not have_class('disabled')
+        course_status_buttons.last.text.should == 'Publish'
+        expect_new_page_load { course_status_buttons.last.click }
+        f('.publish_course_in_wizard_link').should be_nil
+        validate_action_button(:last, 'Published')
+      end
+
+      it "should allow unpublishing of a course through the course status actions" do
+        get "/courses/#{@course.id}"
+        course_status_buttons = ff('#course_status_actions button')
+        f('.publish_course_in_wizard_link').should be_nil
+        course_status_buttons.first.should_not have_class('disabled')
+        course_status_buttons.first.text.should == 'Unpublish'
+        course_status_buttons.last.should have_class('disabled')
+        course_status_buttons.last.text.should == 'Published'
+        expect_new_page_load { course_status_buttons.first.click }
+        f('.publish_course_in_wizard_link').should be_displayed
+        validate_action_button(:first, 'Unpublished')
+      end
+
+      it "should not show course status if graded submissions exist" do
+        course_with_student_submissions({submission_points: true, draft_state: true})
+        get "/courses/#{@course.id}"
+        f('#course_status').should be_nil
+      end
+
+      it "should allow unpublishing of the course if submissions have no score or grade" do
+        course_with_student_submissions({draft_state: true})
+        get "/courses/#{@course.id}"
+        course_status_buttons = ff('#course_status_actions button')
+        expect_new_page_load { course_status_buttons.first.click }
+        assert_flash_notice_message('successfully updated')
+        validate_action_button(:first, 'Unpublished')
+      end
+
+    end
+
     it "should properly hide the wizard and remember its hidden state" do
       course_with_teacher_logged_in
 

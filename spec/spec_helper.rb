@@ -686,6 +686,17 @@ end
     user_session(@user)
   end
 
+  def course_with_student_submissions(opts={})
+    course_with_teacher_logged_in(opts)
+    student_in_course
+    submission_count = opts[:submissions] || 1
+    submission_count.times do |s|
+      assignment = @course.assignments.create!(:title => "test #{s} assignment")
+      submission = assignment.submissions.create!(:assignment_id => assignment.id, :user_id => @student.id)
+      submission.update_attributes!(score: '5') if opts[:submission_points]
+    end
+  end
+
   def set_course_draft_state(enabled=true, opts={})
     course = opts[:course] || @course
     account = opts[:account] || course.account

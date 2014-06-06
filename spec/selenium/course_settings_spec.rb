@@ -35,6 +35,26 @@ describe "course settings" do
       f('.grading_scheme_set').should include_text @standard.title
     end
 
+    it 'should show the correct course status when published' do
+      get "/courses/#{@course.id}/settings"
+      f('#course-status').text.should == 'Course is Published'
+    end
+
+    it 'should show the correct course status when unpublished' do
+      @course.workflow_state = 'claimed'
+      @course.save!
+      get "/courses/#{@course.id}/settings"
+      f('#course-status').text.should == 'Course is Unpublished'
+    end
+
+    it "should show the correct status with a tooltip when published and graded submissions" do
+      course_with_student_submissions({submission_points: true, draft_state: true})
+      get "/courses/#{@course.id}/settings"
+      course_status = f('#course-status')
+      course_status.text.should == 'Course is Published'
+      course_status.should have_attribute('title', 'You cannot unpublish this course if there are graded student submissions')
+    end
+
     it "should allow selection of existing course grading standard" do
       test_select_standard_for @course
     end

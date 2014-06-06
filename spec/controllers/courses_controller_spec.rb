@@ -809,6 +809,7 @@ describe CoursesController do
   end
 
   describe "PUT 'update'" do
+
     it "should require authorization" do
       course_with_teacher(:active_all => true)
       put 'update', :id => @course.id, :course => {:name => "new course name"}
@@ -839,6 +840,33 @@ describe CoursesController do
       Auditors::Course.expects(:record_published).once
       course_with_teacher_logged_in(:active_all => true)
       put 'update', :id => @course.id, :offer => true
+    end
+
+    it "should log claimed event on update" do
+      Auditors::Course.expects(:record_claimed).once
+      course_with_teacher_logged_in(:active_all => true)
+      put 'update', :id => @course.id, :course => {:event => 'claim'}
+    end
+
+    it 'should allow unpublishing of the course' do
+      course_with_teacher_logged_in(:active_all => true)
+      put 'update', :id => @course.id, :course => {:event => 'claim'}
+      @course.reload
+      @course.workflow_state.should == 'claimed'
+    end
+
+    it 'should not allow unpublishing of the course if submissions present' do
+      course_with_student_submissions({active_all: true, submission_points: true})
+      put 'update', :id => @course.id, :course => {:event => 'claim'}
+      @course.reload
+      @course.workflow_state.should == 'available'
+    end
+
+    it "should allow unpublishing of the course if submissions have no score or grade" do
+      course_with_student_submissions
+      put 'update', :id => @course.id, :course => {:event => 'claim'}
+      @course.reload
+      @course.workflow_state.should == 'claimed'
     end
 
     it "should lock active course announcements" do

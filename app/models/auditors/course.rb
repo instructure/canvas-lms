@@ -157,6 +157,11 @@ class Auditors::Course
     self.record(course, user, 'published', {}, opts)
   end
 
+  def self.record_claimed(course, user, opts = {})
+    return unless course
+    self.record(course, user, 'claimed', {}, opts)
+  end
+
   def self.record_copied(course, copy, user, opts = {})
     return unless course && copy
     copied_from = self.record(copy, user, 'copied_from', { copied_from: Shard.global_id_for(course) }, opts)
