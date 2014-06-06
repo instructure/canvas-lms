@@ -42,6 +42,44 @@ describe Polling::Poll do
     end
   end
 
+  describe "#closed_and_viewable_for?" do
+    it "returns false if the latest poll session available to the user is opened" do
+      student = student_in_course(active_user:true).user
+      poll = @teacher.polls.create!(question: 'A Test Poll')
+      session = poll.poll_sessions.create(course: @course)
+      session.publish!
+
+      poll.closed_and_viewable_for?(student).should be_false
+    end
+
+    context "the latest poll session available to the user is closed" do
+      before(:each) do
+        @student = student_in_course(active_user:true).user
+        @poll = @teacher.polls.create!(question: 'A Test Poll')
+        @choice = @poll.poll_choices.create!(text: 'Choice A', is_correct: true)
+        @session = @poll.poll_sessions.create(course: @course)
+      end
+
+      it "returns true if the user has submitted" do
+        @session.publish!
+        @session.poll_submissions.create!(
+          poll: @poll,
+          user: @student,
+          poll_choice: @choice
+        )
+        @session.close!
+
+        @poll.closed_and_viewable_for?(@student).should be_true
+      end
+
+      it "returns false if the user hasn't submitted" do
+        @session.publish!
+        @session.close!
+        @poll.closed_and_viewable_for?(@student).should be_false
+      end
+    end
+  end
+
   describe "#total_results" do
     def create_submission(session, choice)
       student = student_in_course(active_user:true).user

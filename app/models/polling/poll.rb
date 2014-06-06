@@ -45,6 +45,24 @@ module Polling
       can :read
     end
 
+    def closed_and_viewable_for?(user)
+      results = poll_sessions.with_each_shard do |scope|
+        scope
+        .joins(:poll_submissions)
+        .where(["polling_poll_submissions.user_id = ? AND is_published=? AND course_id IN (?) AND (course_section_id IS NULL OR course_section_id IN (?))",
+                user,
+                false,
+                user.enrollments.map(&:course_id).compact,
+                user.enrollments.map(&:course_section_id).compact]
+              )
+        .order('polling_poll_sessions.created_at DESC')
+        .limit(1)
+        .exists?
+      end
+
+       results.any?
+    end
+
     def total_results
       poll_sessions.reduce(Hash.new(0)) do |poll_results, session|
         poll_results = poll_results.merge(session.results) do |key, poll_result_value, session_result_value|

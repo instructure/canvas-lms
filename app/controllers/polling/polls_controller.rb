@@ -70,7 +70,7 @@ module Polling
     #   }
     #
     def index
-      @polls = @current_user.polls
+      @polls = @current_user.polls.order('created_at DESC')
       @polls = Api.paginate(@polls, self, api_v1_polls_url)
 
       render json: serialize_jsonapi(@polls)

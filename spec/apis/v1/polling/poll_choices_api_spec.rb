@@ -114,14 +114,31 @@ describe Polling::PollChoicesController, type: :request do
         response.code.should == '200'
       end
 
-      it "doesn't display is_correct within poll choices" do
-        Polling::PollSession.create!(course: @course, poll: @poll)
+      context "with opened sessions" do
+        it "doesn't display is_correct within poll choices" do
+          Polling::PollSession.create!(course: @course, poll: @poll).publish!
 
-        json = get_show
-        poll_choice_json = json['poll_choices'].first
+          json = get_show
+          poll_choice_json = json['poll_choices'].first
 
-        poll_choice_json.should_not have_key('is_correct')
+          poll_choice_json.should_not have_key('is_correct')
+        end
       end
+
+      context "with closed, available sessions" do
+        it "displays is_correct within poll choices" do
+          session = Polling::PollSession.create!(course: @course, poll: @poll)
+          session.publish!
+          session.poll_submissions.create!(user: @student, poll: @poll, poll_choice: @poll_choice)
+          session.close!
+
+          json = get_show
+          poll_choice_json = json['poll_choices'].first
+
+          poll_choice_json.should have_key('is_correct')
+        end
+      end
+
     end
   end
 

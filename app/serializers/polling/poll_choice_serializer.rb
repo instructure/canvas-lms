@@ -31,7 +31,9 @@ module Polling
     end
 
     def student_keys
-      [:id, :text]
+      keys = [:id, :text]
+      keys << :is_correct if poll.closed_and_viewable_for?(current_user)
+      keys
     end
   end
 end
