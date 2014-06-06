@@ -822,13 +822,23 @@ class Attachment < ActiveRecord::Base
     self.dynamic_thumbnail_sizes.include?(geometry)
   end
 
+  def self.truncate_filename(filename, len, &block)
+    block ||= lambda { |str, len| str[0...len] }
+    ext_index = filename.rindex('.')
+    if ext_index
+      ext = block.call(filename[ext_index..-1], len / 2 + 1)
+      base = block.call(filename[0...ext_index], len - ext.length)
+      base + ext
+    else
+      block.call(filename, len)
+    end
+  end
+
   alias_method :original_sanitize_filename, :sanitize_filename
   def sanitize_filename(filename)
-    filename = CGI::escape(filename)
     filename = self.root_attachment.filename if self.root_attachment && self.root_attachment.filename
-    chunks = (filename || "").scan(/\./).length + 1
-    filename.gsub!(/[^\.]+/) do |str|
-      str[0, 220/chunks]
+    filename = Attachment.truncate_filename(filename, 255) do |component, len|
+      CanvasTextHelper.cgi_escape_truncate(component, len)
     end
     filename
   end
@@ -1004,6 +1014,13 @@ class Attachment < ActiveRecord::Base
 
   def filename
     read_attribute(:filename) || (self.root_attachment && self.root_attachment.filename)
+  end
+
+  def filename=(name)
+    # infer a display name without round-tripping through truncated CGI-escaped filename
+    # (which reduces the length of unicode filenames to as few as 28 characters)
+    self.display_name ||= Attachment.truncate_filename(name, 255)
+    super(name)
   end
 
   def thumbnail_with_root_attachment

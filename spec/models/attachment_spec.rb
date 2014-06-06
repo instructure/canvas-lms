@@ -832,34 +832,40 @@ describe Attachment do
   end
 
   context "inferred display name" do
+    before do
+      s3_storage!  # because we don't 'sanitize' filenames with the local backend
+    end
+
     it "should take a normal filename and use it as a diplay name" do
       a = attachment_model(:filename => 'normal_name.ppt')
       a.display_name.should eql('normal_name.ppt')
-    end
-
-    it "should take a normal filename with spaces and convert the underscores to spaces" do
-      a = attachment_model(:filename => 'normal_name.ppt')
-      a.display_name.should eql('normal_name.ppt')
+      a.filename.should eql('normal_name.ppt')
     end
 
     it "should preserve case" do
       a = attachment_model(:filename => 'Normal_naMe.ppt')
       a.display_name.should eql('Normal_naMe.ppt')
+      a.filename.should eql('Normal_naMe.ppt')
     end
 
-    it "should split long names with dashes" do
-      a = attachment_model(:filename => 'this is a long name, over 30 characters long.ppt')
-      a.display_name.should eql('this is a long name, over 30 characters long.ppt')
+    it "should truncate filenames to 255 characters (preserving extension)" do
+      a = attachment_model(:filename => 'My new study guide or case study on this evolution on monkeys even in that land of costa rica somewhere my own point of  view going along with the field experiment I would say or try out is to put them not in wet areas like costa rico but try and put it so its not so long.docx')
+      a.display_name.should eql("My new study guide or case study on this evolution on monkeys even in that land of costa rica somewhere my own point of  view going along with the field experiment I would say or try out is to put them not in wet areas like costa rico but try and put.docx")
+      a.filename.should eql("My+new+study+guide+or+case+study+on+this+evolution+on+monkeys+even+in+that+land+of+costa+rica+somewhere+my+own+point+of++view+going+along+with+the+field+experiment+I+would+say+or+try+out+is+to+put+them+not+in+wet+areas+like+costa+rico+but+try+and+put.docx")
     end
 
-    it "shouldn't try to break up very large words" do
-      a = attachment_model(:filename => 'A long Bulgarian word is neprotifconstitutiondeistveiteneprotifconstitutiondeistveite')
-      a.display_name.should eql('A long Bulgarian word is neprotifconstitutiondeistveiteneprotifconstitutiondeistveite')
+    it "should use no more than half of the 255 characters for the extension" do
+      a = attachment_model(:filename => ("A" * 150) + "." + ("B" * 150))
+      a.display_name.should eql(("A" * 127) + "." + ("B" * 127))
+      a.filename.should eql(("A" * 127) + "." + ("B" * 127))
     end
 
-    it "should truncate filenames that are just too freaking big" do
-      fn = Attachment.new.sanitize_filename('My new study guide or case study on this evolution on monkeys even in that land of costa rica somewhere my own point of  view going along with the field experiment I would say or try out is to put them not in wet areas like costa rico but try and put it so its not so long.docx')
-      fn.should eql("My+new+study+guide+or+case+study+on+this+evolution+on+monkeys+even+in+that+land+of+costa+rica+somewhere+my+own.docx")
+    it "should not split unicode characters when truncating" do
+      a = attachment_model(:filename => "\u2603" * 300)
+      a.display_name.should eql("\u2603" * 255)
+      a.filename.length.should eql(252)
+      a.unencoded_filename.should be_valid_encoding
+      a.unencoded_filename.should eql("\u2603" * 28)
     end
   end
 
