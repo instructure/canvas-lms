@@ -9,10 +9,38 @@ define [
 
     count: -> @get('outcomes').length
 
-    mastery_count: ->
+
+    statusCount: (status) ->
       @get('outcomes').filter((x) ->
-        x.status() == 'mastery'
+        x.status() == status
       ).length
 
+    mastery_count: ->
+      @statusCount('mastery')
+
+    remedialCount: ->
+      @statusCount('remedial')
+
+    undefinedCount: ->
+      @statusCount('undefined')
+
+    status: ->
+      if @remedialCount() > 0
+        "remedial"
+      else
+        if @mastery_count() == @count()
+          "mastery"
+        else if @undefinedCount() == @count()
+          "undefined"
+        else
+          "near"
+
+    started: ->
+      true
+
     toJSON: ->
-      _.extend(super, count: @count(), mastery_count: @mastery_count())
+      _.extend super,
+        count: @count()
+        mastery_count: @mastery_count()
+        started: @started()
+        status: @status()

@@ -1,7 +1,7 @@
 // print button for grades summary page
 .print-grades
   float: right
-  
+
   @media print
     display: none
 
@@ -9,7 +9,7 @@
 #grades_summary
   border-collapse: collapse
   border-bottom: 1px solid #eee
-  
+
   @media print
     border-bottom: none
     a
@@ -24,7 +24,7 @@
   background-color: #444
   color: #fff
   text-align: left
-  
+
   @media print
     :text-transform uppercase
     :color black
@@ -34,13 +34,13 @@
     :padding-left 0
 
 #grades_summary tr
-  
+
   > *
     padding: 5px
     text-align: left
     border-top: 2px solid black
     background-color: #fff
-  
+
     @media print
       border-top: 1px solid black
       color: black !important
@@ -50,7 +50,7 @@
   border-width: 0
   font-size: 0.8em
   padding-left: 30px
-  
+
   @media print
     padding-left: 0
     font-style: italic
@@ -71,7 +71,7 @@
 
 #grades_summary tr.student_assignment.dropped td
   color: #ccc
-  
+
   @media print
     color: black
 
@@ -82,7 +82,7 @@
 
 #grades_summary tr.student_assignment.dropped td a
   color: #aaa
-  
+
   @media print
     color: black
     font-weight: normal
@@ -121,7 +121,7 @@
   font-weight: normal
   padding-left: 20px
   word-break: break-all
-  
+
   @media print
     padding-left: 0
     font-size: 1.0em
@@ -133,7 +133,7 @@
   color: #999
   padding-left: 10px
   line-height: 0.5em
-  
+
   @media print
     visibility: visible
     margin: 5px 0
@@ -145,16 +145,16 @@
 #grades_summary td.due
   font-size: 0.8em
   white-space: nowrap
-  
+
   @media print
     font-size: 1em
 
 #grades_summary tr.assignment_graded > *
   background-color: #eee
-  
+
   @media print
     background-color: transparent
-  
+
     &.title
       font-weight: bold
 
@@ -163,7 +163,7 @@
   color: #eee
   font-size: 1.5em
   font-weight: bold
-  
+
   @media print
     background-color: transparent
     text-transform: uppercase
@@ -175,12 +175,12 @@
     background-color: #ccc
     border-top-width: 0
     font-weight: bold
-  
+
     @media print
       background-color: transparent
       border-top-width: 1px
       text-transform: uppercase
-    
+
       &.title .context
         display: none
 
@@ -312,9 +312,35 @@ $outcome-border: 1px solid #BCC2CA
 
   .group-description
     overflow: hidden
-    .status
+    padding: 10px 50px 10px 15px
+    .outcome-icon i
+      line-height: 40px
+    .group-title
+      margin: 0
+      font-size: 20px
+      line-height: 40px
+    .group-status
       float: right
-      margin: 1em
+      margin: 0
+      text-align: center
+      font-size: 30px
+      color: #959595
+      position: relative
+      top: 4px
+      strong
+        color: #2a333b
+      span
+        display: block
+        font-size: 14px
+
+  .undefined>i
+    color: #C0C0C0
+  .remedial>i
+    color: #F76A66
+  .near>i
+    color: #DFB056
+  .mastery>i
+    color: #5DC28F
 
   .outcomes
     background-color: #f7f7f7
@@ -326,23 +352,58 @@ $outcome-border: 1px solid #BCC2CA
     list-style-type: none
     overflow: hidden
 
+    .outcome-icon
+      float: left
+      margin-right: 15px
+
   li.outcome
+    padding: 20px 50px 20px 15px
     border-top: $outcome-border
 
     .outcome-properties
       float: left
-      width: 80%
-      padding: 1em
-      box-sizing: border-box
+      width: 70%
 
     .description
-      color: #b4b4b4
+      color: #2a333b
+      p
+        margin: 0
 
     .title
       font-weight: bold
 
-    .score
+    .outcome-score
       float: right
-      width: 20%
-      padding: 1em
-      box-sizing: border-box
+      width: 165px
+      padding-top: 10px
+
+      .bar
+        background: #e1e1e1
+        height: 8px
+        position: relative
+        .bar-marker
+          position: absolute
+          width: 3px
+          background: #f7f7f7
+          z-index: 5
+          height: 8px
+          top: 0
+        .bar-progress
+          height: 8px
+
+          &.remedial
+            background: #F76A66
+          &.near
+            background: #DFB056
+          &.mastery
+            background: #5DC28F
+
+      .score
+        color: #959595
+        font-size: 18px
+        float: left
+        strong
+          color: #2a333b
+      a
+        float: right
+        line-height: 22px

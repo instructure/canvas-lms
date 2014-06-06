@@ -1,7 +1,29 @@
+<div class="outcome-icon {{status}}" data-tooltip="top" title="{{statusTooltip}}" aria-label="Outcome: {{title}} has a status of {{statusTooltip}}">
+  {{#if scoreDefined}}
+    {{#ifEqual status 'mastery'}}
+      {{addIcon 'complete'}}
+    {{else}}
+      {{#ifEqual status 'near'}}
+        {{addIcon 'partial'}}
+      {{else}}
+        {{addIcon 'trouble'}}
+      {{/ifEqual}}
+    {{/ifEqual}}
+  {{else}}
+    <i class="icon-empty"></i>
+  {{/if}}
+</div>
 <div class="outcome-properties">
-  <div class="title">{{title}}</div>
+  <div class="title" data-tooltip title="{{description}}">{{title}}</div>
   <div class="description">{{{description}}}</div>
 </div>
-<div class="score">
-  {{#if score_defined}}{{score}}{{else}}-{{/if}}/{{mastery_points}}
+<div class="outcome-score">
+  <div class="bar">
+    <div class="bar-marker" style="left: {{masteryPercent}}%"></div>
+    <div class="bar-progress {{status}}" style="width: {{percentProgress}}%"></div>
+  </div>
+  <span class="score" aria-label="Score: {{score}} out of {{points_possible}} points with mastery at {{mastery_points}}">
+    <strong>{{#if scoreDefined}}{{score}}{{else}}-{{/if}}</strong>/{{mastery_points}}
+  </span>
+  <a href="#"><strong>X</strong> Alignments</a>
 </div>

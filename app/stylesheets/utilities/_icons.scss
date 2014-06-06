@@ -356,7 +356,12 @@ h1, h2, h3, h4, .h1, .h2, .h3, .h4, p {
 
 
 // define specific icon classes, mapped to the "canvasregular" icon font above
-
+.icon-trouble:before { content: "\e600"; }
+.icon-partial:before { content: "\e601"; }
+.icon-expand:before { content: "\e602"; }
+.icon-empty:before { content: "\e603"; }
+.icon-complete:before { content: "\e604"; }
+.icon-collapse:before { content: "\e605"; }
 .icon-stats:before { content: "\e06a" }
 .icon-paperclip:before { content: "\e03d" }
 .icon-media:before { content: "\e062" }
