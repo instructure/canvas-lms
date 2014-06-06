@@ -2,7 +2,7 @@ module Polling
   class PollChoiceSerializer < Canvas::APISerializer
     root :poll_choice
 
-    attributes :id, :text, :is_correct
+    attributes :id, :text, :is_correct, :position
 
     has_one :poll, embed: :id
 
@@ -31,7 +31,7 @@ module Polling
     end
 
     def student_keys
-      keys = [:id, :text]
+      keys = [:id, :text, :position]
       keys << :is_correct if poll.closed_and_viewable_for?(current_user)
       keys
     end

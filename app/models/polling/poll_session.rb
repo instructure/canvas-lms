@@ -23,7 +23,7 @@ module Polling
     belongs_to :course
     belongs_to :course_section
     belongs_to :poll, class_name: 'Polling::Poll'
-    has_many :poll_submissions, class_name: 'Polling::PollSubmission'
+    has_many :poll_submissions, class_name: 'Polling::PollSubmission', dependent: :destroy
     validates_presence_of :poll, :course
     validate :section_belongs_to_course
 
@@ -34,11 +34,14 @@ module Polling
       can :read and can :create and can :delete and can :publish
 
       given do |user, session|
-        self.cached_context_grants_right?(user, session, :read) &&
-          self.is_published? &&
-          (self.course_section ? self.course_section.grants_right?(user, session, :read) : true)
+        self.visible_to?(user, session)
       end
-      can :read and can :submit
+      can :read
+
+      given do |user, session|
+        self.visible_to?(user, session) && self.is_published?
+      end
+      can :submit
     end
 
     def self.available_for(user)
@@ -63,6 +66,11 @@ module Polling
     def close!
       self.is_published = false
       save!
+    end
+
+    def visible_to?(user, session)
+      self.cached_context_grants_right?(user, session, :read) &&
+      (self.course_section ? self.course_section.grants_right?(user, session, :read) : true)
     end
 
     private

@@ -26,9 +26,11 @@ describe Polling::PollChoicesController, type: :request do
   describe 'GET index' do
     before(:each) do
       @poll = @teacher.polls.create!(question: "Example Poll")
-      5.times do |n|
-        @poll.poll_choices.create!(text: "Poll Choice #{n+1}", is_correct: false)
-      end
+      @poll.poll_choices.create!(text: "Poll Choice 1", is_correct:false, position: 1)
+      @poll.poll_choices.create!(text: "Poll Choice 3", is_correct:false, position: 3)
+      @poll.poll_choices.create!(text: "Poll Choice 4", is_correct:false, position: 4)
+      @poll.poll_choices.create!(text: "Poll Choice 2", is_correct:false, position: 2)
+      @poll.poll_choices.create!(text: "Poll Choice 5", is_correct:false, position: 5)
     end
 
     def get_index(raw = false, data = {})
@@ -46,9 +48,19 @@ describe Polling::PollChoicesController, type: :request do
       poll_choices_json.size.should == 5
 
       poll_choices_json.each_with_index do |pc, i|
-        pc['text'].should == "Poll Choice #{5-i}"
+        pc['text'].should == "Poll Choice #{i+1}"
       end
     end
+
+    it "returns the poll choices in the correct order" do
+      json = get_index
+      poll_choices_json = json['poll_choices']
+
+      poll_choices_json.each_with_index do |pc, i|
+        pc['position'].should == i+1
+      end
+    end
+
 
     context "as a student" do
       before(:each) do
@@ -159,12 +171,13 @@ describe Polling::PollChoicesController, type: :request do
 
     context "as a teacher" do
       it "creates a poll choice successfully" do
-        post_create(text: 'Poll Choice 1', is_correct: false)
+        post_create(text: 'Poll Choice 1', is_correct: false, position: 1)
         @poll.poll_choices.first.text.should == 'Poll Choice 1'
+        @poll.poll_choices.first.position.should == 1
       end
 
       it "sets is_correct to false if is_correct is provided but blank" do
-        post_create(text: 'is correct poll choice', is_correct: '')
+        post_create(text: 'is correct poll choice', is_correct: '', position: 1)
         @poll.poll_choices.first.text.should == 'is correct poll choice'
         @poll.poll_choices.first.is_correct.should be_false
       end

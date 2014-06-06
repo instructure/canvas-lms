@@ -44,6 +44,11 @@ module Polling
   #         "description": "The text of the poll choice.",
   #         "type": "string",
   #         "example": "Choice A"
+  #       },
+  #       "position": {
+  #         "description": "The order of the poll choice in relation to it's sibling poll choices.",
+  #         "type": "integer",
+  #         "example": 1
   #       }
   #     }
   #   }
@@ -101,6 +106,9 @@ module Polling
     # @argument poll_choices[][is_correct] [Optional, Boolean]
     #   Whether this poll choice is considered correct or not. Defaults to false.
     #
+    # @argument poll_choices[][position] [Optional, Integer]
+    #   The order this poll choice should be returned in the context it's sibling poll choices.
+    #
     # @example_response
     #   {
     #     "poll_choices": [PollChoice]
@@ -130,6 +138,9 @@ module Polling
     #
     # @argument poll_choices[][is_correct] [Optional, Boolean]
     #   Whether this poll choice is considered correct or not.  Defaults to false.
+    #
+    # @argument poll_choices[][position] [Optional, Integer]
+    #   The order this poll choice should be returned in the context it's sibling poll choices.
     #
     # @example_response
     #   {

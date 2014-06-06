@@ -66,9 +66,6 @@ describe Polling::PollsController, type: :request do
   describe 'GET show' do
     before(:each) do
       @poll = @teacher.polls.create!(question: 'An Example Poll')
-      5.times do |n|
-        @poll.poll_choices.create!(text: "Poll Choice #{n+1}", is_correct: false)
-      end
     end
 
     def get_show(raw = false, data = {})
@@ -114,7 +111,8 @@ describe Polling::PollsController, type: :request do
 
       it "shouldn't return the id of the user that created the poll" do
         student_in_course(:active_all => true, :course => @course)
-        @poll.poll_sessions.create!(course: @course)
+        session = @poll.poll_sessions.create!(course: @course)
+        session.publish!
 
         json = get_show
         poll_json = json['polls'].first
