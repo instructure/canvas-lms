@@ -21,7 +21,7 @@ module Polling
     attr_accessible :user, :question, :description
 
     belongs_to :user
-    has_many :poll_choices, class_name: 'Polling::PollChoice', dependent: :destroy
+    has_many :poll_choices, class_name: 'Polling::PollChoice', dependent: :destroy, order: :position
     has_many :poll_submissions, class_name: 'Polling::PollSubmission', dependent: :destroy
     has_many :poll_sessions, class_name: 'Polling::PollSession', dependent: :destroy
 

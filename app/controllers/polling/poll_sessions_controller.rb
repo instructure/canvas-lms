@@ -23,7 +23,7 @@ module Polling
   # @model PollSession
   #   {
   #     "id": "PollSession",
-  #     "required": ["id", "poll_id", "course_id", "course_section_id"],
+  #     "required": ["id", "poll_id", "course_id"],
   #     "properties": {
   #       "id": {
   #         "description": "The unique identifier for the poll session.",

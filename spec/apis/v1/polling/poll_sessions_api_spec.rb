@@ -136,6 +136,20 @@ describe Polling::PollSessionsController, type: :request do
     end
 
     context "as a student" do
+      it "doesn't display if the student isn't enrolled in the associated course or course section" do
+        section = @course.course_sections.create!(name: 'Some Course Section')
+        @poll_session.course_section = section
+        @poll_session.save
+
+        student_in_course(active_all: true, course: @course)
+
+        get_show(true)
+
+        response.code.should == '401'
+        @poll_session.reload
+        @poll_session.poll_submissions.size.should be_zero
+      end
+
       it "returns has_submitted as true if the student has made a submission" do
         choice = @poll.poll_choices.create!(text: 'Choice A', is_correct: true)
         submission = create_submission(choice)
