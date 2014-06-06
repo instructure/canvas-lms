@@ -874,6 +874,10 @@ class Course < ActiveRecord::Base
     send_later_if_production(:invite_uninvited_students)
   end
 
+  def do_claim
+    self.workflow_state = 'claimed'
+  end
+
   def invite_uninvited_students
     self.enrollments.find_all_by_workflow_state("creation_pending").each do |e|
       e.invite!
@@ -894,6 +898,7 @@ class Course < ActiveRecord::Base
 
     state :available do
       event :complete, :transitions_to => :completed
+      event :claim, :transitions_to => :claimed
     end
 
     state :completed do

@@ -1733,8 +1733,18 @@ class CoursesController < ApplicationController
 
       if params[:course][:event] && @course.grants_right?(@current_user, session, :change_course_state)
         event = params[:course].delete(:event)
-        @course.process_event(event)
-        Auditors::Course.record_published(@course, @current_user, source: logging_source) if event.to_sym == :offer
+        event = event.to_sym
+        if event == :claim && @course.submissions.with_point_data.exists?
+          flash[:error] = t('errors.unpublish', 'Course cannot be unpublished if student submissions exist.')
+          redirect_to(course_url(@course)) and return
+        else
+          @course.process_event(event)
+          if event == :offer
+            Auditors::Course.record_published(@course, @current_user, source: logging_source)
+          elsif event == :claim
+            Auditors::Course.record_claimed(@course, @current_user, source: logging_source)
+          end
+        end
       end
 
       params[:course][:conclude_at] = params[:course].delete(:end_at) if api_request? && params[:course].has_key?(:end_at)

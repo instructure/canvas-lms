@@ -16,6 +16,38 @@
   <div id="course_show_secondary">
     <% @can_manage_content = can_do(@context, @current_user, :manage_content) %>
     <% if @context.feature_enabled?(:draft_state) %>
+      <% if @can_manage_content && can_do(@context, @current_user, :change_course_state) && !@context.submissions.with_point_data.exists? %>
+        <div id="course_status" class="text-center">
+          <h4>
+            <%= t('headers.course_status', %{Course Status}) %>
+          </h4>
+          <div id='course_status_actions' class="ui-buttonset">
+            <%= form_for @context do |f| %>
+              <% if @context.created? || @context.claimed? %>
+                <button type="button" class='ui-button btn-unpublish disabled'>
+                  <i class="icon-unpublish"></i>
+                  <%= t('#buttons.unpublished', %{Unpublished}) %>
+                </button>
+                <button type='submit' class="ui-button btn-publish">
+                  <i class="icon-unpublished"></i>
+                  <%= t('#buttons.publish', %{Publish}) %>
+                </button>
+                <input type='hidden' name='course[event]' value='offer' />
+              <% else %>
+                <button type='submit' class="ui-button">
+                  <i class="icon-unpublish"></i>
+                  <%= t('#buttons.unpublish', %{Unpublish}) %>
+                </button>
+                <button type="button" class="ui-button disabled btn-published">
+                  <i class="icon-publish"></i>
+                  <%= t('#buttons.published', %{Published}) %>
+                </button>
+                <input type='hidden' name='course[event]' value='claim' />
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
 
       <% if @can_manage_content || @course_home_view != 'feed' || @course_home_sub_navigation_tools.present? %>
         <div class="course-options">
@@ -231,7 +263,7 @@
             <a href="<%= context_url(@context, :context_details_url) %>" class="edit_course_home_content_link"><%= t('links.change_layout', %{Change Home Page Layout}) %></a>
           <% end %>
           <% if can_do(@context, @current_user, :manage_content) && @course_home_view != 'feed' %>
-            | 
+            |
           <% end %>
           <% if @course_home_view != 'feed' %>
             <a href="<%= context_url(@context, :context_url, :view => 'feed') %>"><%= t('links.course_stream', %{See Course Stream}) %></a>
