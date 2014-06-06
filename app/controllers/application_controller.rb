@@ -852,7 +852,7 @@ class ApplicationController < ActionController::Base
 
         @page_view_update = true
       end
-      if @page_view && !request.xhr? && request.get? && (response.content_type || "").match(/html/)
+      if @page_view && !request.xhr? && request.get? && (response.content_type || "").to_s.match(/html/)
         @page_view.render_time ||= (Time.now.utc - @page_before_render) rescue nil
         @page_view_update = true
       end

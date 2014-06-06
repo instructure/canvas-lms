@@ -2,12 +2,17 @@ define [
   'i18n!outcomes'
   'underscore'
   'Backbone'
+  'compiled/views/grade_summary/ProgressBarView'
   'jst/grade_summary/outcome'
-], (I18n, _, Backbone, template) ->
+], (I18n, _, Backbone, ProgressBarView, template) ->
   class OutcomeView extends Backbone.View
     tagName: 'li'
     className: 'outcome'
     template: template
+
+    initialize: ->
+      super
+      @progress = new ProgressBarView(model: @model)
 
     statusTooltip: ->
       switch @model.status()
@@ -20,3 +25,4 @@ define [
       json = super
       _.extend json,
         statusTooltip: @statusTooltip()
+        progress: @progress

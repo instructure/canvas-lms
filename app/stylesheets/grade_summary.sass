@@ -262,36 +262,25 @@ a.screenreader-toggle
 div.rubric-toggle
   :padding-bottom 5px
 
-#navpills li
-  border: none
-  border-radius: 4px
-  background: none
-  float: left
-  list-style-type: none
-
-  &.ui-tabs-active
-    background-color: #1588CC
-    a
-      color: #fff
-
-  a
-    padding: 0.3em 1.3em
-    font-weight: inherit
-    text-shadow: none
-    float: left
-
-#navpills
-  overflow: hidden
-  margin: 0
-  padding: 0
-  margin-bottom: 1em
-
-.ui-tabs .ui-tabs-nav
-  border: none
-
 .ui-tabs .ui-tabs-panel
   border: none
   padding: 0
+
+.outcome-toggles
+  float: right
+  position: absolute
+  right: 1em
+  margin-top: -2.3em
+
+  .btn
+    margin-left: .5em
+
+  a[class*=icon-]:before, a[class^=icon-]:before
+    margin: 0
+
+
+#assignments
+  padding: 1em 0
 
 $outcome-border: 1px solid #BCC2CA
 
@@ -356,9 +345,13 @@ $outcome-border: 1px solid #BCC2CA
       float: left
       margin-right: 15px
 
+  li.group.expanded li.outcome
+    display: block
+
   li.outcome
     padding: 20px 50px 20px 15px
     border-top: $outcome-border
+    display: none
 
     .outcome-properties
       float: left
@@ -377,33 +370,78 @@ $outcome-border: 1px solid #BCC2CA
       width: 165px
       padding-top: 10px
 
-      .bar
-        background: #e1e1e1
-        height: 8px
-        position: relative
-        .bar-marker
-          position: absolute
-          width: 3px
-          background: #f7f7f7
-          z-index: 5
-          height: 8px
-          top: 0
-        .bar-progress
-          height: 8px
-
-          &.remedial
-            background: #F76A66
-          &.near
-            background: #DFB056
-          &.mastery
-            background: #5DC28F
-
-      .score
-        color: #959595
-        font-size: 18px
-        float: left
-        strong
-          color: #2a333b
       a
         float: right
         line-height: 22px
+
+.outcome-bar-wrapper
+  .bar
+    background: #e1e1e1
+    height: 8px
+    position: relative
+    .bar-marker
+      position: absolute
+      width: 3px
+      background: #f7f7f7
+      z-index: 5
+      height: 8px
+      top: 0
+    .bar-progress
+      height: 8px
+
+      &.remedial
+        background: #F76A66
+      &.near
+        background: #DFB056
+      &.mastery
+        background: #5DC28F
+
+  .score
+    color: #959595
+    font-size: 18px
+    float: left
+    strong
+      color: #2a333b
+
+.outcome-modal
+  padding: 7px 0
+
+  .title
+    float: left
+    font-weight: bold
+
+  .outcome-bar-wrapper
+    float: right
+    .score
+      text-align: right
+      margin-right: 5px
+      letter-spacing: 1px
+    .bar
+      float: left
+      width: 170px
+      top: 6px
+
+  .description
+    padding: 5px 0 15px
+    clear: both
+    p
+      margin: 0
+
+  .alignments ul
+    margin: 0 0 5px
+    border-top: 1px solid #d7d7d7
+
+  .alignment
+    list-style: none
+    overflow: auto
+    border-bottom: 1px solid #ebebeb
+    line-height: 35px
+
+    .title
+      font-weight: normal
+
+    .outcome-bar-wrapper
+      .bar
+        top: 13px
+      .score
+        font-size: 14px

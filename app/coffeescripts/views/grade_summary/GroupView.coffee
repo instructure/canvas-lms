@@ -14,6 +14,9 @@ define [
     els:
       '.outcomes': '$outcomes'
 
+    events:
+      'click .group-description': 'expand'
+
     template: template
 
     render: ->
@@ -23,6 +26,8 @@ define [
         collection: @model.get('outcomes')
         itemView: OutcomeView
       outcomesView.render()
+
+    expand: -> @$el.toggleClass('expanded')
 
     statusTooltip: ->
       switch @model.status()

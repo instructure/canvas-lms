@@ -36,6 +36,7 @@ define [
         groups: new GroupCollection([], course_id: @course_id)
         links: new LinkCollection([], course_id: @course_id)
         results: new ResultCollection([], course_id: @course_id, user_id: @user_id)
+      @outcomeCache = new Collection()
 
     fetch: ->
       dfd = $.Deferred()
@@ -43,18 +44,23 @@ define [
       $.when.apply($, requests).done(=> @processCollections(dfd))
       dfd
 
-    scores: ->
+    rollups: ->
       studentResults = @rawCollections.results.at(0).get('scores')
-      pairs = studentResults.map((x) -> [x.links.outcome, x.score])
+      pairs = studentResults.map((x) -> [x.links.outcome, x])
       _.object(pairs)
 
     populateGroupOutcomes: ->
-      scores = @scores()
+      rollups = @rollups()
+      @outcomeCache.reset()
       @rawCollections.links.each (link) =>
         outcome = new Outcome(link.get('outcome'))
-        outcome.set('score', scores[outcome.id])
         parent = @rawCollections.groups.get(link.get('outcome_group').id)
+        rollup = rollups[outcome.id]
+        outcome.set('score', rollup?.score)
+        outcome.set('count', rollup?.count || 0)
+        outcome.group = parent
         parent.get('outcomes').add(outcome)
+        @outcomeCache.add(outcome)
 
     populateSectionGroups: ->
       tmp = new Collection()
