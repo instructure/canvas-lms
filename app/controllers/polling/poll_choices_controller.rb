@@ -85,7 +85,6 @@ module Polling
     #
     def show
       @poll_choice = @poll.poll_choices.find(params[:id])
-
       if authorized_action(@poll, @current_user, :read)
         render json: serialize_jsonapi(@poll_choice)
       end
