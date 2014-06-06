@@ -12,22 +12,20 @@ define [
       # how many course sections before we add defaults
       @courseSectionsLength = @sections.length
 
-      unless @sections.length
-        # If there's no "default" section for the course already present,
-        # such as a course that has been created without one, create a fake one
-        # so that the default due date can still be rendered/updated without
-        # error.
-        @sections.add Section.defaultDueDateSection()
+      @sections.add Section.defaultDueDateSection()
+
+      includeDefaultDate = @overrides.length < @courseSectionsLength or
+        @courseSectionsLength is 0
+      onlyVisibleToOverrides = ENV.DIFFERENTIATED_ASSIGNMENTS_ENABLED and
+        @assignment.isOnlyVisibleToOverrides()
 
       # if we don't have an override for each real section
-      if @assignment? && @overrides.length < @sections.length
-        @sections.add Section.defaultDueDateSection() unless @findDefaultDueDateSection()
-        unless (ENV.DIFFERENTIATED_ASSIGNMENTS_ENABLED && @assignment.isOnlyVisibleToOverrides())
-          override = AssignmentOverride.defaultDueDate
-            due_at: @assignment.get( 'due_at' )
-            lock_at: @assignment.get( 'lock_at' )
-            unlock_at: @assignment.get( 'unlock_at' )
-          @overrides.add override
+      if includeDefaultDate and !onlyVisibleToOverrides
+        override = AssignmentOverride.defaultDueDate
+          due_at: @assignment.get('due_at')
+          lock_at: @assignment.get('lock_at')
+          unlock_at: @assignment.get('unlock_at')
+        @overrides.add override
       @updateDefaultDueDateSection()
       @overrides.on 'add', @updateDefaultDueDateSection
       @overrides.on 'remove', @updateDefaultDueDateSection
@@ -43,7 +41,7 @@ define [
             silent: true
 
     findDefaultDueDateSection: =>
-      @sections.detect ( section ) ->
+      @sections.detect (section) ->
         section.id is Section.defaultDueDateSectionID
 
     getDefaultDueDate: =>
@@ -51,20 +49,20 @@ define [
 
     availableSections: =>
       overrideSectionIDs = @overrideSectionIDs()
-      @sections.reject ( section ) ->
+      @sections.reject (section) ->
         section.id in overrideSectionIDs
 
     availableSectionsPlusOverride: (override, available=@availableSections()) =>
-      section = @sections.detect ( section ) ->
+      section = @sections.detect (section) ->
         section.id is override.get('course_section_id')
       if section?
         available.concat(section)
       else
         available
 
-    addOverride: ( override ) => @overrides.add override
+    addOverride: (override) => @overrides.add override
 
-    removeOverride: ( override ) => @overrides.remove override
+    removeOverride: (override) => @overrides.remove override
 
     overrideSectionIDs: => @overrides.courseSectionIDs()
 
@@ -81,12 +79,12 @@ define [
       @overrides.blank()
 
     sectionsWithOverrides: =>
-      @sections.select ( section ) =>
+      @sections.select (section) =>
         section.id in @overrideSectionIDs() and
           section.id isnt Section.defaultDueDateSectionID
 
     sectionsWithoutOverrides: =>
-      @sections.select ( section ) =>
+      @sections.select (section) =>
         section.id not in @overrideSectionIDs() and
           section.id isnt Section.defaultDueDateSectionID
 
