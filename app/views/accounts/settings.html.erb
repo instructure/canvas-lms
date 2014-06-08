@@ -841,7 +841,7 @@ acknowledge that you have read and agreed to the
           <th class="reports"></th>
         </tr>
         <% @available_reports.sort_by {|_, details| details.title}.each do |report, details|
-           title = details.title || details
+           title = details.title
            description_partial = details[:description_partial]
            description_partial = report + '_description' if description_partial == true
            parameters_partial = details[:parameters_partial]

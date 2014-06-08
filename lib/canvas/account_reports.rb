@@ -25,27 +25,12 @@ module Canvas::AccountReports
 
   class Report < Struct.new(:title, :description_partial, :parameters_partial, :parameters, :module, :proc)
     def title
-      if (title = super).is_a? String
-        title
-      else
-        title.call
-      end
+      super.call
     end
   end
 
   def self.configure_account_report(module_name, reports)
     reports.each do |report_type, details|
-      details[:module] ||= module_name
-      details[:proc] ||= "Canvas::AccountReports::#{module_name}".constantize.method(report_type)
-      report = Report.new(details[:title], details[:description_partial], details[:parameters_partial], details[:parameters], details[:module], details[:proc])
-      REPORTS[report_type] = report
-    end
-  end
-
-  # account id is ignored; use PluginSetting to enable a subset of reports
-  def self.add_account_reports(account_id, module_name, reports)
-    reports.each do |report_type, details|
-      details = {:title => details} if details.is_a? String
       details[:module] ||= module_name
       details[:proc] ||= "Canvas::AccountReports::#{module_name}".constantize.method(report_type)
       report = Report.new(details[:title], details[:description_partial], details[:parameters_partial], details[:parameters], details[:module], details[:proc])
