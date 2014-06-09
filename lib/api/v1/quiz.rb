@@ -166,7 +166,11 @@ module Api::V1::Quiz
       if quiz.new_record?
         quiz.save
       end
-      quiz.workflow_state = Canvas::Plugin.value_to_boolean(published) ? 'available' : 'unpublished'
+      if Canvas::Plugin.value_to_boolean(published)
+        quiz.publish
+      else
+        quiz.unpublish
+      end
     end
     quiz.save if save
 

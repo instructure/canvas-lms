@@ -21,6 +21,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require 'csv'
 
 describe GradebookUploadsController do
+  before do
+    Course.any_instance.stubs(:feature_enabled?).returns(false)
+  end
 
   describe "POST 'create'" do
     it "should require authorization" do
