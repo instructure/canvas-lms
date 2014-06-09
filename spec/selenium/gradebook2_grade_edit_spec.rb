@@ -81,6 +81,7 @@ describe "edititing grades" do
   end
 
   it "should change grades and validate course total is correct" do
+    Course.any_instance.stubs(:feature_enabled?).returns(false)
     expected_edited_total = "33.3%"
     get "/courses/#{@course.id}/gradebook2"
 
