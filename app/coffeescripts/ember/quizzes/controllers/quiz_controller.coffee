@@ -198,11 +198,3 @@ define [
       assignmentId = @get('assignmentId')
       "/courses/#{courseId}/assignments/#{assignmentId}/rubric"
     ).property('env.courseId')
-
-    # Kind of a gross hack so we can get quiz arrows in...
-    addLegacyJS: (->
-      return unless @get('quizSubmissionHtml.html')
-      Ember.$(document.body).append """
-        <script src="/javascripts/compiled/bundles/quiz_show.js"></script>
-      """
-    ).observes('quizSubmissionHtml.html')
