@@ -120,9 +120,9 @@ module LiveAssessments
       return unless authorized_action(Assessment.new(context: @context), @current_user, :read)
 
       @assessments = Assessment.for_context(@context)
-      @assessments = Api.paginate(@assessments, self, polymorphic_url([:api_v1, @context, :live_assessments]))
+      @assessments, meta = Api.jsonapi_paginate(@assessments, self, polymorphic_url([:api_v1, @context, :live_assessments]))
 
-      render json: serialize_jsonapi(@assessments)
+      render json: serialize_jsonapi(@assessments).merge(meta: meta)
     end
 
     protected
