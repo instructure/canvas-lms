@@ -279,6 +279,17 @@ describe "Feature Flags API", type: :request do
                        {}, {}, { expected_status: 403 })
     end
 
+    it "should clear the context's feature flag cache before deciding to insert or update" do
+      cache_key = t_root_account.feature_flag_cache_key('course_feature')
+      enable_cache do
+        flag = t_root_account.feature_flags.create! feature: 'course_feature', state: 'on'
+        # try to trick the controller into inserting (and violating a unique constraint) instead of updating
+        Rails.cache.write(cache_key, :nil)
+        api_call_as_user(t_root_admin, :put, "/api/v1/accounts/#{t_root_account.id}/features/flags/course_feature?state=off",
+                         { controller: 'feature_flags', action: 'update', format: 'json', account_id: t_root_account.to_param, feature: 'course_feature', state: 'off' })
+      end
+    end
+
     describe "locking_account_id" do
       it "should require admin rights in the locking account to lock a flag" do
         api_call_as_user(t_teacher, :put, "/api/v1/courses/#{t_course.id}/features/flags/course_feature?state=on&locking_account_id=#{t_root_account.id}",
