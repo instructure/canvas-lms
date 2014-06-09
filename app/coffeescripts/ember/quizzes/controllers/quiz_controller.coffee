@@ -1,30 +1,23 @@
 define [
   'ember'
   '../mixins/legacy_submission_html'
+  '../shared/is_locked'
   'i18n!quiz'
   'jquery'
   '../shared/environment'
   'compiled/jquery.rails_flash_notifications'
   'compiled/bundles/submission_download'
-], (Ember, LegacySubmissions, I18n, $, env) ->
-
-  updateAllDates = (field) ->
-    date = new Date()
-    @set field, date
-    promises = []
-    # skipping assignment overrides for now...
-    # TODO: need a quizzes assignment overrides endpoint
-    # promises = @get('assignmentOverrides').map (override) ->
-    #  override.set field, date
-    #  override.save()
-    promises.pushObject(@get('model').save())
-    Ember.RSVP.all promises
+], (Ember, LegacySubmissions, isQuizLocked, I18n, $, env) ->
 
   QuizController = Ember.ObjectController.extend LegacySubmissions, Ember.Evented,
     disabledMessage: I18n.t('cant_unpublish_when_students_submit', "Can't unpublish if there are student submissions")
 
     # preserve 'publishing' state by not directly binding to published attr
     showAsPublished: false
+
+    isLocked: (->
+      isQuizLocked(@get('unlockAt'), @get('lockAt'))
+    ).property('unlockAt', 'lockAt')
 
     displayPublished: (->
       @set('showAsPublished', @get('published'))
@@ -159,12 +152,6 @@ define [
         @replaceRoute 'quiz.moderate'
         $.flashMessage I18n.t('now_on_moderate', 'This information is now found on the Moderate tab.')
 
-      toggleLock: ->
-        if @get('lockAt')
-          @send('unlock')
-        else
-          @send('lock')
-
       preview: ->
         $('<form/>').
           attr('action', "#{@get('previewUrl')}&authenticity_token=#{ENV.AUTHENTICITY_TOKEN}").
@@ -172,15 +159,34 @@ define [
           appendTo('body').
           submit()
 
+      toggleLock: ->
+        if @get('isLocked')
+          @send('unlock')
+        else
+          @send('lock')
+
       lock: ->
-        updateAllDates.call(this, 'lockAt').then ->
+        # skipping assignment overrides for now...
+        # TODO: need a quizzes assignment overrides endpoint
+        now = new Date()
+        prevDueAt = @get('dueAt')
+        if !prevDueAt || prevDueAt > now
+          @set('dueAt', now)
+        @set 'lockAt', now
+        @get('model').save().then ->
           $.flashMessage I18n.t('quiz_successfully_updated', 'Quiz Successfully Updated!')
 
       unlock: ->
-        @set 'lockAt', null
-        @get('assignmentOverrides').forEach (override) ->
-          override.set 'lockAt', null
-        updateAllDates.call(this, 'unlockAt').then ->
+        # skipping assignment overrides for now...
+        # TODO: need a quizzes assignment overrides endpoint
+        now = new Date()
+        unlock = @get 'unlockAt'
+        lock = @get 'lockAt'
+        if unlock && unlock > now
+          @set 'unlockAt', now
+        if lock && lock < now
+          @set 'lockAt', null
+        @get('model').save().then ->
           $.flashMessage I18n.t('quiz_successfully_updated', 'Quiz Successfully Updated!')
 
       publish: ->

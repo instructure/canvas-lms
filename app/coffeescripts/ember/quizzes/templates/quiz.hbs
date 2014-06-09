@@ -97,7 +97,7 @@
             {{/ic-menu-item}}
           {{/unless}}
 
-          {{#if lockAt}}
+          {{#if isLocked}}
             {{#ic-menu-item class="js-due-date-toggler" on-select="unlock"}}
               <i class="icon-unlock"></i>
               {{#t 'unlock_this_quiz_now'}}Unlock This Quiz Now{{/t}}
