@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "concluded/unconcluded" do
   include_examples "in-process server selenium tests"
 
-  before (:each) do
+  before do
     username = "nobody@example.com"
     password = "asdfasdf"
     u = user_with_pseudonym :active_user => true,
@@ -21,6 +21,7 @@ describe "concluded/unconcluded" do
     @group = @course.assignment_groups.create!(:name => "default")
     @assignment = @course.assignments.create!(:submission_types => 'online_quiz', :title => 'quiz assignment', :assignment_group => @group)
     login_as(username, password)
+    Course.any_instance.stubs(:feature_enabled?).returns(false)
   end
 
   it "should let the teacher edit the gradebook by default" do

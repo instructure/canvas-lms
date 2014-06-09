@@ -31,6 +31,10 @@ describe GradebooksController do
   end
 
   describe "GET 'grade_summary'" do
+    before do
+      Course.any_instance.stubs(:feature_enabled?).returns(false)
+    end
+
     it "should redirect teacher to gradebook" do
       course_with_teacher_logged_in(:active_all => true)
       get 'grade_summary', :course_id => @course.id, :id => nil
@@ -343,6 +347,7 @@ describe GradebooksController do
   describe "GET 'show'" do
     describe "gradebook_init_json" do
       it "should include group_category in rendered json for assignments" do
+        Course.any_instance.stubs(:feature_enabled?).returns(false)
         course_with_teacher_logged_in(:active_all => true)
         group_category1 = @course.group_categories.create(:name => 'Category 1')
         group_category2 = @course.group_categories.create(:name => 'Category 2')
@@ -359,8 +364,9 @@ describe GradebooksController do
 
       context "draft state" do
         it "should should not return unpublished assignments" do
+          Course.any_instance.stubs(:feature_enabled?).with(:screenreader_gradebook).returns(false)
+          Course.any_instance.stubs(:feature_enabled?).with(:draft_state).returns(true)
           course_with_teacher_logged_in(:active_all => true)
-          @course.account.enable_feature!(:draft_state)
           ag = @course.assignment_groups.create! group_weight: 100
           a1 = ag.assignments.create! :submission_types => 'online_upload',
                                       :points_possible  => 10,
@@ -429,27 +435,6 @@ describe GradebooksController do
       end
     end
 
-    describe "draft state" do
-      it "should properly filter unpublished assignments" do
-        course_with_teacher_logged_in(:active_all => true)
-        @course.account.enable_feature!(:draft_state)
-        assignment1 = @course.assignments.build(:title => "Assignment 1")
-        assignment1.unpublish
-        assignment2 = @course.assignments.create!(:title => "Assignment 2")
-
-        get 'show', :course_id => @course.id
-        assign_ids = assigns[:assignments].map(&:id)
-        assign_ids.include?(assignment1.id).should be_false
-        assign_ids.include?(assignment2.id).should be_true
-        assign_ids.include?("group-#{assignment2.assignment_group.id}").should be_true
-        assign_ids.include?("final-grade").should be_true
-
-        ag_assign_ids = assigns[:js_env][:assignment_groups].first['assignments'].map{|a| a['id']}
-        ag_assign_ids.include?(assignment1.id).should be_false
-        ag_assign_ids.include?(assignment2.id).should be_true
-      end
-    end
-
     context "with screenreader_gradebook enabled" do
       before do
         course_with_teacher_logged_in(:active_all => true)
@@ -508,6 +493,7 @@ describe GradebooksController do
 
   describe "GET 'change_gradebook_version'" do
     it 'should switch to gradebook2 if clicked and back to gradebook1 if clicked with reset=true' do
+      Course.any_instance.stubs(:feature_enabled?).with(:screenreader_gradebook).returns(false)
       course_with_teacher_logged_in(:active_all => true)
       get 'grade_summary', :course_id => @course.id, :id => nil
 
@@ -524,6 +510,8 @@ describe GradebooksController do
 
     context "large roster courses" do
       before do
+        Course.any_instance.stubs(:feature_enabled?).with(:screenreader_gradebook).returns(false)
+        Course.any_instance.stubs(:feature_enabled?).with(:draft_state).returns(false)
         course_with_teacher_logged_in(:active_all => true)
         @user.preferences[:use_gradebook2] = false
         @user.save!
@@ -552,6 +540,10 @@ describe GradebooksController do
   end
 
   describe "POST 'update_submission'" do
+    before do
+      Course.any_instance.stubs(:feature_enabled?).returns(false)
+    end
+
     # rails 3 checks that a route exists when calling it
     if CANVAS_RAILS2
       it "should have a route for update_submission" do
