@@ -50,6 +50,8 @@ describe UserObserver do
     e2 = student_in_course(course: c2, user: student, active_all: true)
 
     observer = user_with_pseudonym(account: a2)
+    Pseudonym.any_instance.stubs(:works_for_account?).returns(false)
+    Pseudonym.any_instance.stubs(:works_for_account?).with(a2, true).returns(true)
     student.observers << observer
 
     enrollments = observer.observer_enrollments
