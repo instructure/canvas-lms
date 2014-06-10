@@ -224,21 +224,18 @@ module AdheresToPolicy
       # state and cache it.
       Cache.fetch(permission_cache_key_for(user, session, sought_right)) do
 
+        conditions = self.class.policy.conditions[sought_right]
+        next false unless conditions
+
         # Loop through all the conditions until we find the first one that
         # grants us the sought_right.
-        self.class.policy.conditions.each do |args|
-          condition = args[0]
-          condition_rights = args[1]
-
-          # We don't need to run the condition if the sought_right is not applicable
-          # to that condition.
-          next unless condition_rights.include?(sought_right)
-          if check_condition?(condition, user, session)
+        conditions.any? do |condition|
+          if check_condition?(condition.given, user, session)
 
             # Since the condition is true we can loop through all the rights
             # that belong to it and cache them.  This will short circut the above
             # Rails.cache.fetch for future checks that we won't have to do again.
-            condition_rights.each do |condition_right|
+            condition.rights.each do |condition_right|
 
               # Skip the condition_right if its the one we are looking for.
               # The Rails.cache.fetch will take care of caching it for us.

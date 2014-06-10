@@ -54,7 +54,7 @@ describe AdheresToPolicy::Policy, "set_policy" do
         }
       end
 
-      expect(example_class.policy.available_rights).to eq [:read, :write]
+      expect(example_class.policy.available_rights.to_a.sort).to eq [:read, :write].sort
     end
   end
 end
