@@ -1142,7 +1142,7 @@ define([
         $.each(submission.versioned_attachments || [], function(i,a){
           var attachment = a.attachment;
           if (attachment['crocodoc_available?'] ||
-              attachment['canvadocable?'] ||
+              attachment.canvadoc_url ||
               (attachment.scribd_doc && attachment.scribd_doc.created) ||
               $.isPreviewable(attachment.content_type, 'google')) {
             inlineableAttachments.push(attachment);
