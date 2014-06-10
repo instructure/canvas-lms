@@ -189,14 +189,14 @@ $subtleBorderColor: #e5e5e5;
   }
 
   .attachment-name-clip {
-    background: linear-gradient(top, transparent 60%, #fff 90%);
+    background: linear-gradient(to bottom, transparent 60%, #fff 90%);
     position: absolute;
     top: 55px;
     width: 80px;
   }
 
   .attachment:focus .attachment-name-clip {
-    background: linear-gradient(top, transparent 95%, #08c 99%);
+    background: linear-gradient(to bottom, transparent 95%, #08c 99%);
     border-radius: 10px;
   }
 

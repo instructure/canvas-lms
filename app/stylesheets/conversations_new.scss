@@ -34,7 +34,7 @@
 
 .conversations .panel {
   background: #f1f1f1;
-  background: linear-gradient(top, #fff, #e6e6e6);
+  background: linear-gradient(to bottom, #fff, #e6e6e6);
   border-bottom: 1px solid #acacac;
   box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
   box-sizing: border-box;
@@ -166,7 +166,7 @@
 
   .messages > li {
     background: #fff;
-    background: linear-gradient(top, #fff, #fafafa);
+    background: linear-gradient(to bottom, #fff, #fafafa);
     box-sizing: border-box;
     border-bottom: 1px solid #bfbfbf;
     cursor: pointer;
