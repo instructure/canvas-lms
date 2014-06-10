@@ -2,7 +2,9 @@ define [
   'i18n!student_groups'
   'ember'
   'ic-ajax'
-], (I18n, Ember, ajax) ->
+  'jquery'
+  'compiled/jquery.rails_flash_notifications'
+], (I18n, Ember, ajax, $) ->
 
   GroupController = Ember.ObjectController.extend
 
@@ -47,14 +49,14 @@ define [
         membership.save().then (membership)->
           controller.parentController.removeFromCategory(controller.get('group_category_id'))
           controller.get('users').addObject(ENV.current_user)
-          controller.parentController.set('noticeMessage', "Joined Group")
+          $.flashMessage I18n.t('group_join', "Joined Group %{group_name}", group_name: group.name)
       leave: (group) ->
         controller = this
         Ember.run =>
           ajax("#{@get('usersUrl')}/self",{type: "DELETE"}).then (response) ->
             user = controller.get('users').findBy('id', ENV.current_user_id)
             controller.get('users').removeObject(user)
-            controller.parentController.set('noticeMessage', "Left Group")
+            $.flashMessage I18n.t('group_leave', "Left Group %{group_name}", group_name: group.name)
             if controller.get('memberCount') == 0
               controller.set('showBody', false)
 

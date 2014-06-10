@@ -26,6 +26,7 @@ define [
            users: [{id: 1, name: "steve"}, {id: 2, name: "cliff"}, {id: 3, name: "walt"}, {id: 4, name: "pinkman"}]
 
         @gc.set('content', @group)
+        @gc.set('group', @group)
     teardown: ->
       run =>
         fakeENV.teardown()
@@ -54,7 +55,7 @@ define [
         id: "1"
       testStatus: '200'
       jqXHR: {}
-
-    @gc.send('leave')
+    
+    @gc.send('leave', @group)
 
     equal @gc.get('users').length, 3
