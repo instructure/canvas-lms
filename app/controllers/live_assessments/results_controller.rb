@@ -38,12 +38,36 @@ module LiveAssessments
   #         },
   #         "assessed_at": {
   #           "type": "datetime",
-  #           "example": "2014-13-05T00:01:57-06:00",
+  #           "example": "2014-05-13T00:01:57-06:00",
   #           "description": "When this result was recorded"
   #         },
   #         "links": {
-  #           "example": "{\"user\"=>\"3\", \"assessor\"=>\"42\", \"assessment\"=>\"30\"}",
+  #           "type": "ResultLinks",
+  #           "example": {"user": "42", "assessor": "23", "assessment": "5"},
   #           "description": "Unique identifiers of objects associated with this result"
+  #         }
+  #       }
+  #     }
+  #
+  # @model ResultLinks
+  #     {
+  #       "id": "ResultLinks",
+  #       "description": "Unique identifiers of objects associated with a result",
+  #       "properties": {
+  #         "user": {
+  #           "type": "string",
+  #           "example": "42",
+  #           "description": "A unique identifier for the user to whom this result applies"
+  #         },
+  #         "assessor": {
+  #           "type": "string",
+  #           "example": "23",
+  #           "description": "A unique identifier for the user who created this result"
+  #         },
+  #         "assessment": {
+  #           "type": "string",
+  #           "example": "5",
+  #           "description": "A unique identifier for the assessment that this result is for"
   #         }
   #       }
   #     }
@@ -54,23 +78,25 @@ module LiveAssessments
     before_filter :require_context
     before_filter :require_assessment
 
-    # @API Create a live assessment results
+    # @API Create live assessment results
     # @beta
+    #
+    # Creates live assessment results and adds them to a live assessment
     #
     # @example_request
     #  {
     #    "results": [{
     #      "passed": false,
     #      "assessed_at": "2014-05-26T14:57:23-07:00",
-    #      "links": [
+    #      "links": {
     #        "user": "15"
-    #      ]
+    #      }
     #    },{
     #      "passed": true,
     #      "assessed_at": "2014-05-26T13:05:40-07:00",
-    #      "links": [
+    #      "links": {
     #        "user": "16"
-    #      ]
+    #      }
     #    }]
     #  }
     #
