@@ -33,13 +33,13 @@ describe Polling::PollChoicesController, type: :request do
       @poll.poll_choices.create!(text: "Poll Choice 5", is_correct:false, position: 5)
     end
 
-    def get_index(raw = false, data = {})
+    def get_index(raw = false, data = {}, headers = {})
       helper = method(raw ? :raw_api_call : :api_call)
       helper.call(:get,
                   "/api/v1/polls/#{@poll.id}/poll_choices",
                   { controller: 'polling/poll_choices', action: 'index', format: 'json',
                     poll_id: @poll.id.to_s
-                  }, data)
+                  }, data, headers)
     end
 
     it "returns all existing poll choices" do
@@ -61,6 +61,20 @@ describe Polling::PollChoicesController, type: :request do
       end
     end
 
+
+    it "paginates to the jsonapi standard if requested" do
+      json = get_index(false, {}, 'Accept' => 'application/vnd.api+json')
+      poll_choices_json = json['poll_choices']
+      poll_choices_json.size.should == 5
+
+      poll_choices_json.each_with_index do |pc, i|
+        pc['text'].should == "Poll Choice #{5-i}"
+      end
+
+      json.should have_key('meta')
+      json['meta'].should have_key('pagination')
+      json['meta']['primaryCollection'].should == 'poll_choices'
+    end
 
     context "as a student" do
       before(:each) do

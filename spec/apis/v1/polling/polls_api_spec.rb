@@ -30,12 +30,13 @@ describe Polling::PollsController, type: :request do
       end
     end
 
-    def get_index(raw = false, data = {})
+    def get_index(raw = false, data = {}, headers = {})
       helper = method(raw ? :raw_api_call : :api_call)
       helper.call(:get,
                   "/api/v1/polls",
                   { controller: 'polling/polls', action: 'index', format: 'json' },
-                  data)
+                  data,
+                  headers)
     end
 
     it "returns all existing polls" do
@@ -46,6 +47,20 @@ describe Polling::PollsController, type: :request do
       poll_json.each_with_index do |poll, i|
         poll['question'].should == "Example Poll #{5-i}"
       end
+    end
+
+    it "paginates to the jsonapi standard if requested" do
+      json = get_index(false, {}, 'Accept' => 'application/vnd.api+json')
+      poll_json = json['polls']
+      poll_json.size.should == 5
+
+      poll_json.each_with_index do |poll, i|
+        poll['question'].should == "Example Poll #{5-i}"
+      end
+
+      json.should have_key('meta')
+      json['meta'].should have_key('pagination')
+      json['meta']['primaryCollection'].should == 'polls'
     end
 
     context "as a site admin" do
@@ -251,7 +266,5 @@ describe Polling::PollsController, type: :request do
         Polling::Poll.find_by_id(@poll.id).should == @poll
       end
     end
-
   end
-
 end

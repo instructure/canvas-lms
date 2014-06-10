@@ -72,9 +72,9 @@ module Polling
     def index
       if authorized_action(@poll, @current_user, :read)
         @poll_choices = @poll.poll_choices
-        @poll_choices = Api.paginate(@poll_choices, self, api_v1_poll_choices_url(@poll))
+        json, meta = paginate_for(@poll_choices)
 
-        render json: serialize_jsonapi(@poll_choices)
+        render json: serialize_jsonapi(json, meta)
       end
     end
 
@@ -178,18 +178,30 @@ module Polling
     end
 
     protected
-    def serialize_jsonapi(poll_choices)
+    def paginate_for(poll_choices)
+      meta = {}
+      json = if accepts_jsonapi?
+              poll_choices, meta = Api.jsonapi_paginate(poll_choices, self, api_v1_poll_choices_url(@poll))
+              meta[:primaryCollection] = 'poll_choices'
+              poll_choices
+             else
+               Api.paginate(poll_choices, self, api_v1_poll_choices_url(@poll))
+             end
+
+      return json, meta
+    end
+
+    def serialize_jsonapi(poll_choices, meta = {})
       poll_choices = Array.wrap(poll_choices)
 
-      serialized_set = Canvas::APIArraySerializer.new(poll_choices, {
+      Canvas::APIArraySerializer.new(poll_choices, {
         each_serializer: Polling::PollChoiceSerializer,
         controller: self,
-        root: false,
+        root: :poll_choices,
+        meta: meta,
         scope: @current_user,
         include_root: false
       }).as_json
-
-      { poll_choices: serialized_set }
     end
 
   end
