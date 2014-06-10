@@ -405,7 +405,7 @@ describe "speed grader" do
   context "multiple enrollments" do
     before(:each) do
       student_in_course
-      @course_section = @course.course_sections.create!(:name => "Other Section")
+      @course_section = @course.course_sections.create!(:name => "<h1>Other Section</h1>")
       @enrollment = @course.enroll_student(@student,
                                            :enrollment_state => "active",
                                            :section => @course_section,
@@ -424,6 +424,7 @@ describe "speed grader" do
       wait_for_ajaximations
 
       sections = @course.course_sections
+      ff("#section-menu ul li a").map{|e| e.attribute('text')}.should be_include(@course_section.name)
       goto_section(sections[0].id)
       ff("#students_selectmenu option").length.should == 1
       goto_section(sections[1].id)
