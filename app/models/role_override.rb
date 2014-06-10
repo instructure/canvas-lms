@@ -678,7 +678,6 @@ class RoleOverride < ActiveRecord::Base
       :manage_content => {
         :label => lambda { t('permissions.manage_content', "Manage all other course content") },
         :available_to => [
-          'StudentEnrollment', # SFU MOD - Enable student permissions needed for Ad Hoc Spaces
           'TaEnrollment',
           'TeacherEnrollment',
           'DesignerEnrollment',
