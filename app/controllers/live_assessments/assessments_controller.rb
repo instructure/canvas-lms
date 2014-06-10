@@ -51,7 +51,8 @@ module LiveAssessments
     # @API Create or find a live assessment
     # @beta
     #
-    # Creates or finds a live assessment with
+    # Creates or finds an existing live assessment with the given key and aligns it with
+    # the linked outcome
     #
     # @example_request
     #  {
