@@ -353,6 +353,13 @@ class CoursesController < ApplicationController
           enrollments = enrollments.reject { |e| e.class.name != e_type }
         end
 
+        if value_to_boolean(params[:current_domain_only])
+          enrollments = enrollments.select { |e| e.root_account_id == @domain_root_account.id }
+        elsif params[:root_account_id]
+          root_account = api_find_all(Account, [params[:root_account_id]], { limit: 1 }).first
+          enrollments = root_account ? enrollments.select { |e| e.root_account_id == root_account.id } : []
+        end
+
         includes = Set.new(Array(params[:include]))
 
         # We only want to return the permissions for single courses and not lists of courses.
