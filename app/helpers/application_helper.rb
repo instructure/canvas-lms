@@ -262,7 +262,7 @@ module ApplicationHelper
   def variant_name_for(bundle_name)
     if k12?
       variant = '_k12'
-    elsif @domain_root_account.feature_enabled?(:new_styles)
+    elsif use_new_styles?
       variant = '_new_styles'
     else
       variant = '_legacy'
@@ -733,7 +733,7 @@ module ApplicationHelper
   end
 
   def include_account_css
-    return if params[:global_includes] == '0' || @domain_root_account.try(:feature_enabled?, :k12) || @domain_root_account.try(:feature_enabled?, :new_styles)
+    return if params[:global_includes] == '0' || @domain_root_account.try(:feature_enabled?, :k12) || @domain_root_account.try(:feature_enabled?, :use_new_styles)
     includes = get_global_includes.inject([]) do |css_includes, global_include|
       css_includes << global_include[:css] if global_include[:css].present?
       css_includes
