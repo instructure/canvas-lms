@@ -68,6 +68,10 @@ define [
     @subCtr.set('model', @blankSub)
     equal @get('friendlyScore'), undefined
 
+  emq.test 'friendlyScore rounds potentially repeating decimal score values', ->
+    @subCtr.set('keptScore', 2.333333333333)
+    equal @get('friendlyScore'), '2.33 / 8'
+
   emq.test 'friendlyTime converts correctly', ->
     equal @get('friendlyTime'), '01:00'
     @subCtr.set('model', @blankSub)
