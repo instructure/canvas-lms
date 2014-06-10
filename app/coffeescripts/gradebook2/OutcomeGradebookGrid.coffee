@@ -334,7 +334,7 @@ define [
         return unless outcome and _.isNumber(value)
         className   = Grid.View.masteryClassName(value, outcome)
         return '' if shouldFilter and !_.include(Grid.filter, className)
-        cellTemplate(score: value, className: className, masteryScore: outcome.mastery_points)
+        cellTemplate(score: Math.round(value * 100.0) / 100.0, className: className, masteryScore: outcome.mastery_points)
 
       studentCell: (row, cell, value, columnDef, dataContext) ->
         studentCellTemplate(value)
