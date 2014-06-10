@@ -27,7 +27,9 @@ describe CrocodocSessionsController do
     course_with_teacher(:active_all => true)
     student_in_course(:active_all => true)
     attachment_model :content_type => 'application/pdf', :context => @student
-    @blob = {attachment_id: @attachment.global_id, user_id: @student.global_id}.to_json
+    @blob = {attachment_id: @attachment.global_id,
+             user_id: @student.global_id,
+             type: "crocodoc"}.to_json
     @hmac = Canvas::Security.hmac_sha1(@blob)
   end
 

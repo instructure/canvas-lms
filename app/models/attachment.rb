@@ -1788,18 +1788,19 @@ class Attachment < ActiveRecord::Base
 
   def canvadoc_url(user)
     return unless canvadocable?
-    "/canvadoc_session?#{preview_params(user)}"
+    "/canvadoc_session?#{preview_params(user, "canvadoc")}"
   end
 
   def crocodoc_url(user)
     return unless crocodoc_available?
-    "/crocodoc_session?#{preview_params(user)}"
+    "/crocodoc_session?#{preview_params(user, "crocodoc")}"
   end
 
-  def preview_params(user)
+  def preview_params(user, type)
     blob = {
       user_id: user.try(:global_id),
       attachment_id: id,
+      type: type,
     }.to_json
     hmac = Canvas::Security.hmac_sha1(blob)
     "blob=#{URI.encode blob}&hmac=#{URI.encode hmac}"

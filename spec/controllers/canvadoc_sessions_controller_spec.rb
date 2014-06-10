@@ -38,7 +38,8 @@ describe CanvadocSessionsController do
     before do
       @blob = {
         attachment_id: @attachment1.global_id,
-        user_id: @teacher.global_id
+        user_id: @teacher.global_id,
+        type: "canvadoc",
       }
     end
 
@@ -70,6 +71,12 @@ describe CanvadocSessionsController do
       @blob[:user_id] = @student.global_id
       blob = @blob.to_json
       get :show, blob: blob, hmac: Canvas::Security.hmac_sha1(blob)
+      assert_status(401)
+    end
+
+    it "doesn't let you use a crocodoc blob" do
+      @blob[:type] = "crocodoc"
+      get :show, blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json)
       assert_status(401)
     end
 
