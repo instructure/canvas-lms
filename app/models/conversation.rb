@@ -420,6 +420,9 @@ class Conversation < ActiveRecord::Base
   def update_participants(message, options = {})
     updated = false
     self.conversation_participants.with_each_shard do |conversation_participants|
+      conversation_participants = conversation_participants.where(:user_id =>
+        (options[:only_users]).map(&:id)) if options[:only_users]
+
       skip_ids = options[:skip_users].try(:map, &:id) || [message.author_id]
       skip_ids = [0] if skip_ids.empty?
       update_for_skips = options[:update_for_skips] != false
