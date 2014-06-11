@@ -39,6 +39,7 @@ module CC
       @migration_config ||= {:keep_after_complete => false}
       @for_course_copy = opts[:for_course_copy]
       @qti_only_export = @content_export && @content_export.qti_export?
+      @manifest_opts = opts.slice(:version)
     end
 
     def self.export(content_export, opts={})
@@ -53,7 +54,7 @@ module CC
         if @qti_only_export
           @manifest = CC::QTI::QTIManifest.new(self)
         else
-          @manifest = Manifest.new(self)
+          @manifest = Manifest.new(self, @manifest_opts)
         end
         @manifest.create_document
         @manifest.close

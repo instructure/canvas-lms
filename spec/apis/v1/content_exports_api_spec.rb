@@ -184,5 +184,19 @@ describe ContentExportsApiController, type: :request do
       export.attachment.should_not be_nil
     end
 
+    it "should create a 1.3 common cartridge if specified" do
+      t_course.assignments.create! name: 'teh assignment', description: '<b>what</b>', points_possible: 11, submission_types: 'online_text_entry'
+      json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge&version=1.3",
+        { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge',
+          version: '1.3' })
+      export = t_course.content_exports.find(json['id'])
+      run_jobs
+      f = export.reload.attachment.open(need_local_file: true)
+      Zip::File.open(f.path) do |zf|
+        doc = Nokogiri::XML(zf.read('imsmanifest.xml'))
+        doc.at_css('metadata schemaversion').text.should == '1.3.0'
+      end
+    end
+
   end
 end

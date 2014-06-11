@@ -53,6 +53,11 @@ module CCHelper
   # imsqti_xmlv1p2/imscc_xmlv1p2/question-bank
   # imsbasiclti_xmlv1p0
 
+  # Common Cartridge 1.3
+  ASSIGNMENT_TYPE = "assignment_xmlv1p0"
+  ASSIGNMENT_NAMESPACE = "http://www.imsglobal.org/xsd/imscc_extensions/assignment"
+  ASSIGNMENT_XSD_URI = "http://www.imsglobal.org/profile/cc/cc_extensions/cc_extresource_assignmentv1p0_v1p0.xsd"
+
   # QTI-only export
   QTI_ASSESSMENT_TYPE = 'imsqti_xmlv1p2'
   
@@ -85,7 +90,8 @@ module CCHelper
   MEDIA_OBJECTS_FOLDER = 'media_objects'
   CANVAS_EXPORT_FLAG = 'canvas_export.txt'
   MEDIA_TRACKS = 'media_tracks.xml'
-  
+  ASSIGNMENT_XML = 'assignment.xml'
+
   def create_key(object, prepend="")
     CCHelper.create_key(object, prepend)
   end

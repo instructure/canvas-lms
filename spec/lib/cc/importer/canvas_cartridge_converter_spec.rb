@@ -698,7 +698,7 @@ describe "Canvas Cartridge importing" do
     #export to xml/html
     migration_id = CC::CCHelper.create_key(asmnt)
     builder = Builder::XmlMarkup.new(:indent=>2)
-    builder.assignment("identifier" => migration_id) {|a|CC::AssignmentResources.create_assignment(a, asmnt)}
+    builder.assignment("identifier" => migration_id) {|a|CC::AssignmentResources.create_canvas_assignment(a, asmnt)}
     html = CC::CCHelper::HtmlContentExporter.new(@copy_from, @from_teacher).html_page(asmnt.description, "Assignment: " + asmnt.title)
     #convert to json
     meta_doc = Nokogiri::XML(builder.target!)
@@ -737,7 +737,7 @@ describe "Canvas Cartridge importing" do
     #export to xml/html
     migration_id = CC::CCHelper.create_key(@assignment)
     builder = Builder::XmlMarkup.new(:indent=>2)
-    builder.assignment("identifier" => migration_id) { |a| CC::AssignmentResources.create_assignment(a, @assignment) }
+    builder.assignment("identifier" => migration_id) { |a| CC::AssignmentResources.create_canvas_assignment(a, @assignment) }
     html = CC::CCHelper::HtmlContentExporter.new(@copy_from, @from_teacher).html_page(@assignment.description, "Assignment: " + @assignment.title)
     #convert to json
     meta_doc = Nokogiri::XML(builder.target!)

@@ -37,8 +37,8 @@ describe "Common Cartridge exporting" do
       end
     end
 
-    def run_export
-      @ce.export_course_without_send_later
+    def run_export(opts = {})
+      @ce.export_course_without_send_later(opts)
       @ce.error_messages.should == []
       @file_handle = @ce.attachment.open :need_local_file => true
       @zip_file = Zip::File.open(@file_handle.path)
@@ -430,6 +430,42 @@ describe "Common Cartridge exporting" do
       @zip_file.read(file_node['href']).should eql(track.content)
       track_doc = Nokogiri::XML(@zip_file.read('course_settings/media_tracks.xml'))
       track_doc.at_css('media_tracks media track[locale=tlh][kind=subtitles][identifierref=id4164d7d594985594573e63f8ca15975]').should be_present
+    end
+
+    it "should export CC 1.3 assignments" do
+      @course.assignments.create! name: 'test assignment', description: '<em>what?</em>', points_possible: 11,
+                                  submission_types: 'online_text_entry,online_upload,online_url'
+      @ce.export_type = ContentExport::COMMON_CARTRIDGE
+      @ce.save!
+      run_export(version: '1.3')
+      @manifest_doc.at_css('metadata schemaversion').text.should eql('1.3.0')
+
+      # validate assignment manifest resource
+      assignment_resource = @manifest_doc.at_css("resource[type='assignment_xmlv1p0']")
+      assignment_id = assignment_resource.attribute('identifier').value
+      assignment_xml_file = assignment_resource.attribute('href').value
+      assignment_resource.at_css('file').attribute('href').value.should == assignment_xml_file
+
+      # validate cc1.3 assignment xml document
+      assignment_xml_doc = Nokogiri::XML(@zip_file.read(assignment_xml_file))
+      assignment_xml_doc.at_css('text').text.should == '<em>what?</em>'
+      assignment_xml_doc.at_css('text').attribute('texttype').value.should == 'text/html'
+      assignment_xml_doc.at_css('gradable').text.should == 'true'
+      assignment_xml_doc.at_css('gradable').attribute('points_possible').value.should == '11'
+      assignment_xml_doc.css('submission_formats format').map{ |fmt| fmt.attribute('type').value }.should =~ %w(html file url)
+
+      # validate presence of canvas extension node
+      extension_node = assignment_xml_doc.at_css('extensions').elements.first
+      extension_node.name.should == 'assignment'
+      extension_node.namespace.href.should == 'http://canvas.instructure.com/xsd/cccv1p0'
+
+      # validate fallback html manifest resource
+      variant_tag = @manifest_doc.at_css(%Q{resource[identifier="#{assignment_id}_fallback"]}).elements.first
+      variant_tag.name.should == 'variant'
+      variant_tag.attribute('identifierref').value.should eql assignment_id
+      variant_tag.next_element.name.should == 'file'
+      html_file = variant_tag.next_element.attribute('href').value
+      @zip_file.read("#{assignment_id}/test-assignment.html").should be_include "<em>what?</em>"
     end
   end
 end

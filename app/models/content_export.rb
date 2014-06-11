@@ -92,7 +92,7 @@ class ContentExport < ActiveRecord::Base
   end
   handle_asynchronously :export_course, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1
 
-  def queue_api_job
+  def queue_api_job(opts)
     if self.job_progress
       p = self.job_progress
     else
@@ -104,7 +104,7 @@ class ContentExport < ActiveRecord::Base
     p.user = self.user
     p.save!
 
-    export_course
+    export_course(opts)
   end
 
   def referenced_files

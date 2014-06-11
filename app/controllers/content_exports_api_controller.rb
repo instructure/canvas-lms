@@ -138,9 +138,10 @@ class ContentExportsApiController < ApplicationController
         export.export_type = ContentExport::COMMON_CARTRIDGE
         export.selected_content = { everything: true }
       end
+      opts = params.slice(:version)
       export.progress = 0
       if export.save
-        export.queue_api_job
+        export.queue_api_job(opts)
         render json: content_export_json(export, @current_user, session)
       else
         render json: export.errors, status: :bad_request
