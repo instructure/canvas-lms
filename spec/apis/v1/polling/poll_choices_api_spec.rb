@@ -68,7 +68,7 @@ describe Polling::PollChoicesController, type: :request do
       poll_choices_json.size.should == 5
 
       poll_choices_json.each_with_index do |pc, i|
-        pc['text'].should == "Poll Choice #{5-i}"
+        pc['text'].should == "Poll Choice #{i+1}"
       end
 
       json.should have_key('meta')
