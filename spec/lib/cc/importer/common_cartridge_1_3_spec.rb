@@ -31,6 +31,7 @@ describe "Standard Common Cartridge importing" do
       @course.assignments.count.should == 1
       a = @course.assignments.first
       a.title.should == 'Cool Assignment'
+      a.points_possible.should == 11
       att = @course.attachments.find_by_migration_id("extensionresource1")
       a.description.gsub("\n", '').should == "<p>You should turn this in for points.</p><ul><li><a href=\"/courses/#{@course.id}/files/#{att.id}/preview\">common.html</a></li></ul>"
       a.submission_types = "online_upload,online_text_entry,online_url"

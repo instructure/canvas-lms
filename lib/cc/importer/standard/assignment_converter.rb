@@ -28,9 +28,10 @@ module CC::Importer::Standard
           asmnt = {:migration_id => res[:migration_id]}.with_indifferent_access
           parse_cc_assignment_data(asmnt, doc, resource_dir)
 
-          if ext_node = doc.at_css('extensions')
-            assgn_node = ext_node.elements.first
-            parse_canvas_assignment_data(assgn_node, nil, asmnt) if assgn_node
+          # FIXME check the XML namespace to make sure it's actually a canvas assignment
+          # (blocked by remove_namespaces! in lib/canvas/migration/migrator.rb)
+          if assgn_node = doc.at_css('extensions > assignment')
+            parse_canvas_assignment_data(assgn_node, nil, asmnt)
           end
 
           asmnts << asmnt
@@ -46,6 +47,10 @@ module CC::Importer::Standard
       asmnt[:instructor_description] = get_node_val(doc, 'instructor_text')
       asmnt[:title] = get_node_val(doc, 'title')
       asmnt[:gradable] = get_bool_val(doc, 'gradable')
+      if points_possible = get_node_att(doc, 'gradable', 'points_possible')
+        asmnt[:grading_type] = 'points'
+        asmnt[:points_possible] = points_possible.to_f
+      end
       if doc.css('submission_formats format').length > 0
         asmnt[:submission_types] = []
         doc.css('submission_formats format').each do |format|
