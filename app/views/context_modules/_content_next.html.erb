@@ -223,7 +223,9 @@ TEXT
             <%= f.text_field :name, :placeholder => t('module_name', %{Module Name}), :class => 'input-block-level' %>
           </div>
         </td>
-      </tr><tr>
+      </tr>
+
+      <tr>
         <td colspan="2">
           <input type="checkbox" id="unlock_module_at"/>
           <label for="unlock_module_at"><%= t('#labels.lock_module_until', %{Lock module until a given date}) %></label>
@@ -234,7 +236,9 @@ TEXT
         </td><td>
           <%= f.text_field :unlock_at, :class => "datetime_field", :'aria-label' => t('#aria_labels.unlock_at_date', "Unlock at date") %>
         </td>
-      </tr><tr>
+      </tr>
+
+      <tr>
         <td colspan="2">
         <div class="prerequisites_entry">
           <b><%= before_label('modules.before_students_view', %{Before students can view this module}) %></b>
@@ -249,16 +253,16 @@ TEXT
                 </span>
               </div>
               <div style="float: right;">
-                <a href="#" class="delete_criterion_link dim-till-hover"><i class="icon-end standalone-icon" title="Delete"></i></a>
+                <button class="delete_criterion_link dim-till-hover" aria-label="<%= t('button.delete_label', %{Delete prerequisites}) %>" title="<%= t('button.delete_title', %{Delete prerequisites}) %>"><i class="icon-end standalone-icon" ></i></button>
               </div>
               <div class="clear"></div>
             </div>
             <div style="font-size: 0.9em;">
-              <a href="#" class="add_prerequisite_link icon-add"><%= t('links.add_prerequisite', %{Add prerequisite}) %></a>
+              <button class="add_prerequisite_link"><i class="icon-add"></i><%= t('links.add_prerequisite', %{Add prerequisite}) %></button>
             </div>
           </div>
         </div>
-        <div class="completion_entry">
+        <div class="completion_entry" style="margin-top:10px;">
           <b><%= before_label('module_complete_when', %{This module is complete when}) %></b>
           <div class="completion_criteria_list">
             <div class="no_items_message"><%= t('prerequisites_need_item', %{You'll need to add items before you can specify how a user will complete this module}) %></div>
@@ -270,8 +274,9 @@ TEXT
             </div>
           </div>
         </div>
-      </td>
-    </tr><tr>
+       </td>
+      </tr>
+     <tr>
         <td colspan="2">
           <%= f.check_box :require_sequential_progress, :id => "require_sequential_progress" %>
           <%= f.label :require_sequential_progress, :en => "Students must move through requirements in this module in sequential order", :for => "require_sequential_progress" %>
