@@ -6,7 +6,8 @@ namespace :js do
   desc 'run testem as you develop, can use `rake js:dev <ember app name> <browser>`'
   task :dev do
     app = ARGV[1]
-    browsers = ARGV[2] || 'Firefox,Chrome,Safari'
+    #browsers = ARGV[2] || 'Firefox,Chrome,Safari'
+    browsers = ARGV[2] || 'Chrome'
     if app
       ENV['JS_SPEC_MATCHER'] = matcher_for_ember_app app
       unless File.exists?("app/coffeescripts/ember/#{app}")

@@ -586,44 +586,44 @@ define [
     ajax.defineFixture window.ENV.GRADEBOOK_OPTIONS.students_url,
       response: clone students
       jqXHR: { getResponseHeader: -> {} }
-      textStatus: ''
+      textStatus: 'success'
 
     ajax.defineFixture window.ENV.GRADEBOOK_OPTIONS.students_url_with_concluded_enrollments,
       response: clone concludedStudents
       jqXHR: { getResponseHeader: -> {} }
-      textStatus: ''
+      textStatus: 'success'
 
     ajax.defineFixture window.ENV.GRADEBOOK_OPTIONS.assignment_groups_url,
       response: clone assignmentGroups
       jqXHR: { getResponseHeader: -> {} }
-      textStatus: ''
+      textStatus: 'success'
 
     ajax.defineFixture window.ENV.GRADEBOOK_OPTIONS.submissions_url,
       response: clone submissions
       jqXHR: { getResponseHeader: -> {} }
-      textStatus: ''
+      textStatus: 'success'
 
     ajax.defineFixture window.ENV.GRADEBOOK_OPTIONS.sections_url,
       response: clone sections
       jqXHR: { getResponseHeader: -> {} }
-      textStatus: ''
+      textStatus: 'success'
 
     ajax.defineFixture window.ENV.GRADEBOOK_OPTIONS.custom_columns_url,
       response: clone customColumns
       jqXHR: { getResponseHeader: -> {} }
-      textStatus: ''
+      textStatus: 'success'
 
     ajax.defineFixture window.ENV.GRADEBOOK_OPTIONS.setting_update_url,
       response: true
       jqXHR: { getResponseHeader: -> {} }
-      textStatus: ''
+      textStatus: 'success'
 
     ajax.defineFixture window.ENV.GRADEBOOK_OPTIONS.outcome_links_url,
       response: clone outcomesRaw
       jqXHR: { getResponseHeader: -> {} }
-      textStatus: ''
+      textStatus: 'success'
 
     ajax.defineFixture window.ENV.GRADEBOOK_OPTIONS.outcome_rollups_url,
       response: clone outcomeRollupsRaw
       jqXHR: { getResponseHeader: -> {} }
-      textStatus: ''
+      textStatus: 'success'

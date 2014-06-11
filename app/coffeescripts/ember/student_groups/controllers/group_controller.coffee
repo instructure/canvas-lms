@@ -53,7 +53,7 @@ define [
       leave: (group) ->
         controller = this
         Ember.run =>
-          ajax("#{@get('usersUrl')}/self",{type: "DELETE"}).then (response) ->
+          ajax.request("#{@get('usersUrl')}/self",{type: "DELETE"}).then (response) ->
             user = controller.get('users').findBy('id', ENV.current_user_id)
             controller.get('users').removeObject(user)
             $.flashMessage I18n.t('group_leave', "Left Group %{group_name}", group_name: group.name)
