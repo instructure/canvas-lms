@@ -1101,7 +1101,6 @@ class CoursesController < ApplicationController
 
       session[:enrollment_uuid]             = enrollment.uuid
       session[:session_affects_permissions] = true
-      session[:enrollment_as_student]       = true if enrollment.student?
       session[:enrollment_uuid_course_id]   = enrollment.course_id
 
       @pending_enrollment = enrollment

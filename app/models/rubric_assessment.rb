@@ -151,9 +151,6 @@ class RubricAssessment < ActiveRecord::Base
   protected :update_artifact
   
   set_policy do
-    given {|user, session| session && session[:rubric_assessment_ids] && session[:rubric_assessment_ids].include?(self.id) }
-    can :create and can :read and can :update
-  
     given {|user| user && self.assessor_id == user.id }
     can :create and can :read and can :update
     
