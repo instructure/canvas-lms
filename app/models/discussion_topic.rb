@@ -761,7 +761,7 @@ class DiscussionTopic < ActiveRecord::Base
     given { |user, session| self.context.respond_to?(:collection) && self.context.collection.grants_right?(user, session, :comment) }
     can :reply
 
-    given { |user, session| self.context.respond_to?(:collection) && user == self.context.user }
+    given { |user| self.context.respond_to?(:collection) && user == self.context.user }
     can :read and can :update and can :delete and can :reply
   end
 

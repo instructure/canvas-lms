@@ -49,7 +49,7 @@ class LearningOutcome < ActiveRecord::Base
     can :create and can :read and can :update and can :delete
 
     # reading a global outcome is also allowed by just being logged in
-    given {|user, session| self.context_id.nil? && user }
+    given {|user| self.context_id.nil? && user }
     can :read
   end
 

@@ -1118,7 +1118,7 @@ class Attachment < ActiveRecord::Base
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_files) } #admins.include? user }
     can :read and can :update and can :delete and can :create and can :download
 
-    given { |user, session| self.public? }
+    given { |user| self.public? }
     can :read and can :download
 
     given { |user, session| self.cached_context_grants_right?(user, session, :read) } #students.include? user }
@@ -1150,7 +1150,7 @@ class Attachment < ActiveRecord::Base
     }
     can :download
 
-    given { |user, session|
+    given { |user|
       owner = self.user
       context_type == 'Assignment' && user == owner
     }

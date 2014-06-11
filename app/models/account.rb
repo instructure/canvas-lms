@@ -780,11 +780,11 @@ class Account < ActiveRecord::Base
     can :create_courses
 
     # any logged in user can read global outcomes, but must be checked against the site admin
-    given{ |user,session| self.site_admin? && user }
+    given{ |user| self.site_admin? && user }
     can :read_global_outcomes
 
     # any user with an association to this account can read the outcomes in the account
-    given{ |user,session| user && self.user_account_associations.find_by_user_id(user.id) }
+    given{ |user| user && self.user_account_associations.find_by_user_id(user.id) }
     can :read_outcomes
   end
 

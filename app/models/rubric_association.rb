@@ -141,7 +141,7 @@ class RubricAssociation < ActiveRecord::Base
     given {|user, session| self.cached_context_grants_right?(user, session, :manage) }
     can :update and can :delete and can :manage and can :assess
     
-    given {|user, session| user && @assessing_user_id && self.assessment_requests.for_assessee(@assessing_user_id).map{|r| r.assessor_id}.include?(user.id) }
+    given {|user| user && @assessing_user_id && self.assessment_requests.for_assessee(@assessing_user_id).map{|r| r.assessor_id}.include?(user.id) }
     can :assess
     
     given {|user, session| self.cached_context_grants_right?(user, session, :participate_as_student) }

@@ -154,10 +154,10 @@ class RubricAssessment < ActiveRecord::Base
     given {|user, session| session && session[:rubric_assessment_ids] && session[:rubric_assessment_ids].include?(self.id) }
     can :create and can :read and can :update
   
-    given {|user, session| user && self.assessor_id == user.id }
+    given {|user| user && self.assessor_id == user.id }
     can :create and can :read and can :update
     
-    given {|user, session| user && self.user_id == user.id }
+    given {|user| user && self.user_id == user.id }
     can :read
     
     given {|user, session| self.rubric_association && self.rubric_association.grants_rights?(user, session, :manage)[:manage] }
