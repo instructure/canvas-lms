@@ -825,6 +825,7 @@ class DiscussionTopic < ActiveRecord::Base
     p.to { active_participants - [user] }
     p.whenever { |record|
       record.context.available? and
+        !record.context.concluded? and
       ((record.just_created && record.active?) || record.changed_state(:active, record.draft_state_enabled? ? :unpublished : :post_delayed))
     }
   end

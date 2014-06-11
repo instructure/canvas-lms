@@ -17,10 +17,10 @@
 #
 
 class Announcement < DiscussionTopic
-  
+
   belongs_to :context, :polymorphic => true
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Group']
-  
+
   EXPORTABLE_ATTRIBUTES = [
     :id, :context_id, :context_type, :title, :message, :type, :user_id,
     :workflow_state, :last_reply_at, :created_at, :updated_at, :delayed_post_at, :posted_at,
@@ -33,9 +33,9 @@ class Announcement < DiscussionTopic
 
   has_a_broadcast_policy
   include HasContentTags
-  
+
   sanitize_field :message, CanvasSanitize::SANITIZE
-  
+
   before_save :infer_content
   before_save :respect_context_lock_rules
   validates_presence_of :context_id
@@ -66,6 +66,7 @@ class Announcement < DiscussionTopic
     to { active_participants(true) - [user] }
     whenever { |record|
       record.context.available? and
+        !record.context.concluded? and
       ((record.just_created and !(record.post_delayed? || record.unpublished?)) || record.changed_state(:active, record.draft_state_enabled? ? :unpublished : :post_delayed))
     }
   end
