@@ -1,7 +1,7 @@
 define [
   'ember'
   'ember-data'
-  'underscore' # which is really lodash trolololo
+  'underscore'
   './jsonapi_adapter'
   '../shared/ic-ajax-jsonapi'
   'ic-ajax'
@@ -12,19 +12,14 @@ define [
 
   QuizAdapter = JSONAPIAdapter.extend
 
-    findAll: (type, array) ->
-      firstPage = @_super(type, array)
-
-      firstPage.then (json) ->
-        json = _.cloneDeep(json)
-        {pagination} = json.meta
+    loadRemainingPages: (store) ->
+      new Ember.RSVP.Promise (resolve, reject) ->
+        pagination = store.metadataFor('quiz').pagination
         {page, page_count, template} = pagination
-        return json if page is page_count
+        if page is page_count
+          resolve()
+          return
         urls = (urlTemplate(template, page) for page in [(page+1)..page_count])
         RSVP.map(urls, ajax).then (pagesOfQuizzes) ->
-          pagesOfQuizzes.push json
-          pagesOfQuizzes = _.flatten pagesOfQuizzes.mapBy('quizzes')
-          json.quizzes = pagesOfQuizzes
-          json.meta.page = page_count
-          json
-
+          store.pushPayload('quiz', {quizzes: pagesOfQuizzes[0].quizzes})
+          resolve()
