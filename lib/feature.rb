@@ -155,6 +155,20 @@ END
       root_opt_in: false,
       development: false
     },
+    'student_outcome_gradebook' =>
+    {
+      display_name: -> { I18n.t('features.student_outcome_gradebook', 'Student Learning Mastery Gradebook') },
+      description:  -> { I18n.t('student_outcome_gradebook_description', <<-END) },
+Student Learning Mastery Gradebook provides a way for students to quickly view progress
+on course learning outcomes. Outcomes are presented in a Gradebook-like
+format and progress is displayed both as a numerical score and as mastered/near
+mastery/remedial.
+END
+      applies_to: 'Course',
+      state: 'allowed',
+      root_opt_in: false,
+      development: false
+    },
   'post_grades' =>
       {
           display_name: -> { I18n.t('features.post_grades', 'Post Grades to SIS') },
@@ -168,20 +182,6 @@ Aspire (SIS2000), JMC, and any other SIF-enabled SIS that accepts the SIF elemen
           root_opt_in: true,
           development: true
       },
-    'student_outcome_gradebook' =>
-    {
-      display_name: -> { I18n.t('features.student_outcome_gradebook', 'Student Outcome Gradebook') },
-      description:  -> { I18n.t('student_outcome_gradebook_description', <<-END) },
-Student Outcome Gradebook provides a way for students to quickly view progress
-on course learning outcomes. Outcomes are presented in a Gradebook-like
-format and progress is displayed both as a numerical score and as mastered/near
-mastery/remedial.
-END
-      applies_to: 'Course',
-      state: 'hidden',
-      root_opt_in: true,
-      development: true
-    },
     'screenreader_gradebook' =>
     {
       display_name: -> { I18n.t('features.individual_gradebook', 'Individual Gradebook View') },
