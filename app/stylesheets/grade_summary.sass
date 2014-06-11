@@ -377,10 +377,35 @@ $outcome-border: 1px solid #BCC2CA
         float: right
         line-height: 22px
 
+@media print
+  #outcomes
+    .groups
+      li.group li.outcome
+        display: block
+
+  .outcome-bar-wrapper
+    .bar
+      border: 1px solid black
+      padding: 3px
+      background: none !important
+      .bar-marker
+        width: 0px !important
+        border: 3px solid black
+        height: 10px !important
+      .bar-progress
+        border: 1px solid black
+        background: none !important
+
+        &.remedial
+          box-shadow: inset 0 0 0 1000px #F76A66
+        &.near
+          box-shadow: inset 0 0 0 1000px #DFB056
+        &.mastery
+          box-shadow: inset 0 0 0 1000px #5DC28F
+
 .outcome-bar-wrapper
   .bar
     background: #e1e1e1
-    height: 8px
     position: relative
     .bar-marker
       position: absolute
