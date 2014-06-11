@@ -126,7 +126,8 @@ module Api::V1::Submission
       hash['attachments'] = attachments.map do |attachment|
         attachment.skip_submission_attachment_lock_checks = true
         atjson = attachment_json(attachment, user, {},
-                                 submission_attachment: true)
+                                 submission_attachment: true,
+                                 includes: ['preview_url'])
         attachment.skip_submission_attachment_lock_checks = false
         atjson
       end.compact unless attachments.blank?

@@ -55,6 +55,8 @@ class SubmissionsApiController < ApplicationController
       @assignment = @context.assignments.active.find(params[:assignment_id])
       @submissions = @assignment.submissions.where(:user_id => visible_user_ids).all
 
+      bulk_load_attachments_and_previews(@submissions)
+
       includes = Array(params[:include])
 
       result = @submissions.map { |s| submission_json(s, @assignment, @current_user, session, @context, includes) }
@@ -174,7 +176,7 @@ class SubmissionsApiController < ApplicationController
                         "assignments.workflow_state != 'deleted'"
                       ).all
                     end
-      Submission.bulk_load_versioned_attachments(submissions)
+      bulk_load_attachments_and_previews(submissions)
       submissions_for_user = submissions.group_by(&:user_id)
 
       seen_users = Set.new
@@ -230,6 +232,7 @@ class SubmissionsApiController < ApplicationController
     @assignment = @context.assignments.active.find(params[:assignment_id])
     @user = get_user_considering_section(params[:user_id])
     @submission = @assignment.submission_for_student(@user)
+    bulk_load_attachments_and_previews([@submission])
 
     if authorized_action(@submission, @current_user, :read)
       includes = Array(params[:include])
@@ -440,6 +443,7 @@ class SubmissionsApiController < ApplicationController
       # submission without going through the model instance -- it'd be nice to
       # fix this at some point.
       @submission.reload
+      bulk_load_attachments_and_previews([@submission])
 
       json = submission_json(@submission, @assignment, @current_user, session, @context, %w(submission_comments))
       json[:all_submissions] = @submissions.map { |submission| submission_json(submission, @assignment, @current_user, session, @context) }
@@ -465,5 +469,12 @@ class SubmissionsApiController < ApplicationController
     end
     scope = @context.enrollments_visible_to(@current_user, opts)
     scope.pluck(:user_id)
+  end
+
+  def bulk_load_attachments_and_previews(submissions)
+    Submission.bulk_load_versioned_attachments(submissions)
+    attachments = submissions.flat_map &:versioned_attachments
+    Attachment.send :preload_associations, attachments,
+      [:canvadoc, :crocodoc_document]
   end
 end

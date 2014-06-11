@@ -1780,12 +1780,12 @@ class Attachment < ActiveRecord::Base
 
   def canvadoc_url(user)
     return unless canvadocable?
-    "/canvadoc_session?#{preview_params(user, "canvadoc")}"
+    "/api/v1/canvadoc_session?#{preview_params(user, "canvadoc")}"
   end
 
   def crocodoc_url(user)
     return unless crocodoc_available?
-    "/crocodoc_session?#{preview_params(user, "crocodoc")}"
+    "/api/v1/crocodoc_session?#{preview_params(user, "crocodoc")}"
   end
 
   def preview_params(user, type)

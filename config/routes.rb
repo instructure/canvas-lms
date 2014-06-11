@@ -398,9 +398,6 @@ CanvasRails::Application.routes.draw do
 
   match 'quiz_statistics/:quiz_statistics_id/files/:file_id/download' => 'files#show', :as => :quiz_statistics_download, :download => '1'
 
-  match '/crocodoc_session' => 'crocodoc_sessions#show', :via => :get, :as => :crocodoc_session
-  match '/canvadoc_session' => 'canvadoc_sessions#show', :via => :get, :as => :canvadoc_session
-
   resources :page_views, :only => [:update]
   match 'media_objects' => 'context#create_media_object', :as => :create_media_object, :via => :post
   match 'media_objects/kaltura_notifications' => 'context#kaltura_notifications', :as => :kaltura_notifications
@@ -1559,6 +1556,10 @@ CanvasRails::Application.routes.draw do
       post 'accounts/:account_id/grading_standards', :action => :create
       post 'courses/:course_id/grading_standards', :action => :create
     end
+
+    get '/crocodoc_session', controller: 'crocodoc_sessions', action: 'show', :as => :crocodoc_session
+    get '/canvadoc_session', controller: 'canvadoc_sessions', action: 'show', as: :canvadoc_session
+
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented
