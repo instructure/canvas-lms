@@ -139,7 +139,11 @@ button[type="submit"]{
 body.modal #modal-box.login-box {
     background: url('/images/Money_Noise_tm.png?1399865639') repeat scroll 0% 0%, radial-gradient(circle farthest-corner at 50% -100px, rgba(255, 255, 255, 0.6) 0%, transparent 100%) repeat scroll 0% 0%, -moz-linear-gradient(center top, #3bed5c, #b415ed) repeat scroll 0% 0% transparent;
 }
-#footer {text-align: center}
+body.modal #footer {
+    display: block !important;
+    width: auto;
+    margin: auto;
+    text-align: center;}
 #footer .footer-logo1 {
     background-color: transparent;
     background-image: url('/slbx/footer1.png');
@@ -159,4 +163,20 @@ body.modal #modal-box.login-box {
     height: 40px;
     margin: 0px 20px 0px 0px;
     width: 307px;
+}
+
+#footer .footer-helper {
+    font-size: 150%;
+}
+#section-tabs .section-tab-hidden a {
+    display:none;
+}
+#assignments_menu_item {
+    display:none;
+}
+#grades_menu_item {
+    display: none;
+}
+#calendar_menu_item {
+    display: none;
 }

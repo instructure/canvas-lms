@@ -10,7 +10,7 @@
 # it actually has semantic significance. An indented gem required in Gemfile is a gem that is NOT
 # directly used by Canvas, but required by a gem that is used by Canvas. We lock into specific versions of
 # these gems to prevent regression, and the indentation serves to alert us to the relationship between the gem and canvas-lms
-source 'https://rubygems.org/'
+source 'https://ruby.taobao.org/'
 
 require File.expand_path("../config/canvas_rails3", __FILE__)
 
