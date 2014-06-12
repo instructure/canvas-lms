@@ -17,6 +17,7 @@ SimpleCov.add_filter '/config/'
 SimpleCov.add_filter '/parallelized_specs/'
 SimpleCov.add_filter '/db_imports/'
 SimpleCov.add_filter 'spec_canvas'
+SimpleCov.add_filter '/db/'
 
 SimpleCov.add_group 'Controllers', 'app/controllers'
 SimpleCov.add_group 'Models', 'app/models'
@@ -26,7 +27,6 @@ SimpleCov.add_group 'Gems', 'gems/'
 SimpleCov.add_group 'Helpers', 'app/helpers'
 SimpleCov.add_group 'Libraries', '/lib/'
 SimpleCov.add_group 'Plugins', 'vendor/plugins'
-SimpleCov.add_group 'Db', '/db/'
 
 SimpleCov.add_group "Long files" do |src_file|
   src_file.lines.count > 500
