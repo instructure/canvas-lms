@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2012 Instructure, Inc.
+# Copyright (C) 2013 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -304,6 +304,18 @@ describe ContentMigrationsController, type: :request do
       migration = ContentMigration.find json['id']
       migration.workflow_state.should == "exported"
       migration.job_progress.should be_nil
+    end
+
+    it "should queue for course copy on concluded courses" do
+      source_course = Course.create(name: 'source course')
+      source_course.enroll_teacher(@user)
+      source_course.workflow_state = 'completed'
+      source_course.save!
+      #tests that the response was a 200
+      api_call(:post, @migration_url, @params,
+               {migration_type: 'course_copy_importer',
+                settings: {source_course_id: source_course.id.to_param}}
+      )
     end
 
     it "should translate a sis source_course_id" do
