@@ -820,7 +820,12 @@ acknowledge that you have read and agreed to the
             <%= f.text_area :message, :class => 'alert_message', :style => "height: 100px;" %>
             <% if @account.site_admin? %>
               <span >
-                *<%= t(:interpolate_account_domain, "Note: enter \"{{ACCOUNT_DOMAIN}}\" to substitute the user's root account domain")  %>
+                <div>
+                  <%= t(:interpolate_account_domain, "Enter \"{{ACCOUNT_DOMAIN}}\" to substitute the user's root account domain")  %>
+                </div>
+                <div>
+                  <%= t(:interpolate_user_id, "Enter \"{{CANVAS_USER_ID}}\" to substitute the user's unique Canvas ID")  %>
+                </div>
               </span>
             <% end %>
           </div>

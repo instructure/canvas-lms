@@ -125,6 +125,12 @@ describe "dashboard" do
       fj("#dashboard .global-message .message.user_content").text.should == announcement.message.gsub("{{ACCOUNT_DOMAIN}}", @course.account.domain)
     end
 
+    it "should interpolate the user's id in global notifications" do
+      announcement = @course.account.announcements.create!(:message => "blah blah http://random-survey-startup.ly/?surveys_are_not_really_anonymous={{CANVAS_USER_ID}}")
+      get "/"
+      fj("#dashboard .global-message .message.user_content").text.should == announcement.message.gsub("{{CANVAS_USER_ID}}", @user.global_id.to_s)
+    end
+
     it "should show appointment stream items on the dashboard" do
       pending "we need to add this stuff back in"
       Notification.create(:name => 'Appointment Group Published', :category => "Appointment Availability")
