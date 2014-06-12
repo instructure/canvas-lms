@@ -131,10 +131,18 @@ define([
     var equella_button = INST && INST.equellaEnabled ? ",instructure_equella" : "";
     instructure_buttons = instructure_buttons + equella_button;
 
-    var buttons1 = "bold,italic,underline,forecolor,backcolor,removeformat";
-    var buttons2 = "justifyleft,justifycenter,justifyright,bullist,outdent,indent";
-    var buttons3 = "sup,sub,numlist,table,instructure_links,unlink" + instructure_buttons;
-    var buttons4 = "fontsizeselect,formatselect";
+    var buttons1 = "bold,italic,underline,forecolor,backcolor,removeformat,justifyleft,justifycenter,justifyright,bullist,outdent,indent,sup,sub,numlist,table,instructure_links,unlink" + instructure_buttons + ",fontsizeselect,formatselect";
+    var buttons2 = "";
+    var buttons3 = "";
+
+    if (width < 359 && width > 0) {
+      buttons1 = "bold,italic,underline,forecolor,backcolor,removeformat,justifyleft,justifycenter,justifyright";
+      buttons2 = "outdent,indent,sup,sub,bullist,numlist,table,instructure_links,unlink" + instructure_buttons;
+      buttons3 = "fontsizeselect,formatselect";
+    } else if (width < 600) {
+      buttons1 = "bold,italic,underline,forecolor,backcolor,removeformat,justifyleft,justifycenter,justifyright,outdent,indent,sup,sub,bullist,numlist";
+      buttons2 = "table,instructure_links,unlink" + instructure_buttons + ",fontsizeselect,formatselect";
+    }
 
     var editor_css = "/javascripts/tinymce/jscripts/tiny_mce/themes/advanced/skins/default/ui.css,/stylesheets_compiled/legacy_normal_contrast/tiny_like_ck_with_external_tools.css";
 
@@ -154,7 +162,6 @@ define([
       theme_advanced_toolbar_align : "center",
       theme_advanced_buttons2: buttons2,
       theme_advanced_buttons3: buttons3,
-      theme_advanced_buttons4: buttons4,
 
       theme_advanced_resize_horizontal : false,
       theme_advanced_resizing : true,
