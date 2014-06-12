@@ -34,8 +34,8 @@ class Account < ActiveRecord::Base
 
   EXPORTABLE_ASSOCIATIONS = [
     :courses, :group_categories, :groups, :enrollment_terms, :enrollments, :account_users, :course_sections,
-    :users, :pseudonyms, :attachments, :folders, :active_assignments, :grading_standards, :assessment_questions,
-    :assessment_question_banks, :roles, :announcements, :alerts, :course_account_associations, :user_account_associations
+    :pseudonyms, :attachments, :folders, :active_assignments, :grading_standards, :assessment_question_banks,
+    :roles, :announcements, :alerts, :course_account_associations, :user_account_associations
   ]
 
   include Workflow

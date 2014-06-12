@@ -80,7 +80,7 @@ class Course < ActiveRecord::Base
   EXPORTABLE_ASSOCIATIONS = [
     :abstract_course, :root_account, :enrollment_term, :grading_standard, :template_course, :course_sections, :enrollments, :custom_gradebook_columns,
     :group_categories, :groups, :assignments, :assignment_groups, :calendar_events, :submissions, :discussion_topics, :discussion_entries, :announcements,
-    :attachments, :folders, :wiki, :quizzes, :assessment_questions, :assessment_question_banks, :grading_standards, :web_conferences,
+    :attachments, :folders, :wiki, :quizzes, :assessment_question_banks, :grading_standards, :web_conferences,
     :collaborations, :context_modules, :context_module_tags, :media_objects, :page_views, :asset_user_accesses, :role_overrides, :alerts,
     :appointment_groups, :content_participation_counts
   ]

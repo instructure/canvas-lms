@@ -31,14 +31,14 @@ class User < ActiveRecord::Base
 
   EXPORTABLE_ATTRIBUTES = [
     :id, :name, :sortable_name, :workflow_state, :time_zone, :uuid, :created_at, :updated_at, :visibility, :avatar_image_url, :avatar_image_source, :avatar_image_updated_at,
-    :phone, :school_name, :school_position, :short_name, :deleted_at, :show_user_services, :gender, :page_views_count, :unread_inbox_items_count, :reminder_time_for_due_dates,
+    :phone, :school_name, :school_position, :short_name, :deleted_at, :show_user_services, :gender, :page_views_count, :reminder_time_for_due_dates,
     :reminder_time_for_grading, :storage_quota, :visible_inbox_types, :last_user_note, :subscribe_to_emails, :features_used, :preferences, :avatar_state, :locale, :browser_locale,
     :unread_conversations_count, :public, :birthdate, :otp_communication_channel_id, :initial_enrollment_type, :crocodoc_id, :last_logged_out, :lti_context_id
   ]
 
   EXPORTABLE_ASSOCIATIONS = [
-    :communication_channels, :communication_channel, :enrollments, :observer_enrollments, :observee_enrollments, :observers, :user_observers,
-    :user_observees, :observed_users, :courses, :group_memberships, :groups, :associated_accounts, :associated_root_accounts, :context_external_tools, :submissions,
+    :communication_channels, :communication_channel, :enrollments, :observer_enrollments, :observee_enrollments, :user_observers,
+    :user_observees, :observed_users, :group_memberships, :context_external_tools, :submissions,
     :pseudonyms, :pseudonym_accounts, :pseudonym, :attachments, :folders, :calendar_events, :quiz_submissions, :eportfolios, :collaborations, :user_services,
     :rubric_associations, :rubrics, :context_rubrics, :grading_standards, :context_module_progressions, :assessment_question_bank_users, :assessment_question_banks,
     :learning_outcome_results, :inbox_items, :submission_comment_participants, :submission_comments, :collaborators, :assigned_assessments, :web_conference_participants,
