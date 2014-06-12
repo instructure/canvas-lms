@@ -318,16 +318,13 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
   end
 
   def prep_submissions(submissions)
-    if includes_all_versions?
-      submissions = submissions.includes(:versions)
+    subs = submissions.includes(:versions).map do |qs|
+      includes_all_versions? ? qs.attempts.version_models : qs.attempts.kept
     end
-    submissions.map { |qs|
-      includes_all_versions? ?
-        qs.submitted_attempts :
-        [qs.latest_submitted_attempt].compact
-    }.flatten.
-    select { |s| s && s.completed? && s.submission_data.is_a?(Array) }.
-    sort_by(&:updated_at).reverse
+    subs = subs.flatten.compact.select do |s|
+      s.completed? && s.submission_data.is_a?(Array)
+    end
+    subs.sort_by(&:updated_at).reverse
   end
 
   def strip_html_answers(question)
