@@ -64,4 +64,9 @@
         });
     });
 
+    // remove SIS ID from user profile
+    utils.onPage(/^\/courses\/\d+\/users\/\d+$/, function() {
+        $('#login_information').remove();
+    });
+
 })(jQuery);

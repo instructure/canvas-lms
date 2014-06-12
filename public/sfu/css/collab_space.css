@@ -2,7 +2,10 @@
     display: none;
 }
 
+li.section > a.assignments,
 li.section > a.grades,
+li.section > a.outcomes,
+li.section > a.quizzes,
 li.section > a.syllabus,
 li.section > a.context_external_tool_159 {
     display: none;
