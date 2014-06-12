@@ -1019,7 +1019,7 @@ class Course < ActiveRecord::Base
     can :read_syllabus
 
     RoleOverride.permissions.each do |permission, details|
-      given {|user, session| (self.enrollment_allows(user, session, permission) || self.account_membership_allows(user, session, permission)) && (!details[:if] || send(details[:if])) }
+      given {|user| (self.enrollment_allows(user, permission) || self.account_membership_allows(user, permission)) && (!details[:if] || send(details[:if])) }
       can permission
     end
 
@@ -1041,17 +1041,17 @@ class Course < ActiveRecord::Base
     given { |user| (self.available? || self.completed?) && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_observer? && e.associated_user_id} }
     can :read_grades
 
-    given { |user, session| self.available? && self.teacherless? && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_student? } && (!session || !session["role_course_#{self.id}"]) }
+    given { |user| self.available? && self.teacherless? && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_student? } }
     can :update and can :delete and RoleOverride.teacherless_permissions.each{|p| can p }
 
     # Active admins (Teacher/TA/Designer)
-    given { |user, session| (self.available? || self.created? || self.claimed?) && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_admin? } && (!session || !session["role_course_#{self.id}"]) }
+    given { |user| (self.available? || self.created? || self.claimed?) && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_admin? } }
     can :read_as_admin and can :read and can :manage and can :update and can :use_student_view and can :read_outcomes and can :view_unpublished_items and can :manage_feature_flags
 
     # Teachers and Designers can delete/reset, but not TAs
-    given { |user, session| !self.deleted? && !self.sis_source_id && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_content_admin? } && (!session || !session["role_course_#{self.id}"]) }
+    given { |user| !self.deleted? && !self.sis_source_id && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_content_admin? } }
     can :delete
-    given { |user, session| !self.deleted? && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_content_admin? } && (!session || !session["role_course_#{self.id}"]) }
+    given { |user| !self.deleted? && user && user.cached_not_ended_enrollments.any?{|e| e.course_id == self.id && e.participating_content_admin? } }
     can :reset_content
 
     # Student view student
@@ -1108,26 +1108,22 @@ class Course < ActiveRecord::Base
     end
     can :read, :read_grades, :read_forum, :read_outcomes
 
-    # Viewing as different role type
-    given { |user, session| session && session["role_course_#{self.id}"] }
-    can :read and can :read_outcomes
-
     # Admin
-    given { |user, session| self.account_membership_allows(user, session) }
+    given { |user| self.account_membership_allows(user) }
     can :read_as_admin
 
-    given { |user, session| self.account_membership_allows(user, session, :manage_courses) }
+    given { |user| self.account_membership_allows(user, :manage_courses) }
     can :read_as_admin and can :manage and can :update and can :delete and can :use_student_view and can :reset_content and can :view_unpublished_items and can :manage_feature_flags
 
-    given { |user, session| self.account_membership_allows(user, session, :read_course_content) }
+    given { |user| self.account_membership_allows(user, :read_course_content) }
     can :read and can :read_outcomes
 
-    given { |user, session| !self.deleted? && self.sis_source_id && self.account_membership_allows(user, session, :manage_sis) }
+    given { |user| !self.deleted? && self.sis_source_id && self.account_membership_allows(user, :manage_sis) }
     can :delete
 
     # Admins with read_roster can see prior enrollments (can't just check read_roster directly,
     # because students can't see prior enrollments)
-    given { |user, session| self.account_membership_allows(user, session, :read_roster) }
+    given { |user| self.account_membership_allows(user, :read_roster) }
     can :read_prior_roster
   end
 
@@ -1149,18 +1145,12 @@ class Course < ActiveRecord::Base
     )
   end
 
-  def enrollment_allows(user, session, permission)
+  def enrollment_allows(user, permission)
     return false unless user && permission
-
-    temp_type = session && session["role_course_#{self.id}"]
 
     @enrollment_lookup ||= {}
     @enrollment_lookup[user.id] ||= shard.activate do
-      if temp_type
-        [Enrollment.typed_enrollment(temp_type).new(:course => self, :user => user, :workflow_state => 'active')]
-      else
-        self.enrollments.active_or_pending.for_user(user).reject { |e| [:inactive, :completed].include?(e.state_based_on_date)}
-      end
+      self.enrollments.active_or_pending.for_user(user).reject { |e| [:inactive, :completed].include?(e.state_based_on_date)}
     end
 
     @enrollment_lookup[user.id].any? {|e| e.has_permission_to?(permission) }
@@ -1250,9 +1240,8 @@ class Course < ActiveRecord::Base
     @account_users[user.global_id]
   end
 
-  def account_membership_allows(user, session, permission = nil)
+  def account_membership_allows(user, permission = nil)
     return false unless user
-    return false if session && session["role_course_#{self.id}"]
 
     @membership_allows ||= {}
     @membership_allows[[user.id, permission]] ||= self.account_users_for(user).any? { |au| permission.nil? || au.has_permission_to?(self, permission) }

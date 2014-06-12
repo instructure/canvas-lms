@@ -389,7 +389,6 @@ routes.draw do
     match 'copy' => 'courses#copy_course', :as => :copy_course, :via => :post
     concerns :media
     match 'user_notes' => 'user_notes#user_notes', :as => :user_notes
-    match 'switch_role/:role' => 'courses#switch_role', :as => :switch_role
     match 'details/sis_publish' => 'courses#sis_publish_status', :as => :sis_publish_status, :via => :get
     match 'details/sis_publish' => 'courses#publish_to_sis', :as => :publish_to_sis, :via => :post
     resources :user_lists, :only => :create

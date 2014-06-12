@@ -69,11 +69,11 @@
       <% end %>
     <% end %>
 
-    <% if @context.available? && @context.self_enrollment && @context.open_enrollment && (!@context_enrollment || !@context_enrollment.active?) && !session["role_course_#{@context.id}"] %>
+    <% if @context.available? && @context.self_enrollment && @context.open_enrollment && (!@context_enrollment || !@context_enrollment.active?) %>
       <div class="rs-margin-lr rs-margin-top">
         <a href="<%= enroll_url(@context.self_enrollment_code) %>" title="<%= t('links.join_course', %{Join this Course}) %>" class="btn button-sidebar-wide self_enrollment_link" data-open-as-dialog><i class="icon-user-add"></i>  <%= t('links.join_course', %{Join this Course}) %></a>
       </div>
-    <% elsif @context_enrollment && @context_enrollment.self_enrolled && @context_enrollment.active? && (!session["role_course_#{@context.id}"]) %>
+    <% elsif @context_enrollment && @context_enrollment.self_enrolled && @context_enrollment.active? %>
       <div class="rs-margin-lr rs-margin-top">
         <a href="#" class="btn button-sidebar-wide self_unenrollment_link"><i class="icon-end"></i> <%= t('links.drop_course', %{Drop this Course}) %></a>
       </div>
@@ -84,11 +84,6 @@
           <a href="<%= course_self_unenrollment_path(@context, @context_enrollment.uuid) %>" class="btn btn-primary action"><i class="icon-end"></i> <span><%= t('links.drop_course', %{Drop this Course}) %></span></a>
           <a href="#" class="btn dialog_closer"><%= t('#buttons.cancel', %{Cancel}) %></a>
         </div>
-      </div>
-    <% elsif temp_type = session["role_course_#{@context.id}"] %>
-      <div class="rs-margin-lr rs-margin-top">
-        <%= image_tag "warning.png" %> <%= t 'acting_as', %{You are currently viewing this course with the role: %{enrollment_type}.  You will only have permissions and access available to users of this role.}, :enrollment_type => content_tag('strong', Enrollment.readable_type(temp_type)) %>
-        <a class="btn button-sidebar-wide"><i class="icon-user"></i> <%= t('links.restore_role', %{Restore Role and Permissions}) %></a>
       </div>
     <% end %>
     <%= render :partial => 'assignments_needing_grading', :locals => {:contexts => [@context]} %>
