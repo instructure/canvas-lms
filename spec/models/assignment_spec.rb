@@ -2450,6 +2450,18 @@ describe Assignment do
       @assignment.save!
       s.reload.version_number.should == 2
     end
+
+    it "works for pass/fail assignments" do
+      student1, student2 = n_students_in_course(2)
+      a = @course.assignments.create! grading_type: "pass_fail", points_possible: 5
+      sub1 = a.grade_student(student1, grade: "complete").first
+      sub2 = a.grade_student(student2, grade: "incomplete").first
+
+      a.update_attribute :points_possible, 10
+
+      sub1.reload.grade.should == "complete"
+      sub2.reload.grade.should == "incomplete"
+    end
   end
 
   describe '#graded_count' do

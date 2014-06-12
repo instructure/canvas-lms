@@ -636,15 +636,13 @@ class Assignment < ActiveRecord::Base
     when "percent"
       result = "#{score_to_grade_percent(score)}%"
     when "pass_fail"
-      if self.points_possible.to_f > 0.0
-        passed = score.to_f == self.points_possible.to_f
+      if points_possible && points_possible > 0
+        passed = score > 0
       elsif given_grade
         # the score for a zero-point pass/fail assignment could be considered
         # either pass *or* fail, so look at what the current given grade is
         # instead
         passed = ["complete", "pass"].include?(given_grade)
-      else
-        passed = score.to_f > 0.0
       end
       result = passed ? "complete" : "incomplete"
     when "letter_grade", "gpa_scale"
