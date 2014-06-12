@@ -208,7 +208,8 @@ class GradebooksController < ApplicationController
       :custom_column_datum_url => api_v1_course_custom_gradebook_column_datum_url(@context, ":id", ":user_id"),
       :reorder_custom_columns_url => api_v1_custom_gradebook_columns_reorder_url(@context),
       :teacher_notes => teacher_notes && custom_gradebook_column_json(teacher_notes, @current_user, session),
-      :change_gradebook_version_url => context_url(@context, :change_gradebook_version_context_gradebook_url, :version => 2)
+      :change_gradebook_version_url => context_url(@context, :change_gradebook_version_context_gradebook_url, :version => 2),
+      :sis_app_url => Setting.get('sis_app_url', nil)
     }
   end
 

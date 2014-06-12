@@ -18,7 +18,7 @@ define [
 
   class PostGradesDialog extends DialogBaseView
     
-    initialize: (model) ->
+    initialize: (model, sis_app_url) ->
       super
 
       model.bind('change:assignments_to_post', =>
@@ -37,6 +37,7 @@ define [
       )
 
       @model = model
+      @sis_app_url = sis_app_url
 
       if @model.missing_and_not_unique().length > 0
         @page = 'assignmentErrors'
@@ -172,7 +173,7 @@ define [
       json_to_post['assignments'] = _.map(@model.get('assignments_to_post'), (assignment) -> assignment.id)
       if @model.get('section_id')
         json_to_post['section_id'] = @model.get('section_id')
-        $.ajax 'http://localhost:9292/grades/section/' + @model.get('section_id'), #need to add SIS APP endpoint to post data
+        $.ajax @sis_app_url + '/grades/section/' + @model.get('section_id'),
           type: 'POST'
           data: JSON.stringify(json_to_post)
           contentType: 'application/json; charset=utf-8'
@@ -183,7 +184,7 @@ define [
         @close()
       else
         json_to_post['course_id'] = @model.get('course_id')
-        $.ajax 'http://localhost:9292/grades/course/' + @model.get('course_id'), #need to add SIS APP endpoint to post data
+        $.ajax @sis_app_url + '/grades/course/' + @model.get('course_id'),
           type: 'POST'
           data: JSON.stringify(json_to_post)
           contentType: 'application/json; charset=utf-8'

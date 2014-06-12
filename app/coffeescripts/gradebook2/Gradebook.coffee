@@ -182,7 +182,7 @@ define [
           }
         )
 
-        postGradesDialog = new PostGradesDialog(postGradesModel)
+        postGradesDialog = new PostGradesDialog(postGradesModel, ENV.GRADEBOOK_OPTIONS.sis_app_url)
         postGradesModel.reset_ignored_assignments()
         postGradesDialog.render().show()
         open = $('#post-grades-container').dialog('isOpen')
