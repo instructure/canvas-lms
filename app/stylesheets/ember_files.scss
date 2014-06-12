@@ -5,19 +5,6 @@
 }
 $border: #e5e4e4;
 
-/* This is much easier than writing code for an edgecase of not showing crumbs */
-#breadcrumbs{
-  display: none;
-}
-#main{
-  max-width: inherit !important;
-}
-
-body.files .container-fluid, body.files #content{
-  padding: 0px;
-}
-
-/* ---------------------------------------- end of the ugly --------------------*/
 
 .ef-search-container{
   position: relative;
@@ -80,7 +67,7 @@ body.files .container-fluid, body.files #content{
   -ms-flex-align: center;
 }
 
-.ef-breadcrumb{
+.ef-breadcrumbs{
   padding-left: 20px;
   border-top: 1px solid $border;
   border-bottom: 1px solid $border;
@@ -90,7 +77,7 @@ body.files .container-fluid, body.files #content{
   -webkit-align-items: center;
   -ms-flex-align: center;
 
-  a{
+  a {
     background-color: transparent;
     background-image: url("/images/breadcrumb-chevron.png");
     background-repeat: no-repeat;
@@ -99,7 +86,7 @@ body.files .container-fluid, body.files #content{
     padding-left: 12px;
     margin-left: 8px;
 
-    &:first-child{
+    &:first-of-type {
       background: none;
       padding-left: 0;
       margin-left: 0;
@@ -205,18 +192,7 @@ body.files .container-fluid, body.files #content{
     -webkit-flex-direction: column;
     -ms-flex-direction: column;
 
-    .ef-directory-header{
-      display: flex;
-      display: -webkit-flex;
-      display: -ms-flexbox;
-      padding: 5px;
 
-      border-bottom: 1px solid #f2f2f2;
-
-      a{
-        color: black;
-      }
-    }
 
     .ef-item-row{
       display: flex;
@@ -284,6 +260,17 @@ body.files .container-fluid, body.files #content{
       display: none;
       margin-left: 14px;
     }
+  }
+}
+.ef-directory-header{
+  display: flex;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  padding: 5px;
+  border-bottom: 1px solid #f2f2f2;
+
+  a{
+    color: black;
   }
 }
 

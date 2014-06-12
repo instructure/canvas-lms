@@ -81,6 +81,7 @@ routes.draw do
       match 'contents' => 'files#attachment_content', :as => :attachment_content
       collection do
         get "folder#{full_path_glob}", :controller => :files, :action => :ember_app, :format => false
+        get "search", :controller => :files, :action => :ember_app, :format => false
         get :quota
         post :reorder
       end
@@ -733,6 +734,7 @@ routes.draw do
   match 'switch_calendar/:preferred_calendar' => 'calendars#switch_calendar', :as => :switch_calendar, :via => :post
   match 'files' => 'files#index', :as => :files, :via => :get
   get "files/folder#{full_path_glob}", :controller => :files, :action => :ember_app, :format => false
+  get "files/search", :controller => :files, :action => :ember_app, :format => false
   match 'files/s3_success/:id' => 'files#s3_success', :as => :s3_success
   match 'files/:id/public_url' => 'files#public_url', :as => :public_url
   match 'files/preflight' => 'files#preflight', :as => :file_preflight
