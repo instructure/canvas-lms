@@ -1,6 +1,6 @@
 {
-  "name": "ic-tabs",
-  "version": "0.1.3",
+  "name": "ic-modal",
+  "version": "0.1.1",
   "authors": [
     "Ryan Florence <rpflorence@gmail.com>"
   ],
@@ -19,23 +19,24 @@
     "TODO.md"
   ],
   "dependencies": {
-    "ember": "^1.3.0",
+    "ember": ">=1.3.0 <= 1.5.0",
     "ic-styled": "~1.1.6"
   },
   "devDependencies": {
-    "ember-qunit": "^0.1.3",
+    "ember-qunit": "0.1.3",
     "jquery-simulate": "https://raw.github.com/jquery/jquery-simulate/master/jquery.simulate.js",
     "ember-canary": "http://builds.emberjs.com/canary/ember.js",
     "ic-styled": "~1.1.6"
   },
-  "homepage": "https://github.com/instructure/ic-tabs",
-  "_release": "0.1.3",
+  "homepage": "https://github.com/instructure/ic-modal",
+  "_release": "0.1.1",
   "_resolution": {
     "type": "version",
-    "tag": "v0.1.3",
-    "commit": "575a4589062badbf1624a61aa61a7065b0386050"
+    "tag": "v0.1.1",
+    "commit": "b5b5c040d4cb49a9d39d8c3f0139250624c032fb"
   },
-  "_source": "git://github.com/instructure/ic-tabs.git",
-  "_target": "0.1.3",
-  "_originalSource": "ic-tabs"
+  "_source": "git://github.com/instructure/ic-modal.git",
+  "_target": "~0.1.1",
+  "_originalSource": "ic-modal",
+  "_direct": true
 }

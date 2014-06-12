@@ -72,6 +72,8 @@ module Canvas
           {'name' => 'ic-styled', 'location' => 'bower/ic-styled'},
           {'name' => 'ic-menu', 'location' => 'bower/ic-menu'},
           {'name' => 'ic-tabs', 'location' => 'bower/ic-tabs/dist/amd'},
+          {'name' => 'ic-lazy-list', 'location' => 'bower/ic-lazy-list/dist/amd'},
+          {'name' => 'ic-modal', 'location' => 'bower/ic-modal/dist/amd'},
           {'name' => 'ember-qunit', 'location' => 'bower/ember-qunit/dist/amd'},
         ].to_json
       end

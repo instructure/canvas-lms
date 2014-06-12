@@ -1,22 +1,21 @@
 {
-  "name": "ic-menu",
-  "version": "0.1.11",
-  "description": "",
+  "name": "ic-lazy-list",
+  "version": "0.2.2",
+  "description": "Lazily loads records from an href as the user scrolls down the page, all in your template",
   "main": "main.js",
   "scripts": {
-    "test": "testem ci -l chrome"
+    "test": "testem ci"
   },
-  "author": "Ryan Florence <rpflorence@gmail.com>",
+  "author": "Jon Doe <jon@example.com>",
   "license": "MIT",
   "dependencies": {
-    "ic-styled": "~1.1.6"
+    "ic-ajax": "^1.0.4"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
     "grunt-ember-templates": "~0.4.17",
     "grunt-contrib-watch": "~0.5.3",
     "grunt-contrib-concat": "~0.3.0",
-    "grunt-contrib-clean": "~0.5.0",
     "testem": "~0.5.12",
     "matchdep": "~0.3.0"
   }
