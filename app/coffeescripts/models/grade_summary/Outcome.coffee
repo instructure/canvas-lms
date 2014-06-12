@@ -21,6 +21,13 @@ define [
       else
         'undefined'
 
+    roundedScore: ->
+      score = @get('score')
+      if _.isNumber(score)
+        Math.round(score * 100.0) / 100.0
+      else
+        null
+
     scoreDefined: ->
       _.isNumber(@get('score'))
 
@@ -36,6 +43,7 @@ define [
     toJSON: ->
       _.extend super,
         status: @status()
+        roundedScore: @roundedScore()
         scoreDefined: @scoreDefined()
         percentProgress: @percentProgress()
         masteryPercent: @masteryPercent()
