@@ -316,7 +316,10 @@ class Conversation < ActiveRecord::Base
         cps = cps.where("user_id NOT IN (?)", skip_users.map(&:user_id)) if skip_users.present?
       end
 
-      cps = cps.where(:user_id => (options[:only_users]+[message.author]).map(&:id)) if options[:only_users]
+      if options[:only_users]
+        options[:only_users] << message.author
+        cps = cps.where(:user_id => (options[:only_users]).map(&:id))
+      end
 
       next unless cps.exists?
 
