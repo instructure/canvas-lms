@@ -24,7 +24,7 @@
     {{#ic-lazy-list data=groups href=groupsUrl}}
     {{#each sortedGroups itemController="group" }}
     <div {{bind-attr class=":accordion :student-groups :content-box showBody isMember"}}>
-      <div class="student-group-header clearfix" >
+      <div class="student-group-header clearfix" {{action 'toggleBody'}}>
         <i class="icon-mini-arrow-right" aria-hidden="true"></i>
         <i class="icon-mini-arrow-down" aria-hidden="true"></i>
         <div class="student-group-title">
@@ -39,7 +39,7 @@
 
         {{#if isMember}}
           {{#if canSignup}}
-            <a href="#" class="student-group-join" {{action "leave" this}} aria-label="leave group">{{#t 'student_groups_leave'}}Leave{{/t}}</a>
+            <a href="#" class="student-group-join" {{action "leave" this bubbles=false}} aria-label="leave group">{{#t 'student_groups_leave'}}Leave{{/t}}</a>
           {{else}}
               <span class="student-group-join">&nbsp</span>
           {{/if}}
@@ -49,10 +49,10 @@
               <span class="student-group-join" aria-hidden="true">{{#t 'full'}}Full{{/t}}</span>
               <span class="screenreader-only">{{#t 'group_full'}}Group is full{{/t}}</span>
             {{else}}
-              {{#if isMemberOfCategory}}
-              <a href="#" class="student-group-join" {{action "join" this}} aria-label="switch to group">{{#t 'student_groups_switch'}}Switch To{{/t}}</a>
+              {{#if shouldSwitch}}
+              <a href="#" class="student-group-join" {{action "join" this bubbles=false}} aria-label="switch to group">{{#t 'student_groups_switch'}}Switch To{{/t}}</a>
               {{else}}
-              <a href="#" class="student-group-join" {{action "join" this}} aria-label="join group">{{#t 'student_groups_join'}}Join{{/t}}</a>
+              <a href="#" class="student-group-join" {{action "join" this bubbles=false}} aria-label="join group">{{#t 'student_groups_join'}}Join{{/t}}</a>
               {{/if}}
             {{/if}}
           {{else}}

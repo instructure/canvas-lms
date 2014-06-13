@@ -14,6 +14,5 @@ define [
   Group.reopenClass
 
     url: ->
-      debugger
       "/api/v1"
 
