@@ -147,7 +147,7 @@ describe "groups" do
 
       new_group_el = fj(".student-group-header:first").text
       new_group_el.should include "My Group"
-      new_group_el.should include "1 student"
+      new_group_el.should include "2 students"
     end
   end
 end
