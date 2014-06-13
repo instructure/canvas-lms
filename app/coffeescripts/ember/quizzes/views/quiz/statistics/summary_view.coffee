@@ -37,7 +37,7 @@ define [ 'ember', 'vendor/d3.v3' ], (Ember, d3) ->
         .attr('width', width + MARGIN_L + MARGIN_R)
         .attr('height', height + MARGIN_T + MARGIN_B)
         .append('g')
-          .attr("transform", "translate(#{MARGIN_L},#{MARGIN_T})");
+          .attr("transform", "translate(#{MARGIN_L},#{MARGIN_T})")
 
       svg.append('g')
         .attr('class', 'x axis')
@@ -69,7 +69,7 @@ define [ 'ember', 'vendor/d3.v3' ], (Ember, d3) ->
           .attr('x', (d, i) -> x(i))
           .attr('width', x.rangeBand)
           .attr('y', (d) -> y(d + visibilityThreshold))
-          .attr('height', (d) -> height - y(d + visibilityThreshold));
+          .attr('height', (d) -> height - y(d + visibilityThreshold))
 
   renderMedianDistGraph = (svg, percentileData, x, y, barMargin) ->
     data = d3.range(0, 101, 10).map (percentile) ->
@@ -78,19 +78,20 @@ define [ 'ember', 'vendor/d3.v3' ], (Ember, d3) ->
 
       { y: point, percentile: percentile + entries.indexOf(point) }
 
+    # -- disable line until we figure out proper normal distribution --
+    #
     # make it so that the line starts and ends on any bar's center, looks better
-    paddingToCenter = x.rangeBand() / 2 - barMargin
-
-    line = d3.svg.line()
-      .x((d, i) -> x(d.percentile) + paddingToCenter)
-      .y((d) -> y(d.y))
-      .interpolate('basis')
+    # paddingToCenter = x.rangeBand() / 2 - barMargin
+    # line = d3.svg.line()
+    #   .x((d, i) -> x(d.percentile) + paddingToCenter)
+    #   .y((d) -> y(d.y))
+    #   .interpolate('basis')
 
     svg.selectAll('path.median-dist-graph')
       .data(data)
       .enter()
         .append('path')
         .attr('class', 'median-dist-graph')
-        .attr('d', line(data))
+        # .attr('d', line(data))
 
   SummaryView
