@@ -386,6 +386,8 @@ define([
         this._removeEditor(more_options);
       } else if(options == "is_dirty") {
         return $instructureEditorBoxList._getEditor(id).isDirty();
+      } else if(options == 'exists?') {
+        return !!$instructureEditorBoxList._getEditor(id);
       }
       return this;
     }
