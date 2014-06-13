@@ -303,33 +303,6 @@ describe Assignment do
     @submission.user_id.should eql(@user.id)
   end
 
-  it "should preserve pass/fail with no points possible" do
-    setup_assignment_without_submission
-    @assignment.grading_type = 'pass_fail'
-    @assignment.points_possible = nil
-    @assignment.save
-    s = @assignment.grade_student(@user, :grade => 'pass')
-    s.should be_is_a(Array)
-    @assignment.reload
-    @assignment.submissions.size.should eql(1)
-    @submission = @assignment.submissions.first
-    @submission.state.should eql(:graded)
-    @submission.should eql(s[0])
-    @submission.score.should eql(0.0)
-    @submission.grade.should eql('complete')
-    @submission.user_id.should eql(@user.id)
-
-    @assignment.grade_student(@user, :grade => 'fail')
-    @assignment.reload
-    @assignment.submissions.size.should eql(1)
-    @submission = @assignment.submissions.first
-    @submission.state.should eql(:graded)
-    @submission.should eql(s[0])
-    @submission.score.should eql(0.0)
-    @submission.grade.should eql('incomplete')
-    @submission.user_id.should eql(@user.id)
-  end
-
   it "should preserve letter grades with zero points possible" do
     setup_assignment_without_submission
     @assignment.grading_type = 'letter_grade'
@@ -2443,24 +2416,29 @@ describe Assignment do
   end
 
   describe "update_student_submissions" do
+    before do
+      @student1, @student2 = n_students_in_course(2)
+      @assignment = @course.assignments.create! grading_type: "pass_fail",
+                                                points_possible: 5
+      @sub1 = @assignment.grade_student(@student1, grade: "complete").first
+      @sub2 = @assignment.grade_student(@student2, grade: "incomplete").first
+    end
+
     it "should save a version when changing grades" do
-      setup_assignment_without_submission
-      s = @assignment.grade_student(@user, :grade => "10").first
-      @assignment.points_possible = 5
-      @assignment.save!
-      s.reload.version_number.should == 2
+      @assignment.update_attribute :points_possible, 10
+      @sub1.reload.version_number.should == 2
     end
 
     it "works for pass/fail assignments" do
-      student1, student2 = n_students_in_course(2)
-      a = @course.assignments.create! grading_type: "pass_fail", points_possible: 5
-      sub1 = a.grade_student(student1, grade: "complete").first
-      sub2 = a.grade_student(student2, grade: "incomplete").first
+      @assignment.update_attribute :points_possible, 10
+      @sub1.reload.grade.should == "complete"
+      @sub2.reload.grade.should == "incomplete"
+    end
 
-      a.update_attribute :points_possible, 10
-
-      sub1.reload.grade.should == "complete"
-      sub2.reload.grade.should == "incomplete"
+    it "works for pass/fail assignments with 0 points possible" do
+      @assignment.update_attribute :points_possible, 0
+      @sub1.reload.grade.should == "complete"
+      @sub2.reload.grade.should == "incomplete"
     end
   end
 

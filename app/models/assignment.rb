@@ -263,7 +263,7 @@ class Assignment < ActiveRecord::Base
   def update_student_submissions
     graded_at = Time.zone.now
     submissions.graded.includes(:user).find_each do |s|
-      s.grade = score_to_grade(s.score)
+      s.grade = score_to_grade(s.score, s.grade)
       s.graded_at = graded_at
       s.assignment = self
       s.assignment_changed_not_sub = true
@@ -637,14 +637,11 @@ class Assignment < ActiveRecord::Base
     when "percent"
       result = "#{score_to_grade_percent(score)}%"
     when "pass_fail"
-      if points_possible && points_possible > 0
-        passed = score > 0
-      elsif given_grade
-        # the score for a zero-point pass/fail assignment could be considered
-        # either pass *or* fail, so look at what the current given grade is
-        # instead
-        passed = ["complete", "pass"].include?(given_grade)
-      end
+      passed = if points_possible && points_possible > 0
+                 score > 0
+               elsif given_grade
+                 given_grade == "complete" || given_grade == "pass"
+               end
       result = passed ? "complete" : "incomplete"
     when "letter_grade", "gpa_scale"
       if self.points_possible.to_f > 0.0
