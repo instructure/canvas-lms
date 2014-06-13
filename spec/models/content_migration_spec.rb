@@ -1119,6 +1119,50 @@ describe ContentMigration do
       q.question_count.should == 1
     end
 
+    it "should generate numeric ids for answers" do
+      pending unless Qti.qti_enabled?
+
+      q = @copy_from.quizzes.create!(:title => "test quiz")
+      mc = q.quiz_questions.create!
+      mc.write_attribute(:question_data, {
+          points_possible: 1,
+          question_type: "multiple_choice_question",
+          question_name: "mc",
+          name: "mc",
+          question_text: "what is your favorite color?",
+          answers: [{ text: 'blue', weight: 0, id: 123 },
+                    { text: 'yellow', weight: 100, id: 456 }]
+      }.with_indifferent_access)
+      mc.save!
+      tf = q.quiz_questions.create!
+      tf.write_attribute(:question_data, {
+          points_possible: 1,
+          question_type: "true_false_question",
+          question_name: "tf",
+          name: "tf",
+          question_text: "this statement is false.",
+          answers: [{ text: "True", weight: 100, id: 9608 },
+                    { text: "False", weight: 0, id: 9093 }]
+      }.with_indifferent_access)
+      tf.save!
+      q.generate_quiz_data
+      q.workflow_state = 'available'
+      q.save!
+
+      run_course_copy
+
+      q2 = @copy_to.quizzes.find_by_migration_id(mig_id(q))
+      q2.quiz_data.size.should eql(2)
+      ans_count = 0
+      q2.quiz_data.each do |qd|
+        qd["answers"].each do |ans|
+          ans["id"].should be_a(Integer)
+          ans_count += 1
+        end
+      end
+      ans_count.should eql(4)
+    end
+
     it "should copy quizzes as published if they were published before" do
       pending unless Qti.qti_enabled?
       g = @copy_from.assignment_groups.create!(:name => "new group")

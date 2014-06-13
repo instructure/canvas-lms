@@ -223,9 +223,13 @@ class AssessmentTestConverter
   end
 
   def unique_local_id
-    @@idx ||= 0
-    @@idx += 1
-    "qti_test_migration_id_#{@identifier}_#{@@idx}"
+    @@ids ||= {}
+    id = rand(100_000)
+    while @@ids[id]
+      id = rand(100_000)
+    end
+    @@ids[id] = true
+    id
   end
 end
 end
