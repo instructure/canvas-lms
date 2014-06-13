@@ -4,19 +4,22 @@ OAuth
 OAuth2 is a protocol designed to let third-party applications
 authenticate to perform actions as a user, without getting the user's
 password. Canvas uses OAuth2 for authentication and
-authorization of the Canvas API. HTTP Basic Auth is deprecated and will be removed.
+authorization of the Canvas API.
 
 Authenticating a Request
 ------------------------
 
 Once you have an OAuth access token, you can use it to make API
 requests. If possible, using the HTTP Authorization header is
-recommended. Sending the access token in the query string or POST
-parameters is also supported.
+recommended.
 
 OAuth2 Token sent in header:
 
     curl -H "Authorization: Bearer <ACCESS-TOKEN>" https://canvas.instructure.com/api/v1/courses
+
+Sending the access token in the query string or POST
+parameters is also supported, but discouraged as it increases the
+chances of the token being logged or leaked in transit.
 
 OAuth2 Token sent in query string:
 
@@ -51,8 +54,14 @@ including but not limited to:
 Manual Token Generation
 -----------------------
 
-If your application only needs to access the API as a single user, the
-simplest option is to generate an access token on the user's profile page.
+For testing your application before you've implemented OAuth, the
+simplest option is to generate an access token on your user's profile
+page. Note that asking any other user to manually generate a token and
+enter it into your application is a violation of Canvas' terms of
+service. Applications in use by multiple users *must* use OAuth to obtain
+tokens.
+
+To manually generate a token for testing:
 
   1. Click the "profile" link in the top right menu bar, or navigate to
      `/profile`
