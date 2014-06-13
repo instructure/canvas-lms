@@ -21,5 +21,8 @@ define [
           return
         urls = (urlTemplate(template, page) for page in [(page+1)..page_count])
         RSVP.map(urls, ajax).then (pagesOfQuizzes) ->
-          store.pushPayload('quiz', {quizzes: pagesOfQuizzes[0].quizzes})
+          quizzes = []
+          pagesOfQuizzes.forEach (result) ->
+            quizzes = quizzes.concat(result.quizzes)
+          store.pushPayload('quiz', {quizzes: quizzes})
           resolve()
