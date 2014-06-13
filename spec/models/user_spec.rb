@@ -1818,6 +1818,17 @@ describe User do
 
       @student.assignments_needing_submitting(:contexts => [@course]).count.should == 1
     end
+
+    it "should always have the only_visible_to_overrides attribute" do
+      course_with_student_logged_in(:active_all => true)
+      assignment_quiz([], :course => @course, :user => @user)
+      @quiz.unlock_at = nil
+      @quiz.lock_at = nil
+      @quiz.due_at = 2.days.from_now
+      @quiz.save!
+      assignments = @student.assignments_needing_submitting(:contexts => [@course])
+      assignments[0].has_attribute?(:only_visible_to_overrides).should be_true
+    end
   end
 
   describe "avatar_key" do
@@ -2130,6 +2141,10 @@ describe User do
       assignment_ids = create_records(Assignment, 20.times.map{ |x| {title: "excess assignment #{x}", submission_types: 'online_text_entry', workflow_state: "available", context_type: "Course", context_id: @course1.id} })
       create_records(Submission, assignment_ids.map{ |id| {assignment_id: id, user_id: @studentB.id, body: "hello", workflow_state: "submitted", submission_type: 'online_text_entry'} })
       @teacher.assignments_needing_grading.size.should == 15
+    end
+
+    it "should always have the only_visible_to_overrides attribute" do
+      @teacher.assignments_needing_grading.each {|a| a.has_attribute?(:only_visible_to_overrides).should be_true }
     end
 
     context "sharding" do

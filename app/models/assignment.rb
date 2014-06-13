@@ -162,6 +162,7 @@ class Assignment < ActiveRecord::Base
     post_to_sis
     integration_data
     integration_id
+    only_visible_to_overrides
   )
 
   def external_tool?
