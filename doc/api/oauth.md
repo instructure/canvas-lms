@@ -138,7 +138,7 @@ This is the OAuth flow for third-party web applications.
 
 <div class="method_details">
 
-<h3 class="endpoint">GET https://&lt;canvas-install-url&gt;/login/oauth2/auth</h3>
+<h3 class="endpoint">GET https://&lt;canvas-install-url&gt;/login/oauth2/auth?client_id=XXX&response_type=code&redirect_uri=https://example.com/oauth_complete&state=YYY</h3>
 
 <h4>Parameters</h4>
 
@@ -163,6 +163,18 @@ currently supported value is <code>code</code>.
 authorization. The domain of this URL must match the domain of the
 redirect_uri stored on the developer key, or it must be a subdomain of
 that domain.
+    </div>
+  </li>
+  <li>
+    <span class="name">state</span>
+    <div class="inline">
+      optional. Your application can pass Canvas an arbitrary piece of
+state in this parameter, which will be passed back to your application
+in Step 2. It's strongly encouraged that your application pass a unique
+identifier in the state parameter, and then verify in Step 2 that the
+state you receive back from Canvas is the same expected value. Failing
+to do this opens your application to the possibility of logging the
+wrong person in, as <a href="http://homakov.blogspot.com/2012/07/saferweb-most-common-oauth2.html">described here</a>.
     </div>
   </li>
   <li>
@@ -203,11 +215,15 @@ request\_uri with a specific query string, containing the OAuth2
 response:
 
 <div class="method_details">
-<h3>http://www.example.com/oauth2response?code=&lt;code&gt;</h3>
+<h3>http://www.example.com/oauth2response?code=XXX&state=YYY</h3>
 </div>
 
 The app can then extract the code, and use it along with the
 client_id and client_secret to obtain the final access_key.
+
+If your application passed a state parameter in step 1, it will be
+returned here in step 2 so that your app can tie the request and
+response together.
 
 If the user doesn't accept the request for access, or if another error
 occurs, Canvas redirects back to your request\_uri with an `error`
