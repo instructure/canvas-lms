@@ -738,6 +738,14 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def take_quiz
+    if @context.feature_enabled?(:quiz_stats) &&
+       @context.feature_enabled?(:draft_state) &&
+       !quiz_submission_active?
+
+      redirect_to ember_urls.course_quiz_url(@quiz.id, headless: params[:headless])
+      return
+    end
+
     return unless quiz_submission_active?
     @show_embedded_chat = false
     flash[:notice] = t('notices.less_than_allotted_time', "You started this quiz near when it was due, so you won't have the full amount of time to take the quiz.") if @submission.less_than_allotted_time?
