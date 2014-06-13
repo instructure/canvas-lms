@@ -202,7 +202,7 @@ END
 When Draft State is allowed/on, this enables the new quiz statistics page for an account.
 END
       applies_to: 'Course',
-      state: 'hidden',
+      state: 'allowed',
       development: true
     },
     'quiz_moderate' =>
