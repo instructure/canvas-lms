@@ -407,7 +407,7 @@ class PseudonymSessionsController < ApplicationController
           aac.debug_set(:is_valid_login_response, 'false')
           aac.debug_set(:login_response_validation_error, response.validation_error)
         end
-        logger.error "Failed to verify SAML signature."
+        logger.error "Failed to verify SAML signature: #{response.validation_error}"
         destroy_session
         flash[:delegated_message] = login_error_message
         redirect_to login_url(:no_auto=>'true')
