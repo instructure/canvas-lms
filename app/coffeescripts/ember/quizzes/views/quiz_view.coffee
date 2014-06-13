@@ -1,11 +1,12 @@
 define [
   'ember'
   '../shared/environment'
+  '../mixins/views/submission_arrows_view'
   'quiz_rubric'
   'compiled/jquery/ModuleSequenceFooter'
-], (Ember, environment, createRubricDialog ) ->
+], (Ember, environment, SubmissionArrowsView, createRubricDialog) ->
 
-  QuizView = Ember.View.extend
+  QuizView = Ember.View.extend SubmissionArrowsView,
 
     addBreadCrumb: (->
       quizUrl = @controller.get('htmlURL')
