@@ -390,7 +390,9 @@ class AssignmentsController < ApplicationController
           {:id => section.id, :name => section.name }
         }),
         :ASSIGNMENT_OVERRIDES =>
-          (assignment_overrides_json(@assignment.overrides_visible_to(@current_user))),
+          (assignment_overrides_json(
+            @assignment.overrides_for(@current_user)
+            )),
         :ASSIGNMENT_INDEX_URL => polymorphic_url([@context, :assignments]),
       }
 

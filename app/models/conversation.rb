@@ -26,6 +26,10 @@ class Conversation < ActiveRecord::Base
   has_many :conversation_message_participants, :through => :conversation_messages
   has_one :stream_item, :as => :asset
   belongs_to :context, :polymorphic => true
+
+  EXPORTABLE_ATTRIBUTES = [:id, :has_attachments, :has_media_objects, :tags, :root_account_ids, :subject, :context_type, :context_id]
+  EXPORTABLE_ASSOCATIONS = [:context]
+
   validates_length_of :subject, :maximum => maximum_string_length, :allow_nil => true
 
   # see also MessageableUser
@@ -415,6 +419,9 @@ class Conversation < ActiveRecord::Base
   def update_participants(message, options = {})
     updated = false
     self.conversation_participants.with_each_shard do |conversation_participants|
+      conversation_participants = conversation_participants.where(:user_id =>
+        (options[:only_users]).map(&:id)) if options[:only_users]
+
       skip_ids = options[:skip_users].try(:map, &:id) || [message.author_id]
       skip_ids = [0] if skip_ids.empty?
       update_for_skips = options[:update_for_skips] != false
@@ -432,8 +439,11 @@ class Conversation < ActiveRecord::Base
           WHERE users.id = cp.user_id AND #{cp_conditions}
         SQL
       else
-        User.where("id IN (SELECT user_id FROM conversation_participants cp WHERE #{cp_conditions})").
-            update_all('unread_conversations_count = unread_conversations_count + 1')
+        lock_type = true
+        lock_type = 'FOR NO KEY UPDATE' if User.connection.adapter_name == 'PostgreSQL' && User.connection.send(:postgresql_version) >= 90300
+        # lock the rows in a predefined order to prevent deadlocks
+        ids = User.where(id: ConversationParticipant.from("conversation_participants cp").where(cp_conditions).select(:user_id)).lock(lock_type).order(:id).pluck(:id)
+        User.where(id: ids).update_all('unread_conversations_count = unread_conversations_count + 1')
       end
 
       conversation_participants.where("(last_message_at IS NULL OR subscribed) AND user_id NOT IN (?)", skip_ids).

@@ -31,6 +31,10 @@ define [
     @optionProperty 'parentModel'
     @optionProperty 'groupCategories'
     @optionProperty 'nested'
+    @optionProperty 'hideGradeIndividually'
+    @optionProperty 'sectionLabel'
+    @optionProperty 'fieldLabel'
+    @optionProperty 'lockedMessage'
 
     showGroupCategoryCreateDialog: =>
       if @$groupCategoryID.val() == 'new'
@@ -52,18 +56,23 @@ define [
         @showGroupCategoryCreateDialog()
 
     toJSON: =>
-      frozenAttributes = @parentModel.frozenAttributes()
+      frozenAttributes = @parentModel.frozenAttributes?() || []
       groupCategoryFrozen = _.include frozenAttributes, 'group_category_id'
-      groupCategoryLocked = @parentModel.attributes.has_submitted_submissions
+      groupCategoryLocked = !@parentModel.canGroup()
 
       groupCategoryId: @parentModel.groupCategoryId()
       groupCategories: @groupCategories
-      gradeGroupStudentsIndividually: @parentModel.gradeGroupStudentsIndividually()
+      hideGradeIndividually: @hideGradeIndividually
+      gradeGroupStudentsIndividually: !@hideGradeIndividually && @parentModel.gradeGroupStudentsIndividually()
       groupCategoryLocked: groupCategoryLocked
 
       hasGroupCategoryDisabled:  groupCategoryFrozen || groupCategoryLocked
       gradeIndividuallyDisabled: groupCategoryFrozen
       groupCategoryIdDisabled:   groupCategoryFrozen || groupCategoryLocked
+
+      sectionLabel: @sectionLabel
+      fieldLabel: @fieldLabel
+      lockedMessage: @lockedMessage
 
       nested: @nested
       prefix: 'assignment' if @nested

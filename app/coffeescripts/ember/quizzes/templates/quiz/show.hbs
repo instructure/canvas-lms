@@ -1,13 +1,13 @@
 <div class="quiz-overview">
   {{#if description}}
   <div class="row-fluid">
-    <div class="span12 quiz-description">
+    <div class="span12 quiz-description user_content">
       {{{description}}}
     </div>
   </div>
   {{/if}}
 
-  <div class="row-fluid" id="quiz-attribute-table">
+  <div class="row-fluid quiz-attributes quiz-attributes-teacher">
     <dl class="span4 quiz-attribute-column">
       <dt>{{#t 'quiz_type'}}Quiz Type{{/t}}</dt>
       <dd>{{tQuizType}}</dd>
@@ -18,7 +18,7 @@
       <dt>{{#t 'time_limit'}}Time Limit{{/t}}</dt>
       <dd>
         {{#if timeLimit}}
-          {{#t 'time_limit_with_minutes'}}{{timeLimit}} minutes{{/t}}
+          {{timeLimitWithMinutes}}
         {{else}}
           {{#t 'no_time_limit'}}None{{/t}}
         {{/if}}
@@ -78,28 +78,18 @@
       <tr>
         <th>{{#t 'due'}}Due{{/t}}</th>
         <th>{{#t 'for'}}For{{/t}}</th>
-        <th>{{#t 'dates_available'}}Dates Available{{/t}}</th>
+        <th>{{#t 'available_from'}}Available From{{/t}}</th>
+        <th>{{#t 'until'}}Until{{/t}}</th>
       </tr>
     </thead>
     <tbody>
-      {{#each allDates}}
-        <tr>
-          {{render "due_date_table_row" this}}
-        </tr>
-      {{/each}}
+    {{#each allDates}}
+      <tr>
+        {{render "due_date_table_row" this}}
+      </tr>
+    {{/each}}
     </tbody>
   </table>
 
-{{! this is only here for legacy styling to pull in
-  quiz submissions from the server! Confusing id-show above vs
-  id_show should be removed soon! }}
-<div id="quiz_show">
-  {{#if didLoadQuizSubmissionHTML}}
-    {{{quizSubmissionHTML.html}}}
-  {{else}}
-    <div id='ember-loading'>
-      <img src='/images/ajax-loader-medium-444.gif' />
-      {{#t 'loading'}}Loading{{/t}}
-    </div>
-  {{/if}}
+  {{partial "quiz/legacy_submissions"}}
 </div>

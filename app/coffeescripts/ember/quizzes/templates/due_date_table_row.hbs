@@ -1,6 +1,6 @@
 <td>
-  {{#if due_at}}
-    {{friendlyDatetimeFromString due_at}}
+  {{#if dueAt}}
+    {{friendlyDatetime dueAt}}
   {{else}}
     -
   {{/if}}
@@ -13,17 +13,16 @@
   {{/if}}
 </td>
 <td>
-  {{#if alwaysAvailable}}
-    -
+  {{#if unlockAt}}
+    {{friendlyDatetime unlockAt}}
   {{else}}
-    {{#if hasLockDateRange}}
-      {{{friendlyDateRangeString}}}
-    {{else}}
-      {{#if lock_at}}
-        {{#t 'until_lock_date'}}Until {{friendlyLockAt}}{{/t}}
-      {{else}}
-        {{#t 'from_unlock_date'}}From {{friendlyUnlockAt}}{{/t}}
-      {{/if}}
-    {{/if}}
+    -
+  {{/if}}
+</td>
+<td>
+  {{#if lockAt}}
+    {{friendlyDatetime lockAt}}
+  {{else}}
+    -
   {{/if}}
 </td>

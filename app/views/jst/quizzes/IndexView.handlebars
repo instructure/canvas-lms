@@ -12,29 +12,31 @@
       {{#t "add_quiz"}}Quiz{{/t}}
     </a>
 
-    <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" href="#">
-      <i class="icon-settings"></i>
-      <i class="icon-mini-arrow-down"></i>
-      <span class="screenreader-only">{{#t "links.settings"}}Settings{{/t}}</span>
-    </a>
+    <div class="inline-block" role="application">
+      <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" href="#">
+        <i class="icon-settings"></i>
+        <i class="icon-mini-arrow-down"></i>
+        <span class="screenreader-only">{{#t "links.settings"}}Settings{{/t}}</span>
+      </a>
 
-    <ul id="toolbar-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false">
-      {{#ifAll permissions.manage flags.question_banks}}
-      <li role="presentation">
-        <a href="{{urls.question_banks_url}}" class="icon-question" tabindex="-1" role="menuitem">
-          {{#t "links.manage_question_banks"}}Manage Question Banks{{/t}}
-        </a>
-      </li>
-      {{/ifAll}}
+      <ul id="toolbar-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false">
+        {{#ifAll permissions.manage flags.question_banks}}
+        <li role="presentation">
+          <a href="{{urls.question_banks_url}}" class="icon-question" tabindex="-1" role="menuitem">
+            {{#t "links.manage_question_banks"}}Manage Question Banks{{/t}}
+          </a>
+        </li>
+        {{/ifAll}}
 
-      {{#ifAll permissions.manage flags.publish_multiple}}
-      <li role="presentation">
-        <a href="#" class="publish_multiple_quizzes_link icon-unpublished" tabindex="-1" role="menuitem">
-          {{#t "links.publish_multiple_quizzes"}}Publish Multiple Quizzes{{/t}}
-        </a>
-      </li>
-      {{/ifAll}}
-    </ul>
+        {{#ifAll permissions.manage flags.publish_multiple}}
+        <li role="presentation">
+          <a href="#" class="publish_multiple_quizzes_link icon-unpublished" tabindex="-1" role="menuitem">
+            {{#t "links.publish_multiple_quizzes"}}Publish Multiple Quizzes{{/t}}
+          </a>
+        </li>
+        {{/ifAll}}
+      </ul>
+    </div>
   </div>
   {{/ifAny}}
 </div>

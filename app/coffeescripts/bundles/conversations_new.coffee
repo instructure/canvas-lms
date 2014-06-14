@@ -13,9 +13,10 @@ require [
   'compiled/util/deparam'
   'compiled/collections/CourseCollection'
   'compiled/collections/FavoriteCourseCollection'
+  'compiled/collections/GroupCollection'
   'jquery.disableWhileLoading'
 ], (I18n, $, _, Backbone, Message, MessageCollection, MessageView, MessageListView, MessageDetailView, MessageFormDialog,
- InboxHeaderView, deparam, CourseCollection, FavoriteCourseCollection) ->
+ InboxHeaderView, deparam, CourseCollection, FavoriteCourseCollection, GroupCollection) ->
 
   class ConversationsRouter extends Backbone.Router
 
@@ -194,9 +195,10 @@ require [
         remoteLaunch: true
 
     _initCollections: () ->
-      @courses = 
+      @courses =
         favorites: new FavoriteCourseCollection()
         all: new CourseCollection()
+        groups: new GroupCollection()
       @courses.favorites.fetch()
 
     _initViews: ->

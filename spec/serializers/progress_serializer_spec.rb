@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe ProgressSerializer do
-  let(:context) { Account.first }
+  let(:context) { Account.default }
 
   let :progress do
     p = context.progresses.build

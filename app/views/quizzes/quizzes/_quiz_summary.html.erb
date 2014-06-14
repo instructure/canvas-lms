@@ -58,7 +58,9 @@
             :href => context_url(@context, :context_quiz_url, q)) %>
         <br/>
       <% elsif due_at = q.overridden_for(@current_user).due_at %>
-        <%= before_label(:quiz_due, "Due") %> <%= datetime_string(due_at) %><br/>
+        <%= before_label(:quiz_due, "Due") %>
+        <%= friendly_datetime(due_at, context: @context) %>
+        <br/>
       <% end %>
       <% if q.time_limit %>
         <%= before_label(:quiz_time_limit, "Time Limit") %> <%= duration_in_minutes(q.time_limit.minutes) %><br/>

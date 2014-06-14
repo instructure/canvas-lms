@@ -62,4 +62,17 @@ describe "Importing Groups" do
     group.discussion_topics.count.should == 1
   end
 
+  it "should respect group_category from the hash" do
+    course_with_teacher
+    group = @course.groups.build
+    Importers::GroupImporter.import_from_migration({:group_category => "random category"}, @course, nil, group)
+    group.group_category.name.should == "random category"
+  end
+
+  it "should default group_category to imported if not in the hash" do
+    course_with_teacher
+    group = @course.groups.build
+    Importers::GroupImporter.import_from_migration({}, @course, nil, group)
+    group.group_category.should == GroupCategory.imported_for(@course)
+  end
 end

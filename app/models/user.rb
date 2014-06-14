@@ -29,109 +29,32 @@ class User < ActiveRecord::Base
   attr_accessible :name, :short_name, :sortable_name, :time_zone, :show_user_services, :gender, :visible_inbox_types, :avatar_image, :subscribe_to_emails, :locale, :bio, :birthdate, :terms_of_use, :self_enrollment_code, :initial_enrollment_type
   attr_accessor :previous_id, :menu_data
 
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :name, :sortable_name, :workflow_state, :time_zone, :uuid, :created_at, :updated_at, :visibility, :avatar_image_url, :avatar_image_source, :avatar_image_updated_at,
+    :phone, :school_name, :school_position, :short_name, :deleted_at, :show_user_services, :gender, :page_views_count, :unread_inbox_items_count, :reminder_time_for_due_dates,
+    :reminder_time_for_grading, :storage_quota, :visible_inbox_types, :last_user_note, :subscribe_to_emails, :features_used, :preferences, :avatar_state, :locale, :browser_locale,
+    :unread_conversations_count, :public, :birthdate, :otp_communication_channel_id, :initial_enrollment_type, :crocodoc_id, :last_logged_out, :lti_context_id
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [
+    :communication_channels, :notification_policies, :communication_channel, :enrollments, :observer_enrollments, :observee_enrollments, :observers, :user_observers,
+    :user_observees, :observed_users, :courses, :group_memberships, :groups, :associated_accounts, :associated_root_accounts, :context_external_tools, :submissions,
+    :pseudonyms, :pseudonym_accounts, :pseudonym, :attachments, :folders, :calendar_events, :quiz_submissions, :eportfolios, :collaborations, :user_services,
+    :rubric_associations, :rubrics, :context_rubrics, :grading_standards, :context_module_progressions, :assessment_question_bank_users, :assessment_question_banks,
+    :learning_outcome_results, :inbox_items, :submission_comment_participants, :submission_comments, :collaborators, :assigned_assessments, :web_conference_participants,
+    :web_conferences, :account_users, :accounts, :media_objects, :user_generated_media_objects, :user_notes, :all_conversations, :conversation_batches, :favorites,
+    :messages, :profile, :otp_communication_channel
+  ]
+
+
   before_save :infer_defaults
   serialize :preferences
   include TimeZoneHelper
   time_zone_attribute :time_zone
   include Workflow
 
-  # Internal: SQL fragments used to return enrollments in their respective workflow
-  # states. Where needed, these consider the state of the course to ensure that
-  # students do not see their enrollments on unpublished courses.
-  #
-  # strict_course_state can be used to bypass the course state checks. This is
-  # useful in places like the course settings UI, where we use these conditions
-  # to search users in the course (rather than as an association on a
-  # particular user)
-  #
-  # the course_workflow_state parameter can be used to simplify the query when
-  # the enrollments are all known to come from one course whose workflow state
-  # is already known. when provided, the method may return nil, in which case
-  # the condition should be treated as 'always false'.
-  def self.enrollment_conditions(state, strict_course_state=true, course_workflow_state=nil)
-    #strict_course_state = true
-    case state
-      when :active
-        if strict_course_state
-          case course_workflow_state
-          when 'available'
-            # all active enrollments in a published and active course count
-            "enrollments.workflow_state='active'"
-          when 'claimed'
-            # student and observer enrollments don't count as active if the
-            # course is unpublished
-            "enrollments.workflow_state='active' AND enrollments.type IN ('TeacherEnrollment','TaEnrollment','DesignerEnrollment','StudentViewEnrollment')"
-          when nil
-            # combine the other branches dynamically based on joined course's
-            # workflow_state
-            "enrollments.workflow_state='active' AND (courses.workflow_state='available' OR courses.workflow_state='claimed' AND enrollments.type IN ('TeacherEnrollment','TaEnrollment','DesignerEnrollment','StudentViewEnrollment'))"
-          else
-            # never include enrollments from unclaimed/completed/deleted
-            # courses
-            nil
-          end
-        else
-          case course_workflow_state
-          when 'deleted'
-            # never include enrollments from deleted courses, even without
-            # strict checks
-            nil
-          when nil
-            # combine the other branches dynamically based on joined course's
-            # workflow_state
-            "enrollments.workflow_state='active' AND courses.workflow_state<>'deleted'"
-          else
-            # all active enrollments in a non-deleted course count
-            "enrollments.workflow_state='active'"
-          end
-        end
-      when :invited
-        if strict_course_state
-          case course_workflow_state
-          when 'available'
-            # all invited enrollments in a published and active course count
-            "enrollments.workflow_state='invited'"
-          when 'deleted'
-            # never include enrollments from deleted courses
-            nil
-          when nil
-            # combine the other branches dynamically based on joined course's
-            # workflow_state
-            "enrollments.workflow_state='invited' AND (courses.workflow_state='available' OR courses.workflow_state<>'deleted' AND enrollments.type IN ('TeacherEnrollment','TaEnrollment','DesignerEnrollment','StudentViewEnrollment'))"
-          else
-            # student and observer enrollments don't count as invited if
-            # the course is unclaimed/unpublished/completed
-            "enrollments.workflow_state='invited' AND enrollments.type IN ('TeacherEnrollment','TaEnrollment','DesignerEnrollment','StudentViewEnrollment')"
-          end
-        else
-          case course_workflow_state
-          when 'deleted'
-            # never include enrollments from deleted courses
-            nil
-          when nil
-            # combine the other branches dynamically based on joined course's
-            # workflow_state
-            "enrollments.workflow_state IN ('invited','creation_pending') AND courses.workflow_state<>'deleted'"
-          else
-            # all invited and creation_pending enrollments in a non-deleted
-            # course count
-            "enrollments.workflow_state IN ('invited','creation_pending')"
-          end
-        end
-      when :deleted;          "enrollments.workflow_state = 'deleted'"
-      when :rejected;         "enrollments.workflow_state = 'rejected'"
-      when :completed;        "enrollments.workflow_state = 'completed'"
-      when :creation_pending; "enrollments.workflow_state = 'creation_pending'"
-      when :inactive;         "enrollments.workflow_state = 'inactive'"
-      when :current_and_invited
-        enrollment_conditions(:active, strict_course_state, course_workflow_state) +
-        " OR " +
-        enrollment_conditions(:invited, strict_course_state, course_workflow_state)
-      when :current_and_concluded
-        enrollment_conditions(:active, strict_course_state, course_workflow_state) +
-        " OR " +
-        enrollment_conditions(:completed, strict_course_state, course_workflow_state)
-    end
+  def self.enrollment_conditions(state)
+    Enrollment::QueryBuilder.new(state).conditions or raise "invalid enrollment conditions"
   end
 
   has_many :communication_channels, :order => 'communication_channels.position ASC', :dependent => :destroy
@@ -145,7 +68,7 @@ class User < ActiveRecord::Base
     has_many :current_and_invited_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :order => 'enrollments.created_at',
             :conditions => enrollment_conditions(:current_and_invited)
     has_many :current_and_future_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :order => 'enrollments.created_at',
-            :conditions => enrollment_conditions(:current_and_invited, false)
+            :conditions => enrollment_conditions(:current_and_future)
     has_many :concluded_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section], :conditions => enrollment_conditions(:completed), :order => 'enrollments.created_at'
     has_many :current_and_concluded_enrollments, :class_name => 'Enrollment', :include => [:course, :course_section],
             :conditions => enrollment_conditions(:current_and_concluded), :order => 'enrollments.created_at'
@@ -155,7 +78,7 @@ class User < ActiveRecord::Base
     has_many :current_and_invited_enrollments, :class_name => 'Enrollment', :joins => [:course], :order => 'enrollments.created_at',
             :conditions => enrollment_conditions(:current_and_invited), :readonly => false
     has_many :current_and_future_enrollments, :class_name => 'Enrollment', :joins => [:course], :order => 'enrollments.created_at',
-            :conditions => enrollment_conditions(:current_and_invited, false), :readonly => false
+            :conditions => enrollment_conditions(:current_and_future), :readonly => false
     has_many :concluded_enrollments, :class_name => 'Enrollment', :joins => [:course], :conditions => enrollment_conditions(:completed), :order => 'enrollments.created_at', :readonly => false
     has_many :current_and_concluded_enrollments, :class_name => 'Enrollment', :joins => [:course],
             :conditions => enrollment_conditions(:current_and_concluded), :order => 'enrollments.created_at', :readonly => false
@@ -175,6 +98,7 @@ class User < ActiveRecord::Base
   has_many :current_and_concluded_courses, :source => :course, :through => :current_and_concluded_enrollments
   has_many :group_memberships, :include => :group, :dependent => :destroy
   has_many :groups, :through => :group_memberships
+  has_many :polls, class_name: 'Polling::Poll'
 
   has_many :current_group_memberships, :include => :group, :class_name => 'GroupMembership', :conditions => "group_memberships.workflow_state = 'accepted' AND groups.workflow_state <> 'deleted'"
   has_many :current_groups, :through => :current_group_memberships, :source => :group
@@ -990,18 +914,33 @@ class User < ActiveRecord::Base
     @courses_with_grades ||= self.available_courses.with_each_shard.select{|c| c.grants_right?(self, nil, :participate_as_student)}
   end
 
-  def sis_pseudonym_for(context)
+  def sis_pseudonym_for(context, include_trusted = false)
     root_account = context.root_account
     raise "could not resolve root account" unless root_account.is_a?(Account)
-    if self.pseudonyms.loaded? && self.shard == root_account.shard
-      self.pseudonyms.detect { |p| p.active? && p.sis_user_id && p.account_id == root_account.id }
-    else
-      root_account.shard.activate do
-        root_account.pseudonyms.active.
-          where("sis_user_id IS NOT NULL AND user_id=?", self).
-          first
+    result = if self.pseudonyms.loaded? && self.shard == root_account.shard
+        self.pseudonyms.detect { |p| p.active? && p.sis_user_id && p.account_id == root_account.id }
+      else
+        root_account.shard.activate do
+          root_account.pseudonyms.active.
+            where("sis_user_id IS NOT NULL AND user_id=?", self).
+            first
+        end
       end
+    if !result && include_trusted
+      result = Shard.partition_by_shard(root_account.trusted_account_ids) do |trusted_ids|
+        next if result
+        result = if self.pseudonyms.loaded? && self.shard == Shard.current
+            self.pseudonyms.detect { |p| p.active? && p.sis_user_id && trusted_ids.include?(p.account_id) }
+          else
+            Pseudonym.where(account_id: trusted_ids).active.
+                where("sis_user_id IS NOT NULL AND user_id=?", self).first
+          end
+      end.first
     end
+    if result
+      result.account = root_account if result.account_id == root_account.id
+    end
+    result
   end
 
   set_policy do
@@ -2298,7 +2237,26 @@ class User < ActiveRecord::Base
       result = self.pseudonyms.detect { |p| p.active? && p.works_for_account?(account, allow_implicit) }
       return result if result || self.associated_shards.length == 1
     end
-    self.all_active_pseudonyms.detect { |p| p.works_for_account?(account, allow_implicit) }
+    if @all_active_pseudonyms
+      return @all_active_pseudonyms.detect { |p| p.works_for_account?(account, allow_implicit) }
+    else
+      shards = self.associated_shards
+      unless allow_implicit
+        # only search the shards with trusted accounts
+
+        trusted_shards = account.root_account.trusted_account_ids.map{|id| Shard.shard_for(id) }
+        trusted_shards << account.root_account.shard
+
+        shards = self.associated_shards & trusted_shards
+      end
+
+      Shard.with_each_shard(shards) do
+        pseudonym = Pseudonym.where(:user_id => self).active.to_a.detect{|p| p.works_for_account?(account, allow_implicit) }
+        return pseudonym if pseudonym
+      end
+
+      nil
+    end
   end
 
   # account = the account that you want a pseudonym for

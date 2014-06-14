@@ -185,6 +185,12 @@ describe "Common Cartridge exporting" do
 
       check_resource_node(@q1, CC::CCHelper::QTI_ASSESSMENT_TYPE)
       check_resource_node(@q2, CC::CCHelper::QTI_ASSESSMENT_TYPE)
+
+      alt_mig_id1 = CC::CCHelper.create_key(@q1, 'canvas_')
+      @manifest_doc.at_css("resource[identifier=#{alt_mig_id1}][type=\"#{CC::CCHelper::LOR}\"]").should_not be_nil
+
+      alt_mig_id2 = CC::CCHelper.create_key(@q2, 'canvas_')
+      @manifest_doc.at_css("resource[identifier=#{alt_mig_id2}][type=\"#{CC::CCHelper::LOR}\"]").should_not be_nil
     end
 
     it "should export quizzes with groups that point to external banks" do
@@ -209,6 +215,7 @@ describe "Common Cartridge exporting" do
       @ce.save!
 
       run_export
+
       doc = Nokogiri::XML.parse(@zip_file.read("#{mig_id(q1)}/#{mig_id(q1)}.xml"))
       selections = doc.css('selection')
       selections[0].at_css("sourcebank_ref").text.to_i.should == bank.id

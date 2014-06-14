@@ -117,7 +117,7 @@ describe "CourseAudit API", type: :request do
         record = Auditors::Course::Record.new(
           'course' => @course,
           'user' => @teacher,
-          'event_type' => 'settings',
+          'event_type' => 'updated',
           'event_data' => @course.changes,
           'created_at' => 1.day.ago
         )

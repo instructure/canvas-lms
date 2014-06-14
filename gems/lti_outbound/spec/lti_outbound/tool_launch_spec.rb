@@ -72,6 +72,7 @@ describe LtiOutbound::ToolLaunch do
     @tool_launch = LtiOutbound::ToolLaunch.new(:url => 'http://www.yahoo.com',
                                                :tool => @tool,
                                                :user => @user,
+                                               :account => @account,
                                                :context => @course,
                                                :link_code => '123456',
                                                :return_url => 'http://www.google.com',
@@ -123,7 +124,7 @@ describe LtiOutbound::ToolLaunch do
         tool_launch = LtiOutbound::ToolLaunch.new(:url => 'http://www.yahoo.com',
                                                   :tool => @tool,
                                                   :user => @user,
-                                                  :context => @course,
+                                                  :account => @account,
                                                   :context => @course,
                                                   :link_code => '123456',
                                                   :return_url => 'http://www.google.com',
@@ -138,6 +139,7 @@ describe LtiOutbound::ToolLaunch do
         tool_launch = LtiOutbound::ToolLaunch.new(:url => 'http://www.yahoo.com',
                                                   :tool => @tool,
                                                   :user => @user,
+                                                  :account => @account,
                                                   :context => @course,
                                                   :link_code => '123456',
                                                   :return_url => 'http://www.google.com')
@@ -161,6 +163,7 @@ describe LtiOutbound::ToolLaunch do
       hash = LtiOutbound::ToolLaunch.new(:url => 'http://www.yahoo.com',
                                          :tool => @tool,
                                          :user => @user,
+                                         :account => @account,
                                          :context => @account,
                                          :link_code => '123456',
                                          :return_url => 'http://www.google.com').generate
@@ -173,6 +176,7 @@ describe LtiOutbound::ToolLaunch do
       hash = LtiOutbound::ToolLaunch.new(:url => 'http://www.yahoo.com',
                                          :tool => @tool,
                                          :user => @user,
+                                         :account => @consumer_instance,
                                          :context => @user,
                                          :link_code => '123456',
                                          :return_url => 'http://www.google.com').generate
@@ -187,6 +191,7 @@ describe LtiOutbound::ToolLaunch do
       hash = LtiOutbound::ToolLaunch.new(:url => 'http://www.yahoo.com?paramater_a=value_a&parameter_b=value_b',
                                          :tool => @tool,
                                          :user => @user,
+                                         :account => @account,
                                          :context => @course,
                                          :link_code => '123456',
                                          :return_url => 'http://www.google.com').generate
@@ -198,6 +203,7 @@ describe LtiOutbound::ToolLaunch do
       hash = LtiOutbound::ToolLaunch.new(:url => 'http://www.yahoo.com?user_id=ATTEMPT_TO_SET_DATA&oauth_callback=ATTEMPT_TO_SET_DATA',
                                          :tool => @tool,
                                          :user => @user,
+                                         :account => @account,
                                          :context => @course,
                                          :link_code => '123456',
                                          :return_url => 'http://www.google.com').generate
@@ -264,6 +270,7 @@ describe LtiOutbound::ToolLaunch do
       hash = LtiOutbound::ToolLaunch.new(:url => 'http://www.yahoo.com',
                                          :tool => @tool,
                                          :user => @user,
+                                         :account => @account,
                                          :context => @course,
                                          :link_code => '123456',
                                          :return_url => 'http://www.yahoo.com',
@@ -274,34 +281,35 @@ describe LtiOutbound::ToolLaunch do
 
     describe 'variable substitutions' do
       before do
-        @substitutor = double('Substitutor', substitute_all!: 'something')
+        @substitutor = double('Substitutor', substitute!: 'something')
         LtiOutbound::VariableSubstitutor.stub(:new).and_return(@substitutor)
       end
 
       it 'substitutes for a course context' do
         @tool_launch.generate
 
-        expect(@substitutor).to have_received(:substitute_all!).with(anything, @user, nil, @course, @consumer_instance)
+        expect(@substitutor).to have_received(:substitute!)
       end
 
       it 'substitutes with an assignment' do
         @tool_launch.for_homework_submission!(@assignment)
         @tool_launch.generate
 
-        expect(@substitutor).to have_received(:substitute_all!).with(anything, @user, @assignment, @course, @consumer_instance)
+        expect(@substitutor).to have_received(:substitute!)
       end
 
       it 'substitutes account if context is account' do
         tool_launch = LtiOutbound::ToolLaunch.new(:url => 'http://www.yahoo.com',
                                                   :tool => @tool,
                                                   :user => @user,
+                                                  :account => @account,
                                                   :context => @account,
                                                   :link_code => '123456',
                                                   :return_url => 'http://www.google.com',
                                                   :outgoing_email_address => 'outgoing_email_address')
         tool_launch.generate
 
-        expect(@substitutor).to have_received(:substitute_all!).with(anything, @user, nil, @account, @consumer_instance)
+        expect(@substitutor).to have_received(:substitute!)
       end
     end
   end

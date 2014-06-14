@@ -17,6 +17,10 @@ module Canvas::Migration
     end
 
     def identify_package
+      if @archive.path.ends_with?('xml')
+        return check_flat_xml_file
+      end
+
       zip_file = Zip::File.open(@archive.path)
       if zip_file.find_entry("AngelManifest.xml")
         :angel_7_4
@@ -40,6 +44,8 @@ module Canvas::Migration
             :common_cartridge_1_1
           elsif get_node_val(doc, 'metadata schemaversion') == "1.2.0"
             :common_cartridge_1_2
+          elsif get_node_val(doc, 'metadata schemaversion') == "1.3.0"
+            :common_cartridge_1_3
           end
         elsif has_namespace(doc, "http://www.blackboard.com/content-packaging")
           :bb_learn
@@ -70,8 +76,21 @@ module Canvas::Migration
       # Not a valid zip file
       :invalid_archive
     end
-    
-    :private
+
+    private
+
+    # Common Cartridge 1.3 supports having just a single xml file
+    # if it's not CC 1.3 then we don't know how to handle it
+    def check_flat_xml_file
+      doc = ::Nokogiri::XML(File.read(@archive))
+      if get_node_val(doc, 'metadata schema') =~ /IMS Common Cartridge/i &&
+              get_node_val(doc, 'metadata schemaversion') == "1.3.0"
+        :common_cartridge_1_3
+      else
+        :unknown
+      end
+    end
+
     
     def has_namespace(node, namespace)
       node.namespaces.values.any?{|ns|ns =~ /#{namespace}/i}

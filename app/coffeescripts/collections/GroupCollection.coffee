@@ -29,6 +29,8 @@ define [
     @optionProperty 'category'
     @optionProperty 'loadAll'
 
+    _defaultUrl: -> '/api/v1/users/self/groups'
+
     url: ->
       if @category?
         @url = "/api/v1/group_categories/#{@category.id}/groups?per_page=50"

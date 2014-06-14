@@ -20,6 +20,8 @@ class AlertCriterion < ActiveRecord::Base
   belongs_to :alert
 
   attr_accessible :criterion_type, :threshold
+  EXPORTABLE_ATTRIBUTES = [:id, :alert_id, :criterion_type, :threshold]
+  EXPORTABLE_ASSOCIATIONS = [:alert]
 
   validates_numericality_of :threshold, :only_integer => true, :greater_than_or_equal_to => 0
 

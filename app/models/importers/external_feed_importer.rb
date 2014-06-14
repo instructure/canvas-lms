@@ -9,7 +9,7 @@ module Importers
       tools.each do |tool|
         if tool['migration_id'] && (!to_import || to_import[tool['migration_id']])
           begin
-            self.import_from_migration(tool, migration.context)
+            self.import_from_migration(tool, migration.context, migration)
           rescue
             migration.add_import_warning(t('#migration.external_feed_type', "External Feed"), tool[:title], $!)
           end
@@ -17,7 +17,7 @@ module Importers
       end
     end
 
-    def self.import_from_migration(hash, context, item=nil)
+    def self.import_from_migration(hash, context, migration=nil, item=nil)
       hash = hash.with_indifferent_access
       return nil if hash[:migration_id] && hash[:external_feeds_to_import] && !hash[:external_feeds_to_import][hash[:migration_id]]
       item ||= ExternalFeed.find_by_context_id_and_context_type_and_migration_id(context.id, context.class.to_s, hash[:migration_id]) if hash[:migration_id]
@@ -31,7 +31,7 @@ module Importers
       item.header_match = hash[:header_match] unless hash[:header_match].blank?
 
       item.save!
-      context.imported_migration_items << item if context.imported_migration_items && item.new_record?
+      migration.add_imported_item(item) if migration && item.new_record?
       item
     end
   end

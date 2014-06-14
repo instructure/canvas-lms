@@ -1,0 +1,7 @@
+source 'https://rubygems.org'
+
+# Specify your gem's dependencies in twitter.gemspec
+gemspec
+
+gem 'html_text_helper', path: '../html_text_helper'
+gem 'canvas_text_helper', path: '../canvas_text_helper'

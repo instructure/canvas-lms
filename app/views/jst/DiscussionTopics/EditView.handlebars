@@ -134,6 +134,10 @@
 </fieldset>
 
 {{#if isTopic}}
+  {{#unless isLargeRoster}}
+    <div id="group_category_options" class="control-group"></div>
+  {{/unless}}
+
   {{#if contextIsCourse}}
     <div id="availability_options" style="{{hiddenIf set_assignment}}">
       <fieldset>
@@ -184,10 +188,6 @@
       <div id="grading_type_options" class="control-group"></div>
 
       <div id="assignment_group_options" class="control-group"></div>
-
-      {{#unless isLargeRoster}}
-        <div id="group_category_options" class="control-group"></div>
-      {{/unless}}
 
       {{#unless isLargeRoster}}
         <div id="peer_review_options" class="control-group"></div>

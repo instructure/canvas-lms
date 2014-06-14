@@ -24,7 +24,7 @@ require 'coffee-script'
 require File.expand_path(File.dirname(__FILE__) + '/helpers/custom_selenium_rspec_matchers')
 include I18nUtilities
 
-SELENIUM_CONFIG = Setting.from_config("selenium") || {}
+SELENIUM_CONFIG = ConfigFile.load("selenium") || {}
 SERVER_IP = SELENIUM_CONFIG[:server_ip] || UDPSocket.open { |s| s.connect('8.8.8.8', 1); s.addr.last }
 BIND_ADDRESS = SELENIUM_CONFIG[:bind_address] || '0.0.0.0'
 SECONDS_UNTIL_COUNTDOWN = 5

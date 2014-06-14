@@ -40,6 +40,13 @@ class ConversationMessage < ActiveRecord::Base
   delegate :subscribed_participants, :to => :conversation
   attr_accessible
 
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :conversation_id, :author_id, :created_at, :generated, :body, :forwarded_message_ids, :media_comment_id, :media_comment_type, :context_id, :context_type,
+    :asset_id, :asset_type, :attachment_ids, :has_attachments, :has_media_objects
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:conversation, :author, :context, :conversation_message_participants, :attachment_associations, :attachments, :asset]
+
   after_create :generate_user_note!
 
   scope :human, where("NOT generated")
@@ -183,7 +190,7 @@ class ConversationMessage < ActiveRecord::Base
 
   def recipients
     return [] unless conversation
-    subscribed = subscribed_participants.reject{ |u| u.id == self.author_id }
+    subscribed = subscribed_participants.reject{ |u| u.id == self.author_id }.map{|x| x.becomes(User)}
     participants = conversation_message_participants.map(&:user)
     subscribed & participants
   end
@@ -226,17 +233,16 @@ class ConversationMessage < ActiveRecord::Base
   def generate_user_note!
     return if skip_broadcasts
     return unless @generate_user_note
-    return unless recipients.size == 1
-    recipient = recipients.first
-    return unless recipient.grants_right?(author, :create_user_notes) && recipient.associated_accounts.any?{|a| a.enable_user_notes }
-
-    title = if conversation.subject
-      t(:subject_specified, "Private message: %{subject}", subject: conversation.subject)
-    else
-      t(:subject, "Private message")
+    recipients.each do |recipient|
+      next unless recipient.grants_right?(author, :create_user_notes) && recipient.associated_accounts.any?{|a| a.enable_user_notes }
+      title = if conversation.subject
+        t(:subject_specified, "Private message: %{subject}", subject: conversation.subject)
+      else
+        t(:subject, "Private message")
+      end
+      note = format_message(body).first
+      recipient.user_notes.create(:creator => author, :title => title, :note => note)
     end
-    note = format_message(body).first
-    recipient.user_notes.create(:creator => author, :title => title, :note => note)
   end
 
   def author_short_name_with_shared_contexts(recipient)

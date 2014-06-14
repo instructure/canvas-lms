@@ -1,4 +1,15 @@
 module Importers
+  def self.register_content_importer(klass)
+    @content_importers ||= {}
+    @content_importers[klass.item_class.to_s] = klass
+  end
+
+  def self.content_importer_for(context_type)
+    klass = @content_importers[context_type]
+    raise "No content importer registered for #{context_type}" unless klass
+    klass
+  end
+
   class Importer
     class << self
       attr_accessor :item_class

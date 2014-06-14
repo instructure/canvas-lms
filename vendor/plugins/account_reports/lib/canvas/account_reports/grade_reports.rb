@@ -30,8 +30,8 @@ module Canvas::AccountReports
 
       if @account_report.has_parameter? "include_deleted"
         @include_deleted = @account_report.parameters["include_deleted"]
-        @account_report.parameters["extra_text"] << I18n.t(
-          'account_reports.grades.deleted', ' Include Deleted Objects: true;')
+        add_extra_text(I18n.t('account_reports.grades.deleted',
+                              'Include Deleted Objects: true;'))
       end
     end
 

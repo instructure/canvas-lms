@@ -1,4 +1,10 @@
-<% cache(['submission_sidebar_render', @current_user_submission, Time.zone.utc_offset].cache_key) do %>
+<% cache([
+  'submission_sidebar_render',
+  @current_user_submission,
+  Time.zone.utc_offset,
+  @current_user_submission.assigned_assessments.count,
+  @current_user_submission.assigned_assessments.incomplete.count
+].cache_key) do %>
 <div class="details">
   <h3 style="margin: 0;"><%= t 'titles.submission', "Submission" %></h3>
   <% if @assignment.expects_submission? %>
@@ -45,9 +51,7 @@
       <ul class="unstyled_list" style="margin: 5px 10px 10px;">
         <li style="<%= hidden unless @current_user_submission.assigned_assessments.empty? %>"><%= t 'labels.none_assigned', "None Assigned" %></li>
         <% @current_user_submission.assigned_assessments.each do |assessment| %>
-          <li><a <%= assessment.completed? ? "class='pass' title='#{h(t('tooltips.finished', "finished"))}'" : "class='warning' title='#{h(t('tooltips.incomplete', "incomplete"))}'" %> href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, assessment.asset.user_id) %> ">
-            <%= assessment.asset_user_name %>
-          </a></li>
+          <li><%= student_peer_review_link_for @context, @assignment, assessment %></li>
         <% end %>
       </ul>
     <% end %>

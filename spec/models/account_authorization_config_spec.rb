@@ -69,7 +69,7 @@ describe AccountAuthorizationConfig do
     end
 
     it "should load encryption settings" do
-      Setting.set_config('saml', {
+      ConfigFile.stub('saml', {
         :entity_id => 'http://www.example.com/saml2',
         :encryption => {
           :private_key => @file_that_exists,
@@ -83,7 +83,7 @@ describe AccountAuthorizationConfig do
     end
 
     it "should load the tech contact settings" do
-      Setting.set_config('saml', {
+      ConfigFile.stub('saml', {
         :tech_contact_name => 'Admin Dude',
         :tech_contact_email => 'admindude@example.com',
       })
@@ -95,7 +95,7 @@ describe AccountAuthorizationConfig do
     end
 
     it "should allow additional private keys to be set" do
-      Setting.set_config('saml', {
+      ConfigFile.stub('saml', {
         :entity_id => 'http://www.example.com/saml2',
         :encryption => {
           :private_key => @file_that_exists,
@@ -113,7 +113,7 @@ describe AccountAuthorizationConfig do
 
     it "should allow some additional private keys to be set when not all exist" do
       file_that_does_not_exist = '/tmp/i_am_not_a_private_key'
-      Setting.set_config('saml', {
+      ConfigFile.stub('saml', {
         :entity_id => 'http://www.example.com/saml2',
         :encryption => {
           :private_key => @file_that_exists,

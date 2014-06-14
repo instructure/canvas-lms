@@ -9,7 +9,7 @@ module Importers
       assignments.each do |assign|
         if migration.import_object?("assignments", assign['migration_id'])
           begin
-            import_from_migration(assign, migration.context)
+            import_from_migration(assign, migration.context, migration)
           rescue
             migration.add_import_warning(t('#migration.assignment_type', "Assignment"), assign[:title], $!)
           end
@@ -26,7 +26,7 @@ module Importers
       end
     end
 
-    def self.import_from_migration(hash, context, item=nil, quiz=nil)
+    def self.import_from_migration(hash, context, migration=nil, item=nil, quiz=nil)
       hash = hash.with_indifferent_access
       return nil if hash[:migration_id] && hash[:assignments_to_import] && !hash[:assignments_to_import][hash[:migration_id]]
       item ||= Assignment.find_by_context_type_and_context_id_and_id(context.class.to_s, context.id, hash[:id])
@@ -40,8 +40,8 @@ module Importers
       end
       hash[:missing_links] = {:description => [], :instructions => [], }
       description = ""
-      description += hash[:instructions_in_html] == false ? ImportedHtmlConverter.convert_text(hash[:description] || "", context) : ImportedHtmlConverter.convert(hash[:description] || "", context, {:missing_links => hash[:missing_links][:description]})
-      description += hash[:instructions_in_html] == false ? ImportedHtmlConverter.convert_text(hash[:instructions] || "", context) : ImportedHtmlConverter.convert(hash[:instructions] || "", context, {:missing_links => hash[:missing_links][:instructions]})
+      description += hash[:instructions_in_html] == false ? ImportedHtmlConverter.convert_text(hash[:description] || "", context) : ImportedHtmlConverter.convert(hash[:description] || "", context, migration, {:missing_links => hash[:missing_links][:description]})
+      description += hash[:instructions_in_html] == false ? ImportedHtmlConverter.convert_text(hash[:instructions] || "", context) : ImportedHtmlConverter.convert(hash[:instructions] || "", context, migration, {:missing_links => hash[:missing_links][:instructions]})
       description += Attachment.attachment_list_from_migration(context, hash[:attachment_ids])
       item.description = description
 
@@ -149,12 +149,12 @@ module Importers
         item.send("#{prop}=", hash[prop]) unless hash[prop].nil?
       end
 
-      context.imported_migration_items << item if context.imported_migration_items && new_record
+      migration.add_imported_item(item) if migration && new_record
       item.save_without_broadcasting!
 
-      if context.respond_to?(:content_migration) && context.content_migration
+      if migration
         hash[:missing_links].each do |field, missing_links|
-          context.content_migration.add_missing_content_links(:class => item.class.to_s,
+          migration.add_missing_content_links(:class => item.class.to_s,
             :id => item.id, :field => field, :missing_links => missing_links,
             :url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/#{item.class.to_s.demodulize.underscore.pluralize}/#{item.id}")
         end

@@ -117,7 +117,9 @@
           <span class="progression_started"><%= t 'progression_started_count', '*%{count}* In Progress', :count => 0, :wrapper => '<span class="progression_started_count">\1</span>' %></span> <span class="progression_complete"><%= t'progression_complete_count', '*%{count}* Complete', :count => 0, :wrapper => '<span class="progression_complete_count">\1</span>' %></span>
         </a>
         <span class="progression_state" style="<%= hidden if editable || !context_module || ((context_module.prerequisites || []).empty? && (context_module.completion_requirements || []).empty?) %>"></span>
-        <div class="unlock_details" style="<%= hidden unless context_module && context_module.to_be_unlocked %>"><%= t 'module_will_unlock_at', 'will unlock *%{unlock_date}*', :wrapper => '<span class="unlock_at">\1</span>', :unlock_date => (datetime_string(context_module.try_rescue(:unlock_at)) || nbsp) %></div>
+        <div class="unlock_details" style="<%= hidden unless context_module && context_module.to_be_unlocked %>">
+          <%= t 'module_will_unlock_at', 'Will unlock *%{unlock_date}*', :wrapper => "<span class=\"unlock_at\" #{context_sensitive_datetime_title(context_module.try_rescue(:unlock_at), @context)}>\\1</span>", :unlock_date => (datetime_string(context_module.try_rescue(:unlock_at)) || nbsp) %>
+        </div>
       </div><!-- progression_container -->
 
       <%= render :partial => "context_modules/prerequisits_footer", :locals => {:editable => editable, :context_module => context_module} %>

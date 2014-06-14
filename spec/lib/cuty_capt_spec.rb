@@ -25,7 +25,7 @@ describe CutyCapt do
 
   context "configuration" do
     it "should correctly look up parameters specified by string keys in the config" do
-      Setting.set_config("cutycapt", { "path" => 'not used', 'timeout' => 1000 })
+      ConfigFile.stub('cutycapt', { "path" => 'not used', 'timeout' => 1000 })
       CutyCapt.config[:path].should == "not used"
       CutyCapt.config[:timeout].should == 1000
     end
@@ -33,14 +33,14 @@ describe CutyCapt do
 
   context "url validation" do
     it "should check for an http scheme" do
-      Setting.set_config("cutycapt", { :path => 'not used' })
+      ConfigFile.stub('cutycapt', { :path => 'not used' })
       CutyCapt.verify_url("ftp://example.com/").should be_false
       CutyCapt.verify_url("http://example.com/").should be_true
       CutyCapt.verify_url("https://example.com/").should be_true
     end
 
     it "should check for blacklisted domains" do
-      Setting.set_config("cutycapt", { :path => 'not used', :domain_blacklist => ['example.com'] })
+      ConfigFile.stub('cutycapt', { :path => 'not used', :domain_blacklist => ['example.com'] })
 
       CutyCapt.verify_url("http://example.com/blah").should be_false
       CutyCapt.verify_url("http://foo.example.com/blah").should be_false
@@ -49,7 +49,7 @@ describe CutyCapt do
     end
 
     it "should check for blacklisted ip blocks" do
-      Setting.set_config("cutycapt", { :path => 'not used' })
+      ConfigFile.stub('cutycapt', { :path => 'not used' })
       
       CutyCapt.verify_url("http://10.0.1.1/blah").should be_false
       CutyCapt.verify_url("http://169.254.169.254/blah").should be_false
@@ -62,7 +62,7 @@ describe CutyCapt do
 
   context "execution" do
     it "should time out cuty processes" do
-      Setting.set_config("cutycapt", { :path => '/bin/sleep', :timeout => '1000' })
+      ConfigFile.stub('cutycapt', { :path => '/bin/sleep', :timeout => '1000' })
 
       CutyCapt.stubs(:cuty_arguments).returns([ "/bin/sleep", "60" ])
       begin

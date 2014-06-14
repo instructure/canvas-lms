@@ -27,6 +27,14 @@ class WebConference < ActiveRecord::Base
   has_many :invitees, :through => :web_conference_participants, :source => :user, :conditions => ['web_conference_participants.participation_type = ?', 'invitee']
   has_many :attendees, :through => :web_conference_participants, :source => :user, :conditions => ['web_conference_participants.participation_type = ?', 'attendee']
   belongs_to :user
+
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :title, :conference_type, :conference_key, :context_id, :context_type, :user_ids, :added_user_ids, :user_id, :started_at, :description, :duration, :created_at,
+    :updated_at, :uuid, :invited_user_ids, :ended_at, :start_at, :end_at, :context_code, :type, :settings
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:web_conference_participants, :users, :invitees, :attendees, :user]
+
   validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_presence_of :conference_type, :title, :context_id, :context_type, :user_id
   

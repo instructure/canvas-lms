@@ -1198,6 +1198,9 @@ describe CalendarEventsApiController, type: :request do
           before :each do
             @section1 = @course.course_sections.create!(:name => 'Section A')
             @section2 = @course.course_sections.create!(:name => 'Section B')
+            student_in_section(@section1)
+            student_in_section(@section2)
+            @user = @teacher
           end
 
           it 'should return 1 entry for each instance' do
@@ -1278,6 +1281,9 @@ describe CalendarEventsApiController, type: :request do
             @section1 = @course.course_sections.create!(:name => 'Section A')
             @section2 = @course.course_sections.create!(:name => 'Section B')
             @course.enroll_user(@ta, 'TaEnrollment', :enrollment_state => 'active', :section => @section1) # only in 1 section
+            student_in_section(@section1)
+            student_in_section(@section2)
+            @user = @ta
           end
 
           it 'should receive all assignments including other sections' do
@@ -1319,9 +1325,6 @@ describe CalendarEventsApiController, type: :request do
           end
 
           it 'should return assignment for enrollment' do
-            override1 = assignment_override_model(:assignment => @default_assignment,
-                                                  :set => @course.default_section,
-                                                  :due_at => DateTime.parse('2012-01-13 12:00:00'))
             override2 = assignment_override_model(:assignment => @default_assignment,
                                                   :set => @course.course_sections.create!(:name => 'Section 2'),
                                                   :due_at => DateTime.parse('2012-01-14 12:00:00'))
@@ -1330,7 +1333,7 @@ describe CalendarEventsApiController, type: :request do
               :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
               :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-07', :end_date => '2012-01-16', :per_page => '25'})
             json.size.should == 1
-            json.first['end_at'].should == '2012-01-13T12:00:00Z'
+            json.first['end_at'].should == '2012-01-12T12:00:00Z'
           end
         end
 
@@ -1428,7 +1431,6 @@ describe CalendarEventsApiController, type: :request do
               end
 
               it 'should return a single assignment event' do
-                pending "is occasionally failing"
                 @user = @observer
                 assignment_override_model(:assignment => @default_assignment, :set => @section1,
                                           :due_at => DateTime.parse('2012-01-14 12:00:00'))
@@ -1509,9 +1511,11 @@ describe CalendarEventsApiController, type: :request do
       context 'as admin' do
         before :each do
           @admin = account_admin_user
-          user_session @admin
           @section1 = @course.default_section
           @section2 = @course.course_sections.create!(:name => 'Section B')
+          student_in_section(@section2)
+          user_session @admin
+          @user = @admin
         end
 
         context 'when viewing own calendar' do
@@ -1527,7 +1531,8 @@ describe CalendarEventsApiController, type: :request do
         context 'when viewing course calendar' do
           it 'should display assignments and overrides' do # behave like teacher
             override = assignment_override_model(:assignment => @default_assignment,
-                                                 :due_at => DateTime.parse('2012-01-15 12:00:00'))
+                                                 :due_at => DateTime.parse('2012-01-15 12:00:00'),
+                                                 :set => @section2)
             json = api_call(:get, "/api/v1/calendar_events?&type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
               :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
               :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-07', :end_date => '2012-01-16', :per_page => '25'})

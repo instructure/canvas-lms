@@ -31,7 +31,6 @@ $(document).ready(function() {
       $dialog.dialog({
         title: I18n.t('titles.details', "Assignment Rubric Details"),
         width: 600,
-        modal: false,
         resizable: true
       });
     }

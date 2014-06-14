@@ -125,11 +125,11 @@ module Quizzes
     private
 
     def student_analysis_report
-      @student_analysis_report ||= object[:student_analysis].report.generate
+      @student_analysis_report ||= object[:student_analysis].report.generate(false)
     end
 
     def item_analysis_report
-      @item_analysis_report ||= object[:item_analysis].report.generate
+      @item_analysis_report ||= object[:item_analysis].report.generate(false)
     end
 
     def remove_unwanted_fields(question)

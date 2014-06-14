@@ -29,6 +29,12 @@ class SubmissionComment < ActiveRecord::Base
   has_many :submission_comment_participants, :dependent => :destroy
   has_many :messages, :as => :context, :dependent => :destroy
 
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :comment, :submission_id, :recipient_id, :author_id, :author_name, :group_comment_id, :created_at, :updated_at, :attachment_ids, :assessment_request_id, :media_comment_id,
+    :media_comment_type, :context_id, :context_type, :cached_attachments, :anonymous, :teacher_only_comment, :hidden
+  ]
+  EXPORTABLE_ASSOCIATIONS = [:submission, :author, :recipient, :assessment_request, :context, :associated_attachments, :submission_comment_participants, :messages]
+
   validates_length_of :comment, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :comment, :minimum => 1, :allow_nil => true, :allow_blank => true
 

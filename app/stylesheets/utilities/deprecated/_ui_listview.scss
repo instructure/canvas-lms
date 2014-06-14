@@ -4,7 +4,7 @@
   list-style: none;
   min-width: 300px;
 
-  @include border-radius(0.6em);
+  border-radius: 0.6em;
   li:first-child { @include border-top-radius(0.6em); }
   li:last-child  { @include border-bottom-radius(0.6em); }
 

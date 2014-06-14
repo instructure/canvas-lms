@@ -27,7 +27,7 @@ module Api::V1::AuthenticationEvent
       :login => Shard.relative_id_for(event.pseudonym_id, Shard.current, Shard.current),
       :account => Shard.relative_id_for(event.account_id, Shard.current, Shard.current),
       :user => Shard.relative_id_for(event.user_id, Shard.current, Shard.current),
-      :page_view => event.page_view.nil? ? nil : event.request_id
+      :page_view => PageView.find_by_id(event.request_id).try(:id)
     }
 
     {

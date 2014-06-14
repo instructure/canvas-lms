@@ -223,7 +223,7 @@ module CCHelper
 
       protocol = HostUrl.protocol
       host = HostUrl.context_host(@course)
-      port = Setting.from_config("domain").try(:[], :domain).try(:split, ':').try(:[], 1)
+      port = ConfigFile.load("domain").try(:[], :domain).try(:split, ':').try(:[], 1)
       @url_prefix = "#{protocol}://#{host}"
       @url_prefix += ":#{port}" if !host.include?(':') && port.present?
     end

@@ -65,7 +65,7 @@ describe Api::V1::CourseEvent do
       @course.start_at = Date.today + index.days
       @course.conclude_at = @course.start_at + 7.days
 
-      @event = Auditors::Course.record_updated(@course, @teacher, @course.changes)
+      @event = Auditors::Course.record_updated(@course, @teacher, @course.changes, source: :api)
       @events << @event
     end
   end
@@ -77,8 +77,9 @@ describe Api::V1::CourseEvent do
     event[:created_at].should == @event.created_at.in_time_zone
     event[:event_type].should == @event.event_type
     event[:event_data].should == @event.event_data
+    event[:event_source].should == @event.event_source
 
-    event[:links].keys.sort.should == [:course, :page_view, :user]
+    event[:links].keys.sort.should == [:course, :page_view, :sis_batch, :user]
 
     event[:links][:course].should == Shard.relative_id_for(@course, Shard.current, Shard.current)
     event[:links][:page_view].should == @page_view.id
@@ -96,7 +97,8 @@ describe Api::V1::CourseEvent do
 
     json_hash[:links].should == {
       "events.course" => "#{url_root}/api/v1/courses/{events.course}",
-      "events.user" => nil
+      "events.user" => nil,
+      "events.sis_batch" => nil
     }
 
     json_hash[:events].should == course_events_json(@events, @user, @session)

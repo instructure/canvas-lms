@@ -3,6 +3,9 @@ class Quizzes::QuizRegradeRun < ActiveRecord::Base
 
   belongs_to :quiz_regrade, class_name: 'Quizzes::QuizRegrade'
   attr_accessible :quiz_regrade_id, :started_at, :finished_at
+
+  EXPORTABLE_ATTRIBUTES = [:id, :quiz_regrade_id, :started_at, :finished_at, :created_at, :updated_at]
+  EXPORTABLE_ASSOCIATIONS = [:quiz_regrade]
   validates_presence_of :quiz_regrade_id
 
   def self.perform(regrade)

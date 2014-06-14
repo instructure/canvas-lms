@@ -23,6 +23,10 @@ class UserService < ActiveRecord::Base
   attr_accessor :password
   attr_accessible :user, :service, :protocol, :token, :secret, :service_user_url, :service_user_id, :service_user_name, :service_domain, :visible
 
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :user_id, :protocol, :service, :created_at, :updated_at, :service_user_url, :service_user_id, :service_user_name, :service_domain, :type, :workflow_state, :last_result_id, :refresh_at, :visible]
+  EXPORTABLE_ASSOCIATIONS = [:user]
+
   validates_presence_of :user_id, :service, :service_user_id, :workflow_state
 
   before_save :infer_defaults
@@ -224,8 +228,8 @@ class UserService < ActiveRecord::Base
   end
   
   def service_access_link
-    if service == 'facebook' && Facebook.config && Facebook.config['canvas_name']
-      "https://apps.facebook.com/#{Facebook.config['canvas_name']}"
+    if service == 'facebook' && Facebook::Connection.config && Facebook::Connection.config['canvas_name']
+      "https://apps.facebook.com/#{Facebook::Connection.config['canvas_name']}"
     else
       service_user_link
     end

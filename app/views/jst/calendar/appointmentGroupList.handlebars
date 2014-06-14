@@ -3,15 +3,15 @@
     {{#each appointment_groups}}
       <li class='appointment-group-item admin-link-hover-area {{#if requiring_action}}requiring-action{{/if}} {{#unless published}}unpublished-ag{{/unless}}' data-appointment-group-id='{{id}}'>
         {{#if is_manageable}}
-          <div class="admin-links">
+          <div class="admin-links" role="application">
             <button class="al-trigger btn btn-mini">
               <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
-              <span class="screenreader-only">Manage</span>
+              <span class="screenreader-only">{{#t "manage"}}Manage{{/t}}</span>
             </button>
             <ul class="al-options">
-              <li><a class="edit_link" href="#"><i class="icon-edit"></i> Edit</a></li>
+              <li><a class="edit_link" href="#"><i class="icon-edit"></i> {{#t "edit"}}Edit{{/t}}</a></li>
               <li><a class="message_link" href="#"><i class="icon-message"></i>&nbsp; {{#ifEqual participant_type "Group"}}{{#t "message_groups"}}Message Groups Who...{{/t}}{{else}}{{#t "message_students"}}Message Students Who...{{/t}}{{/ifEqual}}</a></li>
-              <li><a class="delete_link" href="#"><i class="icon-trash"></i> Delete</a></li>
+              <li><a class="delete_link" href="#"><i class="icon-trash"></i> {{#t "delete" }}Delete{{/t}}</a></li>
             </ul>
           </div>
         {{/if}}
@@ -24,7 +24,7 @@
         {{else}}
           {{#if reserved_times}}
             <div class="alert alert-success">
-              <div>You're signed up for</div>
+              <div>{{#t "signed_up_for" }}You're signed up for{{/t}}</div>
               {{#each reserved_times}}
                 <div><strong><a href="#" class="show_event_link" data-event-id="{{id}}">{{{formatted_time}}}</a></strong></div>
               {{/each}}

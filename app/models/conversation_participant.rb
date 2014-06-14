@@ -26,6 +26,14 @@ class ConversationParticipant < ActiveRecord::Base
   belongs_to :user
   # deprecated
   has_many :conversation_message_participants
+
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :conversation_id, :user_id, :last_message_at, :subscribed, :workflow_state, :last_authored_at, :has_attachments, :has_media_objects, :message_count,
+    :label, :tags, :visible_last_authored_at, :root_account_ids
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:conversation, :user]
+
   after_destroy :destroy_conversation_message_participants
 
   scope :visible, where("last_message_at IS NOT NULL")

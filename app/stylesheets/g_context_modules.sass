@@ -13,10 +13,10 @@ $context_module_bg_color: #f2f3f4
   margin-bottom: 15px
   
   .links a, .reorder_module_link, .move_item_link
-    +opacity(0.5)
+    opacity: 0.5
     text-decoration: none
     &:hover
-      +opacity(1)
+      opacity: 1
   .reorder_module_link, .move_item_link
     padding-left: 2px
   .links
@@ -126,7 +126,7 @@ $context_module_bg_color: #f2f3f4
         display: none
   &.locked_module
     .context_module_item
-      +opacity(0.5)
+      opacity: 0.5
       .title 
         display: none
       .locked_title 
@@ -166,32 +166,44 @@ $context_module_bg_color: #f2f3f4
 .context_module_item 
   border-bottom: 1px dotted #e0e0e0
   &.indent_0
+    td .type_icon
+      padding-right: 15px
     .outdent_item_link
       display: none !important
     .indent_item_link
       border-top-left-radius: 8px
       border-top-right-radius: 8px
   &.indent_1
+    td .type_icon
+      padding-right: 15px
     .type_icon
       padding-left: 20px
     .requirement-description
       padding-left: 20px
   &.indent_2
+    td .type_icon
+      padding-right: 15px
     .type_icon
       padding-left: 40px
     .requirement-description
       padding-left: 40px
   &.indent_3
+    td .type_icon
+      padding-right: 15px
     .type_icon
       padding-left: 60px
     .requirement-description
       padding-left: 60px
   &.indent_4
+    td .type_icon
+      padding-right: 15px
     .type_icon
       padding-left: 80px
     .requirement-description
       padding-left: 80px
   &.indent_5
+    td .type_icon
+      padding-right: 15px
     .type_icon
       padding-left: 100px
     .requirement-description
@@ -282,7 +294,7 @@ $context_module_bg_color: #f2f3f4
       display: none
   &.after_current_position
     .item_name
-      +opacity(0.5)
+      opacity: 0.5
       .title
         display: none
       .locked_title
@@ -299,7 +311,7 @@ $context_module_bg_color: #f2f3f4
 #context_modules.editable
   .context_module_item
     &.after_current_position
-      +opacity(1)
+      opacity: 1
       .title 
         display: inline-block
       .locked_title 

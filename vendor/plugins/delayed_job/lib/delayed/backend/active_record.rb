@@ -353,10 +353,6 @@ module Delayed
         class Failed < Job
           include Delayed::Backend::Base
           self.table_name = :failed_jobs
-
-          def original_job_id
-            read_attribute(:original_job_id) || read_attribute(:original_id)
-          end
         end
       end
 

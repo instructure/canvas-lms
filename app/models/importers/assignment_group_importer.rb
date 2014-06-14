@@ -9,7 +9,7 @@ module Importers
       groups.each do |group|
         if migration.import_object?("assignment_groups", group['migration_id'])
           begin
-            import_from_migration(group, migration.context)
+            import_from_migration(group, migration.context, migration)
           rescue
             migration.add_import_warning(t('#migration.assignment_group_type', "Assignment Group"), group[:title], $!)
           end
@@ -33,13 +33,13 @@ module Importers
       end
     end
 
-    def self.import_from_migration(hash, context, item=nil)
+    def self.import_from_migration(hash, context, migration=nil, item=nil)
       hash = hash.with_indifferent_access
       return nil if hash[:migration_id] && hash[:assignment_groups_to_import] && !hash[:assignment_groups_to_import][hash[:migration_id]]
       item ||= AssignmentGroup.find_by_context_id_and_context_type_and_id(context.id, context.class.to_s, hash[:id])
       item ||= AssignmentGroup.find_by_context_id_and_context_type_and_migration_id(context.id, context.class.to_s, hash[:migration_id]) if hash[:migration_id]
       item ||= context.assignment_groups.new
-      context.imported_migration_items << item if context.imported_migration_items && item.new_record?
+      migration.add_imported_item(item) if migration && item.new_record?
       item.migration_id = hash[:migration_id]
       item.workflow_state = 'available' if item.deleted?
       item.name = hash[:title]

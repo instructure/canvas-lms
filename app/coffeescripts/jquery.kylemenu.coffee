@@ -14,8 +14,6 @@ define [
         @$trigger.append('<i class="icon-mini-arrow-down"></i>') if @opts.buttonOpts.addDropArrow
         @$trigger.button(@opts.buttonOpts)
 
-
-
         # this is to undo the removal of the 'ui-state-active' class that jquery.ui.button
         # does by default on mouse out if the menu is still open
         @$trigger.bind 'mouseleave.button', @keepButtonActive
@@ -62,9 +60,12 @@ define [
       @$menu.popup 'open'
 
     select: (e, ui) =>
-      if e.originalEvent?.type != "click" && $target = $(ui.item).find('a')
+      if e.originalEvent?.type isnt "click" and $target = $(ui.item).find('a')
         e.preventDefault()
-        $target.trigger('click')
+        el = $target[0]
+        event = document.createEvent 'MouseEvent'
+        event.initEvent 'click', true, false
+        el.dispatchEvent event
       @close()
 
     onClose: =>

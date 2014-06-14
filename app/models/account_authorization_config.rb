@@ -175,7 +175,7 @@ class AccountAuthorizationConfig < ActiveRecord::Base
   end
   
   def self.saml_settings_for_account(account, current_host=nil)
-    app_config = Setting.from_config('saml') || {}
+    app_config = ConfigFile.load('saml') || {}
     domains = HostUrl.context_hosts(account, current_host)
     
     settings = Onelogin::Saml::Settings.new

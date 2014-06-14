@@ -8,7 +8,7 @@ module Importers
       standards.each do |standard|
         if migration.import_object?('grading_standards', standard['migration_id'])
           begin
-            self.import_from_migration(standard, migration.context)
+            self.import_from_migration(standard, migration.context, migration)
           rescue
             migration.add_import_warning(t('#migration.grading_standard_type', "Grading Standard"), standard[:title], $!)
           end
@@ -16,7 +16,7 @@ module Importers
       end
     end
 
-    def self.import_from_migration(hash, context, item=nil)
+    def self.import_from_migration(hash, context, migration=nil, item=nil)
       hash = hash.with_indifferent_access
       return nil if hash[:migration_id] && hash[:grading_standards_to_import] && !hash[:grading_standards_to_import][hash[:migration_id]]
       item ||= GradingStandard.find_by_context_id_and_context_type_and_migration_id(context.id, context.class.to_s, hash[:migration_id]) if hash[:migration_id]
@@ -31,7 +31,7 @@ module Importers
       end
 
       item.save!
-      context.imported_migration_items << item if context.imported_migration_items && item.new_record?
+      migration.add_imported_item(item) if migration && item.new_record?
       item
     end
   end

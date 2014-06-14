@@ -30,6 +30,10 @@ class Wiki < ActiveRecord::Base
   attr_accessible :title
 
   has_many :wiki_pages, :dependent => :destroy
+
+  EXPORTABLE_ATTRIBUTES = [:id, :title, :created_at, :updated_at, :front_page_url, :has_no_front_page]
+  EXPORTABLE_ASSOCIATIONS = [:wiki_pages]
+
   before_save :set_has_no_front_page_default
   after_save :update_contexts
 

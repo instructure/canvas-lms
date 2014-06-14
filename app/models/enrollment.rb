@@ -29,6 +29,14 @@ class Enrollment < ActiveRecord::Base
   has_many :pseudonyms, :primary_key => :user_id, :foreign_key => :user_id
   has_many :course_account_associations, :foreign_key => 'course_id', :primary_key => 'course_id'
 
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :user_id, :course_id, :type, :uuid, :workflow_state, :created_at, :updated_at, :associated_user_id, :sis_source_id, :sis_batch_id, :start_at, :end_at,
+    :course_section_id, :root_account_id, :computed_final_score, :completed_at, :self_enrolled, :computed_current_score, :grade_publishing_status, :last_publish_attempt_at,
+    :grade_publishing_message, :limit_privileges_to_course_section, :role_name, :last_activity_at
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:course, :course_section, :root_account, :user, :role_overrides, :pseudonyms]
+
   validates_presence_of :user_id, :course_id, :type, :root_account_id, :course_section_id, :workflow_state
   validates_inclusion_of :limit_privileges_to_course_section, :in => [true, false]
   validates_inclusion_of :associated_user_id, :in => [nil],
@@ -180,11 +188,14 @@ class Enrollment < ActiveRecord::Base
   scope :future, lambda {
     joins(:course).
         where("(courses.start_at>?
-              AND courses.workflow_state='available'
-              AND courses.restrict_enrollments_to_course_dates=?
-              AND enrollments.workflow_state IN ('invited', 'active', 'completed'))
-              OR (courses.workflow_state IN ('created', 'claimed')
-              AND enrollments.workflow_state IN ('invited', 'active', 'completed', 'creation_pending'))", Time.now.utc, true)
+                AND courses.workflow_state='available'
+                AND courses.restrict_enrollments_to_course_dates=?
+                AND enrollments.workflow_state IN ('invited', 'active')
+              ) OR (
+                courses.workflow_state IN ('created', 'claimed')
+                AND enrollments.type IN ('TeacherEnrollment','TaEnrollment', 'DesignerEnrollment')
+                AND enrollments.workflow_state IN ('invited', 'active', 'creation_pending')
+              )", Time.now.utc, true)
   }
 
   scope :past,
@@ -852,21 +863,24 @@ class Enrollment < ActiveRecord::Base
   end
 
   set_policy do
+    given {|user, session| self.course.grants_rights?(user, session, :manage_students, :manage_admin_users).values.any? }
+    can :read
+
     given { |user| self.user == user }
+    can :read and can :read_grades
+
+    given { |user, session| self.course.students_visible_to(user, true).map(&:id).include?(self.user_id) && self.course.grants_rights?(user, session, :manage_grades, :view_all_grades).values.any? }
+    can :read and can :read_grades
+
+    given { |user| course.observer_enrollments.find_by_user_id_and_associated_user_id(user.id, self.user_id).present? }
     can :read and can :read_grades
 
     given {|user, session| self.course.grants_right?(user, session, :participate_as_student) && self.user.show_user_services }
     can :read_services
 
     # read_services says this person has permission to see what web services this enrollment has linked to their account
-    given {|user, session| self.course.grants_right?(user, session, :manage_students) && self.user.show_user_services }
-    can :read and can :read_services
-
-    given { |user, session| self.course.students_visible_to(user, true).map(&:id).include?(self.user_id) && self.course.grants_rights?(user, session, :manage_grades, :view_all_grades).values.any? }
-    can :read and can :read_grades
-
-    given { |user| course.observer_enrollments.find_by_user_id_and_associated_user_id(user.id, self.user_id).present? }
-    can :read and can :read_grades and can :read_services
+    given {|user, session| self.grants_right?(user, session, :read) && self.user.show_user_services }
+    can :read_services
   end
 
   scope :before, lambda{ |date|
@@ -1016,19 +1030,38 @@ class Enrollment < ActiveRecord::Base
     @sis_user_id
   end
 
-  def record_recent_activity_threshold
-    Setting.get('enrollment_last_activity_at_threshold', 10.minutes).to_i
+  def record_last_activity_threshold
+    Setting.get('enrollment_last_activity_at_threshold', 2.minutes).to_i
+  end
+
+  def record_total_activity_threshold
+    Setting.get('enrollment_total_activity_time_threshold', 10.minutes).to_i
   end
 
   def record_recent_activity_worthwhile?(as_of, threshold)
     last_activity_at.nil? || (as_of - last_activity_at >= threshold)
   end
 
+  def increment_total_activity?(as_of, last_threshold, total_threshold)
+    !last_activity_at.nil? &&
+      (as_of - last_activity_at >= last_threshold) &&
+      (as_of - last_activity_at < total_threshold)
+  end
+
   def record_recent_activity(as_of = Time.zone.now,
-                             threshold = record_recent_activity_threshold)
-    if record_recent_activity_worthwhile?(as_of, threshold)
+                             last_threshold = record_last_activity_threshold,
+                             total_threshold = record_total_activity_threshold)
+    return unless record_recent_activity_worthwhile?(as_of, last_threshold)
+    if increment_total_activity?(as_of, last_threshold, total_threshold)
+      self.total_activity_time += (as_of - self.last_activity_at).to_i
+      self.class.where(:id => self).update_all(:total_activity_time => total_activity_time, :last_activity_at => as_of)
+    else
       self.class.where(:id => self).update_all(:last_activity_at => as_of)
-      self.last_activity_at = as_of
     end
+    self.last_activity_at = as_of
+  end
+
+  def total_activity_time
+    self.read_attribute(:total_activity_time).to_i
   end
 end

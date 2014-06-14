@@ -161,7 +161,7 @@
                 <span class="screenreader-only" role="link">
                   <%= t(:click_to_change, "Click to test a different score") unless assignment_presenter.unchangeable? %>
                 </span>
-                <%= render :partial => 'submission_score', :object => submission, :locals => {:student_score => !can_do(@context, @current_user, :manage_grades)} %>
+                <%= student_score_display_for(submission, !can_do(@context, @current_user, :manage_grades)) %>
               <% end %>
             </span>
             <% if assignment_presenter.is_letter_graded? || assignment_presenter.is_gpa_scaled?%>

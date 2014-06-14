@@ -239,11 +239,13 @@ define([
         });
       },
       itemClass: function(content_tag) {
-        return content_tag.content_type + "_" + content_tag.content_id;
+        return (content_tag.content_type || "").replace(/^[A-Za-z]+::/, '') + "_" + content_tag.content_id;
       },
       updateAllItemInstances: function(content_tag) {
         $(".context_module_item."+modules.itemClass(content_tag)+" .title").each(function() {
-          $(this).text(content_tag.title);
+          $this = $(this);
+          $this.text(content_tag.title);
+          $this.attr('title', content_tag.title);
         });
       },
       editModule: function($module) {
@@ -264,7 +266,7 @@ define([
           $form.attr('method', 'PUT');
           $form.find(".submit_button").text(I18n.t('buttons.update', "Update Module"));
         }
-        $form.find("#unlock_module_at").prop('checked', data.unlock_at);
+        $form.find("#unlock_module_at").prop('checked', data.unlock_at).change()
         $form.find("#require_sequential_progress").attr('checked', data.require_sequential_progress == "true" || data.require_sequential_progress == "1");
         $form.find("#publish_final_grade").attr('checked', data.publish_final_grade == "true" || data.publish_final_grade == "1");
         $form.find(".prerequisites_entry").showIf($("#context_modules .context_module").length > 1);
@@ -341,6 +343,7 @@ define([
         $item.addClass(data.type + "_" + data.id);
         $item.addClass(data.type);
         $item.attr('aria-label', data.title);
+        $item.find('.title').attr('title', data.title);
         $item.fillTemplateData({
           data: data,
           id: 'context_module_item_' + data.id,
@@ -375,7 +378,9 @@ define([
       refreshModuleList: function() {
         $("#module_list").find(".context_module_option").remove();
         $("#context_modules .context_module").each(function() {
-          var data = $(this).find(".header").getTemplateData({textValues: ['name', 'id']});
+          $this = $(this);
+          var data = $this.find(".header").getTemplateData({textValues: ['name', 'id']});
+          $this.find('.name').attr('title', data.name);
           var $option = $(document.createElement('option'));
           $option.val(data.id);
 
@@ -484,13 +489,20 @@ define([
       modules: modules
     });
 
+    var $context_module_unlocked_at = $("#context_module_unlock_at");
+    var valCache = '';
     $("#unlock_module_at").change(function() {
       $this = $(this);
-      $unlock_module_at_details = $(".unlock_module_at_details");
-      $unlock_module_at_details.showIf($this.attr('checked'))
+      var $unlock_module_at_details = $(".unlock_module_at_details");
+      $unlock_module_at_details.showIf($this.attr('checked'));
 
-      if (!$this.attr('checked')) {
-        $("#context_module_unlock_at").val('').triggerHandler('change');
+      if ($this.attr('checked')) {
+        if(!$context_module_unlocked_at.val()){
+          $context_module_unlocked_at.val(valCache);
+        }
+      }else{
+        valCache = $context_module_unlocked_at.val();
+        $context_module_unlocked_at.val('').triggerHandler('change');
       }
     }).triggerHandler('change');
 
@@ -755,8 +767,7 @@ define([
       var $item = $(this).parents(".context_module_item");
       var data = $item.getTemplateData({textValues: ['title', 'url', 'indent', 'new_tab']});
       data.indent = modules.currentIndent($item);
-      $("#edit_item_form").find(".external_url").showIf($item.hasClass('external_url') || $item.hasClass('context_external_tool'));
-      $("#edit_item_form").find(".external_tool").showIf($item.hasClass('context_external_tool'));
+      $("#edit_item_form").find(".external").showIf($item.hasClass('external_url') || $item.hasClass('context_external_tool'));
       $("#edit_item_form").attr('action', $(this).attr('href'));
       $("#edit_item_form").fillFormData(data, {object_name: 'content_tag'});
       $("#edit_item_form").dialog({
@@ -820,8 +831,9 @@ define([
       modules.editModule($module);
     });
 
-    $(".add_module_item_link").live('click', function(event) {
+    $(".add_module_item_link").on('click', function(event) {
       event.preventDefault();
+      $(event.currentTarget).blur();
       var $module = $(this).closest(".context_module");
       if($module.hasClass('collapsed_module')) {
         $module.find(".expand_module_link").triggerHandler('click', function() {
@@ -1091,6 +1103,10 @@ define([
         overrideModel(view.model, view);
       });
     }
+
+    $('.external_url_link').click(function() {
+      window.location = $(this).attr('data-item-href');
+    });
 
     $(".datetime_field").datetime_field();
 

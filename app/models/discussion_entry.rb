@@ -39,6 +39,9 @@ class DiscussionEntry < ActiveRecord::Base
   belongs_to :editor, :class_name => 'User'
   has_one :external_feed_entry, :as => :asset
 
+  EXPORTABLE_ATTRIBUTES = [:id, :message, :discussion_topic_id, :user_id, :parent_id, :created_at, :updated_at, :attachment_id, :workflow_state, :deleted_at, :editor_id, :root_entry_id, :depth]
+  EXPORTABLE_ASSOCIATIONS = [:discussion_subentries, :discussion_entry_participants, :discussion_topic, :user, :parent_entry, :root_entry, :attachment, :editor, :external_feed_entry]
+
   before_create :infer_root_entry_id
   after_save :update_discussion
   after_save :context_module_action_later
