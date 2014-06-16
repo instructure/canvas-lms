@@ -74,6 +74,7 @@ define([
         $(".comments .comment_list").append($comment.show()).scrollTop(10000);
       }
       $(".comments .comment_list .play_comment_link").mediaCommentThumbnail('small');
+      $(".save_comment_button").attr('disabled',null);
       if(submission) {
         showGrade(submission);
         $(".submission_details").fillTemplateData({
@@ -118,7 +119,7 @@ define([
       $(document).triggerHandler('grading_change');
     });
     $(document).bind('grading_change', function(event) {
-//    $(".grading_value,.grading_comment").bind('change', function(event) {
+      $(".save_comment_button").attr('disabled','disabled');
       $(".submission_header").loadingImage();
       var url = $(".update_submission_url").attr('href');
       var method = $(".update_submission_url").attr('title');
