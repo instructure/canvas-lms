@@ -1169,6 +1169,26 @@ unless CANVAS_RAILS2
       end
     end
   end
+
+  ActiveRecord::Persistence.module_eval do
+    def nondefaulted_attribute_names
+      attribute_names.select do |attr|
+        read_attribute(attr) != column_for_attribute(attr).try(:default)
+      end
+    end
+
+    def create
+      attributes_values = arel_attributes_values(!id.nil?, true, nondefaulted_attribute_names)
+
+      new_id = self.class.unscoped.insert attributes_values
+
+      self.id ||= new_id if self.class.primary_key
+
+      ActiveRecord::IdentityMap.add(self) if ActiveRecord::IdentityMap.enabled?
+      @new_record = false
+      id
+    end
+  end
 end
 
 ActiveRecord::ConnectionAdapters::AbstractAdapter.class_eval do
