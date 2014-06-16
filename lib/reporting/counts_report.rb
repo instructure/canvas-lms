@@ -43,7 +43,7 @@ class CountsReport
     start_time = Time.now
 
     Shackles.activate(:slave) do
-      Shard.with_each_shard do
+      Shard.with_each_shard(exception: -> { ErrorReport.log_exception(:periodic_job, $!) }) do
         Account.root_accounts.active.each do |account|
           next if account.external_status == 'test'
 
