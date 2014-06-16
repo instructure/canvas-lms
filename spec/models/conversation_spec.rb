@@ -283,6 +283,20 @@ describe Conversation do
         @unsubscribed_guy.conversations.unread.size.should eql 0
       end
 
+      it "should increment only for message participants" do
+        root_convo = Conversation.initiate([@sender, @recipient, @subscribed_guy], false)
+        root_convo.add_message(@sender, 'test')
+
+        @subscribed_guy.conversations.first.update_attribute(:workflow_state, "read")
+        @subscribed_guy.reload.unread_conversations_count.should eql 0
+        @subscribed_guy.conversations.unread.size.should eql 0
+
+        root_convo.add_message(@sender, 'test2', :only_users => [@recipient])
+
+        @subscribed_guy.reload.unread_conversations_count.should eql 0
+        @subscribed_guy.conversations.unread.size.should eql 0
+      end
+
       it "should decrement when deleting an unread conversation" do
         root_convo = Conversation.initiate([@sender, @unread_guy], false)
         root_convo.add_message(@sender, 'test')

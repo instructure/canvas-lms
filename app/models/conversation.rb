@@ -427,15 +427,23 @@ class Conversation < ActiveRecord::Base
         (options[:only_users]).map(&:id)) if options[:only_users]
 
       skip_ids = options[:skip_users].try(:map, &:id) || [message.author_id]
-      skip_ids = [0] if skip_ids.empty?
       update_for_skips = options[:update_for_skips] != false
 
       # make sure this jumps to the top of the inbox and is marked as unread for anyone who's subscribed
-      cp_conditions = sanitize_sql([
-        "cp.conversation_id = ? AND cp.workflow_state <> 'unread' AND (cp.last_message_at IS NULL OR cp.subscribed) AND cp.user_id NOT IN (?)",
+      sql = "cp.conversation_id = ? AND cp.workflow_state <> 'unread' AND (cp.last_message_at IS NULL OR cp.subscribed)"
+      params = [
         self.id,
-        skip_ids
-      ])
+      ]
+      if skip_ids.present?
+        sql += " AND cp.user_id NOT IN (?)"
+        params << skip_ids
+      end
+      if options[:only_users]
+        sql += " AND cp.user_id IN (?)"
+        params << (options[:only_users]).map(&:id)
+      end
+      cp_conditions = sanitize_sql(params.unshift(sql))
+
       if %w{MySQL Mysql2}.include?(connection.adapter_name)
         connection.execute <<-SQL
           UPDATE users, conversation_participants cp
