@@ -29,7 +29,7 @@ Storing Tokens
 --------------
 
 When appropriate, applications should store the token locally, rather
-the requesting a new token for the same user each time the user uses the
+than requesting a new token for the same user each time the user uses the
 application. If the token is deleted or expires, the application will
 get a 401 Unauthorized error from the API, in which case the application should
 perform the OAuth flow again to receive a new token. You can differentiate this
