@@ -113,6 +113,7 @@ define([
             src: opts.canvadoc_session_url,
             width: opts.width,
             height: opts.height,
+            allowfullscreen: "1",
             css: {border: 0}
         });
         iframe.appendTo($this);
