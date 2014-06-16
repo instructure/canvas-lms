@@ -162,6 +162,22 @@ describe CoursesController do
       assigns[:unauthorized_reason].should == :unpublished
       assigns[:unauthorized_message].should_not be_nil
     end
+
+    it "should assign active course_settings_sub_navigation external tools" do
+      course_with_teacher_logged_in(:active_all => true)
+      shared_settings = { consumer_key: 'test', shared_secret: 'secret', url: 'http://example.com/lti' }
+      other_tool = @course.context_external_tools.create(shared_settings.merge(name: 'other', course_navigation: {enabled: true}))
+      inactive_tool = @course.context_external_tools.create(shared_settings.merge(name: 'inactive', course_settings_sub_navigation: {enabled: true}))
+      active_tool = @course.context_external_tools.create(shared_settings.merge(name: 'active', course_settings_sub_navigation: {enabled: true}))
+      inactive_tool.workflow_state = 'deleted'
+      inactive_tool.save!
+
+      get 'settings', :course_id => @course.id
+      assigns[:course_settings_sub_navigation_tools].size.should == 1
+      assigned_tool = assigns[:course_settings_sub_navigation_tools].first
+      assigned_tool.id.should == active_tool.id
+    end
+
   end
 
   describe "GET 'enrollment_invitation'" do

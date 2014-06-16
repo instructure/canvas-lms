@@ -28,6 +28,7 @@ describe "courses/settings.html.erb" do
     assigns[:context] = @course
     assigns[:user_counts] = {}
     assigns[:all_roles] = Role.custom_roles_and_counts_for_course(@course, @user)
+    assigns[:course_settings_sub_navigation_tools] = []
   end
 
   describe "sis_source_id edit box" do

@@ -394,6 +394,7 @@ describe ExternalToolsController, type: :request do
     et.resource_selection = {:url=>"http://www.example.com/ims/lti/resource", :text => "", :selection_width=>50, :selection_height=>50}
     et.migration_selection = {:url=>"http://www.example.com/ims/lti/resource", :text => "migration selection", :selection_width=>42, :selection_height=>24}
     et.course_home_sub_navigation = {:url=>"http://www.example.com/ims/lti/resource", :text => "course home sub navigation", display_type: 'full_width', visibility: 'admins'}
+    et.course_settings_sub_navigation = {:url=>"http://www.example.com/ims/lti/resource", :text => "course settings sub navigation", display_type: 'full_width', visibility: 'admins'}
     et.save!
     et
   end
@@ -506,6 +507,14 @@ describe ExternalToolsController, type: :request do
      "course_home_sub_navigation"=>
              {"text"=>"course home sub navigation",
               "label"=>"course home sub navigation",
+              "url"=>"http://www.example.com/ims/lti/resource",
+              "visibility"=>'admins',
+              "display_type"=>'full_width',
+              "selection_height"=>400,
+              "selection_width"=>800},
+     "course_settings_sub_navigation"=>
+             {"text"=>"course settings sub navigation",
+              "label"=>"course settings sub navigation",
               "url"=>"http://www.example.com/ims/lti/resource",
               "visibility"=>'admins',
               "display_type"=>'full_width',

@@ -924,6 +924,11 @@ class CoursesController < ApplicationController
       js_env :APP_CENTER => {
         enabled: Canvas::Plugin.find(:app_center).enabled?
       }
+
+      @course_settings_sub_navigation_tools = ContextExternalTool.all_tools_for(@context).select(&:has_course_settings_sub_navigation?)
+      unless @context.grants_right?(@current_user, session, :manage_content)
+        @course_settings_sub_navigation_tools.reject! { |tool| tool.course_settings_sub_navigation(:visibility) == 'admins' }
+      end
     end
   end
 
