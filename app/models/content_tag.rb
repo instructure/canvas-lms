@@ -266,21 +266,13 @@ class ContentTag < ActiveRecord::Base
   def update_asset_workflow_state!
     return unless self.sync_workflow_state_to_asset?
     return unless self.asset_context_matches?
+    return unless self.content && self.content.respond_to?(:publish!)
 
-    new_asset_workflow_state = nil
-    if self.unpublished? && self.content.respond_to?(:unpublished?)
-      new_asset_workflow_state = 'unpublished'
-    elsif self.active?
-      if self.content.respond_to?(:available?)
-        new_asset_workflow_state = 'available'
-      elsif self.content.respond_to?(:active?)
-        new_asset_workflow_state = 'active'
-      elsif self.content.respond_to?(:published?)
-        new_asset_workflow_state = 'published'
-      end
-    end
-    if new_asset_workflow_state
-      self.content.update_attribute(:workflow_state, new_asset_workflow_state)
+    if self.unpublished? && self.content.published? && self.content.can_unpublish?
+      self.content.unpublish!
+      self.class.update_for(self.content)
+    elsif self.active? && !self.content.published?
+      self.content.publish!
       self.class.update_for(self.content)
     end
   end
