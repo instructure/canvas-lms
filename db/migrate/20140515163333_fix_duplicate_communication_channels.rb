@@ -10,6 +10,9 @@ class FixDuplicateCommunicationChannels < ActiveRecord::Migration
       all = CommunicationChannel.where(user_id: baddie.user_id, path_type: baddie.path_type).
           by_path(baddie.path).order("CASE workflow_state WHEN 'active' THEN 0 WHEN 'unconfirmed' THEN 1 ELSE 2 END", :created_at).to_a
       keeper = all.shift
+      DelayedMessage.where(communication_channel_id: all).delete_all
+      # it has a dependent: :destroy, but that does them one by one, which could take forever
+      NotificationPolicy.where(communication_channel_id: all).delete_all
       all.each(&:destroy!)
     end
 
