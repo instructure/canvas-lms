@@ -44,8 +44,10 @@ module Importers
       item.migration_id = hash[:migration_id]
       item.workflow_state = 'active' if item.deleted?
       item.title = hash[:title] || hash[:name]
-      hash[:missing_links] = []
-      item.description = ImportedHtmlConverter.convert(hash[:description] || "", context, migration, {:missing_links => hash[:missing_links]})
+      missing_links = []
+      item.description = ImportedHtmlConverter.convert(hash[:description] || "", context, migration) do |warn, link|
+        missing_links << link if warn == :missing_link
+      end
       item.description += import_migration_attachment_suffix(hash, context)
       item.start_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:start_at] || hash[:start_date])
       item.end_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:end_at] || hash[:end_date])
@@ -55,7 +57,7 @@ module Importers
       item.save_without_broadcasting!
       if migration
         migration.add_missing_content_links(:class => item.class.to_s,
-          :id => item.id, :missing_links => hash[:missing_links],
+          :id => item.id, :missing_links => missing_links,
           :url => "/#{context.class.to_s.demodulize.underscore.pluralize}/#{context.id}/#{item.class.to_s.demodulize.underscore.pluralize}/#{item.id}")
       end
       migration.add_imported_item(item) if migration

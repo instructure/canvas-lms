@@ -212,7 +212,9 @@ module Importers
 
     def self.import_syllabus_from_migration(course, syllabus_body, migration)
       missing_links = []
-      course.syllabus_body = ImportedHtmlConverter.convert(syllabus_body, course, migration, {:missing_links => missing_links})
+      course.syllabus_body = ImportedHtmlConverter.convert(syllabus_body, course, migration) do |warn, link|
+        missing_links << link if warn == :missing_link
+      end
       migration.add_missing_content_links(:class => course.class.to_s,
         :id => course.id, :field => "syllabus", :missing_links => missing_links,
         :url => "/#{course.class.to_s.underscore.pluralize}/#{course.id}/assignments/syllabus")

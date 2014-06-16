@@ -150,8 +150,11 @@ module Importers
       item.show_correct_answers_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:show_correct_answers_at]) if hash[:show_correct_answers_at]
       item.hide_correct_answers_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:hide_correct_answers_at]) if hash[:hide_correct_answers_at]
       item.scoring_policy = hash[:which_attempt_to_keep] if hash[:which_attempt_to_keep]
-      hash[:missing_links] = []
-      item.description = ImportedHtmlConverter.convert(hash[:description], context, migration, {:missing_links => hash[:missing_links]})
+
+      missing_links = []
+      item.description = ImportedHtmlConverter.convert(hash[:description], context, migration) do |warn, link|
+        missing_links << link if warn == :missing_link
+      end
 
 
       %w[
@@ -185,7 +188,7 @@ module Importers
       if migration
         migration.add_missing_content_links(
           :class => item.class.to_s,
-          :id => item.id, :missing_links => hash[:missing_links],
+          :id => item.id, :missing_links => missing_links,
           :url => "/#{context.class.to_s.demodulize.underscore.pluralize}/#{context.id}/#{item.class.to_s.demodulize.underscore.pluralize}/#{item.id}"
         )
       end

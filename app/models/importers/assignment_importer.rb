@@ -38,10 +38,21 @@ module Importers
       if hash[:instructions_in_html] == false
         self.extend TextHelper
       end
-      hash[:missing_links] = {:description => [], :instructions => [], }
+
+      missing_links = {:description => [], :instructions => []}
       description = ""
-      description += hash[:instructions_in_html] == false ? ImportedHtmlConverter.convert_text(hash[:description] || "", context) : ImportedHtmlConverter.convert(hash[:description] || "", context, migration, {:missing_links => hash[:missing_links][:description]})
-      description += hash[:instructions_in_html] == false ? ImportedHtmlConverter.convert_text(hash[:instructions] || "", context) : ImportedHtmlConverter.convert(hash[:instructions] || "", context, migration, {:missing_links => hash[:missing_links][:instructions]})
+      if hash[:instructions_in_html] == false
+        description += ImportedHtmlConverter.convert_text(hash[:description] || "", context)
+        description += ImportedHtmlConverter.convert_text(hash[:instructions] || "", context)
+      else
+        description += ImportedHtmlConverter.convert(hash[:description] || "", context, migration) do |warn, link|
+          missing_links[:description] << link if warn == :missing_link
+        end
+        description += ImportedHtmlConverter.convert(hash[:instructions] || "", context, migration) do |warn, link|
+          missing_links[:instructions] << link if warn == :missing_link
+        end
+      end
+
       description += Attachment.attachment_list_from_migration(context, hash[:attachment_ids])
       item.description = description
 
@@ -153,7 +164,7 @@ module Importers
       item.save_without_broadcasting!
 
       if migration
-        hash[:missing_links].each do |field, missing_links|
+        missing_links.each do |field, missing_links|
           migration.add_missing_content_links(:class => item.class.to_s,
             :id => item.id, :field => field, :missing_links => missing_links,
             :url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/#{item.class.to_s.demodulize.underscore.pluralize}/#{item.id}")

@@ -73,7 +73,7 @@ module Importers
         }), context, migration)
       end
       return if hash[:type] && ['folder', 'FOLDER_TYPE'].member?(hash[:type]) && hash[:linked_resource_id]
-      hash[:missing_links] = {}
+      missing_links = {}
       allow_save = true
       if hash[:type] == 'linked_resource' || hash[:type] == "URL_TYPE"
         allow_save = false
@@ -81,11 +81,23 @@ module Importers
         item.title = hash[:title] unless hash[:root_folder]
         description = ""
         if hash[:header]
-          hash[:missing_links][:field] = []
-          description += hash[:header][:is_html] ? ImportedHtmlConverter.convert(hash[:header][:body] || "", context, migration, {:missing_links => hash[:missing_links][:header]}) : ImportedHtmlConverter.convert_text(hash[:header][:body] || [""], context)
+          missing_links[:header] = []
+          if hash[:header][:is_html]
+            description += ImportedHtmlConverter.convert(hash[:header][:body] || "", context, migration) do |warn, link|
+              missing_links[:header] << link if warn == :missing_link
+            end
+          else
+            description  += ImportedHtmlConverter.convert_text(hash[:header][:body] || [""], context)
+          end
         end
-        hash[:missing_links][:description] = []
-        description += ImportedHtmlConverter.convert(hash[:description], context, migration, {:missing_links => hash[:missing_links][:description]}) if hash[:description]
+
+        missing_links[:description] = []
+        if hash[:description]
+          description += ImportedHtmlConverter.convert(hash[:description], context, migration) do |warn, link|
+            missing_links[:description] << link if warn == :missing_link
+          end
+        end
+
         contents = ""
         allow_save = false if hash[:migration_id] && hash[:outline_folders_to_import] && !hash[:outline_folders_to_import][hash[:migration_id]]
         hash[:contents].each do |sub_item|
@@ -99,8 +111,14 @@ module Importers
               contents = ""
             end
             description += "\n<h2>#{sub_item[:title]}</h2>\n" if sub_item[:title]
-            hash[:missing_links][:sub_item] = []
-            description += ImportedHtmlConverter.convert(sub_item[:description], context, migration, {:missing_links => hash[:missing_links][:sub_item]}) if sub_item[:description]
+
+            missing_links[:sub_item] = []
+            if sub_item[:description]
+              description += ImportedHtmlConverter.convert(sub_item[:description], context, migration) do |warn, link|
+                missing_links[:sub_item] << link if warn == :missing_link
+              end
+            end
+
           elsif sub_item[:type] == 'linked_resource'
             case sub_item[:linked_resource_type]
               when 'TOC_TYPE'
@@ -131,10 +149,18 @@ module Importers
           end
         end
         description += "<ul>\n#{contents}\n</ul>" if contents && contents.length > 0
+
         if hash[:footer]
-          hash[:missing_links][:footer] = []
-          description += hash[:footer][:is_html] ? ImportedHtmlConverter.convert(hash[:footer][:body] || "", context, migration, {:missing_links => hash[:missing_links][:footer]}) : ImportedHtmlConverter.convert_text(hash[:footer][:body] || [""], context)
+          missing_links[:footer] = []
+          if hash[:footer][:is_html]
+            description += ImportedHtmlConverter.convert(hash[:footer][:body] || "", context, migration) do |warn, link|
+              missing_links[:footer] << link if warn == :missing_link
+            end
+          else
+            description += ImportedHtmlConverter.convert_text(hash[:footer][:body] || [""], context)
+          end
         end
+
         item.body = description
         allow_save = false if !description || description.empty?
       elsif hash[:page_type] == 'module_toc'
@@ -165,8 +191,12 @@ module Importers
           end
           item.title.splice!(0...WikiPage::TITLE_LENGTH) # truncate too-long titles
         end
-        hash[:missing_links][:body] = []
-        item.body = ImportedHtmlConverter.convert(hash[:text] || "", context, migration, {:missing_links => hash[:missing_links][:body]})
+
+        missing_links[:body] = []
+        item.body = ImportedHtmlConverter.convert(hash[:text] || "", context, migration) do |warn, link|
+          missing_links[:body] << link if warn == :missing_link
+        end
+
         item.editing_roles = hash[:editing_roles] if hash[:editing_roles].present?
         item.notify_of_update = hash[:notify_of_update] if !hash[:notify_of_update].nil?
       else
@@ -176,7 +206,7 @@ module Importers
         item.save_without_broadcasting!
         migration.add_imported_item(item) if migration
         if migration
-          hash[:missing_links].each do |field, missing_links|
+          missing_links.each do |field, missing_links|
             migration.add_missing_content_links(:class => item.class.to_s,
               :id => item.id, :field => field, :missing_links => missing_links,
               :url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/wiki/#{item.url}")
