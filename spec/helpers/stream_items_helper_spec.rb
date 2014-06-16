@@ -30,6 +30,11 @@ describe StreamItemsHelper do
     @discussion = discussion_topic_model
     @announcement = announcement_model
     @assignment = assignment_model(:course => @course)
+    @submission = submission_model(assignment: @assignment, user: @student)
+    @assessor_submission = submission_model(assignment: @assignment, user: @teacher)
+    @assessment_request = AssessmentRequest.create!(assessor: @teacher, asset: @submission, user: @student, assessor_asset: @assessor_submission)
+    @assessment_request.workflow_state = 'assigned'
+    @assessment_request.save
     # this conversation will not be shown, since the teacher is the last author
     conversation(@another_user, @teacher).conversation.add_message(@teacher, 'zomg')
     # whereas this one will be shown
@@ -40,17 +45,18 @@ describe StreamItemsHelper do
   context "categorize_stream_items" do
     it "should categorize different types correctly" do
       @items = @teacher.recent_stream_items
-      @items.size.should == 5 # 1 for each type, 1 hidden conversation
+      @items.size.should == 6 # 1 for each type, 1 hidden conversation
       @categorized = helper.categorize_stream_items(@items, @teacher)
       @categorized["Announcement"].size.should == 1
       @categorized["Conversation"].size.should == 1
       @categorized["Assignment"].size.should == 1
       @categorized["DiscussionTopic"].size.should == 1
+      @categorized["AssessmentRequest"].size.should == 1
     end
 
     it "should normalize output into common fields" do
       @items = @teacher.recent_stream_items
-      @items.size.should == 5 # 1 for each type, 1 hidden conversation
+      @items.size.should == 6 # 1 for each type, 1 hidden conversation
       @categorized = helper.categorize_stream_items(@items, @teacher)
       @categorized.values.flatten.each do |presenter|
         item = @items.detect{ |si| si.id == presenter.stream_item_id }
@@ -101,36 +107,39 @@ describe StreamItemsHelper do
   context "extract_path" do
     it "should link to correct place" do
       @items = @teacher.recent_stream_items
-      @items.size.should == 5 # 1 for each type, 1 hidden conversation
+      @items.size.should == 6 # 1 for each type, 1 hidden conversation
       @categorized = helper.categorize_stream_items(@items, @teacher)
       @categorized["Announcement"].first.path.should match("/courses/#{@course.id}/announcements/#{@announcement.id}")
       @categorized["Conversation"].first.path.should match("/conversations/#{@conversation.id}")
       @categorized["Assignment"].first.path.should match("/courses/#{@course.id}/assignments/#{@assignment.id}")
       @categorized["DiscussionTopic"].first.path.should match("/courses/#{@course.id}/discussion_topics/#{@discussion.id}")
+      @categorized["AssessmentRequest"].first.path.should match("/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}")
     end
   end
 
   context "extract_context" do
     it "should find the correct context" do
       @items = @teacher.recent_stream_items
-      @items.size.should == 5 # 1 for each type, 1 hidden conversation
+      @items.size.should == 6 # 1 for each type, 1 hidden conversation
       @categorized = helper.categorize_stream_items(@items, @teacher)
       @categorized["Announcement"].first.context.id.should == @course.id
       @categorized["Conversation"].first.context.id.should == @other_user.id
       @categorized["Assignment"].first.context.id.should == @course.id
       @categorized["DiscussionTopic"].first.context.id.should == @course.id
+      @categorized["AssessmentRequest"].first.context.id.should == @course.id
     end
   end
 
   context "extract_summary" do
     it "should find the right content" do
       @items = @teacher.recent_stream_items
-      @items.size.should == 5 # 1 for each type, 1 hidden conversation
+      @items.size.should == 6 # 1 for each type, 1 hidden conversation
       @categorized = helper.categorize_stream_items(@items, @teacher)
       @categorized["Announcement"].first.summary.should == @announcement.title
       @categorized["Conversation"].first.summary.should == @participant.last_message.body
       @categorized["Assignment"].first.summary.should =~ /Assignment Created/
       @categorized["DiscussionTopic"].first.summary.should == @discussion.title
+      @categorized["AssessmentRequest"].first.summary.should include(@assignment.title)
     end
   end
 end

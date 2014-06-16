@@ -743,10 +743,10 @@ class UsersController < ApplicationController
   end
 
   def ignore_item
-    unless %w[grading submitting].include?(params[:purpose])
+    unless %w[grading submitting reviewing].include?(params[:purpose])
       return render(:json => { :ignored => false }, :status => 400)
     end
-    @current_user.ignore_item!(ActiveRecord::Base.find_by_asset_string(params[:asset_string], ['Assignment']),
+    @current_user.ignore_item!(ActiveRecord::Base.find_by_asset_string(params[:asset_string], ['Assignment', 'AssessmentRequest']),
                                params[:purpose], params[:permanent] == '1')
     render :json => { :ignored => true }
   end

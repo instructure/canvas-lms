@@ -28,9 +28,9 @@ class StreamItem < ActiveRecord::Base
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account', 'Group', 'AssignmentOverride', 'Assignment']
   belongs_to :asset, :polymorphic => true, :types => [
       :collaboration, :conversation, :discussion_entry,
-      :discussion_topic, :message, :submission, :web_conference]
+      :discussion_topic, :message, :submission, :web_conference, :assessment_request]
   validates_inclusion_of :asset_type, :allow_nil => true, :in => ['Collaboration', 'Conversation', 'DiscussionEntry',
-      'DiscussionTopic', 'Message', 'Submission', 'WebConference']
+      'DiscussionTopic', 'Message', 'Submission', 'WebConference', 'AssessmentRequest']
   validates_presence_of :asset_type, :data
 
   attr_accessible :context, :asset
@@ -168,6 +168,8 @@ class StreamItem < ActiveRecord::Base
     when WebConference
       res = object.attributes
       res['users'] = object.users.map{|u| prepare_user(u)}
+    when AssessmentRequest
+      res = object.attributes
     else
       raise "Unexpected stream item type: #{object.class.to_s}"
     end

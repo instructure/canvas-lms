@@ -28,7 +28,7 @@ module StreamItemsHelper
   end
 
   def categorize_stream_items(stream_items, user = @current_user)
-    supported_categories = %w(Announcement Conversation Assignment DiscussionTopic)
+    supported_categories = %w(Announcement Conversation Assignment DiscussionTopic AssessmentRequest)
     categorized_items = {}
     return categorized_items unless stream_items.present? # if we have no items (possibly because we have no user), don't try to activate the user's shard
     supported_categories.each { |category| categorized_items[category] = [] }
@@ -62,6 +62,8 @@ module StreamItemsHelper
           # - we switch to direct send_to_stream for assignments
           # - no more stream items have this bad data in production
           next if item.context_type == "Assignment"
+        elsif category == "AssessmentRequest"
+          next unless item.data.asset.assignment.published?
         end
 
         if ["DiscussionTopic","Announcement"].include? category
@@ -95,6 +97,9 @@ module StreamItemsHelper
       conversation_path(item.asset_id)
     when "Assignment"
       polymorphic_path([item.context_type.underscore, category.underscore], "#{item.context_type.underscore}_id" => item.context_id, :id => item.data.asset_context_id)
+    when "AssessmentRequest"
+      submission = item.data.assessor_asset
+      course_assignment_submission_path(item.context_id, submission.assignment_id, item.data.user_id)
     else
       nil
     end
@@ -114,6 +119,10 @@ module StreamItemsHelper
       context.id = asset.last_author.id
       context.name = asset.last_author.short_name
       context.linked_to = user_path(asset.last_author.id)
+    when "AssessmentRequest"
+      context.type = item.context_type
+      context.id = item.context_id
+      context.name = asset.context_short_name
     end
     context.time_zone = item.context.try(:time_zone)
     context
@@ -128,6 +137,8 @@ module StreamItemsHelper
       CanvasTextHelper.truncate_text(asset.last_message.body, :max_length => 250)
     when "Assignment"
       asset.subject
+    when "AssessmentRequest"
+      asset.asset.assignment.title + I18n.t('for'," for ") + asset.asset.user.name
     else
       nil
     end

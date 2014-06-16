@@ -8,6 +8,9 @@
 
     <div class="discussion-type">
       {{#if assignment}}
+        {{#if assignment.peer_reviews}}
+          <i class="icon-peer-review" aria-hidden="true"></i>
+        {{/if}}
         <i class="icon-assignment" aria-hidden="true"></i>
       {{/if}}
     </div>

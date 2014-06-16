@@ -8,9 +8,9 @@
 
 <ul class="recent_activity unstyled_list">
 <% categorized_items = categorize_stream_items(@stream_items) %>
-<% %w(Announcement Conversation Assignment DiscussionTopic).each do |category| %>
-  <% items = categorized_items[category] %> 
-  <% category_class = category.underscore %> 
+<% %w(Announcement Conversation Assignment DiscussionTopic AssessmentRequest).each do |category| %>
+  <% items = categorized_items[category] %>
+  <% category_class = category.underscore %>
   <% if items.present? %>
     <li class="stream-category stream-<%= category_class %>" data-category="<%= category %>">
       <div class="stream_header">
@@ -19,7 +19,8 @@
             <i class="<%= {
               'conversation' => 'icon-message',
               'grading' => 'icon-check-plus',
-              'discussion_topic' => 'icon-discussion'
+              'discussion_topic' => 'icon-discussion',
+              'assessment_request' => 'icon-peer-review'
             }[category_class] || "icon-#{category_class}" %>"></i>
           </div>
           <div class=image-block-content>

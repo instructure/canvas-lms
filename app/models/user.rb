@@ -1415,6 +1415,37 @@ class User < ActiveRecord::Base
     end
   end
 
+  def submissions_needing_peer_review(opts={})
+    course_ids = Shackles.activate(:slave) do
+      if opts[:contexts]
+        (Array(opts[:contexts]).map(&:id) &
+        current_student_enrollment_course_ids)
+      else
+        current_student_enrollment_course_ids
+      end
+    end
+
+    opts = {limit: 15}.merge(opts.slice(:limit))
+
+    shard.activate do
+      Rails.cache.fetch([self, 'submissions_needing_peer_review', course_ids, opts].cache_key, expires_in: 15.minutes) do
+        Shackles.activate(:slave) do
+          limit = opts[:limit]
+
+          result = Shard.partition_by_shard(course_ids) do |shard_course_ids|
+            shard_course_context_codes = shard_course_ids.map { |course_id| "course_#{course_id}"}
+            AssessmentRequest.where(assessor_id: id).incomplete.
+              not_ignored_by(self, 'reviewing').
+              for_context_codes(shard_course_context_codes)
+          end
+          # outer limit, since there could be limit * n_shards results
+          result = result[0...limit] if limit
+          result
+        end
+      end
+    end
+  end
+
   def generate_access_verifier(ts)
     require 'openssl'
     digest = OpenSSL::Digest::MD5.new

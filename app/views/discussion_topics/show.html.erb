@@ -142,6 +142,9 @@
       <div class="entry-content">
         <% if @topic.for_assignment? %>
           <%= render :partial => 'assignment_details' %>
+          <% if @presenter.has_peer_reviews?(@current_user) %>
+            <%= render :partial => 'peer_reviews' %>
+          <% end %>
         <% end %>
         <% if @topic.for_group_discussion? %>
           <%= render :partial => 'group_discussion' %>
