@@ -275,17 +275,26 @@ class Quizzes::QuizzesApiController < ApplicationController
   # @returns [Quiz]
   def index
     if authorized_action(@context, @current_user, :read) && tab_enabled?(@context.class::TAB_QUIZZES)
-      api_route = api_v1_course_quizzes_url(@context)
-      scope = Quizzes::Quiz.search_by_attribute(@context.quizzes.active, :title, params[:search_term])
-      json = if accepts_jsonapi?
-        unless is_authorized_action?(@context, @current_user, :manage_assignments)
-          scope = scope.available
+      updated = @context.quizzes.active.reorder(:updated_at).pluck(:updated_at).last
+      cache_key = ['quizzes', @context.id, @context.quizzes.active.size,
+                   @current_user, updated, accepts_jsonapi?,
+                   params[:search_term], params[:page], params[:per_page]
+                  ].cache_key
+
+      json = Rails.cache.fetch(cache_key) do
+        api_route = api_v1_course_quizzes_url(@context)
+        scope = Quizzes::Quiz.search_by_attribute(@context.quizzes.active, :title, params[:search_term])
+        json = if accepts_jsonapi?
+          unless is_authorized_action?(@context, @current_user, :manage_assignments)
+            scope = scope.available
+          end
+          jsonapi_quizzes_json(scope: scope, api_route: api_route)
+        else
+          @quizzes = Api.paginate(scope, self, api_route)
+          quizzes_json(@quizzes, @context, @current_user, session)
         end
-        jsonapi_quizzes_json(scope: scope, api_route: api_route)
-      else
-        @quizzes = Api.paginate(scope, self, api_route)
-        quizzes_json(@quizzes, @context, @current_user, session)
       end
+
       render json: json
     end
   end
