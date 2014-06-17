@@ -504,9 +504,16 @@ class ContextExternalTool < ActiveRecord::Base
   
   scope :having_setting, lambda { |setting| setting ? where("has_#{setting.to_s}" => true) : scoped }
 
-  def self.find_for(id, context, type)
+  def self.find_for(id, context, type, raise_error=true)
     id = id[Api::ID_REGEX] if id.is_a?(String)
-    raise ActiveRecord::RecordNotFound unless id.present?
+    unless id.present?
+      if raise_error
+        raise ActiveRecord::RecordNotFound
+      else
+        return nil
+      end
+    end
+
     tool = context.context_external_tools.having_setting(type).find_by_id(id)
     if !tool && context.is_a?(Group)
       context = context.context
@@ -516,7 +523,8 @@ class ContextExternalTool < ActiveRecord::Base
       account_ids = context.account_chain_ids
       tool = ContextExternalTool.having_setting(type).find_by_context_type_and_context_id_and_id('Account', account_ids, id)
     end
-    raise ActiveRecord::RecordNotFound if !tool
+    raise ActiveRecord::RecordNotFound if !tool && raise_error
+
     tool
   end
   scope :active, where("context_external_tools.workflow_state<>'deleted'")

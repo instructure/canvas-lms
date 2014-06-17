@@ -325,10 +325,7 @@ class ExternalToolsController < ApplicationController
 
   def find_tool(id, selection_type)
     if selection_type.nil? || ContextExternalTool::EXTENSION_TYPES.include?(selection_type.to_sym)
-      begin
-        @tool = ContextExternalTool.find_for(id, @context, selection_type)
-      rescue ActiveRecord::RecordNotFound
-      end
+      @tool = ContextExternalTool.find_for(id, @context, selection_type, false)
     end
 
     if !@tool
