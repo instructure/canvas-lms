@@ -59,6 +59,7 @@ class Assignment < ActiveRecord::Base
 
   has_many :submissions, :dependent => :destroy
   has_many :attachments, :as => :context, :dependent => :destroy
+  has_many :assignment_student_visibilities
   has_one :quiz, class_name: 'Quizzes::Quiz'
   belongs_to :assignment_group
   has_one :discussion_topic, :conditions => ['discussion_topics.root_topic_id IS NULL'], :order => 'created_at'
@@ -592,6 +593,14 @@ class Assignment < ActiveRecord::Base
 
     overridden_users.uniq!
     overridden_users
+  end
+
+  def students_with_visibility
+    if self.differentiated_assignments_applies?
+      context.students.able_to_see_assignment_in_course_with_da(self.id, context.id)
+    else
+      context.students
+    end
   end
 
   attr_accessor :saved_by
@@ -1543,6 +1552,12 @@ class Assignment < ActiveRecord::Base
 
   scope :for_context_codes, lambda { |codes| where(:context_code => codes) }
   scope :for_course, lambda { |course_id| where(:context_type => 'Course', :context_id => course_id) }
+
+  # NOTE: only use for courses with differentiated assignments on
+  scope :visible_to_student_in_course_with_da, lambda { |user_id, course_id|
+    joins(:assignment_student_visibilities).
+    where(:assignment_student_visibilities => { :user_id => user_id, :course_id => course_id })
+  }
 
   scope :due_before, lambda { |date| where("assignments.due_at<?", date) }
 

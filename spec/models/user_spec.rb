@@ -1738,6 +1738,53 @@ describe User do
     end
   end
 
+  describe "assignments_visibile_in_course" do
+    before do
+      @course = course(:active_course => true)
+      @course_section = @course.course_sections.create
+      @student1 = User.create
+      @student2 = User.create
+      @student3 = User.create
+      @assignment = Assignment.create!(title: "title", context: @course, only_visible_to_overrides: true)
+      @course.enroll_student(@student2, :enrollment_state => 'active')
+      @section = @course.course_sections.create!(name: "test section")
+      student_in_section(@section, user: @student1)
+      create_section_override_for_assignment(@assignment, {course_section: @section})
+      @course.reload
+    end
+
+    context "draft state off" do
+      before {@course.disable_feature!(:draft_state)}
+      it "should return all active assignments" do
+        @student1.assignments_visibile_in_course(@course).include?(@assignment).should be_true
+        @student2.assignments_visibile_in_course(@course).include?(@assignment).should be_true
+      end
+    end
+
+    context "draft state on" do
+      before {@course.enable_feature!(:draft_state)}
+      context "differentiated_assignment on" do
+        before {@course.enable_feature!(:differentiated_assignments)}
+        it "should return assignments only when a student has overrides" do
+          @student1.assignments_visibile_in_course(@course).include?(@assignment).should be_true
+          @student2.assignments_visibile_in_course(@course).include?(@assignment).should be_false
+        end
+
+        it "should not return students outside the class" do
+          @student3.assignments_visibile_in_course(@course).include?(@assignment).should be_false
+        end
+      end
+
+      context "differentiated_assignment off" do
+        before {@course.disable_feature!(:differentiated_assignments)}
+        it "should return all published assignments" do
+          @student1.assignments_visibile_in_course(@course).include?(@assignment).should be_true
+          @student2.assignments_visibile_in_course(@course).include?(@assignment).should be_true
+        end
+      end
+    end
+  end
+
   describe "assignments_needing_submitting" do
     # NOTE: More thorough testing of the Assignment#not_locked named scope is in assignment_spec.rb
     context "locked assignments" do
