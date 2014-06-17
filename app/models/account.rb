@@ -427,6 +427,10 @@ class Account < ActiveRecord::Base
     scope.where("EXISTS (SELECT 1 FROM course_account_associations WHERE course_id=courses.id AND account_id=?)", self)
   end
 
+  def associated_user?(user)
+    user_account_associations.where(user_id: user).exists?
+  end
+
   def fast_course_base(opts)
     columns = "courses.id, courses.name, courses.workflow_state, courses.course_code, courses.sis_source_id, courses.enrollment_term_id"
     associated_courses = self.associated_courses.active
