@@ -75,7 +75,7 @@
 </h2>
 
 <% if @presenter.has_courses_with_grades? %>
-  <div style="margin-left: 10px;">
+  <div style="margin-left: 10px;" class="course_selector">
   <%= t(:for_course, "For the course,") %>
   <select id="course_url">
     <% @presenter.selectable_courses.each do |course| %>
