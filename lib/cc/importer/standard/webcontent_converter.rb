@@ -58,13 +58,15 @@ module CC::Importer::Standard
 
       Zip::File.open(zip_file, 'w') do |zipfile|
         file_map.each_value do |val|
+          next if zipfile.entries.include?(val[:path_name])
+
           file_path = File.join(@unzipped_file_path, val[:path_name])
           if File.exists?(file_path)
-            zipfile.add(val[:path_name], file_path)
+            zipfile.add(val[:path_name], file_path) if !File.directory?(file_path)
           else
             web_file_path = File.join(@unzipped_file_path, WEB_RESOURCES_FOLDER, val[:path_name])
             if File.exists?(web_file_path)
-              zipfile.add(val[:path_name], web_file_path)
+              zipfile.add(val[:path_name], web_file_path) if !File.directory?(web_file_path)
             else
               val[:errored] = true
             end
