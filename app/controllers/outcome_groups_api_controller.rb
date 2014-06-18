@@ -104,7 +104,7 @@
 #       "properties": {
 #         "url": {
 #           "description": "the URL for fetching/updating the outcome link. should be treated as opaque",
-#           "example": "/api/v1/account/1/outcome_groups/1/outcomes/1",
+#           "example": "/api/v1/accounts/1/outcome_groups/1/outcomes/1",
 #           "type": "string"
 #         },
 #         "context_id": {
