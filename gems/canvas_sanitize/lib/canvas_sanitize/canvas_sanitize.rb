@@ -78,7 +78,7 @@ module CanvasSanitize #:nodoc:
           'del', 'ins', 'iframe', 'font',
           'colgroup', 'dd', 'div', 'dl', 'dt', 'em', 'figure', 'figcaption', 'i', 'img', 'li', 'ol', 'p', 'pre',
           'q', 'small', 'span', 'strike', 'strong', 'sub', 'sup', 'table', 'tbody', 'td',
-          'tfoot', 'th', 'thead', 'tr', 'u', 'ul', 'object', 'embed', 'param'],
+          'tfoot', 'th', 'thead', 'tr', 'u', 'ul', 'object', 'embed', 'param', 'video', 'audio'],
 
       :attributes => {
           :all => ['style', 'class', 'id', 'title'],
@@ -87,7 +87,7 @@ module CanvasSanitize #:nodoc:
           'col' => ['span', 'width'],
           'colgroup' => ['span', 'width'],
           'img' => ['align', 'alt', 'height', 'src', 'width'],
-          'iframe' => ['src', 'width', 'height', 'name', 'align', 'frameborder', 'scrolling', 'sandbox'],
+          'iframe' => ['src', 'width', 'height', 'name', 'align', 'frameborder', 'scrolling', 'sandbox', 'allowfullscreen'],
           'ol' => ['start', 'type'],
           'q' => ['cite'],
           'table' => ['summary', 'width', 'border', 'cellpadding', 'cellspacing', 'center', 'frame', 'rules', 'dir', 'lang'],
@@ -98,6 +98,8 @@ module CanvasSanitize #:nodoc:
           'param' => ['name', 'value'],
           'object' => ['width', 'height', 'style', 'data', 'type', 'classid', 'codebase'],
           'embed' => ['name', 'src', 'type', 'allowfullscreen', 'pluginspage', 'wmode', 'allowscriptaccess', 'width', 'height'],
+          'video' => ['name', 'src', 'allowfullscreen', 'muted', 'poster', 'width', 'height'],
+          'audio' => ['name', 'src', 'muted'],
           'font' => ['face', 'color', 'size']
       },
 
