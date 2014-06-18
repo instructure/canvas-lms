@@ -28,6 +28,7 @@ module DataFixup::FilterPageViewUrlParams
       rows = get_rows(last_request_id, batch_size)
       break if rows.empty?
       rows.each do |pv|
+        next if !pv.url
         pv.url = LoggingFilter.filter_uri(pv.url)
         PageView::EventStream.update(pv) if pv.url_changed?
       end
