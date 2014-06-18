@@ -4,7 +4,7 @@ skip_locale_loading = (Rails.env.development? || Rails.env.test? || $0 == 'irb')
 if skip_locale_loading
   I18n.load_path = I18n.load_path.grep(%r{/(locales|en)\.yml\z})
 else
-  I18n.load_path += ["config/locales/locales.yml"] # add it at the end, to trump any weird/invalid stuff in locale-specific files
+  I18n.load_path << (Rails.root + "config/locales/locales.yml").to_s # add it at the end, to trump any weird/invalid stuff in locale-specific files
 end
 
 I18n.backend = I18nema::Backend.new
