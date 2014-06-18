@@ -311,10 +311,6 @@ routes.draw do
       match 'read_only' => 'quizzes/quizzes#read_only', :as => :read_only
       match 'submission_html' => 'quizzes/quizzes#submission_html', :as => :submission_html
 
-      collection do
-        get :fabulous_quizzes
-      end
-
       resources :quiz_submissions, :controller => 'quizzes/quiz_submissions', :path => :submissions do
         collection do
           put :backup
@@ -946,7 +942,7 @@ routes.draw do
     end
 
     scope(:controller => :content_migrations) do
-      %w(course group user).each do |context|
+      %w(account course group user).each do |context|
         get "#{context.pluralize}/:#{context}_id/content_migrations/migrators", :action => :available_migrators, :path_name => "#{context}_content_migration_migrators_list"
         get "#{context.pluralize}/:#{context}_id/content_migrations/:id", :action => :show, :path_name => "#{context}_content_migration"
         get "#{context.pluralize}/:#{context}_id/content_migrations", :action => :index, :path_name => "#{context}_content_migration_list"
@@ -957,7 +953,7 @@ routes.draw do
     end
 
     scope(:controller => :migration_issues) do
-      %w(course group user).each do |context|
+      %w(account course group user).each do |context|
         get "#{context.pluralize}/:#{context}_id/content_migrations/:content_migration_id/migration_issues/:id", :action => :show, :path_name => "#{context}_content_migration_migration_issue"
         get "#{context.pluralize}/:#{context}_id/content_migrations/:content_migration_id/migration_issues", :action => :index, :path_name => "#{context}_content_migration_migration_issue_list"
         post "#{context.pluralize}/:#{context}_id/content_migrations/:content_migration_id/migration_issues", :action => :create, :path_name => "#{context}_content_migration_migration_issue_create"
@@ -1376,6 +1372,10 @@ routes.draw do
       post 'courses/:course_id/quizzes/:quiz_id/submissions/:id/complete', :action => :complete, :path_name => 'course_quiz_submission_complete'
     end
 
+    scope(:controller => 'quizzes/quiz_extensions') do
+      post 'courses/:course_id/quizzes/:quiz_id/extensions', :action => :create, :path_name => 'course_quiz_extensions_create'
+    end
+
     scope(:controller => 'quizzes/quiz_submission_questions') do
       get '/quiz_submissions/:quiz_submission_id/questions', :action => :index, :path_name => 'quiz_submission_questions'
       get '/quiz_submissions/:quiz_submission_id/questions/:id', :action => :show, :path_name => 'quiz_submission_question'
@@ -1387,8 +1387,59 @@ routes.draw do
     scope(:controller => 'quizzes/quiz_ip_filters') do
       get 'courses/:course_id/quizzes/:quiz_id/ip_filters', :action => :index, :path_name => 'course_quiz_ip_filters'
     end
+
     scope(:controller => 'quizzes/quiz_statistics') do
       get 'courses/:course_id/quizzes/:quiz_id/statistics', :action => :index, :path_name => 'course_quiz_statistics'
+    end
+
+    scope(:controller => 'polling/polls') do
+      get "polls", :action => :index, :path_name => 'polls'
+      post "polls", :action => :create, :path_name => 'poll_create'
+      get "polls/:id", :action => :show, :path_name => 'poll'
+      put "polls/:id", :action => :update, :path_name => 'poll_update'
+      delete "polls/:id", :action => :destroy, :path_name => 'poll_destroy'
+    end
+
+    scope(:controller => 'polling/poll_choices') do
+      get "polls/:poll_id/poll_choices", :action => :index, :path_name => 'poll_choices'
+      post "polls/:poll_id/poll_choices", :action => :create, :path_name => 'poll_choices_create'
+      get "polls/:poll_id/poll_choices/:id", :action => :show, :path_name => 'poll_choice'
+      put "polls/:poll_id/poll_choices/:id", :action => :update, :path_name => 'poll_choice_update'
+      delete "polls/:poll_id/poll_choices/:id", :action => :destroy, :path_name => 'poll_choice_destroy'
+    end
+
+    scope(:controller => 'polling/poll_sessions') do
+      get "polls/:poll_id/poll_sessions", :action => :index, :path_name => 'poll_sessions'
+      post "polls/:poll_id/poll_sessions", :action => :create, :path_name => 'poll_sessions_create'
+      get "polls/:poll_id/poll_sessions/:id", :action => :show, :path_name => 'poll_session'
+      put "polls/:poll_id/poll_sessions/:id", :action => :update, :path_name => 'poll_session_update'
+      delete "polls/:poll_id/poll_sessions/:id", :action => :destroy, :path_name => 'poll_session_destroy'
+      get "polls/:poll_id/poll_sessions/:id/open", :action => :open, :path_name => 'poll_session_publish'
+      get "polls/:poll_id/poll_sessions/:id/close", :action => :close, :path_name => 'poll_session_close'
+
+      get "poll_sessions/opened", :action => :opened, :path_name => 'poll_sessions_opened'
+      get "poll_sessions/closed", :action => :closed, :path_name => 'poll_sessions_closed'
+    end
+
+    scope(:controller => 'polling/poll_submissions') do
+      post "polls/:poll_id/poll_sessions/:poll_session_id/poll_submissions", :action => :create, :path_name => 'poll_submissions_create'
+      get "polls/:poll_id/poll_sessions/:poll_session_id/poll_submissions/:id", :action => :show, :path_name => 'poll_submission'
+    end
+
+    scope(:controller => 'live_assessments/assessments') do
+      %w(course).each do |context|
+        prefix = "#{context}s/:#{context}_id"
+        get "#{prefix}/live_assessments", :action => :index, :path_name => "#{context}_live_assessments"
+        post "#{prefix}/live_assessments", :action => :create, :path_name => "#{context}_live_assessment_create"
+      end
+    end
+
+    scope(:controller => 'live_assessments/results') do
+      %w(course).each do |context|
+        prefix = "#{context}s/:#{context}_id"
+        get "#{prefix}/live_assessments/:assessment_id/results", :action => :index, :path_name => "#{context}_live_assessment_results"
+        post "#{prefix}/live_assessments/:assessment_id/results", :action => :create, :path_name => "#{context}_live_assessment_result_create"
+      end
     end
 
     scope(:controller => :outcome_groups_api) do

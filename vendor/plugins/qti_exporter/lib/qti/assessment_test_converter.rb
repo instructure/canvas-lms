@@ -89,7 +89,7 @@ class AssessmentTestConverter
     if limit = doc.at_css('timeLimits')
       @quiz[:time_limit] = AssessmentTestConverter.parse_time_limit(limit['maxTime'])
     end
-    if part = doc.at_css('testPart[identifier=BaseTestPart]')
+    if part = doc.at_css('testPart[identifier=BaseTestPart]') || doc.at_css('testPart')
       if control = part.at_css('itemSessionControl')
         if max = control['maxAttempts']
           max = -1 if max =~ /unlimited/i
@@ -153,14 +153,14 @@ class AssessmentTestConverter
         if val = get_bool_val(section, 'sourcebank_is_external')
           group[:question_bank_is_external] = val
         end
-        group[:migration_id] = section['identifier'] && section['identifier'] != "" ? section['identifier'] : rand(100_000)
+        group[:migration_id] = section['identifier'] && section['identifier'] != "" ? section['identifier'] : unique_local_id
         questions_list = group[:questions]
       end
     end
     if section['visible'] and section['visible'] =~ /true/i
       if title = section['title']
         #Create an empty question with a title in it
-        @quiz[:questions] << {:question_type => 'text_only_question', :question_text => title, :migration_id => rand(100_000)}
+        @quiz[:questions] << {:question_type => 'text_only_question', :question_text => title, :migration_id => unique_local_id}
       end
     end
     
@@ -222,5 +222,14 @@ class AssessmentTestConverter
     weight
   end
 
+  def unique_local_id
+    @@ids ||= {}
+    id = rand(100_000)
+    while @@ids[id]
+      id = rand(100_000)
+    end
+    @@ids[id] = true
+    id
+  end
 end
 end

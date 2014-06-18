@@ -28,8 +28,13 @@ describe ContentMigration do
       course_with_teacher(:user => @user, :course_name => "tocourse", :course_code => "tocourse")
       @copy_to = @course
 
-      @cm = ContentMigration.new(:context => @copy_to, :user => @user, :source_course => @copy_from, :copy_options => {:everything => "1"})
-      @cm.user = @user
+      @cm = ContentMigration.new(
+        :context => @copy_to,
+        :user => @user,
+        :source_course => @copy_from,
+        :migration_type => 'course_copy_importer',
+        :copy_options => {:everything => "1"}
+      )
       @cm.migration_settings[:import_immediately] = true
       @cm.save!
     end
@@ -99,7 +104,7 @@ describe ContentMigration do
       @copy_to.syllabus_body.should match(/\/courses\/#{@copy_to.id}\/discussion_topics\/#{new_topic.id}/)
     end
 
-    it "should copy course syllabus when the everything option is selected" do 
+    it "should copy course syllabus when the everything option is selected" do
       course_model
 
       @copy_from.syllabus_body = "What up"
@@ -314,6 +319,19 @@ describe ContentMigration do
       page_to.body.should == body % [@copy_to.id, tag_to.id]
     end
 
+    it "should not escape links to wiki urls" do
+      page1 = @copy_from.wiki.wiki_pages.create!(:title => "keepthese%20percent signs", :body => "blah")
+
+      body = %{<p>Link to module item: <a href="/courses/%s/#{@copy_from.feature_enabled?(:draft_state) ? 'pages' : 'wiki'}/%s#header">some assignment</a></p>}
+      page2 = @copy_from.wiki.wiki_pages.create!(:title => "some page", :body => body % [@copy_from.id, page1.url])
+
+      run_course_copy
+
+      page1_to = @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(page1))
+      page2_to = @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(page2))
+      page2_to.body.should == body % [@copy_to.id, page1_to.url]
+    end
+
     context "unpublished items" do
       before :each do
         Account.default.enable_feature!(:draft_state)
@@ -357,7 +375,7 @@ describe ContentMigration do
         end
       end
 
-      it "should copy unpublised wiki pages" do
+      it "should copy unpublished wiki pages" do
         wiki = @copy_from.wiki.wiki_pages.create(:title => "wiki", :body => "ohai")
         wiki.workflow_state = :unpublished
         wiki.save!
@@ -366,6 +384,29 @@ describe ContentMigration do
 
         wiki2 = @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(wiki))
         wiki2.workflow_state.should == 'unpublished'
+      end
+
+      it "should copy unpublished quiz assignments" do
+        pending unless Qti.qti_enabled?
+        @quiz = @copy_from.quizzes.create!
+        @quiz.did_edit
+        @quiz.offer!
+        @quiz.unpublish!
+        @quiz.assignment.should be_unpublished
+
+        @cm.copy_options = {
+            :assignments => {mig_id(@quiz.assignment) => "0"},
+            :quizzes => {mig_id(@quiz) => "1"},
+        }
+        @cm.save!
+
+        run_course_copy
+
+        quiz_to = @copy_to.quizzes.find_by_migration_id(mig_id(@quiz))
+        quiz_to.should_not be_nil
+        quiz_to.assignment.should_not be_nil
+        quiz_to.assignment.should be_unpublished
+        quiz_to.assignment.migration_id.should == mig_id(@quiz.assignment)
       end
     end
 
@@ -430,6 +471,8 @@ describe ContentMigration do
       end
 
       it "should set retain default behavior if front page is missing and draft state is not enabled" do
+        @copy_to.wiki.front_page.save!
+
         @copy_from.default_view = 'wiki'
         @copy_from.save!
         @copy_from.wiki.set_front_page_url!('haha not here')
@@ -552,6 +595,37 @@ describe ContentMigration do
       @copy_to.learning_outcome_groups.find_by_migration_id(mig_id(log)).should_not be_nil
     end
 
+    it "should copy learning outcome alignments with question banks" do
+      pending unless Qti.qti_enabled?
+      default = @copy_from.root_outcome_group
+      lo = @copy_from.created_learning_outcomes.new
+      lo.context = @copy_from
+      lo.short_description = "outcome1"
+      lo.workflow_state = 'active'
+      lo.data = {:rubric_criterion=>{:mastery_points=>2, :ratings=>[{:description=>"e", :points=>50}, {:description=>"me", :points=>2}, {:description=>"Does Not Meet Expectations", :points=>0.5}], :description=>"First outcome", :points_possible=>5}}
+      lo.save!
+      default.add_outcome(lo)
+
+      bank = @copy_from.assessment_question_banks.create!(:title => 'bank')
+      bank.assessment_questions.create!(:question_data => {'name' => 'test question', 'answers' => [{'id' => 1}, {'id' => 2}]})
+
+      lo.align(bank, @copy_from, {:mastery_type => 'points', :mastery_score => 50.0})
+
+      run_course_copy
+
+      new_lo = @copy_to.learning_outcomes.find_by_migration_id(mig_id(lo))
+      new_bank = @copy_to.assessment_question_banks.find_by_migration_id(mig_id(bank))
+
+      new_lo.alignments.count.should == 1
+      new_alignment = new_lo.alignments.first
+
+      new_alignment.content.should == new_bank
+      new_alignment.context.should == @copy_to
+
+      new_alignment.tag.should == 'points_mastery'
+      new_alignment.mastery_score.should == 50.0
+    end
+
     it "should re-copy deleted items" do
       dt1 = @copy_from.discussion_topics.create!(:message => "hi", :title => "discussion title")
       cm = @copy_from.context_modules.create!(:name => "some module")
@@ -597,9 +671,13 @@ describe ContentMigration do
       @copy_to.grading_standards.find_by_migration_id(mig_id(gs)).destroy
       @copy_to.calendar_events.find_by_migration_id(mig_id(cal)).destroy
 
-      @cm = ContentMigration.new(:context => @copy_to, :user => @user, :source_course => @copy_from, :copy_options => {:everything => "1"})
-      @cm.user = @user
-      @cm.save!
+      @cm = ContentMigration.create!(
+        :context => @copy_to,
+        :user => @user,
+        :source_course => @copy_from,
+        :migration_type => 'course_copy_importer',
+        :copy_options => {:everything => "1"}
+      )
 
       run_course_copy
 
@@ -608,7 +686,9 @@ describe ContentMigration do
       @copy_to.attachments.count.should == 1
       @copy_to.attachments.find_by_migration_id(mig_id(att)).file_state.should == 'available'
       @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(wiki)).workflow_state.should == 'active'
-      @copy_to.rubrics.find_by_migration_id(mig_id(rub1)).workflow_state.should == 'active'
+      rub2 = @copy_to.rubrics.find_by_migration_id(mig_id(rub1))
+      rub2.workflow_state.should == 'active'
+      rub2.rubric_associations.first.bookmarked.should == true
       @copy_to.created_learning_outcomes.find_by_migration_id(mig_id(lo)).workflow_state.should == 'active'
       @copy_to.quizzes.find_by_migration_id(mig_id(quiz)).workflow_state.should == 'created' if Qti.qti_enabled?
       @copy_to.context_external_tools.find_by_migration_id(mig_id(tool)).workflow_state.should == 'public'
@@ -617,25 +697,25 @@ describe ContentMigration do
       @copy_to.grading_standards.find_by_migration_id(mig_id(gs)).workflow_state.should == 'active'
       @copy_to.calendar_events.find_by_migration_id(mig_id(cal)).workflow_state.should == 'active'
     end
-    
+
     def create_outcome(context, group=nil)
       lo = LearningOutcome.new
       lo.context = context
       lo.short_description = "haha_#{rand(10_000)}"
-      lo.data = {:rubric_criterion=>{:mastery_points=>3, :ratings=>[{:description=>"Exceeds Expectations", :points=>5}], :description=>"First outcome", :points_possible=>5}} 
+      lo.data = {:rubric_criterion=>{:mastery_points=>3, :ratings=>[{:description=>"Exceeds Expectations", :points=>5}], :description=>"First outcome", :points_possible=>5}}
       lo.save!
       if group
         group.add_outcome(lo)
       elsif context
         context.root_outcome_group.add_outcome(lo)
       end
-      
+
       lo
     end
 
     it "should copy learning outcomes into the new course" do
       old_root = @copy_from.root_outcome_group
-      
+
       lo = create_outcome(@copy_from, old_root)
 
       log = @copy_from.learning_outcome_groups.new
@@ -646,21 +726,21 @@ describe ContentMigration do
       old_root.adopt_outcome_group(log)
 
       lo2 = create_outcome(@copy_from, log)
-      
+
       log_sub = @copy_from.learning_outcome_groups.new
       log_sub.context = @copy_from
       log_sub.title = "Sub group"
       log_sub.description = "<p>SubGroupage</p>"
       log_sub.save!
       log.adopt_outcome_group(log_sub)
-      
+
       log_sub2 = @copy_from.learning_outcome_groups.new
       log_sub2.context = @copy_from
       log_sub2.title = "Sub group2"
       log_sub2.description = "<p>SubGroupage2</p>"
       log_sub2.save!
       log_sub.adopt_outcome_group(log_sub2)
-      
+
       lo3 = create_outcome(@copy_from, log_sub2)
 
       # copy outcomes into new course
@@ -687,44 +767,64 @@ describe ContentMigration do
       lo_new.short_description.should == lo2.short_description
       lo_new.description.should == lo2.description
       lo_new.data.should == lo2.data
-      
+
       log_sub_new = log_new.child_outcome_groups.first
       log_sub_new.title.should == log_sub.title
       log_sub_new.description.should == log_sub.description
-      
+
       log_sub2_new = log_sub_new.child_outcome_groups.first
       log_sub2_new.title.should == log_sub2.title
       log_sub2_new.description.should == log_sub2.description
-      
+
       lo3_new = log_sub2_new.child_outcome_links.first.content
       lo3_new.short_description.should == lo3.short_description
       lo3_new.description.should == lo3.description
       lo3_new.data.should == lo3.data
     end
-    
+
+    it "should not copy deleted learning outcomes into the new course" do
+      old_root = @copy_from.root_outcome_group
+
+      log = @copy_from.learning_outcome_groups.new
+      log.context = @copy_from
+      log.title = "An outcome group"
+      log.description = "<p>Groupage</p>"
+      log.save!
+      old_root.adopt_outcome_group(log)
+
+      lo = create_outcome(@copy_from, log)
+      lo2 = create_outcome(@copy_from, log)
+      lo2.destroy
+
+      run_course_copy
+
+      @copy_to.created_learning_outcomes.count.should == 1
+      @copy_to.created_learning_outcomes.first.migration_id.should == mig_id(lo)
+    end
+
     it "should relink to external outcomes" do
       account = @copy_from.account
       a_group = account.root_outcome_group
-      
+
       root_group = LearningOutcomeGroup.create!(:title => "contextless group")
-      
+
       lo = create_outcome(nil, root_group)
-      
+
       lo2 = create_outcome(account, a_group)
-      
+
       from_root = @copy_from.root_outcome_group
       from_root.add_outcome(lo)
       from_root.add_outcome(lo2)
-      
+
       run_course_copy
-      
+
       to_root = @copy_to.root_outcome_group
       to_root.child_outcome_links.count.should == 2
       to_root.child_outcome_links.find_by_content_id(lo.id).should_not be_nil
       to_root.child_outcome_links.find_by_content_id(lo2.id).should_not be_nil
     end
-    
-    it "should create outcomes in new course if external context not found" do 
+
+    it "should create outcomes in new course if external context not found" do
       hash = {"is_global_outcome"=>true,
                "points_possible"=>nil,
                "type"=>"learning_outcome",
@@ -734,12 +834,12 @@ describe ContentMigration do
                "external_identifier"=>"0",
                "title"=>"root outcome",
                "migration_id"=>"id1072dcf40e801c6468d9eaa5774e56d"}
-      
+
       @cm.outcome_to_id_map = {}
       Importers::LearningOutcomeImporter.import_from_migration(hash, @cm)
-      
+
       @cm.warnings.should == ["The external Learning Outcome couldn't be found for \"root outcome\", creating a copy."]
-      
+
       to_root = @copy_to.root_outcome_group
       to_root.child_outcome_links.count.should == 1
       new_lo = to_root.child_outcome_links.first.content
@@ -779,16 +879,16 @@ describe ContentMigration do
       new_rubric.title.should == hash["title"]
     end
 
-    it "should link rubric (and assignments) to outcomes" do 
+    it "should link rubric (and assignments) to outcomes" do
       root_group = LearningOutcomeGroup.create!(:title => "contextless group")
-      
+
       lo = create_outcome(nil, root_group)
       lo2 = create_outcome(@copy_from)
-      
+
       from_root = @copy_from.root_outcome_group
       from_root.add_outcome(lo)
       from_root.add_outcome(lo2)
-      
+
       rub = Rubric.new(:context => @copy_from)
       rub.data = [
         {
@@ -812,13 +912,13 @@ describe ContentMigration do
 
       from_assign = @copy_from.assignments.create!(:title => "some assignment")
       rub.associate_with(from_assign, @copy_from, :purpose => "grading")
-      
+
       run_course_copy
-      
+
       new_lo2 = @copy_to.created_learning_outcomes.find_by_migration_id(mig_id(lo2))
       to_rub = @copy_to.rubrics.first
       to_assign = @copy_to.assignments.first
-      
+
       to_rub.data[1]["learning_outcome_id"].should == new_lo2.id
       to_rub.data[1]["ignore_for_scoring"].should == true
       to_rub.data[0]["learning_outcome_id"].should == lo.id
@@ -935,7 +1035,13 @@ describe ContentMigration do
       quiz2.save!
 
       # run again
-      @cm = ContentMigration.new(:context => @copy_to, :user => @user, :source_course => @copy_from, :copy_options => {:everything => "1"})
+      @cm = ContentMigration.new(
+        :context => @copy_to,
+        :user => @user,
+        :source_course => @copy_from,
+        :migration_type => 'course_copy_importer',
+        :copy_options => {:everything => "1"}
+      )
       @cm.user = @user
       @cm.migration_settings[:import_immediately] = true
       @cm.save!
@@ -965,7 +1071,13 @@ describe ContentMigration do
       run_course_copy
 
       # run again
-      @cm = ContentMigration.new(:context => @copy_to, :user => @user, :source_course => @copy_from, :copy_options => {:everything => "1"})
+      @cm = ContentMigration.new(
+        :context => @copy_to,
+        :user => @user,
+        :source_course => @copy_from,
+        :migration_type => 'course_copy_importer',
+        :copy_options => {:everything => "1"}
+      )
       @cm.user = @user
       @cm.migration_settings[:import_immediately] = true
       @cm.migration_settings[:overwrite_quizzes] = false
@@ -1005,6 +1117,50 @@ describe ContentMigration do
       q = @copy_to.quizzes.find_by_migration_id(mig_id(sp))
       q.should_not be_nil
       q.question_count.should == 1
+    end
+
+    it "should generate numeric ids for answers" do
+      pending unless Qti.qti_enabled?
+
+      q = @copy_from.quizzes.create!(:title => "test quiz")
+      mc = q.quiz_questions.create!
+      mc.write_attribute(:question_data, {
+          points_possible: 1,
+          question_type: "multiple_choice_question",
+          question_name: "mc",
+          name: "mc",
+          question_text: "what is your favorite color?",
+          answers: [{ text: 'blue', weight: 0, id: 123 },
+                    { text: 'yellow', weight: 100, id: 456 }]
+      }.with_indifferent_access)
+      mc.save!
+      tf = q.quiz_questions.create!
+      tf.write_attribute(:question_data, {
+          points_possible: 1,
+          question_type: "true_false_question",
+          question_name: "tf",
+          name: "tf",
+          question_text: "this statement is false.",
+          answers: [{ text: "True", weight: 100, id: 9608 },
+                    { text: "False", weight: 0, id: 9093 }]
+      }.with_indifferent_access)
+      tf.save!
+      q.generate_quiz_data
+      q.workflow_state = 'available'
+      q.save!
+
+      run_course_copy
+
+      q2 = @copy_to.quizzes.find_by_migration_id(mig_id(q))
+      q2.quiz_data.size.should eql(2)
+      ans_count = 0
+      q2.quiz_data.each do |qd|
+        qd["answers"].each do |ans|
+          ans["id"].should be_a(Integer)
+          ans_count += 1
+        end
+      end
+      ans_count.should eql(4)
     end
 
     it "should copy quizzes as published if they were published before" do
@@ -1386,7 +1542,7 @@ describe ContentMigration do
 
       @copy_to.syllabus_body.should == @copy_from.syllabus_body.gsub("/courses/#{@copy_from.id}/file_contents/course%20files",'')
     end
-    
+
     it "should re-use kaltura media objects" do
       expect {
         media_id = '0_deadbeef'
@@ -2294,7 +2450,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
     end
 
   end
-  
+
   it "should exclude user-hidden migration plugins" do
     ab = Canvas::Plugin.find(:academic_benchmark_importer)
     ContentMigration.migration_plugins(true).include?(ab).should be_false
@@ -2354,4 +2510,73 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
     worker.perform(cm)
   end
 
+  context "account-level import" do
+    it "should import question banks from qti migrations" do
+      pending unless Qti.qti_enabled?
+
+      account = Account.create!(:name => 'account')
+      @user = user
+      account.add_user(@user)
+      cm = ContentMigration.new(:context => account, :user => @user)
+      cm.migration_type = 'qti_converter'
+      cm.migration_settings['import_immediately'] = true
+      qb_name = 'Import Unfiled Questions Into Me'
+      cm.migration_settings['question_bank_name'] = qb_name
+      cm.save!
+
+      package_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/cc_default_qb_test.zip")
+      attachment = Attachment.new
+      attachment.context = cm
+      attachment.uploaded_data = File.open(package_path, 'rb')
+      attachment.filename = 'file.zip'
+      attachment.save!
+
+      cm.attachment = attachment
+      cm.save!
+
+      cm.queue_migration
+      run_jobs
+
+      cm.migration_issues.should be_empty
+
+      account.assessment_question_banks.count.should == 1
+      bank = account.assessment_question_banks.first
+      bank.title.should == qb_name
+
+      bank.assessment_questions.count.should == 1
+    end
+
+    it "should import questions from quizzes into question banks" do
+      pending unless Qti.qti_enabled?
+
+      account = Account.create!(:name => 'account')
+      @user = user
+      account.add_user(@user)
+      cm = ContentMigration.new(:context => account, :user => @user)
+      cm.migration_type = 'qti_converter'
+      cm.migration_settings['import_immediately'] = true
+      cm.save!
+
+      package_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/quiz_qti.zip")
+      attachment = Attachment.new
+      attachment.context = cm
+      attachment.uploaded_data = File.open(package_path, 'rb')
+      attachment.filename = 'file.zip'
+      attachment.save!
+
+      cm.attachment = attachment
+      cm.save!
+
+      cm.queue_migration
+      run_jobs
+
+      cm.migration_issues.should be_empty
+
+      account.assessment_question_banks.count.should == 1
+      bank = account.assessment_question_banks.first
+      bank.title.should == "Unnamed Quiz"
+
+      bank.assessment_questions.count.should == 1
+    end
+  end
 end

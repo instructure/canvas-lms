@@ -21,7 +21,7 @@ module SIS
 
     def process
       start = Time.now
-      importer = Work.new(@batch_id, @root_account, @logger)
+      importer = Work.new(@batch, @root_account, @logger)
       Course.suspend_callbacks(:update_enrollments_later) do
         Course.process_as_sis(@sis_options) do
           CourseSection.process_as_sis(@sis_options) do
@@ -40,8 +40,8 @@ module SIS
     class Work
       attr_accessor :success_count, :course_ids_to_update_associations
 
-      def initialize(batch_id, root_account, logger)
-        @batch_id = batch_id
+      def initialize(batch, root_account, logger)
+        @batch = batch
         @root_account = root_account
         @logger = logger
         @success_count = 0
@@ -75,7 +75,7 @@ module SIS
             @course.conclude_at = section.course.conclude_at
             @course.restrict_enrollments_to_course_dates = section.course.restrict_enrollments_to_course_dates
             @course.sis_source_id = xlist_course_id
-            @course.sis_batch_id = @batch_id if @batch_id
+            @course.sis_batch_id = @batch.id if @batch
             @course.workflow_state = 'claimed'
             @course.template_course = section.course
             @course.save_without_broadcasting!

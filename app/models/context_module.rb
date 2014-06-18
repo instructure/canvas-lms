@@ -24,6 +24,13 @@ class ContextModule < ActiveRecord::Base
   has_many :context_module_progressions, :dependent => :destroy
   has_many :content_tags, :dependent => :destroy, :order => 'content_tags.position, content_tags.title'
   acts_as_list scope: { context: self, workflow_state: ['active', 'unpublished'] }
+
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :context_id, :context_type, :name, :position, :prerequisites, :completion_requirements, :created_at, :updated_at, :workflow_state, :deleted_at,
+    :unlock_at, :start_at, :end_at, :require_sequential_progress, :cloned_item_id, :completion_events
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:context, :context_module_prograssions, :content_tags]
   
   serialize :prerequisites
   serialize :completion_requirements
@@ -307,6 +314,7 @@ class ContextModule < ActiveRecord::Base
       added_item ||= self.content_tags.build(:context => self.context)
       added_item.attributes = {
         :url => params[:url],
+        :new_tab => params[:new_tab],
         :tag_type => 'context_module', 
         :title => title, 
         :indent => params[:indent], 
@@ -515,14 +523,6 @@ class ContextModule < ActiveRecord::Base
 
   def to_be_unlocked
     self.unlock_at && self.unlock_at > Time.now
-  end
-
-  def self.process_migration(*args)
-    Importers::ContextModuleImporter.process_migration(*args)
-  end
-
-  def self.import_from_migration(*args)
-    Importers::ContextModuleImporter.import_from_migration(*args)
   end
 
   def migration_position

@@ -104,3 +104,8 @@ define [
     tz.changeLocale('fr_FR').then ->
       start()
       equal tz.format(moonwalk, '%c'), "lun. 21 juil. 1969 02:56:00 UTC"
+
+  test 'changeZone(...) should synchronously curry if pre-loaded', ->
+    tz.preload('America/Detroit', detroit)
+    tz.changeZone('America/Detroit')
+    equal tz.format(moonwalk, '%c'), "Sun 20 Jul 1969 09:56:00 PM EST"

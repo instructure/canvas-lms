@@ -29,8 +29,8 @@ module Canvas::AccountReports
       extra_text_term(@account_report)
       if @account_report.has_parameter? "include_deleted"
         @include_deleted = @account_report.parameters["include_deleted"]
-        @account_report.parameters["extra_text"] << I18n.t(
-          'account_reports.grades.deleted', ' Include Deleted Objects: true;')
+        add_extra_text(I18n.t('account_reports.grades.deleted',
+                              'Include Deleted Objects: true;'))
       end
     end
 
@@ -166,8 +166,8 @@ module Canvas::AccountReports
                    'outcomes' => 'learning_outcomes.id, u.id, c.id'}
       if select.length == 1
         order = order_sql[select.first]
-        @account_report.parameters["extra_text"] << " " << I18n.t(
-          'account_reports.outcomes.order', "Order: %{order}", order: select.first)
+        add_extra_text(I18n.t('account_reports.outcomes.order',
+                              "Order: %{order}", order: select.first))
       else
         order = ('u.id, learning_outcomes.id, c.id')
       end

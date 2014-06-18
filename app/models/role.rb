@@ -20,6 +20,10 @@ class Role < ActiveRecord::Base
   belongs_to :account
   belongs_to :root_account, :class_name => 'Account'
   attr_accessible :name
+
+  EXPORTABLE_ATTRIBUTES = [:id, :name, :base_role_type, :account_id, :workflow_state, :created_at, :updated_at, :deleted_at, :root_account_id]
+  EXPORTABLE_ASSOCIATIONS = [:account, :root_account]
+
   before_validation :infer_root_account_id
   validates_presence_of :name, :account_id, :workflow_state
   validates_inclusion_of :base_role_type, :in => RoleOverride::BASE_ROLE_TYPES, :message => 'is invalid'

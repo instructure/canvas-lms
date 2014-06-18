@@ -19,9 +19,21 @@
 class Quizzes::QuizSubmission < ActiveRecord::Base
   self.table_name = 'quiz_submissions' unless CANVAS_RAILS2
 
+  def self.polymorphic_names
+    [self.name, "QuizSubmission"]
+  end
+
   include Workflow
   attr_accessible :quiz, :user, :temporary_user_code, :submission_data, :score_before_regrade
   attr_readonly :quiz_id, :user_id
+
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :quiz_id, :quiz_version, :user_id, :submission_data, :submission_id, :score, :kept_score, :quiz_data, :started_at, :end_at, :finished_at, :attempt, :workflow_state,
+    :created_at, :updated_at, :fudge_points, :quiz_points_possible, :extra_attempts, :temporary_user_code, :extra_time, :manually_unlocked, :manually_scored, :score_before_regrade, :was_preview
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:quiz, :user, :submission, :attachments]
+
   validates_presence_of :quiz_id
   validates_numericality_of :extra_time, greater_than_or_equal_to: 0,
     less_than_or_equal_to: 10080, # one week
@@ -43,23 +55,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   after_save :context_module_action
   before_create :assign_validation_token
 
-  has_many :attachments, :as => :context, :dependent => :destroy do
-    if CANVAS_RAILS2
-      def construct_sql
-        @finder_sql = @counter_sql =
-          "#{@reflection.quoted_table_name}.#{@reflection.options[:as]}_id = #{owner_quoted_id} AND " +
-        "#{@reflection.quoted_table_name}.#{@reflection.options[:as]}_type IN ('QuizSubmission', #{@owner.class.quote_value(@owner.class.base_class.name.to_s)})"
-      end
-    else
-      def where(*args)
-        if args.length == 1 && args.first.is_a?(Arel::Nodes::Equality) && args.first.left.name == 'context_type'
-          super(args.first.left.in(['QuizSubmission', 'Quizzes::QuizSubmission']))
-        else
-          super
-        end
-      end
-    end
-  end
+  has_many :attachments, :as => :context, :dependent => :destroy
 
   # update the QuizSubmission's Submission to 'graded' when the QuizSubmission is marked as 'complete.' this
   # ensures that quiz submissions with essay questions don't show as graded in the SpeedGrader until the instructor
@@ -72,29 +68,6 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   serialize :submission_data
 
   simply_versioned :automatic => false
-
-  has_many :versions,
-    :order => 'number DESC',
-    :as => :versionable,
-    :dependent => :destroy,
-    :inverse_of => :versionable,
-    :extend => SoftwareHeretics::ActiveRecord::SimplyVersioned::VersionsProxyMethods do
-      if CANVAS_RAILS2
-        def construct_sql
-          @finder_sql = @counter_sql =
-            "#{@reflection.quoted_table_name}.#{@reflection.options[:as]}_id = #{owner_quoted_id} AND " +
-          "#{@reflection.quoted_table_name}.#{@reflection.options[:as]}_type IN ('QuizSubmission', #{@owner.class.quote_value(@owner.class.base_class.name.to_s)})"
-        end
-      else
-        def where(*args)
-          if args.length == 1 && args.first.is_a?(Arel::Nodes::Equality) && args.first.left.name == 'versionable_type'
-            super(args.first.left.in(['QuizSubmission', 'Quizzes::QuizSubmission']))
-          else
-            super
-          end
-        end
-      end
-    end
 
   workflow do
     state :untaken do

@@ -8,7 +8,7 @@ define [
 
   Model.extend
     quiz: belongsTo 'quiz', async: false
-    questionStatistics: hasMany 'questionStatistics', async: false, embedded: 'load'
+    questionStatistics: hasMany 'question_statistics', async: false
 
     generatedAt: attr('date')
     multipleAttemptsExist: attr('boolean')

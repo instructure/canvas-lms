@@ -42,7 +42,7 @@ module SIS
             end
 
             begin
-              importer.add_enrollment(row['course_id'], row['section_id'], row['user_id'], row['role'], row['status'], start_date, end_date, row['associated_user_id'])
+              importer.add_enrollment(row['course_id'], row['section_id'], row['user_id'], row['role'], row['status'], start_date, end_date, row['associated_user_id'], row['root_account'])
             rescue ImportError => e
               messages << "#{e}"
               next

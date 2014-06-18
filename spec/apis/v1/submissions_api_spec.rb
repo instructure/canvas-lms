@@ -919,6 +919,7 @@ describe 'Submissions API', type: :request do
       {
         'user_id' => student2.id,
         'submissions' => [],
+        'integration_id' => nil
       },
     ]
 
@@ -927,6 +928,25 @@ describe 'Submissions API', type: :request do
           { :controller => 'submissions_api', :action => 'for_students',
             :format => 'json', :course_id => @course.to_param },
           { :student_ids => [student1.to_param, student2.to_param] })
+    json.should == []
+  end
+
+  it "should return integration_id for user and assignment" do
+    student1 = user(:active_all => true)
+    student2 = user_with_pseudonym(:active_all => true)
+    student2.pseudonym.update_attribute(:sis_user_id, 'my-student-id')
+    student2.pseudonym.update_attribute(:integration_id, 'xyz')
+
+    course_with_teacher(:active_all => true)
+
+    @course.enroll_student(student1).accept!
+    @course.enroll_student(student2).accept!
+    
+    json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/students/submissions.json",
+          { :controller => 'submissions_api', :action => 'for_students',
+            :format => 'json', :course_id => @course.to_param },
+          { :student_ids => 'all' })
     json.should == []
   end
 

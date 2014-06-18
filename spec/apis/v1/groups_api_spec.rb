@@ -28,12 +28,14 @@ describe "Groups API", type: :request do
       'is_public' => group.is_public,
       'join_level' => group.join_level,
       'members_count' => group.members_count,
+      'max_membership' => group.max_membership,
       'avatar_url' => group.avatar_attachment && "http://www.example.com/images/thumbnails/#{group.avatar_attachment.id}/#{group.avatar_attachment.uuid}",
       'context_type' => group.context_type,
       "#{group.context_type.downcase}_id" => group.context_id,
       'role' => group.group_category.role,
       'group_category_id' => group.group_category_id,
-      'storage_quota_mb' => group.storage_quota_mb
+      'storage_quota_mb' => group.storage_quota_mb,
+      'leader' => group.leader
     }
     if group.context_type == 'Account' && is_admin == true
       json['sis_import_id'] = group.sis_batch_id
@@ -678,6 +680,19 @@ describe "Groups API", type: :request do
         (user.keys & expected_keys).sort.should == expected_keys.sort
         @community.users.map(&:id).should include(user['id'])
       end
+    end
+
+    it "honors the include[avatar_url] query parameter flag" do
+      account = @community.context
+      account.set_service_availability(:avatars, true)
+      account.save!
+
+      user = @community.users.first
+      user.avatar_image_url = "http://expected_avatar_url"
+      user.save!
+
+      json = api_call(:get, api_url + "?include[]=avatar_url", api_route.merge(include: ["avatar_url"]))
+      json.first['avatar_url'].should == user.avatar_image_url
     end
   end
 

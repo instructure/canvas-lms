@@ -204,7 +204,7 @@ TEXT
               <% elsif service.has_readable_user_name? %>
                 <span><%= service.service_user_name %></span>
               <% end %>
-              <% if service.service == 'facebook' && feature_and_service_enabled?(:facebook) && Facebook.config['canvas_name'] %>
+              <% if service.service == 'facebook' && feature_and_service_enabled?(:facebook) && Facebook::Connection.config['canvas_name'] %>
                 <div style="line-height: 2.0em;">
                   <a href="<%= service.service_access_link %>"><%= t('links.view_facebook_app', "view the Facebook app") %></a>
                 </div>

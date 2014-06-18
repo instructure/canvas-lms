@@ -61,6 +61,53 @@ describe UsersController do
     end
   end
 
+  describe "GET oauth" do
+    it "sets up oauth for facebook" do
+      Facebook::Connection.config = Proc.new do
+        {}
+      end
+      CanvasUuid::Uuid.stubs(:generate).returns("some_uuid")
+
+      user_with_pseudonym
+      user_session(@user)
+
+      OauthRequest.expects(:create).with(
+          :service => "facebook",
+          :secret => "some_uuid",
+          :return_url => "http://example.com",
+          :user => @user,
+          :original_host_with_port => "test.host"
+      ).returns(stub(global_id: "123"))
+      Facebook::Connection.expects(:authorize_url).returns("http://example.com/redirect")
+
+      get :oauth, {service: "facebook", return_to: "http://example.com"}
+
+      response.should redirect_to "http://example.com/redirect"
+    end
+  end
+
+  describe "GET oauth_success" do
+    it "handles facebook post oauth redirects" do
+
+      user_with_pseudonym
+      user_session(@user)
+
+
+      Canvas::Security.expects(:decrypt_password).with("some", "state", 'facebook_oauth_request').returns("123")
+      mock_oauth_request = stub(original_host_with_port: "test.host", user: @user, return_url: "example.com")
+      OauthRequest.expects(:find_by_id).with("123").returns(mock_oauth_request)
+      Facebook::Connection.expects(:get_service_user_info).with("access_token").returns({"id" => "456", "name" => "joe", "link" => "some_link"})
+      UserService.any_instance.expects(:save) do |user_service|
+        user_service.id.should == "456"
+        user_service.name.should == "joe"
+        user_service.link.should == "some_link"
+      end
+
+      get :oauth_success, state: "some.state", service: "facebook", access_token: "access_token"
+
+    end
+  end
+
   it "should not include deleted courses in manageable courses" do
     course_with_teacher_logged_in(:course_name => "MyCourse1", :active_all => 1)
     course1 = @course
@@ -113,18 +160,6 @@ describe UsersController do
       get 'delete', :user_id => @student.id
       flash[:error].should_not =~ /cannot delete a system-generated user/
       response.should be_success
-    end
-  end
-
-  describe "GET 'user_dashboard'" do
-    context "with a custom dashboard_url" do
-      it "should redirect" do
-        @account = Account.default
-        @account.settings[:dashboard_url] = "http://test.com"
-        user_session(user)
-        get 'user_dashboard'
-        response.should redirect_to("http://test.com?current_user_id=#{@user.id}")
-      end
     end
   end
 
@@ -713,7 +748,23 @@ describe UsersController do
     context "sharding" do
       specs_require_sharding
 
-      it "should include enrollments from all shards" do
+      it "should include enrollments from all shards for the actual user" do
+        course_with_teacher(:active_all => 1)
+        @shard1.activate do
+          account = Account.create!
+          course = account.courses.create!
+          @e2 = course.enroll_teacher(@teacher)
+        end
+        account_admin_user(:user => @teacher)
+        user_session(@teacher)
+
+        get 'show', :id => @teacher.id
+        response.should be_success
+        assigns[:enrollments].sort_by(&:id).should == [@enrollment, @e2]
+      end
+
+      it "should include enrollments from all shards for trusted account admins" do
+        pending "granting read permissions to trusted accounts"
         course_with_teacher(:active_all => 1)
         @shard1.activate do
           account = Account.create!
@@ -721,12 +772,27 @@ describe UsersController do
           @e2 = course.enroll_teacher(@teacher)
         end
         account_admin_user
-        user_session(@admin)
+        user_session(@user)
 
         get 'show', :id => @teacher.id
         response.should be_success
         assigns[:enrollments].sort_by(&:id).should == [@enrollment, @e2]
       end
+    end
+
+    it "should not let admins see enrollments from other accounts" do
+      @enrollment1 = course_with_teacher(:active_all => 1)
+      @enrollment2 = course_with_teacher(:active_all => 1, :user => @user)
+
+      other_root_account = Account.create!(:name => 'other')
+      @enrollment3 = course_with_teacher(:active_all => 1, :user => @user, :account => other_root_account)
+
+      account_admin_user
+      user_session(@admin)
+
+      get 'show', :id => @teacher.id
+      response.should be_success
+      assigns[:enrollments].sort_by(&:id).should == [@enrollment1, @enrollment2]
     end
 
     it "should respond to JSON request" do

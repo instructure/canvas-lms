@@ -49,18 +49,18 @@ module Importers
           if qq[:assessment_question_migration_id]
             if aq = question_data[:aq_data][qq[:assessment_question_migration_id]]
               qq['assessment_question_id'] = aq['assessment_question_id']
-              aq_hash = Importers::AssessmentQuestionImporter.prep_for_import(qq, context)
-              Quizzes::QuizQuestion.import_from_migration(aq_hash, context, quiz, item)
+              aq_hash = Importers::AssessmentQuestionImporter.prep_for_import(qq, context, migration)
+              Importers::QuizQuestionImporter.import_from_migration(aq_hash, context, migration, quiz, item)
             else
-              aq_hash = Importers::AssessmentQuestionImporter.import_from_migration(qq, context)
+              aq_hash = Importers::AssessmentQuestionImporter.import_from_migration(qq, context, migration)
               qq['assessment_question_id'] = aq_hash['assessment_question_id']
-              Quizzes::QuizQuestion.import_from_migration(aq_hash, context, quiz, item)
+              Importers::QuizQuestionImporter.import_from_migration(aq_hash, context, migration, quiz, item)
             end
           end
         elsif aq = question_data[:aq_data][question[:migration_id]]
           aq[:points_possible] = question[:points_possible] if question[:points_possible]
           aq[:position] = i + 1
-          Quizzes::QuizQuestion.import_from_migration(aq, context, quiz, item)
+          Importers::QuizQuestionImporter.import_from_migration(aq, context, migration, quiz, item)
         end
       end
 

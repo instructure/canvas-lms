@@ -67,17 +67,12 @@ ul[class*=ac-] {
   border: 1px solid #ccc;
   border-radius: 3px 0 0 3px;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
-  -moz-box-sizing: border-box;
   box-sizing: border-box;
   cursor: text;
   min-height: 30px;
   overflow: hidden;
   padding: 4px 6px;
   position: relative;
-  -moz-transition: border 0.2s linear 0s, box-shadow 0.2s linear 0s;
-  -ms-transition: border 0.2s linear 0s, box-shadow 0.2s linear 0s;
-  -o-transition: border 0.2s linear 0s, box-shadow 0.2s linear 0s;
-  -webkit-transition: border 0.2s linear 0s, box-shadow 0.2s linear 0s;
   transition: border 0.2s linear 0s, box-shadow 0.2s linear 0s;
   width: 100%;
 
@@ -122,10 +117,6 @@ ul[class*=ac-] {
   left: 12px;
   position: absolute;
   top: 5px;
-  -moz-transition: opacity 0.2s linear;
-  -ms-transition: opacity 0.2s linear;
-  -o-transition: opacity 0.2s linear;
-  -webkit-transition: opacity 0.2s linear;
   transition: opacity 0.2s linear;
 }
 
@@ -159,7 +150,6 @@ ul[class*=ac-] {
   background: #dee7fa;
   border: 1px solid #85ace0;
   border-radius: 14px;
-  -moz-box-sizing: border-box;
   box-sizing: border-box;
   cursor: default;
   display: inline-block;
@@ -225,7 +215,6 @@ ul[class*=ac-] {
   background: #fff;
   border: 1px solid $border-color;
   border-radius: 10px;
-  -moz-box-sizing: border-box;
   box-sizing: border-box;
 	box-shadow: 0 2px 5px rgba(0, 0, 0, .2);
   font-size: 12px;

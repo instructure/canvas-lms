@@ -54,8 +54,10 @@ describe Quizzes::QuizzesController do
         get "courses/#{@course.id}/quizzes"
 
         doc = Nokogiri::HTML(response.body)
-        doc.css("div.description").text.include?("Due: Multiple Dates").should_not be_true
-        doc.css("div.description").text.include?("Due: #{due_at.strftime('%b %-d')}").should be_true
+        description_text = doc.css("div.description").text
+        description_text.include?("Due: Multiple Dates").should_not be_true
+        description_text.include?("Due:").should be_true
+        description_text.include?(due_at.strftime('%b %-d')).should be_true
       end
 
       it "should only use the sections the user is restricted to" do
@@ -171,7 +173,7 @@ describe Quizzes::QuizzesController do
     end
   end
 
-  context "show_student" do 
+  context "show_student" do
     before :each do
       course_with_student_logged_in(:active_all => true)
       course_quiz true

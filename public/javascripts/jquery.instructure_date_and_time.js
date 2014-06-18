@@ -65,7 +65,7 @@ var speakMessage = function ($this, message) {
     date.date = date;
     return date;
   };
-  
+
   $.formatDateTime = function(date, options) {
     var head = "", tail = "";
     if(date) {
@@ -93,8 +93,8 @@ var speakMessage = function ($this, message) {
       result[head + "(5i)" + tail] = "";
     }
     return result;
-  };  
-  
+  };
+
   // fudgeDateForProfileTimezone is used to apply an offset to the date which represents the
   // difference between the user's configured timezone in their profile, and the timezone
   // of the browser. We want to display times in the timezone of their profile. Use
@@ -129,13 +129,20 @@ var speakMessage = function ($this, message) {
   $.midnight = function(date) {
     return date != null && tz.format(date, '%R') == '00:00';
   };
-  $.dateString = function(date) {
-    return (date != null && tz.format(date, $.sameYear(date, new Date()) ? '%b %-d' : '%b %-d, %Y')) || "";
+  $.dateString = function(date, otherZone) {
+    if (date == null) return "";
+    var format = $.sameYear(date, new Date()) ? '%b %-d' : '%b %-d, %Y';
+    if(arguments.length > 1) return tz.format(date, format, otherZone) || '';
+    return tz.format(date, format) || '';
   };
-  $.timeString = function(date) {
-    return (date != null && tz.format(date, '%l:%M%P')) || "";
+  $.timeString = function(date, otherZone) {
+    if (date == null) return "";
+    if(arguments.length > 1) return tz.format(date, '%l:%M%P', otherZone) || '';
+    return tz.format(date, '%l:%M%P') || '';
   };
-  $.datetimeString = function(datetime, localized) {
+  $.datetimeString = function(datetime, options) {
+    var localized = options && options.localized;
+    var timezone = options && options.timezone;
     datetime = tz.parse(datetime);
     if (datetime == null) return "";
     if (localized == false) {
@@ -154,7 +161,16 @@ var speakMessage = function ($this, message) {
       return datePart + " at " + timePart;
     }
     else {
-      return I18n.t('#time.event', '%{date} at %{time}', { date: $.dateString(datetime), time: $.timeString(datetime) });
+      var dateValue = null;
+      var timeValue = null;
+      if(typeof timezone == 'string' || timezone instanceof String){
+        dateValue = $.dateString(datetime, timezone);
+        timeValue = $.timeString(datetime, timezone);
+      }else{
+        dateValue = $.dateString(datetime);
+        timeValue = $.timeString(datetime);
+      }
+      return I18n.t('#time.event', '%{date} at %{time}', { date: dateValue, time: timeValue });
     }
   };
   // end batch
@@ -613,5 +629,5 @@ var speakMessage = function ($this, message) {
     });
     return $picker;
   };
-  
+
 });

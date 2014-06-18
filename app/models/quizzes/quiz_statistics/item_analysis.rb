@@ -34,7 +34,7 @@ class Quizzes::QuizStatistics::ItemAnalysis < Quizzes::QuizStatistics::Report
 
   MIN_STATS_FOR_ALPHA = 15
 
-  def generate
+  def generate(legacy=true)
     stats = summary_stats_for_quiz
     stats.map do |item|
       question_item_analysis = {

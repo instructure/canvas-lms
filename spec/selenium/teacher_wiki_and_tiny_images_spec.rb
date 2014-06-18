@@ -40,6 +40,7 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
     end
 
     it "adds a tabindex to flickr search results" do
+      pending "flickr outage"
       wiki_page_tools_file_tree_setup
       f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
       f('.find_new_image_link').click
@@ -48,9 +49,11 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
       wait_for_animations
       results = f('.results .image_link[tabindex="0"]')
       results.should_not be_nil
+
     end
 
     it "inserts a flickr image when you hit enter" do
+      pending "flickr outage"
       wiki_page_tools_file_tree_setup
       f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
       f('.find_new_image_link').click

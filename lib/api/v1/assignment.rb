@@ -33,6 +33,7 @@ module Api::V1::Assignment
       lock_at
       unlock_at
       assignment_group_id
+      integration_id
       peer_reviews
       automatic_peer_reviews
       post_to_sis

@@ -21,8 +21,8 @@
       left: auto;
       text-decoration: none;
 
-      @include opacity(0.5);
-      &:hover { @include opacity(1); }
+      opacity: 0.5;
+      &:hover { opacity: 1; }
     }
   }
 
@@ -159,8 +159,6 @@
       background-color: #eeeeee;
       .course_name {
         opacity: 1 !important;
-        -moz-opacity: 1 !important;
-        filter: alpha(opacity = 1) !important;
       }
     }
     div.data {
@@ -179,8 +177,8 @@
           line-height: 1.2em;
           padding: 2px 7px;
           color: inherit;
-          @include opacity(0.75);
-          @include border-radius(10px);
+          opacity: 0.75;
+          border-radius: 10px;
         }
       }
       &.assignment_due {
@@ -212,7 +210,7 @@
     width: auto;
     border: 1px solid #999999;
     color: black;
-    @include border-radius(5px);
+    border-radius: 5px;
     .group_move_icon,.add_assignment_link,.edit_group_link,.delete_group_link {
       display: none;
     }
@@ -246,7 +244,7 @@
     }
     .group_assignment {
       min-height: 30px;
-      @include border-radius(3px);
+      border-radius: 3px;
       color: #444444;
       border-bottom: 1px solid #eeeeee;
       &:hover {
@@ -374,7 +372,7 @@ table.full_assignment_table {
   }
   &.has_submission {
     .tools {
-      @include opacity(0.7);
+      opacity: 0.7;
     }
   }
   .tools {
@@ -389,7 +387,7 @@ table.full_assignment_table {
       }
       &:hover {
         background: #eee;
-        @include border-radius(3px);
+        border-radius: 3px;
       }
     }
   }

@@ -78,6 +78,13 @@ module CC::Importer::Standard
                     :linked_resource_id => resource[:migration_id],
                     :linked_resource_title => get_node_val(item_node, 'title'),
             }
+          when /\Aassignment/
+            item = {
+                    :indent =>indent,
+                    :linked_resource_type => 'ASSIGNMENT',
+                    :linked_resource_id => resource[:migration_id],
+                    :linked_resource_title => get_node_val(item_node, 'title'),
+            }
           when /\Aimswl/
             item = {:indent => indent, :linked_resource_type => 'URL'}
             item[:linked_resource_title] = get_node_val(item_node, 'title')

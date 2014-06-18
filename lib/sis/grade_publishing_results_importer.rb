@@ -21,7 +21,7 @@ module SIS
 
     def process
       start = Time.now
-      importer = Work.new(@batch_id, @root_account, @logger)
+      importer = Work.new(@batch, @root_account, @logger)
       yield importer
       @logger.debug("Grade publishing results took #{Time.now - start} seconds")
       return importer.success_count
@@ -31,8 +31,8 @@ module SIS
     class Work
       attr_accessor :success_count
 
-      def initialize(batch_id, root_account, logger)
-        @batch_id = batch_id
+      def initialize(batch, root_account, logger)
+        @batch = batch
         @root_account = root_account
         @logger = logger
         @success_count = 0

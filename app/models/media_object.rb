@@ -24,6 +24,13 @@ class MediaObject < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   belongs_to :attachment
   belongs_to :root_account, :class_name => 'Account'
+
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :user_id, :context_id, :context_type, :workflow_state, :user_type, :title, :user_entered_title, :media_id, :media_type, :duration, :max_size, :root_account_id,
+    :data, :created_at, :updated_at, :attachment_id, :total_size
+  ]
+  EXPORTABLE_ASSOCIATIONS = [:user, :context, :attachment, :root_account, :media_tracks]
+
   validates_presence_of :media_id, :workflow_state
   has_many :media_tracks, :dependent => :destroy, :order => 'locale'
   after_create :retrieve_details_later
@@ -154,7 +161,8 @@ class MediaObject < ActiveRecord::Base
         attachment_id = partner_data[:attachment_id] if partner_data[:attachment_id].present?
       end
       attachment = Attachment.find_by_id(attachment_id) if attachment_id
-      mo = MediaObject.find_or_initialize_by_media_id(entry[:entryId])
+      account = root_account || Account.default
+      mo = account.shard.activate { MediaObject.find_or_initialize_by_media_id(entry[:entryId]) }
       mo.root_account ||= root_account || Account.default
       mo.title ||= entry[:name]
       if attachment

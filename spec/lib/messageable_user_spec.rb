@@ -102,33 +102,21 @@ describe "MessageableUser" do
         should_not match('5')
     end
 
-    it "should order by short_name before name or id" do
-      user1 = user(:active_all => 1, :short_name => 'Bob', :name => 'Yellow Bob')
-      user2 = user(:active_all => 1, :short_name => 'Alice', :name => 'Zebra Alice')
+    it "should order by sortable_name before id" do
+      user1 = user(:active_all => 1, :name => 'Yellow Bob')
+      user2 = user(:active_all => 1, :name => 'Zebra Alice')
       MessageableUser.prepped().where(id: [user1, user2]).first.id.should == user2.id
     end
 
-    it "should ignore case when ordering by short_name" do
-      user1 = user(:active_all => 1, :short_name => 'bob')
-      user2 = user(:active_all => 1, :short_name => 'ALICE')
-      MessageableUser.prepped().where(id: [user1, user2]).first.id.should == user2.id
-    end
-
-    it "should order by name before id" do
-      user1 = user(:active_all => 1, :name => 'Bob')
-      user2 = user(:active_all => 1, :name => 'Alice')
-      MessageableUser.prepped().where(id: [user1, user2]).first.id.should == user2.id
-    end
-
-    it "should ignore case when ordering by name" do
+    it "should ignore case when ordering by sortable_name" do
       user1 = user(:active_all => 1, :name => 'bob')
       user2 = user(:active_all => 1, :name => 'ALICE')
       MessageableUser.prepped().where(id: [user1, user2]).first.id.should == user2.id
     end
 
     it "should order by id as tiebreaker" do
-      user1 = user(:active_all => 1, :short_name => 'Alice')
-      user2 = user(:active_all => 1, :short_name => 'Alice')
+      user1 = user(:active_all => 1, :name => 'Alice')
+      user2 = user(:active_all => 1, :name => 'Alice')
       MessageableUser.prepped().where(id: [user1, user2]).first.id.should == user1.id
     end
 

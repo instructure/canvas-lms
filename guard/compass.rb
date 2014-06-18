@@ -12,11 +12,13 @@ module Guard
     end
 
     def run_on_change(paths)
-      compile_all
+      ::Guard::UI.info "Recompiling SASS files that have changed"
+      compile_all environment: :development
     end
 
     def run_all
-      compile_all force: true
+      ::Guard::UI.info "Forcing recompilation of all SASS files"
+      compile_all force: true, environment: :development
     end
 
   end

@@ -41,7 +41,7 @@ define [
       e.preventDefault()
       e.stopPropagation()
       targetGroup = @$('option:selected').val()
-      if targetGroup then @group.collection.category.reassignUser(@model, targetGroup)
+      if targetGroup then @group.collection.category.reassignUser(@model, @group.collection.get(targetGroup))
       @close()
       # focus override to the user's new group heading if they're moved
       $("[data-id='#{targetGroup}'] .group-heading")?.focus()
@@ -54,7 +54,7 @@ define [
       hasGroups = groupCollection.length > 0
       {
         allFull: hasGroups and groupCollection.models.every (g) -> g.isFull()
-        groupId: @group.get('id')
+        groupId: @group.id
         userName: @model.get('name')
         groups: groupCollection.toJSON()
       }

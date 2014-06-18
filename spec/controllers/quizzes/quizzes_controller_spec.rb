@@ -66,7 +66,7 @@ describe Quizzes::QuizzesController do
 
   def ember_urls
     CanvasEmberUrl::UrlMappings.new(
-      :course_quizzes => fabulous_quizzes_course_quizzes_url
+      :course_quizzes => course_quizzes_url
     )
   end
 
@@ -168,27 +168,13 @@ describe Quizzes::QuizzesController do
       a.save!
     end
 
-    it "should redirect to fabulous quizzes app" do
+    it "should render fabulous quizzes app" do
       course_with_teacher_logged_in(:active_all => true)
       course_quiz(active = true)
       a = Account.default
       a.enable_fabulous_quizzes?.should eql true
       get 'index', :course_id => @course.id
-      assert_redirected_to ember_urls.course_quizzes_url
-    end
-  end
-
-  describe "GET 'fabulous_quizzes' without fabulous quizzes enabled" do
-    it "should redirect to index" do
-      a = Account.default
-      a.disable_fabulous_quizzes!
-      a.save!
-      course_with_teacher_logged_in(:active_all => true)
-      course_quiz(active = true)
-      a = Account.default
-      a.enable_fabulous_quizzes?.should eql false
-      get 'fabulous_quizzes', :course_id => @course.id
-      assert_redirected_to(:controller => "quizzes", :action => "index")
+      assert_response(:success)
     end
   end
 
@@ -944,7 +930,7 @@ describe Quizzes::QuizzesController do
         }
       response.should be_success
       quiz = assigns[:quiz].overridden_for(@user)
-      overrides = quiz.overrides_visible_to(@user)
+      overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(quiz, @user)
       overrides.length.should == 1
       overrides.first[:due_at].iso8601.should == section_due_date
     end
@@ -1027,7 +1013,7 @@ describe Quizzes::QuizzesController do
           }]
         }
       quiz = quiz.reload.overridden_for(@user)
-      overrides = quiz.overrides_visible_to(@user)
+      overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(quiz, @user)
       overrides.length.should == 1
     end
 

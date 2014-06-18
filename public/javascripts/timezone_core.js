@@ -6,6 +6,7 @@ define([
 ], function($, _, require, tz) {
   // start with the bare vendor-provided tz() function
   var _tz = tz;
+  var _preloadedData = {};
 
   // wrap it up in a set of methods that will always call the most up-to-date
   // version. each method is intended to act as a subset of bigeasy's generic
@@ -32,14 +33,26 @@ define([
 
     // format a date value (parsing it if necessary). returns null for parse
     // failure on the value or an unrecognized format string.
-    format: function(value, format) {
+    format: function(value, format, otherZone) {
+      var localTz = _tz;
+      var usingOtherZone = (arguments.length == 3 && otherZone)
+      if(usingOtherZone){
+        if(!(otherZone in _preloadedData)) return null;
+        localTz = _tz(_preloadedData[otherZone]);
+      }
       // make sure we have a good value first
       var datetime = tz.parse(value);
       if (datetime == null) return null;
 
       // try and apply the format string to the datetime. if it succeeds, we'll
       // get a string; otherwise we'll get the (non-string) date back.
-      var formatted = _tz(datetime, format);
+      var formatted = null;
+      if (usingOtherZone){
+        formatted = localTz(datetime, format, otherZone);
+      } else {
+        formatted = localTz(datetime, format);
+      }
+
       if (typeof formatted !== 'string') return null;
       return formatted;
     },
@@ -94,14 +107,35 @@ define([
     applyFeature: function(data, name) {
       var promise = $.Deferred();
       if (arguments.length > 1) {
+        this.preload(name, data);
         tz.extendConfiguration(data, name);
         promise.resolve();
+        return promise;
       }
-      else {
-        name = data;
-        require(["vendor/timezone/" + name], function(data) {
-          tz.extendConfiguration(data, name);
-          promise.resolve();
+
+      name = data;
+      this.preload(name).then(function(preloadedData){
+        tz.extendConfiguration(preloadedData, name);
+        promise.resolve();
+      });
+
+      return promise;
+    },
+
+    // preload a specific data file without having to actually
+    // change the timezone to do it. Future "applyFeature" calls
+    // will apply synchronously if their data is already preloaded.
+    preload: function(name, data) {
+      var promise = $.Deferred();
+      if (arguments.length > 1){
+        _preloadedData[name] = data;
+        promise.resolve(data);
+      } else if(_preloadedData[name]){
+        promise.resolve(_preloadedData[name]);
+      } else {
+        require(["vendor/timezone/" + name], function(data){
+          _preloadedData[name] = data;
+          promise.resolve(data);
         });
       }
       return promise;

@@ -30,16 +30,6 @@ describe LtiOutbound::LTIUser do
   it_behaves_like 'it has a proc attribute setter and getter for', :concluded_roles
   it_behaves_like 'it has a proc attribute setter and getter for', :currently_active_in_course
 
-  it_behaves_like 'it provides variable mapping', '$Canvas.user.id', :id
-  it_behaves_like 'it provides variable mapping', '$Canvas.user.loginId', :login_id
-  it_behaves_like 'it provides variable mapping', '$Canvas.user.sisSourceId', :sis_source_id
-  it_behaves_like 'it provides variable mapping', '$Canvas.enrollment.enrollmentState', :enrollment_state
-  it_behaves_like 'it provides variable mapping', '$Canvas.membership.concludedRoles', :concluded_roles
-  it_behaves_like 'it provides variable mapping', '$Person.name.full', :name
-  it_behaves_like 'it provides variable mapping', '$Person.name.family', :last_name
-  it_behaves_like 'it provides variable mapping', '$Person.name.given', :first_name
-  it_behaves_like 'it provides variable mapping', '$Person.address.timezone', :timezone
-
   let(:teacher_role) { LtiOutbound::LTIRole::INSTRUCTOR }
   let(:learner_role) { LtiOutbound::LTIRole::LEARNER }
 

@@ -163,9 +163,9 @@ describe DiscussionTopic do
     it "should not be visible when no delayed_post but assignment unlock date in future" do
       @topic.delayed_post_at = nil
       group_category = @course.group_categories.create(:name => "category")
+      @topic.group_category = group_category
       @topic.assignment = @course.assignments.build(:submission_types => 'discussion_topic',
         :title => @topic.title,
-        :group_category => group_category,
         :unlock_at => 10.days.from_now,
         :lock_at => 30.days.from_now)
       @topic.assignment.infer_times
@@ -372,16 +372,14 @@ describe DiscussionTopic do
   end
 
   context "sub-topics" do
-    it "should default subtopics_refreshed_at on save if a group assignment" do
+    it "should default subtopics_refreshed_at on save if a group discussion" do
       course_with_student(:active_all => true)
       group_category = @course.group_categories.create(:name => "category")
       @group = @course.groups.create(:name => "group", :group_category => group_category)
       @topic = @course.discussion_topics.create(:title => "topic")
       @topic.subtopics_refreshed_at.should be_nil
 
-      @topic.assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title, :group_category => @group.group_category)
-      @topic.assignment.infer_times
-      @topic.assignment.saved_by = :discussion_topic
+      @topic.group_category = group_category
       @topic.save
       @topic.subtopics_refreshed_at.should_not be_nil
     end
@@ -405,7 +403,7 @@ describe DiscussionTopic do
   end
 
   context "refresh_subtopics" do
-    it "should be a no-op unless there's an assignment and it has a group_category" do
+    it "should be a no-op unless it has a group_category" do
       course_with_student(:active_all => true)
       @topic = @course.discussion_topics.create(:title => "topic")
       @topic.refresh_subtopics
@@ -453,11 +451,13 @@ describe DiscussionTopic do
       course_with_student(:active_all => true)
       group_category = @course.group_categories.create(:name => "category")
       @parent_topic = @course.discussion_topics.create(:title => "parent topic")
+      @parent_topic.group_category = group_category
       @subtopic = @parent_topic.child_topics.build(:title => "subtopic")
-      @assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @subtopic.title, :group_category => group_category)
+      @assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @subtopic.title)
       @assignment.infer_times
       @assignment.saved_by = :discussion_topic
       @subtopic.assignment = @assignment
+      @subtopic.group_category = group_category
       @subtopic.save
 
       @subtopic.should_not be_root_topic
@@ -470,7 +470,7 @@ describe DiscussionTopic do
       @topic.should_not be_root_topic
     end
 
-    it "should be false unless the topic's assignment has a group_category" do
+    it "should be false unless the topic has a group_category" do
       # topic has no root topic and has an assignment, but the assignment has no group_category
       course_with_student(:active_all => true)
       @topic = @course.discussion_topics.create(:title => "topic")
@@ -488,7 +488,8 @@ describe DiscussionTopic do
       course_with_student(:active_all => true)
       group_category = @course.group_categories.create(:name => "category")
       @topic = @course.discussion_topics.create(:title => "topic")
-      @assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title, :group_category => group_category)
+      @topic.group_category = group_category
+      @assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title)
       @assignment.infer_times
       @assignment.saved_by = :discussion_topic
       @topic.assignment = @assignment
@@ -512,23 +513,22 @@ describe DiscussionTopic do
     end
   end
 
-  context "for_assignment?/for_group_assignment?" do
-    it "should not be for_assignment?/for_group_assignment? unless it has an assignment" do
+  context "for_assignment?" do
+    it "should not be for_assignment? unless it has an assignment" do
       course_with_student(:active_all => true)
       @topic = @course.discussion_topics.create(:title => "topic")
       @topic.should_not be_for_assignment
-      @topic.should_not be_for_group_assignment
 
-      group_category = @course.group_categories.build(:name => "category")
-      @topic.assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title, :group_category => group_category)
+      @topic.assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title)
       @topic.assignment.infer_times
       @topic.assignment.saved_by = :discussion_topic
       @topic.save
       @topic.should be_for_assignment
-      @topic.should be_for_group_assignment
     end
+  end
 
-    it "should not be for_group_assignment? unless the assignment has a group_category" do
+  context "for_group_discussion?" do
+    it "should not be for_group_discussion? unless it has a group_category" do
       course_with_student(:active_all => true)
       @topic = @course.discussion_topics.build(:title => "topic")
       @assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title)
@@ -536,12 +536,11 @@ describe DiscussionTopic do
       @assignment.saved_by = :discussion_topic
       @topic.assignment = @assignment
       @topic.save
-      @topic.should be_for_assignment
-      @topic.should_not be_for_group_assignment
+      @topic.should_not be_for_group_discussion
 
-      @assignment.group_category = @course.group_categories.create(:name => "category")
-      @assignment.save
-      @topic.reload.should be_for_group_assignment
+      @topic.group_category = @course.group_categories.create(:name => "category")
+      @topic.save
+      @topic.should be_for_group_discussion
     end
   end
 
@@ -562,12 +561,15 @@ describe DiscussionTopic do
       @topic.should_send_to_stream.should be_true
     end
 
-    it "should be true for the parent topic only in group discussion assignments, not the subtopics" do
+    it "should be true for the parent topic only in group discussions, not the subtopics" do
       course_with_student(:active_all => true)
       group_category = @course.group_categories.create(:name => "category")
       @parent_topic = @course.discussion_topics.create(:title => "parent topic")
+      @parent_topic.group_category = group_category
+      @parent_topic.save
       @subtopic = @parent_topic.child_topics.build(:title => "subtopic")
-      @assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @subtopic.title, :group_category => group_category, :due_at => 1.day.from_now)
+      @subtopic.group_category = group_category
+      @assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => @subtopic.title, :due_at => 1.day.from_now)
       @assignment.saved_by = :discussion_topic
       @subtopic.assignment = @assignment
       @subtopic.save

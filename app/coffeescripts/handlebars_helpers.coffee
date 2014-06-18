@@ -39,17 +39,39 @@ define [
       new Handlebars.SafeString semanticDateRange arguments...
 
     # expects: a Date object or an ISO string
-    friendlyDatetime : (datetime, {hash: {pubdate}}) ->
+    contextSensitiveDatetimeTitle : (datetime, {hash: {justText}})->
+      localDatetime = $.datetimeString(datetime)
+      titleText = localDatetime
+      if ENV and ENV.CONTEXT_TIMEZONE and (ENV.TIMEZONE != ENV.CONTEXT_TIMEZONE)
+        localText = Handlebars.helpers.t('#helpers.local','Local')
+        courseText = Handlebars.helpers.t('#helpers.course', 'Course')
+        courseDatetime = $.datetimeString(datetime, timezone: ENV.CONTEXT_TIMEZONE)
+        if localDatetime != courseDatetime
+          titleText = "#{localText}: #{localDatetime}<br>#{courseText}: #{courseDatetime}"
+
+      if justText
+        new Handlebars.SafeString titleText
+      else
+        new Handlebars.SafeString "data-tooltip title=\"#{titleText}\""
+
+    # expects: a Date object or an ISO string
+    friendlyDatetime : (datetime, {hash: {pubdate, contextSensitive}}) ->
       return unless datetime?
       datetime = tz.parse(datetime) unless _.isDate datetime
       fudged = $.fudgeDateForProfileTimezone(datetime)
-      new Handlebars.SafeString "<time title='#{$.datetimeString(datetime)}' datetime='#{datetime.toISOString()}' #{'pubdate' if pubdate}>#{$.friendlyDatetime(fudged)}</time>"
+      timeTitle = ""
+      if contextSensitive and ENV and ENV.CONTEXT_TIMEZONE
+        timeTitle = Handlebars.helpers.contextSensitiveDatetimeTitle(datetime, hash: {justText: true})
+      else
+        timeTitle = $.datetimeString(datetime)
+
+      new Handlebars.SafeString "<time data-tooltip title='#{timeTitle}' datetime='#{datetime.toISOString()}' #{'pubdate' if pubdate}>#{$.friendlyDatetime(fudged)}</time>"
 
     # expects: a Date object or an ISO string
     formattedDate : (datetime, format, {hash: {pubdate}}) ->
       return unless datetime?
       datetime = tz.parse(datetime) unless _.isDate datetime
-      new Handlebars.SafeString "<time title='#{$.datetimeString(datetime)}' datetime='#{datetime.toISOString()}' #{'pubdate' if pubdate}>#{datetime.toString(format)}</time>"
+      new Handlebars.SafeString "<time data-tooltip title='#{$.datetimeString(datetime)}' datetime='#{datetime.toISOString()}' #{'pubdate' if pubdate}>#{datetime.toString(format)}</time>"
 
     # IMPORTANT: these next two handlebars helpers emit profile-timezone
     # human-formatted strings. don't send them as is to the server (you can
@@ -59,7 +81,7 @@ define [
 
     # expects: anything that $.datetimeString can handle
     datetimeFormatted : (datetime, localized=true) ->
-      $.datetimeString(datetime, localized)
+      $.datetimeString(datetime, {localized: localized})
 
     # Strips the time information from the datetime and accounts for the user's
     # timezone preference. expects: anything tz() can handle

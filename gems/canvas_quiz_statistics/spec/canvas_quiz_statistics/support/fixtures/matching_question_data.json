@@ -1,0 +1,65 @@
+{
+  "id": 20,
+  "regrade_option": "false",
+  "points_possible": 1,
+  "correct_comments": "",
+  "incorrect_comments": "",
+  "neutral_comments": "",
+  "question_type": "matching_question",
+  "question_name": "Question",
+  "name": "Question",
+  "question_text": "",
+  "answers": [
+    {
+      "id": 8796,
+      "text": "What's for a drink?",
+      "left": "What's for a drink?",
+      "right": "A coke, please.",
+      "comments": "",
+      "match_id": 1525
+    },
+    {
+      "id": 6666,
+      "text": "Where were we?",
+      "left": "Where were we?",
+      "right": "Right over there.",
+      "comments": "",
+      "match_id": 4393
+    },
+    {
+      "id": 6430,
+      "text": "What time is it?",
+      "left": "What time is it?",
+      "right": "Some time.",
+      "comments": "",
+      "match_id": 4573
+    }
+  ],
+  "text_after_answers": "",
+  "matching_answer_incorrect_matches": "Home.\nJanuary 1st, 1960.",
+  "matches": [
+    {
+      "text": "A coke, please.",
+      "match_id": 1525
+    },
+    {
+      "text": "Home.",
+      "match_id": 4756
+    },
+    {
+      "text": "January 1st, 1960.",
+      "match_id": 7160
+    },
+    {
+      "text": "Right over there.",
+      "match_id": 4393
+    },
+    {
+      "text": "Some time.",
+      "match_id": 4573
+    }
+  ],
+  "assessment_question_id": 22,
+  "position": 10,
+  "published_at": "2014-04-01T11:47:17Z"
+}

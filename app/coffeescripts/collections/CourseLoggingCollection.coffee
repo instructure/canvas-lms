@@ -30,3 +30,11 @@ define [
     sideLoad:
       course: true
       user: true
+      copied_to:
+        collection: 'courses'
+      copied_from:
+        collection: 'courses'
+      reset_to:
+        collection: 'courses'
+      reset_from:
+        collection: 'courses'

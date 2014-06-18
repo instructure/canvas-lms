@@ -42,7 +42,7 @@ class Shard
     default
   end
 
-  def self.current
+  def self.current(category = :default)
     default
   end
 

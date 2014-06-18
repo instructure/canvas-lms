@@ -18,20 +18,24 @@
   <% if submission_has_regrade?(@submission) && version.score_before_regrade.present? %>
     <td>
       <%= score_out_of_points_possible(version.score_before_regrade, params[:preview] ? version.points_possible_at_submission_time : @quiz.points_possible) %>
+      <%= '*' if version.pending_review? %>
     </td>
     <td class="regraded">
       <%= score_out_of_points_possible(version.score, params[:preview] ? version.points_possible_at_submission_time : @quiz.points_possible) %>
+      <%= '*' if version.pending_review? %>
     </td>
 
   <% elsif submission_has_regrade?(@submission) %>
     <td>
       <%= score_out_of_points_possible(version.score, params[:preview] ? version.points_possible_at_submission_time : @quiz.points_possible) %>
+      <%= '*' if version.pending_review? %>
     </td>
     <td class="regraded">-</td>
 
   <% else %>
     <td>
       <%= score_out_of_points_possible(version.score, params[:preview] ? version.points_possible_at_submission_time : @quiz.points_possible) %>
+      <%= '*' if version.pending_review? %>
     </td>
   <% end %>
 </tr>

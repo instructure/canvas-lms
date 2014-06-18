@@ -539,7 +539,7 @@ class AssignmentsApiController < ApplicationController
   #
   # @argument assignment[name] [String] The assignment name.
   #
-  # @argument assignment[position] [Integer]
+  # @argument assignment[position] [Optional, Integer]
   #   The position of this assignment in the group when displaying
   #   assignment lists.
   #
@@ -564,7 +564,7 @@ class AssignmentsApiController < ApplicationController
   #     "online_url"
   #     "media_recording" (Only valid when the Kaltura plugin is enabled)
   #
-  # @argument assignment[allowed_extensions][] [String]
+  # @argument assignment[allowed_extensions][] [Optional, String]
   #   Allowed extensions if submission_types includes "online_upload"
   #
   #   Example:
@@ -614,33 +614,33 @@ class AssignmentsApiController < ApplicationController
   #       new_tab: false
   #     }
   #
-  # @argument assignment[points_possible] [Float]
+  # @argument assignment[points_possible] [Optional, Float]
   #   The maximum points possible on the assignment.
   #
   # @argument assignment[grading_type] [Optional, "pass_fail"|"percent"|"letter_grade"|"gpa_scale"|"points"]
   #  The strategy used for grading the assignment.
   #  The assignment is ungraded if this field is omitted.
   #
-  # @argument assignment[due_at] [Timestamp]
+  # @argument assignment[due_at] [Optional, Timestamp]
   #   The day/time the assignment is due.
   #   Accepts times in ISO 8601 format, e.g. 2014-10-21T18:48:00Z.
   #
-  # @argument assignment[lock_at] [Timestamp]
+  # @argument assignment[lock_at] [Optional, Timestamp]
   #   The day/time the assignment is locked after.
   #   Accepts times in ISO 8601 format, e.g. 2014-10-21T18:48:00Z.
   #
-  # @argument assignment[unlock_at] [Timestamp]
+  # @argument assignment[unlock_at] [Optional, Timestamp]
   #   The day/time the assignment is unlocked.
   #   Accepts times in ISO 8601 format, e.g. 2014-10-21T18:48:00Z.
   #
-  # @argument assignment[description] [String]
+  # @argument assignment[description] [Optional, String]
   #   The assignment's description, supports HTML.
   #
-  # @argument assignment[assignment_group_id] [Integer]
+  # @argument assignment[assignment_group_id] [Optional, Integer]
   #   The assignment group id to put the assignment in.
   #   Defaults to the top assignment group in the course.
   #
-  # @argument assignment[muted] [Boolean]
+  # @argument assignment[muted] [Optional, Boolean]
   #   Whether this assignment is muted.
   #   A muted assignment does not send change notifications
   #   and hides grades from students.

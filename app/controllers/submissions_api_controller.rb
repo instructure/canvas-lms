@@ -184,6 +184,11 @@ class SubmissionsApiController < ApplicationController
         next if seen_users.include?(student.id)
         seen_users << student.id
         hash = { :user_id => student.id, :submissions => [] }
+
+        if pseudonym = student.sis_pseudonym_for(context)
+          hash[:integration_id] = pseudonym.integration_id
+        end
+
         student_submissions = submissions_for_user[student.id] || []
         student_submissions.each do |submission|
           # we've already got all the assignments loaded, so bypass AR loading
@@ -438,7 +443,7 @@ class SubmissionsApiController < ApplicationController
   end
 
   def map_user_ids(user_ids)
-    Api.map_ids(user_ids, User, @domain_root_account)
+    Api.map_ids(user_ids, User, @domain_root_account, @current_user)
   end
 
   def get_user_considering_section(user_id)

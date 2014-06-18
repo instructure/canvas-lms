@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2012 Instructure, Inc.
+# Copyright (C) 2013 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -99,6 +99,25 @@ describe ContentMigrationsController, type: :request do
         json.first['id'].should == @migration.id
       end
     end
+
+    context "Account" do
+      before do
+        @account = Account.create!(:name => 'name')
+        @account.add_user(@user)
+        @migration = @account.content_migrations.create
+        @migration.migration_type = 'qti_converter'
+        @migration.user = @user
+        @migration.save!
+        @migration_url = "/api/v1/accounts/#{@account.id}/content_migrations"
+        @params = @params.reject{ |k| k == :course_id }.merge(account_id: @account.id)
+      end
+
+      it "should return list" do
+        json = api_call(:get, @migration_url, @params)
+        json.length.should == 1
+        json.first['id'].should == @migration.id
+      end
+    end
   end
 
   describe 'show' do
@@ -144,8 +163,9 @@ describe ContentMigrationsController, type: :request do
     end
 
     it "should not return attachment for course copies" do
-      @migration.migration_type = nil
+      @migration.migration_type = 'course_copy_importer'
       @migration.source_course_id = @course.id
+      @migration.source_course = @course
       @attachment = Attachment.create!(:context => @migration, :filename => "test.zip", :uploaded_data => StringIO.new("test file"))
       @attachment.file_state = "deleted"
       @attachment.workflow_state = "unattached"
@@ -158,8 +178,9 @@ describe ContentMigrationsController, type: :request do
     end
 
     it "should return source course info for course copy" do
-      @migration.migration_type = nil
+      @migration.migration_type = 'course_copy_importer'
       @migration.source_course_id = @course.id
+      @migration.source_course = @course
       @migration.save!
 
       json = api_call(:get, @migration_url, @params)
@@ -213,10 +234,26 @@ describe ContentMigrationsController, type: :request do
       end
     end
 
+    context "Account" do
+      before do
+        @account = Account.create!(:name => 'name')
+        @account.add_user(@user)
+        @migration = @account.content_migrations.create
+        @migration.migration_type = 'qti_converter'
+        @migration.user = @user
+        @migration.save!
+        @migration_url = "/api/v1/accounts/#{@account.id}/content_migrations/#{@migration.id}"
+        @params = @params.reject{ |k| k == :course_id }.merge(account_id: @account.id, id: @migration.to_param)
+      end
+
+      it "should return migration" do
+        json = api_call(:get, @migration_url, @params)
+        json['id'].should == @migration.id
+      end
+    end
   end
 
   describe 'create' do
-
     before do
       @params = {:controller => 'content_migrations', :format => 'json', :course_id => @course.id.to_param, :action => 'create'}
       @post_params = {:migration_type => 'common_cartridge_importer', :pre_attachment => {:name => "test.zip"}}
@@ -230,7 +267,7 @@ describe ContentMigrationsController, type: :request do
     it "should queue a migration" do
       @post_params.delete :pre_attachment
       p = Canvas::Plugin.new("hi")
-      p.stubs(:settings).returns('worker' => 'CCWorker')
+      p.stubs(:default_settings).returns({'worker' => 'CCWorker', 'valid_contexts' => ['Course']}.with_indifferent_access)
       Canvas::Plugin.stubs(:find).returns(p)
       json = api_call(:post, @migration_url, @params, @post_params)
       json["workflow_state"].should == 'running'
@@ -241,19 +278,21 @@ describe ContentMigrationsController, type: :request do
 
     it "should not queue a migration if do_not_run flag is set" do
       @post_params.delete :pre_attachment
-      Canvas::Plugin.stubs(:find).returns(Canvas::Plugin.new("oi"))
+      p = Canvas::Plugin.new("hi")
+      p.stubs(:default_settings).returns({'worker' => 'CCWorker', 'valid_contexts' => ['Course']}.with_indifferent_access)
+      Canvas::Plugin.stubs(:find).returns(p)
       json = api_call(:post, @migration_url, @params, @post_params.merge(:do_not_run => true))
       json["workflow_state"].should == 'pre_processing'
       migration = ContentMigration.find json['id']
       migration.workflow_state.should == "created"
       migration.job_progress.should be_nil
     end
-    
+
     it "should error if expected setting isn't set" do
       json = api_call(:post, @migration_url, @params, {:migration_type => 'course_copy_importer'}, {}, :expected_status => 400)
       json.should == {"message"=>'A course copy requires a source course.'}
     end
-    
+
     it "should queue if correct settings set" do
       # implicitly tests that the response was a 200
       api_call(:post, @migration_url, @params, {:migration_type => 'course_copy_importer', :settings => {:source_course_id => @course.id.to_param}})
@@ -265,6 +304,18 @@ describe ContentMigrationsController, type: :request do
       migration = ContentMigration.find json['id']
       migration.workflow_state.should == "exported"
       migration.job_progress.should be_nil
+    end
+
+    it "should queue for course copy on concluded courses" do
+      source_course = Course.create(name: 'source course')
+      source_course.enroll_teacher(@user)
+      source_course.workflow_state = 'completed'
+      source_course.save!
+      #tests that the response was a 200
+      api_call(:post, @migration_url, @params,
+               {migration_type: 'course_copy_importer',
+                settings: {source_course_id: source_course.id.to_param}}
+      )
     end
 
     it "should translate a sis source_course_id" do
@@ -290,7 +341,7 @@ describe ContentMigrationsController, type: :request do
         migration = ContentMigration.find json['id']
         migration.workflow_state.should == "pre_processing"
       end
-      
+
       it "should error if upload file required but not provided" do
         @post_params.delete :pre_attachment
         json = api_call(:post, @migration_url, @params, @post_params, {}, :expected_status => 400)
@@ -341,7 +392,7 @@ describe ContentMigrationsController, type: :request do
         migration.attachment.should be_nil
         migration.migration_settings[:file_url].should == post_params[:settings][:file_url]
       end
-      
+
     end
 
     context "by LTI extension" do
@@ -399,6 +450,23 @@ describe ContentMigrationsController, type: :request do
                                          :folder_id => @folder.id }})
         migration = ContentMigration.find json['id']
         migration.context.should eql @group
+      end
+    end
+
+    context "Account" do
+      before do
+        @account = Account.create!(:name => 'migration account')
+        @account.add_user(@user)
+        @migration_url = "/api/v1/accounts/#{@account.id}/content_migrations"
+        @params = @params.reject{|k| k == :course_id}.merge(:account_id => @account.to_param)
+      end
+
+      it "should queue a migration" do
+        json = api_call(:post, @migration_url, @params,
+                        { :migration_type => 'qti_converter',
+                          :settings => { :file_url => 'http://example.com/oi.zip' }})
+        migration = ContentMigration.find json['id']
+        migration.context.should eql @account
       end
     end
   end
@@ -488,7 +556,7 @@ describe ContentMigrationsController, type: :request do
       json.should == [{
                               "type" => "common_cartridge_importer",
                               "requires_file_upload" => true,
-                              "name" => "Common Cartridge 1.0/1.1/1.2 Package",
+                              "name" => "Common Cartridge 1.x Package",
                               "required_settings" => []
                       }]
     end

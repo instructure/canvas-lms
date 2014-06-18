@@ -15,7 +15,7 @@ namespace :js do
       end
     end
     Rake::Task['js:generate_runner'].invoke
-    exec("karma start --browsers #{browsers}")
+    exec("node_modules/.bin/karma start --browsers #{browsers}")
   end
 
   def matcher_for_ember_app app_name
@@ -190,7 +190,8 @@ namespace :js do
           Parallel.each(dirs, :in_threads => Parallel.processor_count) do |dir|
             destination = coffee_destination(dir)
             FileUtils.mkdir_p(destination)
-            system("coffee -m -c -o #{destination} #{dir}/*.coffee")
+            flags = "-m" if ENV["CANVAS_SOURCE_MAPS"] != "0"
+            system("coffee #{flags} -c -o #{destination} #{dir}/*.coffee")
             raise "Unable to compile coffeescripts in #{dir}" if $?.exitstatus != 0
           end
         else

@@ -21,7 +21,7 @@ class Group < ActiveRecord::Base
   include Workflow
   include CustomValidations
 
-  attr_accessible :name, :context, :max_membership, :group_category, :join_level, :default_view, :description, :is_public, :avatar_attachment, :storage_quota_mb
+  attr_accessible :name, :context, :max_membership, :group_category, :join_level, :default_view, :description, :is_public, :avatar_attachment, :storage_quota_mb, :leader
   validates_presence_of :context_id, :context_type, :account_id, :root_account_id, :workflow_state
   validates_allowed_transitions :is_public, false => true
 
@@ -61,10 +61,25 @@ class Group < ActiveRecord::Base
   has_many :zip_file_imports, :as => :context
   has_many :content_migrations, :as => :context
   belongs_to :avatar_attachment, :class_name => "Attachment"
+  belongs_to :leader, :class_name => "User"
+
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :name, :workflow_state, :created_at, :updated_at, :context_id, :context_type, :category, :max_membership, :hashtag, :show_public_context_messages, :is_public,
+    :account_id, :default_wiki_editing_roles, :wiki_id, :deleted_at, :join_level, :default_view, :storage_quota, :uuid, :root_account_id, :sis_source_id, :sis_batch_id,
+    :group_category_id, :description, :avatar_attachment_id
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [
+    :users, :group_memberships, :users, :context, :group_category, :account, :root_account, :calendar_events, :discussion_topics, :discussion_entries, :announcements,
+    :attachments, :folders, :collaborators, :external_feeds, :messages, :wiki, :web_conferences, :collaborations, :media_objects, :avatar_attachment
+  ]
 
   before_validation :ensure_defaults
   before_save :maintain_category_attribute
   after_save :close_memberships_if_deleted
+  after_save :update_max_membership_from_group_category
+
+  delegate :time_zone, :to => :context
 
   include StickySisFields
   are_sis_sticky :name
@@ -75,6 +90,11 @@ class Group < ActiveRecord::Base
     elsif value.length > maximum_string_length
       record.errors.add attr, t(:name_too_long, "Enter a shorter group name")
     end
+  end
+
+  validates_each :max_membership do |record, attr, value|
+    next if value.nil?
+    record.errors.add attr, t(:greater_than_1, "Must be greater than 1") unless value.to_i > 1
   end
 
   alias_method :participating_users_association, :participating_users
@@ -91,13 +111,13 @@ class Group < ActiveRecord::Base
   alias_method_chain :wiki, :create
 
   def auto_accept?
-    self.group_category && 
+    self.group_category &&
     self.group_category.allows_multiple_memberships? &&
     self.join_level == 'parent_context_auto_join'
   end
 
   def allow_join_request?
-    self.group_category && 
+    self.group_category &&
     self.group_category.allows_multiple_memberships? &&
     ['parent_context_auto_join', 'parent_context_request'].include?(self.join_level)
   end
@@ -109,7 +129,23 @@ class Group < ActiveRecord::Base
   end
 
   def full?
+    !student_organized? && ((!max_membership && group_category_limit_met?) || (max_membership && participating_users.size >= max_membership))
+  end
+
+  def group_category_limit_met?
     group_category && group_category.group_limit && participating_users.size >= group_category.group_limit
+  end
+  private :group_category_limit_met?
+
+  def student_organized?
+    group_category && group_category.student_organized?
+  end
+
+  def update_max_membership_from_group_category
+    if group_category && group_category.group_limit && (!max_membership || max_membership == 0)
+      self.max_membership = group_category.group_limit
+      self.save
+    end
   end
 
   def free_association?(user)
@@ -376,11 +412,11 @@ class Group < ActiveRecord::Base
     can :create_collaborations and
     can :create_conferences and
     can :manage_calendar and
-    can :manage_content and 
+    can :manage_content and
     can :manage_files and
     can :manage_wiki and
     can :post_to_forum and
-    can :read and 
+    can :read and
     can :read_roster and
     can :send_messages and
     can :send_messages_all and
@@ -397,6 +433,9 @@ class Group < ActiveRecord::Base
     can :manage_admin_users and
     can :manage_students and
     can :moderate_forum and
+    can :update
+
+    given { |user| user && self.leader == user }
     can :update
 
     given { |user| self.group_category.try(:communities?) }
@@ -426,7 +465,7 @@ class Group < ActiveRecord::Base
     given { |user, session| self.context && self.context.grants_right?(user, session, :view_group_pages) }
     can :read and can :read_roster
 
-    # Participate means the user is connected to the group somehow and can be  
+    # Participate means the user is connected to the group somehow and can be
     given { |user| user && can_participate?(user) }
     can :participate
 
@@ -493,11 +532,11 @@ class Group < ActiveRecord::Base
   def storage_quota_mb
     quota / 1.megabyte
   end
-  
+
   def storage_quota_mb=(val)
     self.storage_quota = val.try(:to_i).try(:megabytes)
   end
-  
+
   TAB_HOME, TAB_PAGES, TAB_PEOPLE, TAB_DISCUSSIONS, TAB_FILES,
     TAB_CONFERENCES, TAB_ANNOUNCEMENTS, TAB_PROFILE, TAB_SETTINGS, TAB_COLLABORATIONS = *1..20
   def tabs_available(user=nil, opts={})
@@ -516,7 +555,7 @@ class Group < ActiveRecord::Base
     available_tabs << { :id => TAB_CONFERENCES, :label => t('#tabs.conferences', "Conferences"), :css_class => 'conferences', :href => :group_conferences_path } if user && self.grants_right?(user, nil, :read)
     available_tabs << { :id => TAB_COLLABORATIONS, :label => t('#tabs.collaborations', "Collaborations"), :css_class => 'collaborations', :href => :group_collaborations_path } if user && self.grants_right?(user, nil, :read)
     if root_account.try(:canvas_network_enabled?) && user && grants_right?(user, nil, :manage)
-      available_tabs << { :id => TAB_SETTINGS, :label => t('#tabs.settings', 'Settings'), :css_class => 'settings', :href => :edit_group_path } 
+      available_tabs << { :id => TAB_SETTINGS, :label => t('#tabs.settings', 'Settings'), :css_class => 'settings', :href => :edit_group_path }
     end
     available_tabs
   end

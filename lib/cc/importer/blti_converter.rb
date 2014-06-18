@@ -60,6 +60,7 @@ module CC::Importer
     
     def convert_blti_link(doc)
       blti = get_blti_namespace(doc)
+      blti = nil unless doc.namespaces["xmlns:#{blti}"]
       link_css_path = "cartridge_basiclti_link"
       tool = {}
       tool[:description] = get_node_val(doc, "#{link_css_path} > #{blti}|description")

@@ -43,7 +43,7 @@
   require(['jquery'], function($) {
 
     FB.init({
-      appId  : <%= Facebook.config['app_id'] %>,
+      appId  : <%= Facebook::Connection.config['app_id'] %>,
       status : true, // check login status
       cookie : true, // enable cookies to allow the server to access the session
       xfbml  : true  // parse XFBML

@@ -50,6 +50,13 @@ module CanvasStatsd
       class_eval <<-RUBY, __FILE__, __LINE__+1
       def self.#{method}(stat, *args)
         if self.instance
+          if Array === stat
+            stat.each do |st|
+              self.#{method}(st, *args)
+            end
+            return
+          end
+
           if self.append_hostname?
             stat_name = "\#{stat}.\#{hostname}"
           else

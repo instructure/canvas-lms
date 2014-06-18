@@ -1383,6 +1383,8 @@ describe AssignmentsApiController, type: :request do
           'attachments' => [],
           'permissions' => {'delete' => true, 'attach' => true, 'update' => true},
           'discussion_type' => 'side_comment',
+          'group_category_id' => nil,
+          'can_group' => true,
         }
       end
 

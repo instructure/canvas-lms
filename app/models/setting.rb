@@ -17,10 +17,7 @@
 #
 
 class Setting < ActiveRecord::Base
-  # This is needed because Setting is called in Canvas.cache_store_config
-  # before switchman is loaded
-  cattr_accessor :shard_category unless self.respond_to?(:shard_category)
-  self.shard_category = :unsharded
+  self.shard_category = :unsharded if self.respond_to?(:shard_category=)
 
   attr_accessible :name, :value
 
@@ -73,38 +70,12 @@ class Setting < ActiveRecord::Base
     s.destroy if s
   end
 
+  # backcompat
   def self.set_config(config_name, value)
-    raise "config settings can only be set via config file" unless Rails.env.test?
-    @@yaml_cache[config_name] ||= {}
-    @@yaml_cache[config_name][Rails.env] = value
+    ConfigFile.stub(config_name, value)
   end
 
   def self.from_config(config_name, with_rails_env=:current)
-    with_rails_env = Rails.env if with_rails_env == :current
-
-    if @@yaml_cache[config_name] # if the config wasn't found it'll try again
-      return @@yaml_cache[config_name] if !with_rails_env
-      return @@yaml_cache[config_name][with_rails_env]
-    end
-    
-    config = nil
-    path = File.join(Rails.root, 'config', "#{config_name}.yml")
-    if File.exists?(path)
-      if Rails.env.test?
-        config_string = ERB.new(File.read(path))
-        config = YAML.load(config_string.result)
-      else
-        config = YAML.load_file(path)
-      end
-
-      if config.respond_to?(:with_indifferent_access)
-        config = config.with_indifferent_access
-      else
-        config = nil
-      end
-    end
-    @@yaml_cache[config_name] = config
-    config = config[with_rails_env] if config && with_rails_env
-    config
+    ConfigFile.load(config_name, with_rails_env)
   end
 end

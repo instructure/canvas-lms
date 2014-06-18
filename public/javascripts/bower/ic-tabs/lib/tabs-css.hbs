@@ -1,0 +1,52 @@
+ic-tabs,
+ic-tab-list,
+ic-tab-panel {
+  display: block
+}
+
+ic-tab-list {
+  border-bottom: 1px solid #aaa;
+}
+
+ic-tab {
+  display: inline-block;
+  padding: 6px 12px;
+  border: 1px solid transparent;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  cursor: pointer;
+  margin-bottom: -1px;
+  position: relative;
+}
+
+ic-tab[selected] {
+  border-color: #aaa;
+  border-bottom-color: #fff;
+}
+
+ic-tab:focus {
+  box-shadow: 0 10px 0 0 #fff,
+              0 0 5px hsl(208, 99%, 50%);
+  border-color: hsl(208, 99%, 50%);
+  border-bottom-color: #fff;
+  outline: none;
+}
+
+ic-tab:focus:before,
+ic-tab:focus:after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  width: 5px;
+  height: 5px;
+  background: #fff;
+}
+
+ic-tab:focus:before {
+  left: -4px;
+}
+
+ic-tab:focus:after {
+  right: -4px;
+}
+

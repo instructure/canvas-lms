@@ -169,7 +169,7 @@ describe DiscussionTopicsController do
       response.should be_success
     end
 
-    it "should assign groups from the topic's assignment's category if the topic is for a group assignment" do
+    it "should assign groups from the topic's category if the topic is a group discussion" do
       course_with_teacher_logged_in(:active_all => true)
       course_topic(:with_assignment => true)
 
@@ -179,8 +179,8 @@ describe DiscussionTopicsController do
       @course.groups.create!(:group_category => group_category1)
       @course.groups.create!(:group_category => group_category1)
       @course.groups.create!(:group_category => group_category2)
-      @topic.assignment.group_category = group_category1
-      @topic.assignment.save!
+      @topic.group_category = group_category1
+      @topic.save!
 
       get 'show', :course_id => @course.id, :id => @topic.id
       assigns[:groups].size.should eql(2)

@@ -2,10 +2,16 @@
   <% presenter = OverrideListPresenter.new(assignment, user) %>
   <% presenter.visible_due_dates.each do |due_date| %>
     <tr>
-      <td><%= due_date[:due_at] %></td>
+      <td <%= context_sensitive_datetime_title(due_date[:raw][:due_at], assignment.context) %>>
+        <%= due_date[:due_at] %>
+      </td>
       <td><%= due_date[:due_for] %></td>
-      <td><%= due_date[:unlock_at] %></td>
-      <td><%= due_date[:lock_at] %></td>
+      <td <%= context_sensitive_datetime_title(due_date[:raw][:unlock_at], assignment.context) %>>
+        <%= due_date[:unlock_at] %>
+      </td>
+      <td <%= context_sensitive_datetime_title(due_date[:raw][:lock_at], assignment.context) %>>
+        <%= due_date[:lock_at] %>
+      </td>
     </tr>
   <% end %>
 </tbody>

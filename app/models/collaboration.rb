@@ -25,9 +25,15 @@ class Collaboration < ActiveRecord::Base
 
   belongs_to :context, :polymorphic => true
   belongs_to :user
-
   has_many :collaborators, :dependent => :destroy
-  has_many :users,  :through => :collaborators
+  has_many :users, :through => :collaborators
+
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :collaboration_type, :document_id, :user_id, :context_id, :context_type, :url, :uuid, :data,
+    :created_at, :updated_at, :description, :title, :workflow_state, :deleted_at, :context_code, :type
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:context, :user, :collaborators, :users]
 
   before_destroy { |record| Collaborator.where(:collaboration_id => record).destroy_all }
 

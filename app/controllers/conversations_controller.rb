@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -139,7 +139,7 @@ class ConversationsController < ApplicationController
   #   "course_456". Can be an array (by setting "filter[]") or single value
   #   (by setting "filter")
   #
-  # @argument filter_mode [optional, "and"|"or", default "or"]
+  # @argument filter_mode [Optional, "and"|"or", default "or"]
   #   When filter[] contains multiple filters, combine them with this mode,
   #   filtering conversations that at have at least all of the contexts ("and")
   #   or at least one of the contexts ("or")
@@ -252,7 +252,7 @@ class ConversationsController < ApplicationController
   # reused.
   #
   # @argument recipients[] [String]
-  #   An array of recipient ids. These may beuser ids or course/group ids
+  #   An array of recipient ids. These may be user ids or course/group ids
   #   prefixed with "course_" or "group_" respectively, e.g.
   #   recipients[]=1&recipients[]=2&recipients[]=course_3
   #
@@ -279,6 +279,11 @@ class ConversationsController < ApplicationController
   # @argument media_comment_type [String, "audio"|"video"]
   #   Type of the associated media file
   #
+  # @argument user_note [Optional, Boolean]
+  #   Will add a faculty journal entry for each recipient as long as the user
+  #   making the api call has permission, the recipient is a student and
+  #   faculty journals are enabled in the account.
+  #
   # @argument mode [String, "sync"|"async"]
   #   Determines whether the messages will be created/sent synchronously or
   #   asynchronously. Defaults to sync, and this option is ignored if this is a
@@ -292,7 +297,7 @@ class ConversationsController < ApplicationController
   # @argument filter[] [Optional, String, course_id|group_id|user_id]
   #   Used when generating "visible" in the API response. See the explanation
   #   under the {api:ConversationsController#index index API action}
-  # @argument filter_mode [optional, "and"|"or", default "or"]
+  # @argument filter_mode [Optional, "and"|"or", default "or"]
   #   Used when generating "visible" in the API response. See the explanation
   #   under the {api:ConversationsController#index index API action}
   #
@@ -336,7 +341,7 @@ class ConversationsController < ApplicationController
       visibility_map = infer_visibility(conversations)
       render :json => conversations.map{ |c| conversation_json(c, @current_user, session, :include_participant_avatars => false, :include_participant_contexts => false, :visible => visibility_map[c.conversation_id]) }, :status => :created
     else
-      @conversation = @current_user.initiate_conversation(@recipients, !value_to_boolean(params[:group_conversation]), :subject => params[:subject], :context_type => context_type, :context_id => context_id)
+      @conversation = @current_user.initiate_conversation(@recipients, !group_conversation, :subject => params[:subject], :context_type => context_type, :context_id => context_id)
       @conversation.add_message(message, :tags => @tags, :update_for_sender => false)
       render :json => [conversation_json(@conversation.reload, @current_user, session, :include_indirect_participants => true, :messages => [message])], :status => :created
     end
@@ -391,7 +396,7 @@ class ConversationsController < ApplicationController
   # @argument filter[] [Optional, String, course_id|group_id|user_id]
   #   Used when generating "visible" in the API response. See the explanation
   #   under the {api:ConversationsController#index index API action}
-  # @argument filter_mode [optional, "and"|"or", default "or"]
+  # @argument filter_mode [Optional, "and"|"or", default "or"]
   #   Used when generating "visible" in the API response. See the explanation
   #   under the {api:ConversationsController#index index API action}
   #
@@ -522,7 +527,7 @@ class ConversationsController < ApplicationController
   # @argument filter[] [Optional, String, course_id|group_id|user_id]
   #   Used when generating "visible" in the API response. See the explanation
   #   under the {api:ConversationsController#index index API action}
-  # @argument filter_mode [optional, "and"|"or", default "or"]
+  # @argument filter_mode [Optional, "and"|"or", default "or"]
   #   Used when generating "visible" in the API response. See the explanation
   #   under the {api:ConversationsController#index index API action}
   #
@@ -584,8 +589,8 @@ class ConversationsController < ApplicationController
 
   # internal api
   # @example_request
-  #     curl https://<canvas>/api/v1/conversations/:id/delete_for_all \ 
-  #       -X DELETE \ 
+  #     curl https://<canvas>/api/v1/conversations/:id/delete_for_all \
+  #       -X DELETE \
   #       -H 'Authorization: Bearer <token>'
   def delete_for_all
     return unless authorized_action(Account.site_admin, @current_user, :become_user)
@@ -673,6 +678,11 @@ class ConversationsController < ApplicationController
   # An array of message ids from this conversation to send to recipients
   # of the new message. Recipients who already had a copy of included
   # messages will not be affected.
+  #
+  # @argument user_note [Optional, Boolean]
+  #   Will add a faculty journal entry for each recipient as long as the user
+  #   making the api call has permission, the recipient is a student and
+  #   faculty journals are enabled in the account.
   #
   # @example_response
   #   {
@@ -783,11 +793,11 @@ class ConversationsController < ApplicationController
   #   The action to take on each conversation.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/conversations \ 
-  #       -X PUT \ 
-  #       -H 'Authorization: Bearer <token>' \ 
-  #       -d 'event=mark_as_read' \ 
-  #       -d 'conversation_ids[]=1' \ 
+  #     curl https://<canvas>/api/v1/conversations \
+  #       -X PUT \
+  #       -H 'Authorization: Bearer <token>' \
+  #       -d 'event=mark_as_read' \
+  #       -d 'conversation_ids[]=1' \
   #       -d 'conversation_ids[]=2'
   #
   # @returns Progress
@@ -821,7 +831,7 @@ class ConversationsController < ApplicationController
     # but for backwards API compatibility we need to leave it a string.
     render :json => {'unread_count' => @current_user.unread_conversations_count.to_s}
   end
-  
+
   def public_feed
     return unless get_feed_context(:only => [:user])
     @current_user = @context

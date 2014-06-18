@@ -4,6 +4,7 @@ module Delayed
   class Lifecycle
     EVENTS = {
       :perform    => [:worker, :job],
+      :pop        => [:worker],
     }
 
     def initialize

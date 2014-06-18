@@ -21,4 +21,7 @@ class SubmissionCommentParticipant < ActiveRecord::Base
   belongs_to :submission_comment
 
   attr_accessible :user_id, :participation_type
+
+  EXPORTABLE_ATTRIBUTES = [:id, :submission_comment_id, :user_id, :participation_type, :created_at, :updated_at]
+  EXPORTABLE_ASSOCIATIONS = [:user, :submission_comment]
 end

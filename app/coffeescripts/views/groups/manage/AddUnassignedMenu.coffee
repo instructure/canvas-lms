@@ -34,7 +34,7 @@ define [
       e.stopPropagation()
       $target = $(e.currentTarget)
       user = @collection.get($target.data('user-id'))
-      user.save({'groupId': @groupId})
+      user.save({'group': @group})
       @hide()
 
     showBy: ($target, focus = false) ->

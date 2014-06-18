@@ -22,7 +22,7 @@ module SIS
   class BaseImporter
     def initialize(root_account, opts)
       @root_account = root_account
-      @batch_id = opts[:batch_id]
+      @batch = opts[:batch]
       @batch_user = opts[:batch_user]
       @logger = opts[:logger] || Rails.logger
       @sis_options = {

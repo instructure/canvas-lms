@@ -1,7 +1,8 @@
-define [ 'ember', 'underscore' ], (Ember, _) ->
-  {RSVP} = Ember
+define [ 'ember', '../mixins/redirect' ], (Ember, Redirect) ->
+  Ember.Route.extend Redirect,
+    beforeModel: (transition) ->
+      @validateRoute('canManage', 'quiz.show')
 
-  Ember.Route.extend
     model: (transition, options) ->
       quiz = @modelFor('quiz')
       quiz.get('quizStatistics').then((items)->
@@ -12,10 +13,8 @@ define [ 'ember', 'underscore' ], (Ember, _) ->
         quiz.get('quizReports').then ->
           latestStatistics
 
-    afterModel: ->
-      # for some reason, the quiz is not associating with the quiz_questions,
-      # although the inverse is true (quiz questions *are* associated to the quiz),
-      # anyway, do it manually:
-      set = @modelFor('quizStatistics').get('questionStatistics')
-      set.clear()
-      set.pushObjects(@store.all('questionStatistics'))
+    actions:
+      showDiscriminationIndexHelp: ->
+        @render 'quiz/statistics/questions/multiple_choice/discrimination_index_help',
+          into: 'application'
+          outlet: 'modal'

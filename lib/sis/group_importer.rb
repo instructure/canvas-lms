@@ -21,7 +21,7 @@ module SIS
 
     def process
       start = Time.now
-      importer = Work.new(@batch_id, @root_account, @logger)
+      importer = Work.new(@batch, @root_account, @logger)
       Group.process_as_sis(@sis_options) do
         yield importer
       end
@@ -33,8 +33,8 @@ module SIS
     class Work
       attr_accessor :success_count
 
-      def initialize(batch_id, root_account, logger)
-        @batch_id = batch_id
+      def initialize(batch, root_account, logger)
+        @batch = batch
         @root_account = root_account
         @logger = logger
         @success_count = 0
@@ -68,7 +68,7 @@ module SIS
         # must set .context, not just .account, since these are account-level groups
         group.context = account
         group.sis_source_id = group_id
-        group.sis_batch_id = @batch_id
+        group.sis_batch_id = @batch.id if @batch
 
         case status
         when /available/i

@@ -60,8 +60,7 @@
       </div>
 
       <div class="data assignment_due">
-        <div class="date_text"
-          style="<%= hidden unless assignment && (assignment_has_multiple_due_dates || assignment.due_at) %>">
+        <div class="date_text" style="<%= hidden unless assignment && (assignment_has_multiple_due_dates || assignment.due_at) %>" <%= context_sensitive_datetime_title(assignment.due_at, context) %>>
           <% if assignment_has_multiple_due_dates %>
             <%= multiple_due_date_tooltip(assignment, @current_user, :href => assignment_url) %>
           <% else %>

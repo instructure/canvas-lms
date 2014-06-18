@@ -72,9 +72,10 @@
           <% end %>
 
           <% if @current_user.present? %>
-            <div class="admin-links">
-              <a class="al-trigger btn" href="#" aria-label="<%= t :manage_discussion, 'Manage Discussion' %>">
+            <div class="admin-links" role="application">
+              <a class="al-trigger btn" href="#">
                 <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+                <span class="screenreader-only"><%= t :manage_discussion, 'Manage Discussion' %></span>
               </a>
               <ul class="al-options">
                 <li><a href="#" class="mark_all_as_read"><i class="icon-mark-as-read" aria-hidden="hidden"></i> <%= t :mark_all_as_read, 'Mark All as Read' %></a></li>
@@ -142,6 +143,9 @@
         <% if @topic.for_assignment? %>
           <%= render :partial => 'assignment_details' %>
         <% end %>
+        <% if @topic.for_group_discussion? %>
+          <%= render :partial => 'group_discussion' %>
+        <% end %>
         <header class="discussion-section clearfix">
           <%= avatar((@topic.user), context_code: @context.asset_string) if @topic.user %>
           <div class="discussion-header-content right-of-avatar">
@@ -162,7 +166,7 @@
             </div>
 
             <div class="discussion-header-right pull-right">
-              <div class="discussion-pubdate"><%= friendly_datetime @topic.posted_at %></div>
+              <div class="discussion-pubdate"><%= friendly_datetime @topic.posted_at, context: @topic.context %></div>
               <%= render :partial => 'new_and_total_badge', :locals => { :unread_count => @topic.unread_count(@current_user), :reply_count => @topic.discussion_subentry_count } %>
             </div>
           </div>

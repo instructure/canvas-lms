@@ -1,10 +1,11 @@
-<% 
+<%
   content_for :page_title, join_title(t(:page_title, "Course Details"), @context.name)
   jammit_css :course_settings
   js_bundle :course_settings
   @active_tab = "settings"
 
-  can_rename_course = can_do(@context.account, @current_user, :manage_courses) || !@context.root_account.settings[:prevent_course_renaming_by_teachers]
+  can_manage_courses = can_do(@context.account, @current_user, :manage_courses)
+  can_rename_course = can_manage_courses || !@context.root_account.settings[:prevent_course_renaming_by_teachers]
   has_multiple_sections = @context.course_sections.active.count > 1
 
   publishing_enabled = @context.allows_grade_publishing_by(@current_user) && can_do(@context, @current_user, :manage_grades)
@@ -60,6 +61,15 @@
             <span class="course_form course_code"><%= @context.course_code %></span>
           <% end %>
           <span class="course_info course_code"><%= @context.course_code %></span>
+        </td>
+      </tr>
+      <tr>
+        <td><%= f.blabel :time_zone, :en => "Time Zone" %></td>
+        <td>
+          <span class="course_form">
+            <%= f.time_zone_select :time_zone, ActiveSupport::TimeZone.us_zones %>
+          </span>
+          <span class="course_info time_zone"><%= @context.time_zone.name %></span>
         </td>
       <% if @context.sis_source_id && can_do(@context.root_account, @current_user, :read_sis) || can_do(@context.root_account, @current_user, :manage_sis) %>
         </tr><tr>
@@ -139,13 +149,22 @@
         <td class="form-label"><%= f.blabel :start_at, :en => "Starts" %></td>
         <td class="nobr">
           <span class="course_form"><%= f.text_field :start_at, :class => "date_entry", :value => unlocalized_datetime_string(@context.start_at, :verbose) %></span>
-          <span class="course_info start_at"><%= datetime_string(@context.start_at, :verbose, nil, true) || t('no_date', "No Date Set") %></span>
+          <span class="course_info start_at" <%= context_sensitive_datetime_title(@context.start_at, @context) %>>
+            <%= datetime_string(@context.start_at, :verbose, nil, true) || t('no_date', "No Date Set") %>
+          </span>
         </td>
       </tr><tr>
         <td class="form-label"><%= f.blabel :conclude_at, :en => "Ends" %></td>
         <td class="nobr">
           <span class="course_form"><%= f.text_field :conclude_at, :class => "date_entry", :value => unlocalized_datetime_string(@context.conclude_at, :verbose) %></span>
-          <span class="course_info conclude_at"><%= datetime_string(@context.conclude_at, :verbose, nil, true) || t('no_date', "No Date Set") %></span>
+          <i id="course_conclude_at_warning" style="<%= hidden %>" class="date-warning icon-warning" data-tooltip='{"tooltipClass":"popover", "position":"right"}'
+             title="<div class='popover-title'><%= t(:course_conclude_at_warning_title, "Course Ending at Midnight") %></div><div class='popover-content'><p>
+            <%= t(:course_conclude_at_warning_message, "The course is currently set to end at midnight,
+              meaning that the previous day will be the last day this course is active.") %></p></div>">
+          </i>
+          <span class="course_info conclude_at" <%= context_sensitive_datetime_title(@context.conclude_at, @context) %>>
+            <%= datetime_string(@context.conclude_at, :verbose, nil, true) || t('no_date', "No Date Set") %>
+          </span>
           <div class="course_form">
             <%= f.check_box :restrict_enrollments_to_course_dates %>
             <%= f.label :restrict_enrollments_to_course_dates, :en => "Users can only participate in the course between these dates" %>
@@ -332,7 +351,7 @@ TEXT
       </tr>
     </table>
     <% end %>
-    
+
   </div>
   <div id="tab-sections">
     <h2 style="margin-top: 10px;"><%= t('headings.sections', %{Course Sections}) %></h2>
@@ -398,7 +417,7 @@ TEXT
 
     <div class="hidden-readable" tabindex="0" aria-label="keyboard instructions">
 
-      
+
       <%= t('navigation_keyboard_hint',
         'If using a screen reader, to change the order of the course navigation links,
         Turn off the virtual cursor or virtual buffer on your screen reader (press Insert-z for JAWS).

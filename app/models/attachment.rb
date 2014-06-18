@@ -23,6 +23,14 @@ class Attachment < ActiveRecord::Base
     best_unicode_collation_key(col)
   end
   attr_accessible :context, :folder, :filename, :display_name, :user, :locked, :position, :lock_at, :unlock_at, :uploaded_data, :hidden
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :context_id, :context_type, :size, :folder_id, :content_type, :filename, :uuid, :display_name, :created_at, :updated_at,
+    :scribd_mime_type_id, :submitted_to_scribd_at, :workflow_state, :scribd_doc, :user_id, :local_filename, :locked, :file_state, :deleted_at,
+    :position, :lock_at, :unlock_at, :last_lock_at, :last_unlock_at, :scribd_attempts, :could_be_locked, :root_attachment_id, :cloned_item_id,
+    :namespace, :media_entry_id, :encoding, :need_notify, :upload_error_message, :last_inline_view
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:context, :folder, :user, :media_object, :submission]
 
   include PolymorphicTypeOverride
   override_polymorphic_types context_type: {'QuizStatistics' => 'Quizzes::QuizStatistics',
@@ -70,7 +78,7 @@ class Attachment < ActiveRecord::Base
 
   def self.file_store_config
     # Return existing value, even if nil, as long as it's defined
-    @file_store_config ||= Setting.from_config('file_store')
+    @file_store_config ||= ConfigFile.load('file_store')
     @file_store_config ||= { 'storage' => 'local' }
     @file_store_config['path_prefix'] ||= @file_store_config['path'] || 'tmp/files'
     @file_store_config['path_prefix'] = nil if @file_store_config['path_prefix'] == 'tmp/files' && @file_store_config['storage'] == 's3'
@@ -80,7 +88,7 @@ class Attachment < ActiveRecord::Base
   def self.s3_config
     # Return existing value, even if nil, as long as it's defined
     return @s3_config if defined?(@s3_config)
-    @s3_config ||= Setting.from_config('amazon_s3')
+    @s3_config ||= ConfigFile.load('amazon_s3')
   end
 
   def self.s3_storage?
@@ -624,6 +632,8 @@ class Attachment < ActiveRecord::Base
     end
     if content_type && content_type != "unknown/unknown"
       extras << {'content-type' => content_type}
+    elsif options[:default_content_type]
+      extras << {'content-type' => options[:default_content_type]}
     end
     policy['conditions'] += extras
 
@@ -1824,7 +1834,7 @@ class Attachment < ActiveRecord::Base
 
         new_attachment = Attachment.new
         new_attachment.assign_attributes(attachment.attributes.except(*EXCLUDED_COPY_ATTRIBUTES), :without_protection => true)
-        
+
         new_attachment.context = to_context
         new_attachment.folder = Folder.assert_path(attachment.folder_path, to_context)
         new_attachment.namespace = new_attachment.infer_namespace
@@ -1834,6 +1844,8 @@ class Attachment < ActiveRecord::Base
           new_attachment.write_attribute(:filename, attachment.filename)
           new_attachment.uploaded_data = attachment.open
         end
+
+        new_attachment.content_type = attachment.content_type
 
         new_attachment.save_without_broadcasting!
         if match

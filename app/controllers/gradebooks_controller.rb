@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2012 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -191,12 +191,15 @@ class GradebooksController < ApplicationController
       :students_url => api_v1_course_enrollments_url(@context, :include => [:avatar_url], :type => ['StudentEnrollment', 'StudentViewEnrollment'], :per_page => per_page),
       :students_url_with_concluded_enrollments => api_v1_course_enrollments_url(@context, :include => [:avatar_url], :type => ['StudentEnrollment', 'StudentViewEnrollment'], :state => ['active', 'invited', 'completed'], :per_page => per_page),
       :submissions_url => api_v1_course_student_submissions_url(@context, :grouped => '1'),
+      :outcome_links_url => api_v1_course_outcome_group_links_url(@context),
+      :outcome_rollups_url => api_v1_course_outcome_rollups_url(@context, :per_page => 100),
       :change_grade_url => api_v1_course_assignment_submission_url(@context, ":assignment", ":submission"),
       :context_url => named_context_url(@context, :context_url),
       :download_assignment_submissions_url => named_context_url(@context, :context_assignment_submissions_url, "{{ assignment_id }}", :zip => 1),
       :re_upload_submissions_url => named_context_url(@context, :submissions_upload_context_gradebook_url, "{{ assignment_id }}"),
       :context_id => @context.id,
       :context_code => @context.asset_string,
+      :context_integration_id => @context.integration_id,
       :group_weighting_scheme => @context.group_weighting_scheme,
       :grading_standard =>  @context.grading_standard_enabled? && (@context.grading_standard.try(:data) || GradingStandard.default_grading_standard),
       :course_is_concluded => @context.completed?,
@@ -390,14 +393,15 @@ class GradebooksController < ApplicationController
           if @assignment.grading_type == "percent" && submission[:grade] && submission[:grade] !~ /%\z/
             submission[:grade] = "#{submission[:grade]}%"
           end
-          # requires: assignment_id, user_id, and grade or comment
+
+          submission[:dont_overwrite_grade] = value_to_boolean(params[:dont_overwrite_grades])
           @submissions += @assignment.grade_student(@user, submission)
         rescue => e
           @error_message = e.to_s
         end
       end
       @submissions = @submissions.reverse.uniq.reverse
-      @submissions = nil if @submissions.empty?
+      @submissions = nil if submissions.empty?  # no valid submissions
 
       respond_to do |format|
         if @submissions && !@error_message#&& !@submission.errors || @submission.errors.empty?

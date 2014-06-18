@@ -8,7 +8,6 @@ define [
 
     initialize: ->
       @ignored_assignment_ids = []
-      window.model = @
 
     defaults: ->
       assignments: {}
@@ -42,7 +41,7 @@ define [
       @update_bound_attributes()
 
     course_id: ->
-      @get('gradebook').context_id
+      @get('gradebook').context_integration_id
 
     section_id: ->
       @get('section_id')
@@ -62,7 +61,5 @@ define [
 
     ungraded_submissions: ->
       _.filter(@assignment_list(), (assignment) -> return assignment.needs_grading_count > 0)
-
-    toJSON: ->
 
 

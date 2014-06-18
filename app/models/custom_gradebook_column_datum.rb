@@ -21,6 +21,9 @@ class CustomGradebookColumnDatum < ActiveRecord::Base
 
   attr_accessible :content
 
+  EXPORTABLE_ATTRIBUTES = [:id, :content, :user_id, :custom_gradebook_column_id]
+  EXPORTABLE_ASSOCIATIONS = [:custom_gradebook_column]
+
   validates_length_of :content, :maximum => maximum_string_length,
     :allow_nil => true
   validates_uniqueness_of :user_id, :scope => :custom_gradebook_column_id

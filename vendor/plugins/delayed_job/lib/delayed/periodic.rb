@@ -17,7 +17,7 @@ class Periodic
 
   # throws an error if any cron override in config/periodic_jobs.yml is invalid
   def self.audit_overrides!
-    overrides = Setting.from_config('periodic_jobs') || {}
+    overrides = ConfigFile.load('periodic_jobs') || {}
     overrides.each do |name, cron_line|
       # throws error if the line is malformed
       Rufus::CronLine.new(cron_line)
@@ -32,7 +32,7 @@ class Periodic
 
   def self.cron(job_name, cron_line, job_args = {}, &block)
     raise ArgumentError, "job #{job_name} already scheduled!" if self.scheduled[job_name]
-    override = (Setting.from_config('periodic_jobs') || {})[job_name]
+    override = (ConfigFile.load('periodic_jobs') || {})[job_name]
     cron_line = override if override
     self.scheduled[job_name] = self.new(job_name, cron_line, job_args, block)
   end

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011-2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -67,7 +67,7 @@ class PseudonymSessionsController < ApplicationController
         end
         if st.is_valid?
           @pseudonym = nil
-          @pseudonym = @domain_root_account.pseudonyms.custom_find_by_unique_id(st.response.user)
+          @pseudonym = @domain_root_account.pseudonyms.custom_find_by_unique_id(st.user)
           if @pseudonym
             # Successful login and we have a user
             @domain_root_account.pseudonym_sessions.create!(@pseudonym, false)
@@ -78,9 +78,9 @@ class PseudonymSessionsController < ApplicationController
             successful_login(@user, @pseudonym)
             return
           else
-            logger.warn "Received CAS login for unknown user: #{st.response.user}"
+            logger.warn "Received CAS login for unknown user: #{st.user}"
             reset_session
-            session[:delegated_message] = t 'errors.no_matching_user', "Canvas doesn't have an account for user: %{user}", :user => st.response.user
+            session[:delegated_message] = t 'errors.no_matching_user', "Canvas doesn't have an account for user: %{user}", :user => st.user
             redirect_to(cas_client.logout_url(cas_login_url :no_auto => true))
             return
           end
@@ -95,6 +95,7 @@ class PseudonymSessionsController < ApplicationController
       initiate_cas_login(cas_client)
     elsif @is_saml && !params[:no_auto]
       if params[:account_authorization_config_id]
+        raise ActiveRecord::RecordNotFound if params[:account_authorization_config_id] !~ Api::ID_REGEX
         if aac = @domain_root_account.account_authorization_configs.find_by_id(params[:account_authorization_config_id])
           initiate_saml_login(request.host_with_port, aac)
         else
@@ -240,7 +241,7 @@ class PseudonymSessionsController < ApplicationController
     elsif account.cas_authentication? and session[:cas_session]
       logout_current_user
       session[:delegated_message] = message if message
-      redirect_to(cas_client(account).logout_url(cas_login_url))
+      redirect_to(cas_client(account).logout_url(cas_login_url, nil, cas_login_url))
       return
     else
       logout_current_user
@@ -500,7 +501,7 @@ class PseudonymSessionsController < ApplicationController
 
     verification_code = params[:otp_login][:verification_code]
     if Canvas.redis_enabled?
-      key = "otp_used:#{verification_code}"
+      key = "otp_used:#{@current_user.global_id}:#{verification_code}"
       if Canvas.redis.get(key)
         force_fail = true
       else

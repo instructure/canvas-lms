@@ -22,6 +22,9 @@ class LearningOutcome < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   has_many :learning_outcome_results
   has_many :alignments, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome', 'deleted']
+
+  EXPORTABLE_ATTRIBUTES = [:id, :context_id, :context_type, :short_description, :context_code, :description, :data, :workflow_state, :created_at, :updated_at, :vendor_guid, :low_grade, :high_grade]
+  EXPORTABLE_ASSOCIATIONS = [:context, :learning_outcome_results, :alignments]
   serialize :data
   before_save :infer_defaults
   validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
@@ -58,7 +61,7 @@ class LearningOutcome < ActiveRecord::Base
     tag = self.alignments.find_by_content_id_and_content_type_and_tag_type_and_context_id_and_context_type(asset.id, asset.class.to_s, 'learning_outcome', context.id, context.class.to_s)
     tag ||= self.alignments.create(:content => asset, :tag_type => 'learning_outcome', :context => context)
     mastery_type = opts[:mastery_type]
-    if mastery_type == 'points'
+    if mastery_type == 'points' || mastery_type == 'points_mastery'
       mastery_type = 'points_mastery'
     else
       mastery_type = 'explicit_mastery'
@@ -210,11 +213,4 @@ class LearningOutcome < ActiveRecord::Base
 
   scope :global, where(:context_id => nil)
 
-  def self.process_migration(*args)
-    Importers::LearningOutcomeImporter.process_migration(*args)
-  end
-
-  def self.import_from_migration(*args)
-    Importers::LearningOutcomeImporter.import_from_migration(*args)
-  end
 end

@@ -23,6 +23,10 @@ class CourseImport < ActiveRecord::Base
   serialize :parameters
   belongs_to :course
   belongs_to :source, :class_name => 'Course'
+
+  EXPORTABLE_ATTRIBUTES = [:id, :course_id, :source_id, :added_item_codes, :log, :workflow_state, :import_type, :created_at, :updated_at, :parameters]
+  EXPORTABLE_ASSOCIATIONS = [:course, :source]
+
   validates_presence_of :course_id, :source_id, :import_type, :workflow_state
   validates_length_of :added_item_codes, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   

@@ -45,6 +45,10 @@ define [
       @$selfSignupControls.css opacity: if disabled then 0.5 else 1
       @$selfSignupControls.find(':input').prop 'disabled', disabled
 
+    validateFormData: (data, errors) ->
+      if !@$("[name=group_limit]")[0].validity.valid
+        {"group_limit": [{message: I18n.t('group_limit_number', 'Group limit must be a number') }]}
+
     toJSON: ->
       json = @model.present()
       _.extend {},
