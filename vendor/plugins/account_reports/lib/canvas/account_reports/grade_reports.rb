@@ -33,6 +33,11 @@ module Canvas::AccountReports
         add_extra_text(I18n.t('account_reports.grades.deleted',
                               'Include Deleted Objects: true;'))
       end
+
+      if @account_report.has_parameter? "limiting_period"
+        add_extra_text(I18n.t('account_reports.grades.limited',
+                              'deleted objects limited by days specified;'))
+      end
     end
 
     # retrieve the list of courses for the account
@@ -77,6 +82,14 @@ module Canvas::AccountReports
 
       if @include_deleted
         students = students.where("e.workflow_state IN ('active', 'completed', 'deleted')")
+        if @account_report.parameters.has_key? 'limiting_period'
+          limiting_period = @account_report.parameters['limiting_period'].to_i
+          students = students.where("e.workflow_state = 'active'
+                                    OR c.conclude_at >= ?
+                                    OR (e.workflow_state = 'deleted'
+                                    AND e.updated_at >= ?)",
+                                    limiting_period.days.ago, limiting_period.days.ago)
+        end
       else
         students = students.where(
           "pseudonyms.workflow_state<>'deleted'
