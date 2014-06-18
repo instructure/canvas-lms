@@ -131,14 +131,17 @@ class ContentExportsApiController < ApplicationController
       export.course = @context
       export.user = @current_user
       export.workflow_state = 'created'
+
+      selected_content = ContentMigration.process_copy_params(params[:select], true) if params[:select]
       if params[:export_type] == 'qti'
         export.export_type = ContentExport::QTI
-        export.selected_content = { all_quizzes: true }
+        export.selected_content = selected_content || { all_quizzes: true }
       else
         export.export_type = ContentExport::COMMON_CARTRIDGE
-        export.selected_content = { everything: true }
+        export.selected_content = selected_content || { everything: true }
       end
       opts = params.slice(:version)
+
       export.progress = 0
       if export.save
         export.queue_api_job(opts)
@@ -149,4 +152,16 @@ class ContentExportsApiController < ApplicationController
     end
   end
 
+  def content_list
+    if authorized_action(@context, @current_user, :read_as_admin)
+      base_url = api_v1_course_content_list_url(@context)
+      formatter = Canvas::Migration::Helpers::SelectiveContentFormatter.new(nil, base_url)
+
+      unless formatter.valid_type?(params[:type])
+        return render :json => {:message => "unsupported migration type"}, :status => :bad_request
+      end
+
+      render :json => formatter.get_content_list(params[:type], @context)
+    end
+  end
 end

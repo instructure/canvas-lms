@@ -571,12 +571,6 @@ class ContentMigration < ActiveRecord::Base
     end
   end
 
-  # returns a list of content for selective content migrations
-  # If no section is specified the top-level areas with content are returned
-  def get_content_list(type=nil, base_url=nil)
-    Canvas::Migration::Helpers::SelectiveContentFormatter.new(self, base_url).get_content_list(type)
-  end
-
   UPLOAD_TIMEOUT = 1.hour
   def check_for_pre_processing_timeout
     if self.pre_processing? && (self.updated_at.utc + UPLOAD_TIMEOUT) < Time.now.utc
@@ -588,20 +582,47 @@ class ContentMigration < ActiveRecord::Base
   end
 
   # strips out the "id_" prepending the migration ids in the form
-  def self.process_copy_params(hash)
-    return {} if hash.blank? || !hash.is_a?(Hash)
-    hash.values.each do |sub_hash|
-      next unless sub_hash.is_a?(Hash) # e.g. second level in :copy => {:context_modules => {:id_100 => true, etc}}
+  # also converts arrays of migration ids (or real ids for course exports) into the old hash format
+  def self.process_copy_params(hash, for_content_export=false)
+    return {} if hash.blank?
+    new_hash = {}
 
-      clean_hash = {}
-      sub_hash.keys.each do |k|
-        if k.is_a?(String) && k.start_with?("id_")
-          clean_hash[k.sub("id_", "")] = sub_hash.delete(k)
+    hash.each do |key, value|
+      case value
+      when Hash # e.g. second level in :copy => {:context_modules => {:id_100 => true, etc}}
+        new_sub_hash = {}
+
+        value.each do |sub_key, sub_value|
+          if for_content_export
+            new_sub_hash[CC::CCHelper.create_key(sub_key)] = sub_value
+          elsif sub_key.is_a?(String) && sub_key.start_with?("id_")
+            new_sub_hash[sub_key.sub("id_", "")] = sub_value
+          else
+            new_sub_hash[sub_key] = sub_value
+          end
         end
+
+        new_hash[key] = new_sub_hash
+      when Array
+        # e.g. :select => {:context_modules => [100, 101]} for content exports
+        # or :select => {:context_modules => [blahblahblah, blahblahblah2]} for normal migration ids
+        sub_hash = {}
+        if for_content_export
+          asset_type = key.to_s.singularize
+          value.each do |id|
+            sub_hash[CC::CCHelper.create_key("#{asset_type}_#{id}")] = '1'
+          end
+        else
+          value.each do |id|
+            sub_hash[id] = '1'
+          end
+        end
+        new_hash[key] = sub_hash
+      else
+        new_hash[key] = value
       end
-      sub_hash.merge!(clean_hash)
     end
-    hash
+    new_hash
   end
 
   def imported_migration_items

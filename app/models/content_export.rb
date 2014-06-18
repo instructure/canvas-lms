@@ -164,12 +164,12 @@ class ContentExport < ActiveRecord::Base
     is_set?(selected_content[symbol]) || is_set?(selected_content[:everything])
   end
 
-  def add_item_to_export(obj)
-    return unless obj && obj.class.respond_to?(:table_name)
+  def add_item_to_export(obj, type=nil)
+    return unless obj && (type || obj.class.respond_to?(:table_name))
     return if selected_content.empty?
     return if is_set?(selected_content[:everything])
 
-    asset_type = obj.class.table_name
+    asset_type = type || obj.class.table_name
     selected_content[asset_type] ||= {}
     selected_content[asset_type][CC::CCHelper.create_key(obj)] = true
   end

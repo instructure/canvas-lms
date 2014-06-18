@@ -242,11 +242,11 @@ class ContentZipper
     end
   end
 
-  def process_folder(folder, zipfile, start_dirs=[], &callback)
+  def process_folder(folder, zipfile, start_dirs=[], opts={}, &callback)
     if callback
-      zip_folder(folder, zipfile, start_dirs, &callback)
+      zip_folder(folder, zipfile, start_dirs, opts, &callback)
     else
-      zip_folder(folder, zipfile, start_dirs)
+      zip_folder(folder, zipfile, start_dirs, opts)
     end
   end
 
@@ -261,7 +261,7 @@ class ContentZipper
   end
 
   # The callback should accept two arguments, the attachment/folder and the folder names
-  def zip_folder(folder, zipfile, folder_names, &callback)
+  def zip_folder(folder, zipfile, folder_names, opts={}, &callback)
     if callback && (folder.hidden? || folder.locked)
       callback.call(folder, folder_names)
     end
@@ -275,6 +275,8 @@ class ContentZipper
               else
                 folder.visible_file_attachments
               end
+
+    attachments = attachments.select{|a| opts[:exporter].export_object?(a)} if opts[:exporter]
     attachments.select{|a| !@check_user || a.grants_right?(@user, :download)}.each do |attachment|
       callback.call(attachment, folder_names) if callback
       @context = folder.context
@@ -285,9 +287,9 @@ class ContentZipper
     folder.active_sub_folders.select{|f| !@check_user || f.grants_right?(@user, :read_contents)}.each do |sub_folder|
       new_names = Array.new(folder_names) << sub_folder.name
       if callback
-        zip_folder(sub_folder, zipfile, new_names, &callback)
+        zip_folder(sub_folder, zipfile, new_names, opts, &callback)
       else
-        zip_folder(sub_folder, zipfile, new_names)
+        zip_folder(sub_folder, zipfile, new_names, opts)
       end
     end
   end

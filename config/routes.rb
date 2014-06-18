@@ -843,6 +843,8 @@ routes.draw do
       get  'courses/:course_id/folders/:id', :controller => :folders, :action => :show, :path_name => 'course_folder'
       put  'accounts/:account_id/courses', :action => :batch_update
       post 'courses/:course_id/ping', :action => :ping, :path_name => 'course_ping'
+
+      get "courses/:course_id/content_list", :controller => :content_exports_api, :action => :content_list, :path_name => "course_content_list"
     end
 
     scope(:controller => :tabs) do
