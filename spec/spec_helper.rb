@@ -440,7 +440,7 @@ end
     Attachment.clear_cached_mime_ids
     RoleOverride.clear_cached_contexts
     Delayed::Job.redis.flushdb if Delayed::Job == Delayed::Backend::Redis::Job
-    truncate_all_cassandra_tables
+    #truncate_all_cassandra_tables
     Rails::logger.try(:info, "Running #{self.class.description} #{@method_name}")
     Attachment.domain_namespace = nil
   end
