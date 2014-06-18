@@ -81,12 +81,12 @@ module CanvasSanitize #:nodoc:
           'tfoot', 'th', 'thead', 'tr', 'u', 'ul', 'object', 'embed', 'param'],
 
       :attributes => {
-          :all => ['style', 'class', 'id'],
-          'a' => ['href', 'title', 'target', 'name'],
+          :all => ['style', 'class', 'id', 'title'],
+          'a' => ['href', 'target', 'name'],
           'blockquote' => ['cite'],
           'col' => ['span', 'width'],
           'colgroup' => ['span', 'width'],
-          'img' => ['align', 'alt', 'height', 'src', 'title', 'width'],
+          'img' => ['align', 'alt', 'height', 'src', 'width'],
           'iframe' => ['src', 'width', 'height', 'name', 'align', 'frameborder', 'scrolling', 'sandbox'],
           'ol' => ['start', 'type'],
           'q' => ['cite'],
