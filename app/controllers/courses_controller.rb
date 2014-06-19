@@ -436,9 +436,6 @@ class CoursesController < ApplicationController
   #   Set to true to restrict user enrollments to the start and end dates of the
   #   course.
   #
-  # @argument course[enroll_me] [Optional, Boolean]
-  #   Set to true to enroll the current user as the teacher.
-  #
   # @argument course[term_id] [Optional, Integer]
   #   The unique ID of the term to create to course in.
   #
@@ -458,6 +455,9 @@ class CoursesController < ApplicationController
   # @argument offer [Optional, Boolean]
   #   If this option is set to true, the course will be available to students
   #   immediately.
+  #
+  # @argument enroll_me [Optional, Boolean]
+  #   Set to true to enroll the current user as the teacher.
   #
   # @argument course[syllabus_body] [Optional, String]
   #   The syllabus body for the course
