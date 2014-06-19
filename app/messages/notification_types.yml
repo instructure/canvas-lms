@@ -141,6 +141,8 @@
       delay_for: 0
     - name: Rubric Association Created
       delay_for: 0
+    - name: Peer Review Invitation
+      delay_for: 0
 
 - category: Late Grading
   notifications:
