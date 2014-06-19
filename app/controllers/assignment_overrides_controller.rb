@@ -103,7 +103,7 @@ class AssignmentOverridesController < ApplicationController
   #
   # @returns [AssignmentOverride]
   def index
-    @overrides = assignment_override_scope(@assignment, true).all
+    @overrides = assignment_override_collection(@assignment, true)
     render :json => assignment_overrides_json(@overrides)
   end
 
@@ -203,8 +203,8 @@ class AssignmentOverridesController < ApplicationController
   #   curl 'https://<canvas>/api/v1/courses/1/assignments/2/overrides.json' \
   #        -X POST \ 
   #        -F 'assignment_override[student_ids][]=8' \ 
-  #        -F 'assignment_override[title]=Fred Flinstone' \ 
-  #        -F 'assignment_override[due_at]=2012-10-08T21:00:00Z' \ 
+  #        -F 'assignment_override[title]=Fred Flinstone' \
+  #        -F 'assignment_override[due_at]=2012-10-08T21:00:00Z' \
   #        -H "Authorization: Bearer <token>"
   #
   def create
@@ -263,7 +263,7 @@ class AssignmentOverridesController < ApplicationController
   #   curl 'https://<canvas>/api/v1/courses/1/assignments/2/overrides/3.json' \
   #        -X PUT \ 
   #        -F 'assignment_override[title]=Fred Flinstone' \ 
-  #        -F 'assignment_override[due_at]=2012-10-08T21:00:00Z' \ 
+  #        -F 'assignment_override[due_at]=2012-10-08T21:00:00Z' \
   #        -H "Authorization: Bearer <token>"
   #
   def update

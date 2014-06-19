@@ -554,8 +554,8 @@ class DiscussionTopicsApiController < ApplicationController
   def visible_topics(topic)
     # conflate entries from all child topics for groups the user can access
     topics = [topic]
-    if topic.for_group_assignment? && !topic.child_topics.empty?
-      groups = topic.assignment.group_category.groups.active.select do |group|
+    if topic.for_group_discussion? && !topic.child_topics.empty?
+      groups = topic.group_category.groups.active.select do |group|
         group.grants_right?(@current_user, session, :read)
       end
       topic.child_topics.each{ |t| topics << t if groups.include?(t.context) }

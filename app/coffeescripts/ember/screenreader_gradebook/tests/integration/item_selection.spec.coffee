@@ -18,7 +18,7 @@ define [
     equal text, find(selection).find('option:selected').text()
 
   checkText = (selector, expectedText) ->
-    equal Ember.$.trim(find(selector).text()), expectedText
+    equal Ember.$.trim(find(".assignmentsPanel #{selector}").text()), expectedText
 
   studentSectionAssertions = (selected, currentIndex, expectedIndex) ->
     equal currentIndex, expectedIndex

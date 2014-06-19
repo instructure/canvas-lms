@@ -30,10 +30,17 @@ class LearningOutcomeResult < ActiveRecord::Base
   belongs_to :associated_asset, :polymorphic => true
   belongs_to :context, :polymorphic => true
   simply_versioned
+
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :context_id, :context_type, :context_code, :association_id, :association_type, :content_tag_id, :learning_outcome_id, :mastery, :user_id, :score, :created_at, :updated_at,
+    :attempt, :possible, :comments, :original_score, :original_possible, :original_mastery, :artifact_id, :artifact_type, :assessed_at, :title, :percent, :associated_asset_id, :associated_asset_type
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:user, :learning_outcome, :association_object, :artifact, :associated_asset, :context]
   before_save :infer_defaults
 
   attr_accessible :learning_outcome, :user, :association_object, :alignment, :associated_asset
-  
+
   def infer_defaults
     self.learning_outcome_id = self.alignment.learning_outcome_id
     self.context_code = "#{self.context_type.underscore}_#{self.context_id}" rescue nil
@@ -44,7 +51,7 @@ class LearningOutcomeResult < ActiveRecord::Base
     self.percent = nil if self.percent && !self.percent.to_f.finite?
     true
   end
-  
+
   def assignment
     if self.association_object.is_a?(Assignment)
       self.association_object
@@ -77,7 +84,7 @@ class LearningOutcomeResult < ActiveRecord::Base
       save
     end
   end
-  
+
   scope :for_context_codes, lambda { |codes|
     if codes == 'all'
       scoped

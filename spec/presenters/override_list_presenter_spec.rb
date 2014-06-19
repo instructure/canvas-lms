@@ -184,6 +184,10 @@ describe OverrideListPresenter do
           presenter.formatted_date_string(:due_at,dates_visible_to_user.first)
       end
 
+      it "includes the actual Time for presentation transforms in templates" do
+        visible_due_dates.second[:raw][:due_at].should be_a(Time)
+      end
+
     end
 
     context "only some sections have overrides" do

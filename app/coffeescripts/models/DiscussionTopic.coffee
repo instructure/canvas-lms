@@ -166,3 +166,9 @@ define [
         locked: @get('locked')
       @set('position', null)
       @updatePartial(data)
+
+    groupCategoryId: (id) =>
+      return @get( 'group_category_id' ) unless arguments.length > 0
+      @set 'group_category_id', id
+
+    canGroup: -> @get('can_group')

@@ -76,7 +76,7 @@ table.grid tr:first-child td {
 /*-- workflow state labels --*/
 .label {
   background-color: #999;
-  @include border-radius(3px);
+  border-radius: 3px;
   color: white;
   font-size: 12px;
   font-weight: bold;

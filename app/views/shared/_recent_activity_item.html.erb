@@ -12,7 +12,9 @@
       <%= item.summary %>
     </a>
   </td>
-  <td class="date" tabindex=0><%= datetime_string(item.updated_at) %></td>
+  <td class="date" tabindex=0 >
+    <%= friendly_datetime(item.updated_at, context: item.context, tag_type: :span) %>
+  </td>
   <td class="remove">
     <% translated_close = t :close, 'close' %>
     <a class="close ignore-item" href="#" data-url="<%= dashboard_ignore_stream_item_url(item.stream_item_id) %>" data-remove='tr' title="<%= translated_close %>" aria-label="<%= translated_close %>" role="button">×</a>

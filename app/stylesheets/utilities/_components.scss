@@ -21,8 +21,7 @@
     margin-top: 0;
     padding: 4px 12px;
     font-weight: bold;
-    $shadow: inset 0 1px 0 rgba(255,255,255,0.75);
-    @include box-shadow($shadow);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.75);
     border-bottom: 1px solid $listBorderColor;
     @include bevelText;
     border-top: 1px solid $listBorderColor;
@@ -112,7 +111,7 @@
 }
 
 .box-shadow {
-  @include box-shadow(0 2px 4px rgba(0,0,0,.25))
+  box-shadow: 0 2px 4px rgba(0,0,0,.25)
 }
 
 .page-action-list {
@@ -122,7 +121,7 @@
     color: $gray;
     font-weight: bold;
     border-bottom: solid 1px lighten($grayLight, 10%);
-    @include box-shadow(0 1px 0px rgba(255, 255, 255, 0.85));
+    box-shadow: 0 1px 0px rgba(255, 255, 255, 0.85);
     padding: 8px 0;
 
     &:hover {

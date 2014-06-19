@@ -19,73 +19,92 @@
 require 'spec_helper'
 
 describe LtiOutbound::VariableSubstitutor do
-  class TestLtiModel < LtiOutbound::LTIModel
-    attr_accessor :field, :new_field
-    add_variable_mapping '$Custom.mapper', :field
-    add_variable_mapping '$Custom.newField', :new_field
-  end
+  let(:course) { LtiOutbound::LTICourse.new }
+  subject { LtiOutbound::VariableSubstitutor.new(context: course) }
 
-  let(:lti_model) do
-    TestLtiModel.new.tap do |model|
-      model.field = 'blah'
-    end
-  end
+  describe "#substitute" do
 
-  describe '#substitute!' do
-    it 'substitutes variable' do
-      params = {'field' => '$Custom.mapper'}
-      subject.substitute!(params, lti_model)
-      expect(params).to eq({'field' => 'blah'})
+
+    it "returns the value" do
+      course.id = 1
+      data_hash = {'canvas_course_id' => '$Canvas.course.id'}
+
+      expect(subject.substitute!(data_hash)['canvas_course_id']).to eq 1
     end
 
-    it 'does not replace invalid mappings' do
-      params = {'field' => '$Custom.mapper.wrong'}
-      subject.substitute!(params, lti_model)
-      expect(params).to eq({'field' => '$Custom.mapper.wrong'})
+    it "leaves the value unchanged for unkown keys" do
+      data_hash = {'canvas_course_id' => '$Invalid.key'}
+      expect(subject.substitute!(data_hash)['canvas_course_id']).to eq '$Invalid.key'
     end
 
-    it 'does not replace nil mappings' do
-      lti_model.field = nil
-      params = {'field' => '$Custom.mapper'}
-      subject.substitute!(params, lti_model)
-      expect(params).to eq({'field' => '$Custom.mapper'})
+    it "leaves the value unchanged for missing models" do
+      data_hash = {'canvas_course_id' => '$Canvas.account.id'}
+      expect(subject.substitute!(data_hash)['canvas_course_id']).to eq '$Canvas.account.id'
     end
-  end
 
-  describe '#substitute_all!' do
-    it 'substitutes any number of LTIModels' do
-      model1 = lti_model
-      model2 = TestLtiModel.new.tap do |model|
-        model.new_field = 'new stuff'
+    describe 'variable_substitutions' do
+      let(:account) { double('account', id: 'account_id', name: 'account_name', sis_source_id: 'account_sis_source_id') }
+      let(:assignment) { double('assignment', id: 'assignment_id', title: 'assignment_title', points_possible: 'assignment_points_possible') }
+      let(:consumer_instance) { double('consumer_instance', id: 'consumer_instance_id', sis_source_id: 'consumer_instance_sis_source_id', domain: 'consumer_instance_domain') }
+      let(:course) do
+        course =  LtiOutbound::LTICourse.new
+        course.id = 'course_id'
+        course.sis_source_id =  'course_sis_source_id'
+        course
+      end
+      let(:user) do
+        double('user',
+               id: 'user_id',
+               sis_source_id: 'user_sis_source_id',
+               login_id: 'user_login_id',
+               enrollment_state: 'user_enrollment_state',
+               concluded_role_types: 'user_concluded_role_types',
+               last_name: 'user_last_name',
+               name: 'user_name',
+               first_name: 'user_first_name',
+               timezone: 'user_time_zone'
+        )
       end
 
-      params =  {'field' => '$Custom.mapper', 'new_field' => '$Custom.newField' }
-      subject.substitute_all!(params, model1, model2)
-
-      expect(params).to eq({'field' => 'blah', 'new_field' => 'new stuff' })
-    end
-
-    it 'substitutes variable mappings for objects in order' do
-      model1 = lti_model
-      model2 = TestLtiModel.new.tap do |model|
-        model.field = 'blahblah'
-        model.new_field = 'new stuff'
+      subject do
+        LtiOutbound::VariableSubstitutor.new(
+          account: account,
+          assignment: assignment,
+          consumer_instance: consumer_instance,
+          context: course,
+          user: user
+        )
       end
 
-      params =  {'field' => '$Custom.mapper', 'new_field' => '$Custom.newField' }
-      subject.substitute_all!(params, model1, model2)
+      it 'substitute variables for all substitutions' do
+        data_hash = {
+          account_id: '$Canvas.account.id',
+          account_name: '$Canvas.account.name',
+          account_sis_source_id: '$Canvas.account.sisSourceId',
+          assignment_id: '$Canvas.assignment.id',
+          assignment_title: '$Canvas.assignment.title',
+          assignment_points_possible: '$Canvas.assignment.pointsPossible',
+          consumer_instance_id: '$Canvas.root_account.id',
+          consumer_instance_sis_source_id: '$Canvas.root_account.sisSourceId',
+          consumer_instance_domain: '$Canvas.api.domain',
+          course_id: '$Canvas.course.id',
+          course_sis_source_id: '$Canvas.course.sisSourceId',
+          user_id: '$Canvas.user.id',
+          user_sis_source_id: '$Canvas.user.sisSourceId',
+          user_login_id: '$Canvas.user.loginId',
+          user_enrollment_state: '$Canvas.enrollment.enrollmentState',
+          user_concluded_role_types: '$Canvas.membership.concludedRoles',
+          user_last_name: '$Person.name.family',
+          user_name: '$Person.name.full',
+          user_first_name: '$Person.name.given',
+          user_time_zone: '$Person.address.timezone'
+        }
 
-      expect(params).to eq({'field' => 'blah', 'new_field' => 'new stuff' })
+        subject.substitute!(data_hash)
+        data_hash.each{|k, v| expect(v).to eq k.to_s}
+      end
+
     end
 
-    it 'can handle nil objects' do
-      model1 = lti_model
-      model2 = nil
-
-      params =  {'field' => '$Custom.mapper', 'new_field' => '$Custom.newField' }
-      subject.substitute_all!(params, model1, model2)
-
-      expect(params).to eq({'field' => 'blah', 'new_field' => '$Custom.newField' })
-    end
   end
 end

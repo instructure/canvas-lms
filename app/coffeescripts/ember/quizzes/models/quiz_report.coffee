@@ -1,10 +1,11 @@
 define [
   'ember'
-  'ember-data'
-], (Em, DS) ->
+  'ember-data',
+  '../mixins/queriable_model'
+], (Em, DS, QueriableModel) ->
   {Model, attr, belongsTo} = DS
 
-  Model.extend
+  Model.extend(QueriableModel, {
     quiz: belongsTo 'quiz', async: false
 
     anonymous: attr()
@@ -16,3 +17,4 @@ define [
     progress: attr()
     progressUrl: attr()
     url: attr()
+  })

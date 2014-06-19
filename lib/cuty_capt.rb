@@ -48,7 +48,7 @@ class CutyCapt
 
   def self.config
     return @@config if defined?(@@config) && @@config
-    setting = (Setting.from_config('cutycapt') || {}).symbolize_keys
+    setting = (ConfigFile.load('cutycapt') || {}).symbolize_keys
     @@config = CUTYCAPT_DEFAULTS.merge(setting).with_indifferent_access
     self.process_config
     @@config = nil unless @@config[:path]

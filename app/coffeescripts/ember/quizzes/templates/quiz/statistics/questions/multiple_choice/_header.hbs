@@ -1,0 +1,12 @@
+<header>
+  <span class="question-attempts">{{attemptsLabel}}</span>
+  <aside class="pull-right">
+    <button {{action "showDetails"}} class="btn">
+      <i {{bind-attr class="detailsVisible:icon-collapse:icon-expand"}}></i>
+    </button>
+  </aside>
+
+  <div class="question-text">
+    {{{questionText}}}
+  </div>
+</header>

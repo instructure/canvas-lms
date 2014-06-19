@@ -4,4 +4,4 @@ gem 'simplecov-rcov', '0.2.3', :require => false
 # Specify your gem's dependencies in canvas_cassandra.gemspec
 gemspec
 
-gem 'cassandra-cql', '1.2.1', :github => 'kreynolds/cassandra-cql', :ref => 'd100be075b04153cf4116da7512892a1e8c0a7e4'
+gem 'cassandra-cql', '1.2.2', :github => 'kreynolds/cassandra-cql', :ref => 'beed72e249d02cebc850a4b92b468c8b64b12257'

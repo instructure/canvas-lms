@@ -23,5 +23,8 @@ class CourseAccountAssociation < ActiveRecord::Base
   has_many :account_users, :foreign_key => 'account_id', :primary_key => 'account_id'
   attr_accessible :account, :depth, :course_section
 
+  EXPORTABLE_ATTRIBUTES = [:id, :course_id, :account_id, :depth, :created_at, :updated_at, :course_section_id]
+  EXPORTABLE_ASSOCIATIONS = [:course, :course_section, :account, :account_users]
+
   validates_presence_of :course_id, :account_id, :depth
 end

@@ -10,7 +10,7 @@ Released under the MIT License <http://www.opensource.org/licenses/mit-license.p
 }
 .uploadify-button {
 	background-color: #505050;
-	background-image: linear-gradient(bottom, #505050 0%, #707070 100%);
+	background-image: linear-gradient(to top, #505050 0%, #707070 100%);
 	background-image: -o-linear-gradient(bottom, #505050 0%, #707070 100%);
 	background-image: -moz-linear-gradient(bottom, #505050 0%, #707070 100%);
 	background-image: -webkit-linear-gradient(bottom, #505050 0%, #707070 100%);
@@ -36,7 +36,7 @@ Released under the MIT License <http://www.opensource.org/licenses/mit-license.p
 }
 .uploadify:hover .uploadify-button {
 	background-color: #606060;
-	background-image: linear-gradient(top, #606060 0%, #808080 100%);
+	background-image: linear-gradient(to bottom, #606060 0%, #808080 100%);
 	background-image: -o-linear-gradient(top, #606060 0%, #808080 100%);
 	background-image: -moz-linear-gradient(top, #606060 0%, #808080 100%);
 	background-image: -webkit-linear-gradient(top, #606060 0%, #808080 100%);

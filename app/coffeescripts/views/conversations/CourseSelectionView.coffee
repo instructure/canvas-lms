@@ -24,6 +24,8 @@ define [
       @options.courses.favorites.on('reset', @render)
       @options.courses.all.on('reset', @render)
       @options.courses.all.on('add', @render)
+      @options.courses.groups.on('reset', @render)
+      @options.courses.groups.on('add', @render)
       @render()
 
     render: () =>
@@ -43,7 +45,8 @@ define [
         defaultOption: @options.defaultOption,
         favorites: @options.courses.favorites.toJSON(),
         more: more,
-        concluded: concluded
+        concluded: concluded,
+        groups: @options.courses.groups.toJSON()
       @truncate_course_name_data(data)
       @$el.html(template(data))
       @$el.selectpicker('refresh')
@@ -63,6 +66,7 @@ define [
       if all._loading then return
       all.fetch()
       all._loading = true
+      @options.courses.groups.fetch()
       @$picker.find('> .dropdown-menu').append($('<div />').attr('class', 'paginatedLoadingIndicator').css('clear', 'both'))
 
     _value: ''
@@ -84,20 +88,25 @@ define [
       @searchViews.forEach (view) ->
         view.clearSearch()
 
-    getCurrentCourse: ->
-      course_id = @_value.replace('course_', '')
-      course = @options.courses.favorites.get(course_id)
-      course = @options.courses.all.get(course_id) if !course
-      return if course then {name: course.get('name'), id: @_value} else {}
+    getCurrentContext: ->
+      matches = @_value.match(/(\w+)_(\d+)/)
+      return {} unless matches
+      [match, type, id] = matches
+      context = if type == 'course'
+        course = @options.courses.favorites.get(id) ||
+          @options.courses.all.get(id)
+      else
+        @options.courses.groups.get(id)
+      return if context then {name: context.get('name'), id: @_value} else {}
 
     triggerEvent: ->
-      @trigger('course', @getCurrentCourse())
+      @trigger('course', @getCurrentContext())
 
     focus: ->
       @$el.next().find('.dropdown-toggle').focus()
 
     truncate_course_name_data: (course_data) ->
-      _.each(['favorites', 'more', 'concluded'], (key) =>
+      _.each(['favorites', 'more', 'concluded', 'groups'], (key) =>
         @truncate_course_names(course_data[key])
         )
 

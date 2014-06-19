@@ -56,7 +56,7 @@ TEXT
 <div id="context_modules_sortable_container">
   <div id="context_modules" tabindex="0" aria-label="<%= t('headings.course_modules', %{Course Modules}) %>" class="<%= 'editable' if can_do(@context, @current_user, :manage_content) %>">
     <% editable = can_do(@context, @current_user, :manage_content) %>
-    <% cache([@context.cache_key, editable, 'all_context_modules_5', collection_cache_key(@modules)].join('/')) do %>
+    <% cache([@context.cache_key, editable, 'all_context_modules_6', collection_cache_key(@modules)].join('/')) do %>
       <% ContextModule.send(:preload_associations, @modules, :content_tags => :content) %>
       <% @modules.each do |m| %>
         <%= render :partial => 'context_modules/context_module', :object => m, :locals => {:editable => editable } %>
@@ -78,7 +78,7 @@ TEXT
       </tr><tr>
         <td colspan="2">
           <input type="checkbox" id="unlock_module_at"/>
-          <label for="unlock_module_at"><%= t('#labels.lock_module_until', %{lock module until a given date}) %></label>
+          <label for="unlock_module_at"><%= t('#labels.lock_module_until', %{Lock module until a given date}) %></label>
         </td>
       </tr><tr class="unlock_module_at_details">
         <td>
@@ -135,7 +135,7 @@ TEXT
     <tr>
         <td colspan="2">
           <%= f.check_box :require_sequential_progress, :id => "require_sequential_progress" %>
-          <%= f.label :require_sequential_progress, :en => "students must move through requirements in this module in sequential order", :for => "require_sequential_progress" %>
+          <%= f.label :require_sequential_progress, :en => "Students must move through requirements in this module in sequential order", :for => "require_sequential_progress" %>
         </td>
     </tr><tr>
       <td colspan="2">
@@ -182,10 +182,10 @@ TEXT
             </select>
           </td>
         </tr>
-        <tr class="external_tool">
+        <tr class="external">
           <td colspan="2">
             <%= f.check_box :new_tab %>
-            <%= f.label :new_tab, :en => "Load this tool in a new tab" %>
+            <%= f.label :new_tab, :en => "Load in a new tab" %>
           </td>
         </tr>
         <tr>

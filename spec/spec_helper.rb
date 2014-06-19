@@ -425,12 +425,15 @@ end
     # in g/24755
   end
 
+  # UTC for tests, cuz it's easier :P
+  Account.time_zone_attribute_defaults[:default_time_zone] = 'UTC'
+
   config.before :each do
     I18n.locale = :en
     Time.zone = 'UTC'
     Account.clear_special_account_cache!
-    Account.default.update_attribute(:default_time_zone, 'UTC')
     Setting.reset_cache!
+    ConfigFile.unstub
     HostUrl.reset_cache!
     Notification.reset_cache!
     ActiveRecord::Base.reset_any_instantiation!
@@ -857,7 +860,8 @@ end
     @group2 = course.groups.create!(:name => "group 2", :group_category => group_category)
 
     @topic = course.discussion_topics.build(:title => "topic")
-    @assignment = course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title, :group_category => @group1.group_category)
+    @topic.group_category = group_category
+    @assignment = course.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title)
     @assignment.infer_times
     @assignment.saved_by = :discussion_topic
     @topic.assignment = @assignment
@@ -1045,11 +1049,10 @@ end
     update_with_protected_attributes!(ar_instance, attrs) rescue false
   end
 
-  def process_csv_data(*lines_or_opts)
-    account_model unless @account
-
-    lines = lines_or_opts.reject { |thing| thing.is_a? Hash }
-    opts = lines_or_opts.select { |thing| thing.is_a? Hash }.inject({:allow_printing => false}, :merge)
+  def process_csv_data(*lines)
+    opts = lines.extract_options!
+    opts.reverse_merge!(allow_printing: false)
+    account = opts[:account] || @account || account_model
 
     tmp = Tempfile.new("sis_rspec")
     path = "#{tmp.path}.csv"
@@ -1057,7 +1060,7 @@ end
     File.open(path, "w+") { |f| f.puts lines.flatten.join "\n" }
     opts[:files] = [path]
 
-    importer = SIS::CSV::Import.process(@account, opts)
+    importer = SIS::CSV::Import.process(account, opts)
 
     File.unlink path
 
@@ -1439,6 +1442,31 @@ end
     }
     @page_view.save!
     @page_view
+  end
+
+  # a fast way to create a record, especially if you don't need the actual
+  # ruby object. since it just does a straight up insert, you need to
+  # provide any non-null attributes or things that would normally be
+  # inferred/defaulted prior to saving
+  def create_record(klass, attributes, return_type = :id)
+    create_records(klass, [attributes], return_type)[0]
+  end
+
+  # a little wrapper around bulk_insert that gives you back records or ids
+  # in order
+  # NOTE: if you decide you want to go add something like this to canvas
+  # proper, make sure you have it handle concurrent inserts (this does
+  # not, because READ COMMITTED is the default transaction isolation
+  # level)
+  def create_records(klass, records, return_type = :id)
+    return [] if records.empty?
+    klass.transaction do
+      klass.connection.bulk_insert klass.table_name, records
+      scope = klass.order("id DESC").limit(records.size)
+      return_type == :record ?
+        scope.all.reverse :
+        scope.pluck(:id).reverse
+    end
   end
 end
 

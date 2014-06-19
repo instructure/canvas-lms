@@ -12,7 +12,15 @@
       {{#each allDates}}
         <div class="clearfix">
           <dt>{{dueFor}}</dt>
-          <dd>{{#if dueAt}} {{strftime dueAt "%b %-d"}} {{else}} - {{/if}}</dd>
+          <dd>
+            {{#if dueAt}}
+              <span {{contextSensitiveDatetimeTitle dueAt}}>
+                {{strftime dueAt "%b %-d"}}
+              </span>
+            {{else}}
+               -
+            {{/if}}
+          </dd>
         </div>
       {{/each}}
     </dl>
@@ -21,6 +29,8 @@
 {{else}}
   {{#if singleSectionDueDate}}
     <strong>{{#t "due_date"}}Due{{/t}}</strong>
-    {{datetimeFormatted singleSectionDueDate}}
+    <span {{contextSensitiveDatetimeTitle singleSectionDueDate}}>
+      {{datetimeFormatted singleSectionDueDate}}
+    </span>
   {{/if}}
 {{/if}}

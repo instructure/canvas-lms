@@ -41,6 +41,17 @@ ru:
   accont: 
     feedback_pricing_sub: "Получить номера для вашей организации"
   account: 
+    account_settings: 
+      account_surveys: "Опросы учетной записи"
+      avatars: "Аватары пользователя"
+      delicious: Delicious
+      diigo: Diigo
+      facebook: Facebook
+      google_docs: "Google Docs"
+      google_docs_preview: "Функция предварительного просмотра Google Docs"
+      linked_in: LinkedIn
+      skype: Skype
+      twitter: Twitter
     ask_canvas_network: "Задать вопрос сообществу сети Canvas"
     default_account_name: "Учетная запись по умолчанию"
     default_site_administrator_account_name: "Администратор сайта"
@@ -151,7 +162,7 @@ ru:
         pass: Пароль
         user: "Имя пользователя"
       ldap_test_login_button: "Проверка входа в систему"
-      test_ldap_bind_help_body: "Сервер LDAP отклонил попытку связи. Обратите внимание на следующее:"
+      test_ldap_bind_help_body: "Сервер LDAP отклонил попытку связывания. Обратите внимание на следующее:"
       test_ldap_bind_help_fixes_1: "Проверьте указанные параметры фильтра (например, \"(sAMAccountName={{login}})\")."
       test_ldap_bind_help_fixes_2: "Для имени пользователя требуется дополнительная информация об области применения? (например, \"cn=Canvas,ou=people,dc=example,dc=com\")."
       test_ldap_bind_help_header: "Canvas не может связаться (войти) с сервером LDAP"
@@ -271,6 +282,8 @@ ru:
       no_term: "Необходимо указать конкретный семестр. Пожалуйста, выберите семестр"
     grades: 
       deleted: "Включить удаленные объекты: true;"
+    granite: 
+      invalid_date_range: "Даты были настроены на диапазон в 1 неделю;"
     mississippi: 
       reports: "Отчеты: %{files}"
     outcomes: 
@@ -340,6 +353,14 @@ ru:
     add_user_dialog_title: "Добавить нового пользователя"
     adding_course_message: "Добавление курса..."
     adding_user_message: "Добавление пользователя..."
+    additional_settings: 
+      account_domains: "Домены учетной записи"
+      account_status: "Статус учетной записи"
+      add_new_domain: "Добавить новый домен"
+      external_status: "Внешний статус"
+      license: Лицензия
+      license_type: "Тип лицензии"
+      new_account_domain_title: "Новый домен учетной записи"
     additional_settings_right_side: 
       links: 
         suspend: "Временно отключить учетную запись"
@@ -481,6 +502,13 @@ ru:
             check_box: Отчеты
           tests: 
             check_box: Тесты
+    assignment_score_summary_csv_description: 
+      account_reports: 
+        granite: 
+          assignme_score_summary: 
+            text: "В этом отчете указаны баллы для всех заданий, оцененных в указанный промежуток времени"
+          description: 
+            header: Пример
     avatars: 
       all_link: 
         one: "Все %{count}"
@@ -534,7 +562,7 @@ ru:
           student_activity: 
             description: 
               header: Пример
-            text: "Данный отчет показывает участие студентов в их курсах. Полученный файл .csv будет содержать по одной строке на каждую регистрацию и будет отображать sis идентификатор студента, имя студента, номер телефона, адрес электронной почты, название курса, последнюю отправку, число дней с последней отправки (LDA), текущее соотношение оценок и дату начала их семестра."
+            text: "Данный отчет отображает информацию об участии студентов в их курсах. Полученный файл .csv будет содержать по одной строке на каждую регистрацию и будет отображать sis идентификатор студента, имя студента, номер телефона, адрес электронной почты, название курса, последнюю отправку, число дней с последней отправки (LDA), текущее соотношение оценок и дату начала их семестра."
     confirm_delete_user: 
       confirm_delete: "Удалить этого пользователя из учетной записи %{account}? Данные пользователя (включая оценки) будут удалены из всех курсов и групп. Этот процесс невозможно отменить."
       delete_button: "Удалить %{user}"
@@ -776,7 +804,7 @@ ru:
           description: 
             header: Пример
           student_activity: 
-            text: "Данный отчет отображает все задания и информацию, относящуюся к тем заданиям, которые входят в указанную группу или группы заданий в заданном диапазоне дат. Данный отчет содержит данные о запланированных тренировках по безопасности с минимальными потерями для основных проверок знаний в классе."
+            text: "Данный отчет отображает все задания и информацию, относящуюся к тем заданиям, которые входят в указанную группу или группы заданий в заданном диапазоне дат. Этот отчет содержит данные о запланированных тренировках по безопасности с минимальными потерями для основных проверок знаний в классе."
     safety_drill_csv_parameters: 
       account_reports: 
         newark: 
@@ -803,9 +831,9 @@ ru:
             field: "Идентификатор раздела"
     settings: 
       about_google_docs: |-
-          Чтобы облегчить работу пользователей и не заставлять из загружать такие файлы, как Word, PDF, таблиц Excel или Open Office (тем более что многим пользователям понадобится сначала установить эти программы), он обеспечивает встроенный предварительный просмотр документа во многих областях Canvas. 
+          Функция предварительного просмотра документов Google Docs позволяет пользователям просматривать документы внутри Canvas, вместо того, чтобы скачивать их и открывать соответствующие программы (например, Word или Excel).
           
-          Если для этой учетной записи поделючен Scribd, он будет использоваться для отображения предварительного просмотра. Но поскольку Scribd использует проигрыватель flash player для отображения документов и у многих пользователей (в частности у пользователей iPad/iPhone) не установлен Flash Player, этот предварительный просмотр не будет работать.  При включении Google Docs Previews, если в обозревателе не установлен Flash или если не подключен Scribd, будет использоваться предварительный просмотр Google Docs. Использование этой службы осуществляется в соответствии с устройством для просмотра Google: [условия обслуживания](%{terms_url})
+          Если для данной учетной записи был подключен Scribd, Canvas попытается использовать его для предварительного просмотра. Если для документа предварительный просмотр в Scribd невозможен, или если у пользователя не установлен проигрыватель Flash player (например, у владельцев iPad/iPhone), Canvas вернется к использованию функции предварительного просмотра Google Docs, если эта функция включена. Используя данную службу, вы подтверждаете, что прочли и согласились с [Условиями обслуживания средства просмотра Google Docs](%{terms_url}).
       about_google_docs_tooltip: "О Google Docs Previews"
       account_admins_title: "Администраторы учетных записей"
       account_quotas: 
@@ -1495,14 +1523,11 @@ ru:
       other: "Смотрите приложенные файлы "
     errors: 
       cannot_save_att: "У вас нет разрешения на изменение заблокированных свойств %{att_name}"
-      import: 
-        external_tool_url: "Url-адрес для задания внешнего средства \"%{assignment_name}\" недействительный."
       upload_as_zip: "Загрузите файлы в качестве ZIP-файла"
     feed_entry_title: "Задание: %{assignment}"
     feed_entry_title_with_course: "Задание, %{course}: %{assignment}"
     gpa_scale_explainer: "Что такое система оценок GPA?"
     group_assignment_must_have_group_set: "Выберите набор групп для данного задания"
-    imported_assignments_group: "Импортированные задания"
     labels: 
       due: До
     name_is_required: "Необходимо указать имя!"
@@ -1810,6 +1835,7 @@ ru:
       freeze_properties: "Блокировка свойств задания при копировании"
       notify_content_change: "Уведомлять пользователей об изменении этого содержания"
       points_possible: Баллы
+      post_to_sis: "Опубликовать на SIS"
       warnings: 
         assignment_is_frozen: "Некоторые настройки были заблокированы администратором."
     errors: 
@@ -1818,6 +1844,11 @@ ru:
       google_docs_masquerade_rejected: "Не удается подключиться к Google Docs в качестве пользователя, выдающего себя за другого."
       reminder_failed: "Сбой напоминания"
     everyone_else: "Все остальные"
+    external_content_homework_submission_view: 
+      additional_comments: "Дополнительные комментарии"
+      buttons: 
+        submit_assignment: "Отправить задание"
+      group_assignment_header: Комментарии...
     external_grader_sidebar: 
       edit_assignment_settings: "Редактировать настройки задания"
       speed_grader: "Speed Grader"
@@ -1935,7 +1966,6 @@ ru:
     labels: 
       assignment_group_move_label: "Группа заданий"
       label_place_before: "Разместить до"
-    loading_tools_failed: "Ошибка загрузки инструментов"
     messages: 
       adding_group: "Добавление группы..."
       agree_to_pledge: "Перед отправкой этого задания необходимо согласиться с обязательством."
@@ -2074,7 +2104,6 @@ ru:
         submission: 
           details: "Сведения о передаче"
           download_attachment: "Загрузить %{attachment_display_name}"
-          view_original_entry: "Просмотреть исходную запись"
           view_original_page: "Просмотреть исходную страницу"
           view_quiz: "Просмотреть переданную контрольную работу"
           view_survey: "Просмотреть переданный опрос"
@@ -2251,6 +2280,8 @@ ru:
         edit_assignment_in_detail: "(разрешить загрузку, редактировать описание и т.д.)"
       titles: 
         wizard_box: "Я хочу:"
+  assignments_api: 
+    invalid_date_time: "Неверно указаны дата и время для %{attribute}"
   attachment: 
     default_filename: Файл
     errors: 
@@ -2355,6 +2386,8 @@ ru:
       user_name_description: "Имя пользователя, принадлежащее пользователю, который имеет доступ учителя/дизайнера к курсу для строки. Оно должно совпадать с одним из имен пользователей, записанных в учетных данных для входа в систему Blackboard."
     only_one_bulk_migration: "В один момент времени может быть запущено только одно массовое перемещение курса."
   button: 
+    go_back: "Вернуться назад"
+    post: "Опубликовать оценки"
     submit_assignment: "Отправить задание"
   buttons: 
     add_item: "Добавить элемент"
@@ -2367,6 +2400,7 @@ ru:
     done: Готово
     filter: Фильтр
     find_user: "Найти пользователя"
+    ignore_all: "Игнорировать все"
     import: Импортировать
     login: "Вход в систему"
     manage_rubrics: "Управление рубриками"
@@ -2712,6 +2746,7 @@ ru:
     ics_description_group: "Календарные события для группы, %{group_name}"
     ics_description_user: "Календарные события для пользователя, %{user_name}"
     ics_title: "%{course_or_group_name} Календарь (Canvas)"
+    invalid_date_or_time: "Неверно указана дата или дата и время для %{attr}"
   calendars: 
     assignment_details: "Сведения о задании"
     calendar: 
@@ -3214,6 +3249,8 @@ ru:
     d2_l_export: 
       content: Содержимое
       options: Опции
+    external_tool_content: 
+      content: Содержимое
     file_required: "Вы должны выбрать файл для импортирования из него содержимого"
     file_too_large: "Перемещаемый вами файл не может превышать %{file_size}"
     hide_issues: "Скрыть проблемы"
@@ -3286,6 +3323,9 @@ ru:
         remove_day_substitution_link: "Убрать замену дней"
         remove_day_substitution_link_label: "Убрать замену дней"
         to_happen_on: к
+      external_tool_launch: 
+        course: Курс
+        find_a_course: "Найти курс"
       folder_picker: 
         default_select_folder: "Выбрать папку"
         upload_to: "Загрузить файл"
@@ -3306,6 +3346,7 @@ ru:
       select_content_checkbox: 
         select_all_content: "Все содержимое"
         select_specific_content: "Выбрать конкретное содержимое"
+    unsupported_migration_type: "Неподдерживаемый тип migration_type для контекста"
     upload_warning: "Переход с данной страницы отменит процесс загрузки."
     uploading: Загрузка...
     web_ct: 
@@ -3333,8 +3374,6 @@ ru:
     titles: 
       tag_external_web_page: "Внешняя веб-страница тега"
   context: 
-    all_marked_read: "Входящие сообщения отмечены как прочитанные"
-    bad_message: "Это сообщение не может быть отображено"
     communication: 
       headings: 
         discussions: Обсуждения
@@ -3351,38 +3390,10 @@ ru:
       last_updated: "последнее обновление"
       links: 
         restore: восстановить
-    inbox: 
-      buttons: 
-        mark_all_as_read: "Пометить все сообщения как прочитанные"
-      errors: 
-        mark_as_read_failed: "Сбой отметки, повторите попытку"
-      inbox: 
-        discussion_replies: "Ответы в обсуждении"
-      status: 
-        marking_all_as_read: "Выполняется пометка всех как прочитанных"
-    inbox_item: 
-      images: 
-        alt: 
-          topic: тема
-        title: 
-          topic: 
-            read: "Сообщение обсуждения  - прочитано"
-            unread: "Сообщение обсуждения"
-      links: 
-        remove: Удалить
-        title: 
-          remove_message: "Удалить это сообщение"
-      no_title: "Без названия"
-    inbox_items: 
-      inbox_delete_confirm: "Удалить этот элемент из входящей почты?"
-      loading_results: "Загрузка других результатов"
-      no_messages: "Пока нет сообщений."
     media_object_inline: 
       titles: 
         media_playback: "Воспроизведение мультимедиа"
     media_objects_not_configured: "Мультимедийные объекты не настроены"
-    message_deleted: "Это сообщение удалено"
-    message_removed: "Сообщение, которое вы пытаетесь просмотреть, удалено"
     new_roster_user: 
       completed_enrollment: "завершено *%{completed_at}*"
       confirm: 
@@ -3517,10 +3528,8 @@ ru:
       restore_failed: "восстановление не удалось"
       restoring: восстановление...
   context_external_tool: 
-    external_tool_attention_needed: "Параметры безопасности для внешнего инструмента \"%{tool_name}\" должны быть установлены в настройках курса."
     url_or_domain_required: "Либо URL, либо домен должны быть настроены."
   context_module: 
-    migration_module_item_type: "Элемент модуля"
     requirements: 
       max_score: "должен быть не более %{score}"
       min_score: "результат должен быть не менее %{score}"
@@ -4286,7 +4295,6 @@ ru:
     default_short_name: Курс-101
     errors: 
       sis_in_use: "Идентификатор SIS \"%{sis_id}\" уже используется"
-    failed_import_media_objects: "Не удалось импортировать мультимедийные объекты"
     file_copy_error: "Не удалось скопировать файл \"%{name}\""
     grade_export_types: 
       instructure_csv: "Форматированный Instructure CSV"
@@ -4725,12 +4733,13 @@ ru:
       edit_sections_view: 
         edit_sections_desc: "Разделы являются дополнительным способом организации пользователей. Это позволит вам преподавать в нескольких классах того же курса. Таким образом, вы можете хранить содержимое курса в одном месте. Ниже вы можете перемещать пользователя в другой раздел или добавить/удалить регистрации в разделе. Пользователи все время должны быть, по крайней мере, в одном разделе."
       index: 
-        add_people: "Добавить людей"
         cannot_add_users: "Новые пользователи не могут быть добавлены, поскольку данный курс закончен"
         filter_field_description: "Когда вы начнете набирать текст в этом поле, список пользователей будет автоматически фильтроваться, оставляя только те имена, которые соответствуют вашему вводу."
         filter_list_of_people: "Отфильтровать список пользователей"
+        people: Пользователи
         role_to_search: "Ограничить поиск для роли"
         search_people: "Поиск пользователей"
+        title_add_people: "Добавить пользователей"
       invitations_view: 
         accepted_invitation: "%{name} уже получил(а) и принял(а) приглашение присоединиться к курсу, но вы по-прежнему можете повторно отправить приглашение, если это необходимо."
         admin_invitation_unaccepted: "%{name} еще не принял(а) приглашение присоединиться к курсу. Приглашение было отправлено: %{time}"
@@ -4907,6 +4916,10 @@ ru:
         assignments: "В этом представлении отображается **список заданий** для этого курса, предстоящие и недавние задания показаны сверху."
         confirm_unenroll: "Действительно хотите отменить регистрацию на этот курс? Вы больше не сможете просматривать список курсов или связываться непосредственно с учителями, и вы больше не будете видеть события курса в потоке и как уведомления."
         custom_page: "Можно **создать собственную домашнюю страницу курса** и включить любые ссылки, изображения и мультимедийные объекты."
+        modules: |-
+            Можно систематизировать курс по **модулям или разделам**, где каждый раздел содержит связанный набор файлов, заданий, страниц и т. д. При необходимости можно также расположить модули последовательно, определив критерии и предварительные условия, которые должны быть выполнены для разблокирования каждого модуля.
+            
+                        -Эта структура лучше всего подходит для курсов, не основанных на определенном расписании, таком как срок или семестр.
         recent_activity_dashboard: "**Информационная панель недавней активности** позволяет участникам просматривать самые последние разговоры, объявления, обсуждения и взаимодействия для данного курса. Это очень похоже на информационную панель страницы пользователей, когда они впервые входят в систему, но отображается только содержимое этого конкретного курса."
         syllabus: "**Представление программы обучения** позволяет создавать подробные описания ожиданий курса или вводить курс со ссылками, изображениями и другими объектами, а затем также отображать представление календаря со всеми заданиями и событиями курса."
       draft_state: 
@@ -5027,9 +5040,6 @@ ru:
       invalid_link: "Используемая ссылка регистрации больше недействительна.  Обратитесь к инструктору курса и убедитесь в правильности регистрации."
   create_users_view: 
     required: "Введите несколько адресов электронной почты"
-  crumb: 
-    conversations: Разговоры
-    discussion_replies: "Ответы в обсуждении"
   crumbs: 
     access_report: "Отчет о доступе"
     announcements: Объявления
@@ -5043,7 +5053,6 @@ ru:
     eportfolio_welcome: "Вас приветствует ePortfolio"
     error_reports: "Отчеты об ошибках"
     files: Файлы
-    gradebook: "Табель успеваемости"
     grades: Оценки
     grading_schemes: "Схемы оценок"
     groups: Группы
@@ -5293,58 +5302,82 @@ ru:
   default_question_name: Вопрос
   default_question_text: "Текст вопроса"
   demos: 
+    _register: 
+      add_site: "Добавить сайт"
+      invalid_email: "Недействительный адрес электронной почты"
+      personalizing: "Применение индивидуальных настроек..."
+      ready: Готово!
+      registered_successfully: "Регистрация прошла успешно!"
+      specify_location: "Пожалуйста, укажите свое географическое местоположение"
+      try_again: "Повторите попытку"
+      you_must_agree_to_terms: "Вы должны согласиться с условиями использования"
     demos_add: 
       labels: 
         school_name: "Название школы"
         username: "Адрес электронной почты"
     register: 
-      add_site: "Добавить сайт"
+      africa: Африка
       agree_to_terms: "Я согласен с *правилами использования* и признаю **политику конфиденциальности**."
+      asia_and_middle_east: "Азия и Ближний Восток"
+      assistant_superintendent: "Помощник руководителя"
+      australia_new_zealand_and_oceania: "Австралия, Новая Зеландия и Океания"
       begin_trial: "Запустить пробную версию"
-      choose: Выбрать
+      bus_finance_purchasing_director: "Бизнес/финансовый директор/директор по закупкам"
+      c_level: "Уровень С"
+      choose: "Выбрать один"
       cio: ИТ-директор
       corporate: Корпоративный
       dean: Декан
       director: Директор
+      e_rate_administrator: "Администратор ERate"
+      employee: Сотрудник
+      europe_other: "Европа – другие"
+      europe_uk: "Европа – Великобритания"
+      executive_officer: "Должностное лицо"
+      government: "Государственный служащий"
+      gs_11_15: "GS 11-15"
+      gs_1_7: "GS 1-7"
+      gs_8_10: "GS 8-10"
       higher_education: "Высшее образование"
+      higher_education_for_profit: "Коммерческое высшее образование"
       incorrect: "Неверно. Повторите попытку."
       instructional_designer: "Дизайнер учебного процесса"
-      invalid_email: "Недействительный адрес электронной почты"
+      instructional_media_svcs_dir: "Директор отдела обучающих мультимедийных материалов"
       k12: K12
+      k12_for_profit: "K12 коммерческое"
       labels: 
-        current_lms: "Текущие LMS"
+        location: Местоположение
         name: Имя
-        organization_size: "Размер организации"
         organization_type: "Тип организации"
         phone: "Номер телефона"
-        school_name: Школа/организация
+        school_name: Школа/Организация
         school_position: Заголовок
         type_what_you_hear: "Печатайте то, что вы слышите"
         type_what_you_see: "Печатайте то, что вы видите"
         username: "Электронная почта"
-      lms_admin: "Администратор LMS"
-      no_lms: Нет
+      library_media_specialist: "Специалист хранилища мультимедийных данных/библиотеки"
+      lms_administrator: "Администратор LMS"
+      manager: Менеджер
+      network_system_administrator: "Системный администратор сети"
       one: Другое
       other: Другое
-      other_lms: Другое
-      other_title: Другое
       personalize_demo: "Индивидуальная настройка демонстрации"
-      personalizing: "Применение индивидуальных настроек..."
-      proprietary_lms: "Собственный / Патентованный"
+      principal: Директор
       provost: Проректор
-      ready: Готово!
-      school_admin: "Администратор школы"
+      school_administrator: "Администратор школы"
+      school_technology_coordinator: "Координатор методик школьного образования"
       sign_up_to_canvas: "Зарегистрируйтесь, чтобы попробовать Canvas"
-      specify_lms: "Пожалуйста, укажите ваш текущий LMS или выберите 'нет'"
-      specify_size: "Пожалуйста, укажите размер вашей организации"
+      south_america_central_america_and_caribbean: "Южная Америка, Центральная Америка и Карибский бассейн"
       student: Студент
       subscribe: " Я хочу получать новости, советы и информацию от Instructure"
+      superintendent: Руководитель
       support: Поддержка
-      teacher: Учитель/Инструктор
+      teacher_instructor: Учитель/Инструктор
       technologist: Техник
-      try_again: "Повторите попытку"
-      vice_president: VP
-      you_must_agree_to_terms: "Вы должны согласиться с условиями использования"
+      technology_computer_coord: "Технологический/компьютерный координатор"
+      technology_education_director: "Директор методик образования"
+      united_states_and_canada: "Соединенные Штаты Америки и Канада"
+      vp: VP
   developer_key: 
     api_key: "Ключ: *%{api_key}*"
     created: "Создан: "
@@ -6174,6 +6207,7 @@ ru:
       search_filter: "Сортировать по имени"
       view_app_center: "Просмотреть App Center"
       view_installed_tools: "Просмотреть конфигурации приложения"
+    migration_selection_configured: "Выбор перемещения настроен"
     missing_stars: "Вы должны выбрать рейтинг (количество звезд)"
     rate_tool_view: 
       rate_tool: "Как вы оцениваете этот инструмент?"
@@ -6263,8 +6297,11 @@ ru:
         При отключении этой функции будут опубликованы ВСЕ существующие объекты в этом курсе. Пожалуйста, убедитесь, что черновые версии содержимого
         готовы к публикации и доступны для всех пользователей, прежде чем продолжить.
     google_docs_domain_restriction: "Ограничение домена Google Docs"
+    high_contrast: "Использовать стили повышенной контрастности"
     individual_gradebook: "Просмотр личного  табеля успеваемости"
-    outcome_gradebook: "Табель успеваемости по результатам"
+    learning_mastery_gradebook: "Табель успеваемости по усвоению обучения"
+    new_styles: "Использовать новые стили"
+    post_grades: "Опубликовать оценки в SIS"
     student_outcome_gradebook: "Табель успеваемости по результатам студентов"
   file_browser_view: 
     folder_tree_instructions: "Используйте клавиши со стрелками вверх и вниз для перемещения по дереву. Нажмите клавишу со стрелкой вправо, чтобы развернуть папки, со стрелкой влево, чтобы свернуть, и клавишу ВВОД, чтобы выбрать изображение."
@@ -6476,6 +6513,10 @@ ru:
       Google Docs одним доменом. Студенты, пытающиеся отправить задания или присоединиться 
       к совместной работе в запрещенных доменах, получат сообщение об ошибке, уведомляющее их о том, 
       что им необходимо обновить их настройки интеграции с Google Docs.
+  grade_display_warning_dialog: 
+    grade_display_warning: 
+      checkbox: "Не показывать снова для этого курса."
+      warning: Предупреждение
   gradebook: 
     alerts: 
       no_active_students: "В курсе нет активных студентов, или нет студентов для оценки."
@@ -6520,7 +6561,6 @@ ru:
       none_to_update: "Нет объектов для обновления"
       select_an_option: "Выберите опцию"
       upload_as_zip: "Загрузите файлы как ZIP-файл"
-    grade: "оценка: %{grade}"
     graded_by_me: "%{graded_time} мной"
     graded_then_resubmitted: "оценено, затем отправлено повторно (%{when})"
     gradee_index_of_total: "%{gradee} %{x} от %{y}"
@@ -6540,7 +6580,6 @@ ru:
       submission_details: "Сведения об отправке"
       view_quiz: "Просмотреть эту контрольную работу"
       view_submission: "Просмотреть отправку"
-    loud_late: ПОЗДНО
     message_students_who: "Отправить сообщения студентов, которые..."
     mute_assignment: "Отключить звук задания"
     new_assessment: "[Новая проверка знаний]"
@@ -6620,6 +6659,11 @@ ru:
     errors: 
       none_to_update: "Нет объектов для обновления"
       upload_as_zip: "Загрузите файлы как ZIP-файл"
+    grade_display_warning: 
+      cancel: Отменить
+      continue: Продолжить
+      percent_text: "Студенты также увидят свои итоговые оценки в процентном выражении. Вы уверены, что хотите продолжить?"
+      points_text: "Студенты также увидят свои итоговые оценки в виде баллов. Вы уверены, что хотите продолжить?"
     gradebook_header_menu: 
       assignment_details: "Сведения о задании"
       curve_grades: "Создание кривой оценок"
@@ -6643,12 +6687,14 @@ ru:
     keyboard_comment_desc: "Прокомментировать активную отправку"
     keyboard_menu_desc: "Открыть меню для назначения активного столбца"
     keyboard_sort_desc: "Сортировать сетку по текущему активному столбцу"
+    keyboard_tooltip_desc: "Показать тип отправки для активных отправок"
     keycodes: 
       close_menu: esc
       comment: c
       goto_assignment: з
       menu: m
       sort: s
+      tooltip: t
     learning_outcome: "Результат обучения"
     mastery: усвоено
     near_mastery: "почти усвоено"
@@ -6667,29 +6713,10 @@ ru:
     resubmitted: "Отправлено заново после последней оценки"
     row_student_name: 
       student_placeholder: Студент
-    screenreader: 
-      page_titles: "Табель успеваемости для программ для чтения с экрана"
     secondary_id: "Вторичное ID"
     section_to_show_menu: 
       choose_a_section_to_show: "Выберите раздел для отображения"
       showing_sections: "Отображение *%{currentSection}*"
-    show: 
-      arrange_columns_by_due_date: "Сортировать столбцы по даты выполнения"
-      arrange_columns_by_group: "Сортировать столбцы по группе заданий"
-      download_scores: "Загрузка оценок (.csv)"
-      filter_by_student: "Фильтр по имени студента или вторичному идентификатору"
-      grades: Оценки
-      hide_student_names: "Скрыть имена студентов"
-      include_ungraded: "Рассматривать неоцененные как 0"
-      learning_mastery: "Усвоение обучения"
-      old_gradebook: "старый табель успеваемости"
-      publish_to_sis: "Публикация оценок в SIS"
-      set_group_weights: "Установить весовые критерии для группы"
-      show_attendance_columns: "Показать столбцы участников"
-      show_concluded_enrollments: "Показать завершенные регистрации"
-      srgb_gradebook: "переключить табели успеваемости"
-      upload_scores: "Загрузка оценок (из .csv)"
-      view_grading_history: "Просмотр истории оценок"
     show_notes: "Показать столбец заметок"
     show_student_names: "Показать имена студентов"
     student_name: "Имя студента"
@@ -6710,6 +6737,7 @@ ru:
     titles: 
       discussion: "Отправка обсуждения"
       media: "Отправка мультимедийного комментария"
+      media_recording: "Отправка мультимедийной записи"
       quiz_review: "Требуется проверка этой контрольной работы"
       text: "Отправка текстовой записи"
       upload: "Отправка загрузки файла"
@@ -6968,6 +6996,24 @@ ru:
       upload_info: "Если в файлы отправок студентов ранее вносились изменения, просто заархивируйте их и загрузите ZIP-файл, используя форму ниже. Студенты будут видеть измененные файлы в комментариях для отправки."
       upload_warning: "Убедитесь, что имена файлов подписок не изменены, чтобы их можно было распознать."
       weight_final: "Взвесить итоговую оценку на основе групп"
+    gradebook2: 
+      arrange_columns_by_due_date: "Сортировать столбцы по сроку выполнения"
+      arrange_columns_by_group: "Сортировать столбцы по группе заданий"
+      download_scores: "Скачать оценки (.csv)"
+      filter_by_student: "Фильтр по имени студента или вторичному идентификатору"
+      grades: Оценки
+      hide_student_names: "Скрыть имена студентов"
+      include_ungraded: "Считать неоцененные как 0"
+      learning_mastery: "Усвоение обучения"
+      old_gradebook: "старый табель успеваемости"
+      post_grades: "Опубликовать оценки"
+      publish_to_sis: "Опубликовать оценки в SIS"
+      set_group_weights: "Установить весовые критерии для группы"
+      show_attendance_columns: "Показать столбцы посещений"
+      show_concluded_enrollments: "Показать завершенные регистрации"
+      srgb_gradebook: "переключить табели успеваемости"
+      upload_scores: "Загрузить оценки (из файла .csv)"
+      view_grading_history: "Просмотр истории оценок"
     grades: 
       complete: Завершено
       incomplete: "Не завершено"
@@ -7003,6 +7049,8 @@ ru:
         other: "Файлы и комментарии созданы для %{count} отправлений"
     out_of_final: "%{weight} итога"
     out_of_points_possible: "из %{points_possible}"
+    screenreader: 
+      page_titles: "Табель успеваемости для программ для чтения с экрана"
     show: 
       keycode_descriptions: 
         edit_cell: "Редактировать ячейку"
@@ -7066,8 +7114,6 @@ ru:
         show_assessment_by: "Показать проверки знаний по"
         showing: Отображение
         sort_by: "Сортировка списка студентов"
-        submission_to_view: "Отправка для отображения"
-        submitted: Отправлено
       late_notice: "Примечание: Эта отправка передана ПОЗДНО"
       links: 
         click_to_view: "щелкните здесь для просмотра"
@@ -7585,6 +7631,9 @@ ru:
         few: "*%{count}* обсуждения"
         one: "*1* обсуждение"
         other: "*%{count}* обсуждений"
+  high_contrast_description: |-
+      Если вы предпочитаете версию пользовательского интерфейса Canvas повышенной контрастности, включите ее.
+      Это может быть полезно для людей со слабым зрением или при проблемах с чтением.
   ic_actions: 
     manage: управлять
   images: 
@@ -7594,6 +7643,28 @@ ru:
     invalid_file_size: "Размер изображения превышает допустимый (макс. %{max} байт, получено %{actual})"
     invalid_file_type: "Неверный тип файла %{type}. Разрешены следующие типы: %{type_list}"
     not_an_image: "Выбранный файл не является изображением"
+  importers/assignment_importer: 
+    errors: 
+      import: 
+        external_tool_url: "Url-адрес для задания внешнего средства \"%{assignment_name}\" — недействительный."
+    imported_assignments_group: "Импортированные задания"
+  importers/context_external_tool_importer: 
+    external_tool_attention_needed: "Параметры безопасности для внешнего инструмента \"%{tool_name}\" должны быть установлены в настройках курса."
+  importers/context_module_importer: 
+    migration_module_item_type: "Элемент модуля"
+  importers/course_content_importer: 
+    failed_import_media_objects: "Не удалось импортировать мультимедийные объекты"
+  importers/learning_outcome_group_importer: 
+    no_global_permission: "Вы не можете управлять общими результатами, невозможно добавить \"%{title}\""
+  importers/learning_outcome_importer: 
+    no_context_found: "Внешние результаты обучения для \"%{title}\" не могут быть найдены, создание копии."
+    no_global_permission: "Вы не можете управлять общими результатами, невозможно добавить \"%{title}\""
+  importers/rubric_importer: 
+    no_context_found: "Внешняя рубрика для \"%{title}\" не может быть найдена, создание копии."
+  importers/wiki_page_importer: 
+    title_for_topics_category: "Темы %{category}"
+    warnings: 
+      truncated_wiki_title: "Заголовок следующей вики-страницы был усечен: %{title}"
   individual_gradebook_description: "Вид личного табеля успеваемости представляет просмотр табеля успеваемости, который разработан, чтобы улучшить доступность."
   info: 
     notices: 
@@ -7714,6 +7785,7 @@ ru:
         locked_by: Заблокировано
         max_attempts: "Максимальное число попыток"
         num_attempts: Попытки
+        original_id: "Оригинальный идентификатор"
         priority: Приоритет
         run_at: "Выполнить в"
         strand: конфликт
@@ -7770,13 +7842,14 @@ ru:
       view_all_groups: "Просмотр всех групп"
     mobile_auth: 
       log_in_to_canvas: "Войти в систему Canvas"
+  learning_mastery_gradebook_description: |-
+      Табель успеваемости по усвоению обучения позволяет учителям быстро просматривать прогресс студента
+      и курса по результатам обучения. Результаты представлены в формате табеля успеваемости,
+      и прогресс студента отображается как в виде числовой оценки, так и по шкале усвоено/
+      почти усвоено/коррекция.
   learning_outcome: 
     no_comment: "Нет комментария"
-    no_context_found: "Внешние результаты обучения с названием \"%{title}\" не могут быть найдены, создание копии."
     no_description: "Нет описания"
-    no_global_permission: "Вы не можете управлять общими результатами, невозможно добавить \"%{title}\""
-  learning_outcome_group: 
-    no_global_permission: "Вы не можете управлять общими результатами, невозможно добавить \"%{title}\""
   lib: 
     angel: 
       failed_import_link: "Ошибочная ссылка на импорт"
@@ -8667,13 +8740,11 @@ ru:
         subject: "Подтвердите электронную почту: Canvas"
     confirm_registration: 
       email: 
-        body: "Благодарим за регистрацию в Canvas!  Это сообщение электронной почты — подтверждение регистрации пользователем %{user} новой учетной записи на %{website}."
         details: "Для завершения процесса регистрации перейдите по следующему url-адресу:"
         html: 
-          body: "Благодарим за регистрацию в Canvas! Данное электронное сообщение подтверждает, что пользователь %{user} зарегистрирован с новой учетной записью на %{website}."
+          body: "Благодарим вас за регистрацию в %{product_name}! Данное электронное сообщение подтверждает, что пользователь %{user} зарегистрирован с новой учетной записью на %{website}."
           details: "Щелкните здесь для завершения процесса регистрации"
-          subject: "Подтвердите регистрацию: Canvas"
-        subject: "Подтвердить регистрацию: Canvas"
+          subject: "Подтвердить регистрацию: %{product_name}"
     confirm_sms_communication_channel: 
       sms: 
         body: |-
@@ -9926,6 +9997,7 @@ ru:
       module: 
         prerequisites: "Предварительные условия"
         published: Опубликовано
+    post_grades_dialog_title: "Опубликовать оценки в SIS"
     progression_module_collection: 
       module_progress_for: "Ход выполнения модуля %h{student_link}"
       module_progress_for_student: "Ход выполнения модуля %{student.name}"
@@ -9939,7 +10011,10 @@ ru:
       back_to_modules: "Вернуться к странице модулей"
       no_students_found: "Студенты не найдены"
       student_progress: "Ход выполнения студентом"
+  moodle_dropdown_many_warning_title: "%{count} вопроса (-ов) с несколькими раскрывающимися списками в данном банке могли быть импортированы некорректно"
   moodle_dropdown_warning_title: "Несколько раскрывающихся списков вопросов могли быть импортированы некорректно"
+  moodle_formula_many_warning_title: "%{count} вопроса (-ов) с формулой в данном банке требуют повторного создания возможных ответов на них"
+  moodle_formula_warning_title: "Необходимо повторно создать возможные ответы для вопроса с формулой"
   move_dialog: 
     cancel: Отменить
     save: Сохранить
@@ -9959,6 +10034,9 @@ ru:
     sure_you_want_to_mute: "Действительно хотите отключить звук этого задания? Пока звук этого задания отключен, студенты не будут получать новые уведомления и не смогут просматривать:"
   name: "Импортер Academic Benchmark"
   new_facebook_message: "У вас есть новое сообщение от Canvas"
+  new_styles_description: |-
+      Мы работаем над внешним обновлением пользовательского интерфейса для Canvas. Включите его, чтобы согласиться на просмотр
+      обновленного упрощенного внешнего вида и функций интерфейса Canvas.
   no_migration_file: "Файл, необходимый для перемещения содержимого."
   not_a_number: "должно быть положительным числом"
   not_applicable: Недоступно
@@ -10166,11 +10244,6 @@ ru:
     : Нет
     ? "yes"
     : Да
-  outcome_gradebook_description: |-
-      Табель успеваемости по результатам позволяет учителям быстро просматривать прогресс студента
-      и курса по результатам обучения. Результаты представлены в формате табеля успеваемости,
-      и прогресс студента отображается как в виде числовой оценки, так и по шкале усвоено/
-      почти усвоено/коррекция.
   outcome_groups: 
     invalid_file: "Неверный файл группы результатов"
   outcome_groups_api: 
@@ -10698,11 +10771,16 @@ ru:
         access_key: "Ключ доступа"
         api_url: "Url-адрес Api"
         secret_key: "Секретный ключ"
+  post_grades_description: |-
+      Публикация оценок позволяет учителям публиковать оценки в разрешенных SIS-системах: Powerschool,
+      Aspire (SIS2000), JMC и любые другие разрешенные в SIF SIS, которые допускают SIF-элементы GradingCategory,
+      GradingAssignment, GradingAssignmentScore.
   prerequisites_lookup: 
     headers: 
       completion_prerequisites: "Предварительные условия выполнения"
     labels: 
       requirements_must_be_completed: "Для разблокирования этой страницы должны быть выполнены следующие требования"
+  product_name: Canvas
   profile: 
     access_token: 
       default_app_name: "Нет приложений"
@@ -10825,7 +10903,6 @@ ru:
         change_password: "Изменить пароль"
         confirm_password: "Подтвердить пароль"
         default_email: "Адрес электронной почты по умолчанию"
-        enabled_theme: "Включенная тема"
         expires_at: Истекает
         headers: 
           approved_integrations: "Утвержденные интеграции"
@@ -11129,6 +11206,93 @@ ru:
       publishing: Публикация...
       unpublish: "Отменить публикацию"
       unpublishing: "Отмена публикации…"
+  publish_grades: 
+    assignment_group_list: 
+      no_assignment_groups: "Группы заданий не найдены"
+    assignment_group_list_item: 
+      group_weight: "%{groupWeight}% от общего числа"
+      manage: Управлять
+    assignment_list_item: 
+      assignment_edit: "Редактировать задание"
+      module: Модуль
+      multiple_modules: "Несколько модулей"
+      no_points_possible: "Нет возможных баллов"
+      points_possible: "%{pointsPossible} балла (-ов)"
+      points_possible_screen_reader: "%{pointsPossible} возможных балла (-ов)"
+      settings: "Редактировать задание"
+    assignment_list_item_score: 
+      assignment_grading_type_is_not_graded: "Этому заданию не будет присвоена оценка."
+      assignment_not_yet_graded_screenreader: "Задание еще не оценено. %{pointsPossible} возможных балла (-ов)."
+      empty_points_possible: "-/%{pointsPossible} балла (-ов)"
+      no_submission: "Нет отправки"
+      no_submission_for_assignment_screenreader: "По данному заданию ничего не отправлено. %{pointsPossible} возможных балла (-ов)."
+      not_yet_graded: "*Еще не оценено*"
+      score_with_points_possible: "*%{score}*/%{pointsPossible} балла (-ов)"
+      score_with_points_possible_screenreader: "Оценка: %{score} из %{pointsPossible} баллов."
+    assignment_settings: 
+      cancel: Отменить
+      save: Сохранить
+      validating: Сохранение...
+      weight_groups: "Взвесить итоговую оценку на основе групп заданий"
+    available_date_description: 
+      available_until: "Доступно до"
+      closed: Закрыто
+      not_available_until: "Недоступно до"
+    create_assignment: 
+      assignment: Задание
+      assignment_due_at: "До:"
+      assignment_name: "Имя:"
+      assignment_points: "Баллы:"
+      assignment_type: "Тип:"
+      cancel: Отменить
+      discussion_type: Обсуждение
+      external_tool_type: "Внешний инструмент"
+      more: "Перейти к %{objectType}"
+      multiple_due_dates: "Несколько сроков выполнения"
+      not_graded_type: "Не оценено"
+      quiz_type: "Контрольная работа"
+      save: Сохранить
+      saving: Сохранение...
+    date_available_column_view: 
+      available: Доступно
+      multiple_dates: "Несколько дат"
+    date_due_column_view: 
+      due: Срок
+      due_date: Срок
+      multiple_dates: "Несколько дат"
+    due_date_view: 
+      overrides: 
+        remove_these_dates: "Удалить эти даты"
+    edit_header_view: 
+      buttons: 
+        not_published: "Не опубликовано"
+        published: Опубликовано
+      manage: Управлять
+      titles: 
+        delete: Удалить
+    group_category_selector: 
+      grade_group_students_individually: "Назначить оценки каждому студенту по отдельности"
+      group_assignment_header: "Группа заданий"
+      group_category_options: "Новая категория группы"
+      group_set: "Набор групп"
+      is_group_assignment: "Это  группа заданий"
+      students_already_submitted_warning: "Предыдущие личные отправки не будут учитываться в качестве групповых отправок и не будут должным образом отображаться в SpeedGrader."
+    index_view: 
+      add_group: "Опубликовать оценки за задание"
+      assignments: Задания
+      search_for_assignment: "Поиск заданий"
+      title_add_group: "Добавить группу заданий"
+    never_drop: 
+      remove_rule: "Удалить правило"
+    never_drop_collection: 
+      add_another_assignment: "Добавить другое задание"
+      add_first_assignment: "Добавить задание"
+    no_assignments_list_item: 
+      no_assignments_in_this_group: "В данной группе нет заданий"
+    no_assignments_search: 
+      aria_assignments: Задания
+      assignments: Задания
+      no_assignments_found: "Задания не найдены"
   publish_icon_component: 
     publish: Опубликовать
     publish_click: "опубликовано, щелкните, чтобы отменить публикацию."
@@ -11522,6 +11686,7 @@ ru:
     quiz_question: 
       defaults: 
         question_name: Вопрос
+    quiz_short_answer_length_error: "Ответы на вопросы в бланке должны быть не длиннее 80 символов"
     quiz_statistics: 
       statistics_filename: "Отчет %{quiz_title} %{quiz_type} %{report_type}"
       types: 
@@ -11532,6 +11697,8 @@ ru:
         this_is_an_external_element: "Это внешний элемент, не текст, который мог быть изменен после отправки студента"
         this_is_an_external_frame: "Это внешний кадр, не текст, который мог быть изменен после отправки студента"
         this_is_an_image: "Это изображение, не текст, которое могло быть изменено после отправки студента"
+    quiz_submission_users: 
+      created: создано
     quiz_submissions: 
       errors: 
         invalid_submissions: "Данная отправленная контрольная работа не может быть определена как принадлежащая вам. Повторите попытку."
@@ -11581,7 +11748,6 @@ ru:
         not_yet_graded: "Еще не оценено"
         original_score: "Исходная оценка:"
         points_possible: "%{points_possible} балла (-ов)"
-        question_number: "Вопрос %{question_number}"
         regraded_score: "Оценка после повторной оценки:"
         show_ansers_for_variable: "Показать ответы для %{variable}"
         skip_question_text: "Перейти к тексту вопроса."
@@ -12372,6 +12538,8 @@ ru:
       few: "%{count} вопроса"
       one: "1 вопрос"
       other: "%{count} вопросов"
+  quizzes_redirects: 
+    no_access: "В доступе отказано. Вы перенаправлены на страницу, к которой у вас есть доступ."
   re_upload_submissions_form: 
     buttons: 
       upload: "Загрузить файлы"
@@ -12437,13 +12605,13 @@ ru:
     permission: 
       read_sis: "Прочитать данные SIS"
     permissions: 
+      app_profiling: "Профилирование приложения"
       become_user: "Стать другими пользователями"
       change_course_state: "Изменить состояние курса"
       comment_on_others_submissions: "Просмотр отправок всех студентов и их комментирование"
       create_accounts: "Создание новых корневых учетных записей"
       create_collaborations: "Создание совместных работ студентов"
       create_conferences: "Создание веб-конференций"
-      generate_data_exports: "Создать экспорт данных"
       manage_account_memberships: "Добавление/удаление других администраторов для учетной записи"
       manage_account_settings: "Управление настройками уровня учетной записи"
       manage_admin_users: "Добавление/удаление других учителей, дизайнеров курса или ассистентов к курсу"
@@ -12551,7 +12719,6 @@ ru:
     updating: Обновление...
   rubric: 
     context_name_rubric: "%{course_name} Рубрика"
-    no_context_found: "Внешние рубрики с названием \"%{title}\" не могут быть найдены, создание копии."
     no_description: "Нет описания"
     unknown_details: "Неизвестные сведения"
   rubric_assessment: 
@@ -13499,6 +13666,13 @@ ru:
       back: Назад
       close: Закрыть
       forward: Переслать
+  speed_grader: 
+    submissions_dropdown: 
+      grade: "(оценка: %{grade})"
+      loud_late: ПОЗДНО
+      see_all_quiz_attempts: "Посмотреть все попытки выполнения контрольной работы"
+      submission_to_view: "Отправка для отображения:"
+      submitted: "*Отправлено:* %{submittedAt}"
   sr_gradebook: 
     all_sections: "Все разделы"
     assignment_muted: "Щелкните, чтобы включить звук."
@@ -13623,6 +13797,7 @@ ru:
     click_to_download: "Щелкните здесь для загрузки %{size_of_file}"
     creating_zip: "Создание ZIP-файла..."
     download_submissions: "Загрузка отправленных заданий"
+    download_submissions_title: "Скачать отправки заданий"
     errors: 
       assignment_submit_fail: "Ошибка отправки задания"
       can_not_submit_locked_assignment: "Нельзя отправить заблокированное задание"
@@ -13635,6 +13810,7 @@ ru:
       student_not_enrolled_id: "Указанный пользователь (%{id}) Указанный студент"
     errors_update_failed: "Сбой обновления"
     finished_redirecting: "Завершено!  Перенаправление к файлу..."
+    gathering_files: "Сбор файлов (%{progress})..."
     gathering_files_progress: "Сбор файлов (%{progress})..."
     resubmitted_to_turnitin: "Повторно отправлено на Turnitin."
     see_attached_files: "Смотрите приложенные файлы "
@@ -13804,7 +13980,7 @@ ru:
   text_helper: 
     time: 
       ranges: 
-        different_days: "%{start_date_and_time} — %{end_date_and_time}"
+        different_days: "%{start_date_and_time} *—* %{end_date_and_time}"
   time: 
     am: am
     count_hours_ago: 
@@ -14054,6 +14230,7 @@ ru:
         find_user: "Найти пользователя"
         merge_users: "Объединить учетные записи пользователей"
         really_merge: "Действительно объединить учетные записи пользователей?"
+    birthdate_invalid: "Недопустимая дата или дата и время для даты рождения"
     cant_self_merge: "Нельзя объединить учетную запись с самой собою."
     cc_prefs: 
       buttons: 
@@ -14436,10 +14613,7 @@ ru:
       blank_title: "Заголовок не может быть пустым"
       title_characters: "Заголовок должен содержать ходя бы одну букву или цифру"
       title_too_long: "Заголовок не может превышать %{max_characters} символов"
-    title_for_topics_category: "Темы %{category}"
     unknown_user_name: Неизвестно
-    warnings: 
-      truncated_wiki_title: "Заголовок следующей вики-страницы был усечен: %{title}"
   wiki_page_revisions: 
     index: 
       links: 
@@ -14549,7 +14723,7 @@ ru:
       archive: Архив
       archive_link: "Просмотр архива(-ов)"
   zip_argument_error: "Для загрузки файлов .zip требуется папка, в которую будет осуществляться загрузка."
-  zip_file_description: "Подключаемый модуль перемещения для распаковки файлов .zip в курс"
+  zip_file_description: "Подключаемый модуль перемещения для распаковки архивов .zip в файлах курса, группы или пользователя"
   zip_file_display: "Импорт файла"
   zip_file_file_description: "Распаковать файл .zip в папку"
   zip_file_imports: 

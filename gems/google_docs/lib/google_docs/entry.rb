@@ -16,90 +16,90 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 module GoogleDocs
-class Entry
-  def self.extension_looker_upper
-    @extension_looker_upper
-  end
-
-  def self.extension_looker_upper=(extension_looker_upper)
-    @extension_looker_upper=extension_looker_upper
-  end
-
-  attr_reader :document_id, :folder, :entry
-
-  def initialize(entry)
-    if entry.is_a?(String)
-      @entry = Atom::Entry.load_entry(entry)
-    else
-      @entry = entry
+  class Entry
+    def self.extension_looker_upper
+      @extension_looker_upper
     end
-    set_document_id_from @entry
-    @folder = @entry.categories.find { |c| c.scheme.match(/\Ahttp:\/\/schemas.google.com\/docs\/2007\/folders/) }.label rescue nil
-  end
 
-  def alternate_url
-    link = @entry.links.find { |link| link.rel == "alternate" && link.type == "text/html" }
-    link || "http://docs.google.com"
-  end
+    def self.extension_looker_upper=(extension_looker_upper)
+      @extension_looker_upper=extension_looker_upper
+    end
 
-  def edit_url
-    "https://docs.google.com/feeds/documents/private/full/#{@document_id}"
-  end
+    attr_reader :document_id, :folder, :entry
 
-  def content_type
-    @entry.content && @entry.content.type
-  end
-
-  def extension
-    if @extension.nil?
-      # first, try and chose and extension by content-types we can scribd
-      if !content_type.nil? && !content_type.strip.empty? && self.class.extension_looker_upper && mimetype = self.class.extension_looker_upper.find_by_name(content_type)
-        @extension = mimetype.extension
+    def initialize(entry)
+      if entry.is_a?(String)
+        @entry = Atom::Entry.load_entry(entry)
+      else
+        @entry = entry
       end
-      # second, look at the document id itself for any clues
-      if !@document_id.nil? && !@document_id.strip.empty?
-        @extension ||= case @document_id
-                         when /\Aspreadsheet/ then
-                           "xls"
-                         when /\Apresentation/ then
-                           "ppt"
-                         when /\Adocument/ then
-                           "doc"
-                       end
+      set_document_id_from @entry
+      @folder = @entry.categories.find { |c| c.scheme.match(/\Ahttp:\/\/schemas.google.com\/docs\/2007\/folders/) }.label rescue nil
+    end
+
+    def alternate_url
+      link = @entry.links.find { |link| link.rel == "alternate" && link.type == "text/html" }
+      link || "http://docs.google.com"
+    end
+
+    def edit_url
+      "https://docs.google.com/feeds/documents/private/full/#{@document_id}"
+    end
+
+    def content_type
+      @entry.content && @entry.content.type
+    end
+
+    def extension
+      if @extension.nil?
+        # first, try and chose and extension by content-types we can scribd
+        if !content_type.nil? && !content_type.strip.empty? && self.class.extension_looker_upper && mimetype = self.class.extension_looker_upper.find_by_name(content_type)
+          @extension = mimetype.extension
+        end
+        # second, look at the document id itself for any clues
+        if !@document_id.nil? && !@document_id.strip.empty?
+          @extension ||= case @document_id
+                           when /\Aspreadsheet/ then
+                             "xls"
+                           when /\Apresentation/ then
+                             "ppt"
+                           when /\Adocument/ then
+                             "doc"
+                         end
+        end
+        # finally, just declare it unknown
+        @extension ||= "unknown"
       end
-      # finally, just declare it unknown
-      @extension ||= "unknown"
+      @extension == "unknown" ? nil : @extension
     end
-    @extension == "unknown" ? nil : @extension
-  end
 
-  def display_name
-    @entry.title || "google_doc.#{extension}"
-  end
-
-  def download_url
-    url = @entry.content.src
-    if url && (parsed_url = (URI.parse(url) rescue nil)) && (ext = extension)
-      parsed_url.query = [parsed_url.query, "exportFormat=#{ext}", "format=#{ext}"].compact.join("&")
-      url = parsed_url.to_s
+    def display_name
+      @entry.title || "google_doc.#{extension}"
     end
-    url
-  end
 
-  def to_hash
-    {
-      "name" => display_name,
-      "document_id" => @document_id,
-      "extension" => extension,
-      "alternate_url" => alternate_url
-    }
-  end
+    def download_url
+      url = @entry.content.src
+      if url && (parsed_url = (URI.parse(url) rescue nil)) && (ext = extension)
+        parsed_url.query = [parsed_url.query, "exportFormat=#{ext}", "format=#{ext}"].compact.join("&")
+        url = parsed_url.to_s
+      end
+      url
+    end
 
-  private
+    def to_hash
+      {
+        "name" => display_name,
+        "document_id" => @document_id,
+        "extension" => extension,
+        "alternate_url" => alternate_url
+      }
+    end
 
-  def set_document_id_from(entry)
-    doc_id = entry.simple_extensions["{http://schemas.google.com/g/2005,resourceId}"]
-    @document_id = doc_id.first.to_s
+    private
+
+    def set_document_id_from(entry)
+      doc_id = entry.simple_extensions["{http://schemas.google.com/g/2005,resourceId}"]
+      @document_id = doc_id.first.to_s
+    end
   end
-end
 end

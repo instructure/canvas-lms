@@ -43,6 +43,7 @@ describe Lti::LtiOutboundAdapter do
     Course.new.tap do |course|
       course.stubs(:id).returns('course_id')
       course.root_account = account
+      course.account = account
     end
   }
 

@@ -43,7 +43,7 @@ class Migrator
       end
     end
     
-    config = Setting.from_config('external_migration') || {}
+    config = ConfigFile.load('external_migration') || {}
     @unzipped_file_path = Dir.mktmpdir(migration_type.to_s, config[:data_folder].presence)
     @base_export_dir = @settings[:base_download_dir] || find_export_dir
     @course[:export_folder_path] = File.expand_path(@base_export_dir)
@@ -68,6 +68,16 @@ class Migrator
       raise "unzip isn't installed on this system, exit status #{$?.exitstatus}, message: #{zip_std_out}"
     else
       raise "Could not unzip archive file, exit status #{$?.exitstatus}, message: #{zip_std_out}"
+    end
+  end
+
+  # If the file is a zip file, unzip it, if it's an xml file, copy
+  # it into the directory with the given file name
+  def prepare_cartridge_file(file_name='imsmanifest.xml')
+    if @archive_file_path.ends_with?('xml')
+      FileUtils::cp(@archive_file_path, File.join(@unzipped_file_path, file_name))
+    else
+      unzip_archive
     end
   end
 

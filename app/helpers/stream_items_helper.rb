@@ -24,7 +24,7 @@ module StreamItemsHelper
   end
 
   class ContextPresenter
-    attr_accessor :id, :type, :name, :linked_to
+    attr_accessor :id, :type, :name, :linked_to, :time_zone
   end
 
   def categorize_stream_items(stream_items, user = @current_user)
@@ -115,6 +115,7 @@ module StreamItemsHelper
       context.name = asset.last_author.short_name
       context.linked_to = user_path(asset.last_author.id)
     end
+    context.time_zone = item.context.try(:time_zone)
     context
   end
 

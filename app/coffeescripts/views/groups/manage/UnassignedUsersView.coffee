@@ -35,6 +35,7 @@ define [
 
     attach: ->
       @collection.on 'reset', @render
+      @collection.on 'remove', @render
       @collection.on 'moved', @highlightUser
       @collection.on 'filterOut', _(=> @checkScroll()).debounce(50)
 

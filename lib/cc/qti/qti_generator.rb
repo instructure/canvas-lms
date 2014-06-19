@@ -72,25 +72,29 @@ module CC
         end
       end
 
-      def generate_quiz(quiz)
+      def generate_quiz(quiz, for_cc=true)
         cc_qti_migration_id = create_key(quiz)
         resource_dir = File.join(@export_dir, cc_qti_migration_id)
         FileUtils::mkdir_p resource_dir
 
         # Create the CC-friendly QTI
-        cc_qti_rel_path = File.join(cc_qti_migration_id, ASSESSMENT_CC_QTI)
-        cc_qti_path = File.join(resource_dir, ASSESSMENT_CC_QTI)
+        file_name = for_cc ? ASSESSMENT_CC_QTI : "#{cc_qti_migration_id}.xml"
+        cc_qti_rel_path = File.join(cc_qti_migration_id, file_name)
+        cc_qti_path = File.join(@export_dir, cc_qti_rel_path)
+
         File.open(cc_qti_path, 'w') do |file|
           doc = Builder::XmlMarkup.new(:target=>file, :indent=>2)
-          generate_assessment(doc, quiz, cc_qti_migration_id)
+          generate_assessment(doc, quiz, cc_qti_migration_id, for_cc)
         end
 
-        # Create the Canvas-specific QTI data
-        canvas_qti_rel_path = File.join(ASSESSMENT_NON_CC_FOLDER, cc_qti_migration_id + QTI_EXTENSION)
-        canvas_qti_path = File.join(@export_dir, canvas_qti_rel_path)
-        File.open(canvas_qti_path, 'w') do |file|
-          doc = Builder::XmlMarkup.new(:target=>file, :indent=>2)
-          generate_assessment(doc, quiz, cc_qti_migration_id, false)
+        if for_cc
+          # Create the Canvas-specific QTI data
+          canvas_qti_rel_path = File.join(ASSESSMENT_NON_CC_FOLDER, cc_qti_migration_id + QTI_EXTENSION)
+          canvas_qti_path = File.join(@export_dir, canvas_qti_rel_path)
+          File.open(canvas_qti_path, 'w') do |file|
+            doc = Builder::XmlMarkup.new(:target=>file, :indent=>2)
+            generate_assessment(doc, quiz, cc_qti_migration_id, false)
+          end
         end
 
         # Create the canvas metadata
@@ -104,52 +108,36 @@ module CC
 
         @resources_node.resource(
                 :identifier => cc_qti_migration_id,
-                "type" => ASSESSMENT_TYPE
+                "type" => for_cc ? ASSESSMENT_TYPE : QTI_ASSESSMENT_TYPE
         ) do |res|
           res.file(:href=>cc_qti_rel_path)
           res.dependency(:identifierref=>alt_migration_id)
         end
+
         @resources_node.resource(
                 :identifier => alt_migration_id,
                 :type => LOR,
                 :href => meta_rel_path
         ) do |res|
           res.file(:href=>meta_rel_path)
-          res.file(:href=>canvas_qti_rel_path)
+          res.file(:href=>canvas_qti_rel_path) if for_cc
         end
       end
 
       def generate_qti_only
         FileUtils::mkdir_p @export_dir
 
+        non_cc_folder = File.join(@export_dir, ASSESSMENT_NON_CC_FOLDER)
+        FileUtils::mkdir_p non_cc_folder
+
         @course.quizzes.active.each do |quiz|
           next unless export_object?(quiz)
           begin
-            generate_qti_only_quiz(quiz)
+            generate_quiz(quiz, false)
           rescue
             title = quiz.title rescue I18n.t('unknown_quiz', "Unknown quiz")
             add_error(I18n.t('course_exports.errors.quiz', "The quiz \"%{title}\" failed to export", :title => title), $!)
           end
-        end
-      end
-
-      def generate_qti_only_quiz(quiz)
-        mig_id = create_key(quiz)
-        resource_dir = File.join(@export_dir, mig_id)
-        FileUtils::mkdir_p resource_dir
-
-        canvas_qti_rel_path = File.join(mig_id, mig_id + ".xml")
-        canvas_qti_path = File.join(@export_dir, canvas_qti_rel_path)
-        File.open(canvas_qti_path, 'w') do |file|
-          doc = Builder::XmlMarkup.new(:target=>file, :indent=>2)
-          generate_assessment(doc, quiz, mig_id, false)
-        end
-
-        @resources_node.resource(
-                :identifier => mig_id,
-                "type" => QTI_ASSESSMENT_TYPE
-        ) do |res|
-          res.file(:href=>canvas_qti_rel_path)
         end
       end
 

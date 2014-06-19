@@ -26,6 +26,11 @@ module Quizzes
     #   who have not submitted the quiz. If not present, returns all students for
     #   the course.
     #
+    # @argument includes [Optional, array]
+    #   Optional list of resources to include with the response. May include
+    #   a string of the name of the resource. Possible values are:
+    #   "quiz_submissions".
+    #
     # @returns QuizSubmissionUserList
     #
     # @model QuizSubmissionUserList
@@ -81,16 +86,30 @@ module Quizzes
     # }
     def index
       return unless user_has_teacher_level_access?
-      @users = if submitted_param?
-        @users = submitted? ? submitted_users : unsubmitted_users
-      else
-        @users = user_finder.all_students
+      @users = index_users
+      includes = Array(params[:include])
+      @users, meta = Api.jsonapi_paginate(@users, self, index_base_url, params)
+      if includes.include? 'quiz_submissions'
+        quiz_submissions = QuizSubmission.where(user_id: @users.to_a, quiz_id: @quiz).index_by(&:user_id)
       end
+      users_json = Canvas::APIArraySerializer.new(@users, {
+        quiz: @quiz,
+        root: :users,
+        meta: meta,
+        quiz_submissions: quiz_submissions,
+        includes: includes,
+        controller: self,
+        each_serializer: Quizzes::QuizSubmissionUserSerializer
+      })
+      render json: users_json.as_json
+    end
 
-      @users, meta = Api.jsonapi_paginate(@users, self, index_base_url, page: params[:page])
-      users_json = @users.map { |user| user_json(user, @current_user, session) }
-
-      render json: { meta: meta, users: users_json }
+    def index_users
+      if submitted_param?
+        submitted? ? submitted_users : unsubmitted_users
+      else
+        user_finder.all_students
+      end
     end
 
     # @API Send a message to unsubmitted or submitted users for the quiz

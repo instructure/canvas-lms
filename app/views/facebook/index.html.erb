@@ -14,7 +14,7 @@
     <% if NotificationPolicy.for(@user).where('communication_channels.path_type' => 'facebook').first %>
       <%= t :no_messages_notice, "As things happen in the course you'll start seeing notifications show up here letting you know about things happening in your Canvas account." %>
     <% else %>
-      <%= t :configure_notification_preferences_notice, "After you *configure your notification preferences* you should start to see notifications show up here letting you know about things happening in your Canvas account.", :wrapper => %{<a href="#{Facebook.app_url}/settings">\1</a>} %>
+      <%= t :configure_notification_preferences_notice, "After you *configure your notification preferences* you should start to see notifications show up here letting you know about things happening in your Canvas account.", :wrapper => %{<a href="#{Facebook::Connection.app_url}/settings">\1</a>} %>
     <% end %>
     <%= t :bookmark_notice, "You can see the number of new Canvas notifications from your Facebook home page if you bookmark this 
     application." %><br/><br/>

@@ -105,7 +105,7 @@ class FacebookController < ApplicationController
     @embeddable = true
 
     if params[:signed_request]
-      data, sig = Facebook.parse_signed_request(params[:signed_request])
+      data, sig = Facebook::Connection.parse_signed_request(params[:signed_request])
       if data && sig
         if @facebook_user_id = data['user_id']
           Shard.with_each_shard(UserService.associated_shards('facebook', @facebook_user_id)) do

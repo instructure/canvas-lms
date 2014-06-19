@@ -14,9 +14,7 @@ module Lti
     def convert
       lti_context = case @canvas_context
                       when Account
-                        LtiOutbound::LTIAccount.new.tap do |lti_account|
-                          lti_account.sis_source_id = @canvas_context.sis_source_id
-                        end
+                        Lti::LtiAccountCreator.new(@canvas_context, @canvas_tool).convert
                       when Course
                         LtiOutbound::LTICourse.new.tap do |lti_course|
                           lti_course.course_code = @canvas_context.course_code
@@ -45,5 +43,6 @@ module Lti
         consumer_instance.sis_source_id = @root_account.sis_source_id
       end
     end
+
   end
 end

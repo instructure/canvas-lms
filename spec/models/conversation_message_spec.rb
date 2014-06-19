@@ -152,15 +152,15 @@ describe ConversationMessage do
       student.user_notes.size.should be(0)
     end
 
-    it "should fail if there's more than one recipient" do
+    it "should allow user notes on more than one recipient" do
       Account.default.update_attribute :enable_user_notes, true
       course_with_teacher
       student1 = student_in_course.user
       student2 = student_in_course.user
       conversation = @teacher.initiate_conversation([student1, student2])
       conversation.add_message("reprimanded!", :generate_user_note => true)
-      student1.user_notes.size.should be(0)
-      student2.user_notes.size.should be(0)
+      student1.user_notes.size.should be(1)
+      student2.user_notes.size.should be(1)
     end
   end
 

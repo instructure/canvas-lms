@@ -47,7 +47,7 @@ body.modal
     border-top-color: #ccc
     width: $modal_box_width - (2 * $modal_box_padding)
     padding: 2 * $modal_box_padding
-    @include vertical-gradient-no-ie(#f4f4f4, #e2e2e2)
+    @include vertical-gradient(#f4f4f4, #e2e2e2)
     .bootstrap-form
       p.instructions
         font-weight: bold
@@ -71,12 +71,7 @@ body.modal
         height: 0
     &.login-box
       background-color: #4b555d
-
-      // adding support for gradients in IE10
-      background: url('/images/Money_Noise_tm.png'), -ms-radial-gradient(50% -100px, circle cover, rgba(255, 255, 255, 0.6) 0%, transparent 100%), -ms-linear-gradient(top, #59656e, #3e464c)
-      // this Compass include takes care of everything else for the login background
-      @include background(image-url("/images/Money_Noise_tm.png"), radial-gradient(50% -100px, circle cover, rgba(255, 255, 255, 0.6) 0%, transparent 100%), linear-gradient(top, #59656e, #3e464c))
-
+      background: image-url("/images/Money_Noise_tm.png"), radial-gradient(ellipse farthest-corner at 50% -100px, rgba(255,255,255,0.6) 0%, transparent 100%), linear-gradient(to bottom, #59656e, #3e464c)
       height: 331px
       width: $modal_box_width
       padding: $modal_box_padding

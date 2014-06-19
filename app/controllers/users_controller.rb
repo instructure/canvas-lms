@@ -104,7 +104,6 @@
 #       }
 #     }
 class UsersController < ApplicationController
-  include Twitter
   include DeliciousDiigo
   include SearchHelper
   include I18nUtilities
@@ -155,7 +154,17 @@ class UsersController < ApplicationController
       )
       redirect_to request_token.authorize_url
     elsif params[:service] == "twitter"
-      redirect_to twitter_request_token_url(return_to_url)
+      success_url = oauth_success_url(:service => 'twitter')
+      request_token = Twitter::Connection.request_token(success_url)
+      OauthRequest.create(
+        :service => 'twitter',
+        :token => request_token.token,
+        :secret => request_token.secret,
+        :return_url => return_to_url,
+        :user => @current_user,
+        :original_host_with_port => request.host_with_port
+      )
+      redirect_to request_token.authorize_url
     elsif params[:service] == "linked_in"
       linkedin_connection = LinkedIn::Connection.new
 
@@ -181,7 +190,8 @@ class UsersController < ApplicationController
         :user => @current_user,
         :original_host_with_port => request.host_with_port
       )
-      redirect_to Facebook.authorize_url(oauth_request)
+      state = Canvas::Security.encrypt_password(oauth_request.global_id.to_s, 'facebook_oauth_request').join('.')
+      redirect_to Facebook::Connection.authorize_url(state)
     end
   end
 
@@ -190,7 +200,10 @@ class UsersController < ApplicationController
     if params[:oauth_token]
       oauth_request = OauthRequest.find_by_token_and_service(params[:oauth_token], params[:service])
     elsif params[:state] && params[:service] == 'facebook'
-      oauth_request = OauthRequest.find_by_id(Facebook.oauth_request_id(params[:state]))
+      key,salt = params[:state].split('.', 2)
+      request_id = Canvas::Security.decrypt_password(key, salt, 'facebook_oauth_request')
+
+      oauth_request = OauthRequest.find_by_id(request_id)
     end
 
     if !oauth_request || (request.host_with_port == oauth_request.original_host_with_port && oauth_request.user != @current_user)
@@ -201,8 +214,18 @@ class UsersController < ApplicationController
       redirect_to url
     else
       if params[:service] == "facebook"
-        service = Facebook.authorize_success(@current_user, params[:access_token])
-        if service
+        service = UserService.find_by_user_id_and_service(@current_user.id, 'facebook')
+        service ||= UserService.new(:user => @current_user, :service => 'facebook')
+        service.token = params[:access_token]
+        data = Facebook::Connection.get_service_user_info(service.token)
+
+        if data
+          service.service_user_id = data['id']
+          service.service_user_name = data['name']
+          service.service_user_url = data['link']
+          service.save
+          service
+
           flash[:notice] = t('facebook_added', "Facebook account successfully added!")
         else
           flash[:error] = t('facebook_fail', "Facebook authorization failed.")
@@ -262,7 +285,24 @@ class UsersController < ApplicationController
         end
       else
         begin
-          token = twitter_get_access_token(oauth_request, params[:oauth_verifier])
+          twitter = Twitter::Connection.new(oauth_request.token, oauth_request.secret)
+          access_token = twitter.get_access_token(oauth_request.token, oauth_request.secret, params[:oauth_verifier])
+          service_user_id, service_user_name = twitter.get_service_user(access_token)
+          if oauth_request.user
+            UserService.register(
+              :service => "twitter",
+              :access_token => access_token,
+              :user => oauth_request.user,
+              :service_domain => "twitter.com",
+              :service_user_id => service_user_id,
+              :service_user_name => service_user_name
+            )
+            oauth_request.destroy
+          else
+            session[:oauth_twitter_access_token_token] = access_token.token
+            session[:oauth_twitter_access_token_secret] = access_token.secret
+          end
+
           flash[:notice] = t('twitter_added', "Twitter access authorized!")
         rescue => e
           ErrorReport.log_exception(:oauth, e)
@@ -294,7 +334,7 @@ class UsersController < ApplicationController
           @users = @context.fast_all_users.
               where("EXISTS (?)", Enrollment.where("enrollments.user_id=users.id").
                 joins(:course).
-                where(User.enrollment_conditions(:active)).
+                where(Enrollment::QueryBuilder.new(:active).conditions).
                 where(courses: { enrollment_term_id: params[:enrollment_term_id]}))
         elsif !api_request?
           @users = @context.fast_all_users
@@ -358,9 +398,6 @@ class UsersController < ApplicationController
   end
 
   def user_dashboard
-    if custom_dashboard_url
-      return redirect_to custom_dashboard_url
-    end
     check_incomplete_registration
     get_context
 
@@ -838,14 +875,21 @@ class UsersController < ApplicationController
     if authorized_action(@user, @current_user, :view_statistics)
       add_crumb(t('crumbs.profile', "%{user}'s profile", :user => @user.short_name), @user == @current_user ? user_profile_path(@current_user) : user_path(@user) )
 
+      @group_memberships = @user.current_group_memberships.includes(:group)
+
       # course_section and enrollment term will only be used if the enrollment dates haven't been cached yet;
       # maybe should just look at the first enrollment and check if it's cached to decide if we should include
       # them here
       @enrollments = @user.enrollments.with_each_shard { |scope| scope.where("enrollments.workflow_state<>'deleted' AND courses.workflow_state<>'deleted'").includes({:course => { :enrollment_term => :enrollment_dates_overrides }}, :associated_user, :course_section) }
+
+      # restrict view for other users
+      if @user != @current_user
+        @enrollments = @enrollments.select{|e| e.grants_right?(@current_user, session, :read)}
+      end
+
       @enrollments = @enrollments.sort_by {|e| [e.state_sortable, e.rank_sortable, e.course.name] }
       # pre-populate the reverse association
       @enrollments.each { |e| e.user = @user }
-      @group_memberships = @user.current_group_memberships.includes(:group)
 
       respond_to do |format|
         format.html

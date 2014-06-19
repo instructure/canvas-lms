@@ -9,7 +9,10 @@
         <a class="btn"
            href="{{options.atom_feed_url}}"
            data-tooltip
-           title="{{#t "rss_feed"}}RSS feed{{/t}}"><i class="icon-rss"></i></a>
+           title="{{#t "rss_feed"}}RSS feed{{/t}}">
+           <span class="screenreader-only">{{#t "rss_feed"}}RSS feed{{/t}}</span>
+           <i class="icon-rss"></i>
+        </a>
       {{/if}}
       <span id="actionsForSelectedDiscussions" style="display:none;">
         <input type="checkbox" id="lock" />

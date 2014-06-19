@@ -122,7 +122,7 @@ module MigratorHelper
   end
 
   def create_export_dir(slug)
-    config = Setting.from_config('external_migration')
+    config = ConfigFile.load('external_migration')
     if config && config[:data_folder]
       folder = config[:data_folder]
     else
@@ -150,7 +150,7 @@ module MigratorHelper
   end
   
   def self.download_archive(settings)
-    config = Setting.from_config('external_migration') || {}
+    config = ConfigFile.load('external_migration') || {}
     if settings[:export_archive_path]
       settings[:archive_file] = File.open(settings[:export_archive_path], 'rb')
     elsif settings[:course_archive_download_url].present?

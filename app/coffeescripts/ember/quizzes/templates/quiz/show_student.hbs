@@ -1,0 +1,58 @@
+<div class="quiz-overview">
+  {{#if lockedForUser}}
+    <p class="lock-explanation">{{{lockExplanation}}}</p>
+  {{/if}}
+
+  <div class="quiz-attributes quiz-attributes-student clearfix">
+    <dl class="quiz-attribute-column">
+      <dt>{{#t 'due'}}Due{{/t}}</dt>
+      <dd>
+        {{#if dueAt}}
+          {{friendlyDatetime dueAt}}
+        {{else}}
+          -
+        {{/if}}
+      </dd>
+    </dl>
+    <dl class="quiz-attribute-column">
+      <dt>{{#t 'points'}}Points{{/t}}</dt>
+      <dd>{{pointsPossible}}</dd>
+    </dl>
+    <dl class="quiz-attribute-column">
+      <dt>{{#t 'questions'}}Questions{{/t}}</dt>
+      <dd>{{questionCount}}</dd>
+    </dl>
+    <dl class="quiz-attribute-column">
+      <dt>{{#t 'time_limit'}}Time Limit{{/t}}</dt>
+      <dd>
+        {{#if timeLimit}}
+          {{timeLimitWithMinutes}}
+        {{else}}
+          {{#t 'no_time_limit'}}None{{/t}}
+        {{/if}}
+      </dd>
+    </dl>
+    <dl class="quiz-attribute-column">
+      <dt>{{#t 'attempts'}}Attempts{{/t}}</dt>
+      <dd>
+        {{#if unlimitedAllowedAttempts}}
+          {{#t 'unlimited'}}Unlimited{{/t}}
+        {{else}}
+          {{allowedAttempts}}
+        {{/if}}
+      </dd>
+    </dl>
+  </div>
+
+  <div class="student-quiz-content">
+    {{#if description}}
+    <div class="row-fluid">
+      <div class="span12 quiz-description user_content">
+        {{{description}}}
+      </div>
+    </div>
+    {{/if}}
+
+    {{partial "quiz/legacy_submissions"}}
+  </div>
+</div>

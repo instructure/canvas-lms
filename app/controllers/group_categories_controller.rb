@@ -52,6 +52,16 @@
 #             ]
 #           }
 #         },
+#         "auto_leader": {
+#           "description": "Gives instructors the ability to automatically have group leaders assigned.  Values include 'random', 'first', and null; 'random' picks a student from the group at random as the leader, 'first' sets the first student to be assigned to the group as the leader",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "first",
+#               "random"
+#             ]
+#           }
+#         },
 #         "context_type": {
 #           "description": "The course or account that the category group belongs to. The pattern here is that whatever the context_type is, there will be an _id field named after that type. So if instead context_type was 'Course', the course_id field would be replaced by an course_id field.",
 #           "example": "Account",
@@ -91,7 +101,7 @@ class GroupCategoriesController < ApplicationController
   # Returns a list of group categories in a context
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/accounts/<account_id>/group_categories \ 
+  #     curl https://<canvas>/api/v1/accounts/<account_id>/group_categories \
   #          -H 'Authorization: Bearer <token>'
   #
   # @returns [GroupCategory]
@@ -116,7 +126,7 @@ class GroupCategoriesController < ApplicationController
   # the rights to see it.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/group_categories/<group_category_id> \ 
+  #     curl https://<canvas>/api/v1/group_categories/<group_category_id> \
   #          -H 'Authorization: Bearer <token>'
   #
   # @returns GroupCategory
@@ -145,6 +155,13 @@ class GroupCategoriesController < ApplicationController
   #   "enabled":: allows students to self sign up for any group in course
   #   "restricted":: allows students to self sign up only for groups in the
   #                  same section null disallows self sign up
+  #
+  # @argument auto_leader [Optional, "first"|"random"]
+  #   Assigns group leaders automatically when generating and allocating students to groups
+  #   Valid values are:
+  #   "first":: the first student to be allocated to a group is the leader
+  #   "random":: a random student from all members is chosen as the leader
+  #
   # @argument group_limit [Optional]
   #   Limit the maximum number of users in each group (Course Only). Requires
   #   self signup.
@@ -160,14 +177,13 @@ class GroupCategoriesController < ApplicationController
   #   (Course Only)
   #
   # @example_request
-  #     curl htps://<canvas>/api/v1/courses/<course_id>/group_categories \ 
-  #         -F 'name=Project Groups' \ 
+  #     curl htps://<canvas>/api/v1/courses/<course_id>/group_categories \
+  #         -F 'name=Project Groups' \
   #         -H 'Authorization: Bearer <token>'
   #
   # @returns GroupCategory
   def create
     if authorized_action(@context, @current_user, :manage_groups)
-      process_group_category_api_params if api_request?
       @group_category = @context.group_categories.build
       if populate_group_category_from_params
         if api_request?
@@ -194,6 +210,13 @@ class GroupCategoriesController < ApplicationController
   #   "enabled":: allows students to self sign up for any group in course
   #   "restricted":: allows students to self sign up only for groups in the
   #                  same section null disallows self sign up
+  #
+  # @argument auto_leader [Optional, "first"|"random"]
+  #   Assigns group leaders automatically when generating and allocating students to groups
+  #   Valid values are:
+  #   "first":: the first student to be allocated to a group is the leader
+  #   "random":: a random student from all members is chosen as the leader
+  #
   # @argument group_limit [Optional]
   #   Limit the maximum number of users in each group (Course Only). Requires
   #   self signup.
@@ -209,9 +232,9 @@ class GroupCategoriesController < ApplicationController
   #   (Course Only)
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/group_categories/<group_category_id> \ 
-  #         -X PUT \ 
-  #         -F 'name=Project Groups' \ 
+  #     curl https://<canvas>/api/v1/group_categories/<group_category_id> \
+  #         -X PUT \
+  #         -F 'name=Project Groups' \
   #         -H 'Authorization: Bearer <token>'
   #
   # @returns GroupCategory
@@ -219,7 +242,6 @@ class GroupCategoriesController < ApplicationController
     if authorized_action(@context, @current_user, :manage_groups)
       @group_category ||= @context.group_categories.find_by_id(params[:category_id])
       if api_request?
-        process_group_category_api_params
         if populate_group_category_from_params
           includes = ['progress_url']
           includes.concat(params[:includes]) if params[:includes]
@@ -242,7 +264,7 @@ class GroupCategoriesController < ApplicationController
   #
   # @example_request
   #     curl https://<canvas>/api/v1/group_categories/<group_category_id> \
-  #           -X DELETE \ 
+  #           -X DELETE \
   #           -H 'Authorization: Bearer <token>'
   #
   def destroy
@@ -272,7 +294,7 @@ class GroupCategoriesController < ApplicationController
   # Returns a list of groups in a group category
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/group_categories/<group_cateogry_id>/groups \ 
+  #     curl https://<canvas>/api/v1/group_categories/<group_cateogry_id>/groups \
   #          -H 'Authorization: Bearer <token>'
   #
   # @returns [Group]
@@ -443,33 +465,12 @@ class GroupCategoriesController < ApplicationController
 
   def populate_group_category_from_params
     args = api_request? ? params : params[:category]
-    name = args[:name] || @group_category.name
-    enable_self_signup = value_to_boolean args[:enable_self_signup]
-    restrict_self_signup = value_to_boolean args[:restrict_self_signup]
-    @group_category.name = name
-    @group_category.configure_self_signup(enable_self_signup, restrict_self_signup)
-    if @context.is_a?(Course)
-      if @group_category.self_signup
-        @group_category.create_group_count = args[:create_group_count].to_i
-      elsif args[:split_groups] != '0'
-        @group_category.create_group_count = args[:split_group_count] ? args[:split_group_count].to_i : args[:create_group_count].to_i
-        @group_category.assign_unassigned_members = true if @group_category.create_group_count
-      end
-    end
-    @group_category.group_limit = args[:group_limit]
+    @group_category = GroupCategories::ParamsPolicy.new(@group_category, @context).populate_with(args)
     unless @group_category.save
       render :json => @group_category.errors, :status => :bad_request
       return false
     end
     true
-  end
-
-  def process_group_category_api_params
-    if params.has_key? 'self_signup'
-      self_signup = params[:self_signup].to_s.downcase
-      params[:enable_self_signup] = "1" if %w(enabled restricted).include? self_signup
-      params[:restrict_self_signup] = "1" if "restricted" == self_signup
-    end
   end
 
   protected
@@ -483,7 +484,3 @@ class GroupCategoriesController < ApplicationController
   end
 
 end
-
-
-
-

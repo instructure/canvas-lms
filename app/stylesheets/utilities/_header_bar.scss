@@ -28,14 +28,17 @@
   <div class="header-bar-right">
     <a href="#" class="btn">Preview</a>
     <a href="#" class="btn btn-primary">Add Module</a>
-    <a class="al-trigger btn" aria-label="Settings" href="#">
-      <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
-    </a>
-    <ul class="al-options">
-      <li><a href="#" class="icon-edit">Edit</a></li>
-      <li><a href="#" class="icon-trash">Delete</a></li>
-      <li><a href="#" class="icon-lock">Lock</a></li>
-    </ul>
+    <div class="inline-block" role="application">
+      <a class="al-trigger btn" href="#" role="button">
+        <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+        <span class="screenreader-only">Settings</span>
+      </a>
+      <ul class="al-options">
+        <li><a href="#" class="icon-edit">Edit</a></li>
+        <li><a href="#" class="icon-trash">Delete</a></li>
+        <li><a href="#" class="icon-lock">Lock</a></li>
+      </ul>
+    </div>
   </div>
 </div>
 
@@ -54,14 +57,17 @@
     </div>
     <div class="header-group-right">
       <a href="#" class="btn"><i class="icon-edit"></i> Edit</a>
-      <a class="al-trigger btn" aria-label="Settings" href="#">
-        <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
-      </a>
-      <ul class="al-options">
-        <li><a href="#" class="icon-edit">Edit</a></li>
-        <li><a href="#" class="icon-trash">Delete</a></li>
-        <li><a href="#" class="icon-lock">Lock</a></li>
-      </ul>
+      <div class="inline-block" role="application">
+        <a class="al-trigger btn" href="#" role="button">
+          <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+          <span class="screenreader-only">Settings</span>
+        </a>
+        <ul class="al-options">
+          <li><a href="#" class="icon-edit">Edit</a></li>
+          <li><a href="#" class="icon-trash">Delete</a></li>
+          <li><a href="#" class="icon-lock">Lock</a></li>
+        </ul>
+      </div>
     </div>
   </div>
 </div>
@@ -85,14 +91,17 @@
   </div>
   <div class="span4 align-right">
     <a class="btn btn-primary"><i class="icon-add"></i> Add People</a>
-    <a class="al-trigger btn" aria-label="Settings" href="#">
-      <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
-    </a>
-    <ul class="al-options">
-      <li><a href="#" class="icon-edit">Edit</a></li>
-      <li><a href="#" class="icon-trash">Delete</a></li>
-      <li><a href="#" class="icon-lock">Lock</a></li>
-    </ul>
+    <div class="inline-block" role="application">
+      <a class="al-trigger btn" href="#" role="button">
+        <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+        <span class="screenreader-only">Settings</span>
+      </a>
+      <ul class="al-options">
+        <li><a href="#" class="icon-edit">Edit</a></li>
+        <li><a href="#" class="icon-trash">Delete</a></li>
+        <li><a href="#" class="icon-lock">Lock</a></li>
+      </ul>
+    </div>
   </div>
 </div>
 

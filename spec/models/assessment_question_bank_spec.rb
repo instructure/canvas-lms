@@ -81,4 +81,23 @@ describe AssessmentQuestionBank do
     @course.grants_right?(@user, :manage_assignments).should be_false
     @bank.grants_right?(@user, :read).should be_true
   end
+
+  it "should remove outcome alignments when deleted" do
+    outcome_model(:context => @course)
+    @bank.alignments = { @outcome.id => 0.5 }
+
+    @bank.reload
+    @bank.learning_outcome_alignments.should be_present
+    @bank.learning_outcome_alignments.first.learning_outcome_id.should == @outcome.id
+
+    # regular save shouldn't mess with alignments
+    @bank.save!
+    @bank.reload
+    @bank.learning_outcome_alignments.should be_present
+    @bank.learning_outcome_alignments.first.learning_outcome_id.should == @outcome.id
+
+    @bank.destroy
+    @bank.reload
+    @bank.learning_outcome_alignments.should be_empty
+  end
 end

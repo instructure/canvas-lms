@@ -60,11 +60,16 @@ module Importers
           end
         end
 
-        context.imported_migration_items << item if context.imported_migration_items && item.new_record?
+        migration.add_imported_item(item) if migration && item.new_record?
         item.save!
       end
 
-      unless context.rubric_associations.find_by_rubric_id(item.id)
+      if association = context.rubric_associations.find_by_rubric_id(item.id)
+        unless association.bookmarked
+          association.bookmarked = true
+          association.save!
+        end
+      else
         item.associate_with(context, context)
       end
 

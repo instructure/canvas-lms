@@ -21,13 +21,13 @@ module SIS
 
     def process
       start = Time.now
-      importer = Work.new(@batch_id, @root_account, @logger)
+      importer = Work.new(@batch, @root_account, @logger)
       AbstractCourse.process_as_sis(@sis_options) do
         yield importer
       end
       importer.abstract_courses_to_update_sis_batch_id.in_groups_of(1000, false) do |batch|
-        AbstractCourse.where(:id => batch).update_all(:sis_batch_id => @batch_id)
-      end if @batch_id
+        AbstractCourse.where(:id => batch).update_all(:sis_batch_id => @batch)
+      end if @batch
       @logger.debug("AbstractCourses took #{Time.now - start} seconds")
       return importer.success_count
     end
@@ -36,8 +36,8 @@ module SIS
     class Work
       attr_accessor :success_count, :abstract_courses_to_update_sis_batch_id
 
-      def initialize(batch_id, root_account, logger)
-        @batch_id = batch_id
+      def initialize(batch, root_account, logger)
+        @batch = batch
         @root_account = root_account
         @abstract_courses_to_update_sis_batch_id = []
         @logger = logger
@@ -78,9 +78,9 @@ module SIS
         end
 
         if course.changed?
-          course.sis_batch_id = @batch_id if @batch_id
+          course.sis_batch_id = @batch.id if @batch
           course.save!
-        elsif @batch_id
+        elsif @batch
           @abstract_courses_to_update_sis_batch_id << course.id
         end
         @success_count += 1

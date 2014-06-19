@@ -13,7 +13,7 @@
   .touch &,
   .hover-container:hover &,
   .hover-container:focus & {
-    @include opacity($dimmedOpacity)
+    opacity: $dimmedOpacity;
   }
 
   &:focus, &:hover {
@@ -28,8 +28,8 @@
 //    this will be 50% transparent until hovered over, regardless of .touch or .no-touch
 //  </a>
 .dim-till-hover {
-  @include opacity($dimmedOpacity);
-  &:hover, &:focus { @include opacity(1) }
+  opacity: $dimmedOpacity;
+  &:hover, &:focus { opacity: 1 }
 }
 
 

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -215,7 +215,7 @@ describe PseudonymSessionsController do
     end
 
     it "should scope logins to the correct domain root account" do
-      Setting.set_config("saml", {})
+      ConfigFile.stub('saml', {})
       unique_id = 'foo@example.com'
 
       account1 = account_with_saml
@@ -250,8 +250,6 @@ describe PseudonymSessionsController do
       response.should redirect_to(dashboard_url(:login_success => 1))
       session[:saml_unique_id].should == unique_id
       Pseudonym.find(session['pseudonym_credentials_id']).should == user2.pseudonyms.first
-
-      Setting.set_config("saml", nil)
     end
 
     context "multiple authorization configs" do
@@ -461,7 +459,7 @@ describe PseudonymSessionsController do
 
     context "login attributes" do
       before(:each) do
-        Setting.set_config("saml", {})
+        ConfigFile.stub('saml', {})
         @unique_id = 'foo'
 
         @account = account_with_saml
@@ -505,7 +503,7 @@ describe PseudonymSessionsController do
     end
     
     it "should use the eppn saml attribute if configured" do
-      Setting.set_config("saml", {})
+      ConfigFile.stub('saml', {})
       unique_id = 'foo'
 
       account = account_with_saml
@@ -531,7 +529,7 @@ describe PseudonymSessionsController do
     end
 
     it "should redirect to RelayState relative urls" do
-      Setting.set_config("saml", {})
+      ConfigFile.stub('saml', {})
       unique_id = 'foo@example.com'
 
       account = account_with_saml
@@ -550,7 +548,7 @@ describe PseudonymSessionsController do
     end
 
     it "should decode an actual saml response" do
-      Setting.set_config("saml", {})
+      ConfigFile.stub('saml', {})
       unique_id = 'student@example.edu'
 
       account_with_saml
@@ -677,7 +675,10 @@ describe PseudonymSessionsController do
       cas_client = use_mock ? stub_everything(:cas_client) : controller.cas_client
       cas_client.instance_variable_set(:@stub_response, stub_response)
       def cas_client.validate_service_ticket(st)
-        st.response = CASClient::ValidationResponse.new(@stub_response)
+        response = CASClient::ValidationResponse.new(@stub_response)
+        st.user = response.user
+        st.success = response.is_success?
+        return st
       end
       PseudonymSessionsController.any_instance.stubs(:cas_client).returns(cas_client) if use_mock
     end
@@ -744,6 +745,7 @@ describe PseudonymSessionsController do
       user_with_pseudonym(account: Account.site_admin)
       stubby("yes\n#{@pseudonym.unique_id}\n")
       account_with_cas(account: Account.site_admin)
+      controller.cas_client.expects(:add_service_to_login_url).returns('someurl')
 
       cookies['canvas_sa_delegated'] = '1'
       # *don't* stub domain_root_account
@@ -944,7 +946,7 @@ describe PseudonymSessionsController do
         post 'otp_login', :otp_login => { :verification_code => code }
         response.should redirect_to dashboard_url(:login_success => 1)
         cookies['canvas_otp_remember_me'].should be_nil
-        Canvas.redis.get("otp_used:#{code}").should == '1' if Canvas.redis_enabled?
+        Canvas.redis.get("otp_used:#{@user.global_id}:#{code}").should == '1' if Canvas.redis_enabled?
       end
 
       it "should set a cookie" do
@@ -978,7 +980,7 @@ describe PseudonymSessionsController do
       it "should not allow the same code to be used multiple times" do
         pending "needs redis" unless Canvas.redis_enabled?
 
-        Canvas.redis.set("otp_used:123456", '1')
+        Canvas.redis.set("otp_used:#{@user.global_id}:123456", '1')
         ROTP::TOTP.any_instance.expects(:verify_with_drift).never
         post 'otp_login', :otp_login => { :verification_code => '123456' }
         response.should render_template('otp_login')

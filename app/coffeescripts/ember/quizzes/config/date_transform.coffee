@@ -14,7 +14,6 @@ define [
         null
   
   Em.onLoad 'Ember.Application', (Application) ->
-
     Application.initializer
       after: 'transforms'
       name: 'INSTRUCTURE dateTransform'

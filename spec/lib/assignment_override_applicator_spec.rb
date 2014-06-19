@@ -21,232 +21,473 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe AssignmentOverrideApplicator do
   cache_write_method = CANVAS_RAILS2 ? :write : :write_entry
 
+  def create_group_override
+    @category = group_category
+    @group = @category.groups.create!(context: @course)
+
+    @assignment.group_category = @category
+    @assignment.save!
+
+    @override = assignment_override_model(:assignment => @assignment)
+    @override.set = @group
+    @override.save!
+
+    @membership = @group.add_user(@student)
+  end
+
+  describe "assignment_overridden_for" do
+    before :each do
+      student_in_course
+      @assignment = assignment_model(:course => @course)
+    end
+
+    it "should note the user id for whom overrides were applied" do
+      @adhoc_override = assignment_override_model(:assignment => @assignment)
+      @override_student = @adhoc_override.assignment_override_students.build
+      @override_student.user = @student
+      @override_student.save!
+      @adhoc_override.override_due_at(7.days.from_now)
+      @adhoc_override.save!
+      @overridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student)
+      @overridden_assignment.overridden_for_user.id.should == @student.id
+    end
+
+    it "should note the user id for whom overrides were not found" do
+      @overridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student)
+      @overridden_assignment.overridden_for_user.id.should == @student.id
+    end
+
+    it "should apply new overrides if an overridden assignment is overridden for a new user" do
+      @student1 = @student
+      @overridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student1)
+      @overridden_assignment.overridden_for_user.id.should == @student1.id
+      student_in_course
+      @student2 = @student
+      AssignmentOverrideApplicator.expects(:overrides_for_assignment_and_user).with(@overridden_assignment, @student2).returns([])
+      @reoverridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@overridden_assignment, @student2)
+    end
+
+    it "should not attempt to apply overrides if an overridden assignment is overridden for the same user" do
+      @overridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student)
+      @overridden_assignment.overridden_for_user.id.should == @student.id
+      AssignmentOverrideApplicator.expects(:overrides_for_assignment_and_user).never
+      @reoverridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@overridden_assignment, @student)
+    end
+
+    context "give teachers the more lenient of override.due_at or assignment.due_at" do
+      before do
+        teacher_in_course
+        @section = @course.course_sections.create! :name => "Overridden Section"
+        student_in_section(@section)
+        @student = @user
+      end
+
+      def override_section(section, due)
+        override = assignment_override_model(:assignment => @assignment)
+        override.set = section
+        override.override_due_at(due)
+        override.save!
+      end
+
+      def setup_overridden_assignments(section_due_at, assignment_due_at)
+        override_section(@section, section_due_at)
+        @assignment.update_attribute(:due_at, assignment_due_at)
+
+        @students_assignment = AssignmentOverrideApplicator.
+          assignment_overridden_for(@assignment, @student)
+        @teachers_assignment = AssignmentOverrideApplicator.
+          assignment_overridden_for(@assignment, @teacher)
+      end
+
+      it "assignment.due_at is more lenient" do
+        section_due_at = 5.days.ago
+        assignment_due_at = nil
+        setup_overridden_assignments(section_due_at, assignment_due_at)
+        @teachers_assignment.due_at.to_i.should == assignment_due_at.to_i
+        @students_assignment.due_at.to_i.should == section_due_at.to_i
+      end
+
+      it "override.due_at is more lenient" do
+        section_due_at = 5.days.from_now
+        assignment_due_at = 5.days.ago
+        setup_overridden_assignments(section_due_at, assignment_due_at)
+        @teachers_assignment.due_at.to_i.should == section_due_at.to_i
+        @students_assignment.due_at.to_i.should == section_due_at.to_i
+      end
+
+      it "ignores assignment.due_at if all sections have overrides" do
+        section_due_at = 5.days.from_now
+        assignment_due_at = 1.year.from_now
+
+        override_section(@course.default_section, section_due_at)
+        setup_overridden_assignments(section_due_at, assignment_due_at)
+
+        @teachers_assignment.due_at.to_i.should == section_due_at.to_i
+        @students_assignment.due_at.to_i.should == section_due_at.to_i
+      end
+    end
+  end
+
   describe "overrides_for_assignment_and_user" do
     before :each do
       student_in_course
       @assignment = assignment_model(:course => @course, :due_at => 5.days.from_now)
     end
 
-    it "should be serializable" do
-      override = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student)
-      lambda { Marshal.dump(override) }.should_not raise_error(TypeError)
-    end
-
-    it "should cache by assignment and user" do
-      enable_cache do
-        AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
-        Rails.cache.expects(cache_write_method).never
-        AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
+    context 'it works' do
+      it "should be serializable" do
+        override = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student)
+        lambda { Marshal.dump(override) }.should_not raise_error(TypeError)
       end
-    end
 
-    it "should distinguish cache by assignment" do
-      enable_cache do
-        overrides1 = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
-        assignment = assignment_model
-        Rails.cache.expects(cache_write_method)
-        overrides2 = AssignmentOverrideApplicator.overrides_for_assignment_and_user(assignment, @student)
-      end
-    end
-
-    it "should distinguish cache by assignment version" do
-      Timecop.travel Time.now + 1.hour do
-        @assignment.due_at = 7.days.from_now
-        @assignment.save!
-        @assignment.versions.count.should == 2
+      it "should cache by assignment and user" do
         enable_cache do
-          AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment.versions.first.model, @student)
+          AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
+          Rails.cache.expects(cache_write_method).never
+          AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
+        end
+      end
+
+      it "should distinguish cache by assignment" do
+        enable_cache do
+          overrides1 = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
+          assignment = assignment_model
           Rails.cache.expects(cache_write_method)
-          AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment.versions.current.model, @student)
+          overrides2 = AssignmentOverrideApplicator.overrides_for_assignment_and_user(assignment, @student)
+        end
+      end
+
+      it "should distinguish cache by assignment version" do
+        Timecop.travel Time.now + 1.hour do
+          @assignment.due_at = 7.days.from_now
+          @assignment.save!
+          @assignment.versions.count.should == 2
+          enable_cache do
+            AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment.versions.first.model, @student)
+            Rails.cache.expects(cache_write_method)
+            AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment.versions.current.model, @student)
+          end
+        end
+      end
+
+      it "should distinguish cache by user" do
+        enable_cache do
+          AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
+          user = user_model
+          Rails.cache.expects(cache_write_method)
+          AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, user)
+        end
+      end
+
+      it "should order adhoc override before group override" do
+        @category = group_category
+        @group = @category.groups.create!(:context => @course)
+        @membership = @group.add_user(@student)
+        @assignment.group_category = @category
+        @assignment.save!
+
+        @group_override = assignment_override_model(:assignment => @assignment)
+        @group_override.set = @group
+        @group_override.save!
+
+        @adhoc_override = assignment_override_model(:assignment => @assignment)
+        @override_student = @adhoc_override.assignment_override_students.build
+        @override_student.user = @student
+        @override_student.save!
+
+        overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
+        overrides.size.should == 2
+        overrides.first.should == @adhoc_override
+        overrides.last.should == @group_override
+      end
+
+      it "should order group override before section overrides" do
+        @category = group_category
+        @group = @category.groups.create!(:context => @course)
+        @membership = @group.add_user(@student)
+        @assignment.group_category = @category
+        @assignment.save!
+
+        @section_override = assignment_override_model(:assignment => @assignment)
+        @section_override.set = @course.default_section
+        @section_override.save!
+
+        @group_override = assignment_override_model(:assignment => @assignment)
+        @group_override.set = @group
+        @group_override.save!
+
+        overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
+        overrides.size.should == 2
+        overrides.first.should == @group_override
+        overrides.last.should == @section_override
+      end
+
+      it "should order section overrides by position" # see TODO in implementation
+    end
+
+    context 'adhoc overrides' do
+      before :each do
+        @override = assignment_override_model(:assignment => @assignment)
+        @override_student = @override.assignment_override_students.build
+        @override_student.user = @student
+        @override_student.save!
+      end
+
+      describe 'for students' do
+        it "should include adhoc override for the user" do
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
+          overrides.should == [@override]
+        end
+
+        it "should not include adhoc overrides that don't include the user" do
+          new_student = student_in_course
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, new_student.user)
+          overrides.should be_empty
+        end
+
+        it "finds the overrides for the correct student" do
+          result = AssignmentOverrideApplicator::adhoc_override(@assignment, @student)
+          result.assignment_override_id.should == @override.id
+        end
+
+        it "returns AssignmentOverrideStudent" do
+          result = AssignmentOverrideApplicator::adhoc_override(@assignment, @student)
+          result.should be_an_instance_of(AssignmentOverrideStudent)
+        end
+      end
+
+      describe 'for teachers' do
+        it "works" do
+          teacher_in_course
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @teacher)
+          overrides.should == [@override]
+        end
+      end
+
+      describe 'for observers' do
+        it "works" do
+          course_with_observer({:course => @course, :active_all => true})
+          @course.enroll_user(@observer, "ObserverEnrollment", {:associated_user_id => @student.id})
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @observer)
+          overrides.should == [@override]
+        end
+      end
+
+      describe 'for admins' do
+        it "works" do
+          account_admin_user
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @admin)
+          overrides.should == [@override]
         end
       end
     end
 
-    it "should distinguish cache by user" do
-      enable_cache do
-        AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
-        user = user_model
-        Rails.cache.expects(cache_write_method)
-        AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, user)
-      end
-    end
-
-    it "should include adhoc override for the user" do
-      @override = assignment_override_model(:assignment => @assignment)
-      @override_student = @override.assignment_override_students.build
-      @override_student.user = @student
-      @override_student.save!
-
-      overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
-      overrides.should == [@override]
-    end
-
-    it "should not include adhoc overrides that don't include the user" do
-      @override = assignment_override_model(:assignment => @assignment)
-      overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
-      overrides.should be_empty
-    end
-
-    context "group overrides" do
+    context 'group overrides' do
       before :each do
-        @category = group_category
-        @group = @category.groups.create!(context: @course)
-
-        @assignment.group_category = @category
-        @assignment.save!
-
-        @override = assignment_override_model(:assignment => @assignment)
-        @override.set = @group
-        @override.save!
-
-        @membership = @group.add_user(@student)
+        create_group_override
       end
 
-      it "should include group override for the user" do
-        overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
-        overrides.should == [@override]
+      describe 'for students' do
+        it 'returns group overrides' do
+          result = AssignmentOverrideApplicator.group_override(@assignment, @student)
+          result.should == @override
+        end
+
+        it "should not include group override for groups other than the user's" do
+          @override.set = @category.groups.create!(context: @course)
+          @override.save!
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
+          overrides.should be_empty
+        end
+
+        it "should not include group override for deleted groups" do
+          @group.destroy
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
+          overrides.should be_empty
+        end
+
+        it "should not include group override for deleted group memberships" do
+          @membership.destroy
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
+          overrides.should be_empty
+        end
       end
 
-      it "should not include group override for groups other than the user's" do
-        @override.set = @category.groups.create!(context: @course)
-        @override.save!
-
-        overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
-        overrides.should be_empty
+      describe 'for teachers' do
+        it 'works' do
+          teacher_in_course
+          result = AssignmentOverrideApplicator.group_override(@assignment, @teacher)
+          result.should == @override
+        end
       end
 
-      it "should not include group override for deleted groups" do
-        @group.destroy
-
-        overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
-        overrides.should be_empty
+      describe 'for observers' do
+        it 'works' do
+          course_with_observer({:course => @course, :active_all => true})
+          @course.enroll_user(@observer, "ObserverEnrollment", {:associated_user_id => @student.id})
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @observer)
+          overrides.should == [@override]
+        end
       end
 
-      it "should not include group override for deleted group memberships" do
-        @membership.destroy
-
-        overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
-        overrides.should be_empty
+      describe 'for admins' do
+        it 'works' do
+          account_admin_user
+          user_session(@admin)
+          result = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @admin)
+          result.should == [@override]
+        end
       end
     end
 
-    context "section overrides" do
+    context 'section overrides' do
       before :each do
         @override = assignment_override_model(:assignment => @assignment)
         @override.set = @course.default_section
         @override.save!
-      end
-
-      it "should include section overrides for sections with an active student enrollment" do
-        overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
-        overrides.should == [@override]
-      end
-
-      it "should include section overrides for sections with an active observer enrollment" do
-        course_with_observer(:course => @course, :active_all => true)
-        overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @observer)
-        overrides.should == [@override]
-      end
-
-      it "should not include section overrides for sections without an enrollment" do
-        @override.set = @course.course_sections.create!
-        @override.save!
-
-        overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
-        overrides.should be_empty
-      end
-
-      it "should not include section overrides for sections with deleted enrollments" do
-        @student.student_enrollments.first.destroy
-
-        overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
-        overrides.should be_empty
-      end
-
-      it "should include all relevant section overrides" do
+        @section2 = @course.course_sections.create!(:name => "Summer session")
         @override2 = assignment_override_model(:assignment => @assignment)
-        @override2.set = @course.course_sections.create!
+        @override2.set_type = 'CourseSection'
+        @override2.set_id = @section2.id
+        @override2.due_at = 7.days.from_now
         @override2.save!
-
-        @course.enroll_student(@student, :section => @override2.set, :allow_multiple_enrollments => true)
-
-        overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
-        overrides.size.should == 2
-        overrides.should include(@override)
-        overrides.should include(@override2)
+        @student2 = student_in_section(@section2, {:active_all => true})
       end
 
-      it "should only use the latest due_date for student_view_student" do
-        due_at = 3.days.from_now
+      describe 'for students' do
+        it "returns section overrides" do
+          result = AssignmentOverrideApplicator::section_overrides(@assignment, @student2)
+          result.length.should == 1
+        end
 
-        override1 = @override
-        override1.override_due_at(due_at)
-        override1.save!
+        it "should include section overrides for sections with an active student enrollment" do
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student2)
+          overrides.should == [@override2]
+        end
 
-        cs = @course.course_sections.create!
-        override2 = assignment_override_model(:assignment => @assignment)
-        override2.set = cs
-        override2.override_due_at(due_at - 1.day)
-        override2.save!
+        it "should not include section overrides for sections with deleted enrollments" do
+          @student2.student_enrollments.first.destroy
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student2)
+          overrides.should be_empty
+        end
 
-        @fake_student = @course.student_view_student
-        overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @fake_student)
-        overrides.sort_by(&:set_id).should == [override1, override2]
-        AssignmentOverrideApplicator.collapsed_overrides(@assignment, overrides)[:due_at].to_i.should == due_at.to_i
+        it "should include all relevant section overrides" do
+          @course.enroll_student(@student, :section => @override2.set, :allow_multiple_enrollments => true)
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
+          overrides.size.should == 2
+          overrides.should include(@override)
+          overrides.should include(@override2)
+        end
+
+        it "should work even if :read_roster is disabled" do
+          RoleOverride.create!(:context => @course.root_account, :permission => 'read_roster',
+                               :enrollment_type => "StudentEnrollment", :enabled => false)
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student2)
+          overrides.should == [@override2]
+        end
+
+        it "should only use the latest due_date for student_view_student" do
+          due_at = 3.days.from_now
+          a = assignment_model(:course => @course)
+          cs1 = @course.course_sections.create!
+          override1 = assignment_override_model(:assignment => a)
+          override1.set = cs1
+          override1.override_due_at(due_at)
+          override1.save!
+
+          cs2 = @course.course_sections.create!
+          override2 = assignment_override_model(:assignment => a)
+          override2.set = cs2
+          override2.override_due_at(due_at - 1.day)
+          override2.save!
+
+          @fake_student = @course.student_view_student
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(a, @fake_student)
+          overrides.should include(override1, override2)
+          AssignmentOverrideApplicator.collapsed_overrides(a, overrides)[:due_at].to_i.should == due_at.to_i
+        end
+
+        it "should not include section overrides for sections without an enrollment" do
+          assignment = assignment_model(:course => @course, :due_at => 5.days.from_now)
+          override = assignment_override_model(:assignment => assignment)
+          override.set = @course.course_sections.create!
+          override.save!
+          overrides = AssignmentOverrideApplicator.section_overrides(assignment, @student)
+          overrides.should be_empty
+        end
       end
 
-      it "should work for students even if :read_roster is disabled" do
-        RoleOverride.create!(:context => @course.root_account, :permission => 'read_roster',
-                             :enrollment_type => "StudentEnrollment", :enabled => false)
-        overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
-        overrides.should == [@override]
+      describe 'for teachers' do
+        it 'works' do
+          teacher_in_course
+          result = AssignmentOverrideApplicator.section_overrides(@assignment, @teacher)
+          result.should include(@override, @override2)
+        end
+      end
+
+      describe 'for observers' do
+        it 'works' do
+          course_with_observer({:course => @course, :active_all => true})
+          @course.enroll_user(@observer, "ObserverEnrollment", {:associated_user_id => @student2.id})
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @observer)
+          overrides.should == [@override2]
+        end
+      end
+
+      describe 'for admins' do
+        it 'works' do
+          account_admin_user
+          result = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @admin)
+          result.should include(@override, @override2)
+        end
       end
     end
 
-    it "should order adhoc override before group override" do
-      @category = group_category
-      @group = @category.groups.create!(:context => @course)
-      @membership = @group.add_user(@student)
-      @assignment.group_category = @category
-      @assignment.save!
+    context '#observer_overrides' do
+      it "returns all dates visible to observer" do
+        @override = assignment_override_model(:assignment => @assignment)
+        @override_student = @override.assignment_override_students.build
+        @override_student.user = @student
+        @override_student.save!
+        course_with_observer({:course => @course, :active_all => true})
+        @course.enroll_user(@observer, "ObserverEnrollment", {:associated_user_id => @student.id})
 
-      @group_override = assignment_override_model(:assignment => @assignment)
-      @group_override.set = @group
-      @group_override.save!
-
-      @adhoc_override = assignment_override_model(:assignment => @assignment)
-      @override_student = @adhoc_override.assignment_override_students.build
-      @override_student.user = @student
-      @override_student.save!
-
-      overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
-      overrides.size.should == 2
-      overrides.first.should == @adhoc_override
-      overrides.last.should == @group_override
+        @section2 = @course.course_sections.create!(:name => "Summer session")
+        @override2 = assignment_override_model(:assignment => @assignment)
+        @override2.set_type = 'ADHOC'
+        @override2.due_at = 7.days.from_now
+        @override2.save!
+        @override2_student = @override2.assignment_override_students.build
+        @student2 = student_in_section(@section2, {:active_all => true})
+        @override2_student.user = @student2
+        @override2_student.save!
+        @course.enroll_user(@observer, "ObserverEnrollment", {:allow_multiple_enrollments => true, :associated_user_id => @student2.id})
+        result = AssignmentOverrideApplicator::observer_overrides(@assignment, @observer)
+        result.length.should == 2
+      end
     end
 
-    it "should order group override before section overrides" do
-      @category = group_category
-      @group = @category.groups.create!(:context => @course)
-      @membership = @group.add_user(@student)
-      @assignment.group_category = @category
-      @assignment.save!
+    context '#has_invalid_args?' do
+      it "returns true with nil user" do
+        result = AssignmentOverrideApplicator::has_invalid_args?(@assignment, nil)
+        result.should be_true
+      end
 
-      @section_override = assignment_override_model(:assignment => @assignment)
-      @section_override.set = @course.default_section
-      @section_override.save!
+      it "returns true for assignments with no overrides" do
+        result = AssignmentOverrideApplicator::has_invalid_args?(@assignment, @student)
+        result.should be_true
+      end
 
-      @group_override = assignment_override_model(:assignment => @assignment)
-      @group_override.set = @group
-      @group_override.save!
+      it "returns false if user and overrides are valid" do
+        @override = assignment_override_model(:assignment => @assignment)
+        @override_student = @override.assignment_override_students.build
+        @override_student.user = @student
+        @override_student.save!
 
-      overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
-      overrides.size.should == 2
-      overrides.first.should == @group_override
-      overrides.last.should == @section_override
+        result = AssignmentOverrideApplicator::has_invalid_args?(@assignment, @student)
+        result.should be_false
+      end
     end
-
-    it "should order section overrides by position" # see TODO in implementation
 
     context "versioning" do
       it "should use the appropriate version of an override" do
@@ -775,113 +1016,6 @@ describe AssignmentOverrideApplicator do
     end
   end
 
-  describe "assignment_overridden_for" do
-    before :each do
-      student_in_course
-      @assignment = assignment_model(:course => @course)
-    end
-
-    it "should note the user id for whom overrides were applied" do
-      @adhoc_override = assignment_override_model(:assignment => @assignment)
-      @override_student = @adhoc_override.assignment_override_students.build
-      @override_student.user = @student
-      @override_student.save!
-      @adhoc_override.override_due_at(7.days.from_now)
-      @adhoc_override.save!
-      @overridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student)
-      @overridden_assignment.overridden_for_user.id.should == @student.id
-    end
-
-    it "should note the user id for whom overrides were not found" do
-      @overridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student)
-      @overridden_assignment.overridden_for_user.id.should == @student.id
-    end
-
-    it "should apply new overrides if an overridden assignment is overridden for a new user" do
-      @student1 = @student
-      @overridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student1)
-      @overridden_assignment.overridden_for_user.id.should == @student1.id
-      student_in_course
-      @student2 = @student
-      AssignmentOverrideApplicator.expects(:overrides_for_assignment_and_user).with(@overridden_assignment, @student2).returns([])
-      @reoverridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@overridden_assignment, @student2)
-    end
-
-    it "should not attempt to apply overrides if an overridden assignment is overridden for the same user" do
-      @overridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student)
-      @overridden_assignment.overridden_for_user.id.should == @student.id
-      AssignmentOverrideApplicator.expects(:overrides_for_assignment_and_user).never
-      @reoverridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@overridden_assignment, @student)
-    end
-
-    context "give teachers the more lenient of override.due_at or assignment.due_at" do
-      before do
-        teacher_in_course
-        @section = @course.course_sections.create! :name => "Overridden Section"
-        student_in_section(@section)
-        @student = @user
-      end
-
-      def override_section(section, due)
-        override = assignment_override_model(:assignment => @assignment)
-        override.set = section
-        override.override_due_at(due)
-        override.save!
-      end
-
-      def setup_overridden_assignments(section_due_at, assignment_due_at)
-        override_section(@section, section_due_at)
-        @assignment.update_attribute(:due_at, assignment_due_at)
-
-        @students_assignment = AssignmentOverrideApplicator.
-          assignment_overridden_for(@assignment, @student)
-        @teachers_assignment = AssignmentOverrideApplicator.
-          assignment_overridden_for(@assignment, @teacher)
-      end
-
-      it "assignment.due_at is more lenient" do
-        section_due_at = 5.days.ago
-        assignment_due_at = nil
-        setup_overridden_assignments(section_due_at, assignment_due_at)
-        @teachers_assignment.due_at.to_i.should == assignment_due_at.to_i
-        @students_assignment.due_at.to_i.should == section_due_at.to_i
-      end
-
-      it "override.due_at is more lenient" do
-        section_due_at = 5.days.from_now
-        assignment_due_at = 5.days.ago
-        setup_overridden_assignments(section_due_at, assignment_due_at)
-        @teachers_assignment.due_at.to_i.should == section_due_at.to_i
-        @students_assignment.due_at.to_i.should == section_due_at.to_i
-      end
-
-      it "ignores assignment.due_at if all sections have overrides" do
-        section_due_at = 5.days.from_now
-        assignment_due_at = 1.year.from_now
-
-        override_section(@course.default_section, section_due_at)
-        setup_overridden_assignments(section_due_at, assignment_due_at)
-
-        @teachers_assignment.due_at.to_i.should == section_due_at.to_i
-        @students_assignment.due_at.to_i.should == section_due_at.to_i
-      end
-    end
-  end
-
-  describe "without_overrides" do
-    before :each do
-      student_in_course
-      @assignment = assignment_model(:course => @course)
-    end
-
-    it "should return an unoverridden copy of an overridden assignment" do
-      @overridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student)
-      @overridden_assignment.overridden_for_user.id.should == @student.id
-      @unoverridden_assignment = @overridden_assignment.without_overrides
-      @unoverridden_assignment.overridden_for_user.should == nil
-    end
-  end
-
   describe "Overridable#has_no_overrides" do
     before do
       student_in_course
@@ -900,6 +1034,20 @@ describe AssignmentOverrideApplicator do
       fake_overridden_assignment.overridden.should be_true
       fake_overridden_assignment.due_at.should_not == truly_overridden_assignment.due_at
       fake_overridden_assignment.due_at.should == @assignment.due_at
+    end
+  end
+
+  describe "without_overrides" do
+    before :each do
+      student_in_course
+      @assignment = assignment_model(:course => @course)
+    end
+
+    it "should return an unoverridden copy of an overridden assignment" do
+      @overridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student)
+      @overridden_assignment.overridden_for_user.id.should == @student.id
+      @unoverridden_assignment = @overridden_assignment.without_overrides
+      @unoverridden_assignment.overridden_for_user.should == nil
     end
   end
 

@@ -1,4 +1,4 @@
-if Rails.env.development?
+if Rails.env.development? && ENV["CANVAS_SOURCE_MAPS"] != "0"
   app_dir = File.expand_path "#{Rails.root}/public/app"
   FileUtils.makedirs(app_dir) unless File.exists?(app_dir)
   symlink = File.expand_path "#{Rails.root}/public/app/coffeescripts"

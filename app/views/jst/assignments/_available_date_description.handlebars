@@ -1,11 +1,15 @@
 {{#if pending}}
   <span class="status-description">{{#t "not_available_until"}}Not available until{{/t}}</span>
-  {{strftime unlockAt "%b %-d"}}
+  <span {{ contextSensitiveDatetimeTitle unlockAt }}>
+    {{strftime unlockAt "%b %-d"}}
+  </span>
 {{/if}}
 
 {{#if open}}
   <span class="status-description">{{#t "available_until"}}Available until{{/t}}</span>
-  {{strftime lockAt "%b %-d"}}
+  <span {{ contextSensitiveDatetimeTitle lockAt }}>
+    {{strftime lockAt "%b %-d"}}
+  </span>
 {{/if}}
 
 {{#if closed}}

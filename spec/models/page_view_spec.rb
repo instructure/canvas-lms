@@ -59,10 +59,13 @@ describe PageView do
       it "should always assign the birth shard" do
         PageView.new.shard.should == Shard.birth
         pv = nil
+        u = User.create!
         @shard1.activate do
           pv = page_view_model
           pv.shard.should == Shard.birth
+          pv.user = u
           pv.save!
+          pv.read_attribute(:user_id).should == u.local_id
           pv = PageView.find(pv.request_id)
           pv.should be_present
           pv.shard.should == Shard.birth

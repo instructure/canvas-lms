@@ -252,18 +252,20 @@ define([
     return {raw: raw, formatted: formatted};
   }
 
+  var MENU_PARTS_DELIMITER = '----☃----'; // something random and unlikely to be in a person's name
+
   function initDropdown(){
     var hideStudentNames = utils.shouldHideStudentNames();
     $("#hide_student_names").attr('checked', hideStudentNames);
     var options = $.map(jsonData.studentsWithSubmissions, function(s, idx){
-      var name = htmlEscape(s.name),
+      var name = htmlEscape(s.name).replace(MENU_PARTS_DELIMITER, ""),
           className = classNameBasedOnStudent(s);
 
       if(hideStudentNames) {
         name = I18n.t('nth_student', "Student %{n}", {'n': idx + 1});
       }
 
-      return '<option value="' + s.id + '" class="' + className.raw + '">' + name + ' ---- ' + className.formatted +'</option>';
+      return '<option value="' + s.id + '" class="' + className.raw + ' ui-selectmenu-hasIcon">' + name + MENU_PARTS_DELIMITER + className.formatted + MENU_PARTS_DELIMITER + className.raw + '</option>';
     }).join("");
 
     $selectmenu = $("<select id='students_selectmenu'>" + options + "</select>")
@@ -271,18 +273,22 @@ define([
       .selectmenu({
         style:'dropdown',
         format: function(text){
-          var parts = text.split(" ---- ");
-          return '<span class="ui-selectmenu-item-header">' + htmlEscape(parts[0]) + '</span><span class="ui-selectmenu-item-footer">' + parts[1] + '</span>';
-        },
-        icons: [
-          {find: '.graded'},
-          {find: '.not_graded'},
-          {find: '.not_submitted'},
-          {find: '.resubmitted'}
-        ]
+          var parts = text.split(MENU_PARTS_DELIMITER);
+          return getIcon(parts[2]) + '<span class="ui-selectmenu-item-header">' + htmlEscape(parts[0]) + '</span><span class="ui-selectmenu-item-footer">' + htmlEscape(parts[1]) + '</span>';
+        }
       }).change(function(e){
         EG.handleStudentChanged();
       });
+
+    function getIcon(helper_text){
+      var icon = "<span class='ui-selectmenu-item-icon speedgrader-selectmenu-icon'>";
+      if(helper_text == "graded"){
+        icon += "<i class='icon-check'></i>";
+      }else if(["not_graded", "resubmitted"].indexOf(helper_text) != -1){
+        icon += "&#9679;";
+      }
+      return icon.concat("</span>");
+    }
 
     if (jsonData.context.active_course_sections.length && jsonData.context.active_course_sections.length > 1 && !jsonData.GROUP_GRADING_MODE) {
       var $selectmenu_list = $selectmenu.data('selectmenu').list,
@@ -290,7 +296,7 @@ define([
 
 
       $menu.find('ul').append($.map(jsonData.context.active_course_sections, function(section, i){
-        return '<li><a class="section_' + section.id + '" data-section-id="'+ section.id +'" href="#">'+ section.name  +'</a></li>';
+        return '<li><a class="section_' + section.id + '" data-section-id="'+ section.id +'" href="#">'+ htmlEscape(section.name) +'</a></li>';
       }).join(''));
 
       $menu.insertBefore($selectmenu_list).bind('mouseenter mouseleave', function(event){
@@ -1399,13 +1405,13 @@ define([
 
         $rubric_assessments_select.find("option").remove();
         $.each(this.currentStudent.rubric_assessments, function(){
-          $rubric_assessments_select.append('<option value="' + this.id + '">' + this.assessor_name + '</option>');
+          $rubric_assessments_select.append('<option value="' + this.id + '">' + htmlEscape(this.assessor_name) + '</option>');
         });
 
         // show a new option if there is not an assessment by me
         // or, if I can :manage_course, there is not an assessment already with assessment_type = 'grading'
         if( !assessmentsByMe.length || (ENV.RUBRIC_ASSESSMENT.assessment_type == 'grading' && !gradingAssessments.length) ) {
-          $rubric_assessments_select.append('<option value="new">' + I18n.t('new_assessment', '[New Assessment]') + '</option>');
+          $rubric_assessments_select.append('<option value="new">' + htmlEscape(I18n.t('new_assessment', '[New Assessment]')) + '</option>');
         }
 
         //select the assessment that meets these rules:
@@ -1614,6 +1620,22 @@ define([
           .addClass(className.raw)
           .find(".ui-selectmenu-item-footer")
             .text(className.formatted);
+
+        $status = $(".ui-selectmenu-status");
+        $statusIcon = $status.find(".speedgrader-selectmenu-icon");
+        $queryIcon = $query.find(".speedgrader-selectmenu-icon");
+
+        if(className.raw == "graded" && this == EG.currentStudent){
+          $queryIcon.text("").append("<i class='icon-check'></i>");
+          $status.addClass("graded");
+          $statusIcon.text("").append("<i class='icon-check'></i>");
+        }else if(className.raw == "not_graded" && this == EG.currentStudent){
+          $queryIcon.text("").append("&#9679;");
+          $status.removeClass("graded");
+          $statusIcon.text("").append("&#9679;");
+        }else{
+          $status.removeClass("graded");
+        }
 
         // this is because selectmenu.js uses .data('optionClasses' on the li to keep track
         // of what class to put on the selected option ( aka: $selectmenu.data('selectmenu').newelement )

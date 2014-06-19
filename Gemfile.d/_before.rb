@@ -28,7 +28,7 @@ else
 end
 
 # # enforce the version of bundler itself, to avoid any surprises
-required_bundler_version = '1.5.1'..'1.5.3'
+required_bundler_version = '1.5.1'..'1.6.2'
 gem 'bundler', [">=#{required_bundler_version.first}", "<=#{required_bundler_version.last}"]
 
 unless required_bundler_version.include?(Bundler::VERSION)
@@ -39,7 +39,7 @@ unless required_bundler_version.include?(Bundler::VERSION)
     bundle_command = "bundle _#{required_bundler_version.last}_ #{ARGV.map { |a| Shellwords.escape(a) }.join(' ')}"
   end
 
-  warn "Bundler version #{required_bundler_version.first} is required; you're currently running #{Bundler::VERSION}. Maybe try `#{bundle_command}`."
+  warn "Bundler version #{required_bundler_version.first} is required; you're currently running #{Bundler::VERSION}. Maybe try `#{bundle_command}`, or `gem uninstall bundler -v #{Bundler::VERSION}`."
   exit 1
 end
 
@@ -62,12 +62,20 @@ if CANVAS_RAILS3
 end
 
 # patch bundler to do github over https
-unless Bundler::Dsl.private_instance_methods.include?(:_old_normalize_options)
-  class Bundler::Dsl
-    alias_method :_old_normalize_options, :_normalize_options
-    def _normalize_options(name, version, opts)
-      _old_normalize_options(name, version, opts)
-      opts['git'].sub!('git://', 'https://') if opts['git'] && opts['git'] =~ %r{^git://github.com}
+if respond_to?(:git_source)
+  git_source(:github) do |repo_name|
+    repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
+    "https://github.com/#{repo_name}.git"
+  end
+else
+  # bundler 1.5 doesn't have an API for it, so we have to munge the internals
+  unless Bundler::Dsl.private_instance_methods.include?(:_old_normalize_options)
+    class Bundler::Dsl
+      alias_method :_old_normalize_options, :_normalize_options
+      def _normalize_options(name, version, opts)
+        _old_normalize_options(name, version, opts)
+        opts['git'].sub!('git://', 'https://') if opts['git'] && opts['git'] =~ %r{^git://github.com}
+      end
     end
   end
 end

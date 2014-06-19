@@ -32,8 +32,15 @@ class ContentMigration < ActiveRecord::Base
   cattr_accessor :export_file_path
   DATE_FORMAT = "%m/%d/%Y"
 
-  attr_accessible :context, :migration_settings, :user, :source_course, :copy_options, :migration_type
-  attr_accessor :outcome_to_id_map
+  attr_accessible :context, :migration_settings, :user, :source_course, :copy_options, :migration_type, :initiated_source
+  attr_accessor :imported_migration_items, :outcome_to_id_map
+
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :context_id, :user_id, :workflow_state, :migration_settings, :started_at, :finished_at, :created_at, :updated_at, :context_type,
+    :error_count, :error_data, :attachment_id, :overview_attachment_id, :exported_attachment_id, :source_course_id, :migration_type
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:context, :user, :attachment, :overview_attachment, :exported_attachment, :content_export]
 
   workflow do
     state :created
@@ -98,6 +105,14 @@ class ContentMigration < ActiveRecord::Base
 
   def strand
     migration_settings[:strand]
+  end
+
+  def initiated_source
+    migration_settings[:initiated_source] || :manual
+  end
+
+  def initiated_source=(value)
+    migration_settings[:initiated_source] = value
   end
 
   def n_strand
@@ -406,7 +421,7 @@ class ContentMigration < ActiveRecord::Base
 
       migration_settings[:migration_ids_to_import] ||= {:copy=>{}}
 
-      self.context.import_from_migration(data, migration_settings[:migration_ids_to_import], self)
+      Importers.content_importer_for(self.context_type).import_content(self.context, data, migration_settings[:migration_ids_to_import], self)
 
       if !self.import_immediately?
         update_import_progress(100)
@@ -441,7 +456,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def for_course_copy?
-    !!self.source_course || (self.migration_type && self.migration_type == 'course_copy_importer')
+    self.migration_type && self.migration_type == 'course_copy_importer'
   end
 
   def set_date_shift_options(opts)
@@ -467,7 +482,7 @@ class ContentMigration < ActiveRecord::Base
 
   def download_exported_data
     raise "No exported data to import" unless self.exported_attachment
-    config = Setting.from_config('external_migration') || {}
+    config = ConfigFile.load('external_migration') || {}
     @exported_data_zip = self.exported_attachment.open(
       :need_local_file => true,
       :temp_folder => config[:data_folder])
@@ -508,7 +523,7 @@ class ContentMigration < ActiveRecord::Base
   def progress
     return nil if self.workflow_state == 'created'
     mig_prog = read_attribute(:progress) || 0
-    if self.source_course
+    if self.for_course_copy?
       # this is for a course copy so it needs to combine the progress of the export and import
       # The export will count for 40% of progress
       # The importing step (so the value of progress on this object)will be 60%
@@ -593,5 +608,29 @@ class ContentMigration < ActiveRecord::Base
       sub_hash.merge!(clean_hash)
     end
     hash
+  end
+
+  def imported_migration_items
+    @imported_migration_items_hash ||= {}
+    @imported_migration_items_hash.values.flatten
+  end
+
+  def imported_migration_items_by_class(klass)
+    @imported_migration_items_hash ||= {}
+    @imported_migration_items_hash[klass.name] ||= []
+  end
+
+  def add_imported_item(item)
+    arr = imported_migration_items_by_class(item.class)
+    arr << item unless arr.include?(item)
+  end
+
+  def add_external_tool_translation(migration_id, target_tool, custom_fields)
+    @external_tool_translation_map ||= {}
+    @external_tool_translation_map[migration_id] = [target_tool.id, custom_fields]
+  end
+
+  def find_external_tool_translation(migration_id)
+    @external_tool_translation_map && migration_id && @external_tool_translation_map[migration_id]
   end
 end

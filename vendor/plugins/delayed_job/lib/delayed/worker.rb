@@ -93,11 +93,14 @@ class Worker
     @sleep_delay_stagger ||= Setting.get('delayed_jobs_sleep_delay_stagger', '2.5').to_f
     @make_tmpdir ||= Setting.get('delayed_jobs_unique_tmpdir', 'true') == 'true'
 
-    job = Delayed::Job.get_and_lock_next_available(
-      name,
-      queue,
-      min_priority,
-      max_priority)
+    job =
+        self.class.lifecycle.run_callbacks(:pop, self) do
+          Delayed::Job.get_and_lock_next_available(
+            name,
+            queue,
+            min_priority,
+            max_priority)
+        end
 
     if job
       configure_for_job(job) do
@@ -151,10 +154,11 @@ class Worker
     count
   end
 
-  def perform_batch(job)
-    batch = job.payload_object
+  def perform_batch(parent_job)
+    batch = parent_job.payload_object
     if batch.mode == :serial
       batch.jobs.each do |job|
+        job.source = parent_job.source
         job.create_and_lock!(name)
         configure_for_job(job) do
           ensure_db_connection

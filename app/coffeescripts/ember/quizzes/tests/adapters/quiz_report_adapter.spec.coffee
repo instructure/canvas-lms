@@ -13,6 +13,9 @@ define [
       App = startApp()
       fixtures.create()
       subject = App.__container__.lookup('adapter:quizReport')
+
+      #tmp workaround. these tests shouldn't need to visit the route
+      env.setUserPermissions(true, true)
       visit('/1/statistics')
 
      teardown: ->

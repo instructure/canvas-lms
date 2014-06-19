@@ -11,7 +11,7 @@ define [
   $buffer = $("#flash_message_buffer")
   $holder = $("#flash_message_holder")
   $screenreader_holder = $("#flash_screenreader_holder")
-  $holder.on 'click', '.close_link', preventDefault
+  $holder.on 'click', '.close_link', preventDefault(->)
   $holder.on 'click', 'li', ->
     $this = $(this)
     return if $this.hasClass('no_close')

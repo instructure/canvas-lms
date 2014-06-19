@@ -69,6 +69,28 @@ describe Message do
       msg.html_body.scan(/<html>/).length.should == 1
       msg.html_body.index('<html>').should == 0
     end
+
+    it "should not html escape the subject" do
+      assignment_model(:title => "hey i have weird&<stuff> in my name but that's okay")
+      msg = generate_message(:assignment_created, :email, @assignment)
+      msg.subject.should include(@assignment.title)
+    end
+
+    it "should not html escape the user_name" do
+      course_with_teacher
+      @teacher.name = "For some reason my parent's gave me a name with an apostrophe"
+      @teacher.save!
+
+      student1 = student_in_course.user
+      student2 = student_in_course.user
+      conversation = @teacher.initiate_conversation([student1], false)
+
+      conversation.add_message("some message")
+      event = conversation.add_participants([student2])
+      msg = generate_message(:added_to_conversation, :email, event)
+
+      msg.subject.should include(@teacher.name)
+    end
   end
 
   context "named scopes" do

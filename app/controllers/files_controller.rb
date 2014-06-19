@@ -715,6 +715,7 @@ class FilesController < ApplicationController
                 'attachment[unattached_attachment_id]' => @attachment.id,
                 'check_quota_after' => @check_quota ? '1' : '0'
               },
+              :default_content_type => params[:default_content_type],
               :ssl => request.ssl?)
       render :json => res
     end

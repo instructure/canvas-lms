@@ -1,8 +1,8 @@
-<a
-  href="#"
-  class="remove_never_drop"
-  title="{{#t "remove_rule"}}Remove Rule{{/t}}"
-><i class="icon-end"></i></a>
+<button
+  class="remove_never_drop btn btn-link"
+  title="{{buttonTitle}}"
+  aria-label="{{buttonTitle}}"
+><i class="icon-end"></i></button>
 
 {{#unless chosen}}
   <select name="rules[never_drop][]" aria-labelledby="ag_{{label_id}}_never_drop">

@@ -167,10 +167,10 @@ module CanvasExpected
                      :question_name=>"Oi!",
                      :points_possible=>10.3,
                      :migration_id=>"if87ef626591c52375b6a4f16cdab8bd0",
-                     :question_text=>"Ole"}
+                     :question_text=>"Ole\n<br/>\n<a>Test Page</a>\n<br/>\nWhy would you link to a wiki page from a quiz question? That doesn't seem right."}
 
   TRUE_FALSE = {:points_possible=>10,
-                :question_text=>"Generating QTI is \n<strong>super</strong> awesome!",
+                :question_text=>"Generating QTI is \n<strong>super</strong> awesome!\n<br/>\noh, and &amp;amp;",
                 :answers=>
                         [{:weight=>0, :migration_id=>"RESPONSE_5309", :text=>"True"},
                          {:comments=>"You're an idiot.", :weight=>100, :migration_id=>"RESPONSE_239",:text=>"False"}],

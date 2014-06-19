@@ -1,0 +1,17 @@
+{
+  "id": 54,
+  "regrade_option": "",
+  "points_possible": 1,
+  "correct_comments": "",
+  "incorrect_comments": "",
+  "neutral_comments": "",
+  "question_type": "file_upload_question",
+  "question_name": "FUQuestion",
+  "name": "FUQuestion",
+  "question_text": "<p>File Upload: what do you look like?</p>",
+  "answers": [],
+  "text_after_answers": "",
+  "assessment_question_id": 51,
+  "position": 13,
+  "published_at": "2014-05-17T08:47:21Z"
+}
