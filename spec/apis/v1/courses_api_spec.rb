@@ -1830,6 +1830,19 @@ describe CoursesController, type: :request do
     end
   end
 
+  describe "user" do
+    it "should allow searching for user by sis id" do
+      student = student_in_course(course: @course1, name: "student").user
+      pseudonym = pseudonym(student)
+      pseudonym.sis_user_id = "sis_1"
+      pseudonym.save!
+
+      json = api_call(:get, "/api/v1/courses/#{@course1.id}/users/sis_user_id:#{pseudonym.sis_user_id}.json",
+        { controller: 'courses', action: 'user', course_id: @course1.id.to_s, id: "sis_user_id:#{pseudonym.sis_user_id}", :format => 'json' })
+      response.code.should == '200'
+    end
+  end
+
   it "should return the needs_grading_count for all assignments" do
     @group = @course1.assignment_groups.create!({:name => "some group"})
     @assignment = @course1.assignments.create!(:title => "some assignment", :assignment_group => @group, :points_possible => 12)
