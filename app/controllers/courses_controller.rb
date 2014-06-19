@@ -725,8 +725,7 @@ class CoursesController < ApplicationController
   def user
     get_context
     if authorized_action(@context, @current_user, :read_roster)
-      users = @context.users_visible_to(@current_user)
-      users = users.where(:users => {:id => params[:id]})
+      users = api_find_all(@context.users_visible_to(@current_user), [params[:id]])
       includes = Array(params[:include])
       user_json_preloads(users, includes.include?('email'))
       if includes.include?('enrollments')
