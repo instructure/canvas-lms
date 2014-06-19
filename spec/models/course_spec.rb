@@ -1,4 +1,3 @@
-#
 # Copyright (C) 2011 - 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -115,6 +114,23 @@ describe Course do
       @course.allow_student_discussion_topics = false
       @course.save!
       @course.allow_student_discussion_topics.should == false
+    end
+  end
+
+  describe "#time_zone" do
+    before do
+      @root_account = Account.default
+    end
+
+    it "should use provided value when set, regardless of root account setting" do
+      @root_account.default_time_zone = 'America/Chicago'
+      @course.time_zone = 'America/New_York'
+      @course.time_zone.should == ActiveSupport::TimeZone['Eastern Time (US & Canada)']
+    end
+
+    it "should default to root account value if not set" do
+      @root_account.default_time_zone = 'America/Chicago'
+      @course.time_zone.should == ActiveSupport::TimeZone['Central Time (US & Canada)']
     end
   end
 
@@ -597,47 +613,47 @@ describe Course do
 end
 
 describe Course, "enroll" do
-  
+
   before(:each) do
     @course = Course.create(:name => "some_name")
     @user = user_with_pseudonym
   end
-  
+
   it "should be able to enroll a student" do
     @course.enroll_student(@user)
     @se = @course.student_enrollments.first
     @se.user_id.should eql(@user.id)
     @se.course_id.should eql(@course.id)
   end
-  
+
   it "should be able to enroll a TA" do
     @course.enroll_ta(@user)
     @tae = @course.ta_enrollments.first
     @tae.user_id.should eql(@user.id)
     @tae.course_id.should eql(@course.id)
   end
-  
+
   it "should be able to enroll a teacher" do
     @course.enroll_teacher(@user)
     @te = @course.teacher_enrollments.first
     @te.user_id.should eql(@user.id)
     @te.course_id.should eql(@course.id)
   end
-  
+
   it "should be able to enroll a designer" do
     @course.enroll_designer(@user)
     @de = @course.designer_enrollments.first
     @de.user_id.should eql(@user.id)
     @de.course_id.should eql(@course.id)
   end
-  
+
   it "should enroll a student as creation_pending if the course isn't published" do
     @se = @course.enroll_student(@user)
     @se.user_id.should eql(@user.id)
     @se.course_id.should eql(@course.id)
     @se.should be_creation_pending
   end
-  
+
   it "should enroll a teacher as invited if the course isn't published" do
     Notification.create(:name => "Enrollment Registration", :category => "registration")
     @tae = @course.enroll_ta(@user)
@@ -646,7 +662,7 @@ describe Course, "enroll" do
     @tae.should be_invited
     @tae.messages_sent.should be_include("Enrollment Registration")
   end
-  
+
   it "should enroll a ta as invited if the course isn't published" do
     Notification.create(:name => "Enrollment Registration", :category => "registration")
     @te = @course.enroll_teacher(@user)
@@ -702,7 +718,6 @@ describe Course, "score_to_grade" do
     @course.score_to_grade(0).should eql("F")
     @course.score_to_grade(-100).should eql("F")
   end
-  
 end
 
 describe Course, "gradebook_to_csv" do
@@ -715,7 +730,7 @@ describe Course, "gradebook_to_csv" do
     @course.recompute_student_scores
     @user.reload
     @course.reload
-    
+
     csv = @course.gradebook_to_csv
     csv.should_not be_nil
     rows = CSV.parse(csv)
@@ -797,6 +812,29 @@ describe Course, "gradebook_to_csv" do
      rows[5][0]].should == ["Aardvark, Aardvark", "Ned, Ned", "Zed, Zed", "Student, Test"]
   end
 
+  it "should include all section names in alphabetical order" do
+    course
+    sections = []
+    students = []
+    ['COMPSCI 123 LEC 001', 'COMPSCI 123 DIS 101', 'COMPSCI 123 DIS 102'].each do |section_name|
+      add_section(section_name)
+      sections << @course_section
+    end
+    3.times {|i| students << student_in_section(sections[0], :user => user(:name => "Student #{i}")) }
+
+    @course.enroll_user(students[0], 'StudentEnrollment', :section => sections[1], :enrollment_state => 'active', :allow_multiple_enrollments => true)
+    @course.enroll_user(students[2], 'StudentEnrollment', :section => sections[1], :enrollment_state => 'active', :allow_multiple_enrollments => true)
+    @course.enroll_user(students[2], 'StudentEnrollment', :section => sections[2], :enrollment_state => 'active', :allow_multiple_enrollments => true)
+
+    csv = @course.gradebook_to_csv
+    csv.should_not be_nil
+    rows = CSV.parse(csv)
+    rows.length.should equal(5)
+    rows[2][2].should == "COMPSCI 123 DIS 101 and COMPSCI 123 LEC 001"
+    rows[3][2].should == "COMPSCI 123 LEC 001"
+    rows[4][2].should == "COMPSCI 123 DIS 101, COMPSCI 123 DIS 102, and COMPSCI 123 LEC 001"
+  end
+
   it "should generate csv with final grade if enabled" do
     course_with_student(:active_all => true)
     @course.grading_standard_id = 0
@@ -809,7 +847,7 @@ describe Course, "gradebook_to_csv" do
     @course.recompute_student_scores
     @user.reload
     @course.reload
-    
+
     csv = @course.gradebook_to_csv
     csv.should_not be_nil
     rows = CSV.parse(csv)
@@ -865,6 +903,52 @@ describe Course, "gradebook_to_csv" do
     rows[4][1].should == @user3.id.to_s
     rows[4][2].should be_nil
     rows[4][3].should be_nil
+  end
+
+  it "should include primary domain if a trust exists" do
+    course(:active_all => true)
+    @user1 = user_with_pseudonym(:active_all => true, :name => 'Brian', :username => 'brianp@instructure.com')
+    student_in_course(:user => @user1)
+    account2 = account_model
+    @user2 = user_with_pseudonym(:active_all => true, :name => 'Cody', :username => 'cody@instructure.com', :account => account2)
+    student_in_course(:user => @user2)
+    @user3 = user(:active_all => true, :name => 'JT')
+    student_in_course(:user => @user3)
+    @user1.pseudonym.sis_user_id = "SISUSERID"
+    @user1.pseudonym.save!
+    @user2.pseudonym.sis_user_id = "SISUSERID"
+    @user2.pseudonym.save!
+    @course.reload
+    @course.root_account.stubs(:trust_exists?).returns(true)
+    @course.root_account.any_instantiation.stubs(:trusted_account_ids).returns([account2.id])
+    HostUrl.expects(:context_host).with(@course.root_account).returns('school1')
+    HostUrl.expects(:context_host).with(account2).returns('school2')
+
+    csv = @course.gradebook_to_csv(:include_sis_id => true)
+    csv.should_not be_nil
+    rows = CSV.parse(csv)
+    rows.length.should == 5
+    rows[0][1].should == 'ID'
+    rows[0][2].should == 'SIS User ID'
+    rows[0][3].should == 'SIS Login ID'
+    rows[0][4].should == 'Root Account'
+    rows[0][5].should == 'Section'
+    rows[1][2].should == nil
+    rows[1][3].should == nil
+    rows[1][4].should == nil
+    rows[1][5].should == nil
+    rows[2][1].should == @user1.id.to_s
+    rows[2][2].should == 'SISUSERID'
+    rows[2][3].should == @user1.pseudonym.unique_id
+    rows[2][4].should == 'school1'
+    rows[3][1].should == @user2.id.to_s
+    rows[3][2].should == 'SISUSERID'
+    rows[3][3].should == @user2.pseudonym.unique_id
+    rows[3][4].should == 'school2'
+    rows[4][1].should == @user3.id.to_s
+    rows[4][2].should be_nil
+    rows[4][3].should be_nil
+    rows[4][4].should be_nil
   end
 
   context "accumulated points" do
@@ -984,16 +1068,23 @@ describe Course, "update_account_associations" do
   it "should update account associations correctly" do
     account1 = Account.create!(:name => 'first')
     account2 = Account.create!(:name => 'second')
-    
+
     @c = Course.create!(:account => account1)
     @c.associated_accounts.length.should eql(1)
     @c.associated_accounts.first.should eql(account1)
-    
+
     @c.account = account2
     @c.save!
     @c.reload
     @c.associated_accounts.length.should eql(1)
     @c.associated_accounts.first.should eql(account2)
+  end
+
+  it "should act like it's associated to its account and root account, even if associations are busted" do
+    account1 = Account.default.sub_accounts.create!
+    c = account1.courses.create!
+    c.course_account_associations.scoped.delete_all
+    c.associated_accounts.should == [account1, Account.default]
   end
 end
 
@@ -1026,20 +1117,20 @@ describe Course, "tabs_available" do
     tab_ids.length.should > 0
     @course.tabs_available(@user).map{|t| t[:label] }.compact.length.should eql(tab_ids.length)
   end
-  
+
   it "should hide unused tabs if not an admin" do
     course_with_student(:active_all => true)
     tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
     tab_ids.should_not be_include(Course::TAB_SETTINGS)
     tab_ids.length.should > 0
   end
-  
+
   it "should show grades tab for students" do
     course_with_student(:active_all => true)
     tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
     tab_ids.should be_include(Course::TAB_GRADES)
   end
-  
+
   it "should not show grades tab for observers" do
     course_with_student(:active_all => true)
     @student = @user
@@ -1050,7 +1141,7 @@ describe Course, "tabs_available" do
     tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
     tab_ids.should_not be_include(Course::TAB_GRADES)
   end
-    
+
   it "should show grades tab for observers if they are linked to a student" do
     course_with_student(:active_all => true)
     @student = @user
@@ -1105,7 +1196,7 @@ describe Course, "tabs_available" do
     tabs.should be_include(t1.asset_string)
     tabs.should_not be_include(t2.asset_string)
   end
-  
+
   it "should not include tabs for external tools if opt[:include_external] is false" do
     course_with_student(:active_all => true)
 
@@ -1182,7 +1273,7 @@ describe Course, "backup" do
     data.any?{|i| i.is_a?(DiscussionTopic)}.should eql(true)
     data.any?{|i| i.is_a?(CalendarEvent)}.should eql(true)
   end
-  
+
   it "should backup to a valid json string" do
     course_to_backup
     data = @course.backup_to_json
@@ -1193,7 +1284,7 @@ describe Course, "backup" do
     parse.should be_is_a(Array)
     parse.length.should > 0
   end
-  
+
   it "should not cross learning outcomes with learning outcome groups in the association" do
     pending('fails when being run in the single thread rake task')
     # set up two courses with two outcomes
@@ -1227,7 +1318,7 @@ describe Course, "backup" do
     default_group = course.root_outcome_group
     other_group = course.learning_outcome_groups.create!(:title => 'other group')
     default_group.adopt_outcome_group(other_group)
-    
+
     course.should_not have_outcomes
   end
 
@@ -1251,20 +1342,20 @@ describe Course, 'grade_publishing' do
     @course.save!
     @course_section = @course.default_section
   end
-  
+
   after(:each) do
     Course.valid_grade_export_types.delete("test_export")
   end
 
   context 'mocked plugin settings' do
-    
+
     before(:each) do
       @plugin_settings = Canvas::Plugin.find!("grade_export").default_settings.clone
       @plugin = mock()
       Canvas::Plugin.stubs("find!".to_sym).with('grade_export').returns(@plugin)
       @plugin.stubs(:settings).returns{@plugin_settings}
     end
-    
+
     context 'grade_publishing_status_translation' do
       it 'should work with nil statuses and messages' do
         @course.grade_publishing_status_translation(nil, nil).should == "Unpublished"
@@ -1920,7 +2011,7 @@ describe Course, 'grade_publishing' do
       end
 
     end
-  
+
     context 'generate_grade_publishing_csv_output' do
 
       def add_pseudonym(enrollment, account, unique_id, sis_user_id)
@@ -2440,7 +2531,7 @@ describe Course, 'tabs_available' do
   def new_external_tool(context)
     context.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "example.com")
   end
-  
+
   it "should not include external tools if not configured for course navigation" do
     course_model
     tool = new_external_tool @course
@@ -2452,7 +2543,7 @@ describe Course, 'tabs_available' do
     tabs = @course.tabs_available(@teacher)
     tabs.map{|t| t[:id] }.should_not be_include(tool.asset_string)
   end
-  
+
   it "should include external tools if configured on the course" do
     course_model
     tool = new_external_tool @course
@@ -2468,7 +2559,7 @@ describe Course, 'tabs_available' do
     tab[:href].should == :course_external_tool_path
     tab[:args].should == [@course.id, tool.id]
   end
-  
+
   it "should include external tools if configured on the account" do
     course_model
     @account = @course.root_account.sub_accounts.create!(:name => "sub-account")
@@ -2486,7 +2577,7 @@ describe Course, 'tabs_available' do
     tab[:href].should == :course_external_tool_path
     tab[:args].should == [@course.id, tool.id]
   end
-  
+
   it "should include external tools if configured on the root account" do
     course_model
     @account = @course.root_account.sub_accounts.create!(:name => "sub-account")
@@ -2504,7 +2595,7 @@ describe Course, 'tabs_available' do
     tab[:href].should == :course_external_tool_path
     tab[:args].should == [@course.id, tool.id]
   end
-  
+
   it "should only include admin-only external tools for course admins" do
     course_model
     @course.offer
@@ -2530,7 +2621,7 @@ describe Course, 'tabs_available' do
     tab[:href].should == :course_external_tool_path
     tab[:args].should == [@course.id, tool.id]
   end
-  
+
   it "should not include member-only external tools for unauthenticated users" do
     course_model
     @course.offer
@@ -2556,7 +2647,7 @@ describe Course, 'tabs_available' do
     tab[:href].should == :course_external_tool_path
     tab[:args].should == [@course.id, tool.id]
   end
-  
+
   it "should allow reordering external tool position in course navigation" do
     course_model
     tool = new_external_tool @course
@@ -2570,7 +2661,7 @@ describe Course, 'tabs_available' do
     tabs = @course.tabs_available(@teacher)
     tabs[1][:id].should == tool.asset_string
   end
-  
+
   it "should not show external tools that are hidden in course navigation" do
     course_model
     tool = new_external_tool @course
@@ -2581,13 +2672,13 @@ describe Course, 'tabs_available' do
     @course.enroll_teacher(@teacher).accept
     tabs = @course.tabs_available(@teacher)
     tabs.map{|t| t[:id] }.should be_include(tool.asset_string)
-    
+
     @course.tab_configuration = Course.default_tabs.map{|t| {:id => t[:id] } }.insert(1, {:id => tool.asset_string, :hidden => true})
     @course.save!
     @course = Course.find(@course.id)
     tabs = @course.tabs_available(@teacher)
     tabs.map{|t| t[:id] }.should_not be_include(tool.asset_string)
-    
+
     tabs = @course.tabs_available(@teacher, :for_reordering => true)
     tabs.map{|t| t[:id] }.should be_include(tool.asset_string)
   end
@@ -2643,7 +2734,7 @@ describe Course, 'scoping' do
     c2.save
     Course.name_like("name1").map(&:id).should == [c1.id]
     Course.name_like("sisid2").map(&:id).should == [c2.id]
-    Course.name_like("code1").map(&:id).should == [c1.id]    
+    Course.name_like("code1").map(&:id).should == [c1.id]
   end
 end
 
@@ -3680,7 +3771,7 @@ describe Course do
     end
   end
 
-  it "creates a scope the returns deleted courses" do 
+  it "creates a scope the returns deleted courses" do
     @course1 = Course.create!
     @course1.workflow_state = 'deleted'
     @course1.save!

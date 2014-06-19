@@ -30,7 +30,7 @@ define [
       e.preventDefault()
       e.stopPropagation()
       newGroupId = $(e.currentTarget).data('group-id')
-      @collection.category.reassignUser(@model, newGroupId)
+      @collection.category.reassignUser(@model, @collection.get(newGroupId))
       @hide()
 
     toJSON: ->

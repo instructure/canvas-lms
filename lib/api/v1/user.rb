@@ -40,7 +40,8 @@ module Api::V1::User
     includes ||= []
     api_json(user, current_user, session, API_USER_JSON_OPTS).tap do |json|
       if user_json_is_admin?(context, current_user)
-        if sis_pseudonym = user.sis_pseudonym_for(@domain_root_account)
+        include_root_account = @domain_root_account.trust_exists?
+        if sis_pseudonym = user.sis_pseudonym_for(@domain_root_account, include_root_account)
           # the sis fields on pseudonym are poorly named -- sis_user_id is
           # the id in the SIS import data, where on every other table
           # that's called sis_source_id.
@@ -49,6 +50,7 @@ module Api::V1::User
                       # TODO: don't send sis_login_id; it's garbage data
                       :sis_login_id => sis_pseudonym.unique_id if @domain_root_account.grants_rights?(current_user, :read_sis, :manage_sis).values.any?
           json[:sis_import_id] = sis_pseudonym.sis_batch_id if @domain_root_account.grants_right?(current_user, session, :manage_sis)
+          json[:root_account] = HostUrl.context_host(sis_pseudonym.account) if include_root_account
         end
         if pseudonym = (sis_pseudonym || user.find_pseudonym_for_account(@domain_root_account))
           json[:login_id] = pseudonym.unique_id
@@ -131,10 +133,6 @@ module Api::V1::User
                               :root_account_id,
                               :user_id,
                               :course_id,
-                              :sis_course_id,
-                              :sis_section_id,
-                              :course_integration_id,
-                              :section_integration_id,
                               :course_section_id,
                               :associated_user_id,
                               :limit_privileges_to_course_section,
@@ -150,6 +148,7 @@ module Api::V1::User
       json[:enrollment_state] = json.delete('workflow_state')
       json[:role] = enrollment.role
       json[:last_activity_at] = enrollment.last_activity_at
+      json[:total_activity_time] = enrollment.total_activity_time
       if enrollment.root_account.grants_right?(user, session, :manage_sis)
         json[:sis_import_id] = enrollment.sis_batch_id
       end
@@ -164,10 +163,12 @@ module Api::V1::User
           end
         end
       end
-      json[:sis_course_id] = Course.find_by_id(enrollment.course_id).sis_source_id
-      json[:course_integration_id] = Course.find_by_id(enrollment.course_id).integration_id
-      json[:sis_section_id] = CourseSection.find_by_id(enrollment.course_section_id).sis_source_id
-      json[:section_integration_id] = CourseSection.find_by_id(enrollment.course_section_id).integration_id
+      if @domain_root_account.grants_rights?(@current_user, :read_sis, :manage_sis).values.any?
+        json[:sis_course_id] = enrollment.course.sis_source_id
+        json[:course_integration_id] = enrollment.course.integration_id
+        json[:sis_section_id] = enrollment.course_section.sis_source_id
+        json[:section_integration_id] = enrollment.course_section.integration_id
+      end
       json[:html_url] = course_user_url(enrollment.course_id, enrollment.user_id)
       user_includes = includes.include?('avatar_url') ? ['avatar_url'] : []
       json[:user] = user_json(enrollment.user, user, session, user_includes) if includes.include?(:user)

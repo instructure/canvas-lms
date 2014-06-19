@@ -1,5 +1,6 @@
 @import "environment.sass";
 @import "show";
+@import "moderate";
 @import "statistics";
 $backgroundColor: #dfe9f0;
 $borderColor: #AAA;
@@ -60,6 +61,10 @@ li.quiz .ig-title {
     &:last-of-type {
       border-bottom: 0;
     }
+  }
+
+  .publish-icon i {
+    padding: 6px;
   }
 }
 

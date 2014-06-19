@@ -22,24 +22,24 @@ class ImportedHtmlConverter
 
   CONTAINER_TYPES = ['div', 'p', 'body']
 
-  def self.convert(html, context, opts={})
+  def self.convert(html, context, migration=nil, opts={})
     doc = Nokogiri::HTML(html || "")
     attrs = ['rel', 'href', 'src', 'data', 'value']
     course_path = "/#{context.class.to_s.underscore.pluralize}/#{context.id}"
 
     for_course_copy = false
     domain_substitution_map = {}
-    if context.respond_to?(:content_migration) && context.content_migration
-      for_course_copy = true if context.content_migration.for_course_copy?
+    if migration
+      for_course_copy = true if migration.for_course_copy?
 
-      if ds_map = context.content_migration.migration_settings[:domain_substitution_map]
+      if ds_map = migration.migration_settings[:domain_substitution_map]
         ds_map.each{|k, v| domain_substitution_map[k.to_s] = v.to_s } # ensure strings
       end
     end
 
     doc.search("*").each do |node|
       attrs.each do |attr|
-        if node[attr]
+        if node[attr].present?
           if attr == 'value'
             next unless node['name'] && node['name'] == 'src'
           end
@@ -54,7 +54,7 @@ class ImportedHtmlConverter
             #todo: FLAG UNFOUND REFERENCES TO re-attempt in second loop?
             if wiki_migration_id = $1
               if linked_wiki = context.wiki.wiki_pages.find_by_migration_id(wiki_migration_id)
-                new_url = URI::escape("#{course_path}/wiki/#{linked_wiki.url}")
+                new_url = "#{course_path}/wiki/#{linked_wiki.url}"
               end
             end
           elsif val =~ /discussion_topic_migration_id=(.*)/
@@ -74,7 +74,7 @@ class ImportedHtmlConverter
             type = 'context_modules' if type == 'modules'
             type = 'pages' if type == 'wiki'
             if type == 'pages'
-              new_url = URI::escape("#{course_path}/#{context.feature_enabled?(:draft_state) ? 'pages' : 'wiki'}/#{migration_id}")
+              new_url = "#{course_path}/#{context.feature_enabled?(:draft_state) ? 'pages' : 'wiki'}/#{migration_id}"
             elsif type == 'attachments'
               if att = context.attachments.find_by_migration_id(migration_id)
                 new_url = URI::escape("#{course_path}/files/#{att.id}/preview")
@@ -252,7 +252,7 @@ class ImportedHtmlConverter
   end
   
   def self.relative_url?(url)
-    URI.parse(url).relative?
+    URI.parse(url).relative? && !url.to_s.start_with?("//")
   end
   
   def self.convert_text(text, context, import_source=:webct)

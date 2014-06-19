@@ -331,15 +331,11 @@ describe Quizzes::QuizzesApiController, type: :request do
 
       it "renders in a jsonapi style" do
         @quiz = @course.quizzes.create! title: 'Test Quiz'
-        @json = api_call(:put, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}",
+        @json = raw_api_call(:put, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}",
                          { :controller=>"quizzes/quizzes_api", :action=>"update", :format=>"json", :course_id=>"#{@course.id}", :id => "#{@quiz.id}"},
                          { quizzes: [{ 'id' => @quiz.id, 'title' => 'blah blah' }] },
                         'Accept' => 'application/vnd.api+json')
-        @json = @json.fetch('quizzes').map { |q| q.with_indifferent_access }
-        @json.should =~ [
-          Quizzes::QuizSerializer.new(@quiz.reload, scope: @user, controller: controller, session: session).
-          as_json[:quiz].with_indifferent_access
-        ]
+        response.should be_success
       end
     end
 
@@ -401,15 +397,29 @@ describe Quizzes::QuizzesApiController, type: :request do
         @quiz.reload.should be_published
         api_update_quiz({},{published: nil}) # nil shouldn't change published
         @quiz.reload.should be_published
+
         @quiz.any_instantiation.stubs(:has_student_submissions?).returns true
         json = api_update_quiz({},{}) # nil shouldn't change published
         json['unpublishable'].should == false
+
         json = api_update_quiz({}, {published: false}, {expected_status: 400})
         json['errors']['published'].should_not be_nil
+
         ActiveRecord::Base.reset_any_instantiation!
         @quiz.reload.should be_published
       end
 
+      it "should not lose quiz question count when publishing with draft state" do
+        Account.default.enable_feature!(:draft_state)
+
+        @quiz ||= @course.quizzes.create!(:title => 'title')
+        @qq1 = @quiz.quiz_questions.create!(
+          question_data: multiple_choice_question_data
+        )
+        json = api_update_quiz({}, {published: true})
+        @quiz.reload.should be_published
+        @quiz.question_count.should == 1
+      end
     end
 
     describe "validations" do

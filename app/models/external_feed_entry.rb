@@ -22,6 +22,13 @@ class ExternalFeedEntry < ActiveRecord::Base
   belongs_to :user
   belongs_to :external_feed
   belongs_to :asset, :polymorphic => true
+
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :user_id, :external_feed_id, :title, :message, :source_name, :source_url, :posted_at, :start_at, :end_at, :workflow_state, :url, :author_name, :author_email,
+    :author_url, :asset_id, :asset_type, :uuid, :created_at, :updated_at
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:user, :external_feed, :asset]
   
   before_save :infer_defaults
   validates_presence_of :user_id, :external_feed_id, :workflow_state

@@ -23,7 +23,7 @@ module Canvas
   def self.redis
     raise "Redis is not enabled for this install" unless Canvas.redis_enabled?
     @redis ||= begin
-      settings = Setting.from_config('redis')
+      settings = ConfigFile.load('redis')
       Canvas::RedisConfig.from_settings(settings).redis
     end
   end
@@ -36,7 +36,7 @@ module Canvas
   end
 
   def self.redis_enabled?
-    @redis_enabled ||= Setting.from_config('redis').present?
+    @redis_enabled ||= ConfigFile.load('redis').present?
   end
 
   def self.reconnect_redis
@@ -57,10 +57,10 @@ module Canvas
     unless @cache_stores
       # this method is called really early in the bootup process, and
       # autoloading might not be available yet, so we need to manually require
-      # Setting
-      require_dependency 'app/models/setting'
+      # Config
+      require_dependency 'lib/config_file'
       @cache_stores = {}
-      configs = Setting.from_config('cache_store', nil) || {}
+      configs = ConfigFile.load('cache_store', nil) || {}
 
       # sanity check the file
       unless configs.is_a?(Hash)
@@ -77,7 +77,7 @@ module Canvas
         case config.delete('cache_store')
         when 'mem_cache_store'
           config['namespace'] ||= config['key']
-          servers = config['servers'] || (Setting.from_config('memcache', env))
+          servers = config['servers'] || (ConfigFile.load('memcache', env))
           if servers
             @cache_stores[env] = :mem_cache_store, servers, config
           end
@@ -89,7 +89,7 @@ module Canvas
           #
           # the only options currently supported in redis-cache are the list of
           # servers, not key prefix or database names.
-          config = (Setting.from_config('redis', env) || {}).merge(config)
+          config = (ConfigFile.load('redis', env) || {}).merge(config)
           config['key_prefix'] ||= config['key']
           servers = config['servers']
           @cache_stores[env] = :redis_store, servers

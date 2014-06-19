@@ -200,7 +200,8 @@ class ContextController < ApplicationController
         :permissions => {
           :manage_students => (manage_students = @context.grants_right?(@current_user, session, :manage_students)),
           :manage_admin_users => (manage_admins = @context.grants_right?(@current_user, session, :manage_admin_users)),
-          :add_users => manage_students || manage_admins
+          :add_users => manage_students || manage_admins,
+          :read_reports => @context.grants_right?(@current_user, session, :read_reports)
         },
         :course => {
           :id => @context.id,

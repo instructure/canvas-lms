@@ -60,6 +60,14 @@ describe Api do
       (lambda {@api.api_find(User, "sis_login_id:sis_user_2@example.com")}).should raise_error(ActiveRecord::RecordNotFound)
     end
 
+    it 'should find record from other root account explicitly' do
+      account = Account.create(name: 'new')
+      @user = user_with_pseudonym username: "sis_user_1@example.com", account: account
+      Api.expects(:sis_parse_id).with("root_account:school:sis_login_id:sis_user_1@example.com", anything, anything).
+          returns(['pseudonyms.unique_id', ["sis_user_1@example.com", account]])
+      @api.api_find(User, "root_account:school:sis_login_id:sis_user_1@example.com").should == @user
+    end
+
     it 'should allow passing account param and find record' do
       account = Account.create(name: 'new')
       @user = user_with_pseudonym username: "sis_user_1@example.com", account: account
@@ -143,6 +151,26 @@ describe Api do
           api.api_find(User, user.id).should == user
         end
       end
+    end
+
+    it "should find user by lti_context_id" do
+      @user.lti_context_id = Canvas::Security.hmac_sha1(@user.asset_string.to_s, 'key')
+      @user.save!
+      @api.api_find(User, "lti_context_id:#{@user.lti_context_id}").should == @user
+    end
+
+    it "should find course by lti_context_id" do
+      lti_course = course
+      lti_course.lti_context_id = Canvas::Security.hmac_sha1(lti_course.asset_string.to_s, 'key')
+      lti_course.save!
+      @api.api_find(Course, "lti_context_id:#{lti_course.lti_context_id}").should == lti_course
+    end
+
+    it "should find account by lti_context_id" do
+      account = Account.create!(name: 'account')
+      account.lti_context_id = Canvas::Security.hmac_sha1(account.asset_string.to_s, 'key')
+      account.save!
+      @api.api_find(Account, "lti_context_id:#{account.lti_context_id}").should == account
     end
   end
 
@@ -307,7 +335,7 @@ describe Api do
     it 'should try and make params when non-ar_id columns have returned with ar_id columns' do
       collection = mock()
       Api.expects(:sis_find_sis_mapping_for_collection).with(collection).returns({:lookups => {"id" => "test-lookup"}})
-      Api.expects(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}).returns({"test-lookup" => ["thing1", "thing2"], "other-lookup" => ["thing2", "thing3"]})
+      Api.expects(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}, anything).returns({"test-lookup" => ["thing1", "thing2"], "other-lookup" => ["thing2", "thing3"]})
       Api.expects(:sis_make_params_for_sis_mapping_and_columns).with({"other-lookup" => ["thing2", "thing3"]}, {:lookups => {"id" => "test-lookup"}}, "test-root-account").returns({"find-params" => "test"})
       collection.expects(:scoped).with("find-params" => "test").returns(collection)
       collection.expects(:pluck).with(:id).returns(["thing2", "thing3"])
@@ -317,7 +345,7 @@ describe Api do
     it 'should try and make params when non-ar_id columns have returned without ar_id columns' do
       collection = mock()
       Api.expects(:sis_find_sis_mapping_for_collection).with(collection).returns({:lookups => {"id" => "test-lookup"}})
-      Api.expects(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}).returns({"other-lookup" => ["thing2", "thing3"]})
+      Api.expects(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}, anything).returns({"other-lookup" => ["thing2", "thing3"]})
       Api.expects(:sis_make_params_for_sis_mapping_and_columns).with({"other-lookup" => ["thing2", "thing3"]}, {:lookups => {"id" => "test-lookup"}}, "test-root-account").returns({"find-params" => "test"})
       collection.expects(:scoped).with("find-params" => "test").returns(collection)
       collection.expects(:pluck).with(:id).returns(["thing2", "thing3"])
@@ -327,7 +355,7 @@ describe Api do
     it 'should not try and make params when no non-ar_id columns have returned with ar_id columns' do
       collection = mock()
       Api.expects(:sis_find_sis_mapping_for_collection).with(collection).returns({:lookups => {"id" => "test-lookup"}})
-      Api.expects(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}).returns({"test-lookup" => ["thing1", "thing2"]})
+      Api.expects(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}, anything).returns({"test-lookup" => ["thing1", "thing2"]})
       Api.expects(:sis_make_params_for_sis_mapping_and_columns).at_most(0)
       Api.map_ids("test-ids", collection, "test-root-account").should == ["thing1", "thing2"]
     end
@@ -337,7 +365,7 @@ describe Api do
       object1 = mock()
       object2 = mock()
       Api.expects(:sis_find_sis_mapping_for_collection).with(collection).returns({:lookups => {"id" => "test-lookup"}})
-      Api.expects(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}).returns({})
+      Api.expects(:sis_parse_ids).with("test-ids", {"id" => "test-lookup"}, anything).returns({})
       Api.expects(:sis_make_params_for_sis_mapping_and_columns).at_most(0)
       Api.map_ids("test-ids", collection, "test-root-account").should == []
     end
@@ -446,7 +474,7 @@ describe Api do
   context 'sis_find_params_for_collection' do
     it 'should pass along the sis_mapping to sis_find_params_for_sis_mapping' do
       root_account = account_model
-      Api.expects(:sis_find_params_for_sis_mapping).with(Api::SIS_MAPPINGS['users'], [1,2,3], root_account).returns(1234)
+      Api.expects(:sis_find_params_for_sis_mapping).with(Api::SIS_MAPPINGS['users'], [1,2,3], root_account, anything).returns(1234)
       Api.expects(:sis_find_sis_mapping_for_collection).with(User).returns(Api::SIS_MAPPINGS['users'])
       Api.sis_find_params_for_collection(User, [1,2,3], root_account).should == 1234
     end
@@ -455,7 +483,7 @@ describe Api do
   context 'sis_find_params_for_sis_mapping' do
     it 'should pass along the parsed ids to sis_make_params_for_sis_mapping_and_columns' do
       root_account = account_model
-      Api.expects(:sis_parse_ids).with([1,2,3], "lookups").returns({"users.id" => [4,5,6]})
+      Api.expects(:sis_parse_ids).with([1,2,3], "lookups", anything).returns({"users.id" => [4,5,6]})
       Api.expects(:sis_make_params_for_sis_mapping_and_columns).with({"users.id" => [4,5,6]}, {:lookups => "lookups"}, root_account).returns("params")
       Api.sis_find_params_for_sis_mapping({:lookups => "lookups"}, [1,2,3], root_account).should == "params"
     end

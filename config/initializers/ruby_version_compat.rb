@@ -34,6 +34,13 @@ if RUBY_VERSION < '2.0'
 end
 
 if CANVAS_RAILS2
+  ActionView::Helpers::TagHelper.module_eval do
+    def escape_once(html)
+      # so '&#x27;' (in particular) doesn't get double-escaped (note the 'x?' in the regex)
+      ActiveSupport::Multibyte.clean(html.to_s).gsub(/[\"><]|&(?!([a-zA-Z]+|(#x?\d+));)/) { |special| ERB::Util::HTML_ESCAPE[special] }
+    end
+  end
+
   require "active_support/core_ext/string/output_safety"
   class ERB
     module Util

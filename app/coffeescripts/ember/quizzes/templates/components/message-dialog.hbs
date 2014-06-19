@@ -1,0 +1,11 @@
+<form class="form-dialog">
+  <div class="form-dialog-content">
+    {{yield}}
+  </div>
+
+  <div class="form-controls">
+    <button class="btn btn-primary confirm-dialog-cancel-btn" {{action 'accept'}}>
+      {{accept-text}}
+    </button>
+  </div>
+</form>

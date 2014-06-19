@@ -12,7 +12,7 @@ describe "default plugins" do
     settings = Canvas::Plugin.find(:twitter).try(:settings)
     settings.should be_nil
 
-    Twitter.stubs(:config_check).returns("Bad check")
+    Twitter::Connection.stubs(:config_check).returns("Bad check")
     get "/plugins/twitter"
 
     multiple_accounts_select
@@ -24,7 +24,7 @@ describe "default plugins" do
 
     assert_flash_error_message /There was an error/
 
-    Twitter.stubs(:config_check).returns(nil)
+    Twitter::Connection.stubs(:config_check).returns(nil)
 
     submit_form('#new_plugin_setting')
     wait_for_ajax_requests

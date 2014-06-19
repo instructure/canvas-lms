@@ -18,6 +18,7 @@
 module CC::Importer::Canvas
   module QuizConverter
     include CC::Importer
+    include QuizMetadataConverter
     
     def convert_quizzes
       assessments = []
@@ -31,55 +32,6 @@ module CC::Importer::Canvas
       post_process_assessments
       
       assessments
-    end
-    
-    def post_process_assessments
-      return unless @course[:assessments] && @course[:assessments][:assessments] 
-      quiz_map = {}
-      @course[:assessments][:assessments].each {|a| quiz_map[a[:migration_id]] = a }
-      
-      @manifest.css('resource[type$=assessment]').each do |res|
-        migration_id = res['identifier']
-        
-        path = File.join @unzipped_file_path, migration_id, ASSESSMENT_META
-        doc = open_file_xml(path)
-        
-        if quiz = quiz_map[migration_id]
-          get_quiz_meta(doc, quiz)
-        end
-      end
-    end
-    
-    def get_quiz_meta(doc, quiz)
-      ['title', 'description', 'access_code', 'ip_filter',
-       'quiz_type', 'scoring_policy', 'hide_results', 
-       'lockdown_browser_monitor_data'].each do |string_type|
-        val = get_node_val(doc, string_type)
-        quiz[string_type] = val unless val.nil?
-      end
-      quiz['assignment_group_migration_id'] = get_node_val(doc, 'assignment_group_identifierref')
-      quiz['points_possible'] = get_float_val(doc, 'points_possible')
-      quiz['lock_at'] = get_time_val(doc, 'lock_at')
-      quiz['unlock_at'] = get_time_val(doc, 'unlock_at')
-      quiz['due_at'] = get_time_val(doc, 'due_at')
-      quiz['show_correct_answers_at'] = get_time_val(doc, 'show_correct_answers_at')
-      quiz['hide_correct_answers_at'] = get_time_val(doc, 'hide_correct_answers_at')
-      quiz['time_limit'] = get_int_val(doc, 'time_limit')
-      quiz['allowed_attempts'] = get_int_val(doc, 'allowed_attempts')
-      ['could_be_locked','anonymous_submissions','show_correct_answers',
-       'require_lockdown_browser','require_lockdown_browser_for_results',
-       'shuffle_answers','available', 'cant_go_back', 'one_question_at_a_time',
-       'require_lockdown_browser_monitor'
-      ].each do |bool_val|
-        val = get_bool_val(doc, bool_val)
-        quiz[bool_val] = val unless val.nil?
-      end
-      
-      if asmnt_node = doc.at_css('assignment')
-        quiz['assignment'] = convert_assignment(asmnt_node)
-      end
-
-      quiz
     end
     
     def run_qti_converter(qti_folder)

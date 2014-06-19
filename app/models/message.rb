@@ -34,7 +34,6 @@ class Message < ActiveRecord::Base
   include SendToStream
   include TextHelper
   include HtmlTextHelper
-  include Twitter
   include Workflow
 
   extend TextHelper
@@ -54,6 +53,13 @@ class Message < ActiveRecord::Base
   attr_writer :delayed_messages
   attr_accessor :output_buffer
 
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :to, :from, :cc, :bcc, :subject, :body, :delay_for, :dispatch_at, :sent_at, :workflow_state, :transmission_errors, :is_bounced, :notification_id,
+    :communication_channel_id, :context_id, :context_type, :asset_context_id, :asset_context_type, :user_id, :created_at, :updated_at, :notification_name, :url, :path_type,
+    :from_name, :asset_context_code, :notification_category, :to_email, :html_body, :root_account_id
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:asset_context, :communication_channel, :context, :notification, :user, :attachments]
   # Callbacks
   after_save  :stage_message
   before_save :infer_defaults
@@ -254,6 +260,11 @@ class Message < ActiveRecord::Base
     end
   end
 
+  class UnescapedBuffer < String # acts like safe buffer except for the actually being safe part
+    alias :append= :<<
+    alias :safe_concat :concat
+  end
+
   # Public: Store content in a message_content_... instance variable.
   #
   # name  - The symbol name of the content.
@@ -261,7 +272,11 @@ class Message < ActiveRecord::Base
   #
   # Returns an empty string.
   def define_content(name, &block)
-    old_output_buffer, @output_buffer = [@output_buffer, @output_buffer.dup.clear]
+    if name == :subject || name == :user_name
+      old_output_buffer, @output_buffer = [@output_buffer, UnescapedBuffer.new]
+    else
+      old_output_buffer, @output_buffer = [@output_buffer, @output_buffer.dup.clear]
+    end
 
     yield
 
@@ -662,7 +677,10 @@ class Message < ActiveRecord::Base
   #
   # Returns nothing.
   def deliver_via_twitter
-    TwitterMessenger.new(self).deliver
+    twitter_service = user.user_services.find_by_service('twitter')
+    host = HostUrl.short_host(self.asset_context)
+    msg_id = AssetSignature.generate(self)
+    Twitter::Messenger.new(self, twitter_service, host, msg_id).deliver
     complete_dispatch
   end
 
@@ -672,7 +690,7 @@ class Message < ActiveRecord::Base
   def deliver_via_facebook
     facebook_user_id = self.to.to_i.to_s
     service = self.user.user_services.for_service('facebook').find_by_service_user_id(facebook_user_id)
-    Facebook.dashboard_increment_count(service) if service && service.token
+    Facebook::Connection.dashboard_increment_count(service.service_user_id, service.token, I18n.t(:new_facebook_message, 'You have a new message from Canvas')) if service && service.token
     complete_dispatch
   end
 

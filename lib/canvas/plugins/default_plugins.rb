@@ -118,7 +118,8 @@ Canvas::Plugin.register 'canvas_cartridge_importer', :export_system, {
     :worker => 'CCWorker',
     :migration_partial => 'canvas_config',
     :requires_file_upload => true,
-    :provides =>{:canvas_cartridge => CC::Importer::Canvas::Converter}
+    :provides =>{:canvas_cartridge => CC::Importer::Canvas::Converter},
+    :valid_contexts => %w{Account Course}
   },
 }
 require_dependency 'canvas/migration/worker/course_copy_worker'
@@ -136,7 +137,8 @@ Canvas::Plugin.register 'course_copy_importer', :export_system, {
                 :requires_file_upload => false,
                 :skip_conversion_step => true,
                 :required_options_validator => Canvas::Migration::Validators::CourseCopyValidator,
-                :required_settings => [:source_course_id]
+                :required_settings => [:source_course_id],
+                :valid_contexts => %w{Course}
         },
 }
 require_dependency 'canvas/migration/worker/zip_file_worker'
@@ -155,7 +157,7 @@ Canvas::Plugin.register 'zip_file_importer', :export_system, {
                 :no_selective_import => true,
                 :required_options_validator => Canvas::Migration::Validators::ZipImporterValidator,
                 :required_settings => [:source_folder_id],
-                :additional_contexts => %w(User Group)
+                :valid_contexts => %w(Course Group User)
         },
 }
 Canvas::Plugin.register 'common_cartridge_importer', :export_system, {
@@ -165,7 +167,7 @@ Canvas::Plugin.register 'common_cartridge_importer', :export_system, {
   :author_website => 'http://www.instructure.com',
   :description => lambda{ I18n.t :common_cartridge_description, 'This enables converting a Common Cartridge packages in the intermediary json format to be imported' },
   :version => '1.0.0',
-  :select_text => lambda{ I18n.t :common_cartridge_file_description, "Common Cartridge 1.0/1.1/1.2 Package" },
+  :select_text => lambda{ I18n.t :common_cartridge_file_description, "Common Cartridge 1.x Package" },
   :settings => {
     :worker => 'CCWorker',
     :migration_partial => 'cc_config',
@@ -173,7 +175,9 @@ Canvas::Plugin.register 'common_cartridge_importer', :export_system, {
     :provides =>{:common_cartridge=>CC::Importer::Standard::Converter, 
                  :common_cartridge_1_0=>CC::Importer::Standard::Converter, 
                  :common_cartridge_1_1=>CC::Importer::Standard::Converter, 
-                 :common_cartridge_1_2=>CC::Importer::Standard::Converter},
+                 :common_cartridge_1_2=>CC::Importer::Standard::Converter,
+                 :common_cartridge_1_3=>CC::Importer::Standard::Converter},
+    :valid_contexts => %w{Account Course}
   },
 }
 Canvas::Plugin.register('grade_export', :sis, {

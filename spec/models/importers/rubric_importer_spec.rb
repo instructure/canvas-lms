@@ -27,6 +27,7 @@ describe "Importing Rubrics" do
         context = get_import_context(system)
         migration = stub()
         migration.stubs(:context).returns(context)
+        migration.stubs(:add_imported_item)
 
         data[:rubrics_to_import] = {}
         Importers::RubricImporter.import_from_migration(data, migration).should be_nil

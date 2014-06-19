@@ -1,6 +1,6 @@
 define [
   'ember',
-  'i18n!quizzes_model',
+  'i18n!quiz_index_row',
   '../shared/environment'
 ], (Ember, I18n, environment) ->
 
@@ -10,6 +10,9 @@ define [
   # http://emberjs.com/api/classes/Ember.ObjectController.html
 
   QuizIndexRowController = Ember.ObjectController.extend
+
+    # preserve 'publishing' state by not directly binding to published attr
+    showAsPublished: false
 
     needs: ['quizzes']
 
@@ -39,9 +42,21 @@ define [
       I18n.t('points', 'pt', count: pointsPossible)
     ).property('model.pointsPossible')
 
+    displayPublished: (->
+      @set('showAsPublished', @get('published'))
+    ).on('init')
+
     updatePublished: (publishStatus) ->
+      success = (=> @displayPublished())
+
+      # they're not allowed to unpublish
+      failed = =>
+        @set 'published', true
+        @set 'unpublishable', false
+        @displayPublished()
+
       @set 'published', publishStatus
-      @get('model').save()
+      @get('model').save().then success, failed
 
     actions:
       publish: ->

@@ -1,15 +1,39 @@
-<div class="quiz-moderate">
-  <table class="table quiz-table" id="moderate-table">
+<div class="quiz-moderate allow-inputs">
+  <div class="clearfix">
+    <strong class="have-taken">{{studentsHaveTakenQuiz}}</strong>
+    {{#if checkedStudents.length}}
+      <a class="change-extensions-for icon-edit" href="#" {{action 'studentExtension' checkedStudents}}>
+        {{changeExtensionFor}}
+      </a>
+    {{/if}}
+  </div>
+  <table class="table table-striped quiz-table" id="moderate-table">
     <thead>
     <tr>
-      <th class="check"><input type="checkbox" /></th>
-      <th class="name">{{#t 'student'}}Student{{/t}}</th>
-      <th>{{#t 'attempt'}}Attempt{{/t}}</th>
-      <th>{{#t 'time'}}Time{{/t}}</th>
-      <th>{{#t 'attempts_left'}}Attempts Left{{/t}}</th>
-      <th>{{#t 'score'}}Score{{/t}}</th>
+      <th class="check">{{input type='checkbox' checked=allChecked}}</th>
+      <th class="name">
+        {{#t 'student'}}Student{{/t}}
+      </th>
       <th>
-        <a class="icon-refresh" href="#">
+        {{#t 'attempt'}}Attempt{{/t}}
+      </th>
+      <th>
+        {{#t 'time'}}Time{{/t}}
+      </th>
+      <th>
+        {{#t 'ends_at'}}End Date{{/t}}
+      </th>
+      <th>
+        {{#t 'attempts_left'}}Attempts Left{{/t}}
+      </th>
+      <th>
+        {{#t 'score'}}Score{{/t}}
+      </th>
+      <th class="unlocked">&nbsp;</th>
+      <th class="edit">
+        <a {{bind-attr class="reloading::icon-refresh"}} {{action 'refreshData'}} href>
+          <img {{bind-attr class=":icon-refreshing reloading::inactive" }}
+               src='/images/ajax-reload-animated.gif' />
           <span class="screenreader-only">{{#t 'refresh'}}Refresh{{/t}}</span>
         </a>
       </th>
@@ -17,58 +41,79 @@
     </thead>
 
     <tbody>
-    <tr>
-      <td class="check"><input type="checkbox" /></td>
-      <td class="name">Adair, Callie Ann</td>
-      <td>1</td>
-      <td>10:34</td>
-      <td>3</td>
-      <td>11/15</td>
-      <td>
-        <a class="icon-edit" href="#">
-          <span class="screenreader-only">{{#t 'edit'}}Edit{{/t}}</span>
-        </a>
-      </td>
-    </tr>
-    <tr>
-      <td class="check"><input type="checkbox" /></td>
-      <td class="name">Anderson, Mary</td>
-      <td class="numeric">2</td>
-      <td>11:08</td>
-      <td>0</td>
-      <td>12/15</td>
-      <td>
-        <a class="icon-edit" href="#">
-          <span class="screenreader-only">{{#t 'edit'}}Edit{{/t}}</span>
-        </a>
-      </td>
-    </tr>
-    <tr>
-      <td class="check"><input type="checkbox" /></td>
-      <td class="name">Bevan, Jennifer</td>
-      <td>1</td>
-      <td>8:09</td>
-      <td>1</td>
-      <td>7/15</td>
-      <td>
-        <a class="icon-edit" href="#">
-          <span class="screenreader-only">{{#t 'edit'}}Edit{{/t}}</span>
-        </a>
-      </td>
-    </tr>
-    <tr>
-      <td class="check"><input type="checkbox" /></td>
-      <td class="name">Christopherson, Russ</td>
-      <td>1</td>
-      <td>2:12</td>
-      <td>2</td>
-      <td>14/15</td>
-      <td>
-        <a class="icon-edit" href="#">
-          <span class="screenreader-only">{{#t 'edit'}}Edit{{/t}}</span>
-        </a>
-      </td>
-    </tr>
+    {{#each user in controller itemController='quiz.submission_row'}}
+      <tr class='moderate-submission-row'>
+        <td class="check">{{input type='checkbox' checked=isChecked}}</td>
+        <td class="name">
+          {{#if hasActiveSubmission}}
+            <a {{bind-attr href='historyLink'}}>
+              {{user.sortableName}}
+            </a>
+          {{else}}
+            {{user.sortableName}}
+          {{/if}}
+          {{#if extraTimeAllowed}}
+            <div class="extra-time">{{extraTimeOnAttempt}}</div>
+          {{/if}}
+        </td>
+        <td>
+          {{#if attempts}}
+            {{attempts}}
+          {{else}}
+            <span aria-hidden="true">
+              --
+            </span>
+            <span class='screenreader-only'>
+              {{#t 'no_attempts'}}No Attempts{{/t}}
+            </span>
+          {{/if}}
+        </td>
+        <td>
+          {{#if isActive}}
+            {{#if extendable}}
+              <a class="icon-clock" href="#" {{action 'extendTime' user}}>
+                {{runningTime}}
+              </a>
+            {{else}}
+              <i class="icon-clock"></i>
+              {{runningTime}}
+            {{/if}}
+          {{else}}
+            {{friendlyTime}}
+          {{/if}}
+        </td>
+
+        <td>
+          {{#if friendlyEndsAt}}
+            {{friendlyEndsAt}}
+          {{else}}
+            <span aria-hidden="true">
+              --
+            </span>
+            <span class='screenreader-only'>
+              {{#t 'no_ends_at'}}No Modified End At Date{{/t}}
+            </span>
+          {{/if}}
+        </td>
+        <td>{{remainingStatusLabel}}{{remainingAttempts}}</td>
+        <td>{{user.friendlyScore}}</td>
+        <td class="unlocked">
+          {{#if quizSubmission.manuallyUnlocked}}
+          <span class="unlocked" title="{{#t 'manually_unlocked'}}Manually Unlocked{{/t}}">
+            <i class="icon-unlock standalone-icon">
+              <span class="screenreader-only">{{#t 'manually_unlocked'}}Manually Unlocked{{/t}}</span>
+            </i>
+          </span>
+          {{/if}}
+        </td>
+        <td class="edit">
+          <a class="icon-edit" href="#" {{action 'studentExtension' user}}>
+            <span class="screenreader-only">{{#t 'edit'}}Edit{{/t}}</span>
+          </a>
+        </td>
+      </tr>
+    {{/each}}
     </tbody>
+
   </table>
 </div>

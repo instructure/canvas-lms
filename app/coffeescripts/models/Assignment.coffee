@@ -183,6 +183,8 @@ define [
       return @get( 'group_category_id' ) unless arguments.length > 0
       @set 'group_category_id', id
 
+    canGroup: -> !@get('has_submitted_submissions')
+
     gradingStandardId: (id) =>
       return @get('grading_standard_id') unless arguments.length > 0
       @set 'grading_standard_id', id

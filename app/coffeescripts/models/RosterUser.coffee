@@ -1,4 +1,4 @@
-define ['compiled/models/User'], (User) ->
+define ['compiled/models/User', 'compiled/ember/quizzes/shared/seconds_to_time'], (User, formatSeconds) ->
 
   class RosterUser extends User
 
@@ -7,6 +7,7 @@ define ['compiled/models/User'], (User) ->
 
     computedAttributes: [
       'sections'
+      'total_activity_string'
       {name: 'html_url', deps: ['enrollments']}
     ]
 
@@ -21,4 +22,7 @@ define ['compiled/models/User'], (User) ->
         user_section = sections.get(course_section_id)
         user_sections.push(user_section.attributes) if user_section
       user_sections
+
+    total_activity_string: ->
+      if time = @get('enrollments')[0].total_activity_time then formatSeconds(time) else ''
 

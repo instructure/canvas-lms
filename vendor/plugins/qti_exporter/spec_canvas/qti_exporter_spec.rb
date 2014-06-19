@@ -37,6 +37,13 @@ describe Qti::Converter do
     quiz.assignment.should be_nil
   end
 
+  it "should bring in canvas meta data" do
+    setup_migration(File.expand_path("../fixtures/qti/canvas_qti.zip", __FILE__))
+    do_migration
+    @course.quizzes.count.should == 1
+    @course.quizzes.first.description.should == "<p>Quiz Description</p>"
+  end
+
   describe "applying respondus settings" do
     before do
       @copy = Tempfile.new(['spec-canvas', '.zip'])

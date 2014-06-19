@@ -72,8 +72,8 @@
 .ui-state-error a, .ui-widget-content .ui-state-error a, .ui-widget-header .ui-state-error a { color: $fcError; }
 .ui-state-error-text, .ui-widget-content .ui-state-error-text, .ui-widget-header .ui-state-error-text { color: $fcError; }
 .ui-priority-primary, .ui-widget-content .ui-priority-primary, .ui-widget-header .ui-priority-primary { font-weight: bold; }
-.ui-priority-secondary, .ui-widget-content .ui-priority-secondary,  .ui-widget-header .ui-priority-secondary { @include opacity(.7); font-weight: normal; }
-.ui-state-disabled, .ui-widget-content .ui-state-disabled, .ui-widget-header .ui-state-disabled { @include opacity(.35); background-image: none; }
+.ui-priority-secondary, .ui-widget-content .ui-priority-secondary,  .ui-widget-header .ui-priority-secondary { opacity: 0.7; font-weight: normal; }
+.ui-state-disabled, .ui-widget-content .ui-state-disabled, .ui-widget-header .ui-state-disabled { opacity: 0.35; background-image: none; }
 
 // instructure additions
 .ui-state-success, .ui-state-warning,
@@ -308,9 +308,9 @@
 
 /* Overlays */
 .ui-widget-overlay { background: $bgColorOverlay;
-  @include opacity($opacityOverlay);
+  opacity: $opacityOverlay;
 }
-.ui-widget-shadow { margin: -8px 0 0 -8px; padding: 8px; background: $bgColorShadow; @include opacity($opacityShadow); border-radius: $cornerRadiusShadow; }
+.ui-widget-shadow { margin: -8px 0 0 -8px; padding: 8px; background: $bgColorShadow; opacity: $opacityShadow; border-radius: $cornerRadiusShadow; }
 
 
 //make progressbar blue instead of default header color

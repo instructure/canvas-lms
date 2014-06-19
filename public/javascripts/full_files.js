@@ -2030,8 +2030,8 @@ define([
         $("#lock_item_dialog form").hide();
 
         $form.show();
-        data.lock_at = $.datetimeString(data.last_lock_at, false);
-        data.unlock_at = $.datetimeString(data.last_unlock_at, false);
+        data.lock_at = $.datetimeString(data.last_lock_at, {localized: false});
+        data.unlock_at = $.datetimeString(data.last_unlock_at, {localized: false});
         data.locked = (!data.lock_at && !data.unlock_at) ? '1' : '0';
         $("#lock_item_dialog").fillTemplateData({data: {name: data.name}});
 
@@ -2358,7 +2358,8 @@ define([
         'attachment[filename]': file.name,
         'attachment[context_code]': folder.context_string,
         'no_redirect': true,
-        'attachment[duplicate_handling]': file.duplicate_handling
+        'attachment[duplicate_handling]': file.duplicate_handling,
+        'default_content_type': 'application/octet-stream'
       };
       fileUpload.updateUploadCount();
       $.ajaxJSON('/files/pending', 'POST', post_params, function(data) {

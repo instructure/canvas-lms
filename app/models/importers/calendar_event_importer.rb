@@ -26,7 +26,7 @@ module Importers
       events.each do |event|
         if migration.import_object?("calendar_events", event['migration_id']) || migration.import_object?("events", event['migration_id'])
           begin
-            import_from_migration(event, migration.context)
+            import_from_migration(event, migration.context, migration)
           rescue
             migration.add_import_warning(t('#migration.calendar_event_type', "Calendar Event"), event[:title], $!)
           end
@@ -34,7 +34,7 @@ module Importers
       end
     end
 
-    def self.import_from_migration(hash, context, item=nil)
+    def self.import_from_migration(hash, context, migration=nil, item=nil)
       hash = hash.with_indifferent_access
       return nil if hash[:migration_id] && hash[:events_to_import] && !hash[:events_to_import][hash[:migration_id]]
       item ||= CalendarEvent.find_by_context_type_and_context_id_and_id(context.class.to_s, context.id, hash[:id])
@@ -45,7 +45,7 @@ module Importers
       item.workflow_state = 'active' if item.deleted?
       item.title = hash[:title] || hash[:name]
       hash[:missing_links] = []
-      item.description = ImportedHtmlConverter.convert(hash[:description] || "", context, {:missing_links => hash[:missing_links]})
+      item.description = ImportedHtmlConverter.convert(hash[:description] || "", context, migration, {:missing_links => hash[:missing_links]})
       item.description += import_migration_attachment_suffix(hash, context)
       item.start_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:start_at] || hash[:start_date])
       item.end_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:end_at] || hash[:end_date])
@@ -53,12 +53,12 @@ module Importers
       item.imported = true
 
       item.save_without_broadcasting!
-      if context.respond_to?(:content_migration) && context.content_migration
-        context.content_migration.add_missing_content_links(:class => item.class.to_s,
+      if migration
+        migration.add_missing_content_links(:class => item.class.to_s,
           :id => item.id, :missing_links => hash[:missing_links],
           :url => "/#{context.class.to_s.demodulize.underscore.pluralize}/#{context.id}/#{item.class.to_s.demodulize.underscore.pluralize}/#{item.id}")
       end
-      context.imported_migration_items << item if context.imported_migration_items
+      migration.add_imported_item(item) if migration
       if hash[:all_day]
         item.all_day = hash[:all_day]
         item.save

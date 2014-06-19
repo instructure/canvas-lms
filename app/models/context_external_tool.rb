@@ -9,6 +9,14 @@ class ContextExternalTool < ActiveRecord::Base
                   :course_navigation, :account_navigation, :user_navigation,
                   :resource_selection, :editor_button, :homework_submission,
                   :config_type, :config_url, :config_xml, :tool_id
+
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :context_id, :context_type, :domain, :url, :name, :description, :settings, :workflow_state, :created_at, :updated_at, :has_user_navigation, :has_course_navigation,
+    :has_account_navigation, :has_resource_selection, :has_editor_button, :cloned_item_id, :tool_id, :has_homework_submission
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:content_tags, :context]
+
   validates_presence_of :context_id, :context_type, :workflow_state
   validates_presence_of :name, :consumer_key, :shared_secret
   validates_length_of :name, :maximum => maximum_string_length
@@ -152,7 +160,7 @@ class ContextExternalTool < ActiveRecord::Base
     if tool_hash[:error]
       @config_errors << [error_field, tool_hash[:error]]
     else
-      Importers::ContextExternalToolImporter.import_from_migration(tool_hash, context, self)
+      Importers::ContextExternalToolImporter.import_from_migration(tool_hash, context, nil, self)
     end
     self.name = real_name unless real_name.blank?
   rescue CC::Importer::BLTIConverter::CCImportError => e
@@ -529,14 +537,6 @@ class ContextExternalTool < ActiveRecord::Base
     end
   end
 
-  def self.process_migration(*args)
-    Importers::ContextExternalToolImporter.process_migration(*args)
-  end
-
-  def self.import_from_migration(*args)
-    Importers::ContextExternalToolImporter.import_from_migration(*args)
-  end
-
   def resource_selection_settings
     settings[:resource_selection]
   end
@@ -547,13 +547,35 @@ class ContextExternalTool < ActiveRecord::Base
 
   def self.opaque_identifier_for(asset, shard)
     shard.activate do
-      str = asset.asset_string.to_s
-      raise "Empty value" if str.blank?
-      Canvas::Security.hmac_sha1(str, shard.settings[:encryption_key])
+      lti_context_id = context_id_for(asset, shard)
+      set_asset_context_id(asset, lti_context_id)
     end
   end
 
   private
+
+  def self.set_asset_context_id(asset, context_id)
+    lti_context_id = context_id
+    if asset.respond_to?('lti_context_id')
+      if asset.new_record?
+        asset.lti_context_id = context_id
+      else
+        asset.reload unless asset.lti_context_id?
+        unless asset.lti_context_id
+          asset.lti_context_id = context_id
+          asset.save!
+        end
+        lti_context_id = asset.lti_context_id
+      end
+    end
+    lti_context_id
+  end
+
+  def self.context_id_for(asset, shard)
+    str = asset.asset_string.to_s
+    raise "Empty value" if str.blank?
+    Canvas::Security.hmac_sha1(str, shard.settings[:encryption_key])
+  end
 
   def tool_setting(setting, hash, *keys)
     if !hash || !hash.is_a?(Hash)

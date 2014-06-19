@@ -25,6 +25,9 @@ class DiscussionEntryParticipant < ActiveRecord::Base
   belongs_to :discussion_entry
   belongs_to :user
 
+  EXPORTABLE_ATTRIBUTES = [:id, :discussion_entry_id, :user_id, :workflow_state, :forced_read_state]
+  EXPORTABLE_ASSOCIATIONS = [:discussion_entry, :user]
+
   validates_presence_of :discussion_entry_id, :user_id, :workflow_state
 
   def self.read_entry_ids(entry_ids, user)

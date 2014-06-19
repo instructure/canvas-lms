@@ -19,6 +19,7 @@
 module Api::V1::Course
   include Api::V1::Json
   include Api::V1::EnrollmentTerm
+  include Api::V1::SectionEnrollments
 
   def course_settings_json(course)
     settings = {}
@@ -65,6 +66,7 @@ module Api::V1::Course
       hash['term'] = enrollment_term_json(course.enrollment_term, user, session, {}) if includes.include?('term')
       hash['course_progress'] = CourseProgress.new(course, user).to_json if includes.include?('course_progress')
       hash['apply_assignment_group_weights'] = course.apply_group_weights?
+      hash['sections'] = section_enrollments_json(enrollments) if includes.include?('sections')
       add_helper_dependant_entries(hash, course, builder)
     end
   end

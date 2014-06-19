@@ -49,10 +49,10 @@ define [
   test "tScoringPolicy", ->
 
     run -> quiz.set 'scoringPolicy', 'keep_highest'
-    equal quiz.get('tScoringPolicy'), I18n.t('highest', 'highest')
+    equal quiz.get('tScoringPolicy'), I18n.t('keep_highest', 'Highest')
 
     run -> quiz.set 'scoringPolicy', 'keep_latest'
-    equal quiz.get('tScoringPolicy'), I18n.t('latest', 'latest')
+    equal quiz.get('tScoringPolicy'), I18n.t('keep_latest', 'Latest')
 
   test "tQuizType", ->
 
@@ -127,4 +127,11 @@ define [
     run -> quiz.set 'lockAt', null
 
     equal quiz.get('sortSlug'), App.Quiz.SORT_LAST + 'ohi', 'uses a sort_last token when no date'
+
+  test "allDates", ->
+    date = new Date()
+    run ->
+      quiz.set 'lockAt', date
+      equal quiz.get("allDates").length, 1, 'builds the date'
+
 

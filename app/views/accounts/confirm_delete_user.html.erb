@@ -1,5 +1,5 @@
 <% content_for :page_title do %><%= t(:page_title, "Confirm Delete") %><% end %>
-<% add_crumb("Confirm Delete") %>
+<% add_crumb t(:page_title, "Confirm Delete") %>
 
 <h2><%= t(:title, "Confirm Delete %{user} from %{account}", :user => @user.name, :account => @account.name) %></h2>
 

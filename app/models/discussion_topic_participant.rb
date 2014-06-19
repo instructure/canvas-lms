@@ -25,6 +25,9 @@ class DiscussionTopicParticipant < ActiveRecord::Base
   belongs_to :discussion_topic
   belongs_to :user
 
+  EXPORTABLE_ATTRIBUTES = [:id, :discussion_topic_id, :user_id, :unread_entry_count, :workflow_state, :subscribed]
+  EXPORTABLE_ASSOCIATIONS = [:discussion_topic, :user]
+
   before_save :check_unread_count
 
   validates_presence_of :discussion_topic_id, :user_id, :workflow_state, :unread_entry_count

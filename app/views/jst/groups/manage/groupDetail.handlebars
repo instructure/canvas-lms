@@ -1,29 +1,41 @@
-<div class="row-fluid">
-  <div class="{{#if canAssignUsers}}span7{{else}}span6{{/if}} ellipsis">
+<div class="row-fluid group-header">
+  <div class="{{#if leader}}span5{{else}}span8{{/if}} ellipsis">
     <a href="#" class="toggle-group group-heading" aria-label="{{#t "show_group_details"}}Show details for group {{name}}{{/t}}" title="{{name}}" aria-expanded="false">
       <i class="group-collapsed-item icon-mini-arrow-right"></i>
       <i class="group-expanded-item icon-mini-arrow-down"></i>
       <span class="group-name">{{name}}</span>
     </a>
   </div>
-  <div class="{{#if canAssignUsers}}span3{{else}}span4{{/if}} ellipsis">
-    <span class="toggle-group group-summary">{{summary}}</span>
+  {{#if leader}}
+  <div class="span3 ellipsis group-leader">
+    <i class="icon-user" aria-hidden="true"></i>
+    <a href="{{leader.html_url}}">
+      <span class="screenreader-only">{{#t "group_leader"}}Group Leader{{/t}}</span>
+      {{leader.display_name}}
+    </a>
+  </div>
+  {{/if}}
+  <div class="span2 ellipsis">
     <span class="label label-info show-group-full">{{#t "group_full"}}Full{{/t}}</span>
+    <br class="show-group-full"/>
+    <span class="toggle-group group-summary">{{summary}}</span>
   </div>
   <div class="span2 group-actions">
     {{#if canAssignUsers}}
       <a href="#" class="add-user action-darkgray" data-tooltip aria-label="{{#t "add_user_to_group"}}Assign user to group{{/t}}" title="{{#t "add_user_to_group"}}Assign user to group{{/t}}"><i class="icon-add"></i></a>
     {{/if}}
-    <a id='group-{{id}}-actions' class="al-trigger action-darkgray" href="#">
-      <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
-      <span class="screenreader-only">{{#t "group_settings"}}Settings{{/t}}</span>
-    </a>
-    <ul class="al-options">
-      <li><a href="/groups/{{id}}" class="icon-group visit-group">{{#t "visit_group_homepage"}}Visit Group Homepage{{/t}}</a></li>
-      {{#if canEdit}}
-        <li><a href="#" data-focus-returns-to='group-{{id}}-actions' class="icon-edit edit-group">{{#t "group_edit"}}Edit{{/t}}</a></li>
-        <li><a href="#" class="icon-trash delete-group">{{#t "group_delete"}}Delete{{/t}}</a></li>
-      {{/if}}
-    </ul>
+    <div class="inline-block" role="application">
+      <a id='group-{{id}}-actions' class="al-trigger action-darkgray" href="#" role="button">
+        <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+        <span class="screenreader-only">{{#t "group_settings"}}Settings{{/t}}</span>
+      </a>
+      <ul class="al-options">
+        <li><a href="/groups/{{id}}" class="icon-group visit-group">{{#t "visit_group_homepage"}}Visit Group Homepage{{/t}}</a></li>
+        {{#if canEdit}}
+          <li><a href="#" data-focus-returns-to='group-{{id}}-actions' class="icon-edit edit-group">{{#t "group_edit"}}Edit{{/t}}</a></li>
+          <li><a href="#" class="icon-trash delete-group">{{#t "group_delete"}}Delete{{/t}}</a></li>
+        {{/if}}
+      </ul>
+    </div>
   </div>
 </div>

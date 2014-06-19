@@ -55,8 +55,6 @@ We use jQuery UI tabs, there are two types of tabs:
   .ui-tabs-nav { margin: 0;
     padding: 0;
     border-radius: 0;
-    // need to override filter or bg gradiant will remain in IE
-    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(enabled = false)";
     background: transparent;
     border-width: 0 0 1px 0;
     box-shadow: none; //override .ui-widget-header
@@ -66,8 +64,6 @@ We use jQuery UI tabs, there are two types of tabs:
         text-shadow: 0 1px 0 rgba(255,255,255,0.5);
       }
       &.ui-tabs-active { margin-bottom: 0; padding-bottom: 1px;
-        // need to override filter or bg gradiant will remain in IE
-        -ms-filter: "progid:DXImageTransform.Microsoft.gradient(enabled = false)";
         background: $bgColorContent;
         border-color: $borderColorContent;
         box-shadow: none;

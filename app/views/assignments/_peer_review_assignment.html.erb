@@ -1,9 +1,9 @@
 <% request = peer_review_assignment || nil %>
 <li class="peer_review <%= request.try_rescue(:workflow_state) || 'assigned' %>" id="review_request_<%= request ? request.id : 'blank' %>" style="<%= hidden unless request %>">
   <span style="float: left;">
-    <%= image_tag "pass.png", :alt => "finished", :title => "Finished" if request && request.completed? %> 
-    <%= image_tag "warning_dim.png", :alt => "incomplete", :title => "Assessment not yet Completed" if request && !request.completed? %>
-    <%= image_tag "file.png" %> 
+    <%= image_tag "pass.png", :alt => "finished", :title => "Finished" if request && request.completed? %>
+    <%= image_tag "warning_dim.png", :alt => "incomplete", :title => "Assessment not yet Completed" if (request && !request.completed?) || request.nil? %>
+    <%= image_tag "file.png" %>
     <a href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, request ? request.asset.user_id : '{{ user_id }}') %>">
       <span class="asset_user_name"><%= request.try_rescue(:asset).try_rescue(:user).try_rescue(:last_name_first) || nbsp %></span>
     </a>

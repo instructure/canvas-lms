@@ -30,7 +30,6 @@ module Importers
       let(:attachment) { stub(:context= => true, :migration_id= => true, :save_without_broadcasting! => true) }
 
       before :each do
-        course.imported_migration_items = []
         course.stubs(:id).returns(course_id)
         migration.stubs(:import_object?).with('attachments', migration_id).returns(true)
       end
@@ -56,7 +55,7 @@ module Importers
 
         Importers::AttachmentImporter.process_migration(data, migration)
 
-        course.imported_migration_items.should == [attachment]
+        migration.imported_migration_items.should == [attachment]
       end
 
       it "imports attachments when the migration id is in the files_to_import hash" do
@@ -134,26 +133,6 @@ module Importers
         attachment.expects(:save_without_broadcasting!)
 
         Importers::AttachmentImporter.process_migration(data, migration)
-      end
-
-      it "does not add to the imported_migration_items if imported_migration_items is nil" do
-        data = {
-            'file_map' => {
-                'a' => {
-                    id: attachment_id,
-                    migration_id: migration_id
-                }
-            }
-        }
-
-        course.imported_migration_items = nil
-        ::Attachment.expects(:find_by_context_type_and_context_id_and_id).with("Course", course_id, attachment_id).returns(attachment)
-        migration.expects(:import_object?).with('attachments', migration_id).returns(true)
-        attachment.expects(:save_without_broadcasting!)
-
-        Importers::AttachmentImporter.process_migration(data, migration)
-
-        course.imported_migration_items.should == nil
       end
 
       it "does not import files that are not part of the migration" do

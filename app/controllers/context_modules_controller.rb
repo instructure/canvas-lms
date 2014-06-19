@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -173,6 +173,7 @@ class ContextModulesController < ApplicationController
   def content_tag_prerequisites_needing_finishing
     code = params[:code].split("_")
     id = code.pop
+    raise ActiveRecord::RecordNotFound if id !~ Api::ID_REGEX
     type = code.join("_").classify
     if type == 'ContentTag'
       @tag = @context.context_module_tags.active.find_by_id(id)
@@ -369,7 +370,7 @@ class ContextModulesController < ApplicationController
               @progressions = []
             else
               context_module_ids = @context.context_modules.active.pluck(:id)
-              @progressions = ContextModuleProgression.where(:context_module_id => context_module_ids)
+              @progressions = ContextModuleProgression.where(:context_module_id => context_module_ids).each{|p| p.evaluate }
             end
           end
           render :json => @progressions

@@ -21,7 +21,7 @@ class ContentImportsController < ApplicationController
   before_filter :require_context
   before_filter { |c| c.active_tab = "home" }
   prepend_around_filter :load_pseudonym_from_policy, :only => :migrate_content_upload
-  
+
   include Api::V1::Course
   include ContentImportsHelper
 
@@ -75,8 +75,8 @@ class ContentImportsController < ApplicationController
       end
     end
   end
-  
-  
+
+
   # @API Copy course content
   #
   # DEPRECATED: Please use the {api:ContentMigrationsController#create Content Migrations API}
@@ -102,7 +102,7 @@ class ContentImportsController < ApplicationController
     if api_request?
       @context = api_find(Course, params[:course_id])
     end
-    
+
     if authorized_action(@context, @current_user, :manage_content)
       if api_request?
         @source_course = api_find(Course, params[:source_course])
@@ -130,13 +130,14 @@ class ContentImportsController < ApplicationController
                                     :user => @current_user,
                                     :source_course => @source_course,
                                     :copy_options => copy_params,
-                                    :migration_type => 'course_copy_importer')
+                                    :migration_type => 'course_copy_importer',
+                                    :initiated_source => api_request? ? :api : :manual)
       cm.queue_migration
       cm.workflow_state = 'created'
       render :json => copy_status_json(cm, @context, @current_user, session)
     end
   end
-  
+
   private
 
   def process_migration_params

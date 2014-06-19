@@ -27,6 +27,10 @@ define [
     translations:
       too_long: I18n.t "name_too_long", "Name is too long"
 
+    validateFormData: (data, errors) ->
+      if !$("[name=max_membership]")[0].validity.valid
+        {"max_membership": [{message: I18n.t('max_membership_number', 'Max membership must be a number') }]}
+
     openAgain: ->
       super
       # reset the form contents

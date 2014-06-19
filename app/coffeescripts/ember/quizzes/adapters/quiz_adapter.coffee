@@ -1,19 +1,16 @@
 define [
   'ember'
-  '../shared/ic-ajax-jsonapi'
   'ember-data'
   'underscore' # which is really lodash trolololo
   './jsonapi_adapter'
-], ({RSVP}, ajax, DS, _, JSONAPIAdapter) ->
+  '../shared/ic-ajax-jsonapi'
+  'ic-ajax'
+], ({RSVP}, DS, _, JSONAPIAdapter, ajax) ->
 
   urlTemplate = (template, page) ->
     template.replace /\{page\}/, page
 
   QuizAdapter = JSONAPIAdapter.extend
-
-    ajax: (url, type, options) ->
-      options = @ajaxOptions url, type, options
-      ajax(options)
 
     findAll: (type, array) ->
       firstPage = @_super(type, array)

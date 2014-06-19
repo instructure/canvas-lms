@@ -25,6 +25,9 @@ class CustomGradebookColumn < ActiveRecord::Base
 
   attr_accessible :title, :position, :teacher_notes, :hidden
 
+  EXPORTABLE_ATTRIBUTES = [:id, :title, :position, :workflow_state, :course_id, :created_at, :updated_at, :teacher_notes]
+  EXPORTABLE_ASSOCIATIONS = [:course, :custom_gradebook_column_data]
+
   validates_presence_of :title
   validates_length_of :title, :maximum => maximum_string_length,
     :allow_nil => true

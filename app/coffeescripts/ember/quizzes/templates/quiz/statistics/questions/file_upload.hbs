@@ -1,0 +1,13 @@
+<header>
+  <aside class="pull-right">
+    <a {{bind-attr href=quizSubmissionsZipUrl}} target="_blank">
+      {{t 'download_submissions' 'Download All Files'}}
+    </a>
+  </aside>
+
+  {{partial "quiz/statistics/questions/essay/header_contents"}}
+</header>
+
+<div>
+  {{partial "quiz/statistics/questions/essay/charts"}}
+</div>

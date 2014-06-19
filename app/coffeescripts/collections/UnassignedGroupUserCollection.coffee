@@ -5,10 +5,6 @@ define [
 
   class UnassignedGroupUserCollection extends GroupUserCollection
 
-    defaults:
-      group:
-        id: null
-
     url: ->
       _url = "/api/v1/group_categories/#{@category.id}/users?per_page=50"
       _url += "&unassigned=true" unless @category.get('allows_multiple_memberships')

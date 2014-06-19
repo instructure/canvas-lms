@@ -21,8 +21,11 @@ class NotificationPolicy < ActiveRecord::Base
   belongs_to :notification
   belongs_to :communication_channel
   has_many :delayed_messages
-  
+
   attr_accessible :notification, :communication_channel, :frequency, :notification_id, :communication_channel_id
+
+  EXPORTABLE_ATTRIBUTES = [:id, :notification_id, :communication_channel_id, :broadcast, :frequency, :created_at, :updated_at]
+  EXPORTABLE_ASSOCIATIONS = [:notification, :communication_channel, :delayed_messages]
 
   validates_presence_of :communication_channel_id, :frequency
   validates_inclusion_of :broadcast, in: [true, false]
@@ -181,6 +184,7 @@ class NotificationPolicy < ActiveRecord::Base
       Notification.all.each do |notification|
         next if policies.find { |p| p.notification_id == notification.id }
         Notification.transaction(requires_new: true) do
+          np = nil
           begin
             np = communication_channel.notification_policies.build(notification: notification)
             np.frequency = if communication_channel == communication_channel.user.communication_channel
@@ -193,9 +197,9 @@ class NotificationPolicy < ActiveRecord::Base
             np = nil
             raise ActiveRecord::Rollback
           end
+          np ||= communication_channel.notification_policies.where(notification_id: notification).first
+          policies << np
         end
-        np ||= communication_channel.notification_policies.where(notification_id: notification).first
-        policies << np
       end
       policies
     end

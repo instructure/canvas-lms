@@ -23,7 +23,7 @@ module SIS
 
     def process(messages, updates_every)
       start = Time.now
-      i = Work.new(@batch_id, @root_account, @logger, updates_every, messages)
+      i = Work.new(@batch, @root_account, @logger, updates_every, messages)
       Enrollment.suspend_callbacks(:belongs_to_touch_after_save_or_destroy_for_course, :update_cached_due_dates) do
         User.skip_updating_account_associations do
           Enrollment.process_as_sis(@sis_options) do
@@ -36,8 +36,8 @@ module SIS
       end
       @logger.debug("Raw enrollments took #{Time.now - start} seconds")
       i.enrollments_to_update_sis_batch_ids.in_groups_of(1000, false) do |batch|
-        Enrollment.where(:id => batch).update_all(:sis_batch_id => @batch_id)
-      end if @batch_id
+        Enrollment.where(:id => batch).update_all(:sis_batch_id => @batch)
+      end if @batch
       # We batch these up at the end because we don't want to keep touching the same course over and over,
       # and to avoid hitting other callbacks for the course (especially broadcast_policy)
       i.courses_to_touch_ids.to_a.in_groups_of(1000, false) do |batch|
@@ -65,8 +65,8 @@ module SIS
           :incrementally_update_account_associations_user_ids, :update_account_association_user_ids,
           :account_chain_cache, :users_to_touch_ids, :success_count, :courses_to_recache_due_dates
 
-      def initialize(batch_id, root_account, logger, updates_every, messages)
-        @batch_id = batch_id
+      def initialize(batch, root_account, logger, updates_every, messages)
+        @batch = batch
         @root_account = root_account
         @logger = logger
         @updates_every = updates_every
@@ -86,12 +86,12 @@ module SIS
         @success_count = 0
       end
 
-      def add_enrollment(course_id, section_id, user_id, role, status, start_date, end_date, associated_user_id=nil)
+      def add_enrollment(course_id, section_id, user_id, role, status, start_date, end_date, associated_user_id=nil, root_account_id=nil)
         raise ImportError, "No course_id or section_id given for an enrollment" if course_id.blank? && section_id.blank?
         raise ImportError, "No user_id given for an enrollment" if user_id.blank?
         raise ImportError, "Improper status \"#{status}\" for an enrollment" unless status =~ /\Aactive|\Adeleted|\Acompleted|\Ainactive/i
 
-        @enrollment_batch << [course_id.to_s, section_id.to_s, user_id.to_s, role, status, start_date, end_date, associated_user_id]
+        @enrollment_batch << [course_id.to_s, section_id.to_s, user_id.to_s, role, status, start_date, end_date, associated_user_id, root_account_id]
         process_batch if @enrollment_batch.size >= @updates_every
       end
 
@@ -109,7 +109,7 @@ module SIS
           while !@enrollment_batch.empty? && tx_end_time > Time.now
             enrollment = @enrollment_batch.shift
             @logger.debug("Processing Enrollment #{enrollment.inspect}")
-            course_id, section_id, user_id, role, status, start_date, end_date, associated_user_id = enrollment
+            course_id, section_id, user_id, role, status, start_date, end_date, associated_user_id, root_account_sis_id = enrollment
 
             last_section = @section
             # reset the cached course/section if they don't match this row
@@ -121,16 +121,31 @@ module SIS
               @section = nil
             end
 
-            pseudo = Pseudonym.find_by_account_id_and_sis_user_id(@root_account.id, user_id)
-            user = pseudo.user rescue nil
+            if root_account_sis_id.present?
+              root_account = root_account_from_id(root_account_sis_id)
+              next unless root_account
+            else
+              root_account = @root_account
+            end
+            pseudo = root_account.pseudonyms.find_by_sis_user_id(user_id)
+
+            unless pseudo
+              @messages << "User #{user_id} didn't exist for user enrollment"
+              next
+            end
+
+            user = pseudo.user
+            if root_account != @root_account
+              if !user.find_pseudonym_for_account(@root_account, true)
+                @messages << "User #{root_account_sis_id}:#{user_id} does not have a usable login for this account"
+                next
+              end
+            end
+
             @course ||= Course.find_by_root_account_id_and_sis_source_id(@root_account.id, course_id) unless course_id.blank?
             @section ||= CourseSection.find_by_root_account_id_and_sis_source_id(@root_account.id, section_id) unless section_id.blank?
             unless (@course || @section)
               @messages << "Neither course #{course_id} nor section #{section_id} existed for user enrollment"
-              next
-            end
-            unless user
-              @messages << "User #{user_id} didn't exist for user enrollment"
               next
             end
 
@@ -175,7 +190,7 @@ module SIS
                 'TaEnrollment'
               elsif role =~ /\Aobserver\z/i
                 if associated_user_id
-                  pseudo = Pseudonym.find_by_account_id_and_sis_user_id(@root_account.id, associated_user_id)
+                  pseudo = root_account.pseudonyms.find_by_sis_user_id(associated_user_id)
                   if status =~ /\Aactive/i
                     associated_enrollment = pseudo && @course.student_enrollments.find_by_user_id(pseudo.user_id)
                   else
@@ -237,7 +252,7 @@ module SIS
             if enrollment.changed?
               @users_to_touch_ids.add(user.id)
               courses_to_recache_due_dates << enrollment.course_id if enrollment.workflow_state_changed?
-              enrollment.sis_batch_id = @batch_id if @batch_id
+              enrollment.sis_batch_id = @batch.id if @batch
               begin
                 enrollment.save_without_broadcasting!
               rescue ActiveRecord::RecordInvalid
@@ -248,13 +263,17 @@ module SIS
                 @messages << msg
                 next
               end
-            elsif @batch_id
+            elsif @batch
               @enrollments_to_update_sis_batch_ids << enrollment.id
             end
 
             @success_count += 1
           end
         end
+      end
+
+      def root_account_from_id(root_account_sis_id)
+        nil
       end
 
       def incrementally_update_account_associations

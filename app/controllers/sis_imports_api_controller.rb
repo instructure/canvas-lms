@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -302,7 +302,7 @@ class SisImportsApiController < ApplicationController
       end
 
       batch_mode_term = nil
-      if params[:batch_mode].to_i > 0
+      if value_to_boolean(params[:batch_mode])
         if params[:batch_mode_term_id].present?
           batch_mode_term = api_find(@account.enrollment_terms.active,
                                            params[:batch_mode_term_id])
@@ -319,10 +319,10 @@ class SisImportsApiController < ApplicationController
         end
 
         batch.options ||= {}
-        if params[:override_sis_stickiness].to_i > 0
+        if value_to_boolean(params[:override_sis_stickiness])
           batch.options[:override_sis_stickiness] = true
           [:add_sis_stickiness, :clear_sis_stickiness].each do |option|
-            batch.options[option] = true if params[option].to_i > 0
+            batch.options[option] = true if value_to_boolean(params[option])
           end
         end
       end

@@ -1,5 +1,6 @@
 <%
-  content_for :page_title, t(:edit_topic, "Edit Discussion Topic")
+  content_for :page_title, topic_page_title(@topic)
+
   js_bundle :discussion_topics_edit
   jammit_css :tinymce, :grading_standards, :assignments_edit
 %>

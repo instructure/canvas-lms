@@ -10,19 +10,39 @@
   <h2><%= @tag.title %></h2>
   <%= lock_explanation({:context_module => @tag.context_module, :asset_string => "content_tag_#{@tag.id}"}, nil, @context) %>
 <% else %>
-  <ul style="margin-top:0" class="ui-listview ui-listview-no-rounded-bottom">
-    <li class="active">
-      <span style="font-size:18px; text-align: center; padding: .2em" class="ui-listview-text">
-        <a href="<%= @tag.url %>"><%= @tag.title %></a>
-      </span>
-    </li>
-    <li>
-      <span style="padding:0" class="ui-listview-text">
-        <%= iframe(@tag.url, :id => 'file_content', :style => "width:100%; height: 400px; float:left;") %>
-        <!-- had to float then clear this because there was a space below the iframe I couldnt figure out how to get to go away -->
-        <div class="clear"></div>
-      </span>
-    </li>
-  </ul>
+  <% if @tag.try(:new_tab) %>
+    <%= t :new_tab, "This site needs to be opened in a new browser window." %>
+    <div>
+      <a id="open_url_button" target="_blank" role="link" class="btn external"
+         href="<%= @tag.url %>"
+         title="<%= t('open_url_button', "Open %{title} in a new window", :title => @tag.title) %>"
+         aria-label="<%= t('open_url_button', "Open %{title} in a new window", :title => @tag.title) %>">
+        <%= t('open_url_button', "Open %{title} in a new window", :title => @tag.title) %>
+      </a>
+    </div>
+  <% else %>
+    <% if @tag.url.start_with?('http://') %>
+      <div class="alert alert-error" id="insecure_content_msg">
+        <p>
+          <%= t('tool_insecure_warning', 'You are trying to launch insecure content from within a
+            secure site (canvas).  Some internet browsers may prevent this content from loading.') %>
+        </p>
+      </div>
+    <% end %>
+    <ul style="margin-top:0" class="ui-listview ui-listview-no-rounded-bottom">
+      <li class="active">
+        <span style="font-size:18px; text-align: center; padding: .2em" class="ui-listview-text">
+          <a href="<%= @tag.url %>"><%= @tag.title %></a>
+        </span>
+      </li>
+      <li>
+        <span style="padding:0" class="ui-listview-text">
+          <%= iframe(@tag.url, :id => 'file_content', :style => "width:100%; height: 400px; float:left;") %>
+          <!-- had to float then clear this because there was a space below the iframe I couldnt figure out how to get to go away -->
+          <div class="clear"></div>
+        </span>
+      </li>
+    </ul>
+  <% end %>
 <% end %>
 <%= render :partial => 'shared/sequence_footer', :locals => {:asset => @tag} %>

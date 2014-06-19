@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -83,11 +83,11 @@ require 'set'
 #           "type": "integer"
 #         },
 #         "sis_course_id": {
-#           "description": "the SIS identifier for the course, if defined",
+#           "description": "the SIS identifier for the course, if defined. This field is only included if the user has permission to view SIS information.",
 #           "type": "string"
 #         },
 #         "integration_id": {
-#           "description": "the integration identifier for the course, if defined",
+#           "description": "the integration identifier for the course, if defined. This field is only included if the user has permission to view SIS information.",
 #           "type": "string"
 #         },
 #         "name": {
@@ -274,7 +274,7 @@ class CoursesController < ApplicationController
   #   'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'ObserverEnrollment',
   #   or 'DesignerEnrollment'.
   #
-  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"total_scores"|"term"|"course_progress"]
+  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"total_scores"|"term"|"course_progress"|"sections"]
   #   - "needs_grading_count": Optional information to include with each Course.
   #     When needs_grading_count is given, and the current user has grading
   #     rights, the total number of submissions needing grading for all
@@ -308,6 +308,10 @@ class CoursesController < ApplicationController
   #     completed or the current module does not require sequential progress.
   #     "course_progress" will return an error message if the course is not
   #     module based or the user is not enrolled as a student in the course.
+  #   - "sections": Section enrollment information to include with each Course.
+  #     Returns an array of hashes containing the section ID (id), section name
+  #     (name), start and end dates (start_at, end_at), as well as the enrollment
+  #     type (enrollment_role, e.g. 'StudentEnrollment').
   #
   # @argument state[] [Optional, String, "unpublished"|"available"|"completed"|"deleted"]
   #   If set, only return courses that are in the given state(s).
@@ -331,11 +335,15 @@ class CoursesController < ApplicationController
 
       format.json {
         if params[:state]
-          params[:state] += %w(created claimed) if params[:state].include? 'unpublished'
-          enrollments = @current_user.enrollments
-          enrollments = enrollments.reject { |e| !params[:state].include?(e.course.workflow_state) || (%w(StudentEnrollment ObserverEnrollment).include?(e.type) && %w(created claimed).include?(e.course.workflow_state))}
+          states = Array(params[:state])
+          states += %w(created claimed) if states.include?('unpublished')
+          conditions = states.map{ |state|
+            Enrollment::QueryBuilder.new(nil, course_workflow_state: state, enforce_course_workflow_state: true).conditions
+          }.compact.join(" OR ")
+          enrollments = @current_user.enrollments.joins(:course).includes(:course).where(conditions)
         else
           enrollments = @current_user.cached_current_enrollments
+          Enrollment.send(:preload_associations, enrollments, [:course])
         end
 
         if params[:enrollment_role]
@@ -483,7 +491,9 @@ class CoursesController < ApplicationController
       end
 
       @course = (@sub_account || @account).courses.build(params[:course])
-      @course.sis_source_id = sis_course_id if api_request? && @account.grants_right?(@current_user, :manage_sis)
+      if api_request? && @account.grants_right?(@current_user, :manage_sis)
+        @course.sis_source_id = sis_course_id
+      end
 
       if apply_assignment_group_weights
         @course.apply_assignment_group_weights = value_to_boolean apply_assignment_group_weights
@@ -493,11 +503,13 @@ class CoursesController < ApplicationController
 
       respond_to do |format|
         if @course.save
-          Auditors::Course.record_created(@course, @current_user, changes)
+          Auditors::Course.record_created(@course, @current_user, changes, source: (api_request? ? :api : :manual))
           @course.enroll_user(@current_user, 'TeacherEnrollment', :enrollment_state => 'active') if params[:enroll_me].to_s == 'true'
           # offer updates the workflow state, saving the record without doing validation callbacks
-          @course.offer if api_request? and params[:offer].present?
-
+          if api_request? and params[:offer].present?
+            @course.offer
+            Auditors::Course.record_published(@course, @current_user, source: :api)
+          end
           format.html { redirect_to @course }
           format.json { render :json => course_json(
             @course,
@@ -565,6 +577,7 @@ class CoursesController < ApplicationController
     get_context
     if authorized_action(@context, @current_user, :change_course_state)
       @context.unconclude
+      Auditors::Course.record_unconcluded(@context, @current_user, source: (api_request? ? :api : :manual))
       flash[:notice] = t('notices.unconcluded', "Course un-concluded")
       redirect_to(named_context_url(@context, :context_url))
     end
@@ -797,13 +810,14 @@ class CoursesController < ApplicationController
     if params[:event] != 'conclude' && (@context.created? || @context.claimed? || params[:event] == 'delete')
       return unless authorized_action(@context, @current_user, permission_for_event(params[:event]))
       @context.destroy
+      Auditors::Course.record_deleted(@context, @current_user, source: (api_request? ? :api : :manual))
       flash[:notice] = t('notices.deleted', "Course successfully deleted")
     else
       return unless authorized_action(@context, @current_user, permission_for_event(params[:event]))
 
       @context.complete
       if @context.save
-        Auditors::Course.record_concluded(@context, @current_user)
+        Auditors::Course.record_concluded(@context, @current_user, source: (api_request? ? :api : :manual))
         flash[:notice] = t('notices.concluded', "Course successfully concluded")
       else
         flash[:notice] = t('notices.failed_conclude', "Course failed to conclude")
@@ -934,7 +948,7 @@ class CoursesController < ApplicationController
     changes = changed_settings(@course.changes, @course.settings, old_settings)
 
     if @course.save
-      Auditors::Course.record_updated(@course, @current_user, changes)
+      Auditors::Course.record_updated(@course, @current_user, changes, source: :api)
       render :json => course_settings_json(@course)
     else
       render :json => @course.errors, :status => :bad_request
@@ -1592,7 +1606,7 @@ class CoursesController < ApplicationController
       @course.save
       @course.enroll_user(@current_user, 'TeacherEnrollment', :enrollment_state => 'active')
 
-      @content_migration = @course.content_migrations.build(:user => @current_user, :context => @course, :migration_type => 'course_copy_importer')
+      @content_migration = @course.content_migrations.build(:user => @current_user, :source_course => @context, :context => @course, :migration_type => 'course_copy_importer', :initiated_source => api_request? ? :api : :manual)
       @content_migration.migration_settings[:source_course_id] = @context.id
       @content_migration.workflow_state = 'created'
       @content_migration.set_date_shift_options(params[:date_shift_options])
@@ -1643,6 +1657,7 @@ class CoursesController < ApplicationController
   def update
     @course = api_find(Course, params[:id])
     old_settings = @course.settings
+    logging_source = api_request? ? :api : :manual
 
     if authorized_action(@course, @current_user, :update)
       params[:course] ||= {}
@@ -1726,7 +1741,12 @@ class CoursesController < ApplicationController
         params[:course][:indexed] = nil if params[:course].has_key?(:indexed)
       end
 
-      @course.process_event(params[:course].delete(:event)) if params[:course][:event] && @course.grants_right?(@current_user, session, :change_course_state)
+      if params[:course][:event] && @course.grants_right?(@current_user, session, :change_course_state)
+        event = params[:course].delete(:event)
+        @course.process_event(event)
+        Auditors::Course.record_published(@course, @current_user, source: logging_source) if event.to_sym == :offer
+      end
+
       params[:course][:conclude_at] = params[:course].delete(:end_at) if api_request? && params[:course].has_key?(:end_at)
       respond_to do |format|
         @default_wiki_editing_roles_was = @course.default_wiki_editing_roles
@@ -1735,7 +1755,7 @@ class CoursesController < ApplicationController
         changes = changed_settings(@course.changes, @course.settings, old_settings)
 
         if @course.save
-          Auditors::Course.record_updated(@course, @current_user, changes)
+          Auditors::Course.record_updated(@course, @current_user, changes, source: logging_source)
           @current_user.touch
           if params[:update_default_pages]
             @course.wiki.update_default_wiki_page_roles(@course.default_wiki_editing_roles, @default_wiki_editing_roles_was)
@@ -1790,12 +1810,12 @@ class CoursesController < ApplicationController
 
     if authorized_action(@account, @current_user, permission)
       return render(:json => { :message => 'must specify course_ids[]' }, :status => :bad_request) unless params[:course_ids].is_a?(Array)
-      @course_ids = Api.map_ids(params[:course_ids], Course, @domain_root_account)
+      @course_ids = Api.map_ids(params[:course_ids], Course, @domain_root_account, @current_user)
       return render(:json => { :message => 'course batch size limit (500) exceeded' }, :status => :forbidden) if @course_ids.size > 500
       update_params = params.slice(:event).with_indifferent_access
       return render(:json => { :message => 'need to specify event' }, :status => :bad_request) unless update_params[:event]
       return render(:json => { :message => 'invalid event' }, :status => :bad_request) unless %w(offer conclude delete undelete).include? update_params[:event]
-      progress = Course.batch_update(@account, @current_user, @course_ids, update_params)
+      progress = Course.batch_update(@account, @current_user, @course_ids, update_params, :api)
       render :json => progress_json(progress, @current_user, session)
     end
   end
@@ -1852,6 +1872,7 @@ class CoursesController < ApplicationController
     get_context
     return unless authorized_action(@context, @current_user, :reset_content)
     @new_course = @context.reset_content
+    Auditors::Course.record_reset(@context, @new_course, @current_user, source: api_request? ? :api : :manual)
     redirect_to course_settings_path(@new_course.id)
   end
 

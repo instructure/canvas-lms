@@ -12,7 +12,6 @@
   margin-bottom: 0;
   display: none;
   width: 100%;
-  -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
 
@@ -35,14 +34,9 @@
 
 .conversations .panel {
   background: #f1f1f1;
-  background: -moz-linear-gradient(top, #fff, #e6e6e6);
-  background: -ms-linear-gradient(top, #fff, #e6e6e6);
-  background: -o-linear-gradient(top, #fff, #e6e6e6);
-  background: -webkit-linear-gradient(top, #fff, #e6e6e6);
   background: linear-gradient(top, #fff, #e6e6e6);
   border-bottom: 1px solid #acacac;
   box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
-  -moz-box-sizing: border-box;
   box-sizing: border-box;
   color: #555;
   height: 50px;
@@ -172,12 +166,7 @@
 
   .messages > li {
     background: #fff;
-    background: -moz-linear-gradient(top, #fff, #fafafa);
-    background: -ms-linear-gradient(top, #fff, #fafafa);
-    background: -o-linear-gradient(top, #fff, #fafafa);
-    background: -webkit-linear-gradient(top, #fff, #fafafa);
     background: linear-gradient(top, #fff, #fafafa);
-    -moz-box-sizing: border-box;
     box-sizing: border-box;
     border-bottom: 1px solid #bfbfbf;
     cursor: pointer;
@@ -264,7 +253,6 @@
   .read-state {
     background: #4aaefb;
     border-radius: 5px;
-    -moz-box-sizing: border-box;
     box-sizing: border-box;
     display: inline-block;
     height: 10px;

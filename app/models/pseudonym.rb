@@ -28,6 +28,14 @@ class Pseudonym < ActiveRecord::Base
   belongs_to :communication_channel
   belongs_to :sis_communication_channel, :class_name => 'CommunicationChannel'
   MAX_UNIQUE_ID_LENGTH = 100
+
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :user_id, :account_id, :workflow_state, :unique_id, :login_count, :failed_login_count, :last_request_at, :last_login_at, :current_login_at, :last_login_ip,
+    :current_login_ip, :position, :created_at, :updated_at, :deleted_at, :sis_batch_id, :sis_user_id, :sis_ssha, :communication_channel_id, :login_path_to_ignore, :sis_communication_channel_id
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:account, :user, :communication_channels, :communication_channel, :sis_communication_channel]
+
   validates_length_of :unique_id, :maximum => MAX_UNIQUE_ID_LENGTH
   validates_length_of :sis_user_id, :maximum => maximum_string_length, :allow_blank => true
   validates_presence_of :account_id

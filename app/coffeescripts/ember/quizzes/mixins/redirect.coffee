@@ -3,15 +3,15 @@ define [
   '../shared/environment'
   'i18n!quizzes_redirects'
   'compiled/jquery.rails_flash_notifications' # flash messages
-], (Em, env, I18n) ->
+], (Ember, env, I18n) ->
 
-  Em.Mixin.create
+  Ember.Mixin.create
 
-    validateRoute: (permission, redirectTo) ->
+    validateRoute: (permission, path) ->
       if !env.get(permission)
-        this.transitionTo(redirectTo)
-        Ember.run.throttle(this, @displayRedirect, 150)
+        msg = I18n.t('no_access', 'Access denied. Redirected to a page you have access to.')
+        @redirectTo(path, msg)
 
-    displayRedirect: ->
-      Ember.$.flashWarning I18n.t('no_access', 'Access denied. Redirected to a page you have access to.')
-
+    redirectTo: (path, msg) ->
+      @transitionTo(path)
+      Ember.run.throttle(this, ( -> Ember.$.flashWarning(msg) ), 150)

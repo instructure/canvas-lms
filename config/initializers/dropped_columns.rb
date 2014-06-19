@@ -34,6 +34,7 @@ class ActiveRecord::Base
     'discussion_topics' => %w(authorization_list_id),
     'enrollment_terms' => %w(sis_data sis_name),
     'enrollments' => %w(invitation_email can_participate_before_start_at limit_priveleges_to_course_sections),
+    'failed_jobs' => %w(original_id),
     'groups' => %w(sis_name type groupable_id groupable_type),
     'notification_policies' => %w(user_id),
     'page_views' => %w(contributed),

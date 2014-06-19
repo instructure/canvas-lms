@@ -18,18 +18,78 @@
 
 module LtiOutbound
   class VariableSubstitutor
-    #This method changes given data_hash!
-    def substitute!(data_hash, substitution_object)
-      data_hash.each do |key, val|
-        if substitution_object.has_variable_mapping?(val)
-          replacement_value = substitution_object.variable_substitution_mapping(val)
-          data_hash[key] = replacement_value if replacement_value
+
+    class << self
+      attr_accessor :substitutions
+
+      def add_substitution(key, model, method)
+        self.substitutions ||= {}
+        self.substitutions[key] = {method: method, model: model}
+      end
+
+    end
+
+
+    #Variable Substitutions
+    #
+    #Account
+    add_substitution '$Canvas.account.id', :account, :id
+    add_substitution '$Canvas.account.name', :account, :name
+    add_substitution '$Canvas.account.sisSourceId', :account, :sis_source_id
+    #Assignment
+    add_substitution '$Canvas.assignment.id', :assignment, :id
+    add_substitution '$Canvas.assignment.title', :assignment, :title
+    add_substitution '$Canvas.assignment.pointsPossible', :assignment, :points_possible
+    #Consumer Instance
+    add_substitution '$Canvas.root_account.id', :consumer_instance, :id
+    add_substitution '$Canvas.root_account.sisSourceId', :consumer_instance, :sis_source_id
+    add_substitution '$Canvas.api.domain', :consumer_instance, :domain
+    #Course
+    add_substitution '$Canvas.course.id', :course, :id
+    add_substitution '$Canvas.course.sisSourceId', :course, :sis_source_id
+    #User
+    add_substitution '$Canvas.user.id', :user, :id
+    add_substitution '$Canvas.user.sisSourceId', :user, :sis_source_id
+    add_substitution '$Canvas.user.loginId', :user, :login_id
+    add_substitution '$Canvas.enrollment.enrollmentState', :user, :enrollment_state
+    add_substitution '$Canvas.membership.concludedRoles', :user, :concluded_role_types
+    add_substitution '$Person.name.family', :user, :last_name
+    add_substitution '$Person.name.full', :user, :name
+    add_substitution '$Person.name.given', :user, :first_name
+    add_substitution '$Person.address.timezone', :user, :timezone
+
+
+    attr_reader :substitution_objects
+
+    def initialize(substitution_objects)
+      @substitution_objects = substitution_objects
+    end
+
+    def substitute!(data_hash)
+      data_hash.each do |k, v|
+        if value = substitution_value(v)
+          data_hash[k] = value
         end
+      end
+      data_hash
+    end
+
+
+    private
+
+    def substitution_value(key)
+      lookup = VariableSubstitutor.substitutions[key]
+      if model = lookup && lookup_model(lookup[:model])
+        model.send(lookup[:method])
       end
     end
 
-    def substitute_all!(data_hash, *substitution_objects)
-      substitution_objects.compact.each {|obj| substitute!(data_hash, obj)}
+    def lookup_model(model_name)
+      if model_name == :course && substitution_objects[:context].is_a?(LtiOutbound::LTICourse)
+        model_name = :context
+      end
+      substitution_objects[model_name]
     end
+
   end
 end

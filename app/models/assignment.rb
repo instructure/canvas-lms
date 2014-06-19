@@ -40,6 +40,19 @@ class Assignment < ActiveRecord::Base
     :external_tool_tag_attributes, :freeze_on_copy, :assignment_group_id,
     :only_visible_to_overrides, :post_to_sis
 
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :title, :description, :due_at, :unlock_at, :lock_at, :points_possible, :min_score, :max_score, :mastery_score, :grading_type,
+    :submission_types, :workflow_state, :context_id, :context_type, :assignment_group_id, :grading_scheme_id, :grading_standard_id, :location, :created_at,
+    :updated_at, :group_category, :submissions_downloads, :peer_review_count, :peer_reviews_due_at, :peer_reviews_assigned, :peer_reviews, :automatic_peer_reviews,
+    :all_day, :all_day_date, :could_be_locked, :cloned_item_id, :context_code, :position, :grade_group_students_individually, :anonymous_peer_reviews, :time_zone_edited,
+    :turnitin_enabled, :allowed_extensions, :needs_grading_count, :turnitin_settings, :muted, :group_category_id, :freeze_on_copy, :copied, :only_visible_to_overrides
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [
+    :submissions, :attachments, :quiz, :assignment_group, :discussion_topic, :learning_outcome_alignments,
+    :rubric, :context, :grading_standard, :group_category
+  ]
+
   attr_accessor :previous_id, :updating_user, :copying
 
   attr_reader :assignment_changed
@@ -125,13 +138,8 @@ class Assignment < ActiveRecord::Base
     created_at
     updated_at
     post_to_sis
+    integration_data
   )
-  # create a shim for plugins that use the old association name. this is
-  # TEMPORARY. the plugins should update to use the new association name, and
-  # once they're updated, this shim removed. DO NOT USE in new code.
-  def learning_outcome_tags
-    learning_outcome_alignments
-  end
 
   def external_tool?
     self.submission_types == 'external_tool'
@@ -159,6 +167,8 @@ class Assignment < ActiveRecord::Base
   def name=(val)
     self.title = val
   end
+
+  serialize :integration_data, Hash
 
   serialize :turnitin_settings, Hash
   # file extensions allowed for online_upload submission
@@ -912,6 +922,7 @@ class Assignment < ActiveRecord::Base
     raise "Student must be enrolled in the course as a student to be graded" unless context.includes_student?(original_student)
     raise "Grader must be enrolled as a course admin" if opts[:grader] && !self.context.grants_right?(opts[:grader], nil, :manage_grades)
     opts.delete(:id)
+    dont_overwrite_grade = opts.delete(:dont_overwrite_grade)
     group_comment = Canvas::Plugin.value_to_boolean(opts.delete(:group_comment))
     group, students = group_students(original_student)
     grader = opts.delete :grader
@@ -929,6 +940,7 @@ class Assignment < ActiveRecord::Base
       student = submission.user
       if student == original_student || !grade_group_students_individually
         previously_graded = submission.grade.present?
+        next if previously_graded && dont_overwrite_grade
         submission.attributes = opts
         submission.assignment_id = self.id
         submission.user_id = student.id
@@ -1618,14 +1630,6 @@ class Assignment < ActiveRecord::Base
     end
   end
   protected :readable_submission_type
-
-  def self.process_migration(*args)
-    Importers::AssignmentImporter.process_migration(*args)
-  end
-
-  def self.import_from_migration(*args)
-    Importers::AssignmentImporter.import_from_migration(*args)
-  end
 
   def expects_submission?
     submission_types && submission_types.strip != "" && submission_types != "none" && submission_types != 'not_graded' && submission_types != "on_paper" && submission_types != 'external_tool'

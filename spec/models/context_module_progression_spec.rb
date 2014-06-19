@@ -97,15 +97,54 @@ describe ContextModuleProgression do
     end
   end
 
-  context "evaluate" do
-    it "does not evaluate when current" do
-      progression = ContextModuleProgression.new
-      progression.current = true
-      progression.workflow_state = nil
+  context '#evaluate' do
+    let(:module_progression) do
+      p = @module.context_module_progressions.create do |p|
+        p.context_module = @module
+        p.user = @user
+        p.current = true
+        p.evaluated_at = 5.minutes.ago
+      end
+      p.workflow_state = 'bogus'
+      p
+    end
 
-      progression.evaluate
+    context 'does not evaluate' do
+      it 'when current' do
+        module_progression.evaluate
 
-      progression.workflow_state.should == nil
+        module_progression.workflow_state.should == 'bogus'
+      end
+
+      it 'when current and the module has not yet unlocked' do
+        @module.unlock_at = 10.minutes.from_now
+        module_progression.evaluate
+
+        module_progression.workflow_state.should == 'bogus'
+      end
+    end
+
+    context 'does evaluate' do
+      it 'when not current' do
+        module_progression.current = false
+        module_progression.evaluate
+
+        module_progression.workflow_state.should_not == 'bogus'
+      end
+
+      it 'when current, but the evaluated_at stamp is missing' do
+        module_progression.evaluated_at = nil
+        module_progression.evaluate
+
+        module_progression.workflow_state.should_not == 'bogus'
+      end
+
+      it 'when current, but the module has since unlocked' do
+        @module.unlock_at = 1.minute.ago
+        module_progression.evaluate
+
+        module_progression.workflow_state.should_not == 'bogus'
+      end
     end
   end
 

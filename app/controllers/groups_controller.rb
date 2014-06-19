@@ -139,7 +139,7 @@ class GroupsController < ApplicationController
   include Api::V1::Group
   include Api::V1::GroupCategory
 
-  SETTABLE_GROUP_ATTRIBUTES = %w(name description join_level is_public group_category avatar_attachment storage_quota_mb)
+  SETTABLE_GROUP_ATTRIBUTES = %w(name description join_level is_public group_category avatar_attachment storage_quota_mb max_membership leader)
 
   include TextHelper
 
@@ -192,7 +192,7 @@ class GroupsController < ApplicationController
   #  Only include groups that are in this type of context.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/users/self/groups?context_type=Account \ 
+  #     curl https://<canvas>/api/v1/users/self/groups?context_type=Account \
   #          -H 'Authorization: Bearer <token>'
   #
   # @returns [Group]
@@ -225,7 +225,7 @@ class GroupsController < ApplicationController
   # Returns the list of active groups in the given context that are visible to user.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/courses/1/groups \ 
+  #     curl https://<canvas>/api/v1/courses/1/groups \
   #          -H 'Authorization: Bearer <token>'
   #
   # @returns [Group]
@@ -300,7 +300,7 @@ class GroupsController < ApplicationController
   # the rights to see it.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/groups/<group_id> \ 
+  #     curl https://<canvas>/api/v1/groups/<group_id> \
   #          -H 'Authorization: Bearer <token>'
   #
   # @argument include[] [String, "permissions"]
@@ -392,11 +392,11 @@ class GroupsController < ApplicationController
   #   ignored if the caller does not have the manage_storage_quotas permission.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/groups \ 
-  #          -F 'name=Math Teachers' \ 
-  #          -F 'description=A place to gather resources for our classes.' \ 
-  #          -F 'is_public=true' \ 
-  #          -F 'join_level=parent_context_auto_join' \ 
+  #     curl https://<canvas>/api/v1/groups \
+  #          -F 'name=Math Teachers' \
+  #          -F 'description=A place to gather resources for our classes.' \
+  #          -F 'is_public=true' \
+  #          -F 'join_level=parent_context_auto_join' \
   #          -H 'Authorization: Bearer <token>'
   #
   # @returns Group
@@ -472,10 +472,10 @@ class GroupsController < ApplicationController
   #   ignored if the caller does not have the manage_storage_quotas permission.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/groups/<group_id> \ 
-  #          -X PUT \ 
-  #          -F 'name=Algebra Teachers' \ 
-  #          -F 'join_level=parent_context_request' \ 
+  #     curl https://<canvas>/api/v1/groups/<group_id> \
+  #          -X PUT \
+  #          -F 'name=Algebra Teachers' \
+  #          -F 'join_level=parent_context_request' \
   #          -H 'Authorization: Bearer <token>'
   #
   # @returns Group
@@ -492,6 +492,14 @@ class GroupsController < ApplicationController
 
     if avatar_id = (params[:avatar_id] || (params[:group] && params[:group][:avatar_id]))
       attrs[:avatar_attachment] = @group.active_images.find_by_id(avatar_id)
+    end
+
+    if attrs[:leader]
+      membership = @group.group_memberships.find_by_user_id(attrs[:leader][:id])
+      return render :json => {}, :status => :bad_request unless membership
+      attrs[:leader] = membership.user
+    else
+      attrs[:leader] = nil
     end
 
     if authorized_action(@group, @current_user, :update)
@@ -513,8 +521,8 @@ class GroupsController < ApplicationController
   # Deletes a group and removes all members.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/groups/<group_id> \ 
-  #          -X DELETE \ 
+  #     curl https://<canvas>/api/v1/groups/<group_id> \
+  #          -X DELETE \
   #          -H 'Authorization: Bearer <token>'
   #
   # @returns Group
@@ -547,8 +555,8 @@ class GroupsController < ApplicationController
   #   An array of email addresses to be sent invitations.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/groups/<group_id>/invite \ 
-  #          -F 'invitees[]=leonard@example.com&invitees[]=sheldon@example.com' \ 
+  #     curl https://<canvas>/api/v1/groups/<group_id>/invite \
+  #          -F 'invitees[]=leonard@example.com&invitees[]=sheldon@example.com' \
   #          -H 'Authorization: Bearer <token>'
   def invite
     find_group
@@ -612,6 +620,9 @@ class GroupsController < ApplicationController
   #   The partial name or full ID of the users to match and return in the
   #   results list. Must be at least 3 characters.
   #
+  # @argument include[] [String, "avatar_url"]
+  #   - "avatar_url": Include users' avatar_urls.
+  #
   # @example_request
   #     curl https://<canvas>/api/v1/groups/1/users \
   #          -H 'Authorization: Bearer <token>'
@@ -629,7 +640,7 @@ class GroupsController < ApplicationController
     end
 
     users = Api.paginate(users, self, api_v1_group_users_url)
-    render :json => users.map { |u| user_json(u, @current_user, session) }
+    render :json => users_json(users, @current_user, session, Array(params[:include]))
   end
 
   def edit

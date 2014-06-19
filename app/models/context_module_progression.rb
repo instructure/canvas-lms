@@ -22,6 +22,10 @@ class ContextModuleProgression < ActiveRecord::Base
   belongs_to :context_module
   belongs_to :user
   before_save :set_completed_at
+
+  EXPORTABLE_ATTRIBUTES = [:id, :context_module_id, :user_id, :requirements_met, :workflow_state, :created_at, :updated_at, :collapsed, :current_position, :completed_at]
+  EXPORTABLE_ASSOCIATIONS = [:context_module, :user]
+
   after_save :touch_user
   
   serialize :requirements_met, Array
@@ -215,6 +219,18 @@ class ContextModuleProgression < ActiveRecord::Base
     end
   end
 
+  def outdated?
+    if self.current && evaluated_at.present?
+      # context module not locked or still to be unlocked
+      return false if context_module.unlock_at.blank? || context_module.to_be_unlocked
+
+      # evaluated before unlock time
+      return evaluated_at < context_module.unlock_at
+    end
+
+    true
+  end
+
   def self.prerequisites_satisfied?(user, context_module)
     related_progressions = nil
     (context_module.active_prerequisites || []).all? do |pre|
@@ -280,11 +296,12 @@ class ContextModuleProgression < ActiveRecord::Base
   # calculates and saves the progression state
   # raises a StaleObjectError if there is a conflict
   def evaluate(as_prerequisite_for=nil)
-    return self if self.current
+    return self unless outdated?
 
     # there is no valid progression state for unpublished modules
     return self if context_module.unpublished?
 
+    self.evaluated_at = Time.now.utc
     self.current = true
     self.requirements_met ||= []
     self.workflow_state = 'locked'

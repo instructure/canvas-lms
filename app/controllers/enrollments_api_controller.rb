@@ -69,12 +69,12 @@
 #             "type": "integer"
 #           },
 #           "sis_course_id": {
-#             "description": "The SIS Course ID in which the enrollment is associated. Only displayed if present.",
+#             "description": "The SIS Course ID in which the enrollment is associated. Only displayed if present. This field is only included if the user has permission to view SIS information.",
 #             "example": "SHEL93921",
 #             "type": "string"
 #           },
 #           "course_integration_id": {
-#             "description": "The Course Integration ID in which the enrollment is associated.",
+#             "description": "The Course Integration ID in which the enrollment is associated. This field is only included if the user has permission to view SIS information.",
 #             "example": "SHEL93921",
 #             "type": "string"
 #           },
@@ -84,12 +84,12 @@
 #             "type": "integer"
 #           },
 #           "section_integration_id": {
-#             "description": "The Section Integration ID in which the enrollment is associated.",
+#             "description": "The Section Integration ID in which the enrollment is associated. This field is only included if the user has permission to view SIS information.",
 #             "example": "SHEL93921",
 #             "type": "string"
 #           },
 #           "sis_section_id": {
-#             "description": "The SIS Section ID in which the enrollment is associated. Only displayed if present.",
+#             "description": "The SIS Section ID in which the enrollment is associated. Only displayed if present. This field is only included if the user has permission to view SIS information.",
 #             "example": "SHEL93921",
 #             "type": "string"
 #           },
@@ -153,6 +153,11 @@
 #             "example": "2012-04-18T23:08:51Z",
 #             "type": "datetime"
 #           },
+#           "total_activity_time": {
+#             "description": "The total activity time of the user for the enrollment, in seconds.",
+#             "example": 260,
+#             "type": "integer"
+#           },
 #           "html_url": {
 #             "description": "The URL to the Canvas web UI page for this course enrollment.",
 #             "example":  "https://...",
@@ -209,7 +214,16 @@ class EnrollmentsApiController < ApplicationController
   #
   # @argument state[] [String, "active"|"invited"|"creation_pending"|"deleted"|"rejected"|"completed"|"inactive"]
   #   Filter by enrollment state. If omitted, 'active' and 'invited' enrollments
-  #   are returned.
+  #   are returned. When querying a user's enrollments (either via user_id
+  #   argument or via user enrollments endpoint), the following additional
+  #   synthetic states are supported: "current_and_invited"|"current_and_future"|"current_and_concluded"
+  #
+  # @argument user_id [String]
+  #   Filter by user_id (only valid for course or section enrollment
+  #   queries). If set to the current user's id, this is a way to
+  #   determine if the user has any enrollments in the course or section,
+  #   independent of whether the user has permission to view other people
+  #   on the roster.
   #
   # @returns [Enrollment]
   def index
@@ -420,6 +434,13 @@ class EnrollmentsApiController < ApplicationController
   #
   # Returns an ActiveRecord scope of enrollments on success, false on failure.
   def course_index_enrollments
+    if params[:user_id]
+      # if you pass in your own id, you can see if you are enrolled in the
+      # course, regardless of whether you have read_roster
+      scope = user_index_enrollments
+      return scope && scope.where(course_id: @context.id)
+    end
+
     if authorized_action(@context, @current_user, [:read_roster, :view_all_grades, :manage_grades])
       scope = @context.enrollments_visible_to(@current_user, :type => :all, :include_priors => true).where(enrollment_index_conditions)
       unless params[:state].present?
@@ -490,7 +511,8 @@ class EnrollmentsApiController < ApplicationController
 
     if state.present?
       if use_course_state
-        clauses << "(#{state.map{|s| "(#{User.enrollment_conditions(s.to_sym)})" }.join(' OR ')})"
+        conditions = state.map{ |s| Enrollment::QueryBuilder.new(s.to_sym).conditions }.compact
+        clauses << "(#{conditions.join(' OR ')})"
       else
         clauses << 'enrollments.workflow_state IN (:workflow_state)'
         replacements[:workflow_state] = Array(state)

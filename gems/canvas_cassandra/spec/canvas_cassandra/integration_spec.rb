@@ -31,7 +31,7 @@ describe "execute and update" do
         YAML.load(ERB.new(File.read(config_path)).result)['test']
   end
   let(:db) do
-    # TODO: Setting.from_config really deserves to be its own Config component that we could use here
+    # TODO: ConfigFile.load really deserves to be its own Config component that we could use here
     test_config = YAML.load(ERB.new(File.read(config_path)).result)['test']['page_views']
     CanvasCassandra::Database.new("test_conn", test_config['servers'], {keyspace: test_config['keyspace'], cql_version: '3.0.0'}, TestLogger.new)
   end

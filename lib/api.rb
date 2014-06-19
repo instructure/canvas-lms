@@ -63,8 +63,7 @@ module Api
         end
       end
     end
-
-    find_params = Api.sis_find_params_for_collection(collection, ids, options[:account] || @domain_root_account)
+    find_params = Api.sis_find_params_for_collection(collection, ids, options[:account] || @domain_root_account, @current_user)
     return [] if find_params == :not_found
     find_params[:limit] = options[:limit] unless options[:limit].nil?
     return collection.all(find_params)
@@ -74,9 +73,9 @@ module Api
   # sis ids that can't be found in the db won't appear in the result, however
   # AR object ids aren't verified to exist in the db so they'll still be
   # returned in the result.
-  def self.map_ids(ids, collection, root_account)
+  def self.map_ids(ids, collection, root_account, current_user = nil)
     sis_mapping = sis_find_sis_mapping_for_collection(collection)
-    columns = sis_parse_ids(ids, sis_mapping[:lookups])
+    columns = sis_parse_ids(ids, sis_mapping[:lookups], current_user)
     result = columns.delete(sis_mapping[:lookups]["id"]) || []
     unless columns.empty?
       find_params = sis_make_params_for_sis_mapping_and_columns(columns, sis_mapping, root_account)
@@ -91,7 +90,7 @@ module Api
 
   SIS_MAPPINGS = {
     'courses' =>
-      { :lookups => { 'sis_course_id' => 'sis_source_id', 'id' => 'id', 'sis_integration_id' => 'integration_id' },
+      { :lookups => { 'sis_course_id' => 'sis_source_id', 'id' => 'id', 'sis_integration_id' => 'integration_id', 'lti_context_id' => 'lti_context_id' },
         :is_not_scoped_to_account => ['id'].to_set,
         :scope => 'root_account_id' },
     'enrollment_terms' =>
@@ -99,13 +98,13 @@ module Api
         :is_not_scoped_to_account => ['id'].to_set,
         :scope => 'root_account_id' },
     'users' =>
-      { :lookups => { 'sis_user_id' => 'pseudonyms.sis_user_id', 'sis_login_id' => 'pseudonyms.unique_id', 'id' => 'users.id', 'sis_integration_id' => 'pseudonyms.integration_id' },
-        :is_not_scoped_to_account => ['users.id'].to_set,
+      { :lookups => { 'sis_user_id' => 'pseudonyms.sis_user_id', 'sis_login_id' => 'pseudonyms.unique_id', 'id' => 'users.id', 'sis_integration_id' => 'pseudonyms.integration_id', 'lti_context_id' => 'users.lti_context_id', 'lti_user_id' => 'users.lti_context_id' },
+        :is_not_scoped_to_account => ['users.id', 'users.lti_context_id'].to_set,
         :scope => 'pseudonyms.account_id',
         :joins => [:pseudonym] },
     'accounts' =>
-      { :lookups => { 'sis_account_id' => 'sis_source_id', 'id' => 'id', 'sis_integration_id' => 'integration_id' },
-        :is_not_scoped_to_account => ['id'].to_set,
+      { :lookups => { 'sis_account_id' => 'sis_source_id', 'id' => 'id', 'sis_integration_id' => 'integration_id', 'lti_context_id' => 'lti_context_id' },
+        :is_not_scoped_to_account => ['id', 'lti_context_id'].to_set,
         :scope => 'root_account_id' },
     'course_sections' =>
       { :lookups => { 'sis_section_id' => 'sis_source_id', 'id' => 'id' , 'sis_integration_id' => 'integration_id' },
@@ -123,14 +122,14 @@ module Api
   MAX_ID_LENGTH = 18
   ID_REGEX = %r{\A\d{1,#{MAX_ID_LENGTH}}\z}
 
-  def self.sis_parse_id(id, lookups)
+  def self.sis_parse_id(id, lookups, current_user = nil)
     # returns column_name, column_value
     return lookups['id'], id if id.is_a?(Numeric) || id.is_a?(ActiveRecord::Base)
     id = id.to_s.strip
-    if id =~ %r{\Ahex:(sis_[\w_]+):(([0-9A-Fa-f]{2})+)\z}
+    if id =~ %r{\Ahex:(lti_[\w_]+|sis_[\w_]+):(([0-9A-Fa-f]{2})+)\z}
       sis_column = $1
       sis_id = [$2].pack('H*')
-    elsif id =~ %r{\A(sis_[\w_]+):(.+)\z}
+    elsif id =~ %r{\A(lti_[\w_]+|sis_[\w_]+):(.+)\z}
       sis_column = $1
       sis_id = $2
     elsif id =~ ID_REGEX
@@ -144,11 +143,11 @@ module Api
     return column, sis_id
   end
 
-  def self.sis_parse_ids(ids, lookups)
+  def self.sis_parse_ids(ids, lookups, current_user = nil)
     # returns {column_name => [column_value,...].uniq, ...}
     columns = {}
     ids.compact.each do |id|
-      column, sis_id = sis_parse_id(id, lookups)
+      column, sis_id = sis_parse_id(id, lookups, current_user)
       next unless column && sis_id
       columns[column] ||= []
       columns[column] << sis_id
@@ -171,12 +170,12 @@ module Api
         raise(ArgumentError, "need to add support for table name: #{collection.table_name}")
   end
 
-  def self.sis_find_params_for_collection(collection, ids, sis_root_account)
-    return sis_find_params_for_sis_mapping(sis_find_sis_mapping_for_collection(collection), ids, sis_root_account)
+  def self.sis_find_params_for_collection(collection, ids, sis_root_account, current_user = nil)
+    return sis_find_params_for_sis_mapping(sis_find_sis_mapping_for_collection(collection), ids, sis_root_account, current_user)
   end
 
-  def self.sis_find_params_for_sis_mapping(sis_mapping, ids, sis_root_account)
-    return sis_make_params_for_sis_mapping_and_columns(sis_parse_ids(ids, sis_mapping[:lookups]), sis_mapping, sis_root_account)
+  def self.sis_find_params_for_sis_mapping(sis_mapping, ids, sis_root_account, current_user = nil)
+    return sis_make_params_for_sis_mapping_and_columns(sis_parse_ids(ids, sis_mapping[:lookups], current_user), sis_mapping, sis_root_account)
   end
 
   def self.sis_make_params_for_sis_mapping_and_columns(columns, sis_mapping, sis_root_account)
@@ -194,11 +193,26 @@ module Api
       columns.keys.sort.each do |column|
         if not_scoped_to_account.include?(column)
           query << "#{column} IN (?)"
+          args << columns[column]
         else
           raise ArgumentError, "missing scope for collection" unless sis_mapping[:scope]
-          query << "(#{sis_mapping[:scope]} = #{sis_root_account.id} AND #{column} IN (?))"
+          ids = columns[column]
+          if ids.any? { |id| id.is_a?(Array) }
+            ids_hash = {}
+            ids.each do |id|
+              id = Array(id)
+              account = id.last || sis_root_account
+              ids_hash[account] ||= []
+              ids_hash[account] << id.first
+            end
+          else
+            ids_hash = { sis_root_account => ids }
+          end
+          ids_hash.each do |root_account, ids|
+            query << "(#{sis_mapping[:scope]} = #{root_account.id} AND #{column} IN (?))"
+            args << ids
+          end
         end
-        args << columns[column]
       end
 
       args.unshift(query.join(" OR "))

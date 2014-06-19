@@ -43,6 +43,11 @@
 #           "example": "http://canvas.example.edu/courses/1/quizzes/2?persist_healdess=1&force_user=1",
 #           "type": "string"
 #         },
+#         "preview_url": {
+#           "description": "A url that can be visited in the browser with a POST request to preview a quiz as the teacher. Only present when the user may grade",
+#           "example": "http://canvas.example.edu/courses/1/quizzes/2/take?preview=1",
+#           "type": "string"
+#         },
 #         "description": {
 #           "description": "the description of the quiz",
 #           "example": "This is a quiz on Act 3 of Hamlet",
@@ -189,6 +194,11 @@
 #         "speedgrader_url": {
 #           "description": "Link to Speed Grader for this quiz. Will not be present if quiz is unpublished",
 #           "example": "http://canvas.instructure.com/courses/1/speed_grader?assignment_id=1",
+#           "type": "string"
+#         },
+#         "quiz_extensions_url": {
+#           "description": "Link to endpoint to send extensions for this quiz.",
+#           "example": "http://canvas.instructure.com/courses/1/quizzes/2/quiz_extensions",
 #           "type": "string"
 #         },
 #         "permissions": {
@@ -423,7 +433,11 @@ class Quizzes::QuizzesApiController < ApplicationController
     if authorized_action(@quiz, @current_user, :update)
       update_api_quiz(@quiz, params)
       if @quiz.valid?
-        render_json
+        if accepts_jsonapi?
+          head :no_content
+        else
+          render_json
+        end
       else
         errors = @quiz.errors.as_json[:errors]
         errors['published'] = errors.delete(:workflow_state) if errors.has_key?(:workflow_state)
@@ -469,11 +483,7 @@ class Quizzes::QuizzesApiController < ApplicationController
   private
 
   def render_json
-    if accepts_jsonapi?
-      render json: { quizzes: quizzes_json([@quiz], @context, @current_user, session) }
-    else
-      render json: quiz_json(@quiz, @context, @current_user, session)
-    end
+    render json: quiz_json(@quiz, @context, @current_user, session)
   end
 
   def quiz_params

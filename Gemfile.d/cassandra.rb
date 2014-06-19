@@ -1,5 +1,5 @@
 group :cassandra do
-  gem 'cassandra-cql', '1.2.1', :github => 'kreynolds/cassandra-cql', :ref => 'd100be075b04153cf4116da7512892a1e8c0a7e4' #dependency of canvas_cassandra
+  gem 'cassandra-cql', '1.2.2', :github => 'kreynolds/cassandra-cql', :ref => 'beed72e249d02cebc850a4b92b468c8b64b12257' #dependency of canvas_cassandra
     gem 'simple_uuid', '0.4.0'
     gem 'thrift', '0.8.0'
     gem 'thrift_client', '0.8.4'

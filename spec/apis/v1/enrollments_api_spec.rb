@@ -69,6 +69,7 @@ describe EnrollmentsApiController, type: :request do
           'updated_at'                         => new_enrollment.updated_at.xmlschema,
           'created_at'                         => new_enrollment.created_at.xmlschema,
           'last_activity_at'                   => nil,
+          'total_activity_time'                => 0,
           'sis_course_id'                      => @course.sis_source_id,
           'course_integration_id'              => @course.integration_id,
           'sis_section_id'                     => @section.sis_source_id,
@@ -419,6 +420,7 @@ describe EnrollmentsApiController, type: :request do
           'updated_at'                         => new_enrollment.updated_at.xmlschema,
           'created_at'                         => new_enrollment.created_at.xmlschema,
           'last_activity_at'                   => nil,
+          'total_activity_time'                => 0,
           'sis_course_id'                      => @course.sis_source_id,
           'course_integration_id'              => @course.integration_id,
           'sis_section_id'                     => @section.sis_source_id,
@@ -583,13 +585,15 @@ describe EnrollmentsApiController, type: :request do
             'created_at'  => e.created_at.xmlschema,
             'start_at'  => nil,
             'end_at'  => nil,
-            'last_activity_at' => nil
+            'last_activity_at' => nil,
+            'total_activity_time' => 0
           }
         }
       end
 
-      it "should show last_activity_at for student enrollment" do
+      it "should show last_activity_at and total_activity_time for student enrollment" do
         enrollment = @course.student_enrollments.first
+        enrollment.record_recent_activity(Time.zone.now - 5.minutes)
         enrollment.record_recent_activity(Time.zone.now)
         json = api_call(:get, @user_path, @user_params)
         enrollments = @student.current_enrollments.includes(:user).order("users.sortable_name ASC")
@@ -629,7 +633,8 @@ describe EnrollmentsApiController, type: :request do
             'created_at'         => e.created_at.xmlschema,
             'start_at'           => nil,
             'end_at'             => nil,
-            'last_activity_at'   => e.last_activity_at.xmlschema
+            'last_activity_at'   => e.last_activity_at.xmlschema,
+            'total_activity_time' => e.total_activity_time
           }
         }
       end
@@ -763,10 +768,6 @@ describe EnrollmentsApiController, type: :request do
             'role' => e.role,
             'course_section_id' => e.course_section_id,
             'course_id' => e.course_id,
-            'sis_course_id'                      => @course.sis_source_id,
-            'course_integration_id'              => @course.integration_id,
-            'sis_section_id'                     => @section.sis_source_id,
-            'section_integration_id'             => @section.integration_id,
             'html_url' => course_user_url(@course, e.user),
             'associated_user_id' => nil,
             'updated_at' => e.updated_at.xmlschema,
@@ -774,6 +775,7 @@ describe EnrollmentsApiController, type: :request do
             'start_at' => nil,
             'end_at' => nil,
             'last_activity_at' => nil,
+            'total_activity_time' => 0,
             'user' => {
               'name' => e.user.name,
               'sortable_name' => e.user.sortable_name,
@@ -819,10 +821,6 @@ describe EnrollmentsApiController, type: :request do
             'role' => e.role,
             'course_section_id' => e.course_section_id,
             'course_id' => e.course_id,
-            'sis_section_id' => nil,
-            'sis_course_id' => nil,
-            'course_integration_id' => nil,
-            'section_integration_id' => nil,
             'user' => {
               'name' => e.user.name,
               'sortable_name' => e.user.sortable_name,
@@ -842,7 +840,8 @@ describe EnrollmentsApiController, type: :request do
             'created_at'         => e.created_at.xmlschema,
             'start_at'           => nil,
             'end_at'             => nil,
-            'last_activity_at'   => nil
+            'last_activity_at'   => nil,
+            'total_activity_time' => 0
           }
         }
       end
@@ -856,8 +855,6 @@ describe EnrollmentsApiController, type: :request do
       end
 
       it "should not show enrollments for courses that aren't published" do
-        # Setup test with an unpublished course and an active enrollment in
-        # that course.
         course
         @course.claim
         enrollment = course.enroll_student(@user)
@@ -868,9 +865,20 @@ describe EnrollmentsApiController, type: :request do
         json.map { |e| e['id'] }.should_not include enrollment.id
 
         # Request w/ a state[] filter.
-        json = api_call(:get, "#{@user_path}?state[]=active&type[]=StudentEnrollment",
+        json = api_call(:get, @user_path,
                         @user_params.merge(:state => %w{active}, :type => %w{StudentEnrollment}))
         json.map { |e| e['id'] }.should_not include enrollment.id
+      end
+
+      it "should show enrollments for courses that aren't published if state[]=current_and_future" do
+        course
+        @course.claim
+        enrollment = course.enroll_student(@user)
+        enrollment.update_attribute(:workflow_state, 'active')
+
+        json = api_call(:get, @user_path,
+                        @user_params.merge(:state => %w{current_and_future}, :type => %w{StudentEnrollment}))
+        json.map { |e| e['id'] }.should include enrollment.id
       end
 
       it "should accept multiple state[] filters" do
@@ -879,7 +887,7 @@ describe EnrollmentsApiController, type: :request do
         enrollment = course.enroll_student(@user)
         enrollment.update_attribute(:workflow_state, 'completed')
 
-        json = api_call(:get, "#{@user_path}?state[]=active&state[]=completed",
+        json = api_call(:get, @user_path,
                         @user_params.merge(:state => %w{active completed}))
         json.map { |e| e['id'].to_i }.sort.should == @user.enrollments.map(&:id).sort
       end
@@ -924,10 +932,6 @@ describe EnrollmentsApiController, type: :request do
             'role' => e.role,
             'course_section_id' => e.course_section_id,
             'course_id' => e.course_id,
-            'sis_course_id'                      => @course.sis_source_id,
-            'course_integration_id'              => @course.integration_id,
-            'sis_section_id'                     => @section.sis_source_id,
-            'section_integration_id'             => @section.integration_id,
             'user' => user_json,
             'html_url' => course_user_url(@course, e.user),
             'associated_user_id' => nil,
@@ -935,7 +939,8 @@ describe EnrollmentsApiController, type: :request do
             'created_at' => e.created_at.xmlschema,
             'start_at' => nil,
             'end_at' => nil,
-            'last_activity_at' => nil
+            'last_activity_at' => nil,
+            'total_activity_time' => 0
           }
           h['grades'] = {
             'html_url' => course_student_grades_url(@course, e.user),
@@ -981,10 +986,6 @@ describe EnrollmentsApiController, type: :request do
             'role' => e.role,
             'course_section_id' => e.course_section_id,
             'course_id' => e.course_id,
-            'sis_course_id'                      => @course.sis_source_id,
-            'course_integration_id'              => @course.integration_id,
-            'sis_section_id'                     => @section.sis_source_id,
-            'section_integration_id'             => @section.integration_id,
             'user' => {
               'name' => e.user.name,
               'sortable_name' => e.user.sortable_name,
@@ -997,7 +998,8 @@ describe EnrollmentsApiController, type: :request do
             'created_at' => e.created_at.xmlschema,
             'start_at' => nil,
             'end_at' => nil,
-            'last_activity_at' => nil
+            'last_activity_at' => nil,
+            'total_activity_time' => 0
           }
           h['grades'] = {
             'html_url' => course_student_grades_url(@course, e.user),
@@ -1052,10 +1054,6 @@ describe EnrollmentsApiController, type: :request do
             'id'                                 => @enrollment.id,
             'user_id'                            => @student.id,
             'course_section_id'                  => @enrollment.course_section_id,
-            'sis_course_id'                      => @course.sis_source_id,
-            'course_integration_id'              => @course.integration_id,
-            'sis_section_id'                     => @section.sis_source_id,
-            'section_integration_id'             => @section.integration_id,
             'limit_privileges_to_course_section' => @enrollment.limit_privileges_to_course_section,
             'enrollment_state'                   => 'completed',
             'course_id'                          => @course.id,
@@ -1074,7 +1072,8 @@ describe EnrollmentsApiController, type: :request do
             'created_at'                         => @enrollment.created_at.xmlschema,
             'start_at'                           => nil,
             'end_at'                             => nil,
-            'last_activity_at'                   => nil
+            'last_activity_at'                   => nil,
+            'total_activity_time'                => 0
           }
         end
 
@@ -1108,10 +1107,6 @@ describe EnrollmentsApiController, type: :request do
             'limit_privileges_to_course_section' => @enrollment.limit_privileges_to_course_section,
             'enrollment_state'                   => 'deleted',
             'course_id'                          => @course.id,
-            'sis_course_id'                      => @course.sis_source_id,
-            'course_integration_id'              => @course.integration_id,
-            'sis_section_id'                     => @section.sis_source_id,
-            'section_integration_id'             => @section.integration_id,
             'type'                               => @enrollment.type,
             'role'                               => @enrollment.role,
             'html_url'                           => course_user_url(@course, @student),
@@ -1127,7 +1122,8 @@ describe EnrollmentsApiController, type: :request do
             'created_at'                         => @enrollment.created_at.xmlschema,
             'start_at'                           => nil,
             'end_at'                             => nil,
-            'last_activity_at'                   => nil
+            'last_activity_at'                   => nil,
+            'total_activity_time'                => 0
           }
         end
 
@@ -1173,10 +1169,6 @@ describe EnrollmentsApiController, type: :request do
             'role' => e.role,
             'course_section_id' => e.course_section_id,
             'course_id' => e.course_id,
-            'sis_course_id'                      => @course.sis_source_id,
-            'course_integration_id'              => @course.integration_id,
-            'sis_section_id'                     => @section.sis_source_id,
-            'section_integration_id'             => @section.integration_id,
             'html_url' => course_user_url(@course, e.user),
             'grades' => {
               'html_url' => course_student_grades_url(@course, e.user),
@@ -1191,6 +1183,7 @@ describe EnrollmentsApiController, type: :request do
             'start_at'   => nil,
             'end_at'     => nil,
             'last_activity_at' => nil,
+            'total_activity_time' => 0,
             'user' => {
               'name' => e.user.name,
               'sortable_name' => e.user.sortable_name,
@@ -1220,10 +1213,6 @@ describe EnrollmentsApiController, type: :request do
             'role' => e.role,
             'course_section_id' => e.course_section_id,
             'course_id' => e.course_id,
-            'sis_course_id'                      => @course.sis_source_id,
-            'course_integration_id'              => @course.integration_id,
-            'sis_section_id'                     => @section.sis_source_id,
-            'section_integration_id'             => @section.integration_id,
             'html_url' => course_user_url(@course, e.user),
             'associated_user_id' => nil,
             'updated_at' => e.updated_at.xmlschema,
@@ -1231,6 +1220,7 @@ describe EnrollmentsApiController, type: :request do
             'start_at'   => nil,
             'end_at'     => nil,
             'last_activity_at' => nil,
+            'total_activity_time' => 0,
             'user' => {
               'name' => e.user.name,
               'sortable_name' => e.user.sortable_name,

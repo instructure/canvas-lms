@@ -43,26 +43,29 @@
       </li>
 
       <li>
-        <a href="#"
-           data-kyle-menu-options='{"appendMenuTo": "body"}'
-           class="al-trigger"
-           title="{{#t "more_options"}}More options{{/t}}"
-           data-tooltip>
-          <i class="icon-settings"></i>
-          <i class="icon-mini-arrow-down"></i>
-          <span class="screenreader-only">{{#t "message_actions"}}Message actions{{/t}}</span>
-        </a>
-        <ul class="al-options">
-          <li>
-            <a href="#" class="reply-all-btn">{{#t "reply_all"}}Reply all{{/t}}</a>
-          </li>
-          <li>
-            <a href="#" class="forward-btn">{{#t "forward"}}Forward{{/t}}</a>
-          </li>
-          <li>
-            <a href="#" class="delete-btn">{{#t "delete"}}Delete{{/t}}</a>
-          </li>
-        </ul>
+        <div class="inline-block" role="application">
+          <a href="#"
+             data-kyle-menu-options='{"appendMenuTo": "body"}'
+             role="button"
+             class="al-trigger"
+             title="{{#t "more_options"}}More options{{/t}}"
+             data-tooltip>
+            <i class="icon-settings"></i>
+            <i class="icon-mini-arrow-down"></i>
+            <span class="screenreader-only">{{#t "message_actions"}}Message actions{{/t}}</span>
+          </a>
+          <ul class="al-options">
+            <li>
+              <a href="#" class="reply-all-btn">{{#t "reply_all"}}Reply all{{/t}}</a>
+            </li>
+            <li>
+              <a href="#" class="forward-btn">{{#t "forward"}}Forward{{/t}}</a>
+            </li>
+            <li>
+              <a href="#" class="delete-btn">{{#t "delete"}}Delete{{/t}}</a>
+            </li>
+          </ul>
+        </div>
       </li>
     </ul>
 	</div>

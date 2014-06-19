@@ -1,23 +1,22 @@
 {{#if assignment_grading_type_is_points}}
-  <input name="default_grade" type="number" step="any" value="{{ submission.grade }}" class="grading_value grading_box" id="student_grading_{{assignment.id}} %>" style="text-align: center; width: 50px;"/>
+  <input name="{{inputName}}" type="number" step="any" value="{{ grade }}" class="grading_value grading_box" id="student_grading_{{assignment.id}}" style="text-align: center; width: 50px;"/>
 {{/if}}
 {{#if assignment_grading_type_is_percent}}
-  <span name="default_grade" class="grading_box" id="student_grading_{{assignment.id}}">
-    <input type="number" value="{{ submission.grade }}" class="grading_value" style="text-align: center; width: 50px;"/>
-    <span style="display: none;">%</span>
+  <span name="{{inputName}}" class="grading_box" id="student_grading_{{assignment.id}}">
+    <input name="{{inputName}}" type="text" name="grade" value="{{ grade }}" class="grading_value" style="text-align: center; width: 50px;"/>
   </span>
 {{/if}}
 {{#if assignment_grading_type_is_letter_grade}}
-  <input name="default_grade" type="text" value="{{ submission.score }}" class="grading_value grading_box score_value" id="student_grading_{{assignment.id}}" style="text-align: center; width: 50px;"/>
+  <input name="{{inputName}}" type="text" value="{{ grade }}" class="grading_value grading_box score_value" id="student_grading_{{assignment.id}}" style="text-align: center; width: 50px;"/>
 {{/if}}
 {{#if assignment_grading_type_is_gpa_scale}}
-  <input name="default_grade" type="text" value="{{ submission.score }}" class="grading_value grading_box score_value" id="student_grading_{{assignment.id}}" style="text-align: center; width: 50px;"/>
+  <input name="{{inputName}}" type="text" value="{{ grade }}" class="grading_value grading_box score_value" id="student_grading_{{assignment.id}}" style="text-align: center; width: 50px;"/>
 {{/if}}
 {{#if assignment_grading_type_is_pass_fail}}
-  <select name="default_grade" class="grading_value grading_box pass_fail" id="student_grading_<%= assignment.id %>">
+  <select name="{{inputName}}" class="grading_value grading_box pass_fail" id="student_grading_<%= assignment.id %>">
     <option value="">---</option>
-    <option value="complete">{{#t "#gradebooks.grades.complete"}}Complete{{/t}}</option>
-    <option value="incomplete">{{#t "#gradebooks.grades.incomplete"}}Incomplete{{/t}}</option>
+    <option value="complete" {{selectedIf grade "complete"}}>{{#t "#gradebooks.grades.complete"}}Complete{{/t}}</option>
+    <option value="incomplete" {{selectedIf grade "incomplete"}}>{{#t "#gradebooks.grades.incomplete"}}Incomplete{{/t}}</option>
   </select>
 {{/if}}
 {{#if showPointsPossible}}

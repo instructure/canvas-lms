@@ -52,20 +52,20 @@ describe CoursesController do
       end
     end
 
-    it "should include unpublished enrollments in future enrollments" do
+    it "should include unpublished courses in future enrollments for admins" do
       user
       future_course  = Course.create!(:name => 'future course', :start_at => Time.now + 2.weeks,
                                       :restrict_enrollments_to_course_dates => true)
       current_course = Course.create!(:name => 'current course', :start_at => Time.now - 2.weeks)
 
-      current_unpublished_course  = Course.create!(:name => 'future course 2', :start_at => Time.now - 2.weeks)
+      current_unpublished_course  = Course.create!(:name => 'current course 2', :start_at => Time.now - 2.weeks)
       future_unpublished_course  = Course.create!(:name => 'future course 2', :start_at => Time.now + 2.weeks)
       future_unrestricted_course = Course.create!(:name => 'future course 3', :start_at => Time.now + 2.weeks)
 
       current_enrollment = StudentEnrollment.create!(:course => current_course, :user => @user)
       future_enrollment  = StudentEnrollment.create!(:course => future_course, :user => @user)
-      current_unpublished_enrollment = StudentEnrollment.create!(:course => current_unpublished_course, :user => @user)
-      future_unpublished_enrollment = StudentEnrollment.create!(:course => future_unpublished_course, :user => @user)
+      current_unpublished_enrollment = TeacherEnrollment.create!(:course => current_unpublished_course, :user => @user)
+      future_unpublished_enrollment = TeacherEnrollment.create!(:course => future_unpublished_course, :user => @user)
       future_unrestricted_enrollment = StudentEnrollment.create!(:course => future_unrestricted_course, :user => @user)
 
       [future_course, current_course, future_unrestricted_course].each { |course| course.offer }
@@ -78,6 +78,40 @@ describe CoursesController do
       assigns[:future_enrollments].should include(future_enrollment)
       assigns[:future_enrollments].should include(current_unpublished_enrollment)
       assigns[:future_enrollments].should include(future_unpublished_enrollment)
+    end
+
+    it "should not include unpublished courses in future enrollments for students" do
+      user
+      future_course  = Course.create!(:name => 'future course', :start_at => Time.now + 2.weeks,
+                                      :restrict_enrollments_to_course_dates => true)
+      current_course = Course.create!(:name => 'current course', :start_at => Time.now - 2.weeks)
+
+      current_unpublished_course  = Course.create!(:name => 'current course 2', :start_at => Time.now - 2.weeks)
+      future_unpublished_course  = Course.create!(:name => 'future course 2', :start_at => Time.now + 2.weeks)
+      future_unrestricted_published_course = Course.create!(:name => 'future course 3', :start_at => Time.now + 2.weeks)
+      future_unrestricted_unpublished_course = Course.create!(:name => 'future course 4', :start_at => Time.now + 2.weeks)
+
+      current_enrollment = StudentEnrollment.create!(:course => current_course, :user => @user)
+      future_enrollment  = StudentEnrollment.create!(:course => future_course, :user => @user)
+      current_unpublished_enrollment = StudentEnrollment.create!(:course => current_unpublished_course, :user => @user)
+      future_unpublished_enrollment = StudentEnrollment.create!(:course => future_unpublished_course, :user => @user)
+
+      future_unrestricted_published_enrollment = StudentEnrollment.create!(:course => future_unrestricted_published_course, :user => @user)
+      future_unrestricted_unpublished_enrollment = StudentEnrollment.create!(:course => future_unrestricted_unpublished_course, :user => @user)
+
+      [future_course, current_course, future_unrestricted_published_course].each { |course| course.offer }
+      [current_enrollment, future_enrollment, current_unpublished_enrollment,
+       future_unpublished_enrollment, future_unrestricted_published_enrollment].each { |e| e.accept }
+
+      user_session(@user)
+      get 'index'
+      response.should be_success
+      assigns[:current_enrollments].count.should == 2
+      assigns[:current_enrollments].should include(current_enrollment)
+      assigns[:current_enrollments].should include(future_unrestricted_published_enrollment)
+      assigns[:future_enrollments].count.should == 1
+      assigns[:future_enrollments].should include(future_enrollment)
+
     end
   end
 
@@ -762,7 +796,7 @@ describe CoursesController do
       changes.delete("settings")
       changes["lock_all_announcements"] = [ nil, true ]
 
-      Auditors::Course.expects(:record_created).with(anything, anything, changes)
+      Auditors::Course.expects(:record_created).with(anything, anything, changes, anything)
 
       post 'create', { :account_id => @account.id, :course =>
           { :name => course.name, :lock_all_announcements => true } }
@@ -796,6 +830,12 @@ describe CoursesController do
       assigns[:course].state.should eql(:completed)
     end
 
+    it "should log published event on update" do
+      Auditors::Course.expects(:record_published).once
+      course_with_teacher_logged_in(:active_all => true)
+      put 'update', :id => @course.id, :offer => true
+    end
+
     it "should lock active course announcements" do
       course_with_teacher_logged_in(:active_all => true)
       active_announcement  = @course.announcements.create!(:title => 'active', :message => 'test')
@@ -826,7 +866,7 @@ describe CoursesController do
         "lock_all_announcements" => [ true, false ]
       }
 
-      Auditors::Course.expects(:record_updated).with(anything, anything, changes)
+      Auditors::Course.expects(:record_updated).with(anything, anything, changes, source: :manual)
 
       put 'update', :id => @course.id, :course => {
         :name => changes["name"].last,
@@ -892,6 +932,7 @@ describe CoursesController do
       response.should be_redirect
       @course.reload.should be_completed
       @course.conclude_at.should <= Time.now
+      Auditors::Course.expects(:record_unconcluded).with(anything, anything, source: :manual)
 
       post 'unconclude', :course_id => @course.id
       response.should be_redirect
@@ -1140,6 +1181,12 @@ describe CoursesController do
       post 'reset_content', :course_id => @course.id
       assert_status(401)
       @course.reload.should be_available
+    end
+
+    it "should log reset audit event" do
+      course_with_teacher_logged_in(:active_all => true)
+      Auditors::Course.expects(:record_reset).once.with(@course, anything, @user, anything)
+      post 'reset_content', :course_id => @course.id
     end
   end
 

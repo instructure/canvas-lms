@@ -14,7 +14,6 @@
       </label>
       {{> [groups/manage/selfSignupHelp]}}
     </div>
-    <input name="group_limit" type="hidden" value="">
     <div class="self-signup-controls">
       <div class="control-group">
         <label class="checkbox" for="restrict_self_signup">
@@ -31,6 +30,13 @@
         <span class="hint-text">
           ({{#t "leave_group_limit_blank"}}Leave blank for no limit{{/t}})
         </span>
+        <div>
+          <strong>
+            <em>
+              {{#t "group_limit_override"}}Changing this will override any individually set group limits{{/t}}
+            </em>
+          </strong>
+        </div>
       </div>
     </div>
   </fieldset>
