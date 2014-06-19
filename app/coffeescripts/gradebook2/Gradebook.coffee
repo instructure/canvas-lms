@@ -1057,13 +1057,11 @@ define [
             data.sortCol.field
 
           @sortRowsBy (a, b) =>
-            [b, a] = [a, b] if not data.sortAsc
+            [b, a] = [a, b] unless data.sortAsc
             @localeSort(a[sortProp], b[sortProp])
         else
-          @sortRowsBy (a, b) ->
-            aScore = a[data.sortCol.field]?.score
-            bScore = b[data.sortCol.field]?.score
-            numberCompare(aScore, bScore, descending: !data.sortAsc)
+          @sortRowsBy (a, b) =>
+            @gradeSort(a, b, data.sortCol.field, data.sortAsc)
 
       @grid.onKeyDown.subscribe ->
         # TODO: start editing automatically when a number or letter is typed
@@ -1107,6 +1105,28 @@ define [
       (a || "").localeCompare b || "",
         window.I18n.locale,
         sensitivity: 'accent', numeric: true
+
+    gradeSort: (a, b, field, asc) =>
+      scoreForSorting = (obj) =>
+        percent = (obj) ->
+          if obj[field].possible > 0
+            obj[field].score / obj[field].possible
+          else
+            null
+
+        switch
+          when field == "total_grade"
+            if @options.show_total_grade_as_points
+              obj[field].score
+            else
+              percent(obj)
+          when field.match /^assignment_group/
+            percent(obj)
+          else
+            # TODO: support assignment grading types
+            obj[field].score
+
+      numberCompare(scoreForSorting(a), scoreForSorting(b), descending: !asc)
 
     # show warnings for bad grading setups
     setAssignmentWarnings: =>
