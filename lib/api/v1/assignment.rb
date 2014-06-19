@@ -29,6 +29,8 @@ module Api::V1::Assignment
       description
       points_possible
       grading_type
+      created_at
+      updated_at
       due_at
       lock_at
       unlock_at

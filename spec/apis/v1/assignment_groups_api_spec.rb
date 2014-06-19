@@ -197,6 +197,7 @@ describe AssignmentGroupsController, type: :request do
       override.due_at = 1.day.ago
       override.due_at_overridden = true
     end
+    a1.reload
 
     json = api_call(:get,
           "/api/v1/courses/#{@course.id}/assignment_groups.json?include[]=assignments&include[]=all_dates",

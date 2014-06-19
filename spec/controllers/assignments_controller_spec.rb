@@ -344,13 +344,8 @@ describe AssignmentsController do
       course_with_teacher_logged_in(:active_all => true)
       course_assignment
       get 'edit', :course_id => @course.id, :id => @assignment.id
-      expected_assignment_json = subject.send(:assignment_json, @assignment,
-        assigns[:current_user], session)
-      expected_assignment_json[:has_submitted_submissions] = @assignment.has_submitted_submissions?
-      assigns[:js_env][:ASSIGNMENT].should == expected_assignment_json
-      assigns[:js_env][:ASSIGNMENT_OVERRIDES].should ==
-        subject.send(:assignment_overrides_json,
-                     AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, assigns[:current_user]))
+      assigns[:js_env][:ASSIGNMENT]['id'].should == @assignment.id
+      assigns[:js_env][:ASSIGNMENT_OVERRIDES].should == []
     end
 
   end
