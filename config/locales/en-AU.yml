@@ -18,9 +18,11 @@ en-AU:
     student_count: 
       one: "1 student"
       other: "%{count} students"
+    student_count_max: "%{count} / %{max} students"
     user_count: 
       one: "1 user"
       other: "%{count} users"
+    user_count_max: "%{count} / %{max} users"
   GroupUserCollection: 
     flash: 
       userAlreadyInGroup: "WARNING: %{user} is already a member of %{group}"
@@ -36,8 +38,27 @@ en-AU:
     no_file: "No outcome file or authority given"
     no_permissions: "User isn't allowed to edit global outcomes"
     no_perms: "User isn't allowed to edit global outcomes"
-  accont: 
-    feedback_pricing_sub: "Get the numbers for your institution"
+  access: 
+    course: 
+      extra_text: "Course: %{course};"
+  access_report_header_content: content
+  access_report_header_content_access_id: "content access id"
+  access_report_header_content_type: "content type"
+  access_report_header_course_id: "course id"
+  access_report_header_course_name: "course name"
+  access_report_header_course_sis_id: "course sis id"
+  access_report_header_enrollment_type: "enrollment type"
+  access_report_header_last_viewed: "last viewed"
+  access_report_header_root_account_id: "root account id"
+  access_report_header_section_id: "section id"
+  access_report_header_section_name: "section name"
+  access_report_header_section_sis_id: "section sis id"
+  access_report_header_term_id: "term id"
+  access_report_header_term_sis_id: "term sis id"
+  access_report_header_times_participated: "times participated"
+  access_report_header_times_viewed: "times viewed"
+  access_report_header_user_id: "user id"
+  access_report_header_user_sis_id: "user sis id"
   account: 
     account_settings: 
       account_surveys: "Account Surveys"
@@ -61,7 +82,6 @@ en-AU:
     feedback_feature_request: "Request a Feature"
     feedback_feature_request_canvas_net: "Request a Feature in Canvas Network"
     feedback_feature_request_sub: "Have an idea to improve Canvas?"
-    feedback_pricing: "Canvas Pricing Information"
     manually_created_courses: "Manually-Created Courses"
     root_account_cant_have_sis_id: "SIS IDs cannot be set on root accounts"
     sis_id_in_use: "SIS ID \"%{sis_id}\" is already in use"
@@ -270,6 +290,8 @@ en-AU:
     default: 
       all_terms: "All Terms"
       course_text: "For Course: %{course};"
+      description: 
+        header: Example
       end_text: "End At: %{end_at};"
       error_text: "Failed, please report the following error code to your system administrator: ErrorReport:%{error};"
       extra_text_term: "Term: %{term_name};"
@@ -283,18 +305,32 @@ en-AU:
       deleted: "Include Deleted Objects: true;"
     granite: 
       invalid_date_range: "Dates were adjusted to 1 week range;"
+    lincoln: 
+      invalid_term: "Please select a valid term"
     mississippi: 
       reports: "Reports: %{files}"
+    newark: 
+      assignment_text: "Assignment Group Types: %{groups};"
     outcomes: 
       order: "Order: %{order}"
+    pasco: 
+      missing_start_date: "Please select a start date"
+    penn_harris: 
+      student_grades: 
+        description: 
+          text: "This report shows the student final grade results for students in a given term. The resulting csv file will have one row per enrollment, and will show the final grade that is displayed in the course gradebook."
     sis_exporter: 
-      deleted: "Include Deleted Objects: true;"
       reports: "Reports: %{files}"
     student: 
       enrollment_state: "Include Enrollment State: true;"
       enrollment_states: "Enrollment States: %{states};"
     usu: 
       enrollment_types: "Enrollment types: %{types}"
+    webster: 
+      min: "Minimum Number of items: %{min};"
+      student: Students;
+      ta: Ta's;
+      teacher: Teachers;
   account_settings: 
     account: Account
     account_name_too_long: "Account Name is too long"
@@ -403,9 +439,16 @@ en-AU:
         From: From
         To: To
         Value: Value
+        blank_placeholder: "-"
+        copied_from_label: "Copied From"
+        copied_to_label: "Copied To"
         date: Date
         event_id: "Event Id"
+        event_sis_batch: "SIS Batch"
+        event_source_label: Source
         event_type_label: Type
+        reset_from_label: "Reset From"
+        reset_to_label: "Reset To"
         time: Time
         user: User
       course_logging_item: 
@@ -413,6 +456,7 @@ en-AU:
       course_logging_results: 
         date: Date
         event_details: "Event Details"
+        event_source: Source
         event_type: Type
         no_item_found: "No items found"
         time: Time
@@ -450,6 +494,8 @@ en-AU:
         grade_change_activity: "Grade Change Activity"
         message_assignment_id: "Assignment Id"
         message_course_id: "Course Id"
+      grade_change_logging_item: 
+        blank_placeholder: "-"
       grade_change_logging_results: 
         Assignment: Assignment
         Course: Course
@@ -482,6 +528,13 @@ en-AU:
             header: Example
           student_activity: 
             text: "This report shows shows all of the assignments and info pertaining to those assignments that are in the specified assignment group or groups and in the specified date range. This report provides data for scheduling assignments, and managing students assignment load, showing only students and assignments where there are 2 or more conflicting assignments due on the same date for a student."
+      newark_report_header__assignment_count: "# of assignments"
+      newark_report_header_due_date: "due date"
+      newark_report_header_section_id: "section id"
+      newark_report_header_section_name: "section name"
+      newark_report_header_student_name: "student name"
+      newark_report_header_teacher_id: "teacher id"
+      newark_report_header_teacher_name: "teacher name"
     assignment_scheduling_csv_parameters: 
       account_reports: 
         newark: 
@@ -505,9 +558,20 @@ en-AU:
       account_reports: 
         granite: 
           assignme_score_summary: 
-            text: "This report shows the score for all assignments graded between date selected"
+            text: "This report shows the score for all assignments graded between dates selected"
           description: 
             header: Example
+      granite_report_header_account_id: account_id
+      granite_report_header_assignment_id: assignment_id
+      granite_report_header_assignment_name: assignment_name
+      granite_report_header_assignment_unique_id: assignment_unique_id
+      granite_report_header_course_id: course_id
+      granite_report_header_graded_at: graded_at
+      granite_report_header_submission_date: submission_date
+      granite_report_header_submission_id: submission_id
+      granite_report_header_submission_score: submission_score
+      granite_report_header_term_id: term_id
+      granite_report_header_user_id: user_id
     avatars: 
       all_link: 
         one: "All %{count}"
@@ -542,6 +606,12 @@ en-AU:
             header: Example
           student_login: 
             text: "This report shows all the students enrolled in any courses in a given term. Resulting csv file will have one row per student enrollment that have not visited the course since the date. The online filter will only include enrollments from sections that have '.E' in the section name."
+      bucks_report_header_last_access_to_canvas: "last access to canvas"
+      bucks_report_header_name: name
+      bucks_report_header_section_id: "section id"
+      bucks_report_header_section_name: "section name"
+      bucks_report_header_section_sis_id: "section sis id"
+      bucks_report_header_user_sis_id: "user sis id"
     cannot_manage_account: "You are not allowed to manage account settings"
     cannot_manage_quotas: "You are not allowed to manage quota settings"
     ccp_zero_activity_csv_description: 
@@ -550,6 +620,18 @@ en-AU:
           ccp_zero_activity_csv: 
             header: Example
             text: "This report shows all the students enrolled in any courses in a given term. Resulting csv file will have one row per user enrollment that have not visited the course since the date."
+      ccp_report_header_course_id: "course id"
+      ccp_report_header_course_name: course_name
+      ccp_report_header_course_sis_id: "course sis id"
+      ccp_report_header_email: email
+      ccp_report_header_enrollment_type: "enrollment type"
+      ccp_report_header_first_name: "first name"
+      ccp_report_header_last_name: last_name
+      ccp_report_header_section_id: "section id"
+      ccp_report_header_section_name: "section name"
+      ccp_report_header_section_sis_id: "section sis id"
+      ccp_report_header_user_id: "user id"
+      ccp_report_header_user_sis_id: "user sis id"
     ccp_zero_activity_csv_parameters: 
       account_reports: 
         ccp: 
@@ -562,6 +644,16 @@ en-AU:
             description: 
               header: Example
             text: "This report shows student involvment in their courses. The resulting csv file will have one row per enrollment and will show the student sis id, student name, phone number, email address, course name, last submission, days since last submission(LDA), current grade percentage, and their term start date."
+      chcp_report_header_course: course
+      chcp_report_header_email: email
+      chcp_report_header_grade: grade
+      chcp_report_header_last_submissio: "last submission"
+      chcp_report_header_lda: lda
+      chcp_report_header_phone: phone
+      chcp_report_header_start_date: "start date"
+      chcp_report_header_student_id: "student id"
+      chcp_report_header_student_name: "student name"
+      chcp_report_header_teacher: teacher
     confirm_delete_user: 
       confirm_delete: "Are you sure you want to delete this user from the account %{account}? This will remove the user's data (including grades) from all courses and groups. This process cannot be undone."
       delete_button: "Delete %{user}"
@@ -595,6 +687,21 @@ en-AU:
                   enrollment count, department, and account
           description: 
             header: Example
+      cedar_rapids_report_header_account_id: "Account ID"
+      cedar_rapids_report_header_account_name: "Account Name"
+      cedar_rapids_report_header_course_end_date: "Course End Date"
+      cedar_rapids_report_header_course_id: "Course ID"
+      cedar_rapids_report_header_course_name: "Course Name"
+      cedar_rapids_report_header_course_start_date: "Course Start Date"
+      cedar_rapids_report_header_course_status: "Course Status"
+      cedar_rapids_report_header_department_id: "Department ID"
+      cedar_rapids_report_header_department_name: "Department Name"
+      cedar_rapids_report_header_observer_count: "Observer Count"
+      cedar_rapids_report_header_student_count: "Student Count"
+      cedar_rapids_report_header_ta_count: "TA Count"
+      cedar_rapids_report_header_teacher_count: "Teacher Count"
+      cedar_rapids_report_header_term_id: "Term ID"
+      cedar_rapids_report_header_term_name: "Term Name"
     course_status_csv_description: 
       account_reports: 
         auburn: 
@@ -602,6 +709,26 @@ en-AU:
             text: "This report shows the status of all the courses for a given term. The resulting csv file will have one row per course section and will show the course, course status, term, effective start and end dates, and a teacher of record in the section."
           description: 
             header: Example
+      auburn_report_header_account_id: "account id"
+      auburn_report_header_account_name: "account name"
+      auburn_report_header_account_sis_id: "account sis id"
+      auburn_report_header_course_id: "course id"
+      auburn_report_header_course_name: "course name"
+      auburn_report_header_course_sis_id: "course sis id"
+      auburn_report_header_course_status: "course status"
+      auburn_report_header_effective_date: "effective date"
+      auburn_report_header_end_date: "end date"
+      auburn_report_header_section_id: "section id"
+      auburn_report_header_section_name: "section name"
+      auburn_report_header_section_sis_id: "section sis id"
+      auburn_report_header_start_date: "start date"
+      auburn_report_header_student_count: "student count"
+      auburn_report_header_teacher_id: "teacher id"
+      auburn_report_header_teacher_name: "teacher name"
+      auburn_report_header_teacher_sis_id: "teacher sis id"
+      auburn_report_header_term_id: "term id"
+      auburn_report_header_term_name: "term name"
+      auburn_report_header_term_sis_id: "term sis id"
     course_type: course
     courses: 
       courses_crumb: Courses
@@ -617,12 +744,39 @@ en-AU:
       go_button: Go
       hide_enrollmentless_courses: "Hide enrollmentless courses"
     crumb_statistics: Statistics
+    current_grade_csv_description: 
+      account_reports: 
+        lincoln: 
+          current_grade_report: 
+            text: "This report shows the current grade for a student per course for a specified term"
+          description: 
+            header: Example
+      lincoln_report_header_course_id: Course_ID
+      lincoln_report_header_course_name: Course_Name
+      lincoln_report_header_course_role: Course_Role
+      lincoln_report_header_course_sis_id: Course_SIS_ID
+      lincoln_report_header_current_grade: Current_Grade
+      lincoln_report_header_login: Login_ID
+      lincoln_report_header_student_name: Student_Name
+      lincoln_report_header_student_sis_id: Student_SIS_ID
+      lincoln_report_header_term_id: Term_ID
+      lincoln_report_header_term_name: Term_Name
     custom_grade_export_csv_description: 
       account_reports: 
         ross: 
           description: 
             header: Example
             text: "This report shows the student final grade results for all students in a given term. The resulting csv file will have one row per enrollment, and will show the current and final grade that is displayed in the course gradebook."
+      ross_report_header_comment: Comment
+      ross_report_header_course_id: Course_ID
+      ross_report_header_grade_posting_date: "Grade Posting Date"
+      ross_report_header_grade_type: "Grade Type"
+      ross_report_header_grade_value_type: "Grade Value Type"
+      ross_report_header_miscfield1: MiscField1
+      ross_report_header_miscfield13: MiscField13
+      ross_report_header_miscfield2: MiscField2
+      ross_report_header_numeric_grade: "Numeric Grade"
+      ross_report_header_source_id: Source_ID
     custom_grade_export_csv_parameters: 
       account_reports: 
         ross: 
@@ -647,6 +801,12 @@ en-AU:
               text: "This report shows non-graded submissions by course for quizzes surveys and discussions."
           description: 
             header: Example
+      galen_report_header_account_id: account_id
+      galen_report_header_account_name: account_name
+      galen_report_header_course_name: course_name
+      galen_report_header_course_sis_id: course_sis_id
+      galen_report_header_resource_type: resource_type
+      galen_report_header_title: title
     cv_submission_data_csv_description: 
       account_reports: 
         galen: 
@@ -656,6 +816,12 @@ en-AU:
         tmcc: 
           description: 
             header: Example
+      galen_report_header_course_sis_id: course_sis_id
+      galen_report_header_first_submission: first_submission
+      galen_report_header_section_sis_id: section_sis_id
+      galen_report_header_submission_date: submission_date
+      galen_report_header_submission_type: submission_type
+      galen_report_header_user_sis_id: user_sis_id
     date_picker_parameter: 
       account_reports: 
         default: 
@@ -683,12 +849,33 @@ en-AU:
             header: Example
           google_doc: 
             text: "This is a report of all users and the associated email address used for the Google Docs integration."
+      ut_austin_report_header_canvas_user_id: "canvas user id"
+      ut_austin_report_header_default_email: "default email"
+      ut_austin_report_header_google_doc_address: "google doc address"
+      ut_austin_report_header_name: name
+      ut_austin_report_header_sis_id: "sis id"
     grade_export_csv_description: 
       account_reports: 
         default: 
           description: 
             header: Example
             text: "This report shows the student final grade results for all students in a given term. The resulting csv file will have one row per enrollment, and will show the current and final grade that is displayed in the course gradebook."
+      course_report_header_course_id: "course id"
+      grade_report_header_course: course
+      grade_report_header_course_id: "course id"
+      grade_report_header_course_sis: "course sis"
+      grade_report_header_current_score: "current score"
+      grade_report_header_enrollment_state: "enrollment state"
+      grade_report_header_final_score: "final score"
+      grade_report_header_section: section
+      grade_report_header_section_id: "section id"
+      grade_report_header_section_sis: "section sis"
+      grade_report_header_student_id: "student id"
+      grade_report_header_student_name: "student name"
+      grade_report_header_student_sis: "student sis"
+      grade_report_header_term: term
+      grade_report_header_term_id: "term id"
+      grade_report_header_term_sis: "term sis"
     group_type: group
     include_deleted_parameter: 
       account_reports: 
@@ -708,12 +895,27 @@ en-AU:
             header: Example
           last_submission: 
             text: "This report shows students last activity for submissions."
+      concord_report_header_campus: campus
+      concord_report_header_course_name: "course name"
+      concord_report_header_course_sis_id: "course sis id"
+      concord_report_header_last_course_activity_date: "last course activity date"
+      concord_report_header_student_current_grade: "student current grade"
+      concord_report_header_student_default_email: "student default email"
+      concord_report_header_student_name: "student name"
+      concord_report_header_student_sis_id: "student sis id"
+      concord_report_header_term_name: "term name"
+      concord_report_header_zero_grade_assignments: "zero grade assignments"
     last_user_access_csv_description: 
       account_reports: 
         default: 
           last_user_access: 
             header: Example
             text: "This report shows the last login for active users."
+      student_report_header_last_access_at: "last access at"
+      student_report_header_last_ip: "last ip"
+      student_report_header_user_id: "user id"
+      student_report_header_user_name: "user name"
+      student_report_header_user_sis_id: "user sis id"
     learning_outcome_assignment_type_csv_description: 
       account_reports: 
         newark: 
@@ -722,6 +924,36 @@ en-AU:
         samuel_merrit_university: 
           description: 
             header: Example
+      samuel_report_header_assessment_question_id: "Assessment Question ID"
+      samuel_report_header_assessment_question_name: "Assessment Question name"
+      samuel_report_header_assignment_description: "Assignment Description"
+      samuel_report_header_assignment_id: "Assignment ID"
+      samuel_report_header_assignment_points_possible: "Assignment Points Possible"
+      samuel_report_header_assignment_title: "Assignment Title"
+      samuel_report_header_assignment_type: "Assignment Type"
+      samuel_report_header_course_canvas_id: "Course Canvas ID"
+      samuel_report_header_course_current_score: "Course Current Score"
+      samuel_report_header_course_name: "Course Name"
+      samuel_report_header_course_sis_id: "Course SIS ID"
+      samuel_report_header_course_student_count: "Course Student Count"
+      samuel_report_header_grading_scheme: "Grading Scheme"
+      samuel_report_header_learning_outcome_desc: "Learning Outcome Desc"
+      samuel_report_header_learning_outcome_id: "Learning Outcome ID"
+      samuel_report_header_learning_outcome_score: "Learning Outcome Score"
+      samuel_report_header_learning_outcome_short_name: "Learning Outcome Short Name"
+      samuel_report_header_rubric_title: "Rubric Title"
+      samuel_report_header_section_canvas_id: "Section Canvas ID"
+      samuel_report_header_section_name: "Section Name"
+      samuel_report_header_section_sis_id: "Section SIS ID"
+      samuel_report_header_student_id: "Student ID"
+      samuel_report_header_student_name: "Student Name"
+      samuel_report_header_student_sis_id: "Student SIS ID"
+      samuel_report_header_subaccount_id: "Subaccount ID"
+      samuel_report_header_subaccount_name: "Subaccount Name"
+      samuel_report_header_submission_date: "Submission Date"
+      samuel_report_header_submission_grade: "Submission Grade"
+      samuel_report_header_submissions_attempt: "Submissions Attempt"
+      samuel_report_header_teacher_name: "Teacher Name"
     learning_outcome_assignment_type_csv_parameters: 
       account_reports: 
         samuel_merrit_university: 
@@ -752,6 +984,23 @@ en-AU:
           description: 
             header: Example
             text: "This report shows the learning outcome results for all students. The resulting csv file will have one row per user-outcome-result pair, and will show the details of the result including the associated assignment."
+      outcome_report_header_assessment_id: "assessment id"
+      outcome_report_header_assessment_question: "assessment question"
+      outcome_report_header_assessment_question_id: "assessment question id"
+      outcome_report_header_assessment_title: "assessment title"
+      outcome_report_header_assessment_type: "assessment type"
+      outcome_report_header_attempt: attempt
+      outcome_report_header_course_id: "course id"
+      outcome_report_header_course_name: "course name"
+      outcome_report_header_course_sis_id: "course sis id"
+      outcome_report_header_learning_outcome_id: "learning outcome id"
+      outcome_report_header_learning_outcome_name: "learning outcome name"
+      outcome_report_header_outcome_score: "outcome score"
+      outcome_report_header_student_id: "student id"
+      outcome_report_header_student_name: "student name"
+      outcome_report_header_student_sis_id: "student sis id"
+      outcome_report_header_submission_date: "submission date"
+      outcome_report_header_submission_score: "submission score"
     outcome_results_csv_parameters: 
       account_reports: 
         outcomes: 
@@ -763,23 +1012,64 @@ en-AU:
             radio: Outcomes
           user: 
             radio: Users
+    ph_student_grades_csv_parameters: 
+      account_reports: 
+        penn_harris: 
+          parameters: 
+            note: "Courses with muted assignments may not accurately reflect scores in this report."
     provisioning_csv_description: 
       account_reports: 
         sis_export: 
           description: 
             text: "This report will export all the needed information that relates to provisioning Canvas in its respective categories."
+    public_courses_csv_description: 
+      account_reports: 
+        default: 
+          public_courses: 
+            header: Example
+            text: "This report shows all the courses that are not deleted for a given term that are public. The resulting csv file will have one row per course and will show the course id, course sis id, course short name, course name, course start and end dates."
+      course_report_header_end_date: "end date"
+      course_report_header_id: id
+      course_report_header_name: name
+      course_report_header_short_name: "short name"
+      course_report_header_sis_id: "sis id"
+      course_report_header_start_date: "start date"
     quiz_data_csv_description: 
       account_reports: 
         ace: 
           quiz_data_description: 
             header: Example
             text: "This report shows quiz questions and answers for all quizzes in a given term. The resulting csv file will have one row per quiz question and answer."
+      ace_report_header_correct: correct
+      ace_report_header_course_id: "course id"
+      ace_report_header_course_sis_id: "course sis id"
+      ace_report_header_login_id: "login id"
+      ace_report_header_outcome_id: "outcome id"
+      ace_report_header_points_earned: "points earned"
+      ace_report_header_points_possible: "points possible"
+      ace_report_header_question_id: "question id"
+      ace_report_header_question_name: "question name"
+      ace_report_header_question_text: "question text"
+      ace_report_header_quiz_title: "quiz title"
+      ace_report_header_user_id: "user id"
+      ace_report_header_user_name: "user name"
+      ace_report_header_user_sis_id: "user sis id"
     quiz_statistics_csv_description: 
       account_reports: 
         ace: 
           quiz_statistics_description: 
             header: Example
             text: "This report shows quiz questions, how many users answered the questions, and how many users answered them correctly for all quizzes in a given term. The resulting csv file will have one row per quiz question."
+      ace_report_header_count_correct: "count correct"
+      ace_report_header_count_taken: "count taken"
+      ace_report_header_course_id: "course id"
+      ace_report_header_course_sis_id: "course sis id"
+      ace_report_header_outcome_ids: "outcome ids"
+      ace_report_header_points_possible: "points possible"
+      ace_report_header_question_id: "question id"
+      ace_report_header_question_name: "question name"
+      ace_report_header_question_text: "question text"
+      ace_report_header_quiz_title: "quiz title"
     quota_integer_required: "An integer value is required"
     quota_must_be_positive: "Value must be positive"
     quota_not_updated: "Quota was not updated"
@@ -802,6 +1092,16 @@ en-AU:
             header: Example
           student_activity: 
             text: "This report shows all of the assignments and info pertaining to those assignments that are in the specified assignment group or groups and in the specified date range. This report provides data for scheduling safety drills with a minimum of disruption to major in-class assessments."
+      newark_report_header_assignment_due_date: "assignment due date"
+      newark_report_header_assignment_group_name: "assignment group name"
+      newark_report_header_assignment_id: "assignment id"
+      newark_report_header_assignment_name: "assignment name"
+      newark_report_header_course_code: "course code"
+      newark_report_header_course_id: "course id"
+      newark_report_header_course_name: "course name"
+      newark_report_header_course_sis_id: "course sis id"
+      newark_report_header_section_name: "section name"
+      newark_report_header_teacher_name: "teacher name"
     safety_drill_csv_parameters: 
       account_reports: 
         newark: 
@@ -1156,6 +1456,23 @@ en-AU:
         other: "%{file_size} *from %{count} files*"
       uploaded_file_storage_header: "Uploaded File Storage"
     student_access_csv_description: 
+      access_report_header_content: content
+      access_report_header_content_access_id: "content access id"
+      access_report_header_content_type: "content type"
+      access_report_header_course_id: "course id"
+      access_report_header_course_name: "course name"
+      access_report_header_course_sis_id: "course sis id"
+      access_report_header_last_viewed: "last viewed"
+      access_report_header_root_account_id: "root account id"
+      access_report_header_section_id: "section id"
+      access_report_header_section_name: "section name"
+      access_report_header_section_sis_id: "section sis id"
+      access_report_header_term_id: "term id"
+      access_report_header_term_sis_id: "term sis id"
+      access_report_header_times_participated: "times participated"
+      access_report_header_times_viewed: "times viewed"
+      access_report_header_user_id: "user id"
+      access_report_header_user_sis_id: "user sis id"
       account_reports: 
         tmcc: 
           description: 
@@ -1168,6 +1485,24 @@ en-AU:
           description: 
             header: Example
             text: "This report shows the learning outcome results for all students. The resulting csv file will have one row per user-outcome-result pair, and will show the details of the result including the associated assignment. This report only shows outcome results for assignments and does not include outcomes tied to question banks."
+      outcome_report_header_assignment_id: "assignment id"
+      outcome_report_header_assignment_title: "assignment title"
+      outcome_report_header_assignment_url: "assignment url"
+      outcome_report_header_attempt: attempt
+      outcome_report_header_course_id: "course id"
+      outcome_report_header_course_name: "course name"
+      outcome_report_header_course_sis_id: "course sis id"
+      outcome_report_header_learning_outcome_id: "learning outcome id"
+      outcome_report_header_learning_outcome_name: "learning outcome name"
+      outcome_report_header_outcome_score: "outcome score"
+      outcome_report_header_section_id: "section id"
+      outcome_report_header_section_name: "section name"
+      outcome_report_header_section_sis_id: "section sis id"
+      outcome_report_header_student_id: "student id"
+      outcome_report_header_student_name: "student name"
+      outcome_report_header_student_sis_id: "student sis id"
+      outcome_report_header_submission_date: "submission date"
+      outcome_report_header_submission_score: "submission score"
     student_grades_csv_description: 
       account_reports: 
         auburn: 
@@ -1177,6 +1512,21 @@ en-AU:
         default: 
           description: 
             header: Example
+      auburn_report_header_course: course
+      auburn_report_header_course_id: "course id"
+      auburn_report_header_course_sis: "course sis"
+      auburn_report_header_current_score: "current score"
+      auburn_report_header_enrollment_state: "enrollment state"
+      auburn_report_header_final_score: "final score"
+      auburn_report_header_section: section
+      auburn_report_header_section_id: "section id"
+      auburn_report_header_section_sis: "section sis"
+      auburn_report_header_student_id: "student id"
+      auburn_report_header_student_name: "student name"
+      auburn_report_header_student_sis: "student sis"
+      auburn_report_header_term: term
+      auburn_report_header_term_id: "term id"
+      auburn_report_header_term_sis: "term sis"
     student_grades_csv_parameters: 
       account_reports: 
         auburn: 
@@ -1189,6 +1539,17 @@ en-AU:
             header: Example
           student_login: 
             text: "This report shows all the students enrolled in a given course or all courses in a given term. Resulting csv file will have one row per student enrollment."
+      dubspot_report_header_course_id: "course id"
+      dubspot_report_header_course_name: "course name"
+      dubspot_report_header_course_sis_id: "course sis id"
+      dubspot_report_header_ip_address: "ip address"
+      dubspot_report_header_last_seen_at: "last seen at"
+      dubspot_report_header_section_id: "section id"
+      dubspot_report_header_section_name: "section name"
+      dubspot_report_header_section_sis_id: "section sis id"
+      dubspot_report_header_user_id: "user id"
+      dubspot_report_header_user_login_id: "user login id"
+      dubspot_report_header_user_sis_id: "user sis id"
     student_submissions_csv_description: 
       account_reports: 
         vilas: 
@@ -1196,6 +1557,17 @@ en-AU:
             header: Example
           student_submissions: 
             text: "This is a report of all students enrolled in a course in a given term that have submitted an assignment. This report contains one row per student submission."
+      vilas_report_header_assignment_id: "assignment id"
+      vilas_report_header_assignment_name: "assignment name"
+      vilas_report_header_canvas_course_id: "canvas course id"
+      vilas_report_header_canvas_user_id: "canvas user id"
+      vilas_report_header_course_name: "course name"
+      vilas_report_header_points_possible: "points possible"
+      vilas_report_header_score: score
+      vilas_report_header_sis_course_id: "sis course id"
+      vilas_report_header_sis_user_id: "sis user id"
+      vilas_report_header_submission_date: "submission date"
+      vilas_report_header_user_name: "user name"
     students_with_no_submissions_csv_description: 
       account_reports: 
         default: 
@@ -1203,6 +1575,15 @@ en-AU:
             description: 
               header: Example
             text: "This is a report of all students enrolled in a course in a given term that have not submitted an assignment between the given date range in a course. This report contains one row per student enrollment that meet the criteria. The date range can be no longer than two weeks."
+      student_report_header_course_id: "course id"
+      student_report_header_course_name: "course name"
+      student_report_header_course_sis_id: "course sis id"
+      student_report_header_section_id: "section id"
+      student_report_header_section_name: "section name"
+      student_report_header_section_sis_id: "section sis id"
+      student_report_header_user_id: "user id"
+      student_report_header_user_name: "user name"
+      student_report_header_user_sis_id: "user sis id"
     students_with_no_submissions_csv_parameters: 
       account_reports: 
         default: 
@@ -1224,6 +1605,19 @@ en-AU:
             header: Example
           grade_export: 
             text: "This report shows the student final grade results for all students in a given term. The resulting tab delimited file will have one row per enrollment, and will show the final grade and multiple course information fields that will be used for uploading grade data into Synergy SIS."
+      tempe_report_header_absences: ABSENCES
+      tempe_report_header_citizenship: CITIZENSHIP
+      tempe_report_header_comment_1: COMMENT_1
+      tempe_report_header_comment_2: COMMENT_2
+      tempe_report_header_comment_3: COMMENT_3
+      tempe_report_header_grade_mark: GRADE_MARK
+      tempe_report_header_grading_term: GRADING_TERM
+      tempe_report_header_mark_name: MARK_NAME
+      tempe_report_header_school_code: SCHOOL_CODE
+      tempe_report_header_school_year: SCHOOL_YEAR
+      tempe_report_header_section_id: SECTION_ID
+      tempe_report_header_sis_number: SIS_NUMBER
+      tempe_report_header_workhabits: WORKHABITS
     tempe_grade_export_csv_parameters: 
       account_reports: 
         tempe: 
@@ -1250,6 +1644,12 @@ en-AU:
           unpublishd_courses: 
             header: Example
             text: "This report shows all the courses for a given term that are not published. The resulting csv file will have one row per course and will show the course id, course sis id, course short name, course name, course start and end dates."
+      course_report_header_end_date: "end date"
+      course_report_header_id: id
+      course_report_header_name: name
+      course_report_header_short_name: "short name"
+      course_report_header_sis_id: "sis id"
+      course_report_header_start_date: "start date"
     unrecognized_time_zone: "'%{timezone}' is not a recognised time zone"
     unused_courses_csv_description: 
       account_reports: 
@@ -1258,8 +1658,32 @@ en-AU:
             header: Example
           main: 
             text: "This is a report of all courses that have none of the following items: assignments, announcements, discussions, files, modules, pages, or quizzes."
+      course_report_header_course_id: "course id"
+      course_report_header_course_sis_id: "course sis id"
+      course_report_header_created_at: "created at"
+      course_report_header_long_name: "long name"
+      course_report_header_short_name: "short name"
+      course_report_header_status: status
     update_failed_notice: "Account settings update failed"
     user_access_csv_description: 
+      access_report_header_content: content
+      access_report_header_content_access_id: "content access id"
+      access_report_header_content_type: "content type"
+      access_report_header_course_id: "course id"
+      access_report_header_course_name: "course name"
+      access_report_header_course_sis_id: "course sis id"
+      access_report_header_enrollment_type: "enrollment type"
+      access_report_header_last_viewed: "last viewed"
+      access_report_header_root_account_id: "root account id"
+      access_report_header_section_id: "section id"
+      access_report_header_section_name: "section name"
+      access_report_header_section_sis_id: "section sis id"
+      access_report_header_term_id: "term id"
+      access_report_header_term_sis_id: "term sis id"
+      access_report_header_times_participated: "times participated"
+      access_report_header_times_viewed: "times viewed"
+      access_report_header_user_id: "user id"
+      access_report_header_user_sis_id: "user sis id"
       account_reports: 
         usu: 
           description: 
@@ -1286,11 +1710,39 @@ en-AU:
             header: Example
           low_activity: 
             text: "This report shows all the users enrolled in a given course or all courses in a given term. Resulting csv file will have one row per user enrollment that have not visited the minimum number of course items."
+      webster_report_header_course_id: "course id"
+      webster_report_header_course_name: "course name"
+      webster_report_header_course_sis_id: "course sis id"
+      webster_report_header_enrollment_state: "enrollment state"
+      webster_report_header_enrollment_type: "enrollment type"
+      webster_report_header_last_ip: "last ip"
+      webster_report_header_login_id: "login id"
+      webster_report_header_user_id: "user id"
+      webster_report_header_user_name: "user name"
+      webster_report_header_user_sis_id: "user sis id"
     user_inactivity_csv_parameters: 
       account_reports: 
         webster: 
           login: 
             day_drop: "Minimum course items visited:"
+    user_notes_csv_description: 
+      account_reports: 
+        pasco: 
+          description: 
+            header: Example
+          user_notes: 
+            text: "This report shows students user notes."
+      pasco_report_header_created_at: created_at
+      pasco_report_header_created_by_id: created_by_id
+      pasco_report_header_deleted_at: deleted_at
+      pasco_report_header_note: note
+      pasco_report_header_note_id: id
+      pasco_report_header_title: title
+      pasco_report_header_updated_at: updated_at
+      pasco_report_header_user_id: user_id
+      pasco_report_header_user_sis_id: user_sis_id
+      pasco_report_header_workflow_state: workflow_state
+      pasco_report_url: url
     users_list: 
       login_name_or_sis_id: "Login / SIS ID"
       name: Name
@@ -1302,6 +1754,32 @@ en-AU:
           zero_activity: 
             header: Example
             text: "This report shows all the students enrolled in any courses in a given term. Resulting csv file will have one row per user enrollment that have not visited the course since the date."
+      student_report_header_course_id: "course id"
+      student_report_header_course_name: "course name"
+      student_report_header_course_sis_id: "course sis id"
+      student_report_header_name: name
+      student_report_header_section_id: "section id"
+      student_report_header_section_name: "section name"
+      student_report_header_section_sis_id: "section sis id"
+      student_report_header_user_id: "user id"
+      student_report_header_user_sis_id: "user sis id"
+  ace_report_header_correct: correct
+  ace_report_header_count_correct: "count correct"
+  ace_report_header_count_taken: "count taken"
+  ace_report_header_course_id: "course id"
+  ace_report_header_course_sis_id: "course sis id"
+  ace_report_header_login_id: "login id"
+  ace_report_header_outcome_id: "outcome id"
+  ace_report_header_outcome_ids: "outcome ids"
+  ace_report_header_points_earned: "points earned"
+  ace_report_header_points_possible: "points possible"
+  ace_report_header_question_id: "question id"
+  ace_report_header_question_name: "question name"
+  ace_report_header_question_text: "question text"
+  ace_report_header_quiz_title: "quiz title"
+  ace_report_header_user_id: "user id"
+  ace_report_header_user_name: "user name"
+  ace_report_header_user_sis_id: "user sis id"
   activerecord: 
     errors: 
       full_messages: 
@@ -1503,6 +1981,8 @@ en-AU:
     invalid_participants: "You must allow at least one user to attend"
     title: "Edit %{name}"
     update: Update
+  aria_labels: 
+    unlock_at_date: "Unlock at date"
   assessment_question: 
     default_question_name: Question
   assessment_question_bank: 
@@ -1586,6 +2066,8 @@ en-AU:
     unmute_button: "Unmute Assignment"
     unmute_dialog: "This assignment is currently muted. That means students can't see their grades and feedback. Would you like to unmute now?"
     unmuting_assignment: "Unmuting Assignment..."
+  assignment_scheduling_title: "Assignment Scheduling"
+  assignment_score_summary_title: "Assignment Score Summary"
   assignments: 
     add_assignment_form: 
       assignment_name: "Assignment Name"
@@ -1812,13 +2294,11 @@ en-AU:
         remove_these_dates: "Remove These Dates"
     edit: 
       edit_assignment: "Edit Assignment"
-      new_discussion: "New Discussion"
-      new_quiz: "New Quiz"
     edit_header_view: 
       buttons: 
         not_published: "Not Published"
         published: Published
-      manage: Manage
+      manage_assignment: "Manage Assignment"
       titles: 
         delete: Delete
     edit_view: 
@@ -1828,6 +2308,7 @@ en-AU:
       description: Description
       freeze_properties: "Lock assignment properties when copied"
       notify_content_change: "Notify users that this content has changed"
+      only_visible_to_overrides_note: "Note: This assignment is *only* visible to the section(s) specified below:"
       points_possible: Points
       post_to_sis: "Post to SIS"
       warnings: 
@@ -1915,6 +2396,7 @@ en-AU:
       assignment_locked_tooltip: locked
       keycode_descriptions: 
         add_assignment_or_group: "Add Assignment to Current Group"
+        close_active_dialog: "Close the active dialog"
         delete_assignment_or_group: "Delete Current Assignment/Group"
         edit_assignment_or_group: "Edit Current Assignment/Group"
         full_preview: "Full Preview/Edit Assignment"
@@ -1922,6 +2404,7 @@ en-AU:
         previous_assignment_or_group: "Previous Assignment/Group"
       keycodes: 
         add_assignment_or_group: a
+        close_active_dialog: esc
         delete_assignment_or_group: d
         edit_assignment_or_group: e
         full_preview: f
@@ -1972,8 +2455,6 @@ en-AU:
     name_is_required: "Name is required!"
     name_too_long: "Name is too long"
     name_too_long_error: "Name is too long"
-    never_drop: 
-      remove_rule: "Remove Rule"
     never_drop_collection: 
       add_another_assignment: "Add another assignment"
       add_first_assignment: "Add an assignment"
@@ -2045,6 +2526,8 @@ en-AU:
       redirect_message: |-
           This submission was a url, we're taking you to the url link now.  
           [Click Here to go to the submission](%{url})
+    remove_never_drop_rule: "Remove never drop rule"
+    remove_unsaved_never_drop_rule: "Remove unsaved never drop rule"
     rules_text: 
       one: "%{count} Rules"
       other: "%{count} Rules"
@@ -2109,9 +2592,6 @@ en-AU:
         submission: Submission
         submission_not_turned_in: "Not Turned In!"
         submission_turned_in: "Turned In!"
-      tooltips: 
-        finished: finished
-        incomplete: incomplete
     submission_type_icon: 
       tooltips: 
         submitted: Submitted
@@ -2304,12 +2784,48 @@ en-AU:
     titles: 
       attendance_help: "Attendance Help"
       new_attendance_column: "New Attendance Column"
+  auburn_report_header_account_id: "account id"
+  auburn_report_header_account_name: "account name"
+  auburn_report_header_account_sis_id: "account sis id"
+  auburn_report_header_course: course
+  auburn_report_header_course_id: "course id"
+  auburn_report_header_course_name: "course name"
+  auburn_report_header_course_sis: "course sis"
+  auburn_report_header_course_sis_id: "course sis id"
+  auburn_report_header_course_status: "course status"
+  auburn_report_header_current_score: "current score"
+  auburn_report_header_effective_date: "effective date"
+  auburn_report_header_end_date: "end date"
+  auburn_report_header_enrollment_state: "enrollment state"
+  auburn_report_header_final_score: "final score"
+  auburn_report_header_section: section
+  auburn_report_header_section_id: "section id"
+  auburn_report_header_section_name: "section name"
+  auburn_report_header_section_sis: "section sis"
+  auburn_report_header_section_sis_id: "section sis id"
+  auburn_report_header_start_date: "start date"
+  auburn_report_header_student_count: "student count"
+  auburn_report_header_student_id: "student id"
+  auburn_report_header_student_name: "student name"
+  auburn_report_header_student_sis: "student sis"
+  auburn_report_header_teacher_id: "teacher id"
+  auburn_report_header_teacher_name: "teacher name"
+  auburn_report_header_teacher_sis_id: "teacher sis id"
+  auburn_report_header_term: term
+  auburn_report_header_term_id: "term id"
+  auburn_report_header_term_name: "term name"
+  auburn_report_header_term_sis: "term sis"
+  auburn_report_header_term_sis_id: "term sis id"
   auth_logging: 
     login: LOGIN
     logout: LOGOUT
   bb_display: "Blackboard Learn"
   bb_file_description: "Blackboard 6/7/8/9 export .zip file"
   bb_name: "Blackboard Converter"
+  better_file_browsing_description: |-
+      A new, simpler, more user friendly file browsing interface.  If you turn this on at the course level,
+      then all of the users in that course will see the new interface.  To get it to show up when someone
+      goes to the personal files page for a user ('/files') then you need to turn it on for the account they are a memeber of.
   big_blue_button_conference: 
     conference_is_recorded: "This conference is being recorded."
     recording_setting: Recording
@@ -2318,6 +2834,13 @@ en-AU:
     no_manifest: "This Blackboard .zip has no imsmanifest.xml file in the root directory."
   bookmark_service: 
     default_title: "No Title"
+  bucks_report_header_last_access_to_canvas: "last access to canvas"
+  bucks_report_header_name: name
+  bucks_report_header_section_id: "section id"
+  bucks_report_header_section_name: "section name"
+  bucks_report_header_section_sis_id: "section sis id"
+  bucks_report_header_user_sis_id: "user sis id"
+  bucks_zero_activity_title: "Bucks Zero Activity"
   bulk_course_migration: 
     export_failed: "There was an error exporting the course with bb_lcid %{id} from Blackboard"
     export_failed_no_id: "There was an error importing a course"
@@ -2505,7 +3028,10 @@ en-AU:
     agenda_view_displaying_start_end: "Now displaying %{start} through %{end}"
     appointment_group_deletion_details: "Deleting it will also delete any appointments that have been signed up for by students."
     appointment_group_list: 
+      delete: Delete
+      edit: Edit
       location: "Location:"
+      manage: Manage
       message_groups: "Message Groups Who..."
       message_students: "Message Students Who..."
       scheduler_explanation_student_header: "You do not have any appointment groups to sign up for"
@@ -2516,6 +3042,7 @@ en-AU:
       scheduler_explanation_teacher_paragraph_2: "For example, lets say you want to go over the midterm paper assignment with each of the students in your course. You would create a new appointment group, specify the dates and times that you're available, tell it to split that time into 15 minute blocks and only allow one student per time-block."
       scheduler_explanation_teacher_paragraph_3: "Then students would get notified and see that they need to sign up for one of the specified time blocks. They will be shown a calendar with the available time blocks overlaid on top of everything on their other calendars so they can pick a time that works for them."
       scheduler_explanation_teacher_paragraph_4: "*Get started now by clicking the \"Create an appointment group\" button to the right. *"
+      signed_up_for: "You're signed up for"
       x_groups_have_signed_up: "%{participant_count} groups have signed up"
       x_people_have_signed_up: "%{participant_count} people have signed up"
     buttons: 
@@ -2607,6 +3134,7 @@ en-AU:
       end_time: "End Time"
       event_description: "Event Description"
       event_title: "Event Title"
+      location_address: "Address:"
       location_name: "Location:"
       new_calendar_event_header: "New Calendar Event"
       start_time: "Start Time"
@@ -2630,6 +3158,7 @@ en-AU:
         reserve: Reserve
         unreserve: Un-reserve
       location: Location
+      location_address: Address
       message_students: "Message students"
       slots_available: "Slots available"
     event_event_title: "Event Title:"
@@ -2713,6 +3242,7 @@ en-AU:
         create: "Create Event"
         update: "Update Event"
       labels: 
+        address: Address
         date: Date
         event_description: "Event Description"
         from: From
@@ -2901,11 +3431,50 @@ en-AU:
     by_sa: "CC Attribution Share Alike"
     private: "Private (Copyrighted)"
     public_domain: "Public Domain"
+  ccp_report_header_course_id: "course id"
+  ccp_report_header_course_name: course_name
+  ccp_report_header_course_sis_id: "course sis id"
+  ccp_report_header_email: email
+  ccp_report_header_enrollment_type: "enrollment type"
+  ccp_report_header_first_name: "first name"
+  ccp_report_header_last_name: last_name
+  ccp_report_header_section_id: "section id"
+  ccp_report_header_section_name: "section name"
+  ccp_report_header_section_sis_id: "section sis id"
+  ccp_report_header_user_id: "user id"
+  ccp_report_header_user_sis_id: "user sis id"
+  ccp_zero_activity_title: "CCP Zero Activity"
+  cedar_rapids_report_header_account_id: "Account ID"
+  cedar_rapids_report_header_account_name: "Account Name"
+  cedar_rapids_report_header_course_end_date: "Course End Date"
+  cedar_rapids_report_header_course_id: "Course ID"
+  cedar_rapids_report_header_course_name: "Course Name"
+  cedar_rapids_report_header_course_start_date: "Course Start Date"
+  cedar_rapids_report_header_course_status: "Course Status"
+  cedar_rapids_report_header_department_id: "Department ID"
+  cedar_rapids_report_header_department_name: "Department Name"
+  cedar_rapids_report_header_observer_count: "Observer Count"
+  cedar_rapids_report_header_student_count: "Student Count"
+  cedar_rapids_report_header_ta_count: "TA Count"
+  cedar_rapids_report_header_teacher_count: "Teacher Count"
+  cedar_rapids_report_header_term_id: "Term ID"
+  cedar_rapids_report_header_term_name: "Term Name"
   change_points_possible_to_match_rubric_dialog: 
     prompts: 
       update_assignment_points: "This assignment has %{assignmentPoints} points possible, would you like to change it to have %{rubricPoints} points possible to match this rubric?"
     titles: 
       update_assignment_points: "Change points possible to match rubric?"
+  chcp_report_header_course: course
+  chcp_report_header_email: email
+  chcp_report_header_grade: grade
+  chcp_report_header_last_submissio: "last submission"
+  chcp_report_header_lda: lda
+  chcp_report_header_phone: phone
+  chcp_report_header_start_date: "start date"
+  chcp_report_header_student_id: "student id"
+  chcp_report_header_student_name: "student name"
+  chcp_report_header_teacher: teacher
+  chcp_student_activity_title: "CHCP Student Activity Report"
   collaboration: 
     default_title: "Unnamed Collaboration"
   collaborations: 
@@ -3011,7 +3580,7 @@ en-AU:
     to_now: now
   common_cartridge_description: "This enables converting a Common Cartridge packages in the intermediary json format to be imported"
   common_cartridge_display: "Common Cartridge"
-  common_cartridge_file_description: "Common Cartridge 1.0/1.1/1.2 Package"
+  common_cartridge_file_description: "Common Cartridge 1.x Package"
   common_cartridge_name: "Common Cartridge Importer"
   communication_channel: 
     body: "Your Canvas verification code is %{verification_code}"
@@ -3074,6 +3643,16 @@ en-AU:
     profile: 
       notices: 
         contact_registered: "Contact method registered!"
+  concord_report_header_campus: campus
+  concord_report_header_course_name: "course name"
+  concord_report_header_course_sis_id: "course sis id"
+  concord_report_header_last_course_activity_date: "last course activity date"
+  concord_report_header_student_current_grade: "student current grade"
+  concord_report_header_student_default_email: "student default email"
+  concord_report_header_student_name: "student name"
+  concord_report_header_student_sis_id: "student sis id"
+  concord_report_header_term_name: "term name"
+  concord_report_header_zero_grade_assignments: "zero grade assignments"
   conferences: 
     concluded_conference: 
       delete: Delete
@@ -3081,7 +3660,7 @@ en-AU:
       preparing_video: "Preparing Video"
       recording: "1 Recording"
       recordings: "%{recordingCount} Recordings"
-      setings: settings
+      settings: Settings
       view: View
     confirm: 
       close: |-
@@ -3119,7 +3698,7 @@ en-AU:
       join: Join
       recording: "1 Recording"
       recordings: "%{recordingCount} Recordings"
-      setings: settings
+      settings: Settings
       start: Start
       view: View
     no_concluded_conferences: "There are no concluded conferences"
@@ -3142,6 +3721,12 @@ en-AU:
         new: "Hasn't started yet"
         started: "Started %{time}"
     type_disabled_error: "This type of conference is no longer enabled for this Canvas site"
+  confirm_dialog: 
+    cancel: Cancel
+    ok: Ok
+    submit: Submit
+  confirm_dialog_component: 
+    ok: Ok
   content_exports: 
     buttons: 
       process: "Process Data"
@@ -3624,9 +4209,9 @@ en-AU:
         module_complete_when: "This module is complete when"
         modules: 
           before_students_view: "Before students can view this module"
-        new_tab: "Load this tool in a new tab"
+        new_tab: "Load in a new tab"
         publish_final_grade: "publish final grade for the student when this module is completed"
-        require_sequential_progress: "students must move through requirements in this module in sequential order"
+        require_sequential_progress: "Students must move through requirements in this module in sequential order"
         sort_by: "Sort By"
         title: Title
         unlock_at: "Unlock At"
@@ -3735,8 +4320,8 @@ en-AU:
         module_complete_when: "This module is complete when"
         modules: 
           before_students_view: "Before students can view this module"
-        new_tab: "Load this tool in a new tab"
-        require_sequential_progress: "students must move through requirements in this module in sequential order"
+        new_tab: "Load in a new tab"
+        require_sequential_progress: "Students must move through requirements in this module in sequential order"
         sort_by: "Sort By"
         title: Title
         unlock_at: "Unlock At"
@@ -3807,7 +4392,7 @@ en-AU:
         aria: 
           module_options: 
             label: "Module Options"
-      module_will_unlock_at: "will unlock *%{unlock_date}*"
+      module_will_unlock_at: "Will unlock *%{unlock_date}*"
       progression_complete_count: "*%{count}* Complete"
       progression_started_count: "*%{count}* In Progress"
       reorder_modules: "Drag to reorder modules"
@@ -3830,7 +4415,7 @@ en-AU:
           edit_module: Edit
           student_progress: "See Student Progress for this Module"
       manager_module: "Manage module"
-      module_will_unlock_at: "will unlock *%{unlock_date}*"
+      module_will_unlock_at: "Will unlock *%{unlock_date}*"
       progression_complete_count: "*%{count}* Complete"
       progression_started_count: "*%{count}* In Progress"
       reorder_modules: "Drag to reorder modules"
@@ -3960,6 +4545,10 @@ en-AU:
       edit: "Edit Module Settings"
       edit_item: "Edit Item Details"
       student_progress: "Student Progress for Module"
+    url_show: 
+      new_tab: "This site needs to be opened in a new browser window."
+      open_url_button: "Open %{title} in a new window"
+      tool_insecure_warning: "You are trying to launch insecure content from within a secure site (canvas). Some internet browsers may prevent this content from loading."
   context_modules_api: 
     invalid_position: "Invalid position"
   conversation_dialog: 
@@ -4032,6 +4621,7 @@ en-AU:
     course_options: 
       course_options: 
         concluded: Concluded
+        groups: Groups
         more_courses: "More Courses"
     hide: Hide
     index_new: 
@@ -4073,6 +4663,7 @@ en-AU:
       total_messages: "Total messages"
       unread: Unread
       unstar_conversation: "Unstar conversation"
+    message_deleted: "Message Deleted!"
     message_detail: 
       no_subject: "No subject"
     message_form: 
@@ -4172,6 +4763,7 @@ en-AU:
       id: ID
       points_possible: "Points Possible"
       read_only_field: "(read only)"
+      root_account: "Root Account"
       section: Section
       sis_login_id: "SIS Login ID"
       sis_user_id: "SIS User ID"
@@ -4212,6 +4804,7 @@ en-AU:
   course_copy_name: "Copy Canvas Course"
   course_copy_no_course_error: "The source course was not found."
   course_copy_not_allowed_error: "You are not allowed to copy the source course."
+  course_enrollment_title: "Enrollment Count"
   course_exports: 
     errors: 
       assignment: "The assignment \"%{title}\" failed to export"
@@ -4257,9 +4850,22 @@ en-AU:
       close_course_menu_title: close
       reset_course_menu: Reset
   course_logging: 
+    blank_placeholder: "-"
+    event_source: 
+      api: Api
+      manual: Manual
+      sis: SIS
     event_type: 
       concluded: Concluded
+      copied_from: "Copied From"
+      copied_to: "Copied To"
       created: Created
+      deleted: Deleted
+      published: Published
+      reset_from: "Reset From"
+      reset_to: "Reset To"
+      restored: Restored
+      unconcluded: Unconcluded
       updated: Updated
     field_label: 
       abstract_course_id: "Abstract Course Id"
@@ -4312,6 +4918,17 @@ en-AU:
       uuid: UUID
       wiki_id: "Wiki Id"
       workflow_state: "Workflow State"
+  course_report_header_course_id: "course id"
+  course_report_header_course_sis_id: "course sis id"
+  course_report_header_created_at: "created at"
+  course_report_header_end_date: "end date"
+  course_report_header_id: id
+  course_report_header_long_name: "long name"
+  course_report_header_name: name
+  course_report_header_short_name: "short name"
+  course_report_header_sis_id: "sis id"
+  course_report_header_start_date: "start date"
+  course_report_header_status: status
   course_restore: 
     restore_error: "There was an error attempting to restore the course. Course was not restored."
   course_search: 
@@ -4364,13 +4981,13 @@ en-AU:
     re_send_invitation: "Re-Send Invitation"
     remove_user_from_course_section: "Remove user from %{course_section}"
     titles: 
-      click_to_edit: "Click to Edit"
       link_to_students: "Link to Students"
       move_course: "Move Course"
       reset_course_content_dialog_help: "Reset Course Content"
       section_enrollments: "Section Enrollments"
   course_statistics: 
     unknown: unknown
+  course_status_title: "Course Section Status"
   course_users: 
     greater_than_three: "Please enter a search term with three or more characters"
     unknown_error: "Something went wrong with your search, please try again."
@@ -4454,7 +5071,6 @@ en-AU:
               
               Please **log in** or ***register*** to claim this course.
         files: "The Files tab is the place to share lecture slides, example documents, study helps -- anything your students will want to download. Uploading and organizing your files is easy with Canvas. We'll show you how."
-        home: "When people visit the course, this is the page they'll see. You can set it to show an activity stream, the list of course modules, a syllabus, or a custom page you write yourself. The default is the course activity stream. To customize this, just click %{change_layout}."
         import: "If you've been using another course management system, you probably have stuff in there that you're going to want moved over to Canvas. We can walk you through the process of easily migrating your content into Canvas."
         navigation: "By default all links are enabled for a course. Students won't see links to sections that don't have content. For example, if you haven't created any quizzes, they won't see the quizzes link. You can sort and explicitly disable these links if there are areas of the course you don't want your students accessing."
         publish: 
@@ -4535,11 +5151,8 @@ en-AU:
         look_around: "Feel free to wander around and look over the course. When you're ready, you can either accept or reject the invitation."
     errors: 
       create_failed: "Course creation failed"
-      invalid_role: "Invalid role type"
       role_not_active: "Can't add users for non-active role: '%{role}'"
       role_not_found: "No role named '%{role}' exists."
-      unauthorized: 
-        switch_roles: "You do not have permission to switch roles"
     group_list: 
       headings: 
         groups: "Course Groups"
@@ -4576,8 +5189,6 @@ en-AU:
       login_to_accept: "You'll need to log in before you can accept the enrollment."
       preview_course: "You've been invited to join this course.  You can look around, but you'll need to accept the enrollment invitation before you can participate."
       reset_test_student: "The test student has been reset successfully."
-      role_restored: "Your default role and permissions have been restored"
-      role_switched: "You have switched roles for this course.  You will now see the course in this new role: %{enrollment_type}"
       unconcluded: "Course un-concluded"
       updated: "Course was successfully updated."
     recent_event: 
@@ -4619,7 +5230,7 @@ en-AU:
       index: 
         cannot_add_users: "New users can not be added because this course is concluded"
         filter_field_description: "As you type in this field, the list of people will be automatically filtered to only include those whose names match your input."
-        filter_list_of_people: "Filter list of people"
+        group_set: "Group Set"
         people: People
         role_to_search: "Limit search to role"
         search_people: "Search people"
@@ -4639,6 +5250,9 @@ en-AU:
         re_sending_invitations: Resending...
       role_select: 
         all_roles: "All Roles"
+      roster_tabs: 
+        everyone_tab: Everyone
+        groups: Groups
       roster_user: 
         links: 
           edit_sections: "Edit Sections"
@@ -4657,6 +5271,7 @@ en-AU:
         no_people_found: "No people found"
         role: Role
         section: Section
+        total_activity: "Total Activity"
         you_can_search_by: "You can search by:"
       section: 
         remove_user_from_course_section: "Remove user from %{name}"
@@ -4670,6 +5285,8 @@ en-AU:
         add_section: "Add Section"
         move_course: "Move Course"
         update_course: "Update Course Details"
+      course_conclude_at_warning_message: "The course is currently set to end at midnight, meaning that the previous day will be the last day this course is active."
+      course_conclude_at_warning_title: "Course Ending at Midnight"
       course_open_enrollment: "This course has enabled open enrollment. Students can self-enroll in the course once you share with them this URL: *%{url}*. Alternatively, they can sign up at *%{url2}* and use the following join code: *%{code}*"
       course_open_enrollment_without_code: "This course has enabled open enrollment. Students can self-enroll in the course once you share with them this URL: *%{url}*"
       course_overrides_term: "This will override any term availability settings."
@@ -4732,6 +5349,7 @@ en-AU:
         sis_source_id: "SIS ID"
         start_at: Starts
         storage_quota: "File Storage"
+        time_zone: "Time Zone"
         turnitin_comments: "Turnitin Comments"
       language_overrides_preferences: "This will override any user/system language preferences. This is only recommended for foreign language courses"
       links: 
@@ -4793,9 +5411,9 @@ en-AU:
         stats: "Course Statistics"
         student_view: "Student View"
     show: 
-      acting_as: "You are currently viewing this course with the role: %{enrollment_type}. You will only have permissions and access available to users of this role."
       buttons: 
         update_layout: "Update Layout"
+      change_home_page: Change
       details: 
         assignments: "This view shows the **list of assignments** for this course, with upcoming and recent assignments at the top."
         confirm_unenroll: "Are you sure you want to unenroll in this course? You will no longer be able to see the course roster or communicate directly with the teachers, and you will no longer see course events in your stream and as notifications."
@@ -4813,7 +5431,7 @@ en-AU:
         headings: 
           set_layout: "Set Home Page Layout"
         labels: 
-          select_content: "Select what you'd like to display on the homepage."
+          select_content: "Select what you'd like to display on the home page."
         options: 
           assignments: "Assignments List"
           custom_page: "Pages Front Page"
@@ -4821,9 +5439,10 @@ en-AU:
           recent_activity_dashboard: "Recent Activity Dashboard"
           syllabus: Syllabus
       empty_body: "No Content"
+      front_page_not_set: "Front page must be set first"
       headings: 
+        choose_home_page_title: "Choose Home Page"
         confirm_unenroll: "Confirm Unenrollment"
-        edit_homepage_title: "Edit Homepage"
         importing: "This course is being imported"
         set_layout: "Set Home Page Layout"
         unpublished: "This Course is Unpublished"
@@ -4833,13 +5452,12 @@ en-AU:
       license_notice: "This course content is offered under a %{license_type} license. Content in this course can be considered under this license unless otherwise noted."
       links: 
         change_layout: "Change Home Page Layout"
+        choose_home_page: "Choose Home Page"
         course_setup: "Course Setup Checklist"
         course_stream: "See Course Stream"
         drop_course: "Drop this Course"
-        edit_homepage: "Edit Homepage"
         join_course: "Join this Course"
         new_announcement: "New Announcement"
-        restore_role: "Restore Role and Permissions"
         view_course_stream: "View Course Stream"
       options: 
         assignments: "the Assignment List"
@@ -5004,6 +5622,7 @@ en-AU:
       student: 
         count: "Wrong Student Count"
         ratio: "Wrong Student Ratio"
+  current_grade_title: "Current Grade"
   curve_grades_dialog: 
     average_score: "Average Score"
     buttons: 
@@ -5015,6 +5634,10 @@ en-AU:
       assign_blanks: "Assign zeroes to unsubmitted students"
     out_of_points_possible: "out of %{assignment.points_possible}"
     this_is_permanent: "Grade curving cannot be undone. Pre-curved grade histories will be available, but the curving action is irreversible."
+  custom_grade_export_title: "CampusVue Grade Export"
+  custom_outcomes_title: "Custom Outcomes"
+  cv_non_graded_data__title: "Campus Vue Non-Graded Assignment Report"
+  cv_submission_data__title: "Campus Vue Submission Data"
   d2l_display: Desire2Learn
   d2l_file_description: "D2L export .zip format"
   d2l_name: "D2L Converter"
@@ -5302,7 +5925,6 @@ en-AU:
       graded_discussion_and_points: 
         one: "This is a graded discussion: *%{count} points possible*"
         other: "This is a graded discussion: *%{count} points possible*"
-      separated_conversation_notice: "Since this is a group assignment, each group has its own conversation for this topic. Here are the ones you have access to:"
       show_due_dates: "Show Due Dates"
       until: Until
     cannot_unpublish_with_replies: "Can't unpublish if there are replies"
@@ -5342,7 +5964,6 @@ en-AU:
       my_settings: "My Settings"
       student_settings: "Student Settings"
     edit: 
-      edit_topic: "Edit Discussion Topic"
       new_assignment: "New Assignment"
       new_quiz: "New Quiz"
     edit_crumb: Edit
@@ -5379,11 +6000,17 @@ en-AU:
         other: "Show %{count} More Entries"
     error_draft_state_unauthorized: "You do not have permission to set this topic to draft state."
     error_draft_state_with_posts: "This topic cannot be set to draft state because it contains posts."
+    error_group_announcement: "You cannot use grouped discussion on an announcement."
+    error_group_change: "You cannot change grouping on a discussion with replies."
     group_assignment_discussion_entry: 
       posts: 
         one: "1 Post"
         other: "%{count} Posts"
       separated_conversation_notice: "The conversation for this topic has been separated into separate groups. Below are all the group topics you have access to."
+    group_discussion: 
+      separated_conversation_notice: "Since this is a group discussion, each group has its own conversation for this topic. Here are the ones you have access to:"
+    group_discussion_locked: "Students have already submitted to this discussion, so group settings cannot be changed."
+    group_discussion_title: "Group Discussion"
     index: 
       course_discussions_atom_feed_title: "Course Discussions Atom Feed"
     index_view: 
@@ -5479,6 +6106,7 @@ en-AU:
       locked: "This topic is closed for comments"
       this_topic_is_used_for_grading: "This topic is used for grading"
       topic_podcast_feed: "Topic Podcast Feed"
+    this_is_a_group_discussion: "This is a Group Discussion"
     topic_deleted_notice: "%{topic_title} deleted successfully"
     unread_count_tooltip: 
       one: "1 unread reply."
@@ -5554,25 +6182,42 @@ en-AU:
     unsubscribe: "Unsubscribe from this topic"
     unsubscribed: Unsubscribed
     unsubscribed_hint: "You are not subscribed to this topic. Click to subscribe."
-  draft_state: 
-    cant_unpublish_when_students_submit: "Can't unpublish if there are student submissions"
-    publish: Publish
-    unpublish: Unpublish
   draft_state_description: |-
       This beta feature redesigns many parts of Canvas and allows content to exist in
       a new unpublished state that is invisible to students and excluded from grade
       calculations. Caution--disabling this feature may delete newly created or edited
       content from the teacher's view.
+  dubspot_report_header_course_id: "course id"
+  dubspot_report_header_course_name: "course name"
+  dubspot_report_header_course_sis_id: "course sis id"
+  dubspot_report_header_ip_address: "ip address"
+  dubspot_report_header_last_seen_at: "last seen at"
+  dubspot_report_header_section_id: "section id"
+  dubspot_report_header_section_name: "section name"
+  dubspot_report_header_section_sis_id: "section sis id"
+  dubspot_report_header_user_id: "user id"
+  dubspot_report_header_user_login_id: "user login id"
+  dubspot_report_header_user_sis_id: "user sis id"
   due_dates: 
     due_at: "due: %{assignment_due_date_time}"
     multiple_due_dates: "due: Multiple Due Dates"
     no_due_date: "due: No Due Date"
   ecollege_file_description: Ecollege
   ecollege_name: "Ecollege Converter"
+  edison: 
+    outcome: 
+      extra_text: "Outcome Id: %{outcome_id};"
+    quiz_id: 
+      extra_text: "Quiz id: %{quiz_id};"
+    section_id: 
+      extra_text: "Section: %{section_id};"
   edit_rubric: 
     buttons: 
       create_rubric: "Create Rubric"
       update_rubric: "Update Rubric"
+    discussion_points_possible: 
+      one: "%{count} point possible"
+      other: "%{count} points possible"
     errors: 
       load_rubrics_failed: "Loading rubrics failed, please try again"
     messages: 
@@ -5668,6 +6313,7 @@ en-AU:
     student: Student
     teacher: Teacher
     teacher_assistant: TA
+  enrollment_summary_title: "Enrollment Summary"
   enrollment_term: 
     errors: 
       not_unique: "SIS ID \"%{sis_source_id}\" is already in use"
@@ -6002,6 +6648,7 @@ en-AU:
       delete: Delete
     cannot_locate_launch_request: "Cannot locate launch request, please try again."
     consumer_key: "Consumer Key"
+    course_home_sub_navigation_configured: "Course home sub navigation configured"
     course_navigation_configured: "Course navigation configured"
     delete: Delete
     dialog_title_add_app: "Add App"
@@ -6073,12 +6720,15 @@ en-AU:
     saving: Saving...
     shared_secret: "Shared Secret"
     submit: Submit
-    tool_show: 
+    tool_post_iframe: 
       load_tool_button: "Load %{tool}"
       load_tool_new_tab_button: "Load %{tool} in a new window"
       new_tab: "This tool needs to be loaded in a new browser window"
       new_tab_expired: "The session for this tool has expired. Please reload the page to access the tool again"
       new_tab_loaded: "This tool was successfully loaded in a new browser window. Reload the page to access the tool again."
+    tool_show: 
+      tool_insecure_warning: "You are trying to launch insecure content from within a secure site (canvas). Some internet browsers may prevent this content from loading."
+      tool_load_failure: "It looks like your content might not load. You can use this button to try launching it in a new tab."
     user_navigation_configured: "User navigation configured"
   facebook: 
     authorization_required: "Only authorized users can access that page"
@@ -6127,6 +6777,7 @@ en-AU:
       notifications_config_notice: "Notifications from Canvas can automatically be sent over to your Facebook account. Below you'll see the types of notifications you can have sent. You can change your notification preferences at any time, either here or in Canvas."
       settings_title: "Canvas Notification Settings"
       updating_preferences: "Updating Preferences..."
+  faculty_success_tile: "Faculty Success Report"
   feature_flags: 
     feature_flag: 
       allow: Allow
@@ -6144,6 +6795,7 @@ en-AU:
       feature_options: "Feature Options"
       no_features_available: "No features are currently available."
   features: 
+    better_file_browsing: "Better File Browsing"
     differentiated_assignments: "Differentiated Assignments"
     draft_state: "Draft State"
     draft_state_account_disable_warning: |-
@@ -6154,11 +6806,14 @@ en-AU:
         is ready to be published and available to all users in the course before continuing.
     google_docs_domain_restriction: "Google Docs Domain Restriction"
     high_contrast: "Use High Contrast Styles"
-    individual_gradebook: "Individual Gradebook View"
+    html5_first_videos: "Prefer HTML5 for video playback"
     learning_mastery_gradebook: "Learning Mastery Gradebook"
+    new_quiz_moderate: "New Quiz Moderate Page"
+    new_quiz_statistics: "New Quiz Statistics Page"
     new_styles: "Use New Styles"
     post_grades: "Post Grades to SIS"
-    student_outcome_gradebook: "Student Outcome Gradebook"
+    student_groups: "New Student Groups Page"
+    student_outcome_gradebook: "Student Learning Mastery Gradebook"
   file_browser_view: 
     folder_tree_instructions: "Use the up and down arrow keys to navigate through the tree. Press right to expand folders, left to collapse, and enter to choose an image."
   filebrowserview: 
@@ -6354,6 +7009,17 @@ en-AU:
     no_deleting_folders_with_content: "Can't delete a folder with content"
     no_deleting_root: "Can't delete the root folder"
     only_one_folder: "Can't set folder path and folder id"
+  galen_report_header_account_id: account_id
+  galen_report_header_account_name: account_name
+  galen_report_header_course_name: course_name
+  galen_report_header_course_sis_id: course_sis_id
+  galen_report_header_first_submission: first_submission
+  galen_report_header_resource_type: resource_type
+  galen_report_header_section_sis_id: section_sis_id
+  galen_report_header_submission_date: submission_date
+  galen_report_header_submission_type: submission_type
+  galen_report_header_title: title
+  galen_report_header_user_sis_id: user_sis_id
   global_message_icons: 
     announcement: announcement
     calendar: calendar
@@ -6362,6 +7028,7 @@ en-AU:
     invitation: invitation
     question: question
     warning: warning
+  google_doc_accounts_title: "Google Doc Accounts"
   google_docs_domain_restriction_description: |-
       Google Docs Domain Restriction allows Google Docs submissions and collaborations
       to be restricted to a single domain. Students attempting to submit assignments or
@@ -6371,30 +7038,38 @@ en-AU:
     grade_display_warning: 
       checkbox: "Don't show for this course again."
       warning: Warning
+  grade_export_title: "Grade Export"
+  grade_report_header_course: course
+  grade_report_header_course_id: "course id"
+  grade_report_header_course_sis: "course sis"
+  grade_report_header_current_score: "current score"
+  grade_report_header_enrollment_state: "enrollment state"
+  grade_report_header_final_score: "final score"
+  grade_report_header_section: section
+  grade_report_header_section_id: "section id"
+  grade_report_header_section_sis: "section sis"
+  grade_report_header_student_id: "student id"
+  grade_report_header_student_name: "student name"
+  grade_report_header_student_sis: "student sis"
+  grade_report_header_term: term
+  grade_report_header_term_id: "term id"
+  grade_report_header_term_sis: "term sis"
+  grade_summary: 
+    graph_title: "Mean %{mean}, High %{high}, Low %{low}"
+    outcome: 
+      alignment_count: "*%{count}* Alignments"
   gradebook: 
     alerts: 
       no_active_students: "Sorry, there are either no active students in the course or none are gradable by you."
       no_students_in_groups_back: "Sorry, submissions for this assignment cannot be graded in Speedgrader because there are no assigned users. Please assign users to this group set and try again. Click 'OK' to go back."
       no_students_in_groups_close: "Sorry, submissions for this assignment cannot be graded in Speedgrader because there are no assigned users. Please assign users to this group set and try again. Click 'OK' to close this window."
       no_students_in_section: "Could not find any students in that section, falling back to showing all sections."
-      none_to_update: "None to Update"
-      scores_updated: 
-        one: "1 Student score updated"
-        other: "%{count} Student scores updated"
-      students_updated: 
-        one: "1 Student Updated"
-        other: "%{count} Students Updated"
-    assignment_details: "Assignment Details"
     buttons: 
-      change_section: "Change Section"
       saving_settings: "Saving Settings..."
       submit_comment: "Submit Comment"
       submitting: Submitting...
-      upload_data: "Upload Data"
     cancel_button: Cancel
     click_to_change: "Click to test a different score"
-    click_to_expand: "Click to expand"
-    computing_grades: "Computing Grades..."
     confirms: 
       delete_comment: "Are you sure you want to delete this comment?"
       unsaved_changes: |-
@@ -6402,79 +7077,26 @@ en-AU:
           
            %{users}
           Continue anyway?
-    curve_grade_for_course: "Curve Grade for %{assignment}"
-    curve_grades: "Curve Grades"
-    default_grade_for_course: "Default Grade for %{assignment}"
-    download_scores: "Download Scores (%{format})"
-    download_submissions: "Download Submissions"
     edit_view_rubric: "View Rubric"
     errors: 
-      failed_to_load: "Gradebook failed to load, please try refreshing the page"
-      none_to_update: "None to Update"
       select_an_option: "Please select an option"
-      upload_as_zip: "Please upload files as a .zip"
     graded_by_me: "%{graded_time} by me"
     graded_then_resubmitted: "graded, then resubmitted (%{when})"
     gradee_index_of_total: "%{gradee} %{x} of %{y}"
     group: Group
     hide_all_details_button: "Hide All Details"
-    hide_all_things: "Hide All %{things}"
-    hide_column: "Hide Column"
-    hide_student_name: "Hide Student Names"
-    ignore_ungraded: "Ignore Ungraded Assignments"
-    include_ungraded: "Include Ungraded Assignments"
-    labels: 
-      details: Details
-    links: 
-      download_attachment: "Download %{attachment}"
-      finish_scoring: "Finish Scoring this Quiz"
-      go_to_submission: "Go To Submission URL"
-      submission_details: "Submission Details"
-      view_quiz: "View this Quiz"
-      view_submission: "View Submission"
-    message_students_who: "Message Students Who..."
     mute_assignment: "Mute Assignment"
     new_assessment: "[New Assessment]"
     no_submission_time: "no submission time"
     nth_student: "Student %{n}"
     portion_graded: "%{x} / %{y} Graded"
-    publish_to_sis: "Publish grades to SIS"
-    reupload_submission_files: "Re-Upload Submission Files"
-    reupload_submissions: "Re-Upload Submissions"
-    set_default_grade: "Set Default Grade"
-    set_group_weights: "Set Group Weights"
     show_all_details_button: "Show All Details"
-    show_student_name: "Show Student Names"
-    showing_all_sections: "Showing All Sections"
-    showing_section: "Showing Section: %{section}"
-    sort_columns_by: "Sort Columns By..."
-    sort_rows_by: "Sort Rows By..."
-    speed_grader: SpeedGrader
     student: Student
     student_mute_notification: "Instructor is working on grades"
-    student_name: "Student Name"
-    students_who: 
-      havent_been_graded: "Haven't been graded"
-      havent_submitted_yet: "Haven't submitted yet"
-      no_grade_for: "No grade for %{assignment}"
-      no_submission_for: "No submission for %{assignment}"
-      not_submitted_yet: "Haven't submitted yet"
-      scored_less_than: "Scored less than"
-      scored_less_than_on: "Scored less than %{cutoff} on %{assignment}"
-      scored_more_than: "Scored more than"
-      scored_more_than_on: "Scored more than %{cutoff} on %{assignment}"
-    submission_information: "Submission Information"
-    teacher_muted_title: "Assignment is muted"
     titles: 
-      assignment_groups: "Assignment Groups"
       click_to_record: "Click the mic to record your comments"
       dropped_assignment_no_total: "This assignment will not be considered in the total calculation"
       hypothetical_score: "This is a What-If score"
-      loading: Loading...
-      turnitin_score: "Turnitin similarity score -- more information"
-    tooltips: 
-      submission_dropped: "This submission is dropped for grading purposes"
-      submitted_late: "This submission was submitted late"
     turnitin: 
       error_message: "There was an error submitting to turnitin. Please try resubmitting the file before contacting support"
       info_message: "This file is still being processed by turnitin. Please check back later to see the score"
@@ -6484,12 +7106,8 @@ en-AU:
         pending: "Turnitin Similarity Score - Submission pending"
         score: "Turnitin Similarity Score - See detailed report"
     unmute_assignment: "Unmute Assignment"
-    unmute_button: "Unmute Assignment"
-    upload_scores: "Upload Scores (from %{format})"
-    view_grading_history: "View Grading History"
   gradebook2: 
     alerts: 
-      none_to_update: "None to Update"
       scores_updated: 
         one: "1 Student score updated"
         other: "%{count} Student scores updated"
@@ -6508,6 +7126,7 @@ en-AU:
     error: 
       update: "There was an error updating this assignment. Please refresh the page and try again."
     errors: 
+      no_points_possible: "Cannot curve without points possible"
       none_to_update: "None to Update"
       upload_as_zip: "Please upload files as a .zip"
     grade_display_warning: 
@@ -6658,19 +7277,6 @@ en-AU:
       upload_form: "Choose a CSV file to upload"
     what_should_csv_look_like: "What should the CSV file look like?"
   gradebooks: 
-    assignment: 
-      gradebook: 
-        unmute_assignment: "Unmute Assignment"
-      out_of_points_possible: "*out of* %{points_possible}"
-      points_possible_of_grade: "%{points_possible} *of grade*"
-      teacher_muted_title: "Assignment is muted"
-      unmute_dialog: "This assignment is currently muted. That means students can't see their grades and feedback. Would you like to unmute now?"
-      zero_point_assignment: "Assignments in this group have no points possible and cannot be included in grade calculation"
-    assignments: 
-      options: Options
-      refresh_grades: "Refresh Grades"
-      titles: 
-        refresh_scores: "Refresh Scores"
     attendance: 
       attendance_info: "No attendance assignments have been created."
       buttons: 
@@ -6718,10 +7324,14 @@ en-AU:
       close_rubric: "Close Rubric"
       close_score: Close
       close_score_screenreader: "Close score details"
+      collapse: Collapse
       comment_count: 
         one: "1 comment"
         other: "%{count} comments"
       comment_count_screenreader: "Read comments"
+      comments: Comments
+      disabled_for_student_view: "Test Student scores are not included in grade statistics."
+      expand: Expand
       faculty_journal: "Faculty Journal for %{user}"
       for_course: "For the course,"
       headers: 
@@ -6737,11 +7347,8 @@ en-AU:
       labels: 
         final_grade_hidden: "Calculation of totals has been disabled"
         high: High
-        high_score: High
         low: Low
-        low_score: Low
         mean: Mean
-        mean_score: Mean
         only_graded: "Calculate based only on graded assignments"
         total: Total
         your_score: "Your Score"
@@ -6755,6 +7362,7 @@ en-AU:
       not_official: "*NOTE*: This is NOT your official score."
       page_title: "Grades for %{student}"
       print_grades: "Print grades"
+      score_details: "Score Details"
       see_rubric_results: "See rubric results"
       see_rubric_results_screenreader: "See rubric results"
       see_scoring_details: "See scoring details"
@@ -6770,80 +7378,6 @@ en-AU:
         view_rubric_evaluation: "View Rubric Evaluation"
         view_scoring_details: "View Scoring Details"
       total: Total
-    gradebook: 
-      all_sections: All
-      assignment_submitted_late: (late)
-      buttons: 
-        by_due_date: "By Due Date"
-        by_email: "By Email/ID"
-        by_group: "By Assignment Group"
-        by_name: "By Student Name"
-        by_section: "By Section Name"
-        by_total_asc: "By Total (Lowest First)"
-        by_total_desc: "By Total (Highest First)"
-        curve_grades: "Curve Grades"
-        done: Done
-        normalize: "Make it Total 100%"
-        set_grade: "Set Grade"
-        update: Update
-        upload: "Upload Files"
-      curve_average: "Enter an average grade for the curve for *the assignment*. The chart shows a best attempt at curving the grades based on current student scores."
-      default_grades: "Give all currently visible students the same grade for %{class} by entering and submitting a grade value below:"
-      download: "Download %{attachment}"
-      grade_statistics: "Grade statistics for %{assignment}"
-      headers: 
-        loading_gradebook: "Loading Gradebook..."
-      hide_names: "Hide Student Names"
-      labels: 
-        assign_blanks: "Assign zero's to unsubmitted students"
-        assignment_submitted: Submitted
-        average_score: "Average Score"
-        choose_section: "Section to show"
-        comments: "Comments for student"
-        grade: Grade
-        group_comment: "Send Comment to the Whole Group"
-        high_score: "High Score"
-        low_score: "Low Score"
-        send_comment: "Send a Comment to the Student"
-        sort_columns: "Sort Gradebook Columns"
-        sort_rows: "Sort Gradebook Rows"
-        total_grade_subs: "Total Graded Submissions"
-      links: 
-        add_assignments: "Add Assignments to the Course"
-        add_students: "Add Students to the Course"
-        attach_file: "Attach File"
-        manage: "Manage Assignment Groups"
-      loading_submission: "Loading Submission Details..."
-      no_assignments: "No Assignments created yet for this course."
-      no_comments: "No Comments"
-      no_students: "No Students are enrolled in the course."
-      out_of_points_possible: "*out of* %{points_possible}"
-      overwrite: "Overwrite already-entered grades"
-      submissions: submissions
-      title: 
-        quiz: "Quiz Submission"
-      titles: 
-        choose_section: "Choose A Section To Show"
-        comments: "Submission Comments"
-        complete: Complete
-        discussion: "Discussion Submission"
-        fail: Fail
-        incomplete: Incomplete
-        media: "Media Comment Submission"
-        new_message: "New message for this submission"
-        pass: Pass
-        quiz_review: "This quiz needs review"
-        submission_review: "This submission needs review"
-        text: "Text Entry Submission"
-        total: Total
-        turnitin: "This submission has a turnitin similarity score"
-        upload: "File Upload Submission"
-        url: "URL Submission"
-        view: View
-      try_out_the_new_gradebook: "Try out the new gradebook"
-      upload_info: "If you made changes to the student submission files you downloaded before, just zip them back up and upload the zip with the form below. Students will see the modified files in their comments for the submission."
-      upload_warning: "Make sure you don't change the names of the submission files so we can recognize them."
-      weight_final: "Weight final grade based on groups"
     gradebook2: 
       arrange_columns_by_due_date: "Arrange columns by due date"
       arrange_columns_by_group: "Arrange columns by assignment group"
@@ -6852,8 +7386,8 @@ en-AU:
       grades: Grades
       hide_student_names: "Hide Student Names"
       include_ungraded: "Treat Ungraded as 0"
+      individual_view: "Switch to Individual View"
       learning_mastery: "Learning Mastery"
-      old_gradebook: "old gradebook"
       post_grades: "Post Grades"
       publish_to_sis: "Publish grades to SIS"
       set_group_weights: "Set Group Weights"
@@ -6893,24 +7427,8 @@ en-AU:
         other: "Files and comments created for %{count} submissions"
     out_of_final: "%{weight} of Final"
     out_of_points_possible: "out of %{points_possible}"
-    show: 
-      keycode_descriptions: 
-        edit_cell: "Edit Cell"
-        more_information: "More Information for Current Cell"
-        next_assignment: "Next Assignment"
-        next_student: "Next Student"
-        previous_assignment: "Previous Assignment"
-        previous_student: "Previous Student"
-        refresh_gradebook: "Refresh Gradebook"
-      keycodes: 
-        edit_cell: enter
-        more_information: i
-        next_assignment: right
-        next_student: down
-        previous_assignment: left
-        previous_student: up
-        refresh_gradebook: r
-      page_title: Gradebook
+    screenreader: 
+      page_titles: "Gradebook: Individual View"
     speed_grader: 
       all_sections: "All Sections"
       attach: Attach
@@ -6989,9 +7507,6 @@ en-AU:
         speech_recognition: "Speech Recognition"
     speed_grader_disabled: "SpeedGrader is disabled for this course"
     speedgrader_enabled_only_for_published_content: "Speedgrader is enabled only for published content."
-    student: 
-      new_student: "New Student"
-      student: Student
     student_attendance: 
       headers: 
         assignment: Assignment
@@ -7007,16 +7522,6 @@ en-AU:
         absent: "Marked as Absent, click for more details"
         click_for_details: "Click for More Details"
         present: "Marked as Present, click for more details"
-    submission: 
-      titles: 
-        submission_review: "This submission needs review"
-    submission_score: 
-      icons: 
-        discussion_submission: "Discussion Submission"
-        file_upload_submission: "File Upload Submission"
-        online_url_submission: "Online Url Submission"
-        quiz_submission: "Quiz Submission"
-        text_entry_submission: "Text Entry Submission"
     submissions_zip_upload: 
       comments_made: 
         one: "1 Comment Made"
@@ -7073,7 +7578,29 @@ en-AU:
       saving: Saving...
     titles: 
       grading_scheme_info: "View/Edit Grading Scheme"
+  granite_report_header_account_id: account_id
+  granite_report_header_assignment_id: assignment_id
+  granite_report_header_assignment_name: assignment_name
+  granite_report_header_assignment_unique_id: assignment_unique_id
+  granite_report_header_course_id: course_id
+  granite_report_header_department: Department
+  granite_report_header_ends: Ends
+  granite_report_header_graded_at: graded_at
+  granite_report_header_name: Name
+  granite_report_header_observer_count: Observer_Count
+  granite_report_header_sis_id: SIS_Id
+  granite_report_header_starts: Starts
+  granite_report_header_student_count: Student_Count
+  granite_report_header_submission_date: submission_date
+  granite_report_header_submission_id: submission_id
+  granite_report_header_submission_score: submission_score
+  granite_report_header_ta_count: TA_Count
+  granite_report_header_teacher_count: Teacher_Count
+  granite_report_header_term: Term
+  granite_report_header_term_id: term_id
+  granite_report_header_user_id: user_id
   group: 
+    greater_than_1: "Must be greater than 1"
     memeber: Member
     name_required: "Name is required"
     name_too_long: "Enter a shorter group name"
@@ -7096,6 +7623,7 @@ en-AU:
       imported: "Imported Groups"
       student_organized: "Student Groups"
       uncategorized: Uncategorised
+    invalid_auto_leader: "AutoLeader type needs to be one of the following values: %{values}"
     invalid_self_signup: "Self-signup needs to be one of the following values: %{values}"
     name_required: "Name is required"
     name_reserved: "%{name} is a reserved name."
@@ -7199,6 +7727,8 @@ en-AU:
         open_to_course_members: "Course members are free to join"
       page_title: "Course Groups"
       student_group_warning: "If your teacher has talked about putting you into groups as part of an assignment, this is not the way to make that happen. Groups you organize yourself can't be used for grading... you can still form your own groups, but you won't be able to turn in an electric copy of any assignments unless your teacher builds the groups for you."
+      student_groups_tabs_everyone: Everyone
+      student_groups_tabs_groups: Groups
     context_manage_groups: 
       account_group_explanation: "Account-level student groups are a good way to group students without being tied to a specific course. Every student group gets their own calendar, discussion board and collaboration tools so they can organize themselves and work together more effectively."
       actions: 
@@ -7263,6 +7793,7 @@ en-AU:
       no_members: "No members"
       one: "1 Group"
       other: "%{count} Groups"
+    group_limit_number: "Group limit must be a number"
     group_name: "Group Name"
     groups_count: "Groups (%{count})"
     index: 
@@ -7302,17 +7833,23 @@ en-AU:
         headings: 
           account_groups: "Account-level Student Groups"
           course_groups: "Student Groups"
+        tabs: 
+          everyone: Everyone
       group_category: 
         randomly_assigning_students: "Randomly Assigning Students"
         search_groups: "Search groups"
         search_users: "Search users"
       group_category_create: 
         allow_self_signup: "Allow self sign-up"
+        auto_first_group_leader: "Set first student to join as group leader"
+        auto_group_leader: "Automatically assign a student group leader"
+        auto_random_group_leader: "Set a random student as group leader"
         cancel: Cancel
         create_groups: "Create %h{num_groups} groups now"
         create_groups_manually: "I'll create groups manually"
         group_set_name: "Group Set Name"
         group_structure: "Group Structure"
+        leadership: Leadership
         leave_group_limit_blank: "Leave blank for no limit"
         limit_group_size: "Limit groups to %h{group_limit} members"
         require_same_section: "Require group members to be in the same section"
@@ -7337,6 +7874,7 @@ en-AU:
       group_category_edit: 
         allow_self_signup: "Allow self sign-up"
         cancel: Cancel
+        group_limit_override: "Changing this will override any individually set group limits"
         group_set_name: "Group Set Name"
         leave_group_limit_blank: "Leave blank for no limit"
         limit_group_size: "Limit groups to %h{group_limit} members"
@@ -7348,12 +7886,16 @@ en-AU:
         group_delete: Delete
         group_edit: Edit
         group_full: Full
+        group_leader: "Group Leader"
         group_settings: Settings
         show_group_details: "Show details for group %{name}"
         visit_group_homepage: "Visit Group Homepage"
       group_edit: 
         cancel: Cancel
         group_join_level: Joining
+        group_max_membership: "Limit groups to"
+        group_max_membership_help: "(Leave blank to use group set max)"
+        group_max_membership_members: members
         group_name: "Group Name"
         invitation_only: "Invitation only"
         open: "Members are free to join"
@@ -7362,11 +7904,16 @@ en-AU:
       group_user: 
         assign_to_group: "Assign to Group"
         assign_user_to_group: "Assign %{name} to a group"
-        edit_user_group_assignment: "Remove or move %{name} from group"
+        edit_group_membership: "Edit %{name}'s membership"
+        group_leader: "Group Leader"
         move: "Move To..."
         move_to_new_group: "Move %{name} to a new group"
         remove: Remove
+        remove_as_leader: "Remove as Leader"
         remove_from_group: "Remove %{name} from group"
+        remove_user_as_leader: "Remove %{name} as leader"
+        set_as_leader: "Set as Leader"
+        set_user_as_leader: "Set %{name} as leader"
       group_users: 
         add_student: "Add a student to get started."
         add_user: "Add a user to get started."
@@ -7384,6 +7931,7 @@ en-AU:
       self_signup_help: 
         about_self_signup_groups: "About Self Sign-up Groups"
         self_signup_description: "You can create sets of groups where students can sign up on their own. Students are still limited to being in only one group in the set, but this way students can organise themselves into groups instead of needing the teacher to do the work. Note that as long as this option is enabled, students can move themselves from one group to another."
+    max_membership_number: "Max membership must be a number"
     member: 
       one: "1 member"
       other: "%{count} members"
@@ -7409,6 +7957,7 @@ en-AU:
     randomly_assigning_members: "Randomly Assigning Students"
     show: 
       coming_up: "Coming Up"
+      edit_group: "Edit Group"
       group_atom_feed: "Group Atom Feed"
       new_announcement: "New Announcement"
       next_week: "the next week"
@@ -7455,6 +8004,7 @@ en-AU:
     which_course_is_this_question_about: "Which course is this question about?"
     your_email_address: "Your email address"
   helpers: 
+    course: Course
     dashboard_helper: 
       announcement_details: "Announcement Details"
       assignment_details: "Assignment Details"
@@ -7473,11 +8023,22 @@ en-AU:
       x_new_in_discussions: 
         one: "*%{count}* Discussions"
         other: "*%{count}* Discussions"
+    local: Local
   high_contrast_description: |-
       If you would prefer a higher-contrast version of the Canvas user interface, enable this.
       This might be useful for people with impaired vision or dificulty reading.
+  html5_first_videos_description: |-
+      By default, Canvas will try to use Flash first to play videos. Turn this on to try using HTML5 first,
+      then fall back to Flash.
   ic_actions: 
     manage: manage
+  icons: 
+    discussion_submission: "Discussion Submission"
+    file_upload_submission: "File Upload Submission"
+    media_submission: "Media Submission"
+    online_url_submission: "Online Url Submission"
+    quiz_submission: "Quiz Submission"
+    text_entry_submission: "Text Entry Submission"
   images: 
     error_checking_color: "Error checking image colour"
     invalid_background_color: "Background colour must be %{colour}"
@@ -7495,7 +8056,11 @@ en-AU:
   importers/context_module_importer: 
     migration_module_item_type: "Module Item"
   importers/course_content_importer: 
+    account_grading_standard_warning: "Couldn't find account grading standard for the course."
+    copied_grading_standard_warning: "Couldn't find copied grading standard for the course."
+    due_dates_warning: "Couldn't adjust the due dates."
     failed_import_media_objects: "Failed to import media objects"
+    file_import_warning: "File %{file} could not be found"
   importers/learning_outcome_group_importer: 
     no_global_permission: "You're not allowed to manage global outcomes, can't add \"%{title}\""
   importers/learning_outcome_importer: 
@@ -7507,7 +8072,6 @@ en-AU:
     title_for_topics_category: "%{category} Topics"
     warnings: 
       truncated_wiki_title: "The title of the following wiki page was truncated: %{title}"
-  individual_gradebook_description: "Individual Gradebook View provides a gradebook view that is designed for accessibility."
   info: 
     notices: 
       error_reported: "Thanks for your help!  We'll get right on this"
@@ -7530,12 +8094,13 @@ en-AU:
       search_by_tag: "Search by Tag"
     confirms: 
       default_delete_thing: "Are you sure you want to delete this?"
+    course_time: "COURSE:"
     datepicker: 
       titles: 
         am_pm: am/pm
     draft: Draft
     errors: 
-      cannot_view_document_inline: "This document cannot be viewed inline, you might not have permission to view it or it might have been deleted."
+      cannot_view_document_in_canvas: "This document cannot be displayed within Canvas."
       document_preview_processing: "The document preview is currently being processed. Please try again later."
       field_is_required: "This field is required"
       invalid_datetime: "Invalid date/time value"
@@ -7555,6 +8120,7 @@ en-AU:
       minimize_youtube_video: "Minimize Video"
       view_equella_content_in_new_window: "view the content in a new window"
     loading: Loading...
+    local_time: "LOCAL:"
     no_description: "No description"
     no_items: "No items."
     no_results_found: "No Results Found"
@@ -7580,6 +8146,7 @@ en-AU:
       view_in_new_window: "View in a new window"
     tooltips: 
       enter_search_terms: "enter search terms"
+  invalid_points_possible: "The value of possible points for this assigment must be zero or greater."
   invalid_url_in_xml: "Invalid url in xml. Ampersands must be escaped."
   invalid_xml_syntax: "invalid xml syntax"
   jobs: 
@@ -7627,6 +8194,7 @@ en-AU:
         locked_by: "Locked By"
         max_attempts: "Max Attempts"
         num_attempts: Attempts
+        original_job_id: "Original Job ID"
         priority: Priority
         run_at: "Run At"
         strand: strand
@@ -7643,9 +8211,12 @@ en-AU:
       next: Next
       previous: Previous
   labels: 
-    lock_module_until: "lock module until a given date"
+    lock_module_until: "Lock module until a given date"
+  last_submission_activity_title: "Last Submission Activity"
+  last_user_access_title: "Last User Access"
   layouts: 
     application: 
+      group_switch: Switch
       instructure_description: "Instructure, makers of the open source learning management system Canvas"
       keyboard_navigation: 
         close: "Press comma to close this dialog"
@@ -7663,6 +8234,7 @@ en-AU:
         grades: Grades
       navigation: 
         main: "Main Navigation"
+        user_menu: "User Menu"
       open_source_learning_management_system: "Open Source LMS"
     facebook: 
       title: "Facebook Page"
@@ -7691,6 +8263,7 @@ en-AU:
   learning_outcome: 
     no_comment: "No Comment"
     no_description: "No Description"
+  learning_outcome_assignment_type_title: "Learning Outcome and Assignment Type"
   lib: 
     angel: 
       failed_import_link: "Failed import link"
@@ -7766,6 +8339,17 @@ en-AU:
       word_separator: " "
   license_help: 
     content_license_help: "Content Licensing Help"
+  lincoln_report_header_course_id: "Course ID"
+  lincoln_report_header_course_name: "Course Name"
+  lincoln_report_header_course_role: "Course Role"
+  lincoln_report_header_course_sis_id: "Course SIS ID"
+  lincoln_report_header_current_grade: "Current Grade"
+  lincoln_report_header_invalid_term: "Invalid Term"
+  lincoln_report_header_login: "login ID"
+  lincoln_report_header_student_name: "Student Name"
+  lincoln_report_header_student_sis: "Student SIS ID"
+  lincoln_report_header_term_id: "Term ID"
+  lincoln_report_header_term_name: "Term Name"
   link_enrollment: 
     buttons: 
       link: "Link to Student"
@@ -7856,6 +8440,8 @@ en-AU:
     my_courses: "My Courses"
   message: 
     default_subject: "Canvas Alert"
+  message_dialog_component: 
+    ok: Ok
   message_students: 
     buttons: 
       send_message: "Send Message"
@@ -8000,7 +8586,7 @@ en-AU:
           attendee: Attendee
           attendees: Attendees
           cancel_reason: "Reason for canceling"
-          click_to_see_assignment: "Click here to view the assignment"
+          click_to_see_appointment: "Click here to view the appointment"
           date_and_time: Date/Time
           details: "Appointment Details"
           group: Group
@@ -8008,7 +8594,6 @@ en-AU:
           no_reason_given: "none given"
           slots_remaining: "Available time slots"
           subject: "Reservation cancelled for %{appointment_name} (%{course})"
-          view_appointment: "View the appointment at the following link"
         instructions: "View the appointment at the following link: %{link}"
         labels: 
           attendee: Attendee
@@ -8377,7 +8962,7 @@ en-AU:
         html: 
           assignment_due_date_changed: "Assignment Due Date Changed: %{assignment_name}, %{course_name} (%{override})"
           assignment_due_date_changed_sentence: "The due date for the assignment, %{assignment_name}, for the course, %{course_name} (%{override}), has changed to:"
-          link_text: "View the assignment"
+          link: "Click here to view the assignment"
           no_due_date: "No Due Date"
         labels: 
           click_to_see_assignment: "Click here to view the assignment"
@@ -8402,7 +8987,7 @@ en-AU:
         assignment_graded: "Assignment Graded: %{assignment_name}, %{course_name}"
         html: 
           assignment_graded: "Assignment Graded: %{assignment_name}, %{course_name}"
-          link_text: "View the assignment"
+          link: "Click here to view the assignment"
           the_assignment_is_graded: "The assignment, %{assignment_name}, has been graded."
         labels: 
           view_here: "You can view it here"
@@ -8424,7 +9009,7 @@ en-AU:
     assignment_resubmitted: 
       email: 
         html: 
-          link_text: "View the submission"
+          link: "Click here to view the submission"
           user_resubmitted: "Re-Submission: %{user_name}, %{assignment_name}"
           user_resubmitted_sentence: "%{user_name} has just turned in a re-submission for %{assignment_name} in the course %{course_name}"
         labels: 
@@ -8445,7 +9030,7 @@ en-AU:
     assignment_submitted: 
       email: 
         html: 
-          link_text: "View the submission"
+          link: "Click here to view the submission"
           user_submitted: "Submission: %{user_name}, %{assignment_name}"
           user_submitted_sentence: "%{user_name} has just turned in a submission for %{assignment_name} in the course %{course_name}"
         labels: 
@@ -8466,7 +9051,7 @@ en-AU:
     assignment_submitted_late: 
       email: 
         html: 
-          link_text: "View the submission"
+          link: "Click here to view the submission"
           user_resubmitted_sentence: "%{user_name} has just turned in a late submission for %{assignment_name} in the course %{course_name}"
           user_submitted: "Late Assignment: %{user_name}, %{assignment_name}"
         labels: 
@@ -8606,18 +9191,15 @@ en-AU:
       email: 
         attached_files: "Attached Files:"
         audio_comment: "This message includes media comments. To listen or reply, click the link below:"
-        body: "%{user_name} just sent you a message in Canvas:"
         html: 
           attached_files: "Attached Files:"
-          audio_comment: "This message includes media comments. To listen or reply, click the link below:"
-          body: "%{user_name} just sent you a message in Canvas:"
           download: download
-          reply_to_conversation_message: "You can reply to this message in Canvas by replying directly to this email."
           subject: "%{user_name} just sent you a message in Canvas."
           unknown_user: "Unknown User"
-        reply_to_conversation_message: "You can reply to this message in Canvas by replying directly to this email."
+          view_message: "View this message in Conversations"
         subject: "%{user_name} just sent you a message in Canvas."
         unknown_user: "Unknown User"
+        view_message: "View this message in Conversations"
       facebook: 
         body: "%{user_name} just sent you a message in Canvas."
         link_text: "View Message"
@@ -8971,8 +9553,8 @@ en-AU:
           grading_based_on_points: "Grading is based on total points for all assignments."
           labels: 
             grades_based_on_percent: "Grading is based on the weighted total for each assignment group"
-            now_see_here: "You can see details here"
             subject: "Grade Weight Changed"
+          see_details: "You can see details here"
         labels: 
           grades_based_on_percent: "Grading is based on the weighted total for each assignment group"
           now_see_here: "You can see details here"
@@ -9078,7 +9660,7 @@ en-AU:
     layout: 
       email: 
         html: 
-          click_to_preferences: "Click here to edit your notification preferences"
+          click_to_preferences: "Update your notification settings"
     merge_email_communication_channel: 
       email: 
         body: "An account has been created for you at %{host}, but you already have a Canvas account.  If you would like to merge them together, please visit the following url:"
@@ -9241,7 +9823,7 @@ en-AU:
         discussion_entry_reply_message: "Join the conversation using the link below, or comment by replying to this message."
         html: 
           body: "%{user} posted a new comment on the thread %{discussion_topic} for %{course}:"
-          discussion_entry_link_message: "[Click here to join the conversation](%{url}), or comment by replying to this message."
+          link: "Click here to join the conversation"
           subject: "New Comment for %{discussion_topic}: %{course}"
         subject: "New Comment for %{discussion_topic}: %{course}"
       facebook: 
@@ -9260,8 +9842,8 @@ en-AU:
         html: 
           attached_file: "Attached File"
           body: "A new discussion has been started that may be interesting to you:"
-          details: "Join the conversation here"
           download: download
+          link: "Click here to join the conversation"
           subject: "New Discussion - %{discussion_topic}: %{course}"
         labels: 
           file_included: "File Included"
@@ -9329,7 +9911,7 @@ en-AU:
         body: "%{count} new files have been added for the course, %{name}:"
         html: 
           body: "%{count} new files have been added for the course, %{name}:"
-          link: "You can view them here"
+          see_details: "You can view them here"
           subject: "%{count} new files added for the course, %{name}:"
         link: "You can view them here"
         subject: "%{count} new files added for the course, %{name}:"
@@ -9377,8 +9959,8 @@ en-AU:
         body: "%{user} just registered as a teacher at %{website}."
         html: 
           body: "%{user} just registered as a teacher at %{website}."
+          details: "Click here to view teacher"
           email: Email
-          link: "Click here to view teacher"
           phone: Phone
           school_name: "School Name"
           school_position: "School Position"
@@ -9541,6 +10123,7 @@ en-AU:
         body: "%{author} just made a new comment on the submission for %{user} for %{assignment}"
         html: 
           body: "%{author} just made a new comment on the submission for %{user} for %{assignment}"
+          link_message: "Click here to view the comment"
           someone: Someone
           subject: "Submission Comment: %{user}, %{assignment}, %{context}"
           submission_comment_link_message: "You can review the submission details using the link below, or can reply to this comment by responding to this message."
@@ -9564,7 +10147,8 @@ en-AU:
         body: "%{author} just made a new comment on the submission for %{user} for %{assignment}"
         html: 
           body: "%{author} just made a new comment on the submission for %{user} for %{assignment}"
-          link_message: "You can review the submission details here:"
+          link_message: "You can review the submission details by clicking the link below:"
+          review_submission: "Click here to review the submission"
           someone: Someone
           subject: "Submission Comment: %{user}, %{assignment}, %{context}"
         someone: Someone
@@ -9774,6 +10358,7 @@ en-AU:
     ecollege: 
       course_not_found: "The ECollege course wasn't found."
     external_feed_type: "External Feed"
+    external_tool_type: "External Tool"
     file_type: File
     grading_standard_type: "Grading Standard"
     group_type: Group
@@ -9788,6 +10373,18 @@ en-AU:
   migration_issues: 
     errors: 
       valid_workflow_state: "Must send a valid workflow state"
+  mississippi_report_header_course_id: course_id
+  mississippi_report_header_enrollment_id: enrollment_id
+  mississippi_report_header_enrollment_state: enrollment_state
+  mississippi_report_header_observer_sis_id: observer_sis_id
+  mississippi_report_header_observer_user_id: observer_user_id
+  mississippi_report_header_role: role
+  mississippi_report_header_section_id: section_id
+  mississippi_report_header_sis_course_id: sis_course_id
+  mississippi_report_header_sis_section_id: sis_section_id
+  mississippi_report_header_sis_user_id: sis_user_id
+  mississippi_report_header_user_id: user_id
+  mississippi_sis_title: "SIS data"
   module_item_types: 
     assignment: Assignment
     disuccsion: Discussion
@@ -9849,6 +10446,7 @@ en-AU:
     where_to_move: "Where would you like to move *%{name}*?"
   move_dialog_select: 
     move_to_end: "-- At the bottom --"
+  multi_student_progress_title: "Multi-Student Progress"
   mute_dialog: 
     curving_assignments: "Curving assignments"
     grade_change_notifications: "Grade change notifications"
@@ -9861,12 +10459,28 @@ en-AU:
     sure_you_want_to_mute: "Are you sure you want to mute this assignment? While this assignment is muted, students will not receive new notifications about or be able to see:"
   name: "Academic Benchmark Importer"
   new_facebook_message: "You have a new message from Canvas"
+  new_quiz_moderate_desc: "When Draft State and Quiz Statistics is allowed/on, this enables the new quiz moderate page for an account."
+  new_quiz_statistics_desc: "When Draft State is allowed/on, this enables the new quiz statistics page for an account."
   new_styles_description: |-
       We are working on a UI facelift to Canvas. Turn this on to opt-in to seeing the
       updated, simplified look and feel of the Canvas interface.
+  newark_report_header__assignment_count: "# of assignments"
+  newark_report_header_assignment_due_date: "assignment due date"
+  newark_report_header_assignment_group_name: "assignment group name"
+  newark_report_header_assignment_id: "assignment id"
+  newark_report_header_assignment_name: "assignment name"
+  newark_report_header_course_code: "course code"
+  newark_report_header_course_id: "course id"
+  newark_report_header_course_name: "course name"
+  newark_report_header_course_sis_id: "course sis id"
+  newark_report_header_due_date: "due date"
+  newark_report_header_section_id: "section id"
+  newark_report_header_section_name: "section name"
+  newark_report_header_student_name: "student name"
+  newark_report_header_teacher_id: "teacher id"
+  newark_report_header_teacher_name: "teacher name"
   no_migration_file: "File required for content migration."
   not_a_number: "must be a positive number"
-  not_applicable: N/A
   notification: 
     added_to_conversation_description: "You are added to a conversation"
     added_to_conversation_display: "Added To Conversation"
@@ -10127,8 +10741,32 @@ en-AU:
     account_group_description: "Account level outcomes group."
   outcome_path_mastery_points: "%{path} mastery points"
   outcome_path_result: "%{path} result"
+  outcome_report_header_assessment_id: "assessment id"
+  outcome_report_header_assessment_question: "assessment question"
+  outcome_report_header_assessment_question_id: "assessment question id"
+  outcome_report_header_assessment_title: "assessment title"
+  outcome_report_header_assessment_type: "assessment type"
+  outcome_report_header_assignment_id: "assignment id"
+  outcome_report_header_assignment_title: "assignment title"
+  outcome_report_header_assignment_url: "assignment url"
+  outcome_report_header_attempt: attempt
+  outcome_report_header_course_id: "course id"
+  outcome_report_header_course_name: "course name"
+  outcome_report_header_course_sis_id: "course sis id"
+  outcome_report_header_learning_outcome_id: "learning outcome id"
+  outcome_report_header_learning_outcome_name: "learning outcome name"
+  outcome_report_header_outcome_score: "outcome score"
+  outcome_report_header_section_id: "section id"
+  outcome_report_header_section_name: "section name"
+  outcome_report_header_section_sis_id: "section sis id"
+  outcome_report_header_student_id: "student id"
+  outcome_report_header_student_name: "student name"
+  outcome_report_header_student_sis_id: "student sis id"
+  outcome_report_header_submission_date: "submission date"
+  outcome_report_header_submission_score: "submission score"
   outcome_results: 
     outcomes_filename: Outcomes
+  outcome_results_title: "Outcome Results"
   outcomes: 
     account_standards: "Account Standards"
     account_standards_description: "To the left you'll notice the standards your institution has created for you to use in your courses."
@@ -10183,8 +10821,10 @@ en-AU:
           manage: 
             description: "*Outcomes are created here to track mastery in a course. To get started, checkout the menu bar along the top. Click on the New button to create a new outcome, or the New Group button to create a new group to organise your outcomes into. The Find button will allow you to use outcomes that have been created by your state or institution. As you create and use outcomes you will be able to use the panel to the left to navigate through your outcomes. You can drag and drop outcomes between the different levels to create structure.* *More importantly, Canvas allows you to add outcomes to your grading rubrics so that you can evaluate mastery as you grade assignments. Once you've set up outcomes, click Manage Rubrics to start using your outcomes for grading.*"
             title: "Setting up Outcomes"
+    mastery: Mastery
     mastery_error: "Must be greater than or equal to 0"
     missing_outcome: "Couldn't find that learning outcome"
+    near: "Near mastery"
     new_outcome: "New Outcome"
     new_outcome_group: "New Outcome Group"
     outcome: 
@@ -10206,6 +10846,7 @@ en-AU:
       criterion_dialog: "Learning outcomes can be included in assignment rubrics as an easy way to assess mastery of outcomes aligned to specific assignments. When you define a learning outcome, you should also define a criterion that can be used when building assignment rubrics. Define as many rubric columns as you need, and specify a point threshold that will be used to define mastery of this outcome."
       criterion_info_link: "Click to learn about criterion ratings"
       description: "Describe this outcome"
+      display_name: "Friendly name (optional)"
       mastery: "Mastery at"
       points: "%{points_possible} Points"
       title: "Name this outcome"
@@ -10222,6 +10863,7 @@ en-AU:
       attempt_info: "attempt #%{attempt_number}, %{attempt_date}"
       outcome_mastered: mastered
       scoring: "%{points} out of %{possible_points}"
+    remedial: Remedial
     show: 
       no_aligned_items: "No aligned items"
       no_artifacts: "No artifacts"
@@ -10234,6 +10876,7 @@ en-AU:
     titles: 
       find_outcomes: "Find Outcomes"
     top_level: "%{context} Top Level"
+    undefined: Unstarted
     user_outcome_results: 
       artifacts: 
         one: "1 artifact"
@@ -10307,8 +10950,33 @@ en-AU:
     view_more_link: "View More"
   paginated_view: 
     loading_more_results: "Loading more results"
+  pasco_report_header_created_at: created_at
+  pasco_report_header_created_by_id: created_by_id
+  pasco_report_header_deleted_at: deleted_at
+  pasco_report_header_note: note
+  pasco_report_header_note_id: id
+  pasco_report_header_title: title
+  pasco_report_header_updated_at: updated_at
+  pasco_report_header_user_id: user_id
+  pasco_report_header_user_sis_id: user_sis_id
+  pasco_report_header_workflow_state: workflow_state
+  pasco_report_url: url
+  pasco_user_notes_title: "User Notes"
   paypal: 
     exception: "We're sorry, an error has occurred, please try again later."
+  pci_report_header_course_sis_id: course_sis_id
+  pci_report_header_submission_date: submission_date
+  pci_report_header_submission_type: submission_type
+  pci_report_header_user_sis: user_sis
+  penn_harris_student_grade_title: "Penn Harris Student Grades"
+  ph_student_grades_report_header_account_id: account_id
+  ph_student_grades_report_header_course_id: course_id
+  ph_student_grades_report_header_final_letter_grade: final_letter_grade
+  ph_student_grades_report_header_final_score: final_score
+  ph_student_grades_report_header_mark_type: mark_type
+  ph_student_grades_report_header_term_id: term_id
+  ph_student_grades_report_header_user_id: user_id
+  ph_student_grades_report_term_required: "A Term is required for this report."
   plugins: 
     academic_benchmark_importer: 
       description: "This enables importing Academic Benchmark standards into Canvas."
@@ -10358,11 +11026,16 @@ en-AU:
       secret_description: "This is the %{parameter_name} parameter that can be found in the %{filename} config file."
     buttons: 
       saving: Saving...
+    canvadocs: 
+      description: "Enable Canvadocs (compatible with Box View) as a document preview option"
+      name: Canvadocs
     canvadocs_settings: 
+      description: "This plugin integrates with Canvadocs (or any Box View compatible API) to provide an HTML5 document previewer."
       labels: 
         api_key: "API Key"
         base_url: "Base URL"
     crocodoc: 
+      description: "Enable Crocodoc as a document preview option"
       name: Crocodoc
     crocodoc_settings: 
       description: "This plugin integrates with Crocodoc to provide an HTML5 document previewer which provides teachers and students with the ability to annotate documents."
@@ -10413,10 +11086,19 @@ en-AU:
       description: "Canvas Facebook application"
       name: Facebook
     facebook_settings: 
+      description: |-
+          You will need to create a [new app on facebook.com](%{facebook_url}), and add 'App on Facebook' as a platform.
+          Set the following configuration options to ensure your Facebook app
+          works correctly:
+          
+          * **Settings -- App on Facebook -- Canvas Page:** make a note of whatever you choose (the part after apps.facebook.com) and enter in the form below
+          * **Settings -- App on Facebook -- Canvas URL:** set to %{canvas_url}
+          * After you save your app, make a note of the App ID, Client Token and App Secret
       domain_name: domain
       headers: 
         domain_settings: "Domain Settings"
       hints: 
+        api_key: "Also referred to as Client Token"
         canvas_domain: "this is the domain specified in \"Canvas URL\""
         canvas_name: "this is the path specified in \"Canvas Page\""
         disable_ssl: "Use only for local testing"
@@ -10641,6 +11323,17 @@ en-AU:
         access_key: "Access Key"
         api_url: "Api Url"
         secret_key: "Secret Key"
+  polling: 
+    poll_sessions: 
+      errors: 
+        course_required: "Course is required."
+      validations: 
+        section_belongs_to_course: "That course section does not belong to the existing course."
+    poll_submissions: 
+      validations: 
+        poll_choice_belongs_to_poll: "That poll choice does not belong to the existing poll."
+        poll_is_published: "This poll session is not open for submissions."
+        user_and_poll_session_uniqueness: "can only submit one choice per poll session."
   post_grades_description: |-
       Post Grades allows teachers to post grades back to enabled SIS systems: Powerschool,
       Aspire (SIS2000), JMC, and any other SIF-enabled SIS that accepts the SIF elements GradingCategory,
@@ -10946,6 +11639,36 @@ en-AU:
     upload_file_view: 
       choose_a_picture: "choose a picture"
       crop_instructions: "To crop image, drag the selection and then click the \"Save\" button below."
+  provisioning_report_header_account_id: account_id
+  provisioning_report_header_associated_user_id: associated_user_id
+  provisioning_report_header_canvas_account_id: canvas_account_id
+  provisioning_report_header_canvas_associated_user_id: canvas_associated_user_id
+  provisioning_report_header_canvas_course_id: canvas_course_id
+  provisioning_report_header_canvas_group_id: canvas_group_id
+  provisioning_report_header_canvas_parent_id: canvas_parent_id
+  provisioning_report_header_canvas_section_id: canvas_section_id
+  provisioning_report_header_canvas_term_id: canvas_term_id
+  provisioning_report_header_canvas_user_id: canvas_user_id
+  provisioning_report_header_canvas_xlist_course_id: canvas_xlist_course_id
+  provisioning_report_header_course_id: course_id
+  provisioning_report_header_email: email
+  provisioning_report_header_end_date: end_date
+  provisioning_report_header_first_name: first_name
+  provisioning_report_header_group_id: group_id
+  provisioning_report_header_last_name: last_name
+  provisioning_report_header_login_id: login_id
+  provisioning_report_header_long_name: long_name
+  provisioning_report_header_name: name
+  provisioning_report_header_parent_account_id: parent_account_id
+  provisioning_report_header_role: role
+  provisioning_report_header_section_id: section_id
+  provisioning_report_header_short_name: short_name
+  provisioning_report_header_start_date: start_date
+  provisioning_report_header_status: status
+  provisioning_report_header_term_id: term_id
+  provisioning_report_header_user_id: user_id
+  provisioning_report_header_xlist_course_id: xlist_course_id
+  provisioning_title: Provisioning
   pseudonym: 
     errors: 
       bad_credentials: "Invalid username or password"
@@ -11067,6 +11790,7 @@ en-AU:
       email_sent: "Confirmation email sent to %{email}, make sure to check your spam box"
       link_invalid: "The link you used is no longer valid.  If you can't log in, click \"Don't know your password?\" to reset your password."
       password_changed: "Password changed"
+  public_courses_title: "Public Courses"
   publish_btn_module: 
     buttons: 
       publish: Publish
@@ -11166,8 +11890,11 @@ en-AU:
   publish_icon_component: 
     publish: Publish
     publish_click: "published, click to unpublish"
+    published: Published
+    publishing: Publishing...
     unpublish: Unpublish
     unpublish_click: "unpublished, click to publish"
+    unpublishing: Unpublishing...
   publishable: 
     cant_unpublish: "Can't unpublish"
   publishableModuleItem: 
@@ -11292,6 +12019,16 @@ en-AU:
     quick_start_bar_view: 
       new: "New:"
   quiz: 
+    cancel: Cancel
+    cant_take_unpublished_quiz: "You can't take a quiz until it is published"
+    cant_unpublish_when_students_submit: "Can't unpublish if there are student submissions"
+    delete: Delete
+    delete_quiz: "Delete Quiz"
+    no_more_allowed_quiz_attempts: "You aren't allowed any more attempts on this quiz."
+    now_on_moderate: "This information is now found on the Moderate tab."
+    quiz_regraded_your_score_not_affected: "This quiz has been regraded; your score was not affected."
+    quiz_successfully_deleted: "Quiz Successfully Deleted!"
+    quiz_successfully_updated: "Quiz Successfully Updated!"
     regrade: 
       give_everyone_full_credit: "Give everyone full credit for this question."
       no_scores_reduced: "Award points for both corrected and previously correct answers (*no scores will be reduced*)"
@@ -11299,6 +12036,68 @@ en-AU:
       regrade_options: "Regrade Options *(for students who have already answered this question):*"
       some_scores_reduced: "Only award points for the correct answer (*some students' scores may be reduced*)"
       update_question_without_regrading: "Update question without regrading"
+    regrade_count_affected: "This quiz has been regraded; your new score reflects %{num} questions that were affected."
+    regrade_score_affected: "This quiz has been regraded; your score was affected."
+    resume_the_quiz: "Resume the Quiz"
+    resume_the_survey: "Resume the Survey"
+    take_the_quiz: "Take the Quiz"
+    take_the_quiz_again: "Take the Quiz Again"
+    take_the_survey: "Take the Survey"
+    take_the_survey_again: "Take the Survey Again"
+    there_are_no_files_to_download: "There are no files to download."
+    there_are_no_submissions_to_grade: "There are no submissions to grade."
+    time_limit_minutes: "%{limit} minutes"
+    warning: Warning
+    you_cannot_message_unpublished: "You can not message students until this quiz is published."
+  quiz_data_title: "Quiz Data"
+  quiz_extend_time: 
+    ending_time: "ending time"
+    extend_time: "Extend Time"
+    extensions_student: "Extend time for for %{student}"
+    extensions_successfully_added: "Extensions Successfully Added"
+    now: now
+  quiz_extensions: 
+    everyone_gets_attempts: "everyone already gets %{num}"
+    everyone_gets_time: "everyone already gets %{num} minutes"
+    extensions_num_students: "Extensions for %{num} Students"
+    extensions_student: "Extensions for %{student}"
+    extensions_successfully_added: "Extensions Successfully Added"
+    student_extensions: "Student Extensions"
+  quiz_index_row: 
+    cant_unpublish_when_students_submit: "Can't unpublish if there are student submissions"
+    confirms: 
+      delete_quiz: "Are you sure you want to delete this quiz?"
+    delete_quiz: "Delete Quiz"
+    edit_quiz: "Edit Quiz"
+    points: 
+      one: "1 pt"
+      other: "%{count} pts"
+    questions: 
+      one: "1 Question"
+      other: "%{count} Questions"
+  quiz_message_students: 
+    and_num_more_students: "and %{num} more students"
+    message_not_sent_because_empty: "Message not sent because it was left empty"
+    message_sent_successfully: "Message sent successfully"
+    message_students_who: "Message Students Who..."
+    student_who_have_not_taken_the_quiz: "Students Who Have Not Taken the Quiz"
+    students_who_have_taken_the_quiz: "Students Who Have Taken the Quiz"
+  quiz_model: 
+    everyone: Everyone
+    everyone_else: "Everyone Else"
+    graded_quiz: "Graded Quiz"
+    graded_survey: "Graded Survey"
+    keep_highest: Highest
+    keep_latest: Latest
+    practice_quiz: "Practice Quiz"
+    survey: Survey
+  quiz_moderate: 
+    change_extension_for: "Change extension for %{num} Students"
+    students_have_taken: "%{complete} of %{total} students have completed this quiz"
+  quiz_moderate_route: 
+    moderate: Moderate
+  quiz_overview_route: 
+    overview: Overview
   quiz_reports: 
     quiz_report_generator: 
       download_report_name: "Download %{report_name}"
@@ -11306,6 +12105,53 @@ en-AU:
       generated_at_date_time: "Generated %{dateAndTime}"
       generating_report_name: "Generating %{report_name}..."
       item_analysis_not_available: "Item Analysis is not available for Surveys"
+  quiz_route: 
+    that_quiz_doesnt_exist: "That quiz doesn't exist"
+    that_quiz_has_been_deleted: "That quiz has been deleted"
+  quiz_show: 
+    time_limit_minutes: "%{limit} minutes"
+  quiz_statistics: 
+    attempts: "Attempts: %{count} out of %{total}"
+    correct_essay_student_ratio: "%{ratio}% of your students received full credit for this question."
+    correct_multiple_response_ratio: "%{ratio}% of your students responded correctly."
+    correct_response_ratio: "%{ratio}% of your students correctly answered this question."
+    discrimination_index_help_dialog_title: "The Discrimination Index Chart"
+    errors: 
+      stats_empty: 
+        header: "Nothing to see here everybody."
+        info: "None of your students have taken this quiz yet."
+      stats_too_large: 
+        header: "Too much going on here everyone."
+        info: "This quiz is too large to display."
+    essay_score: "Score: %{score}"
+    generatable: "Report has never been generated."
+    generated: "Report is ready."
+    generated_at: "Generated at %{date}"
+    generating: "Report is being generated..."
+    generation_failed: "Something went wrong, please try again later."
+    item_analysis: "Item Analysis"
+    no_answer: "No Answer"
+    sort_by_discrimination_index: "Sort By Discrimination"
+    sort_by_position: "Sort By Position"
+    stats_error: 
+      image_alt: "Quiz statistics not available yet."
+    student_analysis: "Student Analysis"
+    unknown: 
+      header: "Something went wrong."
+      info: "An unexpected error has occurred."
+    unknown_answer: "Something Else"
+  quiz_statistics_route: 
+    quiz_statistics: Statistics
+  quiz_statistics_title: "Quiz Statistics"
+  quiz_submission: 
+    answers: 
+      correct: Correct!
+      correct_answers: "Correct Answers"
+      incorrect: Incorrect
+      partial: Partial
+      right: "Correct Answer"
+      unanswered: Unanswered
+      you_answered: "You Answered"
   quizzes: 
     after_last_attempt: "After Last Attempt"
     alerts: 
@@ -11316,7 +12162,6 @@ en-AU:
     always: Always
     answer_comments: "Answer comments"
     answer_text: "Answer text"
-    assignment: Assignment
     assignment_points_possible: 
       one: "%{count} pts"
       other: "%{count} pts"
@@ -11409,7 +12254,6 @@ en-AU:
         other: "%{count} minutes"
         zero: "less than 1 minute"
       score_out_of_points_possible: "%{score} out of %{points_possible}"
-    highest: highest
     index: 
       buttons: 
         publishing_quizzes: "Publishing Quizzes..."
@@ -11443,7 +12287,6 @@ en-AU:
       multiple_blanks_question: "Fill in the blank, read surrounding text"
       other_incorrect_matches: "Other Incorrect Match Options"
       possible_answer: "Possible Answer"
-    latest: latest
     ldb_login_popup: 
       email: Email
       log_in: "Log In"
@@ -11865,6 +12708,7 @@ en-AU:
           manually_unlock: "Manually unlock the quiz for the next attempt"
           started: Started
         minutes: minutes
+        moderate_page_title: "%{title}: Moderate"
         page_title: "Moderate Quiz"
         student_gets_extra_time: "*%{student_name}* **gets %{extra_time} extra minutes on each attempt**"
         student_n: "Student %{n}"
@@ -12204,6 +13048,7 @@ en-AU:
       submission_versions: 
         attempt: Attempt
         attempt_history: "Attempt History"
+        questions_not_graded: "Some questions not yet graded"
         quiz_attempt_history_description: "A table that shows your quiz attempt history. Each attempt is on the left side. The attempt, time, and score are across the top."
         regraded: Regraded
         score: Score
@@ -12360,20 +13205,13 @@ en-AU:
       draft_state_unsaved_changes: "*You have made changes to the questions in this quiz.* These changes will not appear for students until you save the quiz."
       unpublished_changes: "*You have made unpublished changes to this quiz.* These changes will not appear for students until you publish or republish the quiz."
       unpublished_quiz: "*This quiz is unpublished* Only teachers can see the quiz until it is published."
-  quizzes_model: 
-    cant_unpublish_when_students_submit: "Can't unpublish if there are student submissions"
-    confirms: 
-      delete_quiz: "Are you sure you want to delete this quiz?"
-    delete_quiz: "Delete Quiz"
-    edit_quiz: "Edit Quiz"
-    points: 
-      one: "1 pt"
-      other: "%{count} pts"
-    questions: 
-      one: "1 Question"
-      other: "%{count} Questions"
   quizzes_redirects: 
     no_access: "Access denied. Redirected to a page you have access to."
+  quizzes_route: 
+    quizzes_route_title: Quizzes
+  quizzez_submission_row: 
+    gets_extra_minutes: "gets %{num} extra minutes on each attempt"
+    unlimited: Unlimited
   re_upload_submissions_form: 
     buttons: 
       upload: "Upload Files"
@@ -12382,6 +13220,7 @@ en-AU:
     upload_warning: "Make sure you don't change the names of the submission files so we can recognize them."
   recent_student: 
     last_logged_in: "last logged in %{last_login}"
+  recently_deleted_courses_title: "Recently Deleted Courses"
   recipient_input: 
     context_search_placeholder: "Enter a name, course, or group"
     context_search_title: "Name, course, or group"
@@ -12395,6 +13234,7 @@ en-AU:
     sections_count: 
       one: "1 section"
       other: "%{count} sections"
+  registrar_tile: "Registrar Report"
   registration: 
     get_started: "Get Started"
     incomplete_registration_warning: 
@@ -12431,6 +13271,7 @@ en-AU:
         email: Email
         name: Name
     welcome_to_canvas: "Welcome to Canvas!"
+  reply_from_name: "%{name} via Canvas Notifications"
   retrieve_timeout: "could not retrieve configuration, the server response timed out"
   role_override: 
     permission: 
@@ -12526,6 +13367,12 @@ en-AU:
     update_failed_notice: "Role creation failed"
   roles: 
     account_admin: "Account Admin"
+    new_role: 
+      add: Add
+      add_role: "Add Role"
+      add_role_label: "Add Role"
+      role_name: "Role name"
+      role_name_label: "Role Name"
     permission_button: 
       rolebutton: 
         disable: Disable
@@ -12533,6 +13380,20 @@ en-AU:
         enable: Enable
         enable_and_lock: "Enable and Lock"
         use_default: "Use Default"
+    permissions: Permissions
+    roles_override_index: 
+      account_roles: "Account Roles"
+      course_roles: "Course Roles"
+  ross_report_header_comment: Comment
+  ross_report_header_course_id: Course_ID
+  ross_report_header_grade_posting_date: "Grade Posting Date"
+  ross_report_header_grade_type: "Grade Type"
+  ross_report_header_grade_value_type: "Grade Value Type"
+  ross_report_header_miscfield1: MiscField1
+  ross_report_header_miscfield13: MiscField13
+  ross_report_header_miscfield2: MiscField2
+  ross_report_header_numeric_grade: "Numeric Grade"
+  ross_report_header_source_id: Source_ID
   roster: 
     delete_confirm: "Are you sure you want to remove this user?"
     error_sending_invitations: "Error sending invitation. Please try again."
@@ -12599,6 +13460,38 @@ en-AU:
         are_you_sure_delete: "Are you sure you want to delete this rubric? Any course currently associated with this rubric will still have access to it, but, no new courses will be able to use it."
         are_you_sure_remove: "Are you sure you want to remove this rubric from your list?"
       remove_rubric: "Remove this Rubric from my list"
+  safety_drill_title: "Safety Drill Scheduling"
+  samuel_report_header_assessment_question_id: "Assessment Question ID"
+  samuel_report_header_assessment_question_name: "Assessment Question name"
+  samuel_report_header_assignment_description: "Assignment Description"
+  samuel_report_header_assignment_id: "Assignment ID"
+  samuel_report_header_assignment_points_possible: "Assignment Points Possible"
+  samuel_report_header_assignment_title: "Assignment Title"
+  samuel_report_header_assignment_type: "Assignment Type"
+  samuel_report_header_course_canvas_id: "Course Canvas ID"
+  samuel_report_header_course_current_score: "Course Current Score"
+  samuel_report_header_course_name: "Course Name"
+  samuel_report_header_course_sis_id: "Course SIS ID"
+  samuel_report_header_course_student_count: "Course Student Count"
+  samuel_report_header_grading_scheme: "Grading Scheme"
+  samuel_report_header_learning_outcome_desc: "Learning Outcome Desc"
+  samuel_report_header_learning_outcome_id: "Learning Outcome ID"
+  samuel_report_header_learning_outcome_score: "Learning Outcome Score"
+  samuel_report_header_learning_outcome_short_name: "Learning Outcome Short Name"
+  samuel_report_header_rubric_title: "Rubric Title"
+  samuel_report_header_section_canvas_id: "Section Canvas ID"
+  samuel_report_header_section_name: "Section Name"
+  samuel_report_header_section_sis_id: "Section SIS ID"
+  samuel_report_header_student_id: "Student ID"
+  samuel_report_header_student_name: "Student Name"
+  samuel_report_header_student_sis_id: "Student SIS ID"
+  samuel_report_header_subaccount_id: "Subaccount ID"
+  samuel_report_header_subaccount_name: "Subaccount Name"
+  samuel_report_header_submission_date: "Submission Date"
+  samuel_report_header_submission_grade: "Submission Grade"
+  samuel_report_header_submissions_attempt: "Submissions Attempt"
+  samuel_report_header_teacher_name: "Teacher Name"
+  scantron_quiz_title: "Scantron Quiz"
   scribd: 
     upgrade_flash: "Hello, you have an old version of Adobe Flash Player. To use iPaper (and lots of other stuff on the web) you need to %{link_tag}get the latest Flash player%{end_link}."
   search: 
@@ -13257,7 +14150,7 @@ en-AU:
       new_file_option: "[ New File ]"
       new_page_option: "[ New Page ]"
       new_quiz_option: "[ New Quiz ]"
-      new_tab: "Load this tool in a new tab"
+      new_tab: "Load in a new tab"
       new_topic_option: "[ New Topic ]"
       options: 
         assignments: Assignments
@@ -13421,6 +14314,7 @@ en-AU:
       unrecorgnized_type: "Unrecognized import type"
     instructure_csv: "Instructure formatted CSV or zipfile of CSVs"
     upload_filename: "sis_upload_%{id}.zip"
+  sis_export_title: "SIS Export"
   sis_import: 
     buttons: 
       process_data: "Process Data"
@@ -13508,7 +14402,9 @@ en-AU:
       one: "Note: Score does not include assignments from the group %{list_of_group_names} because it has no points possible."
       other: "Note: Score does not include assignments from the groups %{list_of_group_names} because they have no points possible."
     media_recordin: "Media recording"
+    next_object: "Next %{type}"
     no_assignment: "No Assignment Selected"
+    no_outcome: "No Outcome Selected"
     no_student: "No Student Selected"
     none: None
     notes: Notes
@@ -13517,6 +14413,7 @@ en-AU:
     online_text_entry: "Online text entry"
     online_upload: "Online upload"
     online_url: "Online URL"
+    previous_object: "Previous %{type}"
     student_hidden_name: "Student %{position}"
   statistics: 
     csv_columns: 
@@ -13525,6 +14422,7 @@ en-AU:
       n_correct: "n correct"
       n_incorrect: "n incorrect"
       name: name
+      root_account: root_account
       score: score
       section: section
       section_id: section_id
@@ -13539,17 +14437,46 @@ en-AU:
     available_until: "Available until"
     closed: Closed
     due: Due
-    everyone_else: "Everyone else"
     not_available: "Available on"
     pending: "Not available until"
   step: Step
+  student_access_title: "Students Access Report"
+  student_assignment_outcome_map_title: "Student Competency"
+  student_grades_title: "Student Grades"
+  student_groups: 
+    group_join: "Joined Group %{group_name}"
+    group_leave: "Left Group %{group_name}"
+    search_groups_placeholder: "Search Groups or People"
+    student_groups_filter_description: "As you type in this field, the list of groups will be automatically filtered to only include those whose names match your input."
+    students_count: 
+      one: "1 student"
+      other: "%{count} students"
+  student_groups_desc: |-
+      This enables the new student group page for an account. The new page was build to provide a more dynamic group signup
+      experience.
   student_id: "Student ID"
+  student_ip_title: "Student IP addresses"
   student_name: "Student name"
   student_outcome_gradebook_description: |-
-      Student Outcome Gradebook provides a way for students to quickly view progress
+      Student Learning Mastery Gradebook provides a way for students to quickly view progress
       on course learning outcomes. Outcomes are presented in a Gradebook-like
       format and progress is displayed both as a numerical score and as mastered/near
       mastery/remedial.
+  student_report_header_course_id: "course id"
+  student_report_header_course_name: "course name"
+  student_report_header_course_sis_id: "course sis id"
+  student_report_header_enrollment_state: "enrollment state"
+  student_report_header_last_access_at: "last access at"
+  student_report_header_last_ip: "last ip"
+  student_report_header_name: name
+  student_report_header_section_id: "section id"
+  student_report_header_section_name: "section name"
+  student_report_header_section_sis_id: "section sis id"
+  student_report_header_user_id: "user id"
+  student_report_header_user_name: "user name"
+  student_report_header_user_sis_id: "user sis id"
+  student_submissions_title: "Student Submissions"
+  students_with_no_submissions_title: "Students with no submissions"
   sub_accounts: 
     alerts: 
       subaccount_has_courses: "You can't delete a sub-account that has courses in it"
@@ -13589,6 +14516,7 @@ en-AU:
       unsubmitted: unsubmitted
   submission_comment: 
     unknown_author: Someone
+  submission_data_title: "Submission Data"
   submission_detail: 
     go_to_submission_url: "Go to submission URL"
     no_submission: "No submission"
@@ -13597,6 +14525,7 @@ en-AU:
   submission_details_dialog: 
     add_a_comment: "Add a comment"
     comments: Comments
+    grade_form_label: "Grade:"
     labels: 
       group_comment: "Send Comment to the Whole Group"
     late: LATE
@@ -13607,6 +14536,7 @@ en-AU:
     post_comment: "Post Comment"
     submitted: "Submitted:"
     this_was_submitted_multiple_times_choose_a_submission_to_view: "Submitted multiple times, choose which to view:"
+    update_grade: "Update Grade"
     view_rubric_assessment_in_the_speedgrader: "View Rubric Assessment in the SpeedGrader"
   submissions: 
     assignment_submit_success: "Assignment successfully submitted."
@@ -13720,6 +14650,9 @@ en-AU:
     assignments: Assignments
     collaborations: Collaborations
     conferences: Conferences
+    course_assignments: "Course Assignments"
+    course_grades: "Course Grades"
+    course_settings: "Course Settings"
     discussions: Discussions
     eportfolios: ePortfolios
     files: Files
@@ -13735,6 +14668,20 @@ en-AU:
     syllabus: Syllabus
     tab_location_error: "That tab location is invalid"
     tab_unmanagable_error: "%{css_class} is not manageable"
+  tempe_grade_export_title: "Tempe Grade Export"
+  tempe_report_header_absences: ABSENCES
+  tempe_report_header_citizenship: CITIZENSHIP
+  tempe_report_header_comment_1: COMMENT_1
+  tempe_report_header_comment_2: COMMENT_2
+  tempe_report_header_comment_3: COMMENT_3
+  tempe_report_header_grade_mark: GRADE_MARK
+  tempe_report_header_grading_term: GRADING_TERM
+  tempe_report_header_mark_name: MARK_NAME
+  tempe_report_header_school_code: SCHOOL_CODE
+  tempe_report_header_school_year: SCHOOL_YEAR
+  tempe_report_header_section_id: SECTION_ID
+  tempe_report_header_sis_number: SIS_NUMBER
+  tempe_report_header_workhabits: WORKHABITS
   terms: 
     index: 
       date: 
@@ -13792,10 +14739,6 @@ en-AU:
         term_start: "term start"
         unspecified: whenever
       timespan: "%{start_at} *to* %{end_at}"
-  text_helper: 
-    time: 
-      ranges: 
-        different_days: "%{start_date_and_time} *to* %{end_date_and_time}"
   time: 
     am: am
     count_hours_ago: 
@@ -13834,6 +14777,11 @@ en-AU:
       image_url_field_label: "Image URL"
       image_width: "Image Width"
       url: URL
+  title: 
+    edit_announcement: "Edit Announcement"
+    edit_topic: "Edit Discussion Topic"
+    new_announcement: "New Announcement"
+    new_topic: "New Discussion Topic"
   title_separator: ": "
   titles: 
     aligned_items: "Aligned Items"
@@ -13854,6 +14802,8 @@ en-AU:
     people: People
     view_in_separate_window: "View in Separate Window"
   tooltips: 
+    finished: finished
+    incomplete: incomplete
     vdd: 
       more_message: "and %{count} more..."
   tours: 
@@ -13878,10 +14828,13 @@ en-AU:
   turnitin_info: 
     buttons: 
       resubmit_to_turnitin: "Resubmit to Turnitin"
+  ungraded_submissions_tile: "Ungraded Student Submissions"
   unknown: Unknown
   unknown_question_bank: "Unknown question bank"
   unknown_quiz: "Unknown quiz"
+  unpublished_courses_title: "Unpublished Courses"
   unsupported_package: "Unsupported content package"
+  unused_courses_title: "Unused Courses"
   user: 
     default_user_name: User
     errors: 
@@ -13894,9 +14847,11 @@ en-AU:
     registration: 
       agree_to_terms_and_privacy_policy: "You agree to the *terms of use* and acknowledge the **privacy policy**."
       agree_to_terms_with_code_of_conduct: "You agree to the *terms of use* and the **code of conduct**."
+  user_access_title: "User Access Report"
   user_date_range_search: 
     cant_be_blank: "Canvas User ID can't be blank"
     cant_come_before_from: "'To Date' can't come before 'From Date'"
+  user_inactivity_title: "User Inactivity Report"
   user_lists: 
     add_n_users: 
       one: "OK Looks Good, Add This 1 User"
@@ -14284,8 +15239,24 @@ en-AU:
                   and in the top navigation. In the meantime, feel free to sign up for
                   more courses or set up your profile.
       welcome_to_happiness: "Welcome to Canvas!"
+  ut_austin_report_header_canvas_user_id: "canvas user id"
+  ut_austin_report_header_default_email: "default email"
+  ut_austin_report_header_google_doc_address: "google doc address"
+  ut_austin_report_header_name: name
+  ut_austin_report_header_sis_id: "sis id"
   validate: 
     is_required: "This field is required"
+  vilas_report_header_assignment_id: "assignment id"
+  vilas_report_header_assignment_name: "assignment name"
+  vilas_report_header_canvas_course_id: "canvas course id"
+  vilas_report_header_canvas_user_id: "canvas user id"
+  vilas_report_header_course_name: "course name"
+  vilas_report_header_points_possible: "points possible"
+  vilas_report_header_score: score
+  vilas_report_header_sis_course_id: "sis course id"
+  vilas_report_header_sis_user_id: "sis user id"
+  vilas_report_header_submission_date: "submission date"
+  vilas_report_header_user_name: "user name"
   warnings: 
     test_install: 
       periodic_message: "This Canvas installation is only for testing, and will reset periodically."
@@ -14307,6 +15278,36 @@ en-AU:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Blackboard Vista/CE, WebCT 6+ Course"
   webct_name: "Blackboard Vista/CE (WebCT)"
+  webster_report_header_course_id: "course id"
+  webster_report_header_course_name: "course name"
+  webster_report_header_course_sis_id: "course sis id"
+  webster_report_header_enrollment_state: "enrollment state"
+  webster_report_header_enrollment_type: "enrollment type"
+  webster_report_header_last_ip: "last ip"
+  webster_report_header_login_id: "login id"
+  webster_report_header_user_id: "user id"
+  webster_report_header_user_name: "user name"
+  webster_report_header_user_sis_id: "user sis id"
+  westminster_report_header_cohort_id: "cohort id"
+  westminster_report_header_cohort_name: "cohort name"
+  westminster_report_header_course_name: "course name"
+  westminster_report_header_current_courses: "current courses"
+  westminster_report_header_current_grade: "current grade"
+  westminster_report_header_first_name: "first name"
+  westminster_report_header_last_completed_course: "last completed course"
+  westminster_report_header_last_completed_module: "last completed module"
+  westminster_report_header_last_faculty_journal_entry: "last faculty journal entry"
+  westminster_report_header_last_graded_date: "last graded date"
+  westminster_report_header_last_mastered_assignment: "last mastered assignment"
+  westminster_report_header_last_name: "last name"
+  westminster_report_header_last_submission_date: "last submission date"
+  westminster_report_header_last_submission_graded: "last submission graded"
+  westminster_report_header_professor_id: "professor id"
+  westminster_report_header_professor_name: "professor name"
+  westminster_report_header_student_id: "student id"
+  westminster_report_header_student_name: "student name"
+  westminster_report_header_term_taken: "term taken"
+  westminster_report_header_ungraded_submissions: "# of ungraded submissions"
   widget: 
     upload_media_track_form: 
       choose_a_language: "--Choose a Language--"
@@ -14530,6 +15531,7 @@ en-AU:
     external_urls: 
       archive: Archive
       archive_link: "View archive(s)"
+  zero_activity_title: "Zero Activity"
   zip_argument_error: "A .zip upload requires a folder to upload to."
   zip_file_description: "Migration plugin for unpacking .zip archives into course, group, or user files"
   zip_file_display: "File Import"
