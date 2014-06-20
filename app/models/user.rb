@@ -2114,7 +2114,7 @@ class User < ActiveRecord::Base
 
   def mark_all_conversations_as_read!
     conversations.unread.update_all(:workflow_state => 'read')
-    User.where(:id => id).update_all(:unread_conversations_count => 0)
+    User.where(:id => id).update_all(:unread_conversations_count => 0, :updated_at => Time.now.utc)
   end
 
   def conversation_participant(conversation_id)
@@ -2125,7 +2125,7 @@ class User < ActiveRecord::Base
   #
   # Returns nothing.
   def reset_unread_conversations_counter
-    self.class.where(:id => id).update_all(:unread_conversations_count => conversations.unread.count)
+    self.class.where(:id => id).update_all(:unread_conversations_count => conversations.unread.count, :updated_at => Time.now.utc)
   end
 
   def set_menu_data(enrollment_uuid)
