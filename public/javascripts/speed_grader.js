@@ -243,12 +243,22 @@ define([
     }
   }
 
+  function formattedSubmissionStateName(raw, submission) {
+    switch(raw) {
+      case "graded":
+        return I18n.t('graded', "graded");
+      case "not_graded":
+        return I18n.t('not_graded', "not graded");
+      case "not_submitted":
+        return I18n.t('not_submitted', 'not submitted');
+      case "resubmitted":
+        return I18n.t('graded_then_resubmitted', "graded, then resubmitted (%{when})", {'when': $.datetimeString(submission.submitted_at)});
+    }
+  }
+
   function classNameBasedOnStudent(student){
     var raw = submissionStateName(student.submission);
-    var formatted = raw.replace("_", " ");
-    if (raw === "resubmitted") {
-      formatted = I18n.t('graded_then_resubmitted', "graded, then resubmitted (%{when})", {'when': $.datetimeString(student.submission.submitted_at)});
-    }
+    var formatted = formattedSubmissionStateName(raw, student.submission);
     return {raw: raw, formatted: formatted};
   }
 
