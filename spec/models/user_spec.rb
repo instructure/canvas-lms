@@ -2531,4 +2531,11 @@ describe User do
       @user.validate_otp_secret_key_remember_me_cookie(cookie2, 'ip2').should be_true
     end
   end
+
+  it "should reset its conversation counter when told to" do
+    user = user_model
+    user.stubs(:conversations).returns Struct.new(:unread).new(Array.new(5))
+    user.reset_unread_conversations_counter
+    user.reload.unread_conversations_count.should == 5
+  end
 end
