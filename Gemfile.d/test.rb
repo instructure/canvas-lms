@@ -8,6 +8,8 @@ group :test do
     gem 'metaclass', '0.0.2'
   gem 'thin', '1.5.1'
     gem 'eventmachine', '1.0.3'
+  gem 'bullet_instructure', '3.0.0', :require => false
+
   if CANVAS_RAILS2
     gem 'rspec', '1.3.2'
     gem 'rspec-rails', '1.3.4'
