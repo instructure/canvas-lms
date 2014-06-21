@@ -20,15 +20,15 @@
 if RUBY_VERSION == "2.0.0"
   warn "Ruby 2.0 support is untested"
   ruby '2.0.0', :engine => 'ruby', :engine_version => '2.0.0'
-elsif RUBY_VERSION == "2.1.0"
+elsif RUBY_VERSION >= "2.1" && RUBY_VERSION < "2.2"
   warn "Ruby 2.1 support is untested"
-  ruby '2.1.0', :engine => 'ruby', :engine_version => '2.1.0'
+  ruby RUBY_VERSION, :engine => 'ruby', :engine_version => RUBY_VERSION
 else
   ruby '1.9.3', :engine => 'ruby', :engine_version => '1.9.3'
 end
 
 # # enforce the version of bundler itself, to avoid any surprises
-required_bundler_version = '1.5.1'..'1.6.2'
+required_bundler_version = '1.5.1'..'1.6.3'
 gem 'bundler', [">=#{required_bundler_version.first}", "<=#{required_bundler_version.last}"]
 
 unless required_bundler_version.include?(Bundler::VERSION)
