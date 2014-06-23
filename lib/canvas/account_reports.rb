@@ -57,12 +57,12 @@ module Canvas::AccountReports
     end
   end
 
-  def self.generate_file_name(account_report, ext)
-    "#{account_report.report_type}_#{Time.now.strftime('%d_%b_%Y')}_#{account_report.id}_.#{ext}"
+  def self.generate_file_name(account_report)
+    "#{account_report.report_type}_#{Time.now.strftime('%d_%b_%Y')}_#{account_report.id}"
   end
 
   def self.generate_file(account_report, ext = 'csv')
-    temp = Tempfile.open(generate_file_name(account_report, ext))
+    temp = Tempfile.open([generate_file_name(account_report), ".#{ext}"])
     filepath = temp.path
     temp.close!
     filepath
@@ -71,8 +71,8 @@ module Canvas::AccountReports
   def self.report_attachment(account_report, csv=nil)
     attachment = nil
     if csv.is_a? Hash
-      filename = generate_file_name(account_report, "zip")
-      temp = Tempfile.open(filename)
+      filename = generate_file_name(account_report)
+      temp = Tempfile.open([filename, ".zip"])
       filepath = temp.path
       temp.close!
 
@@ -98,8 +98,8 @@ module Canvas::AccountReports
           filepath = csv
           filetype = 'text/rtf'
         else
-          filename = generate_file_name(account_report, "csv")
-          f = Tempfile.open(filename)
+          filename = generate_file_name(account_report)
+          f = Tempfile.open([filename, ".csv"])
           f << csv
           f.close
           filepath = f.path
