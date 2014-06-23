@@ -66,8 +66,12 @@ module HtmlTextHelper
              node.children.map{|c| html_node_to_text(c, opts.merge(pre: true))}.join
            when 'img'
              src = node['src']
-             src = URI.join(opts[:base_url], src) if opts[:base_url]
-             node['alt'] ? "[#{node['alt']}](#{src})" : src
+             if src
+               src = URI.join(opts[:base_url], src) if opts[:base_url]
+               node['alt'] ? "[#{node['alt']}](#{src})" : src
+             else
+               ''
+             end
            when 'br'
              "\n"
            else
