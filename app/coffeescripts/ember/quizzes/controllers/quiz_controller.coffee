@@ -1,98 +1,192 @@
 define [
-  'ember',
-  'i18n!quizzes_model',
-  'ic-ajax',
+  'ember'
+  'i18n!quiz'
+  'jquery'
   '../shared/environment'
-], (Ember, I18n, ajax, environment) ->
+  'compiled/jquery.rails_flash_notifications'
+], (Ember, I18n, $, env) ->
 
-  # http://emberjs.com/guides/controllers/
-  # http://emberjs.com/api/classes/Ember.Controller.html
-  # http://emberjs.com/api/classes/Ember.ArrayController.html
-  # http://emberjs.com/api/classes/Ember.ObjectController.html
+  {RSVP, K} = Ember
+  {equal} = Ember.computed
+
+  updateAllDates = (field) ->
+    date = new Date()
+    @set field, date
+    promises = []
+    # skipping assignment overrides for now...
+    # TODO: need a quizzes assignment overrides endpoint
+    # promises = @get('assignmentOverrides').map (override) ->
+    #  override.set field, date
+    #  override.save()
+    promises.pushObject(@get('model').save())
+    RSVP.all promises
 
   QuizController = Ember.ObjectController.extend
-
-    needs: ['quizzes']
-
-    questionCountLabel: (->
-      I18n.t('questions', 'Question', count: @get('question_count'))
-    ).property('question_count')
-
-    canUpdate: ( ->
-      @get('can_update')
-    ).property('can_update')
-
-    isPublishedStatusVisible: ( ->
-      @get('published') && @get('can_update')
-    ).property('published', 'can_update')
-
-    allDates: ( ->
-      if @get('all_dates')
-        @get('all_dates')
-      else
-        [{
-          base: true,
-          unlock_at: @get('unlock_at'),
-          due_at: @get('due_at'),
-          lock_at: @get('lock_at')
-        }]
-    ).property('all_dates')
-
-    disabled: (->
-      !@get('unpublishable')
-    ).property('unpublishable')
+    legacyQuizSubmissionVersionsReady: Ember.computed.and('quizSubmissionVersionsHtml', 'didLoadQuizSubmissionVersionsHtml')
 
     disabledMessage: I18n.t('cant_unpublish_when_students_submit', "Can't unpublish if there are student submissions")
 
-    pubUrl: ( ->
-      "/api/v1/courses/#{environment.get('courseId')}/quizzes/#{@get('id')}/"
-    ).property('environment.courseId')
+    # preserve 'publishing' state by not directly binding to published attr
+    showAsPublished: false
 
-    editTitle: I18n.t('edit_quiz', 'Edit Quiz')
-    deleteTitle: I18n.t('delete_quiz', 'Delete Quiz')
+    displayPublished: (->
+      @set('showAsPublished', @get('published'))
+    ).observes('model')
 
-    editUrl: (->
-      @get('html_url') + "/edit"
-    ).property('html_url')
+    takeQuizVisible: (->
+      @get('published') and @get('takeable') and !@get('lockedForUser')
+    ).property('published', 'takeable', 'lockedForUser')
 
-    deleteUrl: (->
-      @get('html_url')
-    ).property('html_url')
+    takeOrResumeMessage: (->
+      if @get('quizSubmission.isCompleted')
+        if @get('isSurvey')
+          I18n.t 'take_the_survey_again', 'Take the Survey Again'
+        else
+          I18n.t 'take_the_quiz_again', 'Take the Quiz Again'
+      else if @get('quizSubmission.isUntaken')
+        if @get('isSurvey')
+          I18n.t 'resume_the_survey', 'Resume the Survey'
+        else
+          I18n.t 'resume_the_quiz', 'Resume the Quiz'
+      else
+        if @get('isSurvey')
+          I18n.t 'take_the_survey', 'Take the Survey'
+        else
+          I18n.t 'take_the_quiz', 'Take the Quiz'
+    ).property('isSurvey', 'quizSubmisison.isUntaken')
 
-    pointsPossible: (->
-      return '' if !@get('points_possible')
-      I18n.t('points', 'pt', count: @get('points_possible'))
-    ).property('points_possible')
+    updatePublished: (publishStatus) ->
+      success = (=> @displayPublished())
 
-    updatePublished: (url, publishing) ->
-      @set('published', publishing)
-      ajax(url,
-        type: 'PUT',
-        dataType: 'json',
-        contentType: "application/json; charset=utf-8",
-        data: JSON.stringify({quizzes: [@get('model')]})
-      ).then (result) =>
-        @set('model', result.quizzes[0])
-      .fail =>
-        @set('published', !publishing)
+      # they're not allowed to unpublish
+      failed = =>
+        @set 'published', true
+        @set 'unpublishable', false
+        @displayPublished()
+
+      @set 'published', publishStatus
+      @get('model').save().then success, failed
+
+    deleteTitle: (->
+      I18n.t 'delete_quiz', 'Delete Quiz'
+    ).property()
+
+    confirmText: (->
+      I18n.t 'delete', 'Delete'
+    ).property()
+
+    cancelText: (->
+      I18n.t 'cancel', 'Cancel'
+    ).property()
+
+    timeLimitWithMinutes: (->
+      I18n.t('time_limit_minutes', "%{limit} minutes", {limit: @get("timeLimit")})
+    ).property('timeLimit')
+
+    # message students modal
+
+    recipientGroups: (->
+      [
+        Ember.Object.create({
+          id: 'submitted'
+          name: I18n.t('students_who_have_taken_the_quiz', 'Students Who Have Taken the Quiz'),
+        })
+        Ember.Object.create({
+          id: 'unsubmitted'
+          name: I18n.t('student_who_have_not_taken_the_quiz', 'Students Who Have Not Taken the Quiz')
+        })
+      ]
+    ).property('submittedStudents', 'unsubmittedStudents')
+
+    recipients: (->
+      if @get('selectedRecipientGroup') is 'submitted'
+        @get('submittedStudents')
+      else
+        @get('unsubmittedStudents')
+    ).property('selectedRecipientGroup', 'submittedStudents', 'unsubmittedStudents')
+
+    showUnsubmitted: equal 'selectedRecipientGroup', 'unsubmitted'
+
+    noRecipients: equal 'recipients.length', 0
+
+    # /message students modal
 
     actions:
+      takeQuiz: ->
+        url = "#{@get 'takeQuizUrl'}&authenticity_token=#{ENV.AUTHENTICITY_TOKEN}"
+        $('<form></form>').
+          prop('action', url).
+          prop('method', 'POST').
+          appendTo("body").
+          submit()
+
+      speedGrader: ->
+        window.location = @get 'speedGraderUrl'
+
+      showStudentResults: ->
+        @replaceRoute 'quiz.moderate'
+        $.flashMessage I18n.t('now_on_moderate', 'This information is now found on the Moderate tab.')
+
+      toggleLock: ->
+        if @get('lockAt')
+          @send('unlock')
+        else
+          @send('lock')
+
+      preview: ->
+        $('<form/>').
+          attr('action', "#{@get('previewUrl')}&authenticity_token=#{ENV.AUTHENTICITY_TOKEN}").
+          attr('method', 'POST').
+          appendTo('body').
+          submit()
+
+      lock: ->
+        updateAllDates.call(this, 'lockAt').then ->
+          $.flashMessage I18n.t('quiz_successfully_updated', 'Quiz Successfully Updated!')
+
+      unlock: ->
+        @set 'lockAt', null
+        @get('assignmentOverrides').forEach (override) ->
+          override.set 'lockAt', null
+        updateAllDates.call(this, 'unlockAt').then ->
+          $.flashMessage I18n.t('quiz_successfully_updated', 'Quiz Successfully Updated!')
+
       publish: ->
-        @updatePublished(@get('pubUrl'), true)
+        @updatePublished true
 
       unpublish: ->
-        @updatePublished(@get('pubUrl'), false)
-
-      edit: ->
-        window.location = @get('editUrl')
+        @updatePublished false
 
       delete: ->
-        ok = window.confirm I18n.t('confirms.delete_quiz', 'Are you sure you want to delete this quiz?')
-        quizzesController = @get('controllers.quizzes')
-        if ok
-          id = environment.get('courseId')
-          ajax(
-            url: "/api/v1/courses/#{id}/quizzes/#{@get('id')}"
-            type: 'DELETE'
-          ).then =>
-            quizzesController.removeObject(@get('model'))
+        model = @get 'model'
+        model.deleteRecord()
+        model.save().then =>
+          @transitionToRoute 'quizzes'
+
+      # message students modal
+
+      sendMessageToStudents: ->
+        $.ajax
+          url: @get('messageStudentsUrl')
+          data: JSON.stringify(
+            conversations: [
+              recipients: @get('selectedRecipientGroup')
+              body: @get('messageBody')
+            ]
+          )
+          type: 'POST'
+          dataType: 'json'
+          contentType: 'application/json'
+        $.flashMessage I18n.t 'message_sent', 'Message Sent'
+
+      # For modal, just do nothing.
+      cancel: K
+      # /message students modal
+
+    # Kind of a gross hack so we can get quiz arrows in...
+    addLegacyJS: (->
+      return unless @get('quizSubmissionHTML.html')
+      Ember.$(document.body).append """
+        <script src="/javascripts/compiled/bundles/quiz_show.js"></script>
+      """
+    ).observes('quizSubmissionHTML.html')

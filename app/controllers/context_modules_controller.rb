@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -76,7 +76,7 @@ class ContextModulesController < ApplicationController
     if tag.content && tag.content.respond_to?(:locked_for?)
       locked = tag.content.locked_for?(@current_user, :context => @context)
       if locked
-        @context.context_modules.active.each { |m| m.evaluate_for(@current_user, true, true) }
+        @context.context_modules.active.each { |m| m.evaluate_for(@current_user) }
         if tag.content.respond_to?(:clear_locked_cache)
           tag.content.clear_locked_cache(@current_user)
         end
@@ -85,7 +85,7 @@ class ContextModulesController < ApplicationController
   end
   
   def create
-    if authorized_action(@context.context_modules.new, @current_user, :create)
+    if authorized_action(@context.context_modules.scoped.new, @current_user, :create)
       @module = @context.context_modules.build
       if @context.feature_enabled?(:draft_state)
         @module.workflow_state = 'unpublished'
@@ -106,7 +106,7 @@ class ContextModulesController < ApplicationController
   end
   
   def reorder
-    if authorized_action(@context.context_modules.new, @current_user, :update)
+    if authorized_action(@context.context_modules.scoped.new, @current_user, :update)
       m = @context.context_modules.not_deleted.first
       
       m.update_order(params[:order].split(","))
@@ -130,18 +130,17 @@ class ContextModulesController < ApplicationController
   
   def content_tag_assignment_data
     if authorized_action(@context, @current_user, :read)
-      result = Rails.cache.fetch([ @context, @current_user, "content_tag_assignment_info_all" ].cache_key) do
-        info = {}
-        @context.context_module_tags.active.map do |tag|
+      info = {}
+      @context.context_module_tags.not_deleted.each do |tag|
+        info[tag.id] = Rails.cache.fetch([tag, @current_user, "content_tag_assignment_info"].cache_key) do
           if tag.assignment
-            info[tag.id] = tag.assignment.context_module_tag_info(@current_user)
+            tag.assignment.context_module_tag_info(@current_user)
           else
-            info[tag.id] = {:points_possible => nil, :due_date => (tag.content.due_at.utc.iso8601 rescue nil)}
+            {:points_possible => nil, :due_date => (tag.content.due_at.utc.iso8601 rescue nil)}
           end
         end
-        info
       end
-      render :json => result
+      render :json => info
     end
   end
 
@@ -174,6 +173,7 @@ class ContextModulesController < ApplicationController
   def content_tag_prerequisites_needing_finishing
     code = params[:code].split("_")
     id = code.pop
+    raise ActiveRecord::RecordNotFound if id !~ Api::ID_REGEX
     type = code.join("_").classify
     if type == 'ContentTag'
       @tag = @context.context_module_tags.active.find_by_id(id)
@@ -255,8 +255,8 @@ class ContextModulesController < ApplicationController
     @module = @context.context_modules.not_deleted.find(params[:context_module_id])
     if authorized_action(@module, @current_user, :update)
       order = params[:order].split(",").map{|id| id.to_i}
-      tags = @context.context_module_tags.active.find_all_by_id(order).compact
-      affected_module_ids = tags.map(&:context_module_id).uniq.compact
+      tags = @context.context_module_tags.not_deleted.find_all_by_id(order).compact
+      affected_module_ids = (tags.map(&:context_module_id) + [@module.id]).uniq.compact
       affected_items = []
       items = order.map{|id| tags.detect{|t| t.id == id.to_i } }.compact.uniq
       items.each_with_index do |item, idx|
@@ -281,7 +281,8 @@ class ContextModulesController < ApplicationController
 
   def item_details  
     if authorized_action(@context, @current_user, :read)
-      code = params[:id].split("_")
+      # namespaced models are separated by : in the url
+      code = params[:id].gsub(":", "/").split("_")
       id = code.pop.to_i
       type = code.join("_").classify
       @modules = @context.modules_visible_to(@current_user)
@@ -303,7 +304,7 @@ class ContextModulesController < ApplicationController
             result[:current_item] = @tags.detect{|t| t.id == obj.id }
           elsif obj.is_a?(DiscussionTopic) && obj.assignment_id
             result[:current_item] = @tags.detect{|t| t.content_type == 'Assignment' && t.content_id == obj.assignment_id }
-          elsif obj.is_a?(Quiz) && obj.assignment_id
+          elsif obj.is_a?(Quizzes::Quiz) && obj.assignment_id
             result[:current_item] = @tags.detect{|t| t.content_type == 'Assignment' && t.content_id == obj.assignment_id }
           end
         end
@@ -330,6 +331,8 @@ class ContextModulesController < ApplicationController
       @tag[:publishable] = module_item_publishable?(@tag)
       @tag[:published] = module_item_published?(@tag)
       @tag[:publishable_id] = module_item_publishable_id(@tag)
+      @tag[:unpublishable] = module_item_unpublishable?(@tag)
+      @tag[:graded] = @tag.graded?
       render :json => @tag
     end
   end
@@ -359,25 +362,25 @@ class ContextModulesController < ApplicationController
   def progressions
     if authorized_action(@context, @current_user, :read)
       if request.format == :json
-        if @context.context_modules.new.grants_right?(@current_user, session, :update)
+        if @context.grants_right?(@current_user, session, :view_all_grades)
           if params[:user_id] && @user = @context.students.find(params[:user_id])
-            @progressions = @context.context_modules.active.map{|m| m.evaluate_for(@user, true, true) }
+            @progressions = @context.context_modules.active.map{|m| m.evaluate_for(@user) }
           else
             if @context.large_roster
               @progressions = []
             else
               context_module_ids = @context.context_modules.active.pluck(:id)
-              @progressions = ContextModuleProgression.where(:context_module_id => context_module_ids)
+              @progressions = ContextModuleProgression.where(:context_module_id => context_module_ids).each{|p| p.evaluate }
             end
           end
           render :json => @progressions
         else
-          @progressions = @context.context_modules.active.order(:id).map{|m| m.evaluate_for(@current_user, true) }
+          @progressions = @context.context_modules.active.order(:id).map{|m| m.evaluate_for(@current_user) }
           render :json => @progressions
         end
       elsif !@context.feature_enabled?(:draft_state)
         redirect_to named_context_url(@context, :context_context_modules_url, :anchor => "student_progressions")
-      elsif !@context.grants_right?(@current_user, session, :manage_students)
+      elsif !@context.grants_right?(@current_user, session, :view_all_grades)
         @restrict_student_list = true
         student_ids = @context.observer_enrollments.for_user(@current_user).map(&:associated_user_id)
         student_ids << @current_user.id if @context.user_is_student?(@current_user)

@@ -35,7 +35,7 @@ module CC
       @zip_file = nil
       @zip_name = nil
       @logger = Rails.logger
-      @migration_config = Setting.from_config('external_migration')
+      @migration_config = ConfigFile.load('external_migration')
       @migration_config ||= {:keep_after_complete => false}
       @for_course_copy = opts[:for_course_copy]
       @qti_only_export = @content_export && @content_export.qti_export?
@@ -137,7 +137,7 @@ module CC
     end
 
     def create_zip_file
-      name = truncate_text(@course.name.to_url, {:max_length => 200, :ellipsis => ''})
+      name = CanvasTextHelper.truncate_text(@course.name.to_url, {:max_length => 200, :ellipsis => ''})
       if @qti_only_export
         @zip_name = "#{name}-quiz-export.zip"
       else

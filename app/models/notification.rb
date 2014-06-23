@@ -17,6 +17,10 @@
 #
 
 class Notification < ActiveRecord::Base
+  unless CANVAS_RAILS2
+    self.shard_category = :unsharded
+  end
+
   include Workflow
   include TextHelper
 
@@ -47,7 +51,10 @@ class Notification < ActiveRecord::Base
   before_save :infer_default_content
 
   attr_accessible  :name, :subject, :main_link, :delay_for, :category
-  
+
+  EXPORTABLE_ATTRIBUTES = [:id, :workflow_state, :name, :subject, :category, :delay_for, :created_at, :updated_at, :main_link]
+  EXPORTABLE_ASSOCIATIONS = [:messages, :notification_policies]
+
   scope :to_show_in_feed, where("messages.category='TestImmediately' OR messages.notification_name IN (?)", TYPES_TO_SHOW_IN_FEED)
 
   validates_uniqueness_of :name
@@ -170,7 +177,7 @@ class Notification < ActiveRecord::Base
         res << n if n.category && n.dashboard?
       end
     end
-    res.sort_by{|n| n.category == "Other" ? SortLast : n.category }
+    res.sort_by{|n| n.category == "Other" ? CanvasSort::Last : n.category }
   end
 
   # Return a hash with information for a related user option if one exists.

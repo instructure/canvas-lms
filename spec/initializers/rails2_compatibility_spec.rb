@@ -87,7 +87,7 @@ describe 'rails2 compatibility' do
     end
 
     after :each do
-      Rails.env = @current_rails_env
+      Rails.env = @current_rails_env if CANVAS_RAILS2
     end
 
     it "should set the env" do

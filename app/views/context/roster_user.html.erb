@@ -21,7 +21,7 @@
       <% if @context.user_is_instructor?(@user) && can_do(@user, @current_user, :read_reports) %>
         <%= link_to(t('links.teacher_activity', 'Student Interactions Report'), user_course_teacher_activity_url(@user, @context)) %>
       <% elsif @context.user_has_been_student?(@user) && @context.user_is_instructor?(@current_user) && can_do(@context, @current_user, :read_reports) %>
-        <% link_to(user_student_teacher_activity_url(@current_user, @user)) do %>
+        <%= link_to(user_student_teacher_activity_url(@current_user, @user)) do %>
           <i class="icon-peer-review"></i>
           <%= t('links.student_teacher_activity', 'Interactions with You') %>
         <% end %>
@@ -153,7 +153,7 @@
 <div style="margin-bottom: 10px;">&nbsp;</div>
 <% elsif service_enabled?(:avatars) %>
   <div style="margin-bottom: 20px;">
-    <span class="avatar_image"><%= avatar_image(@user) %></span>
+    <%= avatar(@user) %>
     <% if can_do(@user, @current_user, :remove_avatar) %>
       <a href="#" class="remove_avatar_picture_link"><%= t('links.remove_avatar', %{Remove avatar picture}) %></a>
     <% else %>
@@ -170,88 +170,4 @@
   <% end %>
 <% end %>
 
-<% js_block do %>
-<script>
-require([
-  'jquery' /* $ */,
-  'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.instructure_misc_plugins' /* .dim, undim, confirmDelete */,
-  'jquery.loadingImg' /* loadingImage */,
-  'compiled/jquery.rails_flash_notifications',
-  'link_enrollment' /* link_enrollment */
-], function($) {
-
-$(document).ready(function() {
-  $(".show_user_services_checkbox").change(function() {
-    $.ajaxJSON($(".profile_url").attr('href'), 'PUT', {'user[show_user_services]': $(this).prop('checked')}, function(data) {
-    }, function(data) {
-    });
-  });
-  $(".link_enrollment_link").click(function(event) {
-    event.preventDefault();
-    var $link = $(this);
-    var name = $("#name_and_email .name").text();
-    var id = $link.attr('data-id');
-    var associated_id = $link.attr('data-associated-id');
-    link_enrollment.choose(name, id, associated_id, function(enrollment) {
-      $link.attr('data-id', enrollment.id);
-      $link.attr('data-associated-id', enrollment.associated_user_id);
-      $link.parents('.enrollment').find('.associated_user_name').text(enrollment.associated_user_name);
-      $link.parents('.enrollment').find('.associated_user').showIf(enrollment.associated_user_id);
-    });
-  });
-  $(".unconclude_enrollment_link").click(function(event) {
-    event.preventDefault();
-    var $enrollment = $(this).parents(".enrollment");
-    $.ajaxJSON($(this).attr('href'), 'POST', {}, function(data) {
-      $enrollment.find(".conclude_enrollment_link_holder").slideDown();
-      $enrollment.find(".unconclude_enrollment_link_holder").slideUp();
-      $enrollment.find(".completed_at_holder").slideUp();
-    });
-  });
-  $(".conclude_enrollment_link").click(function(event) {
-    event.preventDefault();
-    $(this).parents(".enrollment").confirmDelete({
-      message: <%= raw t('confirm.conclude_student', "Are you sure you want to conclude this student's enrollment?").to_json %>,
-      url: $(this).attr('href'),
-      success: function(data) {
-        $(this).undim();
-        $(this).find(".conclude_enrollment_link_holder").slideUp();
-        $(this).find(".unconclude_enrollment_link_holder").slideDown();
-        // $(this).find(".completed_at").text("just now");
-        // $(this).find(".completed_at_holder").slideDown();
-      }
-    });
-  });
-  $(".elevate_enrollment_link,.restrict_enrollment_link").click(function(event) {
-    var limit = $(this).hasClass('restrict_enrollment_link') ? "1" : "0";
-    var $user = $(this).parents(".tr");
-    $user.loadingImage();
-    $.ajaxJSON($(this).attr('href'), 'POST', {limit: limit}, function(data) {
-      $user.loadingImage('remove');
-      $(".elevate_enrollment_link_holder,.restrict_enrollment_link_holder").slideToggle();
-    }, function(data) {
-      $.flashError(<%= raw t('enrollment_change_failed', "Enrollment privilege change failed, please try again").to_json %>);
-      $user.loadingImage('remove');
-    });
-    event.preventDefault();
-  });
-  $(".delete_enrollment_link").click(function(event) {
-    event.preventDefault();
-    $(this).parents(".enrollment").confirmDelete({
-      message: <%= raw t('confirm.delete_enrollment', "Are you sure you want to delete this student's enrollment?").to_json %>,
-      url: $(this).attr('href'),
-      success: function(data) {
-        $(this).closest('.enrollment').hide();
-      }
-    });
-  });
-  $(".more_user_information_link").click(function(event) {
-    event.preventDefault();
-    $(".more_user_information").slideDown();
-    $(this).hide();
-  });
-});
-});
-</script>
-<% end %>
+<% js_bundle 'legacy/context_roster_user' %>

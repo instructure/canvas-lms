@@ -27,6 +27,7 @@ define [
           click: =>
             @$dialog.disableWhileLoading $.ajaxJSON(@url, 'put', { status : true }, @afterUpdate)
         }]
+        open: => setTimeout (=> @$dialog.find('#assignment_muter_content').focus()), 100
         close: => @$dialog.remove()
         resizable: false
         width: 400

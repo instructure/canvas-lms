@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -39,7 +39,7 @@ describe Submission do
     Submission.create!(@valid_attributes)
   end
 
-  it_should_behave_like "url validation tests"
+  include_examples "url validation tests"
   it "should check url validity" do
     test_url_validation(Submission.create!(@valid_attributes))
   end
@@ -100,23 +100,6 @@ describe Submission do
         @submission.with_versioning(:explicit => true) { @submission.save }
       }.should change(SubmissionVersion, :count)
     end
-  end
-
-  it "should not return duplicate conversation groups" do
-    assignment_model
-    @assignment.workflow_state = 'published'
-    @assignment.save!
-    @course.teacher_enrollments.create(:user => @teacher, :workflow_state => 'accepted')
-    @course.teacher_enrollments.create(:user => @teacher, :workflow_state => 'accepted')
-    @course.teacher_enrollments.create(:user => @teacher, :workflow_state => 'accepted')
-    @course.teacher_enrollments.create(:user => @teacher, :workflow_state => 'invited')
-    @course.teacher_enrollments.create(:user => @teacher, :workflow_state => 'completed')
-    @course.offer!
-    @course.enroll_student(@student = user)
-    @assignment.context.reload
-
-    @submission = @assignment.submit_homework(@student, :body => 'some message')
-    @submission.conversation_groups.should eql @submission.conversation_groups.uniq
   end
 
   it "should ensure the media object exists" do
@@ -246,7 +229,7 @@ describe Submission do
       it "should not create a message when this is a quiz submission" do
         submission_spec_model
         @cc = @user.communication_channels.create(:path => "somewhere")
-        @quiz = Quiz.create!(:context => @course)
+        @quiz = Quizzes::Quiz.create!(:context => @course)
         @submission.quiz_submission = @quiz.generate_submission(@user)
         @submission.save!
         @submission.reload
@@ -292,11 +275,11 @@ describe Submission do
         user       = account_admin_user
         channel    = user.communication_channels.create!(:path => 'admin@example.com')
         submission = quiz.generate_submission(user, false)
-        submission.grade_submission
+        Quizzes::SubmissionGrader.new(submission).grade_submission
 
         channel2   = @teacher.communication_channels.create!(:path => 'chang@example.com')
         submission2 = quiz.generate_submission(@teacher, false)
-        submission2.grade_submission
+        Quizzes::SubmissionGrader.new(submission2).grade_submission
 
         submission.submission.messages_sent.should_not be_include('Submission Graded')
         submission2.submission.messages_sent.should_not be_include('Submission Graded')
@@ -349,7 +332,7 @@ describe Submission do
         @assignment.stubs(:score_to_grade).returns("10.0")
         @assignment.stubs(:due_at).returns(Time.now  - 100)
         submission_spec_model
-        @quiz = Quiz.create!(:context => @course)
+        @quiz = Quizzes::Quiz.create!(:context => @course)
         @submission.quiz_submission = @quiz.generate_submission(@user)
         @submission.save!
         @cc = @user.communication_channels.create(:path => "somewhere")
@@ -920,9 +903,33 @@ describe Submission do
       @submission.should_not be_missing
     end
 
-    it "should be true if not submitted and past due" do
+    it "should be true if not submitted, past due, and expects a submission" do
+      @submission.assignment.submission_types = "online_quiz"
       @submission.submission_type = nil # forces submitted_at to be nil
       @submission.cached_due_date = 1.day.ago
+
+      # Regardless of score
+      @submission.score = 0.00000001
+      @submission.graded_at = Time.zone.now + 1.day
+
+      @submission.should be_missing
+    end
+
+    it "should be true if not submitted, score of zero, and does not expect a submission" do
+      @submission.assignment.submission_types = "on_paper"
+      @submission.submission_type = nil # forces submitted_at to be nil
+      @submission.cached_due_date = 1.day.ago
+      @submission.score = 0
+      @submission.graded_at = Time.zone.now + 1.day
+      @submission.should be_missing
+    end
+
+    it "should be false if not submitted, score greater than zero, and does not expect a submission" do
+      @submission.assignment.submission_types = "on_paper"
+      @submission.submission_type = nil # forces submitted_at to be nil
+      @submission.cached_due_date = 1.day.ago
+      @submission.score = 0.00000001
+      @submission.graded_at = Time.zone.now + 1.day
       @submission.should be_missing
     end
   end
@@ -945,7 +952,7 @@ describe Submission do
   end
 
   describe "update_attachment_associations" do
-    begin
+    before do
       course_with_student active_all: true
       @assignment = @course.assignments.create!
     end

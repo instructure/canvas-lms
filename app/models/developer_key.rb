@@ -38,7 +38,7 @@ class DeveloperKey < ActiveRecord::Base
   end
 
   def generate_api_key(overwrite=false)
-    self.api_key = AutoHandle.generate(nil, 64) if overwrite || !self.api_key
+    self.api_key = CanvasUuid::Uuid.generate(nil, 64) if overwrite || !self.api_key
   end
 
   def self.default
@@ -83,7 +83,7 @@ class DeveloperKey < ActiveRecord::Base
   # for now, only one AWS account for SNS is supported
   def self.sns
     if !defined?(@sns)
-      settings = Setting.from_config('sns')
+      settings = ConfigFile.load('sns')
       @sns = nil
       @sns = AWS::SNS.new(settings) if settings
     end

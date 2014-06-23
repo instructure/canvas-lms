@@ -18,8 +18,14 @@ class QuestionTypeEducatedGuesser < AssessmentItemConverter
       if @doc.at_css('associateInteraction')
         return ['associateinteraction', 'matching']
       end
-      if@doc.at_css('extendedTextInteraction')
+      if @doc.at_css('extendedTextInteraction')
         return ['extendedTextInteraction', nil]
+      end
+      if @doc.at_css('textEntryInteraction')
+        return ['textEntryInteraction', 'text_entry_interaction']
+      end
+      if @doc.at_css('matchInteraction')
+        return ['matchInteraction', 'matching']
       end
     rescue => e
       message = "There was an error educatedly guessing the type for an assessment question"

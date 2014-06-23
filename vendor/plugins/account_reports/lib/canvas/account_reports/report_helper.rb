@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 - 2013 Instructure, Inc.
+# Copyright (C) 2012 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+
+require 'csv'
 
 module Canvas::AccountReports::ReportHelper
 
@@ -39,9 +41,9 @@ module Canvas::AccountReports::ReportHelper
   end
 
   # This function will take a datetime or a datetime string and convert into
-  # iso8601 for the root_account's timezone
+  # strftime for the root_account's timezone
   # it will then format the datetime using the given format string
-  def timezone_strftime(datetime, format)
+  def timezone_strftime(datetime, format, account=root_account)
     if datetime = parse_utc_string(datetime)
       (datetime.in_time_zone(account.default_time_zone)).strftime(format)
     end
@@ -151,7 +153,7 @@ module Canvas::AccountReports::ReportHelper
   end
 
   def report_extra_text
-    if term && check_report_key(:enrollment_term_id)
+    if check_report_key(:enrollment_term_id)
       add_extra_text(I18n.t('account_reports.default.term_text', "Term: %{term_name};",
                        :term_name => term_name))
     end

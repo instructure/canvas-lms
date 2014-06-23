@@ -19,6 +19,14 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe GroupCategory do
+
+  it 'delegates time_zone through to its context' do
+    zone = ActiveSupport::TimeZone["America/Denver"]
+    course = Course.new(time_zone: zone)
+    category = GroupCategory.new(context: course)
+    category.time_zone.should =~ /Mountain Time/
+  end
+
   context "protected_name_for_context?" do
     it "should be false for 'Student Groups' in accounts" do
       account = Account.default
@@ -188,48 +196,26 @@ describe GroupCategory do
     end
   end
 
-  context 'configure_self_signup(enabled, restricted)' do
-    before :each do
-      @category = GroupCategory.new
-      @category.name = "foo"
-    end
 
-    it "should make self_signup? true and unrestricted_self_signup? true given (true, false)" do
-      @category.configure_self_signup(true, false)
-      @category.self_signup?.should be_true
-      @category.unrestricted_self_signup?.should be_true
-    end
-
-    it "should make self_signup? true and unrestricted_self_signup? false given (true, true)" do
-      @category.configure_self_signup(true, true)
-      @category.self_signup?.should be_true
-      @category.unrestricted_self_signup?.should be_false
-    end
-
-    it "should make self_signup? false and unrestricted_self_signup? false given (false, *)" do
-      @category.configure_self_signup(false, false)
-      @category.self_signup?.should be_false
-      @category.unrestricted_self_signup?.should be_false
-
-      @category.configure_self_signup(false, true)
-      @category.self_signup?.should be_false
-      @category.unrestricted_self_signup?.should be_false
-    end
-
-    it "should persist to the DB" do
-      @category.context = course()
-      @category.configure_self_signup(true, true)
-      @category.save!
-      @category.reload
-      @category.self_signup?.should be_true
-      @category.unrestricted_self_signup?.should be_false
-    end
+  it "can pass through selfsignup info given (enabled, restricted)" do
+    @category = GroupCategory.new
+    @category.name = "foo"
+    @category.context = course()
+    @category.configure_self_signup(true, false)
+    @category.self_signup?.should be_true
+    @category.unrestricted_self_signup?.should be_true
   end
 
   it "should default to no self signup" do
     category = GroupCategory.new
     category.self_signup?.should be_false
     category.unrestricted_self_signup?.should be_false
+  end
+
+  it 'passes through a valid auto leader value when auto leader is enabled' do
+    category = GroupCategory.new
+    category.configure_auto_leader(true, 'RANDOM')
+    category.auto_leader.should == 'random'
   end
 
   context "has_heterogenous_group?" do
@@ -263,6 +249,20 @@ describe GroupCategory do
       group.add_user(user1)
       group.add_user(user2)
       category.should_not have_heterogenous_group
+    end
+  end
+
+  describe "max_membership_change" do
+    it "should update groups if the group limit changed" do
+      course_with_teacher(:active_all => true)
+      category = group_category
+      category.group_limit = 2
+      category.save
+      group = category.groups.create(:context => @course)
+      group.max_membership.should == 2
+      category.group_limit = 4
+      category.save
+      group.reload.max_membership.should == 4
     end
   end
 
@@ -316,6 +316,20 @@ describe GroupCategory do
       grouped_memberships = memberships.group_by { |m| m.group_id }
       grouped_memberships[group1.id].size.should == 1
       grouped_memberships[group2.id].size.should == 3
+    end
+
+    it "assigns leaders according to policy" do
+      course_with_teacher_logged_in(:active_all => true)
+      category = @course.group_categories.create(:name => "Group Category")
+      category.update_attribute(:auto_leader, 'first')
+      (1..3).each{|n| category.groups.create(:name => "Group #{n}", :context => @course) }
+      6.times{ @course.enroll_student(user_model).user }
+
+      groups = category.groups.active
+      groups.each{|group| group.reload.leader.should be_nil}
+      potential_members = @course.users_not_in_groups(groups)
+      category.distribute_members_among_groups(potential_members, groups)
+      groups.each{|group| group.reload.leader.should_not be_nil}
     end
 
     it "should update cached due dates for affected assignments" do
@@ -444,6 +458,7 @@ describe GroupCategory do
       category.current_progress.should be_nil
       category.send :start_progress
       category.send :complete_progress
+      category.reload
       category.progresses.count.should == 1
       category.current_progress.should be_nil
       # expect new progress

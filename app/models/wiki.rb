@@ -30,6 +30,10 @@ class Wiki < ActiveRecord::Base
   attr_accessible :title
 
   has_many :wiki_pages, :dependent => :destroy
+
+  EXPORTABLE_ATTRIBUTES = [:id, :title, :created_at, :updated_at, :front_page_url, :has_no_front_page]
+  EXPORTABLE_ASSOCIATIONS = [:wiki_pages]
+
   before_save :set_has_no_front_page_default
   after_save :update_contexts
 
@@ -87,7 +91,7 @@ class Wiki < ActiveRecord::Base
 
     # return an implicitly created page if a page could not be found
     unless page
-      page = self.wiki_pages.new(:title => url.titleize, :url => url)
+      page = self.wiki_pages.scoped.new(:title => url.titleize, :url => url)
       page.wiki = self
     end
     page
@@ -143,6 +147,9 @@ class Wiki < ActiveRecord::Base
     given {|user, session| self.cached_context_grants_right?(user, session, :read)}
     can :read
 
+    given {|user, session| self.cached_context_grants_right?(user, session, :view_unpublished_items)}
+    can :view_unpublished_items
+
     given {|user, session| self.cached_context_grants_right?(user, session, :participate_as_student) && self.context.allow_student_wiki_edits}
     can :read and can :create_page and can :update_page and can :update_page_content
 
@@ -162,7 +169,7 @@ class Wiki < ActiveRecord::Base
       t :default_group_wiki_name, "%{group_name} Wiki", :group_name => nil
 
       self.extend TextHelper
-      name = truncate_text(context.name, {:max_length => 200, :ellipsis => ''})
+      name = CanvasTextHelper.truncate_text(context.name, {:max_length => 200, :ellipsis => ''})
 
       context.wiki = wiki = Wiki.create!(:title => "#{name} Wiki")
       context.save!

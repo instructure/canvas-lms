@@ -44,7 +44,7 @@ end
 def api_call(method, path, params, body_params = {}, headers = {}, opts = {})
   raw_api_call(method, path, params, body_params, headers, opts)
   if opts[:expected_status]
-    response.status.to_i.should == opts[:expected_status]
+    assert_status(opts[:expected_status])
   else
     response.should be_success, response.body
   end
@@ -55,7 +55,7 @@ def api_call(method, path, params, body_params = {}, headers = {}, opts = {})
   end
 
   if jsonapi_call?(headers) && method == :delete
-    response.status.should == '204 No Content'
+    assert_status(204)
     return
   end
 
@@ -239,11 +239,13 @@ def assert_jsonapi_compliance(json, primary_set, associations = [])
     required_keys << 'meta'
   end
 
+  # test key values instead of nr. of keys so we get meaningful failures
+  json.keys.sort.should == required_keys.sort
+
   required_keys.each do |key|
     json.should be_has_key(key)
     json[key].is_a?(Array).should be_true unless key == 'meta'
   end
-  json.size.should == required_keys.size
 
   if associations.any?
     json['meta']['primaryCollection'].should == primary_set

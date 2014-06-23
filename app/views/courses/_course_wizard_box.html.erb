@@ -1,32 +1,4 @@
-<% js_block do %>
-<script>
-
-// TODO: get this out of the view
-require([
-  'jquery',
-  'jquery.instructure_misc_plugins' // indicate
-], function($, _miscPlugins) {
-
-$(document).ready(function() {
-  $("#wizard_box").bind('wizard_opened', function() {
-    $(this).find(".option.intro").click();
-  });
-  $("#wizard_box").click(function(event) {
-    if($(event.target).closest('a,li,input,.wizard_details').length == 0) {
-      $(this).find(".option.intro").click();
-    }
-  });
-  $(".change_home_page_layout_indicate").mouseover(function() {
-    $(".edit_course_home_content_link").indicate();
-  });
-  $(".wizard_options_list .option .header").mouseover(function(event) {
-    $(this).parents(".option").click();
-  });
-});
-
-});
-</script>
-<% end %>
+<% js_bundle 'legacy/courses_course_wizard_box' %>
 
 <% content_for :wizard_box do %>
   <% cache(['wizard_box_partial', @context, @current_user].cache_key) do %>

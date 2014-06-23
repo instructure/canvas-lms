@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/api_spec_helper')
 
-describe UserContent, :type => :integration do
+describe UserContent, type: :request do
   it "should translate course file download links to directly-downloadable urls" do
     course_with_teacher_logged_in(:active_all => true)
     attachment_model

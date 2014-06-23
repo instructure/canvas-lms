@@ -173,8 +173,6 @@ class StreamItem < ActiveRecord::Base
     when WebConference
       res = object.attributes
       res['users'] = object.users.map{|u| prepare_user(u)}
-    when CollectionItem
-      res = object.attributes
     else
       raise "Unexpected stream item type: #{object.class.to_s}"
     end
@@ -240,6 +238,8 @@ class StreamItem < ActiveRecord::Base
       l_context_id = res.context_id
       stream_item_id = res.id
 
+      # do the bulk insert in user id order to avoid locking problems on postges < 9.3 (foreign keys)
+      user_ids_subset.sort!
       #find out what the current largest stream item instance is so that we can delete them all once the new ones are created
       greatest_existing_id = StreamItemInstance.where(:stream_item_id => stream_item_id, :user_id => user_ids_subset).maximum(:id) || 0
 
@@ -337,7 +337,7 @@ class StreamItem < ActiveRecord::Base
     scope = scope.includes(:stream_item_instances) if touch_users
 
     while true
-      batch = scope.all
+      batch = scope.reload.all
       batch.each do |item|
         count += 1
         if touch_users

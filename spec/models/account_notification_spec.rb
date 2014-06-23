@@ -56,6 +56,18 @@ describe AccountNotification do
     AccountNotification.for_user_and_account(@admin, @account).map(&:id).sort.should == [@a1.id, @a2.id, @a3.id]
     AccountNotification.for_user_and_account(@student, @account).map(&:id).sort.should == [@a3.id]
     AccountNotification.for_user_and_account(@unenrolled, @account).map(&:id).sort.should == [@a2.id, @a3.id]
+
+    account_notification(:account => Account.site_admin, :roles => ["TeacherEnrollment","AccountAdmin"], :message => "Announcement 1")
+    @a4 = @announcement
+    account_notification(:account => Account.site_admin, :roles => ["NilEnrollment"], :message => "Announcement 2") #students not currently taking a course
+    @a5 = @announcement
+    account_notification(:account => Account.site_admin, :message => "Announcement 3") # no roles, should go to all
+    @a6 = @announcement
+
+    AccountNotification.for_user_and_account(@teacher, Account.site_admin).map(&:id).sort.should == [@a4.id, @a6.id]
+    AccountNotification.for_user_and_account(@admin, Account.site_admin).map(&:id).sort.should == [@a4.id, @a5.id, @a6.id]
+    AccountNotification.for_user_and_account(@student, Account.site_admin).map(&:id).sort.should == [@a6.id]
+    AccountNotification.for_user_and_account(@unenrolled, Account.site_admin).map(&:id).sort.should == [@a5.id, @a6.id]
   end
 
   it "should allow closing an announcement" do

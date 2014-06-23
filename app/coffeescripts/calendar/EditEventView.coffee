@@ -64,6 +64,9 @@ define [
     toggleHtmlView: (event) ->
       event?.preventDefault()
       $("textarea[name=description]").editorBox('toggle')
+      # hide the clicked link, and show the other toggle link.
+      # todo: replace .andSelf with .addBack when JQuery is upgraded.
+      $(event.currentTarget).siblings('a').andSelf().toggle()
 
     updateRemoveChildEvents: (e) ->
       value = if $(e.target).prop('checked') then '' else '1'

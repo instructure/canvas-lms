@@ -17,7 +17,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe "Favorites API", :type => :integration do
+describe "Favorites API", type: :request do
   before :each do
     @courses = []
     @courses << course_with_student(:active_all => true, :course_name => "Course 0").course

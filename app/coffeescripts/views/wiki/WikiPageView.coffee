@@ -1,4 +1,6 @@
 define [
+  'jquery'
+  'timezone'
   'underscore'
   'Backbone'
   'compiled/str/splitAssetString'
@@ -8,7 +10,7 @@ define [
   'compiled/views/wiki/WikiPageReloadView'
   'compiled/views/PublishButtonView'
   'i18n!pages'
-], (_, Backbone, splitAssetString, template, StickyHeaderMixin, WikiPageDeleteDialog, WikiPageReloadView, PublishButtonView, I18n) ->
+], ($, tz, _, Backbone, splitAssetString, template, StickyHeaderMixin, WikiPageDeleteDialog, WikiPageReloadView, PublishButtonView, I18n) ->
 
   class WikiPageView extends Backbone.View
 
@@ -101,6 +103,7 @@ define [
       json.CAN =
         VIEW_PAGES: !!@WIKI_RIGHTS.read
         PUBLISH: !!@WIKI_RIGHTS.manage && json.contextName == 'courses'
+        VIEW_UNPUBLISHED: !!@WIKI_RIGHTS.manage || !!@WIKI_RIGHTS.view_unpublished_items
         UPDATE_CONTENT: !!@PAGE_RIGHTS.update || !!@PAGE_RIGHTS.update_content
         DELETE: !!@PAGE_RIGHTS.delete && !@course_home
         READ_REVISIONS: !!@PAGE_RIGHTS.read_revisions
@@ -109,9 +112,9 @@ define [
 
       json.lock_info = _.clone(json.lock_info) if json.lock_info
       if json.lock_info?.unlock_at
-        json.lock_info.unlock_at = if Date.parse(json.lock_info.unlock_at) < Date.now()
+        json.lock_info.unlock_at = if tz.parse(json.lock_info.unlock_at) < new Date()
           null
         else
-          $.parseFromISO(json.lock_info.unlock_at).datetime_formatted
+          $.datetimeString(json.lock_info.unlock_at)
 
       json

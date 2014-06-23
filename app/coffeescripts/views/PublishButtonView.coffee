@@ -28,6 +28,7 @@ define [
 
     setElement: ->
       super
+      @$el.attr 'data-tooltip', ''
       @disable() if !@model.get('unpublishable')
 
     # events
@@ -52,6 +53,10 @@ define [
         @unpublish()
 
     addAriaLabel: (label) ->
+      $label = @$el.find('span.screenreader-only.accessible_label')
+      $('<span class="screenreader-only accessible_label"></span>').appendTo(@$el) unless $label.length
+
+      $label.text label
       @$el.attr 'aria-label', label
 
     # calling publish/unpublish on the model expects a deferred object

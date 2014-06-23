@@ -1,31 +1,45 @@
 require [
+  'jquery'
+  'Backbone'
+  'compiled/userSettings'
   'compiled/gradebook2/Gradebook'
   'compiled/views/gradebook/NavigationPillView'
   'compiled/views/gradebook/OutcomeGradebookView'
-], (Gradebook, NavigationPillView, OutcomeGradebookView) ->
+], ($, Backbone, userSettings, Gradebook, NavigationPillView, OutcomeGradebookView) ->
 
-  isLoaded      = false
-  initGradebook = () -> new Gradebook(ENV.GRADEBOOK_OPTIONS)
-  initOutcomes  = (gradebook) ->
-    navigation = new NavigationPillView(el: $('.gradebook-navigation'))
-    book       = new OutcomeGradebookView(
-      el: $('.outcome-gradebook-container'),
-      gradebook: gradebook)
-    book.render()
+  class GradebookRouter extends Backbone.Router
+    routes:
+      '': 'tab'
+      'tab-:viewName': 'tab'
 
-    navigation.on 'pillchange', (viewName) ->
-      $('.gradebook-container, .outcome-gradebook-container').addClass('hidden')
-      $(".#{viewName}-container").removeClass('hidden')
-      loadOutcomes(book) if !isLoaded and viewName is 'outcome-gradebook'
+    initialize: ->
+      @isLoaded      = false
+      @views = {}
+      @views.assignment = new Gradebook(ENV.GRADEBOOK_OPTIONS)
+      if ENV.GRADEBOOK_OPTIONS.outcome_gradebook_enabled
+        @views.outcome = @initOutcomes()
 
-  loadOutcomes = (book) ->
-    isLoaded = true
-    courseID = ENV.context_asset_string.split('_')[1]
-    url      = "/api/v1/courses/#{courseID}/outcome_rollups?per_page=50"
-    dfd      = $.getJSON(url)
-    $('.outcome-gradebook-wrapper').disableWhileLoading(dfd)
-    dfd.then((response) -> book.loadOutcomes(response))
+    initOutcomes: ->
+      book = new OutcomeGradebookView(
+        el: $('.outcome-gradebook-container'),
+        gradebook: @views.assignment)
+      book.render()
+      @navigation = new NavigationPillView(el: $('.gradebook-navigation'))
+      @navigation.on 'pillchange', @handlePillChange
+      book
 
-  $(document).ready ->
-    gradebook = initGradebook()
-    initOutcomes(gradebook) if ENV.GRADEBOOK_OPTIONS.outcome_gradebook_enabled
+    handlePillChange: (viewname) =>
+      @navigate('tab-'+viewname, trigger: true) if viewname
+
+    tab: (viewName) ->
+      viewName ||= userSettings.contextGet 'gradebook_tab'
+      window.tab = viewName
+      viewName = 'assignment' if viewName != 'outcome' || !@views.outcome
+      @navigation.setActiveView(viewName) if @navigation
+      $('.assignment-gradebook-container, .outcome-gradebook-container').addClass('hidden')
+      $(".#{viewName}-gradebook-container").removeClass('hidden')
+      @views[viewName].onShow()
+      userSettings.contextSet 'gradebook_tab', viewName
+
+  @router = new GradebookRouter
+  Backbone.history.start()

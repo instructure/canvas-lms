@@ -307,11 +307,22 @@ define [
         }
       ]
 
+  concludedStudents = [
+        {
+          user: { id: '105', name: 'Lyra' }
+          course_section_id: '1'
+          user_id: '105'
+          workflow_state: 'completed'
+          completed_at: "2013-10-01T10:00:00Z"
+        }
+      ]
+
   assignmentGroups = [
         {
           id: '1'
           name: 'AG1'
           position: 1
+          group_weight: 0
           assignments: [
             {
               id: '1'
@@ -332,7 +343,7 @@ define [
               points_possible: null
               due_at: null
               position: 10
-              submission_types: ["none"]
+              submission_types: ["online_url", "online_text_entry"]
               assignment_group_id:'1'
               published: true
               muted: true
@@ -355,6 +366,7 @@ define [
           id: '2'
           name: 'AG2'
           position: 10
+          group_weight: 0
           assignments: [
             {
               id: '4'
@@ -380,12 +392,23 @@ define [
               published: true
               muted: true
             }
+            {
+              id: '6'
+              name: 'Da Fish and Chips!'
+              points_possible: 40
+              grading_type: "pass_fail"
+              submission_types: ["none"]
+              due_at: "2013-09-01T10:00:00Z"
+              position: 9
+              assignment_group_id:'2'
+            }
           ]
         }
         {
           id: '4'
           name: 'Silent Assignments'
           position: 2
+          group_weight: 0
           assignments: [
             {
               id: '20'
@@ -411,29 +434,48 @@ define [
             }
           ]
         }
-
+        {
+          id: '5'
+          name: 'Invalid AG'
+          position: 3
+          group_weight: 0
+          assignments: [
+            {
+              id: '24'
+              name: 'No Points Assignment'
+              points_possible: 0
+              grading_type: "percent"
+              submission_types: ["not_graded"]
+              due_at: "2013-09-01T10:00:00Z"
+              position: 1
+              assignment_group_id:'4'
+              published: true
+            }
+          ]
+        }
       ]
 
   submissions = [
         {
           user_id: '1'
           submissions: [
-            { id: '1', user_id: '1', assignment_id: '1', grade: '3' }
-            { id: '2', user_id: '1', assignment_id: '2', grade: null }
+            { id: '1', user_id: '1', assignment_id: '1', grade: '3', score: '3' }
+            { id: '2', user_id: '1', assignment_id: '2', grade: null, score: null  }
+            { id: '5', user_id: '1', assignment_id: '6', grade: 'incomplete', score: 'incomplete' }
           ]
         }
         {
           user_id: '2'
           submissions: [
-            { id: '3', user_id: '2', assignment_id: '1', grade: '9' }
-            { id: '4', user_id: '2', assignment_id: '2', grade: null }
+            { id: '3', user_id: '2', assignment_id: '1', grade: '9', score: '9' }
+            { id: '4', user_id: '2', assignment_id: '2', grade: null, score: null }
           ]
         }
         {
           user_id: '3'
           submissions: [
-            { id: '5', user_id: '3', assignment_id: '1', grade: '10' }
-            { id: '6', user_id: '3', assignment_id: '2', grade: null }
+            { id: '5', user_id: '3', assignment_id: '1', grade: '10', score: '10' }
+            { id: '6', user_id: '3', assignment_id: '2', grade: null, score: null }
           ]
         }
         {
@@ -471,11 +513,51 @@ define [
         { id: '2', name: 'Slayers and Scoobies' }
       ]
 
+  customColumns = [
+    hidden: false
+    id: "1"
+    position: 1
+    teacher_notes: true
+    title: "Notes"
+  ]
+
+  outcomesRaw = [
+    { outcome: { id: '1', title: 'Eating' } }
+    { outcome: { id: '2', title: 'Drinking' } }
+  ]
+
+  outcomes = [
+    { id: '1', title: 'Eating' }
+    { id: '2', title: 'Drinking' }
+  ]
+
+  outcomeRollupsRaw = {
+    rollups: [
+      { links: { user: '1' }, scores: [
+        { links: {outcome: '1'}, score: 5 }
+        { links: {outcome: '2'}, score: 4 }
+      ]}
+      { links: { user: '2' }, scores: [
+        { links: {outcome: '2'}, score: 3 }
+      ]}
+    ]
+  }
+
+  outcomeRollups = [
+    { outcome_id: '1', user_id: '1', score: 5 }
+    { outcome_id: '2', user_id: '1', score: 4 }
+    { outcome_id: '2', user_id: '2', score: 3 }
+  ]
+
+  custom_columns: customColumns
   set_default_grade_response: default_grade_response
   students: students
+  concluded_enrollments: concludedStudents
   assignment_groups: assignmentGroups
   submissions: submissions
   sections: sections
+  outcomes: outcomes
+  outcome_rollups: outcomeRollups
   create: (overrides) ->
 
     window.ENV =
@@ -484,18 +566,30 @@ define [
         context_asset_string: 'course_1'
         GRADEBOOK_OPTIONS: {
           students_url: '/api/v1/enrollments'
+          students_url_with_concluded_enrollments: '/api/v1/concluded_enrollments'
           assignment_groups_url: '/api/v1/assignment_groups'
           submissions_url: '/api/v1/submissions'
           sections_url: '/api/v1/sections'
           context_url: '/courses/1'
           context_id: 1
           group_weighting_scheme: "equal"
-          change_grade_url: 'http://localhost:3000/api/v1/courses/2/assignments/:assignment/submissions/:submission'
+          change_grade_url: '/api/v1/courses/1/assignments/:assignment/submissions/:submission'
+          custom_columns_url: 'api/v1/courses/1/custom_gradebook_columns'
+          custom_column_data_url: 'api/v1/courses/1/custom_gradebook_columns/:id'
+          setting_update_url: 'api/v1/courses/1/settings'
+          outcome_gradebook_enabled: true
+          outcome_links_url: 'api/v1/courses/1/outcome_group_links'
+          outcome_rollups_url: 'api/v1/courses/1/outcome_rollups'
         }
       }
 
     ajax.defineFixture window.ENV.GRADEBOOK_OPTIONS.students_url,
       response: clone students
+      jqXHR: { getResponseHeader: -> {} }
+      textStatus: ''
+
+    ajax.defineFixture window.ENV.GRADEBOOK_OPTIONS.students_url_with_concluded_enrollments,
+      response: clone concludedStudents
       jqXHR: { getResponseHeader: -> {} }
       textStatus: ''
 
@@ -514,5 +608,22 @@ define [
       jqXHR: { getResponseHeader: -> {} }
       textStatus: ''
 
-      #ajax.defineFixture overide.url, override.options for override in overrides?
+    ajax.defineFixture window.ENV.GRADEBOOK_OPTIONS.custom_columns_url,
+      response: clone customColumns
+      jqXHR: { getResponseHeader: -> {} }
+      textStatus: ''
 
+    ajax.defineFixture window.ENV.GRADEBOOK_OPTIONS.setting_update_url,
+      response: true
+      jqXHR: { getResponseHeader: -> {} }
+      textStatus: ''
+
+    ajax.defineFixture window.ENV.GRADEBOOK_OPTIONS.outcome_links_url,
+      response: clone outcomesRaw
+      jqXHR: { getResponseHeader: -> {} }
+      textStatus: ''
+
+    ajax.defineFixture window.ENV.GRADEBOOK_OPTIONS.outcome_rollups_url,
+      response: clone outcomeRollupsRaw
+      jqXHR: { getResponseHeader: -> {} }
+      textStatus: ''

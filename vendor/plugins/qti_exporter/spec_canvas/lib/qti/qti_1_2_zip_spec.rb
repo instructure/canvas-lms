@@ -17,11 +17,11 @@ if Qti.migration_executable
 
       @migration.migration_settings[:migration_ids_to_import] = {:copy=>{}}
       @migration.migration_settings[:files_import_root_path] = @course_data[:files_import_root_path]
-      @course.import_from_migration(@course_data, nil, @migration)
+      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
     end
 
     after(:all) do
-      ActiveRecord::Base.all_models.each { |m| truncate_table(m) }
+      truncate_all_tables
       @converter.delete_unzipped_archive
       if File.exists?(@dir)
         FileUtils::rm_rf(@dir)
@@ -101,7 +101,7 @@ if Qti.migration_executable
       course_data['all_files_export']['file_path'] = course_data['all_files_zip']
       migration.migration_settings[:migration_ids_to_import] = {:copy=>{}}
       migration.migration_settings[:files_import_root_path] = course_data[:files_import_root_path]
-      @course.import_from_migration(course_data, nil, migration)
+      Importers::CourseContentImporter.import_content(@course, course_data, nil, migration)
       
       # Check the first import
       aq = @course.assessment_questions.find_by_migration_id("prepend_test_QUE_1003")

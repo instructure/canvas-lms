@@ -9,6 +9,14 @@ class ContextExternalTool < ActiveRecord::Base
                   :course_navigation, :account_navigation, :user_navigation,
                   :resource_selection, :editor_button, :homework_submission,
                   :config_type, :config_url, :config_xml, :tool_id
+
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :context_id, :context_type, :domain, :url, :name, :description, :settings, :workflow_state, :created_at, :updated_at, :has_user_navigation, :has_course_navigation,
+    :has_account_navigation, :has_resource_selection, :has_editor_button, :cloned_item_id, :tool_id, :has_homework_submission
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:content_tags, :context]
+
   validates_presence_of :context_id, :context_type, :workflow_state
   validates_presence_of :name, :consumer_key, :shared_secret
   validates_length_of :name, :maximum => maximum_string_length
@@ -31,35 +39,12 @@ class ContextExternalTool < ActiveRecord::Base
     state :deleted
   end
 
-  def create_launch(context, user, return_url, opts = {})
-    # resolve the url based on selection_type, falling back to the tool url (unless overridden)
-    resource_url = opts[:resource_url]
-    selection_type = opts[:selection_type]
-
-    # if this is an assessment enforce the correct resource_url
-    if selection_type
-      if self.settings[selection_type.to_sym]
-        resource_url ||= self.settings[selection_type.to_sym][:url] if selection_type
-      end
-    end
-    resource_url ||= self.url
-
-    # generate the launch
-    BasicLTI::ToolLaunch.new(:url => resource_url,
-                             :tool => self,
-                             :user => user,
-                             :context => context,
-                             :link_code => opaque_identifier_for(context),
-                             :return_url => return_url,
-                             :resource_type => selection_type)
-  end
-
   set_policy do
     given { |user, session| self.cached_context_grants_right?(user, session, :update) }
     can :read and can :update and can :delete
   end
   
-  EXTENSION_TYPES = [:user_navigation, :course_navigation, :account_navigation, :resource_selection, :editor_button, :homework_submission]
+  EXTENSION_TYPES = [:user_navigation, :course_navigation, :account_navigation, :resource_selection, :editor_button, :homework_submission, :migration_selection]
   def url_or_domain_is_set
     setting_types = EXTENSION_TYPES
     # url or domain (or url on canvas lti extension) is required
@@ -122,7 +107,7 @@ class ContextExternalTool < ActiveRecord::Base
   def validate_vendor_help_link
     return if self.vendor_help_link.blank?
     begin
-      value, uri = CustomValidations.validate_url(self.vendor_help_link)
+      value, uri = CanvasHttp.validate_url(self.vendor_help_link)
       self.vendor_help_link = uri.to_s
     rescue URI::InvalidURIError, ArgumentError
       self.vendor_help_link = nil
@@ -175,7 +160,7 @@ class ContextExternalTool < ActiveRecord::Base
     if tool_hash[:error]
       @config_errors << [error_field, tool_hash[:error]]
     else
-      ContextExternalTool.import_from_migration(tool_hash, context, self)
+      Importers::ContextExternalToolImporter.import_from_migration(tool_hash, context, nil, self)
     end
     self.name = real_name unless real_name.blank?
   rescue CC::Importer::BLTIConverter::CCImportError => e
@@ -255,6 +240,14 @@ class ContextExternalTool < ActiveRecord::Base
     extension_setting(:homework_submission, setting)
   end
 
+  def migration_selection=(hash)
+    tool_setting(:migration_selection, hash, :selection_width, :selection_height, :icon_url)
+  end
+
+  def migration_selection(setting = nil)
+    extension_setting(:migration_selection, setting)
+  end
+
   def icon_url=(i_url)
     settings[:icon_url] = i_url
   end
@@ -301,7 +294,7 @@ class ContextExternalTool < ActiveRecord::Base
     settings[:selection_width] = settings[:selection_width].to_i if settings[:selection_width]
     settings[:selection_height] = settings[:selection_height].to_i if settings[:selection_height]
 
-    [:resource_selection, :editor_button, :homework_submission].each do |type|
+    EXTENSION_TYPES.each do |type|
       if settings[type]
         settings[type][:selection_width] = settings[type][:selection_width].to_i if settings[type][:selection_width]
         settings[type][:selection_height] = settings[type][:selection_height].to_i if settings[type][:selection_height]
@@ -483,7 +476,7 @@ class ContextExternalTool < ActiveRecord::Base
       return preferred_tool
     end
 
-    sorted_external_tools = contexts.collect{|context| context.context_external_tools.active.sort_by{|t| [t.precedence, t.id == preferred_tool_id ? SortFirst : SortLast] }}.flatten(1)
+    sorted_external_tools = contexts.collect{|context| context.context_external_tools.active.sort_by{|t| [t.precedence, t.id == preferred_tool_id ? CanvasSort::First : CanvasSort::Last] }}.flatten(1)
 
     res = sorted_external_tools.detect{|tool| tool.url && tool.matches_url?(url) }
     return res if res
@@ -501,6 +494,8 @@ class ContextExternalTool < ActiveRecord::Base
   scope :having_setting, lambda { |setting| setting ? where("has_#{setting.to_s}" => true) : scoped }
 
   def self.find_for(id, context, type)
+    id = id[Api::ID_REGEX] if id.is_a?(String)
+    raise ActiveRecord::RecordNotFound unless id.present?
     tool = context.context_external_tools.having_setting(type).find_by_id(id)
     if !tool && context.is_a?(Group)
       context = context.context
@@ -525,18 +520,6 @@ class ContextExternalTool < ActiveRecord::Base
   end
   
   def self.serialization_excludes; [:shared_secret,:settings]; end
-  
-  def self.process_migration(data, migration)
-    tools = data['external_tools'] ? data['external_tools']: []
-    tools.each do |tool|
-      if migration.import_object?("context_external_tools", tool['migration_id']) || migration.import_object?("external_tools", tool['migration_id'])
-        item = import_from_migration(tool, migration.context)
-        if item.consumer_key == 'fake' || item.shared_secret == 'fake'
-          migration.add_warning(t('external_tool_attention_needed', 'The security parameters for the external tool "%{tool_name}" need to be set in Course Settings.', :tool_name => item.name))
-        end
-      end
-    end
-  end
 
   # sets the custom fields from the main tool settings, and any on individual resource type settings
   def set_custom_fields(hash, resource_type)
@@ -557,43 +540,6 @@ class ContextExternalTool < ActiveRecord::Base
   def resource_selection_settings
     settings[:resource_selection]
   end
-  
-  def self.import_from_migration(hash, context, item=nil)
-    hash = hash.with_indifferent_access
-    return nil if hash[:migration_id] && hash[:external_tools_to_import] && !hash[:external_tools_to_import][hash[:migration_id]]
-    item ||= find_by_context_id_and_context_type_and_migration_id(context.id, context.class.to_s, hash[:migration_id]) if hash[:migration_id]
-    item ||= context.context_external_tools.new
-    item.migration_id = hash[:migration_id]
-    item.name = hash[:title]
-    item.description = hash[:description]
-    item.tool_id = hash[:tool_id]
-    item.url = hash[:url] unless hash[:url].blank?
-    item.domain = hash[:domain] unless hash[:domain].blank?
-    item.privacy_level = hash[:privacy_level] || 'name_only'
-    item.consumer_key ||= hash[:consumer_key] || 'fake'
-    item.shared_secret ||= hash[:shared_secret] || 'fake'
-    item.settings = hash[:settings].with_indifferent_access if hash[:settings].is_a?(Hash)
-    if hash[:custom_fields].is_a? Hash
-      item.settings[:custom_fields] ||= {}
-      item.settings[:custom_fields].merge! hash[:custom_fields] 
-    end
-    if hash[:extensions].is_a? Array
-      item.settings[:vendor_extensions] ||= []
-      hash[:extensions].each do |ext|
-        next unless ext[:custom_fields].is_a? Hash
-        if existing = item.settings[:vendor_extensions].find { |ve| ve[:platform] == ext[:platform] }
-          existing[:custom_fields] ||= {}
-          existing[:custom_fields].merge! ext[:custom_fields]
-        else
-          item.settings[:vendor_extensions] << {:platform => ext[:platform], :custom_fields => ext[:custom_fields]}
-        end
-      end
-    end
-    
-    item.save!
-    context.imported_migration_items << item if context.respond_to?(:imported_migration_items) && context.imported_migration_items && item.new_record?
-    item
-  end
 
   def opaque_identifier_for(asset)
     ContextExternalTool.opaque_identifier_for(asset, self.shard)
@@ -601,13 +547,35 @@ class ContextExternalTool < ActiveRecord::Base
 
   def self.opaque_identifier_for(asset, shard)
     shard.activate do
-      str = asset.asset_string.to_s
-      raise "Empty value" if str.blank?
-      Canvas::Security.hmac_sha1(str, shard.settings[:encryption_key])
+      lti_context_id = context_id_for(asset, shard)
+      set_asset_context_id(asset, lti_context_id)
     end
   end
 
   private
+
+  def self.set_asset_context_id(asset, context_id)
+    lti_context_id = context_id
+    if asset.respond_to?('lti_context_id')
+      if asset.new_record?
+        asset.lti_context_id = context_id
+      else
+        asset.reload unless asset.lti_context_id?
+        unless asset.lti_context_id
+          asset.lti_context_id = context_id
+          asset.save!
+        end
+        lti_context_id = asset.lti_context_id
+      end
+    end
+    lti_context_id
+  end
+
+  def self.context_id_for(asset, shard)
+    str = asset.asset_string.to_s
+    raise "Empty value" if str.blank?
+    Canvas::Security.hmac_sha1(str, shard.settings[:encryption_key])
+  end
 
   def tool_setting(setting, hash, *keys)
     if !hash || !hash.is_a?(Hash)

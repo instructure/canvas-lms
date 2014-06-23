@@ -13,10 +13,10 @@ $context_module_bg_color: #f2f3f4
   margin-bottom: 15px
   
   .links a, .reorder_module_link, .move_item_link
-    +opacity(0.5)
+    opacity: 0.5
     text-decoration: none
     &:hover
-      +opacity(1)
+      opacity: 1
   .reorder_module_link, .move_item_link
     padding-left: 2px
   .links
@@ -30,6 +30,54 @@ $context_module_bg_color: #f2f3f4
     color: #323232
     .links
       float: right
+
+  .due_date_display, .points_possible_display
+    width: 95px
+    margin-right: 5px
+
+  .ig-details
+    width: 210px
+
+  .ig-row.with-completion-requirements
+    height: 55px
+
+  .module-item-title
+    min-width: 300px
+    right: 250px
+
+  h2 .name
+    display: inline
+    position: absolute
+    left: 45px
+    right: 140px
+    top: 6px
+    white-space: nowrap
+    text-overflow: ellipsis
+    overflow: hidden
+
+  &.student-view
+    h2 .name
+      left: 20px
+
+  .student-view 
+    .requirement-description
+      left: 36px
+    .module-item-title
+      right: 150px
+    .ig-details
+      width: 125px
+      right: 0px
+    .due_date_display
+      width: 65px
+    .points_possible_display
+      width: 33px
+      right: 125px
+    
+  .requirement-description
+    position: absolute
+    bottom: 5px
+    left: 55px
+    font-size: 11px
 
   .completion_status .complete_icon, 
   .locked_icon,
@@ -78,11 +126,11 @@ $context_module_bg_color: #f2f3f4
         display: none
   &.locked_module
     .context_module_item
-      +opacity(0.5)
+      opacity: 0.5
       .title 
         display: none
       .locked_title 
-        display: inline-block
+        display: inline
       .completion_requirement
         color: #aaa
     .completion_status
@@ -117,21 +165,51 @@ $context_module_bg_color: #f2f3f4
 
 .context_module_item 
   border-bottom: 1px dotted #e0e0e0
+  &.indent_0
+    td .type_icon
+      padding-right: 15px
+    .outdent_item_link
+      display: none !important
+    .indent_item_link
+      border-top-left-radius: 8px
+      border-top-right-radius: 8px
   &.indent_1
+    td .type_icon
+      padding-right: 15px
     .type_icon
-      padding-right: 20px
+      padding-left: 20px
+    .requirement-description
+      padding-left: 20px
   &.indent_2
+    td .type_icon
+      padding-right: 15px
     .type_icon
-      padding-right: 40px
+      padding-left: 40px
+    .requirement-description
+      padding-left: 40px
   &.indent_3
+    td .type_icon
+      padding-right: 15px
     .type_icon
-      padding-right: 60px
+      padding-left: 60px
+    .requirement-description
+      padding-left: 60px
   &.indent_4
+    td .type_icon
+      padding-right: 15px
     .type_icon
-      padding-right: 80px
+      padding-left: 80px
+    .requirement-description
+      padding-left: 80px
   &.indent_5
+    td .type_icon
+      padding-right: 15px
     .type_icon
-      padding-right: 100px
+      padding-left: 100px
+    .requirement-description
+      padding-left: 100px
+    .indent_item_link
+      display: none !important
   .type_icon
     display: inline-block
     i
@@ -216,11 +294,11 @@ $context_module_bg_color: #f2f3f4
       display: none
   &.after_current_position
     .item_name
-      +opacity(0.5)
+      opacity: 0.5
       .title
         display: none
       .locked_title
-        display: inline-block
+        display: inline
       .completion_requirement
         color: #aaa
   .module_item_icons
@@ -233,17 +311,16 @@ $context_module_bg_color: #f2f3f4
 #context_modules.editable
   .context_module_item
     &.after_current_position
-      +opacity(1)
+      opacity: 1
       .title 
         display: inline-block
       .locked_title 
         display: none
 
 .module_item_select
-  max-height: 150px
-  max-width: 300px
-  min-height: 75px
+  min-height: 175px
   min-width: 200px
+  width: 100%
 
 .context_module_item 
   .item_name 
@@ -263,7 +340,7 @@ $context_module_bg_color: #f2f3f4
     .title 
       display: none
     .locked_title 
-      display: inline-block
+      display: inline
 
   &.context_module_sub_header 
     .title
@@ -273,7 +350,7 @@ $context_module_bg_color: #f2f3f4
     .criterion img
       display: none
     .locked_title
-      display: inline-block
+      display: inline
       font-weight: bold
       color: #888
   .links
@@ -295,10 +372,6 @@ $context_module_bg_color: #f2f3f4
   td.points_possible_display
     padding-right: 15px
     width: 40px
-    .points_possible_block
-      display: inline-block
-      text-align: right
-      min-width: 25px
   td.due_date_display
     padding-right: 5px
     padding-left: 15px
@@ -377,3 +450,18 @@ body.ie
   div.completion_criterion_option
     select.assignment_picker
       width: auto
+
+@media screen and (max-width : 1024px)
+  .with-left-side.modules
+    min-width: 700px
+
+  #context_modules
+    .student-view
+      .due_date_display
+        display: block
+
+    .due_date_display
+      display: none
+    .ig-details
+      width: 115px
+

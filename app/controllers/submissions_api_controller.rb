@@ -184,6 +184,11 @@ class SubmissionsApiController < ApplicationController
         next if seen_users.include?(student.id)
         seen_users << student.id
         hash = { :user_id => student.id, :submissions => [] }
+
+        if pseudonym = student.sis_pseudonym_for(context)
+          hash[:integration_id] = pseudonym.integration_id
+        end
+
         student_submissions = submissions_for_user[student.id] || []
         student_submissions.each do |submission|
           # we've already got all the assignments loaded, so bypass AR loading
@@ -201,8 +206,9 @@ class SubmissionsApiController < ApplicationController
         result << hash
       end
     else
-      submissions = @context.submissions.except(:includes, :order).where(:user_id => student_ids).includes(:user).order(:id)
+      submissions = @context.submissions.except(:order).where(:user_id => student_ids).order(:id)
       submissions = submissions.where(:assignment_id => assignments) unless assignments.empty?
+      submissions = CANVAS_RAILS2 ? submissions.includes(:user) : submissions.preload(:user)
       submissions = Api.paginate(submissions, self, polymorphic_url([:api_v1, @section || @context, :student_submissions]))
       Submission.bulk_load_versioned_attachments(submissions)
       result = submissions.map do |s|
@@ -257,6 +263,21 @@ class SubmissionsApiController < ApplicationController
     end
   end
 
+  # @model RubricAssessment
+  #  {
+  #     "id" : "RubricAssessment",
+  #     "required": ["criterion_id"],
+  #     "properties": {
+  #       "criterion_id": {
+  #         "description": "The ID of the quiz question.",
+  #         "example": 1,
+  #         "type": "integer",
+  #         "format": "int64"
+  #       },
+  #     }
+  #  }
+  #
+  #
   # @API Grade or comment on a submission
   #
   # Comment on and/or update the grading for a student's assignment submission.
@@ -371,7 +392,7 @@ class SubmissionsApiController < ApplicationController
         @submissions = @assignment.grade_student(@user, submission)
         @submission = @submissions.first
       else
-        @submission = @assignment.find_or_create_submission(@user)
+        @submission = @assignment.find_or_create_submission(@user) if @submission.new_record?
         @submissions ||= [@submission]
       end
 
@@ -422,7 +443,7 @@ class SubmissionsApiController < ApplicationController
   end
 
   def map_user_ids(user_ids)
-    Api.map_ids(user_ids, User, @domain_root_account)
+    Api.map_ids(user_ids, User, @domain_root_account, @current_user)
   end
 
   def get_user_considering_section(user_id)

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -22,6 +22,9 @@ class RoleOverride < ActiveRecord::Base
   belongs_to :parent, :class_name => "Role"
 
   attr_accessible :context, :permission, :enrollment_type, :enabled, :applies_to_self, :applies_to_descendants
+
+  EXPORTABLE_ATTRIBUTES = [:id, :enrollment_type, :permission, :enabled, :locked, :context_id, :context_type, :created_at, :updated_at, :applies_to_self, :applies_to_descendants]
+  EXPORTABLE_ASSOCIATIONS = [:context, :children, :parent]
 
   validate :must_apply_to_something
 
@@ -495,6 +498,16 @@ class RoleOverride < ActiveRecord::Base
         ],
         :true_for => [ 'AccountAdmin' ]
       },
+      :view_course_changes => {
+        :label => lambda { t('permissions.view_course_changes', "View Course Change Logs") },
+        :admin_tool => true,
+        :account_only => true,
+        :available_to => [
+          'AccountAdmin',
+          'AccountMembership'
+        ],
+        :true_for => [ 'AccountAdmin' ]
+      },
       :view_notifications => {
         :label => lambda { t('permissions.view_notifications', "View notifications") },
         :admin_tool => true,
@@ -546,7 +559,6 @@ class RoleOverride < ActiveRecord::Base
       :read_reports => {
         :label => lambda { t('permissions.read_reports', "View usage reports for the course") },
         :available_to => [
-          'StudentEnrollment',
           'TaEnrollment',
           'DesignerEnrollment',
           'TeacherEnrollment',

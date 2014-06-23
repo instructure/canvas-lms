@@ -105,6 +105,7 @@
       <xs:element name="external_tool_url" type="xs:string" minOccurs="0"/>
       <xs:element name="external_tool_new_tab" type="xs:boolean" minOccurs="0"/>
       <xs:element name="freeze_on_copy" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="muted" type="xs:boolean" minOccurs="0"/>
       <xs:element name="saved_rubric_comments" minOccurs="0">
         <xs:complexType>
           <xs:sequence minOccurs="0" maxOccurs="unbounded">
@@ -358,6 +359,23 @@
             <xs:element name="ratings" type="ratingsType" minOccurs="0"/>
             <xs:element name="external_identifier" type="xs:string" minOccurs="0"/>
             <xs:element name="is_global_outcome" type="xs:boolean" minOccurs="0"/>
+            <xs:element name="alignments" minOccurs="0">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="alignment" minOccurs="0" maxOccurs="unbounded">
+                    <xs:complexType>
+                      <xs:all minOccurs="0">
+                        <xs:element name="content_type" type="xs:string" minOccurs="1"/>
+                        <xs:element name="content_id" type="xs:string" minOccurs="1"/>
+                        <xs:element name="mastery_type" type="xs:string" minOccurs="0"/>
+                        <xs:element name="mastery_score" type="xs:float" minOccurs="0"/>
+                        <xs:element name="position" type="xs:integer" minOccurs="0"/>
+                      </xs:all>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
           </xs:all>
           <xs:attribute name="identifier" type="xs:ID" use="required"/>
         </xs:complexType>
@@ -465,6 +483,8 @@
         <xs:element name="hide_results" type="xs:string" minOccurs="0"/>
         <xs:element name="require_lockdown_browser" type="xs:boolean" minOccurs="0"/>
         <xs:element name="require_lockdown_browser_for_results" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="require_lockdown_browser_monitor" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="lockdown_browser_monitor_data" type="xs:string" minOccurs="0"/>
         <xs:element name="access_code" type="xs:string" minOccurs="0"/>
         <xs:element name="ip_filter" type="xs:string" minOccurs="0"/>
         <xs:element name="show_correct_answers" type="xs:boolean" minOccurs="0"/>
@@ -521,7 +541,38 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  
+
+  <xs:element name="media_tracks">
+    <xs:complexType>
+      <xs:sequence minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="media">
+          <xs:complexType>
+            <xs:attribute name="identifierref" type="xs:ID" use="required"/>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+              <xs:element name="track">
+                <xs:complexType>
+                  <xs:attribute name="identifierref" type="xs:ID" use="required"/>
+                  <xs:attribute name="kind" type="xs:string" use="required">
+                    <xs:simpleType>
+                      <xs:restriction base="xs:string">
+                        <xs:enumeration value="subtitles"/>
+                        <xs:enumeration value="captions"/>
+                        <xs:enumeration value="descriptions"/>
+                        <xs:enumeration value="chapters"/>
+                        <xs:enumeration value="metadata"/>
+                      </xs:restriction>
+                    </xs:simpleType>
+                  </xs:attribute>
+                  <xs:attribute name="locale" type="xs:string" use="required"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
   <xs:element name="fileMeta">
     <xs:complexType>
       <xs:all minOccurs="0" maxOccurs="1">

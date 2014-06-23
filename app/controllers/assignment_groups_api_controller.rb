@@ -65,7 +65,7 @@ class AssignmentGroupsApiController < ApplicationController
   #
   # @returns AssignmentGroup
   def create
-    @assignment_group = @context.assignment_groups.new
+    @assignment_group = @context.assignment_groups.scoped.new
     if authorized_action(@assignment_group, @current_user, :create)
       process_assignment_group
     end

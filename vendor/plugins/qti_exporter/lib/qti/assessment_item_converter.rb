@@ -58,26 +58,51 @@ class AssessmentItemConverter
     end
   end
 
+  EXCLUDED_QUESTION_TEXT_CLASSES = ["RESPONSE_BLOCK", "RIGHT_MATCH_BLOCK"]
+
   def create_instructure_question
     begin
       create_doc
       @question[:question_name] = @title || get_node_att(@doc, 'assessmentItem', 'title')
       # The colons are replaced with dashes in the conversion from QTI 1.2
       @question[:migration_id] = get_node_att(@doc, 'assessmentItem', 'identifier')
-      @question[:migration_id] = @question[:migration_id].gsub(/:/, '-') if @question[:migration_id]
+      @question[:migration_id] = @question[:migration_id].gsub(/:/, '-').gsub('identifier=', '') if @question[:migration_id]
+
       if @flavor == Qti::Flavors::D2L
         # In D2L-generated QTI the assessments reference the items by the label instead of the identifier
         # also, the identifier is not always unique, so we use the label as the migration id
         @question[:migration_id] = get_node_att(@doc, 'assessmentItem', 'label')
       end
-      if @doc.at_css('itemBody div.html')
-        @question[:question_text] = ''
-        @doc.css('itemBody > div.html').each_with_index do |text, i|
-          @question[:question_text] += "\n<br/>\n" if i > 0
-          @question[:question_text] += sanitize_html_string(text.text)
+
+      if @type == 'text_entry_interaction'
+        @doc.css('textEntryInteraction').each do |node|
+          node.inner_html = "[#{node['responseIdentifier']}]"
         end
-      elsif text = @doc.at_css('itemBody > div.text')
-        @question[:question_text] = sanitize_html!(text)
+      end
+
+      parse_instructure_metadata
+
+      selectors = ['itemBody > div', 'itemBody > p']
+      type = @opts[:custom_type] || @migration_type || @type
+      unless ['fill_in_multiple_blanks_question', 'canvas_matching', 'matching_question',
+              'multiple_dropdowns_question', 'respondus_matching'].include?(type)
+        selectors << 'itemBody > choiceInteraction > prompt'
+      end
+
+      text_nodes = @doc.css(selectors.join(','))
+      text_nodes = text_nodes.reject{|node| node.inner_html.strip.empty? ||
+        EXCLUDED_QUESTION_TEXT_CLASSES.any?{|c| c.casecmp(node['class'].to_s) == 0}}
+
+      if text_nodes.length > 0
+        @question[:question_text] = ''
+        text_nodes.each_with_index do |node, i|
+          @question[:question_text] += "\n<br/>\n" if i > 0
+          if ['html', 'text'].include?(node['class'])
+            @question[:question_text] += sanitize_html_string(node.text)
+          else
+            @question[:question_text] += sanitize_html!(node)
+          end
+        end
       elsif text = @doc.at_css('itemBody div:first-child') || @doc.at_css('itemBody p:first-child') || @doc.at_css('itemBody div') || @doc.at_css('itemBody p')
         @question[:question_text] = sanitize_html!(text)
       elsif @doc.at_css('itemBody')
@@ -85,7 +110,6 @@ class AssessmentItemConverter
           @question[:question_text] = sanitize_html_string(text.text)
         end
       end
-      parse_instructure_metadata
 
       if @migration_type and UNSUPPORTED_TYPES.member?(@migration_type)
         @question[:question_type] = @migration_type
@@ -109,6 +133,7 @@ class AssessmentItemConverter
     /matching/i => 'matching_question',
     'textInformation' => 'text_only_question',
     'trueFalse' => 'true_false_question',
+    'multiple_dropdowns' => 'multiple_dropdowns_question'
   }
   
   def parse_instructure_metadata
@@ -164,9 +189,9 @@ class AssessmentItemConverter
 
   def unique_local_id
     @@ids ||= {}
-    id = rand(10000)
+    id = rand(100_000)
     while @@ids[id]
-      id = rand(10000)
+      id = rand(100_000)
     end
     @@ids[id] = true
     id
@@ -237,7 +262,7 @@ class AssessmentItemConverter
     # root may not be an html element, so we just sanitize its children so we
     # don't blow away the whole thing
     node.children.each do |child|
-      Sanitize.clean_node!(child, Instructure::SanitizeField::SANITIZE)
+      Sanitize.clean_node!(child, CanvasSanitize::SANITIZE)
     end
 
     # replace any file references with the migration id of the file
@@ -348,7 +373,7 @@ class AssessmentItemConverter
       guesser = QuestionTypeEducatedGuesser.new(opts)
       opts[:interaction_type], opts[:custom_type] = guesser.educatedly_guess_type
     end
-    
+
     case opts[:interaction_type]
       when /choiceinteraction|multiple_choice_question|multiple_answers_question|true_false_question|stupid_likert_scale_question/i
         if opts[:custom_type] and opts[:custom_type] == "matching"
@@ -371,6 +396,8 @@ class AssessmentItemConverter
       when /orderinteraction|ordering_question/i
         q = OrderInteraction.new(opts)
       when /fill_in_multiple_blanks_question|multiple_dropdowns_question/i
+        q = FillInTheBlank.new(opts)
+      when /textentryinteraction/i
         q = FillInTheBlank.new(opts)
       when nil
         q = AssessmentItemConverter.new(opts)

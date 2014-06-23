@@ -18,14 +18,14 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe UsersController, :type => :integration do
+describe UsersController, type: :request do
   include Api
 
 
   context "without current_user" do
     it "should check for auth" do
       get("/api/v1/users/self/upcoming_events")
-      response.status.should == '401 Unauthorized'
+      assert_status(401)
     end
   end
 

@@ -1,5 +1,5 @@
 # coding: utf-8
-# 
+#
 # Copyright (C) 2011 Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -21,7 +21,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe ApplicationHelper do
   include ApplicationHelper
-  
+  include ERB::Util
+
+  alias_method :content_tag_without_nil_return, :content_tag
+
   context "folders_as_options" do
     before(:each) do
       course_model
@@ -32,30 +35,30 @@ describe ApplicationHelper do
       @f_2_1_1 = Folder.create!(:name => 'f_2_1_1', :parent_folder => @f_2_1, :context => @course)
       @all_folders = [ @f, @f_1, @f_2, @f_2_1, @f_2_1_1 ]
     end
-    
+
     it "should work work recursively" do
       option_string = folders_as_options([@f], :all_folders => @all_folders)
-      
+
       html = Nokogiri::HTML::DocumentFragment.parse("<select>#{option_string}</select>")
       html.css('option').count.should == 5
       html.css('option')[0].text.should == @f.name
       html.css('option')[1].text.should match /^\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_1.name}/
       html.css('option')[4].text.should match /^\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_2_1_1.name}/
     end
-    
+
     it "should limit depth" do
       option_string = folders_as_options([@f], :all_folders => @all_folders, :max_depth => 1)
-      
+
       html = Nokogiri::HTML::DocumentFragment.parse("<select>#{option_string}</select>")
       html.css('option').count.should == 3
       html.css('option')[0].text.should == @f.name
       html.css('option')[1].text.should match /^\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_1.name}/
       html.css('option')[2].text.should match /^\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_2.name}/
     end
-    
+
     it "should work without supplying all folders" do
       option_string = folders_as_options([@f])
-      
+
       html = Nokogiri::HTML::DocumentFragment.parse("<select>#{option_string}</select>")
       html.css('option').count.should == 5
       html.css('option')[0].text.should == @f.name
@@ -80,6 +83,69 @@ describe ApplicationHelper do
     it "should always return a time in the future" do
       now = 1.day.from_now.midnight - 5.seconds
       tomorrow_at_midnight.should > now
+    end
+  end
+
+  describe "Time Display Helpers" do
+    before do
+      @zone = Time.zone
+      Time.zone = "Alaska"
+      Timecop.freeze(Time.utc(2013,3,13,9,12))
+    end
+
+    after do
+      Timecop.return
+      Time.zone = @zone
+    end
+
+    describe '#context_sensitive_datetime_title' do
+      it "produces a string showing the local time and the course time" do
+        context = stub(time_zone: ActiveSupport::TimeZone["America/Denver"])
+        context_sensitive_datetime_title(Time.now, context).should == "data-tooltip title=\"Local: Mar 13 at  1:12am<br>Course: Mar 13 at  3:12am\""
+      end
+
+      it "only prints the text if just_text option passed" do
+        context = stub(time_zone: ActiveSupport::TimeZone["America/Denver"])
+        context_sensitive_datetime_title(Time.now, context, just_text: true).should == "Local: Mar 13 at  1:12am<br>Course: Mar 13 at  3:12am"
+      end
+
+      it "uses the simple title if theres no timezone difference" do
+        context = stub(time_zone: ActiveSupport::TimeZone["America/Anchorage"])
+        context_sensitive_datetime_title(Time.now, context, just_text: true).should == "Mar 13 at  1:12am"
+        context_sensitive_datetime_title(Time.now, context).should == "data-tooltip title=\"Mar 13 at  1:12am\""
+      end
+
+      it 'uses the simple title for nil context' do
+        context_sensitive_datetime_title(Time.now, nil, just_text: true).should == "Mar 13 at  1:12am"
+      end
+    end
+
+    describe '#friendly_datetime' do
+      let(:context) { stub(time_zone: ActiveSupport::TimeZone["America/Denver"]) }
+
+      it 'spits out a friendly time tag' do
+        tag = friendly_datetime(Time.now)
+        tag.should == "<time data-tooltip=\"top\" title=\"Mar 13 at  1:12am\">Mar 13 at  1:12am</time>"
+      end
+
+      it 'builds a whole time tag with a useful title showing the timezone offset if theres a context' do
+        tag = friendly_datetime(Time.now, context: context)
+        tag.should =~ /^<time.*<\/time>$/
+        tag.should =~ /Local: Mar 13 at  1:12am/
+        tag.should =~ /Course: Mar 13 at  3:12am/
+      end
+
+      it 'can produce an alternate tag type' do
+        tag = friendly_datetime(Time.now, context: context, tag_type: :span)
+        tag.should =~ /^<span.*<\/span>$/
+        tag.should =~ /Local: Mar 13 at  1:12am/
+        tag.should =~ /Course: Mar 13 at  3:12am/
+      end
+
+      it 'produces no tooltip for a nil datetime' do
+        tag = friendly_datetime(nil, context: context)
+        tag.should == "<time></time>"
+      end
     end
   end
 
@@ -290,7 +356,7 @@ describe ApplicationHelper do
 
         output = include_account_js
         output.should have_tag 'script'
-        output.should match %r{/path/to/js}
+        output.should match %r{\\?/path\\?/to\\?/js}
       end
 
       it "should include site admin javascript" do
@@ -300,7 +366,7 @@ describe ApplicationHelper do
 
         output = include_account_js
         output.should have_tag 'script'
-        output.should match %r{/path/to/js}
+        output.should match %r{\\?/path\\?/to\\?/js}
       end
 
       it "should include both site admin and root account javascript, site admin first" do
@@ -314,7 +380,7 @@ describe ApplicationHelper do
 
         output = include_account_js
         output.should have_tag 'script'
-        output.scan(%r{/path/to/(admin/|root/)?js}).should eql [['admin/'], ['root/']]
+        output.scan(%r{\\?/path\\?/to\\?/(admin|root)?\\?/?js}).should eql [['admin'], ['root']]
       end
     end
   end
@@ -324,7 +390,7 @@ describe ApplicationHelper do
       @site_admin = Account.site_admin
       @site_admin.expects(:global_includes_hash).once.returns({:css => "/path/to/css", :js => "/path/to/js"})
       include_account_css.should match %r{/path/to/css}
-      include_account_js.should match %r{/path/to/js}
+      include_account_js.should match %r{\\?/path\\?/to\\?/js}
     end
 
     it "should only compute includes once, with includes" do
@@ -387,34 +453,6 @@ describe ApplicationHelper do
     end
   end
 
-  describe "avatar_image" do
-    before do
-      user_model(:short_name => 'test guy')
-    end
-
-    it "should accept a user id" do
-      self.expects(:avatar_url_for_user).with(@user).returns("http://www.example.com/test/url")
-      img = Nokogiri::HTML::DocumentFragment.parse(avatar_image(@user)).children.first
-      img['alt'].should == 'test guy'
-      img['src'].should == "http://www.example.com/test/url"
-      img['style'].should match %r"width: 50px"
-    end
-
-    it "should short-circuit user id 0" do
-      img = Nokogiri::HTML::DocumentFragment.parse(avatar_image(0)).children.first
-      img['alt'].should == ''
-      img['src'].should match %r"/images/messages/avatar-50.png"
-    end
-
-    it "should accept a user" do
-      self.expects(:avatar_url_for_user).with(@user).returns("http://www.example.com/test/url")
-      img = Nokogiri::HTML::DocumentFragment.parse(avatar_image(@user, 30)).children.first
-      img['alt'].should == 'test guy'
-      img['src'].should == "http://www.example.com/test/url"
-      img['style'].should match %r"width: 30px"
-    end
-  end
-
   describe "jt" do
     after do
       I18n.locale = I18n.default_locale
@@ -431,6 +469,60 @@ describe ApplicationHelper do
         # and absolute
         jt("#date.days.today", nil).should include expected
       end
+    end
+  end
+
+  context "dashboard_url" do
+    before :each do
+      @domain_root_account = Account.default
+    end
+
+    it "returns a regular canvas dashboard url" do
+      @controller.expects(:dashboard_url).with({}).returns("http://test.host/") if CANVAS_RAILS2
+      dashboard_url.should == "http://test.host/"
+    end
+
+    context "with a custom dashboard_url on the account" do
+      before :each do
+        @domain_root_account.settings[:dashboard_url] = "http://foo.bar"
+      end
+
+      it "returns the custom dashboard_url" do
+        dashboard_url.should == "http://foo.bar"
+      end
+
+      it "with login_success=1, returns a regular canvas dashboard url" do
+        dashboard_url(:login_success => '1').should == "http://test.host/?login_success=1"
+      end
+
+      context "with a user logged in" do
+        before :each do
+          @current_user = user
+        end
+
+        it "returns the custom dashboard_url with the current user's id" do
+          dashboard_url.should == "http://foo.bar?current_user_id=#{@current_user.id}"
+        end
+      end
+    end
+  end
+
+  context "include_custom_meta_tags" do
+    it "should be nil if @meta_tags is not defined" do
+      include_custom_meta_tags.should be_nil
+    end
+
+    it "should include tags if present" do
+      @meta_tags = [{ :name => "hi", :content => "there" }]
+      result = include_custom_meta_tags
+      result.should match(/meta/)
+      result.should match(/name="hi"/)
+      result.should match(/content="there"/)
+    end
+
+    it "should html_safe-ify them" do
+      @meta_tags = [{ :name => "hi", :content => "there" }]
+      include_custom_meta_tags.should be_html_safe
     end
   end
 end

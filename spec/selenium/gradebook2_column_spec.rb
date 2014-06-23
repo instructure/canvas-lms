@@ -30,6 +30,19 @@ describe "assignment column headers" do
     wait_for_ajaximations
   end
 
+  it "should validate row sorting works when first column is clicked" do
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+    first_column = ff('.slick-column-name')[0]
+    first_column.click
+    meta_cells = find_slick_cells(0, f('#gradebook_grid  .container_0'))
+    grade_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
+    #filter validation
+    validate_cell_text(meta_cells[0], STUDENT_NAME_3 + "\n" + @course.name)
+    validate_cell_text(grade_cells[0], ASSIGNMENT_2_POINTS)
+    validate_cell_text(grade_cells[4].find_element(:css, '.percentage'), STUDENT_3_TOTAL_IGNORING_UNGRADED)
+  end
+
   it "should minimize a column and remember it" do
     pending("dragging and dropping these does not work well in selenium")
     get "/courses/#{@course.id}/gradebook2"
@@ -50,19 +63,6 @@ describe "assignment column headers" do
     wait_for_ajaximations
     # being 38px high means it did not wrap
     driver.execute_script('return $("#gradebook_grid .slick-header-columns").height()').should == 38
-  end
-
-  it "should validate row sorting works when first column is clicked" do
-    get "/courses/#{@course.id}/gradebook2"
-    wait_for_ajaximations
-    first_column = ff('.slick-column-name')[0]
-    first_column.click
-    meta_cells = find_slick_cells(0, f('#gradebook_grid  .container_0'))
-    grade_cells = find_slick_cells(0, f('#gradebook_grid .container_1'))
-    #filter validation
-    validate_cell_text(meta_cells[0], STUDENT_NAME_3 + "\n" + @course.name)
-    validate_cell_text(grade_cells[0], ASSIGNMENT_2_POINTS)
-    validate_cell_text(grade_cells[4].find_element(:css, '.percentage'), STUDENT_3_TOTAL_IGNORING_UNGRADED)
   end
 
   it "should validate arrange columns by due date option" do

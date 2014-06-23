@@ -10,7 +10,7 @@ define [
   'compiled/views/assignments/ToggleShowByView'
   'jquery'
   'helpers/fakeENV'
-], (_, Backbone, AssignmentGroup, Assignment, Course, AssignmentGroupCollection, AssignmentGroupListView, IndexView, ToggleShowByView, $) ->
+], (_, Backbone, AssignmentGroup, Assignment, Course, AssignmentGroupCollection, AssignmentGroupListView, IndexView, ToggleShowByView, $, fakeENV) ->
 
 
   COURSE_SUBMISSIONS_URL = "/courses/1/submissions"
@@ -55,9 +55,10 @@ define [
   module 'ToggleShowByView',
     setup: ->
       @server = sinon.fakeServer.create()
+      fakeENV.setup()
 
     teardown: ->
-      ENV.PERMISSIONS = {}
+      fakeENV.teardown()
       @server.restore()
 
   test 'should sort assignments into groups correctly', ->

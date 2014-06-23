@@ -79,6 +79,23 @@ otherwise) it will <em>not</em> be overwritten</p></td>
 <td>Last name of the user.</td>
 </tr>
 <tr>
+<td>full_name</td>
+<td>text</td>
+<td>Full name of the user. Omit first_name and last_name if this is provided.</td>
+</tr>
+<tr>
+<td>sortable_name</td>
+<td>text</td>
+<td>Sortable name of the user. This is normally inferred from the user's name,
+but you can customize it here.</td>
+</tr>
+<tr>
+<td>short_name</td>
+<td>text</td>
+<td>Display name of the user. This is normally inferred from the user's name,
+but you can customize it here.</td>
+</tr>
+<tr>
 <td>email</td>
 <td>text</td>
 <td>The email address of the user. This might be the same as login_id, but should
@@ -91,6 +108,9 @@ still be provided.</td>
 </tr>
 </table>
 
+<p>The user's name (either first_name and last_name, or full_name) should always
+be provided. Otherwise, the name will be blanked out.</p>
+
 <p>When a student is 'deleted' all of its enrollments will also be deleted and
 they won't be able to log in to the school's account. If you still want the
 student to be able to log in but just not participate, leave the student
@@ -99,10 +119,10 @@ student to be able to log in but just not participate, leave the student
 Sample:
 
 <pre>
-user_id,login_id,password,first_name,last_name,email,status
-01103,bsmith01,,Bob,Smith,bob.smith@myschool.edu,active
-13834,jdoe03,,John,Doe,john.doe@myschool.edu,active
-13aa3,psue01,,Peggy,Sue,peggy.sue@myschool.edu,active
+user_id,login_id,password,first_name,last_name,short_name,email,status
+01103,bsmith01,,Bob,Smith,Bobby Smith,bob.smith@myschool.edu,active
+13834,jdoe03,,John,Doe,,john.doe@myschool.edu,active
+13aa3,psue01,,Peggy,Sue,,peggy.sue@myschool.edu,active
 </pre>
 
 accounts.csv
@@ -337,6 +357,11 @@ enrollments.csv
 <td>course_id</td>
 <td>text</td>
 <td><b>Required field if section_id is missing</b>. The course identifier from courses.csv</td>
+</tr>
+<tr>
+<td>root_account</td>
+<td>text</td>
+<td>The domain of the account to search for the user.</td>
 </tr>
 <tr>
 <td>user_id</td>

@@ -47,34 +47,37 @@
       {{/if}}
     {{/if}}
     {{#if has_actions}}
-      <a class="al-trigger al-trigger-gray {{#unless id}}ui-state-disabled{{/unless}}" role="button" aria-haspopup="true"
-       aria-owns="{{id}}-content-1" aria-label="{{#t "setings"}}settings{{/t}}" href="#">
-        <i class="icon-settings"></i>
-        <i class="icon-mini-arrow-down"></i>
-      </a>
-      <ul id="{{id}}-content-1" class="al-options" role="menu" aria-hidden="true" aria-expanded="false" aria-activedescendant="{{id}}-content-2">
-        {{#if permissions.update}}
-          <li role="presentation">
-            <a href="{{ edit_url }}"
-                class="icon-edit edit_conference_link"
-                id="{{id}}-content-2"
-                role="menuitem"
-                aria-label="{{#t "edit"}}Edit{{/t}}"
-                title="{{#t "edit"}}Edit{{/t}}">{{#t "edit"}}Edit{{/t}}</a>
-          </li>
-        {{/if}}
-        {{#if permissions.delete}}
-          <li role="presentation">
-            <a href="{{ url }}"
-                class="icon-trash  delete_conference_link"
-                id="{{id}}-content-3"
-                role="menuitem"
-                aria-label="{{#t "delete"}}Delete{{/t}}"
-                title="{{#t "delete"}}Delete{{/t}}">{{#t "delete"}}Delete{{/t}}
-            </a>
-          </li>
-        {{/if}}
-      </ul>
+      <div class="inline-block" role="application">
+        <a class="al-trigger al-trigger-gray {{#unless id}}ui-state-disabled{{/unless}}" role="button" aria-haspopup="true"
+         aria-owns="{{id}}-content-1" href="#">
+          <i class="icon-settings"></i>
+          <i class="icon-mini-arrow-down"></i>
+          <span class="screenreader-only">{{#t "settings"}}settings{{/t}}</span>
+        </a>
+        <ul id="{{id}}-content-1" class="al-options" role="menu" aria-hidden="true" aria-expanded="false" aria-activedescendant="{{id}}-content-2">
+          {{#if permissions.update}}
+            <li role="presentation">
+              <a href="{{ edit_url }}"
+                  class="icon-edit edit_conference_link"
+                  id="{{id}}-content-2"
+                  role="menuitem"
+                  aria-label="{{#t "edit"}}Edit{{/t}}"
+                  title="{{#t "edit"}}Edit{{/t}}">{{#t "edit"}}Edit{{/t}}</a>
+            </li>
+          {{/if}}
+          {{#if permissions.delete}}
+            <li role="presentation">
+              <a href="{{ url }}"
+                  class="icon-trash  delete_conference_link"
+                  id="{{id}}-content-3"
+                  role="menuitem"
+                  aria-label="{{#t "delete"}}Delete{{/t}}"
+                  title="{{#t "delete"}}Delete{{/t}}">{{#t "delete"}}Delete{{/t}}
+              </a>
+            </li>
+          {{/if}}
+        </ul>
+      </div>
     {{/if}}
   </div>
 </div>

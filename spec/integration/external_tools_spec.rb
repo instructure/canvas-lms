@@ -50,10 +50,14 @@ describe "External Tools" do
     it "should include outcome service params when viewing as student" do
       student_in_course(:course => @course, :active_all => true)
       user_session(@user)
+      Canvas::Security.stubs(:hmac_sha1).returns('some_sha')
+      payload = [@tool.id, @course.id, @assignment.id, @user.id].join('-')
+
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       response.should be_success
       doc = Nokogiri::HTML.parse(response.body)
-      doc.at_css('form#tool_form input#lis_result_sourcedid')['value'].should == BasicLTI::BasicOutcomes.encode_source_id(@tool, @course, @assignment, @user)
+
+      doc.at_css('form#tool_form input#lis_result_sourcedid')['value'].should == "#{payload}-some_sha"
       doc.at_css('form#tool_form input#lis_outcome_service_url')['value'].should == lti_grade_passback_api_url(@tool)
       doc.at_css('form#tool_form input#ext_ims_lis_basic_outcome_url')['value'].should == blti_legacy_grade_passback_api_url(@tool)
     end

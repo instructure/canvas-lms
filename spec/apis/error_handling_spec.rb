@@ -18,16 +18,16 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/api_spec_helper')
 
-describe "API Error Handling", :type => :integration do
+describe "API Error Handling", type: :request do
   before do
     user_with_pseudonym(:active_all => true)
     @token = @user.access_tokens.create!
   end
 
   describe "ActiveRecord Error JSON override" do
-    it "should not return the base object in ActiveRecord::Error.to_json" do
-      err = ActiveRecord::Error.new(@user, :name, :invalid, :message => 'invalid name')
-      JSON.parse(err.to_json).should == { 'attribute' => 'name', 'type' => 'invalid', 'message' => 'invalid name' }
+    it "should not return the base object in ErrorMessage.to_json" do
+      err = ActiveModel::BetterErrors::ErrorMessage.new(@user, :name, :invalid, "invalid name")
+      JSON.parse(err.to_json).should == { 'attribute' => 'name', 'type' => 'invalid', 'message' => 'invalid name', 'options' => {} }
     end
 
     it "should not return the base object in ActiveRecord::Errors.to_json" do
@@ -44,7 +44,8 @@ describe "API Error Handling", :type => :integration do
   it "should respond not_found for 404 errors" do
     get "/api/v1/courses/54321", nil, { 'Authorization' => "Bearer #{@token.full_token}" }
     response.response_code.should == 404
-    JSON.parse(response.body).should == { 'status' => 'not_found', 'message' => 'The specified resource does not exist.' }
+    json = JSON.parse(response.body)
+    json['errors'].should == [{'message' => 'The specified resource does not exist.'}]
   end
 end
 

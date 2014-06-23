@@ -1,6 +1,6 @@
 define [
   'compiled/models/ImageFile'
-  'use!vendor/FileAPI/FileAPI.min'
+  'vendor/FileAPI/FileAPI.min'
 ], (ImageFile, FileAPI) ->
 
   model = null

@@ -106,11 +106,14 @@ class DiscussionTopicsApiController < ApplicationController
         structure = entries.to_json
       end
 
-      participant_info = Shard.partition_by_shard(participant_ids) do |shard_ids|
-        User.find(shard_ids).map do |user|
-          user_display_json(user, @context.is_a_context? && @context)
+      participants = Shard.partition_by_shard(participant_ids) do |shard_ids|
+        User.find(shard_ids)
         end
+
+      participant_info = participants.map do |participant|
+        user_display_json(participant, @context.is_a_context? && @context)
       end
+
       unread_entries = entry_ids - DiscussionEntryParticipant.read_entry_ids(entry_ids, @current_user)
       unread_entries = unread_entries.map(&:to_s) if stringify_json_ids?
       forced_entries = DiscussionEntryParticipant.forced_read_state_entry_ids(entry_ids, @current_user)
@@ -509,11 +512,7 @@ class DiscussionTopicsApiController < ApplicationController
   
   protected
   def require_topic
-    if params[:topic_id] == "self" && @context.is_a?(CollectionItem)
-      @topic = @context.discussion_topic
-    else
-      @topic = @context.all_discussion_topics.active.find(params[:topic_id])
-    end
+    @topic = @context.all_discussion_topics.active.find(params[:topic_id])
     return authorized_action(@topic, @current_user, :read)
   end
 
@@ -540,7 +539,6 @@ class DiscussionTopicsApiController < ApplicationController
     if @entry.save
       @entry.update_topic
       log_asset_access(@topic, 'topics', 'topics', 'participate')
-      generate_new_page_view
       @entry.context_module_action
       if has_attachment
         @attachment = (@current_user || @context).attachments.create(:uploaded_data => params[:attachment])
@@ -556,8 +554,8 @@ class DiscussionTopicsApiController < ApplicationController
   def visible_topics(topic)
     # conflate entries from all child topics for groups the user can access
     topics = [topic]
-    if topic.for_group_assignment? && !topic.child_topics.empty?
-      groups = topic.assignment.group_category.groups.active.select do |group|
+    if topic.for_group_discussion? && !topic.child_topics.empty?
+      groups = topic.group_category.groups.active.select do |group|
         group.grants_right?(@current_user, session, :read)
       end
       topic.child_topics.each{ |t| topics << t if groups.include?(t.context) }

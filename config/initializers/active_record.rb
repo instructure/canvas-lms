@@ -1,3 +1,5 @@
+require 'active_support/callbacks/suspension'
+
 class ActiveRecord::Base
   # XXX: Rails3 There are lots of issues with these patches in Rails3 still
 
@@ -14,6 +16,30 @@ class ActiveRecord::Base
     end
 
     alias :clone :dup
+
+    def serializable_hash(options = nil)
+      result = super
+      if result.present?
+        result = result.with_indifferent_access
+        user_content_fields = options[:user_content] || []
+        result.keys.each do |name|
+          if user_content_fields.include?(name.to_s)
+            result[name] = UserContent.escape(result[name])
+          end
+        end
+      end
+      if options && options[:include_root]
+        result = {self.class.base_ar_class.model_name.element => result}
+      end
+      result
+    end
+
+    # See ActiveModel#serializable_add_includes
+    def serializable_add_includes(options = {}, &block)
+      super(options) do |association, records, opts|
+        yield association, records, opts.reverse_merge(:include_root => options[:include_root])
+      end
+    end
   end
 
   if CANVAS_RAILS2
@@ -176,7 +202,6 @@ class ActiveRecord::Base
   end
 
   def cached_context_grants_right?(user, session, *permissions)
-    @@cached_contexts = nil if Rails.env.test?
     @@cached_contexts ||= {}
     context_key = "#{self.context_type}_#{self.context_id}" if self.respond_to?(:context_type)
     context_key ||= "Course_#{self.course_id}"
@@ -184,7 +209,6 @@ class ActiveRecord::Base
     @@cached_contexts[context_key] ||= self.course
     @@cached_permissions ||= {}
     key = [context_key, (user ? user.id : nil)].cache_key
-    @@cached_permissions[key] = nil if Rails.env.test?
     @@cached_permissions[key] = nil if session && session[:session_affects_permissions]
     @@cached_permissions[key] ||= @@cached_contexts[context_key].grants_rights?(user, session, nil).keys
     (@@cached_permissions[key] & Array(permissions).flatten).any?
@@ -292,7 +316,7 @@ class ActiveRecord::Base
 
     self.revert_from_serialization_options if self.respond_to?(:revert_from_serialization_options)
 
-    hash
+    hash.with_indifferent_access
   end
 
   def class_name
@@ -427,6 +451,7 @@ class ActiveRecord::Base
   end
 
   def self.distinct_on(columns, options)
+    columns = Array(columns)
     bad_options = options.keys - [:select, :order]
     if bad_options.present?
       # while it's possible to make this work with :limit, it would be gross
@@ -435,8 +460,8 @@ class ActiveRecord::Base
     end
 
     native = (connection.adapter_name == 'PostgreSQL')
-    options[:select] = "DISTINCT ON (#{Array(columns).join(', ')}) " + (options[:select] || '*') if native
-    raise "distinct on columns must match the leftmost part of the order-by clause" unless options[:order] && options[:order] =~ /\A#{Array(columns).map{ |c| Regexp.escape(c) }.join(' *(?:asc|desc)?, *')}/i
+    options[:select] = "DISTINCT ON (#{columns.join(', ')}) " + (options[:select] || '*') if native
+    raise "distinct on columns must match the leftmost part of the order-by clause" unless options[:order] && options[:order] =~ /\A#{columns.map{ |c| Regexp.escape(c) }.join(' *(?:asc|desc)?, *')}/i
 
     scope = self
     scope = scope.select(options[:select]) if options[:select]
@@ -497,7 +522,7 @@ class ActiveRecord::Base
   if CANVAS_RAILS2
   def self.find_in_batches_with_usefulness(options = {}, &block)
     # already in a transaction (or transactions don't matter); cursor is fine
-    if (connection.adapter_name == 'PostgreSQL' && (Shackles.environment == :slave || connection.open_transactions > (Rails.env.test? ? 1 : 0))) && !options[:start]
+    if (connection.adapter_name == 'PostgreSQL' && (connection.readonly? || connection.open_transactions > (Rails.env.test? ? 1 : 0))) && !options[:start]
       shard = scope(:find, :shard)
       if shard
         shard.activate(shard_category) { find_in_batches_with_cursor(options, &block) }
@@ -660,11 +685,15 @@ class ActiveRecord::Base
     # take a lock (e.g. when we create a submission).
     retries.times do
       begin
-        return transaction(:requires_new => true) { uncached { yield } }
+        result = transaction(:requires_new => true) { uncached { yield } }
+        connection.clear_query_cache
+        return result
       rescue UniqueConstraintViolation
       end
     end
-    transaction(:requires_new => true) { uncached { yield } }
+    result = transaction(:requires_new => true) { uncached { yield } }
+    connection.clear_query_cache
+    result
   end
 
   # returns batch_size ids at a time, working through the primary key from
@@ -673,13 +702,31 @@ class ActiveRecord::Base
   # note this does a raw connection.select_values, so it doesn't work with scopes
   def self.find_ids_in_batches(options = {})
     batch_size = options[:batch_size] || 1000
-    ids = connection.select_values("select #{primary_key} from #{table_name} order by #{primary_key} limit #{batch_size.to_i}")
+    if CANVAS_RAILS2
+      scope = scope(:find) || {}
+      scope[:select] = primary_key
+      scope[:order] = primary_key
+      scope[:limit] = batch_size
+      ids = nil
+      with_exclusive_scope(find: scope) do
+        ids = connection.select_values(scoped.to_sql)
+      end
+    else
+      scope = except(:select).select(primary_key).reorder(primary_key).limit(batch_size)
+      ids = connection.select_values(scope.to_sql)
+    end
     ids = ids.map(&:to_i) unless options[:no_integer_cast]
     while ids.present?
       yield ids
       break if ids.size < batch_size
       last_value = ids.last
-      ids = connection.select_values(sanitize_sql_array(["select #{primary_key} from #{table_name} where #{primary_key} > ? order by #{primary_key} limit #{batch_size.to_i}", last_value]))
+      if CANVAS_RAILS2
+        with_exclusive_scope(find: scope) do
+          ids = connection.select_values(where("#{primary_key}>?", last_value).to_sql)
+        end
+      else
+        ids = connection.select_values(scope.where("#{primary_key}>?", last_value).to_sql)
+      end
       ids = ids.map(&:to_i) unless options[:no_integer_cast]
     end
   end
@@ -691,7 +738,7 @@ class ActiveRecord::Base
     subquery_scope = self.scoped.except(:select).select("#{quoted_table_name}.#{primary_key} as id").reorder(primary_key).limit(batch_size)
     ids = connection.select_rows("select min(id), max(id) from (#{subquery_scope.to_sql}) as subquery").first
     while ids.first.present?
-      ids.map!(&:to_i) if columns_hash[primary_key].type == :integer
+      ids.map!(&:to_i) if columns_hash[primary_key.to_s].type == :integer
       yield(*ids)
       last_value = ids.last
       next_subquery_scope = subquery_scope.where(["#{quoted_table_name}.#{primary_key}>?", last_value])
@@ -839,6 +886,17 @@ class ActiveRecord::Base
     end
   end
 
+  include ActiveSupport::Callbacks::Suspension
+
+  # saves the record with all its save callbacks suspended.
+  def save_without_callbacks
+    if CANVAS_RAILS2
+      new_record? ? create_without_callbacks : update_without_callbacks
+    else
+      suspend_callbacks(kind: [:validation, :save, (new_record? ? :create : :update)]) { save }
+    end
+  end
+
   if Rails.version < '4'
     if CANVAS_RAILS2
       named_scope :none, lambda { where("?", false) }
@@ -848,13 +906,77 @@ class ActiveRecord::Base
   end
 end
 
+unless defined? OpenDataExport
+  if CANVAS_RAILS2
+    %w{valid_keys_for_has_many_association valid_keys_for_has_one_association
+      valid_keys_for_belongs_to_association valid_keys_for_has_and_belongs_to_many_association}.each do |mattr|
+      ActiveRecord::Associations::ClassMethods.send(mattr) << :exportable
+    end
+  else
+    # allow an exportable option that we don't actually do anything with, because our open-source build may not contain OpenDataExport
+    ActiveRecord::Associations::Builder::Association.class_eval do
+      ([self] + self.descendants).each { |klass| klass.valid_options << :exportable }
+    end
+  end
+end
+
+if defined? ActiveRecord::ConnectionAdapters::PostgreSQLAdapter
+  ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.class_eval do
+    def readonly?(table = nil, column = nil)
+      return @readonly unless @readonly.nil?
+      @readonly = (select_value("SELECT pg_is_in_recovery();") == "t")
+    end
+  end
+end
+
 unless CANVAS_RAILS2
+  # join dependencies in AR 3 insert the conditions right away, but because we have
+  # some reflection conditions that rely on joined tables, we need to insert them later on
+
+  # e.g.: LEFT OUTER JOIN "enrollments" ON "enrollments"."user_id" = "users"."id"
+  #       AND courses.workflow_state='available'
+  #       LEFT OUTER JOIN "courses" ON "courses"."id" = "enrollments"."course_id"
+
+  # to:   LEFT OUTER JOIN "enrollments" ON "enrollments"."user_id" = "users"."id"
+  #       LEFT OUTER JOIN "courses" ON "courses"."id" = "enrollments"."course_id"
+  #       WHERE courses.workflow_state='available'
+  ActiveRecord::Associations::JoinDependency::JoinAssociation.class_eval do
+    def conditions
+      unless @conditions
+        @conditions = reflection.conditions.reverse
+        chain.reverse.each_with_index do |reflection, i|
+          if reflection.options[:joins]
+            @join_conditions ||= []
+            @join_conditions << sanitize(@conditions[i], @tables[i])
+            @conditions[i] = []
+          end
+        end
+      end
+      @conditions
+    end
+
+    def join_to_with_join_conditions(*args)
+      relation = join_to_without_join_conditions(*args)
+      relation = relation.where(@join_conditions) if @join_conditions.present?
+      @join_conditions = []
+      relation
+    end
+    alias_method_chain :join_to, :join_conditions
+  end
+
+  ActiveRecord::Associations::Preloader::Association.class_eval do
+    def build_scope_with_joins
+      build_scope_without_joins.joins(preload_options[:joins] || options[:joins])
+    end
+    alias_method_chain :build_scope, :joins
+  end
+
   ActiveRecord::Relation.class_eval do
     def find_in_batches_with_usefulness(options = {}, &block)
       # already in a transaction (or transactions don't matter); cursor is fine
-      if (connection.adapter_name == 'PostgreSQL' && (Shackles.environment == :slave || connection.open_transactions > (Rails.env.test? ? 1 : 0))) && !options[:start]
+      if (connection.adapter_name == 'PostgreSQL' && (connection.readonly? || connection.open_transactions > (Rails.env.test? ? 1 : 0))) && !options[:start]
         self.activate { find_in_batches_with_cursor(options, &block) }
-      elsif order_values.any? || group_values.any? || select_values.to_s =~ /DISTINCT/i
+      elsif order_values.any? || group_values.any? || select_values.to_s =~ /DISTINCT/i || uniq_value
         raise ArgumentError.new("GROUP and ORDER are incompatible with :start") if options[:start]
         self.activate { find_in_batches_with_temp_table(options, &block) }
       else
@@ -869,8 +991,9 @@ unless CANVAS_RAILS2
       batch_size = options[:batch_size] || 1000
       klass.transaction do
         begin
-          cursor = "#{table_name}_in_batches_cursor"
-          connection.execute("DECLARE #{cursor} CURSOR FOR #{to_sql}")
+          sql = to_sql
+          cursor = "#{table_name}_in_batches_cursor_#{sql.hash.abs.to_s(36)}"
+          connection.execute("DECLARE #{cursor} CURSOR FOR #{sql}")
           includes = includes_values
           klass.send(:with_exclusive_scope) do
             batch = connection.uncached { klass.find_by_sql("FETCH FORWARD #{batch_size} FROM #{cursor}") }
@@ -1021,13 +1144,42 @@ unless CANVAS_RAILS2
       delete_all_without_limit(conditions)
     end
     alias_method_chain :delete_all, :limit
+
+    def with_each_shard(*args)
+      scope = self
+      if self.respond_to?(:proxy_association) && (owner = self.proxy_association.try(:owner)) && self.shard_category != :explicit
+        scope = scope.shard(owner)
+      end
+      scope = scope.shard(args) if args.any?
+      if block_given?
+        ret = scope.activate{ |rel|
+          yield(rel)
+        }
+        Array(ret)
+      else
+        scope.to_a
+      end
+    end
   end
 
-  def with_each_shard
-    if block_given?
-      Array(yield(self))
-    else
-      self.to_a
+  ActiveRecord::Associations::CollectionProxy.class_eval do
+    delegate :with_each_shard, :to => :scoped
+
+    def respond_to?(name, include_private = false)
+      return super if [:marshal_dump, :_dump, 'marshal_dump', '_dump'].include?(name)
+      super ||
+        (load_target && target.respond_to?(name, include_private)) ||
+        proxy_association.klass.respond_to?(name, include_private)
+    end
+  end
+
+  ActiveRecord::Associations::CollectionAssociation.class_eval do
+    def scoped
+      scope = super
+      proxy_association = self
+      scope.extending do
+        define_method(:proxy_association) { proxy_association }
+      end
     end
   end
 end
@@ -1300,6 +1452,19 @@ if CANVAS_RAILS2
   end
 end
 
+unless CANVAS_RAILS2
+  ActiveRecord::Associations::Builder::HasMany.valid_options << :joins
+
+  ActiveRecord::Associations::HasOneAssociation.class_eval do
+    def create_scope
+      scope = scoped.scope_for_create.stringify_keys
+      scope = scope.except(klass.primary_key) unless klass.primary_key.to_s == reflection.foreign_key.to_s
+      scope
+    end
+  end
+end
+
+if CANVAS_RAILS2
 class ActiveRecord::Serialization::Serializer
   def serializable_record
     hash = HashWithIndifferentAccess.new.tap do |serializable_record|
@@ -1325,45 +1490,8 @@ class ActiveRecord::Serialization::Serializer
     hash = { @record.class.base_ar_class.model_name.element => hash }.with_indifferent_access if options[:include_root]
     hash
   end
-
 end
 
-if CANVAS_RAILS2
-
-class ActiveRecord::Errors
-  def as_json(*a)
-    {:errors => @errors}.as_json(*a)
-  end
-end
-
-# We are currently using the ActiveRecord::Errors modification above to return
-# the errors to our javascript in a specific expected format. however, this
-# format was returning the @base attribute of each ActiveRecord::Error, which
-# is a data leakage issue since that's the full json representation of the AR object.
-#
-# This modification removes the @base attribute from the json, which
-# fortunately wasn't being used by our javascript.
-# further development will eventually remove these two modifications
-# completely, and switch our javascript to use the default json formatting of
-# ActiveRecord::Errors
-# See #6733
-class ActiveRecord::Error
-  def as_json(*a)
-    super.slice('attribute', 'type', 'message')
-  end
-end
-
-else
-
-class ActiveModel::Errors
-  def as_json(*a)
-    {:errors => Hash[to_hash.map{|k,v| [k, v.map{|m| {:attribute => k, :message => m, :type => m}}]}]}.as_json(*a)
-  end
-end
-
-end
-
-if CANVAS_RAILS2
 # We need to have 64-bit ids and foreign keys.
 if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
   ActiveRecord::ConnectionAdapters::PostgreSQLAdapter::NATIVE_DATABASE_TYPES[:primary_key] = "bigserial primary key".freeze
@@ -1536,7 +1664,16 @@ class ActiveRecord::Migration
     def has_postgres_proc?(procname)
       connection.select_value("SELECT COUNT(*) FROM pg_proc WHERE proname='#{procname}'").to_i != 0
     end
+  end
 
+  unless CANVAS_RAILS2
+    def connection
+      if self.class.respond_to?(:connection)
+        return self.class.connection
+      else
+        @connection || ActiveRecord::Base.connection
+      end
+    end
   end
 
   def transactional?
@@ -1754,6 +1891,72 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
 
 end
 
+# shims so that AR objects serialized under rails 2 function under rail s3
+if CANVAS_RAILS2
+  ActiveSupport::Cache::Store.subclasses.map(&:constantize).each do |subclass|
+    subclass.class_eval do
+      def delete_with_rails3_shim(key, options = nil)
+        r1 = delete_without_rails3_shim(key, options)
+        r2 = delete_without_rails3_shim("rails3:#{key}", options)
+        r1 || r2
+      end
+      alias_method_chain :delete, :rails3_shim
+    end
+  end
+else
+  ActiveSupport::Cache::Store.class_eval do
+    def namespaced_key_with_rails2_shim(key, options)
+      result = namespaced_key_without_rails2_shim(key, options)
+      result = "rails3:#{result}" if !(result =~ /^rails3/) && !options[:no_rails3]
+      result
+    end
+    alias_method_chain :namespaced_key, :rails2_shim
+
+    def delete_with_rails2_shim(key, options = nil)
+      r1 = delete_without_rails2_shim(key, options)
+      r2 = delete_without_rails2_shim(key, (options || {}).merge(no_rails3: true))
+      r1 || r2
+    end
+    alias_method_chain :delete, :rails2_shim
+  end
+end
+
+unless CANVAS_RAILS2
+  ActiveRecord::AttributeMethods::Serialization::Attribute.class_eval do
+    def unserialize
+      self.state = :unserialized
+      if value.nil?
+        nil
+      else
+        self.value = coder.load(value)
+      end
+    end
+
+    def serialized_value
+      return nil if value.nil?
+      unserialize if state == :serialized
+      coder.dump(value)
+    end
+
+    def serialize
+      serialized_value
+    end
+  end
+
+  ActiveRecord::Associations::CollectionAssociation.class_eval do
+    # CollectionAssociation implements uniq for :uniq option, in its
+    # own special way. re-implement, but as a relation if it's not an
+    # internal use of it
+    def uniq(records = true)
+      if records.is_a?(Array)
+        records.uniq
+      else
+        scoped.uniq(records)
+      end
+    end
+  end
+end
+
 if Rails.version >= '3' && Rails.version < '4'
   ActiveRecord::Sanitization::ClassMethods.module_eval do
     def quote_bound_value_with_relations(value, c = connection)
@@ -1764,5 +1967,28 @@ if Rails.version >= '3' && Rails.version < '4'
       end
     end
     alias_method_chain :quote_bound_value, :relations
+  end
+end
+
+if Rails.version < '4'
+  klass = ActiveRecord::ConnectionAdapters::Mysql2Column if defined?(ActiveRecord::ConnectionAdapters::Mysql2Column)
+  klass = ActiveRecord::ConnectionAdapter::AbstractMysqlAdapter::Column if defined?(ActiveRecord::ConnectionAdapter::AbstractMysqlAdapter::Column)
+  if klass
+    klass.class_eval do
+      def extract_default(default)
+        if sql_type =~ /blob/i || type == :text
+          if default.blank?
+            # CHANGED - don't believe the '' default
+            return nil
+          else
+            raise ArgumentError, "#{type} columns cannot have a default value: #{default.inspect}"
+          end
+        elsif missing_default_forged_as_empty_string?(default)
+          nil
+        else
+          super
+        end
+      end
+    end
   end
 end

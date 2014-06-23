@@ -103,25 +103,101 @@ END
       state: 'hidden',
       root_opt_in: true
     },
-    'outcome_gradebook' =>
+    'new_styles' =>
     {
-      display_name: -> { I18n.t('features.outcome_gradebook', 'Outcome Gradebook') },
-      description:  -> { I18n.t('outcome_gradebook_description', <<-END) },
-Outcome Gradebook provides a way for teachers to quickly view student and course
-progress on course learning outcomes. Outcomes are presented in a Gradebook-like
-format and student progress is displayed both as a numerical score and as mastered/
-near mastery/remedial.
+      display_name: -> { I18n.t('features.new_styles', 'Use New Styles') },
+      description: -> { I18n.t('new_styles_description', <<-END) },
+We are working on a UI facelift to Canvas. Turn this on to opt-in to seeing the
+updated, simplified look and feel of the Canvas interface.
 END
-      applies_to: 'Course',
-      state: 'hidden',
-      root_opt_in: true,
+      applies_to: 'RootAccount',
+      state: 'allowed',
+      beta: true,
       development: true
     },
+    'html5_first_videos' =>
+    {
+      display_name: -> { I18n.t('features.html5_first_videos', 'Prefer HTML5 for video playback') },
+      description: -> { I18n.t('html5_first_videos_description', <<-END) },
+By default, Canvas will try to use Flash first to play videos. Turn this on to try using HTML5 first,
+then fall back to Flash.
+END
+      applies_to: 'RootAccount',
+      state: 'allowed',
+      beta: true,
+      development: true
+    },
+    'high_contrast' =>
+    {
+      display_name: -> { I18n.t('features.high_contrast', 'Use High Contrast Styles') },
+      description: -> { I18n.t('high_contrast_description', <<-END) },
+If you would prefer a higher-contrast version of the Canvas user interface, enable this.
+This might be useful for people with impaired vision or dificulty reading.
+END
+      applies_to: 'User',
+      state: 'allowed',
+      beta: true,
+      development: true
+    },
+    'outcome_gradebook' =>
+    {
+      display_name: -> { I18n.t('features.learning_mastery_gradebook', 'Learning Mastery Gradebook') },
+      description:  -> { I18n.t('learning_mastery_gradebook_description', <<-END) },
+Learning Mastery Gradebook provides a way for teachers to quickly view student and course
+progress on course learning outcomes. Outcomes are presented in a Gradebook-like
+format and student progress is displayed both as a numerical score and as mastered/near
+mastery/remedial.
+END
+      applies_to: 'Course',
+      state: 'allowed',
+      root_opt_in: false,
+      development: false
+    },
+    'student_outcome_gradebook' =>
+    {
+      display_name: -> { I18n.t('features.student_outcome_gradebook', 'Student Learning Mastery Gradebook') },
+      description:  -> { I18n.t('student_outcome_gradebook_description', <<-END) },
+Student Learning Mastery Gradebook provides a way for students to quickly view progress
+on course learning outcomes. Outcomes are presented in a Gradebook-like
+format and progress is displayed both as a numerical score and as mastered/near
+mastery/remedial.
+END
+      applies_to: 'Course',
+      state: 'allowed',
+      root_opt_in: false,
+      development: false
+    },
+  'post_grades' =>
+      {
+          display_name: -> { I18n.t('features.post_grades', 'Post Grades to SIS') },
+          description:  -> { I18n.t('post_grades_description', <<-END) },
+Post Grades allows teachers to post grades back to enabled SIS systems: Powerschool,
+Aspire (SIS2000), JMC, and any other SIF-enabled SIS that accepts the SIF elements GradingCategory,
+ GradingAssignment, GradingAssignmentScore.
+          END
+          applies_to: 'Course',
+          state: 'hidden',
+          root_opt_in: true,
+          development: true
+      },
     'screenreader_gradebook' =>
     {
-      display_name: -> { I18n.t('features.screenreader_gradebook', 'Screenreader Gradebook') },
-      description:  -> { I18n.t('screenreader_gradebook_description', <<-END) },
-Screenreader Gradebook provides an interface to gradebook that is designed for accessibility.
+      display_name: -> { I18n.t('features.individual_gradebook', 'Individual Gradebook View') },
+      description:  -> { I18n.t('individual_gradebook_description', <<-END) },
+Individual Gradebook View provides a gradebook view that is designed for accessibility.
+END
+      applies_to: 'Course',
+      state: 'on',
+      root_opt_in: true,
+      development: false
+    },
+    'differentiated_assignments' =>
+    {
+      display_name: -> { I18n.t('features.differentiated_assignments', 'Differentiated Assignments') },
+      description:  -> { I18n.t('differentiated_assignments_description', <<-END) },
+Differentiated Assignments is a *beta* feature that enables choosing which section(s) an assignment applies to.
+Sections that are not given an assignment will not see it in their course content and their final grade will be
+calculated without those points.
 END
       applies_to: 'Course',
       state: 'hidden',

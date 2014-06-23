@@ -1,0 +1,13 @@
+<header>
+  <aside class="pull-right">
+    <a {{bind-attr href=speedGraderUrl}} target="_blank">
+      {{t 'speedgrader' 'View in SpeedGrader'}}
+    </a>
+  </aside>
+
+  {{partial "quiz/statistics/questions/essay/header_contents"}}
+</header>
+
+<div>
+  {{partial "quiz/statistics/questions/essay/charts"}}
+</div>

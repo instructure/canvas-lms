@@ -17,18 +17,30 @@
 #
 
 class LearningOutcomeResult < ActiveRecord::Base
+  include PolymorphicTypeOverride
+  override_polymorphic_types association_type: {'Quiz' => 'Quizzes::Quiz'},
+                             associated_asset_type: {'Quiz' => 'Quizzes::Quiz'},
+                             artifact_type: {'QuizSubmission' => 'Quizzes::QuizSubmission'}
+
   belongs_to :user
   belongs_to :learning_outcome
   belongs_to :alignment, :class_name => 'ContentTag', :foreign_key => :content_tag_id
-  belongs_to :association, :polymorphic => true
+  belongs_to :association_object, :polymorphic => true, :foreign_type => :association_type, :foreign_key => :association_id
   belongs_to :artifact, :polymorphic => true
   belongs_to :associated_asset, :polymorphic => true
   belongs_to :context, :polymorphic => true
   simply_versioned
+
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :context_id, :context_type, :context_code, :association_id, :association_type, :content_tag_id, :learning_outcome_id, :mastery, :user_id, :score, :created_at, :updated_at,
+    :attempt, :possible, :comments, :original_score, :original_possible, :original_mastery, :artifact_id, :artifact_type, :assessed_at, :title, :percent, :associated_asset_id, :associated_asset_type
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:user, :learning_outcome, :association_object, :artifact, :associated_asset, :context]
   before_save :infer_defaults
 
-  attr_accessible :learning_outcome, :user, :association, :alignment, :associated_asset
-  
+  attr_accessible :learning_outcome, :user, :association_object, :alignment, :associated_asset
+
   def infer_defaults
     self.learning_outcome_id = self.alignment.learning_outcome_id
     self.context_code = "#{self.context_type.underscore}_#{self.context_id}" rescue nil
@@ -39,12 +51,12 @@ class LearningOutcomeResult < ActiveRecord::Base
     self.percent = nil if self.percent && !self.percent.to_f.finite?
     true
   end
-  
+
   def assignment
-    if self.association.is_a?(Assignment)
-      self.association
+    if self.association_object.is_a?(Assignment)
+      self.association_object
     elsif self.artifact.is_a?(RubricAssessment)
-      self.artifact.rubric_association.association
+      self.artifact.rubric_association.association_object
     else
       nil
     end
@@ -72,7 +84,7 @@ class LearningOutcomeResult < ActiveRecord::Base
       save
     end
   end
-  
+
   scope :for_context_codes, lambda { |codes|
     if codes == 'all'
       scoped

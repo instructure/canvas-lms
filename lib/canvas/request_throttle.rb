@@ -80,11 +80,11 @@ class RequestThrottle
       return true
     elsif blacklisted?(request)
       Rails.logger.info("blocking request due to blacklist, client id: #{client_identifier(request)} ip: #{request.remote_ip}")
-      Canvas::Statsd.increment("request_throttling.blacklisted")
+      CanvasStatsd::Statsd.increment("request_throttling.blacklisted")
       return false
     else
       if bucket.full?
-        Canvas::Statsd.increment("request_throttling.throttled")
+        CanvasStatsd::Statsd.increment("request_throttling.throttled")
         if Setting.get("request_throttle.enabled", "true") == "true"
           Rails.logger.info("blocking request due to throttling, client id: #{client_identifier(request)} bucket: #{bucket.to_json}")
           return false
@@ -155,14 +155,14 @@ class RequestThrottle
 
   def report_on_stats(account, starting_mem, ending_mem, user_cpu, system_cpu)
     if account
-      Canvas::Statsd.timing("requests_user_cpu.account_#{account.id}", user_cpu)
-      Canvas::Statsd.timing("requests_system_cpu.account_#{account.id}", system_cpu)
-      Canvas::Statsd.timing("requests_user_cpu.shard_#{account.shard.id}", user_cpu)
-      Canvas::Statsd.timing("requests_system_cpu.shard_#{account.shard.id}", system_cpu)
+      CanvasStatsd::Statsd.timing("requests_user_cpu.account_#{account.id}", user_cpu)
+      CanvasStatsd::Statsd.timing("requests_system_cpu.account_#{account.id}", system_cpu)
+      CanvasStatsd::Statsd.timing("requests_user_cpu.shard_#{account.shard.id}", user_cpu)
+      CanvasStatsd::Statsd.timing("requests_system_cpu.shard_#{account.shard.id}", system_cpu)
 
       if account.shard.respond_to?(:database_server)
-        Canvas::Statsd.timing("requests_system_cpu.cluster_#{account.shard.database_server.id}", system_cpu)
-        Canvas::Statsd.timing("requests_user_cpu.cluster_#{account.shard.database_server.id}", user_cpu)
+        CanvasStatsd::Statsd.timing("requests_system_cpu.cluster_#{account.shard.database_server.id}", system_cpu)
+        CanvasStatsd::Statsd.timing("requests_user_cpu.cluster_#{account.shard.database_server.id}", user_cpu)
       end
     end
 

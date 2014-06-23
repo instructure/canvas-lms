@@ -1,6 +1,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "assignments" do
+
+  # note: due date testing can be found in assignments_overrides_spec
+
   include_examples "in-process server selenium tests"
 
   context "as a teacher" do
@@ -26,7 +29,6 @@ describe "assignments" do
 
     def run_assignment_edit(assignment)
       get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
-      f('#assignment_toggle_advanced_options').try(:click)
 
       yield
 
@@ -72,7 +74,6 @@ describe "assignments" do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
       wait_for_ajaximations
 
-      f('#assignment_toggle_advanced_options').click
       f('#assignment_group_id').should be_displayed
       click_option('#assignment_group_id', second_group.name)
       click_option('#assignment_grading_type', 'Letter Grade')
@@ -104,30 +105,17 @@ describe "assignments" do
 
     it "should display assignment on calendar and link to assignment" do
       assignment_name = 'first assignment'
-      current_date = Time.now.utc
-      due_date = current_date + 2.days
+      due_date = Time.now + 2.days
       @assignment = @course.assignments.create(:name => assignment_name, :due_at => due_date)
 
-      get "/calendar"
+      get "/calendar2#view_name=month&view_start=#{due_date.to_date.to_s}"
 
-      #click on assignment in calendar
-      if due_date.month > current_date.month
-        f('#content .next_month_link').click
-        wait_for_ajaximations
-      end
-      day_id = '#day_' + due_date.year.to_s() + '_' + due_date.strftime('%m') + '_' + due_date.strftime('%d')
-      day_div = f(day_id)
       wait_for_ajaximations
-      sleep 1 # this is one of those cases where if we click too early, no subsequent clicks will work
-      day_div.find_element(:link, assignment_name).click
+      f('.assignment').click
       wait_for_ajaximations
-      details_dialog = f('#event_details').find_element(:xpath, '..')
-      details_dialog.should include_text(assignment_name)
-      details_dialog.find_element(:css, '.edit_event_link').click
+      f('.edit_event_link').click
       wait_for_ajaximations
-      details_dialog = f('#edit_event').find_element(:xpath, '..')
-      details_dialog.find_element(:name, 'assignment[title]').should be_displayed
-      details_dialog.find_element(:css, '#edit_assignment_form .more_options_link').click
+      f('.more_options_link').click
       wait_for_ajaximations
       f('#assignment_name')['value'].should include_text(assignment_name)
     end
@@ -165,38 +153,20 @@ describe "assignments" do
       f('h2.title').should include_text(assignment_name)
     end
 
-    %w(points percent pass_fail letter_grade).each do |grading_option|
+    %w(points percent pass_fail letter_grade gpa_scale).each do |grading_option|
       it "should create assignment with #{grading_option} grading option" do
         assignment_title = 'grading options assignment'
         manually_create_assignment(assignment_title)
-        f('#assignment_toggle_advanced_options').click
         wait_for_ajaximations
         click_option('#assignment_grading_type', grading_option, :value)
         if grading_option == "percent"
           replace_content f('#assignment_points_possible'), ('1')
         end
+        click_option('#assignment_submission_type', 'No Submission')
         submit_assignment_form
         f('.title').should include_text(assignment_title)
         Assignment.find_by_title(assignment_title).grading_type.should == grading_option
       end
-    end
-
-    it "should submit a due date successfully" do
-      assignment = @course.assignments.create
-      get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
-      middle_number = '15'
-      expected_date = (Time.now - 1.month).strftime("%b #{middle_number}")
-      f('#assignment_due_date_controls .ui-datepicker-trigger').click
-      wait_for_ajaximations
-      f('.ui-datepicker-prev').click
-      wait_for_ajaximations
-      fj("#ui-datepicker-div a:contains(#{middle_number})").click
-      wait_for_ajaximations
-      fj('#ui-datepicker-div .ui-datepicker-ok').click
-      wait_for_ajaximations
-      expect_new_page_load { submit_form('#edit_assignment_form') }
-      wait_for_ajaximations
-      assignment.reload.due_at.strftime('%b %d').should == expected_date
     end
 
     it "only allows an assignment editor to edit points and title if assignment " +
@@ -217,7 +187,7 @@ describe "assignments" do
       # Assert input element is hidden to the user, but still present in the
       # form so the due date doesn't get changed to no due date.
       fj('.add_assignment_form .input-append').attribute('style').
-          should contain 'display: none;'
+          should include 'display: none;'
       f('.vdd_no_edit').text.
           should == I18n.t("#assignments.multiple_due_dates", "Multiple Due Dates")
       assignment_title = f("#assignment_title")
@@ -243,6 +213,7 @@ describe "assignments" do
         f('.add_assignment_link').click
         wait_for_ajaximations
         expect_new_page_load { f('.more_options_link').click }
+        click_option('#assignment_submission_type', 'No Submission')
         submit_assignment_form
         @course.assignments.count.should == 1
         get "/courses/#{@course.id}/assignments"
@@ -257,7 +228,6 @@ describe "assignments" do
       get "/courses/#{@course.id}/assignments"
       f('.add_assignment_link').click
       expect_new_page_load { f('.more_options_link').click }
-      f('#assignment_toggle_advanced_options').click
       wait_for_ajaximations
       f('#assignment_has_group_category').click
       wait_for_ajaximations
@@ -267,32 +237,6 @@ describe "assignments" do
       f('#self_signup_help_dialog').should be_displayed
     end
 
-    it "should show a more errors errorBox if any invalid fields are hidden" do
-      assignment_name = 'first test assignment'
-      @assignment = @course.assignments.create({
-         :name => assignment_name,
-         :assignment_group => @course.assignment_groups.create!(:name => "default")
-      })
-
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
-      f('#assignment_toggle_advanced_options').click # show advanced options
-      click_option('#assignment_submission_type', "Online") # setup an error state (online with no types)
-      f('#assignment_toggle_advanced_options').click # hide advanced options
-      f('.btn-primary[type=submit]').click
-      wait_for_ajaximations
-
-      errorBoxes = driver.execute_script("return $('.errorBox').filter('[id!=error_box_template]').toArray();")
-      errorBoxes.size.should == 2 # the inivisible one and the 'advanced options' one
-      visBoxes, hidBoxes = errorBoxes.partition { |eb| eb.displayed? }
-      visBoxes.first.text.should == "There were errors on one or more advanced options"
-
-      f('#assignment_toggle_advanced_options').click
-      wait_for_ajaximations
-      errorBoxes = driver.execute_script("return $('.errorBox').filter('[id!=error_box_template]').toArray();")
-      errorBoxes.size.should == 1 # the more_options_link one has now been removed from the DOM
-      errorBoxes.first.text.should == 'Please choose at least one submission type'
-      errorBoxes.first.should be_displayed
-    end
 
     it "should validate that a group category is selected" do
       assignment_name = 'first test assignment'
@@ -302,7 +246,6 @@ describe "assignments" do
       })
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
-      f('#assignment_toggle_advanced_options').click # show advanced options
       f('#assignment_has_group_category').click
       close_visible_dialog
       f('.btn-primary[type=submit]').click
@@ -324,6 +267,7 @@ describe "assignments" do
         f('.add_assignment_link').click
         wait_for_ajaximations
         expect_new_page_load { f('.more_options_link').click }
+        click_option('#assignment_submission_type', 'No Submission')
         submit_assignment_form
         @course.assignments.count.should == 1
         get "/courses/#{@course.id}/assignments"
@@ -342,7 +286,6 @@ describe "assignments" do
                                                })
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
-      f('#assignment_toggle_advanced_options').click
       click_option('#assignment_grading_type', 'Percentage')
       f('.btn-primary[type=submit]').click
       wait_for_ajaximations
@@ -357,7 +300,6 @@ describe "assignments" do
                                                })
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
-      f('#assignment_toggle_advanced_options').click
       click_option('#assignment_grading_type', 'Percentage')
       replace_content f('#assignment_points_possible'), ('')
       f('.btn-primary[type=submit]').click
@@ -373,23 +315,11 @@ describe "assignments" do
                                                })
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
-      f('#assignment_toggle_advanced_options').click
       click_option('#assignment_grading_type', 'Percentage')
       replace_content f('#assignment_points_possible'), ('taco')
       f('.btn-primary[type=submit]').click
       wait_for_ajaximations
       fj('.error_text div').text.should == "Points possible must be more than 0 for percentage grading"
-    end
-
-
-    it "should create an assignment with the correct date for keyboard entry (mm/dd/yy)" do
-      get "/courses/#{@course.id}/assignments"
-      f('.add_assignment_link').click
-      wait_for_ajaximations
-      replace_content(fj('#assignment_title'), "TACOS TACOS TACOS")
-      replace_content(fj('#assignment_due_at'), '06/10/12')
-      expect_new_page_load { f('.more_options_link').click }
-      f('#assignment_due_date').attribute(:value).should == "Jun 10, 2012 at 12am"
     end
 
     context "frozen assignment_group_id" do
@@ -422,24 +352,6 @@ describe "assignments" do
 
         f('h2.title').should include_text(orig_title + ' edit')
         @frozen_assign.reload.assignment_group.name.should == "other"
-      end
-    end
-
-    context "frozen assignment" do
-      before do
-        stub_freezer_plugin Hash[Assignment::FREEZABLE_ATTRIBUTES.map{|a| [a, "true"]}]
-        default_group = @course.assignment_groups.create!(:name => "default")
-        @frozen_assign = frozen_assignment(default_group)
-      end
-
-      it "should allow editing the due date even if completely frozen" do
-        old_due_at = @frozen_assign.due_at
-        run_assignment_edit(@frozen_assign) do
-          replace_content(fj('.due-date-overrides form:first input[name=due_at]'), 'Sep 20, 2012')
-        end
-
-        f('.assignment_dates').text.should match /Sep 20, 2012/
-        @frozen_assign.reload.due_at.to_i.should_not == old_due_at.to_i
       end
     end
 

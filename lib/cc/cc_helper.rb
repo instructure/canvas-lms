@@ -84,6 +84,7 @@ module CCHelper
   WIKI_FOLDER = 'wiki_content'
   MEDIA_OBJECTS_FOLDER = 'media_objects'
   CANVAS_EXPORT_FLAG = 'canvas_export.txt'
+  MEDIA_TRACKS = 'media_tracks.xml'
   
   def create_key(object, prepend="")
     CCHelper.create_key(object, prepend)
@@ -181,7 +182,7 @@ module CCHelper
           "#{folder}/#{URI.escape(obj.display_name)}#{CCHelper.file_query_string(match.rest)}"
         end
       end
-      @rewriter.set_handler('wiki') do |match|
+      wiki_handler = Proc.new do |match|
         # WikiPagesController allows loosely-matching URLs; fix them before exporting
         if match.obj_id.present?
           url_or_title = match.obj_id
@@ -195,6 +196,8 @@ module CCHelper
           "#{WIKI_TOKEN}/#{match.type}/#{match.obj_id}"
         end
       end
+      @rewriter.set_handler('wiki', &wiki_handler)
+      @rewriter.set_handler('pages', &wiki_handler)
       @rewriter.set_handler('items') do |match|
         item = ContentTag.find(match.obj_id)
         migration_id = CCHelper.create_key(item)
@@ -220,7 +223,7 @@ module CCHelper
 
       protocol = HostUrl.protocol
       host = HostUrl.context_host(@course)
-      port = Setting.from_config("domain").try(:[], :domain).try(:split, ':').try(:[], 1)
+      port = ConfigFile.load("domain").try(:[], :domain).try(:split, ':').try(:[], 1)
       @url_prefix = "#{protocol}://#{host}"
       @url_prefix += ":#{port}" if !host.include?(':') && port.present?
     end
@@ -238,7 +241,7 @@ module CCHelper
       %{<html>\n<head>\n<meta http-equiv="Content-Type" content="text/html; charset=utf-8">\n<title>#{title}</title>\n#{meta_html}</head>\n<body>\n#{content}\n</body>\n</html>}
     end
 
-    UrlAttributes = Instructure::SanitizeField::SANITIZE[:protocols].inject({}) { |h,(k,v)| h[k] = v.keys; h }
+    UrlAttributes = CanvasSanitize::SANITIZE[:protocols].inject({}) { |h,(k,v)| h[k] = v.keys; h }
 
     def html_content(html)
       html = @rewriter.translate_content(html)
@@ -251,8 +254,8 @@ module CCHelper
       doc.css('a.instructure_inline_media_comment').each do |anchor|
         next unless anchor['id']
         media_id = anchor['id'].gsub(/^media_comment_/, '')
-        obj = course.media_objects.by_media_id(media_id).first
-        if obj && obj.context == course && migration_id = CCHelper.create_key(obj)
+        obj = MediaObject.by_media_id(media_id).first
+        if obj && migration_id = CCHelper.create_key(obj)
           @used_media_objects << obj
           info = CCHelper.media_object_info(obj, nil, media_object_flavor)
           @media_object_infos[obj.id] = info
@@ -286,8 +289,8 @@ module CCHelper
 
   def self.media_object_info(obj, client = nil, flavor = nil)
     unless client
-      client = Kaltura::ClientV3.new
-      client.startSession(Kaltura::SessionType::ADMIN)
+      client = CanvasKaltura::ClientV3.new
+      client.startSession(CanvasKaltura::SessionType::ADMIN)
     end
     if flavor
       assets = client.flavorAssetGetByEntryId(obj.media_id)

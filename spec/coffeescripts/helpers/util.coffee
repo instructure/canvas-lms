@@ -1,4 +1,4 @@
-define ['underscore'], (_) ->
+define ['jquery', 'underscore'], ($, _) ->
 
   closeDialog: ->
     $('.ui-dialog-content').dialog 'close'

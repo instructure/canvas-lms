@@ -25,8 +25,8 @@ class OverrideListPresenter
 
   def due_for(due_date)
     return due_date[:title] if due_date[:title]
-    multiple_due_dates? ? 
-      I18n.t('overrides.everyone_else','Everyone else') : 
+    multiple_due_dates? ?
+      I18n.t('overrides.everyone_else','Everyone else') :
       I18n.t('overrides.everyone','Everyone')
   end
 
@@ -55,6 +55,7 @@ class OverrideListPresenter
     return [] unless assignment
 
     assignment.dates_hash_visible_to(user).each do |due_date|
+      due_date[:raw] = due_date.dup
       due_date[:lock_at] = lock_at due_date
       due_date[:unlock_at] = unlock_at due_date
       due_date[:due_at] = due_at due_date

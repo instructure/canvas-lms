@@ -1,4 +1,4 @@
-define ['underscore', 'Backbone'], (_, Backbone) ->
+define ['jquery', 'underscore', 'Backbone'], ($, _, Backbone) ->
 
   class FeatureFlag extends Backbone.Model
 

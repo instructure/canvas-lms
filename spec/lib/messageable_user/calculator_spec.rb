@@ -360,6 +360,17 @@ describe "MessageableUser::Calculator" do
   end
 
   describe "shard_cached" do
+    before do
+      @expected1 = 'random_string1'
+      @expected2 = 'random_string2'
+      @expected3 = 'random_string3 (also ponies)'
+      Foo = Struct.new(:cache_key)
+    end
+
+    after do
+      Object.send(:remove_const, :Foo)
+    end
+
     describe "sharding" do
       specs_require_sharding
 
@@ -374,54 +385,46 @@ describe "MessageableUser::Calculator" do
 
     describe "rails cache" do
       it "should share across calculators with same user" do
-        expected = mock
         calc2 = MessageableUser::Calculator.new(@viewing_user)
         enable_cache do
-          @calculator.shard_cached('cache_key') { expected }
-          calc2.shard_cached('cache_key')[Shard.current].should == expected
+          @calculator.shard_cached('cache_key') { @expected1 }
+          calc2.shard_cached('cache_key')[Shard.current].should == @expected1
         end
       end
 
       it "should distinguish users" do
-        expected1 = mock
-        expected2 = mock
         calc2 = MessageableUser::Calculator.new(user)
 
         enable_cache do
-          @calculator.shard_cached('cache_key') { expected1 }
-          calc2.shard_cached('cache_key') { expected2 }
-          calc2.shard_cached('cache_key')[Shard.current].should == expected2
+          @calculator.shard_cached('cache_key') { @expected1 }
+          calc2.shard_cached('cache_key') { @expected2 }
+          calc2.shard_cached('cache_key')[Shard.current].should == @expected2
         end
       end
 
       it "should notice when a user changes" do
-        expected1 = mock
-        expected2 = mock
         calc2 = MessageableUser::Calculator.new(@viewing_user)
 
         enable_cache do
-          @calculator.shard_cached('cache_key') { expected1 }
+          @calculator.shard_cached('cache_key') { @expected1 }
           @viewing_user.updated_at = 1.minute.from_now
-          calc2.shard_cached('cache_key') { expected2 }
-          calc2.shard_cached('cache_key')[Shard.current].should == expected2
+          calc2.shard_cached('cache_key') { @expected2 }
+          calc2.shard_cached('cache_key')[Shard.current].should == @expected2
         end
       end
 
       it "should be sensitive to the key" do
-        expected1 = mock
-        expected2 = mock
-
         enable_cache do
-          @calculator.shard_cached('cache_key1') { expected1 }
-          @calculator.shard_cached('cache_key2') { expected2 }
-          @calculator.shard_cached('cache_key2')[Shard.current].should == expected2
+          @calculator.shard_cached('cache_key1') { @expected1 }
+          @calculator.shard_cached('cache_key2') { @expected2 }
+          @calculator.shard_cached('cache_key2')[Shard.current].should == @expected2
         end
       end
 
       it "should be sensitive to the method results from additional parameters" do
-        expected1 = stub(:cache_key => 'a')
-        expected2 = stub(:cache_key => 'b')
-        expected3 = stub(:cache_key => 'c')
+        expected1 = Foo.new('a')
+        expected2 = Foo.new('b')
+        expected3 = Foo.new('c')
         @calculator.stubs(:method1 => expected1)
         @calculator.stubs(:method2 => expected2)
 
@@ -446,19 +449,16 @@ describe "MessageableUser::Calculator" do
 
     describe "object-local cache" do
       it "should cache the result the key" do
-        expected = mock
-        @calculator.shard_cached('cache_key') { expected }
+        @calculator.shard_cached('cache_key') { @expected1 }
         @calculator.shard_cached('cache_key') { raise 'should not get here' }
-        @calculator.shard_cached('cache_key')[Shard.current].should == expected
+        @calculator.shard_cached('cache_key')[Shard.current].should == @expected1
       end
 
       it "should distinguish different keys" do
-        expected1 = mock
-        expected2 = mock
-        @calculator.shard_cached('cache_key1') { expected1 }
-        @calculator.shard_cached('cache_key2') { expected2 }
-        @calculator.shard_cached('cache_key1')[Shard.current].should == expected1
-        @calculator.shard_cached('cache_key2')[Shard.current].should == expected2
+        @calculator.shard_cached('cache_key1') { @expected1 }
+        @calculator.shard_cached('cache_key2') { @expected2 }
+        @calculator.shard_cached('cache_key1')[Shard.current].should == @expected1
+        @calculator.shard_cached('cache_key2')[Shard.current].should == @expected2
       end
     end
   end

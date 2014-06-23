@@ -1,5 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook2_common')
-describe "edititing grades" do
+describe "editing grades" do
   include_examples "in-process server selenium tests"
 
   ASSIGNMENT_1_POINTS = "10"
@@ -25,27 +25,19 @@ describe "edititing grades" do
     data_setup
   end
 
-  it "should change grades and validate course total is correct" do
-    expected_edited_total = "33.3%"
-    get "/courses/#{@course.id}/gradebook2"
-
-    #editing grade for first row, first cell
-    edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2', 0)
-
-    #editing grade for second row, first cell
-    edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(2) .l2', 0)
-
-    #refresh page and make sure the grade sticks
-    get "/courses/#{@course.id}/gradebook2"
-    wait_for_ajaximations
-    final_score_for_row(0).should == expected_edited_total
-    final_score_for_row(1).should == expected_edited_total
-
-    #go back to gradebook1 and compare to make sure they match
-    check_gradebook_1_totals({
-       @student_1.id => expected_edited_total,
-       @student_2.id => expected_edited_total
-     })
+  context 'submission details dialog' do
+    it 'successfully grades a submission' do
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+      open_comment_dialog(0, 0)
+      grade_box = f("form.submission_details_grade_form input.grading_value")
+      grade_box.attribute('value').should == ASSIGNMENT_1_POINTS
+      set_value(grade_box, 7)
+      f("form.submission_details_grade_form button").click
+      wait_for_ajax_requests
+      validate_cell_text(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .slick-cell:nth-child(1)'), '7')
+      final_score_for_row(0).should == "80%"
+    end
   end
 
   it "should update a graded quiz and have the points carry over to the quiz attempts page" do
@@ -53,7 +45,7 @@ describe "edititing grades" do
     q = factory_with_protected_attributes(@course.quizzes, :title => "new quiz", :points_possible => points, :quiz_type => 'assignment', :workflow_state => 'available')
     q.save!
     qs = q.generate_submission(@student_1)
-    qs.grade_submission
+    Quizzes::SubmissionGrader.new(qs).grade_submission
     q.reload
 
     get "/courses/#{@course.id}/gradebook2"
@@ -101,6 +93,30 @@ describe "edititing grades" do
 
     final_score_for_row(0).should == STUDENT_1_TOTAL_IGNORING_UNGRADED
     final_score_for_row(1).should == STUDENT_2_TOTAL_IGNORING_UNGRADED
+  end
+
+  it "should change grades and validate course total is correct" do
+    Course.any_instance.stubs(:feature_enabled?).returns(false)
+    expected_edited_total = "33.3%"
+    get "/courses/#{@course.id}/gradebook2"
+
+    #editing grade for first row, first cell
+    edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(1) .l2', 0)
+
+    #editing grade for second row, first cell
+    edit_grade('#gradebook_grid .container_1 .slick-row:nth-child(2) .l2', 0)
+
+    #refresh page and make sure the grade sticks
+    get "/courses/#{@course.id}/gradebook2"
+    wait_for_ajaximations
+    final_score_for_row(0).should == expected_edited_total
+    final_score_for_row(1).should == expected_edited_total
+
+    #go back to gradebook1 and compare to make sure they match
+    check_gradebook_1_totals({
+                                 @student_1.id => expected_edited_total,
+                                 @student_2.id => expected_edited_total
+                             })
   end
 
   it "should allow setting a letter grade on a no-points assignment" do

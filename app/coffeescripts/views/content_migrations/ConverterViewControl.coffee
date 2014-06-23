@@ -1,7 +1,8 @@
 define [
+  'jquery'
   'underscore'
   'vendor/jquery.ba-tinypubsub'
-], (_) -> 
+], ($, _) -> 
   # Handles rendering the correct view depending on the 
   # value selected. 
   class ConverterViewControl

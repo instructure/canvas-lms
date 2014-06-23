@@ -35,11 +35,12 @@ class AccountReport < ActiveRecord::Base
     state :deleted
   end
 
-  scope :last_complete_of_type, lambda{ |type|
-    last_of_type(type).where(:progress => '100')  }
+  scope :last_complete_of_type, lambda { |type, limit = 1|
+    last_of_type(type, limit).where(:progress => '100')
+  }
 
-  scope :last_of_type, lambda {|type|
-    where(:report_type => type).order("updated_at DESC").limit(1)
+  scope :last_of_type, lambda { |type, limit = 1|
+    where(:report_type => type).order("updated_at DESC").limit(limit)
   }
 
   def context

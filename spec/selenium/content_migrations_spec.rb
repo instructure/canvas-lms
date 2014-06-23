@@ -53,99 +53,31 @@ end
 def test_selective_content(source_course=nil)
   visit_page
 
+  # Open selective dialog
   f('.migrationProgressItem .progressStatus').should include_text("Waiting for select")
   f('.migrationProgressItem .selectContentBtn').click
   wait_for_ajaximations
 
-  topic_id = "I_00009_R"
-  att_ids = ["I_00003_R_IMAGERESOURCE", "6a35b0974f59819404dc86d48fe39fc3", "7acb90d1653008e73753aa2cafb16298", "f5",
-             "8612e3db71e452d5d2952ff64647c0d8", "f4", "f3", "I_media_R", "I_00006_Media", "I_00001_R"]
-  # these attachments are inside the folder we'll deselect
-  selected_att_ids = att_ids - ["6a35b0974f59819404dc86d48fe39fc3", "7acb90d1653008e73753aa2cafb16298", "I_00003_R_IMAGERESOURCE"]
+  f('input[name="copy[all_assignments]"]').click
 
-  folder_name = "I_00003_R"
-  tool_ids = ["I_00010_R", "I_00011_R"]
-
-  if source_course
-    topic_id = CC::CCHelper.create_key(source_course.discussion_topics.find_by_migration_id(topic_id))
-    att_ids = att_ids.map { |id| CC::CCHelper.create_key(source_course.attachments.find_by_migration_id(id)) }
-    selected_att_ids = selected_att_ids.map { |id| CC::CCHelper.create_key(source_course.attachments.find_by_migration_id(id)) }
-    tool_ids = tool_ids.map { |id| CC::CCHelper.create_key(source_course.context_external_tools.find_by_migration_id(id)) }
-    folder_name = source_course.folders.find_by_name(folder_name).full_name
-  end
-
-  boxes_to_click = [
-      ["copy[all_context_modules]", false],
-      ["copy[all_quizzes]", false],
-      ["copy[all_discussion_topics]", false],
-      ["copy[discussion_topics][id_#{topic_id}]", true],
-      ["copy[all_context_external_tools]", false],
-      ["copy[discussion_topics][id_#{topic_id}]", false], # deselect
-      ["copy[all_attachments]", false]
-  ]
-  boxes_to_click += att_ids.map { |id| ["copy[attachments][id_#{id}]", true] }
-
-  # directly click checkboxes
-  boxes_to_click.each do |name, value|
-    keep_trying_until do
-      escaped_name = name.gsub("[", "\\[").gsub("]", "\\]")
-      selector = ".selectContentDialog input[name=\"#{escaped_name}\"]"
-      box = f(selector)
-      selector = selector.gsub("\"", "\\\"")
-      box.should_not be_nil
-      set_value(box, value)
-      wait_for_ajaximations
-      is_checked(selector).should == value
-    end
-  end
-
-  # click on select all for external tools
-  suffix = f(".selectContentDialog input[name=\"copy[all_context_external_tools]\"]")["id"].split('-')[1] #checkbox-viewXX -> viewXX
-  all_link = f(".selectContentDialog .showHide #selectAll-#{suffix}")
-  all_link.text.should == "Select All"
-  all_link.click
-
-  # click on select none for folder
-  none_link = ff('.selectContentDialog .showHide a:last-child').last
-  none_link.text.should == "Select None"
-  none_link.click
-
-  expected_params = {
-      "all_assignments" => "1",
-      "context_external_tools" => {tool_ids[0] => "1", tool_ids[1] => "1"},
-      "attachments" => {}
-  }
-  selected_att_ids.each { |id| expected_params["attachments"][id] = "1" }
-  if source_course
-    expected_params.merge!({"all_course_settings" => "1", "all_syllabus_body" => "1", "all_assessment_question_banks" => "1"})
-  end
-
+  # Submit selection
   f(".selectContentDialog input[type=submit]").click
   wait_for_ajaximations
 
-  cm = @course.content_migrations.last
-
-  cm.migration_settings[:migration_ids_to_import][:copy].should == expected_params
-  cm.migration_settings[:copy_options].should == expected_params
 
   if source_course
     run_migration
   else
     import
   end
+
   visit_page
 
   f('.migrationProgressItem .progressStatus').should include_text("Completed")
-
-  @course.context_modules.count.should == 0
   @course.assignments.count.should == 1
-  @course.quizzes.count.should == 0
-  @course.discussion_topics.count.should == 0
-  @course.context_external_tools.count.should == 2
-  @course.attachments.map(&:migration_id).sort.should == selected_att_ids.sort
 end
 
-describe "content migrations" do
+describe "content migrations", :non_parallel do
   include_examples "in-process server selenium tests"
 
   context "common cartridge importing" do
@@ -153,6 +85,28 @@ describe "content migrations" do
       course_with_teacher_logged_in
       @type = 'common_cartridge_importer'
       @filename = 'cc_full_test.zip'
+    end
+
+    it "should import all content immediately by default" do
+      pending unless Qti.qti_enabled?
+      visit_page
+      fill_migration_form
+      ff('[name=selective_import]')[0].click
+      submit
+      run_migration
+
+      keep_trying_until do
+        visit_page
+        f('.migrationProgressItem .progressStatus').should include_text("Completed")
+      end
+
+      # From spec/lib/cc/importer/common_cartridge_converter_spec.rb
+      @course.attachments.count.should == 10
+      @course.discussion_topics.count.should == 2
+      @course.context_modules.count.should == 3
+      @course.context_external_tools.count.should == 2
+      @course.quizzes.count.should == 1
+      @course.quizzes.first.quiz_questions.count.should == 11
     end
 
     it "should show each form" do
@@ -179,11 +133,14 @@ describe "content migrations" do
     it "should submit, queue and list migrations" do
       visit_page
       fill_migration_form
+      ff('[name=selective_import]')[0].click
       submit
 
       ff('.migrationProgressItem').count.should == 1
 
       fill_migration_form(:filename => 'cc_ark_test.zip')
+
+      ff('[name=selective_import]')[0].click
       submit
 
       visit_page
@@ -207,32 +164,11 @@ describe "content migrations" do
       end
     end
 
-    it "should import all content immediately by default" do
-      pending unless Qti.qti_enabled?
-      visit_page
-      fill_migration_form
-      submit
-      run_migration
-
-      keep_trying_until do
-        visit_page
-        f('.migrationProgressItem .progressStatus').should include_text("Completed")
-      end
-
-      # From spec/lib/cc/importer/common_cartridge_converter_spec.rb
-      @course.attachments.count.should == 10
-      @course.discussion_topics.count.should == 2
-      @course.context_modules.count.should == 3
-      @course.context_external_tools.count.should == 2
-      @course.quizzes.count.should == 1
-      @course.quizzes.first.quiz_questions.count.should == 11
-    end
-
     it "should import selective content" do
       pending unless Qti.qti_enabled?
       visit_page
       fill_migration_form
-      f('#selectContentCheckbox').click
+      ff('[name=selective_import]')[1].click
       submit
       run_migration
 
@@ -278,6 +214,7 @@ describe "content migrations" do
         fill_migration_form(:filename => 'cc_default_qb_test.zip', :data => data)
 
         click_option('.questionBank', bank.id.to_s, :value)
+        ff('[name=selective_import]')[0].click
 
         submit
         run_migration
@@ -299,6 +236,7 @@ describe "content migrations" do
 
         f('#createQuestionInput').send_keys('new bank naem')
 
+        ff('[name=selective_import]')[0].click
         submit
         run_migration
 
@@ -319,6 +257,7 @@ describe "content migrations" do
         click_option('.questionBank', 'new_question_bank', :value)
         click_option('.questionBank', f('.questionBank option').text, :text)
 
+        ff('[name=selective_import]')[0].click
         submit
         run_migration
 
@@ -331,7 +270,9 @@ describe "content migrations" do
 
   context "course copy" do
     before :all do
-      @copy_from = course_model(:name => "copy from me")
+      Account.clear_special_account_cache!
+      @copy_from = course
+      @copy_from.update_attribute(:name, 'copy from me')
       data = File.read(File.dirname(__FILE__) + '/../fixtures/migration/cc_full_test.zip')
 
       cm = ContentMigration.new(:context => @copy_from, :migration_type => "common_cartridge_importer")
@@ -348,12 +289,17 @@ describe "content migrations" do
       worker_class = Canvas::Migration::Worker.const_get(Canvas::Plugin.find(cm.migration_type).settings['worker'])
       worker_class.new(cm.id).perform
 
+      @course = nil
       @type = "course_copy_importer"
     end
 
     before :each do
       course_with_teacher_logged_in(:active_all => true)
       @copy_from.enroll_teacher(@user).accept
+    end
+
+    after :all do
+      truncate_all_tables
     end
 
     it "should select by drop-down or by search box" do
@@ -372,13 +318,18 @@ describe "content migrations" do
       end
 
       el = f('.ui-autocomplete li a')
-      el.text.should == @copy_from.name
+      divs = ff('div', el)
+      divs[0].text.should == @copy_from.name
+      divs[1].text.should == @copy_from.enrollment_term.name
       el.click
 
+      ff('[name=selective_import]')[0].click
       submit
 
       cm = @course.content_migrations.last
-      cm.migration_settings["source_course_id"].should == @copy_from.id.to_s
+      cm.migration_settings["source_course_id"].should == @copy_from.id
+      cm.source_course.should == @copy_from
+      cm.initiated_source.should == :api
 
       source_link = f('.migrationProgressItem .sourceLink a')
       source_link.text.should == @copy_from.name
@@ -436,7 +387,7 @@ describe "content migrations" do
       f("option[value=\"#{enrolled_course.id}\"]").should_not be_nil
     end
 
-    it "should copy all content from a course by default" do
+    it "should copy all content from a course" do
       pending unless Qti.qti_enabled?
       visit_page
 
@@ -444,6 +395,7 @@ describe "content migrations" do
       wait_for_ajaximations
 
       click_option('#courseSelect', @copy_from.id.to_s, :value)
+      ff('[name=selective_import]')[0].click
       submit
 
       run_migration
@@ -464,7 +416,7 @@ describe "content migrations" do
       wait_for_ajaximations
 
       click_option('#courseSelect', @copy_from.id.to_s, :value)
-      f('#selectContentCheckbox').click
+      ff('[name=selective_import]')[1].click
       submit
 
       test_selective_content(@copy_from)
@@ -500,6 +452,7 @@ describe "content migrations" do
       f('#newStartDate').send_keys('8-5-2012')
       f('#newEndDate').send_keys('Aug 15, 2012')
 
+      ff('[name=selective_import]')[0].click
       submit
 
       opts = @course.content_migrations.last.migration_settings["date_shift_options"]
@@ -527,6 +480,7 @@ describe "content migrations" do
       click_option('#courseSelect', new_course.id.to_s, :value)
 
       f('#dateShiftCheckbox').click
+      ff('[name=selective_import]')[0].click
 
       submit
 
@@ -539,6 +493,87 @@ describe "content migrations" do
       expected.each do |k, v|
         Date.parse(opts[k].to_s).should == Date.parse(v)
       end
+    end
+  end
+
+  context "importing LTI content" do
+    let(:import_course) { course_with_teacher_logged_in.course }
+    let(:import_tool) do
+      tool = import_course.context_external_tools.new({
+        name: "test lti import tool",
+        consumer_key: "key",
+        shared_secret: "secret",
+        url: "http://www.example.com/ims/lti",
+      })
+      tool.migration_selection = {
+        url: "http://#{HostUrl.default_host}/selection_test",
+        text: "LTI migration text",
+        selection_width: 500,
+        selection_height: 500,
+        icon_url: "/images/add.png",
+      }
+      tool.save!
+      tool
+    end
+    let(:other_tool) do
+      tool = import_course.context_external_tools.new({
+        name: "other lti tool",
+        consumer_key: "key",
+        shared_secret: "secret",
+        url: "http://www.example.com/ims/lti",
+      })
+      tool.resource_selection = {
+        url: "http://#{HostUrl.default_host}/selection_test",
+        text: "other resource text",
+        selection_width: 500,
+        selection_height: 500,
+        icon_url: "/images/add.png",
+      }
+      tool.save!
+      tool
+    end
+
+    it "should show LTI tools with migration_selection in the select control" do
+      import_tool
+      other_tool
+      visit_page
+      migration_type_options = ff('#chooseMigrationConverter option')
+      migration_type_values = migration_type_options.map { |op| op['value'] }
+      migration_type_texts = migration_type_options.map { |op| op.text }
+      migration_type_values.should include(import_tool.asset_string)
+      migration_type_texts.should include(import_tool.name)
+      migration_type_values.should_not include(other_tool.asset_string)
+      migration_type_texts.should_not include(other_tool.name)
+    end
+
+    it "should show LTI view when LTI tool selected" do
+      import_tool
+      visit_page
+      select_migration_type(import_tool.asset_string)
+      f("#converter .externalToolLaunch").should be_displayed
+      f("#converter .selectContent").should be_displayed
+    end
+
+    it "should launch LTI tool on browse and get content link" do
+      import_tool
+      visit_page
+      select_migration_type(import_tool.asset_string)
+      f("button#externalToolLaunch").click
+      tool_iframe = keep_trying_until { f(".tool_launch") }
+      f('.ui-dialog-title').text.should == import_tool.label_for(:migration_selection)
+
+      driver.switch_to.frame(tool_iframe)
+      keep_trying_until { f("#basic_lti_link") }.click
+
+      driver.switch_to.default_content
+      file_name_elt = keep_trying_until { f("#converter .file_name").text.should == "lti embedded link" }
+    end
+
+    it "should have content selection option" do
+      import_tool
+      visit_page
+      select_migration_type(import_tool.asset_string)
+      ff('input[name=selective_import]').size.should == 2
     end
   end
 end

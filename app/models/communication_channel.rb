@@ -27,8 +27,16 @@ class CommunicationChannel < ActiveRecord::Base
   has_many :pseudonyms
   belongs_to :user
   has_many :notification_policies, :dependent => :destroy
+  has_many :delayed_messages
   has_many :messages
   belongs_to :access_token
+
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :path, :path_type, :position, :user_id, :pseudonym_id, :bounce_count, :workflow_state, :confirmation_code,
+    :created_at, :updated_at, :build_pseudonym_on_confirm
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:pseudonyms, :pseudonym, :user, :notification_policies, :delayed_mesasge, :messages]
 
   before_save :consider_retiring, :assert_path_type, :set_confirmation_code
   before_save :consider_building_pseudonym
@@ -54,7 +62,7 @@ class CommunicationChannel < ActiveRecord::Base
   RETIRE_THRESHOLD = 5
 
   def self.sms_carriers
-    @sms_carriers ||= Canvas::ICU.collate_by((Setting.from_config('sms', false) ||
+    @sms_carriers ||= Canvas::ICU.collate_by((ConfigFile.load('sms', false) ||
         { 'AT&T' => 'txt.att.net',
           'Alltel' => 'message.alltel.com',
           'Boost' => 'myboostmobile.com',
@@ -186,10 +194,10 @@ class CommunicationChannel < ActiveRecord::Base
   end
 
   def send_otp!(code)
-    m = self.messages.new
+    m = self.messages.scoped.new
     m.to = self.path
     m.body = t :body, "Your Canvas verification code is %{verification_code}", :verification_code => code
-    Mailer.message(m).deliver rescue nil # omg! just ignore delivery failures
+    Mailer.create_message(m).deliver rescue nil # omg! just ignore delivery failures
   end
 
   # If you are creating a new communication_channel, do nothing, this just
@@ -199,9 +207,9 @@ class CommunicationChannel < ActiveRecord::Base
   def set_confirmation_code(reset=false)
     self.confirmation_code = nil if reset
     if self.path_type == TYPE_EMAIL or self.path_type.nil?
-      self.confirmation_code ||= AutoHandle.generate(nil, 25)
+      self.confirmation_code ||= CanvasUuid::Uuid.generate(nil, 25)
     else
-      self.confirmation_code ||= AutoHandle.generate
+      self.confirmation_code ||= CanvasUuid::Uuid.generate
     end
     true
   end
@@ -340,6 +348,7 @@ class CommunicationChannel < ActiveRecord::Base
     scope = CommunicationChannel.active.by_path(self.path).of_type(self.path_type)
     merge_candidates = {}
     Shard.with_each_shard(shards) do
+      scope = scope.shard(Shard.current) unless CANVAS_RAILS2
       scope.where("user_id<>?", self.user_id).includes(:user).map(&:user).select do |u|
         result = merge_candidates.fetch(u.global_id) do
           merge_candidates[u.global_id] = (u.all_active_pseudonyms.length != 0)
@@ -355,7 +364,7 @@ class CommunicationChannel < ActiveRecord::Base
   end
 
     def self.create_push(access_token, device_token)
-      (scope(:find, :shard) || Shard.current).activate do
+      (scoped.shard_value || Shard.current).activate do
         connection.transaction do
           cc = new
           cc.path_type = CommunicationChannel::TYPE_PUSH

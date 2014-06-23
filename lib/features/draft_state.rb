@@ -17,15 +17,25 @@
 #
 
 
-module DraftState
-  class Publisher < Struct.new(:course_id)
-    def perform
-      course = Course.find(course_id)
-      course.quizzes.where(workflow_state: 'unpublished').update_all(workflow_state: 'edited')
-      course.assignments.where(workflow_state: 'unpublished').update_all(workflow_state: 'published')
-      course.context_modules.where(workflow_state: 'unpublished').update_all(workflow_state: 'active')
-      course.context_module_tags.where(workflow_state: 'unpublished').update_all(workflow_state: 'active')
-      course.discussion_topics.where(workflow_state: 'unpublished').update_all(workflow_state: 'active')
+module Features
+  module DraftState
+    class Publisher < Struct.new(:course_id)
+      def perform
+        course = Course.find(course_id)
+        course.quizzes.where(workflow_state: 'unpublished').update_all(workflow_state: 'edited')
+        course.assignments.where(workflow_state: 'unpublished').update_all(workflow_state: 'published')
+        course.context_modules.where(workflow_state: 'unpublished').update_all(workflow_state: 'active')
+        course.discussion_topics.where(workflow_state: 'unpublished').update_all(workflow_state: 'active')
+
+        # content tags referencing wiki pages or quizzes do not need to be updated
+        # wiki pages and quizzes handle unpublished values correctly in non-draft state
+        course.context_module_tags.where(workflow_state: 'unpublished')
+          .where("content_type NOT IN ('WikiPage', 'Quiz', 'Quizzes::Quiz')")
+          .update_all(workflow_state: 'active')
+
+        # invalidate cache for modules
+        course.context_modules.where("workflow_state<>'deleted'").update_all(updated_at: Time.now.utc)
+      end
     end
   end
 end
@@ -33,16 +43,15 @@ end
 Feature.register('draft_state' => {
     display_name: lambda { I18n.t('features.draft_state', 'Draft State') },
     description: lambda { I18n.t('draft_state_description', <<END) },
-Draft state is a *beta* feature that allows course content to be published and unpublished.
-Unpublished content won't be visible to students and won't affect grades.
-It also includes a redesign of some course areas to make them more consistent in look and functionality.
-
-Unpublished content may not be available if Draft State is disabled.
+This beta feature redesigns many parts of Canvas and allows content to exist in
+a new unpublished state that is invisible to students and excluded from grade
+calculations. Caution--disabling this feature may delete newly created or edited
+content from the teacher's view.
 END
     applies_to: 'Course',
-    state: 'hidden',
+    state: 'allowed',
     root_opt_in: true,
-    development: true,
+    development: false,
 
     custom_transition_proc: ->(user, context, from_state, transitions) do
       if context.is_a?(Course) && from_state == 'on'
@@ -67,7 +76,7 @@ END
 
     after_state_change_proc: ->(context, old_state, new_state) do
       if context.is_a?(Course) && old_state == 'on' && new_state == 'off'
-        Delayed::Job.enqueue(DraftState::Publisher.new(context.id), max_attempts: 1)
+        Delayed::Job.enqueue(Features::DraftState::Publisher.new(context.id), max_attempts: 1)
       end
     end
   }

@@ -21,6 +21,7 @@ class DiscussionEntry < ActiveRecord::Base
   include SendToInbox
   include SendToStream
   include TextHelper
+  include HtmlTextHelper
 
   attr_accessible :plaintext_message, :message, :discussion_topic, :user, :parent, :attachment, :parent_entry
   attr_readonly :discussion_topic_id, :user_id, :parent_id
@@ -38,6 +39,9 @@ class DiscussionEntry < ActiveRecord::Base
   belongs_to :editor, :class_name => 'User'
   has_one :external_feed_entry, :as => :asset
 
+  EXPORTABLE_ATTRIBUTES = [:id, :message, :discussion_topic_id, :user_id, :parent_id, :created_at, :updated_at, :attachment_id, :workflow_state, :deleted_at, :editor_id, :root_entry_id, :depth]
+  EXPORTABLE_ASSOCIATIONS = [:discussion_subentries, :discussion_entry_participants, :discussion_topic, :user, :parent_entry, :root_entry, :attachment, :editor, :external_feed_entry]
+
   before_create :infer_root_entry_id
   after_save :update_discussion
   after_save :context_module_action_later
@@ -47,7 +51,7 @@ class DiscussionEntry < ActiveRecord::Base
   before_validation :set_depth, :on => :create
   validate :validate_depth, on: :create
 
-  sanitize_field :message, Instructure::SanitizeField::SANITIZE
+  sanitize_field :message, CanvasSanitize::SANITIZE
 
   has_a_broadcast_policy
   attr_accessor :new_record_header
@@ -121,7 +125,7 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   def reply_from(opts)
-    raise IncomingMail::IncomingMessageProcessor::UnknownAddressError if self.context.root_account.deleted?
+    raise IncomingMail::Errors::UnknownAddress if self.context.root_account.deleted?
     user = opts[:user]
     if opts[:html]
       message = opts[:html].strip
@@ -143,7 +147,7 @@ class DiscussionEntry < ActiveRecord::Base
         entry.save!
         entry
       else
-        raise IncomingMail::IncomingMessageProcessor::ReplyToLockedTopicError
+        raise IncomingMail::Errors::ReplyToLockedTopic
       end
     end
   end
@@ -165,7 +169,7 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   def summary(length=150)
-    strip_and_truncate(message, :max_length => length)
+    HtmlTextHelper.strip_and_truncate(message, :max_length => length)
   end
 
   def plaintext_message(length=250)
@@ -460,10 +464,11 @@ class DiscussionEntry < ActiveRecord::Base
     participant = discussion_entry_participants.where(:user_id => user).first
     unless participant
       # return a temporary record with default values
-      participant = discussion_entry_participants.new({
+      participant = DiscussionEntryParticipant.new({
         :workflow_state => "unread",
         :forced_read_state => false,
         })
+      participant.discussion_entry = self
       participant.user = user
     end
 

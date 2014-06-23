@@ -15,133 +15,207 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-
 # @API Discussion Topics
 #
-# A discussion topic object looks like:
+# @model FileAttachment
+#     {
+#       "id": "FileAttachment",
+#       "description": "",
+#       "properties": {
+#         "content-type": {
+#           "example": "unknown/unknown",
+#           "type": "string"
+#         },
+#         "url": {
+#           "example": "http://www.example.com/courses/1/files/1/download",
+#           "type": "string"
+#         },
+#         "filename": {
+#           "example": "content.txt",
+#           "type": "string"
+#         },
+#         "display_name": {
+#           "example": "content.txt",
+#           "type": "string"
+#         }
+#       }
+#     }
 #
-#      !!!javascript
-#      {
-#        // The ID of this topic.
-#        "id":1,
+# @model DiscussionTopic
+#     {
+#       "id": "",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "The ID of this topic.",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "title": {
+#           "description": "The topic title.",
+#           "example": "Topic 1",
+#           "type": "string"
+#         },
+#         "message": {
+#           "description": "The HTML content of the message body.",
+#           "example": "<p>content here</p>",
+#           "type": "string"
+#         },
+#         "html_url": {
+#           "description": "The URL to the discussion topic in canvas.",
+#           "example": "https://<canvas>/courses/1/discussion_topics/2",
+#           "type": "string"
+#         },
+#         "posted_at": {
+#           "description": "The datetime the topic was posted. If it is null it hasn't been posted yet. (see delayed_post_at)",
+#           "example": "2037-07-21T13:29:31Z",
+#           "type": "datetime"
+#         },
+#         "last_reply_at": {
+#           "description": "The datetime for when the last reply was in the topic.",
+#           "example": "2037-07-28T19:38:31Z",
+#           "type": "datetime"
+#         },
+#         "require_initial_post": {
+#           "description": "If true then a user may not respond to other replies until that user has made an initial reply. Defaults to false.",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "user_can_see_posts": {
+#           "description": "Whether or not posts in this topic are visible to the user.",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "discussion_subentry_count": {
+#           "description": "The count of entries in the topic.",
+#           "example": 0,
+#           "type": "integer"
+#         },
+#         "read_state": {
+#           "description": "The read_state of the topic for the current user, 'read' or 'unread'.",
+#           "example": "read",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "read",
+#               "unread"
+#             ]
+#           }
+#         },
+#         "unread_count": {
+#           "description": "The count of unread entries of this topic for the current user.",
+#           "example": 0,
+#           "type": "integer"
+#         },
+#         "subscribed": {
+#           "description": "Whether or not the current user is subscribed to this topic.",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "subscription_hold": {
+#           "description": "(Optional) Why the user cannot subscribe to this topic. Only one reason will be returned even if multiple apply. Can be one of: 'initial_post_required': The user must post a reply first 'not_in_group_set': The user is not in the group set for this graded group discussion 'not_in_group': The user is not in this topic's group 'topic_is_announcement': This topic is an announcement",
+#           "example": "not_in_group_set",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "initial_post_required",
+#               "not_in_group_set",
+#               "not_in_group",
+#               "topic_is_announcement"
+#             ]
+#           }
+#         },
+#         "assignment_id": {
+#           "description": "The unique identifier of the assignment if the topic is for grading, otherwise null.",
+#           "type": "integer"
+#         },
+#         "delayed_post_at": {
+#           "description": "The datetime to publish the topic (if not right away).",
+#           "type": "datetime"
+#         },
+#         "published": {
+#           "description": "Whether this discussion topic is published (true) or draft state (false)",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "lock_at": {
+#           "description": "The datetime to lock the topic (if ever).",
+#           "type": "datetime"
+#         },
+#         "locked": {
+#           "description": "whether or not this is locked for students to see.",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "pinned": {
+#           "description": "whether or not the discussion has been 'pinned' by an instructor",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "locked_for_user": {
+#           "description": "Whether or not this is locked for the user.",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "lock_info": {
+#           "description": "(Optional) Information for the user about the lock. Present when locked_for_user is true.",
+#           "$ref": "LockInfo"
+#         },
+#         "lock_explanation": {
+#           "description": "(Optional) An explanation of why this is locked for the user. Present when locked_for_user is true.",
+#           "example": "This discussion is locked until September 1 at 12:00am",
+#           "type": "string"
+#         },
+#         "user_name": {
+#           "description": "The username of the topic creator.",
+#           "example": "User Name",
+#           "type": "string"
+#         },
+#         "topic_children": {
+#           "description": "An array of topic_ids for the group discussions the user is a part of.",
+#           "example": "[5, 7, 10]",
+#           "type": "array",
+#           "items": { "type": "integer"}
+#         },
+#         "root_topic_id": {
+#           "description": "If the topic is for grading and a group assignment this will point to the original topic in the course.",
+#           "type": "integer"
+#         },
+#         "podcast_url": {
+#           "description": "If the topic is a podcast topic this is the feed url for the current user.",
+#           "example": "/feeds/topics/1/enrollment_1XAcepje4u228rt4mi7Z1oFbRpn3RAkTzuXIGOPe.rss",
+#           "type": "string"
+#         },
+#         "discussion_type": {
+#           "description": "The type of discussion. Values are 'side_comment', for discussions that only allow one level of nested comments, and 'threaded' for fully threaded discussions.",
+#           "example": "side_comment",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "side_comment",
+#               "threaded"
+#             ]
+#           }
+#         },
+#         "group_category_id": {
+#           "description": "The unique identifier of the group category if the topic is a group discussion, otherwise null.",
+#           "type": "integer"
+#         },
+#         "attachments": {
+#           "description": "Array of file attachments.",
+#           "type": "array",
+#           "items": { "$ref": "FileAttachment" }
+#         },
+#         "permissions": {
+#           "description": "The current user's permissions on this topic.",
+#           "example": "{\"attach\"=>true}",
+#           "type": "map",
+#           "key": { "type": "string" },
+#           "value": { "type": "boolean" }
+#         }
+#       }
+#     }
 #
-#        // The topic title.
-#        "title":"Topic 1",
-#
-#        // The HTML content of the message body.
-#        "message":"<p>content here</p>",
-#
-#        // The URL to the discussion topic in canvas.
-#        "html_url": "https://<canvas>/courses/1/discussion_topics/2",
-#
-#        // The datetime the topic was posted. If it is null it hasn't been
-#        // posted yet. (see delayed_post_at)
-#        "posted_at":"2037-07-21T13:29:31Z",
-#
-#        // The datetime for when the last reply was in the topic.
-#        "last_reply_at":"2037-07-28T19:38:31Z",
-#
-#        // If true then a user may not respond to other replies until that user
-#        // has made an initial reply. Defaults to false.
-#        "require_initial_post":false,
-#
-#        // Whether or not posts in this topic are visible to the user.
-#       "user_can_see_posts":true,
-#
-#        // The count of entries in the topic.
-#        "discussion_subentry_count":0,
-#
-#        // The read_state of the topic for the current user, "read" or "unread".
-#        "read_state":"read",
-#
-#        // The count of unread entries of this topic for the current user.
-#        "unread_count":0,
-#
-#        // Whether or not the current user is subscribed to this topic.
-#        "subscribed":true,
-#
-#        // (Optional) Why the user cannot subscribe to this topic. Only one reason
-#        // will be returned even if multiple apply. Can be one of:
-#        // 'initial_post_required': The user must post a reply first
-#        // 'not_in_group_set': The user is not in the group set for this graded group discussion
-#        // 'not_in_group': The user is not in this topic's group
-#        // 'topic_is_announcement': This topic is an announcement
-#        "subscription_hold":"not_in_group_set",
-#
-#        // The unique identifier of the assignment if the topic is for grading, otherwise null.
-#        "assignment_id":null,
-#
-#        // The datetime to publish the topic (if not right away).
-#        "delayed_post_at":null,
-#
-#        // Whether this discussion topic is published (true) or draft state (false)
-#        "published":true,
-#
-#        // The datetime to lock the topic (if ever).
-#        "lock_at":null,
-#
-#        // whether or not this is locked for students to see.
-#        "locked":false,
-#
-#        // whether or not the discussion has been "pinned" by an instructor
-#        "pinned":false,
-#
-#        // Whether or not this is locked for the user.
-#        "locked_for_user":true,
-#
-#        // (Optional) Information for the user about the lock. Present when locked_for_user is true.
-#        "lock_info": {
-#          // Asset string for the object causing the lock
-#          "asset_string":"discussion_topic_1",
-#
-#          // (Optional) Time at which this was/will be unlocked.
-#          "unlock_at":"2013-01-01T00:00:00-06:00",
-#
-#          // (Optional) Time at which this was/will be locked.
-#          "lock_at":"2013-02-01T00:00:00-06:00",
-#
-#          // (Optional) Context module causing the lock.
-#          "context_module":{ ... }
-#        },
-#
-#        // (Optional) An explanation of why this is locked for the user. Present when locked_for_user is true.
-#        "lock_explanation":"This discussion is locked until September 1 at 12:00am",
-#
-#        // The username of the topic creator.
-#        "user_name":"User Name",
-#
-#        // An array of topic_ids for the group discussions the user is a part of.
-#        "topic_children":[5, 7, 10],
-#
-#        // If the topic is for grading and a group assignment this will
-#        // point to the original topic in the course.
-#        "root_topic_id":null,
-#
-#        // If the topic is a podcast topic this is the feed url for the current user.
-#        "podcast_url":"/feeds/topics/1/enrollment_1XAcepje4u228rt4mi7Z1oFbRpn3RAkTzuXIGOPe.rss",
-#
-#        // The type of discussion. Values are 'side_comment', for discussions
-#        // that only allow one level of nested comments, and 'threaded' for
-#        // fully threaded discussions.
-#        "discussion_type":"side_comment",
-#
-#        // Array of file attachments.
-#        "attachments":[
-#          {
-#            "content-type":"unknown/unknown",
-#            "url":"http://www.example.com/courses/1/files/1/download",
-#            "filename":"content.txt",
-#            "display_name":"content.txt"
-#          }
-#        ],
-#
-#        // The current user's permissions on this topic.
-#        "permissions":
-#        {
-#          // If true, the calling user can attach files to this discussion's entries.
-#          "attach": true
-#        }
-#      }
 class DiscussionTopicsController < ApplicationController
   before_filter :require_context, :except => :public_feed
 
@@ -154,7 +228,7 @@ class DiscussionTopicsController < ApplicationController
   #
   # Returns the paginated list of discussion topics for this course or group.
   #
-  # @argument order_by [String, "position"|"recent_activity"]
+  # @argument order_by [Optional, String, "position"|"recent_activity"]
   #   Determines the order of the discussion topic list. Defaults to "position".
   #
   # @argument scope [Optional, String, "locked"|"unlocked"|"pinned"|"unpinned"]
@@ -173,7 +247,7 @@ class DiscussionTopicsController < ApplicationController
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \ 
   #          -H 'Authorization: Bearer <token>'
   def index
-    return unless authorized_action(@context.discussion_topics.new, @current_user, :read)
+    return unless authorized_action(@context.discussion_topics.scoped.new, @current_user, :read)
     return child_topic if is_child_topic?
 
     log_asset_access("topics:#{@context.asset_string}", 'topics', 'other')
@@ -184,7 +258,7 @@ class DiscussionTopicsController < ApplicationController
               @context.active_discussion_topics.only_discussion_topics
             end
 
-    scope = params[:order_by] == 'recent_activity' ? scope.by_last_reply_at : scope.by_position
+    scope = params[:order_by] == 'recent_activity' ? scope.by_last_reply_at : scope.by_position_legacy
 
     scope = DiscussionTopic.search_by_attribute(scope, :title, params[:search_term])
 
@@ -225,7 +299,7 @@ class DiscussionTopicsController < ApplicationController
                 lockedTopics: locked_topics,
                 newTopicURL: named_context_url(@context, :new_context_discussion_topic_url),
                 permissions: {
-                    create: @context.discussion_topics.new.grants_right?(@current_user, session, :create),
+                    create: @context.discussion_topics.scoped.new.grants_right?(@current_user, session, :create),
                     moderate: user_can_moderate,
                     change_settings: user_can_edit_course_settings?,
                     publish: user_can_moderate && @context.feature_enabled?(:draft_state)
@@ -265,7 +339,7 @@ class DiscussionTopicsController < ApplicationController
       hash =  {
         URL_ROOT: named_context_url(@context, :api_v1_context_discussion_topics_url),
         PERMISSIONS: {
-          CAN_CREATE_ASSIGNMENT: @context.respond_to?(:assignments) && @context.assignments.new.grants_right?(@current_user, session, :create),
+          CAN_CREATE_ASSIGNMENT: @context.respond_to?(:assignments) && @context.assignments.scoped.new.grants_right?(@current_user, session, :create),
           CAN_ATTACH: @topic.grants_right?(@current_user, session, :attach),
           CAN_MODERATE: user_can_moderate
         }
@@ -275,14 +349,17 @@ class DiscussionTopicsController < ApplicationController
         add_discussion_or_announcement_crumb
         add_crumb(@topic.title, named_context_url(@context, :context_discussion_topic_url, @topic.id))
         add_crumb t :edit_crumb, "Edit"
-        hash[:ATTRIBUTES] = discussion_topic_api_json(@topic, @context, @current_user, session)
+        hash[:ATTRIBUTES] = discussion_topic_api_json(@topic, @context, @current_user, session, override_dates: false)
       end
       (hash[:ATTRIBUTES] ||= {})[:is_announcement] = @topic.is_announcement
+      hash[:ATTRIBUTES][:can_group] = @topic.can_group?
       handle_assignment_edit_params(hash[:ATTRIBUTES])
 
       if @topic.assignment.present?
         hash[:ATTRIBUTES][:assignment][:assignment_overrides] =
-          (assignment_overrides_json(@topic.assignment.overrides_visible_to(@current_user)))
+          (assignment_overrides_json(
+            @topic.assignment.overrides_for(@current_user)
+            ))
         hash[:ATTRIBUTES][:assignment][:has_student_submissions] = @topic.assignment.has_student_submissions?
       end
 
@@ -295,7 +372,7 @@ class DiscussionTopicsController < ApplicationController
                      map { |category| { id: category.id, name: category.name } },
                  CONTEXT_ID: @context.id,
                  CONTEXT_ACTION_SOURCE: :discussion_topic,
-                 DRAFT_STATE: @context.feature_enabled?(:draft_state)}
+                 DRAFT_STATE: @topic.draft_state_enabled?}
       append_sis_data(js_hash)
       js_env(js_hash)
       render :action => "edit"
@@ -325,8 +402,8 @@ class DiscussionTopicsController < ApplicationController
       @locked = @topic.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true) || @topic.locked?
       @unlock_at = @topic.available_from_for(@current_user)
       @topic.change_read_state('read', @current_user)
-      if @topic.for_group_assignment?
-        @groups = @topic.assignment.group_category.groups.active.select{ |g| g.grants_right?(@current_user, session, :read) }
+      if @topic.for_group_discussion?
+        @groups = @topic.group_category.groups.active.select{ |g| g.grants_right?(@current_user, session, :read) }
         topics = @topic.child_topics.to_a
         topics = topics.select{|t| @groups.include?(t.context) } unless @topic.grants_right?(@current_user, session, :update)
         @group_topics = @groups.map do |group|
@@ -360,7 +437,7 @@ class DiscussionTopicsController < ApplicationController
 
               },
               :PERMISSIONS => {
-                :CAN_REPLY      => @locked ? false : !(@topic.for_group_assignment? || @topic.locked_for?(@current_user)),     # Can reply
+                :CAN_REPLY      => @locked ? false : !(@topic.for_group_discussion? || @topic.locked_for?(@current_user)),     # Can reply
                 :CAN_ATTACH     => @locked ? false : @topic.grants_right?(@current_user, session, :attach), # Can attach files on replies
                 :CAN_MANAGE_OWN => @context.user_can_manage_own_discussion_posts?(@current_user),           # Can moderate their own topics
                 :MODERATE       => user_can_moderate                                                        # Can moderate any topic
@@ -411,8 +488,11 @@ class DiscussionTopicsController < ApplicationController
   # Create an new discussion topic for the course or group.
   #
   # @argument title [String]
+  #
   # @argument message [String]
-  # @argument discussion_type [String]
+  #
+  # @argument discussion_type [Optional, String, "side_comment"|"threaded"]
+  #   The type of discussion. Defaults to side_comment if not value is given. Accepted values are 'side_comment', for discussions that only allow one level of nested comments, and 'threaded' for fully threaded discussions.
   #
   # @argument published [Optional, Boolean]
   #   Whether this topic is published (true) or draft state (false). Only
@@ -426,10 +506,10 @@ class DiscussionTopicsController < ApplicationController
   #   provided timestamp. If the timestamp is in the past, the topic will be
   #   locked.
   #
-  # @argument podcast_enabled [Boolean]
+  # @argument podcast_enabled [Optional, Boolean]
   #   If true, the topic will have an associated podcast feed.
   #
-  # @argument podcast_has_student_posts [Boolean]
+  # @argument podcast_has_student_posts [Optional, Boolean]
   #   If true, the podcast will include posts from students as well. Implies
   #   podcast_enabled.
   #
@@ -437,7 +517,7 @@ class DiscussionTopicsController < ApplicationController
   #   If true then a user may not respond to other replies until that user has
   #   made an initial reply. Defaults to false.
   #
-  # @argument assignment [Assignment]
+  # @argument assignment [Optional, Assignment]
   #   To create an assignment discussion, pass the assignment parameters as a
   #   sub-object. See the {api:AssignmentsApiController#create Create an Assignment API}
   #   for the available parameters. The name parameter will be ignored, as it's
@@ -445,15 +525,19 @@ class DiscussionTopicsController < ApplicationController
   #   an assignment NOT an assignment, pass set_assignment = false as part of
   #   the assignment object
   #
-  # @argument is_announcement [Boolean]
+  # @argument is_announcement [Optional, Boolean]
   #   If true, this topic is an announcement. It will appear in the
   #   announcement's section rather than the discussions section. This requires
   #   announcment-posting permissions.
   #
-  # @argument position_after [String]
+  # @argument position_after [Optional, String]
   #   By default, discussions are sorted chronologically by creation date, you
   #   can pass the id of another topic to have this one show up after the other
   #   when they are listed.
+  #
+  # @argument group_category_id [Optional, Integer]
+  #   If present, the topic will become a group discussion assigned
+  #   to the group.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics \ 
@@ -532,7 +616,32 @@ class DiscussionTopicsController < ApplicationController
   def public_topic_feed
   end
 
+  # @API Reorder pinned topics
+  #
+  # Puts the pinned discussion topics in the specified order.
+  # All pinned topics should be included.
+  #
+  # @argument order[] [Optional, Integer]
+  #   The ids of the pinned discussion topics in the desired order.
+  #   (For example, "order=104,102,103".)
+  #
+  def reorder
+    if authorized_action(@context.discussion_topics.scoped.new, @current_user, :update)
+      order = Api.value_to_array(params[:order])
+      reject! "order parameter required" unless order && order.length > 0
+      topics = pinned_topics.where(id: order)
+      reject! "topics not found" unless topics.length == order.length
+      topics[0].update_order(order)
+      new_order = pinned_topics.by_position.pluck(:id).map(&:to_s)
+      render :json => {:reorder => true, :order => new_order}, :status => :ok
+    end
+  end
+
   protected
+
+  def pinned_topics
+    @context.active_discussion_topics.only_discussion_topics.where(pinned: true)
+  end
 
   def add_discussion_or_announcement_crumb
     if  @topic.is_a? Announcement
@@ -550,11 +659,12 @@ class DiscussionTopicsController < ApplicationController
   end
 
   API_ALLOWED_TOPIC_FIELDS = %w(title message discussion_type delayed_post_at lock_at podcast_enabled
-                                podcast_has_student_posts require_initial_post is_announcement pinned)
+                                podcast_has_student_posts require_initial_post is_announcement pinned
+                                group_category_id)
   def process_discussion_topic(is_new = false)
     @errors = {}
     discussion_topic_hash = params.slice(*API_ALLOWED_TOPIC_FIELDS)
-    model_type = value_to_boolean(discussion_topic_hash.delete(:is_announcement)) && @context.announcements.new.grants_right?(@current_user, session, :create) ? :announcements : :discussion_topics
+    model_type = value_to_boolean(discussion_topic_hash.delete(:is_announcement)) && @context.announcements.scoped.new.grants_right?(@current_user, session, :create) ? :announcements : :discussion_topics
     if is_new
       @topic = @context.send(model_type).build
     else
@@ -577,6 +687,8 @@ class DiscussionTopicsController < ApplicationController
       process_lock_parameters(discussion_topic_hash)
     end
     process_published_parameters(discussion_topic_hash)
+    process_group_parameters(discussion_topic_hash)
+    process_pin_parameters(discussion_topic_hash)
 
     if @errors.present?
       render :json => {errors: @errors}, :status => :bad_request
@@ -587,7 +699,6 @@ class DiscussionTopicsController < ApplicationController
       end
       if !@topic.errors.any? && !@topic.root_topic.try(:errors).try(:any?)
         log_asset_access(@topic, 'topics', 'topics', 'participate')
-        generate_new_page_view
 
         apply_positioning_parameters
         apply_attachment_parameters
@@ -596,7 +707,7 @@ class DiscussionTopicsController < ApplicationController
       else
         errors = @topic.errors.as_json[:errors]
         errors.merge!(@topic.root_topic.errors.as_json[:errors]) if @topic.root_topic
-        errors['published'] = errors.delete('workflow_state') if errors.has_key?('workflow_state')
+        errors['published'] = errors.delete(:workflow_state) if errors.has_key?(:workflow_state)
         render :json => {errors: errors}, :status => :bad_request
       end
     end
@@ -669,6 +780,30 @@ class DiscussionTopicsController < ApplicationController
     end
   end
 
+  def process_group_parameters(discussion_topic_hash)
+    if params[:assignment] && params[:assignment].has_key?(:group_category_id)
+      id = params[:assignment].delete(:group_category_id)
+      discussion_topic_hash[:group_category_id] ||= id
+    end
+    return unless params[:group_category_id].to_s != @topic.group_category_id.to_s
+    if @topic.is_announcement
+      @errors[:group] = t(:error_group_announcement, "You cannot use grouped discussion on an announcement.")
+      return
+    end
+    if !@topic.can_group?
+      @errors[:group] = t(:error_group_change, "You cannot change grouping on a discussion with replies.")
+    end
+  end
+
+  # TODO: upgrade acts_as_list after rails3
+  # check_scope will probably handle this
+  def process_pin_parameters(discussion_topic_hash)
+    return unless params.has_key?(:pinned) && params[:pinned] != @topic.pinned?
+    @topic.pinned = params[:pinned]
+    @topic.position = nil
+    @topic.add_to_list_bottom
+  end
+
   def apply_positioning_parameters
     if params[:position_after] && user_can_moderate
       other_topic = @context.discussion_topics.active.find(params[:position_after])
@@ -721,6 +856,7 @@ class DiscussionTopicsController < ApplicationController
 
       elsif (@assignment = @topic.assignment || @topic.restore_old_assignment || (@topic.assignment = @context.assignments.build)) &&
              @assignment.grants_right?(@current_user, session, :update)
+        params[:assignment][:group_category_id] = nil unless @topic.group_category_id || @assignment.has_submitted_submissions?
         update_api_assignment(@assignment, params[:assignment].merge(@topic.attributes.slice('title')))
         @assignment.submission_types = 'discussion_topic'
         @assignment.saved_by = :discussion_topic
@@ -749,7 +885,7 @@ class DiscussionTopicsController < ApplicationController
   def handle_assignment_edit_params(hash)
     hash[:title] = params[:title] if params[:title]
     if params.slice(*[:due_at, :points_possible, :assignment_group_id]).present?
-      if hash[:assignment].nil? && @context.respond_to?(:assignments) && @context.assignments.new.grants_right?(@current_user, session, :create)
+      if hash[:assignment].nil? && @context.respond_to?(:assignments) && @context.assignments.scoped.new.grants_right?(@current_user, session, :create)
         hash[:assignment] ||= {}
       end
       if !hash[:assignment].nil?

@@ -24,18 +24,18 @@ shared_examples_for "url validation tests" do
     # should add http://
     model.url = "example.com"
     model.save!
-    model.errors.length.should == 0
+    model.errors.size.should == 0
     model.url.should == "http://example.com"
 
     # should remove whitespace
     model.url = "   example.com  "
     model.save!
-    model.errors.length.should == 0
+    model.errors.size.should == 0
     model.url.should == "http://example.com"
 
     model.url = "   http://www.example.com  "
     model.save!
-    model.errors.length.should == 0
+    model.errors.size.should == 0
     model.url.should == "http://www.example.com"
 
     # should not work on invalid urls
@@ -46,8 +46,8 @@ shared_examples_for "url validation tests" do
       model.url = invalid_url
       saved = model.save
       [model.url, saved].should == [invalid_url, false]
-      model.errors.length.should == 1
-      model.errors.first.to_s.should =~ /not a valid URL/
+      model.errors.size.should == 1
+      model.errors.full_messages.join.should =~ /not a valid URL/
     end
 
     # should work on valid urls
@@ -61,14 +61,14 @@ shared_examples_for "url validation tests" do
      "http://www.example.com"].each do |valid_url|
       model.url = valid_url
       model.save!
-      model.errors.length.should == 0
+      model.errors.size.should == 0
       model.url.should == valid_url
     end
 
     # should support nil urls
     model.url = nil
     model.save!
-    model.errors.length.should == 0
+    model.errors.size.should == 0
     model.url.should be_nil
   end
 

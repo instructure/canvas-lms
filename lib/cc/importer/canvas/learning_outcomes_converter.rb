@@ -60,15 +60,26 @@ module CC::Importer::Canvas
       outcome[:points_possible] = get_float_val(node, 'points_possible')
       outcome[:is_global_outcome] = get_bool_val(node, 'is_global_outcome')
       outcome[:external_identifier] = get_node_val(node, 'external_identifier')
+
       outcome[:ratings] = []
-      
       node.css('rating').each do |r_node|
         rating = {}
         rating[:description] = get_node_val(r_node, 'description')
         rating[:points] = get_float_val(r_node, 'points')
         outcome[:ratings] << rating
       end
-      
+
+      outcome[:alignments] = []
+      node.css('alignments alignment').each do |align_node|
+        alignment = {}
+        alignment[:content_type] = get_node_val(align_node, 'content_type')
+        alignment[:content_id] = get_node_val(align_node, 'content_id')
+        alignment[:mastery_type] = get_node_val(align_node, 'mastery_type')
+        alignment[:mastery_score] = get_float_val(align_node, 'mastery_score')
+        alignment[:position] = get_int_val(align_node, 'position')
+        outcome[:alignments] << alignment
+      end
+
       outcome
     end
     

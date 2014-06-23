@@ -34,6 +34,7 @@ module Api::V1
 
     def to_hash
       set_sis_course_id(@hash, @course, @user)
+      set_integration_id(@hash, @course, @user)
       @hash['enrollments'] = extract_enrollments( @enrollments )
       @hash['needs_grading_count'] = needs_grading_count(@enrollments, @course) 
       @hash['public_description'] = description(@course)
@@ -60,6 +61,12 @@ module Api::V1
       end
     end
 
+    def set_integration_id(hash, course, user)
+      if course.root_account.grants_rights?( user, :read_sis, :manage_sis).values.any?
+        hash['integration_id'] = course.integration_id
+      end
+    end
+
     def needs_grading_count(enrollments, course)
       if include_grading && enrollments && enrollments.any? { |e| e.participating_instructor? }
         course.assignments.active.to_a.sum{|a| a.needs_grading_count_for_user(user)}
@@ -73,7 +80,11 @@ module Api::V1
     def extract_enrollments( enrollments )
       if enrollments
         enrollments.map do |e|
-          h = { :type => e.readable_type.downcase, :role => e.role }
+          h = {
+            :type => e.sis_type,
+            :role => e.role,
+            :enrollment_state => e.workflow_state
+          }
           if include_total_scores && e.student?
             h.merge!(
               :computed_current_score => e.computed_current_score,

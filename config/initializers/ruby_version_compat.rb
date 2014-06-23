@@ -34,9 +34,20 @@ if RUBY_VERSION < '2.0'
 end
 
 if CANVAS_RAILS2
+  ActionView::Helpers::TagHelper.module_eval do
+    def escape_once(html)
+      # so '&#x27;' (in particular) doesn't get double-escaped (note the 'x?' in the regex)
+      ActiveSupport::Multibyte.clean(html.to_s).gsub(/[\"><]|&(?!([a-zA-Z]+|(#x?\d+));)/) { |special| ERB::Util::HTML_ESCAPE[special] }
+    end
+  end
+
   require "active_support/core_ext/string/output_safety"
   class ERB
     module Util
+
+      # rails 2 uses decimal, rails 3 uses hex, so we use hex everywhere
+      HTML_ESCAPE["'"] = "&#x27;"
+
       # see https://github.com/rails/rails/issues/7430
       def html_escape(s)
         s = s.to_s
@@ -134,26 +145,26 @@ class ActiveRecord::Base
   # existed in the DB before Canvas was Ruby 1.9 only. We've verified that
   # none of these columns should legitimately contain binary data, only text.
   SERIALIZED_COLUMNS_WITH_POTENTIALLY_INVALID_UTF8 = {
-    'AssessmentQuestion'       => %w[question_data],
-    'ContextExternalTool'      => %w[settings],
-    'EportfolioEntry'          => %w[content],
-    'ErrorReport'              => %w[http_env data],
-    'LearningOutcome'          => %w[data],
-    'Profile'                  => %w[data],
-    'Quiz'                     => %w[quiz_data],
-    'QuizQuestion'             => %w[question_data],
-    'QuizSubmission'           => %w[quiz_data submission_data],
-    'QuizSubmissionSnapshot'   => %w[data],
-    'Rubric'                   => %w[data],
-    'RubricAssessment'         => %w[data],
-    'SisBatch'                 => %w[processing_errors processing_warnings],
-    'StreamItem'               => %w[data]
+    'AssessmentQuestion'                => %w[question_data],
+    'ContextExternalTool'               => %w[settings],
+    'EportfolioEntry'                   => %w[content],
+    'ErrorReport'                       => %w[http_env data],
+    'LearningOutcome'                   => %w[data],
+    'Profile'                           => %w[data],
+    'Quizzes::Quiz'                     => %w[quiz_data],
+    'Quizzes::QuizQuestion'             => %w[question_data],
+    'Quizzes::QuizSubmission'           => %w[quiz_data submission_data],
+    'Quizzes::QuizSubmissionSnapshot'   => %w[data],
+    'Rubric'                            => %w[data],
+    'RubricAssessment'                  => %w[data],
+    'SisBatch'                          => %w[processing_errors processing_warnings],
+    'StreamItem'                        => %w[data]
   }
 
   class << self
     def strip_invalid_utf8_from_attribute(attr_name, value)
       if SERIALIZED_COLUMNS_WITH_POTENTIALLY_INVALID_UTF8[self.name].try(:include?, attr_name.to_s)
-        TextHelper.recursively_strip_invalid_utf8!(value, true)
+        Utf8Cleaner.recursively_strip_invalid_utf8!(value, true)
       end
       value
     end

@@ -21,12 +21,22 @@ require 'date'
 class CalendarEvent < ActiveRecord::Base
   include CopyAuthorizedLinks
   include TextHelper
+  include HtmlTextHelper
   attr_accessible :title, :description, :start_at, :end_at, :location_name,
       :location_address, :time_zone_edited, :cancel_reason,
       :participants_per_appointment, :child_event_data,
       :remove_child_events, :all_day
   attr_accessor :cancel_reason, :imported
-  sanitize_field :description, Instructure::SanitizeField::SANITIZE
+
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :title, :description, :location_name, :location_address, :start_at, :end_at, :context_id, :context_type, :workflow_state, :created_at, :updated_at,
+    :user_id, :all_day, :all_day_date, :deleted_at, :cloned_item_id, :context_code, :time_zone_edited, :parent_calendar_event_id, :effective_context_code,
+    :participants_per_appointment, :override_participants_per_appointment
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:context, :user, :child_events]
+
+  sanitize_field :description, CanvasSanitize::SANITIZE
   copy_authorized_links(:description) { [self.effective_context, nil] }
 
   include Workflow
@@ -34,8 +44,8 @@ class CalendarEvent < ActiveRecord::Base
 
   belongs_to :context, :polymorphic => true
   belongs_to :user
-  belongs_to :parent_event, :class_name => 'CalendarEvent', :foreign_key => :parent_calendar_event_id
-  has_many :child_events, :class_name => 'CalendarEvent', :foreign_key => :parent_calendar_event_id, :conditions => "calendar_events.workflow_state <> 'deleted'"
+  belongs_to :parent_event, :class_name => 'CalendarEvent', :foreign_key => :parent_calendar_event_id, :inverse_of => :child_events
+  has_many :child_events, :class_name => 'CalendarEvent', :foreign_key => :parent_calendar_event_id, :conditions => "calendar_events.workflow_state <> 'deleted'", :inverse_of => :parent_event
   validates_presence_of :context, :workflow_state
   validates_associated :context, :if => lambda { |record| record.validate_context }
   validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
@@ -107,8 +117,8 @@ class CalendarEvent < ActiveRecord::Base
   scope :order_by_start_at, order(:start_at)
 
   scope :active, where("calendar_events.workflow_state<>'deleted'")
-  scope :locked, where(:workflow_state => 'locked')
-  scope :unlocked, where("calendar_events.workflow_state NOT IN ('deleted', 'locked')")
+  scope :are_locked, where(:workflow_state => 'locked')
+  scope :are_unlocked, where("calendar_events.workflow_state NOT IN ('deleted', 'locked')")
 
   # controllers/apis/etc. should generally use for_user_and_context_codes instead
   scope :for_context_codes, lambda { |codes| where(:context_code => codes) }
@@ -261,8 +271,8 @@ class CalendarEvent < ActiveRecord::Base
   def sync_child_events
     locked_changes = LOCKED_ATTRIBUTES.select { |attr| send("#{attr}_changed?") }
     cascaded_changes = CASCADED_ATTRIBUTES.select { |attr| send("#{attr}_changed?") }
-    child_events.locked.update_all Hash[locked_changes.map{ |attr| [attr, send(attr)] }] if locked_changes.present?
-    child_events.unlocked.update_all Hash[cascaded_changes.map{ |attr| [attr, send(attr)] }] if cascaded_changes.present?
+    child_events.are_locked.update_all Hash[locked_changes.map{ |attr| [attr, send(attr)] }] if locked_changes.present?
+    child_events.are_unlocked.update_all Hash[cascaded_changes.map{ |attr| [attr, send(attr)] }] if cascaded_changes.present?
   end
 
   attr_writer :skip_sync_parent_event
@@ -279,8 +289,8 @@ class CalendarEvent < ActiveRecord::Base
 
     if events.present?
       CalendarEvent.where(:id => self).
-          update_all(:start_at => events.map(&:start_at).min,
-                     :end_at => events.map(&:end_at).max)
+          update_all(:start_at => events.map(&:start_at).compact.min,
+                     :end_at => events.map(&:end_at).compact.max)
       reload
     end
   end
@@ -299,7 +309,7 @@ class CalendarEvent < ActiveRecord::Base
       self.workflow_state = 'deleted'
       self.deleted_at = Time.now.utc
       save!
-      child_events.each do |e|
+      child_events.find_each do |e|
         e.cancel_reason = cancel_reason
         e.updating_user = updating_user
         e.destroy(false)
@@ -450,7 +460,11 @@ class CalendarEvent < ActiveRecord::Base
   end
 
   def child_events_for(participant)
-    child_events.select{ |e| e.has_asset?(participant) }
+    if child_events.loaded?
+      child_events.select { |e| e.has_asset?(participant) }
+    else
+      child_events.where(context_type: participant.class.name, context_id: participant)
+    end
   end
 
   def participants_per_appointment
@@ -500,28 +514,6 @@ class CalendarEvent < ActiveRecord::Base
     return CalendarEvent::IcalEvent.new(self).to_ics(in_own_calendar)
   end
 
-  def self.process_migration(data, migration)
-    events = data['calendar_events'] ? data['calendar_events']: []
-    events.each do |event|
-      if migration.import_object?("calendar_events", event['migration_id']) || migration.import_object?("events", event['migration_id'])
-        begin
-          import_from_migration(event, migration.context)
-        rescue
-          migration.add_import_warning(t('#migration.calendar_event_type', "Calendar Event"), event[:title], $!)
-        end
-      end
-    end
-  end
-
-  def self.import_from_migration(hash, context, item=nil)
-    hash = hash.with_indifferent_access
-    return nil if hash[:migration_id] && hash[:events_to_import] && !hash[:events_to_import][hash[:migration_id]]
-    item ||= find_by_context_type_and_context_id_and_id(context.class.to_s, context.id, hash[:id])
-    item ||= find_by_context_type_and_context_id_and_migration_id(context.class.to_s, context.id, hash[:migration_id]) if hash[:migration_id]
-    item ||= context.calendar_events.new
-    MigrationImport::CalendarEvent.import_from_migration(hash, context, item)
-  end
-
   def self.max_visible_calendars
     10
   end
@@ -564,7 +556,7 @@ class CalendarEvent < ActiveRecord::Base
     else
       include Rails.application.routes.url_helpers
     end
-    include TextHelper
+    include HtmlTextHelper
 
     def initialize(event)
       @event = event
@@ -602,7 +594,7 @@ class CalendarEvent < ActiveRecord::Base
       end
 
       event.summary = @event.title
-      
+
       if @event.is_a?(CalendarEvent) && @event.description
         html = api_user_content(@event.description, @event.context)
         event.description html_to_text(html)
@@ -652,8 +644,8 @@ class CalendarEvent < ActiveRecord::Base
       end
 
       event.summary += " [#{associated_course.course_code}]" if associated_course
-     
- 
+
+
       event = nil unless start_at
       return event unless in_own_calendar
 

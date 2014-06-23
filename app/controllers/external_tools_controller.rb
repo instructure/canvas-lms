@@ -74,27 +74,27 @@ class ExternalToolsController < ApplicationController
       end
       @tools = ContextExternalTool.search_by_attribute(@tools, :name, params[:search_term])
       respond_to do |format|
-          @tools = Api.paginate(@tools, self, tool_pagination_url)
-          format.json {render :json => external_tools_json(@tools, @context, @current_user, session)}
+        @tools = Api.paginate(@tools, self, tool_pagination_url)
+        format.json { render :json => external_tools_json(@tools, @context, @current_user, session) }
       end
     end
   end
-  
+
   def homework_submissions
     if authorized_action(@context, @current_user, :read)
       @tools = ContextExternalTool.all_tools_for(@context, :user => @current_user).select(&:has_homework_submission)
       respond_to do |format|
-        format.json {render :json => external_tools_json(@tools, @context, @current_user, session)}
+        format.json { render :json => external_tools_json(@tools, @context, @current_user, session) }
       end
     end
   end
-  
+
   def finished
     @headers = false
     if authorized_action(@context, @current_user, :read)
     end
   end
-  
+
   def retrieve
     if authorized_action(@context, @current_user, :read)
       @tool = ContextExternalTool.find_external_tool(params[:url], @context)
@@ -105,13 +105,14 @@ class ExternalToolsController < ApplicationController
       end
       @resource_title = @tool.name
       @resource_url = params[:url]
-      @opaque_id = @tool.opaque_identifier_for(@context)
       add_crumb(@context.name, named_context_url(@context, :context_url))
       @return_url = url_for(@context)
-      @launch = BasicLTI::ToolLaunch.new(:url => @resource_url, :tool => @tool, :user => @current_user, :context => @context, :link_code => @opaque_id, :return_url => @return_url, :resource_type => @resource_type)
-      @tool_settings = @launch.generate
 
-      @tool_launch_type = 'self'
+      adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @context)
+      adapter.prepare_tool_launch(@return_url, resource_type: @resource_type, launch_url: @resource_url)
+      @tool_settings = adapter.generate_post_payload
+
+      @tool_launch_type = 'self' if params['borderless']
       render :template => 'external_tools/tool_show'
     end
   end
@@ -164,6 +165,12 @@ class ExternalToolsController < ApplicationController
           return
         end
 
+        unless assignment.external_tool_tag
+          @context.errors.add(:assignment_id, 'The assignment must have an external tool tag')
+          render :json => @context.errors, :status => :bad_request
+          return
+        end
+
         return unless authorized_action(assignment, @current_user, :read)
 
         launch_url = assignment.external_tool_tag.url
@@ -181,6 +188,7 @@ class ExternalToolsController < ApplicationController
         @tool = ContextExternalTool.find_external_tool(launch_url, @context, tool_id)
       else
         find_tool(tool_id, params[:launch_type])
+        return unless @tool
       end
       if !@tool
         flash[:error] = t "#application.errors.invalid_external_tool", "Couldn't find valid settings for this link"
@@ -189,19 +197,19 @@ class ExternalToolsController < ApplicationController
       end
 
       # generate the launch
-      @launch = @tool.create_launch(@context, @current_user, url_for(@context),
-                                    :selection_type => params[:launch_type],
-                                    :resource_url => params[:url])
-
-      if assignment
-        @launch.for_assignment!(assignment, lti_grade_passback_api_url(@tool), blti_legacy_grade_passback_api_url(@tool))
-      end
+      adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @context)
+      adapter.prepare_tool_launch(url_for(@context), resource_type: params[:launch_type], launch_url: launch_url)
 
       launch_settings = {
-        'launch_url' => @launch.url,
+        'launch_url' => adapter.launch_url,
         'tool_name' => @tool.name,
-        'tool_settings' => @launch.generate,
       }
+
+      if assignment
+        launch_settings['tool_settings'] = adapter.generate_post_payload_for_assignment(assignment, lti_grade_passback_api_url(@tool), blti_legacy_grade_passback_api_url(@tool))
+      else
+        launch_settings['tool_settings'] = adapter.generate_post_payload
+      end
 
       # store the launch settings and return to the user
       verifier = SecureRandom.hex(64)
@@ -214,7 +222,7 @@ class ExternalToolsController < ApplicationController
       end
       uri.query = {:verifier => verifier}.to_query
 
-      render :json => { :id => @tool.id, :name => @tool.name, :url => uri.to_s }
+      render :json => {:id => @tool.id, :name => @tool.name, :url => uri.to_s}
     end
   end
 
@@ -303,8 +311,8 @@ class ExternalToolsController < ApplicationController
     selection_type = 'editor_button' if params[:editor]
     selection_type = 'homework_submission' if params[:homework]
 
-    @return_url    = external_content_success_url('external_tool')
-    @headers       = false
+    @return_url = external_content_success_url('external_tool')
+    @headers = false
     @tool_launch_type = 'self'
 
     find_tool(params[:external_tool_id], selection_type)
@@ -314,32 +322,39 @@ class ExternalToolsController < ApplicationController
   def find_tool(id, selection_type)
     begin
       @tool = ContextExternalTool.find_for(id, @context, selection_type)
-    rescue ActiveRecord::RecordNotFound; end
+    rescue ActiveRecord::RecordNotFound;
+    end
     if !@tool
       flash[:error] = t "#application.errors.invalid_external_tool_id", "Couldn't find valid settings for this tool"
       redirect_to named_context_url(@context, :context_url)
     end
   end
+
   protected :find_tool
 
   def render_tool(selection_type)
     return unless @tool
     @resource_title = @tool.label_for(selection_type.to_sym)
     @return_url ||= url_for(@context)
-    @launch = @tool.create_launch(@context, @current_user, @return_url, :selection_type => selection_type)
+
+    adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @context)
+    adapter.prepare_tool_launch(@return_url, resource_type: selection_type, selected_html: params[:selection])
     if selection_type == 'homework_submission'
       @assignment = @context.assignments.active.find(params[:assignment_id])
-      @launch.for_homework_submission!(@assignment)
+      @tool_settings = adapter.generate_post_payload_for_homework_submission(@assignment)
+    else
+      @tool_settings = adapter.generate_post_payload
     end
-    @launch.has_selection_html!(params[:selection]) if params[:selection]
-    @resource_url = @launch.url
-    resource_uri = URI.parse @launch.url
+
+    @resource_url = adapter.launch_url
+
+    resource_uri = URI.parse @resource_url
     @tool_id = @tool.tool_id || resource_uri.host || 'unknown'
     @tool_path = (resource_uri.path.empty? ? "/" : resource_uri.path)
 
-    @tool_settings = @launch.generate
     render :template => 'external_tools/tool_show'
   end
+
   protected :render_tool
 
   # @API Create an external tool
@@ -506,6 +521,7 @@ class ExternalToolsController < ApplicationController
       set_tool_attributes(@tool, params[:external_tool] || params)
       respond_to do |format|
         if @tool.save
+          invalidate_nav_tabs_cache(@tool)
           if api_request?
             format.json { render :json => external_tool_json(@tool, @context, @current_user, session) }
           else
@@ -534,6 +550,7 @@ class ExternalToolsController < ApplicationController
       respond_to do |format|
         set_tool_attributes(@tool, params[:external_tool] || params)
         if @tool.save
+          invalidate_nav_tabs_cache(@tool)
           if api_request?
             format.json { render :json => external_tool_json(@tool, @context, @current_user, session) }
           else
@@ -560,6 +577,7 @@ class ExternalToolsController < ApplicationController
       respond_to do |format|
         if @tool.destroy
           if api_request?
+            invalidate_nav_tabs_cache(@tool)
             format.json { render :json => external_tool_json(@tool, @context, @current_user, session) }
           else
             format.json { render :json => @tool.as_json(:methods => [:readable_state, :custom_fields_string], :include_root => false) }
@@ -570,15 +588,22 @@ class ExternalToolsController < ApplicationController
       end
     end
   end
-  
+
   private
-  
+
   def set_tool_attributes(tool, params)
     attrs = ContextExternalTool::EXTENSION_TYPES
     attrs += [:name, :description, :url, :icon_url, :domain, :privacy_level, :consumer_key, :shared_secret,
-    :custom_fields, :custom_fields_string, :text, :config_type, :config_url, :config_xml]
+              :custom_fields, :custom_fields_string, :text, :config_type, :config_url, :config_xml]
     attrs.each do |prop|
       tool.send("#{prop}=", params[prop]) if params.has_key?(prop)
     end
   end
+
+  def invalidate_nav_tabs_cache(tool)
+    if tool.has_user_navigation || tool.has_course_navigation || tool.has_account_navigation
+      Lti::NavigationCache.new(@domain_root_account).invalidate_cache_key
+    end
+  end
+
 end

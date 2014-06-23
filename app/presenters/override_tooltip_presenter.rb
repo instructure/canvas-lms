@@ -40,7 +40,7 @@ class OverrideTooltipPresenter < OverrideListPresenter
   end
 
   def selector
-    "#{assignment.class.to_s.downcase}_#{assignment.id}"
+    "#{assignment.class.to_s.demodulize.downcase}_#{assignment.id}"
   end
 
   def due_date_summary

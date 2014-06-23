@@ -1,4 +1,4 @@
-define ->
+define ['jquery'], ($) ->
   blurActiveInput = false
   initialized     = false
   

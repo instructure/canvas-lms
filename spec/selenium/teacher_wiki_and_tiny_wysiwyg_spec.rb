@@ -209,9 +209,9 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       f('#tinymce').should include_text(first_text)
     end
     #make sure each view uses the proper format
-    f('.wiki_switch_views_link').click
+    fj('.wiki_switch_views_link:visible').click
     driver.execute_script("return $('#wiki_page_body').val()").should include '<em><strong>'
-    f('.wiki_switch_views_link').click
+    fj('.wiki_switch_views_link:visible').click
     in_frame "wiki_page_body_ifr" do
       f('#tinymce').should_not include_text('<p>')
     end
@@ -225,6 +225,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
   end
 
   it "should add an equation to the rce by using equation buttons" do
+    pending "check_image broken"
     get "/courses/#{@course.id}/wiki"
 
     f('#wiki_page_body_instructure_equation').click

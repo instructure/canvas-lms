@@ -86,28 +86,37 @@ describe AssignmentOverride do
     @override2.set.should == [@student]
   end
 
-  it "should be versioned" do
-    @override = assignment_override_model
-    @override.should respond_to :version_number
-    old_version = @override.version_number
-    @override.override_due_at(5.days.from_now)
-    @override.save!
-    @override.version_number.should_not == old_version
-  end
+  describe 'versioning' do
+    before do
+      @override = assignment_override_model
+    end
 
-  it "should keep its assignment version up to date" do
-    @override = assignment_override_model
+    it "should indicate when it has versions" do
+      @override.override_due_at(5.days.from_now)
+      @override.save!
+      @override.versions.exists?.should be_true
+    end
 
-    @override.valid? # trigger bookkeeping
-    @override.assignment_version.should == @override.assignment.version_number
+    it "should be versioned" do
+      @override.should respond_to :version_number
+      old_version = @override.version_number
+      @override.override_due_at(5.days.from_now)
+      @override.save!
+      @override.version_number.should_not == old_version
+    end
 
-    old_version = @override.assignment.version_number
-    @override.assignment.due_at = 5.days.from_now
-    @override.assignment.save!
-    @override.assignment.version_number.should_not == old_version
+    it "should keep its assignment version up to date" do
+      @override.valid? # trigger bookkeeping
+      @override.assignment_version.should == @override.assignment.version_number
 
-    @override.valid? # trigger bookkeeping
-    @override.assignment_version.should == @override.assignment.version_number
+      old_version = @override.assignment.version_number
+      @override.assignment.due_at = 5.days.from_now
+      @override.assignment.save!
+      @override.assignment.version_number.should_not == old_version
+
+      @override.valid? # trigger bookkeeping
+      @override.assignment_version.should == @override.assignment.version_number
+    end
   end
 
   describe "active scope" do
@@ -432,119 +441,9 @@ describe AssignmentOverride do
 
   end
 
-  describe "visible_to named scope" do
-    before :each do
-      @course = course_model
-      @assignment = assignment_model(:course => @course)
-    end
-
-    context "adhoc overrides" do
-      before :each do
-        @student = user_model
-        @section2 = @course.course_sections.create!
-        @course.enroll_student(@student, :section => @section2)
-
-        @override = assignment_override_model(:assignment => @assignment)
-        @override_student = @override.assignment_override_students.build
-        @override_student.user = @student
-        @override_student.save!
-      end
-
-      it "should include adhoc overrides for students the user can see" do
-        AssignmentOverride.visible_to(@teacher, @course).should == [@override]
-      end
-
-      it "should not include adhoc overrides for students the user can't see" do
-        @enrollment = @teacher.enrollments.first
-        @enrollment.limit_privileges_to_course_section = true
-        @enrollment.save!
-        AssignmentOverride.visible_to(@teacher, @course).should be_empty
-      end
-    end
-
-    context "group overrides" do
-      before :each do
-        @assignment.group_category = group_category
-        @assignment.save!
-
-        @group = @assignment.group_category.groups.create!(:context => @course)
-        @override = assignment_override_model(:assignment => @assignment)
-        @override.set = @group
-        @override.save!
-      end
-
-      it "should include group overrides for groups the user can see" do
-        AssignmentOverride.visible_to(@teacher, @course).should == [@override]
-      end
-
-      it "should not include group overrides for groups the user can't see" do
-        @student = user_model
-        AssignmentOverride.visible_to(@student, @course).should be_empty
-
-        @group.add_user(@student)
-        AssignmentOverride.visible_to(@student, @course).should == [@override]
-      end
-    end
-
-    context "section overrides" do
-      before :each do
-        @section = @course.default_section
-        @override = assignment_override_model(:assignment => @assignment)
-        @override.set = @section
-        @override.save!
-      end
-
-      it "should include section overrides for section the user can see" do
-        AssignmentOverride.visible_to(@teacher, @course).should == [@override]
-      end
-
-      it "should not include section overrides for sections the user can't see" do
-        @enrollment = @teacher.enrollments.first
-        @enrollment.limit_privileges_to_course_section = true
-        @enrollment.save!
-
-        @section2 = @course.course_sections.create!
-        @override.set = @section2
-        @override.save!
-
-        AssignmentOverride.visible_to(@teacher, @course).should be_empty
-      end
-    end
-
-    it "should work with mixed override types" do
-      @student = user_model
-      @course.enroll_student(@student)
-
-      @override1 = assignment_override_model(:assignment => @assignment)
-      @override_student = @override1.assignment_override_students.build
-      @override_student.user = @student
-      @override_student.save!
-
-      @override2 = assignment_override_model(:assignment => @assignment)
-      @override2.set = @course.default_section
-      @override2.save!
-
-      visible_overrides = AssignmentOverride.visible_to(@teacher, @course)
-      visible_overrides.size.should == 2
-      visible_overrides.should include @override1
-      visible_overrides.should include @override2
-    end
-
-    it "should not return readonly objects" do
-      section = @course.default_section
-      override = assignment_override_model(:assignment => @assignment)
-      override.set = section
-      override.save!
-
-      override = AssignmentOverride.visible_to(@teacher, @course).first
-      override.should_not be_nil
-      override.should_not be_readonly
-    end
-  end
-
   describe "default_values" do
     let(:override) { AssignmentOverride.new }
-    let(:quiz) { Quiz.new }
+    let(:quiz) { Quizzes::Quiz.new }
     let(:assignment) { Assignment.new }
 
     context "when the override belongs to a quiz" do
@@ -668,6 +567,7 @@ describe AssignmentOverride do
     let(:due_at) { Time.utc(2013,1,10,12,30) }
     let(:unlock_at) { Time.utc(2013,1,9,12,30) }
     let(:lock_at) { Time.utc(2013,1,11,12,30) }
+    let(:id) { 1 }
     let(:title) { "My Wonderful VDD" }
     let(:override) do
       override = AssignmentOverride.new
@@ -677,6 +577,7 @@ describe AssignmentOverride do
       override.all_day_date = due_at.to_date
       override.lock_at = lock_at
       override.unlock_at = unlock_at
+      override.id = id
       override
     end
 
@@ -704,6 +605,10 @@ describe AssignmentOverride do
 
     it "includes the lock_at" do
       hash[:lock_at].should == lock_at
+    end
+
+    it "includes the id" do
+      hash[:id].should == id
     end
   end
 end

@@ -22,6 +22,10 @@ class EportfolioCategory < ActiveRecord::Base
 
   has_many :eportfolio_entries, :order => :position, :dependent => :destroy
   belongs_to :eportfolio
+
+  EXPORTABLE_ATTRIBUTES = [:id, :eportfolio_id, :name, :position, :slug, :created_at, :updated_at]
+  EXPORTABLE_ASSOCIATIONS = [:eportfolio_entries, :eportfolio]
+
   before_save :infer_unique_slug
   validates_presence_of :eportfolio_id
   validates_length_of :name, :maximum => maximum_string_length, :allow_blank => true

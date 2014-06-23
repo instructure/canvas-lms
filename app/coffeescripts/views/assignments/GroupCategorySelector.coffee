@@ -31,14 +31,10 @@ define [
     @optionProperty 'parentModel'
     @optionProperty 'groupCategories'
     @optionProperty 'nested'
-
-    initialize: ->
-      super
-
-      # delete this after Ifa654f7d853fd167d5bfbaee6184657209d58272 hits prod
-      gc.id = gc.id.toString() for gc in @groupCategories
-
-      @startedOutAsGroupAssignment = @parentModel.get('group_category_id')?
+    @optionProperty 'hideGradeIndividually'
+    @optionProperty 'sectionLabel'
+    @optionProperty 'fieldLabel'
+    @optionProperty 'lockedMessage'
 
     showGroupCategoryCreateDialog: =>
       if @$groupCategoryID.val() == 'new'
@@ -56,30 +52,35 @@ define [
     toggleGroupCategoryOptions: =>
       @$groupCategoryOptions.toggleAccessibly @$hasGroupCategory.prop('checked')
 
-      @$(".group_submission_warning").toggleAccessibly(
-        !@startedOutAsGroupAssignment and
-        @$hasGroupCategory.prop('checked') and
-        @parentModel.attributes.has_submitted_submissions
-      )
-
       if @$hasGroupCategory.prop('checked') and @groupCategories.length == 0
         @showGroupCategoryCreateDialog()
 
     toJSON: =>
-      frozenAttributes = @parentModel.frozenAttributes()
+      frozenAttributes = @parentModel.frozenAttributes?() || []
+      groupCategoryFrozen = _.include frozenAttributes, 'group_category_id'
+      groupCategoryLocked = !@parentModel.canGroup()
 
       groupCategoryId: @parentModel.groupCategoryId()
       groupCategories: @groupCategories
-      gradeGroupStudentsIndividually: @parentModel.gradeGroupStudentsIndividually()
-      frozenAttributes: frozenAttributes
-      groupCategoryIdFrozen: _.include(frozenAttributes, 'group_category_id')
+      hideGradeIndividually: @hideGradeIndividually
+      gradeGroupStudentsIndividually: !@hideGradeIndividually && @parentModel.gradeGroupStudentsIndividually()
+      groupCategoryLocked: groupCategoryLocked
+
+      hasGroupCategoryDisabled:  groupCategoryFrozen || groupCategoryLocked
+      gradeIndividuallyDisabled: groupCategoryFrozen
+      groupCategoryIdDisabled:   groupCategoryFrozen || groupCategoryLocked
+
+      sectionLabel: @sectionLabel
+      fieldLabel: @fieldLabel
+      lockedMessage: @lockedMessage
+
       nested: @nested
       prefix: 'assignment' if @nested
 
     filterFormData: (data) =>
       hasGroupCategory = data.has_group_category
       delete data.has_group_category
-      unless hasGroupCategory is '1'
+      if hasGroupCategory == '0'
         data.group_category_id = null
         data.grade_group_students_individually = false
       data

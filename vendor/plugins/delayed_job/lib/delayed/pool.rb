@@ -43,6 +43,8 @@ class Pool
     end
     op.parse!(@args)
 
+    read_config(options[:config_file])
+
     command = @args.shift
     case command
     when 'start'
@@ -86,7 +88,7 @@ class Pool
 
     say "Started job master", :info
     $0 = "delayed_jobs_pool"
-    read_config(options[:config_file])
+    apply_config
 
     # fork to handle unlocking (to prevent polluting the parent with worker objects)
     unlock_pid = fork_with_reconnects do
@@ -127,7 +129,7 @@ class Pool
 
     unlocked_jobs = Delayed::Job.unlock_orphaned_jobs(pid)
     say "Unlocked #{unlocked_jobs} orphaned jobs" if unlocked_jobs > 0
-    ActiveRecord::Base.connection_handler.clear_all_connections!
+    ActiveRecord::Base.connection_handler.clear_all_connections! unless Rails.env.test?
   end
 
   def spawn_all_workers
@@ -217,9 +219,10 @@ class Pool
 
   def tail_rails_log
     return if !@options[:tail_logs]
+    return if !Rails.logger.respond_to?(:log_path)
     Rails.logger.auto_flushing = true if Rails.logger.respond_to?(:auto_flushing=)
     Thread.new do
-      f = File.open(Rails.configuration.log_path.presence || (Rails.root+"log/#{Rails.env}.log"), 'r')
+      f = File.open(Rails.logger.log_path, 'r')
       f.seek(0, IO::SEEK_END)
       loop do
         content = f.read
@@ -239,12 +242,14 @@ class Pool
 
     @daemon = true
     File.open(pid_file, 'wb') { |f| f.write(Process.pid.to_s) }
-
-    # if we blow up so badly that we can't syslog the error, it has to go to
-    # log/delayed_job.log
-    last_ditch_logfile = expand_rails_path("log/delayed_job.log")
+    # if we blow up so badly that we can't syslog the error, try to send
+    # it somewhere useful
+    last_ditch_logfile = self.last_ditch_logfile || "log/delayed_job.log"
+    if last_ditch_logfile[0] != '|'
+      last_ditch_logfile = expand_rails_path(last_ditch_logfile)
+    end
     STDIN.reopen("/dev/null")
-    STDOUT.reopen(last_ditch_logfile, 'a')
+    STDOUT.reopen(open(last_ditch_logfile, 'a'))
     STDERR.reopen(STDOUT)
     STDOUT.sync = STDERR.sync = true
   end
@@ -263,6 +268,10 @@ class Pool
     if pid.to_i == Process.pid
       FileUtils.rm(pid_file)
     end
+  end
+
+  def last_ditch_logfile
+    @config['last_ditch_logfile']
   end
 
   def stop(kill = false)
@@ -302,14 +311,18 @@ class Pool
 
   def read_config(config_filename)
     config = YAML.load_file(config_filename)
-    @config = config[Rails.env] || config['default']
+    env = defined?(RAILS_ENV) ? RAILS_ENV : ENV['RAILS_ENV'] || 'development'
+    @config = config[env] || config['default']
     # Backwards compatibility from when the config was just an array of queues
     @config = { :workers => @config } if @config.is_a?(Array)
-    @config = @config.with_indifferent_access
     unless @config && @config.is_a?(Hash)
       raise ArgumentError,
         "Invalid config file #{config_filename}"
     end
+  end
+
+  def apply_config
+    @config = @config.with_indifferent_access
     Worker::Settings.each do |setting|
       Worker.send("#{setting}=", @config[setting.to_s]) if @config.key?(setting.to_s)
     end

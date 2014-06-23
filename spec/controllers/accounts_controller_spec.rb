@@ -20,8 +20,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe AccountsController do
   def account_with_admin_logged_in(opts = {})
-    @account = Account.default
-    account_admin_user
+    @account = opts[:account] || Account.default
+    account_admin_user(account: @account)
     user_session(@admin)
   end
 
@@ -151,6 +151,34 @@ describe AccountsController do
     end
   end
 
+  describe "remove_account_user" do
+    it "should remove account membership from a user" do
+      a = Account.default
+      user_to_remove = account_admin_user(account: a)
+      au_id = user_to_remove.account_users.first.id
+      account_with_admin_logged_in(account: a)
+      post 'remove_account_user', account_id: a.id, id: au_id
+      response.should be_redirect
+      AccountUser.find_by_id(au_id).should be_nil
+    end
+
+    it "should verify that the membership is in the caller's account" do
+      a1 = Account.default
+      a2 = Account.create!(name: 'other root account')
+      user_to_remove = account_admin_user(account: a1)
+      au_id = user_to_remove.account_users.first.id
+      account_with_admin_logged_in(account: a2)
+      begin
+        post 'remove_account_user', :account_id => a2.id, :id => au_id
+        # rails3 returns 404 status
+        response.should be_not_found
+      rescue ActiveRecord::RecordNotFound
+        # rails2 passes the exception through here
+      end
+      AccountUser.find_by_id(au_id).should_not be_nil
+    end
+  end
+
   describe "authentication" do
     it "should redirect to CAS if CAS is enabled" do
       account = account_with_cas({:account => Account.default})
@@ -178,8 +206,9 @@ describe AccountsController do
 
   describe "courses" do
     it "should count total courses correctly" do
-      account_with_admin_logged_in
-      course
+      account = Account.create!
+      account_with_admin_logged_in(account: account)
+      course(account: account)
       @course.course_sections.create!
       @course.course_sections.create!
       @course.update_account_associations
@@ -258,14 +287,12 @@ describe AccountsController do
       account_with_admin_logged_in
       post 'update', :id => @account.id, :account => { :settings => { 
         :global_includes => true,
-        :enable_scheduler => true,
         :enable_profiles => true,
         :admins_can_change_passwords => true,
         :admins_can_view_notifications => true,
       } }
       @account.reload
       @account.global_includes?.should be_false
-      @account.enable_scheduler?.should be_false
       @account.enable_profiles?.should be_false
       @account.admins_can_change_passwords?.should be_false
       @account.admins_can_view_notifications?.should be_false
@@ -278,14 +305,12 @@ describe AccountsController do
       Account.site_admin.add_user(@user)
       post 'update', :id => @account.id, :account => { :settings => { 
         :global_includes => true,
-        :enable_scheduler => true,
         :enable_profiles => true,
         :admins_can_change_passwords => true,
         :admins_can_view_notifications => true,
       } }
       @account.reload
       @account.global_includes?.should be_true
-      @account.enable_scheduler?.should be_true
       @account.enable_profiles?.should be_true
       @account.admins_can_change_passwords?.should be_true
       @account.admins_can_view_notifications?.should be_true
@@ -448,6 +473,19 @@ describe AccountsController do
         }
         response.should_not be_success
       end
+    end
+  end
+
+  describe "#settings" do
+    it "should load account report details" do
+      account_with_admin_logged_in
+      report_type = AccountReport.available_reports(@account).keys.first
+      report = @account.account_reports.create!(report_type: report_type, user: @admin)
+
+      get 'settings', account_id: @account
+      response.should be_success
+
+      assigns[:last_reports].first.last.should == report
     end
   end
 end

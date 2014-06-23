@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 
-describe ConversationsController, :type => :integration do
+describe ConversationsController, type: :request do
   before do
     @other = user(active_all: true)
 
@@ -224,7 +224,7 @@ describe ConversationsController, :type => :integration do
                           { :controller => 'conversations', :action => 'show', :id => @c3.conversation.id.to_s, :format => 'json' })
           json["context_name"].should be_nil
         end
-      end        
+      end
     end
 
     context "filtering by tags" do
@@ -512,7 +512,7 @@ describe ConversationsController, :type => :integration do
           raw_api_call(:post, "/api/v1/conversations",
                   { :controller => 'conversations', :action => 'create', :format => 'json' },
                   { :recipients => [@bob.id], :body => "test", :context_code => "account_#{Account.default.id}" })
-          response.status.to_i.should == 400
+          assert_status(400)
         end
 
         it "should allow site admin to set any account context" do
@@ -546,7 +546,7 @@ describe ConversationsController, :type => :integration do
             raw_api_call(:post, "/api/v1/conversations",
                     { :controller => 'conversations', :action => 'create', :format => 'json' },
                     { :recipients => [@bob.id], :body => "test", :context_code => "account_#{@sub_account.id}" })
-            response.status.to_i.should == 400
+            assert_status(400)
           end
         end
       end
@@ -1059,64 +1059,19 @@ describe ConversationsController, :type => :integration do
       json["starred"].should be_true
     end
 
-    context "submission comments" do
-      before do
-        submission1 = submission_model(:course => @course, :user => @bob)
-        submission2 = submission_model(:course => @course, :user => @bob)
-        conversation(@bob)
-        submission1.add_comment(:comment => "hey bob", :author => @me)
-        submission1.add_comment(:comment => "wut up teacher", :author => @bob)
-        submission2.add_comment(:comment => "my name is bob", :author => @bob)
-      end
+    it "should not link submission comments and conversations anymore" do
+      submission1 = submission_model(:course => @course, :user => @bob)
+      submission2 = submission_model(:course => @course, :user => @bob)
+      conversation(@bob)
+      submission1.add_comment(:comment => "hey bob", :author => @me)
+      submission1.add_comment(:comment => "wut up teacher", :author => @bob)
+      submission2.add_comment(:comment => "my name is bob", :author => @bob)
 
-      it "should return submission and comments with the conversation in api format" do
-        json = api_call(:get, "/api/v1/conversations/#{@conversation.conversation_id}",
-                { :controller => 'conversations', :action => 'show', :id => @conversation.conversation_id.to_s, :format => 'json' })
+      json = api_call(:get, "/api/v1/conversations/#{@conversation.conversation_id}",
+                      { :controller => 'conversations', :action => 'show', :id => @conversation.conversation_id.to_s, :format => 'json' })
 
-        json['messages'].size.should == 1
-        json['submissions'].size.should == 2
-        jsub = json['submissions'][1]
-        jsub['assignment'].should be_present # includes & ['assignment']
-        jcom = jsub['submission_comments']
-        jcom.should be_present # includes & ['submission_comments']
-        jcom.size.should == 2
-        jcom[0]['author_id'].should == @me.id
-        jcom[1]['author_id'].should == @bob.id
-
-        jsub = json['submissions'][0]
-        jcom = jsub['submission_comments']
-        jcom.size.should == 1
-        jcom[0]['author_id'].should == @bob.id
-      end
-
-      it "should interleave submission and comments in the conversation" do
-        @conversation.add_message("another message!")
-
-        json = api_call(:get, "/api/v1/conversations/#{@conversation.conversation_id}?interleave_submissions=1",
-                { :controller => 'conversations', :action => 'show', :id => @conversation.conversation_id.to_s, :format => 'json', :interleave_submissions => '1' })
-
-        json['submissions'].should be_nil
-        json['messages'].size.should eql 4
-        json['messages'][0]['body'].should eql 'another message!'
-
-        json['messages'][1]['body'].should eql 'my name is bob'
-        jsub = json['messages'][1]['submission']
-        jsub['assignment'].should be_present
-        jcom = jsub['submission_comments']
-        jcom.should be_present
-        jcom.size.should == 1
-        jcom[0]['author_id'].should == @bob.id
-
-        json['messages'][2]['body'].should eql 'wut up teacher' # most recent comment
-        jsub = json['messages'][2]['submission']
-        jcom = jsub['submission_comments']
-        jcom.size.should == 2
-        jcom[0]['author_id'].should == @me.id
-        jcom[1]['author_id'].should == @bob.id
-
-        json['messages'][3]['body'].should eql 'test'
-      end
-
+      json['messages'].size.should == 1
+      json['submissions'].size.should == 0
     end
 
     it "should add a message to the conversation" do
@@ -1885,7 +1840,7 @@ describe ConversationsController, :type => :integration do
       json = raw_api_call(:delete, "/api/v1/conversations/#{conv.id}/delete_for_all",
         {:controller => 'conversations', :action => 'delete_for_all', :format => 'json', :id => conv.id.to_s},
         {:domain_root_account => Account.site_admin})
-      response.status.should eql "401 Unauthorized"
+      assert_status(401)
 
       account_admin_user
       p = Account.default.pseudonyms.create!(:unique_id => 'admin', :user => @user)
@@ -1893,13 +1848,13 @@ describe ConversationsController, :type => :integration do
       json = raw_api_call(:delete, "/api/v1/conversations/#{conv.id}/delete_for_all",
         {:controller => 'conversations', :action => 'delete_for_all', :format => 'json', :id => conv.id.to_s},
         {})
-      response.status.should eql "401 Unauthorized"
+      assert_status(401)
 
       user_session(@me)
       json = raw_api_call(:delete, "/api/v1/conversations/#{conv.id}/delete_for_all",
         {:controller => 'conversations', :action => 'delete_for_all', :format => 'json', :id => conv.id.to_s},
         {})
-      response.status.should eql "401 Unauthorized"
+      assert_status(401)
 
       @me.all_conversations.size.should eql 1
       @joe.conversations.size.should eql 1
@@ -1910,7 +1865,7 @@ describe ConversationsController, :type => :integration do
       json = raw_api_call(:delete, "/api/v1/conversations/0/delete_for_all",
         {:controller => 'conversations', :action => 'delete_for_all', :format => 'json', :id => "0"},
         {})
-      response.status.should eql "404 Not Found"
+      assert_status(404)
     end
 
     it "should delete the conversation for all participants" do

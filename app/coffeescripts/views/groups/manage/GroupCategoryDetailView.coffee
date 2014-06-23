@@ -1,5 +1,6 @@
 define [
   'i18n!groups'
+  'jquery'
   'underscore'
   'Backbone'
   'compiled/views/MessageStudentsDialog',
@@ -8,7 +9,7 @@ define [
   'compiled/views/groups/manage/GroupCategoryEditView'
   'compiled/models/Group'
   'jst/groups/manage/groupCategoryDetail'
-], (I18n, _, {View}, MessageStudentsDialog, RandomlyAssignMembersView, GroupCreateView, GroupCategoryEditView, Group, template) ->
+], (I18n, $, _, {View}, MessageStudentsDialog, RandomlyAssignMembersView, GroupCreateView, GroupCategoryEditView, Group, template) ->
 
   class GroupCategoryDetailView extends View
 

@@ -254,8 +254,8 @@ Here's an accessible way to do it for popovers without a header.
   opacity: 1;
   border: 1px solid #ccc;
   border: 1px solid rgba(0,0,0,.2);
-  @include border-radius(6px);
-  @include box-shadow(0 5px 10px rgba(0,0,0,.2));
+  border-radius: 6px;
+  box-shadow: 0 5px 10px rgba(0,0,0,.2);
 }
 
 .ui-widget.ui-tooltip.popover-padded {
@@ -377,18 +377,9 @@ $popoverArrowDistanceFromCorner: $popoverArrowOuterWidth;
 
 @keyframes highlight-shadow-fade {
   from {
-    @include box-shadow(0 0 8px rgba(82,168,236,1));
+    box-shadow: 0 0 8px rgba(82,168,236,1);
   }
   to {
-    @include box-shadow(none);
-  }
-}
-
-@-webkit-keyframes highlight-shadow-fade {
-  from {
-    @include box-shadow(0 0 8px rgba(82,168,236,1));
-  }
-  to {
-    @include box-shadow(none);
+    box-shadow: none;
   }
 }

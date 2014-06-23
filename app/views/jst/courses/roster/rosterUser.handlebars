@@ -1,5 +1,5 @@
 <td class="center">
-  <a href="{{html_url}}" class="avatar" title="{{name}}"><img src="{{avatar_url}}" alt="{{name}}"></a>
+  {{>avatar}}
 </td>
 <td>
   <a href="{{html_url}}" class="roster_user_name">{{name}}</a>
@@ -22,15 +22,27 @@
   <div>{{enrollmentName role}}</div>
   {{/each}}
 </td>
+{{#if ENV.permissions.read_reports}}
+<td>
+  {{#each enrollments}}
+    <div {{contextSensitiveDatetimeTitle last_activity_at }}>
+      {{datetimeFormatted last_activity_at}}
+    </div>
+  {{/each}}
+</td>
+<td>
+  <div>{{total_activity_string}}</div>
+</td>
+{{/if}}
 <td class="right">
   {{#if canManage}}
-  <div class="admin-links">
-    <a class="al-trigger al-trigger-gray" href="javascript:void(0)">
+  <div class="admin-links" role="application">
+    <a role="button" class="al-trigger al-trigger-gray" href="javascript:void(0)">
       <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
       <span class="screenreader-only">{{#t "manage_user"}}Manage {{name}}{{/t}}</span></a>
     <ul class="al-options">
       <li><a href="#" data-event="resendInvitation"><i class="icon-email"></i> {{#t "links.resend_invitation"}}Resend Invitation{{/t}}</a></li>
-      {{#if isObserver}}
+      {{#if canLinkStudents }}
       <li><a href="#" data-event="linkToStudents"><i class="icon-link"></i> {{#t "links.link_to_students"}}Link to Students{{/t}}</a></li>
       {{/if}}
       {{#if canEditSections}}

@@ -36,8 +36,8 @@ describe UserService do
   end
   
   it "should have a named scope for service" do
-    UserService.for_service(@user_service).should eql([@user_service])
-    UserService.for_service(@user_service.service).should eql([@user_service])
+    UserService.for_service(@user_service).should == [@user_service]
+    UserService.for_service(@user_service.service).should == [@user_service]
   end
   
   it "should have a service_name" do

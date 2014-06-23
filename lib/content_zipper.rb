@@ -51,7 +51,7 @@ class ContentZipper
       when Assignment; zip_assignment(attachment, attachment.context)
       when Eportfolio; zip_eportfolio(attachment, attachment.context)
       when Folder; zip_base_folder(attachment, attachment.context)
-      when Quiz; zip_quiz(attachment, attachment.context)
+      when Quizzes::Quiz; zip_quiz(attachment, attachment.context)
       end
     rescue => e
       ErrorReport.log_exception(:default, e, {
@@ -299,7 +299,7 @@ class ContentZipper
   end
 
   def zip_quiz(zip_attachment, quiz)
-    QuizSubmissionZipper.new(
+    Quizzes::QuizSubmissionZipper.new(
       quiz: quiz,
       zip_attachment: zip_attachment).zip!
   end

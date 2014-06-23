@@ -33,7 +33,7 @@ module CC
       FileUtils::mkdir_p @canvas_resource_dir
       
       resources = []
-      resources << run_and_set_progress(:create_course_settings, nil, I18n.t('course_exports.errors.course_settings', "Failed to export course settings"), migration_id)
+      resources << run_and_set_progress(:create_course_settings, nil, I18n.t('course_exports.errors.course_settings', "Failed to export course settings"), migration_id) if export_symbol?(:all_course_settings)
       resources << run_and_set_progress(:create_module_meta, nil, I18n.t('course_exports.errors.module_meta', "Failed to export module meta data"))
       resources << run_and_set_progress(:create_external_feeds, nil, I18n.t('course_exports.errors.external_feeds', "Failed to export external feeds"))
       resources << run_and_set_progress(:create_assignment_groups, nil, I18n.t('course_exports.errors.assignment_groups', "Failed to export assignment groups"))
@@ -125,8 +125,20 @@ JOKE
         c.course_code @course.course_code
         c.start_at ims_datetime(@course.start_at) if @course.start_at
         c.conclude_at ims_datetime(@course.conclude_at) if @course.conclude_at
-        if for_course_copy
-          c.tab_configuration @course.tab_configuration.to_json if @course.tab_configuration.present?
+        if @course.tab_configuration.present?
+          tab_config = []
+          @course.tab_configuration.each do |t|
+            tab = t.dup
+            if tab['id'].is_a?(String)
+              # it's an external tool, so translate the id to a migration_id
+              tool_id = tab['id'].sub('context_external_tool_', '')
+              if tool = ContextExternalTool.find_for(tool_id, @course, :course_navigation)
+                tab['id'] = "context_external_tool_#{create_key(tool)}"
+              end
+            end
+            tab_config << tab
+          end
+          c.tab_configuration tab_config.to_json
         end
         atts = Course.clonable_attributes
         atts -= Canvas::Migration::MigratorHelper::COURSE_NO_COPY_ATTS
@@ -142,6 +154,7 @@ JOKE
             c.grading_standard_id @course.grading_standard.id
           else
             c.grading_standard_identifier_ref create_key(@course.grading_standard)
+            add_item_to_export(@course.grading_standard)
           end
         end
       end

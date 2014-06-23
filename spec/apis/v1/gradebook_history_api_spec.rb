@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe GradebookHistoryApiController, :type => :integration do
+describe GradebookHistoryApiController, type: :request do
   include Api
 
   describe 'GET /courses/:course_id/gradebook_history/days' do

@@ -1,0 +1,9 @@
+source 'https://rubygems.org'
+
+gemspec
+
+group :test do
+  platforms :ruby_20, :ruby_21 do
+    gem 'syck', '1.0.1'
+  end
+end

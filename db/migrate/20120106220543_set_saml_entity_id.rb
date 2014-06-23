@@ -5,7 +5,7 @@ class SetSamlEntityId < ActiveRecord::Migration
   # All future new SAML configs will use the host of the account
   def self.up
     old_default_domain = nil
-    if app_config = Setting.from_config('saml')
+    if app_config = ConfigFile.load('saml')
       old_default_domain = app_config[:entity_id]
     end
     

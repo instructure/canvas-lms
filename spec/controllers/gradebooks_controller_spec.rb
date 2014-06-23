@@ -31,16 +31,19 @@ describe GradebooksController do
   end
 
   describe "GET 'grade_summary'" do
+    before do
+      Course.any_instance.stubs(:feature_enabled?).returns(false)
+    end
+
     it "should redirect teacher to gradebook" do
       course_with_teacher_logged_in(:active_all => true)
-      get 'grade_summary', :course_id => @course.id
-      response.should be_redirect
-      response.should redirect_to(:controller => 'gradebook2', :action => 'show')
+      get 'grade_summary', :course_id => @course.id, :id => nil
+      response.should redirect_to(:action => 'gradebook2')
     end
 
     it "should render for current user" do
       course_with_student_logged_in(:active_all => true)
-      get 'grade_summary', :course_id => @course.id
+      get 'grade_summary', :course_id => @course.id, :id => nil
       response.should render_template('grade_summary')
     end
 
@@ -56,13 +59,13 @@ describe GradebooksController do
       @student = @user
       user(:active_all => true)
       user_session(@user)
-      get 'grade_summary', :course_id => @course.id
+      get 'grade_summary', :course_id => @course.id, :id => nil
       assert_unauthorized
       get 'grade_summary', :course_id => @course.id, :id => @student.id
       assert_unauthorized
     end
 
-    it" should allow access for a linked observer" do
+    it "should allow access for a linked observer" do
       course_with_student(:active_all => true)
       @student = @user
       user(:active_all => true)
@@ -206,11 +209,12 @@ describe GradebooksController do
       a1.grade_student(@student, grade: 10)
       a2.grade_student(@student, grade: 5)
       get 'grade_summary', course_id: @course.id, id: @student.id
+      expected =
       assigns[:js_env][:submissions].sort_by { |s|
-        s[:assignment_id]
+        s['assignment_id']
       }.should == [
-        {score: nil, assignment_id: a1.id},
-        {score: 5, assignment_id: a2.id}
+        {'score' => nil, 'assignment_id' => a1.id},
+        {'score' => 5, 'assignment_id' => a2.id}
       ]
     end
 
@@ -331,11 +335,19 @@ describe GradebooksController do
         check_grades_page(@due_at + 1.day)
       end
     end
+
+    it "should raise an exception on a non-integer :id" do
+      course_with_teacher_logged_in(:active_all => true)
+      assert_page_not_found do
+        get 'grade_summary', :course_id => @course.id, :id => "lqw"
+      end
+    end
   end
 
   describe "GET 'show'" do
     describe "gradebook_init_json" do
       it "should include group_category in rendered json for assignments" do
+        Course.any_instance.stubs(:feature_enabled?).returns(false)
         course_with_teacher_logged_in(:active_all => true)
         group_category1 = @course.group_categories.create(:name => 'Category 1')
         group_category2 = @course.group_categories.create(:name => 'Category 2')
@@ -352,8 +364,9 @@ describe GradebooksController do
 
       context "draft state" do
         it "should should not return unpublished assignments" do
+          Course.any_instance.stubs(:feature_enabled?).with(:screenreader_gradebook).returns(false)
+          Course.any_instance.stubs(:feature_enabled?).with(:draft_state).returns(true)
           course_with_teacher_logged_in(:active_all => true)
-          @course.account.enable_feature!(:draft_state)
           ag = @course.assignment_groups.create! group_weight: 100
           a1 = ag.assignments.create! :submission_types => 'online_upload',
                                       :points_possible  => 10,
@@ -376,47 +389,115 @@ describe GradebooksController do
     end
 
     describe "csv" do
-      it "should not re-compute enrollment grades" do
+      before do
+        Course.any_instance.stubs(:feature_enabled?).with(:draft_state).returns(true)
+        Course.any_instance.stubs(:feature_enabled?).with(:outcome_gradebook).returns(false)
         course_with_teacher_logged_in(:active_all => true)
         student_in_course(:active_all => true)
         assignment1 = @course.assignments.create(:title => "Assignment 1")
         assignment2 = @course.assignments.create(:title => "Assignment 2")
-        Enrollment.expects(:recompute_final_score).never
-        get 'show', :course_id => @course.id, :init => 1, :assignments => 1, :format => 'csv'
-        response.should be_success
-        response.body.should match(/\AStudent,/)
+      end
+
+      shared_examples_for "working download" do
+        it "should successfully return data" do
+          get 'show', :course_id => @course.id, :init => 1, :assignments => 1, :format => 'csv'
+          response.should be_success
+          response.body.should match(/\AStudent,/)
+        end
+        it "should not recompute enrollment grades" do
+          Enrollment.expects(:recompute_final_score).never
+          get 'show', :course_id => @course.id, :init => 1, :assignments => 1, :format => 'csv'
+        end
+      end
+
+      context "with teacher that prefers gradebook2" do
+        before do
+          Course.any_instance.stubs(:feature_enabled?).with(:screenreader_gradebook).returns(true)
+          @user.preferences[:gradebook_version] = "2"
+        end
+        include_examples "working download"
+      end
+
+      context "with teacher that prefers screenreader gradebook" do
+        before do
+          Course.any_instance.stubs(:feature_enabled?).with(:screenreader_gradebook).returns(true)
+          @user.preferences[:gradebook_version] = "srgb"
+        end
+        include_examples "working download"
+      end
+
+      context "with teacher that prefers the old gradebook" do
+        before do
+          Course.any_instance.stubs(:feature_enabled?).with(:screenreader_gradebook).returns(false)
+          @user.preferences[:use_gradebook2] = false
+        end
+        include_examples "working download"
       end
     end
 
-    describe "draft state" do
-      it "should properly filter unpublished assignments" do
+    context "with screenreader_gradebook enabled" do
+      before do
         course_with_teacher_logged_in(:active_all => true)
-        @course.account.enable_feature!(:draft_state)
-        assignment1 = @course.assignments.build(:title => "Assignment 1")
-        assignment1.unpublish
-        assignment2 = @course.assignments.create!(:title => "Assignment 2")
+        Course.any_instance.stubs(:feature_enabled?).with(:screenreader_gradebook).returns(true)
+        Course.any_instance.stubs(:feature_enabled?).with(:draft_state).returns(true)
+        Course.any_instance.stubs(:feature_enabled?).with(:outcome_gradebook).returns(false)
+      end
 
-        get 'show', :course_id => @course.id
-        assign_ids = assigns[:assignments].map(&:id)
-        assign_ids.include?(assignment1.id).should be_false
-        assign_ids.include?(assignment2.id).should be_true
-        assign_ids.include?("group-#{assignment2.assignment_group.id}").should be_true
-        assign_ids.include?("final-grade").should be_true
+      context "teacher that prefers gradebook2" do
+        before do
+          @user.preferences[:gradebook_version] = "2"
+        end
+        it "redirects to gradebook2 with a friendly URL" do
+          get "show", :course_id => @course.id
+          response.should render_template("gradebook2")
+        end
+      end
 
-        ag_assign_ids = assigns[:js_env][:assignment_groups].first['assignments'].map{|a| a['id']}
-        ag_assign_ids.include?(assignment1.id).should be_false
-        ag_assign_ids.include?(assignment2.id).should be_true
+      context "teacher that prefers screenreader gradebook" do
+        before do
+          @user.preferences[:gradebook_version] = "srgb"
+        end
+        it "redirects to the screenreader gradebook with a friendly URL" do
+          get "show", :course_id => @course.id
+          response.should render_template("screenreader")
+        end
+      end
+    end
+
+    context "without gradebook authorization" do
+      before do
+        course_with_student(:active_all => true)
+      end
+
+      context "with screenreader feature flag on" do
+        before do
+          Course.any_instance.stubs(:feature_enabled?).with(:screenreader_gradebook).returns(true)
+        end
+        it "renders the unauthorized page" do
+          get "show", :course_id => @course.id
+          response.should render_template("shared/unauthorized")
+        end
+      end
+
+      context "with screenreader feature flag off" do
+        before do
+          Course.any_instance.stubs(:feature_enabled?).with(:screenreader_gradebook).returns(false)
+        end
+        it "renders the unauthorized page" do
+          get "show", :course_id => @course.id
+          response.should render_template("shared/unauthorized")
+        end
       end
     end
   end
 
   describe "GET 'change_gradebook_version'" do
     it 'should switch to gradebook2 if clicked and back to gradebook1 if clicked with reset=true' do
+      Course.any_instance.stubs(:feature_enabled?).with(:screenreader_gradebook).returns(false)
       course_with_teacher_logged_in(:active_all => true)
-      get 'grade_summary', :course_id => @course.id
+      get 'grade_summary', :course_id => @course.id, :id => nil
 
-      response.should be_redirect
-      response.should redirect_to(:controller => 'gradebook2', :action => 'show')
+      response.should redirect_to(:action => 'gradebook2')
 
       # reset back to showing the old gradebook
       get 'change_gradebook_version', :course_id => @course.id, :version => 1
@@ -424,15 +505,17 @@ describe GradebooksController do
 
       # tell it to use gradebook 2
       get 'change_gradebook_version', :course_id => @course.id, :version => 2
-      response.should redirect_to(:controller => 'gradebook2', :action => 'show')
+      response.should redirect_to(:action => 'gradebook2')
     end
 
     context "large roster courses" do
       before do
+        Course.any_instance.stubs(:feature_enabled?).with(:screenreader_gradebook).returns(false)
+        Course.any_instance.stubs(:feature_enabled?).with(:draft_state).returns(false)
         course_with_teacher_logged_in(:active_all => true)
         @user.preferences[:use_gradebook2] = false
         @user.save!
-        @user.prefers_gradebook2?.should == false
+        @user.preferred_gradebook_version(@course).should == "1"
         @course.large_roster = true
         @course.save!
         @course.reload
@@ -440,14 +523,13 @@ describe GradebooksController do
       end
 
       it 'should use gradebook2 always for large_roster courses even if user prefers gradebook 1' do
-        get 'grade_summary', :course_id => @course.id
-        response.should be_redirect
-        response.should redirect_to(:controller => 'gradebook2', :action => 'show')
+        get 'grade_summary', :course_id => @course.id, :id => nil
+        response.should redirect_to(:action => 'gradebook2')
       end
 
       it 'should not render gb1 json' do
         get 'show', :course_id => @course.id, :format => :json
-        response.status.to_i.should == 404
+        assert_status(404)
       end
 
       it 'should not prevent you from getting gradebook.csv' do
@@ -458,9 +540,16 @@ describe GradebooksController do
   end
 
   describe "POST 'update_submission'" do
-    it "should have a route for update_submission" do
-      params_from(:post, "/courses/20/gradebook/update_submission").should ==
-        {:controller => "gradebooks", :action => "update_submission", :course_id => "20"}
+    before do
+      Course.any_instance.stubs(:feature_enabled?).returns(false)
+    end
+
+    # rails 3 checks that a route exists when calling it
+    if CANVAS_RAILS2
+      it "should have a route for update_submission" do
+        params_from(:post, "/courses/20/gradebook/update_submission").should ==
+          {:controller => "gradebooks", :action => "update_submission", :course_id => "20"}
+      end
     end
 
     it "should allow adding comments for submission" do
@@ -517,9 +606,12 @@ describe GradebooksController do
   end
 
   describe "GET 'speed_grader'" do
-    it "should have a route for speed_grader" do
-      params_from(:get, "/courses/20/gradebook/speed_grader").should ==
-        {:controller => "gradebooks", :action => "speed_grader", :course_id => "20"}
+    # rails 3 checks that a route exists when calling it
+    if CANVAS_RAILS2
+      it "should have a route for speed_grader" do
+        params_from(:get, "/courses/20/gradebook/speed_grader").should ==
+          {:controller => "gradebooks", :action => "speed_grader", :course_id => "20"}
+      end
     end
 
     it "should redirect user if course's large_roster? setting is true" do
@@ -530,7 +622,7 @@ describe GradebooksController do
 
       get 'speed_grader', :course_id => @course.id, :assignment_id => assignment.id
       response.should be_redirect
-      response.flash[:notice].should == 'SpeedGrader is disabled for this course'
+      flash[:notice].should == 'SpeedGrader is disabled for this course'
     end
 
     context "draft state" do
@@ -548,7 +640,7 @@ describe GradebooksController do
 
         get 'speed_grader', course_id: @course, assignment_id: @assign.id
         response.should be_redirect
-        response.flash[:notice].should == I18n.t(
+        flash[:notice].should == I18n.t(
           :speedgrader_enabled_only_for_published_content,
                            'Speedgrader is enabled only for published content.')
 

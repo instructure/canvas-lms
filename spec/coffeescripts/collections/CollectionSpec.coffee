@@ -1,6 +1,7 @@
 define [
+  'jquery'
   'Backbone'
-], (Backbone) ->
+], ($, Backbone) ->
 
   class TestCollection extends Backbone.Collection
 

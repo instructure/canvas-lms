@@ -20,11 +20,13 @@ class Group < ActiveRecord::Base
   include Context
   include Workflow
   include CustomValidations
-  include UserFollow::FollowedItem
 
-  attr_accessible :name, :context, :max_membership, :group_category, :join_level, :default_view, :description, :is_public, :avatar_attachment, :storage_quota_mb
+  attr_accessible :name, :context, :max_membership, :group_category, :join_level, :default_view, :description, :is_public, :avatar_attachment, :storage_quota_mb, :leader
   validates_presence_of :context_id, :context_type, :account_id, :root_account_id, :workflow_state
   validates_allowed_transitions :is_public, false => true
+
+  # use to skip queries in can_participate?, called by policy block
+  attr_accessor :can_participate
 
   has_many :group_memberships, :dependent => :destroy, :conditions => ['group_memberships.workflow_state != ?', 'deleted']
   has_many :users, :through => :group_memberships, :conditions => ['users.workflow_state != ?', 'deleted']
@@ -57,14 +59,27 @@ class Group < ActiveRecord::Base
   has_many :collaborations, :as => :context, :order => 'title, created_at', :dependent => :destroy
   has_many :media_objects, :as => :context
   has_many :zip_file_imports, :as => :context
-  has_many :collections, :as => :context
+  has_many :content_migrations, :as => :context
   belongs_to :avatar_attachment, :class_name => "Attachment"
-  has_many :following_user_follows, :class_name => 'UserFollow', :as => :followed_item
-  has_many :user_follows, :foreign_key => 'following_user_id'
+  belongs_to :leader, :class_name => "User"
+
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :name, :workflow_state, :created_at, :updated_at, :context_id, :context_type, :category, :max_membership, :hashtag, :show_public_context_messages, :is_public,
+    :account_id, :default_wiki_editing_roles, :wiki_id, :deleted_at, :join_level, :default_view, :storage_quota, :uuid, :root_account_id, :sis_source_id, :sis_batch_id,
+    :group_category_id, :description, :avatar_attachment_id
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [
+    :users, :group_memberships, :users, :context, :group_category, :account, :root_account, :calendar_events, :discussion_topics, :discussion_entries, :announcements,
+    :attachments, :folders, :collaborators, :external_feeds, :messages, :wiki, :web_conferences, :collaborations, :media_objects, :avatar_attachment
+  ]
 
   before_validation :ensure_defaults
   before_save :maintain_category_attribute
   after_save :close_memberships_if_deleted
+  after_save :update_max_membership_from_group_category
+
+  delegate :time_zone, :to => :context
 
   include StickySisFields
   are_sis_sticky :name
@@ -75,6 +90,11 @@ class Group < ActiveRecord::Base
     elsif value.length > maximum_string_length
       record.errors.add attr, t(:name_too_long, "Enter a shorter group name")
     end
+  end
+
+  validates_each :max_membership do |record, attr, value|
+    next if value.nil?
+    record.errors.add attr, t(:greater_than_1, "Must be greater than 1") unless value.to_i > 1
   end
 
   alias_method :participating_users_association, :participating_users
@@ -91,13 +111,13 @@ class Group < ActiveRecord::Base
   alias_method_chain :wiki, :create
 
   def auto_accept?
-    self.group_category && 
+    self.group_category &&
     self.group_category.allows_multiple_memberships? &&
     self.join_level == 'parent_context_auto_join'
   end
 
   def allow_join_request?
-    self.group_category && 
+    self.group_category &&
     self.group_category.allows_multiple_memberships? &&
     ['parent_context_auto_join', 'parent_context_request'].include?(self.join_level)
   end
@@ -109,7 +129,23 @@ class Group < ActiveRecord::Base
   end
 
   def full?
+    !student_organized? && ((!max_membership && group_category_limit_met?) || (max_membership && participating_users.size >= max_membership))
+  end
+
+  def group_category_limit_met?
     group_category && group_category.group_limit && participating_users.size >= group_category.group_limit
+  end
+  private :group_category_limit_met?
+
+  def student_organized?
+    group_category && group_category.student_organized?
+  end
+
+  def update_max_membership_from_group_category
+    if group_category && group_category.group_limit && (!max_membership || max_membership == 0)
+      self.max_membership = group_category.group_limit
+      self.save
+    end
   end
 
   def free_association?(user)
@@ -140,11 +176,18 @@ class Group < ActiveRecord::Base
 
   def has_member?(user)
     return nil unless user.present?
-    self.shard.activate { self.participating_group_memberships.find_by_user_id(user.id) }
+    if self.group_memberships.loaded?
+      return self.group_memberships.to_a.find { |gm| gm.accepted? && gm.user_id == user.id }
+    else
+      self.shard.activate { self.participating_group_memberships.find_by_user_id(user.id) }
+    end
   end
 
   def has_moderator?(user)
     return nil unless user.present?
+    if self.group_memberships.loaded?
+      return self.group_memberships.to_a.find { |gm| gm.accepted? && gm.user_id == user.id && gm.moderator }
+    end
     self.shard.activate { self.participating_group_memberships.moderators.find_by_user_id(user.id) }
   end
 
@@ -254,7 +297,6 @@ class Group < ActiveRecord::Base
     user_ids = users.map(&:id)
     old_group_memberships = self.group_memberships.where("user_id IN (?)", user_ids).all
     bulk_insert_group_memberships(users, options)
-    bulk_insert_group_user_follows(users, options)
     all_group_memberships = self.group_memberships.where("user_id IN (?)", user_ids)
     new_group_memberships = all_group_memberships - old_group_memberships
     new_group_memberships.sort_by!(&:user_id)
@@ -284,16 +326,7 @@ class Group < ActiveRecord::Base
         :updated_at => current_time
     }.merge(options)
     GroupMembership.bulk_insert(users.map{ |user|
-      options.merge({:user_id => user.id, :uuid => AutoHandle.generate_securish_uuid})
-    })
-  end
-
-  def bulk_insert_group_user_follows(users, options = {})
-    options = {
-        :followed_item_id => self.id
-    }.merge(options)
-    UserFollow.bulk_insert(users.map{ |user|
-      options.merge({:following_user_id => user.id})
+      options.merge({:user_id => user.id, :uuid => CanvasUuid::Uuid.generate_securish_uuid})
     })
   end
 
@@ -347,8 +380,8 @@ class Group < ActiveRecord::Base
   end
 
   def ensure_defaults
-    self.name ||= AutoHandle.generate_securish_uuid
-    self.uuid ||= AutoHandle.generate_securish_uuid
+    self.name ||= CanvasUuid::Uuid.generate_securish_uuid
+    self.uuid ||= CanvasUuid::Uuid.generate_securish_uuid
     self.group_category ||= GroupCategory.student_organized_for(self.context)
     self.join_level ||= 'invitation_only'
     self.is_public ||= false
@@ -379,15 +412,14 @@ class Group < ActiveRecord::Base
     can :create_collaborations and
     can :create_conferences and
     can :manage_calendar and
-    can :manage_content and 
+    can :manage_content and
     can :manage_files and
     can :manage_wiki and
     can :post_to_forum and
-    can :read and 
+    can :read and
     can :read_roster and
     can :send_messages and
     can :send_messages_all and
-    can :follow and
     can :view_unpublished_items
 
     # if I am a member of this group and I can moderate_forum in the group's context
@@ -401,6 +433,9 @@ class Group < ActiveRecord::Base
     can :manage_admin_users and
     can :manage_students and
     can :moderate_forum and
+    can :update
+
+    given { |user| user && self.leader == user }
     can :update
 
     given { |user| self.group_category.try(:communities?) }
@@ -430,10 +465,7 @@ class Group < ActiveRecord::Base
     given { |user, session| self.context && self.context.grants_right?(user, session, :view_group_pages) }
     can :read and can :read_roster
 
-    given { |user| user && self.is_public? }
-    can :follow
-
-    # Participate means the user is connected to the group somehow and can be  
+    # Participate means the user is connected to the group somehow and can be
     given { |user| user && can_participate?(user) }
     can :participate
 
@@ -451,12 +483,13 @@ class Group < ActiveRecord::Base
 
   # Helper needed by several permissions, use grants_right?(user, :participate)
   def can_participate?(user)
+    return true if can_participate
     return false unless user.present? && self.context.present?
     return true if self.group_category.try(:communities?)
     if self.context.is_a?(Course)
-      return self.context.enrollments.not_fake.where(:user_id => user.id).first.present?
+      return self.context.enrollments.not_fake.except(:includes).where(:user_id => user.id).exists?
     elsif self.context.is_a?(Account)
-      return self.context.user_account_associations.where(:user_id => user.id).first.present?
+      return self.context.user_account_associations.where(:user_id => user.id).exists?
     end
     return false
   end
@@ -499,11 +532,11 @@ class Group < ActiveRecord::Base
   def storage_quota_mb
     quota / 1.megabyte
   end
-  
+
   def storage_quota_mb=(val)
     self.storage_quota = val.try(:to_i).try(:megabytes)
   end
-  
+
   TAB_HOME, TAB_PAGES, TAB_PEOPLE, TAB_DISCUSSIONS, TAB_FILES,
     TAB_CONFERENCES, TAB_ANNOUNCEMENTS, TAB_PROFILE, TAB_SETTINGS, TAB_COLLABORATIONS = *1..20
   def tabs_available(user=nil, opts={})
@@ -522,43 +555,12 @@ class Group < ActiveRecord::Base
     available_tabs << { :id => TAB_CONFERENCES, :label => t('#tabs.conferences', "Conferences"), :css_class => 'conferences', :href => :group_conferences_path } if user && self.grants_right?(user, nil, :read)
     available_tabs << { :id => TAB_COLLABORATIONS, :label => t('#tabs.collaborations', "Collaborations"), :css_class => 'collaborations', :href => :group_collaborations_path } if user && self.grants_right?(user, nil, :read)
     if root_account.try(:canvas_network_enabled?) && user && grants_right?(user, nil, :manage)
-      available_tabs << { :id => TAB_SETTINGS, :label => t('#tabs.settings', 'Settings'), :css_class => 'settings', :href => :edit_group_path } 
+      available_tabs << { :id => TAB_SETTINGS, :label => t('#tabs.settings', 'Settings'), :css_class => 'settings', :href => :edit_group_path }
     end
     available_tabs
   end
 
   def self.serialization_excludes; [:uuid]; end
-
-  def self.process_migration(data, migration)
-    groups = data['groups'] || []
-    groups.each do |group|
-      if migration.import_object?("groups", group['migration_id'])
-        begin
-          import_from_migration(group, migration.context)
-        rescue
-          migration.add_import_warning(t('#migration.group_type', "Group"), group[:title], $!)
-        end
-      end
-    end
-  end
-
-  def self.import_from_migration(hash, context, item=nil)
-    hash = hash.with_indifferent_access
-    return nil if hash[:migration_id] && hash[:groups_to_import] && !hash[:groups_to_import][hash[:migration_id]]
-    item ||= find_by_context_id_and_context_type_and_id(context.id, context.class.to_s, hash[:id])
-    item ||= find_by_context_id_and_context_type_and_migration_id(context.id, context.class.to_s, hash[:migration_id]) if hash[:migration_id]
-    item ||= context.groups.new
-    context.imported_migration_items << item if context.imported_migration_items && item.new_record?
-    item.migration_id = hash[:migration_id]
-    item.name = hash[:title]
-    item.group_category = hash[:group_category].present? ?
-      context.group_categories.find_or_initialize_by_name(hash[:group_category]) :
-      GroupCategory.imported_for(context)
-
-    item.save!
-    context.imported_migration_items << item
-    item
-  end
 
   def allow_media_comments?
     true
@@ -606,10 +608,6 @@ class Group < ActiveRecord::Base
       ["parent_context_auto_join", "Auto join"],
       ["parent_context_request", "Request to join"]
     ]
-  end
-
-  def default_collection_name
-    t "#group.default_collection_name", "%{group_name}'s Collection", :group_name => self.name
   end
 
   def associated_shards

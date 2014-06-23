@@ -36,7 +36,7 @@ describe "/shared/_user_lists" do
   end
 
   it "should render as a root account with customized login handle" do
-    Account.default.account_authorization_configs.create!(:login_handle_name => 'Login')
+    Account.default.account_authorization_configs.create!(:login_handle_name => 'Login', :auth_type => 'ldap')
     assigns[:context] = Account.default
     render :partial => "shared/user_lists"
   end

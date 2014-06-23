@@ -24,6 +24,9 @@ zh:
   GroupUserCollection: 
     flash: 
       userAlreadyInGroup: "警告: %{user} 已经是 %{group} 的成员"
+  LongTextEditor: 
+    cancel: 取消
+    save: 保存
   academic_benchmark: 
     api_error: "无法更新授权 %{auth} 的标准。"
     bad_ab_file: 提供的学术基准文件有错误。
@@ -36,6 +39,17 @@ zh:
   accont: 
     feedback_pricing_sub: 为您的机构获取号码
   account: 
+    account_settings: 
+      account_surveys: 帐户调查
+      avatars: 用户头像
+      delicious: Delicious
+      diigo: Diigo
+      facebook: Facebook
+      google_docs: "Google Docs"
+      google_docs_preview: "Google Docs Preview"
+      linked_in: LinkedIn
+      skype: Skype
+      twitter: Twitter
     ask_canvas_network: "询问 Canvas 网络社区"
     default_account_name: 默认帐户
     default_site_administrator_account_name: 网站管理员
@@ -90,7 +104,6 @@ zh:
         login_handle_name: 登录标签
       login_handle_name_description: "用于唯一登录标识符的标签。示例:登录名、用户名、学生 ID 等"
       save_button: 保存身份验证设置
-    deprecated_fail: 无法同时使用创建的过时版本和当前版本。
     index: 
       add_auth_desc: "添加身份提供商到此帐户:"
       canvas_login_tip: |-
@@ -147,7 +160,7 @@ zh:
         pass: 密码
         user: 用户名
       ldap_test_login_button: 测试登录
-      test_ldap_bind_help_body: "LDAP 服务器拒绝了绑定尝试。要考虑:"
+      test_ldap_bind_help_body: "LDAP 服务器拒绝了绑定尝试。要考虑："
       test_ldap_bind_help_fixes_1: "验证提供的过滤器字符串（例如 '(sAMAccountName={{login}})'）。"
       test_ldap_bind_help_fixes_2: "用户名是否需要更多范围信息?（例如 'cn=Canvas,ou=people,dc=example,dc=com'）。"
       test_ldap_bind_help_header: "Canvas 无法绑定（登录）到您的 LDAP 服务器"
@@ -173,11 +186,8 @@ zh:
       last_ldap_timeout_failure: 上次超时失效
       ldap_timeout_failure_help2: "如果 Canvas 与 LDAP 服务器通信超时太多次，那么它就会封锁接下来尝试登陆使用 LDAP 服务器 %{time} 分钟。"
     login_required: 必须提供
-    no_auth_mixing: 无法混用身份验证类型
     no_changing_auth_types: 无法更改授权配置类型，请删除，然后创建新的配置。
-    no_config_sent: "必须指定 auth_type"
     no_discovery_url: 未设置
-    only_one_cas: "无法创建多个 CAS 配置"
     password_required: 必须提供
     saml_required: "如果要测试 SAML，需要先配置 SAML。"
     saml_settings: 
@@ -249,6 +259,8 @@ zh:
     announcement_deleted_notice: 通告已成功删除
     permission_denied_notice: 无法为该帐户创建通告
   account_reports: 
+    bucks: 
+      courses_only: 仅限在线章节
     ccp: 
       course: 
         check_box: "课程: %{course_id};"
@@ -264,8 +276,12 @@ zh:
       section_text: "班级: %{section};"
       start_text: "开始日期: %{start_at};"
       term_text: "学期: %{term_name};"
+    galen: 
+      no_term: 必须填写具体学期，请选择一个学期
     grades: 
       deleted: "包括删除的对象: true;"
+    granite: 
+      invalid_date_range: "日期调整为 1 周范围；"
     mississippi: 
       reports: "报告：%{files}"
     outcomes: 
@@ -273,6 +289,11 @@ zh:
     sis_exporter: 
       deleted: "包括删除的对象: true;"
       reports: "报告: %{files}"
+    student: 
+      enrollment_state: "包括注册状态: true;"
+      enrollment_states: "注册状态: %{states};"
+    usu: 
+      enrollment_types: "注册类型: %{types}"
   account_settings: 
     account: 帐户
     account_name_too_long: 帐户名太长
@@ -330,6 +351,14 @@ zh:
     add_user_dialog_title: 新增用户
     adding_course_message: 正在添加课程...
     adding_user_message: 正在添加用户...
+    additional_settings: 
+      account_domains: 帐户域
+      account_status: 帐户状态
+      add_new_domain: 添加新域
+      external_status: 外部状态
+      license: 许可证
+      license_type: 许可类型
+      new_account_domain_title: 新建帐户域
     additional_settings_right_side: 
       links: 
         suspend: 挂起帐户
@@ -365,6 +394,28 @@ zh:
         messages_viewed: "从 *%{start_date}*到 *%{end_date}*发送给 *%{user}* 的通知。"
       comm_messages_search_results: 
         no_messages_found: 找不到消息
+      course_logging_content: 
+        course_activity: 课程活动
+        find: 查找
+      course_logging_details: 
+        Field: 字段
+        From: 从
+        To: 至
+        Value: 值
+        date: 日期
+        event_id: "事件 ID"
+        event_type_label: 类型
+        time: 时间
+        user: 用户
+      course_logging_item: 
+        view_event_details: 查看详细信息
+      course_logging_results: 
+        date: 日期
+        event_details: 事件详细信息
+        event_type: 类型
+        no_item_found: 找不到项目
+        time: 时间
+        user: 用户
       course_search_form: 
         labels: 
           find_deleted_course: 查找已删除的课程
@@ -390,8 +441,28 @@ zh:
         successfull_restore: 
           add_enrollments: 添加注册
           subtext: 接下来您要做什么？
+      date_range_search: 
+        message_date_from: 开始日期
+        message_date_to: 结束日期
+      grade_change_logging_content: 
+        find: 查找
+        grade_change_activity: 评分更改活动
+        message_assignment_id: "作业 ID"
+        message_course_id: "课程 ID"
+      grade_change_logging_results: 
+        Assignment: 作业
+        Course: 课程
+        Grader: 评分器
+        Student: 学生
+        To: 至
+        date: 日期
+        from: 从
+        no_item_found: 找不到项目
+        time: 时间
       logging_content_pane: 
         authentication: 登录/登出活动
+        course: 课程活动
+        grade_change: 评分更改活动
         select_default: 选择日志类型
         select_label: 选择要搜索的日志类型。
       page_title: "%{account} 的管理工具"
@@ -429,6 +500,13 @@ zh:
             check_box: 报告
           tests: 
             check_box: 测试
+    assignment_score_summary_csv_description: 
+      account_reports: 
+        granite: 
+          assignme_score_summary: 
+            text: 此报告显示在选定日期之间评分的所有作业的分数
+          description: 
+            header: 示例
     avatars: 
       all_link: 
         one: "所有 %{count}"
@@ -456,6 +534,13 @@ zh:
         zero: 已提交
       title: 头像
       unlock_link: 解锁
+    bucks_zero_activity_csv_description: 
+      account_reports: 
+        bucks: 
+          description: 
+            header: 示例
+          student_login: 
+            text: "此报告显示某个给定学期中注册了任意课程的所有学生。在生成的 csv 文件中，自该日期起尚未访问课程的每项用户注册将具有一行。在线过滤器将仅包括章节名称含有“.E”的章节中的注册。"
     cannot_manage_account: 不允许您管理帐户设置
     cannot_manage_quotas: 不允许您管理配额设置
     ccp_zero_activity_csv_description: 
@@ -475,7 +560,7 @@ zh:
           student_activity: 
             description: 
               header: 例如
-            text: "此报告显示学生参加其课程的情况。在生成的 csv 文件中，每项注册将具有一行，并且将显示学生学号、学生姓名、电话号码、电子邮件地址、课程名称、上次提交、上次提交以来的天数 (LDA)、当前评分百分比以及他们的学期开始日期。"
+            text: "此报告显示学生参加其课程的情况。在生成的 csv 文件中，每项注册将具有一行，并且将显示学生 SIS ID、学生姓名、电话号码、电子邮件地址、课程名称、上次提交、上次提交以来的天数 (LDA)、当前评分百分比以及他们的学期开始日期。"
     confirm_delete_user: 
       confirm_delete: "是否确定要从帐户 %{account} 删除此用户?这将从所有课程和小组删除该用户的数据(包括计分)。此过程无法撤消。"
       delete_button: "删除 %{user}"
@@ -498,6 +583,17 @@ zh:
       teachers_label: 教师
     course_add_failed_message: 添加课程失败，请重试
     course_added_message: "%{course} 已成功添加！"
+    course_enrollment_csv_description: 
+      account_reports: 
+        cedar_rapids: 
+          course_status: 
+            text: |-
+                此报告显示某个给定学期的所有课程的状态。
+                在生成的 csv 文件中，每个课程章节将具有一行，
+                并且将显示课程、课程状态、学期、有效的开始日期和结束日期、
+                注册计数、部门以及帐户
+          description: 
+            header: 示例
     course_status_csv_description: 
       account_reports: 
         auburn: 
@@ -536,14 +632,20 @@ zh:
         edison: 
           description: 
             header: 例如
-            text: "此报告显示所有学生的学习成绩。在生成的 csv 文件中，每对“用户/成绩”将具有一行，并将显示包括相关联的作业在内的成绩详情。"
+            text: "此报告显示所有学生的学习成绩，可查看给定结果和课程。在生成的 csv 文件中，每个用户将具有一行，并将显示包括相关联的作业在内的成绩详情。"
     custom_outcomes_csv_parameters: 
       account_reports: 
         edison: 
-          course: 
-            text: 课程_ID：
           outcome: 
             text: 成果_ID：
+    cv_non_graded_data_csv_description: 
+      account_reports: 
+        galen: 
+          cv: 
+            non_graded: 
+              text: 此报告针对测验调查和讨论按课程显示未评分的提交项。
+          description: 
+            header: 示例
     cv_submission_data_csv_description: 
       account_reports: 
         galen: 
@@ -598,6 +700,13 @@ zh:
       page_title: 帐户
       title: "帐户 I 管理"
     integer_required: 必须填整数值
+    last_submission_activity_csv_description: 
+      account_reports: 
+        concorde: 
+          description: 
+            header: 示例
+          last_submission: 
+            text: 此报告显示学生的上次提交活动。
     last_user_access_csv_description: 
       account_reports: 
         default: 
@@ -691,7 +800,7 @@ zh:
           description: 
             header: 例如
           student_activity: 
-            text: 此报告显示一个或多个指定作业小组和指定日期范围中的所有作业以及与这些作业相关的信息。此报告提供用于计划安全练习的数据，同时对主要的课堂测验干扰最小。
+            text: 此报告显示一个或多个指定作业组和指定日期范围中的所有作业以及与这些作业相关的信息。此报告提供用于计划安全练习的数据，同时对主要的课堂评估干扰最小。
     safety_drill_csv_parameters: 
       account_reports: 
         newark: 
@@ -718,9 +827,16 @@ zh:
             field: "班级 ID"
     settings: 
       about_google_docs: |-
-          为了让用户更方便，而不强制他们下载诸如 Word 文档、PDF、Excel 电子表格等内容以及打开办公文档（此外还需要在其计算机上安装这些程序），在整个 Canvas 的许多区域，用户可以内联预览文档。
+          Google Docs Previews 可让用户从 Canvas 中查看文档，而不必下载和打开相应的程序（如 Word 或 Excel）。
           
-          如果已为此帐户启用 Scribd，将会尝试用其显示预览。但由于 Scribd 使用 flash 显示文档，而许多用户（例如使用 iPad/iPhone 的用户）没有安装 Flash Player，因此无法预览。在启用 Google Docs Previews 后，若浏览器未启用 Flash，或者 Scribd 未启用，将会使用 Google Docs 提供的预览功能。使用此服务需遵守 Google 的浏览器 [使用条款](%{terms_url})
+          如果已在此帐户上启用 Scribd，Canvas 将
+          尝试使用它来显示预览。如果无法在
+          Scribd 中预览文档，或者如果用户未
+          安装 Flash Player（如 iPad/iPhone）。
+          Canvas 将回滚到使用 Google Docs Previews
+          （如果已启用）。通过使用此服务，
+          您承认自己已阅读并同意
+          [Google Docs Viewer 使用条款](%{terms_url})。
       about_google_docs_tooltip: "关于 Google Docs Previews"
       account_admins_title: 帐户管理员
       account_quotas: 
@@ -730,6 +846,7 @@ zh:
         site_admin_quotas: 网站管理员配额
         student_quota: 学生配额
         update: 更新
+      account_roles: "帐户角色:"
       account_settings_title: 帐户设置
       add_a_custom_help_link: 添加定制的帮助连接
       add_admin_title: 添加帐户管理员
@@ -743,6 +860,8 @@ zh:
       alert_icon_warning_option: 警告
       alert_timespan: "从 %{start_at} 到 %{end_at}"
       alerts_title: 警报
+      announcement_blank_to_all: (如果未选择，则发送给所有人)
+      announcement_sent_to_roles: "仅发送给以下类型的用户:"
       announcement_sent_to_subset: "每月发送给 1 / %{denominator} 的用户"
       buttons: 
         add_users: 看起来不错，添加这些用户
@@ -750,6 +869,7 @@ zh:
         modify_users: 返回编辑用户列表
       confirm_global_announcement: "此通告将向 *所有* Canvas 用户显示。请确认您要创建该通告。"
       confirm_turnitin_settings_link: "确认 Turnitin 设置"
+      course_roles: "课程角色:"
       create_courses_description: （帐户管理员可随时创建课程）
       create_courses_title: 谁可以创建新课程
       custom_links_to_include_in_the_help_dialog_popup: 定制链接以包含帮助对话框弹出窗口
@@ -776,6 +896,7 @@ zh:
       help_link_available_to_all_teachers: 教师
       help_link_available_to_all_users: 用户
       if_you_would_like_to_link_to_your_own_campus_support_website_in_the_help_dialog_you_can_do_that_here: 如果您想要将自己学院的支持网站加入到帮助对话中，可以在此处操作
+      interpolate_account_domain: "注意: 输入 \"{{ACCOUNT_DOMAIN}}\" 来替换用户的根帐户域"
       ip_filter_filter_label: 过滤
       ip_filter_name_label: 姓名
       labels: 
@@ -819,6 +940,8 @@ zh:
         restrict_student_future_view: 限制学生在开始日期之前查看课程
         self_enrollment: 允许自我注册
         self_registration: 自行注册
+        self_registration_type_all: 所有帐户类型
+        self_registration_type_observer: 仅限观察员帐户
         show_scheduler: 启用计划程序
         sis_source_id: 学号
         start_at: 开始
@@ -847,6 +970,7 @@ zh:
         select_type_label: 查找课程或小组
         update_button: 更新配额
       never_allow_self_enrollment_option: 从不
+      no_enrollment_roles: 取消注册的用户
       no_language_preference: "未设置（默认使用 %{language}）"
       notifications: 
         custom_name_description: "如果选中，此设置将替代 Canvas 通知中发送的所有其它品牌标识。"
@@ -1042,6 +1166,20 @@ zh:
           description: 
             header: 例如
             text: "此报告显示所有学生的学习成绩。在生成的 csv 文件中，每对“用户/成绩”将具有一行，并将显示包括相关联的作业在内的成绩详情。此报告仅显示作业成绩，而不包括与题库相关的成果。"
+    student_grades_csv_description: 
+      account_reports: 
+        auburn: 
+          student_grades: 
+            description: 
+              text: "此报告显示了学生在给定学期中的最终评分结果。最终得出的 csv 文件将每行代表一个注册，并将显示课程评分册中的当前评分和最终评分。"
+        default: 
+          description: 
+            header: 示例
+    student_grades_csv_parameters: 
+      account_reports: 
+        auburn: 
+          pseudonym_ids: 
+            field: "匿名 ID"
     student_ip_csv_description: 
       account_reports: 
         dubspot: 
@@ -1049,20 +1187,6 @@ zh:
             header: 例如
           student_login: 
             text: "此报告显示某个给定学期中注册了某给定课程或所有课程的所有学生。在生成的 csv 文件中，每项学生注册将具有一行。"
-    student_login_csv_description: 
-      account_reports: 
-        bucks: 
-          description: 
-            header: 例如
-          student_login: 
-            text: 此报告显示自给定日期以来尚未登录的学生。
-    student_login_csv_parameters: 
-      account_reports: 
-        bucks: 
-          login: 
-            check_box: 是否包括从未登录的用户？
-          parameters: 
-            note: "此报告不反映 Canvas 中的上次活动，而是反映用户上次登录的时间。"
     student_submissions_csv_description: 
       account_reports: 
         vilas: 
@@ -1077,6 +1201,15 @@ zh:
             description: 
               header: 示例
             text: 这是某个给定学期中注册了一门课程且在该课程的给定日期范围内未提交作业的所有学生的一份报告。此报告中，每项符合条件的学生注册包含一行。日期范围不能大于两周。
+    students_with_no_submissions_csv_parameters: 
+      account_reports: 
+        default: 
+          enrollment_state: 
+            header: 注册状态
+          include_enrollment_state: 
+            check_box: 包括注册状态
+      active: 活动注册
+      all: 全部注册
     submission_data_csv_description: 
       account_reports: 
         submission_data: 
@@ -1124,6 +1257,24 @@ zh:
           main: 
             text: 这是不包含以下各项的所有课程的一份报告：作业、通告、讨论、文件、单元、页面或测验。
     update_failed_notice: 帐户设置更新失败
+    user_access_csv_description: 
+      account_reports: 
+        usu: 
+          description: 
+            header: 示例
+          user_activity: 
+            text: "此报告显示某个给定学期中注册了某给定课程或所有课程的学生的所有活动。在生成的 csv 文件中，每项学生活动将具有一行，并且将包含以下标题：注册类型、班级 ID、班级 SIS ID、班级名称、课程 ID、课程 SIS ID、课程名称、用户 ID、用户 SIS ID、内容类型、内容、查看次数、参与次数和上次查看时间。查看次数和参与次数从开始时间到报告生成时间进行计数。"
+    user_access_csv_parameters: 
+      account_reports: 
+        usu: 
+          enrollment_type: 
+            header: 注册类型
+      all: 全部注册
+      designer: 设计者注册
+      observer: 观察者注册
+      students: 学生注册
+      ta: 助教注册
+      teachers: 教师注册
     user_add_failed_message: 添加用户失败，请重试
     user_added_message: "%{user} 已成功添加!"
     user_added_message_sent_message: "%{user} 已成功添加! 他们应该很快会收到确认电子邮件。"
@@ -1359,7 +1510,6 @@ zh:
     default_title: "无名称 - %{course}"
     default_unfiled_title: 未归档的问题
   assignment: 
-    advanced_options_errors: 一个或多个高级可选功能中存在错误
     assignment_group_must_have_group: 请为此作业选择作业小组
     at_least_one_file_type: 请指定至少一个允许使用的文件类型
     at_least_one_submission_type: 请选择至少一种提交类型
@@ -1371,21 +1521,17 @@ zh:
       other: 查看附件文件
     errors: 
       cannot_save_att: "您没有权限编辑已锁定的 %{att_name} 属性"
-      import: 
-        external_tool_url: "外部工具作业 \"%{assignment_name}\" 的 URL 无效。"
       upload_as_zip: "请以 .zip 格式上传文件"
     feed_entry_title: "作业: %{assignment}"
     feed_entry_title_with_course: "作业 %{course}: %{assignment}"
+    gpa_scale_explainer: "什么是 GPA 等级评分？"
     group_assignment_must_have_group_set: 请为此作业选择小组集
-    hide_advanced_options: 隐藏高级可选功能
-    imported_assignments_group: 导入的作业
     labels: 
       due: 截止时间
     name_is_required: 需要姓名
     percentage_points_possible: "对于百分制，满分必须大于 0"
     points_possible_number: 满分必须为数字
     select_external_tool_dialog_title: 配置外部工具
-    show_advanced_options: 显示高级可选功能
     submission_action_take_quiz: "提取 %{title}"
     submission_action_turn_in_assignment: "交还 %{title}"
     submission_types: 
@@ -1398,7 +1544,10 @@ zh:
       external_tool: 外部工具
       on_paper: 书面
     titles: 
+      gpa_scale_explainer: "什么是 GPA 等级评分？"
       grading_scheme_info: 查看/编辑评分方案
+  assignment_details: 
+    no_graded_submissions: 无已评分作业
   assignment_details_dialog: 
     average_score: "平均分数:"
     count_of_submissions: "%{cnt} 个作业"
@@ -1409,7 +1558,7 @@ zh:
     no_one_scored_lower: "没有分数低于 %{min}"
     scores_higher_than_the_average: "高于平均分 %{average} 的分数"
     scores_lower_than_the_average: "低于平均分 %{average} 的分数"
-    total_submitted: "提交总数:"
+    total_graded_submissions: 已评分的提交项总数：
   assignment_group: 
     default_name: 作业
     default_title: 作业
@@ -1496,7 +1645,7 @@ zh:
       edit: 编辑
       group_weight: "总数的 %{groupWeight}%"
       manage: 管理
-      move: 移动到...
+      move: 移动到…
     assignment_group_selector: 
       assignment_group: 作业小组
       assignment_group_options: 
@@ -1511,7 +1660,7 @@ zh:
       delete: 删除
       edit: 编辑
       module: 单元
-      move: 移动到...
+      move: 移动到…
       multiple_modules: 多个单元
       no_points_possible: 无最高得分
       points_possible: "%{pointsPossible} 分"
@@ -1554,6 +1703,10 @@ zh:
       warnings: 
         delete_assignment_group: "作业小组 %{group} 中有 %{assignment_count} 个作业。可以删除这些作业或将其移至另一个小组。"
     assignments_list_content: 
+      assignments: 
+        graded: 此作业已计分
+        needs_grading_count: "此作业的 %{needs_grading_count} 个提交作业仍需评分"
+        overdue: 此作业已逾期
       no_assignments: 没有为此课程创建作业。
       titles: 
         assignments: 作业
@@ -1577,6 +1730,10 @@ zh:
       assignment_groups_wrapper: "（%{number_of_groups} 中）"
       links: 
         add_assignment_group: 添加作业小组
+    available_date_description: 
+      available_until: 可供使用的截止日期
+      closed: 已关闭
+      not_available_until: 可供使用的开始时间
     buttons: 
       add_group: 添加小组
       delete_group: 删除小组
@@ -1618,11 +1775,7 @@ zh:
     create_new_crumb: 新建
     date_available_column_view: 
       available: 可用
-      available_on: 可供使用的日期
-      available_until: 结束时间
-      closed: 已关闭
       multiple_dates: 多个日期
-      not_available_until: 开始时间
     date_due_column_view: 
       due: 截止时间
       due_date: 截止时间
@@ -1666,6 +1819,7 @@ zh:
       buttons: 
         not_published: 未发布
         published: 已发布
+      manage: 管理
       titles: 
         delete: 删除
     edit_view: 
@@ -1673,11 +1827,10 @@ zh:
       buttons: 
         update: 更新作业
       description: 说明
-      due_date: 截止时间
       freeze_properties: 复制时锁定作业属性
       notify_content_change: 通知用户此内容已更改
       points_possible: 得分
-      show_advanced_options: 显示高级可选功能
+      post_to_sis: "发布到 SIS"
       warnings: 
         assignment_is_frozen: 某些设置已被管理员锁定。
     errors: 
@@ -1686,6 +1839,11 @@ zh:
       google_docs_masquerade_rejected: "无法以伪装用户的身份连接到 Google Docs。"
       reminder_failed: 提醒失败
     everyone_else: 其他所有人
+    external_content_homework_submission_view: 
+      additional_comments: 其它评论
+      buttons: 
+        submit_assignment: 提交作业
+      group_assignment_header: 评论...
     external_grader_sidebar: 
       edit_assignment_settings: 编辑作业设置
       speed_grader: 快速评分器
@@ -1710,14 +1868,22 @@ zh:
           *确保不要更改提交文件的名称，以便我们组织。*
       titles: 
         related_items: 相关项目
+    grade_gpa_scale_screenreader: "评分：%{grade}"
     grade_letter_grade_screenreader: "评分: %{grade}"
     grade_pass_fail_screenreader: "评分: %{grade}"
     grade_percent: "%{grade}%"
     grade_percent_screenreader: "分数: %{grade}%"
-    graded: 此作业已计分
     grading_type_selector: 
-      grading_type: 评分类型
+      display_grade_as: 计分显示为
+      gpa_scale_explainer: "GPA 等级评分面向使用 4.0（或 5.0/6.0）等级评定所有作业的学校而设计。这一评分方案类似于字母评分显示，但存在一些重要的差别："
+      gpa_scale_input_explainer: "根据 4.0 等级来输入分数。例如，如果作业总共为 100 点，输入 4.0 则结果为 100%，输入 3.0 则结果为 87% 等等。"
+      gpa_scale_letters_explainer: 除了数字评分以外，还可以使用字母评分。
+      gpa_scale_percentage_explainer: "您不能直接输入分数，但可以输入百分比。例如，如果作业总共为 50 分，输入“40”则无效，而输入“80%”则有效。"
+      gpa_scale_recommendation: "除非您的学校使用 4.0（或 5.0/6.0）等级进行评分，否则 Canvas 建议以字母评分方式显示评分。"
+      gpa_scale_scores_explainer: 只允许使用评分方案中预定义的分数。
+      gpa_scale_title: "“什么是 GPA 等级评分？”"
       grading_type_options: 
+        gpa_scale: "GPA 等级"
         letter_grade: 书面评分
         not_graded: 未计分
         pass_fail: 完成/未完成
@@ -1726,10 +1892,11 @@ zh:
       view_grading_levels: 查看评分级别
     group_category_selector: 
       grade_group_students_individually: 分别为每位学生指定评分
+      group_assignment_header: 小组作业
+      group_category_locked_explanation: 学生已经提交了此项作业的家作，因此无法更改组设置。
       group_category_options: 新建小组类别
       group_set: 小组集
       is_group_assignment: 这是一个小组作业
-      students_already_submitted_warning: 以前提交的作业将不作为小组作业计算在内，并且将在快速评分器中错误显示。
     group_comment: 
       labels: 
         group_comment: 发送评论到全小组
@@ -1793,7 +1960,6 @@ zh:
     labels: 
       assignment_group_move_label: 作业小组
       label_place_before: 放在前面
-    loading_tools_failed: 加载工具失败
     messages: 
       adding_group: 正在添加小组...
       agree_to_pledge: 必须同意提交保证才可提交此作业。
@@ -1805,7 +1971,8 @@ zh:
       submitting: 正在提交...
     multiple_due_dates: 多个截止时间
     name_is_required: 需要名称
-    needs_grading_count: "此作业的 %{needs_grading_count} 个提交作业仍需评分"
+    name_too_long: 名称太长
+    name_too_long_error: 姓名太长
     never_drop: 
       remove_rule: 删除规则
     never_drop_collection: 
@@ -1831,7 +1998,6 @@ zh:
       one: "%{count} 份作业"
       other: "%{count} 份作业"
     other_assignments: 其它作业
-    overdue: 此作业已逾期
     peer_review_assignment: 
       titles: 
         remind_reviewer: "向 %{user} 用户提醒测验"
@@ -1863,15 +2029,17 @@ zh:
       titles: 
         automatically_assign_reviews: 自动分配审阅
         remind: "向 %{assessor} 提醒测验，上次通知时间为 %{time}"
+        reminder: "向 %{assessor} 提醒测验，上次通知时间为 %{time}"
     peer_reviews_selector: 
+      how_to_peer_review: 如何分配同伴审阅
       labels: 
         automatically_assign_peer_reviews: 自动分配同伴审阅
         manually_assign_peer_reviews: 手动分配同伴审阅
         require_peer_reviews: 需要同伴审阅
       locked_until: 分配审阅
       peer_reviews_assign_at_explanation: 必须在截止时间之后。如果为空，则使用截止时间。
+      peer_reviews_header: 同伴审阅
       reviews_per_user: 每位用户的审阅次数
-    percent_of_final_grade: "最终评分的 %{percent}"
     points_possible_number: 满分必须为数字
     positive_number: 您必须使用正数
     redirect_page: 
@@ -1928,7 +2096,6 @@ zh:
         submission: 
           details: 提交作业详细信息
           download_attachment: "下载 %{attachment_display_name}"
-          view_original_entry: 查看原始条目
           view_original_page: 查看原始页面
           view_quiz: 查看测验提交
           view_survey: 查看调查提交
@@ -1953,17 +2120,19 @@ zh:
       advanced_turnitin_settings: "高级 Turnitin 设置"
       descriptions: 
         allowed_extensions: "输入接受的扩展名列表，例如: doc,xls,txt"
+      external_tool_options: 外部工具选项
       label: 
         external_tool_new_tab: 在新选项卡中加载此工具
         external_tool_url: "外部工具 URL"
         turnitin_enabled: "启用 Turnitin 提交"
       labels: 
-        allow_file_uploads: 允许文件上传
-        allow_media_recordings: 允许媒体录音
-        allow_text_entry: 允许文本输入
-        allow_url: "允许网站 URL"
+        allow_file_uploads: 文件上传
+        allow_media_recordings: 媒体录音
+        allow_text_entry: 文本输入
+        allow_url: "网站 URL"
         allowed_extensions: 允许的文件扩展名
         restrict_file_extensions: 限制上传文件类型
+      online_entry_options: 在线输入选项
       submission_type: 提交类型
       submission_types: 
         external_tool: 外部工具
@@ -2081,9 +2250,12 @@ zh:
         wizard: 
           details: "在截止时间和获得所需得分之前，还有许多作业要分配。如果要键入作业说明、允许文件上传、更改评分类型或多项其它设置，请单击作业名称或单击 %{edit_icon} 图标，然后单击\"更多可选功能\"。"
           group: 
+            screenreader_step1: 作业组用于组织作业。可为每个组提供名称。如果选择根据组加权最终评分，则亦可为每个组设置比例分数。单击"添加作业组"创建组。
             step1: 作业小组用于组织作业。可为每个小组提供名称。如果选择根据各项作业所占比率计算总成绩（*位置?*），则亦可为每个小组设置比例分数。单击"添加作业小组"创建小组。
           overview: 此页面用于在高级别设置课程。可以添加作业、组织作业，然后加权这些小组。方法是先组织，然后再研究细节。即使这样，在这里也可以执行许多操作。
           quizzes: 测验是特殊类型的作业。可以单击左侧栏中的"测验"链接来创建或导入测验。
+          screenreader_details: 除了到期日期和分数之外，作业中还有许多其他操作。如果要键入作业说明、允许上传文件、更改评分类型或进行多项其他设置，请单击作业名称或单击编辑图标，然后单击"更多选项"。
+          screenreader_step1: 作业始终要分配到组中，因此要添加作业，必须先知道要将其加入哪个组。选择该组，然后单击"添加作业到"或单击添加图标，开始为组分配新作业。
           step1: "作业始终要分配到小组中，因此要添加作业，必须先知道要将其加入哪个小组。选择该小组，然后单击\"将作业添加至\"或单击 %{add_icon} 图标，开始为小组分配新作业。"
           step2: 很好！现在输入详细信息。可以输入作业的标题、截止时间以及最高得分。如果还要执行其它操作，只有等到作业创建后。
           step3: "完成！作业已添加到小组中！如果将鼠标放在作业上，将会看到许多可选功能。其含义如下:"
@@ -2092,11 +2264,16 @@ zh:
         create_assignment_group: 创建作业小组
         create_or_import_quiz: 创建/导入测验
         edit_assignment_in_detail: 编辑作业详细信息
+        screenreader_show_me_add_assignment: 转至添加作业按钮
+        screenreader_show_me_add_assignment_group: 转至添加作业组按钮
+        screenreader_show_me_weight_final_grade: 转至加权最终评分复选框
         show_me_where: 显示我的位置
       subtitles: 
         edit_assignment_in_detail: （允许上传、编辑说明等）
       titles: 
         wizard_box: "我要:"
+  assignments_api: 
+    invalid_date_time: "%{attribute} 的日期时间无效"
   attachment: 
     default_filename: 文件
     errors: 
@@ -2201,6 +2378,8 @@ zh:
       user_name_description: "让教师/设计者访问该行中课程的用户的用户名。该名称必须符合以上列出的 Blackboard 登录凭证中的用户名之一。"
     only_one_bulk_migration: 一次只能运行一个批量课程迁移。
   button: 
+    go_back: 返回
+    post: 发布评分
     submit_assignment: 提交作业
   buttons: 
     add_item: 添加项目
@@ -2213,12 +2392,13 @@ zh:
     done: 完成
     filter: 过滤
     find_user: 查找用户
-    hide_all_artifacts: 隐藏所有产物
+    ignore_all: 忽略全部
     import: 导入
     login: 登录
     manage_rubrics: 管理评分标准
     masquerade: 仿冒此用户
     ok: 确定
+    okay: 确定
     refresh: 刷新
     save: 保存
     search: 搜索
@@ -2557,6 +2737,7 @@ zh:
     ics_description_group: "小组 %{group_name} 的日历事件"
     ics_description_user: "用户 %{user_name} 的日历事件"
     ics_title: "%{course_or_group_name} 日历 (Canvas)"
+    invalid_date_or_time: "%{attr} 的日期或日期时间无效"
   calendars: 
     assignment_details: 作业详细信息
     calendar: 
@@ -2814,8 +2995,6 @@ zh:
     new: 
       pin_to_canvas_network: "固定到 Canvas 网络"
       saved_successfully: 已成功保存
-  collection_view: 
-    no_items: 没有项目。
   comm_messages: 
     from_beginning: 开始
     to_now: 立即
@@ -2894,10 +3073,6 @@ zh:
     disabled_error: "网络会议尚未为此 Canvas 网站启用"
     edit_conference_form: 
       advanced_settings: 管理高级设置...
-      buttons: 
-        cancel: 取消
-        create_conference: 创建会议
-        update_condference: 更新会议
       conference_type: 类型
       description: 说明
       duration: 持续时间
@@ -2914,8 +3089,6 @@ zh:
       concluded_conferences: 已结束的会议
       new_conference: 新会议
       new_conferences: 新会议
-      no_concluded_conferences: 没有已结束的会议
-      no_new_conferences: 没有新会议
       page_title: 网络会议
     loading_urls_message: 正在加载，请稍候...
     multiple_urls_message: "有多个 %{type} 页面可用于此会议。请选择一个:"
@@ -2930,7 +3103,8 @@ zh:
       setings: 设置
       start: 开始
       view: 查看
-    new_conference_title: 新会议
+    no_concluded_conferences: 没有已结束的会议
+    no_new_conferences: 没有新会议
     no_settings_error: 会议没有高级设置页面
     no_urls_error: "抱歉，看起来好像还没有用于此会议的任何 %{type} 页面。"
     notifications: 
@@ -2949,7 +3123,6 @@ zh:
         new: 尚未开始
         started: "开始于 %{time}"
     type_disabled_error: "此类会议不再为此 Canvas 网站启用"
-    update_conference_title: 更新会议
   content_exports: 
     buttons: 
       process: 处理数据
@@ -2987,6 +3160,7 @@ zh:
       no_only_and_except: 无法同时使用"仅"和"除外"可选功能。
     files: 
       buttons: 
+        cancel: 取消
         skip: 跳过此步骤
       description: "可以将压缩的文件集上传至您的课程，我们将为您全部解压缩。这是一种将文件从其它系统移到 Canvas 的简便方式。"
       page_title: 导入文件
@@ -3038,25 +3212,30 @@ zh:
     upload_timeout_error: 文件上传进程超时。
   content_migrations: 
     angel_exporter: 
+      content: 内容
       options: 可选功能
     bad_migration_type: 无效的迁移类型
     blackboard_export: 
+      content: 内容
       options: 可选功能
     canvas_export: 
+      content: 内容
       options: 可选功能
     common_cartridge: 
+      content: 内容
       options: 可选功能
-    content_checkbox: 
-      select_all: 全选
-      select_non: 空出选择
     content_migration: 内容迁移
     content_migration_issue: 
       error_report: 错误报告
     copy_course: 
+      content: 内容
       options: 可选功能
     course_list_error: "无法检索课程。您是否连接到 Internet？"
     d2_l_export: 
+      content: 内容
       options: 可选功能
+    external_tool_content: 
+      content: 内容
     file_required: 您必须选择一个要从中导入内容的文件
     file_too_large: "您的迁移量不能超过 %{file_size}"
     hide_issues: 隐藏问题
@@ -3071,9 +3250,12 @@ zh:
       import_from_label: 内容类型
       import_migration: 导入
     moodle_zip: 
+      content: 内容
       options: 可选功能
     must_upload_file: "需要上传文件或 url"
     no_content_selected: 您尚未选择任何要导入的内容。
+    no_day_substitutions: 未添加日替换
+    no_migrations_running: 目前没有正在运行的迁移
     progressing_content_migration: 
       issues_text: 问题
       select_content: 选择内容
@@ -3087,7 +3269,9 @@ zh:
       options: 可选功能
     school_required: 您必须选择一个学校。
     select_content: 
+      cancel_btn: 取消
       select_content_btn: 选择内容
+      select_content_label: 选择内容，使用上箭头键和下箭头键在树中导航。按右箭头键展开，按左箭头键隐藏。
     select_course: 选择课程
     show_issues: 显示问题
     subviews: 
@@ -3124,6 +3308,9 @@ zh:
         remove_day_substitution_link: 删除日替换
         remove_day_substitution_link_label: 删除日替换
         to_happen_on: 到
+      external_tool_launch: 
+        course: 课程
+        find_a_course: 查找课程
       folder_picker: 
         default_select_folder: 选择文件夹
         upload_to: 上传至
@@ -3142,7 +3329,9 @@ zh:
         question_bank_title: 新题库名称
         select_question_bank: 选择题库
       select_content_checkbox: 
-        select_migration_label: 选择迁移内容
+        select_all_content: 所有内容
+        select_specific_content: 选择具体内容
+    unsupported_migration_type: 上下文的迁移类型不受支持
     upload_warning: 离开此页将取消上传进程。
     uploading: 正在上传...
     web_ct: 
@@ -3170,8 +3359,6 @@ zh:
     titles: 
       tag_external_web_page: 标记外部网页
   context: 
-    all_marked_read: 收件箱消息全部标记为已读
-    bad_message: 此消息无法显示
     communication: 
       headings: 
         discussions: 讨论
@@ -3188,46 +3375,19 @@ zh:
       last_updated: 最近更新时间
       links: 
         restore: 恢复
-    inbox: 
-      buttons: 
-        mark_all_as_read: 标记所有消息为已读
-      errors: 
-        mark_as_read_failed: 标记失败，请重试
-      inbox: 
-        discussion_replies: 讨论回复
-      status: 
-        marking_all_as_read: 全部标记为已读...
-    inbox_item: 
-      images: 
-        alt: 
-          topic: 主题
-        title: 
-          topic: 
-            read: "讨论消息 – 已读"
-            unread: 讨论消息
-      links: 
-        remove: 删除
-        title: 
-          remove_message: 删除此消息
-      no_title: 无标题
-    inbox_items: 
-      inbox_delete_confirm: 是否确定要从收件箱删除此项目?
-      loading_results: 正在加载其它结果
-      no_messages: 抱歉，没有消息。
     media_object_inline: 
       titles: 
         media_playback: 媒体播放
     media_objects_not_configured: 媒体对象未配置
-    message_deleted: 此消息已删除
-    message_removed: 您要查看的消息已删除
     new_roster_user: 
       completed_enrollment: "完成于 *%{completed_at}*"
       confirm: 
         conclude_student: 是否确定要结束此学生的注册?
         delete_enrollment: 是否确定要删除此学生的注册?
       enrolled_as: "已注册为 %{enrollment_type}"
-      enrollment_change_failed: 注册权限更改失败，请重试
       enrollment_linked_to: "已链接到 %{linked_user}"
+      error: 
+        enrollment_change_failed: 注册权限更改失败，请重试
       labels: 
         user_privileges: 权限
       legends: 
@@ -3335,6 +3495,7 @@ zh:
         user_access_report: "%{user} 访问报告"
       links: 
         back_to_user: 返回用户页面
+      loading_more_results: 正在加载其它结果
       table_headings: 
         content: 内容
         last_viewed_time: 上次查看
@@ -3343,15 +3504,16 @@ zh:
       titles: 
         access_report: 访问报告
     undelete_index: 
+      are_you_sure: "是否确定要恢复 %{item_name}?"
       headings: 
         restore__items: 恢复删除的项目
       help: 
         restore_items: 请注意，有些项目在被删除时可能会丢失其关联的数据。确保您已确认所执行的任何恢复的结果。
+      restore_failed: 恢复失败
+      restoring: 正在恢复...
   context_external_tool: 
-    external_tool_attention_needed: "外部工具 \"%{tool_name}\" 的安全参数需要在\"课程设置\"中设置。"
     url_or_domain_required: "应设置 URL 或域名的一项"
   context_module: 
-    migration_module_item_type: 单元项目
     requirements: 
       max_score: "得分不得超过 %{score}"
       min_score: "得分至少为 %{score}"
@@ -3528,10 +3690,10 @@ zh:
         description: 
           delete: 删除当前单元/项目
           edit: 编辑单元/项目
-          indent: 缩进当前项目
+          indent: 增加缩进
           new: 新单元
           next: 下一个单元/项目
-          outdent: 减少缩进当前项目
+          outdent: 减少缩进
           previous: 上一个单元/项目
       keycode_descriptions: 
         next_module_item: 选择下一个单元或单元项目
@@ -3683,10 +3845,10 @@ zh:
       links: 
         edit_item: 编辑项目详细信息
         edit_item_details_label: 编辑项目详细信息
-        indent: 缩进项目
-        indent_label: 缩进项目
-        outdent: 减少缩进项目
-        outdent_label: 减少缩进项目
+        indent: 增加缩进
+        indent_label: 增加缩进
+        outdent: 减少缩进
+        outdent_label: 减少缩进
         remove_item: 从单元删除此项目
         remove_item_label: 从单元删除此项目
       max_score: 
@@ -3724,10 +3886,10 @@ zh:
       links: 
         edit_item: 编辑
         edit_item_details: 编辑项目详细信息
-        indent: 缩进
-        indent_item: 缩进项目
+        indent: 增加缩进
+        indent_item: 增加缩进
         outdent: 减少缩进
-        outdent_item: 减少缩进项目
+        outdent_item: 减少缩进
         remove_item: 删除
         remove_item_from_module: 从单元删除此项目
       max_score: 
@@ -3787,7 +3949,7 @@ zh:
     no_course: 无课程
     select_course: 选择课程
   conversation_message: 
-    subject: "私人消息 %{timestamp}"
+    subject_specified: "私人消息：%{subject}"
     users_added: 
       one: "%{list_of_users} 已加入 %{current_user} 发起的会话"
       other: "%{list_of_users} 已加入 %{current_user} 发起的会话"
@@ -3882,7 +4044,6 @@ zh:
       inbox_view: 查看
       inbox_views: 
         archived_messages: 已存档
-        discussion_replies: 讨论回复
         inbox: 收件箱
         sent_messages: 已发送
         starred_messages: 已标记
@@ -3920,6 +4081,7 @@ zh:
       forward: 转发
       help: 帮助
       inbox: 收件箱
+      mark_as_read: 标记为已读
       mark_as_unread: 标记为未读
       more_options: 更多可选功能
       reply: 回复
@@ -4186,6 +4348,62 @@ zh:
     wrapper: 
       close_course_menu_title: 关闭
       reset_course_menu: 重置
+  course_logging: 
+    event_type: 
+      concluded: 已结束
+      created: 已创建
+      updated: 已更新
+    field_label: 
+      abstract_course_id: "提取课程 ID"
+      account_id: "帐户 ID"
+      allow_student_discussion_editing: 允许学生讨论编辑
+      allow_student_discussion_topics: 允许学生讨论主题
+      allow_student_forum_attachments: 允许学生论坛附件
+      allow_student_organized_groups: 允许学生组织的小组
+      allow_student_wiki_edits: "允许学生 Wiki 编辑"
+      allow_wiki_comments: "允许 Wiki 注释"
+      conclude_at: 结束于
+      course_code: 课程代码
+      created_at: 创建于
+      default_view: 默认视图
+      default_wiki_editing_roles: "默认 Wiki 编辑角色"
+      enrollment_term_id: "注册学期 ID"
+      grading_standard_id: "计分标准 ID"
+      group_weighting_scheme: 小组加权方案
+      hide_distribution_graphs: 隐藏分布图
+      hide_final_grade: 隐藏最终评分
+      indexed: 已索引
+      integration_id: "集成 ID"
+      is_public: 公共
+      large_roster: 大清单
+      license: 许可证
+      locale: 区域设置
+      lock_all_announcements: 锁定所有通告
+      name: 姓名
+      old_account_id: "旧帐户 ID"
+      open_enrollment: 开启注册
+      public_description: 公开说明
+      public_syllabus: 公开大纲
+      replacement_course_id: "替换课程 ID"
+      restrict_enrollments_to_course_dates: 将注册限制在课程日期范围内
+      root_account_id: "根帐户 ID"
+      self_enrollment: 自我注册
+      self_enrollment_code: 自我注册代码
+      self_enrollment_limit: 自我注册限制
+      show_all_discussion_entries: 显示所有讨论条目
+      show_public_context_messages: 显示公共上下文消息
+      sis_batch_id: "SIS 批次 ID"
+      sis_source_id: "SIS 源 ID"
+      start_at: 开始时间
+      storage_quota: 存储配额
+      syllabus_body: syllabus_body
+      tab_configuration: 标签配置
+      template_course_id: "模板课程 ID"
+      turnitin_comments: "Turnitin 评论"
+      updated_at: 更新时间
+      uuid: UUID
+      wiki_id: "Wiki ID"
+      workflow_state: 工作流状态
   course_restore: 
     restore_error: 尝试恢复课程时出现错误。课程未恢复。
   course_search: 
@@ -4226,7 +4444,7 @@ zh:
     invitation_sent_now: 刚才
     link_students_placeholder: 输入学生姓名
     links: 
-      less_options: 更少可选功能
+      fewer_options: 更少选项
       more_options: 更多可选功能
       publish: "发布评分到 SIS"
       publishing: "正在发布评分到 SIS..."
@@ -4249,23 +4467,6 @@ zh:
     greater_than_three: 请输入具有三个或更多字符的搜索词
     unknown_error: 搜索时出错，请重试。
   courses: 
-    add_users: 
-      buttons: 
-        add_users: 看起来不错，添加这些用户
-        continue: 继续...
-        modify_users: 返回并编辑用户列表
-      cannot_add_users_to_concluded_course: 您不能将用户添加到已结业课程。
-      headings: 
-        add_users: 添加课程用户
-      invite_to_unpublished_course: 由于课程尚未发布，虽然可添加学生和助教，但不会发送参与课程的邀请。邀请将在课程发布时发送。
-      labels: 
-        course_section_id: 班级
-      limit_privileges_to_course_section: 这些管理员只能在其负责的班级中为学生评分
-      links: 
-        add_users: 添加用户
-      teacherless_invite_details: 如果您邀请了教师并且被其接受，您将放弃对此课程的管理权限。
-      titles: 
-        course_section: 课程班级
     assignments_needing_grading: 
       headings: 
         grade: "评分 %{assignment}"
@@ -4305,14 +4506,16 @@ zh:
     copy: 
       buttons: 
         create_course: 创建课程
-      choose_content: 选择要复制的项
       conclude_at: 结束日期
+      content_label: 内容
       course_code: 课程代码
       details: 输入以下详细信息开始创建此课程的副本。
       enrollment_term_id: 学期
       headings: 
         copy_course: "复制 %{course}"
       name: 姓名
+      select_all_content: 所有内容
+      select_specific_content: 选择具体内容
       start_at: 开始日期
       titles: 
         copy_course: 复制课程
@@ -4422,11 +4625,6 @@ zh:
         teacher: "您被邀请作为用户帐户 *%{user}* 的*教师*参与此课程。"
       invitiation: 
         look_around: 随意浏览一下课程。当您准备就绪后，您可以接受或拒绝邀请。
-    enrollment_type_select: 
-      labels: 
-        enrollment_type: 添加更多
-      titles: 
-        enrollment_type: 注册类型
     errors: 
       create_failed: 课程创建失败
       invalid_role: 身份类型无效
@@ -4511,12 +4709,13 @@ zh:
       edit_sections_view: 
         edit_sections_desc: "班级是组织用户的另一种方式。通过它，您可以为多个参加同一门课程的班级授课，这样您就可以将课程内容都保存在同一位置。在下面，您可以将用户移至其它班级，或添加/删除班级的注册。 用户必须始终至少位于一个班级。"
       index: 
-        add_people: 填加人员
         cannot_add_users: 由于该课程已结束，无法添加新用户
         filter_field_description: 在此字段中键入时，人员列表将自动过滤，以便仅包括与您的输入匹配的那些姓名。
         filter_list_of_people: 过滤人员列表
+        people: 人员
         role_to_search: 将搜索限制为身份
         search_people: 搜索人员
+        title_add_people: 添加人员
       invitations_view: 
         accepted_invitation: "%{name} 已收到并接受参与课程的邀请，但您仍可以重新发送邀请（如果需要）。"
         admin_invitation_unaccepted: "%{name} 尚未接受参与课程的邀请。邀请发送时间: %{time}"
@@ -4544,6 +4743,7 @@ zh:
         pending_acceptance_of_invitation: 待处理
       roster_users: 
         canvas_user_id: "Canvas 用户 ID"
+        last_activity: 上次活动
         login_name_or_sis_id: 登录名或学号
         name: 姓名
         no_people_found: 找不到人员
@@ -4691,6 +4891,10 @@ zh:
         assignments: 此视图显示本课程的**作业列表**，即将到来和近期的作业显示在顶部。
         confirm_unenroll: 是否确定要取消注册此课程?您将不再能够看到课程清单或与教师直接沟通，并且在您的通信流和通知中不再看到课程事件。
         custom_page: 您可以**设计自己的课程主页**，在其中包含您喜欢的任何链接、图像或富媒体。
+        modules: |-
+            您可以将课程组织成**单元或章节**，每节包含一组相关的文件、作业和页面等。如果需要，还可以通过定义每个单元解锁之前需要完成的标准和先决条件，来组织序列单元。
+            
+                        - 这种布局可能最适合没有特定时间表（例如学期）的课程。
         recent_activity_dashboard: "**最近活动仪表板**让参加者能看到此课程最近的谈话、公告、讨论和互动。它很类似于用户在第一次登录时看到的仪表板，但只显示此特定课程的内容。"
         syllabus: "**大纲视图**允许您编写有关课程期望的说明或通过链接、图像方式等介绍课程。还显示涵盖所有作业和课程事件的日历视图。"
       draft_state: 
@@ -4810,9 +5014,6 @@ zh:
       invalid_link: 您使用的注册链接可能不再有效。请联系课程教师，确保您仍能正确注册。
   create_users_view: 
     required: 请输入一些电子邮件地址
-  crumb: 
-    conversations: 会话
-    discussion_replies: 讨论回复
   crumbs: 
     access_report: 访问报告
     announcements: 通告
@@ -4826,7 +5027,6 @@ zh:
     eportfolio_welcome: 欢迎使用学习档案
     error_reports: 错误报告
     files: 文件
-    gradebook: 评分册
     grades: 评分
     grading_schemes: 评分方案
     groups: 小组
@@ -4943,13 +5143,13 @@ zh:
       show_more: 显示更多
   date: 
     abbr_day_names: 
-      - 周日
-      - 周一
-      - 周二
-      - 周三
-      - 周四
-      - 周五
-      - 周六
+      - Sun
+      - Mon
+      - Tue
+      - Wed
+      - Thu
+      - Fri
+      - Sat
     abbr_month_names: 
       - ~
       - 一月
@@ -4965,13 +5165,13 @@ zh:
       - 十一月
       - 十二月
     day_names: 
-      - 周日
-      - 周一
-      - 周二
-      - 周三
-      - 周四
-      - 周五
-      - 周六
+      - Sunday
+      - Monday
+      - Tuesday
+      - Wednesday
+      - Thursday
+      - Friday
+      - Saturday
     days: 
       today: 今天
       today_lower: 今天
@@ -5006,6 +5206,10 @@ zh:
       - 十二月
   dates: 
     no_date: 无日期
+  dates_available_component: 
+    available: 可用
+    due: 截止时间
+    multiple_dates: 多个日期
   datetime: 
     distance_in_words: 
       about_x_hours: 
@@ -5053,28 +5257,52 @@ zh:
   default_question_name: 问题
   default_question_text: 问题文本
   demos: 
+    _register: 
+      add_site: 添加站点
+      invalid_email: 电子邮件地址无效
+      personalizing: 正在个性化...
+      ready: 准备好了！
+      registered_successfully: 注册成功！
+      specify_location: 请指定您的地理位置
+      try_again: 重试
+      you_must_agree_to_terms: 您必须同意使用条款
     demos_add: 
       labels: 
         school_name: 学校名称
         username: 电子邮件地址
     register: 
-      add_site: 添加站点
+      africa: 非洲
       agree_to_terms: 您同意*使用条款*并承认**隐私政策**。
+      asia_and_middle_east: 亚洲和中东地区
+      assistant_superintendent: 助理主管
+      australia_new_zealand_and_oceania: 澳大利亚、新西兰和大洋洲
       begin_trial: 开始试用
-      choose: 选择
+      bus_finance_purchasing_director: 巴士/财务/采购主管
+      c_level: "C 级"
+      choose: 选择一项
       cio: CIO
       corporate: 公司
       dean: 主任
       director: 主管
+      e_rate_administrator: 电子评级管理员
+      employee: 员工
+      europe_other: "欧洲 - 其他"
+      europe_uk: "欧洲 - 英国"
+      executive_officer: 执行官
+      government: 政府
+      gs_11_15: "GS 11-15"
+      gs_1_7: "GS 1-7"
+      gs_8_10: "GS 8-10"
       higher_education: 高等教育
+      higher_education_for_profit: 盈利性高等教育
       incorrect: 回答错误。请重试。
       instructional_designer: 说明设计者
-      invalid_email: 无效的电子邮件地址
+      instructional_media_svcs_dir: 说明媒体服务主管
       k12: K12
+      k12_for_profit: "盈利性 K12"
       labels: 
-        current_lms: "当前 LMS"
+        location: 位置
         name: 姓名
-        organization_size: 组织规模
         organization_type: 组织类型
         phone: 电话号码
         school_name: 学校/组织
@@ -5082,29 +5310,29 @@ zh:
         type_what_you_hear: 键入您听到的内容
         type_what_you_see: 键入您看到的内容
         username: 电子邮件
-      lms_admin: "LMS 管理者"
-      no_lms: 无
+      library_media_specialist: 图书馆/媒体专家
+      lms_administrator: "LMS 管理员"
+      manager: 经理
+      network_system_administrator: 网络系统管理员
       one: 其它
       other: 其它
-      other_lms: 其它
-      other_title: 其它
       personalize_demo: 个性化您的演示
-      personalizing: 正在个性化...
-      proprietary_lms: 本土/专有
+      principal: 校长
       provost: 教务长
-      ready: 准备好了！
-      school_admin: 学校管理者
+      school_administrator: 学校管理员
+      school_technology_coordinator: 学校技术协调员
       sign_up_to_canvas: "注册试用 Canvas"
-      specify_lms: "请指定您当前的 LMS 或选择“无”"
-      specify_size: 请指定您组织的规模
+      south_america_central_america_and_caribbean: 南美、中美和加勒比海地区
       student: 学生
       subscribe: "我要从 Instructure 接收新闻、提示和信息"
+      superintendent: 主管
       support: 支持
-      teacher: 教师/导师
+      teacher_instructor: 教师/导师
       technologist: 技术员
-      try_again: 重试
-      vice_president: VP
-      you_must_agree_to_terms: 您必须同意使用条款
+      technology_computer_coord: 技术/计算机协调员
+      technology_education_director: 技术培训主管
+      united_states_and_canada: 美国和加拿大
+      vp: VP
   developer_key: 
     api_key: "密钥: *%{api_key}*"
     created: "创建时间:"
@@ -5137,6 +5365,10 @@ zh:
     cancel: 取消
     save_settings: 保存设置
     saving: 正在保存...
+  differentiated_assignments_description: |-
+      差异化作业是一项*测试版*功能，允许选择某个作业应用于哪些班级。
+      没有分配某个作业的班级将不会在其课程内容中看到此作业，其最终计分将
+      在不使用那些分数的情况下计算出来。
   discussion_entries: 
     created_entry_notice: 条目已成功创建。
     deleted_entry_notice: 该条目已删除
@@ -5177,10 +5409,11 @@ zh:
     discussion: 
       close_for_comments: 关闭评论
       delete: 删除
-      due_at: "*截止时间* %{assignment.display_due_at}"
-      graded_discussion: 计分的讨论
+      due: 截止时间
+      graded_discussion: 评分的讨论：
       last_post_date: "最新回复发布于 %{display_last_reply_at}"
       manage: 管理
+      move: 移动到...
       no_due_date: 无截止时间
       open_to_comments: 开放评论
       pin: 固定
@@ -5190,8 +5423,8 @@ zh:
     discussion_feed_title: "%{title} 讨论馈送"
     discussion_list: 
       no_pinned_discussions: 您目前没有固定讨论题目
-      pinned_instructions: 将讨论拖到此处，将其固定至学生讨论页面的顶部
-      there_are_no_discussions_show: 没有可显示的讨论。
+      pinned_instructions: 要将讨论固定至页面顶部，请将其拖到此处，或者从讨论设置菜单中选择“固定”。
+      there_are_no_discussions_show: 此章节中没有可显示的讨论。
     discussions_settings_view: 
       allow_student_discussion_editing: 编辑和删除自己的帖子
       allow_student_topics: 创建讨论主题
@@ -5208,6 +5441,9 @@ zh:
       allow_threaded_replies: 允许将回复信息按话题组织
       attachment: 附件
       available_from: 开始时间
+      buttons: 
+        not_published: 未发布
+        published: 已发布
       delay_posting: 延迟发布
       enable_podcast_feed: 启用播客动态消息
       include_replies_in_podcast_feed: 在播客动态消息中包括回复
@@ -5261,13 +5497,13 @@ zh:
       your_search_did_not_match_any_discussion_topics: 没有符合您搜索条件的讨论主题。
     new_and_total_badge: 
       reply_count_tooltip: 
-        one: "1 个回复"
-        other: "%{count} 个回复"
-        zero: 无回复
+        one: "1 个答复。"
+        other: "%{count} 个答复。"
+        zero: 无答复。
       unread_count_tooltip: 
-        one: "%{count} 条未读的回复"
-        other: "%{count} 条未读的回复"
-        zero: 无未读回复
+        one: "%{count} 个未读答复。"
+        other: "%{count} 个未读答复。"
+        zero: 无未读答复。
     page_nav: 
       Page: 页
       current_page: 当前
@@ -5275,15 +5511,15 @@ zh:
       last_page: 最后一个
     points_possible_number: 满分必须为数字
     reply_count_tooltip: 
-      one: "1 个回复"
-      other: "%{count} 个回复"
-      zero: 无回复
+      one: "1 个答复。"
+      other: "%{count} 个答复。"
+      zero: 无答复。
     show: 
       add_rubric: 添加评分标准说明
       announcement_closed: 此通告已关闭评论
       announcement_locked: "此通告将对用户不可见，直至 *%{date}*"
+      announcement_locked_until: "此通告锁定至 %{time}"
       announcement_not_visible: 此通告对用户不可见
-      announcement_will_open_on: "此通告将于 *%{date}* 开放评论"
       authors_name: 作者姓名
       collapse_replies: 隐藏回复
       confirm_delete_discussion: 是否确定要删除这个讨论?
@@ -5315,13 +5551,13 @@ zh:
       show_rubric: 显示评分标准说明
       speed_grader: 快速评分器
       topic: 主题
+      topic_locked_until: "此主题锁定至 %{time}"
       topic_not_visible: 此主题对用户不可见
       topic_podcast_feed_link: 主题播客动态消息
       topic_subscribe: 订阅
       topic_subscribe_tooltip: 您已取消订阅，将不再收到新评论的通知
       topic_subscribed_tooltip: 您已订阅，将收到新评论的通知
       topic_unsubscribe: 已订阅
-      topic_will_open_on: "此主题将于 *%{date}* 开放评论"
       unlock_topic: 开放评论
       unread: 未读
     sub_entry: 
@@ -5335,9 +5571,9 @@ zh:
       topic_podcast_feed: 主题播客动态消息
     topic_deleted_notice: "成功删除 %{topic_title}"
     unread_count_tooltip: 
-      one: "1 条未读的回复"
-      other: "%{count} 个未读回复"
-      zero: 无未读回复
+      one: "1 个未读答复。"
+      other: "%{count} 个未读答复。"
+      zero: 无未读答复。
     user_settings_view: 
       manually_mark_as_read: 将帖子手动标记为已读
       my_settings: 我的设置
@@ -5367,7 +5603,6 @@ zh:
       show_more: 显示更多
     hide_due_dates: 隐藏截止时间
     initial_post_required_to_subscribe: 您必须在订阅前发布回复
-    lock: 锁定
     mark_as_read: 标记为已读
     mark_as_unread: 标记为未读
     no_content: 无内容
@@ -5380,7 +5615,6 @@ zh:
     ordered_by_recent_activity: 按最近活动排序
     participant: 
       anonymous_user: 匿名
-    pin: 固定
     pinned_discussions: 固定讨论题目
     reply: 
       error_saving_reply: "*发生错误*，请稍后再填写回复。"
@@ -5391,7 +5625,6 @@ zh:
       attach_file: 附件
       cancel: 取消
       post_reply: 帖子回复
-      switch_views: 切换视图
       write_a_reply: 回复
     results_entry: 
       authors_name: 作者姓名
@@ -5404,21 +5637,22 @@ zh:
     subscribe: 订阅此主题
     subscribed: 已订阅
     subscribed_hint: 您已订阅此主题。单击可取消订阅。
-    toggle_message: 切换讨论可见性
+    toggle_message: 切换章节可见性
     uknown_author: 未知作者
     unknown: 未知
     unknown_author: 未知作者
-    unlock: 解锁
-    unpin: 取消固定
     unsubscribe: 取消订阅此主题
     unsubscribed: 取消订阅
     unsubscribed_hint: 您未订阅此主题。单击可订阅。
+  draft_state: 
+    cant_unpublish_when_students_submit: 如有学生提交文件，则无法取消发布
+    publish: 发布
+    unpublish: 取消发布
   draft_state_description: |-
-      草稿状态是一项测试版功能，它允许发布和取消发布课程内容。
-      未发布的内容对学生来说是不可见的，不影响计分。
-      它还包括某些课程区域的重新设计，使其在外观和功能上更加一致。 
-      
-      如果禁用草稿状态，则未发布的内容不可用。
+      此测试版功能重新设计了 Canvas 的许多部分，
+      内容可以在学生不可见的的新的未发布状态下
+      存在并且不包括在评分计算中。注意: 禁用此功能
+      可能会在教师视图中删除新创建的或编辑的内容。
   due_dates: 
     due_at: "截止时间: %{assignment_due_date_time}"
     multiple_due_dates: "截止时间: 多个截止时间"
@@ -5458,16 +5692,19 @@ zh:
     image_not_found: "未找到图像，请尝试新的 URL"
     instructions: "粘贴或键入您想嵌入的图像的 URL:"
     loading: 正在加载...
+    mathjax_text_entry_field_label: "以 LaTeX 格式输入等式。"
     more_external_tools: 更多外部工具
     role: 
       duplicate_role_error: 无法创建此身份，因为具有此姓名的身份已存在。请尝试使用其它姓名
       remove_role_confirmation: 如果有任何用户具有此身份，他们将保留当前的权限，但您无法创建具有该身份的新用户。单击“确定”继续删除此身份。
     save_failed: 保存失败，请稍后重试
     saving: 正在保存...
+    screen_reader_tip: "屏幕阅读器用户: 最便于访问此编辑器的使用方式是，切换到高级试图，然后直接输入 LaTeX 或使用工具栏帮助您完成输入。用于切换到高级视图的链接可在此对话框快结束时找到，紧邻编辑字段前。"
     search_flickr: "搜索 flickr 知识共享"
+    switch_editor_html: "HTML 编辑器"
+    switch_editor_visual: 可视编辑器
     switch_to_mathjax: 切换到基本视图
     switch_to_mathquill: 切换到高级视图
-    switch_views: 切换视图
     tabs: 
       arrows: 箭头
       basic: 基本
@@ -5487,7 +5724,7 @@ zh:
     titles: 
       font_size: 字体大小，按下即可选择
       formatting: 格式，按下即可选择
-      rte_help: "富文本区域，按 ALT F10 显示工具栏。按 ALT 0 显示帮助。"
+      rte_help: "富文本区域。按 ALT F10 显示工具栏。按 ALT F8 显示帮助。"
   email: 
     default_from_name: "Instructure Canvas"
   enrollment: 
@@ -5689,7 +5926,6 @@ zh:
         portfolio: 进入学习档案
         rich_content: 富文本内容
         share: 复制并分享此链接，以便他人可访问您的私人学习档案。
-        switch_views: 切换视图
         view_original: 查看原始文件
         wizard: 入门向导
       login_required: 必须*登录*后才能在此页发表评论。
@@ -5803,6 +6039,7 @@ zh:
     registration_incomplete: 您需要确认您的电子邮件地址，然后才能查看此页面
     required: 必需
     sis_id_in_use: "学号 \"%{sis_id}\" 已在使用中"
+    unsaved_changes: 您有未保存的更改。
   external_content: 
     cancel: 
       canceling: 正在取消...
@@ -5916,6 +6153,7 @@ zh:
       search_filter: 按姓名过滤
       view_app_center: "查看 App Center"
       view_installed_tools: 查看应用程序配置
+    migration_selection_configured: 迁移选择已配置
     missing_stars: 您必须选择一个星级等级
     rate_tool_view: 
       rate_tool: 您如何对此工具评分？
@@ -5996,8 +6234,23 @@ zh:
       feature_options: 功能选项
       no_features_available: 当前没有可用的功能。
   features: 
+    differentiated_assignments: 差异化作业
     draft_state: 草稿状态
+    draft_state_account_disable_warning: |-
+        关闭此功能将影响现有的课程。有关禁用此功能的帮助，请联系
+        您的 Canvas Success 经理。
+    draft_state_course_disable_warning: |-
+        关闭此功能将发布课程中所有现有对象。请在继续之前确保
+        所有草稿内容可以发布，并且对课程中的所有用户可用。
     google_docs_domain_restriction: "Google Docs 域限制"
+    high_contrast: 使用高对比度样式
+    individual_gradebook: 个人评分册视图
+    learning_mastery_gradebook: 学习掌握程度评分册
+    new_styles: 使用新样式
+    post_grades: "发布评分到 SIS"
+    student_outcome_gradebook: 学生成果评分册
+  file_browser_view: 
+    folder_tree_instructions: 使用向上箭头键和向下箭头键在树中导航。按右箭头键展开文件夹，按左箭头键隐藏文件夹，进入可选择图像。
   filebrowserview: 
     course_files: 课程文件
     group_files: 小组文件
@@ -6076,6 +6329,7 @@ zh:
         download_as_zip: 将此文件夹中的文件下载为压缩文件
         download_file: 下载此文件
         download_with_size: "下载文件 (%{size})"
+        download_zip: "单击此处下载 %{size}"
         edit_content: 编辑内容
         import_zip: 导入压缩文件
         lock_file: 锁定此文件
@@ -6090,16 +6344,21 @@ zh:
       locked: 此文件尚未解锁，因此无法下载
       locked2: 此文件被锁定，学生无法下载。
       messages: 
+        creating_zip: "正在创建 zip 文件..."
         gathering_and_zipping: |-
             **此文件夹的内容正被收集**并压缩
             为 zip 文件。这可能需要一些时间，具体取决于文件的大小和数量。
+        gathering_data: 正在收集数据...
         gathering_files: 正在收集文件...
+        gathering_files_with_progress: "正在收集文件 (%{progress}%)..."
         no_preview_avaialble: 无可用预览
         uploading: "正在上传 5 个文件..."
+        zip_finished: 已完成！正在重定向至文件...
       page_title: 文件
       storage_used: "已用存储:%{size1} ³¬³ö %{size2}"
       switch_views: 切换视图
       titles: 
+        download_folder_contents: 下载文件夹内容
         edit_file: "编辑 %{file}"
         edit_file_contents: 编辑文件内容
         file_locked: 已锁定
@@ -6110,10 +6369,8 @@ zh:
         too_many: "有太多课程/课程组同时显示。以下是前 15 个结果。"
     links: 
       add_files: 添加文件
-      download_zip: "单击此处下载 %{size}"
     messages: 
       access_denied: 您无法阅读此文件夹的内容。
-      creating_zip: "正在创建 zip 文件..."
       done_uploading: 完成上传
       error_count: 
         one: "%{count} 个错误"
@@ -6121,8 +6378,6 @@ zh:
       extraction_complete: 提取完成！正在更新文件结构...
       finalizing: 完成
       folder_empty: 此文件夹中没有内容
-      gathering_data: 正在收集数据...
-      gathering_files_with_progress: "正在收集文件 (%{progress}%)..."
       loading_files: 正在加载文件...
       no_files_selected: 未选择有效的文件
       queued: 已排队
@@ -6132,7 +6387,6 @@ zh:
       uploading_files: 
         one: "正在上传 %{count} 个文件..."
         other: "正在上传 %{count} 个文件..."
-      zip_finished: 已完成！正在重定向至文件...
     new: 
       buttons: 
         create: 创建
@@ -6154,7 +6408,6 @@ zh:
       page_title: 文件预览
     titles: 
       click_and_drag: 单击并拖动可将文件夹移动到其它文件夹
-      download_folder_contents: 下载文件夹内容
       drag_to_move: 拖动以移动到其它文件夹
       extracting: 正在提取文件到文件夹
       file_uplaods_queue: 文件上传队列
@@ -6204,6 +6457,10 @@ zh:
       仅限于单个域。尝试在未经批准的域上提交作业或
       加入协作的学生将收到一条错误消息，告知他们
       需要更新其 Google Docs 集成。
+  grade_display_warning_dialog: 
+    grade_display_warning: 
+      checkbox: 不要再显示此课程。
+      warning: 警告
   gradebook: 
     alerts: 
       no_active_students: 对不起，课程中没有活动学生或可评分的学生。
@@ -6246,11 +6503,11 @@ zh:
       none_to_update: 无更新
       select_an_option: 请选择选项
       upload_as_zip: "请以 .zip 形式上传文件"
-    grade: "评分: %{grade}"
     graded_by_me: "我计分的时间 %{graded_time}"
     graded_then_resubmitted: "计分后重新提交的时间 (%{when})"
     gradee_index_of_total: "%{gradee} %{x} / %{y}"
     group: 小组
+    hide_all_details_button: 隐藏所有详细信息
     hide_all_things: "隐藏所有 %{things}"
     hide_column: 隐藏列
     hide_student_name: 隐藏学生姓名
@@ -6265,7 +6522,6 @@ zh:
       submission_details: 提交详细信息
       view_quiz: 查看此测验
       view_submission: 查看提交
-    loud_late: 延迟
     message_students_who: 给相关学生发送信息
     mute_assignment: 屏蔽作业
     new_assessment: "[新测验]"
@@ -6277,6 +6533,7 @@ zh:
     reupload_submissions: 重新上传提交文件
     set_default_grade: 设置默认评分
     set_group_weights: 设置组权重
+    show_all_details_button: 显示所有详细信息
     show_student_name: 显示学生姓名
     showing_all_sections: 正在显示所有班级
     showing_section: "正在显示班级: %{section}"
@@ -6334,12 +6591,20 @@ zh:
       this_assignment_is_muted: 作业已屏蔽
       zero_point_assignment: 此小组中的作业没有可能的得分，不能包括在评分计算中
     concluded_course_error_message: 这是个结业的课程，因此只提供结业登记。
+    course_average: 课程平均分数
+    course_median: 课程中值分数
+    course_mode: 课程模式
     dropped_for_grading: 因评分目的删去
     error: 
       update: 更新此作业时出错。请刷新页面，然后重试。
     errors: 
       none_to_update: 无更新
       upload_as_zip: "请以 .zip 形式上传文件"
+    grade_display_warning: 
+      cancel: 取消
+      continue: 继续
+      percent_text: 学生还将以百分比形式看到其最终评分。是否确定要继续？
+      points_text: 学生还将以分数形式看到其最终评分。是否确定要继续？
     gradebook_header_menu: 
       assignment_details: 作业详细信息
       curve_grades: 曲线评分
@@ -6348,6 +6613,11 @@ zh:
       re_upload_submissions: 重新上传提交文件
       set_default_grade: 设置默认评分
       speedgrader: 快速评分器
+    header_filter: 
+      course_average: 课程平均分数
+      course_median: 课程中值分数
+      course_mode: 课程模式
+    hide_notes: 隐藏备注栏
     hide_student_names: 隐藏学生姓名
     invalid_assignment_groups_warning: 
       one: "分数不包括 %{groups}，因为没有最高得分"
@@ -6357,39 +6627,37 @@ zh:
     keyboard_comment_desc: 对活动作业的评论
     keyboard_menu_desc: 打开活动列的作业
     keyboard_sort_desc: 对当前活动列上的网格排序
+    keyboard_tooltip_desc: 显示当前提交项的提交项类型
     keycodes: 
       close_menu: esc
       comment: c
       goto_assignment: g
       menu: m
       sort: s
+      tooltip: t
+    learning_outcome: 学习成果
+    mastery: 掌握
+    near_mastery: 接近掌握
     no_assignments_have_points_warning: 无法计算得分，直到作业有最高得分
+    notes: 备注
+    outcome_gradebook: 
+      export_report: 导出报告
+      toggle_sidebar: 切换侧栏
+    outcome_popover: 
+      mastery_set_at: 掌握程度设置为
+      no_results: (无结果)
+      view_more_details: 查看更多详细信息
     percent_of_grade: "%{percentage} 的评分 "
     points_out_of: "满分 %{points_possible} 分"
+    remedial: 补课
     resubmitted: 自上次计分后已重新提交
     row_student_name: 
       student_placeholder: 学生
-    screenreader: 
-      page_titles: 屏幕阅读器评分册
     secondary_id: 第二类身份证明
     section_to_show_menu: 
       choose_a_section_to_show: 选择要显示的班级
-    show: 
-      all_sections: 所有班级
-      arrange_columns_by_due_date: 按截止时间排列列
-      arrange_columns_by_group: 按作业小组排列列
-      download_scores: "下载分数 (.csv)"
-      filter_by_student: 以学生姓名或第二类身份证明筛选
-      go_back_to_the_old_gradebook: 返回到旧评分册
-      hide_student_names: 隐藏学生姓名
-      include_ungraded: 包括未计分的作业
-      publish_to_sis: "发布评分到 SIS"
-      set_group_weights: 设置组权重
-      show_attendance_columns: 显示参与列
-      show_concluded_enrollments: 显示结业登记
-      showing_sections: "正在显示：*%{section_being_shown}*"
-      upload_scores: "上传分数（从 .csv）"
-      view_grading_history: 查看评分记录
+      showing_sections: "显示 *%{currentSection}*"
+    show_notes: 显示备注栏
     show_student_names: 显示学生姓名
     student_name: 学生姓名
     students_who: 
@@ -6409,6 +6677,7 @@ zh:
     titles: 
       discussion: 讨论提交
       media: 媒体评论提交
+      media_recording: 媒体录音提交项
       quiz_review: 此测验需要审阅
       text: 文本条目提交
       upload: 文件上传提交
@@ -6474,6 +6743,7 @@ zh:
     leaving_id_will_match_better_can_add_new_assignment: "保持 ID 不变（此例中位 \"(581)\" 部分）将有助于更好地匹配。还可以添加动态创建的新作业。"
     new_assignment_example: 新作业
     optional_ignored: 可选，已忽略。
+    screenreader_csv_explainer: "我的 CSV 文件中应当有哪些列？您的上传内容中应当有以下列：“学生”、“ID”和“现有作业 (#)”。“学生”列应有每个学生的姓名，格式为“姓氏, 名字”。例如，“Smith, John”。“现有作业”列应为作业名称后加上以括号括起的作业 ID。例如，“Chapter One Worksheet (201)”。如果您使用 SIS，请包括以下各列：“SIS 用户 ID”和“SIS 登录 ID”。如果您希望创建一项新作业，请包括一个标题为作业名称的列。例如，“Derivatives Worksheet”。以下各列是可选的：“章节”、“当前分数”和“最终分数”。"
     titles: 
       upload_form: "选择要上传的 CSV 文件"
     what_should_csv_look_like: "CSV 文件应该是什么样子?"
@@ -6528,6 +6798,7 @@ zh:
       muted: 已屏蔽
     grade_summary: 
       assessment_by: "评估者 %{name}"
+      assignments: 作业
       buttons: 
         show_what_if: "显示已保存的 \"假设\" 分数"
       change_score_instructions: 单击任何分数并输入新值以查看该更改对总分的影响。
@@ -6564,6 +6835,7 @@ zh:
         only_graded: 只根据已计分的作业计算
         total: 总计
         your_score: 您的分数
+      learning_outcomes: 学习的掌握程度
       links: 
         click_to_view: 单击此处查看
         download: "下载 %{attachment}"
@@ -6572,7 +6844,6 @@ zh:
       media_comment: 这是一个媒体评论，
       not_official: "*注*:这不是您的正式分数。"
       page_title: "%{student} 的评分"
-      percent: 百分比
       print_grades: 打印评分
       see_rubric_results: 查看评分标准结果
       see_rubric_results_screenreader: 查看评分标准结果
@@ -6583,10 +6854,12 @@ zh:
       student_mute_notification: 教师正在进行评分
       submission_score: "*%{score}*满分 %{possible} 分"
       titles: 
+        enter_score: 输入测试分数
         revert_score: 恢复到原始分数
         turnitin_score: "Turnitin 相似分数 – 更多信息"
         view_rubric_evaluation: 查看评分标准评估
         view_scoring_details: 查看评分详细信息
+      total: 总计
     gradebook: 
       all_sections: 全部
       assignment_submitted_late: （延迟）
@@ -6624,7 +6897,7 @@ zh:
         send_comment: 发送评论到学生
         sort_columns: 排序评分册列
         sort_rows: 排序评分册行
-        total_submitted: 提交总数
+        total_grade_subs: 已评分的提交项总数
       links: 
         add_assignments: 向课程添加作业
         add_students: 向课程添加学生
@@ -6661,6 +6934,24 @@ zh:
       upload_info: 如果您对此前下载的学生提交文件作出了更改，只需压缩其备份并使用以下表单上传该压缩文件。学生将在其提交评论中看到修改的文件。
       upload_warning: 确保不要更改提交文件的名称，以便我们组织。
       weight_final: 根据小组加权最终评分
+    gradebook2: 
+      arrange_columns_by_due_date: 按截止时间排列列
+      arrange_columns_by_group: 按作业小组排列列
+      download_scores: "下载分数 (.csv)"
+      filter_by_student: 按学生姓名或第二类身份证筛选
+      grades: 评分
+      hide_student_names: 隐藏学生姓名
+      include_ungraded: "将未评分的作业当作 0"
+      learning_mastery: 学习掌握程度
+      old_gradebook: 旧评分册
+      post_grades: 发布评分
+      publish_to_sis: "发布评分到 SIS"
+      set_group_weights: 设置组权重
+      show_attendance_columns: 显示参与列
+      show_concluded_enrollments: 显示结业登记
+      srgb_gradebook: 切换评分册
+      upload_scores: "上传分数（从 .csv）"
+      view_grading_history: 查看评分历史记录
     grades: 
       complete: 完成
       incomplete: 未完成
@@ -6693,6 +6984,8 @@ zh:
         other: "为 %{count} 项提交创建的文件和评论"
     out_of_final: "最终的 %{weight}"
     out_of_points_possible: "满分 %{points_possible} 分"
+    screenreader: 
+      page_titles: 屏幕阅读器评分册
     show: 
       keycode_descriptions: 
         edit_cell: 编辑单元格
@@ -6756,8 +7049,6 @@ zh:
         show_assessment_by: 显示测验依据
         showing: 正在显示
         sort_by: 排序学生列表
-        submission_to_view: 要查看的提交文件
-        submitted: 已提交
       late_notice: "注:此提交延迟。"
       links: 
         click_to_view: 单击此处查看
@@ -6783,7 +7074,6 @@ zh:
       titles: 
         download_file: 下载此文件
         not_newest: 使用上述下拉菜单更改要查看的提交文件
-        on_time: 准时提交
         preview_file: 预览此文件
         speedgrader_options: 快速评分器可选功能
       tooltips: 
@@ -6843,6 +7133,13 @@ zh:
       total: 总计
   grading_box: 
     out_of_points_possible: "满分 %{assignment.points_possible} 分"
+  grading_cell: 
+    grade_complete: 完成
+    grade_incomplete: 未完成
+    grade_ungraded: 未评分
+    out_of: "(满分 %{points} 分)"
+    out_of_nil: 无最高分
+    out_of_with_score: "(%{score} 分，满分 %{points} 分)"
   grading_standard: 
     unknown_grading_details: 未知详细信息
   grading_standards: 
@@ -6870,7 +7167,6 @@ zh:
     titles: 
       grading_scheme_info: 查看/编辑评分方案
   group: 
-    default_collection_name: "%{group_name} 集合"
     memeber: 成员
     name_required: 需要名称
     name_too_long: 输入一个更短的小组名称
@@ -6892,12 +7188,14 @@ zh:
       communities: 社区
       imported: 已导入小组
       student_organized: 学习小组
+      uncategorized: 未分类
     invalid_self_signup: "自行注册需要是以下值之一：%{values}"
     name_required: 需要姓名
     name_reserved: "%{name} 是预留的姓名。"
     name_too_long: 输入更短的类别名称
     name_unavailable: "%{name} 已在使用。"
     self_signup_for_courses: 自行注册只对课程组或社区启用
+  group_category_locked: 无法更改组类别，因为学生已经提交了此项作业的家作。
   group_membership: 
     errors: 
       group_full: 该小组已满。
@@ -7107,7 +7405,7 @@ zh:
         save: 保存
         saving: 正在保存...
         self_signup: 自行注册
-        split_into_groups: "将学生分为 %h{split_num} 相等的学习小组"
+        split_into_groups: "将学生分为 %h{num_groups} 个相等的组"
       group_category_detail: 
         add_group: 添加小组
         category_settings: 设置
@@ -7121,6 +7419,7 @@ zh:
         self_organized_warning: 这些小组是学生自发组织的。与其他类型的小组不同，在这些小组中，学生可以同时属于多个小组，因此，这些小组不能用于评分作业。
         self_signup_blurb: 对这些小组启用自行注册。
         settings: 设置
+        uncategorized_groups: "这些组没有关联到任何特定学习小组集。因为它们是通过 SIS 导入的，只能通过 SIS 更新或删除。"
       group_category_edit: 
         allow_self_signup: 允许自行注册
         cancel: 取消
@@ -7155,10 +7454,12 @@ zh:
         remove: 删除
         remove_from_group: "从小组中删除 %{name}"
       group_users: 
+        add_student: 添加学生以开始。
+        add_user: 添加用户以开始。
         no_matching_students: 无匹配学生。
         no_matching_users: 无匹配用户。
-        no_students: 此小组中目前没有学生。请添加学生以开始。
-        no_users: 此小组中目前没有用户。请添加用户以开始。
+        no_students: 目前此学习小组中没有学生。
+        no_users: 目前此学习小组中没有用户。
       groups: 
         no_groups: 此小组集目前无小组。请添加小组以开始。
         no_matching_groups: 没有匹配您当前的搜索术语的小组。
@@ -7190,9 +7491,10 @@ zh:
       students_assigned: 已分配到学习小组的学生。
       update_success: 小组已成功更新。
       welcome: "欢迎加入小组 %{group_name}！"
+    positive_group_count: 必须输入正的学习小组数
     randomly_assigning_members: 随机分配学生
     show: 
-      coming_up: 加油
+      coming_up: 即将到来
       group_atom_feed: "小组 Atom 馈送"
       new_announcement: 新通告
       next_week: 下周
@@ -7257,6 +7559,9 @@ zh:
       x_new_in_discussions: 
         one: "*%{count}* 个讨论"
         other: "*%{count}* 个讨论"
+  high_contrast_description: |-
+      如果您更喜欢对比度较高版本的 Canvas 用户界面，请启用此项。
+      这对于视力受损或阅读困难的人非常有用。
   ic_actions: 
     manage: 管理
   images: 
@@ -7266,6 +7571,29 @@ zh:
     invalid_file_size: "图像文件大小太大 (最大为 %{max} 字节，当前为 %{actual})"
     invalid_file_type: "文件类型 %{type} 无效。允许的类型包括: %{type_list}"
     not_an_image: 所选文件不是图像
+  importers/assignment_importer: 
+    errors: 
+      import: 
+        external_tool_url: "外部工具作业 \"%{assignment_name}\" 的 URL 无效。"
+    imported_assignments_group: 导入的作业
+  importers/context_external_tool_importer: 
+    external_tool_attention_needed: "外部工具 \"%{tool_name}\" 的安全参数需要在\"课程设置\"中设置。"
+  importers/context_module_importer: 
+    migration_module_item_type: 单元项目
+  importers/course_content_importer: 
+    failed_import_media_objects: 导入媒体对象失败
+  importers/learning_outcome_group_importer: 
+    no_global_permission: "您不可以管理全局成果，无法添加“%{title}”"
+  importers/learning_outcome_importer: 
+    no_context_found: "无法找到“%{title}”的外部学习成果，创建一个副本。"
+    no_global_permission: "您不可以管理全局成果，无法添加“%{title}”"
+  importers/rubric_importer: 
+    no_context_found: "无法找到“%{title}”的外部评分标准说明，创建一个副本。"
+  importers/wiki_page_importer: 
+    title_for_topics_category: "%{category} 主题"
+    warnings: 
+      truncated_wiki_title: "以下维基页面的标题被截断：%{title}"
+  individual_gradebook_description: 个人评分册视图提供了一个旨在方便访问的评分册视图。
   info: 
     notices: 
       error_reported: 感谢您的帮助！我们马上解决。
@@ -7314,6 +7642,7 @@ zh:
       view_equella_content_in_new_window: 在新窗口中查看内容
     loading: 正在加载...
     no_description: 无说明
+    no_items: 没有项目。
     no_results_found: 未找到结果
     status: 
       diigo_search_throttling: "Diigo 限制用户每十秒搜索一次。请稍候..."
@@ -7384,6 +7713,7 @@ zh:
         locked_by: 锁定者
         max_attempts: 最多已尝试次数
         num_attempts: 已尝试次数
+        original_id: "原始 ID"
         priority: 优先级
         run_at: 运行时间
         strand: 股
@@ -7440,13 +7770,14 @@ zh:
       view_all_groups: 查看所有小组
     mobile_auth: 
       log_in_to_canvas: "登录到 Canvas"
+  learning_mastery_gradebook_description: |-
+      学习掌握程度评分册为教师提供了一种快速查看有关
+      课程学习结果的学生进度和课程进度的方法。
+      结果是以类似评分册的格式显示的，学生进度显示为
+      数字分数和已掌握/接近掌握/补课。
   learning_outcome: 
     no_comment: 无评论
-    no_context_found: "无法找到“%{title}”的外部学习成果，创建一个副本。"
     no_description: 无说明
-    no_global_permission: "您不可以管理全局成果，无法添加“%{title}”"
-  learning_outcome_group: 
-    no_global_permission: "您不可以管理全局成果，无法添加“%{title}”"
   lib: 
     angel: 
       failed_import_link: 导入链接失败
@@ -7543,12 +7874,11 @@ zh:
       feedback: 单击此处告诉我们发生了什么
     help: 帮助
     show_me_where: 显示我的位置
-    switch_views: 切换视图
   locales: 
     en: 英语
     zh: 中文
   logged_out_user: "注销的用户 %{user_counter}"
-  m2c_file_description: "Moodle 1.9 .zip 文件"
+  m2c_file_description: "Moodle 1.9/2.x"
   m2c_name: "Moodle 导入程序"
   manage_avatars: 
     errors: 
@@ -7583,6 +7913,8 @@ zh:
       save_failed: 保存似乎失败。请关闭此弹出窗口以重试。
       save_failed_try_again: 条目无法保存。请重试。
       upload_failed: "上传失败，错误:"
+    file_size_error: "%{file} 的大小超过所允许的最大文件大小 %{max}。"
+    file_type_error: "%{file} 不是可接受的 %{type} 文件。"
     links: 
       minimize_embedded_kaltura_content: 最小化嵌入的内容
     loading: 正在加载媒体...
@@ -8317,13 +8649,11 @@ zh:
         subject: "确认电子邮件:Canvas"
     confirm_registration: 
       email: 
-        body: "感谢您注册 Canvas！此电子邮件用于确认用户 %{user} 在 %{website} 注册的新帐户。"
         details: "要完成注册过程，请访问以下 url:"
         html: 
-          body: "感谢您注册 Canvas！此电子邮件的目的是确认用户 %{user} 正在 %{website} 上注册一个新帐户。"
+          body: "感谢您注册 %{product_name}！此电子邮件用于确认用户 %{user} 正在 %{website} 上注册一个新帐户。"
           details: 单击此处完成注册过程
-          subject: "确认注册:Canvas"
-        subject: "确认注册:Canvas"
+          subject: "确认注册：%{product_name}"
     confirm_sms_communication_channel: 
       sms: 
         body: |-
@@ -8365,10 +8695,10 @@ zh:
           audio_comment: "此邮件包括媒体评论。要收听或回复，单击下面的链接:"
           body: "%{user_name} 刚刚在 Canvas 中向您发送了一封邮件:"
           download: 下载
-          reply_message: "要回复此邮件，单击下面的链接:"
+          reply_to_conversation_message: "您可以在 Canvas 中回复此消息，直接回复此电子邮件。"
           subject: "%{user_name} 刚刚在 Canvas 中向您发送了一封邮件。"
           unknown_user: 未知用户
-        reply_message: "要回复此邮件，单击下面的链接:"
+        reply_to_conversation_message: "您可以直接回复此电子邮件，以在 Canvas 中回复此消息。"
         subject: "%{user_name} 刚刚在 Canvas 中向您发送了一封邮件。"
         unknown_user: 未知用户
       facebook: 
@@ -8986,10 +9316,10 @@ zh:
     new_discussion_entry: 
       email: 
         body: "%{user} 已发布有关 %{course} 话题 %{discussion_topic} 的新评论:"
-        details: "此处加入会话:"
+        discussion_entry_reply_message: 使用下面的链接加入会话或回复此消息进行评论。
         html: 
           body: "%{user} 已发布有关 %{course} 话题 %{discussion_topic} 的新评论:"
-          details: 单击此处加入会话
+          discussion_entry_link_message: "[单击此处加入会话](%{url})，或回复此消息进行评论。"
           subject: "%{discussion_topic}: %{course} 的新评论"
         subject: "%{discussion_topic}: %{course} 的新评论"
       facebook: 
@@ -9289,9 +9619,9 @@ zh:
         body: "%{author} 刚刚对 %{user} 的 %{assignment} 的提交文件进行了新评论"
         html: 
           body: "%{author} 刚刚对 %{user} 的 %{assignment} 的提交文件进行了新评论"
-          link_message: "您可在此处审阅提交文件的详细信息:"
           someone: 某人
           subject: "提交评论:%{user}，%{assignment}，%{context}"
+          submission_comment_link_message: 您可以使用下面的链接审阅提交文件，或对此消息作出响应以回复此评论。
         link_message: "您可在此处审阅提交文件的详细信息:"
         someone: 某人
         subject: "提交评论:%{user}，%{assignment}，%{context}"
@@ -9315,9 +9645,9 @@ zh:
           link_message: "您可在此处审阅提交文件的详细信息:"
           someone: 某人
           subject: "提交评论:%{user}，%{assignment}，%{context}"
-        link_message: "您可在此处审阅提交文件的详细信息:"
         someone: 某人
         subject: "提交评论:%{user}，%{assignment}，%{context}"
+        submission_comment_link_message: 您可以使用下面的链接审阅提交文件，或对此消息作出响应以回复此评论。
       facebook: 
         body: "*%{author}* 刚刚对 **%{user} 的 %{assignment}** 的提交文件进行了新评论。"
         someone: 某人
@@ -9572,6 +9902,7 @@ zh:
       module: 
         prerequisites: 先修课程
         published: 已发布
+    post_grades_dialog_title: "发布评分到 SIS"
     progression_module_collection: 
       module_progress_for: "%h{student_link} 学习单元的进度"
       module_progress_for_student: "%{student.name} 学习单元的进度"
@@ -9585,7 +9916,10 @@ zh:
       back_to_modules: 返回学习单元页面
       no_students_found: 未找到学生
       student_progress: 学生进度
+  moodle_dropdown_many_warning_title: "可能已错误地导入此题库中的 %{count} 个下拉列表问题"
   moodle_dropdown_warning_title: 可能已错误地导入多个下拉列表问题
+  moodle_formula_many_warning_title: "此题库中的 %{count} 个公式问题将需要重新生成可能的答案"
+  moodle_formula_warning_title: 将需要为公式问题重新生成可能的答案
   move_dialog: 
     cancel: 取消
     save: 保存
@@ -9605,7 +9939,11 @@ zh:
     sure_you_want_to_mute: "是否确定要静音此作业?此作业静音时，学生将不会收到关于以下内容的新通知或无法看到:"
   name: 学术基准导入器
   new_facebook_message: "您有来自 Canvas 的新消息"
+  new_styles_description: |-
+      我们正在改进 Canvas 的 UI 界面。启用此项可选择查看
+      更新的简化外观并感受 Canvas 界面。
   no_migration_file: 内容迁移需要文件
+  not_a_number: 必须为正数
   not_applicable: 不适用
   notification: 
     added_to_conversation_description: 已将您添加到会话
@@ -9814,6 +10152,10 @@ zh:
     invalid_file: 无效的成果组文件
   outcome_groups_api: 
     account_group_description: 帐户级别成果组。
+  outcome_path_mastery_points: "%{path} 掌握程度"
+  outcome_path_result: "%{path} 结果"
+  outcome_results: 
+    outcomes_filename: 成果
   outcomes: 
     account_standards: 帐户标准
     account_standards_description: 在左侧，您将看到您的学校为您创建的标准，以便在您的课程中使用。
@@ -10051,14 +10393,6 @@ zh:
       description: "您将需要访问 Dim Dim 实例。"
       labels: 
         domain: 域
-    embedly: 
-      description: "针对集合请求 Embedly 信息"
-      name: "Embedly 集成"
-    embedly_settings: 
-      description: "此插件集成了 Embedly 服务以预先填充有关集合项目的信息。该付费计划会返回免费计划所没有的额外信息: 您可以从页面上的多个图像中进行选择，之后系统会返回可直接预览的嵌入式信息（播放 youtube 视频等）。"
-      labels: 
-        api_key: "Embedly API 密钥"
-        plan_type: "Embedly 计划类型"
     error_reporting: 
       description: 默认错误报告机制
       name: 错误报告
@@ -10191,15 +10525,19 @@ zh:
         domain_settings: 域设置
         misc_settings: 杂项设置
         ui_conf_ids: "UI 配置 ID"
+      hide_rte_button_note: （仍在该处，可用于会话/快速评分器/媒体录音家作提交项）
       hints: 
         domain: 对于托管的帐户，使用"www.kaltura.com"
         resource_domain: 对于托管的帐户，使用"cdn.kaltura.com"
         rtmp_domain: 对于托管的帐户，使用"www.kaltura.com"
+      kaltura_path_example: 例如
       kaltura_sis_explanation: "如果选中用户和课程，将向 Kaltura 提供 SIS 数据。"
       labels: 
         cache_play_list_seconds: "缓存播放列表 URL 的秒数"
         do_analytics: 发送分析事件
         domain: 域
+        hide_rte_button: 隐藏富内容编辑器中的视频图标。
+        js_uploader: "使用 html5（可访问）上传器"
         kaltura_sis: "将 SIS 数据写入 Kaltura"
         kcw_ui_conf: "KCW UI 配置 ID"
         partner_id: "合作伙伴 ID"
@@ -10209,6 +10547,7 @@ zh:
         secret_key: 管理员密码
         subpartner_id: "子合作伙伴 ID"
         upload_ui_conf: "上传程序 UI 配置 ID"
+        use_alt_record_widget: "使用备用的 Flash 录音小部件"
         user_secret_key: 用户密码
       ui_conf_ids: "对于 Kaltura 托管的客户，您可以要求 Kaltura 提供这些 ID。自托管实例可在 ui_confs 表中找到这些值。"
     linked_in: 
@@ -10232,6 +10571,7 @@ zh:
       labels: 
         download_url: "LockDown Browser 下载 URL"
         plugin_enabled: 已启用
+        use_lti_tool: "使用 LTI 工具管理 LockDown Browser 测验设置 (对班长是必需的)"
     med_cornell_export: 
       labels: 
         password: 身份验证密码
@@ -10333,11 +10673,16 @@ zh:
         access_key: 访问密钥
         api_url: "API URL"
         secret_key: 加密密钥
+  post_grades_description: |-
+      通过发布评分，教师可以将评分重新发布至启用的 SIS 系统：Powerschool、
+      Aspire (SIS2000)、JMC 和其他任何启用了 SIF 的 SIS（接受 SIF 元素 GradingCategory、
+      GradingAssignment 和 GradingAssignmentScore）。
   prerequisites_lookup: 
     headers: 
       completion_prerequisites: 完成先决条件
     labels: 
       requirements_must_be_completed: 需要完成以下要求，然后才能解锁此页面
+  product_name: Canvas
   profile: 
     access_token: 
       default_app_name: 无应用程序
@@ -10351,13 +10696,12 @@ zh:
       titles: 
         delete_this_token: 删除此令牌
     buttons: 
-      add_file: 添加文件
-      adding_file: 正在添加文件...
       generate_token: 生成令牌
       generating_token: 正在生成令牌...
       regenerate_token: 重新生成令牌
       regenerating_token: 正在重新生成令牌...
-      select_image: 选择图像
+      save: 保存
+      select_profile_picture: 选择头像
       selecting_image: 正在选择图像...
     communication: 
       confirm_email_instructions: "在接收任何通知之前，您需要验证电子邮件地址 (%{email})，方法是单击我们给您发送的电子邮件中的链接。如果您没有看到电子邮件，*单击以重新发送电子邮件*，然后确保检查您的垃圾邮件箱。"
@@ -10380,7 +10724,6 @@ zh:
       default_email_option: "[选择电子邮件]"
       new_email_option: 新电子邮件地址
     errors: 
-      adding_file_failed: 添加文件失败
       confirmation_failed: 确认失败。请重试。
       generating_token_failed: 生成令牌失败
       invalid_old_passowrd: "登录信息 %{pseudonym} 的旧密码无效"
@@ -10462,7 +10805,6 @@ zh:
         change_password: 更改密码
         confirm_password: 确认密码
         default_email: 默认电子邮件
-        enabled_theme: 已启用主题
         expires_at: 过期
         headers: 
           approved_integrations: 允许融入使用的外部软件
@@ -10560,7 +10902,6 @@ zh:
       contact_not_confirmed: 此联系人尚未确认。请单击该地址了解详细信息
       email_not_confirmed: 此电子邮件尚未确认。请单击该地址了解详细信息
       register_communication: 注册通信
-      select_profile_pic: 选择头像
       unconfirmed_click_to_confirm: 未确认。单击以确认
     token_never_expires: 从不
     twitter_select: 
@@ -10616,13 +10957,13 @@ zh:
     you_have_no_services: 您尚未注册任何服务，您可以在*设置*页面添加一些服务。
   profiles: 
     avatar_dialog: 
-      butons: 
-        add_picture_file: 添加文件
-      headers: 
-        loading_images: 正在加载图像...
-      links: 
-        upload_new_image: 上传新图像
-      profile_pictures: 选择您想要用作头像的图像，或上传新图像：
+      from_gravatar: "来自 Gravatar"
+      take_a_picture: 提取图片
+      upload_a_picture: 上传图片
+    gravatar_view: 
+      button: 
+        preview: 预览
+      enter_gravatar_email_below: "在下面输入您的 *Gravatar* 电子邮件地址"
     notification_preferences: 
       captions: 
         notification_preferences: "%{name} 通知活动和设置"
@@ -10631,6 +10972,12 @@ zh:
         ok: 确定
         privacy_notice: "注意: 某些通知可能包含机密信息。如果选择使用您的机构提供的地址之外的电子邮件接收通知，可能会导致将敏感的 Canvas 课程和小组信息发送到机构系统外部。"
         privacy_notice_title: 隐私权声明
+    take_picture_view: 
+      retry: 重试
+      take_picture: 拍图
+    upload_file_view: 
+      choose_a_picture: 选择图片
+      crop_instructions: 要裁剪图像，请拖动选择项，然后单击下面的“保存”按钮。
   pseudonym: 
     errors: 
       bad_credentials: 用户名或密码无效
@@ -10663,11 +11010,7 @@ zh:
         no_idp_found: "Canvas 无法退出您的身份提供程序"
       max_attempts: 登录尝试失败次数过多。请稍后重试或联系您的系统管理员。
       no_matching_user: "Canvas 没有以下用户的帐户: %{user}"
-      request_failed: 请求失败。请重试。
       user_deleted: 该用户帐户已被删除。请联系您的系统管理员以重新激活您的帐户。
-    messages: 
-      resending: 正在重新发送...
-      sent: 已发送！邮件可能需要几分钟才能到达。
     mobile_login: 
       back_to_login: 返回登录
       buttons: 
@@ -10678,12 +11021,7 @@ zh:
       password: 密码
       sending: 正在发送...
     new: 
-      details: "您需要完成注册过程，然后才能登录。您应已收到包含返回 Canvas 的确认链接的电子邮件。按照该链接进行操作以完成该过程。确保检查您的垃圾邮件箱。"
-      links: 
-        resend_email: 重新发送电子邮件
       page_title: "登录到 Canvas"
-      titles: 
-        registration_complete: 注册未完成
     notices: 
       mfa_complete: 多重身份验证已配置
     oauth2_auth: 
@@ -10767,6 +11105,93 @@ zh:
       publishing: 正在发布...
       unpublish: 取消发布
       unpublishing: 正在取消发布...
+  publish_grades: 
+    assignment_group_list: 
+      no_assignment_groups: 未找到作业组
+    assignment_group_list_item: 
+      group_weight: "总数的 %{groupWeight}%"
+      manage: 管理
+    assignment_list_item: 
+      assignment_edit: 编辑作业
+      module: 单元
+      multiple_modules: 多个单元
+      no_points_possible: 无最高分
+      points_possible: "%{pointsPossible} 分"
+      points_possible_screen_reader: "%{pointsPossible} 最高分"
+      settings: 编辑作业
+    assignment_list_item_score: 
+      assignment_grading_type_is_not_graded: 此作业将不评分。
+      assignment_not_yet_graded_screenreader: "作业尚未评分。%{pointsPossible} 最高分。"
+      empty_points_possible: "-/%{pointsPossible} 分"
+      no_submission: 无提交项
+      no_submission_for_assignment_screenreader: "此作业无提交项。%{pointsPossible} 最高分。"
+      not_yet_graded: "*尚未评分*"
+      score_with_points_possible: "*%{score}*/%{pointsPossible} 分"
+      score_with_points_possible_screenreader: "分数：%{score}，满分 %{pointsPossible} 分。"
+    assignment_settings: 
+      cancel: 取消
+      save: 保存
+      validating: 正在保存...
+      weight_groups: 根据作业组加权最终评分
+    available_date_description: 
+      available_until: 可供使用的截止日期
+      closed: 已关闭
+      not_available_until: 可供使用的开始时间
+    create_assignment: 
+      assignment: 作业
+      assignment_due_at: 截止时间：
+      assignment_name: 姓名：
+      assignment_points: 分数：
+      assignment_type: 类型：
+      cancel: 取消
+      discussion_type: 讨论
+      external_tool_type: 外部工具
+      more: "转至 %{objectType}"
+      multiple_due_dates: 多个截止日期
+      not_graded_type: 未评分
+      quiz_type: 测验
+      save: 保存
+      saving: 正在保存...
+    date_available_column_view: 
+      available: 可用
+      multiple_dates: 多个日期
+    date_due_column_view: 
+      due: 截止时间
+      due_date: 截止时间
+      multiple_dates: 多个日期
+    due_date_view: 
+      overrides: 
+        remove_these_dates: 删除这些日期
+    edit_header_view: 
+      buttons: 
+        not_published: 未发布
+        published: 已发布
+      manage: 管理
+      titles: 
+        delete: 删除
+    group_category_selector: 
+      grade_group_students_individually: 分别为每位学生指定评分
+      group_assignment_header: 组作业
+      group_category_options: 新建小组类别
+      group_set: 组设置
+      is_group_assignment: 这是一个组作业
+      students_already_submitted_warning: 以前的个人提交项将不计为组提交项，并且将在快速评分器中错误显示。
+    index_view: 
+      add_group: 发布作业评分
+      assignments: 作业
+      search_for_assignment: 搜索作业
+      title_add_group: 添加作业组
+    never_drop: 
+      remove_rule: 删除规则
+    never_drop_collection: 
+      add_another_assignment: 添加另一个作业
+      add_first_assignment: 添加作业
+    no_assignments_list_item: 
+      no_assignments_in_this_group: 此组中无作业
+    no_assignments_search: 
+      aria_assignments: 作业
+      assignments: 作业
+      no_assignments_found: 未找到作业
   publish_icon_component: 
     publish: 发布
     publish_click: 已发布，单击可取消发布
@@ -10785,10 +11210,42 @@ zh:
   qti_display: QTI
   qti_file_description: "QTI .zip 文件"
   qti_name: "QTI 转换器"
+  qualified_locale: zh-CN
   question_answered: 已回答
   question_bank: 
     align_outcomes: 调整成果
+    already_bookmarked: 已添加到书签
+    bookmark_failed: 添加到书签失败
+    bookmarking: 正在添加到书签...
+    buttons: 
+      submit_copying: 
+        one: 正在复制问题...
+        other: 正在复制问题...
+      submit_copying_failed: 
+        one: 复制问题失败，请重试
+        other: 复制问题失败，请重试
+      submit_moving: 
+        one: 正在移动问题...
+        other: 正在移动问题...
+      submit_moving_failed: 
+        one: 移动问题失败，请重试
+        other: 移动问题失败，请重试
+      submit_retry_copying: 复制问题失败，请重试...
+      submit_retry_moving: 移动问题失败，请重试...
+    default_name: 无姓名
+    delete_are_you_sure: 是否确定要删除此题库?
+    error_loading_banks: 加载库时出错
+    links: 
+      more_questions: 更多问题
+    load_questions: 正在加载问题...
+    loading_banks: 正在加载库...
+    loading_more_fail: 加载更多问题失败，请重试
+    move_questions: 移动问题
+    multiple_questions: 多个问题
+    question_bank: 题库
     remove_outcome_from_bank: 是否确定要从库中删除此成果?
+    title: 
+      move_copy_questions: 移动/复制问题
     update_outcomes_fail: 更新成果失败
     updating_outcomes: 正在更新成果...
   question_banks: 
@@ -10822,9 +11279,6 @@ zh:
         edit_question: 编辑此问题
       move_bank: 将问题移动/复制到另一个库
     show: 
-      already_bookmarked: 已添加到书签
-      bookmark_failed: 添加到书签失败
-      bookmarking: 正在添加到书签...
       button: 
         cancel: 取消
         move_copy_question: 移动/复制问题
@@ -10835,24 +11289,7 @@ zh:
         delete: 删除库
         edit: 编辑库详细信息
         move_questions: 移动多个问题
-        submit_copying: 
-          one: 正在复制问题...
-          other: 正在复制问题...
-        submit_copying_failed: 
-          one: 复制问题失败，请重试
-          other: 复制问题失败，请重试
-        submit_moving: 
-          one: 正在移动问题...
-          other: 正在移动问题...
-        submit_moving_failed: 
-          one: 移动问题失败，请重试
-          other: 移动问题失败，请重试
-        submit_retry_copying: 复制问题失败，请重试...
-        submit_retry_moving: 移动问题失败，请重试...
-      default_name: 无姓名
-      delete_are_you_sure: 是否确定要删除此题库?
       edit_warning: 请记住，更改问题模板不会自动更新已使用这些问题的测验。
-      error_loading_banks: 加载库时出错
       headings: 
         aligned_outcomes: 调整成果
       labels: 
@@ -10863,18 +11300,11 @@ zh:
       links: 
         align_outcome: 调整成果
         more_questions: 更多问题
-      load_questions: 正在加载问题...
       loading_banks: 正在加载库...
-      loading_more_fail: 加载更多问题失败，请重试
       mastery_threshold: "掌握 %{threshold_percentage}"
       move_copy: 移动/复制
-      move_questions: 移动问题
-      multiple_questions: 多个问题
-      question_bank: 题库
       select_bank: "选择此问题的目标题库:"
       show_details: 显示问题详细信息
-      title: 
-        move_copy_questions: 移动/复制问题
   question_unanswered: 尚未回答
   quick_start_bar: 
     announcement: 
@@ -10891,59 +11321,21 @@ zh:
     quick_start_bar_view: 
       new: "新建:"
   quiz: 
-    current_filter: 当前过滤器
-    default_question_input: "[选择]"
-    default_text_only_question_name: 间隔
-    default_title: 未命名测验
-    errors: 
-      invalid_hide_results: 隐藏结果无效
-      invalid_ip_filter: "IP 过滤无效"
-      invalid_quiz_type: 测验类型无效
-    question_name_counter: "问题 %{question_number}"
     regrade: 
       give_everyone_full_credit: 对于此问题给所有人满分。
       no_scores_reduced: 更正后的回答以及原本正确的回答均可得分（*将不会扣除任何分数*）
+      regrade_disabled: 不允许对此问题重新评分，因为学生完成提交后已删除答案或更改了问题类型。
       regrade_options: "重新评分可选功能 *（针对已回答此问题的学生）：*"
       some_scores_reduced: 仅正确的回答可得分（*可能会扣除某些学生的分数*）
       update_question_without_regrading: 更新问题而不重新评分
-    types: 
-      quiz: 测验
-      survey: 调查
-  quiz_group: 
-    errors: 
-      no_bank: "找不到测验组 %{group_name} 的题库"
-      no_permissions: "用户无权参考测验组 %{group_name} 的题库"
-    question_group: 问题组
-  quiz_question: 
-    defaults: 
-      question_name: 问题
   quiz_reports: 
     quiz_report_generator: 
       download_report_name: "下载 %{report_name}"
       generate_report_name: "生成 %{report_name}"
       generated_at_date_time: "生成时间 %{dateAndTime}"
       generating_report_name: "正在生成 %{report_name}..."
-  quiz_statistics: 
-    statistics_filename: "%{quiz_title} %{quiz_type} %{report_type} 报告"
-    types: 
-      item_analysis: 项目分析
-      student_analysis: 学生分析
-  quiz_submissions: 
-    errors: 
-      invalid_submissions: 此测验提交无法验证属于您。请重试。
-      late_quiz: 您提交此测验时已晚，您的答案可能没有录制。
-      protected_quiz: 此测验受到保护并且仅从特定位置可用。您当前使用的计算机似乎并非进行此测验的有效位置。
-    show: 
-      score_out_of: "您的得分为 %{score}，满分 %{points_possible} 分"
-    still_zipping: 正在压缩文件...
+      item_analysis_not_available: 项目分析对调查不可用
   quizzes: 
-    access_code: 
-      buttons: 
-        submit: 提交
-      labels: 
-        access_code: 访问代码
-      quiz_restricted: 此测验受访问代码限制。您将需要请求教师或监考人员键入或告诉您访问代码，以便能够进行测验。
-      survey_restricted: 此调查受访问代码限制。您将需要请求教师或监考人员键入或告诉您访问代码，以便能够进行调查。
     after_last_attempt: 在上次尝试后
     alerts: 
       no_valid_combinations: 系统可能无法生成指定参数的任何有效组合
@@ -10953,6 +11345,7 @@ zh:
     always: 始终
     answer_comments: 答案评论
     answer_text: 答案文本
+    assignment: 作业
     assignment_points_possible: 
       one: "%{count} 分"
       other: "%{count} 分"
@@ -10973,6 +11366,7 @@ zh:
     cant_unpublish_when_students_submit: 如有学生提交文件，则无法取消发布
     choose_option: "[选择]"
     confirms: 
+      delete_answer: "是否确定? 从具有提交的问题中删除答案会禁用对此问题重新评分的选项。"
       delete_question: 是否确定要删除此问题?
       delete_quiz: 是否确定要删除此测验?
       scrap_and_restart: 取消此测验并从头开始?
@@ -10984,85 +11378,13 @@ zh:
     default_answer_comments: 学生选择此答案时响应
     default_answer_comments_on_match: 学生匹配此答案时响应
     default_comments_on_wrong_match: 用户遗漏此匹配时响应
-    default_history_crumb: 历史记录
     default_quesiton_name: 问题
     default_question_name: 问题
     default_quiz_title: 测验
     default_response_to_essay: 在学生提交答案后响应以显示学生
     default_response_to_file_upload: 在学生提交答案后显示给学生的答题结果
-    default_title: 新测验
-    display_answer: 
-      labels: 
-        answer_with_margin: 带页边距
-        your_answer: 您的答案
-      margin_of_error: 误差
-      plus_or_minus: +/-
-      range_answer: "在 %{lower_bound} 到 %{upper_bound} 之间"
-      you_left_this_blank: 您将此项留空
-    display_question: 
-      default_question_answer: "[选择]"
-      flag_this_question: 标记此问题
-      headers: 
-        formulas: 公式
-        possible_solutions: 可能的解
-        solution_answer: 答案
-        variable_maximum: 最大值
-        variable_minimum: 最小值
-        variable_name: 变量
-        variable_precision: 小数位
-        variables: 变量
-      labels: 
-        additional_comments: 其它评论
-        for_answer_number: "有关答案 %{answer_number}"
-        warning_icon: 警告
-      links: 
-        delete_question: 删除此问题
-        edit_question: 编辑此问题
-        move_copy_question: 将问题移动/复制到另一个库
-      not_yet_graded: 仍未计分
-      original_score: 原始分数：
-      points_possible: "%{points_possible} 分"
-      regraded_score: 重新计分后的分数：
-      show_ansers_for_variable: "显示 %{variable} 的答案"
-      skip_question_text: 跳至问题文本。
-      submission_was_regraded: 此问题已重新计分。
-      titles: 
-        question_correct_comment: 如果学生回答问题正确，他们将看到此评论
-        question_incorrect_comment: 如果学生回答问题错误，他们将看到此评论
-        question_neutral_comment: 一旦学生回答问题后，他们将看到此评论
-      unsupported_question_type: "此问题从外部来源导入。这是一个\"%{question_type}\"问题，此测验工具中不支持该问题。"
-      you_left_this_blank: 您将此项留空
     download_all_quiz_file_upload_submissions: 下载所有测验文件上传提交项
-    download_file_upload_submissions: 
-      links: 
-        download_submissions: 下载所有文件
     enter_answer_variable_above: "[在上面输入答案变量]"
-    equations_help: 
-      equation_functions: |-
-          除了变量，还有一系列的辅助函数
-          可用于生成有用的值。例如:
-          
-          %{example}
-          
-          要查看指定辅助函数的说明，请从下面的列表中选择
-          该函数:
-      equation_intro: |-
-          计算问题基于一组或多组公式按顺序 
-          计算。您可以定义这些公式中的中间变量，但
-          最后一个公式的数值结果用于生成
-          正确答案。例如:
-          
-          %{example}
-          
-          对于此组公式，最终答案为 71。不过，
-          其中没有预定义的变量，因此所有学生对同一
-          问题得出相同的答案。有关变量的更多信息，请参阅
-          "变量"选项卡。
-      equation_variables2: "您还可以使用括号定义问题文本中的变量 （\"[a] + [b] 等于多少?\"）。对于每个变量，您将看到一个基于 变量设置的\"示例值\"。您可以这样检查您的数学并 确保公式有效。 例如，如果您的问题是\"[a] + 5 等于多少?\"，则要求您 定义变量\"a\"。如果\"a\"的示例值 为 5.2，您可以写入: %{example} 通过此公式，您可以生成任何数量的解集，每个集合 中的\"a\"值不同。一名学生可能看到的问题是 \"5.2 + 5 等于多少?\"，而另一名学生可能看到的是\"9 + 5 等于多少?\"。"
-      links: 
-        functions: 函数
-        intro: 简介
-        variables: 变量
     errors: 
       adding_questions_failed: 添加问题失败，请重试
       creating_group_failed: 创建小组失败，请重试
@@ -11076,16 +11398,11 @@ zh:
       missing_ip_filter: "您必须输入有效的 IP 地址"
       no_answer: 请添加至少一个答案
       no_correct_answer: 请选择一个正确答案
-      no_more_attempts: 您没有剩余的测验尝试
       no_possible_solution: 请生成至少一个可能的解
-      quiz_deleted: 该测验已删除
       quiz_score_not_a_number: "分数必须是 0 到 2,000,000,000 之间的数字。"
       quiz_score_too_long: "分数必须小于 2,000,000,000。"
       quiz_score_too_short: "分数必须大于 0。"
-      quiz_update_failed: 测验无法更新
       retrieving_filters_failed: 检索过滤器失败
-    fabulous_quizzes: 
-      page_titles: 测验
     ? "false"
     : "False"
     file_uploaded_or_removed: 
@@ -11093,135 +11410,6 @@ zh:
         file_successfully_uploaded: 您的文件已成功上传。
         files_removed: "%{display_name} 已删除。"
     final_answer: 最终答案
-    find_question_from_bank: 
-      already_added: 此问题已在测验中
-      bank_description: "%{bank_name}，%{n} 问题"
-      buttons: 
-        add_questions: 添加问题
-        create_group: 创建小组
-        select_bank: 选择库
-      group_pick_count: "%{pick_count} 个问题"
-      group_points: "每个问题 %{points} 分"
-      headers: 
-        bank_name: 库名称
-      hints: 
-        group_pick_count: "目前已选择 %{pick_count} 个"
-      labels: 
-        add_questions_to_group: 添加问题到测验组
-        group_name: 小组名称
-        group_pick_count: 挑选
-        group_points: 得分
-      links: 
-        clear_all_banks: 全部清除
-        manage_question_banks: 管理课程题库
-        more_questions: 更多问题
-        select_all_banks: 全选
-      options: 
-        new_group: "[创建新小组]"
-        no_group: "[无小组]"
-      select_a_question_bank: 从下面的列表中选择一个题库以将其链接到此测验作为问题组。
-      titles: 
-        add_new_question_group: 添加新问题组
-    form_answer: 
-      answer_in_range_accessible: "在 *范围开始* 和 #范围结束# 之间"
-      answer_text: 答案文本
-      answer_weight: 答案小部件
-      exact_answer_with_error_margin_accessible: "*确切答案*，误差范围为 #误差范围#"
-      labels: 
-        answer_comments: 学生选择此答案时的评论
-        answer_in_range: 在范围内回答
-        exact_answer: 确切答案
-      matching_left: 匹配左侧
-      matching_right: 匹配右侧
-      numerical_answer: 数值答案
-      possible_answer: 可能的答案
-      titles: 
-        click_to_enter_answer_comments: 单击以输入学生选择此答案时的评论
-        click_to_set_as_correct: 单击以将此答案设置为正确答案
-        delete_answer: 删除此答案
-        edit_as_html: "将编辑答案文本切换为 HTML"
-    form_question: 
-      allow_tolerance: "允许的误差为 +/- %{tolerance}"
-      buttons: 
-        create_update_question: 创建/更新问题
-        generate: 生成
-        recompute: 重新计算
-      correct_answer_comments: 正确答案评论
-      distractor_instructions: 在其自己的行中键入每个错误选项
-      equation_example: "即\"5 加 [x] 等于多少?\""
-      explanation: 
-        generate_possible_solutions: 最后，根据您的测验需要建立尽可能多的变量-解组合。
-      explanations: 
-        calculated: 输入您的问题，建立一个公式，然后生成一组可能的答案组合。学生将看到通过随机选择的一组变量填充的问题，并且必须键入正确的数值答案。
-        equations: 您可以通过键入括号包围的变量名称来定义变量
-        essay: 系统将为学生提供一个文本字段以撰写其答案。
-        file_upload: 学生可以上传文件来回答问题。
-        fill_in_multiple_blanks: 输入您的问题，指定每个空格应转至的位置。然后定义每个空格可能的正确答案。学生必须在每个空格的文本框中键入正确的答案。
-        formula_definition: 接下来，您将需要写入用于计算正确答案的公式或公式内容。仅使用与上述列出相同的变量名称。
-        matching: 构建成对的匹配值。学生将看到左侧的值，并且必须从右侧的下拉列表中选择匹配的值。多个行可以有相同的答案，并且您可以在右侧添加其它错误选项。
-        missing_word: 定义转至下拉列表之前和之后的文本。构建一组可能的答案并选择一个正确答案。
-        multi_answer_sets: 在下面的框中（您要显示答案框的每个位置），键入一个包含在括号内的参考词（无空格）
-        multiple_answers: 此问题将在每个答案旁边显示一个复选框，并且学生必须选择您标记为正确的"所有"答案。
-        multiple_choice: 输入您的问题和多个答案，然后选择一个正确答案。
-        multiple_dropdowns: 输入您的问题，指定每个下拉列表应转至的位置。然后定义每个下拉列表可能的答案，每个下拉列表有一个正确答案。
-        numerical: 将正确答案定义为范围内的任何数字，或数字加上或减去一些误差。系统将向学生提供一个空文本框用于键入其数值答案。
-        short_answer: |-
-            输入您的问题文本，然后定义空格所有可能的正确答案。  
-            学生将看到问题，后跟一个小文本框用于键入其答案。
-        text_only: 此"问题"将不会评分，但在引入一组相关问题时非常有用。
-        true_false: "输入您的问题文本，然后选择 True 或 False 作为正确答案。"
-        variable_definitions: 一旦您输入上述变量后，应看到这些变量在此处列出。您可以指定下面每个变量可能的值范围。
-      general_answer_comments: 一般答案评论
-      headers: 
-        formula_definition: 公式定义
-        generate_possible_solutions: 生成可能的解
-        variable_definitions: 变量定义
-        variable_example_value: 示例值
-        variable_maximum: 最大值
-        variable_minimum: 最小值
-        variable_name: 变量
-        variable_precision: 小数位
-      label: 
-        question: 
-          name: 问题名称
-          points: 问题分数值
-          type: 问题类型
-      labels: 
-        answers: 答案
-        distractors: 其它匹配可能（错误选项）
-        missing_word_after: 答案后转至的文本
-        points: 得分
-        question: 问题
-      links: 
-        add_another_answer: 添加其它答案
-        need_help: 需要帮助?
-        switch_views: 切换视图
-      multi_answer_sets_example: "即\"玫瑰为 [color1]，紫罗兰为 [color2]\""
-      offer_combinations: "提供 %{how_many} 种可能的值组合（最大值 %{max_combinations}）"
-      options: 
-        only_one_correct: 只有一个正确答案
-        students_select_multiple: 学生选择多个答案
-      question_type: 
-        calculated: 公式问题
-        essay: 问答题
-        file_upload: 文件上传问题
-        fill_in_multiple_blanks: 填写多个空格
-        matching: 匹配
-        missing_word: 缺字
-        multiple_answers: 多个答案
-        multiple_choice: 多选
-        multiple_dropdowns: 多个下拉列表
-        numerical: 数值答案
-        short_answer: 填空题
-        text_only: 文本（无问题）
-        true_false: True/False
-      show_possible_answers: "显示 %{question} 可能的答案"
-      show_possible_answers_no_question: 显示可能的答案
-      titles: 
-        click_to_enter_correct_answer_comments: 单击以输入正确答案的评论
-        click_to_enter_general_answer_comments: 单击以输入一般评论
-        click_to_enter_wrong_answer_comments: 单击以输入错误答案的评论
-      wrong_answer_comments: 错误答案评论
     graded_quiz: 计分测验
     graded_survey: 计分调查
     headers: 
@@ -11250,68 +11438,14 @@ zh:
         other: "%{count} 分钟\n\n"
         zero: "少于 1 分钟"
       score_out_of_points_possible: "%{score}，满分 %{points_possible} 分"
-    history: 
-      anonymous_username: 学生
-      buttons: 
-        allow_extra_attempt: 允许此学生进行额外的尝试
-      count_attempts_left: 
-        one: "%{user} 有 %{count} 次剩余尝试机会"
-        other: "%{user} 有 %{count} 次剩余尝试机会"
-      default_quiz_name: "测验 %{course_name}"
-      default_survey_name: "调查 %{course_name}"
-      grade_by_question_warning: 按问题特性的评分受小组中置乱的问题的影响。
-      headers: 
-        quiz_submissions: 测验提交
-        survey_submissions: 调查提交
-      latest_quiz_results: "以下是 %{user} 的最新测验结果。您可以修改任何问题的得分和添加更多评论，然后单击页面底部的\"更新分数\"。"
-      latest_survey_results: "以下是 %{user} 的最新调查结果。您可以修改任何问题的得分和添加更多评论，然后单击页面底部的\"更新分数\"。"
-      links: 
-        back_to_quiz: 返回测验
-        back_to_survey: 返回调查
-      logged_out_user: "注销的用户 %{index}"
-      named_quiz_results: "%{user} 的 %{quiz_name} 结果"
-      next_questions_arrow_title: 下面的问题
-      no_more_attempts: "%{user} 没有剩余尝试次数"
-      page_title_quiz: "%{user} 的测验历史记录"
-      page_title_survey: "%{user} 的调查历史记录"
-      prev_questions_arrow_title: 前面的问题
-      quiz_not_yet_taken: 测验尚未进行。
-      quiz_not_yet_taken_or_in_progress: 测验尚未进行或当前正在进行
-      quiz_unlimited_attempts: 此测验有无限尝试次数
-      score_for_attempt: "尝试 %{attempt_number}: %{score}"
-      survey_not_yet_taken: 调查尚未进行。
-      survey_not_yet_taken_or_in_progress: 调查尚未进行或当前正在进行
-      survey_unlimited_attempts: 此调查有无限尝试次数
-      titles: 
-        score_pending_review: 此分数待审阅，并且可能会更改
-        submission_needs_review: 此提交文件需要审阅
-      unnamed_quiz_results: "%{user} 的测验结果"
-      unnamed_survey_results: "%{user} 的调查结果"
+    highest: 最高
     index: 
       buttons: 
-        publish_quizzes: 发布测验
         publishing_quizzes: 正在发布测验...
       confirms: 
         delete_quiz: 是否确定要删除此测验?
       default_title: 未命名测验
-      headers: 
-        assignment_quizzes: 测验
-        course_quizzes: 课程测验
-        practice_quizzes: 练习测验
-        publish_multiple_quizzes: 发布多个测验
-        surveys: 调查
-        unpublished_quizzes: 未发布的测验
-      labels: 
-        publish_multiple_quizzes: 选择您想要在此时发布的测验
-      links: 
-        create_new_quiz: 创建新测验
-        manage_question_banks: 管理题库
-        publish_multiple_quizzes: 发布多个测验
       multiple_due_dates: 多个日期
-      no_quizzes: 没有可用的测验
-      page_titles: 测验
-      titles: 
-        this_quiz_is_locked: 此测验当前锁定。单击以了解更多详细信息。
     index_view: 
       add_quiz: 测验
       links: 
@@ -11320,9 +11454,6 @@ zh:
         settings: 设置
       search_for_quiz: 搜索测验
       title_add_quiz: 添加测验
-    invalid_ip: 
-      quiz_protected: 此测验受到保护并且仅从特定位置可用。您当前使用的计算机似乎并非进行此测验的有效位置。
-      survey_protected: 此调查受到保护并且仅从特定位置可用。您当前使用的计算机似乎并非进行此调查的有效位置。
     keep_highest: 最高
     keep_latest: 最新
     label: 
@@ -11341,6 +11472,14 @@ zh:
       multiple_blanks_question: 在空白处填写，阅读周围的文本
       other_incorrect_matches: 其它不正确的匹配可选功能
       possible_answer: 可能的答案
+    latest: 最新
+    ldb_login_popup: 
+      email: 电子邮件
+      log_in: 登录
+      logged_out_of_canvas: "*您已注销 Canvas。*若要继续，请登录。"
+      password: 密码
+      titles: 
+        log_in: 请登录
     links: 
       resume_quiz: 继续测验
       resume_survey: 继续调查
@@ -11354,19 +11493,6 @@ zh:
     loading_question: 正在加载问题...
     loading_question_banks: 正在加载题库...
     loading_questions: 正在加载问题...
-    lockdown_browser_required: 
-      headers: 
-        requires_lockdown: "需要 Respondus LockDown Browser"
-      labels: 
-        download_lockdown: 如果尚未安装该浏览器，请从此处下载
-      links: 
-        download_lockdown: "[下载 Respondus LockDown Browser]"
-      requires_lockdown: "此测验需要 Respondus LockDown Browser。请启动 Respondus LockDown Browser 以进行此测验或查看您的测验结果。"
-    managed_quiz_data: 
-      anonymous_student: "学生 %{user_counter}"
-      logged_out_user: "注销的用户 %{user_counter}"
-      titles: 
-        submission_needs_review: 此提交文件需要审阅
     message_students: 向学生发送消息
     message_students_for_context: "针对 %{context} 向学生发送消息 "
     messages: 
@@ -11375,9 +11501,7 @@ zh:
       no_unsubmitted_students_quiz: 所有学生均已进行测验
       no_unsubmitted_students_survey: 所有学生均已进行调查
     moderate: 
-      add_time: 添加时间
       buttons: 
-        change_extensions_for_selected_students: "更改 %{n} 名所选学生的延时"
         extend_time: 延长时间
         extending_time: 正在延长时间...
         save: 保存
@@ -11387,9 +11511,6 @@ zh:
         time_extension_failed: 延长时间失败，请重试
       confirms: 
         taking_time_away: 这将比学生当前拥有的时间少。是否仍要继续?
-      end_quiz_reference_time_current_end: 当前结束时间
-      end_quiz_reference_time_now: 立即
-      end_quiz_when: "%{reference_time} 过 %{n} 分钟结束测验。"
       errors: 
         quiz_submission_extra_attempts_not_a_number: 额外尝试次数必须为数字。
         quiz_submission_extra_attempts_too_long: "额外尝试次数必须小于 1000。"
@@ -11398,195 +11519,50 @@ zh:
         quiz_submission_extra_time_too_long: "额外时间必须小于 10080。"
         quiz_submission_extra_time_too_short: "额外时间必须大于 0。"
         server_communication_failed: 与服务器通信时出现问题。系统将在五分钟内重试，或者您可以重新加载该页面
-      extended_quiz_time_explanation: 您可以为此学生提供有关其当前测验尝试的额外时间。您想要为其提供多长时间?
       extensions_for_student: "%{student} 的延时"
       extensions_for_students: 
         one: "%{count} 个学生的延时"
         other: "%{count} 个学生的延时"
-      finished_in: "在 %{duration} 内完成"
       finished_in_duration: "在 %{duration} 内完成"
-      global_extra_attempts: "所有人均已获得 %{n}"
-      headers: 
-        attempt: 已尝试次数
-        attempts_left: 剩余尝试次数
-        extended_quiz_time: 延长测验时间
-        score: 分数
-        student: 学生
-        student_extensions: 学生延时
-        time: 时间
-      in_progress: 正在进行
-      labels: 
-        ending: 正在结束
-        extra_attempts: 额外尝试次数
-        extra_time_per_attempt: 每次尝试的额外时间
-        manually_unlock: 手动解锁测验以进行下次尝试
-        started: 开始时间
-      minutes: 分钟
-      page_title: 调整测验
-      student_gets_extra_time: "*%{student_name}* **每次尝试获取 %{extra_time} 分钟的额外时间**"
-      student_n: "学生 %{n}"
       time_up: 时间到！
       titles: 
-        change_user_extensions: 更改用户延时
         extend_quiz_time: 延长测验时间
-        manually_unlocked: 手动解锁
-        minutes_to_add: 要添加的分钟数
-        select_deselect_all: 全选/取消全选
-        select_user: "选择 %{user}"
         student_extensions: 学生延时
     more_questions: 更多问题
-    multi_answer: 
-      choose_answer: 选择
-    muted: 
-      muted_quiz_description: 您的测验分数不可用，因为教师还没有完成评分。教师完成此测验的评分后，您的分数将在此页面上提供。
-      muted_quiz_header: 您的测验已静音
-    new: 
-      allowed_attempts: 允许尝试的次数
-      anonymous_submissions: 提交文件保持匿名
-      buttons: 
-        not_published: 未发布
-        published: 已发布
-        save: 保存
-      cant_go_back: 回答后锁定问题
-      default_page_title: 新测验
-      group: 作业小组
-      headers: 
-        ip_filters: "什么是测验 IP 过滤器?"
-      hide_correct_answers_at: 隐藏正确答案
-      hints: 
-        question_detail_disabled: "注意: 超出 %{question_count} 时问题详细信息不可用。"
-        quiz_score: 一旦进行调查，学生将自动获得满分
-      ip_filters: "可以使用测验 IP 过滤器，只允许指定 IP 范围的计算机访问测验。过滤器可以是逗号分隔的地址列表，或者地址后面接掩码（\"192.168.217.1\"、\"192.168.217.1/24\"或\"192.168.217.1/255.255.255.0\"）。"
-      label: 
-        time_limit: 时间限制
-      labels: 
-        allow_multiple_attempts: 允许多次尝试
-        hide_results_only_after_last: 仅在其上次尝试后
-        ip_filter: "过滤 IP 地址"
-        never_hide_results: 允许学生查看其测验结果
-        quiz_instructions: 测验说明
-        quiz_notify: 通知用户此测验已更改
-        quiz_score: 分数
-        require_access_code: 需要访问代码
-        restrict_quiz: 测验限制
-        show_question_details: 显示问题详细信息
-      limited_attempts: 允许的尝试
-      links: 
-        cancel: 取消
-        find_questions: 查找问题
-        new_question: 新问题
-        new_question_group: 新问题组
-        show_assignment_rubric: 显示评分标准说明
-        switch_views: 切换视图
-      manage: 管理
-      minutes: 分钟
-      new_assignment: 新作业
-      new_discussion: 新建讨论
-      one_question_at_a_time: 一次显示一个问题
-      points_possible: "得分 %{n}"
-      quiz_title: 测验标题
-      quiz_type: 测验类型
-      require_lockdown_browser: "需要 Respondus LockDown Browser"
-      require_lockdown_browser_for_results: 查看测验结果时需要
-      retrieving_filters: 正在检索过滤器...
-      score_to_keep: 要保留的测验分数
-      show_correct_answers: 允许学生看到正确答案
-      show_correct_answers_at: 显示正确答案
-      shuffle_answers: 置乱答案
-      students_cannot_view_responses_after_course_concludes: 学生不能在课程结束后查看测验响应
-      time_limit: 多少分钟?
-      titles: 
-        click_to_select_filter: 单击以选择此过滤器
-        delete: 删除
-        find_ip_address_filter: "查找 IP 地址过滤器"
-      warnings: 
-        has_student_submissions: 学生已进行或开始进行此测验，因此请小心进行编辑。如果对任何测验问题进行重大更改，您可能会想要考虑对进行旧版本测验的学生重新评分。
     no_filters_found: 没有找到过滤器
     no_quizzes_view: 
       headers: 
         course_quizzes: 课程测验
       no_quizzes: 没有可用的测验
     notices: 
-      cant_view_submission_while_muted: 您不能在测验静音时查看测验历史记录。
-      has_submissions_already: 请记住，某些学生已经进行或开始进行此测验
-      less_than_allotted_time: 您开始此测验时测验已接近截止，因此您没有足够的时间量进行测验。
       message_sent: 消息已发送！
-      no_submission_for_user: 没有可用于该用户的提交文件
-      quiz_updated: 测验已成功更新
-      quizzes_published: 
-        one: "%{count} 个测验已成功发布！"
-        other: "%{count} 个测验已成功发布！"
-      quizzes_unpublished: 
-        one: "%{count} 个测验已成功取消发布!"
-        other: "%{count} 个测验已成功取消发布!"
     practice_quiz: 练习测验
     practices_label: 练习测验切换测验可见性
     question_colon: 问题：
     question_count: 
       one: "%{count} 个问题"
       other: "%{count} 个问题"
-    question_group: 
-      buttons: 
-        update: 更新
-      default_group_name: 小组
-      edit_questions_and_points: "挑选 *%{num_questions}* 个问题，每个问题 #%{num_points}# 分"
-      labels: 
-        group_name: 小组名称
-        number_of_questions: 问题数
-        points_per_question: 每个问题的得分
-        question_bank: 将从库中抽取问题
-      links: 
-        link_to_a_question_bank: 链接至题库
-      show_questions_and_points: "挑选 *%{num_questions}* 个问题，每个问题 #%{num_points}# 分"
-      titles: 
-        add_question_to_group: 添加问题到该组
-        collapse_group: 折叠小组
-        delete_group: 删除小组
-        edit_group_details: 编辑小组详细信息
-        expand_group: 展开小组
     question_limit_reached: "您已经达到一个测验所允许的最大问题数 (%{count}/%{limit})。\\n\\n作为一种变通方法，您可考虑跨多个测验传播材料。"
-    question_list_right_side: 
-      headers: 
-        questions: 问题
-    question_statistic: 
-      attempts: 
-        one: "%{count} 次尝试"
-        other: "%{count} 次尝试"
-      empty_response: 答题结果为空
-      labels: 
-        other_answers: 其它答案
-      no_data: 无数据
-      no_responses: 没有此问题的录制答题结果
-      percent_of_responses: "%{percent}%（共 %{total}）的尝试选择此答案"
-      response_count: 
-        one: "已向 %{count} 个学生提供此问题"
-        other: "已向 %{count} 个学生提供此问题"
-    question_teaser: 
-      titles: 
-        click_to_show_details: 单击以显示完整的问题详细信息
-        delete_this_question: 删除此问题
-        edit_this_question: 编辑此问题
+    quiz: 
+      current_filter: 当前过滤器
+      default_question_input: "[选择]"
+      default_text_only_question_name: 间隔
+      default_title: 未命名测验
+      errors: 
+        invalid_hide_results: 隐藏结果无效
+        invalid_ip_filter: "IP 过滤器无效"
+        invalid_quiz_type: 测验类型无效
+      question_name_counter: "问题 %{question_number}"
+      types: 
+        quiz: 测验
+        survey: 调查
     quiz_attempts_length_error: "测试尝试次数限制为 3 位数，如果您想给予学生无限的尝试次数，则不要选中左侧的“允许多次尝试”框"
     quiz_attempts_nan_error: 测试的尝试次数仅可以为数字
-    quiz_details: 
-      allowed_attempts: 允许的尝试次数
-      headers: 
-        available: 可用
-        due: 截止时间
-        points: 得分
-        questions: 问题
-        time_limit: 时间限制
-      multiple_due_dates: 多个截止时间
-      no_due_date: 无截止时间
-      none: 无
-      quiz_availabile_through: "%{start_time} 至 %{end_time}"
-      quiz_available_after: "%{start_time} 之后"
-      quiz_available_until: "结束时间 %{end_time}"
-      requires_lockdown: "需要 Respondus LockDown Browser"
-      time_limit: 
-        one: "%{count} 分钟"
-        other: "%{count} 分钟"
-      unlimited: 无限
+    quiz_group: 
+      errors: 
+        no_bank: "找不到测验组 %{group_name} 的题库"
+        no_permissions: "用户无权参考测验组 %{group_name} 的题库"
+      question_group: 问题组
     quiz_item_group_view: 
       no_quizzes: 未找到测验
       no_surveys: 未找到调查
@@ -11597,125 +11573,718 @@ zh:
       settings: 设置
       title_delete: 删除测验
       title_edit: 编辑测验
-    quiz_right_side: 
-      attempts_left: 
-        one: "尚有 %{count} 次可用尝试"
-        other: "尚有 %{count} 次可用尝试"
-      attempts_so_far: 
-        one: "目前有 %{count} 次尝试"
-        other: "目前有 %{count} 次尝试"
-      labels: 
-        current_score: 当前分数
-        kept_score: 保留分数
-        last_attempt_details: 上次尝试详细信息
-        submission_details: 提交详细信息
-        time: 时间
-      links: 
-        preview_quiz_again: 再次预览测验
-        preview_survey_again: 再次预览调查
-      no_more_attempts: 没有更多可用尝试次数
-      questions_not_graded: 有些问题尚未计分
-      score_set_manually: 教师已设定此分数
-      unlimited_attempts: 无限尝试次数
-      view_previous_attempts: 查看上次尝试
-    quiz_show_teacher: 
-      anonymous_submissions: 匿名提交
-      attempts: 已尝试次数
-      available_from: 开始时间
-      cant_go_back: 回答后锁定问题
-      code: 访问代码
-      due: 截止时间
-      filter: "IP 过滤"
-      for: 适用人群
-      group: 作业小组
-      label: 
-        time_limit: 时间限制
-      multiple_attempts: 多次尝试
-      no_time_limit: 无时间限制
-      one_question_at_a_time: 一次一个问题
-      points: 得分
-      quiz_type: 测验类型
-      require_lockdown_browser: "需要 Respondus LockDown Browser"
-      require_lockdown_browser_for_results: 查看测验结果时需要
-      score_to_keep: 要保留的分数
-      show_correct_answers: 显示正确答案
-      shuffle_answers: 置乱答案
-      time_limit: 
-        one: "%{count} 分钟"
-        other: "%{count} 分钟"
-      until: 结束时间
-      view_responses: 查看答题结果
+    quiz_question: 
+      defaults: 
+        question_name: 问题
+    quiz_short_answer_length_error: "填空问题的答案长度必须少于 80 个字符"
+    quiz_statistics: 
+      statistics_filename: "%{quiz_title} %{quiz_type} %{report_type} 报告"
+      types: 
+        item_analysis: 项目分析
+        student_analysis: 学生分析
     quiz_submission: 
-      attempt_duration: "此尝试进行了 %{duration}。"
-      buttons: 
-        update_scores: 更新分数
-      labels: 
-        final_score: 最终分数
-        fudge_points: 虚假得分
-        fudge_points_changed_points_quiz: "由于 %{user} 进行了此测验，因此最高得分已通过 %{difference} 更改。您可以调整此更改并使用此框手动添加正负得分。"
-        fudge_points_changed_points_survey: "由于 %{user} 进行了此调查，因此最高得分已通过 %{difference} 更改。您可以调整此更改并使用此框手动添加正负得分。"
-        fudge_points_generic_explanation: 您可以通过将正负得分添加到此框手动调整分数。
-        questions_need_review: 以下问题需要审阅
-        quiz_score: 测验分数
-        score_for_attempt: 此尝试的分数
-        score_for_quiz: 此测验的分数
-        score_for_survey: 此调查的分数
-        survey_score: 调查分数
-      links: 
-        click_to_view_results: 单击此处查看结果。
-      questions_not_graded: 有些问题尚未计分
-      quiz_fudged_negative: "此测验分数已手动调整 %{fudge} 分。"
-      quiz_fudged_positive: "此测验分数已手动调整 +%{fudge} 分。"
-      quiz_not_yet_taken: 测验尚未进行。
-      quiz_results_protected: 此测验的测验结果受到保护，并且对学生不可见。
-      quiz_results_protected_until_last_attempt: 此测验的测验结果受到保护，并且对学生不可见，直到其提交最后一次尝试。
-      quiz_submission_needs_review: 自完成文件提交后测验发生了重大更改。该提交文件可能需要重新评分。
-      requires_lockdown: "需要 Respondus LockDown Browser 才能查看您的测验结果。"
-      submitted_at: "提交时间 %{when}"
-      survey_fudged_negative: "此调查分数已手动调整 %{fudge} 分。"
-      survey_fudged_positive: "此调查分数已手动调整 +%{fudge} 分。"
-      survey_not_yet_taken: 调查尚未进行。
       titles: 
         this_is_an_external_element: 这是一个外部元素而不是文本，因此学生提交后无法更改
         this_is_an_external_frame: 这是一个外部框架而不是文本，因此学生提交后无法更改
         this_is_an_image: 这是一幅图像而不是文本，因此学生提交后无法更改
-    quiz_summary: 
-      assignment_points_possible: 
-        one: "%{count} 分"
-        other: "%{count} 分"
-      labels: 
-        allowed_attempts: 允许的尝试
-        attempts_left: 剩余尝试次数
-        attempts_so_far: 目前已尝试次数
-        latest_submission: 最新提交文件
-        quiz_details: 测验详细信息
-        quiz_due: 截止时间
-        quiz_time_limit: 时间限制
-        survey_details: 调查详细信息
-      no_details: 无详细信息
-      points_possible: "%{points_possible} 满分"
-      question_count: 
-        one: "%{count} 个问题"
-        other: "%{count} 个问题"
-      quiz_multiple_due_dates: 多个日期
-      quiz_no_points: 无得分
-      quiz_points_possible: 
-        one: "%{count} 分"
-        other: "%{count} 分"
-      student_mute_notification: 教师正在进行评分
-      unlimited_attempts: 无限尝试次数
-    read_only: 
-      default_page_title: 新测验
-      headers: 
-        quiz_details: 测验详细信息
-      labels: 
-        question_details: 显示问题详细信息
+    quiz_submission_users: 
+      created: 创建时间
+    quiz_submissions: 
+      errors: 
+        invalid_submissions: 此测验提交无法验证属于您。请重试。
+        late_quiz: 您提交此测验时已晚，您的答案可能没有录制。
+        protected_quiz: 此测验受到保护并且仅从特定位置可用。您当前使用的计算机似乎并非进行此测验的有效位置。
+      show: 
+        score_out_of: "您的得分为 %{score}，满分 %{points_possible} 分"
+      still_zipping: 正在压缩文件...
+    quizzes: 
+      access_code: 
+        buttons: 
+          submit: 提交
+        labels: 
+          access_code: 访问代码
+        quiz_restricted: 此测验受访问代码限制。您将需要请求教师或监考人员键入或告诉您访问代码，以便能够进行测验。
+        survey_restricted: 此调查受访问代码限制。您将需要请求教师或监考人员键入或告诉您访问代码，以便能够进行调查。
+      default_history_crumb: 历史记录
+      default_title: 新测验
+      display_answer: 
+        labels: 
+          answer_with_margin: 带页边距
+          your_answer: 您的答案
+        margin_of_error: 误差
+        plus_or_minus: +/-
+        range_answer: "在 %{lower_bound} 到 %{upper_bound} 之间"
+        you_left_this_blank: 您将此项留空
+      display_question: 
+        default_question_answer: "[选择]"
+        flag_this_question: 标记此问题
+        headers: 
+          formulas: 公式
+          possible_solutions: 可能的解
+          solution_answer: 答案
+          variable_maximum: 最大值
+          variable_minimum: 最小值
+          variable_name: 变量
+          variable_precision: 小数位
+          variables: 变量
+        labels: 
+          additional_comments: 其它评论
+          for_answer_number: "答案 %{answer_number}"
+          warning_icon: 警告
+        links: 
+          delete_question: 删除此问题
+          edit_question: 编辑此问题
+          move_copy_question: 将问题移动/复制到另一个库
+        not_yet_graded: 仍未计分
+        original_score: 原始分数：
+        points_possible: "%{points_possible} 分"
+        regraded_score: 重新计分后的分数：
+        show_ansers_for_variable: "显示 %{variable} 的答案"
+        skip_question_text: 跳至问题文本。
+        submission_was_regraded: 此问题已重新计分。
+        titles: 
+          question_correct_comment: 如果学生回答问题正确，他们将看到此评论
+          question_incorrect_comment: 如果学生回答问题错误，他们将看到此评论
+          question_neutral_comment: 一旦学生回答问题后，他们将看到此评论
+        unsupported_question_type: "此问题从外部来源导入。这是一个\"%{question_type}\"问题，此测验工具中不支持该问题。"
+        you_left_this_blank: 您将此项留空
+      download_file_upload_submissions: 
+        links: 
+          download_submissions: 下载所有文件
+      equations_help: 
+        equation_functions: |-
+            除了变量，还有一系列的辅助函数
+            可用于生成有用的值。例如:
+            
+            %{example}
+            
+            要查看指定辅助函数的说明，请从下面的列表中选择
+            该函数:
+        equation_intro: |-
+            计算问题基于一组或多组公式按顺序 
+            计算。您可以定义这些公式中的中间变量，但
+            最后一个公式的数值结果用于生成
+            正确答案。例如:
+            
+            %{example}
+            
+            对于此组公式，最终答案为 71。不过，
+            其中没有预定义的变量，因此所有学生对同一
+            问题得出相同的答案。有关变量的更多信息，请参阅
+            "变量"选项卡。
+        equation_variables2: "您还可以使用括号定义问题文本中的变量 （\"[a] + [b] 等于多少?\"）。对于每个变量，您将看到一个基于 变量设置的\"示例值\"。您可以这样检查您的数学并 确保公式有效。 例如，如果您的问题是\"[a] + 5 等于多少?\"，则要求您 定义变量\"a\"。如果\"a\"的示例值 为 5.2，您可以写入: %{example} 通过此公式，您可以生成任何数量的解集，每个集合 中的\"a\"值不同。一名学生可能看到的问题是 \"5.2 + 5 等于多少?\"，而另一名学生可能看到的是\"9 + 5 等于多少?\"。"
+        links: 
+          functions: 函数
+          intro: 简介
+          variables: 变量
+      errors: 
+        no_more_attempts: 您没有剩余的测验尝试
+        quiz_deleted: 该测验已删除
+        quiz_update_failed: 测验无法更新
+      fabulous_quizzes: 
+        page_titles: 测验
+      find_question_from_bank: 
+        already_added: 此问题已在测验中
+        bank_description: "%{bank_name}，%{n} 问题"
+        buttons: 
+          add_questions: 添加问题
+          create_group: 创建小组
+          select_bank: 选择库
+        group_pick_count: "%{pick_count} 个问题"
+        group_points: "每个问题 %{points} 分"
+        headers: 
+          bank_name: 库名称
+        hints: 
+          group_pick_count: "目前已选择 %{pick_count} 个"
+        labels: 
+          add_questions_to_group: 添加问题到测验组
+          group_name: 小组名称
+          group_pick_count: 挑选
+          group_points: 得分
+        links: 
+          clear_all_banks: 全部清除
+          manage_question_banks: 管理课程题库
+          more_questions: 更多问题
+          select_all_banks: 全选
+        options: 
+          new_group: "[创建新小组]"
+          no_group: "[无小组]"
+        select_a_question_bank: 从下面的列表中选择一个题库以将其链接到此测验作为问题组。
+        titles: 
+          add_new_question_group: 添加新问题组
+      form_answer: 
+        answer_in_range_accessible: "在 *范围开始* 和 #范围结束# 之间"
+        answer_text: 答案文本
+        answer_weight: 答案小部件
+        exact_answer_with_error_margin_accessible: "*确切答案*，误差范围为 #误差范围#"
+        labels: 
+          answer_comments: 学生选择此答案时的评论
+          answer_in_range: 在范围内回答
+          exact_answer: 确切答案
+        matching_left: 匹配左侧
+        matching_right: 匹配右侧
+        numerical_answer: 数值答案
+        possible_answer: 可能的答案
+        titles: 
+          click_to_enter_answer_comments: 单击以输入学生选择此答案时的评论
+          click_to_set_as_correct: 单击以将此答案设置为正确答案
+          delete_answer: 删除此答案
+          edit_as_html: "将编辑答案文本切换为 HTML"
+      form_question: 
+        allow_tolerance: "允许的误差为 +/- %{tolerance}"
+        buttons: 
+          create_update_question: 创建/更新问题
+          generate: 生成
+          recompute: 重新计算
+        correct_answer_comments: 正确答案评论
+        distractor_instructions: 在其自己的行中键入每个错误选项
+        equation_example: "即\"5 加 [x] 等于多少?\""
+        explanation: 
+          generate_possible_solutions: 最后，根据您的测验需要建立尽可能多的变量-解组合。
+        explanations: 
+          calculated: 输入您的问题，建立一个公式，然后生成一组可能的答案组合。学生将看到通过随机选择的一组变量填充的问题，并且必须键入正确的数值答案。
+          equations: 您可以通过键入括号包围的变量名称来定义变量
+          essay: 系统将为学生提供一个文本字段以撰写其答案。
+          file_upload: 学生可以上传文件来回答问题。
+          fill_in_multiple_blanks: 输入您的问题，指定每个空格应转至的位置。然后定义每个空格可能的正确答案。学生必须在每个空格的文本框中键入正确的答案。
+          formula_definition: 接下来您需要写出用于计算正确答案的公式。只使用上面列出的那些变量名。
+          matching: 构建成对的匹配值。学生将看到左侧的值，并且必须从右侧的下拉列表中选择匹配的值。多个行可以有相同的答案，并且您可以在右侧添加其它错误选项。
+          missing_word: 定义转至下拉列表之前和之后的文本。构建一组可能的答案并选择一个正确答案。
+          multi_answer_sets: 在下面的框中（您要显示答案框的每个位置），键入一个包含在括号内的参考词（无空格）
+          multiple_answers: 此问题将在每个答案旁边显示一个复选框，并且学生必须选择您标记为正确的"所有"答案。
+          multiple_choice: 输入您的问题和多个答案，然后选择一个正确答案。
+          multiple_dropdowns: 输入您的问题，指定每个下拉列表应转至的位置。然后定义每个下拉列表可能的答案，每个下拉列表有一个正确答案。
+          numerical: 将正确答案定义为范围内的任何数字，或数字加上或减去一些误差。系统将向学生提供一个空文本框用于键入其数值答案。
+          short_answer: |-
+              输入您的问题文本，然后定义空格所有可能的正确答案。  
+              学生将看到问题，后跟一个小文本框用于键入其答案。
+          text_only: 此"问题"将不会评分，但在引入一组相关问题时非常有用。
+          true_false: "输入您的问题文本，然后选择 True 或 False 作为正确答案。"
+          variable_definitions: 一旦您输入上述变量后，应看到这些变量在此处列出。您可以指定下面每个变量可能的值范围。
+        general_answer_comments: 一般答案评论
+        headers: 
+          formula_definition: 公式定义
+          generate_possible_solutions: 生成可能的解
+          variable_definitions: 变量定义
+          variable_example_value: 示例值
+          variable_maximum: 最大值
+          variable_minimum: 最小值
+          variable_name: 变量
+          variable_precision: 小数位
+        label: 
+          question: 
+            name: 问题名称
+            points: 问题分数值
+            type: 问题类型
+        labels: 
+          answers: 答案
+          distractors: 其它匹配可能（错误选项）
+          missing_word_after: 答案后转至的文本
+          points: 得分
+          question: 问题
+        links: 
+          add_another_answer: 添加其它答案
+          need_help: 需要帮助?
+        multi_answer_sets_example: "即\"玫瑰为 [color1]，紫罗兰为 [color2]\""
+        offer_combinations: "提供 %{how_many} 种可能的值组合（最大值 %{max_combinations}）"
+        options: 
+          only_one_correct: 只有一个正确答案
+          students_select_multiple: 学生选择多个答案
+        question_type: 
+          calculated: 公式问题
+          essay: 问答题
+          file_upload: 文件上传问题
+          fill_in_multiple_blanks: 填写多个空格
+          matching: 匹配
+          missing_word: 缺字
+          multiple_answers: 多个答案
+          multiple_choice: 多选
+          multiple_dropdowns: 多个下拉列表
+          numerical: 数值答案
+          short_answer: 填空题
+          text_only: 文本（无问题）
+          true_false: True/False
+        show_possible_answers: "显示 %{question} 可能的答案"
+        show_possible_answers_no_question: 显示可能的答案
+        titles: 
+          click_to_enter_correct_answer_comments: 单击以输入正确答案的评论
+          click_to_enter_general_answer_comments: 单击以输入一般评论
+          click_to_enter_wrong_answer_comments: 单击以输入错误答案的评论
+        wrong_answer_comments: 错误答案评论
+      history: 
+        anonymous_username: 学生
+        buttons: 
+          allow_extra_attempt: 允许此学生进行额外的尝试
+        count_attempts_left: 
+          one: "%{user} 有 %{count} 次剩余尝试机会"
+          other: "%{user} 有 %{count} 次剩余尝试机会"
+        default_quiz_name: "测验 %{course_name}"
+        default_survey_name: "调查 %{course_name}"
+        grade_by_question_warning: 按问题特性的评分受小组中置乱的问题的影响。
+        headers: 
+          quiz_submissions: 测验提交
+          survey_submissions: 调查提交
+        latest_quiz_results: "以下是 %{user} 的最新测验结果。您可以修改任何问题的得分和添加更多评论，然后单击页面底部的\"更新分数\"。"
+        latest_survey_results: "以下是 %{user} 的最新调查结果。您可以修改任何问题的得分和添加更多评论，然后单击页面底部的\"更新分数\"。"
+        links: 
+          back_to_quiz: 返回测验
+          back_to_survey: 返回调查
+        logged_out_user: "注销的用户 %{index}"
+        named_quiz_results: "%{user} 的 %{quiz_name} 结果"
+        next_questions_arrow_title: 下面的问题
+        no_more_attempts: "%{user} 没有剩余尝试次数"
+        page_title_quiz: "%{user} 的测验历史记录"
+        page_title_survey: "%{user} 的调查历史记录"
+        prev_questions_arrow_title: 前面的问题
+        quiz_not_yet_taken: 测验尚未进行。
+        quiz_not_yet_taken_or_in_progress: 测验尚未进行或当前正在进行
+        quiz_unlimited_attempts: 此测验有无限尝试次数
+        score_for_attempt: "尝试 %{attempt_number}: %{score}"
+        survey_not_yet_taken: 调查尚未进行。
+        survey_not_yet_taken_or_in_progress: 调查尚未进行或当前正在进行
+        survey_unlimited_attempts: 此调查有无限尝试次数
+        titles: 
+          score_pending_review: 此分数待审阅，并且可能会更改
+          submission_needs_review: 此提交文件需要审阅
+        unnamed_quiz_results: "%{user} 的测验结果"
+        unnamed_survey_results: "%{user} 的调查结果"
+      index: 
+        buttons: 
+          publish_quizzes: 发布测验
+        headers: 
+          assignment_quizzes: 作业测验
+          course_quizzes: 课程测验
+          practice_quizzes: 练习测验
+          publish_multiple_quizzes: 发布多个测验
+          surveys: 调查
+          unpublished_quizzes: 未发布的测验
+        labels: 
+          publish_multiple_quizzes: 选择您想要在此时发布的测验
+        links: 
+          create_new_quiz: 创建新测验
+          manage_question_banks: 管理题库
+          publish_multiple_quizzes: 发布多个测验
+        no_quizzes: 没有可用的测验
+        page_titles: 测验
+        titles: 
+          this_quiz_is_locked: 此测验当前锁定。单击以了解更多详细信息。
+      invalid_ip: 
+        quiz_protected: 此测验受到保护并且仅从特定位置可用。您当前使用的计算机似乎并非进行此测验的有效位置。
+        survey_protected: 此调查受到保护并且仅从特定位置可用。您当前使用的计算机似乎并非进行此调查的有效位置。
+      lockdown_browser_required: 
+        headers: 
+          requires_lockdown: "需要 Respondus LockDown Browser"
+        labels: 
+          download_lockdown: 如果尚未安装该浏览器，请从此处下载
+        links: 
+          download_lockdown: "[下载 Respondus LockDown Browser]"
+        requires_lockdown: "此测验需要 Respondus LockDown Browser。请启动 Respondus LockDown Browser 以进行此测验或查看您的测验结果。"
+      managed_quiz_data: 
+        anonymous_student: "学生 %{user_counter}"
+        logged_out_user: "注销的用户 %{user_counter}"
+        titles: 
+          submission_needs_review: 此提交文件需要审阅
+      moderate: 
+        add_time: 添加时间
+        buttons: 
+          change_extensions_for_selected_students: "更改 %{n} 名所选学生的延时"
+          extend_time: 延长时间
+          save: 保存
+        end_quiz_reference_time_current_end: 当前结束时间
+        end_quiz_reference_time_now: 立即
+        end_quiz_when: "%{reference_time} 过 %{n} 分钟结束测验。"
+        extended_quiz_time_explanation: 您可以为此学生提供有关其当前测验尝试的额外时间。您想要为其提供多长时间?
+        finished_in: "在 %{duration} 内完成"
+        global_extra_attempts: "所有人均已获得 %{n}"
+        headers: 
+          attempt: 尝试
+          attempts_left: 剩余尝试次数
+          extended_quiz_time: 延长测验时间
+          score: 分数
+          student: 学生
+          student_extensions: 学生延时
+          time: 时间
+        in_progress: 正在进行
+        labels: 
+          ending: 正在结束
+          extra_attempts: 额外尝试次数
+          extra_time_per_attempt: 每次尝试的额外时间
+          manually_unlock: 手动解锁测验以进行下次尝试
+          started: 已开始
+        minutes: 分钟
+        page_title: 调整测验
+        student_gets_extra_time: "*%{student_name}* **每次尝试获取 %{extra_time} 分钟的额外时间**"
+        student_n: "学生 %{n}"
+        titles: 
+          change_user_extensions: 更改用户延时
+          manually_unlocked: 手动解锁
+          minutes_to_add: 要添加的分钟数
+          select_deselect_all: 全选/取消全选
+          select_user: "选择 %{user}"
+      multi_answer: 
+        choose_answer: 选择
+      muted: 
+        muted_quiz_description: 您的测验分数无法提供，因为教师还没有完成评分。教师完成此测验的评分后，您的分数将在此页面上提供。
+        muted_quiz_header: 您的测验已静音
+      new: 
+        allowed_attempts: 允许尝试的次数
+        anonymous_submissions: 提交文件保持匿名
+        buttons: 
+          not_published: 未发布
+          published: 已发布
+          save: 保存
+        cant_go_back: 回答后锁定问题
+        default_page_title: 新测验
+        group: 作业小组
+        headers: 
+          ip_filters: "什么是测验 IP 过滤器?"
+        hide_correct_answers_at: 隐藏正确答案
+        hints: 
+          question_detail_disabled: "注意: 超出 %{question_count} 个时问题详细信息不可用。"
+          quiz_score: 一旦进行调查，学生将自动获得满分
+        ip_filters: "可以使用测验 IP 过滤器，只允许指定 IP 范围的计算机访问测验。过滤器可以是逗号分隔的地址列表，或者地址后面接掩码（\"192.168.217.1\"、\"192.168.217.1/24\"或\"192.168.217.1/255.255.255.0\"）。"
+        label: 
+          time_limit: 时间限制
+        labels: 
+          allow_multiple_attempts: 允许多次尝试
+          hide_results_only_after_last: 仅在其上次尝试后
+          ip_filter: "过滤 IP 地址"
+          never_hide_results: 允许学生查看其测验结果
+          quiz_instructions: 测验说明
+          quiz_notify: 通知用户此测验已更改
+          quiz_score: 分数
+          require_access_code: 需要访问代码
+          restrict_quiz: 测验限制
+          show_question_details: 显示问题详细信息
+        limited_attempts: 允许的尝试次数
+        links: 
+          cancel: 取消
+          find_questions: 查找问题
+          new_question: 新问题
+          new_question_group: 新问题组
+          show_assignment_rubric: 显示评分标准说明
+        manage: 管理
+        minutes: 分钟
+        new_assignment: 新作业
+        new_discussion: 新建讨论
+        one_question_at_a_time: 一次显示一个问题
+        points_possible: "得分 %{n}"
+        quiz_title: 测验标题
+        quiz_type: 测验类型
+        require_lockdown_browser: "需要 Respondus LockDown Browser"
+        require_lockdown_browser_for_results: 查看测验结果时需要
+        retrieving_filters: 正在检索过滤器...
+        score_to_keep: 要保留的测验分数
+        show_correct_answers: 允许学生看到正确答案
+        show_correct_answers_at: 显示正确答案
+        shuffle_answers: 置乱答案
+        students_cannot_view_responses_after_course_concludes: 学生不能在课程结束后查看测验响应
+        time_limit: 多少分钟?
+        titles: 
+          click_to_select_filter: 单击以选择此过滤器
+          delete: 删除
+          find_ip_address_filter: "查找 IP 地址过滤器"
+        warnings: 
+          has_student_submissions: 学生已进行或开始进行此测验，因此请小心进行编辑。如果对任何测验问题进行重大更改，您可能会想要考虑对进行旧版本测验的学生重新评分。
+      notices: 
+        cant_view_submission_while_muted: 您不能在测验静音时查看测验历史记录。
+        has_submissions_already: 请记住，某些学生已经进行或开始进行此测验
+        less_than_allotted_time: 您开始此测验时测验已接近截止，因此您没有足够的时间量进行测验。
+        no_submission_for_user: 没有可用于该用户的提交文件
+        quiz_updated: 测验已成功更新
+        quizzes_published: 
+          one: "%{count} 个测验已成功发布！"
+          other: "%{count} 个测验已成功发布！"
+        quizzes_unpublished: 
+          one: "%{count} 个测验已成功取消发布!"
+          other: "%{count} 个测验已成功取消发布!"
+      question_group: 
+        buttons: 
+          update: 更新
+        default_group_name: 小组
+        edit_questions_and_points: "挑选 *%{num_questions}* 个问题，每个问题 #%{num_points}# 分"
+        labels: 
+          group_name: 小组名称
+          number_of_questions: 问题数
+          points_per_question: 每个问题的得分
+          question_bank: 将从库中抽取问题
+        links: 
+          link_to_a_question_bank: 链接至题库
+        show_questions_and_points: "挑选 *%{num_questions}* 个问题，每个问题 #%{num_points}# 分"
+        titles: 
+          add_question_to_group: 添加问题到该小组
+          collapse_group: 折叠小组
+          delete_group: 删除小组
+          edit_group_details: 编辑小组详细信息
+          expand_group: 展开小组
+      question_list_right_side: 
+        headers: 
+          questions: 问题
+      question_statistic: 
+        attempts: 
+          one: "%{count} 次尝试"
+          other: "%{count} 次尝试"
+        empty_response: 答题结果为空
+        labels: 
+          other_answers: 其它答案
+        no_data: 无数据
+        no_responses: 没有此问题的录制答题结果
+        percent_of_responses: "%{percent}%（共 %{total}）的尝试选择此答案"
+        response_count: 
+          one: "已向 %{count} 个学生提供此问题"
+          other: "已向 %{count} 个学生提供此问题"
+      question_teaser: 
+        titles: 
+          click_to_show_details: 单击以显示完整的问题详细信息
+          delete_this_question: 删除此问题
+          edit_this_question: 编辑此问题
+      quiz_details: 
+        allowed_attempts: 允许的尝试次数
+        headers: 
+          available: 可用
+          due: 截止时间
+          points: 得分
+          questions: 问题
+          time_limit: 时间限制
+        multiple_due_dates: 多个截止时间
+        no_due_date: 无截止时间
+        none: 无
+        quiz_availabile_through: "%{start_time} 至 %{end_time}"
+        quiz_available_after: "%{start_time} 之后"
+        quiz_available_until: "直到 %{end_time}"
+        requires_lockdown: "需要 Respondus LockDown Browser"
+        time_limit: 
+          one: "%{count} 分钟"
+          other: "%{count} 分钟"
+        unlimited: 无限
+      quiz_right_side: 
+        attempts_left: 
+          one: "增加 %{count} 次尝试机会"
+          other: "增加 %{count} 次尝试机会"
+        attempts_so_far: 
+          one: "目前有 %{count} 次尝试"
+          other: "目前有 %{count} 次尝试"
+        labels: 
+          current_score: 当前分数
+          kept_score: 保留分数
+          last_attempt_details: 上次尝试详细信息
+          submission_details: 提交作业详细信息
+          time: 时间
+        links: 
+          preview_quiz_again: 再次预览测验
+          preview_survey_again: 再次预览调查
+        no_more_attempts: 没有更多可用尝试次数
+        questions_not_graded: 有些问题尚未计分
+        score_set_manually: 教师已设定此分数
+        unlimited_attempts: 无限尝试次数
+        view_previous_attempts: 查看以前的尝试
+      quiz_show_teacher: 
+        anonymous_submissions: 匿名提交
+        attempts: 已尝试次数
+        available_from: 开始时间
+        cant_go_back: 回答后锁定问题
+        code: 访问代码
+        due: 截止时间
+        filter: "IP 过滤"
+        for: 适用人群
+        group: 作业小组
+        label: 
+          time_limit: 时间限制
+        multiple_attempts: 多次尝试
+        no_time_limit: 无时间限制
+        one_question_at_a_time: 一次一个问题
+        points: 得分
+        quiz_type: 测验类型
+        require_lockdown_browser: "需要 Respondus LockDown Browser"
+        require_lockdown_browser_for_results: 查看测验结果时需要
+        require_lockdown_browser_monitor: 需要网络摄像机
+        score_to_keep: 要保留的分数
+        show_correct_answers: 显示正确答案
+        shuffle_answers: 置乱答案
+        time_limit: 
+          one: "%{count} 分钟"
+          other: "%{count} 分钟"
+        until: 直到
+        view_responses: 查看答题结果
+      quiz_submission: 
+        attempt_duration: "此尝试进行了 %{duration}。"
+        buttons: 
+          update_scores: 更新分数
+        labels: 
+          final_score: 最终分数
+          fudge_points: 虚假得分
+          fudge_points_changed_points_quiz: "由于 %{user} 进行了此测验，因此最高得分已更改 %{difference}。您可以调整此更改并使用此框手动添加正负得分。"
+          fudge_points_changed_points_survey: "由于 %{user} 进行了此调查，因此最高得分已更改 %{difference}。您可以调整此更改并使用此框手动添加正负得分。"
+          fudge_points_generic_explanation: 您可以通过将正负得分添加到此框手动调整分数。
+          questions_need_review: 以下问题需要审阅
+          quiz_score: 测验分数
+          score_for_attempt: 此尝试的分数
+          score_for_quiz: 此测验的分数
+          score_for_survey: 此调查的分数
+          survey_score: 调查分数
+        links: 
+          click_to_view_results: 单击此处查看结果。
+        questions_not_graded: 有些问题尚未计分
+        quiz_fudged_negative: "此测验分数已手动调整 %{fudge} 分。"
+        quiz_fudged_positive: "此测验分数已手动调整 +%{fudge} 分。"
+        quiz_not_yet_taken: 测验尚未进行。
+        quiz_results_protected: 此测验的测验结果受到保护，并且对学生不可见。
+        quiz_results_protected_until_last_attempt: 此测验的测验结果受到保护，并且对学生不可见，直到其提交最后一次尝试。
+        quiz_submission_needs_review: 自完成文件提交后测验发生了重大更改。该提交文件可能需要重新评分。
+        requires_lockdown: "需要 Respondus LockDown Browser 才能查看您的测验结果。"
+        submitted_at: "提交时间 %{when}"
+        survey_fudged_negative: "此调查分数已手动调整 %{fudge} 分。"
+        survey_fudged_positive: "此调查分数已手动调整 +%{fudge} 分。"
+        survey_not_yet_taken: 调查尚未进行。
+      quiz_summary: 
+        assignment_points_possible: 
+          one: "%{count} 分"
+          other: "%{count} 分"
+        labels: 
+          allowed_attempts: 允许的尝试次数
+          attempts_left: 剩余尝试次数
+          attempts_so_far: 目前已尝试次数
+          latest_submission: 最新提交文件
+          quiz_details: 测验详细信息
+          quiz_due: 截止时间
+          quiz_time_limit: 时间限制
+          survey_details: 调查详细信息
+        no_details: 无详细信息
+        points_possible: "%{points_possible} 满分"
+        question_count: 
+          one: "%{count} 个问题"
+          other: "%{count} 个问题"
+        quiz_multiple_due_dates: 多个日期
+        quiz_no_points: 无得分
+        quiz_points_possible: 
+          one: "%{count} 分"
+          other: "%{count} 分"
+        student_mute_notification: 教师正在进行评分
+        unlimited_attempts: 无限尝试次数
+      read_only: 
+        default_page_title: 新测验
+        headers: 
+          quiz_details: 测验详细信息
+        labels: 
+          question_details: 显示问题详细信息
+          quiz_instructions: 测验说明
+        links: 
+          back_to_quiz_page: 返回测验页面
+      refresh_quiz_after_popup: 
+        headers: 
+          loading_in_lockdown: "正在 Respondus LockDown Browser 中加载测验"
+      show: 
+        buttons: 
+          lock_quiz: 立即锁定此测验
+          lock_survey: 立即锁定此调查
+          publish: 发布
+          republish: 重新发布
+          unlock_quiz: 立即允许学生进行此测验
+          unlock_survey: 立即允许学生进行此调查
+        labels: 
+          available_until: 直到
+          no_time_limit: 无时间限制
+          warning_icon: 警告
+        links: 
+          edit: 编辑
+          keep_editing_this_quiz: 一直编辑此测验
+          keep_editing_this_survey: 一直编辑此调查
+          message_students_who: 给相关学生发送信息
+          moderate_this_quiz: 调整此测验
+          moderate_this_survey: 调整此调查
+          preview: 预览
+          quiz_statistics: 测验情况数据分析
+          see_full_quiz: 查看完整测验
+          show_assignment_rubric: 显示评分标准说明
+          show_student_quiz_results: 显示学生测验结果
+          show_student_survey_results: 显示学生调查结果
+          survey_statistics: 调查统计
+        manage: 管理
+        only_registered_users: 只有注册的登记用户才能进行计分测验
+        quiz_regraded_your_score_affected: 
+          one: "此测验已重新计分; 您的新分数反映受到影响的 %{count} 个问题。"
+          other: "此测验已重新计分; 您的新分数反映受到影响的 %{count} 个问题。"
+        quiz_regraded_your_score_not_affected: "此测验已重新计分; 您的分数未受影响。"
+        speed_grader: 快速评分器™
+        students_submitted_so_far: 
+          one: "目前 %{count} 个学生已提交"
+          other: "目前 %{count} 个学生已提交"
+        titles: 
+          delete: 删除
+          related_items: 相关项目
+          unlock_for_how_long: 您想要解锁该测验多长时间?
+        warnings: 
+          draft_version: 这是测验草拟版本的预览
+      single_answer: 
+        upload: 上传
+      statistics: 
+        class_too_large: 此课程太大而无法显示统计信息。仍可从右侧边栏下载这些统计信息。
+        headers: 
+          for_question: "有关 %{question_name}"
+          quiz_statistics: 测验情况数据分析
+          survey_statistics: 调查统计
+          users_have_taken_this_quiz: "%{count} 位用户已进行此测验"
+          users_have_taken_this_survey: "%{count} 位用户已进行此调查"
+        labels: 
+          average_correct: 平均正确
+          average_incorrect: 平均错误
+          average_time: 平均时间
+          high_score: 高分
+          low_score: 低分
+          mean_score: 平均分
+          standard_deviation: 标准偏差
+          users_selected_the_answer: "以下用户选择了答案 %{answer_text}"
+        links: 
+          count_all_attempts: 计数**所有**尝试
+          count_only_latest_attempts: 仅计数每一最新尝试
+        page_title: 统计
+        quiz_all_version_disclaimer: 此报告基于所有用户的所有尝试显示测验情况数据分析。
+        quiz_latest_version_disclaimer: 此报告基于每位用户的最新尝试显示测验情况数据分析。
+        student_n: "学生 %{student_counter}"
+        survey_all_version_disclaimer: 此报告基于所有用户的所有尝试显示调查统计。
+        survey_latest_version_disclaimer: 此报告基于每位用户的最新尝试显示调查统计。
+      statistics_crumb: 统计
+      submission_version: 
+        attempt_number: "尝试 %{att_no}"
+        kept: 保留
+        latest: 最新
+      submission_versions: 
+        attempt: 尝试
+        attempt_history: 尝试历史记录
+        quiz_attempt_history_description: 显示您的测验尝试历史记录的表。每次尝试都列在左侧。尝试、时间和分数列在顶部。
+        regraded: 已重新计分
+        score: 分数
+        time: 时间
+      take_quiz: 
+        buttons: 
+          next: 下一页
+          out_of_time_submit: 好的
+          previous: 上一页
+          submit_quiz: 提交测验
+        headers: 
+          draft_preview: 这是测验草拟版本的预览
+        labels: 
+          started: 已开始
+          times_up: 时间到！提交结果
+        logged_out_of_canvas: "*您已注销 Canvas。*若要继续，请登录"
+        login_required: 需要登录
+        not_saved: 未保存
         quiz_instructions: 测验说明
-      links: 
-        back_to_quiz_page: 返回测验页面
-    refresh_quiz_after_popup: 
-      headers: 
-        loading_in_lockdown: "正在 Respondus LockDown Browser 中加载测验"
+      take_quiz_in_popup: 
+        headers: 
+          loading_in_lockdown: "正在 Respondus LockDown Browser 中加载测验"
+        links: 
+          return_to_quiz_page: "[单击此处](%{url}) 以返回测验页面。"
+      take_quiz_right_side: 
+        labels: 
+          attempt_due: 尝试截止
+          score: 分数
+          time_elapsed: 经过时间
+          time_running: 运行时间
+        links: 
+          hide_time_running: 隐藏
+          keep_editing_quiz: 一直编辑此测验
+          keep_editing_survey: 一直编辑此调查
     retrieving_filters: 正在检索过滤器...
     rubric: 
       loading: 正在加载...
@@ -11733,114 +12302,35 @@ zh:
         you_answered: 您已回答
       buttons: 
         already_published: 已发布!
-        lock_quiz: 立即锁定此测验
-        lock_survey: 立即锁定此调查
-        publish: 发布
         publishing: 正在发布...
-        republish: 重新发布
-        unlock_quiz: 立即允许学生进行此测验
-        unlock_survey: 立即允许学生进行此调查
       confirms: 
         delete_quiz: 是否确定要删除此测验?
         delete_quiz_submissions_warning: 
           one: "警告：%{count} 个学生已参加此测验。若删除，则任何已完成的提交文件也将被删除，再也不会出现在评分册中。"
           other: "警告：%{count} 个学生已参加此测验。若删除，则任何已完成的提交文件也将被删除，再也不会出现在评分册中。"
-      labels: 
-        available_until: 结束时间
-        no_time_limit: 无时间限制
-        warning_icon: 警告
       links: 
-        edit: 编辑
         hide_student_quiz_results: 隐藏学生测验结果
         hide_student_survey_results: 隐藏学生调查结果
-        keep_editing_this_quiz: 一直编辑此测验
-        keep_editing_this_survey: 一直编辑此调查
-        message_students_who: 给相关学生发送信息
-        moderate_this_quiz: 调整此测验
-        moderate_this_survey: 调整此调查
-        preview: 预览
-        quiz_statistics: 测验情况数据分析
-        see_full_quiz: 查看完整测验
-        show_assignment_rubric: 显示评分标准说明
         show_student_quiz_results: 显示学生测验结果
         show_student_survey_results: 显示学生调查结果
-        survey_statistics: 调查统计
-      manage: 管理
-      only_registered_users: 只有注册的登记用户才能进行计分测验
-      quiz_regraded_your_score_affected: 
-        one: "此测验已重新计分; 您的新分数反映受到影响的 %{count} 个问题。"
-        other: "此测验已重新计分; 您的新分数反映受到影响的 %{count} 个问题。"
-      quiz_regraded_your_score_not_affected: "此测验已重新计分; 您的分数未受影响。"
-      speed_grader: 快速评分器™
-      students_submitted_so_far: 
-        one: "目前 %{count} 个学生已提交"
-        other: "目前 %{count} 个学生已提交"
       students_who_have_not_taken_the_quiz: 尚未进行测验的学生
       students_who_have_taken_the_quiz: 已进行测验的学生
-      titles: 
-        delete: 删除
-        related_items: 相关项目
-        unlock_for_how_long: 您想要解锁该测验多长时间?
-      warnings: 
-        draft_version: 这是测验草拟版本的预览
     show_and_hide_correct_answers: "从 %{from} 到 %{to}"
     show_correct_answers_after: "在 %{date} 之后"
     show_correct_answers_immediately: 立即
     show_correct_answers_until: "直到 %{date}"
-    single_answer: 
-      upload: 上传
     statistics: 
-      class_too_large: 此课程太大而无法显示统计信息。仍可从右侧边栏下载这些统计信息。
       count_attempts: 
         one: "%{count} 次尝试"
         other: "%{count} 次尝试"
-      headers: 
-        for_question: "有关 %{question_name}"
-        quiz_statistics: 测验情况数据分析
-        survey_statistics: 调查统计
-        users_have_taken_this_quiz: "%{count} 位用户已进行此测验"
-        users_have_taken_this_survey: "%{count} 位用户已进行此调查"
-      labels: 
-        average_correct: 平均正确
-        average_incorrect: 平均错误
-        average_time: 平均时间
-        high_score: 高分
-        low_score: 低分
-        mean_score: 平均分
-        standard_deviation: 标准偏差
-        users_selected_the_answer: "以下用户选择了答案 %{answer_text}"
-      links: 
-        count_all_attempts: 计数**所有**尝试
-        count_only_latest_attempts: 仅计数每一最新尝试
-      page_title: 统计
-      quiz_all_version_disclaimer: 此报告基于所有用户的所有尝试显示测验情况数据分析。
-      quiz_latest_version_disclaimer: 此报告基于每位用户的最新尝试显示测验情况数据分析。
-      survey_all_version_disclaimer: 此报告基于所有用户的所有尝试显示调查统计。
-      survey_latest_version_disclaimer: 此报告基于每位用户的最新尝试显示调查统计。
       titles: 
         submitted_users_for_quesiton: "%{user} 的已提交用户"
       uncounted_submissions: 
         one: "%{count} 个其它提交文件"
         other: "%{count} 个其它提交文件"
-    statistics_crumb: 统计
-    submission_version: 
-      attempt_number: "尝试 %{att_no}"
-      kept: 保留
-      latest: 最新
-    submission_versions: 
-      attempt: 已尝试次数
-      attempt_history: 尝试历史记录
-      quiz_attempt_history_description: 显示您的测验尝试历史记录的表。每次尝试都列在左侧。尝试、时间和分数列在顶部。
-      regraded: 已重新计分
-      score: 分数
-      time: 时间
+    survey: 调查
     surveys_label: 调查切换测验可见性
     take_quiz: 
-      buttons: 
-        next: 下一页
-        out_of_time_submit: 好的
-        previous: 上一页
-        submit_quiz: 提交测验
       confirms: 
         cant_go_back_blank: 您单击”下一个“后，就不能返回此问题。是否确定要留空?
         navigate_away: 您将要导航离开此页面。是否仍要继续?
@@ -11857,25 +12347,20 @@ zh:
       errors: 
         connection_lost: "到 %{host} 的连接丢失。请确保已连接到 Internet，然后继续。"
         only_numerical_values: 只接受数值
-      headers: 
-        draft_preview: 这是测验草拟版本的预览
       hide_time_link: 隐藏
       hours_count: 
         one: "%{count} 小时"
         other: "%{count} 小时"
       labels: 
-        started: 开始时间
         time_elapsed: 经过时间
-        times_up: 时间到！提交结果
-      logged_out_of_canvas: "*您已注销 Canvas。*若要继续，请登录"
-      login_required: 需要登录
+      login_failed: 登录失败。
+      login_successful: 登录成功。
       minutes_count: 
         one: "%{count} 分钟"
         other: "%{count} 分钟"
       months_count: 
         one: "%{count} 个月"
         other: "%{count} 个月"
-      not_saved: 未保存
       notices: 
         extra_time: 系统已提供有关此尝试的额外时间
         five_minutes_left: 剩余五分钟时间
@@ -11885,7 +12370,6 @@ zh:
         twelve_hours_left: 剩余十二小时
       question_answered: 已回答
       question_unanswered: 尚未回答
-      quiz_instructions: 测验说明
       saved_at: "在 %{t} 保存测验"
       saving: 正在保存...
       saving_not_needed: "没有要保存的新数据。最后检查时间是 %{t}"
@@ -11899,21 +12383,6 @@ zh:
       years_count: 
         one: "%{count} 年"
         other: "%{count} 年"
-    take_quiz_in_popup: 
-      headers: 
-        loading_in_lockdown: "正在 Respondus LockDown Browser 中加载测验"
-      links: 
-        return_to_quiz_page: "[单击此处](%{url}) 以返回测验页面。"
-    take_quiz_right_side: 
-      labels: 
-        attempt_due: 尝试截止
-        score: 分数
-        time_elapsed: 经过时间
-        time_running: 运行时间
-      links: 
-        hide_time_running: 隐藏
-        keep_editing_quiz: 一直编辑此测验
-        keep_editing_survey: 一直编辑此调查
     timing: 
       labels: 
         time_elapsed: 经过时间
@@ -11935,6 +12404,7 @@ zh:
     : "True"
     ungraded_survey: 非计分调查
     warnings: 
+      draft_state_unsaved_changes: "*您已对此测验中的问题进行了更改。* 这些更改将不会对学生显示，直到您保存测验。"
       unpublished_changes: "*您已对此测验进行未发布的更改。* 这些更改将不会对学生显示，直到您发布或重新发布测验。"
       unpublished_quiz: "*此测验未发布* 在发布之前，只有教师才能查看此课程。"
   quizzes_model: 
@@ -11949,6 +12419,8 @@ zh:
     questions: 
       one: "%{count} 个问题"
       other: "%{count} 个问题"
+  quizzes_redirects: 
+    no_access: 已拒绝访问。请重新定向到您有访问权限的页面。
   re_upload_submissions_form: 
     buttons: 
       upload: 上传文件
@@ -12011,6 +12483,7 @@ zh:
     permission: 
       read_sis: "读取 SIS 数据"
     permissions: 
+      app_profiling: 应用程序分析
       become_user: 成为其他用户
       change_course_state: 更改课程状态
       comment_on_others_submissions: 查看所有学生的提交文件并对其进行评论
@@ -12063,6 +12536,7 @@ zh:
       undelete_courses: 取消删除课程
       view_all_grades: 查看所有评分
       view_analytics: 查看分析页面
+      view_course_changes: 查看课程更改日志
       view_error_reports: 查看错误报告
       view_grade_changes: "查看评分更改日志 "
       view_group_pages: 查看所有学习小组的学习小组页面
@@ -12123,7 +12597,6 @@ zh:
     updating: 正在更新...
   rubric: 
     context_name_rubric: "%{course_name} 评分标准"
-    no_context_found: "无法找到“%{title}”的外部评分标准说明，创建一个副本。"
     no_description: 无说明
     unknown_details: 未知详细信息
   rubric_assessment: 
@@ -12261,6 +12734,8 @@ zh:
         current_enrollments: 当前注册
         decrosslist_section: 取消交叉列出此班级
   select_content: 选择内容
+  select_content_checkbox: 
+    select_content_error: 您必须选择内容选项
   select_content_dialog: 
     buttons: 
       add_item: 添加项目
@@ -12341,16 +12816,6 @@ zh:
     accounts_right_side_shared: 
       buttons: 
         go: 执行
-      titles: 
-        find_user: 查找用户
-    accounts_secondary_content: 
-      buttons: 
-        go: 执行
-      links: 
-        manage_permissions: 管理身份权限
-        manage_subaccounts: 管理子帐户
-        manage_terms: 管理学期
-        view_statistics: 查看统计
       titles: 
         find_user: 查找用户
     add_assignment: 
@@ -12453,9 +12918,19 @@ zh:
         unenroll_user_section: 从班级中删除用户
       titles: 
         course_section: 课程班级
+    error_form: 
+      message_failed: 报告没有发送。请重试。
+      message_sent: 谢谢您的帮助。我们会修正此错误。
     errors: 
       400_message: 
         description: 嗯。看起来加载您所请求的页面时出现问题。
+        error: 错误：
+        headings: 
+          page: 页面错误
+        title: 页面错误
+      403_message: 
+        description: 嗯。看起来您不该在此处。
+        error: 错误：
         headings: 
           page: 页面错误
         title: 页面错误
@@ -12479,8 +12954,6 @@ zh:
           submit: 发送评论
         labels: 
           email: 电子邮件（可选）
-        message_failed: 报告没有发送。请重试。
-        message_sent: 谢谢您的帮助。我们会修正此错误。
     event_list: 
       at_least_more_events: "至少还有 %{count_of_events} 个"
       at_least_more_events_one_week: "下周至少还有 %{count_of_events} 个"
@@ -12544,6 +13017,7 @@ zh:
       range_upper: 范围的上限
       remove_row: 移除行
       remove_scheme: 删除评分方案
+      select_another_scheme: 选择其他方案
       some_standard: 部分标准
       use_this_standard: 使用此评分标准
     home_menu: 
@@ -12677,6 +13151,8 @@ zh:
       service_contact: "通过 %{service} 与 %{user}  联系"
       social_instructions: 检查您想在个人资料中让其他人看到的联系方式。
       title: 标题
+      titles: 
+        click_to_change_profile_pic: 单击以更改头像
       user_has_no_bio: "%{user} 尚未添加个人简介"
       ways_to_contact_user: "%{name} 的联系方式"
     recent_activity: 
@@ -12889,6 +13365,15 @@ zh:
         click_to_embed: "单击以嵌入 %{image}"
         embed_image: 单击以嵌入图像
     wiki_sidebar: 
+      aria: 
+        file_label: "选择一个文件，上传限制 50"
+      aria_label: 
+        folder_select_label: 选择您的图像要上传至其中的文件夹
+        image_form_collapsed: "单击以切换上传新图像格式 (已隐藏)"
+      aria_labels: 
+        files: 文件，使用上箭头键和下箭头键在树中导航。按右箭头键展开文件夹，按左箭头键隐藏文件夹
+      aria_only: 
+        folder: 文件夹
       buttons: 
         insert_link: 插入链接
         upload: 上传
@@ -12961,7 +13446,6 @@ zh:
       new_page_name: 您想要新页面叫什么名字?
       select_destination: "选择这 %{count} 个文件的目标文件夹:"
       tabs: 
-        collections: 集合
         files: 文件
         images: 图像
         links: 链接
@@ -13021,6 +13505,13 @@ zh:
     columns: 
       date: 日期
       value: 值
+    domain_not_found: 
+      body_description: "请检查您的 Canvas URL 并重试。如果您不知道自己的 Canvas URL，请与您的机构或课程导师联系。"
+      body_reference: "如果您想要一个未绑定到特定机构的免费 Canvas 帐户，可在此注册"
+      links: 
+        canvas_instructure: canvas.instructure.com
+      page_title: "噢，Canvas 无法找到您的登录页面。"
+      you_typed: 您键入了
     institution_suspended: 
       body: "您学校的 Canvas 帐户已暂时挂起。请联系您的 Canvas 管理员。"
       links: 
@@ -13044,10 +13535,36 @@ zh:
       back: 返回
       close: 关闭
       forward: 转发
+  speed_grader: 
+    submissions_dropdown: 
+      grade: "（评分：%{grade}）"
+      loud_late: 延迟
+      see_all_quiz_attempts: 查看所有测验尝试
+      submission_to_view: 要查看的提交项：
+      submitted: "*已提交：* %{submittedAt}"
   sr_gradebook: 
     all_sections: 所有班级
+    assignment_muted: 单击以取消静音。
+    assignment_order_alpha: 按字母顺序
+    assignment_order_assignment_groups: 按作业小组和位置
+    assignment_order_due_date: 根据截止时间
+    assignment_unmuted: 单击以静音。
+    discussion_topic: 讨论主题
+    external_tool: 外部工具
+    invalid_group_warning: 
+      one: "注: 分数不包括小组 %{list_of_group_names} 的作业，因为他们没有最高分。"
+      other: "注: 分数不包括小组 %{list_of_group_names} 的作业，因为他们没有最高分。"
+    media_recordin: 媒体录音
     no_assignment: 未选择作业
     no_student: 未选择学生
+    none: 无
+    notes: 备注
+    on_paper: 书面
+    online_quiz: 在线测验
+    online_text_entry: 在线文本输入
+    online_upload: 在线上传
+    online_url: "在线 URL"
+    student_hidden_name: "学生 %{position}"
   statistics: 
     csv_columns: 
       attempt: 已尝试次数
@@ -13064,7 +13581,22 @@ zh:
     exact_answer: "%{exact_value} +/- %{margin}"
     inexact_answer: "%{lower_bound} 至 %{upper_bound}"
     no_answer: 无答案
+  status_dates: 
+    available: 可用
+    available_until: 结束时间
+    closed: 已关闭
+    due: 截止时间
+    everyone_else: 其他所有人
+    not_available: 可供使用的日期
+    pending: 可供使用的开始时间
   step: 步骤
+  student_id: "学生 ID"
+  student_name: 学生姓名
+  student_outcome_gradebook_description: |-
+      学生结果评分册为学生提供了一种快速查看有关课程
+      学习结果的进度的方法。结果是以类似评分册的格式
+      显示的 ，学生进度显示为数字分数和已掌握/接近
+      掌握/补课。
   sub_accounts: 
     alerts: 
       subaccount_has_courses: 您无法删除其中有课程的子帐户
@@ -13129,6 +13661,7 @@ zh:
     click_to_download: "单击此处下载 %{size_of_file}"
     creating_zip: "正在创建 zip 文件..."
     download_submissions: 下载作业提交文件
+    download_submissions_title: 下载作业提交文件
     errors: 
       assignment_submit_fail: 作业无法提交
       can_not_submit_locked_assignment: 作业锁定时无法提交
@@ -13141,6 +13674,7 @@ zh:
       student_not_enrolled_id: "指定的用户 (%{id}) 并非此课程中的学生"
     errors_update_failed: 更新失败
     finished_redirecting: 已完成！正在重定向至文件...
+    gathering_files: "正在收集文件 (%{progress})..."
     gathering_files_progress: "正在收集文件 (%{progress})..."
     resubmitted_to_turnitin: "已成功重新提交到 Turnitin。"
     see_attached_files: 查看附件文件
@@ -13193,12 +13727,16 @@ zh:
       no_submission: 无提交
       paper_view: 纸张视图
       plain_view: 纯文本视图
-      preview_document: 预览文档
+      preview_crocodoc_document: 预览您的提交项并查看教师反馈（如果可用）
+      preview_scribd_document: 预览您的提交项
+      preview_title: "%{title} 的预览"
       quiz_submission: 此提交是测验提交。正在重定向到测试页面。
       show_entire_discussion: 显示完整讨论
       student: 学生
       url_preview: "URL 预览"
+      view_feedback_button: 查看反馈
       view_original_submission: "查看 %{user} 的原始提交文件"
+      view_preview_button: 预览
     still_zipping: 正在压缩文件...
     submission_download: 
       download_message: "**正在收集学生的提交文件**并将其压缩成 zip 文件。这可能需要一些时间，具体视提交文件的大小和数量而定。"
@@ -13244,6 +13782,8 @@ zh:
     quizzes: 测验
     settings: 设置
     syllabus: 大纲
+    tab_location_error: 该选项卡位置无效
+    tab_unmanagable_error: "%{css_class} 不可管理"
   terms: 
     index: 
       date: 
@@ -13263,6 +13803,7 @@ zh:
       titles: 
         enrollment_terms: 注册学期
         term_details: 学期详细信息
+      update_term: 更新学期
     term: 
       buttons: 
         add: 添加学期
@@ -13300,6 +13841,10 @@ zh:
         term_start: 学期开始
         unspecified: 无论何时
       timespan: "%{start_at} *到* %{end_at}"
+  text_helper: 
+    time: 
+      ranges: 
+        different_days: "%{start_date_and_time} *至* %{end_date_and_time}"
   time: 
     am: 上午
     count_hours_ago: 
@@ -13335,6 +13880,7 @@ zh:
       flickr: Flickr
       image_height: 图像高度
       image_source: 图像来源
+      image_url_field_label: "图像 URL"
       image_width: 图像宽度
       url: URL
   title_separator: ": "
@@ -13386,7 +13932,6 @@ zh:
   unknown_quiz: 未知测验
   unsupported_package: 不受支持的内容包
   user: 
-    default_collection_name: "%{user_name} 的集合"
     default_user_name: 用户
     errors: 
       already_enrolled: 您已经登记此课程
@@ -13401,10 +13946,6 @@ zh:
   user_date_range_search: 
     cant_be_blank: "Canvas 用户 ID 不能为空"
     cant_come_before_from: “结束日期”不能早于“开始日期”
-  user_follow: 
-    errors: 
-      follow_own_collection: 您无法跟随自己的集合
-      follow_self: 您无法关注自己
   user_lists: 
     add_n_users: 
       one: "看起来不错，添加 %{count} 个用户"
@@ -13545,6 +14086,7 @@ zh:
         find_user: 查找用户
         merge_users: 合并用户帐户
         really_merge: 是否确实要合并用户帐户?
+    birthdate_invalid: 生日的日期或日期时间无效
     cant_self_merge: 您不能将帐户与其自身合并。
     cc_prefs: 
       buttons: 
@@ -13563,7 +14105,7 @@ zh:
         one: "%{count} 个参加者"
         other: "%{count} 个参加者"
     dashboard_sidebar: 
-      coming_up: 加油
+      coming_up: 即将到来
       recent_feedback: 最近反馈
       start_new_course: 开始新课程
     delete: 
@@ -13830,6 +14372,9 @@ zh:
     default_group_wiki_name: "%{group_name} 维基"
     front_page_name: 首页
     sidebar: 
+      aria_tree: 
+        file: 文件
+        folder: 文件夹
       buttons: 
         uploading: 正在上传...
       errors: 
@@ -13837,6 +14382,9 @@ zh:
         no_valid_image_files_selected: 未选择有效的图像文件
         unexpected_upload_problem: "上传 %{filename} 时出现意外问题。请重试。"
         upload_failed: 上传失败，请重试
+      image_form: 
+        collapsed: "单击以切换新图像格式 (已隐藏)"
+        expanded: "单击以切换新图像格式 (已展开)"
       loading_more_results: 正在加载其它结果
       no_title: 无标题
       titles: 
@@ -13852,8 +14400,10 @@ zh:
       page_locked_by_modules: "此页面将在您完成这些单元后可用:"
       page_locked_by_modules_until: "此页面将在 %{lock_info.unlock_at} 可用，如果您已经完成这些单元:"
       page_locked_until: "此页面将在 %{lock_info.unlock_at} 可用"
+      published_indicator: 已发布
       toolbar_menu: 
         settings: 设置
+      unpublished_indicator: 未发布
       view_page_history_wiki: 查看页面历史记录
     wiki_page_content: 
       page_locked: 此页面已锁定
@@ -13909,16 +14459,14 @@ zh:
     atom_entry_title: "维基页面 %{course_or_group_name}: %{page_title}"
     cannot_hide_page: 无法隐藏首页
     cannot_set_hidden_front_page: 无法设置为首页，因为该页处于隐藏状态
+    cannot_set_unpublished_front_page: 无法设为首页，因为它未发布
     defaults: 
       no_content: 无内容
     errors: 
       blank_title: 标题不能为空
       title_characters: 标题必须包含至少一个字母或数字
       title_too_long: "标题不能超过 %{max_characters} 个字符"
-    title_for_topics_category: "%{category} 主题"
     unknown_user_name: 未知
-    warnings: 
-      truncated_wiki_title: "以下维基页面的标题已截短: %{title}"
   wiki_page_revisions: 
     index: 
       links: 
@@ -14015,8 +14563,8 @@ zh:
       wiki_description_header: 维基的目的是什么?
   wiki_pages_api: 
     cannot_delete_front_page: 不能删除首页
+    cannot_have_hidden_front_page: 首页无法隐藏
     cannot_have_unpublished_front_page: 不能取消发布首页
-    cannot_hide_front_page: 不能对学生隐藏首页
     cannot_update_editing_roles: 不允许您更新此维基页面的编辑身份
     cannot_update_front_page: 不允许您更改维基首页
     cannot_update_hide_from_students: 不允许您更新此维基页面的从学生隐藏标记
@@ -14028,7 +14576,7 @@ zh:
       archive: 存档
       archive_link: 查看存档
   zip_argument_error: ".zip 上传需要目标上传文件夹。"
-  zip_file_description: "用于将纯 .zip 文件解压为课程的迁移插件"
+  zip_file_description: "用于将 .zip 归档文件解压为课程、组或用户文件的迁移插件"
   zip_file_display: 文件导入
   zip_file_file_description: "将 .zip 文件解压为文件夹"
   zip_file_imports: 

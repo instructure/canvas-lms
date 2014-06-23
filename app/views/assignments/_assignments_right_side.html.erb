@@ -8,13 +8,13 @@
   </span>
 </p>
 <p>
-  <% if can_do(@context.assignments.new, @current_user, :create) %>
+  <% if can_do(@context.assignments.scoped.new, @current_user, :create) %>
     <%= t :add_assignment_to_group, "*Add Assignment* to %{group}",
           :wrapper => "<a href=\"#{context_url(@context, :new_context_assignment_url)}\" class=\"add_assignment_link add groupless_link\">\\1</a>",
           :group => "<select class=\"assignment_groups_select\">#{options_for_select(@groups.map { |group| [group.name, "group_#{group.id}"] })}</select>".html_safe %>
     <br/>
   <% end %>
-  <% if can_do(@context.assignment_groups.new, @current_user, :create) %>
+  <% if can_do(@context.assignment_groups.scoped.new, @current_user, :create) %>
     <a href="#" class="add_group_link add"> <%= t 'links.add_assignment_group', "Add Assignment Group" %></a>
   <% end %>
 </p>

@@ -428,41 +428,40 @@ describe Account do
 
     limited_access = [ :read, :manage, :update, :delete, :read_outcomes ]
     account_enabled_access = [ :view_notifications ]
-    full_access = RoleOverride.permissions.keys + limited_access - account_enabled_access
-    index = full_access.index(:manage_courses)
-    full_access = full_access[0..index] + [:create_courses] + full_access[index+1..-1]
+    full_access = RoleOverride.permissions.keys + limited_access - account_enabled_access + [:create_courses]
+    siteadmin_access = [:app_profiling]
     full_root_access = full_access - RoleOverride.permissions.select { |k, v| v[:account_only] == :site_admin }.map(&:first)
     full_sub_access = full_root_access - RoleOverride.permissions.select { |k, v| v[:account_only] == :root }.map(&:first)
     # site admin has access to everything everywhere
     hash.each do |k, v|
       account = v[:account]
-      account.check_policy(hash[:site_admin][:admin]).should == full_access + (k == :site_admin ? [:read_global_outcomes] : [])
-      account.check_policy(hash[:site_admin][:user]).should == limited_access + (k == :site_admin ? [:read_global_outcomes] : [])
+      account.check_policy(hash[:site_admin][:admin]).should =~ full_access + (k == :site_admin ? [:read_global_outcomes] : [])
+      account.check_policy(hash[:site_admin][:user]).should =~ siteadmin_access + limited_access + (k == :site_admin ? [:read_global_outcomes] : [])
     end
 
     # root admin has access to everything except site admin
     account = hash[:site_admin][:account]
-    account.check_policy(hash[:root][:admin]).should == [:read_global_outcomes]
-    account.check_policy(hash[:root][:user]).should == [:read_global_outcomes]
+    account.check_policy(hash[:root][:admin]).should =~ [:read_global_outcomes]
+    account.check_policy(hash[:root][:user]).should =~ [:read_global_outcomes]
     hash.each do |k, v|
       next if k == :site_admin
       account = v[:account]
-      account.check_policy(hash[:root][:admin]).should == full_root_access
-      account.check_policy(hash[:root][:user]).should == limited_access
+      account.check_policy(hash[:root][:admin]).should =~ full_root_access
+      account.check_policy(hash[:root][:user]).should =~ limited_access
     end
 
     # sub account has access to sub and sub_sub
     hash.each do |k, v|
       next unless k == :site_admin || k == :root
       account = v[:account]
-      account.check_policy(hash[:sub][:admin]).should == (k == :site_admin ? [:read_global_outcomes] : [:read_outcomes])
-      account.check_policy(hash[:sub][:user]).should == (k == :site_admin ? [:read_global_outcomes] : [:read_outcomes])
+      account.check_policy(hash[:sub][:admin]).should =~ (k == :site_admin ? [:read_global_outcomes] : [:read_outcomes])
+      account.check_policy(hash[:sub][:user]).should =~ (k == :site_admin ? [:read_global_outcomes] : [:read_outcomes])
     end
     hash.each do |k, v|
       next if k == :site_admin || k == :root
       account = v[:account]
-      account.check_policy(hash[:sub][:admin]).should == full_sub_access
-      account.check_policy(hash[:sub][:user]).should == limited_access
+      account.check_policy(hash[:sub][:admin]).should =~ full_sub_access
+      account.check_policy(hash[:sub][:user]).should =~ limited_access
     end
 
     # Grant 'Restricted Admin' a specific permission, and re-check everything
@@ -476,32 +475,32 @@ describe Account do
     RoleOverride.clear_cached_contexts
     hash.each do |k, v|
       account = v[:account]
-      account.check_policy(hash[:site_admin][:admin]).should == full_access + (k == :site_admin ? [:read_global_outcomes] : [])
-      account.check_policy(hash[:site_admin][:user]).should == some_access + (k == :site_admin ? [:read_global_outcomes] : [])
+      account.check_policy(hash[:site_admin][:admin]).should =~ full_access + (k == :site_admin ? [:read_global_outcomes] : [])
+      account.check_policy(hash[:site_admin][:user]).should =~ siteadmin_access + some_access + (k == :site_admin ? [:read_global_outcomes] : [])
     end
 
     account = hash[:site_admin][:account]
-    account.check_policy(hash[:root][:admin]).should == [:read_global_outcomes]
-    account.check_policy(hash[:root][:user]).should == [:read_global_outcomes]
+    account.check_policy(hash[:root][:admin]).should =~ [:read_global_outcomes]
+    account.check_policy(hash[:root][:user]).should =~ [:read_global_outcomes]
     hash.each do |k, v|
       next if k == :site_admin
       account = v[:account]
-      account.check_policy(hash[:root][:admin]).should == full_root_access
-      account.check_policy(hash[:root][:user]).should == some_access
+      account.check_policy(hash[:root][:admin]).should =~ full_root_access
+      account.check_policy(hash[:root][:user]).should =~ some_access
     end
 
     # sub account has access to sub and sub_sub
     hash.each do |k, v|
       next unless k == :site_admin || k == :root
       account = v[:account]
-      account.check_policy(hash[:sub][:admin]).should == (k == :site_admin ? [:read_global_outcomes] : [:read_outcomes])
-      account.check_policy(hash[:sub][:user]).should == (k == :site_admin ? [:read_global_outcomes] : [:read_outcomes])
+      account.check_policy(hash[:sub][:admin]).should =~ (k == :site_admin ? [:read_global_outcomes] : [:read_outcomes])
+      account.check_policy(hash[:sub][:user]).should =~ (k == :site_admin ? [:read_global_outcomes] : [:read_outcomes])
     end
     hash.each do |k, v|
       next if k == :site_admin || k == :root
       account = v[:account]
-      account.check_policy(hash[:sub][:admin]).should == full_sub_access
-      account.check_policy(hash[:sub][:user]).should == some_access
+      account.check_policy(hash[:sub][:admin]).should =~ full_sub_access
+      account.check_policy(hash[:sub][:user]).should =~ some_access
     end
   end
 
@@ -1036,4 +1035,43 @@ describe Account do
     end
   end
 
+  describe "default_time_zone" do
+    context "root account" do
+      before do
+        @account = Account.create!
+      end
+
+      it "should use provided value when set" do
+        @account.default_time_zone = 'America/New_York'
+        @account.default_time_zone.should == ActiveSupport::TimeZone['Eastern Time (US & Canada)']
+      end
+
+      it "should have a sensible default if not set" do
+        @account.default_time_zone.should == ActiveSupport::TimeZone[Account.time_zone_attribute_defaults[:default_time_zone]]
+      end
+    end
+
+    context "sub account" do
+      before do
+        @root_account = Account.create!
+        @account = @root_account.sub_accounts.create!
+        @account.root_account = @root_account
+      end
+
+      it "should use provided value when set, regardless of root account setting" do
+        @root_account.default_time_zone = 'America/Chicago'
+        @account.default_time_zone = 'America/New_York'
+        @account.default_time_zone.should == ActiveSupport::TimeZone['Eastern Time (US & Canada)']
+      end
+
+      it "should default to root account value if not set" do
+        @root_account.default_time_zone = 'America/Chicago'
+        @account.default_time_zone.should == ActiveSupport::TimeZone['Central Time (US & Canada)']
+      end
+
+      it "should have a sensible default if neither is set" do
+        @account.default_time_zone.should == ActiveSupport::TimeZone[Account.time_zone_attribute_defaults[:default_time_zone]]
+      end
+    end
+  end
 end

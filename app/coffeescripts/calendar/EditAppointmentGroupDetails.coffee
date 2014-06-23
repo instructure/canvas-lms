@@ -166,8 +166,8 @@ define [
       return false unless @timeBlockList.validate()
       for range in @timeBlockList.blocks()
         params['appointment_group[new_appointments]'].push([
-          $.dateToISO8601UTC($.unfudgeDateForProfileTimezone(range[0])),
-          $.dateToISO8601UTC($.unfudgeDateForProfileTimezone(range[1]))
+          $.unfudgeDateForProfileTimezone(range[0]).toISOString(),
+          $.unfudgeDateForProfileTimezone(range[1]).toISOString()
         ])
 
       if data.per_slot_option is '1'

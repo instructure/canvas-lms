@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,28 +17,112 @@
 #
 
 module GradebooksHelper
+  UNGRADED_SUBMISSION_ICON_ATTRIBUTES = {
+    'online_url' => {
+      :icon_class => 'icon-link',
+      :screenreader_text => I18n.t('icons.online_url_submission', 'Online Url Submission')
+    },
+    'online_text_entry' => {
+      :icon_class => 'icon-text',
+      :screenreader_text => I18n.t('icons.text_entry_submission', 'Text Entry Submission')
+    },
+    'online_upload' => {
+      :icon_class => 'icon-document',
+      :screenreader_text => I18n.t('icons.file_upload_submission', 'File Upload Submission')
+    },
+    'discussion_topic' => {
+      :icon_class => 'icon-discussion',
+      :screenreader_text => I18n.t('icons.discussion_submission', 'Discussion Submission')
+    },
+    'online_quiz' => {
+      :icon_class => 'icon-quiz',
+      :screenreader_text => I18n.t('icons.quiz_submission', 'Quiz Submission')
+    },
+    'media_recording' => {
+      :icon_class => 'icon-filmstrip',
+      :screenreader_text => I18n.t('icons.media_submission', 'Media Submission')
+    },
+  }
+
+  PASS_FAIL_ICON_ATTRIBUTES = {
+    pass: {
+      icon_class: 'icon-check',
+      screenreader_text: I18n.t('#gradebooks.grades.complete', 'Complete'),
+    },
+    fail: {
+      icon_class: 'icon-x',
+      screenreader_text: I18n.t('#gradebooks.grades.incomplete', 'Incomplete'),
+    },
+  }
+
   def display_grade(grade)
     grade.blank? ? "--" : grade
   end
 
   def gradebook_url_for(user, context, assignment=nil)
-    if context
-      gradebook_version = get_gradebook_version(user, context)
-      gradebook_url = polymorphic_url([context, gradebook_version])
+    gradebook_version = user.try(:preferred_gradebook_version, context) || '2'
 
-      if assignment && gradebook_version == 'gradebook'
-        gradebook_url += "#assignment/#{assignment.id}"
-      end
+    if !context.feature_enabled?(:screenreader_gradebook) && (gradebook_version == "2" || !context.old_gradebook_visible?)
+      return polymorphic_url([context, 'gradebook2'])
+    elsif gradebook_version == "1" && assignment
+      return polymorphic_url([context, 'gradebook']) + "#assignment/#{assignment.id}"
     end
 
-    gradebook_url
+    polymorphic_url([context, 'gradebook'])
   end
 
-  def get_gradebook_version(user, context)
-    if !context.old_gradebook_visible? || user.nil? || user.prefers_gradebook2?
-      'gradebook2'
+  def student_score_display_for(submission, show_student_view = false)
+    return '-' if submission.blank?
+    score, grade = score_and_grade_for(submission, show_student_view)
+
+    if submission && grade
+      graded_submission_display(grade, score, submission.assignment.grading_type)
+    elsif submission.submission_type
+      ungraded_submission_display(submission.submission_type)
     else
-      'gradebook'
+      '-'
+    end
+  end
+
+  def graded_submission_display(grade, score, grading_type)
+    if grading_type == "pass_fail"
+      pass_fail_icon(score, grade)
+    elsif grading_type == 'percent'
+      grade
+    elsif grade.to_f.round(2) == score.to_f.round(2)
+      grade.to_f.round(2)
+    end
+  end
+
+  def ungraded_submission_display(submission_type)
+    sub_score = UNGRADED_SUBMISSION_ICON_ATTRIBUTES[submission_type]
+    if sub_score
+      screenreadable_icon(sub_score, %w{submission_icon})
+    else
+      '-'
+    end
+  end
+
+  def pass_fail_icon(score, grade)
+    if score && score > 0 || grade == "complete"
+      icon_attrs = PASS_FAIL_ICON_ATTRIBUTES[:pass]
+    else
+      icon_attrs = PASS_FAIL_ICON_ATTRIBUTES[:fail]
+    end
+    screenreadable_icon(icon_attrs, %w{graded_icon})
+  end
+
+  def screenreadable_icon(icon_attrs, html_classes = [])
+    html_classes << icon_attrs[:icon_class]
+    content_tag('i', '', 'class' => html_classes.join(' '), 'aria-hidden' => true) +
+      content_tag('span', icon_attrs[:screenreader_text], 'class' => 'screenreader-only')
+  end
+
+  def score_and_grade_for(submission, show_student_view = false)
+    if show_student_view
+      [submission.published_score, submission.published_grade]
+    else
+      [submission.score, submission.grade]
     end
   end
 end

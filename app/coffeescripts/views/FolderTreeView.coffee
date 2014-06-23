@@ -1,12 +1,13 @@
 define [
   'Backbone'
+  'jquery'
   'underscore'
   'compiled/fn/preventDefault'
   'compiled/models/Folder'
   'compiled/views/PaginatedCollectionView'
   'compiled/views/FileItemView'
   'jst/FolderTreeCollection'
-], (Backbone, _, preventDefault, Folder, PaginatedCollectionView, FileItemView, collectionTemplate) ->
+], (Backbone, $, _, preventDefault, Folder, PaginatedCollectionView, FileItemView, collectionTemplate) ->
 
   class FolderTreeView extends Backbone.View
 

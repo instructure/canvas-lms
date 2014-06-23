@@ -1,4 +1,4 @@
-define ['Backbone'], ({View}) ->
+define ['jquery', 'Backbone'], ($, {View}) ->
 
   class NavigationPillView extends View
 
@@ -14,3 +14,5 @@ define ['Backbone'], ({View}) ->
       $(active).parent().addClass('active')
       @trigger('pillchange', $(active).data('id'))
 
+    setActiveView: (viewName) ->
+      @setActiveTab(@$("[data-id=#{viewName}]"))

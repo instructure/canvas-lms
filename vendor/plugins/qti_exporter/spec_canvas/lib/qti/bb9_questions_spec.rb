@@ -36,6 +36,10 @@ describe "Converting Blackboard 9 qti" do
     hash.should == BB9Expected::MATCHING2
   end
 
+  it "should convert true/false questions using identifiers, not mattext" do
+    hash = get_question_hash(bb9_question_dir, 'true_false', false, :flavor => Qti::Flavors::BBLEARN)
+    hash[:answers].each {|m| m[:migration_id].should == m[:text]}
+  end
 end
 
 module BB9Expected

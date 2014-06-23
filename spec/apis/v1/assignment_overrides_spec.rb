@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe AssignmentOverridesController, :type => :integration do
+describe AssignmentOverridesController, type: :request do
   def validate_override_json(override, json)
     json['id'].should == override.id
     json['assignment_id'].should == override.assignment_id
@@ -63,7 +63,7 @@ describe AssignmentOverridesController, :type => :integration do
   end
 
   def expect_errors(errors)
-    response.status.should == '400 Bad Request'
+    assert_status(400)
     json = JSON.parse(response.body)
     json.should == {"errors" => errors}
   end
@@ -101,7 +101,7 @@ describe AssignmentOverridesController, :type => :integration do
       json.size.should == 0
     end
 
-    it "should exclude overrides outside the user's visibility" do
+    it "should include overrides outside the user's sections if user is admin" do
       Enrollment.limit_privileges_to_course_section!(@course, @teacher, true)
 
       @override.set = @course.course_sections.create!
@@ -113,7 +113,7 @@ describe AssignmentOverridesController, :type => :integration do
                       :course_id => @course.id.to_s,
                       :assignment_id => @assignment.id.to_s)
 
-      json.size.should == 0
+      json.size.should == 1
     end
 
     it "should have formatted overrides" do
@@ -146,19 +146,27 @@ describe AssignmentOverridesController, :type => :integration do
                :course_id => course.id.to_s, :assignment_id => assignment.id.to_s, :id => override.id.to_s)
     end
 
+    describe 'as an account admin not enrolled in the class' do
+      before :each do
+        account_admin_user(:account => Account.site_admin, :active_all => true)
+        user_session(@admin)
+      end
+
+      it 'it works' do
+        json = api_show_override(@course, @assignment, @override)
+        validate_override_json(@override, json)
+      end
+    end
+
     it "should return the override json" do
       json = api_show_override(@course, @assignment, @override)
       validate_override_json(@override, json)
     end
 
     it "should 404 for non-visible override" do
-      Enrollment.limit_privileges_to_course_section!(@course, @teacher, true)
-
-      @override.set = @course.course_sections.create!
-      @override.save!
-
+      @override.destroy
       raw_api_show_override(@course, @assignment, @override)
-      response.status.should == '404 Not Found'
+      assert_status(404)
     end
 
     it "should exclude due_at/all_day/all_day_date/lock_at/unlock_at when not overridden" do
@@ -195,6 +203,7 @@ describe AssignmentOverridesController, :type => :integration do
       @assignment.save!
 
       @group = @course.groups.create!(:name => 'my group', :group_category => @assignment.group_category)
+      @group.add_user(@teacher, 'accepted')
       @course.groups_visible_to(@teacher).should include @group
 
       @override.reload
@@ -206,7 +215,7 @@ describe AssignmentOverridesController, :type => :integration do
     end
 
     it "should include proper set fields when set is adhoc" do
-      student_in_course(:course => @course)
+      student_in_course({:course => @course, :workflow_state => 'active'})
 
       @override.set = nil
       @override.set_type = 'ADHOC'
@@ -216,7 +225,6 @@ describe AssignmentOverridesController, :type => :integration do
       @override_student.user = @student
       @override_student.save!
 
-      @user = @teacher
       json = api_show_override(@course, @assignment, @override)
       validate_override_json(@override, json)
     end
@@ -230,6 +238,7 @@ describe AssignmentOverridesController, :type => :integration do
       assignment_override_model(:assignment => @assignment)
       @override.set = @group
       @override.save!
+      @group.add_user(@teacher, 'accepted')
     end
 
     it "should redirect in nominal case" do
@@ -251,7 +260,7 @@ describe AssignmentOverridesController, :type => :integration do
                    :controller => 'assignment_overrides', :action => 'group_alias', :format => 'json',
                    :group_id => @other_group.id.to_s,
                    :assignment_id => @assignment.id.to_s)
-      response.status.should == '404 Not Found'
+      assert_status(404)
     end
 
     it "should 404 for unconnected group/assignment" do
@@ -262,7 +271,7 @@ describe AssignmentOverridesController, :type => :integration do
                    :controller => 'assignment_overrides', :action => 'group_alias', :format => 'json',
                    :group_id => @other_group.id.to_s,
                    :assignment_id => @assignment.id.to_s)
-      response.status.should == '404 Not Found'
+      assert_status(404)
     end
   end
 
@@ -286,13 +295,13 @@ describe AssignmentOverridesController, :type => :integration do
 
     it "should 404 for non-visible section" do
       Enrollment.limit_privileges_to_course_section!(@course, @teacher, true)
-      @section = @course.course_sections.create!
+      section = @course.course_sections.create!
 
-      raw_api_call(:get, "/api/v1/sections/#{@section.id}/assignments/#{@assignment.id}/override.json",
+      raw_api_call(:get, "/api/v1/sections/#{section.id}/assignments/#{@assignment.id}/override.json",
                    :controller => 'assignment_overrides', :action => 'section_alias', :format => 'json',
-                   :course_section_id => @section.id.to_s,
+                   :course_section_id => section.id.to_s,
                    :assignment_id => @assignment.id.to_s)
-      response.status.should == '404 Not Found'
+      assert_status(404)
     end
 
     it "should 404 for unconnected section/assignment" do
@@ -302,7 +311,7 @@ describe AssignmentOverridesController, :type => :integration do
                    :controller => 'assignment_overrides', :action => 'section_alias', :format => 'json',
                    :course_section_id => @course.default_section.id.to_s,
                    :assignment_id => @assignment.id.to_s)
-      response.status.should == '404 Not Found'
+      assert_status(404)
     end
   end
 
@@ -676,6 +685,7 @@ describe AssignmentOverridesController, :type => :integration do
 
       it "should error if you try and duplicate a student in an adhoc set" do
         @original_override = @override
+        @original_override.set = @student
         assignment_override_model(:assignment => @assignment)
         @student = student_in_course(:course => @course).user
         @override_student = @override.assignment_override_students.build
@@ -702,8 +712,8 @@ describe AssignmentOverridesController, :type => :integration do
       it "should ignore student_ids, group_id, and section_id" do
         @original_group = @group
         @student = student_in_course(:course => @course).user
-        @group = group_model(:context => @course, :group_category => @assignment.group_category)
         @user = @teacher
+        @original_group.add_user(@user, 'accepted')
 
         api_update_override(@course, @assignment, @override, :assignment_override => { :student_ids => [@student.id] })
         @override.reload
@@ -720,6 +730,7 @@ describe AssignmentOverridesController, :type => :integration do
 
       it "should not allow changing the title" do
         @new_title = "new title"
+        @group.add_user(@user, 'accepted')
         api_update_override(@course, @assignment, @override, :assignment_override => { :title => @new_title })
         @override.reload
         @override.title.should == @group.name
@@ -936,15 +947,11 @@ describe AssignmentOverridesController, :type => :integration do
     end
 
     it "should 404 for non-visible override" do
-      Enrollment.limit_privileges_to_course_section!(@course, @teacher, true)
-
-      @override.set = @course.course_sections.create!
-      @override.save!
-
+      @override.destroy
       raw_api_call(:delete, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/overrides/#{@override.id}.json",
                    :controller => 'assignment_overrides', :action => 'destroy', :format => 'json',
                    :course_id => @course.id.to_s, :assignment_id => @assignment.id.to_s, :id => @override.id.to_s)
-      response.status.should == '404 Not Found'
+      assert_status(404)
     end
   end
 end

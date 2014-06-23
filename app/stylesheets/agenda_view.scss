@@ -146,7 +146,13 @@ body {
   }
 }
 
-#calendar-app {
+// Restore some missing drag styles from fullcalendar css
+#calendar-drag-and-drop-container .fc-event {
+  border-width: 1px;
+  border-radius: 3px;
+}
+
+#calendar-app,#calendar-drag-and-drop-container {
   .fc-content {
     background: none;
   }

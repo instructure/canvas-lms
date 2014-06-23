@@ -231,11 +231,11 @@ describe Conversation do
       end
     end
 
-    it_should_behave_like "message counts"
+    include_examples "message counts"
 
     context "sharding" do
       specs_require_sharding
-      it_should_behave_like "message counts"
+      include_examples "message counts"
     end
   end
 
@@ -318,10 +318,10 @@ describe Conversation do
       end
     end
 
-    it_should_behave_like "unread counts"
+    include_examples "unread counts"
     context "sharding" do
       specs_require_sharding
-      it_should_behave_like "unread counts"
+      include_examples "unread counts"
     end
   end
 
@@ -492,100 +492,21 @@ describe Conversation do
       rconvo.update_attributes(:subscribed => true)
       rconvo.unread?.should be_true
     end
-  end
 
-  context "update_all_for_asset" do
-    it "should delete all messages if requested" do
-      asset = mock
-      asset_messages = mock
-      asset_messages.expects(:destroy_all).returns([])
-      asset.expects(:lock!).returns(true)
-      asset.expects(:conversation_messages).at_least_once.returns(asset_messages)
-      Conversation.update_all_for_asset asset, :delete_all => true
-    end
+    it "should only alert message participants" do
+      sender = user
+      recipients = 5.times.map{ user }
+      convo = Conversation.initiate([sender] + recipients, false)
+      convo.add_message(sender, 'test')
 
-    it "should not create conversations if only_existing is set" do
-      u1 = user
-      u2 = user
-      conversation = Conversation.initiate([u1, u2], true)
-      asset = Submission.new(:user => u1)
-      asset.expects(:conversation_groups).returns([[u1, u2]])
-      asset.expects(:lock!).returns(true)
-      asset.expects(:conversation_messages).at_least_once.returns([])
-      asset.expects(:conversation_message_data).returns({:created_at => Time.now.utc, :author => u1, :body => "asdf"})
-      Conversation.update_all_for_asset asset, :update_message => true, :only_existing => true
-      conversation.conversation_messages.size.should eql 1
-    end
+      recipient = recipients.last
+      rconvo = recipient.conversations.first
+      rconvo.unread?.should be_true
+      rconvo.update_attribute(:workflow_state, "read")
 
-    it "should undelete visible soft-deleted message participants" do
-      u1 = user
-      u2 = user
-      conversation = Conversation.initiate([u1, u2], true)
-      # a message to keep the conversation visible to u2 after remove_messages on the asset's message
-      previous_message = conversation.add_message(u1, 'hello')
-      message = conversation.add_message(u1, 'test message')
+      convo.add_message(sender, 'another test', :only_users => [recipients.first])
 
-      # make u1's conversation invisible so they won't be updated.
-      u1.conversations.first.remove_messages(previous_message, message)
-      u1.conversations.should be_empty
-
-      # u2 only deletes the asset's message, but conversations is still visible
-      u2.conversations.first.remove_messages(message)
-      u2.conversations.first.messages.size.should eql 1
-
-      asset = Submission.new(:user => u1)
-      asset.expects(:conversation_groups).returns([[u1, u2]])
-      asset.expects(:lock!).returns(true)
-      asset.expects(:conversation_messages).at_least_once.returns([message])
-      asset.expects(:conversation_message_data).returns({:created_at => Time.now.utc, :author => u1, :body => "asdf"})
-
-      Conversation.update_all_for_asset asset, :update_message => true, :only_existing => true
-      conversation.conversation_messages.size.should eql 2
-      u1.conversations.should be_empty
-      # but u1 should still have the soft-deleted participant
-      u1.all_conversations.first.all_messages.size.should eql 2
-      u2.conversations.first.messages.size.should eql 2
-    end
-
-    context "sharding" do
-      specs_require_sharding
-
-      it "should re-use conversations from another shard" do
-        u1 = @shard1.activate { user }
-        u2 = user
-        conversation = @shard2.activate { Conversation.initiate([u1, u2], true) }
-        asset = Submission.new(:user => u1)
-        asset.expects(:conversation_groups).returns([[u1, u2]])
-        asset.expects(:lock!).returns(true)
-        asset.expects(:conversation_messages).at_least_once.returns([])
-        asset.expects(:conversation_message_data).returns({:created_at => Time.now.utc, :author => u1, :body => "asdf"})
-        Conversation.update_all_for_asset asset, :update_message => true, :only_existing => true
-        conversation.conversation_messages.size.should eql 1
-      end
-    end
-
-    it "should create conversations by default" do
-      u1 = user
-      u2 = user
-      conversation = Conversation.initiate([u1, u2], true)
-      asset = Submission.new(:user => u1)
-      asset.expects(:conversation_groups).returns([[u1, u2]])
-      asset.expects(:lock!).returns(true)
-      asset.expects(:conversation_messages).at_least_once.returns([])
-      asset.expects(:conversation_message_data).returns({:created_at => Time.now.utc, :author => u1, :body => "asdf"})
-      Conversation.expects(:initiate).returns(conversation)
-      Conversation.update_all_for_asset asset, :update_message => true
-      conversation.conversation_messages.size.should eql 1
-    end
-
-    it "should delete obsolete messages" do
-      old_message = mock
-      old_message.expects(:destroy).returns(true)
-      asset = mock
-      asset.expects(:lock!).returns(true)
-      asset.expects(:conversation_groups).returns([])
-      asset.expects(:conversation_messages).at_least_once.returns([old_message])
-      Conversation.update_all_for_asset(asset, {})
+      rconvo.reload.unread?.should be_false
     end
   end
 
@@ -1124,44 +1045,44 @@ describe Conversation do
       context "matching shards" do
         it "user from another shard participating in both conversations" do
           merge_and_check(@sender, @conversation1, @conversation2, @user2, @user2)
-          @conversation2.associated_shards.should == [Shard.default, @shard1]
+          @conversation2.associated_shards.sort_by(&:id).should == [Shard.default, @shard1].sort_by(&:id)
         end
 
         it "user from another shard participating in source conversation only" do
           merge_and_check(@sender, @conversation1, @conversation2, @user2, nil)
-          @conversation2.associated_shards.should == [Shard.default, @shard1]
+          @conversation2.associated_shards.sort_by(&:id).should == [Shard.default, @shard1].sort_by(&:id)
         end
       end
 
       context "differing shards" do
         it "user from source shard participating in both conversations" do
           merge_and_check(@sender, @conversation1, @conversation3, @user1, @user1)
-          @conversation3.associated_shards.should == [@shard1, Shard.default]
+          @conversation3.associated_shards.sort_by(&:id).should == [@shard1, Shard.default].sort_by(&:id)
         end
 
         it "user from destination shard participating in both conversations" do
           merge_and_check(@sender, @conversation1, @conversation3, @user2, @user2)
-          @conversation3.associated_shards.should == [@shard1, Shard.default]
+          @conversation3.associated_shards.sort_by(&:id).should == [@shard1, Shard.default].sort_by(&:id)
         end
 
         it "user from third shard participating in both conversations" do
           merge_and_check(@sender, @conversation1, @conversation3, @user3, @user3)
-          @conversation3.associated_shards.sort_by(&:id).should == [Shard.default, @shard1, @shard2]
+          @conversation3.associated_shards.sort_by(&:id).should == [Shard.default, @shard1, @shard2].sort_by(&:id)
         end
 
         it "user from source shard participating in source conversation only" do
           merge_and_check(@sender, @conversation1, @conversation3, @user1, nil)
-          @conversation3.associated_shards.should == [@shard1, Shard.default]
+          @conversation3.associated_shards.sort_by(&:id).should == [@shard1, Shard.default].sort_by(&:id)
         end
 
         it "user from destination shard participating in source conversation only" do
           merge_and_check(@sender, @conversation1, @conversation3, @user2, nil)
-          @conversation3.associated_shards.should == [@shard1, Shard.default]
+          @conversation3.associated_shards.sort_by(&:id).should == [@shard1, Shard.default].sort_by(&:id)
         end
 
         it "user from third shard participating in source conversation only" do
           merge_and_check(@sender, @conversation1, @conversation3, @user3, nil)
-          @conversation3.associated_shards.sort_by(&:id).should == [Shard.default, @shard1, @shard2]
+          @conversation3.associated_shards.sort_by(&:id).should == [Shard.default, @shard1, @shard2].sort_by(&:id)
         end
       end
     end

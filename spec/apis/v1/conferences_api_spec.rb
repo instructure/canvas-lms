@@ -22,7 +22,7 @@ include Api::V1::Conferences
 include Api::V1::Json
 include Api
 
-describe "Conferences API", :type => :integration do
+describe "Conferences API", type: :request do
   before do
     # these specs need an enabled web conference plugin
     @plugin = PluginSetting.find_or_create_by_name('wimba')

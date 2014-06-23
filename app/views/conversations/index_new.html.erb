@@ -62,56 +62,28 @@
         </button>
       </div>
 
-      <button class="al-trigger btn"
-              id="admin-btn"
-              title="<%= t(:more_options, "More options") %>"
-              data-tooltip
-              disabled>
-        <span class="screenreader-only"><%= t(:settings, "Settings") %></span>
-        <i class="icon-settings"></i>
-        <i class="icon-mini-arrow-down"></i>
-      </button>
-      <ul class="al-options" id="admin-menu">
-        <li><a href="#" id="mark-unread-btn"><%= t(:mark_as_unread, "Mark as unread") %></a></li>
-        <li><a href="#" id="forward-btn"><%= t(:forward, "Forward") %></a></li>
-        <li><a href="#" id="star-toggle-btn"><%# text set by view %></a></li>
-      </ul>
+      <div class="inline-block" role="application">
+        <button class="al-trigger btn"
+                id="admin-btn"
+                title="<%= t(:more_options, "More options") %>"
+                data-tooltip
+                disabled>
+          <span class="screenreader-only"><%= t(:settings, "Settings") %></span>
+          <i class="icon-settings"></i>
+          <i class="icon-mini-arrow-down"></i>
+        </button>
+        <ul class="al-options" id="admin-menu">
+          <li><a href="#" id="mark-unread-btn"><%= t(:mark_as_unread, "Mark as unread") %></a></li>
+          <li><a href="#" id="mark-read-btn"><%= t(:mark_as_read, "Mark as read") %></a></li>
+          <li><a href="#" id="forward-btn"><%= t(:forward, "Forward") %></a></li>
+          <li><a href="#" id="star-toggle-btn"><%# text set by view %></a></li>
+        </ul>
+      </div>
     </div>
 
     <div id="sending-message" class="badge badge-info" aria-live="polite">
       <span><%= t(:sending, "sending") %></span>
       <div id="sending-spinner"></div>
-    </div>
-
-    <div class="admin-link pull-right">
-      <a id="help-btn"
-         class="al-trigger help-btn"
-         href="#"
-         role="button"
-         aria-haspopup="true"
-         aria-owns="help-menu-items">
-        <i class="icon-question"></i>
-        <i class="icon-mini-arrow-down"></i>
-        <span class="screenreader-only"><%= t(:help, "Help") %></span>
-      </a>
-
-      <ul id="help-menu-items"
-          class="al-options"
-          role="menu"
-          tabindex="0"
-          aria-hidden="true"
-          aria-expanded="false"
-          aria-activedescendant="switch-to-old-conversations-menu-item">
-        <li role="presentation">
-          <a id="switch-to-old-conversations-menu-item"
-             href="/conversations/toggle_new_conversations"
-             data-method="post"
-             rel="nofollow"
-             tabindex="-1"
-             role="menuitem"
-             title="<%= t(:switch_to_old_conversations, "Switch Back to Old Conversations") %>"><%= t(:switch_to_old_conversations, "Switch Back to Old Conversations")%></a>
-        </li>
-      </ul>
     </div>
 
     <div role="search" class="search pull-right form-search">

@@ -17,6 +17,9 @@
 #
 
 class ClonedItem < ActiveRecord::Base
+  include PolymorphicTypeOverride
+  override_polymorphic_types original_item_type: {'Quiz' => 'Quizzes::Quiz'}
+
   belongs_to :original_item, :polymorphic => true
   has_many :attachments, :order => 'id asc'
   has_many :discussion_topics, :order => 'id asc'

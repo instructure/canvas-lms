@@ -26,11 +26,11 @@ module Api::V1::GradeChangeEvent
 
   def grade_change_event_json(event, user, session)
     links = {
-      :assignment => Shard.relative_id_for(event.assignment_id),
-      :course => Shard.relative_id_for(event.course_id),
-      :student => Shard.relative_id_for(event.student_id),
-      :grader => Shard.relative_id_for(event.grader_id),
-      :page_view => event.page_view.nil? ? nil : event.request_id
+      :assignment => Shard.relative_id_for(event.assignment_id, Shard.current, Shard.current),
+      :course => Shard.relative_id_for(event.course_id, Shard.current, Shard.current),
+      :student => Shard.relative_id_for(event.student_id, Shard.current, Shard.current),
+      :grader => Shard.relative_id_for(event.grader_id, Shard.current, Shard.current),
+      :page_view => PageView.find_by_id(event.request_id).try(:id)
     }
 
     {

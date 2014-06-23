@@ -1,6 +1,7 @@
 define [
   'i18n!assignments'
   'Backbone'
+  'jquery'
   'underscore'
   'compiled/views/PublishIconView'
   'compiled/views/assignments/DateDueColumnView'
@@ -14,7 +15,7 @@ define [
   'compiled/views/assignments/AssignmentKeyBindingsMixin'
   'jqueryui/tooltip'
   'compiled/behaviors/tooltip'
-], (I18n, Backbone, _, PublishIconView, DateDueColumnView, DateAvailableColumnView, CreateAssignmentView, MoveDialogView, preventDefault, template, scoreTemplate, round, AssignmentKeyBindingsMixin) ->
+], (I18n, Backbone, $, _, PublishIconView, DateDueColumnView, DateAvailableColumnView, CreateAssignmentView, MoveDialogView, preventDefault, template, scoreTemplate, round, AssignmentKeyBindingsMixin) ->
 
   class AssignmentListItemView extends Backbone.View
     @mixin AssignmentKeyBindingsMixin
@@ -184,6 +185,9 @@ define [
       'letter_grade':
         nonscreenreader: "#{grade}"
         screenreader: I18n.t 'grade_letter_grade_screenreader', 'Grade: %{grade}', grade: grade
+      'gpa_scale':
+        nonscreenreader: "#{grade}"
+        screenreader: I18n.t 'grade_gpa_scale_screenreader', 'Grade: %{grade}', grade: grade
 
 
     _setJSONForGrade: (json) ->

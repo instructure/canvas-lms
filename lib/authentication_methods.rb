@@ -94,7 +94,11 @@ module AuthenticationMethods
         # if the session was created before the last time the user explicitly
         # logged out (of any session for any of their pseudonyms), invalidate
         # this session
-        if (invalid_before = @current_pseudonym.user.last_logged_out) &&
+        invalid_before = @current_pseudonym.user.last_logged_out
+        # they logged out in the future?!? something's busted; just ignore it -
+        # either my clock is off or whoever set this value's clock is off
+        invalid_before = nil if invalid_before && invalid_before > Time.now.utc
+        if invalid_before &&
           (session_refreshed_at = request.env['encrypted_cookie_store.session_refreshed_at']) &&
           session_refreshed_at < invalid_before
 
@@ -119,8 +123,8 @@ module AuthenticationMethods
         @developer_key ||
           request.get? ||
           !allow_forgery_protection ||
-          BreachMitigation::MaskingSecrets.valid_authenticity_token?(session, form_authenticity_param) ||
-          BreachMitigation::MaskingSecrets.valid_authenticity_token?(session, request.headers['X-CSRF-Token']) ||
+          CanvasBreachMitigation::MaskingSecrets.valid_authenticity_token?(session, form_authenticity_param) ||
+          CanvasBreachMitigation::MaskingSecrets.valid_authenticity_token?(session, request.headers['X-CSRF-Token']) ||
           raise(AccessTokenError)
       end
     end
@@ -202,7 +206,11 @@ module AuthenticationMethods
 
   def clean_return_to(url)
     return nil if url.blank?
-    uri = URI.parse(url)
+    begin
+      uri = URI.parse(url)
+    rescue URI::InvalidURIError
+      return nil
+    end
     return nil unless uri.path[0] == ?/
     return "#{request.protocol}#{request.host_with_port}#{uri.path}#{uri.query && "?#{uri.query}"}#{uri.fragment && "##{uri.fragment}"}"
   end
@@ -250,13 +258,13 @@ module AuthenticationMethods
     if @current_user
       render :json => {
                :status => I18n.t('lib.auth.status_unauthorized', 'unauthorized'),
-               :errors => { :message => I18n.t('lib.auth.not_authorized', "user not authorized to perform that action") }
+               :errors => [{ :message => I18n.t('lib.auth.not_authorized', "user not authorized to perform that action") }]
              },
              :status => :unauthorized
     else
       render :json => {
                :status => I18n.t('lib.auth.status_unauthenticated', 'unauthenticated'),
-               :errors => { :message => I18n.t('lib.auth.authentication_required', "user authorization required") }
+               :errors => [{ :message => I18n.t('lib.auth.authentication_required', "user authorization required") }]
              },
              :status => :unauthorized
     end
@@ -281,6 +289,9 @@ module AuthenticationMethods
   end
 
   def initiate_delegated_login(current_host=nil)
+    if cookies['canvas_sa_delegated'] && !params[:canvas_login]
+      @domain_root_account = Account.site_admin
+    end
     is_delegated = @domain_root_account.delegated_authentication? && !params[:canvas_login]
     is_cas = is_delegated && @domain_root_account.cas_authentication?
     is_saml = is_delegated && @domain_root_account.saml_authentication?
@@ -332,6 +343,6 @@ module AuthenticationMethods
   end
 
   def increment_saml_stat(key)
-    Canvas::Statsd.increment("saml.#{Canvas::Statsd.escape(request.host)}.#{key}")
+    CanvasStatsd::Statsd.increment("saml.#{CanvasStatsd::Statsd.escape(request.host)}.#{key}")
   end
 end

@@ -22,12 +22,15 @@ class LearningOutcome < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   has_many :learning_outcome_results
   has_many :alignments, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome', 'deleted']
+
+  EXPORTABLE_ATTRIBUTES = [:id, :context_id, :context_type, :short_description, :context_code, :description, :data, :workflow_state, :created_at, :updated_at, :vendor_guid, :low_grade, :high_grade]
+  EXPORTABLE_ASSOCIATIONS = [:context, :learning_outcome_results, :alignments]
   serialize :data
   before_save :infer_defaults
   validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :short_description, :maximum => maximum_string_length
   validates_presence_of :short_description, :workflow_state
-  sanitize_field :description, Instructure::SanitizeField::SANITIZE
+  sanitize_field :description, CanvasSanitize::SANITIZE
 
   set_policy do
     # managing a contextual outcome requires manage_outcomes on the outcome's context
@@ -58,7 +61,7 @@ class LearningOutcome < ActiveRecord::Base
     tag = self.alignments.find_by_content_id_and_content_type_and_tag_type_and_context_id_and_context_type(asset.id, asset.class.to_s, 'learning_outcome', context.id, context.class.to_s)
     tag ||= self.alignments.create(:content => asset, :tag_type => 'learning_outcome', :context => context)
     mastery_type = opts[:mastery_type]
-    if mastery_type == 'points'
+    if mastery_type == 'points' || mastery_type == 'points_mastery'
       mastery_type = 'points_mastery'
     else
       mastery_type = 'explicit_mastery'
@@ -74,7 +77,7 @@ class LearningOutcome < ActiveRecord::Base
     order_hash = {}
     order.each_with_index{|o, i| order_hash[o.to_i] = i; order_hash[o] = i }
     tags = self.alignments.find_all_by_context_id_and_context_type_and_tag_type(context.id, context.class.to_s, 'learning_outcome')
-    tags = tags.sort_by{|t| order_hash[t.id] || order_hash[t.content_asset_string] || SortLast }
+    tags = tags.sort_by{|t| order_hash[t.id] || order_hash[t.content_asset_string] || CanvasSort::Last }
     updates = []
     tags.each_with_index do |tag, idx|
       tag.position = idx + 1
@@ -199,91 +202,6 @@ class LearningOutcome < ActiveRecord::Base
     end
     LearningOutcome.where(:id => to_delete).update_all(:workflow_state => 'deleted', :updated_at => Time.now.utc)
   end
-  
-  def self.process_migration(data, migration)
-    outcomes = data['learning_outcomes'] ? data['learning_outcomes'] : []
-    migration.outcome_to_id_map = {}
-    outcomes.each do |outcome|
-      begin
-        if outcome[:type] == 'learning_outcome_group'
-          LearningOutcomeGroup.import_from_migration(outcome, migration)
-        else
-          LearningOutcome.import_from_migration(outcome, migration)
-        end
-      rescue
-        migration.add_import_warning(t('#migration.learning_outcome_type', "Learning Outcome"), outcome[:title], $!)
-      end
-    end
-  end
-
-  def self.import_from_migration(hash, migration, item=nil)
-    context = migration.context
-    hash = hash.with_indifferent_access
-    outcome = nil
-    if !item && hash[:external_identifier]
-      if hash[:is_global_outcome]
-        outcome = LearningOutcome.active.find_by_id_and_context_id(hash[:external_identifier], nil)
-      else
-        outcome = context.available_outcome(hash[:external_identifier])
-      end
-      
-      if outcome
-        # Help prevent linking to the wrong outcome if copying into a different install of canvas
-        outcome = nil if outcome.short_description != hash[:title]
-      end
-      
-      if !outcome
-        migration.add_warning(t(:no_context_found, %{The external Learning Outcome couldn't be found for "%{title}", creating a copy.}, :title => hash[:title]))
-      end
-    end
-    
-    if !outcome
-      if hash[:is_global_standard]
-        if Account.site_admin.grants_right?(migration.user, :manage_global_outcomes)
-          # import from vendor with global outcomes
-          context = nil
-          hash[:learning_outcome_group] ||= LearningOutcomeGroup.global_root_outcome_group
-          item ||= LearningOutcome.global.find_by_migration_id(hash[:migration_id]) if hash[:migration_id]
-          item ||= LearningOutcome.global.find_by_vendor_guid(hash[:vendor_guid]) if hash[:vendor_guid]
-          item ||= LearningOutcome.new
-        else
-          migration.add_warning(t(:no_global_permission, %{You're not allowed to manage global outcomes, can't add "%{title}"}, :title => hash[:title]))
-          return
-        end
-      else
-        item ||= find_by_context_id_and_context_type_and_migration_id(context.id, context.class.to_s, hash[:migration_id]) if hash[:migration_id]
-        item ||= context.created_learning_outcomes.new
-        item.context = context
-      end
-      item.migration_id = hash[:migration_id]
-      item.vendor_guid = hash[:vendor_guid]
-      item.low_grade = hash[:low_grade]
-      item.high_grade = hash[:high_grade]
-      item.workflow_state = 'active' if item.deleted?
-      item.short_description = hash[:title]
-      item.description = hash[:description]
-      
-      if hash[:ratings]
-        item.data = {:rubric_criterion=>{}}
-        item.data[:rubric_criterion][:ratings] = hash[:ratings] ? hash[:ratings].map(&:symbolize_keys) : []
-        item.data[:rubric_criterion][:mastery_points] = hash[:mastery_points]
-        item.data[:rubric_criterion][:points_possible] = hash[:points_possible]
-        item.data[:rubric_criterion][:description] = item.short_description || item.description
-      end
-      
-      item.save!
-      context.imported_migration_items << item if context && context.imported_migration_items && item.new_record?
-    else
-      item = outcome
-    end
-    
-    log = hash[:learning_outcome_group] || context.root_outcome_group
-    log.add_outcome(item)
-    
-    migration.outcome_to_id_map[hash[:migration_id]] = item.id
-
-    item
-  end
 
   scope :for_context_codes, lambda { |codes| where(:context_code => codes) }
   scope :active, where("learning_outcomes.workflow_state<>'deleted'")
@@ -294,4 +212,5 @@ class LearningOutcome < ActiveRecord::Base
   }
 
   scope :global, where(:context_id => nil)
+
 end

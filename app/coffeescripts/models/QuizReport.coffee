@@ -9,8 +9,12 @@ define [
   class QuizReport extends Model
     @mixin progressable
 
-    urlRoot: ->
-      "/api/v1/courses/#{@get('course_id')}/quizzes/#{@get('quiz_id')}/reports"
+    url: ->
+      @get('url')
+
+    # You can use this endpoint to generate the CSV attachment by POSTing to it.
+    baseUrl: ->
+      @url().replace(RegExp("/#{@get('id')}$"), '')
 
     toJSON: ->
       quiz_report: _.pick super,
@@ -22,5 +26,5 @@ define [
       if @progressModel.id
         data.progress = @progressModel.toJSON()
       if data.file
-        data.dateAndTime = $.parseFromISO(data.file.created_at).datetime_formatted
+        data.dateAndTime = $.datetimeString(data.file.created_at)
       data

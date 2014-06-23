@@ -17,14 +17,17 @@
 #
 
 class GroupMembership < ActiveRecord::Base
-  
+
   include Workflow
-  
+
   belongs_to :group
   belongs_to :user
 
   attr_accessible :group, :user, :workflow_state, :moderator
-  
+
+  EXPORTABLE_ATTRIBUTES = [:id, :group_id, :workflow_state, :created_at, :updated_at, :user_id, :uuid, :sis_batch_id, :moderator]
+  EXPORTABLE_ASSOCIATIONS = [:group, :user]
+
   before_save :assign_uuid
   before_save :auto_join
   before_save :capture_old_group_id
@@ -35,10 +38,10 @@ class GroupMembership < ActiveRecord::Base
 
   after_save :ensure_mutually_exclusive_membership
   after_save :touch_groups
-  after_save :check_auto_follow_group
   after_save :update_cached_due_dates
+  after_save :update_group_leadership
   after_destroy :touch_groups
-  after_destroy :check_auto_follow_group
+  after_destroy :update_group_leadership
 
   has_a_broadcast_policy
 
@@ -81,8 +84,8 @@ class GroupMembership < ActiveRecord::Base
     p.dispatch :new_student_organized_group
     p.to { self.group.context.admins }
     p.whenever {|record|
-      record.group.context && 
-      record.group.context.is_a?(Course) && 
+      record.group.context &&
+      record.group.context.is_a?(Course) &&
       record.just_created &&
       record.group.group_memberships.count == 1 &&
       record.group.student_organized?
@@ -90,7 +93,7 @@ class GroupMembership < ActiveRecord::Base
   end
 
   def assign_uuid
-    self.uuid ||= AutoHandle.generate_securish_uuid
+    self.uuid ||= CanvasUuid::Uuid.generate_securish_uuid
   end
   protected :assign_uuid
 
@@ -103,6 +106,11 @@ class GroupMembership < ActiveRecord::Base
   end
   protected :auto_join
 
+  def update_group_leadership
+    GroupLeadership.new(Group.find(self.group_id)).member_changed_event(self)
+  end
+  protected :update_group_leadership
+
   def ensure_mutually_exclusive_membership
     return unless self.group
     return if self.deleted?
@@ -110,7 +118,7 @@ class GroupMembership < ActiveRecord::Base
     GroupMembership.active.where(:group_id => peer_groups, :user_id => self.user_id).destroy_all
   end
   protected :ensure_mutually_exclusive_membership
-  
+
   def restricted_self_signup?
     self.group.group_category && self.group.group_category.restricted_self_signup?
   end
@@ -135,7 +143,7 @@ class GroupMembership < ActiveRecord::Base
     end
   end
   protected :validate_within_group_limit
-  
+
   attr_accessor :old_group_id
   def capture_old_group_id
     self.old_group_id = self.group_id_was if self.group_id_changed?
@@ -143,28 +151,19 @@ class GroupMembership < ActiveRecord::Base
   end
   protected :capture_old_group_id
 
-  def check_auto_follow_group
-    if (self.id_changed? || self.workflow_state_changed?) && self.active?
-      UserFollow.create_follow(self.user, self.group)
-    elsif self.destroyed? || (self.workflow_state_changed? && self.deleted?)
-      user_follow = self.user.shard.activate { self.user.user_follows.where(:followed_item_id => self.group_id, :followed_item_type => 'Group').first }
-      user_follow.try(:destroy)
-    end
-  end
-
   def update_cached_due_dates
     if workflow_state_changed? && group.group_category_id && group.context_type == 'Course'
       DueDateCacher.recompute_course(group.context_id, Assignment.where(context_type: group.context_type, context_id: group.context_id, group_category_id: group.group_category_id).pluck(:id))
     end
   end
-  
+
   def touch_groups
     groups_to_touch = [ self.group_id ]
     groups_to_touch << self.old_group_id if self.old_group_id
     Group.where(:id => groups_to_touch).update_all(:updated_at => Time.now.utc)
   end
   protected :touch_groups
-  
+
   workflow do
     state :accepted
     state :invited do
@@ -176,7 +175,7 @@ class GroupMembership < ActiveRecord::Base
     state :deleted
   end
   alias_method :active?, :accepted?
-  
+
   def self.serialization_excludes; [:uuid]; end
 
   # true iff 'active' and the pair of user and group's course match one of the

@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe TabsController, :type => :integration do
+describe TabsController, type: :request do
   describe 'index' do
     it "should require read permissions on the context" do
       course(:active_all => true)

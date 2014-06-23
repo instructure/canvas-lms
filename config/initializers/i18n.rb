@@ -3,6 +3,8 @@
 skip_locale_loading = (Rails.env.development? || Rails.env.test? || $0 == 'irb') && !ENV['RAILS_LOAD_ALL_LOCALES']
 if skip_locale_loading
   I18n.load_path = I18n.load_path.grep(%r{/(locales|en)\.yml\z})
+else
+  I18n.load_path += ["config/locales/locales.yml"] # add it at the end, to trump any weird/invalid stuff in locale-specific files
 end
 
 I18n.backend = I18nema::Backend.new
@@ -11,7 +13,10 @@ I18n.backend.init_translations
 
 I18n.enforce_available_locales = true
 
-I18n.send :extend, I18n::Lolcalize if ENV['LOLCALIZE']
+if ENV['LOLCALIZE']
+  require 'i18n_tasks'
+  I18n.send :extend, I18nTasks::Lolcalize
+end
 
 module I18nUtilities
   def before_label(text_or_key, default_value = nil, *args)
@@ -93,7 +98,7 @@ I18n.class_eval do
         string = ERB::Util.h(string) unless string.html_safe?
       end
       if string.is_a?(ActiveSupport::SafeBuffer) && string.html_safe?
-        ActiveSupport::SafeBuffer.new(interpolate_hash_without_html_safety_awareness(string.to_str, values))
+        string.class.new(interpolate_hash_without_html_safety_awareness(string.to_str, values))
       else
         interpolate_hash_without_html_safety_awareness(string, values)
       end
@@ -167,6 +172,10 @@ I18n.class_eval do
     end
     string.html_safe
   end
+
+  def self.qualified_locale
+    I18n.backend.direct_lookup(I18n.locale.to_s, "qualified_locale") || "en-US"
+  end
 end
 
 if CANVAS_RAILS2
@@ -193,15 +202,36 @@ else
     alias_method_chain :render_template, :assign
   end
 
+  ActionView::PartialRenderer.class_eval do
+    def render_partial_with_assign
+      old_i18n_scope = @lookup_context.i18n_scope
+      @lookup_context.i18n_scope = @path.sub(/\/_/, '/').gsub('/', '.') if @path
+      render_partial_without_assign
+    ensure
+      @lookup_context.i18n_scope = old_i18n_scope
+    end
+    alias_method_chain :render_partial, :assign
+  end
+
   ActionView::Base.class_eval do
     delegate :i18n_scope, :to => :lookup_context
   end
 end
 
 ActionView::Base.class_eval do
-  def translate(key, default, options = {})
+  # can accept either translate(key, default: "default text", option: ...) or
+  # translate(key, "default text", option: ...). when using the former (default
+  # in the options), it's treated as if prepended with a # anchor.
+  def translate(key, *rest)
+    options = rest.extract_options!
+    default_in_options = options.has_key?(:default)
+    default_in_args = !rest.empty?
+    raise ArgumentError, "wrong arity" if rest.size > 1
+    raise ArgumentError, "didn't provide default in args or options" if !default_in_args && !default_in_options
+    raise ArgumentError, "can't provide default in both args and options" if default_in_args && default_in_options
+    default = default_in_options ? options[:default] : rest.first
     key = key.to_s
-    key = "#{i18n_scope}.#{key}" unless key.sub!(/\A#/, '')
+    key = "#{i18n_scope}.#{key}" unless default_in_options || key.sub!(/\A#/, '')
     I18n.translate(key, default, options)
   end
   alias :t :translate

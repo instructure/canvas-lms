@@ -3,7 +3,8 @@ define [
   'compiled/models/GroupCategory'
   'compiled/models/Group'
   'compiled/views/groups/manage/GroupCreateView'
-], ($, GroupCategory, Group, GroupCreateView) ->
+  'helpers/fakeENV'
+], ($, GroupCategory, Group, GroupCreateView, fakeENV) ->
 
   view = null
   groupCategory = null
@@ -11,6 +12,7 @@ define [
 
   module 'GroupCreateView',
     setup: ->
+      fakeENV.setup()
       group = new Group
         id: 42
         name: 'Foo Group'
@@ -21,6 +23,7 @@ define [
       view.$el.appendTo($(document.body))
 
     teardown: ->
+      fakeENV.teardown()
       view.remove()
 
   test 'renders join level in add group dialog for student organized group categories', ->

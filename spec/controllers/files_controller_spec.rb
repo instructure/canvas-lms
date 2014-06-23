@@ -51,7 +51,7 @@ describe FilesController do
     hash[@tag.id.to_s] = {:type => 'must_view'}
     @module.completion_requirements = hash
     @module.save!
-    @module.evaluate_for(@user, true, true).state.should eql(:unlocked)
+    @module.evaluate_for(@user).state.should eql(:unlocked)
   end
 
   def file_with_path(path)
@@ -144,7 +144,7 @@ describe FilesController do
 
       f2 = course_folder
       a2 = folder_file
-      get 'index', :course_id => @course.id, :folder_id => f2.id
+      get 'index', :course_id => @course.id, :folder_id => f2.id, :format => 'json'
       response.should be_success
       assigns[:current_folder].should eql(f2)
       assigns[:current_attachments].should_not be_nil
@@ -270,7 +270,7 @@ describe FilesController do
       file_in_a_module
       get 'show', :course_id => @course.id, :id => @file.id, :download => 1
       @module.reload
-      @module.evaluate_for(@user, true, true).state.should eql(:completed)
+      @module.evaluate_for(@user).state.should eql(:completed)
       @file.reload.last_inline_view.should be_nil
     end
 
@@ -280,7 +280,7 @@ describe FilesController do
       @file.save!
       get 'show', :course_id => @course.id, :id => @file.id, :download => 1
       @module.reload
-      @module.evaluate_for(@user, true, true).state.should eql(:unlocked)
+      @module.evaluate_for(@user).state.should eql(:unlocked)
       @file.reload.last_inline_view.should be_nil
     end
 
@@ -290,7 +290,7 @@ describe FilesController do
       @file.save!
       get 'show', :course_id => @course.id, :id => @file.id
       @module.reload
-      @module.evaluate_for(@user, true, true).state.should eql(:unlocked)
+      @module.evaluate_for(@user).state.should eql(:unlocked)
       @file.reload.last_inline_view.should be_nil
     end
 
@@ -299,7 +299,7 @@ describe FilesController do
       get 'show', :course_id => @course.id, :id => @file.id, :inline => 1
       json_parse.should == {'ok' => true}
       @module.reload
-      @module.evaluate_for(@user, true, true).state.should eql(:completed)
+      @module.evaluate_for(@user).state.should eql(:completed)
       @file.reload.last_inline_view.should > 1.minute.ago
     end
 
@@ -322,7 +322,7 @@ describe FilesController do
       @file.save!
       get 'show', :course_id => @course.id, :id => @file.id, :format => :json
       @module.reload
-      @module.evaluate_for(@user, true, true).state.should eql(:completed)
+      @module.evaluate_for(@user).state.should eql(:completed)
       @file.reload.last_inline_view.should > 1.minute.ago
     end
 
@@ -338,7 +338,7 @@ describe FilesController do
 
       get 'show', :course_id => @course.id, :id => @file.id, :format => :json
       @module.reload
-      @module.evaluate_for(@user, true, true).state.should eql(:unlocked)
+      @module.evaluate_for(@user).state.should eql(:unlocked)
       @file.reload.last_inline_view.should be_nil
     end
 
@@ -442,8 +442,13 @@ describe FilesController do
     it "should fail if the file path doesn't match" do
       course_with_teacher_logged_in(:active_all => true)
       file_in_a_module
-      proc { get "show_relative", :course_id => @course.id, :file_path => @file.full_display_path+"blah" }.should raise_error(ActiveRecord::RecordNotFound)
-      proc { get "show_relative", :file_id => @file.id, :course_id => @course.id, :file_path => @file.full_display_path+"blah" }.should raise_error(ActiveRecord::RecordNotFound)
+      assert_page_not_found do
+        get "show_relative", :course_id => @course.id, :file_path => @file.full_display_path+"blah"
+      end
+
+      assert_page_not_found do
+        get "show_relative", :file_id => @file.id, :course_id => @course.id, :file_path => @file.full_display_path+"blah"
+      end
     end
 
     it "should ignore bad file_ids" do
@@ -501,6 +506,7 @@ describe FilesController do
       response.should be_redirect
       assigns[:attachment].should eql(@file)
       assigns[:attachment].display_name.should eql("new name")
+      assigns[:attachment].user_id.should be_nil
     end
 
     it "should move file into a folder" do
@@ -513,6 +519,18 @@ describe FilesController do
 
       @file.reload
       @file.folder.should eql(@folder)
+    end
+
+    it "should replace content and update user_id" do
+      course_with_teacher_logged_in(:active_all => true)
+      course_file
+      new_content = fixture_file_upload('scribd_docs/txt.txt', 'text/plain', true)
+      put 'update', :course_id => @course.id, :id => @file.id, :attachment => {:uploaded_data => new_content}
+      response.should be_redirect
+      assigns[:attachment].should eql(@file)
+      @file.reload
+      @file.size.should eql new_content.size
+      @file.user.should eql @teacher
     end
   end
 
@@ -678,7 +696,7 @@ describe FilesController do
       # based completely on the policy signature
       course_with_teacher(:active_all => true, :user => user_with_pseudonym)
       @attachment = factory_with_protected_attributes(Attachment, :context => @course, :file_state => 'deleted', :workflow_state => 'unattached', :filename => 'test.txt', :content_type => 'text')
-      @content = StringIO.new("test file")
+      @content = Rack::Test::UploadedFile.new(File.join(ActionController::TestCase.fixture_path, 'courses.yml'), '')
       request.env['CONTENT_TYPE'] = 'multipart/form-data'
       enable_forgery_protection
     end
@@ -688,28 +706,27 @@ describe FilesController do
       post "api_create", params[:upload_params].merge(:file => @content)
       response.should be_redirect
       @attachment.reload
-      @attachment.workflow_state.should == 'processed'
       # the file is not available until the third api call is completed
       @attachment.file_state.should == 'deleted'
-      @attachment.open.read.should == "test file"
+      @attachment.open.read.should == File.read(File.join(ActionController::TestCase.fixture_path, 'courses.yml'))
     end
 
     it "should reject a blank policy" do
       post "api_create", { :file => @content }
-      response.status.to_i.should == 400
+      assert_status(400)
     end
 
     it "should reject an expired policy" do
       params = @attachment.ajax_upload_params(@user.pseudonym, "", "", :expiration => -60)
       post "api_create", params[:upload_params].merge({ :file => @content })
-      response.status.to_i.should == 400
+      assert_status(400)
     end
 
     it "should reject a modified policy" do
       params = @attachment.ajax_upload_params(@user.pseudonym, "", "")
       params[:upload_params]['Policy'] << 'a'
       post "api_create", params[:upload_params].merge({ :file => @content })
-      response.status.to_i.should == 400
+      assert_status(400)
     end
 
     it "should reject a good policy if the attachment data is already uploaded" do
@@ -717,7 +734,7 @@ describe FilesController do
       @attachment.uploaded_data = @content
       @attachment.save!
       post "api_create", params[:upload_params].merge(:file => @content)
-      response.status.to_i.should == 400
+      assert_status(400)
     end
   end
 

@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -27,7 +27,7 @@ describe Attachment do
     end
 
     it "should require a context" do
-      lambda{attachment_model(:context => nil)}.should raise_error(ActiveRecord::RecordInvalid, /Validation failed: Context can't be blank/)
+      lambda{attachment_model(:context => nil)}.should raise_error(ActiveRecord::RecordInvalid, /Context/)
     end
 
   end
@@ -95,6 +95,19 @@ describe Attachment do
     @attachment.should be_scribdable
   end
 
+  describe "needs_scribd_doc?" do
+    it "normally needs a scribd doc" do
+      scribdable_attachment_model
+      @attachment.needs_scribd_doc?.should be_true
+    end
+
+    it "doesn't need a scribd doc when canvadocs are configured" do
+      Canvadocs.stubs(:config).returns(api_key: "asdf")
+      scribdable_attachment_model
+      @attachment.needs_scribd_doc?.should be_false
+    end
+  end
+
   context "authenticated_s3_url" do
     before do
       local_storage!
@@ -144,12 +157,14 @@ describe Attachment do
 
   end
 
+  def configure_crocodoc
+    PluginSetting.create! :name => 'crocodoc',
+                          :settings => { :api_key => "blahblahblahblahblah" }
+    Crocodoc::API.any_instance.stubs(:upload).returns 'uuid' => '1234567890'
+  end
+
   context "crocodoc" do
-    before do
-      PluginSetting.create! :name => 'crocodoc',
-                            :settings => { :api_key => "blahblahblahblahblah" }
-      Crocodoc::API.any_instance.stubs(:upload).returns 'uuid' => '1234567890'
-    end
+    before { configure_crocodoc }
 
     it "crocodocable?" do
       crocodocable_attachment_model
@@ -179,17 +194,28 @@ describe Attachment do
       @attachment.crocodoc_document.uuid.should == '1234567890'
     end
 
-    it "should spawn a delayed job to retry failed uploads (once)" do
+    it "should spawn delayed jobs to retry failed uploads" do
       Crocodoc::API.any_instance.stubs(:upload).returns 'error' => 'blah'
       crocodocable_attachment_model
 
-      expects_job_with_tag('Attachment#submit_to_crocodoc', 1) do
+      attempts = 3
+      Setting.set('max_crocodoc_attempts', attempts)
+
+      track_jobs do
+        # first attempt
         @attachment.submit_to_crocodoc
+
+        time = Time.now
+        # nth attempt won't create more jobs
+        attempts.times {
+          time += 1.hour
+          Timecop.freeze(time) do
+            run_jobs
+          end
+        }
       end
 
-      expects_job_with_tag('Attachment#submit_to_crocodoc', 0) do
-        @attachment.submit_to_crocodoc(2)
-      end
+      created_jobs.size.should == attempts
     end
 
     it "should submit to scribd if crocodoc fails to convert" do
@@ -203,6 +229,53 @@ describe Attachment do
       expects_job_with_tag('Attachment.submit_to_scribd') {
         CrocodocDocument.update_process_states
       }
+    end
+  end
+
+  context "canvadocs" do
+    before do
+      PluginSetting.create! :name => 'canvadocs',
+        :settings => {"api_key" => "blahblahblahblahblah",
+                      "base_url" => "http://example.com"}
+      Canvadocs::API.any_instance.stubs(:upload).returns "id" => 1234
+    end
+
+    describe "submit_to_canvadocs" do
+      it "submits canvadocable documents" do
+        a = canvadocable_attachment_model
+        a.submit_to_canvadocs
+        a.canvadoc.document_id.should_not be_nil
+      end
+
+      it "doesn't submit non-canvadocable documents" do
+        a = attachment_model
+        a.submit_to_canvadocs
+        a.canvadoc.should be_nil
+      end
+
+      it "tries again later when upload fails" do
+        Canvadocs::API.any_instance.stubs(:upload).returns(nil)
+        expects_job_with_tag('Attachment#submit_to_canvadocs') {
+          canvadocable_attachment_model.submit_to_canvadocs
+        }
+      end
+
+      it "prefers crocodoc when annotation is requested" do
+        configure_crocodoc
+        Setting.set('canvadoc_mime_types',
+                    (Canvadoc.mime_types << "application/blah").to_json)
+
+        crocodocable = crocodocable_attachment_model
+        canvadocable = canvadocable_attachment_model content_type: "application/blah"
+
+        crocodocable.submit_to_canvadocs 1, wants_annotation: true
+        crocodocable.canvadoc.should be_nil
+        crocodocable.crocodoc_document.should_not be_nil
+
+        canvadocable.submit_to_canvadocs 1, wants_annotation: true
+        canvadocable.canvadoc.should_not be_nil
+        canvadocable.crocodoc_document.should be_nil
+      end
     end
   end
 
@@ -381,6 +454,17 @@ describe Attachment do
       att
     end
 
+    describe "clones with scribd" do
+      it 'should not copy scribd info on clone' do
+        a = attachment_with_scribd_doc(fake_scribd_doc('zero'))
+        course
+        new_a = a.clone_for(@course)
+        new_a.save!
+        new_a.read_attribute(:scribd_doc).should be_nil
+        new_a.scribd_doc.id.should == a.scribd_doc.id
+      end
+    end
+
     describe "related_attachments" do
       it "should include the root attachment" do
         @root = attachment_model
@@ -403,19 +487,29 @@ describe Attachment do
     end
 
     describe "delete_scribd_doc" do
-      it "should delete the scribd doc" do
+      it "should not delete the scribd doc when the attachment is destroyed" do
         @att = attachment_with_scribd_doc(fake_scribd_doc('zero'))
-        @att.scribd_doc.expects(:destroy).once.returns(true)
+        @att.scribd_doc.expects(:destroy).never
         @att.destroy
-        @att.reload.workflow_state.should eql 'deleted'
-        @att.read_attribute(:scribd_doc).should be_nil
+        @att.file_state.should eql 'deleted'
+        @att.workflow_state.should eql 'pending_upload'
+        @att.read_attribute(:scribd_doc).should_not be_nil
       end
 
       it "should do nothing for non-root attachments" do
         @root = attachment_with_scribd_doc(fake_scribd_doc('zero'))
-        @child = attachment_with_scribd_doc(fake_scribd_doc('one'), :root_attachment => @root)
+        @child = attachment_model(root_attachment: @root)
         @child.scribd_doc.expects(:destroy).never
+        @child.scribd_doc.should == @root.scribd_doc
         @child.delete_scribd_doc
+      end
+
+      it "should delete scribd_doc" do
+        @root = attachment_with_scribd_doc(fake_scribd_doc('zero'))
+        @root.scribd_doc.expects(:destroy).once.returns(true)
+        @root.read_attribute(:scribd_doc).should_not be_nil
+        @root.delete_scribd_doc
+        @root.read_attribute(:scribd_doc).should be_nil
       end
     end
 
@@ -670,17 +764,17 @@ describe Attachment do
       @attachment.file_state = 'available'
       @attachment.save!
     end
-    
+
     it "should disassociate but not delete the associated media object" do
       @attachment.media_entry_id = '0_feedbeef'
       @attachment.save!
-      
+
       media_object = @course.media_objects.build :media_id => '0_feedbeef'
       media_object.attachment_id = @attachment.id
       media_object.save!
-      
+
       @attachment.destroy
-      
+
       media_object.reload
       media_object.should_not be_deleted
       media_object.attachment_id.should be_nil
@@ -1153,17 +1247,32 @@ describe Attachment do
       @root = attachment_model
       @child = attachment_model(:root_attachment => @root)
       @new_account = account_model
+
+      @old_object = mock('old object')
+      @new_object = mock('new object')
+      new_full_filename = @root.full_filename.sub(@root.namespace, @new_account.file_namespace)
+      @objects = { @root.full_filename => @old_object, new_full_filename => @new_object }
+      @root.bucket.stubs(:objects).returns(@objects)
     end
 
     it "should fail for non-root attachments" do
-      AWS::S3::S3Object.any_instance.expects(:rename_to).never
+      @old_object.expects(:copy_to).never
       expect { @child.change_namespace(@new_account.file_namespace) }.to raise_error
       @root.reload.namespace.should == @old_account.file_namespace
       @child.reload.namespace.should == @root.reload.namespace
     end
 
+    it "should not copy if the destination exists" do
+      @new_object.expects(:exists?).returns(true)
+      @old_object.expects(:copy_to).never
+      @root.change_namespace(@new_account.file_namespace)
+      @root.namespace.should == @new_account.file_namespace
+      @child.reload.namespace.should == @root.namespace
+    end
+
     it "should rename root attachments and update children" do
-      AWS::S3::S3Object.any_instance.expects(:rename_to).with(@root.full_filename.sub(@old_account.id.to_s, @new_account.id.to_s), anything)
+      @new_object.expects(:exists?).returns(false)
+      @old_object.expects(:copy_to).with(@root.full_filename.sub(@old_account.id.to_s, @new_account.id.to_s), anything)
       @root.change_namespace(@new_account.file_namespace)
       @root.namespace.should == @new_account.file_namespace
       @child.reload.namespace.should == @root.namespace
@@ -1171,7 +1280,7 @@ describe Attachment do
   end
 
   context "dynamic thumbnails" do
-    let(:sz) { CollectionItemData::THUMBNAIL_SIZE }
+    let(:sz) { "640x>" }
 
     before do
       attachment_model(:uploaded_data => stub_png_data)
@@ -1582,6 +1691,62 @@ describe Attachment do
       end
     end
   end
+
+  describe "#full_path" do
+    it "shouldn't puke for things that don't have folders" do
+      attachment_obj_with_context(Account.default.default_enrollment_term)
+      @attachment.folder = nil
+      @attachment.full_path.should == "/#{@attachment.display_name}"
+    end
+  end
+
+  describe '.context_type' do
+    it 'returns the correct representation of a quiz statistics relation' do
+      stats = Quizzes::QuizStatistics.create!(report_type: 'student_analysis')
+      attachment = attachment_obj_with_context(Account.default.default_enrollment_term)
+      attachment.context = stats
+      attachment.save
+      attachment.context_type.should == "Quizzes::QuizStatistics"
+
+      Attachment.where(id: attachment).update_all(context_type: 'QuizStatistics')
+
+      Attachment.find(attachment.id).context_type.should == 'Quizzes::QuizStatistics'
+    end
+  end
+
+  describe ".clone_url_as_attachment" do
+    it "should reject invalid urls" do
+      expect { Attachment.clone_url_as_attachment("ftp://some/stuff") }.to raise_error(ArgumentError)
+    end
+
+    it "should not raise on non-200 responses" do
+      url = "http://example.com/test.png"
+      CanvasHttp.expects(:get).with(url).yields(stub('code' => '401'))
+      expect { Attachment.clone_url_as_attachment(url) }.to raise_error(CanvasHttp::InvalidResponseCodeError)
+    end
+
+    it "should use an existing attachment if passed in" do
+      url = "http://example.com/test.png"
+      a = attachment_model
+      CanvasHttp.expects(:get).with(url).yields(FakeHttpResponse.new('200', 'this is a jpeg', 'content-type' => 'image/jpeg'))
+      Attachment.clone_url_as_attachment(url, :attachment => a)
+      a.save!
+      a.open.read.should == "this is a jpeg"
+    end
+
+    it "should detect the content_type from the body" do
+      url = "http://example.com/test.png"
+      CanvasHttp.expects(:get).with(url).yields(FakeHttpResponse.new('200', 'this is a jpeg', 'content-type' => 'image/jpeg'))
+      att = Attachment.clone_url_as_attachment(url)
+      att.should be_present
+      att.should be_new_record
+      att.content_type.should == 'image/jpeg'
+      att.context = Account.default
+      att.save!
+      att.open.read.should == 'this is a jpeg'
+    end
+  end
+
 end
 
 def processing_model

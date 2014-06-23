@@ -43,6 +43,7 @@ define [
     ##
     # options.page: 'current', 'next', 'prev', 'first', 'last', 'top', 'bottom'
     fetch: (options = {}) ->
+      options = _.clone(options)
       @loadedAll = false
       exclusionFlag = "fetching#{capitalize options.page}Page"
       @[exclusionFlag] = true

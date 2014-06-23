@@ -12,8 +12,10 @@ end
 require 'rake'
 require 'rake/testtask'
 require 'rdoc/task'
+Bundler.require(:rake_tasks)
 
 if CANVAS_RAILS2
+  Dir["#{RAILS_ROOT}/gems/**/tasks/*.rake"].each { |ext| load ext }
   require 'tasks/rails'
 else
   CanvasRails::Application.load_tasks

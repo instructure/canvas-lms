@@ -28,6 +28,9 @@ define [
       @form.on 'click', '.toggle-wrapper a', (e) =>
         e.preventDefault()
         @textArea.editorBox('toggle')
+        # hide the clicked link, and show the other toggle link.
+        # todo: replace .andSelf with .addBack when JQuery is upgraded.
+        $(e.currentTarget).siblings('a').andSelf().toggle()
       @form.delegate '.alert .close', 'click', preventDefault @hideNotification
       @editing = false
 

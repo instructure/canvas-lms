@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -29,6 +29,14 @@ class Enrollment < ActiveRecord::Base
   has_many :pseudonyms, :primary_key => :user_id, :foreign_key => :user_id
   has_many :course_account_associations, :foreign_key => 'course_id', :primary_key => 'course_id'
 
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :user_id, :course_id, :type, :uuid, :workflow_state, :created_at, :updated_at, :associated_user_id, :sis_source_id, :sis_batch_id, :start_at, :end_at,
+    :course_section_id, :root_account_id, :computed_final_score, :completed_at, :self_enrolled, :computed_current_score, :grade_publishing_status, :last_publish_attempt_at,
+    :grade_publishing_message, :limit_privileges_to_course_section, :role_name, :last_activity_at
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:course, :course_section, :root_account, :user, :role_overrides, :pseudonyms]
+
   validates_presence_of :user_id, :course_id, :type, :root_account_id, :course_section_id, :workflow_state
   validates_inclusion_of :limit_privileges_to_course_section, :in => [true, false]
   validates_inclusion_of :associated_user_id, :in => [nil],
@@ -47,7 +55,7 @@ class Enrollment < ActiveRecord::Base
   after_save :update_cached_due_dates
 
   attr_accessor :already_enrolled
-  attr_accessible :user, :course, :workflow_state, :course_section, :limit_privileges_to_course_section, :already_enrolled
+  attr_accessible :user, :course, :workflow_state, :course_section, :limit_privileges_to_course_section, :already_enrolled, :start_at, :end_at
 
   def self.active_student_conditions(prefix = 'enrollments')
     "(#{prefix}.type IN ('StudentEnrollment', 'StudentViewEnrollment') AND #{prefix}.workflow_state = 'active')"
@@ -180,11 +188,14 @@ class Enrollment < ActiveRecord::Base
   scope :future, lambda {
     joins(:course).
         where("(courses.start_at>?
-              AND courses.workflow_state='available'
-              AND courses.restrict_enrollments_to_course_dates=?
-              AND enrollments.workflow_state IN ('invited', 'active', 'completed'))
-              OR (courses.workflow_state IN ('created', 'claimed')
-              AND enrollments.workflow_state IN ('invited', 'active', 'completed', 'creation_pending'))", Time.now.utc, true)
+                AND courses.workflow_state='available'
+                AND courses.restrict_enrollments_to_course_dates=?
+                AND enrollments.workflow_state IN ('invited', 'active')
+              ) OR (
+                courses.workflow_state IN ('created', 'claimed')
+                AND enrollments.type IN ('TeacherEnrollment','TaEnrollment', 'DesignerEnrollment')
+                AND enrollments.workflow_state IN ('invited', 'active', 'creation_pending')
+              )", Time.now.utc, true)
   }
 
   scope :past,
@@ -220,6 +231,10 @@ class Enrollment < ActiveRecord::Base
   }
   def self.sis_type(type)
     SIS_TYPES[type] || SIS_TYPES['StudentEnrollment']
+  end
+
+  def sis_type
+    Enrollment.sis_type(self.type)
   end
 
   def sis_role
@@ -324,28 +339,31 @@ class Enrollment < ActiveRecord::Base
 
   def update_linked_enrollments
     observers.each do |observer|
-      if enrollment = linked_enrollment_for(observer)
+      if enrollment = active_linked_enrollment_for(observer)
         enrollment.update_from(self)
       end
     end
   end
 
   def create_linked_enrollment_for(observer)
-    enrollment = linked_enrollment_for(observer) || observer.observer_enrollments.build
+    # we don't want to create a new observer enrollment if one exists
+    return true if linked_enrollment_for(observer)
+    enrollment = observer.observer_enrollments.build
     enrollment.associated_user_id = user_id
     enrollment.update_from(self)
   end
 
   def linked_enrollment_for(observer)
-    # there should really only ever be one, but due to SIS or legacy data there
-    # could be multiple. we'll use the best match (based on workflow_state)
-    enrollment = observer.observer_enrollments.where(
+    observer.observer_enrollments.where(
       :associated_user_id => user_id,
       :course_id => course_id,
-      :course_section_id => course_section_id_was).
-      order(self.class.state_rank_sql).first
+      :course_section_id => course_section_id_was).first
+  end
+
+  def active_linked_enrollment_for(observer)
+    enrollment = linked_enrollment_for(observer)
     # we don't want to "undelete" observer enrollments that have been
-    # explicitly deleted 
+    # explicitly deleted
     return nil if enrollment && enrollment.deleted? && workflow_state_was != 'deleted'
     enrollment
   end
@@ -731,7 +749,7 @@ class Enrollment < ActiveRecord::Base
 
   def self.recompute_final_scores(user_id)
     user = User.find(user_id)
-    enrollments = user.student_enrollments.uniq_by { |e| e.course_id }
+    enrollments = user.student_enrollments.to_a.uniq { |e| e.course_id }
     enrollments.each do |enrollment|
       send_later(:recompute_final_score, user_id, enrollment.course_id)
     end
@@ -778,7 +796,7 @@ class Enrollment < ActiveRecord::Base
 
   def self.recompute_final_score_if_stale(course, user=nil)
     Rails.cache.fetch(['recompute_final_scores', course.id, user].cache_key, :expires_in => Setting.get('recompute_grades_window', 600).to_i.seconds) do
-      recompute_final_score user ? user.id : course.student_enrollments.map(&:user_id), course.id
+      recompute_final_score user ? user.id : course.student_enrollments.except(:includes).select(:user_id).uniq.map(&:user_id), course.id
       yield if block_given?
       true
     end
@@ -845,21 +863,24 @@ class Enrollment < ActiveRecord::Base
   end
 
   set_policy do
+    given {|user, session| self.course.grants_rights?(user, session, :manage_students, :manage_admin_users).values.any? }
+    can :read
+
     given { |user| self.user == user }
+    can :read and can :read_grades
+
+    given { |user, session| self.course.students_visible_to(user, true).map(&:id).include?(self.user_id) && self.course.grants_rights?(user, session, :manage_grades, :view_all_grades).values.any? }
+    can :read and can :read_grades
+
+    given { |user| course.observer_enrollments.find_by_user_id_and_associated_user_id(user.id, self.user_id).present? }
     can :read and can :read_grades
 
     given {|user, session| self.course.grants_right?(user, session, :participate_as_student) && self.user.show_user_services }
     can :read_services
 
     # read_services says this person has permission to see what web services this enrollment has linked to their account
-    given {|user, session| self.course.grants_right?(user, session, :manage_students) && self.user.show_user_services }
-    can :read and can :read_services
-
-    given { |user, session| self.course.students_visible_to(user, true).map(&:id).include?(self.user_id) && self.course.grants_rights?(user, session, :manage_grades, :view_all_grades).values.any? }
-    can :read and can :read_grades
-
-    given { |user| course.observer_enrollments.find_by_user_id_and_associated_user_id(user.id, self.user_id).present? }
-    can :read and can :read_grades and can :read_services
+    given {|user, session| self.grants_right?(user, session, :read) && self.user.show_user_services }
+    can :read_services
   end
 
   scope :before, lambda{ |date|
@@ -903,14 +924,16 @@ class Enrollment < ActiveRecord::Base
   def self.order_by_sortable_name
     clause = User.sortable_name_order_by_clause('users')
     scope = self.order(clause)
-    if scope.scope(:find, :select)
+    if scope.select_values.present?
       scope = scope.select(clause)
+    elsif !CANVAS_RAILS2
+      scope = scope.select(self.arel_table[Arel.star])
     end
     scope
   end
 
   def self.top_enrollment_by(key, rank_order = :default)
-    raise "top_enrollment_by_user must be scoped" unless scoped?(:find, :conditions)
+    raise "top_enrollment_by_user must be scoped" unless scoped.where_values.present?
     key = key.to_s
     distinct_on(key, :order => "#{key}, #{type_rank_sql(rank_order)}")
   end
@@ -918,13 +941,13 @@ class Enrollment < ActiveRecord::Base
   def assign_uuid
     # DON'T use ||=, because that will cause an immediate save to the db if it
     # doesn't already exist
-    self.uuid = AutoHandle.generate_securish_uuid if !read_attribute(:uuid)
+    self.uuid = CanvasUuid::Uuid.generate_securish_uuid if !read_attribute(:uuid)
   end
   protected :assign_uuid
 
   def uuid
     if !read_attribute(:uuid)
-      self.update_attribute(:uuid, AutoHandle.generate_securish_uuid)
+      self.update_attribute(:uuid, CanvasUuid::Uuid.generate_securish_uuid)
     end
     read_attribute(:uuid)
   end
@@ -957,47 +980,6 @@ class Enrollment < ActiveRecord::Base
   # course it is currently tied to
   def enrollment_term
     self.course.enrollment_term
-  end
-
-  def self.remove_duplicate_enrollments_from_sections
-    # clean up for enrollments that aren't unique on (user_id,
-    # course_section_id, type, associated_user_id)
-    #
-    # eventually we'll make this a db constraint, and we can drop this method,
-    # but that'll require some more code changes
-    deleted = 0
-    while true
-      pairs = self.connection.select_rows("
-          SELECT user_id, course_section_id, type, associated_user_id
-          FROM enrollments
-          WHERE sis_source_id IS NOT NULL
-          GROUP BY user_id, course_section_id, type, associated_user_id
-          HAVING count(*) > 1 LIMIT 50000")
-      break if pairs.empty?
-      pairs.each do |(user_id, course_section_id, type, associated_user_id)|
-        scope = self.where(:user_id => user_id, :course_section_id => course_section_id, :type => type, :associated_user_id => associated_user_id).
-            where("sis_source_id IS NOT NULL")
-        keeper = scope.select([:id, :workflow_state]).order(:sis_batch_id).last
-        deleted += scope.where("id<>?", keeper).delete_all if keeper
-      end
-    end
-    return deleted
-  end
-
-  # similar to above, but used on a scope or association (e.g. User#enrollments)
-  def self.remove_duplicates!
-    raise "remove_duplicates! needs to be scoped" unless scoped?(:find, :conditions)
-
-    where(["workflow_state NOT IN (?)", ['deleted', 'inactive', 'rejected']]).
-      group_by{ |e| [e.user_id, e.course_id, e.course_section_id, e.associated_user_id] }.
-      each do |key, enrollments|
-        next if enrollments.size == 1
-        enrollments.
-          sort_by{ |e| [e.sis_batch_id || ''] + [-e.state_sortable] }.
-          reverse.
-          slice(1, enrollments.size - 1).
-          each(&:destroy)
-      end
   end
 
   def effective_start_at
@@ -1048,19 +1030,38 @@ class Enrollment < ActiveRecord::Base
     @sis_user_id
   end
 
-  def record_recent_activity_threshold
-    Setting.get('enrollment_last_activity_at_threshold', 10.minutes).to_i
+  def record_last_activity_threshold
+    Setting.get('enrollment_last_activity_at_threshold', 2.minutes).to_i
+  end
+
+  def record_total_activity_threshold
+    Setting.get('enrollment_total_activity_time_threshold', 10.minutes).to_i
   end
 
   def record_recent_activity_worthwhile?(as_of, threshold)
     last_activity_at.nil? || (as_of - last_activity_at >= threshold)
   end
 
+  def increment_total_activity?(as_of, last_threshold, total_threshold)
+    !last_activity_at.nil? &&
+      (as_of - last_activity_at >= last_threshold) &&
+      (as_of - last_activity_at < total_threshold)
+  end
+
   def record_recent_activity(as_of = Time.zone.now,
-                             threshold = record_recent_activity_threshold)
-    if record_recent_activity_worthwhile?(as_of, threshold)
+                             last_threshold = record_last_activity_threshold,
+                             total_threshold = record_total_activity_threshold)
+    return unless record_recent_activity_worthwhile?(as_of, last_threshold)
+    if increment_total_activity?(as_of, last_threshold, total_threshold)
+      self.total_activity_time += (as_of - self.last_activity_at).to_i
+      self.class.where(:id => self).update_all(:total_activity_time => total_activity_time, :last_activity_at => as_of)
+    else
       self.class.where(:id => self).update_all(:last_activity_at => as_of)
-      self.last_activity_at = as_of
     end
+    self.last_activity_at = as_of
+  end
+
+  def total_activity_time
+    self.read_attribute(:total_activity_time).to_i
   end
 end

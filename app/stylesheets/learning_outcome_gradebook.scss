@@ -57,7 +57,6 @@ $page-dark: #ebeff2;
 
 .checkbox-view .checkbox {
   border-radius: 3px;
-  -moz-box-sizing: border-box;
   box-sizing: border-box;
   display: inline-block;
   height: 18px;
@@ -78,9 +77,7 @@ $page-dark: #ebeff2;
   border-top: 1px solid $border-dark;
   box-sizing: border-box;
   color: $font-color;
-  min-height: 450px;
   box-sizing: border-box;
-  -moz-box-sizing: border-box;
   padding-left: 22px;
 }
 
@@ -90,8 +87,7 @@ $page-dark: #ebeff2;
 
 .outcome-gradebook-wrapper, .outcome-gradebook-sidebar {
   box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  min-height: 450px;
+  height: 100%;
 }
 
 .outcome-gradebook-sidebar {
@@ -99,6 +95,7 @@ $page-dark: #ebeff2;
   border-left: 1px solid $border-dark;
   float: right;
   width: 265px;
+  position: relative;
 }
 
 .outcome-gradebook-sidebar .sidebar-toggle {
@@ -126,8 +123,16 @@ $page-dark: #ebeff2;
     padding: 0 4px;
   }
 
+  .operations li {
+    margin: 12px 0;
+  }
+
   .checkbox-label {
     display: none;
+  }
+  .operation-label {
+    position: absolute;
+    top: -999px;
   }
 
   .checkbox {
@@ -144,6 +149,25 @@ $page-dark: #ebeff2;
 
 .outcome-gradebook-sidebar-content {
   padding: 0 21px;
+
+  .operations {
+    border-top: 1px solid $border-sidebar;
+    position: absolute;
+    bottom: 0; left: 16px; right: 16px;
+
+    li {
+      margin: 12px;
+    }
+
+    a {
+      color: $font-color;
+      font-size: 16px;
+    }
+  }
+
+  .operation-label {
+    margin-left: 6px;
+  }
 }
 
 .gradebook-header .section-button-placeholder {
@@ -164,12 +188,12 @@ $page-dark: #ebeff2;
 /* slickgrid */
 
 /* slickgrid overrides */
-.slick-viewport {
-  border-left: 1px solid $border-light;
-  border-top: 1px solid $border-dark;
-}
-
 .outcome-gradebook-wrapper {
+  .slick-viewport {
+    border-left: 1px solid $border-light;
+    border-top: 1px solid $border-dark;
+  }
+
   .ui-state-default {
     background: none;
     border: none;
@@ -290,22 +314,24 @@ $page-dark: #ebeff2;
 
   .outcome-student-cell.slick-cell {
     font-size: 14px;
-  }
-
-  .avatar-circle {
-    border: 1px solid $border-light;
-    border-radius: 25px;
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    float: left;
-    height: 25px;
-    margin: 5px 8px 0 -4px;
-    width: 25px;
+    line-height: 21px;
+    .student-section {
+      color: $font-color;
+    }
   }
 
   .outcome-student-cell-content {
     padding-left: 8px;
     margin-top: 1px;
+    .avatar {
+      width: 25px;
+      height: 25px;
+      margin-top: 3px;
+      margin-right: 4px;
+      float: left;
+      position: relative;
+      z-index: 1;
+    }
   }
 }
 
@@ -341,18 +367,34 @@ $page-dark: #ebeff2;
   padding: 18px 12px;
   border-radius: 8px;
   font-weight: 500;
+  color: #4f5f6e;
   .title {
-    color: #4f5f6e;
     font-size: 14px;
     padding-bottom: 10px;
     border-bottom: 1px solid #b0afaf;
     margin-bottom: 10px;
   }
+  .chart {
+    font-size: 11px;
+    text-align: center;
+  }
   .ratings {
     font-weight: normal;
+    display: inline-block;
+    text-align: left;
     .rating {
       list-style-type: none;
     }
+    .legend-color {
+      width: 13px;
+      height: 13px;
+      display: inline-block;
+      margin-right: 3px;
+      vertical-align: sub;
+    }
+  }
+  .mastery {
+    color: #555;
   }
   .description {
     margin: 10px 0;

@@ -1,13 +1,16 @@
 define [
+  'jquery'
   'underscore'
   'compiled/views/DialogFormView'
   'compiled/views/MoveDialogSelect'
   'jst/MoveDialog'
   'jst/EmptyDialogFormWrapper'
-], (_, DialogFormView, MoveDialogSelect, template, wrapper) ->
+], ($, _, DialogFormView, MoveDialogSelect, template, wrapper) ->
 
   class MoveDialogView extends DialogFormView
     setViewProperties: false
+
+    className: 'form-dialog'
 
     defaults:
       width: 450
@@ -162,15 +165,11 @@ define [
         # if we know how
         if @parentKey
           @model.set @parentKey, collID
-
-        positions = [1..newCollection.length]
       else
         newCollection = @model.collection
-        #unfortunate thing we have to do for AssignmentGroups,
-        #not sure about others...
-        positions = newCollection.pluck 'position'
 
       #update all of the position attributes
+      positions = [1..newCollection.length]
       _.each data.order, (id, index) ->
         newCollection.get(id)?.set 'position', positions[index]
 

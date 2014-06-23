@@ -185,6 +185,12 @@ describe "Common Cartridge exporting" do
 
       check_resource_node(@q1, CC::CCHelper::QTI_ASSESSMENT_TYPE)
       check_resource_node(@q2, CC::CCHelper::QTI_ASSESSMENT_TYPE)
+
+      alt_mig_id1 = CC::CCHelper.create_key(@q1, 'canvas_')
+      @manifest_doc.at_css("resource[identifier=#{alt_mig_id1}][type=\"#{CC::CCHelper::LOR}\"]").should_not be_nil
+
+      alt_mig_id2 = CC::CCHelper.create_key(@q2, 'canvas_')
+      @manifest_doc.at_css("resource[identifier=#{alt_mig_id2}][type=\"#{CC::CCHelper::LOR}\"]").should_not be_nil
     end
 
     it "should export quizzes with groups that point to external banks" do
@@ -209,6 +215,7 @@ describe "Common Cartridge exporting" do
       @ce.save!
 
       run_export
+
       doc = Nokogiri::XML.parse(@zip_file.read("#{mig_id(q1)}/#{mig_id(q1)}.xml"))
       selections = doc.css('selection')
       selections[0].at_css("sourcebank_ref").text.to_i.should == bank.id
@@ -403,6 +410,26 @@ describe "Common Cartridge exporting" do
       @course.name = "a" * Course.maximum_string_length
 
       run_export
+    end
+
+    it "should export media tracks" do
+      stub_kaltura
+      CanvasKaltura::ClientV3.any_instance.stubs(:startSession)
+      CanvasKaltura::ClientV3.any_instance.stubs(:flavorAssetGetPlaylistUrl).returns(Tempfile.new('blah.flv'))
+      CC::CCHelper.stubs(:media_object_info).returns({asset: {id: 1, status: '2'}, filename: 'blah.flv'})
+      obj = @course.media_objects.create! media_id: '0_deadbeef'
+      track = obj.media_tracks.create! kind: 'subtitles', locale: 'tlh', content: "Hab SoSlI' Quch!"
+      page = @course.wiki.front_page
+      page.body = %Q{<a id="media_comment_0_deadbeef" class="instructure_inline_media_comment video_comment"></a>}
+      page.save!
+      @ce.export_type = ContentExport::COMMON_CARTRIDGE
+      @ce.save!
+      run_export
+      file_node = @manifest_doc.at_css("resource[identifier='id4164d7d594985594573e63f8ca15975'] file[href$='/blah.flv.tlh.subtitles']")
+      file_node.should be_present
+      @zip_file.read(file_node['href']).should eql(track.content)
+      track_doc = Nokogiri::XML(@zip_file.read('course_settings/media_tracks.xml'))
+      track_doc.at_css('media_tracks media track[locale=tlh][kind=subtitles][identifierref=id4164d7d594985594573e63f8ca15975]').should be_present
     end
   end
 end

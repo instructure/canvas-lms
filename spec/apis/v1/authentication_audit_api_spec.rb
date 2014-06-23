@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013 Instructure, Inc.
+# Copyright (C) 2013 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -19,21 +19,21 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../cassandra_spec_helper')
 
-describe "AuthenticationAudit API", type: :integration do
+describe "AuthenticationAudit API", type: :request do
   context "not configured" do
     before do
-      Canvas::Cassandra::Database.stubs(:configured?).with('auditors').returns(false)
+      Canvas::Cassandra::DatabaseBuilder.stubs(:configured?).with('auditors').returns(false)
       site_admin_user(user: user_with_pseudonym(account: Account.site_admin))
     end
 
     it "should 404" do
       raw_api_call(:get, "/api/v1/audit/authentication/logins/#{@pseudonym.id}", controller: 'authentication_audit_api', action: "for_login", :login_id => @pseudonym.id.to_s, format: 'json')
-      response.status.should == '404 Not Found'
+      assert_status(404)
     end
   end
 
   context "configured" do
-    it_should_behave_like "cassandra audit logs"
+    include_examples "cassandra audit logs"
 
     before do
       Setting.set('enable_page_views', 'cassandra')
@@ -44,7 +44,7 @@ describe "AuthenticationAudit API", type: :integration do
       @account = Account.default
       user_with_pseudonym(active_all: true)
 
-      @page_view = PageView.new(options)
+      @page_view = PageView.new
       @page_view.user = @viewing_user
       @page_view.request_id = @request_id
       @page_view.remote_ip = '10.10.10.10'
@@ -172,6 +172,7 @@ describe "AuthenticationAudit API", type: :integration do
             "name" => @account.name,
             "parent_account_id" => nil,
             "root_account_id" => nil,
+            "workflow_state" => 'active',
             "default_time_zone" => @account.default_time_zone.tzinfo.name,
             "default_storage_quota_mb" => @account.default_storage_quota_mb,
             "default_user_storage_quota_mb" => @account.default_user_storage_quota_mb,
@@ -323,6 +324,16 @@ describe "AuthenticationAudit API", type: :integration do
     describe "permissions" do
       before do
         @user, @viewing_user = @user, user_model
+      end
+
+      it "should not allow other account models" do
+        new_root_account = Account.create!(name: 'New Account')
+        LoadAccount.stubs(:default_domain_root_account).returns(new_root_account)
+        @user, @pseudonym, @viewing_user = @user, @pseudonym, user_with_pseudonym(account: new_root_account)
+
+        fetch_for_context(@pseudonym, expected_status: 401, type: 'login')
+        fetch_for_context(@account, expected_status: 401)
+        fetch_for_context(@user, expected_status: 401)
       end
 
       context "no permission on account" do

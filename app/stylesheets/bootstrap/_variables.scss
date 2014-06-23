@@ -1,3 +1,7 @@
+// there is magic that happens here, see the docs at the top of assets.yml for more info
+@import 'variant_variables';
+
+
 //
 // Variables
 // --------------------------------------------------
@@ -26,6 +30,9 @@ $green:                 #46a546 !default;
 $red:                   #9d261d !default;
 $yellow:                #ffc40d !default;
 $orange:                #f89406 !default;
+@if $use_high_contrast { $orange: darken($orange, 15%) }
+
+
 $pink:                  #c3325f !default;
 $purple:                #7a43b6 !default;
 
@@ -38,7 +45,9 @@ $textColor:             $grayDark !default;
 
 // Links
 // -------------------------
-$linkColor:             #08c !default;
+$linkColor: #08c;
+@if $use_high_contrast { $linkColor: #14597c; }
+
 $linkColorHover:        darken($linkColor, 15%) !default;
 
 
@@ -87,21 +96,25 @@ $tableBorder:                       #ddd !default; // table and cell border
 $btnBackground:                     $white !default;
 $btnBackgroundHighlight:            darken($white, 10%) !default;
 $btnBorder:                         #bbb !default;
+@if $use_high_contrast { $btnBorder: #555 }
 
 $btnPrimaryBackground:              $linkColor !default;
 $btnPrimaryBackgroundHighlight:     adjust-hue($btnPrimaryBackground, 20%) !default;
 
 $btnInfoBackground:                 #5bc0de !default;
-$btnInfoBackgroundHighlight:        #2f96b4 !default;
+@if $use_high_contrast { $btnInfoBackground: darken($btnInfoBackground, 8%) }
+$btnInfoBackgroundHighlight:        darken($btnInfoBackground, 18%) !default;
 
 $btnSuccessBackground:              #62c462 !default;
-$btnSuccessBackgroundHighlight:     #51a351 !default;
+@if $use_high_contrast { $btnSuccessBackground: darken($btnSuccessBackground, 12%) }
+$btnSuccessBackgroundHighlight:     darken($btnSuccessBackground, 13%) !default;
 
 $btnWarningBackground:              lighten($orange, 15%) !default;
 $btnWarningBackgroundHighlight:     $orange !default;
 
 $btnDangerBackground:               #ee5f5b !default;
-$btnDangerBackgroundHighlight:      #bd362f !default;
+@if $use_high_contrast { $btnDangerBackground: darken($btnDangerBackground, 10%) }
+$btnDangerBackgroundHighlight:      saturate(darken($btnDangerBackground, 30%), 5%) !default;
 
 $btnInverseBackground:              #444 !default;
 $btnInverseBackgroundHighlight:     $grayDarker !default;
@@ -236,18 +249,22 @@ $heroUnitLeadColor:               inherit !default;
 // Form states and alerts
 // -------------------------
 $warningText:             #c09853 !default;
+@if $use_high_contrast { $warningText: darken($warningText, 7%) }
 $warningBackground:       #fcf8e3 !default;
 $warningBorder:           darken(adjust-hue($warningBackground, -10), 3%) !default;
 
 $errorText:               #b94a48 !default;
+@if $use_high_contrast { $errorText: darken($errorText, 7%) }
 $errorBackground:         #f2dede !default;
 $errorBorder:             darken(adjust-hue($errorBackground, -10), 3%) !default;
 
-$successText:             #468847 !default;
+$successText:             #417e42 !default;
+@if $use_high_contrast { $successText: darken($successText, 7%) }
 $successBackground:       #dff0d8 !default;
 $successBorder:           darken(adjust-hue($successBackground, -10), 5%) !default;
 
 $infoText:                #3a87ad !default;
+@if $use_high_contrast { $infoText: darken($infoText, 7%) }
 $infoBackground:          #d9edf7 !default;
 $infoBorder:              darken(adjust-hue($infoBackground, -10), 7%) !default;
 

@@ -1,16 +1,17 @@
 # does Rails-style flash message/error boxes that drop down from the top of the screen
 define [
   'i18n!shared.flash_notices'
+  'jquery'
   'underscore'
   'compiled/fn/preventDefault'
   'jqueryui/effects/drop'
   'vendor/jquery.cookie'
-], (I18n, _, preventDefault) ->
+], (I18n, $, _, preventDefault) ->
 
   $buffer = $("#flash_message_buffer")
   $holder = $("#flash_message_holder")
   $screenreader_holder = $("#flash_screenreader_holder")
-  $holder.on 'click', '.close_link', preventDefault
+  $holder.on 'click', '.close_link', preventDefault(->)
   $holder.on 'click', 'li', ->
     $this = $(this)
     return if $this.hasClass('no_close')
@@ -53,6 +54,10 @@ define [
   # Pops up a small error box at the top of the screen.
   $.flashError = (content, timeout) ->
     flashBox("error", content, timeout)
+
+  # Pops up a small warning box at the top of the screen.
+  $.flashWarning = (content, timeout = 3000) ->
+    flashBox("warning", content, timeout)
 
   $.screenReaderFlashMessage = (content) ->
     screenReaderFlashBox('success', content)

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011-12 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe CalendarEventsApiController, :type => :integration do
+describe CalendarEventsApiController, type: :request do
   before do
     course_with_teacher(:active_all => true, :user => user_with_pseudonym(:active_user => true))
     @me = @user
@@ -621,7 +621,7 @@ describe CalendarEventsApiController, :type => :integration do
       json = api_call(:post, "/api/v1/calendar_events",
                       {:controller => 'calendar_events_api', :action => 'create', :format => 'json'},
                       {:calendar_event => {:context_code => @course.asset_string, :title => "ohai"}})
-      response.status.should =~ /201/
+      assert_status(201)
       json.keys.sort.should eql expected_fields
       json['title'].should eql 'ohai'
     end
@@ -707,7 +707,7 @@ describe CalendarEventsApiController, :type => :integration do
         json = api_call(:post, "/api/v1/calendar_events",
                         {:controller => 'calendar_events_api', :action => 'create', :format => 'json'},
                         {:calendar_event => {:context_code => @course.asset_string, :title => "ohai", :child_event_data => {"0" => {:start_at => "2012-01-01 12:00:00", :end_at => "2012-01-01 13:00:00", :context_code => @course.default_section.asset_string}}}})
-        response.status.should =~ /201/
+        assert_status(201)
         json.keys.sort.should eql expected_fields
         json['title'].should eql 'ohai'
         json['child_events'].size.should eql 1
@@ -817,6 +817,16 @@ describe CalendarEventsApiController, :type => :integration do
         :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
         :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-08', :end_date => '2012-01-07'})
       json.size.should eql 1
+    end
+
+    it 'should 400 for bad dates' do
+      raw_api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=201-201-208&end_date=201-201-209&context_codes[]=course_#{@course.id}", {
+        controller: 'calendar_events_api', action: 'index', format: 'json', type: 'assignment',
+        context_codes: ["course_#{@course.id}"], start_date: '201-201-208', end_date: '201-201-209'})
+      response.code.should eql '400'
+      json = JSON.parse response.body
+      json['errors']['start_date'].should == 'Invalid date or invalid datetime for start_date'
+      json['errors']['end_date'].should == 'Invalid date or invalid datetime for end_date'
     end
 
     it 'should return assignments from up to 10 contexts' do
@@ -980,7 +990,7 @@ describe CalendarEventsApiController, :type => :integration do
       assignment = @course.assignments.create(:title => 'undated')
       raw_api_call(:delete, "/api/v1/calendar_events/assignment_#{assignment.id}", {
         :controller => 'calendar_events_api', :action => 'destroy', :id => "assignment_#{assignment.id}", :format => 'json'})
-      response.status.should == "404 Not Found"
+      assert_status(404)
     end
 
     context 'date overrides' do
@@ -1188,6 +1198,9 @@ describe CalendarEventsApiController, :type => :integration do
           before :each do
             @section1 = @course.course_sections.create!(:name => 'Section A')
             @section2 = @course.course_sections.create!(:name => 'Section B')
+            student_in_section(@section1)
+            student_in_section(@section2)
+            @user = @teacher
           end
 
           it 'should return 1 entry for each instance' do
@@ -1268,6 +1281,9 @@ describe CalendarEventsApiController, :type => :integration do
             @section1 = @course.course_sections.create!(:name => 'Section A')
             @section2 = @course.course_sections.create!(:name => 'Section B')
             @course.enroll_user(@ta, 'TaEnrollment', :enrollment_state => 'active', :section => @section1) # only in 1 section
+            student_in_section(@section1)
+            student_in_section(@section2)
+            @user = @ta
           end
 
           it 'should receive all assignments including other sections' do
@@ -1309,9 +1325,6 @@ describe CalendarEventsApiController, :type => :integration do
           end
 
           it 'should return assignment for enrollment' do
-            override1 = assignment_override_model(:assignment => @default_assignment,
-                                                  :set => @course.default_section,
-                                                  :due_at => DateTime.parse('2012-01-13 12:00:00'))
             override2 = assignment_override_model(:assignment => @default_assignment,
                                                   :set => @course.course_sections.create!(:name => 'Section 2'),
                                                   :due_at => DateTime.parse('2012-01-14 12:00:00'))
@@ -1320,7 +1333,7 @@ describe CalendarEventsApiController, :type => :integration do
               :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
               :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-07', :end_date => '2012-01-16', :per_page => '25'})
             json.size.should == 1
-            json.first['end_at'].should == '2012-01-13T12:00:00Z'
+            json.first['end_at'].should == '2012-01-12T12:00:00Z'
           end
         end
 
@@ -1406,18 +1419,18 @@ describe CalendarEventsApiController, :type => :integration do
 
             context 'when in same course section' do
               before :each do
-                @student_enrollment2 = @course.enroll_user(@student2, 'StudentEnrollment', :enrollment_state => 'active', :section => @section1)
-                @observer_enrollment2 = ObserverEnrollment.create!(:user => @observer,
-                                                                   :course => @course,
-                                                                   :course_section => @section1,
-                                                                   :workflow_state => 'active')
+                @student_enrollment2 = @course.enroll_user(@student2, 'StudentEnrollment', enrollment_state: 'active', section: @section1)
+                @observer_enrollment2 = ObserverEnrollment.new(user: @observer,
+                                                               course: @course,
+                                                               course_section: @section1,
+                                                               workflow_state: 'active')
 
                 @observer_enrollment.update_attribute(:associated_user_id, @student.id)
-                @observer_enrollment2.update_attribute(:associated_user_id, @student2.id)
+                @observer_enrollment2.associated_user_id = @student2.id
+                @observer_enrollment2.save!
               end
 
               it 'should return a single assignment event' do
-                pending "is occasionally failing"
                 @user = @observer
                 assignment_override_model(:assignment => @default_assignment, :set => @section1,
                                           :due_at => DateTime.parse('2012-01-14 12:00:00'))
@@ -1498,9 +1511,11 @@ describe CalendarEventsApiController, :type => :integration do
       context 'as admin' do
         before :each do
           @admin = account_admin_user
-          user_session @admin
           @section1 = @course.default_section
           @section2 = @course.course_sections.create!(:name => 'Section B')
+          student_in_section(@section2)
+          user_session @admin
+          @user = @admin
         end
 
         context 'when viewing own calendar' do
@@ -1516,7 +1531,8 @@ describe CalendarEventsApiController, :type => :integration do
         context 'when viewing course calendar' do
           it 'should display assignments and overrides' do # behave like teacher
             override = assignment_override_model(:assignment => @default_assignment,
-                                                 :due_at => DateTime.parse('2012-01-15 12:00:00'))
+                                                 :due_at => DateTime.parse('2012-01-15 12:00:00'),
+                                                 :set => @section2)
             json = api_call(:get, "/api/v1/calendar_events?&type=assignment&start_date=2012-01-07&end_date=2012-01-16&per_page=25&context_codes[]=course_#{@course.id}", {
               :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
               :context_codes => ["course_#{@course.id}"], :start_date => '2012-01-07', :end_date => '2012-01-16', :per_page => '25'})

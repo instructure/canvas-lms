@@ -5,6 +5,7 @@ describe "layout" do
 
   before (:each) do
     course_with_student_logged_in
+    @user.update_attribute(:name, "</script><b>evil html & name</b>")
     get "/"
   end
 
@@ -41,5 +42,9 @@ describe "layout" do
 
   it "should have ENV available to the JavaScript from js_env" do
     driver.execute_script("return ENV.current_user_id").should == @user.id.to_s
+  end
+
+  it "should escape JSON injected directly into the view" do
+    driver.execute_script("return ENV.current_user.display_name").should ==  "</script><b>evil html & name</b>"
   end
 end

@@ -31,12 +31,12 @@ class MessagesController < ApplicationController
     secure_id, message_id = [params[:secure_id], params[:message_id].to_i]
 
     message = Mail.new
-    message['Content-Type'] = 'text/plain'
+    message['Content-Type'] = 'text/plain; charset="UTF-8"'
     message['Subject']      = params[:subject]
     message['From']         = params[:from]
     message.body            = params[:message]
 
-    IncomingMail::IncomingMessageProcessor.process_single(message, secure_id, message_id)
+    IncomingMailProcessor::IncomingMessageProcessor.new(IncomingMail::MessageHandler.new, ErrorReport::Reporter.new).process_single(message, "#{secure_id}-#{message_id}")
     render :nothing => true
   end
 

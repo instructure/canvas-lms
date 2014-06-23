@@ -24,7 +24,6 @@ module Technoweenie # :nodoc:
               resize_image_or_thumbnail! img
               self.width  = img.width
               self.height = img.height
-              callback_with_args :after_resize, img
             end
           end
 

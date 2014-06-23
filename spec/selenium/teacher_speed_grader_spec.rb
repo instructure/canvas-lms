@@ -44,7 +44,7 @@ describe "speed grader" do
     @assignment.submission_types = 'online_quiz'
     @assignment.title = 'Anonymous Graded Quiz'
     @assignment.save!
-    @quiz = Quiz.find_by_assignment_id(@assignment.id)
+    @quiz = Quizzes::Quiz.find_by_assignment_id(@assignment.id)
     @quiz.update_attribute(:anonymous_submissions, true)
     student_in_course
     qs = @quiz.generate_submission(@student)
@@ -63,7 +63,7 @@ describe "speed grader" do
     @assignment.submission_types = 'online_quiz'
     @assignment.title = 'Anonymous Graded Quiz'
     @assignment.save!
-    q = Quiz.find_by_assignment_id(@assignment.id)
+    q = Quizzes::Quiz.find_by_assignment_id(@assignment.id)
     q.quiz_questions.create!(:quiz => q, :question_data => {:position => 1, :question_type => "true_false_question", :points_possible => 3, :question_name => "true false question"})
     q.quiz_questions.create!(:quiz => q, :question_data => {:position => 2, :question_type => "essay_question", :points_possible => 7, :question_name => "essay question"})
     q.generate_quiz_data
@@ -71,7 +71,7 @@ describe "speed grader" do
     q.save!
     qs = q.generate_submission(student)
     qs.submission_data = {"foo" => "bar1"}
-    qs.grade_submission
+    Quizzes::SubmissionGrader.new(qs).grade_submission
 
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     wait_for_ajaximations
@@ -92,7 +92,7 @@ describe "speed grader" do
     @assignment.title = 'Anonymous Graded Quiz'
     @assignment.save!
 
-    q = Quiz.find_by_assignment_id(@assignment.id)
+    q = Quizzes::Quiz.find_by_assignment_id(@assignment.id)
     q.quiz_questions.create!(:quiz => q, :question_data => {
         :position => 1,
         :question_type => "true_false_question",
@@ -105,7 +105,7 @@ describe "speed grader" do
     [student, @teacher].each do |user|
       q.generate_submission(student).tap do |qs|
         qs.submission_data = {'foo' => 'bar1'}
-        qs.grade_submission
+        Quizzes::SubmissionGrader.new(qs).grade_submission
       end
     end
 
@@ -118,34 +118,47 @@ describe "speed grader" do
     end
   end
 
-  it "lets you view previous quiz submissions" do
-    @assignment.update_attributes! points_possible: 10,
-                                   submission_types: 'online_quiz',
-                                   title: "Quiz"
-    @quiz = Quiz.find_by_assignment_id(@assignment.id)
+  context "quiz submissions" do
+    before do
+      @assignment.update_attributes! points_possible: 10,
+                                     submission_types: 'online_quiz',
+                                     title: "Quiz"
+      @quiz = Quizzes::Quiz.find_by_assignment_id(@assignment.id)
 
-    student_in_course
-    2.times do |i|
-      qs = @quiz.generate_submission(@student)
-      opts = i == 0 ? {finished_at: Date.today - 7} : {}
-      qs.grade_submission(opts)
+      student_in_course
+      2.times do |i|
+        qs = @quiz.generate_submission(@student)
+        opts = i == 0 ? {finished_at: (Date.today - 7) + 30.minutes} : {}
+        Quizzes::SubmissionGrader.new(qs).grade_submission(opts)
+      end
     end
 
-    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    it "lets you view previous quiz submissions" do
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
-    submission_dropdown = f("#submission_to_view")
-    submission_dropdown.should be_displayed
+      submission_dropdown = f("#submission_to_view")
+      submission_dropdown.should be_displayed
 
-    submissions = submission_dropdown.find_elements(:css, "option")
-    submissions.size.should == 2
+      submissions = submission_dropdown.find_elements(:css, "option")
+      submissions.size.should == 2
 
-    submissions.each do |s|
-      s.click
-      submission_date = s.text
-      in_frame('speedgrader_iframe') do
-        wait_for_ajaximations
-        f('.quiz-submission').text.should include submission_date
+      submissions.each do |s|
+        s.click
+        submission_date = s.text
+        in_frame('speedgrader_iframe') do
+          wait_for_ajaximations
+          f('.quiz-submission').text.should include submission_date
+        end
       end
+    end
+
+    it "links to the quiz history page when there are too many quiz submissions" do
+      Setting.set("too_many_quiz_submission_versions", 2)
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      fj("#submission_to_view").should be_nil
+      uri = URI.parse(f(".see-all-attempts")[:href])
+      uri.path.should == "/courses/#{@course.id}/quizzes/#{@quiz.id}/history"
+      uri.query.should == "user_id=#{@student.id}"
     end
   end
 
@@ -392,7 +405,7 @@ describe "speed grader" do
   context "multiple enrollments" do
     before(:each) do
       student_in_course
-      @course_section = @course.course_sections.create!(:name => "Other Section")
+      @course_section = @course.course_sections.create!(:name => "<h1>Other Section</h1>")
       @enrollment = @course.enroll_student(@student,
                                            :enrollment_state => "active",
                                            :section => @course_section,
@@ -411,6 +424,7 @@ describe "speed grader" do
       wait_for_ajaximations
 
       sections = @course.course_sections
+      ff("#section-menu ul li a").map{|e| e.attribute('text')}.should be_include(@course_section.name)
       goto_section(sections[0].id)
       ff("#students_selectmenu option").length.should == 1
       goto_section(sections[1].id)
@@ -419,7 +433,7 @@ describe "speed grader" do
   end
 
   it "should be able to change sorting and hide student names" do
-    student_submission
+    student_submission(name: 'student@example.com')
 
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     wait_for_ajaximations

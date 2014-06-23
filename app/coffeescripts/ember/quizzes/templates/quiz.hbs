@@ -1,46 +1,91 @@
-<li class='quiz'>
-<div {{bind-attr class=':ig-row :ig-editable publishable:ig-publishable isPublishedStatusVisible:ig-published' }}>
-    <a {{bind-attr href='html_url'}} class='ig-title ellipses'>
-      <i class='icon-quiz'></i>
-      {{title}}
-    </a>
-    <div class='ig-details row-fluid'>
-      <div class='span4 ellipses date-available'>
-        {{ic-dates-available allDates=allDates linkHref=html_url}}
-      </div>
-      <div class='span4 ellipses date-due'>
-        {{ic-dates-available allDates=allDates linkHref=html_url showDueDates=true}}
-      </div>
-      <div class='span2 ellipses'>
-        {{pointsPossible}}
-      </div>
-      <div class='span2 ellipses'>
-        {{questionCountLabel}}
-      </div>
+<div class="container-fluid" id="quiz-show">
+  <div class="row-fluid edit-header">
+    <div class="span7">
+      <label class="screenreader-only">
+        {{#t "quiz_title"}}Quiz Title{{/t}}
+      </label>
+      <h1>{{title}}</h1>
     </div>
-    {{#if canUpdate}}
-      <div class="ig-admin">
 
+    {{#if canUpdate}}
+      <div class="span4 teacher-action-buttons pull-right">
         {{ic-publish-icon
-          disabled=disabled
+          disabled=canNotUnpublish
+          is-published=showAsPublished
           disabled-message=disabledMessage
-          is-published=published
           on-publish='publish'
           on-unpublish='unpublish'
         }}
 
-        {{#ic-actions title='settings'}}
-          {{#ic-menu-item on-select='edit'}}
-            <i class='icon-edit'></i>
-            {{#t 'edit'}}Edit{{/t}}
-          {{/ic-menu-item}}
-          {{#ic-menu-item on-select='delete'}}
-            <i class='icon-trash'></i>
-            {{#t 'delete'}}Delete{{/t}}
-          {{/ic-menu-item}}
-        {{/ic-actions}}
+        <a {{bind-attr href="editURL"}} class="btn">
+          <i class="icon-edit"></i>{{#t 'edit'}}Edit{{/t}}
+        </a>
 
+        <a {{bind-attr href="previewUrl"}} {{action "preview"}} class="btn">
+          {{#t "preview"}}Preview{{/t}}
+        </a>
+        {{#ic-actions}}
+          {{#ic-menu-item on-select="speedGrader"}}
+            <i class="icon-speed-grader"></i>
+            <a {{bind-attr href="speedGraderUrl"}}>
+              {{#t "speed_grader"}}Speed Grader{{/t}}
+            </a>
+          {{/ic-menu-item}}
+
+          {{#if takeQuizVisible}}
+            {{#ic-menu-item on-select="takeQuiz" class="js-take-quiz"}}
+              <i class="icon-mark-as-read"></i>
+              <a {{bind-attr href="takeQuizUrl"}}>{{takeOrResumeMessage}}</a>
+            {{/ic-menu-item}}
+          {{/if}}
+
+          {{#ic-menu-item on-select="messageStudents" class="js-message-students"}}
+            <i class="icon-discussion"></i>
+            {{#t 'Message Students'}}Message Students{{/t}}
+          {{/ic-menu-item}}
+          
+          {{#ic-menu-item on-select="showStudentResults"}}
+            <i class="icon-group"></i>
+            {{#t 'show_quiz_results'}}Show Student Quiz Results{{/t}}
+          {{/ic-menu-item}}
+
+          {{! reuse existing ic-menu-item or order issues arise }}
+          {{#ic-menu-item class="js-due-date-toggler" on-select="toggleLock"}}
+            {{#if lockAt}}
+              <i class="icon-unlock"></i>
+              {{#t 'unlock_this_quiz_now'}}Unlock This Quiz Now{{/t}}
+            {{else}}
+              <i class="icon-lock"></i>
+              {{#t 'lock_this_quiz_now'}}
+                Lock This Quiz Now
+              {{/t}}
+            {{/if}}
+          {{/ic-menu-item}}
+
+          {{#ic-menu-item class="js-delete" on-select="confirmDeletion"}}
+            <i class="icon-trash"></i>
+            {{#t "delete"}}Delete{{/t}}
+          {{/ic-menu-item}}
+
+        {{/ic-actions}}
+      </div>
+
+    {{else}}
+      <div class="span4 student-action-buttons pull-right">
+        {{#if takeQuizVisible}}
+          <a {{bind-attr href="takeQuizUrl"}} {{action "takeQuiz"}} class="btn btn-primary">
+            {{takeOrResumeMessage}}
+          </a>
+        {{/if}}
       </div>
     {{/if}}
   </div>
-</li>
+
+  {{#if canUpdate}}
+    {{partial "quiz/show_teacher"}}
+  {{else}}
+    {{partial "quiz/show_student"}}
+  {{/if}}
+
+  <div id="module_sequence_footer"></div>
+</div>

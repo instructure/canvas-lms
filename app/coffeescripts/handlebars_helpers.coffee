@@ -1,4 +1,5 @@
 define [
+  'timezone'
   'compiled/util/enrollmentName'
   'handlebars'
   'i18nObj'
@@ -14,7 +15,7 @@ define [
   'jquery.instructure_misc_helpers'
   'jquery.instructure_misc_plugins'
   'translations/_core_en'
-], (enrollmentName, Handlebars, I18n, $, _, htmlEscape, semanticDateRange, dateSelect, mimeClass, convertApiUserContent, textHelper) ->
+], (tz, enrollmentName, Handlebars, I18n, $, _, htmlEscape, semanticDateRange, dateSelect, mimeClass, convertApiUserContent, textHelper) ->
 
   Handlebars.registerHelper name, fn for name, fn of {
     t : (translationKey, defaultValue, options) ->
@@ -37,37 +38,56 @@ define [
     semanticDateRange : ->
       new Handlebars.SafeString semanticDateRange arguments...
 
-    friendlyDatetime : (datetime, {hash: {pubdate}}) ->
+    # expects: a Date object or an ISO string
+    contextSensitiveDatetimeTitle : (datetime, {hash: {justText}})->
+      localDatetime = $.datetimeString(datetime)
+      titleText = localDatetime
+      if ENV and ENV.CONTEXT_TIMEZONE and (ENV.TIMEZONE != ENV.CONTEXT_TIMEZONE)
+        localText = Handlebars.helpers.t('#helpers.local','Local')
+        courseText = Handlebars.helpers.t('#helpers.course', 'Course')
+        courseDatetime = $.datetimeString(datetime, timezone: ENV.CONTEXT_TIMEZONE)
+        if localDatetime != courseDatetime
+          titleText = "#{localText}: #{localDatetime}<br>#{courseText}: #{courseDatetime}"
+
+      if justText
+        new Handlebars.SafeString titleText
+      else
+        new Handlebars.SafeString "data-tooltip title=\"#{titleText}\""
+
+    # expects: a Date object or an ISO string
+    friendlyDatetime : (datetime, {hash: {pubdate, contextSensitive}}) ->
       return unless datetime?
+      datetime = tz.parse(datetime) unless _.isDate datetime
+      fudged = $.fudgeDateForProfileTimezone(datetime)
+      timeTitle = ""
+      if contextSensitive and ENV and ENV.CONTEXT_TIMEZONE
+        timeTitle = Handlebars.helpers.contextSensitiveDatetimeTitle(datetime, hash: {justText: true})
+      else
+        timeTitle = $.datetimeString(datetime)
 
-      # if datetime is already a date convert it back into an ISO string to parseFromISO,
-      # TODO: be smarter about this
-      datetime = $.dateToISO8601UTC(datetime) if _.isDate datetime
+      new Handlebars.SafeString "<time data-tooltip title='#{timeTitle}' datetime='#{datetime.toISOString()}' #{'pubdate' if pubdate}>#{$.friendlyDatetime(fudged)}</time>"
 
-      parsed = $.parseFromISO(datetime)
-      new Handlebars.SafeString "<time title='#{parsed.datetime_formatted}' datetime='#{parsed.datetime.toISOString()}' #{'pubdate' if pubdate}>#{$.friendlyDatetime(parsed.datetime)}</time>"
-
-    # expects: a Date object
+    # expects: a Date object or an ISO string
     formattedDate : (datetime, format, {hash: {pubdate}}) ->
       return unless datetime?
-      new Handlebars.SafeString "<time title='#{datetime}' datetime='#{datetime.toISOString()}' #{'pubdate' if pubdate}>#{datetime.toString(format)}</time>"
+      datetime = tz.parse(datetime) unless _.isDate datetime
+      new Handlebars.SafeString "<time data-tooltip title='#{$.datetimeString(datetime)}' datetime='#{datetime.toISOString()}' #{'pubdate' if pubdate}>#{datetime.toString(format)}</time>"
 
-    # IMPORTANT: this handlebars helper "fudges", or adjusts the time for the
-    # user's timezone chosen in their preferences using
-    # $.fudgeDateForProfileTimezone. If you use this helper, you need to use
-    # $.unfudgeDateForProfileTimezone before sending to the server!
-    datetimeFormatted : (isoString) ->
-      return '' unless isoString
-      isoString = $.parseFromISO(isoString) unless isoString.datetime
-      isoString.datetime_formatted
+    # IMPORTANT: these next two handlebars helpers emit profile-timezone
+    # human-formatted strings. don't send them as is to the server (you can
+    # parse them with tz.parse(), or preferably not use these values at all
+    # when sending to the server, instead using a machine-formatted value
+    # stored elsewhere).
 
-    # Strips the time information from the datetime and accounts for the
-    # user's timezone preference.
-    dateString : (isoString) ->
-      return '' unless isoString
-      isoString = $.parseFromISO(isoString) unless isoString.datetime
-      isoString.date_string
+    # expects: anything that $.datetimeString can handle
+    datetimeFormatted : (datetime, localized=true) ->
+      $.datetimeString(datetime, {localized: localized})
 
+    # Strips the time information from the datetime and accounts for the user's
+    # timezone preference. expects: anything tz() can handle
+    dateString : (datetime) ->
+      return '' unless datetime
+      tz.format(datetime, '%m/%d/%Y')
 
     # Convert the total amount of minutes into a Hours:Minutes format.
     minutesToHM : (minutes) ->
@@ -115,7 +135,11 @@ define [
     # use this method to process any user content fields returned in api responses
     # this is important to handle object/embed tags safely, and to properly display audio/video tags
     convertApiUserContent: (html, {hash}) ->
-      new Handlebars.SafeString convertApiUserContent(html, hash)
+      content = convertApiUserContent(html, hash)
+      # if the content is going to get picked up by tinymce, do not mark as safe
+      # because we WANT it to be escaped again.
+      content = new Handlebars.SafeString content unless hash and hash.forEditing
+      content
 
     newlinesToBreak : (string) ->
       # Convert a null to an empty string so it doesn't blow up.
@@ -286,8 +310,10 @@ define [
       attributes = for key, val of inputProps when val?
         "#{htmlEscape key}=\"#{htmlEscape val}\""
 
+      hiddenDisabled = if inputProps.disabled then "disabled" else ""
+
       new Handlebars.SafeString """
-        <input name="#{htmlEscape inputProps.name}" type="hidden" value="0" />
+        <input name="#{htmlEscape inputProps.name}" type="hidden" value="0" #{hiddenDisabled}>
         <input #{attributes.join ' '} />
       """
 
@@ -409,6 +435,16 @@ define [
       backboneView.render()
       onNextFrame(replace)
       new Handlebars.SafeString("<span id=\"#{id}\">pk</span>")
+
+    # Public: yields the first non-nil argument
+    #
+    # Examples
+    #   Name: {{or display_name short_name 'Unknown'}}
+    #
+    # Returns the first non-null argument or null
+    or: (args..., options) ->
+      for arg in args when arg
+        return arg
   }
 
   return Handlebars

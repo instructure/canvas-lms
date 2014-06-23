@@ -41,7 +41,7 @@ describe RubricAssessment do
     })
     @assessment.data.first[:comments].should == comment
     t = Class.new
-    t.extend TextHelper
+    t.extend HtmlTextHelper
     @assessment.data.first[:comments_html].should == t.format_message(comment).first
   end
 

@@ -17,12 +17,13 @@
 #
 
 define [
+  'jquery'
   'underscore'
   'compiled/views/PaginatedView'
   'compiled/collections/UserCollection'
   'compiled/collections/GroupCollection'
   'jst/collaborations/collaborator'
-], ({each, extend, flatten, reject}, PaginatedView, UserCollection, GroupCollection, collaboratorTemplate) ->
+], ($, {each, extend, flatten, reject}, PaginatedView, UserCollection, GroupCollection, collaboratorTemplate) ->
 
   class ListView extends PaginatedView
     # Members to exclude from the collection.

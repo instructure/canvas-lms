@@ -2,12 +2,14 @@ define [
   'compiled/views/Filterable'
   'Backbone'
   'compiled/views/CollectionView'
-], (Filterable, {Collection, View}, CollectionView) ->
+  'helpers/fakeENV'
+], (Filterable, {Collection, View}, CollectionView, fakeENV) ->
 
   view = null
 
   module 'Filterable',
     setup: ->
+      fakeENV.setup()
       class MyCollectionView extends CollectionView
         @mixin Filterable
 
@@ -23,6 +25,8 @@ define [
       ]
       view = new MyCollectionView {collection, itemView: View}
       view.render()
+    teardown: ->
+      fakeENV.teardown()
 
   test 'hides items that don\'t match the filter', ->
     equal view.$list.children().length, 2

@@ -72,7 +72,7 @@ describe "Canvas Cartridge importing" do
 
     #import json into new course
     @copy_to.assignment_group_no_drop_assignments = {}
-    AssignmentGroup.process_migration(data, @migration)
+    Importers::AssignmentGroupImporter.process_migration(data, @migration)
     @copy_to.save!
 
     #compare settings
@@ -95,7 +95,7 @@ describe "Canvas Cartridge importing" do
     hash = {:migration_id=>CC::CCHelper.create_key(a),
             :title=>a.title,
             :assignment_group_migration_id=>CC::CCHelper.create_key(ag2)}
-    Assignment.import_from_migration(hash, @copy_to)
+    Importers::AssignmentImporter.import_from_migration(hash, @copy_to)
     
     ag2_2.reload
     ag2_2.assignments.count.should == 1
@@ -147,7 +147,7 @@ describe "Canvas Cartridge importing" do
     tool2_hash = lti_converter.convert_blti_link(doc2)
     tool2_hash['migration_id'] = CC::CCHelper.create_key(tool2)
     #import json into new course
-    ContextExternalTool.process_migration({'external_tools'=>[tool1_hash, tool2_hash]}, @migration)
+    Importers::ContextExternalToolImporter.process_migration({'external_tools'=>[tool1_hash, tool2_hash]}, @migration)
     @copy_to.save!
     
     #compare settings
@@ -238,7 +238,7 @@ describe "Canvas Cartridge importing" do
     hash = @converter.convert_modules(doc)
     #import json into new course
     hash[0] = hash[0].with_indifferent_access
-    ContextModule.process_migration({'modules'=>hash}, @migration)
+    Importers::ContextModuleImporter.process_migration({'modules'=>hash}, @migration)
     @copy_to.save!
 
     mod1_2 = @copy_to.context_modules.find_by_migration_id(CC::CCHelper.create_key(mod1))
@@ -272,7 +272,7 @@ describe "Canvas Cartridge importing" do
     doc = Nokogiri::XML(builder.target!)
     hash = @converter.convert_external_feeds(doc)
     #import json into new course
-    ExternalFeed.process_migration({'external_feeds'=>hash}, @migration)
+    Importers::ExternalFeedImporter.process_migration({'external_feeds'=>hash}, @migration)
     @copy_to.save!
   
     ef_2 = @copy_to.external_feeds.find_by_migration_id(CC::CCHelper.create_key(ef))
@@ -297,7 +297,7 @@ describe "Canvas Cartridge importing" do
     doc = Nokogiri::XML(builder.target!)
     hash = @converter.convert_grading_standards(doc)
     #import json into new course
-    GradingStandard.process_migration({'grading_standards'=>hash}, @migration)
+    Importers::GradingStandardImporter.process_migration({'grading_standards'=>hash}, @migration)
     @copy_to.save!
   
     gs_2 = @copy_to.grading_standards.find_by_migration_id(CC::CCHelper.create_key(gs))
@@ -317,7 +317,7 @@ describe "Canvas Cartridge importing" do
     })
     hash = @converter.convert_grading_standards(doc)
     #import json into new course
-    GradingStandard.process_migration({'grading_standards'=>hash}, @migration)
+    Importers::GradingStandardImporter.process_migration({'grading_standards'=>hash}, @migration)
     @copy_to.save!
 
     gs_2 = @copy_to.grading_standards.last
@@ -344,9 +344,11 @@ describe "Canvas Cartridge importing" do
     @resource.create_learning_outcomes(builder)
     #convert to json
     doc = Nokogiri::XML(builder.target!)
-    hash = @converter.convert_learning_outcomes(doc)
+    data = @converter.convert_learning_outcomes(doc)
+    data = data.map{|h| h.with_indifferent_access}
+
     #import json into new course
-    LearningOutcome.process_migration({'learning_outcomes'=>hash}, @migration)
+    Importers::LearningOutcomeImporter.process_migration({'learning_outcomes'=>data}, @migration)
     @copy_to.save!
   end
   
@@ -418,7 +420,7 @@ describe "Canvas Cartridge importing" do
     rubric2.data = [{:ratings=>[{:criterion_id=>"309_6312", :points=>5, :description=>"Full Marks", :id=>"blank", :long_description=>""}, {:criterion_id=>"309_6312", :points=>0, :description=>"No Marks", :id=>"blank_2", :long_description=>""}], :points=>5, :description=>"Description of criterion", :id=>"309_6312", :long_description=>""}, {:ignore_for_scoring=>false, :mastery_points=>3, :learning_outcome_id=>lo.id, :ratings=>[{:criterion_id=>"309_343", :points=>5, :description=>"Exceeds Expectations", :id=>"309_6516", :long_description=>""}, {:criterion_id=>"309_343", :points=>0, :description=>"Does Not Meet Expectations", :id=>"309_9962", :long_description=>""}], :points=>5, :description=>"Learning Outcome", :id=>"309_343", :long_description=>"<p>Outcome</p>"}]
     rubric2.save!
 
-    assoc = RubricAssociation.create!(:context => @copy_from, :rubric => rubric2, :association => @copy_from, :title => rubric2.title, :purpose => 'bookmark')
+    assoc = RubricAssociation.create!(:context => @copy_from, :rubric => rubric2, :association_object => @copy_from, :title => rubric2.title, :purpose => 'bookmark')
 
     #export to xml
     builder = Builder::XmlMarkup.new(:indent=>2)
@@ -429,7 +431,7 @@ describe "Canvas Cartridge importing" do
     #import json into new course
     hash[0] = hash[0].with_indifferent_access
     hash[1] = hash[1].with_indifferent_access
-    Rubric.process_migration({'rubrics'=>hash}, @migration)
+    Importers::RubricImporter.process_migration({'rubrics'=>hash}, @migration)
     @copy_to.save!
 
     @copy_to.rubric_associations.count.should == 2
@@ -506,7 +508,7 @@ describe "Canvas Cartridge importing" do
     hash[1] = hash[1].with_indifferent_access
     hash[2] = hash[2].with_indifferent_access
     hash[3] = hash[3].with_indifferent_access
-    ContextModule.process_migration({'modules'=>hash}, @migration)
+    Importers::ContextModuleImporter.process_migration({'modules'=>hash}, @migration)
     @copy_to.save!
     
     mod1_2 = @copy_to.context_modules.find_by_migration_id(CC::CCHelper.create_key(mod1))
@@ -569,7 +571,7 @@ describe "Canvas Cartridge importing" do
     hash = hash.with_indifferent_access
     #import into new course
     @copy_to.attachment_path_id_lookup = { 'unfiled/ohai there.txt' => attachment_import.migration_id }
-    WikiPage.import_from_migration(hash, @copy_to)
+    Importers::WikiPageImporter.import_from_migration(hash, @copy_to)
     
     page_2 = @copy_to.wiki.wiki_pages.find_by_migration_id(migration_id)
     page_2.title.should == page.title
@@ -625,7 +627,7 @@ describe "Canvas Cartridge importing" do
     hash = @converter.convert_wiki(doc, 'some-page')
     hash = hash.with_indifferent_access
     #import into new course
-    WikiPage.process_migration({'wikis' => [hash, nil]}, @migration)
+    Importers::WikiPageImporter.process_migration({'wikis' => [hash, nil]}, @migration)
 
     ErrorReport.last.message.should =~ /nil wiki/
 
@@ -652,7 +654,7 @@ describe "Canvas Cartridge importing" do
     hash = @converter.convert_wiki(doc, 'blti-link')
     hash = hash.with_indifferent_access
     #import into new course
-    WikiPage.import_from_migration(hash, @copy_to)
+    Importers::WikiPageImporter.import_from_migration(hash, @copy_to)
     
     page_2 = @copy_to.wiki.wiki_pages.find_by_migration_id(migration_id)
     page_2.title.should == page.title
@@ -705,7 +707,7 @@ describe "Canvas Cartridge importing" do
     hash = @converter.convert_assignment(meta_doc, html_doc)
     hash = hash.with_indifferent_access
     #import
-    Assignment.import_from_migration(hash, @copy_to)
+    Importers::AssignmentImporter.import_from_migration(hash, @copy_to)
     
     asmnt_2 = @copy_to.assignments.find_by_migration_id(migration_id)
     asmnt_2.title.should == asmnt.title
@@ -744,7 +746,7 @@ describe "Canvas Cartridge importing" do
     hash = @converter.convert_assignment(meta_doc, html_doc)
     hash = hash.with_indifferent_access
     #import
-    Assignment.import_from_migration(hash, @copy_to)
+    Importers::AssignmentImporter.import_from_migration(hash, @copy_to)
 
     asmnt_2 = @copy_to.assignments.find_by_migration_id(migration_id)
     asmnt_2.submission_types.should == "external_tool"
@@ -773,7 +775,7 @@ XML
     hash = @converter.convert_assignment(meta_doc, html_doc)
     hash = hash.with_indifferent_access
     #import
-    Assignment.import_from_migration(hash, @copy_to)
+    Importers::AssignmentImporter.import_from_migration(hash, @copy_to)
 
     asmnt_2 = @copy_to.assignments.find_by_migration_id('ia24c092694901d2a5529c142accdaf0b')
     asmnt_2.submission_types.should == "external_tool"
@@ -805,8 +807,8 @@ XML
     hash = @converter.convert_topic(cc_doc, meta_doc)
     hash = hash.with_indifferent_access
     #import
-    DiscussionTopic.import_from_migration(hash, @copy_to)
-    
+    Importers::DiscussionTopicImporter.import_from_migration(hash, @copy_to)
+
     dt_2 = @copy_to.discussion_topics.find_by_migration_id(migration_id)
     dt_2.title.should == dt.title
     dt_2.message.should == body_with_link % @copy_to.id
@@ -853,13 +855,13 @@ XML
     ag1.migration_id = CC::CCHelper.create_key(assignment.assignment_group)
     ag1.save!
     #import
-    DiscussionTopic.import_from_migration(hash, @copy_to)
-    
+    Importers::DiscussionTopicImporter.import_from_migration(hash, @copy_to)
+
     dt_2 = @copy_to.discussion_topics.find_by_migration_id(migration_id)
     dt_2.title.should == dt.title
     dt_2.message.should == body_with_link % @copy_to.id
     dt_2.type.should == dt.type
-    
+
     a = dt_2.assignment
     a.title.should == assignment.title
     a.migration_id.should == CC::CCHelper.create_key(assignment)
@@ -867,6 +869,54 @@ XML
     a.points_possible.should == assignment.points_possible
     a.discussion_topic.should == dt_2
     a.assignment_group.id.should == ag1.id
+  end
+
+  it "should not fail when importing discussion topic when both group_id and assignment are specified" do
+    body = "<p>What do you think about the stuff?</p>"
+    group = @copy_from.groups.create!(:name => "group")
+    dt = group.discussion_topics.new
+    dt.title = "Topic"
+    dt.message = body
+    dt.posted_at = 1.day.ago
+    dt.save!
+
+    assignment = @copy_from.assignments.build
+    assignment.submission_types = 'discussion_topic'
+    assignment.assignment_group = @copy_from.assignment_groups.find_or_create_by_name("Stupid Group")
+    assignment.title = dt.title
+    assignment.points_possible = 13.37
+    assignment.due_at = 1.week.from_now
+    assignment.saved_by = :discussion_topic
+    assignment.save
+
+    dt.assignment = assignment
+    dt.save
+
+    #export to xml
+    migration_id = CC::CCHelper.create_key(dt)
+    cc_topic_builder = Builder::XmlMarkup.new(:indent=>2)
+    cc_topic_builder.topic("identifier" => migration_id) {|t| @resource.create_cc_topic(t, dt)}
+    canvas_topic_builder = Builder::XmlMarkup.new(:indent=>2)
+    canvas_topic_builder.topicMeta {|t| @resource.create_canvas_topic(t, dt)}
+    #convert to json
+    cc_doc = Nokogiri::XML(cc_topic_builder.target!)
+    meta_doc = Nokogiri::XML(canvas_topic_builder.target!)
+    hash = @converter.convert_topic(cc_doc, meta_doc)
+    hash = hash.with_indifferent_access
+    @copy_to.groups.create!(:name => "whatevs")
+
+    group2 = @copy_to.groups.create!(:name => "group")
+    group2.migration_id = CC::CCHelper.create_key(group)
+    group2.save!
+    hash[:group_id] = group2.migration_id
+
+    cm = ContentMigration.new(:context => @copy_to, :copy_options => {:everything => "1"})
+    Importers::DiscussionTopicImporter.process_discussion_topics_migration([hash], cm)
+
+    dt_2 = group2.discussion_topics.find_by_migration_id(migration_id)
+    dt_2.title.should == dt.title
+    dt_2.message.should == body
+    dt_2.type.should == dt.type
   end
   
   it "should import quizzes into correct assignment group" do
@@ -916,7 +966,7 @@ XML
     ag.migration_id = "i713e960ab2685259505efeb08cd48a1d"
     ag.save!
     
-    Quiz.import_from_migration(quiz_hash, @copy_to, {})
+    Importers::QuizImporter.import_from_migration(quiz_hash, @copy_to, nil, {})
     q = @copy_to.quizzes.find_by_migration_id("ie3d8f8adfad423eb225229c539cdc450")
     a = q.assignment
     a.assignment_group.id.should == ag.id
@@ -975,13 +1025,63 @@ XML
 
     migration = ContentMigration.create(:context => @copy_to)
     migration.migration_settings[:migration_ids_to_import] = {:copy => {"everything" => 1}}
-    @copy_to.import_from_migration(data, nil, migration)
+    Importers::CourseContentImporter.import_content(@copy_to, data, nil, migration)
 
     q = @copy_to.quizzes.find_by_migration_id("quizmigrationid")
     a = @copy_to.assignments.find_by_migration_id("assignmentmigrationid")
 
     q.assignment_id.should == a.id
     a.submission_types.should == "online_quiz"
+  end
+
+  it "should convert media tracks" do
+    doc = Nokogiri::XML(<<-XML)
+      <?xml version="1.0" encoding="UTF-8"?>
+      <media_tracks xmlns="http://canvas.instructure.com/xsd/cccv1p0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd">
+        <media identifierref="xyz">
+          <track kind="subtitles" locale="en" identifierref="abc"/>
+          <track kind="subtitles" locale="tlh" identifierref="def"/>
+        </media>
+      </media_tracks>
+    XML
+    @converter.convert_media_tracks(doc).should eql({
+      "xyz"=>[{"migration_id"=>"abc", "kind"=>"subtitles", "locale"=>"en"},
+              {"migration_id"=>"def", "kind"=>"subtitles", "locale"=>"tlh"}]
+    })
+  end
+
+  it "should import media tracks" do
+    media_objects_folder = Folder.create! context: @copy_to, name: CC::CCHelper::MEDIA_OBJECTS_FOLDER, parent_folder: Folder::root_folders(@course).first
+    media_file = @copy_to.attachments.create(folder: media_objects_folder, filename: 'media.flv', uploaded_data: StringIO.new('pretend this is a media file'))
+    media_file.migration_id = 'xyz'
+    media_file.save!
+    mo = MediaObject.new
+    mo.attachment = media_file
+    mo.media_id = '0_deadbeef'
+    mo.save!
+    track_file1 = @copy_to.attachments.create(folder: media_objects_folder, filename: 'media.flv.en.subtitles', uploaded_data: StringIO.new('pretend this is a track file'))
+    track_file1.migration_id = 'abc'
+    track_file1.save!
+    track_file2 = @copy_to.attachments.create(folder: media_objects_folder, filename: 'media.flv.tlh.subtitles', uploaded_data: StringIO.new("Qapla'"))
+    track_file2.migration_id = 'def'
+    track_file2.save!
+    data = {
+      "media_tracks"=>{
+        "xyz"=>[{"migration_id"=>"abc", "kind"=>"subtitles", "locale"=>"en"},
+                {"migration_id"=>"def", "kind"=>"subtitles", "locale"=>"tlh"}]
+      }
+    }.with_indifferent_access
+
+    migration = ContentMigration.create(context: @copy_to)
+    migration.stubs(:canvas_import?).returns(true)
+    migration.migration_settings[:migration_ids_to_import] = {copy: {'everything' => 1}}
+    Importers::CourseContentImporter.import_content(@copy_to, data, nil, migration)
+
+    mo.media_tracks.find_by_locale('en').content.should eql('pretend this is a track file')
+    mo.media_tracks.find_by_locale('tlh').content.should eql("Qapla'")
+
+    @copy_to.attachments.find_by_migration_id('abc').should be_deleted
+    @copy_to.attachments.find_by_migration_id('def').should be_deleted
   end
 
   context "warnings for missing links in imported html" do
@@ -1004,7 +1104,7 @@ XML
 
       migration = ContentMigration.create(:context => @copy_to)
       migration.migration_settings[:migration_ids_to_import] = {:copy => {"everything" => 1}}
-      @copy_to.import_from_migration(data, nil, migration)
+      Importers::CourseContentImporter.import_content(@copy_to, data, nil, migration)
 
       bank = @copy_to.assessment_question_banks.first
       question = @copy_to.assessment_questions.first
@@ -1040,7 +1140,7 @@ XML
 
       migration = ContentMigration.create(:context => @copy_to)
       migration.migration_settings[:migration_ids_to_import] = {:copy => {"everything" => 1}}
-      @copy_to.import_from_migration(data, nil, migration)
+      Importers::CourseContentImporter.import_content(@copy_to, data, nil, migration)
 
       a = @copy_to.assignments.first
 
@@ -1074,7 +1174,7 @@ XML
 
       migration = ContentMigration.create(:context => @copy_to)
       migration.migration_settings[:migration_ids_to_import] = {:copy => {"everything" => 1}}
-      @copy_to.import_from_migration(data, nil, migration)
+      Importers::CourseContentImporter.import_content(@copy_to, data, nil, migration)
 
       event = @copy_to.calendar_events.find_by_migration_id("id4bebe19c7b729e22543bed8a5a02dcb")
 
@@ -1094,7 +1194,7 @@ XML
 
       migration = ContentMigration.create(:context => @copy_to)
       migration.migration_settings[:migration_ids_to_import] = {:copy => {"everything" => 1}}
-      @copy_to.import_from_migration(data, nil, migration)
+      Importers::CourseContentImporter.import_content(@copy_to, data, nil, migration)
 
       migration.migration_issues.count.should == 1
       warning = migration.migration_issues.first
@@ -1127,7 +1227,7 @@ XML
 
       migration = ContentMigration.create(:context => @copy_to)
       migration.migration_settings[:migration_ids_to_import] = {:copy => {"everything" => 1}}
-      @copy_to.import_from_migration(data, nil, migration)
+      Importers::CourseContentImporter.import_content(@copy_to, data, nil, migration)
 
       topic1 = @copy_to.discussion_topics.find_by_migration_id("iaccaf448c9f5218ff2a89d1d846b5224")
       topic2 = @copy_to.discussion_topics.find_by_migration_id("iaccaf448c9f5218ff2a89d1d846b52242")
@@ -1178,7 +1278,7 @@ XML
 
       migration = ContentMigration.create(:context => @copy_to)
       migration.migration_settings[:migration_ids_to_import] = {:copy => {"everything" => 1}}
-      @copy_to.import_from_migration(data, nil, migration)
+      Importers::CourseContentImporter.import_content(@copy_to, data, nil, migration)
 
       quiz = @copy_to.quizzes.first
 
@@ -1204,7 +1304,7 @@ XML
 
       migration = ContentMigration.create(:context => @copy_to)
       migration.migration_settings[:migration_ids_to_import] = {:copy => {"everything" => 1}}
-      @copy_to.import_from_migration(data, nil, migration)
+      Importers::CourseContentImporter.import_content(@copy_to, data, nil, migration)
 
       wiki = @copy_to.wiki.wiki_pages.find_by_migration_id("i642b8969dbfa332fd96ec9029e96156a")
       migration.migration_issues.count.should == 1

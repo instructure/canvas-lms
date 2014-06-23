@@ -21,17 +21,29 @@
 # API for adding additional columns to the gradebook.  Custom gradebook
 # columns will be displayed with the other frozen gradebook columns.
 #
-# @object CustomColumn
-#    {
-#      // header text
-#      "title": "Stuff",
+# @model CustomColumn
+#     {
+#       "id": "CustomColumn",
+#       "description": "",
+#       "properties": {
+#         "title": {
+#           "description": "header text",
+#           "example": "Stuff",
+#           "type": "string"
+#         },
+#         "position": {
+#           "description": "column order",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "hidden": {
+#           "description": "won't be displayed if hidden is true",
+#           "example": false,
+#           "type": "boolean"
+#         }
+#       }
+#     }
 #
-#      // column order
-#      "position": 1,
-#
-#      // won't be displayed if hidden is true
-#      "hidden": false
-#    }
 class CustomGradebookColumnsApiController < ApplicationController
   before_filter :require_context, :require_user
 

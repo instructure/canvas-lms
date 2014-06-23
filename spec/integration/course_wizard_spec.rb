@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../apis/api_spec_helper')
 
-describe CoursesController, :type => :integration do
+describe CoursesController, type: :request do
   it "should cache the course wizard based on the current user" do
     enable_cache do
       course_with_teacher(:active_enrollment => true, :name => 'unpublished course')

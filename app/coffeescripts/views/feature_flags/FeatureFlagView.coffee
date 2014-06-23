@@ -1,8 +1,9 @@
 define [
+  'jquery'
   'Backbone'
   'compiled/views/feature_flags/FeatureFlagDialog'
   'jst/feature_flags/featureFlag'
-], (Backbone, FeatureFlagDialog, template) ->
+], ($, Backbone, FeatureFlagDialog, template) ->
 
   class FeatureFlagView extends Backbone.View
 

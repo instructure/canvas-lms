@@ -26,7 +26,7 @@
           <th><%= before_label('profile_picture', 'Profile Picture') %></th>
           <td>
             <span class="avatar_image">
-              <%= avatar_image(@user, 50) %>
+              <%= avatar @user, url: nil %>
             </span>
             <% if can_do(@user, @current_user, :remove_avatar) %>
               <a href="<%= update_avatar_image_url(@user.id) %>" class="remove_avatar_picture_link"><%= t('remove_avatar', 'Remove avatar picture') %></a>

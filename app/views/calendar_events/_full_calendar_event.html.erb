@@ -59,7 +59,10 @@
     <% end %>
     <tr>
       <td colspan="4">
-        <a href="#" style="font-size: 0.8em; float: right;" class="switch_full_calendar_event_view"><%= t '#links.switch_views', "Switch Views" %></a>
+        <div style="font-size: 0.8em; float: right;">
+          <a href="#" class="switch_full_calendar_event_view"><%= t '#editor.switch_editor_html', "HTML Editor" %></a>
+          <a href="#" class="switch_full_calendar_event_view" style="display:none;"><%= t '#editor.switch_editor_visual', "Visual Editor" %></a>
+        </div>
         <div>
           <%= before_label :event_description, "Event Description" %>
         </div>
@@ -67,6 +70,24 @@
       </td>
     </tr>
   </table>
+  <div>
+    <table id="calendar_event_location_info">
+      <tbody>
+        <tr>
+          <td>
+            <label for="calendar_event_location_name"><%= t 'labels.location', "Location" %></label>
+            <input id="calendar_event_location_name" name="location_name" size="30" maxlength="255"  type="text" value="<%= calendar_event.location_name %>"/>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label for="calendar_event_location_address"><%= t 'labels.address', "Address" %>:</label>
+            <input id="calendar_event_location_address" name="location_address" size="30" maxlength="255" type="text" value="<%= calendar_event.location_address %>"/>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
   <div class="form-actions">
     <button type="button" class="btn cancel_button"><%= t '#buttons.cancel', "Cancel" %></button>
     <button type="submit" class="btn btn-primary submit_button"><%= calendar_event.new_record? ? t('buttons.create', "Create Event") : t('buttons.update', "Update Event") %></button>

@@ -3,10 +3,10 @@
 
 $subdued-text-color: #696969
 $darkened-text-color: #4d4d4d
-$published-text-color: #34832b
+$published-text-color: #33802a
 $unpublished-text-color: $subdued-text-color
 
-$published-icon-color: #34832b
+$published-icon-color: #33802a
 $unpublished-icon-color: #b4b7ba
 
 $border-color: #c1c7cf
@@ -70,11 +70,9 @@ $revision-button-hover-color: #2590cf
   .header-bar-outer-container.page-changed
     :height 103px
     :animation page-changed-header-bar 1.15s
-    :-webkit-animation page-changed-header-bar 1.15s
     .header-bar-container
       :height 103px
       :animation page-changed-header-bar 1.15s
-      :-webkit-animation page-changed-header-bar 1.15s
 
       .page-changed-alert
         :margin -1px 0 0 0
@@ -82,7 +80,6 @@ $revision-button-hover-color: #2590cf
         :box-shadow $shadow
         :height 39px
         :animation page-changed-alert 1.15s
-        :-webkit-animation page-changed-alert 1.15s
 
 .pages.index
   #main
@@ -239,6 +236,9 @@ $revision-button-hover-color: #2590cf
       :margin 0 12px 0 0
     .front-page.label
       :margin 6px 12px 6px 0
+    .published, .unpublished
+      :display inline-block
+      :margin 6px 8px 6px 5px
 
   .locked-alert ul
     :margin 4px 0 6px 25px
@@ -264,15 +264,6 @@ $revision-button-hover-color: #2590cf
 .pages.edit
   .form-actions
     :padding-left 1em
-    
-  .header-bar
-    .published
-      :color $published-text-color
-    .unpublished
-      :color $unpublished-text-color
-    .published, .unpublished
-      :display inline-block
-      :margin 5px 8px 5px 5px
 
   .edit-form
     :margin 0

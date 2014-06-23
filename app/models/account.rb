@@ -22,7 +22,21 @@ class Account < ActiveRecord::Base
     :turnitin_host, :turnitin_comments, :turnitin_pledge,
     :default_time_zone, :parent_account, :settings, :default_storage_quota,
     :default_storage_quota_mb, :storage_quota, :ip_filters, :default_locale,
-    :default_user_storage_quota_mb, :default_group_storage_quota_mb
+    :default_user_storage_quota_mb, :default_group_storage_quota_mb, :integration_id
+
+  EXPORTABLE_ATTRIBUTES = [:id, :name, :created_at, :updated_at, :workflow_state, :deleted_at,
+    :membership_types, :default_time_zone, :external_status, :storage_quota,
+    :enable_user_notes, :allowed_services, :turnitin_pledge, :turnitin_comments,
+    :turnitin_account_id, :allow_sis_import, :sis_source_id, :equella_endpoint,
+    :settings, :uuid, :default_locale, :default_user_storage_quota, :turnitin_host,
+    :created_by_id, :lti_guid, :default_group_storage_quota, :lti_context_id
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [
+    :courses, :group_categories, :groups, :enrollment_terms, :enrollments, :account_users, :course_sections,
+    :users, :pseudonyms, :attachments, :folders, :active_assignments, :grading_standards, :assessment_questions,
+    :assessment_question_banks, :roles, :announcements, :alerts, :course_account_associations, :user_account_associations
+  ]
 
   include Workflow
   belongs_to :parent_account, :class_name => 'Account'
@@ -62,6 +76,8 @@ class Account < ActiveRecord::Base
   has_many :roles
   has_many :all_roles, :class_name => 'Role', :foreign_key => 'root_account_id'
   has_many :progresses, :as => :context
+  has_many :content_migrations, :as => :context
+
   def inherited_assessment_question_banks(include_self = false, *additional_contexts)
     sql = []
     conds = []
@@ -93,7 +109,17 @@ class Account < ActiveRecord::Base
   
   serialize :settings, Hash
   include TimeZoneHelper
+
   time_zone_attribute :default_time_zone, default: "America/Denver"
+  def default_time_zone_with_root_account
+    if read_attribute(:default_time_zone) || root_account?
+      default_time_zone_without_root_account
+    else
+      root_account.default_time_zone
+    end
+  end
+  alias_method_chain :default_time_zone, :root_account
+  alias_method :time_zone, :default_time_zone
 
   validates_locale :default_locale, :allow_nil => true
   validates_length_of :name, :maximum => maximum_string_length, :allow_blank => true
@@ -152,8 +178,6 @@ class Account < ActiveRecord::Base
   add_setting :enable_eportfolios, :boolean => true, :root_only => true
   add_setting :users_can_edit_name, :boolean => true, :root_only => true
   add_setting :open_registration, :boolean => true, :root_only => true
-  add_setting :enable_scheduler, :boolean => true, :root_only => true, :default => false
-  add_setting :calendar2_only, :boolean => true, :root_only => true, :default => false
   add_setting :show_scheduler, :boolean => true, :root_only => true, :default => false
   add_setting :enable_profiles, :boolean => true, :root_only => true, :default => false
   add_setting :enable_manage_groups2, :boolean => true, :root_only => true, :default => true
@@ -173,12 +197,15 @@ class Account < ActiveRecord::Base
   add_setting :allow_invitation_previews, :boolean => true, :root_only => true, :default => false
   add_setting :self_registration, :boolean => true, :root_only => true, :default => false
   # if self_registration_type is 'observer', then only observers (i.e. parents) can self register.
-  # else, any user type can self register.
+  # if self_registration_type is 'all' or nil, any user type can self register.
   add_setting :self_registration_type, :root_only => true
   add_setting :large_course_rosters, :boolean => true, :root_only => true, :default => false
   add_setting :edit_institution_email, :boolean => true, :root_only => true, :default => true
   add_setting :enable_fabulous_quizzes, :boolean => true, :root_only => true, :default => false
+  add_setting :js_kaltura_uploader, :boolean => true, :root_only => true, :default => false
   add_setting :google_docs_domain, root_only: true
+  add_setting :dashboard_url, root_only: true
+  add_setting :product_name, root_only: true
 
   def settings=(hash)
     if hash.is_a?(Hash)
@@ -206,6 +233,10 @@ class Account < ActiveRecord::Base
       end
     end
     settings
+  end
+
+  def product_name
+    settings[:product_name] || t("#product_name", "Canvas")
   end
 
   def allow_global_includes?
@@ -244,7 +275,7 @@ class Account < ActiveRecord::Base
 
   def self_registration_allowed_for?(type)
     return false unless self_registration?
-    return false if self_registration_type && type != self_registration_type
+    return false if self_registration_type && self_registration_type != 'all' && type != self_registration_type
     true
   end
 
@@ -290,7 +321,7 @@ class Account < ActiveRecord::Base
   end
   
   def ensure_defaults
-    self.uuid ||= AutoHandle.generate_securish_uuid
+    self.uuid ||= CanvasUuid::Uuid.generate_securish_uuid
     self.lti_guid ||= self.uuid if self.respond_to?(:lti_guid)
   end
 
@@ -387,7 +418,14 @@ class Account < ActiveRecord::Base
   end
 
   def associated_courses
-    Course.shard(shard).where("EXISTS (SELECT 1 FROM course_account_associations WHERE course_id=courses.id AND account_id=?)", self)
+    scope = if CANVAS_RAILS2
+      Course.shard(shard)
+    else
+      shard.activate do
+        Course.scoped
+      end
+    end
+    scope.where("EXISTS (SELECT 1 FROM course_account_associations WHERE course_id=courses.id AND account_id=?)", self)
   end
 
   def fast_course_base(opts)
@@ -679,13 +717,13 @@ class Account < ActiveRecord::Base
     @account_users_cache ||= {}
     if self == Account.site_admin
       shard.activate do
-        @account_users_cache[user] ||= Rails.cache.fetch('all_site_admin_account_users') do
+        @account_users_cache[user.global_id] ||= Rails.cache.fetch('all_site_admin_account_users') do
           self.account_users.all
         end.select { |au| au.user_id == user.id }.each { |au| au.account = self }
       end
     else
       @account_chain_ids ||= self.account_chain(:include_site_admin => true).map { |a| a.active? ? a.id : nil }.compact
-      @account_users_cache[user] ||= Shard.partition_by_shard(@account_chain_ids) do |account_chain_ids|
+      @account_users_cache[user.global_id] ||= Shard.partition_by_shard(@account_chain_ids) do |account_chain_ids|
         if account_chain_ids == [Account.site_admin.id]
           Account.site_admin.account_users_for(user)
         else
@@ -693,8 +731,8 @@ class Account < ActiveRecord::Base
         end
       end
     end
-    @account_users_cache[user] ||= []
-    @account_users_cache[user]
+    @account_users_cache[user.global_id] ||= []
+    @account_users_cache[user.global_id]
   end
 
   # returns all account users for this entire account tree
@@ -729,7 +767,7 @@ class Account < ActiveRecord::Base
       result = false
 
       if !site_admin? && user
-        scope = user.enrollments.where(:root_account_id => root_account).where("enrollments.workflow_state<>'deleted'")
+        scope = root_account.enrollments.active.where(user_id: user)
         result = root_account.teachers_can_create_courses? &&
             scope.where(:type => ['TeacherEnrollment', 'DesignerEnrollment']).exists?
         result ||= root_account.students_can_create_courses? &&
@@ -837,7 +875,7 @@ class Account < ActiveRecord::Base
     return if self.settings[:auth_discovery_url].blank?
 
     begin
-      value, uri = CustomValidations.validate_url(self.settings[:auth_discovery_url])
+      value, uri = CanvasHttp.validate_url(self.settings[:auth_discovery_url])
       self.auth_discovery_url = value
     rescue URI::InvalidURIError, ArgumentError
       errors.add(:discovery_url, t('errors.invalid_discovery_url', "The discovery URL is not valid" ))
@@ -1110,42 +1148,42 @@ class Account < ActiveRecord::Base
   def self.allowable_services
     {
       :google_docs => {
-        :name => "Google Docs", 
+        :name => t("account_settings.google_docs", "Google Docs"), 
         :description => "",
-        :expose_to_ui => (GoogleDocs.config ? :service : false)
+        :expose_to_ui => (GoogleDocs::Connection.config ? :service : false)
       },
       :google_docs_previews => {
-        :name => "Google Docs Previews", 
+        :name => t("account_settings.google_docs_preview", "Google Docs Preview"), 
         :description => "",
         :expose_to_ui => :service
       },
       :facebook => {
-        :name => "Facebook", 
+        :name => t("account_settings.facebook", "Facebook"), 
         :description => "",
-        :expose_to_ui => (Facebook.config ? :service : false)
+        :expose_to_ui => (Facebook::Connection.config ? :service : false)
       },
       :skype => {
-        :name => "Skype", 
+        :name => t("account_settings.skype", "Skype"), 
         :description => "",
         :expose_to_ui => :service
       },
       :linked_in => {
-        :name => "LinkedIn", 
+        :name => t("account_settings.linked_in", "LinkedIn"), 
         :description => "",
-        :expose_to_ui => (LinkedIn.config ? :service : false)
+        :expose_to_ui => (LinkedIn::Connection.config ? :service : false)
       },
       :twitter => {
-        :name => "Twitter", 
+        :name => t("account_settings.twitter", "Twitter"), 
         :description => "",
-        :expose_to_ui => (Twitter.config ? :service : false)
+        :expose_to_ui => (Twitter::Connection.config ? :service : false)
       },
       :delicious => {
-        :name => "Delicious", 
+        :name => t("account_settings.delicious", "Delicious"), 
         :description => "",
         :expose_to_ui => :service
       },
       :diigo => {
-        :name => "Diigo", 
+        :name => t("account_settings.diigo", "Diigo"), 
         :description => "",
         :expose_to_ui => :service
       },
@@ -1153,13 +1191,13 @@ class Account < ActiveRecord::Base
       # In the meantime, we leave it as a service but expose it in the
       # "Features" (settings) portion of the account admin UI
       :avatars => {
-        :name => "User Avatars",
+        :name => t("account_settings.avatars", "User Avatars"),
         :description => "",
         :default => false,
         :expose_to_ui => :setting
       },
       :account_survey_notifications => {
-        :name => "Account Surveys",
+        :name => t("account_settings.account_surveys", "Account Surveys"),
         :description => "",
         :default => false,
         :expose_to_ui => :setting,
@@ -1315,6 +1353,10 @@ class Account < ActiveRecord::Base
     [ Account.site_admin.id ]
   end
 
+  def trust_exists?
+    false
+  end
+
   def user_list_search_mode_for(user)
     return :preferred if self.root_account.open_registration?
     return :preferred if self.root_account.grants_right?(user, :manage_user_logins)
@@ -1332,21 +1374,21 @@ class Account < ActiveRecord::Base
     false
   end
 
-  def import_from_migration(data, params, migration)
-
-    LearningOutcome.process_migration(data, migration)
-
-    migration.progress=100
-    migration.workflow_state = :imported
-    migration.save
-  end
-
   def enable_fabulous_quizzes!
+    root_account.enable_feature! :draft_state
     change_root_account_setting!(:enable_fabulous_quizzes, true)
   end
 
   def disable_fabulous_quizzes!
     change_root_account_setting!(:enable_fabulous_quizzes, false)
+  end
+
+  def calendar2_only?
+    true
+  end
+
+  def enable_scheduler?
+    true
   end
 
   def change_root_account_setting!(setting_name, new_value)

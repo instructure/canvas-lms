@@ -18,13 +18,14 @@
 
 require [
   'i18n!outcomes'
+  'jquery'
   'underscore'
   'compiled/models/OutcomeGroup'
   'compiled/views/outcomes/FindDialog'
   'compiled/views/outcomes/FindDirectoryView'
   'question_bank'
   'jst/quiz/move_question'
-], (I18n, {map}, OutcomeGroup, FindDialog, FindDirectoryView, {updateAlignments, attachPageEvents}) ->
+], (I18n, $, {map}, OutcomeGroup, FindDialog, FindDirectoryView, {updateAlignments, attachPageEvents}) ->
   class QuestionBankPage
     $els: {}
 

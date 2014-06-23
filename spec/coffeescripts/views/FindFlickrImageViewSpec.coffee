@@ -80,7 +80,8 @@ define [
     button = $('button[type=submit]', @form)
 
     input.val(searchTerm)
-    $('button[type=submit]', @form).simulate 'click'
+    @form.submit()
+    # $('button[type=submit]', @form).simulate 'click'
     @server.respond()
 
     results = $('ul.flickrResults li a.thumbnail', @form)

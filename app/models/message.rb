@@ -23,10 +23,17 @@ class Message < ActiveRecord::Base
   else
     include Rails.application.routes.url_helpers
   end
+
+  include PolymorphicTypeOverride
+  override_polymorphic_types context_type: {'QuizSubmission' => 'Quizzes::QuizSubmission',
+                                            'QuizRegradeRun' => 'Quizzes::QuizRegradeRun'},
+                             asset_context_type: {'QuizSubmission' => 'Quizzes::QuizSubmission',
+                                                  'QuizRegradeRun' => 'Quizzes::QuizRegradeRun'}
+
   include ERB::Util
   include SendToStream
   include TextHelper
-  include Twitter
+  include HtmlTextHelper
   include Workflow
 
   extend TextHelper
@@ -44,7 +51,15 @@ class Message < ActiveRecord::Base
     :notification_name, :asset_context, :data, :root_account_id
 
   attr_writer :delayed_messages
+  attr_accessor :output_buffer
 
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :to, :from, :cc, :bcc, :subject, :body, :delay_for, :dispatch_at, :sent_at, :workflow_state, :transmission_errors, :is_bounced, :notification_id,
+    :communication_channel_id, :context_id, :context_type, :asset_context_id, :asset_context_type, :user_id, :created_at, :updated_at, :notification_name, :url, :path_type,
+    :from_name, :asset_context_code, :notification_category, :to_email, :html_body, :root_account_id
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:asset_context, :communication_channel, :context, :notification, :user, :attachments]
   # Callbacks
   after_save  :stage_message
   before_save :infer_defaults
@@ -204,7 +219,7 @@ class Message < ActiveRecord::Base
   end
 
   # Public: Custom getter that delegates and caches notification category to
-  # associated notification 
+  # associated notification
   #
   # Returns a notification category string.
   def notification_category
@@ -245,6 +260,11 @@ class Message < ActiveRecord::Base
     end
   end
 
+  class UnescapedBuffer < String # acts like safe buffer except for the actually being safe part
+    alias :append= :<<
+    alias :safe_concat :concat
+  end
+
   # Public: Store content in a message_content_... instance variable.
   #
   # name  - The symbol name of the content.
@@ -252,7 +272,11 @@ class Message < ActiveRecord::Base
   #
   # Returns an empty string.
   def define_content(name, &block)
-    old_output_buffer, @output_buffer = [@output_buffer, @output_buffer.dup.clear]
+    if name == :subject || name == :user_name
+      old_output_buffer, @output_buffer = [@output_buffer, UnescapedBuffer.new]
+    else
+      old_output_buffer, @output_buffer = [@output_buffer, @output_buffer.dup.clear]
+    end
 
     yield
 
@@ -261,7 +285,7 @@ class Message < ActiveRecord::Base
     @output_buffer = old_output_buffer.sub(/\n\z/, '')
 
     if old_output_buffer.is_a?(ActiveSupport::SafeBuffer) && old_output_buffer.html_safe?
-      @output_buffer = ActiveSupport::SafeBuffer.new(@output_buffer)
+      @output_buffer = old_output_buffer.class.new(@output_buffer)
     end
 
     ''
@@ -325,11 +349,13 @@ class Message < ActiveRecord::Base
     return nil unless template = load_html_template
 
     # Add the attribute 'inner_html' with the value of inner_html into the _binding
+    @output_buffer = nil
     inner_html = RailsXss::Erubis.new(template, :bufvar => '@output_buffer').result(_binding)
     setter = eval "inner_html = nil; lambda { |v| inner_html = v }", _binding
     setter.call(inner_html)
 
     layout_path = Canvas::MessageHelper.find_message_path('_layout.email.html.erb')
+    @output_buffer = nil
     RailsXss::Erubis.new(File.read(layout_path)).result(_binding)
   ensure
     @i18n_scope = orig_i18n_scope
@@ -353,6 +379,7 @@ class Message < ActiveRecord::Base
 
     if path_type == 'facebook'
       # this will ensure we escape anything that's not already safe
+      @output_buffer = nil
       self.body = RailsXss::Erubis.new(message_body_template).result(_binding)
     else
       self.body = Erubis::Eruby.new(message_body_template,
@@ -471,7 +498,7 @@ class Message < ActiveRecord::Base
     end
 
     # not sure what this is even doing?
-    message_types.to_a.sort_by { |m| m[0] == 'Other' ? SortLast : m[0] }
+    message_types.to_a.sort_by { |m| m[0] == 'Other' ? CanvasSort::Last : m[0] }
   end
 
   # Public: Format and return the body for this message.
@@ -611,7 +638,7 @@ class Message < ActiveRecord::Base
     logger.info "Delivering mail: #{self.inspect}"
 
     begin
-      res = Mailer.message(self).deliver
+      res = Mailer.create_message(self).deliver
     rescue Net::SMTPServerBusy => e
       @exception = e
       logger.error "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
@@ -650,7 +677,10 @@ class Message < ActiveRecord::Base
   #
   # Returns nothing.
   def deliver_via_twitter
-    TwitterMessenger.new(self).deliver
+    twitter_service = user.user_services.find_by_service('twitter')
+    host = HostUrl.short_host(self.asset_context)
+    msg_id = AssetSignature.generate(self)
+    Twitter::Messenger.new(self, twitter_service, host, msg_id).deliver
     complete_dispatch
   end
 
@@ -660,7 +690,7 @@ class Message < ActiveRecord::Base
   def deliver_via_facebook
     facebook_user_id = self.to.to_i.to_s
     service = self.user.user_services.for_service('facebook').find_by_service_user_id(facebook_user_id)
-    Facebook.dashboard_increment_count(service) if service && service.token
+    Facebook::Connection.dashboard_increment_count(service.service_user_id, service.token, I18n.t(:new_facebook_message, 'You have a new message from Canvas')) if service && service.token
     complete_dispatch
   end
 

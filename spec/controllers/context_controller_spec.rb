@@ -93,7 +93,7 @@ describe ContextController do
 
     it "should require a valid HMAC" do
       post 'object_snippet', :object_data => @data, :s => 'DENIED'
-      response.status.should == '400 Bad Request'
+      assert_status(400)
     end
 
     it "should render given a correct HMAC" do
@@ -105,8 +105,8 @@ describe ContextController do
 
   describe "GET '/media_objects/:id/thumbnail" do
     it "should redirect to kaltura even if the MediaObject does not exist" do
-      Kaltura::ClientV3.stubs(:config).returns({})
-      Kaltura::ClientV3.any_instance.expects(:thumbnail_url).returns("http://example.com/thumbnail_redirect")
+      CanvasKaltura::ClientV3.stubs(:config).returns({})
+      CanvasKaltura::ClientV3.any_instance.expects(:thumbnail_url).returns("http://example.com/thumbnail_redirect")
       get :media_object_thumbnail,
         :id => '0_notexist',
         :width => 100,

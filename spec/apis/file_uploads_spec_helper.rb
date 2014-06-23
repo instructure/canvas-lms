@@ -89,6 +89,7 @@ shared_examples_for "file uploads api" do
     attachment.content_type.should == "application/msword"
     attachment.open.read.should == content
     attachment.display_name.should == filename
+    attachment.user.id.should == @user.id
     attachment
   end
 
@@ -123,6 +124,7 @@ shared_examples_for "file uploads api" do
     attachment.file_state.should == 'available'
     attachment.content_type.should == "application/msword"
     attachment.display_name.should == filename
+    attachment.user.id.should == @user.id
     attachment
   end
 
@@ -141,7 +143,7 @@ shared_examples_for "file uploads api" do
     json = api_call(:get, status_url, {:id => attachment.id.to_s, :controller => 'files', :action => 'api_file_status', :format => 'json', :uuid => attachment.uuid})
     json['upload_status'].should == 'pending'
     
-    Canvas::HTTP.expects(:get).with("http://www.example.com/images/delete.png").yields(FakeHttpResponse.new(200, "asdf"))
+    CanvasHttp.expects(:get).with("http://www.example.com/images/delete.png").yields(FakeHttpResponse.new(200, "asdf"))
     run_download_job
 
     json = api_call(:get, status_url, {:id => attachment.id.to_s, :controller => 'files', :action => 'api_file_status', :format => 'json', :uuid => attachment.uuid})
@@ -152,6 +154,7 @@ shared_examples_for "file uploads api" do
     }
     attachment.file_state.should == 'available'
     attachment.size.should == 4
+    attachment.user.id.should == @user.id
   end
   
   it "should fail gracefully with a malformed url" do
@@ -194,7 +197,7 @@ shared_examples_for "file uploads api" do
 
     local_storage!
     # step 1, preflight
-    Canvas::HTTP.expects(:get).with(url).yields(FakeHttpResponse.new(404))
+    CanvasHttp.expects(:get).with(url).yields(FakeHttpResponse.new(404))
     json = preflight({ :name => filename, :size => 20, :url => url })
     attachment = Attachment.order(:id).last
     json['status_url'].should == "http://www.example.com/api/v1/files/#{attachment.id}/#{attachment.uuid}/status"
@@ -213,7 +216,7 @@ shared_examples_for "file uploads api" do
 
     local_storage!
     # step 1, preflight
-    Canvas::HTTP.expects(:get).with(url).raises(Timeout::Error)
+    CanvasHttp.expects(:get).with(url).raises(Timeout::Error)
     json = preflight({ :name => filename, :size => 20, :url => url })
     attachment = Attachment.order(:id).last
     json['status_url'].should == "http://www.example.com/api/v1/files/#{attachment.id}/#{attachment.uuid}/status"
@@ -232,7 +235,7 @@ shared_examples_for "file uploads api" do
 
     local_storage!
     # step 1, preflight
-    Canvas::HTTP.expects(:get).with(url).raises(Canvas::HTTP::TooManyRedirectsError)
+    CanvasHttp.expects(:get).with(url).raises(CanvasHttp::TooManyRedirectsError)
     json = preflight({ :name => filename, :size => 20, :url => url })
     attachment = Attachment.order(:id).last
     attachment.workflow_state.should == 'unattached'
@@ -254,7 +257,7 @@ shared_examples_for "file uploads api" do
 end
 
 shared_examples_for "file uploads api with folders" do
-  it_should_behave_like "file uploads api"
+  include_examples "file uploads api"
 
   it "should allow specifying a folder with deprecated argument name" do
     preflight({ :name => "with_path.txt", :folder => "files/a/b/c/mypath" })
@@ -312,7 +315,7 @@ shared_examples_for "file uploads api with folders" do
     a1 = Attachment.create!(:folder => @folder, :context => context, :filename => "test.txt", :uploaded_data => StringIO.new("first"))
     json = preflight({ :name => "test.txt", :folder => "test", :url => "http://www.example.com/test" })
     attachment = Attachment.order(:id).last
-    Canvas::HTTP.expects(:get).with("http://www.example.com/test").yields(FakeHttpResponse.new(200, "second"))
+    CanvasHttp.expects(:get).with("http://www.example.com/test").yields(FakeHttpResponse.new(200, "second"))
     run_jobs
 
     a1.reload.should be_deleted
@@ -349,7 +352,7 @@ shared_examples_for "file uploads api with folders" do
     a1 = Attachment.create!(:folder => @folder, :context => context, :filename => "test.txt", :uploaded_data => StringIO.new("first"))
     json = preflight({ :name => "test.txt", :folder => "test", :on_duplicate => 'rename', :url => "http://www.example.com/test" })
     attachment = Attachment.order(:id).last
-    Canvas::HTTP.expects(:get).with("http://www.example.com/test").yields(FakeHttpResponse.new(200, "second"))
+    CanvasHttp.expects(:get).with("http://www.example.com/test").yields(FakeHttpResponse.new(200, "second"))
     run_jobs
 
     a1.reload.should be_available
@@ -461,7 +464,7 @@ shared_examples_for "file uploads api with quotas" do
     json = preflight({ :name => "test.txt", :url => "http://www.example.com/test" })
     status_url = json['status_url']
     attachment = Attachment.order(:id).last
-    Canvas::HTTP.expects(:get).with("http://www.example.com/test").yields(FakeHttpResponse.new(200, (" " * 2.megabytes)))
+    CanvasHttp.expects(:get).with("http://www.example.com/test").yields(FakeHttpResponse.new(200, (" " * 2.megabytes)))
     run_jobs
 
     json = api_call(:get, status_url, {:id => attachment.id.to_s, :controller => 'files', :action => 'api_file_status', :format => 'json', :uuid => attachment.uuid})

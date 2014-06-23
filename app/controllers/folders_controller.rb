@@ -19,28 +19,89 @@
 # @API Files
 # @subtopic Folders
 #
-# @object Folder
+# @model Folder
 #     {
-#       "context_type": "Course",
-#       "context_id": 1401,
-#       "files_count": 0,
-#       "position": 3,
-#       "updated_at": "2012-07-06T14:58:50Z",
-#       "folders_url": "https://www.example.com/api/v1/folders/2937/folders",
-#       "files_url": "https://www.example.com/api/v1/folders/2937/files",
-#       "full_name": "course files/11folder",
-#       "lock_at": null,
-#       "id": 2937,
-#       "folders_count": 0,
-#       "name": "11folder",
-#       "parent_folder_id": 2934,
-#       "created_at": "2012-07-06T14:58:50Z",
-#       "unlock_at": null,
-#       "hidden": null,
-#       "hidden_for_user": false,
-#       "locked": true,
-#       "locked_for_user": false
+#       "id": "Folder",
+#       "description": "",
+#       "properties": {
+#         "context_type": {
+#           "example": "Course",
+#           "type": "string"
+#         },
+#         "context_id": {
+#           "example": 1401,
+#           "type": "integer"
+#         },
+#         "files_count": {
+#           "example": 0,
+#           "type": "integer"
+#         },
+#         "position": {
+#           "example": 3,
+#           "type": "integer"
+#         },
+#         "updated_at": {
+#           "example": "2012-07-06T14:58:50Z",
+#           "type": "datetime"
+#         },
+#         "folders_url": {
+#           "example": "https://www.example.com/api/v1/folders/2937/folders",
+#           "type": "string"
+#         },
+#         "files_url": {
+#           "example": "https://www.example.com/api/v1/folders/2937/files",
+#           "type": "string"
+#         },
+#         "full_name": {
+#           "example": "course files/11folder",
+#           "type": "string"
+#         },
+#         "lock_at": {
+#           "example": "2012-07-06T14:58:50Z",
+#           "type": "datetime"
+#         },
+#         "id": {
+#           "example": 2937,
+#           "type": "integer"
+#         },
+#         "folders_count": {
+#           "example": 0,
+#           "type": "integer"
+#         },
+#         "name": {
+#           "example": "11folder",
+#           "type": "string"
+#         },
+#         "parent_folder_id": {
+#           "example": 2934,
+#           "type": "integer"
+#         },
+#         "created_at": {
+#           "example": "2012-07-06T14:58:50Z",
+#           "type": "datetime"
+#         },
+#         "unlock_at": {
+#           "type": "datetime"
+#         },
+#         "hidden": {
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "hidden_for_user": {
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "locked": {
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "locked_for_user": {
+#           "example": false,
+#           "type": "boolean"
+#         }
+#       }
 #     }
+#
 class FoldersController < ApplicationController
   include Api::V1::Folders
   include Api::V1::Attachment
@@ -78,11 +139,20 @@ class FoldersController < ApplicationController
       else
         scope = scope.by_name
       end
-      @folders = Api.paginate(scope, self, api_v1_list_folders_url(@context))
+      @folders = Api.paginate(scope, self, api_v1_list_folders_url(folder))
       render :json => folders_json(@folders, @current_user, session, :can_manage_files => can_manage_files)
     end
   end
-  
+
+  def resolve_path
+    if authorized_action(@context, @current_user, :read)
+      can_manage_files = @context.grants_right?(@current_user, session, :manage_files)
+      folders = Folder.resolve_path(@context, params[:full_path], can_manage_files)
+      raise ActiveRecord::RecordNotFound if folders.blank?
+      render json: folders_json(folders, @current_user, session, :can_manage_files => can_manage_files)
+    end
+  end
+
   # @API Get folder
   # @subtopic Folders
   # Returns the details for a folder
@@ -139,7 +209,11 @@ class FoldersController < ApplicationController
           res = {
             :actual_folder => @folder.as_json(folders_options),
             :sub_folders => sub_folders_scope.by_position.map { |f| f.as_json(folders_options) },
-            :files => files.map { |f| f.as_json(files_options)}
+            :files => files.map { |f|
+              f.as_json(files_options).tap { |json|
+                json['attachment']['canvadoc_session_url'] = f.canvadoc_url(@current_user)
+              }
+            }
           }
           format.json { render :json => res }
         end

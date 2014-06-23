@@ -35,9 +35,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
   end
 
   def add_text_to_tiny(text)
-    f('.wiki_switch_views_link').click
+    fj('.wiki_switch_views_link:visible').click
     clear_wiki_rce
-    f('.wiki_switch_views_link').click
+    fj('.wiki_switch_views_link:visible').click
     type_in_tiny('#wiki_page_body', text)
     in_frame "wiki_page_body_ifr" do
       f('#tinymce').send_keys(:return)
@@ -46,9 +46,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
   end
 
   def add_text_to_tiny_no_val(text)
-    f('.wiki_switch_views_link').click
+    fj('.wiki_switch_views_link:visible').click
     clear_wiki_rce
-    f('.wiki_switch_views_link').click
+    fj('.wiki_switch_views_link:visible').click
     type_in_tiny('#wiki_page_body', text)
   end
 
@@ -120,9 +120,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 
   def add_image_to_rce
     wait_for_tiny(keep_trying_until { f("#new_wiki_page") })
-    f('.wiki_switch_views_link').click
+    fj('.wiki_switch_views_link:visible').click
     clear_wiki_rce
-    f('.wiki_switch_views_link').click
+    fj('.wiki_switch_views_link:visible').click
     f('#editor_tabs .ui-tabs-nav li:nth-child(3) a').click
     f('.upload_new_image_link').click
     wiki_page_tools_upload_file('#sidebar_upload_image_form', :image)

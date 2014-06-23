@@ -41,12 +41,16 @@
 #   page_views:
 #     servers:
 #     - 127.0.0.1:9160
-#     keyspace: pageviews
+#     keyspace: page_views
 #   auditors:
 #     servers:
 #     - 127.0.0.1:9160
 #     keyspace: auditors
 # test:
+#   page_views:
+#     servers:
+#     - 127.0.0.1:9160
+#     keyspace: page_views_test
 #   auditors:
 #     servers:
 #     - 127.0.0.1:9160

@@ -62,6 +62,7 @@ describe AuthenticationMethods do
       let(:saml_request) { stub(:generate_request => 'saml_login_url') }
 
       before do
+        pending('requires SAML extension') unless AccountAuthorizationConfig.saml_enabled
         Onelogin::Saml::AuthRequest.stubs(:new => saml_request)
       end
 
@@ -117,6 +118,16 @@ describe AuthenticationMethods do
         @controller.instance_variable_get(:@current_user).should be_nil
         @controller.instance_variable_get(:@current_pseudonym).should be_nil
       end
+
+      it "should not destroy session if user was logged out in the future" do
+        Timecop.freeze(5.minutes.from_now) do
+          @user.stamp_logout_time!
+        end
+        @pseudonym.reload
+        @controller.send(:load_user).should == @user
+        @controller.instance_variable_get(:@current_user).should == @user
+        @controller.instance_variable_get(:@current_pseudonym).should == @pseudonym
+      end
     end
   end
 end
@@ -148,5 +159,6 @@ class Spec::MockController
     options[:target]
   end
 
+  def cookies; {}; end
 end
 

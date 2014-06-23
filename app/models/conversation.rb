@@ -26,6 +26,10 @@ class Conversation < ActiveRecord::Base
   has_many :conversation_message_participants, :through => :conversation_messages
   has_one :stream_item, :as => :asset
   belongs_to :context, :polymorphic => true
+
+  EXPORTABLE_ATTRIBUTES = [:id, :has_attachments, :has_media_objects, :tags, :root_account_ids, :subject, :context_type, :context_id]
+  EXPORTABLE_ASSOCATIONS = [:context]
+
   validates_length_of :subject, :maximum => maximum_string_length, :allow_nil => true
 
   # see also MessageableUser
@@ -40,6 +44,7 @@ class Conversation < ActiveRecord::Base
 
   def reload(options = nil)
     @current_context_strings = {}
+    @participants = nil
     super
   end
 
@@ -75,7 +80,7 @@ class Conversation < ActiveRecord::Base
   end
 
   def self.initiate(users, private, options = {})
-    users = users.uniq_by(&:id)
+    users = users.uniq(&:id)
     user_ids = users.map(&:id)
     private_hash = private ? private_hash_for(users) : nil
     transaction do
@@ -112,84 +117,6 @@ class Conversation < ActiveRecord::Base
       end
       conversation
     end
-  end
-
-  #
-  # ==== Arguments
-  # * <tt>asset</tt> - The asset with conversation_messages to update.
-  # * <tt>options</tt> - Options for special behavior.
-  #
-  # ==== Options
-  # * <tt>:delete_all</tt> - Boolean option. If +true+, all of the asset's conversation messages are destroyed.
-  # * <tt>:only_existing</tt> - Boolean option. If +true+, only existing ones are updated. No new ones are created.
-  # Additional options are passed on further but not directly used here.
-  # * <tt>:update_participants</tt> - Boolean option.
-  # * <tt>:skip_users</tt> - Array of users to skip.
-  # * <tt>:recalculate_count</tt> - Boolean
-  # * <tt>:recalculate_last_authored_at</tt> - Boolean
-  def self.update_all_for_asset(asset, options)
-    transaction do
-      asset.lock!
-      if options[:delete_all]
-        asset.conversation_messages.destroy_all
-        return
-      end
-
-      groups = asset.conversation_groups
-
-      conversations = if groups.empty?
-        []
-      elsif options[:only_existing]
-        groups.first.first.shard.activate do
-          conversation_ids = ConversationParticipant.select(:conversation_id).uniq.
-            where(:private_hash => groups.map { |g|
-              private_hash_for(g)}).map(&:conversation_id)
-          if conversation_ids.empty?
-            []
-          else
-            find_all_by_id(conversation_ids, :lock => true)
-          end
-        end
-      else
-        groups.map{ |g| initiate(g, true) }.each(&:lock!)
-      end
-
-      current_messages = conversations.map{ |c| c.update_for_asset(asset, options) }
-
-      # delete asset messages from obsolete conversations (e.g. once the first
-      # instructor comments on a submission, remove it from conversations
-      # between the submitter and other instructors)
-      (asset.conversation_messages - current_messages).each(&:destroy)
-    end
-  end
-
-  #
-  # ==== Arguments
-  # * <tt>asset</tt> - The asset with conversation_messages to update.
-  # * <tt>options</tt> - Options for special behavior.
-  #
-  # ==== Options
-  # * <tt>:update_participants</tt> - Boolean option.
-  def update_for_asset(asset, options)
-    message = asset.conversation_messages.detect { |m| m.conversation_id == id }
-    if message
-      add_message_to_participants(message, options) # make sure it gets re-added
-    else
-      message = add_message(asset.user, '', options.merge(:asset => asset, :update_participants => false, :root_account_id => asset.context.try(:root_account_id)))
-    end
-    if (data = asset.conversation_message_data).present?
-      message.created_at = data[:created_at]
-      message.author = data[:author]
-      message.body = data[:body]
-      message.save!
-    end
-
-    if options[:update_participants]
-      update_participants message, options
-    else
-      conversation_participants.each{ |cp| cp.update_cached_data!(options.merge(:set_last_message_at => false)) }
-    end
-    message
   end
 
   def add_participants(current_user, users, options={})
@@ -388,7 +315,7 @@ class Conversation < ActiveRecord::Base
         cps = cps.where("user_id NOT IN (?)", skip_users.map(&:user_id)) if skip_users.present?
       end
 
-      cps = cps.where(:user_id => options[:only_users].map(&:id)) if options[:only_users]
+      cps = cps.where(:user_id => (options[:only_users]+[message.author]).map(&:id)) if options[:only_users]
 
       next unless cps.exists?
 
@@ -415,7 +342,8 @@ class Conversation < ActiveRecord::Base
             cp.update_attribute(:tags, updated_tags)
             if cp.user.shard != self.shard
               cp.user.shard.activate do
-                ConversationParticipant.where(:conversation_id => self, :user_id => cp.user_id).update_all(:tags => serialized_tags(cp.tags))
+                ConversationParticipant.where(:conversation_id => self, :user_id => cp.user_id).
+                  update_all(:tags => serialized_tags(cp.tags))
               end
             end
           end
@@ -491,6 +419,9 @@ class Conversation < ActiveRecord::Base
   def update_participants(message, options = {})
     updated = false
     self.conversation_participants.with_each_shard do |conversation_participants|
+      conversation_participants = conversation_participants.where(:user_id =>
+        (options[:only_users]).map(&:id)) if options[:only_users]
+
       skip_ids = options[:skip_users].try(:map, &:id) || [message.author_id]
       skip_ids = [0] if skip_ids.empty?
       update_for_skips = options[:update_for_skips] != false
@@ -508,8 +439,11 @@ class Conversation < ActiveRecord::Base
           WHERE users.id = cp.user_id AND #{cp_conditions}
         SQL
       else
-        User.where("id IN (SELECT user_id FROM conversation_participants cp WHERE #{cp_conditions})").
-            update_all('unread_conversations_count = unread_conversations_count + 1')
+        lock_type = true
+        lock_type = 'FOR NO KEY UPDATE' if User.connection.adapter_name == 'PostgreSQL' && User.connection.send(:postgresql_version) >= 90300
+        # lock the rows in a predefined order to prevent deadlocks
+        ids = User.where(id: ConversationParticipant.from("conversation_participants cp").where(cp_conditions).select(:user_id)).lock(lock_type).order(:id).pluck(:id)
+        User.where(id: ids).update_all('unread_conversations_count = unread_conversations_count + 1')
       end
 
       conversation_participants.where("(last_message_at IS NULL OR subscribed) AND user_id NOT IN (?)", skip_ids).
@@ -581,10 +515,12 @@ class Conversation < ActiveRecord::Base
   def regenerate_private_hash!(user_ids = nil)
     return unless private?
     self.private_hash = Conversation.private_hash_for(user_ids ||
-      Shard.birth.activate { self.conversation_participants.map(&:user_id) } )
+      Shard.birth.activate { self.conversation_participants.reload.map(&:user_id) } )
     return unless private_hash_changed?
     existing = self.shard.activate do
-      ConversationParticipant.find_by_private_hash(private_hash).try(:conversation)
+      ConversationParticipant.send(:with_exclusive_scope) do
+        ConversationParticipant.find_by_private_hash(private_hash).try(:conversation)
+      end
     end
     if existing
       merge_into(existing)
@@ -607,7 +543,7 @@ class Conversation < ActiveRecord::Base
   def merge_into(other)
     transaction do
       new_participants = other.conversation_participants.index_by(&:user_id)
-      ConversationParticipant.skip_callback(:destroy_conversation_message_participants) do
+      ConversationParticipant.suspend_callbacks(:destroy_conversation_message_participants) do
         conversation_participants(true).each do |cp|
           if new_cp = new_participants[cp.user_id]
             new_cp.update_attribute(:workflow_state, cp.workflow_state) if cp.unread? || new_cp.archived?
@@ -636,7 +572,7 @@ class Conversation < ActiveRecord::Base
             if cp.user.shard != self.shard
               cp.user.shard.activate do
                 ConversationParticipant.where(:conversation_id => self, :user_id => cp.user_id).
-                    update_all(:conversation_id => other)
+                  update_all(:conversation_id => other)
               end
             end
             # create a new duplicate cp on the target conversation's shard
@@ -651,7 +587,6 @@ class Conversation < ActiveRecord::Base
           end
         end
       end
-
       if other.shard == self.shard
         conversation_messages.update_all(:conversation_id => other)
       else
@@ -726,8 +661,8 @@ class Conversation < ActiveRecord::Base
     # post-sort and -uniq in Ruby
     if shards.length > 1
       participants.each do |key, value|
-        participants[key] = value.uniq_by(&:id).sort_by do |user|
-          [user.last_authored_at ? -user.last_authored_at.to_f : SortLast, Canvas::ICU.collation_key(user.short_name || user.name)]
+        participants[key] = value.uniq(&:id).sort_by do |user|
+          [user.last_authored_at ? -user.last_authored_at.to_f : CanvasSort::Last, Canvas::ICU.collation_key(user.short_name || user.name)]
         end
       end
     end
@@ -769,12 +704,7 @@ class Conversation < ActiveRecord::Base
   def delete_for_all
     stream_item.try(:destroy_stream_item_instances)
     shard.activate do
-      if CANVAS_RAILS2
-        # bare scoped call avoid Rails 2 HasManyAssociation loading all objects
-        conversation_message_participants.scoped.delete_all
-      else
-        conversation_message_participants.delete_all
-      end
+      conversation_message_participants.scoped.delete_all
     end
     conversation_participants.with_each_shard { |scope| scope.scoped.delete_all; nil }
   end

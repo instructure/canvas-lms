@@ -18,6 +18,7 @@
 
 class SubmissionComment < ActiveRecord::Base
   include SendToStream
+  include HtmlTextHelper
 
   belongs_to :submission #, :touch => true
   belongs_to :author, :class_name => 'User'
@@ -27,6 +28,12 @@ class SubmissionComment < ActiveRecord::Base
   has_many :associated_attachments, :class_name => 'Attachment', :as => :context
   has_many :submission_comment_participants, :dependent => :destroy
   has_many :messages, :as => :context, :dependent => :destroy
+
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :comment, :submission_id, :recipient_id, :author_id, :author_name, :group_comment_id, :created_at, :updated_at, :attachment_ids, :assessment_request_id, :media_comment_id,
+    :media_comment_type, :context_id, :context_type, :cached_attachments, :anonymous, :teacher_only_comment, :hidden
+  ]
+  EXPORTABLE_ASSOCIATIONS = [:submission, :author, :recipient, :assessment_request, :context, :associated_attachments, :submission_comment_participants, :messages]
 
   validates_length_of :comment, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :comment, :minimum => 1, :allow_nil => true, :allow_blank => true
@@ -39,8 +46,6 @@ class SubmissionComment < ActiveRecord::Base
   after_save :check_for_media_object
   after_destroy :delete_other_comments_in_this_group
   after_create :update_participants
-  after_create { |c| c.submission.create_or_update_conversations!(:create) if c.send_to_conversations? }
-  after_destroy { |c| c.submission.create_or_update_conversations!(:destroy) if c.send_to_conversations? }
 
   serialize :cached_attachments
 
@@ -122,7 +127,7 @@ class SubmissionComment < ActiveRecord::Base
   end
 
   def reply_from(opts)
-    raise IncomingMail::IncomingMessageProcessor::UnknownAddressError if self.context.root_account.deleted?
+    raise IncomingMail::Errors::UnknownAddress if self.context.root_account.deleted?
     user = opts[:user]
     message = opts[:text].strip
     user = nil unless user && self.context.users.include?(user)
@@ -200,7 +205,6 @@ class SubmissionComment < ActiveRecord::Base
     if formatted_body = read_attribute(:formatted_body)
       return formatted_body
     end
-    self.extend TextHelper
     res = format_message(comment).first
     res = truncate_html(res, :max_length => truncate, :words => true) if truncate
     res
@@ -212,10 +216,6 @@ class SubmissionComment < ActiveRecord::Base
   
   def avatar_path
     "/images/users/#{User.avatar_key(self.author_id)}"
-  end
-
-  def send_to_conversations?
-    !hidden? && submission.possible_participants_ids.include?(author_id)
   end
 
   def serialization_methods

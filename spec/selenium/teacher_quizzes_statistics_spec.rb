@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/quizzes_common')
 
 describe "quiz statistics" do
-  it_should_behave_like "quizzes selenium tests"
+  include_examples "quizzes selenium tests"
 
   describe "item analysis" do
 
@@ -58,7 +58,7 @@ describe "quiz statistics" do
 
     def generate_item_analysis
       @quiz.reload
-      QuizStatistics::ItemAnalysis::Summary.new(@quiz)
+      Quizzes::QuizStatistics::ItemAnalysis::Summary.new(@quiz)
     end
 
     def answer_question

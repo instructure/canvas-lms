@@ -24,7 +24,7 @@ describe "/users/registered" do
     course_with_student
     view_context
     @user.pseudonyms.create!(:unique_id => "unique@example.com", :password => "asdfaa", :password_confirmation => "asdfaa")
-    assigns[:cc] = @user.communication_channels.create
+    assigns[:cc] = communication_channel(@user)
     assigns[:user] = @user
     render "users/registered"
     response.should_not be_nil

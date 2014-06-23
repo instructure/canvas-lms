@@ -1,0 +1,25 @@
+<table>
+  <%= render partial: 'terms_parameters',
+             locals: {all_terms_option: true} %>
+  <%= render partial: 'date_picker_parameter',
+             locals: {start_at_option: true,
+                      end_at_option: true} %>
+  <tr>
+    <td>
+      <label class="checkbox">
+        <%= check_box_tag 'parameters[include_enrollment_state]' %>
+        <%= t('account_reports.default.include_enrollment_state.check_box',
+                        'Include Enrollment State') %>
+      </label>
+    </td>
+  </tr>
+  <tr>
+    <td><%= t('account_reports.default.enrollment_state.header', %{Enrollment State}) %>
+      <select name="parameters[enrollment_state][]">
+        <option value="all" <%= 'selected' %>><%= t(:all, "All Enrollments") %></option>
+        <option value="active"><%= t(:active, "Active Enrollments") %></option>
+      </select>
+    </td>
+  </tr>
+
+</table>

@@ -11,10 +11,6 @@
 # Run "rake -D time" for a list of tasks for finding time zone names. Comment line to use default local time.
 config.time_zone = 'UTC'
 
-if ENV['RUNNING_AS_DAEMON'] == 'true'
-  config.log_path = Rails.root+'log/delayed_job.log'
-end
-
 log_config = File.exists?(Rails.root+"config/logging.yml") && YAML.load_file(Rails.root+"config/logging.yml")[CANVAS_RAILS2 ? RAILS_ENV : Rails.env]
 log_config = { 'logger' => 'rails', 'log_level' => 'debug' }.merge(log_config || {})
 opts = {}
@@ -38,6 +34,11 @@ else
   log_path = CANVAS_RAILS2 ?
     config.log_path :
     config.paths['log'].first
+
+  if ENV['RUNNING_AS_DAEMON'] == 'true'
+    log_path = Rails.root+'log/delayed_job.log'
+  end
+
   config.logger = CanvasLogger.new(log_path, log_level, opts)
 end
 
@@ -85,9 +86,11 @@ config.to_prepare do
   ActiveSupport::JSON::Encoding.escape_html_entities_in_json = true
 end
 
-# this patch is perfectly placed to go in as soon as the PostgreSQLAdapter
-# is required for the first time, but before it's actually used
-# XXX: Rails3
+# This patch is perfectly placed to go in as soon as the PostgreSQLAdapter
+# is required for the first time, but before it's actually used.
+#
+# This patch won't be required in Rails >= 4.0.0, which supports params such as
+# connect_timeout.
 if CANVAS_RAILS2
   Rails::Initializer.class_eval do
     def initialize_database_with_postgresql_patches
@@ -118,6 +121,33 @@ if CANVAS_RAILS2
       end
     end
     alias_method_chain :initialize_database, :postgresql_patches
+  end
+else
+  ActiveRecord::Base::ConnectionSpecification.class_eval do
+    def initialize_with_postgresql_patches(config, adapter_method)
+      initialize_without_postgresql_patches(config, adapter_method)
+      if adapter_method == "postgresql_connection" && !defined?(@@postgresql_patches_applied)
+        ActiveRecord::Base.class_eval do
+          def self.postgresql_connection(config) # :nodoc:
+            config = config.symbolize_keys
+            config[:user] ||= config.delete(:username) if config.key?(:username)
+
+            if config.key?(:database)
+              config[:dbname] = config[:database]
+            else
+              raise ArgumentError, "No database specified. Missing argument: database."
+            end
+            conn_params = config.slice(:host, :port, :dbname, :user, :password, :connect_timeout)
+
+            # The postgres drivers don't allow the creation of an unconnected PGconn object,
+            # so just pass a nil connection object for the time being.
+            ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.new(nil, logger, [conn_params], config)
+          end
+        end
+        @@postgresql_patches_applied = true
+      end
+    end
+    alias_method_chain :initialize, :postgresql_patches
   end
 end
 
@@ -180,3 +210,14 @@ end
 # since that could leak information (e.g. valid vs invalid username on
 # login page)
 config.action_view.field_error_proc = Proc.new { |html_tag, instance| html_tag }
+
+unless CANVAS_RAILS2
+  class ExceptionsApp
+    def call(env)
+      @app_controller ||= ActionDispatch::Routing::RouteSet::Dispatcher.new.controller(:controller => 'application')
+      @app_controller.action('rescue_action_dispatch_exception').call(env)
+    end
+  end
+
+  config.exceptions_app = ExceptionsApp.new
+end

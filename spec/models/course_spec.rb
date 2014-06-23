@@ -1,4 +1,3 @@
-#
 # Copyright (C) 2011 - 2012 Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -17,6 +16,8 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
+
+require 'csv'
 require 'socket'
 
 describe Course do
@@ -90,11 +91,16 @@ describe Course do
   end
 
   context "#old_gradebook_visible?" do
-    it "should always return false when enrollment count is large enough" do
-        @course.large_roster = false
-        @course.old_gradebook_visible?.should be_true
-        @course.students.stubs(:count).returns(251)
+    it "should return true for small enrollments" do
+      @course.large_roster = false
+      @course.old_gradebook_visible?.should be_true
+    end
+
+    it "should return false when enrollment count is large enough" do
+      enable_cache do
+        Rails.cache.write(['student_count', @course].cache_key, 251)
         @course.old_gradebook_visible?.should be_false
+      end
     end
   end
 
@@ -108,6 +114,23 @@ describe Course do
       @course.allow_student_discussion_topics = false
       @course.save!
       @course.allow_student_discussion_topics.should == false
+    end
+  end
+
+  describe "#time_zone" do
+    before do
+      @root_account = Account.default
+    end
+
+    it "should use provided value when set, regardless of root account setting" do
+      @root_account.default_time_zone = 'America/Chicago'
+      @course.time_zone = 'America/New_York'
+      @course.time_zone.should == ActiveSupport::TimeZone['Eastern Time (US & Canada)']
+    end
+
+    it "should default to root account value if not set" do
+      @root_account.default_time_zone = 'America/Chicago'
+      @course.time_zone.should == ActiveSupport::TimeZone['Central Time (US & Canada)']
     end
   end
 
@@ -378,7 +401,12 @@ describe Course do
       @course.self_enrollment = true
       @course.sis_source_id = 'sis_id'
       @course.stuck_sis_fields = [].to_set
+      profile = @course.profile
+      profile.description = "description"
+      profile.save!
       @course.save!
+      @course.reload
+
       @course.course_sections.should_not be_empty
       @course.students.should == [@student]
       @course.stuck_sis_fields.should == [].to_set
@@ -436,8 +464,13 @@ describe Course do
       @course.stuck_sis_fields = [].to_set
       @course.name = "course_name"
       @course.stuck_sis_fields.should == [:name].to_set
+      profile = @course.profile
+      profile.description = "description"
+      profile.save!
       @course.save!
       @course.stuck_sis_fields.should == [:name].to_set
+
+      @course.reload
 
       @new_course = @course.reset_content
 
@@ -580,47 +613,47 @@ describe Course do
 end
 
 describe Course, "enroll" do
-  
+
   before(:each) do
     @course = Course.create(:name => "some_name")
     @user = user_with_pseudonym
   end
-  
+
   it "should be able to enroll a student" do
     @course.enroll_student(@user)
     @se = @course.student_enrollments.first
     @se.user_id.should eql(@user.id)
     @se.course_id.should eql(@course.id)
   end
-  
+
   it "should be able to enroll a TA" do
     @course.enroll_ta(@user)
     @tae = @course.ta_enrollments.first
     @tae.user_id.should eql(@user.id)
     @tae.course_id.should eql(@course.id)
   end
-  
+
   it "should be able to enroll a teacher" do
     @course.enroll_teacher(@user)
     @te = @course.teacher_enrollments.first
     @te.user_id.should eql(@user.id)
     @te.course_id.should eql(@course.id)
   end
-  
+
   it "should be able to enroll a designer" do
     @course.enroll_designer(@user)
     @de = @course.designer_enrollments.first
     @de.user_id.should eql(@user.id)
     @de.course_id.should eql(@course.id)
   end
-  
+
   it "should enroll a student as creation_pending if the course isn't published" do
     @se = @course.enroll_student(@user)
     @se.user_id.should eql(@user.id)
     @se.course_id.should eql(@course.id)
     @se.should be_creation_pending
   end
-  
+
   it "should enroll a teacher as invited if the course isn't published" do
     Notification.create(:name => "Enrollment Registration", :category => "registration")
     @tae = @course.enroll_ta(@user)
@@ -629,7 +662,7 @@ describe Course, "enroll" do
     @tae.should be_invited
     @tae.messages_sent.should be_include("Enrollment Registration")
   end
-  
+
   it "should enroll a ta as invited if the course isn't published" do
     Notification.create(:name => "Enrollment Registration", :category => "registration")
     @te = @course.enroll_teacher(@user)
@@ -651,7 +684,7 @@ end
 describe Course, "score_to_grade" do
   it "should correctly map scores to grades" do
     default = GradingStandard.default_grading_standard
-    default.to_json.should eql([["A", 0.94], ["A-", 0.90], ["B+", 0.87], ["B", 0.84], ["B-", 0.80], ["C+", 0.77], ["C", 0.74], ["C-", 0.70], ["D+", 0.67], ["D", 0.64], ["D-", 0.61], ["F", 0]].to_json)
+    default.to_json.should == ([["A", 0.94], ["A-", 0.90], ["B+", 0.87], ["B", 0.84], ["B-", 0.80], ["C+", 0.77], ["C", 0.74], ["C-", 0.70], ["D+", 0.67], ["D", 0.64], ["D-", 0.61], ["F", 0.0]].to_json)
     course_model
     @course.score_to_grade(95).should eql(nil)
     @course.grading_standard_id = 0
@@ -685,7 +718,6 @@ describe Course, "score_to_grade" do
     @course.score_to_grade(0).should eql("F")
     @course.score_to_grade(-100).should eql("F")
   end
-  
 end
 
 describe Course, "gradebook_to_csv" do
@@ -698,7 +730,7 @@ describe Course, "gradebook_to_csv" do
     @course.recompute_student_scores
     @user.reload
     @course.reload
-    
+
     csv = @course.gradebook_to_csv
     csv.should_not be_nil
     rows = CSV.parse(csv)
@@ -710,24 +742,24 @@ describe Course, "gradebook_to_csv" do
     rows[1][-2].should == "(read only)"
     rows[2][-2].should == "100"
   end
-  
-  it "should order assignments by position" do
+
+  it "should order assignments and groups by position" do
     course_with_student(:active_all => true)
 
     @assignment_group_1, @assignment_group_2 = [@course.assignment_groups.create!(:name => "Some Assignment Group 1", :group_weight => 100), @course.assignment_groups.create!(:name => "Some Assignment Group 2", :group_weight => 100)].sort_by{|a| a.id}
 
     now = Time.now
 
-    @course.assignments.create!(:title => "Assignment 01", :due_at => now + 1.days, :position => 3, :assignment_group => @assignment_group_1)
-    @course.assignments.create!(:title => "Assignment 02", :due_at => now + 1.days, :position => 1, :assignment_group => @assignment_group_1)
+    g1a1 = @course.assignments.create!(:title => "Assignment 01", :due_at => now + 1.days, :position => 3, :assignment_group => @assignment_group_1, :points_possible => 10)
+    @course.assignments.create!(:title => "Assignment 02", :due_at => now + 1.days, :position => 1, :assignment_group => @assignment_group_1, :points_possible => 10)
     @course.assignments.create!(:title => "Assignment 03", :due_at => now + 1.days, :position => 2, :assignment_group => @assignment_group_1)
     @course.assignments.create!(:title => "Assignment 05", :due_at => now + 4.days, :position => 4, :assignment_group => @assignment_group_1)
     @course.assignments.create!(:title => "Assignment 04", :due_at => now + 5.days, :position => 5, :assignment_group => @assignment_group_1)
     @course.assignments.create!(:title => "Assignment 06", :due_at => now + 7.days, :position => 6, :assignment_group => @assignment_group_1)
     @course.assignments.create!(:title => "Assignment 07", :due_at => now + 6.days, :position => 7, :assignment_group => @assignment_group_1)
-    @course.assignments.create!(:title => "Assignment 08", :due_at => now + 8.days, :position => 1, :assignment_group => @assignment_group_2)
+    g2a1 = @course.assignments.create!(:title => "Assignment 08", :due_at => now + 8.days, :position => 1, :assignment_group => @assignment_group_2, :points_possible => 10)
     @course.assignments.create!(:title => "Assignment 09", :due_at => now + 8.days, :position => 9, :assignment_group => @assignment_group_1)
-    @course.assignments.create!(:title => "Assignment 10", :due_at => now + 8.days, :position => 10, :assignment_group => @assignment_group_2)
+    @course.assignments.create!(:title => "Assignment 10", :due_at => now + 8.days, :position => 10, :assignment_group => @assignment_group_2, :points_possible => 10)
     @course.assignments.create!(:title => "Assignment 12", :due_at => now + 11.days, :position => 11, :assignment_group => @assignment_group_1)
     @course.assignments.create!(:title => "Assignment 14", :due_at => nil, :position => 14, :assignment_group => @assignment_group_1)
     @course.assignments.create!(:title => "Assignment 11", :due_at => now + 11.days, :position => 11, :assignment_group => @assignment_group_1)
@@ -737,15 +769,32 @@ describe Course, "gradebook_to_csv" do
     @user.reload
     @course.reload
 
+    g1a1.grade_student(@user, grade: 10)
+    g2a1.grade_student(@user, grade: 5)
+
     csv = @course.gradebook_to_csv
     csv.should_not be_nil
     rows = CSV.parse(csv)
     rows.length.should equal(3)
-    assignments = []
+    assignments, groups = [], []
     rows[0].each do |column|
-      assignments << column.sub(/ \([0-9]+\)/, '') if column =~ /Assignment/
+      assignments << column.sub(/ \([0-9]+\)/, '') if column =~ /Assignment \d+/
+      groups << column if column =~ /Some Assignment Group/
     end
     assignments.should == ["Assignment 02", "Assignment 03", "Assignment 01", "Assignment 05",  "Assignment 04", "Assignment 06", "Assignment 07", "Assignment 09", "Assignment 11", "Assignment 12", "Assignment 13", "Assignment 14", "Assignment 08", "Assignment 10"]
+    groups.should == ["Some Assignment Group 1 Current Points",
+                      "Some Assignment Group 1 Final Points",
+                      "Some Assignment Group 1 Current Score",
+                      "Some Assignment Group 1 Final Score",
+                      "Some Assignment Group 2 Current Points",
+                      "Some Assignment Group 2 Final Points",
+                      "Some Assignment Group 2 Current Score",
+                      "Some Assignment Group 2 Final Score"]
+
+    rows[2][-10].should == "100"    # ag1 current score
+    rows[2][-9].should  == "50"     # ag1 final score
+    rows[2][-6].should  == "50"     # ag2 current score
+    rows[2][-5].should  == "25"     # ag2 final score
   end
 
   it "should alphabetize by sortable name with the test student at the end" do
@@ -763,6 +812,29 @@ describe Course, "gradebook_to_csv" do
      rows[5][0]].should == ["Aardvark, Aardvark", "Ned, Ned", "Zed, Zed", "Student, Test"]
   end
 
+  it "should include all section names in alphabetical order" do
+    course
+    sections = []
+    students = []
+    ['COMPSCI 123 LEC 001', 'COMPSCI 123 DIS 101', 'COMPSCI 123 DIS 102'].each do |section_name|
+      add_section(section_name)
+      sections << @course_section
+    end
+    3.times {|i| students << student_in_section(sections[0], :user => user(:name => "Student #{i}")) }
+
+    @course.enroll_user(students[0], 'StudentEnrollment', :section => sections[1], :enrollment_state => 'active', :allow_multiple_enrollments => true)
+    @course.enroll_user(students[2], 'StudentEnrollment', :section => sections[1], :enrollment_state => 'active', :allow_multiple_enrollments => true)
+    @course.enroll_user(students[2], 'StudentEnrollment', :section => sections[2], :enrollment_state => 'active', :allow_multiple_enrollments => true)
+
+    csv = @course.gradebook_to_csv
+    csv.should_not be_nil
+    rows = CSV.parse(csv)
+    rows.length.should equal(5)
+    rows[2][2].should == "COMPSCI 123 DIS 101 and COMPSCI 123 LEC 001"
+    rows[3][2].should == "COMPSCI 123 LEC 001"
+    rows[4][2].should == "COMPSCI 123 DIS 101, COMPSCI 123 DIS 102, and COMPSCI 123 LEC 001"
+  end
+
   it "should generate csv with final grade if enabled" do
     course_with_student(:active_all => true)
     @course.grading_standard_id = 0
@@ -775,7 +847,7 @@ describe Course, "gradebook_to_csv" do
     @course.recompute_student_scores
     @user.reload
     @course.reload
-    
+
     csv = @course.gradebook_to_csv
     csv.should_not be_nil
     rows = CSV.parse(csv)
@@ -818,9 +890,9 @@ describe Course, "gradebook_to_csv" do
     rows[0][2].should == 'SIS User ID'
     rows[0][3].should == 'SIS Login ID'
     rows[0][4].should == 'Section'
-    rows[1][2].should == ''
-    rows[1][3].should == ''
-    rows[1][4].should == ''
+    rows[1][2].should == nil
+    rows[1][3].should == nil
+    rows[1][4].should == nil
     rows[1][-1].should == '(read only)'
     rows[2][1].should == @user1.id.to_s
     rows[2][2].should == 'SISUSERID'
@@ -833,6 +905,52 @@ describe Course, "gradebook_to_csv" do
     rows[4][3].should be_nil
   end
 
+  it "should include primary domain if a trust exists" do
+    course(:active_all => true)
+    @user1 = user_with_pseudonym(:active_all => true, :name => 'Brian', :username => 'brianp@instructure.com')
+    student_in_course(:user => @user1)
+    account2 = account_model
+    @user2 = user_with_pseudonym(:active_all => true, :name => 'Cody', :username => 'cody@instructure.com', :account => account2)
+    student_in_course(:user => @user2)
+    @user3 = user(:active_all => true, :name => 'JT')
+    student_in_course(:user => @user3)
+    @user1.pseudonym.sis_user_id = "SISUSERID"
+    @user1.pseudonym.save!
+    @user2.pseudonym.sis_user_id = "SISUSERID"
+    @user2.pseudonym.save!
+    @course.reload
+    @course.root_account.stubs(:trust_exists?).returns(true)
+    @course.root_account.any_instantiation.stubs(:trusted_account_ids).returns([account2.id])
+    HostUrl.expects(:context_host).with(@course.root_account).returns('school1')
+    HostUrl.expects(:context_host).with(account2).returns('school2')
+
+    csv = @course.gradebook_to_csv(:include_sis_id => true)
+    csv.should_not be_nil
+    rows = CSV.parse(csv)
+    rows.length.should == 5
+    rows[0][1].should == 'ID'
+    rows[0][2].should == 'SIS User ID'
+    rows[0][3].should == 'SIS Login ID'
+    rows[0][4].should == 'Root Account'
+    rows[0][5].should == 'Section'
+    rows[1][2].should == nil
+    rows[1][3].should == nil
+    rows[1][4].should == nil
+    rows[1][5].should == nil
+    rows[2][1].should == @user1.id.to_s
+    rows[2][2].should == 'SISUSERID'
+    rows[2][3].should == @user1.pseudonym.unique_id
+    rows[2][4].should == 'school1'
+    rows[3][1].should == @user2.id.to_s
+    rows[3][2].should == 'SISUSERID'
+    rows[3][3].should == @user2.pseudonym.unique_id
+    rows[3][4].should == 'school2'
+    rows[4][1].should == @user3.id.to_s
+    rows[4][2].should be_nil
+    rows[4][3].should be_nil
+    rows[4][4].should be_nil
+  end
+
   context "accumulated points" do
     before do
       student_in_course(:active_all => true)
@@ -842,6 +960,12 @@ describe Course, "gradebook_to_csv" do
 
     it "includes points for unweighted courses" do
       csv = CSV.parse(@course.gradebook_to_csv)
+      csv[0][-8].should == "Assignments Current Points"
+      csv[0][-7].should == "Assignments Final Points"
+      csv[1][-8].should == "(read only)"
+      csv[1][-7].should == "(read only)"
+      csv[2][-8].should == "8"
+      csv[2][-7].should == "8"
       csv[0][-4].should == "Current Points"
       csv[0][-3].should == "Final Points"
       csv[1][-4].should == "(read only)"
@@ -853,6 +977,8 @@ describe Course, "gradebook_to_csv" do
     it "doesn't include points for weighted courses" do
       @course.update_attribute(:group_weighting_scheme, 'percent')
       csv = CSV.parse(@course.gradebook_to_csv)
+      csv[0][-8].should_not == "Assignments Current Points"
+      csv[0][-7].should_not == "Assignments Final Points"
       csv[0][-4].should_not == "Current Points"
       csv[0][-3].should_not == "Final Points"
     end
@@ -902,12 +1028,12 @@ describe Course, "gradebook_to_csv" do
       rows[0][2].should == 'SIS User ID'
       rows[0][3].should == 'SIS Login ID'
       rows[0][4].should == 'Section'
-      rows[1][0].should == ''
+      rows[1][0].should == nil
       rows[1][5].should == 'Muted'
-      rows[1][6].should == ''
-      rows[2][2].should == ''
-      rows[2][3].should == ''
-      rows[2][4].should == ''
+      rows[1][6].should == nil
+      rows[2][2].should == nil
+      rows[2][3].should == nil
+      rows[2][4].should == nil
       rows[2][-1].should == '(read only)'
       rows[3][1].should == @user1.id.to_s
       rows[3][2].should == 'SISUSERID'
@@ -942,16 +1068,23 @@ describe Course, "update_account_associations" do
   it "should update account associations correctly" do
     account1 = Account.create!(:name => 'first')
     account2 = Account.create!(:name => 'second')
-    
+
     @c = Course.create!(:account => account1)
     @c.associated_accounts.length.should eql(1)
     @c.associated_accounts.first.should eql(account1)
-    
+
     @c.account = account2
     @c.save!
     @c.reload
     @c.associated_accounts.length.should eql(1)
     @c.associated_accounts.first.should eql(account2)
+  end
+
+  it "should act like it's associated to its account and root account, even if associations are busted" do
+    account1 = Account.default.sub_accounts.create!
+    c = account1.courses.create!
+    c.course_account_associations.scoped.delete_all
+    c.associated_accounts.should == [account1, Account.default]
   end
 end
 
@@ -984,20 +1117,20 @@ describe Course, "tabs_available" do
     tab_ids.length.should > 0
     @course.tabs_available(@user).map{|t| t[:label] }.compact.length.should eql(tab_ids.length)
   end
-  
+
   it "should hide unused tabs if not an admin" do
     course_with_student(:active_all => true)
     tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
     tab_ids.should_not be_include(Course::TAB_SETTINGS)
     tab_ids.length.should > 0
   end
-  
+
   it "should show grades tab for students" do
     course_with_student(:active_all => true)
     tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
     tab_ids.should be_include(Course::TAB_GRADES)
   end
-  
+
   it "should not show grades tab for observers" do
     course_with_student(:active_all => true)
     @student = @user
@@ -1008,7 +1141,7 @@ describe Course, "tabs_available" do
     tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
     tab_ids.should_not be_include(Course::TAB_GRADES)
   end
-    
+
   it "should show grades tab for observers if they are linked to a student" do
     course_with_student(:active_all => true)
     @student = @user
@@ -1063,7 +1196,7 @@ describe Course, "tabs_available" do
     tabs.should be_include(t1.asset_string)
     tabs.should_not be_include(t2.asset_string)
   end
-  
+
   it "should not include tabs for external tools if opt[:include_external] is false" do
     course_with_student(:active_all => true)
 
@@ -1140,7 +1273,7 @@ describe Course, "backup" do
     data.any?{|i| i.is_a?(DiscussionTopic)}.should eql(true)
     data.any?{|i| i.is_a?(CalendarEvent)}.should eql(true)
   end
-  
+
   it "should backup to a valid json string" do
     course_to_backup
     data = @course.backup_to_json
@@ -1151,7 +1284,7 @@ describe Course, "backup" do
     parse.should be_is_a(Array)
     parse.length.should > 0
   end
-  
+
   it "should not cross learning outcomes with learning outcome groups in the association" do
     pending('fails when being run in the single thread rake task')
     # set up two courses with two outcomes
@@ -1185,7 +1318,7 @@ describe Course, "backup" do
     default_group = course.root_outcome_group
     other_group = course.learning_outcome_groups.create!(:title => 'other group')
     default_group.adopt_outcome_group(other_group)
-    
+
     course.should_not have_outcomes
   end
 
@@ -1209,20 +1342,20 @@ describe Course, 'grade_publishing' do
     @course.save!
     @course_section = @course.default_section
   end
-  
+
   after(:each) do
     Course.valid_grade_export_types.delete("test_export")
   end
 
   context 'mocked plugin settings' do
-    
+
     before(:each) do
       @plugin_settings = Canvas::Plugin.find!("grade_export").default_settings.clone
       @plugin = mock()
       Canvas::Plugin.stubs("find!".to_sym).with('grade_export').returns(@plugin)
       @plugin.stubs(:settings).returns{@plugin_settings}
     end
-    
+
     context 'grade_publishing_status_translation' do
       it 'should work with nil statuses and messages' do
         @course.grade_publishing_status_translation(nil, nil).should == "Unpublished"
@@ -1878,7 +2011,7 @@ describe Course, 'grade_publishing' do
       end
 
     end
-  
+
     context 'generate_grade_publishing_csv_output' do
 
       def add_pseudonym(enrollment, account, unique_id, sis_user_id)
@@ -2167,7 +2300,7 @@ describe Course, 'grade_publishing' do
   end
 
   context 'integration suite' do
-    def quick_sanity_check(user)
+    def quick_sanity_check(user, expect_success = true)
       Course.valid_grade_export_types["test_export"] = {
           :name => "test export",
           :callback => lambda {|course, enrollments, publishing_user, publishing_pseudonym|
@@ -2178,26 +2311,22 @@ describe Course, 'grade_publishing' do
           },
           :requires_grading_standard => false, :requires_publishing_pseudonym => true}
 
-      server, server_thread, post_lines = start_test_http_server
-
       @plugin = Canvas::Plugin.find!('grade_export')
       @ps = PluginSetting.new(:name => @plugin.id, :settings => @plugin.default_settings)
       @ps.posted_settings = @plugin.default_settings.merge({
           :format_type => "test_export",
           :wait_for_success => "no",
-          :publish_endpoint => "http://localhost:#{server.addr[1]}/endpoint"
+          :publish_endpoint => "http://localhost/endpoint"
         })
       @ps.save!
 
       @course.grading_standard_id = 0
+      if expect_success
+        SSLCommon.expects(:post_data).with("http://localhost/endpoint", "test-jt-data", "application/jtmimetype", {})
+      else
+        SSLCommon.expects(:post_data).never
+      end
       @course.publish_final_grades(user)
-      server_thread.join
-      verify_post_matches(post_lines, [
-          "POST /endpoint HTTP/1.1",
-          "Accept: */*",
-          "Content-Type: application/jtmimetype",
-          "",
-          "test-jt-data"])
     end
 
     it 'should pass a quick sanity check' do
@@ -2210,7 +2339,7 @@ describe Course, 'grade_publishing' do
 
     it 'should not allow grade publishing for a user that is disallowed' do
       @user = User.new
-      (lambda { quick_sanity_check(@user) }).should raise_error("publishing disallowed for this publishing user")
+      (lambda { quick_sanity_check(@user, false) }).should raise_error("publishing disallowed for this publishing user")
     end
 
     it 'should not allow grade publishing for a user with a pseudonym in the wrong account' do
@@ -2218,7 +2347,7 @@ describe Course, 'grade_publishing' do
       @pseudonym.account = account_model
       @pseudonym.sis_user_id = "U1"
       @pseudonym.save!
-      (lambda { quick_sanity_check(@user) }).should raise_error("publishing disallowed for this publishing user")
+      (lambda { quick_sanity_check(@user, false) }).should raise_error("publishing disallowed for this publishing user")
     end
 
     it 'should not allow grade publishing for a user with a pseudonym without a sis id' do
@@ -2226,7 +2355,7 @@ describe Course, 'grade_publishing' do
       @pseudonym.account_id = @course.root_account_id
       @pseudonym.sis_user_id = nil
       @pseudonym.save!
-      (lambda { quick_sanity_check(@user) }).should raise_error("publishing disallowed for this publishing user")
+      (lambda { quick_sanity_check(@user, false) }).should raise_error("publishing disallowed for this publishing user")
     end
 
     it 'should publish csv' do
@@ -2235,27 +2364,20 @@ describe Course, 'grade_publishing' do
       @pseudonym.account_id = @course.root_account_id
       @pseudonym.save!
 
-      server, server_thread, post_lines = start_test_http_server
-
       @plugin = Canvas::Plugin.find!('grade_export')
       @ps = PluginSetting.new(:name => @plugin.id, :settings => @plugin.default_settings)
       @ps.posted_settings = @plugin.default_settings.merge({
           :format_type => "instructure_csv",
           :wait_for_success => "no",
-          :publish_endpoint => "http://localhost:#{server.addr[1]}/endpoint"
+          :publish_endpoint => "http://localhost/endpoint"
         })
       @ps.save!
 
       @course.grading_standard_id = 0
+      csv = "publisher_id,publisher_sis_id,course_id,course_sis_id,section_id,section_sis_id,student_id," +
+          "student_sis_id,enrollment_id,enrollment_status,score,grade\n"
+      SSLCommon.expects(:post_data).with("http://localhost/endpoint", csv, "text/csv", {})
       @course.publish_final_grades(@user)
-      server_thread.join
-      verify_post_matches(post_lines, [
-          "POST /endpoint HTTP/1.1",
-          "Accept: */*",
-          "Content-Type: text/csv",
-          "",
-          "publisher_id,publisher_sis_id,course_id,course_sis_id,section_id,section_sis_id,student_id," +
-          "student_sis_id,enrollment_id,enrollment_status,score,grade\n"])
     end
 
     it 'should publish grades' do
@@ -2351,24 +2473,16 @@ describe Course, 'grade_publishing' do
       teacher = Pseudonym.find_by_sis_user_id("T1")
       teacher.should_not be_nil
 
-      server, server_thread, post_lines = start_test_http_server
-
       @plugin = Canvas::Plugin.find!('grade_export')
       @ps = PluginSetting.new(:name => @plugin.id, :settings => @plugin.default_settings)
       @ps.posted_settings = @plugin.default_settings.merge({
           :format_type => "instructure_csv",
           :wait_for_success => "no",
-          :publish_endpoint => "http://localhost:#{server.addr[1]}/endpoint"
+          :publish_endpoint => "http://localhost/endpoint"
         })
       @ps.save!
 
-      @course.publish_final_grades(teacher.user)
-      server_thread.join
-      verify_post_matches(post_lines, [
-          "POST /endpoint HTTP/1.1",
-          "Accept: */*",
-          "Content-Type: text/csv",
-          "",
+      csv =
           "publisher_id,publisher_sis_id,course_id,course_sis_id,section_id,section_sis_id,student_id," +
           "student_sis_id,enrollment_id,enrollment_status,score\n" +
           "#{teacher.user.id},T1,#{@course.id},C1,#{getsection("S1").id},S1,#{getpseudonym("S1").user.id},S1,#{getenroll("S1", "S1").id},active,70\n" +
@@ -2376,22 +2490,14 @@ describe Course, 'grade_publishing' do
           "#{teacher.user.id},T1,#{@course.id},C1,#{getsection("S2").id},S2,#{getpseudonym("S3").user.id},S3,#{getenroll("S3", "S2").id},active,80\n" +
           "#{teacher.user.id},T1,#{@course.id},C1,#{getsection("S1").id},S1,#{getpseudonym("S4").user.id},S4,#{getenroll("S4", "S1").id},active,0\n" +
           "#{teacher.user.id},T1,#{@course.id},C1,#{getsection("S3").id},S3,#{stud5.user.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud5.user.id, getsection("S3").id).id},active,85\n" +
-          "#{teacher.user.id},T1,#{@course.id},C1,#{sec4.id},S4,#{stud6.user.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud6.user.id, sec4.id).id},active,90\n"])
+          "#{teacher.user.id},T1,#{@course.id},C1,#{sec4.id},S4,#{stud6.user.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud6.user.id, sec4.id).id},active,90\n"
+      SSLCommon.expects(:post_data).with("http://localhost/endpoint", csv, "text/csv", {})
+      @course.publish_final_grades(teacher.user)
 
       @course.grading_standard_id = 0
       @course.save
-      server, server_thread, post_lines = start_test_http_server
-      @ps.posted_settings = @plugin.default_settings.merge({
-          :publish_endpoint => "http://localhost:#{server.addr[1]}/endpoint"
-        })
-      @ps.save!
-      @course.publish_final_grades(teacher.user)
-      server_thread.join
-      verify_post_matches(post_lines, [
-          "POST /endpoint HTTP/1.1",
-          "Accept: */*",
-          "Content-Type: text/csv",
-          "",
+
+      csv =
           "publisher_id,publisher_sis_id,course_id,course_sis_id,section_id,section_sis_id,student_id," +
           "student_sis_id,enrollment_id,enrollment_status,score,grade\n" +
           "#{teacher.user.id},T1,#{@course.id},C1,#{getsection("S1").id},S1,#{getpseudonym("S1").user.id},S1,#{getenroll("S1", "S1").id},active,70,C-\n" +
@@ -2399,20 +2505,13 @@ describe Course, 'grade_publishing' do
           "#{teacher.user.id},T1,#{@course.id},C1,#{getsection("S2").id},S2,#{getpseudonym("S3").user.id},S3,#{getenroll("S3", "S2").id},active,80,B-\n" +
           "#{teacher.user.id},T1,#{@course.id},C1,#{getsection("S1").id},S1,#{getpseudonym("S4").user.id},S4,#{getenroll("S4", "S1").id},active,0,F\n" +
           "#{teacher.user.id},T1,#{@course.id},C1,#{getsection("S3").id},S3,#{stud5.user.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud5.user.id, getsection("S3").id).id},active,85,B\n" +
-          "#{teacher.user.id},T1,#{@course.id},C1,#{sec4.id},S4,#{stud6.user.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud6.user.id, sec4.id).id},active,90,A-\n"])
+          "#{teacher.user.id},T1,#{@course.id},C1,#{sec4.id},S4,#{stud6.user.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud6.user.id, sec4.id).id},active,90,A-\n"
+      SSLCommon.expects(:post_data).with("http://localhost/endpoint", csv, "text/csv", {})
+      @course.publish_final_grades(teacher.user)
+
       admin = user_model
-      server, server_thread, post_lines = start_test_http_server
-      @ps.posted_settings = @plugin.default_settings.merge({
-          :publish_endpoint => "http://localhost:#{server.addr[1]}/endpoint"
-        })
-      @ps.save!
-      @course.publish_final_grades(admin)
-      server_thread.join
-      verify_post_matches(post_lines, [
-          "POST /endpoint HTTP/1.1",
-          "Accept: */*",
-          "Content-Type: text/csv",
-          "",
+
+      csv =
           "publisher_id,publisher_sis_id,course_id,course_sis_id,section_id,section_sis_id,student_id," +
           "student_sis_id,enrollment_id,enrollment_status,score,grade\n" +
           "#{admin.id},,#{@course.id},C1,#{getsection("S1").id},S1,#{getpseudonym("S1").user.id},S1,#{getenroll("S1", "S1").id},active,70,C-\n" +
@@ -2420,11 +2519,11 @@ describe Course, 'grade_publishing' do
           "#{admin.id},,#{@course.id},C1,#{getsection("S2").id},S2,#{getpseudonym("S3").user.id},S3,#{getenroll("S3", "S2").id},active,80,B-\n" +
           "#{admin.id},,#{@course.id},C1,#{getsection("S1").id},S1,#{getpseudonym("S4").user.id},S4,#{getenroll("S4", "S1").id},active,0,F\n" +
           "#{admin.id},,#{@course.id},C1,#{getsection("S3").id},S3,#{stud5.user.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud5.user.id, getsection("S3").id).id},active,85,B\n" +
-          "#{admin.id},,#{@course.id},C1,#{sec4.id},S4,#{stud6.user.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud6.user.id, sec4.id).id},active,90,A-\n"])
+          "#{admin.id},,#{@course.id},C1,#{sec4.id},S4,#{stud6.user.id},,#{Enrollment.find_by_user_id_and_course_section_id(stud6.user.id, sec4.id).id},active,90,A-\n"
+      SSLCommon.expects(:post_data).with("http://localhost/endpoint", csv, "text/csv", {})
+      @course.publish_final_grades(admin)
     end
-
   end
-
 
 end
 
@@ -2432,7 +2531,7 @@ describe Course, 'tabs_available' do
   def new_external_tool(context)
     context.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "example.com")
   end
-  
+
   it "should not include external tools if not configured for course navigation" do
     course_model
     tool = new_external_tool @course
@@ -2444,7 +2543,7 @@ describe Course, 'tabs_available' do
     tabs = @course.tabs_available(@teacher)
     tabs.map{|t| t[:id] }.should_not be_include(tool.asset_string)
   end
-  
+
   it "should include external tools if configured on the course" do
     course_model
     tool = new_external_tool @course
@@ -2460,7 +2559,7 @@ describe Course, 'tabs_available' do
     tab[:href].should == :course_external_tool_path
     tab[:args].should == [@course.id, tool.id]
   end
-  
+
   it "should include external tools if configured on the account" do
     course_model
     @account = @course.root_account.sub_accounts.create!(:name => "sub-account")
@@ -2478,7 +2577,7 @@ describe Course, 'tabs_available' do
     tab[:href].should == :course_external_tool_path
     tab[:args].should == [@course.id, tool.id]
   end
-  
+
   it "should include external tools if configured on the root account" do
     course_model
     @account = @course.root_account.sub_accounts.create!(:name => "sub-account")
@@ -2496,7 +2595,7 @@ describe Course, 'tabs_available' do
     tab[:href].should == :course_external_tool_path
     tab[:args].should == [@course.id, tool.id]
   end
-  
+
   it "should only include admin-only external tools for course admins" do
     course_model
     @course.offer
@@ -2522,7 +2621,7 @@ describe Course, 'tabs_available' do
     tab[:href].should == :course_external_tool_path
     tab[:args].should == [@course.id, tool.id]
   end
-  
+
   it "should not include member-only external tools for unauthenticated users" do
     course_model
     @course.offer
@@ -2548,7 +2647,7 @@ describe Course, 'tabs_available' do
     tab[:href].should == :course_external_tool_path
     tab[:args].should == [@course.id, tool.id]
   end
-  
+
   it "should allow reordering external tool position in course navigation" do
     course_model
     tool = new_external_tool @course
@@ -2562,7 +2661,7 @@ describe Course, 'tabs_available' do
     tabs = @course.tabs_available(@teacher)
     tabs[1][:id].should == tool.asset_string
   end
-  
+
   it "should not show external tools that are hidden in course navigation" do
     course_model
     tool = new_external_tool @course
@@ -2573,13 +2672,13 @@ describe Course, 'tabs_available' do
     @course.enroll_teacher(@teacher).accept
     tabs = @course.tabs_available(@teacher)
     tabs.map{|t| t[:id] }.should be_include(tool.asset_string)
-    
+
     @course.tab_configuration = Course.default_tabs.map{|t| {:id => t[:id] } }.insert(1, {:id => tool.asset_string, :hidden => true})
     @course.save!
     @course = Course.find(@course.id)
     tabs = @course.tabs_available(@teacher)
     tabs.map{|t| t[:id] }.should_not be_include(tool.asset_string)
-    
+
     tabs = @course.tabs_available(@teacher, :for_reordering => true)
     tabs.map{|t| t[:id] }.should be_include(tool.asset_string)
   end
@@ -2635,7 +2734,7 @@ describe Course, 'scoping' do
     c2.save
     Course.name_like("name1").map(&:id).should == [c1.id]
     Course.name_like("sisid2").map(&:id).should == [c2.id]
-    Course.name_like("code1").map(&:id).should == [c1.id]    
+    Course.name_like("code1").map(&:id).should == [c1.id]
   end
 end
 
@@ -2781,7 +2880,7 @@ describe Course, "inherited_assessment_question_banks" do
     @course.inherited_assessment_question_banks(true).should be_empty
 
     bank = @course.assessment_question_banks.create
-    @course.inherited_assessment_question_banks(true).should eql [bank]
+    @course.inherited_assessment_question_banks(true).should == [bank]
   end
 
   it "should include all banks in the account hierarchy" do
@@ -2794,7 +2893,7 @@ describe Course, "inherited_assessment_question_banks" do
     account_bank = @account.assessment_question_banks.create
 
     @course = Course.create(:account => @account)
-    @course.inherited_assessment_question_banks.sort_by(&:id).should eql [root_bank, account_bank]
+    @course.inherited_assessment_question_banks.sort_by(&:id).should == [root_bank, account_bank]
   end
 
   it "should return a useful scope" do
@@ -2810,7 +2909,7 @@ describe Course, "inherited_assessment_question_banks" do
     bank = @course.assessment_question_banks.create
 
     banks = @course.inherited_assessment_question_banks(true)
-    banks.order(:id).should eql [root_bank, account_bank, bank]
+    banks.order(:id).should == [root_bank, account_bank, bank]
     banks.find_by_id(bank.id).should eql bank
     banks.find_by_id(account_bank.id).should eql account_bank
     banks.find_by_id(root_bank.id).should eql root_bank
@@ -2855,7 +2954,7 @@ describe Course, "section_visibility" do
     end
 
     it "should return user's sections if a student" do
-      @course.sections_visible_to(@student1).should eql [@course.default_section]
+      @course.sections_visible_to(@student1).should == [@course.default_section]
     end
 
     it "should return users from all sections" do
@@ -2876,31 +2975,31 @@ describe Course, "section_visibility" do
 
   context "sections" do
     it "should return students from user's sections" do
-      @course.students_visible_to(@ta).should eql [@student1]
+      @course.students_visible_to(@ta).should == [@student1]
     end
 
     it "should return user's sections" do
-      @course.sections_visible_to(@ta).should eql [@course.default_section]
+      @course.sections_visible_to(@ta).should == [@course.default_section]
     end
 
     it "should return non-limited admins from other sections" do
-      @course.enrollments_visible_to(@ta, :type => :teacher, :return_users => true).should eql [@teacher]
+      @course.enrollments_visible_to(@ta, :type => :teacher, :return_users => true).should == [@teacher]
     end
   end
 
   context "restricted" do
     it "should return no students except self and the observed" do
-      @course.students_visible_to(@observer).should eql [@student1]
+      @course.students_visible_to(@observer).should == [@student1]
       RoleOverride.create!(:context => @course.account, :permission => 'read_roster',
                            :enrollment_type => "StudentEnrollment", :enabled => false)
-      @course.students_visible_to(@student1).should eql [@student1]
+      @course.students_visible_to(@student1).should == [@student1]
     end
 
     it "should return no sections" do
-      @course.sections_visible_to(@observer).should eql []
+      @course.sections_visible_to(@observer).should == []
       RoleOverride.create!(:context => @course.account, :permission => 'read_roster',
                            :enrollment_type => "StudentEnrollment", :enabled => false)
-      @course.sections_visible_to(@student1).should eql []
+      @course.sections_visible_to(@student1).should == []
     end
   end
 
@@ -2919,18 +3018,6 @@ describe Course, ".import_from_migration" do
   before do
     attachment_model(:uploaded_data => stub_file_data('test.m4v', 'asdf', 'video/mp4'))
     course_with_teacher
-  end
-
-  it "should wait for media objects on canvas cartridge import" do
-    migration = mock(:migration_settings => { 'worker_class' => 'CC::Importer::Canvas::Converter' }.with_indifferent_access)
-    MediaObject.expects(:add_media_files).with([@attachment], true)
-    @course.import_media_objects([@attachment], migration)
-  end
-
-  it "should not wait for media objects on other import" do
-    migration = mock(:migration_settings => { 'worker_class' => 'CC::Importer::Standard::Converter' }.with_indifferent_access)
-    MediaObject.expects(:add_media_files).with([@attachment], false)
-    @course.import_media_objects([@attachment], migration)
   end
 
   it "should know when it has open course imports" do
@@ -2954,34 +3041,6 @@ describe Course, ".import_from_migration" do
     @course.course_imports.first.update_attribute(:workflow_state, 'failed')
     @course.should_not have_open_course_imports
   end
-
-  describe "setting storage quota" do
-    before do
-      course_with_teacher
-      @course.storage_quota = 1
-      @cm = ContentMigration.new(:context => @course, :user => @user, :copy_options => {:everything => "1"})
-      @cm.user = @user
-      @cm.save!
-    end
-
-    it "should not adjust for unauthorized user" do
-      @course.import_settings_from_migration({:course=>{:storage_quota => 4}}, @cm)
-      @course.storage_quota.should == 1
-    end
-
-    it "should adjust for authorized user" do
-      account_admin_user(:user => @user)
-      @course.import_settings_from_migration({:course=>{:storage_quota => 4}}, @cm)
-      @course.storage_quota.should == 4
-    end
-
-    it "should be set for course copy" do
-      @cm.source_course = @course
-      @course.import_settings_from_migration({:course=>{:storage_quota => 4}}, @cm)
-      @course.storage_quota.should == 4
-    end
-  end
-
 end
 
 describe Course, "enrollments" do
@@ -2993,13 +3052,13 @@ describe Course, "enrollments" do
     @course.root_account = a1
     @course.save!
 
-    @course.student_enrollments.map(&:root_account_id).should eql [a1.id]
-    @course.course_sections.reload.map(&:root_account_id).should eql [a1.id]
+    @course.student_enrollments.map(&:root_account_id).should == [a1.id]
+    @course.course_sections.reload.map(&:root_account_id).should == [a1.id]
 
     @course.root_account = a2
     @course.save!
-    @course.student_enrollments(true).map(&:root_account_id).should eql [a2.id]
-    @course.course_sections.reload.map(&:root_account_id).should eql [a2.id]
+    @course.student_enrollments(true).map(&:root_account_id).should == [a2.id]
+    @course.course_sections.reload.map(&:root_account_id).should == [a2.id]
   end
 end
 
@@ -3593,6 +3652,27 @@ describe Course do
       @course.enrollments.count.should == enrollment_count
     end
 
+    context "unique enrollments" do
+      before do
+        course(active_all: true)
+        user
+        @section2 = @course.course_sections.create!
+        @course.enroll_user(@user, 'StudentEnrollment', section: @course.default_section).reject!
+        @course.enroll_user(@user, 'StudentEnrollment', section: @section2, allow_multiple_enrollments: true).reject!
+        @user.enrollments.count.should == 2
+      end
+
+      it "should not cause problems moving a user between sections (s1)" do
+        # this should not cause a unique constraint violation
+        @course.enroll_user(@user, 'StudentEnrollment', section: @course.default_section)
+      end
+
+      it "should not cause problems moving a user between sections (s2)" do
+        # this should not cause a unique constraint violation
+        @course.enroll_user(@user, 'StudentEnrollment', section: @section2)
+      end
+    end
+
     describe "already_enrolled" do
       before do
         course
@@ -3691,7 +3771,7 @@ describe Course do
     end
   end
 
-  it "creates a scope the returns deleted courses" do 
+  it "creates a scope the returns deleted courses" do
     @course1 = Course.create!
     @course1.workflow_state = 'deleted'
     @course1.save!

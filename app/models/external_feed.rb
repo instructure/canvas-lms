@@ -21,7 +21,14 @@ class ExternalFeed < ActiveRecord::Base
   belongs_to :user
   belongs_to :context, :polymorphic => true
   has_many :external_feed_entries, :dependent => :destroy
-  
+
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :user_id, :context_id, :context_type, :consecutive_failures, :failures, :refresh_at, :title, :feed_type, :feed_purpose, :url, :header_match,
+    :body_match, :created_at, :updated_at, :verbosity
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:user, :context, :external_feed_entries]
+
   before_validation :infer_defaults
 
   include CustomValidations
@@ -193,37 +200,5 @@ class ExternalFeed < ActiveRecord::Base
         :user => self.user
       )
     end
-  end
-  
-  def self.process_migration(data, migration)
-    tools = data['external_feeds'] ? data['external_feeds']: []
-    to_import = migration.to_import 'external_feeds'
-    tools.each do |tool|
-      if tool['migration_id'] && (!to_import || to_import[tool['migration_id']])
-        begin
-          import_from_migration(tool, migration.context)
-        rescue
-          migration.add_import_warning(t('#migration.external_feed_type', "External Feed"), tool[:title], $!)
-        end
-      end
-    end
-  end
-  
-  def self.import_from_migration(hash, context, item=nil)
-    hash = hash.with_indifferent_access
-    return nil if hash[:migration_id] && hash[:external_feeds_to_import] && !hash[:external_feeds_to_import][hash[:migration_id]]
-    item ||= find_by_context_id_and_context_type_and_migration_id(context.id, context.class.to_s, hash[:migration_id]) if hash[:migration_id]
-    item ||= context.external_feeds.new
-    item.migration_id = hash[:migration_id]
-    item.url = hash[:url]
-    item.title = hash[:title]
-    item.feed_type = hash[:feed_type]
-    item.feed_purpose = hash[:purpose]
-    item.verbosity = hash[:verbosity]
-    item.header_match = hash[:header_match] unless hash[:header_match].blank?
-    
-    item.save!
-    context.imported_migration_items << item if context.imported_migration_items && item.new_record?
-    item
   end
 end

@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
-describe "AccountAuthorizationConfigs API", :type => :integration do
+describe "AccountAuthorizationConfigs API", type: :request do
   before do
     @account = account_model(:name => 'root')
     user_with_pseudonym(:active_all => true, :account => @account)
@@ -129,16 +129,20 @@ describe "AccountAuthorizationConfigs API", :type => :integration do
       aac.auth_base.should == '127.0.0.1'
       aac.position.should == 1
     end
+
     it "should not allow multiple cas aacs (for now)" do
       call_create(@cas_hash)
-      json = call_create(@cas_hash, 400)
-      json['message'].should == "Can not create multiple CAS configurations"
+      json = call_create(@cas_hash, 422)
+      json.keys.sort.should == ['error_report_id', 'errors']
+      json['errors'].should == [
+        { "field" => "auth_type", "error_code" => "multiple_cas_configs", "message" => "Only one CAS config is supported" },
+      ]
     end
 
     it "should error when mixing auth_types (for now)" do
       call_create(@ldap_hash)
-      json = call_create(@saml_hash, 400)
-      json['message'].should == 'Can not mix authentication types'
+      json = call_create(@saml_hash, 422)
+      json['errors'].first['error_code'].should == 'mixing_authentication_types'
     end
 
     it "should update positions" do
@@ -156,12 +160,17 @@ describe "AccountAuthorizationConfigs API", :type => :integration do
 
     it "should error if deprecated and new style are used" do
       json = call_create({:account_authorization_config => {"0" => @ldap_hash}}.merge(@ldap_hash), 400)
-      json['message'].should == "Can't use both deprecated and current version of create at the same time."
+      json.keys.sort.should == ['error_report_id', 'errors']
+      json['errors'].should == [
+        "error_code" => "deprecated_request_syntax",
+        "message" => "This request syntax has been deprecated",
+        "field" => nil,
+      ]
     end
 
     it "should error if empty post params sent" do
-      json = call_create({}, 400)
-      json['message'].should == "Must specify auth_type"
+      json = call_create({}, 422)
+      json['errors'].first.should == { 'field' => 'auth_type', 'message' => "invalid auth_type, must be one of #{AccountAuthorizationConfig::VALID_AUTH_TYPES.join(',')}", 'error_code' => 'inclusion' }
     end
 
     it "should return unauthorized error" do

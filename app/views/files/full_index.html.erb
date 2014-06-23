@@ -361,72 +361,7 @@
   <% end %>
 </div>
 </div>
-<% js_block do %>
-<script>
-require([
-  'INST' /* INST */,
-  'i18nObj' /* I18n.t */,
-  'jquery' /* $ */,
-  'jquery.ajaxJSON' /* ajaxJSON */,
-  'jquery.instructure_date_and_time' /* time_field, datetime_field */,
-  'jqueryui/dialog',
-  'jqueryui/progressbar' /* /\.progressbar/ */,
-  'vendor/scribd.view' /* scribd */
-], function(INST, I18n, $) {
-
-window.contexts = <%= raw @contexts.to_json(:permissions => {:user => @current_user, :policies => [:manage_files,:update,:manage_grades,:read_roster]}, :methods => :asset_string, :include_root => false) %>;
-
-INST.downloadFolderFiles = function(url) {
-  var cancelled = false;
-  $("#download_folder_files_dialog .status_box .status").text(<%= jt('#files.messages.gathering_data', "Gathering data...") %>);
-  $("#download_folder_files_dialog").dialog({
-    title: <%= jt('#files.titles.download_folder_contents', "Download Folder Contents") %>,
-    close: function() {
-      cancelled = true;
-    }
-  });
-  $("#download_folder_files_dialog .progress").progressbar({value: 0});
-  var checkForChange = function() {
-    if(cancelled || $("#download_folder_files_dialog:visible").length == 0) { return; }
-    $("#download_folder_files_dialog .status_loader").css('visibility', 'visible');
-    var lastProgress = null;
-    $.ajaxJSON(url, 'GET', {}, function(data) {
-      if(data && data.attachment) {
-        var attachment = data.attachment;
-        if(attachment.workflow_state == 'zipped') { 
-          $("#download_folder_files_dialog .progress").progressbar('value', 100);
-          var html = <%= jt('#files.messages.zip_finished', "Finished!  Redirecting to File...") %>;
-          html += "<br/><a href='" + url +"'><b>";
-          html += <%= jt('#files.links.download_zip', "Click here to download %{size}", '{size: attachment.readable_size}') %>;
-          html += "</b></a>";
-          $("#download_folder_files_dialog .status").html(html)
-          $("#download_folder_files_dialog .status_loader").css('visibility', 'hidden');
-          location.href = url;
-          return;
-        } else {
-          var progress = parseInt(attachment.file_state, 10);
-          if(isNaN(progress)) { progress = 0; }
-          progress += 5
-          $("#download_folder_files_dialog .progress").progressbar('value', progress);
-          $("#download_folder_files_dialog .status").text(progress >= 95 ? <%= jt('#files.messages.creating_zip', "Creating zip file...") %>: <%= jt('#files.messages.gathering_files_with_progress', "Gathering Files (%{progress}%)...", '{progress: progress}') %>)
-          if(progress <= 5 || progress == lastProgress) {
-            $.ajaxJSON(url + "?compile=1", 'GET', {}, function() {}, function() {});
-          }
-          lastProgress = progress;
-        }
-      }
-      $("#download_folder_files_dialog .status_loader").css('visibility', 'hidden');
-      setTimeout(checkForChange, 3000);
-    }, function(data) {
-      $("#download_folder_files_dialog .status_loader").css('visibility', 'hidden');
-      setTimeout(checkForChange, 1000);
-    });
-  }
-  checkForChange();
-}
-});
-</script>
-<% end %>
+<% js_bundle 'legacy/files_full_index' %>
 <div id="download_folder_files_dialog" style="display: none;">
   <%= image_tag "download.png" %> <%= mt 'messages.gathering_and_zipping', "**The contents of this folder are being gathered** and compressed
 into a zip file.  This may take some time, depending on the size and number of files." %>

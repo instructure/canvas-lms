@@ -184,10 +184,16 @@ describe SubmissionsController do
         flag.feature = 'google_docs_domain_restriction'
         flag.state = 'on'
         flag.save!
+        mock_user_service = mock()
+        @user.expects(:user_services).returns(mock_user_service)
+        mock_user_service.expects(:find_by_service).with("google_docs").returns(mock(token: "token", secret: "secret"))
       end
 
       it "should not save if domain restriction prevents it" do
-        SubmissionsController.any_instance.stubs(:google_docs_download).returns([Net::HTTPOK.new(200, {}, ''), 'title', 'pdf'])
+        google_docs = mock
+        GoogleDocs::Connection.expects(:new).returns(google_docs)
+
+        google_docs.expects(:download).returns([Net::HTTPOK.new(200, {}, ''), 'title', 'pdf'])
         post(:create, course_id: @course.id, assignment_id: @assignment.id,
              submission: { submission_type: 'google_doc' },
              google_doc: { document_id: '12345' })
@@ -346,7 +352,7 @@ describe SubmissionsController do
 
       get 'index', { :course_id => @course.id, :assignment_id => @assignment.id, :zip => '1' }, 'HTTP_ACCEPT' => '*/*'
       response.should be_success
-      response['content-type'].should == 'test/file'
+      response.content_type.should == 'test/file'
     end
   end
 

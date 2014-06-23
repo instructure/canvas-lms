@@ -32,6 +32,7 @@ module Api::V1::QuizSubmission
     attempt
     extra_attempts
     extra_time
+    manually_unlocked
     started_at
     finished_at
     end_at
@@ -45,6 +46,7 @@ module Api::V1::QuizSubmission
 
   QUIZ_SUBMISSION_JSON_FIELD_METHODS = %w[
     time_spent
+    attempts_left
   ].freeze
 
   def quiz_submission_json(qs, quiz, user, session, context = nil)
@@ -56,7 +58,7 @@ module Api::V1::QuizSubmission
     })
 
     hash.merge!({
-      html_url: polymorphic_url([ context, quiz, qs ]),
+      html_url: course_quiz_quiz_submission_url(context, quiz, qs),
     })
 
     hash

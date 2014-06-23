@@ -105,11 +105,11 @@ shared_examples_for 'Delayed::Batch' do
   end
 
   describe "current_shard" do
-    it_should_behave_like "delayed_jobs_shards"
+    include_examples "delayed_jobs_shards"
 
     context "sharding" do
       specs_require_sharding
-      it_should_behave_like "delayed_jobs_shards"
+      include_examples "delayed_jobs_shards"
     end
   end
 end

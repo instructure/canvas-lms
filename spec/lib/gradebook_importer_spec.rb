@@ -18,6 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
+require 'csv'
+
 describe GradebookImporter do
   context "construction" do
 
@@ -213,6 +215,17 @@ describe GradebookImporter do
     @gi.assignments.should == [@assignment1]
     @gi.assignments.first.should be_changed
     @gi.assignments.first.points_possible.should == 20
+  end
+
+  it "should not try to create assignments for the totals columns" do
+    course_model
+    @assignment1 = @course.assignments.create!(:name => 'Assignment 1', :points_possible => 10)
+    importer_with_rows(
+        "Student,ID,Section,Assignment 1,Current Points,Final Points,Current Score,Final Score,Final Grade",
+        "Points Possible,,,20,,,,,"
+    )
+    @gi.assignments.should == [@assignment1]
+    @gi.missing_assignments.should be_empty
   end
 
   it "should parse new and existing users" do

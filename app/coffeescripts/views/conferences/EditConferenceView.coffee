@@ -1,10 +1,11 @@
 define [
+  'jquery'
   'underscore'
   'compiled/views/DialogBaseView'
   'compiled/util/deparam'
   'jst/conferences/editConferenceForm'
   'jst/conferences/userSettingOptions'
-], (_, DialogBaseView, deparam, template, userSettingOptionsTemplate) ->
+], ($, _, DialogBaseView, deparam, template, userSettingOptionsTemplate) ->
 
   class EditConferenceView extends DialogBaseView
 
@@ -35,6 +36,9 @@ define [
         success: (data) =>
           @model.set(data)
           @model.trigger('sync')
+        error: =>
+          @show(@model)
+          alert('Save failed.')
       )
 
     show: (model) ->
@@ -95,7 +99,7 @@ define [
             when 'date_picker'
               optionObj['isDatePicker'] = true
               if(currentVal)
-                optionObj['value'] = $.parseFromISO(currentVal).datetime.toString($.datetime.defaultFormat)
+                optionObj['value'] = tz.format(currentVal, "%b %-d, %Y %l:%M%P")
               else
                 optionObj['value'] = currentVal
               break

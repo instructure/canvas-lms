@@ -27,6 +27,13 @@ class AssetUserAccess < ActiveRecord::Base
   before_save :infer_defaults
   attr_accessible :user, :asset_code
 
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :asset_code, :asset_group_code, :user_id, :context_id, :context_type, :count, :last_access, :created_at, :updated_at, :asset_category, :view_score,
+    :participate_score, :action_level, :summarized_at, :interaction_seconds, :display_name, :membership_type
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:context, :user, :page_views]
+
   scope :for_context, lambda { |context| where(:context_id => context, :context_type => context.class.to_s) }
   scope :for_user, lambda { |user| where(:user_id => user) }
   scope :participations, where(:action_level => 'participate')
@@ -185,10 +192,11 @@ class AssetUserAccess < ActiveRecord::Base
   def corrected_view_score
     deductible_points = 0
 
-    if %w[ quizzes ].include?(self.asset_group_code || '')
+    if 'quizzes' == self.asset_group_code
       deductible_points = self.participate_score || 0
     end
 
+    self.view_score ||= 0
     self.view_score -= deductible_points
   end
 

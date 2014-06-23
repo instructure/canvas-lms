@@ -127,7 +127,6 @@ html .fc,
 .fc-cell-overlay { /* semi-transparent rectangle while dragging */
 	background: #bce8f1;
 	opacity: .3;
-	filter: alpha(opacity=30); /* for IE */
 	}
 	
 
@@ -200,13 +199,8 @@ html .fc,
 
 .fc-state-default {
 	background-color: #f5f5f5;
-	background-image: -moz-linear-gradient(top, #ffffff, #e6e6e6);
-	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#e6e6e6));
-	background-image: -webkit-linear-gradient(top, #ffffff, #e6e6e6);
-	background-image: -o-linear-gradient(top, #ffffff, #e6e6e6);
 	background-image: linear-gradient(to bottom, #ffffff, #e6e6e6);
 	background-repeat: repeat-x;
-	border-color: #e6e6e6 #e6e6e6 #bfbfbf;
 	border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
 	color: #333;
 	text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
@@ -225,10 +219,7 @@ html .fc,
 	color: #333333;
 	text-decoration: none;
 	background-position: 0 -15px;
-	-webkit-transition: background-position 0.1s linear;
-	   -moz-transition: background-position 0.1s linear;
-	     -o-transition: background-position 0.1s linear;
-	        transition: background-position 0.1s linear;
+	transition: background-position 0.1s linear;
 	}
 
 .fc-state-down,
@@ -243,7 +234,6 @@ html .fc,
 	cursor: default;
 	background-image: none;
 	opacity: 0.65;
-	filter: alpha(opacity=65);
 	box-shadow: none;
 	}
 
@@ -344,9 +334,7 @@ a.fc-event,
 	cursor: w-resize;
 	}
 	
-.fc-event-hori .ui-resizable-handle {
-	_padding-bottom: 14px; /* IE6 had 0 height */
-	}
+
 	
 	
 	
@@ -402,10 +390,6 @@ table.fc-border-separate {
 	
 .fc-grid .fc-other-month .fc-day-number {
 	opacity: 0.3;
-	filter: alpha(opacity=30); /* for IE */
-	/* opacity with small font can sometimes look too faded
-	   might want to set the 'color' property instead
-	   making day-numbers bold also fixes the problem */
 	}
 	
 .fc-grid .fc-day-content {
@@ -560,7 +544,6 @@ table.fc-border-separate {
 	height: 100%;
 	background: #fff;
 	opacity: .25;
-	filter: alpha(opacity=25);
 	}
 	
 .fc .ui-draggable-dragging .fc-event-bg, /* TODO: something nicer like .fc-opacity */

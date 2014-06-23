@@ -1,0 +1,28 @@
+<td>
+  {{#if dueAt}}
+    {{friendlyDatetime dueAt}}
+  {{else}}
+    -
+  {{/if}}
+</td>
+<td>
+  {{#if title}}
+    {{title}}
+  {{else}}
+    {{#t 'everyone'}}Everyone{{/t}}
+  {{/if}}
+</td>
+<td>
+  {{#if unlockAt}}
+    {{friendlyDatetime unlockAt}}
+  {{else}}
+    -
+  {{/if}}
+</td>
+<td>
+  {{#if lockAt}}
+    {{friendlyDatetime lockAt}}
+  {{else}}
+    -
+  {{/if}}
+</td>

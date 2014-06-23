@@ -1,10 +1,11 @@
 define [
+  'jquery'
   'underscore'
   'Backbone'
   'compiled/models/Account'
   'compiled/views/accounts/settings/QuotasView'
   'compiled/views/accounts/settings/ManualQuotasView'
-], (_, Backbone, Account, QuotasView, ManualQuotasView) ->
+], ($, _, Backbone, Account, QuotasView, ManualQuotasView) ->
 
   if ENV.ACCOUNT
     account = new Account(ENV.ACCOUNT)

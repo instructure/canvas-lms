@@ -1,0 +1,10 @@
+<option value="group_{{id}}"
+{{#if truncated_name}}
+  aria-label="{{name}}" data-content="<abbr class='text' data-value='{{id}}' title='{{name}}'>{{truncated_name}}</abbr>"
+  >
+  {{truncated_name}}
+{{else}}
+  >
+  {{name}}
+{{/if}}
+</option>

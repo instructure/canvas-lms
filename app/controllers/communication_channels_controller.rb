@@ -24,30 +24,59 @@
 # In this API, the `:user_id` parameter can always be replaced with `self` if
 # the requesting user is asking for his/her own information.
 #
-# @object CommunicationChannel
+# @model CommunicationChannel
 #     {
-#       // The ID of the communication channel.
-#       "id": 16,
-#
-#       // The address, or path, of the communication channel.
-#       "address": "sheldon@caltech.example.com",
-#
-#       // The type of communcation channel being described. Possible values
-#       // are: "email", "sms", "facebook" or "twitter". This field
-#       // determines the type of value seen in "address".
-#       "type": "email",
-#
-#       // The position of this communication channel relative to the user's
-#       // other channels when they are ordered.
-#       "position": 1,
-#
-#       // The ID of the user that owns this communication channel.
-#       "user_id": 1,
-#
-#       // The current state of the communication channel. Possible values are:
-#       // "unconfirmed" or "active".
-#       "workflow_state": "active"
+#       "id": "CommunicationChannel",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "The ID of the communication channel.",
+#           "example": 16,
+#           "type": "integer"
+#         },
+#         "address": {
+#           "description": "The address, or path, of the communication channel.",
+#           "example": "sheldon@caltech.example.com",
+#           "type": "string"
+#         },
+#         "type": {
+#           "description": "The type of communcation channel being described. Possible values are: 'email', 'sms', 'chat', 'facebook' or 'twitter'. This field determines the type of value seen in 'address'.",
+#           "example": "email",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "email",
+#               "sms",
+#               "chat",
+#               "facebook",
+#               "twitter"
+#             ]
+#           }
+#         },
+#         "position": {
+#           "description": "The position of this communication channel relative to the user's other channels when they are ordered.",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "user_id": {
+#           "description": "The ID of the user that owns this communication channel.",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "workflow_state": {
+#           "description": "The current state of the communication channel. Possible values are: 'unconfirmed' or 'active'.",
+#           "example": "active",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "unconfirmed",
+#               "active"
+#             ]
+#           }
+#         }
+#       }
 #     }
+#
 class CommunicationChannelsController < ApplicationController
   before_filter :require_user, :only => [:create, :destroy]
   before_filter :reject_student_view_student
@@ -93,16 +122,16 @@ class CommunicationChannelsController < ApplicationController
   #   it.
   #
   # @argument skip_confirmation [Optional, Boolean]
-  #   Only valid for site admins making requests; If true, the channel is
+  #   Only valid for site admins and account admins making requests; If true, the channel is
   #   automatically validated and no confirmation email or SMS is sent.
   #   Otherwise, the user must respond to a confirmation message to confirm the
   #   channel.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/users/1/communication_channels \ 
-  #          -H 'Authorization: Bearer <token>' \ 
-  #          -d 'communication_channel[address]=new@example.com' \ 
-  #          -d 'communication_channel[type]=email' \ 
+  #     curl https://<canvas>/api/v1/users/1/communication_channels \
+  #          -H 'Authorization: Bearer <token>' \
+  #          -d 'communication_channel[address]=new@example.com' \
+  #          -d 'communication_channel[type]=email' \
   #
   # @returns CommunicationChannel
   def create
@@ -113,7 +142,7 @@ class CommunicationChannelsController < ApplicationController
     params.delete(:build_pseudonym) if api_request?
 
     skip_confirmation = value_to_boolean(params[:skip_confirmation]) &&
-      Account.site_admin.grants_right?(@current_user, :manage_students)
+        (Account.site_admin.grants_right?(@current_user, :manage_students) || @domain_root_account.grants_right?(@current_user, :manage_students))
 
     # If a new pseudonym is requested, build (but don't save) a pseudonym to ensure
     # that the unique_id is valid. The pseudonym will be created on approval of the
@@ -228,7 +257,7 @@ class CommunicationChannelsController < ApplicationController
           @merge_opportunities.last.last.sort! { |a, b| Canvas::ICU.compare(a.account.name, b.account.name) }
         end
       end
-      @merge_opportunities.sort_by! { |a| [a.first == @current_user ? SortFirst : SortLast, Canvas::ICU.collation_key(a.first.name)] }
+      @merge_opportunities.sort_by! { |a| [a.first == @current_user ? CanvasSort::First : CanvasSort::Last, Canvas::ICU.collation_key(a.first.name)] }
 
       js_env :PASSWORD_POLICY => @domain_root_account.password_policy
 
@@ -344,6 +373,7 @@ class CommunicationChannelsController < ApplicationController
       end
     else
       flash[:notice] = t 'notices.registration_confirmed', "Registration confirmed!"
+      @current_user ||= @user # since dashboard_url may need it
       respond_to do |format|
         format.html { @enrollment ? redirect_to(course_url(@course)) : redirect_back_or_default(dashboard_url) }
         format.json { render :json => {:url => @enrollment ? course_url(@course) : dashboard_url} }

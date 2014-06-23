@@ -1,7 +1,7 @@
 module DataFixup
   module SanitizeEportfolios
     def self.run
-      config = Instructure::SanitizeField::SANITIZE
+      config = CanvasSanitize::SANITIZE
       EportfolioEntry.
         where("content LIKE '%rich\_text%' OR content LIKE '%html%'").
         find_each do |entry|

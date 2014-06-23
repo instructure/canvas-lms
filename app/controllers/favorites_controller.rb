@@ -16,14 +16,31 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 # @API Favorites
-# @object Favorite
-#     {
-#       // The ID of the object the Favorite refers to
-#       "context_id": 1170,
 #
-#       // The type of the object the Favorite refers to (currently, only "Course" is supported)
-#       "context_type": "Course"
+# @model Favorite
+#     {
+#       "id": "Favorite",
+#       "description": "",
+#       "required": [""],
+#       "properties": {
+#         "context_id": {
+#           "description": "The ID of the object the Favorite refers to",
+#           "example": 1170,
+#           "type": "integer"
+#         },
+#         "context_type": {
+#           "description": "The type of the object the Favorite refers to (currently, only 'Course' is supported)",
+#           "example": "Course",
+#           "type": "string",
+#           "allowableValues": {
+#             "values": [
+#               "Course"
+#             ]
+#           }
+#         }
+#       }
 #     }
+#
 class FavoritesController < ApplicationController
 
   before_filter :require_user
@@ -100,7 +117,7 @@ class FavoritesController < ApplicationController
     # allow removing a Favorite whose context object no longer exists
     # but also allow referencing by sis id, if possible
     courses = api_find_all(Course, [params[:id]])
-    course_id = Shard.relative_id_for(courses.any? ? courses.first.id : params[:id], @current_user.shard)
+    course_id = Shard.relative_id_for(courses.any? ? courses.first.id : params[:id], Shard.current, @current_user.shard)
     fave = @current_user.favorites.where(:context_type => 'Course', :context_id => course_id).first
     if fave
       result = favorite_json(fave, @current_user, session)

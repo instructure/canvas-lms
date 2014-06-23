@@ -73,7 +73,7 @@ module Canvas::Migration::Worker
   
   def self.clear_exported_data(folder)
     begin
-      config = Setting.from_config('external_migration')
+      config = ConfigFile.load('external_migration')
       if !config || !config[:keep_after_complete]
         FileUtils::rm_rf(folder) if File.exists?(folder)
       end

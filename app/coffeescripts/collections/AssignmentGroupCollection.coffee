@@ -1,10 +1,12 @@
 define [
+  'jquery'
   'Backbone'
   'compiled/models/AssignmentGroup'
   'underscore'
   'i18n!assignments'
   'compiled/collections/SubmissionCollection'
-], (Backbone, AssignmentGroup, _, I18n, SubmissionCollection) ->
+  'compiled/collections/ModuleCollection'
+], ($, Backbone, AssignmentGroup, _, I18n, SubmissionCollection, ModuleCollection) ->
 
   PER_PAGE_LIMIT = 50
 
@@ -22,9 +24,12 @@ define [
         include: ["assignments"]
 
     loadModuleNames: ->
-      $.get(ENV.URLS.context_modules_url).then (modules) =>
+      modules = new ModuleCollection([], {course_id: @course.id})
+      modules.loadAll = true
+      modules.fetch()
+      modules.on 'fetched:last', =>
         moduleNames = {}
-        for m in modules
+        for m in modules.toJSON()
           moduleNames[m.id] = m.name
 
         for assignment in @assignments()

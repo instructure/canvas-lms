@@ -100,9 +100,10 @@ module UserContent
       'collaborations' => Collaboration,
       'files' => Attachment,
       'conferences' => WebConference,
-      'quizzes' => Quiz,
+      'quizzes' => Quizzes::Quiz,
       'groups' => Group,
       'wiki' => WikiPage,
+      'pages' => WikiPage,
       'grades' => nil,
       'users' => nil,
       'external_tools' => nil,
@@ -154,7 +155,7 @@ module UserContent
 
       html.gsub(@toplevel_regex) do |relative_url|
         type, obj_id, rest = [$1, $2, $3]
-        if type != "wiki"
+        if type != "wiki" && type != "pages"
           if obj_id.to_i > 0
             obj_id = obj_id.to_i
           else
@@ -181,6 +182,7 @@ module UserContent
 
     # if content is nil, it'll query the block for the content if needed (lazy content load)
     def user_can_view_content?(content = nil, &get_content)
+      return false if user.blank? && content.respond_to?(:locked?) && content.locked?
       return true unless user
       # if user given, check that the user is allowed to manage all
       # context content, or read that specific item (and it's not locked)

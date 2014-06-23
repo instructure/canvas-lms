@@ -13,7 +13,7 @@
   .touch &,
   .hover-container:hover &,
   .hover-container:focus & {
-    @include opacity($dimmedOpacity)
+    opacity: $dimmedOpacity;
   }
 
   &:focus, &:hover {
@@ -28,17 +28,19 @@
 //    this will be 50% transparent until hovered over, regardless of .touch or .no-touch
 //  </a>
 .dim-till-hover {
-  @include opacity($dimmedOpacity);
-  &:hover, &:focus { @include opacity(1) }
+  opacity: $dimmedOpacity;
+  &:hover, &:focus { opacity: 1 }
 }
 
 
 // Completely hide, but make available to screenreader so it can read it.
-.screenreader-only { 
-  position: absolute !important;
-  clip: rect(1px 1px 1px 1px);
-  clip: rect(1px,1px,1px,1px);
-  width: 1px;
+.screenreader-only {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
   overflow: hidden;
-  top: 0;
+  padding: 0;
+  position: absolute;
+  width: 1px;
 }

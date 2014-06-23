@@ -30,7 +30,7 @@ describe AssignmentsController do
 
   describe "GET 'index'" do
     it "should throw 404 error without a valid context id" do
-      rescue_action_in_public!
+      rescue_action_in_public! if CANVAS_RAILS2
       #controller.use_rails_error_handling!
       get 'index'
       assert_status(404)
@@ -127,12 +127,12 @@ describe AssignmentsController do
   
   describe "GET 'show'" do
     it "should return 404 on non-existant assignment" do
-      rescue_action_in_public!
+      rescue_action_in_public! if CANVAS_RAILS2
       #controller.use_rails_error_handling!
       course_with_student_logged_in(:active_all => true)
 
       get 'show', :course_id => @course.id, :id => 5
-      response.status.should eql('404 Not Found')
+      assert_status(404)
     end
 
     it "should return unauthorized if not enrolled" do
@@ -202,7 +202,7 @@ describe AssignmentsController do
       assigns[:locked].should be_true
       # make sure that the show.html.erb template is rendered, because
       # in normal cases we redirect to the assignment's external_tool_tag.
-      response.rendered[:template].should eql 'assignments/show.html.erb'
+      response.should render_template('assignments/show')
     end
 
     it "should require login for external tools in a public course" do
@@ -219,18 +219,18 @@ describe AssignmentsController do
     end
 
     it 'should not error out when google docs is not configured' do
-      GoogleDocs.stubs(:config).returns nil
+      GoogleDocs::Connection.stubs(:config).returns nil
       course_with_student_logged_in(:active_all => true)
       a = @course.assignments.create(:title => "some assignment")
       get 'show', :course_id => @course.id, :id => a.id
-      GoogleDocs.unstub(:config)
+      GoogleDocs::Connection.unstub(:config)
     end
   end
 
   describe "GET 'syllabus'" do
     it "should require authorization" do
       course_with_student
-      rescue_action_in_public!
+      rescue_action_in_public! if CANVAS_RAILS2
       #controller.use_rails_error_handling!
       get 'syllabus', :course_id => @course.id
       assert_unauthorized
@@ -256,7 +256,7 @@ describe AssignmentsController do
 
   describe "GET 'new'" do
     it "should require authorization" do
-      rescue_action_in_public!
+      rescue_action_in_public! if CANVAS_RAILS2
       #controller.use_rails_error_handling!
       course_with_student(:active_all => true)
       get 'new', :course_id => @course.id
@@ -276,7 +276,7 @@ describe AssignmentsController do
   
   describe "POST 'create'" do
     it "should require authorization" do
-      rescue_action_in_public!
+      rescue_action_in_public! if CANVAS_RAILS2
       #controller.use_rails_error_handling!
       course_with_student(:active_all => true)
       post 'create', :course_id => @course.id
@@ -325,7 +325,7 @@ describe AssignmentsController do
   
   describe "GET 'edit'" do
     it "should require authorization" do
-      rescue_action_in_public!
+      rescue_action_in_public! if CANVAS_RAILS2
       #controller.use_rails_error_handling!
       course_with_student(:active_all => true)
       course_assignment
@@ -350,14 +350,14 @@ describe AssignmentsController do
       assigns[:js_env][:ASSIGNMENT].should == expected_assignment_json
       assigns[:js_env][:ASSIGNMENT_OVERRIDES].should ==
         subject.send(:assignment_overrides_json,
-                     @assignment.overrides_visible_to(assigns[:current_user]))
+                     AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, assigns[:current_user]))
     end
 
   end
 
   describe "PUT 'update'" do
     it "should require authorization" do
-      rescue_action_in_public!
+      rescue_action_in_public! if CANVAS_RAILS2
       #controller.use_rails_error_handling!
       course_with_student(:active_all => true)
       course_assignment

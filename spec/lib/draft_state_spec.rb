@@ -33,29 +33,37 @@ describe "Draft State Feature Flag Weirdness" do
     end
 
     it "should kick off a publish job in state change callback" do
-      quiz = t_course.quizzes.create! title: 'a quiz'
-      quiz.workflow_state = 'unpublished'
-      quiz.save!
-
-      page = t_course.wiki.wiki_pages.create title: 'some page'
-      page.workflow_state = 'unpublished'
-      page.save!
-
-      topic = t_course.discussion_topics.create title: 'a topic'
-      topic.workflow_state = 'unpublished'
-      topic.save!
-
-      assignment = t_course.assignments.create name: 'do this'
-      assignment.workflow_state = 'unpublished'
-      assignment.save!
-
       mod = t_course.context_modules.create name: 'blargh'
       mod.workflow_state = 'unpublished'
       mod.save!
 
-      item = mod.add_item type: 'wiki_page', id: page.id
-      item.workflow_state = 'unpublished'
-      item.save!
+      topic = t_course.discussion_topics.create title: 'a topic'
+      topic.workflow_state = 'unpublished'
+      topic.save!
+      topic_item = mod.add_item type: 'discussion_topic', id: topic.id
+      topic_item.workflow_state = 'unpublished'
+      topic_item.save!
+
+      assignment = t_course.assignments.create name: 'do this'
+      assignment.workflow_state = 'unpublished'
+      assignment.save!
+      assignment_item = mod.add_item type: 'assignment', id: assignment.id
+      assignment_item.workflow_state = 'unpublished'
+      assignment_item.save!
+
+      quiz = t_course.quizzes.create! title: 'a quiz'
+      quiz.workflow_state = 'unpublished'
+      quiz.save!
+      quiz_item = mod.add_item type: 'quiz', id: quiz.id
+      quiz_item.workflow_state = 'unpublished'
+      quiz_item.save!
+
+      page = t_course.wiki.wiki_pages.create title: 'some page'
+      page.workflow_state = 'unpublished'
+      page.save!
+      page_item = mod.add_item type: 'wiki_page', id: page.id
+      page_item.workflow_state = 'unpublished'
+      page_item.save!
 
       t_course.disable_feature!(:draft_state)
       expect {
@@ -64,12 +72,21 @@ describe "Draft State Feature Flag Weirdness" do
 
       run_jobs
 
-      quiz.reload.should be_edited
-      page.reload.hide_from_students.should be_true
-      topic.reload.should be_active
-      assignment.reload.should be_published
-      mod.reload.should be_active
-      item.reload.should be_active
+      # make sure everything published properly
+      mod.reload.should             be_published
+
+      topic.reload.should           be_published
+      topic_item.reload.should      be_published
+      assignment.reload.should      be_published
+      assignment_item.reload.should be_published
+
+      # quizzes can be unpublished in non-draft-state, thus should remain unchanged
+      quiz.reload.should            be_unpublished
+      quiz_item.reload.should       be_unpublished
+
+      # pages can be unpublished (hidden from students) in non-draft-state, thus should remain unchanged
+      page.reload.should            be_unpublished
+      page_item.reload.should       be_unpublished
     end
   end
 

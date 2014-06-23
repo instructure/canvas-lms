@@ -22,9 +22,9 @@
   <tbody>
     {{#each dates}}
     <tr class="date{{#if passed}} date_passed{{/if}}{{#if date}} events_{{strftime date "%Y_%m_%d"}}{{/if}}">
-      <th scope="row" class="day_date" data-date="{{#if date}}{{strftime date "%Y_%m_%d"}}{{/if}}" title="{{#if date}}{{tDateToString date "short_weekday"}}{{else}}{{#t "syllabus.other_day"}}Other{{/t}}{{/if}}">
+      <th scope="row" class="day_date" data-date="{{#if date}}{{strftime date "%Y_%m_%d"}}{{/if}}" {{ contextSensitiveDatetimeTitle date }}>
         {{#if date}}
-          {{tDateToString date "short"}}
+          {{tDateToString date "short_with_weekday"}}
         {{/if}}
       </th>
       <th scope="row">{{#if date}}{{tDateToString date "short_weekday"}}{{else}}{{#t "syllabus.other_day"}}Other{{/t}}{{/if}}</th>
@@ -45,16 +45,18 @@
             <td class="dates{{#unless last}} not_last{{/unless}}">
               {{#if start_at}}
                 {{#if due_at}}
-                  due by {{tTimeHours due_at}}
+                  due by <span {{contextSensitiveDatetimeTitle due_at}} >{{tTimeHours due_at}}</span>
                 {{else}}
-                  {{tTimeHours start_at}}
+                  <span {{contextSensitiveDatetimeTitle start_at}} >{{tTimeHours start_at}}</span>
                   {{#unless same_time}}
                     to
-                    {{#if same_day}}
-                      {{tTimeHours end_at}}
-                    {{else}}
-                      {{tEventToString end_at}}
-                    {{/if}}
+                    <span {{contextSensitiveDatetimeTitle end_at}} >
+                      {{#if same_day}}
+                        {{tTimeHours end_at}}
+                      {{else}}
+                        {{tEventToString end_at}}
+                      {{/if}}
+                   </span>
                   {{/unless}}
                 {{/if}}
               {{else}}

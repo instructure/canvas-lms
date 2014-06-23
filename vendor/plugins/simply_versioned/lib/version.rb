@@ -13,6 +13,10 @@
 # class with those attributes.
 #
 class Version < ActiveRecord::Base #:nodoc:
+  # INSTRUCTURE: shims for quizzes namespacing
+  include PolymorphicTypeOverride
+  override_polymorphic_types versionable_type: {'Quiz' => 'Quizzes::Quiz', 'QuizSubmission' => 'Quizzes::QuizSubmission'}
+
   belongs_to :versionable, :polymorphic => true
 
   before_create :initialize_number
@@ -22,6 +26,7 @@ class Version < ActiveRecord::Base #:nodoc:
   def model
     obj = versionable_type.constantize.new
     YAML::load( self.yaml ).each do |var_name,var_value|
+
       # INSTRUCTURE:  added if... so that if a column is removed in a migration after this was versioned it doesen't die with NoMethodError: undefined method `some_column_name=' for ...
        obj.write_attribute(var_name, var_value) if obj.class.columns_hash[var_name]
     end
@@ -39,12 +44,12 @@ class Version < ActiveRecord::Base #:nodoc:
     options = model.class.simply_versioned_options
     self.yaml = model.attributes.except(*options[:exclude]).to_yaml
   end
-  
+
   # Return the next higher numbered version, or nil if this is the last version
   def next
     versionable.versions.next_version( self.number )
   end
-  
+
   # Return the next lower numbered version, or nil if this is the first version
   def previous
     versionable.versions.previous_version( self.number )
@@ -66,5 +71,5 @@ class Version < ActiveRecord::Base #:nodoc:
     return false unless versionable
     self.number = (versionable.versions.maximum( :number ) || 0) + 1
   end
-  
+
 end

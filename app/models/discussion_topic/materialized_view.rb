@@ -39,9 +39,11 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
   end
 
   def self.for(discussion_topic)
-    unique_constraint_retry do
-      self.find_by_discussion_topic_id(discussion_topic.id) ||
-        self.create!(:discussion_topic => discussion_topic)
+    discussion_topic.shard.activate do
+      unique_constraint_retry do
+        self.find_by_discussion_topic_id(discussion_topic.id) ||
+          self.create!(:discussion_topic => discussion_topic)
+      end
     end
   end
 

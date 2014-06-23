@@ -14,6 +14,11 @@
       {{#t "grade_change"}}Grade Change Activity{{/t}}
     </option>
     {{/if}}
+    {{#if course}}
+    <option value='#loggingCourse'>
+      {{#t "course"}}Course Activity{{/t}}
+    </option>
+    {{/if}}
   </select>
 </div>
 <hr/>
@@ -24,4 +29,8 @@
 
 {{#if grade_change}}
 <div id="loggingGradeChange" class="loggingTypeContent"></div>
+{{/if}}
+
+{{#if course}}
+<div id="loggingCourse" class="loggingTypeContent"></div>
 {{/if}}

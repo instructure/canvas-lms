@@ -32,8 +32,15 @@ class ContentMigration < ActiveRecord::Base
   cattr_accessor :export_file_path
   DATE_FORMAT = "%m/%d/%Y"
 
-  attr_accessible :context, :migration_settings, :user, :source_course, :copy_options, :migration_type
-  attr_accessor :outcome_to_id_map
+  attr_accessible :context, :migration_settings, :user, :source_course, :copy_options, :migration_type, :initiated_source
+  attr_accessor :imported_migration_items, :outcome_to_id_map
+
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :context_id, :user_id, :workflow_state, :migration_settings, :started_at, :finished_at, :created_at, :updated_at, :context_type,
+    :error_count, :error_data, :attachment_id, :overview_attachment_id, :exported_attachment_id, :source_course_id, :migration_type
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:context, :user, :attachment, :overview_attachment, :exported_attachment, :content_export]
 
   workflow do
     state :created
@@ -47,7 +54,7 @@ class ContentMigration < ActiveRecord::Base
     state :imported
     state :failed
   end
-  
+
   def self.migration_plugins(exclude_hidden=false)
     plugins = Canvas::Plugin.all_for_tag(:export_system)
     exclude_hidden ? plugins.select{|p|!p.meta[:hide_from_users]} : plugins
@@ -79,15 +86,15 @@ class ContentMigration < ActiveRecord::Base
       migration_settings[key] = val
     end
   end
-  
+
   def import_immediately?
     !!migration_settings[:import_immediately]
   end
-  
+
   def converter_class=(c_class)
     migration_settings[:converter_class] = c_class
   end
-  
+
   def converter_class
     migration_settings[:converter_class]
   end
@@ -100,10 +107,18 @@ class ContentMigration < ActiveRecord::Base
     migration_settings[:strand]
   end
 
+  def initiated_source
+    migration_settings[:initiated_source] || :manual
+  end
+
+  def initiated_source=(value)
+    migration_settings[:initiated_source] = value
+  end
+
   def n_strand
     ["migrations:import_content", self.root_account.try(:global_id) || "global"]
   end
-  
+
   def migration_ids_to_import=(val)
     migration_settings[:migration_ids_to_import] = val
     set_date_shift_options val[:copy]
@@ -167,9 +182,13 @@ class ContentMigration < ActiveRecord::Base
     end
   end
 
+  def canvas_import?
+    migration_settings[:worker_class] == CC::Importer::Canvas::Converter.name
+  end
+
   # add todo/error/warning issue to the import. user_message is what will be
-  # displayed to the end user. 
-  # type must be one of: :todo, :warning, :error 
+  # displayed to the end user.
+  # type must be one of: :todo, :warning, :error
   #
   # The possible opts keys are:
   #
@@ -177,7 +196,7 @@ class ContentMigration < ActiveRecord::Base
   # exception - an exception object
   # error_report_id - the id to an error report
   # fix_issue_html_url - the url to send the user to to fix problem
-  # 
+  #
   def add_issue(user_message, type, opts={})
     mi = self.migration_issues.build(:issue_type => type.to_s, :description => user_message)
     if opts[:error_report_id]
@@ -199,15 +218,15 @@ class ContentMigration < ActiveRecord::Base
 
     mi
   end
-  
+
   def add_todo(user_message, opts={})
     add_issue(user_message, :todo, opts)
   end
-  
+
   def add_error(user_message, opts={})
     add_issue(user_message, :error, opts)
   end
-  
+
   def add_warning(user_message, opts={})
     if !opts.is_a? Hash
       # convert deprecated behavior to new
@@ -223,7 +242,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def add_import_warning(item_type, item_name, warning)
-    item_name = truncate_text(item_name || "", :max_length => 150)
+    item_name = CanvasTextHelper.truncate_text(item_name || "", :max_length => 150)
     add_warning(t('errors.import_error', "Import Error: ") + "#{item_type} - \"#{item_name}\"", warning)
   end
 
@@ -282,11 +301,11 @@ class ContentMigration < ActiveRecord::Base
     p
   end
 
-  def queue_migration
+  def queue_migration(plugin=nil)
     reset_job_progress
 
     set_default_settings
-    plugin = Canvas::Plugin.find(migration_type)
+    plugin ||= Canvas::Plugin.find(migration_type)
     if plugin
       queue_opts = {:priority => Delayed::LOW_PRIORITY, :max_attempts => 1}
       if self.strand
@@ -332,13 +351,21 @@ class ContentMigration < ActiveRecord::Base
   alias_method :export_content, :queue_migration
 
   def set_default_settings
-    if !migration_settings.has_key?(:overwrite_quizzes)
-      migration_settings[:overwrite_quizzes] = for_course_copy? || (self.migration_type && self.migration_type == 'canvas_cartridge_importer')
+    if self.context && self.context.respond_to?(:root_account) && account = self.context.root_account
+      if default_ms = account.settings[:default_migration_settings]
+        self.migration_settings = default_ms.merge(self.migration_settings).with_indifferent_access
+      end
     end
+
+    if !self.migration_settings.has_key?(:overwrite_quizzes)
+      self.migration_settings[:overwrite_quizzes] = for_course_copy? || (self.migration_type && self.migration_type == 'canvas_cartridge_importer')
+    end
+
     check_quiz_id_prepender
   end
 
   def check_quiz_id_prepender
+    return unless self.context.respond_to?(:assessment_questions)
     if !migration_settings[:id_prepender] && (!migration_settings[:overwrite_questions] || !migration_settings[:overwrite_quizzes])
       # only prepend an id if the course already has some migrated questions/quizzes
       if self.context.assessment_questions.where('assessment_questions.migration_id IS NOT NULL').exists? ||
@@ -393,7 +420,8 @@ class ContentMigration < ActiveRecord::Base
       @zip_file.close
 
       migration_settings[:migration_ids_to_import] ||= {:copy=>{}}
-      self.context.import_from_migration(data, migration_settings[:migration_ids_to_import], self)
+
+      Importers.content_importer_for(self.context_type).import_content(self.context, data, migration_settings[:migration_ids_to_import], self)
 
       if !self.import_immediately?
         update_import_progress(100)
@@ -413,7 +441,7 @@ class ContentMigration < ActiveRecord::Base
 
   def prepare_data(data)
     data = data.with_indifferent_access if data.is_a? Hash
-    TextHelper.recursively_strip_invalid_utf8!(data, true)
+    Utf8Cleaner.recursively_strip_invalid_utf8!(data, true)
     data['all_files_export'] ||= {}
     data
   end
@@ -428,7 +456,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def for_course_copy?
-    !!self.source_course || (self.migration_type && self.migration_type == 'course_copy_importer')
+    self.migration_type && self.migration_type == 'course_copy_importer'
   end
 
   def set_date_shift_options(opts)
@@ -454,26 +482,26 @@ class ContentMigration < ActiveRecord::Base
 
   def download_exported_data
     raise "No exported data to import" unless self.exported_attachment
-    config = Setting.from_config('external_migration') || {}
+    config = ConfigFile.load('external_migration') || {}
     @exported_data_zip = self.exported_attachment.open(
       :need_local_file => true,
       :temp_folder => config[:data_folder])
     @exported_data_zip
   end
-  
+
   def create_all_files_path(temp_path)
     "#{temp_path}_all_files.zip"
   end
-  
+
   def clear_migration_data
     @zip_file.close if @zip_file
     @zip_file = nil
   end
-  
+
   def finished_converting
     #todo finish progress if selective
   end
-  
+
   # expects values between 0 and 100 for the conversion process
   def update_conversion_progress(prog)
     if import_immediately?
@@ -482,7 +510,7 @@ class ContentMigration < ActiveRecord::Base
       fast_update_progress(prog)
     end
   end
-  
+
   # expects values between 0 and 100 for the import process
   def update_import_progress(prog)
     if import_immediately?
@@ -495,7 +523,7 @@ class ContentMigration < ActiveRecord::Base
   def progress
     return nil if self.workflow_state == 'created'
     mig_prog = read_attribute(:progress) || 0
-    if self.source_course
+    if self.for_course_copy?
       # this is for a course copy so it needs to combine the progress of the export and import
       # The export will count for 40% of progress
       # The importing step (so the value of progress on this object)will be 60%
@@ -580,5 +608,29 @@ class ContentMigration < ActiveRecord::Base
       sub_hash.merge!(clean_hash)
     end
     hash
+  end
+
+  def imported_migration_items
+    @imported_migration_items_hash ||= {}
+    @imported_migration_items_hash.values.flatten
+  end
+
+  def imported_migration_items_by_class(klass)
+    @imported_migration_items_hash ||= {}
+    @imported_migration_items_hash[klass.name] ||= []
+  end
+
+  def add_imported_item(item)
+    arr = imported_migration_items_by_class(item.class)
+    arr << item unless arr.include?(item)
+  end
+
+  def add_external_tool_translation(migration_id, target_tool, custom_fields)
+    @external_tool_translation_map ||= {}
+    @external_tool_translation_map[migration_id] = [target_tool.id, custom_fields]
+  end
+
+  def find_external_tool_translation(migration_id)
+    @external_tool_translation_map && migration_id && @external_tool_translation_map[migration_id]
   end
 end

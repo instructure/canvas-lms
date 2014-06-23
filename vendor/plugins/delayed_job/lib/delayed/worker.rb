@@ -33,6 +33,10 @@ class Worker
   end
   cattr_reader :on_max_failures
 
+  def self.lifecycle
+    @lifecycle ||= Delayed::Lifecycle.new
+  end
+
   def initialize(options = {})
     @exit = false
     @config = options
@@ -89,11 +93,14 @@ class Worker
     @sleep_delay_stagger ||= Setting.get('delayed_jobs_sleep_delay_stagger', '2.5').to_f
     @make_tmpdir ||= Setting.get('delayed_jobs_unique_tmpdir', 'true') == 'true'
 
-    job = Delayed::Job.get_and_lock_next_available(
-      name,
-      queue,
-      min_priority,
-      max_priority)
+    job =
+        self.class.lifecycle.run_callbacks(:pop, self) do
+          Delayed::Job.get_and_lock_next_available(
+            name,
+            queue,
+            min_priority,
+            max_priority)
+        end
 
     if job
       configure_for_job(job) do
@@ -123,31 +130,35 @@ class Worker
 
   def perform(job)
     count = 1
-    set_process_name("run:#{job.id}:#{job.name}")
-    say("Processing #{log_job(job, :long)}", :info)
-    runtime = Benchmark.realtime do
-      if job.batch?
-        # each job in the batch will have perform called on it, so we don't
-        # need a timeout around this 
-        count = perform_batch(job.payload_object)
-      else
-        job.invoke_job
+    self.class.lifecycle.run_callbacks(:perform, self, job) do
+      set_process_name("run:#{job.id}:#{job.name}")
+      say("Processing #{log_job(job, :long)}", :info)
+      runtime = Benchmark.realtime do
+        if job.batch?
+          # each job in the batch will have perform called on it, so we don't
+          # need a timeout around this 
+          count = perform_batch(job)
+        else
+          job.invoke_job
+        end
+        Delayed::Stats.job_complete(job, self)
+        Rails.logger.quietly do
+          job.destroy
+        end
       end
-      Delayed::Stats.job_complete(job, self)
-      Rails.logger.silence do
-        job.destroy
-      end
+      say("Completed #{log_job(job)} #{"%.0fms" % (runtime * 1000)}", :info)
     end
-    say("Completed #{log_job(job)} #{"%.0fms" % (runtime * 1000)}", :info)
     count
   rescue Exception => e
     handle_failed_job(job, e)
     count
   end
 
-  def perform_batch(batch)
+  def perform_batch(parent_job)
+    batch = parent_job.payload_object
     if batch.mode == :serial
       batch.jobs.each do |job|
+        job.source = parent_job.source
         job.create_and_lock!(name)
         configure_for_job(job) do
           ensure_db_connection

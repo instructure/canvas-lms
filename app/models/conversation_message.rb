@@ -17,6 +17,8 @@
 #
 
 class ConversationMessage < ActiveRecord::Base
+  include HtmlTextHelper
+
   if CANVAS_RAILS2
     include ActionController::UrlWriter
   else
@@ -31,10 +33,19 @@ class ConversationMessage < ActiveRecord::Base
   has_many :conversation_message_participants
   has_many :attachment_associations, :as => :context
   has_many :attachments, :through => :attachment_associations, :order => 'attachments.created_at, attachments.id'
-  belongs_to :asset, :polymorphic => true, :types => :submission # TODO: move media comments into this
+  # we used to attach submission comments to conversations via this asset
+  # TODO: remove this column when we're sure we don't want this relation anymore
+  belongs_to :asset, :polymorphic => true, :types => :submission
   delegate :participants, :to => :conversation
   delegate :subscribed_participants, :to => :conversation
   attr_accessible
+
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :conversation_id, :author_id, :created_at, :generated, :body, :forwarded_message_ids, :media_comment_id, :media_comment_type, :context_id, :context_type,
+    :asset_id, :asset_type, :attachment_ids, :has_attachments, :has_media_objects
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:conversation, :author, :context, :conversation_message_participants, :attachment_associations, :attachments, :asset]
 
   after_create :generate_user_note!
 
@@ -128,7 +139,7 @@ class ConversationMessage < ActiveRecord::Base
     true
   end
 
-  # override AR association magic 
+  # override AR association magic
   def attachment_ids
     read_attribute :attachment_ids
   end
@@ -179,7 +190,7 @@ class ConversationMessage < ActiveRecord::Base
 
   def recipients
     return [] unless conversation
-    subscribed = subscribed_participants.reject{ |u| u.id == self.author_id }
+    subscribed = subscribed_participants.reject{ |u| u.id == self.author_id }.map{|x| x.becomes(User)}
     participants = conversation_message_participants.map(&:user)
     subscribed & participants
   end
@@ -222,18 +233,35 @@ class ConversationMessage < ActiveRecord::Base
   def generate_user_note!
     return if skip_broadcasts
     return unless @generate_user_note
-    return unless recipients.size == 1
-    recipient = recipients.first
-    return unless recipient.grants_right?(author, :create_user_notes) && recipient.associated_accounts.any?{|a| a.enable_user_notes }
+    recipients.each do |recipient|
+      next unless recipient.grants_right?(author, :create_user_notes) && recipient.associated_accounts.any?{|a| a.enable_user_notes }
+      title = if conversation.subject
+        t(:subject_specified, "Private message: %{subject}", subject: conversation.subject)
+      else
+        t(:subject, "Private message")
+      end
+      note = format_message(body).first
+      recipient.user_notes.create(:creator => author, :title => title, :note => note)
+    end
+  end
 
-    self.extend TextHelper
-    title = t(:subject, "Private message, %{timestamp}", :timestamp => date_string(created_at))
-    note = format_message(body).first
-    recipient.user_notes.create(:creator => author, :title => title, :note => note)
+  def author_short_name_with_shared_contexts(recipient)
+    if conversation.context
+      context_names = [conversation.context.name]
+    else
+      shared_tags = author.conversation_context_codes(false)
+      shared_tags &= recipient.conversation_context_codes(false)
+      context_components = shared_tags.map{|t| ActiveRecord::Base.parse_asset_string(t)}
+      context_names = Context.names_by_context_types_and_ids(context_components[0,2]).values
+    end
+    if context_names.empty?
+      author.short_name
+    else
+      "#{author.short_name} (#{context_names.to_sentence})"
+    end
   end
 
   def formatted_body(truncate=nil)
-    self.extend TextHelper
     res = format_message(body).first
     res = truncate_html(res, :max_length => truncate, :words => true) if truncate
     res
@@ -244,7 +272,7 @@ class ConversationMessage < ActiveRecord::Base
   end
 
   def reply_from(opts)
-    raise IncomingMail::IncomingMessageProcessor::UnknownAddressError if self.context.try(:root_account).try(:deleted?)
+    raise IncomingMail::Errors::UnknownAddress if self.context.try(:root_account).try(:deleted?)
     # If this is from conversations 2, only reply to the author.
     recipients = conversation.context ? [author] : nil
     conversation.reply_from(opts.merge(:root_account_id => self.root_account_id, :only_users => recipients))
@@ -277,7 +305,7 @@ class ConversationMessage < ActiveRecord::Base
     extend ApplicationHelper
     extend ConversationsHelper
 
-    title = ERB::Util.h(truncate_text(self.body, :max_words => 8, :max_length => 80))
+    title = ERB::Util.h(CanvasTextHelper.truncate_text(self.body, :max_words => 8, :max_length => 80))
 
     # build content, should be:
     # message body
@@ -331,4 +359,3 @@ class ConversationMessage < ActiveRecord::Base
     end
   end
 end
-

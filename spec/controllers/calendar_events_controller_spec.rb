@@ -41,13 +41,12 @@ describe CalendarEventsController do
     end
 
     it "should render show page" do
-      Account.default.update_attribute(:settings, {:enable_scheduler => true})
       course_with_student_logged_in(:active_all => true)
       course_event
       get 'show', :course_id => @course.id, :id => @event.id
       assigns[:event].should_not be_nil
       # make sure that the show.html.erb template is rendered
-      response.rendered[:template].should eql 'calendar_events/show.html.erb'
+      response.should render_template('calendar_events/show')
     end
 
   end

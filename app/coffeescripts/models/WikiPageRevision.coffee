@@ -1,10 +1,12 @@
 define [
+  'jquery'
   'underscore'
   'Backbone'
   'i18n!pages'
   'compiled/backbone-ext/DefaultUrlMixin'
   'compiled/str/splitAssetString'
-], (_, Backbone, I18n, DefaultUrlMixin, splitAssetString) ->
+  'compiled/jquery.rails_flash_notifications'
+], ($, _, Backbone, I18n, DefaultUrlMixin, splitAssetString) ->
 
   pageRevisionOptions = ['contextAssetString', 'page', 'pageUrl', 'latest', 'summary']
 

@@ -2,6 +2,13 @@ $canvas_tasks_loaded ||= false
 unless $canvas_tasks_loaded
 $canvas_tasks_loaded = true
 
+def log_time(name, &block)
+  puts "--> Starting: '#{name}'"
+  time = Benchmark.realtime(&block)
+  puts "--> Finished: '#{name}' in #{time}"
+  time
+end
+
 def check_syntax(files)
   quick = ENV["quick"] && ENV["quick"] == "true"
   puts "--> Checking Syntax...."
@@ -98,33 +105,59 @@ namespace :canvas do
   end
 
   desc "Compile javascript and css assets."
-  task :compile_assets, :generate_documentation do |t, args|
-    args.with_defaults(:generate_documentation => 'true')
-    generate_docs = args[:generate_documentation]
-    generate_docs = 'true' if !['true', 'false'].include?(args[:generate_documentation])
+  task :compile_assets, :generate_documentation, :use_sass_cache, :check_syntax do |t, args|
+    args.with_defaults(:generate_documentation => true, :use_sass_cache => false, :check_syntax => false)
+    truthy_values = [true, 'true', '1']
+    generate_documentation = truthy_values.include?(args[:generate_documentation])
+    use_sass_cache = !truthy_values.include?(args[:use_sass_cache])
+    check_syntax = truthy_values.include?(args[:check_syntax])
 
-    puts "--> Compiling static assets [css]"
-    Rake::Task['css:generate'].invoke
-    Rake::Task['css:styleguide'].invoke
+    tasks = {
+      "Compile sass and make jammit css bundles" => -> {
+        log_time('css:generate') do
+          Rake::Task['css:generate'].invoke(use_sass_cache, !!:quiet, :production)
+        end
 
-    puts "--> Compiling static assets [jammit]"
-    output = `bundle exec jammit 2>&1`
-    raise "Error running jammit: \n#{output}\nABORTING" if $?.exitstatus != 0
-    puts "--> Compiled static assets [css/jammit]"
+        log_time("Jammit") do
+          require 'jammit'
+          Jammit.package!
+        end
+      },
+      "css:styleguide" => -> {
+        Rake::Task['css:styleguide'].invoke
+      },
+      "compile coffee, js 18n, and run r.js optimizer" => -> {
+        ['js:generate', 'i18n:generate_js', 'js:build'].each do |name|
+          log_time(name) { Rake::Task[name].invoke }
+        end
+      }
+    }
 
-    puts "--> Compiling static assets [javascript]"
-    Rake::Task['js:generate'].invoke
+    if check_syntax
+      tasks["check JavaScript syntax"] = -> {
+        Rake::Task['canvas:check_syntax'].invoke
+      }
+    end
 
-    puts "--> Generating js localization bundles"
-    Rake::Task['i18n:generate_js'].invoke
+    if generate_documentation
+      tasks["Generate documentation [yardoc]"] = -> {
+        Rake::Task['doc:api'].invoke
+      }
+    end
 
-    puts "--> Optimizing JavaScript [r.js]"
-    Rake::Task['js:build'].invoke
 
-    if generate_docs == 'true'
-      puts "--> Generating documentation [yardoc]"
-      Rake::Task['doc:api'].invoke
+
+    require 'parallel'
+    processes = ENV['CANVAS_BUILD_CONCURRENCY'] || Parallel.processor_count
+    puts "working in #{processes} processes"
+    times = nil
+    real_time = Benchmark.realtime do
+      times = Parallel.map(tasks, :in_processes => processes.to_i) do |name, lamduh|
+        log_time(name) { lamduh.call }
       end
+    end
+    combined_time = times.reduce(:+)
+    puts "Finished compiling assets in #{real_time}. parallelism saved #{combined_time - real_time} (#{real_time.to_f / combined_time.to_f * 100.0}%)"
   end
 
   desc "Check static assets and generate api documentation."
@@ -210,14 +243,18 @@ namespace :db do
       queue = config['queue']
       drop_database(queue) if queue rescue nil
       drop_database(config) rescue nil
-      Canvas::Cassandra::Database.config_names.each do |cass_config|
-        db = Canvas::Cassandra::Database.from_config(cass_config)
+      Canvas::Cassandra::DatabaseBuilder.config_names.each do |cass_config|
+        db = Canvas::Cassandra::DatabaseBuilder.from_config(cass_config)
         db.tables.each do |table|
           db.execute("DROP TABLE #{table}")
         end
       end
       create_database(queue) if queue
       create_database(config)
+      unless CANVAS_RAILS2
+        ::ActiveRecord::Base.connection.schema_cache.clear!
+        ::ActiveRecord::Base.descendants.each(&:reset_column_information)
+      end
       Rake::Task['db:migrate'].invoke
     end
   end

@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe GroupMembership do
-  
+
   it "should ensure a mutually exclusive relationship" do
     category = Account.default.group_categories.create!(:name => "blah")
     group1 = category.groups.create!(:context => Account.default)
@@ -60,7 +60,7 @@ describe GroupMembership do
     # expect
     membership = group.group_memberships.build(:user => user_model, :workflow_state => 'accepted')
     membership.should_not be_valid
-    membership.errors[:group_id].should == "The group is full."
+    membership.errors[:group_id].should == ["The group is full."]
   end
 
   context "section homogeneity" do
@@ -79,13 +79,13 @@ describe GroupMembership do
       membership.stubs(:has_common_section_with_me?).returns(false)
       membership.save.should_not be_true
       membership.errors.size.should == 1
-      membership.errors.on(:user_id).should match(/test user does not share a section/)
+      membership.errors[:user_id].to_s.should match(/test user does not share a section/)
     end
 
     it "should pass validation on update" do
       lambda {
         group_membership.save!
-      }.should_not raise_error(ActiveRecord::RecordInvalid)
+      }.should_not raise_error
     end
   end
 
@@ -110,7 +110,8 @@ describe GroupMembership do
     @course.enroll_student(student).accept!
     Notification.create!(name: 'New Context Group Membership', category: 'TestImmediately')
     Notification.create!(name: 'New Context Group Membership Invitation', category: 'TestImmediately')
-    membership.sis_batch_id = '12345'
+    batch = @course.root_account.sis_batches.create!
+    membership.sis_batch_id = batch.id
     membership.save!
     membership.messages_sent.should be_empty
   end
@@ -248,54 +249,16 @@ describe GroupMembership do
     end
   end
 
-  context 'following' do
-    before do
-      user_model
-      @communities = GroupCategory.communities_for(Account.default)
-      group_model(:name => "Algebra Teachers", :group_category => @communities, :join_level => "parent_context_request")
-    end
-
-    it "should auto-follow the group when joining the group" do
-      @group.add_user(@user, 'accepted')
-      @user.reload.user_follows.where(:followed_item_id => @group, :followed_item_type => 'Group').first.should_not be_nil
-    end
-
-    it "should auto-follow the group when a request is accepted" do
-      @membership = @group.add_user(@user, 'requested')
-      @user.reload.user_follows.where(:followed_item_id => @group, :followed_item_type => 'Group').first.should be_nil
-      @membership.workflow_state = 'accepted'
-      @membership.save!
-      @user.reload.user_follows.where(:followed_item_id => @group, :followed_item_type => 'Group').first.should_not be_nil
-    end
-
-    it "should auto-follow the group when an invitation is accepted" do
-      @membership = @group.add_user(@user, 'invited')
-      @user.reload.user_follows.where(:followed_item_id => @group, :followed_item_type => 'Group').first.should be_nil
-      @membership.workflow_state = 'accepted'
-      @membership.save!
-      @user.reload.user_follows.where(:followed_item_id => @group, :followed_item_type => 'Group').first.should_not be_nil
-    end
-  end
-
-  context 'unfollowing' do
-    before do
-      user_model
-      @communities = GroupCategory.communities_for(Account.default)
-      group_model(:name => "Algebra Teachers", :group_category => @communities, :join_level => "parent_context_request")
-    end
-
-    it "should auto-unfollow the group when leaving the group" do
-      @membership = @group.add_user(@user, 'accepted')
-      @membership.workflow_state = 'deleted'
-      @membership.save!
-      @user.reload.user_follows.find(:first, :conditions => { :followed_item_id => @group.id, :followed_item_type => 'Group' }).should be_nil
-    end
-
-    it "should auto-unfollow the group when the membership is destroyed" do
-      @membership = @group.add_user(@user, 'accepted')
-      @membership.destroy
-      @user.reload.user_follows.find(:first, :conditions => { :followed_item_id => @group.id, :followed_item_type => 'Group' }).should be_nil
-    end
+  it 'updates group leadership as membership changes' do
+    course
+    @category = @course.group_categories.build(:name => "category 1")
+    @category.save!
+    @group = @category.groups.create!(:context => @course)
+    @category.auto_leader = "first"
+    @category.save!
+    leader = user_model
+    @group.group_memberships.create!(:user => leader, :workflow_state => 'accepted')
+    @group.reload.leader.should == leader
   end
 
   describe "updating cached due dates" do

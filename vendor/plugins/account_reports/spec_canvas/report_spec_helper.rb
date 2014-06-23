@@ -18,6 +18,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../../../../spec/spec_helper')
 
+require 'csv'
+
 module ReportSpecHelper
   def read_report(type = @type, options = {})
     account_report = run_report(type, options)
@@ -26,11 +28,10 @@ module ReportSpecHelper
 
   def run_report(type = @type, options = {})
     account = options[:account] || @account
-    parameters = options[:params] || {}
+    parameters = options[:params]
     account_report = AccountReport.new(:user => @admin || user,
                                        :account => account,
                                        :report_type => type)
-    account_report.parameters = {}
     account_report.parameters = parameters
     account_report.save
     Canvas::AccountReports.for_account(account)[type][:proc].call(account_report)
@@ -54,10 +55,12 @@ module ReportSpecHelper
 
   def parse_csv(csv, options = {})
     col_sep = options[:col_sep] || ','
+    skip_order = true if options[:order] == 'skip'
     order = Array(options[:order]).presence || [0, 1]
     all_parsed = CSV.parse(csv, {:col_sep => col_sep}).to_a
     header = all_parsed[0]
-    all_parsed = all_parsed[1..-1].sort_by { |r| r.values_at(*order).join }
+    all_parsed = all_parsed[1..-1]
+    all_parsed = all_parsed.sort_by { |r| r.values_at(*order).join } unless skip_order
     all_parsed.unshift(header) if options[:header]
     all_parsed
   end

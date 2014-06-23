@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -33,8 +33,10 @@ module Api::V1::Assignment
       lock_at
       unlock_at
       assignment_group_id
+      integration_id
       peer_reviews
       automatic_peer_reviews
+      post_to_sis
       grade_group_students_individually
       group_category_id
       grading_standard_id
@@ -46,6 +48,7 @@ module Api::V1::Assignment
       points_possible
       due_at
       assignment_group_id
+      post_to_sis
     )
   }
 
@@ -67,7 +70,10 @@ module Api::V1::Assignment
     hash = api_json(assignment, user, session, fields)
     hash['course_id'] = assignment.context_id
     hash['name'] = assignment.title
+
+    hash['post_to_sis'] = assignment.post_to_sis
     hash['submission_types'] = assignment.submission_types_array
+    hash['has_submitted_submissions'] = assignment.has_submitted_submissions?
 
     if assignment.context && assignment.context.turnitin_enabled?
       hash['turnitin_enabled'] = assignment.turnitin_enabled
@@ -142,6 +148,8 @@ module Api::V1::Assignment
         row_hash
       end
       hash['rubric_settings'] = {
+        'id' => rubric.id,
+        'title' => rubric.title,
         'points_possible' => rubric.points_possible,
         'free_form_criterion_comments' => !!rubric.free_form_criterion_comments
       }
@@ -154,7 +162,7 @@ module Api::V1::Assignment
         assignment.discussion_topic.context,
         user,
         session,
-        !:include_assignment)
+        include_assignment: false)
     end
 
     if opts[:include_all_dates] && assignment.assignment_overrides
@@ -174,6 +182,10 @@ module Api::V1::Assignment
     if assignment.context.feature_enabled?(:draft_state)
       hash['published'] = ! assignment.unpublished?
       hash['unpublishable'] = assignment.can_unpublish?
+    end
+
+    if assignment.context.feature_enabled?(:differentiated_assignments)
+      hash['only_visible_to_overrides'] = value_to_boolean(assignment.only_visible_to_overrides)
     end
 
     if submission = opts[:submission]
@@ -251,6 +263,7 @@ module Api::V1::Assignment
     return if overrides && !overrides.is_a?(Array)
 
     return false unless valid_assignment_group_id?(assignment, assignment_params)
+    return false unless valid_assignment_dates?(assignment, assignment_params)
 
     assignment = update_from_params(assignment, assignment_params)
 
@@ -269,6 +282,20 @@ module Api::V1::Assignment
     return false
   end
 
+  # validate that date and times are iso8601
+  def valid_assignment_dates?(assignment, assignment_params)
+    errors = ['due_at', 'lock_at', 'unlock_at', 'peer_reviews_assign_at'].map do |v|
+      if assignment_params[v].present? && assignment_params[v] !~ Api::ISO8601_REGEX
+        assignment.errors.add("assignment[#{v}]",
+                              I18n.t("assignments_api.invalid_date_time",
+                                     'Invalid datetime for %{attribute}',
+                                     attribute: v))
+      end
+    end
+
+    errors.compact.empty?
+  end
+
   def valid_assignment_group_id?(assignment, assignment_params)
     ag_id = assignment_params["assignment_group_id"].presence
     # if ag_id is a non-numeric string, ag_id.to_i will == 0
@@ -285,6 +312,7 @@ module Api::V1::Assignment
 
     if update_params.has_key?('peer_reviews_assign_at')
       update_params['peer_reviews_due_at'] = update_params['peer_reviews_assign_at']
+      update_params.delete('peer_reviews_assign_at')
     end
 
     if update_params["submission_types"].is_a? Array
@@ -305,15 +333,23 @@ module Api::V1::Assignment
       assignment.group_category = assignment.context.group_categories.find_by_id(gc_id)
     end
 
-    #TODO: validate grading_standard_id (it's permissions are currently useless)
+    if update_params.has_key?("grading_standard_id")
+      standard_id = update_params.delete("grading_standard_id")
+      if standard_id.present?
+        grading_standard = GradingStandard.standards_for(context).find_by_id(standard_id)
+        assignment.grading_standard = grading_standard if grading_standard
+      else
+        assignment.grading_standard = nil
+      end
+    end
 
     if assignment_params.key? "muted"
       assignment.muted = value_to_boolean(assignment_params.delete("muted"))
     end
 
     # do some fiddling with due_at for fancy midnight and add to update_params
-    if update_params.has_key?("due_at")
-      update_params["time_zone_edited"] = Time.zone.name
+    if update_params['due_at'].present? && update_params['due_at'] =~ Api::ISO8601_REGEX
+      update_params['time_zone_edited'] = Time.zone.name
     end
 
     if !assignment.context.try(:turnitin_enabled?)
@@ -347,6 +383,17 @@ module Api::V1::Assignment
       end
     end
 
+    if assignment.context.feature_enabled?(:differentiated_assignments)
+      if assignment_params.has_key? "only_visible_to_overrides"
+        assignment.only_visible_to_overrides = value_to_boolean(assignment_params['only_visible_to_overrides'])
+      end
+    end
+
+    if assignment.context.feature_enabled?(:post_grades)
+      if assignment_params.has_key? "post_to_sis"
+        assignment.post_to_sis = value_to_boolean(assignment_params['post_to_sis'])
+      end
+    end
     assignment.updating_user = @current_user
     assignment.attributes = update_params
     assignment.infer_times

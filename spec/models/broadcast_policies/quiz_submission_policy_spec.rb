@@ -12,7 +12,7 @@ module BroadcastPolicies
       mock("Assignment")
     end
     let(:quiz) do
-      mock("Quiz").tap do |q|
+      mock("Quizzes::Quiz").tap do |q|
         q.stubs(:context_id).returns(1)
         q.stubs(:deleted?).returns(false)
         q.stubs(:muted?).returns(false)
@@ -37,7 +37,7 @@ module BroadcastPolicies
       end
     end
     let(:quiz_submission) do
-      mock("QuizSubmission").tap do |qs|
+      mock("Quizzes::QuizSubmission").tap do |qs|
         qs.stubs(:quiz).returns(quiz)
         qs.stubs(:submission).returns(submission)
         qs.stubs(:user).returns(user)

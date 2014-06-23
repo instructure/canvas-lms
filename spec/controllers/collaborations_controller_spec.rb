@@ -41,8 +41,40 @@ describe CollaborationsController do
 
     it "should assign variables" do
       course_with_student_logged_in(:active_all => true)
+      mock_user_service = mock()
+      @user.expects(:user_services).returns(mock_user_service)
+      mock_user_service.expects(:find_by_service).with("google_docs").returns(mock(token: "token", secret: "secret"))
+      GoogleDocs::Connection.any_instance.expects(:verify_access_token).returns(true)
+
       get 'index', :course_id => @course.id
+
       response.should be_success
+      assigns(:google_docs_authorized).should == true
+    end
+
+    it "should handle users without google authorized" do
+      course_with_student_logged_in(:active_all => true)
+      mock_user_service = mock()
+      @user.expects(:user_services).returns(mock_user_service)
+      mock_user_service.expects(:find_by_service).with("google_docs").returns(mock(token: nil, secret: nil))
+
+      get 'index', :course_id => @course.id
+
+      response.should be_success
+      assigns(:google_docs_authorized).should == false
+    end
+
+    it "should assign variables when verify raises" do
+      course_with_student_logged_in(:active_all => true)
+      mock_user_service = mock()
+      @user.expects(:user_services).returns(mock_user_service)
+      mock_user_service.expects(:find_by_service).with("google_docs").returns(mock(token: "token", secret: "secret"))
+      GoogleDocs::Connection.any_instance.expects(:verify_access_token).raises("Error")
+
+      get 'index', :course_id => @course.id
+
+      response.should be_success
+      assigns(:google_docs_authorized).should == false
     end
 
     it "should not allow the student view student to access collaborations" do
@@ -61,6 +93,10 @@ describe CollaborationsController do
       group = gc.groups.create!(:context => @course)
       group.add_user(@student, 'accepted')
 
+      mock_user_service = mock()
+      @user.expects(:user_services).returns(mock_user_service)
+      mock_user_service.expects(:find_by_service).with("google_docs").returns(mock(token: "token", secret: "secret"))
+
       get 'index', :group_id => group.id
       response.should be_success
     end
@@ -75,8 +111,6 @@ describe CollaborationsController do
       course_with_teacher_logged_in(:active_all => true)
       get 'show', :course_id=>collab_course.id, :id => collaboration.id
     end
-
-    after { Setting.set 'enable_page_views', 'false' }
 
     it 'loads the correct collaboration' do
       assigns(:collaboration).should == collaboration
@@ -108,7 +142,7 @@ describe CollaborationsController do
 
     it "should fail with invalid collaboration type" do
       course_with_teacher_logged_in(:active_all => true)
-      rescue_action_in_public!
+      rescue_action_in_public! if CANVAS_RAILS2
       post 'create', :course_id => @course.id, :collaboration => {:title => "My Collab"}
       assert_status(500)
     end

@@ -34,4 +34,7 @@ define [
       , 1000
 
     toJSON: ->
-      _.extend {}, this, super
+      _.extend {groupId: @model.get('group')?.id}, this, super
+
+    isLeader: ->
+      @model.get('group')?.get?('leader')?.id == @model.get('id')

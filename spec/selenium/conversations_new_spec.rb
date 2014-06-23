@@ -82,16 +82,32 @@ describe "conversations new" do
     end
   end
 
-  def select_message_course(new_course)
+  def click_read_toggle_menu_item
+    keep_trying_until do
+      driver.execute_script(%q{$('#admin-btn').hover().click()})
+      sleep 1
+      driver.execute_script(%q{$('#mark-read-btn').hover().click()})
+      wait_for_ajaximations
+    end
+  end
+
+  def select_message_course(new_course, is_group = false)
     new_course = new_course.name if new_course.respond_to? :name
     fj('.dropdown-toggle', get_message_course).click
+    if is_group
+      wait_for_ajaximations
+      fj("a:contains('Groups')", get_message_course).click
+    end
     fj("a:contains('#{new_course}')", get_message_course).click
   end
 
   def add_message_recipient(to)
+    synthetic = !(to.instance_of?(User) || to.instance_of?(String))
     to = to.name if to.respond_to?(:name)
     get_message_recipients_input.send_keys(to)
     keep_trying_until { fj(".ac-result:contains('#{to}')") }.click
+    return unless synthetic
+    keep_trying_until { fj(".ac-result:contains('All in #{to}')") }.click
   end
 
   def set_message_subject(subject)
@@ -123,11 +139,16 @@ describe "conversations new" do
     job.invoke_job
   end
 
+  let :modifier do
+    if driver.execute_script('return !!window.navigator.userAgent.match(/Macintosh/)')
+      :meta
+    else
+      :control
+    end
+  end
+
   before do
     conversation_setup
-    @teacher.preferences[:use_new_conversations] = true
-    @teacher.save!
-
     @s1 = user(name: "first student")
     @s2 = user(name: "second student")
     [@s1, @s2].each { |s| @course.enroll_student(s).update_attribute(:workflow_state, 'active') }
@@ -153,8 +174,6 @@ describe "conversations new" do
 
     it "should allow admins to send a message without picking a context" do
       user = account_admin_user
-      user.preferences[:use_new_conversations] = true
-      user.save!
       user_logged_in({:user => user})
       get_conversations
       compose to: [@s1], subject: 'context-free', body: 'hallo!'
@@ -170,10 +189,21 @@ describe "conversations new" do
       fj('#compose-new-message .ac-input').should have_attribute(:disabled, 'true')
     end
 
+    it "should allow non-admins to send a message to an account-level group" do
+      @group = Account.default.groups.create(:name => "the group")
+      @group.add_user(@s1)
+      @group.add_user(@s2)
+      @group.save
+      user_logged_in({:user => @s1})
+      get_conversations
+      fj('#compose-btn').click
+      wait_for_ajaximations
+      select_message_course(@group, true)
+      add_message_recipient @s2
+    end
+
     it "should allow admins to message users from their profiles" do
       user = account_admin_user
-      user.preferences[:use_new_conversations] = true
-      user.save!
       user_logged_in({:user => user})
       get "/accounts/#{Account.default.id}/users"
       wait_for_ajaximations
@@ -182,6 +212,78 @@ describe "conversations new" do
       f('.icon-email').click
       wait_for_ajaximations
       f('.ac-token').should_not be_nil
+    end
+
+    it "should allow selecting multiple recipients in one search" do
+      get_conversations
+      fj('#compose-btn').click
+      wait_for_ajaximations
+      select_message_course(@course)
+      get_message_recipients_input.send_keys('student')
+      driver.action.key_down(modifier).perform
+      keep_trying_until { fj(".ac-result:contains('first student')") }.click
+      driver.action.key_up(modifier).perform
+      fj(".ac-result:contains('second student')").click
+      ff('.ac-token').count.should == 2
+    end
+
+    it "should not send the message on shift-enter" do
+      get_conversations
+      compose course: @course, to: [@s1], subject: 'context-free', body: 'hallo!', send: false
+      driver.action.key_down(:shift).perform
+      get_message_body_input.send_keys(:enter)
+      driver.action.key_up(:shift).perform
+      fj('#compose-new-message:visible').should_not be_nil
+    end
+
+    context "user notes" do
+      before(:each) do
+        @course.account.update_attribute(:enable_user_notes, true)
+        user_session(@teacher)
+        get_conversations
+      end
+
+      it "should be allowed on new private conversations with students" do
+        compose course: @course, to: [@s1], body: 'hallo!', send: false
+
+        checkbox = f(".user_note")
+        checkbox.should be_displayed
+        checkbox.click
+
+        count = @s1.user_notes.count
+        click_send
+        @s1.user_notes.reload.count.should == count + 1
+      end
+
+      it "should not be allowed if disabled" do
+        @course.account.update_attribute(:enable_user_notes, false)
+        get_conversations
+        compose course: @course, to: [@s1], body: 'hallo!', send: false
+        f(".user_note").should_not be_displayed
+      end
+
+      it "should not be allowed for students" do
+        user_session(@s1)
+        get_conversations
+        compose course: @course, to: [@s2], body: 'hallo!', send: false
+        f(".user_note").should_not be_displayed
+      end
+
+      it "should be allowed with multiple recipients" do
+        compose course: @course, to: [@s1, @s2], body: 'hallo!', send: false
+        f(".user_note").should be_displayed
+      end
+
+      it "should not be allowed with non-student recipient" do
+        compose course: @course, to: [@teacher], body: 'hallo!', send: false
+        f(".user_note").should_not be_displayed
+      end
+
+      it "should not be allowed with group recipient" do
+        @group = @course.groups.create(:name => "the group")
+        compose course: @course, to: [@group], body: 'hallo!', send: false
+        f(".user_note").should_not be_displayed
+      end
     end
   end
 
@@ -403,14 +505,6 @@ describe "conversations new" do
                         conversation(@teacher, @s1, @s2, workflow_state: 'read')]
     end
 
-    let :modifier do
-      if driver.execute_script('return !!window.navigator.userAgent.match(/Macintosh/)')
-        :meta
-      else
-        :control
-      end
-    end
-
     def select_all_conversations
       driver.action.key_down(modifier).perform
       ff('.messages li').each do |message|
@@ -459,6 +553,14 @@ describe "conversations new" do
       select_all_conversations
       click_unread_toggle_menu_item
       keep_trying_until { ffj('.read-state[aria-checked=false]').count.should == 2 }
+    end
+
+    it "should mark multiple conversations as unread" do
+      pending('breaks b/c jenkins is weird')
+      get_conversations
+      select_all_conversations
+      click_read_toggle_menu_item
+      keep_trying_until { ffj('.read-state[aria-checked=true]').count.should == 2 }
     end
 
     it "should star multiple conversations" do

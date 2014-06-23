@@ -14,8 +14,4 @@ define [
     initialize: ->
       @events = _.extend({}, PublishButtonView.prototype.events, @events)
 
-    setElement: ->
-      super
-      @$el.attr 'data-tooltip', ''
-
     events: {'keyclick' : 'click'}

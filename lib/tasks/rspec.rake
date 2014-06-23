@@ -41,12 +41,14 @@ unless ARGV.any? { |a| a =~ /\Agems/ }
 
   if CANVAS_RAILS2
     spec_files_attr = :spec_files=
+    klass = Spec::Rake::SpecTask
   else
     spec_files_attr = :pattern=
+    klass = RSpec::Core::RakeTask
   end
 
   desc "Run all specs in spec directory (excluding plugin specs)"
-  Spec::Rake::SpecTask.new(:spec) do |t|
+  klass.new(:spec) do |t|
     # you can also do SPEC_OPTS='-e "test name"' but this is a little easier I
     # suppose.
     if ENV['SINGLE_TEST']
@@ -89,40 +91,40 @@ unless ARGV.any? { |a| a =~ /\Agems/ }
     end
 
     desc "Run non-selenium files in a single thread"
-    Spec::Rake::SpecTask.new(:single) do |t|
+    klass.new(:single) do |t|
       require File.expand_path(File.dirname(__FILE__) + '/parallel_exclude')
       t.send(spec_files_attr, ParallelExclude::AVAILABLE_FILES)
     end
 
     desc "Print Specdoc for all specs (excluding plugin specs)"
-    Spec::Rake::SpecTask.new(:doc) do |t|
+    klass.new(:doc) do |t|
       t.spec_opts = ["--format", "specdoc", "--dry-run"]
       t.send(spec_files_attr, FileList['spec/**/*/*_spec.rb'])
     end
 
     desc "Print Specdoc for all plugin examples"
-    Spec::Rake::SpecTask.new(:plugin_doc) do |t|
+    klass.new(:plugin_doc) do |t|
       t.spec_opts = ["--format", "specdoc", "--dry-run"]
       t.send(spec_files_attr, FileList['vendor/plugins/**/spec/**/*/*_spec.rb'].exclude('vendor/plugins/rspec/*'))
     end
 
     [:models, :services, :controllers, :views, :helpers, :lib, :selenium].each do |sub|
       desc "Run the code examples in spec/#{sub}"
-      Spec::Rake::SpecTask.new(sub) do |t|
+      klass.new(sub) do |t|
         t.spec_opts = ['--options', "\"#{Rails.root}/spec/spec.opts\""]
         t.send(spec_files_attr, FileList["spec/#{sub}/**/*_spec.rb"])
       end
     end
 
     desc "Run the code examples in vendor/plugins (except RSpec's own)"
-    Spec::Rake::SpecTask.new(:coverage) do |t|
+    klass.new(:coverage) do |t|
       t.spec_opts = ['--options', "\"#{Rails.root}/spec/spec.opts\""]
       t.send(spec_files_attr, FileList['vendor/plugins/*/spec_canvas/**/*_spec.rb'].exclude('vendor/plugins/*/spec_canvas/selenium/*_spec.rb') + FileList['spec/**/*_spec.rb'].exclude('spec/selenium/**/*_spec.rb'))
     end
 
     namespace :plugins do
       desc "Runs the examples for rspec_on_rails"
-      Spec::Rake::SpecTask.new(:rspec_on_rails) do |t|
+      klass.new(:rspec_on_rails) do |t|
         t.spec_opts = ['--options', "\"#{Rails.root}/spec/spec.opts\""]
         t.send(spec_files_attr, FileList['vendor/plugins/rspec-rails/spec/**/*/*_spec.rb'])
       end

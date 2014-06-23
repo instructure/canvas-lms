@@ -14,11 +14,13 @@ define [
     constructor: (@options) ->
       @collection = @options.collection
       super
+
       @options.minLength ||= 3
       @options.labelProperty ||= 'name'
       @options.valueProperty ||= 'id'
       @options.fieldName ||= @options.valueProperty
       @options.placeholder ||= @options.fieldName
+      @options.sourceParameters ||= {}
 
     toJSON: ->
       @options
@@ -26,20 +28,21 @@ define [
     afterRender: ->
       @$searchTerm.autocomplete
         minLength: @options.minLength
-        source: $.proxy(@autocompleteSource, @)
         select: $.proxy(@autocompleteSelect, @)
+        source: $.proxy(@autocompleteSource, @)
         change: $.proxy(@autocompleteSelect, @)
 
     autocompleteSource: (request, response) ->
       @$searchTerm.addClass("loading")
-      params = data:
-        search_term: request.term
+      params = data: @options.sourceParameters
+      params.data.search_term = request.term
       labelProperty = @options.labelProperty
-      valueProperty = @options.valueProperty
       success = ->
         items = @collection.map (item) ->
+          label = labelProperty(item) if $.isFunction(labelProperty)
+          label ||= item.get(labelProperty)
           model: item
-          label: item.get(labelProperty)
+          label: label
         @$searchTerm.removeClass("loading")
         response(items)
       @collection.fetch(params).success $.proxy(success, @)

@@ -156,12 +156,21 @@ describe User do
     @user.recent_stream_items.size.should == 0
   end
 
+  it "should ignore stream item instances from concluded courses" do
+    course_with_teacher(:active_all => true)
+    google_docs_collaboration_model(:user_id => @user.id)
+    @user.recent_stream_items.size.should == 1
+    @course.soft_conclude!
+    @course.save
+    @user.recent_stream_items.size.should == 0
+  end
+
   describe "#recent_stream_items" do
     it "should skip submission stream items" do
       course_with_teacher(:active_all => true)
       course_with_student(:active_all => true, :course => @course)
       assignment = @course.assignments.create!(:title => "some assignment", :submission_types => ['online_text_entry'])
-      sub = bare_submission_model assignment, @student, :submission_type => "online_text_entry", :body => "submission"
+      sub = assignment.submit_homework @student, body: "submission"
       sub.add_comment :author => @teacher, :comment => "lol"
       item = StreamItem.last
       item.asset.should == sub
@@ -933,21 +942,6 @@ describe User do
       search_messageable_users(@student, :context => "course_#{course2.id}", :ids => [@admin.id]).should_not be_empty
     end
 
-    it "should return names with shared contexts" do
-      set_up_course_with_users
-      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
-      @group.users << @student
-
-      @student.shared_contexts(@this_section_user).should eql ['the course', 'the group']
-      @student.short_name_with_shared_contexts(@this_section_user).should eql "#{@this_section_user.short_name} (the course and the group)"
-
-      @student.shared_contexts(@other_section_user).should eql ['the course']
-      @student.short_name_with_shared_contexts(@other_section_user).should eql "#{@other_section_user.short_name} (the course)"
-
-      @student.shared_contexts(@unrelated_user).should eql []
-      @student.short_name_with_shared_contexts(@unrelated_user).should eql @unrelated_user.short_name
-    end
-
     it "should not rank results by default" do
       set_up_course_with_users
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
@@ -1105,10 +1099,15 @@ describe User do
         "https://#{HostUrl.default_host}/images/messages/avatar-50.png"
       User.avatar_fallback_url("/somepath").should ==
         "https://#{HostUrl.default_host}/somepath"
+      HostUrl.expects(:default_host).returns('somedomain:3000')
+      User.avatar_fallback_url("/path").should ==
+        "https://somedomain:3000/path"
       User.avatar_fallback_url("//somedomain/path").should ==
         "https://somedomain/path"
       User.avatar_fallback_url("http://somedomain/path").should ==
         "http://somedomain/path"
+      User.avatar_fallback_url("http://somedomain:3000/path").should ==
+        "http://somedomain:3000/path"
       User.avatar_fallback_url(nil, OpenObject.new(:host => "foo", :protocol => "http://")).should ==
         "http://foo/images/messages/avatar-50.png"
       User.avatar_fallback_url("/somepath", OpenObject.new(:host => "bar", :protocol => "https://")).should ==
@@ -1269,7 +1268,7 @@ describe User do
       (1..3).each do |x|
         course = course_with_student(:course_name => "Course #{x}", :user => @user, :active_all => true).course
         @courses << course
-        @user.favorites.build(context: course)
+        @user.favorites.create!(context: course)
       end
 
       @user.save!
@@ -1293,7 +1292,7 @@ describe User do
         (4..6).each do |x|
           course = course_with_student(:course_name => "Course #{x}", :user => @user, :active_all => true).course
           @courses << course
-          @user.favorites.build(context: course)
+          @user.favorites.create!(context: course)
         end
 
         @user.save!
@@ -1360,6 +1359,31 @@ describe User do
     it "should return nil if none work" do
       user_with_pseudonym(:active_all => 1)
       @user.find_pseudonym_for_account(@account2).should == nil
+    end
+
+    describe 'with cross-sharding' do
+      specs_require_sharding
+      it "should only search trusted shards" do
+        @account1 = Account.create!
+        @user = user(:active_all => 1, :account => @account1)
+        @shard1.activate do
+          @account2 = Account.create!
+          @pseudonym1 = pseudonym(@user, :account => @account2)
+        end
+
+        @shard2.activate do
+          @account3 = Account.create!
+          @pseudonym2 = pseudonym(@user, :account => @account3)
+        end
+
+        @account1.stubs(:trusted_account_ids).returns([@account3.id])
+
+        @shard1.expects(:activate).never
+        @shard2.expects(:activate).once
+
+        pseudonym = @user.find_pseudonym_for_account(@account1)
+        pseudonym.should == @psuedonym2
+      end
     end
 
     it "should create a copy of an existing pseudonym" do
@@ -1459,12 +1483,40 @@ describe User do
     end
   end
 
+  describe "can_be_enrolled_in_course?" do
+    before do
+      course active_all: true
+    end
+
+    it "should allow a user with a pseudonym in the course's root account" do
+      user_with_pseudonym account: @course.root_account, active_all: true
+      @user.can_be_enrolled_in_course?(@course).should be_true
+    end
+
+    it "should allow a temporary user with an existing enrollment but no pseudonym" do
+      @user = User.create! { |u| u.workflow_state = 'creation_pending' }
+      @course.enroll_student(@user)
+      @user.can_be_enrolled_in_course?(@course).should be_true
+    end
+
+    it "should not allow a registered user with an existing enrollment but no pseudonym" do
+      user active_all: true
+      @course.enroll_student(@user)
+      @user.can_be_enrolled_in_course?(@course).should be_false
+    end
+
+    it "should not allow a user with neither an enrollment nor a pseudonym" do
+      user active_all: true
+      @user.can_be_enrolled_in_course?(@course).should be_false
+    end
+  end
+
   describe "email_channel" do
     it "should not return retired channels" do
-      u = User.new
-      retired = u.communication_channels.build(:path => 'retired@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'retired'}
+      u = User.create!
+      retired = u.communication_channels.create!(:path => 'retired@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'retired'}
       u.email_channel.should be_nil
-      active = u.communication_channels.build(:path => 'active@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active'}
+      active = u.communication_channels.create!(:path => 'active@example.com', :path_type => 'email') { |cc| cc.workflow_state = 'active'}
       u.email_channel.should == active
     end
   end
@@ -1533,6 +1585,17 @@ describe User do
     it "should bail if it can't find a root account" do
       context = Course.new # some context that doesn't have an account
       (lambda {User.create!.sis_pseudonym_for(context)}).should raise_error("could not resolve root account")
+    end
+
+    it "should include a pseudonym from a trusted account" do
+      account1 = account_model
+      account2 = account_model
+      u = User.create!
+      p = account2.pseudonyms.create!(user: u, unique_id: 'user') { |p| p.sis_user_id = 'abc' }
+      account1.stubs(:trust_exists?).returns(true)
+      account1.stubs(:trusted_account_ids).returns([account2.id])
+      u.sis_pseudonym_for(account1).should be_nil
+      u.sis_pseudonym_for(account1, true).should == p
     end
 
     context "sharding" do
@@ -1704,13 +1767,13 @@ describe User do
         assignments.each do |assignment|
           assignment.expects(:grants_right?).with(user,nil,:delete).returns true
         end
-        assignments.first.expects(:all_dates_visible_to).with(user).
+        assignments.first.expects(:dates_hash_visible_to).with(user).
           returns [due_date1]
-        assignments.second.expects(:all_dates_visible_to).with(user).
+        assignments.second.expects(:dates_hash_visible_to).with(user).
           returns [due_date2]
-        assignments.third.expects(:all_dates_visible_to).with(user).
+        assignments.third.expects(:dates_hash_visible_to).with(user).
           returns [due_date3]
-        assignments[3].expects(:all_dates_visible_to).with(user).
+        assignments[3].expects(:dates_hash_visible_to).with(user).
           returns [due_date4]
         upcoming_assignments = user.select_upcoming_assignments(assignments,{
           :end_at => 1.week.from_now
@@ -1834,21 +1897,24 @@ describe User do
 
   describe "order_by_sortable_name" do
     it "should sort lexicographically" do
-      User.create!(:name => "John Johnson")
-      User.create!(:name => "John John")
-      User.order_by_sortable_name.all.map(&:sortable_name).should == ["John, John", "Johnson, John"]
+      ids = []
+      ids << User.create!(:name => "John Johnson")
+      ids << User.create!(:name => "John John")
+      User.order_by_sortable_name.where(id: ids).all.map(&:sortable_name).should == ["John, John", "Johnson, John"]
     end
 
     it "should sort support direction toggle" do
-      User.create!(:name => "John Johnson")
-      User.create!(:name => "John John")
-      User.order_by_sortable_name(:direction => :descending).all.map(&:sortable_name).should == ["Johnson, John", "John, John"]
+      ids = []
+      ids << User.create!(:name => "John Johnson")
+      ids << User.create!(:name => "John John")
+      User.order_by_sortable_name(:direction => :descending).where(id: ids).all.map(&:sortable_name).should == ["Johnson, John", "John, John"]
     end
 
     it "should sort support direction toggle with a prior select" do
-      User.create!(:name => "John Johnson")
-      User.create!(:name => "John John")
-      User.select([:id, :sortable_name]).order_by_sortable_name(:direction => :descending).all.map(&:sortable_name).should == ["Johnson, John", "John, John"]
+      ids = []
+      ids << User.create!(:name => "John Johnson")
+      ids << User.create!(:name => "John John")
+      User.select([:id, :sortable_name]).order_by_sortable_name(:direction => :descending).where(id: ids).all.map(&:sortable_name).should == ["Johnson, John", "John, John"]
     end
 
     it "should sort by the current locale with pg_collkey if possible" do
@@ -2065,7 +2131,7 @@ describe User do
       [@course1, @course2].each do |course|
         assignment = course.assignments.create!(:title => "some assignment", :submission_types => ['online_text_entry'])
         [@studentA, @studentB].each do |student|
-          bare_submission_model assignment, student, :submission_type => "online_text_entry", :body => "submission for #{student.name}"
+          assignment.submit_homework student, body: "submission for #{student.name}"
         end
       end
     end
@@ -2113,9 +2179,9 @@ describe User do
     it "should limit the number of returned assignments" do
       20.times do |x|
         assignment = @course1.assignments.create!(:title => "excess assignment #{x}", :submission_types => ['online_text_entry'])
-        bare_submission_model assignment, @studentB
+        assignment.submit_homework @studentB, body: "hello"
       end
-      @teacher.assignments_needing_grading.size.should < 22
+      @teacher.assignments_needing_grading.size.should == 15
     end
 
     context "sharding" do
@@ -2130,7 +2196,7 @@ describe User do
           @course3.enroll_student(@studentA).accept!
           @course3.enroll_student(@studentB).accept!
           @assignment3 = @course3.assignments.create!(:title => "some assignment", :submission_types => ['online_text_entry'])
-          bare_submission_model @assignment3, @studentA, :submission_type => "online_text_entry", :body => "submission for A"
+          @assignment3.submit_homework @studentA, body: "submission for A"
         end
       end
 
@@ -2220,27 +2286,55 @@ describe User do
     end
   end
 
-  describe "prefers_gradebook2?" do
+  describe "preferred_gradebook_version" do
     let(:user) { User.new }
-    subject { user.prefers_gradebook2? }
+    let(:course) { mock('course') }
+    subject { user.preferred_gradebook_version(course) }
 
-    context "by default" do
-      it { should be_true }
+    context "with screenreader_gradebook disabled" do
+      before {
+        course.stubs(:feature_enabled?).with(:screenreader_gradebook).returns(false)
+      }
+
+      context "by default" do
+        it { should == '2' }
+      end
+
+      context "with an explicit preference for gradebook 2" do
+        before { user.stubs(:preferences => { :use_gradebook2 => true }) }
+        it { should == '2' }
+      end
+
+      context "with an truthy preference for gradebook 2" do
+        before { user.stubs(:preferences => { :use_gradebook2 => '1' }) }
+        it { should == '2' }
+      end
+
+      context "with an explicit preference for gradebook 1" do
+        before { user.stubs(:preferences => { :use_gradebook2 => false }) }
+        it { should == '1' }
+      end
     end
 
-    context "with an explicit preference for gradebook 2" do
-      before { user.stubs(:preferences => { :use_gradebook2 => true }) }
-      it { should be_true }
-    end
+    context "with screenreader_gradebook enabled" do
+      before {
+        course.stubs(:feature_enabled?).with(:screenreader_gradebook).returns(true)
+      }
 
-    context "with an truthy preference for gradebook 2" do
-      before { user.stubs(:preferences => { :use_gradebook2 => '1' }) }
-      it { should be_true }
-    end
+      context "prefers gb2" do
+        before { user.stubs(:preferences => { :gradebook_version => '2' }) }
+        it { should == '2' }
+      end
 
-    context "with an explicit preference for gradebook 1" do
-      before { user.stubs(:preferences => { :use_gradebook2 => false }) }
-      it { should be_false }
+      context "prefers srgb" do
+        before { user.stubs(:preferences => { :gradebook_version => 'srgb' }) }
+        it { should == 'srgb' }
+      end
+
+      context "nil preference" do
+        before { user.stubs(:preferences => { :gradebook_version => nil }) }
+        it { should == '2' }
+      end
     end
   end
 

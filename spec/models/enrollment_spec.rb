@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -37,12 +37,15 @@ describe Enrollment do
     @enrollment.state.should eql(:active)
     @enrollment.reject
     @enrollment.state.should eql(:rejected)
+    @enrollment.destroy!
     enrollment_model
     @enrollment.complete
     @enrollment.state.should eql(:completed)
+    @enrollment.destroy!
     enrollment_model
     @enrollment.reject
     @enrollment.state.should eql(:rejected)
+    @enrollment.destroy!
     enrollment_model
     @enrollment.accept
     @enrollment.state.should eql(:active)
@@ -51,6 +54,7 @@ describe Enrollment do
   it "should be pending if it is invited or creation_pending" do
     enrollment_model(:workflow_state => 'invited')
     @enrollment.should be_pending
+    @enrollment.destroy!
 
     enrollment_model(:workflow_state => 'creation_pending')
     @enrollment.should be_pending
@@ -571,153 +575,175 @@ describe Enrollment do
       end
     end
 
-    context 'dates change' do
+    context 'student dates change' do
       before do
-        @old_cache = RAILS_CACHE
-        silence_warnings { Object.const_set(:RAILS_CACHE, ActiveSupport::Cache::MemoryStore.new) }
+        enable_cache
+        Timecop.freeze(10.minutes.ago) do
+          course_with_student(active_all: true)
+        end
       end
 
-      after do
-        silence_warnings { Object.const_set(:RAILS_CACHE, @old_cache) }
+      describe 'enrollment dates' do
+        it "should return active enrolmnet" do
+          @enrollment.start_at = 2.days.ago
+          @enrollment.end_at = 2.days.from_now
+          @enrollment.workflow_state = 'active'
+          @enrollment.save!
+          @enrollment.state.should eql(:active)
+          @enrollment.state_based_on_date.should eql(:active)
+        end
+
+        it "should return completed enrolmnet" do
+          @enrollment.start_at = 4.days.ago
+          @enrollment.end_at = 2.days.ago
+          @enrollment.save!
+          @enrollment.reload.state.should eql(:active)
+          @enrollment.state_based_on_date.should eql(:completed)
+        end
+
+        it "should return inactive enrolmnet" do
+          @enrollment.start_at = 2.days.from_now
+          @enrollment.end_at = 4.days.from_now
+          @enrollment.save!
+          @enrollment.reload.state.should eql(:active)
+          @enrollment.state_based_on_date.should eql(:inactive)
+        end
       end
 
-      it "should return the right state based on availability dates on enrollment" do
-        course_with_student(:active_all => true)
-        @enrollment.start_at = 2.days.ago
-        @enrollment.end_at = 2.days.from_now
-        @enrollment.workflow_state = 'active'
-        @enrollment.save!
-        @enrollment.state.should eql(:active)
-        @enrollment.state_based_on_date.should eql(:active)
+      describe 'section dates' do
+        before do
+          @section = @course.course_sections.first
+          @section.should_not be_nil
+          @section.restrict_enrollments_to_section_dates = true
+        end
 
-        sleep 1
-        @enrollment.start_at = 4.days.ago
-        @enrollment.end_at = 2.days.ago
-        @enrollment.save!
-        @enrollment.reload.state.should eql(:active)
-        @enrollment.state_based_on_date.should eql(:completed)
+        it "should return active" do
+          @section.start_at = 2.days.ago
+          @section.end_at = 2.days.from_now
+          @section.save!
+          @enrollment.state.should eql(:active)
+          @enrollment.state_based_on_date.should eql(:active)
+        end
 
-        sleep 1
-        @enrollment.start_at = 2.days.from_now
-        @enrollment.end_at = 4.days.from_now
-        @enrollment.save!
-        @enrollment.reload.state.should eql(:active)
-        @enrollment.state_based_on_date.should eql(:inactive)
+        it "should return completed" do
+          @section.start_at = 4.days.ago
+          @section.end_at = 2.days.ago
+          @section.save!
+          @enrollment.reload.state.should eql(:active)
+          @enrollment.state_based_on_date.should eql(:completed)
+        end
+
+        it "should return inactive" do
+          @section.start_at = 2.days.from_now
+          @section.end_at = 4.days.from_now
+          @section.save!
+          @enrollment.reload.state.should eql(:active)
+          @enrollment.state_based_on_date.should eql(:inactive)
+        end
       end
 
-      it "should return the right state based on availability dates on course_section" do
-        course_with_student(:active_all => true)
-        @section = @course.course_sections.first
-        @section.should_not be_nil
-        @enrollment.course_section = @section
-        @enrollment.workflow_state = 'active'
-        @enrollment.save!
-        @section.start_at = 2.days.ago
-        @section.end_at = 2.days.from_now
-        @section.restrict_enrollments_to_section_dates = true
-        @section.save!
-        @enrollment.state.should eql(:active)
-        @enrollment.state_based_on_date.should eql(:active)
+      describe 'course dates' do
+        before do
+          @course.restrict_enrollments_to_course_dates = true
+        end
 
-        sleep 1
-        @section.start_at = 4.days.ago
-        @section.end_at = 2.days.ago
-        @section.save!
-        @enrollment.reload.state.should eql(:active)
-        @enrollment.state_based_on_date.should eql(:completed)
+        it "should return active" do
+          @course.start_at = 2.days.ago
+          @course.conclude_at = 2.days.from_now
+          @course.save!
+          @enrollment.workflow_state = 'active'
+          @enrollment.save!
+          @enrollment.reload.state.should eql(:active)
+          @enrollment.state_based_on_date.should eql(:active)
+        end
 
-        sleep 1
-        @section.start_at = 2.days.from_now
-        @section.end_at = 4.days.from_now
-        @section.save!
-        @enrollment.reload.state.should eql(:active)
-        @enrollment.state_based_on_date.should eql(:inactive)
+        it "should return completed" do
+          @course.start_at = 4.days.ago
+          @course.conclude_at = 2.days.ago
+          @course.save!
+          @enrollment.reload.state.should eql(:active)
+          @enrollment.state_based_on_date.should eql(:completed)
+        end
+
+        it "should return inactive" do
+          @course.start_at = 2.days.from_now
+          @course.conclude_at = 4.days.from_now
+          @course.save!
+          @enrollment.reload.state.should eql(:active)
+          @enrollment.state_based_on_date.should eql(:inactive)
+        end
       end
 
-      it "should return the right state based on availability dates on course" do
-        course_with_student(:active_all => true)
-        @course.start_at = 2.days.ago
-        @course.conclude_at = 2.days.from_now
-        @course.restrict_enrollments_to_course_dates = true
-        @course.save!
-        @enrollment.workflow_state = 'active'
-        @enrollment.save!
-        @enrollment.reload.state.should eql(:active)
-        @enrollment.state_based_on_date.should eql(:active)
+      describe 'term dates' do
+        before do
+          @term = @course.enrollment_term
+          @term.should_not be_nil
+        end
 
-        sleep 1
-        @course.start_at = 4.days.ago
-        @course.conclude_at = 2.days.ago
-        @course.save!
-        @enrollment.reload.state.should eql(:active)
-        @enrollment.state_based_on_date.should eql(:completed)
+        it "should return active" do
+          @term.start_at = 2.days.ago
+          @term.end_at = 2.days.from_now
+          @term.save!
+          @enrollment.workflow_state = 'active'
+          @enrollment.reload.state.should eql(:active)
+          @enrollment.state_based_on_date.should eql(:active)
+        end
 
-        sleep 1
-        @course.start_at = 2.days.from_now
-        @course.conclude_at = 4.days.from_now
-        @course.save!
-        @enrollment.reload.state.should eql(:active)
-        @enrollment.state_based_on_date.should eql(:inactive)
+        it "should return completed" do
+          @term.start_at = 4.days.ago
+          @term.end_at = 2.days.ago
+          @term.reset_touched_courses_flag
+          @term.save!
+          @enrollment.reload.state.should eql(:active)
+          @enrollment.state_based_on_date.should eql(:completed)
+        end
+
+        it "should return inactive" do
+          @term.start_at = 2.days.from_now
+          @term.end_at = 4.days.from_now
+          @term.reset_touched_courses_flag
+          @term.save!
+          @enrollment.course.reload
+          @enrollment.reload.state.should eql(:active)
+          @enrollment.state_based_on_date.should eql(:inactive)
+        end
       end
 
-      it "should return the right state based on availability dates on enrollment_term" do
-        course_with_student(:active_all => true)
-        @term = @course.enrollment_term
-        @term.should_not be_nil
-        @term.start_at = 2.days.ago
-        @term.end_at = 2.days.from_now
-        @term.save!
-        @enrollment.workflow_state = 'active'
-        @enrollment.reload.state.should eql(:active)
-        @enrollment.state_based_on_date.should eql(:active)
+      describe 'enrollment_dates_override dates' do
+        before do
+          @term = @course.enrollment_term
+          @term.should_not be_nil
+          @override = @term.enrollment_dates_overrides.create!(:enrollment_type => 'StudentEnrollment', :enrollment_term => @term)
 
-        sleep 1
-        @term.start_at = 4.days.ago
-        @term.end_at = 2.days.ago
-        @term.reset_touched_courses_flag
-        @term.save!
-        @enrollment.reload.state.should eql(:active)
-        @enrollment.state_based_on_date.should eql(:completed)
+        end
 
-        sleep 1
-        @term.start_at = 2.days.from_now
-        @term.end_at = 4.days.from_now
-        @term.reset_touched_courses_flag
-        @term.save!
-        @enrollment.course.reload
-        @enrollment.reload.state.should eql(:active)
-        @enrollment.state_based_on_date.should eql(:inactive)
-      end
+        it "should return active" do
+          @override.start_at = 2.days.ago
+          @override.end_at = 2.days.from_now
+          @override.save!
+          @enrollment.workflow_state = 'active'
+          @enrollment.save!
+          @enrollment.reload.state.should eql(:active)
+          @enrollment.state_based_on_date.should eql(:active)
+        end
 
-      it "should return the right state based on availability dates on enrollment_dates_override" do
-        course_with_student(:active_all => true)
-        @term = @course.enrollment_term
-        @term.should_not be_nil
-        @term.save!
-        @override = @term.enrollment_dates_overrides.create!(:enrollment_type => 'StudentEnrollment', :enrollment_term => @term)
-        @override.start_at = 2.days.ago
-        @override.end_at = 2.days.from_now
-        @override.save!
-        @enrollment.workflow_state = 'active'
-        @enrollment.save!
-        @enrollment.reload.state.should eql(:active)
-        @enrollment.state_based_on_date.should eql(:active)
+        it "should return completed" do
+          @override.start_at = 4.days.ago
+          @override.end_at = 2.days.ago
+          @term.reset_touched_courses_flag
+          @override.save!
+          @enrollment.reload.state.should eql(:active)
+          @enrollment.state_based_on_date.should eql(:completed)
+        end
 
-        sleep 1
-        @override.start_at = 4.days.ago
-        @override.end_at = 2.days.ago
-        @term.reset_touched_courses_flag
-        @override.save!
-        @enrollment.reload.state.should eql(:active)
-        @enrollment.state_based_on_date.should eql(:completed)
-
-        sleep 1
-        @override.start_at = 2.days.from_now
-        @override.end_at = 4.days.from_now
-        @term.reset_touched_courses_flag
-        @override.save!
-        @enrollment.reload.state.should eql(:active)
-        @enrollment.state_based_on_date.should eql(:inactive)
+        it "should return inactive" do
+          @override.start_at = 2.days.from_now
+          @override.end_at = 4.days.from_now
+          @term.reset_touched_courses_flag
+          @override.save!
+          @enrollment.reload.state.should eql(:active)
+          @enrollment.state_based_on_date.should eql(:inactive)
+        end
       end
     end
 
@@ -867,7 +893,6 @@ describe Enrollment do
       @enrollment.inactive?.should be_false
       @enrollment.completed?.should be_false
 
-      sleep 1
       @enrollment.start_at = 4.days.ago
       @enrollment.end_at = 2.days.ago
       @enrollment.save!
@@ -876,7 +901,6 @@ describe Enrollment do
       @enrollment.inactive?.should be_false
       @enrollment.completed?.should be_true
 
-      sleep 1
       @enrollment.start_at = 2.days.from_now
       @enrollment.end_at = 4.days.from_now
       @enrollment.save!
@@ -894,13 +918,11 @@ describe Enrollment do
       @enrollment.save!
       @enrollment.explicitly_completed?.should be_false
 
-      sleep 1
       @enrollment.start_at = 4.days.ago
       @enrollment.end_at = 2.days.ago
       @enrollment.save!
       @enrollment.explicitly_completed?.should be_false
 
-      sleep 1
       @enrollment.start_at = 2.days.from_now
       @enrollment.end_at = 4.days.from_now
       @enrollment.save!
@@ -924,7 +946,6 @@ describe Enrollment do
       @enrollment.completed_at = yesterday
       @enrollment.completed_at.should == yesterday
 
-      sleep 1
       @enrollment.start_at = 4.days.ago
       @enrollment.end_at = 2.days.ago
       @enrollment.completed_at = nil
@@ -1272,7 +1293,7 @@ describe Enrollment do
     end
 
     describe "future scope" do
-      it "should include enrollments for future and unpublished courses" do
+      it "should include enrollments for future but not unpublished courses for students" do
         user
         future_course  = Course.create!(:name => 'future course', :start_at => Time.now + 2.weeks,
                                         :restrict_enrollments_to_course_dates => true)
@@ -1286,6 +1307,29 @@ describe Enrollment do
         future_enrollment  = StudentEnrollment.create!(:course => future_course, :user => @user)
         current_unpublished_enrollment = StudentEnrollment.create!(:course => current_unpublished_course, :user => @user)
         future_unpublished_enrollment = StudentEnrollment.create!(:course => future_unpublished_course, :user => @user)
+        future_unrestricted_enrollment = StudentEnrollment.create!(:course => future_unrestricted_course, :user => @user)
+
+        [future_course, current_course, future_unrestricted_course].each { |course| course.offer }
+        [current_enrollment, future_enrollment, current_unpublished_enrollment, future_unpublished_enrollment, future_unrestricted_enrollment].each { |e| e.accept }
+
+        @user.enrollments.future.length.should == 1
+        @user.enrollments.future.should include(future_enrollment)
+      end
+
+      it "should include enrollments for future as well as unpublished courses for admins" do
+        user
+        future_course  = Course.create!(:name => 'future course', :start_at => Time.now + 2.weeks,
+                                        :restrict_enrollments_to_course_dates => true)
+        current_course = Course.create!(:name => 'current course', :start_at => Time.now - 2.weeks)
+
+        current_unpublished_course  = Course.create!(:name => 'future course 2', :start_at => Time.now - 2.weeks)
+        future_unpublished_course  = Course.create!(:name => 'future course 2', :start_at => Time.now + 2.weeks)
+        future_unrestricted_course = Course.create!(:name => 'future course 3', :start_at => Time.now + 2.weeks)
+
+        current_enrollment = StudentEnrollment.create!(:course => current_course, :user => @user)
+        future_enrollment  = StudentEnrollment.create!(:course => future_course, :user => @user)
+        current_unpublished_enrollment = TeacherEnrollment.create!(:course => current_unpublished_course, :user => @user)
+        future_unpublished_enrollment = TeacherEnrollment.create!(:course => future_unpublished_course, :user => @user)
         future_unrestricted_enrollment = StudentEnrollment.create!(:course => future_unrestricted_course, :user => @user)
 
         [future_course, current_course, future_unrestricted_course].each { |course| course.offer }
@@ -1305,60 +1349,6 @@ describe Enrollment do
       @user.associated_accounts.should == [Account.default]
       @enrollment.destroy
       @user.associated_accounts(true).should == []
-    end
-  end
-
-  describe ".remove_duplicate_enrollments_from_sections" do
-    before do
-      course_with_student(:active_all => true)
-      @e1 = @enrollment
-      @e1.sis_batch_id = 2
-      @e1.sis_source_id = 'ohai'
-      @e1.save!
-    end
-
-    it "should leave single enrollments alone" do
-      expect { Enrollment.remove_duplicate_enrollments_from_sections }.to change(Enrollment, :count).by(0)
-      @e1.reload.should be_active
-    end
-
-    it "should remove duplicates" do
-      enrollment_model(:course_section => @course.course_sections.first, :user => @user, :sis_source_id => 'ohai', :workflow_state => 'active', :type => "StudentEnrollment")
-      expect { Enrollment.remove_duplicate_enrollments_from_sections }.to change(Enrollment, :count).by(-1)
-    end
-
-    it "should prefer the highest sis_batch_id" do
-      enrollment_model(:course_section => @course.course_sections.first, :user => @user, :sis_source_id => 'ohai', :type => "StudentEnrollment", :sis_batch_id => 1)
-      expect { Enrollment.remove_duplicate_enrollments_from_sections }.to change(Enrollment, :count).by(-1)
-      @e1.reload.state.should == :active
-    end
-
-    it "should group by user_id" do
-      enrollment_model(:course_section => @course.course_sections.first, :user => user, :sis_source_id => 'ohai2', :type => "StudentEnrollment")
-      expect { Enrollment.remove_duplicate_enrollments_from_sections }.to change(Enrollment, :count).by(0)
-    end
-
-    it "should group by type" do
-      enrollment_model(:course_section => @course.course_sections.first, :user => @user, :sis_source_id => 'ohai', :type => "TeacherEnrollment")
-      expect { Enrollment.remove_duplicate_enrollments_from_sections }.to change(Enrollment, :count).by(0)
-    end
-
-    it "should group by section" do
-      enrollment_model(:course_section => @course.course_sections.create!(:name => 's2'), :user => @user, :sis_source_id => 'ohai', :type => "StudentEnrollment")
-      expect { Enrollment.remove_duplicate_enrollments_from_sections }.to change(Enrollment, :count).by(0)
-    end
-
-    it "should group by associated_user_id" do
-      @e1.type = "ObserverEnrollment"
-      @e1.save!
-      enrollment_model(:course_section => @course.course_sections.first, :user => @user, :sis_source_id => 'ohai', :associated_user_id => user.id, :type => "ObserverEnrollment")
-      expect { Enrollment.remove_duplicate_enrollments_from_sections }.to change(Enrollment, :count).by(0)
-    end
-
-    it "should ignore non-sis enrollments" do
-      @e1.update_attribute('sis_source_id', nil)
-      enrollment_model(:course_section => @course.course_sections.first, :user => @user, :type => "StudentEnrollment")
-      expect { Enrollment.remove_duplicate_enrollments_from_sections }.to change(Enrollment, :count).by(0)
     end
   end
 
@@ -1518,31 +1508,6 @@ describe Enrollment do
       pe.reload.should be_completed
     end
 
-    it 'should update the best observer enrollment if there are duplicates' do
-      se = course_with_student(:user => @student)
-      pe = @parent.observer_enrollments.first
-      pe.should_not be_nil
-
-      pe.destroy
-      pe2 = @parent.observer_enrollments.build
-      pe2.course_id = pe.course_id
-      pe2.course_section_id = pe.course_section_id
-      pe2.associated_user_id = pe.associated_user_id
-      pe2.save!
-
-      se.invite
-      pe.reload.should be_deleted
-      pe2.reload.should be_invited
-
-      se.accept
-      pe.reload.should be_deleted
-      pe2.reload.should be_active
-
-      se.complete
-      pe.reload.should be_deleted
-      pe2.reload.should be_completed
-    end
-
     it 'should not undelete observer enrollments if the student enrollment wasn\'t already deleted' do
       se = course_with_student(:user => @student)
       pe = @parent.observer_enrollments.first
@@ -1613,7 +1578,7 @@ describe Enrollment do
       @enrollment.last_activity_at.should be_nil
       now = Time.zone.now
       @enrollment.record_recent_activity(now)
-      @enrollment.record_recent_activity(now + 5.minutes)
+      @enrollment.record_recent_activity(now + 1.minutes)
       @enrollment.last_activity_at.to_s.should == now.to_s
     end
 
@@ -1624,6 +1589,19 @@ describe Enrollment do
       @enrollment.record_recent_activity(now)
       @enrollment.record_recent_activity(now + 11.minutes)
       @enrollment.last_activity_at.should.to_s == (now + 11.minutes).to_s
+    end
+
+    it "should update total_activity_time within the time threshold" do
+      course_with_student(:active_all => 1)
+      @enrollment.total_activity_time.should == 0
+      now = Time.zone.now
+      @enrollment.record_recent_activity(now)
+      @enrollment.record_recent_activity(now + 1.minutes)
+      @enrollment.total_activity_time.should == 0
+      @enrollment.record_recent_activity(now + 3.minutes)
+      @enrollment.total_activity_time.should == 3.minutes.to_i
+      @enrollment.record_recent_activity(now + 30.minutes)
+      @enrollment.total_activity_time.should == 3.minutes.to_i
     end
   end
 

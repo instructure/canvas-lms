@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2012 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,7 +17,19 @@
 #
 
 if CANVAS_RAILS2
+class DatabaseServer
+  def id
+    'default'
+  end
+
+  def self.default
+    @default ||= DatabaseServer.new
+  end
+end
+
 class Shard
+  IDS_PER_SHARD = 10_000_000_000_000
+
   def self.stubbed?
     true
   end
@@ -30,7 +42,11 @@ class Shard
     default
   end
 
-  def self.current
+  def self.current(category = :default)
+    default
+  end
+
+  def self.lookup(id)
     default
   end
 
@@ -45,6 +61,10 @@ class Shard
 
   def self.shard_for(object)
     default
+  end
+
+  def database_server
+    DatabaseServer.default
   end
 
   def activate
@@ -63,15 +83,15 @@ class Shard
     "default"
   end
 
-  def relative_id_for(any_id, target_shard = nil)
-    any_id
+  def self.local_id_for(any_id)
+    [any_id, Shard.default]
   end
 
   def self.global_id_for(any_id)
     any_id.is_a?(ActiveRecord::Base) ? any_id.global_id : any_id
   end
 
-  def self.relative_id_for(any_id, target_shard = nil)
+  def self.relative_id_for(any_id, source_shard, target_shard)
     any_id.is_a?(ActiveRecord::Base) ? any_id.local_id : any_id
   end
 
@@ -127,7 +147,7 @@ module ActiveRecord::Associations
   %w{HasManyAssociation HasManyThroughAssociation}.each do |klass|
     const_get(klass).class_eval do
       def with_each_shard(*shards)
-        scope = self
+        scope = self.scoped
         scope = yield(scope) if block_given?
         Array(scope)
       end

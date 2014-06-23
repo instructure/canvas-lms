@@ -91,7 +91,7 @@ define([
         // if I have a url to ping back to the app that I viewed this file inline, ping it.
         if (opts.attachment_view_inline_ping_url) {
           $.ajaxJSON(opts.attachment_view_inline_ping_url, 'POST', {}, function() { }, function() { });
-          $.trackEvent('Doc Previews', serviceUsed, JSON.stringify(opts, ['attachment_id', 'submission_id', 'mimetype', 'crocodoc_session_url', 'scribd_doc_id']));
+          $.trackEvent('Doc Previews', serviceUsed, JSON.stringify(opts, ['attachment_id', 'submission_id', 'mimetype', 'crocodoc_session_url', 'canvadoc_session_url', 'scribd_doc_id']));
         }
       }
 
@@ -104,6 +104,20 @@ define([
         iframe.appendTo($this);
         iframe.load(function() {
           tellAppIViewedThisInline('crocodoc');
+          if ($.isFunction(opts.ready))
+            opts.ready();
+        });
+      }
+      else if (opts.canvadoc_session_url) {
+        var iframe = $('<iframe/>', {
+            src: opts.canvadoc_session_url,
+            width: opts.width,
+            height: opts.height,
+            css: {border: 0}
+        });
+        iframe.appendTo($this);
+        iframe.load(function() {
+          tellAppIViewedThisInline('canvadocs');
           if ($.isFunction(opts.ready))
             opts.ready();
         });
@@ -172,14 +186,16 @@ define([
             embedded: true,
             url: opts.public_url
           });
-          $('<iframe src="' + googleDocPreviewUrl + '" height="' + opts.height  + '" width="100%" />')
-            .appendTo($this)
-            .load(function(){
-              tellAppIViewedThisInline('google');
-              if ($.isFunction(opts.ready)) {
-                opts.ready();
-              }
-            });
+          if (!opts.ajax_valid || opts.ajax_valid()){
+            $('<iframe src="' + googleDocPreviewUrl + '" height="' + opts.height  + '" width="100%" />')
+              .appendTo($this)
+              .load(function(){
+                tellAppIViewedThisInline('google');
+                if ($.isFunction(opts.ready)) {
+                  opts.ready();
+                }
+              });
+          }
         }
         if (opts.public_url) {
           loadGooglePreview()
@@ -205,7 +221,7 @@ define([
           $this.html('<p>' + htmlEscape(I18n.t('errors.document_preview_processing', 'The document preview is currently being processed. Please try again later.')) + '</p>');
           $.ajaxJSON(opts.attachment_scribd_render_url, 'POST', {}, function() {}, function() {});
         } else {
-          $this.html('<p>' + htmlEscape(I18n.t('errors.cannot_view_document_inline', 'This document cannot be viewed inline.')) + '</p>');
+          $this.html('<p>' + htmlEscape(I18n.t('errors.cannot_view_document_in_canvas', 'This document cannot be displayed within Canvas.')) + '</p>');
         }
       }
     });

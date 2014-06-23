@@ -1,4 +1,5 @@
 define [
+  'jquery'
   'underscore'
   'i18n!discussions'
   'compiled/discussions/MarkAsReadWatcher'
@@ -16,7 +17,7 @@ define [
   'compiled/str/convertApiUserContent'
   'jst/_avatar'
   'jst/discussions/_reply_form'
-], (_, I18n, MarkAsReadWatcher, walk, Backbone, EntryCollection, entryContentPartial, deletedEntriesTemplate, entryWithRepliesTemplate, entryStats, Reply, EntryEditor, htmlEscape, {publish}, convertApiUserContent) ->
+], ($, _, I18n, MarkAsReadWatcher, walk, Backbone, EntryCollection, entryContentPartial, deletedEntriesTemplate, entryWithRepliesTemplate, entryStats, Reply, EntryEditor, htmlEscape, {publish}, convertApiUserContent) ->
 
   class EntryView extends Backbone.View
 
@@ -94,7 +95,7 @@ define [
 
     toJSON: ->
       json = @model.attributes
-      json.edited_at = $.parseFromISO(json.updated_at).datetime_formatted
+      json.edited_at = $.datetimeString(json.updated_at)
       if json.editor
         json.editor_name = json.editor.display_name
         json.editor_href = "href=\"#{json.editor.html_url}\""
@@ -204,7 +205,7 @@ define [
         @model.set 'deleted', true
         @model.destroy()
         html = deletedEntriesTemplate @toJSON()
-        @$('.entry_content:first').html html
+        @$('.entry-content:first').html html
 
     edit: ->
       return unless @model.canModerate()

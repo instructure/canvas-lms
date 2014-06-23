@@ -1,9 +1,10 @@
 define [
-  'use!vendor/backbone'
+  'jquery'
+  'vendor/backbone'
   'underscore'
   'str/htmlEscape'
   'compiled/util/mixin'
-], (Backbone, _, htmlEscape, mixin) ->
+], ($, Backbone, _, htmlEscape, mixin) ->
 
   ##
   # Extends Backbone.View on top of itself to be 100X more useful
@@ -296,7 +297,6 @@ define [
     ##
     # DEPRECATED - don't use views option, use `child` constructor method
     renderViews: ->
-      console?.warn? 'the `views` option is deprecated in favor of @child`'
       _.each @options.views, @renderView
 
     ##

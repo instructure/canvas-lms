@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../locked_spec')
 
-describe "Files API", :type => :integration do
+describe "Files API", type: :request do
   context 'locked api item' do
     let(:item_type) { 'file' }
 
@@ -36,7 +36,7 @@ describe "Files API", :type => :integration do
       )
     end
 
-    it_should_behave_like 'a locked api item'
+    include_examples 'a locked api item'
   end
 
   before do
@@ -130,7 +130,7 @@ describe "Files API", :type => :integration do
       upload_data
       raw_api_call(:post, "/api/v1/files/#{@attachment.id}/create_success?uuid=abcde",
                    { :controller => "files", :action => "api_create_success", :format => "json", :id => @attachment.to_param, :uuid => "abcde" })
-      response.status.to_i.should == 400
+      assert_status(400)
     end
 
     it "should fail if the attachment is already available" do
@@ -138,7 +138,7 @@ describe "Files API", :type => :integration do
       @attachment.update_attribute(:file_state, 'available')
       raw_api_call(:post, "/api/v1/files/#{@attachment.id}/create_success?uuid=#{@attachment.uuid}",
                    { :controller => "files", :action => "api_create_success", :format => "json", :id => @attachment.to_param, :uuid => @attachment.uuid })
-      response.status.to_i.should == 400
+      assert_status(400)
     end
 
     context "upload success context callback" do
@@ -263,6 +263,21 @@ describe "Files API", :type => :integration do
       json = api_call(:get, @files_path + "?search_term=fir", @files_path_options.merge(:search_term => 'fir'), {})
       json.map{|h| h['id']}.sort.should == atts.map(&:id).sort
     end
+
+    it "should include user if requested" do
+      @a1.update_attribute(:user, @user)
+      json = api_call(:get, @files_path + "?include[]=user", @files_path_options.merge(include: ['user']))
+      json.map{|f|f['user']}.should eql [
+        {},
+        {},
+        {
+          "id" => @user.id,
+          "display_name" => @user.short_name,
+          "avatar_image_url" => User.avatar_fallback_url,
+          "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@user.id}"
+        }
+      ]
+    end
   end
 
   describe "#index for courses" do
@@ -270,25 +285,70 @@ describe "Files API", :type => :integration do
       @root = Folder.root_folders(@course).first
       @f1 = @root.sub_folders.create!(:name => "folder1", :context => @course)
       @a1 = Attachment.create!(:filename => 'ztest.txt', :display_name => "ztest.txt", :position => 1, :uploaded_data => StringIO.new('file'), :folder => @f1, :context => @course)
-      @a3 = Attachment.create(:filename => 'atest3.txt', :display_name => "atest3.txt", :position => 2, :uploaded_data => StringIO.new('file'), :folder => @f1, :context => @course)
+      @a3 = Attachment.create(:filename => 'atest3.txt', :display_name => "atest3.txt", :position => 2, :uploaded_data => StringIO.new('file_'), :folder => @f1, :context => @course)
       @a3.hidden = true
       @a3.save!
-      @a2 = Attachment.create!(:filename => 'mtest2.txt', :display_name => "mtest2.txt", :position => 3, :uploaded_data => StringIO.new('file'), :folder => @f1, :context => @course, :locked => true)
+      @a2 = Attachment.create!(:filename => 'mtest2.txt', :display_name => "mtest2.txt", :position => 3, :uploaded_data => StringIO.new('file__'), :folder => @f1, :context => @course, :locked => true)
 
       @files_path = "/api/v1/courses/#{@course.id}/files"
       @files_path_options = { :controller => "files", :action => "api_index", :format => "json", :course_id => @course.id.to_param }
     end
 
-    it "should list files in alphabetical order" do
-      json = api_call(:get, @files_path, @files_path_options, {})
-      res = json.map{|f|f['display_name']}
-      res.should == %w{atest3.txt mtest2.txt ztest.txt}
-    end
+    describe "sort" do
+      it "should list files in alphabetical order" do
+        json = api_call(:get, @files_path, @files_path_options, {})
+        res = json.map{|f|f['display_name']}
+        res.should == %w{atest3.txt mtest2.txt ztest.txt}
+      end
 
-    it "should list files in saved order if flag set" do
-      json = api_call(:get, @files_path + "?sort_by=position", @files_path_options.merge(:sort_by => 'position'), {})
-      res = json.map{|f|f['display_name']}
-      res.should == %w{ztest.txt atest3.txt mtest2.txt}
+      it "should list files in saved order if flag set" do
+        json = api_call(:get, @files_path + "?sort_by=position", @files_path_options.merge(:sort_by => 'position'), {})
+        res = json.map{|f|f['display_name']}
+        res.should == %w{ztest.txt atest3.txt mtest2.txt}
+      end
+
+      it "should sort by size" do
+        json = api_call(:get, @files_path + "?sort=size", @files_path_options.merge(sort: 'size'))
+        res = json.map{|f|[f['display_name'], f['size']]}
+        res.should == [['ztest.txt', 4], ['atest3.txt', 5], ['mtest2.txt', 6]]
+      end
+
+      it "should sort by last-modified time" do
+        Timecop.freeze(2.hours.ago) { @a2.touch }
+        Timecop.freeze(1.hour.ago) { @a1.touch }
+        json = api_call(:get, @files_path + "?sort=updated_at", @files_path_options.merge(sort: 'updated_at'))
+        res = json.map{|f|f['display_name']}
+        res.should == %w{mtest2.txt ztest.txt atest3.txt}
+      end
+
+      it "should sort by content_type" do
+        @a1.update_attribute(:content_type, "application/octet-stream")
+        @a2.update_attribute(:content_type, "video/quicktime")
+        @a3.update_attribute(:content_type, "text/plain")
+        json = api_call(:get, @files_path + "?sort=content_type", @files_path_options.merge(sort: 'content_type'))
+        res = json.map{|f|[f['display_name'], f['content-type']]}
+        res.should == [['ztest.txt', 'application/octet-stream'], ['atest3.txt', 'text/plain'], ['mtest2.txt', 'video/quicktime']]
+      end
+
+      it "should sort by user, nulls last" do
+        @caller = @user
+        @s1 = student_in_course(active_all: true, name: 'alice').user
+        @a1.update_attribute :user, @s1
+        @s2 = student_in_course(active_all: true, name: 'bob').user
+        @a3.update_attribute :user, @s2
+        @user = @caller
+        json = api_call(:get, @files_path + "?sort=user", @files_path_options.merge(sort: 'user'))
+        res = json.map do |file|
+          [file['display_name'], file['user']['display_name']]
+        end
+        res.should == [['ztest.txt', 'alice'], ['atest3.txt', 'bob'], ['mtest2.txt', nil]]
+      end
+
+      it "should sort in descending order" do
+        json = api_call(:get, @files_path + "?sort=size&order=desc", @files_path_options.merge(sort: 'size', order: 'desc'))
+        res = json.map{|f|[f['display_name'], f['size']]}
+        res.should == [['mtest2.txt', 6], ['atest3.txt', 5], ['ztest.txt', 4]]
+      end
     end
 
     it "should not list locked file if not authed" do
@@ -472,6 +532,17 @@ describe "Files API", :type => :integration do
       @att.save!
       api_call(:get, @file_path, @file_path_options, {}, {}, :expected_status => 200)
     end
+
+    it "should return user if requested" do
+      @att.update_attribute(:user, @user)
+      json = api_call(:get, @file_path + "?include[]=user", @file_path_options.merge(include: ['user']))
+      json['user'].should eql({
+        "id" => @user.id,
+        "display_name" => @user.short_name,
+        "avatar_image_url" => User.avatar_fallback_url,
+        "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@user.id}"
+      })
+    end
   end
 
   describe "#destroy" do
@@ -538,6 +609,49 @@ describe "Files API", :type => :integration do
     it "should not allow moving to different context" do
       user_root = Folder.root_folders(@user).first
       api_call(:put, @file_path, @file_path_options, {:parent_folder_id => user_root.id.to_param}, {}, :expected_status => 404)
+    end
+  end
+
+  describe "quota" do
+    let(:t_course) do
+      course_with_teacher_logged_in active_all: true
+      @course.storage_quota = 111.megabytes
+      @course.save
+      attachment_model context: @course, size: 33.megabytes
+      @course
+    end
+
+    let(:t_teacher) do
+      t_course.teachers.first
+    end
+
+    it "should return total and used quota" do
+      json = api_call_as_user(t_teacher, :get, "/api/v1/courses/#{t_course.id}/files/quota", controller: 'files',
+                              action: 'api_quota', format: 'json', course_id: t_course.to_param)
+      json.should eql({"quota" => 111.megabytes, "quota_used" => 33.megabytes})
+    end
+
+    it "should require manage_files permissions" do
+      student_in_course course: t_course, active_all: true
+      api_call_as_user(@student, :get, "/api/v1/courses/#{t_course.id}/files/quota",
+                       {controller: 'files', action: 'api_quota', format: 'json', course_id: t_course.to_param},
+                       {}, {}, { expected_status: 401 })
+    end
+
+    it "should operate on groups" do
+      group = Account.default.groups.create!
+      attachment_model context: group, size: 13.megabytes
+      account_admin_user
+      json = api_call(:get, "/api/v1/groups/#{group.id}/files/quota", controller: 'files', action: 'api_quota',
+                      format: 'json', group_id: group.to_param)
+      json.should eql({"quota" => group.quota, "quota_used" => 13.megabytes})
+    end
+
+    it "should operate on users" do
+      course_with_student active_all: true
+      json = api_call(:get, "/api/v1/users/self/files/quota", controller: 'files', action: 'api_quota',
+                      format: 'json', user_id: 'self')
+      json.should eql({"quota" => @student.quota, "quota_used" => 0})
     end
   end
 end

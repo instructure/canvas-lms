@@ -1,10 +1,30 @@
 define [
-  'ember',
+  'ember'
+  '../shared/environment'
+  '../shared/util'
+  '../../screenreader_gradebook/components/fast_select_component'
   '../../shared/components/ic_actions_component'
   '../../shared/components/ic_publish_icon_component'
-], (Ember) ->
+  './date_transform'
+], (Ember, env, Util, FastSelectComponent) ->
+  Ember.Util = Util
 
-  Ember.$.ajaxPrefilter (options, originalOptions, xhr) ->
+  Ember.onLoad 'Ember.Application', (Application) ->
+    Application.initializer
+      name: 'FastSelectComponent'
+      initialize: (container, application) ->
+        container.register 'component:fast-select', FastSelectComponent
+    Application.initializer
+      name: 'environment'
+      initialize: (container, application) ->
+        env.setEnv(window.ENV)
+
+  Ember.Inflector.inflector.irregular('quizStatistics', 'quizStatistics')
+  Ember.Inflector.inflector.irregular('questionStatistics', 'questionStatistics')
+  Ember.Inflector.inflector.irregular('progress', 'progress')
+  Ember.Inflector.inflector.irregular('summaryStatistics', 'summaryStatistics')
+
+  Ember.$.ajaxPrefilter 'json', (options, originalOptions, xhr) ->
     options.dataType = 'json'
     options.headers = 'Accept': 'application/vnd.api+json'
 

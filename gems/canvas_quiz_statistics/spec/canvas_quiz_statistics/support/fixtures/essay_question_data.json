@@ -1,0 +1,18 @@
+{
+  "id": 48,
+  "regrade_option": false,
+  "points_possible": 3,
+  "correct_comments": "",
+  "incorrect_comments": "",
+  "neutral_comments": "",
+  "question_type": "essay_question",
+  "question_name": "[Essay] Question",
+  "name": "[Essay] Question",
+  "question_text": "<p>[Essay] Summarize your feelings towards life, the universe, and everything in decimal numbers.</p>",
+  "answers": [],
+  "text_after_answers": "",
+  "comments": "",
+  "assessment_question_id": 45,
+  "position": 6,
+  "published_at": "2014-04-15T04:37:02Z"
+}

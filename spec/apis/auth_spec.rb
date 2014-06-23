@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
-describe "API Authentication", :type => :integration do
+describe "API Authentication", type: :request do
 
   before do
     @key = DeveloperKey.create!
@@ -49,11 +49,11 @@ describe "API Authentication", :type => :integration do
       response.response_code.should == 401
       get "/api/v1/courses.json?api_key=#{@key.api_key}"
       response.response_code.should == 401
-      get "/api/v1/courses.json?api_key=#{@key.api_key}", {}, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'failboat') }
+      get "/api/v1/courses.json?api_key=#{@key.api_key}", {}, { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'failboat') }
       response.response_code.should == 401
-      get "/api/v1/courses.json", {}, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
+      get "/api/v1/courses.json", {}, { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
       response.should be_success
-      get "/api/v1/courses.json?api_key=#{@key.api_key}", {}, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
+      get "/api/v1/courses.json?api_key=#{@key.api_key}", {}, { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
       response.should be_success
     end
   end
@@ -82,17 +82,17 @@ describe "API Authentication", :type => :integration do
         get "/api/v1/courses.json"
         response.should be_success
         get "/api/v1/courses.json?api_key=#{@key.api_key}", {},
-            { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'failboat') }
+            { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'failboat') }
         response.response_code.should == 401
         get "/api/v1/courses.json", {},
-            { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
+            { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
         response.should be_success
       end
 
       it "should allow basic auth with api key" do
 
         get "/api/v1/courses.json?api_key=#{@key.api_key}", {},
-            { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
+            { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
         response.should be_success
       end
 
@@ -117,14 +117,14 @@ describe "API Authentication", :type => :integration do
         response.response_code.should == 401
         post "/api/v1/courses/#{@course.id}/assignments.json",
              { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } },
-             { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
+             { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
         response.response_code.should == 401
       end
 
       it "should allow post with api key and basic auth" do
         post "/api/v1/courses/#{@course.id}/assignments.json?api_key=#{@key.api_key}",
              { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } },
-             { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
+             { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
         response.should be_success
         @course.assignments.count.should == 1
         @course.assignments.first.title.should == 'test assignment'
@@ -156,11 +156,11 @@ describe "API Authentication", :type => :integration do
       it "should allow replacing the authenticity token with api_key when basic auth is correct" do
         post "/api/v1/courses/#{@course.id}/assignments.json?api_key=#{@key.api_key}",
              { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } },
-             { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'badpass') }
+             { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'badpass') }
         response.response_code.should == 401
         post "/api/v1/courses/#{@course.id}/assignments.json?api_key=#{@key.api_key}",
              { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } },
-             { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
+             { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
         response.should be_success
       end
     end
@@ -191,7 +191,7 @@ describe "API Authentication", :type => :integration do
 
           # we have the code, we can close the browser session
           if opts[:basic_auth]
-            post "/login/oauth2/token", { :code => code }, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials(@client_id, @client_secret) }
+            post "/login/oauth2/token", { :code => code }, { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials(@client_id, @client_secret) }
           else
             post "/login/oauth2/token", :client_id => @client_id, :client_secret => @client_secret, :code => code
           end
@@ -210,7 +210,7 @@ describe "API Authentication", :type => :integration do
           response.should be_success
           json = JSON.parse(response.body)
           json.size.should == 1
-          json.first['enrollments'].should == [{'type' => 'teacher', 'role' => 'TeacherEnrollment'}]
+          json.first['enrollments'].should == [{'type' => 'teacher', 'role' => 'TeacherEnrollment', 'enrollment_state' => 'invited'}]
           AccessToken.authenticate(token).should == AccessToken.last
           AccessToken.last.purpose.should == 'fun'
 
@@ -246,7 +246,8 @@ describe "API Authentication", :type => :integration do
       end
 
       it "should execute for saml login" do
-        Setting.set_config("saml", {})
+        pending("requires SAML extension") unless AccountAuthorizationConfig.saml_enabled
+        ConfigFile.stub('saml', {})
         account = account_with_saml(:account => Account.default)
         flow do
           Onelogin::Saml::Response.any_instance.stubs(:settings=)
@@ -270,7 +271,10 @@ describe "API Authentication", :type => :integration do
           cas = CASClient::Client.new(:cas_base_url => account.account_authorization_config.auth_base)
           cas.instance_variable_set(:@stub_user, @user)
           def cas.validate_service_ticket(st)
-            st.response = CASClient::ValidationResponse.new("yes\n#{@stub_user.pseudonyms.first.unique_id}\n")
+            response = CASClient::ValidationResponse.new("yes\n#{@stub_user.pseudonyms.first.unique_id}\n")
+            st.user = response.user
+            st.success = response.is_success?
+            return st
           end
           CASClient::Client.stubs(:new).returns(cas)
 
@@ -444,7 +448,7 @@ describe "API Authentication", :type => :integration do
             code.should be_present
 
             # exchange the code for the token
-            post "/login/oauth2/token", { :code => code }, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials(@client_id, @client_secret) }
+            post "/login/oauth2/token", { :code => code }, { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials(@client_id, @client_secret) }
             response.should be_success
             response.header['content-type'].should == 'application/json; charset=utf-8'
             json = JSON.parse(response.body)
@@ -456,7 +460,7 @@ describe "API Authentication", :type => :integration do
             response.should be_success
             json = JSON.parse(response.body)
             json.size.should == 1
-            json.first['enrollments'].should == [{'type' => 'teacher', 'role' => 'TeacherEnrollment'}]
+            json.first['enrollments'].should == [{'type' => 'teacher', 'role' => 'TeacherEnrollment', 'enrollment_state' => 'invited'}]
             AccessToken.last.should == AccessToken.authenticate(token)
           end
         end
@@ -485,7 +489,7 @@ describe "API Authentication", :type => :integration do
     end
 
     it "should allow passing the access token in the authorization header" do
-      check_used { get "/api/v1/courses", nil, { 'Authorization' => "Bearer #{@token.full_token}" } }
+      check_used { get "/api/v1/courses", nil, { 'HTTP_AUTHORIZATION' => "Bearer #{@token.full_token}" } }
       JSON.parse(response.body).size.should == 1
     end
 
@@ -493,6 +497,7 @@ describe "API Authentication", :type => :integration do
       @me = @user
       Account.default.add_user(@user)
       u2 = user
+      Account.default.pseudonyms.create!(unique_id: 'user', user: u2)
       @user = @me
       check_used do
         post "/api/v1/accounts/#{Account.default.id}/admins", {
@@ -504,30 +509,30 @@ describe "API Authentication", :type => :integration do
     end
 
     it "should error if the access token is expired or non-existent" do
-      get "/api/v1/courses", nil, { 'Authorization' => "Bearer blahblah" }
-      response.status.to_i.should == 401
+      get "/api/v1/courses", nil, { 'HTTP_AUTHORIZATION' => "Bearer blahblah" }
+      assert_status(401)
       response['WWW-Authenticate'].should == %{Bearer realm="canvas-lms"}
       @token.update_attribute(:expires_at, 1.hour.ago)
-      get "/api/v1/courses", nil, { 'Authorization' => "Bearer #{@token.full_token}" }
-      response.status.to_i.should == 401
+      get "/api/v1/courses", nil, { 'HTTP_AUTHORIZATION' => "Bearer #{@token.full_token}" }
+      assert_status(401)
       response['WWW-Authenticate'].should == %{Bearer realm="canvas-lms"}
     end
 
     it "should require an active pseudonym for the access token user" do
       @user.pseudonym.destroy
-      get "/api/v1/courses", nil, { 'Authorization' => "Bearer #{@token.full_token}" }
-      response.status.to_i.should == 401
+      get "/api/v1/courses", nil, { 'HTTP_AUTHORIZATION' => "Bearer #{@token.full_token}" }
+      assert_status(401)
       response['WWW-Authenticate'].should == %{Bearer realm="canvas-lms"}
       json = JSON.parse(response.body)
-      json['message'].should == "Invalid access token."
+      json['errors'].first['message'].should == "Invalid access token."
     end
 
     it "should error if no access token is given and authorization is required" do
       get "/api/v1/courses"
-      response.status.to_i.should == 401
+      assert_status(401)
       response['WWW-Authenticate'].should == %{Bearer realm="canvas-lms"}
       json = json_parse
-      json["errors"]["message"].should == "user authorization required"
+      json["errors"].first["message"].should == "user authorization required"
     end
 
     it "should be able to log out" do
@@ -538,7 +543,7 @@ describe "API Authentication", :type => :integration do
       response.should be_success
 
       get "/api/v1/courses?access_token=#{@token.full_token}"
-      response.status.to_i.should == 401
+      assert_status(401)
     end
 
     context "sharding" do
@@ -554,7 +559,7 @@ describe "API Authentication", :type => :integration do
         end
         LoadAccount.stubs(:default_domain_root_account).returns(@account)
 
-        check_used { get "/api/v1/courses", nil, { 'Authorization' => "Bearer #{@token.full_token}" } }
+        check_used { get "/api/v1/courses", nil, { 'HTTP_AUTHORIZATION' => "Bearer #{@token.full_token}" } }
         JSON.parse(response.body).size.should == 1
       end
     end
@@ -571,7 +576,6 @@ describe "API Authentication", :type => :integration do
     end
 
     it "should allow as_user_id" do
-      @student.pseudonyms.create!(:unique_id => 'student', :account => Account.default)
       account_admin_user(:account => Account.site_admin)
       user_with_pseudonym(:user => @user)
 
@@ -584,14 +588,15 @@ describe "API Authentication", :type => :integration do
       json.should == {
         'id' => @student.id,
         'name' => 'User',
-        'sortable_name' => 'User',
         'short_name' => 'User',
-        'primary_email' => "blah@example.com",
+        'sortable_name' => 'User',
         'login_id' => "blah@example.com",
-        'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
         'title' => nil,
         'bio' => nil,
+        'primary_email' => "blah@example.com",
+        'integration_id' => nil,
         'time_zone' => 'Etc/UTC',
+        'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" }
       }
 
       # as_user_id is ignored if it's not allowed
@@ -602,16 +607,17 @@ describe "API Authentication", :type => :integration do
       assigns['current_user'].should == @student
       assigns['real_current_user'].should be_nil
       json.should == {
-        'id' => @student.id,
-        'name' => 'User',
-        'sortable_name' => 'User',
-        'short_name' => 'User',
-        'primary_email' => "blah@example.com",
-        'login_id' => "blah@example.com",
-        'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
-        'bio' => nil,
-        'title' => nil,
-        'time_zone' => 'Etc/UTC',
+          'id' => @student.id,
+          'name' => 'User',
+          'short_name' => 'User',
+          'sortable_name' => 'User',
+          'login_id' => "blah@example.com",
+          'title' => nil,
+          'bio' => nil,
+          'primary_email' => "blah@example.com",
+          'integration_id' => nil,
+          'time_zone' => 'Etc/UTC',
+          'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" }
       }
 
       # as_user_id is ignored if it's blank
@@ -620,16 +626,17 @@ describe "API Authentication", :type => :integration do
       assigns['current_user'].should == @student
       assigns['real_current_user'].should be_nil
       json.should == {
-        'id' => @student.id,
-        'name' => 'User',
-        'sortable_name' => 'User',
-        'short_name' => 'User',
-        'primary_email' => "blah@example.com",
-        'login_id' => "blah@example.com",
-        'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
-        'title' => nil,
-        'bio' => nil,
-        'time_zone' => 'Etc/UTC',
+          'id' => @student.id,
+          'name' => 'User',
+          'short_name' => 'User',
+          'sortable_name' => 'User',
+          'login_id' => "blah@example.com",
+          'title' => nil,
+          'bio' => nil,
+          'primary_email' => "blah@example.com",
+          'integration_id' => nil,
+          'time_zone' => 'Etc/UTC',
+          'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" }
       }
     end
 
@@ -646,16 +653,45 @@ describe "API Authentication", :type => :integration do
       json.should == {
         'id' => @student.id,
         'name' => 'User',
-        'sortable_name' => 'User',
         'short_name' => 'User',
+        'sortable_name' => 'User',
         'sis_user_id' => '1234',
         'sis_login_id' => 'blah@example.com',
-        'primary_email' => "blah@example.com",
         'login_id' => "blah@example.com",
+        'integration_id' => nil,
         'bio' => nil,
         'title' => nil,
-        'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
+        'primary_email' => "blah@example.com",
         'time_zone' => 'Etc/UTC',
+        'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
+      }
+    end
+
+    it "should allow integration_id as an as_user_id" do
+      account_admin_user(:account => Account.site_admin)
+      user_with_pseudonym(:user => @user)
+      @student_pseudonym.update_attribute(:integration_id, "1234")
+      @student_pseudonym.update_attribute(:sis_user_id, "1234")
+
+      json = api_call(:get, "/api/v1/users/self/profile?as_user_id=sis_integration_id:#{@student.pseudonym.integration_id}",
+                      :controller => "profile", :action => "settings", :user_id => 'self', :format => 'json', :as_user_id => "sis_integration_id:#{@student.pseudonym.integration_id.to_param}")
+      assigns['current_user'].should == @student
+      assigns['real_current_pseudonym'].should == @pseudonym
+      assigns['real_current_user'].should == @user
+      json.should == {
+          'id' => @student.id,
+          'name' => 'User',
+          'short_name' => 'User',
+          'sortable_name' => 'User',
+          'sis_user_id' => '1234',
+          'sis_login_id' => 'blah@example.com',
+          'login_id' => "blah@example.com",
+          'integration_id' => '1234',
+          'bio' => nil,
+          'title' => nil,
+          'primary_email' => "blah@example.com",
+          'time_zone' => 'Etc/UTC',
+          'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
       }
     end
 
@@ -665,7 +701,7 @@ describe "API Authentication", :type => :integration do
 
       raw_api_call(:get, "/api/v1/users/self/profile?as_user_id=sis_user_id:bogus",
                    :controller => "profile", :action => "settings", :user_id => 'self', :format => 'json', :as_user_id => "sis_user_id:bogus")
-      response.status.should == '401 Unauthorized'
+      assert_status(401)
       JSON.parse(response.body).should == { 'errors' => 'Invalid as_user_id' }
     end
 
@@ -675,7 +711,7 @@ describe "API Authentication", :type => :integration do
       @user = @student
       raw_api_call(:get, "/api/v1/users/self/profile?as_user_id=#{@admin.id}",
                    :controller => "profile", :action => "settings", :user_id => 'self', :format => 'json', :as_user_id => @admin.id.to_param)
-      response.status.should == '401 Unauthorized'
+      assert_status(401)
       JSON.parse(response.body).should == { 'errors' => 'Invalid as_user_id' }
     end
   end
@@ -701,7 +737,7 @@ describe "API Authentication", :type => :integration do
 
     it "should not prepend the CSRF protection to HTTP Basic API requests" do
       user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test123')
-      get "/api/v1/users/self/profile", {}, { :authorization => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
+      get "/api/v1/users/self/profile", {}, { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test123') }
       response.should be_success
       raw_json = response.body
       raw_json.should_not match(%r{^while\(1\);})

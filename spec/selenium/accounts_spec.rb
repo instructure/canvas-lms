@@ -133,7 +133,12 @@ describe "account" do
     end
 
     it "should be able to create a new course when no other courses exist" do
-      Account.default.courses.each { |c| c.enrollments.scoped.delete_all; c.course_account_associations.scoped.delete_all; c.destroy! }
+      Account.default.courses.each do |c|
+        c.course_account_associations.scoped.delete_all
+        c.enrollments.scoped.delete_all
+        c.course_sections.scoped.delete_all
+        c.destroy!
+      end
 
       get "/accounts/#{Account.default.to_param}"
       f('.add_course_link').click
@@ -308,8 +313,9 @@ describe "account" do
         ui_auto_complete.should be_displayed
       end
 
-      element = ff('.ui-autocomplete li a').first
-      element.text.should == @course_name
+      elements = ff('.ui-autocomplete li:first-child a div')
+      elements[0].text.should == @course_name
+      elements[1].text.should == 'Default Term'
       keep_trying_until do
         driver.execute_script("$('.ui-autocomplete li a').hover().click()")
         driver.current_url.should include("/courses/#{@course.id}")

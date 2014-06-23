@@ -18,49 +18,110 @@
 
 # @API Account Authentication Services
 #
-# @object AccountAuthorizationConfig
-#     // SAML configuration
+# @model AccountAuthorizationConfig
 #     {
-#       "login_handle_name":null,
-#       "identifier_format":"urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
-#       "auth_type":"saml",
-#       "id":1649,
-#       "log_out_url":"http://example.com/saml1/slo",
-#       "log_in_url":"http://example.com/saml1/sli",
-#       "certificate_fingerprint":"111222",
-#       "change_password_url":null,
-#       "requested_authn_context":null,
-#       "position":1,
-#       "idp_entity_id":"http://example.com/saml1",
-#       "login_attribute":"nameid"
-#     }
-#     // LDAP configuration
-#     {
-#       "auth_type":"ldap",
-#       "id":1650,
-#       "auth_host":"127.0.0.1",
-#       "auth_filter":"filter1",
-#       "auth_over_tls":null,
-#       "position":1,
-#       "auth_base":null,
-#       "auth_username":"username1",
-#       "auth_port":null
-#     }
-#     // CAS configuration
-#     {
-#       "login_handle_name":null,
-#       "auth_type":"cas",
-#       "id":1651,
-#       "log_in_url":null,
-#       "position":1,
-#       "auth_base":"127.0.0.1"
+#       "id": "AccountAuthorizationConfig",
+#       "description": "",
+#       "properties": {
+#         "login_handle_name": {
+#           "description": "Valid for SAML and CAS authorization.",
+#           "type": "string"
+#         },
+#         "identifier_format": {
+#           "description": "Valid for SAML authorization.",
+#           "example": "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
+#           "type": "string"
+#         },
+#         "auth_type": {
+#           "description": "Valid for SAML, LDAP and CAS authorization.",
+#           "example": "saml",
+#           "type": "string"
+#         },
+#         "id": {
+#           "description": "Valid for SAML, LDAP and CAS authorization.",
+#           "example": 1649,
+#           "type": "integer"
+#         },
+#         "log_out_url": {
+#           "description": "Valid for SAML authorization.",
+#           "example": "http://example.com/saml1/slo",
+#           "type": "string"
+#         },
+#         "log_in_url": {
+#           "description": "Valid for SAML and CAS authorization.",
+#           "example": "http://example.com/saml1/sli",
+#           "type": "string"
+#         },
+#         "certificate_fingerprint": {
+#           "description": "Valid for SAML authorization.",
+#           "example": "111222",
+#           "type": "string"
+#         },
+#         "change_password_url": {
+#           "description": "Valid for SAML authorization.",
+#           "type": "string"
+#         },
+#         "requested_authn_context": {
+#           "description": "Valid for SAML authorization.",
+#           "type": "string"
+#         },
+#         "auth_host": {
+#           "description": "Valid for LDAP authorization.",
+#           "example": "127.0.0.1",
+#           "type": "string"
+#         },
+#         "auth_filter": {
+#           "description": "Valid for LDAP authorization.",
+#           "example": "filter1",
+#           "type": "string"
+#         },
+#         "auth_over_tls": {
+#           "description": "Valid for LDAP authorization.",
+#           "type": "integer"
+#         },
+#         "auth_base": {
+#           "description": "Valid for LDAP and CAS authorization.",
+#           "type": "string"
+#         },
+#         "auth_username": {
+#           "description": "Valid for LDAP authorization.",
+#           "example": "username1",
+#           "type": "string"
+#         },
+#         "auth_port": {
+#           "description": "Valid for LDAP authorization.",
+#           "type": "integer"
+#         },
+#         "position": {
+#           "description": "Valid for SAML, LDAP and CAS authorization.",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "idp_entity_id": {
+#           "description": "Valid for SAML authorization.",
+#           "example": "http://example.com/saml1",
+#           "type": "string"
+#         },
+#         "login_attribute": {
+#           "description": "Valid for SAML authorization.",
+#           "example": "nameid",
+#           "type": "string"
+#         }
+#       }
 #     }
 #
-# @object DiscoveryUrl
+# @model DiscoveryUrl
 #     {
-#       "discovery_url": "http://..."
+#       "id": "DiscoveryUrl",
+#       "description": "",
+#       "properties": {
+#         "discovery_url": {
+#           "example": "http://...",
+#           "type": "string"
+#         }
+#       }
 #     }
-
+#
 class AccountAuthorizationConfigsController < ApplicationController
   before_filter :require_context, :require_root_account_management
   include Api::V1::AccountAuthorizationConfig
@@ -298,23 +359,13 @@ class AccountAuthorizationConfigsController < ApplicationController
     if params[:account_authorization_config] && params[:account_authorization_config].has_key?("0")
       if params.has_key?(:auth_type) || (params[:account_authorization_config] && params[:account_authorization_config].has_key?(:auth_type))
         # it has deprecated configs, and non-deprecated
-        render :json => {:message => t('deprecated_fail', "Can't use both deprecated and current version of create at the same time.")}, :status => 400
+        api_raise(:deprecated_request_syntax)
       else
         update_all
       end
-    elsif params.has_key?(:auth_type) || (params[:account_authorization_config] && params[:account_authorization_config].has_key?(:auth_type))
+    else
       aac_data = params.has_key?(:account_authorization_config) ? params[:account_authorization_config] : params
       data = filter_data(aac_data)
-
-      if @account.account_authorization_config
-        if @account.account_authorization_config.auth_type != data[:auth_type]
-          render :json => {:message => t('no_auth_mixing', 'Can not mix authentication types')}, :status => 400
-          return
-        elsif @account.account_authorization_config.auth_type == 'cas'
-          render :json => {:message => t('only_one_cas', "Can not create multiple CAS configurations")}, :status => 400
-          return
-        end
-      end
 
       position = data.delete :position
       account_config = @account.account_authorization_configs.create!(data)
@@ -325,8 +376,6 @@ class AccountAuthorizationConfigsController < ApplicationController
       end
 
       render :json => aac_json(account_config)
-    else
-      render :json => {:message => t('no_config_sent', "Must specify auth_type")}, :status => 400
     end
   end
 
@@ -401,20 +450,16 @@ class AccountAuthorizationConfigsController < ApplicationController
       data = filter_data(data)
       next if data.empty?
 
-      result = if id.to_i == 0
+      if id.to_i == 0
         account_config = @account.account_authorization_configs.build(data)
-        account_config.save
+        account_config.save!
       else
         account_config = @account.account_authorization_configs.find(id)
         account_configs_to_delete.delete(account_config)
-        account_config.update_attributes(data)
+        account_config.update_attributes!(data)
       end
 
-      if result
-        account_configs << account_config
-      else
-        return render :json => account_config.errors
-      end
+      account_configs << account_config
     end
 
     account_configs_to_delete.map(&:destroy)
@@ -494,7 +539,7 @@ class AccountAuthorizationConfigsController < ApplicationController
         :account_authorization_config_id => config.id,
         :ldap_connection_test => config.test_ldap_connection
       }
-      results << h.merge({:errors => config.errors.map {|attr,msg| {attr => msg}}})
+      results << h.merge({:errors => config.errors.map {|attr,err| {attr => err.message}}})
     end
     render :json => results
   end
@@ -506,7 +551,7 @@ class AccountAuthorizationConfigsController < ApplicationController
         :account_authorization_config_id => config.id,
         :ldap_bind_test => config.test_ldap_bind
       }
-      results << h.merge({:errors => config.errors.map {|attr,msg| {attr => msg}}})
+      results << h.merge({:errors => config.errors.map {|attr,err| {attr => err.message}}})
     end
     render :json => results
   end
@@ -519,7 +564,7 @@ class AccountAuthorizationConfigsController < ApplicationController
         :account_authorization_config_id => config.id,
         :ldap_search_test => res
       }
-      results << h.merge({:errors => config.errors.map {|attr,msg| {attr => msg}}})
+      results << h.merge({:errors => config.errors.map {|attr,err| {attr => err.message}}})
     end
     render :json => results
   end

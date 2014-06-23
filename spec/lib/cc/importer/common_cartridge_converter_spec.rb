@@ -16,7 +16,7 @@ describe "Standard Common Cartridge importing" do
     @migration = ContentMigration.create(:context => @course)
     @migration.migration_settings[:migration_ids_to_import] = {:copy => {}}
     enable_cache do
-      @course.import_from_migration(@course_data, nil, @migration)
+      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
     end
   end
   
@@ -68,7 +68,7 @@ describe "Standard Common Cartridge importing" do
     if Qti.qti_enabled?
       tag = mod1.content_tags[index]
       tag.title.should == "Pretest"
-      tag.content_type.should == 'Quiz'
+      tag.content_type.should == 'Quizzes::Quiz'
       tag.content_id.should == @course.quizzes.find_by_migration_id("I_00003_R").id
       tag.indent.should == 1
       index += 1
@@ -182,7 +182,7 @@ describe "Standard Common Cartridge importing" do
 
       @migration = ContentMigration.create(:context => @course)
       @migration.migration_settings[:migration_ids_to_import] = {:copy => {}}
-      @course.import_from_migration(@course_data, nil, @migration)
+      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
 
       bank = @course.assessment_question_banks.active.find_by_migration_id("I_00004_R_QDB_1")
       bank.should_not be_nil
@@ -210,7 +210,7 @@ describe "Standard Common Cartridge importing" do
     append_before do
       @migration2 = ContentMigration.create(:context => @course)
       @migration2.migration_settings[:migration_ids_to_import] = {:copy=>{}}
-      @course.import_from_migration(@course_data, nil, @migration2)
+      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration2)
     end
     
     it "should import webcontent" do
@@ -271,7 +271,7 @@ describe "Standard Common Cartridge importing" do
                         "context_modules" => {"I_00000" => true},
                         "all_assignment_groups" => "0"}}.with_indifferent_access
 
-      @course.import_from_migration(@course_data, nil, @migration)
+      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
 
       @course.attachments.count.should == 5
       @course.context_external_tools.count.should == 1
@@ -289,7 +289,7 @@ describe "Standard Common Cartridge importing" do
       @migration.migration_settings[:migration_ids_to_import] = {
           :copy => {"everything" => "0"}}.with_indifferent_access
 
-      @course.import_from_migration(@course_data, nil, @migration)
+      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
 
       @course.attachments.count.should == 0
     end
@@ -302,7 +302,7 @@ describe "Standard Common Cartridge importing" do
 
       @course_data['discussion_topics'].find{|topic| topic['migration_id'] == 'I_00006_R'}['type'] = 'announcement'
 
-      @course.import_from_migration(@course_data, nil, @migration)
+      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
 
       @course.announcements.count.should == 1
     end
@@ -369,7 +369,7 @@ describe "Standard Common Cartridge importing" do
               "all_context_modules" => "1"
           }
       }
-      @course.import_from_migration(@import_json, nil, @migration)
+      Importers::CourseContentImporter.import_content(@course, @import_json, nil, @migration)
 
       mods = @course.context_modules.to_a
       mods.map(&:position).should eql [1, 2, 3, 4]
@@ -396,7 +396,7 @@ describe "Standard Common Cartridge importing" do
               "all_assignment_groups" => "1"
           }
       }
-      @course.import_from_migration(@import_json, nil, @migration)
+      Importers::CourseContentImporter.import_content(@course, @import_json, nil, @migration)
 
       ags = @course.assignment_groups.to_a
       ags.map(&:position).should eql [1, 2, 3, 4]
@@ -417,6 +417,7 @@ describe "More Standard Common Cartridge importing" do
     @migration.stubs(:to_import).returns(nil)
     @migration.stubs(:context).returns(@copy_to)
     @migration.stubs(:import_object?).returns(true)
+    @migration.stubs(:add_imported_item)
   end
 
   it "should properly handle top-level resource references" do
@@ -466,7 +467,7 @@ describe "More Standard Common Cartridge importing" do
 
     #import json into new course
     hash = hash.map { |h| h.with_indifferent_access }
-    ContextModule.process_migration({'modules' =>hash}, @migration)
+    Importers::ContextModuleImporter.process_migration({'modules' =>hash}, @migration)
     @copy_to.save!
 
     @copy_to.context_modules.count.should == 3
@@ -545,5 +546,54 @@ describe "non-ASCII attachment names" do
       zipcontents = zipfile.entries.map(&:name)
       (contents - zipcontents).should eql []
     end
+  end
+end
+
+describe "LTI tool combination" do
+  before(:all) do
+    archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/cc_lti_combine_test.zip")
+    unzipped_file_path = File.join(File.dirname(archive_file_path), "cc_#{File.basename(archive_file_path, '.zip')}", 'oi')
+    @export_folder = File.join(File.dirname(archive_file_path), "cc_cc_lti_combine_test.")
+    @converter = CC::Importer::Standard::Converter.new(:export_archive_path=>archive_file_path, :course_name=>'oi', :base_download_dir=>unzipped_file_path)
+    @converter.export
+    @course_data = @converter.course.with_indifferent_access
+    @course_data['all_files_export'] ||= {}
+    @course_data['all_files_export']['file_path'] = @course_data['all_files_zip']
+
+    @course = course
+    @migration = ContentMigration.create(:context => @course)
+    @migration.migration_type = "common_cartridge_importer"
+    @migration.migration_settings[:migration_ids_to_import] = {:copy => {}}
+    enable_cache do
+      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
+    end
+  end
+
+  after(:all) do
+    @converter.delete_unzipped_archive
+    if File.exists?(@export_folder)
+      FileUtils::rm_rf(@export_folder)
+    end
+    truncate_all_tables
+  end
+
+  it "should combine lti tools in cc packages when possible" do
+    @course.context_external_tools.count.should == 2
+    @course.context_external_tools.map(&:migration_id).sort.should == ["TOOL_1", "TOOL_3"]
+
+    combined_tool = @course.context_external_tools.find_by_migration_id("TOOL_1")
+    combined_tool.domain.should == "www.example.com"
+    other_tool = @course.context_external_tools.find_by_migration_id("TOOL_3")
+    @course.context_module_tags.count.should == 5
+
+    combined_tags = @course.context_module_tags.select{|ct| ct.url.start_with?("https://www.example.com")}
+    combined_tags.count.should == 4
+    combined_tags.each do |tag|
+      tag.content.should == combined_tool
+    end
+
+    other_tag = (@course.context_module_tags.to_a - combined_tags).first
+    other_tag.url.start_with?("https://www.differentdomainexample.com").should be_true
+    other_tag.content.should == other_tool
   end
 end

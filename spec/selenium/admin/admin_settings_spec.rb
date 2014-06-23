@@ -46,19 +46,11 @@ describe "settings tabs" do
   end
 
   describe "site admin" do
-    it_should_behave_like "external tools tests"
+    include_examples "external tools tests"
     before(:each) do
       # course_with_
       site_admin_logged_in
       get "/accounts/#{Account.site_admin.id}/settings"
-    end
-
-    context "settings tab" do
-      it "cal2 checkbox should toggle visibility of enable scheduler checkbox" do
-        f("#show_scheduler_checkbox").should_not be_displayed
-        f("#account_settings_enable_scheduler").click
-        f("#show_scheduler_checkbox").should be_displayed
-      end
     end
 
     #context "announcements tab" do
@@ -85,7 +77,7 @@ describe "settings tabs" do
   end
 
   describe "admin" do
-    it_should_behave_like "external tools tests"
+    include_examples "external tools tests"
     before(:each) do
       course_with_admin_logged_in
       get "/accounts/#{Account.default.id}/settings"
@@ -194,6 +186,6 @@ describe 'shared settings specs' do
     let(:account) { Account.default }
     let(:account_settings_url) { "/accounts/#{Account.default.id}/settings" }
     let(:admin_tab_url) { "/accounts/#{Account.default.id}/settings#tab-users" }
-    it_should_behave_like "settings basic tests"
+    include_examples "settings basic tests"
   end
 end

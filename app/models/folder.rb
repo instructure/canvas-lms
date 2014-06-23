@@ -39,6 +39,13 @@ class Folder < ActiveRecord::Base
   has_many :visible_file_attachments, :class_name => 'Attachment', :conditions => ['attachments.file_state in (?, ?)', 'available', 'public']
   has_many :sub_folders, :class_name => "Folder", :foreign_key => "parent_folder_id", :dependent => :destroy
   has_many :active_sub_folders, :class_name => "Folder", :conditions => ['folders.workflow_state != ?', 'deleted'], :foreign_key => "parent_folder_id", :dependent => :destroy
+
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :name, :full_name, :context_id, :context_type, :parent_folder_id, :workflow_state, :created_at, :updated_at, :deleted_at, :locked,
+    :lock_at, :unlock_at, :last_lock_at, :last_unlock_at, :cloned_item_id, :position
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:context, :cloned_item, :parent_folder, :file_attachments, :sub_folders]
   
   acts_as_list :scope => :parent_folder
   
@@ -93,7 +100,7 @@ class Folder < ActiveRecord::Base
   scope :not_locked, lambda { where("(folders.locked IS NULL OR folders.locked=?) AND ((folders.lock_at IS NULL) OR
     (folders.lock_at>? OR (folders.unlock_at IS NOT NULL AND folders.unlock_at<?)))", false, Time.now.utc, Time.now.utc) }
   scope :by_position, order(:position)
-  scope :by_name, order(name_order_by_clause('folders'))
+  scope :by_name, lambda { order(name_order_by_clause('folders')) }
 
   def display_name
     name
@@ -257,6 +264,8 @@ class Folder < ActiveRecord::Base
     end
 
     root_folders = []
+    # something that doesn't have folders?!
+    return root_folders unless context.respond_to?(:folders)
 
     context.shard.activate do
       Folder.unique_constraint_retry do
@@ -346,6 +355,32 @@ class Folder < ActiveRecord::Base
         a = folder.find_attachment_with_components(components.dup)
         return a if a
       end
+    end
+    nil
+  end
+
+  def get_folders_by_component(components, include_hidden_and_locked)
+    return [self] if components.empty?
+    components = components.dup
+    subfolder_name = components.shift
+    # search all subfolders with the given name (yes, there can be duplicates)
+    scope = active_sub_folders.where(name: subfolder_name)
+    scope = scope.not_hidden.not_locked unless include_hidden_and_locked
+    scope.each do |subfolder|
+      sub_components = subfolder.get_folders_by_component(components, include_hidden_and_locked)
+      return [self] + sub_components if sub_components
+    end
+    nil
+  end
+
+  def self.resolve_path(context, path, include_hidden_and_locked = true)
+    path_components = path.is_a?(Array) ? path : path.split('/')
+    root_name = path_components.shift
+    scope = context.folders.where(parent_folder_id: nil, name: root_name)
+    scope = scope.not_hidden.not_locked unless include_hidden_and_locked
+    scope.each do |root_folder|
+      folders = root_folder.get_folders_by_component(path_components, include_hidden_and_locked)
+      return folders if folders
     end
     nil
   end

@@ -10,6 +10,10 @@
       {{/if}}
       <th>{{#t "section"}}Section{{/t}}</th>
       <th>{{#t "role"}}Role{{/t}}</th>
+      {{#if ENV.permissions.read_reports}}
+      <th>{{#t "last_activity"}}Last Activity{{/t}}</th>
+      <th>{{#t "total_activity"}}Total Activity{{/t}}</th>
+      {{/if}}
       <th></th>
     </tr>
   </thead>

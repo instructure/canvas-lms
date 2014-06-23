@@ -348,7 +348,7 @@ module Turnitin
       params = prepare_params(command, fcmd, args)
       
       if post
-        mp = Multipart::MultipartPost.new
+        mp = Multipart::Post.new
         query, headers = mp.prepare_query(params)
         puts query if @testing
         http = Net::HTTP.new(@host, 443)

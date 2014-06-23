@@ -1,11 +1,15 @@
+<%- if @context.all_turnitin_comments.present? %>
+  <tr>
+    <td colspan="2" class='turnitin-comments'>
+      <%= @context.all_turnitin_comments %>
+    </td>
+  </tr>
+<%- end %>
 <tr>
   <td colspan="2">
-    <div style="font-size: 0.8em;">
-    <%= @context.all_turnitin_comments %>
-    </div>
-    <div style="margin-top: 10px;">
-      <input type="checkbox" class="turnitin_pledge" name="turnitin_pledge" value="1"/>
+    <label class='checkbox'>
+      <input type="checkbox" class='turnitin_pledge' name="turnitin_pledge" value="1"/>
       <%= @context.turnitin_pledge %>
-    </div>
+    </label>
   </td>
 </tr>

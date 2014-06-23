@@ -12,7 +12,7 @@
   text-align: center;
   text-decoration: none;
   background-color: $bgColorTooltip;
-  @include opacity(0.8);
+  opacity: 0.8;
   border: none;
 }
 

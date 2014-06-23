@@ -16,6 +16,7 @@ unless ARGV.any? { |a| a =~ /\Agems/ }
     task :nonselenium, :count do |t, args|
       Rake::Task['spec:single'].execute #first rake task to run the files that fail in parallel in a single thread
 
+      #bug funky exit_codes resolved in ruby193p288 fix when resolved
       if File.zero?('tmp/parallel_log/rspec.failures')
         Rake::Task['parallel:nonseleniumparallel'].invoke(args[:count])
       else
@@ -32,11 +33,22 @@ unless ARGV.any? { |a| a =~ /\Agems/ }
       Rake::Task['parallel:spec'].invoke(count, '', '', test_files.join(' '))
     end
 
+    task :selenium_tags, :test_files, :tag do |t, args|
+      require "parallelized_specs"
+      puts 'starting single threaded selenium specs'
+      #fix better logging as tags matures
+      output = `bundle exec rspec --format doc #{args[:test_files]} --tag #{args[:tag]}`
+      puts output
+      #bug funky exit_codes resolved in ruby193p288 fix when resolved
+      output.match(/(\d) failure/).to_a.last.to_i != 0 ? exit(1) : puts('all non_parallel selenium specs passed')
+    end
+
     task :selenium, :count, :build_section do |t, args|
       require "parallelized_specs"
       #used to split selenium builds when :build_section is set split it in two.
       test_files = FileList['spec/selenium/**/*_spec.rb'] + FileList['vendor/plugins/*/spec_canvas/selenium/*_spec.rb']
       test_files = test_files.to_a.sort_by! { |file| File.size(file) }
+
       args[:build_section].to_i == 0 ? section = nil : section = args[:build_section].to_i
 
       unless section.nil?
@@ -69,6 +81,12 @@ unless ARGV.any? { |a| a =~ /\Agems/ }
       end
       test_files.map! { |f| "#{Rails.root}/#{f}" }
       test_files.each { |f| puts f }
+
+      unless CANVAS_RAILS2
+        Rake::Task['parallel:selenium_tags'].invoke(test_files.join(' '), 'non_parallel')
+      end
+
+      puts 'starting paralellized selenium spec runtime'
       Rake::Task['parallel:spec'].invoke(args[:count], '', '', test_files.join(' '))
     end
 

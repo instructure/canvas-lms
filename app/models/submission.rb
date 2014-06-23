@@ -32,13 +32,30 @@ class Submission < ActiveRecord::Base
   has_many :hidden_submission_comments, :class_name => 'SubmissionComment', :order => 'created_at, id', :conditions => { :hidden => true }
   has_many :assessment_requests, :as => :asset
   has_many :assigned_assessments, :class_name => 'AssessmentRequest', :as => :assessor_asset
-  belongs_to :quiz_submission
+  belongs_to :quiz_submission, :class_name => 'Quizzes::QuizSubmission'
   has_one :rubric_assessment, :as => :artifact, :conditions => {:assessment_type => "grading"}
   has_many :rubric_assessments, :as => :artifact
   has_many :attachment_associations, :as => :context
   has_many :attachments, :through => :attachment_associations
+
+  # we no longer link submission comments and conversations, but we haven't fixed up existing
+  # linked conversations so this relation might be useful
+  # TODO: remove this when removing the conversationmessage asset columns
   has_many :conversation_messages, :as => :asset # one message per private conversation
+
   has_many :content_participations, :as => :content
+
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :body, :url, :attachment_id, :grade, :score, :submitted_at, :assignment_id, :user_id, :submission_type, :workflow_state, :created_at, :updated_at, :group_id,
+    :attachment_ids, :processed, :process_attempts, :grade_matches_current_submission, :published_score, :published_grade, :graded_at, :student_entered_score, :grader_id,
+    :media_comment_id, :media_comment_type, :quiz_submission_id, :submission_comments_count, :has_rubric_assessment, :attempt, :context_code, :media_object_id,
+    :turnitin_data, :has_admin_comment, :cached_due_date
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [
+    :attachment, :assignment, :user, :grader, :group, :media_object, :student, :submission_comments, :assessment_requests, :assigned_assessments, :quiz_submission,
+    :rubric_assessment, :rubric_assessments, :attachments, :content_participations
+  ]
 
   serialize :turnitin_data, Hash
   validates_presence_of :assignment_id, :user_id
@@ -89,7 +106,7 @@ class Submission < ActiveRecord::Base
   scope :needs_grading, where(needs_grading_conditions)
 
 
-  sanitize_field :body, Instructure::SanitizeField::SANITIZE
+  sanitize_field :body, CanvasSanitize::SANITIZE
 
   attr_accessor :saved_by,
                 :assignment_changed_not_sub
@@ -101,7 +118,7 @@ class Submission < ActiveRecord::Base
   after_save :touch_user
   after_save :update_assignment
   after_save :update_attachment_associations
-  after_save :submit_attachments_to_crocodoc
+  after_save :submit_attachments_to_canvadocs
   after_save :queue_websnap
   after_save :update_final_score
   after_save :submit_to_turnitin_later
@@ -152,7 +169,7 @@ class Submission < ActiveRecord::Base
     :on_create => lambda{ |model,version| SubmissionVersion.index_version(version) },
     :on_load => lambda{ |model,version| model.cached_due_date = version.versionable.cached_due_date }
 
-  # This needs to be after simply_versioned because the grade change audit uses 
+  # This needs to be after simply_versioned because the grade change audit uses
   # versioning to grab the previous grade.
   after_save :grade_change_audit
 
@@ -222,7 +239,7 @@ class Submission < ActiveRecord::Base
   end
 
   def update_quiz_submission
-    return true if @saved_by == :quiz_submission || !self.quiz_submission || self.score == self.quiz_submission.kept_score
+    return true if @saved_by == :quiz_submission || !self.quiz_submission_id || self.score == self.quiz_submission.kept_score
     self.quiz_submission.set_final_score(self.score)
     true
   end
@@ -237,7 +254,7 @@ class Submission < ActiveRecord::Base
   end
 
   def plaintext_body
-    self.extend TextHelper
+    self.extend HtmlTextHelper
     strip_tags((self.body || "").gsub(/\<\s*br\s*\/\>/, "\n<br/>").gsub(/\<\/p\>/, "</p>\n"))
   end
 
@@ -460,14 +477,15 @@ class Submission < ActiveRecord::Base
   end
   private :attachment_fake_belongs_to_group
 
-  def submit_attachments_to_crocodoc
+  def submit_attachments_to_canvadocs
     if attachment_ids_changed?
       attachments = attachment_associations.map(&:attachment)
       attachments.each do |a|
-        a.send_later_enqueue_args :submit_to_crocodoc,
-          :n_strand     => 'crocodoc',
+        a.send_later_enqueue_args :submit_to_canvadocs, {
+          :n_strand     => 'canvadocs',
           :max_attempts => 1,
           :priority => Delayed::LOW_PRIORITY
+        }, 1, wants_annotation: true
       end
     end
   end
@@ -476,8 +494,9 @@ class Submission < ActiveRecord::Base
     if assignment
       self.context_code = assignment.context_code
     end
+
     self.submitted_at ||= Time.now if self.has_submission? || (self.submission_type && !self.submission_type.empty?)
-    self.quiz_submission.reload if self.quiz_submission
+    self.quiz_submission.reload if self.quiz_submission_id
     self.workflow_state = 'unsubmitted' if self.submitted? && !self.has_submission?
     self.workflow_state = 'graded' if self.grade && self.score && self.grade_matches_current_submission
     self.workflow_state = 'pending_review' if self.submission_type == 'online_quiz' && self.quiz_submission.try(:latest_submitted_attempt).try(:pending_review?)
@@ -499,8 +518,8 @@ class Submission < ActiveRecord::Base
       raise "Can't create media submission without media object"
     end
     if self.submission_type == 'online_quiz'
-      self.quiz_submission ||= QuizSubmission.find_by_submission_id(self.id) rescue nil
-      self.quiz_submission ||= QuizSubmission.find_by_user_id_and_quiz_id(self.user_id, self.assignment.quiz.id) rescue nil
+      self.quiz_submission ||= Quizzes::QuizSubmission.find_by_submission_id(self.id) rescue nil
+      self.quiz_submission ||= Quizzes::QuizSubmission.find_by_user_id_and_quiz_id(self.user_id, self.assignment.quiz.id) rescue nil
     end
     @just_submitted = self.submitted? && self.submission_type && (self.new_record? || self.workflow_state_changed?)
     if score_changed?
@@ -552,7 +571,7 @@ class Submission < ActiveRecord::Base
       end
     end
     res = self.versions.to_a[0,1].map(&:model) if res.empty?
-    res.sort_by{ |s| s.submitted_at || SortFirst }
+    res.sort_by{ |s| s.submitted_at || CanvasSort::First }
   end
 
   def check_url_changed
@@ -685,7 +704,7 @@ class Submission < ActiveRecord::Base
 
   def update_if_pending
     @attachments = nil
-    if self.submission_type == 'online_quiz' && self.quiz_submission && self.score && self.score == self.quiz_submission.score
+    if self.submission_type == 'online_quiz' && self.quiz_submission_id && self.score && self.score == self.quiz_submission.score
       self.workflow_state = self.quiz_submission.complete? ? 'graded' : 'pending_review'
     end
     true
@@ -818,7 +837,7 @@ class Submission < ActiveRecord::Base
   end
 
   def add_comment(opts={})
-    opts.symbolize_keys!
+    opts = opts.symbolize_keys
     opts[:author] = opts.delete(:commenter) || opts.delete(:author) || self.user
     opts[:comment] = opts[:comment].try(:strip) || ""
     opts[:attachments] ||= opts.delete :comment_attachments
@@ -829,11 +848,6 @@ class Submission < ActiveRecord::Base
         opts[:comment] = t('attached_files_comment', "See attached files.")
       end
     end
-    if self.group
-      # this is a bit icky, as it assumes the same opts hash will be passed in to each add_comment call for the group
-      # s|a bit icky|milk-curdling/vomit-inducing/baby-punching|
-      opts[:group_comment_id] ||= AutoHandle.generate_securish_uuid
-    end
     self.save! if self.new_record?
     valid_keys = [:comment, :author, :media_comment_id, :media_comment_type,
                   :group_comment_id, :assessment_request, :attachments,
@@ -843,19 +857,6 @@ class Submission < ActiveRecord::Base
     end
     opts[:assessment_request].comment_added(comment) if opts[:assessment_request] && comment
     comment
-  end
-
-  def conversation_groups
-    participating_instructors.map{ |i| [user, i] }
-  end
-
-  def conversation_message_data
-    latest = visible_submission_comments.where(:author_id => possible_participants_ids).last or return
-    {
-      :created_at => latest.created_at,
-      :author => latest.author,
-      :body => latest.comment
-    }
   end
 
   def comment_authors
@@ -872,55 +873,6 @@ class Submission < ActiveRecord::Base
 
   def possible_participants_ids
     [user_id] + context.participating_instructors.uniq.map(&:id)
-  end
-
-  # ensure that conversations/messages are created/updated for all relevant
-  # participants as submission comments are added/removed. there should be a
-  # conversation between the submitter and each participating admin, and it
-  # should have a single conversation_message that represents the submission
-  # (there may of course be other regular messages in the conversation)
-  #
-  # ==== Arguments
-  # * <tt>trigger</tt> - Values of :create, :destroy, :migrate are supported.
-  # * <tt>overrides</tt> - Hash of overrides that can be passed through when
-  #                        updating the conversation.
-  #
-  # ==== Overrides
-  # * <tt>:skip_users</tt> - Gets passed through to <tt>Conversation</tt>.<tt>update_all_for_asset</tt>.
-  #                        nil by default, which means mark-as-unread for
-  #                        everyone but the author.
-  def create_or_update_conversations!(trigger, overrides={})
-    options = {}
-    case trigger
-    when :create
-      options[:update_participants] = true
-      options[:update_for_skips] = false
-      options[:skip_users] = overrides[:skip_users] || [conversation_message_data[:author]] # don't mark-as-unread for the author
-      options[:skip_users] << user if user.preferences[:use_new_conversations]
-      participating_instructors.each do |t|
-        # Check their settings and add to :skip_users if set to suppress.
-        if t.preferences[:no_submission_comments_inbox] == true ||
-          t.preferences[:use_new_conversations]
-          options[:skip_users] << t
-        end
-      end
-    when :destroy
-      options[:delete_all] = visible_submission_comments.empty?
-      options[:only_existing] = true
-    when :migrate # don't mark-as-unread for anybody or add to empty conversations
-      return unless conversation_message_data
-      options[:recalculate_count] = true
-      options[:recalculate_last_authored_at] = true
-      options[:only_existing] = true
-    end
-
-    Conversation.update_all_for_asset(self, options)
-  end
-
-  def self.batch_migrate_conversations!(ids)
-    find_all_by_id(ids).each do |sub|
-      sub.create_or_update_conversations!(:migrate)
-    end
   end
 
   def limit_comments(user, session=nil)
@@ -1002,7 +954,8 @@ class Submission < ActiveRecord::Base
   alias_method :late, :late?
 
   def missing?
-    submitted_at.nil? && past_due?
+    return false if !past_due? || submitted_at.present?
+    assignment.expects_submission? || !(self.graded? && self.score > 0)
   end
   alias_method :missing, :missing?
 

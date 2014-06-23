@@ -38,16 +38,17 @@ define([
   //'compiled/tinymce', // required, but the bundles that ACTUALLY use
                         // tiny can require it themselves or else we have
                         // build problems
+  'INST', // for IE detection; need to handle links in a special way
   'jqueryui/draggable' /* /\.draggable/ */,
   'jquery.instructure_misc_plugins' /* /\.indicate/ */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'vendor/jquery.ba-tinypubsub',
   'vendor/scribd.view' /* scribd */
-], function(I18nObj, $, EditorAccessibility) {
+], function(I18nObj, $, EditorAccessibility, INST) {
 
-  var enableBookmarking = $("body").hasClass('ie');
+  var enableBookmarking = !!INST.browser.ie;
   $(document).ready(function() {
-    enableBookmarking = $("body").hasClass('ie');
+    enableBookmarking = !!INST.browser.ie;
   });
 
   function EditorBoxList() {
@@ -124,26 +125,18 @@ define([
         instructure_buttons = instructure_buttons + ",instructure_external_button_clump";
       }
     }
-    if(INST && INST.allowMediaComments) {
+    if(INST && INST.allowMediaComments && (INST.kalturaSettings && !INST.kalturaSettings.hide_rte_button)) {
       instructure_buttons = instructure_buttons + ",instructure_record";
     }
     var equella_button = INST && INST.equellaEnabled ? ",instructure_equella" : "";
     instructure_buttons = instructure_buttons + equella_button;
 
-    var buttons1 = "bold,italic,underline,forecolor,backcolor,removeformat,justifyleft,justifycenter,justifyright,bullist,outdent,indent,sup,sub,numlist,table,instructure_links,unlink" + instructure_buttons + ",fontsizeselect,formatselect";
-    var buttons2 = "";
-    var buttons3 = "";
+    var buttons1 = "bold,italic,underline,forecolor,backcolor,removeformat";
+    var buttons2 = "justifyleft,justifycenter,justifyright,bullist,outdent,indent";
+    var buttons3 = "sup,sub,numlist,table,instructure_links,unlink" + instructure_buttons;
+    var buttons4 = "fontsizeselect,formatselect";
 
-    if (width < 359 && width > 0) {
-      buttons1 = "bold,italic,underline,forecolor,backcolor,removeformat,justifyleft,justifycenter,justifyright";
-      buttons2 = "outdent,indent,sup,sub,bullist,numlist,table,instructure_links,unlink" + instructure_buttons;
-      buttons3 = "fontsizeselect,formatselect";
-    } else if (width < 600) {
-      buttons1 = "bold,italic,underline,forecolor,backcolor,removeformat,justifyleft,justifycenter,justifyright,outdent,indent,sup,sub,bullist,numlist";
-      buttons2 = "table,instructure_links,unlink" + instructure_buttons + ",fontsizeselect,formatselect";
-    }
-
-    var editor_css = "/javascripts/tinymce/jscripts/tiny_mce/themes/advanced/skins/default/ui.css,/stylesheets/compiled/tiny_like_ck_with_external_tools.css";
+    var editor_css = "/javascripts/tinymce/jscripts/tiny_mce/themes/advanced/skins/default/ui.css,/stylesheets_compiled/legacy_normal_contrast/tiny_like_ck_with_external_tools.css";
 
     var tinyOptions = $.extend({
       mode : "exact",
@@ -161,13 +154,14 @@ define([
       theme_advanced_toolbar_align : "center",
       theme_advanced_buttons2: buttons2,
       theme_advanced_buttons3: buttons3,
+      theme_advanced_buttons4: buttons4,
 
       theme_advanced_resize_horizontal : false,
       theme_advanced_resizing : true,
       theme_advanced_blockformats : "p,h2,h3,h4,pre",
       theme_advanced_more_colors: false,
       extended_valid_elements : "iframe[src|width|height|name|align|style|class|sandbox]",
-      content_css: "/stylesheets/compiled/instructure_style.css,/stylesheets/compiled/tinymce.editor_box.css",
+      content_css: "/stylesheets_compiled/legacy_normal_contrast/instructure_style.css,/stylesheets_compiled/legacy_normal_contrast/tinymce.editor_box.css",
       editor_css: editor_css,
       auto_focus: options.focus ? id : null,
 
@@ -187,7 +181,7 @@ define([
           if (event.keyCode == 9 && event.shiftKey) {
             var $cur = $(ed.getContainer());
             while (true) {
-              // When jQuery is upgraded to 1.8+, use .addBack instead.
+              // When jQuery is upgraded to 1.8+, use .addBack(':tabbable') instead of andSelf().filter(...)
               if ($cur.prevAll().find(':tabbable').andSelf().filter(':tabbable').last().focus().length) {
                 return false;
               }
@@ -622,6 +616,7 @@ define([
       if(anchor) {
         $(anchor).attr({
           href: url,
+          'data-mce-href': url,
           '_mce_href': url,
           title: title || '',
           id: link_id,

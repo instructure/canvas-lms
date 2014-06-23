@@ -1,10 +1,11 @@
 define [
+  'jquery'
   'compiled/views/courses/roster/CreateUsersView'
   'compiled/collections/RolesCollection'
   'compiled/models/Role'
   'compiled/models/CreateUserList'
   'helpers/assertions'
-], (CreateUsersView, RolesCollection, Role, CreateUserList, assert) ->
+], ($, CreateUsersView, RolesCollection, Role, CreateUserList, assert) ->
 
   view = null
   server = null

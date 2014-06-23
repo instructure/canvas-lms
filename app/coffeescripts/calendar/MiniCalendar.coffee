@@ -17,12 +17,17 @@ define [
         dayClick: @dayClick
         events: @getEvents
         eventRender: @eventRender
+        droppable: true
+        dropAccept: '.fc-event,.undated_event'
+        drop: @drop
         , calendarDefaults)
       ,
         $.subscribe
           "Calendar/visibleContextListChanged" : @visibleContextListChanged
           "Calendar/refetchEvents" : @refetchEvents
           "Calendar/currentDate" : @gotoDate
+          "CommonEvent/eventDeleted" : @eventSaved
+          "CommonEvent/eventSaved" : @eventSaved
       )
 
     getEvents: (start, end, cb) =>
@@ -55,6 +60,16 @@ define [
     visibleContextListChanged: (list) =>
       @refetchEvents()
 
+    eventSaved: =>
+      @refetchEvents()
+
     refetchEvents: () =>
       return unless @calendar.is(':visible')
       @calendar.fullCalendar('refetchEvents')
+
+    drop: (date, allDay, jsEvent, ui) =>
+      if ui.helper.is('.undated_event')
+        @mainCalendar.drop(date, allDay, jsEvent, ui)
+      else if ui.helper.is('.fc-event')
+        @mainCalendar.dropOnMiniCalendar(date, allDay, jsEvent, ui)
+
