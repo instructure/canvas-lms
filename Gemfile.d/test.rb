@@ -4,8 +4,13 @@ group :test do
   gem 'simplecov-rcov', '0.2.3', :require => false
   gem 'bluecloth', '2.0.10' # for generating api docs
     gem 'redcarpet', '3.0.0'
-  gem 'mocha', '1.0.0.alpha', :require => false
-    gem 'metaclass', '0.0.2'
+  if RUBY_VERSION >= '2.1'
+    gem 'mocha', github: 'eac/mocha', :branch => 'eac/alias_method_fix', :ref => 'bb8813fbb4cc589d7c58073d93983722d61b6919', :require => false
+      gem 'metaclass', '0.0.2'
+  else
+    gem 'mocha', '1.1.0', :require => false
+      gem 'metaclass', '0.0.2'
+  end
   gem 'thin', '1.5.1'
     gem 'eventmachine', '1.0.3'
   gem 'bullet_instructure', '3.0.0', :require => false

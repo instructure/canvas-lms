@@ -311,6 +311,12 @@ Mocha::Mock.class_eval do
     raise "Mocks aren't really serializeable!"
   end
 
+  def to_yaml(opts = {})
+    YAML.quick_emit(self.object_id, opts) do |out|
+      out.scalar(nil, 'null')
+    end
+  end
+
   def respond_to_with_marshalling?(symbol, include_private = false)
     return true if [:marshal_dump, :marshal_load].include?(symbol)
     respond_to_without_marshalling?(symbol, include_private)
