@@ -871,6 +871,14 @@ describe Attachment do
       a.unencoded_filename.should be_valid_encoding
       a.unencoded_filename.should eql("\u2603" * 28)
     end
+
+    it "should not double-escape a root attachment's filename" do
+      a = attachment_model(:filename => 'something with spaces.txt')
+      a.filename.should == 'something+with+spaces.txt'
+      a2 = Attachment.new
+      a2.root_attachment = a
+      a2.sanitize_filename(nil).should == a.filename
+    end
   end
 
   context "clone_for" do

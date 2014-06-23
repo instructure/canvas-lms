@@ -836,9 +836,12 @@ class Attachment < ActiveRecord::Base
 
   alias_method :original_sanitize_filename, :sanitize_filename
   def sanitize_filename(filename)
-    filename = self.root_attachment.filename if self.root_attachment && self.root_attachment.filename
-    filename = Attachment.truncate_filename(filename, 255) do |component, len|
-      CanvasTextHelper.cgi_escape_truncate(component, len)
+    if self.root_attachment && self.root_attachment.filename
+      filename = self.root_attachment.filename
+    else
+      filename = Attachment.truncate_filename(filename, 255) do |component, len|
+        CanvasTextHelper.cgi_escape_truncate(component, len)
+      end
     end
     filename
   end
