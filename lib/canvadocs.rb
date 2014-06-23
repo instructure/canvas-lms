@@ -26,10 +26,8 @@ module Canvadocs
     def initialize(opts)
       self.token = opts[:token]
 
-      # setup the http object for ssl
-      @url = URI.parse(opts[:base_url] || BASE_URL)
-      @http = Net::HTTP.new(@url.host, @url.port)
-      @http.use_ssl = true
+      _, @url = CanvasHttp.validate_url(opts[:base_url] || BASE_URL)
+      @http = CanvasHttp.connection_for_uri(@url)
     end
 
     # -- Documents --
