@@ -91,7 +91,7 @@ gem 'ratom-instructure', '0.6.9', :require => "atom" # custom gem until necessar
 gem 'rdiscount', '1.6.8'
 gem 'ritex', '1.0.1'
 
-gem 'rotp', '1.4.1'
+gem 'rotp', '1.6.1'
 gem 'rqrcode', '0.4.2'
 gem 'rscribd', '1.2.0'
 gem 'net-ldap', '0.3.1', :require => 'net/ldap'

@@ -643,7 +643,7 @@ class Attachment < ActiveRecord::Base
     policy_encoded = Base64.encode64(policy.to_json).gsub(/\n/, '')
     signature = Base64.encode64(
       OpenSSL::HMAC.digest(
-        OpenSSL::Digest::Digest.new('sha1'), shared_secret, policy_encoded
+        OpenSSL::Digest.new('sha1'), shared_secret, policy_encoded
       )
     ).gsub(/\n/, '')
 
@@ -662,7 +662,7 @@ class Attachment < ActiveRecord::Base
   def self.decode_policy(policy_str, signature_str)
     return nil if policy_str.blank? || signature_str.blank?
     signature = Base64.decode64(signature_str)
-    return nil if OpenSSL::HMAC.digest(OpenSSL::Digest::Digest.new("sha1"), self.shared_secret, policy_str) != signature
+    return nil if OpenSSL::HMAC.digest(OpenSSL::Digest.new("sha1"), self.shared_secret, policy_str) != signature
     policy = JSON.parse(Base64.decode64(policy_str))
     return nil unless Time.zone.parse(policy['expiration']) >= Time.now
     attachment = Attachment.find(policy['attachment_id'])
