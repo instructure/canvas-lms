@@ -182,7 +182,7 @@ define [
           success: (data) ->
             $.flashMessage('Assignments are being posted.')
         @close()
-      else
+      else if @model.get('course_id')
         json_to_post['course_id'] = @model.get('course_id')
         $.ajax @sis_app_url + '/grades/course/' + @model.get('course_id'),
           type: 'POST'
@@ -193,6 +193,11 @@ define [
           success: (data) ->
             $.flashMessage('Assignments are being posted.')
         @close()
+      else
+        # Odd, the course/section has no SIS ID
+        $.flashError("Grades can't be posted because this course or section was not imported from your SIS.")
+        @close()
+
 
 
 

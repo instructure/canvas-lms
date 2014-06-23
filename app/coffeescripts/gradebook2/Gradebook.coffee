@@ -170,17 +170,19 @@ define [
 
     initPostGrades: () ->
 
-      $("#publish").click (event) =>
+      $("#post-grades-button").click (event) =>
         event.preventDefault()
 
-        postGradesModel = new PostGradesModel(
-          {
-            gradebook: ENV.GRADEBOOK_OPTIONS,
-            assignments: @assignments,
-            section_id: if @sectionToShow then @sections[@sectionToShow].integration_id else null,
-            course_id: ENV.GRADEBOOK_OPTIONS.context_integration_id
-          }
-        )
+        pg = {
+          gradebook: ENV.GRADEBOOK_OPTIONS
+          assignments: @assignments
+        }
+        if @sectionToShow
+          pg.section_id = @sections[@sectionToShow].integration_id
+        else
+          pg.course_id = ENV.GRADEBOOK_OPTIONS.context_integration_id
+
+        postGradesModel = new PostGradesModel(pg)
 
         postGradesDialog = new PostGradesDialog(postGradesModel, ENV.GRADEBOOK_OPTIONS.sis_app_url)
         postGradesModel.reset_ignored_assignments()
@@ -216,6 +218,7 @@ define [
       for section in sections
         htmlEscape(section)
         @sections[section.id] = section
+      @displayPostGradesButton(@sectionToShow)
       @sections_enabled = sections.length > 1
       @hasSections.resolve()
 
@@ -760,8 +763,26 @@ define [
 
     updateCurrentSection: (section, author) =>
       @sectionToShow = section
+      @displayPostGradesButton(section)
       userSettings[if @sectionToShow then 'contextSet' else 'contextRemove']('grading_show_only_section', @sectionToShow)
       @buildRows() if @grid
+
+    displayPostGradesButton: (section) =>
+      if section?
+        is_integration_section = @sections[section] && @sections[section].integration_id
+      else
+        is_integration_course = ENV.GRADEBOOK_OPTIONS.context_integration_id
+
+      if is_integration_section or is_integration_course
+        @showPostGradesButton()
+      else
+        @hidePostGradesButton()
+
+    hidePostGradesButton: ->
+      $('#post-grades-button').closest('.gradebook-navigation').addClass('hidden')
+
+    showPostGradesButton: ->
+      $('#post-grades-button').closest('.gradebook-navigation').removeClass('hidden')
 
     initHeader: =>
       @drawSectionSelectButton() if @sections_enabled
