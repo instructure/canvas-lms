@@ -63,7 +63,7 @@ class GradebooksController < ApplicationController
             'score' => s.grants_right?(@current_user, :read_grade)? s.score  : nil
           }
         }
-        ags_json = light_weight_ags_json(@presenter.groups)
+        ags_json = light_weight_ags_json(@presenter.groups, {student: @presenter.student})
         js_env submissions: submissions_json,
                assignment_groups: ags_json,
                group_weighting_scheme: @context.group_weighting_scheme,
@@ -78,9 +78,9 @@ class GradebooksController < ApplicationController
     end
   end
 
-  def light_weight_ags_json(assignment_groups)
+  def light_weight_ags_json(assignment_groups, opts={})
     assignment_groups.map do |ag|
-      assignments = ag.visible_assignments(@current_user).map do |a|
+      assignments = ag.visible_assignments(opts[:student] || @current_user).map do |a|
         {
           :id => a.id,
           :submission_types => a.submission_types_array,

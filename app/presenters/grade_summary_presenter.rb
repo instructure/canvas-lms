@@ -138,6 +138,7 @@ class GradeSummaryPresenter
                 :content_participations)
       .where("assignments.workflow_state != 'deleted'")
       .find_all_by_user_id(student)
+      .select{ |submission| submission.assignment_visible_to_student?(student_id)}
 
       assignments_index = assignments.index_by(&:id)
 
@@ -167,19 +168,27 @@ class GradeSummaryPresenter
   end
 
   def assignment_stats
-    @stats ||= @context.assignments.active
-      .except(:order)
-      .joins(:submissions)
-      .where("submissions.user_id in (?)", real_and_active_student_ids)
-      .group("assignments.id")
-      .select("assignments.id, max(score) max, min(score) min, avg(score) avg")
-      .index_by(&:id)
+    @stats ||= begin
+      chain = @context.assignments.active
+        .except(:order)
+        .joins(:submissions)
+        .where("submissions.user_id in (?)", real_and_active_student_ids)
+      if @context.feature_enabled?(:differentiated_assignments)
+        # if DA is on, further restrict the assignments to those visible to each student
+        chain = chain.joins(:assignment_student_visibilities).where("""
+                  submissions.assignment_id = assignments.id
+                  AND submissions.assignment_id = assignment_student_visibilities.assignment_id
+                  AND submissions.user_id = assignment_student_visibilities.user_id
+                """)
+      end
+      chain.group("assignments.id")
+        .select("assignments.id, max(score) max, min(score) min, avg(score) avg")
+        .index_by(&:id)
+    end
   end
 
   def real_and_active_student_ids
-    @context.all_real_student_enrollments
-      .where("workflow_state not in (?)", ['rejected','inactive'])
-      .pluck(:user_id).uniq
+    @context.all_real_student_enrollments.where("workflow_state not in (?)", ['rejected','inactive']).pluck(:user_id).uniq
   end
 
   def assignment_presenters
