@@ -181,10 +181,6 @@ class Enrollment < ActiveRecord::Base
               AND enrollments.workflow_state = 'active'
               AND courses.workflow_state != 'deleted')")
 
-  scope :ended,
-        joins(:course).
-        where("courses.workflow_state='completed' OR enrollments.workflow_state='rejected' OR enrollments.workflow_state='completed'")
-
   scope :future, lambda {
     joins(:course).
         where("(courses.start_at>?

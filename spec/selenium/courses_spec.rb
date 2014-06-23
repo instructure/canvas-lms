@@ -372,11 +372,6 @@ describe "courses" do
       assert_flash_notice_message /Invitation canceled./
     end
 
-    it "should validate that a user cannot see a course they are not enrolled in" do
-      login_as(@student.name)
-      f('#menu').should_not include_text('Courses')
-    end
-
     it "should display user groups on courses page" do
       group = Group.create!(:name => "group1", :context => @course)
       group.add_user(@student)

@@ -1291,22 +1291,6 @@ describe Enrollment do
   end
 
   context "named scopes" do
-    describe "ended" do
-      it "should work" do
-        course(:active_all => 1)
-        user
-        Enrollment.ended.should == []
-        @enrollment = StudentEnrollment.create!(:user => @user, :course => @course)
-        Enrollment.ended.should == []
-        @enrollment.update_attribute(:workflow_state, 'active')
-        Enrollment.ended.should == []
-        @enrollment.update_attribute(:workflow_state, 'completed')
-        Enrollment.ended.should == [@enrollment]
-        @enrollment.update_attribute(:workflow_state, 'rejected')
-        Enrollment.ended.should == [@enrollment]
-      end
-    end
-
     describe "future scope" do
       it "should include enrollments for future but not unpublished courses for students" do
         user

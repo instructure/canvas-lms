@@ -129,7 +129,7 @@ describe "self enrollment" do
     }
     let(:primary_action){ "Go to your Dashboard" }
     let(:assert_valid_dashboard) {
-      f('#courses_menu_item').should include_text("Home")
+      f('#courses_menu_item').should include_text("Courses") # show for future course
       f('#dashboard').should include_text("You've enrolled in one or more courses that have not started yet")
     }
     context "with open registration" do
@@ -145,7 +145,7 @@ describe "self enrollment" do
     let(:set_up_course){ }
     let(:primary_action){ "Go to your Dashboard" }
     let(:assert_valid_dashboard) {
-      f('#courses_menu_item').should include_text("Home")
+      f('#courses_menu_item').should include_text("Courses")
       f('#dashboard').should include_text("You've enrolled in one or more courses that have not started yet")
     }
     context "with open registration" do
