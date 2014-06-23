@@ -80,8 +80,7 @@ class GradebooksController < ApplicationController
 
   def light_weight_ags_json(assignment_groups)
     assignment_groups.map do |ag|
-      assignment_scope = AssignmentGroup.assignment_scope_for_grading(@context)
-      assignments = ag.send(assignment_scope).map do |a|
+      assignments = ag.visible_assignments(@current_user).map do |a|
         {
           :id => a.id,
           :submission_types => a.submission_types_array,
@@ -466,11 +465,10 @@ class GradebooksController < ApplicationController
 
 
   def assignment_groups_json(opts={})
-    assignment_scope = AssignmentGroup.assignment_scope_for_grading(@context)
+    assignment_scope = AssignmentGroup.assignment_scope_for_draft_state(@context)
     @context.assignment_groups.active.includes(assignment_scope).map { |g|
       assignment_group_json(g, @current_user, session, ['assignments'], {
         stringify_json_ids: opts[:stringify_json_ids] || stringify_json_ids?,
-        assignment_group_assignment_scope: assignment_scope
       })
     }
   end

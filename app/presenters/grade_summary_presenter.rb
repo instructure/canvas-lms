@@ -114,8 +114,7 @@ class GradeSummaryPresenter
   def assignments
     @assignments ||= begin
       group_index = groups.index_by(&:id)
-
-      groups.flat_map(&relevant_assignments_scope).select { |a|
+      groups.flat_map{|ag| ag.visible_assignments(student)}.select { |a|
         a.submission_types != 'not_graded'
       }.map { |a|
         # prevent extra loads
@@ -128,7 +127,7 @@ class GradeSummaryPresenter
   end
 
   def relevant_assignments_scope
-    AssignmentGroup.assignment_scope_for_grading(@context)
+    AssignmentGroup.assignment_scope_for_draft_state(@context)
   end
 
   def submissions
