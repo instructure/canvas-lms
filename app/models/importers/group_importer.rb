@@ -22,7 +22,7 @@ module Importers
       item ||= Group.find_by_context_id_and_context_type_and_id(context.id, context.class.to_s, hash[:id])
       item ||= Group.find_by_context_id_and_context_type_and_migration_id(context.id, context.class.to_s, hash[:migration_id]) if hash[:migration_id]
       item ||= context.groups.new
-      migration.add_imported_item(item) if migration && item.new_record?
+      migration.add_imported_item(item) if migration
       item.migration_id = hash[:migration_id]
       item.name = hash[:title]
       item.group_category = hash[:group_category].present? ?

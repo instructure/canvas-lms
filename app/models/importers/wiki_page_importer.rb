@@ -63,7 +63,7 @@ module Importers
       end
 
       item.set_as_front_page! if !!hash[:front_page] && context.wiki.has_no_front_page
-      migration.add_imported_item(item) if migration && item.new_record?
+      migration.add_imported_item(item) if migration
 
       item.migration_id = hash[:migration_id]
       (hash[:contents] || []).each do |sub_item|

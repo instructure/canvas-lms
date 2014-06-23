@@ -149,7 +149,7 @@ module Importers
         item.send("#{prop}=", hash[prop]) unless hash[prop].nil?
       end
 
-      migration.add_imported_item(item) if migration && new_record
+      migration.add_imported_item(item) if migration
       item.save_without_broadcasting!
 
       if migration
