@@ -699,6 +699,31 @@ describe User do
     end
   end
 
+  context "check_courses_right?" do
+    before do
+      course_with_teacher(:active_all => true)
+      @student = user_model
+      @course.stubs(:grants_right?).returns(true)
+    end
+
+    it "should require parameters" do
+      @student.check_courses_right?(nil, :some_right).should be_false
+      @student.check_courses_right?(@teacher, nil).should be_false
+    end
+
+    it "should check current courses" do
+      @student.expects(:courses).once.returns([@course])
+      @student.expects(:concluded_courses).never
+      @student.check_courses_right?(@teacher, :some_right).should be_true
+    end
+
+    it "should check concluded courses" do
+      @student.expects(:courses).once.returns([])
+      @student.expects(:concluded_courses).once.returns([@course])
+      @student.check_courses_right?(@teacher, :some_right).should be_true
+    end
+  end
+
   context "search_messageable_users" do
     before(:each) do
       @admin = user_model

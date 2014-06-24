@@ -943,6 +943,16 @@ class User < ActiveRecord::Base
     result
   end
 
+  def check_courses_right?(user, sought_right)
+    # Look through the currently enrolled courses first.  This should
+    # catch most of the calls.  If none of the current courses grant
+    # the right then look at the concluded courses.
+    user && sought_right && (
+      self.courses.any?{ |c| c.grants_right?(user, sought_right) } ||
+      self.concluded_courses.any?{ |c| c.grants_right?(user, sought_right) }
+    )
+  end
+
   set_policy do
     given { |user| user == self }
     can :read and can :manage and can :manage_content and can :manage_files and can :manage_calendar and can :send_messages and can :update_avatar and can :manage_feature_flags
@@ -953,22 +963,16 @@ class User < ActiveRecord::Base
     given {|user| self.courses.any?{|c| c.user_is_instructor?(user)}}
     can :rename and can :create_user_notes and can :read_user_notes
 
-    given do |user|
-      user && (
-        # by default this means that the user we are given is an administrator
-        # of an account of one of the courses that this user is enrolled in, or
-        # an admin (teacher/ta/designer) in the course
-        self.all_courses.any? { |c| c.grants_right?(user, :read_reports) }
-      )
-    end
+    # by default this means that the user we are given is an administrator
+    # of an account of one of the courses that this user is enrolled in, or
+    # an admin (teacher/ta/designer) in the course
+    given { |user| self.check_courses_right?(user, :read_reports) }
     can :rename and can :remove_avatar and can :read_reports
 
-    given do |user|
-      user && self.all_courses.any? { |c| c.grants_right?(user, :manage_user_notes) }
-    end
+    given { |user| self.check_courses_right?(user, :manage_user_notes) }
     can :create_user_notes and can :read_user_notes
 
-    given { |user| user && self.all_courses.any? { |c| c.grants_right?(user, :read_user_notes) } }
+    given { |user| self.check_courses_right?(user, :read_user_notes) }
     can :read_user_notes
 
     given do |user|
