@@ -1382,9 +1382,14 @@ class ApplicationController < ActionController::Base
 
   def check_incomplete_registration
     if @current_user
-      js_env :INCOMPLETE_REGISTRATION => params[:registration_success] && @current_user.pre_registered?, :USER_EMAIL => @current_user.email
+      js_env :INCOMPLETE_REGISTRATION => incomplete_registration?, :USER_EMAIL => @current_user.email
     end
   end
+
+  def incomplete_registration?
+    @current_user && params[:registration_success] && @current_user.pre_registered?
+  end
+  helper_method :incomplete_registration?
 
   def page_views_enabled?
     PageView.page_views_enabled?
