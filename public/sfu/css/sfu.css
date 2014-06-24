@@ -1,0 +1,138 @@
+#header {
+    background: #6a7177 url(../images/clf-header-bg-rainbow.png);
+}
+
+#header-rainbow {
+    height: 10px;
+    background: #494950 url(../images/bg-small.png) -70px 0 no-repeat;
+}
+
+#header-logo, #header.no-user #header-logo {
+    background: url(../images/sfu-canvas-logo@2x.png) 0 0 no-repeat;
+    background-size: 140px 50px;
+    width: 140px;
+    height: 50px;
+    bottom: 0;
+}
+
+#header.no-user #header-logo {
+    top: 16px;
+    left: 16px;
+}
+
+.ie8 #header-logo {
+    background: url(../images/sfu-canvas-logo.png) 0 0 no-repeat;
+}
+
+.with-right-side #header-inner, #header-inner {
+    max-width: 100% !important;
+}
+
+#identity {
+    margin-top: 4px;
+    background: none;
+    border: none;
+    box-shadow: none;
+    font-family: "DINProRegular", "Helvetica Neue", Arial, "Liberation Sans", FreeSans, sans-serif;;
+}
+
+/* Help Link Dropdown */
+
+.sfu_help_links {
+    width: auto;
+    height: auto;
+    font-size: 12px;
+    margin-bottom: auto;
+    position: relative;
+    top: -3px;
+}
+
+#menu {
+    margin-bottom: 12px;
+}
+
+.menu-item .menu-item-title, .menu-item .menu-item-no-drop {
+    font-family: "DINProRegular", "Helvetica Neue", Arial, "Liberation Sans", FreeSans, sans-serif;
+    font-size: 16px;
+}
+
+#topbar {
+    margin-top: 10px;
+    width: auto; /* so it doesn't block clicks on the SFU Canvas logo */
+}
+
+#identity .user_name {
+    font-family: "DINProMedium", "Helvetica Neue", Arial, "Liberation Sans", FreeSans, sans-serif;
+    margin-right: 12px;
+    padding-right: 20px;
+    border-right: 1px solid white;
+    text-transform: uppercase;
+}
+
+#footer {
+    display:none;
+    margin: 0 0 34px 26px;
+}
+
+@font-face {
+    font-family: 'DINProBold';
+    src: url('../fonts/dinpro-bold-webfont.eot');
+    src: url('../fonts/dinpro-bold-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/dinpro-bold-webfont.woff') format('woff'),
+         url('../fonts/dinpro-bold-webfont.ttf') format('truetype'),
+         url('../fonts/dinpro-bold-webfont.svg#DINProBold') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'DINProRegular';
+    src: url('../fonts/dinpro-regular-webfont.eot');
+    src: url('../fonts/dinpro-regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/dinpro-regular-webfont.woff') format('woff'),
+         url('../fonts/dinpro-regular-webfont.ttf') format('truetype'),
+         url('../fonts/dinpro-regular-webfont.svg#DINProRegular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'DINProMedium';
+    src: url('../fonts/dinpro-medium-webfont.eot');
+    src: url('../fonts/dinpro-medium-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/dinpro-medium-webfont.woff') format('woff'),
+         url('../fonts/dinpro-medium-webfont.ttf') format('truetype'),
+         url('../fonts/dinpro-medium-webfont.svg#DINProMedium') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+/* !-- Form styles -- */
+
+.bootstrap-form div.help
+{
+    margin-top: 0.5em;
+    font-size: 0.8em;
+    color: #888;
+}
+
+.bootstrap-form .warning
+{
+    width: 65%;
+    margin: 1.5em 0 2em 12.25em;
+    padding: 0.75em 1em;
+    border: 1px dotted #960;
+    background: #FEC;
+    color: #630;
+}
+
+/* !-- Document preview fix -- */
+/* NOTE: This removes multiple extra scroll bars in the Files browser */
+
+#doc_preview_holder {
+    overflow-y: hidden;
+}
+
+#doc_preview_holder > iframe {
+    border: none;
+}

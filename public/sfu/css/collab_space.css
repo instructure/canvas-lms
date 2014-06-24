@@ -1,0 +1,12 @@
+#wiki_edit_view_main #below_editor div:nth-child(-n+2) {
+    display: none;
+}
+
+li.section > a.assignments,
+li.section > a.grades,
+li.section > a.outcomes,
+li.section > a.quizzes,
+li.section > a.syllabus,
+li.section > a.context_external_tool_159 {
+    display: none;
+}

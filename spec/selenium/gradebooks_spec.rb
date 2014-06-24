@@ -41,19 +41,7 @@ describe "gradebook1" do
       :submission_types => 'online_text_entry,online_upload',
       :assignment_group => @assignments_group
     )
-  end
-
-  it "hides/shows assignments based on their draft state" do
-    @course.root_account.enable_feature!(:draft_state)
-    @assignment.unpublish
-    get "/courses/#{@course.id}/gradebook"
-    wait_for_ajaximations
-    f('body').text.should_not match @assignment.title
-
-    @assignment.publish
-    get "/courses/#{@course.id}/gradebook"
-    wait_for_ajaximations
-    f('body').text.should match @assignment.title
+    Course.any_instance.stubs(:feature_enabled?).returns(false)
   end
 
   def switch_to_section(section_name="All")

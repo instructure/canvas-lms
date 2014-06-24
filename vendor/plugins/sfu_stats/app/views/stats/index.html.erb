@@ -1,0 +1,21 @@
+<%
+  content_for :page_title, "Canvas Stats"
+  @body_classes << "full-width"
+  @show_left_side = false
+  jammit_css :sfustats, :plugin => :sfu_stats
+%>
+
+<div id="sfu_stats">
+
+  <div id="sfu_stats_left" class="clearfix">
+      <h1>Quick Stats</h1>
+      <%= render :partial => 'quickstats' %>
+  </div>
+  <div id="sfu_stats_main" class="clearfix">
+   <%= render :partial => 'courses' %>
+  </div>
+  <div id="sfu_stats_right" class="clearfix">
+      <!-- <h1>Pretty Graphs</h1> -->
+  </div>
+
+</div>

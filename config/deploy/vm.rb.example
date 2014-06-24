@@ -1,0 +1,23 @@
+role :app, "canvas.dev"
+role :db, "canvas.dev", :primary => true
+
+set :repository,    "git://github.com/USERNAME/canvas-lms.git"
+set :rails_env, "production"
+
+namespace :canvas do
+    # override the copy_config step
+    desc "Copy config files from /mnt/data/canvasconfig/config"
+    task :copy_config do
+        run "cp #{shared_path}/config/*.yml #{latest_release}/config"
+    end
+    # override the log_deploy step
+    task :log_deploy do ; end
+end
+
+# override the disable/enable web steps
+namespace :deploy do
+    namespace :web do
+        task :disable do ; end
+        task :enable do ; end
+    end
+end

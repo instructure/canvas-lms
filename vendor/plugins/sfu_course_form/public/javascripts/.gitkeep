@@ -1,0 +1,1 @@
+# canvas:compile_assets might fail if this directory is not present during a deploy

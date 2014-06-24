@@ -155,8 +155,9 @@
         <%= text_field :communication_channel, :address %>
       </div>
     </div>
-
-    <% if @domain_root_account == Account.default %>
+    <%# SFU MOD CANVAS-161 Hide checkbox for adding login using another email address %>
+    <% if false && @domain_root_account == Account.default %>
+    <%# END SFU MOD %>
       <div class="control-group">
         <div class="controls">
           <label class='checkbox' for="build_pseudonym_for_email">

@@ -169,7 +169,6 @@ describe "AuthenticationAudit API", type: :request do
         it "should be formatted as an array of Account objects" do
           @json.should == [{
             "id" => @account.id,
-            "integration_id" => @account.integration_id,
             "name" => @account.name,
             "parent_account_id" => nil,
             "root_account_id" => nil,

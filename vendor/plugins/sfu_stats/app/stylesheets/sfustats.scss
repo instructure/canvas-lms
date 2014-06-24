@@ -1,0 +1,269 @@
+// variables
+$widgetradius: 5px;
+
+
+#sfu_stats > div {
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    float:left;
+    padding: 0 10px;
+    min-height: 500px
+}
+
+#sfu_stats_left, #sfu_stats_right {
+    width: 20%;
+}
+
+#sfu_stats_main {
+    width: 60%;
+}
+
+#sfu_stats_main {
+    border-right: 1px solid #eee;
+    border-left: 1px solid #eee;
+}
+
+#course_table {
+    width: 75%;
+    float: left;
+}
+
+#course_table table {
+    display:none;
+}
+
+//
+// WIDGETS - GENERIC
+//
+#sfu_stats_courses_widget_container {
+    float: right;
+    position: relative;
+    width: 23%;
+}
+
+.sfu_stats_widget {
+    background-color: #ddd;
+    margin: 0;
+    padding-bottom: 3px;
+    border-bottom: 1px solid #eee;
+    border-top-right-radius: $widgetradius;
+    border-top-left-radius: $widgetradius;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.sfu_stats_widget_collapsed {
+    border-bottom-left-radius: $widgetradius;
+    border-bottom-right-radius: $widgetradius;
+    padding-bottom: 0;
+}
+
+.sfu_stats_widget_header {
+    margin: 0 0 5px 10px;
+    padding-top: 5px;
+    cursor: pointer;
+ }
+
+.sfu_stats_widget_header h2 {
+    font-size: 16px;
+}
+
+
+//
+// WIDGET - COURSE FILTERS
+//
+#course_filters {
+    position: relative;
+    top: 14px;
+}
+
+#course_filters .sfu_stats_widget_body>div {
+    border-bottom: 1px solid #fff;
+    background-color: #eee;
+    padding: 10px;
+}
+
+#course_filters .sfu_stats_widget_body>div:last-of-type {
+    border-bottom: none;
+
+}
+
+#course_filter_search {
+    text-align: center;
+}
+
+#course_filter_search input {
+    width: 90%;
+}
+
+#course_filters_workflow label {
+    display: block;
+}
+
+#course_filters_workflow_inputs {
+    float: left;
+    margin-left: 10px;
+}
+
+#course_filters_workflow_label {
+    width: 25%;
+    float: left;
+}
+
+#term_select {
+    margin-left: 7px;
+}
+
+.checkbox-exclude-webct, .checkbox-credit-only {
+    float: right;
+}
+
+//
+// QUICKSTATS
+//
+.stats_enrollment_box {
+    background-color: #eee;
+    text-align: center;
+    margin-bottom: 10px;
+    padding: 15px;
+}
+.stats_enrollment_box p {
+    font-family: PatuaOneRegular, sans-serif;
+    margin: 0 0 10px;
+    font-size: 1.2em;
+}
+.stats_enrollment_box .enrollment_number {
+    font-size: 64px;
+    margin-bottom: 10px;
+}
+.stats_enrollment_box i[class*=icon-], .stats_enrollment_box i[class^=icon-] {
+    margin-left: 5px;
+}
+
+.stats_enrollment_box i[class*=icon-]:hover, .stats_enrollment_box i[class^=icon-]:hover {
+    cursor:pointer
+}
+
+.stats_enrollment_box i[class*=icon-]:before, .stats_enrollment_box i[class^=icon-]:before {
+    color: rgba(85, 85, 85, 0.3);
+}
+
+.stats_enrollment_box i[class*=icon-]:hover:before, .stats_enrollment_box i[class^=icon-]:hover:before {
+    color: #555;
+}
+
+
+//
+// FONTS
+//
+
+@font-face {
+    font-family: 'PatuaOneRegular';
+    src: url('/plugins/sfu_stats/fonts/PatuaOne-Regular-webfont.eot');
+    src: url('/plugins/sfu_stats/fonts/PatuaOne-Regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('/plugins/sfu_stats/fonts/PatuaOne-Regular-webfont.woff') format('woff'),
+         url('/plugins/sfu_stats/fonts/PatuaOne-Regular-webfont.ttf') format('truetype'),
+         url('/plugins/sfu_stats/fonts/PatuaOne-Regular-webfont.svg#PatuaOneRegular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+// icon fonts
+@font-face {
+    font-family: 'icomoon';
+    src:url('/plugins/sfu_stats/fonts/icomoon.eot');
+    src:url('/plugins/sfu_stats/fonts/icomoon.eot?#iefix') format('embedded-opentype'),
+        url('/plugins/sfu_stats/fonts/icomoon.woff') format('woff'),
+        url('/plugins/sfu_stats/fonts/icomoon.ttf') format('truetype'),
+        url('/plugins/sfu_stats/fonts/icomoon.svg#icomoon') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+/* Use the following CSS code if you want to use data attributes for inserting your icons */
+[data-icon]:before {
+    font-family: 'icomoon';
+    content: attr(data-icon);
+    speak: none;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Use the following CSS code if you want to have a class per icon */
+/*
+Instead of a list of all class selectors,
+you can use the generic selector below, but it's slower:
+[class*="icon-"] {
+*/
+.icon-filter, .icon-cloud-download, .icon-file-excel, .icon-file-json, .icon-file {
+    font-family: 'icomoon';
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+}
+.icon-filter:before {
+    content: "\66";
+}
+.icon-cloud-download:before {
+    content: "\65";
+}
+.icon-file-excel:before {
+    content: "\78";
+}
+.icon-file-json:before {
+    content: "\6a";
+}
+.icon-file:before {
+    content: "\64";
+}
+
+
+// spinner
+.spinner_container {
+    display: inline-block;
+}
+
+.spinner {
+    left: 8px !important;
+    top: -5px !important;
+}
+
+//
+// Overrides
+// Instructure changed some things between now (May 13) and our last update (March 22ish)
+//
+
+caption,th,td {
+      text-align: left;
+}
+
+body {
+      line-height: 1.5;
+}
+
+h1, h2 {
+    line-height: 1.5;
+    margin: 0 0 .5em 0;
+}
+
+label {
+    font-size: inherit;
+}
+
+select {
+    width: auto;
+    height: auto;
+    font: -moz-list sans-serif;
+    font: -webkit-small-control;
+    margin-bottom: 4px;
+    color: black;
+    border: 1px solid #A0A0A0;
+}

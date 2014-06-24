@@ -1,0 +1,29 @@
+<%
+  js_bundle :quickstats, :plugin => :sfu_stats
+%>
+
+<div id="quickstats">
+    <%
+        parsed_enrollments = {
+          "student" => {
+            "unique" => @enrollments["unique"]["StudentEnrollment"],
+            "total"  => @enrollments["total"]["StudentEnrollment"],
+          },
+          "teacher" => {
+            "unique" => @enrollments["unique"]["TeacherEnrollment"],
+            "total"  => @enrollments["total"]["TeacherEnrollment"],
+          }
+        }
+
+        parsed_enrollments.each do |type,enrollments|
+          @student_or_teacher = type.capitalize
+          parsed_enrollments[type].each do |enrollment_type, value|
+            @total_or_unique = enrollment_type.capitalize
+            @value = value
+    %>
+            <%= render :partial => 'enrollment_box' %>
+    <%
+          end
+        end
+    %>
+</div>

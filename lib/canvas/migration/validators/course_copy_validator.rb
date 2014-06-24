@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013 Instructure, Inc.
+# Copyright (C) 2013 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -23,7 +23,7 @@ module Canvas::Migration::Validators::CourseCopyValidator
     end
     source = Course.find_by_id(options[:source_course_id])
     if source
-      if !source.grants_rights?(user, nil, :manage)
+      if !source.grants_right?(user, :manage)
         return I18n.t :course_copy_not_allowed_error, 'You are not allowed to copy the source course.'
       end
     else

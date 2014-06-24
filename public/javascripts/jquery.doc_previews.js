@@ -182,7 +182,9 @@ define([
         // else if it's something google docs preview can handle and we can get a public url to this document.
         function loadGooglePreview(){
           // this handles both ssl and plain http.
-          var googleDocPreviewUrl = '//docs.google.com/viewer?' + $.param({
+          // SFU MOD CANVAS-205 Predoc: In-place Replacement for Google Doc Preview
+          var googleDocPreviewUrl = '//docview.sfu.ca/viewer?' + $.param({
+          // END SFU MOD
             embedded: true,
             url: opts.public_url
           });

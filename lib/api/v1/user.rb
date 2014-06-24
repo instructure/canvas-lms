@@ -131,10 +131,6 @@ module Api::V1::User
                               :root_account_id,
                               :user_id,
                               :course_id,
-                              :sis_course_id,
-                              :sis_section_id,
-                              :course_integration_id,
-                              :section_integration_id,
                               :course_section_id,
                               :associated_user_id,
                               :limit_privileges_to_course_section,
@@ -149,6 +145,8 @@ module Api::V1::User
     api_json(enrollment, user, session, :only => API_ENROLLMENT_JSON_OPTS).tap do |json|
       json[:enrollment_state] = json.delete('workflow_state')
       json[:role] = enrollment.role
+      json[:sis_source_id] = enrollment.sis_source_id # SFU MOD - CANVAS-224
+      json[:sis_batch_id] = enrollment.sis_batch_id
       json[:last_activity_at] = enrollment.last_activity_at
       if enrollment.root_account.grants_right?(user, session, :manage_sis)
         json[:sis_import_id] = enrollment.sis_batch_id
@@ -164,10 +162,12 @@ module Api::V1::User
           end
         end
       end
-      json[:sis_course_id] = Course.find_by_id(enrollment.course_id).sis_source_id
-      json[:course_integration_id] = Course.find_by_id(enrollment.course_id).integration_id
-      json[:sis_section_id] = CourseSection.find_by_id(enrollment.course_section_id).sis_source_id
-      json[:section_integration_id] = CourseSection.find_by_id(enrollment.course_section_id).integration_id
+      if @domain_root_account.grants_rights?(@current_user, :read_sis, :manage_sis).values.any?
+        json[:sis_course_id] = enrollment.course.sis_source_id
+        json[:course_integration_id] = enrollment.course.integration_id
+        json[:sis_section_id] = enrollment.course_section.sis_source_id
+        json[:section_integration_id] = enrollment.course_section.integration_id
+      end
       json[:html_url] = course_user_url(enrollment.course_id, enrollment.user_id)
       user_includes = includes.include?('avatar_url') ? ['avatar_url'] : []
       json[:user] = user_json(enrollment.user, user, session, user_includes) if includes.include?(:user)

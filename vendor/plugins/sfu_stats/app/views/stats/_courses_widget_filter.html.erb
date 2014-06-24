@@ -1,0 +1,36 @@
+<div class="sfu_stats_widget" id="course_filters">
+  <div class="sfu_stats_widget_header">
+    <h2 data-icon="f " aria-hidden="true">Filters</h2>
+  </div>
+  <div class="sfu_stats_widget_body">
+    <div id="course_filter_search" class="clearfix">
+      <input type="text" aria-controls="DataTables_Table_0" placeholder="Search Courses…">
+    </div>
+    <div id="course_filter_term" class="clearfix">
+      <label for="term_select">Term</label>
+      <select name="term_select" id="term_select">
+        <%
+          terms = []
+          @terms.each do |term|
+            terms.push [term.name, term.id]
+          end
+        %>
+        <%= options_for_select(terms, @current_term.id) %>
+      </select>
+    </div>
+    <div id="course_filters_workflow" class="clearfix">
+      <div id="course_filters_workflow_label"><span>Status<span></span></span></div>
+      <div id="course_filters_workflow_inputs">
+        <label><input class="checkbox-workflow" type="checkbox" value="published" checked="checked">Published</label>
+        <label><input class="checkbox-workflow" type="checkbox" value="unpublished">Unpublished</label>
+        <label><input class="checkbox-workflow" type="checkbox" value="concluded">Concluded</label>
+      </div>
+    </div>
+    <div id="course_filter_credit" class="clearfix">
+      <label>Credit Courses Only<input class="checkbox-credit-only" data-regex="true" data-filter_checked="[\d\w]" data-col="sis_source_id" type="checkbox" checked="checked"></label>
+    </div>
+    <div id="course_filter_webct" class="clearfix">
+      <label>Hide WebCT Courses<input class="checkbox-exclude-webct" data-regex="true" data-filter_checked="^((?!WebCT).)*$" data-col="name" type="checkbox" checked="checked"></label>
+    </div>
+  </div>
+</div>

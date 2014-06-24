@@ -56,7 +56,7 @@ class ExternalContentController < ApplicationController
     params[:return_type] = return_types[params[:return_type]] if return_types.key? params[:return_type]
 
   end
-  
+
   def oembed_retrieve
     endpoint = params[:endpoint]
     url = params[:url]
@@ -108,7 +108,7 @@ class ExternalContentController < ApplicationController
     end
     @headers = false
   end
-  
+
   def cancel
     @headers = false
     js_env(service: params[:service])
