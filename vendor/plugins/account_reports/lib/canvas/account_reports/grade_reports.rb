@@ -91,21 +91,21 @@ module Canvas::AccountReports
       CSV.open(file, "w") do |csv|
         headers = []
 
-        headers << I18n.t(:grade_report_header_student_name, 'student name')
-        headers << I18n.t(:grade_report_header_student_id, 'student id')
-        headers << I18n.t(:grade_report_header_student_sis, 'student sis')
-        headers << I18n.t(:grade_report_header_course, 'course')
-        headers << I18n.t(:grade_report_header_course_id, 'course id')
-        headers << I18n.t(:grade_report_header_course_sis, 'course sis')
-        headers << I18n.t(:grade_report_header_section, 'section')
-        headers << I18n.t(:grade_report_header_section_id, 'section id')
-        headers << I18n.t(:grade_report_header_section_sis, 'section sis')
-        headers << I18n.t(:grade_report_header_term, 'term')
-        headers << I18n.t(:grade_report_header_term_id, 'term id')
-        headers << I18n.t(:grade_report_header_term_sis, 'term sis')
-        headers << I18n.t(:grade_report_header_current_score, 'current score')
-        headers << I18n.t(:grade_report_header_final_score, 'final score')
-        headers << I18n.t(:grade_report_header_enrollment_state, 'enrollment state')
+        headers << I18n.t('#account_reports.report_header_student_name', 'student name')
+        headers << I18n.t('#account_reports.report_header_student_id', 'student id')
+        headers << I18n.t('#account_reports.report_header_student_sis', 'student sis')
+        headers << I18n.t('#account_reports.report_header_course', 'course')
+        headers << I18n.t('#account_reports.report_header_course_id', 'course id')
+        headers << I18n.t('#account_reports.report_header_course_sis', 'course sis')
+        headers << I18n.t('#account_reports.report_header_section', 'section')
+        headers << I18n.t('#account_reports.report_header_section_id', 'section id')
+        headers << I18n.t('#account_reports.report_header_section_sis', 'section sis')
+        headers << I18n.t('#account_reports.report_header_term', 'term')
+        headers << I18n.t('#account_reports.report_header_term_id', 'term id')
+        headers << I18n.t('#account_reports.report_header_term_sis', 'term sis')
+        headers << I18n.t('#account_reports.report_header_current_score', 'current score')
+        headers << I18n.t('#account_reports.report_header_final_score', 'final score')
+        headers << I18n.t('#account_reports.report_header_enrollment_state', 'enrollment state')
 
         csv << headers
 

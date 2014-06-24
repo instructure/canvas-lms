@@ -73,13 +73,13 @@ module Canvas::AccountReports
           headers = ['user_id', 'login_id', 'password', 'first_name', 'last_name', 'email', 'status']
         else #provisioning_report
           headers = []
-          headers << I18n.t(:provisioning_report_header_canvas_user_id, 'canvas_user_id')
-          headers << I18n.t(:provisioning_report_header_user_id, 'user_id')
-          headers << I18n.t(:provisioning_report_header_login_id, 'login_id')
-          headers << I18n.t(:provisioning_report_header_first_name, 'first_name')
-          headers << I18n.t(:provisioning_report_header_last_name, 'last_name')
-          headers << I18n.t(:provisioning_report_header_email, 'email')
-          headers << I18n.t(:provisioning_report_header_status, 'status')
+          headers << I18n.t('#account_reports.report_header_canvas_user_id', 'canvas_user_id')
+          headers << I18n.t('#account_reports.report_header_user__id', 'user_id')
+          headers << I18n.t('#account_reports.report_header_login_id', 'login_id')
+          headers << I18n.t('#account_reports.report_header_first_name', 'first_name')
+          headers << I18n.t('#account_reports.report_header_last_name', 'last_name')
+          headers << I18n.t('#account_reports.report_header_email', 'email')
+          headers << I18n.t('#account_reports.report_header_status', 'status')
         end
         csv << headers
         users = root_account.pseudonyms.except(:includes).joins(:user).select(
@@ -131,12 +131,12 @@ module Canvas::AccountReports
           headers = ['account_id', 'parent_account_id', 'name', 'status']
         else
           headers = []
-          headers << I18n.t(:provisioning_report_header_canvas_account_id, 'canvas_account_id')
-          headers << I18n.t(:provisioning_report_header_account_id, 'account_id')
-          headers << I18n.t(:provisioning_report_header_canvas_parent_id, 'canvas_parent_id')
-          headers << I18n.t(:provisioning_report_header_parent_account_id, 'parent_account_id')
-          headers << I18n.t(:provisioning_report_header_name, 'name')
-          headers << I18n.t(:provisioning_report_header_status, 'status')
+          headers << I18n.t('#account_reports.report_header_canvas_account_id', 'canvas_account_id')
+          headers << I18n.t('#account_reports.report_header_account_id', 'account_id')
+          headers << I18n.t('#account_reports.report_header_canvas_parent_id', 'canvas_parent_id')
+          headers << I18n.t('#account_reports.report_header_parent_account_id', 'parent_account_id')
+          headers << I18n.t('#account_reports.report_header_name', 'name')
+          headers << I18n.t('#account_reports.report_header_status', 'status')
         end
         csv << headers
         accounts = root_account.all_accounts.
@@ -183,12 +183,12 @@ module Canvas::AccountReports
           headers = ['term_id', 'name', 'status', 'start_date', 'end_date']
         else
           headers = []
-          headers << I18n.t(:provisioning_report_header_canvas_term_id, 'canvas_term_id')
-          headers << I18n.t(:provisioning_report_header_term_id, 'term_id')
-          headers << I18n.t(:provisioning_report_header_name, 'name')
-          headers << I18n.t(:provisioning_report_header_status, 'status')
-          headers << I18n.t(:provisioning_report_header_start_date, 'start_date')
-          headers << I18n.t(:provisioning_report_header_end_date, 'end_date')
+          headers << I18n.t('#account_reports.report_header_canvas_term_id', 'canvas_term_id')
+          headers << I18n.t('#account_reports.report_header_term__id', 'term_id')
+          headers << I18n.t('#account_reports.report_header_name', 'name')
+          headers << I18n.t('#account_reports.report_header_status', 'status')
+          headers << I18n.t('#account_reports.report_header_start__date', 'start_date')
+          headers << I18n.t('#account_reports.report_header_end__date', 'end_date')
         end
         csv << headers
         terms = root_account.enrollment_terms
@@ -228,17 +228,17 @@ module Canvas::AccountReports
                      'start_date', 'end_date']
         else
           headers = []
-          headers << I18n.t(:provisioning_report_header_canvas_course_id, 'canvas_course_id')
-          headers << I18n.t(:provisioning_report_header_course_id, 'course_id')
-          headers << I18n.t(:provisioning_report_header_short_name, 'short_name')
-          headers << I18n.t(:provisioning_report_header_long_name, 'long_name')
-          headers << I18n.t(:provisioning_report_header_canvas_account_id, 'canvas_account_id')
-          headers << I18n.t(:provisioning_report_header_account_id, 'account_id')
-          headers << I18n.t(:provisioning_report_header_canvas_term_id, 'canvas_term_id')
-          headers << I18n.t(:provisioning_report_header_term_id, 'term_id')
-          headers << I18n.t(:provisioning_report_header_status, 'status')
-          headers << I18n.t(:provisioning_report_header_start_date, 'start_date')
-          headers << I18n.t(:provisioning_report_header_end_date, 'end_date')
+          headers << I18n.t('#account_reports.report_header_canvas_course_id', 'canvas_course_id')
+          headers << I18n.t('#account_reports.report_header_course__id', 'course_id')
+          headers << I18n.t('#account_reports.report_header_short__name', 'short_name')
+          headers << I18n.t('#account_reports.report_header_long__name', 'long_name')
+          headers << I18n.t('#account_reports.report_header_canvas_account_id', 'canvas_account_id')
+          headers << I18n.t('#account_reports.report_header_account_id', 'account_id')
+          headers << I18n.t('#account_reports.report_header_canvas_term_id', 'canvas_term_id')
+          headers << I18n.t('#account_reports.report_header_term__id', 'term_id')
+          headers << I18n.t('#account_reports.report_header_status', 'status')
+          headers << I18n.t('#account_reports.report_header_start__date', 'start_date')
+          headers << I18n.t('#account_reports.report_header_end__date', 'end_date')
         end
 
         csv << headers
@@ -303,16 +303,16 @@ module Canvas::AccountReports
           headers = ['section_id', 'course_id', 'name', 'status', 'start_date', 'end_date']
         else
           headers = []
-          headers << I18n.t(:provisioning_report_header_canvas_section_id, 'canvas_section_id')
-          headers << I18n.t(:provisioning_report_header_section_id, 'section_id')
-          headers << I18n.t(:provisioning_report_header_canvas_course_id, 'canvas_course_id')
-          headers << I18n.t(:provisioning_report_header_course_id, 'course_id')
-          headers << I18n.t(:provisioning_report_header_name, 'name')
-          headers << I18n.t(:provisioning_report_header_status, 'status')
-          headers << I18n.t(:provisioning_report_header_start_date, 'start_date')
-          headers << I18n.t(:provisioning_report_header_end_date, 'end_date')
-          headers << I18n.t(:provisioning_report_header_canvas_account_id, 'canvas_account_id')
-          headers << I18n.t(:provisioning_report_header_account_id, 'account_id')
+          headers << I18n.t('#account_reports.report_header_canvas_section_id', 'canvas_section_id')
+          headers << I18n.t('#account_reports.report_header_section__id', 'section_id')
+          headers << I18n.t('#account_reports.report_header_canvas_course_id', 'canvas_course_id')
+          headers << I18n.t('#account_reports.report_header_course__id', 'course_id')
+          headers << I18n.t('#account_reports.report_header_name', 'name')
+          headers << I18n.t('#account_reports.report_header_status', 'status')
+          headers << I18n.t('#account_reports.report_header_start__date', 'start_date')
+          headers << I18n.t('#account_reports.report_header_end__date', 'end_date')
+          headers << I18n.t('#account_reports.report_header_canvas_account_id', 'canvas_account_id')
+          headers << I18n.t('#account_reports.report_header_account_id', 'account_id')
         end
         csv << headers
         sections = root_account.course_sections.
@@ -391,16 +391,16 @@ module Canvas::AccountReports
           headers = ['course_id', 'user_id', 'role', 'section_id', 'status', 'associated_user_id']
         else
           headers = []
-          headers << I18n.t(:provisioning_report_header_canvas_course_id, 'canvas_course_id')
-          headers << I18n.t(:provisioning_report_header_course_id, 'course_id')
-          headers << I18n.t(:provisioning_report_header_canvas_user_id, 'canvas_user_id')
-          headers << I18n.t(:provisioning_report_header_user_id, 'user_id')
-          headers << I18n.t(:provisioning_report_header_role, 'role')
-          headers << I18n.t(:provisioning_report_header_canvas_section_id, 'canvas_section_id')
-          headers << I18n.t(:provisioning_report_header_section_id, 'section_id')
-          headers << I18n.t(:provisioning_report_header_status, 'status')
-          headers << I18n.t(:provisioning_report_header_canvas_associated_user_id, 'canvas_associated_user_id')
-          headers << I18n.t(:provisioning_report_header_associated_user_id, 'associated_user_id')
+          headers << I18n.t('#account_reports.report_header_canvas_course_id', 'canvas_course_id')
+          headers << I18n.t('#account_reports.report_header_course__id', 'course_id')
+          headers << I18n.t('#account_reports.report_header_canvas_user_id', 'canvas_user_id')
+          headers << I18n.t('#account_reports.report_header_user__id', 'user_id')
+          headers << I18n.t('#account_reports.report_header_role', 'role')
+          headers << I18n.t('#account_reports.report_header_canvas_section_id', 'canvas_section_id')
+          headers << I18n.t('#account_reports.report_header_section__id', 'section_id')
+          headers << I18n.t('#account_reports.report_header_status', 'status')
+          headers << I18n.t('#account_reports.report_header_canvas_associated_user_id', 'canvas_associated_user_id')
+          headers << I18n.t('#account_reports.report_header_associated_user_id', 'associated_user_id')
         end
         csv << headers
         enrol = root_account.enrollments.
@@ -479,12 +479,12 @@ module Canvas::AccountReports
           headers = ['group_id', 'account_id', 'name', 'status']
         else
           headers = []
-          headers << I18n.t(:provisioning_report_header_canvas_group_id, 'canvas_group_id')
-          headers << I18n.t(:provisioning_report_header_group_id, 'group_id')
-          headers << I18n.t(:provisioning_report_header_canvas_account_id, 'canvas_account_id')
-          headers << I18n.t(:provisioning_report_header_account_id, 'account_id')
-          headers << I18n.t(:provisioning_report_header_name, 'name')
-          headers << I18n.t(:provisioning_report_header_status, 'status')
+          headers << I18n.t('#account_reports.report_header_canvas_group_id', 'canvas_group_id')
+          headers << I18n.t('#account_reports.report_header_group_id', 'group_id')
+          headers << I18n.t('#account_reports.report_header_canvas_account_id', 'canvas_account_id')
+          headers << I18n.t('#account_reports.report_header_account_id', 'account_id')
+          headers << I18n.t('#account_reports.report_header_name', 'name')
+          headers << I18n.t('#account_reports.report_header_status', 'status')
         end
 
         csv << headers
@@ -530,11 +530,11 @@ module Canvas::AccountReports
           headers = ['group_id', 'user_id', 'status']
         else
           headers = []
-          headers << I18n.t(:provisioning_report_header_canvas_group_id, 'canvas_group_id')
-          headers << I18n.t(:provisioning_report_header_group_id, 'group_id')
-          headers << I18n.t(:provisioning_report_header_canvas_user_id, 'canvas_user_id')
-          headers << I18n.t(:provisioning_report_header_user_id, 'user_id')
-          headers << I18n.t(:provisioning_report_header_status, 'status')
+          headers << I18n.t('#account_reports.report_header_canvas_group_id', 'canvas_group_id')
+          headers << I18n.t('#account_reports.report_header_group_id', 'group_id')
+          headers << I18n.t('#account_reports.report_header_canvas_user_id', 'canvas_user_id')
+          headers << I18n.t('#account_reports.report_header_user__id', 'user_id')
+          headers << I18n.t('#account_reports.report_header_status', 'status')
         end
 
         csv << headers
@@ -589,11 +589,11 @@ module Canvas::AccountReports
           headers = ['xlist_course_id', 'section_id', 'status']
         else
           headers = []
-          headers << I18n.t(:provisioning_report_header_canvas_xlist_course_id, 'canvas_xlist_course_id')
-          headers << I18n.t(:provisioning_report_header_xlist_course_id, 'xlist_course_id')
-          headers << I18n.t(:provisioning_report_header_canvas_section_id, 'canvas_section_id')
-          headers << I18n.t(:provisioning_report_header_section_id, 'section_id')
-          headers << I18n.t(:provisioning_report_header_status, 'status')
+          headers << I18n.t('#account_reports.report_header_canvas_xlist_course_id', 'canvas_xlist_course_id')
+          headers << I18n.t('#account_reports.report_header_xlist_course_id', 'xlist_course_id')
+          headers << I18n.t('#account_reports.report_header_canvas_section_id', 'canvas_section_id')
+          headers << I18n.t('#account_reports.report_header_section__id', 'section_id')
+          headers << I18n.t('#account_reports.report_header_status', 'status')
         end
         csv << headers
         @domain_root_account = root_account
