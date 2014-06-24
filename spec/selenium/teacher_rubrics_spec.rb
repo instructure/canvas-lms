@@ -7,6 +7,7 @@ describe "teacher shared rubric specs" do
   let(:who_to_login) { 'teacher' }
 
   before (:each) do
+    resize_screen_to_normal
     course_with_teacher_logged_in
   end
 
@@ -27,6 +28,7 @@ describe "teacher shared rubric specs" do
   end
 
   it "should round to an integer when splitting" do
+    resize_screen_to_default
     should_round_to_an_integer_when_splitting
   end
 
