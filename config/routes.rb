@@ -866,6 +866,7 @@ routes.draw do
       get  'courses/:course_id/enrollments', :action => :index, :path_name => 'course_enrollments'
       get  'sections/:section_id/enrollments', :action => :index, :path_name => 'section_enrollments'
       get  'users/:user_id/enrollments', :action => :index, :path_name => 'user_enrollments'
+      get  'accounts/:account_id/enrollments/:id', :action => :show, :path_name => 'enrollment'
 
       post 'courses/:course_id/enrollments', :action => :create
       post 'sections/:section_id/enrollments', :action => :create

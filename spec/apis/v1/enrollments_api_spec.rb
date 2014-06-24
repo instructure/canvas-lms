@@ -530,7 +530,9 @@ describe EnrollmentsApiController, type: :request do
       User.all.each { |u| u.destroy unless u.pseudonym.present? }
       @path = "/api/v1/courses/#{@course.id}/enrollments"
       @user_path = "/api/v1/users/#{@user.id}/enrollments"
+      @enroll_path ="/api/v1/accounts/#{@enrollment.root_account_id}/enrollments"
       @params = { :controller => "enrollments_api", :action => "index", :course_id => @course.id.to_param, :format => "json" }
+      @enroll_params = { :controller => "enrollments_api", :action => "show", :account_id => @enrollment.root_account_id, :id => @enrollment.id, :format => "json"}
       @user_params = { :controller => "enrollments_api", :action => "index", :user_id => @user.id.to_param, :format => "json" }
       @section = @course.course_sections.create!
     end
@@ -539,6 +541,41 @@ describe EnrollmentsApiController, type: :request do
       before do
         @user = user_with_pseudonym(:username => 'admin@example.com')
         Account.default.account_users.create!(user: @user)
+      end
+
+      it "should be able to return an enrollment object by id" do
+        json = api_call(:get, "#{@enroll_path}/#{@enrollment.id}", @enroll_params)
+        json.should == {
+            'root_account_id'                    => @enrollment.root_account_id,
+            'id'                                 => @enrollment.id,
+            'user_id'                            => @student.id,
+            'course_section_id'                  => @enrollment.course_section_id,
+            'sis_import_id'                      => @enrollment.sis_batch_id,
+            'sis_course_id'                      => nil,
+            'sis_section_id'                     => nil,
+            'course_integration_id'              => nil,
+            'section_integration_id'             => nil,
+            'limit_privileges_to_course_section' => @enrollment.limit_privileges_to_course_section,
+            'enrollment_state'                   => @enrollment.workflow_state,
+            'course_id'                          => @course.id,
+            'type'                               => @enrollment.type,
+            'role'                               => @enrollment.role,
+            'html_url'                           => course_user_url(@course, @student),
+            'grades'                             => {
+                'html_url' => course_student_grades_url(@course, @student),
+                'final_score' => nil,
+                'current_score' => nil,
+                'final_grade' => nil,
+                'current_grade' => nil,
+            },
+            'associated_user_id'                 => @enrollment.associated_user_id,
+            'updated_at'                         => @enrollment.updated_at.xmlschema,
+            'created_at'                         => @enrollment.created_at.xmlschema,
+            'start_at'                           => nil,
+            'end_at'                             => nil,
+            'last_activity_at'                   => nil,
+            'total_activity_time'                => 0
+        }
       end
 
       it "should list all of a user's enrollments in an account" do
@@ -800,6 +837,36 @@ describe EnrollmentsApiController, type: :request do
         }
       end
 
+      it "should be able to return an enrollment object by id" do
+        json = api_call(:get, "#{@enroll_path}/#{@enrollment.id}", @enroll_params)
+        json.should == {
+            'root_account_id'                    => @enrollment.root_account_id,
+            'id'                                 => @enrollment.id,
+            'user_id'                            => @student.id,
+            'course_section_id'                  => @enrollment.course_section_id,
+            'limit_privileges_to_course_section' => @enrollment.limit_privileges_to_course_section,
+            'enrollment_state'                   => @enrollment.workflow_state,
+            'course_id'                          => @course.id,
+            'type'                               => @enrollment.type,
+            'role'                               => @enrollment.role,
+            'html_url'                           => course_user_url(@course, @student),
+            'grades'                             => {
+                'html_url' => course_student_grades_url(@course, @student),
+                'final_score' => nil,
+                'current_score' => nil,
+                'final_grade' => nil,
+                'current_grade' => nil,
+            },
+            'associated_user_id'                 => @enrollment.associated_user_id,
+            'updated_at'                         => @enrollment.updated_at.xmlschema,
+            'created_at'                         => @enrollment.created_at.xmlschema,
+            'start_at'                           => nil,
+            'end_at'                             => nil,
+            'last_activity_at'                   => nil,
+            'total_activity_time'                => 0
+        }
+      end
+
       it "should filter by enrollment workflow_state" do
         @teacher.enrollments.first.update_attribute(:workflow_state, 'completed')
         json = api_call(:get, "#{@path}?state[]=completed", @params.merge(:state => %w{completed}))
@@ -968,6 +1035,11 @@ describe EnrollmentsApiController, type: :request do
         raw_api_call(:get, @user_path, @user_params)
         response.code.should eql "401"
       end
+
+      it "should return 401 unauthorize for a user requesting an enrollment object by id" do
+        raw_api_call(:get, "#{@enroll_path}/#{@enrollment.id}", @enroll_params)
+        response.code.should eql '401'
+      end
     end
 
     describe "pagination" do
@@ -1076,6 +1148,7 @@ describe EnrollmentsApiController, type: :request do
             'total_activity_time'                => 0
           }
         end
+
 
         it "should not be able to delete an enrollment for other courses" do
           @account = Account.default
