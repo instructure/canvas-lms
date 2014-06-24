@@ -55,12 +55,12 @@ module Canvas::AccountReports
       filename = Canvas::AccountReports.generate_file(@account_report)
       CSV.open(filename, "w") do |csv|
         headers = []
-        headers << I18n.t(:course_report_header_id,'id')
-        headers << I18n.t(:course_report_header_sis_id, 'sis id')
-        headers << I18n.t(:course_report_header_short_name, 'short name')
-        headers << I18n.t(:course_report_header_name, 'name')
-        headers << I18n.t(:course_report_header_start_date, 'start date')
-        headers << I18n.t(:course_report_header_end_date, 'end date')
+        headers << I18n.t('#account_reports.report_header_id', 'id')
+        headers << I18n.t('#account_reports.report_header_sis_id', 'sis id')
+        headers << I18n.t('#account_reports.report_header_short_name', 'short name')
+        headers << I18n.t('#account_reports.report_header_name', 'name')
+        headers << I18n.t('#account_reports.report_header_start_date', 'start date')
+        headers << I18n.t('#account_reports.report_header_end_date', 'end date')
         csv << headers
         Shackles.activate(:slave) do
           @total = courses.count
@@ -141,12 +141,12 @@ module Canvas::AccountReports
         courses = add_course_sub_account_scope(courses)
 
         headers = []
-        headers << I18n.t(:course_report_header_course_id,'course id')
-        headers << I18n.t(:course_report_header_course_sis_id, 'course sis id')
-        headers << I18n.t(:course_report_header_short_name, 'short name')
-        headers << I18n.t(:course_report_header_long_name, 'long name')
-        headers << I18n.t(:course_report_header_status, 'status')
-        headers << I18n.t(:course_report_header_created_at, 'created at')
+        headers << I18n.t('#account_reports.report_header_course_id', 'course id')
+        headers << I18n.t('#account_reports.report_header_course_sis_id', 'course sis id')
+        headers << I18n.t('#account_reports.report_header_short_name', 'short name')
+        headers << I18n.t('#account_reports.report_header_long_name', 'long name')
+        headers << I18n.t('#account_reports.report_header_status', 'status')
+        headers << I18n.t('#account_reports.report_header_created_at', 'created at')
         csv << headers
 
         Shackles.activate(:slave) do

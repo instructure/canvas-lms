@@ -136,16 +136,16 @@ module Canvas::AccountReports
                               "Enrollment States: %{states};", states: enrollment_states_string))
 
         headers = []
-        headers << I18n.t(:student_report_header_user_id, 'user id')
-        headers << I18n.t(:student_report_header_user_sis_id, 'user sis id')
-        headers << I18n.t(:student_report_header_user_name, 'user name')
-        headers << I18n.t(:student_report_header_section_id, 'section id')
-        headers << I18n.t(:student_report_header_section_sis_id, 'section sis id')
-        headers << I18n.t(:student_report_header_section_name, 'section name')
-        headers << I18n.t(:student_report_header_course_id, 'course id')
-        headers << I18n.t(:student_report_header_course_sis_id, 'course sis id')
-        headers << I18n.t(:student_report_header_course_name, 'course name')
-        headers << I18n.t(:student_report_header_enrollment_state, 'enrollment state') if include_enrollment_state
+        headers << I18n.t('#account_reports.report_header_user_id', 'user id')
+        headers << I18n.t('#account_reports.report_header_user_sis_id', 'user sis id')
+        headers << I18n.t('#account_reports.report_header_user_name', 'user name')
+        headers << I18n.t('#account_reports.report_header_section_id', 'section id')
+        headers << I18n.t('#account_reports.report_header_section_sis_id', 'section sis id')
+        headers << I18n.t('#account_reports.report_header_section_name', 'section name')
+        headers << I18n.t('#account_reports.report_header_course_id', 'course id')
+        headers << I18n.t('#account_reports.report_header_course_sis_id', 'course sis id')
+        headers << I18n.t('#account_reports.report_header_course_name', 'course name')
+        headers << I18n.t('#account_reports.report_header_enrollment_state', 'enrollment state') if include_enrollment_state
 
         csv << headers
         Shackles.activate(:slave) do
@@ -211,15 +211,15 @@ module Canvas::AccountReports
         data = add_course_sub_account_scope(data, 'c') unless course
 
         headers = []
-        headers << I18n.t(:student_report_header_user_id, 'user id')
-        headers << I18n.t(:student_report_header_user_sis_id, 'user sis id')
-        headers << I18n.t(:student_report_header_name, 'name')
-        headers << I18n.t(:student_report_header_section_id, 'section id')
-        headers << I18n.t(:student_report_header_section_sis_id, 'section sis id')
-        headers << I18n.t(:student_report_header_section_name, 'section name')
-        headers << I18n.t(:student_report_header_course_id, 'course id')
-        headers << I18n.t(:student_report_header_course_sis_id, 'course sis id')
-        headers << I18n.t(:student_report_header_course_name, 'course name')
+        headers << I18n.t('#account_reports.report_header_user_id', 'user id')
+        headers << I18n.t('#account_reports.report_header_user_sis_id', 'user sis id')
+        headers << I18n.t('#account_reports.report_header_name', 'name')
+        headers << I18n.t('#account_reports.report_header_section_id', 'section id')
+        headers << I18n.t('#account_reports.report_header_section_sis_id', 'section sis id')
+        headers << I18n.t('#account_reports.report_header_section_name', 'section name')
+        headers << I18n.t('#account_reports.report_header_course_id', 'course id')
+        headers << I18n.t('#account_reports.report_header_course_sis_id', 'course sis id')
+        headers << I18n.t('#account_reports.report_header_course_name', 'course name')
 
         csv << headers
 
@@ -271,11 +271,11 @@ module Canvas::AccountReports
         end
 
         headers = []
-        headers << I18n.t(:student_report_header_user_id, 'user id')
-        headers << I18n.t(:student_report_header_user_sis_id, 'user sis id')
-        headers << I18n.t(:student_report_header_user_name, 'user name')
-        headers << I18n.t(:student_report_header_last_access_at, 'last access at')
-        headers << I18n.t(:student_report_header_last_ip, 'last ip')
+        headers << I18n.t('#account_reports.report_header_user_id', 'user id')
+        headers << I18n.t('#account_reports.report_header_user_sis_id', 'user sis id')
+        headers << I18n.t('#account_reports.report_header_user_name', 'user name')
+        headers << I18n.t('#account_reports.report_header_last_access_at', 'last access at')
+        headers << I18n.t('#account_reports.report_header_last_ip', 'last ip')
 
         csv << headers
 
