@@ -6,6 +6,6 @@ class AddReplyToNameToMessages < ActiveRecord::Migration
   end
 
   def self.down
-    remove_column :messages, :reply_to_name, :string
+    remove_column :messages, :reply_to_name
   end
 end
