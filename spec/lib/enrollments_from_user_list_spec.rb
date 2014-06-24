@@ -30,7 +30,7 @@ describe EnrollmentsFromUserList do
   context "initialized object" do
 
     it "should initialize with a course id" do
-      lambda{EnrollmentsFromUserList.new}.should raise_error(ArgumentError, 'wrong number of arguments (0 for 1)')
+      lambda{EnrollmentsFromUserList.new }.should raise_error(ArgumentError, /^wrong number of arguments/)
       e = EnrollmentsFromUserList.new(@course)
       e.course.should eql(@course)
     end
