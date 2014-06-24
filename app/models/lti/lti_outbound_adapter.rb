@@ -20,6 +20,15 @@ module Lti
       end
     end
 
+    # @argument opts
+    #   resource_type:
+    #   selected_html: selected text to be sent to the tool provider as text
+    #   launch_url: a specific launch url for this launch
+    #   link_code: the resource_link_id for this launch
+    #   overrides
+    #   custom_substitutions: hash of translations values for custom variable
+    #      substitutions where the key is what we are translating from, and the value
+    #      is what we are translating to
     def prepare_tool_launch(return_url, opts = {})
       resource_type = opts[:resource_type]
       selected_html = opts[:selected_html]
@@ -32,18 +41,48 @@ module Lti
       lti_tool = Lti::LtiToolCreator.new(@tool).convert
       lti_account = Lti::LtiAccountCreator.new(@context, @tool).convert
 
+      variable_substitutor = LtiOutbound::VariableSubstitutor.new
+
+      #Account
+      variable_substitutor.add_substitution('$Canvas.account.id', lti_account.id)
+      variable_substitutor.add_substitution('$Canvas.account.name', lti_account.name)
+      variable_substitutor.add_substitution('$Canvas.account.sisSourceId', lti_account.sis_source_id)
+      #Consumer Instance
+      variable_substitutor.add_substitution('$Canvas.root_account.id', lti_context.consumer_instance.id)
+      variable_substitutor.add_substitution('$Canvas.root_account.sisSourceId', lti_context.consumer_instance.sis_source_id)
+      variable_substitutor.add_substitution('$Canvas.api.domain', lti_context.consumer_instance.domain)
+      #Course
+      if lti_context.is_a? LtiOutbound::LTICourse
+        variable_substitutor.add_substitution('$Canvas.course.id', lti_context.id)
+        variable_substitutor.add_substitution('$Canvas.course.sisSourceId', lti_context.sis_source_id)
+      end
+      #User
+      variable_substitutor.add_substitution('$Canvas.user.id', lti_user.id)
+      variable_substitutor.add_substitution('$Canvas.user.sisSourceId', -> { lti_user.sis_source_id })
+      variable_substitutor.add_substitution('$Canvas.user.loginId', -> { lti_user.login_id })
+      variable_substitutor.add_substitution('$Canvas.enrollment.enrollmentState', -> { lti_user.enrollment_state })
+      variable_substitutor.add_substitution('$Canvas.membership.concludedRoles', -> { lti_user.concluded_role_types })
+
+      if opts[:custom_substitutions]
+        opts[:custom_substitutions].each do |key, value|
+          variable_substitutor.add_substitution(key, value)
+        end
+      end
+
+
       @tool_launch = LtiOutbound::ToolLaunch.new({
-                                      url: launch_url,
-                                      link_code: link_code,
-                                      return_url: return_url,
-                                      resource_type: resource_type,
-                                      selected_html: selected_html,
-                                      outgoing_email_address: HostUrl.outgoing_email_address,
-                                      context: lti_context,
-                                      user: lti_user,
-                                      tool: lti_tool,
-                                      account: lti_account
-                                  })
+                                                     url: launch_url,
+                                                     link_code: link_code,
+                                                     return_url: return_url,
+                                                     resource_type: resource_type,
+                                                     selected_html: selected_html,
+                                                     outgoing_email_address: HostUrl.outgoing_email_address,
+                                                     context: lti_context,
+                                                     user: lti_user,
+                                                     tool: lti_tool,
+                                                     account: lti_account,
+                                                     :variable_substitutor => variable_substitutor
+                                                 })
       self
     end
 
