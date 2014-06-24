@@ -8,6 +8,6 @@ define ['ember', 'i18nObj', 'jquery', 'jquery.instructure_date_and_time'], (Embe
     fmt = "date.formats.#{i18n_format}"
     I18n.l(fmt, date)
 
-  Ember.Handlebars.helper 'friendlyDatetimeFromString', (time) ->
+  Ember.Handlebars.helper 'friendlyDatetime', (time) ->
     return '' unless time
-    $.friendlyDatetime $.fudgeDateForProfileTimezone time
+    $.friendlyDatetime time

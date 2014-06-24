@@ -15,7 +15,7 @@
           <div class="discussion-title">
             <a {{#if author.html_url}}href="{{author.html_url}}" data-bypass{{/if}} class="author {{#unless author.id}}unknown{{/unless}}" title="{{#t "authors_name"}}Author's name{{/t}}" {{#if author}}{{#if author.url}} href="{{author.url}}" {{/if}}{{/if}} class="author">{{#if author}}{{author.display_name}}{{else}}{{#t "unknown_author"}}Unknown Author{{/t}}{{/if}}</a>
           </div>
-          <div class="discussion-pubdate hide-if-collapsed">{{friendlyDatetime updated_at pubdate=true}}</div>
+          <div class="discussion-pubdate hide-if-collapsed">{{friendlyDatetime updated_at pubdate=true contextSensitive=true}}</div>
         </div>
       </div>
     </header>
@@ -37,6 +37,3 @@
     </div>
   </div>
 </article>
-
-
-

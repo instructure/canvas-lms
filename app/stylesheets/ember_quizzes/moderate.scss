@@ -1,0 +1,147 @@
+#quiz-show {
+  .quiz-moderate {
+    .have-taken {
+      float: left;
+      margin-bottom: 20px;
+      margin-left: 3px;
+    }
+    .change-extensions-for {
+      float: right;
+      margin-bottom: 20px;
+      margin-right: 3px;
+    }
+
+    #moderate-table {
+      .check {
+        width: 12px;
+        line-height: 1em;
+        vertical-align: top;
+      }
+      .icon-refreshing {
+        &.inactive {
+          display:none;
+        }
+        position: relative;
+        left: -2px;
+        top: -2px;
+      }
+      th {
+        text-align: center;
+      }
+      td {
+        text-align: center;
+      }
+      th.name,
+      td.name {
+        text-align: left;
+      }
+      th.unlocked,
+      td.unlocked {
+        padding: 8px 2px;
+      }
+      th.edit,
+      td.edit {
+        padding: 8px 2px;
+      }
+      th a.icon-refresh:before {
+        font-size: 100%;
+      }
+      th a.icon-refresh,
+      td a.icon-edit {
+        color: #444;
+      }
+      .extra-time {
+        font-size: 85%;
+        color: #555;
+      }
+
+    }
+  }
+}
+
+.student-extension-dialog {
+  h2 {
+    margin: 0 0 1.5em 0;
+    font-size: 140%;
+    line-height: 1em;
+  }
+
+  .field {
+    float: left;
+    margin-bottom: 13px;
+
+    label {
+      float: left;
+      width: 260px;
+      font-size: 115%;
+
+      .note {
+        display: block;
+        font-style: normal;
+        font-size: 80%;
+        font-weight: 300;
+        color: #888;
+      }
+    }
+    .input {
+      float: right;
+      width: 160px;
+      margin-top: 6px;
+
+      .text {
+        float: left;
+        width: 50px;
+      }
+      .units {
+        line-height: 30px;
+        margin-left: 8px;
+        font-size: 90%;
+      }
+    }
+  }
+  .manually-unlock {
+    input {
+      float: left;
+      margin-right: 10px;
+    }
+
+    label {
+      width: 400px;
+    }
+  }
+  .invalid {
+    border: 1px solid #b94a48;
+  }
+  dl {
+    margin-bottom: 1.7em;
+  }
+  dt {
+    width: 75px;
+    float: left;
+    font-weight: bold;
+    text-align: right;
+  }
+  dd {
+    width: 330px;
+    float: left;
+  }
+  p {
+    margin-bottom: 1.5em;
+  }
+  p.note {
+    margin: 4px 0 0 0;
+    font-size: 80%;
+    font-weight: 300;
+    color: #888;
+  }
+  .relative-time {
+    input {
+      width: 50px;
+      margin: 0 5px;
+    }
+    select {
+      width: 120px;
+      margin: 0 5px;
+    }
+  }
+}

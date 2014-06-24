@@ -63,7 +63,6 @@ end
 
 def get_import_context(system=nil)
   context = course_model
-  context.imported_migration_items = []
   context.import_source == :webct if system == 'vista'
   
   context

@@ -15,24 +15,49 @@ define [
 
     defaults:
       width: 600
-      height: if ENV.allow_self_signup then 460 else 310
+      height: if ENV.allow_self_signup then 520 else 310
       title: I18n.t('create_group_set', 'Create Group Set')
 
     els: _.extend {},
       GroupCategoryEditView::els
       '.admin-signup-controls': '$adminSignupControls'
       '#split_groups': '$splitGroups'
+      '.auto-group-leader-toggle': '$autoGroupLeaderToggle'
+      '.auto-group-leader-controls': '$autoGroupLeaderControls'
+      '.admin-signup-controls input[name=split_groups][value=1]': '$autoGroupSplitControl'
 
     events: _.extend {},
       GroupCategoryEditView::events
       'click .admin-signup-controls [name=create_group_count]': 'clickSplitGroups'
+      'click .auto-group-leader-toggle': 'toggleAutoGroupLeader'
+      'click .admin-signup-controls input[name=split_groups]' : 'setVisibilityOfGroupLeaderControls'
+
+
+    afterRender: ->
+      super()
+      @setVisibilityOfGroupLeaderControls()
+      @toggleAutoGroupLeader()
+
+    toggleAutoGroupLeader: ->
+      enabled = @$autoGroupLeaderToggle.prop 'checked'
+      @$autoGroupLeaderControls.find('label.radio').css opacity: if enabled then 1 else 0.5
+      @$autoGroupLeaderControls.find('input[name=auto_leader_type]').prop('disabled', !enabled)
+
+    setVisibilityOfGroupLeaderControls: ->
+      splitGroupsChecked = @$autoGroupSplitControl.prop("checked")
+      show = (@selfSignupIsEnabled() or splitGroupsChecked)
+      @$autoGroupLeaderControls.toggle(show)
 
     toggleSelfSignup: ->
-      enabled = @$selfSignupToggle.prop('checked')
+      enabled = @selfSignupIsEnabled()
       @$el.toggleClass('group-category-self-signup', enabled)
       @$el.toggleClass('group-category-admin-signup', !enabled)
       @$selfSignupControls.find(':input').prop 'disabled', !enabled
       @$adminSignupControls.find(':input').prop 'disabled', enabled
+      @setVisibilityOfGroupLeaderControls()
+
+    selfSignupIsEnabled: ->
+      @$selfSignupToggle.prop('checked')
 
     clickSplitGroups: (e) ->
       # firefox doesn't like multiple inputs in the same label, so a little js to the rescue

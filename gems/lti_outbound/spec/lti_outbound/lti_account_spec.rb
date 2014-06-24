@@ -20,7 +20,4 @@ require 'spec_helper'
 
 describe LtiOutbound::LTIAccount do
   it_behaves_like 'an LTI context'
-
-  it_behaves_like 'it provides variable mapping', '$Canvas.account.id', :id
-  it_behaves_like 'it provides variable mapping', '$Canvas.account.sisSourceId', :sis_source_id
 end

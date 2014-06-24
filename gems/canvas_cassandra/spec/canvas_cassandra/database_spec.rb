@@ -19,10 +19,53 @@
 require "spec_helper"
 
 describe CanvasCassandra do
+  let(:conn) { double() }
+
   let(:db) do
     CanvasCassandra::Database.allocate.tap do |db|
-      db.send(:instance_variable_set, :@db, double())
+      db.send(:instance_variable_set, :@db, conn)
+      db.send(:instance_variable_set, :@logger, double().as_null_object)
       db.stub(:sanitize).and_return("")
+    end
+  end
+
+  describe "#execute" do
+    # I'm using %CONSISTENCY% as a query parameter here to make sure that the
+    # execute code doesn't accidentally replace the string in those params
+    def run_query(consistency)
+      db.execute("SELECT a %CONSISTENCY% WHERE a = ?", "%CONSISTENCY%", consistency: consistency)
+    end
+
+    describe "cql3" do
+      before do
+        conn.stub(:use_cql3?).and_return(true)
+      end
+
+      it "passes the consistency level as a param" do
+        expect(conn).to receive(:execute_with_consistency).with("SELECT a WHERE a = ?", CassandraCQL::Thrift::ConsistencyLevel::ONE, "%CONSISTENCY%")
+        run_query('ONE')
+      end
+
+      it "ignores a nil consistency" do
+        expect(conn).to receive(:execute).with("SELECT a WHERE a = ?", "%CONSISTENCY%")
+        run_query(nil)
+      end
+    end
+
+    describe "cql2" do
+      before do
+        conn.stub(:use_cql3?).and_return(false)
+      end
+
+      it "passes the consistency level in the query string" do
+        expect(conn).to receive(:execute).with("SELECT a USING CONSISTENCY ONE WHERE a = ?", "%CONSISTENCY%")
+        run_query('ONE')
+      end
+
+      it "ignores a nil consistency" do
+        expect(conn).to receive(:execute).with("SELECT a WHERE a = ?", "%CONSISTENCY%")
+        run_query(nil)
+      end
     end
   end
 
@@ -187,5 +230,36 @@ describe CanvasCassandra do
       expect(db).to receive(:execute).with("UPDATE test_table SET name = ? WHERE id = ?", "test", 5)
       db.insert_record("test_table", {:id => 5}, {:name => [nil, "test"], :nick => [nil, nil]})
     end
+  end
+
+  describe "#available?" do
+    it 'asks #db.active?' do
+      expect(db.db).to receive(:active?) { true }
+      expect(db.available?).to be_true
+
+      expect(db.db).to receive(:active?) { false }
+      expect(db.available?).to be_false
+    end
+  end
+
+  describe "#keyspace" do
+    it 'asks #db.keyspace' do
+      keyspace_name = 'keyspace'
+
+      expect(db.db).to receive(:keyspace) { keyspace_name }
+      expect(db.keyspace).to eq keyspace_name
+    end
+
+    it 'aliases name' do
+      keyspace_name = 'keyspace'
+
+      expect(db.db).to receive(:keyspace) { keyspace_name }
+      expect(db.name).to eq keyspace_name
+    end
+  end
+
+  it "should map consistency level names to values" do
+    expect(CanvasCassandra.consistency_level("LOCAL_QUORUM")).to eq CassandraCQL::Thrift::ConsistencyLevel::LOCAL_QUORUM
+    expect { CanvasCassandra.consistency_level("XXX") }.to raise_error(NameError)
   end
 end

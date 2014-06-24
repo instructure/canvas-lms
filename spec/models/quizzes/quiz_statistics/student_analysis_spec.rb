@@ -223,6 +223,20 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       stats.last[9].should == '5'
     end
 
+    it 'should include primary domain if trust exists' do
+      account2 = Account.create!
+      HostUrl.stubs(:context_host).returns('school')
+      HostUrl.expects(:context_host).with(account2).returns('school1')
+      @student.pseudonyms.scoped.delete_all
+      account2.pseudonyms.create!(user: @student, unique_id: 'user') { |p| p.sis_user_id = 'sisid' }
+      @quiz.context.root_account.any_instantiation.stubs(:trust_exists?).returns(true)
+      @quiz.context.root_account.any_instantiation.stubs(:trusted_account_ids).returns([account2.id])
+
+      qs = @quiz.generate_submission(@student)
+      qs.grade_submission
+      stats = CSV.parse(csv(:include_all_versions => true))
+      stats[1][3].should == 'school1'
+    end
   end
 
   it "includes attachment display names for quiz file upload questions" do
@@ -302,4 +316,34 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     stats.last[9].should == "lolcats,lolrus"
   end
 
+  describe 'question statistics' do
+    subject { Quizzes::QuizStatistics::StudentAnalysis.new({}) }
+
+    it 'should proxy to CanvasQuizStatistics for supported questions' do
+      question_data = { question_type: 'essay_question' }
+      responses = []
+
+      CanvasQuizStatistics.
+        expects(:analyze).
+          with(question_data, responses).
+          returns({ some_metric: 5 })
+
+      output = subject.send(:stats_for_question, question_data, responses, false)
+      output.should == {
+        question_type: 'essay_question',
+        some_metric: 5
+      }.with_indifferent_access
+    end
+
+    it "shouldn't proxy if the legacy flag is on" do
+      question_data = {
+        question_type: 'essay_question',
+        answers: []
+      }
+
+      CanvasQuizStatistics.expects(:analyze).never
+
+      subject.send(:stats_for_question, question_data, [])
+    end
+  end
 end

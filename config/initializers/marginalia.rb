@@ -1,6 +1,6 @@
 require_dependency 'setting'
 
-config = Setting.from_config('marginalia') || {}
+config = ConfigFile.load('marginalia') || {}
 
 if config[:components].present?
   require 'marginalia'

@@ -1,5 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/helpers/gradebook2_common')
-describe "edititing grades" do
+describe "editing grades" do
   include_examples "in-process server selenium tests"
 
   ASSIGNMENT_1_POINTS = "10"
@@ -23,6 +23,21 @@ describe "edititing grades" do
 
   before (:each) do
     data_setup
+  end
+
+  context 'submission details dialog' do
+    it 'successfully grades a submission' do
+      get "/courses/#{@course.id}/gradebook2"
+      wait_for_ajaximations
+      open_comment_dialog(0, 0)
+      grade_box = f("form.submission_details_grade_form input.grading_value")
+      grade_box.attribute('value').should == ASSIGNMENT_1_POINTS
+      set_value(grade_box, 7)
+      f("form.submission_details_grade_form button").click
+      wait_for_ajax_requests
+      validate_cell_text(f('#gradebook_grid .container_1 .slick-row:nth-child(1) .slick-cell:nth-child(1)'), '7')
+      final_score_for_row(0).should == "80%"
+    end
   end
 
   it "should update a graded quiz and have the points carry over to the quiz attempts page" do

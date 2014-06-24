@@ -23,7 +23,7 @@ module Canvas::Migration::Validators::CourseCopyValidator
     end
     source = Course.find_by_id(options[:source_course_id])
     if source
-      if !source.grants_right?(user, :manage)
+      if !(source.grants_right?(user, :read_as_admin) && source.grants_right?(user, :read))
         return I18n.t :course_copy_not_allowed_error, 'You are not allowed to copy the source course.'
       end
     else

@@ -155,7 +155,7 @@ ul.submission_list.instTree li.submission.leaf
 
     .file_list .instTree .leaf.active 
       :background-color #ddd
-      +border-radius(3px)
+      border-radius: 3px
 
     &.read_only 
       div.section_content 
@@ -209,9 +209,9 @@ ul.submission_list.instTree li.submission.leaf
   &.editing
     .editing_image
       :display inline
-      +opacity(0.3)
+      opacity: 0.3
     li:hover .editing_image
-      +opacity(1.0)
+      opacity: 1
     li.page .name
       :cursor move
     .editing_box
@@ -234,7 +234,7 @@ ul.submission_list.instTree li.submission.leaf
       font-size: 14px
       padding: 5px 0 5px 25px
       border-bottom: 1px solid lighten(#C6C6C6, 4%)
-      +text-shadow(1px, 2px, 3px, #CBCBCB)
+      text-shadow: 1px 2px 3px #CBCBCB
               
       &:hover, &:focus
         background-color: darken(#e4e7e9, 2%)
@@ -291,9 +291,9 @@ ul.submission_list.instTree li.submission.leaf
       :cursor pointer
     .edit_section_link
       :display inline
-      +opacity(0.3)
+      opacity: 0.3
     li.section:hover .edit_section_link
-      +opacity(1.0)
+      opacity: 1
     li.section .name
       :cursor move
 

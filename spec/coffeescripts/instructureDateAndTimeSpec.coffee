@@ -180,10 +180,10 @@ define [
   test 'should not localize if second argument is false', ->
     tz.changeLocale(portuguese, 'pt_PT')
     I18n.locale = 'pt'
-    equal $.datetimeString('1970-01-01 15:00:00Z', false), "Jan 1, 1970 at 3:00pm"
+    equal $.datetimeString('1970-01-01 15:00:00Z', {localized: false}), "Jan 1, 1970 at 3:00pm"
 
   test 'should still apply profile timezone when second argument is false', ->
     tz.changeZone(detroit, 'America/Detroit')
     tz.changeLocale(portuguese, 'pt_PT')
     I18n.locale = 'pt'
-    equal $.datetimeString(new Date(0), false), 'Dec 31, 1969 at 7:00pm'
+    equal $.datetimeString(new Date(0), {localized: false}), 'Dec 31, 1969 at 7:00pm'

@@ -29,7 +29,13 @@ class RubricAssociation < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
   has_many :rubric_assessments, :dependent => :nullify
   has_many :assessment_requests, :dependent => :destroy
-  
+
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :rubric_id, :association_id, :association_type, :use_for_grading, :created_at, :updated_at, :title, :description, :summary_data, :purpose,
+    :url, :context_id, :context_type, :hide_score_total, :bookmarked, :context_code
+  ]
+  EXPORTABLE_ASSOCIAIONS = [:rubric, :association_object, :context, :rubric_assessments, :assessment_requests]
+
   has_a_broadcast_policy
 
   validates_presence_of :purpose, :rubric_id, :association_id, :association_type, :context_id, :context_type

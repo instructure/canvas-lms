@@ -51,40 +51,42 @@
           <i class="icon-plus"></i>
         </a>
 
-        <a id="ag_{{id}}_manage_link" class="al-trigger btn" href="#" tabindex="0">
-          <span class="screenreader-only">{{#t "manage"}}Manage{{/t}}</span>
-          <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
-        </a>
-        <ul class="al-options">
-          <li>
-            <a
-              href="#"
-              class="edit_group icon-edit"
-              aria-label="{{#t 'assignment_group_edit'}}Edit Assignment Group{{/t}}"
-              data-focus-returns-to="ag_{{id}}_manage_link"
-            >{{#t "edit"}}Edit{{/t}}</a>
-          </li>
-          {{#unless hasFrozenAssignments}}
+        <div class="inline-block" role="application">
+          <a id="ag_{{id}}_manage_link" class="al-trigger btn" href="#" tabindex="0" role="button">
+            <span class="screenreader-only">{{#t "manage"}}Manage{{/t}}</span>
+            <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
+          </a>
+          <ul class="al-options">
             <li>
               <a
                 href="#"
-                class="delete_group icon-trash"
-                aria-label='{{#t "assignment_group_delete"}}Delete Assignment Group{{/t}}'
+                class="edit_group icon-edit"
+                aria-label="{{#t 'assignment_group_edit'}}Edit Assignment Group{{/t}}"
                 data-focus-returns-to="ag_{{id}}_manage_link"
-              >{{#t "delete"}}Delete{{/t}}</a>
+              >{{#t "edit"}}Edit{{/t}}</a>
             </li>
-          {{/unless}}
-          {{#if canMove}}
-          <li>
-            <a
-              href="#"
-              class="move_group icon-updown"
-              aria-label='{{#t "assignment_group_move"}}Move Assignment Group{{/t}}'
-              data-focus-returns-to="ag_{{id}}_manage_link"
-            >{{#t "move"}}Move To…{{/t}}</a>
-          </li>
-          {{/if}}
-        </ul>
+            {{#unless hasFrozenAssignments}}
+              <li>
+                <a
+                  href="#"
+                  class="delete_group icon-trash"
+                  aria-label='{{#t "assignment_group_delete"}}Delete Assignment Group{{/t}}'
+                  data-focus-returns-to="ag_{{id}}_manage_link"
+                >{{#t "delete"}}Delete{{/t}}</a>
+              </li>
+            {{/unless}}
+            {{#if canMove}}
+            <li>
+              <a
+                href="#"
+                class="move_group icon-updown"
+                aria-label='{{#t "assignment_group_move"}}Move Assignment Group{{/t}}'
+                data-focus-returns-to="ag_{{id}}_manage_link"
+              >{{#t "move"}}Move To…{{/t}}</a>
+            </li>
+            {{/if}}
+          </ul>
+        </div>
       {{/if}}
     </div>
 

@@ -290,7 +290,10 @@ describe DiscussionTopicsController, type: :request do
                   "locked"=>false,
                   "locked_for_user"=>false,
                   "author" => user_display_json(@topic.user, @topic.context).stringify_keys!,
-                  "permissions" => { "delete"=>true, "attach"=>true, "update"=>true }}
+                  "permissions" => { "delete"=>true, "attach"=>true, "update"=>true },
+                  "group_category_id" => nil,
+                  "can_group" => true,
+      }
     end
 
     describe "GET 'index'" do
@@ -718,6 +721,21 @@ describe DiscussionTopicsController, type: :request do
         @assignment.should be_deleted
       end
 
+      it "should transfer assignment group category to the discussion" do
+        group_category = @course.group_categories.create(:name => 'watup')
+        group = group_category.groups.create!(:name => "group1", :context => @course)
+        group.add_user(@user)
+        api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                 { :controller => "discussion_topics", :action => "update", :format => "json", :course_id => @course.to_param, :topic_id => @topic.to_param },
+                 { :assignment => { :group_category_id => group_category.id } })
+        @topic.reload
+
+        @topic.title.should == "Topic 1"
+        @topic.group_category.should == group_category
+        @topic.assignment.should be_present
+        @topic.assignment.group_category.should be_nil
+      end
+
       it "should allow pinning a topic" do
         api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
                  { controller: 'discussion_topics', action: 'update', format: 'json', course_id: @course.to_param, topic_id: @topic.to_param },
@@ -892,7 +910,9 @@ describe DiscussionTopicsController, type: :request do
       "permissions" => {"delete"=>true, "attach"=>true, "update"=>true},
       "locked" => false,
       "locked_for_user" => false,
-      "author" => user_display_json(gtopic.user, gtopic.context).stringify_keys!
+      "author" => user_display_json(gtopic.user, gtopic.context).stringify_keys!,
+      "group_category_id" => nil,
+      "can_group" => true,
     }
     json.should == expected
   end

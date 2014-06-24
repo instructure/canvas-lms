@@ -1548,7 +1548,7 @@ describe Assignment do
           messages_sent = @assignment.messages_sent['Assignment Created']
           messages_sent.detect{|m|m.user_id == @teacher.id}.body.should be_include "Multiple Dates"
           messages_sent.detect{|m|m.user_id == @studentA.id}.body.should be_include "Jan 1, 2011"
-          messages_sent.detect{|m|m.user_id == @ta.id}.body.should be_include "Jan 1, 2011"
+          messages_sent.detect{|m|m.user_id == @ta.id}.body.should be_include "Multiple Dates"
           messages_sent.detect{|m|m.user_id == @studentB.id}.body.should be_include "Jan 2, 2011"
           messages_sent.detect{|m|m.user_id == @ta2.id}.body.should be_include "Multiple Dates"
         end

@@ -501,7 +501,7 @@ class MessageableUser
     end
 
     # restricts enrollments to those with extended states (see
-    # User.enrollment_conditions) of active, invited, and (conditionally)
+    # Enrollment::QueryBuilder) of active, invited, and (conditionally)
     # completed. also universally excludes student view enrollments
     #
     # with the :include_concluded option false (default: true), completed
@@ -512,11 +512,10 @@ class MessageableUser
     # admin enrollments are included. ignored if :include_concluded is false.
     #
     # the :strict_checks option (default: true) is per load_messageable_users
-    # and controls the strict_course_state parameter of
-    # User.enrollment_conditions.
+    # and gets passed along to Enrollment::QueryBuilder.new.
     #
     # the :course_workflow_state is useful for passing on to
-    # User.enrollment_conditions to simplify the queries when the enrollments
+    # Enrollment::QueryBuilder to simplify the queries when the enrollments
     # are known to come from course(s) with a single workflow_state
     #
     # may return nil, indicating the scope should be treated as empty.
@@ -528,11 +527,11 @@ class MessageableUser
         :course_workflow_state => nil
       }.merge(options)
       state_clauses = [
-        User.enrollment_conditions(:active, options[:strict_checks], options[:course_workflow_state]),
-        User.enrollment_conditions(:invited, options[:strict_checks], options[:course_workflow_state])
+        Enrollment::QueryBuilder.new(:active, options.slice(:strict_checks, :course_workflow_state)).conditions,
+        Enrollment::QueryBuilder.new(:invited, options.slice(:strict_checks, :course_workflow_state)).conditions
       ]
       if options[:include_concluded]
-        clause = User.enrollment_conditions(:completed, options[:strict_checks])
+        clause = Enrollment::QueryBuilder.new(:completed, options.slice(:strict_checks)).conditions
         clause << " AND enrollments.type IN ('TeacherEnrollment', 'TaEnrollment')" unless options[:include_concluded_students]
         state_clauses << clause
       end

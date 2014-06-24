@@ -39,6 +39,16 @@ module Alerts
         student_in_course(:active_all => 1)
       end
 
+      it 'should validate the length of title' do
+        @long_string = 'qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm
+                        qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm
+                        qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm
+                        qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm
+                        qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm'
+        (lambda {::UserNote.create!(creator: @teacher, user: @user, title: @long_string) { |un| un.created_at = Time.now - 30.days }}).
+          should raise_error("Validation failed: Title is too long (maximum is 255 characters)")
+      end
+
       it 'returns true when the course root account has user notes disabled' do
         root_account = @course.root_account
         root_account.enable_user_notes = false

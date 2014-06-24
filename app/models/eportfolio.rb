@@ -23,6 +23,10 @@ class Eportfolio < ActiveRecord::Base
   has_many :eportfolio_categories, :order => :position, :dependent => :destroy
   has_many :eportfolio_entries, :dependent => :destroy
   has_many :attachments, :as => :context
+
+  EXPORTABLE_ATTRIBUTES = [:id, :user_id, :name, :public, :context_id, :context_type, :created_at, :updated_at, :uuid, :workflow_state, :deleted_at]
+  EXPORTABLE_ASSOCIATIONS = [:eportfolio_categories, :eportfolio_entries, :attachments]
+
   belongs_to :user
   validates_presence_of :user_id
   validates_length_of :name, :maximum => maximum_string_length, :allow_blank => true

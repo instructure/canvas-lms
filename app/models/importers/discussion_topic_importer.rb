@@ -3,7 +3,7 @@ module Importers
 
     self.item_class = DiscussionTopic
 
-    attr_accessor :options, :context, :item
+    attr_accessor :options, :context, :item, :migration
 
     def self.process_migration(data, migration)
       process_announcements_migration(Array(data['announcements']), migration)
@@ -16,7 +16,7 @@ module Importers
         event[:type] = 'announcement'
 
         begin
-          self.import_from_migration(event, migration.context)
+          self.import_from_migration(event, migration.context, migration)
         rescue
           migration.add_import_warning(t('#migration.announcement_type', "Announcement"), event[:title], $!)
         end
@@ -32,7 +32,7 @@ module Importers
         context ||= migration.context
         next unless context && can_import_topic?(topic, migration)
         begin
-          import_from_migration(topic.merge(topic_entries_to_import: topic_entries_to_import), context)
+          import_from_migration(topic.merge(topic_entries_to_import: topic_entries_to_import), context, migration)
         rescue
           migration.add_import_warning(t('#migration.discussion_topic_type', "Discussion Topic"), topic[:title], $!)
         end
@@ -46,14 +46,15 @@ module Importers
               migration.import_object?('announcements', topic['migration_id']))
     end
 
-    def self.import_from_migration(hash, context, item=nil)
-      importer = self.new(hash, context, item)
+    def self.import_from_migration(hash, context, migration=nil, item=nil)
+      importer = self.new(hash, context, migration, item)
       importer.run
     end
 
-    def initialize(hash, context, item)
+    def initialize(hash, context, migration, item)
       self.options = DiscussionTopicOptions.new(hash)
       self.context = context
+      self.migration = migration
       self.item    = find_or_create_topic(item)
     end
 
@@ -77,7 +78,7 @@ module Importers
        :require_initial_post].each do |attr|
         item.send("#{attr}=", options[attr])
       end
-      item.message              = options.message ? ImportedHtmlConverter.convert(options.message, context, missing_links: options[:missing_links]) : I18n.t('#discussion_topic.empty_message', 'No message')
+      item.message              = options.message ? ImportedHtmlConverter.convert(options.message, context, migration, missing_links: options[:missing_links]) : I18n.t('#discussion_topic.empty_message', 'No message')
       item.posted_at            = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(options[:posted_at])
       item.delayed_post_at      = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(options.delayed_post_at)
       item.last_reply_at        = item.posted_at if item.new_record?
@@ -102,25 +103,23 @@ module Importers
     def fetch_assignment
       return nil unless context.respond_to?(:assignments)
       if options[:assignment]
-        Importers::AssignmentImporter.import_from_migration(options[:assignment], context)
+        Importers::AssignmentImporter.import_from_migration(options[:assignment], context, migration)
       elsif options[:grading]
         Importers::AssignmentImporter.import_from_migration({
           grading: options[:grading], migration_id: options[:migration_id],
           submission_format: 'discussion_topic', due_date: options.due_date,
           title: options[:grading][:title]
-        }, context)
+        }, context, migration)
       end
     end
 
     def import_migration_item
-      if context.respond_to?(:imported_migration_items)
-        Array(context.imported_migration_items) << item
-      end
+      migration.add_imported_item(item) if migration
     end
 
     def add_missing_content_links
-      if context.try_rescue(:content_migration)
-        context.content_migration.add_missing_content_links(class: item.class.to_s,
+      if migration
+        migration.add_missing_content_links(class: item.class.to_s,
           id: item.id, missing_links: options[:missing_links],
           url: "/#{context.class.to_s.underscore.pluralize}/#{context.id}/#{item.class.to_s.demodulize.underscore.pluralize}/#{item.id}")
       end

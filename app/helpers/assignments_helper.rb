@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,11 +17,27 @@
 #
 
 module AssignmentsHelper
+  PEER_REVIEW_LINK_OPTIONS = {
+    completed: {
+      class: 'pass',
+      title: I18n.t('tooltips.finished', 'finished'),
+    },
+    in_progress: {
+      class: 'warning',
+      title: I18n.t('tooltips.incomplete', 'incomplete'),
+    }
+  }
+
   def multiple_due_dates(assignment)
     # can use this method as the single source of rendering multiple due dates
     # for now, just text, but eventually, a bubble/dialog/link/etc, rendering
     # the information contained in the varied_due_date parameter
     I18n.t '#assignments.multiple_due_dates', 'Multiple Due Dates'
+  end
+
+  def student_peer_review_link_for(context, assignment, assessment)
+    link_options = assessment.completed? ? PEER_REVIEW_LINK_OPTIONS[:completed] : PEER_REVIEW_LINK_OPTIONS[:in_progress]
+    link_to assessment.asset_user_name, context_url(context, :context_assignment_submission_url, assignment.id, assessment.asset.user_id), link_options
   end
 
   def due_at(assignment, user, format='datetime')

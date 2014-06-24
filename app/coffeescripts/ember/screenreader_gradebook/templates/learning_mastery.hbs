@@ -1,0 +1,292 @@
+<div class="row">
+  <div class="span12">
+    <h2>{{#t 'global_settings'}}Global Settings{{/t}}</h2>
+  </div>
+</div>
+
+<div class="row">
+  <div class="span4">
+    <label for="outcome_section_select" class="text-right-responsive">
+      {{#t 'select_a_section'}}Select a section{{/t}}
+    </label>
+  </div>
+  <div class="span8">
+    {{
+      fast-select
+      id="outcome_section_select"
+      class="section_select"
+      items=sections
+      valuePath="id"
+      labelPath="name"
+      labelDefault=sectionSelectDefaultLabel
+      selected=selectedSection
+    }}
+  </div>
+</div>
+<div class="row">
+  <div class="span4"></div>
+  <div class="span8">
+    <div class="checkbox">
+      <label class="checkbox">
+        {{
+          input
+          type="checkbox"
+          id="outcome_hide_names_checkbox"
+          name="hide_names_checkbox"
+          checked=hideStudentNames
+        }}
+        {{#t "hide_student_names_label"}}Hide Student Names{{/t}}
+      </label>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="span4">
+    {{!-- Intentionally left empty so this scales to smaller screens --}}
+  </div>
+  <div class="span8">
+    <div class="pad-box bottom-only">
+      <a class="btn" role="button" href="{{ unbound downloadOutcomeCsvUrl }}">
+        <i class="icon-download"></i> {{#t 'download_results'}}Download Results (.csv){{/t}}
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="hr"></div>
+
+<div class="row">
+  <div class="span12">
+    <h2>{{#t 'content_selection'}}Content Selection{{/t}}</h2>
+  </div>
+</div>
+
+<div class="row pad-box bottom-only">
+  <div class="span4 text-right-responsive">
+    <label for="outcome_student_select">
+      {{#t 'select_student'}}Select a student{{/t}}
+    </label>
+  </div>
+  <div class="span8">
+    {{
+      fast-select id="outcome_student_select"
+      class="student_select"
+      items=studentsInSelectedSection
+      valuePath="id"
+      labelPath=displayName
+      labelDefault=studentSelectDefaultLabel
+      selected=selectedStudent
+    }}
+
+    <div class="row pad-box bottom-only" id="outcome_student_navigation">
+      <div class="span3">
+        <button
+          id="outcome_prev_student"
+          class="btn btn-block"
+          {{action 'selectItem' 'selectedStudent' 'previous'}}
+          {{ bind-attr disabled=disablePrevStudentButton }}
+        >
+          {{#t 'previous_student'}}Previous Student{{/t}}
+        </button>
+      </div>
+      <div class="span3">
+        <button
+          id="outcome_next_student"
+          class="btn btn-block"
+          {{action 'selectItem' 'selectedStudent' 'next'}}
+          {{bind-attr disabled=disableNextStudentButton}}
+        >
+          {{#t 'next_student'}}Next Student{{/t}}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row pad-box bottom-only">
+  <div class="span4 text-right-responsive">
+    <label for="outcome_select">
+      {{#t 'select_outcome'}}Select an outcome{{/t}}
+    </label>
+  </div>
+  <div class="span8">
+    {{
+      fast-select id="outcome_select"
+      class="outcome_select"
+      items=outcomes
+      valuePath="id"
+      labelPath="title"
+      labelDefault=outcomeSelectDefaultLabel
+      selected=selectedOutcome
+    }}
+
+    <div id="outcome_navigation" class="row pad-box bottom-only">
+      <div class="span3">
+        <button
+          id="prev_outcome"
+          class="btn btn-block"
+          {{action 'selectItem' 'selectedOutcome' 'previous'}}
+          {{bind-attr disabled=disablePrevOutcomeButton}}
+        >
+          {{#t 'previous_outcome'}}Previous Outcome{{/t}}
+        </button>
+      </div>
+
+      <div class="span3">
+        <button
+          id="next_outcome"
+          class="btn btn-block"
+          {{action 'selectItem' 'selectedOutcome' 'next'}}
+          {{bind-attr disabled=disableNextOutcomeButton}}
+        >
+          {{#t 'next_outcome'}}Next Outcome{{/t}}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="hr"></div>
+
+<div id="outcome_result">
+  <div class="row">
+    <div class="span4">
+      <h2>{{#t 'result'}}Result{{/t}}</h2>
+    </div>
+    <div class= "span8 pad-box top-only">
+      {{#if selectedOutcomeResult}}
+        <div>
+          <label for="outcome_result_value">
+            <strong>{{#t 'result_for'}}Result for:{{/t}} {{selectedOutcome.title}}</strong>
+          </label>
+        </div>
+        <div id="outcome_result_value">
+          {{#if outcomeResultIsDefined}}
+            {{selectedOutcomeResult.score}}
+          {{else}}
+            -
+          {{/if}}
+        </div>
+      {{else}}
+        <p class="submission_selection">
+          {{#t "empty_submission_selection"}}Select a student and an outcome to view results.{{/t}}
+        </p>
+      {{/if}}
+    </div>
+  </div>
+</div>
+
+<div class="hr"></div>
+
+<div id="outcome_student_information">
+  <div class="row">
+    <div class="span4">
+      <h2>{{#t 'student_info'}}Student Information{{/t}}</h2>
+    </div>
+    <div class="span8">
+      {{#if selectedStudent}}
+        <h3 class="student_selection">
+          {{#if hideStudentNames}}
+            {{selectedStudent.hiddenName}}
+          {{else}}
+          <a {{bind-attr href="studentUrl"}}>
+            {{selectedStudent.name}}
+          </a>
+          {{/if}}
+        </h3>
+        {{#if selectedStudent.isLoaded}}
+          <div>
+            <strong>
+              {{#t 'secondary_id'}}Secondary ID:{{/t}}
+              <span id="outcome_secondary_id">
+                {{#if hideStudentNames}}
+                  <em>{{#t 'hidden'}}hidden{{/t}}</em>
+                {{else}}
+                  {{selectedStudent.login_id}}
+                {{/if}}
+              </span>
+            </strong>
+          </div>
+          <div>
+            <strong>
+              {{#t 'sections'}}Sections:{{/t}} {{selectedStudentSections}}
+            </strong>
+          </div>
+        {{else}}
+          <p>{{#t 'results_loading'}}Results for this student are still loading...{{/t}}</p>
+        {{/if}}
+      {{else}}
+        <p class="student_selection pad-box top-only">
+          {{#t "empty_student_selection"}}Select a student to view additional information here.{{/t}}
+        </p>
+      {{/if}}
+    </div>
+  </div>
+</div>
+
+<div class="hr"></div>
+
+<div id="outcome_information">
+  <div class="row">
+    <div class="span4">
+      <h2>{{#t 'outcome_info'}}Outcome Information{{/t}}</h2>
+    </div>
+    <div class="span8">
+      {{#if selectedOutcome}}
+        <h3 class="outcome_selection">
+          {{selectedOutcome.title}}
+        </h3>
+
+        <div class="pad-box no-sides">
+          <p><strong>
+            {{#t 'result_sub_count'}}Total results: {{/t}} {{outcomeDetails.cnt}}
+          </strong></p>
+        </div>
+
+        <div class="pad-box bottom-only">
+          <table class="table">
+            <thead>
+              <tr>
+                {{#if outcomeDetails}}
+                  {{#with outcomeDetails }}
+                    {{#if cnt}}
+                      <th scope="col">{{#t 'avg_score'}}Average Score{{/t}}</th>
+                      <th scope="col">{{#t 'high_score'}}High Score{{/t}}</th>
+                      <th scope="col">{{#t 'low_score'}}Low Score{{/t}}</th>
+                    {{/if}}
+                  {{/with}}
+                {{/if}}
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                {{#if outcomeDetails}}
+                  {{#with outcomeDetails }}
+                    {{#if cnt}}
+                      <td>{{average}}</td>
+                      <td>{{max}}</td>
+                      <td>{{min}}</td>
+                    {{/if}}
+                  {{/with}}
+                {{/if}}
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      {{else}}
+        <p class="outcome_selection pad-box top-only">
+          {{#t 'empty_outcome_selection'}}Select an outcome to view additional information here.{{/t}}
+        </p>
+      {{/if}}
+    </div>
+
+    <div
+      class="aria-announcer hide-text affix"
+      aria-live="polite"
+      aria-atomic="true"
+      aria-relative="all"
+    >
+      {{ariaAnnounced}}
+    </div>
+  </div>
+</div>

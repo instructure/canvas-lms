@@ -328,6 +328,8 @@ describe "content migrations", :non_parallel do
 
       cm = @course.content_migrations.last
       cm.migration_settings["source_course_id"].should == @copy_from.id
+      cm.source_course.should == @copy_from
+      cm.initiated_source.should == :api
 
       source_link = f('.migrationProgressItem .sourceLink a')
       source_link.text.should == @copy_from.name

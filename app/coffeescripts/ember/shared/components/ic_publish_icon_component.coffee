@@ -22,15 +22,58 @@ define [
     # public published property the controller binds to
     'is-published': false
 
-    tagName: 'span'
+    # public property to determine if this is an icon based publish button
+    'icon-only': false
 
     role: 'button'
 
     attributeBindings: ['data-tooltip', 'aria-label', 'title', 'tabindex', 'aria-disabled']
 
-    classNames: ['publish-icon']
+    classNameBindings: ['buttonClass', 'wrapperClass', 'disabled']
 
-    classNameBindings: ['wrapperClass', 'disabled']
+    buttonClassStates:
+      'button': 'btn'
+      'span':   'publish-icon'
+
+    iconClassStates:
+      'published':            'icon-publish'
+      'unpublished':          'icon-unpublished'
+      'hoverPublished':       'icon-unpublish'
+      'hoverUnpublished':     'icon-unpublished'
+      'publishing':           'icon-publish'
+      'unpublishing':         'icon-unpublished'
+      'hoverJustUnpublished': 'icon-unpublished'
+      'hoverJustPublished':   'icon-publish'
+
+    iconStates:
+      'published':            'publish-icon-published'
+      'unpublished':          'publish-icon-unpublished'
+      'hoverPublished':       'publish-icon-unpublish'
+      'hoverUnpublished':     'publish-icon-publish'
+      'publishing':           'publish-icon-publish'
+      'unpublishing':         'publish-icon-unpublish'
+      'hoverJustUnpublished': 'publish-icon-publish'
+      'hoverJustPublished':   'publish-icon-published'
+
+    buttonStates:
+      'published':            'btn-published'
+      'unpublished':          'btn-publish'
+      'hoverPublished':       'btn-unpublish'
+      'hoverUnpublished':     'btn-publish'
+      'publishing':           'btn-publish'
+      'unpublishing':         'btn-unpublish'
+      'hoverJustUnpublished': 'btn-publish'
+      'hoverJustPublished':   'btn-published'
+
+    textStates:
+      'published':            I18n.t('published',    'Published')
+      'unpublished':          I18n.t('publish',      'Publish')
+      'hoverPublished':       I18n.t('unpublish',    'Unpublish')
+      'hoverUnpublished':     I18n.t('publish',      'Publish')
+      'publishing':           I18n.t('publishing',   'Publishing...')
+      'unpublishing':         I18n.t('unpublishing', 'Unpublishing...')
+      'hoverJustUnpublished': I18n.t('publish',      'Publish')
+      'hoverJustPublished':   I18n.t('published',    'Published')
 
     'data-tooltip': 'top'
 
@@ -39,28 +82,21 @@ define [
 
     mouseIsHovered: false
 
+    tagName: (->
+      if @get('icon-only') then 'span' else 'button'
+    ).property('icon-only')
+
     iconClass: (->
-      switch @get('publishState')
-        when 'published'            then 'icon-publish'
-        when 'unpublished'          then 'icon-unpublished'
-        when 'hoverPublished'       then 'icon-unpublish'
-        when 'hoverUnpublished'     then 'icon-unpublished'
-        when 'publishing'           then 'icon-publish'
-        when 'unpublishing'         then 'icon-unpublished'
-        when 'hoverJustUnpublished' then 'icon-unpublished'
-        when 'hoverJustPublished'   then 'icon-publish'
+      @iconClassStates[@get('publishState')]
     ).property('publishState')
 
+    buttonClass: (->
+      @buttonClassStates[@get('tagName')]
+    ).property('tagName')
+
     wrapperClass: (->
-      switch @get('publishState')
-        when 'published'            then 'publish-icon-published'
-        when 'unpublished'          then 'publish-icon-unpublished'
-        when 'hoverPublished'       then 'publish-icon-unpublish'
-        when 'hoverUnpublished'     then 'publish-icon-publish'
-        when 'publishing'           then 'publish-icon-publish'
-        when 'unpublishing'         then 'publish-icon-unpublish'
-        when 'hoverJustUnpublished' then 'publish-icon-publish'
-        when 'hoverJustPublished'   then 'publish-icon-published'
+      states = if @get("tagName") is "span" then @iconStates else @buttonStates
+      states[@get('publishState')]
     ).property('publishState')
 
     mouseEnter: ->
@@ -103,16 +139,22 @@ define [
         I18n.t('publish', 'Publish')
     ).property('is-published')
 
+    text: (->
+      @textStates[@get('publishState')]
+    ).property('publishState')
+
     'aria-disabled': (->
       @get('disabled')+''
     ).property('disabled')
 
     'aria-label': (->
-      if @get('is-published')
+      if @get('disabled')
+        @get('disabled-message')
+      else if @get('is-published')
         I18n.t('unpublish_click', 'unpublished, click to publish')
       else
         I18n.t('publish_click', 'published, click to unpublish')
-    ).property('is-published')
+    ).property('disabled', 'is-published')
 
     click: ->
       return if @get('disabled')

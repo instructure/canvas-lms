@@ -105,15 +105,17 @@ namespace :canvas do
   end
 
   desc "Compile javascript and css assets."
-  task :compile_assets, :generate_documentation do |t, args|
-    args.with_defaults(:generate_documentation => 'true')
-    generate_docs = args[:generate_documentation]
-    generate_docs = 'true' if !['true', 'false'].include?(args[:generate_documentation])
+  task :compile_assets, :generate_documentation, :use_sass_cache, :check_syntax do |t, args|
+    args.with_defaults(:generate_documentation => true, :use_sass_cache => false, :check_syntax => false)
+    truthy_values = [true, 'true', '1']
+    generate_documentation = truthy_values.include?(args[:generate_documentation])
+    use_sass_cache = !truthy_values.include?(args[:use_sass_cache])
+    check_syntax = truthy_values.include?(args[:check_syntax])
 
     tasks = {
       "Compile sass and make jammit css bundles" => -> {
         log_time('css:generate') do
-          Rake::Task['css:generate'].invoke
+          Rake::Task['css:generate'].invoke(use_sass_cache, !!:quiet, :production)
         end
 
         log_time("Jammit") do
@@ -131,7 +133,13 @@ namespace :canvas do
       }
     }
 
-    if generate_docs == 'true'
+    if check_syntax
+      tasks["check JavaScript syntax"] = -> {
+        Rake::Task['canvas:check_syntax'].invoke
+      }
+    end
+
+    if generate_documentation
       tasks["Generate documentation [yardoc]"] = -> {
         Rake::Task['doc:api'].invoke
       }
@@ -149,7 +157,7 @@ namespace :canvas do
       end
     end
     combined_time = times.reduce(:+)
-    puts "Finished compiling assets in #{real_time}. parralellisim saved #{combined_time - real_time} (#{real_time.to_f / combined_time.to_f * 100.0}%)"
+    puts "Finished compiling assets in #{real_time}. parallelism saved #{combined_time - real_time} (#{real_time.to_f / combined_time.to_f * 100.0}%)"
   end
 
   desc "Check static assets and generate api documentation."

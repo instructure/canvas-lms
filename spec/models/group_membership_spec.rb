@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe GroupMembership do
-  
+
   it "should ensure a mutually exclusive relationship" do
     category = Account.default.group_categories.create!(:name => "blah")
     group1 = category.groups.create!(:context => Account.default)
@@ -85,7 +85,7 @@ describe GroupMembership do
     it "should pass validation on update" do
       lambda {
         group_membership.save!
-      }.should_not raise_error(ActiveRecord::RecordInvalid)
+      }.should_not raise_error
     end
   end
 
@@ -247,6 +247,18 @@ describe GroupMembership do
       community_group.add_user(@teacher, 'accepted', false)
       GroupMembership.where(:group_id => community_group.id, :user_id => @teacher.id).first.grants_right?(@admin, :delete).should be_true
     end
+  end
+
+  it 'updates group leadership as membership changes' do
+    course
+    @category = @course.group_categories.build(:name => "category 1")
+    @category.save!
+    @group = @category.groups.create!(:context => @course)
+    @category.auto_leader = "first"
+    @category.save!
+    leader = user_model
+    @group.group_memberships.create!(:user => leader, :workflow_state => 'accepted')
+    @group.reload.leader.should == leader
   end
 
   describe "updating cached due dates" do

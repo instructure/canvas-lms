@@ -32,7 +32,6 @@ describe "Assessment Question import from hash" do
 
   it "should only import assessment question once" do
     context = get_import_context
-    context.imported_migration_items ||= []
     data = get_import_data '', 'single_question'
     data = {'assessment_questions'=>{'assessment_questions'=>data}}
 
@@ -49,7 +48,6 @@ describe "Assessment Question import from hash" do
 
   it "should update assessment question on re-import" do
     context = get_import_context
-    context.imported_migration_items ||= []
     data = get_import_data '', 'single_question'
     data = {'assessment_questions'=>{'assessment_questions'=>data}}
 
@@ -138,7 +136,7 @@ describe "Assessment Question import from hash" do
     question_data[question[:migration_id]] = context.assessment_questions.find_by_migration_id(question[:migration_id])
 
     quiz = get_import_data 'cengage', 'quiz'
-    Importers::QuizImporter.import_from_migration(quiz, context, question_data)
+    Importers::QuizImporter.import_from_migration(quiz, context, nil, question_data)
     quiz = context.quizzes.find_by_migration_id(quiz[:migration_id])
 
     group = quiz.quiz_groups.first

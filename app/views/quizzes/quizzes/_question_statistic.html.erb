@@ -149,6 +149,7 @@
       </td>
     </tr>
   <% end %>
+  <% question[:unexpected_response_values] ||= [] %>
   <% if !question[:unexpected_response_values].empty? && (question[:question_type] == 'short_answer_question' || question[:question_type] == 'numerical_question') %>
     <tr class=" <%= 'group_row' if in_group %>">
       <td colspan="2">&nbsp;</td>

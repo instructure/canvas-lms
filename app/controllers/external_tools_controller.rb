@@ -165,6 +165,12 @@ class ExternalToolsController < ApplicationController
           return
         end
 
+        unless assignment.external_tool_tag
+          @context.errors.add(:assignment_id, 'The assignment must have an external tool tag')
+          render :json => @context.errors, :status => :bad_request
+          return
+        end
+
         return unless authorized_action(assignment, @current_user, :read)
 
         launch_url = assignment.external_tool_tag.url
@@ -182,6 +188,7 @@ class ExternalToolsController < ApplicationController
         @tool = ContextExternalTool.find_external_tool(launch_url, @context, tool_id)
       else
         find_tool(tool_id, params[:launch_type])
+        return unless @tool
       end
       if !@tool
         flash[:error] = t "#application.errors.invalid_external_tool", "Couldn't find valid settings for this link"
@@ -191,7 +198,7 @@ class ExternalToolsController < ApplicationController
 
       # generate the launch
       adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @context)
-      adapter.prepare_tool_launch(url_for(@context), resource_type: params[:launch_type], launch_url: params[:url])
+      adapter.prepare_tool_launch(url_for(@context), resource_type: params[:launch_type], launch_url: launch_url)
 
       launch_settings = {
         'launch_url' => adapter.launch_url,

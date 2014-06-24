@@ -19,5 +19,8 @@ class UserProfileLink < ActiveRecord::Base
   attr_accessible :url, :title
 
   belongs_to :user_profile
+
+  EXPORTABLE_ATTRIBUTES = [:id, :url, :title, :user_profile_id, :created_at, :updated_at]
+  EXPORTABLE_ASSOCIATIONS = [:user_profile]
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
 end

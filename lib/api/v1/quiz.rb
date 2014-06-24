@@ -55,23 +55,35 @@ module Api::V1::Quiz
   end
 
   def quiz_json(quiz, context, user, session)
-    Quizzes::QuizSerializer.new(quiz,
-                       scope: user,
-                       session: session,
-                       root: false,
-                       controller: self).as_json
+    if accepts_jsonapi?
+      Canvas::APIArraySerializer.new([quiz],
+                         scope: user,
+                         session: session,
+                         root: :quizzes,
+                         each_serializer: Quizzes::QuizSerializer,
+                         controller: self).as_json
+    else
+      Quizzes::QuizSerializer.new(quiz,
+                         scope: user,
+                         session: session,
+                         root: false,
+                         controller: self).as_json
+
+    end
   end
 
   def jsonapi_quizzes_json(options)
     scope = options.fetch(:scope)
     api_route = options.fetch(:api_route)
     @quizzes, meta = Api.jsonapi_paginate(scope, self, api_route)
+    @quiz_submissions = Quizzes::QuizSubmission.where(quiz_id: @quizzes, user_id: @current_user.id).index_by(&:quiz_id)
     meta[:primaryCollection] = 'quizzes'
     add_meta_permissions!(meta)
     Canvas::APIArraySerializer.new(@quizzes,
                           scope: @current_user,
                           controller: self,
                           root: :quizzes,
+                          self_quiz_submissions: @quiz_submissions,
                           meta: meta,
                           each_serializer: Quizzes::QuizSerializer,
                           include_root: false).as_json

@@ -435,7 +435,7 @@ shared_examples_for 'a backend' do
     end
 
     it "should allow overriding schedules using periodic_jobs.yml" do
-      Setting.set_config('periodic_jobs', { 'my ChangedJob' => '*/10 * * * * *' })
+      ConfigFile.stub('periodic_jobs', { 'my ChangedJob' => '*/10 * * * * *' })
       Delayed::Periodic.scheduled = {}
       Delayed::Periodic.cron('my ChangedJob', '*/5 * * * * *') do
         Delayed::Job.enqueue(SimpleJob.new)
@@ -445,7 +445,7 @@ shared_examples_for 'a backend' do
     end
 
     it "should fail if the override cron line is invalid" do
-      Setting.set_config('periodic_jobs', { 'my ChangedJob' => '*/10 * * * * * *' }) # extra asterisk
+      ConfigFile.stub('periodic_jobs', { 'my ChangedJob' => '*/10 * * * * * *' }) # extra asterisk
       Delayed::Periodic.scheduled = {}
       expect { Delayed::Periodic.cron('my ChangedJob', '*/5 * * * * *') do
         Delayed::Job.enqueue(SimpleJob.new)

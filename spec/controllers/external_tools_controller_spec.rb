@@ -298,24 +298,6 @@ describe ExternalToolsController do
       assigns[:tool].has_editor_button.should be_true
     end
 
-    it "should fail gracefully on invalid xml configurations" do
-      course_with_teacher_logged_in(:active_all => true)
-      xml = "bob"
-      post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_xml", :config_xml => xml}, :format => "json"
-      response.should_not be_success
-      assigns[:tool].should be_new_record
-      json = json_parse(response.body)
-      json['errors']['config_xml'][0]['message'].should == I18n.t(:invalid_xml_syntax, 'Invalid xml syntax')
-
-      course_with_teacher_logged_in(:active_all => true)
-      xml = "<a><b>c</b></a>"
-      post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_xml", :config_xml => xml}, :format => "json"
-      response.should_not be_success
-      assigns[:tool].should be_new_record
-      json = json_parse(response.body)
-      json['errors']['config_xml'][0]['message'].should == I18n.t(:invalid_xml_syntax, 'Invalid xml syntax')
-    end
-
     it "should handle advanced xml configurations by URL retrieval" do
       course_with_teacher_logged_in(:active_all => true)
       xml = <<-XML

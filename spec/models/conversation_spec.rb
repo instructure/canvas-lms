@@ -492,6 +492,22 @@ describe Conversation do
       rconvo.update_attributes(:subscribed => true)
       rconvo.unread?.should be_true
     end
+
+    it "should only alert message participants" do
+      sender = user
+      recipients = 5.times.map{ user }
+      convo = Conversation.initiate([sender] + recipients, false)
+      convo.add_message(sender, 'test')
+
+      recipient = recipients.last
+      rconvo = recipient.conversations.first
+      rconvo.unread?.should be_true
+      rconvo.update_attribute(:workflow_state, "read")
+
+      convo.add_message(sender, 'another test', :only_users => [recipients.first])
+
+      rconvo.reload.unread?.should be_false
+    end
   end
 
   context "context tags" do

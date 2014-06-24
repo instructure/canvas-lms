@@ -4,14 +4,13 @@ define [
   'compiled/views/groups/manage/GroupView'
   'compiled/views/groups/manage/GroupUsersView'
   'compiled/views/groups/manage/GroupDetailView'
-  'compiled/views/groups/manage/Scrollable'
   'compiled/views/Filterable'
   'jst/groups/manage/groups'
-], (_, PaginatedCollectionView, GroupView, GroupUsersView, GroupDetailView, Scrollable, Filterable, template) ->
+], (_, PaginatedCollectionView, GroupView, GroupUsersView, GroupDetailView, Filterable, template) ->
 
   class GroupsView extends PaginatedCollectionView
 
-    @mixin Filterable, Scrollable
+    @mixin Filterable
 
     template: template
 

@@ -44,6 +44,7 @@ module Delayed
           options[:queue] = Delayed::Worker.queue unless options.key?(:queue)
           options[:max_attempts] ||= Delayed::Worker.max_attempts
           options[:current_shard] = Shard.current
+          options[:source] = Marginalia::Comment.construct_comment if defined?(Marginalia) && Marginalia::Comment.components
 
           # If two parameters are given to n_strand, the first param is used
           # as the strand name for looking up the Setting, while the second

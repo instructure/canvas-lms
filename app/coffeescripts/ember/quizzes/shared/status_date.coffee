@@ -13,13 +13,6 @@ define [
 
   Ember.Object.extend
 
-    datesFor: ( ->
-      if @get('base')
-        I18n.t('everyone_else', 'Everyone else')
-      else
-        @get('title')
-    ).property('base', 'title')
-
     now: new Date()
 
     setupDate: ( ->
@@ -30,18 +23,18 @@ define [
     ).on('init')
 
     availableStatus: ( ->
-      lockPassed = @get('lock_at') && (new Date(@get('lock_at')) < @get('now'))
-      lockNotPassed = @get('lock_at') && (new Date(@get('lock_at')) > @get('now'))
-      unlockPassed = @get('unlock_at') && (new Date(@get('unlock_at')) < @get('now'))
+      lockPassed = @get('lockAt') && (new Date(@get('lockAt')) < @get('now'))
+      lockNotPassed = @get('lockAt') && (new Date(@get('lockAt')) > @get('now'))
+      unlockPassed = @get('unlockAt') && (new Date(@get('unlockAt')) < @get('now'))
       if lockPassed
         'closed'
-      else if @get('unlock_at') && (new Date(@get('unlock_at')) > @get('now'))
+      else if @get('unlockAt') && (new Date(@get('unlockAt')) > @get('now'))
         'pending'
-      else if (!@get('unlock_at') || unlockPassed) && lockNotPassed
+      else if (!@get('unlockAt') || unlockPassed) && lockNotPassed
         'availableUntil'
       else
         'none'
-    ).property('unlock_at', 'lock_at', 'now')
+    ).property('unlockAt', 'lockAt', 'now')
 
     availableLabel: ( ->
       AVAILABLE_STATUS_LABELS[@get('availableStatus')]
@@ -58,16 +51,16 @@ define [
 
     availableDate: ( ->
       if @get('availableStatus') == 'availableUntil'
-        @get('lock_at')
+        @get('lockAt')
       else if @get('availableStatus') == 'pending'
-        @get('unlock_at')
+        @get('unlockAt')
       else
         ''
     ).property('availableStatus')
 
     dueLabel: ( ->
-      if @get('due_at')
+      if @get('dueAt')
         I18n.t('due', 'Due')
-    ).property('due_at')
+    ).property('dueAt')
 
-    dueDate: Em.computed.alias 'due_at'
+    dueDate: Em.computed.alias 'dueAt'

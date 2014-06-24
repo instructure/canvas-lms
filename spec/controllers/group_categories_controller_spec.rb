@@ -93,6 +93,15 @@ describe GroupCategoriesController do
       assigns[:group_category].groups.size.should == 3
     end
 
+    it "respects auto_leader params" do
+      course_with_teacher_logged_in(:active_all => true)
+      student_in_course
+      post 'create', :course_id => @course.id, :category => {:name => "Study Groups", :enable_auto_leader => '1', :auto_leader_type => 'RANDOM'}
+      response.should be_success
+      assigns[:group_category].should_not be_nil
+      assigns[:group_category].auto_leader.should == 'random'
+    end
+
     it "should respect the max new-category group count" do
       course_with_teacher_logged_in(:active_all => true)
       Setting.set('max_groups_in_new_category', '5')

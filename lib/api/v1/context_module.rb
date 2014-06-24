@@ -111,11 +111,12 @@ module Api::V1::ContextModule
     end
     hash['url'] = api_url if api_url
 
-    # add external_url, if applicable
-    hash['external_url'] = content_tag.url if ['ExternalUrl', 'ContextExternalTool'].include?(content_tag.content_type)
-
-    # add new_tab, if applicable
-    hash['new_tab'] = content_tag.new_tab if content_tag.content_type == 'ContextExternalTool'
+    if ['ExternalUrl', 'ContextExternalTool'].include?(content_tag.content_type)
+      # add external_url, if applicable
+      hash['external_url'] = content_tag.url
+      # add new_tab, if applicable
+      hash['new_tab'] = content_tag.new_tab
+    end
 
     # add completion requirements
     if criterion = context_module.completion_requirements && context_module.completion_requirements.detect { |r| r[:id] == content_tag.id }

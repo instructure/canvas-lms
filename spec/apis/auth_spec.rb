@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -247,7 +247,7 @@ describe "API Authentication", type: :request do
 
       it "should execute for saml login" do
         pending("requires SAML extension") unless AccountAuthorizationConfig.saml_enabled
-        Setting.set_config("saml", {})
+        ConfigFile.stub('saml', {})
         account = account_with_saml(:account => Account.default)
         flow do
           Onelogin::Saml::Response.any_instance.stubs(:settings=)
@@ -271,7 +271,10 @@ describe "API Authentication", type: :request do
           cas = CASClient::Client.new(:cas_base_url => account.account_authorization_config.auth_base)
           cas.instance_variable_set(:@stub_user, @user)
           def cas.validate_service_ticket(st)
-            st.response = CASClient::ValidationResponse.new("yes\n#{@stub_user.pseudonyms.first.unique_id}\n")
+            response = CASClient::ValidationResponse.new("yes\n#{@stub_user.pseudonyms.first.unique_id}\n")
+            st.user = response.user
+            st.success = response.is_success?
+            return st
           end
           CASClient::Client.stubs(:new).returns(cas)
 
@@ -573,7 +576,6 @@ describe "API Authentication", type: :request do
     end
 
     it "should allow as_user_id" do
-      @student.pseudonyms.create!(:unique_id => 'student', :account => Account.default)
       account_admin_user(:account => Account.site_admin)
       user_with_pseudonym(:user => @user)
 

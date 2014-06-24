@@ -155,8 +155,6 @@ shared_examples_for "an object whose dates are overridable" do
   describe "#dates_hash_visible_to" do
 
     before :each do
-      overridable.active_assignment_overrides.stubs(:visible_to => true)
-
       override.set = course.default_section
       override.override_due_at(7.days.from_now)
       override.save!
@@ -186,7 +184,7 @@ shared_examples_for "an object whose dates are overridable" do
       override2.override_due_at(8.days.from_now)
       override2.save!
 
-      dates_hash = overridable.dates_hash_visible_to(user)
+      dates_hash = overridable.dates_hash_visible_to(@teacher)
       dates_hash.size.should == 2
 
       dates_hash.sort_by! {|d| d[:title] }
@@ -199,155 +197,6 @@ shared_examples_for "an object whose dates are overridable" do
   describe "without_overrides" do
     it "returns an object with no overrides applied" do
       overridable.without_overrides.overridden.should be_false
-    end
-  end
-
-  describe "#overrides_visible_to(user)" do
-    before :each do
-      override.set = course.default_section
-      override.save!
-    end
-
-    it "delegates to visible_to on the active overrides by default" do
-      @expected_value = stub("expected value")
-      overridable.active_assignment_overrides.expects(:visible_to).with(@teacher, course).returns(@expected_value)
-      overridable.overrides_visible_to(@teacher).should == @expected_value
-    end
-
-    it "allows overriding the scope" do
-      override.destroy
-      overridable.overrides_visible_to(@teacher).should be_empty
-      overridable.overrides_visible_to(@teacher, overridable.assignment_overrides(true)).should == [override]
-    end
-
-    it "skips the visible_to application if the scope is already empty" do
-      override.destroy
-      overridable.active_assignment_overrides.expects(:visible_to).times(0)
-      overridable.overrides_visible_to(@teacher)
-    end
-
-    it "returns a scope" do
-      # can't use "should respond_to", because that delegates to the instantiated Array
-      lambda{ overridable.overrides_visible_to(@teacher).scoped }.should_not raise_exception
-    end
-  end
-
-  describe "#due_dates_for(user)" do
-    before :each do
-      course_with_student(:course => course)
-
-      override.set = course.default_section
-      override.override_due_at(2.days.ago)
-      override.save!
-    end
-
-    context "for a student" do
-      before do
-        @as_student, @as_instructor = overridable.due_dates_for(@student)
-      end
-
-      it "does not return instructor dates" do
-        @as_instructor.should be_nil
-      end
-
-      it "returns a relevant student date" do
-        @as_student.should_not be_nil
-      end
-    end
-
-    context "for a teacher" do
-      before do
-        @as_student, @as_instructor = overridable.due_dates_for(@teacher)
-      end
-
-      it "does not return a student date" do
-        @as_student.should be_nil
-      end
-
-      it "returns a list of instructor dates" do
-        @as_instructor.should_not be_nil
-      end
-    end
-
-    it "returns both for a user that's both a student and a teacher" do
-      course_with_ta(:course => course, :user => @student, :active_all => true)
-      as_student, as_instructor = overridable.due_dates_for(@student)
-      as_student.should_not be_nil
-      as_instructor.should_not be_nil
-    end
-
-    it "uses the overridden due date as the applicable due date" do
-      as_student, _ = overridable.due_dates_for(@student)
-      as_student[:due_at].to_i.should == override.due_at.to_i
-
-      if overridable.is_a?(Assignment)
-        as_student[:all_day].should == override.all_day
-        as_student[:all_day_date].should == override.all_day_date
-      end
-    end
-
-    it "doesn't use an overridden due date for a nil user's due dates" do
-      as_student, _ = overridable.overridden_for(@student).due_dates_for(nil)
-      as_student[:due_at].should == overridable.due_at
-    end
-
-    it "includes the base due date in the list of due dates" do
-      _, as_instructor = overridable.due_dates_for(@teacher)
-
-      expected_params = {
-        :base => true,
-        :due_at => overridable.due_at,
-        :lock_at => overridable.lock_at,
-        :unlock_at => overridable.lock_at
-      }
-
-      if overridable.is_a?(Assignment)
-        expected_params.merge!({
-          :all_day => overridable.all_day,
-          :all_day_date => overridable.all_day_date
-        })
-      end
-
-      as_instructor.should include expected_params
-    end
-
-    it "includes visible due date overrides in the list of due dates" do
-      _, as_instructor = overridable.due_dates_for(@teacher)
-      intify_timestamps(as_instructor).should include(intify_timestamps({
-        :id => override.id,
-        :title => @course.default_section.name,
-        :due_at => override.due_at,
-        :all_day => override.all_day,
-        :all_day_date => override.all_day_date,
-        :lock_at => override.lock_at,
-        :set_id => override.set_id,
-        :set_type => override.set_type,
-        :unlock_at => override.unlock_at,
-        :override => override
-      }))
-    end
-
-    it "excludes visible overrides that don't override due_at from the list of due dates" do
-      override.clear_due_at_override
-      override.save!
-
-      _, as_instructor = overridable.due_dates_for(@teacher)
-      as_instructor.size.should == 1
-      as_instructor.first[:base].should be_true
-    end
-
-    it "excludes overrides that aren't visible from the list of due dates" do
-      @enrollment = @teacher.enrollments.first
-      @enrollment.limit_privileges_to_course_section = true
-      @enrollment.save!
-
-      @section2 = course.course_sections.create!
-      override.set = @section2
-      override.save!
-
-      _, as_instructor = overridable.due_dates_for(@teacher)
-      as_instructor.size.should == 1
-      as_instructor.first[:base].should be_true
     end
   end
 
@@ -370,15 +219,14 @@ shared_examples_for "an object whose dates are overridable" do
 
   describe "observed_student_due_dates" do
     it "returns a list of overridden due date hashes" do
-      a = Assignment.new
+      a = assignment_model(:course => @course)
       u = User.new
       student1, student2 = [mock, mock]
 
       { student1 => '1', student2 => '2' }.each do |student, value|
-        a.expects(:overridden_for).with(student).returns \
-          mock(:due_date_hash => { :student => value })
+        a.expects(:all_dates_visible_to).with(student).returns({ :student => value })
       end
-      
+
       ObserverEnrollment.expects(:observed_students).returns({student1 => [], student2 => []})
 
       override_hashes = a.observed_student_due_dates(u)

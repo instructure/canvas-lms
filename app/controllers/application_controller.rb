@@ -122,6 +122,7 @@ class ApplicationController < ActionController::Base
     @js_env[:IS_LARGE_ROSTER] = true if !@js_env[:IS_LARGE_ROSTER] && @context.respond_to?(:large_roster?) && @context.large_roster?
     @js_env[:context_asset_string] = @context.try(:asset_string) if !@js_env[:context_asset_string]
     @js_env[:TIMEZONE] = Time.zone.tzinfo.identifier if !@js_env[:TIMEZONE]
+    @js_env[:CONTEXT_TIMEZONE] = @context.time_zone.tzinfo.identifier if !@js_env[:CONTEXT_TIMEZONE] && @context.respond_to?(:time_zone) && @context.time_zone.present?
     @js_env[:LOCALE] = I18n.qualified_locale if !@js_env[:LOCALE]
     @js_env
   end
@@ -1290,9 +1291,9 @@ class ApplicationController < ActionController::Base
       if [:question_banks].include?(feature)
         true
       elsif feature == :twitter
-        !!Twitter.config
+        !!Twitter::Connection.config
       elsif feature == :facebook
-        !!Facebook.config
+        !!Facebook::Connection.config
       elsif feature == :linked_in
         !!LinkedIn::Connection.config
       elsif feature == :google_docs
@@ -1754,5 +1755,15 @@ class ApplicationController < ActionController::Base
       google_docs = GoogleDocs::Connection.new(session[:oauth_gdocs_access_token_token], session[:oauth_gdocs_access_token_secret])
     end
     google_docs
+  end
+
+
+  def twitter_connection
+    if @current_user
+      service = @current_user.user_services.find_by_service("twitter")
+      return Twitter::Connection.new(service.token, service.secret)
+    else
+      return Twitter::Connection.new(session[:oauth_twitter_access_token_token], session[:oauth_twitter_access_token_secret])
+    end
   end
 end

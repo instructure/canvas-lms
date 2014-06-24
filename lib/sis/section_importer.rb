@@ -21,7 +21,7 @@ module SIS
 
     def process
       start = Time.now
-      importer = Work.new(@batch_id, @root_account, @logger)
+      importer = Work.new(@batch, @root_account, @logger)
       Course.skip_updating_account_associations do
         CourseSection.process_as_sis(@sis_options) do
           yield importer
@@ -29,8 +29,8 @@ module SIS
       end
       Course.update_account_associations(importer.course_ids_to_update_associations.to_a) unless importer.course_ids_to_update_associations.empty?
       importer.sections_to_update_sis_batch_ids.in_groups_of(1000, false) do |batch|
-        CourseSection.where(:id => batch).update_all(:sis_batch_id => @batch_id)
-      end if @batch_id
+        CourseSection.where(:id => batch).update_all(:sis_batch_id => @batch)
+      end if @batch
       @logger.debug("Sections took #{Time.now - start} seconds")
       return importer.success_count
     end
@@ -39,8 +39,8 @@ module SIS
     class Work
       attr_accessor :success_count, :sections_to_update_sis_batch_ids, :course_ids_to_update_associations
 
-      def initialize(batch_id, root_account, logger)
-        @batch_id = batch_id
+      def initialize(batch, root_account, logger)
+        @batch = batch
         @root_account = root_account
         @logger = logger
         @success_count = 0
@@ -105,7 +105,7 @@ module SIS
         section.restrict_enrollments_to_section_dates = (section.start_at.present? || section.end_at.present?) unless section.stuck_sis_fields.include?(:restrict_enrollments_to_section_dates)
 
         if section.changed?
-          section.sis_batch_id = @batch_id if @batch_id
+          section.sis_batch_id = @batch.id if @batch
           if section.valid?
             section.save
           else
@@ -114,7 +114,7 @@ module SIS
             msg += section.errors.full_messages.join(", ") + ")"
             raise ImportError, msg
           end
-        elsif @batch_id
+        elsif @batch
           @sections_to_update_sis_batch_ids << section.id
         end
 

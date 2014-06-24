@@ -25,8 +25,4 @@ describe LtiOutbound::LTIAssignment do
   it_behaves_like 'it has a proc attribute setter and getter for', :points_possible
   it_behaves_like 'it has a proc attribute setter and getter for', :return_types
   it_behaves_like 'it has a proc attribute setter and getter for', :allowed_extensions
-
-  it_behaves_like 'it provides variable mapping', '$Canvas.assignment.id', :id
-  it_behaves_like 'it provides variable mapping', '$Canvas.assignment.title', :title
-  it_behaves_like 'it provides variable mapping', '$Canvas.assignment.pointsPossible', :points_possible
 end

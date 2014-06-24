@@ -917,7 +917,6 @@ en:
         enable_alerts: "Alerts (beta)"
         enable_eportfolios: ePortfolios
         enable_profiles: "Enable Profiles"
-        enable_scheduler: "Enable Calendar 2"
         enable_user_notes: "Faculty Journal"
         end_at: Ends
         equella: Equella
@@ -2597,6 +2596,7 @@ en:
       from: "From:"
       links: 
         more_options: "More Options"
+      location: "Location:"
       timespan_separator: to
       title: "Title:"
     edit_calendar_event_full: 
@@ -2610,6 +2610,8 @@ en:
       end_time: "End Time"
       event_description: "Event Description"
       event_title: "Event Title"
+      location_address: "Address:"
+      location_name: "Location:"
       new_calendar_event_header: "New Calendar Event"
       start_time: "Start Time"
     edit_event: 
@@ -2632,6 +2634,7 @@ en:
         reserve: Reserve
         unreserve: Un-reserve
       location: Location
+      location_address: Address
       message_students: "Message students"
       slots_available: "Slots available"
     event_event_title: "Event Title:"
@@ -2715,9 +2718,11 @@ en:
         create: "Create Event"
         update: "Update Event"
       labels: 
+        address: Address
         date: Date
         event_description: "Event Description"
         from: From
+        location: Location
         title: Title
       no_content: "No Content"
       timespan: "%{start_time} *to* %{end_time}"
@@ -3997,16 +4002,12 @@ en:
     all_in_context: "All in %{context}"
     archive: Archive
     archive_conversation: "Archive conversation"
-    attachment_error: "Attachment failed to upload, please try again."
     autocomplete_result: 
       group_people: "People: %{people}"
       no_results: "No results"
     autocomplete_token: 
       remove_recipient: "Remove recipient"
     back: Back
-    buttons: 
-      add_people: "Add People"
-      send_message: Send
     cannot_add_to_private: "You cannot add participants to a private conversation."
     cannot_be_empty: "Message cannot be blank"
     compose_button_bar: 
@@ -4019,7 +4020,6 @@ en:
     confirm: 
       delete_conversation: "Are you sure you want to delete your copy of this conversation? This action cannot be undone."
       delete_message: "Are you sure you want to delete your copy of this message? This action cannot be undone."
-      delete_messages: "Are you sure you want to delete your copy of these messages? This action cannot be undone."
     context_message: 
       delete_message: "Delete message"
       labels: 
@@ -4042,62 +4042,12 @@ en:
         unsubscribe: Unsubscribe
       inbox_actions_description: "Message Actions Menu"
       read_more: more...
-    conversations_list: 
-      no_archived_messages: "You have no archived messages"
-      no_messages: "You have no messages"
-      no_sent_messages: "You have no sent messages"
-      no_starred_messages: "You have no starred messages"
-      no_unread_messages: "You have no unread messages"
-    conversations_pane: 
-      confirm: 
-        delete_conversation: "Are you sure you want to delete your copy of this conversation? This action cannot be undone."
     course_name: "Course name"
     course_options: 
       course_options: 
         concluded: Concluded
         more_courses: "More Courses"
-    enrollments_everyone: Everyone
-    errors: 
-      field_is_required: "This field is required"
-    filter_by_course: "Filter by this course"
-    filter_by_group: "Filter by this group"
-    headings: 
-      new_message: "New Message"
     hide: Hide
-    index: 
-      add_recipients_instructions: "People you add to the conversation will see all previous messages."
-      conversations_intro: "Conversations Intro"
-      help: Help
-      inbox_actions: 
-        delete: Delete
-        forward: Forward
-      inbox_view: VIEW
-      inbox_views: 
-        archived_messages: Archived
-        inbox: Inbox
-        sent_messages: Sent
-        starred_messages: Starred
-        unread_messages: Unread
-      labels: 
-        filter: Filter
-        message: Message
-        submitted: Submitted
-        to: To
-      links: 
-        compose_new_message: "New Message"
-      more_messages: "%{count} more..."
-      page_title: Conversations
-      send_private_message: "New message..."
-      titles: 
-        compose_new_message: "Write a new message"
-        download_attachment: "Download attachment"
-        play_media_comment: "Play media comment"
-        rss: 
-          conversations: "Conversations Atom Feed"
-        submission_author: "Submission Author"
-        submission_score: "Submission Score"
-        view_submission: "Open submission in new window."
-      try_new_conversations: "Try New Conversations"
     index_new: 
       archive: Archive
       archive_conversation: "Archive conversation"
@@ -4109,7 +4059,6 @@ en:
       filter_messages_by_course: "Filter messages by course"
       filter_messages_by_type: "Filter messages by type"
       forward: Forward
-      help: Help
       inbox: Inbox
       mark_as_read: "Mark as read"
       mark_as_unread: "Mark as unread"
@@ -4123,7 +4072,6 @@ en:
       sent: Sent
       settings: Settings
       starred: Starred
-      switch_to_old_conversations: "Switch Back to Old Conversations"
       titles: 
         conversations: Conversations
       unread: Unread
@@ -4205,80 +4153,24 @@ en:
     more_participants: "+%{total} more"
     no_message: 
       batch_selected: "Multiple Conversations Selected"
-      beta_description: "You are using a beta version of the Canvas inbox"
-      beta_version: "Beta Version"
       no_conversations_selected: "No Conversations Selected"
     no_recipients_choose_another_group: "No recipients are in this group. Please choose another group."
     no_results_found: "No results found"
-    not_applicable: N/A
-    not_scored: "no score"
-    notes_to_self: Monologue
     other: 
       one: "1 other"
       other: "%{count} others"
     other_recipients: 
       one: "and 1 other"
       other: "and %{count} others"
-    people_count: 
-      one: "1 person"
-      other: "%{count} people"
-    recipient_error: "The course or group you have selected has no valid recipients"
     search_category: "Search %{category}"
-    select_all: "Select All"
     star: Star
     star_conversation: "Star conversation"
-    title: 
-      add_recipients: "Add Recipients"
-      forward_messages: "Forward Messages"
     titles: 
-      expand_inline: "Show more comments"
       rss_feed: "Conversations Feed"
-      view_submission: "Open submission in new window."
     unarchive: Unarchive
     unarchive_conversation: "Unarchive conversation"
-    unknown_user: "Unknown user"
-    unspecified_error: "An unexpected error occurred, please try again"
     unstar: Unstar
     unstar_conversation: "Unstar conversation"
-  conversations_intro: 
-    slide1: 
-      paragraph1: "Take a look at your Inbox!"
-      paragraph2: "Conversations—the new Canvas messaging system—has arrived!"
-      paragraph3: "Use Conversations to send a private message to a classmate or use Conversations to talk to an entire group of people."
-      paragraph4: "Ready for a short intro? Click the right arrow to get started."
-    slide2: 
-      paragraph1: "All your conversations are shown on the left side."
-      paragraph2: "You can see who the conversation is with, how many messages there are, and a few lines from the newest message in each conversation."
-    slide3: 
-      paragraph1: "Conversations can be marked as read/unread, starred, or archived using the \"actions\" button on the message."
-      paragraph2: "Archived messages aren't deleted, they're just moved out of your inbox, so you can access them again if needed."
-    slide4: 
-      paragraph1: "When you select a conversation, all the messages for that conversation are shown in the panel on the right. When conversations get long, you can always scroll down to see earlier messages."
-    slide5: 
-      paragraph1: "To begin a message, start by clicking the Compose icon."
-    slide6: 
-      paragraph1: "In the New Message box, start typing the person, or group's name, and they'll show up in the dropdown. Alternatively, you can click the address book icon to find someone if you don't remember a name."
-      paragraph2: "Type your message, click Send, and you're golden."
-    slide7: 
-      paragraph1: "You can send messages to one person or to a group of people. By default all group messages are available to everyone in the group."
-      paragraph2: "If you wanted to send the message privately to all the recipients, uncheck the \"This is a group conversation\" checkbox."
-    slide8: 
-      paragraph1: "You can select one or more messages by clicking the checkbox on the right hand side."
-      paragraph2: "Once selected, you can forward them to someone else, or delete them."
-    slide9: 
-      paragraph1: "We think you'll find Conversations simple and easy to use."
-      paragraph2: "Check out this short introduction video to see Conversations in action."
-      paragraph3: "Your old messages have been organized into Conversations for you. So what are you waiting for? Get started!"
-    titles: 
-      slide1: "Slide 1"
-      slide2: "Slide 2"
-      slide3: "Slide 3"
-      slide4: "Slide 4"
-      slide5: "Slide 5"
-      slide6: "Slide 6"
-      slide7: "Slide 7"
-      slide8: "Slide 8"
-      slide9: "Slide 9"
   correct_answer: "This was the correct answer."
   course: 
     access_denied: "Access was denied"
@@ -6281,6 +6173,7 @@ en:
         is ready to be published and available to all users in the course before continuing.
     google_docs_domain_restriction: "Google Docs Domain Restriction"
     high_contrast: "Use High Contrast Styles"
+    html5_first_videos: "Prefer HTML5 for video playback"
     individual_gradebook: "Individual Gradebook View"
     learning_mastery_gradebook: "Learning Mastery Gradebook"
     new_styles: "Use New Styles"
@@ -6635,6 +6528,7 @@ en:
     error: 
       update: "There was an error updating this assignment. Please refresh the page and try again."
     errors: 
+      no_points_possible: "Cannot curve without points possible"
       none_to_update: "None to Update"
       upload_as_zip: "Please upload files as a .zip"
     grade_display_warning: 
@@ -6979,6 +6873,7 @@ en:
       grades: Grades
       hide_student_names: "Hide Student Names"
       include_ungraded: "Treat Ungraded as 0"
+      individual_view: "Switch to Individual View"
       learning_mastery: "Learning Mastery"
       old_gradebook: "old gradebook"
       post_grades: "Post Grades"
@@ -6986,7 +6881,6 @@ en:
       set_group_weights: "Set Group Weights"
       show_attendance_columns: "Show Attendance Columns"
       show_concluded_enrollments: "Show Concluded Enrollments"
-      srgb_gradebook: "switch gradebooks"
       upload_scores: "Upload Scores (from .csv)"
       view_grading_history: "View Grading History"
     grades: 
@@ -7022,7 +6916,7 @@ en:
     out_of_final: "%{weight} of Final"
     out_of_points_possible: "out of %{points_possible}"
     screenreader: 
-      page_titles: "Screenreader Gradebook"
+      page_titles: "Gradebook: Individual View"
     show: 
       keycode_descriptions: 
         edit_cell: "Edit Cell"
@@ -7607,6 +7501,9 @@ en:
   high_contrast_description: |-
       If you would prefer a higher-contrast version of the Canvas user interface, enable this.
       This might be useful for people with impaired vision or dificulty reading.
+  html5_first_videos_description: |-
+      By default, Canvas will try to use Flash first to play videos. Turn this on to try using HTML5 first,
+      then fall back to Flash.
   ic_actions: 
     manage: manage
   images: 
@@ -7758,7 +7655,7 @@ en:
         locked_by: "Locked By"
         max_attempts: "Max Attempts"
         num_attempts: Attempts
-        original_id: "Original ID"
+        original_job_id: "Original Job ID"
         priority: Priority
         run_at: "Run At"
         strand: strand
@@ -10498,8 +10395,16 @@ en:
       secret_description: "This is the %{parameter_name} parameter that can be found in the %{filename} config file."
     buttons: 
       saving: Saving...
+    canvadocs: 
+      description: "Enable Canvadocs (compatible with Box View) as a document preview option"
+      name: Canvadocs
+    canvadocs_settings: 
+      description: "This plugin integrates with Canvadocs (or any Box View compatible API) to provide an HTML5 document previewer."
+      labels: 
+        api_key: "API Key"
+        base_url: "Base URL"
     crocodoc: 
-      description: "Enabled Crocodoc as a document preview option"
+      description: "Enable Crocodoc as a document preview option"
       name: Crocodoc
     crocodoc_settings: 
       description: "This plugin integrates with Crocodoc to provide an HTML5 document previewer which provides teachers and students with the ability to annotate documents."
@@ -10551,20 +10456,18 @@ en:
       name: Facebook
     facebook_settings: 
       description: |-
-          You will need to create a [new app on facebook.com](%{facebook_url}).
+          You will need to create a [new app on facebook.com](%{facebook_url}), and add 'App on Facebook' as a platform.
           Set the following configuration options to ensure your Facebook app
           works correctly:
           
-          * **Web Site -- Site URL:** set to %{site_url}
-          * **Web Site -- Site Domain:** domain of your main Canvas site.  This must match the Site URL setting
-          * **Facebook Integration -- Canvas Page:** make a note of whatever you choose and enter in the form below
-          * **Facebook Integration -- Canvas URL:** set to %{canvas_url}
-          * Make sure **Advanced -- OAuth 2.0 for Canvas** is enabled
-          * After you save your app, make a note of the App ID, API Key and App Secret
+          * **Settings -- App on Facebook -- Canvas Page:** make a note of whatever you choose (the part after apps.facebook.com) and enter in the form below
+          * **Settings -- App on Facebook -- Canvas URL:** set to %{canvas_url}
+          * After you save your app, make a note of the App ID, Client Token and App Secret
       domain_name: domain
       headers: 
         domain_settings: "Domain Settings"
       hints: 
+        api_key: "Also referred to as Client Token"
         canvas_domain: "this is the domain specified in \"Canvas URL\""
         canvas_name: "this is the path specified in \"Canvas Page\""
         disable_ssl: "Use only for local testing"
@@ -13826,7 +13729,7 @@ en:
       paper_view: "Paper View"
       plain_view: "Plain Text View"
       preview_crocodoc_document: "Preview your submission and view teacher feedback, if available"
-      preview_scribd_document: "Preview your submission"
+      preview_submission: "Preview your submission"
       preview_title: "Preview of %{title}"
       quiz_submission: "This submission was a quiz submission. Redirecting to quiz page."
       show_entire_discussion: "Show the Entire Discussion"

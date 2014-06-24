@@ -30,7 +30,8 @@ class DiscussionTopic < ActiveRecord::Base
 
   attr_accessible :title, :message, :user, :delayed_post_at, :lock_at, :assignment,
     :plaintext_message, :podcast_enabled, :podcast_has_student_posts,
-    :require_initial_post, :threaded, :discussion_type, :context, :pinned, :locked
+    :require_initial_post, :threaded, :discussion_type, :context, :pinned, :locked,
+    :group_category, :group_category_id
 
   module DiscussionTypes
     SIDE_COMMENT = 'side_comment'
@@ -51,10 +52,20 @@ class DiscussionTopic < ActiveRecord::Base
   belongs_to :editor, :class_name => 'User'
   belongs_to :old_assignment, :class_name => 'Assignment'
   belongs_to :root_topic, :class_name => 'DiscussionTopic'
+  belongs_to :group_category
   has_many :child_topics, :class_name => 'DiscussionTopic', :foreign_key => :root_topic_id, :dependent => :destroy
   has_many :discussion_topic_participants, :dependent => :destroy
   has_many :discussion_entry_participants, :through => :discussion_entries
   belongs_to :user
+
+  EXPORTABLE_ATTRIBUTES = [
+    :id, :title, :message, :context_id, :context_type, :type, :user_id, :workflow_state, :last_reply_at, :created_at, :updated_at, :delayed_post_at, :posted_at, :assignment_id,
+    :attachment_id, :deleted_at, :root_topic_id, :could_be_locked, :cloned_item_id, :context_code, :position, :subtopics_refreshed_at, :last_assignment_id, :external_feed_id,
+    :editor_id, :podcast_enabled, :podcast_has_student_posts, :require_initial_post, :discussion_type, :lock_at, :pinned, :locked
+  ]
+
+  EXPORTABLE_ASSOCIATIONS = [:discussion_entries, :external_feed_entry, :external_feed, :context, :assignment, :attachment, :editor, :root_topic, :child_topics, :discussion_entry_participants, :user]
+
   validates_presence_of :context_id, :context_type
   validates_inclusion_of :discussion_type, :in => DiscussionTypes::TYPES
   validates_length_of :message, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
@@ -108,12 +119,27 @@ class DiscussionTopic < ActiveRecord::Base
     if self.assignment_id
       self.assignment_id = nil unless (self.assignment && self.assignment.context == self.context) || (self.root_topic && self.root_topic.assignment_id == self.assignment_id)
       self.old_assignment_id = self.assignment_id if self.assignment_id
-      if self.assignment && self.assignment.submission_types == 'discussion_topic' && self.assignment.has_group_category?
-        self.subtopics_refreshed_at ||= Time.parse("Jan 1 2000")
-      end
+    end
+    if self.has_group_category?
+      self.subtopics_refreshed_at ||= Time.parse("Jan 1 2000")
     end
   end
   protected :default_values
+
+  # TODO: These overrides for assignment's group_category can be removed after the migration.
+  alias_method :raw_group_category, :group_category
+
+  def group_category
+    return raw_group_category || (self.assignment && self.assignment.group_category)
+  end
+
+  def legacy_group_category_id
+    return self.group_category.id if self.group_category
+  end
+
+  def has_group_category?
+    self.group_category.present?
+  end
 
   def set_schedule_delayed_transitions
     @should_schedule_delayed_post = self.delayed_post_at? && self.delayed_post_at_changed?
@@ -132,14 +158,14 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def update_subtopics
-    if !self.deleted? && self.assignment && self.assignment.submission_types == 'discussion_topic' && self.assignment.has_group_category?
+    if !self.deleted? && self.has_group_category?
       send_later_if_production :refresh_subtopics
     end
   end
 
   def refresh_subtopics
     return if self.deleted?
-    category = self.assignment.try(:group_category)
+    category = self.group_category
     return unless category && self.root_topic_id.blank?
     category.groups.active.each do |group|
       group.shard.activate do
@@ -149,6 +175,7 @@ class DiscussionTopic < ActiveRecord::Base
           topic.message = self.message
           topic.title = "#{self.title} - #{group.name}"
           topic.assignment_id = self.assignment_id
+          topic.group_category_id = self.group_category_id
           topic.user_id = self.user_id
           topic.discussion_type = self.discussion_type
           topic.workflow_state = self.workflow_state
@@ -205,7 +232,7 @@ class DiscussionTopic < ActiveRecord::Base
   def is_announcement; false end
 
   def root_topic?
-    !self.root_topic_id && self.assignment_id && self.assignment.has_group_category?
+    !self.root_topic_id && self.has_group_category?
   end
 
   # only the root level entries
@@ -222,8 +249,8 @@ class DiscussionTopic < ActiveRecord::Base
     self.assignment && self.assignment.submission_types =~ /discussion_topic/
   end
 
-  def for_group_assignment?
-    self.for_assignment? && self.context == self.assignment.context && self.assignment.has_group_category?
+  def for_group_discussion?
+    self.has_group_category? && self.root_topic?
   end
 
   def plaintext_message=(val)
@@ -543,9 +570,17 @@ class DiscussionTopic < ActiveRecord::Base
   def can_unpublish?
     if self.assignment
       !self.assignment.has_student_submissions?
+    elsif self.for_group_discussion?
+      self.child_topics.all? do |child|
+        child.discussion_subentry_count == 0
+      end
     else
       self.discussion_subentry_count == 0
     end
+  end
+
+  def can_group?
+    can_unpublish?
   end
 
   def should_send_to_stream
@@ -553,7 +588,7 @@ class DiscussionTopic < ActiveRecord::Base
       false
     elsif self.cloned_item_id
       false
-    elsif self.assignment && self.root_topic_id && self.assignment.has_group_category?
+    elsif self.root_topic_id && self.has_group_category?
       false
     elsif self.assignment && self.assignment.submission_types == 'discussion_topic' && (!self.assignment.due_at || self.assignment.due_at > 1.week.from_now) # TODO: vdd
       false
@@ -906,18 +941,6 @@ class DiscussionTopic < ActiveRecord::Base
     super
     Rails.cache.delete(assignment.locked_cache_key(user)) if assignment
     Rails.cache.delete(root_topic.locked_cache_key(user)) if root_topic
-  end
-
-  def self.process_migration(data, migration)
-    # TODO: access Importers::DiscussionTopic directly
-    Importers::DiscussionTopicImporter.process_migration(data, migration)
-  end
-
-  def self.import_from_migration(*args)
-    # TODO: access Importers::DiscussionTopic directly
-    # this class method will eventually go away. leaving now
-    # for edge cases that may be using it.
-    Importers::DiscussionTopicImporter.import_from_migration(*args)
   end
 
   def self.podcast_elements(messages, context)

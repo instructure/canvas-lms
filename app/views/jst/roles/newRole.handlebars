@@ -1,14 +1,14 @@
 <div class="btn-group">
-  <a class="btn btn-primary dropdown-toggle" aria-role="link" href="#" data-toggle="dropdown" aria-haspopup="true">Add Role</a>
+  <a class="btn btn-primary dropdown-toggle" aria-role="link" href="#" data-toggle="dropdown" aria-haspopup="true">{{#t "add_role"}}Add Role{{/t}}</a>
   <div class="dropdown-menu bootstrap-form new-role" aria-hidden="true">
     <form class="form-inline">
-      <input type='text' aria-label="Role Name" tabindex=1 placeholder="Role name"></input>
+        <input type='text' aria-label="{{#t "role_name_label"}}Role Name{{/t}}" tabindex=1 placeholder="{{#t "role_name"}}Role name{{/t}}"></input>
       <select aria-label="Role Basetype" tabindex=2 {{#if adminRoles }}disabled{{/if}}>
         {{#each base_role_types}}
           <option role="menuitem" value="{{value}}">{{ label }}</option>
         {{/each}}
       </select>
-      <button type="submit" class="btn btn-primary" aria-label="Add Role" tabindex=3><i class="icon-add"></i> Add</button>
+      <button type="submit" class="btn btn-primary" aria-label="{{#t "add_role_label"}}Add Role{{/t}}" tabindex=3><i class="icon-add"></i> {{#t "add"}}Add{{/t}}</button>
     <form>
   </div>
 </div>

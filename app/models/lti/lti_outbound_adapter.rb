@@ -30,6 +30,7 @@ module Lti
       lti_context = Lti::LtiContextCreator.new(@context, @tool).convert
       lti_user = Lti::LtiUserCreator.new(@user, @root_account, @tool, @context).convert
       lti_tool = Lti::LtiToolCreator.new(@tool).convert
+      lti_account = Lti::LtiAccountCreator.new(@context, @tool).convert
 
       @tool_launch = LtiOutbound::ToolLaunch.new({
                                       url: launch_url,
@@ -40,7 +41,8 @@ module Lti
                                       outgoing_email_address: HostUrl.outgoing_email_address,
                                       context: lti_context,
                                       user: lti_user,
-                                      tool: lti_tool
+                                      tool: lti_tool,
+                                      account: lti_account
                                   })
       self
     end

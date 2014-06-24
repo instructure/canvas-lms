@@ -84,12 +84,10 @@ $subtleBorderColor: #e5e5e5;
 
   .message-header {
     box-sizing: border-box;
-    -moz-box-sizing: border-box;
   }
 
   .message-body {
     box-sizing: border-box;
-    -moz-box-sizing: border-box;
     width: 100%;
   }
 
@@ -191,10 +189,6 @@ $subtleBorderColor: #e5e5e5;
   }
 
   .attachment-name-clip {
-    background: -ms-linear-gradient(top, transparent 60%, #fff 90%);
-    background: -moz-linear-gradient(top, rgba(255,255,255,0) 60%, rgba(255,255,255,1) 90%);
-    background: -o-linear-gradient(top, transparent 60%, #fff 90%);
-    background: -webkit-linear-gradient(top, transparent 60%, #fff 90%);
     background: linear-gradient(top, transparent 60%, #fff 90%);
     position: absolute;
     top: 55px;
@@ -202,10 +196,6 @@ $subtleBorderColor: #e5e5e5;
   }
 
   .attachment:focus .attachment-name-clip {
-    background: -ms-linear-gradient(top, transparent 95%, #08c 99%);
-    background: -moz-linear-gradient(top, transparent 95%, #08c 99%);
-    background: -o-linear-gradient(top, transparent 95%, #08c 99%);
-    background: -webkit-linear-gradient(top, transparent 95%, #08c 99%);
     background: linear-gradient(top, transparent 95%, #08c 99%);
     border-radius: 10px;
   }
@@ -224,7 +214,6 @@ $subtleBorderColor: #e5e5e5;
     border: none;
     box-shadow: none;
     box-sizing: border-box;
-    -moz-box-sizing: border-box;
   }
 
   .token_input {
@@ -233,7 +222,7 @@ $subtleBorderColor: #e5e5e5;
     border: 1px solid #cccccc;
     line-height: inherit;
 
-    @include border-radius(4px);
+    border-radius: 4px;
     a.browser {
       top: 4px;
       right: 5px;
@@ -258,7 +247,6 @@ $subtleBorderColor: #e5e5e5;
     .message-header-label {
       display: table-cell;
       box-sizing: border-box;
-      -moz-box-sizing: border-box;
       padding: 10px 15px 10px 5px;
       text-align: right;
       width: 1px;
@@ -275,7 +263,6 @@ $subtleBorderColor: #e5e5e5;
 
       input {
         box-sizing: border-box;
-        -moz-box-sizing: border-box;
         height: auto;
       }
       input[type="text"] {
