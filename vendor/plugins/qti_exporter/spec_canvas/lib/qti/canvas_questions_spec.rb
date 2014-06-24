@@ -191,7 +191,7 @@ module CanvasExpected
                                {:comments=>"I don't know!",
                                 :weight=>100,
                                 :migration_id=>"RESPONSE_6878",
-                                :text=>"I'll do that!"},
+                                :text=>"Ill do that!"},
                                {:comments=>"baby.",
                                 :weight=>0,
                                 :migration_id=>"RESPONSE_491",
