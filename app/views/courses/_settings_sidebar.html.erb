@@ -4,6 +4,9 @@
       href="<%= course_external_tool_path(@context, tool, launch_type: 'course_settings_sub_navigation') %>">
       <img class="icon" src="<%= tool.course_settings_sub_navigation(:icon_url) %>" />
       <%= tool.label_for(:course_settings_sub_navigation) %>
+      <% if tool.integration_type == 'lor' %>
+        <span class="badge new_badge pull-right"><%= t('links.new_badge', 'New') %></span>
+      <% end %>
     </a>
   <% end %>
   <% if can_do(@context, @current_user, :use_student_view) %>
