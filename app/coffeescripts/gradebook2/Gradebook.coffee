@@ -61,8 +61,6 @@ define [
 
     DISPLAY_PRECISION = 2
 
-    numberOfFrozenCols: 2
-
     hasSections: $.Deferred()
     allSubmissionsLoaded: $.Deferred()
 
@@ -79,6 +77,8 @@ define [
       @userFilterRemovedRows = []
       @show_concluded_enrollments = userSettings.contextGet 'show_concluded_enrollments'
       @show_concluded_enrollments = true if @options.course_is_concluded
+      @totalColumnInFront = userSettings.contextGet 'total_column_in_front'
+      @numberOfFrozenCols = if @totalColumnInFront then 3 else 2
 
       $.subscribe 'assignment_group_weights_changed', @handleAssignmentGroupWeightChange
       $.subscribe 'assignment_muting_toggled',        @handleAssignmentMutingChange
@@ -413,7 +413,14 @@ define [
         showingPoints: @displayPointTotals
         toggleShowingPoints: @togglePointsOrPercentTotals.bind(this)
         weightedGroups: @weightedGroups
+        totalColumnInFront: @totalColumnInFront
+        moveTotalColumn: @moveTotalColumn.bind(this)
       @totalHeader.render()
+
+    moveTotalColumn: =>
+      @totalColumnInFront = not @totalColumnInFront
+      userSettings.contextSet 'total_column_in_front', @totalColumnInFront
+      window.location.reload()
 
     assignmentGroupHtml: (group_name, group_weight) =>
       escaped_group_name = htmlEscape(group_name)
@@ -1035,7 +1042,7 @@ define [
         }
 
       total = I18n.t "total", "Total"
-      @aggregateColumns.push
+      total_column =
         id: "total_grade"
         field: "total_grade"
         formatter: @groupTotalFormatter
@@ -1047,9 +1054,12 @@ define [
         minWidth: columnWidths.total.min
         maxWidth: columnWidths.total.max
         width: testWidth("Total", columnWidths.total.min, columnWidths.total.max)
-        cssClass: "total-cell"
+        cssClass: if @totalColumnInFront then 'meta-cell' else 'total-cell'
         sortable: true
         type: 'total_grade'
+
+      (if @totalColumnInFront then @parentColumns else
+        @aggregateColumns).push total_column
 
       $widthTester.remove()
 
