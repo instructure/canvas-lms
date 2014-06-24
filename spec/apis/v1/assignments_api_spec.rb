@@ -298,6 +298,21 @@ describe AssignmentsApiController, type: :request do
         @json.has_key?('only_visible_to_overrides').should be_true
         @json['only_visible_to_overrides'].should be_false
       end
+
+      it "should include visibility data if included" do
+        @course.account.enable_feature!(:differentiated_assignments)
+        json =  api_call(:get,
+            "/api/v1/courses/#{@course.id}/assignments.json",
+            {
+              :controller => 'assignments_api', :action => 'index',
+              :format => 'json', :course_id => @course.id.to_s
+            },
+            :include => ['assignment_visibility']
+          )
+        json.each do |a|
+          a.has_key?("assignment_visibility").should == true
+        end
+      end
     end
 
     it "includes submission info with include flag" do
@@ -1812,6 +1827,50 @@ describe AssignmentsApiController, type: :request do
         json = api_get_assignment_in_course(@assignment, @course)
         response.should be_success
         json['unpublishable'].should == false
+      end
+    end
+
+    context "differentiated assignments" do
+      before :once do
+        course_with_teacher_logged_in(:active_all => true)
+        @course.enable_feature!(:differentiated_assignments)
+        @assignment1 = @course.assignments.create! :only_visible_to_overrides => true
+        @assignment2 = @course.assignments.create! :only_visible_to_overrides => true
+        section1 = @course.course_sections.create!
+        section2 = @course.course_sections.create!
+        @student1 = User.create!(name: "Test Student")
+        @student2 = User.create!(name: "Test Student2")
+        @student3 = User.create!(name: "Test Student3")
+        student_in_section(section1, user: @student1)
+        student_in_section(section2, user: @student2)
+        student_in_section(section2, user: @student3)
+        create_section_override_for_assignment(@assignment1, {course_section: section1})
+        create_section_override_for_assignment(@assignment2, {course_section: section2})
+      end
+
+      def visibility_api_request(assignment)
+        api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}.json",
+          {
+            :controller => 'assignments_api', :action => 'show',
+            :format => 'json', :course_id => @course.id.to_s,
+            :id => assignment.id.to_s
+          },
+          :include => ['assignment_visibility']
+        )
+      end
+
+      it "includes assignment_visibility" do
+        json = visibility_api_request @assignment1
+        json.has_key?("assignment_visibility").should == true
+      end
+
+      it "assignment_visibility includes the correct user_ids" do
+        json = visibility_api_request @assignment1
+        json["assignment_visibility"].include?(@student1.id).should == true
+        json = visibility_api_request @assignment2
+        json["assignment_visibility"].include?(@student2.id).should == true
+        json["assignment_visibility"].include?(@student3.id).should == true
       end
     end
   end

@@ -389,7 +389,7 @@
 #           "type": "boolean"
 #         },
 #         "only_visible_to_overrides": {
-#           "description": "(Only visible if 'differentiated assignments' account setting is on) Whether the assignment is only visible to overrides.",
+#           "description": "(Only visible if the Differentiated Assignments course feature is turned on) Whether the assignment is only visible to overrides.",
 #           "example": false,
 #           "type": "boolean"
 #         },
@@ -455,6 +455,11 @@
 #         "rubric": {
 #           "description": "(Optional) A list of scoring criteria and ratings for each rubric criterion. Included if there is an associated rubric.",
 #           "$ref": "RubricCriteria"
+#         },
+#         "assignment_visibility": {
+#           "description": "(Optional) If 'assignment_visibility' is included in the 'include' parameter, includes an array of student IDs who can see this assignment.",
+#           "example": "[137,381,572]",
+#           "type": "array"
 #         }
 #       }
 #     }
@@ -466,8 +471,9 @@ class AssignmentsApiController < ApplicationController
 
   # @API List assignments
   # Returns the list of assignments for the current context.
-  # @argument include[] [String, "submission"]
-  #   Associations to include with the assignment.
+  # @argument include[] [String, "submission"|"assignment_visibility"]
+  #   Associations to include with the assignment. The "assignment_visibility" option
+  #   requires that the Differentiated Assignments course feature be turned on.
   # @argument search_term [Optional, String]
   #   The partial title of the assignments to match and return.
   # @argument override_assignment_dates [Optional, Boolean]
@@ -513,10 +519,13 @@ class AssignmentsApiController < ApplicationController
           each { |a| a.has_no_overrides = true }
       end
 
+      include_visibility = Array(params[:include]).include?('assignment_visibility')
+
       hashes = assignments.map do |assignment|
         submission = submissions[assignment.id]
         assignment_json(assignment, @current_user, session,
-                        submission: submission, override_dates: override_dates)
+                        submission: submission, override_dates: override_dates,
+                        include_visibility: include_visibility)
       end
 
       render :json => hashes
@@ -525,8 +534,9 @@ class AssignmentsApiController < ApplicationController
 
   # @API Get a single assignment
   # Returns the assignment with the given id.
-  # @argument include[] [String, "submission"]
-  #   Associations to include with the assignment.
+  # @argument include[] [String, "submission"|"assignment_visibility"]
+  #   Associations to include with the assignment. The "assignment_visibility" option
+  #   requires that the Differentiated Assignments course feature be turned on.
   # @argument override_assignment_dates [Optional, Boolean]
   #   Apply assignment overrides to the assignment, defaults to true.
   # @returns Assignment
@@ -538,13 +548,16 @@ class AssignmentsApiController < ApplicationController
         submission = @assignment.submissions.for_user(@current_user).first
       end
 
+      include_visibility = Array(params[:include]).include?('assignment_visibility')
+
       override_param = params[:override_assignment_dates] || true
       override_dates = value_to_boolean(override_param)
 
       @assignment.context_module_action(@current_user, :read) unless @assignment.locked_for?(@current_user, :check_policies => true)
       render :json => assignment_json(@assignment, @current_user, session,
                                       submission: submission,
-                                      override_dates: override_dates)
+                                      override_dates: override_dates,
+                                      include_visibility: include_visibility)
     end
   end
 

@@ -91,9 +91,10 @@ class AssignmentGroupsController < ApplicationController
   # Returns the list of assignment groups for the current context. The returned
   # groups are sorted by their position field.
   #
-  # @argument include[] [String, "assignments"|"discussion_topic"|"all_dates"]
-  #  Associations to include with the group. both "discussion_topic" and
-  #  "all_dates" is only valid are only valid if "assignments" is also included.
+  # @argument include[] [String, "assignments"|"discussion_topic"|"all_dates"|"assignment_visibility"]
+  #  Associations to include with the group. "discussion_topic", "all_dates"
+  #  "assignment_visibility" are only valid are only valid if "assignments" is also included.
+  #  The "assignment_visibility" option additionally requires that the Differentiated Assignments course feature be turned on.
   #
   # @argument override_assignment_dates [Optional, Boolean]
   #   Apply assignment overrides for each assignment, defaults to true.

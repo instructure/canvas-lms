@@ -190,6 +190,10 @@ module Api::V1::Assignment
 
     if assignment.context.feature_enabled?(:differentiated_assignments)
       hash['only_visible_to_overrides'] = value_to_boolean(assignment.only_visible_to_overrides)
+
+      if opts[:include_visibility]
+        hash['assignment_visibility'] = assignment.students_with_visibility.pluck(:id).uniq
+      end
     end
 
     if submission = opts[:submission]

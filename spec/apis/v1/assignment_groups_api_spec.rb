@@ -129,40 +129,61 @@ describe AssignmentGroupsController, type: :request do
     compare_json(json, expected)
   end
 
-  it "should only return visible assignments when differentiated assignments is on" do
-    set_up_course_with_groups
-    set_up_four_assignments(only_visible_to_overrides: true)
-    @user.enrollments.each(&:delete)
-    @section = @course.course_sections.create!(name: "test section")
-    student_in_section(@section, user: @user)
-    # make a1 and a3 visible
-    create_section_override_for_assignment(@a1, course_section: @section)
-    @a3.grade_student(@user, {grade: 10})
+  context "differentiated assignments on" do
+    it "should only return visible assignments when differentiated assignments is on" do
+      set_up_course_with_groups
+      set_up_four_assignments(only_visible_to_overrides: true)
+      @user.enrollments.each(&:delete)
+      @section = @course.course_sections.create!(name: "test section")
+      student_in_section(@section, user: @user)
+      # make a1 and a3 visible
+      create_section_override_for_assignment(@a1, course_section: @section)
+      @a3.grade_student(@user, {grade: 10})
 
-    [@a1, @a2, @a3, @a4].each(&:reload)
+      [@a1, @a2, @a3, @a4].each(&:reload)
 
-    @course.enable_feature!(:differentiated_assignments)
+      @course.enable_feature!(:differentiated_assignments)
 
-    json = api_call(:get,
+      json = api_call(:get,
           "/api/v1/courses/#{@course.id}/assignment_groups.json?include[]=assignments",
           { :controller => 'assignment_groups', :action => 'index',
             :format => 'json', :course_id => @course.id.to_s,
             :include => ['assignments'] })
 
-    json.each do |ag_json|
-      ag_json["assignments"].length.should == 1
+      json.each do |ag_json|
+        ag_json["assignments"].length.should == 1
+      end
+
+      @course.disable_feature!(:differentiated_assignments)
+
+      json = api_call(:get,
+          "/api/v1/courses/#{@course.id}/assignment_groups.json?include[]=assignments",
+          { :controller => 'assignment_groups', :action => 'index',
+            :format => 'json', :course_id => @course.id.to_s,
+            :include => ['assignments'] })
+
+      json.each do |ag_json|
+        ag_json["assignments"].length.should == 2
+      end
     end
 
-    @course.disable_feature!(:differentiated_assignments)
-
-    json = api_call(:get,
-          "/api/v1/courses/#{@course.id}/assignment_groups.json?include[]=assignments",
-          { :controller => 'assignment_groups', :action => 'index',
-            :format => 'json', :course_id => @course.id.to_s,
-            :include => ['assignments'] })
-
-    json.each do |ag_json|
-      ag_json["assignments"].length.should == 2
+    it "should include assignment_visibility when requested" do
+      course_with_teacher active_all: true
+      @course.assignments.create!
+      @course.enable_feature!(:differentiated_assignments)
+      json = api_call(:get,
+        "/api/v1/courses/#{@course.id}/assignment_groups.json",
+        {
+          :controller => 'assignment_groups', :action => 'index',
+          :format => 'json', :course_id => @course.id.to_s
+        },
+        :include => ['assignments', 'assignment_visibility']
+      )
+      json.each do |ag|
+        ag["assignments"].each do |a|
+          a.has_key?("assignment_visibility").should == true
+        end
+      end
     end
   end
 
@@ -384,6 +405,24 @@ describe AssignmentGroupsApiController, type: :request do
         :include => ['assignments'])
 
       json['assignments'].should_not be_empty
+    end
+
+    it "should include assignment_visibility when requested and with DA on" do
+      @course.enable_feature!(:differentiated_assignments)
+      @course.assignments.create!(:title => "test", :assignment_group => @group, :points_possible => 10)
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups/#{@group.id}.json",
+        {
+          :controller => 'assignment_groups_api',
+          :action => 'show',
+          :format => 'json',
+          :course_id => @course.id.to_s,
+          :assignment_group_id => @group.id.to_s
+        },
+        :include => ['assignments', 'assignment_visibility']
+      )
+      json['assignments'].each do |a|
+        a.has_key?("assignment_visibility").should == true
+      end
     end
 
     it 'should return never_drop rules as strings with Accept header' do
