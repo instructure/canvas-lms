@@ -1,12 +1,14 @@
-<% add_crumb t('crumbs.course_exports', "Content Exports") %>
-<% content_for :page_title do %><%= t :page_title, "Content Exports" %><% end %>
+<% title = @context.is_a?(Course) ? t('content_exports', "Content Exports") : t('user_data_exports', "User Data Exports") %>
+
+<% add_crumb title %>
+<% content_for :page_title do %><%= title %><% end %>
 
 <% content_for :page_header do %>
-    <h1><%= t :page_title, "Content Exports" %></h1>
+    <h1><%= title %></h1>
 <% end %>
 
 <div>
-  <h2><%= t :page_title, "Content Exports" %></h2>
+  <h2><%= title %></h2>
   
   <div class="export_messages" style="<%= hidden %>">
     <div class="ui-state-error error_message"></div>
@@ -17,14 +19,14 @@
       <% unless export.running? %>
         <% if export.workflow_state == 'exported' #&& export.attachment %>
           <p>
-            <% if export.export_type == 'common_cartridge' %>
-              <%= t 'links.download', "Course Export from %{date}: *Click here to download*",
-                      :date => "<span class=\"created_at time_ago_date\" data-timestamp=\"#{export.created_at.iso8601}\">#{datetime_string export.created_at}</span>".html_safe,
-                      :wrapper => link_to('\1', export.attachment ? verified_file_download_url(export.attachment) : nil) %>
-            <% else %>
-              <%= t 'links.download_qti', "QTI Export from %{date}: *Click here to download*",
-                      :date => "<span class=\"created_at time_ago_date\" data-timestamp=\"#{export.created_at.iso8601}\">#{datetime_string export.created_at}</span>".html_safe,
-                      :wrapper => link_to('\1', export.attachment ? verified_file_download_url(export.attachment) : nil) %>
+            <% date = "<span class=\"created_at time_ago_date\" data-timestamp=\"#{export.created_at.iso8601}\">#{datetime_string export.created_at}</span>".html_safe %>
+            <% wrapper = link_to('\1', export.attachment ? verified_file_download_url(export.attachment) : nil) %>
+            <% if export.export_type == ContentExport::COMMON_CARTRIDGE %>
+              <%= t 'links.download', "Course Export from %{date}: *Click here to download*", :date => date, :wrapper => wrapper %>
+            <% elsif export.export_type == ContentExport::QTI %>
+              <%= t 'links.download_qti', "QTI Export from %{date}: *Click here to download*", :date => date, :wrapper => wrapper %>
+            <% elsif export.export_type == ContentExport::USER_DATA %>
+              <%= t 'links.download_user_export', "User Data Export from %{date}: *Click here to download*", :date => date, :wrapper => wrapper %>
             <% end %>
           </p>
         <% end %>
@@ -33,33 +35,48 @@
   </div>
 
   <div class="form" style="<%= hidden if @current_export_id %>">
-    <%= form_tag course_content_exports_path(@context.id), :id => "exporter_form" do %>
-      <fieldset>
-        <legend><%= t :export_type, "Export Type" %></legend>
-        <div>
-          <input type="radio" name="export_type" value="common_cartridge" id="cc_export_radio" checked>
-          <label for="cc_export_radio"><%= t 'labels.course', 'Course' %></label>
-        </div>
-        <div>
-          <input type="radio" name="export_type" value="qti" id="qti_export_radio">
-          <label for="qti_export_radio"><%= t 'labels.quiz', 'Quiz' %></label>
-          <div id="quiz_selection" style="display:none;">
-            <%= render :partial => 'quiz_export_checklist' %>
+    <% if @context.is_a?(Course) %>
+      <%= form_tag course_content_exports_path(@context.id), :id => "exporter_form" do %>
+        <fieldset>
+          <legend><%= t :export_type, "Export Type" %></legend>
+          <div>
+            <input type="radio" name="export_type" value="common_cartridge" id="cc_export_radio" checked>
+            <label for="cc_export_radio"><%= t 'labels.course', 'Course' %></label>
           </div>
+          <div>
+            <input type="radio" name="export_type" value="qti" id="qti_export_radio">
+            <label for="qti_export_radio"><%= t 'labels.quiz', 'Quiz' %></label>
+            <div id="quiz_selection" style="display:none;">
+              <%= render :partial => 'quiz_export_checklist' %>
+            </div>
+          </div>
+        </fieldset>
+        <div>
+          <button type="submit" class="submit_button btn btn-primary"><%= t 'buttons.create', "Create Export" %></button>
         </div>
-      </fieldset>
-      <div>
-        <button type="submit" class="submit_button btn btn-primary"><%= t 'buttons.create', "Create Export" %></button>
-      </div>
-      <div class="clear"></div>
+        <div class="clear"></div>
+      <% end %>
+    <% elsif @context == @current_user %>
+      <% if @current_user.submissions.exists? %>
+        <%= form_tag dashboard_content_exports_path, :id => "exporter_form" do %>
+          <div>
+            <button type="submit" class="submit_button btn btn-primary"><%= t 'buttons.create', "Create Export" %></button>
+          </div>
+          <div class="clear"></div>
+        <% end %>
+      <% else %>
+        <%= t('no_submissions', "You currently have no submissions to export.") %>
+      <% end %>
     <% end %>
   </div>
   
   <div class="progress_bar_holder" style="<%= hidden unless @current_export_id %> margin-top: 10px;">
       <div class="export_progress"></div>
-      <div class="progress_message">
-        <%= mt 'message.export_started', "The export process has started. This can take awhile for large courses. *You can leave the page* and you'll get an email when the export is complete." %>
-      </div>
+      <% if @context.is_a?(Course) %>
+        <div class="progress_message">
+          <%= mt 'message.export_started', "The export process has started. This can take awhile for large courses. *You can leave the page* and you'll get an email when the export is complete." %>
+        </div>
+      <% end %>
   </div>
 
   <% if @current_export_id %>

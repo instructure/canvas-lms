@@ -28,7 +28,7 @@ class ContentExport < ActiveRecord::Base
   serialize :settings
   attr_accessible :context
   validates_presence_of :context_id, :workflow_state
-  validates_inclusion_of :context_type, :in => ['Course']
+  validates_inclusion_of :context_type, :in => ['Course', 'User']
 
   has_one :job_progress, :class_name => 'Progress', :as => :context
 
@@ -36,6 +36,7 @@ class ContentExport < ActiveRecord::Base
   COMMON_CARTRIDGE = 'common_cartridge'
   COURSE_COPY = 'course_copy'
   QTI = 'qti'
+  USER_DATA = 'user_data'
 
   workflow do
     state :created
@@ -69,6 +70,16 @@ class ContentExport < ActiveRecord::Base
     raise "Use context instead"
   end
 
+  def export(opts={})
+    case context
+    when Course
+      export_course(opts)
+    when User
+      export_user_data(opts)
+    end
+  end
+  handle_asynchronously :export, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1
+
   def export_course(opts={})
     self.workflow_state = 'exporting'
     self.save
@@ -95,7 +106,27 @@ class ContentExport < ActiveRecord::Base
       self.save
     end
   end
-  handle_asynchronously :export_course, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1
+
+  def export_user_data(opts)
+    self.workflow_state = 'exporting'
+    self.save
+    begin
+      self.job_progress.try :start!
+
+      if exported_attachment = Exporters::UserDataExporter.create_user_data_export(self.context)
+        self.attachment = exported_attachment
+        self.progress = 100
+        self.job_progress.try :complete!
+        self.workflow_state = 'exported'
+      end
+    rescue
+      add_error("Error running user_data export.", $!)
+      self.workflow_state = 'failed'
+      self.job_progress.try :fail!
+    ensure
+      self.save
+    end
+  end
 
   def queue_api_job(opts)
     if self.job_progress
@@ -109,7 +140,7 @@ class ContentExport < ActiveRecord::Base
     p.user = self.user
     p.save!
 
-    export_course(opts)
+    export(opts)
   end
 
   def referenced_files

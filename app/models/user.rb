@@ -164,6 +164,7 @@ class User < ActiveRecord::Base
   has_many :messages
   has_many :sis_batches
   has_many :content_migrations, :as => :context
+  has_many :content_exports, :as => :context
 
   has_one :profile, :class_name => 'UserProfile'
   alias :orig_profile :profile
@@ -962,7 +963,7 @@ class User < ActiveRecord::Base
 
   set_policy do
     given { |user| user == self }
-    can :read and can :manage and can :manage_content and can :manage_files and can :manage_calendar and can :send_messages and can :update_avatar and can :manage_feature_flags
+    can :read and can :read_as_admin and can :manage and can :manage_content and can :manage_files and can :manage_calendar and can :send_messages and can :update_avatar and can :manage_feature_flags
 
     given { |user| user == self && user.user_can_edit_name? }
     can :rename

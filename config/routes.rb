@@ -534,6 +534,7 @@ routes.draw do
     match 'users' => 'users#create', :as => :add_user, :via => :post
     match 'users/:user_id/delete' => 'accounts#confirm_delete_user', :as => :confirm_delete_user
     match 'users/:user_id' => 'accounts#remove_user', :as => :delete_user, :via => :delete
+
     resources :users
     resources :account_notifications, :only => [:create, :destroy]
     concerns :announcements
@@ -714,6 +715,7 @@ routes.draw do
       end
     end
 
+    resources :content_exports, :path => :data_exports
     resources :rubrics, :path => :assessments
   end
 

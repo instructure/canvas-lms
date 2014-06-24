@@ -17,13 +17,22 @@
 #
 
 class ContentExportsController < ApplicationController
-  before_filter :require_context, :except => :xml_schema
+  before_filter :require_permission, :except => :xml_schema
   before_filter { |c| c.active_tab = "settings" }
 
-  def index
+  def require_permission
+    get_context
+    @context ||= @current_user # if we're going through the dashboard
     return render_unauthorized_action unless @context.grants_all_rights?(@current_user, :read, :read_as_admin)
+  end
 
-    @exports = @context.content_exports.active.not_for_copy
+  def index
+    if @context.is_a?(Course)
+      @exports = @context.content_exports.active.not_for_copy
+    else
+      @exports = @context.content_exports.active
+    end
+
     @current_export_id = nil
     if export = @context.content_exports.running.first
       @current_export_id = export.id
@@ -31,8 +40,6 @@ class ContentExportsController < ApplicationController
   end
 
   def show
-    return render_unauthorized_action unless @context.grants_all_rights?(@current_user, :read, :read_as_admin)
-
     if params[:id].present? && export = @context.content_exports.find_by_id(params[:id])
       render_export(export)
     else
@@ -41,22 +48,26 @@ class ContentExportsController < ApplicationController
   end
 
   def create
-    return render_unauthorized_action unless @context.grants_all_rights?(@current_user, :read, :read_as_admin)
-
     if @context.content_exports.running.count == 0
       export = @context.content_exports.build
       export.user = @current_user
       export.workflow_state = 'created'
-      if params[:export_type] == 'qti'
-        export.export_type = ContentExport::QTI
-        export.selected_content = params[:copy]
-      else
-        export.export_type = ContentExport::COMMON_CARTRIDGE
-        export.selected_content = { :everything => true }
+
+      if @context.is_a?(Course)
+        if params[:export_type] == 'qti'
+          export.export_type = ContentExport::QTI
+          export.selected_content = params[:copy]
+        else
+          export.export_type = ContentExport::COMMON_CARTRIDGE
+          export.selected_content = { :everything => true }
+        end
+      elsif @context.is_a?(User)
+        export.export_type = ContentExport::USER_DATA
       end
+
       export.progress = 0
       if export.save
-        export.export_course
+        export.export
         render_export(export)
       else
         render :json => {:error_message => t('errors.couldnt_create', "Couldn't create content export.")}
@@ -69,8 +80,6 @@ class ContentExportsController < ApplicationController
   end
 
   def destroy
-    return render_unauthorized_action unless @context.grants_all_rights?(@current_user, :read, :read_as_admin)
-
     if params[:id].present? && export = @context.content_exports.find_by_id(params[:id])
       export.destroy
       render :json => {:success=>'true'}
