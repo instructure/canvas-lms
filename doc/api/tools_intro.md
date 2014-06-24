@@ -2,7 +2,7 @@ External Tools Introduction
 ==============
 
 Canvas, like many LMSs, supports loading external resources inline using the 
-<a href="http://www.imsglobal.org/lti/v1p1pd/ltiIMGv1p1pd.html">IMS LTI standard</a>. 
+<a href="http://www.imsglobal.org/lti/">IMS LTI standard</a>.
 These tools can be configured on a course or account level, and 
 can be added to course modules or used to create custom assignments (see the 
 LTI Outcomes service for more information on that). Canvas supports some additional 
@@ -24,7 +24,7 @@ Canvas currently supports the following types of tool extensions:
 - <a href="assignment_tools.html">External tool assignments, with grades passed back from the tool to Canvas</a>
 
   This type of integration is part of the 
-  <a href="http://www.imsglobal.org/lti/v1p1pd/ltiIMGv1p1pd.html#_Toc309649691">LTI 1.1 specification</a>,
+  <a href="http://www.imsglobal.org/LTI/v1p1/ltiIMGv1p1.html">LTI 1.1 specification</a>,
   and is important in that it allows external services to take care of things
   that can be graded automatically, or outside the LMS scope.
   
