@@ -756,6 +756,34 @@ describe "gradebook2" do
         has_notes_column.call.should be_true
       end
     end
+
+    context "differentiated assignments" do
+      before :each do
+        @course.enable_feature!(:differentiated_assignments)
+        @da_assignment = assignment_model({
+          :course => @course,
+          :name => 'DA assignment',
+          :points_possible => ASSIGNMENT_1_POINTS,
+          :submission_types => 'online_text_entry',
+          :assignment_group => @group,
+          :only_visible_to_overrides => true
+        })
+        create_section_override_for_assignment(@da_assignment, course_section: @other_section)
+      end
+
+      it "should gray out cells" do
+        get "/courses/#{@course.id}/gradebook"
+        #student 3, assignment 4
+        selector = '#gradebook_grid .container_1 .slick-row:nth-child(3) .l5'
+        cell = f(selector)
+        cell.find_element(:css, '.gradebook-cell').should have_class('grayed-out')
+        cell.click
+        f(selector + ' .grade').should be_nil
+        #student 2, assignment 4 (not grayed out)
+        cell = f('#gradebook_grid .container_1 .slick-row:nth-child(2) .l5')
+        cell.find_element(:css, '.gradebook-cell').should_not have_class('grayed-out')
+      end
+    end
   end
 
   context "as an observer" do

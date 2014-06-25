@@ -131,8 +131,20 @@ define [
         for c in @customColumns
           url = @options.custom_column_data_url.replace /:id/, c.id
           @getCustomColumnData(c.id)
+        @assignment_visibility() if ENV.GRADEBOOK_OPTIONS.differentiated_assignments_enabled
 
       @showCustomColumnDropdownOption()
+
+    assignment_visibility: ->
+      all_students_ids = _.keys @students
+      for assignment_id, a of @assignments
+        if a.only_visible_to_overrides
+          hidden_student_ids = @hiddenStudentIdsForAssignment(all_students_ids, a)
+          for student_id in hidden_student_ids
+            @updateSubmission { assignment_id: assignment_id, user_id: student_id, hidden: true }
+
+    hiddenStudentIdsForAssignment: (student_ids, assignment) ->
+      _.difference student_ids, assignment.assignment_visibility.map(String)
 
     onShow: ->
       return if @startedInitializing
@@ -238,7 +250,7 @@ define [
 
     gotAllStudents: ->
       @withAllStudents (students) =>
-        for id, student of students
+        for student_id, student of students
           student.computed_current_score ||= 0
           student.computed_final_score ||= 0
           student.secondary_identifier = student.sis_login_id || student.login_id
@@ -255,8 +267,8 @@ define [
 
           # fill in dummy submissions, so there's something there even if the
           # student didn't submit anything for that assignment
-          for id, assignment of @assignments
-            student["assignment_#{id}"] ||= { assignment_id: id, user_id: student.id }
+          for assignment_id, assignment of @assignments
+            student["assignment_#{assignment_id}"] ||= { assignment_id: assignment_id, user_id: student_id }
 
           @rows.push(student)
 
@@ -445,7 +457,10 @@ define [
     gotSubmissionsChunk: (student_submissions) =>
       for data in student_submissions
         student = @student(data.user_id)
-        @updateSubmission(submission) for submission in data.submissions
+        for submission in data.submissions
+          current_submission = student["assignment_#{submission.assignment_id}"]
+          hidden = current_submission["hidden"] if current_submission?
+          @updateSubmission(submission) unless hidden
         student.loaded = true
         @grid.invalidateRow(student.row)
         @calculateStudentGrade(student)
@@ -501,6 +516,8 @@ define [
     cellFormatter: (row, col, submission) =>
       if !@rows[row].loaded
         @staticCellFormatter(row, col, '')
+      else if submission.hidden
+        @uneditableCellFormatter(row, col)
       else if !submission?
         @staticCellFormatter(row, col, '-')
       else
@@ -515,6 +532,9 @@ define [
 
     staticCellFormatter: (row, col, val) =>
       "<div class='cell-content gradebook-cell'>#{val}</div>"
+
+    uneditableCellFormatter: (row, col) =>
+      "<div class='cell-content gradebook-cell grayed-out'></div>"
 
     groupTotalFormatter: (row, col, val, columnDef, student) =>
       return '' unless val?
@@ -1071,7 +1091,13 @@ define [
 
       @grid.onColumnsReordered.subscribe @onColumnsReordered
 
+      @grid.onBeforeEditCell.subscribe @onBeforeEditCell
+
       @onGridInit()
+
+    onBeforeEditCell: (event, {row, cell}) =>
+      $cell = @grid.getCellNode(row, cell)
+      return false if $($cell).find(".gradebook-cell").hasClass("grayed-out")
 
     onCellChange: (event, {item, column}) =>
       if col_id = column.field.match /^custom_col_(\d+)/
