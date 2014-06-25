@@ -504,7 +504,7 @@ class Message < ActiveRecord::Base
 
     delivery_method = "deliver_via_#{path_type}".to_sym
 
-    if not delivery_method or not respond_to?(delivery_method)
+    if not delivery_method or not respond_to?(delivery_method, true)
       logger.warn("Could not set delivery_method from #{path_type}")
       return nil
     end
