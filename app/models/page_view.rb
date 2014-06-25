@@ -52,8 +52,8 @@ class PageView < ActiveRecord::Base
     self.new(attributes).tap do |p|
       p.url = LoggingFilter.filter_uri(request.url)[0,255]
       p.http_method = CANVAS_RAILS2 ? request.method.to_s.downcase : request.request_method.downcase
-      p.controller = request.path_parameters['controller']
-      p.action = request.path_parameters['action']
+      p.controller = request.path_parameters[:controller]
+      p.action = request.path_parameters[:action]
       p.session_id = request.session_options[:id].to_s.force_encoding(Encoding::UTF_8).presence
       p.user_agent = request.user_agent
       p.remote_ip = request.remote_ip
