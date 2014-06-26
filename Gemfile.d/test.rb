@@ -13,7 +13,6 @@ group :test do
   end
   gem 'thin', '1.5.1'
     gem 'eventmachine', '1.0.3'
-  gem 'bullet_instructure', '3.0.0', :require => false
 
   if CANVAS_RAILS2
     gem 'rspec', '1.3.2'
