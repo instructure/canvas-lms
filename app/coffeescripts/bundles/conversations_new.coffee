@@ -88,7 +88,7 @@ require [
         if model.get('messages')
           @selectConversation(model)
         else
-          @lastFetch = model.fetch(success: @selectConversation)
+          @lastFetch = model.fetch(data: {include_participant_contexts: false, include_private_conversation_enrollments: false}, success: @selectConversation)
           @detail.$el.disableWhileLoading(@lastFetch)
 
     selectConversation: (model) =>
