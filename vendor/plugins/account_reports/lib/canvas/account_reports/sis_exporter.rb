@@ -539,7 +539,7 @@ module Canvas::AccountReports
 
         csv << headers
         gm = root_account.all_groups.
-          select("groups.*, group_memberships.*, pseudonyms.sis_user_id AS user_sis_id").
+          select("group_id, sis_source_id, group_memberships.user_id, pseudonyms.sis_user_id AS user_sis_id, group_memberships.workflow_state").
           joins("INNER JOIN group_memberships ON groups.id = group_memberships.group_id
                  INNER JOIN pseudonyms ON pseudonyms.user_id=group_memberships.user_id").
           where("pseudonyms.account_id=groups.root_account_id AND
