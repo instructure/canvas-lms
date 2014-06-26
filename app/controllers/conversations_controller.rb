@@ -503,9 +503,11 @@ class ConversationsController < ApplicationController
       messages = @conversation.messages
       ConversationMessage.send(:preload_associations, messages, :asset)
     end
+
     render :json => conversation_json(@conversation,
                                       @current_user,
                                       session,
+                                      include_participant_contexts: value_to_boolean(params.fetch(:include_participant_contexts, true)),
                                       include_indirect_participants: true,
                                       messages: messages,
                                       submissions: [],
@@ -1022,7 +1024,11 @@ class ConversationsController < ApplicationController
   end
 
   def include_private_conversation_enrollments
-    value_to_boolean(params[:include_private_conversation_enrollments]) || api_request?
+    if params.has_key? :include_private_conversation_enrollments
+      value_to_boolean(params[:include_private_conversation_enrollments])
+    else
+      api_request?
+    end
   end
 
   # TODO API v2: default to false, like we do in the UI
