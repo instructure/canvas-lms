@@ -423,6 +423,23 @@ describe "Files API", type: :request do
     end
   end
 
+  describe "#index other contexts" do
+    it "should operate on groups" do
+      group_model
+      attachment_model display_name: 'foo', content_type: 'text/plain', context: @group, folder: Folder.root_folders(@group).first
+      account_admin_user
+      json = api_call(:get, "/api/v1/groups/#{@group.id}/files", { controller: "files", action: "api_index", format: "json", group_id: @group.to_param })
+      json.map{|r| r['id']}.should eql [@attachment.id]
+    end
+
+    it "should operate on users" do
+      user_model
+      attachment_model display_name: 'foo', content_type: 'text/plain', context: @user, folder: Folder.root_folders(@user).first
+      json = api_call(:get, "/api/v1/users/#{@user.id}/files", { controller: "files", action: "api_index", format: "json", user_id: @user.to_param })
+      json.map{|r| r['id']}.should eql [@attachment.id]
+    end
+  end
+
   describe "#show" do
     append_before do
       @root = Folder.root_folders(@course).first

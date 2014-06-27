@@ -1051,6 +1051,7 @@ routes.draw do
       put 'users/:id', :action => :update
       post 'users/:user_id/files', :action => :create_file
 
+      get  'users/:user_id/files', :controller => :files, :action => :api_index, :path_name => 'user_files'
       post 'users/:user_id/folders', :controller => :folders, :action => :create
       get 'users/:user_id/folders/by_path/*full_path', :controller => :folders, :action => :resolve_path
       get 'users/:user_id/folders/by_path', :controller => :folders, :action => :resolve_path
@@ -1225,6 +1226,7 @@ routes.draw do
         resources :users, :path_prefix => "groups/:group_id", :name_prefix => "group_", :controller => :group_memberships, :except => [:show, :create]
       end
 
+      get  'groups/:group_id/files', :controller => :files, :action => :api_index, :path_name => 'group_files'
       post 'groups/:group_id/folders', :controller => :folders, :action => :create
       get 'groups/:group_id/folders/by_path/*full_path', :controller => :folders, :action => :resolve_path
       get 'groups/:group_id/folders/by_path', :controller => :folders, :action => :resolve_path
