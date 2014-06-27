@@ -1264,7 +1264,7 @@ class Assignment < ActiveRecord::Base
                 :methods => avatar_methods,
                 :only => [:name, :id])
     }
-    res[:context][:active_course_sections] = context.sections_visible_to(user).
+    res[:context][:active_course_sections] = context.sections_visible_to(user, self.sections_with_visibility(user)).
       map{|s| s.as_json(:include_root => false, :only => [:id, :name]) }
     res[:context][:enrollments] = enrollments.
         map{|s| s.as_json(:include_root => false, :only => [:user_id, :course_section_id]) }
@@ -1338,6 +1338,14 @@ class Assignment < ActiveRecord::Base
     Attachment.skip_thumbnails = nil
   end
 
+  def sections_with_visibility(user)
+    return context.active_course_sections unless self.differentiated_assignments_applies?
+
+    visible_student_ids = visible_students_for_speed_grader(user).map(&:id)
+    context.active_course_sections.joins(:student_enrollments).
+      where(:enrollments => {:user_id => visible_student_ids, :type => "StudentEnrollment"}).uniq.reorder("name")
+  end
+
   # quiz submission versions are too expensive to de-serialize so we have to
   # cap the number we will do
   def too_many_qs_versions?(student_submissions)
@@ -1374,12 +1382,6 @@ class Assignment < ActiveRecord::Base
   # group's submission.  the students name will be changed to the group's
   # name.  for non-group assignments this just returns all visible users
   def representatives(user)
-    visible_students = (
-      user ?
-        context.students_visible_to(user) :
-        context.participating_students
-    ).order_by_sortable_name.uniq.to_a
-
     if grade_as_group?
       submissions = self.submissions.includes(:user)
       users_with_submissions = submissions
@@ -1395,7 +1397,7 @@ class Assignment < ActiveRecord::Base
       group_category.groups.includes(:group_memberships => :user).map { |g|
         [g.name, g.users]
       }.map { |group_name, group_students|
-        visible_group_students = group_students & visible_students
+        visible_group_students = group_students & visible_students_for_speed_grader(user)
         representative   = (visible_group_students & users_with_turnitin_data).first
         representative ||= (visible_group_students & users_with_submissions).first
         representative ||= visible_group_students.first
@@ -1412,8 +1414,21 @@ class Assignment < ActiveRecord::Base
         representative
       }.compact
     else
-      visible_students
+      visible_students_for_speed_grader(user)
     end
+  end
+
+  # using this method instead of students_with_visibility so we
+  # can add the includes and students_visible_to/participating_students scopes
+  def visible_students_for_speed_grader(user)
+    @visible_students_for_speed_grader ||= {}
+    @visible_students_for_speed_grader[user.global_id] ||= (
+      student_scope = user ? context.students_visible_to(user) : context.participating_students
+      if self.differentiated_assignments_applies?
+        student_scope = student_scope.able_to_see_assignment_in_course_with_da(self.id, context.id)
+      end
+      student_scope
+    ).order_by_sortable_name.uniq.to_a
   end
 
   def visible_rubric_assessments_for(user)

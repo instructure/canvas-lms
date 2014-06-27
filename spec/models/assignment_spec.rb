@@ -1854,6 +1854,39 @@ describe Assignment do
     end
   end
 
+  describe "sections_with_visibility" do
+   before(:once) do
+     course_with_teacher(:active_all => true)
+     @course.enable_feature!(:draft_state)
+     @section = @course.course_sections.create!
+     @student = student_in_section(@section, opts={})
+     @assignment, @assignment2, @assignment3 = (1..3).map{|a|@course.assignments.create!}
+
+     @assignment.only_visible_to_overrides = true
+     create_section_override_for_assignment(@assignment, course_section: @section)
+
+     @assignment2.only_visible_to_overrides = true
+
+     @assignment3.only_visible_to_overrides = false
+     create_section_override_for_assignment(@assignment3, course_section: @section)
+     [@assignment, @assignment2, @assignment3].each(&:save!)
+   end
+
+   it "returns active_course_sections with differentiated assignments off" do
+     @course.disable_feature!(:differentiated_assignments)
+     @assignment.sections_with_visibility(@teacher).should == @course.course_sections
+     @assignment2.sections_with_visibility(@teacher).should == @course.course_sections
+     @assignment3.sections_with_visibility(@teacher).should == @course.course_sections
+   end
+
+   it "returns only sections with overrides with differentiated assignments on" do
+     @course.enable_feature!(:differentiated_assignments)
+     @assignment.sections_with_visibility(@teacher).should == [@section]
+     @assignment2.sections_with_visibility(@teacher).should == []
+     @assignment3.sections_with_visibility(@teacher).should == @course.course_sections
+   end
+ end
+
   context "modules" do
     it "should be locked when part of a locked module" do
       ag = @course.assignment_groups.create!
@@ -2319,6 +2352,52 @@ describe Assignment do
       @comment = @submission.add_comment(:comment => 'comment')
       json = @assignment.speed_grader_json(@user)
       json[:submissions].first[:submission_comments].first[:created_at].to_i.should eql @comment.created_at.to_i
+    end
+
+    context "students and active course sections" do
+      before(:once) do
+        @course = course(:active_course => true)
+        @teacher, @student1, @student2 = (1..3).map{User.create}
+        @assignment = Assignment.create!(title: "title", context: @course, only_visible_to_overrides: true)
+        @course.enroll_teacher(@teacher)
+        @course.enroll_student(@student2, :enrollment_state => 'active')
+        @section1 = @course.course_sections.create!(name: "test section 1")
+        @section2 = @course.course_sections.create!(name: "test section 2")
+        student_in_section(@section1, user: @student1)
+        create_section_override_for_assignment(@assignment, {course_section: @section1})
+      end
+
+      it "should include all students and sections with DA off" do
+        @course.disable_feature!(:differentiated_assignments)
+        json = @assignment.speed_grader_json(@teacher)
+
+        json[:context][:students].map{|s| s[:id]}.include?(@student1.id).should be_true
+        json[:context][:students].map{|s| s[:id]}.include?(@student2.id).should be_true
+        json[:context][:active_course_sections].map{|cs| cs[:id]}.include?(@section1.id).should be_true
+        json[:context][:active_course_sections].map{|cs| cs[:id]}.include?(@section2.id).should be_true
+      end
+
+      it "should include only students and sections with overrides when DA is on" do
+        @course.enable_feature!(:differentiated_assignments)
+        json = @assignment.speed_grader_json(@teacher)
+
+        json[:context][:students].map{|s| s[:id]}.include?(@student1.id).should be_true
+        json[:context][:students].map{|s| s[:id]}.include?(@student2.id).should be_false
+        json[:context][:active_course_sections].map{|cs| cs[:id]}.include?(@section1.id).should be_true
+        json[:context][:active_course_sections].map{|cs| cs[:id]}.include?(@section2.id).should be_false
+      end
+
+      it "should include all students when is only_visible_to_overrides false" do
+        @course.enable_feature!(:differentiated_assignments)
+        @assignment.only_visible_to_overrides = false
+        @assignment.save!
+        json = @assignment.speed_grader_json(@teacher)
+
+        json[:context][:students].map{|s| s[:id]}.include?(@student1.id).should be_true
+        json[:context][:students].map{|s| s[:id]}.include?(@student2.id).should be_true
+        json[:context][:active_course_sections].map{|cs| cs[:id]}.include?(@section1.id).should be_true
+        json[:context][:active_course_sections].map{|cs| cs[:id]}.include?(@section2.id).should be_true
+      end
     end
 
     it "should return submission lateness" do
