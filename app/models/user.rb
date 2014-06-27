@@ -1381,13 +1381,20 @@ class User < ActiveRecord::Base
           due_after = opts[:due_after] || 4.weeks.ago
 
           result = Shard.partition_by_shard(course_ids) do |shard_course_ids|
-            Assignment.for_course(shard_course_ids).
-              published.
+            courses = Course.find(shard_course_ids)
+            courses_with_da, courses_without_da = courses.partition{|c| c.feature_enabled?(:differentiated_assignments)}
+
+            da_scope = Assignment.for_course(courses_with_da.map(&:id)).visible_to_student_in_all_courses_with_da(self.id)
+            non_da_scope = Assignment.for_course(courses_without_da.map(&:id))
+
+            [da_scope, non_da_scope].map{|scope|
+              scope.published.
               due_between_with_overrides(due_after,1.week.from_now).
               not_ignored_by(self, 'submitting').
               expecting_submission.
               need_submitting_info(id, limit).
               not_locked
+            }.reduce(&:+)
           end
           # outer limit, since there could be limit * n_shards results
           result = result[0...limit] if limit
