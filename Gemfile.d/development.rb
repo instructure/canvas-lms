@@ -15,6 +15,9 @@ group :development do
   # The ruby debug gems conflict with the IDE-based debugger gem.
   # Set this option in your dev environment to disable.
   unless ENV['DISABLE_RUBY_DEBUGGING']
+    if RUBY_VERSION >= '2.2'
+      gem 'byebug', '3.1.2'
+    end
     gem 'byebug', '3.1.2', :platforms => [:ruby_20, :ruby_21]
       gem 'columnize', '0.8.9', :platforms => [:ruby_20, :ruby_21]
     gem 'debugger', '1.6.6', :platforms => :ruby_19

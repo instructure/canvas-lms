@@ -60,7 +60,7 @@ gem 'hashery', '1.3.0', :require => 'hashery/dictionary'
 gem 'highline', '1.6.1'
 gem 'hoe', '3.8.1'
 gem 'i18n', '0.6.8'
-gem 'i18nema', '0.0.7'
+gem 'i18nema', RUBY_VERSION >= '2.2' ? '0.0.8' : '0.0.7'
 gem 'icalendar', '1.5.4'
 gem 'jammit', '0.6.6'
   gem 'cssmin', '1.0.3'
@@ -73,7 +73,7 @@ gem 'libxml-ruby', '2.6.0', :require => 'xml/libxml'
 gem 'macaddr', '1.0.0' # macaddr 1.2.0 tries to require 'systemu' which isn't a dependency
 gem 'mail', '2.5.4'
   gem 'treetop', '1.4.15'
-    gem 'polyglot', '0.3.3'
+    gem 'polyglot', '0.3.5'
 gem 'marginalia', '1.1.3', :require => false
 gem 'mime-types', '1.17.2', :require => 'mime/types'
 # attachment_fu (even the current technoweenie one on github) does not work
