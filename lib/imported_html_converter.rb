@@ -46,7 +46,8 @@ class ImportedHtmlConverter
 
           new_url = nil
           missing_relative_url = nil
-          val = URI.unescape(node[attr])
+
+          val = URI.unescape(node[attr]) rescue node[attr]
 
           if val =~ /wiki_page_migration_id=(.*)/
             # This would be from a BB9 migration. 
