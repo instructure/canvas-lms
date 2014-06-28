@@ -1242,7 +1242,7 @@ class ActiveRecord::ConnectionAdapters::AbstractAdapter
   end
 
   def after_transaction_commit(&block)
-    if open_transactions <= (Rails.env.test? ? 1 : 0)
+    if open_transactions <= base_transaction_level
       block.call
     else
       @after_transaction_commit ||= []
@@ -1267,8 +1267,14 @@ class ActiveRecord::ConnectionAdapters::AbstractAdapter
   def release_savepoint_with_callbacks
     release_savepoint_without_callbacks
     return unless Rails.env.test?
-    return if open_transactions > 1
+    return if open_transactions > base_transaction_level
     run_transaction_commit_callbacks
+  end
+
+  def base_transaction_level
+    return 0 unless Rails.env.test?
+    return 1 unless defined?(Onceler)
+    Onceler.base_transactions
   end
 
   def rollback_db_transaction_with_callbacks

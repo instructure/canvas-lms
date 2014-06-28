@@ -24,9 +24,7 @@ describe Auditors::Course do
 
   let(:request_id) { 42 }
 
-  before do
-    RequestContextGenerator.stubs( :request_id => request_id )
-
+  before :once do
     @account = Account.default
     @sub_account = Account.create!(:parent_account => @account)
     @sub_sub_account = Account.create!(:parent_account => @sub_account)
@@ -36,6 +34,10 @@ describe Auditors::Course do
     @course.name = "Course 2"
     @course.start_at = Date.today
     @course.conclude_at = Date.today + 7.days
+  end
+
+  before :each do
+    RequestContextGenerator.stubs( :request_id => request_id )
   end
 
   context "nominal cases" do

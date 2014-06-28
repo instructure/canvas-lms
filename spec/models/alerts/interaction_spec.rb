@@ -20,20 +20,22 @@ require File.expand_path(File.dirname(__FILE__) + '../../../spec_helper.rb')
 
 module Alerts
   describe Alerts::Interaction do
+    before :once do
+      course_with_teacher(:active_all => 1)
+      @teacher = @user
+      @user = nil
+      student_in_course(:active_all => 1)
+    end
+
     describe "#should_not_receive_message?" do
       context "when there are no messages" do
         context "when there is a start_at set on the course" do
           it "returns true for new courses" do
-            course_with_teacher(:active_all => 1)
-            student_in_course(:active_all => 1)
-
             interaction_alert = Alerts::Interaction.new(@course, [@student.id], [@teacher.id])
             interaction_alert.should_not_receive_message?(@student.id, 7).should == true
           end
 
           it "returns false for old courses" do
-            course_with_teacher(:active_all => 1)
-            student_in_course(:active_all => 1)
             @course.start_at = Time.now - 30.days
 
             interaction_alert = Alerts::Interaction.new(@course, [@student.id], [@teacher.id])
@@ -43,8 +45,6 @@ module Alerts
 
         context "when there is not a start_at set on the course" do
           it "returns true for new courses" do
-            course_with_teacher(:active_all => 1)
-            student_in_course(:active_all => 1)
             @course.created_at = Time.now
             @course.start_at = nil
             @course.save!
@@ -54,8 +54,6 @@ module Alerts
           end
 
           it "returns false for old courses" do
-            course_with_teacher(:active_all => 1)
-            student_in_course(:active_all => 1)
             @course.created_at = Time.now - 30.days
             @course.start_at = nil
             @course.save!
@@ -67,16 +65,12 @@ module Alerts
       end
 
       it "returns true for submission comments" do
-        course_with_teacher(:active_all => 1)
-        @teacher = @user
-        @user = nil
-        student_in_course(:active_all => 1)
         @assignment = @course.assignments.new(:title => "some assignment")
         @assignment.workflow_state = "published"
         @assignment.save
-        @submission = @assignment.submit_homework(@user)
-        SubmissionComment.create!(:submission => @submission, :comment => 'new comment', :author => @teacher, :recipient => @user)
-        SubmissionComment.create!(:submission => @submission, :comment => 'old comment', :author => @teacher, :recipient => @user) do |submission_comment|
+        @submission = @assignment.submit_homework(@student)
+        SubmissionComment.create!(:submission => @submission, :comment => 'new comment', :author => @teacher, :recipient => @student)
+        SubmissionComment.create!(:submission => @submission, :comment => 'old comment', :author => @teacher, :recipient => @student) do |submission_comment|
           submission_comment.created_at = Time.now - 30.days
         end
         @course.start_at = Time.now - 30.days
@@ -86,15 +80,11 @@ module Alerts
       end
 
       it "returns false for old submission comments" do
-        course_with_teacher(:active_all => 1)
-        @teacher = @user
-        @user = nil
-        student_in_course(:active_all => 1)
         @assignment = @course.assignments.new(:title => "some assignment")
         @assignment.workflow_state = "published"
         @assignment.save
-        @submission = @assignment.submit_homework(@user)
-        SubmissionComment.create!(:submission => @submission, :comment => 'some comment', :author => @teacher, :recipient => @user) do |sc|
+        @submission = @assignment.submit_homework(@student)
+        SubmissionComment.create!(:submission => @submission, :comment => 'some comment', :author => @teacher, :recipient => @student) do |sc|
           sc.created_at = Time.now - 30.days
         end
         @course.start_at = Time.now - 30.days
@@ -104,11 +94,7 @@ module Alerts
       end
 
       it "returns true for conversation messages" do
-        course_with_teacher(:active_all => 1)
-        @teacher = @user
-        @user = nil
-        student_in_course(:active_all => 1)
-        @conversation = @teacher.initiate_conversation([@user])
+        @conversation = @teacher.initiate_conversation([@student])
         @conversation.add_message("hello")
         @course.start_at = Time.now - 30.days
 
@@ -117,10 +103,6 @@ module Alerts
       end
 
       it "returns false for old conversation messages" do
-        course_with_teacher(:active_all => 1)
-        @teacher = @user
-        @user = nil
-        student_in_course(:active_all => 1)
         @conversation = @teacher.initiate_conversation([@student, user])
         message = @conversation.add_message("hello")
         message.created_at = Time.now - 30.days

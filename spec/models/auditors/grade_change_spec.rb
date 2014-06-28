@@ -24,17 +24,7 @@ describe Auditors::GradeChange do
 
   let(:request_id) { 42 }
 
-  before do
-    RequestContextGenerator.stubs( :request_id => request_id )
-
-    shard_class = Class.new {
-      define_method(:activate) { |&b| b.call }
-    }
-
-    EventStream.current_shard_lookup = lambda {
-      shard_class.new
-    }
-
+  before :once do
     @account = Account.default
     @sub_account = Account.create!(:parent_account => @account)
     @sub_sub_account = Account.create!(:parent_account => @sub_account)
@@ -45,6 +35,18 @@ describe Auditors::GradeChange do
     @assignment = @course.assignments.create!(:title => 'Assignment', :points_possible => 10)
     @submission = @assignment.grade_student(@student, grade: 8, grader: @teacher).first
     @event_time = Time.at(1.hour.ago.to_i) # cassandra doesn't remember microseconds
+  end
+
+  before :each do
+    RequestContextGenerator.stubs( :request_id => request_id )
+
+    shard_class = Class.new {
+      define_method(:activate) { |&b| b.call }
+    }
+
+    EventStream.current_shard_lookup = lambda {
+      shard_class.new
+    }
     Timecop.freeze(@event_time) { @event = Auditors::GradeChange.record(@submission) }
   end
 

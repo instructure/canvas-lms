@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe AppointmentGroup do
   context "validations" do
-    before do
+    before :once do
       course_with_student(:active_all => true)
     end
 
@@ -53,8 +53,9 @@ describe AppointmentGroup do
   end
 
   context "add context" do
+    let_once(:course1) { course(:active_all => true) }
+
     it "should only add contexts" do
-      course1 = course
       course_with_student(:active_all => true)
       course2 = @course
 
@@ -76,7 +77,6 @@ describe AppointmentGroup do
     end
 
     it "should not add contexts when it has a group category" do
-      course1 = course
       gc = group_category(context: course1)
       ag = AppointmentGroup.create!(:title => 'test',
                                     :contexts => [course1],
@@ -89,8 +89,6 @@ describe AppointmentGroup do
     end
 
     it "should update appointments effective_context_code" do
-      course(:active_all => true)
-      course1 = @course
       course(:active_all => true)
       course2 = @course
 
@@ -110,7 +108,7 @@ describe AppointmentGroup do
   end
 
   context "add sub_contexts" do
-    before do
+    before :once do
       @course1 = course
       @c1section1 = @course1.default_section
       @c1section2 = @course1.course_sections.create!
@@ -136,11 +134,10 @@ describe AppointmentGroup do
   end
 
   context "add_appointment" do
-    before do
+    before :once do
       course_with_student(:active_all => true)
       @ag = AppointmentGroup.create!(:title => "test", :contexts => [@course], :new_appointments => [['2012-01-01 12:00:00', '2012-01-01 13:00:00']])
       @appointment = @ag.appointments.first
-      @appointment.should_not be_nil
     end
 
     it "should allow additional appointments" do
@@ -172,7 +169,7 @@ describe AppointmentGroup do
   end
 
   context "permissions" do
-    before do
+    before :once do
       course_with_teacher(:active_all => true)
       @teacher = @user
       section1 = @course.default_section
@@ -332,7 +329,7 @@ describe AppointmentGroup do
   end
 
   context "notifications" do
-    before do
+    before :once do
       Notification.create(:name => 'Appointment Group Deleted', :category => "TestImmediately")
       Notification.create(:name => 'Appointment Group Published', :category => "TestImmediately")
       Notification.create(:name => 'Appointment Group Updated', :category => "TestImmediately")
@@ -406,67 +403,64 @@ describe AppointmentGroup do
   end
 
   context "available_slots" do
-    enable_cache do
-      before do
-        course_with_teacher(:active_all => true)
-        @teacher = @user
-        @ag = AppointmentGroup.create(:title => "test", :contexts => [@course], :participants_per_appointment => 2, :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"], ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]])
-        @appointment = @ag.appointments.first
-        @ag.reload.available_slots.should eql 4
-      end
+    before :once do
+      course_with_teacher(:active_all => true)
+      @teacher = @user
+      @ag = AppointmentGroup.create(:title => "test", :contexts => [@course], :participants_per_appointment => 2, :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"], ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]])
+      @appointment = @ag.appointments.first
+    end
 
-      it "should be nil if participants_per_appointment is nil" do
-        @ag.update_attributes :participants_per_appointment => nil
-        @ag.available_slots.should be_nil
-      end
+    it "should be nil if participants_per_appointment is nil" do
+      @ag.update_attributes :participants_per_appointment => nil
+      @ag.available_slots.should be_nil
+    end
 
-      it "should change if participants_per_appointment changes" do
-        @ag.update_attributes :participants_per_appointment => 1
-        @ag.available_slots.should eql 2
-      end
+    it "should change if participants_per_appointment changes" do
+      @ag.update_attributes :participants_per_appointment => 1
+      @ag.available_slots.should eql 2
+    end
 
-      it "should be correct if participants exceed the limit for a given appointment" do
-        @appointment.reserve_for(student_in_course(:course => @course, :active_all => true).user, @teacher)
-        @appointment.reserve_for(student_in_course(:course => @course, :active_all => true).user, @teacher)
-        @ag.reload.available_slots.should eql 2
-        @ag.update_attributes :participants_per_appointment => 1
-        @ag.reload.available_slots.should eql 1
-      end
+    it "should be correct if participants exceed the limit for a given appointment" do
+      @appointment.reserve_for(student_in_course(:course => @course, :active_all => true).user, @teacher)
+      @appointment.reserve_for(student_in_course(:course => @course, :active_all => true).user, @teacher)
+      @ag.reload.available_slots.should eql 2
+      @ag.update_attributes :participants_per_appointment => 1
+      @ag.reload.available_slots.should eql 1
+    end
 
-      it "should increase as appointments are added" do
-        @ag.update_attributes(:new_appointments => [["#{Time.now.year + 1}-01-01 14:00:00", "#{Time.now.year + 1}-01-01 15:00:00"]])
-        @ag.available_slots.should eql 6
-      end
+    it "should increase as appointments are added" do
+      @ag.update_attributes(:new_appointments => [["#{Time.now.year + 1}-01-01 14:00:00", "#{Time.now.year + 1}-01-01 15:00:00"]])
+      @ag.available_slots.should eql 6
+    end
 
-      it "should decrease as appointments are deleted" do
-        @appointment.destroy
-        @ag.reload.available_slots.should eql 2
-      end
+    it "should decrease as appointments are deleted" do
+      @appointment.destroy
+      @ag.reload.available_slots.should eql 2
+    end
 
-      it "should decrease as reservations are made" do
-        @appointment.reserve_for(student_in_course(:course => @course, :active_all => true).user, @teacher)
-        @ag.reload.available_slots.should eql 3
-      end
+    it "should decrease as reservations are made" do
+      @appointment.reserve_for(student_in_course(:course => @course, :active_all => true).user, @teacher)
+      @ag.reload.available_slots.should eql 3
+    end
 
-      it "should increase as reservations are canceled" do
-        res = @appointment.reserve_for(student_in_course(:course => @course, :active_all => true).user, @teacher)
-        @ag.reload.available_slots.should eql 3
-        res.destroy
-        @ag.reload.available_slots.should eql 4
-      end
+    it "should increase as reservations are canceled" do
+      res = @appointment.reserve_for(student_in_course(:course => @course, :active_all => true).user, @teacher)
+      @ag.reload.available_slots.should eql 3
+      res.destroy
+      @ag.reload.available_slots.should eql 4
+    end
 
-      it "should decrease as enrollments conclude (if reservations are in the future)" do
-        enrollment = student_in_course(:course => @course, :active_all => true)
-        @appointment.reserve_for(enrollment.user, @teacher)
-        @ag.reload.available_slots.should eql 3
-        enrollment.conclude
-        @ag.reload.available_slots.should eql 4
-      end
+    it "should decrease as enrollments conclude (if reservations are in the future)" do
+      enrollment = student_in_course(:course => @course, :active_all => true)
+      @appointment.reserve_for(enrollment.user, @teacher)
+      @ag.reload.available_slots.should eql 3
+      enrollment.conclude
+      @ag.reload.available_slots.should eql 4
     end
   end
 
   context "possible_participants" do
-    before do
+    before :once do
       course_with_teacher(:active_all => true)
       @teacher = @user
 
@@ -520,7 +514,7 @@ describe AppointmentGroup do
   end
 
   context "#requiring_action?" do
-    before do
+    before :once do
       course_with_teacher(:active_all => true)
       @teacher = @user
     end

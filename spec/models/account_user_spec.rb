@@ -82,7 +82,7 @@ describe AccountUser do
   end
 
   describe "is_subset_of?" do
-    before do
+    before :once do
       @user1 = User.create!
       @user2 = User.create!
       @ro1 = Account.default.role_overrides.create!(:enrollment_type => 'role1', :permission => 'manage_sis', :enabled => true)

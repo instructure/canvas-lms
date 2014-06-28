@@ -411,13 +411,39 @@ end
 
   config.include Helpers
 
+  if CANVAS_RAILS2
+    require 'spec/onceler_noop'
+    config.include Onceler::Noop
+  else
+    config.include Onceler::BasicHelpers
+
+    # rspec 2+ only runs global before(:all)'s before the top-level
+    # groups, not before each nested one. so we need to reset some
+    # things to play nicely with its caching
+    Onceler.configure do |c|
+      c.before :record do
+        Account.clear_special_account_cache!
+        AdheresToPolicy::Cache.clear
+      end
+    end
+
+    Onceler.instance_eval do
+      # since once-ler creates potentially multiple levels of transaction
+      # nesting, we need a way to know the base level so we can compare it
+      # to AR::Conn#open_transactions. that will tell us if something is
+      # "committed" or not (from the perspective of the spec)
+      def base_transactions
+        # if not recording, it's presumed we're in a spec, in which case
+        # transactional fixtures add one more level
+        open_transactions + (recording? ? 0 : 1)
+      end
+    end
+  end
+
+  Notification.after_create { Notification.reset_cache! }
   config.before :all do
     # so before(:all)'s don't get confused
     Account.clear_special_account_cache!
-    Notification.after_create { Notification.reset_cache! }
-
-    # Since AdheresToPolicy::Cache uses an instance variable class cache lets clear
-    # it so we start with a clean slate.
     AdheresToPolicy::Cache.clear
   end
 
@@ -433,6 +459,7 @@ end
     I18n.locale = :en
     Time.zone = 'UTC'
     Account.clear_special_account_cache!
+    AdheresToPolicy::Cache.clear
     Setting.reset_cache!
     ConfigFile.unstub
     HostUrl.reset_cache!
@@ -554,8 +581,6 @@ end
       cc.workflow_state = 'active' if opts[:active_cc] || opts[:active_all]
       cc.workflow_state = opts[:cc_state] if opts[:cc_state]
     end
-    @cc.should_not be_nil
-    @cc.should_not be_new_record
     @cc
   end
 

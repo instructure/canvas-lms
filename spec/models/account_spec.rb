@@ -46,7 +46,7 @@ describe Account do
   # end
 
   context "course lists" do
-    before(:each) do
+    before :once do
       @account = Account.create!
       process_csv_data_cleanly([
         "user_id,login_id,first_name,last_name,email,status",
@@ -184,7 +184,7 @@ describe Account do
   end
 
   context "services" do
-    before(:each) do
+    before do
       @a = Account.new
     end
     it "should be able to specify a list of enabled services" do
@@ -598,7 +598,7 @@ describe Account do
   end
 
   context "users_not_in_groups" do
-    before :each do
+    before :once do
       @account = Account.default
       @user1 = account_admin_user(:account => @account)
       @user2 = account_admin_user(:account => @account)
@@ -636,6 +636,10 @@ describe Account do
   end
 
   context "tabs_available" do
+    before :once do
+      @account = Account.default.sub_accounts.create!(:name => "sub-account")
+    end
+
     it "should include 'Developer Keys' for the authorized users of the site_admin account" do
       account_admin_user(:account => Account.site_admin)
       tabs = Account.site_admin.tabs_available(@admin)
@@ -646,7 +650,6 @@ describe Account do
     end
 
     it "should not include 'Developer Keys' for non-site_admin accounts" do
-      @account = Account.default.sub_accounts.create!(:name => "sub-account")
       tabs = @account.tabs_available(nil)
       tabs.map{|t| t[:id] }.should_not be_include(Account::TAB_DEVELOPER_KEYS)
 
@@ -655,7 +658,6 @@ describe Account do
     end
 
     it "should not include external tools if not configured for course navigation" do
-      @account = Account.default.sub_accounts.create!(:name => "sub-account")
       tool = @account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "example.com")
       tool.user_navigation = {:url => "http://www.example.com", :text => "Example URL"}
       tool.save!
@@ -665,7 +667,6 @@ describe Account do
     end
 
     it "should include active external tools if configured on the account" do
-      @account = Account.default.sub_accounts.create!(:name => "sub-account")
       tools = []
       2.times do |n|
         t = @account.context_external_tools.new(
@@ -697,7 +698,6 @@ describe Account do
     end
 
     it "should include external tools if configured on the root account" do
-      @account = Account.default.sub_accounts.create!(:name => "sub-account")
       tool = @account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "example.com")
       tool.account_navigation = {:url => "http://www.example.com", :text => "Example URL"}
       tool.save!
@@ -729,15 +729,14 @@ describe Account do
   end
 
   describe "user_list_search_mode_for" do
+    let_once(:account) { Account.default }
     it "should be preferred for anyone if open registration is turned on" do
-      account = Account.default
       account.settings = { :open_registration => true }
       account.user_list_search_mode_for(nil).should == :preferred
       account.user_list_search_mode_for(user).should == :preferred
     end
 
     it "should be preferred for account admins" do
-      account = Account.default
       account.user_list_search_mode_for(nil).should == :closed
       account.user_list_search_mode_for(user).should == :closed
       user
@@ -784,6 +783,8 @@ describe Account do
   end
 
   context "permissions" do
+    before(:once) { Account.default }
+
     it "should grant :read_sis to teachers" do
       user_with_pseudonym(:active_all => 1)
       Account.default.grants_right?(@user, :read_sis).should be_false
@@ -922,7 +923,7 @@ describe Account do
   end
 
   describe "available_course_roles_by_name" do
-    before do
+    before :once do
       account_model
       @roleA = @account.roles.create :name => 'A'
       @roleA.base_role_type = 'StudentEnrollment'
@@ -977,8 +978,8 @@ describe Account do
   end
 
   describe "#can_see_admin_tools_tab?" do
+    let_once(:account) { Account.create! }
     it "returns false if no user is present" do
-      account = Account.create!
       account.can_see_admin_tools_tab?(nil).should be_false
     end
 
@@ -988,14 +989,12 @@ describe Account do
     end
 
     it "doesn't have permission, it returns false" do
-      account = Account.create!
       account.stubs(:grants_right?).returns(false)
       account_admin_user(:account => account)
       account.can_see_admin_tools_tab?(@admin).should be_false
     end
 
     it "does have permission, it returns true" do
-      account = Account.create!
       account.stubs(:grants_right?).returns(true)
       account_admin_user(:account => account)
       account.can_see_admin_tools_tab?(@admin).should be_true
@@ -1017,7 +1016,7 @@ describe Account do
 
   describe "default_time_zone" do
     context "root account" do
-      before do
+      before :once do
         @account = Account.create!
       end
 
@@ -1032,7 +1031,7 @@ describe Account do
     end
 
     context "sub account" do
-      before do
+      before :once do
         @root_account = Account.create!
         @account = @root_account.sub_accounts.create!
         @account.root_account = @root_account
