@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -159,6 +159,8 @@ describe CourseSection, "moving to new course" do
     e = course1.enroll_user(u, 'StudentEnrollment', :section => cs)
     e.workflow_state = 'active'
     e.save!
+    #should also move deleted enrollments
+    e.destroy
     course1.reload
     course2.reload
     course3.workflow_state = 'active'

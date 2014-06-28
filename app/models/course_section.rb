@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -180,15 +180,15 @@ class CourseSection < ActiveRecord::Base
     old_course.course_sections.reset
     course.course_sections.reset
     assignment_overrides.active.destroy_all
-    user_ids = self.enrollments.map(&:user_id).uniq
+    user_ids = self.all_enrollments.map(&:user_id).uniq
 
     old_course_is_unrelated = old_course.id != self.course_id && old_course.id != self.nonxlist_course_id
     if self.root_account_id_changed?
       self.save!
-      self.enrollments.update_all :course_id => course, :root_account_id => self.root_account_id
+      self.all_enrollments.update_all :course_id => course, :root_account_id => self.root_account_id
     else
       self.save!
-      self.enrollments.update_all :course_id => course
+      self.all_enrollments.update_all :course_id => course
     end
     User.send_later_if_production(:update_account_associations, user_ids) if old_course.account_id != course.account_id && !User.skip_updating_account_associations?
     if old_course.id != self.course_id && old_course.id != self.nonxlist_course_id
