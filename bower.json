@@ -11,7 +11,7 @@
     "ic-menu": "0.1.11",
     "ic-styled": "1.1.6",
     "color-slicer": "0.4.0",
-    "k5uploader": "0.0.2",
+    "k5uploader": "0.0.3",
     "ember-qunit": "~0.1.7",
     "ic-tabs": "0.1.3",
     "ic-lazy-list": "0.2.2",
