@@ -16,7 +16,7 @@ define([], function(){
   };
 
   FileFilter.prototype.includesExtension = function(extension) {
-    return this.extensions.indexOf(extension) !== -1;
+    return this.extensions.indexOf(extension.toLowerCase()) !== -1;
   };
 
   FileFilter.prototype.toParams = function() {
