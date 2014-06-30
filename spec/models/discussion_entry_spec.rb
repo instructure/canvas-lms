@@ -511,6 +511,7 @@ describe DiscussionEntry do
     it "should not allow replies to locked topics" do
       @entry = @topic.reply_from(:user => @teacher, :text => "topic")
       @topic.lock!
+      @topic.clear_permissions_cache(@teacher)
       lambda { @entry.reply_from(:user => @teacher, :text => "reply") }.should raise_error(IncomingMail::Errors::ReplyToLockedTopic)
     end
   end

@@ -181,6 +181,7 @@ describe RoleOverride do
       course(:active_all => true)
       @course.expects(:enable_user_notes).once.returns(true)
       @course.grants_right?(@teacher, :manage_user_notes).should be_true
+      @course.clear_permissions_cache(@user)
       @course.expects(:enable_user_notes).once.returns(false)
       @course.grants_right?(@teacher, :manage_user_notes).should be_false
     end
@@ -190,6 +191,7 @@ describe RoleOverride do
       account_admin_user(:active_all => true)
       a.expects(:enable_user_notes).once.returns(true)
       a.grants_right?(@user, :manage_user_notes).should be_true
+      a.clear_permissions_cache(@user)
       a.expects(:enable_user_notes).once.returns(false)
       a.grants_right?(@user, :manage_user_notes).should be_false
     end

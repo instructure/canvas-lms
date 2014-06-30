@@ -397,6 +397,7 @@ describe LearningOutcome do
 
         Account.site_admin.expects(:grants_right?).with(@admin, nil, :manage_global_outcomes).returns(true)
         @outcome.grants_right?(@admin, :update).should be_true
+        @outcome.clear_permissions_cache(@admin)
 
         Account.site_admin.expects(:grants_right?).with(@admin, nil, :manage_global_outcomes).returns(false)
         @outcome.grants_right?(@admin, :update).should be_false

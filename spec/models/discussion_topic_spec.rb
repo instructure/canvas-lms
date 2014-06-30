@@ -84,20 +84,25 @@ describe DiscussionTopic do
     (@topic.check_policy(@teacher) & relevant_permissions).map(&:to_s).sort.should == ['read', 'reply', 'update', 'delete'].sort
     (@topic.check_policy(@student) & relevant_permissions).map(&:to_s).sort.should == ['read', 'reply'].sort
     @topic.lock!
+    @topic.clear_permissions_cache(@user)
     (@topic.check_policy(@teacher) & relevant_permissions).map(&:to_s).sort.should == ['read', 'update', 'delete'].sort
     (@topic.check_policy(@student) & relevant_permissions).map(&:to_s).should == ['read']
     @topic.unlock!
+    @topic.clear_permissions_cache(@user)
     (@topic.check_policy(@teacher) & relevant_permissions).map(&:to_s).sort.should == ['read', 'reply', 'update', 'delete'].sort
     (@topic.check_policy(@student) & relevant_permissions).map(&:to_s).sort.should == ['read', 'reply'].sort
 
     @entry = @topic.discussion_entries.create!(:user => @teacher)
     @entry.discussion_topic = @topic
+    @topic.clear_permissions_cache(@user)
     (@entry.check_policy(@teacher) & relevant_permissions).map(&:to_s).sort.should == ['read', 'reply', 'update', 'delete'].sort
     (@entry.check_policy(@student) & relevant_permissions).map(&:to_s).sort.should == ['read', 'reply'].sort
     @topic.lock!
+    @topic.clear_permissions_cache(@user)
     (@topic.check_policy(@teacher) & relevant_permissions).map(&:to_s).sort.should == ['read', 'update', 'delete'].sort
     (@entry.check_policy(@student) & relevant_permissions).map(&:to_s).should == ['read']
     @topic.unlock!
+    @topic.clear_permissions_cache(@user)
     (@entry.check_policy(@teacher) & relevant_permissions).map(&:to_s).sort.should == ['read', 'reply', 'update', 'delete'].sort
     (@entry.check_policy(@student) & relevant_permissions).map(&:to_s).sort.should == ['read', 'reply'].sort
   end
@@ -625,6 +630,7 @@ describe DiscussionTopic do
       # enroll as a student.
       course_with_student(:course => @course, :user => @ta, :active_enrollment => true)
       @topic.reload
+      @topic.clear_permissions_cache(@ta)
       @topic.user_can_see_posts?(@ta).should == false
     end
 

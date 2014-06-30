@@ -239,19 +239,16 @@ module AdheresToPolicy
 
               # Skip the condition_right if its the one we are looking for.
               # The Rails.cache.fetch will take care of caching it for us.
-              next if condition_right == sought_right
+              if condition_right != sought_right
 
-              # Cache the condition_right since we already know they have access.
-              Cache.write(permission_cache_key_for(user, session, condition_right), true)
+                # Cache the condition_right since we already know they have access.
+                Cache.write(permission_cache_key_for(user, session, condition_right), true)
+              end
             end
 
-            return true
+            true
           end
         end
-
-        # Looks like we didn't find anything for this sought_right so it is
-        # not granted to them.
-        return false
       end
     end
 

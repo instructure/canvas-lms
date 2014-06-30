@@ -154,6 +154,14 @@ describe Course do
   end
 
   context "permissions" do
+    def clear_permissions_cache
+      @course.clear_permissions_cache(@teacher)
+      @course.clear_permissions_cache(@designer)
+      @course.clear_permissions_cache(@ta)
+      @course.clear_permissions_cache(@admin1)
+      @course.clear_permissions_cache(@admin2)
+    end
+
     it "should follow account chain when looking for generic permissions from AccountUsers" do
       account = Account.create!
       sub_account = Account.create!(:parent_account => account)
@@ -188,6 +196,7 @@ describe Course do
       @course.save!
       [@course, @teacher, @designer, @ta, @admin1, @admin2].each(&:reload)
 
+      clear_permissions_cache
       @course.grants_right?(@teacher, :delete).should be_false
       @course.grants_right?(@designer, :delete).should be_false
       @course.grants_right?(@ta, :delete).should be_false
@@ -199,17 +208,20 @@ describe Course do
       @course.complete!
       [@course, @teacher, @designer, @ta, @admin1, @admin2].each(&:reload)
 
+      clear_permissions_cache
       @course.grants_right?(@teacher, :delete).should be_true
       @course.grants_right?(@designer, :delete).should be_true
       @course.grants_right?(@ta, :delete).should be_false
       @course.grants_right?(@admin1, :delete).should be_true
       @course.grants_right?(@admin2, :delete).should be_false
+      @course.clear_permissions_cache(@user)
 
       # completed, sis course
       @course.sis_source_id = 'sis_id'
       @course.save!
       [@course, @teacher, @designer, @ta, @admin1, @admin2].each(&:reload)
 
+      clear_permissions_cache
       @course.grants_right?(@teacher, :delete).should be_false
       @course.grants_right?(@designer, :delete).should be_false
       @course.grants_right?(@ta, :delete).should be_false
@@ -229,6 +241,7 @@ describe Course do
       @course.enroll_ta(@ta).accept!
 
       # active, non-sis course
+      clear_permissions_cache
       @course.grants_right?(@teacher, :reset_content).should be_true
       @course.grants_right?(@designer, :reset_content).should be_true
       @course.grants_right?(@ta, :reset_content).should be_false
@@ -240,6 +253,7 @@ describe Course do
       @course.save!
       [@course, @teacher, @designer, @ta, @admin1, @admin2].each(&:reload)
 
+      clear_permissions_cache
       @course.grants_right?(@teacher, :reset_content).should be_true
       @course.grants_right?(@designer, :reset_content).should be_true
       @course.grants_right?(@ta, :reset_content).should be_false
@@ -251,6 +265,7 @@ describe Course do
       @course.complete!
       [@course, @teacher, @designer, @ta, @admin1, @admin2].each(&:reload)
 
+      clear_permissions_cache
       @course.grants_right?(@teacher, :reset_content).should be_false
       @course.grants_right?(@designer, :reset_content).should be_false
       @course.grants_right?(@ta, :reset_content).should be_false
@@ -262,6 +277,7 @@ describe Course do
       @course.save!
       [@course, @teacher, @designer, @ta, @admin1, @admin2].each(&:reload)
 
+      clear_permissions_cache
       @course.grants_right?(@teacher, :reset_content).should be_false
       @course.grants_right?(@designer, :reset_content).should be_false
       @course.grants_right?(@ta, :reset_content).should be_false
@@ -2792,6 +2808,7 @@ describe Course, "conclusions" do
 
     # active
     @course.rights_status(@user, :read, :participate_as_student).should == {:read => true, :participate_as_student => true}
+    @course.clear_permissions_cache(@user)
 
     # soft conclusion
     enrollment.start_at = 4.days.ago
@@ -2806,6 +2823,7 @@ describe Course, "conclusions" do
     enrollment.should_not be_participating_student
 
     @course.rights_status(@user, :read, :participate_as_student).should == {:read => true, :participate_as_student => false}
+    @course.clear_permissions_cache(@user)
 
     # hard enrollment conclusion
     enrollment.start_at = enrollment.end_at = nil
@@ -2818,6 +2836,7 @@ describe Course, "conclusions" do
     enrollment.state_based_on_date.should == :completed
 
     @course.rights_status(@user, :read, :participate_as_student).should == {:read => true, :participate_as_student => false}
+    @course.clear_permissions_cache(@user)
 
     # course conclusion
     enrollment.workflow_state = 'active'
