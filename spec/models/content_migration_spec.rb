@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe ContentMigration do
 
   context "course copy" do
-    before do
+    before :once do
       course_with_teacher(:course_name => "from course", :active_all => true)
       @copy_from = @course
 
@@ -2176,7 +2176,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
     end
 
     context "copying frozen assignments" do
-      append_before (:each) do
+      before :once do
         @setting = PluginSetting.create!(:name => "assignment_freezer", :settings => {"no_copying" => "yes"})
 
         @asmnt = @copy_from.assignments.create!(:title => 'lock locky')
@@ -2252,7 +2252,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
     end
 
     context "external tools" do
-      append_before do
+      before :once do
         @tool_from = @copy_from.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :custom_fields => {'a' => '1', 'b' => '2'}, :url => "http://www.example.com")
         @tool_from.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
         @tool_from.save!
@@ -2405,7 +2405,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
   end
 
   context "import_object?" do
-    before do
+    before :once do
       course
       @cm = ContentMigration.new(context: @course)
     end

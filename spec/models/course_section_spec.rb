@@ -248,7 +248,7 @@ describe CourseSection, "moving to new course" do
   end
 
   describe 'validation' do
-    before(:each) do
+    before :once do
       course = Course.create_unique
       @section = CourseSection.create(course: course)
       @long_string = 'qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm'
@@ -272,7 +272,7 @@ describe CourseSection, "moving to new course" do
   end
 
   describe 'deletable?' do
-    before do
+    before :once do
       course_with_teacher
       @section = course.course_sections.create!
     end
@@ -295,7 +295,7 @@ describe CourseSection, "moving to new course" do
 
   context 'permissions' do
     context ':read and section_visibilities' do
-      before do
+      before :once do
         RoleOverride.create!({
           :context => Account.default,
           :permission => 'manage_students',

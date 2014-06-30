@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe ConversationMessage do
   context "notifications" do
-    before(:each) do
+    before :once do
       Notification.create(:name => "Conversation Message", :category => "TestImmediately")
       Notification.create(:name => "Added To Conversation", :category => "TestImmediately")
 
@@ -228,7 +228,7 @@ describe ConversationMessage do
   end
 
   context "infer_defaults" do
-    before do
+    before :once do
       course_with_teacher(:active_all => true)
       student_in_course(:active_all => true)
     end

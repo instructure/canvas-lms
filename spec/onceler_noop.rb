@@ -20,7 +20,8 @@ module Onceler
 
       %w{let_once subject_once let_each let_each! subject_each subject_each!}.each do |method|
         define_method(method) do |*args, &block|
-          frd_method = method.sub(/_[^!]+/, '')
+          # make _once behave like !, because that's essentially what onceler is doing
+          frd_method = method.sub(/_each!?\z/, '').sub(/_once!?\z/, '!')
           send frd_method, args.first, &block
         end
       end
