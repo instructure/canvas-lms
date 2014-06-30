@@ -65,6 +65,7 @@ describe "User Profile API", type: :request do
       'bio' => nil,
       'avatar_url' => new_user.gravatar_url,
       'time_zone' => 'Etc/UTC',
+      'locale' => nil
     }
 
     get("/courses/#{@course.id}/students")
@@ -86,6 +87,30 @@ describe "User Profile API", type: :request do
       'title' => nil,
       'bio' => nil,
       'time_zone' => 'Etc/UTC',
+      'locale' => nil
+    }
+  end
+
+  it 'should return the correct locale if not using the system default' do
+    @user = @student
+    @student.locale = 'es'
+    @student.save!
+    json = api_call(:get, "/api/v1/users/#{@student.id}/profile",
+             :controller => "profile", :action => "settings", :user_id => @student.to_param, :format => 'json')
+    json.should == {
+      'id' => @student.id,
+      'name' => 'Student',
+      'sortable_name' => 'Student',
+      'short_name' => 'Student',
+      'integration_id' => nil,
+      'primary_email' => 'pvuser@example.com',
+      'login_id' => 'pvuser@example.com',
+      'avatar_url' => @student.gravatar_url,
+      'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
+      'title' => nil,
+      'bio' => nil,
+      'time_zone' => 'Etc/UTC',
+      'locale' => 'es'
     }
   end
 
@@ -106,6 +131,7 @@ describe "User Profile API", type: :request do
       'title' => nil,
       'bio' => nil,
       'time_zone' => 'Etc/UTC',
+      'locale' => nil
     }
   end
 

@@ -37,6 +37,7 @@ module Api::V1::UserProfile
     json[:integration_id] ||= user.primary_pseudonym.try(:integration_id)
     zone = user.time_zone || @domain_root_account.try(:default_time_zone) || Time.zone
     json[:time_zone] = zone.tzinfo.name
+    json[:locale] = user.locale
 
     if user == current_user
       json[:calendar] = {:ics => "#{feeds_calendar_url(user.feed_code)}.ics"}
