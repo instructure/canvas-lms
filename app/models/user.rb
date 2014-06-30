@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -2467,7 +2467,7 @@ class User < ActiveRecord::Base
   def all_accounts
     @all_accounts ||= shard.activate do
       Rails.cache.fetch(['all_accounts', self].cache_key) do
-        self.accounts.with_each_shard
+        self.accounts.active.with_each_shard
       end
     end
   end

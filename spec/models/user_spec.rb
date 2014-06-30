@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -2263,6 +2263,18 @@ describe User do
       end
 
       @user.all_accounts.map(&:id).sort.should == [Account.site_admin, @account2].map(&:id).sort
+    end
+
+    it "should exclude deleted accounts" do
+      user
+      Account.site_admin.account_users.create!(user: @user)
+      @shard1.activate do
+        @account2 = Account.create!
+        @account2.account_users.create!(user: @user)
+        @account2.destroy
+      end
+
+      @user.all_accounts.map(&:id).sort.should == [Account.site_admin].map(&:id).sort
     end
   end
 
