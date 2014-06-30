@@ -1,682 +1,682 @@
 {
   "checksum": {
-    "previous": "d444a531d21716fdf2ecf8ec7fb7e127690d888b2f58fcf56ee9f2160f11780a",
-    "current": "d444a531d21716fdf2ecf8ec7fb7e127690d888b2f58fcf56ee9f2160f11780a"
+    "previous": "2c23407163fbce3bc5ba472641df170b753525506a0f3b769a8effee42ab228d",
+    "current": "2c23407163fbce3bc5ba472641df170b753525506a0f3b769a8effee42ab228d"
   },
   "fonts": [
-    "public/font/canvas/canvas-icons_d444a531d21716fdf2ecf8ec7fb7e127.ttf",
-    "public/font/canvas/canvas-icons_d444a531d21716fdf2ecf8ec7fb7e127.svg",
-    "public/font/canvas/canvas-icons_d444a531d21716fdf2ecf8ec7fb7e127.woff",
-    "public/font/canvas/canvas-icons_d444a531d21716fdf2ecf8ec7fb7e127.eot"
+    "public/font/canvas/canvas-icons.ttf",
+    "public/font/canvas/canvas-icons.svg",
+    "public/font/canvas/canvas-icons.woff",
+    "public/font/canvas/canvas-icons.eot"
   ],
   "glyphs": {
     "add": {
       "codepoint": 61871,
-      "source": "app/stylesheets/icons/add.svg"
+      "source": "public/font/icons/add.svg"
     },
     "address-book": {
       "codepoint": 61872,
-      "source": "app/stylesheets/icons/address-book.svg"
+      "source": "public/font/icons/address-book.svg"
     },
     "analytics": {
       "codepoint": 61998,
-      "source": "app/stylesheets/icons/analytics.svg"
+      "source": "public/font/icons/analytics.svg"
     },
     "android": {
       "codepoint": 61873,
-      "source": "app/stylesheets/icons/android.svg"
+      "source": "public/font/icons/android.svg"
     },
     "announcement": {
       "codepoint": 61874,
-      "source": "app/stylesheets/icons/announcement.svg"
+      "source": "public/font/icons/announcement.svg"
     },
     "apple": {
       "codepoint": 61875,
-      "source": "app/stylesheets/icons/apple.svg"
+      "source": "public/font/icons/apple.svg"
     },
     "arrow-down": {
       "codepoint": 62000,
-      "source": "app/stylesheets/icons/arrow-down.svg"
+      "source": "public/font/icons/arrow-down.svg"
     },
     "arrow-left": {
       "codepoint": 61870,
-      "source": "app/stylesheets/icons/arrow-left.svg"
+      "source": "public/font/icons/arrow-left.svg"
     },
     "arrow-open-left": {
       "codepoint": 62001,
-      "source": "app/stylesheets/icons/arrow-open-left.svg"
+      "source": "public/font/icons/arrow-open-left.svg"
     },
     "arrow-open-right": {
       "codepoint": 62002,
-      "source": "app/stylesheets/icons/arrow-open-right.svg"
+      "source": "public/font/icons/arrow-open-right.svg"
     },
     "arrow-right": {
       "codepoint": 61866,
-      "source": "app/stylesheets/icons/arrow-right.svg"
+      "source": "public/font/icons/arrow-right.svg"
     },
     "arrow-up": {
       "codepoint": 61876,
-      "source": "app/stylesheets/icons/arrow-up.svg"
+      "source": "public/font/icons/arrow-up.svg"
     },
     "assignment": {
       "codepoint": 61877,
-      "source": "app/stylesheets/icons/assignment.svg"
+      "source": "public/font/icons/assignment.svg"
     },
     "audio": {
       "codepoint": 61878,
-      "source": "app/stylesheets/icons/audio.svg"
+      "source": "public/font/icons/audio.svg"
     },
     "bookmark": {
       "codepoint": 61879,
-      "source": "app/stylesheets/icons/bookmark.svg"
+      "source": "public/font/icons/bookmark.svg"
     },
     "calendar-day": {
       "codepoint": 61880,
-      "source": "app/stylesheets/icons/calendar-day.svg"
+      "source": "public/font/icons/calendar-day.svg"
     },
     "calendar-days": {
       "codepoint": 62005,
-      "source": "app/stylesheets/icons/calendar-days.svg"
+      "source": "public/font/icons/calendar-days.svg"
     },
     "calendar-month": {
       "codepoint": 61881,
-      "source": "app/stylesheets/icons/calendar-month.svg"
+      "source": "public/font/icons/calendar-month.svg"
     },
     "check": {
       "codepoint": 61884,
-      "source": "app/stylesheets/icons/check.svg"
+      "source": "public/font/icons/check.svg"
     },
     "check-dark": {
       "codepoint": 61885,
-      "source": "app/stylesheets/icons/check-dark.svg"
+      "source": "public/font/icons/check-dark.svg"
     },
     "check-plus": {
       "codepoint": 61886,
-      "source": "app/stylesheets/icons/check-plus.svg"
+      "source": "public/font/icons/check-plus.svg"
     },
     "clock": {
       "codepoint": 61887,
-      "source": "app/stylesheets/icons/clock.svg"
+      "source": "public/font/icons/clock.svg"
     },
     "collapse": {
       "codepoint": 61698,
-      "source": "app/stylesheets/icons/collapse.svg"
+      "source": "public/font/icons/collapse.svg"
     },
     "collection": {
       "codepoint": 61888,
-      "source": "app/stylesheets/icons/collection.svg"
+      "source": "public/font/icons/collection.svg"
     },
     "collection-save": {
       "codepoint": 61889,
-      "source": "app/stylesheets/icons/collection-save.svg"
+      "source": "public/font/icons/collection-save.svg"
     },
     "complete": {
       "codepoint": 61831,
-      "source": "app/stylesheets/icons/complete.svg"
+      "source": "public/font/icons/complete.svg"
     },
     "compose": {
       "codepoint": 61890,
-      "source": "app/stylesheets/icons/compose.svg"
+      "source": "public/font/icons/compose.svg"
     },
     "copy-course": {
       "codepoint": 61891,
-      "source": "app/stylesheets/icons/copy-course.svg"
+      "source": "public/font/icons/copy-course.svg"
     },
     "discussion": {
       "codepoint": 61999,
-      "source": "app/stylesheets/icons/discussion.svg"
+      "source": "public/font/icons/discussion.svg"
     },
     "discussion-check": {
       "codepoint": 61892,
-      "source": "app/stylesheets/icons/discussion-check.svg"
+      "source": "public/font/icons/discussion-check.svg"
     },
     "discussion-new": {
       "codepoint": 61893,
-      "source": "app/stylesheets/icons/discussion-new.svg"
+      "source": "public/font/icons/discussion-new.svg"
     },
     "discussion-reply": {
       "codepoint": 61894,
-      "source": "app/stylesheets/icons/discussion-reply.svg"
+      "source": "public/font/icons/discussion-reply.svg"
     },
     "discussion-reply-2": {
       "codepoint": 61895,
-      "source": "app/stylesheets/icons/discussion-reply-2.svg"
+      "source": "public/font/icons/discussion-reply-2.svg"
     },
     "discussion-reply-dark": {
       "codepoint": 61896,
-      "source": "app/stylesheets/icons/discussion-reply-dark.svg"
+      "source": "public/font/icons/discussion-reply-dark.svg"
     },
     "discussion-search": {
       "codepoint": 61897,
-      "source": "app/stylesheets/icons/discussion-search.svg"
+      "source": "public/font/icons/discussion-search.svg"
     },
     "discussion-x": {
       "codepoint": 61898,
-      "source": "app/stylesheets/icons/discussion-x.svg"
+      "source": "public/font/icons/discussion-x.svg"
     },
     "document": {
       "codepoint": 61899,
-      "source": "app/stylesheets/icons/document.svg"
+      "source": "public/font/icons/document.svg"
     },
     "download": {
       "codepoint": 61900,
-      "source": "app/stylesheets/icons/download.svg"
+      "source": "public/font/icons/download.svg"
     },
     "drag-handle": {
       "codepoint": 61901,
-      "source": "app/stylesheets/icons/drag-handle.svg"
+      "source": "public/font/icons/drag-handle.svg"
     },
     "drop-down": {
       "codepoint": 61832,
-      "source": "app/stylesheets/icons/drop-down.svg"
+      "source": "public/font/icons/drop-down.svg"
     },
     "edit": {
       "codepoint": 61902,
-      "source": "app/stylesheets/icons/edit.svg"
+      "source": "public/font/icons/edit.svg"
     },
     "educators": {
       "codepoint": 61903,
-      "source": "app/stylesheets/icons/educators.svg"
+      "source": "public/font/icons/educators.svg"
     },
     "email": {
       "codepoint": 62003,
-      "source": "app/stylesheets/icons/email.svg"
+      "source": "public/font/icons/email.svg"
     },
     "empty": {
       "codepoint": 61833,
-      "source": "app/stylesheets/icons/empty.svg"
+      "source": "public/font/icons/empty.svg"
     },
     "end": {
       "codepoint": 61904,
-      "source": "app/stylesheets/icons/end.svg"
+      "source": "public/font/icons/end.svg"
     },
     "expand": {
       "codepoint": 61834,
-      "source": "app/stylesheets/icons/expand.svg"
+      "source": "public/font/icons/expand.svg"
     },
     "expand-items": {
       "codepoint": 62004,
-      "source": "app/stylesheets/icons/expand-items.svg"
+      "source": "public/font/icons/expand-items.svg"
     },
     "export-content": {
       "codepoint": 61905,
-      "source": "app/stylesheets/icons/export-content.svg"
+      "source": "public/font/icons/export-content.svg"
     },
     "facebook": {
       "codepoint": 61836,
-      "source": "app/stylesheets/icons/facebook.svg"
+      "source": "public/font/icons/facebook.svg"
     },
     "facebook-boxed": {
       "codepoint": 61906,
-      "source": "app/stylesheets/icons/facebook-boxed.svg"
+      "source": "public/font/icons/facebook-boxed.svg"
     },
     "filmstrip": {
       "codepoint": 61907,
-      "source": "app/stylesheets/icons/filmstrip.svg"
+      "source": "public/font/icons/filmstrip.svg"
     },
     "flag": {
       "codepoint": 61837,
-      "source": "app/stylesheets/icons/flag.svg"
+      "source": "public/font/icons/flag.svg"
     },
     "folder": {
       "codepoint": 61908,
-      "source": "app/stylesheets/icons/folder.svg"
+      "source": "public/font/icons/folder.svg"
     },
     "forward": {
       "codepoint": 61838,
-      "source": "app/stylesheets/icons/forward.svg"
+      "source": "public/font/icons/forward.svg"
     },
     "github": {
       "codepoint": 61909,
-      "source": "app/stylesheets/icons/github.svg"
+      "source": "public/font/icons/github.svg"
     },
     "gradebook": {
       "codepoint": 61910,
-      "source": "app/stylesheets/icons/gradebook.svg"
+      "source": "public/font/icons/gradebook.svg"
     },
     "group": {
       "codepoint": 61911,
-      "source": "app/stylesheets/icons/group.svg"
+      "source": "public/font/icons/group.svg"
     },
     "group-new": {
       "codepoint": 61913,
-      "source": "app/stylesheets/icons/group-new.svg"
+      "source": "public/font/icons/group-new.svg"
     },
     "group-new-dark": {
       "codepoint": 62006,
-      "source": "app/stylesheets/icons/group-new-dark.svg"
+      "source": "public/font/icons/group-new-dark.svg"
     },
     "hamburger": {
       "codepoint": 61839,
-      "source": "app/stylesheets/icons/hamburger.svg"
+      "source": "public/font/icons/hamburger.svg"
     },
     "heart": {
       "codepoint": 61914,
-      "source": "app/stylesheets/icons/heart.svg"
+      "source": "public/font/icons/heart.svg"
     },
     "home": {
       "codepoint": 61915,
-      "source": "app/stylesheets/icons/home.svg"
+      "source": "public/font/icons/home.svg"
     },
     "hour-glass": {
       "codepoint": 61840,
-      "source": "app/stylesheets/icons/hour-glass.svg"
+      "source": "public/font/icons/hour-glass.svg"
     },
     "image": {
       "codepoint": 61916,
-      "source": "app/stylesheets/icons/image.svg"
+      "source": "public/font/icons/image.svg"
     },
     "import-content": {
       "codepoint": 61917,
-      "source": "app/stylesheets/icons/import-content.svg"
+      "source": "public/font/icons/import-content.svg"
     },
     "indent": {
       "codepoint": 61918,
-      "source": "app/stylesheets/icons/indent.svg"
+      "source": "public/font/icons/indent.svg"
     },
     "indent2": {
       "codepoint": 61919,
-      "source": "app/stylesheets/icons/indent2.svg"
+      "source": "public/font/icons/indent2.svg"
     },
     "info": {
       "codepoint": 61841,
-      "source": "app/stylesheets/icons/info.svg"
+      "source": "public/font/icons/info.svg"
     },
     "instructure": {
       "codepoint": 61920,
-      "source": "app/stylesheets/icons/instructure.svg"
+      "source": "public/font/icons/instructure.svg"
     },
     "invitation": {
       "codepoint": 61921,
-      "source": "app/stylesheets/icons/invitation.svg"
+      "source": "public/font/icons/invitation.svg"
     },
     "like": {
       "codepoint": 61922,
-      "source": "app/stylesheets/icons/like.svg"
+      "source": "public/font/icons/like.svg"
     },
     "link": {
       "codepoint": 61923,
-      "source": "app/stylesheets/icons/link.svg"
+      "source": "public/font/icons/link.svg"
     },
     "linkedin": {
       "codepoint": 61842,
-      "source": "app/stylesheets/icons/linkedin.svg"
+      "source": "public/font/icons/linkedin.svg"
     },
     "lock": {
       "codepoint": 61924,
-      "source": "app/stylesheets/icons/lock.svg"
+      "source": "public/font/icons/lock.svg"
     },
     "lti": {
       "codepoint": 61925,
-      "source": "app/stylesheets/icons/lti.svg"
+      "source": "public/font/icons/lti.svg"
     },
     "mark-as-read": {
       "codepoint": 61926,
-      "source": "app/stylesheets/icons/mark-as-read.svg"
+      "source": "public/font/icons/mark-as-read.svg"
     },
     "materials-required": {
       "codepoint": 61927,
-      "source": "app/stylesheets/icons/materials-required.svg"
+      "source": "public/font/icons/materials-required.svg"
     },
     "materials-required-light": {
       "codepoint": 61928,
-      "source": "app/stylesheets/icons/materials-required-light.svg"
+      "source": "public/font/icons/materials-required-light.svg"
     },
     "mature": {
       "codepoint": 61929,
-      "source": "app/stylesheets/icons/mature.svg"
+      "source": "public/font/icons/mature.svg"
     },
     "mature-light": {
       "codepoint": 61930,
-      "source": "app/stylesheets/icons/mature-light.svg"
+      "source": "public/font/icons/mature-light.svg"
     },
     "media": {
       "codepoint": 61931,
-      "source": "app/stylesheets/icons/media.svg"
+      "source": "public/font/icons/media.svg"
     },
     "message": {
       "codepoint": 61932,
-      "source": "app/stylesheets/icons/message.svg"
+      "source": "public/font/icons/message.svg"
     },
     "mini-arrow-down": {
       "codepoint": 61933,
-      "source": "app/stylesheets/icons/mini-arrow-down.svg"
+      "source": "public/font/icons/mini-arrow-down.svg"
     },
     "mini-arrow-left": {
       "codepoint": 61934,
-      "source": "app/stylesheets/icons/mini-arrow-left.svg"
+      "source": "public/font/icons/mini-arrow-left.svg"
     },
     "mini-arrow-right": {
       "codepoint": 61935,
-      "source": "app/stylesheets/icons/mini-arrow-right.svg"
+      "source": "public/font/icons/mini-arrow-right.svg"
     },
     "mini-arrow-up": {
       "codepoint": 61936,
-      "source": "app/stylesheets/icons/mini-arrow-up.svg"
+      "source": "public/font/icons/mini-arrow-up.svg"
     },
     "minimize": {
       "codepoint": 61937,
-      "source": "app/stylesheets/icons/minimize.svg"
+      "source": "public/font/icons/minimize.svg"
     },
     "module": {
       "codepoint": 61938,
-      "source": "app/stylesheets/icons/module.svg"
+      "source": "public/font/icons/module.svg"
     },
     "more": {
       "codepoint": 61939,
-      "source": "app/stylesheets/icons/more.svg"
+      "source": "public/font/icons/more.svg"
     },
     "ms-excel": {
       "codepoint": 61940,
-      "source": "app/stylesheets/icons/ms-excel.svg"
+      "source": "public/font/icons/ms-excel.svg"
     },
     "ms-ppt": {
       "codepoint": 61941,
-      "source": "app/stylesheets/icons/ms-ppt.svg"
+      "source": "public/font/icons/ms-ppt.svg"
     },
     "ms-word": {
       "codepoint": 61942,
-      "source": "app/stylesheets/icons/ms-word.svg"
+      "source": "public/font/icons/ms-word.svg"
     },
     "muted": {
       "codepoint": 61943,
-      "source": "app/stylesheets/icons/muted.svg"
+      "source": "public/font/icons/muted.svg"
     },
     "next-unread": {
       "codepoint": 61944,
-      "source": "app/stylesheets/icons/next-unread.svg"
+      "source": "public/font/icons/next-unread.svg"
     },
     "not-graded": {
       "codepoint": 61945,
-      "source": "app/stylesheets/icons/not-graded.svg"
+      "source": "public/font/icons/not-graded.svg"
     },
     "note-dark": {
       "codepoint": 61946,
-      "source": "app/stylesheets/icons/note-dark.svg"
+      "source": "public/font/icons/note-dark.svg"
     },
     "note-light": {
       "codepoint": 61947,
-      "source": "app/stylesheets/icons/note-light.svg"
+      "source": "public/font/icons/note-light.svg"
     },
     "off": {
       "codepoint": 61948,
-      "source": "app/stylesheets/icons/off.svg"
+      "source": "public/font/icons/off.svg"
     },
     "outdent": {
       "codepoint": 61949,
-      "source": "app/stylesheets/icons/outdent.svg"
+      "source": "public/font/icons/outdent.svg"
     },
     "outdent2": {
       "codepoint": 61950,
-      "source": "app/stylesheets/icons/outdent2.svg"
+      "source": "public/font/icons/outdent2.svg"
     },
     "paperclip": {
       "codepoint": 61951,
-      "source": "app/stylesheets/icons/paperclip.svg"
+      "source": "public/font/icons/paperclip.svg"
     },
     "partial": {
       "codepoint": 61843,
-      "source": "app/stylesheets/icons/partial.svg"
+      "source": "public/font/icons/partial.svg"
     },
     "pdf": {
       "codepoint": 61952,
-      "source": "app/stylesheets/icons/pdf.svg"
+      "source": "public/font/icons/pdf.svg"
     },
     "peer-graded": {
       "codepoint": 61953,
-      "source": "app/stylesheets/icons/peer-graded.svg"
+      "source": "public/font/icons/peer-graded.svg"
     },
     "peer-review": {
       "codepoint": 61954,
-      "source": "app/stylesheets/icons/peer-review.svg"
+      "source": "public/font/icons/peer-review.svg"
     },
     "pin": {
       "codepoint": 61955,
-      "source": "app/stylesheets/icons/pin.svg"
+      "source": "public/font/icons/pin.svg"
     },
     "pinterest": {
       "codepoint": 61956,
-      "source": "app/stylesheets/icons/pinterest.svg"
+      "source": "public/font/icons/pinterest.svg"
     },
     "plus": {
       "codepoint": 61957,
-      "source": "app/stylesheets/icons/plus.svg"
+      "source": "public/font/icons/plus.svg"
     },
     "prerequisite": {
       "codepoint": 61958,
-      "source": "app/stylesheets/icons/prerequisite.svg"
+      "source": "public/font/icons/prerequisite.svg"
     },
     "printer": {
       "codepoint": 61959,
-      "source": "app/stylesheets/icons/printer.svg"
+      "source": "public/font/icons/printer.svg"
     },
     "publish": {
       "codepoint": 61960,
-      "source": "app/stylesheets/icons/publish.svg"
+      "source": "public/font/icons/publish.svg"
     },
     "question": {
       "codepoint": 61844,
-      "source": "app/stylesheets/icons/question.svg"
+      "source": "public/font/icons/question.svg"
     },
     "quiz": {
       "codepoint": 61845,
-      "source": "app/stylesheets/icons/quiz.svg"
+      "source": "public/font/icons/quiz.svg"
     },
     "quiz-stats-avg": {
       "codepoint": 61846,
-      "source": "app/stylesheets/icons/quiz-stats-avg.svg"
+      "source": "public/font/icons/quiz-stats-avg.svg"
     },
     "quiz-stats-deviation": {
       "codepoint": 61847,
-      "source": "app/stylesheets/icons/quiz-stats-deviation.svg"
+      "source": "public/font/icons/quiz-stats-deviation.svg"
     },
     "quiz-stats-high": {
       "codepoint": 61848,
-      "source": "app/stylesheets/icons/quiz-stats-high.svg"
+      "source": "public/font/icons/quiz-stats-high.svg"
     },
     "quiz-stats-low": {
       "codepoint": 61849,
-      "source": "app/stylesheets/icons/quiz-stats-low.svg"
+      "source": "public/font/icons/quiz-stats-low.svg"
     },
     "quiz-stats-time": {
       "codepoint": 61850,
-      "source": "app/stylesheets/icons/quiz-stats-time.svg"
+      "source": "public/font/icons/quiz-stats-time.svg"
     },
     "refresh": {
       "codepoint": 61851,
-      "source": "app/stylesheets/icons/refresh.svg"
+      "source": "public/font/icons/refresh.svg"
     },
     "remove-from-collection": {
       "codepoint": 61961,
-      "source": "app/stylesheets/icons/remove-from-collection.svg"
+      "source": "public/font/icons/remove-from-collection.svg"
     },
     "replied": {
       "codepoint": 61852,
-      "source": "app/stylesheets/icons/replied.svg"
+      "source": "public/font/icons/replied.svg"
     },
     "reply-2": {
       "codepoint": 61962,
-      "source": "app/stylesheets/icons/reply-2.svg"
+      "source": "public/font/icons/reply-2.svg"
     },
     "reply-all-2": {
       "codepoint": 61963,
-      "source": "app/stylesheets/icons/reply-all-2.svg"
+      "source": "public/font/icons/reply-all-2.svg"
     },
     "reset": {
       "codepoint": 61853,
-      "source": "app/stylesheets/icons/reset.svg"
+      "source": "public/font/icons/reset.svg"
     },
     "rss": {
       "codepoint": 61964,
-      "source": "app/stylesheets/icons/rss.svg"
+      "source": "public/font/icons/rss.svg"
     },
     "rss-add": {
       "codepoint": 61965,
-      "source": "app/stylesheets/icons/rss-add.svg"
+      "source": "public/font/icons/rss-add.svg"
     },
     "rubric": {
       "codepoint": 61966,
-      "source": "app/stylesheets/icons/rubric.svg"
+      "source": "public/font/icons/rubric.svg"
     },
     "rubric-dark": {
       "codepoint": 61967,
-      "source": "app/stylesheets/icons/rubric-dark.svg"
+      "source": "public/font/icons/rubric-dark.svg"
     },
     "search": {
       "codepoint": 61968,
-      "source": "app/stylesheets/icons/search.svg"
+      "source": "public/font/icons/search.svg"
     },
     "search-address-book": {
       "codepoint": 61969,
-      "source": "app/stylesheets/icons/search-address-book.svg"
+      "source": "public/font/icons/search-address-book.svg"
     },
     "settings": {
       "codepoint": 61854,
-      "source": "app/stylesheets/icons/settings.svg"
+      "source": "public/font/icons/settings.svg"
     },
     "settings-2": {
       "codepoint": 61970,
-      "source": "app/stylesheets/icons/settings-2.svg"
+      "source": "public/font/icons/settings-2.svg"
     },
     "skype": {
       "codepoint": 61971,
-      "source": "app/stylesheets/icons/skype.svg"
+      "source": "public/font/icons/skype.svg"
     },
     "speed-grader": {
       "codepoint": 61972,
-      "source": "app/stylesheets/icons/speed-grader.svg"
+      "source": "public/font/icons/speed-grader.svg"
     },
     "standards": {
       "codepoint": 61855,
-      "source": "app/stylesheets/icons/standards.svg"
+      "source": "public/font/icons/standards.svg"
     },
     "star": {
       "codepoint": 61856,
-      "source": "app/stylesheets/icons/star.svg"
+      "source": "public/font/icons/star.svg"
     },
     "stats": {
       "codepoint": 61973,
-      "source": "app/stylesheets/icons/stats.svg"
+      "source": "public/font/icons/stats.svg"
     },
     "student-view": {
       "codepoint": 61857,
-      "source": "app/stylesheets/icons/student-view.svg"
+      "source": "public/font/icons/student-view.svg"
     },
     "syllabus": {
       "codepoint": 61974,
-      "source": "app/stylesheets/icons/syllabus.svg"
+      "source": "public/font/icons/syllabus.svg"
     },
     "tag": {
       "codepoint": 61858,
-      "source": "app/stylesheets/icons/tag.svg"
+      "source": "public/font/icons/tag.svg"
     },
     "target": {
       "codepoint": 61859,
-      "source": "app/stylesheets/icons/target.svg"
+      "source": "public/font/icons/target.svg"
     },
     "text": {
       "codepoint": 61860,
-      "source": "app/stylesheets/icons/text.svg"
+      "source": "public/font/icons/text.svg"
     },
     "text-center": {
       "codepoint": 61975,
-      "source": "app/stylesheets/icons/text-center.svg"
+      "source": "public/font/icons/text-center.svg"
     },
     "text-left": {
       "codepoint": 61976,
-      "source": "app/stylesheets/icons/text-left.svg"
+      "source": "public/font/icons/text-left.svg"
     },
     "text-right": {
       "codepoint": 61977,
-      "source": "app/stylesheets/icons/text-right.svg"
+      "source": "public/font/icons/text-right.svg"
     },
     "timer": {
       "codepoint": 61978,
-      "source": "app/stylesheets/icons/timer.svg"
+      "source": "public/font/icons/timer.svg"
     },
     "toggle-left": {
       "codepoint": 61979,
-      "source": "app/stylesheets/icons/toggle-left.svg"
+      "source": "public/font/icons/toggle-left.svg"
     },
     "toggle-right": {
       "codepoint": 61980,
-      "source": "app/stylesheets/icons/toggle-right.svg"
+      "source": "public/font/icons/toggle-right.svg"
     },
     "trash": {
       "codepoint": 61981,
-      "source": "app/stylesheets/icons/trash.svg"
+      "source": "public/font/icons/trash.svg"
     },
     "trouble": {
       "codepoint": 61861,
-      "source": "app/stylesheets/icons/trouble.svg"
+      "source": "public/font/icons/trouble.svg"
     },
     "twitter": {
       "codepoint": 61862,
-      "source": "app/stylesheets/icons/twitter.svg"
+      "source": "public/font/icons/twitter.svg"
     },
     "twitter-boxed": {
       "codepoint": 61982,
-      "source": "app/stylesheets/icons/twitter-boxed.svg"
+      "source": "public/font/icons/twitter-boxed.svg"
     },
     "unknown2": {
       "codepoint": 61984,
-      "source": "app/stylesheets/icons/unknown2.svg"
+      "source": "public/font/icons/unknown2.svg"
     },
     "unlock": {
       "codepoint": 61986,
-      "source": "app/stylesheets/icons/unlock.svg"
+      "source": "public/font/icons/unlock.svg"
     },
     "unmuted": {
       "codepoint": 61987,
-      "source": "app/stylesheets/icons/unmuted.svg"
+      "source": "public/font/icons/unmuted.svg"
     },
     "unpublish": {
       "codepoint": 61988,
-      "source": "app/stylesheets/icons/unpublish.svg"
+      "source": "public/font/icons/unpublish.svg"
     },
     "unpublished": {
       "codepoint": 61989,
-      "source": "app/stylesheets/icons/unpublished.svg"
+      "source": "public/font/icons/unpublished.svg"
     },
     "updown": {
       "codepoint": 61863,
-      "source": "app/stylesheets/icons/updown.svg"
+      "source": "public/font/icons/updown.svg"
     },
     "upload": {
       "codepoint": 61990,
-      "source": "app/stylesheets/icons/upload.svg"
+      "source": "public/font/icons/upload.svg"
     },
     "user": {
       "codepoint": 61991,
-      "source": "app/stylesheets/icons/user.svg"
+      "source": "public/font/icons/user.svg"
     },
     "user-add": {
       "codepoint": 61992,
-      "source": "app/stylesheets/icons/user-add.svg"
+      "source": "public/font/icons/user-add.svg"
     },
     "video": {
       "codepoint": 61993,
-      "source": "app/stylesheets/icons/video.svg"
+      "source": "public/font/icons/video.svg"
     },
     "warning": {
       "codepoint": 61994,
-      "source": "app/stylesheets/icons/warning.svg"
+      "source": "public/font/icons/warning.svg"
     },
     "windows": {
       "codepoint": 61995,
-      "source": "app/stylesheets/icons/windows.svg"
+      "source": "public/font/icons/windows.svg"
     },
     "wordpress": {
       "codepoint": 61996,
-      "source": "app/stylesheets/icons/wordpress.svg"
+      "source": "public/font/icons/wordpress.svg"
     },
     "x": {
       "codepoint": 61997,
-      "source": "app/stylesheets/icons/x.svg"
+      "source": "public/font/icons/x.svg"
     },
     "zipped": {
       "codepoint": 61864,
-      "source": "app/stylesheets/icons/zipped.svg"
+      "source": "public/font/icons/zipped.svg"
     }
   },
   "options": {
@@ -692,7 +692,7 @@
     },
     "no_hash": true,
     "output": {
-      "css": "app/stylesheets/utilities",
+      "css": "app/stylesheets/components",
       "fonts": "public/font/canvas",
       "preview": "public/font/canvas"
     },
@@ -703,6 +703,6 @@
     ]
   },
   "templates": [
-    "app/stylesheets/utilities/_canvas-icons.scss"
+    "app/stylesheets/components/_canvas-icons.scss"
   ]
 }

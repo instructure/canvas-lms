@@ -10,6 +10,6 @@ input:
   templates: public/font/icons
 output:
   fonts: public/font/canvas
-  css: app/stylesheets/utilities
+  css: app/stylesheets/components
 templates: 
   - _canvas-icons.scss

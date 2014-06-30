@@ -1,0 +1,118 @@
+@import "base/environment";
+@import "vendor/bootstrap/forms";
+@import "vendor/bootstrap/buttons";
+
+* {
+  margin: 0px;
+  padding: 0px;
+}
+html, body {
+  height: 100%;
+}
+
+html {
+  margin: 0;
+  padding: 0;
+  background-color: black;
+  background: url('/images/Money_Noise_tm.png?1348625397'),
+              -webkit-gradient(radial, 50% 0px, 0, 50% 0px, 0, color-stop(0%, rgba(255, 255, 255, 0.4)), color-stop(100%, transparent)),
+              -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #2B2B2B), color-stop(100%, black));
+  background: url('/images/Money_Noise_tm.png?1348625397'),
+              -webkit-radial-gradient(50% 0px, circle cover, rgba(255, 255, 255, 0.4) 0%, transparent 100%),
+              -webkit-linear-gradient(top, #2B2B2B, black);
+  background: url('/images/Money_Noise_tm.png?1348625397'),
+              radial-gradient(50% -100px, circle cover, rgba(255, 255, 255, 0.6) 0%, transparent 100%),
+              linear-gradient(to bottom, #2B2B2B, black);
+  min-height: 420px;  /* this is a workaround to be high enough on an iphone */
+  font-size: 114%;
+  font-family: Helvetica;
+}
+.face {
+  background: #1a1b1a;
+  border-radius: 1em;
+  color: white;
+}
+#f1_container {
+  position: relative;
+  margin: 0 auto;
+  padding: 110px 0;
+  width: 300px;
+  height: 198px;
+  z-index: 1;
+  background-image: url("/images/canvas_logo_for_mobile_login.png?1");
+  background-position: center 30px;
+  background-repeat: no-repeat;
+  background-size: 270px 48px;
+}
+
+#f1_card {
+  width: 100%;
+  height: 100%;
+}
+
+.face {
+  position: absolute;
+  padding: 15px;
+}
+
+.face.back {
+  display: none;
+}
+
+.flipped .face.back {
+  display: block;
+}
+
+.flipped .face.front {
+  display: none;
+}
+
+a {
+  color: lightgray;
+}
+
+p {
+  margin: 15px 0;
+}
+
+.btn {
+  text-align: center;
+  display: block;
+  text-decoration: none;
+  margin-bottom: 15px;
+  width: 270px;
+}
+a.btn {
+  width: 230px;
+}
+.flip-to-back, .flip-to-front {
+  margin: 0;
+}
+input.input-block-level {
+  display: block;
+  padding: 10px 15px;
+  width: 240px;
+  margin-bottom: 15px;
+  font-size: 20px;
+}
+label {
+  padding: 10px 15px;
+  font-size: 15px;
+}
+input::-webkit-input-placeholder {
+  color: #898989;
+}
+.error {
+  background: #faa;
+  color: #a00;
+  font-size: 20px;
+  text-shadow: 0px 1px 1px rgba(255,255,255,0.4);
+  margin: 15px 0;
+  padding: 10px 5px;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.icon_url {
+  display: none;
+}

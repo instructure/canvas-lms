@@ -1,0 +1,66 @@
+@import "base/environment";
+
+#adminToolsTabPanes {
+  .search-controls {
+    background-color: $lightBackground;
+  }
+  .roster tr.selected td {
+    background-color: $hover-color;
+  }
+}
+
+#commMessagesSearchResults {
+  .collectionViewItems {
+    margin-left: 0;
+    list-style-type: none;
+  }
+  .message { margin-bottom: 1.5em; }
+  .message-body {
+    margin: 0 1em 1em;
+    overflow-y: auto;
+    max-height: 400px;
+  }
+
+  /*-- workflow state labels --*/
+  .label {
+    background-color: #999;
+    border-radius: 3px;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    line-height: 14px;
+    padding: 1px 4px 2px;
+    text-shadow: 0 -1px 0 rgba(black, .25);
+    vertical-align: baseline;
+    white-space: nowrap;
+    float: right;
+
+    &.label-sent, &.label-dashboard {
+      background-color: $successText;
+    }
+
+    &.label-created, &.label-staged, &.label-sending {
+      background-color: #3A87AD;
+    }
+
+    &.label-cancelled, &.label-bounced {
+      background-color: #B94A48;
+    }
+
+    &.label-closed {
+      background-color: #333;
+    }
+  }
+}
+
+.message-meta-data {
+  margin-left: 1em;
+  td {
+    text-align: left;
+    padding-right: 0.75em;
+
+    &.meta-data-label {
+      font-weight: bold;
+    }
+  }
+}

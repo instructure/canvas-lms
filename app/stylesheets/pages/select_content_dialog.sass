@@ -1,0 +1,27 @@
+@import base/environment
+#select_context_content_dialog
+  padding: 35px
+  #context_external_tools_select
+    .tools
+      vertical-align: top
+      padding: 10px 0
+      max-height: 150px
+      overflow: auto
+      .tool
+        border-radius: 3px
+        padding: 2px 5px
+        border-bottom: 1px dotted #ccc
+        cursor: pointer
+        .name
+          font-weight: bold
+        .description
+          max-height: 2.9em
+          overflow: hidden
+          font-size: 0.8em
+        &:hover
+          background-color: #eee
+        &.selected
+          background-color: #ddd
+        &.resource_selection
+          .name
+            background: url(/images/find.png) no-repeat right center
