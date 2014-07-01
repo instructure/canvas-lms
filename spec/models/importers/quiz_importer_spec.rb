@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '../../../import_helper')
 
 describe "Importers::QuizImporter" do
-  before(:each) do
+  before(:once) do
     course_model.root_account.disable_feature!(:draft_state)
   end
 

@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Quizzes::SubmissionGrader do
   context 'with course and quiz' do
-  before(:each) do
+  before(:once) do
     course
     @quiz = @course.quizzes.create!
   end

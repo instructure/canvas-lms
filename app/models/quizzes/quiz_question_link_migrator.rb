@@ -82,6 +82,10 @@ module Quizzes::QuizQuestionLinkMigrator
     return new_link
   end
 
+  def self.reset_cache!
+    @cached_link_migrations = {}
+  end
+
   def self.migrate_file_link(question, link)
     # check for an existing translation we already figured out
     @cached_link_migrations ||= {}

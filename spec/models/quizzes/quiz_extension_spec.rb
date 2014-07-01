@@ -60,7 +60,7 @@ describe Quizzes::QuizExtension do
   end
 
   describe ".build_extensions" do
-    before :each do
+    before :once do
       course
       @quiz = @course.quizzes.create!
 
@@ -91,7 +91,7 @@ describe Quizzes::QuizExtension do
   end
 
   describe "#extend_submission" do
-    before :each do
+    before :once do
       course
       @quiz = @course.quizzes.create!
 

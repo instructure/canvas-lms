@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Quizzes::QuizSubmission do
   context 'with course and quiz' do
-  before(:each) do
+  before(:once) do
     course
     @quiz = @course.quizzes.create!
   end
@@ -89,7 +89,7 @@ describe Quizzes::QuizSubmission do
   end
 
   describe "#update_scores" do
-    before(:each) do
+    before(:once) do
       student_in_course
       assignment_quiz([])
       qd = multiple_choice_question_data
@@ -206,7 +206,7 @@ describe Quizzes::QuizSubmission do
 
   context "explicitly setting grade" do
 
-    before(:each) do
+    before(:once) do
       course_with_student
       @quiz = @course.quizzes.create!
       @quiz.generate_quiz_data
@@ -399,7 +399,7 @@ describe Quizzes::QuizSubmission do
   end
 
   describe "with an essay question" do
-    before(:each) do
+    before(:once) do
       quiz_with_graded_submission([{:question_data => {:name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question'}}]) do
         {
           "text_after_answers"            => "",
@@ -458,7 +458,7 @@ describe Quizzes::QuizSubmission do
   end
 
   describe "with multiple essay questions" do
-    before(:each) do
+    before(:once) do
       quiz_with_graded_submission([{:question_data => {:name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question'}},
                                    {:question_data => {:name => 'question 2', :points_possible => 1, 'question_type' => 'essay_question'}}]) do
         {
@@ -606,7 +606,7 @@ describe Quizzes::QuizSubmission do
 
 
   describe "#score_to_keep" do
-    before(:each) do
+    before(:once) do
       student_in_course
       assignment_quiz([])
       qd = multiple_choice_question_data
@@ -616,7 +616,7 @@ describe Quizzes::QuizSubmission do
     end
 
     context "keep_highest" do
-      before(:each) do
+      before(:once) do
         @quiz.scoring_policy = "keep_highest"
         @quiz.save!
       end
@@ -656,7 +656,7 @@ describe Quizzes::QuizSubmission do
     end
 
     context "keep_latest" do
-      before(:each) do
+      before(:once) do
         @quiz.scoring_policy = "keep_latest"
         @quiz.save!
       end
@@ -878,7 +878,7 @@ describe Quizzes::QuizSubmission do
   end
 
   describe "#update_submission_version" do
-    let(:submission) { @quiz.quiz_submissions.create! }
+    let_once(:submission) { @quiz.quiz_submissions.create! }
 
     before do
       submission.with_versioning(true) do |s|
@@ -994,7 +994,7 @@ describe Quizzes::QuizSubmission do
   end
 
   describe "#needs_grading?" do
-    before do
+    before :once do
       student_in_course
       assignment_quiz([])
       qd = multiple_choice_question_data
@@ -1061,7 +1061,7 @@ describe Quizzes::QuizSubmission do
   end
 
   describe "#questions_regraded_since_last_attempt" do
-    before do
+    before :once do
       @quiz = @course.quizzes.create! title: 'Test Quiz'
       course_with_teacher_logged_in(active_all: true, course: @course)
 
@@ -1098,7 +1098,7 @@ describe Quizzes::QuizSubmission do
   end
 
   describe 'broadcast policy' do
-    before do
+    before :once do
       Notification.create(:name => 'Submission Graded')
       Notification.create(:name => 'Submission Grade Changed')
       Notification.create(:name => 'Submission Needs Grading')

@@ -76,7 +76,7 @@ describe Quizzes::QuizQuestion do
       object.quiz_questions.active.sort_by{|q| q.position }.map {|q| q.id }
     end
 
-    before do
+    before :once do
       course
       @quiz = @course.quizzes.create!(:title => "some quiz")
       @question1 = @quiz.quiz_questions.create!(:question_data => {'name' => 'test question 1', 'answers' => [{'id' => 1}, {'id' => 2}]})
