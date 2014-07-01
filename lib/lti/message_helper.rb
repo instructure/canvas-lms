@@ -23,7 +23,8 @@ module Lti
   module MessageHelper
     def common_variable_substitutions
       {
-          '$Canvas.api.domain' => -> {HostUrl.context_host(@domain_root_account, request.host)}
+          '$Canvas.api.domain' => -> {HostUrl.context_host(@domain_root_account, request.host)},
+          '$Canvas.xapi.url' => -> {lti_xapi_url(@tool)}
       }
     end
   end
