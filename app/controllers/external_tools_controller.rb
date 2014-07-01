@@ -320,10 +320,7 @@ class ExternalToolsController < ApplicationController
   end
 
   def find_tool(id, selection_type)
-    begin
-      @tool = ContextExternalTool.find_for(id, @context, selection_type)
-    rescue ActiveRecord::RecordNotFound;
-    end
+    @tool = ContextExternalTool.find_for(id, @context, selection_type, false)
     if !@tool
       flash[:error] = t "#application.errors.invalid_external_tool_id", "Couldn't find valid settings for this tool"
       redirect_to named_context_url(@context, :context_url)

@@ -132,7 +132,7 @@ JOKE
             if tab['id'].is_a?(String)
               # it's an external tool, so translate the id to a migration_id
               tool_id = tab['id'].sub('context_external_tool_', '')
-              if tool = ContextExternalTool.find_for(tool_id, @course, :course_navigation)
+              if tool = ContextExternalTool.find_for(tool_id, @course, :course_navigation, false)
                 tab['id'] = "context_external_tool_#{create_key(tool)}"
               end
             end
