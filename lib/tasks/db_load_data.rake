@@ -139,8 +139,8 @@ namespace :db do
           raise pseudonym.errors.full_messages.first if pseudonym.errors.size > 0
           raise "unknown error saving password"
         end
-        Account.site_admin.add_user(user, 'AccountAdmin')
-        Account.default.add_user(user, 'AccountAdmin')
+        Account.site_admin.account_users.where(user_id: user, membership_type: 'AccountAdmin').first_or_create!
+        Account.default.account_users.where(user_id: user, membership_type: 'AccountAdmin').first_or_create!
         user
       rescue => e
         STDERR.puts "Problem creating administrative account, please try again: #{e}"

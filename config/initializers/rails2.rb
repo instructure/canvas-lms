@@ -304,6 +304,10 @@ end
       first || build
     end
 
+    def first_or_create!
+      first || create!
+    end
+
     def first!
       first or raise ActiveRecord::RecordNotFound
     end
