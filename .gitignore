@@ -25,6 +25,7 @@
 Gemfile.lock
 Gemfile.lock2
 Gemfile.lock3
+Gemfile.lock4
 /log/
 /public/app/
 /public/assets/
@@ -34,7 +35,7 @@ Gemfile.lock3
 /public/javascripts/translations/
 /public/optimized/
 /public/stylesheets_compiled/
-/config/RAILS3
+/config/RAILS4
 /spec/javascripts/runner.html
 /spec/javascripts/tests.js
 /spec/javascripts/compiled/

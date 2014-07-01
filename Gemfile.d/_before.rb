@@ -45,6 +45,24 @@ else
   ruby '1.9.3', :engine => 'ruby', :engine_version => '1.9.3'
 end
 
+# force a different lockfile for rails 4
+unless CANVAS_RAILS3
+  Bundler::SharedHelpers.class_eval do
+    class << self
+      def default_lockfile
+        Pathname.new("#{Bundler.default_gemfile}.lock4")
+      end
+    end
+  end
+
+  Bundler::Dsl.class_eval do
+    def to_definition(lockfile, unlock)
+      @sources << @rubygems_source unless @sources.include?(@rubygems_source)
+      Definition.new(Bundler.default_lockfile, @dependencies, @sources, unlock, @ruby_version)
+    end
+  end
+end
+
 # patch bundler to do github over https
 if respond_to?(:git_source)
   git_source(:github) do |repo_name|

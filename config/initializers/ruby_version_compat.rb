@@ -97,12 +97,23 @@ class ActiveRecord::Base
       value
     end
 
-    def type_cast_attribute_with_utf8_check(attr_name, attributes, cache={})
-      value = type_cast_attribute_without_utf8_check(attr_name, attributes, cache)
-      strip_invalid_utf8_from_attribute(attr_name, value)
+    if CANVAS_RAILS3
+      def type_cast_attribute_with_utf8_check(attr_name, attributes, cache={})
+        value = type_cast_attribute_without_utf8_check(attr_name, attributes, cache)
+        strip_invalid_utf8_from_attribute(attr_name, value)
+      end
+      alias_method_chain :type_cast_attribute, :utf8_check
     end
-    alias_method_chain :type_cast_attribute, :utf8_check
   end
+end
+
+unless CANVAS_RAILS3
+  module AttributeReadWithUtf8Check
+    def read_attribute(attr_name, &block)
+      self.class.strip_invalid_utf8_from_attribute(attr_name, super)
+    end
+  end
+  ActiveRecord::AttributeMethods::Read.send(:prepend, AttributeReadWithUtf8Check)
 end
 
 # Fix for https://bugs.ruby-lang.org/issues/7278 , which was filling up our logs with these warnings

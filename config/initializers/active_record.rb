@@ -615,8 +615,12 @@ end
 
 unless defined? OpenDataExport
   # allow an exportable option that we don't actually do anything with, because our open-source build may not contain OpenDataExport
-  ActiveRecord::Associations::Builder::Association.class_eval do
-    ([self] + self.descendants).each { |klass| klass.valid_options << :exportable }
+  if CANVAS_RAILS3
+    ActiveRecord::Associations::Builder::Association.class_eval do
+      ([self] + self.descendants).each { |klass| klass.valid_options << :exportable }
+    end
+  else
+    ActiveRecord::Associations::Builder::Association.valid_options << :exportable
   end
 end
 
@@ -660,7 +664,7 @@ ActiveRecord::Associations::JoinDependency::JoinAssociation.class_eval do
     @join_conditions = []
     relation
   end
-  alias_method_chain :join_to, :join_conditions
+  alias_method_chain :join_to, :join_conditions if CANVAS_RAILS3 # TODO RAILS4: this changed drastically
 end
 
 ActiveRecord::Associations::Preloader::Association.class_eval do
@@ -1171,7 +1175,16 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
 
 end
 
-ActiveRecord::Associations::Builder::HasMany.valid_options << :joins
+if CANVAS_RAILS3
+  ActiveRecord::Associations::Builder::HasMany.valid_options << :joins
+else
+  module HasManyAllowJoins
+    def valid_options
+      super + [:joins]
+    end
+  end
+  ActiveRecord::Associations::Builder::HasMany.send(:prepend, HasManyAllowJoins)
+end
 
 ActiveRecord::Associations::HasOneAssociation.class_eval do
   def create_scope
