@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe Group do
 
-  before do
+  before :once do
     course_model
     group_model(:context => @course)
   end
@@ -517,7 +517,7 @@ describe Group do
   end
 
   context "tabs_available" do
-    before do
+    before :once do
       course_with_teacher
       @teacher = @user
       @group = group(:group_context => @course)
@@ -571,7 +571,7 @@ describe Group do
   end
 
   describe "#feature_enabled?" do
-    before(:each) do
+    before(:once) do
       course_with_teacher(active_all: true)
       @course.root_account.allow_feature!(:draft_state)
     end
@@ -584,7 +584,7 @@ describe Group do
     end
 
     context "an account with :draft_state enabled" do
-      before do
+      before :once do
         @course.root_account.enable_feature!(:draft_state)
       end
 

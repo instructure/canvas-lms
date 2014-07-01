@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe EportfolioEntry do
 
   describe 'validation' do
-    before(:each) do
+    before(:once) do
       eportfolio_model
       @long_string = 'qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm
                       qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm
@@ -48,6 +48,10 @@ describe EportfolioEntry do
   end
 
   context "parse_content" do
+    before :once do
+      eportfolio_model
+    end
+
     it "should accept valid attachments" do
       eportfolio_model
       attachment_model(:context => @user)
@@ -59,9 +63,7 @@ describe EportfolioEntry do
     end
 
     it "should not accept invalid attachments" do
-      @old_user = user_model
-      eportfolio_model
-      attachment_model(:context => @old_user)
+      attachment_model(:context => User.create)
       @eportfolio_entry.parse_content({:section_count => 1, :section_1 => {:section_type => 'attachment', :attachment_id => @attachment.id}})
       @eportfolio_entry.content.should_not be_nil
       @eportfolio_entry.content.length.should eql(1)
@@ -74,7 +76,6 @@ describe EportfolioEntry do
     end
 
     it "should accept valid submissions" do
-      eportfolio_model
       submission_model(:user => @user)
       @eportfolio_entry.parse_content({:section_count => 1, :section_1 => {:section_type => 'submission', :submission_id => @submission.id}})
       @eportfolio_entry.content.should_not be_nil
@@ -100,7 +101,6 @@ describe EportfolioEntry do
     end
 
     it "should accept valid html content" do
-      eportfolio_model
       @eportfolio_entry.parse_content({:section_count => 1, :section_1 => {:section_type => 'html', :content => "<a onclick='javascript: alert(5);' href='#bob;'>link</a>"}})
       @eportfolio_entry.content.should_not be_nil
       @eportfolio_entry.content.length.should eql(1)
@@ -112,7 +112,6 @@ describe EportfolioEntry do
     end
 
     it "should not accept invalid html content" do
-      eportfolio_model
       @eportfolio_entry.parse_content({:section_count => 1, :section_1 => {:section_type => 'html'}})
       @eportfolio_entry.content.should_not be_nil
       @eportfolio_entry.content.length.should eql(1)
@@ -120,7 +119,6 @@ describe EportfolioEntry do
     end
 
     it "should accept valid rich content" do
-      eportfolio_model
       @eportfolio_entry.parse_content({:section_count => 1, :section_1 => {:section_type => 'rich_text', :content => "<a onclick='javascript: alert(5);' href='#bob;'>link</a>"}})
       @eportfolio_entry.content.should_not be_nil
       @eportfolio_entry.content.length.should eql(1)
@@ -132,7 +130,6 @@ describe EportfolioEntry do
     end
 
     it "should not accept invalid rich content" do
-      eportfolio_model
       @eportfolio_entry.parse_content({:section_count => 1, :section_1 => {:section_type => 'rich_text', :content => "<blink/>"}})
       @eportfolio_entry.content.should_not be_nil
       @eportfolio_entry.content.length.should eql(1)
