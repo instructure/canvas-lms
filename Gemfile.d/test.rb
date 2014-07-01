@@ -25,7 +25,7 @@ group :test do
   else
     gem 'rspec', '2.14.1'
     gem 'rspec-rails', '2.14.1'
-    gem 'once-ler', '0.0.8'
+    gem 'once-ler', '0.0.11'
   end
   gem 'sequel', '4.5.0', :require => false
   gem 'selenium-webdriver', '2.42.0'
