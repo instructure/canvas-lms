@@ -1798,7 +1798,7 @@ class Attachment < ActiveRecord::Base
 
   def preview_params(user)
     blob = {
-      user_id: user.global_id,
+      user_id: user.try(:global_id),
       attachment_id: id,
     }.to_json
     hmac = Canvas::Security.hmac_sha1(blob)
