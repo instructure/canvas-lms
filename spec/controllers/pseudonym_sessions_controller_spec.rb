@@ -681,6 +681,36 @@ describe PseudonymSessionsController do
       PseudonymSessionsController.any_instance.stubs(:cas_client).returns(cas_client) if use_mock
     end
 
+    it "should accept extra attributes" do
+      account = account_with_cas
+      user_with_pseudonym(active_all: true, account: account)
+
+      response_text = <<-RESPONSE_TEXT
+        <cas:serviceResponse xmlns:cas="http://www.yale.edu/tp/cas">
+          <cas:authenticationSuccess>
+            <cas:user>#{@user.email}</cas:user>
+            <cas:attributes>
+              <cas:name>#{@user.name}</cas:name>
+              <cas:email><![CDATA[#{@user.email}]]></cas:email>
+              <cas:yaml><![CDATA[--- true]]></cas:yaml>
+              <cas:json><![CDATA[{"id":#{@user.id}]]></cas:json>
+            </cas:attributes>
+          </cas:authenticationSuccess>
+        </cas:serviceResponse>
+      RESPONSE_TEXT
+
+      cas_client = controller.cas_client(account)
+      cas_client.instance_variable_set(:@stub_response, response_text)
+      def cas_client.request_cas_response(uri, type, options={})
+        type.new(@stub_response, @conf_options)
+      end
+
+      controller.request.env['canvas.domain_root_account'] = account
+      get 'new', :ticket => 'ST-abcd'
+      response.should redirect_to(dashboard_url(:login_success => 1))
+      session[:cas_session].should == 'ST-abcd'
+    end
+
     it "should scope logins to the correct domain root account" do
       unique_id = 'foo@example.com'
 
@@ -714,7 +744,7 @@ describe PseudonymSessionsController do
       Pseudonym.find(session['pseudonym_credentials_id']).should == user2.pseudonyms.first
     end
 
-    it "should log our correctly if the user is from a different account" do
+    it "should log out correctly if the user is from a different account" do
       account = account_with_cas
       user_with_pseudonym(active_all: true, account: account)
 

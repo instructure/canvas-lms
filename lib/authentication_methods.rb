@@ -311,11 +311,17 @@ module AuthenticationMethods
     false
   end
 
-  def initiate_cas_login(cas_client = nil)
+  def cas_client(account = @domain_root_account)
+    @cas_client ||= CASClient::Client.new(
+      cas_base_url: account.account_authorization_config.auth_base,
+      encode_extra_attributes_as: :raw
+    )
+  end
+
+  def initiate_cas_login(client = nil)
     reset_session_for_login
-    config = { :cas_base_url => @domain_root_account.account_authorization_config.auth_base }
-    cas_client ||= CASClient::Client.new(config)
-    delegated_auth_redirect(cas_client.add_service_to_login_url(cas_login_url))
+    client ||= cas_client
+    delegated_auth_redirect(client.add_service_to_login_url(cas_login_url))
   end
 
   def initiate_saml_login(current_host=nil, aac=nil)

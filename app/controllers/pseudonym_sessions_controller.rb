@@ -445,12 +445,6 @@ class PseudonymSessionsController < ApplicationController
     logout_user_action
   end
 
-  def cas_client(account = @domain_root_account)
-    return @cas_client if @cas_client
-    config = { :cas_base_url => account.account_authorization_config.auth_base }
-    @cas_client = CASClient::Client.new(config)
-  end
-
   def saml_response(raw_response, settings=nil)
     response = Onelogin::Saml::Response.new(raw_response, settings)
     response.logger = logger

@@ -5,7 +5,7 @@ describe AuthenticationMethods do
 
   describe '#initiate_delegated_login' do;
     let(:request) { stub(:host_with_port => '', :host => '' ) }
-    let(:controller) { Spec::MockController.new(domain_root_account, request) }
+    let(:controller) { RSpec::MockController.new(domain_root_account, request) }
 
     describe 'when auth is not delegated' do
       let(:domain_root_account) { stub(:delegated_authentication? => false) }
@@ -42,9 +42,32 @@ describe AuthenticationMethods do
       end
 
       it 'can be overriden by passing the canvas_login parameter' do
-        controller = Spec::MockController.new(domain_root_account, request, :canvas_login => true)
+        controller = RSpec::MockController.new(domain_root_account, request, :canvas_login => true)
         controller.initiate_delegated_login.should be_false
         controller.redirects.should == []
+      end
+
+
+      context "cas_client" do
+        let(:controller) { RSpec::MockController.new(domain_root_account, request, :canvas_login => true) }
+        let(:cas_client) { controller.cas_client }
+        let(:cas_base_url) { domain_root_account.account_authorization_config.auth_base }
+
+        it "accepts an account parameter" do
+          account_url = "account_url"
+          account = domain_root_account
+          account.account_authorization_config.stubs(:auth_base).returns(account_url)
+          controller.instance_variable_set('@cas_client', nil)
+          controller.cas_client(account).cas_base_url.should == account_url
+        end
+
+        it 'sets the cas_clients config values' do
+          config = {
+            cas_base_url: cas_base_url,
+            encode_extra_attributes_as: :raw
+          }
+          cas_client.instance_variable_get('@conf_options').should == config
+        end
       end
     end
 
@@ -82,7 +105,7 @@ describe AuthenticationMethods do
       end
 
       it 'can be overriden by passing the canvas_login parameter' do
-        controller = Spec::MockController.new(domain_root_account, request, :canvas_login => true)
+        controller = RSpec::MockController.new(domain_root_account, request, :canvas_login => true)
         controller.initiate_delegated_login.should be_false
         controller.redirects.should == []
       end
@@ -92,7 +115,7 @@ describe AuthenticationMethods do
   describe "#load_user" do
     before do
       @request = stub(:env => {'encrypted_cookie_store.session_refreshed_at' => 5.minutes.ago})
-      @controller = Spec::MockController.new(nil, @request)
+      @controller = RSpec::MockController.new(nil, @request)
       @controller.stubs(:load_pseudonym_from_access_token)
       @controller.stubs(:api_request?).returns(false)
     end
@@ -132,7 +155,7 @@ describe AuthenticationMethods do
   end
 end
 
-class Spec::MockController
+class RSpec::MockController
   include AuthenticationMethods
 
   attr_reader :redirects, :params, :session, :request
