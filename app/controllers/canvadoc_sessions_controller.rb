@@ -17,12 +17,11 @@
 #
 
 class CanvadocSessionsController < ApplicationController
-  before_filter :require_user
   include HmacHelper
 
   def show
     blob = extract_blob(params[:hmac], params[:blob],
-                        "user_id" => @current_user.global_id)
+                        "user_id" => @current_user.try(:global_id))
     attachment = Attachment.find(blob["attachment_id"])
 
     if attachment.canvadocable?
