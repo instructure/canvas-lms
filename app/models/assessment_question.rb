@@ -263,5 +263,5 @@ class AssessmentQuestion < ActiveRecord::Base
     dup
   end
 
-  scope :active, where("assessment_questions.workflow_state<>'deleted'")
+  scope :active, -> { where("assessment_questions.workflow_state<>'deleted'") }
 end

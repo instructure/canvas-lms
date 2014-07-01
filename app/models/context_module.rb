@@ -140,9 +140,9 @@ class ContextModule < ActiveRecord::Base
     state :deleted
   end
 
-  scope :active, where(:workflow_state => 'active')
-  scope :unpublished, where(:workflow_state => 'unpublished')
-  scope :not_deleted, where("context_modules.workflow_state<>'deleted'")
+  scope :active, -> { where(:workflow_state => 'active') }
+  scope :unpublished, -> { where(:workflow_state => 'unpublished') }
+  scope :not_deleted, -> { where("context_modules.workflow_state<>'deleted'") }
 
   alias_method :published?, :active?
 

@@ -465,10 +465,10 @@ class ContentMigration < ActiveRecord::Base
 
   scope :for_context, lambda { |context| where(:context_id => context, :context_type => context.class.to_s) }
 
-  scope :successful, where(:workflow_state => 'imported')
-  scope :running, where(:workflow_state => ['exporting', 'importing'])
-  scope :waiting, where(:workflow_state => 'exported')
-  scope :failed, where(:workflow_state => ['failed', 'pre_process_error'])
+  scope :successful, -> { where(:workflow_state => 'imported') }
+  scope :running, -> { where(:workflow_state => ['exporting', 'importing']) }
+  scope :waiting, -> { where(:workflow_state => 'exported') }
+  scope :failed, -> { where(:workflow_state => ['failed', 'pre_process_error']) }
 
   def complete?
     %w[imported failed pre_process_error].include?(workflow_state)

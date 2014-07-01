@@ -48,7 +48,7 @@ class WebConference < ActiveRecord::Base
 
   scope :for_context_codes, lambda { |context_codes| where(:context_code => context_codes) }
 
-  scope :with_config, lambda { where(conference_type: WebConference.conference_types.map{|ct| ct['conference_type']}) }
+  scope :with_config, -> { where(conference_type: WebConference.conference_types.map{|ct| ct['conference_type']}) }
 
   serialize :settings
   def settings
@@ -418,7 +418,7 @@ class WebConference < ActiveRecord::Base
     end
   end
 
-  scope :active, scoped
+  scope :active, -> { scoped }
 
   def as_json(options={})
     url = options.delete(:url)

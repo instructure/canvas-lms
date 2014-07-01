@@ -38,8 +38,8 @@ class CustomGradebookColumn < ActiveRecord::Base
     state :deleted
   end
 
-  scope :active, where(workflow_state: "active")
-  scope :not_deleted, where("workflow_state != 'deleted'")
+  scope :active, -> { where(workflow_state: "active") }
+  scope :not_deleted, -> { where("workflow_state != 'deleted'") }
 
   set_policy do
     given { |user, session|

@@ -65,12 +65,12 @@ class Submission < ActiveRecord::Base
   include CustomValidations
   validates_as_url :url
 
-  scope :with_comments, includes(:submission_comments)
+  scope :with_comments, -> { includes(:submission_comments) }
   scope :after, lambda { |date| where("submissions.created_at>?", date) }
   scope :before, lambda { |date| where("submissions.created_at<?", date) }
   scope :submitted_before, lambda { |date| where("submitted_at<?", date) }
   scope :submitted_after, lambda { |date| where("submitted_at>?", date) }
-  scope :with_point_data, where("submissions.score IS NOT NULL OR submissions.grade IS NOT NULL")
+  scope :with_point_data, -> { where("submissions.score IS NOT NULL OR submissions.grade IS NOT NULL") }
 
   scope :for_context_codes, lambda { |context_codes| where(:context_code => context_codes) }
 
@@ -104,7 +104,7 @@ class Submission < ActiveRecord::Base
     conditions
   end
 
-  scope :needs_grading, where(needs_grading_conditions)
+  scope :needs_grading, -> { where(needs_grading_conditions) }
 
 
   sanitize_field :body, CanvasSanitize::SANITIZE
@@ -753,23 +753,23 @@ class Submission < ActiveRecord::Base
     state :graded
   end
 
-  scope :graded, where("submissions.grade IS NOT NULL")
+  scope :graded, -> { where("submissions.grade IS NOT NULL") }
 
-  scope :ungraded, where(:grade => nil).includes(:assignment)
+  scope :ungraded, -> { where(:grade => nil).includes(:assignment) }
 
   scope :in_workflow_state, lambda { |provided_state| where(:workflow_state => provided_state) }
 
-  scope :having_submission, where("submissions.submission_type IS NOT NULL")
-  scope :without_submission, where(submission_type: nil, workflow_state: "unsubmitted")
+  scope :having_submission, -> { where("submissions.submission_type IS NOT NULL") }
+  scope :without_submission, -> { where(submission_type: nil, workflow_state: "unsubmitted") }
 
-  scope :include_user, includes(:user)
+  scope :include_user, -> { includes(:user) }
 
-  scope :include_assessment_requests, includes(:assessment_requests, :assigned_assessments)
-  scope :include_versions, includes(:versions)
-  scope :include_submission_comments, includes(:submission_comments)
-  scope :speed_grader_includes, includes(:versions, :submission_comments, :attachments, :rubric_assessment)
+  scope :include_assessment_requests, -> { includes(:assessment_requests, :assigned_assessments) }
+  scope :include_versions, -> { includes(:versions) }
+  scope :include_submission_comments, -> { includes(:submission_comments) }
+  scope :speed_grader_includes, -> { includes(:versions, :submission_comments, :attachments, :rubric_assessment) }
   scope :for_user, lambda { |user| where(:user_id => user) }
-  scope :needing_screenshot, where("submissions.submission_type='online_url' AND submissions.attachment_id IS NULL AND submissions.process_attempts<3").order(:updated_at)
+  scope :needing_screenshot, -> { where("submissions.submission_type='online_url' AND submissions.attachment_id IS NULL AND submissions.process_attempts<3").order(:updated_at) }
 
   def needs_regrading?
     graded? && !grade_matches_current_submission?

@@ -1362,12 +1362,10 @@ class Account < ActiveRecord::Base
     :closed
   end
 
-  scope :root_accounts, where(:root_account_id => nil)
-  scope :processing_sis_batch, where("accounts.current_sis_batch_id IS NOT NULL").order(:updated_at)
-  scope :name_like, lambda { |name|
-    where(wildcard('accounts.name', name))
-  }
-  scope :active, where("accounts.workflow_state<>'deleted'")
+  scope :root_accounts, -> { where(:root_account_id => nil) }
+  scope :processing_sis_batch, -> { where("accounts.current_sis_batch_id IS NOT NULL").order(:updated_at) }
+  scope :name_like, lambda { |name| where(wildcard('accounts.name', name)) }
+  scope :active, -> { where("accounts.workflow_state<>'deleted'") }
 
   def canvas_network_enabled?
     false

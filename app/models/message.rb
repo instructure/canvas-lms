@@ -140,15 +140,15 @@ class Message < ActiveRecord::Base
 
   scope :after, lambda { |date| where("messages.created_at>?", date) }
 
-  scope :to_dispatch, lambda {
+  scope :to_dispatch, -> {
     where("messages.workflow_state='staged' AND messages.dispatch_at<=? AND 'messages.to'<>'dashboard'", Time.now.utc)
   }
 
-  scope :to_email, where(:path_type => ['email', 'sms'])
+  scope :to_email, -> { where(:path_type => ['email', 'sms']) }
 
-  scope :to_facebook, where(:path_type => 'facebook', :workflow_state => 'sent').order("sent_at DESC").limit(25)
+  scope :to_facebook, -> { where(:path_type => 'facebook', :workflow_state => 'sent').order("sent_at DESC").limit(25) }
 
-  scope :not_to_email, where("messages.path_type NOT IN ('email', 'sms')")
+  scope :not_to_email, -> { where("messages.path_type NOT IN ('email', 'sms')") }
 
   scope :by_name, lambda { |notification_name| where(:notification_name => notification_name) }
 
@@ -158,13 +158,13 @@ class Message < ActiveRecord::Base
 
   # messages that can be moved to the 'cancelled' state. dashboard messages
   # can be closed by calling 'cancel', but aren't included
-  scope :cancellable, where(:workflow_state => ['created', 'staged', 'sending'])
+  scope :cancellable, -> { where(:workflow_state => ['created', 'staged', 'sending']) }
 
   # For finding a very particular message:
   # Message.for(context).by_name(name).directed_to(to).for_user(user), or
   # messages.for(context).by_name(name).directed_to(to).for_user(user)
   # Where user can be a User or id, name needs to be the Notification name.
-  scope :staged, lambda { where("messages.workflow_state='staged' AND messages.dispatch_at>?", Time.now.utc) }
+  scope :staged, -> { where("messages.workflow_state='staged' AND messages.dispatch_at>?", Time.now.utc) }
 
   scope :in_state, lambda { |state| where(:workflow_state => Array(state).map(&:to_s)) }
 

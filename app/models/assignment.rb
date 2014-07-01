@@ -1502,21 +1502,21 @@ class Assignment < ActiveRecord::Base
     0.5
   end
 
-  scope :include_submitted_count, select(
+  scope :include_submitted_count, -> { select(
     "assignments.*, (SELECT COUNT(*) FROM submissions
     WHERE assignments.id = submissions.assignment_id
-    AND submissions.submission_type IS NOT NULL) AS submitted_count")
+    AND submissions.submission_type IS NOT NULL) AS submitted_count") }
 
-  scope :include_graded_count, select(
+  scope :include_graded_count, -> { select(
     "assignments.*, (SELECT COUNT(*) FROM submissions
     WHERE assignments.id = submissions.assignment_id
-    AND submissions.grade IS NOT NULL) AS graded_count")
+    AND submissions.grade IS NOT NULL) AS graded_count") }
 
-  scope :include_quiz_and_topic, includes(:quiz, :discussion_topic)
+  scope :include_quiz_and_topic, -> { includes(:quiz, :discussion_topic) }
 
-  scope :no_graded_quizzes_or_topics, where("submission_types NOT IN ('online_quiz', 'discussion_topic')")
+  scope :no_graded_quizzes_or_topics, -> { where("submission_types NOT IN ('online_quiz', 'discussion_topic')") }
 
-  scope :with_submissions, includes(:submissions)
+  scope :with_submissions, -> { includes(:submissions) }
 
   scope :for_context_codes, lambda { |codes| where(:context_code => codes) }
   scope :for_course, lambda { |course_id| where(:context_type => 'Course', :context_id => course_id) }
@@ -1524,11 +1524,11 @@ class Assignment < ActiveRecord::Base
   scope :due_before, lambda { |date| where("assignments.due_at<?", date) }
 
   scope :due_after, lambda { |date| where("assignments.due_at>?", date) }
-  scope :undated, where(:due_at => nil)
+  scope :undated, -> { where(:due_at => nil) }
 
-  scope :only_graded, where("submission_types<>'not_graded'")
+  scope :only_graded, -> { where("submission_types<>'not_graded'") }
 
-  scope :with_just_calendar_attributes, lambda {
+  scope :with_just_calendar_attributes, -> {
     select(((Assignment.column_names & CalendarEvent.column_names) + ['due_at', 'assignment_group_id', 'could_be_locked', 'unlock_at', 'lock_at', 'submission_types', '(freeze_on_copy AND copied) AS frozen'] - ['cloned_item_id', 'migration_id']).join(", "))
   }
 
@@ -1560,7 +1560,7 @@ class Assignment < ActiveRecord::Base
   # query as ambigious for the "due_at" field if combined with another table
   # (e.g. assignment overrides) with similar fields (like id,lock_at,etc),
   # throwing an error.
-  scope :api_needed_fields, select(API_NEEDED_FIELDS.map{ |f| "assignments." + f.to_s})
+  scope :api_needed_fields, -> { select(API_NEEDED_FIELDS.map{ |f| "assignments." + f.to_s}) }
 
   # This should only be used in the course drop down to show assignments needing a submission
   scope :need_submitting_info, lambda { |user_id, limit|
@@ -1595,22 +1595,22 @@ class Assignment < ActiveRecord::Base
     end
   }
 
-  scope :expecting_submission, where("submission_types NOT IN ('', 'none', 'not_graded', 'on_paper') AND submission_types IS NOT NULL")
+  scope :expecting_submission, -> { where("submission_types NOT IN ('', 'none', 'not_graded', 'on_paper') AND submission_types IS NOT NULL") }
 
-  scope :gradeable, where("assignments.submission_types<>'not_graded'")
+  scope :gradeable, -> { where("assignments.submission_types<>'not_graded'") }
 
-  scope :active, where("assignments.workflow_state<>'deleted'")
+  scope :active, -> { where("assignments.workflow_state<>'deleted'") }
   scope :before, lambda { |date| where("assignments.created_at<?", date) }
 
-  scope :not_locked, lambda {
+  scope :not_locked, -> {
     where("(assignments.unlock_at IS NULL OR assignments.unlock_at<:now) AND (assignments.lock_at IS NULL OR assignments.lock_at>:now)",
       :now => Time.zone.now)
   }
 
-  scope :order_by_base_due_at, order("assignments.due_at")
+  scope :order_by_base_due_at, -> { order("assignments.due_at") }
 
-  scope :unpublished, where(:workflow_state => 'unpublished')
-  scope :published, where(:workflow_state => 'published')
+  scope :unpublished, -> { where(:workflow_state => 'unpublished') }
+  scope :published, -> { where(:workflow_state => 'published') }
 
   def overdue?
     due_at && due_at <= Time.now

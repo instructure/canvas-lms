@@ -14,7 +14,7 @@ class AccessToken < ActiveRecord::Base
   # on the scope defined in the auth process (scope has not
   # yet been implemented)
 
-  scope :active, lambda { where("expires_at IS NULL OR expires_at>?", Time.zone.now) }
+  scope :active, -> { where("expires_at IS NULL OR expires_at>?", Time.zone.now) }
 
   TOKEN_SIZE = 64
   OAUTH2_SCOPE_NAMESPACE = '/auth/'

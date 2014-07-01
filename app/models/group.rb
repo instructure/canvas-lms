@@ -251,9 +251,9 @@ class Group < ActiveRecord::Base
 
   Bookmarker = BookmarkedCollection::SimpleBookmarker.new(Group, :name, :id)
 
-  scope :active, where("groups.workflow_state<>'deleted'")
-  scope :by_name, lambda { order(Bookmarker.order_by) }
-  scope :uncategorized, where("groups.group_category_id IS NULL")
+  scope :active, -> { where("groups.workflow_state<>'deleted'") }
+  scope :by_name, -> { order(Bookmarker.order_by) }
+  scope :uncategorized, -> { where("groups.group_category_id IS NULL") }
 
   def full_name
     res = before_label(self.name) + " "

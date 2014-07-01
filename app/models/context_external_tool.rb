@@ -547,7 +547,7 @@ class ContextExternalTool < ActiveRecord::Base
 
     tool
   end
-  scope :active, where("context_external_tools.workflow_state<>'deleted'")
+  scope :active, -> { where("context_external_tools.workflow_state<>'deleted'") }
 
   def self.find_all_for(context, type)
     tools = []

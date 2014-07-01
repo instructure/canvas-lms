@@ -227,8 +227,8 @@ class AppointmentGroup < ActiveRecord::Base
         )
         COND
   }
-  scope :current, lambda { where("end_at>=?", Time.zone.now.midnight) }
-  scope :current_or_undated, lambda { where("end_at>=? OR end_at IS NULL", Time.zone.now.midnight) }
+  scope :current, -> { where("end_at>=?", Time.zone.now.midnight) }
+  scope :current_or_undated, -> { where("end_at>=? OR end_at IS NULL", Time.zone.now.midnight) }
   scope :intersecting, lambda { |start_date, end_date| where("start_at<? AND end_at>?", end_date, start_date) }
 
   set_policy do

@@ -1062,11 +1062,11 @@ class Quizzes::Quiz < ActiveRecord::Base
     can :read and can :submit
   end
 
-  scope :include_assignment, includes(:assignment)
+  scope :include_assignment, -> { includes(:assignment) }
   scope :before, lambda { |date| where("quizzes.created_at<?", date) }
-  scope :active, where("quizzes.workflow_state<>'deleted'")
-  scope :not_for_assignment, where(:assignment_id => nil)
-  scope :available, where("quizzes.workflow_state = 'available'")
+  scope :active, -> { where("quizzes.workflow_state<>'deleted'") }
+  scope :not_for_assignment, -> { where(:assignment_id => nil) }
+  scope :available, -> { where("quizzes.workflow_state = 'available'") }
 
   def teachers
     context.teacher_enrollments.map(&:user)

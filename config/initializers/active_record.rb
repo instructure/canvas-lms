@@ -886,9 +886,9 @@ class ActiveRecord::Base
 
   if Rails.version < '4'
     if CANVAS_RAILS2
-      named_scope :none, lambda { where("?", false) }
+      named_scope :none, -> { where("?", false) }
     else
-      scope :none, lambda { {:conditions => ["?", false]} }
+      scope :none, -> { {:conditions => ["?", false]} }
     end
   end
 end

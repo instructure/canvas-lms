@@ -223,7 +223,7 @@ class SubmissionComment < ActiveRecord::Base
     context.root_account.service_enabled?(:avatars) ? [:avatar_path] : []
   end
 
-  scope :visible, where(:hidden => false)
+  scope :visible, -> { where(:hidden => false) }
 
   scope :after, lambda { |date| where("submission_comments.created_at>?", date) }
   scope :for_context, lambda { |context| where(:context_id => context, :context_type => context.class.to_s) }

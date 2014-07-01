@@ -238,8 +238,8 @@ class DiscussionEntry < ActiveRecord::Base
     end
   end
 
-  scope :active, where("discussion_entries.workflow_state<>'deleted'")
-  scope :deleted, where(:workflow_state => 'deleted')
+  scope :active, -> { where("discussion_entries.workflow_state<>'deleted'") }
+  scope :deleted, -> { where(:workflow_state => 'deleted') }
 
   def user_name
     self.user.name rescue t :default_user_name, "User Name"
@@ -308,9 +308,9 @@ class DiscussionEntry < ActiveRecord::Base
   scope :for_user, lambda { |user| where(:user_id => user).order("discussion_entries.created_at") }
   scope :for_users, lambda { |users| where(:user_id => users) }
   scope :after, lambda { |date| where("created_at>?", date) }
-  scope :top_level_for_topics, lambda {|topics| where(:root_entry_id => nil, :discussion_topic_id => topics) }
+  scope :top_level_for_topics, lambda { |topics| where(:root_entry_id => nil, :discussion_topic_id => topics) }
   scope :all_for_topics, lambda { |topics| where(:discussion_topic_id => topics) }
-  scope :newest_first, order("discussion_entries.created_at DESC, discussion_entries.id DESC")
+  scope :newest_first, -> { order("discussion_entries.created_at DESC, discussion_entries.id DESC") }
 
   def to_atom(opts={})
     author_name = self.user.present? ? self.user.name : t('atom_no_author', "No Author")

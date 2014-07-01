@@ -490,14 +490,14 @@ class Course < ActiveRecord::Base
     accounts
   end
 
-  scope :recently_started, lambda { where(:start_at => 1.month.ago..Time.zone.now).order("start_at DESC").limit(10) }
-  scope :recently_ended, lambda { where(:conclude_at => 1.month.ago..Time.zone.now).order("start_at DESC").limit(10) }
-  scope :recently_created, lambda { where("created_at>?", 1.month.ago).order("created_at DESC").limit(50).includes(:teachers) }
+  scope :recently_started, -> { where(:start_at => 1.month.ago..Time.zone.now).order("start_at DESC").limit(10) }
+  scope :recently_ended, -> { where(:conclude_at => 1.month.ago..Time.zone.now).order("start_at DESC").limit(10) }
+  scope :recently_created, -> { where("created_at>?", 1.month.ago).order("created_at DESC").limit(50).includes(:teachers) }
   scope :for_term, lambda {|term| term ? where(:enrollment_term_id => term) : scoped }
-  scope :active_first, lambda { order("CASE WHEN courses.workflow_state='available' THEN 0 ELSE 1 END, #{best_unicode_collation_key('name')}") }
+  scope :active_first, -> { order("CASE WHEN courses.workflow_state='available' THEN 0 ELSE 1 END, #{best_unicode_collation_key('name')}") }
   scope :name_like, lambda { |name| where(wildcard('courses.name', 'courses.sis_source_id', 'courses.course_code', name)) }
   scope :needs_account, lambda { |account, limit| where(:account_id => nil, :root_account_id => account).limit(limit) }
-  scope :active, where("courses.workflow_state<>'deleted'")
+  scope :active, -> { where("courses.workflow_state<>'deleted'") }
   scope :least_recently_updated, lambda { |limit| order(:updated_at).limit(limit) }
   scope :manageable_by_user, lambda { |*args|
     # args[0] should be user_id, args[1], if true, will include completed
@@ -514,19 +514,19 @@ class Course < ActiveRecord::Base
          WHERE courses.workflow_state <> 'deleted') as course_users
        ON course_users.course_id = courses.id")
   }
-  scope :not_deleted, where("workflow_state<>'deleted'")
+  scope :not_deleted, -> { where("workflow_state<>'deleted'") }
 
-  scope :with_enrollments, lambda {
+  scope :with_enrollments, -> {
     where("EXISTS (?)", Enrollment.active.where("enrollments.course_id=courses.id"))
   }
-  scope :without_enrollments, lambda {
+  scope :without_enrollments, -> {
     where("NOT EXISTS (?)", Enrollment.active.where("enrollments.course_id=courses.id"))
   }
-  scope :completed, lambda {
+  scope :completed, -> {
     joins(:enrollment_term).
         where("courses.workflow_state='completed' OR courses.conclude_at<? OR enrollment_terms.end_at<?", Time.now.utc, Time.now.utc)
   }
-  scope :not_completed, lambda {
+  scope :not_completed, -> {
     joins(:enrollment_term).
         where("courses.workflow_state<>'completed' AND
           (courses.conclude_at IS NULL OR courses.conclude_at>=?) AND
@@ -537,13 +537,13 @@ class Course < ActiveRecord::Base
       none :
       where("EXISTS (?)", Enrollment.active.where("enrollments.course_id=courses.id AND enrollments.type='TeacherEnrollment' AND enrollments.user_id IN (?)", teacher_ids))
   }
-  scope :by_associated_accounts, lambda{ |account_ids|
+  scope :by_associated_accounts, lambda { |account_ids|
     account_ids.empty? ?
       none :
       where("EXISTS (?)", CourseAccountAssociation.where("course_account_associations.course_id=courses.id AND course_account_associations.account_id IN (?)", account_ids))
   }
 
-  scope :deleted, where(:workflow_state => 'deleted')
+  scope :deleted, -> { where(:workflow_state => 'deleted') }
 
   set_broadcast_policy do |p|
     p.dispatch :grade_weight_changed

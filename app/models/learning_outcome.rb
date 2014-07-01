@@ -207,13 +207,13 @@ class LearningOutcome < ActiveRecord::Base
   end
 
   scope :for_context_codes, lambda { |codes| where(:context_code => codes) }
-  scope :active, where("learning_outcomes.workflow_state<>'deleted'")
+  scope :active, -> { where("learning_outcomes.workflow_state<>'deleted'") }
   scope :has_result_for, lambda { |user|
     joins(:learning_outcome_results).
         where("learning_outcomes.id=learning_outcome_results.learning_outcome_id AND learning_outcome_results.user_id=?", user).
         order(best_unicode_collation_key('short_description'))
   }
 
-  scope :global, where(:context_id => nil)
+  scope :global, -> { where(:context_id => nil) }
 
 end

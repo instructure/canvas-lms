@@ -52,7 +52,7 @@ class Notification < ActiveRecord::Base
 
   attr_accessible  :name, :subject, :main_link, :delay_for, :category
 
-  scope :to_show_in_feed, where("messages.category='TestImmediately' OR messages.notification_name IN (?)", TYPES_TO_SHOW_IN_FEED)
+  scope :to_show_in_feed, -> { where("messages.category='TestImmediately' OR messages.notification_name IN (?)", TYPES_TO_SHOW_IN_FEED) }
 
   validates_uniqueness_of :name
 

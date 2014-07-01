@@ -88,7 +88,7 @@ class Collaboration < ActiveRecord::Base
     can :read and can :update and can :delete
   end
 
-  scope :active, where("collaborations.workflow_state<>'deleted'")
+  scope :active, -> { where("collaborations.workflow_state<>'deleted'") }
 
   scope :after, lambda { |date| where("collaborations.updated_at>?", date) }
 

@@ -235,11 +235,11 @@ class CommunicationChannel < ActiveRecord::Base
     where("#{by_path_condition("communication_channels.path")}=#{by_path_condition("?")}", path)
   }
 
-  scope :email, where(:path_type => TYPE_EMAIL)
-  scope :sms, where(:path_type => TYPE_SMS)
+  scope :email, -> { where(:path_type => TYPE_EMAIL) }
+  scope :sms, -> { where(:path_type => TYPE_SMS) }
 
-  scope :active, where(:workflow_state => 'active')
-  scope :unretired, where("communication_channels.workflow_state<>'retired'")
+  scope :active, -> { where(:workflow_state => 'active') }
+  scope :unretired, -> { where("communication_channels.workflow_state<>'retired'") }
 
   scope :for_notification_frequency, lambda { |notification, frequency|
     includes(:notification_policies).where(:notification_policies => { :notification_id => notification, :frequency => frequency })
@@ -262,10 +262,10 @@ class CommunicationChannel < ActiveRecord::Base
       all
   end
 
-  scope :include_policies, includes(:notification_policies)
+  scope :include_policies, -> { includes(:notification_policies) }
 
   scope :in_state, lambda { |state| where(:workflow_state => state.to_s) }
-  scope :of_type, lambda {|type| where(:path_type => type) }
+  scope :of_type, lambda { |type| where(:path_type => type) }
   
   def can_notify?
     self.notification_policies.any? { |np| np.frequency == 'never' } ? false : true

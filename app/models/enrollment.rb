@@ -148,40 +148,40 @@ class Enrollment < ActiveRecord::Base
     }
   end
 
-  scope :active, where("enrollments.workflow_state<>'deleted'")
+  scope :active, -> { where("enrollments.workflow_state<>'deleted'") }
 
-  scope :admin,
-        select(:course_id).
+  scope :admin, -> {
+    select(:course_id).
         joins(:course).
         where("enrollments.type IN ('TeacherEnrollment','TaEnrollment', 'DesignerEnrollment')
-              AND (courses.workflow_state='claimed' OR (enrollments.workflow_state='active' AND courses.workflow_state='available'))")
+              AND (courses.workflow_state='claimed' OR (enrollments.workflow_state='active' AND courses.workflow_state='available'))") }
 
-  scope :of_admin_type, where(:type => ['TeacherEnrollment','TaEnrollment', 'DesignerEnrollment'])
+  scope :of_admin_type, -> { where(:type => ['TeacherEnrollment','TaEnrollment', 'DesignerEnrollment']) }
 
-  scope :of_instructor_type, where(:type => ['TeacherEnrollment', 'TaEnrollment'])
+  scope :of_instructor_type, -> { where(:type => ['TeacherEnrollment', 'TaEnrollment']) }
 
-  scope :of_content_admins, where(:type => ['TeacherEnrollment', 'DesignerEnrollment'])
+  scope :of_content_admins, -> { where(:type => ['TeacherEnrollment', 'DesignerEnrollment']) }
 
-  scope :student,
-        select(:course_id).
+  scope :student, -> {
+    select(:course_id).
         joins(:course).
-        where(:type => 'StudentEnrollment', :workflow_state => 'active', :courses => { :workflow_state => 'available' })
+        where(:type => 'StudentEnrollment', :workflow_state => 'active', :courses => { :workflow_state => 'available' }) }
 
-  scope :student_in_claimed_or_available,
-        select(:course_id).
+  scope :student_in_claimed_or_available, -> {
+    select(:course_id).
         joins(:course).
-        where(:type => 'StudentEnrollment', :workflow_state => 'active', :courses => { :workflow_state => ['available', 'claimed'] })
+        where(:type => 'StudentEnrollment', :workflow_state => 'active', :courses => { :workflow_state => ['available', 'claimed'] }) }
 
-  scope :all_student,
-        includes(:course).
+  scope :all_student, -> {
+    includes(:course).
         where("(enrollments.type = 'StudentEnrollment'
               AND enrollments.workflow_state IN ('invited', 'active', 'completed')
               AND courses.workflow_state IN ('available', 'completed')) OR
               (enrollments.type = 'StudentViewEnrollment'
               AND enrollments.workflow_state = 'active'
-              AND courses.workflow_state != 'deleted')")
+              AND courses.workflow_state != 'deleted')") }
 
-  scope :future, lambda {
+  scope :future, -> {
     joins(:course).
         where("(courses.start_at>?
                 AND courses.workflow_state='available'
@@ -191,16 +191,15 @@ class Enrollment < ActiveRecord::Base
                 courses.workflow_state IN ('created', 'claimed')
                 AND enrollments.type IN ('TeacherEnrollment','TaEnrollment', 'DesignerEnrollment')
                 AND enrollments.workflow_state IN ('invited', 'active', 'creation_pending')
-              )", Time.now.utc, true)
-  }
+              )", Time.now.utc, true) }
 
-  scope :past,
-        joins(:course).
+  scope :past, -> {
+    joins(:course).
         where("(courses.workflow_state='completed'
               AND enrollments.workflow_state NOT IN ('invited', 'deleted'))
-              OR enrollments.workflow_state IN ('rejected', 'completed')")
+              OR enrollments.workflow_state IN ('rejected', 'completed')") }
 
-  scope :not_fake, where("enrollments.type<>'StudentViewEnrollment'")
+  scope :not_fake, -> { where("enrollments.type<>'StudentViewEnrollment'") }
 
 
   def self.readable_types
@@ -883,7 +882,7 @@ class Enrollment < ActiveRecord::Base
     can :read_services
   end
 
-  scope :before, lambda{ |date|
+  scope :before, lambda { |date|
     where("enrollments.created_at<?", date)
   }
 
@@ -894,10 +893,10 @@ class Enrollment < ActiveRecord::Base
         joins(:user).
         select("user_id, course_id, users.name AS user_name")
   }
-  scope :invited, where(:workflow_state => 'invited')
-  scope :accepted, where("enrollments.workflow_state<>'invited'")
-  scope :active_or_pending, where(:workflow_state => ['invited', 'creation_pending', 'active'])
-  scope :currently_online, joins(:pseudonyms).where("pseudonyms.last_request_at>?", 5.minutes.ago)
+  scope :invited, -> { where(:workflow_state => 'invited') }
+  scope :accepted, -> { where("enrollments.workflow_state<>'invited'") }
+  scope :active_or_pending, -> { where(:workflow_state => ['invited', 'creation_pending', 'active']) }
+  scope :currently_online, -> { joins(:pseudonyms).where("pseudonyms.last_request_at>?", 5.minutes.ago) }
   # this returns enrollments for creation_pending users; should always be used in conjunction with the invited scope
   scope :for_email, lambda { |email|
     joins(:user => :communication_channels).

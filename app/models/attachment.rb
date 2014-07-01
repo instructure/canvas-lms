@@ -1253,11 +1253,11 @@ class Attachment < ActiveRecord::Base
     state :unattached_temporary
   end
 
-  scope :visible, where(['attachments.file_state in (?, ?)', 'available', 'public'])
-  scope :not_deleted, where("attachments.file_state<>'deleted'")
+  scope :visible, -> { where(['attachments.file_state in (?, ?)', 'available', 'public']) }
+  scope :not_deleted, -> { where("attachments.file_state<>'deleted'") }
 
-  scope :not_hidden, where("attachments.file_state<>'hidden'")
-  scope :not_locked, lambda {
+  scope :not_hidden, -> { where("attachments.file_state<>'hidden'") }
+  scope :not_locked, -> {
     where("(attachments.locked IS NULL OR attachments.locked=?) AND ((attachments.lock_at IS NULL) OR
       (attachments.lock_at>? OR (attachments.unlock_at IS NOT NULL AND attachments.unlock_at<?)))", false, Time.now.utc, Time.now.utc)
   }
@@ -1631,14 +1631,14 @@ class Attachment < ActiveRecord::Base
   def self.serialization_methods; [:mime_class, :scribdable?, :currently_locked, :crocodoc_available?]; end
   cattr_accessor :skip_thumbnails
 
-  scope :scribdable?, where("scribd_mime_type_id IS NOT NULL")
-  scope :recyclable, where("attachments.scribd_attempts<? AND attachments.workflow_state='errored'", MAX_SCRIBD_ATTEMPTS)
-  scope :needing_scribd_conversion_status, lambda { where("attachments.workflow_state='processing' AND attachments.updated_at<? AND scribd_doc IS NOT NULL", 30.minutes.ago).limit(50) }
-  scope :uploadable, where(:workflow_state => 'pending_upload')
-  scope :active, where(:file_state => 'available')
-  scope :thumbnailable?, where(:content_type => Technoweenie::AttachmentFu.content_types)
-  scope :by_display_name, lambda { order(display_name_order_by_clause('attachments')) }
-  scope :by_position_then_display_name, lambda { order("attachments.position, #{display_name_order_by_clause('attachments')}") }
+  scope :scribdable?, -> { where("scribd_mime_type_id IS NOT NULL") }
+  scope :recyclable, -> { where("attachments.scribd_attempts<? AND attachments.workflow_state='errored'", MAX_SCRIBD_ATTEMPTS) }
+  scope :needing_scribd_conversion_status, -> { where("attachments.workflow_state='processing' AND attachments.updated_at<? AND scribd_doc IS NOT NULL", 30.minutes.ago).limit(50) }
+  scope :uploadable, -> { where(:workflow_state => 'pending_upload') }
+  scope :active, -> { where(:file_state => 'available') }
+  scope :thumbnailable?, -> { where(:content_type => Technoweenie::AttachmentFu.content_types) }
+  scope :by_display_name, -> { order(display_name_order_by_clause('attachments')) }
+  scope :by_position_then_display_name, -> { order("attachments.position, #{display_name_order_by_clause('attachments')}") }
   def self.serialization_excludes; [:uuid, :namespace]; end
   def set_serialization_options
     if self.scribd_doc

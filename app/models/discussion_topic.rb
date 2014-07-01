@@ -462,17 +462,17 @@ class DiscussionTopic < ActiveRecord::Base
     topic_participant
   end
 
-  scope :recent, lambda { where("discussion_topics.last_reply_at>?", 2.weeks.ago).order("discussion_topics.last_reply_at DESC") }
-  scope :only_discussion_topics, where(:type => nil)
-  scope :for_subtopic_refreshing, where("discussion_topics.subtopics_refreshed_at IS NOT NULL AND discussion_topics.subtopics_refreshed_at<discussion_topics.updated_at").order("discussion_topics.subtopics_refreshed_at")
-  scope :active, where("discussion_topics.workflow_state<>'deleted'")
-  scope :for_context_codes, lambda {|codes| where(:context_code => codes) }
+  scope :recent, -> { where("discussion_topics.last_reply_at>?", 2.weeks.ago).order("discussion_topics.last_reply_at DESC") }
+  scope :only_discussion_topics, -> { where(:type => nil) }
+  scope :for_subtopic_refreshing, -> { where("discussion_topics.subtopics_refreshed_at IS NOT NULL AND discussion_topics.subtopics_refreshed_at<discussion_topics.updated_at").order("discussion_topics.subtopics_refreshed_at") }
+  scope :active, -> { where("discussion_topics.workflow_state<>'deleted'") }
+  scope :for_context_codes, lambda { |codes| where(:context_code => codes) }
 
   scope :before, lambda { |date| where("discussion_topics.created_at<?", date) }
 
-  scope :by_position, order("discussion_topics.position ASC, discussion_topics.created_at DESC, discussion_topics.id DESC")
-  scope :by_position_legacy, order("discussion_topics.position DESC, discussion_topics.created_at DESC, discussion_topics.id DESC")
-  scope :by_last_reply_at, order("discussion_topics.last_reply_at DESC, discussion_topics.created_at DESC, discussion_topics.id DESC")
+  scope :by_position, -> { order("discussion_topics.position ASC, discussion_topics.created_at DESC, discussion_topics.id DESC") }
+  scope :by_position_legacy, -> { order("discussion_topics.position DESC, discussion_topics.created_at DESC, discussion_topics.id DESC") }
+  scope :by_last_reply_at, -> { order("discussion_topics.last_reply_at DESC, discussion_topics.created_at DESC, discussion_topics.id DESC") }
 
   alias_attribute :available_from, :delayed_post_at
   alias_attribute :unlock_at, :delayed_post_at

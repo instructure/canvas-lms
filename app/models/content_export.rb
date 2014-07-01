@@ -210,12 +210,12 @@ class ContentExport < ActiveRecord::Base
     self.job_progress.try(:update_completion!, val)
   end
   
-  scope :active, where("workflow_state<>'deleted'")
-  scope :not_for_copy, where("export_type<>?", COURSE_COPY)
-  scope :common_cartridge, where(:export_type => COMMON_CARTRIDGE)
-  scope :qti, where(:export_type => QTI)
-  scope :course_copy, where(:export_type => COURSE_COPY)
-  scope :running, where(:workflow_state => ['created', 'exporting'])
+  scope :active, -> { where("workflow_state<>'deleted'") }
+  scope :not_for_copy, -> { where("export_type<>?", COURSE_COPY) }
+  scope :common_cartridge, -> { where(:export_type => COMMON_CARTRIDGE) }
+  scope :qti, -> { where(:export_type => QTI) }
+  scope :course_copy, -> { where(:export_type => COURSE_COPY) }
+  scope :running, -> { where(:workflow_state => ['created', 'exporting']) }
 
   private
 

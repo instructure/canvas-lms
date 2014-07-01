@@ -186,13 +186,13 @@ class User < ActiveRecord::Base
   end
 
   scope :of_account, lambda { |account| where("EXISTS (?)", account.user_account_associations.where("user_account_associations.user_id=users.id")).shard(account.shard) }
-  scope :recently_logged_in, lambda {
+  scope :recently_logged_in, -> {
     includes(:pseudonyms).
         where("pseudonyms.current_login_at>?", 1.month.ago).
         order("pseudonyms.current_login_at DESC").
         limit(25)
   }
-  scope :include_pseudonym, includes(:pseudonym)
+  scope :include_pseudonym, -> { includes(:pseudonym) }
   scope :restrict_to_sections, lambda { |sections|
     if sections.empty?
       scoped
@@ -203,9 +203,9 @@ class User < ActiveRecord::Base
   scope :name_like, lambda { |name|
     where("#{wildcard('users.name', 'users.short_name', name)} OR EXISTS (?)", Pseudonym.where(wildcard('pseudonyms.sis_user_id', 'pseudonyms.unique_id', name)).where("pseudonyms.user_id=users.id").active)
   }
-  scope :active, where("users.workflow_state<>'deleted'")
+  scope :active, -> { where("users.workflow_state<>'deleted'") }
 
-  scope :has_current_student_enrollments, where("EXISTS (SELECT * FROM enrollments JOIN courses ON courses.id=enrollments.course_id AND courses.workflow_state='available' WHERE enrollments.user_id=users.id AND enrollments.workflow_state IN ('active','invited') AND enrollments.type='StudentEnrollment')")
+  scope :has_current_student_enrollments, -> { where("EXISTS (SELECT * FROM enrollments JOIN courses ON courses.id=enrollments.course_id AND courses.workflow_state='available' WHERE enrollments.user_id=users.id AND enrollments.workflow_state IN ('active','invited') AND enrollments.type='StudentEnrollment')") }
 
   def self.order_by_sortable_name(options = {})
     order_clause = clause = sortable_name_order_by_clause

@@ -115,11 +115,11 @@ class CalendarEvent < ActiveRecord::Base
     effective_context_code && ActiveRecord::Base.find_by_asset_string(effective_context_code) || context
   end
 
-  scope :order_by_start_at, order(:start_at)
+  scope :order_by_start_at, -> { order(:start_at) }
 
-  scope :active, where("calendar_events.workflow_state<>'deleted'")
-  scope :are_locked, where(:workflow_state => 'locked')
-  scope :are_unlocked, where("calendar_events.workflow_state NOT IN ('deleted', 'locked')")
+  scope :active, -> { where("calendar_events.workflow_state<>'deleted'") }
+  scope :are_locked, -> { where(:workflow_state => 'locked') }
+  scope :are_unlocked, -> { where("calendar_events.workflow_state NOT IN ('deleted', 'locked')") }
 
   # controllers/apis/etc. should generally use for_user_and_context_codes instead
   scope :for_context_codes, lambda { |codes| where(:context_code => codes) }
@@ -161,10 +161,10 @@ class CalendarEvent < ActiveRecord::Base
     SQL
   }
 
-  scope :undated, where(:start_at => nil, :end_at => nil)
+  scope :undated, -> { where(:start_at => nil, :end_at => nil) }
 
   scope :between, lambda { |start, ending| where(:start_at => start..ending) }
-  scope :current, lambda { where("calendar_events.end_at>=?", Time.zone.now.midnight) }
+  scope :current, -> { where("calendar_events.end_at>=?", Time.zone.now.midnight) }
   scope :updated_after, lambda { |*args|
     if args.first
       where("calendar_events.updated_at IS NULL OR calendar_events.updated_at>?", args.first)
@@ -173,8 +173,8 @@ class CalendarEvent < ActiveRecord::Base
     end
   }
 
-  scope :events_without_child_events, where("NOT EXISTS (SELECT 1 FROM calendar_events children WHERE children.parent_calendar_event_id = calendar_events.id AND children.workflow_state<>'deleted')")
-  scope :events_with_child_events, where("EXISTS (SELECT 1 FROM calendar_events children WHERE children.parent_calendar_event_id = calendar_events.id AND children.workflow_state<>'deleted')")
+  scope :events_without_child_events, -> { where("NOT EXISTS (SELECT 1 FROM calendar_events children WHERE children.parent_calendar_event_id = calendar_events.id AND children.workflow_state<>'deleted')") }
+  scope :events_with_child_events, -> { where("EXISTS (SELECT 1 FROM calendar_events children WHERE children.parent_calendar_event_id = calendar_events.id AND children.workflow_state<>'deleted')") }
 
   def validate_context!
     @validate_context = true

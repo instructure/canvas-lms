@@ -141,8 +141,8 @@ class SisBatch < ActiveRecord::Base
     self.save
   end
 
-  scope :needs_processing, where(:workflow_state => 'created').order(:created_at)
-  scope :importing, where(:workflow_state => 'importing')
+  scope :needs_processing, -> { where(:workflow_state => 'created').order(:created_at) }
+  scope :importing, -> { where(:workflow_state => 'importing') }
 
   def self.process_all_for_account(account)
     loop do

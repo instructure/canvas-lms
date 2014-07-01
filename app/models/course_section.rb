@@ -246,7 +246,7 @@ class CourseSection < ActiveRecord::Base
     save!
   end
 
-  scope :active, where("course_sections.workflow_state<>'deleted'")
+  scope :active, -> { where("course_sections.workflow_state<>'deleted'") }
 
   scope :sis_sections, lambda { |account, *source_ids| where(:root_account_id => account, :sis_source_id => source_ids).order(:sis_source_id) }
 
