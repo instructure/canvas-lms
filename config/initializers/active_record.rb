@@ -145,11 +145,6 @@ class ActiveRecord::Base
     @global_asset_string ||= "#{self.class.reflection_type_name}_#{global_id}"
   end
 
-  # Override the adheres_to_policy permission_cache_key for to make it shard aware.
-  def permission_cache_key_for(user, session, right)
-    Shard.default.activate { super }
-  end
-
   # little helper to keep checks concise and avoid a db lookup
   def has_asset?(asset, field = :context)
     asset.id == send("#{field}_id") && asset.class.base_ar_class.name == send("#{field}_type")
