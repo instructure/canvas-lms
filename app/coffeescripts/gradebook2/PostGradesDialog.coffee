@@ -18,17 +18,19 @@ define [
 
   class PostGradesDialog extends DialogBaseView
     
-    initialize: (model, sis_app_url) ->
+    initialize: (model, sis_app_url, sis_app_token) ->
       super
 
       model.bind('change:assignments_to_post', =>
         $(".assignments_to_post_count").html(model.assignments_to_post().length)
       )
-      model.bind('change:missing_not_unique', =>
-        $(".assignment-error-count").html(model.get('missing_not_unique'))
-        if @model.get('missing_not_unique') == 0
+      model.bind('change:assignments_with_errors_count', =>
+        $(".assignment-error-count").html(model.get('assignments_with_errors_count'))
+        if @model.get('assignments_with_errors_count') == 0
           $('#assignment-error-text').hide()
-          @postSummaryPage()
+          @saveAssignments()
+          @page = "postSummary"
+          @render()
         else
           $('#assignment-error-text').show()
           $('#assignment-error-text').addClass('text-error')
@@ -37,6 +39,7 @@ define [
 
       @model = model
       @sis_app_url = sis_app_url
+      @sis_app_token = sis_app_token
 
       if @model.missing_and_not_unique().length > 0
         @page = 'assignmentErrors'
@@ -89,7 +92,6 @@ define [
               'class' : 'post_grades btn-primary'
               click : (e) =>
                 e.preventDefault
-                @saveAssignments()
                 @postGrades()
             ]
           )
@@ -114,11 +116,7 @@ define [
       e.preventDefault()
       assignment_id = "" + $(e.target).closest('form').data('assignment-id')
       @model.ignore_assignment(assignment_id)
-      @model.set(missing_not_unique: @model.assignments_with_errors_count())
-      $('#assignment-error-'+assignment_id).hide();
-      if @model.get('missing_not_unique') == 0
-        @page = "postSummary"
-        @render()
+      $('#assignment-error-' + assignment_id).hide();
 
     needsGrading: (e) =>
       e.preventDefault()
@@ -176,36 +174,49 @@ define [
 
     datePicker: ->
       dialog = this
-      $('.date_field', @$el).datetime_field(addHiddenInput: true).change ->
+      $('.date_field', @$el).datetime_field().change ->
         $picker = $(this)
 
         # Convert the date to a Date object with proper Timezone conversion
-        due_at_string = $picker.val()
-        due_at = null
+        due_at = $picker.data('date')
         error_circle = true
-        if due_at_string != ''
-          raw_date = new Date($picker.next().val())
-          unfudge = $.unfudgeDateForProfileTimezone(raw_date)
-          if unfudge?
-            due_at = unfudge.toISOString()
-            error_circle = false
+        if due_at?
+          due_at = $.unfudgeDateForProfileTimezone(due_at).toISOString()
+          error_circle = false
 
-        # Show or hide the red circle, depending on validity of date          
+        # Show or hide the red circle, depending on validity of date
         $circle = $picker.closest('.input-container').prev()
         dialog.showErrorCircle($circle, error_circle)
 
-        # Update the @model assignment with new due_at date
+        # Update the @model assignment with (possibly null) due_at date
         assignment_id = parseInt($picker.closest('form.passback-form').data('assignment-id'))
-        dialog.model.update_assignment(assignment_id, due_at: due_at)
+        if assignment_id?
+          dialog.model.update_assignment(assignment_id, due_at: due_at)
+        else
+          $.flashError('Unable to save due date, assignment_id unavailable')
 
     saveAssignments: ->
-      assignments = @model.missing_and_not_unique()
-      # saveAssignmentsToCanvas(assignments)
+      @saveAssignmentToCanvas(a) for a in @model.modified_assignments()
 
-    sendGradesToSISApp: (grades_json, url) ->
+    saveAssignmentToCanvas: (assignment) ->
+      url = '/api/v1/courses/' + @model.get('course_id') + '/assignments/' + assignment.id
+      data =
+        assignment:
+          name: assignment.name
+          due_at: assignment.due_at
+      $.ajax url,
+        type: 'PUT',
+        data: JSON.stringify(data)
+        contentType: 'application/json; charset=utf-8'
+        error: (err) ->
+          $.flashError('An error occurred saving assignment (' + assignment.id + '). ' + "HTTP Error " + data.status + " : " + data.statusText)
+
+    sendGradesToSISApp: (grades_json, url) =>
       $.ajax url,
         type: 'POST'
         data: JSON.stringify(grades_json)
+        headers:
+          'Authorization': @sis_app_token
         contentType: 'application/json; charset=utf-8'
         error: (data) ->
           $.flashError('An error occurred posting your grades. ' + "HTTP Error " + data.status + " : " + data.statusText)
@@ -217,13 +228,13 @@ define [
       json_to_post['canvas_domain'] = document.location.origin
       json_to_post['assignments'] = _.map(@model.get('assignments_to_post'), (assignment) -> assignment.id)
       if @model.get('section_id')
-        json_to_post['section_id'] = @model.get('section_id')
-        url = @sis_app_url + '/grades/section/' + @model.get('section_id')
+        json_to_post['section_id'] = @model.get('integration_section_id')
+        url = @sis_app_url + '/grades/section/' + @model.get('integration_section_id')
         @sendGradesToSISApp(json_to_post, url)
         @close()
-      else if @model.get('course_id')
-        json_to_post['course_id'] = @model.get('course_id')
-        url = @sis_app_url + '/grades/course/' + @model.get('course_id')
+      else if @model.get('integration_course_id')
+        json_to_post['course_id'] = @model.get('integration_course_id')
+        url = @sis_app_url + '/grades/course/' + @model.get('integration_course_id')
         @sendGradesToSISApp(json_to_post, url)
         @close()
       else
