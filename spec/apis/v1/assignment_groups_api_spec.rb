@@ -158,6 +158,10 @@ describe AssignmentGroupsController, type: :request do
       override.due_at_overridden = true
     end
 
+    # catch updated timestamps
+    a1.reload
+    a2.reload
+
     json = api_call(:get,
           "/api/v1/courses/#{@course.id}/assignment_groups.json?include[]=assignments",
           { :controller => 'assignment_groups', :action => 'index',
