@@ -17,6 +17,8 @@
 #
 
 module QuizzesHelper
+  RE_EXTRACT_BLANK_ID = /['"]question_\w+_(.*?)['"]/
+
   def needs_unpublished_warning?(quiz=@quiz, user=@current_user)
     if quiz.feature_enabled?(:draft_state)
       return false unless can_publish(quiz)
@@ -401,23 +403,30 @@ module QuizzesHelper
     end
   end
 
+  # @param [Array<Hash>] options.answer_list
+  #   A set of question blanks and the student response for each. Example:
+  #   [{ blank_id: "color", "answer": "red" }]
   def fill_in_multiple_blanks_question(options)
     question = hash_get(options, :question)
     answers  = hash_get(options, :answers).dup
-    answer_list = hash_get(options, :answer_list)
+    answer_list = hash_get(options, :answer_list, [])
     res      = user_content hash_get(question, :question_text)
     readonly_markup = hash_get(options, :editable) ? " />" : 'readonly="readonly" />'
     label_attr = "aria-label='#{I18n.t('#quizzes.labels.multiple_blanks_question', "Fill in the blank, read surrounding text")}'"
-    index  = 0
+
+    answer_list.each do |entry|
+      entry[:blank_id] = AssessmentQuestion.variable_id(entry[:blank_id])
+    end
 
     res.gsub! %r{<input.*?name=['"](question_.*?)['"].*?/>} do |match|
-      a = h(answer_list[index])
-      index += 1
-      # If given answer list, insert the values into the text inputs for displaying user's answers.
-      if answer_list && !answer_list.empty?
+      blank = match.match(RE_EXTRACT_BLANK_ID).to_a[1]
+      answer = answer_list.detect { |entry| entry[:blank_id] == blank } || {}
+      answer = h(answer[:answer] || '')
 
+      # If given answer list, insert the values into the text inputs for displaying user's answers.
+      if answer_list.any?
         #  Replace the {{question_BLAH}} template text with the user's answer text.
-        match = match.sub(/\{\{question_.*?\}\}/, a.to_s).
+        match = match.sub(/\{\{question_.*?\}\}/, answer.to_s).
           # Match on "/>" but only when at the end of the string and insert "readonly" if set to be readonly
           sub(/\/\>\Z/, readonly_markup)
       end
@@ -426,7 +435,7 @@ module QuizzesHelper
       match.sub(/\/\>\Z/, "#{label_attr} />")
     end
 
-    unless answer_list && !answer_list.empty?
+    if answer_list.empty?
       answers.delete_if { |k, v| !k.match /^question_#{hash_get(question, :id)}/ }
       answers.each { |k, v| res.sub! /\{\{#{k}\}\}/, h(v) }
       res.gsub! /\{\{question_[^}]+\}\}/, ""
