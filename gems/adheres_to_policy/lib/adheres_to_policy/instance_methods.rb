@@ -325,7 +325,6 @@ module AdheresToPolicy
 
       value = some_array.collect { |element| ActiveSupport::Cache.expand_cache_key(element) }.to_param
       some_array.instance_variable_set("@cache_key",  value) unless some_array.frozen?
-      value
 
       some_array.collect { |element| ActiveSupport::Cache.expand_cache_key(element) }.to_param
     end
