@@ -1626,7 +1626,7 @@ class Course < ActiveRecord::Base
         e.already_enrolled = true
         e.attributes = {
           :course_section => section,
-          :workflow_state => 'invited',
+          :workflow_state => e.is_a?(StudentViewEnrollment) ? 'active' : 'invited',
           :limit_privileges_to_course_section => limit_privileges_to_course_section } if e.completed? || e.rejected? || e.deleted?
       end
       # if we're creating a new enrollment, we want to return it as the correct

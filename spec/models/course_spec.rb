@@ -3240,6 +3240,13 @@ describe Course, "student_view_student" do
     @fake_student = @course.student_view_student
     @course.grants_right?(@fake_student, nil, :read_forum).should be_true
   end
+
+  it "should not update the fake student's enrollment state to 'invited' in a concluded course" do
+    @course.student_view_student
+    @course.enrollment_term.update_attributes(:start_at => 4.days.ago, :end_at => 2.days.ago)
+    @fake_student = @course.student_view_student
+    @fake_student.enrollments.where(course_id: @course).map(&:workflow_state).should eql(['active'])
+  end
 end
 
 describe Course do
