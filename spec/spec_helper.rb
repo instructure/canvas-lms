@@ -31,6 +31,8 @@ unless CANVAS_RAILS2
   end
 
   RSpec.configure do |c|
+    c.color_enabled = true
+
     c.around(:each) do |example|
       attempts = 0
       begin
