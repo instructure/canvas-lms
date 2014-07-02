@@ -33,17 +33,6 @@ module Quizzes::QuizQuestion::AnswerSerializers
       raise NotImplementedError
     end
 
-    # Automatically register answer serializers. Each serializer will be mapped
-    # to the QuizQuestion of a type that is deduced from the serializer's class
-    # name.
-    #
-    # See #question_type
-    def self.inherited(klass)
-      Quizzes::QuizQuestion::AnswerSerializers.register_serializer klass.question_type, klass
-    end
-
-    # Override this to explicitly specify the question_type the serializer works
-    # for.
     def self.question_type
       self.name.demodulize.underscore
     end
@@ -94,40 +83,6 @@ module Quizzes::QuizQuestion::AnswerSerializers
     # @return [Boolean] True if the answer_id identifies a known answer
     def answer_available?(answer_id)
       answer_ids.include?(answer_id.to_i)
-    end
-  end
-
-  class << self
-    attr_accessor :serializers
-
-    def register_serializer(question_type, serializer)
-      self.serializers ||= {}
-      self.serializers[question_type] = serializer
-    end
-
-    # Get an instance of an AnswerSerializer appropriate for the given question.
-    #
-    # @param [QuizQuestion] question
-    #   The question to locate the serializer for.
-    #
-    # @return [AnswerSerializer]
-    #   The serializer.
-    #
-    # @throw RuntimeError if no serializer was found for the given question
-    def serializer_for(question)
-      self.serializers ||= {}
-
-      question_type = question.respond_to?(:data) ?
-        question.data[:question_type] :
-        question[:question_type]
-
-      question_type.gsub! /_question$/, ''
-
-      unless serializer_klass = self.serializers[question_type]
-        raise "No known serializer for questions of type #{question_type}"
-      end
-
-      serializer_klass.new(question)
     end
   end
 end
