@@ -247,6 +247,19 @@ describe QuizzesHelper do
     end
   end
 
+  context "multiple_dropdowns_question" do
+    before do
+      def user_content(stuff); stuff; end # mock #user_content
+    end
+
+    it "should select the user's answer" do
+      html = multiple_dropdowns_question(question: { question_text: "some <select name='question_4'><option value='val'>val</option></select>"},
+                                         answer_list: ['val'])
+      html.should == "some <select name='question_4'><option value='val' selected>val</option></select>"
+      html.should be_html_safe
+    end
+  end
+
   describe "#quiz_edit_text" do
 
     it "returns correct string for survey" do
