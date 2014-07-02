@@ -432,7 +432,8 @@ module QuizzesHelper
       res.gsub! /\{\{question_[^}]+\}\}/, ""
     end
 
-    res
+    # all of our manipulation lost this flag - reset it
+    res.html_safe
   end
 
   def multiple_dropdowns_question(options)
