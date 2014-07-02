@@ -20,9 +20,14 @@ define [
       assignments_to_ignore = (assignment) => _.contains(@ignored_assignment_ids, assignment.id)
       _.reject(@assignment_list(), assignments_to_ignore)
 
-
     assignment_count: ->
       _.size @get('assignments')
+
+    update_assignment: (id, attrs) ->
+      _.extend(@get('assignments')[id], attrs)
+
+    assignments_with_errors_count: ->
+      @missing_and_not_unique().length - @ignored_assignment_ids.length
 
     update_bound_attributes: ->
       @set(assignments_to_post: @assignments_to_post())
