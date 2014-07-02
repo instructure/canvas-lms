@@ -233,6 +233,7 @@ describe QuizzesHelper do
       )
 
       html.should == %q|<input name="question_1" 'value=&#x27;&gt;&lt;script&gt;alert(&#x27;ha!&#x27;)&lt;/script&gt;&lt;img' readonly="readonly" aria-label='Fill in the blank, read surrounding text' />|
+      html.should be_html_safe
     end
 
     it 'should add an appropriate label' do
