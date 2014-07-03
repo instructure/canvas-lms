@@ -418,6 +418,10 @@ end
     # so before(:all)'s don't get confused
     Account.clear_special_account_cache!
     Notification.after_create { Notification.reset_cache! }
+    AdheresToPolicy::Cache.clear
+
+    # allow tests to still run in non-draft state even though it's hard-coded on
+    Feature.definitions["draft_state"].send(:instance_variable_set, '@state', 'allowed')
   end
 
   def delete_fixtures!
