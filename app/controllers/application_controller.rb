@@ -887,6 +887,7 @@ class ApplicationController < ActionController::Base
         @page_view.context = @context if !@page_view.context_id
         @page_view.account_id = @domain_root_account.id
         @page_view.store
+        RequestContextGenerator.store_page_view_meta(@page_view)
       end
     else
       @page_view.destroy if @page_view && !@page_view.new_record?

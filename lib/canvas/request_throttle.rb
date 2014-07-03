@@ -16,24 +16,24 @@
 #
 require 'set'
 
-# unfortunately this timing data isn't exposed elsewhere,
-# so we override this method to put it in the rack env
-class ActionController::Base
-  def active_record_runtime
-    db_runtime = ActiveRecord::Base.connection.reset_runtime
-    db_runtime += @db_rt_before_render if @db_rt_before_render
-    db_runtime += @db_rt_after_render if @db_rt_after_render
-    request.env['active_record_runtime'] = db_runtime / 1000.0 if request
-    "DB: %.0f" % db_runtime
-  end
-end
-
 module Canvas
 class RequestThrottle
   # this @@last_sample data isn't thread-safe, and if canvas ever becomes
   # multi-threaded, we'll have to just get rid of it since we can't measure
   # per-thread heap used
   @@last_sample = 0
+
+  class ActionControllerLogSubscriber < ActiveSupport::LogSubscriber
+    def process_action(event)
+      # we don't have access to the request here, so we can't just put this in the env
+      Thread.current[:request_throttle_db_runtime] = (event.payload[:db_runtime] || 0) / 1000.0
+    end
+  end
+  ActionControllerLogSubscriber.attach_to :action_controller
+
+  def db_runtime(_request)
+    Thread.current[:request_throttle_db_runtime]
+  end
 
   def initialize(app)
     @app = app
@@ -64,11 +64,12 @@ class RequestThrottle
       user_cpu = ending_cpu.utime - starting_cpu.utime
       system_cpu = ending_cpu.stime - starting_cpu.stime
       account = env["canvas.domain_root_account"]
-      report_on_stats(account, starting_mem, ending_mem, user_cpu, system_cpu)
+      db_runtime = (self.db_runtime(request) || 0.0)
+      report_on_stats(db_runtime, account, starting_mem, ending_mem, user_cpu, system_cpu)
 
       # currently we define cost as the amount of user cpu time plus the amount
       # of time spent in db queries
-      cost = user_cpu + (env['active_record_runtime'] || 0.0)
+      cost = user_cpu + db_runtime
       cost
     end
 
@@ -153,7 +154,13 @@ class RequestThrottle
     ]
   end
 
-  def report_on_stats(account, starting_mem, ending_mem, user_cpu, system_cpu)
+  def report_on_stats(db_runtime, account, starting_mem, ending_mem, user_cpu, system_cpu)
+    RequestContextGenerator.add_meta_header("b", starting_mem)
+    RequestContextGenerator.add_meta_header("m", ending_mem)
+    RequestContextGenerator.add_meta_header("u", "%.2f" % [user_cpu])
+    RequestContextGenerator.add_meta_header("y", "%.2f" % [system_cpu])
+    RequestContextGenerator.add_meta_header("d", "%.2f" % [db_runtime])
+
     if account
       CanvasStatsd::Statsd.timing("requests_user_cpu.account_#{account.id}", user_cpu)
       CanvasStatsd::Statsd.timing("requests_system_cpu.account_#{account.id}", system_cpu)
