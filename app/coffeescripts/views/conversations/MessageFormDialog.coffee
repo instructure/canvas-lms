@@ -307,7 +307,7 @@ define [
       return true if(user.id.match(/students$/) || user.id.match(/^group/))
       for id, roles of user.get('common_courses')
         return true if 'StudentEnrollment' in roles and
-          (ENV.CONVERSATIONS.CAN_ADD_NOTES_FOR_ACCOUNT or ENV.CONVERSATIONS.CONTEXTS.courses[id]?.permissions?.manage_user_notes)
+          (ENV.CONVERSATIONS.CAN_ADD_NOTES_FOR_ACCOUNT or ENV.CONVERSATIONS.CAN_ADD_NOTES_FOR_COURSES[id])
       false
 
     toggleUserNote: (state) ->
