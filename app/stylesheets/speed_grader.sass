@@ -309,6 +309,18 @@
     margin: 0
     padding: 0
     list-style: none
+
+    //Chrome has a nice bug where clicking on block element
+    //inside an inline element will force the inline element
+    //to keep the :active pseudo class.
+    //this causes tooltips to stay open since our tooltips
+    //show if the tooltip element has the :active pseudo class
+    //a bug has been filed at https://code.google.com/p/chromium/issues/detail?id=391254
+    .tooltip .tooltip_wrap
+      display: none
+    .tooltip:hover .tooltip_wrap
+      display: block
+    /////// END: fix for chrome bug.
     .prompt
       color: #999
       font-weight: bold
