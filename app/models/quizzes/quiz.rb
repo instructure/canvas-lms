@@ -73,7 +73,6 @@ class Quizzes::Quiz < ActiveRecord::Base
   validate :validate_quiz_type, :if => :quiz_type_changed?
   validate :validate_ip_filter, :if => :ip_filter_changed?
   validate :validate_hide_results, :if => :hide_results_changed?
-  validate :validate_draft_state_change, :if => :workflow_state_changed?
   validate :validate_correct_answer_visibility, :if => lambda { |quiz|
     quiz.show_correct_answers_at_changed? ||
       quiz.hide_correct_answers_at_changed?
@@ -81,7 +80,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   sanitize_field :description, CanvasSanitize::SANITIZE
   copy_authorized_links(:description) { [self.context, nil] }
 
-  before_save :generate_quiz_data_on_publish
+  before_save :generate_quiz_data_on_publish, :if => :needs_republish?
   before_save :build_assignment
   before_save :set_defaults
   before_save :flag_columns_that_need_republish
@@ -149,23 +148,24 @@ class Quizzes::Quiz < ActiveRecord::Base
   # generate quiz data and update time when we publish. This method makes it
   # harder to mess up (like someone setting using workflow_state directly)
   def generate_quiz_data_on_publish
-    # when draft state is turned on permanently, remove this conditional, the
-    # @publishing ivar from publish!, and change the filter to:
-    #
-    #  before_save :generate_quiz_data_on_publish, :if => :workflow_state_changed?
-    #
-    if context.feature_enabled?(:draft_state)
-      return unless workflow_state_changed?
-
-    # pre-draft state we need ability to republish things. Since workflow_state
-    # is stays available, we need to flag when we're forcing to publish!
-    else
-      return unless @publishing
-    end
-
     if workflow_state == 'available'
       self.generate_quiz_data
       self.published_at = Time.zone.now
+    end
+  end
+  private :generate_quiz_data_on_publish
+
+  # @return [Boolean] Whether the quiz has unsaved changes due for a republish.
+  def needs_republish?
+    # TODO: remove this conditional and the non-DS scenario once Draft State is
+    # permanently turned on
+    if context.feature_enabled?(:draft_state)
+      return true if @publishing || workflow_state_changed?
+
+    # pre-draft state we need ability to republish things. Since workflow_state
+    # stays available, we need to flag when we're forcing to publish!
+    else
+      return true if @publishing
     end
   end
 

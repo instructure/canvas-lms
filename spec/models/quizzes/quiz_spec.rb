@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../../lib/canvas/draft_state_validations_spec.rb')
 
 describe Quizzes::Quiz do
   before :once do
@@ -102,6 +103,8 @@ describe Quizzes::Quiz do
       quiz.published?.should be_false
     end
   end
+
+  it_should_behave_like 'Canvas::DraftStateValidations'
 
   it "should flag as edited if shuffle answers changes to off" do
     q = @course.quizzes.create!(:title => "new quiz")
@@ -1168,6 +1171,37 @@ describe Quizzes::Quiz do
       @quiz.should_not be_published
       @quiz.workflow_state = 'deleted'
       @quiz.should_not be_published
+    end
+  end
+
+  describe '#needs_republish?' do
+    subject { @course.quizzes.create!(title: 'Test Quiz') }
+
+    it 'should be true if publish! was manually called' do
+      subject.needs_republish?.should be_false
+
+      # intercepting the call to save! and running our expectations there
+      # because by the time it's saved, #needs_republish? will be reset
+      subject.expects(:save!).with { |*args|
+        subject.needs_republish?.should be_true
+        true
+      }
+
+      subject.publish!
+    end
+
+    context 'with draft-state' do
+      before do
+        subject.context.root_account.enable_feature!(:draft_state)
+      end
+
+      it 'should be true if the workflow_state has changed' do
+        subject.workflow_state = 'deleted'
+        subject.save!
+        subject.reload
+        subject.workflow_state = 'available'
+        subject.needs_republish?.should be_true
+      end
     end
   end
 
