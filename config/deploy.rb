@@ -57,6 +57,26 @@ namespace :deploy do
 end
 
 namespace :canvas do
+
+  namespace :delayed_jobs do
+
+    desc "Stop delayed_jobs"
+    task :stop, :roles => :db do
+      run "sudo /etc/init.d/canvas_init stop"
+    end
+
+    desc "Start delayed_jobs"
+    task :stop, :roles => :db do
+      run "sudo /etc/init.d/canvas_init start"
+    end
+
+    desc "Restart delayed_jobs"
+    task :stop, :roles => :db do
+      run "sudo /etc/init.d/canvas_init restart"
+    end
+
+  end
+
   desc "Set application nodes from config file"
   task :set_app_nodes,  :roles => :db, :only => { :primary => true } do
     stage = fetch :stage
@@ -104,11 +124,6 @@ namespace :canvas do
     run "cd #{latest_release} && #{rake} RAILS_ENV=#{rails_env} db:load_notifications"
   end
 
-  desc "Restart delayed jobs workers"
-  task :restart_jobs, :roles => :db do
-    run "sudo /etc/init.d/canvas_init restart"
-  end
-
   desc "Log the deploy to graphite"
   task :log_deploy do
     ts = Time.now.to_i
@@ -133,7 +148,7 @@ namespace :canvas do
 
   desc "Tasks that run after the deploy completes"
   task :after_deploy do
-    restart_jobs
+    canvas.delayed_jobs.start
     log_deploy
   end
 
@@ -143,6 +158,7 @@ namespace :canvas do
   end
 end
 
+before(:deploy, "canvas:delayed_jobs:stop")
 before("deploy:create_symlink", "canvas:before_create_symlink")
 after("deploy:create_symlink", "canvas:after_create_symlink")
 after("deploy:restart", "canvas:ping")
