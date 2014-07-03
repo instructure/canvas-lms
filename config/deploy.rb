@@ -66,12 +66,12 @@ namespace :canvas do
     end
 
     desc "Start delayed_jobs"
-    task :stop, :roles => :db do
+    task :start, :roles => :db do
       run "sudo /etc/init.d/canvas_init start"
     end
 
     desc "Restart delayed_jobs"
-    task :stop, :roles => :db do
+    task :restart, :roles => :db do
       run "sudo /etc/init.d/canvas_init restart"
     end
 
