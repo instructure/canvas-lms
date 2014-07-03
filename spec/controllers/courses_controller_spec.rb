@@ -52,68 +52,199 @@ describe CoursesController do
       end
     end
 
-    it "should include unpublished courses in future enrollments for admins" do
-      user
-      future_course  = Course.create!(:name => 'future course', :start_at => Time.now + 2.weeks,
-                                      :restrict_enrollments_to_course_dates => true)
-      current_course = Course.create!(:name => 'current course', :start_at => Time.now - 2.weeks)
+    describe 'past_enrollments' do
+      it "should include 'completed' courses" do
+        enrollment1 = course_with_student active_all: true
+        enrollment1.should be_active
+        enrollment1.course.complete!
 
-      current_unpublished_course  = Course.create!(:name => 'current course 2', :start_at => Time.now - 2.weeks)
-      future_unpublished_course  = Course.create!(:name => 'future course 2', :start_at => Time.now + 2.weeks)
-      future_unrestricted_course = Course.create!(:name => 'future course 3', :start_at => Time.now + 2.weeks)
+        user_session(@student)
+        get 'index'
+        response.should be_success
+        assigns[:past_enrollments].should eql([enrollment1])
+        assigns[:current_enrollments].should eql([])
+        assigns[:future_enrollments].should eql([])
+      end
 
-      current_enrollment = StudentEnrollment.create!(:course => current_course, :user => @user)
-      future_enrollment  = StudentEnrollment.create!(:course => future_course, :user => @user)
-      current_unpublished_enrollment = TeacherEnrollment.create!(:course => current_unpublished_course, :user => @user)
-      future_unpublished_enrollment = TeacherEnrollment.create!(:course => future_unpublished_course, :user => @user)
-      future_unrestricted_enrollment = StudentEnrollment.create!(:course => future_unrestricted_course, :user => @user)
+      it "should include 'rejected' and 'completed' enrollments" do
+        active_enrollment = course_with_student name: 'active', active_course: true
+        active_enrollment.accept!
+        rejected_enrollment = course_with_student user: @student, course_name: 'rejected', active_course: true
+        rejected_enrollment.update_attribute(:workflow_state, 'rejected')
+        completed_enrollment = course_with_student user: @student, course_name: 'completed', active_course: true
+        completed_enrollment.update_attribute(:workflow_state, 'completed')
 
-      [future_course, current_course, future_unrestricted_course].each { |course| course.offer }
-      [current_enrollment, future_enrollment, current_unpublished_enrollment, future_unpublished_enrollment, future_unrestricted_enrollment].each { |e| e.accept }
+        user_session(@student)
+        get 'index'
+        response.should be_success
+        assigns[:past_enrollments].should == [completed_enrollment, rejected_enrollment]
+        assigns[:current_enrollments].should == [active_enrollment]
+        assigns[:future_enrollments].should be_empty
+      end
 
-      user_session(@user)
-      get 'index'
-      response.should be_success
-      assigns[:future_enrollments].count.should == 3
-      assigns[:future_enrollments].should include(future_enrollment)
-      assigns[:future_enrollments].should include(current_unpublished_enrollment)
-      assigns[:future_enrollments].should include(future_unpublished_enrollment)
+      it "should include 'active' enrollments whose term is past" do
+        @student = user
+
+        # by course date, unrestricted
+        course1 = Account.default.courses.create! start_at: 2.months.ago, conclude_at: 1.month.ago,
+                                                  restrict_enrollments_to_course_dates: false,
+                                                  name: 'One'
+        course1.offer!
+        enrollment1 = course_with_student course: course1, user: @student, active_all: true
+
+        # by course date, restricted
+        course2 = Account.default.courses.create! start_at: 2.months.ago, conclude_at: 1.month.ago,
+                                                  restrict_enrollments_to_course_dates: true,
+                                                  name: 'Two'
+        course2.offer!
+        enrollment2 = course_with_student course: course2, user: @student, active_all: true
+
+        # by enrollment term
+        enrollment3 = course_with_student user: @student, course_name: 'Three', active_all: true
+        past_term = Account.default.enrollment_terms.create! name: 'past term', start_at: 1.month.ago, end_at: 1.day.ago
+        enrollment3.course.enrollment_term = past_term
+        enrollment3.course.save!
+
+        user_session(@student)
+        get 'index'
+        response.should be_success
+        assigns[:past_enrollments].should == [enrollment3, enrollment2]
+        assigns[:current_enrollments].should == [enrollment1]
+        assigns[:future_enrollments].should be_empty
+      end
     end
 
-    it "should not include unpublished courses in future enrollments for students" do
-      user
-      future_course  = Course.create!(:name => 'future course', :start_at => Time.now + 2.weeks,
-                                      :restrict_enrollments_to_course_dates => true)
-      current_course = Course.create!(:name => 'current course', :start_at => Time.now - 2.weeks)
+    describe 'current_enrollments' do
+      it "should include courses with no applicable start/end dates" do
+        # no dates at all
+        enrollment1 = student_in_course active_all: true, course_name: 'A'
 
-      current_unpublished_course  = Course.create!(:name => 'current course 2', :start_at => Time.now - 2.weeks)
-      future_unpublished_course  = Course.create!(:name => 'future course 2', :start_at => Time.now + 2.weeks)
-      future_unrestricted_published_course = Course.create!(:name => 'future course 3', :start_at => Time.now + 2.weeks)
-      future_unrestricted_unpublished_course = Course.create!(:name => 'future course 4', :start_at => Time.now + 2.weeks)
+        # past date that doesn't count
+        course2 = Account.default.courses.create! start_at: 2.weeks.ago, conclude_at: 1.week.ago,
+                                                  restrict_enrollments_to_course_dates: false,
+                                                  name: 'B'
+        course2.offer!
+        enrollment2 = student_in_course user: @student, course: course2, active_all: true
 
-      current_enrollment = StudentEnrollment.create!(:course => current_course, :user => @user)
-      future_enrollment  = StudentEnrollment.create!(:course => future_course, :user => @user)
-      current_unpublished_enrollment = StudentEnrollment.create!(:course => current_unpublished_course, :user => @user)
-      future_unpublished_enrollment = StudentEnrollment.create!(:course => future_unpublished_course, :user => @user)
+        # future date that doesn't count
+        course3 = Account.default.courses.create! start_at: 1.weeks.from_now, conclude_at: 2.weeks.from_now,
+                                                  restrict_enrollments_to_course_dates: false,
+                                                  name: 'C'
+        course3.offer!
+        enrollment3 = student_in_course user: @student, course: course3, active_all: true
 
-      future_unrestricted_published_enrollment = StudentEnrollment.create!(:course => future_unrestricted_published_course, :user => @user)
-      future_unrestricted_unpublished_enrollment = StudentEnrollment.create!(:course => future_unrestricted_unpublished_course, :user => @user)
+        user_session(@student)
+        get 'index'
+        response.should be_success
+        assigns[:past_enrollments].should be_empty
+        assigns[:current_enrollments].should == [enrollment1, enrollment2, enrollment3]
+        assigns[:future_enrollments].should be_empty
+      end
 
-      [future_course, current_course, future_unrestricted_published_course].each { |course| course.offer }
-      [current_enrollment, future_enrollment, current_unpublished_enrollment,
-       future_unpublished_enrollment, future_unrestricted_published_enrollment].each { |e| e.accept }
+      it "should include courses with current start/end dates" do
+        course1 = Account.default.courses.create! start_at: 1.week.ago, conclude_at: 1.week.from_now,
+                                                  restrict_enrollments_to_course_dates: true,
+                                                  name: 'A'
+        course1.offer!
+        enrollment1 = student_in_course course: course1
 
-      user_session(@user)
-      get 'index'
-      response.should be_success
-      assigns[:current_enrollments].count.should == 2
-      assigns[:current_enrollments].should include(current_enrollment)
-      assigns[:current_enrollments].should include(future_unrestricted_published_enrollment)
-      assigns[:future_enrollments].count.should == 1
-      assigns[:future_enrollments].should include(future_enrollment)
+        enrollment2 = course_with_student user: @student, course_name: 'B', active_all: true
+        current_term = Account.default.enrollment_terms.create! name: 'current term', start_at: 1.month.ago, end_at: 1.month.from_now
+        enrollment2.course.enrollment_term = current_term
+        enrollment2.course.save!
 
+        user_session(@student)
+        get 'index'
+        response.should be_success
+        assigns[:past_enrollments].should be_empty
+        assigns[:current_enrollments].should == [enrollment1, enrollment2]
+        assigns[:future_enrollments].should be_empty
+      end
+
+      it "should include 'invited' enrollments, and list them before 'active'" do
+        enrollment1 = course_with_student course_name: 'Z'
+        @student.register!
+        @course.offer!
+        enrollment1.invite!
+
+        enrollment2 = course_with_student user: @student, course_name: 'A', active_all: true
+
+        user_session(@student)
+        get 'index'
+        response.should be_success
+        assigns[:past_enrollments].should be_empty
+        assigns[:current_enrollments].should == [enrollment1, enrollment2]
+        assigns[:future_enrollments].should be_empty
+      end
+
+      it "should include unpublished courses" do
+        enrollment = course_with_student
+        @course.should be_unpublished
+        enrollment.invite!
+
+        user_session(@student)
+        get 'index'
+        response.should be_success
+        assigns[:past_enrollments].should be_empty
+        assigns[:current_enrollments].should == [enrollment]
+        assigns[:future_enrollments].should be_empty
+      end
     end
-  end
+
+    describe 'future_enrollments' do
+      it "should include courses with a start date in the future, regardless of published state" do
+        # published course
+        course1 = Account.default.courses.create! start_at: 1.month.from_now, restrict_enrollments_to_course_dates: true, name: 'A'
+        course1.offer!
+        enrollment1 = course_with_student course: course1
+
+        # unpublished course
+        course2 = Account.default.courses.create! start_at: 1.month.from_now, restrict_enrollments_to_course_dates: true, name: 'B'
+        course2.should be_unpublished
+        enrollment2 = course_with_student user: @student, course: course2
+
+        user_session(@student)
+        get 'index'
+        response.should be_success
+        assigns[:past_enrollments].should be_empty
+        assigns[:current_enrollments].should be_empty
+        assigns[:future_enrollments].map(&:course_id).should == [course1.id, course2.id]
+
+        observer = user_with_pseudonym(active_all: true)
+        o = @student.user_observers.build; o.observer = observer; o.save!
+        user_session(observer)
+        get 'index'
+        response.should be_success
+        assigns[:past_enrollments].should be_empty
+        assigns[:current_enrollments].should be_empty
+        assigns[:future_enrollments].map(&:course_id).should == [course1.id, course2.id]
+      end
+
+      it "should be empty if the caller is a student or observer and the root account restricts students viewing courses before the start date" do
+        course1 = Account.default.courses.create! start_at: 1.month.from_now, restrict_enrollments_to_course_dates: true
+        course1.offer!
+        enrollment1 = course_with_student course: course1
+        enrollment1.root_account.settings[:restrict_student_future_view] = true
+        enrollment1.root_account.save!
+
+        user_session(@student)
+        get 'index'
+        response.should be_success
+        assigns[:past_enrollments].should be_empty
+        assigns[:current_enrollments].should be_empty
+        assigns[:future_enrollments].should be_empty
+
+        observer = user_with_pseudonym(active_all: true)
+        o = @student.user_observers.build; o.observer = observer; o.save!
+        user_session(observer)
+        get 'index'
+        response.should be_success
+        assigns[:past_enrollments].should be_empty
+        assigns[:current_enrollments].should be_empty
+        assigns[:future_enrollments].should be_empty
+      end
+    end
+ end
 
   describe "GET 'statistics'" do
     it 'does not break using new student_ids method from course' do

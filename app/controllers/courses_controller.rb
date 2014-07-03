@@ -322,15 +322,26 @@ class CoursesController < ApplicationController
   def index
     respond_to do |format|
       format.html {
-        @current_enrollments = @current_user.cached_current_enrollments(:include_enrollment_uuid => session[:enrollment_uuid]).sort_by{|e| [e.active? ? 1 : 0, Canvas::ICU.collation_key(e.long_name)] }
-        @past_enrollments    = @current_user.enrollments.with_each_shard{|scope| scope.past }
-        @future_enrollments  = @current_user.enrollments.with_each_shard{|scope| scope.future.includes(:root_account)}.reject{|e| e.root_account.settings[:restrict_student_future_view]}
-
-        @past_enrollments.concat(@current_enrollments.select { |e| e.state_based_on_date == :completed })
-        @current_enrollments.reject! do |e|
-          [:inactive, :completed].include?(e.state_based_on_date) ||
-            @future_enrollments.include?(e)
+        all_enrollments = @current_user.enrollments.with_each_shard { |scope| scope.not_deleted }
+        @past_enrollments = []
+        @current_enrollments = []
+        @future_enrollments  = []
+        Canvas::Builders::EnrollmentDateBuilder.preload(all_enrollments)
+        all_enrollments.each do |e|
+          if [:completed, :rejected].include?(e.state_based_on_date)
+            @past_enrollments << e
+          else
+            start_at, end_at = e.enrollment_dates.first
+            if start_at && start_at > Time.now.utc
+              @future_enrollments << e unless %w(StudentEnrollment ObserverEnrollment).include?(e.type) && e.root_account.settings[:restrict_student_future_view]
+            else
+              @current_enrollments << e
+            end
+          end
         end
+
+        @past_enrollments.sort_by!{|e| Canvas::ICU.collation_key(e.long_name)}
+        [@current_enrollments, @future_enrollments].each{|list| list.sort_by!{|e| [e.active? ? 1 : 0, Canvas::ICU.collation_key(e.long_name)] }}
       }
 
       format.json {

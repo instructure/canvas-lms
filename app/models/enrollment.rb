@@ -181,23 +181,10 @@ class Enrollment < ActiveRecord::Base
               AND enrollments.workflow_state = 'active'
               AND courses.workflow_state != 'deleted')") }
 
-  scope :future, -> {
+  scope :not_deleted, -> {
     joins(:course).
-        where("(courses.start_at>?
-                AND courses.workflow_state='available'
-                AND courses.restrict_enrollments_to_course_dates=?
-                AND enrollments.workflow_state IN ('invited', 'active')
-              ) OR (
-                courses.workflow_state IN ('created', 'claimed')
-                AND enrollments.type IN ('TeacherEnrollment','TaEnrollment', 'DesignerEnrollment')
-                AND enrollments.workflow_state IN ('invited', 'active', 'creation_pending')
-              )", Time.now.utc, true) }
-
-  scope :past, -> {
-    joins(:course).
-        where("(courses.workflow_state='completed'
-              AND enrollments.workflow_state NOT IN ('invited', 'deleted'))
-              OR enrollments.workflow_state IN ('rejected', 'completed')") }
+        where("(courses.workflow_state<>'deleted') AND (enrollments.workflow_state<>'deleted')")
+  }
 
   scope :not_fake, -> { where("enrollments.type<>'StudentViewEnrollment'") }
 
