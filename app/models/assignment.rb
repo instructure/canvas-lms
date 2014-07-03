@@ -573,10 +573,6 @@ class Assignment < ActiveRecord::Base
     self.quiz.restore(:assignment) if from != :quiz && self.quiz
   end
 
-  def participants
-    self.context.participants
-  end
-
   def participants_with_overridden_due_at
     Assignment.participants_with_overridden_due_at([self])
   end
@@ -891,9 +887,15 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  # Everyone, students, TAs, teachers
   def participants
-    context.participants
+    return context.participants unless differentiated_assignments_applies?
+    participants_with_visibility
+  end
+
+  def participants_with_visibility
+    users = context.participating_admins
+    users += students_with_visibility
+    users.uniq
   end
 
   def set_default_grade(options={})

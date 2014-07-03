@@ -480,6 +480,10 @@ RSpec.configure do |config|
         account.allow_feature!(:draft_state)
         @course.enable_feature!(:draft_state)
       end
+      if opts[:differentiated_assignments]
+        account.allow_feature!(:differentiated_assignments)
+        @course.enable_feature!(:differentiated_assignments)
+      end
     end
     @course
   end

@@ -1462,6 +1462,41 @@ describe Assignment do
     end
   end
 
+  context "participants" do
+    describe "with differentiated_assignments on" do
+      before :once do
+        setup_differentiated_assignments_course
+      end
+
+      it 'returns users with visibility' do
+        @assignment.participants.length.should == 3
+      end
+
+      it 'includes students with visibility' do
+        @assignment.participants.include?(@student_one).should be_true
+      end
+
+      it 'excludes students without visibility' do
+        @assignment.participants.include?(@student_two).should be_false
+      end
+
+      it 'includes admins with visibility' do
+        @assignment.participants.include?(@teacher).should be_true
+        @assignment.participants.include?(@ta).should be_true
+      end
+    end
+
+    describe "with differentiated_assignments off" do
+      before :once do
+        setup_differentiated_assignments_course(false)
+      end
+
+      it 'returns all users in the course' do
+        @assignment.participants.length.should == 4
+      end
+    end
+  end
+
   context "broadcast policy" do
     context "due date changed" do
       before :once do
@@ -1635,6 +1670,21 @@ describe Assignment do
           messages_sent.detect{|m|m.user_id == @ta.id}.body.should be_include "Multiple Dates"
           messages_sent.detect{|m|m.user_id == @studentB.id}.body.should be_include "Jan 2, 2011"
           messages_sent.detect{|m|m.user_id == @ta2.id}.body.should be_include "Multiple Dates"
+        end
+
+        it "should notify the correct people with differentiated_assignments enabled" do
+          @assignment.context.root_account.enable_feature!(:differentiated_assignments)
+          section = @course.course_sections.create!(name: 'Lonely Section')
+          student = student_in_section(section)
+          @assignment.do_notifications!
+
+          messages_sent = @assignment.messages_sent['Assignment Created']
+          messages_sent.detect{|m|m.user_id == @teacher.id}.body.should be_include "Multiple Dates"
+          messages_sent.detect{|m|m.user_id == @studentA.id}.body.should be_include "Jan 1, 2011"
+          messages_sent.detect{|m|m.user_id == @ta.id}.body.should be_include "Multiple Dates"
+          messages_sent.detect{|m|m.user_id == @studentB.id}.body.should be_include "Jan 2, 2011"
+          messages_sent.detect{|m|m.user_id == @ta2.id}.body.should be_include "Multiple Dates"
+          messages_sent.detect{|m|m.user_id == student.id}.should be_nil
         end
 
         it "should collapse identical instructor due dates" do
@@ -3052,6 +3102,22 @@ describe Assignment do
       a2.should_not be_valid
     end
   end
+end
+
+
+def setup_differentiated_assignments_course(enabled=true)
+  @course = course(draft_state: true, active_all: true, differentiated_assignments: enabled)
+  @section_one = @course.course_sections.create!(name: 'Section One')
+  @section_two = @course.course_sections.create!(name: 'Section Two')
+
+  @ta = course_with_ta(course: @course, active_all: true).user
+  @student_one = student_in_section(@section_one)
+  @student_two = student_in_section(@section_two)
+
+  @assignment = assignment_model(course: @course)
+  @override_s1 = differentiated_assignment(assignment: @assignment, course_section: @section_one)
+  @override_s1.due_at = 1.day.from_now
+  @override_s1.save!
 end
 
 def setup_assignment_with_group
