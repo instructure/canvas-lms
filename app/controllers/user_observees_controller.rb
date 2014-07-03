@@ -145,11 +145,13 @@ class UserObserveesController < ApplicationController
       user.user_observees.create! do |uo|
         uo.user_id = observee.id
       end
+      user.touch
     end
   end
 
   def remove_observee(observee)
     user.user_observees.where(user_id: observee).destroy_all
+    user.touch
   end
 
   def has_observee?(observee)
