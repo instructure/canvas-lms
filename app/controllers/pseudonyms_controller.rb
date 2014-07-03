@@ -197,7 +197,7 @@ class PseudonymsController < ApplicationController
     @pseudonym = @account.pseudonyms.build(params[:pseudonym])
     @pseudonym.sis_user_id = sis_user_id if sis_user_id.present? && @account.grants_right?(@current_user, session, :manage_sis)
     @pseudonym.generate_temporary_password if !params[:pseudonym][:password]
-    if @pseudonym.save
+    if @pseudonym.save_without_session_maintenance
       respond_to do |format|
         flash[:notice] = t 'notices.account_registered', "Account registered!"
         format.html { redirect_to user_profile_url(@current_user) }
