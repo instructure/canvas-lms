@@ -75,7 +75,6 @@ class Assignment < ActiveRecord::Base
 
   has_one :external_tool_tag, :class_name => 'ContentTag', :as => :context, :dependent => :destroy
   validates_associated :external_tool_tag, :if => :external_tool?
-  validate :validate_draft_state_change, :if => :workflow_state_changed?
   validate :group_category_changes_ok?
   validate :positive_points_possible?
 
