@@ -189,5 +189,7 @@ stylesheets:
     - public/stylesheets/compiled/mobile_auth.css
   external_tool_full_width:
     - public/stylesheets/compiled/external_tools/full_width.css
+  user_observees:
+    - public/stylesheets/compiled/user_observees.css
 
   <%= plugin_assets.anchors_yml %>

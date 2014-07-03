@@ -668,6 +668,7 @@ routes.draw do
       get :communication
       put :communication_update
       get :settings
+      get :observees
     end
   end
 
