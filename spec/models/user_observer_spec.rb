@@ -19,8 +19,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe UserObserver do
+  let_once(:student) { user }
   it "should enroll the observer in all pending/active courses" do
-    student = user
     c1 = course(:active_all => true)
     e1 = student_in_course(:course => c1, :user => student)
     c2 = course(:active_all => true)
@@ -39,8 +39,6 @@ describe UserObserver do
   end
 
   it "should not enroll the observer in institutions where they lack a login" do
-    student = user
-
     a1 = account_model
     c1 = course(account: a1, active_all: true)
     e1 = student_in_course(course: c1, user: student, active_all: true)

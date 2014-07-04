@@ -88,14 +88,14 @@ describe RoleOverride do
   end
 
   describe "manage_role_override" do
-    before :each do
+    before :once do
       @account = account_model(:parent_account => Account.default)
       @role = 'NewRole'
       @permission = 'read_reports'
     end
 
     describe "override already exists" do
-      before :each do
+      before :once do
         @existing_override = @account.role_overrides.build(
           :permission => @permission,
           :enrollment_type => @role)
@@ -141,7 +141,7 @@ describe RoleOverride do
     end
 
     describe "no override yet" do
-      before :each do
+      before :once do
         @initial_count = @account.role_overrides.size
       end
 
@@ -198,7 +198,7 @@ describe RoleOverride do
   end
 
   describe "#permissions_for" do
-    before :each do
+    before :once do
       @account = account_model(:parent_account => Account.default)
       @role_name = 'NewRole'
       @permission = :view_group_pages
@@ -386,7 +386,7 @@ describe RoleOverride do
     end
 
     context "account_only" do
-      before do
+      before :once do
         @site_admin = User.create!
         Account.site_admin.account_users.create!(user: @site_admin)
         @root_admin = User.create!
@@ -466,7 +466,7 @@ describe RoleOverride do
   end
 
   context "enabled_for_plugin" do
-    before(:each) do
+    before(:once) do
       account_model
     end
 

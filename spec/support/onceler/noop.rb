@@ -15,6 +15,13 @@ module Onceler
 
       def before(scope = nil, &block)
         scope = :each if scope == :once || scope.nil?
+        return if scope == :record || scope == :replay
+        super(scope, &block)
+      end
+
+      def after(scope = nil, &block)
+        scope = :each if scope.nil?
+        return if scope == :record || scope == :replay
         super(scope, &block)
       end
 
