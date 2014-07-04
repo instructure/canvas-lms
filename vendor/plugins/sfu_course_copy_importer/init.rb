@@ -14,7 +14,8 @@ Rails.configuration.to_prepare do
           :requires_file_upload => false,
           :skip_conversion_step => true,
           :required_options_validator => Canvas::Migration::Validators::CourseCopyValidator,
-          :required_settings => [:source_course_id]
+          :required_settings => [:source_course_id],
+          :valid_contexts => %w{Course}
       },
   }
 end
