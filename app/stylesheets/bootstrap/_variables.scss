@@ -45,8 +45,7 @@ $textColor:             $grayDark !default;
 
 // Links
 // -------------------------
-$linkColor: #08c;
-@if $use_high_contrast { $linkColor: #14597c; }
+$linkColor:             ensure-contrast(#08c, white);
 
 $linkColorHover:        darken($linkColor, 15%) !default;
 
@@ -170,7 +169,7 @@ $iconWhiteSpritePath:     image-path("glyphicons-halflings-white.png") !default;
 
 // Input placeholder text color
 // -------------------------
-$placeholderText:         $grayLight !default;
+$placeholderText:         ensure-contrast($grayLight, white) !default;
 
 
 // Hr border color
@@ -248,24 +247,20 @@ $heroUnitLeadColor:               inherit !default;
 
 // Form states and alerts
 // -------------------------
-$warningText:             #c09853 !default;
-@if $use_high_contrast { $warningText: darken($warningText, 7%) }
 $warningBackground:       #fcf8e3 !default;
+$warningText:             ensure-contrast(#c09853, $warningBackground) !default;
 $warningBorder:           darken(adjust-hue($warningBackground, -10), 3%) !default;
 
-$errorText:               #b94a48 !default;
-@if $use_high_contrast { $errorText: darken($errorText, 7%) }
 $errorBackground:         #f2dede !default;
+$errorText:               ensure-contrast(#b94a48, $errorBackground) !default;
 $errorBorder:             darken(adjust-hue($errorBackground, -10), 3%) !default;
 
-$successText:             #417e42 !default;
-@if $use_high_contrast { $successText: darken($successText, 7%) }
 $successBackground:       #dff0d8 !default;
+$successText:             ensure-contrast(#417e42, $successBackground) !default;
 $successBorder:           darken(adjust-hue($successBackground, -10), 5%) !default;
 
-$infoText:                #3a87ad !default;
-@if $use_high_contrast { $infoText: darken($infoText, 7%) }
 $infoBackground:          #d9edf7 !default;
+$infoText:               ensure-contrast(#3a87ad, $infoBackground) !default;
 $infoBorder:              darken(adjust-hue($infoBackground, -10), 7%) !default;
 
 

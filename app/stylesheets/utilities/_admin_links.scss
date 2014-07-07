@@ -100,11 +100,7 @@ Cogs, *AKA admin links*, are generally floated to the right, make sure it's the 
 }
 
 .al-trigger-gray, .al-trigger-gray:hover {
-  @if $use_high_contrast {
-    color: #444;
-  } @else {
-    color: #bbb;
-  }
+  color: ensure-contrast(#bbb, white);
 }
 
 .admin-link-hover-area:hover .al-trigger,

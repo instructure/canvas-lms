@@ -473,14 +473,11 @@ body.with-right-side.with-left-side {
 }
 
 .discussion-reply-box {
+  $bg-color: #fdfdfd;
   display: block;
-  background-color: #fdfdfd;
+  background-color: $bg-color;
   font-size: 11px;
-  @if $use_high_contrast {
-    color: #444;
-  } @else {
-    color: #aaa;
-  }
+  color: ensure-contrast(#aaa, $bg-color);
   padding: 3px 10px;
   cursor: text;
   border: 1px solid #d4d5d7;
