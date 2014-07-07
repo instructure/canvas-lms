@@ -1545,9 +1545,21 @@ describe ContentMigration do
       account.settings[:default_migration_settings] = {:domain_substitution_map => {"http://derp.derp" => "https://derp.derp"}}
       account.save!
 
+      mod = @copy_from.context_modules.create!(:name => "some module")
+      tag1 = mod.add_item({ :title => 'Example 1', :type => 'external_url', :url => 'http://derp.derp/something' })
+      tool = @copy_from.context_external_tools.create!(:name => "b", :url => "http://derp.derp/somethingelse", :consumer_key => '12345', :shared_secret => 'secret')
+      tag2 = mod.add_item :type => 'context_external_tool', :id => tool.id, :url => "#{tool.url}?queryyyyy=something"
+
       @copy_from.syllabus_body = "<p><a href=\"http://derp.derp/stuff\">this is a link to an insecure domain that could cause problems</a></p>"
 
       run_course_copy
+
+      tool_to = @copy_to.context_external_tools.find_by_migration_id(mig_id(tool))
+      tool_to.url.should == tool.url.sub("http://derp.derp", "https://derp.derp")
+      tag1_to = @copy_to.context_module_tags.find_by_migration_id(mig_id(tag1))
+      tag1_to.url.should == tag1.url.sub("http://derp.derp", "https://derp.derp")
+      tag2_to = @copy_to.context_module_tags.find_by_migration_id(mig_id(tag2))
+      tag2_to.url.should == tag2.url.sub("http://derp.derp", "https://derp.derp")
 
       @copy_to.syllabus_body.should == @copy_from.syllabus_body.sub("http://derp.derp", "https://derp.derp")
     end

@@ -28,13 +28,8 @@ class ImportedHtmlConverter
     course_path = "/#{context.class.to_s.underscore.pluralize}/#{context.id}"
 
     for_course_copy = false
-    domain_substitution_map = {}
     if migration
       for_course_copy = true if migration.for_course_copy?
-
-      if ds_map = migration.migration_settings[:domain_substitution_map]
-        ds_map.each{|k, v| domain_substitution_map[k.to_s] = v.to_s } # ensure strings
-      end
     end
 
     doc.search("*").each do |node|
@@ -139,8 +134,10 @@ class ImportedHtmlConverter
             node[attr] = replace_missing_relative_url(missing_relative_url, context, course_path)
           end
 
-          if new_converted_url = check_domain_substitutions(new_url || val, domain_substitution_map)
-            new_url = new_converted_url
+          if migration && converted_url = migration.process_domain_substitutions(new_url || val)
+            if converted_url != (new_url || val)
+              new_url = converted_url
+            end
           end
 
           if new_url
@@ -163,17 +160,6 @@ class ImportedHtmlConverter
     node.inner_html
   rescue
     ""
-  end
-
-  def self.check_domain_substitutions(url, sub_map)
-    return nil if sub_map.empty?
-    new_url = nil
-    sub_map.each do |from_domain, to_domain|
-      if url.start_with?(from_domain)
-        new_url = url.sub(from_domain, to_domain)
-      end
-    end
-    return new_url
   end
 
   def self.find_file_in_context(rel_path, context)

@@ -144,12 +144,14 @@ module Importers
         }, existing_item, :position => context_module.migration_position)
       elsif hash[:linked_resource_type] =~ /url/i
         # external url
-        if hash['url']
+        if url = hash[:url]
+          url = migration.process_domain_substitutions(url) if migration
+
           item = context_module.add_item({
             :title => hash[:title] || hash[:linked_resource_title] || hash['description'],
             :type => 'external_url',
             :indent => hash[:indent].to_i,
-            :url => hash['url']
+            :url => url
           }, existing_item, :position => context_module.migration_position)
         end
       elsif hash[:linked_resource_type] =~ /contextexternaltool/i
@@ -170,6 +172,7 @@ module Importers
         end
 
         if external_tool_url
+          external_tool_url = migration.process_domain_substitutions(external_tool_url) if migration
           item = context_module.add_item({
             :title => hash[:title] || hash[:linked_resource_title] || hash['description'],
             :type => 'context_external_tool',
