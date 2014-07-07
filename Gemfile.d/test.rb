@@ -23,8 +23,8 @@ group :test do
     gem 'rspec-rails', '1.3.4'
     gem 'test-unit', '1.2.3'
   else
-    gem 'rspec', '2.14.1'
-    gem 'rspec-rails', '2.14.1'
+    gem 'rspec', '2.99.0'
+    gem 'rspec-rails', '2.99.0'
     gem 'once-ler', '0.0.11'
   end
   gem 'sequel', '4.5.0', :require => false
