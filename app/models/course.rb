@@ -434,11 +434,12 @@ class Course < ActiveRecord::Base
               if association.nil?
                 # new association, create it
                 begin
-                  CourseAccountAssociation.create! do |aa|
-                    aa.course_id = course.id
-                    aa.course_section_id = section.try(:id)
-                    aa.account_id = account_id
-                    aa.depth = depth
+                  course.transaction(requires_new: true) do
+                    course.course_account_associations.create! do |aa|
+                      aa.course_section_id = section.try(:id)
+                      aa.account_id = account_id
+                      aa.depth = depth
+                    end
                   end
                 rescue ActiveRecord::Base::UniqueConstraintViolation
                   course.course_account_associations.where(course_section_id: section,
