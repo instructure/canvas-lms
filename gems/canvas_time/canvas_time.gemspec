@@ -21,7 +21,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "tzinfo", "0.3.35"
 
   if CANVAS_RAILS3
-    spec.add_dependency "activesupport", "3.2.17"
+    spec.add_dependency "activesupport", "~>3.2"
   else
     spec.add_dependency "activesupport", "~>2.3.17"
   end
