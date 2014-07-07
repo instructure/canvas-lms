@@ -33,7 +33,11 @@ module Importers
       item.name = hash[:title]
       item.description = hash[:description]
       item.tool_id = hash[:tool_id]
-      item.url = hash[:url] unless hash[:url].blank?
+      if hash[:url].present?
+        url = hash[:url]
+        url = migration.process_domain_substitutions(url) if migration
+        item.url = url
+      end
       item.domain = hash[:domain] unless hash[:domain].blank?
       item.privacy_level = hash[:privacy_level] || 'name_only'
       item.consumer_key ||= hash[:consumer_key] || 'fake'

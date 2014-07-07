@@ -358,6 +358,23 @@ class ContentMigration < ActiveRecord::Base
     check_quiz_id_prepender
   end
 
+  def process_domain_substitutions(url)
+    unless @domain_substitution_map
+      @domain_substitution_map = {}
+      (self.migration_settings[:domain_substitution_map] || {}).each do |k, v|
+        @domain_substitution_map[k.to_s] = v.to_s # ensure strings
+      end
+    end
+
+    @domain_substitution_map.each do |from_domain, to_domain|
+      if url.start_with?(from_domain)
+        return url.sub(from_domain, to_domain)
+      end
+    end
+
+    url
+  end
+
   def check_quiz_id_prepender
     return unless self.context.respond_to?(:assessment_questions)
     if !migration_settings[:id_prepender] && (!migration_settings[:overwrite_questions] || !migration_settings[:overwrite_quizzes])
