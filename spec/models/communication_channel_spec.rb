@@ -230,10 +230,9 @@ describe CommunicationChannel do
   end
 
   describe "merge candidates" do
+    let_once(:user1) { User.create! }
+    let_once(:cc1) { user1.communication_channels.create!(:path => 'jt@instructure.com') }
     it "should return users with a matching e-mail address" do
-      user1 = User.create!
-      cc1 = user1.communication_channels.create!(:path => 'jt@instructure.com')
-
       user2 = User.create!
       cc2 = user2.communication_channels.create!(:path => 'jt@instructure.com')
       cc2.confirm!
@@ -244,9 +243,6 @@ describe CommunicationChannel do
     end
 
     it "should not return users without an active pseudonym" do
-      user1 = User.create!
-      cc1 = user1.communication_channels.create!(:path => 'jt@instructure.com')
-
       user2 = User.create!
       cc2 = user2.communication_channels.create!(:path => 'jt@instructure.com')
       cc2.confirm!
@@ -256,9 +252,6 @@ describe CommunicationChannel do
     end
 
     it "should not return users that match on an unconfirmed cc" do
-      user1 = User.create!
-      cc1 = user1.communication_channels.create!(:path => 'jt@instructure.com')
-
       user2 = User.create!
       cc2 = user2.communication_channels.create!(:path => 'jt@instructure.com')
       Account.default.pseudonyms.create!(:user => user2, :unique_id => 'user2')
@@ -268,9 +261,6 @@ describe CommunicationChannel do
     end
 
     it "should only check one user for boolean result" do
-      user1 = User.create!
-      cc1 = user1.communication_channels.create!(:path => 'jt@instructure.com')
-
       user2 = User.create!
       cc2 = user2.communication_channels.create!(:path => 'jt@instructure.com')
       cc2.confirm!
@@ -289,9 +279,6 @@ describe CommunicationChannel do
 
       it "should find a match on another shard" do
         Enrollment.stubs(:cross_shard_invitations?).returns(true)
-        user1 = User.create!
-        cc1 = user1.communication_channels.create!(:path => 'jt@instructure.com')
-
         @shard1.activate do
           @user2 = User.create!
           cc2 = @user2.communication_channels.create!(:path => 'jt@instructure.com')
@@ -308,8 +295,6 @@ describe CommunicationChannel do
 
       it "should search a non-default shard *only*" do
         Enrollment.stubs(:cross_shard_invitations?).returns(false)
-        user1 = User.create!
-        cc1 = user1.communication_channels.create!(:path => 'jt@instructure.com')
         cc1.confirm!
         Account.default.pseudonyms.create!(:user => user1, :unique_id => 'user1')
 

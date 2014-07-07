@@ -3352,8 +3352,11 @@ describe Course do
   end
 
   describe 'permission policies' do
-    before :each do
+    before :once do
       @course = course_model
+    end
+
+    before :each do
       @course.write_attribute(:workflow_state, 'available')
       @course.write_attribute(:is_public, true)
     end

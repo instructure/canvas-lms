@@ -17,8 +17,11 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/support/onceler/sharding')
 
-unless defined?(ShardRSpecHelper)
+SHARDING_ENABLED = defined?(ShardRSpecHelper)
+
+unless SHARDING_ENABLED
   module ShardRSpecHelper
     def self.included(klass)
       klass.before do
@@ -30,4 +33,5 @@ end
 
 def specs_require_sharding
   include ShardRSpecHelper
+  include Onceler::Sharding if SHARDING_ENABLED && !CANVAS_RAILS2
 end

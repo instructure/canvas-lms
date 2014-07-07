@@ -414,7 +414,7 @@ end
   config.include Helpers
 
   if CANVAS_RAILS2
-    require 'spec/onceler_noop'
+    require 'spec/support/onceler/noop'
     config.include Onceler::Noop
   else
     config.include Onceler::BasicHelpers

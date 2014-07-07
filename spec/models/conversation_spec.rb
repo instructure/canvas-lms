@@ -194,7 +194,7 @@ describe Conversation do
 
   context "message counts" do
     shared_examples_for "message counts" do
-      before do
+      before :once do
         (@shard1 || Shard.default).activate do
           @sender = user
           @recipient = user
@@ -241,7 +241,7 @@ describe Conversation do
 
   context "unread counts" do
     shared_examples_for "unread counts" do
-      before do
+      before :once do
         (@shard1 || Shard.default).activate do
           @sender = user
           @unread_guy = @recipient = user
@@ -1043,7 +1043,7 @@ describe Conversation do
     context "sharding" do
       specs_require_sharding
 
-      before do
+      before :once do
         @sender = User.create!(:name => 'a')
         @conversation1 = Conversation.initiate([@sender], false)
         @conversation2 = Conversation.initiate([@sender], false)
