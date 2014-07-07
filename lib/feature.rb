@@ -203,7 +203,8 @@ When Draft State is allowed/on, this enables the new quiz statistics page for an
 END
       applies_to: 'Course',
       state: 'allowed',
-      development: true
+      development: true,
+      beta: true
     },
     'quiz_moderate' =>
     {
