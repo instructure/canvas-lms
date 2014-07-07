@@ -23,7 +23,7 @@ class ActiveRecord::Base
     'account_authorization_configs' => %w(auth_uid),
     'access_tokens' => %w(token),
     'asset_user_accesses' => %w(asset_access_stat_id),
-    'assignments' => %w(sequence_position minimum_required_blog_posts minimum_required_blog_comments reminders_created_for_due_at publishing_reminder_sent previously_published),
+    'assignments' => %w(sequence_position minimum_required_blog_posts minimum_required_blog_comments reminders_created_for_due_at publishing_reminder_sent previously_published before_quiz_submission_types),
     'attachments' => %w(enrollment_id cached_s3_url s3_url_cached_at scribd_account_id scribd_user),
     'calendar_events' => %w(calendar_event_repeat_id for_repeat_on),
     'content_tags' => %w(sequence_position context_module_association_id),

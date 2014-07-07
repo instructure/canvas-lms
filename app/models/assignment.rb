@@ -596,9 +596,6 @@ class Assignment < ActiveRecord::Base
         quiz.saved_by = :assignment
         quiz.save
       end
-      if self.submission_types_changed? && self.submission_types_was != 'online_quiz'
-        self.before_quiz_submission_types = self.submission_types_was
-      end
     end
   end
   protected :process_if_quiz
