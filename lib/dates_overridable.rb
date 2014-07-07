@@ -31,15 +31,11 @@ module DatesOverridable
   end
 
   def has_overrides?
-    (assignment_overrides.loaded? ?
-      assignment_overrides.present? :
-      assignment_overrides.exists?)
+    assignment_overrides.count > 0
   end
 
   def has_active_overrides?
-    (assignment_overrides.loaded? ?
-      assignment_overrides.select { |o| o.active? }.present? :
-      assignment_overrides.active.exists?)
+    assignment_overrides.active.count > 0
   end
 
   def multiple_due_dates?
