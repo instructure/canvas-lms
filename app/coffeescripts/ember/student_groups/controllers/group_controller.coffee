@@ -30,6 +30,18 @@ define [
 
     memberCount: Ember.computed.alias('users.length')
 
+    isExpanded: (->
+      '' + this.get('showBody');
+    ).property('showBody')
+
+    groupName: ( ->
+      I18n.t('group_name', "%{group_name} in %{group_category}", {group_name: @get('name'), group_category: @get('group_category.name')});
+    ).property('name', 'group_category.name')
+
+    sgid: (->
+      "student-group-#{@.get('id')}"
+    ).property('id')
+
     hasMultipleMembers: Ember.computed.not('memberCount',1)
     actions:
       visitGroup: ->
@@ -37,7 +49,12 @@ define [
           window.location.href = @get('groupUrl')
       toggleBody: ->
         if @.get('memberCount') > 0
+          focusedElement = "##{@get('sgid')} ul.student-group-list"
           @toggleProperty('showBody')
+          if (!this.get('showBody'))
+            focusedElement = "##{@get('sgid')} .student-group-title"
+          Ember.run.scheduleOnce 'afterRender', ->
+            Ember.$(focusedElement).focus()  
         else
           @set('showBody', false)
       join: (group) ->

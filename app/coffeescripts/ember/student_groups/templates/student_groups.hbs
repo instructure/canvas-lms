@@ -23,13 +23,13 @@
     </div>
     {{#ic-lazy-list data=groups href=groupsUrl}}
     {{#each sortedGroups itemController="group" }}
-    <div {{bind-attr class=":accordion :student-groups :content-box showBody isMember"}}>
+    <div {{bind-attr class=":accordion :student-groups :content-box showBody isMember"}} {{bind-attr id=sgid}}>
       <div class="student-group-header clearfix" {{action 'toggleBody'}}>
         <i class="icon-mini-arrow-right" aria-hidden="true"></i>
         <i class="icon-mini-arrow-down" aria-hidden="true"></i>
         <div class="student-group-title">
-          <h3>
-            <a {{action 'toggleBody'}} href="#" {{bind-attr aria-expanded=showBody}} aria-controls="student-group-body" aria-label="show students for group">{{name}}</a>
+          <h3 {{action 'toggleBody'}} href="#" {{bind-attr aria-expanded=isExpanded}} aria-controls="student-group-body" role="button" {{bind-attr aria-label=groupName}}>
+            {{name}}
             <small>{{group_category.name}}</small>
           </h3>
           {{#if isMember}}
@@ -67,17 +67,15 @@
           {{i18nStudentsCount}}
         </span>
       </div>
-      {{#if showBody}}
-      <div class="student-group-body">
-        <ul class="student-group-list clearfix" aria-label="group members">
+      <div {{bind-attr class=":student-group-body showBody::hidden"}} {{bind-attr aria-expanded=isExpanded}}>
+        <ul class="student-group-list clearfix" aria-label="group members" tabindex='0' role='region'>
           {{#each users}}
-            <li>
+            <li tabindex='0' role='listitem'>
               {{#if display_name}}{{display_name}}{{else}}{{short_name}}{{/if}}
             </li>
           {{/each}}
         </ul>
       </div>
-      {{/if}}
     </div>
     {{/each}}
     {{/ic-lazy-list}}
