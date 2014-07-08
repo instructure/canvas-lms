@@ -35,7 +35,7 @@ module AdheresToPolicy
     #
     # Returns the value of the cached object from the key.
     def self.fetch(key)
-      return unless key
+      return yield unless key
 
       unless value = self.read(key)
         if block_given?
