@@ -167,6 +167,7 @@ module AdheresToPolicy
     #   # => nil
     #
     def clear_permissions_cache(user, session = nil)
+      return if respond_to?(:new_record?) && new_record?
       Cache.clear
       self.class.policy.available_rights.each do |available_right|
         Rails.cache.delete(permission_cache_key_for(user, session, available_right))
@@ -269,6 +270,7 @@ module AdheresToPolicy
     # Returns a string to use as a permissions cache key in the context of the
     # provided user and/or right.
     def permission_cache_key_for(user, session, right)
+      return nil if respond_to?(:new_record?) && new_record?
       # If you're going to add something to the user session that
       # affects permissions, you'd durn well better a :permissions_key
       # on the session as well
