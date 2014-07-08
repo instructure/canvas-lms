@@ -663,7 +663,7 @@ class Account < ActiveRecord::Base
     account_roles |= ['AccountAdmin']
     account_roles |= self.parent_account.available_account_roles if self.parent_account
     if user
-      account_roles.select! { |role| account_users.new.grants_right?(user, :create) }
+      account_roles.select! { |role| account_users.new(membership_type: role).grants_right?(user, :create) }
     end
     account_roles
   end
