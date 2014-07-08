@@ -892,7 +892,9 @@ define([
 
       $multiple_submissions.change(function(e) {
         if (typeof EG.currentStudent.submission == 'undefined') EG.currentStudent.submission = {};
-        var i = parseInt(e.target.value, 10);
+        var i = e.target.value ?
+          parseInt(e.target.value, 10) :
+          EG.currentStudent.submission.submission_history.length - 1;
         EG.currentStudent.submission.currentSelectedIndex = i;
         EG.handleSubmissionSelectionChange();
       });
