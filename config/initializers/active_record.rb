@@ -1906,8 +1906,21 @@ end
 
 # shims so that AR objects serialized under rails 2 function under rail s3
 if CANVAS_RAILS2
+  class ActiveSupport::Cache::Entry
+    def value
+      Marshal.load(@compressed ? Zlib::Inflate.inflate(@value) : @value) if @value
+    end
+  end
+
   ActiveSupport::Cache::Store.subclasses.map(&:constantize).each do |subclass|
     subclass.class_eval do
+      def read_with_rails3_shim(*args)
+        result = read_without_rails3_shim(*args)
+        result = result.value if ActiveSupport::Cache::Entry === result
+        result
+      end
+      alias_method_chain :read, :rails3_shim
+
       def delete_with_rails3_shim(key, options = nil)
         r1 = delete_without_rails3_shim(key, options)
         r2 = delete_without_rails3_shim("rails3:#{key}", options)
