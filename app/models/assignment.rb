@@ -1004,11 +1004,29 @@ class Assignment < ActiveRecord::Base
   def find_or_create_submissions(students)
     submissions = self.submissions.where(user_id: students).order(:user_id).to_a
     submissions_hash = submissions.index_by(&:user_id)
+    # we touch the user in an after_save; the FK causes a read lock
+    # to be taken on the user during submission INSERT, so to avoid
+    # deadlocks, we pre-lock the users
+    needs_lock = false
+    shard.activate do
+      if Submission.connection.adapter_name == 'PostgreSQL' && Submission.connection.send(:postgresql_version) < 90300
+        needs_lock = Submission.connection.open_transactions == 0
+        # we're already in a transaction, and can lock everyone at once
+        if !needs_lock
+          missing_users = students.map(&:id) - submissions_hash.keys
+          User.shard(shard).where(id: missing_users).order(:id).lock.pluck(:id)
+        end
+      end
+    end
     students.each do |student|
       submission = submissions_hash[student.id]
       if !submission
         begin
           transaction(requires_new: true) do
+            # lock just one user
+            if needs_lock
+              User.shard(shard).where(id: student).lock.pluck(:id)
+            end
             submission = self.submissions.build(user: student)
             submission.assignment = self
             yield submission if block_given?
