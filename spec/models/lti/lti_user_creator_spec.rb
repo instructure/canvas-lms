@@ -225,5 +225,80 @@ describe Lti::LtiUserCreator do
         end
       end
     end
+
+    describe "variable substitution" do
+      let(:canvas_course) { course(active_course: true) }
+      let(:variable_substitutor) { LtiOutbound::VariableSubstitutor.new }
+      let(:course_user_creator) { Lti::LtiUserCreator.new(canvas_user, root_account, tool, canvas_course, variable_substitutor) }
+
+      it "adds user id" do
+        canvas_user.stubs(:id).returns(12345)
+        course_user_creator.convert
+
+        hash = {variable: '$Canvas.user.id'}
+        variable_substitutor.substitute!(hash)
+
+        hash[:variable].should == 12345
+      end
+
+      it "adds sis source id" do
+        pseudonym = pseudonym(canvas_user, account: root_account, username: 'login_id')
+
+        pseudonym.sis_user_id = 'sis id!'
+        pseudonym.save!
+        course_user_creator.convert
+
+        hash = {variable: '$Canvas.user.sisSourceId'}
+        variable_substitutor.substitute!(hash)
+
+        hash[:variable].should == 'sis id!'
+      end
+
+      it "adds login id" do
+        pseudonym = pseudonym(canvas_user, account: root_account, username: 'login_id')
+        course_user_creator.convert
+
+        hash = {variable: '$Canvas.user.loginId'}
+        variable_substitutor.substitute!(hash)
+
+        hash[:variable].should == 'login_id'
+      end
+
+      it "adds enrollment state" do
+        student_in_course(user: canvas_user, course: canvas_course, active_enrollment: true)
+        course_user_creator.convert
+
+        hash = {variable: '$Canvas.enrollment.enrollmentState'}
+        variable_substitutor.substitute!(hash)
+
+        hash[:variable].should == LtiOutbound::LTIUser::ACTIVE_STATE
+      end
+
+      it "adds concluded roles" do
+        student_in_course(user: canvas_user, course: canvas_course, active_enrollment: true).conclude
+        teacher_in_course(user: canvas_user, course: canvas_course, active_enrollment: true).conclude
+        course_with_designer(user: canvas_user, course: canvas_course, active_enrollment: true)
+        account_admin_user(user: canvas_user, account: canvas_course.account)
+
+        course_user_creator.convert
+
+        hash = {variable: '$Canvas.membership.concludedRoles'}
+        variable_substitutor.substitute!(hash)
+        hash[:variable].should == [LtiOutbound::LTIRole::LEARNER,LtiOutbound::LTIRole::INSTRUCTOR].join(',')
+      end
+
+      it "adds roles" do
+        student_in_course(user: canvas_user, course: canvas_course, active_enrollment: true).conclude
+        teacher_in_course(user: canvas_user, course: canvas_course, active_enrollment: true)
+        course_with_designer(user: canvas_user, course: canvas_course, active_enrollment: true)
+        account_admin_user(user: canvas_user, account: canvas_course.account)
+
+        course_user_creator.convert
+
+        hash = {variable: '$Canvas.membership.roles'}
+        variable_substitutor.substitute!(hash)
+        hash[:variable].should == "TeacherEnrollment,DesignerEnrollment,Account Admin"
+      end
+    end
   end
 end
