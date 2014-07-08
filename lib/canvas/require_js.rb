@@ -125,6 +125,9 @@ module Canvas
             'handlebars': {
               deps: ['bower/handlebars/handlebars.runtime.amd'],
               exports: 'Handlebars'
+            },
+            'bower/react/react': {
+              exports: 'React'
             }
           }
         JS
