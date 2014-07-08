@@ -38,7 +38,6 @@ environment_configuration(defined?(config) && config) do |config|
   unless ENV['DISABLE_RUBY_DEBUGGING']
     if RUBY_VERSION >= '2.0.0'
       require 'byebug'
-      Kernel.send(:alias_method, :debugger, :byebug)
     else
       require "debugger"
     end

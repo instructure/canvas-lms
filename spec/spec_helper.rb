@@ -26,12 +26,14 @@ if CANVAS_RAILS2
 end
 
 unless CANVAS_RAILS2
-  Spec.configure do |c|
-   c.treat_symbols_as_metadata_keys_with_true_values = true
+  begin
+    require RUBY_VERSION >= '2.0.0' ? 'byebug' : 'debugger'
+  rescue LoadError
   end
 
   RSpec.configure do |c|
-    c.color_enabled = true
+    c.treat_symbols_as_metadata_keys_with_true_values = true
+    c.color = true
 
     c.around(:each) do |example|
       attempts = 0
@@ -408,8 +410,6 @@ end
   config.use_transactional_fixtures = true
   config.use_instantiated_fixtures = false
   config.fixture_path = Rails.root+'spec/fixtures/'
-
-  ((config.debug = true) rescue nil) unless CANVAS_RAILS2
 
   config.include Helpers
 
