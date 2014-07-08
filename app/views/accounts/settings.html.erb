@@ -637,7 +637,9 @@ acknowledge that you have read and agreed to the
     <h2><%= t(:account_admins_title, "Account Admins") %></h2>
     <ul class="admins_list user_list list admins">
       <%= render :partial => 'account_user', :collection => @account_users %>
-      <%= render :partial => 'account_user', :object => nil %>
+      <% if can_do(@context, @current_user, :manage_account_memberships) %>
+        <%= render :partial => 'account_user', :object => nil %>
+      <% end %>
     </ul>
     <% if can_do(@context, @current_user, :manage_account_memberships) %>
       <% js_bundle :user_lists %>

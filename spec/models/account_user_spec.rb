@@ -146,7 +146,8 @@ describe AccountUser do
       u2 = User.create!
       au = Account.default.account_users.build(user: u2, membership_type: 'lesser')
       au.grants_right?(@user, :create).should be_true
-
+      au = Account.default.account_users.build(user: u2, membership_type: 'AccountAdmin')
+      au.grants_right?(@user, :create).should be_false
     end
   end
 end
