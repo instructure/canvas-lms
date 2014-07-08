@@ -22,6 +22,16 @@ Canvas::Plugin.register('linked_in', nil, {
   :settings_partial => 'plugins/linked_in_settings',
   :validator => 'LinkedInValidator'
 })
+Canvas::Plugin.register('diigo', nil, {
+  :name => lambda{ t :name, 'Diigo' },
+  :description => lambda{ t :description, 'Diigo integration' },
+  :website => 'https://www.diigo.com',
+  :author => 'Instructure',
+  :author_website => 'http://www.instructure.com',
+  :version => '1.0.0',
+  :settings_partial => 'plugins/diigo_settings',
+  :validator => 'DiigoValidator'
+})
 Canvas::Plugin.register('twitter', nil, {
   :name => lambda{ t :name, 'Twitter' },
   :description => lambda{ t :description, 'Twitter notifications' },

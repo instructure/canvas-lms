@@ -105,7 +105,7 @@
 #       }
 #     }
 class UsersController < ApplicationController
-  include DeliciousDiigo
+  include Delicious
   include SearchHelper
   include I18nUtilities
 
@@ -851,7 +851,7 @@ class UsersController < ApplicationController
         when 'delicious'
           delicious_get_last_posted(service)
         when 'diigo'
-          diigo_get_bookmarks(service, 1)
+          Diigo::Connection.diigo_get_bookmarks(service, 1)
         when 'skype'
           true
         else

@@ -284,11 +284,6 @@ describe "admin settings tab" do
       check_box_verifier("#account_services_delicious", {:allowed_services => :delicious})
     end
 
-    it "should unclick and then click on diigo" do
-      check_box_verifier("#account_services_diigo", {:allowed_services => :diigo}, false)
-      check_box_verifier("#account_services_diigo", {:allowed_services => :diigo})
-    end
-
     it "should unclick and click on google docs previews" do
       check_box_verifier("#account_services_google_docs_previews", {:allowed_services => :google_docs_previews}, false)
       check_box_verifier("#account_services_google_docs_previews", {:allowed_services => :google_docs_previews})

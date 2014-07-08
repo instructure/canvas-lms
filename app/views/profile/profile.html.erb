@@ -393,7 +393,7 @@ TEXT
           </div>
         </div>
       </li>
-      <li id="unregistered_service_diigo" class="service" style="<%= hidden if services.include?("diigo") || !service_enabled?(:diigo) %>">
+      <li id="unregistered_service_diigo" class="service" style="<%= hidden if services.include?("diigo") || !feature_and_service_enabled?(:diigo) %>">
         <a href="#" class="btn btn-small"><%= image_tag "diigo_icon.png" %> <%= t('links.diigo', "Diigo") %></a>
         <div style="display: none; text-align: left;" class="content" title="<%= t('titles.diigo_login', "Diigo Login") %>" id="unregistered_service_diigo_dialog">
           <div>

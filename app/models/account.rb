@@ -1237,7 +1237,7 @@ class Account < ActiveRecord::Base
       :diigo => {
         :name => t("account_settings.diigo", "Diigo"),
         :description => "",
-        :expose_to_ui => :service
+        :expose_to_ui => (Diigo::Connection.config ? :service : false)
       },
       # TODO: move avatars to :settings hash, it makes more sense there
       # In the meantime, we leave it as a service but expose it in the

@@ -258,7 +258,7 @@ class UserService < ActiveRecord::Base
   end
   
   def self.configured_services
-    [:facebook, :google_docs, :twitter, :linked_in]
+    [:facebook, :google_docs, :twitter, :linked_in, :diigo]
   end
   
   def self.configured_service?(service)

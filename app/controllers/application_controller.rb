@@ -1380,6 +1380,8 @@ class ApplicationController < ActionController::Base
         !!Facebook::Connection.config
       elsif feature == :linked_in
         !!LinkedIn::Connection.config
+      elsif feature == :diigo
+        !!Diigo::Connection.config
       elsif feature == :google_docs
         !!GoogleDocs::Connection.config
       elsif feature == :etherpad
