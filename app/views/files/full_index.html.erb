@@ -4,6 +4,7 @@
   js_bundle :full_files 
   showing_all_contexts = @context.is_a?(UserProfile) && @context.user == @current_user && params[:show_all_contexts]
 %>
+  <h1 class="screenreader-only"><%= t 'files_title', "Files" %></h1>
 <div id="file_uploads" style="display: none;">
   <div class="file_upload" id="file_upload_blank" style="display: none;">
     <div style="float: left;">

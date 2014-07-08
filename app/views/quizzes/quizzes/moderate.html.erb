@@ -4,7 +4,7 @@
 %>
 <% content_for :page_title do %><%= t(:moderate_page_title, "%{title}: Moderate", :title => @quiz.title) %><% end %>
 
-<h2><%= t(:page_title, "Moderate Quiz") %></h2>
+<h1><%= t(:page_title, "Moderate Quiz") %></h1>
 <table id="students" class="<%= 'can_add_attempts' if @quiz.allowed_attempts < 0 %>">
   <thead>
     <tr>

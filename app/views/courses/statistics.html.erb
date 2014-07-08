@@ -6,7 +6,7 @@
 
 <% content_for :page_title, join_title(t(:page_title, "Course Statistics"), @context.name) %>
 <div style="padding: 0 20px;" id="stats">
-<h2><%= t 'headings.stats', 'Statistics for %{course}', :course => @context.name %></h2>
+<h1><%= t 'headings.stats', 'Statistics for %{course}', :course => @context.name %></h1>
 
 <% active_students = @context.participating_students.where("enrollments.type<>'StudentViewEnrollment'").enrolled_before(@range_end).count %>
 <% inactive_students = @context.student_enrollments.before(@range_end).select{|e| e.invited? }.length %>
@@ -33,7 +33,7 @@
     <li><a href="#tab-files"><%= t('tabs.files', %{File Storage}) %></a></li>
   </ul>
   <div class="stats" id="tab-totals">
-    <h3><%= t('headings.totals', %{Running Totals}) %></h3>
+    <h2><%= t('headings.totals', %{Running Totals}) %></h2>
     <table>
       <tr>
         <td><%= t('discussions', %{Discussions}) %></td>
@@ -78,7 +78,7 @@
     </table>
   </div>
   <div class="stats" id="tab-assignments">
-    <h3><%= t('headings.assignments', %{Assignments Usage Report}) %></h3>
+    <h2><%= t('headings.assignments', %{Assignments Usage Report}) %></h2>
     <table>
       <thead><tr>
         <th><%= t('submission_type', %{Submission Type}) %></th>
@@ -122,11 +122,11 @@
     </table>
   </div>
   <div id="tab-students">
-    <h3><%= t('headings.students', %{Recently Logged-In Users}) %></h3>
+    <h2><%= t('headings.students', %{Recently Logged-In Users}) %></h2>
     <ul class="item_list"></ul>
   </div>
   <div class="stats" id="tab-files">
-    <h3><%= t('headings.files', %{File Storage}) %></h3>
+    <h2><%= t('headings.files', %{File Storage}) %></h2>
     <table>
       <tr>
         <td><%= before_label('allotted_storage', %{Allotted Storage}) %></td>

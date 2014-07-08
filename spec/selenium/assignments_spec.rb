@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + '/common')
+﻿require File.expand_path(File.dirname(__FILE__) + '/common')
 
 describe "assignments" do
 
@@ -150,7 +150,7 @@ describe "assignments" do
       #click on assignment link
       f("#assignment_#{Assignment.last.id} .title").click
       wait_for_ajaximations
-      f('h2.title').should include_text(assignment_name)
+      f('h1.title').should include_text(assignment_name)
     end
 
     %w(points percent pass_fail letter_grade gpa_scale).each do |grading_option|
@@ -350,7 +350,7 @@ describe "assignments" do
           click_option('#assignment_group_id', "other")
         end
 
-        f('h2.title').should include_text(orig_title + ' edit')
+        f('h1.title').should include_text(orig_title + ' edit')
         @frozen_assign.reload.assignment_group.name.should == "other"
       end
     end
