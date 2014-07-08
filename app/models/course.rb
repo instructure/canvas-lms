@@ -1211,12 +1211,12 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def account_chain
-    self.account.account_chain
+  def account_chain(opts = {})
+    self.account.account_chain(opts)
   end
 
-  def account_chain_ids
-    account_chain.map(&:id)
+  def account_chain_ids(opts = {})
+    account_chain(opts).map(&:id)
   end
 
   def institution_name

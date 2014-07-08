@@ -594,7 +594,7 @@ class Account < ActiveRecord::Base
           res << account
         end
       end
-      res << self.root_account unless res.map(&:id).include?(self.root_account_id)
+      res << self.root_account if !res.map(&:id).include?(self.root_account_id) && !root_account?
       @account_chain = res.compact
     end
     results = @account_chain.dup
@@ -760,7 +760,7 @@ class Account < ActiveRecord::Base
 
       next unless details[:account_only]
       ((details[:available_to] | details[:true_for]) & enrollment_types).each do |role|
-        given { |user| user && RoleOverride.permission_for(self, permission, role)[:enabled] &&
+        given { |user| user && RoleOverride.permission_for(self, self, permission, role)[:enabled] &&
           self.course_account_associations.joins('INNER JOIN enrollments ON course_account_associations.course_id=enrollments.course_id').
             where("enrollments.type=? AND enrollments.workflow_state IN ('active', 'completed') AND user_id=?", role, user).first &&
           (!details[:if] || send(details[:if])) }

@@ -31,7 +31,7 @@ module Api::V1::Role
     }
 
     RoleOverride.manageable_permissions(account).keys.each do |permission|
-      perm = RoleOverride.permission_for(account, permission, role.base_role_type, role.name)
+      perm = RoleOverride.permission_for(account, account, permission, role.base_role_type, role.name)
       json[:permissions][permission] = permission_json(perm, current_user, session) if perm[:account_allows]
     end
 
