@@ -36,5 +36,8 @@ define [
 
     restore: (ev) ->
       ev?.preventDefault()
-      @model.restore().done =>
-        window.location.reload()
+      @model.restore().done (attrs) =>
+        if @pages_path
+          window.location.href = "#{@pages_path}/#{attrs.url}/revisions"
+        else
+          window.location.reload()
