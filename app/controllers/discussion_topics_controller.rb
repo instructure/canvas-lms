@@ -785,7 +785,7 @@ class DiscussionTopicsController < ApplicationController
       id = params[:assignment].delete(:group_category_id)
       discussion_topic_hash[:group_category_id] ||= id
     end
-    return unless params[:group_category_id].to_s != @topic.group_category_id.to_s
+    return unless discussion_topic_hash[:group_category_id].to_s != @topic.group_category.try(:id).to_s
     if @topic.is_announcement
       @errors[:group] = t(:error_group_announcement, "You cannot use grouped discussion on an announcement.")
       return
