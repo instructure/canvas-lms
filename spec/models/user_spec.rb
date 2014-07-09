@@ -467,6 +467,17 @@ describe User do
     @user.recent_feedback(:contexts => [@course]).should be_empty
   end
 
+  it "should not include recent feedback for other students in admin feedback" do
+    create_course_with_student_and_assignment
+    other_teacher = @teacher
+    teacher = teacher_in_course(:active_all => true).user
+    student = student_in_course(:active_all => true).user
+    sub = @assignment.grade_student(student, :grade => 9).first
+    sub.submission_comments.create!(:comment => 'c1', :author => other_teacher, :recipient_id => student.id)
+    sub.save!
+    teacher.recent_feedback(:contexts => [@course]).should be_empty
+  end
+
   describe '#courses_with_primary_enrollment' do
 
     it "should return appropriate courses with primary enrollment" do
