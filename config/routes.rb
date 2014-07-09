@@ -846,6 +846,10 @@ routes.draw do
       get "courses/:course_id/content_list", :controller => :content_exports_api, :action => :content_list, :path_name => "course_content_list"
     end
 
+    scope(:controller => :account_notifications) do
+      post 'accounts/:account_id/account_notifications', :action => :create, :path_name => 'account_notification'
+    end
+
     scope(:controller => :tabs) do
       get "courses/:course_id/tabs", :action => :index, :path_name => 'course_tabs'
       get "groups/:group_id/tabs", :action => :index, :path_name => 'group_tabs'

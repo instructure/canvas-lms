@@ -762,9 +762,11 @@ end
     req_service = opts[:required_account_service] || nil
     roles = opts[:roles] || []
     message = opts[:message] || "hi there"
+    subj = opts[:subject] || "this is a subject"
     @account = opts[:account] || Account.default
-    @announcement = @account.announcements.build(message: message, required_account_service: req_service)
+    @announcement = @account.announcements.build(subject: subj, message: message, required_account_service: req_service)
     @announcement.start_at = opts[:start_at] || 5.minutes.ago.utc
+    @announcement.end_at = opts[:end_at] || 1.day.from_now.utc
     @announcement.account_notification_roles.build(roles.map { |r| {account_notification_id: @announcement.id, role_type: r} }) unless roles.empty?
     @announcement.save!
   end
