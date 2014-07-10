@@ -29,10 +29,6 @@ describe AuditorApiController do
     end
   end
 
-  before do
-    pending 'Auditing Search is currently disabled.'
-  end
-
   let(:audits_controller) { AuditsController.new }
 
   context 'check_configured' do
