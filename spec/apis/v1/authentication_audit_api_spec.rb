@@ -20,6 +20,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../cassandra_spec_helper')
 
 describe "AuthenticationAudit API", type: :request do
+  before do
+    pending 'Audit Search is disabled.'
+  end
+
   context "not configured" do
     before do
       Canvas::Cassandra::DatabaseBuilder.stubs(:configured?).with('auditors').returns(false)
@@ -476,7 +480,7 @@ describe "AuthenticationAudit API", type: :request do
     end
 
     describe "per-account with sharding when fetching by user" do
-      specs_require_sharding
+      # specs_require_sharding
 
       before do
         @shard2.activate do
