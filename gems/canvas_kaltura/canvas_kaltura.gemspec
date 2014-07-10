@@ -20,7 +20,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "canvas_http"
   spec.add_dependency "canvas_sort"
   spec.add_dependency "multipart"
-  spec.add_dependency "canvas_uuid"
+  spec.add_dependency "canvas_slug"
 
   spec.add_development_dependency "bundler", "~> 1.5"
   spec.add_development_dependency "rake"

@@ -167,7 +167,7 @@ class Pseudonym < ActiveRecord::Base
     if !self.persistence_token || self.persistence_token == ''
       # Some pseudonyms can end up without a persistence token if they were created
       # using the SIS, for example.
-      self.persistence_token = CanvasUuid::Uuid.generate('pseudo', 15)
+      self.persistence_token = CanvasSlug.generate('pseudo', 15)
       self.save
     end
     

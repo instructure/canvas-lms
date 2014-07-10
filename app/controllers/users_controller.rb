@@ -148,7 +148,7 @@ class UsersController < ApplicationController
         :service => 'google_docs',
         :token => request_token.token,
         :secret => request_token.secret,
-        :user_secret => CanvasUuid::Uuid.generate(nil, 16),
+        :user_secret => CanvasSlug.generate(nil, 16),
         :return_url => return_to_url,
         :user => @real_current_user || @current_user,
         :original_host_with_port => request.host_with_port
@@ -186,7 +186,7 @@ class UsersController < ApplicationController
     elsif params[:service] == "facebook"
       oauth_request = OauthRequest.create(
         :service => 'facebook',
-        :secret => CanvasUuid::Uuid.generate("fb", 10),
+        :secret => CanvasSlug.generate("fb", 10),
         :return_url => return_to_url,
         :user => @current_user,
         :original_host_with_port => request.host_with_port

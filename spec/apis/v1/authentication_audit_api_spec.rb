@@ -41,7 +41,7 @@ describe "AuthenticationAudit API", type: :request do
 
     before do
       Setting.set('enable_page_views', 'cassandra')
-      @request_id = UUIDSingleton.instance.generate
+      @request_id = CanvasUUID.generate
       RequestContextGenerator.stubs( :request_id => @request_id )
 
       @viewing_user = site_admin_user(user: user_with_pseudonym(account: Account.site_admin))
@@ -267,7 +267,7 @@ describe "AuthenticationAudit API", type: :request do
       before do
         @event2 = @pseudonym.shard.activate do
           record = Auditors::Authentication::Record.new(
-            'id' => UUIDSingleton.instance.generate,
+            'id' => CanvasUUID.generate,
             'created_at' => 1.day.ago,
             'pseudonym' => @pseudonym,
             'event_type' => 'logout')

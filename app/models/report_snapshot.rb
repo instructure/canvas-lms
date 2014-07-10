@@ -87,7 +87,7 @@ class ReportSnapshot < ActiveRecord::Base
       
       installation_uuid = Setting.get("installation_uuid", "")
       if installation_uuid == ""
-        installation_uuid = CanvasUuid::Uuid.generate_securish_uuid
+        installation_uuid = CanvasSlug.generate_securish_uuid
         Setting.set("installation_uuid", installation_uuid)
       end
   

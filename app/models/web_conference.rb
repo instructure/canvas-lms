@@ -171,7 +171,7 @@ class WebConference < ActiveRecord::Base
   end
 
   def assign_uuid
-    self.uuid ||= CanvasUuid::Uuid.generate_securish_uuid
+    self.uuid ||= CanvasSlug.generate_securish_uuid
   end
   protected :assign_uuid
 

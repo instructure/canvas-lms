@@ -8,7 +8,7 @@
 ### NOW:
 ## Everything wrong is due to keith@oreilly.com
 
-require "canvas_uuid"
+require "canvas_slug"
 require "mime/types"
 require "net/http"
 require "cgi"

@@ -40,7 +40,7 @@ describe "CourseAudit API", type: :request do
     include_examples "cassandra audit logs"
 
     before do
-      @request_id = UUIDSingleton.instance.generate
+      @request_id = CanvasUUID.generate
       RequestContextGenerator.stubs( :request_id => @request_id )
 
       @domain_root_account = Account.default

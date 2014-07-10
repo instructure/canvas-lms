@@ -102,7 +102,7 @@ describe CommunicationChannel do
   end
   
   it "should set a confirmation code unless one has been set" do
-    CanvasUuid::Uuid.expects(:generate).at_least(1).returns('abc123')
+    CanvasSlug.expects(:generate).at_least(1).returns('abc123')
     communication_channel_model
     @cc.confirmation_code.should eql('abc123')
   end

@@ -482,7 +482,7 @@ class Job
   end
 
   def create
-    self.id ||= UUIDSingleton.instance.generate
+    self.id ||= CanvasUUID.generate
     self.created_at = self.updated_at = Time.now.utc
     save_job_to_redis
     update_queues

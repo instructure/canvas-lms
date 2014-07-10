@@ -146,7 +146,7 @@ describe EportfolioEntriesController do
       eportfolio_category
       eportfolio_entry(@category)
       begin
-        get 'attachment', :eportfolio_id => @portfolio.id, :entry_id => @entry.id, :attachment_id => UUIDSingleton.instance.generate
+        get 'attachment', :eportfolio_id => @portfolio.id, :entry_id => @entry.id, :attachment_id => CanvasUUID.generate
       rescue => e
         e.to_s.should eql("Not Found")
       end

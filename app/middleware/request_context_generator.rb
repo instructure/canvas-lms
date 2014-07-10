@@ -24,7 +24,7 @@ class RequestContextGenerator
 
   def call(env)
     # This is a crummy way to plumb this data through to the logger
-    request_id = UUIDSingleton.instance.generate
+    request_id = CanvasUUID.generate
     session_id = (env['rack.session.options'] || {})[:id]
     Thread.current[:context] = {
       :request_id => request_id,
