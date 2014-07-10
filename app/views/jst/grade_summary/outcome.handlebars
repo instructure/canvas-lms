@@ -24,5 +24,7 @@
   <span class="score" aria-label="Score: {{roundedScore}} out of {{points_possible}} points with mastery at {{mastery_points}}">
     <strong>{{#if scoreDefined}}{{roundedScore}}{{else}}-{{/if}}</strong>/{{mastery_points}}
   </span>
-  <a href="#tab-outcomes/{{id}}">{{#t 'alignment_count'}}<strong>{{count}}</strong> Alignments{{/t}}</a>
+  <a href="#tab-outcomes/{{id}}" aria-haspopup='true' aria-owns='outcome_detail'>
+    {{#t 'alignment_count'}}<strong>{{count}}</strong> Alignments{{/t}}
+  </a>
 </div>

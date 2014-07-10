@@ -42,6 +42,7 @@ define [
     @optionProperty 'course_id'
 
     dialogOptions: ->
+      containerId: "outcome_detail"
       close: @onClose
       buttons: []
       width: 640
