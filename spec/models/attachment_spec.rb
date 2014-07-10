@@ -324,7 +324,7 @@ describe Attachment do
 
   context "submit_to_scribd!" do
     before do
-      ScribdAPI.stubs(:upload).returns(UUIDSingleton.instance.generate)
+      ScribdAPI.stubs(:upload).returns(CanvasUUID.generate)
     end
 
     describe "submit_to_scribd job" do

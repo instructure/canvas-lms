@@ -16,8 +16,20 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "securerandom"
+require "uuid"
 
-module CanvasUuid
-  require "canvas_uuid/uuid"
+# Creating a testable Singleton for UUID
+class CanvasUUID < ::UUID
+  def self.instance
+    @@uuid_singleton ||= new
+  end
+
+  def self.generate
+    instance.generate
+  end
 end
+
+# Disable the UUID lib's state file thing. Across all processes, defaults to 
+# /var/tmp/ruby-uuid? *boggle*. We could do a tempfile thing, but this lib
+# doesn't clean up after itself.
+CanvasUUID.state_file = false

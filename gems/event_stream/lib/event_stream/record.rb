@@ -35,7 +35,7 @@ class EventStream::Record < Struct.new(:attributes)
       attributes['request_id'] = request_id.to_s
     end
 
-    attributes['id'] ||= CanvasUuid::Uuid.generate
+    attributes['id'] ||= CanvasUUID.generate
     attributes['created_at'] ||= Time.zone.now
     attributes['created_at'] = Time.zone.at(attributes['created_at'].to_i)
     attributes['event_type'] ||= self.class.name.gsub("::#{self.class.name.demodulize}", '').demodulize.underscore

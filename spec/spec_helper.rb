@@ -1452,7 +1452,7 @@ end
 
     @request_id = opts[:request_id] || RequestContextGenerator.request_id
     unless @request_id
-      @request_id = UUIDSingleton.instance.generate
+      @request_id = CanvasUUID.generate
       RequestContextGenerator.stubs(:request_id => @request_id)
     end
 

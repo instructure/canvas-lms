@@ -942,7 +942,7 @@ class Assignment < ActiveRecord::Base
       :media_comment_id => (opts.delete :media_comment_id),
       :media_comment_type => (opts.delete :media_comment_type),
     }
-    comment[:group_comment_id] = CanvasUuid::Uuid.generate_securish_uuid if group_comment && group
+    comment[:group_comment_id] = CanvasSlug.generate_securish_uuid if group_comment && group
     submissions = []
     find_or_create_submissions(students) do |submission|
       submission_updated = false
@@ -1051,7 +1051,7 @@ class Assignment < ActiveRecord::Base
       res = find_or_create_submissions(students) do |s|
         s.group = group
         s.save! if s.changed?
-        opts[:group_comment_id] = CanvasUuid::Uuid.generate_securish_uuid if group
+        opts[:group_comment_id] = CanvasSlug.generate_securish_uuid if group
         s.add_comment(opts)
         # this is lame, SubmissionComment updates the submission directly in the db
         # in an after_save, and of course Rails doesn't preload the reverse association
@@ -1124,7 +1124,7 @@ class Assignment < ActiveRecord::Base
       context_module_action(homework.student, homework.workflow_state.to_sym)
       if comment && (group_comment || homework == primary_homework)
         hash = {:comment => comment, :author => original_student}
-        hash[:group_comment_id] = CanvasUuid::Uuid.generate_securish_uuid if group_comment && group
+        hash[:group_comment_id] = CanvasSlug.generate_securish_uuid if group_comment && group
         homework.add_comment(hash)
       end
     end
@@ -1377,7 +1377,7 @@ class Assignment < ActiveRecord::Base
         attachments: attachments,
       }
       group, students = group_students(user)
-      comment[:group_comment_id] = CanvasUuid::Uuid.generate_securish_uuid if group
+      comment[:group_comment_id] = CanvasSlug.generate_securish_uuid if group
       find_or_create_submissions(students).map do |submission|
         submission.add_comment(comment)
       end

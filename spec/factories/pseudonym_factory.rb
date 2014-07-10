@@ -24,10 +24,10 @@ end
 # Re-generate these because I need a Unique ID
 def valid_pseudonym_attributes
   {
-    :unique_id => "#{UUIDSingleton.instance.generate}@example.com",
+    :unique_id => "#{CanvasUUID.generate}@example.com",
     :password => "password",
     :password_confirmation => "password",
-    :persistence_token => "pt_#{UUIDSingleton.instance.generate}",
+    :persistence_token => "pt_#{CanvasUUID.generate}",
     :perishable_token => "value for perishable_token",
     :login_count => 1,
     :failed_login_count => 0,
