@@ -352,7 +352,7 @@ module CanvasExpected
                    {:scale=>3, :min=>1, :max=>10, :name=>"brian"}],
           :incorrect_comments=>"Calculated incorrect. (idiot)",
           :question_name=>"Formula 2",
-          :answer_tolerance=>0.1,
+          :answer_tolerance=>'0.1%',
           :correct_comments=>"Calculated Correct",
           :formulas=>[{:formula=>"temp = 1 + x"}, {:formula=>"temp + x + y + brian"}],
           :points_possible=>15,
