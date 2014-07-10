@@ -797,14 +797,6 @@ routes.draw do
     concerns :files
   end
 
-  # commenting out all collection urls until collections are live
-  # resources :collection_items, :only => [:new]
-  # match 'get_bookmarklet', => 'collection_items#get_bookmarklet', :as => :get_bookmarklet
-  match 'collection_items/link_data' => 'collection_items#link_data', :as => :collection_item_link_data, :via => :post
-  # resources :collections, :only => [:show, :index] do
-  #   resources :collection_items, :only => [:show, :index]
-  # end
-
   scope(:controller => :outcome_results) do
     get 'courses/:course_id/outcome_rollups', :action => :rollups, :path_name => 'course_outcome_rollups'
   end
@@ -998,7 +990,6 @@ routes.draw do
       end
       topic_routes("course")
       topic_routes("group")
-      topic_routes("collection_item")
     end
 
     scope(:controller => :collaborations) do
@@ -1235,23 +1226,6 @@ routes.draw do
       get 'groups/:group_id/folders/by_path/*full_path', :controller => :folders, :action => :resolve_path
       get 'groups/:group_id/folders/by_path', :controller => :folders, :action => :resolve_path
       get 'groups/:group_id/folders/:id', :controller => :folders, :action => :show, :path_name => 'group_folder'
-    end
-
-    scope(:controller => :collections) do
-      get "collections", :action => :list, :path_name => 'collections'
-      resources :collections, :path_prefix => "users/:user_id", :name_prefix => "user_", :only => [:index, :create]
-      resources :collections, :path_prefix => "groups/:group_id", :name_prefix => "group_", :only => [:index, :create]
-      resources :collections, :except => [:index, :create]
-      put "collections/:collection_id/followers/self", :action => :follow
-      delete "collections/:collection_id/followers/self", :action => :unfollow
-
-      scope(:controller => :collection_items) do
-        get "collections/:collection_id/items", :action => :index, :path_name => 'collection_items_list'
-        resources :items, :path_prefix => "collections/:collection_id", :name_prefix => "collection_", :controller => :collection_items, :only => [:index, :create]
-        resources :items, :path_prefix => "collections", :name_prefix => "collection_", :controller => :collection_items, :except => [:index, :create]
-        put "collections/items/:item_id/upvotes/self", :action => :upvote
-        delete "collections/items/:item_id/upvotes/self", :action => :remove_upvote
-      end
     end
 
     scope(:controller => :developer_keys) do
