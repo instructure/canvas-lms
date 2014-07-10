@@ -121,6 +121,11 @@
 #           "type": "integer",
 #           "format": "int64"
 #         },
+#         "has_seen_results": {
+#           "description": "Whether the student has viewed their results to the quiz.",
+#           "example": true,
+#           "type": "boolean"
+#         },
 #         "workflow_state": {
 #           "description": "The current state of the quiz submission. Possible values: ['untaken'|'pending_review'|'complete'|'settings_only'|'preview'].",
 #           "example": "untaken",

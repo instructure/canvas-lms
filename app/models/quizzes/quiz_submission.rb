@@ -24,12 +24,13 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   include Workflow
-  attr_accessible :quiz, :user, :temporary_user_code, :submission_data, :score_before_regrade
+  attr_accessible :quiz, :user, :temporary_user_code, :submission_data, :score_before_regrade, :has_seen_results
   attr_readonly :quiz_id, :user_id
 
   EXPORTABLE_ATTRIBUTES = [
     :id, :quiz_id, :quiz_version, :user_id, :submission_data, :submission_id, :score, :kept_score, :quiz_data, :started_at, :end_at, :finished_at, :attempt, :workflow_state,
-    :created_at, :updated_at, :fudge_points, :quiz_points_possible, :extra_attempts, :temporary_user_code, :extra_time, :manually_unlocked, :manually_scored, :score_before_regrade, :was_preview
+    :created_at, :updated_at, :fudge_points, :quiz_points_possible, :extra_attempts, :temporary_user_code, :extra_time, :manually_unlocked, :manually_scored, :score_before_regrade, :was_preview,
+    :has_seen_results
   ]
 
   EXPORTABLE_ASSOCIATIONS = [:quiz, :user, :submission, :attachments]
@@ -199,6 +200,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   def results_visible?
     return true unless quiz
     return false if quiz.restrict_answers_for_concluded_course?
+    return false if quiz.one_time_results && self.has_seen_results?
 
     if quiz.hide_results == 'always'
       false
@@ -226,6 +228,10 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     else
       false
     end
+  end
+
+  def has_seen_results?
+    !!self.has_seen_results
   end
 
   def finished_in_words
@@ -488,7 +494,10 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def mark_completed
-    Quizzes::QuizSubmission.where(:id => self).update_all(:workflow_state => 'complete')
+    Quizzes::QuizSubmission.where(:id => self).update_all({
+      workflow_state: 'complete',
+      has_seen_results: false
+    })
   end
 
   def grade_submission(opts={})

@@ -278,6 +278,13 @@
                     </div>
 
                     <div>
+                      <label class="checkbox" for="quiz_one_time_results">
+                        <%= check_box :quiz, :one_time_results %>
+                        <%= t(:one_time_results, "Only Once After Each Attempt") %>
+                      </label>
+                    </div>
+
+                    <div>
                       <label class="checkbox" for="quiz_show_correct_answers">
                         <%= check_box :quiz, :show_correct_answers %>
                         <%= t(:show_correct_answers, "Let Students See The Correct Answers") %>

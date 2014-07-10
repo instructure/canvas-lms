@@ -36,7 +36,8 @@ class Quizzes::Quiz < ActiveRecord::Base
     :hide_results, :locked, :ip_filter, :require_lockdown_browser,
     :require_lockdown_browser_for_results, :context, :notify_of_update,
     :one_question_at_a_time, :cant_go_back, :show_correct_answers_at, :hide_correct_answers_at,
-    :require_lockdown_browser_monitor, :lockdown_browser_monitor_data
+    :require_lockdown_browser_monitor, :lockdown_browser_monitor_data,
+    :one_time_results
 
   attr_readonly :context_id, :context_type
   attr_accessor :notify_of_update

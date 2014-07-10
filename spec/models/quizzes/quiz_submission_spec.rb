@@ -875,6 +875,18 @@ describe Quizzes::QuizSubmission do
       qs = Quizzes::QuizSubmission.new(:quiz => quiz)
       qs.results_visible?.should be_true
     end
+
+    it "returns false if results are locked down" do
+      quiz = Quizzes::Quiz.new
+      quiz.stubs(:restrict_answers_for_concluded_course? => false)
+      quiz.stubs(:one_time_results => true)
+
+      qs = Quizzes::QuizSubmission.new(:quiz => quiz)
+      qs.results_visible?.should be_true
+
+      qs.stubs(:has_seen_results => true)
+      qs.results_visible?.should be_false
+    end
   end
 
   describe "#update_submission_version" do

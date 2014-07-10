@@ -19,7 +19,7 @@ module Quizzes
                 :message_students_url, :quiz_submission_html_url, :section_count,
                 :moderate_url, :take_quiz_url, :quiz_extensions_url, :takeable,
                 :quiz_submissions_zip_url, :preview_url, :quiz_submission_versions_html_url,
-                :assignment_id
+                :assignment_id, :one_time_results
 
     def_delegators :@controller,
       :api_v1_course_assignment_group_url,

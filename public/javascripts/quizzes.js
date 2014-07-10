@@ -1038,6 +1038,7 @@ define([
         serializeField('hide_correct_answers_at');
       } else {
         resetField('show_correct_answers', '0');
+        resetField('one_time_results', '0');
         resetField('show_correct_answers_at');
         resetField('hide_correct_answers_at');
       }
