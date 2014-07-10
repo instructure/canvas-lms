@@ -90,17 +90,12 @@ class DiscussionEntry < ActiveRecord::Base
 
   on_create_send_to_streams do
     if self.root_entry_id.nil?
-      recent_entries = DiscussionEntry.active.
-          where('discussion_topic_id=? AND created_at > ?', self.discussion_topic_id, 2.weeks.ago).
-          select(:user_id).all
-      # If the topic has been going for more than two weeks and it suddenly
-      # got "popular" again, move it back up in user streams
-      if !self.discussion_topic.for_assignment? && self.created_at && self.created_at > self.discussion_topic.created_at + 2.weeks && recent_entries.select{|e| e.created_at && e.created_at > 24.hours.ago }.length > 10
-        self.discussion_topic.active_participants
       # If the topic has beeng going for more than two weeks, only show
       # people who have been participating in the topic
-      elsif self.created_at > self.discussion_topic.created_at + 2.weeks
-        recent_entries.map(&:user_id).uniq
+      if self.created_at > self.discussion_topic.created_at + 2.weeks
+        DiscussionEntry.active.
+            where('discussion_topic_id=? AND created_at > ?', self.discussion_topic_id, 2.weeks.ago).
+            select(:user_id).uniq.map(&:user_id)
       else
         self.discussion_topic.active_participants
       end
