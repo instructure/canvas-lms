@@ -190,6 +190,10 @@ describe "admin_tools" do
   end
 
   context "Logging" do
+    before do
+      pending "Audit Search is disabled."
+    end
+
     include_examples "cassandra audit logs"
 
     it "should change log types with dropdown" do
@@ -288,6 +292,8 @@ describe "admin_tools" do
     include_examples "cassandra audit logs"
 
     before do
+      pending "Audit Search is disabled"
+
       Timecop.freeze(8.seconds.ago) do
         Auditors::Authentication.record(@student.pseudonyms.first, 'login')
       end
@@ -319,6 +325,8 @@ describe "admin_tools" do
     include_examples "cassandra audit logs"
 
     before do
+      pending "Audit Search is disabled"
+
       Timecop.freeze(8.seconds.ago) do
         course_with_teacher(course: @course, :user => user_with_pseudonym(:name => 'Teacher TestUser'))
         @assignment = @course.assignments.create!(:title => 'Assignment', :points_possible => 10)
@@ -382,6 +390,8 @@ describe "admin_tools" do
     it_should_behave_like "cassandra audit logs"
 
     before do
+      pending "Audit Search is disabled"
+
       course_with_teacher(course: @course, :user => user_with_pseudonym(:name => 'Teacher TestUser'))
 
       load_admin_tools_page
