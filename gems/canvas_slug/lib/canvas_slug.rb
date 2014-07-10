@@ -16,21 +16,27 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module CanvasUuid
-  class Uuid
-    class << self
-      CHARS = ('0'..'9').to_a + ('a'..'z').to_a + ('A'..'Z').to_a
+require "securerandom"
 
-      def generate_securish_uuid(length = 40)
-        Array.new(length) { CHARS[SecureRandom.random_number(CHARS.length)] }.join
-      end
+class CanvasSlug
+  class << self
+    CHARS = ('0'..'9').to_a + ('a'..'z').to_a + ('A'..'Z').to_a
 
-      def generate(purpose = nil, length = 4)
-        slug = ''
-        slug << purpose << '-' if purpose
-        slug << generate_securish_uuid(length)
-        slug
-      end
+    def generate_securish_uuid(length = 40)
+      Array.new(length) { CHARS[SecureRandom.random_number(CHARS.length)] }.join
+    end
+
+    def generate(purpose = nil, length = 4)
+      slug = ''
+      slug << purpose << '-' if purpose
+      slug << generate_securish_uuid(length)
+      slug
     end
   end
+end
+
+# TODO: stub until other references to CanvasUuid outside core canvas-lms
+# are replaced with CanvasSlug. remove when those are updated.
+module CanvasUuid
+  Uuid = CanvasSlug
 end

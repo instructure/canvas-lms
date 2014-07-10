@@ -3,7 +3,7 @@
   <p><%= t 'notices.uploading_progress_info', 'Uploading and processing your zip file, if there are a lot of files in the zip file or it is very large, this may take a while.' %></p>
 </div>
 <%= form_for((@zfi || ZipFileImport.new), :url => context_url(@context, :context_zip_file_imports_url), :html => { :id => "zip_file_import_form", :multipart => true })  do |form| %>
-  <input type="hidden" name="batch_id" value="<%= CanvasUuid::Uuid.generate(@current_user.asset_string, 10) %>" id="zip_import_batch_id"/>
+  <input type="hidden" name="batch_id" value="<%= CanvasSlug.generate(@current_user.asset_string, 10) %>" id="zip_import_batch_id"/>
   <%= form.error_messages %>
   <div>
     <input type="file" name="zip_file" id="zip_file"/><br/>

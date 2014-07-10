@@ -38,7 +38,7 @@ class DeveloperKey < ActiveRecord::Base
   end
 
   def generate_api_key(overwrite=false)
-    self.api_key = CanvasUuid::Uuid.generate(nil, 64) if overwrite || !self.api_key
+    self.api_key = CanvasSlug.generate(nil, 64) if overwrite || !self.api_key
   end
 
   def self.default
