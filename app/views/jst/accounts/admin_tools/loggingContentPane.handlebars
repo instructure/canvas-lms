@@ -1,7 +1,12 @@
 <label class="control-label" for="loggingType">
   <h4>{{#t "select_label"}}Select a log type to search.{{/t}}</h4>
 </label>
-<div class="controls">
+
+<p class="ui-state-error" style="padding:0.7em;">
+  Log searches have been temporarily disabled.
+</p>
+
+<div class="controls hide">
   <select id="loggingType">
     <option value="default">{{#t "select_default"}}Select a Log type{{/t}}</option>
     {{#if authentication}}
