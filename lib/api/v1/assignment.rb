@@ -71,7 +71,6 @@ module Api::V1::Assignment
     hash = api_json(assignment, user, session, fields)
     hash['course_id'] = assignment.context_id
     hash['name'] = assignment.title
-    hash['post_to_sis'] = assignment.post_to_sis
     hash['submission_types'] = assignment.submission_types_array
     hash['has_submitted_submissions'] = assignment.has_submitted_submissions?
 

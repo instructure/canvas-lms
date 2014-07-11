@@ -529,16 +529,9 @@ class AssignmentsApiController < ApplicationController
   #   Apply assignment overrides to the assignment, defaults to true.
   # @returns Assignment
   def show
-    if authorized_action(@context, @current_user, :read)
-      @assignment = @context.active_assignments.find(params[:id],
-          :include => [:assignment_group, :rubric_association, :rubric])
-
-      if @context.feature_enabled?(:draft_state) && !@assignment.grants_right?(@current_user, session, :read)
-        # user should not see unpublished assignments
-        render_unauthorized_action
-        return
-      end
-
+    @assignment = @context.active_assignments.find(params[:id],
+        :include => [:assignment_group, :rubric_association, :rubric])
+    if authorized_action(@assignment, @current_user, :read)
       if Array(params[:include]).include?('submission')
         submission = @assignment.submissions.for_user(@current_user).first
       end
@@ -836,7 +829,7 @@ class AssignmentsApiController < ApplicationController
   #
   # @returns Assignment
   def update
-    @assignment = @context.assignments.find(params[:id])
+    @assignment = @context.active_assignments.find(params[:id])
     if authorized_action(@assignment, @current_user, :update)
       save_and_render_response
     end
