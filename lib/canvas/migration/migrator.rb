@@ -152,6 +152,9 @@ class Migrator
       r_node.css('dependency').each do |d_node|
         resource[:dependencies] << d_node[:identifierref]
       end
+      if variant = r_node.at_css('variant')
+        resource[:preferred_resource_id] = variant['identifierref']
+      end
       @resources[id] = resource
     end
   end

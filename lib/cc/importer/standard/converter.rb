@@ -25,6 +25,7 @@ module CC::Importer::Standard
     include QuizConverter
 
     MANIFEST_FILE = "imsmanifest.xml"
+    SUPPORTED_TYPES = /assessment\z|\Aassignment|\Aimswl|\Aimsbasiclti|\Aimsdt|webcontent|learning-application-resource\z/
     
     attr_accessor :resources
 
@@ -45,6 +46,7 @@ module CC::Importer::Standard
       @manifest.remove_namespaces!
 
       get_all_resources(@manifest)
+      process_variants
       create_file_map
 
       @course[:discussion_topics] = convert_discussions
@@ -62,6 +64,26 @@ module CC::Importer::Standard
       @course
     end
     alias_method :export, :convert
+
+    # A resource can have a "variant" that points to another resource.
+    # That means the other resource is preferred if it's supported.
+    # After this runs all migration_ids in @resources for the variant chain
+    # should point to just one object
+    def process_variants
+      @resources.values.select{|r|r[:preferred_resource_id]}.each do |res|
+        preferred = @resources[res[:preferred_resource_id]]
+        if preferred && preferred != res
+          if preferred[:type] =~ SUPPORTED_TYPES
+            # The preferred resource is supported, use it instead
+            @resources[res[:migration_id]] = preferred
+          else
+            # The preferred resource isn't supported, don't try to import it
+            @resources[preferred[:migration_id]] = res
+          end
+          res.delete :preferred_resource_id
+        end
+      end
+    end
 
     def find_file_migration_id(path)
       @file_path_migration_id[path] || @file_path_migration_id[path.gsub(%r{\$[^$]*\$|\.\./}, '')] ||
