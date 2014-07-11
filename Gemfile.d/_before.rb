@@ -16,20 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# NOTE: this has to use 1.8.7 hash syntax to not raise a parser exception on 1.8.7
-if RUBY_VERSION == "2.0.0"
-  warn "Ruby 2.0 support is untested"
-  ruby '2.0.0', :engine => 'ruby', :engine_version => '2.0.0'
-elsif RUBY_VERSION >= "2.1" && RUBY_VERSION < "2.2"
-  warn "Ruby 2.1 support is untested"
-  ruby RUBY_VERSION, :engine => 'ruby', :engine_version => RUBY_VERSION
-elsif RUBY_VERSION >= "2.2"
-  warn "Ruby newer than 2.1 is very UNSUPPORTED"
-  ruby RUBY_VERSION, :engine => 'ruby', :engine_version => RUBY_VERSION
-else
-  ruby '1.9.3', :engine => 'ruby', :engine_version => '1.9.3'
-end
-
 # # enforce the version of bundler itself, to avoid any surprises
 required_bundler_version = '1.5.1'..'1.6.3'
 gem 'bundler', [">=#{required_bundler_version.first}", "<=#{required_bundler_version.last}"]
@@ -44,6 +30,20 @@ unless required_bundler_version.include?(Bundler::VERSION)
 
   warn "Bundler version #{required_bundler_version.first} is required; you're currently running #{Bundler::VERSION}. Maybe try `#{bundle_command}`, or `gem uninstall bundler -v #{Bundler::VERSION}`."
   exit 1
+end
+
+# NOTE: this has to use 1.8.7 hash syntax to not raise a parser exception on 1.8.7
+if RUBY_VERSION == "2.0.0"
+  warn "Ruby 2.0 support is untested"
+  ruby '2.0.0', :engine => 'ruby', :engine_version => '2.0.0'
+elsif RUBY_VERSION >= "2.1" && RUBY_VERSION < "2.2"
+  warn "Ruby 2.1 support is untested"
+  ruby RUBY_VERSION, :engine => 'ruby', :engine_version => RUBY_VERSION
+elsif RUBY_VERSION >= "2.2"
+  warn "Ruby newer than 2.1 is very UNSUPPORTED"
+  ruby RUBY_VERSION, :engine => 'ruby', :engine_version => RUBY_VERSION
+else
+  ruby '1.9.3', :engine => 'ruby', :engine_version => '1.9.3'
 end
 
 # force a different lockfile for rails 3
