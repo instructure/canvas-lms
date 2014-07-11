@@ -180,9 +180,6 @@ class Notification < ActiveRecord::Base
   # Return a hash with information for a related user option if one exists.
   def related_user_setting(user)
     case self.category
-      when 'Submission Comment'
-        setting = {:name => :no_submission_comments_inbox, :value => user.preferences[:no_submission_comments_inbox],
-                   :label => t(:submission_new_as_read, 'Mark new submission comments as read.')}
       when 'Grading'
         setting = {:name => :send_scores_in_emails, :value => user.preferences[:send_scores_in_emails],
                    :label => t(:grading_notify_include_grade, 'Include scores when alerting about grade changes.')}
@@ -459,9 +456,6 @@ EOS
       mt(:submission_comment_description, <<-EOS)
 Assignment submission comment
 
-&nbsp;
-
-Check 'Mark new submission comments as read' if you don't want them to show up as 'new' in your Canvas Inbox
 EOS
     when 'Grading Policies'
       t(:grading_policies_description, 'Course grading policy change')
