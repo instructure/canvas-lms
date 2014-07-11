@@ -475,6 +475,7 @@ end
     Delayed::Job.redis.flushdb if Delayed::Job == Delayed::Backend::Redis::Job
     Rails::logger.try(:info, "Running #{self.class.description} #{@method_name}")
     Attachment.domain_namespace = nil
+    $spec_api_tokens = {}
   end
 
   # flush redis before the first spec, and before each spec that comes after
