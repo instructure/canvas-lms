@@ -16,8 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Auditors; end
-
 class Auditors::GradeChange
   class Record < Auditors::Record
     attributes :account_id,
@@ -119,7 +117,7 @@ class Auditors::GradeChange
     end
   end
 
-  Stream = EventStream::Stream.new do
+  Stream = Auditors.stream do
     database -> { Canvas::Cassandra::DatabaseBuilder.from_config(:auditors) }
     table :grade_changes
     record_type Auditors::GradeChange::Record

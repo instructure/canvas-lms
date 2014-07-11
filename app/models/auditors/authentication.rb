@@ -16,8 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Auditors; end
-
 class Auditors::Authentication
   class Record < Auditors::Record
     attributes :pseudonym_id,
@@ -56,7 +54,7 @@ class Auditors::Authentication
     end
   end
 
-  Stream = EventStream::Stream.new do
+  Stream = Auditors.stream do
     database -> { Canvas::Cassandra::DatabaseBuilder.from_config(:auditors) }
     table :authentications
     record_type Auditors::Authentication::Record
