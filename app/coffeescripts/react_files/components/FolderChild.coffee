@@ -3,11 +3,11 @@ define [
   '../mixins/BackboneMixin'
   '../utils/withGlobalDom'
   './FriendlyDatetime'
+  './ItemCog'
   'compiled/util/friendlyBytes'
-], (React, BackboneMixin, withGlobalDom, FriendlyDatetime, friendlyBytes) ->
+], (React, BackboneMixin, withGlobalDom, FriendlyDatetime, ItemCog, friendlyBytes) ->
 
   EVERYTHING_BEFORE_THE_FIRST_SLASH = /^[^\/]+/
-
 
   FolderChild = React.createClass
 
@@ -48,24 +48,5 @@ define [
             span( {className:'screenreader-only accessible_label'}, 'Published. Click to unpublish.')
           ),
 
-          div( {className:'ef-hover-options'},
-            a( {herf:'#', style: {'color': 'black', 'margin-right': '10px'}}, i( {className:'icon-download'})),
-            div( {className:'ef-admin-gear'},
-              div(null,
-                a( {className:'al-trigger al-trigger-gray', role:'button', 'aria-haspopup':'true', 'aria-owns':'content-1', 'aria-label':'Settings', href:'#'},
-                  i( {className:'icon-settings'}),
-                  i( {className:'icon-mini-arrow-down'})
-                ),
-
-                ul( {id:'content-1', className:'al-options', role:'menu', tabIndex:'0', 'aria-hidden':'true', 'aria-expanded':'false', 'aria-activedescendant':'content-2'},
-                  li( {role:'presentation'},
-                  a( {href:'#', className:'icon-edit', id:'content-2', tabIndex:'-1', role:'menuitem', title:'Edit'}, 'Edit')
-                  ),
-                  li( {role:'presentation'},
-                  a( {href:'#', className:'icon-trash', id:'content-3', tabIndex:'-1', role:'menuitem', title:'Delete this module'}, 'Delete')
-                  )
-                )
-              )
-            )
-          )
+          ItemCog(model: @props.model)
         )
