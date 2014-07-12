@@ -514,7 +514,8 @@ class FilesController < ApplicationController
       end
       if request.format == :json
         options = {:permissions => {:user => @current_user}}
-        if attachment.grants_right?(@current_user, session, :download)
+        can_download = attachment.grants_right?(@current_user, session, :download)
+        if can_download
           # Right now we assume if they ask for json data on the attachment
           # which includes the scribd doc data, then that means they have 
           # viewed or are about to view the file in some form.
@@ -533,8 +534,10 @@ class FilesController < ApplicationController
       end
       format.json {
         render :json => attachment.as_json(options).tap { |json|
-          canvadoc_url = attachment.canvadoc_url(@current_user)
-          json['attachment']['canvadoc_session_url'] = canvadoc_url
+          if can_download
+            canvadoc_url = attachment.canvadoc_url(@current_user)
+            json['attachment']['canvadoc_session_url'] = canvadoc_url
+          end
         }
       }
     end
