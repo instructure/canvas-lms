@@ -19,7 +19,7 @@
 module Auditors; end
 
 class Auditors::Authentication
-  class Record < EventStream::Record
+  class Record < Auditors::Record
     attributes :pseudonym_id,
                :account_id,
                :user_id
@@ -30,8 +30,6 @@ class Auditors::Authentication
 
     def initialize(*args)
       super(*args)
-
-      self.request_id ||= RequestContextGenerator.request_id
 
       if attributes['pseudonym']
         self.pseudonym = attributes.delete('pseudonym')

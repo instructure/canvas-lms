@@ -19,7 +19,7 @@
 module Auditors; end
 
 class Auditors::GradeChange
-  class Record < EventStream::Record
+  class Record < Auditors::Record
     attributes :account_id,
                :grade_after,
                :grade_before,
@@ -40,8 +40,6 @@ class Auditors::GradeChange
 
     def initialize(*args)
       super(*args)
-
-      self.request_id ||= RequestContextGenerator.request_id
 
       if attributes['submission']
         self.submission = attributes.delete('submission')
