@@ -7958,6 +7958,7 @@ nb:
       add_group_category: "Legg til et sett av grupper"
       self_signup_help: "Grupper med egenpåmelding"
     unassigned_students: "Unassigned Students (%{count})"
+    unassigned_users: "Ufordelte brukere (% {count})"
   help_dialog: 
     Back: Tilbake
     Help: Hjelp
