@@ -414,6 +414,26 @@ describe FilesController do
       end
     end
 
+    describe "canvadoc_session_url" do
+      before do
+        course_with_student_logged_in active_all: true
+        Canvadocs.stubs(:enabled?).returns true
+        @file = canvadocable_attachment_model
+      end
+
+      it "is included if :download is allowed" do
+        get 'show', :course_id => @course.id, :id => @file.id, :format => 'json'
+        json_parse['attachment']['canvadoc_session_url'].should be_present
+      end
+
+      it "is not included if locked" do
+        @file.lock_at = 1.month.ago
+        @file.save!
+        get 'show', :course_id => @course.id, :id => @file.id, :format => 'json'
+        json_parse['attachment']['canvadoc_session_url'].should be_nil
+      end
+    end
+
   end
 
   describe "GET 'show_relative'" do
