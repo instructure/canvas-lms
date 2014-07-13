@@ -39,7 +39,7 @@ describe Quizzes::QuizzesApiController, type: :request do
   end
 
   describe "GET /courses/:course_id/quizzes (index)" do
-    before { teacher_in_course(:active_all => true) }
+    before(:once) { teacher_in_course(:active_all => true) }
 
     it "should return list of quizzes" do
       quizzes = (0..3).map{ |i| @course.quizzes.create! :title => "quiz_#{i}" }
@@ -113,7 +113,7 @@ describe Quizzes::QuizzesApiController, type: :request do
   end
 
   describe "GET /courses/:course_id/quizzes/:id (show)" do
-    before { course_with_teacher_logged_in(:active_all => true, :course => @course) }
+    before(:once) { course_with_teacher(:active_all => true, :course => @course) }
 
     context "unpublished quiz" do
       before do
@@ -165,7 +165,7 @@ describe Quizzes::QuizzesApiController, type: :request do
               {:quiz => quiz_params}, {}, opts)
     end
 
-    before { teacher_in_course(:active_all => true) }
+    before(:once) { teacher_in_course(:active_all => true) }
 
     let (:new_quiz) { @course.quizzes.first }
 
@@ -209,9 +209,9 @@ describe Quizzes::QuizzesApiController, type: :request do
 
     describe "validations" do
       context "assignment_group_id" do
-        let!(:my_group) { @course.assignment_groups.create! :name => 'my group' }
-        let (:other_course) { Course.create! :name => 'other course' }
-        let!(:other_group) { other_course.groups.create! :name => 'other group' }
+        let_once(:my_group) { @course.assignment_groups.create! :name => 'my group' }
+        let_once(:other_course) { Course.create! :name => 'other course' }
+        let_once(:other_group) { other_course.groups.create! :name => 'other group' }
 
         it "should put the quiz in a group owned by its course" do
           api_create_quiz({'title' => 'test quiz', 'assignment_group_id' => my_group.id})
@@ -352,7 +352,7 @@ describe Quizzes::QuizzesApiController, type: :request do
     end
 
     context 'lockdown_browser' do
-      before do
+      before :once do
         # require_lockdown_browser, require_lockdown_browser_for_results and
         # require_lockdown_browser_monitor will only return true if the plugin is enabled,
         # so register and enable it for these test
@@ -498,7 +498,7 @@ describe Quizzes::QuizzesApiController, type: :request do
   end
 
   describe "POST /courses/:course_id/quizzes/:id/reorder (reorder)" do
-    before do
+    before :once do
       teacher_in_course(:active_all => true)
       @quiz  = @course.quizzes.create! :title => 'title'
       @question1 = @quiz.quiz_questions.create!(:question_data => {'name' => 'test question 1', 'answers' => [{'id' => 1}, {'id' => 2}], :position => 1})

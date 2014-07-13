@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 describe ProgressController, type: :request do
 
   describe "show" do
-    before do
+    before :once do
       @account = account_model
       account_admin_user :account => @account
       @progress = @account.progresses.build :tag => 'course_batch_update', :completion => 55.0, :message => 'hello'

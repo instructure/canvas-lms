@@ -19,11 +19,11 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe ContentExportsApiController, type: :request do
-  let(:t_teacher) do
+  let_once(:t_teacher) do
     user(active_all: true)
   end
 
-  let(:t_course) do
+  let_once(:t_course) do
     course_with_teacher(user: t_teacher, active_all: true)
     @course.wiki.wiki_pages.create! title: "something to export"
     @course
@@ -198,118 +198,113 @@ describe ContentExportsApiController, type: :request do
       end
     end
 
-    it "should create a selective course export with old migration id format" do
-      att_to_copy = Attachment.create!(:context => t_course, :filename => 'hi.txt',
-        :uploaded_data => StringIO.new("stuff"), :folder => Folder.unfiled_folder(t_course))
-      att_to_not_copy = Attachment.create!(:context => t_course, :filename => 'derp.txt',
-        :uploaded_data => StringIO.new("more stuff"), :folder => Folder.unfiled_folder(t_course))
+    context "selective exports" do
+      let_once :att_to_copy do
+        Attachment.create!(:context => t_course, :filename => 'hi.txt',
+                           :uploaded_data => StringIO.new("stuff"), :folder => Folder.unfiled_folder(t_course))
+      end
+      let_once :att_to_not_copy do
+        Attachment.create!(:context => t_course, :filename => 'derp.txt',
+                           :uploaded_data => StringIO.new("more stuff"), :folder => Folder.unfiled_folder(t_course))
+      end
+      let_once :page_to_copy do
+        page_to_copy = t_course.wiki.wiki_pages.create!(:title => "other page")
+        page_to_copy.body = "<p><a href=\"/courses/#{t_course.id}/files/#{att_to_copy.id}/preview\">hey look a link</a></p>"
+        page_to_copy.save!
+        page_to_copy
+      end
+      let_once(:page_to_not_copy){ t_course.wiki.wiki_pages.create!(:title => "another page") }
+      let_once(:mod) do
+        # both the wiki page and the referenced attachment should be exported implicitly through the module
+        mod = t_course.context_modules.create!(:name => "who cares")
+        mod.add_item(:id => page_to_copy.id, :type => "wiki_page")
+        mod
+      end
 
-      page_to_copy = t_course.wiki.wiki_pages.create!(:title => "other page")
-      page_to_copy.body = "<p><a href=\"/courses/#{t_course.id}/files/#{att_to_copy.id}/preview\">hey look a link</a></p>"
-      page_to_copy.save!
-      page_to_not_copy = t_course.wiki.wiki_pages.create!(:title => "another page")
+      it "should create a selective course export with old migration id format" do
+        json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
+                                { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge'},
+                                { :select => {:context_modules => {mod.asset_string => "1"}}})
+        export = t_course.content_exports.find_by_id(json['id'])
+        export.should_not be_nil
+        export.workflow_state.should eql 'created'
+        export.export_type.should eql 'common_cartridge'
+        export.user_id.should eql t_teacher.id
+        export.settings['selected_content']['context_modules'].should == {CC::CCHelper.create_key(mod) => "1"}
+        export.job_progress.should be_queued
 
-      # both the wiki page and the referenced attachment should be exported implicitly through the module
-      mod = t_course.context_modules.create!(:name => "who cares")
-      mod.add_item(:id => page_to_copy.id, :type => "wiki_page")
+        run_jobs
 
-      json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
-                              { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge'},
-                              { :select => {:context_modules => {mod.asset_string => "1"}}})
-      export = t_course.content_exports.find_by_id(json['id'])
-      export.should_not be_nil
-      export.workflow_state.should eql 'created'
-      export.export_type.should eql 'common_cartridge'
-      export.user_id.should eql t_teacher.id
-      export.settings['selected_content']['context_modules'].should == {CC::CCHelper.create_key(mod) => "1"}
-      export.job_progress.should be_queued
+        export.reload
+        export.workflow_state.should eql 'exported'
+        export.job_progress.should be_completed
+        export.attachment.should_not be_nil
 
-      run_jobs
+        course
+        cm = @course.content_migrations.new
+        cm.attachment = export.attachment
+        cm.migration_type = "canvas_cartridge_importer"
+        cm.migration_settings[:import_immediately] = true
+        cm.save!
+        cm.queue_migration
 
-      export.reload
-      export.workflow_state.should eql 'exported'
-      export.job_progress.should be_completed
-      export.attachment.should_not be_nil
+        run_jobs
 
-      course
-      cm = @course.content_migrations.new
-      cm.attachment = export.attachment
-      cm.migration_type = "canvas_cartridge_importer"
-      cm.migration_settings[:import_immediately] = true
-      cm.save!
-      cm.queue_migration
+        @course.context_modules.find_by_migration_id(CC::CCHelper.create_key(mod)).should_not be_nil
+        copied_page = @course.wiki.wiki_pages.find_by_migration_id(CC::CCHelper.create_key(page_to_copy))
+        copied_page.should_not be_nil
+        @course.wiki.wiki_pages.find_by_migration_id(CC::CCHelper.create_key(page_to_not_copy)).should be_nil
 
-      run_jobs
+        copied_att = @course.attachments.find_by_filename(att_to_copy.filename)
+        copied_att.should_not be_nil
+        copied_page.body.should == "<p><a href=\"/courses/#{@course.id}/files/#{copied_att.id}/preview\">hey look a link</a></p>"
+        @course.attachments.find_by_filename(att_to_not_copy.filename).should be_nil
+      end
 
-      @course.context_modules.find_by_migration_id(CC::CCHelper.create_key(mod)).should_not be_nil
-      copied_page = @course.wiki.wiki_pages.find_by_migration_id(CC::CCHelper.create_key(page_to_copy))
-      copied_page.should_not be_nil
-      @course.wiki.wiki_pages.find_by_migration_id(CC::CCHelper.create_key(page_to_not_copy)).should be_nil
+      it "should create a selective course export with arrays of ids" do
+        json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
+                                { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge'},
+                                { :select => {:context_modules => [mod.id]}})
+        export = t_course.content_exports.find_by_id(json['id'])
+        export.should_not be_nil
+        export.workflow_state.should eql 'created'
+        export.export_type.should eql 'common_cartridge'
+        export.user_id.should eql t_teacher.id
+        export.settings['selected_content']['context_modules'].should == {CC::CCHelper.create_key(mod) => "1"}
+        export.job_progress.should be_queued
 
-      copied_att = @course.attachments.find_by_filename(att_to_copy.filename)
-      copied_att.should_not be_nil
-      copied_page.body.should == "<p><a href=\"/courses/#{@course.id}/files/#{copied_att.id}/preview\">hey look a link</a></p>"
-      @course.attachments.find_by_filename(att_to_not_copy.filename).should be_nil
-    end
+        run_jobs
 
-    it "should create a selective course export with arrays of ids" do
-      att_to_copy = Attachment.create!(:context => t_course, :filename => 'hi.txt',
-                                       :uploaded_data => StringIO.new("stuff"), :folder => Folder.unfiled_folder(t_course))
-      att_to_not_copy = Attachment.create!(:context => t_course, :filename => 'derp.txt',
-                                           :uploaded_data => StringIO.new("more stuff"), :folder => Folder.unfiled_folder(t_course))
+        export.reload
+        export.workflow_state.should eql 'exported'
+        export.job_progress.should be_completed
+        export.attachment.should_not be_nil
 
-      page_to_copy = t_course.wiki.wiki_pages.create!(:title => "other page")
-      page_to_copy.body = "<p><a href=\"/courses/#{t_course.id}/files/#{att_to_copy.id}/preview\">hey look a link</a></p>"
-      page_to_copy.save!
-      page_to_not_copy = t_course.wiki.wiki_pages.create!(:title => "another page")
+        course
+        cm = @course.content_migrations.new
+        cm.attachment = export.attachment
+        cm.migration_type = "canvas_cartridge_importer"
+        cm.migration_settings[:import_immediately] = true
+        cm.save!
+        cm.queue_migration
 
-      # both the wiki page and the referenced attachment should be exported implicitly through the module
-      mod = t_course.context_modules.create!(:name => "who cares")
-      mod.add_item(:id => page_to_copy.id, :type => "wiki_page")
+        run_jobs
 
-      json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
-                              { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge'},
-                              { :select => {:context_modules => [mod.id]}})
-      export = t_course.content_exports.find_by_id(json['id'])
-      export.should_not be_nil
-      export.workflow_state.should eql 'created'
-      export.export_type.should eql 'common_cartridge'
-      export.user_id.should eql t_teacher.id
-      export.settings['selected_content']['context_modules'].should == {CC::CCHelper.create_key(mod) => "1"}
-      export.job_progress.should be_queued
+        @course.context_modules.find_by_migration_id(CC::CCHelper.create_key(mod)).should_not be_nil
+        copied_page = @course.wiki.wiki_pages.find_by_migration_id(CC::CCHelper.create_key(page_to_copy))
+        copied_page.should_not be_nil
+        @course.wiki.wiki_pages.find_by_migration_id(CC::CCHelper.create_key(page_to_not_copy)).should be_nil
 
-      run_jobs
-
-      export.reload
-      export.workflow_state.should eql 'exported'
-      export.job_progress.should be_completed
-      export.attachment.should_not be_nil
-
-      course
-      cm = @course.content_migrations.new
-      cm.attachment = export.attachment
-      cm.migration_type = "canvas_cartridge_importer"
-      cm.migration_settings[:import_immediately] = true
-      cm.save!
-      cm.queue_migration
-
-      run_jobs
-
-      @course.context_modules.find_by_migration_id(CC::CCHelper.create_key(mod)).should_not be_nil
-      copied_page = @course.wiki.wiki_pages.find_by_migration_id(CC::CCHelper.create_key(page_to_copy))
-      copied_page.should_not be_nil
-      @course.wiki.wiki_pages.find_by_migration_id(CC::CCHelper.create_key(page_to_not_copy)).should be_nil
-
-      copied_att = @course.attachments.find_by_filename(att_to_copy.filename)
-      copied_att.should_not be_nil
-      copied_page.body.should == "<p><a href=\"/courses/#{@course.id}/files/#{copied_att.id}/preview\">hey look a link</a></p>"
-      @course.attachments.find_by_filename(att_to_not_copy.filename).should be_nil
+        copied_att = @course.attachments.find_by_filename(att_to_copy.filename)
+        copied_att.should_not be_nil
+        copied_page.body.should == "<p><a href=\"/courses/#{@course.id}/files/#{copied_att.id}/preview\">hey look a link</a></p>"
+        @course.attachments.find_by_filename(att_to_not_copy.filename).should be_nil
+      end
     end
   end
 
   describe "#content_list" do
     it "should return a list of exportable content for a course directly" do
-      course_with_teacher_logged_in(:active_all => true)
       @dt1 = @course.discussion_topics.create!(:message => "hi", :title => "discussion title")
       @cm = @course.context_modules.create!(:name => "some module")
       @att = Attachment.create!(:filename => 'first.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@course), :context => @course)
@@ -331,7 +326,7 @@ describe ContentExportsApiController, type: :request do
         {"type"=>"discussion_topics", "property"=>"select[all_discussion_topics]", "title"=>"Discussion Topics", "count"=>1, "sub_items_url"=>"http://www.example.com/api/v1/courses/#{@course.id}/content_list?type=discussion_topics"},
         {"type"=>"quizzes", "property"=>"select[all_quizzes]", "title"=>"Quizzes", "count"=>1, "sub_items_url"=>"http://www.example.com/api/v1/courses/#{@course.id}/content_list?type=quizzes"},
         {"type"=>"syllabus_body", "property"=>"select[all_syllabus_body]", "title"=>"Syllabus Body"},
-        {"type"=>"wiki_pages", "property"=>"select[all_wiki_pages]", "title"=>"Wiki Pages", "count"=>1, "sub_items_url"=>"http://www.example.com/api/v1/courses/#{@course.id}/content_list?type=wiki_pages"}
+        {"type"=>"wiki_pages", "property"=>"select[all_wiki_pages]", "title"=>"Wiki Pages", "count"=>2, "sub_items_url"=>"http://www.example.com/api/v1/courses/#{@course.id}/content_list?type=wiki_pages"}
       ]
 
       json = api_call(:get, list_url + '?type=context_modules', params.merge({type: 'context_modules'}))

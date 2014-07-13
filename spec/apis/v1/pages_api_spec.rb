@@ -49,7 +49,7 @@ describe "Pages API", type: :request do
     include_examples 'a locked api item'
   end
 
-  before do
+  before :once do
     course
     @course.offer!
     @wiki = @course.wiki
@@ -62,7 +62,7 @@ describe "Pages API", type: :request do
   end
 
   context 'versions' do
-    before :each do
+    before :once do
       @page = @wiki.wiki_pages.create!(:title => 'Test Page', :body => 'Test content')
     end
 
@@ -126,7 +126,7 @@ describe "Pages API", type: :request do
   end
 
   context "as a teacher" do
-    before :each do
+    before :once do
       course_with_teacher(:course => @course, :active_all => true)
     end
 
@@ -218,7 +218,7 @@ describe "Pages API", type: :request do
     end
     
     describe "show" do
-      before do
+      before :once do
         @teacher.short_name = 'the teacher'
         @teacher.save!
         @hidden_page.user_id = @teacher.id
@@ -305,7 +305,7 @@ describe "Pages API", type: :request do
     end
     
     describe "revisions" do
-      before do
+      before :once do
         @timestamps = %w(2013-01-01 2013-01-02 2013-01-03).map { |d| Time.zone.parse(d) }
         course_with_ta :course => @course, :active_all => true
         Timecop.freeze(@timestamps[0]) do      # rev 1
@@ -684,14 +684,14 @@ describe "Pages API", type: :request do
       end
 
       context 'hide_from_students' do
-        before :each do
+        before :once do
           @test_page = @course.wiki.wiki_pages.build(:title => 'Test Page')
           @test_page.workflow_state = 'active'
           @test_page.save!
         end
 
         context 'without draft state' do
-          before :each do
+          before :once do
             set_course_draft_state false
           end
 
@@ -733,7 +733,7 @@ describe "Pages API", type: :request do
         end
 
         context 'with draft state' do
-          before :each do
+          before :once do
             set_course_draft_state true
           end
 
@@ -766,14 +766,13 @@ describe "Pages API", type: :request do
       end
 
       context 'with unpublished page' do
-        before do
+        before :once do
           set_course_draft_state
           @unpublished_page = @course.wiki.wiki_pages.build(:title => 'Unpublished Page', :body => 'Body of unpublished page')
           @unpublished_page.workflow_state = 'unpublished'
           @unpublished_page.save!
 
           @unpublished_page.reload
-          @unpublished_page.should be_unpublished
         end
 
         it 'should publish a page with published=true' do
@@ -840,7 +839,7 @@ describe "Pages API", type: :request do
       end
       
       describe "notify_of_update" do
-        before do
+        before :once do
           @notify_page = @hidden_page
           @notify_page.publish!
 
@@ -891,7 +890,7 @@ describe "Pages API", type: :request do
     end
 
     context "unpublished pages" do
-      before do
+      before :once do
         @deleted_page = @wiki.wiki_pages.create! :title => "Deleted page"
         @deleted_page.destroy
         @course.account.allow_feature!(:draft_state)
@@ -940,7 +939,7 @@ describe "Pages API", type: :request do
   end
 
   context "as a student" do
-    before :each do
+    before :once do
       course_with_student(:course => @course, :active_all => true)
     end
     
@@ -952,18 +951,18 @@ describe "Pages API", type: :request do
     end
     
     it "should paginate, excluding hidden" do
-      11.times { |i| @wiki.wiki_pages.create!(:title => "New Page #{i}") }
-      json = api_call(:get, "/api/v1/courses/#{@course.id}/pages",
-                      :controller=>'wiki_pages_api', :action=>'index', :format=>'json', :course_id=>"#{@course.id}")
-      json.size.should == 10
+      2.times { |i| @wiki.wiki_pages.create!(:title => "New Page #{i}") }
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/pages?per_page=2",
+                      :controller=>'wiki_pages_api', :action=>'index', :format=>'json', :course_id=>"#{@course.id}", :per_page => "2")
+      json.size.should == 2
       urls = json.collect{ |page| page['url'] }
 
-      json = api_call(:get, "/api/v1/courses/#{@course.id}/pages?page=2",
-                      :controller=>'wiki_pages_api', :action=>'index', :format=>'json', :course_id=>"#{@course.id}", :page => "2")
-      json.size.should == 2
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/pages?per_page=2&page=2",
+                      :controller=>'wiki_pages_api', :action=>'index', :format=>'json', :course_id=>"#{@course.id}", :per_page => "2", :page => "2")
+      json.size.should == 1
       urls += json.collect{ |page| page['url'] }
 
-      urls.should == @wiki.wiki_pages.select{ |p| !p.hide_from_students }.sort_by(&:id).collect(&:url)      
+      urls.should == @wiki.wiki_pages.select{ |p| !p.hide_from_students }.sort_by(&:id).collect(&:url)
     end
     
     it "should refuse to show a hidden page" do
@@ -1040,7 +1039,7 @@ describe "Pages API", type: :request do
     end
 
     describe "with students in editing_roles" do
-      before do
+      before :once do
         @editable_page = @course.wiki.wiki_pages.create! :title => 'Editable Page', :editing_roles => 'students'
         @editable_page.workflow_state = 'active'
         @editable_page.save!
@@ -1146,7 +1145,7 @@ describe "Pages API", type: :request do
     end
 
     context "unpublished pages" do
-      before do
+      before :once do
         @course.account.allow_feature!(:draft_state)
         @course.enable_feature!(:draft_state)
         @unpublished_page = @wiki.wiki_pages.create(:title => "Draft Page", :body => "Don't text and drive.")
@@ -1183,7 +1182,7 @@ describe "Pages API", type: :request do
     end
 
     context "revisions" do
-      before do
+      before :once do
         @vpage = @course.wiki.wiki_pages.build :title => 'student version test page', :body => 'draft'
         @vpage.workflow_state = 'unpublished'
         @vpage.save! # rev 1
@@ -1225,7 +1224,7 @@ describe "Pages API", type: :request do
       end
 
       context "with page-level student editing role" do
-        before do
+        before :once do
           @vpage.editing_roles = 'teachers,students'
           @vpage.body = 'with student editing roles'
           @vpage.save! # rev 4
@@ -1277,7 +1276,7 @@ describe "Pages API", type: :request do
       end
 
       context "with course-level student editing role" do
-        before do
+        before :once do
           @course.default_wiki_editing_roles = 'teachers,students'
           @course.save!
         end
@@ -1295,7 +1294,7 @@ describe "Pages API", type: :request do
   end
   
   context "group" do
-    before :each do
+    before :once do
       group_with_user(:active_all => true)
       5.times { |i| @group.wiki.wiki_pages.create!(:title => "Group Wiki Page #{i}", :body => "<blink>Content of page #{i}</blink>") }
     end
@@ -1336,7 +1335,7 @@ describe "Pages API", type: :request do
     end
 
     context "revisions" do
-      before do
+      before :once do
         @vpage = @group.wiki.wiki_pages.create! :title => 'revision test page', :body => 'old version'
         @vpage.body = 'new version'
         @vpage.save!

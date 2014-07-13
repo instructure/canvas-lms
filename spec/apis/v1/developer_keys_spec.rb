@@ -73,7 +73,6 @@ describe DeveloperKeysController, type: :request do
 
   def admin_session
     account_admin_user(:account => Account.site_admin)
-    user_session(@admin)
   end
 
   def index_call

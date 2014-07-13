@@ -21,9 +21,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../file_uploads_spec_helper'
 
 describe 'Submissions API', type: :request do
 
-  before {
+  before :each do
     HostUrl.stubs(:file_host_with_shard).returns(["www.example.com", Shard.default])
-  }
+  end
 
   def submit_homework(assignment, student, opts = {:body => "test!"})
     @submit_homework_time ||= Time.zone.at(0)
@@ -75,7 +75,7 @@ describe 'Submissions API', type: :request do
   end
 
   describe "using section ids" do
-    before do
+    before :once do
       @student1 = user(:active_all => true)
       course_with_teacher(:active_all => true)
       @default_section = @course.default_section
@@ -267,8 +267,8 @@ describe 'Submissions API', type: :request do
     end
 
     context 'submission comment attachments' do
-      before do
-        course_with_student_logged_in(active_all: true)
+      before :once do
+        course_with_student(active_all: true)
         @assignment = @course.assignments.create! name: "blah",
           submission_types: "online_upload"
         @attachment = Attachment.create! context: @assignment,
@@ -1162,7 +1162,7 @@ describe 'Submissions API', type: :request do
   end
 
   describe "for_students non-admin" do
-    before do
+    before :once do
       course_with_student :active_all => true
       @student1 = @student
       @student2 = student_in_course(:active_all => true).user
@@ -1265,7 +1265,7 @@ describe 'Submissions API', type: :request do
     end
 
     context "observers" do
-      before do
+      before :once do
         @observer = user :active_all => true
         @course.enroll_user(@observer, 'ObserverEnrollment', :associated_user_id => @student1.id).accept!
         @course.enroll_user(@observer, 'ObserverEnrollment', :allow_multiple_enrollments => true, :associated_user_id => @student2.id).accept!
@@ -1302,7 +1302,7 @@ describe 'Submissions API', type: :request do
       end
 
       context "observer that is a student" do
-        before do
+        before :once do
           @course.enroll_student(@observer, :allow_multiple_enrollments => true).accept!
           submit_homework(@assignment1, @observer)
           @assignment1.grade_student(@observer, grade: 5)
@@ -2010,7 +2010,7 @@ describe 'Submissions API', type: :request do
   end
 
   context "create" do
-    before do
+    before :once do
       course_with_student(:active_all => true)
       assignment_model(:course => @course, :submission_types => "online_url", :points_possible => 12)
       @url = "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions"
@@ -2116,7 +2116,7 @@ describe 'Submissions API', type: :request do
     end
 
     context "submission file uploads" do
-      before do
+      before :once do
         @assignment.update_attributes(:submission_types => 'online_upload')
         @student1 = @student
         course_with_student(:course => @course)
@@ -2158,7 +2158,7 @@ describe 'Submissions API', type: :request do
   end
 
   context "draft assignments" do
-    before do
+    before :once do
       course_with_teacher(:active_all => true)
       student_in_course(:active_all => true)
       @a2 = @course.assignments.create!({:title => 'assignment2'})

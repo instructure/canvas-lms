@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe "Folders API", type: :request do
-  before do
+  before :once do
     course_with_teacher(:active_all => true, :user => user_with_pseudonym)
     @root = Folder.root_folders(@course).first
 
@@ -344,7 +344,7 @@ describe "Folders API", type: :request do
   end
 
   describe "#update" do
-    append_before do
+    before :once do
       @sub1 = @root.sub_folders.create!(:name => "sub1", :context => @course)
       @update_url = @folders_path + "/#{@sub1.id}"
       @folders_path_options = { :controller => "folders", :action => "update", :format => "json", :id => @sub1.id.to_param }
@@ -387,12 +387,12 @@ describe "Folders API", type: :request do
   end
 
   describe "#resolve_path" do
-    before do
+    before :once do
       @params_hash = { controller: 'folders', action: 'resolve_path', format: 'json' }
     end
 
     context "course" do
-      before do
+      before :once do
         course active_all: true
         @root_folder = Folder.root_folders(@course).first
         @request_path = "/api/v1/courses/#{@course.id}/folders/by_path"
@@ -411,7 +411,7 @@ describe "Folders API", type: :request do
       end
 
       describe "with full_path" do
-        before do
+        before :once do
           @folder = @course.folders.create! parent_folder: @root_folder, name: 'a folder'
           @sub_folder = @course.folders.create! parent_folder: @folder, name: 'locked subfolder', locked: true
           @path = [@folder.name, @sub_folder.name].join('/')
@@ -439,7 +439,7 @@ describe "Folders API", type: :request do
     end
 
     context "group" do
-      before do
+      before :once do
         group_with_user
         @root_folder = Folder.root_folders(@group).first
         @params_hash.merge!(group_id: @group.id)
@@ -458,7 +458,7 @@ describe "Folders API", type: :request do
     end
 
     context "user" do
-      before do
+      before :once do
         user active_all: true
         @root_folder = Folder.root_folders(@user).first
         @params_hash.merge!(user_id: @user.id)

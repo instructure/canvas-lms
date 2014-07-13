@@ -19,9 +19,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe SisImportsApiController, type: :request do
-  before do
+  before :once do
     @user = user_with_pseudonym :active_all => true
-    user_session @user
     @account = Account.default
     @account.allow_sis_import = true
     @account.save
@@ -458,7 +457,6 @@ describe SisImportsApiController, type: :request do
 
   it "should list sis imports for an account" do
     @user = user_with_pseudonym :active_all => true
-    user_session @user
     @account = Account.create(name: 'sis account')
     @account.allow_sis_import = true
     @account.save!

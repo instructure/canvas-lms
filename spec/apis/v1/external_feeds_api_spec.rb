@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe 'ExternalFeedsController', type: :request do
   shared_examples_for "Announcement External Feeds" do
-    before do
+    before :once do
       @url_params = { :controller => "external_feeds", :action => "index", :format => "json" }
     end
 
@@ -102,7 +102,7 @@ describe 'ExternalFeedsController', type: :request do
 
   describe "in a Course" do
     include_examples "Announcement External Feeds"
-    before do
+    before :once do
       @allowed_user = teacher_in_course(:active_all => true).user
       @context = @course
       @denied_user = student_in_course(:course => @course, :active_all => true).user
@@ -113,7 +113,7 @@ describe 'ExternalFeedsController', type: :request do
 
   describe "in a Group" do
     include_examples "Announcement External Feeds"
-    before do
+    before :once do
       group_with_user(:moderator => true, :active_all => true)
       @allowed_user = @user
       @allowed_user.pseudonyms.create!(:unique_id => 'user1', :account => Account.default)

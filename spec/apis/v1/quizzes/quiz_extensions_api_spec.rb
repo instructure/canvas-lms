@@ -18,12 +18,13 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 
 describe Quizzes::QuizExtensionsController, type: :request do
-  before :each do
+  before :once do
     course
     @quiz = @course.quizzes.create!(:title => 'quiz')
     @quiz.published_at = Time.now
     @quiz.workflow_state = 'available'
     @quiz.save!
+    @student = student_in_course(course: @course, active_all: true).user
   end
 
   describe "POST /api/v1/courses/:course_id/quizzes/:quiz_id/extensions (create)" do
@@ -36,10 +37,6 @@ describe Quizzes::QuizExtensionsController, type: :request do
     end
 
     context "as a student" do
-      before :each do
-        @student = student_in_course(course: @course, active_all: true).user
-      end
-
       it "should be unauthorized" do
         quiz_extension_params = [
           {user_id: @student.id, extra_attempts: 2},
@@ -54,13 +51,13 @@ describe Quizzes::QuizExtensionsController, type: :request do
     end
 
     context "as a teacher" do
-      before :each do
-        @student1 = student_in_course(course: @course, active_all: true).user
+      before :once do
+        @student1 = @student
+        @student2 = student_in_course(course: @course, active_all: true).user
+        @teacher  = teacher_in_course(course: @course, active_all: true).user
       end
 
       it "should extend attempts for a existing submission" do
-        @teacher = teacher_in_course(course: @course, active_all: true).user
-
         quiz_submission = @quiz.generate_submission(@student1)
         quiz_submission.grants_right?(@teacher, :add_attempts)
 
@@ -72,8 +69,6 @@ describe Quizzes::QuizExtensionsController, type: :request do
       end
 
       it "should extend attempts for a new submission" do
-        @teacher = teacher_in_course(course: @course, active_all: true).user
-
         quiz_extension_params = [
           {user_id: @student1.id, extra_attempts: 2}
         ]
@@ -82,9 +77,6 @@ describe Quizzes::QuizExtensionsController, type: :request do
       end
 
       it "should extend attempts for multiple students" do
-        @student2 = student_in_course(course: @course, active_all: true).user
-        @teacher  = teacher_in_course(course: @course, active_all: true).user
-
         quiz_extension_params = [
           {user_id: @student1.id, extra_attempts: 2},
           {user_id: @student2.id, extra_attempts: 3}

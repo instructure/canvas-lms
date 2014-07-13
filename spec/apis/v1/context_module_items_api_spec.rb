@@ -18,7 +18,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe "Module Items API", type: :request do
-  before do
+  before :once do
     course.offer!
 
     @module1 = @course.context_modules.create!(:name => "module1")
@@ -57,7 +57,7 @@ describe "Module Items API", type: :request do
   end
 
   context "as a teacher" do
-    before :each do
+    before :once do
       course_with_teacher(:course => @course, :active_all => true)
     end
 
@@ -782,7 +782,7 @@ describe "Module Items API", type: :request do
       end
 
       context "with duplicate items" do
-        before do
+        before :once do
           @other_quiz_tag = @module3.add_item(:id => @quiz.id, :type => 'quiz')
         end
 
@@ -826,8 +826,8 @@ describe "Module Items API", type: :request do
   end
 
   context "as a student" do
-    before :each do
-      course_with_student_logged_in(:course => @course, :active_all => true)
+    before :once do
+      course_with_student(:course => @course, :active_all => true)
     end
 
     def override_assignment
@@ -873,7 +873,7 @@ describe "Module Items API", type: :request do
       end
       let(:assignment_details) { json.find{|item| item['id'] == @assignment_tag.id}['content_details'] }
 
-      before do
+      before :once do
         override_assignment
       end
 
@@ -906,7 +906,7 @@ describe "Module Items API", type: :request do
       end
       let(:assignment_details) { json['content_details'] }
 
-      before do
+      before :once do
         override_assignment
       end
 
@@ -1011,7 +1011,7 @@ describe "Module Items API", type: :request do
 
     describe "GET 'module_item_sequence'" do
       context "unpublished item" do
-        before do
+        before :once do
           @quiz_tag.unpublish
         end
 
@@ -1036,7 +1036,7 @@ describe "Module Items API", type: :request do
       end
 
       context "unpublished module" do
-        before do
+        before :once do
           @new_assignment_1 = @course.assignments.create!
           @new_assignment_1_tag = @module3.add_item :type => 'assignment', :id => @new_assignment_1.id
           @module4 = @course.context_modules.create!
@@ -1069,7 +1069,7 @@ describe "Module Items API", type: :request do
   end
 
   context "unauthorized user" do
-    before do
+    before :once do
       user
     end
 

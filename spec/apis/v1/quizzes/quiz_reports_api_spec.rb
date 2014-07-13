@@ -42,7 +42,7 @@ describe Quizzes::QuizReportsController, type: :request do
     end
 
     context 'with privileged access' do
-      before do
+      before :once do
         teacher_in_course(:active_all => true)
         @quiz = @course.quizzes.create({ title: 'Test Quiz' })
       end
@@ -109,7 +109,7 @@ describe Quizzes::QuizReportsController, type: :request do
         }, params, headers
     end
 
-    before do
+    before :once do
       teacher_in_course(:active_all => true)
       @me = @user
       simple_quiz_with_submissions %w{T T T}, %w{T T T}, %w{T F F}, %w{T F T}, :user => @user, :course => @course
@@ -173,7 +173,7 @@ describe Quizzes::QuizReportsController, type: :request do
     end
 
     context 'with privileged access' do
-      before do
+      before :once do
         teacher_in_course(:active_all => true)
         @quiz = @course.quizzes.create({ title: 'Test Quiz' })
         @report = @quiz.current_statistics_for('student_analysis')

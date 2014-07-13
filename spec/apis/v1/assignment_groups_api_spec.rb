@@ -22,8 +22,7 @@ describe AssignmentGroupsController, type: :request do
   include Api
   include Api::V1::Assignment
 
-  def set_up_course_with_groups
-    course_with_teacher(:active_all => true)
+  def set_up_groups
     @group1 = @course.assignment_groups.create!(:name => 'group1')
     @group1.update_attribute(:position, 10)
     @group1.update_attribute(:group_weight, 40)
@@ -39,10 +38,13 @@ describe AssignmentGroupsController, type: :request do
     @a4 = @course.assignments.create!({:title => "test4", :assignment_group => @group2, :points_possible => 9}.merge(assignment_opts))
   end
 
+  before :once do
+    course_with_teacher(:active_all => true)
+  end
+
   it "should sort the returned list of assignment groups" do
     # the API returns the assignments sorted by
     # assignment_groups.position
-    course_with_teacher(:active_all => true)
     group1 = @course.assignment_groups.create!(:name => 'group1')
     group1.update_attribute(:position, 10)
     group2 = @course.assignment_groups.create!(:name => 'group2')
@@ -81,7 +83,7 @@ describe AssignmentGroupsController, type: :request do
   end
 
   it "should include full assignment jsonification when specified" do
-    set_up_course_with_groups
+    set_up_groups
     set_up_four_assignments
 
     rubric_model(:user => @user, :context => @course, :points_possible => 12,
@@ -131,7 +133,7 @@ describe AssignmentGroupsController, type: :request do
 
   context "differentiated assignments on" do
     it "should only return visible assignments when differentiated assignments is on" do
-      set_up_course_with_groups
+      set_up_groups
       set_up_four_assignments(only_visible_to_overrides: true)
       @user.enrollments.each(&:delete)
       @section = @course.course_sections.create!(name: "test section")
@@ -168,7 +170,6 @@ describe AssignmentGroupsController, type: :request do
     end
 
     it "should include assignment_visibility when requested" do
-      course_with_teacher active_all: true
       @course.assignments.create!
       @course.enable_feature!(:differentiated_assignments)
       json = api_call(:get,
@@ -188,7 +189,6 @@ describe AssignmentGroupsController, type: :request do
   end
 
   it "should include module_ids when requested" do
-    course_with_teacher active_all: true
     mods = 2.times.map { |i| @course.context_modules.create! name: "Mod#{i}" }
     g = @course.assignment_groups.create! name: 'assignments'
     a = @course.assignments.create! assignment_group: g, title: "blah"
@@ -204,7 +204,6 @@ describe AssignmentGroupsController, type: :request do
   end
 
   it "should not include all dates " do
-    course_with_teacher(:active_all => true)
     group = @course.assignment_groups.build(:name => 'group1')
     group.position = 10
     group.group_weight = 40
@@ -248,7 +247,6 @@ describe AssignmentGroupsController, type: :request do
   end
 
   it "should include all dates" do
-    course_with_teacher(:active_all => true)
     group = @course.assignment_groups.build(:name => 'group1')
     group.position = 10
     group.group_weight = 40
@@ -289,7 +287,6 @@ describe AssignmentGroupsController, type: :request do
   end
 
   it "should exclude deleted assignments" do
-    course_with_teacher(:active_all => true)
     group1 = @course.assignment_groups.create!(:name => 'group1')
     group1.update_attribute(:position, 10)
 
@@ -311,7 +308,6 @@ describe AssignmentGroupsController, type: :request do
   end
 
   it "should return weights that aren't being applied" do
-    course_with_teacher(:active_all => true)
     @course.update_attribute(:group_weighting_scheme, 'equal')
 
     group1 = @course.assignment_groups.create!(:name => 'group1', :group_weight => 50)
@@ -325,7 +321,6 @@ describe AssignmentGroupsController, type: :request do
   end
 
   it "should not explode on assignments with <objects> with percentile widths" do
-    course_with_teacher(:active_all => true)
     group = @course.assignment_groups.create!(:name => 'group')
     assignment = @course.assignments.create!(:title => "test", :assignment_group => group, :points_possible => 10)
     assignment.description = '<object width="100%" />'
@@ -340,7 +335,7 @@ describe AssignmentGroupsController, type: :request do
   end
 
   it "should not return unpublished assignments to students" do
-    course_with_student(:active_all => true)
+    student_in_course(:active_all => true)
     @course.root_account.enable_feature!(:draft_state)
     @course.require_assignment_group
     assignment = @course.assignments.create! do |a|
@@ -368,7 +363,7 @@ describe AssignmentGroupsApiController, type: :request do
 
   context '#show' do
 
-    before do
+    before :once do
       course_with_teacher(:active_all => true)
       rules_in_db = "drop_lowest:1\ndrop_highest:1\nnever_drop:1\nnever_drop:2\n"
       @group = @course.assignment_groups.create!(:name => 'group', :rules => rules_in_db)
@@ -472,7 +467,7 @@ describe AssignmentGroupsApiController, type: :request do
   end
 
   context '#update' do
-    before do
+    before :once do
       course_with_teacher(:active_all => true)
       @assignment_group = @course.assignment_groups.create!(:name => 'Some group', :position => 1)
     end
@@ -512,7 +507,7 @@ describe AssignmentGroupsApiController, type: :request do
   end
 
   context '#destroy' do
-    before do
+    before :once do
       course_with_teacher(:active_all => true)
       @assignment_group = @course.assignment_groups.create!(:name => 'Some group', :position => 1)
     end

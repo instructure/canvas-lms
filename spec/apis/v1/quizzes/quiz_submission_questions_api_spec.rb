@@ -125,7 +125,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
 
   describe 'GET /quiz_submissions/:quiz_submission_id/questions [index]' do
     before :each do
-      course_with_student_logged_in(:active_all => true)
+      course_with_student(:active_all => true)
       @quiz = quiz_model(course: @course)
       @quiz_submission = @quiz.generate_submission(@student)
     end
@@ -159,8 +159,8 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
   end
 
   describe 'GET /quiz_submissions/:quiz_submission_id/questions/:id [show]' do
-    before :each do
-      course_with_student_logged_in(:active_all => true)
+    before :once do
+      course_with_student(:active_all => true)
       @quiz = quiz_model(course: @course)
       @quiz_submission = @quiz.generate_submission(@student)
 
@@ -266,8 +266,8 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
     end
 
     context 'as a student' do
-      before :each do
-        course_with_student_logged_in(:active_all => true)
+      before :once do
+        course_with_student(:active_all => true)
         @quiz = quiz_model(course: @course)
         @quiz_submission = @quiz.generate_submission(@student)
       end

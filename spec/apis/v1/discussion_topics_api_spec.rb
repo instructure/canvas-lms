@@ -28,7 +28,7 @@ class DiscussionTopicsTestCourseApi
 end
 
 describe Api::V1::DiscussionTopics do
-  before do
+  before :once do
     @test_api = DiscussionTopicsTestCourseApi.new
     course_with_teacher(:active_all => true, :user => user_with_pseudonym)
     @me = @user
@@ -76,9 +76,11 @@ describe DiscussionTopicsController, type: :request do
   include Api::V1::User
 
   context 'locked api item' do
+    include_examples 'a locked api item'
+
     let(:item_type) { 'discussion_topic' }
 
-    let(:locked_item) do
+    let_once(:locked_item) do
       @course.discussion_topics.create!(:user => @user, :message => 'Locked Discussion')
     end
 
@@ -90,11 +92,9 @@ describe DiscussionTopicsController, type: :request do
         {:controller => 'discussion_topics_api', :action => 'show', :format => 'json', :course_id => @course.id.to_s, :topic_id => locked_item.id.to_s},
       )
     end
-
-    include_examples 'a locked api item'
   end
 
-  before(:each) do
+  before(:once) do
     course_with_teacher(:active_all => true, :user => user_with_pseudonym)
   end
 
@@ -241,10 +241,13 @@ describe DiscussionTopicsController, type: :request do
   end
 
   context "With item" do
-    before do
+    before :once do
       @attachment = create_attachment(@course)
       @topic = create_topic(@course, :title => "Topic 1", :message => "<p>content here</p>", :podcast_enabled => true, :attachment => @attachment)
       @sub = create_subtopic(@topic, :title => "Sub topic", :message => "<p>i'm subversive</p>")
+    end
+
+    before :each do
       @response_json =
                  {"read_state"=>"read",
                   "unread_count"=>0,
@@ -994,7 +997,7 @@ describe DiscussionTopicsController, type: :request do
   end
 
   context "creating an entry under a topic" do
-    before :each do
+    before :once do
       @topic = create_topic(@course, :title => "Topic 1", :message => "<p>content here</p>")
       @message = "my message"
     end
@@ -1123,7 +1126,7 @@ describe DiscussionTopicsController, type: :request do
   end
 
   context "listing top-level discussion entries" do
-    before :each do
+    before :once do
       @topic = create_topic(@course, :title => "topic", :message => "topic")
       @attachment = create_attachment(@course)
       @entry = create_entry(@topic, :message => "first top-level entry", :attachment => @attachment)
@@ -1239,7 +1242,7 @@ describe DiscussionTopicsController, type: :request do
   end
 
   context "listing replies" do
-    before :each do
+    before :once do
       @topic = create_topic(@course, :title => "topic", :message => "topic")
       @entry = create_entry(@topic, :message => "top-level entry")
       @reply = create_reply(@entry, :message => "first reply")
@@ -1313,7 +1316,7 @@ describe DiscussionTopicsController, type: :request do
 
   # stolen and adjusted from spec/controllers/discussion_topics_controller_spec.rb
   context "require initial post" do
-    before(:each) do
+    before(:once) do
       course_with_student(:active_all => true)
 
       @observer = user(:name => "Observer", :active_all => true)
@@ -1346,7 +1349,7 @@ describe DiscussionTopicsController, type: :request do
     end
 
     describe "student" do
-      before(:each) do
+      before(:once) do
         @topic.reply_from(user: @teacher, text: 'Lorem ipsum dolor')
         @user = @student
         @url  = "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}"
@@ -1377,7 +1380,7 @@ describe DiscussionTopicsController, type: :request do
     end
 
     describe "observer" do
-      before(:each) do
+      before(:once) do
         @topic.reply_from(user: @teacher, text: 'Lorem ipsum')
         @user = @observer
         @url  = "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries"
@@ -1402,7 +1405,7 @@ describe DiscussionTopicsController, type: :request do
   end
 
   context "update entry" do
-    before do
+    before :once do
       @topic = create_topic(@course, :title => "topic", :message => "topic")
       @entry = create_entry(@topic, :message => "<p>top-level entry</p>")
     end
@@ -1450,7 +1453,7 @@ describe DiscussionTopicsController, type: :request do
   end
 
   context "delete entry" do
-    before do
+    before :once do
       @topic = create_topic(@course, :title => "topic", :message => "topic")
       @entry = create_entry(@topic, :message => "top-level entry")
     end
@@ -1512,7 +1515,7 @@ describe DiscussionTopicsController, type: :request do
   end
 
   context "read/unread state" do
-    before(:each) do
+    before(:once) do
       @topic = create_topic(@course, :title => "topic", :message => "topic")
       @entry = create_entry(@topic, :message => "top-level entry")
       @reply = create_reply(@entry, :message => "first reply")
@@ -1696,7 +1699,7 @@ describe DiscussionTopicsController, type: :request do
   end
 
   context "subscribing" do
-    before do
+    before :once do
       student_in_course(:active_all => true)
       @topic1 = create_topic(@course, :user => @student)
       @topic2 = create_topic(@course, :user => @teacher, :require_initial_post => true)
@@ -1788,7 +1791,7 @@ describe DiscussionTopicsController, type: :request do
   end
 
   describe "threaded discussions" do
-    before do
+    before :once do
       student_in_course(:active_all => true)
       @topic = create_topic(@course, :threaded => true)
       @entry = create_entry(@topic)

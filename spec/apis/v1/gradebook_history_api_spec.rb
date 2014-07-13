@@ -72,7 +72,7 @@ describe GradebookHistoryApiController, type: :request do
     let(:date) { Time.now.in_time_zone }
     let(:date_string) { date.strftime('%Y-%m-%d') }
 
-    before do
+    before :once do
       course_with_teacher(:active_all => true)
       @student = user_with_pseudonym(:username => 'student@example.com', :active_all => 1)
       student_in_course(:user => @student, :active_all => 1)
@@ -119,7 +119,7 @@ describe GradebookHistoryApiController, type: :request do
   end
 
   describe 'GET /courses/:course_id/gradebook_history/feed' do
-    before do
+    before :once do
       course_with_teacher(:active_all => true)
 
       @student1 = user_with_pseudonym(:username => 'student@example.com', :active_all => 1)

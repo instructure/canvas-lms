@@ -309,6 +309,11 @@ class Folder < ActiveRecord::Base
     @@path_lookups[key] = current_folder
   end
 
+  def self.reset_path_lookups!
+    @@root_folders = {}
+    @@path_lookups = {}
+  end
+
   def self.unfiled_folder(context)
     folder = context.folders.find_by_parent_folder_id_and_workflow_state_and_name(Folder.root_folders(context).first.id, 'visible', 'unfiled')
     unless folder

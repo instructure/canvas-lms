@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe "AccountAuthorizationConfigs API", type: :request do
-  before do
+  before :once do
     @account = account_model(:name => 'root')
     user_with_pseudonym(:active_all => true, :account => @account)
     @account.account_users.create!(user: @user)
@@ -366,7 +366,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
   end
 
   context "discovery url" do
-    append_before do
+    before :once do
       @account.auth_discovery_url = "http://example.com/auth"
       @account.save!
     end

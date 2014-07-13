@@ -73,7 +73,7 @@ describe AssignmentOverridesController, type: :request do
   end
 
   context "index" do
-    before :each do
+    before :once do
       course_with_teacher(:active_all => true)
       assignment_model(:course => @course)
       assignment_override_model(:assignment => @assignment)
@@ -126,7 +126,7 @@ describe AssignmentOverridesController, type: :request do
   end
 
   context "show" do
-    before :each do
+    before :once do
       course_with_teacher(:active_all => true)
       assignment_model(:course => @course, :group_category => 'category')
       assignment_override_model(:assignment => @assignment)
@@ -149,7 +149,6 @@ describe AssignmentOverridesController, type: :request do
     describe 'as an account admin not enrolled in the class' do
       before :each do
         account_admin_user(:account => Account.site_admin, :active_all => true)
-        user_session(@admin)
       end
 
       it 'it works' do
@@ -231,7 +230,7 @@ describe AssignmentOverridesController, type: :request do
   end
 
   context "group alias" do
-    before :each do
+    before :once do
       course_with_teacher(:active_all => true)
       assignment_model(:course => @course, :group_category => 'category')
       group_model(:context => @course, :group_category => @assignment.group_category)
@@ -276,7 +275,7 @@ describe AssignmentOverridesController, type: :request do
   end
 
   context "section alias" do
-    before :each do
+    before :once do
       course_with_teacher(:active_all => true)
       assignment_model(:course => @course)
       assignment_override_model(:assignment => @assignment)
@@ -331,7 +330,7 @@ describe AssignmentOverridesController, type: :request do
         data)
     end
 
-    before :each do
+    before :once do
       course_with_teacher(:active_all => true)
       assignment_model(:course => @course)
     end
@@ -342,7 +341,7 @@ describe AssignmentOverridesController, type: :request do
     end
 
     context "adhoc" do
-      before :each do
+      before :once do
         @student = student_in_course(:course => @course, :user => user_with_pseudonym).user
         @title = 'adhoc title'
         @user = @teacher
@@ -397,7 +396,7 @@ describe AssignmentOverridesController, type: :request do
     end
 
     context "group" do
-      before :each do
+      before :once do
         @assignment.group_category = @course.group_categories.create!(name: "foo")
         @assignment.save!
         @group = group_model(:context => @course, :group_category => @assignment.group_category)
@@ -620,7 +619,7 @@ describe AssignmentOverridesController, type: :request do
         data)
     end
 
-    before :each do
+    before :once do
       course_with_teacher(:active_all => true)
       assignment_model(:course => @course)
       assignment_override_model(:assignment => @assignment)
@@ -648,7 +647,7 @@ describe AssignmentOverridesController, type: :request do
     end
 
     context "adhoc override" do
-      before :each do
+      before :once do
         @student = student_in_course(:course => @course).user
         @title = 'adhoc title'
         @user = @teacher
@@ -699,7 +698,7 @@ describe AssignmentOverridesController, type: :request do
     end
 
     context "group override" do
-      before :each do
+      before :once do
         @assignment.group_category = @course.group_categories.create!(name: "foo")
         @assignment.save!
         @group = group_model(:context => @course, :group_category => @assignment.group_category)
@@ -738,7 +737,7 @@ describe AssignmentOverridesController, type: :request do
     end
 
     context "section override" do
-      before :each do
+      before :once do
         @override.set = @course.default_section
         @override.save!
       end
@@ -771,7 +770,7 @@ describe AssignmentOverridesController, type: :request do
     end
 
     context "overridden due_at" do
-      before :each do
+      before :once do
         @override.set = @course.default_section
         @override.save!
 
@@ -817,7 +816,7 @@ describe AssignmentOverridesController, type: :request do
     end
 
     context "overridden unlock_at" do
-      before :each do
+      before :once do
         @override.set = @course.default_section
         @override.save!
 
@@ -864,7 +863,7 @@ describe AssignmentOverridesController, type: :request do
     end
 
     context "overridden lock_at" do
-      before :each do
+      before :once do
         @override.set = @course.default_section
         @override.save!
 
@@ -922,7 +921,7 @@ describe AssignmentOverridesController, type: :request do
   end
 
   context "destroy" do
-    before :each do
+    before :once do
       course_with_teacher(:active_all => true)
       assignment_model(:course => @course, :group_category => 'category')
       assignment_override_model(:assignment => @assignment)

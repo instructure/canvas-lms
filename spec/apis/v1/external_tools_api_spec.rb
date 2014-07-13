@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 describe ExternalToolsController, type: :request do
 
   describe "in a course" do
-    before(:each) do
+    before(:once) do
       course_with_teacher(:active_all => true, :user => user_with_pseudonym)
     end
 
@@ -193,7 +193,7 @@ describe ExternalToolsController, type: :request do
   end
 
   describe "in an account" do
-    before(:each) do
+    before(:once) do
       account_admin_user(:active_all => true, :user => user_with_pseudonym)
       @account = @user.account
     end

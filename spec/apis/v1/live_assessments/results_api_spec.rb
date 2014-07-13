@@ -19,18 +19,18 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 
 describe LiveAssessments::ResultsController, type: :request do
-  let(:assessment_course) { course(active_all: true) }
-  let(:teacher) { assessment_course.teachers.first }
-  let(:student) { course_with_student(course: assessment_course).user }
-  let(:another_student) { course_with_student(course: assessment_course).user }
-  let(:outcome) do
+  let_once(:assessment_course) { course(active_all: true) }
+  let_once(:teacher) { assessment_course.teachers.first }
+  let_once(:student) { course_with_student(course: assessment_course).user }
+  let_once(:another_student) { course_with_student(course: assessment_course).user }
+  let_once(:outcome) do
     outcome = assessment_course.created_learning_outcomes.create!(:description => 'this is a test outcome', :short_description => 'test outcome')
     assessment_course.root_outcome_group.add_outcome(outcome)
     assessment_course.root_outcome_group.save!
     assessment_course.reload
     outcome
   end
-  let(:assessment) do
+  let_once(:assessment) do
     assessment = LiveAssessments::Assessment.create!(context: assessment_course, key: '2014-05-28-Outcome-1', title: 'an assessment')
     outcome.align(assessment, assessment_course, mastery_type: 'none', mastery_score: 0.6)
     assessment

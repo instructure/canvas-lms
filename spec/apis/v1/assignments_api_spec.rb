@@ -25,17 +25,17 @@ describe AssignmentsApiController, type: :request do
   include Api::V1::Submission
 
   context 'locked api item' do
+    include_examples 'a locked api item'
+
     let(:item_type) { 'assignment' }
 
-    let(:locked_item) do
+    let_once(:locked_item) do
       @course.assignments.create!(:title => 'Locked Assignment')
     end
 
     def api_get_json
       api_get_assignment_in_course(locked_item, @course)
     end
-
-    include_examples 'a locked api item'
   end
 
   def create_submitted_assignment_with_user(user=@user)
@@ -69,6 +69,9 @@ describe AssignmentsApiController, type: :request do
   end
 
   describe "GET /courses/:course_id/assignments (#index)" do
+    before :once do
+      course_with_teacher(:active_all => true)
+    end
 
     it "returns unauthorized for users who cannot :read the course" do
       # unpublished course with invited student
@@ -92,7 +95,6 @@ describe AssignmentsApiController, type: :request do
     it "sorts the returned list of assignments" do
       # the API returns the assignments sorted by
       # [assignment_groups.position, assignments.position]
-      course_with_teacher(:active_all => true)
       group1 = @course.assignment_groups.create!(:name => 'group1')
       group1.update_attribute(:position, 10)
       group2 = @course.assignment_groups.create!(:name => 'group2')
@@ -136,7 +138,6 @@ describe AssignmentsApiController, type: :request do
     end
 
     it "should search for assignments by title" do
-      course_with_teacher(:active_all => true)
       2.times {|i| @course.assignments.create!(:title => "First_#{i}") }
       ids = @course.assignments.map(&:id)
       2.times {|i| @course.assignments.create!(:title => "second_#{i}") }
@@ -156,7 +157,6 @@ describe AssignmentsApiController, type: :request do
     it "should return the assignments list with API-formatted Rubric data" do
       # the API changes the structure of the data quite a bit, to hide
       # implementation details and ease API use.
-      course_with_teacher(:active_all => true)
       @group = @course.assignment_groups.create!({:name => "some group"})
       @assignment = @course.assignments.create!(:title => "some assignment",
                                                 :assignment_group => @group,
@@ -206,7 +206,6 @@ describe AssignmentsApiController, type: :request do
     end
 
     it "should return learning outcome info with rubric criterions if available" do
-      course_with_teacher(:active_all => true)
       @group = @course.assignment_groups.create!({:name => "some group"})
       @assignment = @course.assignments.create!(:title => "some assignment",
                                                 :assignment_group => @group,
@@ -243,7 +242,6 @@ describe AssignmentsApiController, type: :request do
     end
 
     it "should exclude deleted assignments in the list return" do
-      course_with_teacher(:active_all => true)
       @context = @course
       @assignment = factory_with_protected_attributes(
         @course.assignments,
@@ -259,7 +257,7 @@ describe AssignmentsApiController, type: :request do
     end
 
     describe "enable draft" do
-      before do
+      before :once do
         course_with_teacher(:active_all => true)
         @assignment = @course.assignments.create :name => 'some assignment'
         @assignment.workflow_state = 'unpublished'
@@ -282,7 +280,7 @@ describe AssignmentsApiController, type: :request do
     end
 
     describe "differentiated assignments" do
-      before do
+      before :once do
         course_with_teacher(:active_all => true)
         @assignment = @course.assignments.create :name => 'differentiated assignment'
       end
@@ -384,8 +382,8 @@ describe AssignmentsApiController, type: :request do
 
     describe "draft state" do
 
-      before do
-        course_with_student_logged_in(:active_all => true)
+      before :once do
+        course_with_student(:active_all => true)
         @course.account.enable_feature!(:draft_state)
         @published = @course.assignments.create!({:name => "published assignment"})
         @published.workflow_state = 'published'
@@ -406,7 +404,6 @@ describe AssignmentsApiController, type: :request do
         user
         @enrollment = @course.enroll_user(@user, 'TeacherEnrollment')
         @enrollment.course = @course # set the reverse association
-        user_session(@user, :active_all => true)
 
         json = api_get_assignments_index_from_course(@course)
         json.length.should == 2
@@ -464,7 +461,7 @@ describe AssignmentsApiController, type: :request do
       }
     end
 
-    before do
+    before :once do
       course_with_teacher(:active_all => true)
     end
 
@@ -715,6 +712,9 @@ describe AssignmentsApiController, type: :request do
   end
 
   describe "PUT /courses/:course_id/assignments/:id (#update)" do
+    before :once do
+      course_with_teacher(:active_all => true)
+    end
 
     it "returns unauthorized for users who do not have permission" do
       course_with_student(:active_all => true)
@@ -739,7 +739,6 @@ describe AssignmentsApiController, type: :request do
     end
 
     it "should update published/unpublished" do
-      course_with_teacher(:active_all => true)
       @course.account.enable_feature!(:draft_state)
       @assignment = @course.assignments.create({
         :name => "some assignment",
@@ -781,7 +780,6 @@ describe AssignmentsApiController, type: :request do
     end
 
     it "should 400 with invalid date times" do
-      course_with_teacher(:active_all => true)
       the_date = 1.day.ago
       @assignment = @course.assignments.create({
         :name => "some assignment",
@@ -802,7 +800,6 @@ describe AssignmentsApiController, type: :request do
     end
 
     it "should allow clearing dates" do
-      course_with_teacher(:active_all => true)
       the_date = 1.day.ago
       @assignment = @course.assignments.create({
         :name => "some assignment",
@@ -878,8 +875,7 @@ describe AssignmentsApiController, type: :request do
     end
 
     context "without overrides or frozen attributes" do
-      before do
-        course_with_teacher(:active_all => true)
+      before :once do
         @start_group = @course.assignment_groups.create!({:name => "start group"})
         @group = @course.assignment_groups.create!({:name => "new group"})
         @assignment = @course.assignments.create!(:title => "some assignment",
@@ -897,7 +893,9 @@ describe AssignmentsApiController, type: :request do
         @assignment.save!
 
         @new_grading_standard = grading_standard_for(@course)
+      end
 
+      before :each do
         @json = api_update_assignment_call(@course,@assignment,{
           'name' => 'some assignment',
           'points_possible' => '12',
@@ -1003,7 +1001,6 @@ describe AssignmentsApiController, type: :request do
     end
 
     it "should process html content in description on update" do
-      course_with_teacher(:active_all => true)
       @assignment = @course.assignments.create!
 
       should_process_incoming_user_content(@course) do |content|
@@ -1018,13 +1015,15 @@ describe AssignmentsApiController, type: :request do
 
     context "with assignment overrides on the assignment" do
       describe 'updating assignment overrides' do
-        before do
-          course_with_teacher(:active_all => true)
+        before :once do
           student_in_course(:course => @course, :active_enrollment => true)
           @assignment = @course.assignments.create!
           @adhoc_due_at = 5.days.from_now
           @section_due_at = 7.days.from_now
           @user = @teacher
+        end
+
+        before :each do
           api_update_assignment_call(@course,@assignment,{
             'name' => 'Assignment With Overrides',
             'assignment_overrides' => {
@@ -1064,7 +1063,6 @@ describe AssignmentsApiController, type: :request do
 
       describe "deleting all CourseSection overrides from assignment" do
         it "works when :assignment_overrides key is nil" do
-          course_with_teacher(:active_all => true)
           student_in_course(:course => @course, :active_all => true)
           @assignment = @course.assignments.create!
           Assignment.where(:id => @assignment).update_all(:created_at => Time.zone.now - 1.day)
@@ -1084,9 +1082,8 @@ describe AssignmentsApiController, type: :request do
     end
 
     context "broadcasting while updating overrides" do
-      before do
+      before :once do
         @notification = Notification.create! :name => "Assignment Changed"
-        course_with_teacher(:active_all => true)
         student_in_course(:course => @course, :active_all => true)
         @student.communication_channels.create(:path => "student@instructure.com").confirm!
         @student.email_channel.notification_policies.
@@ -1126,8 +1123,7 @@ describe AssignmentsApiController, type: :request do
     end
 
     context "when turnitin is enabled on the context" do
-      before do
-        course_with_teacher(:active_all => true)
+      before :once do
         @assignment = @course.assignments.create!
         acct = @course.account
         acct.turnitin_account_id = 0
@@ -1199,10 +1195,12 @@ describe AssignmentsApiController, type: :request do
     end
 
     context "when a non-admin tries to update a frozen assignment" do
-      before do
-        course_with_teacher(:active_all => true)
-        PluginSetting.stubs(:settings_for_plugin).returns({"title" => "yes"}).at_least_once
+      before :once do
         @assignment = create_frozen_assignment_in_course(@course)
+      end
+
+      before :each do
+        PluginSetting.stubs(:settings_for_plugin).returns({"title" => "yes"}).at_least_once
       end
 
       it "doesn't allow the non-admin to update a frozen attribute" do
@@ -1239,8 +1237,7 @@ describe AssignmentsApiController, type: :request do
     end
 
     context "differentiated assignments" do
-      before do
-        course_with_teacher(:active_all => true)
+      before :once do
         @assignment = @course.assignments.create(:name => 'test', :only_visible_to_overrides => false)
         @flag_before = @assignment.only_visible_to_overrides
       end
@@ -1262,9 +1259,8 @@ describe AssignmentsApiController, type: :request do
     end
 
     context "when an admin tried to update a grading_standard" do
-      before(:each) do
-        @user = account_admin_user
-        course_with_teacher(:active_all => true, :user => @user)
+      before(:once) do
+        account_admin_user(user: @user)
         @assignment = @course.assignments.create({:name => "some assignment"})
         @assignment.save!
         @account_standard = @course.account.grading_standards.create!(:title => "account standard", :standard_data => {:a => {:name => 'A', :value => '95'}, :b => {:name => 'B', :value => '80'}, :f => {:name => 'F', :value => ''}})
@@ -1415,7 +1411,7 @@ describe AssignmentsApiController, type: :request do
   end
 
   describe "DELETE /courses/:course_id/assignments/:id (#delete)" do
-    before do
+    before :once do
       course_with_student(:active_all => true)
       @assignment = @course.assignments.create!(
         :title => "Test Assignment",
@@ -1462,14 +1458,20 @@ describe AssignmentsApiController, type: :request do
 
   describe "GET /courses/:course_id/assignments/:id (#show)" do
 
+    before :once do
+      course_with_student(:active_all => true)
+    end
+
     describe 'with a normal assignment' do
 
-      before do
-        course_with_student(:active_all => true)
+      before :once do
         @assignment = @course.assignments.create!(
           :title => "Locked Assignment",
           :description => "secret stuff"
         )
+      end
+
+      before :each do
         @assignment.any_instantiation.stubs(:overridden_for).
           returns @assignment
         @assignment.any_instantiation.stubs(:locked_for?).returns(
@@ -1497,7 +1499,7 @@ describe AssignmentsApiController, type: :request do
       end
 
       it "returns the discussion topic url" do
-        course_with_teacher(:active_all => true)
+        @user = @teacher
         @context = @course
         @assignment = factory_with_protected_attributes(
           @course.assignments,
@@ -1548,7 +1550,6 @@ describe AssignmentsApiController, type: :request do
       end
 
       it "fulfills module progression requirements" do
-        course_with_student(:active_all => true)
         @assignment = @course.assignments.create!(
           :title => "Test Assignment",
           :description => "public stuff"
@@ -1576,8 +1577,6 @@ describe AssignmentsApiController, type: :request do
       end
 
       it "returns the dates for assignment as they apply to the user" do
-        course_with_student(:active_all => true)
-        @user = @student
         @student.enrollments.map(&:destroy!)
         @assignment = @course.assignments.create!(
           :title => "Test Assignment",
@@ -1595,8 +1594,6 @@ describe AssignmentsApiController, type: :request do
       end
 
       it "returns original assignment due dates" do
-        course_with_student(:active_all => true)
-        @user = @student
         @student.enrollments.map(&:destroy!)
         @assignment = @course.assignments.create!(
           :title => "Test Assignment",
@@ -1622,7 +1619,6 @@ describe AssignmentsApiController, type: :request do
       end
 
       it "does not fulfill requirements when description isn't returned" do
-        course_with_student(:active_all => true)
         @assignment = @course.assignments.create!(
           :title => "Locked Assignment",
           :description => "locked!"
@@ -1644,7 +1640,6 @@ describe AssignmentsApiController, type: :request do
       end
 
       it "includes submission info when requested with include flag" do
-        course_with_student_logged_in(:active_all => true)
         assignment,submission = create_submitted_assignment_with_user(@user)
         json = api_call(:get,
           "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}.json",
@@ -1659,7 +1654,7 @@ describe AssignmentsApiController, type: :request do
       context "AssignmentFreezer plugin disabled" do
 
         before do
-          course_with_teacher(:active_all => true)
+          @user = @teacher
           @assignment = create_frozen_assignment_in_course(@course)
           PluginSetting.stubs(:settings_for_plugin).returns {}
           @json = api_get_assignment_in_course(@assignment,@course)
@@ -1675,10 +1670,13 @@ describe AssignmentsApiController, type: :request do
       context "AssignmentFreezer plugin enabled" do
 
         context "assignment frozen" do
-          before do
-            course_with_teacher(:active_all => true)
-            PluginSetting.stubs(:settings_for_plugin).returns({"title" => "yes"})
+          before :once do
+            @user = @teacher
             @assignment = create_frozen_assignment_in_course(@course)
+          end
+
+          before :each do
+            PluginSetting.stubs(:settings_for_plugin).returns({"title" => "yes"})
             @json = api_get_assignment_in_course(@assignment,@course)
           end
 
@@ -1702,13 +1700,16 @@ describe AssignmentsApiController, type: :request do
         end
 
         context "assignment not frozen" do
-          before do
-            course_with_teacher(:active_all => true)
-            PluginSetting.stubs(:settings_for_plugin).returns({"title" => "yes"}) #enable plugin
+          before :once do
+            @user = @teacher
             @assignment = @course.assignments.create!({
               :title => "Frozen",
               :description => "frozen!"
             })
+          end
+
+          before :each do
+            PluginSetting.stubs(:settings_for_plugin).returns({"title" => "yes"}) #enable plugin
             @assignment.any_instantiation.expects(:overridden_for).returns @assignment
             @assignment.any_instantiation.expects(:frozen?).at_least_once.returns false
             @json = api_get_assignment_in_course(@assignment,@course)
@@ -1729,7 +1730,7 @@ describe AssignmentsApiController, type: :request do
 
         context "assignment with quiz" do
           before do
-            course_with_teacher(:active_all => true)
+            @user = @teacher
             @quiz = Quizzes::Quiz.create!(:title => 'Quiz Name', :context => @course)
             @quiz.did_edit!
             @quiz.offer!
@@ -1748,16 +1749,18 @@ describe AssignmentsApiController, type: :request do
 
       context "external tool assignment" do
 
-        before do
-          course_with_student(:active_all => true)
-          assignment = @course.assignments.create!
+        before :once do
+          @assignment = @course.assignments.create!
           @tool_tag = ContentTag.new({:url => 'http://www.example.com', :new_tab=>false})
-          @tool_tag.context = assignment
+          @tool_tag.context = @assignment
           @tool_tag.save!
-          assignment.submission_types = 'external_tool'
-          assignment.save!
-          assignment.external_tool_tag.should_not be_nil
-          @json = api_get_assignment_in_course(assignment, @course)
+          @assignment.submission_types = 'external_tool'
+          @assignment.save!
+          @assignment.external_tool_tag.should_not be_nil
+        end
+
+        before :each do
+          @json = api_get_assignment_in_course(@assignment, @course)
         end
 
         it 'has the external tool submission type' do
@@ -1783,8 +1786,7 @@ describe AssignmentsApiController, type: :request do
 
     context "draft state" do
 
-      before do
-        course_with_student_logged_in(:active_all => true)
+      before :once do
         @course.account.enable_feature!(:draft_state)
         @assignment = @course.assignments.create!({
           :name => "unpublished assignment",
@@ -1793,7 +1795,6 @@ describe AssignmentsApiController, type: :request do
         @assignment.workflow_state = 'unpublished'
         @assignment.save!
       end
-
 
       it "returns an authorization error to students if an assignment is unpublished" do
 
@@ -1832,7 +1833,7 @@ describe AssignmentsApiController, type: :request do
 
     context "differentiated assignments" do
       before :once do
-        course_with_teacher_logged_in(:active_all => true)
+        @user = @teacher
         @course.enable_feature!(:differentiated_assignments)
         @assignment1 = @course.assignments.create! :only_visible_to_overrides => true
         @assignment2 = @course.assignments.create! :only_visible_to_overrides => true
@@ -1878,7 +1879,7 @@ describe AssignmentsApiController, type: :request do
   describe "assignment_json" do
     let(:result) { assignment_json(@assignment, @user, {}) }
 
-    before do
+    before :once do
       course_with_teacher(:active_all => true)
       @assignment = @course.assignments.create!(:title => "some assignment")
     end
@@ -1904,7 +1905,7 @@ describe AssignmentsApiController, type: :request do
   end
 
   context "update_from_params" do
-    before do
+    before :once do
       course_with_teacher(:active_all => true)
       @assignment = @course.assignments.create!(:title => "some assignment")
     end

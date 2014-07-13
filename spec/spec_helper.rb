@@ -432,6 +432,7 @@ end
       c.before :record do
         Account.clear_special_account_cache!
         AdheresToPolicy::Cache.clear
+        Folder.reset_path_lookups!
       end
     end
 
@@ -477,6 +478,7 @@ end
     Notification.reset_cache!
     ActiveRecord::Base.reset_any_instantiation!
     Attachment.clear_cached_mime_ids
+    Folder.reset_path_lookups!
     RoleOverride.clear_cached_contexts
     Delayed::Job.redis.flushdb if Delayed::Job == Delayed::Backend::Redis::Job
     Rails::logger.try(:info, "Running #{self.class.description} #{@method_name}")
@@ -629,7 +631,6 @@ end
     pseudonym(user, opts)
     @pseudonym.sis_user_id = opts[:sis_user_id] || "U001"
     @pseudonym.save!
-    @pseudonym.should be_managed_password
     @pseudonym
   end
 
@@ -1517,6 +1518,59 @@ end
         scope.all.reverse :
         scope.pluck(:id).reverse
     end
+  end
+
+  # create a bunch of courses at once, optionally enrolling a user in them
+  # records can either be the number of records to create, or an array of
+  # hashes of attributes you want to insert
+  def create_courses(records, options = {})
+    account = options[:account] || Account.default
+    records = records.times.map{ {} } if records.is_a?(Fixnum)
+    records = records.map { |record| course_valid_attributes.merge(account_id: account.id, root_account_id: account.id, workflow_state: 'available', enrollment_term_id: account.default_enrollment_term.id).merge(record) }
+    course_data = create_records(Course, records, options[:return_type])
+    course_ids = options[:return_type] == :record ?
+      course_data.map(&:id) :
+      course_data
+
+    if options[:account_associations]
+      create_records(CourseAccountAssociation, course_ids.map{ |id| {account_id: account.id, course_id: id, depth: 0}})
+    end
+    if user = options[:enroll_user]
+      section_ids = create_records(CourseSection, course_ids.map{ |id| {course_id: id, root_account_id: account.id, name: "Default Section", default_section: true}})
+      type = options[:enrollment_type] || "TeacherEnrollment"
+      create_records(Enrollment, course_ids.each_with_index.map{ |id, i| {course_id: id, user_id: user.id, type: type, course_section_id: section_ids[i], root_account_id: account.id, workflow_state: 'active'}})
+    end
+    course_data
+  end
+
+  def create_users(records, options = {})
+    records = records.times.map{ {} } if records.is_a?(Fixnum)
+    records = records.map { |record| valid_user_attributes.merge(workflow_state: "registered").merge(record) }
+    create_records(User, records, options[:return_type])
+  end
+
+  # create a bunch of users at once, and enroll them all in the same course
+  def create_users_in_course(course, records, options = {})
+    user_data = create_users(records, options)
+    create_enrollments(course, user_data, options)
+
+    user_data
+  end
+
+  def create_enrollments(course, users, options = {})
+    user_ids = users.first.is_a?(User) ?
+      users.map(&:id) :
+      users
+
+    section_id = options[:section_id] || course.default_section.id
+    type = options[:enrollment_type] || "StudentEnrollment"
+    create_records(Enrollment, user_ids.map{ |id| {course_id: course.id, user_id: id, type: type, course_section_id: section_id, root_account_id: course.account.id, workflow_state: 'active'}})
+  end
+
+  def create_assignments(course_ids, count_per_course = 1, fields = {})
+    course_ids = Array(course_ids)
+    course_ids *= count_per_course
+    create_records(Assignment, course_ids.each_with_index.map { |id, i| {context_id: id, context_type: 'Course', context_code: "course_#{id}", title: "#{id}:#{i}", workflow_state: 'published'}.merge(fields)})
   end
 end
 

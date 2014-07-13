@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 
 describe Quizzes::QuizQuestionsController, type: :request do
   context 'as a teacher' do
-    before do
+    before :once do
       @course = course
       teacher_in_course active_all: true
       @quiz = @course.quizzes.create!(:title => "A Sample Quiz")
@@ -96,8 +96,8 @@ describe Quizzes::QuizQuestionsController, type: :request do
   end
 
   context 'as a student' do
-    before do
-      course_with_student_logged_in :active_all => true
+    before :once do
+      course_with_student :active_all => true
 
       @quiz = @course.quizzes.create!(:title => 'quiz')
       @quiz.published_at = Time.now
@@ -128,7 +128,7 @@ describe Quizzes::QuizQuestionsController, type: :request do
     end
 
     context 'whom has started a quiz' do
-      before do
+      before :once do
         @quiz.generate_submission(@student)
       end
 
