@@ -16,7 +16,7 @@ if CANVAS_RAILS2
   gem 'authlogic', '2.1.3'
 
   gem 'instructure-active_model-better_errors', '1.6.5.rails2.3', :require => 'active_model/better_errors'
-  gem 'encrypted_cookie_store-instructure', '1.0.5', :require => 'encrypted_cookie_store'
+  gem 'encrypted_cookie_store-instructure', '1.0.6', :require => 'encrypted_cookie_store'
   gem 'erubis', '2.7.0'
   gem 'fake_arel', '1.5.0'
   gem 'fake_rails3_routes', '1.0.4'
@@ -31,7 +31,7 @@ else
   gem 'authlogic', '3.3.0'
   gem 'active_model-better_errors', '1.6.7', :require => 'active_model/better_errors'
   gem 'dynamic_form', '1.1.4'
-  gem 'encrypted_cookie_store-instructure', '1.1.3', :require => 'encrypted_cookie_store'
+  gem 'encrypted_cookie_store-instructure', '1.1.4', :require => 'encrypted_cookie_store'
   gem 'rails-patch-json-encode', '0.0.1'
   gem 'rack', '1.4.5'
   gem 'routing_concerns', '0.1.0'
