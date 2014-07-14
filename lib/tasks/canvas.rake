@@ -260,4 +260,8 @@ namespace :db do
   end
 end
 
+if CANVAS_RAILS3
+  %w{db:pending_migrations db:migrate:predeploy db:migrate:postdeploy}.each { |task_name| Switchman.shardify_task(task_name) }
+end
+
 end

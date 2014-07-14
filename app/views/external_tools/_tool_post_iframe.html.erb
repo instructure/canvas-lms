@@ -1,0 +1,29 @@
+<form action="<%= @resource_url %>"
+      class="hide"
+      method="POST" target="tool_content"
+      id="tool_form"
+      data-tool-launch-type="<%= @tool_launch_type %>"
+      data-tool-id="<%= @tool_id %>"
+      data-tool-path="<%= @tool_path %>">
+  <% @tool_settings.each do |key, value| %>
+    <%= hidden_field_tag key, value %>
+  <% end %>
+  <% if @tag.try(:new_tab) %>
+    <div style="margin-bottom: 20px;">
+      <div class="load_tab">
+        <%= t :new_tab, "This tool needs to be loaded in a new browser window" %>
+        <div style="margin: 10px 0;">
+          <button class="btn" type="submit" data-expired_message="<%= t :new_tab_expired, "The session for this tool has expired. Please reload the page to access the tool again" %>"><%= t :load_tool_new_tab_button, "Load %{tool} in a new window", :tool => @tool.name %></button>
+        </div>
+      </div>
+      <div class="tab_loaded" style="display: none;">
+        <%= t :new_tab_loaded, "This tool was successfully loaded in a new browser window. Reload the page to access the tool again." %>
+      </div>
+    </div>
+  <% else %>
+    <button class="btn" type="submit"><%= t :load_tool_button, "Load %{tool}", :tool => @resource_title %></button>
+  <% end %>
+</form>
+
+<%= iframe("about:blank", :name => 'tool_content', :id => 'tool_content', :width => '100%', :height => '400') %>
+

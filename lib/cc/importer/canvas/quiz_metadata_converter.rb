@@ -45,7 +45,7 @@ module CC::Importer::Canvas
       end
 
       if asmnt_node = doc.at_css('assignment')
-        quiz['assignment'] = convert_assignment(asmnt_node)
+        quiz['assignment'] = parse_canvas_assignment_data(asmnt_node)
       end
 
       quiz

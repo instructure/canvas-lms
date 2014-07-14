@@ -87,6 +87,10 @@ describe InfoController do
     it "should set the locale for translated help link text from the current user" do
       user = User.create!(locale: 'es')
       user_session(user)
+      # create and save account instance so that we don't invoke I18n's
+      # localizer lambda in a request filter prior to loading necessary
+      # users, accounts, context etc.
+      Account.default
       get 'help_links'
       (I18n.locale.to_s).should == 'es'
     end

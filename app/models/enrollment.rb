@@ -348,6 +348,7 @@ class Enrollment < ActiveRecord::Base
   def create_linked_enrollment_for(observer)
     # we don't want to create a new observer enrollment if one exists
     return true if linked_enrollment_for(observer)
+    return false unless observer.can_be_enrolled_in_course?(course)
     enrollment = observer.observer_enrollments.build
     enrollment.associated_user_id = user_id
     enrollment.update_from(self)
@@ -627,7 +628,10 @@ class Enrollment < ActiveRecord::Base
   def destroy
     self.workflow_state = 'deleted'
     result = self.save
-    self.user.try(:update_account_associations) if result
+    if result
+      self.user.try(:update_account_associations)
+      self.user.touch
+    end
     result
   end
 
@@ -941,13 +945,13 @@ class Enrollment < ActiveRecord::Base
   def assign_uuid
     # DON'T use ||=, because that will cause an immediate save to the db if it
     # doesn't already exist
-    self.uuid = CanvasUuid::Uuid.generate_securish_uuid if !read_attribute(:uuid)
+    self.uuid = CanvasSlug.generate_securish_uuid if !read_attribute(:uuid)
   end
   protected :assign_uuid
 
   def uuid
     if !read_attribute(:uuid)
-      self.update_attribute(:uuid, CanvasUuid::Uuid.generate_securish_uuid)
+      self.update_attribute(:uuid, CanvasSlug.generate_securish_uuid)
     end
     read_attribute(:uuid)
   end

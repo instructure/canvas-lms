@@ -4,13 +4,20 @@ define([
   'jqueryui/dialog'
 ], function(I18n, $) {
 
-$(document).ready(function() {
-  $(".show_rubric_link").click(function(event) {
-    event.preventDefault();
-    var url = $(this).attr('rel');
+
+  function ready($dialog) {
+    $dialog = $("#rubrics.rubric_dialog");
+    $dialog.dialog({
+      title: I18n.t('titles.details', "Assignment Rubric Details"),
+      width: 600,
+      resizable: true
+    });
+  }
+
+  function createRubricDialog (url) {
     var $dialog = $("#rubrics.rubric_dialog");
     if($dialog.length) {
-      ready();
+      ready($dialog);
     } else {
       var $loading = $("<div/>");
       $loading.text(I18n.t('loading', "Loading..."));
@@ -23,18 +30,19 @@ $(document).ready(function() {
         $("body").append(html);
         $loading.dialog('close');
         $loading.remove();
-        ready();
+        ready($dialog);
       });
     }
-    function ready() {
-      $dialog = $("#rubrics.rubric_dialog");
-      $dialog.dialog({
-        title: I18n.t('titles.details', "Assignment Rubric Details"),
-        width: 600,
-        resizable: true
-      });
-    }
+  }
+
+  $(document).ready(function() {
+    $(".show_rubric_link").click(function(event) {
+      event.preventDefault();
+      var url = $(this).attr('rel');
+      createRubricDialog(url);
+    });
   });
-});
+
+  return createRubricDialog;
 
 });

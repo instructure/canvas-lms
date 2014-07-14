@@ -59,7 +59,8 @@
 #         "sis_import_id": {
 #           "description": "The id of the SIS import.  This field is only included if the user came from a SIS import and has permissions to manage SIS information.",
 #           "example": "18",
-#           "type": "int64"
+#           "type": "integer",
+#           "format": "int64"
 #         },
 #         "sis_login_id": {
 #           "description": "DEPRECATED: The SIS login ID associated with the user. Please use the sis_user_id or login_id. This field will be removed in a future version of the API.",
@@ -147,7 +148,7 @@ class UsersController < ApplicationController
         :service => 'google_docs',
         :token => request_token.token,
         :secret => request_token.secret,
-        :user_secret => CanvasUuid::Uuid.generate(nil, 16),
+        :user_secret => CanvasSlug.generate(nil, 16),
         :return_url => return_to_url,
         :user => @real_current_user || @current_user,
         :original_host_with_port => request.host_with_port
@@ -185,7 +186,7 @@ class UsersController < ApplicationController
     elsif params[:service] == "facebook"
       oauth_request = OauthRequest.create(
         :service => 'facebook',
-        :secret => CanvasUuid::Uuid.generate("fb", 10),
+        :secret => CanvasSlug.generate("fb", 10),
         :return_url => return_to_url,
         :user => @current_user,
         :original_host_with_port => request.host_with_port

@@ -1,8 +1,8 @@
 define [
   'ember'
   'vendor/d3.v3'
-], ({View}, d3) ->
-  View.extend
+], (Ember, d3) ->
+  Ember.View.extend
     width: 270
     height: 14 * 3
     renderChart: (->

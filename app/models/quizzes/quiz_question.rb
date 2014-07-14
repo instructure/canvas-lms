@@ -27,7 +27,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   belongs_to :assessment_question
   belongs_to :quiz_group, class_name: 'Quizzes::QuizGroup'
 
-  EXPORTABL_ATTRIBUTES = [:id, :quiz_id, :quiz_group_id, :assessment_question_id, :question_data, :assessment_question_version, :position, :created_at, :updated_at, :workflow_state]
+  EXPORTABLE_ATTRIBUTES = [:id, :quiz_id, :quiz_group_id, :assessment_question_id, :question_data, :assessment_question_version, :position, :created_at, :updated_at, :workflow_state]
   EXPORTABLE_ASSOCIATIONS = [:quiz, :assessment_question, :quiz_group]
 
   before_save :infer_defaults

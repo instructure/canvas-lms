@@ -320,7 +320,7 @@ describe Attachment do
 
   context "submit_to_scribd!" do
     before do
-      ScribdAPI.stubs(:upload).returns(UUIDSingleton.instance.generate)
+      ScribdAPI.stubs(:upload).returns(CanvasUUID.generate)
     end
 
     describe "submit_to_scribd job" do
@@ -832,34 +832,48 @@ describe Attachment do
   end
 
   context "inferred display name" do
+    before do
+      s3_storage!  # because we don't 'sanitize' filenames with the local backend
+    end
+
     it "should take a normal filename and use it as a diplay name" do
       a = attachment_model(:filename => 'normal_name.ppt')
       a.display_name.should eql('normal_name.ppt')
-    end
-
-    it "should take a normal filename with spaces and convert the underscores to spaces" do
-      a = attachment_model(:filename => 'normal_name.ppt')
-      a.display_name.should eql('normal_name.ppt')
+      a.filename.should eql('normal_name.ppt')
     end
 
     it "should preserve case" do
       a = attachment_model(:filename => 'Normal_naMe.ppt')
       a.display_name.should eql('Normal_naMe.ppt')
+      a.filename.should eql('Normal_naMe.ppt')
     end
 
-    it "should split long names with dashes" do
-      a = attachment_model(:filename => 'this is a long name, over 30 characters long.ppt')
-      a.display_name.should eql('this is a long name, over 30 characters long.ppt')
+    it "should truncate filenames to 255 characters (preserving extension)" do
+      a = attachment_model(:filename => 'My new study guide or case study on this evolution on monkeys even in that land of costa rica somewhere my own point of  view going along with the field experiment I would say or try out is to put them not in wet areas like costa rico but try and put it so its not so long.docx')
+      a.display_name.should eql("My new study guide or case study on this evolution on monkeys even in that land of costa rica somewhere my own point of  view going along with the field experiment I would say or try out is to put them not in wet areas like costa rico but try and put.docx")
+      a.filename.should eql("My+new+study+guide+or+case+study+on+this+evolution+on+monkeys+even+in+that+land+of+costa+rica+somewhere+my+own+point+of++view+going+along+with+the+field+experiment+I+would+say+or+try+out+is+to+put+them+not+in+wet+areas+like+costa+rico+but+try+and+put.docx")
     end
 
-    it "shouldn't try to break up very large words" do
-      a = attachment_model(:filename => 'A long Bulgarian word is neprotifconstitutiondeistveiteneprotifconstitutiondeistveite')
-      a.display_name.should eql('A long Bulgarian word is neprotifconstitutiondeistveiteneprotifconstitutiondeistveite')
+    it "should use no more than half of the 255 characters for the extension" do
+      a = attachment_model(:filename => ("A" * 150) + "." + ("B" * 150))
+      a.display_name.should eql(("A" * 127) + "." + ("B" * 127))
+      a.filename.should eql(("A" * 127) + "." + ("B" * 127))
     end
 
-    it "should truncate filenames that are just too freaking big" do
-      fn = Attachment.new.sanitize_filename('My new study guide or case study on this evolution on monkeys even in that land of costa rica somewhere my own point of  view going along with the field experiment I would say or try out is to put them not in wet areas like costa rico but try and put it so its not so long.docx')
-      fn.should eql("My+new+study+guide+or+case+study+on+this+evolution+on+monkeys+even+in+that+land+of+costa+rica+somewhere+my+own.docx")
+    it "should not split unicode characters when truncating" do
+      a = attachment_model(:filename => "\u2603" * 300)
+      a.display_name.should eql("\u2603" * 255)
+      a.filename.length.should eql(252)
+      a.unencoded_filename.should be_valid_encoding
+      a.unencoded_filename.should eql("\u2603" * 28)
+    end
+
+    it "should not double-escape a root attachment's filename" do
+      a = attachment_model(:filename => 'something with spaces.txt')
+      a.filename.should == 'something+with+spaces.txt'
+      a2 = Attachment.new
+      a2.root_attachment = a
+      a2.sanitize_filename(nil).should == a.filename
     end
   end
 
@@ -1036,7 +1050,27 @@ describe Attachment do
       @a.file_state.should == 'available'
       @a1.reload
       @a1.file_state.should == 'deleted'
+      @a1.replacement_attachment.should eql @a
       deleted.should == [ @a1 ]
+    end
+
+    it "should update replacement pointers to replaced files" do
+      @a.update_attribute(:display_name, 'a1')
+      @a.handle_duplicates(:overwrite)
+      @a1.reload.replacement_attachment.should eql @a
+      again = attachment_with_context(@course, :display_name => 'a1')
+      again.handle_duplicates(:overwrite)
+      @a1.reload.replacement_attachment.should eql again
+    end
+
+    it "should update replacement pointers to replaced-then-renamed files" do
+      @a.update_attribute(:display_name, 'a1')
+      @a.handle_duplicates(:overwrite)
+      @a1.reload.replacement_attachment.should eql @a
+      @a.update_attribute(:display_name, 'renamed')
+      again = attachment_with_context(@course, :display_name => 'renamed')
+      again.handle_duplicates(:overwrite)
+      @a1.reload.replacement_attachment.should eql again
     end
 
     it "should handle renaming duplicates" do
@@ -1064,6 +1098,21 @@ describe Attachment do
       @a2.destroy
       tag2.reload
       tag2.should be_deleted
+    end
+
+    it "should find replacement file by id if name changes" do
+      @a.display_name = 'a1'
+      @a.handle_duplicates(:overwrite)
+      @a.display_name = 'renamed!!'
+      @a.save!
+      @course.attachments.find(@a1.id).should eql @a
+    end
+
+    it "should find replacement file by name if id isn't present" do
+      @a.display_name = 'a1'
+      @a.handle_duplicates(:overwrite)
+      @a1.update_attribute(:replacement_attachment_id, nil)
+      @course.attachments.find(@a1.id).should eql @a
     end
   end
 

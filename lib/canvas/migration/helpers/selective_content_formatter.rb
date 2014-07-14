@@ -138,6 +138,16 @@ module Canvas::Migration::Helpers
       if type == 'attachments'
         hash[:path] = item['path_name']
         hash[:title] = item['file_name']
+      elsif type == 'assessment_question_banks'
+        if hash[:title].blank?  && @migration.context.respond_to?(:assessment_question_banks)
+          if hash[:migration_id] && bank = @migration.context.assessment_question_banks.find_by_migration_id(hash[:migration_id])
+            hash[:title] = bank.title
+          elsif @migration.question_bank_id && default_bank = @migration.context.assessment_question_banks.find_by_id(@migration.question_bank_id)
+            hash[:title] = default_bank.title
+          end
+          hash[:title] ||= @migration.question_bank_name || AssessmentQuestionBank.default_imported_title
+          hash[:migration_id] ||= CC::CCHelper.create_key(hash[:title], 'assessment_question_bank')
+        end
       end
 
       hash = add_linked_resource(type, item, hash)

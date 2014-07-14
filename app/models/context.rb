@@ -228,6 +228,10 @@ module Context
     true
   end
 
+  def concluded?
+    false
+  end
+
   # Public: Boolean flag re: whether a feature is enabled
   # provides defaults for objects that do not include FeatureFlags
   # (note: include Context _before_ FeatureFlags)

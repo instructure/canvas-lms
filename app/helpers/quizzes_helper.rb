@@ -432,7 +432,8 @@ module QuizzesHelper
       res.gsub! /\{\{question_[^}]+\}\}/, ""
     end
 
-    res
+    # all of our manipulation lost this flag - reset it
+    res.html_safe
   end
 
   def multiple_dropdowns_question(options)
@@ -441,7 +442,7 @@ module QuizzesHelper
     answer_list = hash_get(options, :answer_list)
     res      = user_content hash_get(question, :question_text)
     index  = 0
-    res.gsub %r{<select.*?name=['"](question_.*?)['"].*?>.*?</select>} do |match|
+    res.to_str.gsub %r{<select.*?name=['"](question_.*?)['"].*?>.*?</select>} do |match|
       if answer_list && !answer_list.empty?
         a = answer_list[index]
         index += 1
@@ -449,7 +450,7 @@ module QuizzesHelper
         a = hash_get(answers, $1)
       end
       match.sub(%r{(<option.*?value=['"]#{ERB::Util.h(a)}['"])}, '\\1 selected')
-    end
+    end.html_safe
   end
 
   def duration_in_minutes(duration_seconds)

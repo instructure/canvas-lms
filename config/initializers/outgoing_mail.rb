@@ -23,8 +23,16 @@ Rails.configuration.to_prepare do
   IncomingMailProcessor::MailboxAccount.default_outgoing_email = HostUrl.outgoing_email_address
 end
 
-# delivery_method can be :smtp, :sendmail or :test
+# delivery_method can be :smtp, :sendmail, :letter_opener, or :test
 ActionMailer::Base.delivery_method = config[:delivery_method]
+
+if config[:delivery_method].to_sym == :letter_opener && CANVAS_RAILS2
+  Rails.configuration.after_initialize do
+    ActionMailer::Base.delivery_method = :letter_opener
+    ActionMailer::Base.custom_letter_opener_mailer = LetterOpener::DeliveryMethod.new(:location => Rails.root.join("tmp", "letter_opener"))
+  end
+end
+
 ActionMailer::Base.perform_deliveries = config[:perform_deliveries] if config.has_key?(:perform_deliveries)
 
 case config[:delivery_method]

@@ -2,6 +2,7 @@ define [
   'ember'
   '../start_app'
   'i18n!quizzes'
+  '../environment_setup'
 ], (Em, startApp, I18n) ->
 
   {run} = Em

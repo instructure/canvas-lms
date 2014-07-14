@@ -52,7 +52,7 @@
          aria-owns="{{id}}-content-1" href="#">
           <i class="icon-settings"></i>
           <i class="icon-mini-arrow-down"></i>
-          <span class="screenreader-only">{{#t "settings"}}settings{{/t}}</span>
+          <span class="screenreader-only">{{#t "settings"}}Settings{{/t}}</span>
         </a>
         <ul id="{{id}}-content-1" class="al-options" role="menu" aria-hidden="true" aria-expanded="false" aria-activedescendant="{{id}}-content-2">
           {{#if permissions.update}}
@@ -61,7 +61,6 @@
                   class="icon-edit edit_conference_link"
                   id="{{id}}-content-2"
                   role="menuitem"
-                  aria-label="{{#t "edit"}}Edit{{/t}}"
                   title="{{#t "edit"}}Edit{{/t}}">{{#t "edit"}}Edit{{/t}}</a>
             </li>
           {{/if}}

@@ -25,8 +25,10 @@ class RubricAssociation < ActiveRecord::Base
   attr_accessible :rubric, :association_object, :context, :use_for_grading, :title, :description, :summary_data, :purpose, :url, :hide_score_total, :bookmarked
   belongs_to :rubric
   belongs_to :association_object, :polymorphic => true, :foreign_type => :association_type, :foreign_key => :association_id
+  validates_inclusion_of :association_type, 'allow_nil' => true, :in => ['Account', 'Course', 'Assignment']
 
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account']
   has_many :rubric_assessments, :dependent => :nullify
   has_many :assessment_requests, :dependent => :destroy
 
@@ -139,7 +141,7 @@ class RubricAssociation < ActiveRecord::Base
     given {|user, session| self.cached_context_grants_right?(user, session, :manage) }
     can :update and can :delete and can :manage and can :assess
     
-    given {|user, session| user && @assessing_user_id && self.assessment_requests.for_assessee(@assessing_user_id).map{|r| r.assessor_id}.include?(user.id) }
+    given {|user| user && @assessing_user_id && self.assessment_requests.for_assessee(@assessing_user_id).map{|r| r.assessor_id}.include?(user.id) }
     can :assess
     
     given {|user, session| self.cached_context_grants_right?(user, session, :participate_as_student) }

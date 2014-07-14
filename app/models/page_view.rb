@@ -28,6 +28,7 @@ class PageView < ActiveRecord::Base
   before_save :ensure_account
   before_save :cap_interaction_seconds
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account', 'Group', 'User', 'UserProfile']
 
   EXPORTABLE_ATTRIBUTES = [
     :request_id, :session_id, :user_id, :url, :context_id, :context_type, :asset_id, :asset_type, :controller, :action, :interaction_seconds, :created_at, :updated_at,
@@ -51,8 +52,8 @@ class PageView < ActiveRecord::Base
     self.new(attributes).tap do |p|
       p.url = LoggingFilter.filter_uri(request.url)[0,255]
       p.http_method = CANVAS_RAILS2 ? request.method.to_s.downcase : request.request_method.downcase
-      p.controller = request.path_parameters['controller']
-      p.action = request.path_parameters['action']
+      p.controller = request.path_parameters[:controller]
+      p.action = request.path_parameters[:action]
       p.session_id = request.session_options[:id].to_s.force_encoding(Encoding::UTF_8).presence
       p.user_agent = request.user_agent
       p.remote_ip = request.remote_ip

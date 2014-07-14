@@ -148,9 +148,21 @@ module Canvas::Oauth
         Token.generate_code_for(1, 1).should == code
       end
 
-      it 'sets the new data hash into redis' do
+      it 'sets the new data hash into redis with 10 min ttl' do
         redis = Object.new
-        redis.expects(:setex)
+        code_data = {user: 1, client_id: 1, scopes: nil, purpose: nil, remember_access: nil}
+        #should have 10 min (in seconds) ttl passed as second param
+        redis.expects(:setex).with('oauth2:brand_new_code', 600, code_data.to_json)
+        Canvas.stubs(:redis => redis)
+        Token.generate_code_for(1, 1)
+      end
+
+      it 'sets the new data hash into redis with 10 sec ttl' do
+        redis = Object.new
+        code_data = {user: 1, client_id: 1, scopes: nil, purpose: nil, remember_access: nil}
+        #should have 10 sec ttl passed as second param with setting
+        Setting.set('oath_token_request_timeout', '10')
+        redis.expects(:setex).with('oauth2:brand_new_code', 10, code_data.to_json)
         Canvas.stubs(:redis => redis)
         Token.generate_code_for(1, 1)
       end

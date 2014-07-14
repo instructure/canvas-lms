@@ -106,7 +106,7 @@ describe "grades" do
       f('#navpills').should_not be_nil
       f('a[href="#outcomes"]').click
       wait_for_ajaximations
-      ff('#outcomes li').count.should == @course.learning_outcome_links.count
+      ff('#outcomes li.outcome').count.should == @course.learning_outcome_links.count
     end
 
     context 'student view' do

@@ -6,6 +6,12 @@
   <%= t('assignment_created', 'Assignment Created - %{assignment_name}, %{course_name}', :assignment_name => asset.title, :course_name => asset.context.name) %>
 <% end %>
 
+<% define_content :footer_link do %>
+  <a href="<%= content(:link) %>">
+    <%= t :link_text, 'View the assignment' %>
+  </a>
+<% end %>
+
 <p><%= t('new_assignment', 'A new assignment has been created for your course, %{course_name}',
          :course_name => asset.context.name) %></p>
 
@@ -28,13 +34,3 @@
   <%= t('no_due_date', 'No Due Date') %>
 <% end %>
 </p>
-
-<hr style="border: 0;
-    height: 1px;
-    background: #333;
-    background-image: -webkit-linear-gradient(left, #ddd, #aaa, #eee);
-    background-image:    -moz-linear-gradient(left, #ddd, #aaa, #eee);
-    background-image:     -ms-linear-gradient(left, #ddd, #aaa, #eee);
-    background-image:      -o-linear-gradient(left, #ddd, #aaa, #eee);" />
-
-<p><a href="<%= content :link %>"><%= t :link_text, 'View the assignment' %></a></p>

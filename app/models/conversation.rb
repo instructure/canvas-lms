@@ -26,6 +26,7 @@ class Conversation < ActiveRecord::Base
   has_many :conversation_message_participants, :through => :conversation_messages
   has_one :stream_item, :as => :asset
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Account', 'Course', 'Group']
 
   EXPORTABLE_ATTRIBUTES = [:id, :has_attachments, :has_media_objects, :tags, :root_account_ids, :subject, :context_type, :context_id]
   EXPORTABLE_ASSOCATIONS = [:context]
@@ -315,7 +316,10 @@ class Conversation < ActiveRecord::Base
         cps = cps.where("user_id NOT IN (?)", skip_users.map(&:user_id)) if skip_users.present?
       end
 
-      cps = cps.where(:user_id => (options[:only_users]+[message.author]).map(&:id)) if options[:only_users]
+      if options[:only_users]
+        options[:only_users] << message.author
+        cps = cps.where(:user_id => (options[:only_users]).map(&:id))
+      end
 
       next unless cps.exists?
 
@@ -492,12 +496,14 @@ class Conversation < ActiveRecord::Base
   def reply_from(opts)
     user = opts.delete(:user)
     message = opts.delete(:text).to_s.strip
-    user = nil unless user && self.conversation_participants.find_by_user_id(user.id)
+    participant = self.conversation_participants.find_by_user_id(user.id)
+    user = nil unless user && participant
     if !user
       raise "Only message participants may reply to messages"
     elsif message.blank?
       raise "Message body cannot be blank"
     else
+      participant.update_attribute(:workflow_state, 'read') if participant.workflow_state == 'unread'
       add_message(user, message, opts)
     end
   end

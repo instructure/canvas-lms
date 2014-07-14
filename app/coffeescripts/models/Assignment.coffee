@@ -286,6 +286,9 @@ define [
         'published', 'htmlUrl', 'htmlEditUrl', 'labelId', 'position', 'postToSIS',
         'multipleDueDates', 'allDates', 'isQuiz', 'singleSectionDueDate'
       ]
+      if ENV.DIFFERENTIATED_ASSIGNMENTS_ENABLED
+        fields.push 'isOnlyVisibleToOverrides'
+
       hash = id: @get 'id'
       for field in fields
         hash[field] = @[field]()
@@ -367,3 +370,7 @@ define [
 
     disabledMessage: ->
       I18n.t('cant_unpublish_when_students_submit', "Can't unpublish if there are student submissions")
+
+    isOnlyVisibleToOverrides: (override_flag) ->
+      return @get('only_visible_to_overrides') || false unless arguments.length > 0
+      @set 'only_visible_to_overrides', override_flag

@@ -322,7 +322,7 @@ class SubmissionsController < ApplicationController
   # * Media comments can be submitted, however, there is no API yet for creating a media comment to submit.
   # * Integration with Google Docs is not yet supported.
   #
-  # @argument comment[text_comment] [String]
+  # @argument comment[text_comment] [Optional, String]
   #   Include a textual comment with the submission.
   #
   # @argument submission[submission_type] [String, "online_text_entry"|"online_url"|"online_upload"|"media_recording"]
@@ -334,19 +334,19 @@ class SubmissionsController < ApplicationController
   #   set to "online_url", otherwise the submission[url] parameter will be
   #   ignored.
   #
-  # @argument submission[body] [String]
+  # @argument submission[body] [Optional, String]
   #   Submit the assignment as an HTML document snippet. Note this HTML snippet
   #   will be sanitized using the same ruleset as a submission made from the
   #   Canvas web UI. The sanitized HTML will be returned in the response as the
   #   submission body. Requires a submission_type of "online_text_entry".
   #
-  # @argument submission[url] [String]
+  # @argument submission[url] [Optional, String]
   #   Submit the assignment as a URL. The URL scheme must be "http" or "https",
   #   no "ftp" or other URL schemes are allowed. If no scheme is given (e.g.
   #   "www.example.com") then "http" will be assumed. Requires a submission_type
   #   of "online_url".
   #
-  # @argument submission[file_ids][] [Integer]
+  # @argument submission[file_ids][] [Optional, Integer]
   #   Submit the assignment as a set of one or more previously uploaded files
   #   residing in the submitting user's files section (or the group's files
   #   section, for group assignments).
@@ -355,14 +355,14 @@ class SubmissionsController < ApplicationController
   #
   #   Requires a submission_type of "online_upload".
   #
-  # @argument submission[media_comment_id] [Integer]
+  # @argument submission[media_comment_id] [Optional, String]
   #   The media comment id to submit. Media comment ids can be submitted via
   #   this API, however, note that there is not yet an API to generate or list
   #   existing media comments, so this functionality is currently of limited use.
   #
   #   Requires a submission_type of "media_recording".
   #
-  # @argument submission[media_comment_type] [String, "audio"|"video"]
+  # @argument submission[media_comment_type] [Optional, String, "audio"|"video"]
   #   The type of media comment being submitted.
   #
   def create
@@ -370,7 +370,7 @@ class SubmissionsController < ApplicationController
     @assignment = @context.assignments.active.find(params[:assignment_id])
     @assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @current_user)
     if authorized_action(@assignment, @current_user, :submit)
-          if @assignment.locked_for?(@current_user) && !@assignment.grants_right?(@current_user, nil, :update)
+      if @assignment.locked_for?(@current_user) && !@assignment.grants_right?(@current_user, nil, :update)
         flash[:notice] = t('errors.can_not_submit_locked_assignment', "You can't submit an assignment when it is locked")
         redirect_to named_context_url(@context, :context_assignment_user, @assignment.id)
         return

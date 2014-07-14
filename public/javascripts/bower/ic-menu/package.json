@@ -1,15 +1,14 @@
 {
   "name": "ic-menu",
-  "version": "0.1.3",
+  "version": "0.1.9",
   "description": "",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
     "test": "testem ci"
   },
   "author": "Ryan Florence <rpflorence@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "ember": "1.2.0",
     "ic-styled": "~1.1.0"
   },
   "devDependencies": {

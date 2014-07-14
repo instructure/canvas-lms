@@ -190,6 +190,10 @@ describe "admin_tools" do
   end
 
   context "Logging" do
+    before do
+      pending "Audit Search is disabled."
+    end
+
     include_examples "cassandra audit logs"
 
     it "should change log types with dropdown" do
@@ -288,6 +292,8 @@ describe "admin_tools" do
     include_examples "cassandra audit logs"
 
     before do
+      pending "Audit Search is disabled"
+
       Timecop.freeze(8.seconds.ago) do
         Auditors::Authentication.record(@student.pseudonyms.first, 'login')
       end
@@ -319,6 +325,8 @@ describe "admin_tools" do
     include_examples "cassandra audit logs"
 
     before do
+      pending "Audit Search is disabled"
+
       Timecop.freeze(8.seconds.ago) do
         course_with_teacher(course: @course, :user => user_with_pseudonym(:name => 'Teacher TestUser'))
         @assignment = @course.assignments.create!(:title => 'Assignment', :points_possible => 10)
@@ -382,6 +390,8 @@ describe "admin_tools" do
     it_should_behave_like "cassandra audit logs"
 
     before do
+      pending "Audit Search is disabled"
+
       course_with_teacher(course: @course, :user => user_with_pseudonym(:name => 'Teacher TestUser'))
 
       load_admin_tools_page
@@ -460,11 +470,28 @@ describe "admin_tools" do
       @event = Auditors::Course.record_updated(@course, @teacher, @course.changes)
 
       show_event_details("Updated", old_name)
+      items = ffj('.ui-dialog dl > dd')
+      items[4].text.should == "Manual"
+      items[5].text.should == "Updated"
+
       cols = ffj('.ui-dialog table:first tbody tr:first td')
       cols.size.should == 3
       cols[0].text.should == "Name"
       cols[1].text.should == old_name
       cols[2].text.should == @course.name
+    end
+
+    it "should show sis batch id if source is sis" do
+      old_name = @course.name
+      @course.name = "Course Updated"
+
+      sis_batch = @account.root_account.sis_batches.create
+      @event = Auditors::Course.record_updated(@course, @teacher, @course.changes, source: :sis, sis_batch: sis_batch)
+
+      show_event_details("Updated", old_name)
+      items = ffj('.ui-dialog dl > dd')
+      items[4].text.should == "SIS"
+      items[5].text.should == sis_batch.id.to_s
     end
 
     it "should show concluded event details" do

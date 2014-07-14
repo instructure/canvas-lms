@@ -1,0 +1,19 @@
+<div class="row">
+  <div class="span4">
+    <label for="section_select" class="text-right-responsive">
+      {{#t 'select_a_section'}}Select a section{{/t}}
+    </label>
+  </div>
+  <div class="span8">
+    {{
+      fast-select
+      id="section_select"
+      class="section_select"
+      items=sections
+      valuePath="id"
+      labelPath="name"
+      labelDefault=sectionSelectDefaultLabel
+      selected=selectedSection
+    }}
+  </div>
+</div>

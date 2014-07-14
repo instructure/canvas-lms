@@ -23,6 +23,7 @@ module DataExportsApi
 
     has_one :job_progress, :class_name => 'Progress', :as => :context
     belongs_to :context, :polymorphic => true
+    validates_inclusion_of :context_type, :allow_nil => true, :in => ['EnrollmentTerm', 'Account', 'Course', 'User']
     belongs_to :user
 
     attr_accessible :user, :context

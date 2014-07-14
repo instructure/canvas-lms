@@ -63,7 +63,7 @@ define [
       equal quiz.get('tQuizType'), tQuizType
 
     setQuizType 'assignment'
-    assertTQuizType I18n.t('assignment', 'Assignment')
+    assertTQuizType I18n.t('graded_quiz', 'Graded Quiz')
 
     setQuizType 'survey'
     assertTQuizType I18n.t('survey', 'Survey')

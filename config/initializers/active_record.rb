@@ -529,7 +529,7 @@ class ActiveRecord::Base
       else
         find_in_batches_with_cursor(options, &block)
       end
-    elsif scope(:find, :order) || scope(:find, :group) || scope(:find, :select).to_s =~ /DISTINCT/i
+    elsif scope(:find, :order) || scope(:find, :group) || scope(:find, :select).to_s =~ /DISTINCT/i || scope(:find, :select) && !scope(:find, :select).include?(primary_key)
       raise ArgumentError.new("GROUP and ORDER are incompatible with :start") if options[:start]
       shard = scope(:find, :shard)
       if shard
@@ -576,11 +576,11 @@ class ActiveRecord::Base
 
   def self.find_in_batches_with_temp_table(options = {})
     batch_size = options[:batch_size] || 1000
-    table = "#{table_name}_find_in_batches_temporary_table"
     scope = scope(:find)
     scope = scope ? scope.dup : {}
     scope.delete(:include)
     sql = with_exclusive_scope(find: scope) { scoped.to_sql }
+    table = "#{table_name}_find_in_batches_temporary_table_#{sql.hash.abs.to_s(36)}"
     if %w{MySQL Mysql2}.include?(connection.adapter_name)
       table_options = " (temp_primary_key MEDIUMINT NOT NULL AUTO_INCREMENT PRIMARY KEY)"
     end
@@ -976,7 +976,7 @@ unless CANVAS_RAILS2
       # already in a transaction (or transactions don't matter); cursor is fine
       if (connection.adapter_name == 'PostgreSQL' && (connection.readonly? || connection.open_transactions > (Rails.env.test? ? 1 : 0))) && !options[:start]
         self.activate { find_in_batches_with_cursor(options, &block) }
-      elsif order_values.any? || group_values.any? || select_values.to_s =~ /DISTINCT/i || uniq_value
+      elsif order_values.any? || group_values.any? || select_values.to_s =~ /DISTINCT/i || uniq_value || select_values.present? && !select_values.map(&:to_s).include?(primary_key)
         raise ArgumentError.new("GROUP and ORDER are incompatible with :start") if options[:start]
         self.activate { find_in_batches_with_temp_table(options, &block) }
       else
@@ -1013,8 +1013,9 @@ unless CANVAS_RAILS2
 
     def find_in_batches_with_temp_table(options = {})
       batch_size = options[:batch_size] || 1000
-      table = "#{table_name}_find_in_batches_temporary_table"
-      connection.execute "CREATE TEMPORARY TABLE #{table} AS #{to_sql}"
+      sql = to_sql
+      table = "#{table_name}_find_in_batches_temporary_table_#{sql.hash.abs.to_s(36)}"
+      connection.execute "CREATE TEMPORARY TABLE #{table} AS #{sql}"
       begin
         index = "temp_primary_key"
         case connection.adapter_name
@@ -1037,10 +1038,7 @@ unless CANVAS_RAILS2
         end
 
         includes = includes_values
-        sql = "SELECT *
-             FROM #{table}
-             ORDER BY #{index} ASC
-             LIMIT #{batch_size}"
+        sql = "SELECT * FROM #{table} ORDER BY #{index} LIMIT #{batch_size}"
         klass.send(:with_exclusive_scope) do
           batch = klass.find_by_sql(sql)
           while !batch.empty?
@@ -1893,8 +1891,21 @@ end
 
 # shims so that AR objects serialized under rails 2 function under rail s3
 if CANVAS_RAILS2
+  class ActiveSupport::Cache::Entry
+    def value
+      Marshal.load(@compressed ? Zlib::Inflate.inflate(@value) : @value) if @value
+    end
+  end
+
   ActiveSupport::Cache::Store.subclasses.map(&:constantize).each do |subclass|
     subclass.class_eval do
+      def read_with_rails3_shim(*args)
+        result = read_without_rails3_shim(*args)
+        result = result.value if ActiveSupport::Cache::Entry === result
+        result
+      end
+      alias_method_chain :read, :rails3_shim
+
       def delete_with_rails3_shim(key, options = nil)
         r1 = delete_without_rails3_shim(key, options)
         r2 = delete_without_rails3_shim("rails3:#{key}", options)

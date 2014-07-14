@@ -1,6 +1,15 @@
-<% define_content :link do %><%= HostUrl.protocol %>://<%= HostUrl.context_host(asset) %>/courses/<%= asset.id %><% end %>
+<% define_content :link do %>
+  <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset) %>/courses/<%= asset.id %>
+<% end %>
+
 <% define_content :subject do %>
   <%= t :subject, "New Course" %>
+<% end %>
+
+<% define_content :footer_link do %>
+  <a href="<%= content(:link) %>">
+    <%= t :link, "Click here to view the course" %>
+  </a>
 <% end %>
 
 <p><%= t :title, "New Course for %{account}", :account => asset.root_account.name %></p>
@@ -20,14 +29,3 @@
     </ul>
   </p>
 <% end %>
-
-<hr style="border: 0;
-    margin-top: 15px;
-    height: 1px;
-    background: #333;
-    background-image: -webkit-linear-gradient(left, #ddd, #aaa, #eee);
-    background-image:    -moz-linear-gradient(left, #ddd, #aaa, #eee);
-    background-image:     -ms-linear-gradient(left, #ddd, #aaa, #eee);
-    background-image:      -o-linear-gradient(left, #ddd, #aaa, #eee);" />
-
-<p><a href="<%= content :link %>"><%= t :link, "Click here to view the course" %></a></p>

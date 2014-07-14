@@ -90,20 +90,6 @@ describe Course do
     end
   end
 
-  context "#old_gradebook_visible?" do
-    it "should return true for small enrollments" do
-      @course.large_roster = false
-      @course.old_gradebook_visible?.should be_true
-    end
-
-    it "should return false when enrollment count is large enough" do
-      enable_cache do
-        Rails.cache.write(['student_count', @course].cache_key, 251)
-        @course.old_gradebook_visible?.should be_false
-      end
-    end
-  end
-
   describe "allow_student_discussion_topics" do
 
     it "should default true" do
@@ -400,6 +386,7 @@ describe Course do
       @course.wiki.front_page.save!
       @course.self_enrollment = true
       @course.sis_source_id = 'sis_id'
+      @course.lti_context_id = 'lti_context_id'
       @course.stuck_sis_fields = [].to_set
       profile = @course.profile
       profile.description = "description"
@@ -421,6 +408,7 @@ describe Course do
       @course.students.should be_empty
       @course.sis_source_id.should be_nil
       @course.self_enrollment_code.should be_nil
+      @course.lti_context_id.should_not be_nil
 
       @new_course.reload
       @new_course.course_sections.should_not be_empty
@@ -432,6 +420,7 @@ describe Course do
       @new_course.syllabus_body.should be_blank
       @new_course.stuck_sis_fields.should == [].to_set
       @new_course.self_enrollment_code.should == self_enrollment_code
+      @new_course.lti_context_id.should be_nil
 
       @course.uuid.should_not == @new_course.uuid
       @course.wiki_id.should_not == @new_course.wiki_id

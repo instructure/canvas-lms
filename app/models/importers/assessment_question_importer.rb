@@ -3,125 +3,90 @@ module Importers
 
     self.item_class = AssessmentQuestion
 
+    def self.preprocess_migration_data(data)
+      return if data['assessment_questions'] && data['assessment_questions']['preprocessed']
+
+      Importers::QuizImporter.preprocess_migration_data(data)
+      Importers::AssessmentQuestionBankImporter.preprocess_migration_data(data)
+
+      data['assessment_questions'] ||= {}
+      data['assessment_questions']['preprocessed'] = true
+    end
+
     def self.process_migration(data, migration)
-      question_data = {:aq_data=>{}, :qq_data=>{}}
+      data = data.with_indifferent_access
+      Importers::AssessmentQuestionImporter.preprocess_migration_data(data) # just in case
+      question_data = {:aq_data => {}, :qq_ids => {}}
       questions = data['assessment_questions'] ? data['assessment_questions']['assessment_questions'] : []
       questions ||= []
-      to_import = migration.to_import 'quizzes'
-      total = questions.length
 
-      # If a question doesn't have a specified question bank
-      # we want to put it in a bank named after the assessment it's in
-      bank_map = {}
-      assessments = data['assessments'] ? data['assessments']['assessments'] : []
-      assessments ||= []
-      assessments.each do |assmnt|
-        next unless assmnt['questions']
-        assmnt['questions'].each do |q|
-          if q["question_type"] == "question_reference"
-            bank_map[q['migration_id']] = [assmnt['title'], assmnt['migration_id']] if q['migration_id']
-          elsif q["question_type"] == "question_group"
-            q['questions'].each do |ref|
-              bank_map[ref['migration_id']] = [assmnt['title'], assmnt['migration_id']] if ref['migration_id']
-            end
-          end
-        end
+      existing_questions = migration.context.assessment_questions.
+          except(:select).
+          select("assessment_questions.id, assessment_questions.migration_id").
+          where("assessment_questions.migration_id IS NOT NULL").
+          index_by(&:migration_id)
+      questions.each do |q|
+        existing_question = existing_questions[q['migration_id']]
+        q['assessment_question_id'] = existing_question.id if existing_question
       end
-      if migration.to_import('assessment_questions') != false || (to_import && !to_import.empty?)
 
-        existing_questions = migration.context.assessment_questions.
-            except(:select).
-            select("assessment_questions.id, assessment_questions.migration_id").
-            where("assessment_questions.migration_id IS NOT NULL").
-            index_by(&:migration_id)
-        questions.each do |q|
-          existing_question = existing_questions[q['migration_id']]
-          q['assessment_question_id'] = existing_question.id if existing_question
+      default_bank = migration.question_bank_id ? migration.context.assessment_question_banks.find_by_id(migration.question_bank_id) : nil
+      migration.question_bank_name = default_bank.title if default_bank
+      default_title = migration.question_bank_name || AssessmentQuestionBank.default_imported_title
+
+      bank_map = migration.context.assessment_question_banks.reload.index_by(&:migration_id)
+      bank_map[CC::CCHelper.create_key(default_title, 'assessment_question_bank')] = default_bank if default_bank
+
+      questions.each do |question|
+        question_data[:aq_data][question['migration_id']] = question
+
+        bank_mig_id = question[:question_bank_migration_id] || CC::CCHelper.create_key(default_title, 'assessment_question_bank')
+        next unless migration.import_object?("assessment_question_banks", bank_mig_id)
+
+        question_bank = bank_map[bank_mig_id]
+
+        if !question_bank
+          question_bank = migration.context.assessment_question_banks.new
+          if bank_hash = data['assessment_question_banks'].detect{|qb_hash| qb_hash['migration_id'] == bank_mig_id}
+            question_bank.title = bank_hash['title']
+          end
+          question_bank.title ||= default_title
+          question_bank.migration_id = bank_mig_id
+          question_bank.save!
+          migration.add_imported_item(question_bank)
+          bank_map[question_bank.migration_id] = question_bank
         end
 
-        logger.debug "adding #{total} assessment questions"
+        if question_bank.workflow_state == 'deleted'
+          question_bank.workflow_state = 'active'
+          question_bank.save!
+        end
 
-        default_bank = migration.question_bank_id ? migration.context.assessment_question_banks.find_by_id(migration.question_bank_id) : nil
-        banks = {}
-        questions.each do |question|
-          question_bank = nil
-          question[:question_bank_name] = nil if question[:question_bank_name] == ''
-          question[:question_bank_name], question[:question_bank_migration_id] = bank_map[question[:migration_id]] if question[:question_bank_name].blank?
-          if default_bank
-            question_bank = default_bank
-          else
-            question[:question_bank_name] ||= migration.question_bank_name
-            question[:question_bank_name] ||= AssessmentQuestionBank.default_imported_title
-          end
-          if question[:assessment_question_migration_id] && !migration.migration_settings[:import_quiz_questions_without_quiz]
-            question_data[:qq_data][question['migration_id']] = question
-            next
-          end
-          next if question[:question_bank_migration_id] &&
-              !migration.import_object?("quizzes", question[:question_bank_migration_id]) &&
-              !migration.import_object?("assessment_question_banks", question[:question_bank_migration_id])
+        begin
+          question = self.import_from_migration(question, migration.context, migration, question_bank)
 
-          if !question_bank
-            hash_id = "#{question[:question_bank_id]}_#{question[:question_bank_name]}"
-            if !banks[hash_id]
-              bank_mig_id = question[:question_bank_id] || question[:question_bank_migration_id]
-              unless bank = migration.context.assessment_question_banks.find_by_title_and_migration_id(question[:question_bank_name], bank_mig_id)
-                bank = migration.context.assessment_question_banks.new
-                bank.title = question[:question_bank_name]
-                bank.migration_id = bank_mig_id
-                bank.save!
-              end
-              if bank.workflow_state == 'deleted'
-                bank.workflow_state = 'active'
-                bank.save!
-              end
-              banks[hash_id] = bank
-            end
-            question_bank = banks[hash_id]
+          # If the question appears to have links, we need to translate them so that file links point
+          # to the AssessmentQuestion. Ideally we would just do this before saving the question, but
+          # the link needs to include the id of the AQ, which we don't have until it's saved. This will
+          # be a problem as long as we use the question as a context for its attachments. (We're turning this
+          # hash into a string so we can quickly check if anywhere in the hash might have a URL.)
+          if question.to_s =~ %r{/files/\d+/(download|preview)}
+            AssessmentQuestion.find(question[:assessment_question_id]).translate_links
           end
 
-          begin
-            question = self.import_from_migration(question, migration.context, migration, question_bank)
-
-            # If the question appears to have links, we need to translate them so that file links point
-            # to the AssessmentQuestion. Ideally we would just do this before saving the question, but
-            # the link needs to include the id of the AQ, which we don't have until it's saved. This will
-            # be a problem as long as we use the question as a context for its attachments. (We're turning this
-            # hash into a string so we can quickly check if anywhere in the hash might have a URL.)
-            if question.to_s =~ %r{/files/\d+/(download|preview)}
-              AssessmentQuestion.find(question[:assessment_question_id]).translate_links
-            end
-
-            question_data[:aq_data][question['migration_id']] = question
-          rescue
-            migration.add_import_warning(t('#migration.quiz_question_type', "Quiz Question"), question[:question_name], $!)
-          end
+          question_data[:aq_data][question['migration_id']] = question
+        rescue
+          migration.add_import_warning(t('#migration.quiz_question_type', "Quiz Question"), question[:question_name], $!)
         end
       end
 
       question_data
     end
 
-    def self.import_from_migration(hash, context, migration=nil, bank=nil, options={})
+    def self.import_from_migration(hash, context, migration, bank, options={})
       hash = hash.with_indifferent_access
-      if !bank
-        hash[:question_bank_name] = nil if hash[:question_bank_name] == ''
-        hash[:question_bank_name] ||= AssessmentQuestionBank::default_imported_title
-        migration_id = hash[:question_bank_id] || hash[:question_bank_migration_id]
-        unless bank = AssessmentQuestionBank.find_by_context_type_and_context_id_and_title_and_migration_id(context.class.to_s, context.id, hash[:question_bank_name], migration_id)
-          bank ||= context.assessment_question_banks.new
-          bank.title = hash[:question_bank_name]
-          bank.migration_id = migration_id
-          bank.save!
-        end
-        if bank.workflow_state == 'deleted'
-          bank.workflow_state = 'active'
-          bank.save!
-        end
-      end
       hash.delete(:question_bank_migration_id) if hash.has_key?(:question_bank_migration_id)
 
-      migration.add_imported_item(bank) if migration
       self.prep_for_import(hash, context, migration)
 
       missing_links = hash.delete(:missing_links) || {}
@@ -159,6 +124,7 @@ module Importers
     end
 
     def self.prep_for_import(hash, context, migration=nil)
+      return hash if hash[:prepped_for_import]
       hash[:missing_links] = {}
       [:question_text, :correct_comments_html, :incorrect_comments_html, :neutral_comments_html, :more_comments_html].each do |field|
         hash[:missing_links][field] = []

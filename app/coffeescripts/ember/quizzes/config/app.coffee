@@ -6,12 +6,12 @@ define [
   '../../shared/components/ic_actions_component'
   '../../shared/components/ic_publish_icon_component'
   './date_transform'
-], (Ember, env, Util, FastSelectComponent) ->
+], (Ember, env, Util, FastSelectComponent, ConfirmDialogComponent, FormDialogComponent) ->
   Ember.Util = Util
 
   Ember.onLoad 'Ember.Application', (Application) ->
     Application.initializer
-      name: 'FastSelectComponent'
+      name: 'SharedComponents'
       initialize: (container, application) ->
         container.register 'component:fast-select', FastSelectComponent
     Application.initializer
@@ -19,10 +19,12 @@ define [
       initialize: (container, application) ->
         env.setEnv(window.ENV)
 
-  Ember.Inflector.inflector.irregular('quizStatistics', 'quizStatistics')
-  Ember.Inflector.inflector.irregular('questionStatistics', 'questionStatistics')
   Ember.Inflector.inflector.irregular('progress', 'progress')
   Ember.Inflector.inflector.irregular('summaryStatistics', 'summaryStatistics')
+
+  Ember.Inflector.inflector.uncountable('quizstatistics');
+  Ember.Inflector.inflector.uncountable('questionstatistics');
+  Ember.Inflector.inflector.uncountable('question_statistics');
 
   Ember.$.ajaxPrefilter 'json', (options, originalOptions, xhr) ->
     options.dataType = 'json'

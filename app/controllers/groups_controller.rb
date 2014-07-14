@@ -288,8 +288,8 @@ class GroupsController < ApplicationController
 
       format.json do
         path = send("api_v1_#{@context.class.to_s.downcase}_user_groups_url")
-        paginated_groups = Api.paginate(@groups, self, path)
-        render :json => paginated_groups.map { |g| group_json(g, @current_user, session) }
+        paginated_groups = Api.paginate(all_groups, self, path)
+        render :json => paginated_groups.map { |g| group_json(g, @current_user, session, :include => Array(params[:include])) }
       end
     end
   end
@@ -498,13 +498,12 @@ class GroupsController < ApplicationController
       membership = @group.group_memberships.find_by_user_id(attrs[:leader][:id])
       return render :json => {}, :status => :bad_request unless membership
       attrs[:leader] = membership.user
-    else
-      attrs[:leader] = nil
     end
 
     if authorized_action(@group, @current_user, :update)
       respond_to do |format|
         if @group.update_attributes(attrs.slice(*SETTABLE_GROUP_ATTRIBUTES))
+          @group.users.update_all(updated_at: Time.now.utc)
           flash[:notice] = t('notices.update_success', 'Group was successfully updated.')
           format.html { redirect_to clean_return_to(params[:return_to]) || group_url(@group) }
           format.json { render :json => group_json(@group, @current_user, session) }

@@ -6,8 +6,12 @@
   <%= t :subject, "Quiz Submitted: %{quiz}, %{context}", :quiz => asset.quiz.title, :context => asset.assignment.context.name %>
 <% end %>
 
+<% define_content :footer_link do %>
+  <a href="<%= content(:link) %>">
+    <%= t :link_message, "You can review the submission here" %>
+  </a>
+<% end %>
+
 <p><%= t :body, "%{user_name} has completed the quiz %{quiz_title}, and it requires manual grading.", :user_name => asset.user.name, :quiz_title => asset.quiz.title %></p>
 
 <p><%= t :submitted_date, "submitted: %{date}", :date => datetime_string(force_zone(asset.finished_at))  %></p>
-
-<p><a href="<%= content :link %>"><%= t :link_message, "You can review the submission here" %></a></p>

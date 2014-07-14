@@ -24,6 +24,7 @@ class Collaboration < ActiveRecord::Base
   attr_readonly   :collaboration_type
 
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Group']
   belongs_to :user
   has_many :collaborators, :dependent => :destroy
   has_many :users, :through => :collaborators
@@ -63,7 +64,7 @@ class Collaboration < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user, session|
+    given { |user|
       !self.new_record? &&
         (self.user_id == user.id ||
          self.users.include?(user) ||
@@ -277,7 +278,7 @@ class Collaboration < ActiveRecord::Base
   #
   # Returns a UUID string.
   def assign_uuid
-    self.uuid ||= CanvasUuid::Uuid.generate_securish_uuid
+    self.uuid ||= CanvasSlug.generate_securish_uuid
   end
   protected :assign_uuid
 

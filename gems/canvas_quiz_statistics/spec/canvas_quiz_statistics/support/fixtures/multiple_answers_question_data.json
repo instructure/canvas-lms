@@ -1,0 +1,36 @@
+{
+  "id": 17,
+  "regrade_option": false,
+  "points_possible": 1,
+  "correct_comments": "",
+  "incorrect_comments": "",
+  "neutral_comments": "",
+  "question_type": "multiple_answers_question",
+  "question_name": "Question",
+  "name": "Question",
+  "question_text": "<p>A and B, or B and C?</p>",
+  "answers": [
+    {
+      "id": 5514,
+      "text": "A",
+      "comments": "",
+      "weight": 100
+    },
+    {
+      "id": 4261,
+      "text": "B",
+      "comments": "",
+      "weight": 100
+    },
+    {
+      "id": 3322,
+      "text": "C",
+      "comments": "",
+      "weight": 0
+    }
+  ],
+  "text_after_answers": "",
+  "assessment_question_id": 19,
+  "position": 7,
+  "published_at": "2014-04-01T11:47:17Z"
+}

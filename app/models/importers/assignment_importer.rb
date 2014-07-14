@@ -164,7 +164,7 @@ module Importers
         tag = item.create_external_tool_tag(:url => hash[:external_tool_url], :new_tab => hash[:external_tool_new_tab])
         tag.content_type = 'ContextExternalTool'
         if !tag.save
-          context.add_migration_warning(t('errors.import.external_tool_url', "The url for the external tool assignment \"%{assignment_name}\" wasn't valid.", :assignment_name => item.title)) if tag.errors["url"]
+          migration.add_warning(t('errors.import.external_tool_url', "The url for the external tool assignment \"%{assignment_name}\" wasn't valid.", :assignment_name => item.title)) if migration && tag.errors["url"]
           if CANVAS_RAILS2
             item.external_tool_tag = nil
           else

@@ -254,7 +254,7 @@ class CoursesController < ApplicationController
   include SearchHelper
 
   before_filter :require_user, :only => [:index]
-  before_filter :require_context, :only => [:roster, :locks, :switch_role, :create_file]
+  before_filter :require_context, :only => [:roster, :locks, :create_file, :ping]
 
   include Api::V1::Course
   include Api::V1::Progress
@@ -351,6 +351,13 @@ class CoursesController < ApplicationController
         elsif params[:enrollment_type]
           e_type = "#{params[:enrollment_type].capitalize}Enrollment"
           enrollments = enrollments.reject { |e| e.class.name != e_type }
+        end
+
+        if value_to_boolean(params[:current_domain_only])
+          enrollments = enrollments.select { |e| e.root_account_id == @domain_root_account.id }
+        elsif params[:root_account_id]
+          root_account = api_find_all(Account, [params[:root_account_id]], { limit: 1 }).first
+          enrollments = root_account ? enrollments.select { |e| e.root_account_id == root_account.id } : []
         end
 
         includes = Set.new(Array(params[:include]))
@@ -718,8 +725,7 @@ class CoursesController < ApplicationController
   def user
     get_context
     if authorized_action(@context, @current_user, :read_roster)
-      users = @context.users_visible_to(@current_user)
-      users = users.where(:users => {:id => params[:id]})
+      users = api_find_all(@context.users_visible_to(@current_user), [params[:id]])
       includes = Array(params[:include])
       user_json_preloads(users, includes.include?('email'))
       if includes.include?('enrollments')
@@ -1094,7 +1100,6 @@ class CoursesController < ApplicationController
 
       session[:enrollment_uuid]             = enrollment.uuid
       session[:session_affects_permissions] = true
-      session[:enrollment_as_student]       = true if enrollment.student?
       session[:enrollment_uuid_course_id]   = enrollment.course_id
 
       @pending_enrollment = enrollment
@@ -1368,33 +1373,17 @@ class CoursesController < ApplicationController
       if @current_user and (@show_recent_feedback = @context.user_is_student?(@current_user))
         @recent_feedback = (@current_user && @current_user.recent_feedback(:contexts => @contexts)) || []
       end
+
+      @course_home_sub_navigation_tools = ContextExternalTool.all_tools_for(@context).select(&:has_course_home_sub_navigation?)
+      unless @context.grants_right?(@current_user, session, :manage_content)
+        @course_home_sub_navigation_tools.reject! { |tool| tool.course_home_sub_navigation(:visibility) == 'admins' }
+      end
     else
       # clear notices that would have been displayed as a result of processing
       # an enrollment invitation, since we're giving an error
       flash[:notice] = nil
       render_unauthorized_action
     end
-  end
-
-  def switch_role
-    @enrollments = @context.enrollments.where("workflow_state='active'").for_user(@current_user)
-    @enrollment = @enrollments.sort_by{|e| [e.state_sortable, e.rank_sortable] }.first
-    if params[:role] == 'revert'
-      session.delete("role_course_#{@context.id}")
-      flash[:notice] = t('notices.role_restored', "Your default role and permissions have been restored")
-    elsif (@enrollment && @enrollment.can_switch_to?(params[:role])) || @context.grants_right?(@current_user, session, :manage_admin_users)
-      @temp_enrollment = Enrollment.typed_enrollment(params[:role]).new rescue nil
-      if @temp_enrollment
-        session["role_course_#{@context.id}"] = params[:role]
-        session[:session_affects_permissions] = true
-        flash[:notice] = t('notices.role_switched', "You have switched roles for this course.  You will now see the course in this new role: %{enrollment_type}", :enrollment_type => @temp_enrollment.readable_type)
-      else
-        flash[:error] = t('errors.invalid_role', "Invalid role type")
-      end
-    else
-      flash[:error] = t('errors.unauthorized.switch_roles', "You do not have permission to switch roles")
-    end
-    redirect_to course_url(@context)
   end
 
   def confirm_action
@@ -1743,8 +1732,18 @@ class CoursesController < ApplicationController
 
       if params[:course][:event] && @course.grants_right?(@current_user, session, :change_course_state)
         event = params[:course].delete(:event)
-        @course.process_event(event)
-        Auditors::Course.record_published(@course, @current_user, source: logging_source) if event.to_sym == :offer
+        event = event.to_sym
+        if event == :claim && @course.submissions.with_point_data.exists?
+          flash[:error] = t('errors.unpublish', 'Course cannot be unpublished if student submissions exist.')
+          redirect_to(course_url(@course)) and return
+        else
+          @course.process_event(event)
+          if event == :offer
+            Auditors::Course.record_published(@course, @current_user, source: logging_source)
+          elsif event == :claim
+            Auditors::Course.record_claimed(@course, @current_user, source: logging_source)
+          end
+        end
       end
 
       params[:course][:conclude_at] = params[:course].delete(:end_at) if api_request? && params[:course].has_key?(:end_at)
@@ -1965,5 +1964,9 @@ class CoursesController < ApplicationController
       },
       :PERMISSIONS => permissions,
     })
+  end
+
+  def ping
+    render json: {success: true}
   end
 end

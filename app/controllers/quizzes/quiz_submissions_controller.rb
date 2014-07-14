@@ -210,7 +210,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
           end
         end
 
-        format.json { render :json => attachment.as_json(:methods => :readable_size) }
+        format.any(:json, :jsonapi) { render :json => attachment.as_json(:methods => :readable_size) }
       else
         flash[:notice] = t('still_zipping', "File zipping still in process...")
 
@@ -222,7 +222,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
           redirect_to named_context_url(context, :context_quiz_url, quiz.id)
         end
 
-        format.json { render :json => attachment }
+        format.any(:json, :jsonapi) { render :json => attachment }
       end
     end
   end

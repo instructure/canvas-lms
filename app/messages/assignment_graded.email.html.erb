@@ -6,6 +6,10 @@
   <%= t('assignment_graded', 'Assignment Graded: %{assignment_name}, %{course_name}', :assignment_name => asset.title, :course_name => asset.context.name) %>
 <% end %>
 
-<p><%= t('the_assignment_is_graded', 'The assignment, %{assignment_name}, has been graded.', :assignment_name => asset.title) %></p>
+<% define_content :footer_link do %>
+  <a href="<%= content(:link) %>">
+    <%= t :link, "Click here to view the assignment" %>
+  </a>
+<% end %>
 
-<p><a href="<%= content :link %>"><%= t :link_text, 'View the assignment' %></a></p>
+<p><%= t('the_assignment_is_graded', 'The assignment, %{assignment_name}, has been graded.', :assignment_name => asset.title) %></p>

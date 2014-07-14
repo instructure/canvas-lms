@@ -94,7 +94,7 @@ class CourseSection < ActiveRecord::Base
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_students, :manage_admin_users) }
     can :read
 
-    given { |user, session| self.course.account_membership_allows(user, session, :read_roster) }
+    given { |user| self.course.account_membership_allows(user, :read_roster) }
     can :read
 
     given { |user, session| self.cached_context_grants_right?(user, session, :manage_calendar) }

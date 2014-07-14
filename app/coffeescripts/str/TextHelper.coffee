@@ -67,7 +67,7 @@ define [
             AUTO_LINKIFY_PLACEHOLDER
           else
             link = match
-            link = "http://" + link if link[0..3] == 'www'
+            link = "http://" + link if link[0..3] == 'www.'
             link = encodeURI(link).replace(/'/g, '%27')
             links.push link
             "<a href='#{htmlEscape(link)}'>#{htmlEscape(match)}</a>"

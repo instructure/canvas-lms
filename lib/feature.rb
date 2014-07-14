@@ -27,6 +27,8 @@ class Feature
       next if key == :state && !%w(hidden off allowed on).include?(val)
       instance_variable_set "@#{key}", val
     end
+    # for RootAccount features, "allowed" state is redundant; show "off" instead
+    @root_opt_in = true if @applies_to == 'RootAccount'
   end
 
   def default?
@@ -153,6 +155,20 @@ END
       root_opt_in: false,
       development: false
     },
+    'student_outcome_gradebook' =>
+    {
+      display_name: -> { I18n.t('features.student_outcome_gradebook', 'Student Learning Mastery Gradebook') },
+      description:  -> { I18n.t('student_outcome_gradebook_description', <<-END) },
+Student Learning Mastery Gradebook provides a way for students to quickly view progress
+on course learning outcomes. Outcomes are presented in a Gradebook-like
+format and progress is displayed both as a numerical score and as mastered/near
+mastery/remedial.
+END
+      applies_to: 'Course',
+      state: 'allowed',
+      root_opt_in: false,
+      development: false
+    },
   'post_grades' =>
       {
           display_name: -> { I18n.t('features.post_grades', 'Post Grades to SIS') },
@@ -166,31 +182,6 @@ Aspire (SIS2000), JMC, and any other SIF-enabled SIS that accepts the SIF elemen
           root_opt_in: true,
           development: true
       },
-    'student_outcome_gradebook' =>
-    {
-      display_name: -> { I18n.t('features.student_outcome_gradebook', 'Student Outcome Gradebook') },
-      description:  -> { I18n.t('student_outcome_gradebook_description', <<-END) },
-Student Outcome Gradebook provides a way for students to quickly view progress
-on course learning outcomes. Outcomes are presented in a Gradebook-like
-format and progress is displayed both as a numerical score and as mastered/near
-mastery/remedial.
-END
-      applies_to: 'Course',
-      state: 'hidden',
-      root_opt_in: true,
-      development: true
-    },
-    'screenreader_gradebook' =>
-    {
-      display_name: -> { I18n.t('features.individual_gradebook', 'Individual Gradebook View') },
-      description:  -> { I18n.t('individual_gradebook_description', <<-END) },
-Individual Gradebook View provides a gradebook view that is designed for accessibility.
-END
-      applies_to: 'Course',
-      state: 'on',
-      root_opt_in: true,
-      development: false
-    },
     'differentiated_assignments' =>
     {
       display_name: -> { I18n.t('features.differentiated_assignments', 'Differentiated Assignments') },
@@ -202,6 +193,52 @@ END
       applies_to: 'Course',
       state: 'hidden',
       root_opt_in: true,
+      development: true
+    },
+    'quiz_stats' =>
+    {
+      display_name: -> { I18n.t('features.new_quiz_statistics', 'New Quiz Statistics Page') },
+      description: -> { I18n.t('new_quiz_statistics_desc', <<-END) },
+When Draft State is allowed/on, this enables the new quiz statistics page for an account.
+END
+      applies_to: 'Course',
+      state: 'allowed',
+      development: true,
+      beta: true
+    },
+    'quiz_moderate' =>
+    {
+      display_name: -> { I18n.t('features.new_quiz_moderate', 'New Quiz Moderate Page') },
+      description: -> { I18n.t('new_quiz_moderate_desc', <<-END) },
+When Draft State and Quiz Statistics is allowed/on, this enables the new quiz moderate page for an account.
+END
+      applies_to: 'Course',
+      state: 'hidden',
+      development: true
+    },
+    'student_groups_next' =>
+    {
+      display_name: -> { I18n.t('features.student_groups', 'New Student Groups Page') },
+      description:  -> { I18n.t('student_groups_desc', <<-END) },
+This enables the new student group page for an account. The new page was build to provide a more dynamic group signup
+experience.
+END
+      applies_to: 'RootAccount',
+      state: 'allowed',
+      root_opt_in: true,
+      development: true
+    },
+    'better_file_browsing' =>
+    {
+      display_name: -> { I18n.t('features.better_file_browsing', 'Better File Browsing') },
+      description:  -> { I18n.t('better_file_browsing_description', <<-END) },
+A new, simpler, more user friendly file browsing interface.  If you turn this on at the course level,
+then all of the users in that course will see the new interface.  To get it to show up when someone
+goes to the personal files page for a user ('/files') then you need to turn it on for the account they are a memeber of.
+END
+
+      applies_to: 'Course',
+      state: 'hidden',
       development: true
     }
   )
@@ -248,22 +285,28 @@ END
     definitions.values.select{ |fd| applicable_types.include?(fd.applies_to) }
   end
 
-  def self.default_transitions(context, orig_state)
+  def default_transitions(context, orig_state)
     valid_states = %w(off on)
     valid_states << 'allowed' if context.is_a?(Account)
     (valid_states - [orig_state]).inject({}) do |transitions, state|
-      transitions[state] = { 'locked' => false }
+      transitions[state] = { 'locked' => (state == 'allowed' && @applies_to == 'RootAccount' &&
+          context.is_a?(Account) && context.root_account? && !context.site_admin?) }
       transitions
     end
   end
 
-  def self.transitions(feature, user, context, orig_state)
-    h = Feature.default_transitions(context, orig_state)
-    fd = definitions[feature.to_s]
-    if fd.custom_transition_proc.is_a?(Proc)
-      fd.custom_transition_proc.call(user, context, orig_state, h)
+  def transitions(user, context, orig_state)
+    h = default_transitions(context, orig_state)
+    if @custom_transition_proc.is_a?(Proc)
+      @custom_transition_proc.call(user, context, orig_state, h)
     end
     h
+  end
+
+  def self.transitions(feature_name, user, context, orig_state)
+    fd = definitions[feature_name.to_s]
+    return nil unless fd
+    fd.transitions(user, context, orig_state)
   end
 end
 

@@ -1,0 +1,33 @@
+{
+  "name": "ic-data",
+  "homepage": "https://github.com/instructure/ic-data",
+  "authors": [
+    "Ryan Florence <rpflorence@gmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "ember": "^1.0.0",
+    "ember-data": "~1.0.0-beta.7",
+    "ic-ajax": "~1.0.4"
+  },
+  "devDependencies": {
+    "ember-qunit": "~0.1.8",
+    "ic-ajax": "~1.0.4"
+  },
+  "_release": "86a1d089ea",
+  "_resolution": {
+    "type": "branch",
+    "branch": "folder_stuff",
+    "commit": "86a1d089eaac95d2c892876fb71320f742a5b52b"
+  },
+  "_source": "git://github.com/ryankshaw/ic-data.git",
+  "_target": "folder_stuff",
+  "_originalSource": "git://github.com/ryankshaw/ic-data.git"
+}

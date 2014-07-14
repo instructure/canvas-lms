@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2012 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -38,14 +38,14 @@ class Assignment < ActiveRecord::Base
     :notify_of_update, :time_zone_edited, :turnitin_enabled,
     :turnitin_settings, :context, :position, :allowed_extensions,
     :external_tool_tag_attributes, :freeze_on_copy, :assignment_group_id,
-    :only_visible_to_overrides, :post_to_sis
+    :only_visible_to_overrides, :post_to_sis, :integration_id, :integration_data
 
   EXPORTABLE_ATTRIBUTES = [
     :id, :title, :description, :due_at, :unlock_at, :lock_at, :points_possible, :min_score, :max_score, :mastery_score, :grading_type,
     :submission_types, :workflow_state, :context_id, :context_type, :assignment_group_id, :grading_scheme_id, :grading_standard_id, :location, :created_at,
     :updated_at, :group_category, :submissions_downloads, :peer_review_count, :peer_reviews_due_at, :peer_reviews_assigned, :peer_reviews, :automatic_peer_reviews,
     :all_day, :all_day_date, :could_be_locked, :cloned_item_id, :context_code, :position, :grade_group_students_individually, :anonymous_peer_reviews, :time_zone_edited,
-    :turnitin_enabled, :allowed_extensions, :needs_grading_count, :turnitin_settings, :muted, :group_category_id, :freeze_on_copy, :copied, :only_visible_to_overrides
+    :turnitin_enabled, :allowed_extensions, :needs_grading_count, :turnitin_settings, :muted, :group_category_id, :freeze_on_copy, :copied, :only_visible_to_overrides, :integration_id, :integration_data
   ]
 
   EXPORTABLE_ASSOCIATIONS = [
@@ -68,13 +68,15 @@ class Assignment < ActiveRecord::Base
   has_one :teacher_enrollment, :class_name => 'TeacherEnrollment', :foreign_key => 'course_id', :primary_key => 'context_id', :include => :user, :conditions => ["enrollments.workflow_state = 'active' AND enrollments.type = 'TeacherEnrollment'"]
   has_many :ignores, :as => :asset
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course']
+  validates_length_of :title, :maximum => maximum_string_length, :allow_nil => false, :allow_blank => true
   belongs_to :grading_standard
   belongs_to :group_category
 
   has_one :external_tool_tag, :class_name => 'ContentTag', :as => :context, :dependent => :destroy
   validates_associated :external_tool_tag, :if => :external_tool?
-  validate :validate_draft_state_change, :if => :workflow_state_changed?
   validate :group_category_changes_ok?
+  validate :positive_points_possible?
 
   accepts_nested_attributes_for :external_tool_tag, :update_only => true, :reject_if => proc { |attrs|
     # only accept the url and new_tab params, the other accessible
@@ -94,6 +96,18 @@ class Assignment < ActiveRecord::Base
       end
     end
     true
+  end
+
+  def positive_points_possible?
+    return if self.points_possible.to_i >= 0
+    return unless self.points_possible_changed?
+    errors.add(
+      :points_possible,
+      I18n.t(
+        "invalid_points_possible",
+        "The value of possible points for this assigment must be zero or greater."
+      )
+    )
   end
 
   def group_category_changes_ok?
@@ -139,6 +153,7 @@ class Assignment < ActiveRecord::Base
     updated_at
     post_to_sis
     integration_data
+    integration_id
   )
 
   def external_tool?
@@ -146,6 +161,8 @@ class Assignment < ActiveRecord::Base
   end
 
   validates_presence_of :context_id, :context_type, :workflow_state
+
+  validates_presence_of :title, if: :title_changed?
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
   validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :allowed_extensions, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
@@ -619,15 +636,13 @@ class Assignment < ActiveRecord::Base
     when "percent"
       result = "#{score_to_grade_percent(score)}%"
     when "pass_fail"
-      if self.points_possible.to_f > 0.0
-        passed = score.to_f == self.points_possible.to_f
+      if points_possible && points_possible > 0
+        passed = score > 0
       elsif given_grade
         # the score for a zero-point pass/fail assignment could be considered
         # either pass *or* fail, so look at what the current given grade is
         # instead
         passed = ["complete", "pass"].include?(given_grade)
-      else
-        passed = score.to_f > 0.0
       end
       result = passed ? "complete" : "incomplete"
     when "letter_grade", "gpa_scale"
@@ -933,7 +948,7 @@ class Assignment < ActiveRecord::Base
       :media_comment_id => (opts.delete :media_comment_id),
       :media_comment_type => (opts.delete :media_comment_type),
     }
-    comment[:group_comment_id] = CanvasUuid::Uuid.generate_securish_uuid if group_comment && group
+    comment[:group_comment_id] = CanvasSlug.generate_securish_uuid if group_comment && group
     submissions = []
     find_or_create_submissions(students) do |submission|
       submission_updated = false
@@ -1042,7 +1057,7 @@ class Assignment < ActiveRecord::Base
       res = find_or_create_submissions(students) do |s|
         s.group = group
         s.save! if s.changed?
-        opts[:group_comment_id] = CanvasUuid::Uuid.generate_securish_uuid if group
+        opts[:group_comment_id] = CanvasSlug.generate_securish_uuid if group
         s.add_comment(opts)
         # this is lame, SubmissionComment updates the submission directly in the db
         # in an after_save, and of course Rails doesn't preload the reverse association
@@ -1115,7 +1130,7 @@ class Assignment < ActiveRecord::Base
       context_module_action(homework.student, homework.workflow_state.to_sym)
       if comment && (group_comment || homework == primary_homework)
         hash = {:comment => comment, :author => original_student}
-        hash[:group_comment_id] = CanvasUuid::Uuid.generate_securish_uuid if group_comment && group
+        hash[:group_comment_id] = CanvasSlug.generate_securish_uuid if group_comment && group
         homework.add_comment(hash)
       end
     end
@@ -1360,7 +1375,7 @@ class Assignment < ActiveRecord::Base
         attachments: attachments,
       }
       group, students = group_students(user)
-      comment[:group_comment_id] = CanvasUuid::Uuid.generate_securish_uuid if group
+      comment[:group_comment_id] = CanvasSlug.generate_securish_uuid if group
       find_or_create_submissions(students).map do |submission|
         submission.add_comment(comment)
       end

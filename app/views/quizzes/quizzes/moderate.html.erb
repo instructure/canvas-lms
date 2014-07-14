@@ -2,7 +2,7 @@
   add_crumb @quiz.title, context_url(@context, :context_quiz_url, @quiz)
   add_crumb t(:page_title, 'Moderate Quiz')
 %>
-<% content_for :page_title do %><%= t(:page_title, "Moderate Quiz") %><% end %>
+<% content_for :page_title do %><%= t(:moderate_page_title, "%{title}: Moderate", :title => @quiz.title) %><% end %>
 
 <h2><%= t(:page_title, "Moderate Quiz") %></h2>
 <table id="students" class="<%= 'can_add_attempts' if @quiz.allowed_attempts < 0 %>">

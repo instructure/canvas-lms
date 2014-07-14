@@ -22,6 +22,7 @@ class GroupCategory < ActiveRecord::Base
   attr_accessor :assign_unassigned_members
 
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account']
   has_many :groups, :dependent => :destroy
   has_many :assignments, :dependent => :nullify
   has_many :progresses, :as => 'context', :dependent => :destroy

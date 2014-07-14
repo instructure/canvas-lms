@@ -267,7 +267,6 @@ describe ExternalToolsController, type: :request do
     json = api_call(:get, "/api/v1/#{type}s/#{context.id}/external_tools/#{et.id}.json",
                     {:controller => 'external_tools', :action => 'show', :format => 'json',
                      :"#{type}_id" => context.id.to_s, :external_tool_id => et.id.to_s})
-
     HashDiff.diff(json, example_json(et)).should == []
   end
 
@@ -394,6 +393,7 @@ describe ExternalToolsController, type: :request do
     et.homework_submission = {:url=>"http://www.example.com/ims/lti/editor", :selection_width=>50, :selection_height=>50, :text=>"homework submission"}
     et.resource_selection = {:url=>"http://www.example.com/ims/lti/resource", :text => "", :selection_width=>50, :selection_height=>50}
     et.migration_selection = {:url=>"http://www.example.com/ims/lti/resource", :text => "migration selection", :selection_width=>42, :selection_height=>24}
+    et.course_home_sub_navigation = {:url=>"http://www.example.com/ims/lti/resource", :text => "course home sub navigation", display_type: 'full_width', visibility: 'admins'}
     et.save!
     et
   end
@@ -502,6 +502,14 @@ describe ExternalToolsController, type: :request do
               "label"=>"migration selection",
               "url"=>"http://www.example.com/ims/lti/resource",
               "selection_height"=>24,
-              "selection_width"=>42}}
+              "selection_width"=>42},
+     "course_home_sub_navigation"=>
+             {"text"=>"course home sub navigation",
+              "label"=>"course home sub navigation",
+              "url"=>"http://www.example.com/ims/lti/resource",
+              "visibility"=>'admins',
+              "display_type"=>'full_width',
+              "selection_height"=>400,
+              "selection_width"=>800}}
   end
 end

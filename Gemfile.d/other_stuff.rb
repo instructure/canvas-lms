@@ -25,8 +25,7 @@ if CANVAS_RAILS2
   gem 'folio-pagination-legacy', '0.0.3', :require => 'folio/rails'
   gem 'will_paginate', '2.3.15', :require => false
 else
-  # just to be clear, Canvas is NOT READY to run under Rails 3 in production
-  gem 'rails', '3.2.17'
+  gem 'rails', '3.2.18'
   gem 'active_model_serializers', '0.9.0alpha1',
     :github => 'rails-api/active_model_serializers', :ref => '61882e1e4127facfe92e49057aec71edbe981829'
   gem 'authlogic', '3.3.0'
@@ -36,7 +35,7 @@ else
   gem 'rails-patch-json-encode', '0.0.1'
   gem 'rack', '1.4.5'
   gem 'routing_concerns', '0.1.0'
-  gem 'switchman', '1.2.3'
+  gem 'switchman', '1.2.8'
   gem 'folio-pagination', '0.0.7', :require => 'folio/rails'
   gem 'will_paginate', '3.0.4', :require => false
 end
@@ -85,7 +84,7 @@ gem 'nokogiri', '1.5.6'
 # oauth gem, with rails3 fixes rolled in
 gem 'oauth-instructure', '0.4.10', :require => 'oauth'
 gem 'rack-mini-profiler', '0.9.1', :require => false
-gem 'rake', '10.3.1'
+gem 'rake', '10.3.2'
 gem 'rdoc', '3.12'
 gem 'ratom-instructure', '0.6.9', :require => "atom" # custom gem until necessary changes are merged into mainstream
 gem 'rdiscount', '1.6.8'
@@ -129,6 +128,7 @@ gem 'event_stream', :path => 'gems/event_stream'
 gem 'canvas_mimetype_fu', :path => 'gems/canvas_mimetype_fu'
 gem 'canvas_quiz_statistics', :path => 'gems/canvas_quiz_statistics'
 gem 'canvas_sanitize', :path => 'gems/canvas_sanitize'
+gem 'canvas_slug', :path => 'gems/canvas_slug'
 gem 'canvas_sort', :path => 'gems/canvas_sort'
 gem 'canvas_statsd', :path => 'gems/canvas_statsd'
 gem 'canvas_stringex', :path => 'gems/canvas_stringex'

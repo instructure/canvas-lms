@@ -269,7 +269,8 @@ describe "Outcome Results API", type: :request do
           rollup['links']['user'].should == outcome_student.id.to_s
           rollup['scores'].size.should == 1
           rollup['scores'].each do |score|
-            score.keys.sort.should == %w(links score)
+            score.keys.sort.should == %w(count links score)
+            score['count'].should == 1
             score['score'].should == first_outcome_rating[:points]
             score['links'].keys.sort.should == %w(outcome)
             score['links']['outcome'].should == outcome_object.id.to_s
@@ -305,7 +306,8 @@ describe "Outcome Results API", type: :request do
             student_ids.should be_include(rollup['links']['user'])
             rollup['scores'].size.should == 1
             rollup['scores'].each do |score|
-              score.keys.sort.should == %w(links score)
+              score.keys.sort.should == %w(count links score)
+              score['count'].should == 1
               [0,1].should be_include(score['score'])
               score['links'].keys.sort.should == %w(outcome)
               score['links']['outcome'].should == outcome_object.id.to_s
@@ -332,7 +334,8 @@ describe "Outcome Results API", type: :request do
             outcome_course_sections[0].student_ids.map(&:to_s).should be_include(rollup['links']['user'])
             rollup['scores'].size.should == 1
             rollup['scores'].each do |score|
-              score.keys.sort.should == %w(links score)
+              score.keys.sort.should == %w(count links score)
+              score['count'].should == 1
               [0,2].should be_include(score['score'])
               score['links'].keys.sort.should == %w(outcome)
               score['links']['outcome'].should == outcome_object.id.to_s
@@ -491,7 +494,8 @@ describe "Outcome Results API", type: :request do
           rollup['links']['course'] == @course.id.to_s
           rollup['scores'].size.should == 1
           rollup['scores'].each do |score|
-            score.keys.sort.should == %w(links score)
+            score.keys.sort.should == %w(count links score)
+            score['count'].should == 1
             score['score'].should == first_outcome_rating[:points]
             score['links'].keys.sort.should == %w(outcome)
           end
@@ -515,7 +519,8 @@ describe "Outcome Results API", type: :request do
             rollup['links']['course'].should == @course.id.to_s
             rollup['scores'].size.should == 1
             rollup['scores'].each do |score|
-              score.keys.sort.should == %w(links score)
+              score.keys.sort.should == %w(count links score)
+              score['count'].should == 2
               score['score'].should == 0.5
               score['links'].keys.sort.should == %w(outcome)
             end
@@ -539,7 +544,8 @@ describe "Outcome Results API", type: :request do
             rollup['links']['course'].should == outcome_course.id.to_s
             rollup['scores'].size.should == 1
             rollup['scores'].each do |score|
-              score.keys.sort.should == %w(links score)
+              score.keys.sort.should == %w(count links score)
+              score['count'].should == outcome_course_sections[0].enrollments.count
               score['score'].should == 1
               score['links'].keys.sort.should == %w(outcome)
             end

@@ -13,6 +13,7 @@ Mime::Type.register "application/vnd.ms-excel", :xls
 Mime::Type.register "application/postscript", :ps
 Mime::Type.register "application/rtf", :rtf
 Mime::Type.register "text/plaintext", :log
+Mime::Type.register 'application/vnd.api+json', :jsonapi
 Mime::Type.register 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', :docx
 Mime::Type.register 'application/vnd.openxmlformats-officedocument.presentationml.presentation', :pptx
 Mime::Type.register 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', :xlsx

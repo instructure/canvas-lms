@@ -1,7 +1,7 @@
 define [
   'ember'
   'ember-data'
-], (Em, DS, ajax) ->
+], (Em, DS) ->
 
   {alias, equal, any} = Em.computed
   computed = Em.computed
@@ -27,6 +27,7 @@ define [
     timeSpent: attr()
     validationToken: attr()
     workflowState: attr()
+    questionsRegradedSinceLastAttempt: attr()
     isCompleted: computed.or 'isPendingReview', 'isComplete'
     isComplete: equal 'workflowState', 'complete'
     isPendingReview: equal 'workflowState', 'pending_review'

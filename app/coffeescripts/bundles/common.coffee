@@ -27,6 +27,8 @@ require [
   'compiled/behaviors/elementToggler'
   'compiled/behaviors/tooltip'
   'compiled/behaviors/instructure_inline_media_comment'
+  'compiled/behaviors/ping'
+  'compiled/behaviors/favicon'
   'compiled/behaviors/unread_conversations'
 
   # other stuff several bundles use

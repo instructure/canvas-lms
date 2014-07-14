@@ -1196,6 +1196,19 @@ describe Enrollment do
       end
     end
 
+    it "should uncache user enrollments when deleted" do
+      enable_cache do
+        course_with_student(:active_course => 1)
+        User.where(:id => @user).update_all(:updated_at => 1.year.ago)
+        @user.reload
+        @user.cached_current_enrollments.should == [@enrollment]
+        @enrollment.destroy
+        # have to get the new updated_at
+        @user.reload
+        @user.cached_current_enrollments.should == []
+      end
+    end
+
     context "sharding" do
       specs_require_sharding
 
@@ -1480,7 +1493,7 @@ describe Enrollment do
   describe 'observing users' do
     before do
       @student = user(:active_all => true)
-      @parent = user(:active_all => true)
+      @parent = user_with_pseudonym(:active_all => true)
       @student.observers << @parent
     end
 

@@ -232,12 +232,12 @@ class AppointmentGroup < ActiveRecord::Base
   scope :intersecting, lambda { |start_date, end_date| where("start_at<? AND end_at>?", end_date, start_date) }
 
   set_policy do
-    given { |user, session|
+    given { |user|
       active? && participant_for(user)
     }
     can :reserve and can :read
 
-    given { |user, session|
+    given { |user|
       next false if deleted?
       next false unless active_contexts.all? { |c| c.grants_right? user, nil, :manage_calendar }
       if appointment_group_sub_contexts.present? && appointment_group_sub_contexts.first.sub_context_type == 'CourseSection'
@@ -252,8 +252,8 @@ class AppointmentGroup < ActiveRecord::Base
     can :manage and can :manage_calendar and can :read and can :read_appointment_participants and
     can :create and can :update and can :delete
 
-    given { |user, session|
-      participant_visibility == 'protected' && grants_right?(user, session, :reserve)
+    given { |user|
+      participant_visibility == 'protected' && grants_right?(user, :reserve)
     }
     can :read_appointment_participants
   end

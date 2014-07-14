@@ -100,4 +100,28 @@ describe Quizzes::QuizStatisticsSerializer do
     @json['links'].should be_present
     @json['links']['quiz'].should == 'http://example.com/api/v1/courses/1/quizzes/1'
   end
+
+  it 'stringifies question_statistics ids' do
+    subject.stubs(student_analysis_report: {
+      questions: [ ['question', { id: 5 }] ]
+    })
+
+    json = subject.as_json[:quiz_statistics]
+    json[:question_statistics].should be_present
+    json[:question_statistics][0][:id].should == "5"
+  end
+
+  it 'munges item_analysis with question_statistics' do
+    subject.stubs(student_analysis_report: {
+      questions: [ ['question', { id: 5 }] ]
+    })
+
+    subject.stubs(item_analysis_report: [
+      { question_id: 5, foo: 'bar' }
+    ])
+
+    json = subject.as_json[:quiz_statistics]
+    json[:question_statistics].should be_present
+    json[:question_statistics][0][:foo].should == "bar"
+  end
 end

@@ -33,6 +33,7 @@ class Group < ActiveRecord::Base
   has_many :participating_group_memberships, :class_name => "GroupMembership", :conditions => ['group_memberships.workflow_state = ?', 'accepted']
   has_many :participating_users, :source => :user, :through => :participating_group_memberships
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account']
   belongs_to :group_category
   belongs_to :account
   belongs_to :root_account, :class_name => "Account"
@@ -71,7 +72,7 @@ class Group < ActiveRecord::Base
 
   EXPORTABLE_ASSOCIATIONS = [
     :users, :group_memberships, :users, :context, :group_category, :account, :root_account, :calendar_events, :discussion_topics, :discussion_entries, :announcements,
-    :attachments, :folders, :collaborators, :external_feeds, :messages, :wiki, :web_conferences, :collaborations, :media_objects, :avatar_attachment
+    :attachments, :folders, :collaborators, :wiki, :web_conferences, :collaborations, :media_objects, :avatar_attachment
   ]
 
   before_validation :ensure_defaults
@@ -326,7 +327,7 @@ class Group < ActiveRecord::Base
         :updated_at => current_time
     }.merge(options)
     GroupMembership.bulk_insert(users.map{ |user|
-      options.merge({:user_id => user.id, :uuid => CanvasUuid::Uuid.generate_securish_uuid})
+      options.merge({:user_id => user.id, :uuid => CanvasSlug.generate_securish_uuid})
     })
   end
 
@@ -380,8 +381,8 @@ class Group < ActiveRecord::Base
   end
 
   def ensure_defaults
-    self.name ||= CanvasUuid::Uuid.generate_securish_uuid
-    self.uuid ||= CanvasUuid::Uuid.generate_securish_uuid
+    self.name ||= CanvasSlug.generate_securish_uuid
+    self.uuid ||= CanvasSlug.generate_securish_uuid
     self.group_category ||= GroupCategory.student_organized_for(self.context)
     self.join_level ||= 'invitation_only'
     self.is_public ||= false
@@ -628,4 +629,5 @@ class Group < ActiveRecord::Base
       create_discussion_topic: DiscussionTopic.context_allows_user_to_create?(self, user, session)
     )
   end
+
 end

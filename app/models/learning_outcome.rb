@@ -18,8 +18,11 @@
 
 class LearningOutcome < ActiveRecord::Base
   include Workflow
-  attr_accessible :context, :description, :short_description, :title, :rubric_criterion, :vendor_guid
+  attr_accessible :context, :description, :short_description, :title, :display_name
+  attr_accessible :rubric_criterion, :vendor_guid
+
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Account', 'Course']
   has_many :learning_outcome_results
   has_many :alignments, :class_name => 'ContentTag', :conditions => ['content_tags.tag_type = ? AND content_tags.workflow_state != ?', 'learning_outcome', 'deleted']
 
@@ -46,17 +49,17 @@ class LearningOutcome < ActiveRecord::Base
     can :create and can :read and can :update and can :delete
 
     # reading a global outcome is also allowed by just being logged in
-    given {|user, session| self.context_id.nil? && user }
+    given {|user| self.context_id.nil? && user }
     can :read
   end
-  
+
   def infer_defaults
     if self.data && self.data[:rubric_criterion]
       self.data[:rubric_criterion][:description] = self.short_description
     end
     self.context_code = "#{self.context_type.underscore}_#{self.context_id}" rescue nil
   end
-  
+
   def align(asset, context, opts={})
     tag = self.alignments.find_by_content_id_and_content_type_and_tag_type_and_context_id_and_context_type(asset.id, asset.class.to_s, 'learning_outcome', context.id, context.class.to_s)
     tag ||= self.alignments.create(:content => asset, :tag_type => 'learning_outcome', :context => context)
@@ -72,7 +75,7 @@ class LearningOutcome < ActiveRecord::Base
     tag.save
     tag
   end
-  
+
   def reorder_alignments(context, order)
     order_hash = {}
     order.each_with_index{|o, i| order_hash[o.to_i] = i; order_hash[o] = i }
@@ -87,7 +90,7 @@ class LearningOutcome < ActiveRecord::Base
     self.touch
     tags
   end
-  
+
   def remove_alignment(asset, context, opts={})
     tag = self.alignments.find_by_content_id_and_content_type_and_tag_type_and_context_id_and_context_type(asset.id, asset.class.to_s, 'learning_outcome', context.id, context.class.to_s)
     tag.destroy if tag
@@ -122,7 +125,7 @@ class LearningOutcome < ActiveRecord::Base
   def title=(new_title)
     self.short_description = new_title
   end
-  
+
   workflow do
     state :active
     state :retired
@@ -134,7 +137,7 @@ class LearningOutcome < ActiveRecord::Base
       self.context.short_name rescue ""
     end
   end
-  
+
   def rubric_criterion=(hash)
     self.data ||= {}
 
@@ -177,11 +180,11 @@ class LearningOutcome < ActiveRecord::Base
     self.workflow_state = 'deleted'
     save!
   end
-  
+
   def tie_to(context)
     @tied_context = context
   end
-  
+
   def artifacts_count_for_tied_context
     codes = [@tied_context.asset_string]
     if @tied_context.is_a?(Account)

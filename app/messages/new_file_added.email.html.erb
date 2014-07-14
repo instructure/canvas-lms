@@ -1,11 +1,17 @@
 <% define_content :link do %>
   <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/<%= asset.context.class.to_s.downcase.pluralize %>/<%= asset.context_id %>/files/<%= asset.id %>
 <% end %>
+
 <% define_content :subject do %>
   <%= t('subject', 'New File Added: %{title}, %{name}', :title => asset.title, :name => asset.context.name) %>
 <% end %>
+
+<% define_content :footer_link do %>
+  <a href="<%= content(:link) %>">
+    <%= t :link, "Click to view" %>
+  </a>
+<% end %>
+
 <p><%= t('body', 'A new file has been added for the course, %{name}:', :name => asset.context.name) %></p>
 
 <p><%= asset.title %> <span style="font-size: 11px; color: #777;">(<%= asset.readable_size %>)</span></p>
-
-<p><a href="<%= content :link %>"><%= t :link, "Click to view" %></a></p>

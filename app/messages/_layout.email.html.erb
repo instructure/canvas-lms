@@ -1,14 +1,14 @@
 <html>
-<body style="background-color: #EAEAEA;">
+<body style="background-color: #FFFFFF;">
 
 <center>
-  <table cellpadding="8" cellspacing="0" style="margin: 0; padding: 0; width:528px;" border="0">
+  <table cellpadding="8" cellspacing="0" style="margin: 0; padding: 0; width:728px;" border="0">
     <tr>
       <td valign="top">
-        <table cellpadding="0" cellspacing="0" align="center" border="0" style="background-color: #ffffff; border-left: 1px #D2D2D2 solid; border-right: 1px #D2D2D2 solid; border-top: 1px #D2D2D2 solid;">
+        <table cellpadding="0" cellspacing="0" align="center" style="background-color: #ffffff;">
           <tr>
             <td>
-              <table cellpadding="0" cellspacing="0" style="border-bottom: 1px #D2D2D2 solid;" border="0" align="center">
+              <table cellpadding="0" cellspacing="0" style="" border="0" align="center">
                 <tr>
                   <td colspan="3" height="36"></td>
                 </tr>
@@ -28,17 +28,29 @@
             </td>
           </tr>
         </table>
-        <table cellpadding="0" cellspacing="0" align="center" border="0">
+        <table cellpadding="0" cellspacing="0" align="center" border="0" style="background-color: #ffffff;">
           <tr>
-            <td height="10"></td>
+            <td height="60"></td>
+          </tr>
+          <tr>
+            <td align="center"> <img src="https://lh3.googleusercontent.com/D1pgZeJZrBFc_n_EnEWpj9BQpVUaQ6xj2FYl1ZaxhDN4c-x8X69DqfJ258Eb0u7sXyuvYI533FkaCouBv6131tpxMbd1CpjZDEMr2kN4t8_Epitm77c" alt="Canvas Logo"></td>
+          </tr>
+          <tr>
+            <td height="15"></td>
           </tr>
           <tr>
             <td style="padding: 0; border-collapse: collapse;">
               <table cellpadding="0" cellspacing="0" align="center" border="0">
-                <tr style="font-size: 11px; color: #a8b9c6; font-family: 'Open Sans', 'Lucida Grande', 'Segoe UI', Arial, Verdana, 'Lucida Sans Unicode', Tahoma, 'Sans Serif';" valign="top">
-                  <td width="400" align="left"><a href="<%= "#{HostUrl.protocol}://#{primary_host}/profile/communication" %>" style="color: #555555;">
-                    <%= t 'click_to_preferences', "Click here to edit your notification preferences" %></a></td>
-                  <td width="128" align="right">&#169; <%= Time.now.year %> Instructure</td>
+                <tr style="font-size: 11px; color: #a8b9c6; background-color: #ffffff; font-family: 'Open Sans', 'Lucida Grande', 'Segoe UI', Arial, Verdana, 'Lucida Sans Unicode', Tahoma, 'Sans Serif';" valign="top">
+                  <% if content(:footer_link) %>
+                    <td width="375" align="right">
+                    <%= content(:footer_link).html_safe %></td>
+                  <% else %>
+                    <td width="375"></td>
+                  <% end %>
+                  <td width="50" align="center"> | </td>
+                  <td width="375" align="left"><a href="<%= "#{HostUrl.protocol}://#{primary_host}/profile/communication" %>">
+                    <%= t 'click_to_preferences', "Update your notification settings" %></a></td>
                 </tr>
               </table>
             </td>
@@ -48,6 +60,5 @@
     </tr>
   </table>
 </center>
-
 </body>
 </html>

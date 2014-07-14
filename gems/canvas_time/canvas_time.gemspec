@@ -21,13 +21,13 @@ Gem::Specification.new do |spec|
   spec.add_dependency "tzinfo", "0.3.35"
 
   if CANVAS_RAILS3
-    spec.add_dependency "activesupport", "3.2.17"
+    spec.add_dependency "activesupport", "~>3.2"
   else
     spec.add_dependency "activesupport", "~>2.3.17"
   end
 
   spec.add_development_dependency "bundler", "~> 1.5"
   spec.add_development_dependency "rake"
-  spec.add_development_dependency "rspec"
+  spec.add_development_dependency "rspec", "2.14.1"
   spec.add_development_dependency "timecop"
 end

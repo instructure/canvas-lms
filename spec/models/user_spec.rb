@@ -2289,52 +2289,21 @@ describe User do
   describe "preferred_gradebook_version" do
     let(:user) { User.new }
     let(:course) { mock('course') }
-    subject { user.preferred_gradebook_version(course) }
+    subject { user.preferred_gradebook_version }
 
-    context "with screenreader_gradebook disabled" do
-      before {
-        course.stubs(:feature_enabled?).with(:screenreader_gradebook).returns(false)
-      }
-
-      context "by default" do
-        it { should == '2' }
-      end
-
-      context "with an explicit preference for gradebook 2" do
-        before { user.stubs(:preferences => { :use_gradebook2 => true }) }
-        it { should == '2' }
-      end
-
-      context "with an truthy preference for gradebook 2" do
-        before { user.stubs(:preferences => { :use_gradebook2 => '1' }) }
-        it { should == '2' }
-      end
-
-      context "with an explicit preference for gradebook 1" do
-        before { user.stubs(:preferences => { :use_gradebook2 => false }) }
-        it { should == '1' }
-      end
+    context "prefers gb2" do
+      before { user.stubs(:preferences => { :gradebook_version => '2' }) }
+      it { should == '2' }
     end
 
-    context "with screenreader_gradebook enabled" do
-      before {
-        course.stubs(:feature_enabled?).with(:screenreader_gradebook).returns(true)
-      }
+    context "prefers srgb" do
+      before { user.stubs(:preferences => { :gradebook_version => 'srgb' }) }
+      it { should == 'srgb' }
+    end
 
-      context "prefers gb2" do
-        before { user.stubs(:preferences => { :gradebook_version => '2' }) }
-        it { should == '2' }
-      end
-
-      context "prefers srgb" do
-        before { user.stubs(:preferences => { :gradebook_version => 'srgb' }) }
-        it { should == 'srgb' }
-      end
-
-      context "nil preference" do
-        before { user.stubs(:preferences => { :gradebook_version => nil }) }
-        it { should == '2' }
-      end
+    context "nil preference" do
+      before { user.stubs(:preferences => { :gradebook_version => nil }) }
+      it { should == '2' }
     end
   end
 
@@ -2520,5 +2489,28 @@ describe User do
       test_student.destroy
       test_student.reload.enrollments.each { |e| e.should be_deleted }
     end
+  end
+
+  describe "otp remember me cookie" do
+    before do
+      @user = User.new
+      @user.otp_secret_key = ROTP::Base32.random_base32
+    end
+
+    it "should add an ip to an existing cookie" do
+      cookie1 = @user.otp_secret_key_remember_me_cookie(Time.now.utc, nil, 'ip1')
+      cookie2 = @user.otp_secret_key_remember_me_cookie(Time.now.utc, cookie1, 'ip2')
+      @user.validate_otp_secret_key_remember_me_cookie(cookie1, 'ip1').should be_true
+      @user.validate_otp_secret_key_remember_me_cookie(cookie1, 'ip2').should be_false
+      @user.validate_otp_secret_key_remember_me_cookie(cookie2, 'ip1').should be_true
+      @user.validate_otp_secret_key_remember_me_cookie(cookie2, 'ip2').should be_true
+    end
+  end
+
+  it "should reset its conversation counter when told to" do
+    user = user_model
+    user.stubs(:conversations).returns Struct.new(:unread).new(Array.new(5))
+    user.reset_unread_conversations_counter
+    user.reload.unread_conversations_count.should == 5
   end
 end

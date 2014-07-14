@@ -6,6 +6,7 @@ module BroadcastPolicies
       ctx = mock()
       ctx.stubs(:available?).returns(true)
       ctx.stubs(:feature_enabled?).with(:draft_state).returns(false)
+      ctx.stubs(:concluded?).returns(false)
       ctx
     }
     let(:prior_version) { stub(:due_at => 7.days.ago, :points_possible => 50) }
@@ -43,6 +44,7 @@ module BroadcastPolicies
           }
         }
         specify { wont_send_when { assignment.stubs(:published?).returns false}}
+        specify { wont_send_when { context.stubs(:concluded?).returns true } }
       end
     end
 
@@ -57,6 +59,7 @@ module BroadcastPolicies
       end
 
       specify { wont_send_when { context.stubs(:available?).returns false } }
+      specify { wont_send_when { context.stubs(:concluded?).returns true } }
       specify { wont_send_when { assignment.stubs(:just_created).returns false } }
     end
 
@@ -75,6 +78,7 @@ module BroadcastPolicies
       end
 
       specify { wont_send_when { context.stubs(:available?).returns false } }
+      specify { wont_send_when { context.stubs(:concluded?).returns true } }
       specify { wont_send_when { assignment.stubs(:prior_version).returns nil } }
       specify { wont_send_when { assignment.stubs(:changed_in_state).returns false } }
       specify { wont_send_when { assignment.stubs(:due_at).returns prior_version.due_at } }
@@ -96,6 +100,7 @@ module BroadcastPolicies
       end
 
       specify { wont_send_when { context.stubs(:available?).returns false } }
+      specify { wont_send_when { context.stubs(:concluded?).returns true } }
       specify { wont_send_when { assignment.stubs(:prior_version).returns nil } }
       specify { wont_send_when { assignment.stubs(:published?).returns false } }
       specify { wont_send_when { assignment.stubs(:muted?).returns true } }

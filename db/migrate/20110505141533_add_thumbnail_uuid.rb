@@ -6,7 +6,7 @@ class AddThumbnailUuid < ActiveRecord::Migration
     add_index :thumbnails, [:id, :uuid]
 
     Thumbnail.find_each do |t|
-      t.uuid ||= CanvasUuid::Uuid.generate_securish_uuid
+      t.uuid ||= CanvasSlug.generate_securish_uuid
       t.save
     end
   end

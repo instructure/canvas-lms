@@ -20,7 +20,6 @@ describe Moodle::Converter do
     @course_data = Marshal.load(Marshal.dump(@base_course_data))
     @course = Course.create(:name => "test course")
     @cm = ContentMigration.create(:context => @course)
-    @course.content_migration = @cm
   end
 
   it "should successfully import the course" do

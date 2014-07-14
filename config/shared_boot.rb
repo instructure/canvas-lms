@@ -76,7 +76,7 @@ else
 end
 
 params_parser = CANVAS_RAILS2 ? 'ActionController::ParamsParser' : 'ActionDispatch::ParamsParser'
-config.middleware.insert_before(params_parser, "RequestContextGenerator")
+config.middleware.insert_before(CANVAS_RAILS2 ? params_parser : 'ActionDispatch::RequestId', "RequestContextGenerator")
 config.middleware.insert_before(params_parser, 'StatsTiming')
 config.middleware.insert_before(params_parser, 'Canvas::RequestThrottle')
 config.middleware.insert_before(params_parser, 'PreventNonMultipartParse')

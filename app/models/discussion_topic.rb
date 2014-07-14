@@ -47,6 +47,7 @@ class DiscussionTopic < ActiveRecord::Base
   has_one :external_feed_entry, :as => :asset
   belongs_to :external_feed
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Group']
   belongs_to :attachment
   belongs_to :assignment
   belongs_to :editor, :class_name => 'User'
@@ -760,7 +761,7 @@ class DiscussionTopic < ActiveRecord::Base
     given { |user, session| self.context.respond_to?(:collection) && self.context.collection.grants_right?(user, session, :comment) }
     can :reply
 
-    given { |user, session| self.context.respond_to?(:collection) && user == self.context.user }
+    given { |user| self.context.respond_to?(:collection) && user == self.context.user }
     can :read and can :update and can :delete and can :reply
   end
 
@@ -824,6 +825,7 @@ class DiscussionTopic < ActiveRecord::Base
     p.to { active_participants - [user] }
     p.whenever { |record|
       record.context.available? and
+        !record.context.concluded? and
       ((record.just_created && record.active?) || record.changed_state(:active, record.draft_state_enabled? ? :unpublished : :post_delayed))
     }
   end

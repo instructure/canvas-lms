@@ -51,9 +51,6 @@ describe ConversationsController do
       get 'index'
       response.should be_success
       assigns[:js_env].should_not be_nil
-      assigns[:contexts][:courses].to_a.map{|p|p[1]}.
-        reduce(true){|truth, con| truth and con.has_key?(:url)}.should be_true
-      assigns[:contexts][:courses][@course.id][:term].should == "Fall"
     end
 
     it "should assign variables for json" do

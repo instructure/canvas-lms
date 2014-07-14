@@ -20,8 +20,14 @@ class DelayedNotification < ActiveRecord::Base
   include Workflow
 
   belongs_to :asset, :polymorphic => true
+  validates_inclusion_of :asset_type, :allow_nil => true, :in => ['AssessmentRequest', 'Attachment',
+    'ContentMigration', 'ContentExport', 'Collaborator', 'Submission', 'Assignment',
+    'CommunicationChannel', 'CalendarEvent', 'ConversationMessage', 'DiscussionEntry',
+    'SubmissionComment', 'Quizzes::QuizSubmission', 'DiscussionTopic', 'Course', 'Enrollment',
+    'WikiPage', 'GroupMembership', 'WebConference']
   belongs_to :notification
   belongs_to :asset_context, :polymorphic => true
+  validates_inclusion_of :asset_context_type, :allow_nil => true, :in => ['Account', 'Group', 'Course']
 
   attr_accessible :asset, :notification, :recipient_keys, :asset_context, :data
   attr_accessor :data

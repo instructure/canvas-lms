@@ -16,6 +16,8 @@ define [
 
     selectedMessages: []
 
+    autoFetch: true
+
     events:
       'click': 'onClick'
 

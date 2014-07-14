@@ -390,6 +390,9 @@ var speakMessage = function ($this, message) {
       }
 
       var $suggest = $('<div class="datetime_suggest" />').insertAfter($thingToPutSuggestAfter);
+      if (ENV && ENV.CONTEXT_TIMEZONE && (ENV.TIMEZONE != ENV.CONTEXT_TIMEZONE)){
+        var $suggest2 = $('<div class="datetime_suggest" />').insertAfter($suggest);
+      }
 
       if (options.addHiddenInput) {
         var $hiddenInput = $('<input type="hidden">').insertAfter($field);
@@ -405,31 +408,49 @@ var speakMessage = function ($this, message) {
         if (options.timeOnly && val && parseInt(val, 10) == val) {
           val += (val < 8) ? "pm" : "am";
         }
-        var d = $.datetime.parse(val);
+        var fudged_d = $.datetime.parse(val);
+        var d = $.unfudgeDateForProfileTimezone(fudged_d);
         var parse_error_message = I18n.t('errors.not_a_date', "That's not a date!");
         var text = parse_error_message;
+        var text2 = ""
         if (!$this.val()) { text = ""; }
-        if (d) {
-          $this.data('date', d);
+        if (fudged_d) {
+          $this.data('date', fudged_d);
           if ($this.data('hiddenInput')) {
-            $this.data('hiddenInput').val(d);
+            $this.data('hiddenInput').val(fudged_d);
           }
-          if(!options.timeOnly && !options.dateOnly && (d.getHours() || d.getMinutes() || options.alwaysShowTime)) {
-            text = d.toString('ddd MMM d, yyyy h:mmtt');
+          if(!options.timeOnly && !options.dateOnly && (!$.midnight(d) || options.alwaysShowTime)) {
+            text = fudged_d.toString('ddd MMM d, yyyy h:mmtt');
+            if($suggest2)
+              text2 = tz.format(d,"%a %b %m, %Y %l:%M%p", ENV.CONTEXT_TIMEZONE);
             $this
-              .data('time-hour', d.toString('h'))
-              .data('time-minute', d.toString('mm'))
-              .data('time-ampm', d.toString('tt').toLowerCase());
+              .data('time-hour', fudged_d.toString('h'))
+              .data('time-minute', fudged_d.toString('mm'))
+              .data('time-ampm', fudged_d.toString('tt').toLowerCase());
           } else if(!options.timeOnly) {
-            text = d.toString('ddd MMM d, yyyy');
+            text = fudged_d.toString('ddd MMM d, yyyy');
           } else {
-            text = d.toString('h:mmtt').toLowerCase();
+            text = fudged_d.toString('h:mmtt').toLowerCase();
+            if($suggest2)
+              text2 = tz.format(d,"%l:%M%p", ENV.CONTEXT_TIMEZONE);
+          }
+
+          if($suggest2) {
+            if(text2.length > 0){
+              $suggest2.text(I18n.t('course_time',"COURSE: ")+text2);
+            } else {
+              $suggest2.text("");
+            }
           }
         }
+
+        if(text.length > 0 && $suggest2)
+          text = I18n.t('local_time',"LOCAL: ") + text;
 
         $suggest
           .toggleClass('invalid_datetime', text == parse_error_message)
           .text(text);
+
         if (text == parse_error_message ) {
           $this.data(
             'accessible-message-timeout',

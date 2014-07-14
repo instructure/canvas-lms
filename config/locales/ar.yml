@@ -22,6 +22,7 @@ ar:
       other: "%{count} من الطلاب"
       two: "%{count} طالب"
       zero: "%{count} طالب"
+    student_count_max: "%{count} / %{max} من الطلاب"
     user_count: 
       few: "%{count} مستخدمين"
       many: "%{count} مستخدم"
@@ -29,6 +30,7 @@ ar:
       other: "%{count} من المستخدمين"
       two: "%{count} مستخدم"
       zero: "%{count} مستخدم"
+    user_count_max: "%{count} / %{max} من المستخدمين"
   GroupUserCollection: 
     flash: 
       userAlreadyInGroup: "تحذير: %{user} هو عضو بالفعل في %{group}"
@@ -44,8 +46,27 @@ ar:
     no_file: "لا يتوفر ملف نتيجة أو إعطاء تفويض"
     no_permissions: "غير مسموح للمستخدم بتحرير النتائج العالمية"
     no_perms: "غير مسموح للمستخدم بتحرير النتائج العالمية"
-  accont: 
-    feedback_pricing_sub: "الحصول على أرقام المعهد"
+  access: 
+    course: 
+      extra_text: "المساق: %{course};"
+  access_report_header_content: المحتوى
+  access_report_header_content_access_id: "معرف الوصول إلى المحتوى"
+  access_report_header_content_type: "نوع المحتوى"
+  access_report_header_course_id: "معرف المساق"
+  access_report_header_course_name: "اسم المساق"
+  access_report_header_course_sis_id: "معرف sis للمساق"
+  access_report_header_enrollment_type: "نوع التسجيل"
+  access_report_header_last_viewed: "آخر عرض"
+  access_report_header_root_account_id: "معرف الحساب الجذري"
+  access_report_header_section_id: "معرف القسم"
+  access_report_header_section_name: "اسم القسم"
+  access_report_header_section_sis_id: "معرف sis للقسم"
+  access_report_header_term_id: "معرف الفصل الدراسي"
+  access_report_header_term_sis_id: "معرف sis للفصل الدراسي"
+  access_report_header_times_participated: "أوقات المشاركة"
+  access_report_header_times_viewed: "أوقات العرض"
+  access_report_header_user_id: "معرف المستخدم"
+  access_report_header_user_sis_id: "معرف sis للمستخدم"
   account: 
     account_settings: 
       account_surveys: "استطلاعات الحساب"
@@ -69,7 +90,6 @@ ar:
     feedback_feature_request: "طلب الحصول على ميزة"
     feedback_feature_request_canvas_net: "طلب الحصول على ميزة في شبكة Canvas"
     feedback_feature_request_sub: "هل لديك مقترحات لتحسين Canvas؟"
-    feedback_pricing: "معلومات حول أسعار Canvas"
     manually_created_courses: "مساقات تم إنشاؤها يدويًا"
     root_account_cant_have_sis_id: "لا يمكن ضبط معرفات SIS على حسابات أصلية"
     sis_id_in_use: "معرف SIS \"%{sis_id}\" قيد الاستخدام بالفعل"
@@ -98,7 +118,6 @@ ar:
     default_delegated_login_handle_name: "تسجيل الدخول"
     default_login_handle_name: "البريد الإلكتروني"
     saml_eppn_domain_stripped: "%{eppn} (تم تجريد المجال)"
-    test_bind_failed: "فشل الربط"
     test_connection_timeout: "مهلة أثناء التوصيل"
     test_host_unknown: "مضيف غير معروف: %{host}"
     test_login_auth_exception: "استثناء عند تسجيل الدخول: %{error}"
@@ -276,6 +295,8 @@ ar:
     default: 
       all_terms: "كل الفصول الدراسية"
       course_text: "للمساق: %{course};"
+      description: 
+        header: مثال
       end_text: "ينتهي في: %{end_at};"
       error_text: "حدث فشل، ويرجى إبلاغ مسؤول النظام برمز الخطأ التالي: ErrorReport:%{error};"
       extra_text_term: "الفصل الدراسي: %{term_name}؛"
@@ -289,18 +310,32 @@ ar:
       deleted: "تضمين الكائنات المحذوفة: صواب؛"
     granite: 
       invalid_date_range: "تم ضبط التواريخ إلى نطاق من 1 أسبوع،"
+    lincoln: 
+      invalid_term: "الرجاء تحديد فصل دراسي صالح"
     mississippi: 
       reports: "التقارير: %{ملفًا}"
+    newark: 
+      assignment_text: "أنواع مجموعات المهام: %{groups};"
     outcomes: 
       order: "الأمر: %{order}"
+    pasco: 
+      missing_start_date: "الرجاء تحديد تاريخ بداية صالح"
+    penn_harris: 
+      student_grades: 
+        description: 
+          text: "يعرض هذا التقرير نتائج الدرجات النهائية للطلاب في فصل دراسي معين. وسيحتوي ملف CSV الناتج على صف واحد لكل تسجيل، كما سيُظهر الدرجة النهائية المعروضة في دفتر تقديرات المساق."
     sis_exporter: 
-      deleted: "تضمين الكائنات المحذوفة: صواب؛"
       reports: "تقارير: %{files}"
     student: 
       enrollment_state: "تضمين حالة التسجيل: صواب؛"
       enrollment_states: "حالات التسجيل: %{states};"
     usu: 
       enrollment_types: "أنواع التسجيل: %{types}"
+    webster: 
+      min: "الحد الأدنى لعدد العناصر: %{min};"
+      student: الطلاب،
+      ta: "المدرسون المساعدون،"
+      teacher: المدرسون،
   account_settings: 
     account: الحساب
     account_name_too_long: "اسم الحساب طويل جدًا"
@@ -409,9 +444,16 @@ ar:
         From: من
         To: إلى
         Value: القيمة
+        blank_placeholder: "-"
+        copied_from_label: "منسوخ من"
+        copied_to_label: "منسوخ إلى"
         date: التاريخ
         event_id: "معرّف الحدث"
+        event_sis_batch: "دفعة SIS"
+        event_source_label: المصدر
         event_type_label: النوع
+        reset_from_label: "إعادة تعيين من"
+        reset_to_label: "إعادة تعيين إلى"
         time: الوقت
         user: مستخدم
       course_logging_item: 
@@ -419,6 +461,7 @@ ar:
       course_logging_results: 
         date: التاريخ
         event_details: "تفاصيل الحدث"
+        event_source: المصدر
         event_type: النوع
         no_item_found: "لم يتم العثور على أي عناصر"
         time: الوقت
@@ -456,6 +499,8 @@ ar:
         grade_change_activity: "نشاط تغيير الدرجة"
         message_assignment_id: "معرف المهمة"
         message_course_id: "معرف المساق"
+      grade_change_logging_item: 
+        blank_placeholder: "-"
       grade_change_logging_results: 
         Assignment: المهمة
         Course: المساق
@@ -488,6 +533,13 @@ ar:
             header: مثال
           student_activity: 
             text: "يعرض هذا التقرير كل المهام والمعلومات المتعلقة بتلك المهام الموجودة في مجموعة أو مجموعات المهام المحددة والتي في نطاق التاريخ المحدد. ويوفر هذا التقرير بيانات لجدولة المهام وإدارة عبء مهام الطلاب، مع عرض الطلاب والمهام التي توجد بها مهمتان متعارضتان أو أكثر ومستحقة في اليوم نفسه لأحد الطلاب."
+      newark_report_header__assignment_count: "عدد المهام"
+      newark_report_header_due_date: "تاريخ الاستحقاق"
+      newark_report_header_section_id: "معرف القسم"
+      newark_report_header_section_name: "اسم القسم"
+      newark_report_header_student_name: "اسم الطالب"
+      newark_report_header_teacher_id: "معرف المدرس"
+      newark_report_header_teacher_name: "اسم المدرس"
     assignment_scheduling_csv_parameters: 
       account_reports: 
         newark: 
@@ -511,9 +563,20 @@ ar:
       account_reports: 
         granite: 
           assignme_score_summary: 
-            text: "يعرض هذا التقرير درجة كل المهام التي تم تقدير درجاتها بين البيانات المحددة"
+            text: "يعرض هذا التقرير درجة كل المهام التي تم تقدير درجاتها بين التواريخ المحددة"
           description: 
             header: مثال
+      granite_report_header_account_id: "معرف الحساب"
+      granite_report_header_assignment_id: "معرف المهمة"
+      granite_report_header_assignment_name: "اسم المهمة"
+      granite_report_header_assignment_unique_id: "المعرف الفريد للمهمة"
+      granite_report_header_course_id: "معرف المساق"
+      granite_report_header_graded_at: "تاريخ تقدير الدرجة"
+      granite_report_header_submission_date: "تاريخ الإرسال"
+      granite_report_header_submission_id: "معرف الإرسال"
+      granite_report_header_submission_score: "درجة الإرسال"
+      granite_report_header_term_id: "معرف الفصل الدراسي"
+      granite_report_header_user_id: "معرف المستخدم"
     avatars: 
       all_link: 
         one: "الكل%{count}"
@@ -548,6 +611,12 @@ ar:
             header: مثال
           student_login: 
             text: "يوضح هذا التقرير جميع الطلاب الملتحقين بأي مساقات في فصل دراسي معين. سيحتوي الملف الناتج بتنسيق cvs على صف واحد لتسجيل كل مستخدم لم يقم بزيارة المساق منذ ذلك التاريخ. وسيتضمن عامل التصفية عبر الإنترنت عمليات التسجيل من الأقسام التي تشتمل على '.E' في اسم القسم فقط."
+      bucks_report_header_last_access_to_canvas: "آخر وصول إلى canvas"
+      bucks_report_header_name: الاسم
+      bucks_report_header_section_id: "معرف القسم"
+      bucks_report_header_section_name: "اسم القسم"
+      bucks_report_header_section_sis_id: "معرف sis للقسم"
+      bucks_report_header_user_sis_id: "معرف sis للمستخدم"
     cannot_manage_account: "غير مسموح لك بإدارة إعدادات الحساب"
     cannot_manage_quotas: "غير مسموح لك بإدارة إعدادات الحصة النسبية"
     ccp_zero_activity_csv_description: 
@@ -556,6 +625,18 @@ ar:
           ccp_zero_activity_csv: 
             header: مثال
             text: "يوضح هذا التقرير جميع الطلاب الملتحقين بأي مساقات في فصل دراسي معين. سيحتوي الملف الناتج بتنسيق cvs على صف واحد لالتحاق كل مستخدم لم يقم بزيارة المساق منذ ذلك التاريخ."
+      ccp_report_header_course_id: "معرف المساق"
+      ccp_report_header_course_name: "اسم المساق"
+      ccp_report_header_course_sis_id: "معرف sis للمساق"
+      ccp_report_header_email: "البريد الإلكتروني"
+      ccp_report_header_enrollment_type: "نوع التسجيل"
+      ccp_report_header_first_name: "الاسم الأول"
+      ccp_report_header_last_name: "الاسم الأخير"
+      ccp_report_header_section_id: "معرف القسم"
+      ccp_report_header_section_name: "اسم القسم"
+      ccp_report_header_section_sis_id: "معرف sis للقسم"
+      ccp_report_header_user_id: "معرف المستخدم"
+      ccp_report_header_user_sis_id: "معرف sis للمستخدم"
     ccp_zero_activity_csv_parameters: 
       account_reports: 
         ccp: 
@@ -568,6 +649,16 @@ ar:
             description: 
               header: مثال
             text: "يعرض هذا التقرير اشتراك الطالب في المساقات المشترك بها. وسيشتمل ملف csv الناتج على صف واحد لكل اشتراك، وسيعرض معرف sis للطالب واسم الطالب ورقم الهاتف وعنوان البريد الإلكتروني واسم المساق وآخر عملية إرسال وعدد الأيام منذ آخر عملية إرسال (LDA) والنسبة المئوية للدرجة الحالية وتاريخ بدء الفصل الدراسي."
+      chcp_report_header_course: المساق
+      chcp_report_header_email: "البريد الإلكتروني"
+      chcp_report_header_grade: الدرجة
+      chcp_report_header_last_submissio: "آخر إرسال"
+      chcp_report_header_lda: "آخر تاريخ حضور (LDA)"
+      chcp_report_header_phone: الهاتف
+      chcp_report_header_start_date: "تاريخ البدء"
+      chcp_report_header_student_id: "معرف الطالب"
+      chcp_report_header_student_name: "اسم الطالب"
+      chcp_report_header_teacher: المدرس
     confirm_delete_user: 
       confirm_delete: "هل ترغب بالتأكيد في إزالة هذا المستخدم من الحساب %{account}؟ سيؤدي ذلك إلى إزالة بيانات المستخدم (بما في ذلك التقييمات) من كل المساقات والمجموعات. لا يمكن التراجع عن هذه العملية."
       delete_button: "حذف%{user}"
@@ -609,6 +700,21 @@ ar:
                 وعدد التسجيلات والقسم والحساب.
           description: 
             header: مثال
+      cedar_rapids_report_header_account_id: "معرف الحساب"
+      cedar_rapids_report_header_account_name: "اسم الحساب"
+      cedar_rapids_report_header_course_end_date: "تاريخ انتهاء المساق"
+      cedar_rapids_report_header_course_id: "معرف المساق"
+      cedar_rapids_report_header_course_name: "اسم المساق"
+      cedar_rapids_report_header_course_start_date: "تاريخ بدء المساق"
+      cedar_rapids_report_header_course_status: "حالة المساق"
+      cedar_rapids_report_header_department_id: "معرف القسم"
+      cedar_rapids_report_header_department_name: "اسم القسم"
+      cedar_rapids_report_header_observer_count: "عدد الملاحظين"
+      cedar_rapids_report_header_student_count: "عدد الطلاب"
+      cedar_rapids_report_header_ta_count: "عدد المدرسين المساعدين"
+      cedar_rapids_report_header_teacher_count: "عدد المدرسين"
+      cedar_rapids_report_header_term_id: "معرف الفصل الدراسي"
+      cedar_rapids_report_header_term_name: "اسم الفصل الدراسي"
     course_status_csv_description: 
       account_reports: 
         auburn: 
@@ -616,6 +722,26 @@ ar:
             text: "يعرض هذا التقرير حالة جميع المساقات في فصل دراسي معين. وسيحتوي ملف CSV الناتج على صف واحد لكل قسم في المساق، وسيعرض المساق وحالة المساق والفصل الدراسي وتاريخ سريان الفعالية وتواريخ النهاية ومعلم له سجل في القسم."
           description: 
             header: مثال
+      auburn_report_header_account_id: "معرف الحساب"
+      auburn_report_header_account_name: "اسم الحساب"
+      auburn_report_header_account_sis_id: "معرف sis للحساب"
+      auburn_report_header_course_id: "معرف المساق"
+      auburn_report_header_course_name: "اسم المساق"
+      auburn_report_header_course_sis_id: "معرف sis للمساق"
+      auburn_report_header_course_status: "حالة المساق"
+      auburn_report_header_effective_date: "تاريخ السريان"
+      auburn_report_header_end_date: "تاريخ الانتهاء"
+      auburn_report_header_section_id: "معرف القسم"
+      auburn_report_header_section_name: "اسم القسم"
+      auburn_report_header_section_sis_id: "معرف sis القسم"
+      auburn_report_header_start_date: "تاريخ البدء"
+      auburn_report_header_student_count: "عدد الطلاب"
+      auburn_report_header_teacher_id: "معرف المدرس"
+      auburn_report_header_teacher_name: "اسم المدرس"
+      auburn_report_header_teacher_sis_id: "معرف sis للمدرس"
+      auburn_report_header_term_id: "معرف الفصل الدراسي"
+      auburn_report_header_term_name: "اسم الفصل الدراسي"
+      auburn_report_header_term_sis_id: "معرف sis للفصل الدراسي"
     course_type: المساق
     courses: 
       courses_crumb: المساقات
@@ -631,12 +757,39 @@ ar:
       go_button: انتقال
       hide_enrollmentless_courses: "إخفاء المساقات غير المسجلة"
     crumb_statistics: إحصاءات
+    current_grade_csv_description: 
+      account_reports: 
+        lincoln: 
+          current_grade_report: 
+            text: "يعرض هذا التقرير الدرجة الحالية للطالب لكل مساق في فصل دراسي معين"
+          description: 
+            header: مثال
+      lincoln_report_header_course_id: "معرف المساق"
+      lincoln_report_header_course_name: "اسم المساق"
+      lincoln_report_header_course_role: "دور المساق"
+      lincoln_report_header_course_sis_id: "معرف SIS للمساق"
+      lincoln_report_header_current_grade: "الدرجة الحالية"
+      lincoln_report_header_login: "معرف تسجيل الدخول"
+      lincoln_report_header_student_name: "اسم الطالب"
+      lincoln_report_header_student_sis_id: "معرف SIS للطالب"
+      lincoln_report_header_term_id: "معرف الفصل الدراسي"
+      lincoln_report_header_term_name: "اسم الفصل الدراسي"
     custom_grade_export_csv_description: 
       account_reports: 
         ross: 
           description: 
             header: مثال
             text: "يعرض هذا التقرير نتائج درجات الطلاب النهائية لجميع الطلاب في فصل دراسي معين. وسيحتوي ملف CSV الناتج على صف واحد لكل تسجيل، وسوف يُظهر الدرجة الحالية والنهائية المعروضتين في دفتر تقديرات المساق."
+      ross_report_header_comment: تعليق
+      ross_report_header_course_id: "معرف الفصل الدراسي"
+      ross_report_header_grade_posting_date: "تاريخ نشر الدرجات"
+      ross_report_header_grade_type: "نوع الدرجة"
+      ross_report_header_grade_value_type: "نوع قيمة الدرجة"
+      ross_report_header_miscfield1: MiscField1
+      ross_report_header_miscfield13: MiscField13
+      ross_report_header_miscfield2: MiscField2
+      ross_report_header_numeric_grade: "درجة رقمية"
+      ross_report_header_source_id: "معرف المصدر"
     custom_grade_export_csv_parameters: 
       account_reports: 
         ross: 
@@ -661,6 +814,12 @@ ar:
               text: "يعرض هذا التقرير عمليات الإرسال التي لم يتم تصحيحها حسب المساق لاستبيانات الاختبارات والمناقشات."
           description: 
             header: مثال
+      galen_report_header_account_id: "معرف الحساب"
+      galen_report_header_account_name: "اسم الحساب"
+      galen_report_header_course_name: "اسم المساق"
+      galen_report_header_course_sis_id: "معرف sis للمساق"
+      galen_report_header_resource_type: "نوع المورد"
+      galen_report_header_title: العنوان
     cv_submission_data_csv_description: 
       account_reports: 
         galen: 
@@ -670,6 +829,12 @@ ar:
         tmcc: 
           description: 
             header: مثال
+      galen_report_header_course_sis_id: "معرف sis للمساق"
+      galen_report_header_first_submission: "أول إرسال"
+      galen_report_header_section_sis_id: "معرف sis للقسم"
+      galen_report_header_submission_date: "تاريخ الإرسال"
+      galen_report_header_submission_type: "نوع الإرسال"
+      galen_report_header_user_sis_id: "معرف sis للمستخدم"
     date_picker_parameter: 
       account_reports: 
         default: 
@@ -697,12 +862,33 @@ ar:
             header: مثال
           google_doc: 
             text: "هذا تقرير لكل المستخدمين وعنوان البريد الإلكتروني المقترن المستخدَم لتكامل Google Docs."
+      ut_austin_report_header_canvas_user_id: "معرف مستخدم Canvas"
+      ut_austin_report_header_default_email: "البريد الإلكتروني الافتراضي"
+      ut_austin_report_header_google_doc_address: "عنوان Google Docs"
+      ut_austin_report_header_name: الاسم
+      ut_austin_report_header_sis_id: "معرف sis"
     grade_export_csv_description: 
       account_reports: 
         default: 
           description: 
             header: مثال
             text: "يبين هذا التقرير نتائج درجة الطالب النهائية لجميع الطلاب في فصل دراسي معين. سوف يحتوي ملف CSV الناتج على صف واحد لكل تسجيل، وسوف يُظهر الدرجة الحالية والنهائية المعروضة في دفتر تقديرات المساق."
+      course_report_header_course_id: "معرف المساق"
+      grade_report_header_course: المساق
+      grade_report_header_course_id: "معرف المساق"
+      grade_report_header_course_sis: "sis للمساق"
+      grade_report_header_current_score: "درجة المساق"
+      grade_report_header_enrollment_state: "حالة التسجيل"
+      grade_report_header_final_score: "الدرجة النهائية"
+      grade_report_header_section: القسم
+      grade_report_header_section_id: "معرف القسم"
+      grade_report_header_section_sis: "sis للقسم"
+      grade_report_header_student_id: "معرف الطالب"
+      grade_report_header_student_name: "اسم الطالب"
+      grade_report_header_student_sis: "sis للطالب"
+      grade_report_header_term: "الفصل الدراسي"
+      grade_report_header_term_id: "معرف الفصل الدراسي"
+      grade_report_header_term_sis: "sis للفصل الدراسي"
     group_type: المجموعة
     include_deleted_parameter: 
       account_reports: 
@@ -722,12 +908,27 @@ ar:
             header: مثال
           last_submission: 
             text: "يعرض هذا التقرير آخر نشاط للطلاب فيما يتعلق بعمليات الإرسال."
+      concord_report_header_campus: "الحرم الجامعي"
+      concord_report_header_course_name: "اسم المساق"
+      concord_report_header_course_sis_id: "معرف sis للمساق"
+      concord_report_header_last_course_activity_date: "تاريخ آخر نشاط للمساق"
+      concord_report_header_student_current_grade: "الدرجة الحالية للطالب"
+      concord_report_header_student_default_email: "البريد الإلكتروني الافتراضي للطالب"
+      concord_report_header_student_name: "اسم الطالب"
+      concord_report_header_student_sis_id: "معرف sis للطالب"
+      concord_report_header_term_name: "اسم الفصل الدراسي"
+      concord_report_header_zero_grade_assignments: "مهام بدرجة صفرية"
     last_user_access_csv_description: 
       account_reports: 
         default: 
           last_user_access: 
             header: مثال
             text: "يوضح هذا التقرير آخر عملية تسجيل دخول للمستخدمين النشطاء."
+      student_report_header_last_access_at: "تاريخ آخر وصول"
+      student_report_header_last_ip: "آخر ip"
+      student_report_header_user_id: "معرف المستخدم"
+      student_report_header_user_name: "اسم المستخدم"
+      student_report_header_user_sis_id: "معرف sis للمستخدم"
     learning_outcome_assignment_type_csv_description: 
       account_reports: 
         newark: 
@@ -736,6 +937,36 @@ ar:
         samuel_merrit_university: 
           description: 
             header: مثال
+      samuel_report_header_assessment_question_id: "معرف سؤال التقييم"
+      samuel_report_header_assessment_question_name: "اسم سؤال التقييم"
+      samuel_report_header_assignment_description: "وصف المهمة"
+      samuel_report_header_assignment_id: "معرف المهمة"
+      samuel_report_header_assignment_points_possible: "النقاط الممكنة للمهمة"
+      samuel_report_header_assignment_title: "عنوان المهمة"
+      samuel_report_header_assignment_type: "نوع المهمة"
+      samuel_report_header_course_canvas_id: "معرف Canvas للمساق"
+      samuel_report_header_course_current_score: "الدرجة الحالية للمساق"
+      samuel_report_header_course_name: "اسم المساق"
+      samuel_report_header_course_sis_id: "معرف SIS للمساق"
+      samuel_report_header_course_student_count: "عدد الطلاب في المساق"
+      samuel_report_header_grading_scheme: "نظام التقييم"
+      samuel_report_header_learning_outcome_desc: "وصف نتيجة التعلم"
+      samuel_report_header_learning_outcome_id: "معرف نتيجة التعلم"
+      samuel_report_header_learning_outcome_score: "درجة نتيجة التعلم"
+      samuel_report_header_learning_outcome_short_name: "الاسم القصير لنتيجة التعلم"
+      samuel_report_header_rubric_title: العنوان
+      samuel_report_header_section_canvas_id: "معرف Canvas للقسم"
+      samuel_report_header_section_name: "اسم القسم"
+      samuel_report_header_section_sis_id: "معرف sis  للقسم"
+      samuel_report_header_student_id: "معرف الطالب"
+      samuel_report_header_student_name: "اسم الطالب"
+      samuel_report_header_student_sis_id: "معرف sis  للطالب"
+      samuel_report_header_subaccount_id: "معرف الحساب الفرعي"
+      samuel_report_header_subaccount_name: "اسم الحساب الفرعي"
+      samuel_report_header_submission_date: "تاريخ الإرسال"
+      samuel_report_header_submission_grade: "درجة الإرسال"
+      samuel_report_header_submissions_attempt: "محاولة الإرسالات"
+      samuel_report_header_teacher_name: "اسم المدرس"
     learning_outcome_assignment_type_csv_parameters: 
       account_reports: 
         samuel_merrit_university: 
@@ -766,6 +997,23 @@ ar:
           description: 
             header: مثال
             text: "يعرض هذا التقرير نتائج التحصيل التعليمي لكل الطلاب. وسيحتوي ملف csv الناتج على صف واحد لكل زوج من نتائج تحصيل الطالب، وسيعرض تفاصيل النتيجة بما في ذلك المهمة المقترنة."
+      outcome_report_header_assessment_id: "معرف التقييم"
+      outcome_report_header_assessment_question: "سؤال التقييم"
+      outcome_report_header_assessment_question_id: "معرف سؤال التقييم"
+      outcome_report_header_assessment_title: "عنوان التقييم"
+      outcome_report_header_assessment_type: "نوع التقييم"
+      outcome_report_header_attempt: المحاولة
+      outcome_report_header_course_id: "معرف المساق"
+      outcome_report_header_course_name: "اسم المساق"
+      outcome_report_header_course_sis_id: "معرف sis للمساق"
+      outcome_report_header_learning_outcome_id: "معرف نتيجة التعلم"
+      outcome_report_header_learning_outcome_name: "اسم نتيجة التعلم"
+      outcome_report_header_outcome_score: "درجة التعلم"
+      outcome_report_header_student_id: "معرف الطالب"
+      outcome_report_header_student_name: "اسم الطالب"
+      outcome_report_header_student_sis_id: "معرف sis للطالب"
+      outcome_report_header_submission_date: "تاريخ الإرسال"
+      outcome_report_header_submission_score: "درجة الإرسال"
     outcome_results_csv_parameters: 
       account_reports: 
         outcomes: 
@@ -777,23 +1025,64 @@ ar:
             radio: النتائج
           user: 
             radio: المستخدمون
+    ph_student_grades_csv_parameters: 
+      account_reports: 
+        penn_harris: 
+          parameters: 
+            note: "المساقات ذات المهام التي بدون إعلامات قد لا تعكس الدرجات بدقة في هذا التقرير."
     provisioning_csv_description: 
       account_reports: 
         sis_export: 
           description: 
             text: "سيقوم هذا التقرير بتصدير كل المعلومات اللازمة ذات الصلة بتزويد Canvas في الفئات المختصة."
+    public_courses_csv_description: 
+      account_reports: 
+        default: 
+          public_courses: 
+            header: مثال
+            text: "يعرض هذا التقرير جميع المساقات التي لم يتم حذفها لفصل دراسي محدد غير منشور. سيشتمل ملف csv الناتج على صف واحد لكل مساق، وسيعرض معرف المساق ومعرف sis للمساق والاسم القصير للمساق واسم المساق وتاريخ البدء وتاريخ الانتهاء للمساق."
+      course_report_header_end_date: "تاريخ الانتهاء"
+      course_report_header_id: المعرف
+      course_report_header_name: الاسم
+      course_report_header_short_name: "الاسم القصير"
+      course_report_header_sis_id: "معرف sis"
+      course_report_header_start_date: "تاريخ البدء"
     quiz_data_csv_description: 
       account_reports: 
         ace: 
           quiz_data_description: 
             header: مثال
             text: "يعرض هذا التقرير أسئلة الاختبار وإجاباتها لكل الاختبارات في فصل دراسي معين. وسيحتوي ملف csv الناتج على صف واحد لكل سؤال وإجابته في الاختبار."
+      ace_report_header_correct: صحيح
+      ace_report_header_course_id: "معرف المساق"
+      ace_report_header_course_sis_id: "معرف sis للمساق"
+      ace_report_header_login_id: "معرف تسجيل الدخول"
+      ace_report_header_outcome_id: "معرف النتيجة"
+      ace_report_header_points_earned: "النقاط المكتسبة"
+      ace_report_header_points_possible: "النقاط الممكنة"
+      ace_report_header_question_id: "معرف السؤال"
+      ace_report_header_question_name: "اسم السؤال"
+      ace_report_header_question_text: "نص السؤال"
+      ace_report_header_quiz_title: "عنوان الاختبار"
+      ace_report_header_user_id: "معرف المستخدم"
+      ace_report_header_user_name: "اسم المستخدم"
+      ace_report_header_user_sis_id: "معرف sis للمستخدم"
     quiz_statistics_csv_description: 
       account_reports: 
         ace: 
           quiz_statistics_description: 
             header: مثال
             text: "يعرض هذا التقرير أسئلة الاختبار وعدد المستخدمين الذي أجابوا على الأسئلة وعدد المستخدمين الذين أجابوا على الأسئلة بشكل صحيح لكل الاختبارات في فصل دراسي معين. وسيحتوي ملف csv النائتج على صف واحد لكل سؤال اختبار."
+      ace_report_header_count_correct: "العدد صحيح"
+      ace_report_header_count_taken: "العدد المأخوذ"
+      ace_report_header_course_id: "معرف المساق"
+      ace_report_header_course_sis_id: "معرف sis للمساق"
+      ace_report_header_outcome_ids: "معرفات النتائج"
+      ace_report_header_points_possible: "النقاط الممكنة"
+      ace_report_header_question_id: "معرف السؤال"
+      ace_report_header_question_name: "اسم السؤال"
+      ace_report_header_question_text: "نص السؤال"
+      ace_report_header_quiz_title: "عنوان الاختبار"
     quota_integer_required: "مطلوب قيمة عدد صحيح"
     quota_must_be_positive: "يجب أن تكون القيمة موجبة"
     quota_not_updated: "لم يتم تحديث الحصة"
@@ -816,6 +1105,16 @@ ar:
             header: مثال
           student_activity: 
             text: "يعرض هذا التقرير كل المهام والمعلومات المتعلقة بتلك المهام الموجودة في مجموعة أو مجموعات المهام المحددة والتي في نطاق التاريخ المحدد. ويوفر هذا التقرير بيانات جدولة تدريبات الأمان بأدنى درجة من التشويش للمهام في الفصل لمواد التخصص."
+      newark_report_header_assignment_due_date: "تاريخ استحقاق المهمة"
+      newark_report_header_assignment_group_name: "اسم مجموعة المهام"
+      newark_report_header_assignment_id: "معرف المهمة"
+      newark_report_header_assignment_name: "اسم المهمة"
+      newark_report_header_course_code: "كود المساق"
+      newark_report_header_course_id: "معرف المساق"
+      newark_report_header_course_name: "اسم المساق"
+      newark_report_header_course_sis_id: "معرف sis للمساق"
+      newark_report_header_section_name: "اسم القسم"
+      newark_report_header_teacher_name: "اسم المدرس"
     safety_drill_csv_parameters: 
       account_reports: 
         newark: 
@@ -918,7 +1217,6 @@ ar:
         enable_alerts: تنبيهات
         enable_eportfolios: ePortfolios
         enable_profiles: "تمكين ملفات التعريف"
-        enable_scheduler: "تمكين التقويم 2"
         enable_user_notes: "دفتر الكلية"
         end_at: انتهى
         equella: Equella
@@ -1027,7 +1325,6 @@ ar:
       tab_quotas: الحصص
       tab_reports: التقارير
       tab_settings: إعدادات
-      transifex_message: "انضم إلى [مجتمع ترجمة Canvas ] (٪ {} transifex_url)\n"
       turnitin_comments_help: "سيتم عرض هذه التعليقات للطلاب عند إرسال مهمة تم تمكين Turnitin لها"
       turnitin_pledge_help: "يجب أن يضع الطلاب علامة اختيار أمام الخانة التي تفيد بأنهم يوافقون على هذا التعهد"
       turnitin_settings_title: "إعدادات Turnitin"
@@ -1170,6 +1467,23 @@ ar:
         zero: "%{file_size} *من %{count} من الملفات*"
       uploaded_file_storage_header: "تخزين الملف الذي تم تحميله"
     student_access_csv_description: 
+      access_report_header_content: المحتوى
+      access_report_header_content_access_id: "معرف الوصول إلى المحتوى"
+      access_report_header_content_type: "نوع المحتوى"
+      access_report_header_course_id: "معرف المساق"
+      access_report_header_course_name: "اسم المساق"
+      access_report_header_course_sis_id: "معرف sis  للمساق"
+      access_report_header_last_viewed: "آخر عرض"
+      access_report_header_root_account_id: "معرف الحساب الجذري"
+      access_report_header_section_id: "معرف القسم"
+      access_report_header_section_name: "اسم القسم"
+      access_report_header_section_sis_id: "معرف sis للقسم"
+      access_report_header_term_id: "معرف الفصل الدراسي"
+      access_report_header_term_sis_id: "معرف sis للفصل الدراسي"
+      access_report_header_times_participated: "أوقات المشاركة"
+      access_report_header_times_viewed: "أوقات العرض"
+      access_report_header_user_id: "معرف المستخدم"
+      access_report_header_user_sis_id: "معرف sis  للمستخدم"
       account_reports: 
         tmcc: 
           description: 
@@ -1182,6 +1496,24 @@ ar:
           description: 
             header: مثال
             text: "يعرض هذا التقرير نتائج التحصيل الدراسي لكل الطلاب. وسيتضمن ملف csv الناتج على صف واحد لكل زوج من نتائج تحصيل الطالب، وسيعرض تفاصيل النتيجة بما في ذلك المهمة المقترنة. ويعرض هذا التقرير نتائج التحصيل الدراسي فقط للمهام ولا يتضمن النتائج المرتبطة ببنوك الأسئلة."
+      outcome_report_header_assignment_id: "معرف المهمة"
+      outcome_report_header_assignment_title: "عنوان المهمة"
+      outcome_report_header_assignment_url: "عنوان url للمهمة"
+      outcome_report_header_attempt: المحاولة
+      outcome_report_header_course_id: "معرف المساق"
+      outcome_report_header_course_name: "اسم المساق"
+      outcome_report_header_course_sis_id: "معرف sis  للمساق"
+      outcome_report_header_learning_outcome_id: "معرف نتيجة التعلم"
+      outcome_report_header_learning_outcome_name: "اسم نتيجة التعلم"
+      outcome_report_header_outcome_score: "درجة النتيجة"
+      outcome_report_header_section_id: "معرف القسم"
+      outcome_report_header_section_name: "اسم القسم"
+      outcome_report_header_section_sis_id: "معرف sis للقسم"
+      outcome_report_header_student_id: "معرف الطالب"
+      outcome_report_header_student_name: "اسم الطالب"
+      outcome_report_header_student_sis_id: "معرف sis للطالب"
+      outcome_report_header_submission_date: "حالة الإرسال"
+      outcome_report_header_submission_score: "درجة الإرسال"
     student_grades_csv_description: 
       account_reports: 
         auburn: 
@@ -1191,6 +1523,21 @@ ar:
         default: 
           description: 
             header: مثال
+      auburn_report_header_course: المساق
+      auburn_report_header_course_id: "معرف المساق"
+      auburn_report_header_course_sis: "sis للمساق"
+      auburn_report_header_current_score: "الدرجة الحالية"
+      auburn_report_header_enrollment_state: "حالة التسجيل"
+      auburn_report_header_final_score: "الدرجة النهائية"
+      auburn_report_header_section: القسم
+      auburn_report_header_section_id: "معرف القسم"
+      auburn_report_header_section_sis: "sis للقسم"
+      auburn_report_header_student_id: "معرف الطالب"
+      auburn_report_header_student_name: "اسم الطالب"
+      auburn_report_header_student_sis: "sis للطالب"
+      auburn_report_header_term: "الفصل الدراسي"
+      auburn_report_header_term_id: "معرف الفصل الدراسي"
+      auburn_report_header_term_sis: "sis للفصل الدراسي"
     student_grades_csv_parameters: 
       account_reports: 
         auburn: 
@@ -1203,6 +1550,17 @@ ar:
             header: مثال
           student_login: 
             text: "يعرض هذا التقرير كل الطلاب المسجلين في مساق معين أو كل المساقات في فصل دراسي معين. وسيحتوي ملف csv الناتج على صف واحد لكل تسجيل طالب."
+      dubspot_report_header_course_id: "معرف المساق"
+      dubspot_report_header_course_name: "اسم المساق"
+      dubspot_report_header_course_sis_id: "معرف sis للمساق"
+      dubspot_report_header_ip_address: "عنوان ip"
+      dubspot_report_header_last_seen_at: "تاريخ آخر مشاهدة"
+      dubspot_report_header_section_id: "معرف القسم"
+      dubspot_report_header_section_name: "اسم القسم"
+      dubspot_report_header_section_sis_id: "معرف sis للقسم"
+      dubspot_report_header_user_id: "معرف المستخدم"
+      dubspot_report_header_user_login_id: "معرف تسجيل الدخول للمستخدم"
+      dubspot_report_header_user_sis_id: "معرف sis للمستخدم"
     student_submissions_csv_description: 
       account_reports: 
         vilas: 
@@ -1210,6 +1568,17 @@ ar:
             header: مثال
           student_submissions: 
             text: "هذا تقرير لكل الطلاب المسجلين في مساق في فصل دراسي معين والذين قاموا بإرسال مهمة. ويحتوي هذا التقرير على صف واحد لكل عملية إرسال لطالب."
+      vilas_report_header_assignment_id: "معرف المهمة"
+      vilas_report_header_assignment_name: "اسم المهمة"
+      vilas_report_header_canvas_course_id: "معرف مساق Canvas"
+      vilas_report_header_canvas_user_id: "معرف مستخدم Canvas"
+      vilas_report_header_course_name: "اسم المساق"
+      vilas_report_header_points_possible: "النقاط الممكنة"
+      vilas_report_header_score: النقاط
+      vilas_report_header_sis_course_id: "معرف مساق sis"
+      vilas_report_header_sis_user_id: "معرف مستخدم sis"
+      vilas_report_header_submission_date: "تاريخ الإرسال"
+      vilas_report_header_user_name: "اسم المستخدم"
     students_with_no_submissions_csv_description: 
       account_reports: 
         default: 
@@ -1217,6 +1586,15 @@ ar:
             description: 
               header: مثال
             text: "هذا تقرير لكل الطلاب المسجلين في مساق في فصل دراسي معين والذين لم يرسلوا مهمة بين نطاق التاريخ المعين في المساق. ويحتوي هذا التقرير على صف واحد لكل عملية تسجيل لطالب تفي بالمعايير. ولا يمكن أن يكون نطاق التاريخ أكثر من أسبوعين."
+      student_report_header_course_id: "معرف المساق"
+      student_report_header_course_name: "اسم المساق"
+      student_report_header_course_sis_id: "معرف sis للمساق"
+      student_report_header_section_id: "معرف القسم"
+      student_report_header_section_name: "اسم القسم"
+      student_report_header_section_sis_id: "معرف sis للقسم"
+      student_report_header_user_id: "معرف المستخدم"
+      student_report_header_user_name: "اسم المستخدم"
+      student_report_header_user_sis_id: "معرف sis للمستخدم"
     students_with_no_submissions_csv_parameters: 
       account_reports: 
         default: 
@@ -1238,6 +1616,19 @@ ar:
             header: مثال
           grade_export: 
             text: "يبين هذا التقرير نتائج درجة الطالب النهائية لجميع الطلاب في فصل دراسي معين. سوف يحتوي الملف المحدد بعلامات تبويب الناتج على صف واحد لكل تسجيل، وسوف يُظهر الدرجة النهائية المعروضة وحقول معلومات المساق المتعددة التي ستُستخدم لتحميل بيانات الدرجات إلى Synergy SIS."
+      tempe_report_header_absences: "حالات الغياب"
+      tempe_report_header_citizenship: الجنسية
+      tempe_report_header_comment_1: "تعليق 1"
+      tempe_report_header_comment_2: "تعليق 2"
+      tempe_report_header_comment_3: "تعليق 3"
+      tempe_report_header_grade_mark: "علامة الدرجة"
+      tempe_report_header_grading_term: "الفصل الدراسي الخاضع للتقييم"
+      tempe_report_header_mark_name: "اسم العلامة"
+      tempe_report_header_school_code: "رمز المدرسة"
+      tempe_report_header_school_year: "السنة الدراسية"
+      tempe_report_header_section_id: "معرف القسم"
+      tempe_report_header_sis_number: "رقم SIS"
+      tempe_report_header_workhabits: "عادات العمل"
     tempe_grade_export_csv_parameters: 
       account_reports: 
         tempe: 
@@ -1264,6 +1655,12 @@ ar:
           unpublishd_courses: 
             header: مثال
             text: "يعرض هذا التقرير جميع المساقات لمدة محددة غير منشورة. سيشتمل ملف csv الناتج على صف واحد لكل مساق، وسيعرض معرف المساق و معرف sis للمساق والاسم المختصر للمساق واسم المساق وتواريخ بدء وانتهاء المساق."
+      course_report_header_end_date: "تاريخ الانتهاء"
+      course_report_header_id: المعرف
+      course_report_header_name: الاسم
+      course_report_header_short_name: "الاسم القصير"
+      course_report_header_sis_id: "معرف sis"
+      course_report_header_start_date: "تاريخ البدء"
     unrecognized_time_zone: "'%{timezone}' ليست منطقة زمنية معروفة"
     unused_courses_csv_description: 
       account_reports: 
@@ -1272,8 +1669,32 @@ ar:
             header: مثال
           main: 
             text: "هذا تقرير لكل المساقات التي ليس لها أي من العناصر التالية: مهام أو إعلانات أو مناقشات أو ملفات أو وحدات أو صفحات أو اختبارات."
+      course_report_header_course_id: "معرف المساق"
+      course_report_header_course_sis_id: "معرف sis للمساق"
+      course_report_header_created_at: "تاريخ الإنشاء"
+      course_report_header_long_name: "الاسم الطويل"
+      course_report_header_short_name: "الاسم القصير"
+      course_report_header_status: الحالة
     update_failed_notice: "فشل تحديث إعدادات الحساب"
     user_access_csv_description: 
+      access_report_header_content: المحتوى
+      access_report_header_content_access_id: "معرف الوصول إلى المحتوى"
+      access_report_header_content_type: "نوع المحتوى"
+      access_report_header_course_id: "معرف المساق"
+      access_report_header_course_name: "اسم المساق"
+      access_report_header_course_sis_id: "معرف sis للمساق"
+      access_report_header_enrollment_type: "نوع التسجيل"
+      access_report_header_last_viewed: "آخر عرض"
+      access_report_header_root_account_id: "معرف الحساب الجذري"
+      access_report_header_section_id: "معرف القسم"
+      access_report_header_section_name: "اسم القسم"
+      access_report_header_section_sis_id: "معرف sis للقسم"
+      access_report_header_term_id: "معرف الفصل الدراسي"
+      access_report_header_term_sis_id: "معرف sis للفصل الدراسي"
+      access_report_header_times_participated: "أوقات المشاركة"
+      access_report_header_times_viewed: "أوقات العرض"
+      access_report_header_user_id: "معرف المستخدم"
+      access_report_header_user_sis_id: "معرف sis للمستخدم"
       account_reports: 
         usu: 
           description: 
@@ -1292,8 +1713,6 @@ ar:
       ta: "تسجيلات Ta"
       teachers: "تسجيلات المعلمين"
     user_add_failed_message: "فشل إضافة مستخدم، الرجاء المحاولة مرة أخرى"
-    user_added_message: "تمت إضافة %{user} بنجاح!"
-    user_added_message_sent_message: "تمت إضافة %{user} بنجاح! يجب أن يتلقوا بريدًا إلكترونيًا للتأكيد بعد قليل."
     user_deleted_message: "تم حذف %{username} بنجاح"
     user_inactivity_csv_description: 
       account_reports: 
@@ -1302,11 +1721,39 @@ ar:
             header: مثال
           low_activity: 
             text: "يوضح هذا التقرير المستخدمين الملتحقين في مساق معين أو في جميع المساقات خلال فترة معينة. سيكون للملف الناتج بتنسيق cvs صف واحد لالتحاق كل مستخدم لم يحصل على الحد الأدنى من الزيارات."
+      webster_report_header_course_id: "معرف المساق"
+      webster_report_header_course_name: "اسم المساق"
+      webster_report_header_course_sis_id: "معرف sis للمساق"
+      webster_report_header_enrollment_state: "حالة التسجيل"
+      webster_report_header_enrollment_type: "نوع التسجيل"
+      webster_report_header_last_ip: "آخر ip"
+      webster_report_header_login_id: "معرف تسجيل الدخول"
+      webster_report_header_user_id: "معرف المستخدم"
+      webster_report_header_user_name: "اسم المستخدم"
+      webster_report_header_user_sis_id: "معرف sis للمستخدم"
     user_inactivity_csv_parameters: 
       account_reports: 
         webster: 
           login: 
             day_drop: "الحد الأدنى من عناصر المساق التي تمت زيارتها:"
+    user_notes_csv_description: 
+      account_reports: 
+        pasco: 
+          description: 
+            header: مثال
+          user_notes: 
+            text: "يعرض هذا التقرير ملاحظات المستخدم للطلاب."
+      pasco_report_header_created_at: "تاريخ الإنشاء"
+      pasco_report_header_created_by_id: "معرف المنشئ"
+      pasco_report_header_deleted_at: "تاريخ الحذف"
+      pasco_report_header_note: ملاحظة
+      pasco_report_header_note_id: المعرف
+      pasco_report_header_title: العنوان
+      pasco_report_header_updated_at: "تاريخ التحديث"
+      pasco_report_header_user_id: "معرف المستخدم"
+      pasco_report_header_user_sis_id: "معرف sis للمستخدم"
+      pasco_report_header_workflow_state: "حالة سير العمل"
+      pasco_report_url: "عنوان url"
     users_list: 
       login_name_or_sis_id: "معرّف تسجيل دخول / SIS"
       name: الاسم
@@ -1318,6 +1765,32 @@ ar:
           zero_activity: 
             header: مثال
             text: "يوضح هذا التقرير جميع الطلاب الملتحقين بأي مساقات في فصل دراسي معين. سيحتوي الملف الناتج بتنسيق cvs على صف واحد لالتحاق كل مستخدم لم يقم بزيارة المساق منذ ذلك التاريخ."
+      student_report_header_course_id: "معرف المساق"
+      student_report_header_course_name: "اسم المساق"
+      student_report_header_course_sis_id: "معرف sis للمساق"
+      student_report_header_name: الاسم
+      student_report_header_section_id: "معرف القسم"
+      student_report_header_section_name: "اسم القسم"
+      student_report_header_section_sis_id: "معرف sis للقسم"
+      student_report_header_user_id: "معرف المستخدم"
+      student_report_header_user_sis_id: "معرف sis للمستخدم"
+  ace_report_header_correct: صحيح
+  ace_report_header_count_correct: "العدد صحيح"
+  ace_report_header_count_taken: "العدد المأخوذ"
+  ace_report_header_course_id: "معرف المساق"
+  ace_report_header_course_sis_id: "معرف sis للمساق"
+  ace_report_header_login_id: "معرف تسجيل الدخول"
+  ace_report_header_outcome_id: "معرف النتيجة"
+  ace_report_header_outcome_ids: "معرفات النتائج"
+  ace_report_header_points_earned: "النقاط المكتسبة"
+  ace_report_header_points_possible: "نقاط ممكنة"
+  ace_report_header_question_id: "معرف السؤال"
+  ace_report_header_question_name: "اسم السؤال"
+  ace_report_header_question_text: "نص السؤال"
+  ace_report_header_quiz_title: "عنوان الاختبار"
+  ace_report_header_user_id: "معرف المستخدم"
+  ace_report_header_user_name: "اسم المستخدم"
+  ace_report_header_user_sis_id: "معرف sis للمستخدم"
   activerecord: 
     errors: 
       full_messages: 
@@ -1527,6 +2000,8 @@ ar:
     invalid_participants: "يجب عليك السماح لمستخدم واحد على الأقل بالحضور"
     title: "تحرير %{name}"
     update: تحديث
+  aria_labels: 
+    unlock_at_date: "إلغاء التأمين في التاريخ"
   assessment_question: 
     default_question_name: السؤال
   assessment_question_bank: 
@@ -1614,6 +2089,8 @@ ar:
     unmute_button: "إلغاء حجب المهمة"
     unmute_dialog: "تم حجب هذه المهمة حاليًا. وهذا يعني أن الطلاب لا يمكنهم عرض الدرجات والملاحظات الخاصة بهم. هل ترغب في إلغاء حجبها الآن؟"
     unmuting_assignment: "إظهار درجة التعيين..."
+  assignment_scheduling_title: "جدولة المهمة"
+  assignment_score_summary_title: "ملخص درجات المهمة"
   assignments: 
     add_assignment_form: 
       assignment_name: "اسم المهمة"
@@ -1649,7 +2126,6 @@ ar:
         never_drop: "لا يتم الإسقاط مطلقًا"
         no_assignments: "[بدون مهام]"
         weighted_by_points: "التقدير حسب النقاط"
-      percent_of_total_grade: "%{percent} % من إجمالي الدرجات"
     assignment_count: 
       few: "%{count} من التعيينات"
       many: "%{count} من التعيينات"
@@ -1857,13 +2333,11 @@ ar:
         remove_these_dates: "حذف هذه التواريخ"
     edit: 
       edit_assignment: "تحرير التقييم"
-      new_discussion: "نقاش جديد"
-      new_quiz: "الاختبار الجديد"
     edit_header_view: 
       buttons: 
         not_published: "غير منشور"
         published: منشور
-      manage: إدارة
+      manage_assignment: "إدارة المهام"
       titles: 
         delete: حذف
     edit_view: 
@@ -1963,6 +2437,7 @@ ar:
       assignment_locked_tooltip: "تم التأمين"
       keycode_descriptions: 
         add_assignment_or_group: "إضافة مهمة إلى المجموعة الحالية"
+        close_active_dialog: "إغلاق الحوار النشط"
         delete_assignment_or_group: "حذف المهمة/المجموعة الحالية"
         edit_assignment_or_group: "تحرير المهمة/المجموعة الحالية"
         full_preview: "المعاينة بالكامل/تحرير المهمة"
@@ -1970,6 +2445,7 @@ ar:
         previous_assignment_or_group: "المهمة/المجموعة السابقة"
       keycodes: 
         add_assignment_or_group: a
+        close_active_dialog: esc
         delete_assignment_or_group: d
         edit_assignment_or_group: e
         full_preview: f
@@ -2020,8 +2496,6 @@ ar:
     name_is_required: "الاسم مطلوب!"
     name_too_long: "الاسم طويل للغاية"
     name_too_long_error: "الاسم طويل للغاية"
-    never_drop: 
-      remove_rule: "إزالة القاعدة"
     never_drop_collection: 
       add_another_assignment: "إضافة مهمة أخرى"
       add_first_assignment: "إضافة مهمة"
@@ -2097,6 +2571,8 @@ ar:
       redirect_message: |-
           كان هذا الإرسال عنوان url، سنأخذك إلى ارتباط url الآن.  
           [انقر هنا للانتقال إلى الإرسال](%{url})
+    remove_never_drop_rule: "إزالة قاعدة عدم الإسقاط"
+    remove_unsaved_never_drop_rule: "إزالة قاعدة عدم الإسقاط غير المحفوظة"
     rules_text: 
       few: "%{count} من القواعد"
       many: "%{count} من القواعد"
@@ -2165,9 +2641,6 @@ ar:
         submission: إرسال
         submission_not_turned_in: "ألم تسلّم بعد!"
         submission_turned_in: "تم التسليم!"
-      tooltips: 
-        finished: "تم الانتهاء"
-        incomplete: "غير كامل"
     submission_type_icon: 
       tooltips: 
         submitted: "تم الإرسال"
@@ -2338,7 +2811,6 @@ ar:
     title: 
       migration_list: "ملفات مرتبطة"
     upload_error_invalid_response_code: "كود استجابة غير صالح، كان المتوقع 200 لكنه حصل على %{code}"
-    upload_error_invalid_url: ju`v
     upload_error_over_quota: "تجاوز حجم الملف قيود الحصة: %{bytes} بايت"
     upload_error_relative_uri: "لم يتم توفير مضيف لـ URL: التالي %{url}"
     upload_error_timeout: "انتهت مهلة الطلب: %{url}"
@@ -2359,12 +2831,48 @@ ar:
     titles: 
       attendance_help: "تعليمات الحضور"
       new_attendance_column: "العمود الجديد للحضور"
+  auburn_report_header_account_id: "معرف الحساب"
+  auburn_report_header_account_name: "اسم الحساب"
+  auburn_report_header_account_sis_id: "معرف sis للحساب"
+  auburn_report_header_course: المساق
+  auburn_report_header_course_id: "معرف المساق"
+  auburn_report_header_course_name: "اسم المساق"
+  auburn_report_header_course_sis: "sis للمساق"
+  auburn_report_header_course_sis_id: "معرف sis للمساق"
+  auburn_report_header_course_status: "حالة المساق"
+  auburn_report_header_current_score: "الدرجة الحالية"
+  auburn_report_header_effective_date: "تاريخ السريان"
+  auburn_report_header_end_date: "تاريخ الانتهاء"
+  auburn_report_header_enrollment_state: "حالة التسجيل"
+  auburn_report_header_final_score: "الدرجة النهائية"
+  auburn_report_header_section: القسم
+  auburn_report_header_section_id: "معرف القسم"
+  auburn_report_header_section_name: "اسم القسم"
+  auburn_report_header_section_sis: "sis للقسم"
+  auburn_report_header_section_sis_id: "معرف sis للقسم"
+  auburn_report_header_start_date: "تاريخ البدء"
+  auburn_report_header_student_count: "عدد الطلاب"
+  auburn_report_header_student_id: "معرف الطالب"
+  auburn_report_header_student_name: "اسم الطالب"
+  auburn_report_header_student_sis: "sis للطالب"
+  auburn_report_header_teacher_id: "معرف المدرس"
+  auburn_report_header_teacher_name: "اسم المدرس"
+  auburn_report_header_teacher_sis_id: "معرف sis للمدرس"
+  auburn_report_header_term: "الفصل الدراسي"
+  auburn_report_header_term_id: "معرف الفصل الدراسي"
+  auburn_report_header_term_name: "اسم الفصل الدراسي"
+  auburn_report_header_term_sis: "sis للفصل الدراسي"
+  auburn_report_header_term_sis_id: "معرف sis للفصل الدراسي"
   auth_logging: 
     login: "تسجيل الدخول"
     logout: "تسجيل الخروج"
   bb_display: "تعلم Blackboard"
   bb_file_description: "تصدير Blackboard 6/7/8/9 بتنسيق ملف zip."
   bb_name: "محول Blackboard"
+  better_file_browsing_description: |-
+      واجهة جديدة وبسيطة وسهلة الاستخدام لاستعراض الملفات. إذا قمت بتشغيلها على مستوى المساق،
+      فإن جميع المستخدمين في هذا المساق سيشاهدون الواجهة الجديدة. ولجعلها تظهر عندما ينتقل أحد الأشخاص إلى
+      صفحة الملفات الشخصية لأحد المستخدمين ('/files')، فإنك تحتاج إلى تشغيلها للحساب الذي هو عضو فيه.
   big_blue_button_conference: 
     conference_is_recorded: "يتم تسجيل هذا المؤتمر."
     recording_setting: تسجيل
@@ -2373,6 +2881,13 @@ ar:
     no_manifest: "لا يوجد أي ملف imsmanifest.xml في imsmanifest.xml في الدليل الجذر."
   bookmark_service: 
     default_title: "بلا عنوان"
+  bucks_report_header_last_access_to_canvas: "آخر وصول إلى canvas"
+  bucks_report_header_name: الاسم
+  bucks_report_header_section_id: "معرف القسم"
+  bucks_report_header_section_name: "اسم القسم"
+  bucks_report_header_section_sis_id: "معرف sis للقسم"
+  bucks_report_header_user_sis_id: "معرف sis للمستخدم"
+  bucks_zero_activity_title: "النشاط الصفري لـ Bucks"
   bulk_course_migration: 
     export_failed: "حدث خطأ أثناء تصدير المساق ذي المعرف bb_lcid %{id} من Blackboard"
     export_failed_no_id: "حدث خطأ أثناء استيراد مساق"
@@ -2560,7 +3075,10 @@ ar:
     agenda_view_displaying_start_end: "يتم الآن عرض %{start} من خلال %{end}"
     appointment_group_deletion_details: "سيؤدي حذفه إلى حذف أي مواعيد قام الطلاب بالاشتراك فيها"
     appointment_group_list: 
+      delete: حذف
+      edit: تحرير
       location: "الموقع:"
+      manage: إدارة
       message_groups: "إرسال رسالة للمجموعات التي..."
       message_students: "إرسال رسائل للطلاب الذين..."
       scheduler_explanation_student_header: "ليس لديك أية مجموعات مواعيد للاشتراك فيها"
@@ -2570,6 +3088,10 @@ ar:
       scheduler_explanation_teacher_paragraph_1: "هذه هي أداة الجدولة. يمكنك استخدامها لإنشاء مجموعات مواعيد لطلابك لتسجيل الاشتراك فيها."
       scheduler_explanation_teacher_paragraph_2: "على سبيل المثال، لنفترض أنك تريد فحص تعيين ورقة نصف العام مع كل طالب من طلابك في المساق. يمكنك إنشاء مجموعة مواعيد جديدة، وتحدد التواريخ والأوقات التي تكون متاحًا فيها، وتقوم بتقسيم تلك الأوقات إلى مجموعات زمنية مقدار كل منها 15 دقيقة وتسمح بطالب واحد فقط لكل مجموعة زمنية."
       scheduler_explanation_teacher_paragraph_3: "ثم يتم إخطار الطلاب وسوف يرون أنهم بحاجة إلى تسجيل الاشتراك في واحدة من هذه المجموعات الزمنية. وسيتم عرض تقويم أمامهم تظهر به المجموعات الزمنية متراكبة فوق كل شيء موجود في تقاويمهم الأخرى حتى يتسنى لهم اختيار الوقت المناسب لهم."
+      scheduler_explanation_teacher_paragraph_4: "*يمكنك البدء الآن بالنقر فوق زر \"إنشاء مجموعة مواعيد\" الموجود على اليمين. *"
+      signed_up_for: "لقد قمت بتسجيل الاشتراك في"
+      x_groups_have_signed_up: "قامت %{participant_count} مجموعة بتسجيل الاشتراك"
+      x_people_have_signed_up: "قام %{participant_count} شخصًا بتسجيل الاشتراك"
     buttons: 
       cancel: إلغاء
       send_message: إرسال
@@ -2649,6 +3171,8 @@ ar:
       from: "من:"
       links: 
         more_options: "مزيد من الخيارات"
+      location: "الموقع:"
+      timespan_separator: إلى
       title: "العنوان:"
     edit_calendar_event_full: 
       buttons: 
@@ -2661,6 +3185,8 @@ ar:
       end_time: "وقت النهاية"
       event_description: "وصف الحدث"
       event_title: "عنوان الحدث"
+      location_address: "العنوان:"
+      location_name: "الموقع:"
       new_calendar_event_header: "حدث جديد في التقويم"
       start_time: "وقت البداية"
     edit_event: 
@@ -2683,6 +3209,7 @@ ar:
         reserve: حجز
         unreserve: "إلغاء الحجز"
       location: الموقع
+      location_address: العنوان
       message_students: "مراسلة الطلاب"
       slots_available: "الأجزء الزمنية المتاحة"
     event_event_title: "عنوان الحدث:"
@@ -2766,9 +3293,11 @@ ar:
         create: "إنشاء حدث"
         update: "تحديث حدث"
       labels: 
+        address: العنوان
         date: التاريخ
         event_description: "وصف الحدث"
         from: من
+        location: الموقع
         title: العنوان
       no_content: "لا يوجد محتوى"
       timespan: "%{start_time} *إلى* %{end_time}"
@@ -2957,11 +3486,50 @@ ar:
     by_sa: "سمة CC المشاركة أيضًا"
     private: "خاص (محمي بموجب حقوق النشر)"
     public_domain: "المجال العام"
+  ccp_report_header_course_id: "معرف المساق"
+  ccp_report_header_course_name: "اسم المساق"
+  ccp_report_header_course_sis_id: "معرف sis للمساق"
+  ccp_report_header_email: "البريد الإلكتروني"
+  ccp_report_header_enrollment_type: "نوع التسجيل"
+  ccp_report_header_first_name: "الاسم الأول"
+  ccp_report_header_last_name: "الاسم الأخير"
+  ccp_report_header_section_id: "معرف القسم"
+  ccp_report_header_section_name: "اسم القسم"
+  ccp_report_header_section_sis_id: "معرف sis للقسم"
+  ccp_report_header_user_id: "معرف المستخدم"
+  ccp_report_header_user_sis_id: "معرف sis للمستخدم"
+  ccp_zero_activity_title: "النشاط الصفري لـ CCP"
+  cedar_rapids_report_header_account_id: "معرف الحساب"
+  cedar_rapids_report_header_account_name: "اسم الحساب"
+  cedar_rapids_report_header_course_end_date: "تاريخ انتهاء المساق"
+  cedar_rapids_report_header_course_id: "معرف المساق"
+  cedar_rapids_report_header_course_name: "اسم المساق"
+  cedar_rapids_report_header_course_start_date: "تاريخ بداية المساق"
+  cedar_rapids_report_header_course_status: "حالة المساق"
+  cedar_rapids_report_header_department_id: "معرف القسم"
+  cedar_rapids_report_header_department_name: "اسم القسم"
+  cedar_rapids_report_header_observer_count: "عدد الملاحظين"
+  cedar_rapids_report_header_student_count: "عدد الطلاب"
+  cedar_rapids_report_header_ta_count: "عدد مساعدي المدرسين"
+  cedar_rapids_report_header_teacher_count: "عدد المدرسين"
+  cedar_rapids_report_header_term_id: "معرف الفصل الدراسي"
+  cedar_rapids_report_header_term_name: "اسم الفصل الدراسي"
   change_points_possible_to_match_rubric_dialog: 
     prompts: 
       update_assignment_points: "هذا التعيين يشتمل على %{assignmentPoints} نقطة ممكنة، هل ترغب في تغييره بحيث يشتمل على %{rubricPoints} نقطة ممكنة لمطابقة هذا المعيار؟"
     titles: 
       update_assignment_points: "هل تريد تغيير النقاط الممكنة لمطابقة نموذج التقييم؟"
+  chcp_report_header_course: المساق
+  chcp_report_header_email: "البريد الإلكتروني"
+  chcp_report_header_grade: الدرجة
+  chcp_report_header_last_submissio: "آخر إرسال"
+  chcp_report_header_lda: "تاريخ آخر حضور (LDA)"
+  chcp_report_header_phone: الهاتف
+  chcp_report_header_start_date: "تاريخ البدء"
+  chcp_report_header_student_id: "معرف الطالب"
+  chcp_report_header_student_name: "اسم الطالب"
+  chcp_report_header_teacher: المدرس
+  chcp_student_activity_title: "تقرير نشاط طلاب CHCP"
   collaboration: 
     default_title: "تعاون بدون تسمية"
   collaborations: 
@@ -3016,6 +3584,10 @@ ar:
         update: "تحديث التعاون"
       collaboration_name: "تعاون %{course_or_group_name}"
       descriptions: 
+        etherpad: |-
+            EtherPad هو مشروع ذو مصدر مفتوح يتيح لك إعداد المستندات المشتركة بسرعة. وهو سريع بالقدر الكافي الذي يمكنك من رؤية ما يكتبه الآخرون أثناء قيامهم بالكتابة. على الجانب الآخر، لا تخضع "اللوحات" للحماية بكلمة مرور بحيث يمكن لأي شخص لديه ارتباط تحريرها. ويتسم EtherPad بكونه أكثر مناسبة من مستندات Google إذا كنت ترغب في دعم عدم معرفة الهوية و/أو السماح للأشخاص الذيم ليس لديهم حسابات Google بالمشاركة.  
+              
+            **تحذير**: تأكد من معرفتك الجيدة [بسياسة الحذف فيEtherPad](%{etherpad_deletion_policy_url}) لضمان الحفاظ على عملك.
         google_docs: |-
             تعد Google Docs منطقة رائعة للتعاون في مشروع المجموعة.  إنها تشبه Microsoft Word، غير أنها تتيح لك فرصة العمل مع الآخرين في نفس الملف في الوقت نفسه دون إرسال بريد إلكتروني إليهم.  
               
@@ -3063,7 +3635,7 @@ ar:
     to_now: الآن
   common_cartridge_description: "يقوم هذا الإجراء بتمكين تحويل حِزم الكارتريدج المشتركة الموجودة بتنسيق json الوسيط ليتم استيرادها"
   common_cartridge_display: "الكارتريدج المشتركة"
-  common_cartridge_file_description: "حزمة ‎1.0/1.1/1.2 للكارتريدج المشتركة"
+  common_cartridge_file_description: "حزمة ‎1.x للكارتريدج المشتركة"
   common_cartridge_name: "مستورد الكارتريدج المشتركة"
   communication_channel: 
     body: "كود تحقق Canvas الخاص بك هو %{verification_code}"
@@ -3118,6 +3690,16 @@ ar:
     profile: 
       notices: 
         contact_registered: "تم تسجيل طريقة الاتصال!"
+  concord_report_header_campus: "الحرم الجامعي"
+  concord_report_header_course_name: "اسم المساق"
+  concord_report_header_course_sis_id: "معرف sis للمساق"
+  concord_report_header_last_course_activity_date: "تاريخ آخر نشاط للمساق"
+  concord_report_header_student_current_grade: "الدرجة الحالية للطالب"
+  concord_report_header_student_default_email: "البريد الإلكتروني الافتراضي للطالب"
+  concord_report_header_student_name: "اسم الطالب"
+  concord_report_header_student_sis_id: "معرف sis للطالب"
+  concord_report_header_term_name: "اسم الفصل الدراسي"
+  concord_report_header_zero_grade_assignments: "مهام بدرجة صفرية"
   conferences: 
     concluded_conference: 
       delete: حذف
@@ -3125,7 +3707,7 @@ ar:
       preparing_video: "إعداد الفيديو"
       recording: "تسجيل واحد"
       recordings: "%{recordingCount} تسجيل/تسجيلات"
-      setings: إعدادات
+      settings: إعدادات
       view: عرض
     confirm: 
       close: |-
@@ -3163,7 +3745,7 @@ ar:
       join: انضمام
       recording: "تسجيل واحد"
       recordings: "%{recordingCount} تسجيل/تسجيلات"
-      setings: إعدادات
+      settings: إعدادات
       start: بدء
       view: عرض
     no_concluded_conferences: "لا توجد مؤتمرات منجزة"
@@ -3190,6 +3772,12 @@ ar:
         new: "لم يبدأ بعد"
         started: "بدأ %{time}"
     type_disabled_error: "لم يعد هذا النوع من المؤتمرات ممكّنًا لموقع Canvas هذا"
+  confirm_dialog: 
+    cancel: إلغاء
+    ok: موافق
+    submit: إرسال
+  confirm_dialog_component: 
+    ok: موافق
   content_exports: 
     buttons: 
       process: "بيانات العملية"
@@ -3452,7 +4040,6 @@ ar:
         conclude_student: "هل ترغب بالتأكيد في الوصول إلى تسجيل الطالب هذا؟"
         delete_enrollment: "هل ترغب بالتأكيد في حذف تسجيل الطالب هذا؟"
       enrolled_as: "تم التسجيل كـ %{enrollment_type}"
-      enrollment_linked_to: "مرتبط بـ %{linked_user}"
       error: 
         enrollment_change_failed: "فشل تغيير ميزة التسجيل، الرجاء المحاولة مرة أخرى"
       labels: 
@@ -3509,6 +4096,7 @@ ar:
       enrollment_change_failed: "فشل تغيير ميزة التسجيل، الرجاء المحاولة مرة أخرى"
       headings: 
         recent_messages: "الرسائل الحديثة"
+        user_services: "خدمات الويب المسجّلة"
       help: 
         list_services: "لم تقم بتمكين قائمة الخدمات المسجلة. إن تمكين هذه القائمة سيتيح للزملاء في المساق وأعضاء المجموعة بالتواصل معك بسهولة أكبر خارج الفصل."
         services: "لم تقم بربط الملف الشخصي للمستخدم بأية خدمات خارجية. يمكنك ربط حساب Canvas بالخدمات مثل Facebook وTwitter. وهذا يجعل من السهل للزملاء في المساق وأعضاء المجموعة بالتواصل معك خارج غرفة الدراسة."
@@ -3518,20 +4106,27 @@ ar:
       legends: 
         memberships: "عضوية (عضويات)"
       links: 
+        access_report: "تقرير الوصول"
         cant_delete: "تعذر الحذف"
         conclude_enrollment: "الوصول لهذا التسجيل"
         delete_enrollment: "حذف هذا التسجيل"
+        faculty_journal: "دفتر الكلية "
         link_enrollment: "ربط هذا التسجيل"
         link_services: "ربط خدمات الويب بالحساب الخاص بي"
+        message_user: "إرسال رسالة"
         more_about_this_user: "المزيد عن هذا المستخدم"
         more_user_details: "المزيد من تفاصيل المستخدم..."
         remove_avatar: "إزالة الصورة المجسمة"
         report_avatar: "تقرير بصورة غير مناسبة"
         restore_enrollment: "استعادة هذا التسجيل"
+        student_teacher_activity: "التفاعلات معك"
+        teacher_activity: "تقرير تفاعل الطالب "
         title: 
           enrollment_sis_defined: "تم تعريف هذا التسجيل بواسطة الجامعة، ولا يمكن حذفه"
         user_account_details: "تفاصيل حساب المستخدم"
+        user_grades: الدرجات
         user_only_view_section: "اجعل هذا المستخدم لا يشاهد إلا رفاقه المستخدمين في نفس القسم"
+        user_outcomes: النواتج
         user_view_all_sections: "اسمح لهذا المستخدم بمشاهدة كل مستخدمي المساق"
       no_messages: "لا توجد رسائل"
       no_services: "لم يقم %{user} بربط أي خدمات خارجية بالحساب بعد."
@@ -3671,7 +4266,7 @@ ar:
         module_complete_when: "تحجبل هذه الوحدة عند"
         modules: 
           before_students_view: "قبل أن يتمكن الطلاب من عرض هذه الوحدة"
-        new_tab: "تحميل هذه الأداة في علامة تبويب جديدة"
+        new_tab: "تحميل في علامة تبويب جديدة"
         publish_final_grade: "نشر التقييم النهائي للطالب عند إكمال هذه الوحدة"
         require_sequential_progress: "يجب أن ينتقل الطلاب عبر المتطلبات الضرورية في هذه الوحدة بترتيب تسلسلي"
         sort_by: "فرز حسب"
@@ -3782,7 +4377,7 @@ ar:
         module_complete_when: "تكتمل هذه الوحدة عند"
         modules: 
           before_students_view: "قبل أن يتمكن الطلاب من عرض هذه الوحدة"
-        new_tab: "تحميل هذه الأداة في علامة تبويب جديدة"
+        new_tab: "تحميل في علامة تبويب جديدة"
         require_sequential_progress: "يجب أن ينتقل الطلاب عبر المتطلبات الضرورية في هذه الوحدة بترتيب تسلسلي"
         sort_by: "فرز حسب"
         title: العنوان
@@ -4007,6 +4602,10 @@ ar:
       edit: "تحرير إعدادات الوحدة"
       edit_item: "تحرير تفاصيل العنصر"
       student_progress: "تقدم الطلاب في الوحدة"
+    url_show: 
+      new_tab: "يجب فتح هذا الموقع في نافذة مستعرض جديدة."
+      open_url_button: "عرض %{title} في نافذة جديدة"
+      tool_insecure_warning: "أنت تحاول تشغيل محتوى غير آمن من موقع آمن (canvas). بعض مستعرضات الإنترنت تمنع هذا المحتوى من التحميل."
   context_modules_api: 
     invalid_position: "وضع غير صالح"
   conversation_dialog: 
@@ -4016,6 +4615,7 @@ ar:
     no_course: "لا يوجد مساق"
     select_course: "تحديد مساق"
   conversation_message: 
+    subject: "رسالة خاصة"
     subject_specified: "رسالة خاصة: %{subject}"
     users_added: 
       few: "تمت إضافة %{list_of_users} من قبل %{current_user}"
@@ -4042,16 +4642,12 @@ ar:
     all_in_context: "الكل في %{context}"
     archive: أرشيف
     archive_conversation: "أرشفة محادثات"
-    attachment_error: "فشل في تحميل المرفق ، الرجاء المحاولة مرة أخرى"
     autocomplete_result: 
       group_people: "الأشخاص: %{people}"
       no_results: "بلا نتائج"
     autocomplete_token: 
       remove_recipient: "إزالة المستلم"
     back: عودة
-    buttons: 
-      add_people: "إضافة أشخاص"
-      send_message: إرسال
     cannot_add_to_private: "لا يمكنك إضافة مشاركين إلى محادثة خاصة."
     cannot_be_empty: "لا يمكن أن تكون الرسالة فارغة"
     compose_button_bar: 
@@ -4064,7 +4660,6 @@ ar:
     confirm: 
       delete_conversation: "هل تريد بالتأكيد حذف نسختك من هذه المحادثة؟ لن يمكن التراجع عن هذا الإجراء."
       delete_message: "هل تريد بالتأكيد حذف نسختك من هذه الرسالة؟ لن يمكن التراجع عن هذا الإجراء."
-      delete_messages: "هل تريد بالتأكيد حذف نسختك من هذه الرسائل؟ لن يمكن التراجع عن هذا الإجراء."
     context_message: 
       delete_message: "حذف الرسالة"
       labels: 
@@ -4087,62 +4682,13 @@ ar:
         unsubscribe: "إلغاء الاشتراك"
       inbox_actions_description: "قائمة إجراءات الرسالة"
       read_more: المزيد...
-    conversations_list: 
-      no_archived_messages: "ليست لديك رسائل مؤرشفة"
-      no_messages: "ليست لديك رسائل"
-      no_sent_messages: "ليست لديك رسائل مرسلة"
-      no_starred_messages: "ليست لديك رسائل تم وضع نجمة عليها"
-      no_unread_messages: "ليست لديك رسائل غير مقروءة"
-    conversations_pane: 
-      confirm: 
-        delete_conversation: "هل تريد بالتأكيد حذف نسختك من هذه المحادثة؟ لن يمكن التراجع عن هذا الإجراء."
     course_name: "اسم المساق"
     course_options: 
       course_options: 
         concluded: "تم الانتهاء"
+        groups: المجموعات
         more_courses: "مزيد من المساقات"
-    enrollments_everyone: الجميع
-    errors: 
-      field_is_required: "هذا الحقل مطلوب"
-    filter_by_course: "تصفية حسب هذا المساق"
-    filter_by_group: "تصفية حسب هذه المجموعة"
-    headings: 
-      new_message: "رسالة جديدة"
     hide: إخفاء
-    index: 
-      add_recipients_instructions: "الأشخاص الذين تضيفهم إلى المحادثة سيشاهدون كل الرسائل السابقة."
-      conversations_intro: "مقدمة المحادثات"
-      help: تعليمات
-      inbox_actions: 
-        delete: حذف
-        forward: "إعادة توجيه"
-      inbox_view: عرض
-      inbox_views: 
-        archived_messages: مؤرشف
-        inbox: "صندوق الوارد"
-        sent_messages: مرسلة
-        starred_messages: "تم وضع نجمة عليها"
-        unread_messages: "غير مقروء"
-      labels: 
-        filter: تصفية
-        message: الرسالة
-        submitted: "تم إرسال"
-        to: إلى
-      links: 
-        compose_new_message: "رسالة جديدة"
-      more_messages: "%{count} المزيد..."
-      page_title: المحادثات
-      send_private_message: "رسالة جديدة..."
-      titles: 
-        compose_new_message: "كتابة رسالة جديدة"
-        download_attachment: "تنزيل المرفق"
-        play_media_comment: "تشغيل تعليق الوسائط"
-        rss: 
-          conversations: "موجز ويب Atom للمحادثات"
-        submission_author: "مؤلف الإرسال"
-        submission_score: "درجات الإرسال"
-        view_submission: "فتح الإرسال في نافذة جديدة."
-      try_new_conversations: "تجربة محادثات جديدة"
     index_new: 
       archive: أرشيف
       archive_conversation: "أرشفة محادثة"
@@ -4154,7 +4700,6 @@ ar:
       filter_messages_by_course: "تصفية الرسائل حسب المساق"
       filter_messages_by_type: "تصفية الرسائل حسب النوع"
       forward: "إعادة توجيه"
-      help: تعليمات
       inbox: "صندوق الوارد"
       mark_as_read: "وضع علامة كمقروء"
       mark_as_unread: "وضع علامة غير مقروء"
@@ -4168,7 +4713,6 @@ ar:
       sent: مرسلة
       settings: إعدادات
       starred: "تم وضع نجمة عليها"
-      switch_to_old_conversations: "التبديل إلى المحادثات القديمة"
       titles: 
         conversations: المحادثات
       unread: "غير مقروء"
@@ -4184,6 +4728,7 @@ ar:
       total_messages: "إجمالي الرسائل"
       unread: "غير مقروء"
       unstar_conversation: "إزالة النجمة من محادثة"
+    message_deleted: "تم حذف الرسالة!"
     message_detail: 
       no_subject: "لا يوجد موضوع"
     message_form: 
@@ -4250,14 +4795,9 @@ ar:
     more_participants: "+%{total} أكثر"
     no_message: 
       batch_selected: "تم تحديد العديد من المحادثات"
-      beta_description: "إنك تستخدم إصدار بيتا من علبة وارد Canvas"
-      beta_version: "إصدار بيتا"
       no_conversations_selected: "لم يتم تحديث محادثات"
     no_recipients_choose_another_group: "لا يوجد مستلمون في هذه المجموعة. الرجاء اختيار مجموعة أخرى."
     no_results_found: "لم يتم العثور على نتائج"
-    not_applicable: "لا يوجد"
-    not_scored: "بلا نقاط"
-    notes_to_self: مونولوج
     other: 
       few: "%{count} آخرين"
       many: "%{count} آخرين"
@@ -4272,70 +4812,15 @@ ar:
       other: "و %{count} آخرين"
       two: "و %{count} آخرين"
       zero: "و %{count} آخرين"
-    people_count: 
-      few: "%{count} من الأشخاص"
-      many: "%{count} من الأشخاص"
-      one: "شخص واحد"
-      other: "%{count} من الأشخاص"
-      two: "%{count} من الأشخاص"
-      zero: "%{count} من الأشخاص"
-    recipient_error: "المجموعة أو المساق الذي حددته لا يحوي مستلمين صالحين"
     search_category: "بحث في %{category}"
-    select_all: "تحديد الكل"
     star: "وضع نجمة"
     star_conversation: "وضع نجمة على محادثة"
-    title: 
-      add_recipients: "إضافة مستلمين"
-      forward_messages: "إعادة توجيه الرسائل"
     titles: 
-      expand_inline: "إظهار مزيد من التعليقات"
       rss_feed: "موجز المحادثات"
-      view_submission: "فتح الإرسال في نافذة جديدة."
     unarchive: "إلغاء الأرشفة"
     unarchive_conversation: "إلغاء أرشفة محادثة"
-    unknown_user: "مستخدم غير معروف"
-    unspecified_error: "حدث خطأ غير متوقع، الرجاء إعادة المحاولة"
     unstar: "إلغاء النجمة"
     unstar_conversation: "إزالة النجمة من محادثة"
-  conversations_intro: 
-    slide1: 
-      paragraph1: "ألقِ نظرة على صندوق البريد لديك!"
-      paragraph2: "أخيرًا جاءت المحادثات! نظام المراسلة الجديد من Canvas!"
-      paragraph3: "استخدم المحادثات لإرسال رسالة خاصة إلى رفيقك في الفصل أو استخدم المحادثات للتحدث مع مجموعة أشخاص كاملة."
-      paragraph4: "هل أنت مستعد لمقدمة قصيرة؟ انقر فوق السهم الأيمن للبدء."
-    slide2: 
-      paragraph1: "يتم عرض كل محادثاتك على الجانب الأيسر."
-      paragraph2: "يمكنك أن ترى الشخص الذي معك في المحادثة، وعدد الرسائل الموجودة، وعددًا قليلاً من أسطر أحدث رسالة في كل محادثة."
-    slide3: 
-      paragraph1: "يمكن وضع علامة على المحادثات مقروءة/مقروءة أو مميزة بنجمة أو مؤرشفة، أو مسماة حسب اللون باستخدام الزر \"إجراءات\" على الرسالة."
-      paragraph2: "لم يتم حذف الرسائل المؤرشفة، كل ما في الأمر أنها نُقلت من صندوق البريد لديك، وما زال بإمكانك الوصول إليها مرة أخرى عند الحاجة."
-    slide4: 
-      paragraph1: "عندما تحدد محادثة، يتم عرض كل الرسائل الخاصة بهذه المحادثة في اللوحة على اليمين. وعندما تطول المحادثات، يمكنك في أي وقت التنقل لأسفل لرؤية الرسائل الأقدم."
-    slide5: 
-      paragraph1: "لبدء رسالة، ابدأ بالنقر فوق الأيقونة إنشاء."
-    slide6: 
-      paragraph1: "في مربع رسالة جديدة، ابدأ بكتابة اسم الشخص، أو اسم المجموعة، وسيظهر في القائمة المنسدلة. أو بدلاً من ذلك، يمكنك النقر فوق أيقونة دفتر العناوين للعثور على شخص ما إذا كنت لا تتذكر اسمه."
-      paragraph2: "اكتب رسالتك، ثم انقر فوق إرسال، وأبشر بالنجاح."
-    slide7: 
-      paragraph1: "يمكنك إرسال رسائل إلى شخص واحد أو مجموعة من الأشخاص. وافتراضيًا ستكون كل رسائل المجموعة متاحة لكل شخص في هذه المجموعة."
-      paragraph2: "إذا أردت إرسال الرسالة بشكل خاص إلى كافة المستلمين، فقم بإلغاء تحديد \"هذه مجموعة محادثة\"."
-    slide8: 
-      paragraph1: "يمكنك تحديد رسالة أو رسائل بالنقر فوق خانة الاختيار التي على الجانب الأيمن."
-      paragraph2: "بعد تحديدها، يمكنك إعادة توجيه الرسالة أو الرسائل إلى شخص آخر، أو حذفها."
-    slide9: 
-      paragraph1: "نحن واثقون أنك ستجد المحادثات أداة بسيطة وسهلة الاستخدام."
-      paragraph2: "تفضل بتجريب هذا الفيديو القصير الذي يحوي مقدمة تريك المحادثات قيد العمل."
-      paragraph3: "تم تنظيم الرسائل القديمة في محادثات تيسيرًا لك. فماذا تنتظر؟ هيا ابدأ!"
-    titles: 
-      slide1: "الشريحة 1"
-      slide2: "الشريحة 2"
-      slide3: "الشريحة 3"
-      slide4: "الشريحة 4"
-      slide5: "الشريحة 5"
-      slide6: "الشريحة 6"
-      slide7: "الشريحة 7"
-      slide8: "الشريحة 8"
-      slide9: "الشريحة 9"
   correct_answer: "كانت هذه الإجابة الصحيحة."
   course: 
     access_denied: "تم رفض الوصول"
@@ -4355,6 +4840,7 @@ ar:
       id: المعرّف
       points_possible: "النقاط المحتملة"
       read_only_field: "(للقراءة فقط)"
+      root_account: "الحساب الجذري"
       section: القسم
       sis_login_id: "معرّف تسجيل دخول SIS"
       sis_user_id: "معرّف مستخدم SIS"
@@ -4395,6 +4881,7 @@ ar:
   course_copy_name: "نسخ مساق Canvas"
   course_copy_no_course_error: "المساق المصدر غير موجود."
   course_copy_not_allowed_error: "غير مسموح لك بنسخ المساق المصدر."
+  course_enrollment_title: "عدد التسجيلات"
   course_exports: 
     errors: 
       assignment: "فشل تصدير \"%{title}\" المهمة"
@@ -4440,9 +4927,22 @@ ar:
       close_course_menu_title: إغلاق
       reset_course_menu: "إعادة تعيين"
   course_logging: 
+    blank_placeholder: "-"
+    event_source: 
+      api: Api
+      manual: يدوي
+      sis: SIS
     event_type: 
       concluded: "تم الانتهاء"
+      copied_from: "منسوخ من"
+      copied_to: "منسوخ إلى"
       created: "تاريخ الإنشاء"
+      deleted: محذوف
+      published: منشور
+      reset_from: "إعادة تعيين من"
+      reset_to: "إعادة تعيين إلى"
+      restored: "تمت الاستعادة"
+      unconcluded: "غير منته"
       updated: محدّث
     field_label: 
       abstract_course_id: "معرف المساق التجريدي"
@@ -4495,6 +4995,17 @@ ar:
       uuid: UUID
       wiki_id: "معرّف Wiki"
       workflow_state: "حالة سير العمل"
+  course_report_header_course_id: "معرف المساق"
+  course_report_header_course_sis_id: "معرف sis للمساق"
+  course_report_header_created_at: "تاريخ الإنشاء"
+  course_report_header_end_date: "تاريخ الانتهاء"
+  course_report_header_id: المعرف
+  course_report_header_long_name: "الاسم الطويل"
+  course_report_header_name: الاسم
+  course_report_header_short_name: "الاسم القصير"
+  course_report_header_sis_id: "معرف sis"
+  course_report_header_start_date: "تاريخ البدء"
+  course_report_header_status: الحالة
   course_restore: 
     restore_error: "حدثت مشكلة أثناء محاولة استرداد المساق. لم يتم استرداد المساق."
   course_search: 
@@ -4547,13 +5058,13 @@ ar:
     re_send_invitation: "إعادة إرسال الدعوة"
     remove_user_from_course_section: "إزالة المستخدم من %{course_section}"
     titles: 
-      click_to_edit: "انقر للتحرير"
       link_to_students: "ارتباط إلى الطلاب"
       move_course: "نقل المساق"
       reset_course_content_dialog_help: "إعادة تعيين محتوى المساق"
       section_enrollments: "تسجيلات القسم"
   course_statistics: 
     unknown: "غير معروف"
+  course_status_title: "حالة قسم المساق"
   course_users: 
     greater_than_three: "يرجى إدخال مصطلح بحث يضم ثلاثة أحرف أو أكثر"
     unknown_error: "حدث خطأ في بحثك. يرجى إعادة المحاولة."
@@ -4589,6 +5100,7 @@ ar:
         delete_course: "حذف المساق"
       details: 
         conclude_alt_text: "إذا كنت ترغب في الاحتفاظ بالقدرة على تغيير الدرجات مع تحديد إمكانية وصول الطالب إلى المساق، فالرجاء استخدام إعدادات تواريخ المساق. ويمكنك التعرف على إعدادات تاريخ المساق من خلال الأدلة الخاصة بنا *هنا*"
+        confirm_conclude: "تحذير: إنهاء هذا المساق سيمنعك من تعديل الدرجات والوصول إلى محتوى المساق."
         confirm_delete: "هل ترغب بالتأكيد في حذف هذا المساق؟ بمجرد حذفه، لن يعود بإمكان الطلاب والمعلمين الوصول إليه. إذا كنت ترغب فقط في إزالته من القائمة المنسدلة للمساقات، يجب *إنهاء المساق بدلاً من ذلك*."
         confirm_delete_addendum: "إذا لم يكن لديك إذن بإنهاء المساق، يمكنك *تغيير تاريخ إنهاء المساق*، أو مطالبة المسؤول بإنهاء المساق."
       headings: 
@@ -4641,7 +5153,6 @@ ar:
               
               الرجاء **تسجيل الدخول** أو ***التسجيل*** للمطالبة بهذا المساق.
         files: "تعتبر علامة التبويب الملفات هي المكان المناسب لمشاركة شرائح المحاضرة ومستندات الأمثلة وتعليمات الدراسة؛ وأي شيء يريد الطلاب تنزيله. إن تحميل الملفات وتنظيمها صار سهلا ً عبر Canvas. وسنوضح لك كيف ذلك."
-        home: "عندما يزور الأشخاص المساق، فهذه هي الصفحة التي سيشاهدونها. يمكنك ضبطها لعرض تدفق نشاط، أو قائمة وحدات المساق، أو منهج، أو صفحة مخصصة كتبتها بنفسك. والإعداد الافتراضي هو تدفق نشاط المساق. لتخصيص ذلك، انقر فقط فوق %{change_layout}."
         import: "إذا كنت تستخدم نظام إدارة مساق آخر، فربما يكون لديك بعض الأشياء تريد نقلها إلى Canvas. يمكننا إرشادك عبر عملية ترحيل المحتوى بسهولة إلى داخل موقع Canvas."
         navigation: "وقد تم تمكين كل الارتباطات الخاصة بالمساق افتراضيًا. لن يرى الطلاب الارتباطات الخاصة بالأقسام التي ليس بها محتوى. على سبيل المثال، إذا لم تقم بإنشاء أي اختبارات، فإنهم لن يروا ارتباط الاختبارات. يمكنك فرز هذه الارتباطات وتعطيلها بشكل صريح إذا كانت هناك مناطق في المساق لا تريد أن يصل إليها الطلاب."
         publish: 
@@ -4722,11 +5233,8 @@ ar:
         look_around: "لك مطلق الحرية في التجول عبر المساق والاطلاع فيه. عندما تكون مستعدًا، يمكنك إما قبول الدعوة أو رفضها."
     errors: 
       create_failed: "فشل إنشاء المساق"
-      invalid_role: "نوع دور غير صالح"
       role_not_active: "لا يمكن إضافة مستخدمين لدور غير نشط: '%{role}'"
       role_not_found: "لا يوجد دور تحت اسم '%{role}'."
-      unauthorized: 
-        switch_roles: "ليس لديك إذن بتحويل الأدوار"
     group_list: 
       headings: 
         groups: "مجموعات المساق"
@@ -4763,8 +5271,6 @@ ar:
       login_to_accept: "ستحتاج إلى تسجيل الدخول قبل أن تتمكن من قبول التسجيل."
       preview_course: "لقد تمت دعوتك للانضمام لهذا المساق.  يمكنك الاطلاع عليه، لكنك ستحتاج إلى قبول دعوة التسجيل قبل أن تتمكن من المشاركة."
       reset_test_student: "تمت إعادة تعيين طالب الاختبار بنجاح."
-      role_restored: "تمت استعادة الدور الافتراضي والأذونات"
-      role_switched: "لقد قمت بتبديل الأدوار الخاصة بهذا المساق.  سترى الآن المساق في هذا الدور الجديد: %{enrollment_type}"
       unconcluded: "لم يتم الوصول إلى المساق"
       updated: "تم تحديث المساق بنجاح."
     recent_event: 
@@ -4806,7 +5312,7 @@ ar:
       index: 
         cannot_add_users: "لا يمكن إضافة مستخدمين جدد بسبب انتهاء هذا المساق"
         filter_field_description: "بينما تقوم بالكتابة في هذا الحقل، سيتم تصفية قائمة الأشخاص تلقائيا لتشمل فقط أولئك الذين تطابق أسماؤهم إدخالك."
-        filter_list_of_people: "تصفية قائمة الأشخاص"
+        group_set: "مجموعة المجموعات"
         people: الأشخاص
         role_to_search: "تقييد البحث على الدور"
         search_people: "البحث عن أشخاص"
@@ -4826,6 +5332,9 @@ ar:
         re_sending_invitations: "جارٍ إعادة الإرسال..."
       role_select: 
         all_roles: "كل الأدوار"
+      roster_tabs: 
+        everyone_tab: الجميع
+        groups: المجموعات
       roster_user: 
         links: 
           edit_sections: "تحرير الأقسام"
@@ -4844,6 +5353,7 @@ ar:
         no_people_found: "لم يتم العثور على أشخاص"
         role: الدور
         section: القسم
+        total_activity: "إجمالي النشاط"
         you_can_search_by: "يمكنك البحث بواسطة:"
       section: 
         remove_user_from_course_section: "إزالة مستخدم من %{name}"
@@ -4857,6 +5367,9 @@ ar:
         add_section: "إضافة قسم"
         move_course: "نقل المساق"
         update_course: "تحديث تفاصيل المساق"
+      course_conclude_at_warning_message: "المساق معين حاليًا لينتهي في منتصف الليل، مما يعني أن اليوم السابق هو آخر يوم يكون فيه هذا المساق نشطًا."
+      course_conclude_at_warning_title: "ينتهي المساق في منتصف الليل"
+      course_open_enrollment: "في هذا المساق تم تمكين التسجيل المفتوح. فبإمكان الطلاب تسجيل أنفسهم بأنفسهم في المساق بمجرد أن تشاركهم رابط URL هذا *%{url}*. أو يمكنهم تسجيل الاشتراك في *%{url2}* واستخدام كود الانضمام التالي: *%{code}*"
       course_open_enrollment_without_code: "يعمل هذا المساق على تمكين التسجيل المفتوح. يمكن للطلاب التسجيل الذاتي في المساق بمجرد قيامك بمشاركة عنوان URL هذا معهم: *%{url}*"
       course_overrides_term: "سيتجاوز ذلك أي إعدادات إتاحة للفترة."
       date_restricted: "يمكن للمستخدمين المشاركة فقط في المساق بين هذه التواريخ"
@@ -4922,6 +5435,7 @@ ar:
         sis_source_id: "معرّف SIS"
         start_at: يبدأ
         storage_quota: "تخزين الملفات"
+        time_zone: "المنطقة الزمنية"
         turnitin_comments: "تعليقات Turnitin على الإرسال"
       language_overrides_preferences: "سيتجاوز ذلك أي تفضيلات للغة المستخدم/النظام. ويعد هذا هو الأسلوب المفضل فقط لمساقات اللغة الأجنبية"
       links: 
@@ -4959,7 +5473,6 @@ ar:
         tools: التطبيق
       titles: 
         edit_navigation: "تحرير تنقل المساق"
-      transifex_message: "انضم إلى [مجتمع ترجمة Canvas ] (٪ {} transifex_url)\n"
       turnitin: "سيتم عرض هذه التعليقات للطلاب عند إرسال مهمة تم تمكين Turnitin لها"
       view_grading_scheme: "عرض نظام التقييم"
       wiki_editing_roles: "يستطيع إنشاء صفحات wiki للمساق وإعادة تسميتها وتحريرها بشكل افتراضي"
@@ -4983,9 +5496,9 @@ ar:
         stats: "إحصاءات المساق"
         student_view: "عرض الطالب"
     show: 
-      acting_as: "إنك تقوم حاليًا بعرض هذا المساق بدور: %{enrollment_type}. سيتوفر لك فقط أذونات والوصول إلى مستخدمي هذا الدور."
       buttons: 
         update_layout: "تحديث التخطيط"
+      change_home_page: تغيير
       details: 
         assignments: "يوضح هذا العرض **قائمة مهام** هذا المساق، بالمهام القادمة والحديثة بأعلى."
         confirm_unenroll: "هل ترغب بالتأكيد في إلغاء التسجيل في هذا المساق؟ لن يعود بإمكانك مشاهدة كشف المساق أو الاتصال مباشرة بالمعلمين، ولن تعود قادرًا على مشاهدة أحداث المساق في التدفق وكإعلامات."
@@ -5003,7 +5516,7 @@ ar:
         headings: 
           set_layout: "تعيين تخطيط الصفحة الرئيسية"
         labels: 
-          select_content: "حدد ما ترغب في عرضه على الصفحة الرئيسية."
+          select_content: "حدد ما ترغب في عرضه بالصفحة الرئيسية."
         options: 
           assignments: "قائمة المهام"
           custom_page: "الصفحة الأمامية للصفحات"
@@ -5011,9 +5524,10 @@ ar:
           recent_activity_dashboard: "لوحة تحكم النشاط الأخير"
           syllabus: المناهج
       empty_body: "لا يوجد محتوى"
+      front_page_not_set: "يجب تعيين الصفحة الأمامية أولاً"
       headings: 
+        choose_home_page_title: "اختيار الصفحة الرئيسية"
         confirm_unenroll: "تأكيد إلغاء التسجيل"
-        edit_homepage_title: "تحرير الصفحة الرئيسية"
         importing: "يجري استيراد هذا المساق"
         set_layout: "ضبط تخطيط الصفحة الرئيسية"
         unpublished: "هذا المساق غير منشور"
@@ -5023,13 +5537,12 @@ ar:
       license_notice: "يتوفر محتوى هذا المساق بموجب ترخيص %{license_type}. يمكن تطبيق هذا الترخيص على المحتوى الوارد في هذا المساق ما لم يذكر خلاف ذلك."
       links: 
         change_layout: "تغيير تخطيط الصفحة الرئيسية"
+        choose_home_page: "اختيار الصفحة الرئيسية"
         course_setup: "قائمة اختيار إعداد المساق"
         course_stream: "مشاهدة تدفق المساق"
         drop_course: "إسقاط هذا المساق"
-        edit_homepage: "تحرير الصفحة الرئيسية"
         join_course: "الانضمام لهذا المساق"
         new_announcement: "إعلان جديد"
-        restore_role: "استعادة الدور والأذونات"
         view_course_stream: "عرض تدفق المساق"
       options: 
         assignments: "قائمة المهام"
@@ -5198,6 +5711,7 @@ ar:
       student: 
         count: "عدد الطلاب خاطئ"
         ratio: "نسبة الطلاب خاطئة"
+  current_grade_title: "الدرجة الحالية"
   curve_grades_dialog: 
     average_score: "متوسط الدرجات"
     buttons: 
@@ -5209,6 +5723,10 @@ ar:
       assign_blanks: "تخصيص الأصفار للطلاب الذين لم يتم إرسالهم"
     out_of_points_possible: "من %{assignment.points_possible}"
     this_is_permanent: "لا يمكن التراجع عن إنشاء منحنى للدرجات. ستتوفر محفزظات الدرجة التي تم إنشاء منحنى لها مسبقًا، إلا أنه لا يمكن التراجع عن إجراء إنشاء منحنى."
+  custom_grade_export_title: "تصدير درجة CampusVue"
+  custom_outcomes_title: "نتائج مخصصة"
+  cv_non_graded_data__title: "تقرير المهام التي لم يتم تقدير درجاتها لـ Campus Vue"
+  cv_submission_data__title: "بيانات الإرسال لـ Campus Vue"
   d2l_display: Desire2Learn
   d2l_file_description: "تصدير D2L بتنسيق zip."
   d2l_name: "محول D2L"
@@ -5287,18 +5805,18 @@ ar:
       - Sat
     abbr_month_names: 
       - ~
-      - يناير
-      - فبراير
-      - مارس
-      - أبريل
-      - مايو
-      - يونيو
-      - يوليو
-      - أغسطس
-      - سبتمبر
-      - أكتوبر
-      - نوفمبر
-      - ديسمبر
+      - Jan
+      - Feb
+      - Mar
+      - Apr
+      - May
+      - Jun
+      - Jul
+      - Aug
+      - Sep
+      - Oct
+      - Nov
+      - Dec
     day_names: 
       - Sunday
       - Monday
@@ -5327,18 +5845,18 @@ ar:
       weekday: "%A"
     month_names: 
       - ~
-      - يناير
-      - فبراير
-      - مارس
-      - أبريل
-      - مايو
-      - يونيو
-      - يوليو
-      - أغسطس
-      - سبتمبر
-      - أكتوبر
-      - نوفمبر
-      - ديسمبر
+      - January
+      - February
+      - March
+      - April
+      - May
+      - June
+      - July
+      - August
+      - September
+      - October
+      - November
+      - December
   dates: 
     no_date: "بلا تاريخ"
   dates_available_component: 
@@ -5572,11 +6090,10 @@ ar:
       graded_discussion_and_points: 
         few: "هذه مناقشة مدرجة: تتوافر *%{count} من النقاط*"
         many: "هذه مناقشة مدرجة: تتوافر *%{count} من النقاط*"
-        one: "هذه مناقشة مدرجة: تتوافر *%{count} من النقاط*"
+        one: "هذه مناقشة تم تقييم درجاتها: تتوافر *%{count} من النقاط*"
         other: "هذه مناقشة تم تقييم درجاتها: تتوافر *%{count} من النقاط*"
         two: "هذه مناقشة مدرجة: تتوافر *%{count} من النقاط*"
         zero: "هذه مناقشة مدرجة: تتوافر *%{count} من النقاط*"
-      separated_conversation_notice: "تم تقسيم المحادثة الخاصة بهذا الموضوع إلى مجموعات منفصلة. فيما يلي قائمة بموضوعات المجموعة التي يمكنك الوصول إليها."
       show_due_dates: "إظهار تواريخ الاستحقاق"
       until: حتى
     cannot_unpublish_with_replies: "لا يمكن إلغاء النشر إذا كان هناك ردود"
@@ -5624,7 +6141,6 @@ ar:
       my_settings: إعداداتي
       student_settings: "إعدادات الطالب"
     edit: 
-      edit_topic: "تحرير موضوع مناقشة"
       new_assignment: "مهمة جديدة"
       new_quiz: "اختبار جديد"
     edit_crumb: تحرير
@@ -5665,6 +6181,8 @@ ar:
         zero: "إظهار %{count} إدخالات إضافية"
     error_draft_state_unauthorized: "ليس لديك إذن لتعيين هذا الموضوع على حالة المسودة."
     error_draft_state_with_posts: "لا يمكن تعيين هذا الموضوع على حالة المسودة لأنه يحتوي على منشورات."
+    error_group_announcement: "لا يمكنك استخدام مناقشة مقسمة إلى مجموعات في إعلان."
+    error_group_change: "لا يمكنك تغيير المجموعات في مناقشة بها ردود."
     group_assignment_discussion_entry: 
       posts: 
         few: "%{count} من النشرات"
@@ -5674,6 +6192,10 @@ ar:
         two: "%{count} من النشرات"
         zero: "%{count} من النشرات"
       separated_conversation_notice: "تم تقسيم المحادثة الخاصة بهذا الموضوع إلى مجموعات منفصلة. فيما يلي كل موضوعات المجموعة التي يمكنك الوصول إليها."
+    group_discussion: 
+      separated_conversation_notice: "بما أنها مناقشة مقسمة إلى مجموعات، فإن لكل مجموعة محادثة خاصة لهذا الموضوع. فيما يلي قائمة الموضوعات التي يمكنك الوصول إليها:"
+    group_discussion_locked: "لم قام الطلاب بالإرسال إلى هذه المناقشة بالفعل، لذا لا يمكن تغيير إعدادات المجموعة."
+    group_discussion_title: "مناقشة مجموعات"
     index: 
       course_discussions_atom_feed_title: "موجز Atom لمناقشات المساق"
     index_view: 
@@ -5700,7 +6222,7 @@ ar:
         other: "%{count} من الردود."
         zero: "لا توجد ردود."
       unread_count_tooltip: 
-        one: "%{count} من الردود غير المقروءة."
+        one: "1 رد غير مقروء."
         other: "%{count} من الردود غير المقروءة."
         zero: "لا توجد ردود غير مقروءة."
     page_nav: 
@@ -5768,6 +6290,7 @@ ar:
       locked: "هذا الموضوع مغلق للتعليقات"
       this_topic_is_used_for_grading: "هذا الموضوع يُستخدم للتصحيح"
       topic_podcast_feed: "موجز Podcast للموضوع"
+    this_is_a_group_discussion: "هذه مناقشة مجموعات"
     topic_deleted_notice: "تم حذف %{topic_title} بنجاح"
     unread_count_tooltip: 
       one: "1 رد غير مقروء."
@@ -5783,6 +6306,8 @@ ar:
     closed_for_comments: "التعليقات مغلقة"
     confirm_delete_discussion_topic: "هل تريد بالتأكيد حذف موضوع المناقشة هذا؟"
     delete: حذف
+    deleted_entry: 
+      deleted: "تم حذف*%{editor_name}* بواسطة %{edited_at}"
     discussions: المناقشات
     edit_settings: "تحرير إعدادات المناقشات"
     entry_collection_view: 
@@ -5847,25 +6372,46 @@ ar:
     unsubscribe: "إلغاء الاشتراك في هذا الموضوع"
     unsubscribed: "غير مشترك"
     unsubscribed_hint: "أنت غير مشترك في هذا الموضوع. انقر للاشتراك."
-  draft_state: 
-    cant_unpublish_when_students_submit: "لا يمكن إلغاء النشر في حالة وجود عمليات إرسال لطالب"
-    publish: نشر
-    unpublish: "إلغاء النشر"
   draft_state_description: |-
       تعمل هذه الميزة، التي في الإصدار بيتا، على إعادة تصميم العديد من أجزاء Canvas وتتيح للمحتوى أن يوجد
       بحالة غير منشورة جديدة وغير مرئية للطلاب ويتم استبعادها من حسابات الدرجات
       تنبيه--قد يؤدي تعطيل هذه الميزة إلى حذف المحتوى المضاف
       أو المحرر من طريقة عرض المدرس.
+  dubspot_report_header_course_id: "معرف المساق"
+  dubspot_report_header_course_name: "اسم المساق"
+  dubspot_report_header_course_sis_id: "معرف sis للمساق"
+  dubspot_report_header_ip_address: "عنوان ip"
+  dubspot_report_header_last_seen_at: "تاريخ آخر مشاهدة"
+  dubspot_report_header_section_id: "معرف القسم"
+  dubspot_report_header_section_name: "اسم القسم"
+  dubspot_report_header_section_sis_id: "معرف sis للقسم"
+  dubspot_report_header_user_id: "معرف المستخدم"
+  dubspot_report_header_user_login_id: "معرف تسجيل الدخول للمستخدم"
+  dubspot_report_header_user_sis_id: "معرف sis للمستخدم"
   due_dates: 
     due_at: "موعد الاستحقاق: %{assignment_due_date_time}"
     multiple_due_dates: "موعد الاستحقاق: تواريخ محددة عديدة"
     no_due_date: "موعد الاستحقاق: بلا تاريخ استحقاق"
   ecollege_file_description: Ecollege
   ecollege_name: "محول Ecollege"
+  edison: 
+    outcome: 
+      extra_text: "معرف النتيجة: %{outcome_id}،"
+    quiz_id: 
+      extra_text: "معرف الاختبار: %{quiz_id}،"
+    section_id: 
+      extra_text: "القسم: %{section_id}،"
   edit_rubric: 
     buttons: 
       create_rubric: "إنشاء عنوان"
       update_rubric: "تحديث العنوان"
+    discussion_points_possible: 
+      few: "%{count} نقطة ممكنة"
+      many: "%{count} نقطة ممكنة"
+      one: "%{count} نقطة ممكنة"
+      other: "%{count} نقطة ممكنة"
+      two: "%{count} نقطة ممكنة"
+      zero: "%{count} نقطة ممكنة"
     errors: 
       load_rubrics_failed: "فشل تحميل العناوين، الرجاء المحاولة مرة أخرى"
     messages: 
@@ -5961,6 +6507,7 @@ ar:
     student: الطالب
     teacher: المعلم
     teacher_assistant: "مساعد المعلم"
+  enrollment_summary_title: "ملخص التسجيل"
   enrollment_term: 
     errors: 
       not_unique: "معرف SIS \"%{sis_source_id}\" قيد الاستخدام بالفعل"
@@ -6305,6 +6852,7 @@ ar:
       delete: حذف
     cannot_locate_launch_request: "تعذر العثور على أمر التشغيل، الرجاء إعادة المحاولة."
     consumer_key: "مفتاح العميل"
+    course_home_sub_navigation_configured: "تم تكوين التنقل الفرعي بالصفحة الرئيسية للدورة التدريبية"
     course_navigation_configured: "تم تكوين التنقل في المساق"
     delete: حذف
     dialog_title_add_app: "إضافة تطبيق"
@@ -6376,12 +6924,15 @@ ar:
     saving: "جارٍ الحفظ..."
     shared_secret: "كلمة السر المشتركة"
     submit: إرسال
-    tool_show: 
+    tool_post_iframe: 
       load_tool_button: "تحميل %{tool}"
       load_tool_new_tab_button: "تحميل %{tool} في نافذة جديدة"
       new_tab: "تحتاج هذه الأداة للتحميل في نافذة مستعرض جديدة"
       new_tab_expired: "انتهى وقت الجلسة الخاصة بهذه الأداة. الرجاء إعادة تحميل الصفحة للوصول إلى الأداة مرة أخرى."
       new_tab_loaded: "تم تحميل هذه الأداة بنجاح في نافذة مستعرض جديدة. أعد تحميل الصفحة للوصول إلى الأداة مرة أخرى."
+    tool_show: 
+      tool_insecure_warning: "أنت تحاول تشغيل محتوى غير آمن من موقع آمن (canvas). بعض مستعرضات الإنترنت تمنع هذا المحتوى من التحميل."
+      tool_load_failure: "يبدو أن المحتوى لن يتمكن من التحميل. يمكنك استخدام هذا الزر لمحاولة تشغيله في علامة تبويب جديدة."
     user_navigation_configured: "تم تكوين تنقل المستخدم"
   facebook: 
     authorization_required: "يمكن للمستخدمين المخولين فقط الوصول لهذه الصفحة"
@@ -6430,6 +6981,7 @@ ar:
       notifications_config_notice: "يمكن إرسال إعلامات من Canvas تلقائيًا من خلال حساب Facebook الخاص بك. ستشاهد أدناه أنواع الإعلامات التي يمكنك إرسالها. يمكنك تغيير تفضيلات الإعلام في أي وقت، سواء هنا أو في Canvas."
       settings_title: "إعدادات إعلام Canvas"
       updating_preferences: "جارٍ تحديث التفضيلات..."
+  faculty_success_tile: "تقرير نجاح الكلية"
   feature_flags: 
     feature_flag: 
       allow: سماح
@@ -6447,6 +6999,7 @@ ar:
       feature_options: "خيارات الميزة"
       no_features_available: "لا توجد ميزات متاحة حاليًا."
   features: 
+    better_file_browsing: "استعراض أفضل للملفات"
     differentiated_assignments: "التعيينات التمييزية"
     draft_state: "حالة المسودة"
     draft_state_account_disable_warning: |-
@@ -6457,11 +7010,14 @@ ar:
         جاهز للنشر ومتاح لكل المستخدمين في المساق قبل المتابعة.
     google_docs_domain_restriction: "قيد على مجال Google Docs"
     high_contrast: "استخدام الأنماط العالية التباين"
-    individual_gradebook: "عرض دفتر الدرجات الفردي"
+    html5_first_videos: "تفضيل HTML5 لتشغيل الفيديو"
     learning_mastery_gradebook: "دفتر درجات إتقان التعلم"
+    new_quiz_moderate: "صفحة جديدة لمتوسط الاختبار"
+    new_quiz_statistics: "صفحة جديدة لإحصاءات الاختبار"
     new_styles: "استخدام أنماط جديدة"
     post_grades: "نشر الدرجات في SIS"
-    student_outcome_gradebook: "دفتر تقديرات نتيجة الطلاب"
+    student_groups: "صفحة جديدة لمجموعات الطلاب"
+    student_outcome_gradebook: "دفتر درجات إتقان التعلم للطلاب"
   file_browser_view: 
     folder_tree_instructions: "استخدم السهم السفلي والسهم العلوي للتنقل خلال الشجرة، واضغط على السهم الأيمن لتوسيع المجلدات وعلى السهم الأيسر لطيها، واضغط على مفتاح الإدخال لاختيار صورة."
   filebrowserview: 
@@ -6663,6 +7219,17 @@ ar:
     no_deleting_folders_with_content: "يتعذر حذف مجلد بداخله محتوى"
     no_deleting_root: "يتعذر حذف المجلد الجذري"
     only_one_folder: "يتعذر تعيين مسار مجلد ومعرف المجلد"
+  galen_report_header_account_id: "معرف الحساب"
+  galen_report_header_account_name: "اسم الحساب"
+  galen_report_header_course_name: "اسم المساق"
+  galen_report_header_course_sis_id: "معرف sis للمساق"
+  galen_report_header_first_submission: "أول إرسال"
+  galen_report_header_resource_type: "نوع المورد"
+  galen_report_header_section_sis_id: "معرف sis للقسم"
+  galen_report_header_submission_date: "تاريخ الإرسال"
+  galen_report_header_submission_type: "نوع الإرسال"
+  galen_report_header_title: العنوان
+  galen_report_header_user_sis_id: "معرف sis للمستخدم"
   global_message_icons: 
     announcement: إعلان
     calendar: تقويم
@@ -6671,43 +7238,44 @@ ar:
     invitation: دعوة
     question: سؤال
     warning: تحذير
+  google_doc_accounts_title: "حسابات Google Docs"
   google_docs_domain_restriction_description: "القيد على مجال Google Docs يسمح بقصر عمليات الإرسال والتعاون في Google Docs على نطاق واحد فقط. وبالنسبة للطلاب الذين يحاولون إرسال فروض دراسية أو المشاركة في عمليات تعاون في مجال غير معتمد، فسيتلقون رسالة خطأ تبلغهم بضرورة تحديث تكامل Google Docs."
   grade_display_warning_dialog: 
     grade_display_warning: 
       checkbox: "عدم إظهار لهذا المساق مرة أخرى."
       warning: تحذير
+  grade_export_title: "تصدير الدرجة"
+  grade_report_header_course: المساق
+  grade_report_header_course_id: "معرف المساق"
+  grade_report_header_course_sis: "sis للمساق"
+  grade_report_header_current_score: "الدرجة الحالية"
+  grade_report_header_enrollment_state: "حالة التسجيل"
+  grade_report_header_final_score: "الدرجة النهائية"
+  grade_report_header_section: القسم
+  grade_report_header_section_id: "معرف القسم"
+  grade_report_header_section_sis: "sis للقسم"
+  grade_report_header_student_id: "معرف الطالب"
+  grade_report_header_student_name: "اسم الطالب"
+  grade_report_header_student_sis: "sis للطالب"
+  grade_report_header_term: "الفصل الدراسي"
+  grade_report_header_term_id: "معرف الفصل الدراسي"
+  grade_report_header_term_sis: "sis للفصل الدراسي"
+  grade_summary: 
+    graph_title: "متوسط %{mean}، مرتفع %{high}، منخفض %{low}"
+    outcome: 
+      alignment_count: "*%{count}* من المهام"
   gradebook: 
     alerts: 
       no_active_students: "عذرًا، لا يوجد طلاب نشطون في المساق أو لا يوجد شخص قابل للتقييم من قِبلك."
       no_students_in_groups_back: "عذرًا، لا يمكن تقييم عمليات إرسال هذه المهمة في Speedgrader لعدم وجود مستخدمين معينين. الرجاء تعيين مستخدمين لهذه الفئة من المجموعات وإعادة المحاولة. انقر فوق 'موافق' للعودة."
       no_students_in_groups_close: "عذرًا، لا يمكن تقييم عمليات إرسال هذه المهمة في Speedgrader لعدم وجود مستخدمين معينين. الرجاء تعيين مستخدمين لهذه الفئة من المجموعات وإعادة المحاولة. انقر فوق 'موافق' لإغلاق هذه النافذة."
       no_students_in_section: "تعذر العثور على أي طالب في هذا القسم، يتم التراجع وإظهار كل الأقسام."
-      none_to_update: "لا يوجد شيء لتحديثه"
-      scores_updated: 
-        few: "تم تحديث نتيجة %{count} من الطلاب"
-        many: "تم تحديث نتيجة %{count} من الطلاب"
-        one: "تم تحديث نتيجة طالب واحد"
-        other: "تم تحديث نتيجة %{count} من الطلاب"
-        two: "تم تحديث نتيجة %{count} من الطلاب"
-        zero: "تم تحديث نتيجة %{count} من الطلاب"
-      students_updated: 
-        few: "تم تحديث %{count} من الطلاب"
-        many: "تم تحديث %{count} من الطلاب"
-        one: "تم تحديث طالب واحد"
-        other: "تم تحديث %{count} من الطلاب"
-        two: "تم تحديث %{count} من الطلاب"
-        zero: "تم تحديث %{count} من الطلاب"
-    assignment_details: "تفاصيل المهمة"
     buttons: 
-      change_section: "تغيير قسم"
       saving_settings: "جارٍ حفظ الإعدادات..."
       submit_comment: "إرسال تعليق"
       submitting: "جارٍ الإرسال..."
-      upload_data: "تحميل البيانات"
     cancel_button: إلغاء
     click_to_change: "انقر لاختبار درجة مختلفة"
-    click_to_expand: "انقر للتوسيع"
-    computing_grades: "جارٍ حساب الدرجات..."
     confirms: 
       delete_comment: "هل ترغب بالتأكيد في حذف هذا التعليق؟"
       unsaved_changes: |-
@@ -6715,79 +7283,26 @@ ar:
           
            %{users}
           Continue anyway?
-    curve_grade_for_course: "منحنى الدرجات الخاص بـ %{assignment}"
-    curve_grades: "منحنى الدرجات"
-    default_grade_for_course: "الدرجة الافتراضية الخاصة بـ %{assignment}"
-    download_scores: "تنزيل الدرجات (%{format})"
-    download_submissions: "تنزيل الإرسالات"
     edit_view_rubric: "عرض العنوان"
     errors: 
-      failed_to_load: "فشل تحميل دفتر الدرجات، الرجاء محاولة تحديث الصفحة"
-      none_to_update: "لا يوجد شيء لتحديثه"
       select_an_option: "الرجاء تحديد خيار"
-      upload_as_zip: "الرجاء تحميل الملفات كملف zip. مضغوط"
     graded_by_me: "%{graded_time} بواسطتي"
     graded_then_resubmitted: "تم تقييم الدرجات، ثم تمت إعادة الإرسال (%{when})"
     gradee_index_of_total: "%{gradee} %{x} من %{y}"
     group: المجموعة
     hide_all_details_button: "إخفاء كل التفاصيل"
-    hide_all_things: "إخفاء الكل %{things}"
-    hide_column: "إخفاء الأعمدة"
-    hide_student_name: "إخفاء أسماء الطلاب"
-    ignore_ungraded: "تجاهل المهام التي لم يتم تقييم درجاتها"
-    include_ungraded: "تضمين المهام التي لم يتم تقييم درجاتها"
-    labels: 
-      details: التفاصيل
-    links: 
-      download_attachment: "تنزيل %{attachment}"
-      finish_scoring: "إنهاء حساب درجات هذا الاختبار"
-      go_to_submission: "الانتقال إلى عنوان URL للإرسال"
-      submission_details: "تفاصيل الإرسال"
-      view_quiz: "عرض هذا الاختبار"
-      view_submission: "عرض الإرسال"
-    message_students_who: "رسائل الطلاب الذين..."
     mute_assignment: "إخفاء المهمة"
     new_assessment: "[المهمة الجديدة]"
     no_submission_time: "لا يوجد وقت للإرسال"
     nth_student: "طالب %{n}"
     portion_graded: "تم تقييم درجات %{x} / %{y}"
-    publish_to_sis: "نشر الدرجات على SIS"
-    reupload_submission_files: "إعادة تحميل ملفات الإرسال"
-    reupload_submissions: "إعادة تحميل الإرسالات"
-    set_default_grade: "ضبط الدرجة الافتراضية"
-    set_group_weights: "ضبط تقييمات المجموعة"
     show_all_details_button: "إظهار كل التفاصيل"
-    show_student_name: "إظهار أسماء الطلاب"
-    showing_all_sections: "إظهار كل الأقسام"
-    showing_section: "إظهار قسم: %{section}"
-    sort_columns_by: "فرز الأعمدة حسب..."
-    sort_rows_by: "فرز الصفوف حسب..."
-    speed_grader: SpeedGrader
     student: الطالب
     student_mute_notification: "يعمل المعلم في الدرجات"
-    student_name: "اسم الطالب"
-    students_who: 
-      havent_been_graded: "لم يتم تصحيحها"
-      havent_submitted_yet: "لم يتم الإرسال بعد"
-      no_grade_for: "لا توجد درجات لـ %{assignment}"
-      no_submission_for: "لا يوجد إرسال لـ %{assignment}"
-      not_submitted_yet: "لم يتم الإرسال بعد"
-      scored_less_than: "تم إحراز نقاط أقل من"
-      scored_less_than_on: "تم إحراز درجات أقل من %{cutoff} في %{assignment}"
-      scored_more_than: "تم إحراز نقاط أكثر من"
-      scored_more_than_on: "تم إحراز درجات أكثر من %{cutoff} في %{assignment}"
-    submission_information: "معلومات الإرسال"
-    teacher_muted_title: "تم حجب المهمة"
     titles: 
-      assignment_groups: "مجموعات المهام"
       click_to_record: "انقر فوق الميكروفون لتسجيل التعليقات"
       dropped_assignment_no_total: "لن يتم اعتبار هذه المهمة ضمن الحساب الإجمالي"
       hypothetical_score: "هذا مجموع نقاط ماذا لو"
-      loading: "جارٍ التحميل..."
-      turnitin_score: "رصد التشابه حسب Turnitin - مزيد من المعلومات"
-    tooltips: 
-      submission_dropped: "يتم إسقاط هذا الإرسال لأغراض التقييم"
-      submitted_late: "تم إرسال هذا الإرسال متأخرًا"
     turnitin: 
       error_message: "حدث خطأ أثناء الإرسال إلى turnitin. الرجاء محاولة إعادة إرسال الملف قبل الاتصال بالدعم"
       info_message: "لا يزال هذا الملف تجري معالجته بواسطة Turnitin. الرجاء معاودة الفحص لاحقًا لترى النتيجة"
@@ -6797,12 +7312,8 @@ ar:
         pending: "رصد التشابه حسب Turnitin - الإرسال معلق"
         score: "رصد التشابه حسب Turnitin - انظر التقرير المفصل"
     unmute_assignment: "إلغاء حجب المهمة"
-    unmute_button: "إلغاء حجب المهمة"
-    upload_scores: "تحميل الدرجات (من %{format})"
-    view_grading_history: "عرض محفوظات التقييم"
   gradebook2: 
     alerts: 
-      none_to_update: "لا يوجد شيء لتحديثه"
       scores_updated: 
         few: "تم تحديث نتائج %{count} من الطلاب"
         many: "تم تحديث نتائج %{count} من الطلاب"
@@ -6825,6 +7336,7 @@ ar:
     error: 
       update: "حدث خطأ عند تحديث هذه المهمة. يرجى تحديث الصفحة والمحاولة مرة أخرى.\n"
     errors: 
+      no_points_possible: "يتعذر الانحناء دون النقاط الممكنة"
       none_to_update: "لا يوجد شيء لتحديثه"
       upload_as_zip: "الرجاء تحميل الملفات كملف zip. مضغوط"
     grade_display_warning: 
@@ -6983,19 +7495,6 @@ ar:
       upload_form: "اختيار ملف CSV لتحميله"
     what_should_csv_look_like: "ما الشكل الذي يجب أن يكون عليه ملف CSV؟"
   gradebooks: 
-    assignment: 
-      gradebook: 
-        unmute_assignment: "إلغاء حجب المهمة"
-      out_of_points_possible: "*من* %{points_possible}"
-      points_possible_of_grade: "%{points_possible} *من درجة*"
-      teacher_muted_title: "تم حجب المهمة"
-      unmute_dialog: "تم حجب هذه المهمة حاليًا. وهذا يعني أن الطلاب لا يمكنهم عرض الدرجات والملاحظات الخاصة بهم. هل ترغب في إلغاء حجبها الآن؟"
-      zero_point_assignment: "المهام في هذه المجموعة ليس بها نقاط ممكنة ولا يمكن تضمينها في حساب الدرجات"
-    assignments: 
-      options: خيارات
-      refresh_grades: "تحديث الدرجات"
-      titles: 
-        refresh_scores: "تحديث الدرجات"
     attendance: 
       attendance_info: "لم يتم إنشاء أي مهام للحضور."
       buttons: 
@@ -7043,6 +7542,7 @@ ar:
       close_rubric: "إغلاق العنوان"
       close_score: إغلاق
       close_score_screenreader: "إغلاق تفاصيل الدرجات"
+      collapse: طي
       comment_count: 
         few: "%{count} من التعليقات"
         many: "%{count} من التعليقات"
@@ -7051,6 +7551,9 @@ ar:
         two: "%{count} من التعليقات"
         zero: "%{count} من التعليقات"
       comment_count_screenreader: "قراءة التعليقات"
+      comments: التعليقات
+      disabled_for_student_view: "درجات طلاب الاختبار غير مضمنة في إحصائيات الدرجة."
+      expand: توسيع
       faculty_journal: "دفتر الكلية من أجل %{user}"
       for_course: "بالنسبة للمساق،"
       headers: 
@@ -7066,11 +7569,8 @@ ar:
       labels: 
         final_grade_hidden: "تم تعطيل حساب الإجماليات"
         high: مرتفعة
-        high_score: مرتفعة
         low: منخفضة
-        low_score: منخفضة
         mean: متوسطة
-        mean_score: متوسطة
         only_graded: "يعتمد الحساب فقط على المهام التي تم تقييم درجاتها"
         total: الإجمالي
         your_score: "الدرجة الخاصة بك"
@@ -7084,6 +7584,7 @@ ar:
       not_official: "*ملاحظة*: هذه ليست درجتك الرسمية."
       page_title: "الدرجات لـ %{student}"
       print_grades: "طباعة الدرجات"
+      score_details: "تفاصيل الدرجات"
       see_rubric_results: "عرض نتائج العنوان"
       see_rubric_results_screenreader: "عرض نتائج العنوان"
       see_scoring_details: "عرض تفاصيل الدرجات"
@@ -7099,80 +7600,6 @@ ar:
         view_rubric_evaluation: "عرض تقييم العنوان"
         view_scoring_details: "عرض تفاصيل الدرجات"
       total: الإجمالي
-    gradebook: 
-      all_sections: الكل
-      assignment_submitted_late: (متأخر)
-      buttons: 
-        by_due_date: "حسب موعد الاستحقاق"
-        by_email: "حسب البريد الإلكتروني/المعرف"
-        by_group: "حسب مجموعة المهام"
-        by_name: "حسب اسم الطالب"
-        by_section: "حسب اسم القسم"
-        by_total_asc: "حسب الإجمالي (الأقل أولاً)"
-        by_total_desc: "حسب الإجمالي (الأعلى أولاً)"
-        curve_grades: "منحنى الدرجات"
-        done: انتهاء
-        normalize: "اجعل الإجمالي 100%"
-        set_grade: "ضبط الدرجة"
-        update: تحديث
-        upload: "تحميل الملفات"
-      curve_average: "أدخل متوسط الدرجات الخاص بمنحنى *المهمة*. يوضح المخطط أفضل محاولة لمنحنى الدرجات طبقًا لدرجات الطالب الحالية."
-      default_grades: "إعطاء كل الطلاب الظاهرين حاليًا نفس الدرجة لـ %{class} بواسطة إدخال قيمة الدرجة وإرسالها أدناه:"
-      download: "تنزيل %{attachment}"
-      grade_statistics: "إحصاءات الدرجة من أجل %{assignment}"
-      headers: 
-        loading_gradebook: "جارٍ تحميل دفتر العناوين..."
-      hide_names: "إخفاء أسماء الطلاب"
-      labels: 
-        assign_blanks: "تخصيص الأصفار للطلاب الذين لم يتم إرسالهم"
-        assignment_submitted: "تم الإرسال"
-        average_score: "متوسط مجموع النقاط"
-        choose_section: "القسم المراد عرضه"
-        comments: "تعليقات خاصة بالطلاب"
-        grade: الدرجة
-        group_comment: "إرسال تعليق إلى المجموعة بالكامل"
-        high_score: "مجموع نقاط مرتفع"
-        low_score: "مجموع نقاط منخفض"
-        send_comment: "إرسال تعليق إلى الطالب"
-        sort_columns: "فرز أعمدة دفتر الدرجات"
-        sort_rows: "فرز صفوف دفتر الدرجات"
-        total_grade_subs: "إجمالي عمليات الإرسال التي تم تصحيحها"
-      links: 
-        add_assignments: "إضافة مهام إلى المساق"
-        add_students: "تمت إضافة طلاب إلى المساق"
-        attach_file: "إرفاق ملف"
-        manage: "إدارة مجموعات المهام"
-      loading_submission: "جارٍ تحميل تفاصيل الإرسال..."
-      no_assignments: "لم يتم إنشاء أي مهام لهذا المساق بعد."
-      no_comments: "بدون تعليقات"
-      no_students: "لم يتم تسجيل طلاب في المساق."
-      out_of_points_possible: "*من* %{points_possible}"
-      overwrite: "الكتابة فوق الدرجات التي تم إدخالها بالفعل"
-      submissions: الإرسالات
-      title: 
-        quiz: "إرسال الاختبار"
-      titles: 
-        choose_section: "اختيار قسم لعرضه"
-        comments: "تعليقات الإرسال"
-        complete: مكتمل
-        discussion: "إرسال المناقشة"
-        fail: فشل
-        incomplete: "غير كامل"
-        media: "إرسال تعليق الوسائط"
-        new_message: "رسالة جديدة لهذا الإرسال"
-        pass: مقبول
-        quiz_review: "يلزم مراجعة هذا الاختبار"
-        submission_review: "يلزم مراجعة هذا الإرسال"
-        text: "إرسال إدخال النص"
-        total: الإجمالي
-        turnitin: "تم رصد درجة تشابه من Turnitin لهذا الإرسال"
-        upload: "إرسال تحميل الملف"
-        url: "إرسال عنوان URL"
-        view: عرض
-      try_out_the_new_gradebook: "تجريب دفتر الدرجات الجديد"
-      upload_info: "إذا قمت بعمل تغييرات على ملفات الإرسال الخاصة بالطالب والتي قمت بتنزيلها من قبل، فما عليك سوى ضغطها وتحميل الملف المضغوط مثل النموذج أدناه. سيشاهد الطلاب الملفات التي تم تعديلها في التعليقات الخاصة بهم فيما يتعلق بالإرسال."
-      upload_warning: "*تأكد من عدم تغيير أسماء ملفات الإرسال وذلك حتى نتمكن من التعرف عليها."
-      weight_final: "الدرجة النهائية للتقييم استنادًا إلى المجموعات"
     gradebook2: 
       arrange_columns_by_due_date: "ترتيب الأعمدة حسب موعد الاستحقاق"
       arrange_columns_by_group: "ترتيب الأعمدة حسب مجموعة المهام"
@@ -7181,14 +7608,13 @@ ar:
       grades: الدرجات
       hide_student_names: "إخفاء أسماء الطلاب"
       include_ungraded: "اعتبار درجة المهام التي لم يتم تقييمها كـ 0"
+      individual_view: "تبديل إلى العرض الفردي"
       learning_mastery: "إتقان التعلم"
-      old_gradebook: "دفتر الدرجات القديم"
       post_grades: "نشر الدرجات"
       publish_to_sis: "نشر الدرجات في SIS"
       set_group_weights: "ضبط تقييمات المجموعة"
       show_attendance_columns: "إظهار أعمدة الحضور"
       show_concluded_enrollments: "عرض التسجيلات المنتهية"
-      srgb_gradebook: "تبديل دفاتر الدرجات"
       upload_scores: "تحميل الدرجات (من csv.)"
       view_grading_history: "عرض محفوظات التقييم"
     grades: 
@@ -7218,7 +7644,7 @@ ar:
     invalid_assignment_groups_warning: 
       few: "لا يتضمن مجموع الدرجات بضع مجموعات لأنها ليست لديها نقاط ممكنة"
       many: "لا يتضمن مجموع الدرجات عدة مجموعات لأنها ليست لديها نقاط ممكنة"
-      one: "لا يتضمن مجموع الدرجات مجموعة واحدة لأنها ليست لديها نقاط ممكنة"
+      one: "لا يتضمن مجموع الدرجات %{groups} مجموعات لأنها ليست لديها نقاط ممكنة"
       other: "لا يتضمن مجموع الدرجات %{groups} مجموعات لأنها ليست لديها نقاط ممكنة"
       two: "لا يتضمن مجموع الدرجات مجموعتين لأنهما ليست لديهما نقاط ممكنة"
       zero: "لا يتضمن مجموع الدرجات أي مجموعة لأنها ليست لديها نقاط ممكنة"
@@ -7236,25 +7662,7 @@ ar:
     out_of_final: "%{weight} من النهائي"
     out_of_points_possible: "من %{points_possible}"
     screenreader: 
-      page_titles: "دفتر درجات قارئ الشاشة"
-    show: 
-      keycode_descriptions: 
-        edit_cell: "تحرير خلية"
-        more_information: "مزيد من المعلومات للخلية الحالية"
-        next_assignment: "المهمة القادمة"
-        next_student: "الطالب القادم"
-        previous_assignment: "المهمة السابقة"
-        previous_student: "الطالب السابق"
-        refresh_gradebook: "تحديث دفتر الدرجات"
-      keycodes: 
-        edit_cell: enter
-        more_information: i
-        next_assignment: يمين
-        next_student: أسفل
-        previous_assignment: يسار
-        previous_student: أعلى
-        refresh_gradebook: r
-      page_title: "دفتر الدرجات"
+      page_titles: "دفتر الدرجات: عرض فردي"
     speed_grader: 
       all_sections: "كل الأقسام"
       attach: إرفاق
@@ -7333,9 +7741,6 @@ ar:
         speech_recognition: "التعرف على الكلام"
     speed_grader_disabled: "تم تعطيل SpeedGrader لهذا المساق"
     speedgrader_enabled_only_for_published_content: "تم تمكين برنامج Speedgrader للمحتوى المنشور فقط."
-    student: 
-      new_student: "طالب جديد"
-      student: الطالب
     student_attendance: 
       headers: 
         assignment: المهمة
@@ -7351,16 +7756,6 @@ ar:
         absent: "تم وضع علامة كغائب، انقر لمزيد من التفاصيل"
         click_for_details: "انقر لمزيد من التفاصيل"
         present: "تم وضع علامة كحاضر، انقر لمزيد من التفاصيل"
-    submission: 
-      titles: 
-        submission_review: "يلزم مراجعة هذا الإرسال"
-    submission_score: 
-      icons: 
-        discussion_submission: "إرسال المناقشة"
-        file_upload_submission: "إرسال تحميل الملف"
-        online_url_submission: "إرسال عنوان URL عبر الإنترنت"
-        quiz_submission: "إرسال الاختبار"
-        text_entry_submission: "إرسال إدخال النص"
     submissions_zip_upload: 
       comments_made: 
         few: "تم وضع %{count} من التعليقات"
@@ -7425,7 +7820,29 @@ ar:
       saving: "جارٍ الحفظ..."
     titles: 
       grading_scheme_info: "عرض/تحرير نظام تقييم الدرجات"
+  granite_report_header_account_id: "معرف الحساب"
+  granite_report_header_assignment_id: "معرف المهمة"
+  granite_report_header_assignment_name: "اسم المهمة"
+  granite_report_header_assignment_unique_id: "المعرف الفريد للمهمة"
+  granite_report_header_course_id: "معرف المساق"
+  granite_report_header_department: القسم
+  granite_report_header_ends: ينتهي
+  granite_report_header_graded_at: "تاريخ تقدير الدرجة"
+  granite_report_header_name: الاسم
+  granite_report_header_observer_count: "عدد الملاحظين"
+  granite_report_header_sis_id: "معرف SIS"
+  granite_report_header_starts: يبدأ
+  granite_report_header_student_count: "عدد الطلاب"
+  granite_report_header_submission_date: "تاريخ الإرسال"
+  granite_report_header_submission_id: "معرف الإرسال"
+  granite_report_header_submission_score: "درجة الإرسال"
+  granite_report_header_ta_count: "عدد المدرسين المساعدين"
+  granite_report_header_teacher_count: "عدد المدرسين"
+  granite_report_header_term: "الفصل الدراسي"
+  granite_report_header_term_id: "معرف الفصل الدراسي"
+  granite_report_header_user_id: "معرف المستخدم"
   group: 
+    greater_than_1: "يجب أن يكون أكبر من 1"
     memeber: العضو
     name_required: "الاسم مطلوب"
     name_too_long: "أدخل اسمًا أقل طولاً للمجموعة"
@@ -7448,6 +7865,7 @@ ar:
       imported: "المجموعات المستوردة"
       student_organized: "مجموعات الطلاب"
       uncategorized: "غير مصنّف"
+    invalid_auto_leader: "يجب أن يكون نوع القائد الذاتي إحدى القيم التالية: %{values}"
     invalid_self_signup: "يجب أن يكون التسجيل الذاتي أحد القيم التالية: %{values}"
     name_required: "الاسم مطلوب"
     name_reserved: "%{name}  هو اسم محجوز."
@@ -7546,6 +7964,8 @@ ar:
         open_to_course_members: "لأعضاء المساق الحرية في الانضمام"
       page_title: "مجموعات المساق"
       student_group_warning: "إذا تحدث المعلم عن وضعك في مجموعات كجزء من مهمة، فإن هذه ليست هي الطريقة لإتمام هذا الأمر. ولا يمكن استخدام المجموعات التي تقوم بتنظيمها أنت بنفسك لتقييم الدرجات... ولا يزال بإمكانك تكوين مجموعاتك الخاصة، إلا أنك لن تقدر على تسليم نسخة إلكترونية من أي مهام ما لم يقم المعلم بإنشاء مجموعات لك."
+      student_groups_tabs_everyone: الجميع
+      student_groups_tabs_groups: المجموعات
     context_manage_groups: 
       account_group_explanation: "تعد مجموعات الطلاب على مستوى الحساب طريقة جيدة لتجميع الطلاب دون ربطهم بمساق خاص. بحيث تحصل كل مجموعة طلاب على تقويم ولوحة مناقشة وأدوات تعاون حتى يستطيعوا تنظيم أنفسهم والعمل معًا بفعالية أكبر."
       actions: 
@@ -7614,6 +8034,7 @@ ar:
       no_members: "لا يوجد أعضاء"
       one: "مجموعة واحدة"
       other: "%{count} مجموعة (مجموعات)"
+    group_limit_number: "حد المجموعة يجب أن يكون رقمًا."
     group_name: "اسم المجموعة"
     groups_count: "المجموعات (%{count})"
     index: 
@@ -7653,17 +8074,23 @@ ar:
         headings: 
           account_groups: "مجموعات الطلاب على مستوى الحساب"
           course_groups: "مجموعات الطلاب"
+        tabs: 
+          everyone: الجميع
       group_category: 
         randomly_assigning_students: "تعيين الطلاب عشوائيًا"
         search_groups: "بحث عن مجموعات"
         search_users: "البحث عن مستخدمين"
       group_category_create: 
         allow_self_signup: "السماح بالتسجيل الذاتي"
+        auto_first_group_leader: "تعيين أول طالب للانضمام كقائد للمجموعة"
+        auto_group_leader: "تعيين قائد مجموعة الطلاب تلقائيًا"
+        auto_random_group_leader: "تعيين طالب عشوائي كقائد للمجموعة"
         cancel: إلغاء
         create_groups: "إنشاء %h{num_groups} مجموعة/مجموعات الآن"
         create_groups_manually: "سأقوم بإنشاء مجموعات يدويًا"
         group_set_name: "اسم مجموعة المجموعات"
         group_structure: "هيكل المجموعة"
+        leadership: القيادة
         leave_group_limit_blank: "اتركه فارغًا لعدم وجود حد"
         limit_group_size: "قصر المجموعات على %h{group_limit} من الأعضاء"
         require_same_section: "يلزم وجود أفراد المجموعة في نفس القسم"
@@ -7688,6 +8115,7 @@ ar:
       group_category_edit: 
         allow_self_signup: "السماح بالتسجيل الذاتي"
         cancel: إلغاء
+        group_limit_override: "سيؤدي تغيير هذا إلى تجاوز أي حدود معينة بشكل فردي للمجموعة"
         group_set_name: "اسم مجموعة المجموعات"
         leave_group_limit_blank: "اتركه فارغًا لعدم وجود حد"
         limit_group_size: "قصر المجموعات على %h{group_limit} من الأعضاء"
@@ -7699,12 +8127,16 @@ ar:
         group_delete: حذف
         group_edit: تحرير
         group_full: مكتمل
+        group_leader: "قائد المجموعة"
         group_settings: إعدادات
         show_group_details: "عرض التفاصيل للمجموعة %{name}"
         visit_group_homepage: "زيارة الصفحة الرئيسية للمجموعة"
       group_edit: 
         cancel: إلغاء
         group_join_level: الانضمام
+        group_max_membership: "قصر المجموعة على"
+        group_max_membership_help: "(اترك الحقل فارغًا لاستخدام الحد الأقصى المعين للمجموعة)"
+        group_max_membership_members: الأعضاء
         group_name: "اسم المجموعة"
         invitation_only: "بدعوة فقط"
         open: "يحق للأعضاء الانضمام"
@@ -7713,11 +8145,16 @@ ar:
       group_user: 
         assign_to_group: "تعيين إلى المجموعة"
         assign_user_to_group: "تعيين %{name} لمجموعة"
-        edit_user_group_assignment: "إزالة %{name} أو نقله من مجموعة"
+        edit_group_membership: "تحرير عضوية %{name}"
+        group_leader: "قائد المجموعة"
         move: "نقل إلى..."
         move_to_new_group: "نقل %{name} إلى مجموعة جديدة"
         remove: إزالة
+        remove_as_leader: "إزالة كقائد"
         remove_from_group: "إزالة %{name} من مجموعة"
+        remove_user_as_leader: "إزالة %{name} كقائد"
+        set_as_leader: "تعيين كقائد"
+        set_user_as_leader: "تعيين %{name} كقائد"
       group_users: 
         add_student: "أضف طالبًا للشروع في العمل."
         add_user: "أضف مستخدمًا للشروع في العمل."
@@ -7735,6 +8172,7 @@ ar:
       self_signup_help: 
         about_self_signup_groups: "حول مجموعات التسجيل الذاتي"
         self_signup_description: "يمكنك إنشاء مجموعات من المجموعات ويمكن للطلاب التسجيل في مجموعات يمتلكونها. ولا يزال يقتصر على الطلاب التسجيل بمجموعة واحدة بكل مجموعة من المجموعات، ولكن بهذه الطريقة يمكن للطلاب تنظيم أنفسهم في مجموعات بدلاً من الحاجة إلى قيام المدرس بالعمل. لاحظ أنه ما دام هذا الخيار ممكنًا، يمكن للطلاب نقل أنفسهم من مجموعة إلى أخرى."
+    max_membership_number: "يجب أن يكون الحد الأقصى للعضوية رقمًا"
     member: 
       few: "%{count} من الأعضاء"
       many: "%{count} من الأعضاء"
@@ -7764,6 +8202,7 @@ ar:
     randomly_assigning_members: "تعيين الطلاب عشوائيًا"
     show: 
       coming_up: متطور
+      edit_group: "تحرير المجموعة"
       group_atom_feed: "موجز Atom للمجموعة"
       new_announcement: "إعلان جديد"
       next_week: "الأسبوع التالي"
@@ -7810,6 +8249,7 @@ ar:
     which_course_is_this_question_about: "أي مساق يدور حوله هذا السؤال؟"
     your_email_address: "بريدك الإلكتروني"
   helpers: 
+    course: المساق
     dashboard_helper: 
       announcement_details: "تفاصيل الإعلان"
       assignment_details: "تفاصيل المهمة"
@@ -7819,36 +8259,47 @@ ar:
       x_new_in_announcements: 
         few: "*%{count}* من الإعلانات"
         many: "*%{count}* من الإعلانات"
-        one: "إعلان واحد"
+        one: "*%{count}* من الإعلانات"
         other: "*%{count}* من الإعلانات"
         two: "*%{count}* من الإعلانات"
         zero: "*%{count}* من الإعلانات"
       x_new_in_assignments: 
         few: "*%{count}* من إخطارات المهمة"
         many: "*%{count}* من إخطارات المهمة"
-        one: "إخطار مهمة واحد"
+        one: "*%{count}* من إخطارات المهمة"
         other: "*%{count}* من إخطارات المهمة"
         two: "*%{count}* من إخطارات المهمة"
         zero: "*%{count}* من إخطارات المهمة"
       x_new_in_conversations: 
         few: "*%{count}* من رسالات المحادثة"
         many: "*%{count}* من رسالات المحادثة"
-        one: "رسالة محادثة واحدة"
+        one: "*%{count}* من رسالات المحادثة"
         other: "*%{count}* من رسالات المحادثة"
         two: "*%{count}* من رسالات المحادثة"
         zero: "*%{count}* من رسالات المحادثة"
       x_new_in_discussions: 
         few: "*%{count}* من المناقشات"
         many: "*%{count}* من المناقشات"
-        one: "مناقشة واحدة"
+        one: "*%{count}* من المناقشات"
         other: "*%{count}* من المناقشات"
         two: "*%{count}* من المناقشات"
         zero: "*%{count}* من المناقشات"
+    local: محلي
   high_contrast_description: |-
       إذا كنت ترغب في إصدار عالي التباين من واجهة مستخدم Canvas، فعليك تمكين هذا.
       قد يفيد ذلك الأشخاص الذين يعانون من إعاقة بصرية أو صعوبة في القراءة.
+  html5_first_videos_description: |-
+      بشكل افتراضي، سيحاول Canvas استخدام Flash أولاً لتشغيل مقاطع الفيديو. يمكنك تشغيل هذا الخيار لمحاولة استخدام HTML5 أولاً،
+      ثم العودة إلى Flash.
   ic_actions: 
     manage: إدارة
+  icons: 
+    discussion_submission: "إرسال المناقشة"
+    file_upload_submission: "إرسال تحميل الملف"
+    media_submission: "إرسال الوسائط"
+    online_url_submission: "إرسال عنوان URL عبر الإنترنت"
+    quiz_submission: "إرسال الاختبار"
+    text_entry_submission: "إرسال إدخال النص"
   images: 
     error_checking_color: "خطأ في التحقق من لون الصورة"
     invalid_background_color: "يجب أن يكون لون الصورة %{color}"
@@ -7866,7 +8317,11 @@ ar:
   importers/context_module_importer: 
     migration_module_item_type: "عنصر الوحدة"
   importers/course_content_importer: 
+    account_grading_standard_warning: "تعذر العثور على معيار تقدير درجات الحساب للمساق."
+    copied_grading_standard_warning: "تعذر العثور على معيار تقدير الدرجات المنسوخ للمساق."
+    due_dates_warning: "تعذر تعديل تواريخ الاستحقاق."
     failed_import_media_objects: "فشل استيراد كائنات الوسائط"
+    file_import_warning: "تعذر العثور على الملف %{file}"
   importers/learning_outcome_group_importer: 
     no_global_permission: "غير مسموح لك بإدارة النتائج العامة، لا يمكن إضافة \"%{title}\""
   importers/learning_outcome_importer: 
@@ -7878,7 +8333,6 @@ ar:
     title_for_topics_category: "موضوعات %{category}"
     warnings: 
       truncated_wiki_title: "تم اقتطاع عنوان صفحة wiki التالية: %{title}"
-  individual_gradebook_description: "يوفر عرض دفتر الدرجات الفردي طريقة عرض لدفتر الدرجات وهي مصممة بحيث تتيح سهولة الوصول."
   info: 
     notices: 
       error_reported: "شكرًا لمساعدتك!  سنتخذ اللازم فورًا"
@@ -7901,12 +8355,13 @@ ar:
       search_by_tag: "بحث حسب العلامة"
     confirms: 
       default_delete_thing: "هل ترغب بالتأكيد في حذف هذا؟"
+    course_time: "المساق:"
     datepicker: 
       titles: 
         am_pm: صباحًا/مساءً
     draft: مسودة
     errors: 
-      cannot_view_document_inline: "لا يمكن عرض هذا المستند بشكل فردي، ربما لا يكون لديك إذن لعرضه أو ربما تم حذفه."
+      cannot_view_document_in_canvas: "لا يمكن عرض هذا المستند في Canvas."
       document_preview_processing: "تجري معالجة معاينة المستند حاليًا. الرجاء إعادة المحاولة لاحقًا."
       field_is_required: "هذا الحقل مطلوب"
       invalid_datetime: "تاريخ/قيمة زمنية غير صالحة"
@@ -7926,6 +8381,7 @@ ar:
       minimize_youtube_video: "تصغير الفيديو"
       view_equella_content_in_new_window: "عرض المحتوى في نافذة جديدة"
     loading: "جارٍ التحميل..."
+    local_time: "محلي:"
     no_description: "بلا وصف"
     no_items: "لا توجد عناصر."
     no_results_found: "لم يتم العثور على نتائج"
@@ -7951,6 +8407,7 @@ ar:
       view_in_new_window: "عرض في نافذة جديدة"
     tooltips: 
       enter_search_terms: "إدخال كلمات البحث"
+  invalid_points_possible: "يجب أن تكون قيمة النقاط الممكنة لهذه المهمةصفرًا أو أكبر."
   invalid_url_in_xml: "عنوان url غير صالح في xml. يجب تجاوز علامات العطف."
   invalid_xml_syntax: "بناء جملة xml غير صالح"
   jobs: 
@@ -7998,7 +8455,7 @@ ar:
         locked_by: "تم التأمين بواسطة"
         max_attempts: "أقصى حد للمحاولات"
         num_attempts: المحاولات
-        original_id: "المعرف الأصلي"
+        original_job_id: "معرف المهمة الأصلي"
         priority: الأولوية
         run_at: "تم التشغيل في"
         strand: جزء
@@ -8016,8 +8473,11 @@ ar:
       previous: السابق
   labels: 
     lock_module_until: "تأمين الوحدة حتى تاريخ محدد"
+  last_submission_activity_title: "آخر نشاط إرسال"
+  last_user_access_title: "أخر وصول للمستخدم"
   layouts: 
     application: 
+      group_switch: تبديل
       instructure_description: "شركة Instructure: صاحبة نظام إدارة التعليم بالمصدر المفتوح؛ Canvas"
       keyboard_navigation: 
         close: "اضغط على علامة الفاصلة لإغلاق هذا الحوار"
@@ -8035,6 +8495,7 @@ ar:
         grades: الدرجات
       navigation: 
         main: "التنقل الرئيسي"
+        user_menu: "قائمة المستخدم"
       open_source_learning_management_system: "نظام LMS مفتوح المصدر"
     facebook: 
       title: "صفحة Facebook"
@@ -8063,6 +8524,7 @@ ar:
   learning_outcome: 
     no_comment: "بلا تعليق"
     no_description: "بلا وصف"
+  learning_outcome_assignment_type_title: "نوع المهمة ونتيجة التعلم"
   lib: 
     angel: 
       failed_import_link: "فشل استيراد الارتباط"
@@ -8140,6 +8602,17 @@ ar:
       word_separator: " "
   license_help: 
     content_license_help: "تعليمات ترخيص المحتوى"
+  lincoln_report_header_course_id: "معرف المساق"
+  lincoln_report_header_course_name: "اسم المساق"
+  lincoln_report_header_course_role: "دور المساق"
+  lincoln_report_header_course_sis_id: "معرف SIS للمساق"
+  lincoln_report_header_current_grade: "الدرجة الحالية"
+  lincoln_report_header_invalid_term: "الفصل الدراسي غير صحيح"
+  lincoln_report_header_login: "معرف تسجيل الدخول"
+  lincoln_report_header_student_name: "اسم الطالب"
+  lincoln_report_header_student_sis: "معرف sis  للطالب"
+  lincoln_report_header_term_id: "معرف الفصل الدراسي"
+  lincoln_report_header_term_name: "اسم الفصل الدراسي"
   link_enrollment: 
     buttons: 
       link: "الارتباط بالطالب"
@@ -8230,6 +8703,8 @@ ar:
     my_courses: مساقاتي
   message: 
     default_subject: "تنبيه Canvas"
+  message_dialog_component: 
+    ok: موافق
   message_students: 
     buttons: 
       send_message: "إرسال رسالة"
@@ -8438,7 +8913,7 @@ ar:
           attendee: الحاضر
           attendees: الحضور
           cancel_reason: "سبب الإلغاء"
-          click_to_see_assignment: "انقر هنا لعرض المهمة"
+          click_to_see_appointment: "انقر هنا لعرض الموعد"
           date_and_time: التاريخ/الوقت
           details: "تفاصيل الموعد"
           group: المجموعة
@@ -8446,7 +8921,6 @@ ar:
           no_reason_given: "لم يتم تحديد سبب"
           slots_remaining: "الأجزاء الزمنية المتاحة"
           subject: "تم إلغاء الحجز لـ %{appointment_name} (%{course})"
-          view_appointment: "عرض الموعد على الارتباط التالي"
         instructions: "عرض الموعد على الرابط التالي: %{link}"
         labels: 
           attendee: الحاضر
@@ -8814,7 +9288,7 @@ ar:
         html: 
           assignment_due_date_changed: "تم تغيير تاريخ استحقاق المهمة: %{assignment_name}، %{course_name} (%{override})"
           assignment_due_date_changed_sentence: "تم تغيير تاريخ الاستحقاق للمهمة %{assignment_name} للمساق %{course_name} (%{override}) إلى:"
-          link_text: "عرض المهمة"
+          link: "انقر هنا لعرض المهمة"
           no_due_date: "بلا تاريخ استحقاق"
         labels: 
           click_to_see_assignment: "انقر هنا لعرض المهمة"
@@ -8839,7 +9313,7 @@ ar:
         assignment_graded: "تم تقييم درجات للمهمة: %{assignment_name}, %{course_name}"
         html: 
           assignment_graded: "تم تقييم الدرجات للمهمة: %{assignment_name}، %{course_name}"
-          link_text: "عرض المهمة"
+          link: "انقر هنا لعرض المهمة"
           the_assignment_is_graded: "تم تقييم الدرجات للمهمة %{assignment_name}."
         labels: 
           view_here: "يمكنك عرضها هنا"
@@ -8861,7 +9335,7 @@ ar:
     assignment_resubmitted: 
       email: 
         html: 
-          link_text: "عرض الإرسال"
+          link: "انقر هنا لعرض الإرسال"
           user_resubmitted: "إعادة الإرسال: %{user_name}، %{assignment_name}"
           user_resubmitted_sentence: "قام %{user_name} بإعادة إرسال %{assignment_name} في المساق %{course_name}"
         labels: 
@@ -8882,7 +9356,7 @@ ar:
     assignment_submitted: 
       email: 
         html: 
-          link_text: "عرض الإرسال"
+          link: "انقر هنا لعرض الإرسال"
           user_submitted: "الإرسال: %{user_name}، %{assignment_name}"
           user_submitted_sentence: "قام %{user_name} بإرسال %{assignment_name} في المساق %{course_name}"
         labels: 
@@ -8903,7 +9377,7 @@ ar:
     assignment_submitted_late: 
       email: 
         html: 
-          link_text: "عرض الإرسال"
+          link: "انقر هنا لعرض الإرسال"
           user_resubmitted_sentence: "قام %{user_name} بإرسال %{assignment_name} في المساق %{course_name} متأخرًا"
           user_submitted: "المهمة المتأخرة: %{user_name}، %{assignment_name}"
         labels: 
@@ -9000,11 +9474,13 @@ ar:
         subject: "تأكيد البريد الإلكتروني: Canvas"
     confirm_registration: 
       email: 
+        body: "شكرًا على التسجيل في %{product_name}! هذا البريد الإلكتروني مرسل لتأكيد تسجيل المستخدم %{user} حسابًا جديدًا في %{website}."
         details: "لإنهاء عملية التسجيل هذه، تفضل بزيارة عنوان url التالي:"
         html: 
           body: "شكرًا لك على التسجيل في %{product_name}! هذا البريد الإلكتروني مرسل لتأكيد تسجيل المستخدم %{user} حسابًا جديدًا على %{website}."
           details: "انقر هنا لإنهاء عملية التسجيل"
           subject: "تأكيد التسجيل: %{product_name}"
+        subject: "تأكيد التسجيل: %{product_name}"
     confirm_sms_communication_channel: 
       sms: 
         body: |-
@@ -9040,18 +9516,15 @@ ar:
       email: 
         attached_files: "الملفات المرفقة:"
         audio_comment: "تشتمل هذه الرسالة على تعليقات الوسائط. للاستماع أو الرد، انقر فوق الارتباط أدناه:"
-        body: "أرسل %{user_name} لتوه رسالة لك في Canvas:"
         html: 
           attached_files: "الملفات المرفقة:"
-          audio_comment: "تشتمل هذه الرسالة على تعليقات الوسائط. للاستماع أو الرد، انقر فوق الارتباط أدناه:"
-          body: "أرسل %{user_name} لتوه رسالة لك في Canvas:"
           download: تنزيل
-          reply_to_conversation_message: "يمكنك الرد على هذه الرسالة في Canvas عن طريق الرد مباشرة على هذا البريد الإلكتروني."
           subject: "أرسل %{user_name} لتوه رسالة لك في Canvas."
           unknown_user: "مستخدم غير معروف"
-        reply_to_conversation_message: "يمكنك الرد على هذه الرسالة في Canvas عن طريق الرد مباشرة على هذا البريد الإلكتروني."
+          view_message: "عرض هذه المحادثة في المحادثات"
         subject: "أرسل %{user_name} لتوه رسالة لك في Canvas."
         unknown_user: "مستخدم غير معروف"
+        view_message: "عرض هذه المحادثة في المحادثات"
       facebook: 
         body: "أرسل %{user_name} لتوه رسالة لك في Canvas."
         link_text: "عرض الرسالة"
@@ -9403,8 +9876,8 @@ ar:
           grading_based_on_points: "يعتمد تقييم الدرجات على إجمالي النقاط لكافة المهام."
           labels: 
             grades_based_on_percent: "يعتمد تقييم الدرجات على الإجمالي المقدر لكل مجموعة مهام"
-            now_see_here: "يمكنك الاطلاع على التفاصيل هنا"
             subject: "لقد تغير تقدير الدرجات"
+          see_details: "يمكنك الاطلاع على التفاصيل هنا"
         labels: 
           grades_based_on_percent: "يعتمد تقييم الدرجات على الإجمالي المقدر لكل مجموعة مهام"
           now_see_here: "يمكنك الاطلاع على التفاصيل هنا"
@@ -9510,9 +9983,10 @@ ar:
     layout: 
       email: 
         html: 
-          click_to_preferences: "انقر هنا لتحرير تفضيلات الإخطارات"
+          click_to_preferences: "تحديث إعدادات الإعلام"
     merge_email_communication_channel: 
       email: 
+        body: "تم إنشاء حساب لك على عنوان %{host}، ولكن لديك بالفعل حساب Canvas.  وإذا كنت تود دمجهما معًا، فيرجى زيارة عنوان url التالي:"
         html: 
           account_created: "تم إنشاء حساب لك على %{host}، ولكن لديك حساب Canvas بالفعل."
           merge2: "إذا كنت ترغب في دمجهما معًا، *انقر هنا*"
@@ -9539,7 +10013,6 @@ ar:
     migration_export_ready: 
       email: 
         html: 
-          body: "لقد اكتملت عملية الاستخراج للمساق %{course_name}. المحتوى جاهز الآن ليتم استيراده إلى المساق لديك."
           link_message2: "انقر فوق *هذا الارتباط* لاختيار عناصر المحتوى المراد استيرادها"
           subject: "محتوى المساق \"%{course_name}\" جاهز للاستيراد"
         subject: "استخراج المساق جاهز: %{course_name}"
@@ -9670,7 +10143,7 @@ ar:
         discussion_entry_reply_message: "انضم إلى المحادثة باستخدام الارتباط أدناه، أو قم بالتعليق عن طريق الرد على هذه الرسالة."
         html: 
           body: "نشر %{user} تعليقًا جديدًا على سلسلة المناقشة %{discussion_topic} لـ %{course}:"
-          discussion_entry_link_message: "[انقر هنا للانضمام إلى المحادثة](%{url})، أو قم بالتعليق عن طريق الرد على هذه الرسالة."
+          link: "انقر هنا للانضمام إلى المحادثة"
           subject: "تعليق جديد لـ %{discussion_topic}: %{course}"
         subject: "التعليق الجديد لـ %{discussion_topic}: %{course}"
       facebook: 
@@ -9689,8 +10162,8 @@ ar:
         html: 
           attached_file: "ملف مرفق"
           body: "لقد تم بدء مناقشة جديدة قد تكون شيقة بالنسبة لك: "
-          details: "انضم إلى المحادثة من هنا"
           download: تنزيل
+          link: "انقر هنا للانضمام إلى المحادثة"
           subject: "المناقشة الجديدة - %{discussion_topic}: %{course}"
         labels: 
           file_included: "الملف المضمَن"
@@ -9758,7 +10231,7 @@ ar:
         body: "تمت إضافة %{count} من الملفات الجديدة للمساق، %{name}:"
         html: 
           body: "تمت إضافة %{count} من الملفات الجديدة للمساق، %{name}:"
-          link: "يمكنك عرضها هنا"
+          see_details: "يمكنك عرضها هنا"
           subject: "%{count} من الملفات الجديدة المضافة للمساق، %{name}:"
         link: "يمكنك عرضها هنا"
         subject: "%{count} من الملفات الجديدة المضافة للمساق، %{name}:"
@@ -9806,8 +10279,8 @@ ar:
         body: "قام %{user} بالتسجيل كمعلم فقط على موقع %{website}."
         html: 
           body: "قام %{user} بالتسجيل كمعلم فقط على موقع %{website}."
+          details: "انقر هنا لعرض المدرس"
           email: "البريد الإلكتروني"
-          link: "انقر هنا لعرض المعلم"
           phone: الهاتف
           school_name: "اسم المدرسة"
           school_position: "موضع المدرسة"
@@ -9970,6 +10443,7 @@ ar:
         body: "وضع %{author} لتوه تعليقًا جديدًا على الإرسال الخاص بـ %{user} لـ %{assignment}"
         html: 
           body: "وضع %{author} لتوه تعليقًا جديدًا على الإرسال الخاص بـ %{user} لـ %{assignment}"
+          link_message: "انقر هنا لعرض التعليق"
           someone: "شخص ما"
           subject: "تعليق الإرسال: %{user}، %{assignment}، %{context}"
           submission_comment_link_message: "يمكنك مراجعة تفاصيل الإرسال باستخدام الارتباط أدناه، أو يمكنك الرد على هذا التعليق عن طريق الاستجابة لهذه الرسالة."
@@ -9993,7 +10467,8 @@ ar:
         body: "وضع %{author} لتوه تعليقًا جديدًا على الإرسال الخاص بـ %{user} لـ %{assignment}"
         html: 
           body: "وضع %{author} لتوه تعليقًا جديدًا على الإرسال الخاص بـ %{user} لـ %{assignment}"
-          link_message: "يمكنك مراجعة تفاصيل الإرسال هنا:"
+          link_message: "يمكنك مراجعة تفاصيل الإرسال بالنقر فوق الارتباط التالي:"
+          review_submission: "انقر هنا لمراجعة الإرسال"
           someone: "شخص ما"
           subject: "تعليق الإرسال: %{user}، %{assignment}، %{context}"
         someone: "شخص ما"
@@ -10203,6 +10678,7 @@ ar:
     ecollege: 
       course_not_found: "لم يتم العثور على مساق ECollege."
     external_feed_type: "موجز خارجي"
+    external_tool_type: "الأداة الخارجية"
     file_type: ملف
     grading_standard_type: "معيار تقييم الدرجات"
     group_type: المجموعة
@@ -10217,6 +10693,18 @@ ar:
   migration_issues: 
     errors: 
       valid_workflow_state: "يجب إرسال حالة سير عمل صالحة"
+  mississippi_report_header_course_id: "معرف المساق"
+  mississippi_report_header_enrollment_id: "معرف التسجيل"
+  mississippi_report_header_enrollment_state: "حالة التسجيل"
+  mississippi_report_header_observer_sis_id: "معرف sis للملاحظ"
+  mississippi_report_header_observer_user_id: "معرف المستخدم للملاحظ"
+  mississippi_report_header_role: الدور
+  mississippi_report_header_section_id: "معرف القسم"
+  mississippi_report_header_sis_course_id: "معرف المساق لنظام SIS"
+  mississippi_report_header_sis_section_id: "معرف القسم لنظام SIS"
+  mississippi_report_header_sis_user_id: "معرف المستخدم لنظام SIS"
+  mississippi_report_header_user_id: "معرف المستخدم"
+  mississippi_sis_title: "بيانات SIS"
   module_item_types: 
     assignment: المهمة
     disuccsion: المناقشة
@@ -10278,6 +10766,7 @@ ar:
     where_to_move: "أين تريد نقل *%{name}*؟"
   move_dialog_select: 
     move_to_end: "-- في الأسفل --"
+  multi_student_progress_title: "تقدم متعدد الطلاب"
   mute_dialog: 
     curving_assignments: "المهام المنحنية"
     grade_change_notifications: "إعلامات تغيير الدرجات"
@@ -10290,18 +10779,42 @@ ar:
     sure_you_want_to_mute: "هل ترغب بالتأكيد في حجب هذه المهمة؟ بينما تم حجب هذه المهمة، لن يتلقى الطلاب إعلامات جديدة حولها أو لن يقدروا على رؤيتها:"
   name: "مستورد القياس الأكاديمي"
   new_facebook_message: "لديك رسالة جديدة من Canvas"
+  new_quiz_moderate_desc: "عندما تكون حالة المسودة وإحصائيات الاختبار مسموحًا بها/قيد التشغيل، فهذا يؤدي إلى تمكين صفحة متوسط الاختبار الجديدة لأحد الحسابات."
+  new_quiz_statistics_desc: "عندما تكون حالة المسودة مسموحًا بها/قيد التشغيل، فهذا يؤدي إلى تمكين صفحة إحصائيات الاختبار الجديدة لأحد الحسابات."
   new_styles_description: |-
       نحن نستخدم شكل معدل من واجهة مستخدم Canvas. عليك تشغيل هذا لاختيار مشاهدة
       شكل وأداء واجهة Canvas المحدثة والمبسطة.
+  newark_report_header__assignment_count: "عدد المهام"
+  newark_report_header_assignment_due_date: "تاريخ استحقاق المهمة"
+  newark_report_header_assignment_group_name: "اسم مجموعة المهام"
+  newark_report_header_assignment_id: "معرف المهمة"
+  newark_report_header_assignment_name: "اسم المهمة"
+  newark_report_header_course_code: "رمز المساق"
+  newark_report_header_course_id: "معرف المساق"
+  newark_report_header_course_name: "اسم المساق"
+  newark_report_header_course_sis_id: "معرف sis للمساق"
+  newark_report_header_due_date: "تاريخ الاستحقاق"
+  newark_report_header_section_id: "معرف القسم"
+  newark_report_header_section_name: "اسم القسم"
+  newark_report_header_student_name: "اسم الطالب"
+  newark_report_header_teacher_id: "معرف المدرس"
+  newark_report_header_teacher_name: "اسم المدرس"
   no_migration_file: "الملف مطلوب لترحيل المحتوى."
   not_a_number: "يجب أن تكون القيمة عددًا موجبًا"
-  not_applicable: "لا يوجد"
   notification: 
     added_to_conversation_description: "تمت إضافتك إلى المحادثة"
     added_to_conversation_display: "تمت الإضافة إلى المحادثة"
+    all_submissions_description: |-
+        *المعلم والمسؤول فقط:*
+        
+        إرسال/إعادة إرسال المهمة
     all_submissions_display: "كافة الإرسالات"
     announcement_description: "إعلان جديد في المساق لديك"
     announcement_display: الإعلان
+    appointment_availability_description: |-
+        *المعلم والمسؤول فقط:*
+        
+        تغيير في منافذ وقت الموعد
     appointment_availability_display: "توفر الموعد"
     appointment_cancelations_description: "إلغاء الموعد"
     appointment_cancelations_display: "إلغاءات الموعد"
@@ -10335,6 +10848,12 @@ ar:
       submission_comment: "تعليق الإرسال"
     conversation_message_description: "رسائل جديدة في علبة الوارد"
     conversation_message_display: "رسالة المحادثة"
+    course_content_description: |-
+        تغيير إلى محتوى مساق:
+        
+        * WikiPage
+        * محتوى اختبار
+        * محتوى مهمة
     course_content_display: "محتوى المساق"
     discussion_description: "موضوع مناقشة جديد في المساق لديك"
     discussion_display: المناقشات
@@ -10344,11 +10863,34 @@ ar:
     due_date_display: "تاريخ الاستحقاق"
     files_description: "ملف جديد مضاف إلى المساق لديك"
     files_display: الملفات
+    grading_description: |-
+        يتضمن:
+        
+        * الدرجة المدخلة/المتغيرة للمهمة/الإرسال
+        * درجة مهمة صوتية
+        * تم تغيير معدل الدرجة
+        
+        &nbsp;
+        
+        تحقق من "تضمين النتائج عند التنبيه بشأن تغيرات الدرجة" إذا كنت تريد رؤية درجاتك في الإشعارات.
+        إذا كان بريدك الإلكتروني غير مؤسسي، فهذا يعني أنه سيتم إرسال المحتوى الحساس خارج المؤسسة.
     grading_display: التقديرات
     grading_notify_include_grade: "تضمين النقاط عند التنبيه حول تغييرات التقديرات."
     grading_policies_description: "تغييرات سياسة تقييم درجات المساق"
     grading_policies_display: "سياسات تقييم الدرجات"
+    invitation_description: |-
+        دعوة إلى:
+        
+        * مؤتمر ويب
+        * مجموعة
+        * تعاون
+        * مساق
+        * مراجعة نظراء وتذكير
     invitation_display: الدعوة
+    late_grading_description: |-
+        *المعلم والمسؤول فقط:*
+        
+        إرسال المهمة متأخرًا
     late_grading_display: "تقييم الدرجات الأخير"
     membership_update_description: |-
         *المسؤول فقط: تم تنشيط الالتحاق المعلق*
@@ -10427,8 +10969,22 @@ ar:
       updated_wiki_page: "صفحة Wiki المحدثة"
       web_conference_invitation: "دعوة لمؤتمر عبر الويب"
     no_subject: "لا يوجد موضوع"
+    other_description: |-
+        *المعلم والمسؤول فقط:*
+        
+        * الالتحاق بالمساق
+        * تم إنشاء تقرير
+        * تصدير المحتوى
+        * تقرير الترحيل
+        * حساب مستخدم جديد
+        * تسجيل مدرس جديد
+        * مجموعة طلاب جديدة
     other_display: "إخطارات إدارية"
     reminder_display: التذكير
+    student_appointment_description: |-
+        *المعلم والمسؤول فقط:*
+        
+        التسجيل لموعد طالب
     student_appointment_display: "تسجيلات موعد الطالب"
     submission_comment_description: |-
         تعليق إرسال المهمة
@@ -10508,8 +11064,32 @@ ar:
     account_group_description: "مجموعة نتائج مستوى الحساب."
   outcome_path_mastery_points: "%{path} نقاط درجة الإتقان"
   outcome_path_result: "%{path} النتيجة"
+  outcome_report_header_assessment_id: "معرف التقييم"
+  outcome_report_header_assessment_question: "سؤال التقييم"
+  outcome_report_header_assessment_question_id: "معرف سؤال التقييم"
+  outcome_report_header_assessment_title: "عنوان التقييم"
+  outcome_report_header_assessment_type: "نوع التقييم"
+  outcome_report_header_assignment_id: "معرف المهمة"
+  outcome_report_header_assignment_title: "عنوان المهمة"
+  outcome_report_header_assignment_url: "عنوان url للمهمة"
+  outcome_report_header_attempt: المحاولة
+  outcome_report_header_course_id: "معرف المساق"
+  outcome_report_header_course_name: "اسم المساق"
+  outcome_report_header_course_sis_id: "معرف sis للمساق"
+  outcome_report_header_learning_outcome_id: "معرف نتيجة التعلم"
+  outcome_report_header_learning_outcome_name: "اسم نتيجة التعلم"
+  outcome_report_header_outcome_score: "درجة التعلم"
+  outcome_report_header_section_id: "معرف القسم"
+  outcome_report_header_section_name: "اسم القسم"
+  outcome_report_header_section_sis_id: "معرف sis للقسم"
+  outcome_report_header_student_id: "معرف الطالب"
+  outcome_report_header_student_name: "اسم الطالب"
+  outcome_report_header_student_sis_id: "معرف sis للطالب"
+  outcome_report_header_submission_date: "تاريخ الإرسال"
+  outcome_report_header_submission_score: "درجة الإرسال"
   outcome_results: 
     outcomes_filename: النتائج
+  outcome_results_title: "نتائج التحصيل"
   outcomes: 
     account_standards: "معايير الحساب"
     account_standards_description: "ستلاحظ جهة اليسار المعايير التي قامت مؤسستك بإنشائها لاستخدامها في دوراتك."
@@ -10562,10 +11142,11 @@ ar:
       instructions: 
         main: 
           manage: 
-            description: "* يتم إنشاء النتائج هنا لتتبع درجة الإتقان في الدورة التدريبية. للبدء، افحص شريط القائمة على طول الجزء العلوي. انقر على الزر \"جديد\" لإنشاء نتيجة جديدة، أو على الزر \"مجموعة جديدة\" لإنشاء مجموعة جديدة لتنظيم النتائج الخاصة بك. سيتيح لك الزر \"عثور\" استخدام النتائج التي تم إنشاؤها من قبل الولاية أو المؤسسة. ولأنه يمكنك إنشاء واستخدام النتائج، ستتمكن من استخدام اللوحة على اليسار للتنقل خلال النتائج الخاصة بك. يمكنك سحب النتائج وإسقاطها بين المستويات المختلفة لإنشاء بنية. ** الأهم من ذلك، تتيح Canvas إضافة نتائج لعناوين التصنيف بحيث يمكنك تقييم درجة الإتقان كما كنت تقوم بتصنيف المهام. بمجرد إعداد النتائج، انقر فوق \"إدارة العناوين\" لبدء استخدام النتائج للتصنيف. *\n"
             title: "إعداد النتائج"
+    mastery: إتقان
     mastery_error: "يجب أن تكون أكبر من أو تساوي 0"
     missing_outcome: "تعذر العثور على ناتج التعلم ذلك"
+    near: "قريب من الإتقان"
     new_outcome: "نتيجة جديدة"
     new_outcome_group: "مجموعة نتيجة جديدة"
     outcome: 
@@ -10576,7 +11157,6 @@ ar:
       point_mastery: "درجة الإتقان وفقًا للنسبة المئوية %{mastery_points} بالنقاط"
       points: 
         rating: "%{points} نقاط"
-        total: "%{points} نقاط"
       total_points: "إجمالي النقاط"
       use_for_scoring: "استخدم هذا المعيار لتوزيع الدرجات"
     outcome_alignment: 
@@ -10587,6 +11167,7 @@ ar:
       criterion_dialog: "يمكن تضمين نتائج التعلم في عناوين المهمة كطريقة سهلة لتقييم إتقان النتائج التي تمت محاذاتها إلى المهام الخاصة.  وعند تعريف ناتج تعلم، يجب عليك تعريف معيار يمكن استخدامه عند إنشاء عناوين المهمة. فقم بتعريف العديد من أعمدة العناوين بقدر ما تحتاج، وحدد عتبة نقطة سيتم استخدامها لتعريف إتقان هذا الناتج. "
       criterion_info_link: "انقر للتعرف على تصنيفات المعيار"
       description: "وصف هذه النتيجة"
+      display_name: "الاسم المألوف (اختياري)"
       mastery: "الإتقان عند"
       points: "%{points_possible} نقاط"
       title: "تسمية هذه النتيجة"
@@ -10603,6 +11184,7 @@ ar:
       attempt_info: "رقم المحاولة %{attempt_number}, %{attempt_date}"
       outcome_mastered: "تم إتقان"
       scoring: "%{points} من  %{possible_points}"
+    remedial: "بجاجة إلى تحسين"
     show: 
       no_aligned_items: "لا توجد عناصر تمت محاذاتها"
       no_artifacts: "لا توجد أدوات"
@@ -10615,6 +11197,7 @@ ar:
     titles: 
       find_outcomes: "العثور على نتائج"
     top_level: "%{context} مستوى أعلى"
+    undefined: "لم تبدأ"
     user_outcome_results: 
       artifacts: 
         few: "%{count} من الأدوات"
@@ -10696,8 +11279,33 @@ ar:
     view_more_link: "عرض المزيد"
   paginated_view: 
     loading_more_results: "تحميل مزيد من النتائج"
+  pasco_report_header_created_at: "تاريخ الإنشاء"
+  pasco_report_header_created_by_id: "معرف المنشئ"
+  pasco_report_header_deleted_at: "تاريخ الحذف"
+  pasco_report_header_note: ملاحظة
+  pasco_report_header_note_id: المعرف
+  pasco_report_header_title: العنوان
+  pasco_report_header_updated_at: "تاريخ التحديث"
+  pasco_report_header_user_id: "معرف المستخدم"
+  pasco_report_header_user_sis_id: "معرف sis للمستخدم"
+  pasco_report_header_workflow_state: "حالة سير العمل"
+  pasco_report_url: "عنوان url"
+  pasco_user_notes_title: "ملاحظات المستخدم"
   paypal: 
     exception: "عذرًا، حدث خطأ، الرجاء المحاولة مرة أخرى لاحقًا."
+  pci_report_header_course_sis_id: "معرف sis للمساق"
+  pci_report_header_submission_date: "حالة الإرسال"
+  pci_report_header_submission_type: "نوع الإرسال"
+  pci_report_header_user_sis: "sis للمستخدم"
+  penn_harris_student_grade_title: "درجات طلاب Penn Harris"
+  ph_student_grades_report_header_account_id: "معرف الحساب"
+  ph_student_grades_report_header_course_id: "معرف المساق"
+  ph_student_grades_report_header_final_letter_grade: "الدرجة الحرفية النهائية"
+  ph_student_grades_report_header_final_score: "الدرجة النهائية"
+  ph_student_grades_report_header_mark_type: "نوع العلامة"
+  ph_student_grades_report_header_term_id: "معرف الفصل الدراسي"
+  ph_student_grades_report_header_user_id: "معرف المستخدم"
+  ph_student_grades_report_term_required: "يجب تحديد فصل دراسي لهذا التقرير."
   plugins: 
     academic_benchmark_importer: 
       description: "يقوم هذا بتمكين استيراد معايير القياس الأكاديمي إلى Canvas."
@@ -10744,6 +11352,14 @@ ar:
       secret_description: "هذه هي المعلمة %{parameter_name} التي يمكن العثور عليها في ملف التكوين %{filename}."
     buttons: 
       saving: "جارٍ الحفظ..."
+    canvadocs: 
+      description: "تمكين Canvadocs (متوافق مع Box View) كخيار في معاينة المستند"
+      name: Canvadocs
+    canvadocs_settings: 
+      description: "تتكامل هذه الأداة الإضافية مع Canvadocs (أو أي API متوافق مع Box View) لتوفير عارض مستندات HTML5 ."
+      labels: 
+        api_key: "مفتاح واجهة API"
+        base_url: "عنوان URL الأساسي"
     crocodoc: 
       description: "تمكين Crocodoc كخيار في معاينة المستند"
       name: Crocodoc
@@ -10797,19 +11413,17 @@ ar:
       name: Facebook
     facebook_settings: 
       description: |-
-          سيلزم إنشاء [تطبيق جديد على facebook.com](%{facebook_url}).
-          قم بتعيين خيارات التكوين التالية لضمان عمل تطبيق Facebook بشكل صحيح:
+          ستحتاج إلى إنشاء [تطبيق جديد على موقع facebook.com](%{facebook_url})، وإضافة "التطبيق على Facebook" كنظام أساسي.
+          قم بتعيين خيارات التكوين التالية لضمان أن يعمل تطبيق Facebook بشكل صحيح:
           
-          * **Web Site -- Site URL:** تم التعيين إلى %{site_url}
-          * **Web Site -- Site Domain:** مجال موقع Canvas الرئيسي الخاص بك:  ويجب أن يتوافق هذا مع إعداد URL للموقع
-          * **Facebook Integration -- Canvas Page:** تدوين ملاحظة عن أي شيء تختاره وإدخاله في النموذج أدناه
-          * **Facebook Integration -- Canvas URL:** تم التعيين إلى %{canvas_url}
-          * تأكد من أنه تم تمكين **OAuth 2.0 لـ Canvas -- متطور**
-          * بعد حفظ التطبيق، قم بتدوين ملاحظة عن المعرّف App ID ومفتاح API والكلمة السرية للتطبيق
+          * **إعدادات -- التطبيق على Facebook -- صفحة Canvas:** دوِّن ملاحظة باختيارك أيًا كان (الجزء الذي يلي apps.facebook.com) وأدخلها بالشكل التالي
+          * **إعدادات -- التطبيق على Facebook -- عنوان URL لـ Canvas:** تعيين على %{canvas_url}
+          * بعد حفظ التطبيق، دوِّن ملاحظة بمعرف التطبيق ورمز العميل وكلمة سر التطبيق
       domain_name: مجال
       headers: 
         domain_settings: "إعدادات المجال"
       hints: 
+        api_key: "يُشار إليه أيضًا كرمز العميل"
         canvas_domain: "هذا هو المجال المحدد في \"عنوان URL لـ Canvas\""
         canvas_name: "هذا هو المسار المحدد في \"صفحة Canvas\""
         disable_ssl: "استخدام الاختبارات المحلية"
@@ -11028,6 +11642,17 @@ ar:
         access_key: "مفتاح الوصول"
         api_url: "Api Url"
         secret_key: "المفتاح السري"
+  polling: 
+    poll_sessions: 
+      errors: 
+        course_required: "المساق مطلوب."
+      validations: 
+        section_belongs_to_course: "قسم المساق هذا لا ينتمي إلى المساق الموجود."
+    poll_submissions: 
+      validations: 
+        poll_choice_belongs_to_poll: "اختيار الاستطلاع هذا لا ينتمي إلى الاستطلاع الموجود."
+        poll_is_published: "جلسة الاستطلاع هذه غير مفتوحة لعمليات الإرسال."
+        user_and_poll_session_uniqueness: "يمكن إرسال اختيار واحد فقط لكل جلسة استطلاع."
   post_grades_description: |-
       يتيح "نشر الدرجات" للمدرسين نشر الدرجات مرة أخرى إلى أنظمة SIS الممكنة: نظام Powerschool
       وAspire (SIS2000)‎ وJMC وأي نظام SIS يستخدم SIF ويقبل عناصر SIF: ‏GradingCategory
@@ -11114,7 +11739,6 @@ ar:
         save_skype_name: "حفظ اسم Skype"
         select_image: "تحديد صورة"
         update_settings: "تحديث الإعدادات"
-      confirm_email_instructions: "حتى تتمكن من تحرير ملف تعريفك، تحتاج إلى التحقق من عنوان بريدك الإلكتروني (%{email}) بالنقر فوق الارتباط الذي في البريد الإلكتروني الذي أرسلناه إليك."
       delicious_description: "تعد Delicious أداة تتيح لك تخزين إشاراتك المرجعية ومشاركتها مع الآخرين. وسيتيح لك محرر محتوى Canvas الثري بالخيارات البحث في علامات Delicious لسهولة إجراء ارتباط من داخل Canvas إلى الموارد الأخرى التي تراها مفيدة."
       diigo_description: "تعد Diigo أداة لوضع إشارات مرجعية اجتماعية تم تصميمها خصيصًا للأبحاث والتعليم. وسيتيح لك محرر محتوى Canvas الثري بالخيارات البحث في علامات Diigo لسهولة إجراء ارتباط من داخل Canvas إلى الموارد الأخرى التي تراها مفيدة."
       error_loading_token_details: "خطأ أثناء تحميل تفاصيل الرمز المميز"
@@ -11322,6 +11946,24 @@ ar:
     upload_file_view: 
       choose_a_picture: "اختيار صورة"
       crop_instructions: "لقص صورة، اسحب الجزء المحدد، ثم انقر فوق زر \"حفظ\" بالأسفل."
+  provisioning_report_header_account_id: "معرف الحساب"
+  provisioning_report_header_course_id: "معرف المساق"
+  provisioning_report_header_email: "البريد الإلكتروني"
+  provisioning_report_header_end_date: "تاريخ الانتهاء"
+  provisioning_report_header_first_name: "الاسم الأول"
+  provisioning_report_header_group_id: "معرف المجموعة"
+  provisioning_report_header_last_name: "الاسم الأخير"
+  provisioning_report_header_login_id: "معرف تسجيل الدخول"
+  provisioning_report_header_long_name: "الاسم الطويل"
+  provisioning_report_header_name: الاسم
+  provisioning_report_header_role: الدور
+  provisioning_report_header_section_id: "معرف القسم"
+  provisioning_report_header_short_name: "الاسم القصير"
+  provisioning_report_header_start_date: "تاريخ البدء"
+  provisioning_report_header_status: الحالة
+  provisioning_report_header_term_id: "معرف الفصل الدراسس"
+  provisioning_report_header_user_id: "معرف المستخدم"
+  provisioning_title: التزويد
   pseudonym: 
     errors: 
       bad_credentials: "اسم مستخدم غير صالح أو كلمة مرور غير صالحة"
@@ -11438,6 +12080,7 @@ ar:
       email_sent: "تم إرسال بريد الكتروني للتأكيد إلى %{email}, وتأكد من مراجعة صندوق البريد العشوائي"
       link_invalid: "الارتباط الذي استخدمته لم يعد صالحًا. وإذا لم تستطع تسجيل الدخول، فانقر فوق \"لا تعلم كلمة المرور الخاصة بك؟\" لإعادة تعيين كلمة المرور."
       password_changed: "تغيرت كلمة المرور"
+  public_courses_title: "المساقات العامة"
   publish_btn_module: 
     buttons: 
       publish: نشر
@@ -11537,8 +12180,11 @@ ar:
   publish_icon_component: 
     publish: نشر
     publish_click: "تم النشر، انقر لإلغاء النشر"
+    published: "تم النشر"
+    publishing: "جارٍ النشر..."
     unpublish: "إلغاء النشر"
     unpublish_click: "لم يتم النشر، انقر للنشر"
+    unpublishing: "جارٍ إلغاء النشر..."
   publishable: 
     cant_unpublish: "لا يمكن إلغاء النشر"
   publishableModuleItem: 
@@ -11683,6 +12329,16 @@ ar:
     quick_start_bar_view: 
       new: "جديد:"
   quiz: 
+    cancel: إلغاء
+    cant_take_unpublished_quiz: "لا يمكنك إجراء الاختبار حتى يتم نشره"
+    cant_unpublish_when_students_submit: "لا يمكن إلغاء النشر في حالة وجود عمليات إرسال لطالب"
+    delete: حذف
+    delete_quiz: "حذف الاختبار"
+    no_more_allowed_quiz_attempts: "غير مسموح لك بأي محاولات أخرى في هذا الاختبار."
+    now_on_moderate: "هذه المعلومات موحودة ضمن علامة التبويب \"متوسط\"."
+    quiz_regraded_your_score_not_affected: "تمت إعادة تقييم هذه السؤال. لم تتأثر نقاطك."
+    quiz_successfully_deleted: "تم حذف الاختبار بنجاح!"
+    quiz_successfully_updated: "تم تحديث الاختبار بنجاح!"
     regrade: 
       give_everyone_full_credit: "امنح كل شخص الدرجة الكاملة لهذا السؤال."
       no_scores_reduced: "منح النقاط لكل من الأسئلة التي تم تصحيحها والأسئلة الصحيحة السابقة (*لن يتم تقليل أي درجات*)"
@@ -11690,6 +12346,76 @@ ar:
       regrade_options: "خيارات إعادة النقييم *(للطلاب الذين أجابوا بالفعل على هذا السؤال):*"
       some_scores_reduced: "منح النقاط للإجابة الصحيحة فقط (*قد يتم تقليل بعض درجات الطلاب*)"
       update_question_without_regrading: "تحديث السؤال دون إعادة تقييم"
+    regrade_count_affected: "تمت إعادة تقييم هذا الاختبار، تعكس درجتك الجديدة أن %{count} من الأسئلة قد تأثرت."
+    regrade_score_affected: "تمت إعادة تقييم هذا السؤال، ولقد تأثرت درجتك."
+    resume_the_quiz: "استئناف الاختبار"
+    resume_the_survey: "استئناف الاستطلاع"
+    take_the_quiz: "أداء الاختبار"
+    take_the_quiz_again: "أداء الاختبار مرة أخرى"
+    take_the_survey: "أداء الاستطلاع"
+    take_the_survey_again: "أداء الاستطلاع مرة أخرى"
+    there_are_no_files_to_download: "لا توجد أي ملفات لتنزيلها."
+    there_are_no_submissions_to_grade: "لا توجد أي عمليات إرسال لتقديرها."
+    time_limit_minutes: "%{limit} من الدقائق"
+    warning: تحذير
+    you_cannot_message_unpublished: "لا يمكنك مراسلة الطلاب حتى يتم نشر الاختبار."
+  quiz_data_title: "بيانات الاختبار"
+  quiz_extend_time: 
+    ending_time: "وقت النهاية"
+    extend_time: "تمديد الوقت"
+    extensions_student: "تمديد الوقت لـ %{student}"
+    extensions_successfully_added: "تمت إضافة التمديدات بنجاح"
+    now: الآن
+  quiz_extensions: 
+    everyone_gets_attempts: "يحصل كل شخص على %{num} بالفعل"
+    everyone_gets_time: "يحصل كل شخص على %{num} دقيقة بالفعل"
+    extensions_num_students: "تمديدات لعدد %{num} من الطلاب"
+    extensions_student: "امتدادات لـ %{student}"
+    extensions_successfully_added: "تمت إضافة التمديدات بنجاح"
+    student_extensions: "تمديدات للطالب"
+  quiz_index_row: 
+    cant_unpublish_when_students_submit: "لا يمكن إلغاء النشر في حالة وجود عمليات إرسال لطالب"
+    confirms: 
+      delete_quiz: "هل ترغب بالتأكيد في حذف هذا الاختبار؟"
+    delete_quiz: "حذف الاختبار"
+    edit_quiz: "تحرير الاختبار"
+    points: 
+      few: "%{count} من النقاط"
+      many: "%{count} من النقاط"
+      one: "%{count} من النقاط"
+      other: "%{count} من النقاط"
+      two: "%{count} من النقاط"
+      zero: "%{count} من النقاط"
+    questions: 
+      few: "%{count} من الأسئلة"
+      many: "%{count} من الأسئلة"
+      one: "%{count} من الأسئلة"
+      other: "%{count} من الأسئلة"
+      two: "%{count} من الأسئلة"
+      zero: "%{count} من الأسئلة"
+  quiz_message_students: 
+    and_num_more_students: "و%{num} من الطلاب الإضافيين"
+    message_not_sent_because_empty: "لم يتم إرسال الرسالة لأنها فارغة"
+    message_sent_successfully: "تم إرسال الرسالة بنجاح"
+    message_students_who: "إرسال رسائل للطلاب الذين..."
+    student_who_have_not_taken_the_quiz: "الطلاب الذين لم يؤدوا الاختبار"
+    students_who_have_taken_the_quiz: "الطلاب الذين أدوا الاختبار"
+  quiz_model: 
+    everyone: الجميع
+    everyone_else: "أي شخص آخر"
+    graded_quiz: "اختبار تم تقييم درجاته"
+    graded_survey: "استطلاع تم تقييم درجاته"
+    keep_highest: الأعلى
+    keep_latest: الأدنى
+    practice_quiz: "أداء الاختبار"
+    survey: استطلاع
+  quiz_moderate: 
+    change_extension_for: "تغيير التمديد لعدد %{num} من الطلاب"
+    students_have_taken: "%{complete} من %{total} من الطلاب أكملوا هذا الاختبار"
+  quiz_moderate_route: 
+    moderate: متوسط
+  quiz_overview_route: 
+    overview: "نظرة عامة"
   quiz_reports: 
     quiz_report_generator: 
       download_report_name: "تنزيل %{report_name}"
@@ -11697,6 +12423,53 @@ ar:
       generated_at_date_time: "تم الإنشاء في %{dateAndTime}"
       generating_report_name: "جارٍ إنشاء %{report_name}..."
       item_analysis_not_available: "تحليل العنصر غير متاح للاستبيانات"
+  quiz_route: 
+    that_quiz_doesnt_exist: "هذا الاختبار غير موجود"
+    that_quiz_has_been_deleted: "لقد تم حذف ذلك الاختبار"
+  quiz_show: 
+    time_limit_minutes: "%{limit} من الدقائق"
+  quiz_statistics: 
+    attempts: "محاولات: %{count} من %{total}"
+    correct_essay_student_ratio: "%{ratio}% من طلابك حصلوا على الدرجة الكاملة لهذا السؤال."
+    correct_multiple_response_ratio: "%{ratio}% من طلابك أجابوا إجابات صحيحة."
+    correct_response_ratio: "%{ratio}% من طلابك أجابوا على هذا السؤال بشكل صحيح."
+    discrimination_index_help_dialog_title: "مخطط فهرس التمييز"
+    errors: 
+      stats_empty: 
+        header: "لا يوجد شيء لعرضه هنا."
+        info: "لم يؤدِ أي من طلابك هذا الاختبار حتى الآن."
+      stats_too_large: 
+        header: "يوجد الكثير جدًا هنا."
+        info: "هذا الاختبار كبير جدًا على أن يُعرض."
+    essay_score: "الدرجة: %{score}"
+    generatable: "لم يتم إنشاء التقرير."
+    generated: "التقرير جاهز."
+    generated_at: "تم الإنشاء بتاريخ %{date}"
+    generating: "جارٍ إنشاء التقرير..."
+    generation_failed: "حدث خطأ، يرجى إعادة المحاولة لاحقًا."
+    item_analysis: "تحليل العنصر"
+    no_answer: "لا توجد إجابة"
+    sort_by_discrimination_index: "فرز حسب التمييز"
+    sort_by_position: "فرز حسب الموضع"
+    stats_error: 
+      image_alt: "إحصائيات الاختبار غير متاحة حتى الآن."
+    student_analysis: "تحليل الطالب"
+    unknown: 
+      header: "حدث خطأ ما."
+      info: "حدث خطأ غير متوقع."
+    unknown_answer: "شيء آخر"
+  quiz_statistics_route: 
+    quiz_statistics: إحصاءات
+  quiz_statistics_title: "إحصاءات الاختبار"
+  quiz_submission: 
+    answers: 
+      correct: صحيح!
+      correct_answers: "إجابات صحيحة"
+      incorrect: "غير صحيح"
+      partial: جزئي
+      right: "إجابة صحيحة"
+      unanswered: "غير مجاب عنه"
+      you_answered: "أنت أجبت"
   quizzes: 
     after_last_attempt: "بعد المحاولة الأخيرة"
     alerts: 
@@ -11711,7 +12484,6 @@ ar:
     always: دائمًا
     answer_comments: "الإجابة على التعليقات"
     answer_text: "نص الإجابة"
-    assignment: المهمة
     assignment_points_possible: 
       few: "%{count} من النقاط"
       many: "%{count} من النقاط"
@@ -11808,7 +12580,6 @@ ar:
         other: "%{count} دقيقة"
         zero: "أقل من 1 دقيقة"
       score_out_of_points_possible: "%{score} من  %{points_possible}"
-    highest: الأعلى
     index: 
       buttons: 
         publishing_quizzes: "جارٍ نشر الاختبارات..."
@@ -11842,7 +12613,6 @@ ar:
       multiple_blanks_question: "املأ الفراغات، اقرأ النص المجاور"
       other_incorrect_matches: "خيارات المطابقة غير الصحيحة الأخرى"
       possible_answer: "الإجابة الممكنة"
-    latest: الأدنى
     ldb_login_popup: 
       email: "البريد الإلكتروني"
       log_in: "تسجيل الدخول"
@@ -12276,6 +13046,7 @@ ar:
           manually_unlock: "إلغاء تأمين الاختبار يدويًا للمحاولة التالية"
           started: "تم البدء"
         minutes: دقائق
+        moderate_page_title: "%{title}: متوسط"
         page_title: "اختبار متوسط"
         student_gets_extra_time: "*%{student_name}* **يحصل على %{extra_time} دقيقة (دقائق) إضافية على كل محاولة**"
         student_n: "طالب %{n}"
@@ -12667,6 +13438,7 @@ ar:
       submission_versions: 
         attempt: المحاولة
         attempt_history: "محفوظات المحاولات"
+        questions_not_graded: "بعض الأسئلة لم يتم تقييمها بعد"
         quiz_attempt_history_description: "جدول يعرض لك محفوظات محاولات إجراء الاختبار. كل محاولة موجودة على الجانب الأيسر. وستكون المحاولة والوقت والدرجة موجودة في الأعلى."
         regraded: "تمت إعادة التقييم"
         score: الدرجة
@@ -12867,28 +13639,13 @@ ar:
       draft_state_unsaved_changes: "*لقد أجريت تغييرات على الأسئلة في هذا الاختبار.* لن تظهر هذه التغييرات للطلاب حتى تحفظ الاختبار."
       unpublished_changes: "*لقد أجريت تغييرات غير منشورة في هذا الاختبار.* ولن تظهر هذه التغييرات للطلاب حتى تقوم بنشر الاختبار أو تعيد نشره."
       unpublished_quiz: "*هذا الاختبار غير منشور* يمكن للمعلمين فقط مشاهدة هذا الاختبار حتى يتم نشره."
-  quizzes_model: 
-    cant_unpublish_when_students_submit: "لا يمكن إلغاء النشر في حالة وجود عمليات إرسال لطالب"
-    confirms: 
-      delete_quiz: "هل ترغب بالتأكيد في حذف هذا الاختبار؟"
-    delete_quiz: "حذف الاختبار"
-    edit_quiz: "تحرير الاختبار"
-    points: 
-      few: "%{count} نقاط"
-      many: "%{count} نقطة"
-      one: "1 نقطة"
-      other: "%{count} من النقاط"
-      two: "%{count} نقطة"
-      zero: "%{count} نقطة"
-    questions: 
-      few: "%{count} أسئلة"
-      many: "%{count} سؤال"
-      one: "1 سؤال"
-      other: "%{count} من الأسئلة"
-      two: "%{count} سؤال"
-      zero: "%{count} سؤال"
   quizzes_redirects: 
     no_access: "تم رفض الوصول. وتم التوجيه إلى صفحة لديك صلاحية الوصول إليها."
+  quizzes_route: 
+    quizzes_route_title: الاختبارات
+  quizzez_submission_row: 
+    gets_extra_minutes: "يحصل على %{num} من الدقائق الإضافية في كل محاولة."
+    unlimited: "غير محدود"
   re_upload_submissions_form: 
     buttons: 
       upload: "تحميل الملفات"
@@ -12897,6 +13654,7 @@ ar:
     upload_warning: "تأكد من عدم تغيير أسماء ملفات الإرسال حتى نستطيع التعرف عليها."
   recent_student: 
     last_logged_in: "آخر تسجيل دخول في %{last_login}"
+  recently_deleted_courses_title: "المساقات التي تم حذفها مؤخرًا"
   recipient_input: 
     context_search_placeholder: "أدخل اسمًا أو المساق أو المجموعة"
     context_search_title: "الاسم أو المساق أو المجموعة"
@@ -12922,6 +13680,7 @@ ar:
       other: "%{count} من الأقسام"
       two: "%{count} من الأقسام"
       zero: "%{count} من الأقسام"
+  registrar_tile: "تقرير المسجل"
   registration: 
     get_started: "بدء العمل"
     incomplete_registration_warning: 
@@ -12958,6 +13717,7 @@ ar:
         email: "البريد الإلكتروني"
         name: الاسم
     welcome_to_canvas: "مرحبًا بك في Canvas!"
+  reply_from_name: "%{name} عبر إعلامات Canvas"
   retrieve_timeout: "تعذرت استعادة التكوين، انتهت مهلة استجابة الخادم"
   role_override: 
     permission: 
@@ -13053,6 +13813,12 @@ ar:
     update_failed_notice: "فشل إنشاء الدور"
   roles: 
     account_admin: "مسؤول الحساب"
+    new_role: 
+      add: إضافة
+      add_role: "إضافة دور"
+      add_role_label: "إضافة دور"
+      role_name: "اسم الدور"
+      role_name_label: "اسم الدور"
     permission_button: 
       rolebutton: 
         disable: تعطيل
@@ -13060,6 +13826,20 @@ ar:
         enable: تمكين
         enable_and_lock: "تمكين وتأمين"
         use_default: "استخدام الافتراضي"
+    permissions: الأذونات
+    roles_override_index: 
+      account_roles: "أدوار الحساب"
+      course_roles: "أدوار المساق"
+  ross_report_header_comment: تعليق
+  ross_report_header_course_id: "معرف المساق"
+  ross_report_header_grade_posting_date: "تاريخ نشر الدرجات"
+  ross_report_header_grade_type: "نوع الدرجة"
+  ross_report_header_grade_value_type: "نوع قيمة الدرجة"
+  ross_report_header_miscfield1: MiscField1
+  ross_report_header_miscfield13: MiscField13
+  ross_report_header_miscfield2: MiscField2
+  ross_report_header_numeric_grade: "درجة رقمية"
+  ross_report_header_source_id: "معرف المصدر"
   roster: 
     delete_confirm: "هل ترغب بالتأكيد في إزالة هذه المستخدم؟"
     error_sending_invitations: "حدث خطأ في إرسال الدعوة.  يرجى المحاولة مرة أخرى."
@@ -13134,6 +13914,38 @@ ar:
         are_you_sure_delete: "هل ترغب بالتأكيد في حذف هذا العنوان؟  أي مكان ما زال يستخدم العنوان حاليًا سيظل قادرًا على الوصول لهذا العنوان، لكن لن يستطيع أي شخص آخر استخدامه."
         are_you_sure_remove: "هل ترغب بالتأكيد في إزالة هذا العنوان من قائمتك؟"
       remove_rubric: "إزالة هذا العنوان من قائمتي"
+  safety_drill_title: "جدولة تدريبات السلامة"
+  samuel_report_header_assessment_question_id: "معرف سؤال التقييم"
+  samuel_report_header_assessment_question_name: "اسم سؤال التقييم"
+  samuel_report_header_assignment_description: "وصف المهمة"
+  samuel_report_header_assignment_id: "معرف المهمة"
+  samuel_report_header_assignment_points_possible: "النقاط الممكنة للمهمة"
+  samuel_report_header_assignment_title: "عنوان المهمة"
+  samuel_report_header_assignment_type: "نوع المهمة"
+  samuel_report_header_course_canvas_id: "معرف Canvas للمساق"
+  samuel_report_header_course_current_score: "الدرجة الحالية للمساق"
+  samuel_report_header_course_name: "اسم المساق"
+  samuel_report_header_course_sis_id: "معرف SIS للمساق"
+  samuel_report_header_course_student_count: "عدد الطلاب في المساق"
+  samuel_report_header_grading_scheme: "نظام التقييم"
+  samuel_report_header_learning_outcome_desc: "وصف نتيجة التعلم"
+  samuel_report_header_learning_outcome_id: "معرف نتيجة التعلم"
+  samuel_report_header_learning_outcome_score: "درجة نتيجة التعلم"
+  samuel_report_header_learning_outcome_short_name: "الاسم القصير لنتيجة التعلم"
+  samuel_report_header_rubric_title: العنوان
+  samuel_report_header_section_canvas_id: "معرف Canvas للقسم"
+  samuel_report_header_section_name: "اسم القسم"
+  samuel_report_header_section_sis_id: "معرف sis  للقسم"
+  samuel_report_header_student_id: "معرف الطالب"
+  samuel_report_header_student_name: "اسم الطالب"
+  samuel_report_header_student_sis_id: "معرف sis  للطالب"
+  samuel_report_header_subaccount_id: "معرف الحساب الفرعي"
+  samuel_report_header_subaccount_name: "اسم الحساب الفرعي"
+  samuel_report_header_submission_date: "تاريخ الإرسال"
+  samuel_report_header_submission_grade: "درجة الإرسال"
+  samuel_report_header_submissions_attempt: "محاولة الإرسالات"
+  samuel_report_header_teacher_name: "اسم المدرس"
+  scantron_quiz_title: "اختبار Scantron"
   scribd: 
     upgrade_flash: "مرحبًا، إصدار Adobe Flash Player الذي لديك قديم. لاستخدام iPaper (وكثير من المواد الأخرى على الويب) تحتاج إلى %{link_tag}get the latest Flash player%{end_link}."
   search: 
@@ -13672,8 +14484,6 @@ ar:
       unread_count_badge: 
         few: "%{count} * من العناصر غير المقروءة"
         many: "%{count} * من العناصر غير المقروءة"
-        one: "عنصر واحد غير مقروء"
-        other: "%{count} * من العناصر غير المقروءة"
         two: "%{count} * من العناصر غير المقروءة"
         zero: "%{count} * من العناصر غير المقروءة"
     recent_activity_item: 
@@ -13819,7 +14629,7 @@ ar:
       new_file_option: "[ ملف جديد ]"
       new_page_option: "[صفحة جديدة]"
       new_quiz_option: "[ الاختبار الجديد ]"
-      new_tab: "تحميل هذه الأداة في علامة تبويب جديدة"
+      new_tab: "تحميل في علامة تبويب جديدة"
       new_topic_option: "[ الموضوع الجديد]"
       options: 
         assignments: المهام
@@ -13983,6 +14793,7 @@ ar:
       unrecorgnized_type: "نوع استيراد لم يتم التعرف عليه"
     instructure_csv: "CSV أو ملف مضغوط يحتوي على ملفات CSV تم تنسيقها من قبل المعلم"
     upload_filename: "sis_upload_%{id}.zip"
+  sis_export_title: "تصدير SIS"
   sis_import: 
     buttons: 
       process_data: "بيانات العملية"
@@ -14074,7 +14885,9 @@ ar:
       two: "ملاحظة: لا تتضمن الدرجات تعيينات من المجموعات %{list_of_group_names} لأنها ليست لديها نقاط ممكنة."
       zero: "ملاحظة: لا تتضمن الدرجات تعيينات من المجموعات %{list_of_group_names} لأنها ليست لديها نقاط ممكنة."
     media_recordin: "تسجيل الوسائط"
+    next_object: "%{type} التالي"
     no_assignment: "لم يتم اختيار مهمة"
+    no_outcome: "لم يتم تحديد نتيجة"
     no_student: "لم يتم اختيار أي طالب"
     none: بلا
     notes: ملاحظات
@@ -14083,6 +14896,7 @@ ar:
     online_text_entry: "إدخال نصي عبر الإنترنت"
     online_upload: "تحميل عبر الإنترنت"
     online_url: "عنوان URL عبر الإنترنت"
+    previous_object: "%{type} السابق"
     student_hidden_name: "الطالب %{position}"
   statistics: 
     csv_columns: 
@@ -14091,6 +14905,7 @@ ar:
       n_correct: "الرقم صحيح"
       n_incorrect: "الرقم غير صحيح"
       name: الاسم
+      root_account: "الحساب الجذري"
       score: النقاط
       section: القسم
       section_id: section_id
@@ -14105,17 +14920,50 @@ ar:
     available_until: "متوفر حتى"
     closed: مغلق
     due: مستحق
-    everyone_else: "أي شخص آخر"
     not_available: "متوفر في"
     pending: "غير متوفر حتى"
   step: خطوة
+  student_access_title: "تقرير وصول الطلاب"
+  student_assignment_outcome_map_title: "كفاءة الطلاب"
+  student_grades_title: "درجات الطلاب"
+  student_groups: 
+    group_join: "تم الانضمام إلى المجموعة %{group_name}"
+    group_leave: "تمت مغادرة المجموعة %{group_name}"
+    search_groups_placeholder: "بحث عن مجموعات أو أشخاص"
+    student_groups_filter_description: "بينما تقوم بالكتابة في هذا الحقل، ستتم تصفية قائمة المجموعات تلقائيًا لتشمل فقط تلك التي تطابق أسماؤها إدخالك."
+    students_count: 
+      few: "%{count} من الطلاب"
+      many: "%{count} من الطلاب"
+      one: "%{count} من الطلاب"
+      other: "%{count} من الطلاب"
+      two: "%{count} من الطلاب"
+      zero: "%{count} من الطلاب"
+  student_groups_desc: |-
+      هذا يتيح تمكين صفحة مجموعة الطلاب الجديدة لحساب. وقد تم إنشاء الصفحة الجديدة لتوفر تجربة اشتراك في المجموعة
+      تتميز بالحيوية
   student_id: "معرف الطالب"
+  student_ip_title: "عناوين IP للطلاب"
   student_name: "اسم الطالب"
   student_outcome_gradebook_description: |-
-      يوفر "دفتر درجات النتيجة" طريقة للمدرسين لعرض تقدم الطلاب والمساق بسرعة
+      يوفر "دفتر درجات إتقان التعلم للطلاب" طريقة للمدرسين لعرض تقدم الطلاب والمساق بسرعة
       في نتائج التعلم للمساق. ويتم عرض النتائج بتنسيق يشبه دفتر الدرجات ويتم عرض تقدم
       الطلاب كدرجة رقمية وكتقدير من بين إتقان/قريب من الإتقان/
       بحاجة إلى تحسين.
+  student_report_header_course_id: "معرف المساق"
+  student_report_header_course_name: "اسم المساق"
+  student_report_header_course_sis_id: "معرف sis للمساق"
+  student_report_header_enrollment_state: "حالة التسجيل"
+  student_report_header_last_access_at: "تاريخ آخر وصول"
+  student_report_header_last_ip: "آخر ip"
+  student_report_header_name: الاسم
+  student_report_header_section_id: "معرف القسم"
+  student_report_header_section_name: "اسم القسم"
+  student_report_header_section_sis_id: "معرف sis للقسم"
+  student_report_header_user_id: "معرف المستخدم"
+  student_report_header_user_name: "اسم المستخدم"
+  student_report_header_user_sis_id: "معرف sis للمستخدم"
+  student_submissions_title: "إرسالات الطلاب"
+  students_with_no_submissions_title: "الطلاب الذين بدون إرسالات"
   sub_accounts: 
     alerts: 
       subaccount_has_courses: "لا يمكنك حذف حساب فرعي يحتوي بداخله على مساقات"
@@ -14171,6 +15019,7 @@ ar:
       unsubmitted: "لم يتم الإرسال"
   submission_comment: 
     unknown_author: "شخص ما"
+  submission_data_title: "بيانات الإرسال"
   submission_detail: 
     go_to_submission_url: "انتقال إلى عنوان URL الخاص بالإرسال"
     no_submission: "لا يوجد إرسال"
@@ -14179,6 +15028,7 @@ ar:
   submission_details_dialog: 
     add_a_comment: "إضافة تعليق"
     comments: التعليقات
+    grade_form_label: "الدرجة:"
     labels: 
       group_comment: "إرسال تعليق إلى المجموعة بالكامل"
     late: متأخر
@@ -14189,6 +15039,7 @@ ar:
     post_comment: "نشر التعليق"
     submitted: "تم الإرسال:"
     this_was_submitted_multiple_times_choose_a_submission_to_view: "تم الإرسال لعدة مرات، اختر ما تريد عرضه:"
+    update_grade: "تحديث الدرجة"
     view_rubric_assessment_in_the_speedgrader: "عرض تقييم العنوان في SpeedGrader"
   submissions: 
     assignment_submit_success: "تم إرسال المهمة بنجاح."
@@ -14261,7 +15112,7 @@ ar:
       paper_view: "عرض الصفحة"
       plain_view: "عرض نص عادي"
       preview_crocodoc_document: "يرجى معاينة عملية الإرسال وعرض ملاحظات المدرس، إن وجدت"
-      preview_scribd_document: "معاينة الإرسال"
+      preview_submission: "معاينة الإرسال"
       preview_title: "معاينة %{title}"
       quiz_submission: "كان هذا الإرسال إرسال اختبار. تمت إعادة التوجيه إلى صفحة الاختبار."
       show_entire_discussion: "إظهار المناقشة الكاملة"
@@ -14302,6 +15153,9 @@ ar:
     assignments: المهام
     collaborations: "الأعمال الجماعية"
     conferences: المؤتمرات
+    course_assignments: "مهام المساق"
+    course_grades: "درجات المساق"
+    course_settings: "إعدادات المساق"
     discussions: المناقشات
     eportfolios: المحفظات
     files: الملفات
@@ -14317,6 +15171,20 @@ ar:
     syllabus: المناهج
     tab_location_error: "موقع علامة التبويب هذه غير صالح"
     tab_unmanagable_error: "%{css_class} غير قابل للإدارة"
+  tempe_grade_export_title: "تصدير درجات Tempe"
+  tempe_report_header_absences: "حالات الغياب"
+  tempe_report_header_citizenship: الجنسية
+  tempe_report_header_comment_1: "تعليق 1"
+  tempe_report_header_comment_2: "تعليق 2"
+  tempe_report_header_comment_3: "تعليق 3"
+  tempe_report_header_grade_mark: "علامة الدرجة"
+  tempe_report_header_grading_term: "الفصل الدراسي الخاضع للتقييم"
+  tempe_report_header_mark_name: "اسم العلامة"
+  tempe_report_header_school_code: "رمز المدرسة"
+  tempe_report_header_school_year: "السنة الدراسية"
+  tempe_report_header_section_id: "معرف القسم"
+  tempe_report_header_sis_number: "رقم SIS"
+  tempe_report_header_workhabits: "عادات العمل"
   terms: 
     index: 
       date: 
@@ -14382,10 +15250,6 @@ ar:
         term_start: "بداية المدة"
         unspecified: "في أي وقت"
       timespan: "%{start_at} *إلى* %{end_at}"
-  text_helper: 
-    time: 
-      ranges: 
-        different_days: "%{start_date_and_time} *إلى* %{end_date_and_time}"
   time: 
     am: صباحًا
     count_hours_ago: 
@@ -14432,6 +15296,11 @@ ar:
       image_url_field_label: "عنوان URL للصورة"
       image_width: "عرض الصورة"
       url: URL
+  title: 
+    edit_announcement: "تحرير الإعلان"
+    edit_topic: "تحرير موضوع مناقشة"
+    new_announcement: "إعلان جديد"
+    new_topic: "موضوع المناقشة الجديد"
   title_separator: ": "
   titles: 
     aligned_items: "العناصر التي تمت محاذاتها"
@@ -14452,6 +15321,8 @@ ar:
     people: الأشخاص
     view_in_separate_window: "عرض في نافذة منفصلة"
   tooltips: 
+    finished: "تم الانتهاء"
+    incomplete: "غير كامل"
     vdd: 
       more_message: "و%{count} أكثر..."
   tours: 
@@ -14476,10 +15347,13 @@ ar:
   turnitin_info: 
     buttons: 
       resubmit_to_turnitin: "إعادة الإرسال إلى Turnitin"
+  ungraded_submissions_tile: "إرسالات لم يتم تقييم درجاتها"
   unknown: "غير معروف"
   unknown_question_bank: "بنك الأسئلة غير معروف"
   unknown_quiz: "الاختبار غير معروف"
+  unpublished_courses_title: "مساقات لم يتم نشرها"
   unsupported_package: "حزمة محتوى غير مدعومة"
+  unused_courses_title: "مساقات غير مستخدمة"
   user: 
     default_user_name: المستخدم
     errors: 
@@ -14492,9 +15366,11 @@ ar:
     registration: 
       agree_to_terms_and_privacy_policy: "أنت توافق على *شروط الاستخدام* وتقر **بسياسة الخصوصية**."
       agree_to_terms_with_code_of_conduct: "أنت توافق على *شروط الاستخدام* و**مدونة قواعد السلوك**."
+  user_access_title: "تقرير وصول المستخدم"
   user_date_range_search: 
     cant_be_blank: "لا يمكن ترك معرف مستخدم Canvas فارغًا"
     cant_come_before_from: "لا يمكن أن يكون \"إلى تاريخ\" قبل \"من تاريخ\""
+  user_inactivity_title: "تقرير عدم نشاط المستخدم"
   user_lists: 
     add_n_users: 
       few: "حسنًا يبدو جيدًا، أضف هؤلاء الـ %{count} من المستخدمين"
@@ -14910,8 +15786,24 @@ ar:
       no_courses_message: "ليس لديك أي مساقات، لذا لن تكون هذه الصفحة مثيرة جدًا الآن. بمجرد أن قمت بإنشاء المساقات أو توقيعها، ستبدأ في رؤية المحادثات الواردة من كافة الفصول."
       unpublished_courses_message: "لقد قمت بالتسجيل في واحد أو أكثر من المساقات التي لم تبدأ بعد. بمجرد أن تصبح هذه المساقات متاحة، ستظهر المعلومات المتعلقة بها هنا وفي شريط التنقل العلوي. في نفس الوقت؛ يمكنك الاشتراك في المزيد من المساقات أو إعداد ملفك التعريفي."
       welcome_to_happiness: "مرحبًا بك في Canvas!"
+  ut_austin_report_header_canvas_user_id: "معرف مستخدم Canvas"
+  ut_austin_report_header_default_email: "البريد الإلكتروني الافتراضي"
+  ut_austin_report_header_google_doc_address: "عنوان Google Docs"
+  ut_austin_report_header_name: الاسم
+  ut_austin_report_header_sis_id: "معرف sis"
   validate: 
     is_required: "هذا الحقل مطلوب"
+  vilas_report_header_assignment_id: "معرف المهمة"
+  vilas_report_header_assignment_name: "اسم المهمة"
+  vilas_report_header_canvas_course_id: "معرف مساق Canvas"
+  vilas_report_header_canvas_user_id: "معرف مستخدم Canvas"
+  vilas_report_header_course_name: "اسم المساق"
+  vilas_report_header_points_possible: "النقاط الممكنة"
+  vilas_report_header_score: الدرجة
+  vilas_report_header_sis_course_id: "معرف مساق sis"
+  vilas_report_header_sis_user_id: "معرف مستخدم sis"
+  vilas_report_header_submission_date: "تاريخ الإرسال"
+  vilas_report_header_user_name: "اسم المستخدم"
   warnings: 
     test_install: 
       periodic_message: "تثبيت Canvas هذا للاختبار فقط وستتم إعادة تعيينه بشكل دوري."
@@ -14937,6 +15829,36 @@ ar:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Blackboard Vista/CE،‏ WebCT 6+ المساق"
   webct_name: "Blackboard Vista/CE (WebCT)"
+  webster_report_header_course_id: "معرف المساق"
+  webster_report_header_course_name: "اسم المساق"
+  webster_report_header_course_sis_id: "معرف sis للمساق"
+  webster_report_header_enrollment_state: "حالة التسجيل"
+  webster_report_header_enrollment_type: "نوع التسجيل"
+  webster_report_header_last_ip: "آخر ip"
+  webster_report_header_login_id: "معرف تسجيل الدخول"
+  webster_report_header_user_id: "معرف المستخدم"
+  webster_report_header_user_name: "اسم المستخدم"
+  webster_report_header_user_sis_id: "معرف sis للمستخدم"
+  westminster_report_header_cohort_id: "معرف المجموعة"
+  westminster_report_header_cohort_name: "اسم المجموعة"
+  westminster_report_header_course_name: "اسم المساق"
+  westminster_report_header_current_courses: "المساقات الحالية"
+  westminster_report_header_current_grade: "الدرجة الحالية"
+  westminster_report_header_first_name: "الاسم الأول"
+  westminster_report_header_last_completed_course: "آخر مساق مكتمل"
+  westminster_report_header_last_completed_module: "آخر وحدة مكتملة"
+  westminster_report_header_last_faculty_journal_entry: "آخر إدخال دفتر كلية"
+  westminster_report_header_last_graded_date: "آخر تاريخ تم فيه تقدير الدرجات"
+  westminster_report_header_last_mastered_assignment: "آخر مهمة تمت بإتقان"
+  westminster_report_header_last_name: "الاسم الأخير"
+  westminster_report_header_last_submission_date: "آخر تاريخ إرسال"
+  westminster_report_header_last_submission_graded: "آخر إرسال تم تقدير الدرجة له"
+  westminster_report_header_professor_id: "معرف المعلم"
+  westminster_report_header_professor_name: "اسم المعلم"
+  westminster_report_header_student_id: "معرف الطالب"
+  westminster_report_header_student_name: "اسم الطالب"
+  westminster_report_header_term_taken: "الفصل الدراسي"
+  westminster_report_header_ungraded_submissions: "عدد الإرسالات التي لم يتم تقدير درجاتها"
   widget: 
     upload_media_track_form: 
       choose_a_language: "-- اختر لغة--"
@@ -15160,6 +16082,7 @@ ar:
     external_urls: 
       archive: أرشيف
       archive_link: "عرض الأرشيف (الأرشيفات)"
+  zero_activity_title: "نشاط صفري"
   zip_argument_error: "تحميل ملف بتنسيق .zip بحاجة إلى مجلد لتحميله."
   zip_file_description: "المكون الإضافي للترحيل لإلغاء ضغط الملفات التي بتنسيق ‎.zip في ملفات مستخدم أو مجموعة أو مساق"
   zip_file_display: "استيراد الملف"

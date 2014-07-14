@@ -98,6 +98,9 @@ module CanvasQuizStatistics::Analyzers::Base::DSL
   #
   def inherit(*metric_keys, options)
     metrics = self.metrics_for(options[:from])
+
+    return inherit_metrics(options[:from]) if metric_keys.first == :all
+
     metric_keys.each do |metric_key|
       metric = metrics.detect do |metric|
         metric[:key] == metric_key

@@ -17,14 +17,15 @@
 #
 
 class RoleOverride < ActiveRecord::Base
-  belongs_to :context, :polymorphic => true # only Account now; we dropped Course level role overrides
+  belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Account']
   has_many :children, :class_name => "Role", :foreign_key => "parent_id"
   belongs_to :parent, :class_name => "Role"
 
   attr_accessible :context, :permission, :enrollment_type, :enabled, :applies_to_self, :applies_to_descendants
 
   EXPORTABLE_ATTRIBUTES = [:id, :enrollment_type, :permission, :enabled, :locked, :context_id, :context_type, :created_at, :updated_at, :applies_to_self, :applies_to_descendants]
-  EXPORTABLE_ASSOCIATIONS = [:context, :children, :parent]
+  EXPORTABLE_ASSOCIATIONS = [:context]
 
   validate :must_apply_to_something
 

@@ -2,7 +2,7 @@
 result=0
 
 rm -f Gemfile.lock
-bundle install
+bundle check || bundle install
 bundle exec rspec spec
 let result=$result+$?
 

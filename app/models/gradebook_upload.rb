@@ -18,5 +18,6 @@
 
 class GradebookUpload < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course']
   attr_accessible
 end

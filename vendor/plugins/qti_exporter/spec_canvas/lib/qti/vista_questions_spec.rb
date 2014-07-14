@@ -75,7 +75,7 @@ describe "Converting Blackboard Vista qti" do
 
   it "should convert images correctly" do
     manifest_node=get_manifest_node('true_false', :interaction_type => 'choiceInteraction')
-    hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>vista_question_dir)
+    hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node=>manifest_node, :base_dir=>vista_question_dir).with_indifferent_access
     hash[:answers].each { |a| a.delete(:id) }
     hash.should == VistaExpected::TRUE_FALSE2
   end
@@ -184,6 +184,7 @@ module VistaExpected
   # the multiple choice example minus the ids for the answers because those are random.
   MULTIPLE_CHOICE = {:points_possible=>1,
                      :question_bank_name=>"Export Test",
+                     :question_bank_migration_id => "i3d03dcf5be63c744bdbd32ad8ef840bc",
                      :question_text=>"The answer is nose.<br>",
                      :question_type=>"multiple_choice_question",
                      :answers=>
@@ -194,11 +195,12 @@ module VistaExpected
                      :migration_id=>"ID_4609865476341",
                      :correct_comments=>"",
                      :question_name=>"Multiple Choice",
-                     :incorrect_comments=>""}
+                     :incorrect_comments=>""}.with_indifferent_access
 
   TRUE_FALSE = {:correct_comments=>"",
                 :points_possible=>1,
                 :question_bank_name=>"Export Test",
+                :question_bank_migration_id => "i3d03dcf5be63c744bdbd32ad8ef840bc",
                 :question_name=>"True/False",
                 :question_text=>"I am wearing a black hat.<br>",
                 :incorrect_comments=>"",
@@ -206,7 +208,7 @@ module VistaExpected
                         [{:text=>"true", :weight=>100, :migration_id=>"true"},
                          {:text=>"false", :weight=>0, :migration_id=>"false"}],
                 :question_type=>"true_false_question",
-                :migration_id=>"ID_4609865577341"}
+                :migration_id=>"ID_4609865577341"}.with_indifferent_access
   
   TRUE_FALSE2 = {:correct_comments=>"",
                 :points_possible=>1,
@@ -217,13 +219,14 @@ module VistaExpected
                         [{:text=>"true", :weight=>100, :migration_id=>"true"},
                          {:text=>"false", :weight=>0, :migration_id=>"false"}],
                 :question_type=>"true_false_question",
-                :migration_id=>"4609865577341"}
+                :migration_id=>"4609865577341"}.with_indifferent_access
 
   # removed ids on the answers
   MULTIPLE_ANSWER = {:migration_id=>"ID_4609865392341",
                      :correct_comments=>"",
                      :points_possible=>1,
                      :question_bank_name=>"Export Test",
+                     :question_bank_migration_id => "i3d03dcf5be63c744bdbd32ad8ef840bc",
                      :question_name=>"Multiple Answer",
                      :answers=>
                              [{:migration_id=>"MC0",
@@ -244,7 +247,7 @@ module VistaExpected
                                :weight=>0}],
                      :question_text=>"The answers are house and garage.<br>",
                      :incorrect_comments=>"",
-                     :question_type=>"multiple_answers_question"}
+                     :question_type=>"multiple_answers_question"}.with_indifferent_access
 
   ESSAY = {:question_text=>"Who likes to use Blackboard?<br>",
            :incorrect_comments=>"",
@@ -255,7 +258,8 @@ module VistaExpected
            :example_solution=>"Nobody.",
            :points_possible=>1,
            :question_bank_name=>"Export Test",
-           :question_name=>"Essay Question"}
+           :question_bank_migration_id => "i3d03dcf5be63c744bdbd32ad8ef840bc",
+           :question_name=>"Essay Question"}.with_indifferent_access
 
   # removed ids on the answers
   SHORT_ANSWER = {:question_text=>"We all live in what?<br>",
@@ -267,12 +271,14 @@ module VistaExpected
                   :correct_comments=>"",
                   :points_possible=>1,
                   :question_bank_name=>"Export Test",
-                  :question_name=>"Short Answer"}
+                  :question_bank_migration_id => "i3d03dcf5be63c744bdbd32ad8ef840bc",
+                  :question_name=>"Short Answer"}.with_indifferent_access
 
   # removed ids on the answers
   MATCHING = {:correct_comments=>"",
               :points_possible=>1,
               :question_bank_name=>"Export Test",
+              :question_bank_migration_id => "i3d03dcf5be63c744bdbd32ad8ef840bc",
               :question_name=>"Matching",
               :question_text=>"Match these.<br>\n<br/>\n<br>\n<br/>\n<br>\n<br/>\n<br>\n<br/>\n<br>",
               :answers=>
@@ -287,7 +293,7 @@ module VistaExpected
                        {:text=>"right 2"},
                        {:text=>"right 3"},
                        {:text=>"right 4"}],
-              :migration_id=>"ID_4609865194341"}
+              :migration_id=>"ID_4609865194341"}.with_indifferent_access
 
   ASSESSMENT = {:time_limit=>60,
                 :question_count=>11,
@@ -339,7 +345,7 @@ module VistaExpected
                                 :due_date=>nil,
                                 :weight=>nil
                         }
-  }
+  }.with_indifferent_access
 
 
   CALCULATED_SIMPLE = {:answer_tolerance=>0,
@@ -358,6 +364,7 @@ module VistaExpected
                                 {:weight=>100, :answer=>10, :variables=>[{:value=>0, :name=>"x"}]},
                                 {:weight=>100, :answer=>18, :variables=>[{:value=>-8, :name=>"x"}]}],
                        :question_bank_name=>"Export Test",
+                       :question_bank_migration_id => "i3d03dcf5be63c744bdbd32ad8ef840bc",
                        :points_possible=>100,
                        :question_name=>"Calculated Question 2",
                        :question_text=>"What is 10 - [x]?",
@@ -365,7 +372,7 @@ module VistaExpected
                        :formulas=>[],
                        :neutral_comments=>"General Feedback.",
                        :question_type=>"calculated_question",
-                       :variables=>[{:scale=>0, :min=>-10, :max=>10, :name=>"x"}]}
+                       :variables=>[{:scale=>0, :min=>-10, :max=>10, :name=>"x"}]}.with_indifferent_access
 
   CALCULATED_COMPLEX = {:neutral_comments=>"Right answer.",
                         :question_type=>"calculated_question",
@@ -461,23 +468,25 @@ module VistaExpected
                                  {:scale=>0, :min=>20, :max=>120, :name=>"n"}],
                         :correct_comments=>"",
                         :question_bank_name=>"Export Test",
+                        :question_bank_migration_id => "i3d03dcf5be63c744bdbd32ad8ef840bc",
                         :points_possible=>100,
                         :question_name=>"Calculated Question ",
                         :formulas=>[],
                         :question_text=>
                                 "Based on her excellent performance as a district sales manager, Maria receives a sizable bonus at work. Since her generous salary is more than enough to provide for the needs of her family, she decides to use the bonus to buy a bond as an investment. The par value of the bond that Maria would like to purchase is $[F] thousand. The bond pays [r]% interest, compounded semiannually (with payment on January 1 and July 1) and matures on July 1, 20[Y]. Maria wants a return of [i]%, compounded semiannually. How much would she be willing to pay for the bond if she buys it [n] days after the July 2010 interest anniversary? Give your answer in the format of a quoted bond price, as a percentage of par to three decimal places -- like you would see in the Wall Street Journal. Use the formula discussed in class -- and from the book, NOT the HP 12c bond feature. (Write only the digits, to three decimal palces, e.g. 114.451 and no $, commas, formulas, etc.)",
                         :answer_tolerance=>0.1,
-                        :incorrect_comments=>""}
+                        :incorrect_comments=>""}.with_indifferent_access
 
   COMBINATION = {:migration_id=>"ID_4609885376341",
                  :correct_comments=>"",
                  :answers=>[{:weight=>100, :text=>"B, C", :migration_id=>"MC0"}],
                  :points_possible=>1,
                  :question_bank_name=>"defaultWebctCategory",
+                 :question_bank_migration_id => "i813b3667731b3c61c09ae932568aacde",
                  :question_name=>"Combination",
                  :question_text=>"This should just be a multiple answer. B and C are correct<br>\nA. wrong 1<br>\nB. right 1<br>\nC. right 2<br>\nD. wrong 2<br>\nE. wrong 3<br>",
                  :incorrect_comments=>"",
-                 :question_type=>"multiple_choice_question"}
+                 :question_type=>"multiple_choice_question"}.with_indifferent_access
 
   FILL_IN_MULTIPLE_BLANKS = {:question_type=>"fill_in_multiple_blanks_question",
                              :migration_id=>"ID_4609842630341",
@@ -488,9 +497,10 @@ module VistaExpected
                              :correct_comments=>"",
                              :points_possible=>1,
                              :question_bank_name=>"Export Test",
+                             :question_bank_migration_id => "i3d03dcf5be63c744bdbd32ad8ef840bc",
                              :question_name=>"Fill in the blank",
                              :question_text=>"I'm just a [poor] boy from a poor [family]",
-                             :incorrect_comments=>""}
+                             :incorrect_comments=>""}.with_indifferent_access
 
   JUMBLED_SENTENCE = {:question_text=>"",
                       :incorrect_comments=>"",
@@ -501,6 +511,7 @@ module VistaExpected
                       :unsupported=>true,
                       :points_possible=>1,
                       :question_bank_name=>"Export Test",
-                      :question_name=>"Jumbled Sentence"}
+                      :question_bank_migration_id => "i3d03dcf5be63c744bdbd32ad8ef840bc",
+                      :question_name=>"Jumbled Sentence"}.with_indifferent_access
 end
 end

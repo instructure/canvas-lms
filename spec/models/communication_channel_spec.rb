@@ -102,7 +102,7 @@ describe CommunicationChannel do
   end
   
   it "should set a confirmation code unless one has been set" do
-    CanvasUuid::Uuid.expects(:generate).at_least(1).returns('abc123')
+    CanvasSlug.expects(:generate).at_least(1).returns('abc123')
     communication_channel_model
     @cc.confirmation_code.should eql('abc123')
   end
@@ -200,10 +200,6 @@ describe CommunicationChannel do
     @user.communication_channels.create!(:path => 'user2@example.com')
     # should allow a different path_type
     @user.communication_channels.create!(:path => 'user1@example.com', :path_type => 'sms')
-    # should allow a retired duplicate
-    @user.communication_channels.create!(:path => 'user1@example.com') { |cc| cc.workflow_state = 'retired' }
-    # the unconfirmed should still be valid, even though a retired exists
-    @cc.should be_valid
   end
 
   context "notifications" do

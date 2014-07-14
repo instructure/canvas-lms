@@ -26,8 +26,9 @@ define [
     ).property('quizSubmission.attempt')
 
     friendlyScore: ( ->
-      return if @get('isActive') || !@get('keptScore')
-      "#{@get('keptScore')} / #{@get('quizPointsPossible')}"
+      return if @get('isActive') || (!@get('keptScore') && @get('keptScore') != 0)
+      score = Math.round(@get('keptScore') * 100) / 100
+      "#{score} / #{@get('quizPointsPossible')}"
     ).property('keptScore', 'quizPointsPossible', 'isActive')
 
     remainingAttempts: ( ->

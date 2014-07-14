@@ -60,10 +60,17 @@ define ['jquery', 'underscore', 'Backbone'], ($, _, Backbone) ->
     transitions: ->
       @get('feature_flag').transitions
 
+    transitionLocked: (action) ->
+      settings = @transitions()[action]
+      # the button remains enabled if there's an associated message
+      return settings?.locked && !settings.message
+
     toJSON: ->
       _.extend(super, isAllowed: @isAllowed(), isHidden: @isHidden(),
         isOff: @isOff(true), isOn: @isOn(), isSiteAdmin: @isSiteAdmin(),
-        currentContextIsAccount: @isContext('account'))
+        currentContextIsAccount: @isContext('account'),
+        disableOn: @transitionLocked('on'), disableAllow: @transitionLocked('allowed'),
+        disableOff: @transitionLocked('off'))
 
     parse: (json) ->
       _.extend(json, @attributes)

@@ -1,0 +1,16 @@
+<h3>
+  {{#t 'final_grade'}}Final Grade:{{/t}}
+  <span class="total-grade">
+    {{#if showGrade}}
+      {{percent}}%
+      {{#if showPoints}}
+        ({{pointRatioDisplay}})
+      {{/if}}
+      {{#if showLetterGrade}}
+        - {{letterGrade}}
+      {{/if}}
+    {{else}}
+      -
+    {{/if}}
+  </span>
+</h3>

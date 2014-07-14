@@ -13,8 +13,8 @@ require [
     students.urls = null
   else
     students = new UserCollection null,
-      per_page: 50
       params:
+        per_page: 50
         enrollment_type: 'student'
 
     students.fetch()

@@ -32,7 +32,8 @@ module Api::V1::Outcome
   # can_edit. full expands on that by adding description and criterion values
   # (if any).
   def outcome_json(outcome, user, session, style=:full)
-    api_json(outcome, user, session, :only => %w(id context_type context_id vendor_guid), :methods => [:title]).tap do |hash|
+    json_attributes = %w(id context_type context_id vendor_guid display_name)
+    api_json(outcome, user, session, :only => json_attributes, :methods => [:title]).tap do |hash|
       hash['url'] = api_v1_outcome_path :id => outcome.id
       hash['can_edit'] = outcome.context_id ?
         outcome.context.grants_right?(user, session, :manage_outcomes) :
@@ -75,16 +76,18 @@ module Api::V1::Outcome
     end
   end
 
-  def outcome_link_json(outcome_link, user, session)
+  def outcome_link_json(outcome_link, user, session, opts={})
+    opts[:outcome_style] ||= :abbrev
+    opts[:outcome_group_style] ||= :abbrev
     api_json(outcome_link, user, session, :only => %w(context_type context_id)).tap do |hash|
       hash['url'] = polymorphic_path [:api_v1, outcome_link.context || :global, :outcome_link],
         :id => outcome_link.associated_asset_id,
         :outcome_id => outcome_link.content_id
-      hash['outcome_group'] = outcome_group_json(outcome_link.associated_asset, user, session, :abbrev)
+      hash['outcome_group'] = outcome_group_json(outcome_link.associated_asset, user, session, opts[:outcome_group_style])
       # use learning_outcome_content vs. content in case
       # learning_outcome_content has been preloaded (e.g. by
       # ContentTag.order_by_outcome_title)
-      hash['outcome'] = outcome_json(outcome_link.learning_outcome_content, user, session, :abbrev)
+      hash['outcome'] = outcome_json(outcome_link.learning_outcome_content, user, session, opts[:outcome_style])
     end
   end
 end

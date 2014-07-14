@@ -39,7 +39,7 @@ class EportfolioEntry < ActiveRecord::Base
   serialize :content
 
   set_policy do
-    given {|user, session| user && self.allow_comments }
+    given {|user| user && self.allow_comments }
     can :comment
   end
   

@@ -240,6 +240,48 @@ describe "Admins API", type: :request do
                              "login_id"=>@admin.pseudonym.unique_id}}]
       end
 
+      it "should scope the results to the user_id if given" do
+        2.times do |x|
+          u = user(:name => "User #{x}", :account => @account)
+          @account.account_users.create!(:user => u, :membership_type => "MT #{x}")
+        end
+        @user = @admin
+        json = api_call(:get, @path, @path_opts.merge(user_id: @admin.id))
+        json.should ==[{"id"=>@admin.account_users.first.id,
+                        "role"=>"AccountAdmin",
+                        "user"=>
+                            {"id"=>@admin.id,
+                             "name"=>@admin.name,
+                             "sortable_name"=>@admin.sortable_name,
+                             "short_name"=>@admin.short_name,
+                             "login_id"=>@admin.pseudonym.unique_id}}]
+      end
+
+      it "should scope the results to the array of user_ids if given" do
+        2.times do |x|
+          u = user(:name => "User #{x}", :account => @account)
+          @account.account_users.create!(:user => u, :membership_type => "MT #{x}")
+        end
+        another_admin = @user
+        @user = @admin
+        json = api_call(:get, @path, @path_opts.merge(user_id: [@admin.id, another_admin.id]))
+        json.should ==[{"id"=>@admin.account_users.first.id,
+                        "role"=>"AccountAdmin",
+                        "user"=>
+                            {"id"=>@admin.id,
+                             "name"=>@admin.name,
+                             "sortable_name"=>@admin.sortable_name,
+                             "short_name"=>@admin.short_name,
+                             "login_id"=>@admin.pseudonym.unique_id}},
+                       {"id"=>another_admin.account_users.first.id,
+                        "role"=>"MT 1",
+                        "user"=>
+                            {"id"=>another_admin.id,
+                             "name"=>another_admin.name,
+                             "sortable_name"=>another_admin.sortable_name,
+                             "short_name"=>another_admin.short_name}}]
+      end
+
       it "should paginate" do
         4.times do |x|
           u = user(:name => "User #{x}", :account => @account)

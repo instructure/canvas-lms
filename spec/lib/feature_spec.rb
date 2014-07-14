@@ -107,23 +107,45 @@ describe Feature do
     end
   end
 
+  describe "RootAccount feature" do
+    it "should imply root_opt_in" do
+      Feature.definitions['RA'].root_opt_in.should be_true
+    end
+  end
+
   describe "default_transitions" do
+    it "should enumerate RootAccount transitions" do
+      fd = Feature.definitions['RA']
+      fd.default_transitions(t_site_admin, 'allowed').should eql({'off'=>{'locked'=>false},'on'=>{'locked'=>false}})
+      fd.default_transitions(t_site_admin, 'on').should eql({'allowed'=>{'locked'=>false},'off'=>{'locked'=>false}})
+      fd.default_transitions(t_site_admin, 'off').should eql({'allowed'=>{'locked'=>false},'on'=>{'locked'=>false}})
+      fd.default_transitions(t_root_account, 'allowed').should eql({'off'=>{'locked'=>false},'on'=>{'locked'=>false}})
+      fd.default_transitions(t_root_account, 'on').should eql({'allowed'=>{'locked'=>true},'off'=>{'locked'=>false}})
+      fd.default_transitions(t_root_account, 'off').should eql({'allowed'=>{'locked'=>true},'on'=>{'locked'=>false}})
+    end
+
     it "should enumerate Account transitions" do
-      Feature.default_transitions(t_root_account, 'allowed').should eql({'off'=>{'locked'=>false},'on'=>{'locked'=>false}})
-      Feature.default_transitions(t_root_account, 'on').should eql({'allowed'=>{'locked'=>false},'off'=>{'locked'=>false}})
-      Feature.default_transitions(t_root_account, 'off').should eql({'allowed'=>{'locked'=>false},'on'=>{'locked'=>false}})
+      fd = Feature.definitions['A']
+      fd.default_transitions(t_root_account, 'allowed').should eql({'off'=>{'locked'=>false},'on'=>{'locked'=>false}})
+      fd.default_transitions(t_root_account, 'on').should eql({'allowed'=>{'locked'=>false},'off'=>{'locked'=>false}})
+      fd.default_transitions(t_root_account, 'off').should eql({'allowed'=>{'locked'=>false},'on'=>{'locked'=>false}})
+      fd.default_transitions(t_sub_account, 'allowed').should eql({'off'=>{'locked'=>false},'on'=>{'locked'=>false}})
+      fd.default_transitions(t_sub_account, 'on').should eql({'allowed'=>{'locked'=>false},'off'=>{'locked'=>false}})
+      fd.default_transitions(t_sub_account, 'off').should eql({'allowed'=>{'locked'=>false},'on'=>{'locked'=>false}})
     end
 
     it "should enumerate Course transitions" do
-      Feature.default_transitions(t_course, 'allowed').should eql({'off'=>{'locked'=>false},'on'=>{'locked'=>false}})
-      Feature.default_transitions(t_course, 'on').should eql({'off'=>{'locked'=>false}})
-      Feature.default_transitions(t_course, 'off').should eql({'on'=>{'locked'=>false}})
+      fd = Feature.definitions['C']
+      fd.default_transitions(t_course, 'allowed').should eql({'off'=>{'locked'=>false},'on'=>{'locked'=>false}})
+      fd.default_transitions(t_course, 'on').should eql({'off'=>{'locked'=>false}})
+      fd.default_transitions(t_course, 'off').should eql({'on'=>{'locked'=>false}})
     end
 
     it "should enumerate User transitions" do
-      Feature.default_transitions(t_user, 'allowed').should eql({'off'=>{'locked'=>false},'on'=>{'locked'=>false}})
-      Feature.default_transitions(t_user, 'on').should eql({'off'=>{'locked'=>false}})
-      Feature.default_transitions(t_user, 'off').should eql({'on'=>{'locked'=>false}})
+      fd = Feature.definitions['U']
+      fd.default_transitions(t_user, 'allowed').should eql({'off'=>{'locked'=>false},'on'=>{'locked'=>false}})
+      fd.default_transitions(t_user, 'on').should eql({'off'=>{'locked'=>false}})
+      fd.default_transitions(t_user, 'off').should eql({'on'=>{'locked'=>false}})
     end
   end
 

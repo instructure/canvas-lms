@@ -1,0 +1,21 @@
+<table class="table left-first">
+  <thead>
+    <tr>
+      <th>{{#t 'ag_group_name'}}Assignment Group{{/t}}</th>
+      <th>{{#t 'ag_group_grade'}}Grade{{/t}}</th>
+      <th>{{#t 'ag_letter_grade'}}Letter Grade{{/t}}</th>
+      <th>{{#t 'ag_group_percent_grade'}}% of Grade{{/t}}</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each assignment_group in assignment_groups}}
+      {{
+        assignment-group-grades
+        ag=assignment_group
+        student=selectedStudent
+        weightingScheme=weightingScheme
+        gradingStandard=ENV.GRADEBOOK_OPTIONS.grading_standard
+      }}
+    {{/each}}
+  </tbody>
+</table>

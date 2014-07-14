@@ -6,36 +6,61 @@
   <%= t :subject, "Submission Comment: %{user}, %{assignment}, %{context}", :user => asset.submission.user.name, :assignment => asset.submission.assignment.title, :context => asset.submission.assignment.context.name %>
 <% end %>
 
+<% define_content :footer_link do %>
+  <a href="<%= content(:link) %>">
+    <%= t :review_submission, "Click here to review the submission" %>
+  </a>
+<% end %>
+
 <p><%= t :body, "%{author} just made a new comment on the submission for %{user} for %{assignment}",
          :author => (asset.author_name || t(:someone, "Someone")),
          :user => asset.submission.user.short_name,
          :assignment => asset.submission.assignment.title %></p>
 
-<hr style="border: 0;
-    height: 1px;
-    background: #333;
-    background-image: -webkit-linear-gradient(left, #ddd, #aaa, #eee);
-    background-image:    -moz-linear-gradient(left, #ddd, #aaa, #eee);
-    background-image:     -ms-linear-gradient(left, #ddd, #aaa, #eee);
-    background-image:      -o-linear-gradient(left, #ddd, #aaa, #eee);" />
-
 <%= format_message(asset.comment).first %>
 
-<hr style="border: 0;
-    height: 1px;
-    background: #333;
-    background-image: -webkit-linear-gradient(left, #ddd, #aaa, #eee);
-    background-image:    -moz-linear-gradient(left, #ddd, #aaa, #eee);
-    background-image:     -ms-linear-gradient(left, #ddd, #aaa, #eee);
-    background-image:      -o-linear-gradient(left, #ddd, #aaa, #eee);" />
+<% if avatar_enabled? %> 
+  <table border="0" style="border-collapse: collapse">
+    <tr height="30px">
+      <td></td>
+    </tr>
+    <tr >
+      <td align="left" width="50px" ><img style="border-radius: 50px;" height= 50px width = 50px src= <%=author_avatar_url%> alt=<%=author_short_name%>> </td>
+      <td width="10"></td>
+      <td>
+        <table border="0" style="font-size: 14px; color: #444444; background-color: #ffffff; font-family: 'Open Sans', 'Lucida Grande', 'Segoe UI', Arial, Verdana, 'Lucida Sans Unicode', Tahoma, 'Sans Serif';" valign="top" align="left">
+          <tr>
+            <td valign="bottom" align="left">
+              <b><%= author_short_name%></b>
+            </td>
+          </tr>
+          <tr>
+            <td valign="top" align="left">
+              <a href="<%= content :link %>">
+                <%= author_email_address%>
+              </a>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+<% else %>
+  <p height="30px"></p>
+  <p>
+    <b><%= author_short_name%></b>
+    <br/>
+    <a href="<%= content :link %>">
+      <%= author_email_address%>
+    </a>
+  </p>
+<% end %>
 
 <% if asset.media_comment? %>
 <p><%= t "#messages.conversation_message.email.audio_comment", "This message includes media comments. To listen or reply, click the link below:" %></p>
 <% else %>
-<p><%= t :link_message, "You can review the submission details here:" %></p>
+<p><%= t :link_message, "You can review the submission details by clicking the link below:" %></p>
 <% end %>
-
-<p><a href="<%= content :link %>"><%= content :link %></a></p>
 
 <% unless asset.attachments.empty? %>
 <div style="margin-top: 20px; padding: 10px; border: 1px solid #f1f1f1; background-color: #f3f3f3;">

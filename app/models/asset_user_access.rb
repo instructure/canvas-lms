@@ -21,6 +21,7 @@
 # so, for example, the asset could be an assignment, the group would be the assignment_group
 class AssetUserAccess < ActiveRecord::Base
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['User', 'Group', 'Course']
   belongs_to :user
   has_many :page_views
   has_many :asset_access_ranges

@@ -92,7 +92,7 @@ module Canvas::Oauth
         SCOPES_KEY => options[:scopes],
         PURPOSE_KEY => options[:purpose],
         REMEMBER_ACCESS => options[:remember_access] }
-      Canvas.redis.setex("#{REDIS_PREFIX}#{code}", 1.day, code_data.to_json)
+      Canvas.redis.setex("#{REDIS_PREFIX}#{code}", Setting.get('oath_token_request_timeout', 10.minutes.to_s).to_i, code_data.to_json)
       return code
     end
 
