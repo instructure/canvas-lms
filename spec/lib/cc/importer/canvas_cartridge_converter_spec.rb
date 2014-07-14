@@ -1368,3 +1368,54 @@ describe "cc assignment extensions" do
     assignment3.workflow_state.should == 'unpublished'
   end
 end
+
+describe "matching question reordering" do
+  before(:all) do
+    archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/canvas_matching_reorder.zip")
+    unzipped_file_path = File.join(File.dirname(archive_file_path), "cc_#{File.basename(archive_file_path, '.zip')}", 'oi')
+    @export_folder = File.join(File.dirname(archive_file_path), "cc_canvas_matching_reorder")
+    @converter = CC::Importer::Canvas::Converter.new(:export_archive_path=>archive_file_path, :course_name=>'oi', :base_download_dir=>unzipped_file_path)
+    @converter.export
+    @course_data = @converter.course.with_indifferent_access
+
+    @course = course
+    @migration = ContentMigration.create(:context => @course)
+    @migration.migration_type = "canvas_cartridge_importer"
+    @migration.migration_settings[:migration_ids_to_import] = {:copy => {}}
+    enable_cache do
+      Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
+    end
+  end
+
+  after(:all) do
+    @converter.delete_unzipped_archive
+    if File.exists?(@export_folder)
+      FileUtils::rm_rf(@export_folder)
+    end
+    truncate_all_tables
+  end
+
+  it "should reorder matching question answers with images if possible (and warn otherwise)" do
+    @migration.migration_issues.count.should == 2
+    @course.assessment_questions.count.should == 3
+
+    broken1 = @course.assessment_questions.find_by_migration_id("m20b544d870a086de6e59b79e6dd9186cf_quiz_question")
+    mi1 = @migration.migration_issues.detect{|mi| mi.description ==
+        "Imported matching question contains images on both sides, which is unsupported"}
+    mi1.fix_issue_html_url.include?("question_#{broken1.id}_question_text").should == true
+
+    broken2 = @course.assessment_questions.find_by_migration_id("m22b544d870a086de6e59b79e6dd9186be_quiz_question")
+    mi2 = @migration.migration_issues.detect{|mi| mi.description ==
+        "Imported matching question contains images inside the choices, and could not be fixed because it also contains distractors"}
+    mi2.fix_issue_html_url.include?("question_#{broken2.id}_question_text").should == true
+
+    fixed = @course.assessment_questions.find_by_migration_id("m21e0c78d05b78dc312bbc0dc77b963781_quiz_question")
+    fixed.question_data[:answers].each do |answer|
+      Nokogiri::HTML(answer[:left_html]).at_css("img").should be_present
+      Nokogiri::HTML(answer[:right]).at_css("img").should be_blank
+    end
+    fixed.question_data[:matches].each do |match|
+      Nokogiri::HTML(match[:text]).at_css("img").should be_blank
+    end
+  end
+end
