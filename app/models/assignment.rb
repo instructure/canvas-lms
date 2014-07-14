@@ -590,9 +590,9 @@ class Assignment < ActiveRecord::Base
 
   def students_with_visibility
     if self.differentiated_assignments_applies?
-      context.students.able_to_see_assignment_in_course_with_da(self.id, context.id)
+      context.all_students.able_to_see_assignment_in_course_with_da(self.id, context.id)
     else
-      context.students
+      context.all_students
     end
   end
 

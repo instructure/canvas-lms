@@ -779,6 +779,10 @@ class Submission < ActiveRecord::Base
   scope :for_user, lambda { |user| where(:user_id => user) }
   scope :needing_screenshot, -> { where("submissions.submission_type='online_url' AND submissions.attachment_id IS NULL AND submissions.process_attempts<3").order(:updated_at) }
 
+  def assignment_visible_to_user?(user)
+    assignment.visible_to_user?(user)
+  end
+
   def needs_regrading?
     graded? && !grade_matches_current_submission?
   end

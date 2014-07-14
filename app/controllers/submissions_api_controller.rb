@@ -136,6 +136,8 @@ class SubmissionsApiController < ApplicationController
       if all
         student_ids = allowed_student_ids
       else
+        # if any student_ids exist that the current_user shouldnt have access to, return an error
+        # (student looking at other students, observer looking at student out of their scope)
         inaccessible_students = student_ids - allowed_student_ids
         return render_unauthorized_action if !inaccessible_students.empty?
       end
@@ -152,7 +154,23 @@ class SubmissionsApiController < ApplicationController
     if requested_assignment_ids.present?
       assignment_scope = assignment_scope.where(:id => requested_assignment_ids)
     end
+
     assignments = assignment_scope.all
+
+    assignment_visibilities = {}
+    if @context.feature_enabled?(:differentiated_assignments)
+      assignment_visibilities = AssignmentStudentVisibility.users_with_visibility_by_assignment(course_id: @context.id, user_id: student_ids, assignment_id: assignments.map(&:id))
+    else
+      students_with_visibility = @context.all_students.pluck(:id).uniq.to_set
+      assignments.each { |a| assignment_visibilities[a.id] = students_with_visibility }
+    end
+
+    # unless teacher, filter assignments down to only assignments current user can see
+    unless @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments)
+      assignments = assignments.select{ |a| (assignment_visibilities.fetch(a.id,[]) & student_ids).any?}
+    end
+
+
     # preload with stuff already in memory
     assignments.each { |a| a.context = @context }
     assignments_hash = assignments.index_by(&:id)
@@ -192,13 +210,17 @@ class SubmissionsApiController < ApplicationController
         end
 
         student_submissions = submissions_for_user[student.id] || []
-        student_submissions.each do |submission|
-          # we've already got all the assignments loaded, so bypass AR loading
-          # here and just give the submission its assignment
-          submission.assignment = assignments_hash[submission.assignment_id]
-          submission.user = student
+        student_submissions = student_submissions.select{ |s|
+          assignment_visibilities.fetch(s.assignment_id, []).include?(s.user_id) || can_view_all
+        }
 
-          hash[:submissions] << submission_json(submission, submission.assignment, @current_user, session, @context, includes)
+        student_submissions.each do |submission|
+            # we've already got all the assignments loaded, so bypass AR loading
+            # here and just give the submission its assignment
+            submission.assignment = assignments_hash[submission.assignment_id]
+            submission.user = student
+
+            hash[:submissions] << submission_json(submission, submission.assignment, @current_user, session, @context, includes)
         end unless assignments.empty?
         if includes.include?('total_scores') && params[:grouped].present?
           hash.merge!(
@@ -211,12 +233,15 @@ class SubmissionsApiController < ApplicationController
       submissions = @context.submissions.except(:order).where(:user_id => student_ids).order(:id)
       submissions = submissions.where(:assignment_id => assignments) unless assignments.empty?
       submissions = submissions.preload(:user)
+
       submissions = Api.paginate(submissions, self, polymorphic_url([:api_v1, @section || @context, :student_submissions]))
       Submission.bulk_load_versioned_attachments(submissions)
-      result = submissions.map do |s|
+      result = submissions.select{ |s|
+        assignment_visibilities.fetch(s.assignment_id, []).include?(s.user_id) || can_view_all
+      }.map { |s|
         s.assignment = assignments_hash[s.assignment_id]
         submission_json(s, s.assignment, @current_user, session, @context, includes)
-      end
+      }
     end
 
     render :json => result
@@ -235,8 +260,15 @@ class SubmissionsApiController < ApplicationController
     bulk_load_attachments_and_previews([@submission])
 
     if authorized_action(@submission, @current_user, :read)
-      includes = Array(params[:include])
-      render :json => submission_json(@submission, @assignment, @current_user, session, @context, includes)
+      if !@context.feature_enabled?(:differentiated_assignments) ||
+           @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments) ||
+           @submission.assignment_visible_to_user?(@current_user)
+        includes = Array(params[:include])
+        render :json => submission_json(@submission, @assignment, @current_user, session, @context, includes)
+      else
+        @unauthorized_message = t('#application.errors.submission_unauthorized', "You cannot access this submission.")
+        return render_unauthorized_action
+      end
     end
   end
 

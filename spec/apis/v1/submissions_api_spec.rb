@@ -1088,6 +1088,247 @@ describe 'Submissions API', type: :request do
     json.all? { |submission| submission['assignment_id'].should == a1.id }.should be_true
   end
 
+  context "for_students (differentiated_assignments)" do
+    before do
+      # set up course with DA and submit homework for an assignment
+      # that is only visible to overrides for @section1
+      @student = user(:active_all => true)
+      course_with_teacher(:active_all => true)
+      @section1 = @course.course_sections.create!(name: "test section")
+      @section2 = @course.course_sections.create!(name: "test section")
+      student_in_section(@section1, user: @student)
+      @assignment = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15, :only_visible_to_overrides => true)
+      create_section_override_for_assignment(@assignment, course_section: @section1)
+      submit_homework(@assignment, @student)
+
+      user_session(@student)
+    end
+
+    def call_to_for_students(opts={})
+      helper_method = if opts[:as_student]
+                        [:api_call_as_user, @student]
+                      elsif opts[:as_observer]
+                        [:api_call_as_user, @observer]
+                      else
+                        [:api_call]
+                      end
+      args = helper_method + [:get,
+                        "/api/v1/courses/#{@course.id}/students/submissions.json",
+                        { :controller => 'submissions_api', :action => 'for_students',
+                          :format => 'json', :course_id => @course.to_param },
+                        { :student_ids => [@student.to_param] }]
+      self.send(*args)
+    end
+
+    context "as student" do
+      context "differentiated_assignments on" do
+        before { @course.enable_feature!(:differentiated_assignments) }
+        it "should return the submissons if the student is in the overriden section" do
+          json = call_to_for_students(as_student: true)
+
+          json.size.should == 1
+          json.each { |submission| submission['user_id'].should == @student.id }
+        end
+
+        it "should not return the submissons if the student is not in the overriden section and has a submission with no grade" do
+          @student.enrollments.each(&:destroy!)
+          student_in_section(@section2, user: @student)
+          @assignment.grade_student(@student, grade: nil)
+
+          json = call_to_for_students(as_student: true)
+
+          json.size.should == 0
+        end
+
+        it "should return the submissons if the student is not in the overriden section but has a graded submission" do
+          @student.enrollments.each(&:destroy!)
+          student_in_section(@section2, user: @student)
+          @assignment.grade_student(@student, grade: 5)
+
+          json = call_to_for_students(as_student: true)
+
+          json.size.should == 1
+          json.each { |submission| submission['user_id'].should == @student.id }
+        end
+      end
+
+      context "differentiated_assignments off" do
+        before {@course.disable_feature!(:differentiated_assignments)}
+        it "should return the submission regardless of section" do
+          @student.enrollments.each(&:destroy!)
+          student_in_section(@section2, user: @student)
+          json = call_to_for_students(as_student: true)
+
+          json.size.should == 1
+          json.each { |submission| submission['user_id'].should == @student.id }
+        end
+      end
+    end
+
+    context "as an observer" do
+      before {
+        @observer = User.create
+        observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active')
+        observer_enrollment.update_attribute(:associated_user_id, @student.id)
+        @course.enable_feature!(:differentiated_assignments)
+      }
+      context "differentiated_assignments on" do
+        before {@course.enable_feature!(:differentiated_assignments)}
+        it "should return the submissons if the observed student is in the overriden section" do
+          json = call_to_for_students(as_observer: true)
+
+          json.size.should == 1
+          json.each { |submission| submission['user_id'].should == @student.id }
+        end
+
+        it "should not return the submissons if the observed student is not in the overriden section and has a submission with no grade" do
+          @student.enrollments.each(&:destroy!)
+          student_in_section(@section2, user: @student)
+          @assignment.grade_student(@student, grade: nil)
+
+          json = call_to_for_students(as_observer: true)
+
+          json.size.should == 0
+        end
+
+        it "should return the submissons if the observed student is not in the overriden section but has a graded submission" do
+          @student.enrollments.each(&:destroy!)
+          student_in_section(@section2, user: @student)
+          @assignment.grade_student(@student, grade: 5)
+
+          json = call_to_for_students(as_observer: true)
+
+          json.size.should == 1
+          json.each { |submission| submission['user_id'].should == @student.id }
+        end
+      end
+
+      context "differentiated_assignments off" do
+        before {@course.disable_feature!(:differentiated_assignments)}
+        it "should return the submission regardless of observed students section" do
+          @student.enrollments.each(&:destroy!)
+          student_in_section(@section2, user: @student)
+          json = call_to_for_students(as_observer: true)
+
+          json.size.should == 1
+          json.each { |submission| submission['user_id'].should == @student.id }
+        end
+      end
+    end
+
+    context "as teacher" do
+      context "differentiated_assignments on" do
+        before{@course.enable_feature!(:differentiated_assignments)}
+        it "should return the submissons if the student is in the overriden section" do
+          json = call_to_for_students(as_student: false)
+
+          json.size.should == 1
+          json.each { |submission| submission['user_id'].should == @student.id }
+        end
+
+        it "should return the submissons even if the student is not in the overriden section" do
+          @student.enrollments.each(&:destroy!)
+          student_in_section(@section2, user: @student)
+
+          json = call_to_for_students(as_student: false)
+
+          json.size.should == 1
+          json.each { |submission| submission['user_id'].should == @student.id }
+        end
+      end
+
+      context "differentiated_assignments off" do
+        before {@course.disable_feature!(:differentiated_assignments)}
+        it "should return the submission regardless of section" do
+          @student.enrollments.each(&:destroy!)
+          student_in_section(@section2, user: @student)
+
+          json = call_to_for_students(as_student: false)
+
+          json.size.should == 1
+          json.each { |submission| submission['user_id'].should == @student.id }
+        end
+      end
+    end
+  end
+
+  context "show (differentiated_assignments)" do
+    before do
+      # set up course with DA and submit homework for an assignment
+      # that is only visible to overrides for @section1
+      # move student to a section that cannot see assignment by default
+      @student = user(:active_all => true)
+      course_with_teacher(:active_all => true)
+      @section1 = @course.course_sections.create!(name: "test section")
+      @section2 = @course.course_sections.create!(name: "test section")
+      student_in_section(@section1, user: @student)
+      @assignment = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15, :only_visible_to_overrides => true)
+      create_section_override_for_assignment(@assignment, course_section: @section1)
+      submit_homework(@assignment, @student)
+      @student.enrollments.each(&:destroy!)
+      student_in_section(@section2, user: @student)
+
+      user_session(@student)
+    end
+
+    def call_to_submissions_show(opts={})
+      helper_method = opts[:as_student] ? [:api_call_as_user, @student] : [:api_call]
+      args = helper_method + [:get,
+            "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+            { :controller => 'submissions_api', :action => 'show',
+              :format => 'json', :course_id => @course.to_param, :assignment_id => @assignment.id.to_s, :user_id => @student.id.to_s },
+            { :include => %w(submission_comments rubric_assessment) }]
+      self.send(*args)
+    end
+
+    context "as teacher" do
+      context "with differentiated_assignments" do
+        before {@course.enable_feature!(:differentiated_assignments)}
+        it "should return the assignment" do
+          json = call_to_submissions_show(as_student: false)
+
+          json["assignment_id"].should_not be_nil
+        end
+      end
+      context "without differentiated_assignments" do
+        before {@course.disable_feature!(:differentiated_assignments)}
+        it "should return the assignment" do
+          json = call_to_submissions_show(as_student: false)
+
+          json["assignment_id"].should_not be_nil
+        end
+      end
+    end
+
+    context "as student in a section without an override" do
+      context "with differentiated_assignments" do
+        before {@course.enable_feature!(:differentiated_assignments)}
+        it "should return an unauthorized error" do
+          api_call_as_user(@student, :get,
+              "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+              { :controller => 'submissions_api', :action => 'show',
+                :format => 'json', :course_id => @course.to_param, :assignment_id => @assignment.id.to_s, :user_id => @student.id.to_s },
+              { :include => %w(submission_comments rubric_assessment)}, {}, expected_status: 401)
+        end
+
+        it "should return the submission if it is graded" do
+          @assignment.grade_student(@student, grade: 5)
+          json = call_to_submissions_show(as_student: true)
+
+          json["assignment_id"].should_not be_nil
+        end
+      end
+      context "without differentiated_assignments" do
+        before {@course.disable_feature!(:differentiated_assignments)}
+        it "should return the assignment" do
+          json = call_to_submissions_show(as_student: true)
+
+          json["assignment_id"].should_not be_nil
+        end
+      end
+    end
+  end
+
   it "should return student submissions grouped by student" do
     student1 = user(:active_all => true)
     student2 = user_with_pseudonym(:active_all => true)
