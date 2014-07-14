@@ -29,6 +29,15 @@ unless SHARDING_ENABLED
       end
     end
   end
+
+  unless CANVAS_RAILS2
+    RSpec.configure do |config|
+      config.before :all do
+        Shard.default.destroy
+        Shard.default(true)
+      end
+    end
+  end
 end
 
 def specs_require_sharding
