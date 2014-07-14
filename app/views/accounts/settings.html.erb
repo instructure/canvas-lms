@@ -195,7 +195,7 @@ TEXT
                     <td><%= before_label(t(:ip_filter_filter_label, "Filter")) %></td>
                     <td><input type="text" class="value" value="<%= filter %>" maxlength="255"/></td>
                     <td>
-                      <a href="#" class="delete_filter_link"><i class="icon-end standalone-icon"></i></a>
+                      <a href="#" title="<%= t(:quiz_ip_filters_delete, "Remove Filter") %>" class="delete_filter_link"><i class="icon-end standalone-icon"></i></a>
                     </td>
                   </tr>
                 <% end %>
