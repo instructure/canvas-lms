@@ -484,6 +484,22 @@ describe Quizzes::QuizzesController do
       assigns[:submissions_from_users][@quiz_submission.user_id].should == @quiz_submission
       assigns[:submitted_students].should == [@user1]
     end
+
+    it "should not include teacher previews" do
+      course_with_teacher_logged_in(:active_all => true)
+
+      quiz = quiz_model(course: @course)
+      quiz.publish!
+
+      quiz_submission = quiz.generate_submission(@teacher, true)
+      quiz_submission.complete!
+
+      get 'managed_quiz_data', :course_id => @course.id, :quiz_id => quiz.id
+
+      assigns[:submissions_from_users].should be_empty
+      assigns[:submissions_from_logged_out].should be_empty
+      assigns[:submitted_students].should be_empty
+    end
   end
 
   describe "GET 'moderate'" do
