@@ -156,7 +156,6 @@ describe Moodle::Converter do
       quiz = @course.quizzes.find_by_title "First Quiz"
       quiz.should_not be_nil
       quiz.description.should match /Pop quiz hot shot/
-      quiz.quiz_type.should == 'practice_quiz'
       quiz.quiz_questions.count.should == 9
     end
 
