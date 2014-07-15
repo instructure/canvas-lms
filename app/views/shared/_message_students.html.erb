@@ -9,7 +9,7 @@
       <%= t('for_title', 'for %{title}', :title => '<span class="asset_title">&nbsp;</span>'.html_safe) %>
     </div>
     <div style="margin-bottom: 10px;">
-      <select class="message_types">
+      <select class="message_types" aria-label="<%= t(:message_type, "Message Type") %>">
       </select>
       <span class="cutoff_holder">
         <input type="text" class="cutoff_score" style="width: 35px;"/>
