@@ -447,7 +447,7 @@ namespace :i18n do
   desc "Imports new translations, ignores missing or unexpected keys"
   task :autoimport, [:translated_file, :source_file] => :environment do |t, args|
     require 'open-uri'
-    
+
     if args[:source_file].present?
       source_translations = YAML.safe_load(open(args[:source_file]))
     else
@@ -464,13 +464,14 @@ namespace :i18n do
     raise "Need source translations" unless source_translations
     raise "Need translated_file" unless new_translations
 
+    errors = []
+
     import = I18nTasks::I18nImport.new(source_translations, new_translations)
 
-    puts import.language
     complete_translations = import.compile_complete_translations do |error_items, description|
       if description =~ /mismatches/
         # Output malformed stuff and don't import them
-        puts error_items.join("\n")
+        errors.concat error_items
         :discard
       else
         # Import everything else
@@ -482,6 +483,11 @@ namespace :i18n do
     File.open("config/locales/#{import.language}.yml", "w") { |f|
       f.write({import.language => complete_translations}.ya2yaml(:syck_compatible => true))
     }
+
+    puts({
+      language: import.language,
+      errors: errors,
+    }.to_json)
   end
 
   def transifex_languages(languages)

@@ -2,6 +2,12 @@ module I18nTasks
   class I18nImport
     attr_reader :source_translations, :new_translations, :language
 
+    class MisMatch < Struct.new(:key, :expected, :actual)
+      def to_s
+        "#{key}: expected #{expected.inspect}, got #{actual.inspect}"
+      end
+    end
+
     def initialize(source_translations, new_translations)
       @source_translations = init_source(source_translations)
       @language = init_language(new_translations)
@@ -38,12 +44,12 @@ module I18nTasks
           [@markdown_mismatches, "markdown/wrapper mismatches"],
       ].each do |mismatches, description|
         if mismatches.size > 0
-          case (action = yield(mismatch_diff(mismatches), description))
+          case (action = yield(mismatches, description))
             when :abort then
               throw(:abort)
             when :discard then
               @new_translations.delete_if do |k, v|
-                mismatches.keys.include? k
+                mismatches.any? { |m| m.key == k }
               end
             when :accept then
               :ok
@@ -89,17 +95,17 @@ module I18nTasks
     end
 
     def find_mismatches
-      @placeholder_mismatches = {}
-      @markdown_mismatches = {}
+      @placeholder_mismatches = []
+      @markdown_mismatches = []
       new_translations.keys.each do |key|
         next unless source_translations[key]
         p1 = placeholders(source_translations[key].to_s)
         p2 = placeholders(new_translations[key].to_s)
-        @placeholder_mismatches[key] = [p1, p2] if p1 != p2
+        @placeholder_mismatches << MisMatch.new(key, p1, p2) if p1 != p2
 
         m1 = markdown_and_wrappers(source_translations[key].to_s)
         m2 = markdown_and_wrappers(new_translations[key].to_s)
-        @markdown_mismatches[key] = [m1, m2] if m1 != m2
+        @markdown_mismatches << MisMatch.new(key, m1, m2) if m1 != m2
       end
     end
 
@@ -148,10 +154,6 @@ module I18nTasks
       language = translations.keys.first
       raise "Translation file appears to have only English strings" if language == 'en'
       language
-    end
-
-    def mismatch_diff(mismatches)
-      mismatches.map { |k, (p1, p2)| "#{k}: expected #{p1.inspect}, got #{p2.inspect}" }.sort
     end
   end
 end
