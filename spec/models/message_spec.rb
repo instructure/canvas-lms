@@ -362,6 +362,15 @@ describe Message do
       authorless_message.author_avatar_url.should be_nil
     end
 
+    it "uses an absolute url for avatar src" do
+      user.avatar_image_url = user.avatar_path
+      user.save!
+      message = Message.new(context: convo_message)
+      message.author_short_name.should == user.short_name
+      message.author_email_address.should == user.email
+      message.author_avatar_url.should == "#{HostUrl.protocol}://#{HostUrl.context_host(user.account)}#{user.avatar_path}"
+    end
+
     describe 'author_account' do
       it 'is nil if there is no author' do
         authorless_message.author_account.should be_nil

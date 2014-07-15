@@ -195,7 +195,8 @@ class Message < ActiveRecord::Base
   end
 
   def author_avatar_url
-    author.try(:avatar_url)
+    url = author.try(:avatar_url)
+    URI.join("#{HostUrl.protocol}://#{HostUrl.context_host(author_account)}", url).to_s if url
   end
 
   def author_short_name
