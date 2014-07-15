@@ -319,6 +319,81 @@ nb:
       student_grades: 
         description: 
           text: "Denne rapporten viser studentens sluttkarakter for studenter i et gitt semester. Den resulterende csv-filen vil ha en rad per påmelding, og vil vise den sluttkarakteren som vises li kursets karakteroversikt."
+    report_header_account_id: konto_id
+    report_header_assessment_id: "vurdering id"
+    report_header_assessment_question: vurderingsspørsmål
+    report_header_assessment_question_id: "id for vurderingsspørsmål"
+    report_header_assessment_title: "vurdering navn"
+    report_header_assessment_type: "vurdering type"
+    report_header_assignment_id: "oppgave id"
+    report_header_assignment_title: "oppgave navn"
+    report_header_assignment_url: "oppgave url"
+    report_header_associated_user_id: tilhørende_bruker_id
+    report_header_attempt: forsøk
+    report_header_canvas_account_id: canvas_konto_id
+    report_header_canvas_associated_user_id: canvas_assosiert_bruker_id
+    report_header_canvas_course_id: canvas_kurs_id
+    report_header_canvas_group_id: canvas_gruppe_id
+    report_header_canvas_parent_id: canvas_oopphavs_id
+    report_header_canvas_section_id: canvas_klasse_id
+    report_header_canvas_term_id: canvas_semester_id
+    report_header_canvas_user_id: canvas_bruker_id
+    report_header_canvas_xlist_course_id: canvas_xlist_kurs_id
+    report_header_course: kurs
+    report_header_course__id: kurs_id
+    report_header_course_id: "kurs id"
+    report_header_course_name: kursnavn
+    report_header_course_sis: "kurs sis"
+    report_header_course_sis_id: "kurs sis id"
+    report_header_created_at: opprettet
+    report_header_current_score: "gjeldende resultat"
+    report_header_email: epost
+    report_header_end__date: slutt_dato
+    report_header_end_date: sluttdato
+    report_header_enrollment_state: påmeldingsstatus
+    report_header_final_score: sluttresultat
+    report_header_first_name: fornavn
+    report_header_group_id: gruppe_id
+    report_header_id: id
+    report_header_last_access_at: "forrige tilgang"
+    report_header_last_ip: "siste ip"
+    report_header_last_name: etternavn
+    report_header_learning_outcome_id: "læringsmål id"
+    report_header_learning_outcome_name: "læringsmål navn"
+    report_header_login_id: innloggings_id
+    report_header_long__name: langt_navn
+    report_header_long_name: "langt navn"
+    report_header_name: navn
+    report_header_outcome_score: "resultat for læringsmål"
+    report_header_parent_account_id: opphav_konto_id
+    report_header_role: rolle
+    report_header_section: klasse
+    report_header_section__id: klasse_id
+    report_header_section_id: klasse-ID
+    report_header_section_name: klassenavn
+    report_header_section_sis: "klasse sis"
+    report_header_section_sis_id: "klasse sis id"
+    report_header_short__name: kort_navn
+    report_header_short_name: kortnavn
+    report_header_sis_id: "sis id"
+    report_header_start__date: start_dato
+    report_header_start_date: startdato
+    report_header_status: status
+    report_header_student_id: "student id"
+    report_header_student_name: studentnavn
+    report_header_student_sis: "student sis"
+    report_header_student_sis_id: "student sis id"
+    report_header_submission_date: "dato for innlevering"
+    report_header_submission_score: innleveringsresultat
+    report_header_term: semester
+    report_header_term__id: semester_id
+    report_header_term_id: "semester id"
+    report_header_term_sis: "semester sis"
+    report_header_user__id: bruker_id
+    report_header_user_id: "bruker id"
+    report_header_user_name: brukernavn
+    report_header_user_sis_id: "bruker sis id"
+    report_header_xlist_course_id: xlist_kurs_id
     sis_exporter: 
       reports: "Rapporter: %{files}"
     student: 
@@ -575,6 +650,7 @@ nb:
     avatars: 
       all_link: 
         one: "Alle %{count}"
+        other: "Alle %{count}"
         zero: Alle
       approve_link: godkjenn
       delete_link: slett
@@ -1126,6 +1202,19 @@ nb:
           section_id: 
             field: Klasse-ID
     settings: 
+      about_google_docs: |-
+          Google Docs forhåndsvisning tillater brukere å vise dokumenter fra
+          inne i Canvas, heller enn å måtte laste dem ned og
+          åpne det tilsvarende programmet (f.eks. Word eller Excel).
+          
+          Hvis Scribd har blitt aktivert på denne kontoen, vil Canvas
+          prøve å bruke den til forhåndsvisning. Hvis dokumentet
+          ikke kan forhåndsvises i Scribd, eller hvis brukeren ikke
+          har Flashplayer installert (f.eks iPad/iPhone),
+          vil Canvas velge å bruke Google Docs forhåndsvisning
+          hvis den er aktivert. Ved å bruke denne tjenesten, erkjenner
+          du at du har lest og akseptert vilkårene for
+          [Google Docs Viewer Terms of Service](%{terms_url}).
       about_google_docs_tooltip: "Om Google Docs-forhåndsvisning"
       account_admins_title: Kontoadministratorer
       account_quotas: 
@@ -2336,6 +2425,7 @@ nb:
           Studentene vil se de modifiserte filene i kommentarfeltet for innlevering.
           
           *Pass på at du ikke endrer navnene på innleverte filer slik at vi kan gjenkjenne dem.*
+      speed_grader: SpeedGrader™
       titles: 
         related_items: "Relaterte elementer"
     grade_gpa_scale_screenreader: "Karakter: %{grade}"
@@ -2561,6 +2651,7 @@ nb:
     submission_sidebar: 
       comment_signature: "%{author}, %{created_at}"
       labels: 
+        grade: "Karakter: %{grade} *(%{points_possible} poeng oppnåelig)*"
         none_assigned: "Ingen tildelt"
       links: 
         resubmit: "Lever besvarelsen på nytt"
@@ -2909,6 +3000,8 @@ nb:
     masquerade: "Forkle deg som en bruker"
     ok: OK
     okay: OK
+    publish: Publiser
+    published: Publisert
     refresh: oppdater
     save: Lagre
     search: Søk
@@ -2919,6 +3012,8 @@ nb:
     show_all_artifacts: "Vis alle artifakter"
     submit: "Send inn"
     unmasquerade: "Stopp forkledning"
+    unpublish: Depubliser
+    unpublished: "Ikke publisert"
     update: Oppdater
     view_account_roster: "Se kontodeltagere"
     view_course_roster: "Se kursets deltagere"
@@ -3530,6 +3625,10 @@ nb:
       titles: 
         new: "Start et nytt Samarbeid"
     index: 
+      description_rs: |-
+          Gratis nettbaserte verktøy som [Google Docs](%{google_url}) og [EtherPad](%{etherpad_url}) 
+          er godt egnede steder for studenter å samarbeide rundt gruppeprosjekter eller -innleveringer, dele notater, etc.
+          Lærer *eller* studenter kan etablere gruppesamarbeid.
       description_student: |-
           **Hva mener vi med samarbeid?**  Vi snakker om nettbaserte verktøy som
           muliggjør samarbeid på et delt dokumenter.  Du kan benytte ressurser som for eks.
@@ -4390,6 +4489,8 @@ nb:
       reorder_modules: "Dra for å ordne moduler"
       unpublish: Depubliser
     context_module_next: 
+      aria_labels: 
+        add_item: "Legg til innhold"
       images: 
         alt: 
           incomplete: ufullstendig
@@ -5401,6 +5502,7 @@ nb:
         delete: "Slett dette kurset permanent"
         export_content: "Eksporter kursinnhold"
         import: "Importer innhold til dette kurset"
+        new_badge: Ny
         reset: "Tilbakestill kursinnhold"
         stats: Kursstatistikk
         student_view: Studentvisning
@@ -5416,6 +5518,7 @@ nb:
             Du kan organisere kurset i **moduler eller deler**, hvor hver del inneholder et beslektet sett med filer, oppgaver, sider, etc. Hvis du ønsker, kan du også sekvensiere moduler ved å definere kriterier og forutsetninger som må være ferdig før hver modul gjøres tilgjengelig.
             
             -Dette oppsettet er trolig best for kurs som ikke er basert på en bestemt tidsplan som en termin eller et semester.
+        recent_activity_dashboard: "**Kontrollpanelet for nylig aktivitet** lar deltakerne se de nyeste samtalene, kunngjøringer, diskusjoner og interaksjoner for dette kurset. Det er nesten tilsvarende kontrollpanelet brukerne ser når de logger inn, men viser kun  innhold for dette spesifikke kurset."
         syllabus: "Med **Pensumvisning** kan du gi en beskrivelse av kursforventninger eller introdusere kurset med lenker, bilder, osv., og deretter også vise  kalendervisning av alle oppgaver og kurshendelser."
       draft_state: 
         buttons: 
@@ -5433,6 +5536,8 @@ nb:
           syllabus: Pensum
       empty_body: "Uten innhold"
       front_page_not_set: "Forsiden må etableres først"
+      headers: 
+        course_status: Kursstatus
       headings: 
         choose_home_page_title: "Velg hjemmeside"
         confirm_unenroll: "Bekreft avmelding"
@@ -6125,6 +6230,7 @@ nb:
       authors_name: "Forfatterens navn"
       delete: Slett
       edit: Rediger
+      edited_comment: "Redigert av *%{editor.display_name}* %{edited_at}"
       go_to_parent: "Gå til opphav"
       go_to_topic: "Gå til tema"
       manage_discussion_entry: "Behandle diskusjonsoppføring"
@@ -6152,6 +6258,7 @@ nb:
       error_saving_reply: "*En feil oppsto*. Vennligst post svaret ditt senere."
       saving_reply: "Lagrer svaret..."
     reply_attachment: 
+      attachment_label: Vedlegg
       remove_attachment: fjern
     reply_form: 
       attach_file: "Legg ved"
@@ -7066,6 +7173,7 @@ nb:
     edit_view_rubric: "Se vurderingsveiledning"
     errors: 
       select_an_option: "Vennligst gjør et valg"
+    graded: vurdert
     graded_by_me: "%{graded_time} av meg"
     graded_then_resubmitted: "rettet, så levert på nytt (%{when})"
     gradee_index_of_total: "%{gradee} %{x} eller %{y}"
@@ -7074,6 +7182,8 @@ nb:
     mute_assignment: "Skjul oppgaven"
     new_assessment: "[Ny vurdering]"
     no_submission_time: "intet tidspunkt for innlevering"
+    not_graded: "ikke rettet"
+    not_submitted: "ikke levert inn"
     nth_student: "Student %{n}"
     portion_graded: "%{x} / %{y} karaktersatt"
     show_all_details_button: "Vis alle detaljer"
@@ -7958,7 +8068,7 @@ nb:
       add_group_category: "Legg til et sett av grupper"
       self_signup_help: "Grupper med egenpåmelding"
     unassigned_students: "Unassigned Students (%{count})"
-    unassigned_users: "Ufordelte brukere (% {count})"
+    unassigned_users: "Ufordelte brukere (%{count})"
   help_dialog: 
     Back: Tilbake
     Help: Hjelp
@@ -8314,6 +8424,7 @@ nb:
       completed_message: 
         one: "1 element prosessert"
         other: "%{count} elementer prosessert"
+      error_message: "%{error}: %{ids}"
     send_to_inbox: 
       default_subject: "Intet emne"
     text_helper: 
@@ -8941,8 +9052,10 @@ nb:
     assignment_due_date_override_changed: 
       email: 
         assignment_due_date_changed: "Oppgavefrist endret: %{assignment_name}, %{course_name} (%{override})"
+        assignment_due_date_changed_sentence: "Fristen for oppgaven %{assignment_name} i kurset %{course_name} (%{override}) har blitt endret til:"
         html: 
           assignment_due_date_changed: "Oppgavefrist endret: %{assignment_name}, %{course_name} (%{override})"
+          assignment_due_date_changed_sentence: "Fristen for oppgaven %{assignment_name} i kurset %{course_name} (%{override}) har blitt endret til:"
           link: "Klikk her for å se oppgaven"
           no_due_date: "Ingen frist"
         labels: 
@@ -9126,6 +9239,7 @@ nb:
         subject: "Bekreft epost: Canvas"
     confirm_registration: 
       email: 
+        body: "Takk for at du registrerte deg på %{product_name}! Denne eposten er en bekreftelse på at brukeren %{user} registrerer en ny konto på %{website}."
         details: "For å fullføre registreringsprosessen, vennligst se følgende url:"
         html: 
           body: "Takk for at du registrerte deg på %{product_name}! Denne eposten er en bekreftelse på at brukeren %{user} registrerer en ny konto på %{website}."
@@ -9719,6 +9833,7 @@ nb:
           html_details_course2: "Du kan se hvilke grupper du er del av i dette kurset ved å *klikke her*"
           subject: "Nytt gruppemedlemskap for %{course_or_account} "
           title: "Nytt gruppemedlemskap: %{group_name}"
+        subject: "Nytt gruppemedlemskap for %{course_or_account}"
         title: "Nytt gruppemedlemskap: %{group_name}"
       facebook: 
         body_account: "Du har blitt lagt til i en ny gruppe med kontoen %{account}. Navnet på gruppen er %{group_name}."
@@ -9737,9 +9852,11 @@ nb:
     new_context_group_membership_invitation: 
       email: 
         body_account: "Du har blitt invitert til å bli med i gruppen %{group} med kontoen %{account}."
+        body_course: "Du har blitt invitert til å bli med i gruppa %{group} i kurset %{course}."
         details: "Du kan se på gruppen ved å klikke på lenken nedenfor:"
         html: 
           body_account: "Du har blitt invitert til å bli med i gruppen %{group} med kontoen %{account}. "
+          body_course: "Du har blitt invitert til å bli med i gruppa %{group} i kurset %{course}."
           details: "Du kan sjekke ut gruppa ved å klikke her"
           subject: "Nytt gruppemedlemskap for %{course_or_account} "
           title: "Nytt gruppemedlemskap: %{group_name}"
@@ -9747,11 +9864,14 @@ nb:
         title: "Nytt gruppemedlemskap: %{group_name}"
       facebook: 
         body_account: "Du har blitt invitert til å bli med i gruppen %{group} med kontoen %{account}."
+        body_course: "Du har blitt invitert til å bli med i gruppen %{group} i kurset %{course}."
       sms: 
         body_account: "Du har blitt invitert til å bli med i gruppen %{group} med kontoen %{account}."
+        body_course: "Du har blitt invitert til å bli med i gruppen %{group} i kurset %{course}."
         details: "Mer info på %{url}"
       summary: 
         body_account: "Du har blitt invitert til å bli med i gruppen %{group} med kontoen %{account}."
+        body_course: "Du har blitt invitert til å bli med i gruppen %{group} i kurset %{course}."
         subject: "Nytt gruppemedlemskap for %{course_or_account}"
       twitter: 
         body_account: "Canvas-varsel – Invitasjon: %{group} for kontoen %{account}"
@@ -9910,6 +10030,9 @@ nb:
           title: "Ny studentgruppe: %{group_name}"
         subject: "Ny studentgruppe for %{course_or_account}"
         title: "Ny studentgruppe: %{group_name}"
+      facebook: 
+        body_account: "En ny studentgruppe kalt %{group_name} ble opprettet for kontoen %{account}. Det første medlemmet er %{user}."
+        body_course: "En ny studentgruppe kalt %{group_name} ble opprettet for kurset %{course}. Det første medlemmet er %{user}."
       sms: 
         body_account: "En ny gruppe kalt \"%{group_name}\" ble opprettet for kontoen %{account}. Det første medlemmet er %{user}."
         body_course: "En ny gruppe kalt \"%{group_name}\" ble opprettet for kurset %{course}. Det første medlemmet er %{user}."
@@ -10032,6 +10155,8 @@ nb:
           subject: "Påminnelse til å vurdere: %{rubric}, %{context}"
         link_message: "Du kan se gjennom vurderingen og levere innlegget din her:"
         subject: "Påminnelse om å vurdere: %{rubric}, %{context}"
+      facebook: 
+        body: "Du har blitt minnet på å vurdere: *%{title}* for %{context}."
       sms: 
         body: "Du har blitt minnet på å vurdere: %{rubric}, %{context}."
         more_info: "Mer info på %{url}"
@@ -10142,12 +10267,14 @@ nb:
           regraded_date: "endret karakter: %{date}"
           score: "resultat: %{score} av %{total}"
           score_pending: "resultatet avhenger av gjennomgang fra faglærer"
+          subject: "Karakter endret: %{assignment}, %{context}"
         link_message: "Du kan se over oppgaven her:"
         no_date_set: "Ingen dato satt"
         not_applicable: N/A
         regraded_date: "endret karakter: %{date}"
         score: "resultat: %{score} av %{total}"
         score_pending: "resultatet avhenger av gjennomgang fra faglærer"
+        subject: "Karakter endret: %{assignment}, %{context}"
       facebook: 
         body: "Resultatet på din besvarelse, *%{title}* er endret."
         no_date_set: "Ingen dato satt"
@@ -10781,6 +10908,7 @@ nb:
       instructions: 
         main: 
           manage: 
+            description: "*Læringsmål er opprettet her for å spore mestring i et kurs. For å komme i gang, se menylinjen øverst. Klikk på knappen Ny for å opprette et nytt læringsmål, eller Ny gruppe for å opprette en ny gruppe for å organisere dine læringsmål i. Finn-knappen vil tillate deg å bruke mål som er opprettet av departementet, fylket eller din institusjon. Ettersom du oppretter og bruker læringsmål vil du være i stand til å bruke panelet til venstre for å navigere gjennom dine læringsmål. Du kan dra og slippe mål mellom de ulike nivåer for å skape struktur.* *Enda viktigere, Canvas lar deg legge resultatene til vurderingskriteriene slik at du kan vurdere mestring etterhvert som du retter oppgaver. Når du har satt opp læringsmål, klikk Behandle kriterier for å begynne å bruke dine mål for karaktersetting.*"
             title: "Setter opp resultater"
     mastery: Mestrer
     mastery_error: "Må være større eller lik 0"
@@ -10821,6 +10949,7 @@ nb:
       title: "Navngi gruppen"
     outcome_result: 
       all_outcomes: "alle resultater for denne studenten"
+      attempt_info: "forsøk nr. %{attempt_number}, %{attempt_date}"
       outcome_mastered: mestret
       scoring: "%{points} av %{possible_points}"
     remedial: Forbedringspotensial
@@ -10850,6 +10979,7 @@ nb:
       mastery: "Mestring i siste forsøk"
       no_mastery: "Ingen mestring i siste forsøk"
       outcomes_for: "Resultater for %{user_name}"
+      score_out_of_possible: "%{score}* av %{possible}*"
       short_title: 
         attempts: Forsøk
         average_percent: "Snitt i prosent"
@@ -11045,6 +11175,14 @@ nb:
       description: "Canvas' Facebook-applikasjon"
       name: Facebook
     facebook_settings: 
+      description: |-
+          Du må opprette en [ny app på facebook.com](%{facebook_url}), og legg til  'App på Facebook' som en plattform.
+          Sett følgende konfigurasjonsalternativer for å sikre at din Facebook-app
+          fungerer riktig:
+          
+          * **Innstillinger -- App på Facebook -- Canvas Page:** noter hva du velger (den delen som er etter apps.facebook.com) og gå inn i skjemaet nedenfor
+          * **Innstillinger -- App på Facebook -- Canvas URL:** satt til%{canvas_url}
+          * Når du har lagret programmet ditt, bør du notere deg App-ID, Client Token og App Secret
       domain_name: domene
       headers: 
         domain_settings: "Innstillinger for domene"
@@ -12084,6 +12222,15 @@ nb:
       right: "Riktig svar"
       unanswered: Ubesvart
       you_answered: "Du svarte"
+  quiz_submission_arrows: 
+    answers: 
+      correct: Riktig!
+      correct_answers: "Riktige svar"
+      incorrect: Feil
+      partial: Delvis
+      right: "Riktig svar"
+      unanswered: Ubesvart
+      you_answered: "Du svarte"
   quizzes: 
     after_last_attempt: "Etter siste forsøk"
     alerts: 
@@ -12399,6 +12546,8 @@ nb:
           download_submissions: "Last ned alle filer"
       equations_help: 
         equation_functions: "I tillegg til variabler, er det også en samling av hjelpefunksjoner du kan bruke for å generere nyttige verdier. For eksempel: %{example} For å se en forklaring for en gitt hjelpefunksjonen, velger du det fra listen nedenfor:"
+        equation_intro: "Beregnede spørsmål er basert på et sett av en eller flere formler beregnet i rekkefølge. Du kan definere mellomliggende variabler i disse formlene, men det numeriske resultatet av den siste formelen er det som brukes til å generere det riktige svaret. For eksempel: %{example} For dette settet med formler, er det endelige svaret 71. Det er imidlertid ikke noen forhåndsdefinerte variabler, slik at alle studenter vil ha samme spørsmål med samme svar. Se \"variabler\" fanen for mer informasjon om variabler."
+        equation_variables2: "Du kan også definere variabler i spørsmålsteksten ved hjelp av braketter (\"Hva er [a] + [b]?\"). For hver variabel, vil du se en \"Eksempelverdi\" basert på varabelinnstillingene. Dette gjør at du kan sjekke matematikken og sikre at formlene fungerer. Om for eksempel ditt spørsmål var \"Hva er [a] + 5?\" så vil du vil bli bedt om å definere variabelen \"a\". Hvis eksempelverdien for \"a\" var 5.2, kan du skrive: %{example} Med denne formelen du kan generere en rekke løsningssett, med forskjellig verdi av \"a\" i hvert sett. En student kan se spørsmålet \"Hva er 5,2 + 5?\" og en annen kan se \"Hva er 9 + 5?\"."
         links: 
           functions: Funksjoner
           intro: Intro
@@ -13360,6 +13509,7 @@ nb:
         add_rubric: "Legg til vurderingsveiledning"
       course_rubrics: "Kursets vurderingsveiledninger"
       delete_rubric: "Slett vurderingsveiledning"
+      edit_rubric: "Rediger vurderingsveiledning"
       page_title: Vurderingsveiledning
       points_possible: 
         one: "1 poeng oppnåelig"
@@ -14257,6 +14407,7 @@ nb:
       accounts: "Kontoer: %{account_count}"
       courses: "Kurs: %{course_count}"
       crosslists: "Krysslister: %{crosslist_count}"
+      enrollments: "Påmeldinger: %{enrollment_count}"
       group_enrollments: "Gruppepåmeldinger: %{group_enrollments_count}"
       groups: "Grupper: %{group_count}"
       sections: "Klasser: %{section_count}"
@@ -14594,6 +14745,7 @@ nb:
     settings: Innstillinger
     syllabus: Pensum
     tab_location_error: "Den faneplasseringen er ugyldig"
+    tab_unmanagable_error: "%{css_class} kan ikke behandles"
   tempe_grade_export_title: "Tempe karaktereksport"
   tempe_report_header_absences: FRAVÆR
   tempe_report_header_citizenship: STATSBORGERSKAP
@@ -14643,6 +14795,7 @@ nb:
         teachers_can_access_from: "**Forelesere** kan aksessere fra"
       name: "Semesternavn:"
       sis_source_id: "SIS-ID:"
+      term_runs_from: "**Semesteret varer** fra"
       titles: 
         term_ends: "Semesteret slutter"
         term_starts: "Semesteret starter"
