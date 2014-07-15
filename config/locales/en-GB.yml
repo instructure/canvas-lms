@@ -319,6 +319,81 @@ en-GB:
       student_grades: 
         description: 
           text: "This report shows the student final grade results for students in a given term. The resulting csv file will have one row per enrolment, and will show the final grade that is displayed in the course gradebook."
+    report_header_account_id: account_id
+    report_header_assessment_id: "assessment id"
+    report_header_assessment_question: "assessment question"
+    report_header_assessment_question_id: "assessment question id"
+    report_header_assessment_title: "assessment title"
+    report_header_assessment_type: "assessment type"
+    report_header_assignment_id: "assignment id"
+    report_header_assignment_title: "assignment title"
+    report_header_assignment_url: "assignment url"
+    report_header_associated_user_id: associated_user_id
+    report_header_attempt: attempt
+    report_header_canvas_account_id: canvas_account_id
+    report_header_canvas_associated_user_id: canvas_associated_user_id
+    report_header_canvas_course_id: canvas_course_id
+    report_header_canvas_group_id: canvas_group_id
+    report_header_canvas_parent_id: canvas_parent_id
+    report_header_canvas_section_id: canvas_section_id
+    report_header_canvas_term_id: canvas_term_id
+    report_header_canvas_user_id: canvas_user_id
+    report_header_canvas_xlist_course_id: canvas_xlist_course_id
+    report_header_course: course
+    report_header_course__id: course_id
+    report_header_course_id: "course id"
+    report_header_course_name: "course name"
+    report_header_course_sis: "course sis"
+    report_header_course_sis_id: "course sis id"
+    report_header_created_at: "created at"
+    report_header_current_score: "current score"
+    report_header_email: email
+    report_header_end__date: end_date
+    report_header_end_date: "end date"
+    report_header_enrollment_state: "enrolment state"
+    report_header_final_score: "final score"
+    report_header_first_name: first_name
+    report_header_group_id: group_id
+    report_header_id: ID
+    report_header_last_access_at: "last access at"
+    report_header_last_ip: "last ip"
+    report_header_last_name: last_name
+    report_header_learning_outcome_id: "learning outcome id"
+    report_header_learning_outcome_name: "learning outcome name"
+    report_header_login_id: login_id
+    report_header_long__name: long_name
+    report_header_long_name: "long name"
+    report_header_name: name
+    report_header_outcome_score: "outcome score"
+    report_header_parent_account_id: parent_account_id
+    report_header_role: role
+    report_header_section: section
+    report_header_section__id: section_id
+    report_header_section_id: "section id"
+    report_header_section_name: "section name"
+    report_header_section_sis: "section sis"
+    report_header_section_sis_id: "section sis id"
+    report_header_short__name: short_name
+    report_header_short_name: "short name"
+    report_header_sis_id: "sis id"
+    report_header_start__date: start_date
+    report_header_start_date: "start date"
+    report_header_status: status
+    report_header_student_id: "student id"
+    report_header_student_name: "student name"
+    report_header_student_sis: "student sis"
+    report_header_student_sis_id: "student sis id"
+    report_header_submission_date: "submission date"
+    report_header_submission_score: "submission score"
+    report_header_term: term
+    report_header_term__id: term_id
+    report_header_term_id: "term id"
+    report_header_term_sis: "term sis"
+    report_header_user__id: user_id
+    report_header_user_id: "user id"
+    report_header_user_name: "user name"
+    report_header_user_sis_id: "user sis id"
+    report_header_xlist_course_id: xlist_course_id
     sis_exporter: 
       reports: "Reports: %{files}"
     student: 
@@ -2346,6 +2421,7 @@ en-GB:
           Students will see the modified files in their comments for the submission.
           
           *Make sure you don't change the names of the submission files so we can recognise them.*
+      speed_grader: SpeedGrader™
       titles: 
         related_items: "Related items"
     grade_gpa_scale_screenreader: "Grade: %{grade}"
@@ -2919,6 +2995,8 @@ en-GB:
     masquerade: "Masquerade as user"
     ok: OK
     okay: Okay
+    publish: Publish
+    published: Published
     refresh: refresh
     save: Save
     search: Search
@@ -2929,6 +3007,8 @@ en-GB:
     show_all_artifacts: "Show all artifacts"
     submit: Submit
     unmasquerade: "Stop masquerading"
+    unpublish: Unpublish
+    unpublished: Unpublished
     update: Update
     view_account_roster: "View account schedule"
     view_course_roster: "View course schedule"
@@ -4403,6 +4483,8 @@ en-GB:
       reorder_modules: "Drag to reorder modules"
       unpublish: Unpublish
     context_module_next: 
+      aria_labels: 
+        add_item: "Add content"
       images: 
         alt: 
           incomplete: incomplete
@@ -5413,6 +5495,7 @@ en-GB:
         delete: "Permanently delete this course"
         export_content: "Export course content"
         import: "Import content into this course"
+        new_badge: New
         reset: "Reset course content"
         stats: "Course statistics"
         student_view: "Student view"
@@ -5446,6 +5529,8 @@ en-GB:
           syllabus: Syllabus
       empty_body: "No content"
       front_page_not_set: "Front page must be set first"
+      headers: 
+        course_status: "Course Status"
       headings: 
         choose_home_page_title: "Choose Home Page"
         confirm_unenroll: "Confirm unenrolment"
@@ -6166,6 +6251,7 @@ en-GB:
       error_saving_reply: "*An error occured*, please post your reply again later"
       saving_reply: "Saving reply..."
     reply_attachment: 
+      attachment_label: Attachment
       remove_attachment: remove
     reply_form: 
       attach_file: Attach
@@ -7086,6 +7172,7 @@ en-GB:
     edit_view_rubric: "View rubric"
     errors: 
       select_an_option: "Please select an option"
+    graded: graded
     graded_by_me: "%{graded_time} by me"
     graded_then_resubmitted: "graded, then resubmitted (%{when})"
     gradee_index_of_total: "%{gradee} %{x} of %{y}"
@@ -7094,6 +7181,8 @@ en-GB:
     mute_assignment: "Mute assignment"
     new_assessment: "[New assessment]"
     no_submission_time: "no submission time"
+    not_graded: "not graded"
+    not_submitted: "not submitted"
     nth_student: "Student %{n}"
     portion_graded: "%{x} / %{y} graded"
     show_all_details_button: "Show all details"
@@ -12149,6 +12238,15 @@ en-GB:
       right: "Correct answer"
       unanswered: Unanswered
       you_answered: "You Answered"
+  quiz_submission_arrows: 
+    answers: 
+      correct: Correct!
+      correct_answers: "Correct answers"
+      incorrect: Incorrect
+      partial: Partial
+      right: "Correct answer"
+      unanswered: Unanswered
+      you_answered: "You Answered"
   quizzes: 
     after_last_attempt: "After last attempt"
     alerts: 
@@ -13427,6 +13525,7 @@ en-GB:
         add_rubric: "Add rubric"
       course_rubrics: "Course rubrics"
       delete_rubric: "Delete rubric"
+      edit_rubric: "Edit rubric"
       page_title: Rubrics
       points_possible: 
         one: "1 point possible"
