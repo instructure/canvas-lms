@@ -16,11 +16,17 @@
   </a>
 <% end %>
 
+<% if asset.conversation.subject.present? %>
+<h4>
+  <%= format_message(asset.conversation.subject).first %>
+</h4>
+<% end %>
+
 <p>
   <%= format_message(asset.body).first %>
 </p>
 
-<% if avatar_enabled? %> 
+<% if avatar_enabled? %>
   <table border="0" style="border-collapse: collapse">
     <tr height="30px">
       <td></td>
