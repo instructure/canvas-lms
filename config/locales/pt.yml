@@ -267,6 +267,8 @@ pt:
     default: 
       all_terms: "Todos os períodos"
       course_text: "Para a disciplina: %{course};"
+      description: 
+        header: Exemplo
       end_text: "Terminar em: %{end_at};"
       error_text: "Falha, comunique o seguinte código de erro ao administrador do sistema: ErrorReport:%{error};"
       extra_text_term: "Período: %{term_name};"
@@ -284,6 +286,14 @@ pt:
       reports: "Relatórios: %{files}"
     outcomes: 
       order: "Ordem: %{order}"
+    report_header_attempt: tentativa
+    report_header_course: disciplina
+    report_header_created_at: "criado em"
+    report_header_email: email
+    report_header_id: id
+    report_header_name: nome
+    report_header_section: secção
+    report_header_section__id: section_id
     sis_exporter: 
       deleted: "Incluir objetos eliminados: verdadeiro;"
       reports: "Relatórios: %{files}"
@@ -402,6 +412,7 @@ pt:
         Value: Valor
         date: Data
         event_id: "ID do evento"
+        event_source_label: Origem
         event_type_label: Tipo
         time: Hora
         user: Utilizador
@@ -410,6 +421,7 @@ pt:
       course_logging_results: 
         date: Data
         event_details: "Detalhes do evento"
+        event_source: Origem
         event_type: Tipo
         no_item_found: "Não foram encontrados itens"
         time: Hora
@@ -760,6 +772,11 @@ pt:
             radio: Resultados
           user: 
             radio: Utilizadores
+    ph_student_grades_csv_parameters: 
+      account_reports: 
+        penn_harris: 
+          parameters: 
+            note: "Disciplinas com inscrições silenciadas podem não refletir corretamente os resultados neste relatório."
     provisioning_csv_description: 
       account_reports: 
         sis_export: 
@@ -1620,6 +1637,7 @@ pt:
         never_drop: "Nunca eliminar"
         no_assignments: "[Nenhuma tarefa]"
         weighted_by_points: "Ponderado por pontos"
+      percent_of_total_grade: "% da nota total"
     assignment_count: 
       one: "1 tarefa"
       other: "%{count} tarefas"
@@ -1864,6 +1882,7 @@ pt:
           Os alunos verão os ficheiros modificados nos seus comentários para o envio.
           
           *Certifique-se de que não muda os nomes dos ficheiros enviados, para que possamos reconhecê-los.*
+      speed_grader: SpeedGrader™
       titles: 
         related_items: "Itens relacionados"
     grade_gpa_scale_screenreader: "Nota: %{grade}"
@@ -1914,6 +1933,7 @@ pt:
       assignment_locked_tooltip: bloqueado
       keycode_descriptions: 
         add_assignment_or_group: "Adicionar tarefa ao grupo atual"
+        close_active_dialog: "Fechar a caixa de diálogo ativa"
         delete_assignment_or_group: "Excluir grupo/tarefa atual"
         edit_assignment_or_group: "Editar grupo/tarefa atual"
         full_preview: "Visualização completa/edição da tarefa"
@@ -1921,6 +1941,7 @@ pt:
         previous_assignment_or_group: "Tarefa/grupo anterior"
       keycodes: 
         add_assignment_or_group: a
+        close_active_dialog: esc
         delete_assignment_or_group: d
         edit_assignment_or_group: e
         full_preview: f
@@ -2395,6 +2416,8 @@ pt:
     masquerade: "Fazer-se passar por utilizador"
     ok: OK
     okay: OK
+    publish: Publicar
+    published: Publicado
     refresh: atualizar
     save: Guardar
     search: Pesquisar
@@ -2405,6 +2428,8 @@ pt:
     show_all_artifacts: "Exibir todos os artefatos"
     submit: Enviar
     unmasquerade: "Parar de se mascarar"
+    unpublish: "Anular publicação"
+    unpublished: "Publicação anulada"
     update: Atualizar
     view_account_roster: "Exibir rol de contas"
     view_course_roster: "Ver rol da disciplina"
@@ -2502,7 +2527,10 @@ pt:
     agenda_view_displaying_start_end: "A visualizar %{start} até %{end}"
     appointment_group_deletion_details: "Eliminar isto também irá eliminar compromissos para os quais os alunos se tenham inscrito."
     appointment_group_list: 
+      delete: Eliminar
+      edit: Editar
       location: "Localização:"
+      manage: Gerir
       message_groups: "Contactar grupos que..."
       message_students: "Enviar mensagem aos alunos que..."
       scheduler_explanation_student_header: "Não dispõe de nenhum grupo de compromissos para se inscrever"
@@ -2512,6 +2540,9 @@ pt:
       scheduler_explanation_teacher_paragraph_1: "Esta é a Ferramenta de Agendamento. Pode utilizá-la para criar grupos de compromissos para os quais os seus alunos se possam inscrever."
       scheduler_explanation_teacher_paragraph_2: "Por exemplo, imagine que pretende analisar o trabalho de avaliação intercalar com cada um dos alunos inscritos na sua disciplina. Teria de criar um novo grupo de compromissos, especificar as datas e as horas em que se encontra disponível, dividir esse tempo em blocos de 15 minutos e permitir apenas um aluno por cada bloco de tempo."
       scheduler_explanation_teacher_paragraph_3: "Em seguida, os alunos seriam notificados e constatavam que teriam de se inscrever para obterem um dos blocos de tempo especificados. É-lhes apresentado um calendário com os blocos de tempo disponíveis colocado por cima de toda a informação constante dos seus outros calendários, para poderem escolher uma hora que lhes seja conveniente."
+      scheduler_explanation_teacher_paragraph_4: "*Comece já clicando no botão \"Criar um grupo de compromissos\" no lado direito. *"
+      x_groups_have_signed_up: "Inscreveram-se %{participant_count} grupos"
+      x_people_have_signed_up: "Inscreveram-se %{participant_count} pessoas"
     buttons: 
       cancel: Cancelar
       send_message: Enviar
@@ -2587,6 +2618,8 @@ pt:
       from: "De:"
       links: 
         more_options: "Mais opções"
+      location: "Localização:"
+      timespan_separator: para
       title: "Título:"
     edit_calendar_event_full: 
       buttons: 
@@ -2599,6 +2632,7 @@ pt:
       end_time: "Hora de fim"
       event_description: "Descrição do evento"
       event_title: "Título do evento"
+      location_name: "Localização:"
       new_calendar_event_header: "Novo evento do calendário"
       start_time: "Hora de início"
     edit_event: 
@@ -2707,6 +2741,7 @@ pt:
         date: Data
         event_description: "Descrição do evento"
         from: De
+        location: Localização
         title: Título
       no_content: "Sem conteúdo"
       timespan: "%{start_time} *para* %{end_time}"
@@ -2946,6 +2981,10 @@ pt:
         update: "Atualizar colaboração"
       collaboration_name: "%{course_or_group_name} Colaboração"
       descriptions: 
+        etherpad: |-
+            O EtherPad é um projeto "open source" que permite configurar rapidamente documentos partilhados. É tão rápido que até consegue ver o que as outras pessoas estão a escrever à medida que escrevem. Por outro lado, os "blocos" não são protegidos por palavra-passe, o que significa que qualquer pessoa com uma ligação pode editá-los. O EtherPad é mais adequado do que o Google Docs se pretender a função de anonimato e/ou permitir a participação de pessoas sem contas Google.  
+              
+            **Aviso**: certifique-se de que está familiarizado com a [política de eliminação do EtherPad](%{etherpad_deletion_policy_url}) para assegurar a preservação do seu trabalho.
         google_docs: |-
             O Google Docs é um bom local para colaborar num projeto de grupo.  É semelhante ao Microsoft Word, mas permite trabalhar em conjunto com outras pessoas no mesmo ficheiro, ao mesmo tempo, sem ser necessário enviar o ficheiro por e-mail.  
               
@@ -3064,6 +3103,7 @@ pt:
       recording: "1 gravação"
       recordings: "%{recordingCount} gravações"
       setings: definições
+      settings: Definições
       view: Ver
     confirm: 
       close: |-
@@ -3102,6 +3142,7 @@ pt:
       recording: "1 gravação"
       recordings: "%{recordingCount} gravações"
       setings: definições
+      settings: Definições
       start: Início
       view: Ver
     no_concluded_conferences: "Não existem conferências concluídas"
@@ -3124,6 +3165,12 @@ pt:
         new: "Ainda não começou"
         started: "Iniciado %{time}"
     type_disabled_error: "Este tipo de conferência não está mais ativada para este site do Canvas"
+  confirm_dialog: 
+    cancel: Cancelar
+    ok: Ok
+    submit: Enviar
+  confirm_dialog_component: 
+    ok: Ok
   content_exports: 
     buttons: 
       process: "Dados do processo"
@@ -3443,6 +3490,7 @@ pt:
       enrollment_change_failed: "Falha na alteração de privilégio de inscrição, tente novamente"
       headings: 
         recent_messages: "Mensagens recentes"
+        user_services: "Serviços Web registados"
       help: 
         list_services: "Não ativou a sua lista de serviços registados. Ativar esta lista permite que os seus colegas da disciplina e de grupo estabeleçam ligação consigo mais facilmente fora da aula."
         services: "Não associou o seu perfil de utilizador a nenhum serviço externo. Pode associar a sua conta do Canvas a serviços como Facebook e Twitter. Isso permite que os seus colegas da disciplina e de grupo estabeleçam ligação consigo mais facilmente fora da aula."
@@ -3452,20 +3500,27 @@ pt:
       legends: 
         memberships: Associações
       links: 
+        access_report: "Aceder a relatório"
         cant_delete: "Não é possível excluir"
         conclude_enrollment: "Concluir esta inscrição"
         delete_enrollment: "Excluir esta inscrição"
+        faculty_journal: "Diário da faculdade"
         link_enrollment: "Vincular esta inscrição"
         link_services: "Vincular serviços web à minha conta"
+        message_user: "Enviar mensagem"
         more_about_this_user: "Mais sobre este utilizador"
         more_user_details: "mais detalhes do utilizador..."
         remove_avatar: "Remover imagem do avatar"
         report_avatar: "Comunicar uma imagem inapropriada"
         restore_enrollment: "Restaurar esta inscrição"
+        student_teacher_activity: "Interações consigo"
+        teacher_activity: "Relatório de interações do aluno"
         title: 
           enrollment_sis_defined: "Esta inscrição foi definida pela universidade e não pode ser excluída"
         user_account_details: "Detalhes da conta de utilizador"
+        user_grades: Notas
         user_only_view_section: "limitar este utilizador a ver apenas os colegas da secção"
+        user_outcomes: Resultados
         user_view_all_sections: "permitir que este utilizador veja todos os utilizadores da disciplina"
       no_messages: "Não há mensagens"
       no_services: "%{user} ainda não vinculou nenhum serviço externo a sua conta."
@@ -3794,6 +3849,8 @@ pt:
       reorder_modules: "Arrastar para reordenar os módulos"
       unpublish: "Anular publicação"
     context_module_next: 
+      aria_labels: 
+        add_item: "Adicionar conteúdo"
       images: 
         alt: 
           incomplete: incompleto
@@ -3950,6 +4007,7 @@ pt:
     no_course: "Nenhuma disciplina"
     select_course: "Selecionar disciplina"
   conversation_message: 
+    subject: "Mensagem privada"
     subject_specified: "Mensagem privada: %{subject}"
     users_added: 
       one: "%{user} foi adicionado à conversa por %{current_user}"
@@ -4026,6 +4084,7 @@ pt:
     course_options: 
       course_options: 
         concluded: Concluído
+        groups: Grupos
         more_courses: "Mais disciplinas"
     enrollments_everyone: Todos
     errors: 
@@ -4353,6 +4412,8 @@ pt:
     event_type: 
       concluded: Concluído
       created: Criado
+      deleted: Excluído
+      published: Publicado
       updated: Atualizado
     field_label: 
       abstract_course_id: "ID de disciplina abstrata"
@@ -4495,6 +4556,7 @@ pt:
         delete_course: "Eliminar disciplina"
       details: 
         conclude_alt_text: "Se pretender manter a capacidade de alterar notas enquanto limita o acesso de alunos à disciplina, utilize as definições de datas da disciplina. Pode obter mais informações sobre as definições de datas das disciplinas nos nossos guias *aqui*."
+        confirm_conclude: "Aviso: a conclusão da disciplina irá impedir a modificação de notas e o acesso ao conteúdo da disciplina."
         confirm_delete: "Tem a certeza de que pretende eliminar esta disciplina? Uma vez eliminada a disciplina, os alunos e os professores deixarão de ter acesso à mesma. Se pretender removê-la apenas do menu pendente de disciplinas, deve *concluir a disciplina*."
         confirm_delete_addendum: "Se não tiver permissão para concluir a disciplina, pode *alterar a data de fim da disciplina* ou pedir ao administrador que conclua a disciplina."
       headings: 
@@ -4713,6 +4775,7 @@ pt:
         cannot_add_users: "Não é possível adicionar novos utilizadores porque esta disciplina está concluída"
         filter_field_description: "À medida que escreve neste campo, a lista de pessoas será filtrada automaticamente para incluir apenas as pessoas cujos nomes correspondam ao conteúdo introduzido."
         filter_list_of_people: "Filtrar lista de pessoas"
+        group_set: "Conjunto de grupos"
         people: Pessoas
         role_to_search: "Limitar pesquisa a função"
         search_people: "Procurar pessoas"
@@ -4732,6 +4795,9 @@ pt:
         re_sending_invitations: "A reenviar..."
       role_select: 
         all_roles: "Todas as funções"
+      roster_tabs: 
+        everyone_tab: Todos
+        groups: Grupos
       roster_user: 
         links: 
           edit_sections: "Editar secções"
@@ -4763,6 +4829,7 @@ pt:
         add_section: "Adicionar seção"
         move_course: "Mover disciplina"
         update_course: "Atualizar detalhes da disciplina"
+      course_open_enrollment: "Esta disciplina tem inscrições abertas. Os alunos podem inscrever-se na disciplina quando partilhar com eles este URL: *%{url}*.  Em alternativa, podem visitar este endereço *%{url2}* e usar o código seguinte: *%{code}* para se registarem na disciplina."
       course_open_enrollment_without_code: "Esta disciplina tem inscrições abertas. Os alunos podem inscrever-se na disciplina assim que partilhar com eles este URL: *%{url}*"
       course_overrides_term: "Isto substituirá qualquer configuração de disponibilidade de período."
       date_restricted: "Os utilizadores só podem participar na disciplina entre estas datas"
@@ -4824,6 +4891,7 @@ pt:
         sis_source_id: "ID do SIS"
         start_at: "Inicia em"
         storage_quota: "Armazenamento de arquivos"
+        time_zone: "Fuso Horário"
         turnitin_comments: "Comentários de envio do Turnitin"
       language_overrides_preferences: "Isto substituirá qualquer preferência de idioma do utilizador/sistema. Isto é recomendado apenas para disciplinas em idioma estrangeiro"
       links: 
@@ -4881,6 +4949,7 @@ pt:
         delete: "Eliminar permanentemente esta disciplina"
         export_content: "Exportar conteúdo da disciplina"
         import: "Importar conteúdo para esta disciplina"
+        new_badge: Novo
         reset: "Redefinir conteúdo da disciplina"
         stats: "Estatísticas da disciplina"
         student_view: "Vista de aluno"
@@ -5500,7 +5569,7 @@ pt:
         other: "%{count} respostas."
         zero: "Nenhuma resposta."
       unread_count_tooltip: 
-        one: "%{count} respostas não lidas."
+        one: "1 resposta não lida."
         other: "%{count} respostas não lidas."
         zero: "Nenhuma resposta não lida."
     page_nav: 
@@ -5583,6 +5652,8 @@ pt:
     closed_for_comments: "Fechado para comentários"
     confirm_delete_discussion_topic: "Tem a certeza de que pretende eliminar este tópico?"
     delete: Eliminar
+    deleted_entry: 
+      deleted: "Eliminado por *%{editor_name}* em %{edited_at}"
     discussions: Discussões
     edit_settings: "Editar definições de discussões"
     entry_collection_view: 
@@ -5619,6 +5690,7 @@ pt:
       error_saving_reply: "*Ocorreu um erro*, publique novamente a sua resposta mais tarde"
       saving_reply: "A guardar a resposta..."
     reply_attachment: 
+      attachment_label: Anexo
       remove_attachment: remover
     reply_form: 
       attach_file: Anexar
@@ -6063,7 +6135,7 @@ pt:
       links: 
         add_external_feed: "Adicionar feed externo"
       options: 
-        content_to_post: "--Conteúdo a publicar--"
+        content_to_post: "Conteúdo para publicação"
         full_article: "Artigo completo"
         link_only: "Apenas link"
         truncated: Truncado
@@ -6159,6 +6231,12 @@ pt:
     saving: "A guardar..."
     shared_secret: "Segredo partilhado"
     submit: Enviar
+    tool_post_iframe: 
+      load_tool_button: "Carregar %{tool}"
+      load_tool_new_tab_button: "Carregar %{tool} em uma nova janela"
+      new_tab: "Esta ferramenta precisa ser carregada em uma nova janela do navegador"
+      new_tab_expired: "A sessão desta ferramenta expirou. Recarregue a página para acessar a ferramenta novamente."
+      new_tab_loaded: "Esta ferramenta foi carregada com sucesso em uma nova janela do navegador Recarregue a página para acessar a ferramenta novamente."
     tool_show: 
       load_tool_button: "Carregar %{tool}"
       load_tool_new_tab_button: "Carregar %{tool} em uma nova janela"
@@ -6455,6 +6533,7 @@ pt:
     grade_display_warning: 
       checkbox: "Não mostrar novamente para esta disciplina"
       warning: Aviso
+  grade_export_title: "Exportação de notas"
   gradebook: 
     alerts: 
       no_active_students: "Não há alunos ativos na disciplina ou nenhum deles pode ser avaliado por si."
@@ -6497,6 +6576,7 @@ pt:
       none_to_update: "Nada a atualizar"
       select_an_option: "Selecione uma opção"
       upload_as_zip: "Faça upload dos arquivos como um .zip"
+    graded: avaliada
     graded_by_me: "%{graded_time} por mim"
     graded_then_resubmitted: "avaliado, depois reenviado (%{when})"
     gradee_index_of_total: "%{gradee} %{x} de %{y}"
@@ -6520,6 +6600,8 @@ pt:
     mute_assignment: "Silenciar tarefa"
     new_assessment: "[Nova avaliação]"
     no_submission_time: "Sem hora de envio"
+    not_graded: "não avaliado"
+    not_submitted: "não enviado"
     nth_student: "Aluno %{n}"
     portion_graded: "%{x} / %{y} Avaliado"
     publish_to_sis: "Publicar notas no SIS"
@@ -6806,6 +6888,8 @@ pt:
         one: "1 comentário"
         other: "%{count} comentários"
       comment_count_screenreader: "Ler comentários"
+      comments: Comentários
+      expand: Expandir
       faculty_journal: "Diário da Faculdade para %{user}"
       for_course: "Para a disciplina,"
       headers: 
@@ -7161,6 +7245,7 @@ pt:
     titles: 
       grading_scheme_info: "Exibir/Editar esquema de avaliação"
   group: 
+    greater_than_1: "Tem de ser superior a 1"
     memeber: Membro
     name_required: "É necessário o nome"
     name_too_long: "Introduza um nome de grupo mais curto"
@@ -7282,6 +7367,8 @@ pt:
         open_to_course_members: "Membros da disciplina são livres de aderir"
       page_title: "Grupos da disciplina"
       student_group_warning: "Se o seu professor falou sobre colocá-los em grupos como parte de uma tarefa, esta não é a maneira de fazê-lo. Os grupos que organizar não podem ser utilizados para avaliação... Mesmo assim, pode formar os seus próprios grupos, mas não será possível entregar uma cópia eletrónica de nenhuma tarefa, a não ser que o seu professor crie os grupos por si."
+      student_groups_tabs_everyone: Todos
+      student_groups_tabs_groups: Grupos
     context_manage_groups: 
       account_group_explanation: "Os grupos de alunos no nível da conta são uma boa maneira de agrupar alunos sem estar preso a uma disciplina específica. Todos os grupos de alunos obtêm o seu próprio calendário, quadro de discussão e ferramentas de colaboração, para que se possam organizar sozinhos e trabalhar em grupo mais eficientemente."
       actions: 
@@ -7385,6 +7472,8 @@ pt:
         headings: 
           account_groups: "Grupos de alunos no nível da conta"
           course_groups: "Grupos de alunos"
+        tabs: 
+          everyone: Todos
       group_category: 
         randomly_assigning_students: "Atribuir alunos aleatoriamente"
         search_groups: "Procurar grupos"
@@ -7492,6 +7581,7 @@ pt:
     randomly_assigning_members: "Atribuir alunos aleatoriamente"
     show: 
       coming_up: "Em breve"
+      edit_group: "Editar grupo"
       group_atom_feed: "Feed Atom do grupo"
       new_announcement: "Novo anúncio"
       next_week: "a próxima semana"
@@ -7538,6 +7628,7 @@ pt:
     which_course_is_this_question_about: "A que disciplina se refere esta pergunta?"
     your_email_address: "Endereço de e-mail"
   helpers: 
+    course: Disciplina
     dashboard_helper: 
       announcement_details: "Detalhes do anúncio"
       assignment_details: "Detalhes da tarefa"
@@ -7561,6 +7652,12 @@ pt:
       Poderá ser útil para pessoas com deficiências visuais ou dificuldade de leitura.
   ic_actions: 
     manage: gerir
+  icons: 
+    discussion_submission: "Envio de discussão"
+    file_upload_submission: "Envio de carregamento de ficheiro"
+    online_url_submission: "Envio de URL online"
+    quiz_submission: "Envio do teste"
+    text_entry_submission: "Envio de entrada de texto"
   images: 
     error_checking_color: "Erro ao verificar a cor da imagem"
     invalid_background_color: "A cor de fundo tem de ser %{color}"
@@ -7940,6 +8037,8 @@ pt:
     my_courses: "As minhas disciplinas"
   message: 
     default_subject: "Alerta do Canvas"
+  message_dialog_component: 
+    ok: Ok
   message_students: 
     buttons: 
       send_message: "Enviar mensagem"
@@ -8461,6 +8560,7 @@ pt:
         html: 
           assignment_due_date_changed: "Data de entrega de tarefa alterada: %{assignment_name}, %{course_name} (%{override})"
           assignment_due_date_changed_sentence: "A data de entrega da tarefa, %{assignment_name}, relativa à disciplina, %{course_name} (%{override}), foi alterada para:"
+          link: "Clique aqui para ver a tarefa"
           link_text: "Ver tarefa"
           no_due_date: "Sem data de entrega"
         labels: 
@@ -8486,6 +8586,7 @@ pt:
         assignment_graded: "Tarefa avaliada: %{assignment_name}, %{course_name}"
         html: 
           assignment_graded: "Tarefa avaliada: %{assignment_name}, %{course_name}"
+          link: "Clique aqui para ver a tarefa"
           link_text: "Ver tarefa"
           the_assignment_is_graded: "A tarefa, %{assignment_name}, foi avaliada."
         labels: 
@@ -8642,11 +8743,13 @@ pt:
         subject: "Confirmar e-mail: Canvas"
     confirm_registration: 
       email: 
+        body: "Obrigado pelo seu registo no %{product_name}! Este e-mail é a confirmação de que o utilizador %{user} está a registar-se para uma nova conta em %{website}."
         details: "Para concluir o processo de registro, acesse o seguinte url:"
         html: 
           body: "Obrigado pelo seu registo no %{product_name}! Este e-mail é a confirmação de que o utilizador %{user} está a registar-se para uma nova conta em %{website}."
           details: "Clique aqui para finalizar o processo de registo"
           subject: "Confirmar registo: %{product_name}"
+        subject: "Confirmar registo: %{product_name}"
     confirm_sms_communication_channel: 
       sms: 
         body: |-
@@ -9049,6 +9152,7 @@ pt:
             grades_based_on_percent: "A avaliação é baseada no total ponderado de cada grupo de tarefas"
             now_see_here: "Pode ver os detalhes aqui"
             subject: "Alteração na ponderação de nota"
+          see_details: "Pode ver os detalhes aqui"
         labels: 
           grades_based_on_percent: "A avaliação é baseada no total ponderado de cada grupo de tarefa"
           now_see_here: "Pode ver os detalhes aqui"
@@ -9157,6 +9261,7 @@ pt:
           click_to_preferences: "Clique aqui para editar as suas preferências de notificação"
     merge_email_communication_channel: 
       email: 
+        body: "Foi criada uma conta para si em %{host}, mas já tem uma conta do Canvas.  Se quiser juntar as contas, visite o seguinte URL:"
         html: 
           account_created: "Foi criada uma conta para si em %{host}, mas já tem uma conta do Canvas."
           merge2: "Se quiser juntá-los, *clique aqui*"
@@ -9316,6 +9421,7 @@ pt:
         html: 
           body: "%{user} publicou um novo comentário na discussão %{discussion_topic} de %{course}:"
           discussion_entry_link_message: "[Clique aqui para se juntar à conversa](%{url}) ou comente respondendo a esta mensagem."
+          link: "Clique aqui para se juntar à conversa"
           subject: "Novo comentário para %{discussion_topic}: %{course}"
         subject: "Novo comentário para %{discussion_topic}: %{course}"
       facebook: 
@@ -9336,6 +9442,7 @@ pt:
           body: "Foi iniciada uma nova discussão que pode ser do seu interesse:"
           details: "Junte-se à conversa aqui"
           download: descarregar
+          link: "Clique aqui para se juntar à conversa"
           subject: "Nova discussão - %{discussion_topic}: %{course}"
         labels: 
           file_included: "Arquivo incluído"
@@ -9404,6 +9511,7 @@ pt:
         html: 
           body: "Foram adicionados %{count} novos ficheiros à disciplina, %{name}:"
           link: "Pode vê-los aqui"
+          see_details: "Pode vê-los aqui"
           subject: "%{count} novos ficheiros adicionados à disciplina, %{name}:"
         link: "Pode vê-los aqui"
         subject: "%{count} novos ficheiros adicionados à disciplina, %{name}:"
@@ -9451,6 +9559,7 @@ pt:
         body: "%{user} acabou de se registrar como professor em %{website}."
         html: 
           body: "%{user} acabou de se registar como professor em %{website}."
+          details: "Clique aqui para ver o professor"
           email: E-mail
           link: "Clique aqui para ver o professor"
           phone: Telefone
@@ -9848,6 +9957,7 @@ pt:
     ecollege: 
       course_not_found: "A disciplina do ECollege não foi encontrada."
     external_feed_type: "Feed externo"
+    external_tool_type: "Ferramenta externa"
     file_type: Ficheiro
     grading_standard_type: "Padrão de avaliação"
     group_type: Grupo
@@ -9944,9 +10054,17 @@ pt:
   notification: 
     added_to_conversation_description: "Foi adicionado a uma conversa"
     added_to_conversation_display: "Adicionado à conversa"
+    all_submissions_description: |-
+        *Apenas Instrutor e Administrador:*
+        
+        Envio/reenvio de tarefa
     all_submissions_display: "Todos os envios"
     announcement_description: "Novo anúncio na sua disciplina"
     announcement_display: Anúncio
+    appointment_availability_description: |-
+        *Apenas Instrutor e Administrador:*
+        
+        Alteração de horários de compromissos
     appointment_availability_display: "Disponibilidade de compromissos"
     appointment_cancelations_description: "Cancelamento de compromisso"
     appointment_cancelations_display: "Cancelamentos de compromissos"
@@ -9980,6 +10098,12 @@ pt:
       submission_comment: "Comentário de envio"
     conversation_message_description: "Novas mensagens na Caixa de entrada"
     conversation_message_display: "Mensagem da conversa"
+    course_content_description: |-
+        Alteração do conteúdo da disciplina:
+        
+        * Página Wiki
+        * Conteúdo de teste
+        * Conteúdo de tarefa
     course_content_display: "Conteúdo da disciplina"
     discussion_description: "Novo tópico de discussão na sua disciplina"
     discussion_display: Discussão
@@ -9989,11 +10113,34 @@ pt:
     due_date_display: "Data de entrega"
     files_description: "Novo ficheiro adicionado à sua disciplina"
     files_display: Arquivos
+    grading_description: |-
+        Inclui:
+        
+        * Nota de tarefa/envio introduzida/alterada
+        * Nota de tarefa reativada
+        * Ponderação de nota alterada
+        
+        &nbsp;
+        
+        Marque a opção 'Incluir pontuações ao alertar sobre alteração de notas' se quiser ver as suas notas nas notificações.
+        Se o seu endereço de e-mail não for de uma instituição, isso significa que será enviado conteúdo sensível para fora da instituição.
     grading_display: Pontuação
     grading_notify_include_grade: "Inclua as pontuações ao me alertar sobre alteração de notas."
     grading_policies_description: "Alteração da política de avaliação da disciplina"
     grading_policies_display: "Políticas de avaliação"
+    invitation_description: |-
+        Convite para:
+        
+        * Conferência Web
+        * Grupo
+        * Colaboração
+        * Disciplina
+        * Revisão por colegas e lembrete
     invitation_display: Convite
+    late_grading_description: |-
+        *Apenas Instrutor e Administrador:*
+        
+        Envio de tarefa atrasado
     late_grading_display: "Avaliação atrasada"
     membership_update_description: |-
         *Apenas Administrador: inscrição pendente ativada*
@@ -10072,8 +10219,22 @@ pt:
       updated_wiki_page: "Atualizar página do wiki"
       web_conference_invitation: "Convite da webconferência"
     no_subject: "Sem assunto"
+    other_description: |-
+        *Apenas Instrutor e Administrador:*
+        
+        * Inscrição em disciplina
+        * Relatório criado
+        * Exportação de conteúdo
+        * Relatório de migração
+        * Nova conta de utilizador
+        * Registo de novo professor
+        * Novo grupo de alunos
     other_display: "Notificações administrativas"
     reminder_display: Lembrete
+    student_appointment_description: |-
+        *Apenas Instrutor e Administrador:*
+        
+        Inscrição de alunos para compromissos
     student_appointment_display: "Inscrições para compromissos de alunos"
     submission_comment_description: |-
         Comentário de envio de tarefa
@@ -10381,6 +10542,10 @@ pt:
       secret_description: "Este é o parâmetro %{parameter_name} que pode ser encontrado no arquivo config%{filename}."
     buttons: 
       saving: "A guardar..."
+    canvadocs_settings: 
+      labels: 
+        api_key: "Chave API"
+        base_url: "URL base"
     crocodoc: 
       description: "Crocodoc ativado como opção de pré-visualização de documentos"
       name: Crocodoc
@@ -11192,8 +11357,11 @@ pt:
   publish_icon_component: 
     publish: Publicar
     publish_click: "publicado, clique para anular a publicação"
+    published: Publicado
+    publishing: "A publicar..."
     unpublish: "Anular publicação"
     unpublish_click: "não publicado, clique para publicar"
+    unpublishing: "A anular a publicação..."
   publishable: 
     cant_unpublish: "Não é possível anular a publicação"
   publishableModuleItem: 
@@ -11318,6 +11486,11 @@ pt:
     quick_start_bar_view: 
       new: "Novo:"
   quiz: 
+    cancel: Cancelar
+    cant_unpublish_when_students_submit: "Não é possível anular a publicação se existirem envios de alunos"
+    delete: Eliminar
+    delete_quiz: "Eliminar teste"
+    quiz_regraded_your_score_not_affected: "Este teste foi reavaliado; a sua pontuação não foi afetada."
     regrade: 
       give_everyone_full_credit: "Atribuir pontuação total a todos nesta pergunta."
       no_scores_reduced: "Atribuir pontos por respostas corrigidas e respostas anteriormente corretas (*nenhuma pontuação será reduzida*)"
@@ -11325,6 +11498,34 @@ pt:
       regrade_options: "Opções de reavaliação *(para alunos que já responderam a esta pergunta):*"
       some_scores_reduced: "Atribuir pontos apenas pela resposta correta (*as pontuações de alguns alunos poderão ser reduzidas*)"
       update_question_without_regrading: "Atualizar pergunta sem reavaliar"
+    take_the_quiz: "Fazer o teste"
+    take_the_quiz_again: "Fazer o teste novamente"
+    take_the_survey: "Fazer o questionário"
+    take_the_survey_again: "Fazer o questionário novamente"
+    warning: Aviso
+  quiz_extend_time: 
+    extend_time: "Prolongar tempo"
+    now: agora
+  quiz_extensions: 
+    extensions_student: "Extensões para %{student}"
+    student_extensions: "Extensões do aluno"
+  quiz_index_row: 
+    cant_unpublish_when_students_submit: "Não é possível anular a publicação se existirem envios de alunos"
+    confirms: 
+      delete_quiz: "Tem a certeza de que pretende eliminar este teste?"
+    delete_quiz: "Eliminar teste"
+    edit_quiz: "Editar teste"
+  quiz_message_students: 
+    message_students_who: "Enviar mensagem aos alunos que..."
+  quiz_model: 
+    everyone: Todos
+    everyone_else: "Todos os outros"
+    graded_quiz: "Teste avaliado"
+    graded_survey: "Questionário avaliado"
+    keep_highest: Maior
+    keep_latest: "Mais recente"
+    practice_quiz: "Teste prático"
+    survey: Questionário
   quiz_reports: 
     quiz_report_generator: 
       download_report_name: "Transferir %{report_name}"
@@ -11332,6 +11533,24 @@ pt:
       generated_at_date_time: "Criado %{dateAndTime}"
       generating_report_name: "A criar %{report_name}..."
       item_analysis_not_available: "A análise de item não está disponível para questionários"
+  quiz_route: 
+    that_quiz_has_been_deleted: "Este teste foi eliminado"
+  quiz_statistics: 
+    item_analysis: "Análise de item"
+    no_answer: "Sem resposta"
+    student_analysis: "Análise de aluno"
+  quiz_statistics_route: 
+    quiz_statistics: Estatísticas
+  quiz_statistics_title: "Estatísticas do teste"
+  quiz_submission_arrows: 
+    answers: 
+      correct: Correto!
+      correct_answers: "Respostas corretas"
+      incorrect: Incorreto
+      partial: Parcial
+      right: "Resposta correta"
+      unanswered: "Sem resposta"
+      you_answered: Respondeu
   quizzes: 
     after_last_attempt: "Após a última tentativa"
     alerts: 
@@ -12242,6 +12461,7 @@ pt:
       submission_versions: 
         attempt: Tentativa
         attempt_history: "Histórico de tentativas"
+        questions_not_graded: "Algumas perguntas ainda sem nota"
         quiz_attempt_history_description: "Tabela que mostra o seu histórico de tentativas de teste. Cada tentativa aparece no lado esquerdo. A tentativa, o tempo e a pontuação aparecem na parte superior. "
         regraded: Reavaliado
         score: Pontuação
@@ -12412,6 +12632,10 @@ pt:
       other: "%{count} perguntas"
   quizzes_redirects: 
     no_access: "Acesso negado. Redirecionado para uma página à qual tem acesso."
+  quizzes_route: 
+    quizzes_route_title: Testes
+  quizzez_submission_row: 
+    unlimited: Ilimitado
   re_upload_submissions_form: 
     buttons: 
       upload: "Enviar arquivos (upload)"
@@ -12564,6 +12788,8 @@ pt:
     update_failed_notice: "Falha na criação de função."
   roles: 
     account_admin: "Administrador de conta"
+    new_role: 
+      add: Adicionar
     permission_button: 
       rolebutton: 
         disable: Desativar
@@ -12571,6 +12797,7 @@ pt:
         enable: Ativar
         enable_and_lock: "Ativar e bloquear"
         use_default: "Utilizar predefinição"
+    permissions: Permissões
   roster: 
     delete_confirm: "Tem a certeza de que pretende remover este utilizador?"
     error_sending_invitations: "Erro ao enviar o convite. Tente novamente."
@@ -12607,6 +12834,7 @@ pt:
         add_rubric: "Adicionar protocolo"
       course_rubrics: "Protocolos da disciplina"
       delete_rubric: "Excluir protocolo"
+      edit_rubric: "Editar protocolo"
       page_title: Protocolos
       points_possible: 
         one: "1 ponto possível"
@@ -13717,6 +13945,7 @@ pt:
       plain_view: "Exibição em texto simples"
       preview_crocodoc_document: "Pré-visualizar o envio e ver observações do professor, se disponíveis"
       preview_scribd_document: "Pré-visualizar o envio"
+      preview_submission: "Pré-visualizar o envio"
       preview_title: "Pré-visualização de %{title}"
       quiz_submission: "Este envio era a entrega de um teste. Redirecionar à página do teste"
       show_entire_discussion: "Exibir toda a discussão"
@@ -13757,6 +13986,8 @@ pt:
     assignments: Tarefas
     collaborations: Colaborações
     conferences: Conferências
+    course_assignments: "Tarefas da disciplina"
+    course_settings: "Definições de disciplina"
     discussions: Discussões
     eportfolios: ePortfolios
     files: Arquivos
@@ -13871,6 +14102,10 @@ pt:
       image_url_field_label: "URL da imagem"
       image_width: "Largura da imagem"
       url: URL
+  title: 
+    edit_topic: "Editar tópico de discussão"
+    new_announcement: "Novo anúncio"
+    new_topic: "Novo tópico de discussão"
   title_separator: ": "
   titles: 
     aligned_items: "Itens alinhados"
@@ -13891,6 +14126,8 @@ pt:
     people: Pessoas
     view_in_separate_window: "Ver numa janela separada"
   tooltips: 
+    finished: finalizado
+    incomplete: incompleto
     vdd: 
       more_message: "e mais %{count}..."
   tours: 
