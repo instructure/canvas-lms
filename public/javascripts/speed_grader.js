@@ -882,10 +882,9 @@ define([
 
       $multiple_submissions.change(function(e) {
         if (typeof EG.currentStudent.submission == 'undefined') EG.currentStudent.submission = {};
-        var i = e.target.value ?
-          parseInt(e.target.value, 10) :
-          EG.currentStudent.submission.submission_history.length - 1;
-        EG.currentStudent.submission.currentSelectedIndex = i;
+        var i = $("#submission_to_view").val() ||
+                EG.currentStudent.submission.submission_history.length - 1;
+        EG.currentStudent.submission.currentSelectedIndex = parseInt(i, 10);
         EG.handleSubmissionSelectionChange();
       });
 
@@ -1216,6 +1215,9 @@ define([
 
       if (submissionHistory.length > 0) {
         var noSubmittedAt = I18n.t('no_submission_time', 'no submission time');
+        var selectedIndex = parseInt($("#submission_to_view").val() ||
+                                       submissionHistory.length - 1,
+                                     10);
         var templateSubmissions = _(submissionHistory).map(function(o, i) {
           var s = o.submission;
           if (s.grade && (s.grade_matches_current_submission ||
@@ -1225,11 +1227,12 @@ define([
           return {
             value: s.version || i,
             late: s.late,
+            selected: selectedIndex === i,
             submittedAt: $.datetimeString(s.submitted_at) || noSubmittedAt,
             grade: grade
           };
         });
-        _(templateSubmissions).last().selected = true;
+
         innerHTML = submissionsDropdownTemplate({
           singleSubmission: submissionHistory.length == 1,
           submissions: templateSubmissions,
