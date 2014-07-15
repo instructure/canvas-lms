@@ -276,52 +276,156 @@ describe Assignment do
     end
   end
 
-  describe "students_with_visibility" do
-    before do
-      @course = course(:active_course => true)
-      @course_section = @course.course_sections.create
-      @student1 = User.create
-      @student2 = User.create
-      @student3 = User.create
-      @assignment = Assignment.create!(title: "title", context: @course, only_visible_to_overrides: true)
-      @course.enroll_student(@student2, :enrollment_state => 'active')
-      @section = @course.course_sections.create!(name: "test section")
-      student_in_section(@section, user: @student1)
-      create_section_override_for_assignment(@assignment, {course_section: @section})
-      @course.reload
+  context "differentiated_assignment visibility" do
+
+    def setup_DA
+        @course = course(:active_course => true)
+        @course_section = @course.course_sections.create
+        @student1, @student2, @student3 = (1..3).map{User.create}
+        @assignment = Assignment.create!(title: "title", context: @course, only_visible_to_overrides: true)
+        @course.enroll_student(@student2, :enrollment_state => 'active')
+        @section = @course.course_sections.create!(name: "test section")
+        @section2 = @course.course_sections.create!(name: "second test section")
+        student_in_section(@section, user: @student1)
+        create_section_override_for_assignment(@assignment, {course_section: @section})
+        @course.reload
     end
 
-    context "draft state off" do
-      before {@course.disable_feature!(:draft_state)}
-      it "should return all active assignments" do
-
-        @assignment.students_with_visibility.include?(@student1).should be_true
-        @assignment.students_with_visibility.include?(@student2).should be_true
-      end
-    end
-
-    context "draft state on" do
-      before {@course.enable_feature!(:draft_state)}
-      context "differentiated_assignment on" do
-        before {@course.enable_feature!(:differentiated_assignments)}
-        it "should return assignments only when a student has overrides" do
-          @assignment.students_with_visibility.include?(@student1).should be_true
-          @assignment.students_with_visibility.include?(@student2).should be_false
-        end
-
-        it "should not return students outside the class" do
-          @assignment.students_with_visibility.include?(@student3).should be_false
-        end
+    describe "students_with_visibility" do
+      before do
+        setup_DA
       end
 
-      context "differentiated_assignment off" do
-        before {@course.disable_feature!(:differentiated_assignments)}
-        it "should return all published assignments" do
+      context "draft state off" do
+        before {@course.disable_feature!(:draft_state)}
+        it "should return all active assignments" do
           @assignment.students_with_visibility.include?(@student1).should be_true
           @assignment.students_with_visibility.include?(@student2).should be_true
         end
       end
+
+      context "draft state on" do
+        before {@course.enable_feature!(:draft_state)}
+        context "differentiated_assignment on" do
+          before {@course.enable_feature!(:differentiated_assignments)}
+          it "should return assignments only when a student has overrides" do
+            @assignment.students_with_visibility.include?(@student1).should be_true
+            @assignment.students_with_visibility.include?(@student2).should be_false
+          end
+
+          it "should not return students outside the class" do
+            @assignment.students_with_visibility.include?(@student3).should be_false
+          end
+        end
+
+        context "differentiated_assignment off" do
+          before {@course.disable_feature!(:differentiated_assignments)}
+          it "should return all published assignments" do
+            @assignment.students_with_visibility.include?(@student1).should be_true
+            @assignment.students_with_visibility.include?(@student2).should be_true
+          end
+        end
+      end
     end
+
+    describe "visible_to_observer?" do
+      before do
+        setup_DA
+        @course.enable_feature!(:draft_state)
+        @course.enable_feature!(:differentiated_assignments)
+        @observer = User.create
+      end
+
+      context "user_is_not_an_observer" do
+        it "should not be visible" do
+          @assignment.visible_to_observer?(@student1).should be_false
+        end
+      end
+
+      context "differentiated_assignment on" do
+        context "observing only a section with visibility" do
+          before do
+            @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section, :enrollment_state => 'active')
+          end
+          it "should be visible" do
+            @assignment.visible_to_observer?(@observer).should be_true
+          end
+        end
+
+        context "observing a student with visibility" do
+          before do
+            @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active')
+            @observer_enrollment.update_attribute(:associated_user_id, @student1.id)
+          end
+          it "should be visible" do
+            @assignment.visible_to_observer?(@observer).should be_true
+          end
+        end
+
+        context "without a student or section with visibility" do
+          before do
+            @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active')
+            @observer_enrollment.update_attribute(:associated_user_id, @student2.id)
+          end
+          it "should not be visible" do
+            @assignment.visible_to_observer?(@observer).should be_false
+          end
+        end
+
+        context "observing two students, one with visibility" do
+          before do
+            @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active', :associated_user_id => @student1.id)
+            @course.enroll_user(@observer, "ObserverEnrollment", {:allow_multiple_enrollments => true, :associated_user_id => @student2.id})
+          end
+          it "should not be visible" do
+            @assignment.visible_to_observer?(@observer).should be_true
+          end
+        end
+
+        context "observing two students, neither with visibility" do
+          before do
+            @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active', :associated_user_id => @student3.id)
+            @course.enroll_user(@observer, "ObserverEnrollment", {:allow_multiple_enrollments => true, :associated_user_id => @student2.id})
+          end
+          it "should not be visible" do
+            @assignment.visible_to_observer?(@observer).should be_false
+          end
+        end
+      end
+
+      context "differentiated_assignment off" do
+        before { @course.disable_feature!(:differentiated_assignments) }
+        context "observing only a section with visibility" do
+          before do
+            @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section, :enrollment_state => 'active')
+          end
+          it "should be visible" do
+            @assignment.visible_to_observer?(@observer).should be_true
+          end
+        end
+
+        context "observing a student with visibility" do
+          before do
+            @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active')
+            @observer_enrollment.update_attribute(:associated_user_id, @student1.id)
+          end
+          it "should be visible" do
+            @assignment.visible_to_observer?(@observer).should be_true
+          end
+        end
+
+        context "without a student or section with visibility" do
+          before do
+            @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active')
+            @observer_enrollment.update_attribute(:associated_user_id, @student2.id)
+          end
+          it "should be visible" do
+            @assignment.visible_to_observer?(@observer).should be_true
+          end
+        end
+      end
+    end
+
   end
 
   context "grading" do

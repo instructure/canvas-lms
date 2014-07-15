@@ -603,6 +603,31 @@ class Assignment < ActiveRecord::Base
     end
   end
 
+  def visible_to_user?(user)
+    return true if context.grants_any_right?(user, :read_as_admin, :manage_grades)
+    visible_to_observer?(user) || students_with_visibility.pluck(:id).include?(user.id)
+  end
+
+  def visible_to_observer?(user)
+    return false unless context.user_has_been_observer?(user)
+    return true if !differentiated_assignments_applies? && self.grants_right?(user, :read)
+
+    visible_student_ids = students_with_visibility.pluck(:id)
+    observed_students = ObserverEnrollment.observed_students(context, user)
+
+    has_visible_students = observed_students.any?{ |student, enrollments|
+      visible_student_ids.include?(student.id)
+    }
+
+    # if the observer has any students, don't make decision based on section enrollments
+    return has_visible_students if observed_students.any?
+
+    enrollment_section_ids = context.observer_enrollments.for_user(user).pluck(:course_section_id)
+    has_visible_sections = self.active_assignment_overrides.where(:set_type => 'CourseSection').map(&:set_id).any?{ |ao_section_id|
+      enrollment_section_ids.include?(ao_section_id)
+    }
+  end
+
   attr_accessor :saved_by
   def process_if_quiz
     if self.submission_types == "online_quiz"

@@ -226,6 +226,15 @@ class SubmissionsController < ApplicationController
     js_env(hash)
 
     @submission = @assignment.submissions.where(user_id: @user).first
+
+    if @submission && !@assignment.visible_to_user?(@current_user)
+      respond_to do |format|
+        flash[:error] = t 'notices.submission_not_availible', "The assignment you requested is no longer availible to your course section. Prior submissions will not count towards your grade."
+        format.html { redirect_to named_context_url(@context, :context_assignments_url) }
+      end
+      return
+    end
+
     @submission ||= @assignment.submissions.build(:user => @user)
     @rubric_association = @assignment.rubric_association
     @rubric_association.assessing_user_id = @submission.user_id if @rubric_association
