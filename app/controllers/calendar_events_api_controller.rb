@@ -737,7 +737,34 @@ class CalendarEventsApiController < ApplicationController
       conditions << 'published'
     end
 
-    Assignment.where([sql.join(' OR ')] + conditions)
+    scope = Assignment.where([sql.join(' OR ')] + conditions)
+    return scope unless @current_user
+
+    student_ids = [@current_user.id]
+    courses_to_not_filter = []
+
+    # all assignments visible to an observers students should be visible to an observer
+    @current_user.observer_enrollments.each do |e|
+      course_student_ids = ObserverEnrollment.observed_student_ids(e.course, @current_user)
+      if course_student_ids.any?
+        student_ids.concat course_student_ids
+      else
+        # in courses without any observed students, observers can see all published assignments
+        courses_to_not_filter << e.course_id
+      end
+    end
+
+    courses_to_filter_assignments = other.
+      # context can sometimes be a user, so must filter those out
+      select{|context| context.is_a? Course }.
+      reject{|course|
+       !course.feature_enabled?(:differentiated_assignments) ||
+       courses_to_not_filter.include?(course.id)
+      }
+
+    # in courses with diff assignments on, only show the visible assignments
+    scope = scope.filter_by_visibilities_in_given_courses(student_ids, courses_to_filter_assignments.map(&:id))
+    scope
   end
 
   def calendar_event_scope

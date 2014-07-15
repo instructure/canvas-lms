@@ -609,19 +609,19 @@ class Assignment < ActiveRecord::Base
     return true if !differentiated_assignments_applies? && self.grants_right?(user, :read)
 
     visible_student_ids = students_with_visibility.pluck(:id)
-    observed_students = ObserverEnrollment.observed_students(context, user)
 
-    has_visible_students = observed_students.any?{ |student, enrollments|
-      visible_student_ids.include?(student.id)
-    }
+    observed_students_ids = ObserverEnrollment.observed_student_ids(context, user)
 
-    # if the observer has any students, don't make decision based on section enrollments
-    return has_visible_students if observed_students.any?
+    # observers can be students as well, so their own assignments must be included
+    if user.student_enrollments.where(course_id: self.context_id).any?
+      observed_student_ids << user.id
+    end
 
-    enrollment_section_ids = context.observer_enrollments.for_user(user).pluck(:course_section_id)
-    has_visible_sections = self.active_assignment_overrides.where(:set_type => 'CourseSection').map(&:set_id).any?{ |ao_section_id|
-      enrollment_section_ids.include?(ao_section_id)
-    }
+    # if the observer doesn't have students, show them published assignments
+    has_visible_students = (observed_students_ids & visible_student_ids).any?
+    return has_visible_students if observed_students_ids.any?
+
+    self.published?
   end
 
   attr_accessor :saved_by
@@ -1588,6 +1588,24 @@ class Assignment < ActiveRecord::Base
   scope :visible_to_student_in_course_with_da, lambda { |user_id, course_id|
     joins(:assignment_student_visibilities).
     where(:assignment_student_visibilities => { :user_id => user_id, :course_id => course_id })
+  }
+
+  # course_ids should be courses that restrict visibility based on overrides
+  # ie: courses with differentiated assignments on or in which the user is not a teacher
+  scope :filter_by_visibilities_in_given_courses, lambda { |user_ids, course_ids|
+    if course_ids.nil? || course_ids.empty?
+      active
+    else
+      joins(:assignment_student_visibilities).
+      where("""
+        (assignments.context_id NOT IN (?)
+        AND assignments.workflow_state<>'deleted')
+        OR (
+          assignment_student_visibilities.user_id IN (?)
+          AND assignment_student_visibilities.course_id IN (?)
+        )
+      """, course_ids, user_ids, course_ids)
+    end
   }
 
   scope :due_before, lambda { |date| where("assignments.due_at<?", date) }

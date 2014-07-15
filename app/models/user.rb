@@ -1340,8 +1340,25 @@ class User < ActiveRecord::Base
   end
 
   def assignments_visibile_in_course(course)
+    return course.active_assignments if course.grants_any_right?(self, :read_as_admin, :manage_grades)
     if course.feature_enabled?(:differentiated_assignments)
-      course.active_assignments.visible_to_student_in_course_with_da(self.id, course.id)
+      return assignments_visible_as_observer(course) if course.user_has_been_observer?(self)
+      course.active_assignments.published.visible_to_student_in_course_with_da(self.id, course.id)
+    else
+      course.active_assignments.published
+    end
+  end
+
+  def assignments_visible_as_observer(course)
+    return [] unless course.user_has_been_observer?(self)
+
+    observed_student_ids = ObserverEnrollment.observed_student_ids(course, self)
+    if self.student_enrollments.any?
+      observed_student_ids.concat self.student_enrollments.pluck(:user_id)
+    end
+
+    if course.feature_enabled?(:differentiated_assignments) && observed_student_ids.any?
+      course.active_assignments.visible_to_student_in_course_with_da(observed_student_ids, course.id)
     else
       course.active_assignments
     end
@@ -1366,7 +1383,10 @@ class User < ActiveRecord::Base
           due_after = opts[:due_after] || 4.weeks.ago
 
           result = Shard.partition_by_shard(course_ids) do |shard_course_ids|
+            courses = Course.find(shard_course_ids)
+            courses_with_da = courses.select{|c| c.feature_enabled?(:differentiated_assignments)}
             Assignment.for_course(shard_course_ids).
+              filter_by_visibilities_in_given_courses(self.id, courses_with_da.map(&:id)).
               published.
               due_between_with_overrides(due_after,1.week.from_now).
               not_ignored_by(self, 'submitting').

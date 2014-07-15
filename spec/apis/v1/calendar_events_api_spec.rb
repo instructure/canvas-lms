@@ -919,6 +919,101 @@ describe CalendarEventsApiController, type: :request do
       end
     end
 
+    context 'differentiated assignments on' do
+      before :once do
+        course_with_teacher(:active_course => true, :active_enrollment => true, :user => @teacher)
+        @course.enable_feature!(:differentiated_assignments)
+
+        @student_in_overriden_section = User.create
+        @student_in_general_section = User.create
+
+        @course.enroll_student(@student_in_general_section, :enrollment_state => 'active')
+        @section = @course.course_sections.create!(name: "test section")
+        student_in_section(@section, user: @student_in_overriden_section)
+
+
+        @only_vis_to_o, @not_only_vis_to_o = (1..2).map{@course.assignments.create(:title => 'test assig', :workflow_state => 'published',:due_at => '2012-01-07 12:00:00')}
+        @only_vis_to_o.only_visible_to_overrides = true
+        @only_vis_to_o.save!
+        [@only_vis_to_o, @not_only_vis_to_o].each { |a| a.workflow_state = 'published'; a.save! }
+
+        create_section_override_for_assignment(@only_vis_to_o, {course_section: @section})
+      end
+
+
+      context 'as a student' do
+        it "only shows events for visible assignments" do
+          json = api_call_as_user(@student_in_overriden_section, :get, "/api/v1/calendar_events?type=assignment&start_date=2011-01-08&end_date=2015-01-08&context_codes[]=course_#{@course.id}", {
+            :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+            :context_codes => ["course_#{@course.id}"], :start_date => '2011-01-08', :end_date => '2015-01-08'})
+          json.size.should eql 2
+
+
+          json = api_call_as_user(@student_in_general_section, :get, "/api/v1/calendar_events?type=assignment&start_date=2011-01-08&end_date=2015-01-08&context_codes[]=course_#{@course.id}", {
+            :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+            :context_codes => ["course_#{@course.id}"], :start_date => '2011-01-08', :end_date => '2015-01-08'})
+          json.size.should eql 1
+        end
+      end
+
+      context 'as an observer' do
+        before do
+          @observer = User.create
+          @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active', :allow_multiple_enrollments => true)
+        end
+        context 'following a student with visibility' do
+          before{ @observer_enrollment.update_attribute(:associated_user_id, @student_in_overriden_section.id) }
+          it "only shows events for assignments visible to that student" do
+            json = api_call_as_user(@observer, :get, "/api/v1/calendar_events?type=assignment&start_date=2011-01-08&end_date=2015-01-08&context_codes[]=course_#{@course.id}", {
+              :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+              :context_codes => ["course_#{@course.id}"], :start_date => '2011-01-08', :end_date => '2015-01-08'})
+            json.size.should eql 2
+          end
+        end
+
+        context 'following two students with visibility' do
+          before do
+            @observer_enrollment.update_attribute(:associated_user_id, @student_in_overriden_section.id)
+            student_in_section(@section, user: @student_in_general_section)
+            @course.enroll_user(@observer, "ObserverEnrollment", {:allow_multiple_enrollments => true, :associated_user_id => @student_in_general_section.id})
+          end
+          it "doesnt show duplicate events" do
+            json = api_call_as_user(@observer, :get, "/api/v1/calendar_events?type=assignment&start_date=2011-01-08&end_date=2015-01-08&context_codes[]=course_#{@course.id}", {
+              :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+              :context_codes => ["course_#{@course.id}"], :start_date => '2011-01-08', :end_date => '2015-01-08'})
+            json.size.should eql 2
+          end
+        end
+
+        context 'following a student without visibility' do
+          before{ @observer_enrollment.update_attribute(:associated_user_id, @student_in_general_section.id) }
+          it "only shows events for assignments visible to that student" do
+            json = api_call_as_user(@observer, :get, "/api/v1/calendar_events?type=assignment&start_date=2011-01-08&end_date=2015-01-08&context_codes[]=course_#{@course.id}", {
+              :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+              :context_codes => ["course_#{@course.id}"], :start_date => '2011-01-08', :end_date => '2015-01-08'})
+            json.size.should eql 1
+          end
+        end
+        context 'in a section only' do
+          it "shows events for all active assignment" do
+            json = api_call_as_user(@observer, :get, "/api/v1/calendar_events?type=assignment&start_date=2011-01-08&end_date=2015-01-08&context_codes[]=course_#{@course.id}", {
+              :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+              :context_codes => ["course_#{@course.id}"], :start_date => '2011-01-08', :end_date => '2015-01-08'})
+            json.size.should eql 2
+          end
+        end
+      end
+
+      context 'as a teacher' do
+        it "shows events for all active assignment" do
+            json = api_call_as_user(@teacher, :get, "/api/v1/calendar_events?type=assignment&start_date=2011-01-08&end_date=2015-01-08&context_codes[]=course_#{@course.id}", {
+              :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
+              :context_codes => ["course_#{@course.id}"], :start_date => '2011-01-08', :end_date => '2015-01-08'})
+            json.size.should eql 2
+        end
+      end
+    end
+
     context 'all assignments' do
       before :once do
         @course.assignments.create(:title => 'undated')

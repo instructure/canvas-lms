@@ -278,6 +278,7 @@ describe Assignment do
   context "differentiated_assignment visibility" do
 
     def setup_DA
+      @course = course(:active_course => true)
       @course_section = @course.course_sections.create
       @student1, @student2, @student3 = create_users(3, return_type: :record)
       @assignment = Assignment.create!(title: "title", context: @course, only_visible_to_overrides: true)
@@ -341,9 +342,9 @@ describe Assignment do
       end
 
       context "differentiated_assignment on" do
-        context "observing only a section with visibility" do
+        context "observing only a section (with or without an override)" do
           before do
-            @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section, :enrollment_state => 'active')
+            @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active')
           end
           it "should be visible" do
             @assignment.visible_to_observer?(@observer).should be_true
@@ -360,7 +361,7 @@ describe Assignment do
           end
         end
 
-        context "without a student or section with visibility" do
+        context "observing a student without visibility" do
           before do
             @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active')
             @observer_enrollment.update_attribute(:associated_user_id, @student2.id)

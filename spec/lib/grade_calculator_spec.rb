@@ -366,27 +366,15 @@ describe GradeCalculator do
       @user.enrollments.first.computed_final_score.should eql(48.4)
     end
 
-    context "draft state" do
-      it "should not include unpublished assignments when draft state is enabled" do
-        two_graded_assignments
+    it "should not include unpublished assignments" do
+      two_graded_assignments
 
-        @course.account.enable_feature!(:draft_state)
-        @assignment2.unpublish
+      @course.enable_feature!(:draft_state)
+      @assignment2.unpublish
 
-        @user.reload
-        @user.enrollments.first.computed_current_score.should eql(40.0)
-        @user.enrollments.first.computed_final_score.should eql(40.0)
-      end
-
-      it "should include unpublished assignments when draft state is disabled" do
-        two_graded_assignments
-
-        @assignment2.unpublish
-
-        @user.reload
-        @user.enrollments.first.computed_current_score.should eql(60.0)
-        @user.enrollments.first.computed_final_score.should eql(60.0)
-      end
+      @user.reload
+      @user.enrollments.first.computed_current_score.should eql(40.0)
+      @user.enrollments.first.computed_final_score.should eql(40.0)
     end
   end
 
