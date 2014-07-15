@@ -33,7 +33,7 @@ unless SHARDING_ENABLED
   unless CANVAS_RAILS2
     RSpec.configure do |config|
       config.before :all do
-        Shard.default.destroy
+        Shard.default.destroy if Shard.default.is_a?(Shard)
         Shard.default(true)
       end
     end
