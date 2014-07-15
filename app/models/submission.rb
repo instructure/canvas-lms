@@ -620,6 +620,7 @@ class Submission < ActiveRecord::Base
     attachment_ids_by_submission = Hash[
       submissions.map { |s|
         attachment_ids = (s.attachment_ids || "").split(",").map(&:to_i)
+        attachment_ids << s.attachment_id if s.attachment_id
         [s, attachment_ids]
       }
     ]

@@ -986,6 +986,10 @@ describe Submission do
   end
 
   describe "#bulk_load_versioned_attachments" do
+    def ensure_attachments_arent_queried
+      Attachment.expects(:where).never
+    end
+
     it "loads attachments for many submissions at once" do
       attachments = []
 
@@ -1000,9 +1004,23 @@ describe Submission do
       }
 
       Submission.bulk_load_versioned_attachments(submissions)
+      ensure_attachments_arent_queried
       submissions.each_with_index { |s, i|
         s.versioned_attachments.should == attachments[i]
       }
+    end
+
+    it "includes url submission attachments" do
+      student_in_course active_all: true
+      s = @assignment.submit_homework(@student,
+                                      submission_type: "online_url",
+                                      url: "http://example.com")
+      s.attachment = attachment_model(filename: "screenshot.jpg",
+                                      context: @student)
+
+      Submission.bulk_load_versioned_attachments([s])
+      ensure_attachments_arent_queried
+      s.versioned_attachments.should == [s.attachment]
     end
   end
 
