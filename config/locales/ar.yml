@@ -324,6 +324,69 @@ ar:
       student_grades: 
         description: 
           text: "يعرض هذا التقرير نتائج الدرجات النهائية للطلاب في فصل دراسي معين. وسيحتوي ملف CSV الناتج على صف واحد لكل تسجيل، كما سيُظهر الدرجة النهائية المعروضة في دفتر تقديرات المساق."
+    report_header_account_id: "معرف الحساب"
+    report_header_assessment_id: "معرف التقييم"
+    report_header_assessment_question: "سؤال التقييم"
+    report_header_assessment_question_id: "معرف سؤال التقييم"
+    report_header_assessment_title: "عنوان التقييم"
+    report_header_assessment_type: "نوع التقييم"
+    report_header_assignment_id: "معرف المهمة"
+    report_header_assignment_title: "عنوان المهمة"
+    report_header_assignment_url: "عنوان url للمهمة"
+    report_header_attempt: المحاولة
+    report_header_course: المساق
+    report_header_course__id: "معرف المساق"
+    report_header_course_id: "معرف المساق"
+    report_header_course_name: "اسم المساق"
+    report_header_course_sis: "sis للمساق"
+    report_header_course_sis_id: "معرف sis للمساق"
+    report_header_created_at: "تاريخ الإنشاء"
+    report_header_current_score: "الدرجة الحالية"
+    report_header_email: "البريد الإلكتروني"
+    report_header_end__date: "تاريخ الانتهاء"
+    report_header_end_date: "تاريخ الانتهاء"
+    report_header_enrollment_state: "حالة التسجيل"
+    report_header_final_score: "الدرجة النهائية"
+    report_header_first_name: "الاسم الأول"
+    report_header_group_id: "معرف المجموعة"
+    report_header_id: المعرف
+    report_header_last_access_at: "تاريخ آخر وصول"
+    report_header_last_ip: "آخر ip"
+    report_header_last_name: "الاسم الأخير"
+    report_header_learning_outcome_id: "معرف نتيجة التعلم"
+    report_header_learning_outcome_name: "اسم نتيجة التعلم"
+    report_header_login_id: "معرف تسجيل الدخول"
+    report_header_long__name: "الاسم الطويل"
+    report_header_long_name: "الاسم الطويل"
+    report_header_name: الاسم
+    report_header_outcome_score: "درجة التعلم"
+    report_header_role: الدور
+    report_header_section: القسم
+    report_header_section__id: "معرف القسم"
+    report_header_section_id: "معرف القسم"
+    report_header_section_name: "اسم القسم"
+    report_header_section_sis: "sis للقسم"
+    report_header_section_sis_id: "معرف sis للقسم"
+    report_header_short__name: "الاسم القصير"
+    report_header_short_name: "الاسم القصير"
+    report_header_sis_id: "معرف sis"
+    report_header_start__date: "تاريخ البدء"
+    report_header_start_date: "تاريخ البدء"
+    report_header_status: الحالة
+    report_header_student_id: "معرف الطالب"
+    report_header_student_name: "اسم الطالب"
+    report_header_student_sis: "sis للطالب"
+    report_header_student_sis_id: "معرف sis للطالب"
+    report_header_submission_date: "تاريخ الإرسال"
+    report_header_submission_score: "درجة الإرسال"
+    report_header_term: "الفصل الدراسي"
+    report_header_term__id: "معرف الفصل الدراسس"
+    report_header_term_id: "معرف الفصل الدراسي"
+    report_header_term_sis: "sis للفصل الدراسي"
+    report_header_user__id: "معرف المستخدم"
+    report_header_user_id: "معرف المستخدم"
+    report_header_user_name: "اسم المستخدم"
+    report_header_user_sis_id: "معرف sis للمستخدم"
     sis_exporter: 
       reports: "تقارير: %{files}"
     student: 
@@ -2387,6 +2450,7 @@ ar:
           سيشاهد الطلاب الملفات التي تم تعديلها في التعليقات الخاصة بهم فيما يتعلق بالإرسال.
           
           *تأكد من عدم تغيير أسماء ملفات الإرسال وذلك حتى نتمكن من التعرف عليها.*
+      speed_grader: SpeedGrader™
       titles: 
         related_items: "عناصر ذات صلة"
     grade_gpa_scale_screenreader: "الدرجة: %{grade}"
@@ -2968,6 +3032,8 @@ ar:
     masquerade: "إخفاء الاسم باعتبارك مستخدمًا"
     ok: موافق
     okay: موافق
+    publish: نشر
+    published: منشور
     refresh: تحديث
     save: حفظ
     search: بحث
@@ -2978,6 +3044,8 @@ ar:
     show_all_artifacts: "عرض كل الأدوات"
     submit: إرسال
     unmasquerade: "إيقاف إخفاء الأسماء"
+    unpublish: "إلغاء النشر"
+    unpublished: "غير منشور"
     update: تحديث
     view_account_roster: "عرض كشف الحساب"
     view_course_roster: "عرض كشف المساق"
@@ -4455,6 +4523,8 @@ ar:
       reorder_modules: "قم بسحب الوحدات لإعادة ترتيبها"
       unpublish: "عدم النشر"
     context_module_next: 
+      aria_labels: 
+        add_item: "إضافة محتوى"
       images: 
         alt: 
           incomplete: "غير مكتملة"
@@ -5492,6 +5562,7 @@ ar:
         delete: "حذف هذا المساق نهائيًا"
         export_content: "تصدير محتوى المساق"
         import: "استيراد المحتوى داخل المساق"
+        new_badge: جديد
         reset: "إعادة تعيين محتوى المساق"
         stats: "إحصاءات المساق"
         student_view: "عرض الطالب"
@@ -5525,6 +5596,8 @@ ar:
           syllabus: المناهج
       empty_body: "لا يوجد محتوى"
       front_page_not_set: "يجب تعيين الصفحة الأمامية أولاً"
+      headers: 
+        course_status: "حالة المساق"
       headings: 
         choose_home_page_title: "اختيار الصفحة الرئيسية"
         confirm_unenroll: "تأكيد إلغاء التسجيل"
@@ -6344,6 +6417,7 @@ ar:
       error_saving_reply: "*حدث خطأ*، الرجاء نشر ردك مرة أخرى لاحقًا"
       saving_reply: "يجري حفظ الرد..."
     reply_attachment: 
+      attachment_label: مرفق
       remove_attachment: إزالة
     reply_form: 
       attach_file: إرفاق
@@ -6827,7 +6901,7 @@ ar:
       links: 
         add_external_feed: "إضافة موجز خارجي"
       options: 
-        content_to_post: "--محتوى للنشر--"
+        content_to_post: "المحتوى المراد نشره"
         full_article: "مقال بالكامل"
         link_only: "ارتباط فقط"
         truncated: مقطوع
@@ -7286,6 +7360,7 @@ ar:
     edit_view_rubric: "عرض العنوان"
     errors: 
       select_an_option: "الرجاء تحديد خيار"
+    graded: "تم تقييم الدرجات"
     graded_by_me: "%{graded_time} بواسطتي"
     graded_then_resubmitted: "تم تقييم الدرجات، ثم تمت إعادة الإرسال (%{when})"
     gradee_index_of_total: "%{gradee} %{x} من %{y}"
@@ -7294,6 +7369,8 @@ ar:
     mute_assignment: "إخفاء المهمة"
     new_assessment: "[المهمة الجديدة]"
     no_submission_time: "لا يوجد وقت للإرسال"
+    not_graded: "لم يتم تقييم الدرجات"
+    not_submitted: "لم يتم الإرسال"
     nth_student: "طالب %{n}"
     portion_graded: "تم تقييم درجات %{x} / %{y}"
     show_all_details_button: "إظهار كل التفاصيل"
@@ -12470,6 +12547,15 @@ ar:
       right: "إجابة صحيحة"
       unanswered: "غير مجاب عنه"
       you_answered: "أنت أجبت"
+  quiz_submission_arrows: 
+    answers: 
+      correct: صحيح!
+      correct_answers: "إجابات صحيحة"
+      incorrect: "غير صحيح"
+      partial: جزئي
+      right: "إجابة صحيحة"
+      unanswered: "غير مجاب عنه"
+      you_answered: "أنت أجبت"
   quizzes: 
     after_last_attempt: "بعد المحاولة الأخيرة"
     alerts: 
@@ -13876,6 +13962,7 @@ ar:
         add_rubric: "إضافة العنوان"
       course_rubrics: "عناوين المساق"
       delete_rubric: "حذف العنوان"
+      edit_rubric: "تحرير العنوان"
       page_title: العناوين
       points_possible: 
         few: "%{count} من النقاط ممكنة"
