@@ -2,7 +2,7 @@ unless CANVAS_RAILS2
   Rails.application.config.to_prepare do
     Switchman::Shard.class_eval do
       class << self
-        alias :birth :default
+        alias :birth :default unless instance_methods.include?(:birth)
 
         def current_with_delayed_jobs(category=:default)
           if category == :delayed_jobs
