@@ -39,6 +39,7 @@ unless CANVAS_RAILS2
       before_save :encrypt_settings
 
       def settings
+        return {} unless self.class.columns_hash.key?('settings')
         s = super
         unless s.is_a?(Hash) || s.nil?
           s = s.unserialize
