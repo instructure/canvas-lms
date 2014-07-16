@@ -70,7 +70,7 @@ define([
   // if you're using it elsewhere
   $.raw = function(str) {
     str = new String(str);
-    str.htmlSafe = true;
+    str._icHTMLSafe = true;
     return str;
   }
 

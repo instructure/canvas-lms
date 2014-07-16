@@ -123,10 +123,10 @@ I18n.interpolate = function(message, options) {
       value = "[missing " + placeholder + " value]";
     }
     if (needsEscaping) {
-      if (!value.htmlSafe && !htmlSafe) {
+      if (!value._icHTMLSafe && !htmlSafe) {
         value = htmlEscape(value);
       }
-    } else if (value.htmlSafe || htmlSafe) {
+    } else if (value._icHTMLSafe || htmlSafe) {
       needsEscaping = true;
       message = htmlEscape(message);
     }

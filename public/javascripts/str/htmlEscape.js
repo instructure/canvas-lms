@@ -2,7 +2,7 @@ define(['INST', 'jquery'], function(INST, $) {
   var dummy = $('<div/>');
 
   var htmlEscape = function(str) {
-    return str && str.htmlSafe ?
+    return str && str._icHTMLSafe ?
       str.toString() :
       dummy.text(str).html();
   }
