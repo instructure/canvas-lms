@@ -21,6 +21,14 @@ require 'csv'
 class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
   CQS = CanvasQuizStatistics
 
+  # The question_data attributes that we'll expose with the question statistics
+  CQS_QuestionDataFields = %w[
+    id
+    question_type
+    question_text
+    position
+  ].map(&:to_sym).freeze
+
   include HtmlTextHelper
 
   def readable_type
@@ -301,7 +309,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
       #submissions from users
       for_users = quiz.context.student_ids
       scope = quiz.quiz_submissions.where(:user_id => for_users)
-      logged_out = quiz.quiz_submissions.logged_out
+      logged_out = quiz.quiz_submissions.logged_out.where('NOT was_preview')
 
       all_submissions = []
       all_submissions = prep_submissions scope
@@ -310,16 +318,13 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
   end
 
   def prep_submissions(submissions)
-    if includes_all_versions?
-      submissions = submissions.includes(:versions)
+    subs = submissions.includes(:versions).map do |qs|
+      includes_all_versions? ? qs.attempts.version_models : qs.attempts.kept
     end
-    submissions.map { |qs|
-      includes_all_versions? ?
-        qs.submitted_attempts :
-        [qs.latest_submitted_attempt].compact
-    }.flatten.
-    select { |s| s && s.completed? && s.submission_data.is_a?(Array) }.
-    sort_by(&:updated_at).reverse
+    subs = subs.flatten.compact.select do |s|
+      s.completed? && s.submission_data.is_a?(Array)
+    end
+    subs.sort_by(&:updated_at).reverse
   end
 
   def strip_html_answers(question)
@@ -360,13 +365,16 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
   #   "multiple_responses"=>false}],
   def stats_for_question(question, responses, legacy=true)
     if !legacy && CQS.can_analyze?(question)
+      output = {}
+
       # the gem expects all hash keys to be symbols:
       question = CQS::Util.deep_symbolize_keys(question.to_hash)
       responses = responses.map(&CQS::Util.method(:deep_symbolize_keys))
 
-      analysis = CQS.analyze(question, responses)
+      output.merge! question.slice(*CQS_QuestionDataFields)
+      output.merge! CQS.analyze(question, responses)
 
-      return question.merge(analysis).with_indifferent_access
+      return output
     end
 
     question[:responses] = 0

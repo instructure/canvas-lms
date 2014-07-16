@@ -233,6 +233,7 @@ describe QuizzesHelper do
       )
 
       html.should == %q|<input name="question_1" 'value=&#x27;&gt;&lt;script&gt;alert(&#x27;ha!&#x27;)&lt;/script&gt;&lt;img' readonly="readonly" aria-label='Fill in the blank, read surrounding text' />|
+      html.should be_html_safe
     end
 
     it 'should add an appropriate label' do
@@ -244,6 +245,19 @@ describe QuizzesHelper do
 
       html.should =~ /aria\-label/
       html.should =~ /Fill in the blank/
+    end
+  end
+
+  context "multiple_dropdowns_question" do
+    before do
+      def user_content(stuff); stuff; end # mock #user_content
+    end
+
+    it "should select the user's answer" do
+      html = multiple_dropdowns_question(question: { question_text: "some <select name='question_4'><option value='val'>val</option></select>"},
+                                         answer_list: ['val'])
+      html.should == "some <select name='question_4'><option value='val' selected>val</option></select>"
+      html.should be_html_safe
     end
   end
 

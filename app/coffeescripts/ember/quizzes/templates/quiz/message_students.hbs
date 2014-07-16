@@ -1,0 +1,43 @@
+{{#form-dialog
+  title=title
+  on-submit="submit"
+  submit-disabled=noRecipients
+  height=modalHeight
+  width=500
+  fix-dialog-buttons=false
+}}
+<div class="message-students-who-dialog">
+  <div class="field">
+    <label for="select-recipient-group">
+      {{#t 'recipients'}}Recipients{{/t}}
+    </label>
+    {{fast-select
+      items=recipientGroups
+      value=selectedRecipientGroup
+      class="input-xlarge"
+      valuePath="id"
+      labelPath="name"
+      id="select-recipient-group"
+    }}
+  </div>
+
+  <div class="recipients">
+    {{#if recipients.isFulfilled}}
+      {{#each recipients}}
+        <span class="label">{{shortName}}</span>
+      {{/each}}
+      <span class="more-label">
+        {{moreRecipientsLabel}}
+      </span>
+    {{else}}
+      <img src='/images/ajax-loader-medium-444.gif'/>
+      {{#t 'loading'}}Loading{{/t}}
+    {{/if}}
+  </div>
+
+  <label for="message-body">
+    {{#t 'message'}}Message{{/t}}
+  </label>
+  {{textarea value=messageBody id='message-body'}}
+</div>
+{{/form-dialog}}

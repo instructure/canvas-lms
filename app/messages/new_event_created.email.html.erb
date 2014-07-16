@@ -6,6 +6,12 @@
   <%= t('subject', 'New Event - %{event_title}, %{course_name}', :event_title => asset.title, :course_name => asset.context.name) %>
 <% end %>
 
+<% define_content :footer_link do %>
+  <a href="<%= content(:link) %>">
+    <%= t 'see_details', 'You can see details here' %>
+  </a>
+<% end %>
+
 <p><%= t('body', "There's a new event scheduled for %{course_name} that you should be aware of:", :course_name => asset.context.name) %></p>
 
 <p><strong><%= asset.title %></strong></p>
@@ -19,5 +25,3 @@
     <%= t('from_to_time', 'from %{start_date_time} to %{end_date_time}', :start_date_time => datetime_string(force_zone(asset.start_at)), :end_date_time => datetime_string(force_zone(asset.end_at))) %>
   <% end %>
 </em></p>
-
-<p><a href="<%= content :link %>"><%= t 'see_details', 'You can see details here' %></a></p>

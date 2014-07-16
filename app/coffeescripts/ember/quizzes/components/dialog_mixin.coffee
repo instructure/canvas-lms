@@ -42,6 +42,8 @@ define [
         position: @get('position')
         close: => @sendAction('_destroyAction')
 
+      @set("dialog", $el)
+
       uiDialog = $el
       .dialog('open')
       .data('dialog')
@@ -59,6 +61,11 @@ define [
         Em.run this, 'closeAndCancel'
 
     ).on 'didInsertElement'
+
+    adjustDimensions: (->
+      @get('dialog').dialog("option", "height", @get('height'))
+      @get('dialog').dialog("option", "width",  @get('width'))
+    ).observes('height', 'width')
 
     _close: ->
       @$().dialog 'close'

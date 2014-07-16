@@ -30,6 +30,7 @@ class AssignmentGroup < ActiveRecord::Base
 
   attr_readonly :context_id, :context_type
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course']
   acts_as_list scope: { context: self, workflow_state: 'available' }
   has_a_broadcast_policy
 

@@ -22,7 +22,7 @@ define [
       @discussionEntry = @el.closest '.discussion_entry'
       # required for non-threaded reply area at bottom of an entry block
       @discussionEntry = @el.closest '.entry' if @discussionEntry.length == 0
-      @form = @discussionEntry.find('form:first').submit preventDefault @submit
+      @form = @discussionEntry.find('form.discussion-reply-form:first').submit preventDefault @submit
       @textArea = @getEditingElement()
       @form.find('.cancel_button').click @hide
       @form.on 'click', '.toggle-wrapper a', (e) =>

@@ -1,16 +1,32 @@
 <p><%= t('account_reports.default.last_user_access.text',
          %{This report shows the last login for active users.}) %></p>
 
-<h3><%= t('account_reports.default.last_user_access.header', %{Example}) %></h3>
+<h3><%= t('#account_reports.default.description.header', %{Example}) %></h3>
 
 <table class="report_example">
   <thead>
-  <tr><th>user id</th><th>user sis id</th><th>user name</th>
-    <th>last access at</th><th>last ip</th></tr>
+  <tr>
+    <th><%= t('#account_reports.report_header_user_id', %{user id}) %></th>
+    <th><%= t('#account_reports.report_header_user_sis_id', %{user sis id}) %></th>
+    <th><%= t('#account_reports.report_header_user_name', %{user name}) %></th>
+    <th><%= t('#account_reports.report_header_last_access_at', %{last access at}) %></th>
+    <th><%= t('#account_reports.report_header_last_ip', %{last ip}) %></th>
+  </tr>
   </thead>
   <tbody>
-  <tr><td>smith, heather</td><td>423945</td><td>u96872</td>
-    <td>2012-12-21T11:54:34-07:00</td><td>10.10.0.55</td></tr>
-  <tr><td>smith, kacie</td><td>104837</td><td>u48956</td><td></td><td></td></tr>
+  <tr>
+    <td>smith, heather</td>
+    <td>423945</td>
+    <td>u96872</td>
+    <td>2012-12-21T11:54:34-07:00</td>
+    <td>10.10.0.55</td>
+  </tr>
+  <tr>
+    <td>smith, kacie</td>
+    <td>104837</td>
+    <td>u48956</td>
+    <td></td>
+    <td></td>
+  </tr>
   </tbody>
 </table>

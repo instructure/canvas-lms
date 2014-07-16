@@ -22,6 +22,7 @@ class WebConference < ActiveRecord::Base
   attr_accessible :title, :duration, :description, :conference_type, :user, :user_settings, :context
   attr_readonly :context_id, :context_type
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Group', 'Account']
   has_many :web_conference_participants
   has_many :users, :through => :web_conference_participants
   has_many :invitees, :through => :web_conference_participants, :source => :user, :conditions => ['web_conference_participants.participation_type = ?', 'invitee']
@@ -170,7 +171,7 @@ class WebConference < ActiveRecord::Base
   end
 
   def assign_uuid
-    self.uuid ||= CanvasUuid::Uuid.generate_securish_uuid
+    self.uuid ||= CanvasSlug.generate_securish_uuid
   end
   protected :assign_uuid
   
@@ -386,7 +387,7 @@ class WebConference < ActiveRecord::Base
     given { |user, session| self.users.include?(user) && self.cached_context_grants_right?(user, session, :read) && long_running? && active? }
     can :resume
 
-    given { |user, session| (self.respond_to?(:is_public) && self.is_public rescue false) }
+    given { |user| (self.respond_to?(:is_public) && self.is_public rescue false) }
     can :read and can :join
 
     given { |user, session| self.cached_context_grants_right?(user, session, :create_conferences) }

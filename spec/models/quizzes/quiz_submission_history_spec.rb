@@ -83,5 +83,17 @@ describe Quizzes::QuizSubmissionHistory do
         models.first.should be_a(Quizzes::QuizSubmission)
       end
     end
+
+    describe "#kept" do
+      it "should return the version of the submission that was kept" do
+        attempts = Quizzes::QuizSubmissionHistory.new(@submission)
+        attempts.length.should == 2
+
+        models = attempts.version_models
+        models.length.should == 2
+
+        attempts.kept.should == models.first
+      end
+    end
   end
 end

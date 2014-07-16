@@ -4,18 +4,13 @@ class ContextExternalTool < ActiveRecord::Base
 
   has_many :content_tags, :as => :content
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account']
   attr_accessible :privacy_level, :domain, :url, :shared_secret, :consumer_key, 
                   :name, :description, :custom_fields, :custom_fields_string,
                   :course_navigation, :account_navigation, :user_navigation,
                   :resource_selection, :editor_button, :homework_submission,
+                  :course_home_sub_navigation,
                   :config_type, :config_url, :config_xml, :tool_id
-
-  EXPORTABLE_ATTRIBUTES = [
-    :id, :context_id, :context_type, :domain, :url, :name, :description, :settings, :workflow_state, :created_at, :updated_at, :has_user_navigation, :has_course_navigation,
-    :has_account_navigation, :has_resource_selection, :has_editor_button, :cloned_item_id, :tool_id, :has_homework_submission
-  ]
-
-  EXPORTABLE_ASSOCIATIONS = [:content_tags, :context]
 
   validates_presence_of :context_id, :context_type, :workflow_state
   validates_presence_of :name, :consumer_key, :shared_secret
@@ -44,7 +39,7 @@ class ContextExternalTool < ActiveRecord::Base
     can :read and can :update and can :delete
   end
   
-  EXTENSION_TYPES = [:user_navigation, :course_navigation, :account_navigation, :resource_selection, :editor_button, :homework_submission, :migration_selection]
+  EXTENSION_TYPES = [:user_navigation, :course_navigation, :account_navigation, :resource_selection, :editor_button, :homework_submission, :migration_selection, :course_home_sub_navigation]
   def url_or_domain_is_set
     setting_types = EXTENSION_TYPES
     # url or domain (or url on canvas lti extension) is required
@@ -248,6 +243,18 @@ class ContextExternalTool < ActiveRecord::Base
     extension_setting(:migration_selection, setting)
   end
 
+  def course_home_sub_navigation=(hash)
+    tool_setting(:course_home_sub_navigation, hash, :icon_url) do |tool_settings|
+      if %w(members admins).include?(hash[:visibility])
+        tool_settings[:visibility] = hash[:visibility]
+      end
+    end
+  end
+
+  def course_home_sub_navigation(setting = nil)
+    extension_setting(:course_home_sub_navigation, setting)
+  end
+
   def icon_url=(i_url)
     settings[:icon_url] = i_url
   end
@@ -266,6 +273,10 @@ class ContextExternalTool < ActiveRecord::Base
   
   def shared_secret=(val)
     write_attribute(:shared_secret, val) unless val.blank?
+  end
+
+  def display_type(extension_type)
+    extension_setting(extension_type, :display_type) || 'in_context'
   end
 
   def extension_setting(type, property = nil)
@@ -493,9 +504,16 @@ class ContextExternalTool < ActiveRecord::Base
   
   scope :having_setting, lambda { |setting| setting ? where("has_#{setting.to_s}" => true) : scoped }
 
-  def self.find_for(id, context, type)
+  def self.find_for(id, context, type, raise_error=true)
     id = id[Api::ID_REGEX] if id.is_a?(String)
-    raise ActiveRecord::RecordNotFound unless id.present?
+    unless id.present?
+      if raise_error
+        raise ActiveRecord::RecordNotFound
+      else
+        return nil
+      end
+    end
+
     tool = context.context_external_tools.having_setting(type).find_by_id(id)
     if !tool && context.is_a?(Group)
       context = context.context
@@ -505,7 +523,8 @@ class ContextExternalTool < ActiveRecord::Base
       account_ids = context.account_chain_ids
       tool = ContextExternalTool.having_setting(type).find_by_context_type_and_context_id_and_id('Account', account_ids, id)
     end
-    raise ActiveRecord::RecordNotFound if !tool
+    raise ActiveRecord::RecordNotFound if !tool && raise_error
+
     tool
   end
   scope :active, where("context_external_tools.workflow_state<>'deleted'")
@@ -589,6 +608,7 @@ class ContextExternalTool < ActiveRecord::Base
 
     settings[setting][:url] = hash[:url] if hash[:url]
     settings[setting][:text] = hash[:text] if hash[:text]
+    settings[setting][:display_type] = hash[:display_type] if hash[:display_type]
     settings[setting][:custom_fields] = hash[:custom_fields] if hash[:custom_fields]
     settings[setting][:enabled] = Canvas::Plugin.value_to_boolean(hash[:enabled]) if hash.has_key?(:enabled)
     keys.each { |key| settings[setting][key] = hash[key] if hash.has_key?(key) }

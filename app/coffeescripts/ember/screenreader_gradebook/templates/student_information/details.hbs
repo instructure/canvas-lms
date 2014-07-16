@@ -1,0 +1,17 @@
+<div>
+  <strong>
+    {{#t 'secondary_id'}}Secondary ID:{{/t}}
+    <span class="secondary_id">
+      {{#if hideStudentNames}}
+        <em>{{#t 'hidden'}}hidden{{/t}}</em>
+      {{else}}
+        {{selectedStudent.login_id}}
+      {{/if}}
+    </span>
+  </strong>
+</div>
+<div>
+  <strong>
+    {{#t 'sections'}}Sections:{{/t}} {{selectedStudentSections}}
+  </strong>
+</div>

@@ -1,0 +1,58 @@
+<div id="student_information">
+  <div class="row">
+    <div class="span4">
+      <h2>{{#t 'student_info'}}Student Information{{/t}}</h2>
+    </div>
+    <div class="span8">
+      {{#if selectedStudent}}
+        <h3 class="student_selection">
+          {{#if hideStudentNames}}
+            {{selectedStudent.hiddenName}}
+          {{else}}
+          <a {{bind-attr href="studentUrl"}}>
+            {{selectedStudent.name}}
+          </a>
+          {{/if}}
+        </h3>
+        {{#if selectedStudent.isLoaded}}
+
+          {{partial "student_information/details"}}
+
+          {{#each column in custom_columns}}
+          {{
+            custom-column-cell
+            student=selectedStudent
+            column=column
+            dataForStudent=dataForStudent
+            on-column-save='columnUpdated'
+          }}
+          {{/each}}
+
+          <h4>{{#t 'grades'}}Grades{{/t}}</h4>
+
+          {{partial "student_information/assignment_groups"}}
+
+          {{
+            final-grade
+            student=selectedStudent
+            weighted_groups=groupsAreWeighted
+            gradingStandard=ENV.GRADEBOOK_OPTIONS.grading_standard
+          }}
+
+          {{#if showInvalidGroupWarning}}
+            <span class="text-error">
+              <i class="icon-warning"></i> {{invalidGroupsWarningPhrases}}
+            </span>
+          {{/if}}
+
+        {{else}}
+          <p>{{#t 'submissions_loading'}}Submissions for this student are still loading...{{/t}}</p>
+        {{/if}}
+      {{else}}
+        <p class="student_selection pad-box top-only">
+          {{#t "empty_student_selection"}}Select a student to view additional information here.{{/t}}
+        </p>
+      {{/if}}
+    </div>
+  </div>
+</div>

@@ -1,9 +1,17 @@
 <% define_content :link do %>
   <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.collaboration.context) %>/<%= asset.collaboration.context.class.base_ar_class.to_s.downcase.pluralize %>/<%= asset.collaboration.context_id %>/collaborations/<%= asset.collaboration.id %>
 <% end %>
+
 <% define_content :subject do %>
   <%= t :subject, "Collaboration Invitation: %{course_or_group}", :course_or_group => asset.collaboration.context.name %>
 <% end %>
+
+<% define_content :footer_link do %>
+  <a href="<%= content(:link) %>">
+    <%= t :link, "You can see the details here" %>
+  </a>
+<% end %>
+
 <p>
 <% if asset.collaboration.user %>
   <%= t :body_with_user,
@@ -26,5 +34,3 @@
 <p><%= t :change_profile_settings,
          "If that's the wrong email address for this type of collaboration, you'll need to change your profile settings or register with %{service}.",
          :service => asset.collaboration.service_name %></p>
-
-<p><a href="<%= content :link %>"><%= t :link, "You can see the details here" %></a></p>

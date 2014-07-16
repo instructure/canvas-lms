@@ -13,6 +13,8 @@ else
   routes = CanvasRails::Application.routes
 end
 
+full_path_glob = CANVAS_RAILS2 ? '/*full_path' : '(/*full_path)'
+
 routes.draw do
   resources :submission_comments, :only => :destroy
 
@@ -77,11 +79,12 @@ routes.draw do
       match 'inline_view' => 'files#show', :as => :inline_view, :inline => '1'
       match 'scribd_render' => 'files#scribd_render', :as => :scribd_render
       match 'contents' => 'files#attachment_content', :as => :attachment_content
-      match ':file_path' => 'files#show_relative', :as => :relative_path, :file_path => /.+/
       collection do
+        get "folder#{full_path_glob}", :controller => :files, :action => :ember_app, :format => false
         get :quota
         post :reorder
       end
+      match ':file_path' => 'files#show_relative', :as => :relative_path, :file_path => /.+/ #needs to stay below ember_app route
     end
   end
 
@@ -386,7 +389,6 @@ routes.draw do
     match 'copy' => 'courses#copy_course', :as => :copy_course, :via => :post
     concerns :media
     match 'user_notes' => 'user_notes#user_notes', :as => :user_notes
-    match 'switch_role/:role' => 'courses#switch_role', :as => :switch_role
     match 'details/sis_publish' => 'courses#sis_publish_status', :as => :sis_publish_status, :via => :get
     match 'details/sis_publish' => 'courses#publish_to_sis', :as => :publish_to_sis, :via => :post
     resources :user_lists, :only => :create
@@ -725,7 +727,8 @@ routes.draw do
   match 'calendar2' => 'calendars#show2', :as => :calendar2, :via => :get
   match 'course_sections/:course_section_id/calendar_events/:id' => 'calendar_events#show', :as => :course_section_calendar_event, :via => :get
   match 'switch_calendar/:preferred_calendar' => 'calendars#switch_calendar', :as => :switch_calendar, :via => :post
-  match 'files' => 'files#full_index', :as => :files, :via => :get
+  match 'files' => 'files#index', :as => :files, :via => :get
+  get "files/folder#{full_path_glob}", :controller => :files, :action => :ember_app, :format => false
   match 'files/s3_success/:id' => 'files#s3_success', :as => :s3_success
   match 'files/:id/public_url' => 'files#public_url', :as => :public_url
   match 'files/preflight' => 'files#preflight', :as => :file_preflight
@@ -837,8 +840,10 @@ routes.draw do
       post 'courses/:course_id/files', :action => :create_file, :path_name => 'course_create_file'
       post 'courses/:course_id/folders', :controller => :folders, :action => :create
       get 'courses/:course_id/folders/by_path/*full_path', :controller => :folders, :action => :resolve_path
+      get 'courses/:course_id/folders/by_path', :controller => :folders, :action => :resolve_path
       get  'courses/:course_id/folders/:id', :controller => :folders, :action => :show, :path_name => 'course_folder'
       put  'accounts/:account_id/courses', :action => :batch_update
+      post 'courses/:course_id/ping', :action => :ping, :path_name => 'course_ping'
     end
 
     scope(:controller => :tabs) do
@@ -1049,6 +1054,7 @@ routes.draw do
 
       post 'users/:user_id/folders', :controller => :folders, :action => :create
       get 'users/:user_id/folders/by_path/*full_path', :controller => :folders, :action => :resolve_path
+      get 'users/:user_id/folders/by_path', :controller => :folders, :action => :resolve_path
       get 'users/:user_id/folders/:id', :controller => :folders, :action => :show, :path_name => 'user_folder'
 
       get 'users/:id/settings', controller: 'users', action: 'settings'
@@ -1214,6 +1220,7 @@ routes.draw do
 
       post 'groups/:group_id/folders', :controller => :folders, :action => :create
       get 'groups/:group_id/folders/by_path/*full_path', :controller => :folders, :action => :resolve_path
+      get 'groups/:group_id/folders/by_path', :controller => :folders, :action => :resolve_path
       get 'groups/:group_id/folders/:id', :controller => :folders, :action => :show, :path_name => 'group_folder'
     end
 
@@ -1258,6 +1265,7 @@ routes.draw do
       delete 'files/:id', :action => :destroy
       put 'files/:id', :action => :api_update
       get 'files/:id/:uuid/status', :action => :api_file_status, :path_name => 'file_status'
+      get 'files/:id/public_url', :action => :public_url
       %w(course group user).each do |context|
         get "#{context}s/:#{context}_id/files/quota", :action => :api_quota
       end

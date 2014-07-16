@@ -1,4 +1,4 @@
-<div class="discussion-content">
+<div class="discussion-content" id="{{id}}_discussion_content">
   <div class="discussion-row{{#if ENV.permissions.publish}} {{#if published}}discussion-published{{else}}discussion-unpublished{{/if}}{{/if}}">
     {{#if permissions.moderate}}
       <div class="draggable-handle">
@@ -85,7 +85,7 @@
 
     <div class="discussion-actions" role="application">
       {{#if permissions.delete}}
-        <a href="#" class="al-trigger" role="button">
+        <a href="#" class="al-trigger" role="button" id="manage_link">
           <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
           <span class="screenreader-only">{{#t "manage"}}Manage{{/t}}</span>
         </a>

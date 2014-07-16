@@ -1,0 +1,17 @@
+<div class="row pad-box bottom-only">
+  <div class="span4">
+    <label for="arrange_assignments" class="text-right-responsive">
+      {{#t 'sort_assignments'}}Sort assignments{{/t}}
+    </label>
+  </div>
+  <div class="span8">
+    {{
+      fast-select
+      name="arrange_assignments"
+      id="arrange_assignments"
+      items=assignmentSortOptions
+      selected=assignmentSort
+      value=assignmentSort.value
+    }}
+  </div>
+</div>

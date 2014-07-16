@@ -1,8 +1,15 @@
 <% define_content :link do %>
   <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.context) %>/<%= asset.context_type.underscore.pluralize %>/<%= asset.context_id %>/calendar_events/<%= asset.id %>
 <% end %>
+
 <% define_content :subject do %>
   <%= t('subject', 'Event Date Changed: %{event_title}, %{course_name}', :event_title => asset.title, :course_name => asset.context.name) %>
+<% end %>
+
+<% define_content :footer_link do %>
+  <a href="<%= content(:link) %>">
+    <%= t 'see_details', 'You can see details here' %>
+  </a>
 <% end %>
 
 <p>
@@ -18,5 +25,3 @@
   <%= t('from_to_time', 'from %{start_date_time} to %{end_date_time}', :start_date_time => datetime_string(force_zone(asset.start_at)), :end_date_time => datetime_string(force_zone(asset.end_at))) %>
 <% end %>
 </em></p>
-
-<p><a href="<%= content :link %>"><%= t 'see_details', 'You can see details here' %></a></p>

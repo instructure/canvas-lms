@@ -160,7 +160,7 @@ describe Assignment do
       @assignment.reload
       @assignment.needs_grading_count.should eql(0)
     end
-  
+
     it "should update when enrollment changes" do
       setup_assignment_with_homework
       @assignment.needs_grading_count.should eql(1)
@@ -173,29 +173,29 @@ describe Assignment do
       e.accept
       @assignment.reload
       @assignment.needs_grading_count.should eql(1)
-  
+
       # multiple enrollments should not cause double-counting (either by creating as or updating into "active")
       section2 = @course.course_sections.create!(:name => 's2')
-      e2 = @course.enroll_student(@user, 
+      e2 = @course.enroll_student(@user,
                                   :enrollment_state => 'invited',
                                   :section => section2,
                                   :allow_multiple_enrollments => true)
       e2.accept
       section3 = @course.course_sections.create!(:name => 's2')
-      e3 = @course.enroll_student(@user, 
-                                  :enrollment_state => 'active', 
+      e3 = @course.enroll_student(@user,
+                                  :enrollment_state => 'active',
                                   :section => section3,
                                   :allow_multiple_enrollments => true)
       @user.enrollments.where(:workflow_state => 'active').count.should eql(3)
       @assignment.reload
       @assignment.needs_grading_count.should eql(1)
-  
+
       # and as long as one enrollment is still active, the count should not change
       e2.destroy
       e3.complete
       @assignment.reload
       @assignment.needs_grading_count.should eql(1)
-  
+
       # ok, now gone for good
       e.destroy
       @assignment.reload
@@ -720,7 +720,7 @@ describe Assignment do
       lambda {
         sub = yield(@assignment, @user)
       }.should_not raise_error
-      
+
       sub.should_not be_new_record
       sub.should eql real_sub
     end
@@ -1512,17 +1512,13 @@ describe Assignment do
         @teacher.communication_channels.create(:path => "teacher@instructure.com").confirm!
 
         @studentA = user_with_pseudonym(:active_all => true, :name => 'StudentA', :username => 'studentA@instructure.com')
-        @studentA.communication_channels.create(:path => "studentA@instructure.com").confirm!
         @ta = user_with_pseudonym(:active_all => true, :name => 'TA1', :username => 'ta1@instructure.com')
-        @ta.communication_channels.create(:path => "ta1@instructure.com").confirm!
         @course.enroll_student(@studentA).update_attribute(:workflow_state, 'active')
         @course.enroll_user(@ta, 'TaEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
 
         @section2 = @course.course_sections.create!(:name => 'section 2')
         @studentB = user_with_pseudonym(:active_all => true, :name => 'StudentB', :username => 'studentB@instructure.com')
-        @studentB.communication_channels.create(:path => "studentB@instructure.com").confirm!
         @ta2 = user_with_pseudonym(:active_all => true, :name => 'TA2', :username => 'ta2@instructure.com')
-        @ta2.communication_channels.create(:path => "ta2@instructure.com").confirm!
         @section2.enroll_user(@studentB, 'StudentEnrollment', 'active')
         @course.enroll_user(@ta2, 'TaEnrollment', :section => @section2, :enrollment_state => 'active', :limit_privileges_to_course_section => true)
 
@@ -2454,6 +2450,18 @@ describe Assignment do
       @assignment.save!
       s.reload.version_number.should == 2
     end
+
+    it "works for pass/fail assignments" do
+      student1, student2 = n_students_in_course(2)
+      a = @course.assignments.create! grading_type: "pass_fail", points_possible: 5
+      sub1 = a.grade_student(student1, grade: "complete").first
+      sub2 = a.grade_student(student2, grade: "incomplete").first
+
+      a.update_attribute :points_possible, 10
+
+      sub1.reload.grade.should == "complete"
+      sub2.reload.grade.should == "incomplete"
+    end
   end
 
   describe '#graded_count' do
@@ -2620,6 +2628,16 @@ describe Assignment do
       @assignment.title = 'short title'
       @assignment.title_slug.should == @assignment.title
     end
+
+    it "should not allow titles over 255 char" do
+      @assignment.title = 'qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm
+                           qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm
+                           qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm
+                           qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm
+                           qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm'
+
+      (lambda { @assignment.save! }).should raise_error("Validation failed: Title is too long (maximum is 255 characters), Title is too long (maximum is 255 characters)")
+    end
   end
 
   describe "external_tool_tag" do
@@ -2774,6 +2792,82 @@ describe Assignment do
       @assignment.due_at = 1.hour.ago
       @assignment.description = 'blah'
       @assignment.save!
+    end
+  end
+
+  describe "basic validation" do
+
+    describe "possible points" do
+
+      it "does not allow a negative value" do
+        assignment = Assignment.new(points_possible: -1)
+        assignment.valid?
+        assignment.errors.keys.include?(:points_possible).should be_true
+      end
+
+      it "allows a nil value" do
+        assignment = Assignment.new(points_possible: nil)
+        assignment.valid?
+        assignment.errors.keys.include?(:points_possible).should be_false
+      end
+
+      it "allows a 0 value" do
+        assignment = Assignment.new(points_possible: 0)
+        assignment.valid?
+        assignment.errors.keys.include?(:points_possible).should be_false
+      end
+
+      it "allows a positive value" do
+        assignment = Assignment.new(points_possible: 13)
+        assignment.valid?
+        assignment.errors.keys.include?(:points_possible).should be_false
+      end
+
+      it "does not attempt validation unless points_possible has changed" do
+        assignment = Assignment.new(points_possible: -13)
+        assignment.stubs(:points_possible_changed?).returns(false)
+        assignment.valid?
+        assignment.errors.keys.include?(:points_possible).should be_false
+      end
+
+    end
+  end
+
+  describe 'title validation' do
+    let(:assignment) { Assignment.new }
+    let(:errors) {
+      assignment.valid?
+      assignment.errors
+    }
+
+    it 'must allow a title equal to the maximum length' do
+      assignment.title = 'a' * Assignment.maximum_string_length
+      errors[:title].should be_empty
+    end
+
+    it 'must not allow a title longer than the maximum length' do
+      assignment.title = 'a' * (Assignment.maximum_string_length + 1)
+      errors[:title].should_not be_empty
+    end
+
+    it 'must allow a blank title when it is unchanged and was previously blank' do
+      setup_assignment
+      assignment = @c.assignments.create!(assignment_valid_attributes)
+      assignment.title = ''
+      assignment.save(validate: false)
+
+      assignment.valid?
+      errors = assignment.errors
+      errors[:title].should be_empty
+    end
+
+    it 'must not allow the title to be blank if changed' do
+      setup_assignment
+      assignment = @c.assignments.create!(assignment_valid_attributes)
+      assignment.title = ' '
+      assignment.valid?
+      errors = assignment.errors
+      errors[:title].should_not be_empty
     end
   end
 

@@ -84,6 +84,7 @@ define [
 
     setUnassignedHeading: ->
       count = @model.unassignedUsersCount() ? 0
+      @unassignedUsersView.render() if @unassignedUsersView
       @$unassignedUsersHeading.text(
         if @model.get('allows_multiple_memberships')
           I18n.t('everyone', "Everyone (%{count})", {count})

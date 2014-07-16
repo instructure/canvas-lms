@@ -112,12 +112,11 @@ define [
       @$span = @_initializeWidthSpan()
       setTimeout((=> @_disable() if @options.disabled), 0)
       @_fetchResults = _.debounce(@__fetchResults, 250)
-      @resultCollection = new PaginatedCollection([], model: ConversationSearchResult)
       @resultView = new PaginatedCollectionView
         el: @$resultContents
         scrollContainer: @$resultContainer
         buffer: 50
-        collection: @resultCollection
+        collection: new Backbone.Collection()
         template: null
         itemView: Backbone.View.extend
           template: resultTemplate
@@ -135,14 +134,14 @@ define [
               id: "result-#{$.guid++}" # for aria-activedescendant
             attributes['aria-haspopup'] = @model.get('isContext')
             attributes
-      @_attachCollection()
 
     # Internal: Manage events on the results collection.
     #
     # Returns nothing.
     _attachCollection: ->
-      @resultCollection.off('reset',  @resultView.renderOnReset)
-      @resultCollection.off('remove', @resultView.removeItem)
+      @resultView.switchCollection(@resultCollection)
+      @resultView.stopListening(@resultCollection, 'reset',  @resultView.renderOnReset)
+      @resultView.stopListening(@resultCollection, 'remove', @resultView.removeItem)
 
     # Public: Toggle visibility of result list.
     #
@@ -270,7 +269,6 @@ define [
     #
     # Returns nothing.
     _onSearchResultLoad: =>
-      @cache[@currentUrl] = @resultCollection.toJSON()
       _.extend(@permissions, @_getPermissions())
       @_addEveryoneResult(@resultCollection) unless @excludeAll or !@_canSendToAll()
       @resultCollection.each @_addToModelCache
@@ -359,13 +357,16 @@ define [
       return unless url
       @currentUrl = url
       if @cache[url]
-        @resultCollection.reset(@cache[url])
+        @resultCollection = @cache[url]
+        @_attachCollection()
         @toggleResultList(true)
         @_onSearchResultLoad()
       else
-        @currentRequest = @resultCollection.fetch
-          url: @url(@$input.val())
-          success: @_onSearchResultLoad
+        @resultCollection = new PaginatedCollection([], model: ConversationSearchResult)
+        @resultCollection.url = url
+        @cache[url] = @resultCollection
+        @_attachCollection()
+        @currentRequest = @resultCollection.fetch().done(@_onSearchResultLoad)
         @toggleResultList(true)
 
     # Internal: Get URL for the current request, caching it as

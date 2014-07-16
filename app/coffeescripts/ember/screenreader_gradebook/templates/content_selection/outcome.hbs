@@ -1,0 +1,25 @@
+<div class="row pad-box bottom-only">
+  <div class="span4 text-right-responsive">
+    <label for="outcome_select">
+      {{#t 'select_outcome'}}Select an outcome{{/t}}
+    </label>
+  </div>
+  <div class="span8">
+    {{
+      fast-select id="outcome_select"
+      class="outcome_select"
+      items=outcomes
+      valuePath="id"
+      labelPath="title"
+      labelDefault=outcomeSelectDefaultLabel
+      selected=selectedOutcome
+    }}
+
+    {{view App.SelectionButtonsView
+      type='outcome'
+      selected=selectedOutcome
+      list=outcomes
+     }}
+    </div>
+  </div>
+</div>

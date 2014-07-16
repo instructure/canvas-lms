@@ -54,7 +54,7 @@ class AdminsController < ApplicationController
   #
   # Flag an existing user as an admin within the account.
   #
-  # @argument user_id [String]
+  # @argument user_id [Integer]
   #   The id of the user to promote.
   #
   # @argument role [Optional, String]
@@ -92,15 +92,19 @@ class AdminsController < ApplicationController
       render :json => admin_json(admin, @current_user, session)
     end
   end
-  
+
   # @API List account admins
   #
   # List the admins in the account
-  # 
+  #
+  # @argument user_id[] [Optional, [Integer]]
+  #   Scope the results to those with user IDs equal to any of the IDs specified here.
+  #
   # @returns [Admin]
   def index
     if authorized_action(@context, @current_user, :manage_account_memberships)
       scope = @context.account_users
+      scope = scope.where(user_id: params[:user_id]) if params[:user_id]
       route = polymorphic_url([:api_v1, @context, :admins])
       admins = Api.paginate(scope.order(:id), self, route)
       render :json => admins.collect{ |admin| admin_json(admin, @current_user, session) }

@@ -107,7 +107,7 @@ describe Auditors::Authentication do
     before do
       @event2 = @pseudonym.shard.activate do
         record = Auditors::Authentication::Record.new(
-          'id' => UUIDSingleton.instance.generate,
+          'id' => CanvasUUID.generate,
           'created_at' => 1.day.ago,
           'pseudonym' => @pseudonym,
           'event_type' => 'login')

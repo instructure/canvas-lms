@@ -153,7 +153,7 @@ define([
       $("#submit_assignment").show();
       $(".submit_assignment_link").hide();
       $("html,body").scrollTo($("#submit_assignment"));
-      $("#submit_online_text_entry_form textarea:first").editorBox();
+      createSubmitAssignmentTabs();
       homeworkSubmissionLtiContainer.loadExternalTools();
     });
 
@@ -169,15 +169,29 @@ define([
       $(".submit_assignment_link").show();
     });
 
-    $("#submit_assignment_tabs").tabs({
-      beforeActivate: function( event, ui ) {
-        // determine if this is an external tool
-        if ($(event.currentTarget).hasClass('external-tool')) {
-          var externalToolId = $(event.currentTarget).data('id');
-          homeworkSubmissionLtiContainer.embedLtiLaunch(externalToolId)
+    function createSubmitAssignmentTabs() {
+      $("#submit_assignment_tabs").tabs({
+        beforeActivate: function( event, ui ) {
+          // determine if this is an external tool
+          if ($(event.currentTarget).hasClass('external-tool')) {
+            var externalToolId = $(event.currentTarget).data('id');
+            homeworkSubmissionLtiContainer.embedLtiLaunch(externalToolId)
+          }
+        },
+        activate: function(event, ui) {
+          if (ui.newTab.find('a').hasClass('submit_online_text_entry_option')) {
+            $el = $("#submit_online_text_entry_form textarea:first");
+            if (!$el.editorBox('exists?')) { $el.editorBox(); }
+          }
+        },
+        create: function(event, ui) {
+          if (ui.tab.find('a').hasClass('submit_online_text_entry_option')) {
+            $el = $("#submit_online_text_entry_form textarea:first");
+            if (!$el.editorBox('exists?')) { $el.editorBox(); }
+          }
         }
-      }
-    });
+      });
+    }
 
     $("#uploaded_files > ul").instTree({
       autoclose: false,

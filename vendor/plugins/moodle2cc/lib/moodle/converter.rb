@@ -21,7 +21,7 @@ module Moodle
       File.open(@course[:full_export_file_path], 'w') { |file| file << @course.to_json}
       @course
     ensure
-      FileUtils.rm migrator.imscc_path if migrator && File.exists?(migrator.imscc_path)
+      FileUtils.rm migrator.imscc_path if migrator && migrator.imscc_path && File.exists?(migrator.imscc_path)
     end
 
     def add_question_warnings

@@ -122,7 +122,7 @@ class PseudonymsController < ApplicationController
       @pseudonym.require_password = true
       @pseudonym.password = params[:pseudonym][:password]
       @pseudonym.password_confirmation = params[:pseudonym][:password_confirmation]
-      if @pseudonym.save
+      if @pseudonym.save_without_session_maintenance
         # If they changed the password (and we subsequently log them in) then
         # we're pretty confident this is the right user, and the communication
         # channel is valid, so register the user and approve the channel.
@@ -197,7 +197,7 @@ class PseudonymsController < ApplicationController
     @pseudonym = @account.pseudonyms.build(params[:pseudonym])
     @pseudonym.sis_user_id = sis_user_id if sis_user_id.present? && @account.grants_right?(@current_user, session, :manage_sis)
     @pseudonym.generate_temporary_password if !params[:pseudonym][:password]
-    if @pseudonym.save
+    if @pseudonym.save_without_session_maintenance
       respond_to do |format|
         flash[:notice] = t 'notices.account_registered', "Account registered!"
         format.html { redirect_to user_profile_url(@current_user) }
@@ -275,7 +275,9 @@ class PseudonymsController < ApplicationController
     params[:pseudonym].delete_if { |k, v| ![:unique_id, :password, :password_confirmation, :sis_user_id].include?(k.to_sym) }
     # return 401 if psuedonyms is empty here, because it means that the user doesn't have permissions to do anything.
     return render(:json => nil, :status => :unauthorized) if params[:pseudonym].blank? && changed_sis_id
-    if @pseudonym.update_attributes(params[:pseudonym])
+
+    @pseudonym.assign_attributes(params[:pseudonym])
+    if @pseudonym.save_without_session_maintenance
       flash[:notice] = t 'notices.account_updated', "Account updated!"
       respond_to do |format|
         format.html { redirect_to user_profile_url(@current_user) }

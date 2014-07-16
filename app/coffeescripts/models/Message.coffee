@@ -11,16 +11,17 @@ define [
 
     parse: (data) ->
       if data.messages
+          findParticipant = (id) -> _.find(data.participants, id: id)
         _.each data.messages, (message) ->
-          message.author = _.find(data.participants, (p) -> p.id is message.author_id)
-          message.participants = _.chain(message.participating_user_ids)
-            .map((id) ->
-              return null if id == message.author_id
-              _.find(data.participants, (p) -> p.id == id)
-            )
-            .reject((message) -> _.isNull(message))
-            .value()
-          message.participantNames = _.pluck(message.participants, 'name')
+          message.author = findParticipant(message.author_id)
+
+          message.participants = []
+          message.participantNames = []
+          for id in message.participating_user_ids when id isnt message.author_id
+            if participant = findParticipant(id)
+              message.participants.push participant
+              message.participantNames.push participant.name
+
           if message.participants.length > 2
             message.summarizedParticipantNames = message.participantNames.slice(0, 2)
             message.hiddenParticipantCount = message.participants.length - 2

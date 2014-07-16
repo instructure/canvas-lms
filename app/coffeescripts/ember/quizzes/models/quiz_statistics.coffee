@@ -4,11 +4,11 @@ define [
 ], (Em, DS) ->
 
   {alias} = Em.computed
-  {Model, attr, belongsTo, hasMany} = DS
+  {attr} = DS
 
-  Model.extend
-    quiz: belongsTo 'quiz', async: false
-    questionStatistics: hasMany 'question_statistics', async: false
+  DS.Model.extend
+    quiz: DS.belongsTo 'quiz', async: false
+    questionStatistics: DS.hasMany 'question_statistics', async: false
 
     generatedAt: attr('date')
     multipleAttemptsExist: attr('boolean')

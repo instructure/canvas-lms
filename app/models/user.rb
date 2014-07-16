@@ -31,14 +31,14 @@ class User < ActiveRecord::Base
 
   EXPORTABLE_ATTRIBUTES = [
     :id, :name, :sortable_name, :workflow_state, :time_zone, :uuid, :created_at, :updated_at, :visibility, :avatar_image_url, :avatar_image_source, :avatar_image_updated_at,
-    :phone, :school_name, :school_position, :short_name, :deleted_at, :show_user_services, :gender, :page_views_count, :unread_inbox_items_count, :reminder_time_for_due_dates,
+    :phone, :school_name, :school_position, :short_name, :deleted_at, :show_user_services, :gender, :page_views_count, :reminder_time_for_due_dates,
     :reminder_time_for_grading, :storage_quota, :visible_inbox_types, :last_user_note, :subscribe_to_emails, :features_used, :preferences, :avatar_state, :locale, :browser_locale,
     :unread_conversations_count, :public, :birthdate, :otp_communication_channel_id, :initial_enrollment_type, :crocodoc_id, :last_logged_out, :lti_context_id
   ]
 
   EXPORTABLE_ASSOCIATIONS = [
-    :communication_channels, :notification_policies, :communication_channel, :enrollments, :observer_enrollments, :observee_enrollments, :observers, :user_observers,
-    :user_observees, :observed_users, :courses, :group_memberships, :groups, :associated_accounts, :associated_root_accounts, :context_external_tools, :submissions,
+    :communication_channels, :communication_channel, :enrollments, :observer_enrollments, :observee_enrollments, :user_observers,
+    :user_observees, :observed_users, :group_memberships, :context_external_tools, :submissions,
     :pseudonyms, :pseudonym_accounts, :pseudonym, :attachments, :folders, :calendar_events, :quiz_submissions, :eportfolios, :collaborations, :user_services,
     :rubric_associations, :rubrics, :context_rubrics, :grading_standards, :context_module_progressions, :assessment_question_bank_users, :assessment_question_banks,
     :learning_outcome_results, :inbox_items, :submission_comment_participants, :submission_comments, :collaborators, :assigned_assessments, :web_conference_participants,
@@ -558,7 +558,7 @@ class User < ActiveRecord::Base
   def assign_uuid
     # DON'T use ||=, because that will cause an immediate save to the db if it
     # doesn't already exist
-    self.uuid = CanvasUuid::Uuid.generate_securish_uuid if !read_attribute(:uuid)
+    self.uuid = CanvasSlug.generate_securish_uuid if !read_attribute(:uuid)
   end
   protected :assign_uuid
 
@@ -1429,7 +1429,7 @@ class User < ActiveRecord::Base
 
   def uuid
     if !read_attribute(:uuid)
-      self.update_attribute(:uuid, CanvasUuid::Uuid.generate_securish_uuid)
+      self.update_attribute(:uuid, CanvasSlug.generate_securish_uuid)
     end
     read_attribute(:uuid)
   end
@@ -2012,7 +2012,7 @@ class User < ActiveRecord::Base
       self.class.default_storage_quota :
       accounts.sum(&:default_user_storage_quota)
   end
-  
+
   def self.default_storage_quota
     Setting.get('user_default_quota', 50.megabytes.to_s).to_i
   end
@@ -2110,7 +2110,7 @@ class User < ActiveRecord::Base
 
   def mark_all_conversations_as_read!
     conversations.unread.update_all(:workflow_state => 'read')
-    User.where(:id => id).update_all(:unread_conversations_count => 0)
+    User.where(:id => id).update_all(:unread_conversations_count => 0, :updated_at => Time.now.utc)
   end
 
   def conversation_participant(conversation_id)
@@ -2121,7 +2121,7 @@ class User < ActiveRecord::Base
   #
   # Returns nothing.
   def reset_unread_conversations_counter
-    self.class.where(:id => id).update_all(:unread_conversations_count => conversations.unread.count)
+    self.class.where(:id => id).update_all(:unread_conversations_count => conversations.unread.count, :updated_at => Time.now.utc)
   end
 
   def set_menu_data(enrollment_uuid)
@@ -2323,14 +2323,24 @@ class User < ActiveRecord::Base
     orig_profile(force_reload) || build_profile
   end
 
-  def otp_secret_key_remember_me_cookie(time)
-    "#{time.to_i}.#{Canvas::Security.hmac_sha1("#{time.to_i}.#{self.otp_secret_key}")}"
+  def parse_otp_remember_me_cookie(cookie)
+    return 0, [], nil unless cookie
+    time, *ips, hmac = cookie.split('-')
+    [time, ips, hmac]
   end
 
-  def validate_otp_secret_key_remember_me_cookie(value)
-    value =~ /^(\d+)\.[0-9a-f]+/ &&
-        $1.to_i >= (Time.now.utc - 30.days).to_i &&
-        value == otp_secret_key_remember_me_cookie($1)
+  def otp_secret_key_remember_me_cookie(time, current_cookie, remote_ip = nil)
+    _, ips, _ = parse_otp_remember_me_cookie(current_cookie)
+    cookie = [time.to_i, *[*ips, remote_ip].compact.sort].join('-')
+
+    "#{cookie}-#{Canvas::Security.hmac_sha1("#{cookie}.#{self.otp_secret_key}")}"
+  end
+
+  def validate_otp_secret_key_remember_me_cookie(value, remote_ip = nil)
+    time, ips, hmac = parse_otp_remember_me_cookie(value)
+    time.to_i >= (Time.now.utc - 30.days).to_i &&
+        (remote_ip.nil? || ips.include?(remote_ip)) &&
+        value == otp_secret_key_remember_me_cookie(time, value)
   end
 
   def otp_secret_key
@@ -2477,13 +2487,8 @@ class User < ActiveRecord::Base
     @all_active_pseudonyms ||= self.pseudonyms.with_each_shard { |scope| scope.active }
   end
 
-  # when we turn GB1 off, we can remove context from this function
-  def preferred_gradebook_version(context)
-    if context.feature_enabled?(:screenreader_gradebook)
-      preferences[:gradebook_version] || '2'
-    else
-      preferences[:use_gradebook2] == false ? '1' : '2'
-    end
+  def preferred_gradebook_version
+    preferences[:gradebook_version] || '2'
   end
 
   def stamp_logout_time!

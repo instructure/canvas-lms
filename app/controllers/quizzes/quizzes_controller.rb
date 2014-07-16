@@ -35,15 +35,21 @@ class Quizzes::QuizzesController < ApplicationController
   def index
     if authorized_action(@context, @current_user, :read)
       # fabulous quizzes
-      if @context.root_account.enable_fabulous_quizzes? && @context.feature_enabled?(:draft_state)
+      if @context.feature_enabled?(:quiz_stats) &&
+         @context.feature_enabled?(:draft_state)
         js_env(:PERMISSIONS => {
           :create  => can_do(@context.quizzes.scoped.new, @current_user, :create),
           :manage  => can_do(@context, @current_user, :manage_assignments)
         },
         :FLAGS => {
           :question_banks => feature_enabled?(:question_banks),
-          :fabulous_quizzes => true
+          :quiz_statistics => true,
+          :quiz_moderate   => @context.feature_enabled?(:quiz_moderate)
         })
+
+        # headless prevents inception in submission preview
+        setup_headless if params[:headless]
+
         render action: "fabulous_quizzes"
 
       else
@@ -94,8 +100,17 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def show
-    if @context.root_account.enable_fabulous_quizzes? && @context.feature_enabled?(:draft_state) && !params.key?(:take)
-      redirect_to ember_urls.course_quiz_url(@quiz.id)
+    if @context.feature_enabled?(:quiz_stats) &&
+       @context.feature_enabled?(:draft_state) &&
+       !params.key?(:take)
+
+      ember_url = if params[:preview]
+        ember_urls.course_quiz_preview_url(@quiz.id)
+      else
+        ember_urls.course_quiz_url(@quiz.id, headless: params[:headless])
+      end
+
+      redirect_to ember_url
       return
     end
 
@@ -399,7 +414,8 @@ class Quizzes::QuizzesController < ApplicationController
 
   # student_analysis report
   def statistics
-    if @context.root_account.enable_fabulous_quizzes? && @context.feature_enabled?(:draft_state)
+    if @context.feature_enabled?(:quiz_stats) &&
+       @context.feature_enabled?(:draft_state)
       redirect_to ember_urls.course_quiz_statistics_url(@quiz.id)
       return
     end
@@ -550,7 +566,9 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def moderate
-    if @context.root_account.enable_fabulous_quizzes? && @context.feature_enabled?(:draft_state)
+    if @context.feature_enabled?(:quiz_moderate) &&
+       @context.feature_enabled?(:quiz_stats) &&
+       @context.feature_enabled?(:draft_state)
       redirect_to ember_urls.course_quiz_moderate_url(@quiz.id)
       return
     end
@@ -720,6 +738,14 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def take_quiz
+    if @context.feature_enabled?(:quiz_stats) &&
+       @context.feature_enabled?(:draft_state) &&
+       !quiz_submission_active?
+
+      redirect_to ember_urls.course_quiz_url(@quiz.id, headless: params[:headless])
+      return
+    end
+
     return unless quiz_submission_active?
     @show_embedded_chat = false
     flash[:notice] = t('notices.less_than_allotted_time', "You started this quiz near when it was due, so you won't have the full amount of time to take the quiz.") if @submission.less_than_allotted_time?

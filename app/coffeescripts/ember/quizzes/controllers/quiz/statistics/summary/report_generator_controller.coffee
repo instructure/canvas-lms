@@ -1,11 +1,10 @@
 define [
   'ember'
-  'underscore'
   'ic-ajax'
   'i18n!quiz_statistics'
   'jquery.instructure_date_and_time' # fudgeDateForProfileTimezone, friendlyDatetime
-], (Ember, _, ajax, I18n) ->
-  {$} = Ember
+], (Ember, ajax, I18n) ->
+  {friendlyDatetime, fudgeDateForProfileTimezone} = Ember.$
 
   # This controller handles the generation of a CSV quiz report (student or item
   # analysis), tracks the progress of the generation, and auto-downloads the CSV
@@ -14,6 +13,8 @@ define [
   # Auto-downloading will be cancelled if the teacher refreshes the page before
   # the report is generated to minimize annoyance.
   Ember.ObjectController.extend
+    isLocked: Ember.computed.alias('busy')
+
     readableTypeLabel: (->
       if @get('reportType') == 'item_analysis'
         I18n.t('item_analysis', 'Item Analysis')
@@ -23,12 +24,12 @@ define [
 
     generatedAtLabel: (->
       I18n.t('generated_at', 'Generated at %{date}', {
-        date: $.friendlyDatetime $.fudgeDateForProfileTimezone @get('file.created_at')
+        date: friendlyDatetime(fudgeDateForProfileTimezone(@get('file.created_at')))
       })
     ).property('file.created_at')
 
     isGenerating: (->
-      _.contains ['queued', 'running'], @get('progress.workflowState')
+      Ember.A(['queued', 'running']).contains(@get('progress.workflowState'))
     ).property('progress.workflowState')
 
     generationStatusLabel: (->
@@ -79,7 +80,7 @@ define [
       ).finally(=> @unlock())
 
     triggerDownload: ->
-      $('<iframe />', {
+      Ember.$('<iframe />', {
         style: 'display: none;',
         src: @get('file.url')
       }).appendTo(document.body)
@@ -89,5 +90,3 @@ define [
 
     unlock: ->
       @set 'busy', false
-
-    isLocked: Ember.computed.alias('busy')

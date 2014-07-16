@@ -2,7 +2,7 @@ define [
   'ember'
   '../shared/seconds_to_time'
   'i18nObj'
-], (Ember, formatSeconds, I18n) ->
+], (Ember, secondsToTime, I18n) ->
 
   MS_PER_SECOND = 1000
   MS_PER_MINUTE = 60 * MS_PER_SECOND
@@ -56,7 +56,7 @@ define [
       #is in play, don't show timeSpent to be any bigger than timeLimit
       if timeLimit
         timeSpent = Math.min(timeSpent, (timeLimit * SECONDS_PER_MINUTE))
-      formatSeconds(timeSpent)
+      secondsToTime(timeSpent)
     ).property('timeSpent')
 
     updateRunningTime: ->
@@ -66,7 +66,7 @@ define [
         seconds = @calcCurrentSeconds()
       if @isTimeExpired()
         @closeOutSubmission()
-      @set('runningTime', formatSeconds(seconds))
+      @set('runningTime', secondsToTime(seconds))
       @startStopRunningTime()
 
     # locally close out submission, this doesn't persist anything, only stops

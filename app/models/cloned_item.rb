@@ -21,6 +21,9 @@ class ClonedItem < ActiveRecord::Base
   override_polymorphic_types original_item_type: {'Quiz' => 'Quizzes::Quiz'}
 
   belongs_to :original_item, :polymorphic => true
+  validates_inclusion_of :original_item_type, :allow_nil => true, :in => ['Attachment', 'ContentTag', 'Folder',
+    'Assignment', 'WikiPage', 'Quizzes::Quiz', 'DiscussionTopic', 'ContextModule', 'CalendarEvent',
+    'AssignmentGroup', 'ContextExternalTool']
   has_many :attachments, :order => 'id asc'
   has_many :discussion_topics, :order => 'id asc'
   has_many :wiki_pages, :order => 'id asc'

@@ -1,5 +1,6 @@
 #quiz-show {
   font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+  background-color: #fff;
 
   .edit-header {
     padding-right: 20px;
@@ -31,12 +32,19 @@
     margin-right: 25px;
   }
 
-  .lock-explanation {
-    background-color: #F8FAFB;
+  .lock-explanation,
+  .quiz-preview {
+    margin: 0 20px 25px;
     border: 1px solid #D1D3D7;
     border-radius: 7px;
-    margin: 0 20px 25px;
+    background-color: #F8FAFB;
     padding: 8px 20px;
+  }
+  .lock-explanation {
+  }
+  .quiz-preview {
+    margin: 0 0 25px 0;
+    padding: 0 20px;
   }
 
   //===== Tabs ===
@@ -47,7 +55,7 @@
 
     ol li {
       border: 1px solid transparent;
-      border-bottom-width: 0;
+      border-bottom: 1px solid #CAD0D7;
       background: white;
       position: relative;
       display: inline-block;
@@ -226,6 +234,13 @@
   ic-menu-item {
     display: block;
   }
+  ic-menu-item.disabled {
+    color: #aaa;
+  }
+  ic-menu-item.disabled:focus {
+    color: #999;
+    background-color: #f8f8f8;
+  }
   ic-menu-item a {
     color: inherit;
     text-decoration: none;
@@ -241,12 +256,30 @@
 // Dialogs - Put outside the #quiz_show scope because jQueryUI puts
 // it in the body.
 
-#message-students-dialog {
+.message-students-who-dialog {
+  .field {
+    margin-bottom: 11px;
+  }
+  .recipients {
+    margin-bottom: 11px;
+  }
+  select {
+    margin-bottom: 0;
+    width: 300px;
+  }
+  .label {
+    margin: 2px 0;
+  }
+  .more-label {
+    font-size: 88%;
+    color: #666;
+  }
   textarea {
     box-sizing: border-box;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     width: 100%;
+    height: 90px;
   }
 }
 

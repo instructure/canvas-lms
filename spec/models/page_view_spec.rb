@@ -260,7 +260,7 @@ describe PageView do
   end
 
   describe '.generate' do
-    let(:params) { {'action' => 'path', 'controller' => 'some'} }
+    let(:params) { {:action => 'path', :controller => 'some'} }
     let(:session) { {:id => '42'} }
     let(:request) { stub(:url => (@url || 'host.com/some/path'), :path_parameters => params, :user_agent => 'Mozilla', :session_options => session, :method => :get, :remote_ip => '0.0.0.0', :request_method => 'GET') }
     let(:user) { User.new }
@@ -273,8 +273,8 @@ describe PageView do
 
     its(:url) { should == request.url }
     its(:user) { should == user }
-    its(:controller) { should == params['controller'] }
-    its(:action) { should == params['action'] }
+    its(:controller) { should == params[:controller] }
+    its(:action) { should == params[:action] }
     its(:session_id) { should == session[:id] }
     its(:real_user) { should == user }
     its(:user_agent) { should == request.user_agent }

@@ -2,5 +2,7 @@ source 'https://rubygems.org'
 
 gem 'simplecov', '0.8.2', :require => false
 gem 'simplecov-rcov', '0.2.3', :require => false
+gem 'canvas_text_helper', :path => '../canvas_text_helper'
+gem 'html_text_helper', :path => '../html_text_helper'
 
 gemspec

@@ -1,0 +1,149 @@
+
+<div class="ef-directory">
+  <header class="ef-directory-header">
+    {{#each columns itemController="columnHeader"}}
+      <div {{bind-attr class="isSorted:current-filter className"}}>
+        <a {{action toggleSort property}}>
+          {{displayName}}
+          {{#if sortedAsc}}
+            <i class="icon-arrow-up"></i>
+          {{/if}}
+          {{#if sortedDesc}}
+            <i class="icon-arrow-down"></i>
+          {{/if}}
+        </a>
+      </div>
+    {{/each}}
+    <div class="ef-links-col"></div>
+  </header>
+
+  {{#each}}
+
+    <div class="ef-item-row">
+      <div class="ef-name-col">
+        {{#if display_name}}{{! TODO: find a better way to check if folder}}
+          <a {{bind-attr href="url"}}>
+            {{#if thumbnail_url}}
+              <img {{bind-attr src="thumbnail_url"}} class="ef-thumbnail" alt="">
+            {{else}}
+              <i class="icon-document"></i>
+            {{/if}}
+            {{display_name}}
+          </a>
+        {{else}}
+          {{#link-to "folder" this}}
+            <i class="icon-folder"></i>
+            {{name}}
+          {{/link-to}}
+        {{/if}}
+      </div>
+      <div class="ef-date-modified-col">{{friendlyDatetime updated_at}}</div>
+      <div class="ef-modified-by-col"><a {{bind-attr href="user.html_url"}}>{{user.display_name}}</a></div>
+      <div class="ef-size-col">{{#if size}}{{friendlyBytes size}}{{else}}--{{/if}}</div>
+      <div class="ef-links-col">
+        <span data-module-type="assignment" data-content-id="6" data-id="6" data-course-id="4" data-module-id="3" data-module-item-id="3" data-published="true" data-publishable="true" data-unpublishable="true" class="publish-icon published publish-icon-published" role="button" tabindex="0" aria-pressed="true" title="Published" aria-describedby="ui-tooltip-1" aria-label="Published. Click to unpublish."><i class="icon-publish"></i>
+          <span class="publish-text" tabindex="-1">&nbsp;Published</span>
+          <span class="screenreader-only accessible_label">Published. Click to unpublish.</span>
+          <span class="screenreader-only accessible_label">Published. Click to unpublish.</span>
+          <span class="screenreader-only accessible_label">Published. Click to unpublish.</span>
+        </span>
+
+        <div class="ef-hover-options">
+          <a herf="#" style="color: black; margin-right:10px"><i class="icon-download"></i></a>
+          <div class="ef-admin-gear">
+            <div>
+              <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="content-1" aria-label="Settings" href="#">
+                <i class="icon-settings"></i>
+                <i class="icon-mini-arrow-down"></i>
+              </a>
+
+              <ul id="content-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="content-2">
+                <li role="presentation">
+                <a href="#" class="icon-edit" id="content-2" tabindex="-1" role="menuitem" title="Edit">Edit</a>
+                </li>
+                <li role="presentation">
+                <a href="#" class="icon-trash" id="content-3" tabindex="-1" role="menuitem" title="Delete this module">Delete</a>
+                </li>
+              </ul>
+            </div>
+          </div><!-- admin gear end -->
+        </div><!-- hover options end -->
+
+      </div><!-- end ef links col -->
+    </div><!-- end ef item row -->
+  {{/each}}
+
+  <div class="ef-item-row currently-selected-item">
+    <div class="ef-name-col"><i class="icon-folder"></i> <a href="#">Algebra</a></div>
+    <div class="ef-date-modified-col">Jan 6, 2013</div>
+    <div class="ef-modified-by-col">{{user.name}}</div>
+    <div class="ef-size-col">--</div>
+    <div class="ef-links-col">
+      <span data-module-type="assignment" data-content-id="6" data-id="6" data-course-id="4" data-module-id="3" data-module-item-id="3" data-published="true" data-publishable="true" data-unpublishable="true" class="publish-icon published publish-icon-published" role="button" tabindex="0" aria-pressed="true" title="Published" aria-describedby="ui-tooltip-1" aria-label="Published. Click to unpublish."><i class="icon-publish"></i>
+        <span class="publish-text" tabindex="-1">&nbsp;Published</span>
+        <span class="screenreader-only accessible_label">Published. Click to unpublish.</span>
+        <span class="screenreader-only accessible_label">Published. Click to unpublish.</span>
+        <span class="screenreader-only accessible_label">Published. Click to unpublish.</span>
+      </span>
+
+      <div class="ef-hover-options">
+        <a herf="#" style="color: black; margin-right:10px"><i class="icon-download"></i></a>
+        <div class="ef-admin-gear">
+          <div>
+            <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="content-1" aria-label="Settings" href="#">
+              <i class="icon-settings"></i>
+              <i class="icon-mini-arrow-down"></i>
+            </a>
+
+            <ul id="content-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="content-2">
+              <li role="presentation">
+              <a href="#" class="icon-edit" id="content-2" tabindex="-1" role="menuitem" title="Edit">Edit</a>
+              </li>
+              <li role="presentation">
+              <a href="#" class="icon-trash" id="content-3" tabindex="-1" role="menuitem" title="Delete this module">Delete</a>
+              </li>
+            </ul>
+          </div>
+        </div><!-- admin gear end -->
+      </div><!-- hover options end -->
+
+    </div><!-- end ef links col -->
+  </div><!-- end ef item row -->
+
+  <div class="ef-item-row">
+    <div class="ef-name-col"><i class="icon-document"></i> <a href="#">Lecture Notes.doc</a></div>
+    <div class="ef-date-modified-col">Feb 6, 2014</div>
+    <div class="ef-modified-by-col">Josh Coats</div>
+    <div class="ef-size-col">1.2 MB</div>
+    <div class="ef-links-col">
+      <span data-module-type="assignment" data-content-id="6" data-id="6" data-course-id="4" data-module-id="3" data-module-item-id="3" data-published="true" data-publishable="true" data-unpublishable="true" class="publish-icon published publish-icon-published" role="button" tabindex="0" aria-pressed="true" title="Published" aria-describedby="ui-tooltip-1" aria-label="Published. Click to unpublish."><i class="icon-publish"></i>
+        <span class="publish-text" tabindex="-1">&nbsp;Published</span>
+        <span class="screenreader-only accessible_label">Published. Click to unpublish.</span>
+        <span class="screenreader-only accessible_label">Published. Click to unpublish.</span>
+        <span class="screenreader-only accessible_label">Published. Click to unpublish.</span>
+      </span>
+
+      <div class="ef-hover-options">
+        <a herf="#" style="color: black; margin-right:10px"><i class="icon-download"></i></a>
+        <div class="ef-admin-gear">
+          <div>
+            <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="content-1" aria-label="Settings" href="#">
+              <i class="icon-settings"></i>
+              <i class="icon-mini-arrow-down"></i>
+            </a>
+
+            <ul id="content-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="content-2">
+              <li role="presentation">
+              <a href="#" class="icon-edit" id="content-2" tabindex="-1" role="menuitem" title="Edit">Edit</a>
+              </li>
+              <li role="presentation">
+              <a href="#" class="icon-trash" id="content-3" tabindex="-1" role="menuitem" title="Delete this module">Delete</a>
+              </li>
+            </ul>
+          </div>
+        </div><!-- admin gear end -->
+      </div><!-- hover options end -->
+
+    </div><!-- end ef links col -->
+  </div><!-- end ef item row -->
+</div>

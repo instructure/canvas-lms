@@ -59,18 +59,6 @@ module GradebooksHelper
     grade.blank? ? "--" : grade
   end
 
-  def gradebook_url_for(user, context, assignment=nil)
-    gradebook_version = user.try(:preferred_gradebook_version, context) || '2'
-
-    if !context.feature_enabled?(:screenreader_gradebook) && (gradebook_version == "2" || !context.old_gradebook_visible?)
-      return polymorphic_url([context, 'gradebook2'])
-    elsif gradebook_version == "1" && assignment
-      return polymorphic_url([context, 'gradebook']) + "#assignment/#{assignment.id}"
-    end
-
-    polymorphic_url([context, 'gradebook'])
-  end
-
   def student_score_display_for(submission, show_student_view = false)
     return '-' if submission.blank?
     score, grade = score_and_grade_for(submission, show_student_view)

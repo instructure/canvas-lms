@@ -1,9 +1,13 @@
 define [
   'ember'
   '../shared/environment'
+  '../mixins/views/submission_arrows_view'
+  'quiz_rubric'
   'compiled/jquery/ModuleSequenceFooter'
-], (Ember, environment) ->
-  QuizView = Ember.View.extend
+], (Ember, environment, SubmissionArrowsView, createRubricDialog) ->
+
+  QuizView = Ember.View.extend SubmissionArrowsView,
+
     addBreadCrumb: (->
       quizUrl = @controller.get('htmlURL')
       breadcrumb = $(
@@ -17,12 +21,25 @@ define [
       $("#breadcrumbs li").last().remove()
     ).on('willDestroyElement')
 
-    addModuleSequenceFooter: (->
+    setupViewAddOns: ( ->
+      @setupControllerListeners()
+      @addModuleSequenceFooter()
+    ).on('didInsertElement')
+
+    addModuleSequenceFooter: ->
       this.$('#module_sequence_footer').moduleSequenceFooter(
         courseID: environment.get('courseId')
         assetType: 'Quiz'
         assetID: @controller.get("id")
       )
-    ).on('didInsertElement')
 
+    setupControllerListeners: ->
+      @get('controller').on('rubricDisplayRequest', this, @displayRubric)
 
+    teardownControllerListeners: ( ->
+      @get('controller').off('rubricDisplayRequest', this, @displayRubric)
+    ).on('willDestroyElement')
+
+    displayRubric: ->
+      url = @get('controller.rubricUrl')
+      createRubricDialog(url)

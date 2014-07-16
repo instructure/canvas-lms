@@ -1,8 +1,15 @@
 <% define_content :link do %>
   <%= HostUrl.protocol %>://<%= HostUrl.context_host(asset.group.context) %>/<%= asset.group.context.class.to_s.downcase.pluralize %>/<%= asset.group.context_id %>/groups/<%= asset.group_id %>
 <% end %>
+
 <% define_content :subject do %>
   <%= t :subject, "New Group Membership for %{course_or_account}", :course_or_account => asset.group.context.name %>
+<% end %>
+
+<% define_content :footer_link do %>
+  <a href="<%= content(:link) %>">
+    <%= t :details, "You can check out the group by clicking here" %>
+  </a>
 <% end %>
 
 <p><%= t :title, "New Group Membership: %{group_name}", :group_name => asset.group.name %></p>
@@ -16,5 +23,3 @@
     end
 %>
 </p>
-
-<p><a href="<%= content :link %>"><%= t :details, "You can check out the group by clicking here" %></a></p>

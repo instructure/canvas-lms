@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013 Instructure, Inc.
+# Copyright (C) 2013 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -29,20 +29,23 @@ module Canvas::AccountReports
       extra_text_term(@account_report)
     end
 
-    def recently_deleted
-      courses = root_account.all_courses.
+    def default_courses
+      root_account.all_courses.
         select([:id, :sis_source_id, :name, :course_code, :start_at,
-                :conclude_at, :restrict_enrollments_to_course_dates]).
-        where("workflow_state = 'deleted' AND updated_at > ?", 30.days.ago)
-      csv(courses)
+                :conclude_at, :restrict_enrollments_to_course_dates])
+    end
+
+    def recently_deleted
+      csv(default_courses.where("workflow_state = 'deleted' AND updated_at > ?",
+                                30.days.ago))
+    end
+
+    def public_courses
+      csv(default_courses.active.where(is_public: true))
     end
 
     def unpublished_courses
-      courses = root_account.all_courses.
-        select([:id, :sis_source_id, :name, :course_code, :start_at,
-                :conclude_at, :restrict_enrollments_to_course_dates]).
-        where(:workflow_state => ['claimed', 'created'])
-      csv(courses)
+      csv(default_courses.where(:workflow_state => ['claimed', 'created']))
     end
 
     def csv(courses)
@@ -51,8 +54,14 @@ module Canvas::AccountReports
 
       filename = Canvas::AccountReports.generate_file(@account_report)
       CSV.open(filename, "w") do |csv|
-        csv << ['id', 'sis id', 'short name', 'name', 'start date', 'end date']
-
+        headers = []
+        headers << I18n.t('#account_reports.report_header_id', 'id')
+        headers << I18n.t('#account_reports.report_header_sis_id', 'sis id')
+        headers << I18n.t('#account_reports.report_header_short_name', 'short name')
+        headers << I18n.t('#account_reports.report_header_name', 'name')
+        headers << I18n.t('#account_reports.report_header_start_date', 'start date')
+        headers << I18n.t('#account_reports.report_header_end_date', 'end date')
+        csv << headers
         Shackles.activate(:slave) do
           @total = courses.count
           i = 0
@@ -131,8 +140,14 @@ module Canvas::AccountReports
         courses = add_term_scope(courses)
         courses = add_course_sub_account_scope(courses)
 
-        csv << ['course id','course sis id','short name','long name','status',
-                'created at']
+        headers = []
+        headers << I18n.t('#account_reports.report_header_course_id', 'course id')
+        headers << I18n.t('#account_reports.report_header_course_sis_id', 'course sis id')
+        headers << I18n.t('#account_reports.report_header_short_name', 'short name')
+        headers << I18n.t('#account_reports.report_header_long_name', 'long name')
+        headers << I18n.t('#account_reports.report_header_status', 'status')
+        headers << I18n.t('#account_reports.report_header_created_at', 'created at')
+        csv << headers
 
         Shackles.activate(:slave) do
           courses.find_each do |c|

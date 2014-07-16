@@ -34,8 +34,8 @@ class Account < ActiveRecord::Base
 
   EXPORTABLE_ASSOCIATIONS = [
     :courses, :group_categories, :groups, :enrollment_terms, :enrollments, :account_users, :course_sections,
-    :users, :pseudonyms, :attachments, :folders, :active_assignments, :grading_standards, :assessment_questions,
-    :assessment_question_banks, :roles, :announcements, :alerts, :course_account_associations, :user_account_associations
+    :pseudonyms, :attachments, :folders, :active_assignments, :grading_standards, :assessment_question_banks,
+    :roles, :announcements, :alerts, :course_account_associations, :user_account_associations
   ]
 
   include Workflow
@@ -201,7 +201,6 @@ class Account < ActiveRecord::Base
   add_setting :self_registration_type, :root_only => true
   add_setting :large_course_rosters, :boolean => true, :root_only => true, :default => false
   add_setting :edit_institution_email, :boolean => true, :root_only => true, :default => true
-  add_setting :enable_fabulous_quizzes, :boolean => true, :root_only => true, :default => false
   add_setting :js_kaltura_uploader, :boolean => true, :root_only => true, :default => false
   add_setting :google_docs_domain, root_only: true
   add_setting :dashboard_url, root_only: true
@@ -280,11 +279,11 @@ class Account < ActiveRecord::Base
   end
 
   def terms_of_use_url
-    Setting.get('terms_of_use_url', 'http://www.instructure.com/policies/terms-of-use')
+    Setting.get('terms_of_use_url', 'http://www.canvaslms.com/policies/terms-of-use')
   end
 
   def privacy_policy_url
-    Setting.get('privacy_policy_url', 'http://www.instructure.com/policies/privacy-policy-instructure')
+    Setting.get('privacy_policy_url', 'http://www.canvaslms.com/policies/privacy-policy')
   end
 
   def terms_required?
@@ -321,7 +320,7 @@ class Account < ActiveRecord::Base
   end
   
   def ensure_defaults
-    self.uuid ||= CanvasUuid::Uuid.generate_securish_uuid
+    self.uuid ||= CanvasSlug.generate_securish_uuid
     self.lti_guid ||= self.uuid if self.respond_to?(:lti_guid)
   end
 
@@ -781,11 +780,11 @@ class Account < ActiveRecord::Base
     can :create_courses
 
     # any logged in user can read global outcomes, but must be checked against the site admin
-    given{ |user,session| self.site_admin? && user }
+    given{ |user| self.site_admin? && user }
     can :read_global_outcomes
 
     # any user with an association to this account can read the outcomes in the account
-    given{ |user,session| user && self.user_account_associations.find_by_user_id(user.id) }
+    given{ |user| user && self.user_account_associations.find_by_user_id(user.id) }
     can :read_outcomes
   end
 
@@ -1372,15 +1371,6 @@ class Account < ActiveRecord::Base
 
   def canvas_network_enabled?
     false
-  end
-
-  def enable_fabulous_quizzes!
-    root_account.enable_feature! :draft_state
-    change_root_account_setting!(:enable_fabulous_quizzes, true)
-  end
-
-  def disable_fabulous_quizzes!
-    change_root_account_setting!(:enable_fabulous_quizzes, false)
   end
 
   def calendar2_only?

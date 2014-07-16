@@ -1,6 +1,6 @@
 <td>
   {{#if dueAt}}
-    {{friendlyDatetime dueAt}}
+    {{tDateToString dueAt 'short_weekday'}}, {{tDateToString dueAt 'date_at_time'}}
   {{else}}
     -
   {{/if}}
@@ -14,14 +14,14 @@
 </td>
 <td>
   {{#if unlockAt}}
-    {{friendlyDatetime unlockAt}}
+    {{tDateToString unlockAt 'short_weekday'}}, {{tDateToString unlockAt 'date_at_time'}}
   {{else}}
     -
   {{/if}}
 </td>
 <td>
   {{#if lockAt}}
-    {{friendlyDatetime lockAt}}
+    {{tDateToString lockAt 'short_weekday'}}, {{tDateToString lockAt 'date_at_time'}}
   {{else}}
     -
   {{/if}}

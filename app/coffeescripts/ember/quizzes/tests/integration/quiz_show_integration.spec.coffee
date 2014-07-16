@@ -5,8 +5,9 @@ define [
   '../environment_setup'
   'ic-ajax'
   'jquery'
+  '../test_title'
   'jqueryui/dialog'
-], (Ember, startApp, fixtures, env, ajax, $) ->
+], (Ember, startApp, fixtures, env, ajax, $, testTitle) ->
   App = null
 
   QUIZ = fixtures.QUIZZES[0]
@@ -25,6 +26,10 @@ define [
   testShowPage = (desc, callback) ->
     test desc, ->
       visit('/1').then callback
+
+  testTitle
+    path: '/1',
+    title: 'Alt practice test: Overview'
 
   testShowPage 'shows attributes', ->
     html = find('#quiz-show').html()
@@ -113,6 +118,10 @@ define [
       start()
       equal $(find('.js-take-quiz')).attr('href'), quiz.get('takeQuizUrl')
 
+  testShowPage 'displays a rubric link in the dropdown', ->
+    click('ic-menu-trigger').then ->
+      equal find('ic-menu-item .icon-rubric').length, 1
+
   module "Quiz Show Integration for Students",
     setup: ->
       App = startApp()
@@ -147,4 +156,3 @@ define [
 
   testShowPage 'doesnt show tabs', ->
     ok !find('#quiz-show-tabs').length, "should not have tabs"
-

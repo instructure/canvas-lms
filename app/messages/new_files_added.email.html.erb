@@ -8,8 +8,12 @@
           :name => asset.context.name) %>
 <% end %>
 
+<% define_content :footer_link do %>
+  <a href="<%= content(:link) %>">
+    <%= t 'see_details', 'You can view them here' %>
+  </a>
+<% end %>
+
 <p><%= t('body', '%{count} new files have been added for the course, %{name}:', 
         :count => data.count,
         :name => asset.context.name) %></p>
-
-<p><a href="<%= content :link %>"><%= t 'link', 'You can view them here' %></a></p>

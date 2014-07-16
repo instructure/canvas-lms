@@ -68,6 +68,7 @@ module Canvas
       def packages
         @packages ||= [
           {'name' => 'ic-ajax', 'location' => 'bower/ic-ajax'},
+          {'name' => 'ic-data', 'location' => 'bower/ic-data/dist/amd'},
           {'name' => 'ic-styled', 'location' => 'bower/ic-styled'},
           {'name' => 'ic-menu', 'location' => 'bower/ic-menu'},
           {'name' => 'ic-tabs', 'location' => 'bower/ic-tabs/dist/amd'},

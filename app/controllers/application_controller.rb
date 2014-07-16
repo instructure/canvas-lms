@@ -121,6 +121,7 @@ class ApplicationController < ActionController::Base
     end
     @js_env[:IS_LARGE_ROSTER] = true if !@js_env[:IS_LARGE_ROSTER] && @context.respond_to?(:large_roster?) && @context.large_roster?
     @js_env[:context_asset_string] = @context.try(:asset_string) if !@js_env[:context_asset_string]
+    @js_env[:ping_url] = polymorphic_url([:api_v1, @context, :ping]) if @context.is_a?(Course)
     @js_env[:TIMEZONE] = Time.zone.tzinfo.identifier if !@js_env[:TIMEZONE]
     @js_env[:CONTEXT_TIMEZONE] = @context.time_zone.tzinfo.identifier if !@js_env[:CONTEXT_TIMEZONE] && @context.respond_to?(:time_zone) && @context.time_zone.present?
     @js_env[:LOCALE] = I18n.qualified_locale if !@js_env[:LOCALE]
@@ -851,7 +852,7 @@ class ApplicationController < ActionController::Base
 
         @page_view_update = true
       end
-      if @page_view && !request.xhr? && request.get? && (response.content_type || "").match(/html/)
+      if @page_view && !request.xhr? && request.get? && (response.content_type || "").to_s.match(/html/)
         @page_view.render_time ||= (Time.now.utc - @page_before_render) rescue nil
         @page_view_update = true
       end
@@ -1386,9 +1387,14 @@ class ApplicationController < ActionController::Base
 
   def check_incomplete_registration
     if @current_user
-      js_env :INCOMPLETE_REGISTRATION => params[:registration_success] && @current_user.pre_registered?, :USER_EMAIL => @current_user.email
+      js_env :INCOMPLETE_REGISTRATION => incomplete_registration?, :USER_EMAIL => @current_user.email
     end
   end
+
+  def incomplete_registration?
+    @current_user && params[:registration_success] && @current_user.pre_registered?
+  end
+  helper_method :incomplete_registration?
 
   def page_views_enabled?
     PageView.page_views_enabled?

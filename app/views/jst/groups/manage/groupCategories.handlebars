@@ -31,9 +31,14 @@
     </p>
   {{/ifEqual}}
 </div>
-
+<div style="display:none">
+  {{#if isCourse}}
+  <li class="static"><a href="/courses/{{context_id}}/users">{{#t 'tabs.everyone'}}Everyone{{/t}}</a></li>
+  {{/if}}
+</div>
 <div id="group_categories_tabs" class="ui-tabs-minimal">
-  <ul class='collectionViewItems'></ul>
+  <ul class='collectionViewItems'>
+  </ul>
   <!--panels get inserted dynamically-->
 </div>
 

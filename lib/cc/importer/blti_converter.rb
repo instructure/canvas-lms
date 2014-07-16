@@ -42,7 +42,7 @@ module CC::Importer
       tools = []
 
       blti_resources.each do |res|
-        path = res[:href] || res[:files].first[:href]
+        path = res[:href] || (res[:files] && res[:files].first && res[:files].first[:href])
         path = converter.get_full_path(path)
 
         if File.exists?(path)

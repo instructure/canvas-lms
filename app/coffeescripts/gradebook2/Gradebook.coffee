@@ -760,7 +760,6 @@ define [
         sections: @sectionList(),
         currentSection: @sectionToShow)
       @sectionMenu.render()
-      @initPostGrades()
 
     updateCurrentSection: (section, author) =>
       @sectionToShow = section
@@ -803,6 +802,8 @@ define [
 
       @userFilter = new InputFilterView el: '.gradebook_filter input'
       @userFilter.on 'input', @onUserFilterInput
+
+      @initPostGrades()
 
       @renderTotalHeader()
 

@@ -26,9 +26,13 @@ class LearningOutcomeResult < ActiveRecord::Base
   belongs_to :learning_outcome
   belongs_to :alignment, :class_name => 'ContentTag', :foreign_key => :content_tag_id
   belongs_to :association_object, :polymorphic => true, :foreign_type => :association_type, :foreign_key => :association_id
+  validates_inclusion_of :association_type, :allow_nil => true, :in => ['Quizzes::Quiz', 'RubricAssociation', 'Assignment', 'LiveAssessments::Assessment']
   belongs_to :artifact, :polymorphic => true
+  validates_inclusion_of :artifact_type, :allow_nil => true, :in => ['Quizzes::QuizSubmission', 'RubricAssessment', 'Submission', 'LiveAssessments::Submission']
   belongs_to :associated_asset, :polymorphic => true
+  validates_inclusion_of :associated_asset_type, :allow_nil => true, :in => ['AssessmentQuestion', 'Quizzes::Quiz', 'LiveAssessments::Assessment']
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course']
   simply_versioned
 
   EXPORTABLE_ATTRIBUTES = [
@@ -40,7 +44,7 @@ class LearningOutcomeResult < ActiveRecord::Base
   before_save :infer_defaults
 
   attr_accessible :learning_outcome, :user, :association_object, :alignment, :associated_asset
-
+  
   def infer_defaults
     self.learning_outcome_id = self.alignment.learning_outcome_id
     self.context_code = "#{self.context_type.underscore}_#{self.context_id}" rescue nil
@@ -51,7 +55,7 @@ class LearningOutcomeResult < ActiveRecord::Base
     self.percent = nil if self.percent && !self.percent.to_f.finite?
     true
   end
-
+  
   def assignment
     if self.association_object.is_a?(Assignment)
       self.association_object
@@ -84,7 +88,7 @@ class LearningOutcomeResult < ActiveRecord::Base
       save
     end
   end
-
+  
   scope :for_context_codes, lambda { |codes|
     if codes == 'all'
       scoped

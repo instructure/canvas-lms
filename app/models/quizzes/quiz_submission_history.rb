@@ -24,19 +24,33 @@
 
 class Quizzes::QuizSubmissionHistory
   extend Forwardable
-  def_delegators :@attempts, :length, :size, :[], :each, :last
+  def_delegators :attempts, :length, :size, :[], :each, :last
   include Enumerable
 
   def initialize(quiz_submission)
-    @attempts = build_attempts(quiz_submission)
+    @submission = quiz_submission
+  end
+
+  def attempts
+    @attempts ||= build_attempts(@submission)
   end
 
   def last_versions
-    @attempts.map { |attempt| attempt.versions.last }
+    attempts.map { |attempt| attempt.versions.last }
   end
 
   def version_models
     last_versions.map { |version| version.model }
+  end
+
+  def kept
+    @kept ||= begin
+      if @submission.score == @submission.kept_score
+        @submission
+      else
+        version_models.detect {|v| v.score == @submission.kept_score }
+      end
+    end
   end
 
   private

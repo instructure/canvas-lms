@@ -1,13 +1,19 @@
 define [
   'ember'
   '../mixins/redirect'
+  '../shared/environment'
   'i18n!quiz_route'
-], (Ember, Redirect, I18n) ->
+  '../shared/title_builder'
+], (Ember, Redirect, env, I18n, titleBuilder) ->
 
   QuizRoute = Ember.Route.extend Redirect,
 
     # redirect for deleted model
     afterModel: (quiz, transition) ->
+      # set the quiz in the env so that we can use it for nested routes
+      env.set("quizId", quiz.id)
+      titleBuilder([quiz.get('title')])
+
       if quiz.get("deleted")
         quiz.unloadRecord()
         msg = I18n.t('that_quiz_has_been_deleted', 'That quiz has been deleted')
@@ -33,6 +39,6 @@ define [
           outlet: 'modal'
 
       messageStudents: ->
-        @render 'message_students',
+        @render 'quiz/message_students',
           into: 'application'
           outlet: 'modal'

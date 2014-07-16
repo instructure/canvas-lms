@@ -29,6 +29,7 @@ class RubricAssessment < ActiveRecord::Base
   belongs_to :user
   belongs_to :assessor, :class_name => 'User'
   belongs_to :artifact, :polymorphic => true, :touch => true
+  validates_inclusion_of :artifact_type, :allow_nil => true, :in => ['Submission', 'Assignment']
   has_many :assessment_requests, :dependent => :destroy
   serialize :data
 
@@ -150,13 +151,10 @@ class RubricAssessment < ActiveRecord::Base
   protected :update_artifact
   
   set_policy do
-    given {|user, session| session && session[:rubric_assessment_ids] && session[:rubric_assessment_ids].include?(self.id) }
-    can :create and can :read and can :update
-  
-    given {|user, session| user && self.assessor_id == user.id }
+    given {|user| user && self.assessor_id == user.id }
     can :create and can :read and can :update
     
-    given {|user, session| user && self.user_id == user.id }
+    given {|user| user && self.user_id == user.id }
     can :read
     
     given {|user, session| self.rubric_association && self.rubric_association.grants_rights?(user, session, :manage)[:manage] }

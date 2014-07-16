@@ -26,6 +26,7 @@ require [
 
     messages:
       confirmDelete: I18n.t('confirm.delete_conversation', 'Are you sure you want to delete your copy of this conversation? This action cannot be undone.')
+      messageDeleted: I18n.t('message_deleted', 'Message Deleted!')
 
     sendingCount: 0
 
@@ -87,7 +88,7 @@ require [
         if model.get('messages')
           @selectConversation(model)
         else
-          @lastFetch = model.fetch(success: @selectConversation)
+          @lastFetch = model.fetch(data: {include_participant_contexts: false, include_private_conversation_enrollments: false}, success: @selectConversation)
           @detail.$el.disableWhileLoading(@lastFetch)
 
     selectConversation: (model) =>
@@ -125,6 +126,8 @@ require [
       messages = @batchUpdate('destroy')
       delete @detail.model
       @list.collection.remove(messages)
+      @header.updateUi(null)
+      $.flashMessage(@messages.messageDeleted)
       @detail.render()
 
     onCompose: (e) =>

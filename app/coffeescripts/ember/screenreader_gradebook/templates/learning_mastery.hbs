@@ -1,8 +1,4 @@
-<div class="row">
-  <div class="span12">
-    <h2>{{#t 'global_settings'}}Global Settings{{/t}}</h2>
-  </div>
-</div>
+{{partial "settings/header"}}
 
 <div class="row">
   <div class="span4">
@@ -23,6 +19,7 @@
     }}
   </div>
 </div>
+
 <div class="row">
   <div class="span4"></div>
   <div class="span8">
@@ -40,6 +37,7 @@
     </div>
   </div>
 </div>
+
 <div class="row">
   <div class="span4">
     {{!-- Intentionally left empty so this scales to smaller screens --}}
@@ -55,11 +53,7 @@
 
 <div class="hr"></div>
 
-<div class="row">
-  <div class="span12">
-    <h2>{{#t 'content_selection'}}Content Selection{{/t}}</h2>
-  </div>
-</div>
+{{partial "content_selection/header"}}
 
 <div class="row pad-box bottom-only">
   <div class="span4 text-right-responsive">
@@ -67,6 +61,8 @@
       {{#t 'select_student'}}Select a student{{/t}}
     </label>
   </div>
+
+
   <div class="span8">
     {{
       fast-select id="outcome_student_select"
@@ -78,73 +74,19 @@
       selected=selectedStudent
     }}
 
-    <div class="row pad-box bottom-only" id="outcome_student_navigation">
-      <div class="span3">
-        <button
-          id="outcome_prev_student"
-          class="btn btn-block"
-          {{action 'selectItem' 'selectedStudent' 'previous'}}
-          {{ bind-attr disabled=disablePrevStudentButton }}
-        >
-          {{#t 'previous_student'}}Previous Student{{/t}}
-        </button>
-      </div>
-      <div class="span3">
-        <button
-          id="outcome_next_student"
-          class="btn btn-block"
-          {{action 'selectItem' 'selectedStudent' 'next'}}
-          {{bind-attr disabled=disableNextStudentButton}}
-        >
-          {{#t 'next_student'}}Next Student{{/t}}
-        </button>
-      </div>
+    {{view App.SelectionButtonsView
+      type='student'
+      selected=selectedStudent
+      list=studentsInSelectedSection
+     }}
+
     </div>
   </div>
 </div>
 
-<div class="row pad-box bottom-only">
-  <div class="span4 text-right-responsive">
-    <label for="outcome_select">
-      {{#t 'select_outcome'}}Select an outcome{{/t}}
-    </label>
-  </div>
-  <div class="span8">
-    {{
-      fast-select id="outcome_select"
-      class="outcome_select"
-      items=outcomes
-      valuePath="id"
-      labelPath="title"
-      labelDefault=outcomeSelectDefaultLabel
-      selected=selectedOutcome
-    }}
 
-    <div id="outcome_navigation" class="row pad-box bottom-only">
-      <div class="span3">
-        <button
-          id="prev_outcome"
-          class="btn btn-block"
-          {{action 'selectItem' 'selectedOutcome' 'previous'}}
-          {{bind-attr disabled=disablePrevOutcomeButton}}
-        >
-          {{#t 'previous_outcome'}}Previous Outcome{{/t}}
-        </button>
-      </div>
 
-      <div class="span3">
-        <button
-          id="next_outcome"
-          class="btn btn-block"
-          {{action 'selectItem' 'selectedOutcome' 'next'}}
-          {{bind-attr disabled=disableNextOutcomeButton}}
-        >
-          {{#t 'next_outcome'}}Next Outcome{{/t}}
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
+{{partial "content_selection/outcome"}}
 
 <div class="hr"></div>
 
@@ -195,23 +137,7 @@
           {{/if}}
         </h3>
         {{#if selectedStudent.isLoaded}}
-          <div>
-            <strong>
-              {{#t 'secondary_id'}}Secondary ID:{{/t}}
-              <span id="outcome_secondary_id">
-                {{#if hideStudentNames}}
-                  <em>{{#t 'hidden'}}hidden{{/t}}</em>
-                {{else}}
-                  {{selectedStudent.login_id}}
-                {{/if}}
-              </span>
-            </strong>
-          </div>
-          <div>
-            <strong>
-              {{#t 'sections'}}Sections:{{/t}} {{selectedStudentSections}}
-            </strong>
-          </div>
+          {{partial "student_information/details"}}
         {{else}}
           <p>{{#t 'results_loading'}}Results for this student are still loading...{{/t}}</p>
         {{/if}}
@@ -226,67 +152,4 @@
 
 <div class="hr"></div>
 
-<div id="outcome_information">
-  <div class="row">
-    <div class="span4">
-      <h2>{{#t 'outcome_info'}}Outcome Information{{/t}}</h2>
-    </div>
-    <div class="span8">
-      {{#if selectedOutcome}}
-        <h3 class="outcome_selection">
-          {{selectedOutcome.title}}
-        </h3>
-
-        <div class="pad-box no-sides">
-          <p><strong>
-            {{#t 'result_sub_count'}}Total results: {{/t}} {{outcomeDetails.cnt}}
-          </strong></p>
-        </div>
-
-        <div class="pad-box bottom-only">
-          <table class="table">
-            <thead>
-              <tr>
-                {{#if outcomeDetails}}
-                  {{#with outcomeDetails }}
-                    {{#if cnt}}
-                      <th scope="col">{{#t 'avg_score'}}Average Score{{/t}}</th>
-                      <th scope="col">{{#t 'high_score'}}High Score{{/t}}</th>
-                      <th scope="col">{{#t 'low_score'}}Low Score{{/t}}</th>
-                    {{/if}}
-                  {{/with}}
-                {{/if}}
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                {{#if outcomeDetails}}
-                  {{#with outcomeDetails }}
-                    {{#if cnt}}
-                      <td>{{average}}</td>
-                      <td>{{max}}</td>
-                      <td>{{min}}</td>
-                    {{/if}}
-                  {{/with}}
-                {{/if}}
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      {{else}}
-        <p class="outcome_selection pad-box top-only">
-          {{#t 'empty_outcome_selection'}}Select an outcome to view additional information here.{{/t}}
-        </p>
-      {{/if}}
-    </div>
-
-    <div
-      class="aria-announcer hide-text affix"
-      aria-live="polite"
-      aria-atomic="true"
-      aria-relative="all"
-    >
-      {{ariaAnnounced}}
-    </div>
-  </div>
-</div>
+{{partial 'outcome_information'}}

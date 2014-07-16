@@ -136,5 +136,5 @@ if Qti.migration_executable
                     :question_count=>10,
                     :quiz_type=>nil,
                     :quiz_name=>"Quiz",
-                    :title=>"Quiz"}]}
+                    :title=>"Quiz"}]}.with_indifferent_access
 end

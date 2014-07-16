@@ -119,4 +119,60 @@ describe Quizzes::QuizStatistics do
     stats.expects(:build_csv_attachment).never
     stats.generate_csv.should == attachment
   end
+
+  describe 'self#large_quiz?' do
+    let :quiz_questions do
+      Object.new.tap { |o| o.stubs(size: 50) }
+    end
+
+    let :quiz_submissions do
+      Object.new.tap { |o| o.stubs(size: 15) }
+    end
+
+    let :quiz do
+      Quizzes::Quiz.new.tap do |quiz|
+        quiz.stubs(:quiz_questions).returns(quiz_questions)
+        quiz.stubs(:quiz_submissions).returns(quiz_submissions)
+      end
+    end
+
+    context 'quiz_statistics_max_questions' do
+      it 'should be true when there are too many questions' do
+        Setting.expects(:get).with('quiz_statistics_max_questions',
+          Quizzes::QuizStatistics::DefaultMaxQuestions).returns 25
+
+        Quizzes::QuizStatistics.large_quiz?(quiz).should be_true
+      end
+
+      it 'should be false otherwise' do
+        Setting.expects(:get).with('quiz_statistics_max_questions',
+          Quizzes::QuizStatistics::DefaultMaxQuestions).returns 100
+
+        Setting.expects(:get).with('quiz_statistics_max_submissions',
+          Quizzes::QuizStatistics::DefaultMaxSubmissions).returns 25
+
+        Quizzes::QuizStatistics.large_quiz?(quiz).should be_false
+      end
+    end
+
+    context 'quiz_statistics_max_submissions' do
+      it 'should be true when there are too many submissions' do
+        Setting.expects(:get).with('quiz_statistics_max_questions',
+          Quizzes::QuizStatistics::DefaultMaxQuestions).returns 100
+        Setting.expects(:get).with('quiz_statistics_max_submissions',
+          Quizzes::QuizStatistics::DefaultMaxSubmissions).returns 5
+
+        Quizzes::QuizStatistics.large_quiz?(quiz).should be_true
+      end
+
+      it 'should be false otherwise' do
+        Setting.expects(:get).with('quiz_statistics_max_questions',
+          Quizzes::QuizStatistics::DefaultMaxQuestions).returns 100
+        Setting.expects(:get).with('quiz_statistics_max_submissions',
+          Quizzes::QuizStatistics::DefaultMaxSubmissions).returns 25
+
+        Quizzes::QuizStatistics.large_quiz?(quiz).should be_false
+      end
+    end
+  end
 end

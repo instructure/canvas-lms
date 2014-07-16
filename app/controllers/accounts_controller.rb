@@ -466,7 +466,7 @@ class AccountsController < ApplicationController
 
   def settings
     if authorized_action(@account, @current_user, :read)
-      @available_reports = AccountReport.available_reports(@account) if @account.grants_right?(@current_user, @session, :read_reports)
+      @available_reports = AccountReport.available_reports if @account.grants_right?(@current_user, @session, :read_reports)
       if @available_reports
         @last_complete_reports = {}
         @last_reports = {}

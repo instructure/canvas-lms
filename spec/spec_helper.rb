@@ -418,6 +418,10 @@ end
     # so before(:all)'s don't get confused
     Account.clear_special_account_cache!
     Notification.after_create { Notification.reset_cache! }
+    AdheresToPolicy::Cache.clear
+
+    # allow tests to still run in non-draft state even though it's hard-coded on
+    Feature.definitions["draft_state"].send(:instance_variable_set, '@state', 'allowed')
   end
 
   def delete_fixtures!
@@ -684,6 +688,17 @@ end
   def course_with_observer_logged_in(opts={})
     course_with_observer(opts)
     user_session(@user)
+  end
+
+  def course_with_student_submissions(opts={})
+    course_with_teacher_logged_in(opts)
+    student_in_course
+    submission_count = opts[:submissions] || 1
+    submission_count.times do |s|
+      assignment = @course.assignments.create!(:title => "test #{s} assignment")
+      submission = assignment.submissions.create!(:assignment_id => assignment.id, :user_id => @student.id)
+      submission.update_attributes!(score: '5') if opts[:submission_points]
+    end
   end
 
   def set_course_draft_state(enabled=true, opts={})
@@ -1416,7 +1431,7 @@ end
 
     @request_id = opts[:request_id] || RequestContextGenerator.request_id
     unless @request_id
-      @request_id = UUIDSingleton.instance.generate
+      @request_id = CanvasUUID.generate
       RequestContextGenerator.stubs(:request_id => @request_id)
     end
 

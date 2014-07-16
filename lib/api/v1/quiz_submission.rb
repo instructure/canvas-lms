@@ -47,6 +47,7 @@ module Api::V1::QuizSubmission
   QUIZ_SUBMISSION_JSON_FIELD_METHODS = %w[
     time_spent
     attempts_left
+    questions_regraded_since_last_attempt
   ].freeze
 
   def quiz_submission_json(qs, quiz, user, session, context = nil)

@@ -24,13 +24,14 @@ describe "manage groups" do
         f('#add-group-set').click
         set_value f('#new_category_name'), "zomg"
         f('[name=split_groups]').click
-        set_value f('[name=create_group_count]'), 2
+        driver.execute_script("$('[name=create_group_count]:enabled').val(2)")
         submit_form f('.group-category-create')
 
         wait_for_ajaximations
 
         # yay, added
-        f('#group_categories_tabs .collectionViewItems').text.should == 'zomg'
+        f('#group_categories_tabs .collectionViewItems').text.should include('Everyone')
+        f('#group_categories_tabs .collectionViewItems').text.should include('zomg')
 
         run_jobs
 
@@ -60,7 +61,7 @@ describe "manage groups" do
       wait_for_ajaximations
 
       # verify the group set tab is created
-      fj("#group_categories_tabs li[role='tab']:first").text.should == 'Group Set 1'
+      fj("#group_categories_tabs li[role='tab']:nth-child(2)").text.should == 'Group Set 1'
       # verify has the two created but unassigned students
       ff("div[data-view='unassignedUsers'] .group-user-name").length.should == 2
 

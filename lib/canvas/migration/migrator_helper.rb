@@ -139,6 +139,10 @@ module MigratorHelper
   def save_to_file(file_name = nil)
     make_export_dir
     add_assessment_id_prepend
+
+    @course = @course.with_indifferent_access
+    Importers::AssessmentQuestionImporter.preprocess_migration_data(@course)
+
     file_name ||= File.join(@base_export_dir, FULL_COURSE_JSON_FILENAME)
     file_name = File.expand_path(file_name)
     @course[:full_export_file_path] = file_name
@@ -165,7 +169,7 @@ module MigratorHelper
 
     settings[:archive_file]
   end
-  
+
   def id_prepender
     @settings[:id_prepender]
   end
@@ -284,6 +288,7 @@ module MigratorHelper
     @overview[:all_questions_qti_export] = @course[:all_questions_qti_export] if @course[:all_questions_qti_export]
     @overview[:course_outline] = @course[:course_outline] if @course[:course_outline]
     @overview[:error_count] = @error_count
+
     if @course[:assessments]
       @overview[:assessments] = []
       if @course[:assessments][:assessments]
@@ -306,6 +311,14 @@ module MigratorHelper
         end
       end
     end
+
+    if @course[:assessment_question_banks]
+      @overview[:assessment_question_banks] ||= []
+      @course[:assessment_question_banks].each do |aqb|
+        @overview[:assessment_question_banks] << aqb.dup
+      end
+    end
+
     if @course[:calendar_events]
       @overview[:calendar_events] = []
       @course[:calendar_events].each do |e|

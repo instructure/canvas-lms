@@ -14,6 +14,7 @@
 
 <% if @context.is_a?(Course) %>
   <% js_bundle :roster %>
+  <% js_env :canManageCourse => can_do(@context, @current_user, :manage) %>
 <% else %>
   <% content_for :stylesheets do %>
     <style>
@@ -48,7 +49,7 @@
                 <div class="more_info">
                   <div class="short_name"><%= student.short_name %></div>
                   <div class="email"><%= student.email %></div>
-                  <% if @enrollments_hash %> 
+                  <% if @enrollments_hash %>
                     <% @enrollments_hash[student.id].each do |e| %>
                       <div class="course_section"><%= e.try(:course_section).try(:display_name) %></div>
                     <% end %>
@@ -78,7 +79,7 @@
                 <div class="more_info">
                   <div class="short_name"><%= teacher.short_name %></div>
                   <div class="email"><%= teacher.email %></div>
-                  <% if @enrollments_hash %> 
+                  <% if @enrollments_hash %>
                     <% @enrollments_hash[teacher.id].each do |e| %>
                       <div class="course_section"><%= e.try(:course_section).try(:display_name) %></div>
                     <% end %>

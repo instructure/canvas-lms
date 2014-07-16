@@ -104,6 +104,7 @@ describe "Outcomes API", type: :request do
         "context_id" => @account.id,
         "context_type" => "Account",
         "title" => @outcome.title,
+        "display_name" => nil,
         "url" => api_v1_outcome_path(:id => @outcome.id),
         "vendor_guid" => "vendorguid9000",
         "can_edit" => true,
@@ -134,6 +135,7 @@ describe "Outcomes API", type: :request do
         "context_id" => @account.id,
         "context_type" => "Account",
         "title" => @outcome.title,
+        "display_name" => nil,
         "url" => api_v1_outcome_path(:id => @outcome.id),
         "vendor_guid" => "vendorguid9000",
         "can_edit" => true,
@@ -250,6 +252,7 @@ describe "Outcomes API", type: :request do
         "context_type" => "Account",
         "vendor_guid" => "vendorguid9000",
         "title" => "New Title",
+        "display_name" => nil,
         "url" => api_v1_outcome_path(:id => @outcome.id),
         "can_edit" => true,
         "description" => "New Description"

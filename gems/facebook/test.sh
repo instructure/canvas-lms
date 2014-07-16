@@ -2,7 +2,7 @@
 result=0
 
 
-bundle install
+bundle check || bundle install
 bundle exec rspec spec
 let result=$result+$?
 

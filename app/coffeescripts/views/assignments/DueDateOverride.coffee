@@ -4,11 +4,11 @@ define [
   'jst/assignments/DueDateOverride'
   'compiled/models/AssignmentOverride'
   'i18n!overrides'
-], (Backbone, _, template, AssignmentOverride,I18n) ->
+], (Backbone, _, template, AssignmentOverride, I18n) ->
 
   # Class Summary
   #   Holds a list of Due Dates and adds items to the collection
-  #   when the user creates a new due date. 
+  #   when the user creates a new due date.
   class DueDateOverrideView extends Backbone.View
 
     template: template

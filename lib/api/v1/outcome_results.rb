@@ -59,7 +59,7 @@ module Api::V1::OutcomeResults
   def outcome_results_include_outcomes_json(outcomes)
     outcomes.map do |o|
       hash = outcome_json(o, @current_user, session)
-      hash.merge!(alignments: o.alignments.map(&:content).map(&:asset_string))
+      hash.merge!(alignments: o.alignments.map(&:content_asset_string))
       Api.recursively_stringify_json_ids(hash)
     end
   end
@@ -136,18 +136,14 @@ module Api::V1::OutcomeResults
       [rollup, serialize_rollup(rollup, :user)]
     end
 
-    serialized_rollups_with_section_duplicates = serialized_rollup_pairs.map do |rollup, serialized_rollup|
-      duplicate_rollup_row_for_sections(rollup, serialized_rollup)
-    end
-
-    serialized_rollups_with_section_duplicates.flatten(1)
+    duplicate_rollup_rows_for_sections(serialized_rollup_pairs)
   end
 
   # Internal: generates an array of duplicate serialized_rollups with distinct
   # section links for each section of the user's course. If @section is set (as
   # it is if section_id is sent as a parameter to the rollup api endpoint), only
   # that section is included
-  def duplicate_rollup_row_for_sections(rollup, serialized_rollup)
+  def duplicate_rollup_rows_for_sections(serialized_rollup_pairs)
     # this is uglier than it should be to inject section ids. they really should
     # be in a 'links' section or something.
     # ideally, we would have some seperate mapping from users to course sections
@@ -155,9 +151,18 @@ module Api::V1::OutcomeResults
     # we're mostly assuming that there is one section enrollment per user. if a user
     # is in multiple sections, they will have multiple rollup results. pagination is
     # still by user, so the counts won't match up. again, this is a very rare thing
-    (@section ? [@section] : rollup.context.sections_for_course(@context)).map do |section|
-      serialized_rollup.deep_merge(links: {section: section.id.to_s})
-    end
+    section_ids_func = if @section
+                         ->(user) { [@section.id] }
+                       else
+                         enrollments = @context.student_enrollments.active.where(:user_id => serialized_rollup_pairs.map{|pair| pair[0].context.id}).to_a
+                         ->(user) { enrollments.select{|e| e.user_id == user.id}.map(&:course_section_id) }
+                       end
+
+    serialized_rollup_pairs.map do |rollup, serialized_rollup|
+      section_ids_func.call(rollup.context).map do |section_id|
+        serialized_rollup.deep_merge(links: {section: section_id.to_s})
+      end
+    end.flatten(1)
   end
 
   # Internal: Returns an Array of serialized rollup scores
@@ -169,6 +174,7 @@ module Api::V1::OutcomeResults
   def serialize_rollup_score(score)
     {
       score: score.score,
+      count: score.count,
       links: {outcome: score.outcome.id.to_s},
     }
   end

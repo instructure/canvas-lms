@@ -17,9 +17,13 @@
 #
 
 class AuditorApiController < ApplicationController
-  before_filter :check_configured
+  before_filter :check_configured, :disable_auditors
 
   private
+
+  def disable_auditors
+    render :json => { :message => 'Log searches have been temporarily disabled.' }, :status => :service_unavailable
+  end
 
   def check_configured
     not_found unless Canvas::Cassandra::DatabaseBuilder.configured?('auditors')

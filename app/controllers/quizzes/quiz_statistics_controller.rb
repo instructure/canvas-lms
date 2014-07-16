@@ -284,9 +284,18 @@ class Quizzes::QuizStatisticsController < ApplicationController
   #  }
   def index
     if authorized_action(@quiz, @current_user, :read_statistics)
-      all_versions = value_to_boolean(params[:all_versions])
-      statistics = @service.generate_aggregate_statistics(all_versions)
-      render json: serialize(statistics)
+      scope = @quiz.quiz_submissions.not_settings_only.completed
+      updated = scope.order('updated_at DESC').limit(1).pluck(:updated_at).first
+      cache_key = ['quiz_statistics', @quiz.id, @quiz.updated_at, updated,
+                   params[:all_versions]].cache_key
+
+      json = Rails.cache.fetch(cache_key) do
+        all_versions = value_to_boolean(params[:all_versions])
+        statistics = @service.generate_aggregate_statistics(all_versions)
+        serialize(statistics)
+      end
+
+      render json: json
     end
   end
 

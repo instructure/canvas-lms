@@ -62,7 +62,12 @@ module CC::Importer::Standard
           if File.exists?(file_path)
             zipfile.add(val[:path_name], file_path)
           else
-            # todo add warning
+            web_file_path = File.join(@unzipped_file_path, WEB_RESOURCES_FOLDER, val[:path_name])
+            if File.exists?(web_file_path)
+              zipfile.add(val[:path_name], web_file_path)
+            else
+              val[:errored] = true
+            end
           end
         end
       end

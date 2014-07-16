@@ -149,7 +149,7 @@ module Canvas::AccountReports::ReportHelper
   end
 
   def check_report_key(key)
-    Canvas::AccountReports.for_account(account)[@account_report.report_type][:parameters].keys.include? key
+    Canvas::AccountReports.available_reports[@account_report.report_type][:parameters].keys.include? key
   end
 
   def report_extra_text
@@ -179,8 +179,12 @@ module Canvas::AccountReports::ReportHelper
     end
   end
 
+  def report_title(account_report )
+    Canvas::AccountReports.available_reports[account_report.report_type].title
+  end
+
   def send_report(file = nil, account_report = @account_report)
-    type = Canvas::AccountReports.for_account(account)[account_report.report_type][:title]
+    type = report_title(account_report)
     if account_report.has_parameter? "extra_text"
       options = account_report.parameters["extra_text"]
     end

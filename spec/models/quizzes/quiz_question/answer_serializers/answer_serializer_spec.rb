@@ -6,16 +6,19 @@ describe Quizzes::QuizQuestion::AnswerSerializers::AnswerSerializer do
   it 'automatically registers answer serializers' do
     serializer = nil
 
-    qq = {}
-    qq.stubs(:data).returns { { question_type: 'uber_hax_question' } }
+    qq = { question_type: 'uber_hax_question' }
 
     expect { ASes.serializer_for qq }.to raise_error
 
-    class UberHax < Quizzes::QuizQuestion::AnswerSerializers::AnswerSerializer
+    class Quizzes::QuizQuestion::AnswerSerializers::UberHax < Quizzes::QuizQuestion::AnswerSerializers::AnswerSerializer
     end
 
-    expect { serializer = ASes.serializer_for qq }.to_not raise_error
+    begin
+      expect { serializer = ASes.serializer_for qq }.to_not raise_error
 
-    serializer.is_a?(ASes::AnswerSerializer).should be_true
+      serializer.is_a?(ASes::AnswerSerializer).should be_true
+    ensure
+      Quizzes::QuizQuestion::AnswerSerializers.send(:remove_const, :UberHax)
+    end
   end
 end

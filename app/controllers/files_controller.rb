@@ -90,7 +90,7 @@
 #
 class FilesController < ApplicationController
   before_filter :require_user, :only => :create_pending
-  before_filter :require_context, :except => [:full_index,:assessment_question_show,:image_thumbnail,:show_thumbnail,:preflight,:create_pending,:s3_success,:show,:api_create,:api_create_success,:api_show,:api_index,:destroy,:api_update,:api_file_status]
+  before_filter :require_context, :except => [:full_index,:assessment_question_show,:image_thumbnail,:show_thumbnail,:preflight,:create_pending,:s3_success,:show,:api_create,:api_create_success,:api_show,:api_index,:destroy,:api_update,:api_file_status,:public_url]
   before_filter :check_file_access_flags, :only => [:show_relative, :show]
   prepend_around_filter :load_pseudonym_from_policy, :only => :create
   skip_before_filter :verify_authenticity_token, :only => :api_create
@@ -160,6 +160,8 @@ class FilesController < ApplicationController
   protected :check_file_access_flags
 
   def index
+    return ember_app if (@context.feature_enabled?(:better_file_browsing))
+
     if request.format == :json
       if authorized_action(@context.attachments.build, @current_user, :read)
         @current_folder = Folder.find_folder(@context, params[:folder_id])
@@ -309,6 +311,15 @@ class FilesController < ApplicationController
     end
   end
 
+  def ember_app
+    raise ActiveRecord::RecordNotFound unless tab_enabled?(@context.class::TAB_FILES) && @context.feature_enabled?(:better_file_browsing)
+    clear_crumbs
+    js_bundle :files
+    jammit_css :ember_files
+    render :text => "".html_safe, :layout => true
+  end
+
+
   def full_index
     get_context
     get_quota
@@ -369,7 +380,18 @@ class FilesController < ApplicationController
     show
   end
 
-  # this is used for the google docs preview of a document
+  # @API Get quota information
+  # Determine the URL that should be used for inline preview of the file.
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/files/1/public_url' \
+  #         -H 'Authorization: Bearer <token>'
+  #
+  # @example_response
+  #
+  #  { "public_url": "https://example-bucket.s3.amazonaws.com/example-namespace/attachments/1/example-filename?AWSAccessKeyId=example-key&Expires=1400000000&Signature=example-signature" }
+  #
   def public_url
     @attachment = Attachment.find(params[:id])
     # if the attachment is part of a submisison, its 'context' will be the student that submmited the assignment.  so if  @current_user is a
@@ -492,7 +514,8 @@ class FilesController < ApplicationController
       end
       if request.format == :json
         options = {:permissions => {:user => @current_user}}
-        if attachment.grants_right?(@current_user, session, :download)
+        can_download = attachment.grants_right?(@current_user, session, :download)
+        if can_download
           # Right now we assume if they ask for json data on the attachment
           # which includes the scribd doc data, then that means they have 
           # viewed or are about to view the file in some form.
@@ -511,8 +534,10 @@ class FilesController < ApplicationController
       end
       format.json {
         render :json => attachment.as_json(options).tap { |json|
-          canvadoc_url = attachment.canvadoc_url(@current_user)
-          json['attachment']['canvadoc_session_url'] = canvadoc_url
+          if can_download
+            canvadoc_url = attachment.canvadoc_url(@current_user)
+            json['attachment']['canvadoc_session_url'] = canvadoc_url
+          end
         }
       }
     end

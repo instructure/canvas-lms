@@ -21,3 +21,12 @@ define ['../../shared/environment'], (environment) ->
         update: true
     equal environment.get('canManage'), true
     equal environment.get('canUpdate'), true
+
+  test 'returns false for flags when not available', ->
+    equal environment.get('moderateEnabled'), false
+
+  test 'returns appropriate flag status when available', ->
+    environment.setEnv
+      FLAGS:
+        quiz_moderate: true
+    equal environment.get('moderateEnabled'), true

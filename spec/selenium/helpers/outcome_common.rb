@@ -153,10 +153,8 @@ def should_create_a_learning_outcome_nested
   replace_content(f('.outcomes-content input[name=title]'), outcome_name)
 
   # submit
-  driver.execute_script("$('.submit_button').click()")
-  if !f('.submit_button').nil?
-    driver.execute_script("$('.submit_button').click()")
-  end
+  f('.submit_button').click
+  wait_for_ajaximations
   refresh_page
 
   #select group

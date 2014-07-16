@@ -228,16 +228,26 @@ class ConversationsController < ApplicationController
       render :json => @conversations_json
     else
       return redirect_to conversations_path(:scope => params[:redirect_scope]) if params[:redirect_scope]
-      load_all_contexts :permissions => [:manage_user_notes]
+      @current_user.reset_unread_conversations_counter
+      @current_user.reload
+
       notes_enabled = @current_user.associated_accounts.any?{|a| a.enable_user_notes }
-      can_add_notes_for_account = notes_enabled && @current_user.associated_accounts.any?{|a| a.grants_right?(@current_user, nil, :manage_students) }
-      js_env(:CONVERSATIONS => {
-               :ATTACHMENTS_FOLDER_ID => @current_user.conversation_attachments_folder.id,
-               :ACCOUNT_CONTEXT_CODE => "account_#{@domain_root_account.id}",
-               :CONTEXTS => @contexts,
-               :NOTES_ENABLED => notes_enabled,
-               :CAN_ADD_NOTES_FOR_ACCOUNT => can_add_notes_for_account,
-             })
+      hash = {
+        :ATTACHMENTS_FOLDER_ID => @current_user.conversation_attachments_folder.id,
+        :ACCOUNT_CONTEXT_CODE => "account_#{@domain_root_account.id}",
+        :NOTES_ENABLED => notes_enabled,
+      }
+
+      if notes_enabled
+        unless hash[:CAN_ADD_NOTES_FOR_ACCOUNT] = @current_user.associated_accounts.any?{|a| a.grants_right?(@current_user, nil, :manage_students) }
+          course_note_permissions = {}
+          @current_user.enrollments.of_instructor_type.each do |enrollment|
+            course_note_permissions[enrollment.course_id] = true if enrollment.has_permission_to?(:manage_user_notes)
+          end
+          hash[:CAN_ADD_NOTES_FOR_COURSES] = course_note_permissions
+        end
+      end
+      js_env(CONVERSATIONS: hash)
       return render :template => 'conversations/index_new'
     end
   end
@@ -493,9 +503,11 @@ class ConversationsController < ApplicationController
       messages = @conversation.messages
       ConversationMessage.send(:preload_associations, messages, :asset)
     end
+
     render :json => conversation_json(@conversation,
                                       @current_user,
                                       session,
+                                      include_participant_contexts: value_to_boolean(params.fetch(:include_participant_contexts, true)),
                                       include_indirect_participants: true,
                                       messages: messages,
                                       submissions: [],
@@ -1012,7 +1024,11 @@ class ConversationsController < ApplicationController
   end
 
   def include_private_conversation_enrollments
-    value_to_boolean(params[:include_private_conversation_enrollments]) || api_request?
+    if params.has_key? :include_private_conversation_enrollments
+      value_to_boolean(params[:include_private_conversation_enrollments])
+    else
+      api_request?
+    end
   end
 
   # TODO API v2: default to false, like we do in the UI

@@ -3,6 +3,7 @@ define [
   'ember'
   'underscore'
   '../start_app'
+  '../environment_setup'
 ], (ajax, Ember, _, startApp) ->
 
   {run} = Ember

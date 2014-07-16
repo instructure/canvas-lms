@@ -66,7 +66,7 @@ describe UsersController do
       Facebook::Connection.config = Proc.new do
         {}
       end
-      CanvasUuid::Uuid.stubs(:generate).returns("some_uuid")
+      CanvasSlug.stubs(:generate).returns("some_uuid")
 
       user_with_pseudonym
       user_session(@user)

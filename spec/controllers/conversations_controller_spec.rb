@@ -51,9 +51,6 @@ describe ConversationsController do
       get 'index'
       response.should be_success
       assigns[:js_env].should_not be_nil
-      assigns[:contexts][:courses].to_a.map{|p|p[1]}.
-        reduce(true){|truth, con| truth and con.has_key?(:url)}.should be_true
-      assigns[:contexts][:courses][@course.id][:term].should == "Fall"
     end
 
     it "should assign variables for json" do
@@ -181,6 +178,19 @@ describe ConversationsController do
         response.should be_success
         assigns[:conversations_json][:conversations].size.should eql 1
         assigns[:conversations_json][:conversation_ids].size.should eql 1
+      end
+
+      it "should recompute inbox count" do
+        # In an effort to make the data fix easy to do and self-healing,
+        # recompute the unread inbox count when the page is loaded.
+        course_with_student_logged_in(:active_all => true)
+        @user.update_attribute(:unread_conversations_count, -20) # create invalid starting value
+        @c1 = conversation
+
+        get 'index'
+        response.should be_success
+        @user.reload
+        @user.unread_conversations_count.should == 0
       end
     end
   end

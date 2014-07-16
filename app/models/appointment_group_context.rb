@@ -19,6 +19,7 @@
 class AppointmentGroupContext < ActiveRecord::Base
   belongs_to :appointment_group
   belongs_to :context, :polymorphic => true
+  validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course']
 
   attr_accessible :appointment_group, :context
   EXPORTABLE_ATTRIBUTES = [:id, :appointment_group_id, :context_id, :context_type, :created_at, :updated_at]

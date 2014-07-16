@@ -11,8 +11,8 @@ define [ '../questions_controller', 'i18n!quiz_statistics' ], (Base, I18n) ->
     correctResponseRatio: (->
       participantCount = @get('participantCount')
 
-      if participantCount == 0
-        return 0
-
-      @get('fullCredit') / participantCount
+      if participantCount > 0
+        @get('fullCredit') / participantCount
+      else
+        0
     ).property('fullCredit', 'participantCount')

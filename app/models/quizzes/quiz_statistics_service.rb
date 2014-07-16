@@ -12,8 +12,8 @@ class Quizzes::QuizStatisticsService
   #   An object ready for API serialization containing (persisted) versions of
   #   the *latest* Student and Item analysis for the quiz.
   def generate_aggregate_statistics(all_versions)
-    if all_versions && quiz.context.large_roster?
-      reject! 'operation not available for large courses', 400
+    if Quizzes::QuizStatistics.large_quiz?(quiz)
+      reject! 'operation not available for large quizzes', 400
     end
 
     Quizzes::QuizStatisticsSerializer::Input.new(quiz, *[

@@ -24,7 +24,7 @@ describe Course do
     # the whole example JSON from Bracken because the formatting is
     # somewhat in flux
     json = File.open(File.join(IMPORT_JSON_DIR, 'import_from_migration.json')).read
-    data = JSON.parse(json)
+    data = JSON.parse(json).with_indifferent_access
     data['all_files_export'] = {
       'file_path'  => File.join(IMPORT_JSON_DIR, 'import_from_migration_small.zip')
     }
@@ -202,19 +202,21 @@ describe Course do
 
     Importers::CourseContentImporter.import_content(@course, data, params, migration)
 
-    aqb1 = @course.assessment_question_banks.find_by_migration_id("i7ed12d5eade40d9ee8ecb5300b8e02b2")
+    aqb1 = @course.assessment_question_banks.find_by_migration_id("i7c16375e1a00381824d060d3d4f9acc4")
     aqb1.assessment_questions.count.should == 3
-    aqb2 = @course.assessment_question_banks.find_by_migration_id("ife86eb19e30869506ee219b17a6a1d4e")
+    aqb2 = @course.assessment_question_banks.find_by_migration_id("i966491408fab70dfc76ae02b197938a3")
     aqb2.assessment_questions.count.should == 2
   end
 
-  it "should not create assessment question banks or import questions for quizzes that are not selected" do
+  it "should not create assessment question banks if they are not selected" do
     course
 
     json = File.open(File.join(IMPORT_JSON_DIR, 'assessments.json')).read
     data = JSON.parse(json).with_indifferent_access
 
-    params = {"copy" => {"quizzes" => {"i7ed12d5eade40d9ee8ecb5300b8e02b2" => true}}}
+    params = {"copy" => {"assessment_question_banks" => {"i7c16375e1a00381824d060d3d4f9acc4" => true},
+                         "quizzes" => {"i7ed12d5eade40d9ee8ecb5300b8e02b2" => true,
+                                       "ife86eb19e30869506ee219b17a6a1d4e" => true}}}
 
     migration = ContentMigration.create!(:context => @course)
     migration.migration_settings[:migration_ids_to_import] = params
@@ -222,12 +224,17 @@ describe Course do
 
     Importers::CourseContentImporter.import_content(@course, data, params, migration)
 
-    aqb1 = @course.assessment_question_banks.find_by_migration_id("i7ed12d5eade40d9ee8ecb5300b8e02b2")
+    @course.assessment_question_banks.count.should == 1
+    aqb1 = @course.assessment_question_banks.find_by_migration_id("i7c16375e1a00381824d060d3d4f9acc4")
     aqb1.assessment_questions.count.should == 3
-    aqb2 = @course.assessment_question_banks.find_by_migration_id("ife86eb19e30869506ee219b17a6a1d4e")
-    aqb2.should be_nil
-
     @course.assessment_questions.count.should == 3
+
+    @course.quizzes.count.should == 2
+    quiz1 = @course.quizzes.find_by_migration_id("i7ed12d5eade40d9ee8ecb5300b8e02b2")
+    quiz1.quiz_questions.each{|qq| qq.assessment_question.should_not be_nil }
+
+    quiz2 = @course.quizzes.find_by_migration_id("ife86eb19e30869506ee219b17a6a1d4e")
+    quiz2.quiz_questions.each{|qq| qq.assessment_question.should be_nil } # since the bank wasn't brought in
   end
 
   describe "shift_date_options" do

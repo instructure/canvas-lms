@@ -1,4 +1,4 @@
-define [ 'ember', 'vendor/d3.v3' ], ({Mixin}, d3) ->
+define [ 'ember', 'vendor/d3.v3' ], (Ember, d3) ->
   d3.selection.prototype.inspectable = (view) ->
     this
       .on('mouseover', view.inspect.bind(view))
@@ -6,7 +6,7 @@ define [ 'ember', 'vendor/d3.v3' ], ({Mixin}, d3) ->
 
   # This view mixin adds support displaying tooltips for data points in a d3
   # chart.
-  Mixin.create({
+  Ember.Mixin.create({
     # Override this to prepare the set of items that will be used as content to
     # display in the tooltip for each distinct answer.
     #

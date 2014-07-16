@@ -50,6 +50,11 @@ module Polling
   #           "description": "The unique identifier for the user that created the poll.",
   #           "example": 105,
   #           "type": "integer"
+  #         },
+  #         "total_results": {
+  #           "description": "An aggregate of the results of all associated poll sessions, with the poll choice id as the key, and the aggregated submission count as the value.",
+  #           "example": { "543": 20, "544": 5, "545": 17 },
+  #           "type": "object"
   #         }
   #       }
   #    }
@@ -71,9 +76,9 @@ module Polling
     #
     def index
       @polls = @current_user.polls.order('created_at DESC')
-      @polls = Api.paginate(@polls, self, api_v1_polls_url)
+      json, meta = paginate_for(@polls)
 
-      render json: serialize_jsonapi(@polls)
+      render json: serialize_jsonapi(json, meta)
     end
 
     # @API Get a single poll
@@ -166,18 +171,30 @@ module Polling
     end
 
     protected
-    def serialize_jsonapi(polls)
+    def paginate_for(polls)
+      meta = {}
+      json = if accepts_jsonapi?
+              polls, meta = Api.jsonapi_paginate(polls, self, api_v1_polls_url)
+              meta[:primaryCollection] = 'polls'
+              polls
+             else
+               Api.paginate(polls, self, api_v1_polls_url)
+             end
+
+      return json, meta
+    end
+
+    def serialize_jsonapi(polls, meta = {})
       polls = Array.wrap(polls)
 
-      serialized_set = Canvas::APIArraySerializer.new(polls, {
+      Canvas::APIArraySerializer.new(polls, {
         each_serializer: Polling::PollSerializer,
         controller: self,
-        root: false,
+        root: :polls,
+        meta: meta,
         scope: @current_user,
         include_root: false
       }).as_json
-
-      { polls: serialized_set }
     end
 
   end

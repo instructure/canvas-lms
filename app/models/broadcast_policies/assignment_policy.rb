@@ -25,7 +25,7 @@ module BroadcastPolicies
     end
 
     def should_dispatch_assignment_created?
-      return false unless assignment.context.available?
+      return false unless context_sendable?
       if assignment.context.feature_enabled?(:draft_state)
         published_on_create? || just_published?
       else
@@ -34,8 +34,14 @@ module BroadcastPolicies
     end
 
     private
-    def accepting_messages?
+
+    def context_sendable?
       assignment.context.available? &&
+        !assignment.context.concluded?
+    end
+
+    def accepting_messages?
+      context_sendable? &&
       prior_version
     end
 

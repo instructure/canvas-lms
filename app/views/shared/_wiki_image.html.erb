@@ -1,7 +1,7 @@
 <% url = context_url(@context, :context_file_preview_url, wiki_image.id) if wiki_image %>
-<div style="text-align: center <%= hidden unless wiki_image %>" class="img_link" title="<%= t('titles.embed_image', %{Click to embed image}) %>">
+<a href="#" style="text-align: center <%= hidden unless wiki_image %>" class="img_link" title="<%= t('titles.embed_image', %{Click to embed image}) %>">
   <div class="img_holder">
     <img class="img" data-url="<%= url %>" src="<%= (wiki_image && wiki_image.thumbnail_url) || url %>" alt="<%= wiki_image ? wiki_image.display_name : '{{ display_name }}' %>" title="<%= t'titles.click_to_embed', "Click to embed %{image}", :image => (wiki_image ? wiki_image.display_name : '{{ display_name }}') %>">
   </div>
   <div class="display_name"><%= wiki_image ? wiki_image.display_name : '{{ display_name }}' %></div>
-</div>
+</a>

@@ -2,17 +2,23 @@
 <% a = p.account %>
 <% product_name = a.product_name || "Canvas" %>
 <% cc = asset.is_a?(CommunicationChannel) ? asset : (p.communication_channel || p.user.communication_channel) %>
+
 <% define_content :link do %>
   <%= HostUrl.protocol %>://<%= HostUrl.context_host((p.account rescue nil)) %>/register/<%= cc.confirmation_code %>
 <% end %>
+
 <% define_content :subject do %>
   <%= t :subject, "Confirm Registration: %{product_name}", product_name: product_name %>
 <% end %>
+
+<% define_content :footer_link do %>
+  <a href="<%= content(:link) %>">
+    <%= t :details, "Click here to finish the registration process" %>
+  </a>
+<% end %>
+
 <p><%= t :body,
       "Thank you for registering with %{product_name}!  This email is confirmation that the user %{user} is registering for a new account at %{website}.",
       :product_name => product_name,
       :user => asset.user.short_name,
       :website => (HostUrl.context_host((p.account rescue nil)) || HostUrl.default_host) %></p>
-
-<p><a href="<%= content :link %>"><%= t :details, "Click here to finish the registration process" %></a></p>
-

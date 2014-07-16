@@ -150,14 +150,16 @@ describe CourseProgress do
       progress[:requirement_completed_count].should == 1
     end
 
-    it "only queries active ContentTags" do
-      progress1 = CourseProgress.new(@course, @user)
-      old_content_tag = progress1.current_content_tag
-      old_content_tag.destroy
+    it "does not query destroyed ContentTags" do
+      @tag.destroy
+      progress = CourseProgress.new(@course, @user)
+      progress.current_content_tag.id.should_not == @tag.id
+    end
 
-      # build a new progress object to refresh memoization caching
-      progress2 = CourseProgress.new(@course, @user)
-      progress2.current_content_tag.id.should_not == old_content_tag.id
+    it "does not query unpublished ContentTags" do
+      @tag.unpublish
+      progress = CourseProgress.new(@course, @user)
+      progress.current_content_tag.id.should_not == @tag.id
     end
   end
 end

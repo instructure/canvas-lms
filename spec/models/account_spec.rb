@@ -1015,26 +1015,6 @@ describe Account do
     end
   end
 
-  describe ":enable_fabulous_quizzes setting" do
-
-    it "is false by default" do
-      account = Account.create!
-      account.enable_fabulous_quizzes?.should == false
-    end
-  end
-
-  describe "disable/enable_fabulous_quizzes!" do
-
-    it "toggles the enable_fabulous_quizzes setting appropriately" do
-      account = Account.create!
-      account.enable_fabulous_quizzes!
-      account.enable_fabulous_quizzes?.should == true
-
-      account.disable_fabulous_quizzes!
-      account.enable_fabulous_quizzes?.should == false
-    end
-  end
-
   describe "default_time_zone" do
     context "root account" do
       before do

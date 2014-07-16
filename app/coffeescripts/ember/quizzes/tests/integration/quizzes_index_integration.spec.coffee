@@ -4,9 +4,10 @@ define [
   'ic-ajax',
   '../shared_ajax_fixtures',
   '../../shared/environment'
+  '../test_title',
   '../environment_setup',
   '../../../../behaviors/elementToggler'
-], (startApp, Ember, ajax, fixtures, env) ->
+], (startApp, Ember, ajax, fixtures, env, testTitle) ->
 
   App = null
 
@@ -17,6 +18,10 @@ define [
 
     teardown: ->
       Ember.run App, 'destroy'
+
+  testTitle
+    path: '/',
+    title: 'Quizzes'
 
   test 'Quizzes pages load appropriately', ->
     visit('/').then ->

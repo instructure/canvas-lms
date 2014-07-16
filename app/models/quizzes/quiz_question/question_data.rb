@@ -107,9 +107,10 @@ class Quizzes::QuizQuestion::QuestionData
   end
 
   def build_answer_parser
-    if Quizzes::QuizQuestion::AnswerParsers.constants.include?(type_to_class(@question[:question_type]))
-      Quizzes::QuizQuestion::AnswerParsers.const_get(type_to_class(@question[:question_type]))
-    else
+    klass = type_to_class(question[:question_type])
+    begin
+      "Quizzes::QuizQuestion::AnswerParsers::#{klass}".constantize
+    rescue NameError
       Quizzes::QuizQuestion::AnswerParsers::AnswerParser
     end
   end
@@ -120,6 +121,6 @@ class Quizzes::QuizQuestion::QuestionData
 
 
   def type_to_class(type)
-    type.to_s.gsub("_question", "").camelize.to_sym
+    type.to_s.gsub("_question", "").camelize
   end
 end
