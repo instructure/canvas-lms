@@ -16,6 +16,8 @@ group :development do
   # Option to DISABLE_RUBY_DEBUGGING is helpful IDE-based debugging.
   # The ruby debug gems conflict with the IDE-based debugger gem.
   # Set this option in your dev environment to disable.
+
+
   unless ENV['DISABLE_RUBY_DEBUGGING']
     if RUBY_VERSION >= '2.2'
       gem 'byebug', '3.1.2'

@@ -562,7 +562,8 @@ class ActiveRecord::Base
     scope = scope ? scope.dup : {}
     scope.delete(:include)
     sql = with_exclusive_scope(find: scope) { scoped.to_sql }
-    table = "#{table_name}_find_in_batches_temporary_table_#{sql.hash.abs.to_s(36)}"
+    table = "#{table_name}_find_in_batches_temp_table_#{sql.hash.abs.to_s(36)}"
+    table = table[-64..-1] if table.length > 64
     if %w{MySQL Mysql2}.include?(connection.adapter_name)
       table_options = " (temp_primary_key MEDIUMINT NOT NULL AUTO_INCREMENT PRIMARY KEY)"
     end
@@ -996,7 +997,8 @@ unless CANVAS_RAILS2
     def find_in_batches_with_temp_table(options = {})
       batch_size = options[:batch_size] || 1000
       sql = to_sql
-      table = "#{table_name}_find_in_batches_temporary_table_#{sql.hash.abs.to_s(36)}"
+      table = "#{table_name}_find_in_batches_temp_table_#{sql.hash.abs.to_s(36)}"
+      table = table[-64..-1] if table.length > 64
       connection.execute "CREATE TEMPORARY TABLE #{table} AS #{sql}"
       begin
         index = "temp_primary_key"
