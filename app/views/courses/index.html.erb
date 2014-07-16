@@ -43,6 +43,10 @@
         <span class="name ellipsis" title=<%= group_name %>>
           <%= group_name %>
         </span>
+        <span class="subtitle ellipsis"><%= group.context.name %></span>
+        <% if group.context_type == 'Course' && !group.context.enrollment_term.default_term? %>
+          <span class="subtitle ellipsis"><%= group.context.enrollment_term.name %></span>
+        <% end %>
         </a>
         </td>
       </tr>
