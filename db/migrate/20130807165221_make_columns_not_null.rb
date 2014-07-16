@@ -2,22 +2,32 @@ class MakeColumnsNotNull < ActiveRecord::Migration
   disable_ddl_transaction!
   tag :postdeploy
 
+  def self.mysql?
+    %w{MySQL Mysql2}.include?(connection.adapter_name)
+  end
+
+  def self.change_fk_column_null_with_less_locking(table, column, foreign_table = column.to_s.sub(/_id$/, '').tableize.to_sym)
+    remove_foreign_key table, column: column if mysql?
+    change_column_null_with_less_locking table, column
+    add_foreign_key table, foreign_table, column: column if mysql?
+  end
+
   def self.up
     change_column_null_with_less_locking :abstract_courses, :workflow_state
-    change_column_null_with_less_locking :abstract_courses, :account_id
-    change_column_null_with_less_locking :abstract_courses, :root_account_id
+    change_fk_column_null_with_less_locking :abstract_courses, :account_id
+    change_fk_column_null_with_less_locking :abstract_courses, :root_account_id, :accounts
     AbstractCourse.where(enrollment_term_id: nil).find_each do |ac|
       AbstractCourse.where(id: ac).update_all(enrollment_term_id: ac.root_account.default_enrollment_term.id)
     end
-    change_column_null_with_less_locking :abstract_courses, :enrollment_term_id
-    change_column_null_with_less_locking :account_authorization_configs, :account_id
+    change_fk_column_null_with_less_locking :abstract_courses, :enrollment_term_id
+    change_fk_column_null_with_less_locking :account_authorization_configs, :account_id
     change_column_null_with_less_locking :account_notifications, :start_at
     change_column_null_with_less_locking :account_notifications, :end_at
-    change_column_null_with_less_locking :account_notifications, :account_id
-    change_column_null_with_less_locking :account_users, :account_id
+    change_fk_column_null_with_less_locking :account_notifications, :account_id
+    change_fk_column_null_with_less_locking :account_users, :account_id
     change_column_null_with_less_locking :account_users, :user_id
     change_column_null_with_less_locking :account_users, :membership_type
-    change_column_null_with_less_locking :account_reports, :account_id
+    change_fk_column_null_with_less_locking :account_reports, :account_id
     change_column_null_with_less_locking :account_reports, :user_id
     change_column_null_with_less_locking :account_reports, :workflow_state
     change_column_null_with_less_locking :accounts, :workflow_state
@@ -51,7 +61,7 @@ class MakeColumnsNotNull < ActiveRecord::Migration
     change_column_null_with_less_locking :collections, :workflow_state
     change_column_null_with_less_locking :collections, :context_id
     change_column_null_with_less_locking :collections, :context_type
-    change_column_null_with_less_locking :collection_items, :collection_id
+    change_fk_column_null_with_less_locking :collection_items, :collection_id
     change_column_null_with_less_locking :collection_items, :collection_item_data_id
     change_column_null_with_less_locking :collection_items, :user_id
     change_column_null_with_less_locking :collection_items, :workflow_state
@@ -60,10 +70,10 @@ class MakeColumnsNotNull < ActiveRecord::Migration
     change_column_null_with_less_locking :collection_item_upvotes, :user_id
     change_column_null_with_less_locking :communication_channels, :path
     change_column_null_with_less_locking :communication_channels, :path_type
-    change_column_null_with_less_locking :communication_channels, :user_id
+    change_fk_column_null_with_less_locking :communication_channels, :user_id
     change_column_null_with_less_locking :communication_channels, :workflow_state
     change_column_null_with_less_locking :content_exports, :workflow_state
-    change_column_null_with_less_locking :content_exports, :course_id
+    change_fk_column_null_with_less_locking :content_exports, :course_id
     change_column_null_with_less_locking :content_migrations, :workflow_state
     change_column_null_with_less_locking :content_migrations, :context_id
     change_column_null_with_less_locking :content_participations, :workflow_state
@@ -92,16 +102,16 @@ class MakeColumnsNotNull < ActiveRecord::Migration
     change_column_null_with_less_locking :course_account_associations, :course_id
     change_column_null_with_less_locking :course_account_associations, :account_id
     change_column_null_with_less_locking :course_imports, :workflow_state
-    change_column_null_with_less_locking :course_imports, :course_id
+    change_fk_column_null_with_less_locking :course_imports, :course_id
     change_column_null_with_less_locking :course_imports, :import_type
     change_column_null_with_less_locking :course_imports, :workflow_state
     change_column_null_with_less_locking :course_sections, :course_id
-    change_column_null_with_less_locking :course_sections, :root_account_id
+    change_fk_column_null_with_less_locking :course_sections, :root_account_id, :accounts
     change_column_null_with_less_locking :course_sections, :workflow_state
     change_column_null_with_less_locking :courses, :workflow_state
-    change_column_null_with_less_locking :courses, :account_id
-    change_column_null_with_less_locking :courses, :root_account_id
-    change_column_null_with_less_locking :courses, :enrollment_term_id
+    change_fk_column_null_with_less_locking :courses, :account_id
+    change_fk_column_null_with_less_locking :courses, :root_account_id, :accounts
+    change_fk_column_null_with_less_locking :courses, :enrollment_term_id
     change_column_null_with_less_locking :delayed_notifications, :workflow_state
     change_column_null_with_less_locking :delayed_notifications, :notification_id
     change_column_null_with_less_locking :delayed_notifications, :asset_id
@@ -111,27 +121,27 @@ class MakeColumnsNotNull < ActiveRecord::Migration
     change_column_null_with_less_locking :discussion_entry_participants, :discussion_entry_id
     change_column_null_with_less_locking :discussion_topic_participants, :workflow_state
     change_column_null_with_less_locking :discussion_topic_participants, :user_id
-    change_column_null_with_less_locking :discussion_topic_participants, :discussion_topic_id
+    change_fk_column_null_with_less_locking :discussion_topic_participants, :discussion_topic_id
     change_column_null_with_less_locking :discussion_topic_participants, :unread_entry_count
     change_column_null_with_less_locking :discussion_topics, :context_type
     change_column_null_with_less_locking :discussion_topics, :context_id
     change_column_null_with_less_locking :discussion_topics, :workflow_state
-    change_column_null_with_less_locking :enrollment_terms, :root_account_id
+    change_fk_column_null_with_less_locking :enrollment_terms, :root_account_id, :accounts
     change_column_null_with_less_locking :enrollment_terms, :workflow_state
     change_column_null_with_less_locking :enrollments, :user_id
-    change_column_null_with_less_locking :enrollments, :course_id
+    change_fk_column_null_with_less_locking :enrollments, :course_id
     change_column_null_with_less_locking :enrollments, :type
-    change_column_null_with_less_locking :enrollments, :root_account_id
+    change_fk_column_null_with_less_locking :enrollments, :root_account_id, :accounts
     Enrollment.where(course_section_id: nil).find_each do |e|
       Enrollment.where(id: e).update_all(course_section_id: e.course.default_section.id)
     end
     change_column_null_with_less_locking :enrollments, :course_section_id
     change_column_null_with_less_locking :enrollments, :workflow_state
-    change_column_null_with_less_locking :eportfolios, :user_id
+    change_fk_column_null_with_less_locking :eportfolios, :user_id
     change_column_null_with_less_locking :eportfolios, :workflow_state
-    change_column_null_with_less_locking :eportfolio_categories, :eportfolio_id
-    change_column_null_with_less_locking :eportfolio_entries, :eportfolio_id
-    change_column_null_with_less_locking :eportfolio_entries, :eportfolio_category_id
+    change_fk_column_null_with_less_locking :eportfolio_categories, :eportfolio_id
+    change_fk_column_null_with_less_locking :eportfolio_entries, :eportfolio_id
+    change_fk_column_null_with_less_locking :eportfolio_entries, :eportfolio_category_id
     change_column_null_with_less_locking :external_feed_entries, :workflow_state
     change_column_null_with_less_locking :external_feed_entries, :external_feed_id
     change_column_null_with_less_locking :external_feeds, :url
@@ -143,13 +153,13 @@ class MakeColumnsNotNull < ActiveRecord::Migration
     change_column_null_with_less_locking :grading_standards, :workflow_state
     change_column_null_with_less_locking :grading_standards, :context_id
     change_column_null_with_less_locking :grading_standards, :context_type
-    change_column_null_with_less_locking :group_memberships, :group_id
+    change_fk_column_null_with_less_locking :group_memberships, :group_id
     change_column_null_with_less_locking :group_memberships, :user_id
     change_column_null_with_less_locking :group_memberships, :workflow_state
     change_column_null_with_less_locking :groups, :context_id
     change_column_null_with_less_locking :groups, :context_type
-    change_column_null_with_less_locking :groups, :account_id
-    change_column_null_with_less_locking :groups, :root_account_id
+    change_fk_column_null_with_less_locking :groups, :account_id
+    change_fk_column_null_with_less_locking :groups, :root_account_id, :accounts
     change_column_null_with_less_locking :groups, :workflow_state
     LearningOutcome.where(short_description: nil).update_all(short_description: '')
     change_column_null_with_less_locking :learning_outcomes, :short_description
@@ -168,7 +178,7 @@ class MakeColumnsNotNull < ActiveRecord::Migration
     change_column_null_with_less_locking :notification_policies, :broadcast
     change_column_null_with_less_locking :notifications, :workflow_state
     change_column_null_with_less_locking :page_views, :user_id
-    change_column_null_with_less_locking :profiles, :root_account_id
+    change_fk_column_null_with_less_locking :profiles, :root_account_id, :accounts
     change_column_null_with_less_locking :profiles, :context_id
     change_column_null_with_less_locking :profiles, :context_type
     change_column_null_with_less_locking :progresses, :context_id
@@ -186,11 +196,11 @@ class MakeColumnsNotNull < ActiveRecord::Migration
     change_column_null_with_less_locking :quiz_submissions, :quiz_id
     change_column_null_with_less_locking :roles, :workflow_state
     change_column_null_with_less_locking :rubric_assessments, :assessment_type
-    change_column_null_with_less_locking :rubric_assessments, :rubric_id
+    change_fk_column_null_with_less_locking :rubric_assessments, :rubric_id
     change_column_null_with_less_locking :rubric_assessments, :artifact_id
     change_column_null_with_less_locking :rubric_assessments, :artifact_type
     change_column_null_with_less_locking :rubric_associations, :purpose
-    change_column_null_with_less_locking :rubric_associations, :rubric_id
+    change_fk_column_null_with_less_locking :rubric_associations, :rubric_id
     change_column_null_with_less_locking :rubric_associations, :association_id
     change_column_null_with_less_locking :rubric_associations, :association_type
     change_column_null_with_less_locking :rubric_associations, :context_id
@@ -199,7 +209,7 @@ class MakeColumnsNotNull < ActiveRecord::Migration
     change_column_null_with_less_locking :rubrics, :context_id
     change_column_null_with_less_locking :rubrics, :context_type
     change_column_null_with_less_locking :session_persistence_tokens, :crypted_token
-    change_column_null_with_less_locking :session_persistence_tokens, :pseudonym_id
+    change_fk_column_null_with_less_locking :session_persistence_tokens, :pseudonym_id
     change_column_null_with_less_locking :session_persistence_tokens, :token_salt
     change_column_null_with_less_locking :sis_batches, :workflow_state
     change_column_null_with_less_locking :sis_batches, :account_id
