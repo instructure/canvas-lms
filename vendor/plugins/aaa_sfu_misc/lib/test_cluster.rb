@@ -23,7 +23,8 @@ require Pathname(File.dirname(__FILE__)) + "../../sfu_api/app/model/sfu/sfu"
 ApplicationController.class_eval do
   def self.test_cluster
     unless defined?(@test_cluster)
-      @test_cluster = Setting.from_config('testcluster', false).try(:[], 'test_cluster')
+      config = ConfigFile.load('testcluster', false) || {}
+      @test_cluster = config['test_cluster']
     end
     @test_cluster
   end
