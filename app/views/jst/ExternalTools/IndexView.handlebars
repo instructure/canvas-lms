@@ -17,9 +17,9 @@
 <div class="clearfix" id="app_center_filter_wrapper">
   <input type="text" id="app_center_filter" class="input-large search-query pull-right" placeholder="{{#t "search_filter"}}Filter by name{{/t}}">
   <ul class="nav nav-pills" id="target-installed-state-items">
-    <li data-installed-state="all" class="active"><a href="#" data-toggle-installed-state="all">{{#t "all"}}All{{/t}}</a></li>
-    <li data-installed-state="not_installed"><a href="#" data-toggle-installed-state="not_installed">{{#t "not_installed"}}Not Installed{{/t}}</a></li>
-    <li data-installed-state="installed"><a href="#" data-toggle-installed-state="installed">{{#t "installed"}}Installed{{/t}}</a></li>
+    <li data-installed-state="all" class="active"><a href="#" data-toggle-installed-state="all" role="tab" aria-selected="true" >{{#t "all"}}All{{/t}}</a></li>
+    <li data-installed-state="not_installed"><a href="#" data-toggle-installed-state="not_installed" role="tab" aria-selected="false">{{#t "not_installed"}}Not Installed{{/t}}</a></li>
+    <li data-installed-state="installed"><a href="#" data-toggle-installed-state="installed" role="tab" aria-selected="false">{{#t "installed"}}Installed{{/t}}</a></li>
   </ul>
 </div>
 
