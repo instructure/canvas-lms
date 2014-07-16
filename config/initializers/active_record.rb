@@ -1412,8 +1412,14 @@ if defined?(ActiveRecord::ConnectionAdapters::PostgreSQLAdapter)
           if CANVAS_RAILS2
             conditions = " WHERE #{ActiveRecord::Base.send(:sanitize_sql, conditions, table_name.to_s.dup)}"
           else
-            model_class = ActiveRecord::Base.all_models.detect{|m| m.table_name.to_s == table_name.to_s} || ActiveRecord::Base
-            conditions = " WHERE #{model_class.send(:sanitize_sql, conditions, table_name.to_s.dup)}"
+            sql_conditions = options[:where]
+            unless sql_conditions.is_a?(String)
+              model_class = table_name.classify.constantize rescue nil
+              model_class ||= ActiveRecord::Base.all_models.detect{|m| m.table_name.to_s == table_name.to_s}
+              model_class ||= ActiveRecord::Base
+              sql_conditions = model_class.send(:sanitize_sql, conditions, table_name.to_s.dup)
+            end
+            conditions = " WHERE #{sql_conditions}"
           end
         end
       else
