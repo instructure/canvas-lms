@@ -323,6 +323,7 @@ nl:
       reports: "Rapporten: %{files}"
     student: 
       enrollment_state: "Inclusief provincie van inschrijving: waar;"
+      enrollment_states: "Provincies van inschrijving: %{states};"
   account_settings: 
     account: Account
     account_name_too_long: "Accountnaam is te lang"
@@ -887,6 +888,7 @@ nl:
       help_link_available_to_all_teachers: Docenten
       help_link_available_to_all_users: Gebruikers
       if_you_would_like_to_link_to_your_own_campus_support_website_in_the_help_dialog_you_can_do_that_here: "Als je een link naar jouw eigen campusondersteuningswebsite wilt maken in het Help-dialoogvenster, kun je dat hier doen."
+      interpolate_account_domain: "\"{{ACCOUNT_DOMAIN}} invoeren om het domein van het hoofdaccount van de gebruiker te vervangen"
       ip_filter_filter_label: Filter
       ip_filter_name_label: Naam
       labels: 
@@ -1094,9 +1096,8 @@ nl:
         other: "%{count} batches wachten op verwerking."
       pending_batches_title: "Batches in behandeling"
       process_data_button: "Gegevens verwerken"
-      select_file_instructions: |-
-          Selecteer het zipbestand dat u wil importeren.
-          [Zie deze documentatie](%{uri}) als u wilt weten hoe u deze zipbestanden kunt genereren.
+      select_file_instructions: "Het zipbestand selecteren dat je wilt importeren.\n\
+          [Zie deze documentatie](%{url}) als je wilt weten hoe je deze zipbestanden kunt genereren. "
       sis_import_crumb: SIS-import
       started_at_message: "Gestart: %{started_at}"
       title: SIS-import
@@ -1261,8 +1262,8 @@ nl:
       ta: "Onderwijsassistent inschrijvingen"
       teachers: "Docent inschrijvingen"
     user_add_failed_message: "Toevoegen van gebruiker mislukt. Probeer het opnieuw."
-    user_added_message: "%{user} succesvol toegevoegd!"
-    user_added_message_sent_message: "%{user} succesvol toegevoegd! Er wordt spoedig een bevestiging per e-mail verstuurd."
+    user_added_message: "*%{user}* succesvol toegevoegd!"
+    user_added_message_sent_message: "*%{user}* succesvol toegevoegd! Per e-mail wordt spoedig een bevestiging gestuurd."
     user_deleted_message: "%{username} is verwijderd"
     user_inactivity_csv_description: 
       account_reports: 
@@ -1514,6 +1515,7 @@ nl:
       upload_as_zip: "Upload bestanden als een zipbestand"
     feed_entry_title: "Opdracht: %{assignment}"
     feed_entry_title_with_course: "Opdracht, %{course}: %{assignment}"
+    gpa_scale_explainer: "Wat is de schaal van het eindcijfer?"
     group_assignment_must_have_group_set: "Selecteer een groep voor deze opdracht"
     hide_advanced_options: "Verberg geavanceerde opties"
     imported_assignments_group: "Geïmporteerde opdrachten"
@@ -1539,6 +1541,7 @@ nl:
       external_tool: "een externe tool"
       on_paper: "op papier"
     titles: 
+      gpa_scale_explainer: "Wat is de schaal van het eindcijfer?"
       grading_scheme_info: "Beoordelingsschema bekijken/bewerken"
     warnings: 
       group_assignment: "De opdracht \"%{assignment}\" is een groepsopdracht. U moet de groepsinstellingen opnieuw instellen voor deze nieuwe context"
@@ -1676,7 +1679,9 @@ nl:
       empty_points_possible: "-%{pointsPossible} punten"
       no_submission: "Geen inzending"
       no_submission_for_assignment_screenreader: "Geen inzending voor deze opdracht. %{pointsPossible} punten mogelijk."
-      score_with_points_possible_screenreader: "Score: %{score} van %{pointsPossible} punten."
+      not_yet_graded: "*Nog niet beoordeeld*"
+      score_with_points_possible: "*%{score}*/%{pointsPossible} punten"
+      score_with_points_possible_screenreader: "Score: %{score} op %{pointsPossible} punten."
     assignment_locked: 
       assignment_locked: "Deze opdracht is vergrendeld sinds *%{lock_at}*"
       assignment_unlocked_from: "Deze opdracht is vergrendeld tot *%{unlock_at}*"
@@ -1879,10 +1884,16 @@ nl:
     graded: "De opdracht is beoordeeld"
     grading_type_selector: 
       display_grade_as: "Geef eindcijfer aan als"
+      gpa_scale_explainer: "De schaal voor het eindcijfer is voor instellingen ontworpen die voor alle opdrachten een schaal van 4.0 (of 5.0/6.0) gebruiken. Het schaalsysteem lijkt op de display van het lettercijfer maar verschilt in belangrijke punten:"
+      gpa_scale_input_explainer: "Scores worden in de schaal van 4.0 ingevoerd. Bijvoorbeeld, als een opdracht uit 100 punten bestaat, een cijfer van 4.0 komt overheen met 100%. 3.0 komt overheen met 87%, etc."
       gpa_scale_letters_explainer: "Letter als eindcijfer naast getal als eindcijfer gebruiken. "
       gpa_scale_percentage_explainer: "Je kunt geen punten direct invoeren, maar je kunt wel percentages invoeren. Als je bijvoorbeeld een opdracht hebt die 50 punten waard is, zal \"40\" invoeren niet lukken but \"80%\" zal wel lukken."
+      gpa_scale_recommendation: "Tenzij jouw instelling een schaal van 4.0 of (5.0/6.0) gebruikt, raad Canvas aan om eindcijfers als lettercijfers aan te geven."
+      gpa_scale_scores_explainer: "De enige scores die toegestaan zijn zijn al vooraf in het schaalsysteem gedefinieerd."
+      gpa_scale_title: "\"Wat is de schaal van het eindcijfer?\""
       grading_type: Beoordelingtype
       grading_type_options: 
+        gpa_scale: "Schaal van het eindcijfer"
         letter_grade: "Beoordeling in de vorm van een letter"
         not_graded: "Niet beoordeeld"
         pass_fail: Compleet/incompleet
@@ -2151,6 +2162,9 @@ nl:
         record_media: "Media opnemen/uploaden"
         submit_assignment: "Opdracht insturen"
       comments_placeholder: Reacties...
+      errors: 
+        unacceptable_file_type: "Dit bestandstype is niet toegestaan. Toegestane bestandstypen: %{allowed_extensions_list}"
+      gmail_restriction_description: "Jouw account heeft Google Doc inzendingen naar Google accounts op het %{domain} domein beperkt. Om deze opdracht met een Google Doc in te sturen, zul je de Google doc integratie op jouw gebruikers pagina instelling opnieuw moeten configureren."
       instructions: 
         from_external_tool: "Een hulpprogramma uit de onderstaande lijst selecteren om een bron vanuit deze tool te laden en in te sturen."
         google_docs: "Het bestand uit de onderstaande lijst selecteren."
@@ -2252,9 +2266,12 @@ nl:
         wizard: 
           details: "Er komt bij een opdracht heel wat meer kijken dan alleen inleverdata en punten. Als je een beschrijving van de opdracht wilt uittypen, als je het uploaden van bestanden mogelijk wilt maken, als je het beoordelingstype wilt wijzigen of andere zaken wilt bewerken, dan klikken op de naam van de opdracht of klikken op het pictogram %{edit_icon} en vervolgens op \"meer opties\"."
           group: 
+            screenreader_step1: "Opdrachtgroepen worden gebruikt om opdrachten te organiseren. Je geeft een naam voor iedere groep aan. Als je kiest om het eindcijfer in te schatten op basis van groepen dan kun je ook een percentage score voor iedere groep instellen. Klik \"Opdrachtgroep toevoegen\" om een groep te maken."
             step1: "Opdrachtgroepen worden gebruikt om opdrachten te ordenen. Je geeft  voor iedere groep een naam op. Indien je ervoor kiest om het eindcijfer te wegen op basis van groepen (*waar?*), dan kun je ook  voor elke groep een score perecentage instellen. Klikken op \"Opdrachtgroep\" om een groep aan te maken."
           overview: "Deze pagina kan jouw cursus op een hoog niveau tillen. Je kunt opdrachten toevoegen en groeperen, en die groepen vervolgens wegen. Het idee is om eerst alles in grote lijnen te ordenen en vervolgens in de details te duiken. Je kunt hier hoe dan ook veel doen."
           quizzes: "Toetsen zijn een speciaal type opdrachten. Je kunt toetsen maken of importeren door te klikken op de link \"Toetsen\" op de linkerzijbalk."
+          screenreader_details: "Een opdracht is meer dan een inleverdatum en punten. Als je een beschrijving van de opdracht wilt aangeven, het uploaden van bestanden wilt toelaten, het type eindcijfer wilt veranderen of een stel andere dingen wilt doen, klik dan op de naam van de opdracht of klik op de pictogram bijwerken en dan op \"meer opties\"."
+          screenreader_step1: "Opdrachten zijn altijd in groepen georganiseerd, zodat als je een opdracht wilt maken je eerst moet weten welke groep je eraan wilt toevoegen. Kies de groep en klik \"Opdracht toevoegen aan\" of klik het pictogram toevoegen om een nieuwe opdracht voor een groep te beginnen."
           step1: "Opdrachten/assignments komen altijd in groepen tot stand, dus voordat je een opdracht toevoegt, moetje eerst weten welke groep je er aan wilt toevoegen. De groep selecteren en klikken op \"Opdracht toevoegen\" of klikken op het pictogram %{add_icon} om een nieuwe opdracht  voor een groep aan te maken."
           step2: "Mooi! Nu jouw details invullen. Je kunt een titel, een inleverdatum en het maximale aantal punten  voor jouw opdracht invoeren. Als je nog een stap verder wilt gaan, maar dat kan pas als de opdracht is aangemaakt."
           step3: "Klaar! De opdracht is nu aan de groep toegevoegd ! Als je  met jouw muis over de opdracht schuift, zul je een aantal opties zien. Ze betekenen het volgende:"
@@ -2265,6 +2282,7 @@ nl:
         edit_assignment_in_detail: "Opdrachten in detail bewerken"
         screenreader_show_me_add_assignment: "Neem mij naar de knop opdracht toevoegen"
         screenreader_show_me_add_assignment_group: "Neem mij naar de knop opdrachtgroep toevoegen"
+        screenreader_show_me_weight_final_grade: "Neem mij naar het keuzevakje eindcijfer bepalen"
         show_me_where: "Aan mij laten zien waar"
       subtitles: 
         edit_assignment_in_detail: "(hiermee kun je bestanden uploaden, de beschrijving bewerken, enzovoort)"
@@ -2522,6 +2540,7 @@ nl:
       scheduler_explanation_teacher_paragraph_1: "Dit is de planner/de planningstool. Je kunt deze gebruiken om afspraakgroepen aan te maken zodat jouw cursisten zich hiervoor kunnen inschrijven."
       scheduler_explanation_teacher_paragraph_2: "Stel,  dat je een schriftelijk midterm opdracht  met alle cursisten uit de cursus wilt bespreken. Je kunt dan een nieuwe afspraakgroep aanmaken, je kunt opgeven op welke dagen en tijdstippen je beschikbaar bent, je kunt de tijdstippen opsplitsen in blokken van 15 minuten en maximaal een cursist per tijdblok toelaten."
       scheduler_explanation_teacher_paragraph_3: "De cursisten ontvangen dan een bericht dat ze zich moeten inschrijven voor een van de opgegeven tijdblokken. De cursisten krijgen een combinatie van een kalender met de beschikbare tijdblokken te zien , zodat ze een voor hen geschikte tijd kunnen kiezen."
+      scheduler_explanation_teacher_paragraph_4: "*Klik op de knop \"Maak een afspraakgroep\" rechts om nu aan de slag te gaan.\"*"
       x_groups_have_signed_up: "%{participant_count} groepen hebben zich aangemeld"
       x_people_have_signed_up: "%{participant_count} personen hebben zich aangemeld"
     buttons: 
@@ -2916,6 +2935,8 @@ nl:
     private: "Privé (auteursrechtelijk beschermd)"
     public_domain: "Openbaar domein"
   change_points_possible_to_match_rubric_dialog: 
+    prompts: 
+      update_assignment_points: "Deze opdracht heeft maximaal %{assignmentPoints} aantal punten. Wil je dit wijzigen in maximaal %{rubricPoints} punten in overeenstemming met deze rubric?"
     titles: 
       update_assignment_points: "Maximaal aantal punten wijzigen om met de rubric te matchen?"
   chat: 
@@ -3556,7 +3577,7 @@ nl:
         user_view_all_sections: "Laat aan deze gebruiker alle cursusgebruikers zien"
       no_messages: "Geen berichten"
       no_services: "%{user} heeft nog geen enkele externe service aan zijn of haar account gekoppeld."
-      services_not_visible: "Geregistreerde services van %{user} zijn momenteel niet zichtbaar voor u."
+      services_not_visible: "Je kunt momenteel geen geregistreerde services van %{user} zien."
       user_only_view_section: "deze gebruiker kan alleen cursisten bekijken in de aan hem of haar toegewezen cursussectie(s)"
       user_view_all_sections: "deze gebruiker kan cursisten in elke cursussectie bekijken"
     roster_user_services: 
@@ -4044,7 +4065,7 @@ nl:
     subject: "Persoonlijk bericht"
     subject_specified: "Privébericht: %{subject}"
     users_added: 
-      one: "%{list_of_users} is toegevoegd aan de conversatie door %{current_user}"
+      one: "%{user} is toegevoegd aan de discussie door %{current_user}"
       other: "%{list_of_users} zijn toegevoegd aan de discussie door %{current_user}"
   conversation_participant: 
     batch_update_message: 
@@ -4413,8 +4434,9 @@ nl:
       course_settings: "Exporteren van cursusinstellingen mislukt"
       events: "Exporteren van kalendergebeurtenissen van de kalender mislukt"
       external_feeds: "Exporteren van externe feeds mislukt\""
+      file: "Het bestand \"%{file_name}\" kan niet geëxporteerd worden"
       file_meta: "Exporteren van de metagegevens van het bestand mislukt"
-      files: "Exporteren van een media bestand mislukt"
+      files: "Exporteren van verschillende bestanden mislukt"
       grading_standards: "Exporteren van beoordelingsstandaarden mislukt"
       learning_outcomes: "Exporteren van leerdoelen mislukt"
       lti_links: "Exporteren van enige configuraties van externe hulpprogramma mislukt"
@@ -4652,10 +4674,23 @@ nl:
         calendar: "Dit is een mooie gelegenheid om de kalender te leren kennen en om gebeurtenissen, anders dan opdrachten,  aan jouw cursus toe te voegen. Maak je geen zorgen, we helpen je hierbij."
         claimed: 
           not_saved: |-
-              U hebt een cursus aangemaakt. Wat nu? Voordat u de cursus publiceert, kunt u het beste eerst de basis in orde maken. Gebruik de lijst aan de linkerkant om te controleren of uw cursus klaar is voor gebruik.
+              Geweldig! Je hebt dus een cursus gemaakt... Wat nu? Goed, voordat je de cursus voor iedereen publiceert, kun je het beste eerst de basis in orde maken. Gebruik de lijst aan de linkerkant om te controleren of jouw cursus klaar is voor gebruik.
               
-              *Deze cursus is alleen zichtbaar voor docenten zolang de cursus nog niet is gepubliceerd*
+              *Zolang de cursus nog niet is gepubliceerd is deze cursus alleen voor docenten zichtbaar*
           saved: "Over en uit! Jouw cursus %{course} is nu officieel gemaakt. Deze is alleen voor jou zichtbaar totdat de cursus wordt gepubliceerd. Maar voordat je de cursus echt publiceert, raden wij je aan om de lijst aan de linkerkant door te lopen om een idee te krijgen van de mogelijkheden van Canvas en om ervoor te zorgen dat je straks echt les kunt geven."
+        created: 
+          not_saved: |-
+              Deze cursus is gemaakt maar niet geclaimd. De cursus zal verwijderd worden als deze niet binnen een week geclaimd wordt. In de tussentijd kun je de lijst aan de linkerkant doorlopen om te kijken of je er klaar voor bent.
+              
+              Als je wilt starten en erop  wilt terugkomen voordat het zover is, sla *deze link* dan op om er later op terug te komen.
+              
+              **Log in** of ***registreer jezelf*** om deze cursus te claimen.
+          saved: |-
+              Over en uit! Jouw cursus %{course} is nu officieel gemaakt. Deze is alleen voor jou zichtbaar totdat de cursus wordt gepubliceerd. Maar voordat je de cursus publiceert, raden we je  aan om de lijst aan de linkerkant door te lopen om een idee te krijgen van de mogelijkheden van Canvas en ervoor te zorgen dat je straks echt les kunt geven.
+              
+              Als je wilt stoppen en erop wilt terugkomen voordat het zover is, sla *deze link* dan op om er later op terug te komen.
+              
+              **Log in** of ***registreer jezelf*** om deze cursus te claimen.
         files: "Op het tabblad Bestanden kunnen jouw cursisten dias over lezingen, voorbeelddocumenten en studiehulpmiddelen of enig ander materiaal die ze willen downloaden, delen. Het uploaden en indelen van bestanden is gemakkelijk in Canvas. We zullen je weergeven hoe."
         home: "Als personen de cursus bezoeken, is dit de pagina die ze te zien krijgen. U kunt de pagina instellen als een activiteitenoverzicht, een lijst van cursusmodules, een syllabus of een zelfgemaakte pagina. De standaardinstelling is een cursusactiviteitenoverzicht. Om dit aan te passen, klikt u op %{change_layout}."
         import: "Als je hiervoor een ander cursusbeheersysteem hebt gebruikt, heb je waarschijnlijk materiaal dat je naar Canvas wilt verplaatsen. We kunnen je laten zien hoe gemakkelijk je jouw inhoud in Canvas kunt migreren."
@@ -4882,6 +4917,8 @@ nl:
         add_section: "Sectie toevoegen"
         move_course: "Cursus verplaatsen"
         update_course: "Cursusgegevens bijwerken"
+      course_open_enrollment: "Deze cursus heeft een open inschrijving. Cursisten kunnen zichzelf voor deze cursus  inschrijven eenmaal je deze URL met hen deelt: *%{url}*. Als alternatief kunnen cursisten zich inschrijven via *%{url2}* en deze volgende deelname code gebruiken: *%{code}*"
+      course_open_enrollment_without_code: "Deze cursus kent open inschrijving. Cursisten kunnen zichzelf voor deze cursus inschrijven eenmaal je deze URL met hen deelt: *%{url}*"
       course_overrides_term: "Hiermee overschrijf je beschikbaarheidsinstellingen voor alle periodes."
       date_restricted: "Gebruikers kunnen alleen tussen deze datums deelnemen aan deze cursus"
       deatils: 
@@ -5109,6 +5146,8 @@ nl:
       new: Nieuw
       new_discussion_entries: "Nieuwe discussieberichten"
       new_discussions: "Nieuwe discussies"
+      num_assignments: "# opdrachten"
+      num_submissions: "# inzendingen"
       page_title: Cursusstatistieken
       quiz: Toets
       quiz_questions: Toetsvragen
@@ -5405,24 +5444,33 @@ nl:
       africa: Afrika
       agree_to_terms: "Ik ga akkoord met de *gebruikersvoorwaarden* en bevestig het *privacybeleid**. "
       asia_and_middle_east: "Azië en Midden-Oosten"
+      assistant_superintendent: "Hulpinspecteur van het onderwijs"
       australia_new_zealand_and_oceania: "Australië, Nieuw-Zeeland, en Oceanië"
       begin_trial: "Proefabonnement beginnen"
+      bus_finance_purchasing_director: "Dir Bus/Financiën/Inkoop"
+      c_level: C-niveau
       choose: Kiezen
       cio: Informatiemanager
       corporate: Zakelijk
       dean: Decaan
       director: Directeur
+      e_rate_administrator: "ERate Administrateur"
       employee: Werknemer
+      europe_other: "Europa - Ander"
       europe_uk: "Europa - VK"
+      executive_officer: "Algemeen directeur"
       government: Overheid
       gs_11_15: "GS 11-15"
       gs_1_7: "GS 1-7"
       gs_8_10: "GS 8-10"
       higher_education: "Hoger onderwijs"
+      higher_education_for_profit: "For-profit hoger onderwijs"
       incorrect: "Onjuist. Opnieuw proberen."
       instructional_designer: "Instructie ontwerper"
+      instructional_media_svcs_dir: "Dir instructioneel mediadienst"
       invalid_email: "Geen geldig e-mailadres"
       k12: K12
+      k12_for_profit: "For-profit lager en hoger middelbaar onderwijs"
       labels: 
         current_lms: "Huidige ELO"
         location: Locatie
@@ -5435,6 +5483,7 @@ nl:
         type_what_you_hear: "Type wat je hoort"
         type_what_you_see: "Type wat je ziet"
         username: E-mail
+      library_media_specialist: "Specialist bibliotheek/media"
       lms_admin: ELO-beheerder
       lms_administrator: ELO-beheerder
       manager: Manager
@@ -5452,15 +5501,20 @@ nl:
       ready: Klaar!
       school_admin: Instellingsbeheerder
       school_administrator: Instellingsbeheerder
+      school_technology_coordinator: "Coordinator technologie in het onderwijs"
       sign_up_to_canvas: "Aanmelden om Canvas uit te proberen"
+      south_america_central_america_and_caribbean: "Zuid-Amerika, Centraal-Amerika en Caraïben"
       specify_lms: "Voer je huidige ELO in of selecteer 'geen'"
       specify_size: "Voer de grootte van je organisatie in"
       student: Cursist
       subscribe: " Van Instructure wil ik nieuws, tips en informatie ontvangen"
+      superintendent: Hoofdinspecteur
       support: Ondersteuning
       teacher: Docent/instructeur
       teacher_instructor: Docent/instructeur
       technologist: Technoloog
+      technology_computer_coord: "Coord Technologie/Computer"
+      technology_education_director: "Directeur technologie in het onderwijs"
       try_again: "Probeer opnieuw"
       united_states_and_canada: "Verenigde Staten en Canada"
       vice_president: "Coordinator "
@@ -5524,7 +5578,7 @@ nl:
       due_date: "inleverdatum %{date}"
       for: Voor
       graded_discussion_and_points: 
-        one: "Deze discussie wordt beoordeeld: *%{count} punt mogelijk*"
+        one: "Deze discussie wordt beoordeeld: *1 punt mogelijk*"
         other: "Deze discussie wordt beoordeeld: *%{count} punten mogelijk*"
       separated_conversation_notice: "Omdat dit een groepsopdracht is, heeft iedere groep een eigen gesprek voor dit onderwerp. Hier zijn de gesprekken die beschikbaar zijn voor u:"
       show_due_dates: "inleverdatums weergeven"
@@ -5544,6 +5598,7 @@ nl:
       delete: Verwijderen
       due: Inleverdatum
       graded_discussion: "Beoordeelde discussie"
+      last_post_date: "Het laatste gepost %{display_last_reply_at}"
       manage: Beheren
       move: "Verplaats naar&hellip;"
       no_due_date: "Geen inleverdatum"
@@ -5687,6 +5742,7 @@ nl:
       speed_grader: "Speed Grader"
       topic: Onderwerp
       topic_locked: "Dit onderwerp is  voor gebruikers niet zichtbaar tot *%{date}*"
+      topic_locked_until: "Dit onderwerp is vergrendeld tot %{time}"
       topic_not_visible: "Dit onderwerp is niet voor gebruikers zichtbaar"
       topic_podcast_feed_link: "Podcast-feed onderwerp"
       topic_subscribe: Aanmelden
@@ -5951,8 +6007,8 @@ nl:
     edit_link_text: "%{edit_icon} Deze pagina bewerken"
     eportfolio: 
       entry_count: 
-        one: "*%{count}* pagina's"
-        other: "*%{count}* paginas"
+        one: "*1* pagina"
+        other: "*%{count}* pagina's"
       updated_at: "laatst bijgewerkt %{updated_at}"
     help_link_text: "%{help_icon} Hoe kan ik...?"
     manage_pages_link_text: "Paginas indelen/beheren"
@@ -6204,7 +6260,7 @@ nl:
       links: 
         add_external_feed: "Externe feed toevoegen"
       options: 
-        content_to_post: "--Inhoud om te plaatsen--"
+        content_to_post: "Inhoud om te posten"
         full_article: "Volledig artikel"
         link_only: "Alleen link"
         truncated: Afgekapt
@@ -6386,6 +6442,9 @@ nl:
     draft_state_account_disable_warning: "Het uitschakelen van deze functie zal impact hebben op bestaande cursussen. Neem bij voorbeeld bij het uitschakelen van deze functie, contact op met jouw Canvas Success Manager\n"
     draft_state_course_disable_warning: "Door het uitschakelen van deze functie zullen alle bestaande objecten in de cursus gepubliceerd worden. Zorg ervoor dat, voordat je verder gaat, alle concept inhoud al klaar is voor publicatie en al beschikbaar is voor alle gebruikers van de cursus.\n"
     google_docs_domain_restriction: "Beperking van Google Docs domein"
+    high_contrast: "Hoge contrast stijlen gebruiken"
+    learning_mastery_gradebook: "Cijferlijst vakbekwaamheid leren"
+    new_styles: "Nieuwe stijlen gebruiken"
     post_grades: "Eindcijfers op SIS posten"
     student_outcome_gradebook: "Resultaat cijferlijst\""
   file_browser_view: 
@@ -6547,6 +6606,7 @@ nl:
     show: 
       messages: 
         file_locked: "Het bestand is nog niet ontgrendeld."
+        folder_locked: "Deze map \"%{folder}\", inclusief dit bestand is vergrendeld."
     text_show: 
       page_title: Bestandsvoorbeeld
     titles: 
@@ -6769,12 +6829,14 @@ nl:
     keyboard_comment_desc: "Opmerking over de actieve inzending"
     keyboard_menu_desc: "Het menu voor de kolom met actieve opdracht openen"
     keyboard_sort_desc: "Raster sorteren op de huidige actieve kolom"
+    keyboard_tooltip_desc: "Het type inzending aangeven voor actieve inzending"
     keycodes: 
       close_menu: esc
       comment: c
       goto_assignment: g
       menu: m
       sort: s
+      tooltip: t
     learning_outcome: Leerdoel
     mastery: vakbekwaam
     near_mastery: "in de buurt van vakbekwaamheid\""
@@ -6796,6 +6858,7 @@ nl:
     secondary_id: "Secundaire ID"
     section_to_show_menu: 
       choose_a_section_to_show: "Een sectie kiezen om weer te geven"
+      showing_sections: "Geeft *%{currentSection}* aan"
     show: 
       all_sections: "Alle secties"
       arrange_columns_by_due_date: "Sorteer kolommen op vervaldatum"
@@ -6898,6 +6961,7 @@ nl:
     leaving_id_will_match_better_can_add_new_assignment: "Door de ID niet te wijzigen (het \"(581)\"-gedeelte in dit geval) kan de vergelijking verbeterd worden. Je kunt ook nieuwe opdrachten toevoegen, die direct gemaakt worden."
     new_assignment_example: "Een nieuwe opdracht"
     optional_ignored: "Optioneel, genegeerd."
+    screenreader_csv_explainer: "Wat zou in mijn CSV-bestand moeten zitten? Jouw upload zou de volgende kolommen moeten bevatten: \"Student\", \"ID\", en \"Bestaande Opdracht (#)\". De Student kolom moet de naam van iedere student bevatten, in het formaat van achternaam, voornaam. Bijvoorbeeld, \"Smith, John\". De kolommen met bestaande opdracht moeten de naam van de opdracht aangeven gevolgd door het opdracht-ID tussen haakjes. Bijvoorbeeld, \"Hoofdstuk 1 werksheet (201)\". Als je SIS gebruikt, neem dan de volgende kolommen op: \"SIS gebruikers-ID\" en \"SIS aanmeldings-ID\". Als je een nieuwe opdracht wilt maken, neem dan de kolom op met dezelfde naam als de naam van de opdracht. Bijvoorbeeld, \"Deriatieven werksheet\". De volgende kolommen zijn optioneel: \"Sectie\", \"Huidige cijfer\", \"Eindcijfer.\""
     titles: 
       upload_form: "Een CSV-bestand kiezen om te uploaden"
     what_should_csv_look_like: "Hoe zou het CSV-bestand er uit moeten zien?"
@@ -6934,7 +6998,7 @@ nl:
         title: Titel
       links: 
         add_column: "Kolom toevoegen"
-      mark_attendance_info: "De aanwezigheidsweergave toont een tabel met cursisten aan de linkerkant en opdrachten aan de bovenkant. Om een leerling als aanwezig of afwezig te markeren, klikt u op het corresponderende vakje (%{present_icon} voor aanwezigheid, %{absent_icon} voor afwezigheid). U kunt ook met behulp van de keuzelijst voor elke opdracht iedereen op aanwezig of afwezig zetten."
+      mark_attendance_info: "De aanwezigheidsweergave geeft een tabel met cursisten linksonder en een tabel met opdrachten aan de bovenkant weer. Om een cursist als aanwezig of afwezig te markeren, op het corresponderende vakje klikken tot de juiste markering (%{present_icon} voor aanwezig, %{absent_icon} voor afwezigheid weergegeven wordt). Je kunt ook voor iedere opdracht de keuzelijst gebruiken om van iedereen de aanwezigheid of afwezigheid vast te stellen."
       new_group: "Nieuwe groep"
       page_title: Aanwezigheid
       points_abbrev: punten
@@ -7139,6 +7203,8 @@ nl:
         other: "Bestanden en opmerkingen gemaakt voor %{count} inzendingen"
     out_of_final: "%{weight} van eindcijfer"
     out_of_points_possible: "van %{points_possible}"
+    screenreader: 
+      page_titles: "Cijferlijst: Individu weergave"
     show: 
       keycode_descriptions: 
         edit_cell: "Wijzig cel"
@@ -7539,12 +7605,14 @@ nl:
         all_groups_full: "Alle groepen zijn vol."
         all_groups_full_suggestion: "Of groepslimieten wijzigen of meer groepen toevoegen."
         assign_user_to_group: "Gebruiker aan deze groep toewijzen"
+        assign_user_to_group_name: "Gebruiker aan groep %{name} toevoegen "
         no_groups_created: "Groepen dienen gemaakt te worden voordat gebruikers toegewezen kunnen worden."
       edit_group_assignment: 
         all_available_groups_full: "Alle beschikbare groepen zijn vol"
         all_groups_full_suggestion: "Of groepslimieten wijzigen of meer groepen toevoegen."
         move_to_group_label: "Naar groep verplaatsen"
         saving: "Bezig met opslaan..."
+        where_to_move: "Waar zou je *%{userName}* willen verplaatsen?"
       group: 
         add_user_to_group: "Gebruiker aan groep toewijzen"
         group_delete: Verwijder
@@ -7739,17 +7807,20 @@ nl:
       discussion_details: "Details over discussie"
       x_more: "%{x} meer..."
       x_new_in_announcements: 
-        one: "1 aankondiging"
+        one: "*1* aankondiging"
         other: "*%{count}* aankondigingen"
       x_new_in_assignments: 
-        one: "1 opdrachtmelding"
+        one: "*1* opmerking over inzending"
         other: "*%{count}* Opmerkingen over inzendingen"
       x_new_in_conversations: 
-        one: "1 bericht"
+        one: "*1* Gespreksbericht"
         other: "*%{count}* gespreksberichten"
       x_new_in_discussions: 
-        one: "1 discussie"
+        one: "*1* discussie"
         other: "*%{count}* discussies"
+  high_contrast_description: |-
+      Als je liever een hoog contrast versie van de gebruikersinterface van Canvas hebt, schakel dit dan in.
+      Dit kan handig zijn voor personen met verminderd zichtsvermogen of die moeilijk kunnen lezen.
   ic_actions: 
     manage: beheren
   icons: 
@@ -8031,7 +8102,7 @@ nl:
         subject: "Antwoord op bericht mislukt: %{subject}"
     progress_runner: 
       completed_message: 
-        one: "%{count} item verwerkt"
+        one: " 1 item verwerkt"
         other: "%{count} items verwerkt"
       error_message: "%{error}: %{ids}"
     send_to_inbox: 
@@ -8613,6 +8684,7 @@ nl:
         new_assignment: "Nieuwe odracht voor %{course_name}"
         no_due_date: "inleverdatum: geen inleverdatum"
       summary: 
+        assignment_created: "Opdracht gemaakt - %{assignment_name}, %{course_name}"
         due_at: "inleverdatum: %{assignment_due_date_time}"
         multiple_due_dates: "inleverdatum: meerdere datums"
         no_due_date: "inleverdatum: Geen inleverdatum"
@@ -8662,7 +8734,7 @@ nl:
           click_to_see_assignment: "Hier klikken om de opdracht te bekijken"
         no_due_date: "Geen inleverdatum"
       facebook: 
-        assignment_due_date_changed_sentence: "De inleverdatum voor de opdracht *%{assignment_name}* voor %{course_name} ({override}) is gewijzigd in:"
+        assignment_due_date_changed_sentence: "De inleverdatum voor de opdracht *%{assignment_name}* voor %{course_name} (%{override}) is gewijzigd in:"
         no_due_date: "Geen inleverdatum"
       sms: 
         assignment_due_date_changed: "%{assignment_name}, %{course_name} (%{override}) moet nu ingeleverd worden:"
@@ -8734,6 +8806,7 @@ nl:
         user_submitted_sentence: "%{user_name} heeft net een inzending ingeleverd voor %{assignment_name} voor de cursus %{course_name}"
       facebook: 
         click_to_view: "Hier klikken om de inzending te bekijken."
+        user_submitted: "**%{user_name}** heeft net een inzending ingeleverd voor **%{assignment_name}** voor de cursus %{course_name}"
       sms: 
         more_info_at: "Meer informatie op %{web_address}"
         user_submitted: "%{user_name} heeft net zijn/haar opdracht %{assignment_name} ingeleverd"
@@ -8817,7 +8890,7 @@ nl:
             %{course_or_group}. Het document is gemaakt door %{user} met %{service}.
       sms: 
         body: |-
-            Je bent uitgenodigd om samen te werken aan een document %{document} voor %{course_or_group}.
+            Je bent uitgenodigd om samen aan een document te werken, %{document} voor %{course_or_group}.
             
             Meer informatie op %{link}
       summary: 
@@ -8843,13 +8916,21 @@ nl:
         subject: "E-mailadres: Canvas bevestigen"
     confirm_registration: 
       email: 
-        body: "Bedankt voor uw registratie bij Canvas! We versturen deze e-mail om te bevestigen dat gebruiker %{user} zich registreert voor een nieuwe account op %{website}."
+        body: "Bedankt voor jouw registratie op %{product_name}! We sturen deze e-mail om te bevestigen dat gebruiker %{user} zich registreert voor een nieuwe account op %{website}."
         details: "Ga naar de volgende link om het registratieproces te voltooien :"
         html: 
-          body: "Bedankt voor uw registratie op Canvas! We versturen deze e-mail om te bevestigen dat gebruiker %{user} zich registreert voor een nieuw account op %{website}."
+          body: "Bedankt voor jouw registratie op %{product_name}! We sturen deze e-mail om te bevestigen dat gebruiker %{user} zich registreert voor een nieuw account op %{website}."
           details: "Hier klikken om het registratieproces te voltooien"
-          subject: "Bevestig registratie: Canvas"
-        subject: "Bevestig registratie: Canvas"
+          subject: "Registratie bevestigen: %{product_name}"
+        subject: "Registratie bevestigen: %{product_name}"
+    confirm_sms_communication_channel: 
+      sms: 
+        body: |-
+            Canvas-registratie bevestigen met code:
+            
+            %{confirmation_code}
+            
+            voor %{user} door %{website} te bezoeken.
     content_export_failed: 
       email: 
         body: |-
@@ -9180,7 +9261,7 @@ nl:
         from_to_time: "van %{start_date_time} tot %{end_date_time}"
         html: 
           email_body: "Het tijdstip van gebeurtenis %{event_title} voor de cursus %{course_name} is gewijzigd in:"
-          from_to_time: "van %{start_date_time} tot %{eind_date_time}"
+          from_to_time: "van %{start_date_time} tot %{end_date_time}"
           no_time_set: "Geen tijd ingesteld"
           see_details: "Je kunt hier de details zien"
           subject: "Datum van gebeurtenis gewijzigd: %{event_title}, %{course_name}"
@@ -9203,6 +9284,7 @@ nl:
         subject: "Datum van gebeurtenis gewijzigd: %{event_title}, %{course_name}"
       twitter: 
         email_body: "Het tijdstip van de gebeurtenis %{event_title} voor de cursus %{course_name} is gewijzigd. Het is nu: %{new_time}"
+        from_to_time: "van %{start_date_time} tot %{end_date_time}"
         no_time_set: "Geen tijd ingesteld"
     file_locked: "Dit bestand is momenteel vergrendeld."
     file_locked_at: "Dit bestand is vergrendeld %{at}."
@@ -9220,7 +9302,7 @@ nl:
             change_password_at: "Het wachtwoord voor dit account wijzigen op"
           login_at_account: "%{login_email} op %{account_name}"
           login_managed_by_account: "deze inloggegevens worden beheerd door %{account_name}"
-          password_from_account: "Het wachtwoord voor dit account wordt uitgegeven door de systeembeheerders van %{account_Name}. Canvas heeft geen toegang tot uw wachtwoord. Als uw wachtwoord niet werkt, neemt u contact op met de systeembeheerders om uw wachtwoord te controleren en te veranderen."
+          password_from_account: "Het wachtwoord voor deze login wordt verstrekt door de systeembeheerders van %{account_name}. Instructure heeft geen toegang tot jouw wachtwoord. Als jouw wachtwoord niet werkt, neem dan contact op met de systeembeheerders om jouw wachtwoord te wijzigen of  te verifiëren."
           requested_password_reset: "Je vroeg om een bevestiging van jouw Canvas-wachtwoord."
           subject: "Wachtwoord vergeten: Canvas"
         labels: 
@@ -9229,6 +9311,7 @@ nl:
           click_to_reset: "Klikken op de volgende link om een nieuw wachtwoord in te stellen"
         login_at_account: "%{login_email} op %{account_name}"
         login_managed_by_account: "Deze inloggegevens worden beheerd door %{account_name}"
+        password_from_account: "Het wachtwoord voor deze login wordt verstrekt door de systeembeheerders van %{account_name}. Instructure heeft geen toegang tot jouw wachtwoord. Als jouw wachtwoord niet werkt, neem dan contact op met de systeembeheerders om jouw wachtwoord te wijzigen of te verifiëren."
         requested_password_reset: "Je vroeg om een bevestiging van jouw Canvas-wachtwoord."
         subject: "Wachtwoord vergeten: Canvas"
     grade_weight_changed: 
@@ -9273,6 +9356,8 @@ nl:
         labels: 
           view_submission_here: "Je kunt hier de inzending bekijken"
         subject: "Opdracht te laat: %{group_name}, %{assignment_name}"
+      facebook: 
+        body: "De groep %{group_name} heeft zojuist een inzending te laat ingeleverd voor **[%{assignment_name}](%{assignment_url})** voor de cursus %{course_name}."
       sms: 
         more_info: "Meer informatie op %{web_address}"
         subject: "%{group_name} heeft zojuist zijn/haar opdracht {late} ingeleverd voor %{assignment_name}"
@@ -9300,6 +9385,7 @@ nl:
       facebook: 
         account_group: "Jouw verzoek om deel te mogen nemen aan de groep **[%{group_name}](%{group_url})** met het account %{account_name} is geaccepteerd."
         course_group: "Jouw verzoek om deel te mogen nemen aan de groep **[%{group_name}](%{group_url})** voor de cursus %{course_name} is geaccepteerd."
+        group_request_accepted: "Deelname aan groep geaccepteerd: %{group_name}"
       sms: 
         account_group: "Jouw verzoek om deel te mogen nemen aan de groep %{group_name} met het account %{account_name} is geaccepteerd."
         course_group: "Jouw verzoek om deel te mogen nemen aan de groep %{group_name} voor de cursus %{course_name} is geaccepteerd."
@@ -9379,7 +9465,7 @@ nl:
         body: "Jouw inhoud is klaar om in jouw cursus geïmporteerd te worden."
         html: 
           body: "Jouw inhoud is klaar om in jouw cursus geïmporteerd te worden ."
-          link_message2: "Klik op deze link om een keuze te maken welke inhoud u wilt importeren"
+          link_message2: "Op *deze koppeling* klikken om een keuze te maken welke inhoudsitems je wilt importeren"
           subject: "Jouw inhoud voor \"%{course_name}\" is klaar om geïmporteerd te worden"
         link_message: "Op deze koppeling klikken om een keuze te maken welke inhoudsitems je wilt importeren:"
         subject: "Jouw inhoud voor \"%{course_name}\" is klaar om geïmporteerd te worden"
@@ -9553,7 +9639,7 @@ nl:
         from_to_time: "van %{start_date_time} tot %{end_date_time}"
         html: 
           body: "Er is een nieuwe gebeurtenis gepland voor %{course_name}, waar je van op de hoogte moet zijn:"
-          from_to_time: "van %{start_date_time} tot %{eind_date_time}"
+          from_to_time: "van %{start_date_time} tot %{end_date_time}"
           no_time_set: "Geen tijd ingesteld"
           see_details: "Je kunt hier de details zien"
           subject: "Nieuwe gebeurtenis - %{event_title}, %{course_name}"
@@ -9563,15 +9649,19 @@ nl:
         subject: "Nieuwe gebeurtenis - %{event_title}, %{course_name}"
       facebook: 
         body: "Er is een nieuwe gebeurtenis gepland voor %{course_name}:"
+        from_to_time: "van %{start_date_time} tot %{end_date_time}"
         no_time_set: "Geen tijd ingesteld"
       sms: 
+        from_to_time: "van %{start_date_time} tot %{end_date_time}"
         more_info: "Meer informatie op %{web_address}"
         no_time_set: "Geen tijd ingesteld"
         subject: "Nieuwe gebeurtenis voor %{course_name}:"
       summary: 
+        from_to_time: "van %{start_date_time} tot %{end_date_time}"
         no_time_set: "Geen tijd ingesteld"
         subject: "Nieuwe gebeurtenis - %{event_title}, %{course_name}"
       twitter: 
+        from_to_time: "van %{start_date_time} tot %{end_date_time}"
         no_time_set: "Geen tijd ingesteld"
         subject: "Canvas melding - Gebeurtenis %{event_title}, %{course_name}"
     new_file_added: 
@@ -9822,6 +9912,7 @@ nl:
         body: "*%{author}* heeft zojuist een nieuwe opmerking gemaakt op de inzending van **%{user} voor %{assignment}**."
         someone: Iemand
       sms: 
+        body: "Nieuwe opmerking door %{author} op %{assignment}, %{user}, %{context}"
         more_info: "Meer informatie op %{url}"
       summary: 
         body: "%{author} heeft zojuist een nieuwe opmerking gemaakt op de inzending van %{user} voor %{assignment}"
@@ -10391,6 +10482,7 @@ nl:
     invalid_file: "Ongeldig bestand over leerresultaat voor groep"
   outcome_groups_api: 
     account_group_description: "Leerresultaatgroep op accountniveau."
+  outcome_path_mastery_points: "%{path} vakbekwaamheid punten"
   outcome_path_result: "%{path} resultaat"
   outcome_results: 
     outcomes_filename: Resultaten
@@ -10484,6 +10576,7 @@ nl:
       title: "Aan deze groep een naam geven"
     outcome_result: 
       all_outcomes: "alle leerresultaten voor deze cursist"
+      attempt_info: "poging #%{attempt_number}, %{attempt_date}"
       outcome_mastered: gehaald
       scoring: "%{points} van %{possible_points}"
     show: 
@@ -10691,6 +10784,14 @@ nl:
       description: "Applicatie van Facebook op Canvas"
       name: Facebook
     facebook_settings: 
+      description: |-
+          Je moet een [nieuwe app op facebook.com](%{facebook_url}) maken en 'App op Facebook' als een platform toevoegen.
+          Stel de volgende instellingen in om ervoor te zorgen dat jouw Facebook app 
+          juist werkt:
+          
+          * **Instellingen -- App op Facebook -- Canvas Pagina: ** noteer wat je kiest (het gedeelte na apps.facebook.com) en in het formulier hieronder invoeren
+          * **Instellingen -- App op Facebook -- Canvas URL:** instellen als %{canvas_url}
+          * Nadat je de app hebt opgeslagen, noteer de App-ID, de API-sleutel en het App-geheim
       domain_name: domein
       headers: 
         domain_settings: Domeininstellingen
@@ -10754,14 +10855,17 @@ nl:
       account_settings: "Deze waarden zijn te vinden op de beheerconsole van Kaltura onder \"Instellingen -> Integratie-instellingen\""
       cache_explanation: "Leeg betekent cache oneindig, 0 betekent geen cache."
       description: |-
-          U hebt een account nodig op [Kaltura.com](%{kaltura_url})
-          of gebruik een zelfgehoste instantie van Kaltura.
+          Je hebt een account nodig op ofwel [Kaltura.com](%{kaltura_url}) 
+          of een zelfgehoste instantie van Kaltura.
           
-          **Let op:** Zodra u Kaltura hebt geconfigureerd met Canvas, dient u naar de beheerconsole van Kaltura te gaan. Activeer onder "Instellingen -> Integratie-Instellingen" servernotificaties met als notificatie-URL:
+          **Let op:** Eens je Kaltura met Canvas hebt geconfigureerd,
+          moet je naar de beheerconsole van Kaltura gaan en onder \"Instellingen -> 
+          Integratie-Instellingen" server meldingen met een 
+          URL melding instellen:
           
           %{notification_url}
           
-          Vink ook de vakjes aan voor "Invoer toevoegen" en "Invoer verwijderen" in de kolom "Verzonden door server".
+          Dan de vakjes voor "Invoer toevoegen" en "Invoer verwijderen" in de kolom "Verstuurd door server" kolom aanvinken.
       headers: 
         account_settings: Accountinstellingen
         canvas_settings: Canvas-instellingen
@@ -10790,6 +10894,7 @@ nl:
         secret_key: Beheerdersgeheim
         subpartner_id: Subpartner-ID
         upload_ui_conf: "Uploader UI Conf ID"
+        use_alt_record_widget: "Gebruik een alternatieve flash opname widget"
         user_secret_key: Gebruikersgeheim
       ui_conf_ids: "Klanten die gebruikmaken van Kaltura-hosting kunnen Kaltura vragen om deze ids aan te leveren. Zelfgehoste instanties kunnen deze instellingen vinden in de tabel ui_confs."
     linked_in: 
@@ -11376,7 +11481,8 @@ nl:
       empty_points_possible: "-%{pointsPossible} punten"
       no_submission: "Geen inzending"
       no_submission_for_assignment_screenreader: "Geen inzending voor deze opdracht. %{pointsPossible} punten mogelijk."
-      score_with_points_possible_screenreader: "Score: %{score} van %{pointsPossible} punten."
+      score_with_points_possible: "*%{score}*/%{pointsPossible} punten"
+      score_with_points_possible_screenreader: "Score: %{score} op %{pointsPossible} punten."
     assignment_settings: 
       cancel: Annuleren
       save: Opslaan
@@ -11617,7 +11723,7 @@ nl:
       no_scores_reduced: "Punten toekennen voor zowel gecorrigeerde als eerdere juiste antwoorden (*scores zullen niet verlaagd worden *)"
       regrade_disabled: "Het opnieuw beoordelen van deze vraag is niet toegestaan omdat het antwoord was verwijderd of omdat het type vraag was veranderd nadat een student een inzending heeft gedaan."
       regrade_options: "Opties voor herberekening *(voor studenten die deze vraag al hebben beantwoord):*"
-      some_scores_reduced: "Geef alleen punten voor het correcte antwoord (*de scores van sommige studenten kan worden verlaagd*)"
+      some_scores_reduced: "Geef alleen punten voor het correcte antwoord (*scores van sommige studenten kunen verlaagd worden*)"
       update_question_without_regrading: "Zonder herberekening vraag bijwerken"
     take_the_quiz: "Maak de test "
     take_the_quiz_again: "Maak de test opnieuw"
@@ -11744,7 +11850,9 @@ nl:
       scrap_and_restart: "Deze toets wissen en opnieuw beginnen?"
     correct_answers_no_longer_available: "De juiste antwoorden ziin niet meer beschikbaar."
     correct_answers_protected: "Juiste antwoorden zijn verborgen"
+    correct_answers_shown_after: "Juiste antwoorden zullen beschikbaar zijn op %{date}."
     correct_answers_shown_between: "De juiste antwoorden zullen beschikbaar zijn %{from} - %{to}."
+    correct_answers_shown_until: "Juiste antwoorden zijn beschikbaar tot %{date}"
     current_filter: "Huidig filter"
     default_answer_comments: "Antwoord als de cursist dit antwoord kiest"
     default_answer_comments_on_match: "Antwoord als de cursist dit antwoord vergelijkt"
@@ -12527,6 +12635,7 @@ nl:
           variables: Variabelen
         labels: 
           additional_comments: "Aanvullende opmerkingen"
+          for_answer_number: "Antwoord %{answer_number}"
           warning_icon: Waarschuwing
         links: 
           delete_question: "Deze vraag verwijderen"
@@ -12911,6 +13020,7 @@ nl:
         percent_of_responses: "%{percent}% van %{total} pogingen heeft dit antwoord geselecteerd"
         response_count: 
           one: "Deze vraag is aan 1 cursist gegeven"
+          other: "Deze vraag is aan %{count} cursisten gegeven"
       question_teaser: 
         titles: 
           click_to_show_details: "Klikken om alle details van de vraag weer te geven"
@@ -12981,6 +13091,7 @@ nl:
         shuffle_answers: "Volgorde van antwoorden wisselen"
         time_limit: 
           one: "1 Minuut"
+          other: "%{count} Minuten"
         until: Tot
         view_responses: "Antwoorden bekijken"
       quiz_submission: 
@@ -13029,6 +13140,7 @@ nl:
         points_possible: "%{points_possible} punten mogelijk"
         question_count: 
           one: "1 vraag"
+          other: "%{count} vragen"
         quiz_multiple_due_dates: "Meer datums"
         quiz_no_points: "Geen punten"
         quiz_points_possible: 
@@ -13083,6 +13195,7 @@ nl:
         speed_grader: SpeedGraderläó
         students_submitted_so_far: 
           one: "Tot dusver 1 cursist  ingeleverd"
+          other: "Tot dusver %{count} cursisten ingeleverd"
         titles: 
           delete: Verwijderen
           related_items: "Gerelateerde items"
@@ -13109,6 +13222,7 @@ nl:
           standard_deviation: Standaard-deviatie
           users_selected_the_answer: "De volgende gebruikers hebben het antwoord %{answer_text} geselecteerd"
         links: 
+          count_all_attempts: "**alle** pogingen tellen"
           count_only_latest_attempts: "Alleen elke laatste poging tellen"
         page_title: Statistieken
         quiz_all_version_disclaimer: "Dit rapport geeft toets-statistieken weer, gebaseerd op alle pogingen van alle gebruikers."
@@ -13239,7 +13353,9 @@ nl:
       warnings: 
         draft_version: "Dit is een voorbeeld van de conceptversie van de test"
     show_and_hide_correct_answers: "Van %{from} tot %{to}"
+    show_correct_answers_after: "Na %{date}"
     show_correct_answers_immediately: Onmiddelijk
+    show_correct_answers_until: "Tot %{date}"
     single_answer: 
       upload: Uploaden
     statistics: 
@@ -13391,6 +13507,7 @@ nl:
     : Waar
     ungraded_survey: "Niet-beoordeelde enquête"
     warnings: 
+      draft_state_unsaved_changes: "*Je hebt wijzigingen in de vragen van deze toets aangebracht.* Deze wijzigingen zullen voor cursisten pas verschijnen als je de toets hebt opgeslagen."
       unpublished_changes: "*Je hebt wijzigingen in deze toets niet opgeslagen.*Deze wijzigingen zullen voor cursisten pas verschijnen als je de toets publiceert of opnieuw publiceert."
       unpublished_quiz: "*Deze toets is niet gepubliceerd* Alleen docenten kunnen de toets zien totdat deze gepubliceerd wordt."
   quizzes_redirects: 
@@ -13423,7 +13540,7 @@ nl:
   registration: 
     get_started: "Aan de slag"
     incomplete_registration_warning: 
-      set_up_account: "Uw account is bijna klaar. Controleer uw e-mail (%{email}) om uw wachtwoord in te stellen en dit proces af te ronden."
+      set_up_account: "Jouw account is bijna ingesteld. Controleer jouw e-mail *%{email}* om jouw wachtwoord in te stellen om dit proces te voltooien."
       start_participating: "Je kunt nu gaan deelnemen, maar je moet een wachtwoord instellen voordat je opnieuw kunt inloggen."
     login: 
       password: Wachtwoord
@@ -13760,10 +13877,10 @@ nl:
       buttons: 
         enroll_in_course: "Inschrijven voor cursus"
         next: Volgende
-      getting_started: "U schrijft zich in voor **{course}**"
+      getting_started: "Je schrijft je in voor **%{course}**"
       switch_users: "Je bent momenteel aangemeld als *%{user}*. **Aanmelden als een andere gebruiker**."
     course_full: 
-      class_full: "Het maximale aantal leerlingen voor **%{course}* is bereikt. Excuses voor het ongemak."
+      class_full: "Het maximale aantal cursisten voor **%{course}** is bereikt. Excuses voor het ongemak."
     enrollment_closed: 
       enrollment_is_closed: "Inschrijving is gesloten voor **%{course}**."
     new: 
@@ -13787,6 +13904,7 @@ nl:
   services_api: 
     must_be_logged_in: "Je moet ingelogd zijn om Kaltura te kunnen gebruiken"
   set_default_grade_dialog: 
+    default_grades: "Aan alle cursisten hetzelfde cijfer geven voor *%{assignment.name}* door hieronder een cijfer in te voeren en in te zenden:"
     dialog_title: "Standaardcijfer voor %{assignment.name}"
     overwrite: "Reeds ingevoerde cijfers overschrijven"
     set_grades_button: "Standaardcijfer instellen"
@@ -13850,6 +13968,7 @@ nl:
         move: Verplaatsen
       defaults: 
         group_name: Cursusopdrachten
+      group_weight: "*%{percent}% van totaal cijfer"
       links: 
         add_an_assignment: "Een opdracht toevoegen"
         edit_group_details: "Details over groep bewerken"
@@ -14009,6 +14128,7 @@ nl:
       range_upper: "Bovengrens van het bereik"
       remove_row: "Rij verwijderen"
       remove_scheme: "Beoordelingsschema verwijderen"
+      select_another_scheme: "Kies een ander systeem"
       some_standard: "Een bepaalde standaard"
       use_this_standard: "Deze beoordelingsstandaard gebruiken"
     home_menu: 
@@ -14329,6 +14449,7 @@ nl:
       unauthorized_2: "Als je denkt dat je deze pagina moet kunnen bekijken, gebruik dan de \"Help\" koppeling om de systeembeheerder hiervan op de hoogte te brengen."
       unauthorized_action: "Je moet eerst inloggen voordat je deze pagina kunt bekijken."
       unauthorized_user: "%{user_name}, je moet eerst inloggen voordat je die pagina kunt bekijken. Op \"Wachtwoord vergeten\" klikken als je jouw wachtwoord niet vergeten bent of niet weet."
+      unauthorized_user_is_other: "%{current_user}, je bent niet gemachtigd om deze pagina te bekijken. De koppeling die je hier naartoe heeft geleid, was voor **%{unauthorized_user} (%{unauthorized_user_email})**. Als je dit wel bent, kun je dan misschien uitloggen en opnieuw inloggen met dat e-mailadres om toegang  tot deze pagina te krijgen."
     unauthorized_feed: 
       bad_params: "De parameters voor de feed die je uitprobeerde om toegang te krijgen zijn ongeldig."
       feedback: "Alsje vrij zeker bent dat deze URL zou moet werken, vertel ons dan hoe je hier terechtkwam door op onderstaande koppeling te klikken zodat wij er naar kunnen kijken."
@@ -14655,6 +14776,7 @@ nl:
       assignment_submit_fail: "Fout bij inzenden van opdracht"
       can_not_submit_locked_assignment: "Je  kunt geen opdracht inleveren wanneer deze vergrendeld is"
       invalid_file_type: "Ongeldig bestandstype"
+      invalid_google_docs_domain: "Je kunt vanuit deze google_docs domain geen opdrachten inzenden"
       media_file_attached: "Er is geen media opname in deze inzending gevonden"
       no_attached_file: "Je moet minimaal een bestand  aan deze opdracht toevoegen"
       no_report: "Geen rapportage gevonden voor die inzending"
@@ -15273,6 +15395,8 @@ nl:
       resending: "Bezig met opnieuw te versturen..."
       sent_email_paragraph: "Wij versturen een e-mail naar %{email_address}\". *Op de koppeling in de e-mail klikken om de registratie te voltooien*. **Hier klikken om de e-mail opnieuw te versturen** als je het niet ziet, en zorg er voor dat je jouw spambox controleert."
       while_you_wait: "Terwijl je aan het wachten bent..."
+    scheduled_conference: 
+      current_conference_text: "Je bent uigenodigd om deel te nemen aan %{conference}. Deze start op %{starts_at}"
     service_not_enabled: "Die dienst is niet ingeschakeld."
     show: 
       accounts: Accounts
@@ -15308,6 +15432,7 @@ nl:
       no_students: "Er zijn geen leerlingen om over te rapporteren."
       submitted_time: 
         one: "1 dag geleden ingezonden"
+        other: "%{count} dagen geleden ingezonden"
         zero: "minder dan 1 dag geleden ingezonden"
       title: "Rapport over activiteiten van docent"
     twitter_added: "Toegang tot Twitter geautoriseerd!"
