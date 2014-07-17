@@ -2725,4 +2725,12 @@ class Course < ActiveRecord::Base
   def multiple_sections?
     self.active_course_sections.count > 1
   end
+
+  def content_exports_visible_to(user)
+    if self.grants_right?(user, :read_as_admin)
+      self.content_exports.admin(user)
+    else
+      self.content_exports.non_admin(user)
+    end
+  end
 end

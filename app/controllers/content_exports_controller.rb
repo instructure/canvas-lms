@@ -27,28 +27,25 @@ class ContentExportsController < ApplicationController
   end
 
   def index
-    if @context.is_a?(Course)
-      @exports = @context.content_exports.active.not_for_copy
-    else
-      @exports = @context.content_exports.active
-    end
+    @exports = @context.content_exports_visible_to(@current_user).active.not_for_copy
 
     @current_export_id = nil
-    if export = @context.content_exports.running.first
+    if export = @context.content_exports_visible_to(@current_user).running.first
       @current_export_id = export.id
     end
   end
 
   def show
-    if params[:id].present? && export = @context.content_exports.find_by_id(params[:id])
+    if params[:id].present? && export = @context.content_exports_visible_to(@current_user).find_by_id(params[:id])
       render_export(export)
     else
-      render :json => {:errors => {:base => t('errors.not_found', "Export does not exist")}}, :status => :bad_request
+      render :json => {:errors => {:base => t('errors.not_found', "Export does not exist")}}, :status => :not_found
     end
   end
 
   def create
-    if @context.content_exports.running.count == 0
+    export = @context.content_exports_visible_to(@current_user).running.first
+    unless export
       export = @context.content_exports.build
       export.user = @current_user
       export.workflow_state = 'created'
@@ -74,17 +71,16 @@ class ContentExportsController < ApplicationController
       end
     else
       # an export is already running, just return it
-      export = @context.content_exports.running.first
       render_export(export)
     end
   end
 
   def destroy
-    if params[:id].present? && export = @context.content_exports.find_by_id(params[:id])
+    if params[:id].present? && export = @context.content_exports_visible_to(@current_user).find_by_id(params[:id])
       export.destroy
       render :json => {:success=>'true'}
     else
-      render :json => {:errors => {:base => t('errors.not_found', "Export does not exist")}}, :status => :bad_request
+      render :json => {:errors => {:base => t('errors.not_found', "Export does not exist")}}, :status => :not_found
     end
   end
 
@@ -93,7 +89,7 @@ class ContentExportsController < ApplicationController
       cancel_cache_buster
       send_file(filename, :type => 'text/xml', :disposition => 'inline')
     else
-      render :template => 'shared/errors/404_message', :status => :bad_request
+      render :template => 'shared/errors/404_message', :status => :not_found
     end
   end
 

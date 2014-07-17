@@ -2497,4 +2497,8 @@ class User < ActiveRecord::Base
       User.where(:id => self).update_all(:last_logged_out => Time.zone.now)
     end
   end
+
+  def content_exports_visible_to(user)
+    self.content_exports.where(user_id: user)
+  end
 end

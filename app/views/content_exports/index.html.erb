@@ -27,6 +27,8 @@
               <%= t 'links.download_qti', "QTI Export from %{date}: *Click here to download*", :date => date, :wrapper => wrapper %>
             <% elsif export.export_type == ContentExport::USER_DATA %>
               <%= t 'links.download_user_export', "User Data Export from %{date}: *Click here to download*", :date => date, :wrapper => wrapper %>
+            <% elsif export.export_type == ContentExport::ZIP %>
+                <%= t 'links.download_file_export', "File Export from %{date}: *Click here to download*", :date => date, :wrapper => wrapper %>
             <% end %>
           </p>
         <% end %>

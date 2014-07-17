@@ -84,13 +84,14 @@ class ContentExportsApiController < ApplicationController
 
   # @API List content exports
   #
-  # List the past and pending content export jobs for a course.
+  # List the past and pending content export jobs for a course, group, or user.
   # Exports are returned newest first.
   #
   # @returns [ContentExport]
   def index
-    if authorized_action(@context, @current_user, :read_as_admin)
-      scope = @context.content_exports.active.not_for_copy.order('id DESC')
+    if authorized_action(@context, @current_user, :read)
+      scope = @context.content_exports_visible_to(@current_user).active.not_for_copy
+      scope = scope.order('id DESC')
       route = polymorphic_url([:api_v1, @context, :content_exports])
       exports = Api.paginate(scope, self, route)
       render json: exports.map { |export| content_export_json(export, @current_user, session) }
@@ -103,14 +104,15 @@ class ContentExportsApiController < ApplicationController
   #
   # @returns ContentExport
   def show
-    if authorized_action(@context, @current_user, :read_as_admin)
-      render json: content_export_json(@context.content_exports.not_for_copy.find(params[:id]), @current_user, session)
+    export = @context.content_exports.not_for_copy.find(params[:id])
+    if authorized_action(export, @current_user, :read)
+      render json: content_export_json(export, @current_user, session)
     end
   end
 
-  # @API Export course content
+  # @API Export content
   #
-  # Begin a content export job for a course.
+  # Begin a content export job for a course, group, or user.
   #
   # You can use the {api:ProgressController#show Progress API} to track the
   # progress of the export. The migration's progress is linked to with the
@@ -120,27 +122,37 @@ class ContentExportsApiController < ApplicationController
   # to retrieve a download URL for the exported content.
   #
   # @argument export_type [String, "common_cartridge"|"qti"]
-  #   "common_cartridge":: Export the contents of the course in the Common Cartridge (.imscc) format
-  #   "qti":: Export quizzes in the QTI format
+  #   "common_cartridge":: Export the contents of a course in the Common Cartridge (.imscc) format
+  #   "qti":: Export quizzes from a course in the QTI format
+  #   "zip":: Export files from a course, group, or user in a zip file
   #
   # @returns ContentExport
   def create
-    if authorized_action(@context, @current_user, :read_as_admin)
-      return render json: { message: 'invalid export_type' }, status: :bad_request unless %w(qti common_cartridge).include?(params[:export_type])
+    if authorized_action(@context, @current_user, :read)
+      valid_types = %w(zip)
+      valid_types += %w(qti common_cartridge) if @context.is_a?(Course)
+      return render json: { message: 'invalid export_type' }, status: :bad_request unless valid_types.include?(params[:export_type])
       export = @context.content_exports.build
       export.user = @current_user
       export.workflow_state = 'created'
 
-      selected_content = ContentMigration.process_copy_params(params[:select], true) if params[:select]
-      if params[:export_type] == 'qti'
+      # ZipExporter accepts unhashed asset strings, to avoid having to instantiate all the files and folders
+      selected_content = ContentMigration.process_copy_params(params[:select], true, params[:export_type] == ContentExport::ZIP) if params[:select]
+      case params[:export_type]
+      when 'qti'
         export.export_type = ContentExport::QTI
         export.selected_content = selected_content || { all_quizzes: true }
+      when 'zip'
+        export.export_type = ContentExport::ZIP
+        export.selected_content = selected_content || { all_attachments: true }
       else
         export.export_type = ContentExport::COMMON_CARTRIDGE
         export.selected_content = selected_content || { everything: true }
       end
-      opts = params.slice(:version)
+      # recheck, since the export type influences permissions (e.g., students can download zips of non-locked files, but not common cartridges)
+      return unless authorized_action(export, @current_user, :create)
 
+      opts = params.slice(:version)
       export.progress = 0
       if export.save
         export.queue_api_job(opts)
@@ -153,7 +165,7 @@ class ContentExportsApiController < ApplicationController
 
   def content_list
     if authorized_action(@context, @current_user, :read_as_admin)
-      base_url = api_v1_course_content_list_url(@context)
+      base_url = polymorphic_url([:api_v1, @context, :content_list])
       formatter = Canvas::Migration::Helpers::SelectiveContentFormatter.new(nil, base_url)
 
       unless formatter.valid_type?(params[:type])

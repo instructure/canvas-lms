@@ -607,8 +607,13 @@ class ContentMigration < ActiveRecord::Base
 
   # strips out the "id_" prepending the migration ids in the form
   # also converts arrays of migration ids (or real ids for course exports) into the old hash format
-  def self.process_copy_params(hash, for_content_export=false)
+  def self.process_copy_params(hash, for_content_export=false, return_asset_strings=false)
     return {} if hash.blank?
+    process_key = if return_asset_strings
+      ->(asset_string) { asset_string }
+    else
+      ->(asset_string) { CC::CCHelper.create_key(asset_string) }
+    end
     new_hash = {}
 
     hash.each do |key, value|
@@ -618,7 +623,7 @@ class ContentMigration < ActiveRecord::Base
 
         value.each do |sub_key, sub_value|
           if for_content_export
-            new_sub_hash[CC::CCHelper.create_key(sub_key)] = sub_value
+            new_sub_hash[process_key.call(sub_key)] = sub_value
           elsif sub_key.is_a?(String) && sub_key.start_with?("id_")
             new_sub_hash[sub_key.sub("id_", "")] = sub_value
           else
@@ -634,7 +639,7 @@ class ContentMigration < ActiveRecord::Base
         if for_content_export
           asset_type = key.to_s.singularize
           value.each do |id|
-            sub_hash[CC::CCHelper.create_key("#{asset_type}_#{id}")] = '1'
+            sub_hash[process_key.call("#{asset_type}_#{id}")] = '1'
           end
         else
           value.each do |id|
