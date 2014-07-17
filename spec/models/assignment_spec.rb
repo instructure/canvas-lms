@@ -583,11 +583,6 @@ describe Assignment do
       s.versions.length.should eql(1)
       s2[0].state.should eql(:graded)
     end
-
-    it "should not mark as submitted if no submission" do
-      s = @a.submit_homework(@user)
-      s.workflow_state.should == "unsubmitted"
-    end
   end
 
   describe  "interpret_grade" do
@@ -611,13 +606,47 @@ describe Assignment do
     end
   end
 
-  it "should create a new version for each submission" do
-    setup_assignment_without_submission
-    @a.submit_homework(@user)
-    @a.submit_homework(@user)
-    @a.submit_homework(@user)
-    @a.reload
-    @a.submissions.first.versions.length.should eql(3)
+  describe '#submit_homework' do
+    before(:once) do
+      course_with_student(active_all: true)
+      @a = @course.assignments.create! title: "blah",
+        submission_types: "online_text_entry,online_url",
+        points_possible: 10
+    end
+
+    it "creates a new version for each submission" do
+      setup_assignment_without_submission
+      @a.submit_homework(@user)
+      @a.submit_homework(@user)
+      @a.submit_homework(@user)
+      @a.reload
+      @a.submissions.first.versions.length.should eql(3)
+    end
+
+    it "doesn't mark as submitted if no submission" do
+      s = @a.submit_homework(@user)
+      s.workflow_state.should == "unsubmitted"
+    end
+
+    it "clears out stale submission information" do
+      s = @a.submit_homework(@user, submission_type: "online_url",
+                             url: "http://example.com")
+      s.submission_type.should == "online_url"
+      s.url.should == "http://example.com"
+
+      s2 = @a.submit_homework(@user, submission_type: "online_text_entry",
+                              body: "blah blah blah blah blah blah blah")
+      s2.submission_type.should == "online_text_entry"
+      s2.body.should == "blah blah blah blah blah blah blah"
+      s2.url.should be_nil
+      s2.workflow_state.should == "submitted"
+
+      # comments shouldn't clear out submission data
+      s3 = @a.submit_homework(@user, comment: "BLAH BLAH")
+      s3.body.should == "blah blah blah blah blah blah blah"
+      s3.submission_comments.first.comment.should == "BLAH BLAH"
+      s3.submission_type.should == "online_text_entry"
+    end
   end
 
   describe "muting" do

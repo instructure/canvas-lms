@@ -1130,11 +1130,16 @@ class Assignment < ActiveRecord::Base
     res
   end
 
+  SUBMIT_HOMEWORK_ATTRS = %w[body url attachments submission_type
+                             media_comment_id media_comment_type]
+  ALLOWABLE_SUBMIT_HOMEWORK_OPTS = (SUBMIT_HOMEWORK_ATTRS +
+                                    %w[comment group_comment]).to_set
+
   def submit_homework(original_student, opts={})
     # Only allow a few fields to be submitted.  Cannot submit the grade of a
     # homework assignment, for instance.
     opts.keys.each { |k|
-      opts.delete(k) unless [:body, :url, :attachments, :submission_type, :comment, :media_comment_id, :media_comment_type, :group_comment].include?(k.to_sym)
+      opts.delete(k) unless ALLOWABLE_SUBMIT_HOMEWORK_OPTS.include?(k.to_s)
     }
     raise "Student Required" unless original_student
     comment = opts.delete(:comment)
@@ -1155,6 +1160,11 @@ class Assignment < ActiveRecord::Base
                 end
     transaction do
       find_or_create_submissions(students) do |homework|
+        # clear out attributes from prior submissions
+        if opts[:submission_type].present?
+          SUBMIT_HOMEWORK_ATTRS.each { |attr| homework[attr] = nil }
+        end
+
         student = homework.user
         homework.grade_matches_current_submission = homework.score ? false : true
         homework.attributes = opts.merge({
