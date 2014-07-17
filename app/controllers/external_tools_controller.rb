@@ -193,8 +193,7 @@ class ExternalToolsController < ApplicationController
       if launch_url
         @tool = ContextExternalTool.find_external_tool(launch_url, @context, tool_id)
       else
-        find_tool(tool_id, params[:launch_type])
-        return unless @tool
+        return unless find_tool(tool_id, params[:launch_type])
       end
       if !@tool
         flash[:error] = t "#application.errors.invalid_external_tool", "Couldn't find valid settings for this link"
@@ -299,9 +298,13 @@ class ExternalToolsController < ApplicationController
       end
     else
       selection_type = params[:launch_type] || "#{@context.class.base_ar_class.to_s.downcase}_navigation"
-      find_tool(params[:id], selection_type)
-      @active_tab = @tool.asset_string if @tool
-      @show_embedded_chat = false if @tool.try(:tool_id) == 'chat'
+      if find_tool(params[:id], selection_type)
+        if selection_type == 'course_home_sub_navigation'
+          @return_url = named_context_url(@context, :context_external_tool_finished_url, @tool.id, :include_host => true)
+        end
+        @active_tab = @tool.asset_string
+        @show_embedded_chat = false if @tool.tool_id == 'chat'
+      end
       render tool_launch(@tool, selection_type) if @tool
       add_crumb(@context.name, named_context_url(@context, :context_url))
     end
@@ -332,6 +335,8 @@ class ExternalToolsController < ApplicationController
       flash[:error] = t "#application.errors.invalid_external_tool_id", "Couldn't find valid settings for this tool"
       redirect_to named_context_url(@context, :context_url)
     end
+
+    @tool
   end
   protected :find_tool
 
