@@ -1184,7 +1184,7 @@ de:
       process_data_button: "Daten verarbeiten"
       select_file_instructions: |-
           Wählen Sie die ZIP-datei aus, die Sie importieren möchten.  
-          Eine Anleitung zur Erstellung solcher ZIP-dateien [können Sie dieser Dokumentation entnehmen](%{uri}).
+          Eine Anleitung zur Erstellung solcher ZIP-dateien [können Sie dieser Dokumentation entnehmen](%{url}).
       sis_import_crumb: SIS-import
       started_at_message: "Beginn: %{started_at}"
       title: SIS-import
@@ -1351,6 +1351,8 @@ de:
       ta: Lehrassistent-Einschreibungen
       teachers: Dozenten-Einschreibungen
     user_add_failed_message: "Hinzufügen des Nutzers fehlgeschlagen, bitte erneut versuchen"
+    user_added_message: "*%{user}* erfolgreich hinzugefügt!"
+    user_added_message_sent_message: "*%{user}* erfolgreich hinzugefügt! In Kürze erhält der Benutzer eine E-Mail-Bestätigung."
     user_deleted_message: "%{username} erfolgreich gelöscht"
     user_inactivity_csv_description: 
       account_reports: 
@@ -1907,6 +1909,9 @@ de:
       description: Beschreibung
       freeze_properties: "Aufgabeeigenschaften nach Kopiervorgang sperren"
       notify_content_change: "Benutzer bei Änderung von Inhalten benachrichtigen"
+      only_visible_to_overrides_note: |-
+          Hinweis: Diese Aufgabe ist *nur* in dem/n nachfolgend angegebenen A
+          Abschnitt/en sichtbar.
       points_possible: Punkte
       post_to_sis: "In SIS veröffentlichen"
       warnings: 
@@ -3120,6 +3125,10 @@ de:
         ? "yes"
         : Ja
       details: 
+        account_exists: |-
+            Es existiert bereits ein Konto für %{email}.
+            
+              **Sind Sie %{name}?**
         account_needed: "Sie sind eingeladen, an **%{course}** teilzunehmen. Um diese Einladung akzeptieren zu können, benötigen Sie ein Konto bei Canvas. Klicken Sie auf den unten stehenden Link, um ein Canvas-konto einzurichten."
         add_email: "Möchten Sie diese E-mailadresse Ihrem aktuellen Konto hinzufügen?"
         choose_login: "Wählen Sie aus, wo Sie sich anmelden wollen."
@@ -3490,6 +3499,7 @@ de:
         conclude_student: "Möchten Sie diese Studenteneinschreibung wirklich abschließen?"
         delete_enrollment: "Möchten Sie diese Studenteneinschreibung wirklich löschen?"
       enrolled_as: "Eingeschrieben als ein %{enrollment_type}"
+      enrollment_linked_to: "verlinkt mit *%{linked_user}*"
       error: 
         enrollment_change_failed: "Änderung der Einschreibungsberechtigung fehlgeschlagen. Versuchen Sie es erneut."
       labels: 
@@ -3544,6 +3554,7 @@ de:
         delete_enrollment: "Möchten Sie diese Studenteneinschreibung wirklich löschen?"
       enrolled_as: "Eingeschrieben als ein %{enrollment_type}"
       enrollment_change_failed: "Änderung der Einschreibungsberechtigung fehlgeschlagen, bitte erneut versuchen"
+      enrollment_linked_to: "verlinkt mit *%{linked_user}*"
       headings: 
         recent_messages: "Zuletzt eingegangene Nachrichten"
         user_services: "Registrierte Webdienste"
@@ -4905,7 +4916,8 @@ de:
         update_course: "Kursdetails aktualisieren"
       course_conclude_at_warning_message: "Derzeit ist festgelegt, dass der Kurs um Mitternacht endet., d. h. der vorherige Tag ist der letzte Tag, an dem der Kurs aktiv ist."
       course_conclude_at_warning_title: "Kurs endet um Mitternacht"
-      course_open_enrollment_without_code: "Für diesen Kurs sind offene Einschreibungen aktiviert. Die Studenten können sich selbständig für den Kurs einschreiben, wenn Sie die folgende URL an sie weiterleiten: *%{url}*"
+      course_open_enrollment: "Für diesen Kurs ist die offene Einschreibung konfiguriert. Die Studenten können sich selbst für den Kurs einschreiben, wenn Sie die folgende URL an sie weiterleiten: *%{url}*. Alternative dazu können Sie sich unter *%{url2}* anmelden und folgenden Teilnahmecode verwenden: *%{code}*"
+      course_open_enrollment_without_code: "Für diesen Kurs ist die offene Einschreibung aktiviert. Die Studenten können sich selbst für den Kurs einschreiben, wenn Sie die folgende URL an sie weiterleiten: *%{url}*"
       course_overrides_term: "Hierdurch werden alle Verfügbarkeitseinstellungen außer Kraft gesetzt."
       date_restricted: "Die Benutzer können nur innerhalb dieses Zeitraums am Kurs teilnehmen"
       deatils: 
@@ -8686,6 +8698,7 @@ de:
           click_to_see_assignment: "Klicken Sie hier, um die Aufgabe anzuzeigen"
         no_due_date: "Kein Abgabetermin"
       facebook: 
+        assignment_due_date_changed_sentence: "Der Abgabetermin für die Aufgabe *%{assignment_name}* für den Kurs %{course_name} (%{override}) wurde verlegt auf:"
         no_due_date: "Kein Abgabetermin "
       sms: 
         assignment_due_date_changed: "%{assignment_name}, %{course_name} (%{override}) ist jetzt fällig:"
@@ -8778,6 +8791,7 @@ de:
         user_submitted: "Verspätete Aufgabe: %{user_name}, %{assignment_name}"
       facebook: 
         click_to_view: "Klicken Sie hier, um die Einsendung anzuzeigen."
+        user_resubmitted_sentence: "**%{user_name}** hat soeben eine verspätete Einsendung für **%{assignment_name}** im Kurs %{course_name} übermittelt"
       sms: 
         more_info_at: "Weitere Informationen auf %{web_address}"
         user_submitted: "%{user_name} hat soeben die (verspätete) Aufgabe %{assignment_name} eingesandt"
@@ -8861,6 +8875,7 @@ de:
             Beim Exportieren von Kurs "%{course}" ist ein Fehler aufgetreten.
             Bitte benachrichtigen Sie Ihren Systemadministrator und geben Sie folgenden Export-identifier an: %{id}.
         html: 
+          body2: "Beim Exportieren des Kurses *%{course}* ist ein Fehler aufgetreten. Benachrichtigen Sie Ihren Systemadministrator, und geben Sie folgenden Export-Identifier an:"
           link: "Zum Anzeigen von Exporten klicken"
           subject: "Kursexport fehlgeschlagen: %{course}"
         subject: "Kursexport fehlgeschlagen: %{course}"
@@ -9388,6 +9403,7 @@ de:
           body: "Ihre Inhalte können jetzt in Ihren Kurs importiert werden."
           link_message2: "Klicken Sie auf *diesen Link*, um auszuwählen, welche Inhaltselemente importiert werden sollen"
           subject: "Ihre Inhalte für %{course_name} können jetzt importiert werden"
+        link_message: "Klicken Sie auf folgenden Link, um die zu importierenden Inhalte auszuwählen:"
         subject: "Ihre Inhalte für den Kurs %{course_name} sind nun bereit für den Import."
     new_account_user: 
       email: 
@@ -9499,10 +9515,12 @@ de:
           teachers: Dozenten
         subject: "Neuer Kurs für %{account}"
       sms: 
+        body: "Der neue Kurs %{course} wurde für das Benutzerkonto %{account} hinzugefügt"
         details: "Weitere Informationen auf %{url}"
         labels: 
           teachers: Dozenten
       summary: 
+        body: "Der neue Kurs %{course} wurde für das Benutzerkonto %{account} hinzugefügt"
         labels: 
           teachers: Dozenten
         subject: "Neuer Kurs"
@@ -9731,8 +9749,10 @@ de:
       facebook: 
         body: "Neubenotung für Quiz durchgeführt: %{title}"
       sms: 
+        body_sms: "Neubenotung für Quiz durchgeführt für %{title}, %{context}"
         more_info: "Weitere Informationen finden Sie unter %{url}"
       summary: 
+        body: "Für Ihr Quiz %{title} wurde eine Neubenotung durchgeführt."
         subject: "Quiz neu benotet: %{quiz}, %{context}"
       twitter: 
         body: "Canvas-Benachrichtigung – Quiz neu benotet : %{quiz}"
@@ -10591,6 +10611,7 @@ de:
     academic_benchmark_settings: 
       api_url_description: "(z. B. %{url})"
       common_core_guid: "(z. B. %{guid})"
+      description: "Sie müssen Zugriff auf ein [Academic Benchmark](%{url})-Konto haben."
       labels: 
         api_key: API-Key
         api_url: API-Url
@@ -10622,6 +10643,7 @@ de:
       description: BigBlueButton-Webkonferenzunterstützung
       name: BigBlueButton
     big_blue_button_settings: 
+      description: "Sie müssen Zugang zu einer [BigBlueButton](%{url})-Instanz haben."
       domain_description: "**Hostname** oder **ip-adresse** Ihrer BigBlueButton-installation (z. B. bigbluebutton.mycompany.com)"
       labels: 
         domain: Domain
@@ -13087,6 +13109,7 @@ de:
   services_api: 
     must_be_logged_in: "Sie müssen angemeldet sein, um Kaltura zu nutzen"
   set_default_grade_dialog: 
+    default_grades: "Vergeben Sie an alle Studenten die gleiche Note für *%{assignment.name}*, indem Sie unten eine Note eingeben und absenden:"
     dialog_title: "Standardnote für %{assignment.name}"
     overwrite: "Bereits eingegebene Noten überschreiben"
     set_grades_button: "Standardnote festlegen"
@@ -13440,12 +13463,13 @@ de:
       recent_activity_in_course: "Aktuelle Aktivität in %{course_or_group}"
       unread_column: Ungelesen
       unread_count_badge: 
-        one: "%{count} *ungelesene Elemente*"
+        one: "1 *ungelesenes Element*"
         other: "%{count} *ungelesene Elemente*"
     recent_activity_item: 
       close: schließen
       unread: Ungelesen
     registration_incomplete: 
+      confirm_email_instructions: "Bevor Sie diese Seite aufrufen können, müssen Sie *Ihre E-Mail-Adresse bestätigen* (%{email}). Klicken Sie auf den Link in der E-Mail, um die Erstellung Ihres Kontos abzuschließen. Falls Sie diese E-Mail nicht erhalten haben, **klicken sie hier, um sie erneut zu senden**, und überprüfen Sie Ihren Spam-Ordner."
       headings: 
         confirm_email: "Bestätigen Sie Ihre E-mailadresse"
     right_side: 
@@ -13549,6 +13573,7 @@ de:
         full_comments: "Klicken, um Kommentare vollständig anzuzeigen"
         linked_to_learning_outcome: "Dieses Kriterium ist an ein Lernresultat gebunden"
     select_content_dialog: 
+      add_to_module: "%{item} zum *Modul* hinzufügen"
       assignment_item: Aufgabe
       assignment_notice: "Wählen Sie die Aufgabe aus, die Sie diesem *Modul* zuordnen möchten, oder klicken Sie auf \"Neue Aufgabe\", um eine Aufgabe hinzuzufügen."
       content_page_item: Inhaltsseite
@@ -14384,7 +14409,7 @@ de:
     current_conference: 
       current_conference_text: "Sie wurden eingeladen, an **[%{conference}](%{link_to_conference})** teilzunehmen. Die Konferenz begann am %{started_at}, und die Teilnehmerzahl beträgt %{participant_count}."
       participant_count: 
-        one: "%{count} Teilnehmer"
+        one: "1 Teilnehmer"
         other: "%{count} Teilnehmer"
     dashboard_sidebar: 
       coming_up: Demnächst
@@ -14480,6 +14505,11 @@ de:
     masquerade: 
       are_you_sure_start: "Möchten Sie sich wirklich als dieser Benutzer maskieren?"
       are_you_sure_stop: "Möchten Sie den Maskierungsmodus wirklich beenden?"
+      details: |-
+          Eine Maskierung ist im Wesentlichen die Anmeldung als dieser Benutzer ohne Passworteingabe.
+          Sie können beliebige Schritte vornehmen, ganz so, als ob Sie dieser Benutzer wären. Für alle anderen Benutzer hat es dabei den Anschein,
+          als würden diese Schritte von diesem Benutzer ausgeführt. Die Auditlogs zeichnen jedoch auf, dass
+          die jeweiligen Schritte von **Ihnen** im Namen dieses Benutzers getätigt wurden.
       masquerade_as: "Maskierung als %{user_name}"
     merge: 
       login_to_merge_different_account: "Um das Benutzerkonto %{current_user_name} (%{current_user_email}) mit einem anderen Benutzerkonto zusammenzuführen, melden Sie sich bitte bei Ihrem neuen Konto an:"
@@ -14791,6 +14821,7 @@ de:
         anyone: Alle
         only_members: "Nur Mitglieder"
         prompt: "%{options} können diese Seite bearbeiten."
+      group_wiki_warning: "Diese Seite gehört zum Gruppen-Wiki und *nicht* zu Ihrem Kurs-Wiki. Wenn Sie nach dem Kurswiki suchen, [klicken Sie hier](%{link})."
       labels: 
         hide_from_students: "Diese Seite vor Studenten verbergen."
         last_edited: "Zuletzt bearbeitet von %{name} vor %{time_ago}"
