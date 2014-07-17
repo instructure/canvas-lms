@@ -94,7 +94,7 @@ pl:
     default_delegated_login_handle_name: Zaloguj
     default_login_handle_name: "Adres e-mail"
     saml_eppn_domain_stripped: "%{eppn} (bez domeny)"
-    test_bind_failed: "Operacja powiązania nie powiodła się"
+    test_bind_failed: "Operacja powiązania nie powiodła się: %{error}"
     test_connection_timeout: "Przekroczony limit czasu podczas łączenia"
     test_host_unknown: "Nieznany host: %{host}"
     test_login_auth_exception: "Wyjątek podczas logowania: %{error}"
@@ -1163,7 +1163,7 @@ pl:
       process_data_button: "Przetwórz dane"
       select_file_instructions: |-
           Wybierz plik .zip, który chcesz importować.  
-          Opis generowania plików .zip [znajduje się w dokumentacji](%{uri}).
+          Opis generowania plików .zip [znajduje się w dokumentacji](%{url}).
       sis_import_crumb: "Importowanie danych SIS"
       started_at_message: "Rozpoczęto: %{started_at}"
       title: "Importowanie danych SIS"
@@ -1330,8 +1330,8 @@ pl:
       ta: "Zapisy asystentów instruktora"
       teachers: "Zapisy nauczycieli"
     user_add_failed_message: "Dodawanie użytkownika nie powiodło się; ponów próbę"
-    user_added_message: "Użytkownik %{user} został pomyślnie dodany!"
-    user_added_message_sent_message: "Użytkownik %{user} został pomyślnie dodany! Wkrótce użytkownik powinien otrzymać wiadomość e-mail potwierdzającą dodanie."
+    user_added_message: "Użytkownik *%{user}* został pomyślnie dodany!"
+    user_added_message_sent_message: "Użytkownik *%{user}* został pomyślnie dodany! Wkrótce użytkownik powinien otrzymać wiadomość e-mail potwierdzającą dodanie."
     user_deleted_message: "Użytkownik %{username} został pomyślnie usunięty"
     user_inactivity_csv_description: 
       account_reports: 
@@ -1722,7 +1722,7 @@ pl:
       move: "Przenieś do..."
       multiple_modules: "Wiele modułów"
       no_points_possible: "Brak możliwych punktów"
-      points_possible: "%{points_possible} pkt"
+      points_possible: "%{pointsPossible} pkt"
       points_possible_screen_reader: "Liczba punktów możliwych do zdobycia: %{pointsPossible}"
       settings: Ustawienia
     assignment_list_item_score: 
@@ -2352,7 +2352,7 @@ pl:
     upload_error_invalid_response_code: "Nieprawidłowy kod odpowiedzi, oczekiwanych 200 otrzymanych %{code}"
     upload_error_invalid_url: "Nie można przeanalizować URL: %{url}"
     upload_error_over_quota: "rozmiar pliku przekracza przydział: %{bytes} bajtów"
-    upload_error_relative_uri: "Brak dostarczonego hosta do adresu URL: % {url}"
+    upload_error_relative_uri: "Brak dostarczonego hosta do adresu URL: %{url}"
     upload_error_timeout: "Żądanie przekroczyło limit czasu: %{url}"
     upload_error_too_many_redirects: "Zbyt dużo przekierowań"
     upload_error_unexpected: "Nieznany błąd pojawił się podczas pobierania z adresu url %{url}"
@@ -3036,6 +3036,10 @@ pl:
         update: "Aktualizuj projekt współpracy"
       collaboration_name: "Projekt współpracy %{course_or_group_name}"
       descriptions: 
+        etherpad: |-
+            EtherPad to projekt o jawnym kodzie źródłowym umożliwiający tworzenie udostępnianych dokumentów. Jest wystarczająco szybki, aby pozwolić zobaczyć, co piszą inni w momencie, gdy wpisują tekst. Z drugiej strony jednak "pady"nie są chronione hasłem, dlatego każda osoba dysponująca łączem może je edytować. EtherPad jest w lepszym stopniu przystosowany do zapewnienia anonimowości niż Google Docs i umożliwienia udziału we współpracy osobom nieposiadającym konta Google.
+            
+            **Ostrzeżenie**: pamiętaj, aby zapoznać się z [EtherPad's deletion policy](%{etherpad_deletion_policy_url}) w celu zachowania dotychczasowych postępów w pracy.
         google_docs: |-
             Google Docs to doskonałe miejsce do współpracy nad projektem grupowym.  Działa na takiej zasadzie jak program Microsoft Word, ale umożliwia wspólną pracę nad tym samym plikiem w tym samym czasie bez konieczności przesyłania pliku pocztą elektroniczną.  
               
@@ -3114,6 +3118,10 @@ pl:
         logged_in_other_user_course: "Zaproszenie do uczestnictwa w kursie %{course} zostało wysłane na adres **%{email}**, ale teraz jesteś zalogowany jako użytkownik **%{user}**."
         merge_multiple: "Wybierz konto, które chcesz połączyć z użytkownikiem **%{current_user}**."
         merge_one: "Czy chcesz połączyć użytkowników **%{current_user}** i **%{other_user}**?"
+        multiple_accounts_course: |-
+            W systemie znajdują się %{count} konta dla tego adresu e-mail.
+            
+            Które jest twoje?
         none_of_these: "Żaden z wymienionych, jestem nowym użytkownikiem"
         register: "Aby zakończyć zapisy, niezbędne jest podanie jeszcze kilku informacji."
         register_with_course: "Aby zakończyć zapisy na kurs **%{course}**, niezbędne jest podanie jeszcze kilku informacji."
@@ -3477,7 +3485,7 @@ pl:
         conclude_student: "Czy na pewno chcesz zaakceptować zapisy tego uczestnika?"
         delete_enrollment: "Czy na pewno chcesz usunąć zapisy tego uczestnika?"
       enrolled_as: "Zapisany jako %{enrollment_type}"
-      enrollment_linked_to: "połączony z użytkownikiem %{linked_user}"
+      enrollment_linked_to: "połączony z użytkownikiem *%{linked_user}*"
       error: 
         enrollment_change_failed: "Zmiana przywileju zapisów nie powiodła się, ponów próbę"
       labels: 
@@ -3532,6 +3540,7 @@ pl:
         delete_enrollment: "Czy na pewno chcesz usunąć zapisy tego uczestnika?"
       enrolled_as: "Zapisany jako %{enrollment_type}"
       enrollment_change_failed: "Zmiana przywileju zapisów nie powiodła się, ponów próbę"
+      enrollment_linked_to: "połączony z użytkownikiem *%{linked_user}*"
       headings: 
         recent_messages: "Najnowsze wiadomości"
         user_services: "Zarejestrowane usługi sieci Web"
@@ -4612,7 +4621,7 @@ pl:
         delete_course: "Usuń kurs"
       details: 
         conclude_alt_text: "Jeśli chcesz zachować możliwość modyfikowania ocen i ograniczyć dostęp studenta do kursu, skorzystaj z ustawień dat kursu. Więcej informacji o ustawieniach daty kursu znajdziesz w naszych przewodnikach *here*"
-        confirm_conclude: "Czy na pewno chcesz zakończyć ten kurs? Uczestnicy i instruktorzy będą w dalszym ciągu widzieć zawartość kursu w formacie tylko do odczytu ze poziomu strony \"wcześniejsze kursy\". Jeśli chcesz, aby kurs nie był dla nikogo widoczny, możesz skorzystać z opcji *całkowicie usuń kurs*."
+        confirm_conclude: "Ostrzeżenie: Po ukończeniu kursu nie będzie możliwości modyfikowania ocen ani dostępu do zawartości kursu."
         confirm_delete: "Czy na pewno chcesz usunąć ten kurs? Po usunięciu kursu uczestnicy i instruktorzy nie będą mieć do niego dostępu. Jeśli chcesz tylko usunąć kurs z rozwijanej listy, powinieneś zamiast tego wybrać opcję *zakończ kurs*."
         confirm_delete_addendum: "Jeśli nie masz pozwolenia na zakończenie kursu, możesz *zmienić datę zakończenia kursu* lub poprosić administratora, aby zakończył ten kurs."
       headings: 
@@ -4651,6 +4660,19 @@ pl:
               
               *Kurs jest widoczny tylko dla instruktorów, do momentu aż nie zostanie opublikowany*
           saved: "Gotowe!  Kurs %{course} został oficjalnie utworzony. Do momentu publikacji jest widoczny tylko dla Ciebie. Ale zanim popełnisz falstart, zechcesz z pewnością przejrzeć listę znajdującą się lewej stronie i dowiedzieć się, jak działa program Canvas oraz przekonać się, że możesz prowadzić kurs w roli instruktora."
+        created: 
+          not_saved: |-
+              Klasa została utworzona, ale nie została zgłoszona.  Zostanie automatycznie usunięta, jeśli nie zgłosisz jej w ciągu tygodnia.  W międzyczasie upewnij się, że Twoje przygotowanie jest odpowiednie, sprawdzając to z listą znajdującą się po lewej stronie.
+              
+              Jeśli musisz wcześniej opuścić tę stronę i powrócić do niej, wystarczy, że zapiszesz *to łącze*, aby skorzystać z niego w późniejszym czasie.
+              
+              **Zaloguj się** lub ***zarejestruj***, aby zgłosić klasę.
+          saved: |-
+              Gotowe!  Kurs %{course} został oficjalnie utworzony.  Do momentu publikacji jest widoczny tylko dla Ciebie. Ale zanim popełnisz falstart, zechcesz z pewnością przejrzeć listę znajdującą się lewej stronie i dowiedzieć się, jak działa program Canvas oraz przekonać się, że możesz prowadzić kurs w roli instruktora.
+              
+              Jeśli musisz wcześniej opuścić tę stronę i powrócić do niej, wystarczy, że zapiszesz *to łącze*, aby skorzystać z niego w późniejszym czasie.
+              
+              **Zaloguj się** lub ***zarejestruj***, aby zgłosić klasę.
         files: "Zakładka Pliki służy do udostępniania materiałów związanych z zajęciami, np. dokumentów, pomocy naukowych — wszystkiego, co uczestnicy mogliby pobrać. Program Canvas zapewnia łatwy sposób przesyłania i organizacji plików. Wszystko zostanie dokładnie przedstawione."
         home: "Gdy użytkownicy zechcą przejść do kursu, wyświetli się ta strona. Można ją ustawić tak, aby przedstawiała ciąg czynności, listę modułów kursu, program kursu lub niestandardową stronę Twojego autorstwa. Ustawieniem domyślnym dla strony jest ciąg czynności. Aby zmienić to ustawienie, wystarczy kliknąć opcję %{change_layout}."
         import: "Możliwe, że chcesz przenieść swoje materiały z innego systemu zarządzania kursami do programu Canvas. Pomożemy Ci w łatwy sposób przenieść zawartość do systemu Canvas."
@@ -5692,6 +5714,7 @@ pl:
       show_rubric: "Wyświetl kryteria ocen"
       speed_grader: "Speed Grader"
       topic: Temat
+      topic_locked: "Do tematu nie można dodawać komentarzy do *%{date}*"
       topic_locked_until: "Ten temat jest zablokowany do %{time} "
       topic_not_visible: "Temat nie jest widoczny dla użytkowników"
       topic_podcast_feed_link: "Kanał informacyjny Podcast dot. tematu"
@@ -6076,6 +6099,7 @@ pl:
         share: "Kopiuj i udostępnij to łącze, aby inni zyskali dostęp do Twojego prywatnego ePortfolio."
         view_original: "Pokaż oryginalny plik"
         wizard: "Kreator wprowadzenia"
+      login_required: "Należy być *zalogowanym*, aby móc zamieszczać komentarze na tej stronie."
       new_section: "Nowa sekcja"
       no_comments: "Brak komentarzy"
       no_files: "Nie przekazano żadnych plików"
@@ -6330,6 +6354,7 @@ pl:
       all_set: "Wszystkie ustawienia zostały zakończone!"
       bookmark_notice: "Jeśli dodasz tę aplikację do zakładek, liczba nowych powiadomień w programie Canvas będzie widoczna na Twojej stronie głównej w portalu Facebook."
       canvas_messages: "Wiadomości z programu Canvas"
+      configure_notification_preferences_notice: "Po zakończeniu *konfiguracji preferencji dotyczących powiadomień* powiadomienia powinny zacząć wyświetlać się w tym miejscu, umożliwiając obserwację konta Canvas."
       installation_about: "Aby zainstalować aplikację Canvas dla portalu Facebook, przejdź do strony profilowej w systemie Canvas i kliknij przycisk Facebook w celu połączenia swojego konta z kontem w portalu Facebook."
       learn_more: "Dowiedz się więcej na stronie instructure.com"
       more_information: "Dowiedz się więcej na %{domain_list}"
@@ -7583,7 +7608,7 @@ pl:
         group_set_name: "Nazwa zestawu grup"
         group_structure: "Struktura grupy"
         leave_group_limit_blank: "Pozostaw puste, aby nie ustalać limitu"
-        limit_group_size: "Ogranicz grupy do następującej liczby uczestników: %{group_limit}"
+        limit_group_size: "Ogranicz grupy do następującej liczby uczestników: %h{group_limit}"
         require_same_section: "Wymagaj, aby członkowie grupy znajdowali się w tej samej sekcji"
         save: Zapisz
         saving: "Trwa zapisywanie..."
@@ -7608,7 +7633,7 @@ pl:
         cancel: Anuluj
         group_set_name: "Nazwa zestawu grupy"
         leave_group_limit_blank: "Pozostaw puste, aby nie ustalać limitu"
-        limit_group_size: "Ogranicz grupy do następującej liczby uczestników: %{group_limit}"
+        limit_group_size: "Ogranicz grupy do następującej liczby uczestników: %h{group_limit}"
         require_same_section: "Wymagaj, aby członkowie grupy znajdowali się w tej samej sekcji"
         save: Zapisz
         saving: "Trwa zapisywanie..."
@@ -11073,6 +11098,11 @@ pl:
           **Teraz skopiuj ten token**. Po opuszczeniu strony odzyskanie pełnego tokenu
           nie będzie możliwe i konieczne będzie jego ponowne wygenerowanie w celu otrzymania nowej
           wartości.
+      generate_access_token_description: |-
+          Tokeny dostępu służą do zezwalania aplikacjom producentów zewnętrznych na dostęp do zasobów systemu Canvas
+          w imieniu użytkownika. Zwykle tokeny te są automatycznie generowane dla
+          aplikacji, gdy jest to potrzebne, ale jeśli [użytkownik pracuje nad nowym projektem lub projektem
+          z ograniczonym dostępem](%{documentation_url}) tokeny można generować tutaj.
       google_docs_description: "Kiedy już autoryzujesz nas do swoich Dokumentów Google, będziesz mieć możliwość wysyłania swoich prac bezpośrednio z Dokumentów Google, oraz tworzyć i współdzielić z członkami Twoich klas."
       headers: 
         application_abbrev: Aplikacja
@@ -11419,7 +11449,7 @@ pl:
       module: Moduł
       multiple_modules: "Wiele modułów"
       no_points_possible: "Brak możliwych punktów"
-      points_possible: "%{points_possible} pkt"
+      points_possible: "%{pointsPossible} pkt"
       points_possible_screen_reader: "Liczba punktów możliwych do zdobycia: %{pointsPossible}"
       settings: "Edytuj zadanie"
     assignment_list_item_score: 
@@ -12185,7 +12215,7 @@ pl:
         count_attempts_left: 
           few: "%{user} pozostało %{count} proby"
           one: "%{user} pozostała %{count} próba"
-          other: "%{user} pozostało %{count} prób"
+          other: "Użytkownikowi %{user} pozostało %{count} prób"
         default_quiz_name: "Test z kursu %{course_name}"
         default_survey_name: "Ankieta do kursu %{course_name}"
         grade_by_question_warning: "Na funkcję „grade by question” mają wpływ pytania, których kolejność w grupie jest ustalana losowo."
@@ -12248,7 +12278,7 @@ pl:
           download_lockdown: "[Pobierz Respondus LockDown Browser]"
         requires_lockdown: "Test wymaga programu Respondus LockDown Browser. Uruchom program Respondus LockDown Browser, aby podejść do testu lub wyświetlić swoje wyniki."
       managed_quiz_data: 
-        anonymous_student: "Uczestnik %{user_count}"
+        anonymous_student: "Uczestnik %{user_counter}"
         logged_out_user: "Użytkownik wylogowany %{user_counter}"
         titles: 
           submission_needs_review: "Przesłane zadanie wymaga sprawdzenia"
@@ -13582,7 +13612,7 @@ pl:
       close: zamknij
       unread: Nieprzeczytane
     registration_incomplete: 
-      confirm_email_instructions: "Zanim będziesz mógł przeglądać tę stronę, musisz potwierdzić adres email (%{email}). Kliknij na łącze w e-mailu, aby dokończyć konfigurowanie Twojego konta. Jeśli nie widzisz e-maila, *wyślij ponownie email*, i upewnij się, że sprawdziłeś folder ze spamem."
+      confirm_email_instructions: "Zanim będziesz mógł przeglądać tę stronę, musisz *potwierdzić adres email* (%{email}). Kliknij na łącze w e-mailu, aby dokończyć konfigurowanie Twojego konta. Jeśli nie widzisz e-maila, **naciśnij, aby wysłać ponownie email** i upewnij się, że sprawdziłeś folder ze spamem."
       headings: 
         confirm_email: "Potwierdź adres email"
     right_side: 
