@@ -155,6 +155,12 @@ namespace :i18n do
     # the `environment` rake task.
     require 'bundler'
     Bundler.setup
+    unless CANVAS_RAILS2
+      # for consistency in how canvas does json ... this way our specs can
+      # verify _core_en is up to date
+      ActiveSupport::JSON.backend = :oj
+      MultiJson.dump_options = {:escape_mode => :xss_safe}
+    end
 
     # set up rails i18n paths ... normally rails env does this for us :-/
     require 'action_controller' 

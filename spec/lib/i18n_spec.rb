@@ -100,7 +100,7 @@ describe I18n do
   context "_core_en.js" do
     it "should be up-to-date" do
       pending('RAILS_LOAD_ALL_LOCALES=true') unless ENV['RAILS_LOAD_ALL_LOCALES']
-      pending('cannot pass in both rails 2 and rails 3') unless CANVAS_RAILS2
+      pending('cannot pass in both rails 2 and rails 3') if CANVAS_RAILS2
       translations = {'en' => I18n.backend.direct_lookup('en').slice(*I18nTasks::Utils::CORE_KEYS)}
 
       # HINT: if this spec fails, run `rake i18n:generate_js`...
