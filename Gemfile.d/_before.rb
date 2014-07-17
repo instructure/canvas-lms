@@ -46,12 +46,12 @@ else
   ruby '1.9.3', :engine => 'ruby', :engine_version => '1.9.3'
 end
 
-# force a different lockfile for rails 3
-if CANVAS_RAILS3
+# force a different lockfile for rails 2
+if CANVAS_RAILS2
   Bundler::SharedHelpers.class_eval do
     class << self
       def default_lockfile
-        Pathname.new("#{Bundler.default_gemfile}.lock3")
+        Pathname.new("#{Bundler.default_gemfile}.lock2")
       end
     end
   end
