@@ -106,7 +106,7 @@ gem 'sanitize', '2.0.3'
 gem 'shackles', '1.0.5'
 
 gem 'tzinfo', '0.3.35'
-gem 'useragent', '0.4.16'
+gem 'useragent', '0.10.0'
 gem 'uuid', '2.3.2'
 
 gem 'xml-simple', '1.0.12', :require => 'xmlsimple'
