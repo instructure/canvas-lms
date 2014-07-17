@@ -22,11 +22,14 @@ require File.expand_path(File.dirname(__FILE__) + '/support/onceler/sharding')
 SHARDING_ENABLED = defined?(ShardRSpecHelper)
 
 unless SHARDING_ENABLED
+  require File.expand_path(File.dirname(__FILE__) + '/support/onceler/noop')
+
   module ShardRSpecHelper
     def self.included(klass)
       klass.before do
         pending "needs a sharding implementation"
       end
+      klass.send(:include, Onceler::Noop)
     end
   end
 
