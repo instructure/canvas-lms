@@ -1486,7 +1486,7 @@ nb:
       process_data_button: "Prosesser data"
       select_file_instructions: |-
           Velg zip-filen du ønsker å importere.
-          For en beskrivelse av hvordan å generere disse zip-filene, [se denne dokumentasjonen](%{uri}).
+          For en beskrivelse av hvordan å generere disse zip-filene, [se denne dokumentasjonen](%{url}).
       sis_import_crumb: SIS-import
       started_at_message: "Startet: %{started_at}"
       title: SIS-import
@@ -10513,6 +10513,7 @@ nb:
         published: Publisert
     post_grades_dialog_title: "Send karakterer til SIS"
     progression_module_collection: 
+      module_progress_for: "Modulframdrift for %h{student_link}"
       module_progress_for_student: "Modulframdrift for %{student.name}"
       no_modules_found: "Ingen moduler funnet"
     progression_module_view: 
