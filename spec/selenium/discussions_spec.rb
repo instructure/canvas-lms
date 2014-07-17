@@ -675,7 +675,8 @@ describe "discussions" do
 
           new_points = get_value(".criterion_points")
           dialog = fj(".ui-dialog:visible")
-
+          
+          keep_trying_until { fj(".grading_rubric_checkbox:visible").should be_displayed }
           set_value fj(".grading_rubric_checkbox:visible", dialog), true
 
           fj(".save_button:visible", dialog).click
@@ -1239,13 +1240,13 @@ describe "discussions" do
           topic.save!
 
           get url
-          wait_for_ajaximations
+
+          keep_trying_until { f('input[type=text][name="delayed_post_at"]').should be_displayed }
 
           f('input[type=text][name="delayed_post_at"]').clear
           f('input[type=text][name="lock_at"]').clear
 
           expect_new_page_load { f('.form-actions button[type=submit]').click }
-          wait_for_ajaximations
 
           topic.reload
           topic.delayed_post_at.should be_nil

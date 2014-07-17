@@ -3,7 +3,6 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 def visit_page
   @course.reload
   get "/courses/#{@course.id}/content_migrations"
-  wait_for_ajaximations
 end
 
 def select_migration_type(type=nil)
@@ -32,7 +31,6 @@ def submit
   keep_trying_until do
     @course.content_migrations.count.should == count + 1
   end
-  wait_for_ajaximations
 end
 
 def run_migration(cm=nil)
@@ -116,8 +114,8 @@ describe "content migrations", :non_parallel do
       migration_types = ff('#chooseMigrationConverter option').map { |op| op['value'] } - ['none']
       migration_types.each do |type|
         select_migration_type(type)
-        wait_for_ajaximations
-        ff("input[type=\"submit\"]").any? { |el| el.displayed? }.should == true
+
+        keep_trying_until { ffj("input[type=\"submit\"]").any? { |el| el.displayed? }.should == true }
 
         select_migration_type('none')
         ff("input[type=\"submit\"]").any? { |el| el.displayed? }.should == false
@@ -220,8 +218,10 @@ describe "content migrations", :non_parallel do
         submit
         run_migration
 
-        @course.assessment_question_banks.count.should == 1
-        bank.assessment_questions.count.should == 1
+        keep_trying_until do
+          @course.assessment_question_banks.count.should == 1
+          bank.assessment_questions.count.should == 1
+        end
       end
 
       it "should import into new question bank" do
@@ -501,34 +501,34 @@ describe "content migrations", :non_parallel do
     let(:import_course) { course_with_teacher_logged_in.course }
     let(:import_tool) do
       tool = import_course.context_external_tools.new({
-        name: "test lti import tool",
-        consumer_key: "key",
-        shared_secret: "secret",
-        url: "http://www.example.com/ims/lti",
-      })
+                                                          name: "test lti import tool",
+                                                          consumer_key: "key",
+                                                          shared_secret: "secret",
+                                                          url: "http://www.example.com/ims/lti",
+                                                      })
       tool.migration_selection = {
-        url: "http://#{HostUrl.default_host}/selection_test",
-        text: "LTI migration text",
-        selection_width: 500,
-        selection_height: 500,
-        icon_url: "/images/add.png",
+          url: "http://#{HostUrl.default_host}/selection_test",
+          text: "LTI migration text",
+          selection_width: 500,
+          selection_height: 500,
+          icon_url: "/images/add.png",
       }
       tool.save!
       tool
     end
     let(:other_tool) do
       tool = import_course.context_external_tools.new({
-        name: "other lti tool",
-        consumer_key: "key",
-        shared_secret: "secret",
-        url: "http://www.example.com/ims/lti",
-      })
+                                                          name: "other lti tool",
+                                                          consumer_key: "key",
+                                                          shared_secret: "secret",
+                                                          url: "http://www.example.com/ims/lti",
+                                                      })
       tool.resource_selection = {
-        url: "http://#{HostUrl.default_host}/selection_test",
-        text: "other resource text",
-        selection_width: 500,
-        selection_height: 500,
-        icon_url: "/images/add.png",
+          url: "http://#{HostUrl.default_host}/selection_test",
+          text: "other resource text",
+          selection_width: 500,
+          selection_height: 500,
+          icon_url: "/images/add.png",
       }
       tool.save!
       tool

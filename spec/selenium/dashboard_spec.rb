@@ -42,7 +42,7 @@ describe "dashboard" do
       items.first.reload.hidden.should == true
     end
 
-    it "should allow hiding a stream item on the dashboard" do
+    it "should allow hiding a stream item on the dashboard", :non_parallel do
       test_hiding("/")
     end
 
