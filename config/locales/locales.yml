@@ -69,3 +69,8 @@ tr:
     tr: Türkçe (crowd-sourced)
   qualified_locale: tr-TR
   crowdsourced: true
+fa-IR:
+  locales:
+    fa-IR: فارسی (crowd-sourced)
+  qualified_locale: fa-IR
+  crowdsourced: true
