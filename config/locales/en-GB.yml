@@ -303,6 +303,7 @@ en-GB:
       no_term: "A specific term is required - please select a term"
     grades: 
       deleted: "Include deleted objects: true;"
+      limited: "deleted objects limited by days specified;"
     granite: 
       invalid_date_range: "Dates were adjusted to 1 week range;"
     lincoln: 
@@ -354,7 +355,7 @@ en-GB:
     report_header_final_score: "final score"
     report_header_first_name: first_name
     report_header_group_id: group_id
-    report_header_id: ID
+    report_header_id: id
     report_header_last_access_at: "last access at"
     report_header_last_ip: "last ip"
     report_header_last_name: last_name
@@ -1274,7 +1275,8 @@ en-GB:
       help_link_available_to_all_teachers: Teachers
       help_link_available_to_all_users: Users
       if_you_would_like_to_link_to_your_own_campus_support_website_in_the_help_dialog_you_can_do_that_here: "If you would like to link to your own campus support website in the help dialog you can do that here"
-      interpolate_account_domain: "Note: enter \"{{ACCOUNT_DOMAIN}}\" to substitute the user's root account domain"
+      interpolate_account_domain: "Enter \"{{ACCOUNT_DOMAIN}}\" to substitute the user's root account domain"
+      interpolate_user_id: "Enter \"{{CANVAS_USER_ID}}\" to substitute the user's unique Canvas ID"
       ip_filter_filter_label: Filter
       ip_filter_name_label: Name
       labels: 
@@ -1486,7 +1488,7 @@ en-GB:
       process_data_button: "Process data"
       select_file_instructions: |-
           Select the zip file that you want imported.  
-          For a description of how to generate these zip files, [please see this documentation](%{uri}).
+          For a description of how to generate these zip files, [please see this documentation](%{url}).
       sis_import_crumb: "SIS import"
       started_at_message: "Started: %{started_at}"
       title: "SIS import"
@@ -1777,6 +1779,8 @@ en-GB:
       ta: "Ta Enrolments"
       teachers: "Teacher Enrolments"
     user_add_failed_message: "Adding user failed, please try again"
+    user_added_message: "*%{user}* successfully added!"
+    user_added_message_sent_message: "*%{user}* successfully added! They should receive an email confirmation shortly."
     user_deleted_message: "%{username} successfully deleted"
     user_inactivity_csv_description: 
       account_reports: 
@@ -2178,6 +2182,7 @@ en-GB:
         never_drop: "Never drop"
         no_assignments: "[No assignments]"
         weighted_by_points: "Weighted by points"
+      percent_of_total_grade: "% of total grade"
     assignment_count: 
       one: "1 assignment"
       other: "%{count} assignments"
@@ -4155,6 +4160,7 @@ en-GB:
         user_account_details: "User account details"
         user_grades: Grades
         user_only_view_section: "limit this user to only see fellow section users"
+        user_outcomes: Outcomes
         user_view_all_sections: "let this user see all course users"
       no_messages: "No messages"
       no_services: "%{user} hasn't linked any external services to their account yet."
@@ -4338,6 +4344,9 @@ en-GB:
     content_next: 
       add_prerequisite: "Add prerequisite to *%{module}*"
       assignment_points_possible: "out of %{points_possible}"
+      button: 
+        delete_label: "Delete prerequisites"
+        delete_title: "Delete prerequisites"
       buttons: 
         add_module: "Add module"
         add_prerequisite: "Add prerequisite"
@@ -5159,6 +5168,7 @@ en-GB:
               
               Please **log in** or ***register*** to claim this course.
         files: "The Files tab is the place to share lecture slides, example documents, study helps -- anything your students will want to download. Uploading and organising your files is easy with Canvas. We'll show you how."
+        home2: "When people visit the course, this is the page they'll see. You can set it to show an activity stream, the list of course modules, a syllabus, or a custom page you write yourself. The default is the course activity stream. To customise this, just click %{choose_home_page}."
         import: "If you've been using another course management system, you probably have stuff in there that you're going to want moved over to Canvas. We can walk you through the process of easily migrating your content into Canvas."
         navigation: "By default all links are enabled for a course. Students won't see links to sections that don't have content. For example, if you haven't created any quizzes, they won't see the quizzes link. You can sort and explicitly disable these links if there are areas of the course you don't want your students accessing."
         publish: 
@@ -5241,6 +5251,7 @@ en-GB:
       create_failed: "Course creation failed"
       role_not_active: "Can't add users for non-active role: '%{role}'"
       role_not_found: "No role named '%{role}' exists."
+      unpublish: "Course cannot be unpublished if student submissions exist."
     group_list: 
       headings: 
         groups: "Course groups"
@@ -5303,6 +5314,8 @@ en-GB:
         close: Done
         duplicates_removed: "Some duplicates were removed."
         email: Email
+        email_field_label: "Enter the email addresses of the users you would like to add, seperated by commas"
+        email_field_place_holder: "\"Example Student\" &lt;student@example.com&gt;, \"Lastname, Firstname\" &lt;firstlast@example.com&gt;, justAnEmailAddress@example.com"
         example_formats: "Examples: user@example.com, \"First Last\" &lt;user@example.com&gt;, \"Last, First\" &lt;user@example.com&gt;"
         form_instructions: "Type or paste a list of email addresses below:"
         go_back: "Start over"
@@ -5420,6 +5433,8 @@ en-GB:
         course_lock_all_announcements: "Disable comments on announcements"
         course_name: Name
         course_section_name: "Add a new section"
+        course_status_published: "Course is published"
+        course_status_unpublished: "Course is unpublished"
         course_visibility: Visibility
         enrollment_term_id: Term
         grading_scheme: "Grading scheme"
@@ -5475,6 +5490,8 @@ en-GB:
         tools: Apps
       titles: 
         edit_navigation: "Edit course navigation"
+      tooltips: 
+        cannot_unpublish_course: "You cannot unpublish this course if there are graded student submissions"
       transifex_message: "Join the [Canvas Translation Community](%{transifex_url})"
       turnitin: "these comments will be shown to students when submitting a Turnitin-enabled assignment"
       view_grading_scheme: "view grading scheme"
@@ -5530,7 +5547,7 @@ en-GB:
       empty_body: "No content"
       front_page_not_set: "Front page must be set first"
       headers: 
-        course_status: "Course Status"
+        course_status: "Course status"
       headings: 
         choose_home_page_title: "Choose Home Page"
         confirm_unenroll: "Confirm unenrolment"
@@ -6709,13 +6726,14 @@ en-GB:
         adding_feed: "Adding feed..."
       descriptions: 
         add_new_feed: "You can automatically add posts from an RSS or Atom feed as announcements for this course. Just paste the feed URL below and any new entries will be added."
+      feed_url_label: "Feed URL"
       keyword: "Keyword:"
       labels: 
         match_phrase_checkbox: "Only add posts with a specific phrase in the title"
       links: 
         add_external_feed: "Add external feed"
       options: 
-        content_to_post: "--Content to post--"
+        content_to_post: "Content to post"
         full_article: "Full article"
         link_only: "Link only"
         truncated: Truncated
@@ -6742,6 +6760,7 @@ en-GB:
     consumer_key: "Consumer key"
     course_home_sub_navigation_configured: "Course home sub navigation configured"
     course_navigation_configured: "Course navigation configured"
+    course_settings_sub_navigation_configured: "Course settings sub navigation configured"
     delete: Delete
     dialog_title_add_app: "Add App"
     dialog_title_edit_tool: "Edit external tool"
@@ -12246,7 +12265,7 @@ en-GB:
       partial: Partial
       right: "Correct answer"
       unanswered: Unanswered
-      you_answered: "You Answered"
+      you_answered: "You answered"
   quizzes: 
     after_last_attempt: "After last attempt"
     alerts: 
@@ -13408,6 +13427,7 @@ en-GB:
       manage_students: "Add/remove students for the course"
       manage_user_logins: "Modify login details for users"
       manage_user_notes: "Manage faculty journal entries"
+      manage_user_observers: "Manage observers for users"
       manage_wiki: "Manage wiki (add/edit/delete pages)"
       managed_jobs: "Manage background jobs"
       moderate_form: "Moderate discussions (delete/edit other's posts, lock topics)"
@@ -14160,6 +14180,7 @@ en-GB:
         additional_comments: "Additional comments"
       instructor_comments: "Instructor comments"
       labels: 
+        long_description: "Long description"
         save_criterion_for_reuse: "Save this comment for reuse"
         threshold: threshold
       links: 
@@ -14179,6 +14200,7 @@ en-GB:
         update_description: "Update description"
       labels: 
         additional_comments: "Additional comments"
+        long_description: "Long description"
     rubric_dialog: 
       buttons: 
         use_this_rubric: "Use this rubric"
@@ -14206,6 +14228,8 @@ en-GB:
       defaults: 
         description: "Description of criterion"
       full_marks: "Full marks"
+      labels: 
+        long_description: "Long description"
       links: 
         view_longer_description: "view longer description"
       no_marks: "No marks"
