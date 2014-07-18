@@ -234,7 +234,7 @@ END
       description:  -> { I18n.t('better_file_browsing_description', <<-END) },
 A new, simpler, more user friendly file browsing interface.  If you turn this on at the course level,
 then all of the users in that course will see the new interface.  To get it to show up when someone
-goes to the personal files page for a user ('/files') then you need to turn it on for the account they are a memeber of.
+goes to the personal files page for a user ('/files') then you need to turn it on for the account they are a member of.
 END
 
       applies_to: 'Course',
