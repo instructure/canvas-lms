@@ -402,8 +402,7 @@ routes.draw do
 
   match 'quiz_statistics/:quiz_statistics_id/files/:file_id/download' => 'files#show', :as => :quiz_statistics_download, :download => '1'
 
-  match '/submissions/:submission_id/attachments/:attachment_id/crocodoc_sessions' => 'crocodoc_sessions#create', :via => :post
-  match '/attachments/:attachment_id/crocodoc_sessions' => 'crocodoc_sessions#create', :via => :post
+  match '/crocodoc_session' => 'crocodoc_sessions#show', :via => :get, :as => :crocodoc_session
   match '/canvadoc_session' => 'canvadoc_sessions#show', :via => :get, :as => :canvadoc_session
 
   resources :page_views, :only => [:update]

@@ -882,8 +882,9 @@ define([
 
       $multiple_submissions.change(function(e) {
         if (typeof EG.currentStudent.submission == 'undefined') EG.currentStudent.submission = {};
-        var i = parseInt(e.target.value, 10);
-        EG.currentStudent.submission.currentSelectedIndex = i;
+        var i = $("#submission_to_view").val() ||
+                EG.currentStudent.submission.submission_history.length - 1;
+        EG.currentStudent.submission.currentSelectedIndex = parseInt(i, 10);
         EG.handleSubmissionSelectionChange();
       });
 
@@ -1141,7 +1142,7 @@ define([
         $turnitinInfoContainer = $("#submission_files_container .turnitin_info_container").empty();
         $.each(submission.versioned_attachments || [], function(i,a){
           var attachment = a.attachment;
-          if (attachment['crocodoc_available?'] ||
+          if (attachment.crocodoc_url ||
               attachment.canvadoc_url ||
               (attachment.scribd_doc && attachment.scribd_doc.created) ||
               $.isPreviewable(attachment.content_type, 'google')) {
@@ -1214,6 +1215,9 @@ define([
 
       if (submissionHistory.length > 0) {
         var noSubmittedAt = I18n.t('no_submission_time', 'no submission time');
+        var selectedIndex = parseInt($("#submission_to_view").val() ||
+                                       submissionHistory.length - 1,
+                                     10);
         var templateSubmissions = _(submissionHistory).map(function(o, i) {
           var s = o.submission;
           if (s.grade && (s.grade_matches_current_submission ||
@@ -1223,11 +1227,12 @@ define([
           return {
             value: s.version || i,
             late: s.late,
+            selected: selectedIndex === i,
             submittedAt: $.datetimeString(s.submitted_at) || noSubmittedAt,
             grade: grade
           };
         });
-        _(templateSubmissions).last().selected = true;
+
         innerHTML = submissionsDropdownTemplate({
           singleSubmission: submissionHistory.length == 1,
           submissions: templateSubmissions,
@@ -1307,7 +1312,6 @@ define([
         $iframe_holder.empty();
 
         if (attachment) {
-          var crocodocAvailable = attachment['crocodoc_available?'];
           var scribdDocAvailable = attachment.scribd_doc && attachment.scribd_doc.created && attachment.workflow_state != 'errored' && attachment.scribd_doc.attributes.doc_id;
           var previewOptions = {
             height: '100%',
@@ -1322,27 +1326,10 @@ define([
             }
           };
         }
-        if (crocodocAvailable) {
-          var currentStudentIDAsOfAjaxCall = this.currentStudent.id;
-          var that = this;
-          $iframe_holder.show();
-          $iframe_holder.disableWhileLoading($.ajaxJSON(
-            '/submissions/' + this.currentStudent.submission.id + '/attachments/' + attachment.id + '/crocodoc_sessions/',
-            'POST',
-            {version: this.currentStudent.submission.currentSelectedIndex},
-            function(response) {
-              if (currentStudentIDAsOfAjaxCall == that.currentStudent.id) {
-                $iframe_holder.loadDocPreview($.extend(previewOptions, {
-                  crocodoc_session_url: response.session_url
-                }));
-              }
-            },
-            function() {
-              // pretend there isn't a crocodoc and try again
-              attachment['crocodoc_available?'] = false;
-              EG.handleSubmissionSelectionChange();
-            }
-          ));
+        if (attachment && attachment.crocodoc_url) {
+          $iframe_holder.show().loadDocPreview($.extend(previewOptions, {
+            crocodoc_session_url: attachment.crocodoc_url
+          }));
         }
         else if (attachment && attachment.canvadoc_url) {
           $iframe_holder.show().loadDocPreview($.extend(previewOptions, {
@@ -1378,6 +1365,7 @@ define([
             '/assignments/' + this.currentStudent.submission.assignment_id +
             '/submissions/' + this.currentStudent.submission.user_id +
             '?preview=true' + (
+
               this.currentStudent.submission &&
               !isNaN(this.currentStudent.submission.currentSelectedIndex) &&
               this.currentStudent.submission.currentSelectedIndex != null ?

@@ -1788,13 +1788,23 @@ class Attachment < ActiveRecord::Base
 
   def canvadoc_url(user)
     return unless canvadocable?
+    "/canvadoc_session?#{preview_params(user)}"
+  end
+
+  def crocodoc_url(user)
+    return unless crocodoc_available?
+    "/crocodoc_session?#{preview_params(user)}"
+  end
+
+  def preview_params(user)
     blob = {
-      user_id: user.global_id,
+      user_id: user.try(:global_id),
       attachment_id: id,
     }.to_json
     hmac = Canvas::Security.hmac_sha1(blob)
-    "/canvadoc_session?blob=#{URI.encode blob}&hmac=#{URI.encode hmac}"
+    "blob=#{URI.encode blob}&hmac=#{URI.encode hmac}"
   end
+  private :preview_params
 
   def check_rerender_scribd_doc
     if scribd_doc_missing?
