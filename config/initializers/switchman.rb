@@ -1,4 +1,8 @@
-unless CANVAS_RAILS2
+if CANVAS_RAILS2
+  module Switchman
+    Shard = ::Shard
+  end
+else
   Rails.application.config.to_prepare do
     Switchman::Shard.class_eval do
       class << self
