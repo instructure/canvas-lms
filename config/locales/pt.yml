@@ -90,7 +90,7 @@ pt:
     default_delegated_login_handle_name: Login
     default_login_handle_name: Email
     saml_eppn_domain_stripped: "%{eppn} (domínio retirado)"
-    test_bind_failed: "Falha na vinculação"
+    test_bind_failed: "Falha na vinculação com o seguinte erro: %{error}"
     test_connection_timeout: "Tempo limite excedido ao conectar"
     test_host_unknown: "Anfitrião desconhecido: %{host}"
     test_login_auth_exception: "Exceção durante o login: %{error}"
@@ -1051,6 +1051,7 @@ pt:
       no_courses_term_message: "Não existem disciplinas neste período"
       subtitle_term: "Para o período **%{term}**"
       title: "Disciplinas nesta conta"
+      too_many_courses_message: "Há demasiadas disciplinas para mostrar (%{count}). Utilize o localizador à direita para encontrar uma disciplina específica."
     sis_batch_counts: 
       accounts_label: Contas
       courses_label: Disciplinas
@@ -1125,7 +1126,7 @@ pt:
       process_data_button: "Processar dados"
       select_file_instructions: |-
           Selecione o ficheiro zip que pretende importar.  
-          Para ver uma descrição de como gerar estes ficheiros zip, [consulte esta documentação](%{uri}).
+          Para ver uma descrição de como gerar estes ficheiros zip, [consulte esta documentação](%{url}).
       sis_import_crumb: "Importação de SIS"
       started_at_message: "Iniciado: %{started_at}"
       title: "Importação de SIS"
@@ -1292,8 +1293,8 @@ pt:
       ta: "Inscrições de assistentes"
       teachers: "Inscrições de professores"
     user_add_failed_message: "Falha ao adicionar utilizador, tente novamente"
-    user_added_message: "%{user} adicionado com sucesso!"
-    user_added_message_sent_message: "%{user} adicionado com sucesso! O utilizador deverá receber em breve um e-mail de confirmação."
+    user_added_message: "*%{user}* adicionado com sucesso!"
+    user_added_message_sent_message: "*%{user}* adicionado com sucesso! O utilizador deverá receber em breve um e-mail de confirmação."
     user_deleted_message: "%{username} eliminado com sucesso"
     user_inactivity_csv_description: 
       account_reports: 
@@ -3071,6 +3072,10 @@ pt:
         logged_in_other_user_course: "O convite para %{course} foi enviado para **%{email}**, mas tem sessão iniciada como **%{user}**."
         merge_multiple: "Selecione a conta que deseja combinar com **%{current_user}**."
         merge_one: "Deseja combinar as contas **%{current_user}** e **%{other_user}**?"
+        multiple_accounts_course: |-
+            Já existem %{count} associadas a este endereço de e-mail.
+            
+            Qual é a sua?
         none_of_these: "Nenhum desses, sou um novo utilizador"
         register: "Para finalizar sua inscrição, precisamos de mais algumas informações."
         register_with_course: "Para finalizar a sua inscrição na disciplina **%{course}**, precisamos de mais algumas informações."
@@ -5619,6 +5624,7 @@ pt:
       show_rubric: "Exibir protocolo"
       speed_grader: SpeedGrader
       topic: Tópico
+      topic_locked: "Este tópico não estará visível para os utilizadores até *%{date}*"
       topic_locked_until: "Este tópico está bloqueado até %{time}"
       topic_not_visible: "Este tópico não está visível para os utilizadores"
       topic_podcast_feed_link: "Feed do Podcast do tópico"
@@ -9292,6 +9298,7 @@ pt:
           body: "O conteúdo está pronto para ser importado para a disciplina."
           link_message2: "Clique *nesta ligação* para selecionar os itens do conteúdo a importar"
           subject: "O conteúdo de \"%{course_name}\" está pronto para ser importado"
+        link_message: "Clique nesta ligação para selecionar os itens do conteúdo a importar:"
         subject: "O conteúdo de \"%{course_name}\" está pronto para ser importado"
     new_account_user: 
       email: 
@@ -11624,7 +11631,7 @@ pt:
     file_uploaded_or_removed: 
       quizzes: 
         file_successfully_uploaded: "O seu ficheiro foi carregado com sucesso."
-        files_removed: "{display_name} foi removido."
+        files_removed: "%{display_name} foi removido."
     final_answer: "Resposta final"
     graded_quiz: "Teste avaliado"
     graded_survey: "Questionário avaliado"
