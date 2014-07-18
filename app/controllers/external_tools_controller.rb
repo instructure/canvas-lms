@@ -109,17 +109,23 @@ class ExternalToolsController < ApplicationController
         redirect_to named_context_url(@context, :context_url)
         return
       end
-      @resource_title = @tool.name
-      @resource_url = params[:url]
       add_crumb(@context.name, named_context_url(@context, :context_url))
-      @return_url = url_for(@context)
+
+      @lti_launch = Lti::Launch.new
 
       adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @context)
-      adapter.prepare_tool_launch(@return_url, resource_type: @resource_type, launch_url: @resource_url)
-      @tool_settings = adapter.generate_post_payload
+      adapter.prepare_tool_launch(url_for(@context), resource_type: @resource_type, launch_url: params[:url])
+      @lti_launch.params = adapter.generate_post_payload
 
-      @tool_launch_type = 'self' if params['borderless']
-      render :template => 'external_tools/tool_show'
+      @lti_launch.resource_url = params[:url]
+      @lti_launch.link_text =  @tool.name
+
+      if params['borderless']
+        @lti_launch.launch_type = 'self'
+        render :template => 'lti/framed_launch', layout: 'bare'
+      else
+        render :template => 'lti/framed_launch'
+      end
     end
   end
 
