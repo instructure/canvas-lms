@@ -1186,7 +1186,7 @@ zh:
       process_data_button: 处理数据
       select_file_instructions: |-
           选择要导入的压缩文件。  
-          有关如何生成这些压缩文件的说明，[请参阅本文档](%{uri})。
+          有关如何生成这些压缩文件的说明，[请参阅本文档](%{url})。
       sis_import_crumb: "SIS 导入"
       started_at_message: "开始时间: %{started_at}"
       title: "SIS 导入"
@@ -1353,8 +1353,8 @@ zh:
       ta: 助教注册
       teachers: 教师注册
     user_add_failed_message: 添加用户失败，请重试
-    user_added_message: "%{user} 已成功添加!"
-    user_added_message_sent_message: "%{user} 已成功添加! 他们应该很快会收到确认电子邮件。"
+    user_added_message: "*%{user}* 已成功添加！"
+    user_added_message_sent_message: "*%{user}* 已成功添加！他们应该很快会收到确认电子邮件。"
     user_deleted_message: "%{username} 已成功删除"
     user_inactivity_csv_description: 
       account_reports: 
@@ -1702,7 +1702,7 @@ zh:
         never_drop: 不删除
         no_assignments: "[无作业]"
         weighted_by_points: 按得分加权
-      percent_of_total_grade: "总计分的 %{percent} %"
+      percent_of_total_grade: "总计分的 %"
     assignment_count: 
       one: "%{count} 份作业"
       other: "%{count} 份作业"
@@ -3140,6 +3140,10 @@ zh:
         ? "yes"
         : 是
       details: 
+        account_exists: |-
+            已存在与 %{email} 关联的用户帐户。
+            
+              **您是否为 %{name}？**
         account_needed: "您已获邀请参加 **%{course}**。要接受此请求，您需要 Canvas 帐户。单击下面的链接创建 Canvas 帐户。"
         add_email: 是否要将此电子邮件地址添加到您当前的帐户?
         choose_login: 选择要登录的位置。
@@ -3147,6 +3151,10 @@ zh:
         logged_in_other_user_course: "对 %{course} 的邀请已发送到 **%{email}**，而您目前登录为 **%{user}**。"
         merge_multiple: "选择要与 **%{current_user}** 合并的帐户。"
         merge_one: "是否要合并 **%{current_user}** 与 **%{other_user}**?"
+        multiple_accounts_course: |-
+            已存在与此电子邮件地址关联的 %{count} 帐户。
+            
+            哪一个是您？
         none_of_these: 以上情况都不符合，我是一个新用户
         register: 要完成注册，我们需要更多信息。
         register_with_course: "要完成对课程 **%{course}** 的注册，我们需要更多信息。"
@@ -3509,7 +3517,7 @@ zh:
         conclude_student: 是否确定要结束此学生的注册?
         delete_enrollment: 是否确定要删除此学生的注册?
       enrolled_as: "已注册为 %{enrollment_type}"
-      enrollment_linked_to: "已链接到 %{linked_user}"
+      enrollment_linked_to: "已链接到 *%{linked_user}*"
       error: 
         enrollment_change_failed: 注册权限更改失败，请重试
       labels: 
@@ -3564,6 +3572,7 @@ zh:
         delete_enrollment: 是否确定要删除此学生的注册?
       enrolled_as: "已注册为 %{enrollment_type}"
       enrollment_change_failed: 注册权限更改失败，请重试
+      enrollment_linked_to: "已链接到 *%{linked_user}*"
       headings: 
         recent_messages: 最近的消息
         user_services: 已注册的网络服务
@@ -5704,6 +5713,7 @@ zh:
       show_rubric: 显示评分标准说明
       speed_grader: 快速评分器
       topic: 主题
+      topic_locked: "此主题在 *%{date}* 之前对用户不可见"
       topic_locked_until: "此主题锁定至 %{time}"
       topic_not_visible: 此主题对用户不可见
       topic_podcast_feed_link: 主题播客动态消息
@@ -9383,10 +9393,12 @@ zh:
       success: 正在传送您的电子邮件。
     migration_export_ready: 
       email: 
+        body: 您的内容已准备好导入到您的课程中。
         html: 
-          body: "课程 %{course_name} 的提取过程已完成。内容现已准备好导入到您的课程中。"
+          body: 您的内容已准备好导入到您的课程中。
           link_message2: 单击*此链接*选择要导入的内容项
           subject: "课程提取就绪: %{course_name}"
+        link_message: 单击此链接选择要导入的内容项：
         subject: "课程提取就绪: %{course_name}"
     new_account_user: 
       email: 
@@ -10432,7 +10444,7 @@ zh:
       close_rating: 确定
       criterion_rating_points: 标准等级得分
       delete_criterion: 删除
-      edit_criterion_rating_title: "编辑 \"%{description\" 标准等级"
+      edit_criterion_rating_title: "编辑 %{description} 标准等级"
       insert_criterion_rating: 插入标准等级
       insert_rating: 插入
       points: 得分
