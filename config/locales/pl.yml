@@ -4064,7 +4064,7 @@ pl:
     subject_specified: "Prywatna wiadomość: %{subject}"
     users_added: 
       few: "%{list_of_users} zostali dodani do konwersacji przez %{current_user}"
-      one: "%{list_of_users} został dodany do konwersacji przez %{current_user}"
+      one: "%{user} został dodany do konwersacji przez %{current_user}"
       other: "%{list_of_users} zostali dodani do konwersacji przez %{current_user}"
   conversation_participant: 
     batch_update_message: 
