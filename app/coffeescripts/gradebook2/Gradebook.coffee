@@ -274,6 +274,12 @@ define [
 
     defaultSortType: 'assignment_group'
 
+    studentsThatCanSeeAssignment: (potential_students, assignment) =>
+      if ENV.GRADEBOOK_OPTIONS.differentiated_assignments_enabled
+        _.pick potential_students, assignment.assignment_visibility...
+      else
+        potential_students
+
     getStoredSortOrder: =>
       userSettings.contextGet('sort_grade_columns_by') || { sortType: @defaultSortType }
 
