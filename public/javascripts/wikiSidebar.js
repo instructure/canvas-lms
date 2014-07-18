@@ -31,8 +31,7 @@ define([
   'tinymce.editor_box',
   'vendor/jquery.pageless' /* pageless */,
   'jqueryui/accordion' /* /\.accordion\(/ */,
-  'jqueryui/tabs' /* /\.tabs/ */,
-  'vendor/scribd.view' /* scribd */
+  'jqueryui/tabs' /* /\.tabs/ */
 ], function(I18n, $, htmlEscape) {
 
   var $editor_tabs,
@@ -115,7 +114,7 @@ define([
           .attr('aria-level', children.data('level'))
           .attr('id', this.generateTreeItemID('file'))
           .addClass(file.mime_class)
-          .toggleClass('scribdable', !!(file['scribdable?'] || file.canvadoc_session_url));
+          .toggleClass('scribdable', !!(file.canvadoc_session_url));
         if(file.media_entry_id) {
           $file
             .addClass('kalturable')

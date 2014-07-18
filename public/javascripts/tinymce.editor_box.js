@@ -42,8 +42,7 @@ define([
   'jqueryui/draggable' /* /\.draggable/ */,
   'jquery.instructure_misc_plugins' /* /\.indicate/ */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
-  'vendor/jquery.ba-tinypubsub',
-  'vendor/scribd.view' /* scribd */
+  'vendor/jquery.ba-tinypubsub'
 ], function(I18nObj, $, EditorAccessibility, INST) {
 
   var enableBookmarking = !!INST.browser.ie;

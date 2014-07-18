@@ -68,7 +68,7 @@ describe SubmissionsController do
       course_with_student_logged_in(:active_all => true)
       @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload")
       data1 = fixture_file_upload("scribd_docs/doc.doc", "application/msword", true)
-      data2 = fixture_file_upload("scribd_docs/xls.xls", "application/vnd.ms-excel", true)
+      data2 = fixture_file_upload("scribd_docs/txt.txt", "application/vnd.ms-excel", true)
       post 'create', :course_id => @course.id, :assignment_id => @assignment.id, :submission => {:submission_type => "online_upload"}, :attachments => {"0" => {:uploaded_data => data1}, "1" => {:uploaded_data => data2}}
       response.should be_redirect
       assigns[:submission].should_not be_nil
@@ -78,7 +78,7 @@ describe SubmissionsController do
       assigns[:submission].attachments.should_not be_empty
       assigns[:submission].attachments.length.should eql(2)
       assigns[:submission].attachments.map{|a| a.display_name}.should be_include("doc.doc")
-      assigns[:submission].attachments.map{|a| a.display_name}.should be_include("xls.xls")
+      assigns[:submission].attachments.map{|a| a.display_name}.should be_include("txt.txt")
     end
 
     it "should fail but not raise when the submission is invalid" do
@@ -285,7 +285,7 @@ describe SubmissionsController do
       @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload")
       @submission = @assignment.submit_homework(@user)
       data1 = fixture_file_upload("scribd_docs/doc.doc", "application/msword", true)
-      data2 = fixture_file_upload("scribd_docs/xls.xls", "application/vnd.ms-excel", true)
+      data2 = fixture_file_upload("scribd_docs/txt.txt", "text/plain", true)
       put 'update', :course_id => @course.id, :assignment_id => @assignment.id, :id => @user.id, :submission => {:comment => "some comment"}, :attachments => {"0" => {:uploaded_data => data1}, "1" => {:uploaded_data => data2}}
       response.should be_redirect
       assigns[:submission].should eql(@submission)
@@ -293,7 +293,7 @@ describe SubmissionsController do
       assigns[:submission].submission_comments[0].comment.should eql("some comment")
       assigns[:submission].submission_comments[0].attachments.length.should eql(2)
       assigns[:submission].submission_comments[0].attachments.map{|a| a.display_name}.should be_include("doc.doc")
-      assigns[:submission].submission_comments[0].attachments.map{|a| a.display_name}.should be_include("xls.xls")
+      assigns[:submission].submission_comments[0].attachments.map{|a| a.display_name}.should be_include("txt.txt")
     end
 
     it "should allow setting 'student_entered_grade'" do

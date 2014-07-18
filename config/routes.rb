@@ -67,7 +67,6 @@ CanvasRails::Application.routes.draw do
       match 'download.:type' => 'files#show', :as => :typed_download, :download => '1'
       match 'preview' => 'files#show', :as => :preview, :preview => '1'
       match 'inline_view' => 'files#show', :as => :inline_view, :inline => '1'
-      match 'scribd_render' => 'files#scribd_render', :as => :scribd_render
       match 'contents' => 'files#attachment_content', :as => :attachment_content
       collection do
         get "folder#{full_path_glob}", :controller => :files, :action => :ember_app, :format => false
@@ -739,7 +738,6 @@ CanvasRails::Application.routes.draw do
   resources :assignments, :only => [:index] do
     resources :files, :only => [] do
       match 'inline_view' => 'files#show', :as => :inline_view, :via => :post, :inline => '1'
-      match 'scribd_render' => 'files#scribd_render', :as => :scribd_render, :via => :post
     end
   end
 

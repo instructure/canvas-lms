@@ -50,7 +50,6 @@ class UnzipAttachment
     @logger ||= opts[:logger]
     @rename_files = !!opts[:rename_files]
     @migration_id_map = opts[:migration_id_map] || {}
-    @queue_scribd = !!opts[:queue_scribd]
 
     raise ArgumentError, "Must provide a context." unless self.context && self.context.is_a_context?
     raise ArgumentError, "Must provide a filename." unless self.filename
@@ -92,7 +91,6 @@ class UnzipAttachment
     with_unzip_configuration do
       zip_stats.validate_against(context)
 
-      @attachments = []
       id_positions = {}
       path_positions = zip_stats.paths_with_positions(last_position)
       CanvasUnzip.extract_archive(self.filename) do |entry, index|
@@ -122,7 +120,6 @@ class UnzipAttachment
             if migration_id = @migration_id_map[entry.name]
               attachment.update_attribute(:migration_id, migration_id)
             end
-            @attachments << attachment if attachment
           rescue Attachment::OverQuotaError
             f.unlink
             raise
@@ -135,7 +132,6 @@ class UnzipAttachment
       update_attachment_positions(id_positions)
     end
 
-    queue_scribd_submissions(@attachments)
     @context.touch
     update_progress(1.0)
   end
@@ -152,14 +148,6 @@ class UnzipAttachment
     if updates.any?
       sql = "UPDATE attachments SET position=CASE #{updates.join(" ")} ELSE position END WHERE id IN (#{id_positions.keys.join(",")})"
       Attachment.connection.execute(sql)
-    end
-  end
-
-  def queue_scribd_submissions(attachments)
-    return unless @queue_scribd
-    scribdable_ids = attachments.select(&:scribdable?).map(&:id)
-    if scribdable_ids.any?
-      Attachment.send_later_enqueue_args(:submit_to_scribd, { :strand => 'scribd', :max_attempts => 1 }, scribdable_ids)
     end
   end
 

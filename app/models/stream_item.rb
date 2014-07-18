@@ -144,7 +144,6 @@ class StreamItem < ActiveRecord::Base
       end
       if object.attachment
         hash = object.attachment.attributes.slice('id', 'display_name')
-        hash['scribdable?'] = object.attachment.scribdable?
         res[:attachment] = hash
       end
     when Conversation

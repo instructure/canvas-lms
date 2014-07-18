@@ -1238,8 +1238,8 @@ class Assignment < ActiveRecord::Base
                       :cached_attachments, :attachments]
 
     attachment_fields = [:id, :comment_id, :content_type, :context_id, :context_type,
-                         :display_name, :filename, :mime_class, :scribd_doc,
-                         :scribdable?, :size, :submitter_id, :workflow_state]
+                         :display_name, :filename, :mime_class,
+                         :size, :submitter_id, :workflow_state]
 
     res = as_json(
       :include => {
@@ -1294,7 +1294,7 @@ class Assignment < ActiveRecord::Base
             :only => [:mime_class, :comment_id, :id, :submitter_id ]
           },
         },
-        :methods => [:scribdable?, :scribd_doc, :submission_history, :late],
+        :methods => [:submission_history, :late],
         :only => submission_fields
       ).merge("from_enrollment_type" => enrollment_types_by_id[sub.user_id])
 
@@ -1311,7 +1311,7 @@ class Assignment < ActiveRecord::Base
                                            version_json['submission']['versioned_attachments'].map! do |a|
                                              a.as_json(
                                                :only => attachment_fields,
-                                               :methods => [:view_inline_ping_url, :scribd_render_url]
+                                               :methods => [:view_inline_ping_url]
                                              ).tap { |json|
                                                json[:attachment][:canvadoc_url] = a.canvadoc_url(user)
                                                json[:attachment][:crocodoc_url] = a.crocodoc_url(user)

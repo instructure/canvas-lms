@@ -19,11 +19,10 @@
 define([
   'compiled/editor/stocktiny',
   'jquery',
-  'vendor/scribd.view',
   'jquery.instructure_misc_helpers',
   'jqueryui/dialog',
   'jquery.instructure_misc_plugins',
-], function(tinymce, $, scribd) {
+], function(tinymce, $) {
 
   var lastLookup = null;
 

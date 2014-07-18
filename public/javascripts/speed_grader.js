@@ -48,7 +48,6 @@ define([
   'vendor/jquery.getScrollbarWidth' /* getScrollbarWidth */,
   'vendor/jquery.scrollTo' /* /\.scrollTo/ */,
   'vendor/jquery.spin' /* /\.spin/ */,
-  'vendor/scribd.view' /* scribd */,
   'vendor/spin' /* new Spinner */,
   'vendor/ui.selectmenu' /* /\.selectmenu/ */
 ], function(submissionsDropdownTemplate, round, _, INST, I18n, $, tz, userSettings, htmlEscape, rubricAssessment, turnitinInfoTemplate, turnitinScoreTemplate) {
@@ -822,7 +821,6 @@ define([
   var EG = {
     options: {},
     publicVariable: [],
-    scribdDoc: null,
     currentStudent: null,
 
     domReady: function(){
@@ -1156,7 +1154,6 @@ define([
           var attachment = a.attachment;
           if (attachment.crocodoc_url ||
               attachment.canvadoc_url ||
-              (attachment.scribd_doc && attachment.scribd_doc.created) ||
               $.isPreviewable(attachment.content_type, 'google')) {
             inlineableAttachments.push(attachment);
           }
@@ -1329,7 +1326,6 @@ define([
         $iframe_holder.empty();
 
         if (attachment) {
-          var scribdDocAvailable = attachment.scribd_doc && attachment.scribd_doc.created && attachment.workflow_state != 'errored' && attachment.scribd_doc.attributes.doc_id;
           var previewOptions = {
             height: '100%',
             mimeType: attachment.content_type,
@@ -1337,7 +1333,6 @@ define([
             submission_id: this.currentStudent.submission.id,
             attachment_view_inline_ping_url: attachment.view_inline_ping_url,
             attachment_preview_processing: attachment.workflow_state == 'pending_upload' || attachment.workflow_state == 'processing',
-            attachment_scribd_render_url: attachment.scribd_render_url,
             ready: function(){
               EG.resizeFullHeight();
             }
@@ -1371,15 +1366,9 @@ define([
             canvadoc_session_url: attachment.canvadoc_url
           }));
         }
-        else if ( attachment && (attachment['scribdable?'] || $.isPreviewable(attachment.content_type, 'google')) ) {
+        else if ( attachment && ($.isPreviewable(attachment.content_type, 'google')) ) {
           if (!INST.disableCrocodocPreviews) $no_annotation_warning.show();
 
-          if (scribdDocAvailable) {
-            previewOptions = $.extend(previewOptions, {
-              scribd_doc_id: attachment.scribd_doc.attributes.doc_id,
-              scribd_access_key: attachment.scribd_doc.attributes.access_key
-            });
-          }
           var currentStudentIDAsOfAjaxCall = this.currentStudent.id;
           previewOptions = $.extend(previewOptions, {
               ajax_valid: _.bind(function() {

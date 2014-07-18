@@ -497,18 +497,6 @@ class FilesController < ApplicationController
     end
   end
 
-  def scribd_render
-    # ApplicationController#get_context doesn't support Assignment
-    if @context.is_a?(User) && params[:assignment_id].present?
-      @context = Assignment.find(params[:assignment_id])
-    end
-    @attachment = @context.attachments.find(params[:file_id])
-    if @attachment.attachment_associations.where(:context_type => 'Submission').any? { |aa| aa.context.grants_right?(@current_user, session, :read) } || authorized_action(@attachment, @current_user, :read)
-      @attachment.check_rerender_scribd_doc
-      render :json => {:ok => true}
-    end
-  end
-
   def render_attachment(attachment)
     respond_to do |format|
       if params[:preview] && attachment.mime_class == 'image'
@@ -525,18 +513,16 @@ class FilesController < ApplicationController
         can_download = attachment.grants_right?(@current_user, session, :download)
         if can_download
           # Right now we assume if they ask for json data on the attachment
-          # which includes the scribd doc data, then that means they have
-          # viewed or are about to view the file in some form.
+          # then that means they have viewed or are about to view the file in
+          # some form.
           if @current_user &&
-            ((feature_enabled?(:scribd) && attachment.scribd_doc) ||
-             attachment.canvadocable? ||
-             (service_enabled?(:google_docs_previews) && attachment.authenticated_s3_url))
+             (attachment.canvadocable? ||
+              (service_enabled?(:google_docs_previews) && attachment.authenticated_s3_url))
             attachment.context_module_action(@current_user, :read)
             attachment.record_inline_view
           end
           options[:methods] = []
           options[:methods] << :authenticated_s3_url if service_enabled?(:google_docs_previews) && attachment.authenticated_s3_url
-          options[:methods] << :scribd_render_url if attachment.scribd_doc_missing?
           log_asset_access(attachment, "files", "files")
         end
       end
@@ -701,7 +687,6 @@ class FilesController < ApplicationController
       @group = @asset.group_category.group_for(@current_user) if @asset.has_group_category?
       @context = @group || @current_user
       @check_quota = false
-      @attachment.submission_attachment = true
     elsif @context && intent == 'attach_discussion_file'
       permission_object = @context.discussion_topics.scoped.new
       permission = :attach
@@ -1048,7 +1033,7 @@ class FilesController < ApplicationController
     json = {
       :attachment => attachment.as_json(
         allow: :uuid,
-        methods: [:uuid,:readable_size,:mime_class,:currently_locked,:scribdable?,:thumbnail_url],
+        methods: [:uuid,:readable_size,:mime_class,:currently_locked,:thumbnail_url],
         permissions: {user: @current_user, session: session},
         include_root: false
       ),

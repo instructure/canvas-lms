@@ -46,7 +46,6 @@ os: !ruby/object:OpenStruct
       modifiable: true
       table: 
         :c: 3
-scribd: !ruby/object:Scribd::Document
 str: !str
   hai
 mime: !ruby/object:Mime::Type
@@ -103,8 +102,6 @@ YAML
     os.b.should == 2
     os.sub.class.should == OpenStruct
     os.sub.c.should == 3
-
-    scribd = verify(result, 'scribd', Scribd::Document)
 
     str = verify(result, 'str', String)
     str.should == "hai"

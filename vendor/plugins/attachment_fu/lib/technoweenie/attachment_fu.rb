@@ -333,10 +333,7 @@ module Technoweenie # :nodoc:
           if !self.new_record?
             self.root_attachment = nil
             self.root_attachment_id = nil
-            self.scribd_mime_type_id = nil
-            self.submitted_to_scribd_at = nil
             self.workflow_state = nil
-            self.scribd_doc = nil
             self.filename = filename.sub(/\A\d+_\d+__/, "")
             self.filename = "#{Time.now.to_i}_#{rand(999)}__#{self.filename}" if self.filename
           end

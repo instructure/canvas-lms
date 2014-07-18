@@ -294,7 +294,7 @@ class SubmissionsApiController < ApplicationController
     permission = :nothing if @user != @current_user
     # we don't check quota when uploading a file for assignment submission
     if authorized_action(@assignment, @current_user, permission)
-      api_attachment_preflight(@user, request, :check_quota => false, :do_submit_to_scribd => true)
+      api_attachment_preflight(@user, request, :check_quota => false)
     end
   end
 

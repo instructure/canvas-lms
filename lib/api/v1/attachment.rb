@@ -108,7 +108,6 @@ module Api::V1::Attachment
     atts = process_attachment_params(params)
     atts.delete(:display_name)
     @attachment.attributes = atts
-    @attachment.submission_attachment = true if opts[:submission_attachment]
     @attachment.file_state = 'deleted'
     @attachment.workflow_state = 'unattached'
     @attachment.user = @current_user

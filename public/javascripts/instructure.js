@@ -52,7 +52,6 @@ define([
   'jqueryui/tabs' /* /\.tabs/ */,
   'compiled/behaviors/trackEvent',
   'compiled/badge_counts',
-  'vendor/scribd.view' /* scribd */,
   'vendor/jquery.placeholder'
 ], function(KeyboardNavDialog, INST, I18n, $, _, tz, userSettings, htmlEscape, wikiSidebar) {
 
@@ -392,22 +391,17 @@ define([
         event.preventDefault();
         var $link = $(this).loadingImage({image_size: 'small'}).hide();
         $.ajaxJSON($link.attr('href').replace(/\/download.*/, ""), 'GET', {}, function(data) {
-          var attachment = data && data.attachment,
-              scribdDocAttributes = attachment && attachment.scribd_doc && attachment.scribd_doc.attributes;
+          var attachment = data && data.attachment;
           $link.loadingImage('remove');
           if (attachment &&
-                (attachment['scribdable?'] ||
-                 $.isPreviewable(attachment.content_type, 'google') ||
+                ($.isPreviewable(attachment.content_type, 'google') ||
                  attachment.canvadoc_session_url)) {
             var $div = $("<span><br /></span>")
               .insertAfter($link.parents(".link_holder:last"))
               .loadDocPreview({
                 canvadoc_session_url: attachment.canvadoc_session_url,
-                scribd_doc_id: scribdDocAttributes && scribdDocAttributes.doc_id,
-                scribd_access_key: scribdDocAttributes && scribdDocAttributes.access_key,
                 mimeType: attachment.content_type,
                 public_url: attachment.authenticated_s3_url,
-                attachment_scribd_render_url: attachment.scribd_render_url,
                 attachment_preview_processing: attachment.workflow_state == 'pending_upload' || attachment.workflow_state == 'processing'
               })
               .append(

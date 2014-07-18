@@ -41,70 +41,6 @@ describe Attachment do
       @attachment.display_name.should eql(@attachment.filename)
     end
 
-    context "scribd_mime_type_id" do
-      it "should get set given extension" do
-        Attachment.clear_cached_mime_ids
-        scribd_mime_type_model(:extension => 'pdf')
-
-        @attachment = @course.attachments.build(:filename => 'some_file.pdf')
-        @attachment.content_type = ''
-        @attachment.save!
-        @attachment.scribd_mime_type.should eql(@scribd_mime_type)
-      end
-
-      it "should get set given content_type" do
-        Attachment.clear_cached_mime_ids
-        scribd_mime_type_model(:name => 'application/pdf')
-
-        @attachment = @course.attachments.build(:filename => 'some_file')
-        @attachment.content_type = 'application/pdf'
-        @attachment.save!
-        @attachment.scribd_mime_type.should eql(@scribd_mime_type)
-      end
-
-      it "should prefer using content_type over extension" do
-        Attachment.clear_cached_mime_ids
-        mime_type_pdf = scribd_mime_type_model(:name => 'application/pdf')
-        mime_type_doc = scribd_mime_type_model(:extension => 'doc')
-
-        @attachment = @course.attachments.build(:filename => 'some_file.doc')
-        @attachment.content_type = 'application/pdf'
-        @attachment.save!
-        @attachment.scribd_mime_type.should eql(mime_type_pdf)
-      end
-
-      it "should not get set for html content despite extension" do
-        ['text/html', 'application/xhtml+xml', 'application/xml', 'text/xml'].each do |content_type|
-          # make sure mime type exists so we'd otherwise have a chance to set it
-          mime_type_doc = scribd_mime_type_model(:extension => 'doc')
-          mime_type_html = scribd_mime_type_model(:name => content_type)
-
-          @attachment = @course.attachments.build(:filename => 'some_file.doc')
-          @attachment.content_type = content_type
-          @attachment.save!
-          @attachment.scribd_mime_type.should be_nil
-        end
-      end
-    end
-
-  end
-
-  it "should be scribdable if scribd_mime_type_id is set" do
-    scribdable_attachment_model
-    @attachment.should be_scribdable
-  end
-
-  describe "needs_scribd_doc?" do
-    it "normally needs a scribd doc" do
-      scribdable_attachment_model
-      @attachment.needs_scribd_doc?.should be_true
-    end
-
-    it "doesn't need a scribd doc when canvadocs are configured" do
-      Canvadocs.stubs(:config).returns(api_key: "asdf")
-      scribdable_attachment_model
-      @attachment.needs_scribd_doc?.should be_false
-    end
   end
 
   context "authenticated_s3_url" do
@@ -127,37 +63,6 @@ describe Attachment do
     end
   end
 
-  context "scribdable_context" do
-    it "should be a scribdable_context if the context is Course" do
-      course_model
-      attachment_with_context(@course)
-      @attachment.send(:scribdable_context?).should be_true
-    end
-
-    it "should be a scribdable_context if the context is Group" do
-      group_model
-      attachment_with_context(@group)
-      @attachment.send(:scribdable_context?).should be_true
-    end
-
-    it "should be a scribdable_context if the context is User" do
-      user_model
-      attachment_with_context(@user)
-      @attachment.context = @user
-      @attachment.context.should be_is_a(User)
-      @attachment.send(:scribdable_context?).should be_true
-    end
-
-    it "should not be a scribdable_context for non-scribdable contexts (like an Account, for example)" do
-      account_model
-      attachment_with_context(@account)
-      @attachment.context = @account
-      @attachment.context.should be_is_a(Account)
-      @attachment.send(:scribdable_context?).should be_false
-    end
-
-  end
-
   def configure_crocodoc
     PluginSetting.create! :name => 'crocodoc',
                           :settings => { :api_key => "blahblahblahblahblah" }
@@ -170,20 +75,6 @@ describe Attachment do
     it "crocodocable?" do
       crocodocable_attachment_model
       @attachment.should be_crocodocable
-    end
-
-    it "should not submit to auto-submit to scribd if a crocodoc is present" do
-      expects_job_with_tag('Attachment#submit_to_scribd!', 0) do
-        attachment_model(:content_type => 'application/pdf', :submission_attachment => true)
-        @attachment.after_attachment_saved
-      end
-
-      expects_job_with_tag('Attachment#submit_to_scribd!') do
-        scribd_mime_type_model(:extension => 'odt', :name => 'openoffice')
-        attachment_model(:content_type => 'openoffice')
-        @attachment.crocodocable?.should_not be_true
-        @attachment.after_attachment_saved
-      end
     end
 
     it "should submit to crocodoc" do
@@ -219,15 +110,16 @@ describe Attachment do
       created_jobs.size.should == attempts
     end
 
-    it "should submit to scribd if crocodoc fails to convert" do
+    it "should submit to canvadocs if crocodoc fails to convert" do
       crocodocable_attachment_model
       @attachment.submit_to_crocodoc
 
       Crocodoc::API.any_instance.stubs(:status).returns [
         {'uuid' => '1234567890', 'status' => 'ERROR'}
       ]
+      Canvadocs.stubs(:enabled?).returns true
 
-      expects_job_with_tag('Attachment.submit_to_scribd') {
+      expects_job_with_tag('Attachment.submit_to_canvadocs') {
         CrocodocDocument.update_process_states
       }
     end
@@ -297,13 +189,6 @@ describe Attachment do
       @attachment.state.should eql(:pending_upload)
     end
 
-    it "should be able to upload and record the submitted_to_scribd_at" do
-      time = Time.now
-      @attachment.upload!
-      @attachment.submitted_to_scribd_at.to_i.should be_close(time.to_i, 2)
-      @attachment.state.should eql(:processing)
-    end
-
     it "should be able to take a processing object and complete its process" do
       attachment_model(:workflow_state => 'processing')
       @attachment.process!
@@ -322,331 +207,7 @@ describe Attachment do
     end
   end
 
-  context "submit_to_scribd!" do
-    before do
-      ScribdAPI.stubs(:upload).returns(CanvasUUID.generate)
-    end
-
-    describe "submit_to_scribd job" do
-      it "should queue for scribdable types" do
-        expects_job_with_tag('Attachment#submit_to_scribd!') do
-          scribdable_attachment_model
-          @attachment.after_attachment_saved
-        end
-        @attachment.should be_pending_upload
-      end
-
-      it "should not queue for non-scribdable types" do
-        expects_job_with_tag('Attachment#submit_to_scribd!', 0) do
-          attachment_model
-          @attachment.after_attachment_saved
-        end
-        @attachment.should be_processed
-      end
-
-      it "should not queue for non-root attachments" do
-        expects_job_with_tag('Attachment#submit_to_scribd!', 1) do
-          @attachment1 = scribdable_attachment_model
-          @attachment1.after_attachment_saved
-          @attachment2 = scribdable_attachment_model
-          # normally done by uploaded_data= in attachment_fu
-          @attachment2.root_attachment = @attachment1
-          @attachment2.after_attachment_saved
-        end
-        @attachment1.should be_pending_upload
-        @attachment2.should be_processed
-      end
-
-      describe "scribd submit filtering" do
-        it "should still submit if the attachment is tagged" do
-          Attachment.stubs(:filtering_scribd_submits?).returns(true)
-          expects_job_with_tag('Attachment#submit_to_scribd!') do
-            scribd_mime_type_model(:extension => 'pdf')
-            attachment_model(:content_type => 'application/pdf', :submission_attachment => true)
-            @attachment.after_attachment_saved
-          end
-          @attachment.should be_pending_upload
-        end
-
-        it "should skip submit if the attachment isn't tagged" do
-          Attachment.stubs(:filtering_scribd_submits?).returns(true)
-          expects_job_with_tag('Attachment#submit_to_scribd!', 0) do
-            scribdable_attachment_model
-            @attachment.after_attachment_saved
-          end
-          @attachment.should be_processed
-        end
-      end
-    end
-
-    it "should upload scribdable attachments" do
-      scribdable_attachment_model
-      @doc_obj = Scribd::Document.new
-      ScribdAPI.expects(:upload).returns(@doc_obj)
-      @doc_obj.stubs(:thumbnail).returns("the url to the scribd doc thumbnail")
-      @attachment.submit_to_scribd!.should be_true
-      @attachment.scribd_doc.should eql(@doc_obj)
-      @attachment.state.should eql(:processing)
-    end
-
-    it "should bypass non-scridbable attachments" do
-      attachment_model
-      @attachment.should_not be_scribdable
-      Scribd::API.instance.expects(:user=).never
-      ScribdAPI.expects(:upload).never
-      @attachment.submit_to_scribd!.should be_true
-      @attachment.state.should eql(:processed)
-    end
-
-    it "should not mess with attachments outside the pending_upload state" do
-      Scribd::API.instance.expects(:user=).never
-      ScribdAPI.expects(:upload).never
-      attachment_model(:workflow_state => 'processing')
-      @attachment.submit_to_scribd!.should be_false
-      attachment_model(:workflow_state => 'processed')
-      @attachment.submit_to_scribd!.should be_false
-    end
-
-    it "should use the root attachment scribd doc" do
-      Scribd::Document.any_instance.stubs(:destroy).returns(true)
-      a1 = attachment_model(:workflow_state => 'processing')
-      a2 = attachment_model(:workflow_state => 'processing', :root_attachment => a1)
-      a2.root_attachment.should == a1
-      a1.scribd_doc = doc = Scribd::Document.new
-      a2.scribd_doc.should == doc
-      a2.destroy
-      a1.scribd_doc.should == doc
-    end
-
-    it "should not send the secret password via to_json" do
-      attachment_model
-      @attachment.scribd_doc = Scribd::Document.new
-      @attachment.scribd_doc.doc_id = 'asdf'
-      @attachment.scribd_doc.secret_password = 'password'
-      res = JSON.parse(@attachment.to_json)
-      res['attachment'].should_not be_nil
-      res['attachment']['scribd_doc'].should_not be_nil
-      res['attachment']['scribd_doc']['attributes'].should_not be_nil
-      res['attachment']['scribd_doc']['attributes']['doc_id'].should eql('asdf')
-      res['attachment']['scribd_doc']['attributes']['secret_password'].should eql('')
-      @attachment.scribd_doc.doc_id.should eql('asdf')
-      @attachment.scribd_doc.secret_password.should eql('password')
-    end
-  end
-
-  context "scribd cleanup" do
-    before do
-      ScribdAPI.stubs(:enabled?).returns(true)
-    end
-
-    after do
-      ScribdAPI.unstub(:enabled?)
-    end
-
-    def fake_scribd_doc(doc_id = String.random(8))
-      scribd_doc = Scribd::Document.new
-      scribd_doc.doc_id = doc_id
-      scribd_doc.secret_password = 'asdf'
-      scribd_doc.access_key = 'jkl;'
-      scribd_doc
-    end
-
-    def attachment_with_scribd_doc(doc = fake_scribd_doc, opts = {})
-      att = attachment_model(opts)
-      att.scribd_doc = doc
-      att.save!
-      att
-    end
-
-    describe "clones with scribd" do
-      it 'should not copy scribd info on clone' do
-        a = attachment_with_scribd_doc(fake_scribd_doc('zero'))
-        course
-        new_a = a.clone_for(@course)
-        new_a.save!
-        new_a.read_attribute(:scribd_doc).should be_nil
-        new_a.scribd_doc.id.should == a.scribd_doc.id
-      end
-    end
-
-    describe "related_attachments" do
-      before :once do
-        @root = attachment_model
-      end
-
-      it "should include the root attachment" do
-        @child = attachment_model :root_attachment => @root
-        @child.related_attachments.map(&:id).should == [@root.id]
-      end
-
-      it "should include child attachments" do
-        @child = attachment_model :root_attachment => @root
-        @root.related_attachments.map(&:id).should == [@child.id]
-      end
-
-      it "should include sibling attachments" do
-        @child1 = attachment_model :root_attachment => @root
-        @child2 = attachment_model :root_attachment => @root
-        @child1.related_attachments.map(&:id).sort.should == [@root.id, @child2.id].sort
-      end
-    end
-
-    describe "delete_scribd_doc" do
-      it "should not delete the scribd doc when the attachment is destroyed" do
-        @att = attachment_with_scribd_doc(fake_scribd_doc('zero'))
-        @att.scribd_doc.expects(:destroy).never
-        @att.destroy
-        @att.file_state.should eql 'deleted'
-        @att.workflow_state.should eql 'pending_upload'
-        @att.read_attribute(:scribd_doc).should_not be_nil
-      end
-
-      it "should do nothing for non-root attachments" do
-        @root = attachment_with_scribd_doc(fake_scribd_doc('zero'))
-        @child = attachment_model(root_attachment: @root)
-        @child.scribd_doc.expects(:destroy).never
-        @child.scribd_doc.should == @root.scribd_doc
-        @child.delete_scribd_doc
-      end
-
-      it "should delete scribd_doc" do
-        @root = attachment_with_scribd_doc(fake_scribd_doc('zero'))
-        @root.scribd_doc.expects(:destroy).once.returns(true)
-        @root.read_attribute(:scribd_doc).should_not be_nil
-        @root.delete_scribd_doc
-        @root.read_attribute(:scribd_doc).should be_nil
-      end
-    end
-
-    describe "check_rerender_scribd_doc" do
-      before do
-        scribd_mime_type_model(:extension => 'docx')
-      end
-
-      it "should resubmit a deleted scribd doc" do
-        @attachment = attachment_with_scribd_doc(fake_scribd_doc, :filename => 'file.docx', :scribd_attempts => 3)
-        @attachment.scribd_doc.expects(:destroy).once.returns(true)
-        @attachment.delete_scribd_doc
-        expect {
-          @attachment.check_rerender_scribd_doc
-        }.to change(Delayed::Job, :count).by(1)
-        Delayed::Job.find_by_tag('Attachment#submit_to_scribd!').should_not be_nil
-        @attachment.should be_pending_upload
-        @attachment.scribd_attempts.should == 0
-      end
-
-      it "should not queue up duplicate render requests for the same document" do
-        @attachment = attachment_model(:filename => 'file.docx', :workflow_state => 'deleted')
-        expect { @attachment.check_rerender_scribd_doc }.to change(Delayed::Job, :count).by(1)
-        expect { @attachment.check_rerender_scribd_doc }.to change(Delayed::Job, :count).by(0)
-      end
-
-      it "should do nothing if a scribd_doc already exists" do
-        @attachment = attachment_with_scribd_doc(fake_scribd_doc, :filename => 'file.docx')
-        expect {
-          @attachment.check_rerender_scribd_doc
-        }.to change(Delayed::Job, :count).by(0)
-      end
-
-      it "should be invoked on record_inline_view" do
-        @attachment = attachment_model(:filename => 'file.docx', :workflow_state => 'deleted')
-        expect {
-          @attachment.record_inline_view
-        }.to change(Delayed::Job, :count).by(1)
-      end
-
-      it "should do nothing on non-scribdable types" do
-        @attachment = attachment_model(:filename => 'file.lolcats')
-        expect {
-          @attachment.check_rerender_scribd_doc
-        }.to change(Delayed::Job, :count).by(0)
-      end
-    end
-
-    describe "scribd_render_url" do
-      before do
-        scribd_mime_type_model(:extension => 'docx')
-      end
-
-      it "should return a url to request scribd rerendering" do
-        @attachment = attachment_model(:filename => 'file.docx', :workflow_state => 'deleted')
-        @attachment.scribd_render_url.should == "/#{@attachment.context_url_prefix}/files/#{@attachment.id}/scribd_render"
-      end
-
-      it "should return nil if the scribd doc isn't missing" do
-        @attachment = attachment_with_scribd_doc
-        @attachment.scribd_render_url.should be_nil
-      end
-    end
-  end
-
-  context "conversion_status" do
-    before(:each) do
-      @document = Scribd::Document.new
-      @document.stubs(:conversion_status).returns(:status_from_scribd)
-      Scribd::API.instance.stubs(:user=).returns(true)
-      ScribdAPI.stubs(:upload).returns(@document)
-      ScribdAPI.stubs(:enabled?).returns(true)
-    end
-
-    it "should have a default conversion_status of :not_submitted for attachments that haven't been submitted" do
-      attachment_model
-      @attachment.conversion_status.should eql('NOT SUBMITTED')
-    end
-
-    it "should ask Scribd for the status" do
-      scribdable_attachment_model
-      @doc_obj = Scribd::Document.new
-      @doc_obj.expects(:conversion_status).returns(:status_from_scribd)
-      ScribdAPI.expects(:upload).returns(@doc_obj)
-      @doc_obj.stubs(:thumbnail).returns("the url to the scribd doc thumbnail")
-      @attachment.submit_to_scribd!
-      @attachment.query_conversion_status!
-    end
-
-    it "should not ask Scribd for the status" do
-      scribdable_attachment_model
-      @doc_obj = Scribd::Document.new
-      @doc_obj.expects(:conversion_status).never
-      ScribdAPI.expects(:upload).returns(@doc_obj)
-      @doc_obj.stubs(:thumbnail).returns("the url to the scribd doc thumbnail")
-      @attachment.submit_to_scribd!
-      @attachment.conversion_status.should == "PROCESSING"
-    end
-
-  end
-
-  context "download_url" do
-    before do
-      Scribd::API.instance.stubs(:user=).returns(true)
-      @doc = mock('Scribd Document', :download_url => 'some url')
-      Scribd::Document.stubs(:find).returns(@doc)
-    end
-  end
-
   context "named scopes" do
-    it "should have a scope for all scribdable attachments, regardless their state" do
-      (1..3).each { attachment_model }
-      (1..3).each { scribdable_attachment_model }
-      Attachment.scribdable?.size.should eql(3)
-      Attachment.all.size.should eql(6)
-      Attachment.scribdable?.each {|m| m.should be_scribdable}
-    end
-
-    it "should have a scope for uploadable models, all models that are in the pending_upload state" do
-      attachment_model
-      attachments = [@attachment]
-      @attachment.submit_to_scribd!
-      attachment_model
-      attachments << @attachment
-      scribdable_attachment_model
-      attachments << @attachment
-      Attachment.all.size.should eql(3)
-      Attachment.uploadable.size.should eql(2)
-      Attachment.uploadable.should be_include(Attachment.find(attachments[1].id))
-      Attachment.uploadable.should be_include(Attachment.find(attachments[2].id))
-    end
-
     context "by_content_types" do
       before :once do
         course_model
@@ -1251,19 +812,6 @@ describe Attachment do
   context "sharding" do
     specs_require_sharding
 
-    it "should infer scribd mime type regardless of shard" do
-      scribd_mime_type_model(:extension => 'pdf')
-      attachment_model(:content_type => 'application/pdf')
-      @attachment.should be_scribdable
-      Attachment.clear_cached_mime_ids
-      @shard1.activate do
-        # need to create a context on this shard
-        @context = course_model(:account => Account.create!)
-        attachment_model(:content_type => 'application/pdf')
-        @attachment.should be_scribdable
-      end
-    end
-
     it "grants rights to owning user even if the user is on a seperate shard" do
       user = nil
       attachments = []
@@ -1396,22 +944,6 @@ describe Attachment do
       url.should be_present
       thumb.should be_present
       url.should == thumb.authenticated_s3_url
-    end
-
-    describe 'when its a scribd document' do
-      before do
-        @attachment.scribd_doc = Scribd::Document.new
-        ScribdAPI.expects(:enabled?).times(0)
-      end
-
-      it 'returns the cached thumbnail if present' do
-        @attachment.cached_scribd_thumbnail = "THUMBNAIL_URL"
-        @attachment.thumbnail_url.should == "THUMBNAIL_URL"
-      end
-
-      it 'just returns nil if there is no cached thumbnail' do
-        @attachment.thumbnail_url.should be_nil
-      end
     end
   end
 
@@ -1618,7 +1150,7 @@ describe Attachment do
 
   context "#process_s3_details!" do
     before :once do
-      attachment_model(filename: 'new filename', cached_scribd_thumbnail: "THUMBNAIL_URL")
+      attachment_model(filename: 'new filename')
     end
 
     before :each do
@@ -1631,8 +1163,8 @@ describe Attachment do
     context "deduplication" do
       before :once do
         attachment = @attachment
-        @existing_attachment = attachment_model(filename: 'existing filename', cached_scribd_thumbnail: "THUMBNAIL_URL")
-        @child_attachment = attachment_model(root_attachment: @existing_attachment, cached_scribd_thumbnail: "THUMBNAIL_URL")
+        @existing_attachment = attachment_model(filename: 'existing filename')
+        @child_attachment = attachment_model(root_attachment: @existing_attachment)
         @attachment = attachment
       end
 
@@ -1661,11 +1193,6 @@ describe Attachment do
           @attachment.process_s3_details!({})
           @attachment.reload.filename.should == @existing_attachment.filename
         end
-
-        it "should retire the new attachment's cached_scribd_thumbnail" do
-          @attachment.process_s3_details!({})
-          @attachment.reload.cached_scribd_thumbnail.should be_nil
-        end
       end
 
       context "existing attachment is missing s3object" do
@@ -1688,11 +1215,6 @@ describe Attachment do
           @attachment.reload.filename == 'new filename'
         end
 
-        it "should not retire the new attachment's cached_scribd_thumbnail" do
-          @attachment.process_s3_details!({})
-          @attachment.reload.cached_scribd_thumbnail == 'scribd url'
-        end
-
         it "should put the existing attachment under the new attachment" do
           @attachment.process_s3_details!({})
           @existing_attachment.reload.root_attachment.should == @attachment
@@ -1704,66 +1226,11 @@ describe Attachment do
           @existing_attachment.filename.should == @attachment.filename
         end
 
-        it "should retire the existing attachment's cached_scribd_thumbnail" do
-          @attachment.process_s3_details!({})
-          @existing_attachment.reload.cached_scribd_thumbnail.should be_nil
-        end
-
         it "should reparent the child attachment under the new attachment" do
           @attachment.process_s3_details!({})
           @child_attachment.reload.root_attachment.should == @attachment
         end
-
-        it "should retire the child attachment's cached_scribd_thumbnail" do
-          @attachment.process_s3_details!({})
-          @child_attachment.reload.cached_scribd_thumbnail.should be_nil
-        end
       end
-    end
-  end
-
-  describe ".delete_stale_scribd_docs" do
-    before :once do
-      attachment_model
-    end
-
-    before :each do
-      @attachment.scribd_doc = Scribd::Document.new
-      ScribdAPI.stubs(:enabled?).returns(true)
-    end
-
-    it "should delete old views ones" do
-      Scribd::Document.any_instance.expects(:destroy).returns(true).once
-      @attachment.update_attribute(:last_inline_view, 1.year.ago)
-      Attachment.delete_stale_scribd_docs
-      @attachment.reload
-      @attachment.scribd_doc.should be_nil
-      @attachment.workflow_state.should == 'deleted'
-    end
-
-    it "should delete old ones that were never viewed" do
-      Scribd::Document.any_instance.expects(:destroy).returns(true).once
-      @attachment.update_attribute(:created_at, 1.year.ago)
-      Attachment.delete_stale_scribd_docs
-      @attachment.reload
-      @attachment.scribd_doc.should be_nil
-      @attachment.workflow_state.should == 'deleted'
-    end
-
-    it "should not delete new ones that were never viewed" do
-      Scribd::Document.any_instance.expects(:destroy).never
-      @attachment.save!
-      Attachment.delete_stale_scribd_docs
-      @attachment.reload
-      @attachment.scribd_doc.should_not be_nil
-    end
-
-    it "should not delete recently viewed ones" do
-      Scribd::Document.any_instance.expects(:destroy).never
-      @attachment.update_attribute(:last_inline_view, 1.hour.ago)
-      Attachment.delete_stale_scribd_docs
-      @attachment.reload
-      @attachment.scribd_doc.should_not be_nil
     end
   end
 
@@ -1838,13 +1305,3 @@ describe Attachment do
   end
 
 end
-
-def processing_model
-  document = Scribd::Document.new
-  Scribd::API.instance.stubs(:user=).returns(true)
-  document.stubs(:conversion_status).returns(:status_from_scribd)
-  ScribdAPI.stubs(:upload).returns(document)
-  scribdable_attachment_model
-  @attachment.submit_to_scribd!
-end
-
