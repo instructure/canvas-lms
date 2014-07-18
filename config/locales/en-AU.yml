@@ -1486,7 +1486,7 @@ en-AU:
       process_data_button: "Process Data"
       select_file_instructions: |-
           Select the zip file that you want imported.  
-          For a description of how to generate these zip files, [please see this documentation](%{uri}).
+          For a description of how to generate these zip files, [please see this documentation](%{url}).
       sis_import_crumb: "SIS Import"
       started_at_message: "Started: %{started_at}"
       title: "SIS Import"
@@ -1777,6 +1777,7 @@ en-AU:
       ta: "Ta Enrollments"
       teachers: "Teacher Enrollments"
     user_add_failed_message: "Adding User Failed, please try again"
+    user_added_message_sent_message: "*%{user}* successfully added! They should receive an email confirmation shortly."
     user_deleted_message: "%{username} successfully deleted"
     user_inactivity_csv_description: 
       account_reports: 
@@ -2178,6 +2179,7 @@ en-AU:
         never_drop: "Never Drop"
         no_assignments: "[No Assignments]"
         weighted_by_points: "Weighted By Points"
+      percent_of_total_grade: "% of total grade"
     assignment_count: 
       one: "1 Assignment"
       other: "%{count} Assignments"
@@ -4127,6 +4129,7 @@ en-AU:
       enrollment_linked_to: "linked to *%{linked_user}*"
       headings: 
         recent_messages: "Recent Messages"
+        user_services: "Registered Web Services"
       help: 
         list_services: "You haven't enabled your list of registered services. Enabling this list will let fellow course and group members more easily link up with you outside of class."
         services: "You haven't linked your user profile to any external services. You can link your Canvas account to services like Facebook and Twitter. This will make it easier for fellow course and group members to link up with you outside of class."
@@ -4136,20 +4139,27 @@ en-AU:
       legends: 
         memberships: Membership(s)
       links: 
+        access_report: "Access Report"
         cant_delete: "Can't Delete"
         conclude_enrollment: "Conclude this Enrollment"
         delete_enrollment: "Delete this Enrollment"
+        faculty_journal: "Faculty Journal"
         link_enrollment: "Link this Enrollment"
         link_services: "Link web services to my account"
+        message_user: "Send Message"
         more_about_this_user: "More About This User"
         more_user_details: "more user details..."
         remove_avatar: "Remove avatar picture"
         report_avatar: "Report inappropriate picture"
         restore_enrollment: "Restore this Enrollment"
+        student_teacher_activity: "Interactions with You"
+        teacher_activity: "Student Interactions Report"
         title: 
           enrollment_sis_defined: "This enrollment was defined by the university, and can't be deleted"
         user_account_details: "User Account Details"
+        user_grades: Grades
         user_only_view_section: "limit this user to only see fellow section users"
+        user_outcomes: Outcomes
         user_view_all_sections: "let this user see all course users"
       no_messages: "No Messages"
       no_services: "%{user} hasn't linked any external services to their account yet."
@@ -5101,6 +5111,7 @@ en-AU:
         delete_course: "Delete Course"
       details: 
         conclude_alt_text: "If you would like to retain the ability to change grades while limiting student access to the course, please utilise the course dates settings. You can learn about course date settings in our guides *here*"
+        confirm_conclude: "Warning: Concluding the course will prevent you from modifying grades and accessing course content."
         confirm_delete: "Are you sure you want to delete this course? Once it is deleted, students and teachers will no longer have access to it. If you just want to remove it from the course drop-down menu, you should *conclude the course instead*."
         confirm_delete_addendum: "If you do not have permission to conclude the course, you can *change the course end date*, or ask your administrator to conclude the course."
       headings: 
@@ -6207,6 +6218,8 @@ en-AU:
     closed_for_comments: "Closed for Comments"
     confirm_delete_discussion_topic: "Are you sure you want to delete this discussion topic?"
     delete: Delete
+    deleted_entry: 
+      deleted: "Deleted by *%{editor_name}* on %{edited_at}"
     discussions: Discussions
     edit_settings: "Edit Discussions Settings"
     entry_collection_view: 
