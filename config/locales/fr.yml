@@ -90,6 +90,7 @@ fr:
     default_delegated_login_handle_name: Connexion
     default_login_handle_name: E-mail
     saml_eppn_domain_stripped: "%{eppn}(domaine enlevé)"
+    test_bind_failed: "Échec de liaison avec l’erreur suivante : %{error}"
     test_connection_timeout: "Expiration du délai de connexion"
     test_host_unknown: "Hôte inconnu : %{host}"
     test_login_auth_exception: "Exception lors de la connexion : %{error}"
@@ -269,6 +270,8 @@ fr:
     default: 
       all_terms: "Tous les trimestres"
       course_text: "Pour le cours : %{course};"
+      description: 
+        header: Exemple
       end_text: "Fin à : %{end_at};"
       error_text: "Échec ; communiquez ce code d’erreur à votre administrateur système : ErrorReport:%{error};"
       extra_text_term: "Trimestre : %{term_name};"
@@ -286,6 +289,14 @@ fr:
       reports: "Rapports : %{files}"
     outcomes: 
       order: "Ordre : %{order}"
+    report_header_attempt: tentative
+    report_header_course: cours
+    report_header_created_at: "créé à"
+    report_header_email: E-mail
+    report_header_id: ID
+    report_header_name: nom
+    report_header_section: section
+    report_header_section__id: section_id
     sis_exporter: 
       deleted: "Inclure les objets supprimés : true;"
       reports: "Rapports : %{files}"
@@ -404,6 +415,7 @@ fr:
         Value: Valeur
         date: Date
         event_id: "ID d’événement"
+        event_source_label: Source
         event_type_label: Type
         time: Heure
         user: Utilisateur
@@ -412,6 +424,7 @@ fr:
       course_logging_results: 
         date: Date
         event_details: "Détails de l’événement"
+        event_source: Source
         event_type: Type
         no_item_found: "Recherche infructueuse"
         time: Heure
@@ -762,6 +775,11 @@ fr:
             radio: Résultats
           user: 
             radio: Utilisateurs
+    ph_student_grades_csv_parameters: 
+      account_reports: 
+        penn_harris: 
+          parameters: 
+            note: "Il se peut que les cours contenant des travaux silencieux ne reflètent pas précisément les résultats de ce rapport."
     provisioning_csv_description: 
       account_reports: 
         sis_export: 
@@ -1276,6 +1294,8 @@ fr:
       ta: "Inscriptions AE"
       teachers: "Inscriptions d’enseignant"
     user_add_failed_message: "Échec de l’ajout du cours, veuillez réessayer"
+    user_added_message: "*%{user}* a été ajouté."
+    user_added_message_sent_message: "*%{user}* a été ajouté. Un e-mail de confirmation sera envoyé prochainement."
     user_deleted_message: "%{username} a été supprimé"
     user_inactivity_csv_description: 
       account_reports: 
@@ -1619,6 +1639,7 @@ fr:
         never_drop: "Ne jamais ôter"
         no_assignments: "[Pas de tâches]"
         weighted_by_points: "Pondération par points"
+      percent_of_total_grade: "% de la note totale"
     assignment_count: 
       one: 1 devoir
       other: "%{count} tâches"
@@ -1861,6 +1882,7 @@ fr:
           Les étudiants verront les fichiers modifiés dans les commentaires de leur envoi.
           
           *Assurez-vous de ne pas modifier les noms des fichiers d’envoi afin que nous puissions les reconnaître.*
+      speed_grader: SpeedGrader™
       titles: 
         related_items: "Éléments apparentés"
     grade_gpa_scale_screenreader: "Note : %{grade}"
@@ -1911,6 +1933,7 @@ fr:
       assignment_locked_tooltip: verrouillé
       keycode_descriptions: 
         add_assignment_or_group: "Ajouter un travail au groupe actuel"
+        close_active_dialog: "Fermer la boîte de dialogue"
         delete_assignment_or_group: "Supprimer la tâche et/ou le groupe actuel"
         edit_assignment_or_group: "Modifier la tâche et/ou le groupe actuel"
         full_preview: "Aperçu complet/Modifier la tâche"
@@ -1918,6 +1941,7 @@ fr:
         previous_assignment_or_group: "Tâche/groupe précédent"
       keycodes: 
         add_assignment_or_group: a
+        close_active_dialog: Échap
         delete_assignment_or_group: d
         edit_assignment_or_group: e
         full_preview: f
@@ -2393,6 +2417,8 @@ fr:
     masquerade: "Se faire passer pour l’utilisateur"
     ok: OK
     okay: OK
+    publish: Publier
+    published: Publiés
     refresh: actualiser
     save: Enregistrer
     search: Chercher
@@ -2403,6 +2429,8 @@ fr:
     show_all_artifacts: "Afficher tous les artefacts"
     submit: Envoyer
     unmasquerade: "Arrêter l’usurpation d’identité"
+    unpublish: "Annuler la publication"
+    unpublished: "Non publié"
     update: "Mettre à jour"
     view_account_roster: "Afficher la liste des comptes"
     view_course_roster: "Afficher la liste des cours"
@@ -2500,7 +2528,10 @@ fr:
     agenda_view_displaying_start_end: "Vue actuelle : de %{start} à %{end}"
     appointment_group_deletion_details: "La suppression de cet élément entraînera la suppression de tous les rendez-vous pris par les étudiants."
     appointment_group_list: 
+      delete: Supprimer
+      edit: Modifier
       location: "Lieu :"
+      manage: Gérer
       message_groups: "Envoyer un message aux groupes qui..."
       message_students: "Envoyer un message aux étudiants qui..."
       scheduler_explanation_student_header: "Vous n’avez aucun groupe de rendez-vous auxquels vous pouvez vous inscrire."
@@ -2511,6 +2542,7 @@ fr:
       scheduler_explanation_teacher_paragraph_2: "Par exemple, supposons que vous souhaitiez revoir le travail sur table de la mi-trimestre avec chaque étudiant du cours. Vous créez un nouveau groupe de rendez-vous, vous indiquez les dates et heures auxquelles vous êtes disponibles, vous demandez à l’outil de répartir ce temps en tranches horaires de 15 minutes et vous n’autorisez qu’un seul étudiant par tranche horaire."
       scheduler_explanation_teacher_paragraph_3: "Les étudiants seront avisés et verront qu’ils doivent s’inscrire à l’une des tranches horaires indiquées. Un calendrier avec les tranches horaires disponibles s’affichera au-dessus de toutes les activités de leurs autres calendriers pour qu’ils choisissent un horaire qui leur convient."
       scheduler_explanation_teacher_paragraph_4: "* Commencez en cliquant sur le bouton « Créer un groupe de rendez-vous » proposé à droite. *"
+      x_groups_have_signed_up: "%{participant_count} groupes se sont inscrits"
       x_people_have_signed_up: "%{signed_up} personnes se sont inscrites"
     buttons: 
       cancel: Annuler
@@ -2587,6 +2619,8 @@ fr:
       from: "Du :"
       links: 
         more_options: "Plus d’options"
+      location: "Lieu :"
+      timespan_separator: à
       title: "Titre :"
     edit_calendar_event_full: 
       buttons: 
@@ -2599,6 +2633,7 @@ fr:
       end_time: "Heure de fin"
       event_description: "Description de l’événement"
       event_title: "Titre de l’événement"
+      location_name: "Lieu :"
       new_calendar_event_header: "Nouvel événement du calendrier"
       start_time: "Heure de début"
     edit_event: 
@@ -2707,6 +2742,7 @@ fr:
         date: Date
         event_description: "Description de l’événement"
         from: Pour
+        location: Lieu
         title: Titre
       no_content: "Pas de contenu"
       timespan: "%{start_time} *à* %{end_time}"
@@ -3062,6 +3098,7 @@ fr:
       recording: "1 enregistrement"
       recordings: "%{recordingCount} enregistrements"
       setings: Paramètres
+      settings: Paramètres
       view: Afficher
     confirm: 
       close: |-
@@ -3100,6 +3137,7 @@ fr:
       recording: "1 enregistrement"
       recordings: "%{recordingCount} enregistrements"
       setings: Paramètres
+      settings: Paramètres
       start: Démarrer
       view: Afficher
     no_concluded_conferences: "Pas de conférences closes"
@@ -3122,6 +3160,12 @@ fr:
         new: "N’a pas encore commencé"
         started: "Début à %{time}"
     type_disabled_error: "Ce type de conférence n’est plus disponible sur le site Canvas"
+  confirm_dialog: 
+    cancel: Annuler
+    ok: OK
+    submit: Envoyer
+  confirm_dialog_component: 
+    ok: OK
   content_exports: 
     buttons: 
       process: "Traiter les données"
@@ -3442,6 +3486,7 @@ fr:
       enrollment_linked_to: "liée à *%{linked_user}*"
       headings: 
         recent_messages: "Messages récents"
+        user_services: "Services Web enregistrés"
       help: 
         list_services: "Vous n’avez pas activé votre liste de services enregistrés. L’activation de cette liste permettra aux membres du même cours et groupe que vous de se connecter plus facilement avec vous en dehors de la classe."
         services: "Vous n’avez pas lié votre profil utilisateur à des services externes. Vous pouvez lier votre compte Canvas à des services tels que Facebook ou Twitter. Les membres de votre cours et de votre groupe pourront se connecter avec vous en dehors de la classe."
@@ -3451,20 +3496,27 @@ fr:
       legends: 
         memberships: Adhésions
       links: 
+        access_report: "Accéder au rapport"
         cant_delete: "Suppression impossible"
         conclude_enrollment: "Terminer cette inscription"
         delete_enrollment: "Supprimer cette inscription"
+        faculty_journal: "Journal des enseignants"
         link_enrollment: "Lier cette inscription"
         link_services: "Lier des services Web à mon compte"
+        message_user: "Envoyer un message"
         more_about_this_user: "Plus d’infos sur cet utilisateur"
         more_user_details: "plus d’informations sur l’utilisateur..."
         remove_avatar: "Supprimer l’image de l’avatar"
         report_avatar: "Signaler une image inappropriée"
         restore_enrollment: "Rétablir cette inscription"
+        student_teacher_activity: "Interactions avec vous"
+        teacher_activity: "Rapport d’interactions d’étudiant"
         title: 
           enrollment_sis_defined: "Cette inscription a été définie par l’université et ne peut pas être supprimée"
         user_account_details: "Informations du compte utilisateur"
+        user_grades: Notes
         user_only_view_section: "laisser cet utilisateur voir uniquement les utilisateurs de la même section"
+        user_outcomes: Résultats
         user_view_all_sections: "laisser cet utilisateur voir tous les utilisateurs du cours"
       no_messages: "Aucun message"
       no_services: "%{user} n’a lié encore aucun service externe à son compte."
@@ -3793,6 +3845,8 @@ fr:
       reorder_modules: "Faire glisser les modules pour les classer"
       unpublish: "Annuler la publication"
     context_module_next: 
+      aria_labels: 
+        add_item: "Ajouter un contenu"
       images: 
         alt: 
           incomplete: incomplet
@@ -3949,6 +4003,7 @@ fr:
     no_course: "Pas de cours"
     select_course: "Sélectionner un cours"
   conversation_message: 
+    subject: "Message privé"
     subject_specified: "Message privé : %{subject}"
     users_added: 
       one: "%{user} a été ajouté à la conversation par %{current_user}"
@@ -4025,6 +4080,7 @@ fr:
     course_options: 
       course_options: 
         concluded: Closes
+        groups: Groupes
         more_courses: "Cours supplémentaires"
     enrollments_everyone: Tous
     errors: 
@@ -4352,6 +4408,8 @@ fr:
     event_type: 
       concluded: Terminé
       created: Créé
+      deleted: Supprimé
+      published: Publiés
       updated: Actualisé
     field_label: 
       abstract_course_id: "ID de cours abstrait"
@@ -4494,6 +4552,7 @@ fr:
         delete_course: "Supprimer le cours"
       details: 
         conclude_alt_text: "Si vous souhaitez conserver la possibilité de modifier les notes tout en limitant l’accès des étudiants au cours, utilisez les paramètres de date du cours. Pour en savoir plus sur ces paramètres, reportez-vous *ici* dans nos guides."
+        confirm_conclude: "Avertissement : conclure ce cours vous empêchera de modifier les notes et d’accéder à son contenu."
         confirm_delete: "Voulez-vous vraiment supprimer ce cours ? Après la suppression, les étudiants et les enseignants ne pourront plus y accéder. Si vous souhaitez simplement le retirer de la liste déroulante, vous devez plutôt *clore le cours*."
         confirm_delete_addendum: "Si vous n’êtes pas autorisé à clore le cours, vous pouvez en *changer la date de fin* ou demander à l’administrateur de le clore pour vous."
       headings: 
@@ -4712,6 +4771,7 @@ fr:
         cannot_add_users: "Il n’est pas possible d’ajouter des utilisateurs, car ce cours est terminé"
         filter_field_description: "Lorsque vous tapez quelque chose dans ce champ, la liste des personnes est filtrée automatiquement pour inclure uniquement les noms qui correspondent à votre saisie."
         filter_list_of_people: "Filtrer la liste de personnes"
+        group_set: "Ensemble de groupes"
         people: Personnes
         role_to_search: "Limiter la recherche au rôle"
         search_people: "Rechercher des personnes"
@@ -4731,6 +4791,9 @@ fr:
         re_sending_invitations: Renvoi...
       role_select: 
         all_roles: "Tous les rôles"
+      roster_tabs: 
+        everyone_tab: Tous
+        groups: Groupes
       roster_user: 
         links: 
           edit_sections: "Modifier les sections"
@@ -4762,6 +4825,7 @@ fr:
         add_section: "Ajouter une section"
         move_course: "Déplacer le cours"
         update_course: "Mettre à jour les informations du cours"
+      course_open_enrollment: "Ce cours autorise l’inscription libre. Les étudiants peuvent s’inscrire au cours dès que vous leur avez communiqué cette URL : *%{url}*. Ils peuvent aussi s’inscrire à l’adresse *%{url2}* et utiliser le code suivant : *%{code}*"
       course_open_enrollment_without_code: "L’inscription libre est possible pour ce cours. Les étudiants pourront s’y inscrire dès que vous leur aurez communiqué cette URL : *%{url}*"
       course_overrides_term: "Cette action remplacera les paramètres de disponibilité du trimestre."
       date_restricted: "Les utilisateurs peuvent participer à ce cours uniquement entre ces dates."
@@ -4823,6 +4887,7 @@ fr:
         sis_source_id: "ID SIS"
         start_at: "Débute à"
         storage_quota: "Stockage de fichier"
+        time_zone: "Fuseau horaire"
         turnitin_comments: "Soumission à Turnitin - Commentaires"
       language_overrides_preferences: "Les paramètres linguistiques des utilisateurs/du système seront remplacés. Cette option est recommandée uniquement pour les cours en langue étrangère"
       links: 
@@ -4882,6 +4947,7 @@ fr:
         delete: "Supprimer définitivement ce cours"
         export_content: "Exporter le contenu du cours"
         import: "Importer le contenu dans ce cours"
+        new_badge: Nouveau
         reset: "Réinitialiser le contenu du cours"
         stats: "Statistiques du cours"
         student_view: "Affichage étudiant"
@@ -5503,7 +5569,7 @@ fr:
         other: "%{count} réponses."
         zero: "Pas de réponses."
       unread_count_tooltip: 
-        one: "%{count} réponses non lues."
+        one: "1 réponse non lue."
         other: "%{count} réponses non lues."
         zero: "Pas de réponses non lues."
     page_nav: 
@@ -5587,6 +5653,8 @@ fr:
     closed_for_comments: "Fermées aux commentaires"
     confirm_delete_discussion_topic: "Voulez-vous vraiment supprimer ce sujet de discussion ?"
     delete: Supprimer
+    deleted_entry: 
+      deleted: "Entrée supprimée par *%{editor_name}* le %{edited_at}"
     discussions: Discussions
     edit_settings: "Modifier les paramètres des discussions"
     entry_collection_view: 
@@ -5623,6 +5691,7 @@ fr:
       error_saving_reply: "*Une erreur s’est produite*. Veuillez renvoyer votre réponse ultérieurement."
       saving_reply: "Enregistrement de la réponse..."
     reply_attachment: 
+      attachment_label: "Pièce jointe"
       remove_attachment: supprimer
     reply_form: 
       attach_file: Joindre
@@ -6069,7 +6138,7 @@ fr:
       links: 
         add_external_feed: "Ajouter un flux externe"
       options: 
-        content_to_post: "--Contenu à publier--"
+        content_to_post: "Contenu à publier"
         full_article: "Article complet"
         link_only: "Lien uniquement"
         truncated: Tronqué
@@ -6165,6 +6234,12 @@ fr:
     saving: Enregistrement...
     shared_secret: "Secret partagé"
     submit: Envoyer
+    tool_post_iframe: 
+      load_tool_button: "Télécharger %{tool}"
+      load_tool_new_tab_button: "Télécharger %{tool} dans une nouvelle fenêtre"
+      new_tab: "Cet outil doit être téléchargé dans une nouvelle fenêtre du navigateur"
+      new_tab_expired: "La session de cet outil a expiré. Retéléchargez cette page pour accéder de nouveau à l’outil."
+      new_tab_loaded: "Cet outil a été téléchargé dans une nouvelle fenêtre du navigateur. Retéléchargez cette page pour accéder de nouveau à l’outil."
     tool_show: 
       load_tool_button: "Télécharger %{tool}"
       load_tool_new_tab_button: "Télécharger %{tool} dans une nouvelle fenêtre"
@@ -6459,6 +6534,7 @@ fr:
     grade_display_warning: 
       checkbox: "Ne plus afficher pour ce cours."
       warning: Avertissement
+  grade_export_title: "Exportation de note"
   gradebook: 
     alerts: 
       no_active_students: "Il n’y a aucun étudiant actif dans ce cours ou aucun d’entre eux ne peut être noté par vous."
@@ -6501,6 +6577,7 @@ fr:
       none_to_update: "Aucune mise à jour nécessaire"
       select_an_option: "Sélectionnez une option"
       upload_as_zip: "Veuillez télécharger les fichiers sous forme de fichier zip."
+    graded: noté
     graded_by_me: "%{graded_time} par moi"
     graded_then_resubmitted: "noté, puis renvoyé (%{when})"
     gradee_index_of_total: "%{gradee} %{x} sur %{y}"
@@ -6524,6 +6601,8 @@ fr:
     mute_assignment: "Tâche silencieuse"
     new_assessment: "[Nouvelle évaluation]"
     no_submission_time: "aucune heure d’envoi"
+    not_graded: "non noté"
+    not_submitted: "non envoyé"
     nth_student: "Étudiant %{n}"
     portion_graded: "%{x} / %{y} noté"
     publish_to_sis: "Publier les notes sur SIS"
@@ -6810,6 +6889,8 @@ fr:
         one: 1 commentaire
         other: "%{count} commentaires"
       comment_count_screenreader: "Lire les commentaires"
+      comments: Commentaires
+      expand: Développer
       faculty_journal: "Journal des enseignants pour %{user}"
       for_course: "Pour le cours,"
       headers: 
@@ -7165,6 +7246,7 @@ fr:
     titles: 
       grading_scheme_info: "Afficher/Modifier le système de notation"
   group: 
+    greater_than_1: "Doit être supérieur à 1"
     memeber: Membre
     name_required: "Le nom doit être spécifié."
     name_too_long: "Spécifiez un nom de groupe plus court"
@@ -7286,6 +7368,8 @@ fr:
         open_to_course_members: "Adhésion libre pour les membres du cours"
       page_title: "Groupes de cours"
       student_group_warning: "Si votre enseignant vous a proposé de rejoindre des groupes associés à une tâche, l’adhésion aux groupes doit se faire différemment. Les groupes que vous organisez vous-même ne peuvent pas être utilisés pour la notation. Vous pouvez quand même former vos propres groupes, mais vous ne pourrez pas remettre une copie électronique de vos tâches à moins que votre enseignant ne crée les groupes pour vous."
+      student_groups_tabs_everyone: Tous
+      student_groups_tabs_groups: Groupes
     context_manage_groups: 
       account_group_explanation: "Les groupes d’étudiants créés au niveau du compte représentent un bon moyen de créer des groupes sans être lié à un cours donné. Chaque groupe d’étudiants reçoit son calendrier, son tableau de discussion et ses outils de collaboration afin de s’organiser et de travailler ensemble plus efficacement."
       actions: 
@@ -7389,6 +7473,8 @@ fr:
         headings: 
           account_groups: "Groupes d’étudiants au niveau compte"
           course_groups: "Groupes d’étudiants"
+        tabs: 
+          everyone: Tous
       group_category: 
         randomly_assigning_students: "Attribution aléatoire des étudiants"
         search_groups: "Rechercher des groupes"
@@ -7496,6 +7582,7 @@ fr:
     randomly_assigning_members: "Attribution aléatoire des étudiants"
     show: 
       coming_up: "À venir"
+      edit_group: "Modifier le groupe"
       group_atom_feed: "Flux Atom du groupe"
       new_announcement: "Nouvelle annonce"
       next_week: "la semaine prochaine"
@@ -7542,6 +7629,7 @@ fr:
     which_course_is_this_question_about: "À quel cours cette question se rapporte-t-elle ?"
     your_email_address: "Votre adresse e-mail"
   helpers: 
+    course: Cours
     dashboard_helper: 
       announcement_details: "Détails de l’annonce"
       assignment_details: "Informations sur la tâche"
@@ -7565,6 +7653,12 @@ fr:
       Cela peut être utile pour les malvoyants ou les personnes ayant des difficultés à lire.
   ic_actions: 
     manage: gérer
+  icons: 
+    discussion_submission: "Envoi de la discussion"
+    file_upload_submission: "Envoi d’un téléchargement de fichier"
+    online_url_submission: "Envoi en ligne (URL)"
+    quiz_submission: "Envoi de questionnaire"
+    text_entry_submission: "Envoi d’une entrée de texte"
   images: 
     error_checking_color: "Erreur de vérification de la couleur de l’image"
     invalid_background_color: "L’arrière-plan doit être de couleur %{color}"
@@ -7941,6 +8035,8 @@ fr:
     my_courses: "Mes cours"
   message: 
     default_subject: "Alerte Canvas"
+  message_dialog_component: 
+    ok: OK
   message_students: 
     buttons: 
       send_message: "Envoyer le message"
@@ -8462,6 +8558,7 @@ fr:
         html: 
           assignment_due_date_changed: "La date d’échéance de la tâche a été modifiée : %{assignment_name}, %{course_name} (%{override})"
           assignment_due_date_changed_sentence: "La date d’échéance de la tâche %{assignment_name} pour le cours %{course_name} (%{override}) est maintenant le :"
+          link: "Cliquez ici pour afficher le travail"
           link_text: "Afficher la tâche"
           no_due_date: "Pas d’échéance"
         labels: 
@@ -8487,6 +8584,7 @@ fr:
         assignment_graded: "Tâche notée : %{assignment_name}, %{course_name}"
         html: 
           assignment_graded: "Travail noté : %{assignment_name}, %{course_name}"
+          link: "Cliquez ici pour afficher le travail"
           link_text: "Afficher la tâche"
           the_assignment_is_graded: "Le travail %{assignment_name} a été noté."
         labels: 
@@ -8649,11 +8747,13 @@ fr:
         subject: "Confirmer l’e-mail : Canvas"
     confirm_registration: 
       email: 
+        body: "Merci de votre enregistrement sur %{product_name} !. Cet e-mail est une confirmation d’enregistrement de l’utilisateur %{user} pour un nouveau compte sur %{website}."
         details: "Pour terminer le processus d’enregistrement, consultez l’URL suivante :"
         html: 
           body: "Merci de vous être enregistré pour %{product_name} ! Cet e-mail confirme que l’utilisateur %{user} crée un nouveau compte sur %{website}. "
           details: "Cliquez ici pour terminer l’enregistrement"
           subject: "Confirmer l’enregistrement : %{product_name}"
+        subject: "Confirmer l’enregistrement : %{product_name}"
     confirm_sms_communication_channel: 
       sms: 
         body: |-
@@ -9050,6 +9150,7 @@ fr:
             grades_based_on_percent: "La notation est basée sur le total pondéré de chaque groupe de travaux."
             now_see_here: "Vous pouvez consulter les informations ici"
             subject: "Coefficient modifié"
+          see_details: "Vous pouvez consulter les informations ici"
         labels: 
           grades_based_on_percent: "La notation est basée sur le total pondéré pour chaque groupe de tâches"
           now_see_here: "Vous pouvez consulter les informations ici"
@@ -9158,6 +9259,7 @@ fr:
           click_to_preferences: "Cliquez ici pour modifier vos préférences de notification"
     merge_email_communication_channel: 
       email: 
+        body: "Un compte a été créé pour vous sur %{host}, mais vous possédez déjà un compte Canvas. Si vous souhaitez les combiner, consultez l’URL suivante :"
         html: 
           account_created: "Un compte a été créé pour vous sur %{host}, mais vous possédez déjà un compte Canvas."
           merge2: "Si vous souhaitez les fusionner, *cliquez ici*"
@@ -9318,6 +9420,7 @@ fr:
         html: 
           body: "%{user} a publié un nouveau commentaire sur le fil de discussion %{discussion_topic} pour %{course} :"
           discussion_entry_link_message: "[Cliquez ici pour prendre part à la conversation](%{url}) ou ajoutez un commentaire en répondant à ce message."
+          link: "Cliquez ici pour prendre part à la conversation"
           subject: "Nouveau commentaire sur %{discussion_topic} : %{course}"
         subject: "Nouveau commentaire pour %{discussion_topic} : %{course}"
       facebook: 
@@ -9338,6 +9441,7 @@ fr:
           body: "Une discussion qui vient de commencer peut peut-être vous intéresser :"
           details: "Prenez part à la conversation en cliquant ici"
           download: télécharger
+          link: "Cliquez ici pour prendre part à la conversation"
           subject: "Nouvelle discussion - %{discussion_topic} : %{course}"
         labels: 
           file_included: "Fichier inclus"
@@ -9406,6 +9510,7 @@ fr:
         html: 
           body: "%{count} nouveaux fichiers ont été ajoutés au cours %{name} :"
           link: "Vous pouvez les consulter ici"
+          see_details: "Vous pouvez les consulter ici"
           subject: "%{count} nouveaux fichiers ajoutés au cours %{name} :"
         link: "Vous pouvez les consulter ici"
         subject: "%{count} nouveaux fichiers ajoutés au cours %{name} :"
@@ -9453,6 +9558,7 @@ fr:
         body: "%{user} vient de s’enregistrer comme enseignant sur %{website}."
         html: 
           body: "%{user} vient de s’enregistrer en tant qu’enseignant sur %{website}."
+          details: "Cliquez ici pour afficher l’enseignant"
           email: E-mail
           link: "Cliquez ici pour afficher l’enseignant"
           phone: Téléphone
@@ -9850,6 +9956,7 @@ fr:
     ecollege: 
       course_not_found: "Le cours ECollege est introuvable."
     external_feed_type: "Flux externe"
+    external_tool_type: "Outil externe"
     file_type: Fichier
     grading_standard_type: "Critère de notation"
     group_type: Groupe
@@ -9946,9 +10053,17 @@ fr:
   notification: 
     added_to_conversation_description: "Vous êtes ajouté à une conversation"
     added_to_conversation_display: "Ajouté à la conversation"
+    all_submissions_description: |-
+        *Formateur et administrateur uniquement :*
+        
+        Envoi/renvoi d’activité
     all_submissions_display: "Tous les envois"
     announcement_description: "Nouvelle annonce dans votre cours"
     announcement_display: Annonce
+    appointment_availability_description: |-
+        *Formateur et administrateur uniquement :*
+        
+        Modification des créneaux horaires de rendez-vous
     appointment_availability_display: "Disponibilité pour les rendez-vous"
     appointment_cancelations_description: "Annulation de rendez-vous"
     appointment_cancelations_display: "Annulations de rendez-vous"
@@ -9982,6 +10097,12 @@ fr:
       submission_comment: "Commentaire sur l’envoi"
     conversation_message_description: "Nouveaux messages dans la boîte aux lettres"
     conversation_message_display: "Message de conversation"
+    course_content_description: |-
+        Passer au contenu du cours :
+        
+        * WikiPage
+        * Contenu de questionnaire
+        * Contenu d’activité
     course_content_display: "Contenu du cours"
     discussion_description: "Nouveau sujet de discussion dans votre cours"
     discussion_display: Discussion
@@ -9991,11 +10112,34 @@ fr:
     due_date_display: "Date d’échéance"
     files_description: "Nouveau fichier ajouté à votre cours"
     files_display: Fichiers
+    grading_description: |-
+        Contient :
+        
+        * Note entrée/modifiée pour une activité/un envoi
+        * Note d’activité non silencieuse
+        * Coefficient modifié
+        
+        &nbsp;
+        
+        Activez l’option pour inclure les résultats lors des alertes sur les changements de note si vous souhaitez voir vos notes dans les notifications.
+        Si votre e-mail n’est pas celui d’une institution, cela implique que le contenu sensible sera envoyé vers l’extérieur.
     grading_display: Notation
     grading_notify_include_grade: "Inclure les notes dans les alertes de modification de notes."
     grading_policies_description: "Modification des règles de notation du cours"
     grading_policies_display: "Règles de notation"
+    invitation_description: |-
+        Invitation pour :
+        
+        * Conférence Web
+        * Groupe
+        * Collaboration
+        * Cours
+        * Révisions par les pairs et rappel
     invitation_display: Invitation
+    late_grading_description: |-
+        *Formateur et administrateur uniquement :*
+        
+        Dernier envoi d’activité
     late_grading_display: "Notation en retard"
     membership_update_description: |-
         *Administrateur uniquement : inscription en attente activée*
@@ -10074,8 +10218,22 @@ fr:
       updated_wiki_page: "Page Wiki mise à jour"
       web_conference_invitation: "Invitation à la conférence Web"
     no_subject: "Aucun sujet"
+    other_description: |-
+        *Instructeur et administrateur uniquement :*
+        
+        * Inscription aux cours
+        * Rapport généré
+        * Contenu exporté
+        * Rapport de migration
+        * Nouveau compte d’utilisateur
+        * Immatriculation des nouveaux enseignants
+        * Nouveau groupe d’étudiants
     other_display: "Notifications administratives"
     reminder_display: Rappel
+    student_appointment_description: |-
+        *Formateur et administrateur uniquement :*
+        
+        Inscription de rendez-vous d’étudiant
     student_appointment_display: "Inscriptions des étudiants aux rendez-vous"
     submission_comment_description: |-
         Commentaires sur l’envoi de l’activité
@@ -10383,6 +10541,10 @@ fr:
       secret_description: "Paramètre %{parameter_name} qui se trouve dans le fichier de configuration %{filename}."
     buttons: 
       saving: "Enregistrement en cours..."
+    canvadocs_settings: 
+      labels: 
+        api_key: "Clé API"
+        base_url: "URL de base"
     crocodoc: 
       description: "Crocodoc activé en tant qu’option d’aperçu de document"
       name: Crocodoc
@@ -11198,8 +11360,11 @@ fr:
   publish_icon_component: 
     publish: Publier
     publish_click: "publié, cliquez pour annuler la publication"
+    published: Publiés
+    publishing: "Publication en cours..."
     unpublish: "Annuler la publication"
     unpublish_click: "non publié, cliquez pour publier"
+    unpublishing: "Annulation de la publication..."
   publishable: 
     cant_unpublish: "Impossible d’annuler la publication"
   publishableModuleItem: 
@@ -11324,6 +11489,11 @@ fr:
     quick_start_bar_view: 
       new: "Nouveau :"
   quiz: 
+    cancel: Annuler
+    cant_unpublish_when_students_submit: "Impossible de retirer la publication s’il y a des envois d’étudiants"
+    delete: Supprimer
+    delete_quiz: "Supprimer le questionnaire"
+    quiz_regraded_your_score_not_affected: "La note de ce questionnaire a été recalculée, mais cela n’a pas changé le total."
     regrade: 
       give_everyone_full_credit: "Accordez tous les points à tous pour cette question."
       no_scores_reduced: "Attribuez des points pour les réponses qui ont été rectifiées et celles qui étaient correctes (*les notes ne pourront pas baisser*)"
@@ -11331,6 +11501,34 @@ fr:
       regrade_options: "Options de recalcul de la note *(pour les étudiants qui ont déjà répondu à cette question) :*"
       some_scores_reduced: "Attribuez des points uniquement pour la réponse correcte (*la note de certains étudiants pourra baisser*)"
       update_question_without_regrading: "Actualiser la question sans reclassement"
+    take_the_quiz: "Compléter le questionnaire"
+    take_the_quiz_again: "Compléter à nouveau le questionnaire"
+    take_the_survey: "Compléter l’enquête"
+    take_the_survey_again: "Compléter à nouveau l’enquête"
+    warning: Avertissement
+  quiz_extend_time: 
+    extend_time: "Prolonger la durée"
+    now: maintenant
+  quiz_extensions: 
+    extensions_student: "Prolongation pour %{student}"
+    student_extensions: "Prolongations pour l’étudiant"
+  quiz_index_row: 
+    cant_unpublish_when_students_submit: "Impossible de retirer la publication s’il y a des envois d’étudiants"
+    confirms: 
+      delete_quiz: "Voulez-vous vraiment supprimer ce questionnaire ?"
+    delete_quiz: "Supprimer le questionnaire"
+    edit_quiz: "Modifier le questionnaire"
+  quiz_message_students: 
+    message_students_who: "Envoyer un message aux étudiants qui..."
+  quiz_model: 
+    everyone: Tous
+    everyone_else: "Tous les autres"
+    graded_quiz: "Questionnaire noté"
+    graded_survey: "Enquête notée"
+    keep_highest: "La plus élevée"
+    keep_latest: "La dernière"
+    practice_quiz: "Questionnaire d’entraînement"
+    survey: Enquête
   quiz_reports: 
     quiz_report_generator: 
       download_report_name: "Télécharger %{report_name}"
@@ -11338,6 +11536,24 @@ fr:
       generated_at_date_time: "Généré le %{dateAndTime}"
       generating_report_name: "Génération de %{report_name}..."
       item_analysis_not_available: "L’analyse des éléments n’est pas possible pour les enquêtes"
+  quiz_route: 
+    that_quiz_has_been_deleted: "Ce questionnaire a été supprimé"
+  quiz_statistics: 
+    item_analysis: "Analyse - élément"
+    no_answer: "Aucune réponse"
+    student_analysis: "Analyse - étudiant"
+  quiz_statistics_route: 
+    quiz_statistics: Statistiques
+  quiz_statistics_title: "Statistiques du questionnaire"
+  quiz_submission_arrows: 
+    answers: 
+      correct: "Correct !"
+      correct_answers: "Réponses correctes"
+      incorrect: Incorrect
+      partial: Partiel
+      right: "Bonne réponse"
+      unanswered: "Sans réponse"
+      you_answered: "Vous avez répondu"
   quizzes: 
     after_last_attempt: "Après la dernière tentative"
     alerts: 
@@ -12251,6 +12467,7 @@ fr:
       submission_versions: 
         attempt: Tentative
         attempt_history: "Historique des tentatives"
+        questions_not_graded: "Certaines questions n’ont pas encore été notées."
         quiz_attempt_history_description: "Un tableau qui récapitule vos tentatives pour les questionnaires. Chaque essai est indiqué à gauche, avec l’heure et le résultat en haut."
         regraded: "Note recalculée"
         score: Note
@@ -12421,6 +12638,10 @@ fr:
       other: "%{count} questions"
   quizzes_redirects: 
     no_access: "Accès refusé. Redirection vers une page à laquelle vous avez accès."
+  quizzes_route: 
+    quizzes_route_title: Questionnaires
+  quizzez_submission_row: 
+    unlimited: "Sans limite"
   re_upload_submissions_form: 
     buttons: 
       upload: "Charger des fichiers"
@@ -12573,6 +12794,8 @@ fr:
     update_failed_notice: "Échec de la création de rôle"
   roles: 
     account_admin: "Administrateur de compte"
+    new_role: 
+      add: Ajouter
     permission_button: 
       rolebutton: 
         disable: Désactiver
@@ -12580,6 +12803,7 @@ fr:
         enable: Activer
         enable_and_lock: "Activer et verrouiller"
         use_default: "Utiliser les valeurs par défaut"
+    permissions: Autorisations
   roster: 
     delete_confirm: "Voulez-vous vraiment supprimer cet utilisateur ?"
     error_sending_invitations: "Erreur lors de l’envoi de l’invitation. Veuillez réessayer."
@@ -12616,6 +12840,7 @@ fr:
         add_rubric: "Ajouter un barème"
       course_rubrics: "Barèmes du cours"
       delete_rubric: "Supprimer le barème"
+      edit_rubric: "Modifier un barème"
       page_title: Barèmes
       points_possible: 
         one: "1 point possible"
@@ -13726,6 +13951,7 @@ fr:
       plain_view: "Format texte brut"
       preview_crocodoc_document: "Prévisualisez votre envoi et lisez les éventuels commentaires de l’enseignant"
       preview_scribd_document: "Aperçu de l’envoi"
+      preview_submission: "Aperçu de l’envoi"
       preview_title: "Aperçu de %{title}"
       quiz_submission: "Cet envoi correspond à un questionnaire. Redirection vers la page du questionnaire."
       show_entire_discussion: "Afficher la discussion complète"
@@ -13766,6 +13992,8 @@ fr:
     assignments: Tâches
     collaborations: Collaborations
     conferences: Conférences
+    course_assignments: "Travail sur le cours"
+    course_settings: "Paramètres du cours"
     discussions: Discussions
     eportfolios: "Portefeuilles électroniques"
     files: Fichiers
@@ -13880,6 +14108,10 @@ fr:
       image_url_field_label: "URL de l’image"
       image_width: "Largeur de l’image"
       url: URL
+  title: 
+    edit_topic: "Modifier le sujet de discussion"
+    new_announcement: "Nouvelle annonce"
+    new_topic: "Nouveau sujet de discussion"
   title_separator: ": "
   titles: 
     aligned_items: "Éléments alignés"
@@ -13900,6 +14132,8 @@ fr:
     people: Personnes
     view_in_separate_window: "Afficher dans une fenêtre séparée"
   tooltips: 
+    finished: terminé
+    incomplete: incomplet
     vdd: 
       more_message: "et %{count} autres..."
   tours: 
