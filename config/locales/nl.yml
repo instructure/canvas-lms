@@ -296,28 +296,86 @@ nl:
       term_text: "Periode: %{term_name};"
     grades: 
       deleted: "Inclusief verwijderde objecten: waar;"
+      limited: "objecten die tot specifieke beperkte dagen verwijderd zijn;"
     mississippi: 
       reports: "Rapportages: %{files}"
     outcomes: 
       order: "Ordenen: %{order}"
     report_header_account_id: account_id
+    report_header_assessment_id: evaluatie-id
+    report_header_assessment_question: evaluatievraag
+    report_header_assessment_question_id: evaluatievraag-id
+    report_header_assessment_title: evaluatietitel
+    report_header_assessment_type: "type evaluatie"
+    report_header_assignment_id: opdracht-id
+    report_header_assignment_title: opdrachttitel
+    report_header_assignment_url: opdracht-url
+    report_header_associated_user_id: gekoppelde_gebruiker_id
     report_header_attempt: poging
+    report_header_canvas_account_id: canvas_account_id
+    report_header_canvas_associated_user_id: canvas_gekoppelde_gebruiker_id
+    report_header_canvas_course_id: canvas_cursus_id
+    report_header_canvas_group_id: canvas_groep_id
+    report_header_canvas_parent_id: canvas_ouder_id
+    report_header_canvas_section_id: canvas_sectie_id
+    report_header_canvas_term_id: canvas_periode_id
+    report_header_canvas_user_id: canvas_gebruiker_id
+    report_header_canvas_xlist_course_id: canvas_xlijst_cursus_id
     report_header_course: cursus
+    report_header_course__id: cursus_id
     report_header_course_id: cursus-id
     report_header_course_name: "naam van de cursus"
+    report_header_course_sis: "cursus sis"
     report_header_course_sis_id: "sis-id van cursus"
     report_header_created_at: "gemaakt op"
+    report_header_current_score: "huidige score"
+    report_header_email: e-mail
+    report_header_end__date: eind_datum
+    report_header_end_date: einddatum
+    report_header_enrollment_state: "provincie van inschrijving"
+    report_header_final_score: eindscore
+    report_header_first_name: voor_naam
+    report_header_group_id: groep_id
     report_header_id: id
+    report_header_last_access_at: "toegang laatst op"
+    report_header_last_ip: "laatste ip"
+    report_header_last_name: achter_naam
+    report_header_learning_outcome_id: leerresultaat-id
+    report_header_learning_outcome_name: "naam van het leerresultaat"
+    report_header_login_id: aanmeldings-id
+    report_header_long__name: lange_naam
+    report_header_long_name: "lange naam"
     report_header_name: naam
+    report_header_outcome_score: resultaat
+    report_header_parent_account_id: ouder_account_id
+    report_header_role: rol
     report_header_section: sectie
     report_header_section__id: sectie_id
     report_header_section_id: sectie-id
     report_header_section_name: "naam van sectie"
+    report_header_section_sis: "sis sectie"
     report_header_section_sis_id: "sis-id van sectie"
+    report_header_short__name: korte_naam
+    report_header_short_name: "korte naam"
+    report_header_sis_id: sis-id
+    report_header_start__date: start_datum
+    report_header_start_date: startdatum
+    report_header_status: status
+    report_header_student_id: student-id
     report_header_student_name: "naam van student"
+    report_header_student_sis: "student sis"
+    report_header_student_sis_id: "student sis-id"
+    report_header_submission_date: inzendingdatum
+    report_header_submission_score: inzendingscore
+    report_header_term: periode
+    report_header_term__id: periode_id
     report_header_term_id: periode-id
+    report_header_term_sis: "periode sis"
+    report_header_user__id: gebruiker_id
     report_header_user_id: gebruiker-id
+    report_header_user_name: gebruikersnaam
     report_header_user_sis_id: "sis-id van gebruiker"
+    report_header_xlist_course_id: xlijst_cursus_id
     sis_exporter: 
       deleted: "Inclusief verwijderde objecten: ja;"
       reports: "Rapporten: %{files}"
@@ -658,7 +716,7 @@ nl:
           course: 
             text: "cursus_id:"
           outcome: 
-            text: "leerdoel_id:"
+            text: "resultaat_id:"
     date_picker_parameter: 
       account_reports: 
         default: 
@@ -739,7 +797,7 @@ nl:
         outcomes: 
           description: 
             header: Voorbeeld
-            text: "Dit rapport toont de resultaten van de leerdoelen van alle cursisten. Het daaruitvoortvloeiende CSV-bestand zal een rij met een tweetal leerdoelresultaten per gebruiker hebben en zal de details van het resultaat inclusief de bijbehorende opdracht bevatten."
+            text: "Dit rapport laat de leerresultaten van alle cursisten zien. Het daaruitvoortvloeiende CSV-bestand zal een rij met een tweetal leerresultaten per gebruiker hebben en zal de details van het resultaat inclusief de bijbehorende opdracht bevatten."
     outcome_results_csv_parameters: 
       account_reports: 
         outcomes: 
@@ -804,7 +862,7 @@ nl:
       account_reports: 
         newark: 
           assignment_groups: 
-            label: "Bijbehorende opdrachtgroepen:"
+            label: "Bij opdrachtgroepen opnemen:"
           assignments: 
             check_box: Opdrachten
           major: 
@@ -834,7 +892,7 @@ nl:
         media_quota: Mediaquota
         site_admin_quotas: Sitebeheerdersquota
         student_quota: Cursistenquota
-        update: Updaten
+        update: Bijwerken
       account_roles: "Account functies"
       account_settings_title: Accountinstellingen
       add_a_custom_help_link: "Een aangepaste Help-link toevoegen"
@@ -894,6 +952,7 @@ nl:
       help_link_available_to_all_users: Gebruikers
       if_you_would_like_to_link_to_your_own_campus_support_website_in_the_help_dialog_you_can_do_that_here: "Als je een link naar jouw eigen campusondersteuningswebsite wilt maken in het Help-dialoogvenster, kun je dat hier doen."
       interpolate_account_domain: "\"{{ACCOUNT_DOMAIN}} invoeren om het domein van het hoofdaccount van de gebruiker te vervangen"
+      interpolate_user_id: "\"{{CANVAS_USER_ID}}\" invoeren om de unieke Canvas-ID van de gebruiker te vervangen"
       ip_filter_filter_label: Filter
       ip_filter_name_label: Naam
       labels: 
@@ -1158,7 +1217,7 @@ nl:
         student_assignment_map: 
           description: 
             header: Voorbeeld
-            text: "Dit rapport toont de resultaten van de leerdoelen van alle cursisten zien. Het daaruitvoortvloeiende CSV-bestand zal een rij per twee leerdoelresultaten van de gebruiker hebben en zal de details van het resultaat inclusief de bijbehorende opdracht laten. Dit rapport toont alleen de resultaten van de leerdoelen van de opdrachten en niet de leerdoelen die aan de vraagbanken zijn gekoppeld."
+            text: "Dit rapport laat de leerresultaten van alle cursisten zien. Het daaruitvoortvloeiende CSV-bestand zal een rij per twee leerresultaten per gebruiker hebben en zal de details van het resultaat inclusief de bijbehorende opdracht bevatten. Dit rapport geeft alleen de resultaten van de opdrachten aan en niet de resulteation die aan de toetsbanken zijn gekoppeld."
     student_grades_csv_parameters: 
       account_reports: 
         auburn: 
@@ -1198,7 +1257,7 @@ nl:
           students_with_no_submissions: 
             description: 
               header: Voorbeeld
-            text: "Dit is een rapport van alle cursisten die voor een cursus in een bepaalde periode staan ingeschreven en die geen opdracht tussen bepaalde data hebben ingeleverd. Deze rapportage bevat een rij per ingeschreven cursist die aan de criteria voldoet. Het datumbereik kan niet langer dan twee weken zijn."
+            text: "Dit is een rapport van alle cursisten die voor een cursus in een bepaalde periode staan ingeschreven en die geen opdracht tussen bepaalde data hebben ingeleverd. Dit rapport bevat een rij per ingeschreven cursist die aan de criteria voldoet. Het datumbereik kan niet langer dan twee weken zijn."
     students_with_no_submissions_csv_parameters: 
       account_reports: 
         default: 
@@ -1672,7 +1731,7 @@ nl:
       assignment_move: "Opdracht verplaatsen"
       delete: Verwijderen
       delete_asssignment_title: "Verwijder deze opdracht"
-      edit: bewerken
+      edit: Bewerken
       edit_assignment_title: "Opdracht bewerken"
       module: Module
       move: "Verplaatsen naar"
@@ -2001,9 +2060,9 @@ nl:
     never_drop: 
       remove_rule: "Regel verwijderen"
     never_drop_collection: 
-      add_another_assignment: "Nog een opdracht toevoegen"
+      add_another_assignment: "Een andere opdracht toevoegen"
       add_first_assignment: "Een opdracht toevoegen"
-    never_drop_rule: "Nooit weglaten/overslaan%{assignment_name}"
+    never_drop_rule: "Nooit %{assignment_name} weglaten"
     never_drop_scores: "%{assignment_name} nooit weglaten/overslaan"
     no_assignments: "[Geen opdrachten]"
     no_assignments_list_item: 
@@ -2156,8 +2215,8 @@ nl:
         external_tool_url: "Externe hulpprogramma URL"
         turnitin_enabled: "Turnitin-inzendingen mogelijk maken"
       labels: 
-        allow_file_uploads: "Het uploaden van bestanden"
-        allow_media_recordings: "Media opnamen"
+        allow_file_uploads: "Bestanden uploaden"
+        allow_media_recordings: "Media opnames"
         allow_text_entry: Tekstinvoer
         allow_url: Website-URL
         allowed_extensions: "Toegestane bestandsextensies"
@@ -2318,7 +2377,7 @@ nl:
     upload_error_relative_uri: "Geen host  voor de URL: %{url} opgegeven"
     upload_error_timeout: "Het verzoek voor een Time-out: %{url}"
     upload_error_too_many_redirects: "Te veel nazendingen"
-    upload_error_unexpected: " Een onbekende error veroorzaakte het downloaden van%{url}"
+    upload_error_unexpected: " Een onbekende fout veroorzaakte het downloaden van %{url}"
   attendance: 
     default_attendance_title: "Aanwezigheid %{date}"
     errors: 
@@ -2351,6 +2410,7 @@ nl:
     no_manifest: "Dit Blackboard-zipbestand heeft geen imsmanifest.xml in de hoofd directory."
   bookmark_service: 
     default_title: "Geen titel"
+  bucks_zero_activity_title: "Geen activiteit Bucks"
   bulk_course_migration: 
     export_failed: "Er is een fout opgetreden bij het exporteren van de cursus met bb_lcid %{id} vanuit Blackboard"
     export_failed_no_id: "Er is een fout opgetreden bij het importeren van een cursus"
@@ -2738,7 +2798,7 @@ nl:
       edit_event: "Gebeurtenis bewerken"
     today: Vandaag
     undated_events: 
-      loading_undated_events: "Bezig met het laden van items zonder datum"
+      loading_undated_events: "Bezig met het laden van items zonder datum..."
       no_undated_events: "Geen items zonder datum."
       show_undated_events: "Items zonder datum laten zien"
       undated_events: "Ongedateerde gebeurtenissen"
@@ -2951,6 +3011,7 @@ nl:
     by_sa: "CC bijdrage, gelijk delen"
     private: "Privé (auteursrechtelijk beschermd)"
     public_domain: "Openbaar domein"
+  ccp_zero_activity_title: "Geen activiteit CCP"
   change_points_possible_to_match_rubric_dialog: 
     prompts: 
       update_assignment_points: "Deze opdracht heeft maximaal %{assignmentPoints} aantal punten. Wil je dit wijzigen in maximaal %{rubricPoints} punten in overeenstemming met deze rubric?"
@@ -3055,7 +3116,7 @@ nl:
     to_now: nu
   common_cartridge_description: "Hiermee kun je  Common Cartridge-pakketten converteren naar de intermediaire JSON-indeling, die je kunt importeren"
   common_cartridge_display: "Common Cartridge"
-  common_cartridge_file_description: "Common Cartridge 1.0/1.1/1.2-pakket"
+  common_cartridge_file_description: "Gewone cartridge 1.x-pakket"
   common_cartridge_name: "Common Cartridge Importer"
   communication_channel: 
     body: "Jouw Canvas-verificatiecode is %{verification_code}"
@@ -3318,7 +3379,7 @@ nl:
       options: Opties
     external_tool_content: 
       content: Inhoud
-    file_required: "Je moet een bestand selecteren om inhoud ervan te importeren"
+    file_required: "Je moet een bestand selecteren om inhoud te importeren van"
     file_too_large: "Jouw migratie mag niet groter zijn dan %{file_size}"
     hide_issues: "Problemen verbergen"
     index: 
@@ -3334,7 +3395,7 @@ nl:
     moodle_zip: 
       content: Inhoud
       options: Opties
-    must_upload_file: "Het uploaden van bestand of url is verplicht"
+    must_upload_file: "Het uploaden van bestand of url is vereist"
     no_content_selected: "Je hebt geen enkele inhoud geselecteerd om te importeren."
     no_day_substitutions: "Geen dag inzendingen toegevoegd"
     no_migrations_running: "Momenteel worden er geen migraties uitgevoerd"
@@ -3372,21 +3433,21 @@ nl:
         checkbox_label: "Gebeurtenissenevents en einddatums bewerken"
         ending_change_to: "wijzigen in"
         ending_date: Einddatum
-        new_end_date_label: "Einddatum wijzigen in"
-        new_end_date_title: "Einddatum wijzigen in"
-        new_start_date_label: "Begindatum gaan wijzigen in"
-        new_start_date_title: "Begindatum gaan wijzigen in"
+        new_end_date_label: "Einddatum wijzigen naar"
+        new_end_date_title: "Einddatum wijzigen naar"
+        new_start_date_label: "Startdatum wijzigen naar"
+        new_start_date_title: "Startdatum wijzigen naar"
         old_end_date_label: Einddatum
         old_end_date_title: Einddatum
-        old_start_date_label: Begindatum
-        old_start_date_title: Begindatum
+        old_start_date_label: Startdatum
+        old_start_date_title: Startdatum
         substitution: Vervanging
       day_substitution: 
         move_from: "Verplaatsen uit"
         move_from_select_label: "Van weekdag verplaatsen"
         move_from_select_title: "Van weekdag verplaatsen"
-        move_to_select_label: "Naar andere weekdag verplaatsen"
-        move_to_select_title: "Naar andere weekdag verplaatsen"
+        move_to_select_label: "Naar weekdag verplaatsen"
+        move_to_select_title: "Naar weekdag verplaatsen"
         remove_day_substitution_link: "Vervanging van dag verwijderen"
         remove_day_substitution_link_label: "Vervanging van dag verwijderen"
         to_happen_on: tot
@@ -3397,25 +3458,25 @@ nl:
         default_select_folder: "Map selecteren"
         upload_to: "Uploaden naar"
       overwrite_assessment_content: 
-        assessment_help_label: "Hulp pictogram bij beoordelingen overschrijven"
+        assessment_help_label: "Hulp pictogram beoordeling overschrijven"
         assessment_help_text: "Sommige systemen vernieuwen hun ID's bij iedere export. Hierdoor hebben bij export twee verschillende vragenbanken dezelfde ID's. Om ervoor te zorgen dat data van opdrachten niet verloren gaan, behandelt Canvas deze objecten standaard verschillend. Deze optie schakelt deze beveiliging uit en maakt het mogelijk om data met opdrachten met dezelfde ID's te overschrijven."
         assessment_help_title: "\"Hulp bij overschrijven van beoordelingen\""
-        assessment_help_title_icon: "Hulp pictogram bij beoordelingen overschrijven"
+        assessment_help_title_icon: "Hulp pictogram beoordelingen overschrijven"
         overwrite_assessment_content: "Beoordelingsinhoud met identieke ID's overschrijven"
       question_bank: 
-        aria_new_label: "Nieuwe vragenbank maken"
+        aria_new_label: "Nieuwe toetsbank maken"
         create_new_question: "-- Nieuwe vragenbank maken --"
         question_bank_label: Vragenbank
-        question_bank_placeholder: "\"Naam van vragenbank\""
-        question_bank_placeholder_aria: "\"Voer naam nieuwe vragenbank in\""
-        question_bank_title: "Naam van nieuwe vragenbank "
+        question_bank_placeholder: "\"Naam van toetsbank\""
+        question_bank_placeholder_aria: "\"Nieuwe naam voor toetsbank invoeren\""
+        question_bank_title: "Nieuwe naam voor toetsbank "
         select_question_bank: "Vragenbank selecteren"
       select_content_checkbox: 
         select_all_content: "Alle inhoud"
         select_migration_label: "Migratie-inhoud selecteren"
         select_specific_content: "Specifieke inhoud selecteren"
     unsupported_migration_type: "migration_type voor inhoud niet ondersteund"
-    upload_warning: "Door deze pagina te gaan verlaten zal je het uploadproces annuleren."
+    upload_warning: "Door deze pagina te verlaten zal het uploadproces geannuleerd worden."
     uploading: "Bezig met uploaden..."
     web_ct: 
       cancel: Annuleren
@@ -3427,7 +3488,7 @@ nl:
       course_list: Cursus(sen)
       no_files_help_label: "Meer informatie over de optie 'Bestanden niet downloaden'"
       no_files_help_text: "Het downloaden van bestanden van WebCT-cursussen kan erg lang duren, en kan ervoor zorgen dat het migratieproces mislukt. In plaats daarvan kun je de inhoud handmatig kopiëeren en daarna deze optie kiezen om de rest van de inhoud te migreren."
-      no_files_help_title: "\"Meer informatie over het ontbreken van de optie 'Geen bestanden downloaden'\""
+      no_files_help_title: "\"Meer informatie over het ontbreken van de optie 'Bestanden niet downloaden'\""
       no_files_help_title_icon: "Meer informatie over de optie 'Bestanden niet downloaden'"
       options: Opties
       skip_all_files: "Bestanden van deze cursus niet downloaden"
@@ -3733,9 +3794,9 @@ nl:
         module_complete_when: "Deze module is voltooid wanneer"
         modules: 
           before_students_view: "Voordat cursisten deze module kunnen bekijken"
-        new_tab: "Deze tool op een nieuw tabblad laden"
+        new_tab: "In een nieuw tabblad laden"
         publish_final_grade: "Eindcijfer voor de cursist publiceren als de module voltooid is"
-        require_sequential_progress: "cursisten moeten in de juiste volgorde aan de vereisten voor deze module voldoen "
+        require_sequential_progress: "Cursisten moeten in de juiste volgorde aan de vereisten van deze module voldoen "
         sort_by: "Sorteren op"
         title: Titel
         unlock_at: "Ontgrendelen op"
@@ -3777,6 +3838,9 @@ nl:
     content_next: 
       add_prerequisite: "Vereisten toevoegen aan *%{module}*"
       assignment_points_possible: "van %{points_possible}"
+      button: 
+        delete_label: "Eerste vereiste verwijderen"
+        delete_title: "Eerste vereiste verwijderen"
       buttons: 
         add_module: "Module toevoegen"
         add_prerequisite: "Vereiste toevoegen"
@@ -3916,7 +3980,7 @@ nl:
         aria: 
           module_options: 
             label: "Module opties"
-      module_will_unlock_at: "wordt ontgrendeld *%{unlock_date}*"
+      module_will_unlock_at: "Wordt *%{unlock_date}* ontgrendeld "
       progression_complete_count: "*%{count}* voltooid"
       progression_started_count: "*%{count}* voortgang"
       reorder_modules: "Slepen om modules opnieuw te ordenen"
@@ -3976,10 +4040,10 @@ nl:
       links: 
         edit_item: "Itemdetails bewerken"
         edit_item_details_label: "Itemdetails bewerken"
-        indent: "inspringen vergroten"
-        indent_label: "inspringen vergroten"
+        indent: "Inspringen vergroten"
+        indent_label: "Inspringen vergroten"
         outdent: "Inspringen verkleinen"
-        outdent_label: "Inspringen vergroten"
+        outdent_label: "Inspringen verkleinen"
         remove_item: "Dit item uit de module verwijderen"
         remove_item_label: "Dit item uit de module verwijderen"
       max_score: 
@@ -4061,8 +4125,8 @@ nl:
           remove_prerequisite: "Deze vereiste verwijderen"
     progressions: 
       titles: 
-        student_progress: Studievoortgang
-        student_progression: "Modulevoortgang per cursist"
+        student_progress: "Voortgang van cursist"
+        student_progression: "Voortgang van module per cursist"
     still_needs_completing: "Moet nog  voltooid worden"
     titles: 
       add: "Module toevoegen"
@@ -4074,6 +4138,7 @@ nl:
     url_show: 
       new_tab: "Deze site moet in een nieuw browservenster geopend worden."
       open_url_button: "%{title} in een nieuw venster openen"
+      tool_insecure_warning: "Je probeert onveilige inhoud te starten vanaf een beveiligde site (canvas). Sommige internet browsers kunnen het uploaden van deze inhoud voorkomen."
   context_modules_api: 
     invalid_position: "Ongeldige positie"
   conversation_dialog: 
@@ -4083,7 +4148,7 @@ nl:
     no_course: "Geen cursus"
     select_course: "Cursus selecteren"
   conversation_message: 
-    subject: "Persoonlijk bericht"
+    subject: Privébericht
     subject_specified: "Privébericht: %{subject}"
     users_added: 
       one: "%{user} is toegevoegd aan de discussie door %{current_user}"
@@ -4225,9 +4290,9 @@ nl:
       reply: Beantwoorden
       reply_all: "Allen beantwoorden"
       search_by_user: "Zoeken voor gebruiker"
-      search_for_recipients: "Op gebruiker zoeken"
+      search_for_recipients: "Op geadresseerde zoeken"
       search_names_groups_courses: "Namen, groepen en cursussen zoeken"
-      sending: "Bezig met verzenden"
+      sending: "bezig met verzenden"
       sent: Verzonden
       settings: Instellingen
       starred: "Met ster"
@@ -4247,6 +4312,7 @@ nl:
       total_messages: "Totaal aantal berichten"
       unread: Ongelezen
       unstar_conversation: "Ster van gesprek verwijderen"
+    message_deleted: "Bericht verwijderd!"
     message_detail: 
       no_subject: "Geen onderwerp"
     message_form: 
@@ -4404,6 +4470,7 @@ nl:
       id: ID
       points_possible: "Maximaal aantal punten"
       read_only_field: (alleen-lezen)
+      root_account: Hoodfaccount
       section: Sectie
       sis_login_id: SIS-login-ID
       sis_user_id: SIS-gebruiker's-ID
@@ -4444,6 +4511,7 @@ nl:
   course_copy_name: "Canvas-cursus kopiëren"
   course_copy_no_course_error: "Kan de broncursus niet vinden."
   course_copy_not_allowed_error: "Je mag de broncursus niet kopiëren."
+  course_enrollment_title: "Aantal inschrijvingen"
   course_exports: 
     errors: 
       assignment: "De opdracht  \"%{title}\" kan niet  geexporteerd worden"
@@ -4490,6 +4558,10 @@ nl:
       reset_course_menu: Resetten
   course_logging: 
     blank_placeholder: "-"
+    event_source: 
+      api: Api
+      manual: Handmatig
+      sis: SIS
     event_type: 
       concluded: Voltooid
       copied_from: "Gekopieerd van"
@@ -4499,6 +4571,8 @@ nl:
       published: Gepubliceerd
       reset_from: "Reset van"
       reset_to: "Reset naar"
+      restored: Teruggezet
+      unconcluded: "Niet afgemaakt"
       updated: bijgewerkt
     field_label: 
       abstract_course_id: Cursus-samenvatting-id
@@ -4611,6 +4685,7 @@ nl:
       section_enrollments: Sectie-inschrijvingen
   course_statistics: 
     unknown: onbekend
+  course_status_title: "Status van het gedeelte van de cursus"
   course_users: 
     greater_than_three: "Voer een zoekterm in van drie of meer tekens"
     unknown_error: "Er is  tijdens het zoeken iets misgegaan, probeer het opnieuw."
@@ -4714,6 +4789,7 @@ nl:
               **Log in** of ***registreer jezelf*** om deze cursus te claimen.
         files: "Op het tabblad Bestanden kunnen jouw cursisten dias over lezingen, voorbeelddocumenten en studiehulpmiddelen of enig ander materiaal die ze willen downloaden, delen. Het uploaden en indelen van bestanden is gemakkelijk in Canvas. We zullen je weergeven hoe."
         home: "Als personen de cursus bezoeken, is dit de pagina die ze te zien krijgen. U kunt de pagina instellen als een activiteitenoverzicht, een lijst van cursusmodules, een syllabus of een zelfgemaakte pagina. De standaardinstelling is een cursusactiviteitenoverzicht. Om dit aan te passen, klikt u op %{change_layout}."
+        home2: "Dit is de pagina dat personen die deze pagina bezoeken zullen zien. Je kunt het instellen om activiteiten, de lijst met cursusmodulen, een syllabus, of een aangepaste pagina die je zelf hebt geschreven wilt weergeven. De standaard keuze is de activeiten van de cursus. Klik gewoon op %{choose_home_page} om dit aan te passen. "
         import: "Als je hiervoor een ander cursusbeheersysteem hebt gebruikt, heb je waarschijnlijk materiaal dat je naar Canvas wilt verplaatsen. We kunnen je laten zien hoe gemakkelijk je jouw inhoud in Canvas kunt migreren."
         navigation: "Standaard zijn alle links voor een cursus geactiveerd. Cursisten krijgen geen links naar secties zonder inhoud  te zien. Als je bijvoorbeeld nog geen toetsen hebt gemaakt, zullen ze ook geen link naar toetsen zien. Je kunt de links sorteren en ze opzettelijk verbergen als er onderdelen van de cursus zijn die je  voor de cursisten wilt verbergen."
         publish: 
@@ -4804,6 +4880,7 @@ nl:
       role_not_found: "Rol %{role} bestaat niet."
       unauthorized: 
         switch_roles: "U hebt geen toestemming om van rol te veranderen"
+      unpublish: "Publicatie van de cursus kan niet ongedaan gemaakt worden als er studenten inzendingen bestaan."
     group_list: 
       headings: 
         groups: Cursusgroepen
@@ -4868,6 +4945,8 @@ nl:
         close: Klaar
         duplicates_removed: "Enkele duplicaten zijn verwijderd."
         email: E-mail
+        email_field_label: "De e-mailadressen van de gebruikers die je wilt toevoegen, gescheiden door komma's, invoeren. "
+        email_field_place_holder: "\"Student voorbeeld\" &lt;student@example.com&gt;, \"Achternaam, voornaam\" &lt;firstlast@example.com&gt;, justAnEmailAddress@example.com"
         example_formats: "Voorbeelden: gebruiker@voorbeeld.com, \"Voornaam Achternaam\" &lt;gebruiker@voorbeeld.com&gt;, \"Achternaam, Voornaam\" &lt;gebruiker@voorbeeld.com&gt;"
         form_instructions: "Een lijst met e-mailadressen typen of plakken in het veld hieronder:"
         go_back: "Opnieuw beginnen"
@@ -4925,6 +5004,7 @@ nl:
         no_people_found: "Geen personen gevonden"
         role: Rol
         section: Sectie
+        total_activity: "Totale activiteit"
         you_can_search_by: "Je kunt zoeken op:"
       section: 
         remove_user_from_course_section: "Gebruiker uit %{name} verwijderen"
@@ -4938,6 +5018,8 @@ nl:
         add_section: "Sectie toevoegen"
         move_course: "Cursus verplaatsen"
         update_course: "Cursusgegevens bijwerken"
+      course_conclude_at_warning_message: "De cursus is momenteel ingesteld om op middernacht te eindigen, dat betekent dat de dag van tevoren de laatste dag is dat de cursus actief is."
+      course_conclude_at_warning_title: "Cursus eindigt op middernacht"
       course_open_enrollment: "Deze cursus heeft een open inschrijving. Cursisten kunnen zichzelf voor deze cursus  inschrijven eenmaal je deze URL met hen deelt: *%{url}*. Als alternatief kunnen cursisten zich inschrijven via *%{url2}* en deze volgende deelname code gebruiken: *%{code}*"
       course_open_enrollment_without_code: "Deze cursus kent open inschrijving. Cursisten kunnen zichzelf voor deze cursus inschrijven eenmaal je deze URL met hen deelt: *%{url}*"
       course_overrides_term: "Hiermee overschrijf je beschikbaarheidsinstellingen voor alle periodes."
@@ -4991,6 +5073,8 @@ nl:
         course_lock_all_announcements: "Opmerkingen op aankondigingen uitschakelen"
         course_name: Naam
         course_section_name: "Een nieuwe sectie toevoegen"
+        course_status_published: "Cursus is gepubliceerd"
+        course_status_unpublished: "Cursus is niet gepubliceerd"
         course_visibility: Zichtbaarheid
         enrollment_term_id: Periode
         grading_scheme: Beoordelingsschema
@@ -5021,7 +5105,7 @@ nl:
           delete_section: "Sectie verwijderen"
           edit_section: "Sectie bewerken"
       megabytes: megabyte
-      navigation_keyboard_hint: "Zet de virtuele cursor of virtuele buffer op jouw schermlezer uit als je een schermlezer gebruikt, om de volgorde van de koppelingen in de cursusnavigatie te wijzigen (druk op insert-z voor JAWS). Drukken op control home om naar de top van de pagina te springen, dan op de tab key drukken tot je de eerste cursusnavigatie link bereikt. Op het pijltje naar boven en naar beneden drukken tot je de koppeling hoort waar je naar toe wilt bewegen en dan op spatie drukken  om deze te selecteren. Dan op de key pijtjes omhoog en omlaag drukken tot je de nieuwe positie opspoort. Tenslotte, weer op spatie drukken om de koppeling te plaatsen daar waar je direct na de huidige koppeling naar toe wilt bewegen. Als dat klaar is, de vituele buffer/cursor opnieuw inschakelen."
+      navigation_keyboard_hint: "De virtuele cursor of virtuele buffer op de schermlezer uitzetten als een schermlezer gebruikt wordt, om de volgorde van de koppelingen in de cursusnavigatie te wijzigen (druk op insert-z voor JAWS). Op control-home drukken om naar de top van de pagina te springen, dan op de tab key drukken tot je de eerste cursusnavigatie koppeling bereikt. Op het pijltje naar boven en naar beneden drukken tot je de koppeling hoort waar je naar toe wilt bewegen en dan op spatie drukken om deze te selecteren. Dan op de pijtjes naar boven en naar beneden drukken tot je de nieuwe positie opspoort. Tenslotte, weer op spatie drukken om de koppeling te plaatsen daar waar je direct na de huidige koppeling naar toe wilt bewegen. Als dat klaar is, de virtuele buffer/cursor opnieuw inschakelen."
       no_date: "Geen datum ingesteld"
       no_language_preference: "Niet ingesteld (in te stellen door gebruiker, standaard: %{language})"
       none: Geen
@@ -5047,6 +5131,8 @@ nl:
         tools: Apps
       titles: 
         edit_navigation: "Cursusnavigatie bewerken"
+      tooltips: 
+        cannot_unpublish_course: "Je kunt publicatie van deze cursus niet ongedaan maken als er beoordeelde studenten inzendingen bestaan"
       transifex_message: "Lid worden van de [Canvas-vertaalcommunity](%{transifex_url})"
       turnitin: "deze opmerkingen zullen aan cursisten weergegeven worden als ze een ingeschakelde Turnitin opdracht inleveren"
       view_grading_scheme: "Beoordelingsschema bekijken"
@@ -5075,6 +5161,7 @@ nl:
       acting_as: "U bekijkt deze cursus momenteel met de rol: %{enrollment_type}. Daarom beschikt u alleen over de bevoegdheden en toegang die bij deze rol horen."
       buttons: 
         update_layout: "Lay-out bijwerken"
+      change_home_page: Verander
       details: 
         assignments: "Deze weergave geeft de **lijst met opdrachten** voor deze cursus weer, met komende en huidige opdrachten bovenaan."
         confirm_unenroll: "Weet je zeker dat je je wilt uitschrijven voor deze cursus? Je kunt dan niet langer het cursusrooster zien of direct met de docenten communiceren. Bovendien zul je niet langer gebeurtenissen die tijdens de cursus plaatsinden  in jouw gegevensstroom en als opmerkingen zien."
@@ -5097,7 +5184,11 @@ nl:
           recent_activity_dashboard: "Dashboard met recente activiteiten"
           syllabus: Syllabus
       empty_body: "Geen inhoud"
+      front_page_not_set: "Voorpagina moet eerst ingesteld worden"
+      headers: 
+        course_status: "Status van de cursus"
       headings: 
+        choose_home_page_title: "Startpagina kiezen"
         confirm_unenroll: "Uitschrijving bevestigen"
         importing: "Deze cursus wordt nu geïmporteerd"
         set_layout: "Lay-out van startpagina instellen"
@@ -5109,6 +5200,7 @@ nl:
       license_notice: "Deze cursusinhoud wordt aangeboden onder een %{license_type}-licentie. De inhoud van deze cursus valt onder deze licentie, tenzij anders vermeld."
       links: 
         change_layout: "Lay-out van startpagina wijzigen"
+        choose_home_page: "Startpagina kiezen"
         course_setup: "Controlelijst voor cursus-setup"
         course_stream: "Gegevensstroom van de cursus zien"
         drop_course: "Deze cursus neerzetten"
@@ -5285,6 +5377,7 @@ nl:
       student: 
         count: "Verkeerd aantal cursisten"
         ratio: "Verkeerde cursistratio"
+  current_grade_title: "Huidige cijfer"
   curve_grades_dialog: 
     average_score: "Gemiddelde score"
     buttons: 
@@ -5296,6 +5389,10 @@ nl:
       assign_blanks: "Nullen toewijzen aan cursisten die geen opdracht ingediend hebben"
     out_of_points_possible: "vanuit %{assignment.points_possible}"
     this_is_permanent: "Gewijzigde cijferverdeling kan niet ongedaan gemaakt worden. De cijfers van vóór de cijferverdeling zijn nog wel beschikbaar, maar de gewijzigde verdeling kan niet teruggedraaid worden."
+  custom_grade_export_title: "Exporteren van het cijfer CampusVue"
+  custom_outcomes_title: "Aangepaste resultaten"
+  cv_non_graded_data__title: "Rapport van niet beoordeelde opdrachten Campus Vue"
+  cv_submission_data__title: "Inzendingen gegevens Campus Vue"
   d2l_display: Desire2Learn
   d2l_file_description: "D2L-exportindeling (.zip)"
   d2l_name: "D2L Converter"
@@ -5308,10 +5405,10 @@ nl:
       other: " %{count} aankondigingen uitvouwen"
     assignments_collapse: 
       one: "%{count} opdrachtmelding samenvouwen"
-      other: "%{count} opdrachtmeldingen samenvouwen"
+      other: "%{count} opdracht kennisgeving samenvouwen"
     assignments_expand: 
       one: "%{count} opdrachtmelding uitvouwen"
-      other: "%{count} opdrachtmeldingen uitvouwen"
+      other: "%{count} opdracht kennisgeving uitvouwen"
     conversations_collapse: 
       one: "%{count} gespreksbericht samenvouwen"
       other: " %{count} gespreksberichten samenvouwen"
@@ -5470,7 +5567,7 @@ nl:
       begin_trial: "Proefabonnement beginnen"
       bus_finance_purchasing_director: "Dir Bus/Financiën/Inkoop"
       c_level: C-niveau
-      choose: Kiezen
+      choose: "Een kiezen"
       cio: Informatiemanager
       corporate: Zakelijk
       dean: Decaan
@@ -5490,7 +5587,7 @@ nl:
       instructional_designer: "Instructie ontwerper"
       instructional_media_svcs_dir: "Dir instructioneel mediadienst"
       invalid_email: "Geen geldig e-mailadres"
-      k12: K12
+      k12: "Basis onderwijs, lager en hoger middelbaar onderwijs"
       k12_for_profit: "For-profit lager en hoger middelbaar onderwijs"
       labels: 
         current_lms: "Huidige ELO"
@@ -5501,8 +5598,8 @@ nl:
         phone: Telefoonnummer
         school_name: School/organisatie
         school_position: Titel
-        type_what_you_hear: "Type wat je hoort"
-        type_what_you_see: "Type wat je ziet"
+        type_what_you_hear: "Wat je hoort typen"
+        type_what_you_see: "Wat je ziet typen"
         username: E-mail
       library_media_specialist: "Specialist bibliotheek/media"
       lms_admin: ELO-beheerder
@@ -5514,7 +5611,7 @@ nl:
       other: Andere
       other_lms: "Andere dag"
       other_title: "Andere dag"
-      personalize_demo: "Jouw demo bewerken"
+      personalize_demo: "Jouw demo aanpassen"
       personalizing: "Bezig met personaliseren..."
       principal: Schooldirecteur
       proprietary_lms: Gepatenteerd
@@ -5618,7 +5715,7 @@ nl:
       close_for_comments: "Sluiten voor opmerkingen"
       delete: Verwijderen
       due: Inleverdatum
-      graded_discussion: "Beoordeelde discussie"
+      graded_discussion: "Beoordeelde discussie:"
       last_post_date: "Het laatste gepost %{display_last_reply_at}"
       manage: Beheren
       move: "Verplaats naar&hellip;"
@@ -5631,7 +5728,7 @@ nl:
     discussion_feed_title: "%{title} discussie feed"
     discussion_list: 
       no_pinned_discussions: "Je hebt momenteel geen vastgezette discussies."
-      pinned_instructions: "Een discussie hierheen slepen om deze boven aan de discussiepagina voor cursisten vast te zetten."
+      pinned_instructions: "Een discussie hier slepen om deze boven aan de pagina vast te zetten of selecteer vastzetten van het instellingen menu van de discussie."
       there_are_no_discussions_show: "Er zijn geen discussies om weer te geven."
     discussions_settings_view: 
       allow_student_discussion_editing: "Bewerken en verwijderen van hun eigen berichten"
@@ -5679,6 +5776,8 @@ nl:
     error_draft_state_announcement: "Kan dit onderwerp niet instellen op de conceptstatus omdat het een aankondiging is."
     error_draft_state_unauthorized: "Je bent niet gemachtigd om dit onderwerp in de conceptstatus in te stellen."
     error_draft_state_with_posts: "Dit onderwerp kan niet in de conceptstatus ingesteld worden omdat het berichten bevat."
+    error_group_announcement: "Je kunt geen groepsdiscussie gebruiken op een aankondiging."
+    error_group_change: "Je kunt de groepering voor een discussie met antwoorden niet veranderen."
     errors: 
       bad_scope: "bereik is tegenstrijdig"
     group_assignment_discussion_entry: 
@@ -5686,6 +5785,10 @@ nl:
         one: "1 bericht"
         other: "%{count} berichten"
       separated_conversation_notice: "Het  gesprek over dit onderwerp is over verschillende groepen verdeeld. Hieronder staan alle groepsonderwerpen waar je toegang toe hebt."
+    group_discussion: 
+      separated_conversation_notice: "Aangezien dit een groepsdiscussie is, heeft elke groep zijn eigen discussie over dit onderwerp. Hier zijn degene waarop je toegang hebt:"
+    group_discussion_locked: "Studenten hebben al aan deze discussie toegevoegd, zodat de instellingen van de groep niet kunnen worden veranderd."
+    group_discussion_title: Groepsdiscussie
     index: 
       course_discussions_atom_feed_title: "Atom-feed cursusdiscussies"
     index_view: 
@@ -5708,13 +5811,13 @@ nl:
       your_search_did_not_match_any_discussion_topics: "Het zoeken van jou heeft geen match met welk discussie-onderwerp dan ook."
     new_and_total_badge: 
       reply_count_tooltip: 
-        one: "1 antwoord"
-        other: "%{count} antwoorden"
-        zero: "Geen antwoorden"
+        one: "1 antwoord."
+        other: "%{count} antwoorden."
+        zero: "Geen antwoorden."
       unread_count_tooltip: 
-        one: "1 ongelezen antwoord"
-        other: "%{count} ongelezen antwoorden"
-        zero: "Geen ongelezen antwoorden"
+        one: "1 ongelezen antwoord."
+        other: "%{count} ongelezen antwoorden."
+        zero: "Geen ongelezen antwoorden."
     page_nav: 
       Page: Pagina
       current_page: Huidig
@@ -5722,9 +5825,9 @@ nl:
       last_page: Laatste
     points_possible_number: "Mogelijke punten moeten een getal zijn"
     reply_count_tooltip: 
-      one: "1 antwoord"
-      other: "%{count} antwoorden"
-      zero: "Geen antwoorden"
+      one: "1 antwoord."
+      other: "%{count} antwoorden."
+      zero: "Geen antwoorden."
     show: 
       add_rubric: "Rubric toevoegen"
       announcement_closed: "Deze aankondiging is voor opmerkingen gesloten"
@@ -5781,11 +5884,12 @@ nl:
       locked: "Dit onderwerp is  voor opmerkingen gesloten"
       this_topic_is_used_for_grading: "Dit onderwerp wordt gebruikt voor beoordeling"
       topic_podcast_feed: "Onderwerp podcastfeed"
+    this_is_a_group_discussion: "Dit is een groepsdiscussie"
     topic_deleted_notice: "%{topic_title} succesvol verwijderd"
     unread_count_tooltip: 
-      one: "1 ongelezen antwoord"
-      other: "%{count} ongelezen antwoorden"
-      zero: "Geen ongelezen antwoorden"
+      one: "1 ongelezen antwoord."
+      other: "%{count} ongelezen antwoorden."
+      zero: "Geen ongelezen antwoorden."
     user_settings_view: 
       manually_mark_as_read: "Berichten handmatig markeren als gelezen"
       my_settings: "Mijn instellingen"
@@ -5855,7 +5959,7 @@ nl:
     subscribe: "Voor dit onderwerp aanmelden"
     subscribed: Aangemeld
     subscribed_hint: "Je bent aangemeld voor dit onderwerp. Klikken om je aanmelding op te heffen."
-    toggle_message: "zichtbaarheid van discussies inschakelen"
+    toggle_message: "zichtbaarheid van sectie in-/uitschakelen"
     uknown_author: "Onbekende auteur"
     unknown: Onbekend
     unknown_author: "Onbekende auteur"
@@ -5875,6 +5979,9 @@ nl:
     buttons: 
       create_rubric: "Rubric maken"
       update_rubric: "Rubric bijwerken"
+    discussion_points_possible: 
+      one: "%{count} punt mogelijk"
+      other: "%{count} mogelijke punten"
     errors: 
       load_rubrics_failed: "Het laden van de rubrics is mislukt, probeer het opnieuw"
     messages: 
@@ -5971,6 +6078,7 @@ nl:
     student: Cursist
     teacher: Docent
     teacher_assistant: Onderwijsassistent
+  enrollment_summary_title: "Samenvatting van inschrijving"
   enrollment_term: 
     errors: 
       not_unique: "SIS-ID \"%{sis_source_id}\" is reeds in gebruik"
@@ -5986,7 +6094,7 @@ nl:
     errors: 
       compiling: "Er is een fout opgetreden tijdens het compileren  van je ePortfolio. Probeer het later opnieuw."
       missing_file: "Selecteer een bestand"
-      name_required: "Naam is verplicht"
+      name_required: "Naam is vereist"
       name_too_long: "Naam is te lang"
       section_name_invalid: "Sectienaam is niet geldig"
       section_name_too_long: "Sectienaam is te lang"
@@ -6275,6 +6383,7 @@ nl:
         adding_feed: "Bezig met toevoegen van Feed..."
       descriptions: 
         add_new_feed: "Je kunt automatisch berichten van een RSS- of Atom-feed posten als aankondigingen voor deze cursus. Plak gewoon de URL van de feed hieronder en alle nieuwe invoer wordt toegevoegd."
+      feed_url_label: "URL van de feed"
       keyword: "Trefwoord:"
       labels: 
         match_phrase_checkbox: "Alleen berichten posten met een specifieke woordgroep in de titel"
@@ -6310,7 +6419,9 @@ nl:
       delete: Verwijderen
     cannot_locate_launch_request: "Kan startaanvraag niet vinden. Probeer het opnieuw."
     consumer_key: Consument-sleutel
+    course_home_sub_navigation_configured: "Start sub-navigatie van de cursus geconfigureerd"
     course_navigation_configured: "Cursusnavigatie geconfigureerd"
+    course_settings_sub_navigation_configured: "Sub-navigatie instellingen van de cursus geconfigureerd"
     delete: Verwijderen
     dialog_title_add_app: "App toevoegen"
     dialog_title_edit_tool: "Extern hulpprogramma bewerken"
@@ -6393,6 +6504,8 @@ nl:
       new_tab: "Deze tool dient in een nieuw venster geopend te worden"
       new_tab_expired: "De sessie voor deze tool is verlopen. Herlaad de pagina om opnieuw toegang te krijgen."
       new_tab_loaded: "Deze tool is in een nieuw venster geopend. Herlaad deze pagina om opnieuw toegang te krijgen."
+      tool_insecure_warning: "Je probeert onveilige inhoud te starten vanaf een beveiligde site (canvas). Sommige internet browsers kunnen het uploaden van deze inhoud voorkomen."
+      tool_load_failure: "Het lijkt erop dat jouw inhoud niet gaat loaden. Je kunt deze toets gebruiken om het in een nieuw tabblad proberen te starten."
     user_navigation_configured: "Gebruikersnavigatie geconfigureerd"
   facebook: 
     authorization_required: "Alleen geautoriseerde gebruikers hebben toegang tot deze pagina"
@@ -6441,6 +6554,7 @@ nl:
       notifications_config_notice: "Canvas kan automatisch meldingen  naar jouw Facebook-account doorzenden. Hieronder zie je een overzicht van de verschillende typen meldingen die je kunt verzenden. Je kunt op elk moment of hier of in Canvas jouw meldingsvoorkeuren wijzigen."
       settings_title: "Meldingsinstellingen voor Canvas"
       updating_preferences: "Bezig met updaten van voorkeuren..."
+  faculty_success_tile: "Rapport over het succes van de faculteit"
   feature_flags: 
     feature_flag: 
       allow: Toestaan
@@ -6458,6 +6572,7 @@ nl:
       feature_options: "Functie opties"
       no_features_available: "Er zijn momenteel geen functies beschikaar"
   features: 
+    better_file_browsing: "Beter bladderen van bestanden"
     differentiated_assignments: " Gedifferentieerde opdrachten"
     draft_state: Concept-status
     draft_state_account_disable_warning: "Het uitschakelen van deze functie zal impact hebben op bestaande cursussen. Neem bij voorbeeld bij het uitschakelen van deze functie, contact op met jouw Canvas Success Manager\n"
@@ -6466,8 +6581,11 @@ nl:
     high_contrast: "Hoge contrast stijlen gebruiken"
     html5_first_videos: "Voorkeur voor HTML5 om video af te spelen"
     learning_mastery_gradebook: "Cijferlijst vakbekwaamheid leren"
+    new_quiz_moderate: "Pagina voor nieuwe toets"
+    new_quiz_statistics: "Pagina van statistieken voor nieuwe toets"
     new_styles: "Nieuwe stijlen gebruiken"
     post_grades: "Eindcijfers op SIS posten"
+    student_groups: "Pagina van nieuwe studenten groepen"
     student_outcome_gradebook: "Resultaat cijferlijst\""
   file_browser_view: 
     folder_tree_instructions: "Het toetspijltje omhoog en toetspijltje omlaag  gebruiken om door de boomstructuur te navigeren. Op toetspijltje naar rechts drukken om bestanden uit te vouwen, op toetspijltje naar links drukken om bestanden samen te vouwen en op entertoets drukken om een afbeelding te kiezen."
@@ -6678,12 +6796,17 @@ nl:
     invitation: uitnodiging
     question: vraag
     warning: waarschuwing
+  google_doc_accounts_title: "Google Doc Accounts"
   google_docs_domain_restriction_description: "Beperking van Google Docs Domein staat toe dat inzendingen en samenwerkingen in Googel Docs beperkt worden tot een enkel domein. Cursisten die proberen opdrachten of samenwerkingen in een niet goedgekeurd domein in te zenden zullen een foutbericht ontvangen om ze te waarschuwen dat ze hun Google Docs integratie moeten bijwerken. \n"
   grade_display_warning_dialog: 
     grade_display_warning: 
       checkbox: "Deze cursus nog niet een keer aangeven."
       warning: Waarschuwing
   grade_export_title: Cijferexport
+  grade_summary: 
+    graph_title: "Gemiddelde %{mean}, hoog %{high}, laag %{low}"
+    outcome: 
+      alignment_count: "*%{count}* uitlijningen"
   gradebook: 
     alerts: 
       no_active_students: "Sorry, er zijn of geen cursisten actief in de cursus of er zijn geen cursisten die door jou beoordeeld kunnen worden. "
@@ -7049,11 +7172,14 @@ nl:
       close_rubric: "Rubric sluiten"
       close_score: Sluiten
       close_score_screenreader: "Details over scores sluiten"
+      collapse: Samenvouwen
       comment_count: 
         one: 1opmerking
         other: "%{count} opmerkingen"
       comment_count_screenreader: "Opmerkingen lezen"
       comments: Opmerkingen
+      disabled_for_student_view: "Scores van test studenten zijn niet in de statistieken van het cijfer meegerekend."
+      expand: Uitvouwen
       faculty_journal: "Faculteitsnieuws voor %{user}"
       for_course: "Voor de cursus,"
       headers: 
@@ -7088,6 +7214,7 @@ nl:
       page_title: "Cijfers voor  %{student}"
       percent: Percentage
       print_grades: "Cijfers afdrukken"
+      score_details: "Details van de score"
       see_rubric_results: "Rubricresultaten zien"
       see_rubric_results_screenreader: "Rubricresultaten zien"
       see_scoring_details: "Details van de score zien"
@@ -7327,7 +7454,7 @@ nl:
         media_comment: "Media opmerking"
         speech_recognition: Spraakherkenning
     speed_grader_disabled: "SpeedGrader is  voor deze cursus uitgeschakeld"
-    speedgrader_enabled_only_for_published_content: "SpeedGrader is alleen voor gepubliceerde inhoud ingeschakeld."
+    speedgrader_enabled_only_for_published_content: "Speedgrader is alleen voor gepubliceerde inhoud ingeschakeld."
     student: 
       new_student: "Nieuwe cursist"
       student: Cursist
@@ -7438,6 +7565,7 @@ nl:
       imported: "Geïmporteerde groepen"
       student_organized: "Groepen cursisten"
       uncategorized: "Niet gecategoriseerd"
+    invalid_auto_leader: "AutoLeader moet een van de volgende waarden hebben: %{values}"
     invalid_self_signup: "Zelf inschrijven moet een van de volgende waarden hebben: %{values}"
     name_required: "Naam is verplicht"
     name_reserved: "%{name} is een gereserveerde naam."
@@ -7606,6 +7734,7 @@ nl:
     group_count: 
       one: "1 groep"
       other: "%{count} groepen"
+    group_limit_number: "Groepslimiet moet een getal zijn"
     group_name: Groepsnaam
     groups_count: "Groepen (%{count})"
     index: 
@@ -7663,11 +7792,15 @@ nl:
         unassigned_users: "Niet-toegewezen gebruikers"
       group_category_create: 
         allow_self_signup: "Zelfinschrijving toestaan"
+        auto_first_group_leader: "Eerste student als groepsleider aanstellen "
+        auto_group_leader: "Automatisch een student als groepsleider aanstellen"
+        auto_random_group_leader: "Willekeurige student als groepsleider aanstellen"
         cancel: Annuleren
         create_groups: " %h{num_groups} nu groepen maken"
         create_groups_manually: "Ik zal groepen handmatig maken"
         group_set_name: "Naam van groepsreeks"
         group_structure: Groepsstructuur
+        leadership: Leiderschap
         leave_group_limit_blank: "Leeglaten voor geen limiet"
         limit_group_size: "Groepen beperken tot %h{group_limit} leden"
         require_same_section: "Groepsleden moeten in dezelfde sectie zitten"
@@ -7683,12 +7816,12 @@ nl:
         delete_category_option: Verwijderen
         edit_category_option: Bewerken
         group: Groep
-        group_limit_blurb: "Groepen zijn beperkt tot *%{group_limit}* leden."
+        group_limit_blurb: "Groepen worden beperkt tot *%{group_limit}* leden."
         message_all_unassigned_option: "Bericht naar alle niet toegewezen studenten"
         randomly_assign_students_option: "Cursisten willekeurig toewijzen"
         restricted_self_signup_blurb: "Alle  cursisten uit een groep moeten in dezelfde sectie zitten."
         search: zoeken
-        self_organized_warning: "Deze groepen zijn door cursisten zelf ingedeeld. Cursisten kunnen niet tegelijkertijd, zoals in andere typen groepen, deel uit maken van meer dan een van deze groepen, dus deze groepen zijn niet geschikt voor het beoordelen van opdrachten"
+        self_organized_warning: "Deze groepen zijn door cursisten zelf ingedeeld. Cursisten kunnen niet tegelijkertijd, zoals in andere typen groepen, deel uit maken van meer dan een van deze groepen, dus deze groepen zijn niet geschikt voor het beoordelen van opdrachten."
         self_signup_blurb: "Zelf inschrijven is geactiveerd voor deze groepen."
         self_signup_help_tooltip: "Wat is zelf inschrijven bij groepen?"
         settings: Instellingen
@@ -7698,6 +7831,7 @@ nl:
       group_category_edit: 
         allow_self_signup: "Zelfinschrijven toestaan"
         cancel: Annuleren
+        group_limit_override: "Dit veranderen zal enige individuele ingestelde groepslimieten overschrijven"
         group_set_name: "Naam van groepsreeks"
         leave_group_limit_blank: "Leeglaten voor geen limiet"
         limit_group_size: "Groepen beperken tot %h{group_limit} leden"
@@ -7711,12 +7845,16 @@ nl:
         group_delete: Verwijderen
         group_edit: Bewerken
         group_full: Vol
+        group_leader: Groepsleider
         group_settings: Instellingen
         show_group_details: "Details voor groep %{name} weergeven"
         visit_group_homepage: "Startpagina van groep bezoeken"
       group_edit: 
         cancel: Annuleren
         group_join_level: Deelnemen
+        group_max_membership: "Groepen beperken tot"
+        group_max_membership_help: "(Blanco laten om max set groep te gebruiken)"
+        group_max_membership_members: leden
         group_name: Groepsnaam
         invitation_only: "Aleen uitnodiging"
         open: "Leden zijn vrij om deel te nemen"
@@ -7725,20 +7863,26 @@ nl:
       group_user: 
         assign_to_group: "Aan groep toewijzen"
         assign_user_to_group: "Aan een groep toewijzen %{name}"
+        edit_group_membership: "Lidmaatschap van %{name} veranderen"
+        group_leader: Groepsleider
         move: "verplaatsen naar…"
         move_to_new_group: "Naar een nieuwe groep verplaatsen %{name}"
         remove: Verwijderen
+        remove_as_leader: "Als leider verwijderen"
         remove_from_group: "Uit groep verwijderen %{name}"
+        remove_user_as_leader: "%{name} als leider verwijderen"
+        set_as_leader: "Als leider aanstellen"
+        set_user_as_leader: "%{name} als leider aanstellen"
       group_users: 
         add_student: "Een cursist toevoegen om te kunnen starten"
         add_user: "Een gebruiker toevoegen om te kunnen starten"
         no_matching_students: "Geen cursisten die overeenkomen"
         no_matching_users: "Geen gebruikers die overeenkomen"
-        no_students: "Deze groep heeft momenteel geen cursisten"
-        no_users: "Deze groep heeft momenteel geen gebruikers"
+        no_students: "Deze groep heeft momenteel geen cursisten."
+        no_users: "Deze groep heeft momenteel geen gebruikers."
       groups: 
         groups: Groepen
-        no_groups: "Deze groepset heeft momenteel geen groepen. Een groep toevoegen om te kunnen starten"
+        no_groups: "Deze groepsreeks heeft momenteel geen groepen. Een groep toevoegen om te kunnen beginnen."
         no_matching_groups: "Er zijn geen groepen die overeenkomen met jouw zoekterm"
         search: Zoek
         search_groups: "Groepen zoeken"
@@ -7751,6 +7895,7 @@ nl:
       self_signup_help: 
         about_self_signup_groups: "Over zelfinschrijvingsgroepen"
         self_signup_description: "Je kunt groepsreeksen maken waar studenten zich zelfstandig voor in kunnen schrijven. Cursisten zijn nog steeds beperkt tot een groep uit de reeks, maar op deze manier kunnen cursisten zichzelf in groepen indelen in plaats van dat de docent dit moet doen. Houd in gedachten dat studenten zichzelf van de ene naar de andere groep kunnen verplaatsen zolang deze optie is ingeschakeld."
+    max_membership_number: "Max lidmaatschap moet een getal zijn"
     member: 
       one: "1 (groeps)lid"
       other: "%{count} leden"
@@ -7842,6 +7987,7 @@ nl:
       x_new_in_discussions: 
         one: "*1* discussie"
         other: "*%{count}* discussies"
+    local: Plaatselijk
   high_contrast_description: |-
       Als je liever een hoog contrast versie van de gebruikersinterface van Canvas hebt, schakel dit dan in.
       Dit kan handig zijn voor personen met verminderd zichtsvermogen of die moeilijk kunnen lezen.
@@ -7853,6 +7999,7 @@ nl:
   icons: 
     discussion_submission: Discussie-inzending
     file_upload_submission: "Inzending via bestand uploaden"
+    media_submission: "Media inzending"
     online_url_submission: Online-URL-inzending
     quiz_submission: Testinzending
     text_entry_submission: Tekstinzending
@@ -7873,7 +8020,11 @@ nl:
   importers/context_module_importer: 
     migration_module_item_type: Module-item
   importers/course_content_importer: 
+    account_grading_standard_warning: "Kon geen standaard voor beoordeling van het account voor de cursus vinden"
+    copied_grading_standard_warning: "Kon geen gekopieerde standaard voor beoordeling van de cursus vinden."
+    due_dates_warning: "Kon de inleverdatum niet aanpassen."
     failed_import_media_objects: "Media objecten importeren mislukt"
+    file_import_warning: "Bestand %{file} kon niet gevonden worden"
   importers/learning_outcome_group_importer: 
     no_global_permission: "U bent niet geautoriseerd om globale leerdoelen te beheren, kan \"%{title}\" niet toevoegen"
   importers/learning_outcome_importer: 
@@ -7907,11 +8058,13 @@ nl:
       search_by_tag: "Zoeken op label"
     confirms: 
       default_delete_thing: "Weet je zeker dat je dit wilt verwijderen?"
+    course_time: "CURSUS:"
     datepicker: 
       titles: 
         am_pm: am/pm
     draft: Concept
     errors: 
+      cannot_view_document_in_canvas: "Dit document kan niet in Canvas weergegeven worden."
       cannot_view_document_inline: "Dit document kan niet inline bekeken worden."
       document_preview_processing: "De voorbeeldweergave van het document wordt momenteel verwerkt. Probeer het later opnieuw."
       field_is_required: "Dit veld is verplicht"
@@ -7932,6 +8085,7 @@ nl:
       minimize_youtube_video: " Video minimaliseren"
       view_equella_content_in_new_window: "De inhoud in een nieuw venster bekijken"
     loading: "Bezig met laden..."
+    local_time: "PLAATSELIJK:"
     no_description: "Geen beschrijving"
     no_items: "Geen items."
     no_results_found: "Geen resultaten gevonden"
@@ -7957,6 +8111,7 @@ nl:
       view_in_new_window: "In een nieuw venster bekijken"
     tooltips: 
       enter_search_terms: "Zoektermen invoeren"
+  invalid_points_possible: "De waarde van mogelijke punten voor deze opdracht moet nul of groter zijn."
   invalid_url_in_xml: "Ongeldige URL in XML. Ampersands moeten van een Escape-teken  voorzien worden."
   invalid_xml_syntax: "ongeldige xml syntax"
   jobs: 
@@ -8022,8 +8177,11 @@ nl:
       previous: Vorige
   labels: 
     lock_module_until: "Module tot een bepaalde datum vergrendelen"
+  last_submission_activity_title: "Activiteit van laatste inzending"
+  last_user_access_title: "Toegang van laatste gebruiker"
   layouts: 
     application: 
+      group_switch: Overschakelen
       instructure_description: "Instructure, makers van het open-source learning management system Canvas"
       keyboard_navigation: 
         close: "Op komma drukken om deze dialoog te sluiten"
@@ -8041,6 +8199,7 @@ nl:
         grades: Cijfers
       navigation: 
         main: Hoofdnavigatie
+        user_menu: Gebruikersmenu
       open_source_learning_management_system: "Open-source LMS"
     facebook: 
       title: Facebook-pagina
@@ -8070,6 +8229,7 @@ nl:
     no_context_found: "Het externe leerdoel kan niet gevonden worden voor \"%{title}\", er wordt een kopie gemaakt."
     no_description: "Geen beschrijving"
     no_global_permission: "U bent niet geautoriseerd om globale leerdoelen te beheren, kan \"%{title}\" niet toevoegen"
+  learning_outcome_assignment_type_title: "Type leerresultaat en opdracht"
   learning_outcome_group: 
     no_global_permission: "U bent niet geautoriseerd om globale leerdoelen te beheren, kan \"%{title}\" niet toevoegen"
   lib: 
@@ -8160,9 +8320,9 @@ nl:
       no_link: "[ Geen link ]"
     titles: 
       link_to_student: "Koppeling naar cursist"
-  linked_assignment_message: "gekoppeld aan opdracht %{title}"
-  linked_discussion_topic_message: "gekoppeld aan discussie-onderwerp %{title}"
-  linked_quiz_message: "gekoppeld aan toets %{title}"
+  linked_assignment_message: "gekoppeld aan opdracht '%{title}'"
+  linked_discussion_topic_message: "gekoppeld aan discussie-onderwerp '%{title}'"
+  linked_quiz_message: "gekoppeld aan toets '%{title}'"
   links: 
     dashboard: "Mijn dashboard"
     errors: 
@@ -8175,7 +8335,7 @@ nl:
     en: Engels
     nl: "Nederlands (crowd-sourced)"
   logged_out_user: "Uitgelogde gebruiker %{user_counter}"
-  m2c_file_description: "Moodle 1.9-zipbestand"
+  m2c_file_description: "Moodle 1.9/2.x"
   m2c_name: "Moodle Importer"
   manage_avatars: 
     errors: 
@@ -8384,6 +8544,7 @@ nl:
           attendee: Deelnemer
           attendees: Deelnemers
           cancel_reason: "Reden om te annuleren"
+          click_to_see_appointment: "Hier klikken om de afspraak te bekijken"
           click_to_see_assignment: "Klik hier om de opdracht te bekijken"
           date_and_time: Datum/tijd
           details: "Details over afspraak"
@@ -8810,6 +8971,7 @@ nl:
     assignment_resubmitted: 
       email: 
         html: 
+          link: "Hier klikken om de inzending te bekijken"
           link_text: "Bekijk de inzending"
           user_resubmitted: "Nieuwe inzending: %{user_name}, %{assignment_name}"
           user_resubmitted_sentence: "%{user_name} heeft net een nieuwe inzending ingeleverd voor %{assignment_name} voor de cursus %{course_name}"
@@ -8831,6 +8993,7 @@ nl:
     assignment_submitted: 
       email: 
         html: 
+          link: "Hier klikken om de inzending te bekijken"
           link_text: "Bekijk de inzending"
           user_submitted: "Inzending: %{user_name}, %{assignment_name}"
           user_submitted_sentence: "%{user_name} heeft net een inzending ingeleverd voor %{assignment_name} voor de cursus %{course_name}"
@@ -8852,6 +9015,7 @@ nl:
     assignment_submitted_late: 
       email: 
         html: 
+          link: "Hier klikken om de inzending te bekijken"
           link_text: "Bekijk de inzending"
           user_resubmitted_sentence: "%{user_name} heeft net een inzending te laat ingeleverd voor %{assignment_name} voor de cursus %{course_name}"
           user_submitted: "Opdracht te laat ingeleverd: %{user_name}, %{assignment_name}"
@@ -9001,9 +9165,11 @@ nl:
           reply_message: "Om te reageren op dit bericht, klikt u op de onderstaande link:"
           subject: "%{user_name} heeft jou net via Canvas een bericht gestuurd."
           unknown_user: "Onbekende gebruiker"
+          view_message: "Dit bericht in gesprekken bekijken"
         reply_message: "Om te reageren op dit bericht, klikt u op de onderstaande link:"
         subject: "%{user_name} heeft jou net via Canvas een bericht gestuurd."
         unknown_user: "Onbekende gebruiker"
+        view_message: "Dit bericht in gesprekken bekijken"
       facebook: 
         body: "%{user_name} heeft jou net via Canvas een bericht gestuurd."
         link_text: "Bericht bekijken"
@@ -9023,9 +9189,9 @@ nl:
         body: |-
             Hallo %{user},
             
-            %{course}, jouw cursus op het netwerk van Canvas, is een paar dagen geleden gestart en we hebben gemerkt dat je nog niet bent ingelogd. We wilden jou net een laatste herinnering sturen voor het geval dat je het vergeten bent.
+            %{course}, jouw cursus op het netwerk van Canvas, is een paar dagen geleden gestart en we hebben gemerkt dat jij je nog niet hebt aangemeld. We wilden jou nog een laatste herinnering sturen voor het geval dat je het vergeten bent.
             
-            Ga naar %{site} en voer jouw gebruikersnaam en wachtwoord in om in te loggen. Als je nog geen wachtwoord hebt ingesteld kun je dat hier doen: %{password_url}. 
+            Ga naar %{site} en voer jouw gebruikersnaam en wachtwoord in om aan te melden. Als je nog geen wachtwoord hebt ingesteld kun je dat hier doen: %{password_url}. 
             
             Als je gewoonweg deze bepaalde cursus niet kunt doen, voel je dan vrij om door onze catalogus te bladeren op %{site} om iets anders te zoeken dat je interesseert. Er worden regelmatig nieuwe cursussen toegevoegd!
             
@@ -9467,7 +9633,7 @@ nl:
     layout: 
       email: 
         html: 
-          click_to_preferences: "Hier klikken om jouw meldingsvoorkeuren te bewerken"
+          click_to_preferences: "Hier klikken om jouw meldingsinstellingen te bewerken"
     merge_email_communication_channel: 
       email: 
         body: "Er is een account voor jou gemaakt op %{host}, maar je hebt al een Canvas-account. Als je ze wilt samenvoegen, bezoek dan de volgende URL:"
@@ -9838,23 +10004,23 @@ nl:
     quiz_locked_until: "Deze toets is vergrendeld tot %{date}."
     quiz_regrade_finished: 
       email: 
-        body: "Een herberekening van de toets is voltooid %{quiz}"
+        body: "Een nieuwe beoordeling van de toets %{quiz} is voltooid"
         html: 
-          body: "Een herberekening van de toets is voltooid %{quiz}"
+          body: "Een nieuwe beoordeling van de toets %{quiz} is voltooid"
           link_message: "Je kunt de toets hier bekijken:"
-          subject: "Herberekening  van toets voltooid: %{quiz}, %{context}"
-        link_message: "Je kunt de toets hier bekijken"
-        subject: "Herberekening van de toets voltooid: %{quiz}, %{context}"
+          subject: "Nieuwe beoordeling van de toets voltooid: %{quiz}, %{context}"
+        link_message: "Je kunt de toets hier bekijken:"
+        subject: "Nieuwe beoordeling van de toets voltooid: %{quiz}, %{context}"
       facebook: 
-        body: "Herberekening van de toets voltooid: %{title}"
+        body: "Nieuwe beoordeling van de toets voltooid: %{title}"
       sms: 
-        body_sms: "Herberekening van de toets is voltooid: %{title}, %{context}"
+        body_sms: "Nieuwe beoordeling van de toets voltooid: %{title}, %{context}"
         more_info: "Meer informatie op %{url}"
       summary: 
-        body: "Een herberekening voor jouw toets %{title} is voltooid"
-        subject: "Toets herberekend: %{quiz}, %{context}"
+        body: "Nieuwe beoordeling van jouw toets %{title} is voltooid"
+        subject: "Toets opnieuw beoordeeld: %{quiz}, %{context}"
       twitter: 
-        body: "Canvas melding - Toest herberekend: %{quiz}"
+        body: "Canvas melding - Toest opnieuw beoordeeld: %{quiz}"
     quiz_unpublished_module: "Deze toets is onderdeel van een niet-gepubliceerde module en is nog niet beschikbaar."
     report_generated: 
       email: 
@@ -9921,8 +10087,8 @@ nl:
         html: 
           farewell: "Blijf leren!"
           greetings: "Hallo %{user},"
-          profile_reminder: "Vergeet niet jouw *profiel voor het Canvas-netwerk* in te stellen zodat anderen uit  de cursus weten te komen wie je bent. "
-          self_enrollment_confirmation: "Je hebt jouzelf succesvol ingeschreven voor %{course}, een cursus op het Canvas-netwerk!"
+          profile_reminder: "Vergeet niet jouw *profiel op Canvas-netwerk* in te stellen zodat anderen uit  de cursus te weten komen wie je bent. "
+          self_enrollment_confirmation: "Je hebt jezelf succesvol ingeschreven voor %{course}, een cursus op het Canvas-netwerk!"
           self_enrollment_registration: "Jouw inschrijving in %{course}"
           signature: Canvas-netwerk
         self_enrollment_registration: "Jouw inschrijving in %{course}"
@@ -9935,7 +10101,7 @@ nl:
         body: "%{author} heeft zojuist een nieuwe opmerking gemaakt op de inzending van %{user} voor %{assignment}"
         html: 
           body: "%{author} heeft zojuist een nieuwe opmerking gemaakt op de inzending van %{user} voor %{assignment}"
-          link_message: "U kunt de details van de inzending hier bekijken:"
+          link_message: "Hier klikken om het commentaar te bekijken"
           someone: Iemand
           subject: "Opmerking op inzending: %{user}, %{assignment}, %{context}"
           submission_comment_link_message: "Je kunt de details van de inzending door gebruik van onderstaande link beoordelen. Je kunt ook op deze opmerking antwoorden door op dit bericht te antwoorden."
@@ -9959,7 +10125,8 @@ nl:
         body: "%{author} heeft zojuist een nieuwe opmerking gemaakt op de inzending van %{user} voor %{assignment}"
         html: 
           body: "%{author} heeft zojuist een nieuwe opmerking gemaakt op de inzending van %{user} voor %{assignment}"
-          link_message: "Je  kunt de details van de inzending hier beoordelen:"
+          link_message: "Je  kunt de details van de inzending controleren door op de koppeling hieronder te drukken:"
+          review_submission: "Hier klikken om de inzending te controleren"
           someone: Iemand
           subject: "Opmerking op inzending: %{user}, %{assignment}, %{context}"
         link_message: "U kunt de details van de inzending hier bekijken:"
@@ -10185,6 +10352,7 @@ nl:
   migration_issues: 
     errors: 
       valid_workflow_state: "Moet een geldige workflow status sturen"
+  mississippi_sis_title: "SIS gegevens"
   module_item_types: 
     assignment: Opdracht
     disuccsion: Discussie
@@ -10232,11 +10400,11 @@ nl:
     progression_student_view: 
       show_progressions_for_student: "Voortgang van %{name} weergeven"
     progressions_index: 
-      back_to_modules: "Terug naar module-pagina"
+      back_to_modules: "Terug naar pagina met modules"
       no_students_found: "Er zijn geen cursisten gevonden"
       student_progress: "Voortgang van cursist"
   moodle_dropdown_many_warning_title: "Deze toetsbank heeft %{count} meerdere dropdown vragen die misschien niet goed geimporteerd zijn"
-  moodle_dropdown_warning_title: "Meerdere vervolgkeuzelijst-vragen zijn mogelijk verkeerd geimporteerd. "
+  moodle_dropdown_warning_title: "Meerdere vragen van de vervolgkeuzelijst zijn mogelijk verkeerd geimporteerd"
   moodle_formula_many_warning_title: "Deze toetsbank heeft %{count} formule vragen waarvan de mogelijke antwoorden opnieuw gegenereerd moeten worden"
   moodle_formula_warning_title: "Mogelijke antwoorden zullen voor formule vragen opnieuw gegenereerd moeten worden"
   move_dialog: 
@@ -10246,6 +10414,7 @@ nl:
     where_to_move: "Waar wil je *%{name}* naar toe verplaatsen?"
   move_dialog_select: 
     move_to_end: "-- Onderaan --"
+  multi_student_progress_title: "Voortgang van meerdere studenten"
   mute_dialog: 
     curving_assignments: "Cijfers van opdrachten bijstellen"
     grade_change_notifications: "Meldingen over cijfer-wijziging"
@@ -10258,6 +10427,8 @@ nl:
     sure_you_want_to_mute: "Weet je zeker dat je deze opdracht wilt verbergen? Terwijl deze opdracht verborgen wordt, zullen cursisten geen nieuwe meldingen ontvangen. Ze kunnen ze ook niet zien:"
   name: "Academic Benchmark Importer"
   new_facebook_message: "Er is een nieuw bericht van Canvas"
+  new_quiz_moderate_desc: "Dit schakelt de pagina beheren voor de nieuwe toets voor een account in wanneer conceptversie en toetsstatistieken zijn toegestaan/ingeschakeld. "
+  new_quiz_statistics_desc: "Dit schakelt de pagina van de statistieken voorde nieuwe toets voor een account in wanneer conceptversie is toegestaan/ingeschakeld. "
   new_styles_description: |-
       Wij zijn bezig met een facelift van het gebruikersinterface op Canvas. Schakel dit in om het
       bijgewerkte, simpeler uiterlijk van het gebruikersinterface op Canvas.
@@ -10526,6 +10697,7 @@ nl:
   outcome_path_result: "%{path} resultaat"
   outcome_results: 
     outcomes_filename: Resultaten
+  outcome_results_title: Resultaten
   outcomes: 
     account_standards: "Standaards voor accounts"
     account_standards_description: "Aan de linkerkant zul je de standaards opmerken die jouw instelling heeft gemaakt voor gebruik in cursussen."
@@ -10580,8 +10752,10 @@ nl:
           manage: 
             description: "*Leerresultaten worden gemaakt om kennis in een cursus bij te houden. Controleer het menu aan de bovenkant om aan de slag te gaan. Op de \"Nieuw\" knop klikken om een nieuw leerresultaat te maken of op de \"Nieuwe Groep\" knop drukken om een nieuwe groep te maken om jouw leerresultaten in te delen. Door de \"Zoeken\" knop te drukken kun je leeerresultaten gebruiken die gemaakt zijn door jouw status of instelling. Met het linkerpaneel kun je door de door jou gemaakte en gebruikte leerresultaten navigeren. Je kunt leerresultaten tussen de verschillende niveaus verslepen en verplaatsen om structuur te creëren/maken.* *Belangrijker: Canvas maakt het jou mogelijk om leerresultaten toe te voegen aan te beoordelen rubrics. Zo is het mogelijk om de kennis van een cursist te evalueren als je opdrachten beoordeelt. Eens je de leerresultaten ingesteld hebt , klik dan op \"Rubrics beheren\" om jouw leerresultaten voor de beoordeling te gebruiken.*"
             title: "Leerresultaten instellen"
+    mastery: Bekwaam
     mastery_error: "Moet groter zijn dan of gelijk zijn aan 0"
     missing_outcome: "Kan dit leerresultaat niet vinden"
+    near: "Bijna bekwaam"
     new_outcome: "Nieuw leerresulaat"
     new_outcome_group: "Nieuwe leerresultatengroep"
     outcome: 
@@ -10603,6 +10777,7 @@ nl:
       criterion_dialog: "Leerdoelen kunnen toegevoegd worden aan opdrachtrubrieken. Als u een studieresultaat definieert, dient u ook een criterium te definiëren om te gebruiken bij het maken van opdrachtrubrieken. Definieer zoveel rubriekkolommen als u nodig hebt en geef het aantal punten op dat minimaal behaald moet worden om dit leerdoelen te behalen."
       criterion_info_link: "Hier klikken om meer te weten te komen over standaards voor beoordelingen"
       description: "Dit leerresulaat bschrijven"
+      display_name: "Vriendelijke naam (optioneel)"
       mastery: "Bekwaamheid bij"
       points: "%{points_possible} punten"
       title: "Dit leerresultaat een naam geven"
@@ -10619,6 +10794,7 @@ nl:
       attempt_info: "poging #%{attempt_number}, %{attempt_date}"
       outcome_mastered: gehaald
       scoring: "%{points} van %{possible_points}"
+    remedial: Verbetering
     show: 
       no_aligned_items: "Geen afgestemde items"
       no_artifacts: "Geen artefacten"
@@ -10631,6 +10807,7 @@ nl:
     titles: 
       find_outcomes: "Leerresultaten zoeken"
     top_level: "%{context} bovenste niveau"
+    undefined: "Nog niet begonnen"
     user_outcome_results: 
       artifacts: 
         one: "1 artefacten"
@@ -10675,7 +10852,7 @@ nl:
         user_agent: Gebruikersagent
   pages: 
     cancel_button: Annuleren
-    cannot_unpublish_front_page: "Kan de voorpagina niet publiceren"
+    cannot_unpublish_front_page: "Publicatie van de voorpagina kan niet ongedaan worden gemaakt"
     delete_button: Verwijderen
     delete_confirmation: "Weet je zeker dat je deze wiki-pagina wilt verwijderen?"
     delete_dialog_title: "Wiki-pagina verwijderen"
@@ -10689,14 +10866,14 @@ nl:
     notices: 
       delete_failed: "Kan de pagina \"%{title}\" niet verwijderen."
       page_deleted: "De pagina \"%{title}\" is verwijderd."
-    reload_editing_page: "De pagina is veranderd sinds je bent begonnen met bewerken. *Verversen* zal leiden tot verlies van je veranderingen."
-    reload_viewing_page: "De pagina is veranderd sinds je bent begonnen met bewerken. *Verversen*"
+    reload_editing_page: "Deze pagina is veranderd sinds je bent begonnen met bewerken. *Verversen* zal tot verlies van je veranderingen leiden."
+    reload_viewing_page: "De pagina is sinds je bent begonnen met bekijken ervan veranderd. *Verversen*"
     restore_failed: "Het herstellen van paginarevisie mislukt"
     save_button: Opslaan
     saving_button: "Bezig met opslaan..."
     warnings: 
       overwrite_changes: "Je staat op het punt om andere veranderingen die je hebt gemaakt sinds je bent begonnen met bewerken te overschrijven. \\n\\nDeze veranderingen overschrijven?"
-      unsaved_changes: "Je hebt niet-opgeslagen veranderingen. Wil je doorgaan zonder deze veranderingen op te slaan?"
+      unsaved_changes: "Je hebt veranderingen die niet opgeslagen zijn. Wil je doorgaan zonder deze veranderingen op te slaan?"
   paginated_collection: 
     no_items: "Geen items."
   paginated_list: 
@@ -10704,8 +10881,10 @@ nl:
     view_more_link: "Meer bekijken"
   paginated_view: 
     loading_more_results: "Bezig met het laden van meer resultaten"
+  pasco_user_notes_title: "Notitities van de gebruiker"
   paypal: 
     exception: "Onze excuses, er is een fout opgetreden. Probeer later opnieuw."
+  penn_harris_student_grade_title: "Eindcijfers voor studenten Penn Harris"
   plugins: 
     academic_benchmark_importer: 
       description: "Hiermee kun je Academic Benchmark-standaarden in Canvas importeren."
@@ -10741,7 +10920,7 @@ nl:
         canvas_source_identifier: "Naam van jouw Canvas-instantie"
         sis_source_identifier: "Naam van jouw Banner-instantie"
     big_blue_button: 
-      description: "Ondersteuning bij BigBlueButton webvergarderingen"
+      description: "BigBlueButton ondersteuning bij webvergarderingen"
       name: BigBlueButton
     big_blue_button_settings: 
       description: "Je hebt toegang  tot een [BigBlueButton](%{url})-instantie nodig."
@@ -10762,7 +10941,7 @@ nl:
         api_key: API-sleutel
         base_url: Basis-URL
     crocodoc: 
-      description: "Crocodoc ingeschakeld als optie voor een voorbeeld van een document"
+      description: "Crocodoc ingeschakeld als optie voor een document voorbeeldweergave"
       name: Crocodoc
     crocodoc_settings: 
       description: "Deze plug-in integreert met Crocodoc als voorbeeld van een HTML5-document, zodat docenten en cursisten de mogelijkheid hebben om aantekeningen  in documenten te maken."
@@ -10944,6 +11123,15 @@ nl:
       description: "Integratie met Linkedin"
       name: LinkedIn
     linked_in_settings: 
+      description: |-
+          Je moet een [nieuwe applicatie op LinkedIn](%{linkedin_url}) registreren.
+          Stel de volgende instellingen om ervoor te zorgen dat jouw de LinkedIn-integratie
+          juist werkt:
+          
+          * **Applicatietype:** instellen als "Webapplicatie"
+          * **Livestatus:** instellen als "Live"
+          * **OAuth-doorstuur-URL:** instellen als %{oauth_url}
+          * Noteer, na het opslaan van de app, de API-sleutel en de geheime sleutel
       domain_name: domein
       labels: 
         api_key: API-sleutel
@@ -11063,6 +11251,17 @@ nl:
         access_key: Toegangssleutel
         api_url: Api-URL
         secret_key: "Geheime sleutel"
+  polling: 
+    poll_sessions: 
+      errors: 
+        course_required: "Cursus is vereist."
+      validations: 
+        section_belongs_to_course: "Dit gedeelte van de cursus maakt niet deel uit van de bestaande cursus."
+    poll_submissions: 
+      validations: 
+        poll_choice_belongs_to_poll: "Die keuze van peiling maakt niet deel uit van de bestaande peiling."
+        poll_is_published: "Deze peilingsessie is niet open voor inzendingen."
+        user_and_poll_session_uniqueness: "kan alleen maar een keuze per peilingsessie invoeren."
   post_grades_description: "Cijfers posten laat docenten cijfers op een ingeschakelde SIS-systeem posten: Powerschool,\n\
       Aspire (SIS2000), JMC, en enig ander SIF-ingeschakelde SIS die de SIF CategorieBeoordeling, \n\
       OpdrachtBeoordeling, OpdrachtBeoordelingCijfer accepteert.  "
@@ -11262,7 +11461,7 @@ nl:
           U kunt ook Canvas-notificaties naar uw Twitter-account laten sturen. Deze worden getoond als DM's van uzelf naar uzelf en ze verschijnen niet in uw openbare stream.
       unknown_service: Onbekend"
       web_services: "Canvas kan jouw leven een stuk gemakkelijker maken door veel te integreren met webhulpmiddelen die je al gebruikt. Op welke dienst dan ook in \"Andere services\" klikken om te zien wat we daarmee bedoelen."
-    purpose_required: "Doel is verplicht"
+    purpose_required: "Doel is vereist"
     resending: "Bezig met opnieuw versturen..."
     secondary_nav: 
       links: 
@@ -11368,6 +11567,7 @@ nl:
     upload_file_view: 
       choose_a_picture: "een foto kiezen"
       crop_instructions: "Afbeelding bijsnijden, de selectie slepen en dan op de knop \"Afbeelding selecteren\" hieronder klikken."
+  provisioning_title: Inrichting
   pseudonym: 
     errors: 
       bad_credentials: "Ongeldige gebruikersnaam of ongeldig wachtwoord"
@@ -11498,12 +11698,13 @@ nl:
       email_sent: "Bevestigingsmail is verstuurd naar %{email}. E-mail niet ontvangen? Zorg ervoor dat je jouw spambox controleert."
       link_invalid: "De koppeling die je gebruikt, is niet langer geldig. Als je niet kunt inloggen, klik dan op \"Weet je jouw wachtwoord niet?\" om jouw wachtwoord opnieuw in te stellen."
       password_changed: "Wachtwoord gewijzigd"
+  public_courses_title: "Openbare cursussen"
   publish_btn_module: 
     buttons: 
       publish: Publiceren
-      publish_desc: "Niet gepubliceerd. Klik om te publiceren."
+      publish_desc: "Niet gepubliceerd. Klikken om te publiceren."
       published: Gepubliceerd
-      published_desc: "Gepubliceerd. Klik om het publiceren ongedaan te maken."
+      published_desc: "Gepubliceerd. Klikken om het publiceren ongedaan te maken."
       publishing: "Bezig met publiceren..."
       unpublish: "Publicatie ongedaan maken"
       unpublishing: "Bezig met ongedaan maken van publicatie..."
@@ -11527,6 +11728,7 @@ nl:
       empty_points_possible: "-%{pointsPossible} punten"
       no_submission: "Geen inzending"
       no_submission_for_assignment_screenreader: "Geen inzending voor deze opdracht. %{pointsPossible} punten mogelijk."
+      not_yet_graded: "*Nog niet beoordeeld*"
       score_with_points_possible: "*%{score}*/%{pointsPossible} punten"
       score_with_points_possible_screenreader: "Score: %{score} op %{pointsPossible} punten."
     assignment_settings: 
@@ -11753,6 +11955,7 @@ nl:
       new: "Nieuw:"
   quiz: 
     cancel: Annuleren
+    cant_take_unpublished_quiz: "Je kunt geen toets afnemen totdat deze is gepubliceerd"
     cant_unpublish_when_students_submit: "Kan publicatie niet ongedaan maken als er inzendingen van cursisten zijn"
     default_question_input: "[ Selecteer ]"
     default_text_only_question_name: Spacer
@@ -11763,28 +11966,48 @@ nl:
       invalid_hide_results: "Verberg resultaten is niet geldig"
       invalid_ip_filter: "IP-filter is niet geldig"
       invalid_quiz_type: "Testtype is niet geldig"
+    no_more_allowed_quiz_attempts: "Je mag geen andere pogingen op deze toets doen."
+    now_on_moderate: "Deze informatie is nu te vinden op het tabblad beheren."
     question_name_counter: "Vraag %{question_number}"
     quiz_regraded_your_score_not_affected: "Deze toets is opnieuw beoordeeld; jouw score is niet beïnvloed."
+    quiz_successfully_deleted: "Toets verwijderen succesvol!"
+    quiz_successfully_updated: "Toets bijwerken succesvol!"
     regrade: 
       give_everyone_full_credit: "Aan iedereen het volledige aantal punten voor deze vraag geven."
-      no_scores_reduced: "Punten toekennen voor zowel gecorrigeerde als eerdere juiste antwoorden (*scores zullen niet verlaagd worden *)"
+      no_scores_reduced: "Punten toekennen voor zowel gecorrigeerde als eerdere juiste antwoorden (*scores zullen niet verlaagd worden*)"
       regrade_disabled: "Het opnieuw beoordelen van deze vraag is niet toegestaan omdat het antwoord was verwijderd of omdat het type vraag was veranderd nadat een student een inzending heeft gedaan."
-      regrade_options: "Opties voor herberekening *(voor studenten die deze vraag al hebben beantwoord):*"
+      regrade_options: "Opties voor het opnieuw beoordelen *(voor cursisten die deze vraag al hebben beantwoord):*"
       some_scores_reduced: "Geef alleen punten voor het correcte antwoord (*scores van sommige studenten kunen verlaagd worden*)"
-      update_question_without_regrading: "Zonder herberekening vraag bijwerken"
+      update_question_without_regrading: "Vraag bijwerken zonder opnieuw te beoordelen"
+    regrade_count_affected: "Deze toets is opnieuw beoordeeld; je nieuwe score vertegenwoordigt %{count} vragen die zijn beïnvloed."
+    regrade_score_affected: "Deze toets is opnieuw beoordeeld; jouw score is aangepast."
+    resume_the_quiz: "Toets hervatten"
+    resume_the_survey: "Enquête hervatten"
     take_the_quiz: "Maak de test "
     take_the_quiz_again: "Maak de test opnieuw"
     take_the_survey: "Maak de enquête"
     take_the_survey_again: "Maak de enquête opnieuw"
+    there_are_no_files_to_download: "Er zijn geen bestanden om te downloaden."
+    there_are_no_submissions_to_grade: "Er zijn geen inzendingen die beoorbeeld moeten worden."
+    time_limit_minutes: "%{limit} minuten"
     types: 
       quiz: Test
       survey: Enquête
     warning: Waarschuwing
+    you_cannot_message_unpublished: "Je kunt geen berichten aan studenten sturen totdat deze toets gepubliceerd is."
+  quiz_data_title: Toetsgegevens
   quiz_extend_time: 
+    ending_time: eindtijd
     extend_time: "Tijd verlengen"
+    extensions_student: "Tijd verlengen voor %{student}"
+    extensions_successfully_added: "Verlengingen succesvol toegevoegd"
     now: nu
   quiz_extensions: 
+    everyone_gets_attempts: "iedereen krijgt al %{num}"
+    everyone_gets_time: "iedereen krijgt al %{num} minuten"
+    extensions_num_students: "Verlengingen voor %{num} studenten"
     extensions_student: "Verlengingen voor %{student}"
+    extensions_successfully_added: "Verlengingen succesvol toegevoegd"
     student_extensions: "Tijdsverlengingen voor leerling"
   quiz_group: 
     errors: 
@@ -11804,7 +12027,12 @@ nl:
       one: "% {count} vragen"
       other: "% {count} vragen"
   quiz_message_students: 
+    and_num_more_students: "en %{num} meer studenten"
+    message_not_sent_because_empty: "Bericht niet verzonden omdat het blanco was"
+    message_sent_successfully: "Bericht succesvol verzonden"
     message_students_who: "Verstuur een bericht naar cursisten die..."
+    student_who_have_not_taken_the_quiz: "Studenten die de toets niet hebben afgenomen"
+    students_who_have_taken_the_quiz: "Studenten die de toets hebben afgenomen"
   quiz_model: 
     everyone: Iedereen
     everyone_else: "Alle anderen"
@@ -11814,6 +12042,13 @@ nl:
     keep_latest: Laatste
     practice_quiz: "Oefen test"
     survey: Enquête
+  quiz_moderate: 
+    change_extension_for: "Verlenging voor %{num} studenten veranderen"
+    students_have_taken: "%{complete} uit %{total} studenten hebben de toets voltooid"
+  quiz_moderate_route: 
+    moderate: Beheren
+  quiz_overview_route: 
+    overview: Overzicht
   quiz_question: 
     defaults: 
       question_name: Vraag
@@ -11825,15 +12060,44 @@ nl:
       generating_report_name: "%{report_name} Bezig met genereren..."
       item_analysis_not_available: "Analyse van item is niet voor enquêtes beschikbaar"
   quiz_route: 
+    that_quiz_doesnt_exist: "Die toets bestaat niet"
     that_quiz_has_been_deleted: "Deze test is verwijderd"
+  quiz_show: 
+    time_limit_minutes: "%{limit} minuten"
   quiz_statistics: 
+    attempts: "Pogingen: %{count} uit %{total}"
+    correct_essay_student_ratio: "%{ratio}% van jouw studenten hebben het volle aantal punten gekregen voor deze vraag."
+    correct_multiple_response_ratio: "%{ratio}% hebben juist beantwoord."
+    correct_response_ratio: "%{ratio}% van jouw studenten hebben deze vraag juist beantwoord."
+    discrimination_index_help_dialog_title: "De disciminatie indexkaart"
+    errors: 
+      stats_empty: 
+        header: "Niks te zien hier."
+        info: "Geen enkel van jouw studenten hebben nog deze toets afgenomen."
+      stats_too_large: 
+        header: "Te veel gaande hier."
+        info: "Deze toets is te lang om weer te geven."
+    essay_score: "Score: %{score}"
+    generatable: "Rapport was nooit gegenereerd."
+    generated: "Rapport is klaar."
+    generated_at: "Gegenereerd op %{date}"
+    generating: "Rapport wordt gegenereerd..."
+    generation_failed: "Er is iets misgegaan, probeer nog eens later."
     item_analysis: Itemanalyse
     no_answer: "Geen antwoord"
+    sort_by_discrimination_index: "Op discriminatie sorteren"
+    sort_by_position: "Op functie sorteren"
     statistics_filename: "%{quiz_title} %{quiz_type} %{report_type}-rapportage"
+    stats_error: 
+      image_alt: "Toetsstatistieken zijn nog niet beschikbaar."
     student_analysis: Leerlinganalyse
     types: 
       item_analysis: Itemanalyse
       student_analysis: Leerlinganalyse
+    unknown: 
+      header: "Er is iets misgegaan."
+      info: "Er is een onverwachte fout opgetreden."
+    unknown_answer: "Iets anders"
   quiz_statistics_route: 
     quiz_statistics: Statistieken
   quiz_statistics_title: Teststatistieken
@@ -12948,6 +13212,7 @@ nl:
           manually_unlock: "De toets handmatig ontgrendelen voor de volgende poging"
           started: Gestart
         minutes: minuten
+        moderate_page_title: "%{title}: Beheren"
         page_title: "Gemiddelde toets"
         student_gets_extra_time: "*%{student_name}* **krijgt %{extra_time} extra tijd bij iedere poging**"
         student_n: "Cursist %{n}"
@@ -13175,6 +13440,7 @@ nl:
       quiz_summary: 
         assignment_points_possible: 
           one: "1 punt"
+          other: "%{count} punten"
         labels: 
           allowed_attempts: "Toegestane pogingen"
           attempts_left: "Resterende pogingen"
@@ -13550,7 +13816,7 @@ nl:
       help_with_formulas: "Helpen bij het gebruik van formules in toetsvragen"
       ip_address_filtering: "Filteren van IP-adres"
       set_as_correct: "Dit antwoord is als juist ingesteld"
-    toggle_message: "zichtbaarheid van toets in/uitschakelen"
+    toggle_message: "zichtbaarheid van toets in-/uitschakelen"
     ? "true"
     : Waar
     ungraded_survey: "Niet-beoordeelde enquête"
@@ -13563,6 +13829,7 @@ nl:
   quizzes_route: 
     quizzes_route_title: Tests
   quizzez_submission_row: 
+    gets_extra_minutes: "levert %{num} extra minuten per poging"
     unlimited: Ongelimiteerd
   re_upload_submissions_form: 
     buttons: 
@@ -13572,6 +13839,7 @@ nl:
     upload_warning: "Let op dat u de naam van de ingeleverde bestanden niet wijzigt. Hieraan kan Canvas de bestanden herkennen."
   recent_student: 
     last_logged_in: "laatst ingelogd op  %{last_login}"
+  recently_deleted_courses_title: "Cursus die recent zijn verwijderd"
   recipient_input: 
     context_search_placeholder: "Naam, cursus of groep invoeren"
     context_search_title: "Naam, cursus of groep"
@@ -13585,6 +13853,7 @@ nl:
     sections_count: 
       one: "1 sectie"
       other: "%{count} secties"
+  registrar_tile: "Rapport voor registrar"
   registration: 
     get_started: "Aan de slag"
     incomplete_registration_warning: 
@@ -13621,6 +13890,7 @@ nl:
         email: E-mail
         name: Naam
     welcome_to_canvas: "Welkom op Canvas!"
+  reply_from_name: "%{name} via Canvas notificaties"
   retrieve_timeout: "Kan configuratie niet ophalen, de server heeft niet op tijd geantwoord"
   role_override: 
     permission: 
@@ -13662,6 +13932,7 @@ nl:
       manage_students: "Cursisten aan de cursus toevoegen/verwijderen"
       manage_user_logins: "Login-gegevens voor gebruikers wijzigen"
       manage_user_notes: "Faculteitsnieuws beheren"
+      manage_user_observers: "Waarnemers voor de gebruikers beheren"
       manage_wiki: "Wiki beheren (paginas toevoegen/bewerken/verwijderen)"
       managed_jobs: "Achtergrondprocessen beheren"
       moderate_form: "Discussies matigen (berichten van anderen verwijderen/bewerken, onderwerpen vergrendelen)"
@@ -13718,6 +13989,10 @@ nl:
     account_admin: "Account beheerder"
     new_role: 
       add: Toevoegen
+      add_role: "Rol toevoegen"
+      add_role_label: "Rol toevoegen"
+      role_name: "Naam van de rol"
+      role_name_label: "Naam van de rol"
     permission_button: 
       rolebutton: 
         disable: Uitschakelen
@@ -13726,6 +14001,9 @@ nl:
         enable_and_lock: "Inschakelen en vergrendelen"
         use_default: "Gebruik standaard"
     permissions: Machtigingen
+    roles_override_index: 
+      account_roles: Account-rollen
+      course_roles: Cursus-rollen
   roster: 
     delete_confirm: "Weet je zeker dat je deze gebruiker wilt verwijderen?"
     error_sending_invitations: "Fout bij het versturen van de uitnodiging. Probeer opnieuw."
@@ -13794,6 +14072,8 @@ nl:
         are_you_sure_delete: "Weet je zeker dat je deze rubric wilt verwijderen? Alle cursussen die momenteel aan deze rubric gekoppeld zijn kunnen de rubric nog steeds gebruiken, maar het is niet meer mogelijk om deze voor nieuwe cursussen te gebruiken."
         are_you_sure_remove: "Weet je zeker dat je deze rubric uit de lijst wilt verwijderen?"
       remove_rubric: "Deze rubric uit mijn lijst verwijderen"
+  safety_drill_title: "Veiligheidsoefening plannen"
+  scantron_quiz_title: "Scantron toets"
   scribd: 
     upgrade_flash: "Hello, Je gebruikt een oude versie van Adobe Flash Player. Om iPaper (en veel andere hulpprogrammas) op het web te kunnen gebruiken, moet je de %{link_tag} laatste Flash Player downloaden%{end_link}."
   search: 
@@ -14234,7 +14514,7 @@ nl:
       labels: 
         due: einddatum
       needs_grading_count: 
-        one: "nog 1 beoordelen"
+        one: "nog 1 te beoordelen"
         other: "%{count} nog te beoordelen"
     menu_enrollment: 
       labels: 
@@ -14374,6 +14654,7 @@ nl:
         additional_comments: "Aanvullende opmerkingen"
       instructor_comments: "Opmerkingen van cursusleider"
       labels: 
+        long_description: "Lange beschrijving"
         save_criterion_for_reuse: "Deze opmerking opslaan om nog eens te gebruiken"
         threshold: drempel
       links: 
@@ -14394,6 +14675,7 @@ nl:
         update_description: "Beschrijving bijwerken"
       labels: 
         additional_comments: "Extra opmerkingen"
+        long_description: "Lange beschrijving"
     rubric_dialog: 
       buttons: 
         use_this_rubric: "Deze rubric gebruiken"
@@ -14421,6 +14703,8 @@ nl:
       defaults: 
         description: "Beschrijving van criterium"
       full_marks: "Volledige markeringen"
+      labels: 
+        long_description: "Lange beschrijving"
       links: 
         view_longer_description: "Uitgebreide beschrijving bekijken"
       no_marks: "Geen markeringen"
@@ -14461,7 +14745,7 @@ nl:
       new_file_option: "[ Nieuw bestand ]"
       new_page_option: "[ Nieuwe pagina ]"
       new_quiz_option: "[ Nieuwe toets ]"
-      new_tab: "Dit hulpprogramma in een nieuw tabblad laden"
+      new_tab: "In een nieuw tabblad laden"
       new_topic_option: "[ Nieuw onderwerp ]"
       options: 
         assignments: Opdrachten
@@ -14626,6 +14910,7 @@ nl:
       unrecorgnized_type: "Kan importtype niet herkennen"
     instructure_csv: "Instructure CSV-formaat of zipbestand met CSVs"
     upload_filename: "sis_upload_%{id}.zip"
+  sis_export_title: "SIS Export"
   sis_import: 
     buttons: 
       process_data: "Data verwerken"
@@ -14713,7 +14998,9 @@ nl:
       one: "Opgelet: In de score zijn opdrachten van de groep %{list_of_group_names} niet opgenomen, omdat er geen punten mogelijk zijn"
       other: "Opgelet: In de score zijn geen opdrachten van de groepen %{list_of_group_names}, omdat er geen punten mogelijk zijn:"
     media_recordin: "media opname"
+    next_object: "Volgende %{type}"
     no_assignment: "Geen opdracht gekozen"
+    no_outcome: "Geen gekozen resultaat"
     no_student: "Geen student geselcteerd"
     none: Geen
     notes: Opmerkingen
@@ -14722,6 +15009,7 @@ nl:
     online_text_entry: "Online tekst invoer"
     online_upload: "online upload"
     online_url: "Online URL"
+    previous_object: "Vorige %{type}"
     student_hidden_name: "Student %{position}"
   statistics: 
     csv_columns: 
@@ -14730,6 +15018,7 @@ nl:
       n_correct: "n juist"
       n_incorrect: "n fout"
       name: naam
+      root_account: hoofd_account
       score: score
       section: sectie
       section_id: sectie_id
@@ -14747,16 +15036,27 @@ nl:
     not_available: "Beschikbaar op"
     pending: "Niet beschikbaar tot"
   step: Stap
+  student_access_title: "Rapport van toegang studenten"
+  student_assignment_outcome_map_title: "Studenten competentie"
+  student_grades_title: "Studenten cijfers"
   student_groups: 
+    group_join: "aan groep %{group_name} gesloten"
+    group_leave: "heeft group %{group_name} verlaten"
+    search_groups_placeholder: "Groepen of personen zoeken"
+    student_groups_filter_description: "Een lijst met groepen zal automatisch gefiltered worden om alleen namen op te nemen voor degene waarvan de namen met jouw invoer overheenkomen als je in dit veld typt. "
     students_count: 
       one: "%{count} cursisten"
       other: "%{count} cursisten"
+  student_groups_desc: "Dit schakelt de nieuw pagina voor de studenten groep in voor een account. De nieuwe pagina was samengesteld om de aanmelding van de group meer dynamisch te maken."
   student_id: Student-ID
+  student_ip_title: "Studenten IP-adressen"
   student_name: "Naam van de student"
   student_outcome_gradebook_description: |
       De cijferlijst met leerresulaten van cursisten biedt een manier aan studenten om snel hun voortgang 
       op het gebied van leerresultaten te bekijken. Leerresulten worden in een cijferlijst-achtige format en voortgang 
       als een numerieke score en als bekwaam/bijna bekwaam/verbetering weergegeven
+  student_submissions_title: "Studenten inzendingen"
+  students_with_no_submissions_title: "Studenten zonder inzendingen"
   sub_accounts: 
     alerts: 
       subaccount_has_courses: "Je kunt geen subaccount met cursussen erin verwijderen"
@@ -14796,6 +15096,7 @@ nl:
       unsubmitted: "niet ingeleverd"
   submission_comment: 
     unknown_author: Iemand
+  submission_data_title: "Inzending gegevens"
   submission_detail: 
     go_to_submission_url: "Via URL naar Inzending gaan"
     no_submission: "Geen inzending"
@@ -14804,6 +15105,7 @@ nl:
   submission_details_dialog: 
     add_a_comment: "Een opmerking toevoegen"
     comments: Opmerkingen
+    grade_form_label: "Cijfer:"
     labels: 
       group_comment: "Opmerking naar de hele groep sturen"
     late: "TE LAAT"
@@ -14814,6 +15116,7 @@ nl:
     post_comment: "Opmerking plaatsen"
     submitted: "Ingezonden:"
     this_was_submitted_multiple_times_choose_a_submission_to_view: "Meerdere keren ingeleverd, kies welke je wilt bekijken:"
+    update_grade: "Cijfer bijwerken"
     view_rubric_assessment_in_the_speedgrader: "Beoordeling van rubric bekijken in SpeedGrader"
   submissions: 
     assignment_submit_success: "Opdracht succesvol ingeleverd."
@@ -14930,6 +15233,7 @@ nl:
     collaborations: Samenwerkingen
     conferences: Vergaderingen
     course_assignments: Cursusopdrachten
+    course_grades: "Cijfers van de cursus"
     course_settings: Cursusinstellingen
     discussions: Discussies
     eportfolios: ePortfolios
@@ -14946,6 +15250,7 @@ nl:
     syllabus: Syllabus
     tab_location_error: "Die locatie van tabblad is ongeldig"
     tab_unmanagable_error: "%{css_class} kan niet worden beheerd"
+  tempe_grade_export_title: "Cijferrapport voor Tempe"
   terms: 
     index: 
       date: 
@@ -14995,7 +15300,7 @@ nl:
         term_starts_tas: "Voor onderwijsassistenten begint de periode"
         term_starts_teachers: "Voor docenten begint de periode"
       user_count: 
-        one: "1 Gebruiker"
+        one: "1 gebruiker"
         other: "%{count} gebruikers"
     timespan: 
       date: 
@@ -15042,6 +15347,7 @@ nl:
       image_width: "Breedte van afbeelding"
       url: URL
   title: 
+    edit_announcement: "Aankondiging bijwerken"
     edit_topic: "Bewerk discussieonderwerp"
     new_announcement: "Nieuwe aankondiging"
     new_topic: "Nieuw discussieonderwerp"
@@ -15091,10 +15397,13 @@ nl:
   turnitin_info: 
     buttons: 
       resubmit_to_turnitin: "Opnieuw inleveren bij Turnitin"
+  ungraded_submissions_tile: "Studenten inzendingen die niet beoordeeld zijn"
   unknown: Onbekend
   unknown_question_bank: "Onbekende toetsbank"
   unknown_quiz: "Onbekende toets"
+  unpublished_courses_title: "Cursussen die niet gepubliceerd zijn"
   unsupported_package: "Niet ondersteund inhoud pakket"
+  unused_courses_title: "Cursussen die niet gebruikt zijn"
   user: 
     default_collection_name: "%{user_name}'s collectie"
     default_user_name: Gebruiker
@@ -15108,6 +15417,7 @@ nl:
     registration: 
       agree_to_terms_and_privacy_policy: "Je gaat akkoord met de *gebruiksvoorwaarden* en het **privacy-beleid**."
       agree_to_terms_with_code_of_conduct: "Je gaat akkoord met de *gebruiksvoorwaarden* en de **gedragscode**."
+  user_access_title: "Rapport van toegang gebruiker"
   user_date_range_search: 
     cant_be_blank: "ID van Canvas gebruiker mag niet leeg zijn"
     cant_come_before_from: "Tot-datum mag niet voor Van-datum vallen"
@@ -15115,6 +15425,7 @@ nl:
     errors: 
       follow_own_collection: "U kunt uw eigen collectie niet volgen"
       follow_self: "U kunt uzelf niet volgen"
+  user_inactivity_title: "Rapport van inactiviteit van de gebruiker"
   user_lists: 
     add_n_users: 
       one: "OK, ziet er goed uit. Deze ene gebruiker toevoegen."
@@ -15743,7 +16054,7 @@ nl:
   wiki_pages_api: 
     cannot_delete_front_page: "De voorpagina kan niet verwijderd worden"
     cannot_have_hidden_front_page: "De voorpagina kan niet verborgen worden"
-    cannot_have_unpublished_front_page: "De voorpagina kan niet ontoegankelijk gemaakt worden"
+    cannot_have_unpublished_front_page: "Publicatie van de voorpagina kan niet ongedaan worden gemaakt"
     cannot_hide_front_page: "De voorpagina kan niet worden verborgen voor cursisten"
     cannot_update_editing_roles: "Je mag de bewerkingsrollen van deze wiki-pagina niet bijwerken."
     cannot_update_front_page: "Je mag de wiki-voorpagina niet wijzigen"
@@ -15755,8 +16066,9 @@ nl:
     external_urls: 
       archive: Archief
       archive_link: "Archief bekijken"
+  zero_activity_title: "Geen activiteit"
   zip_argument_error: "Voor het uploaden van een zipbestand is een map nodig om te uploaden naar."
-  zip_file_description: "Migratieplug-in voor het uitpakken van gewone zipbestanden in een cursus"
+  zip_file_description: "Migratieplug-in voor het uitpakken van gewone zipbestanden in cursus, groep, of gebruiker bestanden"
   zip_file_display: Bestandsimport
   zip_file_file_description: "Zipbestand uitpakken in map"
   zip_file_imports: 
