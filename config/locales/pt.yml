@@ -3438,7 +3438,7 @@ pt:
         conclude_student: "Tem certeza de que deseja concluir esta inscrição do aluno?"
         delete_enrollment: "Tem certeza de que deseja excluir esta inscrição do aluno?"
       enrolled_as: "Inscrito como %{enrollment_type}"
-      enrollment_linked_to: "vinculado a %{linked_user}"
+      enrollment_linked_to: "vinculado a *%{linked_user}*"
       error: 
         enrollment_change_failed: "Falha na alteração de privilégio de inscrição, tente novamente"
       labels: 
@@ -3493,6 +3493,7 @@ pt:
         delete_enrollment: "Tem certeza de que deseja excluir esta inscrição do aluno?"
       enrolled_as: "Inscrito como %{enrollment_type}"
       enrollment_change_failed: "Falha na alteração de privilégio de inscrição, tente novamente"
+      enrollment_linked_to: "vinculado a *%{linked_user}*"
       headings: 
         recent_messages: "Mensagens recentes"
         user_services: "Serviços Web registados"
@@ -13271,6 +13272,7 @@ pt:
       body_designer: "Foi convidado para aderir a %{course} como **designer** da conta de utilizador **%{email_address}**."
       body_observer: "Foi convidado para aderir a %{course} como **observador** da conta de utilizador **%{email_address}**."
       body_student: "Foi convidado para aderir a %{course} como **aluno** da conta de utilizador **%{email_address}**."
+      body_ta: "Foi convidado para aderir a %{course} como **assistente** da conta de utilizador **%{email_address}**."
       body_teacher: "Foi convidado para aderir a %{course} como **professor** da conta de utilizador **%{email_address}**."
       buttons: 
         accept: "Aceitar convite"
