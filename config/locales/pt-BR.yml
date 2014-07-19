@@ -185,6 +185,7 @@ pt-BR:
       test_ldap_search_label: "Testando a pesquisa LDAP..."
     ldap_timeout_error: 
       last_ldap_timeout_failure: "Última falha de tempo limite"
+      ldap_timeout_failure_help2: "Se o tempo de comunicação entre o Canvas e o servidor LDAP expirar várias vezes, o Canvas bloqueará tentativas de login posteriores de usar esse servidor LDPA por %{time}."
     login_required: "deve ser fornecido"
     no_changing_auth_types: "Não é possível alterar tipo de configuração de autorização. Exclua e crie uma nova configuração."
     no_discovery_url: "Nenhuma configuração"
@@ -1294,6 +1295,8 @@ pt-BR:
       ta: "Inscrições de assistente"
       teachers: "Inscrições de professor"
     user_add_failed_message: "Falha ao adicionar usuário, tente novamente"
+    user_added_message: "*%{user}* adicionado com sucesso!"
+    user_added_message_sent_message: "*%{user}* adicionado com sucesso! Eles deverão receber em breve um email de confirmação."
     user_deleted_message: "%{username} excluído com sucesso"
     user_inactivity_csv_description: 
       account_reports: 
@@ -1491,6 +1494,7 @@ pt-BR:
     notices: 
       first_teacher: "Este curso foi reivindicado e você foi registrado como o primeiro professor."
       first_teacher_with_email: "Este curso foi reivindicado e você foi registrado como o primeiro professor. Você deverá receber um email em breve para concluir o processo de registro."
+      need_to_accept_enrollment: "Será necessário [aceitar o convite de inscrição](%{url}) antes de poder participar totalmente deste curso."
       page_disabled: "Esta página foi desativada"
       page_disabled_for_account: "Esta página foi desativada para esta conta"
       page_disabled_for_course: "Esta página foi desativada para este curso"
@@ -1636,6 +1640,7 @@ pt-BR:
         never_drop: "Nunca eliminar"
         no_assignments: "[Nenhuma tarefa]"
         weighted_by_points: "Ponderado por pontos"
+      percent_of_total_grade: "% da nota total"
     assignment_count: 
       one: "1 tarefa"
       other: "%{count} tarefas"
@@ -3060,6 +3065,10 @@ pt-BR:
         ? "yes"
         : Sim
       details: 
+        account_exists: |-
+            Já existe uma conta de usuário associada a %{email}.
+            
+              **Você é o(a) %{name}?**
         account_needed: "Você tem um convite para o curso **%{course}**. Para aceitar esta solicitação, é necessária uma conta do Canvas. Clique no link abaixo para criar uma conta do Canvas."
         add_email: "Você gostaria de adicionar este endereço de email a sua conta atual?"
         choose_login: "Selecione onde você gostaria de fazer login."
@@ -3067,6 +3076,10 @@ pt-BR:
         logged_in_other_user_course: "O convite para %{course} foi enviado para **%{email}**, mas você está logado no momento como **%{user}**."
         merge_multiple: "Selecione a conta que deseja combinar com **%{current_user}**."
         merge_one: "Você deseja combinar **%{current_user}** e **%{other_user}**?"
+        multiple_accounts_course: |-
+            Já existem %{count} contas associadas a este endereço de email.
+            
+            Qual delas é você?
         none_of_these: "Nenhum desses. Eu sou um novo usuário."
         register: "Para finalizar sua inscrição, precisamos de mais algumas informações."
         register_with_course: "Para finalizar sua inscrição para o curso **%{course}**, precisamos de mais algumas informações."
@@ -3429,6 +3442,7 @@ pt-BR:
         conclude_student: "Tem certeza que deseja concluir esta inscrição do aluno?"
         delete_enrollment: "Tem certeza que deseja excluir esta inscrição do aluno?"
       enrolled_as: "Inscrito como %{enrollment_type}"
+      enrollment_linked_to: "vinculado a *%{linked_user}*"
       error: 
         enrollment_change_failed: "Falha na alteração de privilégio de inscrição, tente novamente"
       labels: 
@@ -3483,8 +3497,10 @@ pt-BR:
         delete_enrollment: "Tem certeza de que deseja excluir esta inscrição do aluno?"
       enrolled_as: "Inscrito como %{enrollment_type}"
       enrollment_change_failed: "Falha na alteração de privilégio de inscrição, tente novamente"
+      enrollment_linked_to: "vinculado a *%{linked_user}*"
       headings: 
         recent_messages: "Mensagens recentes"
+        user_services: "Serviços da web registrados"
       help: 
         list_services: "Você não ativou sua lista de serviços registrados. Ativar esta lista permite que seus colegas de curso e de grupo conectem-se com você mais facilmente fora de aula."
         services: "Você não vinculou seu perfil de usuário com nenhum serviço externo. Você pode vincular sua conta do Canvas a serviços como Facebook e Twitter. Isso facilitará que seus colegas de curso e de grupo fiquem conectados com você fora da sala de aula."
@@ -3494,20 +3510,27 @@ pt-BR:
       legends: 
         memberships: Associações
       links: 
+        access_report: "Acessar relatório"
         cant_delete: "Não é possível excluir"
         conclude_enrollment: "Concluir esta inscrição"
         delete_enrollment: "Excluir esta inscrição"
+        faculty_journal: "Diário da faculdade"
         link_enrollment: "Vincular esta inscrição"
         link_services: "Vincular serviços web à minha conta"
+        message_user: "Enviar mensagem"
         more_about_this_user: "Mais sobre este usuário"
         more_user_details: "mais detalhes do usuário..."
         remove_avatar: "Remover imagem do avatar"
         report_avatar: "Comunicar uma imagem inapropriada"
         restore_enrollment: "Restaurar esta inscrição"
+        student_teacher_activity: "Interações com você"
+        teacher_activity: "Relatório de interações do aluno"
         title: 
           enrollment_sis_defined: "Esta inscrição foi definida pela universidade e não pode ser excluída"
         user_account_details: "Detalhes da conta de usuário"
+        user_grades: Notas
         user_only_view_section: "limitar este usuário a ver somente os colegas da turma"
+        user_outcomes: Resultados
         user_view_all_sections: "permitir que este usuário veja todos os usuários do curso"
       no_messages: "Não há mensagens"
       no_services: "%{user} ainda não vinculou nenhum serviço externo a sua conta."
@@ -4430,6 +4453,7 @@ pt-BR:
         delete_course: "Excluir curso"
       details: 
         conclude_alt_text: "Caso você queira manter a capacidade de alterar notas enquanto limita o acesso do aluno ao curso, utilize as configurações de data do curso. Você pode aprender sobre as configurações de data do curso em nossos guias *aqui*."
+        confirm_conclude: "Aviso: Se você concluir o curso, não será mais possível modificar notas nem acessar o conteúdo do curso."
         confirm_delete: "Tem certeza de que deseja excluir este curso? Uma vez excluído, os alunos e os professores não terão mais acesso a ele. Se quiser apenas removê-lo do menu suspenso de cursos, você deve *concluir o curso*."
         confirm_delete_addendum: "Se você não tem permissão para concluir o curso, você pode *alterar a data final de curso* ou pedir a seu administrador para concluir o curso."
       headings: 
@@ -4926,6 +4950,8 @@ pt-BR:
       new: Nova
       new_discussion_entries: "Nova entrada de discussão"
       new_discussions: "Nova discussão"
+      num_assignments: "# Tarefas"
+      num_submissions: "# Envios"
       page_title: "Estatísticas do curso"
       quiz: Teste
       quiz_questions: "Questões do teste"
@@ -5492,6 +5518,7 @@ pt-BR:
       show_rubric: "Exibir protocolo"
       speed_grader: SpeedGrader
       topic: Tópico
+      topic_locked: "Este tópico não será visível aos usuários até *%{date}*"
       topic_locked_until: "Este tópico está bloqueado até %{time}"
       topic_not_visible: "Este tópico não é visível para usuários"
       topic_podcast_feed_link: "Feed do Podcast do tópico"
@@ -5535,6 +5562,7 @@ pt-BR:
       authors_name: "Nome do autor"
       delete: Excluir
       edit: Editar
+      edited_comment: "Editado por *%{editor.display_name}* em %{edited_at}"
       go_to_parent: "Ir para o principal"
       go_to_topic: "Ir para o tópico"
       manage_discussion_entry: "Gerenciar entrada de discussão"
@@ -7496,6 +7524,7 @@ pt-BR:
     report_problem: "Informe um problema"
     report_problem_sub: "Se o Canvas se comportar mal, conte para nós"
     search_the_canvas_guides: "Pesquise os guias Canvas"
+    see_if_your_issue_is_addressed_in_the_canvas_guides: "Veja se seu problema foi tratado nos *Guias do Canvas*."
     send_message: "Enviar mensagem"
     sending: Enviando...
     somethings_broken_but_i_can_work_around_it_for_now: "Tem algo com defeito, mas posso contornar isso por enquanto"
@@ -8647,6 +8676,9 @@ pt-BR:
             Houve um problema com a exportação do curso "%{course}".
             Notifique seu administrador do sistema e forneça a ele o seguinte identificador de exportação: %{id}.
         html: 
+          body2: |-
+              Houve um problema com a exportação do curso *%{course}*.
+              Notifique o administrador do sistema e forneça a ele o seguinte identificador de exportação:
           link: "Clicar para exibir as exportações"
           subject: "Falha na exportação do curso: %{course}"
         subject: "Falha na exportação do curso: %{course}"
@@ -8654,6 +8686,7 @@ pt-BR:
       email: 
         body: "A exportação do seu curso \"%{course}\" foi concluída."
         html: 
+          body2: "A exportação do seu curso para *%{course}* foi concluída."
           link: "Clicar para exibir as exportações"
           subject: "Exportação do curso concluída: %{course}"
         subject: "Exportação do curso concluída: %{course}"
@@ -9169,8 +9202,10 @@ pt-BR:
     migration_export_ready: 
       email: 
         html: 
+          body: "Agora, o conteúdo está pronto para ser importado em seu curso."
           link_message2: "Clique *neste link* para escolher quais itens do seu conteúdo para importar"
           subject: "Extração do curso pronta: %{course_name}"
+        link_message: "Clique neste link para escolher os itens de seu conteúdo a serem importados:"
         subject: "Extração do curso pronta: %{course_name}"
     new_account_user: 
       email: 
@@ -10978,6 +11013,7 @@ pt-BR:
       validations: 
         should_be_10_digits: "dever ser um número com 10 dígitos"
     ways_to_contact_me: "Formas de entrar em contato comigo"
+    you_have_no_services: "Você não registrou nenhum serviço. Você pode adicionar alguns na página *settings*."
   profiles: 
     avatar_dialog: 
       from_gravatar: "De Gravatar"
@@ -11555,6 +11591,7 @@ pt-BR:
     ldb_login_popup: 
       email: Email
       log_in: "Log In"
+      logged_out_of_canvas: "*Você se desconectou do Canvas.* Conecte-se para continuar."
       password: Senha
       titles: 
         log_in: "Faça o login"
@@ -12349,6 +12386,7 @@ pt-BR:
         labels: 
           started: Iniciado
           times_up: "O tempo acabou! Enviando resultados em"
+        logged_out_of_canvas: "*Você se desconectou do Canvas.* Conecte-se para continuar."
         login_required: "A conexão é obrigatória"
         not_saved: "Não salvo"
         quiz_instructions: "Instruções do teste"
