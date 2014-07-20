@@ -9,12 +9,12 @@ nl:
     context_required: "Je moet een kalender selecteren"
     select_calendars: "Kalenders selecteren"
   EditGroupAssignmentView: 
-    move_to: "Verplaatsen Naar"
+    move_to: "Verplaatsen naar"
   GroupDetailView: 
     delete_confirm: "Weet je zeker dat je deze groep wilt verwijderen?"
     flash: 
       removeError: "Kan de groep niet verwijderen. Probeer het later opnieuw."
-      removed: "Groep is verwijderd."
+      removed: "Groep verwijderen is succesvol."
     student_count: 
       one: "1 cursist"
       other: "%{count} cursisten"
@@ -288,7 +288,7 @@ nl:
       description: 
         header: Voorbeeld
       end_text: "Eindigen op: %{end_at};"
-      error_text: "Mislukt. Geef de volgende foutcode aan jouw systeem beheerder door: Error Report: %{error}"
+      error_text: "Mislukt. Geef de volgende foutcode aan jouw systeem beheerder door: ErrorReport:%{error};"
       extra_text_term: "Periode: %{term_name};"
       message: "%{type} rapport succesvol gegenereerd met de volgende instellingen. Account: %{account}; %{options}"
       section_text: "Voor sectie: %{section};"
@@ -460,7 +460,7 @@ nl:
       admin_tools: 
         auth_logging: Aan-/afmelden
         tab_labels: 
-          admin_tools_logging: "Bezig met inloggen"
+          admin_tools_logging: Logboekregistratie
           restore_course: "Cursussen herstellen"
         view_messages: "Meldingen bekijken"
       admin_tools_cumb: Beheertools
@@ -540,13 +540,13 @@ nl:
           add_enrollments: "Inschrijvingen toevoegen"
           subtext: "Wat wil je nu doen?"
       date_range_search: 
-        message_date_from: Van-datum
-        message_date_to: Tot-datum
+        message_date_from: "Van datum"
+        message_date_to: "Tot datum"
       grade_change_logging_content: 
         find: Vinden
         grade_change_activity: "Activiteit in verandering van een cijfer"
-        message_assignment_id: "Opdracht Id"
-        message_course_id: "Cursus Id"
+        message_assignment_id: Opdracht-Id
+        message_course_id: Cursus-Id
       grade_change_logging_item: 
         blank_placeholder: "-"
       grade_change_logging_results: 
@@ -560,11 +560,11 @@ nl:
         no_item_found: "Geen items gevonden"
         time: Tijd
       logging_content_pane: 
-        authentication: "Log in/Log uit activiteit"
+        authentication: "Aanmelden/afmelden activiteit"
         course: "Cursus activiteit"
         grade_change: "Activiteit in verandering van een cijfer"
-        select_default: "Een log type selecteren"
-        select_label: "Een log type selecteren om te zoeken"
+        select_default: "Een type logbesand selecteren"
+        select_label: "Een type logbestand selecteren om te zoeken."
       page_title: "Beheertools voor %{account}"
       user_date_range_search_form: 
         find: Vinden
@@ -585,7 +585,7 @@ nl:
       account_reports: 
         newark: 
           assignment_count: 
-            field: "# opdrachten"
+            field: "# opdrachten:"
           assignment_groups: 
             label: "Bijbehorende opdrachtgroepen:"
           assignments: 
@@ -893,7 +893,7 @@ nl:
         site_admin_quotas: Sitebeheerdersquota
         student_quota: Cursistenquota
         update: Bijwerken
-      account_roles: "Account functies"
+      account_roles: "Account functies:"
       account_settings_title: Accountinstellingen
       add_a_custom_help_link: "Een aangepaste Help-link toevoegen"
       add_admin_title: "Accountbeheerders toevoegen"
@@ -916,7 +916,7 @@ nl:
           Door Conceptstatus hier toe te passen stelt docenten in staat dit in hun individuele cursussen te activeren.
       allow_draft_help_tooltip: "Wat is een ontwerpstatus?"
       announcement_blank_to_all: "(Als niemand is geslecteerd, aan iedereen toesturen)"
-      announcement_sent_to_roles: "Alleen verzenden aan de volgende typen gebruikers"
+      announcement_sent_to_roles: "Alleen verzenden aan de volgende typen gebruikers:"
       announcement_sent_to_subset: "Verzonden naar 1 / %{denominator} gebruikers per maand"
       buttons: 
         add_users: "Okay, ziet er goed uit, deze gebruikers toevoegen"
@@ -924,7 +924,7 @@ nl:
         modify_users: "Teruggaan en de gebruikerslijst bewerken"
       confirm_global_announcement: "Deze aankondiging zal aan *alle* Canvas-gebruikers getoond worden. Bevestig dat je deze wilt aanmaken."
       confirm_turnitin_settings_link: "Turnitin-instellingen bevestigen"
-      course_roles: "Cursus functies"
+      course_roles: "Cursus functies:"
       create_courses_description: "(Account-beheerders kunnen altijd cursussen aanmaken)"
       create_courses_title: "Wie kan nieuwe cursussen aanmaken"
       custom_links_to_include_in_the_help_dialog_popup: "Aangepaste links opnemen in het Help-pop-upvenster"
@@ -965,7 +965,7 @@ nl:
         canvas_authentication: Canvas-verificatie
         default_language: Standaardtaal
         default_time_zone: Standaardtijdzone
-        domain: Domein
+        domain: "Domein:"
         edit_institution_email: "Gebruikers kunnen een aan hen toegewezen e-mailadres verwijderen"
         enable_alerts: "Meldingen (beta)"
         enable_eportfolios: ePortfolio's
@@ -992,7 +992,7 @@ nl:
         outgoing_email_default_name_option_custom: "Aangepast(e) \"Van\" naam"
         outgoing_email_default_name_option_default: "Standaard Canvas-instelling"
         prevent_course_renaming_by_teachers: "Laat docenten de namen van hun cursussen niet wijzigen"
-        restrict_quiz_questions: "Het bekijken van toetsvragen door studenten na de einddatum van de cursus beperken"
+        restrict_quiz_questions: "Het bekijken van toetsvragen door cursisten na de einddatum van de cursus beperken"
         restrict_student_future_view: "Beperk cursisten om cursussen te bekijken voor de startdatum"
         self_enrollment: "Zelfinschrijving toestaan"
         self_registration: Zelfregistratie
@@ -1026,7 +1026,7 @@ nl:
         select_type_label: "Cursus of groep zoeken"
         update_button: "Quota bijwerken"
       never_allow_self_enrollment_option: Nooit
-      no_enrollment_roles: " uitgeschreven gebruikers"
+      no_enrollment_roles: " Uitgeschreven gebruikers"
       no_language_preference: "Niet ingesteld (standaard: %{language})"
       notifications: 
         custom_name_description: "Als je deze optie selecteert, zal deze alle verzonden markeringen in Canvas meldingen vervangen."
@@ -1714,7 +1714,7 @@ nl:
       edit: bewerken
       group_weight: "%{groupWeight}% van totaal"
       manage: Beheren
-      move: "Verplaatsen naar"
+      move: "Verplaatsen naar..."
       title_delete: "Verwijder opdrachtgroep?"
       title_edit: "Opdrachtgroep bewerken"
       title_move: "Verplaats opdrachtgroep"
@@ -1734,7 +1734,7 @@ nl:
       edit: Bewerken
       edit_assignment_title: "Opdracht bewerken"
       module: Module
-      move: "Verplaatsen naar"
+      move: "Verplaatsen naar..."
       move_assignment_title: "Verplaats opdracht"
       multiple_modules: "Meerdere modules"
       no_points_possible: "Geen punten mogelijk"
@@ -1742,9 +1742,9 @@ nl:
       points_possible_screen_reader: "%{pointsPossible} punten mogelijk"
       settings: Instellingen
     assignment_list_item_score: 
-      assignment_grading_type_is_not_graded: "Deze opdracht zal geen cijfer krijgen"
+      assignment_grading_type_is_not_graded: "Deze opdracht zal geen cijfer krijgen."
       assignment_not_yet_graded_screenreader: "Opdracht is nog niet beoordeeld. %{pointsPossible} punten mogelijk."
-      empty_points_possible: "-%{pointsPossible} punten"
+      empty_points_possible: "-/%{pointsPossible} punten"
       no_submission: "Geen inzending"
       no_submission_for_assignment_screenreader: "Geen inzending voor deze opdracht. %{pointsPossible} punten mogelijk."
       not_yet_graded: "*Nog niet beoordeeld*"
@@ -1947,10 +1947,10 @@ nl:
       titles: 
         related_items: "Gerelateerde items"
     grade_gpa_scale_screenreader: "Eindcijfer: %{grade}"
-    grade_letter_grade_screenreader: "Eindcijfer: %{grade}"
-    grade_pass_fail_screenreader: "Eindcijfer: %{grade}"
+    grade_letter_grade_screenreader: "Cijfer: %{grade}"
+    grade_pass_fail_screenreader: "Cijfer: %{grade}"
     grade_percent: "%{grade}%"
-    grade_percent_screenreader: "Eindcijfer: %{grade}%"
+    grade_percent_screenreader: "Cijfer: %{grade}%"
     graded: "De opdracht is beoordeeld"
     grading_type_selector: 
       display_grade_as: "Geef eindcijfer aan als"
@@ -2029,7 +2029,7 @@ nl:
     keyboard_del_item: "De huidige opdracht of groep verwijderen"
     keyboard_edit_item: "De huidige opdracht of groep bewerken"
     keyboard_next_item: "Op de volgende opdracht of groep focussen"
-    keyboard_prev_item: "Op de vorige opdracht focussen"
+    keyboard_prev_item: "Op de voorgaande opdracht focussen"
     keyboard_show_assign: "Volledige voorbeeldweergave van de geselecteerde opdracht tonen"
     keycodes: 
       add_item: a
@@ -2053,7 +2053,7 @@ nl:
       submit_failed: "Insturen mislukt. Probeer het opnieuw"
       submitting: "Bezig met insturen..."
     multiple_due_dates: "Meerdere vervaldatums"
-    name_is_required: "Naam is verplicht!"
+    name_is_required: "Naam is vereist!"
     name_too_long: "Naam is te lang"
     name_too_long_error: "Naam is te lang"
     needs_grading_count: "%{needs_grading_count} inzendingen voor deze opdracht moeten nog beoordeeld worden"
@@ -2071,7 +2071,7 @@ nl:
       aria_assignments: Opdrachten
       assignments: Opdrachten
       no_assignments_found: "Geen opdrachten gevonden"
-    no_name_error: "Een naam is verplicht"
+    no_name_error: "Een naam is vereist"
     no_tools_found: "Geen hulpprogramma's gevonden"
     non_number: "Je moet een nummer gebruiken"
     notices: 
@@ -2114,7 +2114,7 @@ nl:
       titles: 
         automatically_assign_reviews: "Reviews automatisch toewijzen"
         remind: "%{assessor} Herinneren aan opdracht. Laatst herinnerd om %{time}"
-        reminder: "%{assessor} Herinneren aan opdracht. Laatst herinnerd om %{time}"
+        reminder: "%{assessor} herinneren aan opdracht. Laatst herinnerd om %{time}"
     peer_reviews_selector: 
       how_to_peer_review: "Hoe peer reviews toewijzen"
       labels: 
@@ -2368,7 +2368,7 @@ nl:
       not_found: "Bestandsgegevens zijn niet te vinden"
     feed_title: "Bestand: %{title}"
     feed_title_with_context: "Bestand, %{course_or_group}: %{title}"
-    over_quota: "Het gedownloaded bestand overschrijdt de quota"
+    over_quota: "Het gedownloaded bestand overschrijdt de quota."
     title: 
       migration_list: "Gekoppelde bestanden"
     upload_error_invalid_response_code: "Ongeldige response code, 200 verwacht maar %{code} verkregen"
@@ -2403,7 +2403,7 @@ nl:
       dan zullen alle gebruikers van die cursus de nieuw interface zien. Om het te laten verschijnen wanneer iemand\n\
       naar de persoonlijke bestandspagina van een gebruiker ('/files') gaat dan moet je die voor het account waarop ze lid zijn inschakelen. "
   big_blue_button_conference: 
-    conference_is_recorded: "Deze vergadering wordt opgenomen"
+    conference_is_recorded: "Deze vergadering wordt opgenomen."
     recording_setting: "Bezig met opnemen"
     recording_setting_description: "Deze vergadering opnemen"
   blackboard: 
@@ -2491,7 +2491,7 @@ nl:
     manage_rubrics: "Rubrics beheren"
     masquerade: "Als gebruiker voordoen"
     ok: OK
-    okay: Okay
+    okay: Oké
     publish: Publiceren
     published: Gepubliceerd
     refresh: vernieuwen
@@ -2598,9 +2598,9 @@ nl:
     agenda_view: 
       due: Inleverdatum
       loading: "Bezig met laden"
-      no_events: "Geen evenementen na deze datum\""
-      starts_at: "Beginnen op:"
-    agenda_view_displaying_start_end: " Nu weergeven% {start} tot % {end}"
+      no_events: "Geen gebeurtenissen na deze datum."
+      starts_at: "Begint op"
+    agenda_view_displaying_start_end: " Nu weergeven %{start} tot %{end}"
     appointment_group_deletion_details: "Verwijderen betekent ook dat iedere afspraak die door studenten gemaakt  is verwijderd wordt"
     appointment_group_list: 
       delete: Verwijder
@@ -2628,18 +2628,18 @@ nl:
       create_event: "Nieuw evenement maken"
       done_go_back_to_list: "Gereed, ga terug naar de lijst"
       links: 
-        accessibility_warning: "Waarschuwing: Op screenreaders is dit niet te bekijken. Gebruik daarvoor in de plaats de agenda weergave"
+        accessibility_warning: "Waarschuwing: Op screenreaders is dit niet te bekijken. Gebruik daarvoor in de plaats de agenda weergave."
         calendar_agenda: Agenda
         calendar_month: Maand
         calendar_scheduler: Planner
         calendar_week: Week
-        screenreader_recommend_agenda: "Gebruikers van screenreader: Gebruik de agenda om de evenementen te bekijken"
+        screenreader_recommend_agenda: "Gebruikers van screenreader: Gebruik de agenda om de gebeurtenissen te bekijken"
       loading: "Bezig met laden"
       my_appointment_groups: "Mijn afspraakgroepen"
       refresh: Vernieuwen
       use_old_calendar: "Oude agenda"
     calendar_navigator: 
-      enter_navigation_date: "De datum invoeren waar je naar toe wilt navigeren"
+      enter_navigation_date: "De datum invoeren waar je naar toe wilt navigeren."
       next: Volgende
       previous: Vorige
       today: Vandaag
@@ -2707,7 +2707,7 @@ nl:
       date: Datum
       delete: Verwijderen
       different_date_for_each_section: "Voor iedere sectie een andere datum gebruiken"
-      edit_calendar_event_header: "De gebeurtenis  op de kalender bijwerken"
+      edit_calendar_event_header: "De gebeurtenis  op de kalender bewerken"
       end_time: Eindtijd
       event_description: "Beschrijving van gebeurtenis"
       event_title: "Titel van gebeurtenis"
@@ -2789,7 +2789,7 @@ nl:
     save_changes: "Wijzigingen opslaan"
     scheduler_right_side_admin_section: 
       create_a_new_set_of_appointments: "Een afspraakgroep maken"
-    screenreader_date_suggestion: "%{date}. Op Enter drukken om te accepteren."
+    screenreader_date_suggestion: "%{date}. Op enter drukken om te accepteren."
     time_block_errors: "Er zitten fouten in jouw tijd blokselecties."
     time_block_row: 
       delete_link: "Tijdsbereik verwijderen"
@@ -3373,7 +3373,7 @@ nl:
     copy_course: 
       content: Inhoud
       options: Opties
-    course_list_error: "Kan de cursussen niet ophalen. Ben je verbonden met internet?"
+    course_list_error: "Kon de cursussen niet ophalen. Ben je met internet verbonden?"
     d2_l_export: 
       content: Inhoud
       options: Opties
@@ -3397,7 +3397,7 @@ nl:
       options: Opties
     must_upload_file: "Het uploaden van bestand of url is vereist"
     no_content_selected: "Je hebt geen enkele inhoud geselecteerd om te importeren."
-    no_day_substitutions: "Geen dag inzendingen toegevoegd"
+    no_day_substitutions: "Geen dag vervangingen toegevoegd"
     no_migrations_running: "Momenteel worden er geen migraties uitgevoerd"
     progressing_content_migration: 
       issues_text: problemen
@@ -3410,7 +3410,7 @@ nl:
       loading: "Bezig met laden"
     qti_zip: 
       options: Opties
-    school_required: "Je moet een school selecteren."
+    school_required: "Je moet een instelling selecteren."
     select_content: 
       cancel_btn: Annuleren
       select_content_btn: "Inhoud selecteren"
@@ -3482,7 +3482,7 @@ nl:
       cancel: Annuleren
       get_courses: "Cursussen krijgen"
       password: Wachtwoord
-      select_school: "School selecteren"
+      select_school: "Instelling selecteren"
       username: Gebruikersnaam
     web_ct_course_list: 
       course_list: Cursus(sen)
@@ -3692,7 +3692,7 @@ nl:
       titles: 
         access_report: Toegangsrapportage
     undelete_index: 
-      are_you_sure: "Weet je zeker dat je % wilt herstellen {item_naam}?"
+      are_you_sure: "Weet je zeker dat je  %{item_name} wilt herstellen?"
       headings: 
         restore__items: "Verwijderde items herstellen"
       help: 
@@ -3795,7 +3795,7 @@ nl:
         modules: 
           before_students_view: "Voordat cursisten deze module kunnen bekijken"
         new_tab: "In een nieuw tabblad laden"
-        publish_final_grade: "Eindcijfer voor de cursist publiceren als de module voltooid is"
+        publish_final_grade: "eindcijfer voor de cursist publiceren als de module voltooid is"
         require_sequential_progress: "Cursisten moeten in de juiste volgorde aan de vereisten van deze module voldoen "
         sort_by: "Sorteren op"
         title: Titel
@@ -3837,7 +3837,7 @@ nl:
         student_progression: "Modulevoortgang per cursist"
     content_next: 
       add_prerequisite: "Vereisten toevoegen aan *%{module}*"
-      assignment_points_possible: "van %{points_possible}"
+      assignment_points_possible: "op %{points_possible}"
       button: 
         delete_label: "Eerste vereiste verwijderen"
         delete_title: "Eerste vereiste verwijderen"
@@ -3848,7 +3848,7 @@ nl:
       headings: 
         add_prerequisite: "Vereiste toevoegen aan %{name}"
         course_modules: Cursusmodules
-        student_progress: "Modulevoortgang per cursist"
+        student_progress: "Voortgang van module per cursist"
         student_progress_for_module: "Voortgang van cursist voor %{module}"
         students_completed: "Cursisten die de module hebben voltooid"
         students_in_progress: "Cursisten die met de module bezig zijn "
@@ -3883,7 +3883,7 @@ nl:
         description: 
           delete: "Huidige module/huidig item verwijderen"
           edit: "Module/item bewerken"
-          indent: "inspringen vergroten"
+          indent: "Inspringen vergroten"
           new: "Nieuwe module"
           next: "Volgend(e) module/item"
           outdent: "Inspringen verkleinen"
@@ -3908,25 +3908,25 @@ nl:
         module_complete_when: "Deze module is voltooid wanneer"
         modules: 
           before_students_view: "Voordat cursisten deze module kunnen bekijken"
-        new_tab: "Dit hulpprogramma op een nieuw tabblad laden"
-        require_sequential_progress: "cursisten moeten in de juiste volgorde aan de vereisten voor deze module voldoen "
+        new_tab: "In een nieuw tabblad laden"
+        require_sequential_progress: "Cursisten moeten in de juiste volgorde aan de vereisten voor deze module voldoen "
         sort_by: "Sorteren op"
         title: Titel
         unlock_at: "Ontgrendelen op"
         url: URL
       links: 
-        add_prerequisite: "Primaire vereiste toevoegen"
+        add_prerequisite: "Vereiste toevoegen"
         add_requirement: "Vereiste toevoegen"
         reload_student: "Voortgang van cursist opnieuw laden"
         sort_by_name: Naam
         sort_by_progress: Voortgang
         student_progress: "Voortgang bekijken"
         title: 
-          remove_prerequisite: "Deze primaire vereiste verwijderen"
+          remove_prerequisite: "Deze vereiste verwijderen"
       module: module
-      module_details: "Modules worden in een bepaalde volgorde  weergegeven, dus alleen modules boven %{name} kunnen als primaire vereisten gelden."
-      module_name: "Naam van de module"
-      modules_keyboard_hint: "Eerst de cursor van uw schermlezer uitschakelen om de volgorde van de cursusmodules en moduleonderdelen te wijzigen. In JAWS Z invoegen. Op tab drukken om de eerste module te selecteren. Op het pijltje naar boven of naar beneden drukken om een module of module-item te selecteren. Op spatie drukken om de module of het module-item te selecteren en te beginnen met slepen. Vervolgens op pijltje naar boven of naar beneden drukken om een bestemming te selecteren. Dan nogmaals op spatie drukken om het geselecteerde op de plaats van bestemming neer te zetten."
+      module_details: "Modules worden in een bepaalde volgorde  weergegeven, dus alleen modules boven %{name} kunnen als primaire vereisten aangegeven worden."
+      module_name: Modulenaam
+      modules_keyboard_hint: "Eerst de cursor van uw schermlezer uitschakelen om de volgorde van de cursusmodules en moduleonderdelen te wijzigen. In JAWS z-invoegen. Op tab drukken om de eerste module te selecteren. Op het pijltje naar boven of naar beneden drukken om een module of module-item te selecteren. Op spatie drukken om de module of het module-item te selecteren en te beginnen met slepen. Vervolgens op pijltje naar boven of naar beneden drukken om een bestemming te selecteren. Dan nogmaals op spatie drukken om het geselecteerde op de plaats van bestemming neer te zetten."
       must_complete_prerequisites: "Ze moeten voltooien"
       no_preprequisites: "Geen vereisten gedefinieërd"
       no_requirements: "Geen vereisten gedefinieërd"
@@ -3935,19 +3935,19 @@ nl:
       prerequisites_need_item: "Je moet items toevoegen voordat je kunt opgeven hoe een gebruiker deze module moet voltooien"
       requirements: 
         must_contribute: "Aan de pagina bijdragen"
-        must_score_at_least: "minimum score"
+        must_score_at_least: "minimaal scoren"
         must_submit: "de opdracht inleveren"
         must_view: "het item bekijken"
       select_module: 
         instructions: "Module selecteren"
         name: "de module, %{module}"
-      select_prerequisite: "Het type vereiste selecteren. Cursisten kunnen de module pas zien zodra aan alle vereisten is voldaan."
+      select_prerequisite: "Het type vereiste selecteren. Cursisten kunnen de module pas zien zodra aan alle vereisten zijn voldaan."
       student_name: "Naam cursist"
       table_headings: 
         module: Module
-        state: Status
+        state: Provincie
       titles: 
-        student_progression: "Modulevoortgang per cursist"
+        student_progression: "Voortgang van module per cursist"
     context_module: 
       admin_links: 
         module_options_label: "Module beheren"
@@ -4005,9 +4005,9 @@ nl:
           edit_module: Bewerken
           student_progress: "De voortgang van de cursist voor deze module weergeven"
       manager_module: "Module beheren"
-      module_will_unlock_at: "wordt ontgrendeld *%{unlock_date}*"
+      module_will_unlock_at: "Wordt ontgrendeld *%{unlock_date}*"
       progression_complete_count: "*%{count}* voltooid"
-      progression_started_count: "*%{count}* voortgang"
+      progression_started_count: "*%{count}* wordt uitgevoerd"
       reorder_modules: "Slepen om modules opnieuw te ordenen"
     context_modules: 
       publish: Publiceren
@@ -4094,8 +4094,8 @@ nl:
         fulfilled: "minimaal een %{score} gescoord"
         unfulfilled: "moet minimaal een %{score} scoren"
       must_contribute: 
-        fulfilled: "bijgedragen aan de inhoud van de pagina"
-        unfulfilled: "moet bijdragen aan de inhoud van de pagina"
+        fulfilled: "aan de inhoud van de pagina bijgedragen"
+        unfulfilled: "moet aan de inhoud van de pagina bijdragen"
       must_submit: 
         fulfilled: "de opdracht ingezonden"
         unfulfilled: "moet de opdracht inzenden"
@@ -4166,7 +4166,7 @@ nl:
     all_courses: "Alle cursussen"
     all_in_context: "Alles in %{context}"
     archive: Archieveren
-    archive_conversation: "Discussie archieveren"
+    archive_conversation: "Gesprek archieveren"
     attachment_error: "Uploaden van bijlage mislukt, probeer het opnieuw."
     autocomplete_result: 
       group_people: "Personen: %{people}"
@@ -4221,7 +4221,7 @@ nl:
     conversations_pane: 
       confirm: 
         delete_conversation: "Weet u zeker dat u uw kopie van dit gesprek wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt."
-    course_name: "Naam van de cursus"
+    course_name: Cursusnaam
     course_options: 
       course_options: 
         concluded: Gesloten
@@ -4317,7 +4317,7 @@ nl:
       no_subject: "Geen onderwerp"
     message_form: 
       buttons: 
-        reply: Beantwoorden
+        reply: Antwoorden
         reply_all: "Allen beantwoorden"
         send_message: Versturen
       headings: 
@@ -4360,7 +4360,7 @@ nl:
       no_course: "Geen cursus"
       no_subject: "Geen onderwerp"
       search_names_groups_courses: "Namen, groepen en cursussen zoeken"
-      send_individual_messages: "Individuele berichten versturen"
+      send_individual_messages: "Individuele berichten verzenden"
       titles: 
         media_comment: "Opgenomen media-opmerking"
         record_media_comment: "Een audio- of video-opmerking opnemen"
@@ -4410,8 +4410,8 @@ nl:
       expand_inline: "Toon meer reacties"
       rss_feed: "Discussies feed"
       view_submission: "Bekijk inzending in een nieuw venster."
-    unarchive: "Archiveren ongedaan maken"
-    unarchive_conversation: "Archiveren van discussie ongedaan maken"
+    unarchive: "Uit het archief halen"
+    unarchive_conversation: "Gesprek uit het archief halen"
     unknown_user: "Onbekende gebruiker"
     unspecified_error: "Er is een onverwachte fout opgetreden, probeer het opnieuw"
     unstar: "Ster verwijderen"
@@ -5179,7 +5179,7 @@ nl:
           select_content: "Selecteren dat wat je op de startpagina wilt weergeven."
         options: 
           assignments: Opdrachtenlijst
-          custom_page: "Voorpagina van paginas"
+          custom_page: "Voorpagina van pagina's"
           modules: Cursusmodules
           recent_activity_dashboard: "Dashboard met recente activiteiten"
           syllabus: Syllabus
@@ -5468,7 +5468,7 @@ nl:
       date_at_time: "%b %-d om %l:%M%P"
       default: "%d-%m-%Y"
       long: "%B %-d,%Y"
-      long_with_weekday: "5A,%B%-d"
+      long_with_weekday: "%A, %B %-d"
       medium: "%d %b %Y"
       medium_month: "%b %Y"
       medium_with_weekday: "%a %b %-d, %Y"
@@ -5701,7 +5701,7 @@ nl:
       separated_conversation_notice: "Omdat dit een groepsopdracht is, heeft iedere groep een eigen gesprek voor dit onderwerp. Hier zijn de gesprekken die beschikbaar zijn voor u:"
       show_due_dates: "inleverdatums weergeven"
       until: Tot
-    cannot_unpublish_with_replies: "Kan het publiceren niet ongedaan maken als er reacties zijn"
+    cannot_unpublish_with_replies: "Kan publicatie niet ongedaan maken als er antwoorden zijn"
     confirm_delete_announcement: 
       one: "Weet je zeker dat je deze aankondiging wilt verwijderen?"
       other: "Weet je zeker dat je deze %{count} aankondigingen wilt verwijderen?"
@@ -5833,7 +5833,7 @@ nl:
       announcement_closed: "Deze aankondiging is voor opmerkingen gesloten"
       announcement_locked: "Deze aankondiging is  voor gebruikers niet zichtbaar tot *%{date}*"
       announcement_locked_until: "Deze aankondiging is vergrendeld tot %{time}"
-      announcement_not_visible: "Deze aankondiging is voor gebruikers zichtbaar"
+      announcement_not_visible: "Deze aankondiging is voor gebruikers niet zichtbaar"
       authors_name: "Naam van de auteur"
       collapse_replies: "Antwoorden samenvouwen"
       confirm_delete_discussion: "Weet je zeker dat je deze discussie wilt verwijderen?"
@@ -6559,15 +6559,15 @@ nl:
     feature_flag: 
       allow: Toestaan
       disabled: Uitgeschakeld
-      enabled: Geactiveerd
-      estimated_release: "geschatte vrijgeving"
-      no_description: "Geen beschrijving"
+      enabled: Ingeschakeld
+      estimated_release: "Geschatte versie:"
+      no_description: "geen beschrijving"
       ? "off"
       : Uit
       ? "on"
       : Aan
-      release_notes: "opmerkingen over versie"
-      toggle_feature_details: "Functiedetails in/uitschakelen"
+      release_notes: "opmerkingen bij de versie"
+      toggle_feature_details: "Functiedetails in-/uitschakelen"
     feature_flag_admin_view: 
       feature_options: "Functie opties"
       no_features_available: "Er zijn momenteel geen functies beschikaar"
@@ -7171,7 +7171,7 @@ nl:
       close_comments_label: "Opmerkingen sluiten"
       close_rubric: "Rubric sluiten"
       close_score: Sluiten
-      close_score_screenreader: "Details over scores sluiten"
+      close_score_screenreader: "Details over score sluiten"
       collapse: Samenvouwen
       comment_count: 
         one: 1opmerking
@@ -7218,7 +7218,7 @@ nl:
       see_rubric_results: "Rubricresultaten zien"
       see_rubric_results_screenreader: "Rubricresultaten zien"
       see_scoring_details: "Details van de score zien"
-      see_scoring_details_screenreader: "Details van de score zien"
+      see_scoring_details_screenreader: "Details over score zien"
       see_turnitin_results: "Turnitin-resultaten zien"
       student_mute_legend: "Jouw cursusleider is op dit moment bezig met de cijfers. Terwijl jouw cursusleider daarmee bezig is, zijn cijfer en informatie over opmerking niet beschikbaar."
       student_mute_notification: "Cursusleider is bezig met de cijfers"
@@ -7543,7 +7543,7 @@ nl:
     default_collection_name: "Collectie van %{group_name}"
     greater_than_1: "Moet groter zijn dan 1"
     memeber: Lid
-    name_required: "Naam is verplicht"
+    name_required: "Naam is vereist"
     name_too_long: "Een kortere groepsnaam invoeren"
     tabs: 
       chat: Chatten
@@ -7756,13 +7756,13 @@ nl:
       assign_to_group_menu: 
         add_to_group: "Aan groep toevoegen"
         all_groups_full: "Alle groepen zijn vol."
-        all_groups_full_suggestion: "Of groepslimieten wijzigen of meer groepen toevoegen."
+        all_groups_full_suggestion: "Ofwel groepslimieten wijzigen of meer groepen toevoegen."
         assign_user_to_group: "Gebruiker aan deze groep toewijzen"
         assign_user_to_group_name: "Gebruiker aan groep %{name} toevoegen "
         no_groups_created: "Groepen dienen gemaakt te worden voordat gebruikers toegewezen kunnen worden."
       edit_group_assignment: 
-        all_available_groups_full: "Alle beschikbare groepen zijn vol"
-        all_groups_full_suggestion: "Of groepslimieten wijzigen of meer groepen toevoegen."
+        all_available_groups_full: "Alle beschikbare groepen zijn vol."
+        all_groups_full_suggestion: "Ofwel groepslimieten wijzigen of meer groepen toevoegen."
         move_to_group_label: "Naar groep verplaatsen"
         saving: "Bezig met opslaan..."
         where_to_move: "Waar zou je *%{userName}* willen verplaatsen?"
@@ -7773,11 +7773,11 @@ nl:
         group_settings: Instellingen
         show_group_details: "Groepsgegevens tonen"
       group_categories: 
-        account_group_explanation: "Groepen cursisten op accountniveau zijn nuttig om groepen te maken die in iedere cursus gelden. Elke groep krijgt een eigen agenda, forum en andere hulpmiddelen. Hiermee kunnen ze effectief samenwerken."
-        add_group_set: "Ggroepset toevoegen"
-        course_group_explanation: "Voor cursisten is het maken van groepen een goede manier om aan groepsprojecten of papers te werken zonder gebonden te zijn aan een specifieke groep. Elke groep cursisten krijgt zijn eigen kalender, discussieforum en andere samenwerkingshulpprogrammas, dus kunnen zij zichzelf indelen en effectiever samenwerken."
+        account_group_explanation: "Groepen cursisten op accountniveau zijn nuttig om groepen te maken zonder zonder gebonden te zijn aan een specifieke cursus. Elke groep krijgt een eigen kalender, discussieforum en andere samenwerkingshulpmiddelen. Hiermee kunnen ze zichzelf indelen en effectiever samenwerken."
+        add_group_set: "Groepsreeks toevoegen"
+        course_group_explanation: "Voor cursisten is het maken van groepen een goede manier om aan groepsprojecten of papers te werken zonder gebonden te zijn aan een specifieke groep. Elke groep cursisten krijgt zijn eigen kalender, discussieforum en andere samenwerkingshulpmiddelen, dus kunnen zij zichzelf indelen en effectiever samenwerken."
         group_assignment_instructions: "U kunt cursisten willekeurig toewijzen aan groepen van een specifieke grootte of je kunt handmatig groepen maken en indelen. Eens jouw groepen gemaakt zijn, kun je opdrachten  instellen als \"groepsinzending\" opdrachten, wat inhoudt dat iedere groep een opdracht zal inzenden namens alle leden van die groep."
-        group_set: "Groepsreeks toevoegen"
+        group_set: Groepsreeks
         group_set_create: "Set groepen toevoegen"
         headings: 
           account_groups: "Groepen cursisten op accountniveau"
@@ -7796,19 +7796,19 @@ nl:
         auto_group_leader: "Automatisch een student als groepsleider aanstellen"
         auto_random_group_leader: "Willekeurige student als groepsleider aanstellen"
         cancel: Annuleren
-        create_groups: " %h{num_groups} nu groepen maken"
+        create_groups: " %h{num_groups} groepen nu maken"
         create_groups_manually: "Ik zal groepen handmatig maken"
         group_set_name: "Naam van groepsreeks"
         group_structure: Groepsstructuur
         leadership: Leiderschap
         leave_group_limit_blank: "Leeglaten voor geen limiet"
         limit_group_size: "Groepen beperken tot %h{group_limit} leden"
-        require_same_section: "Groepsleden moeten in dezelfde sectie zitten"
+        require_same_section: "Vereisen dat groepsleden in dezelfde sectie moeten zitten"
         save: Opslaan
         saving: "Bezig met opslaan..."
         self_signup: Zelfinschrijving
         self_signup_description: "Je kunt groepssets aanmaken waar studenten zich zelfstandig voor kunnen inschrijven. Studenten zijn nog steeds beperkt tot één groep in de set, maar op deze manier kunnen studenten zichzelf in groepen indelen in plaats van dat de docent dit moet doen. Houd in gedachten dat studenten zichzelf van de ene naar de andere groep kunnen verplaatsen zolang deze optie is ingeschakeld."
-        split_into_groups: "Cursisten in%h{num_groups} gelijke groepen splitsen"
+        split_into_groups: "Cursisten in %h{num_groups} gelijke groepen splitsen"
         what_is_this: "Wat is dit?"
       group_category_detail: 
         add_group: "Groep toevoegen"
@@ -7817,7 +7817,7 @@ nl:
         edit_category_option: Bewerken
         group: Groep
         group_limit_blurb: "Groepen worden beperkt tot *%{group_limit}* leden."
-        message_all_unassigned_option: "Bericht naar alle niet toegewezen studenten"
+        message_all_unassigned_option: "Bericht naar alle niet toegewezen studenten verzenden"
         randomly_assign_students_option: "Cursisten willekeurig toewijzen"
         restricted_self_signup_blurb: "Alle  cursisten uit een groep moeten in dezelfde sectie zitten."
         search: zoeken
@@ -7826,7 +7826,7 @@ nl:
         self_signup_help_tooltip: "Wat is zelf inschrijven bij groepen?"
         settings: Instellingen
         student_group_instructions: "(versleep cursisten om ze toe te wijzen)"
-        uncategorized_groups: "Deze groepen worden niet gekoppeld aan een enkele andere groepsreeks. Omdat ze via SIS geïmporteerd zijn, kunnen ze alleen via SIS bijgewerkt of verwijderd worden."
+        uncategorized_groups: "Deze groepen worden niet aan een enkele andere groepsreeks gekoppeld. Omdat ze via SIS geïmporteerd zijn, kunnen ze alleen via SIS bijgewerkt of verwijderd worden."
         user_group_instructions: "(versleep gebruikers om ze toe te wijzen)"
       group_category_edit: 
         allow_self_signup: "Zelfinschrijven toestaan"
@@ -7835,7 +7835,7 @@ nl:
         group_set_name: "Naam van groepsreeks"
         leave_group_limit_blank: "Leeglaten voor geen limiet"
         limit_group_size: "Groepen beperken tot %h{group_limit} leden"
-        require_same_section: "Groepsleden moeten in dezelfde sectie zitten"
+        require_same_section: "Vereisen dat groepsleden in dezelfde sectie moeten zitten"
         save: Opslaan
         saving: "Bezig met opslaan..."
         self_signup_description: "Je kunt groepssets aanmaken waar studenten zich zelfstandig voor kunnen inschrijven. Studenten zijn nog steeds beperkt tot één groep in de set, maar op deze manier kunnen studenten zichzelf in groepen indelen in plaats van dat de docent dit moet doen. Houd in gedachten dat studenten zichzelf van de ene naar de andere groep kunnen verplaatsen zolang deze optie is ingeschakeld."
@@ -7856,7 +7856,7 @@ nl:
         group_max_membership_help: "(Blanco laten om max set groep te gebruiken)"
         group_max_membership_members: leden
         group_name: Groepsnaam
-        invitation_only: "Aleen uitnodiging"
+        invitation_only: "Alleen uitnodiging"
         open: "Leden zijn vrij om deel te nemen"
         save: Opslaan
         saving: "Bezig met opslaan..."
@@ -7865,7 +7865,7 @@ nl:
         assign_user_to_group: "Aan een groep toewijzen %{name}"
         edit_group_membership: "Lidmaatschap van %{name} veranderen"
         group_leader: Groepsleider
-        move: "verplaatsen naar…"
+        move: "Verplaatsen naar…"
         move_to_new_group: "Naar een nieuwe groep verplaatsen %{name}"
         remove: Verwijderen
         remove_as_leader: "Als leider verwijderen"
@@ -7874,10 +7874,10 @@ nl:
         set_as_leader: "Als leider aanstellen"
         set_user_as_leader: "%{name} als leider aanstellen"
       group_users: 
-        add_student: "Een cursist toevoegen om te kunnen starten"
-        add_user: "Een gebruiker toevoegen om te kunnen starten"
-        no_matching_students: "Geen cursisten die overeenkomen"
-        no_matching_users: "Geen gebruikers die overeenkomen"
+        add_student: "Een cursist toevoegen om te kunnen starten."
+        add_user: "Een gebruiker toevoegen om te kunnen starten."
+        no_matching_students: "Geen cursisten die overeenkomen."
+        no_matching_users: "Geen gebruikers die overeenkomen."
         no_students: "Deze groep heeft momenteel geen cursisten."
         no_users: "Deze groep heeft momenteel geen gebruikers."
       groups: 
@@ -7890,11 +7890,11 @@ nl:
         add_more_users: Annuleren
         cancel: Annuleren
         close: Oké
-        okay: Okay
+        okay: Oké
         randomly_assign_students_dialog: "Hiermee wijs je automatisch alle niet-toegewezen cursisten zo gelijkmatig mogelijk toe aan de bestaande groepen cursisten."
       self_signup_help: 
         about_self_signup_groups: "Over zelfinschrijvingsgroepen"
-        self_signup_description: "Je kunt groepsreeksen maken waar studenten zich zelfstandig voor in kunnen schrijven. Cursisten zijn nog steeds beperkt tot een groep uit de reeks, maar op deze manier kunnen cursisten zichzelf in groepen indelen in plaats van dat de docent dit moet doen. Houd in gedachten dat studenten zichzelf van de ene naar de andere groep kunnen verplaatsen zolang deze optie is ingeschakeld."
+        self_signup_description: "Je kunt groepsreeksen maken waar cusisten zich zelfstandig voor in kunnen schrijven. Cursisten zijn nog steeds beperkt tot een groep uit de reeks, maar op deze manier kunnen cursisten zichzelf in groepen indelen in plaats van dat de docent dit moet doen. Houd in gedachten dat cusisten zichzelf van de ene naar de andere groep kunnen verplaatsen zolang deze optie is ingeschakeld."
     max_membership_number: "Max lidmaatschap moet een getal zijn"
     member: 
       one: "1 (groeps)lid"
@@ -7917,7 +7917,7 @@ nl:
       students_assigned: "Cursisten aan groepen  toegewezen."
       update_success: "Groep succesvol bijgewerkt."
       welcome: "Welkom bij de groep %{group_name}!"
-    positive_group_count: "Moet een positief groepsaccount invoeren"
+    positive_group_count: "Moet een positief groepsaantal invoeren"
     randomly_assigning_members: "Cursisten worden willekeurig toegewezen"
     show: 
       coming_up: "Aankomende (gebeurtenissen)"
@@ -8256,7 +8256,7 @@ nl:
           , maar was niet mogelijk omdat de opdracht geen maximaal aantal punten heeft.
       no_points_possible: "Opdracht heeft geen maximaal aantal punten."
       no_score: "Geen score gegeven"
-      no_submission_created: "Het verzoek van dit leerresultaat om een nieuwe huiswerking inzending te maken is mislukt."
+      no_submission_created: "Het verzoek voor een resultaat om een nieuwe opdracht inzending te maken is mislukt."
     canvas: 
       migration: 
         announcements: Aankondigingen
@@ -10432,7 +10432,7 @@ nl:
   new_styles_description: |-
       Wij zijn bezig met een facelift van het gebruikersinterface op Canvas. Schakel dit in om het
       bijgewerkte, simpeler uiterlijk van het gebruikersinterface op Canvas.
-  no_migration_file: "Bestand nodig om inhoud te migreren"
+  no_migration_file: "Bestand nodig om inhoud te migreren."
   not_a_number: "Moet een positief getal zijn"
   not_applicable: "Niet van toepassing"
   notification: 
@@ -11801,7 +11801,7 @@ nl:
     published: Gepubliceerd
     publishing: Publiceren...
     unpublish: "Publicatie ongedaan maken"
-    unpublish_click: "Niet gepubliceerd, op publiceren klikken"
+    unpublish_click: "Niet gepubliceerd, klikken om te publiceren"
     unpublishing: "Publicatie ongedaan maken..."
   publishable: 
     cant_unpublish: "Kan publicatie niet ongedaan maken"
@@ -12138,7 +12138,7 @@ nl:
     assignment_points_possible: 
       one: "1 punt"
       other: "%{count} punten"
-    assignments_label: "Voor toetsen met opdracht(en) toets zichtbaar maken"
+    assignments_label: "Opdrachtoetsen schakelt zichtbaarheid van toets in/uit"
     buttons: 
       add_selected_questions: "Geselecteerde vragen toevoegen"
       adding_questions: "Bezig met toevoegen van vragen..."
@@ -12160,7 +12160,7 @@ nl:
       delete_quiz: "Weet je zeker dat je deze toets wilt verwijderen?"
       scrap_and_restart: "Deze toets wissen en opnieuw beginnen?"
     correct_answers_no_longer_available: "De juiste antwoorden ziin niet meer beschikbaar."
-    correct_answers_protected: "Juiste antwoorden zijn verborgen"
+    correct_answers_protected: "Juiste antwoorden zijn verborgen."
     correct_answers_shown_after: "Juiste antwoorden zullen beschikbaar zijn op %{date}."
     correct_answers_shown_between: "De juiste antwoorden zullen beschikbaar zijn %{from} - %{to}."
     correct_answers_shown_until: "Juiste antwoorden zijn beschikbaar tot %{date}"
@@ -12247,8 +12247,8 @@ nl:
       no_possible_solution: "Genereer minimaal een mogelijke oplossing"
       quiz_deleted: "Deze test is verwijderd"
       quiz_score_not_a_number: "Score moet een getal zijn tussen 0 en 2.000.000.000"
-      quiz_score_too_long: "Score moet minder dan 2.000.000.000 zijn\""
-      quiz_score_too_short: "Score moet groter zijn dan 0"
+      quiz_score_too_long: "Score moet minder dan 2.000.000.000 zijn."
+      quiz_score_too_short: "Score moet groter zijn dan 0."
       quiz_update_failed: "Kan test niet wijzigen"
       retrieving_filters_failed: "Het ophalen van filters  mislukt"
     ? "false"
@@ -12567,9 +12567,9 @@ nl:
         quiz_submission_extra_attempts_not_a_number: " Extra pogingen moeten een getal zijn."
         quiz_submission_extra_attempts_too_long: "Extra pogingen moeten minder dan 1.000 zijn."
         quiz_submission_extra_attempts_too_short: "Extra pogingen moeten groter dan 0 zijn."
-        quiz_submission_extra_time_not_a_number: "Extra tijd moet een getal zijn"
-        quiz_submission_extra_time_too_long: "Extra tijd moet minder dan 10080 zijn"
-        quiz_submission_extra_time_too_short: "Extra tijd moet groter dan 0 zijn"
+        quiz_submission_extra_time_not_a_number: "Extra tijd moet een getal zijn."
+        quiz_submission_extra_time_too_long: "Extra tijd moet minder dan 10080 zijn."
+        quiz_submission_extra_time_too_short: "Extra tijd moet groter dan 0 zijn."
         server_communication_failed: "Er is tijdens het communiceren met de server een probleem opgetreden. Het systeem zal het  over vijf minuten opnieuw proberen. Je kunt ook deze pagina opnieuw laden"
       extended_quiz_time_explanation: "U kunt de leerling extra tijd geven voor de huidige testpoging. Hoeveel tijd wilt u geven?"
       extensions_for_student: "Verlengingen voor %{student}"
@@ -12692,7 +12692,7 @@ nl:
         one: "Publicatie van 1 test ongedaan gemaakt"
         other: "Publicatie van %{count} tests ongedaan gemaakt!"
     practice_quiz: "Oefenen van toetsen"
-    practices_label: "Oefenen van toetsen schakelt zichtbaarheid van toets in"
+    practices_label: "Oefentoetsen schakelt zichtbaarheid van toets in/uit"
     question_colon: "Vraag:"
     question_count: 
       one: "1 vraag"
@@ -13914,7 +13914,7 @@ nl:
       manage_courses: "Cursussen beheren (toevoegen/bewerken/verwijderen)"
       manage_demos: "Demos beheren"
       manage_developer_keys: "Sleutels voor ontwikkelaars beheren"
-      manage_feature_flags: "functies op (een) account niveau in- of uitschakelen"
+      manage_feature_flags: "Functies op een account niveau in- of uitschakelen"
       manage_files: "Cursusbestanden beheren (toevoegen/bewerken/verwijderen)"
       manage_frozen_assignment: "Bevroren opdrachten beheren (bewerken/verwijderen)"
       manage_global_outcomes: "Globale leerresultaten beheren"
@@ -14007,9 +14007,9 @@ nl:
   roster: 
     delete_confirm: "Weet je zeker dat je deze gebruiker wilt verwijderen?"
     error_sending_invitations: "Fout bij het versturen van de uitnodiging. Probeer opnieuw."
-    filter_multiple_users_found: "%{userCount} gebruikers gevonden"
-    filter_no_users_found: "Geen vergelijkbare gebruikers gevonden"
-    filter_one_user_found: "1 gebruiker gevonden"
+    filter_multiple_users_found: "%{userCount} gebruikers gevonden."
+    filter_no_users_found: "Geen vergelijkbare gebruikers gevonden."
+    filter_one_user_found: "1 gebruiker gevonden."
     flash: 
       removeError: "Kan de gebruiker niet verwijderen. Probeer later opnieuw."
       removed: "Gebruiker succesvol verwijderd."
@@ -14698,7 +14698,7 @@ nl:
       labels: 
         total_points: "Totaal aantal punten"
       points_out_of: "*%{points}* van **%{total}**"
-      rubric: Rubriek
+      rubric: Rubric
     rubric_summary_criterion: 
       defaults: 
         description: "Beschrijving van criterium"
@@ -14968,8 +14968,8 @@ nl:
     titles: 
       value_over_time: "%{value} te laat"
     user_search: 
-      find_user_by: "Een gebruiker door Login of email zoeken"
-      find_user_by_label: Login/Email
+      find_user_by: "Een gebruiker door aanmelding of email zoeken"
+      find_user_by_label: Aanmelden/Email
     users: 
       user_search_label: "Gebruiker zoeken"
       users_matching_label: "Gebruikers overeenkomstig"
@@ -15001,7 +15001,7 @@ nl:
     next_object: "Volgende %{type}"
     no_assignment: "Geen opdracht gekozen"
     no_outcome: "Geen gekozen resultaat"
-    no_student: "Geen student geselcteerd"
+    no_student: "Geen student geselecteerd"
     none: Geen
     notes: Opmerkingen
     on_paper: "Op papier"
@@ -15129,7 +15129,7 @@ nl:
       assignment_submit_fail: "Fout bij inzenden van opdracht"
       can_not_submit_locked_assignment: "Je  kunt geen opdracht inleveren wanneer deze vergrendeld is"
       invalid_file_type: "Ongeldig bestandstype"
-      invalid_google_docs_domain: "Je kunt vanuit deze google_docs domain geen opdrachten inzenden"
+      invalid_google_docs_domain: "Je kunt vanuit deze google_docs domein geen opdrachten inleveren"
       media_file_attached: "Er is geen media opname in deze inzending gevonden"
       no_attached_file: "Je moet minimaal een bestand  aan deze opdracht toevoegen"
       no_report: "Geen rapportage gevonden voor die inzending"
@@ -15148,7 +15148,7 @@ nl:
         save_comment: "Opmerking opslaan"
       crumbs: 
         assignments: Opdrachten
-      hide_rubric_button: "Rubric verbergen\""
+      hide_rubric_button: "Rubric verbergen"
       labels: 
         add_a_comment: "Een opmerking toevoegen"
         grade: Cijfer
@@ -15377,11 +15377,11 @@ nl:
       more_message: "en nog %{count} meer..."
   tours: 
     quiz_regrade: 
-      first_bullet: "Als je eenmaal een antwoord gewijzigd hebt moet je een optie kiezen voordat je de vraag bijwerkt."
+      first_bullet: "Je zult een optie moeten kiezen als je eenmaal een antwoord gewijzigd hebt voordat je de vraag kunt bijwerken."
       got_it: "Ok, ik snap het"
-      second_bullet: "Zorg ervoor dat je de meest toepasselijke optie kiest omdat de scores van cursisten beïnvloed kunnen worden"
-      third_bullet: "Canvas zal alle inzendingen herberekenen wanneer je deze toets hebt opgeslagen; dit kan een paar minuten duren."
-      try_later: "Je kunt nu de herberekingsopties instellen voor cursisten die de toets al gemaakt hebben."
+      second_bullet: "Zorg ervoor dat je de meest toepasselijke optie kiest omdat de scores van cursisten beïnvloed kunnen worden."
+      third_bullet: "Canvas zal alle inzendingen opnieuw beoordelen nadat je de toets opslaat; dit kan een paar minuten duren."
+      try_later: "Je kunt nu de opties voor het opnieuw beoordelen instellen voor cursisten die de toets al afgenomen hebben."
   turnitin: 
     error_1007: "Het geüploade bestand is te groot."
     error_1009: "Ongeldig bestandstype. (Geldige bestandstypen zijn MS Word, Acrobat PDF, Postscript, Text, HTML, WordPerfect (WPD) en Rich Text Format.)"
@@ -15815,11 +15815,11 @@ nl:
   warnings: 
     test_install: 
       message: "Deze Canvas-installatie is alleen bestemd voor tests en zal elke week gereset worden."
-      periodic_message: "Deze canvas installatie is alleen voor toetsing en zal periodiek opnieuw ingesteld worden"
+      periodic_message: "Deze Canvas installatie is alleen voor toetsing en zal periodiek opnieuw ingesteld worden."
       title: "Toets-installatie van Canvas"
       weekly_message: 
-        one: "Deze canavs instelling is alleen voor toetsing en zal iedere week opnieuw ingesteld worden"
-        other: "Deze canvas instelling is alleen voor toetsing en zal iedere %{count} weken opnieuw ingesteld worden"
+        one: "Deze Canvas instelling is alleen voor toetsing en zal iedere week opnieuw ingesteld worden."
+        other: "Deze Canvas instelling is alleen voor toetsing en zal iedere %{count} weken opnieuw ingesteld worden."
   web_conference: 
     default_name_for_courses: "Cursusvergadering (online)"
     default_name_for_groups: "Groepsvergadering (online)"
@@ -16018,7 +16018,7 @@ nl:
     front_page: Voorpagina
     notices: 
       cannot_edit: "Je mag de pagina \"%{title}\" niet bewerken."
-      cannot_read_revisions: "Je mag de historische revisies van \"%{title}\" niet controleren."
+      cannot_read_revisions: "Je mag de historische revisies van \"%{title}\" niet bekijken."
       create_non_existent_page: "De pagina \"%{title}\" bestaat (nog) niet, maar deze kun je hieronder maken"
       page_deleted: "De pagina \"%{title}\" is verwijderd."
       page_does_not_exist: "De pagina \"%{title}\" bestaat niet."
@@ -16026,7 +16026,7 @@ nl:
     page_link: 
       link_hidden_from_students_warning: "Cursisten zullen deze koppeling niet zien"
     page_revisions: 
-      page_revisions_title: "%{title} revisies:%{context_name}"
+      page_revisions_title: "%{title} revisies: %{context_name}"
     pages_index: 
       titles: 
         pages: Paginas
