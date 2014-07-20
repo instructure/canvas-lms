@@ -118,6 +118,7 @@ ar:
     default_delegated_login_handle_name: "تسجيل الدخول"
     default_login_handle_name: "البريد الإلكتروني"
     saml_eppn_domain_stripped: "%{eppn} (تم تجريد المجال)"
+    test_bind_failed: "فشل الربط مع ظهور الخطأ التالي: %{error}"
     test_connection_timeout: "مهلة أثناء التوصيل"
     test_host_unknown: "مضيف غير معروف: %{host}"
     test_login_auth_exception: "استثناء عند تسجيل الدخول: %{error}"
@@ -138,6 +139,7 @@ ar:
           إذا قمت بتكوين إعدادات جعلتك غير قادر على تسجيل الدخول فيمكنك إضافة
             *%{url1}* إلى نهاية عنوان url لتسجيل الدخول. سيتيح لك ذلك تسجيل الدخول            باستخدام إجراء تسجيل الدخول العادي لـ Canvas. بالنسبة لهذا الحساب يمكن أن يكون عنوان url هو %{url2}
       choose_auth_type_option: "اختيار خدمة المصادقة"
+      current_settings_title: "التكامل الحالي"
       delete_auth_confirmation: "هل أنت متأكد؟ قد لا يتمكن المستخدمون من تسجيل الدخول إذا تمت إزالة هذا."
       delete_auth_link: "إزالة المصادقة"
       edit_auth_link: "تحرير التفاصيل"
@@ -333,7 +335,17 @@ ar:
     report_header_assignment_id: "معرف المهمة"
     report_header_assignment_title: "عنوان المهمة"
     report_header_assignment_url: "عنوان url للمهمة"
+    report_header_associated_user_id: associated_user_id
     report_header_attempt: المحاولة
+    report_header_canvas_account_id: canvas_account_id
+    report_header_canvas_associated_user_id: canvas_associated_user_id
+    report_header_canvas_course_id: canvas_course_id
+    report_header_canvas_group_id: canvas_group_id
+    report_header_canvas_parent_id: canvas_parent_id
+    report_header_canvas_section_id: canvas_section_id
+    report_header_canvas_term_id: canvas_term_id
+    report_header_canvas_user_id: canvas_user_id
+    report_header_canvas_xlist_course_id: canvas_xlist_course_id
     report_header_course: المساق
     report_header_course__id: "معرف المساق"
     report_header_course_id: "معرف المساق"
@@ -360,6 +372,7 @@ ar:
     report_header_long_name: "الاسم الطويل"
     report_header_name: الاسم
     report_header_outcome_score: "درجة التعلم"
+    report_header_parent_account_id: parent_account_id
     report_header_role: الدور
     report_header_section: القسم
     report_header_section__id: "معرف القسم"
@@ -387,6 +400,7 @@ ar:
     report_header_user_id: "معرف المستخدم"
     report_header_user_name: "اسم المستخدم"
     report_header_user_sis_id: "معرف sis للمستخدم"
+    report_header_xlist_course_id: xlist_course_id
     sis_exporter: 
       reports: "تقارير: %{files}"
     student: 
@@ -1388,6 +1402,7 @@ ar:
       tab_quotas: الحصص
       tab_reports: التقارير
       tab_settings: إعدادات
+      transifex_message: "انضم إلى [مجتمع ترجمة Canvas](%{transifex_url})"
       turnitin_comments_help: "سيتم عرض هذه التعليقات للطلاب عند إرسال مهمة تم تمكين Turnitin لها"
       turnitin_pledge_help: "يجب أن يضع الطلاب علامة اختيار أمام الخانة التي تفيد بأنهم يوافقون على هذا التعهد"
       turnitin_settings_title: "إعدادات Turnitin"
@@ -1476,8 +1491,8 @@ ar:
       pending_batches_title: "دفعات معلقة"
       process_data_button: "بيانات العملية"
       select_file_instructions: |-
-          حدد ملف zip الذي تريد استيراده.  
-          بالنسبة لوصف كيفية إنشاء ملفات zip هذه، [الرجاء مراجعة هذه الوثائق](%{uri}).
+          حدد ملف zip الذي تريد استيراده.
+          للحصول على وصف لكيفية إنشاء ملفات zip هذه، [الرجاء مراجعة هذه الوثائق](%{url}).
       sis_import_crumb: "استيراد SIS"
       started_at_message: "بدأ: %{started_at}"
       title: "استيراد SIS"
@@ -1776,6 +1791,8 @@ ar:
       ta: "تسجيلات Ta"
       teachers: "تسجيلات المعلمين"
     user_add_failed_message: "فشل إضافة مستخدم، الرجاء المحاولة مرة أخرى"
+    user_added_message: "تمت إضافة *%{user}* بنجاح!"
+    user_added_message_sent_message: "تمت إضافة *%{user}* بنجاح! يجب أن يتلقوا بريدًا إلكترونيًا للتأكيد بعد قليل."
     user_deleted_message: "تم حذف %{username} بنجاح"
     user_inactivity_csv_description: 
       account_reports: 
@@ -2189,6 +2206,7 @@ ar:
         never_drop: "لا يتم الإسقاط مطلقًا"
         no_assignments: "[بدون مهام]"
         weighted_by_points: "التقدير حسب النقاط"
+      percent_of_total_grade: "نسبة الدرجة الإجمالية"
     assignment_count: 
       few: "%{count} من التعيينات"
       many: "%{count} من التعيينات"
@@ -2410,6 +2428,7 @@ ar:
       description: الوصف
       freeze_properties: "تأمين خصائص التعيين عند النسخ"
       notify_content_change: "إعلام المستخدمين بأن هذا المحتوى قد تغير"
+      only_visible_to_overrides_note: "ملاحظة: يمكن رؤية هذه المهمة *فقط* بواسطة القسم (الأقسام) المحددة أدناه:"
       points_possible: النقاط
       post_to_sis: "نشر في SIS"
       warnings: 
@@ -2875,6 +2894,7 @@ ar:
     title: 
       migration_list: "ملفات مرتبطة"
     upload_error_invalid_response_code: "كود استجابة غير صالح، كان المتوقع 200 لكنه حصل على %{code}"
+    upload_error_invalid_url: "تعذر تحليل عنوان URL: %{url}"
     upload_error_over_quota: "تجاوز حجم الملف قيود الحصة: %{bytes} بايت"
     upload_error_relative_uri: "لم يتم توفير مضيف لـ URL: التالي %{url}"
     upload_error_timeout: "انتهت مهلة الطلب: %{url}"
@@ -3727,6 +3747,9 @@ ar:
         ? "yes"
         : نعم
       details: 
+        account_exists: |-
+            يوجد حساب مستخدم مقترن بالفعل بالبريد الإلكتروني %{email}.
+            **هل أنت %{name}؟**
         account_needed: "لقد تمت دعوتك للانضمام إلى **%{course}**. لقبول هذا الطلب فإنك تحتاج إلى حساب Canvas. انقر فوق الارتباط أدناه لإنشاء حساب Canvas."
         add_email: "هل تود إضافة عنوان البريد الإلكتروني هذا إلى الحساب الحالي الخاص بك؟"
         choose_login: "حدّد المكان الذي تريد تسجيل الدخول إليه."
@@ -3734,6 +3757,9 @@ ar:
         logged_in_other_user_course: "تم إرسال الدعوة بشأن %{course} إلى **%{email}**، لكن تم تسجيل دخولك حاليًا كـ **%{user}**."
         merge_multiple: "حدّد الحساب الذي تود الانضمام إليه **%{current_user}**."
         merge_one: "هل تود الانضمام إلى **%{current_user}** و**%{other_user}**؟"
+        multiple_accounts_course: |-
+            يوجد %{count} من الحسابات المقترنة بعنوان البريد الإلكتروني هذا.
+            فأيهما أنت؟
         none_of_these: "لا شيء من هذا، أنا مستخدم جديد"
         register: "لإنهاء تسجيل دخولك، ستحتاج إلى المزيد من المعلومات القليلة."
         register_with_course: "لإنهاء تسجيل دخولك للمساق **%{course}**، ستحتاج إلى المزيد من المعلومات القليلة."
@@ -4108,6 +4134,7 @@ ar:
         conclude_student: "هل ترغب بالتأكيد في الوصول إلى تسجيل الطالب هذا؟"
         delete_enrollment: "هل ترغب بالتأكيد في حذف تسجيل الطالب هذا؟"
       enrolled_as: "تم التسجيل كـ %{enrollment_type}"
+      enrollment_linked_to: "مرتبط بـ *%{linked_user}*"
       error: 
         enrollment_change_failed: "فشل تغيير ميزة التسجيل، الرجاء المحاولة مرة أخرى"
       labels: 
@@ -4162,6 +4189,7 @@ ar:
         delete_enrollment: "هل ترغب بالتأكيد في حذف تسجيل الطالب هذا؟"
       enrolled_as: "تم التسجيل كـ %{enrollment_type}"
       enrollment_change_failed: "فشل تغيير ميزة التسجيل، الرجاء المحاولة مرة أخرى"
+      enrollment_linked_to: "مرتبط بـ *%{linked_user}*"
       headings: 
         recent_messages: "الرسائل الحديثة"
         user_services: "خدمات الويب المسجّلة"
@@ -4688,17 +4716,17 @@ ar:
     subject: "رسالة خاصة"
     subject_specified: "رسالة خاصة: %{subject}"
     users_added: 
-      few: "تمت إضافة %{list_of_users} من قبل %{current_user}"
-      many: "تمت إضافة %{list_of_users} من قبل %{current_user}"
-      one: "تمت إضافة %{list_of_users} من قبل %{current_user}"
-      other: "تمت إضافة %{list_of_users} من قبل %{current_user}"
-      two: "تمت إضافة %{list_of_users} من قبل %{current_user}"
-      zero: "تمت إضافة %{list_of_users} من قبل %{current_user}"
+      few: "تمت إضافة %{list_of_users} إلى المحادثة بواسطة %{current_user}"
+      many: "تمت إضافة %{list_of_users} إلى المحادثة بواسطة %{current_user}"
+      one: "تمت إضافة %{user} إلى المحادثة بواسطة %{current_user}"
+      other: "تمت إضافة %{list_of_users} إلى المحادثة بواسطة %{current_user}"
+      two: "تمت إضافة %{list_of_users} إلى المحادثة بواسطة %{current_user}"
+      zero: "تمت إضافة %{list_of_users} إلى المحادثة بواسطة %{current_user}"
   conversation_participant: 
     batch_update_message: 
       few: "تمت معالجة %{count} من المحادثات"
       many: "تمت معالجة %{count} من المحادثات"
-      one: "تمت معالجة %{count} من المحادثات"
+      one: "تمت معالجة محادثة واحدة"
       other: "تمت معالجة %{count} من المحادثات"
       two: "تمت معالجة %{count} من المحادثات"
       zero: "تمت معالجة %{count} من المحادثات"
@@ -5543,6 +5571,7 @@ ar:
         tools: التطبيق
       titles: 
         edit_navigation: "تحرير تنقل المساق"
+      transifex_message: "انضم إلى [مجتمع ترجمة Canvas](%{transifex_url})"
       turnitin: "سيتم عرض هذه التعليقات للطلاب عند إرسال مهمة تم تمكين Turnitin لها"
       view_grading_scheme: "عرض نظام التقييم"
       wiki_editing_roles: "يستطيع إنشاء صفحات wiki للمساق وإعادة تسميتها وتحريرها بشكل افتراضي"
@@ -6161,12 +6190,12 @@ ar:
       due_date: "تاريخ الاستحقاق %{date}"
       for: "بالنسبة لـ"
       graded_discussion_and_points: 
-        few: "هذه مناقشة مدرجة: تتوافر *%{count} من النقاط*"
-        many: "هذه مناقشة مدرجة: تتوافر *%{count} من النقاط*"
-        one: "هذه مناقشة تم تقييم درجاتها: تتوافر *%{count} من النقاط*"
-        other: "هذه مناقشة تم تقييم درجاتها: تتوافر *%{count} من النقاط*"
-        two: "هذه مناقشة مدرجة: تتوافر *%{count} من النقاط*"
-        zero: "هذه مناقشة مدرجة: تتوافر *%{count} من النقاط*"
+        few: "هذه مناقشة يتم تقييم درجاتها: يتوفر *%{count} من النقاط*"
+        many: "هذه مناقشة يتم تقييم درجاتها: يتوفر *%{count} من النقاط*"
+        one: "هذه مناقشة يتم تقييم درجاتها: *تتوفر نقطة واحدة*"
+        other: "هذه مناقشة يتم تقييم درجاتها: يتوفر *%{count} من النقاط*"
+        two: "هذه مناقشة يتم تقييم درجاتها: يتوفر *%{count} من النقاط*"
+        zero: "هذه مناقشة يتم تقييم درجاتها: يتوفر *%{count} من النقاط*"
       show_due_dates: "إظهار تواريخ الاستحقاق"
       until: حتى
     cannot_unpublish_with_replies: "لا يمكن إلغاء النشر إذا كان هناك ردود"
@@ -6345,6 +6374,7 @@ ar:
       show_rubric: "إظهار العنوان"
       speed_grader: "تقييم سريع"
       topic: الموضوع
+      topic_locked: "لن يتمكن المستخدمون من رؤية هذا الموضوع حتى *%{date}*"
       topic_locked_until: "هذا الموضوع مؤمّن حتى %{time}"
       topic_not_visible: "لا يظهر هذا الموضوع للمستخدمين"
       topic_podcast_feed_link: "موجز Podcast للموضوع"
@@ -7719,12 +7749,12 @@ ar:
       titles: 
         submission_graded: "%{graded_date} حسب %{grader}"
     invalid_assignment_groups_warning: 
-      few: "لا يتضمن مجموع الدرجات بضع مجموعات لأنها ليست لديها نقاط ممكنة"
-      many: "لا يتضمن مجموع الدرجات عدة مجموعات لأنها ليست لديها نقاط ممكنة"
-      one: "لا يتضمن مجموع الدرجات %{groups} مجموعات لأنها ليست لديها نقاط ممكنة"
-      other: "لا يتضمن مجموع الدرجات %{groups} مجموعات لأنها ليست لديها نقاط ممكنة"
-      two: "لا يتضمن مجموع الدرجات مجموعتين لأنهما ليست لديهما نقاط ممكنة"
-      zero: "لا يتضمن مجموع الدرجات أي مجموعة لأنها ليست لديها نقاط ممكنة"
+      few: "لا يتضمن مجموع الدرجات %{groups} لأنها لا تشتمل على نقاط ممكنة"
+      many: "لا يتضمن مجموع الدرجات %{groups} لأنها لا تشتمل على نقاط ممكنة"
+      one: "لا يتضمن مجموع الدرجات %{groups} لأنها لا تشتمل على نقاط ممكنة"
+      other: "لا يتضمن مجموع الدرجات %{groups} لأنها لا تشتمل على نقاط ممكنة"
+      two: "لا يتضمن مجموع الدرجات %{groups} لأنها لا تشتمل على نقاط ممكنة"
+      zero: "لا يتضمن مجموع الدرجات %{groups} لأنها لا تشتمل على نقاط ممكنة"
     no_assignments_have_points_warning: "لا يمكن حساب مجموع الدرجات إلا أن تكون للمهمة نقاط ممكنة"
     notices: 
       unauthorized: "غير مُصرح لك بعرض الحضور الخاص بهذا المساق"
@@ -7732,7 +7762,7 @@ ar:
       uploaded: 
         few: "تم إنشاء الملفات والتعليقات لعدد %{count} من عمليات الإرسال"
         many: "تم إنشاء الملفات والتعليقات لعدد %{count} من عمليات الإرسال"
-        one: "تم إنشاء الملفات والتعليقات لعدد %{count} من عمليات الإرسال"
+        one: "تم إنشاء الملفات والتعليقات لعملية إرسال واحدة"
         other: "تم إنشاء الملفات والتعليقات لعدد %{count} من عمليات الإرسال"
         two: "تم إنشاء الملفات والتعليقات لعدد %{count} من عمليات الإرسال"
         zero: "تم إنشاء الملفات والتعليقات لعدد %{count} من عمليات الإرسال"
@@ -8336,28 +8366,28 @@ ar:
       x_new_in_announcements: 
         few: "*%{count}* من الإعلانات"
         many: "*%{count}* من الإعلانات"
-        one: "*%{count}* من الإعلانات"
+        one: "إعلان واحد *1*"
         other: "*%{count}* من الإعلانات"
         two: "*%{count}* من الإعلانات"
         zero: "*%{count}* من الإعلانات"
       x_new_in_assignments: 
         few: "*%{count}* من إخطارات المهمة"
         many: "*%{count}* من إخطارات المهمة"
-        one: "*%{count}* من إخطارات المهمة"
+        one: "إخطار مهمة واحد *1*"
         other: "*%{count}* من إخطارات المهمة"
         two: "*%{count}* من إخطارات المهمة"
         zero: "*%{count}* من إخطارات المهمة"
       x_new_in_conversations: 
-        few: "*%{count}* من رسالات المحادثة"
-        many: "*%{count}* من رسالات المحادثة"
-        one: "*%{count}* من رسالات المحادثة"
-        other: "*%{count}* من رسالات المحادثة"
-        two: "*%{count}* من رسالات المحادثة"
-        zero: "*%{count}* من رسالات المحادثة"
+        few: "*%{count}* من رسائل المحادثة"
+        many: "*%{count}* من رسائل المحادثة"
+        one: "رسالة محادثة واحدة *1*"
+        other: "*%{count}* من رسائل المحادثة"
+        two: "*%{count}* من رسائل المحادثة"
+        zero: "*%{count}* من رسائل المحادثة"
       x_new_in_discussions: 
         few: "*%{count}* من المناقشات"
         many: "*%{count}* من المناقشات"
-        one: "*%{count}* من المناقشات"
+        one: "مناقشة واحدة *1*"
         other: "*%{count}* من المناقشات"
         two: "*%{count}* من المناقشات"
         zero: "*%{count}* من المناقشات"
@@ -8666,7 +8696,7 @@ ar:
       completed_message: 
         few: "تمت معالجة %{count} من العناصر"
         many: "تمت معالجة %{count} من العناصر"
-        one: "تمت معالجة %{count} من العناصر"
+        one: "تمت معالجة عنصر واحد"
         other: "تمت معالجة %{count} من العناصر"
         two: "تمت معالجة %{count} من العناصر"
         zero: "تمت معالجة %{count} من العناصر"
@@ -9242,6 +9272,7 @@ ar:
           message: "قام %{user} بتسجيل الاشتراك لك في \"%{appointment_name}\"."
           slots_remaining: "الأجزاء الزمنية المتاحة"
           subject: "تم تسجيل الاشتراك لك في \"%{appointment_name}\""
+        instructions: "تسجيل الاشتراك في جزء زمني مختلف على الارتباط التالي: %{link}"
         labels: 
           attendee: الحاضر
           attendees: الحضور
@@ -10089,9 +10120,12 @@ ar:
       success: "يجري تسليم بريدك الإلكتروني."
     migration_export_ready: 
       email: 
+        body: "المحتوى جاهز ليتم استيراده إلى المساق لديك."
         html: 
+          body: "المحتوى جاهز ليتم استيراده إلى المساق لديك."
           link_message2: "انقر فوق *هذا الارتباط* لاختيار عناصر المحتوى المراد استيرادها"
           subject: "محتوى المساق \"%{course_name}\" جاهز للاستيراد"
+        link_message: "انقر فوق هذا الارتباط لاختيار عناصر المحتوى المراد استيرادها:"
         subject: "استخراج المساق جاهز: %{course_name}"
     new_account_user: 
       email: 
@@ -11219,6 +11253,7 @@ ar:
       instructions: 
         main: 
           manage: 
+            description: "*يتم إنشاء النتائج هنا لتتبع درجة الإتقان في الدورة التدريبية. للبدء، افحص شريط القائمة على طول الجزء العلوي. انقر على الزر \"جديد\" لإنشاء نتيجة جديدة، أو على الزر \"مجموعة جديدة\" لإنشاء مجموعة جديدة لتنظيم النتائج الخاصة بك. سيتيح لك الزر \"عثور\" استخدام النتائج التي تم إنشاؤها من قبل الولاية أو المؤسسة. ولأنه يمكنك إنشاء واستخدام النتائج، ستتمكن من استخدام اللوحة على اليسار للتنقل خلال النتائج الخاصة بك. يمكنك سحب النتائج وإسقاطها بين المستويات المختلفة لإنشاء بنية.* *الأهم من ذلك، تتيح Canvas إضافة نتائج لعناوين التصنيف بحيث يمكنك تقييم درجة الإتقان كما كنت تقوم بتصنيف المهام. بمجرد إعداد النتائج، انقر فوق \"إدارة العناوين\" لبدء استخدام النتائج للتصنيف.*"
             title: "إعداد النتائج"
     mastery: إتقان
     mastery_error: "يجب أن تكون أكبر من أو تساوي 0"
@@ -11234,6 +11269,7 @@ ar:
       point_mastery: "درجة الإتقان وفقًا للنسبة المئوية %{mastery_points} بالنقاط"
       points: 
         rating: "%{points} نقاط"
+        total: "%{points_possible} من النقاط"
       total_points: "إجمالي النقاط"
       use_for_scoring: "استخدم هذا المعيار لتوزيع الدرجات"
     outcome_alignment: 
@@ -11421,6 +11457,7 @@ ar:
       description: "دعم عقد مؤتمرات على ويب من خلال BigBlueButton"
       name: BigBlueButton
     big_blue_button_settings: 
+      description: "سيلزم الوصول إلى مثيل [BigBlueButton](%{url})."
       domain_description: "**اسم المضيف** أو **عنوان ip** لتثبيت BigBlueButton (مثل bigbluebutton.mycompany.com)"
       labels: 
         domain: المجال
@@ -11704,6 +11741,7 @@ ar:
       description: "دعم عقد مؤتمرات Wimba عبر الويب"
       name: Wimba
     wimba_settings: 
+      description: "سيلزمك الوصول إلى حساب [Wimba](%{url})."
       domain_description: "(على سبيل المثال، mycompany.wimba.com)"
       labels: 
         domain: المجال
@@ -11816,11 +11854,21 @@ ar:
         save_skype_name: "حفظ اسم Skype"
         select_image: "تحديد صورة"
         update_settings: "تحديث الإعدادات"
+      confirm_email_instructions: "حتى تتمكن من تحرير ملف تعريفك، تحتاج إلى التحقق من عنوان بريدك الإلكتروني (%{email}) بالنقر فوق الارتباط الذي في البريد الإلكتروني الذي أرسلناه إليك. إذا كنت لا تراه، *فانقر فوق إعادة إرسال البريد الإلكتروني*، وتأكد من الاطلاع على صندوق البريد الإلكتروني العشوائي."
       delicious_description: "تعد Delicious أداة تتيح لك تخزين إشاراتك المرجعية ومشاركتها مع الآخرين. وسيتيح لك محرر محتوى Canvas الثري بالخيارات البحث في علامات Delicious لسهولة إجراء ارتباط من داخل Canvas إلى الموارد الأخرى التي تراها مفيدة."
       diigo_description: "تعد Diigo أداة لوضع إشارات مرجعية اجتماعية تم تصميمها خصيصًا للأبحاث والتعليم. وسيتيح لك محرر محتوى Canvas الثري بالخيارات البحث في علامات Diigo لسهولة إجراء ارتباط من داخل Canvas إلى الموارد الأخرى التي تراها مفيدة."
       error_loading_token_details: "خطأ أثناء تحميل تفاصيل الرمز المميز"
       facebook_description: "إذا كان لديك حساب Facebook، فيمكنك تثبيت تطبيق Canvas وتلقي إعلامات المساق على ملف التعريف الخاص بك. ويمكنك تحديد أنواع الإعلامات التي تريدها وعدد مرات إرسالها كما ترغب."
       feature_options: "خيارات الميزة"
+      full_token_warning: |-
+          **انسخ هذا الرمز المميز الآن**. وبمجرد أن تترك هذه الصفحة، لن تستطيع
+          استرداد الرمز المميز الكامل بعد ذلك، وسيلزم إعادة إنشائه للحصول على قيمة
+          جديدة.
+      generate_access_token_description: |-
+          إن رموز الوصول هي ما يسمح لتطبيقات الجهات الأخرى بالوصول إلى موارد Canvas
+          نيابة عنك. ويتم إنشاء هذه الرموز بشكل طبيعي تلقائيًا
+          للتطبيقات بحسب الحاجة، ولكن إذا [كنت تقوم بتطوير مشروع
+          جديد أو محدد](%{documentation_url}) فما عليك سوى إنشاء الرمز المميز من هنا.
       google_docs_description: "وبمجرد تخويلك لرؤية Google Docs، ستستطيع إرسال مهامك مباشرة من Google Docs، وإنشاء مستنداتك ومشاركتها مع أفراد من فصلك."
       headers: 
         application_abbrev: التطبيق
@@ -14569,10 +14617,12 @@ ar:
       recent_activity_in_course: "نشاط حديث في %{course_or_group}"
       unread_column: "غير مقروء"
       unread_count_badge: 
-        few: "%{count} * من العناصر غير المقروءة"
-        many: "%{count} * من العناصر غير المقروءة"
-        two: "%{count} * من العناصر غير المقروءة"
-        zero: "%{count} * من العناصر غير المقروءة"
+        few: "%{count} *من العناصر غير المقروءة*"
+        many: "%{count} *من العناصر غير المقروءة*"
+        one: "عنصر واحد *غير مقروء*"
+        other: "%{count} *من العناصر غير المقروءة*"
+        two: "%{count} *من العناصر غير المقروءة*"
+        zero: "%{count} *من العناصر غير المقروءة*"
     recent_activity_item: 
       close: إغلاق
       unread: "غير مقروء"
@@ -14615,6 +14665,7 @@ ar:
           two: "ضع في الاعتبار أن %{count} من الطلاب قد تم تقييمهم باستخدام نموذج التقييم هذا. سيؤدي تغييره إلى التأثير على تقييمهم. "
           zero: "ضع في الاعتبار أن %{count} من الطلاب قد تم تقييمهم باستخدام نموذج التقييم هذا. سيؤدي تغييره إلى التأثير على تقييمهم."
         rubric_in_use2: "لقد قمت بتصنيف الطلاب بالفعل باستخدام هذا العنوان. وقد تؤثر أي تغييرات رئيسية على نتائج التقييم."
+      out_of: "%{points} *من %{total}*"
       rubric: العنوان
       rubric_title: العنوان
       titles: 
