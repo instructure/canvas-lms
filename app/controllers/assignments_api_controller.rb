@@ -604,15 +604,15 @@ class AssignmentsApiController < ApplicationController
   #   Toggles Turnitin submissions for the assignment.
   #   Will be ignored if Turnitin is not available for the course.
   #
+  # @argument assignment[turnitin_settings] [Optional]
+  #   Settings to send along to turnitin. See Assignment object definition for
+  #   format.
+  #
   # @argument assignment[integration_data] [Optional]
   #   Data related to third party integrations, JSON string required.
   #
   # @argument assignment[integration_id] [Optional]
   #   Unique ID from third party integrations
-  #
-  # @argument assignment[turnitin_settings] [Optional]
-  #   Settings to send along to turnitin. See Assignment object definition for
-  #   format.
   #
   # @argument assignment[peer_reviews] [Optional, Boolean]
   #   If submission_types does not include external_tool,discussion_topic,
@@ -751,6 +751,12 @@ class AssignmentsApiController < ApplicationController
   # @argument assignment[turnitin_settings] [Optional]
   #   Settings to send along to turnitin. See Assignment object definition for
   #   format.
+  #
+  # @argument assignment[integration_data] [Optional]
+  #   Data related to third party integrations, JSON string required.
+  #
+  # @argument assignment[integration_id] [Optional]
+  #   Unique ID from third party integrations
   #
   # @argument assignment[peer_reviews] [Optional, Boolean]
   #   If submission_types does not include external_tool,discussion_topic,
