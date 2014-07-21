@@ -50,10 +50,6 @@ module MigratorHelper
     end
   end
 
-  def self.unzip_command(zip_file, dest_dir)
-    "unzip -qo #{Shellwords.escape(zip_file)} -d #{Shellwords.escape(dest_dir)} 2>&1"
-  end
-
   def add_error(type, message, object=nil, e=nil)
     logger.error message
     @error_count += 1

@@ -111,23 +111,15 @@ describe UnzipAttachment do
       filename = fixture_filename('alphabet_soup.zip')
       Zip::File.open(filename) do |zip|
         # make sure the files aren't read from the zip in alphabetical order (so it's not alphabetized by chance)
-        fake_files = []
-        fake_files << zip.get_entry('f.txt')
-        fake_files << zip.get_entry('d/e.txt')
-        fake_files << zip.get_entry('d/d.txt')
-        fake_files << zip.get_entry('c.txt')
-        fake_files << zip.get_entry('b.txt')
-        fake_files << zip.get_entry('a.txt')
+        zip.entries.map(&:name).should eql(%w(f.txt d/e.txt d/d.txt c.txt b.txt a.txt))
+      end
 
-        Zip::File.stubs(:open).returns(fake_files)
+      ua = UnzipAttachment.new(:course => @course, :filename => filename)
+      ua.process
 
-        ua = UnzipAttachment.new(:course => @course, :filename => 'fake')
-        ua.process
-
-        @course.attachments.count.should == 6
-        %w(a b c d e f).each_with_index do |letter, index|
-          @course.attachments.find_by_position(index).display_name.should == "#{letter}.txt"
-        end
+      @course.attachments.count.should == 6
+      %w(a b c d e f).each_with_index do |letter, index|
+        @course.attachments.find_by_position(index).display_name.should == "#{letter}.txt"
       end
     end
 
