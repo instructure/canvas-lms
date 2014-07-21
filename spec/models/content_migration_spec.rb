@@ -401,6 +401,22 @@ describe ContentMigration do
         end
       end
 
+      it "should copy unpublished discussion topics" do
+        dt1 = @copy_from.discussion_topics.create!(:message => "hideeho", :title => "Blah")
+        dt1.workflow_state = :unpublished
+        dt1.save!
+        dt2 = @copy_from.discussion_topics.create!(:message => "asdf", :title => "qwert")
+        dt2.workflow_state = :active
+        dt2.save!
+
+        run_course_copy
+
+        dt1_copy = @copy_to.discussion_topics.find_by_migration_id(mig_id(dt1))
+        dt1_copy.workflow_state.should == 'unpublished'
+        dt2_copy = @copy_to.discussion_topics.find_by_migration_id(mig_id(dt2))
+        dt2_copy.workflow_state.should == 'active'
+      end
+
       it "should copy unpublished wiki pages" do
         wiki = @copy_from.wiki.wiki_pages.create(:title => "wiki", :body => "ohai")
         wiki.workflow_state = :unpublished

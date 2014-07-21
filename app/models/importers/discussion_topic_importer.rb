@@ -90,8 +90,15 @@ module Importers
       item.posted_at            = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(options[:posted_at])
       item.delayed_post_at      = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(options.delayed_post_at)
       item.last_reply_at        = item.posted_at if item.new_record?
-      item.workflow_state       = 'active'       if item.deleted?
-      item.workflow_state       = 'post_delayed' if item.should_not_post_yet
+
+      if options[:workflow_state].present?
+        item.workflow_state = options[:workflow_state]
+      elsif item.should_not_post_yet
+        item.workflow_state = 'post_delayed'
+      else
+        item.workflow_state = 'active'
+      end
+
       item.attachment           = context.attachments.where(migration_id: options[:attachment_migration_id]).first
       item.external_feed        = context.external_feeds.where(migration_id: options[:external_feed_migration_id]).first
       item.assignment           = fetch_assignment
