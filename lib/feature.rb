@@ -195,6 +195,19 @@ END
       root_opt_in: true,
       development: true
     },
+    'k12' =>
+    {
+      display_name: -> { I18n.t('features.k12', 'K-12 specific features') },
+      description:  -> { I18n.t('k12_description', <<-END) },
+Features, settings and styles that make more sense specifically in a K-12 environment. For now, this only
+applies some style changes, but more K-12 specific things may be added in the future.
+END
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      root_opt_in: true,
+      beta: true,
+      development: true
+    },
     'quiz_stats' =>
     {
       display_name: -> { I18n.t('features.new_quiz_statistics', 'New Quiz Statistics Page') },
