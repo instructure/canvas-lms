@@ -26,6 +26,10 @@ module DataFixup
       migration.drop_mapping_table
     end
 
+    def batch_size
+      @batch_size ||= Setting.get('fix_audit_log_uuid_indexes_batch_size', 1000).to_i
+    end
+
     def initialize
       @corrected_ids = {}
 
@@ -51,14 +55,17 @@ module DataFixup
     # Check if the mapping table exits
     def mapping_table_exists?
       cql = %{
-        SELECT columnfamily_name
-        FROM System.schema_columnfamilies
-        WHERE columnfamily_name = ?
-          AND keyspace_name = ?
-        ALLOW FILTERING
+        SELECT id
+        FROM #{MAPPING_TABLE}
+        LIMIT 1
       }
 
-      database.execute(cql, MAPPING_TABLE, database.keyspace).count == 1
+      begin
+        database.execute(cql)
+        true
+      rescue CassandraCQL::Error::InvalidRequestException
+        false
+      end
     end
 
     # Drops mapping table
@@ -78,47 +85,88 @@ module DataFixup
 
     # Fixes a specified index
     def fix_index(index)
+      batch_number = 0
       iterate_invalid_keys(index) do |rows|
+        batch_number += 1
+        Rails.logger.debug("FixAuditLogUuidIndexes: Updating batch #{batch_number} (#{rows.size} rows) for index table: #{index.table}")
         update_index_batch(index, rows)
       end
     end
 
+    def format_row(index, row)
+      row = row.to_hash
+
+      # Strip the bucket off the key.
+      keys = row[index.key_column].split('/')
+      row['bucket'] = keys.pop.to_i
+      row['index_key'] = keys.join('/')
+      row['timestamp'] = row['ordered_id'].split('/').first.to_i
+
+      row
+    end
+
     # Returns corrupted indexes.
     def iterate_invalid_keys(index)
-      # page 1 implicit start at first event in "current" bucket
-      bucket = index.bucket_for_time(Time.now)
-      previous_bucket = bucket + index.bucket_size
-
-      oldest_bucket = index.bucket_for_time(start_time)
+      last_seen_key = ''
+      last_seen_ordered_id = ''
 
       cql = %{
         SELECT #{index.id_column},
                #{index.key_column},
                ordered_id
         FROM #{index.table} %CONSISTENCY%
-        WHERE ordered_id >= ?
-          AND ordered_id < ?
-        ALLOW FILTERING
+        WHERE token(#{index.key_column}) > token(?)
+        LIMIT ?
       }
 
-      # pull results from each bucket until the page is full or we go past the
-      # end bucket
-      until bucket < oldest_bucket
-        array = []
+     loop do
+        rows = []
 
-        database.execute(cql, "#{bucket}/", "#{previous_bucket}/", consistency: index.event_stream.read_consistency_level).fetch do |row|
-          row = row.to_hash
-          # Strip the bucket off the key.
-          row['index_key'] = row[index.key_column].split("/#{bucket}").first
-          row['timestamp'] = row['ordered_id'].split('/').first.to_i
-          array << row
+        database.execute(cql, last_seen_key, batch_size, consistency: index.event_stream.read_consistency_level).fetch do |row|
+          row = format_row(index, row)
+          last_seen_key = row[index.key_column]
+          last_seen_ordered_id = row['ordered_id']
+          rows << row
         end
 
-        yield array
+        # Sort of lame but we need to get the rest of the rows if the limit exculded them.
+        last_seen_key, last_seen_ordered_id = get_ordered_id_rows(index, last_seen_key, last_seen_ordered_id) do |ordered_id_rows|
+          rows.concat(ordered_id_rows)
+        end
 
-        previous_bucket = bucket
-        bucket -= index.bucket_size
+        break if rows.empty?
+        yield rows
       end
+    end
+
+    def get_ordered_id_rows(index, last_seen_key, last_seen_ordered_id)
+      return [last_seen_key, last_seen_ordered_id] if last_seen_key.blank?
+
+      cql = %{
+        SELECT #{index.id_column},
+               #{index.key_column},
+               ordered_id
+        FROM #{index.table} %CONSISTENCY%
+        WHERE #{index.key_column} = ?
+          AND ordered_id > ?
+        LIMIT ?
+      }
+
+      loop do
+        rows = []
+
+        database.execute(cql, last_seen_key, last_seen_ordered_id, batch_size, consistency: index.event_stream.read_consistency_level).fetch do |row|
+          row = format_row(index, row)
+          last_seen_key = row[index.key_column]
+          last_seen_ordered_id = row['ordered_id']
+          rows << row
+        end
+
+        break if rows.empty?
+        yield rows
+      end
+
+      return [last_seen_key, last_seen_ordered_id]
     end
 
     # Fixes a corrupted index record
@@ -126,9 +174,11 @@ module DataFixup
       need_inspection = []
       need_tombstone = []
       updates = []
+      oldest_bucket = index.bucket_for_time(start_time)
 
       # Check each row to see if we need to update it or inspect it.
       rows.each do |row|
+        next if row['bucket'] < oldest_bucket
         current_id, timestamp, key = extract_row_keys(index, row)
         actual_id = query_corrected_id(index.event_stream, current_id, timestamp)
         if actual_id.nil?
@@ -257,7 +307,7 @@ module DataFixup
       # Add the bucket back onto the key.
       key = index.create_key(index.bucket_for_time(timestamp), key)
       ordered_id = "#{timestamp}/#{id[0, 8]}"
-      database.execute("DELETE FROM #{index.table} WHERE ordered_id = ? AND key = ?", ordered_id, key)
+      database.execute("DELETE FROM #{index.table} WHERE ordered_id = ? AND #{index.key_column} = ?", ordered_id, key)
     end
   end
 end
