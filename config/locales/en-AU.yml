@@ -1777,6 +1777,7 @@ en-AU:
       ta: "Ta Enrollments"
       teachers: "Teacher Enrollments"
     user_add_failed_message: "Adding User Failed, please try again"
+    user_added_message: "*%{user}* successfully added!"
     user_added_message_sent_message: "*%{user}* successfully added! They should receive an email confirmation shortly."
     user_deleted_message: "%{username} successfully deleted"
     user_inactivity_csv_description: 
@@ -4653,11 +4654,11 @@ en-AU:
     subject: "Private message"
     subject_specified: "Private message: %{subject}"
     users_added: 
-      one: "%{list_of_users} were added to the conversation by %{current_user}"
+      one: "%{user} was added to the conversation by %{current_user}"
       other: "%{list_of_users} were added to the conversation by %{current_user}"
   conversation_participant: 
     batch_update_message: 
-      one: "%{count} conversations processed"
+      one: "1 conversation processed"
       other: "%{count} conversations processed"
     not_participating: "The user is not participating in this conversation"
   conversations: 
@@ -4844,7 +4845,7 @@ en-AU:
   course: 
     access_denied: "Access was denied"
     batch_update_message: 
-      one: "%{count} courses processed"
+      one: "1 course processed"
       other: "%{count} courses processed"
     course_not_found: "The course was not found"
     csv: 
@@ -6019,7 +6020,7 @@ en-AU:
       due_date: "due %{date}"
       for: For
       graded_discussion_and_points: 
-        one: "This is a graded discussion: *%{count} points possible*"
+        one: "This is a graded discussion: *1 point possible*"
         other: "This is a graded discussion: *%{count} points possible*"
       show_due_dates: "Show Due Dates"
       until: Until
@@ -7525,7 +7526,7 @@ en-AU:
       unauthorized: "You are not authorized to view attendance for this course"
       updated: "Assignment submission was successfully updated."
       uploaded: 
-        one: "Files and comments created for %{count} submissions"
+        one: "Files and comments created for 1 submission"
         other: "Files and comments created for %{count} submissions"
     out_of_final: "%{weight} of Final"
     out_of_points_possible: "out of %{points_possible}"
@@ -8114,16 +8115,16 @@ en-AU:
       discussion_details: "Discussion Details"
       x_more: "%{x} more..."
       x_new_in_announcements: 
-        one: "*%{count}* Announcements"
+        one: "*1* Announcement"
         other: "*%{count}* Announcements"
       x_new_in_assignments: 
-        one: "*%{count}* Assignment Notifications"
+        one: "*1* Assignment Notification"
         other: "*%{count}* Assignment Notifications"
       x_new_in_conversations: 
         one: "*1* Conversation Message"
         other: "*%{count}* Conversation Messages"
       x_new_in_discussions: 
-        one: "*%{count}* Discussions"
+        one: "*1* Discussion"
         other: "*%{count}* Discussions"
     local: Local
   high_contrast_description: |-
@@ -8430,7 +8431,7 @@ en-AU:
         subject: "Message Reply Failed: %{subject}"
     progress_runner: 
       completed_message: 
-        one: "%{count} items processed"
+        one: "1 item processed"
         other: "%{count} items processed"
       error_message: "%{error}: %{ids}"
     send_to_inbox: 
@@ -13248,7 +13249,7 @@ en-AU:
           other: "You have %{count} unanswered questions (see the right sidebar for details).  Submit anyway?"
         unfinished_quiz: "You're about to leave the quiz unfinished.  Continue anyway?"
         unseen_questions: 
-          one: "There are still %{count} questions you haven't seen yet.  Submit anyway?"
+          one: "There is still 1 question you haven't seen yet.  Submit anyway?"
           other: "There are still %{count} questions you haven't seen yet.  Submit anyway?"
       days_count: 
         one: "1 Day"
@@ -14120,7 +14121,7 @@ en-AU:
       recent_activity_in_course: "Recent Activity in %{course_or_group}"
       unread_column: Unread
       unread_count_badge: 
-        one: "%{count} *unread items*"
+        one: "1 *unread item*"
         other: "%{count} *unread items*"
     recent_activity_item: 
       close: close
@@ -15120,7 +15121,7 @@ en-AU:
     current_conference: 
       current_conference_text: "You have been invited to join **[%{conference}](%{link_to_conference})**. It started at %{started_at} and has %{participant_count}."
       participant_count: 
-        one: "%{count} participants"
+        one: "1 participant"
         other: "%{count} participants"
     dashboard_sidebar: 
       coming_up: "Coming Up"
