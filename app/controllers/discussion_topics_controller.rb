@@ -361,7 +361,6 @@ class DiscussionTopicsController < ApplicationController
             @topic.assignment.overrides_for(@current_user)
             ))
         hash[:ATTRIBUTES][:assignment][:has_student_submissions] = @topic.assignment.has_student_submissions?
-        hash[:ATTRIBUTES][:only_visible_to_overrides] = @topic.assignment.only_visible_to_overrides if @topic.assignment.differentiated_assignments_applies?
       end
 
 
