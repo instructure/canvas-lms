@@ -95,7 +95,7 @@ class UnzipAttachment
       @attachments = []
       id_positions = {}
       path_positions = zip_stats.paths_with_positions(last_position)
-      Zip::File.open(self.filename).each_with_index do |entry, index|
+      CanvasUnzip.extract_archive(self.filename) do |entry, index|
         next if should_skip?(entry)
 
         folder_path_array = path_elements_for(@context_files_folder.full_name)
@@ -311,7 +311,7 @@ class ZipFileStats
 
   private
   def process!
-    Zip::File.open(filename).each do |entry|
+    CanvasUnzip::extract_archive(filename) do |entry|
       @file_count += 1
       @total_size += [entry.size, Attachment.minimum_size_for_quota].max
       @paths << entry.name
