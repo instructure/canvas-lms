@@ -260,9 +260,15 @@ module ApplicationHelper
   end
 
   def variant_name_for(bundle_name)
-    use_new_styles = @domain_root_account.feature_enabled?(:new_styles)
+    if k12?
+      variant = '_k12'
+    elsif @domain_root_account.feature_enabled?(:new_styles)
+      variant = '_new_styles'
+    else
+      variant = '_legacy'
+    end
+
     use_high_contrast = @current_user && @current_user.prefers_high_contrast?
-    variant = use_new_styles ? '_new_styles' : '_legacy'
     variant += use_high_contrast ? '_high_contrast' : '_normal_contrast'
     "#{bundle_name}#{variant}"
   end

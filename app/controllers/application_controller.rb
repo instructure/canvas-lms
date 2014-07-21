@@ -129,6 +129,11 @@ class ApplicationController < ActionController::Base
   end
   helper_method :js_env
 
+  def k12?
+    @domain_root_account && @domain_root_account.feature_enabled?('k12')
+  end
+  helper_method 'k12?'
+
   # Reject the request by halting the execution of the current handler
   # and returning a helpful error message (and HTTP status code).
   #
