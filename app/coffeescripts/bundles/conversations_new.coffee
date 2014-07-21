@@ -14,6 +14,7 @@ require [
   'compiled/collections/CourseCollection'
   'compiled/collections/FavoriteCourseCollection'
   'compiled/collections/GroupCollection'
+  'compiled/behaviors/unread_conversations'
   'jquery.disableWhileLoading'
 ], (I18n, $, _, Backbone, Message, MessageCollection, MessageView, MessageListView, MessageDetailView, MessageFormDialog,
  InboxHeaderView, deparam, CourseCollection, FavoriteCourseCollection, GroupCollection) ->
