@@ -15,6 +15,7 @@ module CanvasRails
     config.encoding = 'utf-8'
     require_dependency 'logging_filter'
     config.filter_parameters.concat LoggingFilter.filtered_parameters
+    config.action_dispatch.rescue_responses['AuthenticationMethods::AccessTokenError'] = 401
 
     config.app_generators do |c|
       c.test_framework :rspec
