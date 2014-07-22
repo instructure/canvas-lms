@@ -90,7 +90,7 @@ ja:
     default_delegated_login_handle_name: ログイン
     default_login_handle_name: "電子メール アドレス"
     saml_eppn_domain_stripped: "%{eppn} (ドメインは除去)"
-    test_bind_failed: バインドに失敗しました
+    test_bind_failed: "バインドに失敗しました: %{error}"
     test_connection_timeout: 接続がタイムアウトしました
     test_host_unknown: "不明なホスト: %{host}"
     test_login_auth_exception: "ログインでの例外: %{error}"
@@ -1085,7 +1085,7 @@ ja:
             check_box: "X リスト CSV"
         sis_default: 
           parameters: 
-            note: "* 期間の設定は、コース、セクション、登録、X リストの各 CSV ファイルに対してのみ適用されます。"
+            note: "*期間の設定は、コース、セクション、登録、X リストの各 CSV ファイルに対してのみ適用されます。"
     sis_import: 
       add_sis_stickiness_instructions: "このオプションを選択すると、この SIS インポートにより行われた変更内容は、あたかも UI の変更内容であるかのように処理されます。これにより、後続の非優先的な SIS インポートによって、ここで変更したフィールドが変更されることを防止できます。"
       add_sis_stickiness_label: "UI の変更内容として処理する"
@@ -1280,8 +1280,8 @@ ja:
       ta: "TA 登録"
       teachers: 講師登録
     user_add_failed_message: ユーザの追加に失敗しました。もう一度やり直してください
-    user_added_message: "%{user} は正常に追加されました!"
-    user_added_message_sent_message: "%{user} は正常に追加されました! 追加されたユーザには、間もなく確認の電子メールが送信されます。"
+    user_added_message: "*%{user}* は正常に追加されました!"
+    user_added_message_sent_message: "*%{user}* は正常に追加されました! 追加されたユーザには、間もなく確認の電子メールが送信されます。"
     user_deleted_message: "%{username} は正常に削除されました。"
     user_inactivity_csv_description: 
       account_reports: 
@@ -1625,7 +1625,7 @@ ja:
         never_drop: 決して下げない
         no_assignments: "[課題なし]"
         weighted_by_points: 点数で重み付けする
-      percent_of_total_grade: "総合成績の %{percent} %"
+      percent_of_total_grade: "総合成績の %"
     assignment_count: 
       one: "%{count} 個の課題"
       other: "%{count} 個の課題"
@@ -1796,7 +1796,7 @@ ja:
       tooltips: 
         target_group: この課題の移動先となるグループを選択してください
       warnings: 
-        delete_assignment_group: "*%{assignment_count}** 件の課題がある *%{name}* を削除しようとしています。"
+        delete_assignment_group: "**%{assignment_count}** 件の課題がある *%{name}* を削除しようとしています。"
       would_you_like: "行う操作:"
     drop_highest_rule: 
       one: "上位 %{count} 個のスコアを除外する"
@@ -2530,7 +2530,7 @@ ja:
       scheduler_explanation_teacher_paragraph_1: "これはスケジューラ ツールです。講師はこのツールを使用して、受講生がサインアップする予定グループを作成できます。"
       scheduler_explanation_teacher_paragraph_2: "例えば、講師がコースの各受講生に中間筆記課題を出すものとします。そのような場合は、新しい予定グループを作成し、自分の都合の良い日時を指定し、その時間を 15 分のブロックに分割して、各時間ブロックで 1 人の受講生だけを受け付けるようにします。"
       scheduler_explanation_teacher_paragraph_3: その後、受講生向けに、指定の時間ブロックのいずれかにサインアップする必要があることを通知します。受講生のカレンダーには、利用できる時間ブロックが他のすべての予定と共に表示されるので、受講生は都合のよい時間を選択できます。
-      scheduler_explanation_teacher_paragraph_4: "* 今すぐ始めるには、右側の [予定グループの作成] ボタンをクリックします。 *"
+      scheduler_explanation_teacher_paragraph_4: "*今すぐ始めるには、右側の [予定グループの作成] ボタンをクリックします。 *"
       x_groups_have_signed_up: "%{participant_count} 個のグループがサインアップしています"
       x_people_have_signed_up: "%{participant_count} 人がサインアップしています"
     buttons: 
@@ -3050,12 +3050,21 @@ ja:
         ? "yes"
         : はい
       details: 
+        account_exists: |-
+            %{email} に関連付けられたアカウントが既に存在しています。
+            
+            **あなたは %{name} ですか?**
         account_needed: "**%{course}** に招待されています。この要求を受諾するには、Canvas アカウントが必要です。下のリンクをクリックして、Canvas アカウントを作成してください。"
         add_email: "この電子メール アドレスを現在のアカウントに追加しますか?"
         choose_login: ログイン先を選択してください。
+        logged_in_other_user: "**%{email}** は新しいアカウントですが、現在 **%{user}** でログインしています。"
         logged_in_other_user_course: "%{course} への招待が **%{email}** に送信されましたが、現在 **%{user}** でログインしています。"
         merge_multiple: "**%{current_user}** とまとめるアカウントを選択してください。"
         merge_one: "**%{current_user}** と **%{other_user}** を 1 つにまとめますか?"
+        multiple_accounts_course: |-
+            この電子メール アドレスを持つアカウントが %{count} 件あります。
+            
+            どのアカウントを使用しますか?
         none_of_these: どれでもありません。新しいユーザです
         register: サインアップを完了するためには、まだいくつかの情報が必要です。
         register_with_course: "コース **%{course}** へのサインアップを完了するためには、まだいくつかの情報が必要です。"
@@ -3418,7 +3427,7 @@ ja:
         conclude_student: この受講生の登録を完了してもよろしいですか?
         delete_enrollment: この受講生の登録を削除してもよろしいですか?
       enrolled_as: "登録のタイプ: %{enrollment_type}"
-      enrollment_linked_to: "リンク先: %{linked_user}"
+      enrollment_linked_to: "リンク先: *%{linked_user}*"
       error: 
         enrollment_change_failed: 登録権限の変更に失敗しました。もう一度やり直してください
       labels: 
@@ -3473,6 +3482,7 @@ ja:
         delete_enrollment: この受講生の登録を削除してもよろしいですか?
       enrolled_as: "登録のタイプ: %{enrollment_type}"
       enrollment_change_failed: 登録権限の変更に失敗しました。もう一度やり直してください
+      enrollment_linked_to: "リンク先: *%{linked_user}*"
       headings: 
         recent_messages: 最近のメッセージ
         user_services: "登録済みの Web サービス"
@@ -3581,6 +3591,7 @@ ja:
       buttons: 
         add_module: モジュールの追加
         add_prerequisite: 前提条件の追加
+      criterion_for_assignment: "%{assignment} の場合、ユーザは %{select_criterion} を行う必要があります"
       headings: 
         add_prerequisite: "%{name} への前提条件の追加"
         course_modules: "コース モジュール"
@@ -5605,6 +5616,7 @@ ja:
       show_rubric: 注釈の表示
       speed_grader: SpeedGrader
       topic: トピック
+      topic_locked: "このトピックは *%{date}* までユーザーに表示されません"
       topic_locked_until: "このトピックは %{time} までロックされています"
       topic_not_visible: このトピックはユーザに表示されません
       topic_podcast_feed_link: "トピックのポッドキャスト フィード"
@@ -5639,7 +5651,7 @@ ja:
     confirm_delete_discussion_topic: "このディスカッション トピックを削除してもよろしいですか?"
     delete: 削除
     deleted_entry: 
-      deleted: このエントリは削除されました
+      deleted: "%{edited_at}  に *%{editor_name}* によって削除されました"
     discussions: ディスカッション
     edit_settings: ディスカッション設定の編集
     entry_collection_view: 
@@ -6204,7 +6216,7 @@ ja:
       all: すべて
       app_headder: 外部アプリ
       external_tools_note: "アプリを利用すると、Canvas に新しい機能を簡単に追加できます。アプリは、個別のコースに追加することも、アカウントのすべてのコースに追加することもできます。アプリを設定すると、コース モジュールからアプリにリンクして、アセスメント ツール用の課題を作成できます。"
-      external_tools_references: "*ここ* をクリックして Canvas との優れた連携機能を持つ LTI ツールを確認できます。*ここ* をクリックすると、LTI ツールについての Canvas コミュニティのトピックを参照できます"
+      external_tools_references: "*ここ* をクリックすると、Canvas との優れた連携機能を持つ LTI ツールを確認できます。**ここ** をクリックすると、LTI ツールについての Canvas コミュニティのトピックを参照できます"
       installed: インストール済み
       not_installed: 未インストール
       search_filter: 名前でフィルタ
@@ -6801,6 +6813,7 @@ ja:
       upload_data: データのアップロード
     example_csv_file: "CSV ファイル例"
     existing_assignment_example: "既存の課題 (581)"
+    explanation_of_required_columns: "これらの列が *すべて* 揃っている必要があります。*1 行に 1 項目* で十分です。"
     instructions: 
       csv_download_and_upload: "疑わしい場合は、いつでも *CSV をダウンロード* し、成績を変更して、同じファイルを再度アップロードしてください。"
     labels: 
@@ -8550,7 +8563,7 @@ ja:
           click_to_see_assignment: 課題を表示するにはここをクリック
         no_due_date: 期日なし
       facebook: 
-        assignment_due_date_changed_sentence: "コース「%{course_name}」の課題「*%{assignment_name}*」の期日が、次のように変更されました:"
+        assignment_due_date_changed_sentence: "コース「%{course_name}」(%{override}) の課題「*%{assignment_name}*」の期日が、次のように変更されました:"
         no_due_date: 期日なし
       sms: 
         assignment_due_date_changed: "%{assignment_name}、%{course_name} (%{override}) の期限になりました:"
@@ -8684,6 +8697,16 @@ ja:
             
             詳細はここで確認できます:
             %{link}
+        body_with_user: |-
+            文書「%{document}」の共同作業に招待されました。対象:
+            %{course_or_group}。文書は、%{user} により
+            %{service} で作成され、招待に使用された電子メール アドレスは %{email} です。
+            
+            このタイプの共同作業に対して、この電子メール アドレスが間違いである場合は、 
+            プロフィール設定を変更するか、または %{service} に登録する必要があります。
+            
+            詳細はここで確認できます:
+            %{link}
         html: 
           body: "%{course_or_group} の文書「%{document}」の共同作業に招待されました。この文書は %{service} で作成され、招待に使用された電子メール アドレスは %{email} です。"
           body_with_user: "%{course_or_group} の文書「%{document}」の共同作業に招待されました。この文書は、%{user} により %{service} で作成され、招待に使用された電子メール アドレスは %{email} です。"
@@ -8704,6 +8727,10 @@ ja:
             文書「%{document}」の共同作業に招待されました。対象:
             %{course_or_group}。文書は %{service} で作成され、
             招待に使用された電子メール アドレスは %{email} です。
+        body_with_user: |-
+            文書「%{document}」の共同作業に招待されました。対象:
+            %{course_or_group}。文書は、%{user} により
+            %{service} で作成され、招待に使用された電子メール アドレスは %{email} です。
         subject: "共同作業への招待: %{course_or_group}"
       twitter: 
         body: "Canvas アラート - 共同作業への招待: %{document}、%{course_or_group}"
@@ -9085,7 +9112,7 @@ ja:
         no_time_set: 時間が設定されていません
         subject: "イベントの日程が変更されました: %{event_title}、%{course_name}"
       twitter: 
-        email_body: "コース「%{course_name}」のイベント「%{event_title}」は、時間が変更されました。現在は次のとおりです:"
+        email_body: "コース「%{course_name}」のイベント「%{event_title}」は、時間が変更されました。現在は %{new_time} です"
         from_to_time: "開始日時 %{start_date_time} 終了日時 %{end_date_time}"
         no_time_set: 時間が設定されていません
     file_locked: このファイルは現在ロックされています。
@@ -9262,10 +9289,12 @@ ja:
       success: 電子メールは配信されています。
     migration_export_ready: 
       email: 
+        body: コンテンツの準備が整い、ご自分のコースにインポートできる状態になっています。
         html: 
-          body: "コース「%{course_name}」を取り出すプロセスが完了しました。コンテンツの準備が整い、ご自分のコースにインポートできる状態になっています。"
+          body: コンテンツの準備が整い、ご自分のコースにインポートできる状態になっています。
           link_message2: "インポートするコンテンツのアイテムを選択するには、*このリンク* をクリックしてください"
           subject: "コースをインポートする準備が整いました: %{course_name}"
+        link_message: "インポートするアイテムを選択するには、このリンクをクリックしてください:"
         subject: "コースを取り出す準備が整いました: %{course_name}"
     new_account_user: 
       email: 
@@ -9708,6 +9737,7 @@ ja:
         body: "*%{author}* は、たった今、**%{assignment} への提出物について %{user}** に新しいコメントを書きました。"
         someone: 名前未登録ユーザ
       sms: 
+        body: "%{author} から %{assignment}、%{user}、%{context} に対する新しいコメント"
         more_info: "詳細は %{url} をご覧ください"
       summary: 
         body: "%{author} は、たった今、%{assignment} への提出物について %{user} に新しいコメントを書きました。"
@@ -9731,6 +9761,7 @@ ja:
         someone: 名前未登録ユーザ
       sms: 
         more_info: "詳細は %{url} をご覧ください"
+        sms_body: "%{author} から %{assignment}、%{user}、%{context} に対する新しいコメント"
       summary: 
         body: "%{author} は、たった今、%{assignment} への提出物について %{user} に新しいコメントを書きました。"
         someone: 名前未登録ユーザ
@@ -9910,6 +9941,8 @@ ja:
           details_link: 詳細を表示するにはここをクリック
           subject: "Web 会議への招待: %{name}"
         subject: "Web 会議への招待: %{name}"
+      facebook: 
+        body: "#%{name}# さんの Web 会議「*%{title}*」に招待されています。"
       sms: 
         body: "%{name} さんの Web 会議「%{title}」に招待されました。"
         link_message: "詳細は %{url} をご覧ください"
@@ -10401,6 +10434,7 @@ ja:
       mastery: 直近の試行で熟達あり
       no_mastery: 直近の試行で熟達なし
       outcomes_for: "%{user_name} の成果"
+      score_out_of_possible: "スコア: %{score}* / 配点: %{possible}*"
       short_title: 
         attempts: 試行回数
         average_percent: 平均％
@@ -12977,6 +13011,7 @@ ja:
   services_api: 
     must_be_logged_in: Kalturaを使用するにはログインする必要があります。
   set_default_grade_dialog: 
+    default_grades: "以下に成績値を入力して送信することによって、*%{assignment.name}* については、すべての受講生に同じ成績を与える:"
     dialog_title: "%{assignment.name} の既定の成績"
     overwrite: 既に入力されている成績を上書き
     set_grades_button: 既定の成績の設定
