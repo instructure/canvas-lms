@@ -1,7 +1,9 @@
 # dummy methods for CANVAS_RAILS2
 module Onceler
-  def self.base_transactions
-    1
+  unless self.method_defined?(:base_transactions)
+    def self.base_transactions
+      1
+    end
   end
 
   module Noop
