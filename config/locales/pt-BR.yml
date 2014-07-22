@@ -10833,6 +10833,10 @@ pt-BR:
           **Copiar este token agora**. Assim que deixar esta página, não será mais possível
           recuperar o token completo, você terá que gerá-lo novamente para obter um novo 
           valor.
+      generate_access_token_description: |-
+          Os tokens de acesso permitem que aplicativos de terceiros acessem os recursos
+          do Canvas em seu nome. Estes tokens são normalmente criados de forma automática
+          para os aplicativos quando necessários, mas se [você estiver desenvolvendo um projeto novo ou limitado](%{documentation_url}), só será possível gerar o token a partir daqui.
       google_docs_description: "Assim que você nos autorizar a ver seus Google Docs, você poderá enviar suas tarefas diretamente a partir do Google Docs e criar e compartilhar documentos com membros da sua turma de aula."
       headers: 
         application_abbrev: Aplicativo
