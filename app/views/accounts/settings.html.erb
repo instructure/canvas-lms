@@ -863,8 +863,11 @@ acknowledge that you have read and agreed to the
             <td class="title reports">
               <span class="title"><%= title %></span>
               <% if description_partial %>
-                <a href="#" class="open_report_description_link"><i class="icon-question standalone-icon"></i></a>
-                <div style="display: none" class="report_description">
+                <a href="#" class="open_report_description_link" role="button" aria-haspopup="true" aria-owns="<%= "#{report}_report_description" %>">
+                  <i class="icon-question standalone-icon"></i>
+                  <span class="screenreader-only"><%= t(:open_report_description, "Open Report Description") %></span>
+                </a>
+                <div id="<%= "#{report}_report_description" %>" style="display: none" class="report_description">
                   <%= render(:partial => description_partial) %>
                 </div>
               <% end %>
