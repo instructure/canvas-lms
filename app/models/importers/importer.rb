@@ -29,5 +29,5 @@ module Importers
   end
 end
 
-require 'importers/account_content_importer'
-require 'importers/course_content_importer'
+require_dependency 'importers/account_content_importer'
+require_dependency 'importers/course_content_importer'
