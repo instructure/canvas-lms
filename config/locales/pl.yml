@@ -3111,6 +3111,7 @@ pl:
         ? "yes"
         : Tak
       details: 
+        account_exists: "Konto dla adresu %{email} już istnieje. **Czy nazwa to %{name}?**"
         account_needed: "Otrzymałeś zaproszenie do uczestnictwa w kursie **%{course}**. Aby zaakceptować zaproszenie, musisz posiadać konto w systemie Canvas. Kliknij poniższe łącze, aby utworzyć konto w systemie Canvas."
         add_email: "Czy chcesz dodać ten adres e-mail do bieżącego konta?"
         choose_login: "Wybierz miejsce wyświetlane po zalogowaniu."
@@ -7760,19 +7761,19 @@ pl:
       x_more: "%{x} więcej..."
       x_new_in_announcements: 
         few: "*%{count}* ogłoszenia"
-        one: "*%{count}* ogłoszenie"
+        one: "*1* ogłoszenie"
         other: "*%{count}* ogłoszeń"
       x_new_in_assignments: 
         few: "*%{count}* powiadomienia o zadaniach"
-        one: "*%{count}* powiadomienie o zadaniach"
+        one: "*1* powiadomienie o zadaniach"
         other: "*%{count}* powiadomień o zadaniach"
       x_new_in_conversations: 
         few: "*%{count}* wiadomości w rozmowach"
-        one: "*%{count}* wiadomość w rozmowie"
+        one: "*1* wiadomość w rozmowie"
         other: "*%{count}* wiadomości w rozmowach"
       x_new_in_discussions: 
         few: "*%{count}* dyskusje"
-        one: "*%{count}* dyskusja"
+        one: "*1* dyskusja"
         other: "*%{count}* dyskusji"
   high_contrast_description: |-
       Jeśli wolisz wersję z wższym kontrastem interfejsu użytkownika systemu Canvas, uaktywnij to.
@@ -9453,6 +9454,7 @@ pl:
           body: "Zawartość można teraz importować do kursu."
           link_message2: "Aby zakończyć importowanie zawartości do kursu, kliknij *to łącze*"
           subject: "Wypakowanie kursu zakończone: %{course_name}"
+        link_message: "Kliknij poniższe łącze, aby wybrać, które elementy zawartości należy importować:"
         subject: "Wypakowanie kursu zakończone: %{course_name}"
     new_account_user: 
       email: 
@@ -12213,8 +12215,8 @@ pl:
         buttons: 
           allow_extra_attempt: "zezwól uczestnikowi na dodatkową próbę"
         count_attempts_left: 
-          few: "%{user} pozostało %{count} proby"
-          one: "%{user} pozostała %{count} próba"
+          few: "%{user} pozostały próby"
+          one: "%{user} pozostała 1 próba"
           other: "Użytkownikowi %{user} pozostało %{count} prób"
         default_quiz_name: "Test z kursu %{course_name}"
         default_survey_name: "Ankieta do kursu %{course_name}"
@@ -12686,7 +12688,7 @@ pl:
         headers: 
           loading_in_lockdown: "Trwa ładowanie testu w programie Respondus LockDown Browser"
         links: 
-          return_to_quiz_page: "[Kliknij tutaj] (%{url}), aby powrócić do poprzedniej strony."
+          return_to_quiz_page: "[Click here](%{url}), aby powrócić do poprzedniej strony."
       take_quiz_right_side: 
         labels: 
           attempt_due: "Termin dostarczenia próby"
