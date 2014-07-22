@@ -1744,6 +1744,7 @@ fr:
         show_only_assignments_from: "Afficher uniquement les tâches pour"
         upcoming_assignments: "Prochaines tâches"
     assignments_right_side: 
+      add_assignment_to_group: "*Ajouter le devoir* dans %{group}"
       assignment_groups_wrapper: "( dans %{number_of_groups})"
       links: 
         add_assignment_group: "Ajouter un groupe de travaux"
@@ -1809,7 +1810,7 @@ fr:
       tooltips: 
         target_group: "Sélectionner un groupe vers lequel déplacer ce travail"
       warnings: 
-        delete_assignment_group: "Vous êtes sur le point de supprimer *%{name}*, qui contient *%{assignment_count}* travaux."
+        delete_assignment_group: "Vous êtes sur le point de supprimer *%{name}*, qui contient **%{assignment_count}** travaux."
       would_you_like: "Souhaitez-vous :"
     drop_highest_rule: 
       one: "Ôter la note la plus élevée"
@@ -2541,9 +2542,9 @@ fr:
       scheduler_explanation_teacher_paragraph_1: "Voici l’outil de planification. Vous pouvez l’utiliser pour créer des groupes de rendez-vous auxquels vos étudiants peuvent s’inscrire."
       scheduler_explanation_teacher_paragraph_2: "Par exemple, supposons que vous souhaitiez revoir le travail sur table de la mi-trimestre avec chaque étudiant du cours. Vous créez un nouveau groupe de rendez-vous, vous indiquez les dates et heures auxquelles vous êtes disponibles, vous demandez à l’outil de répartir ce temps en tranches horaires de 15 minutes et vous n’autorisez qu’un seul étudiant par tranche horaire."
       scheduler_explanation_teacher_paragraph_3: "Les étudiants seront avisés et verront qu’ils doivent s’inscrire à l’une des tranches horaires indiquées. Un calendrier avec les tranches horaires disponibles s’affichera au-dessus de toutes les activités de leurs autres calendriers pour qu’ils choisissent un horaire qui leur convient."
-      scheduler_explanation_teacher_paragraph_4: "* Commencez en cliquant sur le bouton « Créer un groupe de rendez-vous » proposé à droite. *"
+      scheduler_explanation_teacher_paragraph_4: "*Commencez en cliquant sur le bouton « Créer un groupe de rendez-vous » proposé à droite. *"
       x_groups_have_signed_up: "%{participant_count} groupes se sont inscrits"
-      x_people_have_signed_up: "%{signed_up} personnes se sont inscrites"
+      x_people_have_signed_up: "%{participant_count} personnes se sont inscrites"
     buttons: 
       cancel: Annuler
       send_message: Envoyer
@@ -2982,6 +2983,10 @@ fr:
         update: "Mettre à jour la collaboration"
       collaboration_name: "Collaboration %{course_or_group_name}"
       descriptions: 
+        etherpad: |-
+            EtherPad est un projet libre et ouvert (Open Source) qui permet de créer rapidement des documents partagés. Il est suffisamment rapide pour vous permettre de voir ce que les autres personnes tapent en temps réel. En revanche, les « pads » ne sont pas protégés par mot de passe, par conséquent, quiconque possède un lien vers ceux-ci peut les modifier. EtherPad est mieux adapté que Google Docs si vous souhaitez préserver l’anonymat et/ou permettre aux utilisateurs ne disposant pas d’un compte Google de participer.  
+              
+            **Avertissement**  : vous devez connaître la [politique de suppression d’EtherPad](%{etherpad_deletion_policy_url}) pour éviter de perdre votre travail.
         google_docs: |-
             Google Docs est un excellent endroit pour collaborer à un projet de groupe. Il fonctionne comme Microsoft Word, mais permet de travailler à plusieurs en même temps sur un même fichier, sans l’envoyer par e-mail aux autres participants. 
               
@@ -7059,7 +7064,7 @@ fr:
       unauthorized: "Vous n’êtes pas autorisé à afficher la participation pour ce cours"
       updated: "L’envoi du travail a été mis à jour."
       uploaded: 
-        one: "Fichiers et commentaires créés pour %{count} envois"
+        one: "Fichiers et commentaires créés pour 1 envoi"
         other: "Fichiers et commentaires créés pour %{count} envois"
     out_of_final: "%{weight} de la note finale"
     out_of_points_possible: "sur %{points_possible}"
@@ -7637,17 +7642,17 @@ fr:
       discussion_details: "Détails de la discussion"
       x_more: "%{x} en plus..."
       x_new_in_announcements: 
-        one: "1 annonce"
-        other: "%{count} annonces"
+        one: "*1* annonce"
+        other: "*%{count}* annonces"
       x_new_in_assignments: 
-        one: "1 notification de devoir"
-        other: "%{count} notifications de tâche"
+        one: "*1* notification de tâche"
+        other: "*%{count}* notifications de tâche"
       x_new_in_conversations: 
-        one: "1 message de conversation"
-        other: "%{count} messages de conversation"
+        one: "*1* message de conversation"
+        other: "*%{count}* messages de conversation"
       x_new_in_discussions: 
-        one: "1 discussion"
-        other: "%{count} discussions"
+        one: "*1* discussion"
+        other: "*%{count}* discussions"
   high_contrast_description: |-
       Si vous préférez une version de l’interface Canvas avec un contraste plus élevé, activez cette option.
       Cela peut être utile pour les malvoyants ou les personnes ayant des difficultés à lire.
