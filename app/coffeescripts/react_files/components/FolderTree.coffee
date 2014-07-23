@@ -1,11 +1,11 @@
 define [
   'react'
-  '../utils/withGlobalDom'
-], (React, withGlobalDom) ->
+  'compiled/react/shared/utils/withReactDOM'
+], (React, withReactDOM) ->
 
   FolderChildren = React.createClass
 
-    render: withGlobalDom ->
+    render: withReactDOM ->
 
       div( {className:"ef-folder-list"},
         ul( {role:"tree"},

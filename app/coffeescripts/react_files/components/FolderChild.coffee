@@ -1,11 +1,11 @@
 define [
   'react'
   '../mixins/BackboneMixin'
-  '../utils/withGlobalDom'
+  'compiled/react/shared/utils/withReactDOM'
   './FriendlyDatetime'
   './ItemCog'
   'compiled/util/friendlyBytes'
-], (React, BackboneMixin, withGlobalDom, FriendlyDatetime, ItemCog, friendlyBytes) ->
+], (React, BackboneMixin, withReactDOM, FriendlyDatetime, ItemCog, friendlyBytes) ->
 
   EVERYTHING_BEFORE_THE_FIRST_SLASH = /^[^\/]+/
 
@@ -16,7 +16,7 @@ define [
     folderHref: ->
       @props.baseUrl + 'folder' + @props.model.get('full_name').replace(EVERYTHING_BEFORE_THE_FIRST_SLASH, '')
 
-    render: withGlobalDom ->
+    render: withReactDOM ->
 
       div className:'ef-item-row',
         div className:'ef-name-col',

@@ -1,7 +1,7 @@
 define [
   'underscore'
   'react'
-  '../utils/withGlobalDom'
+  'compiled/react/shared/utils/withReactDOM'
   'compiled/models/Folder'
   './Toolbar'
   './Breadcrumbs'
@@ -9,14 +9,14 @@ define [
   './FilesUsage'
   './FolderChildren'
   './SearchResults'
-], (_, React, withGlobalDom, Folder, Toolbar, Breadcrumbs, FolderTree, FilesUsage, FolderChildren, SearchResults) ->
+], (_, React, withReactDOM, Folder, Toolbar, Breadcrumbs, FolderTree, FilesUsage, FolderChildren, SearchResults) ->
 
   FilesApp = React.createClass
 
     propTypes:
       currentFolder: React.PropTypes.instanceOf(Folder).isRequired
 
-    render: withGlobalDom ->
+    render: withReactDOM ->
       div null,
         Toolbar(baseUrl: @props.baseUrl)
         (Breadcrumbs(baseUrl: @props.baseUrl, folderPath:@props.folderPath) if @props.showBreadcrumb)

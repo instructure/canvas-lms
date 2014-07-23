@@ -4,13 +4,13 @@ define [
   'react'
   '../mixins/BackboneMixin'
   'compiled/models/Folder'
-  '../utils/withGlobalDom'
+  'compiled/react/shared/utils/withReactDOM'
   'compiled/util/deparam'
   './ColumnHeaders'
   './LoadingIndicator'
   './FolderChild'
   '../mixins/SortableMixin'
-], ($, _, React, BackboneMixin, Folder, withGlobalDom, deparam, ColumnHeaders, LoadingIndicator, FolderChild, SortableMixin) ->
+], ($, _, React, BackboneMixin, Folder, withReactDOM, deparam, ColumnHeaders, LoadingIndicator, FolderChild, SortableMixin) ->
 
   FolderChildren = React.createClass
 
@@ -21,7 +21,7 @@ define [
       @props.collection.fetch(data: search_term: '.js')
 
 
-    render: withGlobalDom ->
+    render: withReactDOM ->
       div className:'ef-directory',
         ColumnHeaders(subject: @props.collection)
         @props.collection.models.sort(Folder::childrenSorter.bind(@props.collection)).map (child) =>

@@ -3,13 +3,13 @@ define [
   'underscore'
   'react'
   '../mixins/BackboneMixin'
-  '../utils/withGlobalDom'
+  'compiled/react/shared/utils/withReactDOM'
   'compiled/util/deparam'
   './ColumnHeaders'
   './LoadingIndicator'
   './FolderChild'
   '../mixins/SortableMixin'
-], ($, _, React, BackboneMixin, withGlobalDom, deparam, ColumnHeaders, LoadingIndicator, FolderChild, SortableMixin) ->
+], ($, _, React, BackboneMixin, withReactDOM, deparam, ColumnHeaders, LoadingIndicator, FolderChild, SortableMixin) ->
 
   FolderChildren = React.createClass
 
@@ -27,7 +27,7 @@ define [
       @registerListeners()
       @props.model.loadAll()
 
-    render: withGlobalDom ->
+    render: withReactDOM ->
       div className:'ef-directory',
         ColumnHeaders(subject: @props.model)
         @props.model.children().map (child) =>

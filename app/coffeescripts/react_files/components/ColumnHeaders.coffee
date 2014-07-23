@@ -1,8 +1,8 @@
 define [
   'react'
-  '../utils/withGlobalDom'
+  'compiled/react/shared/utils/withReactDOM'
   'compiled/fn/preventDefault'
-], (React, withGlobalDom, preventDefault) ->
+], (React, withReactDOM, preventDefault) ->
 
 
   columns = [
@@ -34,7 +34,7 @@ define [
           else
             'asc'
 
-    render: withGlobalDom ->
+    render: withReactDOM ->
       div className:'ef-directory',
         header className:'ef-directory-header',
           columns.map (column) =>

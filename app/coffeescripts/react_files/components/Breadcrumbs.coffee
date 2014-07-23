@@ -1,7 +1,7 @@
 define [
   'react'
-  '../utils/withGlobalDom'
-], (React, withGlobalDom) ->
+  'compiled/react/shared/utils/withReactDOM'
+], (React, withReactDOM) ->
 
   Breadcrumbs = React.createClass
 
@@ -22,7 +22,7 @@ define [
           last: i is split.length - 1
           key: i
 
-    render: withGlobalDom ->
+    render: withReactDOM ->
       nav 'aria-label':'breadcrumbs', role:'navigation', className:'ef-breadcrumbs',
         @getCrumbs().map (crumb) ->
           a key: crumb.key, href: crumb.url, className: ('active' if crumb.last),

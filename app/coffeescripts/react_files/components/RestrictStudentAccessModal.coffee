@@ -1,7 +1,7 @@
 define [
   'react'
-  '../utils/withGlobalDom'
-], (React, withGlobalDom) ->
+  'compiled/react/shared/utils/withReactDOM'
+], (React, withReactDOM) ->
   
   RestrictStudentAccessModal = React.createClass
 
@@ -20,7 +20,7 @@ define [
       else
         @dialog.dialog('close')
 
-    render: withGlobalDom ->
+    render: withReactDOM ->
       form ref: 'dialog', id:"testdialog", style: {display: 'none'}, title:"Title Goes Here",
         p null,
           "everything should go in here"

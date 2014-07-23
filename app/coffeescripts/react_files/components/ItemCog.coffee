@@ -1,10 +1,10 @@
 define [
   'react'
-  '../utils/withGlobalDom'
+  'compiled/react/shared/utils/withReactDOM'
   'compiled/models/Folder'
   'compiled/models/File'
   'compiled/react_files/components/RestrictStudentAccessModal'
-], (React, withGlobalDom, Folder, File, RestrictStudentAccessModal) ->
+], (React, withReactDOM, Folder, File, RestrictStudentAccessModal) ->
 
   # Expects @props.model to be either a folder or a file collection/backbone model
   ItemCog = React.createClass
@@ -20,7 +20,7 @@ define [
     getInitialState: -> restrictStudentModalOpen: false
     openRestricStudentModal: -> @setState restrictStudentModalOpen: true
 
-    render: withGlobalDom ->
+    render: withReactDOM ->
       div null,
         RestrictStudentAccessModal open: @state.restrictStudentModalOpen, null
 

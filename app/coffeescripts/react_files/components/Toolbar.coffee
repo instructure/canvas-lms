@@ -1,11 +1,11 @@
 define [
   'react'
-  '../utils/withGlobalDom'
-], (React, withGlobalDom) ->
+  'compiled/react/shared/utils/withReactDOM'
+], (React, withReactDOM) ->
 
   Toolbar = React.createClass
 
-    render: withGlobalDom ->
+    render: withReactDOM ->
       header className:'ef-header',
         form action: @props.baseUrl + 'search', method: 'GET', className:'ef-search-container',
           i className:'icon-search',

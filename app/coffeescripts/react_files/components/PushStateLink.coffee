@@ -1,7 +1,6 @@
 define [
   'react'
-  '../utils/withGlobalDom'
-], (React, withGlobalDom) ->
+], (React) ->
 
   PushStateLink = React.createClass
 
