@@ -218,6 +218,43 @@ describe FilesController do
       get 'show', :course_id => @course.id, :id => @file.id, :download => 1, :verifier => @file.uuid, :download_frd => 1
     end
 
+    it "should remember most recent sf_verifier in session" do
+      user1 = user(:active_all => true)
+      file1 = user_file
+      ts1, sf_verifier1 = user1.access_verifier
+
+      user2 = user(:active_all => true)
+      file2 = user_file
+      ts2, sf_verifier2 = user2.access_verifier
+
+      # first verifier
+      user_session(user1)
+      get 'show', :user_id => user1.id, :id => file1.id, :ts => ts1, :sf_verifier => sf_verifier1
+      response.should be_success
+
+      session[:file_access_user_id].should == user1.id
+      session[:file_access_expiration].should_not be_nil
+      session[:permissions_key].should_not be_nil
+      permissions_key = session[:permissions_key]
+
+      # second verifier, should update session
+      get 'show', :user_id => user2.id, :id => @file.id, :ts => ts2, :sf_verifier => sf_verifier2
+      response.should be_success
+
+      session[:file_access_user_id].should == user2.id
+      session[:file_access_expiration].should_not be_nil
+      session[:permissions_key].should_not == permissions_key
+      permissions_key = session[:permissions_key]
+
+      # repeat access, even without verifier, should extend expiration (though
+      # we can't assert that, because milliseconds) and thus change
+      # permissions_key
+      get 'show', :user_id => user2.id, :id => @file.id
+      response.should be_success
+
+      session[:permissions_key].should_not == permissions_key
+    end
+
     it "should set cache headers for non text files" do
       course_with_teacher(:active_all => true)
       course_file

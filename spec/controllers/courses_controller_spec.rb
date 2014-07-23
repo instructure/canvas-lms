@@ -703,6 +703,8 @@ describe CoursesController do
         assigns[:pending_enrollment].should == @enrollment
         assigns[:current_user].should == @student1
         session[:enrollment_uuid].should == @enrollment.uuid
+        session[:permissions_key].should_not be_nil
+        permissions_key = session[:permissions_key]
         @enrollment.reload
         @enrollment.should be_invited
 
@@ -711,6 +713,7 @@ describe CoursesController do
         assigns[:pending_enrollment].should == @enrollment
         assigns[:current_user].should == @student1
         session[:enrollment_uuid].should == @enrollment.uuid
+        session[:permissions_key].should == permissions_key
         @enrollment.reload
         @enrollment.should be_invited
       end
@@ -744,12 +747,15 @@ describe CoursesController do
         response.should be_success
         assigns[:pending_enrollment].should == @enrollment1
         session[:enrollment_uuid].should == @enrollment1.uuid
+        session[:permissions_key].should_not be_nil
+        permissions_key = session[:permissions_key]
 
         controller.instance_variable_set(:@pending_enrollment, nil)
         get 'show', :id => @course2.id
         response.should be_success
         assigns[:pending_enrollment].should == @enrollment2
         session[:enrollment_uuid].should == @enrollment2.uuid
+        session[:permissions_key].should_not == permissions_key
       end
 
       it "should find temporary enrollments that match the logged in user" do

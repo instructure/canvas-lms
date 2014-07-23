@@ -1074,6 +1074,8 @@ class CoursesController < ApplicationController
     end
 
     session.delete(:enrollment_uuid)
+    session[:permissions_key] = CanvasUUID.generate
+
     redirect_to(@current_user ? dashboard_url : root_url)
   end
   protected :reject_enrollment
@@ -1114,9 +1116,9 @@ class CoursesController < ApplicationController
         return !!redirect_to(registration_confirmation_path(enrollment.user.email_channel.confirmation_code, :enrollment => enrollment.uuid))
       end
 
-      session[:enrollment_uuid]             = enrollment.uuid
-      session[:session_affects_permissions] = true
-      session[:enrollment_uuid_course_id]   = enrollment.course_id
+      session[:enrollment_uuid] = enrollment.uuid
+      session[:enrollment_uuid_course_id] = enrollment.course_id
+      session[:permissions_key] = CanvasUUID.generate
 
       @pending_enrollment = enrollment
 
@@ -1139,7 +1141,10 @@ class CoursesController < ApplicationController
         flash[:notice] = message || t('notices.invitation_accepted', "Invitation accepted!  Welcome to %{course}!", :course => @context.name)
       end
 
-      session.delete(:enrollment_uuid) if session[:enrollment_uuid] == session[:accepted_enrollment_uuid]
+      if session[:enrollment_uuid] == session[:accepted_enrollment_uuid]
+        session.delete(:enrollment_uuid)
+        session[:permissions_key] = CanvasUUID.generate
+      end
       session.delete(:accepted_enrollment_uuid)
       session.delete(:enrollment_uuid_course_id)
     end

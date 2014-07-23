@@ -280,6 +280,8 @@ class PseudonymSessionsController < ApplicationController
   def clear_file_session
     session.delete('file_access_user_id')
     session.delete('file_access_expiration')
+    session[:permissions_key] = CanvasUUID.generate
+
     render :text => "ok"
   end
 

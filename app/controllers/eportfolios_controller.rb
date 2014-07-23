@@ -57,7 +57,7 @@ class EportfoliosController < ApplicationController
     if params[:verifier] == @portfolio.uuid
       session[:eportfolio_ids] ||= []
       session[:eportfolio_ids] << @portfolio.id
-      session[:session_affects_permissions] = true
+      session[:permissions_key] = CanvasUUID.generate
     end
     if authorized_action(@portfolio, @current_user, :read)      
       @category = @portfolio.eportfolio_categories.first rescue nil
