@@ -195,8 +195,13 @@ $(document).ready(function() {
 
             $("#select_context_content_dialog").loadingImage('remove');
             item_data['item[id]'] = obj.id;
-            item_data['item[title]'] = $("#select_context_content_dialog .module_item_option:visible:first .item_title").val();
-            item_data['item[title]'] = item_data['item[title]'] || obj.display_name
+            if (item_data['item[type]'] === 'attachment') {
+              // some browsers return a fake path in the file input value, so use the name returned by the server
+              item_data['item[title]'] = obj.display_name;
+            } else {
+              item_data['item[title]'] = $("#select_context_content_dialog .module_item_option:visible:first .item_title").val();
+              item_data['item[title]'] = item_data['item[title]'] || obj.display_name;
+            }
             var $option = $(document.createElement('option'));
             $option.val(obj.id).text(item_data['item[title]']);
             $("#" + item_data['item[type]'] + "s_select").find(".module_item_select option:last").after($option);
