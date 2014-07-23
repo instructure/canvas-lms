@@ -1371,6 +1371,7 @@ end
 
 describe "matching question reordering" do
   before(:all) do
+    pending unless Qti.qti_enabled?
     archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/canvas_matching_reorder.zip")
     unzipped_file_path = File.join(File.dirname(archive_file_path), "cc_#{File.basename(archive_file_path, '.zip')}", 'oi')
     @export_folder = File.join(File.dirname(archive_file_path), "cc_canvas_matching_reorder")
