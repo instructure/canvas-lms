@@ -416,6 +416,12 @@ end
   if CANVAS_RAILS2
     require 'spec/support/onceler/noop'
     config.include Onceler::Noop
+
+    Onceler.instance_eval do
+      def self.base_transactions
+        1
+      end
+    end
   else
     config.include Onceler::BasicHelpers
 
