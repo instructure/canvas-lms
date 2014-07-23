@@ -1161,6 +1161,21 @@ describe ContentMigration do
       q.question_count.should == 1
     end
 
+    it "should not mix up quiz questions and assessment questions with the same ids" do
+      pending unless Qti.qti_enabled?
+      quiz1 = @copy_from.quizzes.create!(:title => "quiz 1")
+      quiz2 = @copy_from.quizzes.create!(:title => "quiz 1")
+
+      qq1 = quiz1.quiz_questions.create!(:question_data => {'question_name' => 'test question 1', 'answers' => [{'id' => 1}, {'id' => 2}]})
+      qq2 = quiz2.quiz_questions.create!(:question_data => {'question_name' => 'test question 2', 'answers' => [{'id' => 1}, {'id' => 2}]})
+      Quizzes::QuizQuestion.where(:id => qq1).update_all(:assessment_question_id => qq2.id)
+
+      run_course_copy
+
+      newquiz2 = @copy_to.quizzes.find_by_migration_id(mig_id(quiz2))
+      newquiz2.quiz_questions.first.question_data['question_name'].should == 'test question 2'
+    end
+
     it "should generate numeric ids for answers" do
       pending unless Qti.qti_enabled?
 
