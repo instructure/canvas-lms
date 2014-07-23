@@ -142,9 +142,7 @@ define([
             if($(this).val() > 0) {  //if the thing that was selected is an id( not ignore or add )
               $("#" + thing + "_resolution_template select option").removeAttr("disabled");
               $("#" + thing + "_resolution_template select").each(function(){
-                 if($(this).val() != "ignore" ) {
-                 	$("#" + thing + "_resolution_template select").not(this).find("option[value='" + $(this).val() + "']").attr("disabled", true);
-                 }
+                $("#" + thing + "_resolution_template select").not(this).find("option[value='" + $(this).val() + "']").attr("disabled", true);
               });
             }
             else if ( $(this).val() === "new" ) {
