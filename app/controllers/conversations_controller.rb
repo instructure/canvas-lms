@@ -946,7 +946,7 @@ class ConversationsController < ApplicationController
   end
 
   def infer_visibility(conversations)
-    multiple = conversations.is_a?(Enumerable) || (!CANVAS_RAILS2 && conversations.is_a?(ActiveRecord::Relation))
+    multiple = conversations.is_a?(Enumerable) || conversations.is_a?(ActiveRecord::Relation)
     conversations = [conversations] unless multiple
     result = Hash.new(false)
     visible_conversations = @current_user.shard.activate do

@@ -754,14 +754,8 @@ module ApplicationHelper
       attributes['data-tooltip'] ||= 'top'
     end
 
-    if CANVAS_RAILS2 # see config/initializers/rails2.rb
-      content_tag_without_nil_return(tag_type, attributes) do
-        datetime_string(datetime)
-      end
-    else
-      content_tag(tag_type, attributes) do
-        datetime_string(datetime)
-      end
+    content_tag(tag_type, attributes) do
+      datetime_string(datetime)
     end
   end
 

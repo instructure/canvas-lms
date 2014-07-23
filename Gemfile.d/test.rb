@@ -19,15 +19,10 @@ group :test do
       gem 'eventmachine', '1.0.3'
     end
 
-  if CANVAS_RAILS2
-    gem 'rspec', '1.3.2'
-    gem 'rspec-rails', '1.3.4'
-    gem 'test-unit', '1.2.3'
-  else
-    gem 'rspec', '2.99.0'
-    gem 'rspec-rails', '2.99.0'
-    gem 'once-ler', '0.0.13'
-  end
+  gem 'rspec', '2.99.0'
+  gem 'rspec-rails', '2.99.0'
+  gem 'once-ler', '0.0.13'
+
   gem 'sequel', '4.5.0', :require => false
   gem 'selenium-webdriver', '2.42.0'
     gem 'childprocess', '0.5.0'

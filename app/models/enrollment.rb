@@ -912,7 +912,7 @@ class Enrollment < ActiveRecord::Base
     scope = self.order(clause)
     if scope.select_values.present?
       scope = scope.select(clause)
-    elsif !CANVAS_RAILS2
+    else
       scope = scope.select(self.arel_table[Arel.star])
     end
     scope

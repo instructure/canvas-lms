@@ -17,7 +17,7 @@
 #
 
 class Quizzes::QuizSubmission < ActiveRecord::Base
-  self.table_name = 'quiz_submissions' unless CANVAS_RAILS2
+  self.table_name = 'quiz_submissions'
 
   def self.polymorphic_names
     [self.name, "QuizSubmission"]

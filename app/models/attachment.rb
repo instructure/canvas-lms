@@ -160,9 +160,7 @@ class Attachment < ActiveRecord::Base
       # attachment in the same context and the same full path, we return that
       # instead, to emulate replacing a file without having to update every
       # by-id reference in every user content field.
-      if CANVAS_RAILS2
-        owner = proxy_owner
-      elsif self.respond_to?(:proxy_association)
+      if self.respond_to?(:proxy_association)
         owner = proxy_association.owner
       end
 
@@ -197,10 +195,8 @@ class Attachment < ActiveRecord::Base
     run_after_attachment_saved
   end
 
-  unless CANVAS_RAILS2
-    before_attachment_saved :run_before_attachment_saved
-    after_attachment_saved :run_after_attachment_saved
-  end
+  before_attachment_saved :run_before_attachment_saved
+  after_attachment_saved :run_after_attachment_saved
 
   def run_before_attachment_saved
     @after_attachment_saved_workflow_state = self.workflow_state
@@ -352,11 +348,7 @@ class Attachment < ActiveRecord::Base
   def scribd_user
     self.scribd_doc.try(:owner) ||
       if Rails.env.production?
-        if CANVAS_RAILS2
-          "#{self.context_type.downcase.first}#{self.context.shard.id.to_s(36)}-#{self.context.local_id.to_s(36)}"
-        else
-          "#{self.context_type.downcase.first}#{self.context.shard.id.to_s(36)}-#{self.local_context_id.to_s(36)}"
-        end
+        "#{self.context_type.downcase.first}#{self.context.shard.id.to_s(36)}-#{self.local_context_id.to_s(36)}"
       else
         "canvas-#{Rails.env}"
       end

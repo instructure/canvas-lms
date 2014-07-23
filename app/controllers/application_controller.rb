@@ -21,11 +21,7 @@
 
 class ApplicationController < ActionController::Base
   def self.promote_view_path(path)
-    if CANVAS_RAILS2
-      self.view_paths.delete path
-    else
-      self.view_paths = self.view_paths.to_ary.reject{ |p| p.to_s == path }
-    end
+    self.view_paths = self.view_paths.to_ary.reject{ |p| p.to_s == path }
     prepend_view_path(path)
   end
 
@@ -155,10 +151,8 @@ class ApplicationController < ActionController::Base
     @real_current_user || @current_user
   end
 
-  unless CANVAS_RAILS2
-    def rescue_action_dispatch_exception
-      rescue_action_in_public(request.env['action_dispatch.exception'])
-    end
+  def rescue_action_dispatch_exception
+    rescue_action_in_public(request.env['action_dispatch.exception'])
   end
 
   protected
@@ -214,8 +208,6 @@ class ApplicationController < ActionController::Base
   end
 
   def set_response_headers
-    headers['X-UA-Compatible'] = 'IE=Edge,chrome=1' if CANVAS_RAILS2
-
     # we can't block frames on the files domain, since files domain requests
     # are typically embedded in an iframe in canvas, but the hostname is
     # different
@@ -723,7 +715,6 @@ class ApplicationController < ActionController::Base
     if !@context || (opts[:only] && !opts[:only].include?(@context.class.to_s.underscore.to_sym))
       @problem ||= t("#application.errors.invalid_feed_parameters", "Invalid feed parameters.") if (opts[:only] && !opts[:only].include?(@context.class.to_s.underscore.to_sym))
       @problem ||= t "#application.errors.feed_not_found", "Could not find feed."
-      params[:format] = 'html' if CANVAS_RAILS2
       render template: "shared/unauthorized_feed", status: :bad_request, formats: [:html]
       return false
     end
@@ -870,42 +861,40 @@ class ApplicationController < ActionController::Base
     true
   end
 
-  unless CANVAS_RAILS2
-    rescue_from Exception, :with => :rescue_exception
+  rescue_from Exception, :with => :rescue_exception
 
-    # analogous to rescue_action_without_handler from ActionPack 2.3
-    def rescue_exception(exception)
-      ActiveSupport::Deprecation.silence do
-        message = "\n#{exception.class} (#{exception.message}):\n"
-        message << exception.annoted_source_code.to_s if exception.respond_to?(:annoted_source_code)
-        message << "  " << exception.backtrace.join("\n  ")
-        logger.fatal("#{message}\n\n")
-      end
-
-      if config.consider_all_requests_local || local_request?
-        rescue_action_locally(exception)
-      else
-        rescue_action_in_public(exception)
-      end
+  # analogous to rescue_action_without_handler from ActionPack 2.3
+  def rescue_exception(exception)
+    ActiveSupport::Deprecation.silence do
+      message = "\n#{exception.class} (#{exception.message}):\n"
+      message << exception.annoted_source_code.to_s if exception.respond_to?(:annoted_source_code)
+      message << "  " << exception.backtrace.join("\n  ")
+      logger.fatal("#{message}\n\n")
     end
 
-    def interpret_status(code)
-      message = Rack::Utils::HTTP_STATUS_CODES[code]
-      code, message = [500, Rack::Utils::HTTP_STATUS_CODES[500]] unless message
-      "#{code} #{message}"
+    if config.consider_all_requests_local || local_request?
+      rescue_action_locally(exception)
+    else
+      rescue_action_in_public(exception)
     end
+  end
 
-    def response_code_for_rescue(exception)
-      ActionDispatch::ExceptionWrapper.status_code_for_exception(exception.class.name)
-    end
+  def interpret_status(code)
+    message = Rack::Utils::HTTP_STATUS_CODES[code]
+    code, message = [500, Rack::Utils::HTTP_STATUS_CODES[500]] unless message
+    "#{code} #{message}"
+  end
 
-    def render_optional_error_file(status)
-      path = "#{Rails.public_path}/#{status.to_s[0,3]}#{".html" if CANVAS_RAILS2}"
-      if File.exist?(path)
-        render :file => path, :status => status, :content_type => Mime::HTML, :layout => false, :formats => [:html]
-      else
-        head status
-      end
+  def response_code_for_rescue(exception)
+    ActionDispatch::ExceptionWrapper.status_code_for_exception(exception.class.name)
+  end
+
+  def render_optional_error_file(status)
+    path = "#{Rails.public_path}/#{status.to_s[0,3]}"
+    if File.exist?(path)
+      render :file => path, :status => status, :content_type => Mime::HTML, :layout => false, :formats => [:html]
+    else
+      head status
     end
   end
 
@@ -927,7 +916,7 @@ class ApplicationController < ActionController::Base
           :user_agent => request.headers['User-Agent'],
           :request_context_id => RequestContextGenerator.request_id,
           :account => @domain_root_account,
-          :request_method => CANVAS_RAILS2 ? request.method : request.request_method_symbol,
+          :request_method => request.request_method_symbol,
           :format => request.format,
         }.merge(ErrorReport.useful_http_env_stuff_from_request(request)))
       end
@@ -973,11 +962,6 @@ class ApplicationController < ActionController::Base
           :message => message,
         }
     end
-  end
-
-  if CANVAS_RAILS2
-    rescue_responses['AuthenticationMethods::AccessTokenError'] = 401
-    rescue_responses['AuthenticationMethods::LoggedOutError'] = 401
   end
 
   def rescue_action_in_api(exception, error_report, response_code)
@@ -1501,11 +1485,7 @@ class ApplicationController < ActionController::Base
       json = options.delete(:json)
       unless json.is_a?(String)
         json_cast(json)
-        if CANVAS_RAILS2
-          json = MultiJson.dump(json).force_encoding(Encoding::ASCII_8BIT)
-        else
-          json = ActiveSupport::JSON.encode(json)
-        end
+        json = ActiveSupport::JSON.encode(json)
       end
 
       # prepend our CSRF protection to the JSON response, unless this is an API
@@ -1675,22 +1655,6 @@ class ApplicationController < ActionController::Base
     data[:common_contexts] = [] + common_courses + common_groups
     data[:known_user] = known_user
     data
-  end
-
-  if CANVAS_RAILS2
-    filter_parameter_logging *LoggingFilter.filtered_parameters
-
-    # filter out sensitive parameters in the query string as well when logging
-    # the rails "Completed in XXms" line.
-    # this is fixed in Rails 3.x
-    def complete_request_uri
-      uri = LoggingFilter.filter_uri(request.fullpath)
-      "#{request.protocol}#{request.host}#{uri}"
-    end
-
-    def view_context
-      @template
-    end
   end
 
   def self.batch_jobs_in_actions(opts = {})

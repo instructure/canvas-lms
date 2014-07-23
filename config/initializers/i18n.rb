@@ -1,7 +1,7 @@
 # loading all the locales has a significant (>30%) impact on the speed of initializing canvas
 # so we skip it in situations where we don't need the locales, such as in development mode and in rails console
 skip_locale_loading = (Rails.env.development? || Rails.env.test? || $0 == 'irb') && !ENV['RAILS_LOAD_ALL_LOCALES']
-load_path = CANVAS_RAILS2 ? I18n.load_path : Rails.application.config.i18n.railties_load_path
+load_path = Rails.application.config.i18n.railties_load_path
 if skip_locale_loading
   load_path.replace(load_path.grep(%r{/(locales|en)\.yml\z}))
 else
@@ -189,44 +189,36 @@ I18n.class_eval do
   end
 end
 
-if CANVAS_RAILS2
-  ActionView::Base.class_eval do
-    def i18n_scope
-      "#{template.base_path}.#{template.name.sub(/\A_/, '')}"
-    end
-  end
-else
-  ActionView::LookupContext.class_eval do
-    attr_accessor :i18n_scope
-  end
+ActionView::LookupContext.class_eval do
+  attr_accessor :i18n_scope
+end
 
-  ActionView::TemplateRenderer.class_eval do
-    def render_template_with_assign(template, *a)
-      old_i18n_scope = @lookup_context.i18n_scope
-      if template.respond_to?(:virtual_path) && (virtual_path = template.virtual_path)
-        @lookup_context.i18n_scope = virtual_path.sub(/\/_/, '/').gsub('/', '.')
-      end
-      render_template_without_assign(template, *a)
-    ensure
-      @lookup_context.i18n_scope = old_i18n_scope
+ActionView::TemplateRenderer.class_eval do
+  def render_template_with_assign(template, *a)
+    old_i18n_scope = @lookup_context.i18n_scope
+    if template.respond_to?(:virtual_path) && (virtual_path = template.virtual_path)
+      @lookup_context.i18n_scope = virtual_path.sub(/\/_/, '/').gsub('/', '.')
     end
-    alias_method_chain :render_template, :assign
+    render_template_without_assign(template, *a)
+  ensure
+    @lookup_context.i18n_scope = old_i18n_scope
   end
+  alias_method_chain :render_template, :assign
+end
 
-  ActionView::PartialRenderer.class_eval do
-    def render_partial_with_assign
-      old_i18n_scope = @lookup_context.i18n_scope
-      @lookup_context.i18n_scope = @path.sub(/\/_/, '/').gsub('/', '.') if @path
-      render_partial_without_assign
-    ensure
-      @lookup_context.i18n_scope = old_i18n_scope
-    end
-    alias_method_chain :render_partial, :assign
+ActionView::PartialRenderer.class_eval do
+  def render_partial_with_assign
+    old_i18n_scope = @lookup_context.i18n_scope
+    @lookup_context.i18n_scope = @path.sub(/\/_/, '/').gsub('/', '.') if @path
+    render_partial_without_assign
+  ensure
+    @lookup_context.i18n_scope = old_i18n_scope
   end
+  alias_method_chain :render_partial, :assign
+end
 
-  ActionView::Base.class_eval do
-    delegate :i18n_scope, :to => :lookup_context
-  end
+ActionView::Base.class_eval do
+  delegate :i18n_scope, :to => :lookup_context
 end
 
 ActionView::Base.class_eval do

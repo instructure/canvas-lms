@@ -17,7 +17,7 @@
 #
 
 class Quizzes::QuizGroup < ActiveRecord::Base
-  self.table_name = 'quiz_groups' unless CANVAS_RAILS2
+  self.table_name = 'quiz_groups'
 
   attr_accessible :name, :pick_count, :question_points, :assessment_question_bank_id
   attr_readonly :quiz_id

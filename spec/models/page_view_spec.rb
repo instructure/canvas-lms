@@ -343,44 +343,6 @@ describe PageView do
     end
   end
 
-  if CANVAS_RAILS2
-    describe ".find_some" do
-      context "db-backed" do
-        before do
-          Setting.set('enable_page_views', 'db')
-        end
-
-        it "should return the existing page view" do
-          page_views = (0..3).map { |index| page_view_model }
-          page_view_ids = page_views.map { |page_view| page_view.request_id }
-
-          PageView.find_some(page_view_ids).should == page_views
-        end
-
-        it "should raise ActiveRecord::RecordNotFound with unknown request id" do
-          pv = page_view_model
-          expect { PageView.find_some([pv.request_id, 'unknown']) }.to raise_error(ActiveRecord::RecordNotFound)
-        end
-      end
-
-      context "cassandra-backed" do
-        include_examples "cassandra page views"
-
-        it "should return the existing page view" do
-          page_views = (0..3).map { |index| page_view_model }
-          page_view_ids = page_views.map { |page_view| page_view.request_id }
-
-          PageView.find_some(page_view_ids).should == page_views
-        end
-
-        it "should raise ActiveRecord::RecordNotFound with unknown request id" do
-          pv = page_view_model
-          expect { PageView.find_some([pv.request_id, 'unknown']) }.to raise_error(ActiveRecord::RecordNotFound)
-        end
-      end
-    end
-  end
-
   describe ".find_by_id" do
     context "db-backed" do
       before :once do

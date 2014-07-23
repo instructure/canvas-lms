@@ -174,11 +174,7 @@ describe ContextModuleProgression do
 
     it 'does not raise a stale object error during catastrophic evaluate!' do
       progression = stale_progression
-      if CANVAS_RAILS2
-        progression.stubs(:save).at_least_once.raises(ActiveRecord::StaleObjectError.new)
-      else
-        progression.stubs(:save).at_least_once.raises(ActiveRecord::StaleObjectError.new(progression, 'Save'))
-      end
+      progression.stubs(:save).at_least_once.raises(ActiveRecord::StaleObjectError.new(progression, 'Save'))
 
       new_progression = nil
       expect { new_progression = progression.evaluate! }.to_not raise_error

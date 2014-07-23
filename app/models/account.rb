@@ -419,14 +419,9 @@ class Account < ActiveRecord::Base
   end
 
   def associated_courses
-    scope = if CANVAS_RAILS2
-      Course.shard(shard)
-    else
-      shard.activate do
-        Course.scoped
-      end
+    shard.activate do
+      Course.where("EXISTS (SELECT 1 FROM course_account_associations WHERE course_id=courses.id AND account_id=?)", self)
     end
-    scope.where("EXISTS (SELECT 1 FROM course_account_associations WHERE course_id=courses.id AND account_id=?)", self)
   end
 
   def associated_user?(user)

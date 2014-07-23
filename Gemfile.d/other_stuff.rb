@@ -1,44 +1,17 @@
-if CANVAS_RAILS2
-  # If you have a license to rails lts, you can create a vendor/plugins/*/RAILS_LTS yaml file
-  # with the Gemfile `gem` command to use (pointing to the private repo with your username/password).
-  # Otherwise, the free community version of rails lts will be used.
-  lts_file = Dir.glob(File.expand_path("../../vendor/plugins/*/RAILS_LTS", __FILE__)).first
-  if lts_file
-    eval(File.read(lts_file))
-  else
-    gem 'rails', :github => 'makandra/rails', :branch => '2-3-lts', :ref => 'e86daf8ff727d5efc0040c876ba00c9444a5d915'
-  end
-  # AMS needs to be loaded BEFORE authlogic because it defines the constant
-  # "ActiveModel", and aliases ActiveRecord::Errors to ActiveModel::Errors
-  # so Authlogic will use the right thing when it detects that ActiveModel
-  # is defined.
-  gem 'active_model_serializers_rails_2.3', '0.9.0alpha1', :require => 'active_model_serializers'
-  gem 'authlogic', '2.1.3'
 
-  gem 'instructure-active_model-better_errors', '1.6.5.rails2.3', :require => 'active_model/better_errors'
-  gem 'encrypted_cookie_store-instructure', '1.0.6', :require => 'encrypted_cookie_store'
-  gem 'erubis', '2.7.0'
-  gem 'fake_arel', '1.5.0'
-  gem 'fake_rails3_routes', '1.0.4'
-    gem 'journey', '1.0.4'
-  gem 'rack', '1.1.3'
-  gem 'folio-pagination-legacy', '0.0.3', :require => 'folio/rails'
-  gem 'will_paginate', '2.3.15', :require => false
-else
-  gem 'rails', '3.2.19'
-  gem 'active_model_serializers', '0.9.0alpha1',
-    :github => 'rails-api/active_model_serializers', :ref => '61882e1e4127facfe92e49057aec71edbe981829'
-  gem 'authlogic', '3.3.0'
-  gem 'active_model-better_errors', '1.6.7', :require => 'active_model/better_errors'
-  gem 'dynamic_form', '1.1.4'
-  gem 'encrypted_cookie_store-instructure', '1.1.4', :require => 'encrypted_cookie_store'
-  gem 'rails-patch-json-encode', '0.0.1'
-  gem 'rack', '1.4.5'
-  gem 'routing_concerns', '0.1.0'
-  gem 'switchman', '1.2.12'
-  gem 'folio-pagination', '0.0.7', :require => 'folio/rails'
-  gem 'will_paginate', '3.0.4', :require => false
-end
+gem 'rails', '3.2.19'
+gem 'active_model_serializers', '0.9.0alpha1',
+  :github => 'rails-api/active_model_serializers', :ref => '61882e1e4127facfe92e49057aec71edbe981829'
+gem 'authlogic', '3.3.0'
+gem 'active_model-better_errors', '1.6.7', :require => 'active_model/better_errors'
+gem 'dynamic_form', '1.1.4'
+gem 'encrypted_cookie_store-instructure', '1.1.4', :require => 'encrypted_cookie_store'
+gem 'rails-patch-json-encode', '0.0.1'
+gem 'rack', '1.4.5'
+gem 'routing_concerns', '0.1.0'
+gem 'switchman', '1.2.12'
+gem 'folio-pagination', '0.0.7', :require => 'folio/rails'
+gem 'will_paginate', '3.0.4', :require => false
 
 gem "aws-sdk", '1.21.0'
   gem 'uuidtools', '2.1.4'
@@ -46,9 +19,9 @@ gem 'barby', '0.5.0'
   gem 'chunky_png', '1.3.0'
 gem 'bcrypt-ruby', '3.0.1'
 gem 'builder', '3.0.0'
-gem 'canvas_connect', '0.3.5'
+gem 'canvas_connect', '0.3.6'
   gem 'adobe_connect', '1.0.0'
-gem 'canvas_webex', '0.14'
+gem 'canvas_webex', '0.15'
 gem 'daemons', '1.1.0'
 gem 'diff-lcs', '1.1.3', :require => 'diff/lcs'
 

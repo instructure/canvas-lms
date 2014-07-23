@@ -1,21 +1,6 @@
-if CANVAS_RAILS2
-  # Even on Rails 2.3, we're using Rails 3 style routes.
-  #
-  # You should have plenty of examples in here for anything you're trying to do,
-  # but if you want a full primer this is a good one:
-  # http://blog.engineyard.com/2010/the-lowdown-on-routes-in-rails-3
-  #
-  # Don't try anything too fancy, FakeRails3Routes doesn't support some of the
-  # more advanced Rails 3 routing features, since in the background it's just
-  # calling into the Rails 2 routing system.
-  routes = FakeRails3Routes
-else
-  routes = CanvasRails::Application.routes
-end
+full_path_glob = '(/*full_path)'
 
-full_path_glob = CANVAS_RAILS2 ? '/*full_path' : '(/*full_path)'
-
-routes.draw do
+CanvasRails::Application.routes.draw do
   resources :submission_comments, :only => :destroy
 
   match 'inbox' => 'context#inbox', :as => :inbox
@@ -1078,7 +1063,7 @@ routes.draw do
     end
 
     scope(:controller => :custom_data) do
-      glob = CANVAS_RAILS2 ? '/*scope' : '(/*scope)'
+      glob = '(/*scope)'
       get "users/:user_id/custom_data#{glob}", action: 'get_data'
       put "users/:user_id/custom_data#{glob}", action: 'set_data'
       delete "users/:user_id/custom_data#{glob}", action: 'delete_data'

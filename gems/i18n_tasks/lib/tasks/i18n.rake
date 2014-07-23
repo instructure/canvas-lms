@@ -80,13 +80,13 @@ namespace :i18n do
 
     # Ruby
     files = (Dir.glob('./*') - ['./vendor'] + ['./vendor/plugins/*'] - ['./guard', './tmp']).map { |d| Dir.glob("#{d}/**/*rb") }.flatten.
-      reject{ |file| file =~ %r{\A\./(rb-fsevent|vendor/plugins/rails_xss|db|spec)/} }
+      reject{ |file| file =~ %r{\A\./(rb-fsevent|db|spec)/} }
     files &= only if only
     file_count = files.size
     rb_extractor = I18nExtraction::RubyExtractor.new(:translations => @translations)
     process_files(files) do |file|
       source = File.read(file)
-      source = RailsXss::Erubis.new(source).src if file =~ /\.erb\z/
+      source = ActionView::Template::Handlers::Erubis.new(source).src if file =~ /\.erb\z/
 
       # add a magic comment since that's the best way to convince RubyParser
       # 3.x it should treat the source as utf-8 (it ignores the source string encoding)
@@ -155,12 +155,10 @@ namespace :i18n do
     # the `environment` rake task.
     require 'bundler'
     Bundler.setup
-    unless CANVAS_RAILS2
-      # for consistency in how canvas does json ... this way our specs can
-      # verify _core_en is up to date
-      ActiveSupport::JSON.backend = :oj
-      MultiJson.dump_options = {:escape_mode => :xss_safe}
-    end
+    # for consistency in how canvas does json ... this way our specs can
+    # verify _core_en is up to date
+    ActiveSupport::JSON.backend = :oj
+    MultiJson.dump_options = {:escape_mode => :xss_safe}
 
     # set up rails i18n paths ... normally rails env does this for us :-/
     require 'action_controller' 

@@ -10,11 +10,7 @@ environment_configuration(defined?(config) && config) do |config|
   config.whiny_nils = true
 
   # Show full error reports and disable caching
-  if CANVAS_RAILS2
-    config.action_controller.consider_all_requests_local = true
-  else
-    config.consider_all_requests_local = true
-  end
+  config.consider_all_requests_local = true
   config.action_controller.perform_caching = false
 
   # run rake js:build to build the optimized JS if set to true
@@ -43,23 +39,11 @@ environment_configuration(defined?(config) && config) do |config|
     end
   end
 
-  if CANVAS_RAILS2
-    config.to_prepare do
-      # Raise an exception on bad mass assignment. Helps us catch these bugs before
-      # they hit.
-      Canvas.protected_attribute_error = :raise
+  # Print deprecation notices to the Rails logger
+  config.active_support.deprecation = :log
 
-      # Raise an exception on finder type mismatch or nil arguments. Helps us catch
-      # these bugs before they hit.
-      Canvas.dynamic_finder_nil_arguments_error = :raise
-    end
-  else
-    # Print deprecation notices to the Rails logger
-    config.active_support.deprecation = :log
-
-    # Only use best-standards-support built into browsers
-    config.action_dispatch.best_standards_support = :builtin
-  end
+  # Only use best-standards-support built into browsers
+  config.action_dispatch.best_standards_support = :builtin
 
   # we use lots of db specific stuff - don't bother trying to dump to ruby
   # (it also takes forever)

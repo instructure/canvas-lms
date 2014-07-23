@@ -237,11 +237,7 @@ class Conversation < ActiveRecord::Base
       save! if new_tags.present? || root_account_ids_changed?
 
       # so we can take advantage of other preloaded associations
-      if CANVAS_RAILS2
-        ConversationMessage.send :add_preloaded_record_to_collection, [message], :conversation, self
-      else
-        message.association(:conversation).target = self
-      end
+      message.association(:conversation).target = self
       message.save_without_broadcasting!
 
       add_message_to_participants(message, options.merge(
@@ -619,13 +615,7 @@ class Conversation < ActiveRecord::Base
           ConversationMessageParticipant.joins(:conversation_message).
               where(:conversation_messages => { :conversation_id => self.id }).
               delete_all
-          if CANVAS_RAILS2
-            # bare scoped call avoids HasManyAssociation's delete_all, which loads
-            # all records in Rails 2
-            self.conversation_messages.scoped.delete_all
-          else
-            self.conversation_messages.delete_all
-          end
+          self.conversation_messages.delete_all
         end
       end
 
@@ -724,11 +714,7 @@ class Conversation < ActiveRecord::Base
   protected
 
   def maybe_update_timestamp(col, val, additional_conditions=[])
-    if CANVAS_RAILS2
-      condition = self.class.merge_conditions(["(#{col} IS NULL OR #{col} < ?)", val], additional_conditions)
-    else
-      condition = self.class.where(["(#{col} IS NULL OR #{col} < ?)", val]).where(additional_conditions).where_values.join(' AND ')
-    end
+    condition = self.class.where(["(#{col} IS NULL OR #{col} < ?)", val]).where(additional_conditions).where_values.join(' AND ')
     sanitize_sql ["#{col} = CASE WHEN #{condition} THEN ? ELSE #{col} END", val]
   end
 end

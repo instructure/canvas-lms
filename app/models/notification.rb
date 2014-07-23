@@ -17,9 +17,7 @@
 #
 
 class Notification < ActiveRecord::Base
-  unless CANVAS_RAILS2
-    self.shard_category = :unsharded
-  end
+  self.shard_category = :unsharded
 
   include Workflow
   include TextHelper

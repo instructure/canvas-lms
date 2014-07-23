@@ -36,7 +36,6 @@ describe AssignmentsController do
 
   describe "GET 'index'" do
     it "should throw 404 error without a valid context id" do
-      rescue_action_in_public! if CANVAS_RAILS2
       #controller.use_rails_error_handling!
       get 'index'
       assert_status(404)
@@ -130,7 +129,6 @@ describe AssignmentsController do
   
   describe "GET 'show'" do
     it "should return 404 on non-existant assignment" do
-      rescue_action_in_public! if CANVAS_RAILS2
       #controller.use_rails_error_handling!
       user_session(@student)
 
@@ -224,7 +222,6 @@ describe AssignmentsController do
 
   describe "GET 'syllabus'" do
     it "should require authorization" do
-      rescue_action_in_public! if CANVAS_RAILS2
       #controller.use_rails_error_handling!
       get 'syllabus', :course_id => @course.id
       assert_unauthorized
@@ -250,7 +247,6 @@ describe AssignmentsController do
 
   describe "GET 'new'" do
     it "should require authorization" do
-      rescue_action_in_public! if CANVAS_RAILS2
       #controller.use_rails_error_handling!
       get 'new', :course_id => @course.id
       assert_unauthorized
@@ -268,7 +264,6 @@ describe AssignmentsController do
   
   describe "POST 'create'" do
     it "should require authorization" do
-      rescue_action_in_public! if CANVAS_RAILS2
       #controller.use_rails_error_handling!
       post 'create', :course_id => @course.id
       assert_unauthorized
@@ -314,7 +309,6 @@ describe AssignmentsController do
   
   describe "GET 'edit'" do
     it "should require authorization" do
-      rescue_action_in_public! if CANVAS_RAILS2
       #controller.use_rails_error_handling!
       get 'edit', :course_id => @course.id, :id => @assignment.id
       assert_unauthorized
@@ -337,7 +331,6 @@ describe AssignmentsController do
 
   describe "PUT 'update'" do
     it "should require authorization" do
-      rescue_action_in_public! if CANVAS_RAILS2
       #controller.use_rails_error_handling!
       put 'update', :course_id => @course.id, :id => @assignment.id
       assert_unauthorized

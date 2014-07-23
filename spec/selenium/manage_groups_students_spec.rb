@@ -385,11 +385,8 @@ describe "manage groups students" do
       loading = fj("#category_#{@category.id} .group_blank .loading_members:visible")
       loading.text.should == 'Assigning Students...'
       lock.unlock
-      if CANVAS_RAILS2
-        GroupsController.filter_chain.pop
-      else
-        UsersController._process_action_callbacks.pop
-      end
+      UsersController._process_action_callbacks.pop
+
       # make sure we wait before moving on
       wait_for_ajax_requests
     end

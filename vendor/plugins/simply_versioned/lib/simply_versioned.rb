@@ -251,7 +251,7 @@ module SoftwareHeretics
 
         def populate_versionable(version)
           if version && !version.frozen?
-            version.versionable = CANVAS_RAILS2 ? proxy_owner : proxy_association.owner
+            version.versionable = proxy_association.owner
           end
           version
         end

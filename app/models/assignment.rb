@@ -91,11 +91,7 @@ class Assignment < ActiveRecord::Base
       assignment.external_tool_tag.context = assignment
       assignment.external_tool_tag.content_type = "ContextExternalTool"
     else
-      if CANVAS_RAILS2
-        assignment.external_tool_tag = nil
-      else
-        assignment.association(:external_tool_tag).reset
-      end
+      assignment.association(:external_tool_tag).reset
     end
     true
   end
@@ -1648,11 +1644,7 @@ class Assignment < ActiveRecord::Base
     # select doesn't work with include() in rails3, and include(:context)
     # doesn't work because of the polymorphic association. So we'll preload
     # context for the assignments in a single query.
-    if CANVAS_RAILS2
-      chain.select("(SELECT name FROM courses WHERE id = assignments.context_id) AS context_name, needs_grading_count")
-    else
-      chain.preload(:context)
-    end
+    chain.preload(:context)
   }
 
   # This should only be used in the course drop down to show assignments not yet graded.
@@ -1661,11 +1653,8 @@ class Assignment < ActiveRecord::Base
         where("assignments.needs_grading_count>0").
         limit(limit).
         order("assignments.due_at")
-    if CANVAS_RAILS2
-      chain.select("(SELECT name FROM courses WHERE id = assignments.context_id) AS context_name, needs_grading_count")
-    else
-      chain.preload(:context)
-    end
+
+    chain.preload(:context)
   }
 
   scope :expecting_submission, -> { where("submission_types NOT IN ('', 'none', 'not_graded', 'on_paper') AND submission_types IS NOT NULL") }
@@ -1687,12 +1676,6 @@ class Assignment < ActiveRecord::Base
 
   def overdue?
     due_at && due_at <= Time.now
-  end
-
-  # We can replace context_name with context.name in _menu_assignment.html.erb
-  # and remove this once the rails3 switch is complete
-  def context_name
-    CANVAS_RAILS2 ? read_attribute('context_name') : context.name
   end
 
   def readable_submission_types

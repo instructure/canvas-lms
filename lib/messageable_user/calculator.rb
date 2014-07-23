@@ -567,7 +567,7 @@ class MessageableUser
         :common_role_column => 'enrollments.type'
       }.merge(options)
       scope = base_scope(options)
-      scope = scope.joins("INNER JOIN enrollments ON enrollments.user_id=users.id") unless CANVAS_RAILS2 # see below
+      scope = scope.joins("INNER JOIN enrollments ON enrollments.user_id=users.id")
 
       enrollment_conditions = self.class.enrollment_conditions(options)
       if enrollment_conditions
@@ -575,15 +575,6 @@ class MessageableUser
         scope = scope.where(enrollment_conditions)
       else
         scope = scope.where('?', false)
-      end
-
-      if CANVAS_RAILS2
-        # this comes after the conditional join on courses that needs
-        # enrollments, because fake_arel is going to swap the order for some
-        # reason. if this came first (e.g. immediately after base_scope), then
-        # the join on courses would show up first in the SQL, which could make
-        # the database sad.
-        scope = scope.joins("INNER JOIN enrollments ON enrollments.user_id=users.id")
       end
 
       scope

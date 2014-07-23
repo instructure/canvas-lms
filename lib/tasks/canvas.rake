@@ -250,17 +250,13 @@ namespace :db do
       end
       create_database(queue) if queue
       create_database(config)
-      unless CANVAS_RAILS2
-        ::ActiveRecord::Base.connection.schema_cache.clear!
-        ::ActiveRecord::Base.descendants.each(&:reset_column_information)
-      end
+      ::ActiveRecord::Base.connection.schema_cache.clear!
+      ::ActiveRecord::Base.descendants.each(&:reset_column_information)
       Rake::Task['db:migrate'].invoke
     end
   end
 end
 
-if CANVAS_RAILS3
-  %w{db:pending_migrations db:migrate:predeploy db:migrate:postdeploy}.each { |task_name| Switchman.shardify_task(task_name) }
-end
+%w{db:pending_migrations db:migrate:predeploy db:migrate:postdeploy}.each { |task_name| Switchman.shardify_task(task_name) }
 
 end

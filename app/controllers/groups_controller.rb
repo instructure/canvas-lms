@@ -161,14 +161,8 @@ class GroupsController < ApplicationController
       groups = []
     end
 
-    if CANVAS_RAILS2
-      scope = @context.users_not_in_groups(groups, order: User.sortable_name_order_by_clause('users'))
-      total_entries = scope.count('users.id', distinct: true)
-      users = scope.paginate(page: page, per_page: per_page, total_entries: total_entries)
-    else
-      users = @context.users_not_in_groups(groups, order: User.sortable_name_order_by_clause('users')).
-        paginate(page: page, per_page: per_page)
-    end
+    users = @context.users_not_in_groups(groups, order: User.sortable_name_order_by_clause('users')).
+      paginate(page: page, per_page: per_page)
 
     if authorized_action(@context, @current_user, :manage)
       json = {

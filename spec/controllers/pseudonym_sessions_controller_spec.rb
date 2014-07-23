@@ -237,7 +237,7 @@ describe PseudonymSessionsController do
       Pseudonym.find(session['pseudonym_credentials_id']).should == user1.pseudonyms.first
 
       (controller.instance_variables.grep(/@[^_]/) - ['@mock_proxy']).each{ |var| controller.send :remove_instance_variable, var }
-      CANVAS_RAILS2 ? session.reset : session.clear
+      session.clear
 
       controller.stubs(:saml_response).returns(
         stub('response', :is_valid? => true, :success_status? => true, :name_id => unique_id, :name_qualifier => nil, :session_index => nil, :process => nil)
@@ -734,7 +734,7 @@ describe PseudonymSessionsController do
       Pseudonym.find(session['pseudonym_credentials_id']).should == user1.pseudonyms.first
 
       (controller.instance_variables.grep(/@[^_]/) - ['@mock_proxy']).each{ |var| controller.send :remove_instance_variable, var }
-      CANVAS_RAILS2 ? session.reset : session.clear
+      session.clear
 
       stubby("yes\n#{unique_id}\n")
 

@@ -28,11 +28,7 @@ class CustomData < ActiveRecord::Base
     end
   end
 
-  if CANVAS_RAILS2
-    set_table_name 'custom_data'
-  else
-    self.table_name = 'custom_data'
-  end
+  self.table_name = 'custom_data'
 
   belongs_to :user
 

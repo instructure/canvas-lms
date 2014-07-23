@@ -30,7 +30,7 @@ class EnrollmentDateBuilder
 
   def self.preload(enrollments)
     return if enrollments.empty?
-    courses_loaded = CANVAS_RAILS2 ? enrollments.first.loaded_course? : enrollments.first.association(:course).loaded?
+    courses_loaded = enrollments.first.association(:course).loaded?
     Enrollment.send(:preload_associations, enrollments, :course) unless courses_loaded
 
     to_preload = enrollments.reject { |e| fetch(e) }

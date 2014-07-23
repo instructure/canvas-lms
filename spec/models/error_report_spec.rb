@@ -86,7 +86,7 @@ describe ErrorReport do
       :query_parameters => { "access_token" => "abcdef", "pseudonym[password]" => "zzz" },
       :request_parameters => { "client_secret" => "xoxo" }
     }
-    mock_attrs[:url] = mock_attrs[:env]["REQUEST_URI"] unless CANVAS_RAILS2
+    mock_attrs[:url] = mock_attrs[:env]["REQUEST_URI"]
     req = mock(mock_attrs)
     report = ErrorReport.new
     report.assign_data(ErrorReport.useful_http_env_stuff_from_request(req))

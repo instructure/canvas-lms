@@ -148,7 +148,6 @@ describe CollaborationsController do
 
     it "should fail with invalid collaboration type" do
       user_session(@teacher)
-      rescue_action_in_public! if CANVAS_RAILS2
       post 'create', :course_id => @course.id, :collaboration => {:title => "My Collab"}
       assert_status(500)
     end

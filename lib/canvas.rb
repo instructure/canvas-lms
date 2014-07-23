@@ -96,20 +96,10 @@ module Canvas
         when 'memory_store'
           @cache_stores[env] = :memory_store
         when 'nil_store'
-          if CANVAS_RAILS2
-            require 'nil_store'
-            @cache_stores[env] = NilStore.new
-          else
-            @cache_stores[env] = :null_store
-          end
+          @cache_stores[env] = :null_store
         end
       end
-      @cache_stores[Rails.env] ||= if CANVAS_RAILS2
-        require 'nil_store'
-        NilStore.new
-      else
-        :null_store
-      end
+      @cache_stores[Rails.env] ||= :null_store
     end
     @cache_stores
   end

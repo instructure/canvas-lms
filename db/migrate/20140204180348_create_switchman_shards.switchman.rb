@@ -2,10 +2,6 @@
 class CreateSwitchmanShards < ActiveRecord::Migration
   tag :predeploy
 
-  def self.runnable?
-    CANVAS_RAILS3
-  end
-
   def self.up
     unless table_exists?('switchman_shards')
       create_table :switchman_shards do |t|

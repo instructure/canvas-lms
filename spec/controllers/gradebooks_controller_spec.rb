@@ -387,14 +387,6 @@ describe GradebooksController do
   end
 
   describe "POST 'update_submission'" do
-    # rails 3 checks that a route exists when calling it
-    if CANVAS_RAILS2
-      it "should have a route for update_submission" do
-        params_from(:post, "/courses/20/gradebook/update_submission").should ==
-          {:controller => "gradebooks", :action => "update_submission", :course_id => "20"}
-      end
-    end
-
     it "should allow adding comments for submission" do
       user_session(@teacher)
       @assignment = @course.assignments.create!(:title => "some assignment")
@@ -449,14 +441,6 @@ describe GradebooksController do
   end
 
   describe "GET 'speed_grader'" do
-    # rails 3 checks that a route exists when calling it
-    if CANVAS_RAILS2
-      it "should have a route for speed_grader" do
-        params_from(:get, "/courses/20/gradebook/speed_grader").should ==
-          {:controller => "gradebooks", :action => "speed_grader", :course_id => "20"}
-      end
-    end
-
     it "should redirect user if course's large_roster? setting is true" do
       user_session(@teacher)
       assignment = @course.assignments.create!(:title => 'some assignment')

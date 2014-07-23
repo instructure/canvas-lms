@@ -18,7 +18,7 @@
 require 'canvas/draft_state_validations'
 
 class Quizzes::Quiz < ActiveRecord::Base
-  self.table_name = 'quizzes' unless CANVAS_RAILS2
+  self.table_name = 'quizzes'
 
   include Workflow
   include HasContentTags

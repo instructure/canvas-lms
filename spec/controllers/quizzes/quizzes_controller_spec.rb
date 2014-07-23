@@ -1330,12 +1330,7 @@ describe Quizzes::QuizzesController do
       sub.save!
       get 'submission_html', course_id: @course.id, quiz_id: @quiz.id
       response.should be_success
-      template = if CANVAS_RAILS2
-        "quizzes/quizzes/submission_html.html.erb"
-      else
-        "quizzes/submission_html"
-      end
-      response.should render_template(template)
+      response.should render_template("quizzes/submission_html")
     end
   end
 
@@ -1357,13 +1352,7 @@ describe Quizzes::QuizzesController do
       get 'submission_html', course_id: @course.id, quiz_id: @quiz.id
       response.should be_success
 
-      template = if CANVAS_RAILS2
-        "quizzes/quizzes/submission_html.html.erb"
-      else
-        "quizzes/submission_html"
-      end
-
-      response.should render_template(template)
+      response.should render_template("quizzes/submission_html")
       submission.reload.has_seen_results.should == true
     end
   end

@@ -47,11 +47,7 @@ class StreamItem < ActiveRecord::Base
     when 'DiscussionTopic', 'Announcement'
       root_discussion_entries = data.delete(:root_discussion_entries)
       root_discussion_entries = root_discussion_entries.map { |entry| reconstitute_ar_object('DiscussionEntry', entry) }
-      if CANVAS_RAILS2
-        res.root_discussion_entries.target = root_discussion_entries
-      else
-        res.association(:root_discussion_entries).target = root_discussion_entries
-      end
+      res.association(:root_discussion_entries).target = root_discussion_entries
       res.attachment = reconstitute_ar_object('Attachment', data.delete(:attachment))
     when 'Submission'
       data['body'] = nil
@@ -59,11 +55,7 @@ class StreamItem < ActiveRecord::Base
     if data.has_key?('users')
       users = data.delete('users')
       users = users.map { |user| reconstitute_ar_object('User', user) }
-      if CANVAS_RAILS2
-        res.users.target = users
-      else
-        res.association(:users).target = users
-      end
+      res.association(:users).target = users
     end
     if data.has_key?('participants')
       users = data.delete('participants')
@@ -354,11 +346,7 @@ class StreamItem < ActiveRecord::Base
 
     unless user_ids.empty?
       # touch all the users to invalidate the cache
-      if CANVAS_RAILS2
-        User.update_all({:updated_at => Time.now.utc}, {:id => user_ids.to_a})
-      else
-        User.where(:id => user_ids.to_a).update_all(:updated_at => Time.now.utc)
-      end
+      User.where(:id => user_ids.to_a).update_all(:updated_at => Time.now.utc)
     end
 
     count
@@ -398,11 +386,7 @@ class StreamItem < ActiveRecord::Base
           original_res = res
           res = original_res.clone
           res.id = original_res.id
-          if CANVAS_RAILS2
-            res.root_discussion_entries.target = []
-          else
-            res.association(:root_discussion_entries).target = []
-          end
+          res.association(:root_discussion_entries).target = []
           res.user_has_posted = false
           res.readonly!
         end
@@ -415,12 +399,7 @@ class StreamItem < ActiveRecord::Base
   public
   def destroy_stream_item_instances
     self.stream_item_instances.with_each_shard do |scope|
-      if CANVAS_RAILS2
-        # bare scoped call avoid Rails 2 HasManyAssociation loading all objects
-        scope.scoped.delete_all
-      else
-        scope.delete_all
-      end
+      scope.delete_all
       nil
     end
   end

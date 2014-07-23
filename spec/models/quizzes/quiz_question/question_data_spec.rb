@@ -18,7 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
-(CANVAS_RAILS2 ? Spec::Matchers : RSpec::Matchers).define :have_question_field do |expected|
+RSpec::Matchers.define :have_question_field do |expected|
   match do |question_data|
     question_data.key? expected
   end

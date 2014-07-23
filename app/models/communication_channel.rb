@@ -350,7 +350,7 @@ class CommunicationChannel < ActiveRecord::Base
     scope = CommunicationChannel.active.by_path(self.path).of_type(self.path_type)
     merge_candidates = {}
     Shard.with_each_shard(shards) do
-      scope = scope.shard(Shard.current) unless CANVAS_RAILS2
+      scope = scope.shard(Shard.current)
       scope.where("user_id<>?", self.user_id).includes(:user).map(&:user).select do |u|
         result = merge_candidates.fetch(u.global_id) do
           merge_candidates[u.global_id] = (u.all_active_pseudonyms.length != 0)

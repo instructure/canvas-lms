@@ -9,8 +9,7 @@
 # Periodic jobs default to low priority. You can override this in the arguments
 # passed to Delayed::Periodic.cron
 
-session_store = CANVAS_RAILS2 ? ActionController::Base.session_store : Rails.configuration.session_store
-if session_store == ActiveRecord::SessionStore
+if Rails.configuration.session_store == ActiveRecord::SessionStore
   expire_after = (ConfigFile.load("session_store") || {})[:expire_after]
   expire_after ||= 1.day
 

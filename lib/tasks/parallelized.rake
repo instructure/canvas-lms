@@ -82,9 +82,7 @@ unless ARGV.any? { |a| a =~ /\Agems/ }
       test_files.map! { |f| "#{Rails.root}/#{f}" }
       test_files.each { |f| puts f }
 
-      unless CANVAS_RAILS2
-        Rake::Task['parallel:selenium_tags'].invoke(test_files.join(' '), 'non_parallel')
-      end
+      Rake::Task['parallel:selenium_tags'].invoke(test_files.join(' '), 'non_parallel')
 
       puts 'starting paralellized selenium spec runtime'
       Rake::Task['parallel:spec'].invoke(args[:count], '', '', test_files.join(' '))

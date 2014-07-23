@@ -21,11 +21,7 @@
 class DiscussionTopic::MaterializedView < ActiveRecord::Base
   include Api::V1::DiscussionTopics
   include Api
-  if CANVAS_RAILS2
-    include ActionController::UrlWriter
-  else
-    include Rails.application.routes.url_helpers
-  end
+  include Rails.application.routes.url_helpers
 
   attr_accessible :discussion_topic
 

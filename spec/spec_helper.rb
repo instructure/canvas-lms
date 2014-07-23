@@ -16,44 +16,33 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../config/canvas_rails3')
-if CANVAS_RAILS2
-  Spec::Example::ExampleGroupMethods.module_eval do
-    def include_examples(*args)
-      it_should_behave_like(*args)
-    end
-  end
+begin
+  require RUBY_VERSION >= '2.0.0' ? 'byebug' : 'debugger'
+rescue LoadError
 end
 
-unless CANVAS_RAILS2
-  begin
-    require RUBY_VERSION >= '2.0.0' ? 'byebug' : 'debugger'
-  rescue LoadError
-  end
+RSpec.configure do |c|
+  c.treat_symbols_as_metadata_keys_with_true_values = true
+  c.color = true
 
-  RSpec.configure do |c|
-    c.treat_symbols_as_metadata_keys_with_true_values = true
-    c.color = true
-
-    c.around(:each) do |example|
-      attempts = 0
-      begin
-        Timeout::timeout(180) {
-          example.run
-        }
-        if ENV['AUTORERUN']
-          e = @example.instance_variable_get('@exception')
-          if !e.nil? && (attempts += 1) < 2 && !example.metadata[:no_retry]
-            puts "FAILURE: #{@example.description} \n #{e}".red
-            puts "RETRYING: #{@example.description}".yellow
-            @example.instance_variable_set('@exception', nil)
-            redo
-          elsif e.nil? && attempts != 0
-            puts "SUCCESS: retry passed for \n #{@example.description}".green
-          end
+  c.around(:each) do |example|
+    attempts = 0
+    begin
+      Timeout::timeout(180) {
+        example.run
+      }
+      if ENV['AUTORERUN']
+        e = @example.instance_variable_get('@exception')
+        if !e.nil? && (attempts += 1) < 2 && !example.metadata[:no_retry]
+          puts "FAILURE: #{@example.description} \n #{e}".red
+          puts "RETRYING: #{@example.description}".yellow
+          @example.instance_variable_set('@exception', nil)
+          redo
+        elsif e.nil? && attempts != 0
+          puts "SUCCESS: retry passed for \n #{@example.description}".green
         end
-      end until true
-    end
+      end
+    end until true
   end
 end
 
@@ -65,136 +54,96 @@ end
 ENV["RAILS_ENV"] = 'test'
 
 require File.expand_path('../../config/environment', __FILE__) unless defined?(Rails)
-if CANVAS_RAILS2
-  require 'spec'
-  # require 'spec/autorun'
-  require 'spec/rails'
+require 'rspec/rails'
 
-  # integration specs were renamed to request specs in rspec 2
-  def describe_with_rspec2_types(*args, &block)
-    unless args.last.is_a?(Hash)
-      args << {}
+ActionView::TestCase::TestController.view_paths = ApplicationController.view_paths
+
+module RSpec::Rails
+  module ViewExampleGroup
+    module ExampleMethods
+      # normally in rspec 2, assigns returns a newly constructed hash
+      # which means that 'assigns[:key] = value' in view specs does nothing
+      def assigns
+        @assigns ||= super
+      end
+
+      alias :view_assigns :assigns
+
+      delegate :content_for, :to => :view
+
+      def render_with_helpers(*args)
+        controller_class = ("#{@controller.controller_path.camelize}Controller".constantize rescue nil) || ApplicationController
+
+        controller_class.instance_variable_set(:@js_env, nil)
+        # this extends the controller's helper methods to the view
+        # however, these methods are delegated to the test controller
+        view.singleton_class.class_eval do
+          include controller_class._helpers unless included_modules.include?(controller_class._helpers)
+        end
+
+        # so create a "real_controller"
+        # and delegate the helper methods to it
+        @controller.singleton_class.class_eval do
+          attr_accessor :real_controller
+
+          controller_class._helper_methods.each do |helper|
+            delegate helper, :to => :real_controller
+          end
+        end
+
+        real_controller = controller_class.new
+        real_controller.instance_variable_set(:@_request, @controller.request)
+        @controller.real_controller = real_controller
+
+        # just calling "render 'path/to/view'" by default looks for a partial
+        if args.first && args.first.is_a?(String)
+          file = args.shift
+          args = [{:template => file}] + args
+        end
+        render_without_helpers(*args)
+      end
+
+      alias_method_chain :render, :helpers
     end
-    raise "please use type: :request instead of type: :integration for rspec 2 compatibility" if args.last[:type] == :integration
-    if args.last[:type] == :request
-      args.last[:type] = :integration
-    end
-    args.last[:location] ||= caller(0)[1]
-    describe_without_rspec2_types(*args, &block)
   end
 
-  alias :describe_without_rspec2_types :describe
-  alias :describe :describe_with_rspec2_types
+  module Matchers
+    class HaveTag
+      include ActionDispatch::Assertions::SelectorAssertions
+      include Test::Unit::Assertions
 
-  ActionController::TestProcess.module_eval do
-    def process_with_use_route_shim(action, parameters = nil, session = nil, flash = nil, http_method = 'GET')
-      if parameters.is_a?(Hash)
-        parameters.delete(:use_route)
+      def initialize(expected)
+        @expected = expected
       end
-      process_without_use_route_shim(action, parameters, session, flash, http_method)
-    end
 
-    alias_method_chain :process, :use_route_shim
-  end
+      def matches?(html, &block)
+        @selected = [HTML::Document.new(html).root]
+        assert_select(*@expected, &block)
+        return !@failed
+      end
 
-  Spec::Rails::Example::ViewExampleGroup.class_eval do
-    alias :view :template
-
-    def content_for(name)
-      response.capture(name)
-    end
-  end
-else
-  require 'rspec/rails'
-
-  ActionView::TestCase::TestController.view_paths = ApplicationController.view_paths
-
-  module RSpec::Rails
-    module ViewExampleGroup
-      module ExampleMethods
-        # normally in rspec 2, assigns returns a newly constructed hash
-        # which means that 'assigns[:key] = value' in view specs does nothing
-        def assigns
-          @assigns ||= super
+      def assert(val, msg=nil)
+        unless !!val
+          @msg = msg
+          @failed = true
         end
+      end
 
-        alias :view_assigns :assigns
+      def failure_message_for_should
+        @msg
+      end
 
-        delegate :content_for, :to => :view
-
-        def render_with_helpers(*args)
-          controller_class = ("#{@controller.controller_path.camelize}Controller".constantize rescue nil) || ApplicationController
-
-          controller_class.instance_variable_set(:@js_env, nil)
-          # this extends the controller's helper methods to the view
-          # however, these methods are delegated to the test controller
-          view.singleton_class.class_eval do
-            include controller_class._helpers unless included_modules.include?(controller_class._helpers)
-          end
-
-          # so create a "real_controller"
-          # and delegate the helper methods to it
-          @controller.singleton_class.class_eval do
-            attr_accessor :real_controller
-
-            controller_class._helper_methods.each do |helper|
-              delegate helper, :to => :real_controller
-            end
-          end
-
-          real_controller = controller_class.new
-          real_controller.instance_variable_set(:@_request, @controller.request)
-          @controller.real_controller = real_controller
-
-          # just calling "render 'path/to/view'" by default looks for a partial
-          if args.first && args.first.is_a?(String)
-            file = args.shift
-            args = [{:template => file}] + args
-          end
-          render_without_helpers(*args)
-        end
-
-        alias_method_chain :render, :helpers
+      def failure_message_for_should_not
+        @msg
       end
     end
 
-    module Matchers
-      class HaveTag
-        include ActionDispatch::Assertions::SelectorAssertions
-        include Test::Unit::Assertions
-
-        def initialize(expected)
-          @expected = expected
-        end
-
-        def matches?(html, &block)
-          @selected = [HTML::Document.new(html).root]
-          assert_select(*@expected, &block)
-          return !@failed
-        end
-
-        def assert(val, msg=nil)
-          unless !!val
-            @msg = msg
-            @failed = true
-          end
-        end
-
-        def failure_message_for_should
-          @msg
-        end
-
-        def failure_message_for_should_not
-          @msg
-        end
-      end
-
-      def have_tag(*args)
-        HaveTag.new(args)
-      end
+    def have_tag(*args)
+      HaveTag.new(args)
     end
   end
 end
+
 require 'action_controller_test_process'
 require File.expand_path(File.dirname(__FILE__) + '/mocha_rspec_adapter')
 require File.expand_path(File.dirname(__FILE__) + '/mocha_extensions')
@@ -205,13 +154,11 @@ require 'handlebars_tasks'
 
 # if mocha was initialized before rails (say by another spec), CollectionProxy would have
 # undef_method'd them; we need to restore them
-unless CANVAS_RAILS2
-  Mocha::ObjectMethods.instance_methods.each do |m|
-    ActiveRecord::Associations::CollectionProxy.class_eval <<-RUBY
-      def #{m}; end
-      remove_method #{m.inspect}
-    RUBY
-  end
+Mocha::ObjectMethods.instance_methods.each do |m|
+  ActiveRecord::Associations::CollectionProxy.class_eval <<-RUBY
+    def #{m}; end
+    remove_method #{m.inspect}
+  RUBY
 end
 
 Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/factories/*.rb").each { |file| require file }
@@ -329,7 +276,7 @@ Mocha::Mock.class_eval do
   alias_method_chain :respond_to?, :marshalling
 end
 
-[ActiveSupport::Cache::MemoryStore, (CANVAS_RAILS2 ? NilStore : ActiveSupport::Cache::NullStore)].each do |store|
+[ActiveSupport::Cache::MemoryStore, ActiveSupport::Cache::NullStore].each do |store|
   store.class_eval do
     def write_with_serialization_check(name, value, options = nil)
       Marshal.dump(value)
@@ -340,20 +287,17 @@ end
   end
 end
 
-unless CANVAS_RAILS2
-  ActiveSupport::Cache::NullStore.class_eval do
-    def fetch_with_serialization_check(name, options = {}, &block)
-      result = fetch_without_serialization_check(name, options, &block)
-      Marshal.dump(result) if result
-      result
-    end
-
-    alias_method_chain :fetch, :serialization_check
+ActiveSupport::Cache::NullStore.class_eval do
+  def fetch_with_serialization_check(name, options = {}, &block)
+    result = fetch_without_serialization_check(name, options, &block)
+    Marshal.dump(result) if result
+    result
   end
+
+  alias_method_chain :fetch, :serialization_check
 end
 
-matchers_module = (CANVAS_RAILS2 ? Spec::Matchers : RSpec::Matchers)
-matchers_module.define :encompass do |expected|
+RSpec::Matchers.define :encompass do |expected|
   match do |actual|
     if expected.is_a?(Array) && actual.is_a?(Array)
       expected.size == actual.size && expected.zip(actual).all? { |e, a| a.slice(*e.keys) == e }
@@ -365,7 +309,7 @@ matchers_module.define :encompass do |expected|
   end
 end
 
-matchers_module.define :match_ignoring_whitespace do |expected|
+RSpec::Matchers.define :match_ignoring_whitespace do |expected|
   def whitespaceless(str)
     str.gsub(/\s+/, '')
   end
@@ -403,7 +347,7 @@ if ActiveRecord::Base.connection.adapter_name == 'PostgreSQL' &&
   end
 end
 
-(CANVAS_RAILS2 ? Spec::Runner : RSpec).configure do |config|
+RSpec.configure do |config|
   # If you're not using ActiveRecord you should remove these
   # lines, delete config/database.yml and disable :active_record
   # in your config/boot.rb
@@ -413,39 +357,28 @@ end
 
   config.include Helpers
 
-  if CANVAS_RAILS2
-    require 'spec/support/onceler/noop'
-    config.include Onceler::Noop
+  config.include Onceler::BasicHelpers
 
-    Onceler.instance_eval do
-      def self.base_transactions
-        1
-      end
+  # rspec 2+ only runs global before(:all)'s before the top-level
+  # groups, not before each nested one. so we need to reset some
+  # things to play nicely with its caching
+  Onceler.configure do |c|
+    c.before :record do
+      Account.clear_special_account_cache!
+      AdheresToPolicy::Cache.clear
+      Folder.reset_path_lookups!
     end
-  else
-    config.include Onceler::BasicHelpers
+  end
 
-    # rspec 2+ only runs global before(:all)'s before the top-level
-    # groups, not before each nested one. so we need to reset some
-    # things to play nicely with its caching
-    Onceler.configure do |c|
-      c.before :record do
-        Account.clear_special_account_cache!
-        AdheresToPolicy::Cache.clear
-        Folder.reset_path_lookups!
-      end
-    end
-
-    Onceler.instance_eval do
-      # since once-ler creates potentially multiple levels of transaction
-      # nesting, we need a way to know the base level so we can compare it
-      # to AR::Conn#open_transactions. that will tell us if something is
-      # "committed" or not (from the perspective of the spec)
-      def base_transactions
-        # if not recording, it's presumed we're in a spec, in which case
-        # transactional fixtures add one more level
-        open_transactions + (recording? ? 0 : 1)
-      end
+  Onceler.instance_eval do
+    # since once-ler creates potentially multiple levels of transaction
+    # nesting, we need a way to know the base level so we can compare it
+    # to AR::Conn#open_transactions. that will tell us if something is
+    # "committed" or not (from the perspective of the spec)
+    def base_transactions
+      # if not recording, it's presumed we're in a spec, in which case
+      # transactional fixtures add one more level
+      open_transactions + (recording? ? 0 : 1)
     end
   end
 
@@ -1050,12 +983,8 @@ end
   end
 
   def assert_page_not_found(&block)
-    if CANVAS_RAILS2
-      block.should raise_exception(ActiveRecord::RecordNotFound)
-    else
-      yield
-      assert_status(404)
-    end
+    yield
+    assert_status(404)
   end
 
   def assert_require_login
@@ -1117,10 +1046,6 @@ end
 
   def enable_cache(new_cache=:memory_store)
     new_cache ||= :null_store
-    if CANVAS_RAILS2 && new_cache == :null_store
-      require 'nil_store'
-      new_cache = NilStore.new
-    end
     new_cache = ActiveSupport::Cache.lookup_store(new_cache)
     previous_cache = Rails.cache
     Rails.stubs(:cache).returns(new_cache)
@@ -1450,11 +1375,7 @@ end
   end
 
   def consider_all_requests_local(value)
-    if CANVAS_RAILS2
-      ActionController::Base.consider_all_requests_local = value
-    else
-      Rails.application.config.consider_all_requests_local = value
-    end
+    Rails.application.config.consider_all_requests_local = value
   end
 
   def page_view_for(opts={})

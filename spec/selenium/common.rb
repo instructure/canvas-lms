@@ -203,14 +203,7 @@ module SeleniumTestsHelperMethods
   def self.rack_app()
     app = Rack::Builder.new do
       use Rails::Rack::Debugger unless Rails.env.test?
-      if CANVAS_RAILS2
-        map '/' do
-          use Rails::Rack::Static
-          run ActionController::Dispatcher.new
-        end
-      else
-        run CanvasRails::Application
-      end
+      run CanvasRails::Application
     end.to_app
     return app
   end
@@ -291,11 +284,7 @@ shared_examples_for "all selenium tests" do
   include CustomSeleniumRspecMatchers
 
   # set up so you can use rails urls helpers in your selenium tests
-  if CANVAS_RAILS2
-    include ActionController::UrlWriter
-  else
-    include Rails.application.routes.url_helpers
-  end
+  include Rails.application.routes.url_helpers
 
   def selenium_driver;
     $selenium_driver
@@ -950,7 +939,7 @@ shared_examples_for "all selenium tests" do
     truncate_all_tables unless self.use_transactional_fixtures
   end
 
-  unless CANVAS_RAILS2 || EncryptedCookieStore.respond_to?(:test_secret)
+  unless EncryptedCookieStore.respond_to?(:test_secret)
     EncryptedCookieStore.class_eval do
       cattr_accessor :test_secret
 
@@ -969,11 +958,7 @@ shared_examples_for "all selenium tests" do
       tries ||= 3
       driver.manage.timeouts.implicit_wait = 3
       driver.manage.timeouts.script_timeout = 60
-      if CANVAS_RAILS2
-        EncryptedCookieStore.any_instance.stubs(:secret).returns(SecureRandom.hex(64))
-      else
-        EncryptedCookieStore.test_secret = SecureRandom.hex(64)
-      end
+      EncryptedCookieStore.test_secret = SecureRandom.hex(64)
       enable_forgery_protection
     rescue
       if ENV['PARALLEL_EXECS'] != nil
@@ -1115,7 +1100,7 @@ shared_examples_for "in-process server selenium tests" do
       @dj_connection = Delayed::Backend::ActiveRecord::Job.connection
 
       # synchronize db connection methods for a modicum of thread safety
-      methods_to_sync = CANVAS_RAILS2 ? %w{execute} : %w{execute exec_cache exec_no_cache query}
+      methods_to_sync = %w{execute exec_cache exec_no_cache query}
       [@db_connection, @dj_connection].each do |conn|
         methods_to_sync.each do |method_name|
           if conn.respond_to?(method_name, true) && !conn.respond_to?("#{method_name}_with_synchronization", true)

@@ -44,11 +44,7 @@ environment_configuration(defined?(config) && config) do |config|
   config.whiny_nils = false
 
   # Show full error reports and disable caching
-  if CANVAS_RAILS2
-    config.action_controller.consider_all_requests_local = true
-  else
-    config.consider_all_requests_local = true
-  end
+  config.consider_all_requests_local = true
   config.action_controller.perform_caching = false
 
   # run rake js:build to build the optimized JS if set to true
@@ -68,28 +64,11 @@ environment_configuration(defined?(config) && config) do |config|
   # eval <env>-local.rb if it exists
   Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read) }
 
-  if CANVAS_RAILS2
-    require_dependency 'nil_store'
-    config.cache_store = NilStore.new
-  else
-    config.cache_store = :null_store
-  end
+  config.cache_store = :null_store
 
-  if CANVAS_RAILS2
-    require_dependency 'canvas'
+  # Raise exceptions instead of rendering exception templates
+  config.action_dispatch.show_exceptions = true
 
-    # Raise an exception on bad mass assignment. Helps us catch these bugs before
-    # they hit.
-    Canvas.protected_attribute_error = :raise
-
-    # Raise an exception on finder type mismatch or nil arguments. Helps us catch
-    # these bugs before they hit.
-    Canvas.dynamic_finder_nil_arguments_error = :raise
-  else
-    # Raise exceptions instead of rendering exception templates
-    config.action_dispatch.show_exceptions = true
-
-    # Print deprecation notices to the stderr
-    config.active_support.deprecation = :stderr
-  end
+  # Print deprecation notices to the stderr
+  config.active_support.deprecation = :stderr
 end

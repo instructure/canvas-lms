@@ -89,7 +89,6 @@ describe TokensController do
     end
 
     it "should not allow deleting someone else's access token" do
-      rescue_action_in_public! if CANVAS_RAILS2
       user(:active_user => true)
       user_session(@user)
       user2 = User.create!
@@ -131,7 +130,6 @@ describe TokensController do
     end
     
     it "should not allow retrieving someone else's access token" do
-      rescue_action_in_public! if CANVAS_RAILS2
       user(:active_user => true)
       user_session(@user)
       user2 = User.create!
@@ -200,7 +198,6 @@ describe TokensController do
     end
     
     it "should not allow updating someone else's token" do
-      rescue_action_in_public! if CANVAS_RAILS2
       user(:active_user => true)
       user_session(@user)
       user2 = User.create!

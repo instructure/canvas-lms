@@ -1659,9 +1659,7 @@ class UsersController < ApplicationController
         joins('INNER JOIN conversation_participants ON conversation_participants.conversation_id=conversation_messages.conversation_id').
         where('conversation_messages.author_id = ? AND conversation_participants.user_id IN (?) AND NOT conversation_messages.generated', teacher, ids)
     # fake_arel can't pass an array in the group by through the scope
-    last_message_dates = CANVAS_RAILS2 ?
-        scope.maximum(:created_at, :group => ['conversation_participants.user_id', 'conversation_messages.author_id']) :
-        scope.group(['conversation_participants.user_id', 'conversation_messages.author_id']).maximum(:created_at)
+    last_message_dates = scope.group(['conversation_participants.user_id', 'conversation_messages.author_id']).maximum(:created_at)
     last_message_dates.each do |key, date|
       next unless student = data[key.first.to_i]
       student[:last_interaction] = [student[:last_interaction], date].compact.max

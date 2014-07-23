@@ -2,10 +2,6 @@
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
-unless defined?(CANVAS_RAILS3)
-  require File.expand_path("../../../config/canvas_rails3", __FILE__)
-end
-
 Gem::Specification.new do |spec|
   spec.name          = "activesupport-suspend_callbacks"
   spec.version       = '0.0.1'
@@ -18,11 +14,7 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  if CANVAS_RAILS3
-    spec.add_dependency "activesupport", "~>3.2"
-  else
-    spec.add_dependency "activesupport", "~>2.3"
-  end
+  spec.add_dependency "activesupport", "~>3.2"
 
   spec.add_development_dependency "bundler", "~>1.5"
   spec.add_development_dependency "rake"

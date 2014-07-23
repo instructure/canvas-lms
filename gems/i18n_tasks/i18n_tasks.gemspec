@@ -2,10 +2,6 @@
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
-unless defined?(CANVAS_RAILS3)
-  require File.expand_path("../../../config/canvas_rails3", __FILE__)
-end
-
 Gem::Specification.new do |spec|
   spec.name          = "i18n_tasks"
   spec.version       = '0.0.1'
@@ -18,11 +14,7 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  if CANVAS_RAILS3
-    spec.add_dependency "activesupport", "~> 3.2"
-  else
-    spec.add_dependency "activesupport", "~> 2.3"
-  end
+  spec.add_dependency "activesupport", "~> 3.2"
 
   spec.add_dependency "i18n", "0.6.8"
   spec.add_dependency "ruby_parser", "3.6.1"

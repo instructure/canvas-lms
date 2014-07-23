@@ -214,7 +214,7 @@ class PseudonymSessionsController < ApplicationController
       cookies.delete('canvas_sa_delegated',
                      domain: otp_remember_me_cookie_domain,
                      httponly: true,
-                     secure: CANVAS_RAILS2 ? ActionController::Base.session_options[:secure] : CanvasRails::Application.config.session_options[:secure])
+                     secure: CanvasRails::Application.config.session_options[:secure])
     end
 
     account = @current_pseudonym.try(:account) || @domain_root_account
@@ -468,7 +468,7 @@ class PseudonymSessionsController < ApplicationController
   end
 
   def otp_remember_me_cookie_domain
-    CANVAS_RAILS2 ? ActionController::Base.session_options[:domain] : CanvasRails::Application.config.session_options[:domain]
+    CanvasRails::Application.config.session_options[:domain]
   end
 
   def otp_login(send_otp = false)
@@ -531,7 +531,7 @@ class PseudonymSessionsController < ApplicationController
               :expires => now + 30.days,
               :domain => otp_remember_me_cookie_domain,
               :httponly => true,
-              :secure => CANVAS_RAILS2 ? ActionController::Base.session_options[:secure] : CanvasRails::Application.config.session_options[:secure],
+              :secure => CanvasRails::Application.config.session_options[:secure],
               :path => '/login'
             }
       end
@@ -583,7 +583,7 @@ class PseudonymSessionsController < ApplicationController
           :value => '1',
           :domain => otp_remember_me_cookie_domain,
           :httponly => true,
-          :secure => CANVAS_RAILS2 ? ActionController::Base.session_options[:secure] : CanvasRails::Application.config.session_options[:secure]
+          :secure => CanvasRails::Application.config.session_options[:secure]
       }
     end
     session[:require_terms] = true if @domain_root_account.require_acceptance_of_terms?(@current_user)
@@ -677,11 +677,7 @@ class PseudonymSessionsController < ApplicationController
   end
 
   def oauth2_token
-    if CANVAS_RAILS2
-      basic_user, basic_pass = ActionController::HttpAuthentication::Basic.user_name_and_password(request) if ActionController::HttpAuthentication::Basic.authorization(request)
-    else
-      basic_user, basic_pass = ActionController::HttpAuthentication::Basic.user_name_and_password(request) if request.authorization
-    end
+    basic_user, basic_pass = ActionController::HttpAuthentication::Basic.user_name_and_password(request) if request.authorization
 
     client_id = params[:client_id].presence || basic_user
     secret = params[:client_secret].presence || basic_pass

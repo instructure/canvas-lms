@@ -190,7 +190,6 @@ describe ExternalToolsController do
     end
 
     it "should fail on basic xml with no url or domain set" do
-      rescue_action_in_public! if CANVAS_RAILS2
       user_session(@teacher)
       xml = <<-XML
 <?xml version="1.0" encoding="UTF-8"?>

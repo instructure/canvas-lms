@@ -581,9 +581,7 @@ class Course < ActiveRecord::Base
     scope = current_enrollments.
       where(:course_id => self, :user_id => user_id).
       where("course_section_id IS NOT NULL")
-    section_ids = CANVAS_RAILS2 ?
-      scope.pluck(:course_section_id).uniq :
-      scope.uniq.pluck(:course_section_id)
+    section_ids = scope.uniq.pluck(:course_section_id)
     participating_instructors.restrict_to_sections(section_ids)
   end
 
@@ -1702,13 +1700,7 @@ class Course < ActiveRecord::Base
   end
 
   def resubmission_for(asset)
-    if CANVAS_RAILS2
-      # without the scoped, Rails 2 will try to do an update_all instead (due
-      # to the association)
-      asset.ignores.where(:purpose => 'grading', :permanent => false).scoped.delete_all
-    else
-      asset.ignores.where(:purpose => 'grading', :permanent => false).delete_all
-    end
+    asset.ignores.where(:purpose => 'grading', :permanent => false).delete_all
     instructors.order(:id).each(&:touch)
   end
 
@@ -2224,11 +2216,7 @@ class Course < ActiveRecord::Base
   def invited_count_visible_to(user)
     scope = users_visible_to(user).
       where("enrollments.workflow_state = 'invited' AND enrollments.type != 'StudentViewEnrollment'")
-    if CANVAS_RAILS2
-      scope.count(:distinct => true, :select => 'users.id')
-    else
-      scope.select('users.id').uniq.count
-    end
+    scope.select('users.id').uniq.count
   end
 
   def unpublished?

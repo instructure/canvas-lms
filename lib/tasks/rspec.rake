@@ -2,11 +2,7 @@
 unless Rails.env.production? || ARGV.any? { |a| a =~ /\Agems/ }
 
   begin
-    if CANVAS_RAILS2
-      require 'spec/rake/spectask'
-    else
-      require 'rspec/core/rake_task'
-    end
+    require 'rspec/core/rake_task'
   rescue MissingSourceFile, LoadError
     module Spec
       module Rake
@@ -39,13 +35,8 @@ unless Rails.env.production? || ARGV.any? { |a| a =~ /\Agems/ }
   task :default => :spec
   task :stats => "spec:statsetup"
 
-  if CANVAS_RAILS2
-    spec_files_attr = :spec_files=
-    klass = Spec::Rake::SpecTask
-  else
-    spec_files_attr = :pattern=
-    klass = RSpec::Core::RakeTask
-  end
+  spec_files_attr = :pattern=
+  klass = RSpec::Core::RakeTask
 
   desc "Run all specs in spec directory (excluding plugin specs)"
   klass.new(:spec) do |t|

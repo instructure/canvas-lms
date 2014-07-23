@@ -54,19 +54,7 @@ module Lti
     end
 
     def oauth_consumer_key
-      @oauth_consumer_key ||= OAuth::Helper.parse_header(authorization_header(request))['oauth_consumer_key']
+      @oauth_consumer_key ||= OAuth::Helper.parse_header(request.authorization)['oauth_consumer_key']
     end
-
-    def authorization_header(request)
-      if CANVAS_RAILS3
-        request.authorization
-      else
-        request.env['HTTP_AUTHORIZATION'] ||
-          request.env['X-HTTP_AUTHORIZATION'] ||
-          request.env['X_HTTP_AUTHORIZATION'] ||
-          request.env['REDIRECT_X_HTTP_AUTHORIZATION']
-      end
-    end
-
   end
 end
