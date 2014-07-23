@@ -95,6 +95,10 @@ module Canvas
       def shims
         <<-JS.gsub(%r{\A +|^ {8}}, '')
           {
+            'bower/react-router/dist/react-router': {
+              deps: ['react'],
+              exports: 'ReactRouter'
+            },
             'bower/ember/ember': {
               deps: ['jquery', 'handlebars'],
               exports: 'Ember'
@@ -125,9 +129,6 @@ module Canvas
             'handlebars': {
               deps: ['bower/handlebars/handlebars.runtime.amd'],
               exports: 'Handlebars'
-            },
-            'bower/react/react': {
-              exports: 'React'
             }
           }
         JS
