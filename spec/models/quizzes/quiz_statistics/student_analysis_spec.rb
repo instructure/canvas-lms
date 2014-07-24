@@ -336,6 +336,29 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     stats[:unique_submission_count].should == 0
   end
 
+  it 'should not count student view submissions' do
+    @course = course(active_all: true)
+    fake_student = @course.student_view_student
+    q = @course.quizzes.create!
+    q.update_attribute(:published_at, Time.now)
+    q.quiz_questions.create!(:question_data => {:name => 'q1', :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' => [{'answer_text' => '', 'answer_html' => '<em>zero</em>', 'answer_weight' => '100'}, {'answer_text' => "", 'answer_html' => "<p>one</p>", 'answer_weight' => '0'}]})
+    q.quiz_questions.create!(:question_data => {:name => 'q2', :points_possible => 1, 'question_type' => 'multiple_answers_question', 'answers' => [{'answer_text' => '', 'answer_html' => "<a href='http://example.com/caturday.gif'>lolcats</a>", 'answer_weight' => '100'}, {'answer_text' => 'lolrus', 'answer_weight' => '100'}]})
+    q.generate_quiz_data
+    q.save
+    qs = q.generate_submission(fake_student)
+    qs.submission_data = {
+        "question_#{q.quiz_data[0][:id]}" => "#{q.quiz_data[0][:answers][0][:id]}",
+        "question_#{q.quiz_data[1][:id]}_answer_#{q.quiz_data[1][:answers][0][:id]}" => "1",
+        "question_#{q.quiz_data[1][:id]}_answer_#{q.quiz_data[1][:answers][1][:id]}" => "1"
+    }
+    Quizzes::SubmissionGrader.new(qs).grade_submission
+
+    stats = q.statistics
+    stats[:unique_submission_count].should == 0
+
+    puts "Stats: #{stats.to_json}"
+  end
+
   describe 'question statistics' do
     subject { Quizzes::QuizStatistics::StudentAnalysis.new({}) }
 

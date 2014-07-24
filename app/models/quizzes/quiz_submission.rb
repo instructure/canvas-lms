@@ -654,6 +654,16 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   scope :not_settings_only, -> { where("quiz_submissions.workflow_state<>'settings_only'") }
   scope :completed, -> { where(:workflow_state => %w(complete pending_review)) }
 
+  # Excludes teacher preview submissions.
+  #
+  # You may still have to deal with StudentView submissions if you want
+  # submissions made by students for real, which you can do by using the
+  # for_user_ids scope and pass in quiz.context.all_real_student_ids.
+  scope :not_preview, -> { where('was_preview IS NULL OR NOT was_preview') }
+
+  # Excludes teacher preview and Student View submissions.
+  scope :for_students, ->(quiz) { not_preview.for_user_ids(quiz.context.all_real_student_ids) }
+
   has_a_broadcast_policy
 
   set_broadcast_policy do |p|
