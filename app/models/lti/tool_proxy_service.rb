@@ -24,7 +24,7 @@ module Lti
       tool_proxy = nil
       ToolProxy.transaction do
         product_family = create_product_family(tp, context.root_account)
-        tool_proxy = create_tool_proxy(tp, context.root_account, product_family)
+        tool_proxy = create_tool_proxy(tp, context, product_family)
         process_resources(tp, tool_proxy)
         create_proxy_binding(tool_proxy, context)
       end
@@ -33,14 +33,14 @@ module Lti
 
     private
 
-    def create_tool_proxy(tp, account, product_family)
+    def create_tool_proxy(tp, context, product_family)
       tool_proxy = ToolProxy.new
       tool_proxy.product_family = product_family
       tool_proxy.guid = tp.tool_proxy_guid
       tool_proxy.shared_secret = tp.security_contract.shared_secret
       tool_proxy.product_version = tp.tool_profile.product_instance.product_info.product_version
       tool_proxy.lti_version = tp.tool_profile.lti_version
-      tool_proxy.root_account = account.root_account
+      tool_proxy.context = context
       tool_proxy.workflow_state = 'disabled'
       tool_proxy.raw_data = tp.as_json
       tool_proxy.save!
@@ -54,10 +54,13 @@ module Lti
         product_family = ProductFamily.new
         product_family.vendor_code = vendor_code
         product_family.product_code = product_code
-        product_family.vendor_name = tp.tool_profile.product_instance.product_info.product_family.vendor.default_name
-        product_family.vendor_description = tp.tool_profile.product_instance.product_info.product_family.vendor.default_description
-        product_family.website = tp.tool_profile.product_instance.product_info.product_family.vendor.website
-        product_family.vendor_email = tp.tool_profile.product_instance.product_info.product_family.vendor.contact.email
+
+        vendor = tp.tool_profile.product_instance.product_info.product_family.vendor
+        product_family.vendor_name = vendor.default_name
+        product_family.vendor_description = vendor.default_description
+        product_family.website = vendor.website
+        product_family.vendor_email = vendor.contact.email if vendor.contact
+
         product_family.root_account = account.root_account
         product_family.save!
       end
@@ -83,6 +86,7 @@ module Lti
       resource_handler.icon_info = create_json(rh.icon_info)
       resource_handler.tool_proxy = tool_proxy
       resource_handler.save!
+
       resource_handler
     end
 
@@ -95,11 +99,24 @@ module Lti
     end
 
     def process_resources(tp, tool_proxy)
-      tp.tool_profile.resource_handler.each do |rh|
-        resource = create_resource_handler(rh, tool_proxy)
-        rh.message.each do |mh|
-          create_message_handler(mh, tp.tool_profile.base_message_url, resource)
+      resource_handlers = tp.tool_profile.resource_handlers
+      if tp.tool_profile.messages
+        rh =  IMS::LTI::Models::ResourceHandler.new.from_json(
+            {
+                resource_type: {code: 'instructure.com:default'},
+                resource_name: {default_value: 'Default'}
+            }.to_json
+        )
+        rh.message = tp.tool_profile.messages
+        resource_handlers << rh
+      end
+
+      resource_handlers.each do |rh|
+        resource_handler = create_resource_handler(rh, tool_proxy)
+        rh.messages.each do |mh|
+          create_message_handler(mh, tp.tool_profile.base_message_url, resource_handler)
         end
+
       end
     end
 

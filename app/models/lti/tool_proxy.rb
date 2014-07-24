@@ -19,17 +19,20 @@
 module Lti
   class ToolProxy < ActiveRecord::Base
 
-    attr_accessible :shared_secret, :guid, :product_version, :lti_version, :product_family, :root_account, :workflow_state, :raw_data
+    attr_accessible :shared_secret, :guid, :product_version, :lti_version, :product_family, :workflow_state, :raw_data, :context
 
     has_many :bindings, class_name: 'Lti::ToolProxyBinding'
     has_many :resources, class_name: 'Lti::ResourceHandler'
-    belongs_to :root_account, class_name: 'Account'
+    validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account']
+    belongs_to :context, :polymorphic => true
+
     belongs_to :product_family, class_name: 'Lti::ProductFamily'
 
     serialize :raw_data
 
-    validates_presence_of :shared_secret, :guid, :product_version, :lti_version, :product_family_id, :root_account_id, :workflow_state, :raw_data
+    validates_presence_of :shared_secret, :guid, :product_version, :lti_version, :product_family_id, :workflow_state, :raw_data, :context
     validates_uniqueness_of :guid
+    validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account']
 
   end
 end
