@@ -55,20 +55,17 @@ class Migrator
   end
 
   def unzip_archive
-    command = MigratorHelper.unzip_command(@archive_file_path, @unzipped_file_path)
-    logger.debug "Running unzip command: #{command}"
-    zip_std_out = `#{command}`
-
-    if $?.exitstatus == 0
-      return true
-    elsif $?.exitstatus == 1
-      add_warning(I18n.t('canvas.migration.warning.unzip_warning', 'The content package unzipped successfully, but with a warning'), zip_std_out)
-      return true
-    elsif $?.exitstatus == 127
-      raise "unzip isn't installed on this system, exit status #{$?.exitstatus}, message: #{zip_std_out}"
-    else
-      raise "Could not unzip archive file, exit status #{$?.exitstatus}, message: #{zip_std_out}"
+    logger.debug "Extracting #{@archive_file_path} to #{@unzipped_file_path}"
+    warnings = CanvasUnzip.extract_archive(@archive_file_path, @unzipped_file_path)
+    unless warnings.empty?
+      diagnostic_text = ''
+      warnings.each do |tag, files|
+        diagnostic_text += tag.to_s + ': ' + files.join(', ') + "\n"
+      end
+      logger.debug "CanvasUnzip returned warnings: " + diagnostic_text
+      add_warning(I18n.t('canvas.migration.warning.unzip_warning', 'The content package unzipped successfully, but with a warning'), diagnostic_text)
     end
+    return true
   end
 
   # If the file is a zip file, unzip it, if it's an xml file, copy
