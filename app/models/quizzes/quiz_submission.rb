@@ -353,7 +353,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
       @assignment_submission.submitted_at = self.finished_at
       @assignment_submission.grade_matches_current_submission = true
       @assignment_submission.quiz_submission_id = self.id
-      @assignment_submission.graded_at = self.end_at || Time.now
+      @assignment_submission.graded_at = [self.end_at, Time.zone.now].compact.min
       @assignment_submission.grader_id = "-#{self.quiz_id}".to_i
       @assignment_submission.body = "user: #{self.user_id}, quiz: #{self.quiz_id}, score: #{self.score}, time: #{Time.now.to_s}"
       @assignment_submission.user_id = self.user_id

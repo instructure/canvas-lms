@@ -212,7 +212,7 @@ describe Quizzes::QuizSubmission do
       @quiz.generate_quiz_data
       @quiz.published_at = Time.now
       @quiz.workflow_state = 'available'
-      @quiz.scoring_policy == "keep_highest"
+      @quiz.scoring_policy = "keep_highest"
       @quiz.save!
       @assignment = @quiz.assignment
       @quiz_sub = @quiz.generate_submission @user, false
@@ -500,25 +500,34 @@ describe Quizzes::QuizSubmission do
     end
   end
 
-  it "should update associated submission" do
-    c = factory_with_protected_attributes(Course, :workflow_state => "active")
-    a = c.assignments.create!(:title => "some assignment")
-    u = User.new
-    u.workflow_state = "registered"
-    u.save!
-    c.enroll_student(u)
-    s = a.submit_homework(u)
-    quiz = c.quizzes.create!
-    q = quiz.quiz_submissions.new
-    q.submission_id = s.id
-    q.user_id = u.id
-    q.workflow_state = "complete"
-    q.score = 5.0
-    q.save!
-    q.kept_score.should eql(5.0)
-    s.reload
+  context "update_assignment_submission" do
+    before(:once) do
+      student_in_course
+      @quiz.generate_quiz_data
+      @quiz.published_at = Time.now
+      @quiz.workflow_state = 'available'
+      @quiz.scoring_policy = "keep_highest"
+      @quiz.due_at = 5.days.from_now
+      @quiz.save!
+      @assignment = @quiz.assignment
+      @quiz_sub = @quiz.generate_submission @user, false
+      @quiz_sub.workflow_state = "complete"
+      @quiz_sub.save!
+      @quiz_sub.score = 5
+      @quiz_sub.fudge_points = 0
+      @quiz_sub.kept_score = 5
+      @quiz_sub.with_versioning(true, &:save!)
+      @submission = @quiz_sub.submission
+    end
 
-    s.score.should eql(5.0)
+    it "should sync the score" do
+      @submission.score.should eql(5.0)
+    end
+
+    it "should not set graded_at to be in the future" do
+      @quiz_sub.end_at.should_not be_nil
+      @submission.graded_at.to_i.should <= Time.zone.now.to_i
+    end
   end
 
   describe "learning outcomes" do
