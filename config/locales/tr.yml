@@ -285,6 +285,7 @@ tr:
       no_term: "Dönem seçebilmek için belirli bir dönemin olması gereklidir"
     grades: 
       deleted: "Silinen Nesneleri İçer: doğru;"
+      limited: "silinmiş nesneler belirtilen tarih aralığıyla sınırlandırılmıştır;"
     granite: 
       invalid_date_range: "Günler 1 haftalık süre aralığına göre ayarlandı;"
     mississippi: 
