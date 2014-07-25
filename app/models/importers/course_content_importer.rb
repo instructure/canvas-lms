@@ -162,6 +162,11 @@ module Importers
             event.save_without_broadcasting!
           end
 
+          migration.imported_migration_items_by_class(Announcement).each do |event|
+            event.delayed_post_at = shift_date(event.delayed_post_at, shift_options)
+            event.save_without_broadcasting!
+          end
+
           migration.imported_migration_items_by_class(DiscussionTopic).each do |event|
             event.delayed_post_at = shift_date(event.delayed_post_at, shift_options)
             event.save_without_broadcasting!
@@ -308,7 +313,7 @@ module Importers
         old_event_diff = old_date - old_start_date
         old_event_percent = old_full_diff > 0 ? old_event_diff.to_f / old_full_diff.to_f : 0
         new_full_diff = new_end_date - new_start_date
-        new_event_diff = (new_full_diff.to_f * old_event_percent).to_i
+        new_event_diff = (new_full_diff.to_f * old_event_percent).round
         new_date = new_start_date + new_event_diff
         options[:day_substitutions] ||= {}
         options[:day_substitutions][old_date.wday.to_s] ||= old_date.wday.to_s
