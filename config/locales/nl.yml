@@ -380,8 +380,8 @@ nl:
       deleted: "Inclusief verwijderde objecten: ja;"
       reports: "Rapporten: %{files}"
     student: 
-      enrollment_state: "Inclusief provincie van inschrijving: waar;"
-      enrollment_states: "Provincies van inschrijving: %{states};"
+      enrollment_state: "Inclusief status van inschrijving: waar;"
+      enrollment_states: "Statussen van inschrijving: %{states};"
   account_settings: 
     account: Account
     account_name_too_long: "Accountnaam is te lang"
@@ -1274,9 +1274,9 @@ nl:
       account_reports: 
         default: 
           enrollment_state: 
-            header: "Provincie van inschrijving"
+            header: "Status van inschrijving"
           include_enrollment_state: 
-            check_box: "Provincie van inschrijving toevoegen"
+            check_box: "Status van inschrijving toevoegen"
       active: "Actieve inschrijvingen"
       all: "Alle inschrijvingen"
     submission_data_csv_description: 
@@ -3957,7 +3957,7 @@ nl:
       student_name: "Naam cursist"
       table_headings: 
         module: Module
-        state: Provincie
+        state: Status
       titles: 
         student_progression: "Voortgang van module per cursist"
     context_module: 
@@ -6590,7 +6590,7 @@ nl:
   features: 
     better_file_browsing: "Beter door bestanden bladderen"
     differentiated_assignments: " Gedifferentieerde opdrachten"
-    draft_state: Concept-status
+    draft_state: Conceptstatus
     draft_state_account_disable_warning: "Het uitschakelen van deze functie zal impact hebben op bestaande cursussen. Neem bij voorbeeld bij het uitschakelen van dit onderdeel contact op met jouw Canvas Success Manager."
     draft_state_course_disable_warning: "Door het uitschakelen van deze functie zullen alle bestaande objecten in de cursus gepubliceerd worden. Zorg ervoor dat, voordat je verder gaat, de hele concept inhoud al klaar is voor publicatie en al beschikbaar is voor alle gebruikers van de cursus."
     google_docs_domain_restriction: "Beperking van Google Docs domein"
@@ -10367,7 +10367,7 @@ nl:
     wiki_page_type: Wikipagina
   migration_issues: 
     errors: 
-      valid_workflow_state: "Moet een geldige workflow status sturen"
+      valid_workflow_state: "Moet een geldige workflow-status sturen"
   mississippi_sis_title: "SIS gegevens"
   module_item_types: 
     assignment: Opdracht
@@ -10443,8 +10443,8 @@ nl:
     sure_you_want_to_mute: "Weet je zeker dat je deze opdracht wilt verbergen? Terwijl deze opdracht verborgen wordt, zullen cursisten geen nieuwe meldingen ontvangen. Ze kunnen ze ook niet zien:"
   name: "Academic Benchmark Importer"
   new_facebook_message: "Er is een nieuw bericht van Canvas"
-  new_quiz_moderate_desc: "Wanneer conceptversie en toetsstatistieken aan staan/zijn ingeschakeld schakelt dit de pagina voor het overzien van de nieuwe toets voor een account in. "
-  new_quiz_statistics_desc: "Wanneer conceptversie en toetsstatistieken aan staan/zijn ingeschakeld schakelt dit de pagina van de statistieken van de nieuwe toets voor een account in."
+  new_quiz_moderate_desc: "Wanneer conceptstatus en toetsstatistieken aan staan/zijn ingeschakeld schakelt dit de pagina voor het overzien van de nieuwe toets voor een account in. "
+  new_quiz_statistics_desc: "Wanneer conceptstatus en toetsstatistieken aan staan/zijn ingeschakeld schakelt dit de pagina van de statistieken van de nieuwe toets voor een account in."
   new_styles_description: |-
       Wij zijn bezig met een facelift van het gebruikersinterface op Canvas. Schakel die in om het
       bijgewerkte, vereenvoudigde look en feel van het gebruikersinterface op Canvas te zien.
