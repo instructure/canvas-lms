@@ -19,7 +19,7 @@ describe "equation editor" do
       equation_editor
     end
 
-    f('.ui-dialog-titlebar-close').click
+    fj('.ui-dialog-titlebar-close:visible').click
     type_in_tiny 'textarea#quiz_description', 'bar'
     f('.save_quiz_button').click
 

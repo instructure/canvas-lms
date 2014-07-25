@@ -32,6 +32,7 @@ define([
   'compiled/views/calendar/MissingDateDialogView',
   'compiled/editor/MultipleChoiceToggle',
   'compiled/str/TextHelper',
+  'compiled/views/quizzes/editor/KeyboardShortcuts',
   'jquery.ajaxJSON' /* ajaxJSON */,
   'jquery.instructure_date_and_time' /* time_field, datetime_field */,
   'jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors, errorBox */,
@@ -52,7 +53,8 @@ define([
 ], function(regradeTemplate, I18n,_,$,calcCmd, htmlEscape, pluralize,
             wikiSidebar, DueDateListView, DueDateOverrideView, Quiz,
             DueDateList,SectionList,
-            MissingDateDialog,MultipleChoiceToggle,TextHelper){
+            MissingDateDialog,MultipleChoiceToggle,TextHelper,
+            RCEKeyboardShortcuts){
 
   var dueDateList, overrideView, quizModel, sectionList, correctAnswerVisibility,
       scoreValidation;
@@ -3100,7 +3102,10 @@ define([
       wikiSidebar.attachToEditor($("#quiz_description"));
     }
 
+    var keyboardShortcutsView = new RCEKeyboardShortcuts();
+
     $("#quiz_description").editorBox({tinyOptions: {aria_label: I18n.t('label.quiz.instructions', 'Quiz instructions, rich text area')}});
+    keyboardShortcutsView.render().$el.insertBefore($(".toggle_description_views_link:first"));
 
     $(".toggle_description_views_link").click(function(event) {
       event.preventDefault();
