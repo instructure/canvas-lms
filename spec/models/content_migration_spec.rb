@@ -1803,6 +1803,9 @@ describe ContentMigration do
       @copy_from.discussion_topics.create!(:title => "some topic",
                                            :message => "<p>some text</p>",
                                            :delayed_post_at => old_start + 3.days)
+      @copy_from.announcements.create!(:title => "hear ye",
+                                       :message => "<p>grades will henceforth be in Cyrillic letters</p>",
+                                       :delayed_post_at => old_start + 10.days)
       @copy_from.calendar_events.create!(:title => "an event",
                                          :start_at => old_start + 4.days,
                                          :end_at => old_start + 4.days + 1.hour)
@@ -1831,6 +1834,9 @@ describe ContentMigration do
 
       new_disc = @copy_to.discussion_topics.first
       new_disc.delayed_post_at.to_i.should == (new_start + 3.day).to_i
+
+      new_ann = @copy_to.announcements.first
+      new_ann.delayed_post_at.to_i.should == (new_start + 10.day).to_i
 
       new_event = @copy_to.calendar_events.first
       new_event.start_at.to_i.should == (new_start + 4.day).to_i
