@@ -274,14 +274,22 @@ TEXT
             </div>
           </div>
         </div>
-       </td>
+        </td>
       </tr>
-     <tr>
+      <% if Canvas::Plugin.find!('grade_export').enabled? %>
+       <tr>
+        <td colspan="2">
+         <%= f.check_box :publish_final_grade, :id => "publish_final_grade" %>
+         <%= f.label :publish_final_grade, :en => "Publish final grade for the student when this module is completed", :for => "publish_final_grade" %>
+        </td>
+       </tr>
+      <% end %>
+      <tr>
         <td colspan="2">
           <%= f.check_box :require_sequential_progress, :id => "require_sequential_progress" %>
           <%= f.label :require_sequential_progress, :en => "Students must move through requirements in this module in sequential order", :for => "require_sequential_progress" %>
         </td>
-    </tr><tr>
+      </tr><tr>
       <td colspan="2">
         <div class="button-container">
           <button type="button" class="btn cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></button>
@@ -289,8 +297,8 @@ TEXT
         </div>
         <a href="<%= context_url(@context, :context_context_modules_url) %>" style="display: none;" class="add_context_module_url">&nbsp;</a>
       </td>
-    </tr>
-  </table>
+      </tr>
+    </table>
   <% end %>
   <div id="add_module_prerequisite_dialog" style="display: none;">
     <span class="context_module_id" style="display: none;">&nbsp;</span>

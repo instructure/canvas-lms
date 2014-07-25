@@ -98,6 +98,7 @@
       <span style="display: none;">
         <span class="name"><%= context_module && context_module.name %></span>
         <span class="id"><%= context_module && context_module.id %></span>
+        <span class="publish_final_grade"><%= context_module.try_rescue(:publish_final_grade?) || nbsp %></span>
         <span class="require_sequential_progress"><%= context_module.try_rescue(:require_sequential_progress) || nbsp %></span>
       </span>
     </div>
