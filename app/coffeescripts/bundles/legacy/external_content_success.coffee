@@ -10,7 +10,10 @@ require [
       parentWindow.$(parentWindow).trigger "externalContentReady", data
       parentWindow[callback].ready data
       setTimeout (->
-        $("#dialog_message").text I18n.t("popup_success", "Success! This popup should close on its own...")
+        if callback == 'external_tool_dialog'
+          $("#dialog_message").text I18n.t("popup_success", "Success! This popup should close on its own...")
+        else
+          $("#dialog_message").text ''
       ), 1000
     else
       $("#dialog_message").text I18n.t("content_failure", "Content retrieval failed, please try again or notify your system administrator of the error.")

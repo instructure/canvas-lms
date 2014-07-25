@@ -305,8 +305,10 @@ class ExternalToolsController < ApplicationController
     else
       selection_type = params[:launch_type] || "#{@context.class.base_ar_class.to_s.downcase}_navigation"
       if find_tool(params[:id], selection_type)
-        if selection_type == 'course_home_sub_navigation'
-          @return_url = named_context_url(@context, :context_external_tool_finished_url, @tool.id, :include_host => true)
+        if selection_type == 'course_home_sub_navigation' && @context.is_a?(Course)
+          @return_url = external_content_success_url('external_tool_redirect', :include_host => true)
+          @redirect_return = true
+          js_env(:course_id => @context.id)
         end
         @active_tab = @tool.asset_string
         @show_embedded_chat = false if @tool.tool_id == 'chat'
@@ -324,7 +326,7 @@ class ExternalToolsController < ApplicationController
     selection_type = 'editor_button' if params[:editor]
     selection_type = 'homework_submission' if params[:homework]
 
-    @return_url = external_content_success_url('external_tool')
+    @return_url = external_content_success_url('external_tool_dialog')
     @headers = false
     @tool_launch_type = 'self'
 
