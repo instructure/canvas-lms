@@ -496,9 +496,7 @@ class AssignmentsApiController < ApplicationController
         scope = scope.published
       end
 
-      # TODO temporary! remote this default_per_page parameter once dependent
-      # applications have had a change to start honoring the pagination
-      assignments = Api.paginate(scope, self, api_v1_course_assignments_url(@context), default_per_page: Api.max_per_page)
+      assignments = Api.paginate(scope, self, api_v1_course_assignments_url(@context))
 
       if Array(params[:include]).include?('submission')
         submissions = Hash[
