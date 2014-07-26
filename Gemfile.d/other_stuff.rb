@@ -25,7 +25,7 @@ if CANVAS_RAILS2
   gem 'folio-pagination-legacy', '0.0.3', :require => 'folio/rails'
   gem 'will_paginate', '2.3.15', :require => false
 else
-  gem 'rails', '3.2.18'
+  gem 'rails', '3.2.19'
   gem 'active_model_serializers', '0.9.0alpha1',
     :github => 'rails-api/active_model_serializers', :ref => '61882e1e4127facfe92e49057aec71edbe981829'
   gem 'authlogic', '3.3.0'
