@@ -7,7 +7,7 @@ describe "Sessions Timeout" do
     context "when you are logged in as an admin" do 
       before do
         user_logged_in
-        Account.site_admin.add_user(@user)
+        Account.site_admin.account_users.create!(user: @user)
       end
 
       it "requires session expiration to be at least 20 minutes" do 

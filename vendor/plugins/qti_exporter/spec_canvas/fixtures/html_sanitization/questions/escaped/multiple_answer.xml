@@ -32,7 +32,7 @@ Warning: case-insensitive comparison of identifiers not supported in version 2
 <div class="html">Google Picasa&lt;br&gt;
 &lt;span style=&quot; color:#000000;&quot;&gt;&lt;IMG src=&quot;http://lh4.ggpht.com/_U8dXqlIRHu8/Ss4167b2RzI/AAAAAAAAABs/MVyeP6FhYDM/picasa-logo.jpg&quot; width=150 height=59 border=0&gt;&lt;!-- RspH:P:I:W:150:H:59 --&gt;&lt;/span&gt;&amp;nbsp; </div></simpleChoice>
 <simpleChoice identifier="QUE_1053_A3" fixed="true">
-<div class="html">Facebook &lt;script&gt;alert('0xFACE')&lt;/script&gt;</div></simpleChoice>
+<div class="html">Facebook &lt;script&gt;alert(0xFACE)&lt;/script&gt;</div></simpleChoice>
 <simpleChoice identifier="QUE_1054_A4" fixed="true">
 <div class="html"> &lt;br&gt; Twitter &lt; br &gt; </div></simpleChoice>
 </choiceInteraction>

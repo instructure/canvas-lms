@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Polling::PollSession do
-  before(:each) do
+  before :once do
     course
     @course.root_account.disable_feature!(:draft_state)
     @section = @course.course_sections.create!(name: 'Section 2')
@@ -104,22 +104,19 @@ describe Polling::PollSession do
   end
 
   describe "#has_submission_from?" do
-    before(:each) do
+    before :once do
       @session = Polling::PollSession.create(poll: @poll, course: @course)
       @session.publish!
+      student_in_course(active_all: true, course: @course)
     end
 
     it "returns true if the provided user has submitted to the session" do
-      student_in_course(active_all: true, course: @course)
-
       @session.poll_submissions.create!(poll: @poll, poll_choice: @choice, user: @student)
 
       @session.has_submission_from?(@student).should be_true
     end
 
     it "returns false if the provided user hasn't submitted to the session" do
-      student_in_course(active_all: true, course: @course)
-
       @session.has_submission_from?(@student).should be_false
     end
   end

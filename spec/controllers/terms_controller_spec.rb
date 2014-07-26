@@ -22,7 +22,7 @@ describe TermsController do
   it "should only touch courses once when setting overrides" do
     a = Account.default
     u = user(:active_all => true)
-    a.add_user(u)
+    a.account_users.create!(user: u)
     user_session(@user)
 
     term = a.default_enrollment_term

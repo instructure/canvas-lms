@@ -300,8 +300,11 @@ $outcome-border: 1px solid #BCC2CA
     float: left
 
   .group-description
+    cursor: pointer
     overflow: hidden
     padding: 10px 50px 10px 15px
+    &:hover
+      background-color: #f7f7f7
     .outcome-icon i
       line-height: 40px
     .group-title
@@ -359,14 +362,21 @@ $outcome-border: 1px solid #BCC2CA
 
     .description
       color: #2a333b
+      margin: 0
+      white-space: nowrap
+      overflow: hidden
+      text-overflow: ellipsis
       p
-        margin: 0
-        white-space: nowrap
-        overflow: hidden
-        text-overflow: ellipsis
+        display: inline
 
     .title
       font-weight: bold
+
+      h4
+        padding: 0
+        margin: 0
+        font-size: inherit
+        font-weight: bold
 
     .outcome-score
       float: right

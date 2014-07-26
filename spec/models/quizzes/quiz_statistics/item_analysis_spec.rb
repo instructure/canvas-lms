@@ -8,7 +8,7 @@ describe Quizzes::QuizStatistics::ItemAnalysis do
   let(:report_type) { 'item_analysis' }
   include_examples "Quizzes::QuizStatistics::Report"
 
-  before(:each) do
+  before(:once) do
     simple_quiz_with_submissions(
       %w{T D F A},
       %w{T B T A}, # 2 wrong

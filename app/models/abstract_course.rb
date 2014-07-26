@@ -43,7 +43,7 @@ class AbstractCourse < ActiveRecord::Base
     save!
   end
   
-  scope :active, where("abstract_courses.workflow_state<>'deleted'")
+  scope :active, -> { where("abstract_courses.workflow_state<>'deleted'") }
   
   include StickySisFields
   are_sis_sticky :name, :short_name, :enrollment_term_id

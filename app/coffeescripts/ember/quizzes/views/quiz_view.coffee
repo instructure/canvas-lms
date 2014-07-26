@@ -10,9 +10,10 @@ define [
 
     addBreadCrumb: (->
       quizUrl = @controller.get('htmlURL')
+      escapedTitle = $("<div />").text(@controller.get("title")).html()
       breadcrumb = $(
         "<li><a href=\"#{quizUrl}\"><span class=\"ellipsible\">" +
-          @controller.get("title") +
+          escapedTitle +
         "</span></a></li>")
       $("#breadcrumbs ul").append(breadcrumb)
     ).on('didInsertElement')

@@ -351,7 +351,7 @@ describe "account" do
 
     it "should be able to view user details from parent account" do
       user_non_root = user
-      create_sub_account.add_user(user_non_root)
+      create_sub_account.account_users.create!(user: user_non_root)
       get "/accounts/#{Account.default.id}/users/#{user_non_root.id}"
       #verify user details displayed properly
       f('.accounts .unstyled_list li').should include_text('sub_account')

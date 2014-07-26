@@ -18,7 +18,7 @@ define [
         SpecModelAdapter: App.ApplicationAdapter.extend({
           # use ic-ajax
           ajax: (url, method) ->
-            ajax({ url: url, type: method })
+            ajax.request({ url: url, type: method })
 
           # use the model's "url" attribute if it's persistent
           buildURL: (type, id) ->
@@ -39,7 +39,7 @@ define [
       run App, 'destroy'
 
   asyncTest '#reload: it uses the query parameters', ->
-    ajax.defineFixture '/api/v1/courses/1/spec_models/1?page=1', response: {
+    ajax.defineFixture '/api/v1/courses/1/spec_models/1?page=1', textStatus: 'success', response: {
       id: 1,
       fruit: 'banana'
     }
@@ -58,7 +58,7 @@ define [
         start()
 
   asyncTest '#reload: it restores the original url', ->
-    ajax.defineFixture '/api/v1/courses/1/spec_models/1?page=1', response: {
+    ajax.defineFixture '/api/v1/courses/1/spec_models/1?page=1', textStatus: 'success', response: {
       id: 1,
       fruit: 'banana'
     }

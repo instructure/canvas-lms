@@ -56,7 +56,7 @@ describe DiscussionEntry do
   end
 
   context "entry notifications" do
-    before do
+    before :once do
       course_with_teacher(:active_all => true)
       student_in_course(:active_all => true)
       @non_posting_student = @student
@@ -193,15 +193,15 @@ describe DiscussionEntry do
       @sub_topic.root_topic_id = @parent_topic.id
       @sub_topic.save!
       @sub_entry = @sub_topic.discussion_entries.create!(:message => "entry", :user => @first_user)
-      @group_entry.grants_right?(@first_user, nil, :update).should eql(true)
-      @group_entry.grants_right?(@second_user, nil, :update).should eql(false)
-      @sub_entry.grants_right?(@first_user, nil, :update).should eql(true)
-      @sub_entry.grants_right?(@second_user, nil, :update).should eql(false)
+      @group_entry.grants_right?(@first_user, :update).should eql(true)
+      @group_entry.grants_right?(@second_user, :update).should eql(false)
+      @sub_entry.grants_right?(@first_user, :update).should eql(true)
+      @sub_entry.grants_right?(@second_user, :update).should eql(false)
     end
   end
 
   context "update_topic" do
-    before :each do
+    before :once do
       course_with_student(:active_all => true)
       @course.enroll_student(@user).accept
       @topic = @course.discussion_topics.create!(:title => "title", :message => "message")
@@ -240,7 +240,7 @@ describe DiscussionEntry do
   end
 
   context "deleting entry" do
-    before :each do
+    before :once do
       course_with_student(:active_all => true)
       @author = @user
       @reader = user()
@@ -299,7 +299,7 @@ describe DiscussionEntry do
   end
 
   context "read/unread state" do
-    before(:each) do
+    before(:once) do
       course_with_teacher(:active_all => true)
       student_in_course(:active_all => true)
       @topic = @course.discussion_topics.create!(:title => "title", :message => "message", :user => @teacher)
@@ -389,8 +389,11 @@ describe DiscussionEntry do
   end
 
   context "threaded discussions" do
-    it "should force a root entry as parent if the discussion isn't threaded" do
+    before :once do
       course_with_teacher
+    end
+
+    it "should force a root entry as parent if the discussion isn't threaded" do
       discussion_topic_model
       root = @topic.reply_from(:user => @teacher, :text => "root entry")
       sub1 = root.reply_from(:user => @teacher, :html => "sub entry")
@@ -402,7 +405,6 @@ describe DiscussionEntry do
     end
 
     it "should allow a sub-entry as parent if the discussion is threaded" do
-      course_with_teacher
       discussion_topic_model(:threaded => true)
       root = @topic.reply_from(:user => @teacher, :text => "root entry")
       sub1 = root.reply_from(:user => @teacher, :html => "sub entry")
@@ -427,7 +429,7 @@ describe DiscussionEntry do
   end
 
   describe "DiscussionEntryParticipant" do
-    before do
+    before :once do
       topic_with_nested_replies
     end
 
@@ -487,9 +489,12 @@ describe DiscussionEntry do
   end
 
   describe "reply_from" do
-    it "should ignore replies in deleted accounts" do
+    before :once do
       course_with_teacher
       discussion_topic_model
+    end
+
+    it "should ignore replies in deleted accounts" do
       root = @topic.reply_from(:user => @teacher, :text => "root entry")
       Account.default.destroy
       root.reload
@@ -497,8 +502,6 @@ describe DiscussionEntry do
     end
 
     it "should prefer html to text" do
-      course_with_teacher
-      discussion_topic_model
       @entry = @topic.reply_from(:user => @teacher, :text => "topic")
       msg = @entry.reply_from(:user => @teacher, :text => "text body", :html => "<p>html body</p>")
       msg.should_not be_nil
@@ -506,10 +509,9 @@ describe DiscussionEntry do
     end
 
     it "should not allow replies to locked topics" do
-      course_with_teacher
-      discussion_topic_model
       @entry = @topic.reply_from(:user => @teacher, :text => "topic")
       @topic.lock!
+      @topic.clear_permissions_cache(@teacher)
       lambda { @entry.reply_from(:user => @teacher, :text => "reply") }.should raise_error(IncomingMail::Errors::ReplyToLockedTopic)
     end
   end

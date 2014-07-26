@@ -28,7 +28,7 @@ describe Quizzes::QuizSerializer do
     @quiz.context = @context
     @user = User.new
     @quiz.stubs(:locked_for?).returns false
-    @quiz.stubs(:grants_right?).returns true
+    @quiz.stubs(:check_right?).returns true
     @session = stub(:[] => nil)
     controller.stubs(:session).returns session
     controller.stubs(:context).returns context
@@ -331,6 +331,7 @@ describe Quizzes::QuizSerializer do
 
       it "sends nil if user can't grade" do
         course_with_student_logged_in(active_all: true)
+        @quiz.unstub(:check_right?)
         @quiz.unstub(:grants_right?)
         serializer = quiz_serializer(scope: @student)
         serializer.as_json[:quiz]['links'].should_not have_key 'unsubmitted_students'
@@ -352,6 +353,7 @@ describe Quizzes::QuizSerializer do
     describe "unsubmitted_students" do
 
       it "sends nil if user can't grade" do
+        @quiz.unstub(:check_right?)
         @quiz.unstub(:grants_right?)
         course_with_student_logged_in(active_all: true)
         serializer = quiz_serializer(scope: @student)

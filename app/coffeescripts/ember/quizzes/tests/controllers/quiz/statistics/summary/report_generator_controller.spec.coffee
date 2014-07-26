@@ -85,7 +85,7 @@ define [
   emq.test '#pullGeneratedReport: it reloads and auto-downloads', ->
     expect 3
 
-    ajax.defineFixture '/quiz_reports/1?include[]=file', response: {
+    ajax.defineFixture '/quiz_reports/1?include[]=file', textStatus: 'success', response: {
       quiz_reports: [{
         id: 1,
         file: FileFixture
@@ -104,7 +104,7 @@ define [
   emq.test "#pullGeneratedReport: it reloads but doesn't auto-download", ->
     expect 3
 
-    ajax.defineFixture '/quiz_reports/1?include[]=file', response: {
+    ajax.defineFixture '/quiz_reports/1?include[]=file', textStatus: 'success', response: {
       quiz_reports: [{
         id: 1,
         file: FileFixture

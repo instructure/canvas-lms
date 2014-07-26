@@ -74,11 +74,11 @@ class DelayedMessage < ActiveRecord::Base
   
   scope :in_state, lambda { |state| where(:workflow_state => state.to_s) }
 
-  scope :to_summarize, lambda {
+  scope :to_summarize, -> {
     where("delayed_messages.workflow_state='pending' and delayed_messages.send_at<=?", Time.now.utc)
   }
   
-  scope :next_to_summarize, lambda {
+  scope :next_to_summarize, -> {
     where(:workflow_state => 'pending').order(:send_at).limit(1)
   }
   

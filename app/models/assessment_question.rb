@@ -48,7 +48,7 @@ class AssessmentQuestion < ActiveRecord::Base
   serialize :question_data
 
   set_policy do
-    given{|user, session| cached_context_grants_right?(user, session, :manage_assignments) }
+    given{|user, session| self.context.grants_right?(user, session, :manage_assignments) }
     can :read and can :create and can :update and can :delete
   end
 
@@ -263,5 +263,5 @@ class AssessmentQuestion < ActiveRecord::Base
     dup
   end
 
-  scope :active, where("assessment_questions.workflow_state<>'deleted'")
+  scope :active, -> { where("assessment_questions.workflow_state<>'deleted'") }
 end

@@ -236,7 +236,7 @@ class Attachment < ActiveRecord::Base
 
     # try an infer encoding if it would be useful to do so
     send_later(:infer_encoding) if self.encoding.nil? && self.content_type =~ /text/ && self.context_type != 'SisBatch'
-    if respond_to?(:process_attachment_with_processing) && thumbnailable? && !attachment_options[:thumbnails].blank? && parent_id.nil?
+    if respond_to?(:process_attachment_with_processing, true) && thumbnailable? && !attachment_options[:thumbnails].blank? && parent_id.nil?
       temp_file = temp_path || create_temp_file
       self.class.attachment_options[:thumbnails].each { |suffix, size| send_later_if_production(:create_thumbnail_size, suffix) }
     end
@@ -643,7 +643,7 @@ class Attachment < ActiveRecord::Base
     policy_encoded = Base64.encode64(policy.to_json).gsub(/\n/, '')
     signature = Base64.encode64(
       OpenSSL::HMAC.digest(
-        OpenSSL::Digest::Digest.new('sha1'), shared_secret, policy_encoded
+        OpenSSL::Digest.new('sha1'), shared_secret, policy_encoded
       )
     ).gsub(/\n/, '')
 
@@ -662,7 +662,7 @@ class Attachment < ActiveRecord::Base
   def self.decode_policy(policy_str, signature_str)
     return nil if policy_str.blank? || signature_str.blank?
     signature = Base64.decode64(signature_str)
-    return nil if OpenSSL::HMAC.digest(OpenSSL::Digest::Digest.new("sha1"), self.shared_secret, policy_str) != signature
+    return nil if OpenSSL::HMAC.digest(OpenSSL::Digest.new("sha1"), self.shared_secret, policy_str) != signature
     policy = JSON.parse(Base64.decode64(policy_str))
     return nil unless Time.zone.parse(policy['expiration']) >= Time.now
     attachment = Attachment.find(policy['attachment_id'])
@@ -1118,28 +1118,28 @@ class Attachment < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user, session| self.cached_context_grants_right?(user, session, :manage_files) } #admins.include? user }
+    given { |user, session| self.context.grants_right?(user, session, :manage_files) } #admins.include? user }
     can :read and can :update and can :delete and can :create and can :download
 
     given { |user| self.public? }
     can :read and can :download
 
-    given { |user, session| self.cached_context_grants_right?(user, session, :read) } #students.include? user }
+    given { |user, session| self.context.grants_right?(user, session, :read) } #students.include? user }
     can :read
 
     given { |user, session|
-      self.cached_context_grants_right?(user, session, :read) &&
-      (self.cached_context_grants_right?(user, session, :manage_files) || !self.locked_for?(user))
+      self.context.grants_right?(user, session, :read) &&
+      (self.context.grants_right?(user, session, :manage_files) || !self.locked_for?(user))
     }
     can :download
 
-    given { |user, session| self.context_type == 'Submission' && self.context.grant_rights?(user, session, :comment) }
+    given { |user, session| self.context_type == 'Submission' && self.context.grant_right?(user, session, :comment) }
     can :create
 
     given { |user, session|
         session && session['file_access_user_id'].present? &&
         (u = User.find_by_id(session['file_access_user_id'])) &&
-        self.cached_context_grants_right?(u, session, :read) &&
+        self.context.grants_right?(u, session, :read) &&
         session['file_access_expiration'] && session['file_access_expiration'].to_i > Time.now.to_i
     }
     can :read
@@ -1147,8 +1147,8 @@ class Attachment < ActiveRecord::Base
     given { |user, session|
         session && session['file_access_user_id'].present? &&
         (u = User.find_by_id(session['file_access_user_id'])) &&
-        self.cached_context_grants_right?(u, session, :read) &&
-        (self.cached_context_grants_right?(u, session, :manage_files) || !self.locked_for?(u)) &&
+        self.context.grants_right?(u, session, :read) &&
+        (self.context.grants_right?(u, session, :manage_files) || !self.locked_for?(u)) &&
         session['file_access_expiration'] && session['file_access_expiration'].to_i > Time.now.to_i
     }
     can :download
@@ -1166,7 +1166,7 @@ class Attachment < ActiveRecord::Base
 
   def locked_for?(user, opts={})
     return false if @skip_submission_attachment_lock_checks
-    return false if opts[:check_policies] && self.grants_right?(user, nil, :update)
+    return false if opts[:check_policies] && self.grants_right?(user, :update)
     return {:asset_string => self.asset_string, :manually_locked => true} if self.locked || (self.folder && self.folder.locked?)
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       locked = false
@@ -1253,11 +1253,11 @@ class Attachment < ActiveRecord::Base
     state :unattached_temporary
   end
 
-  scope :visible, where(['attachments.file_state in (?, ?)', 'available', 'public'])
-  scope :not_deleted, where("attachments.file_state<>'deleted'")
+  scope :visible, -> { where(['attachments.file_state in (?, ?)', 'available', 'public']) }
+  scope :not_deleted, -> { where("attachments.file_state<>'deleted'") }
 
-  scope :not_hidden, where("attachments.file_state<>'hidden'")
-  scope :not_locked, lambda {
+  scope :not_hidden, -> { where("attachments.file_state<>'hidden'") }
+  scope :not_locked, -> {
     where("(attachments.locked IS NULL OR attachments.locked=?) AND ((attachments.lock_at IS NULL) OR
       (attachments.lock_at>? OR (attachments.unlock_at IS NOT NULL AND attachments.unlock_at<?)))", false, Time.now.utc, Time.now.utc)
   }
@@ -1588,7 +1588,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def protect_for(user)
-    @cant_preview_scribd_doc = !self.grants_right?(user, nil, :download)
+    @cant_preview_scribd_doc = !self.grants_right?(user, :download)
   end
 
   def self.attachment_list_from_migration(context, ids)
@@ -1631,14 +1631,14 @@ class Attachment < ActiveRecord::Base
   def self.serialization_methods; [:mime_class, :scribdable?, :currently_locked, :crocodoc_available?]; end
   cattr_accessor :skip_thumbnails
 
-  scope :scribdable?, where("scribd_mime_type_id IS NOT NULL")
-  scope :recyclable, where("attachments.scribd_attempts<? AND attachments.workflow_state='errored'", MAX_SCRIBD_ATTEMPTS)
-  scope :needing_scribd_conversion_status, lambda { where("attachments.workflow_state='processing' AND attachments.updated_at<? AND scribd_doc IS NOT NULL", 30.minutes.ago).limit(50) }
-  scope :uploadable, where(:workflow_state => 'pending_upload')
-  scope :active, where(:file_state => 'available')
-  scope :thumbnailable?, where(:content_type => Technoweenie::AttachmentFu.content_types)
-  scope :by_display_name, lambda { order(display_name_order_by_clause('attachments')) }
-  scope :by_position_then_display_name, lambda { order("attachments.position, #{display_name_order_by_clause('attachments')}") }
+  scope :scribdable?, -> { where("scribd_mime_type_id IS NOT NULL") }
+  scope :recyclable, -> { where("attachments.scribd_attempts<? AND attachments.workflow_state='errored'", MAX_SCRIBD_ATTEMPTS) }
+  scope :needing_scribd_conversion_status, -> { where("attachments.workflow_state='processing' AND attachments.updated_at<? AND scribd_doc IS NOT NULL", 30.minutes.ago).limit(50) }
+  scope :uploadable, -> { where(:workflow_state => 'pending_upload') }
+  scope :active, -> { where(:file_state => 'available') }
+  scope :thumbnailable?, -> { where(:content_type => Technoweenie::AttachmentFu.content_types) }
+  scope :by_display_name, -> { order(display_name_order_by_clause('attachments')) }
+  scope :by_position_then_display_name, -> { order("attachments.position, #{display_name_order_by_clause('attachments')}") }
   def self.serialization_excludes; [:uuid, :namespace]; end
   def set_serialization_options
     if self.scribd_doc

@@ -58,7 +58,7 @@ define [
     actions:
       submit: ->
         if @get('messageBody')
-          ajax
+          ajax.request
             url: @get('quiz.messageStudentsUrl')
             data: JSON.stringify(
               conversations: [

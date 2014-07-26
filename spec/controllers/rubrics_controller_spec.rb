@@ -477,8 +477,8 @@ describe RubricsController do
     end
     it "should delete the rubric if the rubric is only associated with a course" do
       course_with_teacher_logged_in :active_all => true
-      Account.site_admin.add_user(@user, 'AccountAdmin')
-      Account.default.add_user(@user, 'AccountAdmin')
+      Account.site_admin.account_users.create!(user: @user)
+      Account.default.account_users.create!(user: @user)
 
       @rubric = Rubric.create!(:user => @user, :context => @course)
       RubricAssociation.create!(:rubric => @rubric, :context => @course, :purpose => :bookmark, :association_object => @course)
@@ -492,8 +492,8 @@ describe RubricsController do
     end
     it "should delete the rubric association even if the rubric doesn't belong to a course" do
       course_with_teacher_logged_in :active_all => true
-      Account.site_admin.add_user(@user, 'AccountAdmin')
-      Account.default.add_user(@user, 'AccountAdmin')
+      Account.site_admin.account_users.create!(user: @user)
+      Account.default.account_users.create!(user: @user)
       @user.reload
 
       @rubric = Rubric.create!(:user => @user, :context => Account.default)

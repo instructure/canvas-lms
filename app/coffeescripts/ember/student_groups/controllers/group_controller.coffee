@@ -47,13 +47,14 @@ define [
         })
         controller = this
         membership.save().then (membership)->
-          controller.parentController.removeFromCategory(controller.get('group_category_id'))
+          unless controller.get('isStudentGroup')
+            controller.parentController.removeFromCategory(controller.get('group_category_id'))
           controller.get('users').addObject(ENV.current_user)
           $.flashMessage I18n.t('group_join', "Joined Group %{group_name}", group_name: group.name)
       leave: (group) ->
         controller = this
         Ember.run =>
-          ajax("#{@get('usersUrl')}/self",{type: "DELETE"}).then (response) ->
+          ajax.request("#{@get('usersUrl')}/self",{type: "DELETE"}).then (response) ->
             user = controller.get('users').findBy('id', ENV.current_user_id)
             controller.get('users').removeObject(user)
             $.flashMessage I18n.t('group_leave', "Left Group %{group_name}", group_name: group.name)
@@ -65,8 +66,8 @@ define [
     ).property('users.@each.id')
 
     canSignup: (->
-      @get('group_category.self_signup') == "enabled"
-    ).property('group_category.self_signup')
+      @get('group_category.self_signup') == "enabled" or @get('join_level') == "parent_context_auto_join"
+    ).property('group_category.self_signup', 'join_level')
 
 
     isFull: (->
@@ -76,3 +77,11 @@ define [
     isMemberOfCategory: (->
       @parentController.isMemberOfCategory(@get('group_category_id'))
     ).property('users.@each.id')
+
+    isStudentGroup: (->
+      @get('group_category.role') == 'student_organized'
+    ).property('group_category.role')
+
+    shouldSwitch: (->
+      @get('isMemberOfCategory') && !@get('isStudentGroup')
+    ).property('isMemberOfCategory', 'isStudentGroup')

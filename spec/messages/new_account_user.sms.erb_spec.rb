@@ -23,7 +23,7 @@ describe 'new_account_user.sms' do
   it "should render" do
     account = Account.create!(:name => "some account")
     user_model
-    account_user = account.add_user(@user)
+    account_user = account.account_users.create!(user: @user)
     account_user.account.should eql(account)
     account_user.user.should eql(@user)
     @object = account_user

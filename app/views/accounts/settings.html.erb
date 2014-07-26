@@ -637,7 +637,9 @@ acknowledge that you have read and agreed to the
     <h2><%= t(:account_admins_title, "Account Admins") %></h2>
     <ul class="admins_list user_list list admins">
       <%= render :partial => 'account_user', :collection => @account_users %>
-      <%= render :partial => 'account_user', :object => nil %>
+      <% if can_do(@context, @current_user, :manage_account_memberships) %>
+        <%= render :partial => 'account_user', :object => nil %>
+      <% end %>
     </ul>
     <% if can_do(@context, @current_user, :manage_account_memberships) %>
       <% js_bundle :user_lists %>
@@ -648,7 +650,7 @@ acknowledge that you have read and agreed to the
           <div>
             <%= label_tag :membership_type, :en => "Add More" %>
             <select name="membership_type" id="admin_membership_type">
-            <% @context.available_account_roles.each do |type| %>
+            <% @context.available_account_roles(@current_user).each do |type| %>
               <option value="<%= type %>"><%= AccountUser.readable_type(type) %></option>
             <% end %>
             </select>
@@ -820,7 +822,12 @@ acknowledge that you have read and agreed to the
             <%= f.text_area :message, :class => 'alert_message', :style => "height: 100px;" %>
             <% if @account.site_admin? %>
               <span >
-                *<%= t(:interpolate_account_domain, "Note: enter \"{{ACCOUNT_DOMAIN}}\" to substitute the user's root account domain")  %>
+                <div>
+                  <%= t(:interpolate_account_domain, "Enter \"{{ACCOUNT_DOMAIN}}\" to substitute the user's root account domain")  %>
+                </div>
+                <div>
+                  <%= t(:interpolate_user_id, "Enter \"{{CANVAS_USER_ID}}\" to substitute the user's unique Canvas ID")  %>
+                </div>
               </span>
             <% end %>
           </div>

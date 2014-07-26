@@ -1,7 +1,7 @@
 shared_examples_for "Quizzes::QuizStatistics::Report" do
   # let(:report_type) - report_type to test
 
-  before(:each) do
+  before(:once) do
     student_in_course(:active_all => true)
     @quiz = @course.quizzes.create!
     @quiz.quiz_questions.create!(:question_data => { :name => "test 1" })

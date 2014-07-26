@@ -76,19 +76,19 @@ class Collaboration < ActiveRecord::Base
     }
     can :read
 
-    given { |user, session| self.cached_context_grants_right?(user, session, :create_collaborations) }
+    given { |user, session| self.context.grants_right?(user, session, :create_collaborations) }
     can :create
 
-    given { |user, session| self.cached_context_grants_right?(user, session, :manage_content) }
+    given { |user, session| self.context.grants_right?(user, session, :manage_content) }
     can :read and can :update and can :delete
 
     given { |user, session|
       user && self.user_id == user.id &&
-        self.cached_context_grants_right?(user, session, :create_collaborations) }
+        self.context.grants_right?(user, session, :create_collaborations) }
     can :read and can :update and can :delete
   end
 
-  scope :active, where("collaborations.workflow_state<>'deleted'")
+  scope :active, -> { where("collaborations.workflow_state<>'deleted'") }
 
   scope :after, lambda { |date| where("collaborations.updated_at>?", date) }
 

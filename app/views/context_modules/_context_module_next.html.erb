@@ -73,12 +73,13 @@
           <i class="icon-<%= published_status %>"></i>
         </span>
 
-        <a href="#"
+        <button
+          aria-label="<%= t('aria_labels.add_item', %{Add Content}) %>"
           rel="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/items"
-          class="add_module_item_link btn"><i class="icon-plus"></i><span class="screenreader-only"><%= t('links.add_item', %{Add Content}) %></span></a>
-        <a href="#" class="btn al-trigger" aria-label="<%= t("manager_module", "Manage module") %>">
+          class="add_module_item_link btn"><i class="icon-plus"></i><span class="screenreader-only"><%= t('links.add_item', %{Add Content}) %></span></button>
+        <button class="btn al-trigger" aria-label="<%= t("manager_module", "Manage module") %>">
           <i class="icon-settings"></i><i class="icon-mini-arrow-down"></i>
-        </a>
+        </button>
         <ul class="al-options">
           <li>
             <a

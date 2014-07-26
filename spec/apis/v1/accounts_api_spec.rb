@@ -23,11 +23,11 @@ describe "Accounts API", type: :request do
     Pseudonym.any_instance.stubs(:works_for_account?).returns(true)
     user_with_pseudonym(:active_all => true)
     @a1 = account_model(:name => 'root', :default_time_zone => 'UTC', :default_storage_quota_mb => 123, :default_user_storage_quota_mb => 45, :default_group_storage_quota_mb => 42)
-    @a1.add_user(@user)
+    @a1.account_users.create!(user: @user)
     @sis_batch = @a1.sis_batches.create
     SisBatch.where(id: @sis_batch).update_all(workflow_state: 'imported')
     @a2 = account_model(:name => 'subby', :parent_account => @a1, :root_account => @a1, :sis_source_id => 'sis1',  :sis_batch_id => @sis_batch.id, :default_time_zone => 'Alaska', :default_storage_quota_mb => 321, :default_user_storage_quota_mb => 54, :default_group_storage_quota_mb => 41)
-    @a2.add_user(@user)
+    @a2.account_users.create!(user: @user)
     @a3 = account_model(:name => 'no-access')
     # even if we have access to it implicitly, it's not listed
     @a4 = account_model(:name => 'implicit-access', :parent_account => @a1, :root_account => @a1)
@@ -246,12 +246,12 @@ describe "Accounts API", type: :request do
     context 'with :manage_storage_quotas' do
       before(:each) do
         # remove the user from being an Admin
-        @a1.add_user(@user).destroy
+        @a1.account_users.where(user_id: @user).delete_all
 
         # re-add the user as an admin with quota rights
         custom_account_role 'quotas', :account => @a1
         @a1.role_overrides.create! :enrollment_type => 'quotas', :permission => 'manage_storage_quotas', :enabled => true
-        @a1.add_user @user, 'quotas'
+        @a1.account_users.create!(user: @user, membership_type: 'quotas')
 
         @params = { :controller => 'accounts', :action => 'update', :id => @a1.to_param, :format => 'json' }
       end
@@ -296,13 +296,13 @@ describe "Accounts API", type: :request do
     context 'without :manage_storage_quotas' do
       before(:each) do
         # remove the user from being an Admin
-        @a1.add_user(@user).destroy
+        @a1.account_users.where(user_id: @user).delete_all
 
         # re-add the user as an admin without quota rights
         custom_account_role 'no-quotas', :account => @a1
         @a1.role_overrides.create! :enrollment_type => 'no-quotas', :permission => 'manage_account_settings', :enabled => true
         @a1.role_overrides.create! :enrollment_type => 'no-quotas', :permission => 'manage_storage_quotas', :enabled => false
-        @a1.add_user @user, 'no-quotas'
+        @a1.account_users.create!(user: @user, membership_type: 'no-quotas')
 
         @params = { :controller => 'accounts', :action => 'update', :id => @a1.to_param, :format => 'json' }
       end
@@ -331,9 +331,9 @@ describe "Accounts API", type: :request do
   end
 
   it "should find accounts by sis in only this root account" do
-    Account.default.add_user(@user)
+    Account.default.account_users.create!(user: @user)
     other_sub = account_model(:name => 'other_sub', :parent_account => Account.default, :root_account => Account.default, :sis_source_id => 'sis1')
-    other_sub.add_user(@user)
+    other_sub.account_users.create!(user: @user)
 
     # this is scoped to Account.default
     json = api_call(:get, "/api/v1/accounts/sis_account_id:sis1",

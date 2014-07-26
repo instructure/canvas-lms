@@ -824,7 +824,7 @@ describe Conversation do
     end
 
     context "migration" do
-      before do
+      before :once do
         @u1 = student_in_course(:active_all => true).user
         @u2 = student_in_course(:active_all => true, :course => @course).user
         @course1 = @course
@@ -867,7 +867,7 @@ describe Conversation do
     end
 
     context 'tag updates' do
-      before(:each) do
+      before :once do
         @teacher    = teacher_in_course(:active_all => true).user
         @student    = student_in_course(:active_all => true, :course => @course).user
         @old_course = @course

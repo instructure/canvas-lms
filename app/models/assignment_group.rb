@@ -72,10 +72,10 @@ class AssignmentGroup < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user, session| self.context.grants_rights?(user, session, :read, :view_all_grades, :manage_grades).any?(&:last) }
+    given { |user, session| self.context.grants_any_right?(user, session, :read, :view_all_grades, :manage_grades) }
     can :read
 
-    given { |user, session| self.context.grants_rights?(user, session, :manage_assignments).any?(&:last) }
+    given { |user, session| self.context.grants_right?(user, session, :manage_assignments) }
     can :read and can :create and can :update and can :delete
   end
 
@@ -146,8 +146,8 @@ class AssignmentGroup < ActiveRecord::Base
     self.assignments.map{|a| a.points_possible || 0}.sum
   end
 
-  scope :include_active_assignments, includes(:active_assignments)
-  scope :active, where("assignment_groups.workflow_state<>'deleted'")
+  scope :include_active_assignments, -> { includes(:active_assignments) }
+  scope :active, -> { where("assignment_groups.workflow_state<>'deleted'") }
   scope :before, lambda { |date| where("assignment_groups.created_at<?", date) }
   scope :for_context_codes, lambda { |codes| active.where(:context_code => codes).order(:position) }
   scope :for_course, lambda { |course| where(:context_id => course, :context_type => 'Course') }

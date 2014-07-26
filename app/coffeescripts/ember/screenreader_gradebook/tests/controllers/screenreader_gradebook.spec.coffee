@@ -83,16 +83,18 @@ define [
     equal @srgb.get('displayName'), "name"
 
   test 'displayPointTotals is false when groups are weighted even if showTotalAsPoints is true', ->
-    @srgb.set('showTotalAsPoints', true)
-    @srgb.set('groupsAreWeighted', true)
-    equal @srgb.get('displayPointTotals'), false
+    Ember.run =>
+      @srgb.set('showTotalAsPoints', true)
+      @srgb.set('groupsAreWeighted', true)
+      equal @srgb.get('displayPointTotals'), false
 
   test 'displayPointTotals is toggled by showTotalAsPoints when groups are unweighted', ->
-    @srgb.set('groupsAreWeighted', false)
-    @srgb.set('showTotalAsPoints', true)
-    equal @srgb.get('displayPointTotals'), true
-    @srgb.set('showTotalAsPoints', false)
-    equal @srgb.get('displayPointTotals'), false
+    Ember.run =>
+      @srgb.set('groupsAreWeighted', false)
+      @srgb.set('showTotalAsPoints', true)
+      equal @srgb.get('displayPointTotals'), true
+      @srgb.set('showTotalAsPoints', false)
+      equal @srgb.get('displayPointTotals'), false
 
   test 'updateSubmission attaches the submission to the student', ->
     student = clone fixtures.students[0].user
@@ -429,7 +431,8 @@ define [
     equal @srgb.get('invalidGroupsWarningPhrases'), "Note: Score does not include assignments from the group Invalid AG because it has no points possible."
 
   test 'sets showInvalidGroupWarning to false if groups are not weighted', ->
-    @srgb.set('weightingScheme', "equal")
-    equal @srgb.get('showInvalidGroupWarning'), false
-    @srgb.set('weightingScheme', "percent")
-    equal @srgb.get('showInvalidGroupWarning'), true
+    Ember.run =>
+      @srgb.set('weightingScheme', "equal")
+      equal @srgb.get('showInvalidGroupWarning'), false
+      @srgb.set('weightingScheme', "percent")
+      equal @srgb.get('showInvalidGroupWarning'), true

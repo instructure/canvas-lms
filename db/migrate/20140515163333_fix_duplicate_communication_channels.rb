@@ -23,4 +23,8 @@ class FixDuplicateCommunicationChannels < ActiveRecord::Migration
       add_index :communication_channels, [:user_id, :path, :path_type], unique: true
     end
   end
+
+  def self.down
+    remove_index :communication_channels, [:user_id, :path, :path_type]
+  end
 end

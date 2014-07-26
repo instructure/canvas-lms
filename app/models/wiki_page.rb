@@ -217,21 +217,21 @@ class WikiPage < ActiveRecord::Base
     self.versions.map(&:model)
   end
 
-  scope :active, where(:workflow_state => 'active')
+  scope :active, -> { where(:workflow_state => 'active') }
 
-  scope :deleted_last, order("workflow_state='deleted'")
+  scope :deleted_last, -> { order("workflow_state='deleted'") }
 
-  scope :not_deleted, where("wiki_pages.workflow_state<>'deleted'")
+  scope :not_deleted, -> { where("wiki_pages.workflow_state<>'deleted'") }
 
-  scope :published, where("wiki_pages.workflow_state='active' AND (wiki_pages.hide_from_students=? OR wiki_pages.hide_from_students IS NULL)", false)
-  scope :unpublished, where("wiki_pages.workflow_state='unpublished' OR (wiki_pages.hide_from_students=? AND wiki_pages.workflow_state<>'deleted')", true)
+  scope :published, -> { where("wiki_pages.workflow_state='active' AND (wiki_pages.hide_from_students=? OR wiki_pages.hide_from_students IS NULL)", false) }
+  scope :unpublished, -> { where("wiki_pages.workflow_state='unpublished' OR (wiki_pages.hide_from_students=? AND wiki_pages.workflow_state<>'deleted')", true) }
 
   # needed for ensure_unique_url
   def not_deleted
     !deleted?
   end
 
-  scope :order_by_id, order(:id)
+  scope :order_by_id, -> { order(:id) }
 
   def locked_for?(user, opts={})
     return false unless self.could_be_locked

@@ -397,22 +397,22 @@ define [
       ajax.defineFixture '/api/v1/courses/1/quizzes',
         response: JSON.parse(JSON.stringify quizIndexResponse),
         jqXHR: {}
-        testStatus: '200'
+        textStatus: 'success'
 
       ajax.defineFixture '/api/v1/courses/1/assignment_groups/1',
         response: JSON.parse(JSON.stringify assignmentGroup),
         jqXHR: {}
-        testStatus: '200'
+        textStatus: 'success'
 
       ajax.defineFixture '/api/v1/courses/1/quizzes/1',
         response: JSON.parse(JSON.stringify quizIndexResponse),
         jqXHR: {}
-        testStatus: '200'
+        textStatus: 'success'
 
       ajax.defineFixture '/api/v1/courses/1/quizzes/2',
         response: JSON.parse(JSON.stringify quizShowStudentResponse),
         jqXHR: {}
-        testStatus: '200'
+        textStatus: 'success'
 
       ajax.defineFixture '/api/v1/courses/1/quizzes/3',
         response: JSON.parse(JSON.stringify quizEmptyStatisticsResponse),
@@ -422,15 +422,17 @@ define [
       ajax.defineFixture '/courses/1/quizzes/1/submission_html',
         response: 'submission html!'
         textStatus: '200'
+        textStatus: 'success'
 
       ajax.defineFixture '/courses/1/quizzes/2/submission_html',
         response: 'submission html!'
         textStatus: '200'
+        textStatus: 'success'
 
       ajax.defineFixture '/api/v1/courses/1/quizzes/1/statistics',
         response: JSON.parse(JSON.stringify quizStatisticsResponse),
         jqXHR: {}
-        testStatus: '200'
+        textStatus: 'success'
 
       ajax.defineFixture '/api/v1/courses/1/quizzes/1/reports',
         response: JSON.parse(JSON.stringify quizReportsResponse),
@@ -438,7 +440,7 @@ define [
       ajax.defineFixture '/api/v1/courses/1/quizzes/1/statistics?include=quiz_questions',
         response: JSON.parse(JSON.stringify(quizStatisticsResponse)),
         jqXHR: {}
-        testStatus: '200'
+        textStatus: 'success'
 
       ajax.defineFixture '/api/v1/courses/1/quizzes/1/reports?includes_all_versions=true',
         response: JSON.parse(JSON.stringify(quizReportsResponse)),
@@ -453,7 +455,7 @@ define [
       ajax.defineFixture '/api/v1/courses/1/quizzes/3/reports',
         response: JSON.parse(JSON.stringify(emptyQuizReportsResponse)),
         jqXHR: {}
-        testStatus: '200'
+        textStatus: 'success'
 
       ajax.defineFixture '/api/v1/courses/1/assignment_overrides/1',
         response:
@@ -461,11 +463,12 @@ define [
           title: "My Section"
           due_at: new Date()
           lock_at: new Date()
-        testStatus: '200'
+        textStatus: 'success'
         jqXHR: {}
 
       ajax.defineFixture '/api/v1/courses/1/quizzez/1/submission_users?include[]=quiz_submissions',
         response: submissionUsers
+        textStatus: 'success'
 
       ajax.defineFixture '/api/v1/courses/1/quizzes/1/submission_users?submitted=true',
 
@@ -478,7 +481,7 @@ define [
               sortable_name: 'roxette'
             }
           ]
-        testStatus: '200'
+        textStatus: 'success'
         jqXHR: {}
   }
 

@@ -1,3 +1,4 @@
+# coding: utf-8
 #
 # Copyright (C) 2011 Instructure, Inc.
 #
@@ -21,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe ContentMigration do
 
   context "course copy" do
-    before do
+    before :once do
       course_with_teacher(:course_name => "from course", :active_all => true)
       @copy_from = @course
 
@@ -317,6 +318,32 @@ describe ContentMigration do
       tag_to = mod1_to.content_tags.first
       page_to = @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(page))
       page_to.body.should == body % [@copy_to.id, tag_to.id]
+    end
+
+    it "should be able to copy links to files in folders with html entities and unicode in path" do
+      root_folder = Folder.root_folders(@copy_from).first
+      folder1 = root_folder.sub_folders.create!(:context => @copy_from, :name => "mol&eacute;")
+      att1 = Attachment.create!(:filename => "first.txt", :uploaded_data => StringIO.new('ohai'), :folder => folder1, :context => @copy_from)
+      folder2 = root_folder.sub_folders.create!(:context => @copy_from, :name => "olé")
+      att2 = Attachment.create!(:filename => "first.txt", :uploaded_data => StringIO.new('ohai'), :folder => folder2, :context => @copy_from)
+
+      body = "<a class='instructure_file_link' href='/courses/#{@copy_from.id}/files/#{att1.id}/download'>link</a>"
+      body += "<a class='instructure_file_link' href='/courses/#{@copy_from.id}/files/#{att2.id}/download'>link</a>"
+      dt = @copy_from.discussion_topics.create!(:message => body, :title => "discussion title")
+      page = @copy_from.wiki.wiki_pages.create!(:title => "some page", :body => body)
+
+      run_course_copy
+
+      att_to1 = @copy_to.attachments.find_by_migration_id(mig_id(att1))
+      att_to2 = @copy_to.attachments.find_by_migration_id(mig_id(att2))
+
+      page_to = @copy_to.wiki.wiki_pages.find_by_migration_id(mig_id(page))
+      page_to.body.include?("/courses/#{@copy_to.id}/files/#{att_to1.id}/download").should be_true
+      page_to.body.include?("/courses/#{@copy_to.id}/files/#{att_to2.id}/download").should be_true
+
+      dt_to = @copy_to.discussion_topics.find_by_migration_id(mig_id(dt))
+      dt_to.message.include?("/courses/#{@copy_to.id}/files/#{att_to1.id}/download").should be_true
+      dt_to.message.include?("/courses/#{@copy_to.id}/files/#{att_to2.id}/download").should be_true
     end
 
     it "should not escape links to wiki urls" do
@@ -2188,7 +2215,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
     end
 
     context "copying frozen assignments" do
-      append_before (:each) do
+      before :once do
         @setting = PluginSetting.create!(:name => "assignment_freezer", :settings => {"no_copying" => "yes"})
 
         @asmnt = @copy_from.assignments.create!(:title => 'lock locky')
@@ -2264,7 +2291,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
     end
 
     context "external tools" do
-      append_before do
+      before :once do
         @tool_from = @copy_from.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :custom_fields => {'a' => '1', 'b' => '2'}, :url => "http://www.example.com")
         @tool_from.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
         @tool_from.save!
@@ -2417,7 +2444,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
   end
 
   context "import_object?" do
-    before do
+    before :once do
       course
       @cm = ContentMigration.new(context: @course)
     end
@@ -2528,7 +2555,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
 
       account = Account.create!(:name => 'account')
       @user = user
-      account.add_user(@user)
+      account.account_users.create!(user: @user)
       cm = ContentMigration.new(:context => account, :user => @user)
       cm.migration_type = 'qti_converter'
       cm.migration_settings['import_immediately'] = true
@@ -2563,7 +2590,7 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
 
       account = Account.create!(:name => 'account')
       @user = user
-      account.add_user(@user)
+      account.account_users.create!(user: @user)
       cm = ContentMigration.new(:context => account, :user => @user)
       cm.migration_type = 'qti_converter'
       cm.migration_settings['import_immediately'] = true

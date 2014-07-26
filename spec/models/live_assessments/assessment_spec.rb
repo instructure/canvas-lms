@@ -19,11 +19,11 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe LiveAssessments::Assessment do
-  let(:assessment_context) { course(active_all: true) }
-  let(:assessment_user) { course_with_student(course: assessment_context, active_all: true).user }
-  let(:assessor) { assessment_context.teachers.first }
-  let(:another_assessment_user) { course_with_student(course: assessment_context, active_all: true).user }
-  let(:assessment) { LiveAssessments::Assessment.create!(context: assessment_context, key: 'test key', title: 'test title') }
+  let_once(:assessment_context) { course(active_all: true) }
+  let_once(:assessment_user) { course_with_student(course: assessment_context, active_all: true).user }
+  let_once(:assessor) { assessment_context.teachers.first }
+  let_once(:another_assessment_user) { course_with_student(course: assessment_context, active_all: true).user }
+  let_once(:assessment) { LiveAssessments::Assessment.create!(context: assessment_context, key: 'test key', title: 'test title') }
   let(:outcome) do
     outcome = assessment_context.created_learning_outcomes.create!(:description => 'this is a test outcome', :short_description => 'test outcome')
     assessment_context.root_outcome_group.add_outcome(outcome)

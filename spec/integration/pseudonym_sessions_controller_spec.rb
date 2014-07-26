@@ -59,7 +59,7 @@ describe PseudonymSessionsController do
       response.should redirect_to(dashboard_url(:login_success => 1))
       session[:cas_session].should == 'ST-abcd'
 
-      get logout_url
+      delete logout_url
       response.should redirect_to(@cas_client.logout_url(cas_login_url))
     end
 
@@ -208,7 +208,7 @@ describe PseudonymSessionsController do
 
   it "should redirect back for jobs controller" do
     user_with_pseudonym(:password => 'qwerty', :active_all => 1)
-    Account.site_admin.add_user(@user)
+    Account.site_admin.account_users.create!(user: @user)
 
     get jobs_url
     response.should redirect_to login_url

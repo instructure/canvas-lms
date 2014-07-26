@@ -80,7 +80,7 @@ describe "student interactions links" do
 
   it "should not show mail link for admins" do
     user_model
-    Account.site_admin.add_user(@user)
+    Account.site_admin.account_users.create!(user: @user)
     user_session(@user)
     get "/users/#{@teacher.id}/teacher_activity/course/#{@course.id}"
     response.should be_success

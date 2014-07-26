@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe LearningOutcomeGroup do
   
-  before do
+  before :each do
     course
     @root = @course.root_outcome_group
   end

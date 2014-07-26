@@ -8,6 +8,22 @@ ko:
     bad_per_slot: "시간 슬롯 당 적어도 하나의 약속을 허용해야 함"
     context_required: "달력을 선택해야 합니다."
     select_calendars: "달력 선택"
+  EditGroupAssignmentView: 
+    move_to: "다음으로 이동"
+  GroupDetailView: 
+    delete_confirm: "이 그룹을 제거하시겠습니까?"
+    flash: 
+      removeError: "그룹을 제거할 수 없습니다. 다시 시도하시기 바랍니다."
+      removed: "그룹을 성공적으로 제거했습니다."
+    student_count: 
+      one: "학생 %{count}명"
+      other: "학생 %{count}명"
+    user_count: 
+      one: "사용자 %{count}명"
+      other: "사용자 %{count}명"
+  LongTextEditor: 
+    cancel: 취소
+    save: 저장
   academic_benchmark: 
     api_error: "기관 %{auth}에 대한 표준을 업데이트할 수 없습니다."
     bad_ab_file: "제공한 Academic Benchmark 파일에 오류가 있습니다."
@@ -20,6 +36,14 @@ ko:
   accont: 
     feedback_pricing_sub: "여러분의 기관에 대한 가격 얻기"
   account: 
+    account_settings: 
+      delicious: Delicious
+      diigo: Diigo
+      facebook: Facebook
+      google_docs: "Google Docs"
+      linked_in: LinkedIn
+      skype: Skype
+      twitter: Twitter
     ask_canvas_network: "Canvas Network 커뮤니티에 묻기"
     default_account_name: "기본 계정"
     default_site_administrator_account_name: "사이트 관리자"
@@ -60,6 +84,7 @@ ko:
     default_delegated_login_handle_name: 로그인
     default_login_handle_name: 이메일
     saml_eppn_domain_stripped: "%{eppn} (도메인 생략)"
+    test_bind_failed: "다음 오류로 인해 바인딩 실패: %{error}"
     test_connection_timeout: "연결 시간 초과"
     test_host_unknown: "알 수 없는 호스트: %{host}"
     test_login_auth_exception: "로그인 예외: %{error}"
@@ -153,6 +178,7 @@ ko:
     ldap_timeout_error: 
       last_ldap_timeout_failure: "마지막 시간 초과 오류"
       ldap_timeout_failure_help: "Canvas가 LDAP 서버와 통신할 때 시간 초과 오류가 발생하면 해당 LDAP 서버를 이용하는 이후의 로그인 시도를 %{time} 동안 차단합니다."
+      ldap_timeout_failure_help2: "Canvas에서 LDAP 서버와 통신하는 데 너무 잦은 횟수의 시간 초과가 발생하면 %{time} 동안 해당 LDAP 서버를 이용하는 로그인 시도를 차단하게 됩니다."
     login_required: 필수임
     no_auth_mixing: "인증 유형을 혼합할 수 없음"
     no_changing_auth_types: "인증 구성의 유형을 바꿀 수 없습니다. 삭제하고 새로운 구성을 만드시기 바랍니다."
@@ -232,19 +258,41 @@ ko:
   account_reports: 
     default: 
       all_terms: "모든 학기"
+      course_text: "해당 과목: %{course};"
+      description: 
+        header: 예
+      end_text: "종료: %{end_at};"
+      error_text: "실패했습니다. 다음 오류 코드를 시스템 관라지에게 알려주시기 바랍니다: ErrorReport:%{error};"
       extra_text_term: "학기: %{term_name};"
       message: "다음 설정으로 %{type} 보고서를 성공적으로 생성했습니다. Account: %{account}; %{options}"
+      section_text: "해당 섹션: %{section};"
+      start_text: "시작: %{start_at};"
+      term_text: "학기: %{term_name};"
     grades: 
       deleted: "삭제된 개체 포함: 예;"
     mississippi: 
       reports: "보고서: %{files}"
+    outcomes: 
+      order: "순서: %{order}"
+    report_header_attempt: 시도
+    report_header_course: 과목
+    report_header_created_at: "생성 시각"
+    report_header_email: 이메일
+    report_header_id: ID
+    report_header_name: 이름
+    report_header_section: 섹션
+    report_header_section__id: "섹션 ID"
     sis_exporter: 
       deleted: "삭제된 개체 포함: 예;"
       reports: "보고서: %{files}"
   account_settings: 
+    account: 계정
+    account_name_too_long: "계정 이름이 너무 김"
     confirms: 
       delete_announcement: "이 공지 사항을 삭제하시겠습니까?"
+      global_announcement: "전체 공지를 확인해야 함"
       remove_account_admin: "이 계정 관리자글 제거하시겠습니까?"
+    course: 과목
     custom_text_blank: "[사용자 정의 텍스트]"
     links: 
       turnitin: 
@@ -258,11 +306,14 @@ ko:
       configure_report: "구성 보고서"
       open_registration_delegated_warning_dialog: "외부 ID 공급자를 사용함"
       what_are_quiz_ip_filters: "퀴즈 IP 필터가 무엇입니까?"
+    user: 사용자
   account_user: 
     types: 
       account_admin: "계정 관리자"
   accounts: 
     account_name_required: "계정 이름이 있어야 함"
+    account_quotas_not_updated: "계정 할당량을 업데이트하지 않았음"
+    account_quotas_updated: "계정 할당량을 업데이트했음"
     account_user: 
       remove_admin_tooltip: "이 관리자를 제거"
     add_course_button: "과목 추가"
@@ -290,6 +341,8 @@ ko:
     add_user_dialog_title: "새 사용자 추가"
     adding_course_message: "과목 추가 중..."
     adding_user_message: "사용자 추가 중..."
+    additional_settings: 
+      license: 라이선스
     additional_settings_right_side: 
       links: 
         suspend: "계정 일시 중단"
@@ -301,17 +354,26 @@ ko:
     admin_tools: 
       admin_tools: 
         tab_labels: 
+          admin_tools_logging: 로깅
           restore_course: "과목 복원"
         view_messages: "알림 보기"
       admin_tools_cumb: "관리 도구"
+      auth_logging_content_pane: 
+        auth_logging: "사용자 로그인 / 로그아웃 활동"
+      auth_logging_search_results: 
+        activity: 활동
+        date: 날짜
+        no_item_found: "항목을 찾을 수 없음"
+        time: 시간
       comm_message_item: 
         created_at: 생성일
         from_name: 시작
         reply_to: 회신
         sent_at: "발송:"
-        to: "받는 사람"
+        to: 수신
       comm_messages_content_pane: 
         search_info: "Canvas 사용자에게 전송된 모든 알림을 보려면 검색을 위한 Canvas 사용자 ID와 날짜 범위를 입력하십시오."
+        search_info2: "Canvas 사용자에게 전송된 모든 알림을 보려면 검색을 위한 사용자와 날짜 범위를 선택하십시오."
         view_notifications: "알림 보기"
       comm_messages_search_form: 
         canvas_user_id: "Canvas 사용자 ID"
@@ -322,6 +384,25 @@ ko:
         messages_viewed: "*%{start_date}*부터 *%{end_date}*까지 *%{user}*에게 전송된 알림입니다."
       comm_messages_search_results: 
         no_messages_found: "찾은 메시지 없음"
+      course_logging_content: 
+        find: 찾기
+      course_logging_details: 
+        From: 시작
+        To: "받는 사람"
+        Value: 값
+        date: 날짜
+        event_source_label: 원본
+        event_type_label: 유형
+        time: 시간
+        user: 사용자
+      course_logging_results: 
+        date: 날짜
+        event_details: "행사 세부 정보"
+        event_source: 원본
+        event_type: 유형
+        no_item_found: "항목을 찾을 수 없음"
+        time: 시간
+        user: 사용자
       course_search_form: 
         labels: 
           find_deleted_course: "삭제된 과목 찾기"
@@ -347,7 +428,48 @@ ko:
         successfull_restore: 
           add_enrollments: "등록 추가"
           subtext: "다음에 어떤 작업을 하시겠습니까?"
+      date_range_search: 
+        message_date_from: "시작 날짜"
+        message_date_to: "끝 날짜"
+      grade_change_logging_content: 
+        find: 찾기
+      grade_change_logging_results: 
+        Assignment: 과제
+        Course: 과목
+        Student: 학생
+        To: "받는 사람"
+        date: 날짜
+        from: 시작
+        no_item_found: "항목을 찾을 수 없음"
+        time: 시간
+      logging_content_pane: 
+        authentication: "로그인 / 로그아웃 활동"
+        select_default: "로그 유형 선택"
+        select_label: "검색하려는 로그 유형을 선택하십시오."
       page_title: "%{account}의 관리 도구"
+      user_date_range_search_form: 
+        find: 찾기
+        generate_activity_userid: "사용자 ID: *%{user_id}*"
+        generate_activity_username: "*%{user}*의 일반 활동"
+        message_date_from: "시작 날짜"
+        message_date_to: "끝 날짜"
+        search: 검색
+        search_people: "사람 검색"
+    assignment_scheduling_csv_parameters: 
+      account_reports: 
+        newark: 
+          assignment_groups: 
+            label: "포함할 과제 그룹:"
+          assignments: 
+            check_box: 과제
+          papers: 
+            check_box: 보고서
+          projects: 
+            check_box: 프로젝트
+          reports: 
+            check_box: 보고서
+          tests: 
+            check_box: 테스트
     avatars: 
       all_link: 
         one: "모두(%{count})"
@@ -377,6 +499,11 @@ ko:
       unlock_link: "잠금 해제"
     cannot_manage_account: "계정 설정을 관리할 권한이 없음"
     cannot_manage_quotas: "할당량 설정을 관리할 권한이 없음"
+    ccp_zero_activity_csv_parameters: 
+      account_reports: 
+        ccp: 
+          filter_online: 
+            check_box: "온라인 과목만"
     confirm_delete_user: 
       confirm_delete: "이 사용자를 계정 %{account}에서 삭제하시겠습니까? 그러면 모든 과목과 그룹에서 해당 사용자의 (성적을 포함한) 자료를 삭제합니다. 이 작업은 실행을 취소할 수 없습니다."
       delete_button: "%{user} 삭제"
@@ -412,6 +539,7 @@ ko:
             text: "이 보고서는 해당 학기의 모든 과목에 대한 상태를 표시합니다. 결과 csv 파일은 과목 섹션 당 하나의 행을 가지며, 해당 섹션의 과목, 과목 상태, 학기, 실제 시작 날짜 및 끝 날짜, 기록 교사를 표시합니다."
           description: 
             header: 예
+    course_type: 과목
     courses: 
       courses_crumb: 과목
       no_results_message: "검색 결과 없음"
@@ -437,7 +565,20 @@ ko:
         ross: 
           parameters: 
             note: " "
+    custom_outcomes_csv_parameters: 
+      account_reports: 
+        edison: 
+          outcome: 
+            text: "성과 ID:"
     date_picker_parameter: 
+      account_reports: 
+        default: 
+          end: 
+            parameters: 
+              header: "끝 날짜:"
+          start: 
+            parameters: 
+              header: "시작 날짜:"
       custom_reports: 
         end: 
           parameters: 
@@ -447,6 +588,8 @@ ko:
             header: "시작 날짜:"
     default_account_quotas_not_updated: "기본 계정 할당량을 업데이트하지 않았음"
     default_account_quotas_updated: "기본 계정 할당량을 업데이트했음"
+    find_not_authorized: "%{type}을(를) 액세스할 권한이 없음"
+    find_not_found: "해당 ID를 가진 %{type}을(를) 찾을 수 없음"
     google_doc_accounts_csv_description: 
       account_reports: 
         ut_austin: 
@@ -460,6 +603,7 @@ ko:
           description: 
             header: 예
             text: "이 보고서는 해당 학기의 모든 학생에 대한 최종 평가 결과를 표시합니다. 결과 csv 파일은 등록 학생 당 하나의 행을 가지며, 과목 평가 기록부에 표시된 현재 평가 및 최종 평가를 표시합니다."
+    group_type: 그룹
     include_deleted_parameter: 
       account_reports: 
         default: 
@@ -471,6 +615,18 @@ ko:
       page_title: 계정
       title: "계정 | 관리"
     integer_required: "정수 값이 필요함"
+    last_user_access_csv_description: 
+      account_reports: 
+        default: 
+          last_user_access: 
+            text: "이 보고서는 활성 사용자의 마지막 로그인을 표시합니다."
+    learning_outcome_assignment_type_csv_parameters: 
+      account_reports: 
+        samuel_merrit_university: 
+          course: 
+            text: "과목 ID"
+          parameters: 
+            note1: "해당 학기의 모든 과목에 대해 보고서를 생성하려면 과목 ID가 공란일 수 없습니다."
     mississippi_sis_csv_description: 
       account_reports: 
         mississisppi: 
@@ -486,6 +642,27 @@ ko:
           users: 
             check_box: "사용자 CSV"
     no_user_message: "해당 ID를 가진 사용자를 찾을 수 없음"
+    outcome_results_csv_description: 
+      account_reports: 
+        outcomes: 
+          description: 
+            text: "이 보고서는 모든 학생에 대한 학습 성과를 표시합니다. 결과 csv 파일은 사용자-성과 쌍마다 하나의 행을 가지며, 관련 과제를 포함한 결과의 세부 정보를 표시합니다."
+    outcome_results_csv_parameters: 
+      account_reports: 
+        outcomes: 
+          course: 
+            radio: 과목
+          order: 
+            label: 순서
+          outcome: 
+            radio: 성과
+          user: 
+            radio: 사용자
+    ph_student_grades_csv_parameters: 
+      account_reports: 
+        penn_harris: 
+          parameters: 
+            note: " "
     provisioning_csv_description: 
       account_reports: 
         sis_export: 
@@ -505,18 +682,54 @@ ko:
             text: "이 보고서는 해당 학기의 모든 퀴즈에 대해 얼마나 많은 사용자가 질문에 답변했으며, 얼마나 많은 사용자가 정확하게 답변했는지 표시합니다. 결과 csv 파일은 퀴즈 질문 당 하나의 행을 가집니다."
     quota_integer_required: "정수 값이 필요함"
     quota_must_be_positive: "값이 양수이어야 함"
+    quota_not_updated: "할당량을 업데이트하지 않았음"
     quota_too_large: "값이 너무 큼"
+    quota_updated: "할당량을 업데이트했음"
+    recently_deleted_courses_csv_description: 
+      account_reports: 
+        default: 
+          recently_deleted_courses: 
+            text: "이 보고서는 지난 30일 동안 삭제된 해당 학기의 모든 과목을 표시합니다. 결과 csv 파일은 과목 당 하나의 행을 가지며, 과목 ID, 과목 SIS ID, 짧은 과목 이름, 과목 이름, 과목 시작 날짜와 끝 날짜를 표시합니다."
     retry_login: "로그인 다시 시도"
     root_accounts: 
       labels: 
         name: "계정 이름"
+    safety_drill_csv_parameters: 
+      account_reports: 
+        newark: 
+          assignment_groups: 
+            label: "포함할 과제 그룹:"
+          assignments: 
+            check_box: 과제
+          papers: 
+            check_box: 보고서
+          projects: 
+            check_box: 프로젝트
+          reports: 
+            check_box: 보고서
+          tests: 
+            check_box: 테스트
+    scantron_quiz_csv_parameters: 
+      account_reports: 
+        edison: 
+          quiz_id: 
+            field: "퀴즈 ID"
+          section_id: 
+            field: "섹션 ID"
     settings: 
       about_google_docs: |-
-          사용자들의 편의를 위해서 워드 문서(Word docs), PDF 파일, 엑셀 스프레드 시트(Excel spreadsheets),나 다른 오픈 오피스 문서 (해당 소프트웨어를 사용자의 컴퓨터에 설치하도록 요구하지 않을 뿐만 아니라)를 강제로 다운로드 받도록 하지 않고, Canvas의 여러 곳에서 해당 문서를 웹사이트 내에서 볼 수 있도록 합니다.
+          구글 Docs 미리보기로 캔버스 안에서 문서를 열람할 수 있으며 다운로드를 따로 받아서 (워드 엑셀 같은) 해당 응용프로그램으로 열지 않아도 됩니다.
           
-          만약 본 계정에 Scribd를 사용할 수 있도록 설정되었다면, Scribd를 사용해서 문서 미리보기를 할 것입니다. 그러나 Scribd는 문서보기를 위해 플래쉬 기능을 사용하는데, 많은 사용자들(아이패드/아이폰 사용자)이 플래쉬 플레이어가 설치되어 있지 않은 경우, 미리보기를 사용할 수 없습니다. 따라서 구글 문서 미리보기(Google Docs Previews)기능을 사용으로 설정해 두시면, 사용 웹브라우저가 플래쉬를 지원하지 않거나 Scribd가 미사용으로 설정되어 있을 경우, 구글 문서(Google Docs)가 제공하는 미리보기 기능을 사용합니다. 본 서비스는 구글 뷰어(Google's viewer)의 사용조건을 따릅니다. [terms of service](%{terms_url})
+          이 계정에 Scribd 가 활성되었으며 이로써 캔버스는 미리보기 기능을 사용할 것입니다. 문서가 Scribd 로 미리보기 되지 않거나 사용자에게 플래시 재생기가 설치되어 있지 않은 경우에 (iPad 이거나 iPhone 인 경우) 캔버스는 구글 Docs 가 활성되어 있다면 거기로 돌아가서 미리보기 실행을 할 것입니다. 이 서비스를 이용하심으로써 귀하는 [구글 Docs 뷰어 서비스 약관](%{terms_url})에 읽고 동의한 것으로 인정하는 셈입니다.
       about_google_docs_tooltip: "구글 문서 미리보기에 대한 정보"
       account_admins_title: "계정 관리자"
+      account_quotas: 
+        file_quota: "파일 할당량"
+        gigabytes: 기가바이트
+        media_quota: "미디어 할당량"
+        site_admin_quotas: "사이트 관리자 할당량"
+        student_quota: "학생 할당량"
+        update: 업데이트
       account_settings_title: "계정 설정"
       add_a_custom_help_link: "사용자 정의 도움말 링크 추가"
       add_admin_title: "계정 관리자 추가"
@@ -530,10 +743,12 @@ ko:
       alert_icon_warning_option: 경고
       alert_timespan: "%{start_at}부터 %{end_at}까지"
       alerts_title: 알림
+      announcement_sent_to_subset: "매달 1 / %{denominator} 사용자에게 보냄"
       buttons: 
         add_users: "좋습니다. 이 사용자들을 추가합니다."
         continue: 계속...
         modify_users: "돌아가서 사용자 목록 편집"
+      confirm_global_announcement: "이 공지는 *모든* Canvas 사용자에게 표시됩니다. 정말 공지할 것인지 확인하십시오."
       confirm_turnitin_settings_link: "Turnitin 설정 확인"
       create_courses_description: "(계정 관리자는 항상 과목을 개설할 수 있음)"
       create_courses_title: "새 과목을 개설할 수 있는 사용자"
@@ -551,6 +766,7 @@ ko:
       global_announcements_title: "전체 공지"
       global_js_and_css_includes_description: "이 파일은 계정에 대해 로드되는 모든 페이지에 포함됩니다."
       global_js_and_css_includes_title: "전역 자바스크립트 및 CSS"
+      google_docs_domain: "허용되는 Google Docs 도메인"
       headers: 
         report_last_run: "마지막 실행"
         report_name: 이름
@@ -571,6 +787,7 @@ ko:
         canvas_authentication: "Canvas 인증"
         default_language: "기본 언어"
         default_time_zone: "기본 표준 시간대"
+        domain: "도메인:"
         edit_institution_email: "사용자가 기관에서 할당한 이메일 주소를 삭제할 수 있음"
         enable_alerts: 알림
         enable_eportfolios: ePortfolios
@@ -599,6 +816,7 @@ ko:
         prevent_course_renaming_by_teachers: "교사가 과목 이름을 변경하지 못하도록 함"
         restrict_student_future_view: "학생이 시작일 이전의 과목을 볼 수 없도록 제한"
         self_enrollment: "직접 등록 허용"
+        self_registration: "자동 등록"
         show_scheduler: "일정 관리 사용"
         sis_source_id: "SIS ID"
         start_at: 시작
@@ -609,6 +827,7 @@ ko:
         turnitin: Turnitin
         turnitin_account_id: "Turnitin 계정 ID"
         turnitin_comments: "제출물 설명"
+        turnitin_host: "Turnitin 호스트"
         turnitin_pledge: "Turnitin 서약"
         turnitin_shared_secret: "Turnitin 공유 비밀"
         users_can_edit_name: "사용자가 표시 이름을 편집할 수 있음"
@@ -616,6 +835,15 @@ ko:
         add_admins: "계정 관리자 추가"
         configure_report: 구성...
         run_report: "보고서 실행"
+      manual_quotas: 
+        find_button: 찾기
+        manual_quotas_title: "수동으로 설정할 수 있는 할당량"
+        megabytes: 메가바이트
+        megabytes_tooltip: 메가바이트
+        select_type_courses: "과목 ID"
+        select_type_groups: "그룹 ID"
+        select_type_label: "과목이나 그룹 찾기"
+        update_button: "할당량 업데이트"
       never_allow_self_enrollment_option: "허용 안 함"
       no_language_preference: "설정 안 됨 (기본값은 %{language})"
       notifications: 
@@ -644,6 +872,7 @@ ko:
       quotas: 
         default_account_quota_title: "기본 계정 할당량"
         default_course_storage_quota: "과목 할당량"
+        default_group_storage_quota: "그룹 할당량"
         default_user_storage_quota: "사용자 할당량"
         megabytes: 메가바이트
         megabytes_tooltip: 메가바이트
@@ -659,10 +888,11 @@ ko:
       self_enroll_for_any_courses_option: "모든 과목"
       self_enroll_for_manually_created_courses_option: "수동으로 개설한 과목"
       settings_crumb: 설정
+      survey_announcement: "이는 설문 공지입니다. 매달 사용 가능한 계정의 1 / %{denominator} 사용자에게 전송합니다."
       tab_admins: 관리자
       tab_alerts: 알림
       tab_announcements: "공지 사항"
-      tab_external_tools: 외부도구
+      tab_external_tools: 앱
       tab_notifications: 알림
       tab_quotas: 할당량
       tab_reports: 보고서
@@ -803,6 +1033,11 @@ ko:
             header: 예
           student_activity: 
             text: "이 보고서는 해당 학기의 주어진 과목이나 모든 과목에 등록한 학생의 모든 활동을 표시합니다. 결과 csv 파일은 학생 활동 당 하나의 행을 가지며 다음 머리글을 갖게 됩니다: 섹션 ID, 섹션 SIS ID, 섹션 이름, 과목 ID, 과목 SIS ID, 과목 이름, 사용자 ID, 사용자 SIS ID, 내용 유형, 내용, 본 횟수, 참여한 횟수, 마지막으로 본 날짜. 본 횟수와 참여한 횟수는 처음부터 보고서를 만들 때까지의 카운터입니다."
+    student_assignment_outcome_map_csv_description: 
+      account_reports: 
+        student_assignment_map: 
+          description: 
+            text: "이 보고서는 모든 학생에 대한 학습 성과를 표시합니다. 결과 csv 파일은 사용자-성과 쌍마다 하나의 행을 가지며, 관련 과제를 포함한 결과의 세부 정보를 표시합니다. 이 보고서는 과제에 대한 성과만 표시하며 문제 은행과 관련한 성과는 포함하지 않습니다."
     student_ip_csv_description: 
       account_reports: 
         dubspot: 
@@ -843,6 +1078,14 @@ ko:
         submission_data: 
           description: 
             text: "이 보고서는 출석 도구의 제출 날짜를 포함합니다."
+    tempe_grade_export_csv_parameters: 
+      account_reports: 
+        tempe: 
+          course: 
+            text: "과목 ID"
+          parameters: 
+            note1: "해당 학기의 모든 과목에 대해 보고서를 생성하려면 과목 ID가 공란일 수 없습니다."
+            note2: " "
     terms_parameters: 
       account_reports: 
         default: 
@@ -855,15 +1098,28 @@ ko:
     test_ldap_result_ok: 정상
     test_login: "테스트 로그인"
     testing: "테스트 중..."
+    unpublished_courses_csv_description: 
+      account_reports: 
+        default: 
+          unpublishd_courses: 
+            text: "이 보고서는 해당 학기의 게시되지 않은 모든 과목을 표시합니다. 결과 csv 파일은 과목 당 하나의 행을 가지며, 과목 ID, 과목 SIS ID, 짧은 과목 이름, 과목 이름, 과목 시작 날짜와 끝 날짜를 표시합니다."
     unrecognized_time_zone: "'%{timezone}'을(를) 인식할 수 없음"
     unused_courses_csv_description: 
       account_reports: 
+        unused_courses: 
+          main: 
+            text: "이는 다음 항목을 하나도 포함하지 않은 모든 과목에 대한 보고서입니다: 과제, 공지, 토론, 모듈, 페이지, 퀴즈."
         uw: 
           description: 
             header: 예
           student_submissions: 
             text: "이는 다음 항목을 하나도 포함하지 않은 모든 과목에 대한 보고서입니다: 과제, 공지, 토론, 모듈, 페이지, 퀴즈."
     update_failed_notice: "계정 설정 업데이트 실패"
+    user_access_csv_parameters: 
+      account_reports: 
+        usu: 
+          enrollment_type: 
+            header: "등록 유형"
     user_add_failed_message: "사용자 추가 실패"
     user_added_message: "%{user}를 성공적으로 추가함"
     user_added_message_sent_message: "%{user}를 성공적으로 추가했습니다. 잠시 후 사용자는 이메일 확인을 받게 됩니다."
@@ -880,6 +1136,16 @@ ko:
         webster: 
           login: 
             day_drop: "방문한 최소 과목 항목:"
+    users_list: 
+      login_name_or_sis_id: "로그인 / SIS ID"
+      name: 이름
+      no_people_found: "사람 없음"
+      you_can_search_by: "다음 조건으로 검색 가능:"
+    zero_activity_csv_description: 
+      account_reports: 
+        default: 
+          zero_activity: 
+            text: "이 보고서는 주어진 학기의 과목에 등록된 사용자를 모두 표시합니다. 결과 CSV 파일은 해당 날짜 이후에 과목을 방문하지 않은 사용자 등록 당 하나의 행을 가지고 있습니다."
   activerecord: 
     errors: 
       full_messages: 
@@ -923,7 +1189,7 @@ ko:
     alert: 
       buttons: 
         add_criterion: "트리거 추가"
-        add_recipient: "받는 사람 추가"
+        add_recipient: "수신인 추가"
         save_alert: "알림 저장"
       criteria: "알림을 보낼 때"
       labels: 
@@ -985,11 +1251,13 @@ ko:
     file_copy_fail: "\"%{base_path}\" 폴더를 복사할 수 없음"
     file_copy_fail_message: "\"%{path}\" 경로로 디렉토리 이름을 바꿀 수 없음"
     file_import_fail: "\"%{file_path}\" 파일을 가져올 수 없음"
+  angel_display: "ANGEL 학습"
   angel_file_description: "Angel 내보내기 .zip 형식"
   announcement: 
     no_title: "제목 없음"
   announcements: 
     announcements_crumb: 공지
+    error_draft_state: "이 주제는 공지 사항이므로 초안 상태로 설정할 수 없습니다."
     external_feed: 
       alts: 
         deleted_feed: "이 피드 삭제"
@@ -1005,6 +1273,21 @@ ko:
       feed_title_group: "그룹 공지 Atom 피드"
       podcast_title_course: "과목 공지 Podcast 피드"
       podcast_title_group: "그룹 공지 Podcast 피드"
+    index_view: 
+      delete: 삭제
+      loading: "로드하는 중..."
+      lock_for_comments: "의견 잠금"
+      make_an_announcement: 공지하기
+      make_an_announcement_caps: 공지하기
+      make_sure_all_search_terms_are_spelled_correctly: "모든 검색 용어의 철자가 올바른지 확인하십시오. "
+      rss_feed: "RSS 피드"
+      search_title_body_or_author: "제목, 내용, 작성자 검색"
+      suggestions: "제안:"
+      there_are_no_announcements_show: "표시할 공지가 없음"
+      try_different_more_general_or_fewer_keywords: "다른 키워드나 보다 일반적인 키워드나 더 적은 키워드로 다시 시도해 보십시오."
+      try_disabling_the_unread_filters: "\"읽지 않음\" 필터를 사용하지 말아 보십시오."
+      unread: "읽지 않은 메시지"
+      your_search_did_not_match_any_announcements: "검색과 일치하는 공지가 없습니다."
     podcast_feed_description_course: "\"%{course}\" 과목에 속한 공지에서 링크하거나 포함된 모든 미디어 파일이 이 피드에 표시됩니다."
     podcast_feed_name: "%{course} 공지 Podcast 피드"
   application: 
@@ -1097,6 +1380,8 @@ ko:
     messages: 
       assignment_created: "과제 \"%{assignment}\"을(를) 생성함"
     name_is_required: "이름이 필요합니다!"
+    percentage_points_possible: "백분률 평가에서 가능한 점수는 0 이상이어야 함"
+    points_possible_number: "가능한 점수는 숫자이어야 함"
     select_external_tool_dialog_title: "외부 도구 구성"
     show_advanced_options: "고급 옵션 표시"
     submission_action_take_quiz: "%{title} 보기"
@@ -1141,6 +1426,9 @@ ko:
       created: "과제 그룹을 성공적으로 만들었습니다."
       deleted: "그룹이 삭제됨"
       updated: "과제 그룹을 성공적으로 업데이트했습니다."
+  assignment_groups_api: 
+    errors: 
+      frozen_assignments_error: "잠긴 과제를 포함한 그룹을 삭제할 수 없습니다."
   assignment_muter: 
     mute_assignment: "과제 평점 비공개"
     muting_assignment: "과제 평점 비공개 중..."
@@ -1196,6 +1484,17 @@ ko:
         cancel: 취소
       links: 
         add_assignment_group: "과제 그룹 추가"
+    assignment_group_list: 
+      no_assignment_groups: "과제 그룹을 찾을 수 없음"
+    assignment_group_list_item: 
+      add_assignment_to: "%{name}에 과제 추가"
+      assignment_group_delete: "과제 그룹 삭제"
+      assignment_group_edit: "과제 그룹 편집"
+      assignment_group_move: "과제 그룹 이동"
+      delete: 삭제
+      edit: 편집
+      group_weight: "전체 중 %{groupWeight}%"
+      manage: 관리
     assignment_group_selector: 
       assignment_group: "과제 그룹"
       assignment_group_options: 
@@ -1203,10 +1502,36 @@ ko:
     assignment_groups_count: 
       one: "그룹 %{count}개"
       other: "그룹 %{count}개"
+    assignment_list_item: 
+      assignment_delete: "과제 삭제"
+      assignment_edit: "과제 편집"
+      assignment_move: "과제 이동"
+      delete: 삭제
+      edit: 편집
+      module: 모듈
+      multiple_modules: "여러 모듈"
+      no_points_possible: "가능한 점수 없음"
+      points_possible: "%{pointsPossible}점"
+      points_possible_screen_reader: "%{pointsPossible}점 가능"
+      settings: 설정
+    assignment_list_item_score: 
+      assignment_grading_type_is_not_graded: "이 과제는 평점이 할당되지 않습니다."
+      assignment_not_yet_graded_screenreader: "과제물을 아직 평가하지 않았습니다. %{pointsPossible}점이 가능합니다."
+      empty_points_possible: "-/%{pointsPossible}점"
+      no_submission: "제출물 없음"
+      no_submission_for_assignment_screenreader: "이 과제에 대한 제출물이 없습니다. %{pointsPossible}점이 가능합니다."
+      not_yet_graded: "*평가 안 됨*"
+      score_with_points_possible: "*%{score}*/%{pointsPossible} pts"
+      score_with_points_possible_screenreader: "점수: %{pointsPossible}점 중 %{score}"
     assignment_locked: 
       assignment_locked: "이 과제는 *%{lock_at}* 현재 잠겨 있음"
       assignment_unlocked_from: "이 과제는 *%{unlock_at}*까지 잠겨 있음"
       assignment_unlocked_from_to: "이 과제는 *%{unlock_at}*부터 *%{lock_at}*까지 잠금 해제되어 있음"
+    assignment_settings: 
+      cancel: 취소
+      save: 저장
+      validating: "저장 중..."
+      weight_groups: "과제 그룹을 바탕으로 최종 평가를 가중"
     assignment_sidebar: 
       buttons: 
         publish: "이 과제를 게시"
@@ -1232,6 +1557,10 @@ ko:
       warnings: 
         delete_assignment_group: "%{group} 과제 그룹에 %{assignment_count}개의 과제가 있습니다. 이 과제를 삭제하거나 다른 과제 그룹으로 옮길 수 있습니다."
     assignments_list_content: 
+      assignments: 
+        graded: "이 과제는 평가됨"
+        needs_grading_count: "이 과제의 제출물 %{needs_grading_count}개의 평가가 필요함"
+        overdue: "과제가 지연됨"
       no_assignments: "이 과목에 과제가 없습니다."
       titles: 
         assignments: 과제
@@ -1255,15 +1584,75 @@ ko:
       assignment_groups_wrapper: "(그룹 %{number_of_groups}개 중)"
       links: 
         add_assignment_group: "과제 그룹 추가"
+    available_date_description: 
+      closed: 닫힘
     buttons: 
       add_group: "그룹 추가"
       delete_group: "그룹 삭제"
       submit_assignment: "과제 제출"
+    cannot_delete_group: "하나 이상의 과제 그룹이 있어야 합니다."
+    cant_unpublish_when_students_submit: "확생 제출물이 있으면 게시를 취소할 수 없음"
+    complete: 완료
     confirm: 
       delete_assignment: "이 과제를 삭제하시겠습니까?"
       delete_group: "이 그룹을 삭제하시겠습니까?"
+    confirm_delete_group: "이 과제 그룹을 삭제하시겠습니까?"
+    confirms: 
+      delete_assignment: "이 과제를 삭제하시겠습니까?"
+    create_assignment: 
+      assignment: 과제
+      assignment_due_at: "기한:"
+      assignment_name: "이름:"
+      assignment_points: "점수:"
+      assignment_type: "유형:"
+      cancel: 취소
+      discussion_type: 토론
+      external_tool_type: "외부 도구"
+      more: "기타 옵션"
+      multiple_due_dates: "기한: 여러 기한"
+      not_graded_type: "평가 안 됨"
+      quiz_type: 퀴즈
+      save: 저장
+      saving: "저장 중..."
+    create_group: 
+      cancel: 취소
+      drop_highest: "최고 점수:"
+      drop_lowest: "최저 점수:"
+      example_group_name: "예) 에세이 그룹 1"
+      group_name: "그룹 이름:"
+      never_drop: "제외 안 함:"
+      percent_of_total: "전체 평점의 %"
+      save: 저장
+      saving: "저장 중..."
     create_new_crumb: "새로 만들기"
+    date_available_column_view: 
+      available: "사용 가능"
+      multiple_dates: "여러 날짜"
+    date_due_column_view: 
+      due: 기한
+      due_date: 기한
+      multiple_dates: "여러 날짜"
+    delete_group: 
+      cancel: 취소
+      delete: "그룹 삭제"
+      deleting: "삭제 중..."
+      labels: 
+        delete_assignments_in_group: "과제 삭제"
+        move_assignments_to: "다음으로 과제 이동"
+      options: 
+        select_group: "그룹 선택"
+      tooltips: 
+        target_group: "이 과제를 이동할 그룹 선택"
+      warnings: 
+        delete_assignment_group: "**%{assignment_count}**개의 과제를 포함한 *%{name}*를 삭제하려고 합니다."
+      would_you_like: "원하는 작업:"
+    drop_highest_rule: 
+      one: "최고 점수 %{count}개 제외"
+      other: "최고 점수 %{count}개 제외"
     drop_highest_scores: "최고 점수 %{number}개 제외"
+    drop_lowest_rule: 
+      one: "최저 점수 %{count}개 제외"
+      other: "최저 점수 %{count}개 제외"
     drop_lowest_scores: "최저 점수 %{number}개 제외"
     due_date_override: 
       overrides: 
@@ -1271,10 +1660,19 @@ ko:
         due_date: 기한
         for: 과제
       until: "다음 시간까지"
+    due_date_view: 
+      overrides: 
+        remove_these_dates: "이 날짜 제거"
     edit: 
       edit_assignment: "과제 편집"
       new_discussion: "새 토론"
       new_quiz: "새 퀴즈"
+    edit_header_view: 
+      buttons: 
+        not_published: "게시 안 됨"
+        published: 게시됨
+      titles: 
+        delete: 삭제
     edit_view: 
       assignment_name: "과제 이름"
       buttons: 
@@ -1293,6 +1691,12 @@ ko:
       deleting_group_failed: "삭제 실패"
       google_docs_masquerade_rejected: "Google Docs에 가장된 사용자로 연결할 수 없습니다."
       reminder_failed: "미리 알림 실패"
+    everyone_else: "다른 모든 사람"
+    external_content_homework_submission_view: 
+      additional_comments: "추가 의견"
+      buttons: 
+        submit_assignment: "과제 제출"
+      group_assignment_header: 의견...
     external_grader_sidebar: 
       edit_assignment_settings: "과제 설정 편집"
       speed_grader: "Speed Grader"
@@ -1314,8 +1718,14 @@ ko:
           학생이 제출물 파일에 대한 의견에서 변경된 파일을 볼 수 있습니다.
           
           *파일 이름을 인식할 수 있도록 제출물 파일의 이름을 바꾸지 마십시오.*
+      speed_grader: SpeedGrader™
       titles: 
         related_items: "관련 항목"
+    grade_gpa_scale_screenreader: "평점: %{grade}"
+    grade_letter_grade_screenreader: "평점: %{grade}"
+    grade_pass_fail_screenreader: "평점: %{grade}"
+    grade_percent: "%{grade}%"
+    grade_percent_screenreader: "평점: %{grade}%"
     graded: "이 과제는 평가됨"
     grading_type_selector: 
       grading_type: "평가 유형"
@@ -1343,6 +1753,8 @@ ko:
         assignment_group: "과제 그룹"
         group_weight: 가중치
         total: 합계
+    higher_than_max: "과제 수 이상의 숫자를 사용할 수 없음"
+    incomplete: "완료 안 됨"
     index: 
       assignment_locked: "현재 이 과제는 잠겨 있습니다. 자세한 정보를 보려면 과제 세부 정보를 방문하십시오."
       assignment_locked_tooltip: 잠김
@@ -1355,6 +1767,7 @@ ko:
         previous_assignment_or_group: "이전 과제/그룹"
       keycodes: 
         add_assignment_or_group: a
+        close_active_dialog: ESC
         delete_assignment_or_group: d
         edit_assignment_or_group: e
         full_preview: f
@@ -1363,8 +1776,27 @@ ko:
       links: 
         wizard: 도움말
       page_title: 과제
+    index_view: 
+      add_assignment: 과제
+      add_group: 그룹
+      assignments: 과제
+      assignments_settings: "과제 설정"
+      assignments_settings_screenreader: "과제 설정"
+      search_for_assignment: "과제 검색"
+      title_add_assignment: "과제 추가"
+      title_add_group: "과제 그룹 추가"
     invalid_file_retrieval: "이 도구에서 전송한 파일을 검색하는 데 문제가 발생했습니다."
     invalid_tool_return: "시작한 도구가 이 과제에 대해 잘못된 자원을 반환했습니다."
+    keycodes: 
+      add_item: a
+      close_menu: ESC
+      del_item: d
+      edit_item: e
+      next: j
+      previous: k
+      show_assign: f
+    labels: 
+      assignment_group_move_label: "과제 그룹"
     loading_tools_failed: "도구 로드 실패"
     messages: 
       adding_group: "그룹 추가 중..."
@@ -1376,10 +1808,24 @@ ko:
       submit_failed: "제출에 실패했습니다. 다시 시도하시기 바랍니다."
       submitting: "제출 중..."
     multiple_due_dates: "여러 기한"
+    name_is_required: "이름이 필요합니다!"
+    name_too_long: "이름이 너무 김"
+    name_too_long_error: "이름이 너무 김"
     needs_grading_count: "이 과제의 제출물 %{needs_grading_count}개의 평가가 필요함"
+    never_drop_collection: 
+      add_another_assignment: "다른 과제 추가"
+      add_first_assignment: "과제 추가"
+    never_drop_rule: "%{assignment_name}을(를) 드롭한 적 없음"
     never_drop_scores: "%{assignment_name}을(를) 드롭한 적 없음"
     no_assignments: "[과제 없음]"
+    no_assignments_list_item: 
+      no_assignments_in_this_group: "이 그룹에 과제가 없음"
+    no_assignments_search: 
+      aria_assignments: 과제
+      assignments: 과제
+      no_assignments_found: "과제를 찾을 수 없음"
     no_tools_found: "도구 없음"
+    non_number: "숫자를 사용해야 함"
     notices: 
       assignment_delete: "과제가 삭제됨"
       created: "과제를 성공적으로 만들었습니다."
@@ -1420,6 +1866,7 @@ ko:
       titles: 
         automatically_assign_reviews: "자동으로 리뷰 할당"
         remind: "%{assessor}에게 평가에 대해서 알리기, %{time}에 마지막 알림"
+        reminder: "%{assessor}에게 평가에 대해서 알리기, %{time}에 마지막 알림"
     peer_reviews_selector: 
       labels: 
         automatically_assign_peer_reviews: "자동으로 피어 리뷰 할당"
@@ -1427,12 +1874,18 @@ ko:
         require_peer_reviews: "피어 리뷰 필요"
       locked_until: "검토 할당"
       peer_reviews_assign_at_explanation: "기한 이후의 날짜여야 합니다. 공란으로 두면 기한일을 사용합니다."
+      peer_reviews_header: "피어 리뷰"
       reviews_per_user: "사용자별 검토"
     percent_of_final_grade: "최종 평가의 %{percent}"
+    points_possible_number: "가능한 점수는 숫자이어야 함"
+    positive_number: "양수를 사용해야 함"
     redirect_page: 
       redirect_message: |-
           이 제출물은 URL이며 지금 해당 URL 링크로 갈 수 있습니다.  
           [제출물로 가려면 여기를 클릭하십시오](%{url})
+    rules_text: 
+      one: "규칙 %{count}개"
+      other: "규칙 %{count}개"
     select_assignment: "[과제 선택]"
     show: 
       assignment_locked: "현재 이 과제는 잠겨 있습니다."
@@ -1512,8 +1965,8 @@ ko:
       labels: 
         allow_file_uploads: "파일 업로드 허용"
         allow_media_recordings: "미디어 녹음/녹화 허용"
-        allow_text_entry: "텍스트 항목 허용"
-        allow_url: "웹 사이트 URL 허용"
+        allow_text_entry: "텍스트 항목"
+        allow_url: "웹 사이트 URL"
         allowed_extensions: "파일 확장자 허용"
         restrict_file_extensions: "업로드 파일 유형 제한"
       submission_type: "제출물 유형"
@@ -1530,12 +1983,14 @@ ko:
       comments_placeholder: 의견...
       errors: 
         unacceptable_file_type: "이 파일 유형은 허용되지 않습니다. 허용되는 파일 유형은 다음과 같습니다: %{allowed_extensions_list}"
+      gmail_restriction_description: "이 계정에서 Google Docs 제출물을 %{domain} 도메인에 있는 Google 계정으로 제한합니다. 이 과제를 Google Docs으로 제출하려면 사용자 설정 페이지에서 Google Docs 통합을 다시 구성해야 합니다."
       instructions: 
         from_external_tool: "아래 목록에서 로드할 도구를 선택하고 해당 도구가 제공하는 자원을 제출하십시오."
         google_docs: "아래 목록에서 파일을 선택하십시오."
         media_recording: "아래 링크를 이용하여 제출물을 녹음/녹화하십시오. 녹음/녹화를 마치고 제출할 준비가 되면 \"저장\"을 클릭하십시오."
         online_text_entry: "여기에 제출물을 복사해서 붙여넣거나 입력하십시오."
         online_url: "이 과제에 대해 제출하려는 웹사이트를 가리키는 링크를 복사해서 붙여넣으십시오."
+      invalid_google_docs_domain: "올바르지 않은 도메인"
       labels: 
         uploaded_data: 파일
         url: "웹사이트 URL"
@@ -1590,6 +2045,11 @@ ko:
     titles: 
       add_assignment_group: "과제 그룹 추가"
       uploading: "제출물 업로드"
+    toggle_message: "과제 표시 토글"
+    toggle_show_by: 
+      date: 날짜
+      show_by: "표시 기준:"
+      type: 유형
     turnitin_settings_dialog: 
       assignments: 
         turnitin_settings: 
@@ -1606,6 +2066,7 @@ ko:
           internet_check: "인터넷 데이터베이스"
           journal_check: "잡지, 정기 간행물, 출판물"
           student_paper_check: "다른 학생 보고서"
+        originality_report_never: 전혀
         originality_report_visibility: "학생이 독창성 보고서를 볼 수 있음"
         originality_report_visible_after_due_date: "기한 이후"
         originality_report_visible_after_grading: "과제 평가 이후"
@@ -1646,6 +2107,7 @@ ko:
       not_found: "파일 자료를 찾을 수 없음"
     feed_title: "파일: %{title}"
     feed_title_with_context: "파일, %{course_or_group}: %{title}"
+    over_quota: "다운로드 파일이 할당량을 초과합니다."
     title: 
       migration_list: "연결된 파일"
     upload_error_invalid_response_code: "유효하지 않은 응답 코드입니다. 200이 정상이지만 %{code}을(를) 받았습니다."
@@ -1654,7 +2116,7 @@ ko:
     upload_error_relative_uri: "URL에 제공된 호스트가 없음: %{url}"
     upload_error_timeout: "요청 시간 초과: %{url}"
     upload_error_too_many_redirects: "너무 많은 리디렉션"
-    upload_error_unexpected: "%{url}에서 다운로드 중 알 수 없는 오류 발생"
+    upload_error_unexpected: "%{url}에서 다운로드하는 중에 알 수 없는 오류 발생"
   attendance: 
     default_attendance_title: "%{date}의 출석"
     errors: 
@@ -1670,8 +2132,12 @@ ko:
     titles: 
       attendance_help: "출석 도움말"
       new_attendance_column: "새 출석 열"
+  auth_logging: 
+    login: 로그인
+    logout: 로그아웃
+  bb_display: "Blackboard 학습"
   bb_file_description: "Blackboard 6/7/8/9 내보내기 .zip 파일"
-  bb_name: "Blackboard 내보내기"
+  bb_name: "Blackboard 변환기"
   big_blue_button_conference: 
     recording_setting: 녹음/녹화
     recording_setting_description: "이 회의를 녹음/녹화"
@@ -1738,6 +2204,7 @@ ko:
       user_name_description: "행에 해당하는 과목에 대한 교사/디자이너 액세스를 가진 사용자의 사용자 이름입니다. 이는 위 Blackboard 로그인 자격 증명에 나열된 사용자 이름 중 하나와 일치해야 합니다."
     only_one_bulk_migration: "한번에 하나의 일괄 과목 마이그레이션만 실행할 수 있습니다."
   button: 
+    go_back: "뒤로 가기"
     submit_assignment: "과제 제출"
   buttons: 
     add_item: "항목 추가"
@@ -1755,15 +2222,21 @@ ko:
     manage_rubrics: "루브릭 관리"
     masquerade: "사용자로 가장"
     ok: 정상
+    okay: OK
+    publish: 게시
+    published: 게시됨
     refresh: "새로 고침"
     save: 저장
     search: 검색
+    send: 보내기
     send_message: "메시지 보내기"
     sending: "보내는 중..."
     sent: 전송했습니다!
     show_all_artifacts: "모든 아티팩트 표시"
     submit: 제출
     unmasquerade: "가장 중지"
+    unpublish: "게시 취소"
+    unpublished: "게시 안 됨"
     update: 업데이트
     view_account_roster: "계정 명부 보기"
     view_course_roster: "과목 명부 보기"
@@ -1853,9 +2326,18 @@ ko:
     last_formula_row: "마지막 수식 줄은 최종 결과를 계산하는 데 사용됨"
     sample_final_answer: "이 값은 이 문제 유형에 대한 최종 답변의 예제임"
   calendar: 
+    agenda_view: 
+      due: 기한
+      loading: "로드 중"
+      no_events: "이 날짜 이후에 행사가 없습니다."
+      starts_at: "시작 날짜"
+    agenda_view_displaying_start_end: "이제 %{start}부터 %{end}까지 표시함"
     appointment_group_deletion_details: "이를 삭제하면 학생이 등록한 약속도 삭제됩니다."
     appointment_group_list: 
+      delete: 삭제
+      edit: 편집
       location: "위치:"
+      manage: 관리
       message_groups: "다음 그룹에게 메시지 보내기"
       message_students: "다음 학생에게 메시지 보내기"
       my_appointment_groups: "내 약속 그룹"
@@ -1867,6 +2349,8 @@ ko:
       scheduler_explanation_teacher_paragraph_2: "예를 들어, 과목의 각 학생과 중간 학기 보고서 과제를 이야기한다고 해봅시다. 여러분은 새 약속 그룹을 만들고, 사용 가능한 날짜와 시간을 지정한 후, 해당 시간을 15분 블록으로 나누고, 시간 블록 당 한 명의 학생만 허용하도록 할 수 있습니다."
       scheduler_explanation_teacher_paragraph_3: "그러면 학생은 지정된 시간 블록 중 하나에 등록하라는 알림을 받게 됩니다. 표시되는 달력은 다른 항목 위에 사용 가능한 시간이 겹쳐서 나오므로 가능한 시간을 고를 수 있습니다."
       scheduler_explanation_teacher_paragraph_4: "* 오른쪽에 있는 \"약속 그룹 만들기\" 버튼을 클릭해서 지금 시작 *"
+      x_groups_have_signed_up: "%{participant_count} 그룹이 등록함"
+      x_people_have_signed_up: "%{participant_count} 사용자가 등록함"
     buttons: 
       cancel: 취소
       send_message: 전송
@@ -1879,6 +2363,21 @@ ko:
         calendar_week: 주
       refresh: "새로 고침"
       use_old_calendar: "이전 달력으로 돌아가기"
+    calendar_header: 
+      create_event: "새 행사 만들기"
+      done_go_back_to_list: "마침 - 목록으로 돌아가기"
+      links: 
+        calendar_agenda: 안건
+        calendar_month: 월
+        calendar_scheduler: "일정 관리"
+        calendar_week: 주
+      loading: "로드 중"
+      my_appointment_groups: "내 약속 그룹"
+    calendar_navigator: 
+      enter_navigation_date: "탐색하려는 날짜를 입력하십시오."
+      next: 다음
+      previous: 이전
+      today: 오늘
     calendar_title: "달력:"
     cancel_appointment: "%{name}와(과)의 약속을 취소하시겠습니까?"
     confirm_appointment_group_deletion: "이 약속 그룹을 삭제하시겠습니까?"
@@ -1933,6 +2432,8 @@ ko:
       from: "시작:"
       links: 
         more_options: "옵션 더 보기"
+      location: "위치:"
+      timespan_separator: 부터
       title: "제목:"
     edit_calendar_event_full: 
       buttons: 
@@ -1941,9 +2442,12 @@ ko:
       date: 날짜
       delete: 삭제
       different_date_for_each_section: "각 섹션에 다른 날짜를 사용"
+      edit_calendar_event_header: "달력 행사 편집"
       end_time: "끝 시각"
       event_description: "행사 설명"
       event_title: "행사 제목"
+      location_name: "위치:"
+      new_calendar_event_header: "새 행사"
       start_time: "시작 시각"
     edit_event: 
       tabs: 
@@ -1957,6 +2461,7 @@ ko:
     event_details: 
       attendees: 참석자
       calendar: 달력
+      close: 닫기
       details: "세부 정보"
       links: 
         delete: 삭제
@@ -1968,8 +2473,16 @@ ko:
       slots_available: "사용 가능한 슬롯"
     event_event_title: "행사 제목:"
     event_on_this_day: "이 날에 행사가 있음"
+    event_type: 
+      assignment: 과제
+      discussion: 토론
+      event: 행사
+      quiz: 퀴즈
+    input_is_invalid_date: "입력값이 올바른 날짜가 아닙니다."
     labels: 
       due: 기한
+    loading_more_items: "더 많은 항목을 로드합니다."
+    loading_undated_events: "날짜 없는 행사 로드 중"
     message_participants: 
       all_groups: "모든 그룹"
       all_users: "모든 사용자"
@@ -2009,14 +2522,18 @@ ko:
     save_changes: "변경 내용 저장"
     scheduler_right_side_admin_section: 
       create_a_new_set_of_appointments: "약속 그룹 만들기"
+    screenreader_date_suggestion: "%{date}. 수락하려면 엔터를 누르십시오."
     time_block_errors: "시간 블록 선택에 오류가 있습니다."
+    time_block_row: 
+      delete_link: "시간 범위 삭제"
     titles: 
       edit_appointment_group: "약속 그룹 편집"
       edit_event: "행사 편집"
     today: 오늘
     undated_events: 
-      loading_undated_events: "날짜 없는 행사 로드 중..."
-      show_undated_events: "날짜 없는 행사 표시"
+      loading_undated_events: "날짜 없는 항목 로드 중..."
+      no_undated_events: "날짜 없는 항목이 없습니다."
+      show_undated_events: "날짜 없는 항목 표시"
       undated_events: "날짜 없는 행사"
   calendar_event: 
     errors: 
@@ -2041,6 +2558,7 @@ ko:
         date: 날짜
         event_description: "행사 설명"
         from: 시작
+        location: 위치
         title: 제목
       no_content: "내용 없음"
       timespan: "%{start_time} *부터* %{end_time}"
@@ -2162,10 +2680,15 @@ ko:
     show2: 
       calendar_feed: "달력 피드"
       calendar_feed_instructions: "아래 링크를 복사하여 iCal 피드를 사용할 수 있는 달력 앱(Google Calendar, iCal, Outlook 등)에 붙여넣습니다."
+      calendars: 달력
       feed_dialog_title: "달력 피드"
       feed_title: "과목 달력 Atom 피드"
       links: 
         feed: "피드를 보려면 여기를 클릭"
+      skip_to_calendar: "달력으로 건너뛰기"
+      toggle_calendars: "달력 토글"
+      toggle_undated_items: "날짜 없는 항목 토글"
+      undated_items: "날짜 없는 항목"
     titles: 
       add_new_assignment: "새 과제 추가"
       add_new_event: "새 행사 추가"
@@ -2206,8 +2729,10 @@ ko:
         login_expiration_minimum: "세션 만료는 20분 이상이어야 함"
         need_integer: "재생 목록 캐시를 위한 정수를 입력하시기 바랍니다."
   canvas_cartridge_description: "Canvas 내보내기를 가져올 수 있는 중재 JSON 형식으로 변환"
+  canvas_cartridge_display: "Canvas Common Cartridge"
   canvas_cartridge_file_description: "Canvas 과목 내보내기 패키지"
   canvas_cartridge_name: "Canvas Cartridge 가져오기"
+  canvas_revision_unknown: "알 수 없음"
   cc: 
     by: "CC 유형"
     by_nc: "CC 유형 비영리"
@@ -2277,6 +2802,10 @@ ko:
         update: "협업 업데이트"
       collaboration_name: "%{course_or_group_name} 협업"
       descriptions: 
+        etherpad: |-
+            EtherPad는 신속하게 공유 문서를 설정할 수 있는 오픈 소스 프로젝트입니다. 이는 다른 사람이 입력하는 동안에 무엇을 입력하는 지 볼 수 있을 정도로 충분히 빠릅니다. 반면 "패드"가 암호로 보호되지 않아서 링크를 가진 누구나 편집할 수 있습니다. EtherPad는 익명성을 보장하고 Google 계정이 없어도 참여할 수 있도록 하려면 Google Docs보다 적합합니다.
+            
+            **주의**: 여러분의 작업을 확실하게 보존하려면 [EtherPad 삭제 정책](%{etherpad_deletion_policy_url})을 숙지해야 합니다.
         google_docs: |-
             Google Docs는 그룹 프로젝트에서 협업하기에 좋은 곳입니다. Microsoft Word와 같으면서도 이메일을 주고 받지 않고 다른 사람들과 동시에 작업을 할 수 있게 해줍니다.  
               
@@ -2325,6 +2854,7 @@ ko:
     from_beginning: 시작
     to_now: 지금
   common_cartridge_description: "Common Cartridge 패키지를 가져올 중재 JSON 형식으로 변환"
+  common_cartridge_display: "Common Cartridge"
   common_cartridge_file_description: "Common Cartridge 1.0/1.1/1.2 패키지"
   common_cartridge_name: "Common Cartridge 가져오기"
   communication_channel: 
@@ -2391,7 +2921,11 @@ ko:
   conferences: 
     concluded_conference: 
       delete: 삭제
-      no_recording: 녹음/녹화&nbsp;없음
+      no_recording: "녹음/녹화 없음"
+      preparing_video: "비디오 준비"
+      recording: "녹음/녹화 1개"
+      recordings: "녹음/녹화 %{recordingCount}개"
+      settings: 설정
       view: 보기
     confirm: 
       close: |-
@@ -2416,6 +2950,7 @@ ko:
       name: 이름
       options: 옵션
     general_error: "회의 참여 중 오류 발생"
+    general_error_with_message: "회의에 참여하는 중에 오류가 발생했습니다. 메시지: '%{message}'"
     inactive_error: "활성된 회의가 아님"
     index: 
       concluded_conferences: "종결된 회의"
@@ -2432,8 +2967,14 @@ ko:
       end_it_now: 끝
       in_progress: "진행 중"
       join: 참여
+      recording: "녹음/녹화 1개"
+      recordings: "녹음/녹화 %{recordingCount}개"
+      settings: 설정
       start: 시작
+      view: 보기
     new_conference_title: "새 회의"
+    no_concluded_conferences: "종결된 회의 없음"
+    no_new_conferences: "새 회의 없음"
     no_settings_error: "이 회의에는 고급 설정 페이지가 없음"
     no_urls_error: "죄송합니다. 이 회의에는 아직 %{type} 페이지가 없습니다."
     notifications: 
@@ -2453,6 +2994,12 @@ ko:
         started: "%{time}에 시작함"
     type_disabled_error: "이 Canvas 사이트에서 더 이상 이 유형의 회의를 사용하지 않음"
     update_conference_title: "회의 업데이트"
+  confirm_dialog: 
+    cancel: 취소
+    ok: 확인
+    submit: 제출
+  confirm_dialog_component: 
+    ok: 확인
   content_exports: 
     buttons: 
       process: "자료 처리"
@@ -2600,6 +3147,7 @@ ko:
       upload_failed: "업로드 실패"
     files: 
       buttons: 
+        cancel: 취소
         skip: "이 단계 건너뛰기"
       description: "파일 묶음을 압축해서 과목으로 올리면 압축이 해제됩니다. 이는 다른 시스템에서 Canvas로 파일을 옮기는 손쉬운 방법입니다."
       instructions: 
@@ -2814,40 +3362,143 @@ ko:
     missing_content_links_title: "가져온 내용에 누락된 링크가 있음"
     unexpected_error: "예기치 않은 오류가 발생했습니다. 사용자 지원팀에 문의하시기 바랍니다."
     unknown: "알 수 없음"
+    upload_timeout_error: "파일 업로드 프로세스가 제한 시간을 초과했습니다."
   content_migrations: 
+    angel_exporter: 
+      content: 내용
+      options: 옵션
     bad_migration_type: "유효하지 않은 마이그레이션 유형"
+    blackboard_export: 
+      content: 내용
+      options: 옵션
+    canvas_export: 
+      content: 내용
+      options: 옵션
+    common_cartridge: 
+      content: 내용
+      options: 옵션
+    content_migration: "내용 마이그레이션"
+    content_migration_issue: 
+      error_report: "오류 보고서"
+    copy_course: 
+      content: 내용
+      options: 옵션
+    course_list_error: "과목을 가져올 수 없습니다. 인터넷에 연결되어 있습니까?"
+    d2_l_export: 
+      content: 내용
+      options: 옵션
+    external_tool_content: 
+      content: 내용
+    file_required: "내용을 가져올 파일을 선택해야 함"
+    file_too_large: "마이그레이션은 %{file_size}을(를) 초과할 수 없음"
+    hide_issues: "이슈 숨기기"
+    index: 
+      page_title: "내용 가져오기"
+    issues: 이슈
+    loading: "로드하는 중..."
     migration_converter: 
-      default_option: "마이그레이션할 시스템 선택"
+      cancel_migration: 취소
+      default_option: "하나 선택"
       header: "내용 가져오기"
-      import_from_label: "내용을 가져올 대상"
+      import_from_label: "내용 유형"
+      import_migration: 가져오기
       subtext: "이는 파일, 과제, 퀴즈와 같은 이미 가지고 있는 내용을 다른 과목 관리 시스템에서 Canvas로 가져올 수 있도록 도와줍니다."
-    must_upload_file: "파일 업로드 필요"
+    moodle_zip: 
+      content: 내용
+      options: 옵션
+    must_upload_file: "파일 업로드나 URL이 필요"
+    no_content_selected: "가져올 내용을 선택하지 않았습니다."
     progressing_content_migration: 
+      issues_text: 이슈
       select_content: "내용 선택"
       show_issues: "이슈 표시"
     progressing_content_migration_collection: 
       no_items: "대기 목록에 작업 없음"
       progress_label: "현재 작업"
     progressing_issues: 
+      loading: "로드 중"
       no_items: "항목이 없습니다."
+    qti_zip: 
+      options: 옵션
+    school_required: "학교를 선택해야 합니다."
     select_content: 
+      cancel_btn: 취소
       select_content_btn: "내용 선택"
       test_checkbox: "테스트 체크 상자"
+    select_course: "과목 선택"
+    show_issues: "이슈 표시"
     subviews: 
+      choose_migration_file: 
+        migration_text: 원본
       course_find_select: 
+        course_name: "과목 이름"
+        include_completed_courses: "완료된 과목 포함"
         or: 또는
         search_label: "과목 검색"
         select_default: "과목 선택"
       date_shift: 
+        add_day_sub_title: "요일 대체 추가"
+        beginning_change_to: "다음으로 변경"
+        beginning_date: "시작 날짜"
         checkbox_label: "행사와 기한 조정"
+        ending_change_to: "다음으로 변경"
+        ending_date: "끝 날짜"
+        new_end_date_label: "끝 날짜를 다음으로 변경"
+        new_end_date_title: "끝 날짜를 다음으로 변경"
+        new_start_date_label: "시작 날짜를 다음으로 변경"
+        new_start_date_title: "시작 날짜를 다음으로 변경"
+        old_end_date_label: "끝 날짜"
+        old_end_date_title: "끝 날짜"
+        old_start_date_label: "시작 날짜"
+        old_start_date_title: "시작 날짜"
+        substitution: 대체
+      day_substitution: 
+        move_from: "다음 요일에서"
+        move_from_select_label: "다음 요일에서"
+        move_from_select_title: "다음 요일에서"
+        move_to_select_label: "다음 요일로"
+        move_to_select_title: "다음 요일로"
+        remove_day_substitution_link: "요일 대체 제거"
+        remove_day_substitution_link_label: "요일 대체 제거"
+        to_happen_on: "다음 요일로"
+      external_tool_launch: 
+        course: 과목
+        find_a_course: "과목 찾기"
+      folder_picker: 
+        default_select_folder: "폴더 선택"
+        upload_to: "업로드 위치"
       overwrite_assessment_content: 
+        assessment_help_label: "평가 덮어쓰기 도움말 아이콘"
+        assessment_help_text: "어떤 시스템은 새로 내보내기를 할 때마다 ID를 재활용합니다. 그 결과, 내보낸 다른 문제 은행이 같은 ID를 갖게 됩니다. 평가 자료를 잃지 않으려면 ID를 무시하고 개체를 다른 것으로 처리해야 합니다. 이 옵션을 선택하면 이러한 안전 기능을 사용하지 않고 같은 ID를 가진 기존 평가 자료를 덮어쓰게 됩니다."
+        assessment_help_title: "\"평가 덮어쓰기 도움말\""
+        assessment_help_title_icon: "평가 덮어쓰기 도움말 아이콘"
         overwrite_assessment_content: "ID가 일치하는 평가 내용을 덮어쓰기"
       question_bank: 
+        aria_new_label: "새 문제 은행 만들기"
         create_new_question: "-- 새 문제 은행 만들기 --"
         question_bank_label: "문제 은행"
+        question_bank_placeholder: "\"문제 은행 이름\""
+        question_bank_placeholder_aria: "\"새 문제 은행 이름을 입력하십시오\""
+        question_bank_title: "새 문제 은행 이름"
         select_question_bank: "문제 은행 선택"
       select_content_checkbox: 
         select_migration_label: "문제 은행 선택?"
+    upload_warning: "이 페이지를 벗어나면 업로드 과정이 취소됩니다."
+    uploading: "업로드 중..."
+    web_ct: 
+      cancel: 취소
+      get_courses: "과목 가져오기"
+      password: 암호
+      select_school: "학교 선택"
+      username: "사용자 이름"
+    web_ct_course_list: 
+      course_list: 과목
+      no_files_help_label: "'파일 다운로드 안 함' 옵션에 대한 자세한 정보"
+      no_files_help_text: "WebCT 과목에서 파일을 다운로드하는 작업은 시간이 오래 걸리며, 마이그레이션 과정이 실패하는 원인이 될 수도 있습니다. 대신, 수동으로 파일을 복사한 후에 이 옵션을 선택해서 나머지 내용을 마이그레이션할 수 있습니다."
+      no_files_help_title: "\"'파일 다운로드 안함'이 아닌 옵션에 대한 자세한 정보\""
+      no_files_help_title_icon: "'파일 다운로드 안 함' 옵션에 대한 자세한 정보"
+      options: 옵션
+      skip_all_files: "과목에서 파일 다운로드 안 함"
   content_tag: 
     no_title: "제목 없음"
   content_tags: 
@@ -2921,6 +3572,8 @@ ko:
       enrolled_as: "%{enrollment_type}로 등록됨"
       enrollment_change_failed: "등록 권한 변경 실패. 다시 시도하시기 바랍니다."
       enrollment_linked_to: "*%{linked_user}*로 연결됨"
+      error: 
+        enrollment_change_failed: "등록 권한 변경 실패. 다시 시도하시기 바랍니다."
       labels: 
         user_privileges: 권한
       legends: 
@@ -2999,6 +3652,8 @@ ko:
         remove_avatar: "아바타 그림 제거"
         report_avatar: "부적절한 그림 보고"
         restore_enrollment: "이 등록 복원"
+        student_teacher_activity: "여러분과의 상호 작용"
+        teacher_activity: "학생 상호 작용 보고서"
         title: 
           enrollment_sis_defined: "이 등록은 대학에서 정의한 것이고 삭제할 수 없음"
         user_account_details: "사용자 계정 세부 정보"
@@ -3035,6 +3690,7 @@ ko:
         user_access_report: "%{user} 액세스 보고서"
       links: 
         back_to_user: "사용자 페이지로 돌아가기"
+      loading_more_results: "더 많은 결과 로드 중"
       table_headings: 
         content: 내용
         last_viewed_time: "마지막 본 시간"
@@ -3143,6 +3799,7 @@ ko:
         modules: 
           before_students_view: "학생이 이 모듈을 보기 전에"
         new_tab: "새 탭에 이 도구 로드하기"
+        publish_final_grade: "이 모듈을 마치면 학생의 최종 평점을 게시함"
         require_sequential_progress: "학생이 이 모듈의 요구 조건을 순서대로 이동해야 함"
         sort_by: "정렬 조건"
         title: 제목
@@ -3182,7 +3839,116 @@ ko:
         state: 상태
       titles: 
         student_progression: "학생별 모듈 진행률"
+    content_next: 
+      add_prerequisite: "*%{module}*에 필수 조건 추가"
+      assignment_points_possible: "/ %{points_possible}"
+      buttons: 
+        add_module: "모듈 추가"
+        add_prerequisite: "필수 조건 추가"
+      criterion_for_assignment: "%{assignment}에서 사용자는 %{select_criterion}해야 함"
+      headings: 
+        add_prerequisite: "%{name}에 필수 조건 추가"
+        course_modules: "과목 모듈"
+        student_progress: "학생별 모듈 진행률"
+        student_progress_for_module: "%{module}에 대한 학생의 진행률"
+        students_completed: "모듈을 완료한 학생"
+        students_in_progress: "모듈을 진행 중인 학생"
+        students_locked: "모듈의 잠금을 해제하지 않은 학생"
+        students_unlocked: "모듈의 잠금을 해제한 (시작하지는 않은) 학생"
+      help: 
+        create: |-
+            과목 모듈을 이용하면 과제, 페이지, 파일 등을 보다 작은 섹션이나 단위로 구성할 수 있습니다. 모듈은 테마를 중심으로 하거나 특정 주제에 촛점을 맞추거나 단순히 연대순으로 묶을 수도 있습니다.
+            
+            또한 각 모듈에 대한 기준과 선행 작업을 정의함으로써 일정한 순서로 배열할 수 있습니다. 학생은 모든 선행 작업의 잠금을 해제하기 전까지 모듈에 액세스할 수 없습니다. 이러한 방식으로 예컨대 학생이 복습 퀴즈에서 적어도 75% 이상 받을 때까지 어떤 내용이나 파일에 액세스하는 것을 막을 수 있습니다.
+            
+            코스를 모듈로 구성하려면 오른쪽의 "%{button}" 버튼을 클릭하십시오.
+        no_modules: "이 과목에 정의된 모듈이 없습니다."
+      images: 
+        alt: 
+          min_score: "최저 점수"
+          must_contribute: "참여해야 함"
+          must_submit: "제출해야 함"
+          must_view: "봐야 함"
+        title: 
+          min_score: "모듈을 마치려면 학생이 이 항목에서 적어도 %{min_score}점을 받아야 함"
+          must_contribute: "모듈을 마치려면 학생이 이 항목에 참여해야 함"
+          must_submit: "모듈을 마치려면 학생이 이 과제를 제출해야 함"
+          must_view: "모듈을 마치려면 학생이 이 항목을 봐야 함"
+      indent: 
+        ? "n"
+        : 
+          one: "한 수준 들여쓰기"
+          other: "%{count} 수준 들여쓰기"
+          zero: "들여쓰지 않음"
+      key: 
+        description: 
+          delete: "현재 모듈/항목 삭제"
+          edit: "모듈/항목 편집"
+          new: "새 모듈"
+          next: "다음 모듈/항목"
+          previous: "이전 모듈/항목"
+      keycode_descriptions: 
+        next_module_item: "다음 모듈이나 모듈 항목 선택"
+        previous_module_item: "이전 모듈이나 모듈 항목 선택"
+        toggle_module_dragging: "끌기를 시작할 항목을 선택하거나 이전에 선택한 항목을 놓기"
+      keycodes: 
+        delete: d
+        edit: e
+        indent: i
+        new: "n"
+        next: j
+        next_module_item: 위로
+        outdent: o
+        previous: k
+        previous_module_item: 아래로
+        toggle_module_dragging: 공백
+      labels: 
+        indent: 들여쓰기
+        module_complete_when: "다음 경우에 모듈을 마침"
+        modules: 
+          before_students_view: "학생이 이 모듈을 보기 전에"
+        sort_by: "정렬 조건"
+        title: 제목
+        unlock_at: "잠금 해제 시각"
+        url: URL
+      links: 
+        add_prerequisite: "필수 조건 추가"
+        add_requirement: "요구 조건 추가"
+        reload_student: "학생의 진행률을 다시 로드"
+        sort_by_name: 이름
+        sort_by_progress: 진행률
+        student_progress: "진행 상황 보기"
+        title: 
+          remove_prerequisite: "필수 조건 제거"
+      module: 모듈
+      module_details: "모듈은 순서대로 표시되므로 %{name} 위에 있는 모듈만 필수 조건으로 추가할 수 있습니다."
+      module_name: "모듈 이름"
+      modules_keyboard_hint: "과목 모듈이나 모듈 항목의 순서를 바꾸려면 먼저 스크린 리더에서 커서를 끄십시오. JAWS에서 Insert-z 입니다. 첫 번째 모듈을 선택하려면 탭을 누르십시오. 모듈이나 모듈 항목을 선택하려면 업/다운을 누르십시오. 끌기를 시작할 모듈이나 모듈 항목을 선택하려면 스페이스를 누르십시오. 대상을 선택하려면 업/다운을 누르십시오. 그리고 나서 대상 뒤에 선택한 항목을 놓으려면 스페이스를 다시 누르십시오."
+      must_complete_prerequisites: "다음을 마쳐야 함"
+      no_preprequisites: "정의된 필수 조건 없음"
+      no_requirements: "정의된 요구 조건 없음"
+      prerequisites: 
+        another_module: "다른 모듈"
+      prerequisites_need_item: "사용자가 이 모듈을 마치는 방법을 지정하기 전에 항목을 추가해야 함"
+      requirements: 
+        must_contribute: "페이지에 참여"
+        must_score_at_least: "최저 점수를 얻기"
+        must_submit: "과제를 제출"
+        must_view: "항목을 보기"
+      select_module: 
+        instructions: "모듈 선택"
+        name: "%{module} 모듈"
+      select_prerequisite: "필수 조건의 유형을 선택하십시오. 모든 필수 조건이 만족될 때까지 학생은  모듈을 볼 수 없습니다."
+      student_name: "학생 이름"
+      table_headings: 
+        module: 모듈
+        state: 상태
+      titles: 
+        student_progression: "학생별 모듈 진행률"
     context_module: 
+      admin_links: 
+        module_options_label: "모듈 관리"
+        module_options_title: "모듈 관리"
       context_module: 
         draft: (초안)
       images: 
@@ -3208,11 +3974,39 @@ ko:
           edit_module: "모듈 설정 편집"
           student_progress: "이 모듈에 대한 학생 진행률 보기"
         unpublish: "게시 취소"
+      manage: "모듈 관리"
+      module_toolbar: 
+        aria: 
+          module_options: 
+            label: "모듈 옵션"
       module_will_unlock_at: "*%{unlock_date}*에 잠금 해제함"
       progression_complete_count: "*%{count}*개 완료"
       progression_started_count: "*%{count}*개 진행 중"
       reorder_modules: "모듈을 다시 정렬하려면 끌기"
       unpublish: "게시 취소"
+    context_module_next: 
+      aria_labels: 
+        add_item: "내용 추가"
+      images: 
+        alt: 
+          incomplete: "완료 안 됨"
+        title: 
+          complete: "모듈이 완료됨"
+          incomplete: "모듈이 완료 안 됨"
+          locked: "모듈이 잠김"
+      links: 
+        add_item: "내용 추가"
+        text: 
+          delete_module: 삭제
+          edit_module: 편집
+        title: 
+          delete_module: "이 모듈 삭제"
+          edit_module: 편집
+          student_progress: "이 모듈에 대한 학생 진행률 보기"
+      manager_module: "모듈 관리"
+      progression_complete_count: "*%{count}*개 완료"
+      progression_started_count: "*%{count}*개 진행 중"
+      reorder_modules: "모듈을 다시 정렬하려면 끌기"
     context_modules: 
       publish: 게시
     errors: 
@@ -3220,6 +4014,7 @@ ko:
     index: 
       titles: 
         course_modules: "과목 모듈"
+    module_complete: 완료
     module_empty: "\"%{module}\" 모듈에 항목이 없음"
     module_item: 
       drag_to_reorder: "항목을 다시 정렬하거나 다른 모듈로 옮기려면 끌기"
@@ -3243,12 +4038,53 @@ ko:
       links: 
         edit_item: "항목 세부 정보 편집"
         edit_item_details_label: "항목 세부 정보 편집"
-        indent: "항목 들여쓰기"
-        indent_label: "항목 들여쓰기"
-        outdent: "항목 내어쓰기"
-        outdent_label: "항목 내어쓰기"
+        indent: "들여쓰기 확대"
+        indent_label: "들여쓰기 확대"
+        outdent: "들여쓰기 축소"
+        outdent_label: "들여쓰기 축소"
         remove_item: "모듈에서 항목 제거"
         remove_item_label: "모듈에서 이 항목 제거"
+      max_score: 
+        fulfilled: "%{score}점 이하 받음"
+        unfulfilled: "%{score}점 이하 받아야 함"
+      min_score: 
+        fulfilled: "%{score}점 이상 받음"
+        unfulfilled: "%{score}점 이상 받아야 함"
+      module: 
+        item_aria_label: "%{item_label} 모듈 항목"
+      must_contribute: 
+        fulfilled: "페이지 내용에 참여함"
+        unfulfilled: "페이지 내용에 참여해야 함"
+      must_submit: 
+        fulfilled: "과제를 제출함"
+        unfulfilled: "과제를 제출해야 함"
+      must_view: 
+        fulfilled: "페이지를 봄"
+        unfulfilled: "페이지를 봐야 함"
+    module_item_next: 
+      drag_to_reorder: "항목을 다시 정렬하거나 다른 모듈로 옮기려면 끌기"
+      images: 
+        alt: 
+          max_score: "최고 점수"
+          min_score: "최저 점수"
+          must_contribute: "참여해야 함"
+          must_submit: "제출해야 함"
+          must_view: "봐야 함"
+        title: 
+          max_score: "모듈을 마치려면 학생이 이 항목에서 최고 점수를 넘으면 안 됨"
+          min_score: "모듈을 마치려면 학생이 이 항목에서 최저 점수에 도달해야 함"
+          must_contribute: "모듈을 마치려면 학생이 이 항목에 참여해야 함"
+          must_submit: "모듈을 마치려면 학생이 이 과제를 제출해야 함"
+          must_view: "모듈을 마치려면 학생이 이 항목을 봐야 함"
+      links: 
+        edit_item: 편집
+        edit_item_details: "항목 세부 정보 편집"
+        indent: "들여쓰기 확대"
+        indent_item: "들여쓰기 확대"
+        outdent: "들여쓰기 축소"
+        outdent_item: "들여쓰기 축소"
+        remove_item: 제거
+        remove_item_from_module: "모듈에서 이 항목 제거"
       max_score: 
         fulfilled: "%{score}점 이하 받음"
         unfulfilled: "%{score}점 이하 받아야 함"
@@ -3264,6 +4100,10 @@ ko:
       must_view: 
         fulfilled: "페이지를 봄"
         unfulfilled: "페이지를 봐야 함"
+      settings: 설정
+    module_locked: 잠김
+    module_started: "진행 중"
+    module_unlocked: "잠금 해제됨"
     none_in_progress: "진행 중인 항목 없음"
     optgroup: 
       assignments: 과제
@@ -3281,6 +4121,10 @@ ko:
       links: 
         title: 
           remove_prerequisite: "필수 조건 제거"
+    progressions: 
+      titles: 
+        student_progress: "학생 진행률"
+        student_progression: "학생별 모듈 진행률"
     still_needs_completing: "완료해야 함"
     titles: 
       add: "모듈 추가"
@@ -3291,6 +4135,12 @@ ko:
       student_progress: "모듈의 학생 진행률"
   context_modules_api: 
     invalid_position: "유효하지 않은 위치"
+  conversation_dialog: 
+    errors: 
+      field_is_required: "이 필드가 필요함"
+    message_sent: "메시지를 보냈습니다!"
+    no_course: "과목 없음"
+    select_course: "과목 선택"
   conversation_message: 
     subject: "비공개 메시지, %{timestamp}"
     users_added: 
@@ -3306,14 +4156,38 @@ ko:
       titles: 
         attachment: "첨부할 파일"
         remove_attachment: "첨부 제거"
+    all_courses: "모든 과목"
+    all_in_context: "%{context}에 속한 모두"
+    archive: 저장소
+    archive_conversation: "대화 저장"
     attachment_error: "첨부를 업로드할 수 없습니다. 다시 시도하시기 바랍니다."
+    autocomplete_result: 
+      group_people: "사용자: %{people}"
+      no_results: "결과 없음"
+    autocomplete_token: 
+      remove_recipient: "수신인 제거"
+    back: 뒤로
     buttons: 
       add_people: "사람 추가"
       send_message: 보내기
+    cannot_add_to_private: "사적인 대화에 참여자를 추가할 수 없습니다."
     cannot_be_empty: "메시지 내용이 있어야 함"
+    compose_button_bar: 
+      titles: 
+        add_attachment: "첨부 추가"
+        record_media_comment: "오디오나 비디오 설명을 녹음/녹화"
+    compose_title_bar: 
+      buttons: 
+        close: 닫기
     confirm: 
+      delete_conversation: "이 대화의 사본을 삭제하시겠습니까? 이 작업은 실행을 취소할 수 없습니다."
       delete_message: "이 메시지의 사본을 삭제하시겠습니까? 이 작업은 실행을 취소할 수 없습니다."
       delete_messages: "이 메시지의 사본을 삭제하시겠습니까? 이 작업은 실행을 취소할 수 없습니다."
+    context_message: 
+      delete_message: "메시지 삭제"
+      labels: 
+        less: 간단히...
+        more: "더 보기..."
     conversation_context: "다음 사용자와의 대화에서"
     conversation_item: 
       has_attachments: "이 대화에 하나 이상의 첨부가 있음"
@@ -3340,6 +4214,12 @@ ko:
     conversations_pane: 
       confirm: 
         delete_conversation: "이 대화의 사본을 삭제하시겠습니까? 이 작업은 실행을 취소할 수 없습니다."
+    course_name: "과목 이름"
+    course_options: 
+      course_options: 
+        concluded: 종결됨
+        groups: 그룹
+        more_courses: "다른 과목"
     enrollments_everyone: 모두
     errors: 
       field_is_required: "필수 필드임"
@@ -3347,6 +4227,7 @@ ko:
     filter_by_group: "이 그룹으로 필터링"
     headings: 
       new_message: "새 메시지"
+    hide: 숨기기
     index: 
       add_recipients_instructions: "여러분이 이 대화에 추가한 사람은 이전 메시지를 볼 수 있습니다."
       inbox_actions: 
@@ -3379,8 +4260,51 @@ ko:
         submission_author: "제출물 작성자"
         submission_score: "제출물 점수"
         view_submission: "제출물을 새 창에서 엽니다."
+    index_new: 
+      archive: 저장소
+      archive_conversation: "대화 저장"
+      archived: "보관된 메시지"
+      clear_search: "검색 결과 삭제"
+      compose_new_message: "새 메시지 작성"
+      delete: 삭제
+      delete_conversation: "대화 삭제"
+      filter_messages_by_course: "과목으로 메시지 필터링"
+      filter_messages_by_type: "유형으로 메시지 필터링"
+      forward: 전달
+      inbox: "받은 편지함"
+      mark_as_read: "읽음으로 표시"
+      mark_as_unread: "읽지 않음으로 표시"
+      more_options: "기타 옵션"
+      reply: "답변 작성..."
+      reply_all: "전체 회신"
+      search_by_user: "사용자 검색"
+      search_for_recipients: "수신인 검색"
+      search_names_groups_courses: "이름이나 그룹이나 과목을 검색"
+      sending: "전송 중..."
+      sent: "보낸 메시지"
+      settings: 설정
+      starred: "별표 표시된 메시지"
+      titles: 
+        conversations: 대화
+      unread: "읽지 않은 메시지"
+    mark_as_read: "읽음으로 표시"
+    mark_as_unread: "읽지 않음으로 표시"
+    message: 
+      mark_as_read: "읽음으로 표시"
+      mark_as_unread: "읽지 않음으로 표시"
+      no_subject: "주제 없음"
+      open_message: "메시지 열기"
+      star_conversation: "대화에 별표하기"
+      starred: "별표 표시된 메시지"
+      total_messages: "총 메시지 수"
+      unread: "읽지 않은 메시지"
+      unstar_conversation: "대화 별표 취소"
+    message_detail: 
+      no_subject: "주제 없음"
     message_form: 
       buttons: 
+        reply: "답변 작성..."
+        reply_all: "전체 회신"
         send_message: 보내기
       headings: 
         new_message: "새 메시지"
@@ -3390,7 +4314,7 @@ ko:
         add_to_faculty_journal: "교원 일지 항목으로 추가"
         group_conversation: "이는 그룹 대화입니다. 참가자는 모든 사람의 답장을 볼 수 있습니다."
         message: "메시지:"
-        to: "받는 사람:"
+        to: "수신:"
       links: 
         add_attachment: 첨부
         media_comment: 녹음/녹화
@@ -3400,11 +4324,50 @@ ko:
         media_comment: "녹음/녹화된 미디어 설명"
         record_media_comment: "오디오나 비디오 의견을 녹음/녹화"
         remove_media_comment: "미디어 설명 제거"
+    message_form_dialog: 
+      body: 본문
+      headings: 
+        new_message: "새 메시지"
+      inbox_actions: 
+        add_people: "사람 추가"
+      individual_message_explanation: "이는 각 수신인에게 개별 메시지를 보냄"
+      labels: 
+        add_to_faculty_journal: "교원 일지 항목으로 추가"
+        attachments: 첨부
+        course: 과목
+        select_course: "과목 선택"
+        subject: 제목
+        to: "받는 사람"
+      links: 
+        media_comment: 녹음/녹화
+      media_comment: "미디어 설명"
+      no_course: "과목 없음"
+      no_subject: "주제 없음"
+      search_names_groups_courses: "이름, 그룹, 과목 검색"
+      send_individual_messages: "개별 메시지 보내기"
+      titles: 
+        media_comment: "녹음/녹화된 미디어 설명"
+        record_media_comment: "오디오나 비디오 설명을 녹음/녹화"
+        remove_media_comment: "미디어 설명 제거"
+    message_item: 
+      delete: 삭제
+      forward: 전달
+      message_actions: "메시지 동작"
+      more_options: "기타 옵션"
+      reply: "답변 작성..."
+      reply_all: "전체 회신"
+    message_list: 
+      messages: 메시지
     message_progress_bar_text: 
       done_sending_message: "*%{message_preview}*를 *%{num_people}*명에게 보냄"
       error_sending_message: "메시지 보내기 오류:"
       sending_message: "*%{message_preview}*를 *%{num_people}*명에게 보내는 중"
+    more_participants: "+%{total}개 더"
+    no_message: 
+      batch_selected: "여러 대화를 선택함"
+      no_conversations_selected: "선택한 대화 없음"
     no_recipients_choose_another_group: "이 그룹에 수신인이 없습니다. 다른 그룹을 선택하시기 바랍니다."
+    no_results_found: "결과 없음"
     not_applicable: "해당 없음"
     not_scored: "점수 없음"
     notes_to_self: 독백
@@ -3415,7 +4378,10 @@ ko:
       one: "%{count}명"
       other: "%{count}명"
     recipient_error: "선택한 과목이나 그룹에 유효한 수신인이 없음"
+    search_category: "%{category} 검색"
     select_all: "전부 선택"
+    star: "별표 표시"
+    star_conversation: "대화 별표하기"
     title: 
       add_recipients: "받는 사람 추가"
       forward_messages: "메시지 전달"
@@ -3423,8 +4389,12 @@ ko:
       expand_inline: "추가 의견 표시"
       rss_feed: "대화 피드"
       view_submission: "새 창에서 제출물을 엽니다."
+    unarchive: "보관 해제"
+    unarchive_conversation: "대화 저장 해제"
     unknown_user: "알 수 없는 사용자"
     unspecified_error: "예기치 않은 오류 발생"
+    unstar: "별표 해제"
+    unstar_conversation: "대화 별표 취소"
   conversations_intro: 
     slide1: 
       paragraph1: "받은 편지함을 확인해 보십시오!"
@@ -3464,6 +4434,7 @@ ko:
       slide7: "슬라이드 7"
       slide8: "슬라이드 8"
       slide9: "슬라이드 9"
+  correct_answer: 정답입니다.
   course: 
     access_denied: "액세스가 거부됨"
     batch_update_message: 
@@ -3513,6 +4484,7 @@ ko:
       teachers_students: "교사와 학생"
   course_copy_argument_error: "과목 복사에는 원본 과목이 필요합니다."
   course_copy_description: "Canvas 과목 복사를 위한 마이그레이션 플러그 인"
+  course_copy_display: "과목 복사"
   course_copy_file_description: "Canvas 과목 복사"
   course_copy_name: "Canvas 과목 복사"
   course_copy_no_course_error: "원본 과목을 찾을 수 없습니다."
@@ -3536,6 +4508,7 @@ ko:
       lti_links: "일부 웹 링크 내보내기 실패"
       media_file: "미디어 파일 내보내기 실패"
       media_files: "일부 미디어 파일 내보내기 실패"
+      media_files_too_large: "전체 파일 크기가 너무 크기 때문에 미디어 파일을 내보내지 않았습니다."
       module_meta: "모듈 메타 데이터 내보내기 실패"
       organization: "조직 구조 생성에 실패했습니다."
       question_bank: "\"%{title}\" 문제 은행 내보내기 실패"
@@ -3560,6 +4533,17 @@ ko:
     wrapper: 
       close_course_menu_title: 닫기
       reset_course_menu: 원래대로
+  course_logging: 
+    event_type: 
+      concluded: 종결됨
+      created: 생성
+      deleted: 삭제됨
+      published: 게시됨
+    field_label: 
+      course_code: "과목 코드"
+      license: 라이선스
+      name: 이름
+      turnitin_comments: "Turnitin 설명"
   course_restore: 
     restore_error: "과목 복원을 시도하는 중에 오류가 발생했습니다. 과목이 복원되지 않았습니다."
   course_search: 
@@ -3580,6 +4564,7 @@ ko:
     course_dates_enforced: "사용자가 이 날짜 사이의 과목에만 참여할 수 있음"
     course_dates_unenforced: "이 날짜는 과목 사용 가능에 영향을 미치지 않음"
     edit_sections_placeholder: "섹션 이름 입력"
+    edit_sections_title: "이름 선택"
     errors: 
       invalid_sis_status: "유효하지 않은 SIS 게시 상태"
       invitation: "초대에 실패했습니다. 다시 시도하십시오."
@@ -3609,6 +4594,7 @@ ko:
     private_course: 비공개
     public_course: 공개
     re_send_invitation: "초대 다시 보내기"
+    remove_user_from_course_section: "%{course_section}에서 사용자 제거"
     titles: 
       click_to_edit: "편집하려면 클릭"
       link_to_students: "학생에게 연결"
@@ -3667,7 +4653,7 @@ ko:
         other: "%{count}개 평가 필요함"
       points_possible: "/ %{points_possible}"
     canvasnet_instructor: 
-      avatar_url: "아바타 (URL)"
+      avatar_url: 아바타
       biography: 약력
       instructor_name: 이름
       job_title: 제목
@@ -3691,7 +4677,11 @@ ko:
     copy: 
       buttons: 
         create_course: "과목 만들기"
+      conclude_at: "끝 날짜"
+      content_label: 내용
+      course_code: "과목 코드"
       details: "새 과목에 대한 세부 정보를 입력하시기 바랍니다."
+      enrollment_term_id: 학기
       headings: 
         copy_course: "%{course} 복사"
       labels: 
@@ -3700,6 +4690,8 @@ ko:
         enrollment_term_id: 학기
         name: 이름
         start_at: "시작 날짜"
+      name: 이름
+      start_at: "시작 날짜"
       titles: 
         copy_course: "과목 복사"
     course_wizard_box: 
@@ -3767,7 +4759,8 @@ ko:
         enrollment_fee: "등록 비용"
         format: 형식
         image: 이미지
-        path: 경로
+        path: "과목 경로"
+        portal_path: "포털 경로"
         position: 위치
         related_id: "링크 ID"
         self_enrollment: 등록
@@ -3777,9 +4770,10 @@ ko:
         title: 제목
         visibility: "표시 여부"
       leave_blank_if_free: "무료 과목인 경우에 공란으로 둠"
-      logo: "로고 (URL)"
+      logo: 로고
       page_title: "과목 프로필"
       path_syntax: "소문자, 숫자, 대시"
+      portal_path_syntax: "소문자, 숫자, 대시와 슬래시 (예: harvard/chemistry)"
       private: 비공개
       public: "canvas.net에 공개"
       save_changes: "변경 내용 저장"
@@ -3821,6 +4815,7 @@ ko:
       headings: 
         future_enrollments: "향후 등록"
         my_courses: "내 과목"
+        my_groups: "내 그룹"
         past_enrollments: "지난 등록"
       start_new_course: "새 과목 시작하기"
       titles: 
@@ -3890,9 +4885,12 @@ ko:
       index: 
         add_people: "사람 추가"
         cannot_add_users: "이 과목이 종료되어 새 사용자를 추가할 수 없음"
+        group_set: "그룹 집합"
+        people: 사용자
         role_to_search: "역할으로 검색을 제한"
         search: 검색
         search_people: "사람 검색"
+        title_add_people: "사람 추가"
       invitations_view: 
         accepted_invitation: "%{name}이(가) 이미 과목 참여 초대를 받고 수락했지만 필요하다면 초대를 다시 보낼 수 있습니다."
         admin_invitation_unaccepted: "%{name}이(가) 아직 과목 참여 초대를 수락하지 않았습니다. 초대 발송 시각: %{time}"
@@ -3908,6 +4906,9 @@ ko:
         re_sending_invitations: "다시 보내는 중..."
       role_select: 
         all_roles: "모든 역할"
+      roster_tabs: 
+        everyone_tab: 모두
+        groups: 그룹
       roster_user: 
         links: 
           edit_sections: "섹션 편집"
@@ -3916,15 +4917,19 @@ ko:
           resend_invitation: "초대 다시 보내기"
           user_details: "사용자 세부 정보"
         manage: 관리
+        manage_user: "%{name} 관리"
         pending_acceptance_explanation: "이 사용자는 아직 과목 초대를 수락하지 않음"
         pending_acceptance_of_invitation: "보류 중"
       roster_users: 
+        canvas_user_id: "Canvas 사용자 ID"
         login_name_or_sis_id: "로그인 / SIS ID"
         name: 이름
         no_people_found: "사람 없음"
         role: 역할
         section: 섹션
         you_can_search_by: "다음 조건으로 검색 가능:"
+      section: 
+        remove_user_from_course_section: "%{name}에서 사용자 제거"
     section: 
       enrollment: 
         links: 
@@ -3935,6 +4940,8 @@ ko:
         add_section: "섹션 추가"
         move_course: "과목 이동"
         update_course: "과목 세부 정보 업데이트"
+      course_open_enrollment: "이 과목은 열린 등록을 사용합니다. 다음 URL을 공유하면 학생이 직접 등록할 수 있습니다: *%{url}*. 또한 *%{url2}*에서 다음 참여 코드를 이용하여 등록할 수도 있습니다: *%{code}*"
+      course_open_enrollment_without_code: "이 과목은 열린 등록을 사용합니다. 다음 URL을 공유하면 학생이 직접 등록할 수 있습니다: *%{url}*"
       course_overrides_term: "이는 학기 사용 가능 여부를 재정의합니다."
       date_restricted: "사용자가 이 날짜 사이의 과목에만 참여할 수 있음"
       deatils: 
@@ -3996,6 +5003,7 @@ ko:
         sis_source_id: "SIS ID"
         start_at: 시작
         storage_quota: "파일 저장소"
+        time_zone: "표준 시간대"
         turnitin_comments: "Turnitin 설명"
       language_overrides_preferences: "이는 사용자/시스템 언어 기본 설정을 다시 정의합니다. 이는 외국어 과목에 대해서만 권합니다."
       links: 
@@ -4016,6 +5024,8 @@ ko:
       private_course: 비공개
       public_course: 공개
       section_sis_id: "SIS ID: %{section_sis}"
+      self_enrollment: "비밀 URL이나 코드를 공유하여 학생이 직접 등록할 수 있도록 허용"
+      self_enrollment_without_code: "비밀 URL을 공유하여 학생이 직접 등록할 수 있도록 허용"
       set_grading_scheme: "평가 구성표 설정"
       sis_source_id: "SIS ID"
       tab_cant_disable: "이 페이지는 사용 안 할 수 없고 숨기기만 가능"
@@ -4027,14 +5037,14 @@ ko:
         grade_publishing: "평점 게시"
         navigation: 탐색
         sections: 섹션
-        tools: "외부 도구"
+        tools: 앱
         users: 사용자
       titles: 
         edit_navigation: "과목 탐색 편집"
       transifex_message: "[Canvas 번역 커뮤니티](%{transifex_url})에 참여"
       turnitin: "이 설명은 학생이 Turnitin 사용 과제를 제출할 때 표시됨"
       view_grading_scheme: "평가 구성표 보기"
-      wiki_editing_roles: "기본 값으로 과목 위키 페이지를 편집할 수 있음"
+      wiki_editing_roles: "기본 값으로 과목 위키 페이지를 만들고, 이름을 바꾸거나 편집할 수 있음"
       wiki_editing_roles_change_existing: "현재 \"%{current_setting}\"이(가) 편집할 수 있는 페이지를 \"%{new_setting}\"이(가) 편집할 수 있도록 변경합니다."
     settings_sidebar: 
       buttons: 
@@ -4051,6 +5061,7 @@ ko:
         delete: "이 과목을 영구적으로 삭제"
         export_content: "과목 내용 내보내기"
         import: "과목에 내용 가져오기"
+        new_badge: "새 항목"
         reset: "과목 내용 다시 설정"
         stats: "과목 통계"
         student_view: "학생 뷰"
@@ -4068,6 +5079,17 @@ ko:
             이 레이아웃은 기간이나 학기와 같이 지정된 일정에 바탕을 두지 않은 과목에 대해 제일 좋습니다.
         recent_activity_dashboard: "**최근 활동 대시보드**를 이용하면 참여자가 이 과목에 대한 최근 대화, 공지 사항, 토론, 상호 작용을 볼 수 있습니다. 이는 사용자가 처음에 로그인하면 보게 되는 대시보드 페이지와 유사하지만 특정 과목의 내용만 표시합니다."
         syllabus: "**요강 뷰**에서는 과목 목표에 대한 설명을 적고 링크 이미지 등과 함께 과목을 소개할 수 있으며, 모든 과제와 과목 행사에 대한 달력 뷰를 표시합니다."
+      draft_state: 
+        buttons: 
+          cancel: 취소
+          update_layout: 저장
+        headings: 
+          set_layout: "홈 페이지 레이아웃 설정"
+        options: 
+          assignments: "과제 목록"
+          modules: "과목 모듈"
+          recent_activity_dashboard: "최근 활동 대시보드"
+          syllabus: 요강
       empty_body: "내용 없음"
       headings: 
         confirm_unenroll: "등록 취소 확인"
@@ -4076,6 +5098,7 @@ ko:
         unpublished: "이 과목은 게시되지 않음"
       importing: "과목 복사/마이그레이션을 진행 중입니다. 따라서 일부 내용을 잠시 사용하지 못할 수도 있습니다."
       labels: 
+        select_content: "사용자가 과목 페이지를 방문할 때 다음을 표시"
         set_layout: "사용자가 과목 페이지를 방문할 때 다음을 표시"
       license_notice: "이 과목 내용은 %{license_type} 라이선스에 따라 제공됩니다. 별도의 언급이 없으면 이 과목의 내용은 해당 라이선스를 따르는 것으로 간주합니다."
       links: 
@@ -4086,6 +5109,7 @@ ko:
         join_course: "이 과목에 참여"
         new_announcement: "새 공지"
         restore_role: "역할과 권한 복구"
+        view_course_stream: "과목 스트림 보기"
       options: 
         assignments: "과제 목록"
         custom_page: "내가 직접 디자인할 페이지"
@@ -4168,6 +5192,7 @@ ko:
       page_moved_to_people_section_notice: "이 페이지는 *사용자 섹션*으로 이동함"
   create_users_view: 
     required: "이메일 주소 입력"
+  crowdsourced: true
   crumb: 
     conversations: 대화
     discussion_replies: "토론 답변"
@@ -4265,15 +5290,44 @@ ko:
     labels: 
       assign_blanks: "제출하지 않은 학생에게 0점 할당"
     out_of_points_possible: "/ %{assignment.points_possible}"
+    this_is_permanent: "상대 평가를 실행 취소할 수 없습니다. 상대 평가 이전의 평점 이력은 사용할 수 있으나 상대 평가 동작은 되돌릴 수 없습니다."
+  d2l_display: Desire2Learn
   d2l_file_description: "D2L 내보내기 .zip 형식"
   d2l_name: "D2L 변환기"
   dashboard: 
+    announcements_collapse: 
+      one: "공지 %{count}개 축소"
+      other: "공지 %{count}개 축소"
+    announcements_expand: 
+      one: "공지 %{count}개 확장"
+      other: "공지 %{count}개 확장"
+    assignments_collapse: 
+      one: "과제 공지 %{count}개 축소"
+      other: "과제 공지 %{count}개 축소"
+    assignments_expand: 
+      one: "과제 공지 %{count}개 확장"
+      other: "과제 공지 %{count}개 확장"
+    conversations_collapse: 
+      one: "대화 메시지 %{count}개 축소"
+      other: "대화 메시지 %{count}개 축소"
+    conversations_expand: 
+      one: "대화 메시지 %{count}개 확장"
+      other: "대화 메시지 %{count}개 확장"
     disable_dashboard: "이전 대시보드로 돌아가기"
+    discussions_collapse: 
+      one: "토론 %{count}개 축소"
+      other: "토론 %{count}개 축소"
+    discussions_expand: 
+      one: "토론 %{count}개 확장"
+      other: "토론 %{count}개 확장"
     enable_dashboard: "새 대시보드 사용해 보기"
     event_created: "행사 만듦"
     message_sent: "메시지 보냄"
     show_less: "간단히 표시"
     show_more: "자세히 표시"
+    show_more_link: 
+      show_less: "간단히 표시"
+      show_more: "자세히 표시"
   date: 
     abbr_day_names: 
       - 일
@@ -4337,6 +5391,10 @@ ko:
       - 12월
   dates: 
     no_date: "날짜 없음"
+  dates_available_component: 
+    available: "사용 가능"
+    due: 기한
+    multiple_dates: "여러 날짜"
   datetime: 
     distance_in_words: 
       about_x_hours: 
@@ -4381,21 +5439,56 @@ ko:
       second: 초
       year: 년
   default_conference_title: "%{course_name} 회의"
+  default_question_name: 문제
+  default_question_text: "질문 텍스트"
   demos: 
+    _register: 
+      add_site: "사이트 추가"
+      invalid_email: "유효하지 않은 이메일 주소"
+      personalizing: "개인 설정 중..."
+      ready: 준비되었습니다!
+      try_again: "다시 시도"
+      you_must_agree_to_terms: "사용 조건에 동의해야 합니다."
     demos_add: 
       labels: 
         school_name: "학교 이름"
         username: "이메일 주소"
     register: 
+      agree_to_terms: "*사용 조건*에 동의하고 **개인 정보 보호 정책**을 승인합니다."
+      begin_trial: "체험 시작"
+      cio: CIO
+      corporate: 기업
+      dean: 학장
+      director: 감독관
+      higher_education: "고등 교육"
+      incorrect: "올바르지 않습니다. 다시 시도하시기 바랍니다."
+      instructional_designer: "교육 설계자"
+      k12: K12
       labels: 
         current_lms: "현재 LMS"
+        location: 위치
         name: 이름
         organization_size: "조직 규모"
         organization_type: "조직 유형"
-        phone: 전화번호
+        phone: "전화 번호"
         school_name: "학교 / 조직"
         school_position: 제목
+        type_what_you_hear: "들은 사항을 입력"
+        type_what_you_see: "본 사항을 입력"
         username: 이메일
+      lms_administrator: "LMS 관리자"
+      one: 기타
+      other: 기타
+      personalize_demo: "데모 개인 설정"
+      provost: 교무처장
+      school_administrator: "학교 관리자"
+      sign_up_to_canvas: "Canvas 체험 등록"
+      student: 학생
+      subscribe: "Instructure로부터 뉴스, 정보, 팁 받기"
+      support: "사용자 지원"
+      teacher_instructor: 교사/강사
+      technologist: 기술자
+      vp: VP
   developer_key: 
     api_key: "키: *%{api_key}*"
     created: "작성:"
@@ -4456,6 +5549,7 @@ ko:
       separated_conversation_notice: "이는 그룹 과제이므로 각 그룹은 이 주제에 대한 자신의 대화를 가지고 있습니다. 다음은 액세스할 수 있는 대화입니다:"
       show_due_dates: "기한 표시"
       until: "다음 시간까지"
+    cannot_unpublish_with_replies: "답변이 있으면 게시를 취소할 수 없음"
     confirm_delete_announcement: 
       one: "이 알림 %{count}개를 삭제하시겠습니까?"
       other: "이 알림 %{count}개를 삭제하시겠습니까?"
@@ -4465,7 +5559,21 @@ ko:
     create_new_crumb: "새로 만들기"
     default_discussion_title: "제목 없음"
     deleted_topic_notice: "해당 주제가 삭제됨"
+    discussion: 
+      close_for_comments: "의견 닫기"
+      delete: 삭제
+      due: 기한
+      last_post_date: "마지막 게시 %{display_last_reply_at}"
+      manage: 관리
+      no_due_date: "기한 없음"
+      open_to_comments: "의견 열기"
+      pin: 고정
+      unpin: "고정 해제"
+      user_subscribed: "이 주제를 구독하고 있습니다. 구독을 해제하려면 클릭합니다."
+      user_unsubscribed: "이 주제를 구독하고 있지 않습니다. 구독하려면 클릭합니다."
     discussion_feed_title: "%{title} 토론 피드"
+    discussion_list: 
+      no_pinned_discussions: "고정한 토론이 없음"
     discussions_settings_view: 
       allow_student_discussion_editing: "자신의 게시물을 편집하거나 삭제"
       allow_student_topics: "토론 주제 만들기"
@@ -4482,6 +5590,9 @@ ko:
       allow_threaded_replies: "계층 구조 답변 허용"
       attachment: 첨부
       available_from: "다음부터 사용 가능"
+      buttons: 
+        not_published: "게시 안 됨"
+        published: 게시됨
       delay_posting: "지연 게시"
       enable_podcast_feed: "Podcast 피드 사용"
       include_replies_in_podcast_feed: "Podcast 피드에 답변 포함"
@@ -4506,6 +5617,8 @@ ko:
       show_more_entries: 
         one: "추가 항목 %{count}개 표시"
         other: "추가 항목 %{count}개 표시"
+    error_draft_state_unauthorized: "이 주제를 초안 상태로 변경할 권한이 없습니다."
+    error_draft_state_with_posts: "이 주제는 게시물을 포함하고 있으므로 초안 상태로 설정할 수 없습니다."
     group_assignment_discussion_entry: 
       posts: 
         one: "게시글 %{count}개"
@@ -4516,13 +5629,14 @@ ko:
     index_view: 
       assignments: 과제
       delete: 삭제
+      discussion_topics: "토론 주제"
       edit_settings: "토론 설정 편집"
       loading: "로드 중..."
       lock_for_comments: "의견 잠금"
       make_an_announcement: 공지하기
       make_an_announcement_caps: 공지하기
       make_sure_all_search_terms_are_spelled_correctly: "모든 검색 용어의 철자가 올바른지 확인하십시오. "
-      new_discussion: "토론 시작하기"
+      new_discussion: "토론 *시작하기*"
       rss_feed: "RSS 피드"
       search_title_body_or_author: "제목, 내용, 작성자 검색"
       start_one_now: "지금 하나 시작"
@@ -4549,13 +5663,16 @@ ko:
       current_page: 현재
       first_page: 처음
       last_page: 마지막
+    points_possible_number: "가능한 점수는 숫자이어야 함"
     reply_count_tooltip: 
       one: "답변 1개"
       other: "답변 %{count}개"
       zero: "답변 없음"
     show: 
       add_rubric: "루브릭 추가"
+      announcement_closed: "이 공지 사항은 의견을 받지 않음"
       announcement_locked: "이 공지 사항은 사용자에게 *%{date}*까지 보이지 않음"
+      announcement_not_visible: "이 공지 사항은 사용자에게 표시되지 않음"
       authors_name: "작성자 이름"
       collapse_replies: "답변 축소"
       confirm_delete_discussion: "이 토론을 삭제하시겠습니까?"
@@ -4589,7 +5706,12 @@ ko:
       speed_grader: "Speed Grader"
       topic: 주제
       topic_locked: "이 주제는 사용자에게 *%{date}*까지 보이지 않음"
+      topic_not_visible: "이 주제는 사용자에게 보이지 않음"
       topic_podcast_feed_link: "주제 Podcast 피드"
+      topic_subscribe: 구독
+      topic_subscribe_tooltip: "구독 해제 상태가 되어 새 의견에 대한 알림을 받지 않음"
+      topic_subscribed_tooltip: "구독 상태가 되어 새 의견에 대한 알림을 받음"
+      topic_unsubscribe: 구독함
       unlock_topic: "의견 다시 열기"
       unread: "읽지 않은 메시지"
     sub_entry: 
@@ -4611,8 +5733,14 @@ ko:
       my_settings: "내 설정"
   discussions: 
     are_your_sure_delete: "이 항목을 삭제하시겠습니까?"
+    cant_subscribe_not_in_group: "구독하려면 이 그룹에 속해야 함"
+    cant_subscribe_not_in_group_set: "구독하려면 이 관련 그룹에 속해 있어야 함"
+    closed_for_comments: "의견 닫힘"
+    confirm_delete_discussion_topic: "이 토론 주제를 삭제하시겠습니까?"
+    delete: 삭제
     deleted_entry: 
       deleted: "이 항목이 삭제됨"
+    discussions: 토론
     edit_settings: "토론 설정 편집"
     entry_collection_view: 
       add_reply_to_topic: "주제에 답변 추가"
@@ -4626,9 +5754,11 @@ ko:
       manage_discussion_entry: "토론 항목 관리"
       open_in_speedgrader: "SpeedGrader에서 열기"
       unknown_author: "알 수 없는 작성자"
+      write_a_reply: "답변 작성..."
     entry_stats: 
       show_more: "자세히 표시"
     hide_due_dates: "기한 숨기기"
+    initial_post_required_to_subscribe: "구독 전에 답변을 게시해야 함"
     mark_as_read: "읽음으로 표시"
     mark_as_unread: "읽지 않음으로 표시"
     no_content: "내용 없음"
@@ -4638,16 +5768,20 @@ ko:
       try_different_more_general_or_fewer_keywords: "다른 키워드나 보다 일반적인 키워드나 더 적은 키워드로 다시 시도해 보십시오."
       try_disabling_the_unread_filter: "\"읽지 않음\" 필터를 사용하지 말아 보십시오."
       your_search_did_not_match_any_entries: "검색과 일치하는 항목이 없습니다."
+    ordered_by_recent_activity: "최근 활동으로 정렬"
     participant: 
       anonymous_user: 익명
+    pinned_discussions: "고정된 토론"
     reply: 
       error_saving_reply: "*오류가 발생했습니다*. 나중에 다시 답변을 게시하시기 바랍니다."
       saving_reply: "답변 저장 중..."
     reply_attachment: 
+      attachment_label: 첨부
       remove_attachment: 제거
     reply_form: 
       attach_file: 첨부
       cancel: 취소
+      post_reply: "답변 게시"
       post_response: "답변 게시"
       switch_views: "뷰 전환"
       write_a_reply: "답변 작성..."
@@ -4659,9 +5793,15 @@ ko:
       one: "답변 %{count}개 모두 표시"
       other: "답변 %{count}개 모두 표시"
     show_due_dates: "기한 표시"
+    subscribe: "이 주제를 구독"
+    subscribed: 구독함
+    subscribed_hint: "이 주제를 구독합니다. 구독 해제하려면 클릭합니다."
     uknown_author: "알 수 없는 작성자"
     unknown: "알 수 없음"
     unknown_author: "알 수 없는 작성자"
+    unsubscribe: "이 주제를 구독 해제"
+    unsubscribed: "구독 해제함"
+    unsubscribed_hint: "이 주제를 구독하고 있지 않습니다. 구독하려면 클릭합니다."
   due_dates: 
     due_at: "기한: %{assignment_due_date_time}"
     multiple_due_dates: "기한: 여러 기한"
@@ -4779,6 +5919,10 @@ ko:
     errors: 
       compiling: "ePortfolio를 모으는 중에 오류가 발생했습니다. 잠시 후에 다시 시도하시기 바랍니다."
       missing_file: "파일 선택"
+      name_required: "이름이 필요함"
+      name_too_long: "이름이 너무 김"
+      section_name_invalid: "섹션 이름이 올바르지 않음"
+      section_name_too_long: "섹션 이름이 너무 김"
       upload_failed: "업로드를 실패했습니다."
     first_category: 홈
     first_entry: 
@@ -5080,9 +6224,15 @@ ko:
     account_navigation_configured: "계정 탐색이 구성됨"
     app_full_view: 
       add_tool: "도구 추가"
+      app_already_installed: "이 앱은 이미 설치됨"
+      average_rating: "평균 등급"
       back_to_app_center: "앱 센터로 돌아가기"
+      education_levels: "교육 수준"
+      extensions: 확장
+      help_link: "도움말 링크"
+      rate_tool: "이 도구를 평가"
     app_review_view: 
-      posted_by_on: "*%{created}*에 *%{user_name}*이(가) 게시"
+      posted_by_on: "*%{user.name}*이(가) *%{created_at}*에 게시함"
     app_saved_message: "%{app}을(를) 성공적으로 저장했습니다!"
     buttons: 
       cancel: 취소
@@ -5093,6 +6243,7 @@ ko:
     delete: 삭제
     dialog_title_add_app: "앱 추가"
     dialog_title_edit_tool: "외부 도구 편집"
+    dialog_title_rate_tool: "이 도구를 어떻게 평가하시겠습니까?"
     edit_view: 
       anonymous: 익명
       by_url: URL로
@@ -5139,21 +6290,35 @@ ko:
     generic_error: "요청을 처리하는 중 오류 발생"
     homework_submission_configured: "과제 제출물 구성됨"
     index_view: 
-      add_new_tool: "새 도구 추가"
+      add_new_tool: "새 앱 추가"
+      all: 전부
+      app_headder: "외부 앱"
       external_tools: 외부도구
-      external_tools_note: "외부 도구는 Canvas에 새 기능을 추가하는 쉬운 방법입니다. 개별 과목이나 계정에 있는 모든 과목에 추가할 수 있습니다. 구성을 마치면 과목 모듈을 통해 연결하거나고 평가 도구를 위한 과제를 만들 수 있습니다."
+      external_tools_note: "앱은 Canvas에 새 기능을 추가하는 쉬운 방법입니다. 개별 과목이나 계정에 있는 모든 과목에 추가할 수 있습니다. 구성을 마치면 과목 모듈을 통해 연결하거나고 평가 도구를 위한 과제를 만들 수 있습니다."
       external_tools_references: "*여기*를 클릭하면 Canvas와 잘 동작하는 LTI 도구를 볼 수 있습니다. **여기**에서는 LTI 도구와 관련한 Canvas 커뮤니티 주제도 확인할 수 있습니다."
+      installed: 설치됨
+      not_installed: "설치 안 됨"
       search_filter: "이름으로 필터링"
       view_app_center: "앱 센터 보기"
-      view_installed_tools: "설치된 도구 보기"
+      view_installed_tools: "앱 구성 보기"
+    missing_stars: "별점을 선택해야 함"
+    rate_tool_view: 
+      rate_tool: "이 도구를 어떻게 평가하시겠습니까?"
     remove_tool: "이 도구를 제거하시겠습니까?"
     resource_selection_configured: "리소스 선택이 구성됨"
+    save_failed: "검토를 저장할 수 없음: %{message}"
     saving: "저장 중..."
     sessionless_launch: 
       load_tool_button: "%{tool}을(를) 수동으로 로드"
       redirecting_to_lti: "LTI 앱으로 리디렉션 중입니다. 잠시 기다려 주시기 바랍니다."
     shared_secret: "공유 시크릿"
     submit: 제출
+    tool_post_iframe: 
+      load_tool_button: "%{tool} 로드"
+      load_tool_new_tab_button: "새 창에 %{tool} 로드"
+      new_tab: "이 도구는 새 브라우저 창에 로드해야 함"
+      new_tab_expired: "이 도구의 세션이 만료되었습니다. 도구를 다시 액세스하려면 페이지를 다시 로드하십시오."
+      new_tab_loaded: "이 도구를 새 브라우저 창에 성공적으로 로드했습니다. 도구를 다시 액세스하려면 페이지를 다시 로드하십시오."
     tool_show: 
       load_tool_button: "%{tool} 로드"
       load_tool_new_tab_button: "새 창에 %{tool} 로드"
@@ -5208,6 +6373,23 @@ ko:
       notifications_config_notice: "Canvas의 알림을 자동으로 Facebook 계정에 보낼 수 있습니다. 아래에서 보낼 수 있는 알림 유형을 볼 수 있습니다. 알림 기본 설정은 여기 또는 Canvas에서 언제든지 바꿀 수 있습니다."
       settings_title: "Canvas 알림 설정"
       updating_preferences: "기본 설정 업데이트 중..."
+  feature_flags: 
+    feature_flag: 
+      allow: 허용
+      disabled: "사용 안 함"
+      enabled: 사용함
+      no_description: "설명 없음"
+      ? "off"
+      : 끄기
+      ? "on"
+      : 켜기
+      release_notes: "배포 노트"
+      toggle_feature_details: "기능 세부 정보 토글"
+    feature_flag_admin_view: 
+      no_features_available: "현재 사용할 수 있는 기능이 없음"
+  features: 
+    draft_state: "초안 상태"
+    google_docs_domain_restriction: "Google Docs 도메인 제한"
   filebrowserview: 
     course_files: "과목 파일"
     group_files: "그룹 파일"
@@ -5286,6 +6468,7 @@ ko:
         download_as_zip: "이 폴더의 파일을 zip으로 다운로드"
         download_file: "이 파일을 다운로드"
         download_with_size: "파일을 다운로드 (%{size})"
+        download_zip: "%{size}을(를) 다운로드하려면 여기를 클릭"
         edit_content: "내용 편집"
         import_zip: "zip 파일 가져오기"
         lock_file: "이 파일 잠금"
@@ -5300,16 +6483,21 @@ ko:
       locked: "이 파일은 아직 잠금이 해제되지 않아서 다운로드할 수 없습니다."
       locked2: "이 파일은 잠겨 있어서 학생이 다운로드할 수 없습니다."
       messages: 
+        creating_zip: "압축 파일을 만드는 중..."
         gathering_and_zipping: |-
             **이 폴더의 내용을 모아서** zip 파일로 압축합니다.
             이 작업은 파일의 크기와 개수에 따라 다소 시간이 걸릴 수도 있습니다.
+        gathering_data: "데이터 모으는 중..."
         gathering_files: "파일을 모으는 중..."
+        gathering_files_with_progress: "파일 모으는 중 (%{progress}%)..."
         no_preview_avaialble: "미리 보기 없음"
         uploading: "5개 파일 업로드 중..."
+        zip_finished: "완료됨! 파일로 리디렉트 중..."
       page_title: 파일
       storage_used: "사용된 저장소: %{size2} 중 %{size1}"
       switch_views: "뷰 전환"
       titles: 
+        download_folder_contents: "폴더 내용 다운로드"
         edit_file: "%{file} 편집"
         edit_file_contents: "파일 내용 편집"
         file_locked: 잠김
@@ -5409,9 +6597,16 @@ ko:
     invitation: 초대
     question: 문제
     warning: 경고
+  google_docs_domain_restriction_description: "Google Docs 도메인 제한을 이용하면 Google Docs 제출물과 협업을 단일 도메인으로 제한할 수 있습니다. 승인되지 않은 도메인에서 과제를 제출하거나 협업에 참여하려는 학생은 Google Docs 통합을 업데이트할 필요가 있다는 것을 알리는 오류 메시지를 받게 됩니다."
+  grade_display_warning_dialog: 
+    grade_display_warning: 
+      warning: 경고
+  grade_export_title: "평점 내보내기"
   gradebook: 
     alerts: 
       no_active_students: "죄송합니다. 과목에 활동 중인 학생이 없거나 평가할 수 있는 학생이 없습니다."
+      no_students_in_groups_back: "할당된 사용자가 없기 때문에 이 과제에 대한 제출물은 Speedgrader에서 평가할 수 없습니다. 이 그룹 집합에 사용자를 할당하고 다시 시도하시기 바랍니다. 뒤로 돌아가려면 '확인'을 클릭하십시오."
+      no_students_in_groups_close: "할당된 사용자가 없기 때문에 이 과제에 대한 제출물은 Speedgrader에서 평가할 수 없습니다. 이 그룹 집합에 사용자를 할당하고 다시 시도하시기 바랍니다. 이 창을 닫으려면 '확인'을 클릭하십시오."
       no_students_in_section: "해당 섹션에 학생이 없어서 모든 섹션 보기로 돌아갑니다."
       none_to_update: "업데이트할 내용 없음"
       scores_updated: 
@@ -5450,8 +6645,11 @@ ko:
       select_an_option: "옵션을 선택하시기 바랍니다."
       upload_as_zip: "zip 파일로 올려주시기 바랍니다."
     grade: "평점: %{grade}"
+    graded: 평가됨
     graded_by_me: "%{graded_time}에 내가 평가"
     graded_then_resubmitted: "평가된 후 다시 제출됨 (%{when})"
+    gradee_index_of_total: "%{gradee} %{x} / %{y}"
+    group: 그룹
     hide_all_things: "%{things} 모두 숨기기"
     hide_column: "열 숨기기"
     hide_student_name: "학생 이름 숨기기"
@@ -5471,12 +6669,16 @@ ko:
     mute_assignment: "과제 평점 비공개"
     new_assessment: "[새 과제]"
     no_submission_time: "제출 시간 없음"
+    not_graded: "평가 안 됨"
+    not_submitted: "제출 안 됨"
     nth_student: "%{n}번째 학생"
+    portion_graded: "%{x} / %{y} 평가됨"
     publish_to_sis: "SIS에 평점 게시"
     reupload_submission_files: "제출물 파일 다시 업로드"
     reupload_submissions: "제출물 다시 업로드"
     set_default_grade: "기본 평점 설정"
     set_group_weights: "그룹 가중치 설정"
+    show_all_details_button: "모든 세부 정보 보기"
     show_student_name: "학생 이름 표시"
     showing_all_sections: "모든 섹션 표시하기"
     showing_section: "다음 섹션 표시하기: %{section}"
@@ -5536,6 +6738,9 @@ ko:
     errors: 
       none_to_update: "업데이트할 내용 없음"
       upload_as_zip: "zip 파일로 업로드하시기 바랍니다."
+    grade_display_warning: 
+      cancel: 취소
+      continue: 계속
     gradebook_header_menu: 
       assignment_details: "과제 세부 정보"
       curve_grades: "상대 평가"
@@ -5548,6 +6753,18 @@ ko:
     invalid_assignment_groups_warning: 
       one: "%{groups}에 가능한 점수가 없어서 점수에 포함되지 않음"
       other: "%{groups}에 가능한 점수가 없어서 점수에 포함되지 않음"
+    keyboard_assignment_desc: "현재 과제의 세부 정보 페이지로 이동"
+    keyboard_close_menu: "현재 활성인 과제 메뉴 닫기"
+    keyboard_comment_desc: "활성 제출물에 대한 의견 달기"
+    keyboard_menu_desc: "활성 열 과제에 대한 메뉴 열기"
+    keyboard_sort_desc: "현재 활성인 열로 그리드 정렬"
+    keycodes: 
+      close_menu: ESC
+      comment: c
+      goto_assignment: g
+      menu: M
+      sort: S
+    learning_outcome: "학습 성과"
     no_assignments_have_points_warning: "과제가 가능한 점수를 갖기 전까지 점수를 계산할 수 없음"
     percent_of_grade: "평점의 %{percentage}"
     points_out_of: "/ %{points_possible}"
@@ -5578,8 +6795,13 @@ ko:
     students_who: 
       havent_been_graded: "평가되지 않음"
       havent_submitted_yet: "제출되지 않음"
+      no_grade_for: "%{assignment}에 대한 평점 없음"
+      no_submission_for: "%{assignment}에 대한 제출물 없음"
+      not_submitted_yet: "제출되지 않음"
       scored_less_than: "다음 이하 점수"
+      scored_less_than_on: "%{assignment}에서 %{cutoff} 미만의 점수를 기록함"
       scored_more_than: "다음 이상 점수"
+      scored_more_than_on: "%{assignment}에서 %{cutoff} 이상의 점수를 기록함"
     submitted_late: "늦게 제출됨"
     title: 
       quiz: "퀴즈 제출물"
@@ -5704,13 +6926,21 @@ ko:
       muted: "평점 비공개"
     grade_summary: 
       assessment_by: "%{name}이(가) 평가"
+      assignments: 과제
       buttons: 
         show_what_if: "저장된 \"What-If\" 점수 표시"
       change_score_instructions: "변경 내용이 합계에 미치는 영향을 보려면 점수를 클릭하고 새 값을 입력하십시오."
       click_to_change: "다른 점수를 테스트하려면 클릭"
+      close_comments: 닫기
+      close_comments_label: "의견 받지 않기"
+      close_rubric: "루브릭 마감"
+      close_score: 닫기
+      close_score_screenreader: "점수 세부 정보 마감"
       comment_count: 
         one: "의견 %{count}개"
         other: "의견 %{count}개"
+      comment_count_screenreader: "의견 읽기"
+      comments: 의견
       faculty_journal: "%{user}의 교원 일지"
       for_course: "과목에 대해"
       headers: 
@@ -5720,6 +6950,9 @@ ko:
         name: 이름
         out_of: 총점
         score: 점수
+      icons: 
+        rubric_results: "루브릭 결과 보기"
+        turnitin_results: "Turnitin 결과 보기"
       labels: 
         final_grade_hidden: "합계 계산을 사용하지 않음"
         high: 최고
@@ -5742,7 +6975,9 @@ ko:
       percent: 퍼센트
       print_grades: "평점 인쇄"
       see_rubric_results: "루브릭 결과 보기"
+      see_rubric_results_screenreader: "루브릭 결과 보기"
       see_scoring_details: "점수 세부 정보 보기"
+      see_scoring_details_screenreader: "점수 세부 정보 보기"
       see_turnitin_results: "Turnitin 결과 보기"
       student_mute_legend: "교사가 평가 중입니다. 교사가 평가하는 중에는 평점과 의견 정보를 알 수 없습니다."
       student_mute_notification: "교사가 평가 중"
@@ -5752,6 +6987,7 @@ ko:
         turnitin_score: "Turnitin 유사성 점수 -- 자세한 정보"
         view_rubric_evaluation: "루브릭 평가 보기"
         view_scoring_details: "점수 세부 정보 보기"
+      total: 합계
       view_comments: "의견과 점수 세부 정보 보기"
     gradebook: 
       all_sections: 모두
@@ -5827,6 +7063,19 @@ ko:
       upload_info: "이전에 다운로드한 학생의 제출물 파일을 바꿨다면 다시 압축해서 아래 양식에 압축 파일을 업로드하십시오. 학생이 제출물 파일에 대한 의견에서 변경된 파일을 볼 수 있습니다."
       upload_warning: "인식할 수 있도록 파일 이름을 바꾸지 마십시오."
       weight_final: "그룹에 따라 최종 평점에 가중"
+    gradebook2: 
+      arrange_columns_by_due_date: "기한으로 열 정렬"
+      arrange_columns_by_group: "과제 그룹으로 열 정렬"
+      download_scores: "점수 다운로드 (.csv)"
+      filter_by_student: "학생 이름이나 보조 ID로 학생 필터링"
+      grades: 평점
+      hide_student_names: "학생 이름 숨기기"
+      publish_to_sis: "SIS에 평점 게시"
+      set_group_weights: "그룹 가중치 설정"
+      show_attendance_columns: "출석 열 표시"
+      show_concluded_enrollments: "종결된 등록 표시"
+      upload_scores: "점수 업로드 (.csv 에서)"
+      view_grading_history: "평가 기록 보기"
     grades: 
       complete: 완료
       incomplete: "완료 안 됨"
@@ -5856,7 +7105,7 @@ ko:
       updated: "참석 과제를 성공적으로 업데이트했습니다."
       uploaded: 
         one: "사용자 의견 %{count}개에 대한 파일과 의견을 만듦"
-        other: "사용자 의견 %{count}개에 대한 파일과 의견을 만듦"
+        other: "%{count} 개의 제출물에 대한 파일과 의견"
     out_of_final: "최종 평가의 %{weight}"
     out_of_points_possible: "/ %{points_possible}"
     show: 
@@ -5892,8 +7141,14 @@ ko:
         assessment: 평가
         discussion: 토론
         grading: "평점 매기기"
+        no_group_submission: "이 그룹은 이 과제에 대한 제출물이 없음"
         no_submission: "이 학생은 이 과제에 대한 제출물이 없음"
         submission: "이 학생은 과제를 제출했음"
+      icons: 
+        delete_comment: "의견 삭제"
+        file_attachment: "파일 첨부"
+        media_comment: "미디어 설명"
+        speech_recognition: "음성 인식"
       keycode_descriptions: 
         change_grade: "평점 바꾸기"
         leave_comment: "의견 남기기"
@@ -5910,6 +7165,7 @@ ko:
         add_comment: "의견 추가"
         average: 평균
         grade: 평점
+        grade_by_question_beta: "질문에 따라 평가 (베타)"
         group_comment: "전체 그룹에 의견 보내기"
         hide_names: "SpeedGrader에서 학생 이름 숨기기"
         show_assessment_by: "평가 표시 기준"
@@ -5952,6 +7208,7 @@ ko:
         media_comment: "미디어 설명"
         speech_recognition: "음성 인식"
     speed_grader_disabled: "이 과목은 SpeedGrader를 사용 안 함"
+    speedgrader_enabled_only_for_published_content: "Speedgrader는 게시된 내용에 대해서만 사용할 수 있습니다."
     student: 
       new_student: "새 학생"
       student: 학생
@@ -5996,6 +7253,9 @@ ko:
       total: 합계
   grading_box: 
     out_of_points_possible: "/ %{assignment.points_possible}"
+  grading_cell: 
+    grade_complete: 완료
+    grade_incomplete: "완료 안 됨"
   grading_standard: 
     unknown_grading_details: "알 수 없는 세부 정보"
   grading_standards: 
@@ -6024,7 +7284,10 @@ ko:
       grading_scheme_info: "평가 구성표 보기/편집"
   group: 
     default_collection_name: "%{group_name}의 협업"
+    greater_than_1: "1보다 커야 함"
     memeber: 구성원
+    name_required: "이름이 필요함"
+    name_too_long: "짧은 그룹 이름 입력"
     tabs: 
       chat: 채팅
       discussions: 토론
@@ -6044,10 +7307,18 @@ ko:
       delete_category_success: "범주를 성공적으로 삭제함"
       update_category_success: "범주를 성공적으로 업데이트했습니다."
   group_category: 
+    cant_restrict_self_signup: "범주에 혼합 섹션 그룹이 있으면 자동 등록을 제한할 수 없음"
+    greater_than_1: "1보다 커야 함"
     group_categories: 
       communities: 커뮤니티
       imported: "가져온 그룹"
       student_organized: "학생 그룹"
+    invalid_self_signup: "자동 등록은 다음 값 중 하나가 필요함: %{values}"
+    name_required: "이름이 필요함"
+    name_reserved: "%{name}은(는) 예약된 이름입니다."
+    name_too_long: "더 짧은 범주 이름을 입력"
+    name_unavailable: "%{name}은(는) 이미 사용 중입니다."
+    self_signup_for_courses: "자동 등록은 과목 그룹이나 커뮤니티를 대상으로만 사용할 수 있음"
   group_membership: 
     errors: 
       group_full: "그룹이 꽉 찼습니다."
@@ -6055,6 +7326,7 @@ ko:
   group_settings: 
     invitation_sent: "초대 보냄"
   groups: 
+    add_group: "그룹 추가"
     add_group_category: 
       allow_self_signup: "직접 등록 허용"
       buttons: 
@@ -6116,7 +7388,7 @@ ko:
         one: "학생 %{count}명"
         other: "학생 %{count}명"
       warnings: 
-        studend_groups: "이 그룹은 학생이 직접 구성한 것입니다. 다른 그룹 유형과 달리 학생이 하나 이상의 이 그룹에 속할 수 있으므로, 평가 과제에 대한 가장 좋은 방법은 아닙니다."
+        studend_groups: "이 그룹은 학생이 직접 구성한 것입니다. 다른 그룹 유형과 달리 학생이 하나 이상의 이 그룹에 속할 수 있으므로 평가 과제에 사용할 수 없습니다."
     confirm: 
       assign_students: "이는 할당되지 않은 학생을 기존 학생 그룹에 가능한 한 고르게 임의로 할당함"
       delete_group: "이 그룹을 삭제하시겠습니까?"
@@ -6142,6 +7414,8 @@ ko:
         open_to_course_members: "과목 구성원은 자유롭게 참여"
       page_title: "과목 그룹"
       student_group_warning: "만약 교사가 여러분을 과제의 일부인 그룹에 넣는 것에 대해서 언급했다면 이는 올바른 방식이 아닙니다. 스스로 구성한 그룹은 평가에 사용할 수 없습니다… 여러분은 여전히 자신의 그룹을 만들 수 있지만 교사가 여러분을 위해 만든 그룹이 아니라면 과제의 전자 사본을 제출할 수 없습니다."
+      student_groups_tabs_everyone: 모두
+      student_groups_tabs_groups: 그룹
     context_manage_groups: 
       account_group_explanation: "계정 수준 학생 그룹은 특정 과목에 묶이지 않은 학생을 묶는 좋은 방법입니다. 모든 학생 그룹은 자신의 달력, 토론장, 협업 도구를 가지고 있어서 스스로 구성하고 보다 효율적으로 함께 작업할 수 있습니다."
       actions: 
@@ -6159,6 +7433,9 @@ ko:
       messages: 
         no_students: "이 과목에 추가된 학생이 없음"
       page_title: "과목 그룹"
+      page_title_accounts: "계정 그룹"
+    create_group_set: "그룹 집합 만들기"
+    delete_confirm: "이 그룹 집합을 삭제하시겠습니까?"
     edit: 
       buttons: 
         update: "그룹 업데이트"
@@ -6168,12 +7445,14 @@ ko:
         description: 설명
         join_level: "참여 권한"
         name: 제목
+    edit_group: "그룹 편집"
     edit_group_category: 
       allow_self_signup: "직접 등록 허용"
       group_limit_blank: "(제한이 없으면 공란으로 두십시오)"
       group_structure_group_limit: "그룹을 %{group_limit}명으로 *제한*"
       restricted_self_signup: "그룹 구성원이 같은 섹션에 있어야 함"
       self_signup_help_tooltip: "직접 등록 그룹이 무엇입니까?"
+    edit_group_set: "그룹 집합 편집하기"
     errors: 
       category_in_use: "\"%{category_name}\"은(는) 이미 사용 중임"
       creating_category_failed: "범주 만들기 실패. 다시 시도하시기 바랍니다."
@@ -6182,7 +7461,11 @@ ko:
       group_limit: "그룹 제한은 공란이거나 1보다 커야 함"
       unknown: "예기치 않은 오류가 발생했습니다."
       update_failed: "업데이트 실패. 다시 시도하시기 바랍니다."
+    everyone: "모두 (%{count}명)"
     feed_title: "%{course_or_account_name} 피드"
+    flash: 
+      removeError: "그룹 집합을 삭제할 수 없습니다. 나중에 다시 시도하시기 바랍니다."
+      removed: "그룹 집합을 성공적으로 제거했습니다."
     group: 
       actions: 
         ask_to_join_group: "이 그룹에 참여 요청"
@@ -6198,10 +7481,121 @@ ko:
       one: "그룹 1개"
       other: "그룹 %{count}개"
     group_name: "그룹 이름"
+    groups_count: "그룹 (%{count}개)"
     index: 
       heading_current_groups: "현재 그룹"
       no_groups: "그룹 없음"
     loading: "그룹 명부 로드 중..."
+    manage: 
+      add_unassigned_menu: 
+        add_unassigned_student: "할당 안 된 학생 추가"
+        add_unassigned_user: "할당 안 된 사용자 추가"
+        search_people: "사람 검색"
+      add_unassigned_user: 
+        add_to_group: "사용자를 그룹에 추가"
+        add_user_to_group: "사용자 %{name}을(를) 그룹에 추가"
+      add_unassigned_users: 
+        no_users_found: "사용자 없음"
+        too_short: "3자 이상으로 된 검색어를 입력하십시오."
+      assign_to_group_menu: 
+        add_to_group: "그룹에 추가"
+        all_groups_full: "모든 그룹이 꽉 찼습니다."
+        all_groups_full_suggestion: "그룹 제한을 변경하거나 그룹을 추가하십시오."
+        assign_user_to_group: "사용자를 이 그룹에 할당"
+        assign_user_to_group_name: "사용자를 그룹 %{name}에 추가"
+        no_groups_created: "사용자를 추가하기 전에 그룹을 만들어야 합니다."
+      edit_group_assignment: 
+        all_available_groups_full: "사용할 수 있는 그룹이 꽉 찼습니다."
+        all_groups_full_suggestion: "그룹 제한을 변경하거나 그룹을 추가하십시오."
+        move_to_group_label: "그룹으로 이동"
+        saving: "저장 중..."
+        where_to_move: "*%{userName}*를 어디로 이동하시겠습니까?"
+      group_categories: 
+        account_group_explanation: "계정 수준 학생 그룹은 특정 과목에 묶이지 않은 학생을 묶는 좋은 방법입니다. 모든 학생 그룹은 자신의 달력, 토론장, 협업 도구를 가지고 있어서 스스로 구성하고 보다 효율적으로 함께 작업할 수 있습니다."
+        add_group_set: "그룹 집합 추가"
+        course_group_explanation: "학생 그룹은 그룹 프로젝트나 보고서를 위해 학생을 구성하는 유용한 방법입니다. 모든 학생 그룹은 별도의 달력과 토론 보드와 협업 도구가 있어서 스스로 조직하고 더 효과적으로 함께 일할 수 있습니다."
+        group_assignment_instructions: "학생을 임의로 정해진 크기의 그룹에 할당하거나 수동으로 그룹을 만들고 구성할 수 있습니다. 그룹을 만들면 과제를 \"그룹 제출\" 과제로 만들 수 있는데, 그러면 각 그룹은 그룹의 모든 사용자에 대한 하나의 제출물을 갖게 됩니다."
+        group_set: "그룹 집합"
+        headings: 
+          account_groups: "계정 수준 학생 그룹"
+          course_groups: "학생 그룹"
+        tabs: 
+          everyone: 모두
+      group_category: 
+        randomly_assigning_students: "임의로 학생 할당 중"
+        search_groups: "그룹 검색"
+        search_users: "사용자 검색"
+      group_category_create: 
+        allow_self_signup: "직접 등록 허용"
+        cancel: 취소
+        create_groups: "지금 그룹 %h{num_groups}개 만들기"
+        create_groups_manually: "그룹을 수동을 만들겠습니다."
+        group_set_name: "그룹 집합 이름"
+        group_structure: "그룹 구조"
+        leave_group_limit_blank: "(제한이 없으면 공란으로 둠)"
+        limit_group_size: "그룹을 %h{group_limit}명으로 제한"
+        require_same_section: "그룹 구성원이 같은 섹션에 있어야 함"
+        save: 저장
+        saving: "저장 중..."
+        self_signup: "직접 등록"
+      group_category_detail: 
+        add_group: "그룹 추가"
+        category_settings: 설정
+        delete_category_option: 삭제
+        edit_category_option: 편집
+        group: 그룹
+        group_limit_blurb: "그룹은 *%{group_limit}*명으로 제한됩니다."
+        message_all_unassigned_option: "모든 할당 안 된 학생을 관리"
+        randomly_assign_students_option: "임의로 학생 할당"
+        restricted_self_signup_blurb: "하나의 그룹에 속한 모든 학생은 같은 섹션에 포함되어야 합니다."
+        self_organized_warning: "이 그룹은 학생이 직접 구성한 것입니다. 다른 그룹 유형과 달리 학생이 하나 이상의 이 그룹에 속할 수 있으므로 평가 과제에 사용할 수 없습니다."
+        self_signup_blurb: "이 그룹은 직접 등록을 사용합니다."
+        settings: 설정
+      group_category_edit: 
+        allow_self_signup: "직접 등록 허용"
+        cancel: 취소
+        group_set_name: "그룹 집합 이름"
+        leave_group_limit_blank: "(제한이 없으면 공란으로 둠)"
+        limit_group_size: "그룹을 %h{group_limit}명으로 제한"
+        require_same_section: "그룹 구성원이 같은 섹션에 있어야 함"
+        save: 저장
+        saving: "저장 중..."
+      group_detail: 
+        add_user_to_group: "사용자를 그룹에 할당"
+        group_delete: 삭제
+        group_edit: 편집
+        group_full: "꽉 참"
+        group_settings: 설정
+        show_group_details: "그룹 %{name}에 대한 세부 정보 표시"
+        visit_group_homepage: "그룹 홈페이지 방문"
+      group_edit: 
+        cancel: 취소
+        group_join_level: 참여하기
+        group_name: "그룹 이름"
+        invitation_only: "초대 전용"
+        open: "구성원이 자유롭게 참여"
+        save: 저장
+        saving: "저장 중..."
+      group_user: 
+        assign_to_group: "그룹에 할당"
+        assign_user_to_group: "%{name}을(를) 그룹에 할당"
+        move: "다음으로 이동..."
+        move_to_new_group: "%{name}을(를) 새 그룹으로 이동"
+        remove: 제거
+        remove_from_group: "%{name}을(를) 그룹에서 제거"
+      group_users: 
+        no_matching_students: "일치하는 학생이 없습니다."
+        no_matching_users: "일치하는 사용자가 없습니다."
+      groups: 
+        no_groups: "현재 이 그룹 집합에 그룹이 없습니다. 시작하려면 그룹을 추가하십시오."
+        no_matching_groups: "현재 검색 조건에 일치하는 그룹이 없습니다."
+      randomly_assign_members: 
+        cancel: 취소
+        okay: OK
+        randomly_assign_students_dialog: "이는 할당되지 않은 학생을 기존 학생 그룹에 가능한 한 고르게 임의로 할당합니다."
+      self_signup_help: 
+        about_self_signup_groups: "직접 등록 그룹에 대한 정보"
+        self_signup_description: "학생이 직접 등록할 수 있는 그룹의 집합을 만들 수 있습니다. 학생은 집합에 있는 하나의 그룹에만 속할 수 있지만, 이러한 방식으로 교사 대신 학생들이 스스로 그룹을 구성할 수 있습니다. 이 옵션을 사용하면 학생이 하나의 그룹에서 다른 그룹으로 직접 이동할 수 있습니다."
     member: 
       one: "멤버 %{count}명"
       other: "멤버 %{count}명"
@@ -6213,6 +7607,7 @@ ko:
       group_join_request_info: "이 그룹에 참여 요청을 했습니다. 요청이 수락되거나 거부되면 알림을 받게 됩니다."
     messages: 
       creating_group: "그룹 만드는 중..."
+    name_too_long: "이름이 너무 김"
     notices: 
       already_deleted: "해당 그룹이 삭제됨"
       create_success: "그룹을 성공적으로 만들었습니다."
@@ -6222,8 +7617,10 @@ ko:
       students_assigned: "학생을 그룹에 할당했습니다."
       update_success: "그룹을 성공적으로 업데이트했습니다."
       welcome: "%{group_name} 그룹에 오신 것을 환영합니다!"
+    randomly_assigning_members: "임의로 학생 할당 중"
     show: 
       coming_up: 예정
+      edit_group: "그룹 편집"
       group_atom_feed: "그룹 Atom 피드"
       new_announcement: "새 공지"
       next_week: "다음 주"
@@ -6237,6 +7634,8 @@ ko:
     titles: 
       add_group_category: "그룹 집합 추가"
       self_signup_help: "직접 등록 그룹"
+    unassigned_students: "할당 안 된 학생 (%{count}명)"
+    unassigned_users: "할당 안 된 사용자 (%{count}명)"
   help_dialog: 
     Back: 뒤로
     Help: 도움말
@@ -6268,6 +7667,7 @@ ko:
     which_course_is_this_question_about: "이 질문은 어떤 과목에 대한 것입니까?"
     your_email_address: "이메일 주소"
   helpers: 
+    course: 과목
     dashboard_helper: 
       announcement_details: "공지 사항 세부 정보"
       assignment_details: "과제 세부 정보"
@@ -6286,12 +7686,49 @@ ko:
       x_new_in_discussions: 
         one: "토론 *%{count}*개"
         other: "토론 *%{count}*개"
+  ic_actions: 
+    manage: 관리
+  icons: 
+    discussion_submission: "토론 제출물"
+    file_upload_submission: "파일 업로드 제출물"
+    online_url_submission: "온라인 URL 제출물"
+    quiz_submission: "퀴즈 제출물"
+    text_entry_submission: "텍스트 항목 제출물"
+  images: 
+    error_checking_color: "이미지 색상 확인 오류"
+    invalid_background_color: "배경색은 %{color}이어야 함"
+    invalid_dimensions: "올바르지 않은 이미지 크기 (현재 %{actual}, 예상: %{expected})"
+    invalid_file_size: "이미지 파일이 너무 큼 (최대 %{max} 바이트, 현재 %{actual})"
+    invalid_file_type: "유효하지 않은 파일 유형 %{type}. 허용되는 유형 목록: %{type_list}"
+    not_an_image: "선택한 파일은 이미지가 아닙니다."
+  importers/assignment_importer: 
+    errors: 
+      import: 
+        external_tool_url: "외부 도구 과제 \"%{assignment_name}\"에 대한 url이 유효하지 않습니다."
+    imported_assignments_group: "가져온 과제"
+  importers/context_external_tool_importer: 
+    external_tool_attention_needed: "\"%{tool_name}\" 외부 도구의 보안 매개 변수를 과목 설정에서 설정해야 합니다."
+  importers/context_module_importer: 
+    migration_module_item_type: "모듈 항목"
+  importers/learning_outcome_group_importer: 
+    no_global_permission: "전체 성과를 관리하도록 허용되지 않아서 \"%{title}\"을 추가할 수 없음"
+  importers/learning_outcome_importer: 
+    no_context_found: "\"%{title}\"에 대한 외부 학습 성과를 찾을 수 없어서 사본을 만듭니다."
+    no_global_permission: "전체 성과를 관리하도록 허용되지 않아서 \"%{title}\"을 추가할 수 없음"
+  importers/rubric_importer: 
+    no_context_found: "\"%{title}\"에 대한 외부 루브릭을 찾을 수 없어서 사본을 만듭니다."
+  importers/wiki_page_importer: 
+    title_for_topics_category: "%{category} 주제"
+    warnings: 
+      truncated_wiki_title: "다음 위키 페이지의 제목이 잘렸습니다: %{title}"
   info: 
     notices: 
       error_reported: "도와주셔서 감사합니다. 곧바로 확인하겠습니다."
     old_styleguide: 
       create_collection: "컬렉션 만들기"
       start_a_group: "그룹 시작하기"
+    styleguide: 
+      manage: 관리
   instructions: 
     authorize_google_docs: "문서에 대해 협업하기 전에 Canvas가 Google Docs 계정을 접근할 수 있도록 권한을 부여해야 합니다."
   instructure: 
@@ -6312,12 +7749,14 @@ ko:
     draft: 초안
     errors: 
       cannot_view_document_inline: "이 문서를 인라인으로 볼 수 없습니다. 문서 보기 권한이 없거나 문서가 삭제되었습니다."
+      document_preview_processing: "문서 미리 보기를 처리 중입니다. 나중에 다시 시도하시기 바랍니다."
       field_is_required: "이 필드가 필요함"
       invalid_datetime: "유효하지 않은 날짜/시간값"
       invalid_entry_for_field: "유효하지 않은 항목: %{field}"
       invalid_number: "숫자가 필요합니다."
       not_a_date: "날짜가 아닙니다!"
       posting_message_failed: "게시 실패. 다시 시도하시기 바랍니다."
+      required: "필수 필드"
       search_failed: "검색에 실패했습니다. 다시 시도하시기 바랍니다."
     ignore_forever: "계속 무시"
     ignore_until_new_submission: "새로 제출할 때까지 무시"
@@ -6330,6 +7769,7 @@ ko:
       view_equella_content_in_new_window: "새 창에서 내용 보기"
     loading: "로드하는 중..."
     no_description: "설명 없음"
+    no_items: "항목이 없습니다."
     no_results_found: "결과를 찾을 수 없음"
     status: 
       diigo_search_throttling: "Diigo는 매 10초마다 한 번의 검색만 허용합니다. 기다려 주십시오..."
@@ -6362,6 +7802,7 @@ ko:
       id: ID
       priority: "우선 순위"
       run_at: "실행 시각"
+      runtime: "실행 시간"
       strand: 고립
       tag: 태그
       worker: 작업자
@@ -6410,6 +7851,10 @@ ko:
     titles: 
       job_handler: "작업 처리기"
       last_error: "마지막 오류"
+  jquery: 
+    module_sequence_footer: 
+      next: 다음
+      previous: 이전
   labels: 
     announcements: 공지
     assignments: 과제
@@ -6463,6 +7908,8 @@ ko:
       view_all_accounts: "모든 계정 보기"
       view_all_enrollments: "모든 과목 보기"
       view_all_groups: "모든 그룹 보기"
+    mobile_auth: 
+      log_in_to_canvas: "Canvas에 로그인"
   learning_outcome: 
     no_comment: "의견 없음"
     no_context_found: "\"%{title}\"에 대한 외부 학습 성과를 찾을 수 없어서 사본을 만듭니다."
@@ -6557,6 +8004,9 @@ ko:
       no_link: "[ 연결 없음 ]"
     titles: 
       link_to_student: "학생에게 연결"
+  linked_assignment_message: "과제 '%{title}'와(과) 연결됨"
+  linked_discussion_topic_message: "토론 주제'%{title}'와(과) 연결됨"
+  linked_quiz_message: "퀴즈 '%{title}'와(과) 연결됨"
   links: 
     dashboard: "내 대시보드"
     errors: 
@@ -6567,6 +8017,8 @@ ko:
     switch_views: "뷰 전환"
   locales: 
     en: 영어
+    ko: "한국말 (crowd-sourced)"
+  logged_out_user: "사용자 %{user_counter} 로그 아웃"
   m2c_file_description: "Moodle 1.9 .zip 파일"
   m2c_name: "Moodle 가져오기"
   manage_avatars: 
@@ -6596,6 +8048,7 @@ ko:
     errors: 
       file_too_large: "*파일이 너무 큽니다.* 최대 크기는 %{size}MB입니다."
       load_failed: "미디어 설명 응용 프로그램을 로드하는 데 실패했습니다. 다시 시도하시기 바랍니다."
+      media_comment_installation_broken: "미디어 의견 올리기가 올바르게 설정되지 않았습니다. 시스템 관리자에게 문의하시기 바랍니다."
       must_be_logged_in: "미디어를 녹음/녹화하려면 로그인해야 합니다."
       persistent_problem: "이 문제가 계속 발생하면 미디어를 로컬에서 녹음/녹화하고 저장된 파일을 업로드하는 방법을 대신 시도해 볼 수 있습니다."
       save_failed: "저장에 실패한 것 같습니다. 이 팝업을 닫고 다시 시도하시기 바랍니다."
@@ -6627,6 +8080,8 @@ ko:
     my_courses: "내 과목"
   message: 
     default_subject: "Canvas 알림"
+  message_dialog_component: 
+    ok: 확인
   message_students: 
     buttons: 
       send_message: "메시지 보내기"
@@ -7147,6 +8602,7 @@ ko:
         html: 
           assignment_due_date_changed: "과제 기한 변경: %{assignment_name}, %{course_name} (%{override})"
           assignment_due_date_changed_sentence: "%{course_name} (%{override}) 과목 %{assignment_name} 과제의 변경된 기한:"
+          link: "과제를 보려면 여기를 클릭"
           link_text: "과제 보기"
           no_due_date: "기한 없음"
         labels: 
@@ -7172,6 +8628,7 @@ ko:
         assignment_graded: "과제 평가됨: %{assignment_name}, %{course_name}"
         html: 
           assignment_graded: "과제 평가됨: %{assignment_name}, %{course_name}"
+          link: "과제를 보려면 여기를 클릭"
           link_text: "과제 보기"
           the_assignment_is_graded: "%{assignment_name} 과제가 평가되었습니다."
         labels: 
@@ -7737,6 +9194,7 @@ ko:
             grades_based_on_percent: "평가는 각 과제 그룹에 대한 가중 합계를 바탕으로 함"
             now_see_here: "여기에서 세부 정보 보기"
             subject: "평점 가중치 변경됨"
+          see_details: "여기에서 세부 정보 보기"
         labels: 
           grades_based_on_percent: "평가는 각 과제 그룹에 대한 가중 합계를 바탕으로 함"
           now_see_here: "여기에서 세부 정보 보기"
@@ -7844,6 +9302,7 @@ ko:
           click_to_preferences: "알림 기본 설정을 편집하려면 여기를 클릭"
     merge_email_communication_channel: 
       email: 
+        body: "%{host}에 계정을 만들었지만 이미 Canvas 계정이 있습니다. 계정을 하나로 합하고 싶은 경우에는 다음 URL을 방문하시기 바랍니다:"
         html: 
           account_created: "%{host}에 계정을 만들었지만 이미 Canvas 계정이 있습니다."
           merge2: "하나로 병합하려면 *여기를 클릭*"
@@ -8026,6 +9485,7 @@ ko:
         html: 
           body: "%{user}이(가) %{course}의 %{discussion_topic} 글타래에 새 의견을 게시함:"
           details: "대화에 참여하려면 여기를 클릭"
+          link: "대화에 참여하려면 여기를 클릭"
           subject: "%{discussion_topic}에 대한 새 의견: %{course}"
         subject: "%{discussion_topic}에 대한 새 의견: %{course}"
       facebook: 
@@ -8046,6 +9506,7 @@ ko:
           body: "관심있을 만한 새 토론이 시작되었습니다:"
           details: "여기에서 대화에 참여"
           download: 다운로드
+          link: "대화에 참여하려면 여기를 클릭"
           subject: "새 토론 - %{discussion_topic}: %{course}"
         labels: 
           file_included: "포함된 파일"
@@ -8114,6 +9575,7 @@ ko:
         html: 
           body: "%{name} 과목에 새 파일 %{count}개가 추가됨:"
           link: "여기에서 볼 수 있음"
+          see_details: "여기에서 볼 수 있음"
           subject: "%{name} 과목에 새 파일 %{count}개가 추가됨:"
         link: "여기에서 볼 수 있음"
         subject: "%{name} 과목에 새 파일 %{count}개가 추가됨:"
@@ -8161,6 +9623,7 @@ ko:
         body: "%{user}이(가) %{website}에 교사로 등록했습니다."
         html: 
           body: "%{user}이(가) %{website}에 교사로 등록했습니다."
+          details: "교사를 보려면 여기를 클릭"
           email: 이메일
           link: "교사를 보려면 여기를 클릭"
           phone: 전화
@@ -8226,6 +9689,25 @@ ko:
     quiz_locked_at: "이 퀴즈는 %{at}에 잠겼습니다."
     quiz_locked_module: "이 퀴즈는 *%{module}* 모듈의 일부로 아직 잠금이 해제되지 않았습니다."
     quiz_locked_until: "이 퀴즈는 %{date}까지 잠겨 있습니다."
+    quiz_regrade_finished: 
+      email: 
+        body: "퀴즈 %{quiz}에 대한 다시 평가를 마쳤습니다."
+        html: 
+          body: "퀴즈 %{quiz}에 대한 다시 평가를 마쳤습니다."
+          link_message: "여기에서 퀴즈를 볼 수 있음:"
+          subject: "퀴즈 다시 평가 마침: %{quiz}, %{context}"
+        link_message: "여기에서 퀴즈를 볼 수 있음:"
+        subject: "퀴즈 다시 평가 마침: %{quiz}, %{context}"
+      facebook: 
+        body: "퀴즈 다시 평가 마침: %{title}"
+      sms: 
+        body_sms: "%{context}의 %{title}에 대한 퀴즈 다시 평가를 마쳤습니다."
+        more_info: "자세한 정보는 %{url}에서 확인"
+      summary: 
+        body: "퀴즈 %{title}에 대해 다시 평가를 마쳤습니다."
+        subject: "퀴즈가 다시 평가됨: %{quiz}, %{context}"
+      twitter: 
+        body: "Canvas 알림 - 퀴즈가 다시 평가됨 : %{quiz}"
     quiz_unpublished_module: "이 퀴즈는 게시 안 된 모듈의 일부로서 아직 사용할 수 없습니다."
     report_generated: 
       email: 
@@ -8277,6 +9759,11 @@ ko:
         subject: "새 평가: %{title}, %{context}"
       twitter: 
         tweet: "Canvas 알림 - 새 평가: %{title}, %{context}."
+    self_enrollment_registration: 
+      email: 
+        html: 
+          profile_reminder: "과목에 속한 다른 사람들이 여러분이 누구인지 알 수 있도록 *Canvas Network 프로필*을 설정하는 것을 잊지 마시기 바랍니다."
+          signature: "Canvas Network"
     send_form: 
       labels: 
         message_body: 메시지
@@ -8517,8 +10004,9 @@ ko:
     ecollege: 
       course_not_found: "ECollege 과목을 찾지 못했습니다."
     external_feed_type: "외부 피드"
+    external_tool_type: "외부 도구"
     file_type: 파일
-    grading_standard_type: "평가 표준"
+    grading_standard_type: "평점 도출 기준"
     group_type: 그룹
     learning_outcome_type: "학습 성과"
     module_type: 모듈
@@ -8531,6 +10019,63 @@ ko:
   migration_issues: 
     errors: 
       valid_workflow_state: "올바른 워크플로 상태를 보내야 함"
+  module_item_types: 
+    assignment: 과제
+    disuccsion: 토론
+    external_tool: "외부 도구"
+    external_url: "외부 URL"
+    file: 파일
+    page: 페이지
+    quiz: 퀴즈
+    sub_header: "하위 머리글"
+  modules: 
+    add_module_item_dialog: 
+      item_type: "유형:"
+    add_module_item_dialog_wrapper: 
+      Save: 저장
+      cancel: 취소
+      creating: "만드는 중..."
+    dialog_title: "%{moduleName}에 항목 추가"
+    module_collection_view: 
+      button: 
+        preview: "미리 보기"
+      course_modules: "과목 모듈"
+      header: 
+        module: 모듈
+    module_item_view: 
+      button: 
+        delete: 삭제
+        edit: 편집
+      manage: 관리
+      module_item: 
+        available: "사용 가능"
+        due: 기한
+        points_abbreviated: 점
+    module_view: 
+      module: 
+        prerequisites: "필수 조건"
+        published: 게시됨
+    progression_module_collection: 
+      module_progress_for: "%h{student_link}의 모듈 진행률"
+      module_progress_for_student: "%{student.name}의 모듈 진행률"
+      no_modules_found: "모듈을 찾을 수 없음"
+    progression_module_view: 
+      items: "완료할 항목"
+      items_below: "아래 완료할 항목"
+    progression_student_view: 
+      show_progressions_for_student: "%{name}의 진행률을 표시"
+    progressions_index: 
+      back_to_modules: "모듈 페이지로 돌아가기"
+      no_students_found: "학생을 찾을 수 없음"
+      student_progress: "학생 진행률"
+  moodle_dropdown_warning_title: "다시 선다 문제를 올바르게 가져오지 못함"
+  move_dialog: 
+    cancel: 취소
+    save: 저장
+    saving: "저장 중..."
+    where_to_move: "*%{name}*을(를) 어디로 이동하시겠습니까?"
+  move_dialog_select: 
+    move_to_end: "-- 아래에 --"
   mute_dialog: 
     curving_assignments: "과제 상대 평가"
     grade_change_notifications: "평점 변경 알림"
@@ -8542,13 +10087,23 @@ ko:
     submission_comments: "제출물 의견"
     sure_you_want_to_mute: "이 과제의 평점을 비공개하시겠습니까? 과제가 평점 비공개 상태인 동안에는 학생이 다음 경우에 대한 알림을 받거나 볼 수 없습니다:"
   name: "Academic Benchmark 가져오기 도구"
+  new_facebook_message: "Canvas에서 온 새로운 메시지가 있음"
+  no_migration_file: "내용 마이그레이션을 위해 필요한 파일입니다."
   not_applicable: "해당 사항 없음"
   notification: 
     added_to_conversation_description: "대화에 추가됨"
     added_to_conversation_display: "대화에 추가됨"
+    all_submissions_description: |-
+        *강사와 관리자에게만 해당:*
+        
+        과제 제출/다시 제출
     all_submissions_display: "모든 제출물"
     announcement_description: "과목에 새 공지가 있음"
     announcement_display: 공지
+    appointment_availability_description: |-
+        *강사와 관리자에게만 해당:*
+        
+        약속 시간 슬롯으로 변경
     appointment_availability_display: "약속 가능 여부"
     appointment_cancelations_description: "약속 취소"
     appointment_cancelations_display: "약속 취소"
@@ -8582,20 +10137,51 @@ ko:
       submission_comment: "제출물 의견"
     conversation_message_description: "새 받은 편지함 메시지"
     conversation_message_display: "대화 메시지"
+    course_content_description: |-
+        과목 내용으로 변경:
+        
+        * 위키 페이지
+        * 퀴즈 내용
+        * 과제 내용
     course_content_display: "과목 내용"
     discussion_description: "과목의 새 토론 주제"
     discussion_display: 토론
     discussion_entry_description: "참여하는 주제의 새 토론 게시물"
     discussion_entry_display: "토론 항목"
+    discussion_post_description: "구독 중인 주제의 새 토론 게시물"
+    discussion_post_display: "토론 게시물"
     due_date_description: "과제 기한 변경됨"
     due_date_display: 기한
     files_description: "과목에 새 파일 추가됨"
     files_display: 파일
+    grading_description: |-
+        포함하는 경우:
+        
+        * 과제/제출물 평가 입력/변경
+        * 과제 평점 비공개 해제
+        * 평점 가중치 변경
+        
+        &nbsp;
+        
+        알림에서 평점을 보고 싶으면 '평점 변경을 알릴 때 점수 포함'을 체크합니다.
+        만약 여러분의 이메일이 기관의 이메일이 아닌 경우에는 기관 밖으로 민감한 내용이 전송된다는 것을 의미합니다.
     grading_display: 평가
     grading_notify_include_grade: "평점 변경을 알릴 때 점수 포함"
     grading_policies_description: "과목 평가 정책 변경"
     grading_policies_display: "평가 정책"
+    invitation_description: |-
+        초대장:
+        
+        * 웹 회의
+        * 그룹
+        * 협업
+        * 과목
+        * 피어 리뷰 & 알리미
     invitation_display: 초대
+    late_grading_description: |-
+        *강사와 관리자에게만 해당:*
+        
+        지연된 과제 제출물
     late_grading_display: "지연된 평가"
     membership_update_description: |-
         *관리자에게만 해당: 보류 중인 등록 활성화*
@@ -8674,8 +10260,22 @@ ko:
       updated_wiki_page: "변경된 위키 페이지"
       web_conference_invitation: "웹 회의 초대"
     no_subject: "제목 없음"
+    other_description: |-
+        *강사와 관리자에게만 해당:*
+        
+        * 과목 등록
+        * 보고서 생성
+        * 내용 내보내기
+        * 마이그레이션 보고서
+        * 새 계정 사용자
+        * 새 교사 등록
+        * 새 학생 그룹
     other_display: "관리 알림"
     reminder_display: 알리미
+    student_appointment_description: |-
+        *강사와 관리자에게만 해당:*
+        
+        학생 약속 등록
     student_appointment_display: "학생 약속 등록"
     submission_comment_description: |-
         과제 제출물 설명
@@ -8693,6 +10293,8 @@ ko:
         saving_preferences_failed: "오류가 발생했습니다. 다시 시도하시기 바랍니다."
       facebook: 
         display: Facebook
+      push: 
+        display: "푸시 알림"
       sms: 
         display: "휴대전화 번호"
       twitter: 
@@ -8751,6 +10353,8 @@ ko:
     invalid_file: "유효하지 않은 성과 그룹 파일"
   outcome_groups_api: 
     account_group_description: "계정 수준 성과 그룹입니다."
+  outcome_results: 
+    outcomes_filename: 성과
   outcomes: 
     account_standards: "계정 표준"
     account_standards_description: "왼쪽으로는 과목에서 사용할 수 있도록 여러분의 기관에서 만든 표준을 볼 수 있습니다."
@@ -8797,6 +10401,7 @@ ko:
       importError: "가져오는 중에 오류가 발생했습니다. 다시 시도하시기 바랍니다."
       importSuccess: "성공적으로 가져옴"
       updateSuccess: "성공적으로 업데이트함"
+    length_error: "255글자보다 적어야 함"
     loading_more_results: "더 많은 결과 로드"
     main_instructions: 
       instructions: 
@@ -8897,6 +10502,30 @@ ko:
         time: 시간
         url: URL
         user_agent: "사용자 에이전트"
+  pages: 
+    cancel_button: 취소
+    cannot_unpublish_front_page: "첫 페이지를 게시 취소할 수 없음"
+    delete_button: 삭제
+    delete_confirmation: "이 위키 페이지를 삭제하시겠습니까?"
+    delete_dialog_title: "위키 페이지 삭제"
+    deleting_button: "삭제 중..."
+    edit_dialog_title: "위키 페이지 편집"
+    errors: 
+      require_title: "제목을 입력해야 함"
+    headers: 
+      sort_ascending: "%{title}, 오름차순 정렬"
+      sort_descending: "%{title}, 내림차순 정렬"
+    notices: 
+      delete_failed: "\"%{title}\" 페이지를 삭제할 수 없습니다."
+      page_deleted: "\"%{title}\" 페이지가 삭제되었습니다."
+    reload_editing_page: "이 페이지는 여러분의 편집을 시작한 이후에 변경되었습니다. *다시 로드*하면 변경 사항을 모두 잃게 됩니다."
+    reload_viewing_page: "이 페이지는 여러분이 페이지를 보기 시작한 이후에 변경되었습니다. *다시 로드*하십시오."
+    restore_failed: "페이지 수정 복원 실패"
+    save_button: 저장
+    saving_button: "저장 중..."
+    warnings: 
+      overwrite_changes: "여러분이 편집을 시작한 이후에 다른 사람이 변경한 사항을 덮어쓰려고 합니다.\\n\\n변경 사항을 덮어쓰시겠습니까?"
+      unsaved_changes: "저장하지 않은 변경 사항이 있습니다. 해당 변경 사항을 저장하지 않고 계속 진행하시겠습니까?"
   paginated_collection: 
     no_items: "항목이 없습니다."
   paginated_list: 
@@ -8924,7 +10553,7 @@ ko:
       description: "Canvas에 외부 도구를 설치/추적하기 위한 앱 센터"
       name: "앱 센터"
     app_center_settings: 
-      description: "앱 센터는 과목이나 계정의 설정에서 \"외부 도구\" 탭에 표시됩니다. 아래 제공된 URL은 유효한 앱 센터 끝점을 가리켜야 합니다(예를 들어, https://lti-examples.heroku.com -- 뒤에 오는 슬래시를 생략해야 합니다)."
+      description: "앱 센터는 과목이나 계정의 설정에서 \"앱\" 탭에 표시됩니다. 아래 제공된 URL은 유효한 앱 센터 끝점을 가리켜야 합니다(예를 들어, https://lti-examples.heroku.com -- 뒤에 오는 슬래시를 생략해야 합니다)."
       labels: 
         app_reviews_endpoint: "앱 표시 끝점"
         apps_index_endpoint: "앱 색인 끝점"
@@ -8941,17 +10570,22 @@ ko:
         canvas_source_identifier: "Canvas 인스턴스 이름"
         sis_source_identifier: "Banner 인스턴스 이름"
     big_blue_button: 
-      description: "Big Blue Button 웹 회의 지원"
-      name: "Big Blue Button"
+      description: "BigBlueButton 웹 회의 지원"
+      name: BigBlueButton
     big_blue_button_settings: 
       description: "[BigBlueButton](%{url}) 인스턴스에 대한 액세스가 필요합니다."
       domain_description: "설치된 BigBlueButton의 **hostname** 또는 **ip address** (e.g. bigbluebutton.mycompany.com)"
       labels: 
         domain: 도메인
+        recording_enabled: "회의 녹음/녹화를 허용합니다."
         secret: 시크릿
       secret_description: "이는 %{filename} 구성 파일에서 찾을 수 있는 %{parameter_name} 매개 변수입니다."
     buttons: 
       saving: "저장 중..."
+    canvadocs_settings: 
+      labels: 
+        api_key: "API 키"
+        base_url: "기준 URL"
     crocodoc: 
       description: "문서 미리보기 옵션으로 Crocodoc을 사용"
       name: Crocodoc
@@ -9103,14 +10737,18 @@ ko:
         account_settings: "계정 설정"
         canvas_settings: "Canvas 설정"
         domain_settings: "도메일 설정"
+        misc_settings: "기타 설정"
         ui_conf_ids: "UI 구성 ID"
       hints: 
         domain: "호스팅하는 계정에 대해서는 \"www.kaltura.com\" 사용"
         resource_domain: "호스팅하는 계정에 대해서는 \"cdn.kaltura.com\" 사용"
         rtmp_domain: "호스팅하는 계정에 대해서는 \"www.kaltura.com\" 사용"
+      kaltura_sis_explanation: "체크하면 사용자와 과목 SIS 데이터를 Kaltura에 제공하게 됩니다."
       labels: 
         cache_play_list_seconds: "재생 목록 URL을 캐시하는 시간(초)"
+        do_analytics: "분석 이벤트 전송"
         domain: 도메인
+        kaltura_sis: "SIS 데이터를 Kaltura에 쓰기"
         kcw_ui_conf: "KCW UI 구성 ID"
         partner_id: "파트너 ID"
         player_ui_conf: "플레이어 UI 구성 ID"
@@ -9142,6 +10780,10 @@ ko:
       labels: 
         download_url: "LockDown 브라우저 다운로드 URL"
         plugin_enabled: 사용함
+    med_cornell_export: 
+      labels: 
+        password: "인증에 사용할 암호"
+        username: "인증에 사용할 사용자 이름"
     notices: 
       settings_updated: "플러그 인 설정을 성공적으로 업데이트했습니다."
     qti_converter_settings: 
@@ -9166,6 +10808,7 @@ ko:
           프로필을 생성한 후에 "Settings -> API"에서 얻을 수 있습니다.
       labels: 
         api_key: "API 키"
+        enable_html5_viewer: "HTML5 문서 뷰어 사용"
         secret_key: "API 시크릿"
     sessions: 
       description: "세션 시간 만료 관리"
@@ -9173,6 +10816,11 @@ ko:
     sessions_timeout: 
       labels: 
         session_timeout: "세션이 만료되기 전 시간(분) (최소 20)"
+    settings_header: 
+      prompt_change_for_all_line1: "이는 모든 계정에 대한 설정을 변경합니다!"
+      prompt_change_for_all_line2: "정말로 이 작업을 실행하시겠습니까?"
+      prompt_delete_account_setting: "계정 구성을 삭제하시겠습니까?"
+      select_account_prompt: "(계정 선택)"
     show: 
       back_to_list: "플러그 인 목록으로 돌아가기"
       labels: 
@@ -9246,6 +10894,7 @@ ko:
       completion_prerequisites: "완료 필수 구성 요소"
     labels: 
       requirements_must_be_completed: "이 페이지를 잠금 해제하기 전에 다음 요구 사항이 완료되어야 합니다."
+  product_name: Canvas
   profile: 
     access_token: 
       default_app_name: "앱 없음"
@@ -9267,6 +10916,7 @@ ko:
       generating_token: "토큰 생성 중..."
       regenerate_token: "토큰 다시 생성"
       regenerating_token: "토큰 다시 생성 중..."
+      save: 저장
       select_image: "이미지 선택"
       selecting_image: "이미지 선택 중..."
     communication: 
@@ -9448,6 +11098,7 @@ ko:
           알림은 직접 메시지로 전달되므로 공개 스트림에는 표시되지 않습니다.
       unknown_service: "알 수 없음"
       web_services: "Canvas는 여러분이 이미 사용하고 있는 웹 도구 안에서 직접 입력하므로 매우 편리합니다. \"기타 서비스\" 중 하나를 클릭하면 그 의미를 알 수 있습니다."
+    purpose_required: "목적이 필요함"
     resending: "다시 전송 중..."
     secondary_nav: 
       links: 
@@ -9508,14 +11159,25 @@ ko:
       sent_confirmation_sms: "4글자로 된 인증 코드를 %{sms_number}로 보냈습니다. 이 SMS 번호를 활성화하려면 코드를 아래에 입력하십시오."
       titles: 
         confirm_email_address: "이메일 주소 확인"
+        confirm_email_address_alt: "이메일 주소 확인"
+        confirm_email_address_aria_label: "이메일 주소 확인"
         default_email_address: "기본 이메일 주소"
+        default_email_address_alt: "기본 이메일 주소"
+        default_email_address_aria_label: "기본 이메일 주소"
         merge_users: "다른 사용자가 같은 이메일 주소를 가지고 있습니다. 사용자 계정을 결합하려면 여기를 클릭하십시오."
+        merge_users_alt: "다른 사용자가 같은 이메일 주소를 가지고 있습니다. 사용자 계정을 결합하려면 여기를 클릭하십시오."
+        merge_users_aria_label: "다른 사용자가 같은 이메일 주소를 가지고 있습니다. 사용자 계정을 결합하려면 여기를 클릭하십시오."
         remove_email_address: "이메일 주소 제거"
+        remove_email_address_alt: "이메일 주소 제거"
+        remove_email_address_aria_label: "이메일 주소 제거"
       validations: 
         should_be_10_digits: "10자리 숫자이어야 함"
     ways_to_contact_me: "연락 방법"
     you_have_no_services: "아직 등록한 서비스가 없으며 *설정* 페이지에서 추가할 수 있습니다."
   profiles: 
+    gravatar_view: 
+      button: 
+        preview: "미리 보기"
     notification_preferences: 
       captions: 
         notification_preferences: "%{name} 알림 이벤트와 설정"
@@ -9591,6 +11253,15 @@ ko:
       labels: 
         remember_access: "이 서비스에 대한 인증을 저장"
       page_title: "앱 로그인"
+    oauth2_confirm_mobile: 
+      cancel: 취소
+      details: 
+        allow_application: "%{app_name}이(가) 여러분의 계정에 액세스를 요청하고 있습니다."
+        email: "이메일 주소가 %{email}입니다."
+        login_name: "이 앱에 %{user_name}로 로그인 중입니다."
+      login: 로그인
+      page_title: "앱 로그인"
+      remember_auth: "이 서비스에 대한 인증을 저장"
     otp_login: 
       buttons: 
         send: 전송
@@ -9637,6 +11308,7 @@ ko:
     login: 
       invalid_login: "유효하지 않은 로그인"
       invalid_password: "유효하지 않은 암호"
+      parent_signup: "부모 등록"
       password_confirmation_sent: "암호 확인을 %{email_address}로 전송했습니다. 스팸 상자를 확인하는 것을 잊지 마십시오."
     notices: 
       account_registered: "계정을 등록했습니다!"
@@ -9644,14 +11316,142 @@ ko:
       email_sent: "확인 이메일을 %{email}로 전송했습니다. 스팸 상자를 확인하는 것을 잊지 마십시오."
       link_invalid: "사용한 링크가 더 이상 유효하지 않습니다. 로그인할 수 없는 경우에는 \"암호를 모릅니다\"를 클릭해서 암호를 다시 설정하십시오."
       password_changed: "암호 변경됨"
+  publish_btn_module: 
+    buttons: 
+      publish: 게시
+      publish_desc: "게시가 취소되었습니다. 게시하려면 클릭하십시오."
+      published: 게시됨
+      published_desc: "게시되었습니다. 게시 취소하려면 클릭하십시오."
+      publishing: "게시 중..."
+      unpublish: "게시 취소"
+      unpublishing: "게시 취소 중..."
+  publish_grades: 
+    assignment_group_list: 
+      no_assignment_groups: "과제 그룹을 찾을 수 없음"
+    assignment_group_list_item: 
+      group_weight: "전체 중 %{groupWeight}%"
+      manage: 관리
+    assignment_list_item: 
+      assignment_edit: "과제 편집"
+      module: 모듈
+      multiple_modules: "여러 모듈"
+      no_points_possible: "가능한 점수 없음"
+      points_possible: "%{pointsPossible}점"
+      points_possible_screen_reader: "%{pointsPossible}점 가능"
+      settings: "과제 편집"
+    assignment_list_item_score: 
+      assignment_grading_type_is_not_graded: "이 과제는 평점이 할당되지 않습니다."
+      assignment_not_yet_graded_screenreader: "과제물을 아직 평가하지 않았습니다. %{pointsPossible}점이 가능합니다."
+      empty_points_possible: "-/%{pointsPossible}점"
+      no_submission: "제출물 없음"
+      no_submission_for_assignment_screenreader: "이 과제에 대한 제출물이 없습니다. %{pointsPossible}점이 가능합니다."
+      not_yet_graded: "*평가 안 됨*"
+      score_with_points_possible: "*%{score}*/%{pointsPossible} pts"
+      score_with_points_possible_screenreader: "점수: %{pointsPossible}점 중 %{score}"
+    assignment_settings: 
+      cancel: 취소
+      save: 저장
+      validating: "저장 중..."
+      weight_groups: "과제 그룹을 바탕으로 최종 평가를 가중"
+    available_date_description: 
+      closed: 닫힘
+    create_assignment: 
+      assignment: 과제
+      assignment_due_at: "기한:"
+      assignment_name: "이름:"
+      assignment_points: "점수:"
+      assignment_type: "유형:"
+      cancel: 취소
+      discussion_type: 토론
+      external_tool_type: "외부 도구"
+      multiple_due_dates: "기한: 여러 기한"
+      not_graded_type: "평가 안 됨"
+      quiz_type: 퀴즈
+      save: 저장
+      saving: "저장 중..."
+    date_available_column_view: 
+      available: "사용 가능"
+      multiple_dates: "여러 날짜"
+    date_due_column_view: 
+      due: 기한
+      due_date: 기한
+      multiple_dates: "여러 날짜"
+    due_date_view: 
+      overrides: 
+        remove_these_dates: "이 날짜 제거"
+    edit_header_view: 
+      buttons: 
+        not_published: "게시 안 됨"
+        published: 게시됨
+      manage: 관리
+      titles: 
+        delete: 삭제
+    group_category_selector: 
+      grade_group_students_individually: "각 학생에게 개별적으로 평점 할당"
+      group_category_options: "새 그룹 범주"
+      group_set: "그룹 집합"
+      is_group_assignment: "그룹 과제임"
+      students_already_submitted_warning: "이전의 개별 제출물은 그룹 제출물로 계산되지 않으며 speedgrader에 올바르지 않게 표시됩니다."
+    index_view: 
+      assignments: 과제
+      search_for_assignment: "과제 검색"
+      title_add_group: "과제 그룹 추가"
+    never_drop: 
+      remove_rule: "규칙 제거"
+    never_drop_collection: 
+      add_another_assignment: "다른 과제 추가"
+      add_first_assignment: "과제 추가"
+    no_assignments_list_item: 
+      no_assignments_in_this_group: "이 그룹에 과제가 없음"
+    no_assignments_search: 
+      aria_assignments: 과제
+      assignments: 과제
+      no_assignments_found: "과제를 찾을 수 없음"
+  publish_icon_component: 
+    publish: 게시
+    publish_click: "게시되었습니다. 취소하려면 클릭하십시오."
+    published: 게시됨
+    publishing: "게시 중..."
+    unpublish: "게시 취소"
+    unpublish_click: "게시가 취소되었습니다. 게시하려면 클릭하십시오."
+    unpublishing: "게시 취소 중..."
+  publishable: 
+    cant_unpublish: "게시 취소할 수 없음"
+  publishableModuleItem: 
+    disabled: "이 항목에 대해 게시를 사용하지 않음"
+    disabled_assignment: "확생 제출물이 있으면 게시를 취소할 수 없음"
+    disabled_discussion_topic: "확생 제출물이 있으면 게시를 취소할 수 없음"
+    disabled_quiz: "확생 제출물이 있으면 게시를 취소할 수 없음"
   purchases: 
     new: 
       payment_info: "지불 정보"
+  qti_display: QTI
   qti_file_description: "QTI .zip 파일"
   qti_name: "QTI 변환기"
+  qualified_locale: ko-KR
+  question_answered: 답변함
   question_bank: 
     align_outcomes: "성과 정렬"
+    already_bookmarked: "이미 북마크됨"
+    bookmark_failed: "북마크 실패"
+    bookmarking: "북마크 중..."
+    buttons: 
+      submit_retry_copying: "문제 복사에 실패했습니다. 다시 시도하시기 바랍니다."
+      submit_retry_moving: "문제 이동에 실패했습니다. 다시 시도하시기 바랍니다."
+    default_name: "이름 없음"
+    delete_are_you_sure: "이 문제 은행을 삭제하시겠습니까?"
+    error_loading_banks: "은행 로드 오류"
+    links: 
+      more_questions: "더 많은 질문"
+    load_questions: "문제 로드 중..."
+    loading_banks: "은행 로드 중..."
+    loading_more_fail: "더 많은 문제를 로드하는 데 실패했습니다. 다시 시도하시기 바랍니다."
+    move_questions: "문제 이동"
+    multiple_questions: "여러 문제"
+    question_bank: "문제 은행"
     remove_outcome_from_bank: "이 성과를 은행에서 제거하시겠습니까?"
+    title: 
+      move_copy_questions: "문제 이동/복사"
     update_outcomes_fail: "성과 업데이트 실패"
     updating_outcomes: "성과 업데이트 중..."
   question_banks: 
@@ -9669,6 +11469,8 @@ ko:
       user_question_banks: "사용자 문제 은행"
     question_bank: 
       bookmark_bank: "이 문제 은행 북마크하기"
+      delete_bank: "이 문제 은행 삭제"
+      edit_bank: "이 문제 은행 편집"
       last_updated: "최종 업데이트: *%{datetime}*"
       no_name: "이름 없음"
       no_questions: "문제 없음"
@@ -9681,7 +11483,7 @@ ko:
       links: 
         delete_question: "이 문제 삭제"
         edit_question: "이 문제 편집"
-      move_bank: "문제를 다른 은행으로 이동/복사"
+      move_bank: "다른 은행으로 문제 이동/복사"
     show: 
       already_bookmarked: "이미 북마크됨"
       bookmark_failed: "북마크 실패"
@@ -9737,6 +11539,7 @@ ko:
       title: 
         move_copy_questions: "문제 이동/복사"
   question_blank: "문제 공란"
+  question_unanswered: "아직 답변하지 않음"
   quick_start_bar: 
     announcement: 
       saving: "저장 중..."
@@ -9752,22 +11555,61 @@ ko:
     quick_start_bar_view: 
       new: "새 항목:"
   quiz: 
+    cancel: 취소
+    cant_unpublish_when_students_submit: "확생 제출물이 있으면 게시를 취소할 수 없음"
     default_question_input: "[ 선택 ]"
     default_text_only_question_name: 공백
     default_title: "이름 없는 퀴즈"
+    delete: 삭제
+    delete_quiz: "퀴즈 삭제"
     errors: 
       invalid_hide_results: "숨기기 결과가 유효하지 않음"
       invalid_ip_filter: "IP 필터가 유효하지 않음"
       invalid_quiz_type: "퀴즈 유형이 유효하지 않음"
     question_name_counter: "질문 %{question_number}"
+    quiz_regraded_your_score_not_affected: "이 퀴즈가 다시 평가되었으며, 여러분의 점수에 영향이 없습니다."
+    regrade: 
+      give_everyone_full_credit: "이 문제에 대해 모든 학생에게 만점을 줍니다."
+      no_scores_reduced: "정답과 이전 정답에 모두 점수 주기 (*낮아지는 점수가 없음*)"
+      regrade_options: "*(이 문제를 이미 답변한 학생을 위한)* 다시 평가하기 옵션:"
+      some_scores_reduced: "정답에만 점수 주기 (*일부 학생*의 점수가 낮아질 수도 있음)"
+      update_question_without_regrading: "다시 평가하지 않고 문제를 업데이트"
+    take_the_quiz: "퀴즈 치르기"
+    take_the_quiz_again: "퀴즈 다시 치르기"
+    take_the_survey: "설문 치르기"
+    take_the_survey_again: "설문 다시 치르기"
     types: 
       quiz: 퀴즈
       survey: 설문
+    warning: 경고
+  quiz_extend_time: 
+    extend_time: "시간 연장"
+    now: 지금
+  quiz_extensions: 
+    extensions_student: "%{student}에 대한 연장"
+    student_extensions: "학생 연장"
   quiz_group: 
     errors: 
       no_bank: "%{group_name} 퀴즈 그룹을 위한 문제 은행을 찾을 수 없음"
       no_permissions: "사용자가 %{group_name} 퀴즈 그룹에 있는 문제 은행을 참조할 권한을 가지고 있지 않음"
     question_group: "문제 그룹"
+  quiz_index_row: 
+    cant_unpublish_when_students_submit: "확생 제출물이 있으면 게시를 취소할 수 없음"
+    confirms: 
+      delete_quiz: "이 퀴즈를 삭제하시겠습니까?"
+    delete_quiz: "퀴즈 삭제"
+    edit_quiz: "퀴즈 편집"
+  quiz_message_students: 
+    message_students_who: "다음 학생에게 메시지 보내기"
+  quiz_model: 
+    everyone: 모두
+    everyone_else: "나머지 모든 사람"
+    graded_quiz: "평가된 퀴즈"
+    graded_survey: "평가된 설문"
+    keep_highest: 최고
+    keep_latest: 최신
+    practice_quiz: "퀴즈 연습"
+    survey: 설문
   quiz_question: 
     defaults: 
       question_name: 문제
@@ -9777,11 +11619,28 @@ ko:
       generate_report_name: "%{report_name} 생성"
       generated_at_date_time: "%{dateAndTime}에 생성"
       generating_report_name: "%{report_name} 생성 중..."
+  quiz_route: 
+    that_quiz_has_been_deleted: "퀴즈가 삭제됨"
   quiz_statistics: 
+    item_analysis: "항목 분석"
+    no_answer: "답 없음"
     statistics_filename: "%{quiz_title} %{quiz_type} %{report_type} 보고서"
+    student_analysis: "학생 분석"
     types: 
       item_analysis: "항목 분석"
       student_analysis: "학생 분석"
+  quiz_statistics_route: 
+    quiz_statistics: 통계
+  quiz_statistics_title: "퀴즈 통계"
+  quiz_submission_arrows: 
+    answers: 
+      correct: 정답입니다!
+      correct_answers: 정답
+      incorrect: 오답
+      partial: 부분
+      right: 정답
+      unanswered: "답변 안 함"
+      you_answered: "여러분의 답변은"
   quiz_submissions: 
     errors: 
       invalid_submissions: "이 퀴즈 제출물의 소유자를 확인할 수 없습니다. 다시 시도하시기 바랍니다."
@@ -9807,6 +11666,10 @@ ko:
     always: 항상
     answer_comments: "답변 의견"
     answer_text: "답변 내용"
+    assignment_points_possible: 
+      one: "%{count}점"
+      other: "%{count}점"
+    assignments_label: "퀴즈 표시를 토글하는 과제 퀴즈"
     buttons: 
       add_selected_questions: "선택한 문제 추가"
       adding_questions: "문제 추가 중..."
@@ -9815,6 +11678,7 @@ ko:
       creating_group: "그룹 만드는 중..."
       generating: "만드는 중..."
       generating_combinations_progress: "만드는 중... (%{done}/%{total})"
+      save: 저장
       saved: 저장되었습니다!
       saving: "저장 중..."
       update_group: "그룹 업데이트"
@@ -9825,6 +11689,11 @@ ko:
       delete_question: "이 문제를 삭제하시겠습니까?"
       delete_quiz: "이 퀴즈를 삭제하시겠습니까?"
       scrap_and_restart: "이 퀴즈를 스크랩하고 처음부터 시작하시겠습니까?"
+    correct_answers_no_longer_available: "정답을 더 이상 사용할 수 없습니다."
+    correct_answers_protected: "정답은 보이지 않습니다."
+    correct_answers_shown_after: "정답은 %{date}에 사용할 수 있습니다."
+    correct_answers_shown_between: "정답은 %{from}부터 %{to}까지 사용할 수 있습니다."
+    correct_answers_shown_until: "정답은 %{date}까지 사용할 수 있습니다."
     current_filter: "현재 필터"
     default_answer_comments: "학생이 이 답변을 선택한 경우의 대답"
     default_answer_comments_on_match: "학생이 이 답변에 짝을 지은 경우의 대답"
@@ -9891,15 +11760,21 @@ ko:
       adding_questions_failed: "문제 추가 실패. 다시 시도하시기 바랍니다."
       creating_group_failed: "그룹 만들기 실패. 다시 시도하시기 바랍니다."
       field_is_required: "이 필드가 필요함"
+      invalid_show_correct_answers_range: "숨김 날짜는 표시 날짜 이전일 수 없습니다."
       loading_banks_failed: "문제 은행 로드 실패. 다시 시도하시기 바랍니다."
       loading_more_questions_failed: "문제 더 로드하기 실패"
       loading_question_failed: "문제 로드 실패..."
       loading_questions_failed: "문제 로드 실패. 다시 시도하시기 바랍니다."
+      missing_access_code: "액세스 코드를 입력해야 함"
+      missing_ip_filter: "올바른 IP 주소를 입력해야 함"
       no_answer: "적어도 하나 이상의 답변을 추가하십시오."
       no_correct_answer: "정답을 선택하십시오."
       no_more_attempts: "퀴즈 시도 회수가 남아있지 않습니다."
       no_possible_solution: "적어도 하나 이상의 가능한 해답을 만드십시오."
       quiz_deleted: "퀴즈가 삭제됨"
+      quiz_score_not_a_number: "점수는 0과 2,000,000,000 사이의 숫자이어야 합니다."
+      quiz_score_too_long: "점수는 2,000,000,000보다 작아야 합니다."
+      quiz_score_too_short: "점수는 0보다 커야 합니다."
       quiz_update_failed: "퀴즈 업데이트 실패"
       retrieving_filters_failed: "필터 검색 실패"
     ? "false"
@@ -10039,6 +11914,8 @@ ko:
     graded_quiz: "평가된 퀴즈"
     graded_survey: "평가된 설문"
     headers: 
+      assignment_quizzes: "과제 퀴즈"
+      practice_quizzes: "연습 퀴즈"
       submitted_students_quiz_title: 
         one: "이 퀴즈를 치른 학생 (%{count})"
         other: "이 퀴즈를 치른 학생 (%{count})"
@@ -10047,6 +11924,7 @@ ko:
         one: "이 설문을 치른 학생 (%{count})"
         other: "이 설문을 치른 학생 (%{count})"
         zero: "이 설문을 치른 학생"
+      surveys: 설문
       unsubmitted_students_quiz_title: 
         one: "이 퀴즈를 치르지 않은 학생 (%{count})"
         other: "이 퀴즈를 치르지 않은 학생 (%{count})"
@@ -10115,10 +11993,19 @@ ko:
         create_new_quiz: "새 퀴즈 만들기"
         manage_question_banks: "문제 은행 관리"
         publish_multiple_quizzes: "여러 퀴즈 게시"
+      multiple_due_dates: "여러 날짜"
       no_quizzes: "사용 가능한 퀴즈가 없음"
       page_titles: 퀴즈
       titles: 
         this_quiz_is_locked: "이 퀴즈는 현재 잠겨있습니다. 세부 정보를 보려면 클릭하십시오."
+    index_view: 
+      add_quiz: 퀴즈
+      links: 
+        manage_question_banks: "문제 은행 관리"
+        publish_multiple_quizzes: "여러 퀴즈 게시"
+        settings: 설정
+      search_for_quiz: "퀴즈 검색"
+      title_add_quiz: "퀴즈 추가"
     invalid_ip: 
       quiz_protected: "이 퀴즈는 보호된 것으로 특정 위치에서만 사용할 수 있습니다. 현재 이용 중인 컴퓨터는 이 퀴즈를 치르기에 유효한 위치에 있지 않은 것으로 보입니다."
       survey_protected: "이 설문은 보호된 것으로 특정 위치에서만 사용할 수 있습니다. 현재 이용 중인 컴퓨터는 이 퀴즈를 치르기에 유효한 위치에 있지 않은 것으로 보입니다."
@@ -10139,6 +12026,12 @@ ko:
       message_text: "메시지 내용"
       other_incorrect_matches: "기타 잘못된 짝짓기 옵션"
       possible_answer: "가능한 답변"
+    ldb_login_popup: 
+      email: 이메일
+      log_in: 로그인
+      password: 암호
+      titles: 
+        log_in: "로그인 필요"
     links: 
       resume_quiz: "퀴즈 다시 시작"
       resume_survey: "설문 다시 시작"
@@ -10188,6 +12081,12 @@ ko:
       end_quiz_reference_time_now: 지금
       end_quiz_when: "퀴즈를 %{reference_time}에서 %{n}분에 마칩니다."
       errors: 
+        quiz_submission_extra_attempts_not_a_number: "추가 시도 회수는 숫자이어야 합니다."
+        quiz_submission_extra_attempts_too_long: "추가 시도 회수는 1000보다 작어야 합니다."
+        quiz_submission_extra_attempts_too_short: "추가 시도 회수는 0보다 커야 합니다."
+        quiz_submission_extra_time_not_a_number: "추가 시간은 숫자이어야 합니다."
+        quiz_submission_extra_time_too_long: "추가 시간은 10080보다 작아야 합니다."
+        quiz_submission_extra_time_too_short: "츠가 시간은 0보다 커야 합니다."
         server_communication_failed: "서버와 통신하는 데 문제가 있습니다. 시스템이 5분 내에 다시 시도하거나 여러분이 페이지를 다시 로드할 수 있습니다."
       extended_quiz_time_explanation: "학생에게 현재 퀴즈 시도에 추가 시간을 줄 수 있습니다. 시간을 얼마나 주시겠습니까?"
       extensions_for_student: "%{student}에 대한 연장"
@@ -10288,6 +12187,10 @@ ko:
       warnings: 
         has_student_submissions: "학생이 이 퀴즈를 이미 치렀거나 치르고 있는 중이므로 편집하는 데 신중하시기 바랍니다. 어떤 문제를 중대한 방식으로 바꾸었다면 지난 버전 퀴즈를 치른 학생을 다시 평가하는 것에 대해 고려해 보십시오."
     no_filters_found: "필터를 찾을 수 없음"
+    no_quizzes_view: 
+      headers: 
+        course_quizzes: "과목 퀴즈"
+      no_quizzes: "사용 가능한 퀴즈가 없음"
     notices: 
       cant_view_submission_while_muted: "퀴즈가 평점 비공개 상태인 동안에는 퀴즈 이력을 볼 수 없음"
       has_submissions_already: "어떤 학생이 이미 퀴즈를 치렀거나 시작했다는 점을 염두에 두십시오."
@@ -10299,7 +12202,11 @@ ko:
         one: "퀴즈 %{count}개를 성공적으로 게시했습니다!"
         other: "퀴즈 %{count}개를 성공적으로 게시했습니다!"
     practice_quiz: "퀴즈 연습"
+    practices_label: "퀴즈 표시를 토글하는 연습 퀴즈"
     question_colon: "질문:"
+    question_count: 
+      one: "문제 %{count}개"
+      other: "문제 %{count}개"
     question_group: 
       buttons: 
         update: 업데이트
@@ -10340,6 +12247,19 @@ ko:
         click_to_show_details: "전체 문제 세부 정보를 표시하려면 클릭"
         delete_this_question: "이 문제 삭제"
         edit_this_question: "이 문제 편집"
+    quiz: 
+      current_filter: "현재 필터"
+      default_question_input: "[ 선택 ]"
+      default_text_only_question_name: 공백
+      default_title: "이름 없는 퀴즈"
+      errors: 
+        invalid_hide_results: "숨기기 결과가 유효하지 않음"
+        invalid_ip_filter: "IP 필터가 유효하지 않음"
+        invalid_quiz_type: "퀴즈 유형이 유효하지 않음"
+      question_name_counter: "질문 %{question_number}"
+      types: 
+        quiz: 퀴즈
+        survey: 설문
     quiz_attempts_length_error: "퀴즈 시도는 세 자리로 제한되므로 학생에게 제한없는 시도를 허용하려면 왼쪽에 있는 여러 시도 허용 상자를 체크하지 마십시오."
     quiz_attempts_nan_error: "퀴즈 시도는 숫자로만 지정할 수 있음"
     quiz_details: 
@@ -10363,6 +12283,24 @@ ko:
         one: "%{count}분"
         other: "%{count}분"
       unlimited: 무제한
+    quiz_group: 
+      errors: 
+        no_bank: "%{group_name} 퀴즈 그룹을 위한 문제 은행을 찾을 수 없음"
+        no_permissions: "사용자가 %{group_name} 퀴즈 그룹에 있는 문제 은행을 참조할 권한을 가지고 있지 않음"
+      question_group: "문제 그룹"
+    quiz_item_group_view: 
+      no_quizzes: "퀴즈를 찾을 수 없음"
+      no_surveys: "설문을 찾을 수 없음"
+    quiz_item_view: 
+      links: 
+        delete: 삭제
+        edit: 편집
+      settings: 설정
+      title_delete: "퀴즈 삭제"
+      title_edit: "퀴즈 편집"
+    quiz_question: 
+      defaults: 
+        question_name: 문제
     quiz_right_side: 
       attempts_left: 
         one: "시도 %{count}번 더 사용할 수 있음"
@@ -10411,6 +12349,11 @@ ko:
         other: "%{count}분"
       until: "다음 시간까지"
       view_responses: "답변 보기"
+    quiz_statistics: 
+      statistics_filename: "%{quiz_title} %{quiz_type} %{report_type} 보고서"
+      types: 
+        item_analysis: "항목 분석"
+        student_analysis: "학생 분석"
     quiz_submission: 
       attempt_duration: "이 시도는 %{duration}이(가) 걸렸습니다."
       labels: 
@@ -10443,6 +12386,16 @@ ko:
         this_is_an_external_element: "이는 텍스트가 아닌 외부 요소로서 학생이 제출한 이후에 바뀌었을 수도 있습니다."
         this_is_an_external_frame: "이는 텍스트가 아닌 외부 프레임으로서 학생이 제출한 이후에 바뀌었을 수도 있습니다."
         this_is_an_image: "이는 텍스트가 아닌 이미지로서 학생이 제출한 이후에 바뀌었을 수도 있습니다."
+    quiz_submission_users: 
+      created: "만든 날짜"
+    quiz_submissions: 
+      errors: 
+        invalid_submissions: "이 퀴즈 제출물의 소유자를 확인할 수 없습니다. 다시 시도하시기 바랍니다."
+        late_quiz: "이 퀴즈를 늦게 제출했으므로 답변이 기록되지 않았을 수도 있습니다."
+        protected_quiz: "이 퀴즈는 보호된 것으로 특정 위치에서만 사용할 수 있습니다. 현재 이용 중인 컴퓨터는 이 퀴즈를 치르기에 유효한 위치에 있지 않은 것으로 보입니다."
+      show: 
+        score_out_of: "%{points_possible}점 중 %{score}점을 얻음"
+      still_zipping: "파일 압축 진행 중..."
     quiz_summary: 
       assignment_points_possible: 
         one: "%{count}점"
@@ -10473,6 +12426,628 @@ ko:
         edit_quiz: "퀴즈 편집"
         edit_survey: "설문 편집"
       unlimited_attempts: "무제한 시도"
+    quizzes: 
+      access_code: 
+        buttons: 
+          submit: 제출
+        labels: 
+          access_code: "액세스 코드"
+        quiz_restricted: "이 퀴즈는 액세스 코드로 제한하고 있습니다. 퀴즈는 치르려면 교사나 감독관에게 액세스 코드를 입력거나 알려달라고 요청해야 합니다."
+        survey_restricted: "이 설문은 액세스 코드로 제한하고 있습니다. 설문에 답하려면 교사나 감독관에게 액세스 코드를 입력하거나 알려달라고 해야 합니다."
+      default_history_crumb: 이력
+      default_title: "새 퀴즈"
+      display_answer: 
+        labels: 
+          answer_with_margin: "(오차 허용)"
+          your_answer: 답변
+        margin_of_error: "허용되는 오차"
+        plus_or_minus: +/-
+        range_answer: "%{lower_bound}와 %{upper_bound} 사이"
+        you_left_this_blank: "(공란으로 둠)"
+      display_question: 
+        default_question_answer: "[ 선택 ]"
+        flag_this_question: "이 문제에 플래그를 지정"
+        headers: 
+          formulas: 수식
+          possible_solutions: "가능한 해답"
+          solution_answer: 답변
+          variable_maximum: 최대
+          variable_minimum: 최소
+          variable_name: 변수
+          variable_precision: 소수점
+          variables: 변수
+        labels: 
+          additional_comments: "추가 의견"
+          for_answer_number: "답변 %{answer_number}개"
+          warning_icon: 경고
+        links: 
+          delete_question: "문제 삭제하기"
+          edit_question: "문제 편집하기"
+          move_copy_question: "다른 은행으로 문제 이동/복사"
+        not_yet_graded: "평가 안 됨"
+        original_score: "원래 점수:"
+        points_possible: "%{points_possible}점"
+        regraded_score: "다시 평가된 점수:"
+        show_ansers_for_variable: "%{variable}의 답변 표시"
+        skip_question_text: "문제 텍스트로 건너뜁니다."
+        submission_was_regraded: "이 문제는 다시 평가되었습니다."
+        titles: 
+          question_correct_comment: "학생이 문제를 맞히면 이 의견을 보게 됨"
+          question_incorrect_comment: "학생이 문제를 틀리면 이 의견을 보게 됨"
+          question_neutral_comment: "학생이 문제에 답변을 하면 이 의견을 보게 됨"
+        unsupported_question_type: "이 문제는 외부 소스에서 가져온 것입니다. 이는 '%{question_type}' 문제로 이 퀴즈 도구에서는 지원하지 않습니다."
+        you_left_this_blank: "(공란으로 둠)"
+      download_file_upload_submissions: 
+        links: 
+          download_submissions: "모든 파일 다운로드"
+      equations_help: 
+        equation_functions: "변수와 더불어 여러분이 유용한 값을 생성하는 데 사용할 수 있는 도우미 함수 모음도 있습니다. 예: %{example} 주어진 도우미 함수의 설명을 보려면 아래 목록에서 선택하십시오:"
+        equation_intro: "계산 문제는 순서가 있는 한 개 이상의 수식의 집합으로 이루어집니다. 이 수식에 중간 변수를 정의할 수 있지만 마지막 수식의 결과 값이 정답을 생성하는 데 사용됩니다. 예: %{example} 이 수식 집합에 대한 정답은 71입니다. 그러나 미리 정의된 변수가 없으므로 모든 학생에게 같은 답을 가진 같은 문제가 표시됩니다. 변수에 대해서는 \"변수\" 탭을 참고하십시오."
+        equation_variables2: "대괄호를 사용해서 문제 텍스트에 변수를 정의할 수도 있습니다(\"[a] + [b]는 무엇입니까?\"). 모든 변수에 대해 여러분은 변수 설정에 따르는 \"보기 값\"을 보게 됩니다. 이는 계산을 확인하고 수식이 올바른 지 확인하기 위한 것입니다. 예를 들어, 문제가 \"[a] + 5는 무엇입니까?\"라면 변수 \"a\"를 정의해야 합니다. 만약 \"a\"의 보기 값이 5.2라면 다음과 같이 쓸 수 있습니다: %{example} 이 수식을 가지고 각 집합에서 a 값을 달리하는 해답 집합을 만들 수 있습니다. 어떤 학생은 \"5.2 + 5는 무엇입니까?\"라는 질문을 볼 수 있고 다른 학생은 \"9 + 5는 얼마입니까?\"라는 문제를 볼 수 있습니다."
+        links: 
+          functions: 함수
+          intro: 소개
+          variables: 변수
+      errors: 
+        no_more_attempts: "퀴즈 시도 회수가 남아있지 않습니다."
+        quiz_deleted: "퀴즈가 삭제됨"
+        quiz_update_failed: "퀴즈 업데이트 실패"
+      fabulous_quizzes: 
+        page_titles: 퀴즈
+      find_question_from_bank: 
+        already_added: "이 문제는 이미 퀴즈에 있음"
+        bank_description: "%{bank_name}, 문제 %{n}개"
+        buttons: 
+          add_questions: "문제 추가"
+          create_group: "그룹 만들기"
+          select_bank: "은행 선택"
+        group_pick_count: "문제 %{pick_count}개"
+        group_points: "문제 당 %{points}점"
+        headers: 
+          bank_name: "은행 이름"
+        hints: 
+          group_pick_count: "현재까지 %{pick_count}개 선택함"
+        labels: 
+          add_questions_to_group: "퀴즈 그룹에 문제 추가"
+          group_name: "그룹 이름"
+          group_pick_count: 선택
+          group_points: 점
+        links: 
+          clear_all_banks: "모두 지우기"
+          manage_question_banks: "과목 문제 은행 관리"
+          more_questions: "더 많은 질문"
+          select_all_banks: "모두 선택"
+        options: 
+          new_group: "[ 새 그룹 ]"
+          no_group: "[ 그룹 없음 ]"
+        select_a_question_bank: "문제 그룹으로 이 퀴즈에 링크하려면 아래 목록에서 문제 은행을 선택하십시오."
+        titles: 
+          add_new_question_group: "새 문제 그룹 추가"
+      form_answer: 
+        answer_in_range_accessible: "*범위 시작*과 #범위 끝# 사이"
+        answer_text: "답변 내용"
+        answer_weight: "답변 가중치"
+        exact_answer_with_error_margin_accessible: "오차 범위가 #error margin#인 *정답*"
+        labels: 
+          answer_comments: "이 답변을 선택한 경우의 의견"
+          answer_in_range: "범위 내의 답변"
+          exact_answer: "정확한 답변"
+        matching_left: "왼쪽 일치"
+        matching_right: "오른쪽 일치"
+        numerical_answer: "숫자로 된 답변"
+        possible_answer: "가능한 답변"
+        titles: 
+          click_to_enter_answer_comments: "이 답변을 선택한 경우의 의견을 입력하려면 클릭"
+          click_to_set_as_correct: "이 답변을 정답으로 지정하려면 클릭"
+          delete_answer: "이 답변 삭제"
+          edit_as_html: "HTML 편집"
+      form_question: 
+        allow_tolerance: "오차 범위 +/- %{tolerance} 허용"
+        buttons: 
+          create_update_question: "문제 만들기/업데이트"
+          generate: 생성
+          recompute: "다시 계산"
+        correct_answer_comments: "정답 의견"
+        distractor_instructions: "정답 이외의 항목을 각 줄에 입력"
+        equation_example: "즉 \"5 더하기 [x]는 무엇입니까\""
+        explanation: 
+          generate_possible_solutions: "결국 퀴즈에 필요한 만큼의 변수-해답 조합을 만듭니다."
+        explanations: 
+          calculated: "문제를 입력하고 수식을 만들어서 가능한 답변 조합을 생성합니다. 학생들은 임의로 선택되어 채워진 변수 집합을 가진 문제를 보게 되고 숫자로 된 정답을 입력해야 합니다. "
+          equations: "대괄호로 둘러 싼 변수 이름을 입력하는 방법으로 변수를 정의할 수 있음"
+          essay: "학생들에게 답변을 작성할 텍스트 필드가 표시됩니다."
+          file_upload: "학생이 답변에 대한 파일을 업로드할 수 있습니다."
+          fill_in_multiple_blanks: "문제를 입력하고 각 공란이 어디로 가야 하는 지 지정하십시오. 그리고 각 공란에 대해 가능한 정답을 정의하십시오. 학생들은 각 공란의 텍스트 상자에 정답을 입력해야 합니다."
+          matching: "일치하는 값의 쌍을 만듭니다. 학생들은 왼쪽에 있는 값을 보고 오른쪽에 있는 드롭다운에서 일치하는 값을 골라야 합니다. 여러 줄에 같은 답이 있을 수 있고, 오른쪽에 정답 이외의 항목을 더 추가할 수 있습니다."
+          missing_word: "드롭다운 이전과 이후에 들어갈 텍스트를 정의하십시오. 가능한 답변의 집합을 만들고 정답 하나를 고르십시오."
+          multi_answer_sets: "아래 상자 안에서 답변 상자를 표시하려는 모든 곳에 대괄호로 둘러 싼 참조 단어(공백 없음)를 입력하십시오."
+          multiple_answers: "이 문제는 체크 상자를 나란히 표시하게 되는데 학생들은 정답으로 지정된 모든 답변을 선택해야 합니다."
+          multiple_choice: "문제와 함께 여러 개의 답변을 입력하고 나서 하나의 정답을 선택하십시오."
+          multiple_dropdowns: "문제를 입력하고 각 드롭다운이 어디로 가야 하는지 지정하십시오. 그리고 각 드롭다운마다 하나의 정답과 함께 가능한 답변을 정의하십시오."
+          numerical: "범위 내의 모든 값이나 숫자 더하기/빼기 오차 범위로 정답을 정의하십시오. 학생들은 빈 텍스트 상자에 숫자로 된 답변을 입력해야 합니다."
+          short_answer: |-
+              문제 내용을 입력하고 공란에 대한 가능한 정답을 모두 정의하십시오.
+              학생들에게 문제 다음에 답변을 입력할 수 있는 작은 상자가 표시됩니다.
+          text_only: "이 \"질문\"은 점수를 매기지는 않지만 관련된 질문을 소개하는 데 유용합니다."
+          true_false: "문제 내용을 입력하고 참이나 거짓을 정답으로 선택합니다."
+          variable_definitions: "위 변수를 입력하고 나면 여기에 나열되는 것을 볼 수 있습니다. 아래에세 각 변수에 대해 가능한 값의 범위를 지정할 수 있습니다."
+        general_answer_comments: "일반 답변 의견"
+        headers: 
+          formula_definition: "수식 정의"
+          generate_possible_solutions: "가능한 해답 생성"
+          variable_definitions: "변수 정의"
+          variable_example_value: "본보기 값"
+          variable_maximum: 최대
+          variable_minimum: 최소
+          variable_name: 변수
+          variable_precision: 소수점
+        label: 
+          question: 
+            name: "문제 이름"
+            points: "문제 점수 값"
+            type: "문제 유형"
+        labels: 
+          answers: 답변
+          distractors: "정답 이외의 항목"
+          missing_word_after: "답변 다음에 나오는 내용"
+          points: 점
+          question: 문제
+        links: 
+          add_another_answer: "다른 답변 추가"
+          need_help: 도움말
+        multi_answer_sets_example: "즉 \"장미는 [color1], 바이올렛은 [color2]\""
+        offer_combinations: "%{how_many}개의 가능한 값 조합 (최대 %{max_combinations})을 제공"
+        options: 
+          only_one_correct: "단 한 개의 정답"
+          students_select_multiple: "학생이 여러 개의 답변을 선택"
+        question_type: 
+          calculated: "수식 문제"
+          essay: "작문 문제"
+          file_upload: "파일 업로드 문제"
+          fill_in_multiple_blanks: "여러 공란 채우기"
+          matching: 짝짓기
+          missing_word: "빠진 단어"
+          multiple_answers: "여러 답변"
+          multiple_choice: "여러 선택"
+          multiple_dropdowns: "여러 드롭다운"
+          numerical: "숫자로 된 답변"
+          short_answer: "공란 채우기"
+          text_only: "내용(문제 없음)"
+          true_false: 참/거짓
+        show_possible_answers: "%{question}에 대한 가능한 답변 표시"
+        show_possible_answers_no_question: "다음에 대한 가능한 답변을 표시"
+        titles: 
+          click_to_enter_correct_answer_comments: "정답에 대한 의견을 입력하려면 클릭"
+          click_to_enter_general_answer_comments: "일반적인 의견을 입력하려면 클릭"
+          click_to_enter_wrong_answer_comments: "오답에 대한 의견을 입력하려면 클릭"
+        wrong_answer_comments: "오답 의견"
+      history: 
+        anonymous_username: 학생
+        buttons: 
+          allow_extra_attempt: "이 학생에게 추가 시도 허용"
+        default_quiz_name: "%{course_name} 퀴즈"
+        default_survey_name: "%{course_name} 설문"
+        grade_by_question_warning: "문제에 따른 평가 기능은 그룹 안에서 순서가 섞이는 문제에 영향을 받습니다."
+        headers: 
+          quiz_submissions: "퀴즈 제출물"
+          survey_submissions: "설문 제출물"
+        latest_quiz_results: "여기에 %{user}의 최종 퀴즈 결과가 있습니다. 문제의 점수를 수정하거나 의견을 추가한 후에 페이지 아래에 있는 \"점수 업데이트\" 클릭하면 됩니다."
+        latest_survey_results: "여기에 %{user}의 최종 설문 결과가 있습니다. 문제의 점수를 수정하거나 의견을 추가한 후에 페이지 아래에 있는 \"점수 업데이트\" 클릭하면 됩니다."
+        links: 
+          back_to_quiz: "퀴즈로 돌아가기"
+          back_to_survey: "설문으로 돌아가기"
+        logged_out_user: "사용자 %{index} 로그아웃"
+        named_quiz_results: "%{user}의 %{quiz_name} 결과"
+        next_questions_arrow_title: "다음 문제"
+        no_more_attempts: "%{user}에게 남은 시도 회수가 없음"
+        page_title_quiz: "%{user}의 퀴즈 이력"
+        page_title_survey: "%{user}의 설문 이력"
+        prev_questions_arrow_title: "이전 문제"
+        quiz_not_yet_taken: "퀴즈를 아직 치르지 않았습니다."
+        quiz_not_yet_taken_or_in_progress: "퀴즈를 치르지 않았거나 현재 치르는 중"
+        quiz_unlimited_attempts: "이 퀴즈는 시도 회수에 제한이 없음"
+        score_for_attempt: "%{attempt_number}차 시도: %{score}"
+        survey_not_yet_taken: "설문을 아직 치르지 않았습니다."
+        survey_not_yet_taken_or_in_progress: "설문을 치르지 않았거나 현재 치르는 중"
+        survey_unlimited_attempts: "이 설문은 시도 회수에 제한이 없음"
+        titles: 
+          score_pending_review: "이 점수는 검토 대기 중이며 바뀔 수 있음"
+          submission_needs_review: "이 제출물은 검토가 필요함"
+        unnamed_quiz_results: "%{user}의 퀴즈 결과"
+        unnamed_survey_results: "%{user}의 설문 결과"
+      index: 
+        buttons: 
+          publish_quizzes: "퀴즈 게시"
+        headers: 
+          assignment_quizzes: "과제 퀴즈"
+          course_quizzes: "과목 퀴즈"
+          practice_quizzes: "연습 퀴즈"
+          publish_multiple_quizzes: "여러 퀴즈 게시"
+          surveys: 설문
+          unpublished_quizzes: "게시 안 된 퀴즈"
+        labels: 
+          publish_multiple_quizzes: "이번에 게시하려는 퀴즈를 선택"
+        links: 
+          create_new_quiz: "새 퀴즈 만들기"
+          manage_question_banks: "문제 은행 관리"
+          publish_multiple_quizzes: "여러 퀴즈 게시"
+        no_quizzes: "사용 가능한 퀴즈가 없음"
+        page_titles: 퀴즈
+        titles: 
+          this_quiz_is_locked: "이 퀴즈는 현재 잠겨있습니다. 세부 정보를 보려면 클릭하십시오."
+      invalid_ip: 
+        quiz_protected: "이 퀴즈는 보호된 것으로 특정 위치에서만 사용할 수 있습니다. 현재 이용 중인 컴퓨터는 이 퀴즈를 치르기에 유효한 위치에 있지 않은 것으로 보입니다."
+        survey_protected: "이 설문은 보호된 것으로 특정 위치에서만 사용할 수 있습니다. 현재 이용 중인 컴퓨터는 이 퀴즈를 치르기에 유효한 위치에 있지 않은 것으로 보입니다."
+      lockdown_browser_required: 
+        headers: 
+          requires_lockdown: "Respondus LockDown Browser 필요"
+        labels: 
+          download_lockdown: "아직 브라우저를 설치하지 않았다면 여기에서 다운로드하시기 바랍니다."
+        links: 
+          download_lockdown: "[Respondus LockDown Browser 다운로드]"
+        requires_lockdown: "이 퀴즈는 Respondus LockDown Browser가 필요합니다. 이 퀴즈를 치르거나 퀴즈 결과를 보려면 Respondus LockDown Browser를 실행하십시오."
+      managed_quiz_data: 
+        anonymous_student: "학생 %{user_counter}"
+        logged_out_user: "사용자 %{user_counter} 로그 아웃"
+        titles: 
+          submission_needs_review: "이 제출물은 검토가 필요함"
+      moderate: 
+        add_time: "시간 추가"
+        buttons: 
+          change_extensions_for_selected_students: "선택된 학생 %{n}명에 대한 연장 바꾸기"
+          extend_time: "시간 연장"
+          save: 저장
+        end_quiz_reference_time_current_end: "현재 종료 시각"
+        end_quiz_reference_time_now: 지금
+        end_quiz_when: "퀴즈를 %{reference_time}에서 %{n}분에 마칩니다."
+        extended_quiz_time_explanation: "학생에게 현재 퀴즈 시도에 추가 시간을 줄 수 있습니다. 시간을 얼마나 주시겠습니까?"
+        finished_in: "%{duration} 안에 마침"
+        global_extra_attempts: "이미 모두 %{n}을(를) 얻음"
+        headers: 
+          attempt: 시도
+          attempts_left: "남은 시도"
+          extended_quiz_time: "퀴즈 시간 연장"
+          score: 점수
+          student: 학생
+          student_extensions: "학생 연장"
+          time: 시간
+        in_progress: "진행 중"
+        labels: 
+          ending: 마침
+          extra_attempts: "추가 시도"
+          extra_time_per_attempt: "모든 시도에 대한 추가 시간"
+          manually_unlock: "다음 시도에 대해 수동으로 퀴즈 잠금 해제"
+          started: 시작됨
+        minutes: 분
+        page_title: "퀴즈 살펴보기"
+        student_gets_extra_time: "*%{student_name}*이(가) **각 시도에 대해 추가 %{extra_time}분을 얻음 **"
+        student_n: "학생 %{n}"
+        titles: 
+          change_user_extensions: "사용자 연장 바꾸기"
+          manually_unlocked: "수동으로 잠금 해제함"
+          minutes_to_add: "추가할 시간(분)"
+          select_deselect_all: "모두 선택/해제"
+          select_user: "%{user} 선택"
+      multi_answer: 
+        choose_answer: 선택
+      muted: 
+        muted_quiz_description: "교사가 평가를 마치지 않았기 때문에 퀴즈 점수를 표시할 수 없습니다. 교사가 이 퀴즈의 평가를 마치면 이 페이지에 점수가 표시됩니다."
+        muted_quiz_header: "퀴즈가 평점 비공개 상태임"
+      new: 
+        allowed_attempts: "허용된 시도 회수"
+        anonymous_submissions: "제출물을 익명으로 유지"
+        buttons: 
+          not_published: "게시 안 됨"
+          published: 게시됨
+          save: 저장
+        cant_go_back: "답변 후에 문제 잠금"
+        default_page_title: "새 퀴즈"
+        group: "과제 그룹"
+        headers: 
+          ip_filters: "퀴즈 IP 필터가 무엇입니까?"
+        hide_correct_answers_at: "정답 숨김 시간"
+        hints: 
+          question_detail_disabled: "참고: %{question_count} 이상일 때는 문제 세부 정보를 이용할 수 없습니다."
+          quiz_score: "학생이 설문을 치르면 자동으로 학점을 받게 됨"
+        ip_filters: "퀴즈 IP 필터는 특정 IP 범위에 있는 컴퓨터로 퀴즈에 대한 액세스를 제한하는 방법입니다. 필터는 콤마로 구분된 주소 목록이나 주소 다음에 마스크를 붙인 것이 될 수 있습니다(\"192.168.217.1\", \"192.168.217.1/24\" 또는 \"192.168.217.1/255.255.255.0\")."
+        label: 
+          time_limit: "시간 제한"
+        labels: 
+          allow_multiple_attempts: "여러 번 시도 허용"
+          ip_filter: "IP 주소 필터링"
+          quiz_instructions: "퀴즈 지침"
+          quiz_notify: "사용자에게 이 퀴즈가 바뀐 것을 알림"
+          quiz_score: 점수
+          require_access_code: "액세스 코드 필요"
+          restrict_quiz: "퀴즈 제한"
+          show_question_details: "퀴즈 세부 정보 표시"
+        limited_attempts: "허용된 시도"
+        links: 
+          cancel: 취소
+          find_questions: "문제 찾기"
+          new_question: "새 문제"
+          new_question_group: "새 문제 그룹"
+          show_assignment_rubric: "루브릭 보기"
+        manage: 관리
+        minutes: 분
+        new_assignment: "새 과제"
+        new_discussion: "새 토론"
+        one_question_at_a_time: "한 번에 문제 하나만 표시"
+        quiz_title: "퀴즈 제목"
+        quiz_type: "퀴즈 유형"
+        require_lockdown_browser: "Respondus LockDown Browser 필요"
+        require_lockdown_browser_for_results: "퀴즈 결과를 보려면 필요"
+        retrieving_filters: "필터 가져오는 중..."
+        score_to_keep: "유지할 퀴즈 점수"
+        show_correct_answers: "학생이 정답을 보도록 허용"
+        show_correct_answers_at: "정답 표시 시간"
+        shuffle_answers: "답변 뒤섞기"
+        students_cannot_view_responses_after_course_concludes: "학생은 과목 종결 이후에 퀴즈 답변을 볼 수 없음"
+        time_limit: "허용된 시간(분)은 얼마입니까?"
+        titles: 
+          click_to_select_filter: "이 필터를 선택하려면 클릭"
+          delete: 삭제
+          find_ip_address_filter: "IP 주소 필터 찾기"
+        warnings: 
+          has_student_submissions: "학생들이 이 퀴즈를 이미 치렀거나 치르기 시작했으므로 편집에 주의하시기 바랍니다. 퀴즈 문제에 중요한 변경이 있으면, 이전 버전의 퀴즈를 치른 학생을 다시 평가하도록 고려해 보시기 바랍니다."
+      notices: 
+        cant_view_submission_while_muted: "퀴즈가 평점 비공개 상태인 동안에는 퀴즈 이력을 볼 수 없음"
+        has_submissions_already: "어떤 학생이 이미 퀴즈를 치렀거나 시작했다는 점을 염두에 두십시오."
+        less_than_allotted_time: "기한에 가까울 때 퀴즈를 시작했으므로 퀴즈를 치를 충분한 시간을 가지지 못합니다."
+        no_submission_for_user: "사용자에 대한 이용 가능한 제출물이 없음"
+        quiz_updated: "퀴즈를 성공적으로 업데이트함"
+      question_group: 
+        buttons: 
+          update: 업데이트
+        default_group_name: 그룹
+        edit_questions_and_points: "*%{num_questions}*문제 선택, 문제 당 #%{num_points}#점"
+        labels: 
+          group_name: "그룹 이름"
+          number_of_questions: "문제 수"
+          points_per_question: "문제 당 점수"
+          question_bank: "문제를 은행에서 꺼내옴"
+        links: 
+          link_to_a_question_bank: "문제 은행으로 링크"
+        show_questions_and_points: "*%{num_questions}*문제 선택, 문제 당 #%{num_points}#점"
+        titles: 
+          add_question_to_group: "문제를 이 그룹에 추가"
+          collapse_group: "그룹 축소"
+          delete_group: "그룹 삭제"
+          edit_group_details: "그룹 세부 정보 편집"
+          expand_group: "그룹 확장"
+      question_list_right_side: 
+        headers: 
+          questions: 문제
+      question_statistic: 
+        empty_response: "빈 응답"
+        labels: 
+          other_answers: "다른 답변"
+        no_data: "자료 없음"
+        no_responses: "이 문제에 대해 기록된 응답이 없음"
+        percent_of_responses: "%{total} 중 %{percent}% 번의 시도가 이 답변을 선택함"
+      question_teaser: 
+        titles: 
+          click_to_show_details: "전체 문제 세부 정보를 표시하려면 클릭"
+          delete_this_question: "문제 삭제하기"
+          edit_this_question: "문제 편집하기"
+      quiz_details: 
+        allowed_attempts: "허용된 시도"
+        headers: 
+          available: "사용 가능"
+          due: 기한
+          points: 점
+          questions: 문제
+          time_limit: "시간 제한"
+        multiple_due_dates: "여러 기한"
+        none: 없음
+        quiz_available_after: "%{start_time} 이후"
+        quiz_available_until: "%{end_time}까지"
+        requires_lockdown: "Respondus LockDown Browser 필요"
+        unlimited: 무제한
+      quiz_right_side: 
+        labels: 
+          current_score: "현재 점수"
+          kept_score: "보관된 점수"
+          last_attempt_details: "마지막 시도 세부 정보"
+          submission_details: "제출물 세부 정보"
+          time: 시간
+        links: 
+          preview_quiz_again: "이 퀴즈 다시 미리 보기"
+          preview_survey_again: "이 설문 다시 미리 보기"
+        no_more_attempts: "남아 있는 시도가 없음"
+        questions_not_graded: "어떤 문제는 아직 평가 안 됨"
+        score_set_manually: "교사가 이 점수를 설정함"
+        unlimited_attempts: "무제한 시도"
+        view_previous_attempts: "이전 시도 보기"
+      quiz_show_teacher: 
+        anonymous_submissions: "익명 제출물"
+        attempts: 시도
+        available_from: "다음부터 사용 가능"
+        cant_go_back: "답변 후에 문제 잠금"
+        code: "액세스 코드"
+        due: 기한
+        filter: "IP 필터"
+        for: 과제
+        group: "과제 그룹"
+        label: 
+          time_limit: "시간 제한"
+        multiple_attempts: "여러 번 시도"
+        no_time_limit: "시간 제한 없음"
+        one_question_at_a_time: "한 번에 문제 하나만"
+        points: 점
+        quiz_type: "퀴즈 유형"
+        require_lockdown_browser: "Respondus LockDown Browser 필요"
+        require_lockdown_browser_for_results: "퀴즈 결과를 보려면 필요"
+        score_to_keep: "유지할 점수"
+        show_correct_answers: "정답 표시"
+        shuffle_answers: "답변 뒤섞기"
+        until: "다음 시간까지"
+        view_responses: "답변 보기"
+      quiz_submission: 
+        attempt_duration: "이 시도는 %{duration}이(가) 걸렸습니다."
+        buttons: 
+          update_scores: "점수 업데이트"
+        labels: 
+          final_score: "최종 점수"
+          fudge_points: "점수 조정"
+          fudge_points_changed_points_quiz: "%{user}이(가) 퀴즈를 치른 후에 이 퀴즈의 가능한 점수가 %{difference}점 변경되었습니다. 그러한 변경에 따라 이 상자를 이용하여 수동으로 점수를 더하거나 뺄 수 있습니다."
+          fudge_points_changed_points_survey: "%{user}이(가) 설문을 치른 후에 이 설문의 가능한 점수가 %{difference}점 변경되었습니다. 그러한 변경에 따라 이 상자를 이용하여 수동으로 점수를 더하거나 뺄 수 있습니다."
+          fudge_points_generic_explanation: "이 상자에 양수나 음수 점수를 추가함으로써 수동으로 점수를 조정할 수 있습니다."
+          questions_need_review: "다음 문제는 검토 필요"
+          quiz_score: "퀴즈 점수"
+          score_for_attempt: "이 시도의 점수"
+          score_for_quiz: "이 퀴즈의 점수"
+          score_for_survey: "이 설문의 점수"
+          survey_score: "설문 점수"
+        links: 
+          click_to_view_results: "결과를 보려면 클릭"
+        questions_not_graded: "어떤 문제는 아직 평가 안 됨"
+        quiz_fudged_negative: "이 퀴즈 점수는 수동으로 %{fudge}점 조정되었습니다."
+        quiz_fudged_positive: "이 퀴즈 점수는 수동으로 +%{fudge}점 조정되었습니다."
+        quiz_not_yet_taken: "아직 이 퀴즈를 치르지 않았습니다."
+        quiz_results_protected: "이 퀴즈의 결과는 보호되어 있어서 학생에게 보이지 않습니다."
+        quiz_results_protected_until_last_attempt: "이 퀴즈의 결과는 보호되어 있어서 학생이 마지막 시도를 제출하기 전까지 보이지 않습니다."
+        quiz_submission_needs_review: "이 퀴즈는 제출 이후에 중대한 변경이 있었습니다. 제출물을 다시 평가해야 할 수도 있습니다."
+        requires_lockdown: "퀴즈 결과를 보려면 Respondus LockDown Browser가 필요합니다."
+        submitted_at: "%{when}에 제출됨"
+        survey_fudged_negative: "이 설문 점수는 수동으로 %{fudge}점 조정되었습니다."
+        survey_fudged_positive: "이 설문 점수는 수동으로 +%{fudge}점 조정되었습니다."
+        survey_not_yet_taken: "아직 이 설문을 치르지 않았습니다."
+      quiz_summary: 
+        labels: 
+          allowed_attempts: "허용된 시도"
+          attempts_left: "남은 시도"
+          attempts_so_far: "현재까지의 시도"
+          latest_submission: "마지막 제출"
+          quiz_details: "퀴즈 세부 정보"
+          quiz_due: 기한
+          quiz_time_limit: "시간 제한"
+          survey_details: "설문 세부 정보"
+        no_details: "세부 정보 없음"
+        points_possible: "%{points_possible}점 가능"
+        quiz_multiple_due_dates: "여러 날짜"
+        quiz_no_points: "점수 없음"
+        student_mute_notification: "교사가 평가 작업 중임"
+        unlimited_attempts: "무제한 시도"
+      read_only: 
+        default_page_title: "새 퀴즈"
+        headers: 
+          quiz_details: "퀴즈 세부 정보"
+        labels: 
+          question_details: "퀴즈 세부 정보 표시"
+          quiz_instructions: "퀴즈 지침"
+        links: 
+          back_to_quiz_page: "퀴즈 페이지로 돌아가기"
+      refresh_quiz_after_popup: 
+        headers: 
+          loading_in_lockdown: "Respondus LockDown 브라우저에 퀴즈 로드 중"
+      show: 
+        buttons: 
+          lock_quiz: "이 퀴즈를 지금 잠금"
+          lock_survey: "이 설문을 지금 잠금"
+          publish: 게시
+          republish: "다시 게시"
+          unlock_quiz: "지금 학생이 이 퀴즈를 치르도록 함"
+          unlock_survey: "지금 학생이 이 설문을 치르도록 함"
+        labels: 
+          available_until: "다음 시간까지"
+          no_time_limit: "시간 제한 없음"
+          warning_icon: 경고
+        links: 
+          edit: 편집
+          keep_editing_this_quiz: "이 퀴즈 계속 편집"
+          keep_editing_this_survey: "이 설문 계속 편집"
+          message_students_who: "다음 학생에게 메시지 보내기"
+          moderate_this_quiz: "이 퀴즈 살펴보기"
+          moderate_this_survey: "이 설문 살펴보기"
+          preview: "미리 보기"
+          quiz_statistics: "퀴즈 통계"
+          see_full_quiz: "전체 퀴즈 보기"
+          show_assignment_rubric: "루브릭 보기"
+          show_student_quiz_results: "학생 퀴즈 결과 표시"
+          show_student_survey_results: "학생 설문 결과 표시"
+          survey_statistics: "설문 통계"
+        manage: 관리
+        only_registered_users: "등록한 학생만 평가되는 퀴즈를 치를 수 있습니다."
+        quiz_regraded_your_score_not_affected: "이 퀴즈가 다시 평가되었으며, 여러분의 점수에 영향이 없습니다."
+        speed_grader: SpeedGrader™
+        titles: 
+          delete: 삭제
+          related_items: "관련 항목"
+          unlock_for_how_long: "퀴즈를 얼마나 오래 잠금 해제하시겠습니까?"
+        warnings: 
+          draft_version: "이는 퀴즈 초안 미리 보기입니다."
+      single_answer: 
+        upload: 업로드
+      statistics: 
+        class_too_large: "이 과목은 통계를 표시하기에 너무 큽니다. 하지만 오른쪽 사이드바에서 다운로드하는 것은 가능합니다."
+        headers: 
+          for_question: "%{question_name}"
+          quiz_statistics: "퀴즈 통계"
+          survey_statistics: "설문 통계"
+          users_have_taken_this_quiz: "사용자 %{count}명이 이 퀴즈를 치름"
+          users_have_taken_this_survey: "사용자 %{count}명이 이 설문을 치름"
+        labels: 
+          average_correct: "평균 정답"
+          average_incorrect: "평균 오답"
+          average_time: "평균 시간"
+          high_score: "최고 점수"
+          low_score: "최저 점수"
+          mean_score: "평균 점수"
+          standard_deviation: 표준편차
+          users_selected_the_answer: "다음 사용자가 답변 %{answer_text}을(를) 선택했습니다."
+        links: 
+          count_all_attempts: "**모든** 시도 계산"
+          count_only_latest_attempts: "각 마지막 시도만 계산"
+        page_title: 통계
+        quiz_all_version_disclaimer: "이 보고서는 모든 사용자의 모든 시도를 바탕으로 한 퀴즈 통계를 표시하고 있습니다."
+        quiz_latest_version_disclaimer: "이 보고서는 각 사용자의 마지막 시도를 바탕으로 한 퀴즈 통계를 표시하고 있습니다."
+        student_n: "학생 %{student_counter}"
+        survey_all_version_disclaimer: "이 보고서는 모든 사용자의 모든 시도를 바탕으로 한 설문 통계를 표시하고 있습니다."
+        survey_latest_version_disclaimer: "이 보고서는 모든 사용자의 모든 시도를 바탕으로 한 설문 통계를 표시하고 있습니다."
+      statistics_crumb: 통계
+      submission_version: 
+        attempt_number: "시도 %{att_no}"
+        kept: 보관
+        latest: 최신
+      submission_versions: 
+        attempt: 시도
+        attempt_history: "시도 이력"
+        questions_not_graded: "어떤 문제는 아직 평가 안 됨"
+        quiz_attempt_history_description: "퀴즈 시도 이력을 표시하는 표입니다. 각 시도는 왼쪽에 있습니다. 시도, 시간, 점수는 위쪽에 있습니다."
+        regraded: "다시 평가됨"
+        score: 점수
+        time: 시간
+      take_quiz: 
+        buttons: 
+          next: 다음
+          out_of_time_submit: "네, 좋습니다."
+          previous: 이전
+          submit_quiz: "퀴즈 제출"
+        headers: 
+          draft_preview: "이는 퀴즈 초안 미리 보기입니다."
+        labels: 
+          started: 시작됨
+          times_up: "시간 종료! 결과 제출 중 - "
+        logged_out_of_canvas: "*canvas에서 로그아웃했습니다.* 계속 하려면 로그인하시기 바랍니다."
+        login_required: "로그인 필요"
+        not_saved: "저장 안 됨"
+        quiz_instructions: "퀴즈 지침"
+      take_quiz_in_popup: 
+        headers: 
+          loading_in_lockdown: "Respondus LockDown 브라우저에 퀴즈 로드 중"
+        links: 
+          return_to_quiz_page: "퀴즈 페이지로 돌아가려며 [여기를 클릭](%{url})하십시오."
+      take_quiz_right_side: 
+        labels: 
+          attempt_due: "시도 기한"
+          score: 점수
+          time_elapsed: "지난 시간"
+          time_running: "남은 시간"
+        links: 
+          hide_time_running: 숨기기
+          keep_editing_quiz: "이 퀴즈 계속 편집"
+          keep_editing_survey: "이 설문 계속 편집"
     read_only: 
       default_page_title: "새 퀴즈"
       headers: 
@@ -10490,6 +13065,7 @@ ko:
       loading: "로드 중..."
       titles: 
         details: "과제 루브릭 세부 정보"
+    search_placeholder: "퀴즈 검색"
     show: 
       answers: 
         correct: 정답입니다!
@@ -10500,6 +13076,7 @@ ko:
         unanswered: "답변 안 함"
         you_answered: "여러분의 답변은"
       buttons: 
+        already_published: 게시되었습니다!
         lock_quiz: "이 퀴즈를 지금 잠금"
         lock_survey: "이 설문을 지금 잠금"
         publish: 게시
@@ -10545,6 +13122,10 @@ ko:
         unlock_for_how_long: "퀴즈를 얼마나 오래 잠금 해제하시겠습니까?"
       warnings: 
         draft_version: "이는 퀴즈의 초안 미리 보기입니다."
+    show_and_hide_correct_answers: "%{from}부터 %{to}까지"
+    show_correct_answers_after: "%{date} 이후"
+    show_correct_answers_immediately: 즉시
+    show_correct_answers_until: "%{date} 까지"
     single_answer: 
       upload: 업로드
     statistics: 
@@ -10582,6 +13163,8 @@ ko:
         one: "다른 제출물 %{count}개"
         other: "다른 제출물 %{count}개"
     statistics_crumb: 통계
+    survey: 설문
+    surveys_label: "퀴즈 표시를 토글하는 설문"
     take_quiz: 
       buttons: 
         next: 다음
@@ -10612,6 +13195,7 @@ ko:
         other: "%{count}시간"
       labels: 
         started: 시작됨
+        time_elapsed: "지난 시간"
         times_up: "시간 종료! 결과 제출 중 - "
       logged_out_of_canvas: "*canvas에서 로그아웃했습니다.* 계속 하려면 로그인하시기 바랍니다."
       login_required: "로그인 필요"
@@ -10633,6 +13217,7 @@ ko:
       question_unanswered: "아직 답변하지 않음"
       saved_at: "%{t}에 저장됨"
       saving: "저장 중..."
+      saving_not_needed: "저장할 새 자료가 없습니다. %{t}에 마지막으로 확인했습니다."
       seconds_count: 
         one: "%{count}초"
         other: "%{count}초"
@@ -10663,6 +13248,7 @@ ko:
       labels: 
         time_elapsed: "지난 시간"
         time_remaining: "남은 시간"
+    title_add_quiz: "퀴즈 추가"
     titles: 
       add_questions_as_group: "그룹으로 질문 추가"
       click_to_enter_comments_on_answer: "학생이 이 답변을 선택한 경우에 대한 의견을 입력하려면 클릭"
@@ -10674,12 +13260,17 @@ ko:
       help_with_formulas: "퀴즈 문제 수식 도움말"
       ip_address_filtering: "IP 주소 필터링"
       set_as_correct: "이 답변을 정답으로 지정"
+    toggle_message: "퀴즈 표시 토\x1d글"
     ? "true"
     : 참
     ungraded_survey: "평가 안 된 설문"
     warnings: 
       unpublished_changes: "*이 퀴즈에 게시하지 않은 변경 사항이 있습니다.* 변경 사항은 퀴즈를 게시하거나 다시 게시하기 전까지 학생에게 나타나지 않습니다."
       unpublished_quiz: "*이 퀴즈를 게시하지 않았습니다.* 게시하기 전까지 교사만 이 퀴즈를 볼 수 있습니다."
+  quizzes_route: 
+    quizzes_route_title: 퀴즈
+  quizzez_submission_row: 
+    unlimited: 무제한
   re_upload_submissions_form: 
     buttons: 
       upload: "파일 업로드"
@@ -10690,6 +13281,7 @@ ko:
     last_logged_in: "%{last_login}에 마지막으로 로그인"
   recipient_input: 
     context_search_placeholder: "이름, 과목, 그룹을 입력"
+    context_search_title: "이름이나 과목이나 그룹"
     groups_count: 
       one: "그룹 %{count}개"
       other: "그룹 %{count}개"
@@ -10710,7 +13302,7 @@ ko:
       remember_me: 기억하기
       sign_in: 로그인
     parent_dialog: 
-      agree_to_terms_and_pp: "*사용 조건*과 **개인 정보 보호 정책**에 동의합니다."
+      agree_to_terms_and_pp: "*사용 조건*에 동의하고 **개인 정보 보호 정책**을 승인합니다."
       buttons: 
         start_participating: "참여 시작"
       labels: 
@@ -10719,7 +13311,7 @@ ko:
         password: "자식의 암호"
         username: "자식의 사용자 이름"
     student_dialog: 
-      agree_to_terms_and_pp: "*사용 조건*과 **개인 정보 보호 정책**에 동의합니다."
+      agree_to_terms_and_pp: "*사용 조건*에 동의하고 **개인 정보 보호 정책**을 승인합니다."
       buttons: 
         start_learning: "학습 시작"
       labels: 
@@ -10729,7 +13321,7 @@ ko:
         password_confirmation: "암호 확인"
         username: "사용자 이름"
     teacher_dialog: 
-      agree_to_terms_and_pp: "*사용 조건*과 **개인 정보 보호 정책**에 동의합니다."
+      agree_to_terms_and_pp: "*사용 조건*에 동의하고 **개인 정보 보호 정책**을 승인합니다."
       buttons: 
         start_teaching: "교육 시작"
       labels: 
@@ -10751,6 +13343,7 @@ ko:
       manage_account_settings: "계정 수준 설정 관리"
       manage_admin_users: "다른 교사, 과목 디자이너, 조교를 과목에 추가/제거"
       manage_alerts: "전체 알림 관리"
+      manage_announcements: "전체 공지 관리"
       manage_assignments: "과제와 퀴즈 관리 (추가/편집/삭제)"
       manage_calendar: "과목 달력에 행사 추가, 편집, 삭제"
       manage_canvasnet_courses: "Canvas Network 과목 관리"
@@ -10827,6 +13420,8 @@ ko:
     update_failed_notice: "역할 만들기 실패"
   roles: 
     account_admin: "계정 관리자"
+    new_role: 
+      add: 추가
     permission_button: 
       rolebutton: 
         disable: "사용 안 함"
@@ -10834,9 +13429,13 @@ ko:
         enable: 사용
         enable_and_lock: "사용 및 잠금"
         use_default: "기본값 사용"
+    permissions: 권한
   roster: 
     delete_confirm: "이 사용자를 제거하시겠습니까?"
     error_sending_invitations: "초대를 보내는 데 오류가 발생했습니다. 다시 시도하시기 바랍니다."
+    filter_multiple_users_found: "사용자 %{userCount}명을 찾았습니다."
+    filter_no_users_found: "일치하는 사용자가 없습니다."
+    filter_one_user_found: "사용자 1명을 찾았습니다."
     flash: 
       removeError: "사용자를 제거할 수 없습니다. 다시 시도하시기 바랍니다."
       removed: "사용자를 성공적으로 제거했습니다."
@@ -10871,6 +13470,7 @@ ko:
         add_rubric: "루브릭 추가"
       course_rubrics: "과목 루브릭"
       delete_rubric: "루브릭 삭제"
+      edit_rubric: "루브릭 편집"
       page_title: 루브릭
       points_possible: 
         one: "%{count}점 가능"
@@ -11015,6 +13615,7 @@ ko:
         crosslist_this_section: "섹션 교차 나열"
         current_enrollments: "현재 등록"
         decrosslist_section: "섹션 교차 나열 해제"
+  select_content: "내용 선택"
   select_content_dialog: 
     buttons: 
       add_item: "항목 추가"
@@ -11027,6 +13628,7 @@ ko:
     titles: 
       add_item_to_module: "모듈에 항목 추가"
       find_links_using_service: "%{service}을(를) 이용해서 링크 찾기"
+  selected_answer: "이 답변을 선택했습니다."
   self_enrollments: 
     already_enrolled: 
       already_enrolled: "이미 **%{course}**에 등록했습니다."
@@ -11073,6 +13675,13 @@ ko:
         go_to_course: "과목으로 가기"
         go_to_dashboard: "대시보드로 가기"
       not_available_yet: "과목이 시작하기 직전에 이메일을 보냅니다."
+  sequence_footer: 
+    next_module: "다음 모듈:"
+    next_module_desc: "다음 모듈: *모듈*"
+    next_module_item_desc: "다음: *항목*"
+    prev_module: "이전 모듈:"
+    prev_module_desc: "이전 모듈: *모듈*"
+    prev_module_item_desc: "이전: *항목*"
   services_api: 
     must_be_logged_in: "Kaltura를 사용하려면 로그인해야 합니다."
   set_default_grade_dialog: 
@@ -11205,6 +13814,10 @@ ko:
         headings: 
           page: "페이지 오류"
         title: "페이지 오류"
+      403_message: 
+        headings: 
+          page: "페이지 오류"
+        title: "페이지 오류"
       404_message: 
         generic_description: "해당 페이지를 찾을 수 없습니다."
         headings: 
@@ -11276,6 +13889,8 @@ ko:
       find: 찾기
       find_existing_scheme: "기존 평가 구성표 찾기"
       full_name: "전체 이름, 작은 텍스트"
+      grading_standard_name_table_summary: "여러분의 평가 계획을 포함하는 편집 가능한 하나의 셀만 가진 표입니다."
+      grading_standard_summary: "여러분의 평가 계획을 포함한 표입니다. 값의 이름과 범위가 위에 있습니다. 각 행은 백분률의 최소, 최대값을 포함하고 있습니다."
       insert_here: "여기에 삽입"
       labels: 
         name: 이름
@@ -11283,7 +13898,10 @@ ko:
         scheme_name: "구성표 이름"
       loading_grading_standards: "평가 기준 로드 중..."
       managing_grading_standards: "평가 구성표 관리"
+      range_lower: "범위의 하한"
       range_of_numbers: "%{lower_number} ~ %{higher_number}"
+      range_upper: "범위의 상한"
+      remove_row: "행 삭제"
       remove_scheme: "평가 구성표 제거"
       some_standard: "일부 표준"
       use_this_standard: "이 평가 기준 사용"
@@ -11327,6 +13945,7 @@ ko:
       back_to_login: "로그인으로 돌아가기"
       buttons: 
         request_password: "암호 요청"
+      coenrollment_banner: "*Canvas 사용자 부모입니까?* **계정을 만드시려면 여기를 클릭하십시오**"
       default_login_message: "여러분의 기관에서 로그인"
       dont_know_password: "암호를 모르십니까?"
       labels: 
@@ -11352,6 +13971,7 @@ ko:
       for_title: "%{title}"
       labels: 
         body: 메시지
+        subject: 제목
       message_students_who: "다음 학생에게 메시지 보내기"
       out_of_points: "/ %{points_possible}"
     mute_dialog: 
@@ -11415,6 +14035,8 @@ ko:
       service_contact: "%{service}(으)로 %{user}에게 연락"
       social_instructions: "프로필에서 다른 사람에게 표시되는 연락 방법을 표시하십시오."
       title: 제목
+      titles: 
+        click_to_change_profile_pic: "프로필 사진을 변경하려면 클릭"
       user_has_no_bio: "%{user}이(가) 추가한 약력 없음"
       ways_to_contact_user: "%{name}에게 연락하는 방법"
     recent_activity: 
@@ -11466,6 +14088,8 @@ ko:
           other: "이 루브릭을 사용해서 학생 %{count}명을 이미 평가했다는 것을 염두에 두십시오. 이를 변경하면 평가에 영향을 미칩니다."
         rubric_in_use2: "이미 이 루브릭을 가지고 학생을 평가했습니다. 주요 변경은 평가 결과에 영향을 미칠 수도 있습니다."
       out_of: "%{points} */ %{total}*"
+      rubric: 루브릭
+      rubric_title: 제목
       titles: 
         find_existing_rubric: "기존 루브릭 찾기"
     rubric_criterion: 
@@ -11474,6 +14098,8 @@ ko:
       description: 
         custom_comments_area: "이 영역은 평가자가 기준과 관련한 의견을 남기는 데 사용합니다."
       full_marks: "전체 표시"
+      icons: 
+        additional_comments: "추가 의견"
       instructor_comments: "교사 의견"
       labels: 
         save_criterion_for_reuse: "다시 사용하기 위해 의견 저장"
@@ -11485,7 +14111,9 @@ ko:
       options: 
         select: "[ 선택 ]"
       points: "%{points}점"
+      points_label: 점
       points_out_of: "%{points} / %{total}점"
+      points_out_of2: "%{points} / %{total}점"
       titles: 
         linked_to_learning_outcome: "이 기준은 학습 성과로 링크됨"
     rubric_criterion_dialog: 
@@ -11516,6 +14144,7 @@ ko:
       labels: 
         total_points: 총점
       points_out_of: "*%{points}* / **%{total}**"
+      rubric: 루브릭
     rubric_summary_criterion: 
       defaults: 
         description: "기준에 대한 설명"
@@ -11578,6 +14207,9 @@ ko:
       assignment: 과제
       grading_alt: 평가
       submission_comment: "제출물 의견"
+    terms_required: 
+      terms_have_changed: "*사용 조건*이 변경되었습니다. Canvas를 계속 사용하시기 전에 잠시 시간을 들여 검토해 주시기 바랍니다."
+      updated_terms_of_use: "업데이트된 사용 조건"
     unauthorized: 
       headings: 
         needs_cookies: "쿠키 필요"
@@ -11617,6 +14249,8 @@ ko:
         click_to_embed: "%{image}을(를) 내장하려면 클릭"
         embed_image: "이미지를 내장하려면 클릭"
     wiki_sidebar: 
+      aria_only: 
+        folder: 폴더
       buttons: 
         insert_link: "링크 삽입"
         upload: 업로드
@@ -11707,6 +14341,8 @@ ko:
         uploading: "업로드 중입니다. 잠시 기다려 주십시오."
   sis_batch: 
     errors: 
+      too_many_errors: "오류 %{count}개가 더 있음"
+      too_many_warnings: "경고 %{count}개가 더 있음"
       unrecorgnized_type: "인식할 수 없는 가져오기 유형"
     instructure_csv: "Instructure 서식 CSV 또는 CSV를 압축한 파일"
     upload_filename: "sis_upload_%{id}.zip"
@@ -11759,11 +14395,26 @@ ko:
       loading: "로드 중..."
     titles: 
       value_over_time: "%{value} 시간 외"
+    user_search: 
+      find_user_by: "로그인/이메일로 사용자 찾기"
+      find_user_by_label: 로그인/이메일
+    users: 
+      user_search_label: "사용자 검색"
+      users_matching_label: "일치하는 사용자"
   slideshow: 
     titles: 
       back: 뒤로
       close: 닫기
       forward: 앞으로
+  speed_grader: 
+    submissions_dropdown: 
+      loud_late: 지연
+  sr_gradebook: 
+    all_sections: "모든 섹션"
+    assignment_order_due_date: 기한으로
+    no_assignment: "선택한 과제 없음"
+    no_student: "선택한 학생 없음"
+    none: 없음
   statistics: 
     csv_columns: 
       attempt: 시도
@@ -11780,6 +14431,10 @@ ko:
     exact_answer: "%{exact_value} +/- %{margin}"
     inexact_answer: "%{lower_bound} 부터 %{upper_bound} 까지"
     no_answer: "답 없음"
+  status_dates: 
+    available: "사용 가능"
+    closed: 닫힘
+    due: 기한
   step: 단계
   sub_accounts: 
     alerts: 
@@ -11845,6 +14500,7 @@ ko:
     click_to_download: "%{size_of_file} 다운로드하려면 여기를 클릭하십시오."
     creating_zip: "압축 파일을 만드는 중..."
     download_submissions: "과제 제출물 다운로드"
+    download_submissions_title: "과제 제출물 다운로드"
     errors: 
       assignment_submit_fail: "과제 제출 실패"
       can_not_submit_locked_assignment: "과제가 잠겨있을 때 과제를 제출할 수 없음"
@@ -11856,6 +14512,7 @@ ko:
       student_not_enrolled_id: "지정한 사용자(%{id})는 이 과목의 학생이 아님"
     errors_update_failed: "업데이트 실패"
     finished_redirecting: "완료됨! 파일로 리디렉트 중..."
+    gathering_files: "파일 수집 중 (%{progress})..."
     gathering_files_progress: "파일 수집 중 (%{progress})..."
     resubmitted_to_turnitin: "성공적으로 Turnitin에 다시 제출했습니다."
     see_attached_files: "첨부 파일 보기"
@@ -11866,6 +14523,7 @@ ko:
         save_comment: "의견 저장"
       crumbs: 
         assignments: 과제
+      hide_rubric_button: "루브릭 숨기기"
       labels: 
         add_a_comment: "의견 추가"
         grade: 평점
@@ -11911,6 +14569,7 @@ ko:
       student: 학생
       url_preview: "URL 미리 보기"
       view_original_submission: "%{user}의 원본 제출물 보기"
+      view_preview_button: "미리 보기"
     still_zipping: "파일 압축 진행 중..."
     submission_download: 
       download_message: "**학생 제출물을 수집해서** ZIP 파일로 압축합니다. 이 작업은 제출물 파일의 크기와 수에 따라 다소 시간이 걸릴 수도 있습니다."
@@ -11944,6 +14603,8 @@ ko:
     chat: 채팅
     collaborations: 협업
     conferences: 회의
+    course_assignments: "과목 과제"
+    course_settings: "과목 설정"
     discussions: 토론
     eportfolios: ePortfolios
     files: 파일
@@ -11976,6 +14637,7 @@ ko:
       titles: 
         enrollment_terms: "등록 학기"
         term_details: "학기 세부 정보"
+      update_term: "학기 업데이트"
     term: 
       buttons: 
         add: "학기 추가"
@@ -12050,21 +14712,41 @@ ko:
       image_source: "이미지 원본"
       image_width: "이미지 너비"
       url: URL
+  title: 
+    edit_topic: "토론 주제 편집"
+    new_announcement: "새 공지"
+    new_topic: "새 토론 주제"
   title_separator: ": "
   titles: 
     aligned_items: "정렬된 항목"
     announcement: 공지
     announcements: 공지
+    assignments: 과제
+    come_back_later: "나중에 돌아오기 위해 이 문제를 표시"
+    delete_quiz: "퀴즈 삭제"
+    delete_survey: "설문 삭제"
     discussion: 토론
     discussions: 토론
+    edit_quiz: "퀴즈 편집"
+    edit_survey: "설문 편집"
     error_reports: "오류 보고서"
     learning_outcomes: "학습 성과"
     messages: 메시지
     outcome_artifacts: "성과 아티팩트"
+    people: 사용자
     view_in_separate_window: "별도 창에 보기"
   tooltips: 
+    finished: 완료됨
+    incomplete: "완료 안 됨"
     vdd: 
       more_message: "%{count}개 더…"
+  tours: 
+    quiz_regrade: 
+      first_bullet: "답변을 변경하고 나면 문제를 업데이트하기 전에 옵션을 선택해야 합니다."
+      got_it: 확인
+      second_bullet: "학생의 점수에 영향을 미치므로 가장 적절한 옵션을 선택하십시오."
+      third_bullet: "퀴즈를 저장한 후에 제출물을 다시 평가게 되며, 이 작업에는 수 분이 걸립니다."
+      try_later: "이제 이 퀴즈를 이미 치른 학생을 위한 다시 평가하기 옵션을 설정할 수 있습니다."
   turnitin: 
     error_1007: "업로드한 파일이 너무 큽니다."
     error_1009: "유효하지 않은 파일 유형입니다. (유효한 파일 유형은 MS Word, Acrobat PDF, Postscript, Text, HTML, WordPerfect, RTF 입니다.)"
@@ -12083,6 +14765,7 @@ ko:
   unknown: "알 수 없음"
   unknown_question_bank: "알 수 없는 문제 은행"
   unknown_quiz: "알 수 없는 퀴즈"
+  unsupported_package: "지원하지 않는 내용 묶음"
   user: 
     default_collection_name: "%{user_name}의 컬렉션"
     default_user_name: 사용자
@@ -12095,7 +14778,11 @@ ko:
       too_long: "%{max}글자를 초과할 수 없습니다."
     registration: 
       agree_to_terms: "*사용 조건*에 동의합니다."
+      agree_to_terms_and_privacy_policy: "*사용 조건*에 동의하고 **개인 정보 보호 정책**을 승인합니다."
       agree_to_terms_with_code_of_conduct: "*사용 조건*과 **준수 사항**에 동의합니다."
+  user_date_range_search: 
+    cant_be_blank: "Canvas 사용자 ID는 공란일 수 없음"
+    cant_come_before_from: "'끝 날짜'는 '시작 날짜' 이전일 수 없습니다."
   user_follow: 
     errors: 
       follow_own_collection: "자신의 컬렉션을 팔로우할 수 없습니다."
@@ -12203,6 +14890,7 @@ ko:
         student: 학생
       page_title: "교원 일지"
   user_profile: 
+    profile_title_too_long: "제목이 너무 김"
     tabs: 
       notifications: 알림
       profile: 프로필
@@ -12397,6 +15085,8 @@ ko:
       update_instructions: "이 사용자의 정보를 업데이트할 수 있지만 사용자가 원래대로 바꿀 수 있습니다."
     new: 
       create_a_canvas_account: "Canvas 계정 만들기"
+      privacy_policy: "개인 정보 보호 정책"
+      terms_of_use: "사용 조건"
     no_deleting_sis_user: "시스템에서 생성한 사용자를 삭제할 수 없음"
     no_self_registration: "이 계정은 직접 등록을 사용 안 함"
     oauth_fail: "OAuth 인증에 실패했습니다. 유효한 요청을 찾을 수 없습니다."
@@ -12425,6 +15115,8 @@ ko:
       resending: "다시 보내는 중..."
       sent_email_paragraph: "%{email_address}(으)로 이메일을 보냈습니다. *등록을 마치려면 이메일에 있는 링크를 클릭하십시오*. 메일을 볼 수 없다면 **이메일 다시 보내기를 클릭**하거나 스팸 상자를 확인해 보시기 바랍니다."
       while_you_wait: "기다리는 동안..."
+    scheduled_conference: 
+      current_conference_text: "%{conference}에 참여하도록 초대를 받았습니다. 회의는 %{starts_at}에 시작합니다."
     service_not_enabled: "해당 서비스를 사용 안 함"
     show: 
       accounts: 계정
@@ -12489,7 +15181,11 @@ ko:
   warnings: 
     test_install: 
       message: "이 Canvas 설치는 테스트를 위한 것이며 매주 다시 설정됩니다."
+      periodic_message: "이 Canvas 설치는 테스트를 위한 것이며 주기적으로 다시 설정됩니다."
       title: "Canvas 테스트 설치"
+      weekly_message: 
+        one: "이 Canvas 설치는 테스트를 위한 것이며 %{count}주마다 다시 설정됩니다."
+        other: "이 Canvas 설치는 테스트를 위한 것이며 %{count}주마다 다시 설정됩니다."
   web_conference: 
     default_name_for_courses: "과목 웹 회의"
     default_name_for_groups: "그룹 웹 회의"
@@ -12501,6 +15197,7 @@ ko:
         : 켜기
   webct_credentials: 
     credential_not_found: "자격 증명이 없습니다."
+  webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Blackboard Vista/CE, WebCT 6+ 과목"
   webct_name: "Blackboard Vista/CE (WebCT)"
   widget: 
@@ -12523,6 +15220,9 @@ ko:
     default_group_wiki_name: "%{group_name} 위키"
     front_page_name: "첫 페이지"
     sidebar: 
+      aria_tree: 
+        file: 파일
+        folder: 폴더
       buttons: 
         uploading: "업로드 중..."
       errors: 
@@ -12534,6 +15234,71 @@ ko:
       no_title: "제목 없음"
       titles: 
         select_folder_for_uploads: "파일 업로드를 위한 폴더 선택"
+    wiki_page: 
+      buttons: 
+        edit: 편집
+        view_all_pages: "모든 페이지 보기"
+      delete_wiki: 삭제
+      labels: 
+        front_page: "첫 페이지"
+      page_locked: "이 페이지가 잠겨 있습니다."
+      page_locked_by_modules: "다음 모듈을 완료하고 나면 이 페이지를 사용할 수 있습니다:"
+      page_locked_by_modules_until: "다음 모듈을 완료하고 나면 %{lock_info.unlock_at}에 이 페이지를 이용할 수 있습니다:"
+      page_locked_until: "이 페이지는 %{lock_info.unlock_at}에 이용할 수 있음"
+      published_indicator: 게시됨
+      toolbar_menu: 
+        settings: 설정
+      unpublished_indicator: "게시 안 됨"
+      view_page_history_wiki: "페이지 이력 보기"
+    wiki_page_content: 
+      page_locked: "이 페이지가 잠겨 있습니다."
+      page_locked_by_modules: "다음 모듈을 완료하고 나면 이 페이지를 사용할 수 있습니다:"
+      page_locked_by_modules_until: "다음 모듈을 완료하고 나면 %{lock_info.unlock_at}에 이 페이지를 이용할 수 있습니다:"
+      page_locked_until: "이 페이지는 %{lock_info.unlock_at}에 이용할 수 있음"
+    wiki_page_edit: 
+      buttons: 
+        cancel: 취소
+        save: 저장
+      course_editing_roles: 
+        anyone: 모두
+        only_teachers: 교사만
+        teachers_and_students: "교사와 학생"
+      editing_roles: 
+        anyone: 모두
+        can_edit_page: "은(는) 이 페이지를 편집할 수 있음"
+        only_members: 멤버만
+      notify_users_text: "이 내용이 바뀐 것을 사용자에게 알림"
+      options_label: 옵션
+      title_label: "페이지 제목"
+    wiki_page_index: 
+      add_page: 추가하기!
+      buttons: 
+        new_page: 페이지
+        new_page_label: "페이지 "
+      headers: 
+        creation_date: "만든 날짜"
+        last_edit: "마지막 편집"
+        page_title: "페이지 제목"
+      loading: "로드 중..."
+      loading_more: "더 로드 중..."
+      no_pages: "아직 페이지를 만들지 않았습니다."
+    wiki_page_index_edit_dialog: 
+      page_title: 제목
+    wiki_page_index_item: 
+      labels: 
+        front_page: "첫 페이지"
+      menu: 
+        delete: 삭제
+        edit: 편집
+        settings: 설정
+        use_front_page: "첫 페이지로 사용"
+    wiki_page_revision: 
+      latest_revision: 최종본
+      restore_revision: "이 수정본 복원"
+      revision_summary: "%{edited_by}이(가) *%{updated_at}*에 업데이트함"
+      same_as_latest: "*최종본*과 같음"
+    wiki_page_revisions: 
+      revision_history: "수정 이력"
   wiki_page: 
     atom_author: "위키 페이지"
     atom_entry_title: "위키 페이지, %{course_or_group_name}: %{page_title}"
@@ -12620,10 +15385,19 @@ ko:
     notices: 
       add_comment_failed: "의견 추가에 실패했습니다. 다시 시도하시기 바랍니다."
       adding_comment: "의견 추가 중..."
+      cannot_edit: "\"%{title}\" 페이지를 편집할 수 없습니다."
+      cannot_read_revisions: "\"%{title}\"의 수정 이력을 검토할 권한이 없습니다."
+      create_non_existent_page: "\"%{title}\" 페이지가 존재하지 않지만, 아래에서 생성할 수 있음"
       page_deleted: "\"%{title}\" 페이지가 삭제되었습니다."
+      page_does_not_exist: "\"%{title}\" 페이지가 존재하지 않습니다."
       page_updated: "페이지가 성공적으로 업데이트되었습니다."
     page_link: 
       link_hidden_from_students_warning: "학생은 이 링크를 볼 수 없음"
+    page_revisions: 
+      page_revisions_title: "%{title} 수정본 : %{context_name}"
+    pages_index: 
+      titles: 
+        pages: 페이지
     wiki_page_comment: 
       links: 
         delete_comment: "의견 삭제"
@@ -12654,6 +15428,14 @@ ko:
       wiki_description_for_group: "이를 내용을 담고 있는 열린 공간으로 생각하시면 됩니다. 그룹을 기술하고 어려운 주제에 대해 도움이 되는 설명을 제공할 수 있으며 멤버들이 글쓰기 프로젝트에서 함께 작업하는 데 사용할 수 있습니다."
       wiki_description_header: "위키가 무엇입니까?"
   wiki_pages_api: 
+    cannot_delete_front_page: "첫 페이지는 삭제할 수 없음"
+    cannot_have_unpublished_front_page: "첫 페이지를 게시 취소할 수 없음"
+    cannot_update_editing_roles: "이 위키 페이지의 편집 역할을 업데이트할 수 없음"
+    cannot_update_front_page: "위키 첫 페이지를 변경할 수 없음"
+    cannot_update_hide_from_students: "이 위키 페이지의 학생에게 감추기 플래그를 업데이트할 수 없음"
+    cannot_update_published: "이 위키 페이지의 게시 상태를 업데이트할 수 없음"
+    cannot_update_title: "이 위키 페이지의 제목을 업데이트할 수 없음"
+    invalid_editing_roles: "제공된 편집 역할이 올바르지 않음"
     no_wiki_front_page: "설정된 첫 페이지 없음"
   wimba_conference: 
     external_urls: 
@@ -12663,6 +15445,7 @@ ko:
     step: "%{number}단계"
   zip_argument_error: ".zip 업로드는 업로드할 대상 폴더가 필요합니다."
   zip_file_description: "일반 .zip 파일을 과목에 압축 해제하기 위한 마이그레이션 플러그 인"
+  zip_file_display: "파일 가져오기"
   zip_file_file_description: ".zip 파일을 폴더에 압축 해제"
   zip_file_imports: 
     errors: 

@@ -186,13 +186,13 @@ class User < ActiveRecord::Base
   end
 
   scope :of_account, lambda { |account| where("EXISTS (?)", account.user_account_associations.where("user_account_associations.user_id=users.id")).shard(account.shard) }
-  scope :recently_logged_in, lambda {
+  scope :recently_logged_in, -> {
     includes(:pseudonyms).
         where("pseudonyms.current_login_at>?", 1.month.ago).
         order("pseudonyms.current_login_at DESC").
         limit(25)
   }
-  scope :include_pseudonym, includes(:pseudonym)
+  scope :include_pseudonym, -> { includes(:pseudonym) }
   scope :restrict_to_sections, lambda { |sections|
     if sections.empty?
       scoped
@@ -203,9 +203,9 @@ class User < ActiveRecord::Base
   scope :name_like, lambda { |name|
     where("#{wildcard('users.name', 'users.short_name', name)} OR EXISTS (?)", Pseudonym.where(wildcard('pseudonyms.sis_user_id', 'pseudonyms.unique_id', name)).where("pseudonyms.user_id=users.id").active)
   }
-  scope :active, where("users.workflow_state<>'deleted'")
+  scope :active, -> { where("users.workflow_state<>'deleted'") }
 
-  scope :has_current_student_enrollments, where("EXISTS (SELECT * FROM enrollments JOIN courses ON courses.id=enrollments.course_id AND courses.workflow_state='available' WHERE enrollments.user_id=users.id AND enrollments.workflow_state IN ('active','invited') AND enrollments.type='StudentEnrollment')")
+  scope :has_current_student_enrollments, -> { where("EXISTS (SELECT * FROM enrollments JOIN courses ON courses.id=enrollments.course_id AND courses.workflow_state='available' WHERE enrollments.user_id=users.id AND enrollments.workflow_state IN ('active','invited') AND enrollments.type='StudentEnrollment')") }
 
   def self.order_by_sortable_name(options = {})
     order_clause = clause = sortable_name_order_by_clause
@@ -911,7 +911,7 @@ class User < ActiveRecord::Base
   end
 
   def courses_with_grades
-    @courses_with_grades ||= self.available_courses.with_each_shard.select{|c| c.grants_right?(self, nil, :participate_as_student)}
+    @courses_with_grades ||= self.available_courses.with_each_shard.select{|c| c.grants_right?(self, :participate_as_student)}
   end
 
   def sis_pseudonym_for(context, include_trusted = false)
@@ -943,6 +943,16 @@ class User < ActiveRecord::Base
     result
   end
 
+  def check_courses_right?(user, sought_right)
+    # Look through the currently enrolled courses first.  This should
+    # catch most of the calls.  If none of the current courses grant
+    # the right then look at the concluded courses.
+    user && sought_right && (
+      self.courses.any?{ |c| c.grants_right?(user, sought_right) } ||
+      self.concluded_courses.any?{ |c| c.grants_right?(user, sought_right) }
+    )
+  end
+
   set_policy do
     given { |user| user == self }
     can :read and can :manage and can :manage_content and can :manage_files and can :manage_calendar and can :send_messages and can :update_avatar and can :manage_feature_flags
@@ -953,27 +963,21 @@ class User < ActiveRecord::Base
     given {|user| self.courses.any?{|c| c.user_is_instructor?(user)}}
     can :rename and can :create_user_notes and can :read_user_notes
 
-    given do |user|
-      user && (
-        # by default this means that the user we are given is an administrator
-        # of an account of one of the courses that this user is enrolled in, or
-        # an admin (teacher/ta/designer) in the course
-        self.all_courses.any? { |c| c.grants_right?(user, nil, :read_reports) }
-      )
-    end
+    # by default this means that the user we are given is an administrator
+    # of an account of one of the courses that this user is enrolled in, or
+    # an admin (teacher/ta/designer) in the course
+    given { |user| self.check_courses_right?(user, :read_reports) }
     can :rename and can :remove_avatar and can :read_reports
 
-    given do |user|
-      user && self.all_courses.any? { |c| c.grants_right?(user, nil, :manage_user_notes) }
-    end
+    given { |user| self.check_courses_right?(user, :manage_user_notes) }
     can :create_user_notes and can :read_user_notes
 
-    given { |user| user && self.all_courses.any? { |c| c.grants_right?(user, nil, :read_user_notes) } }
+    given { |user| self.check_courses_right?(user, :read_user_notes) }
     can :read_user_notes
 
     given do |user|
       user && (
-        self.associated_accounts.any?{|a| a.grants_right?(user, nil, :manage_user_notes)}
+        self.associated_accounts.any?{|a| a.grants_right?(user, :manage_user_notes)}
       )
     end
     can :create_user_notes and can :read_user_notes and can :delete_user_notes
@@ -981,7 +985,7 @@ class User < ActiveRecord::Base
     given do |user|
       user && (
       Account.site_admin.grants_right?(user, :view_statistics) ||
-          self.associated_accounts.any?{|a| a.grants_right?(user, nil, :view_statistics)  }
+          self.associated_accounts.any?{|a| a.grants_right?(user, :view_statistics)  }
       )
     end
     can :view_statistics
@@ -990,7 +994,7 @@ class User < ActiveRecord::Base
       user && (
         # or, if the user we are given is an admin in one of this user's accounts
         Account.site_admin.grants_right?(user, :manage_students) ||
-        self.associated_accounts.any? {|a| a.grants_right?(user, nil, :manage_students) }
+        self.associated_accounts.any? {|a| a.grants_right?(user, :manage_students) }
       )
     end
     can :manage_user_details and can :update_avatar and can :remove_avatar and can :rename and can :view_statistics and can :read and can :read_reports and can :manage_feature_flags
@@ -998,7 +1002,7 @@ class User < ActiveRecord::Base
     given do |user|
       user && (
         Account.site_admin.grants_right?(user, :manage_user_logins) ||
-        self.associated_accounts.any?{|a| a.grants_right?(user, nil, :manage_user_logins)  }
+        self.associated_accounts.any?{|a| a.grants_right?(user, :manage_user_logins)  }
       )
     end
     can :view_statistics and can :read and can :read_reports
@@ -1007,7 +1011,7 @@ class User < ActiveRecord::Base
       user && (
         # or, if the user we are given is an admin in one of this user's accounts
         Account.site_admin.grants_right?(user, :manage_user_logins) ||
-        (self.associated_accounts.any?{|a| a.grants_right?(user, nil, :manage_user_logins) } &&
+        (self.associated_accounts.any?{|a| a.grants_right?(user, :manage_user_logins) } &&
          self.all_accounts.select(&:root_account?).all? {|a| has_subset_of_account_permissions?(user, a) } )
       )
     end
@@ -1017,7 +1021,7 @@ class User < ActiveRecord::Base
   def can_masquerade?(masquerader, account)
     return true if self == masquerader
     # student view should only ever have enrollments in a single course
-    return true if self.fake_student? && self.courses.any?{ |c| c.grants_right?(masquerader, nil, :use_student_view) }
+    return true if self.fake_student? && self.courses.any?{ |c| c.grants_right?(masquerader, :use_student_view) }
     return false unless
         account.grants_right?(masquerader, nil, :become_user) && self.find_pseudonym_for_account(account, true)
     has_subset_of_account_permissions?(masquerader, account)
@@ -1794,7 +1798,7 @@ class User < ActiveRecord::Base
   def select_upcoming_assignments(assignments,opts)
     time = opts[:time] || Time.zone.now
     assignments.select do |a|
-      if a.grants_right?(self, nil, :delete)
+      if a.grants_right?(self, :delete)
         a.dates_hash_visible_to(self).any? do |due_hash|
           due_hash[:due_at] && due_hash[:due_at] >= time && due_hash[:due_at] <= opts[:end_at]
         end
@@ -1877,7 +1881,7 @@ class User < ActiveRecord::Base
     return @manageable_appointment_context_codes if @manageable_appointment_context_codes
     ret = {:full => [], :limited => [], :secondary => []}
     cached_current_enrollments.each do |e|
-      next unless e.course.grants_right?(self, nil, :manage_calendar)
+      next unless e.course.grants_right?(self, :manage_calendar)
       if e.course.visibility_limited_to_course_sections?(self)
         ret[:limited] << "course_#{e.course_id}"
         ret[:secondary] << "course_section_#{e.course_section_id}"
@@ -2287,28 +2291,6 @@ class User < ActiveRecord::Base
       end
     end
     pseudonym
-  end
-
-  # Public: Add this user as an admin in the given account.
-  #
-  # account - The account model to create the admin in.
-  # role - String name of the role to add the user to. If nil,
-  #        'AccountAdmin' will be used (default: nil).
-  # send_notification - If set to false, do not send any email
-  #                     notifications (default: true).
-  #
-  # Returns an AccountUser model object.
-  def flag_as_admin(account, role=nil, send_notification = true)
-    admin = account.add_user(self, role)
-
-    return admin unless send_notification
-
-    if self.registered?
-      admin.account_user_notification!
-    else
-      admin.account_user_registration!
-    end
-    admin
   end
 
   def fake_student?

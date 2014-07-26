@@ -166,7 +166,7 @@ describe Pseudonym do
   end
 
   context "LDAP errors" do
-    before do
+    before :once do
       require 'net/ldap'
       user_with_pseudonym(:active_all => true)
       @aac = @pseudonym.account.account_authorization_configs.create!(
@@ -212,7 +212,7 @@ describe Pseudonym do
   end
 
   context "Needs a pseudonym with an active user" do
-    before do
+    before :once do
       user_model
       pseudonym_model
     end

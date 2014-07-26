@@ -1226,13 +1226,13 @@ class UsersController < ApplicationController
     end
 
     managed_attributes = []
-    managed_attributes.concat [:name, :short_name, :sortable_name, :birthdate] if @user.grants_right?(@current_user, nil, :rename)
+    managed_attributes.concat [:name, :short_name, :sortable_name, :birthdate] if @user.grants_right?(@current_user, :rename)
     managed_attributes << :terms_of_use if @user == (@real_current_user || @current_user)
-    if @user.grants_right?(@current_user, nil, :manage_user_details)
+    if @user.grants_right?(@current_user, :manage_user_details)
       managed_attributes.concat([:time_zone, :locale])
     end
 
-    if @user.grants_right?(@current_user, nil, :update_avatar)
+    if @user.grants_right?(@current_user, :update_avatar)
       avatar = params[:user].delete(:avatar)
 
       # delete any avatar_image passed, because we only allow updating avatars
@@ -1255,8 +1255,8 @@ class UsersController < ApplicationController
     if user_params == params[:user]
       # admins can update avatar images even if they are locked
       admin_avatar_update = user_params[:avatar_image] &&
-        @user.grants_right?(@current_user, nil, :update_avatar) &&
-        @user.grants_right?(@current_user, nil, :manage_user_details)
+        @user.grants_right?(@current_user, :update_avatar) &&
+        @user.grants_right?(@current_user, :manage_user_details)
 
       if admin_avatar_update
         old_avatar_state = @user.avatar_state

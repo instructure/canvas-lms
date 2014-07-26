@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe DataExportsApi::DataExport do #nothing
   context "for" do
-    before do
+    before :once do
       @dd = DataExportsApi::DataExport.for(Account.default).build(user: user)
       @dd.save!
     end

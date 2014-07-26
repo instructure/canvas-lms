@@ -607,7 +607,7 @@ routes.draw do
   match 'grades' => 'users#grades', :as => :grades
   match 'login' => 'pseudonym_sessions#new', :as => :login, :via => :get
   match 'login' => 'pseudonym_sessions#create', :via => :post
-  match 'logout' => 'pseudonym_sessions#destroy', :as => :logout
+  match 'logout' => 'pseudonym_sessions#destroy', :as => :logout, :via => :delete
   match 'login/cas' => 'pseudonym_sessions#new', :as => :cas_login, :via => :get
   match 'login/cas' => 'pseudonym_sessions#cas_logout', :as => :cas_logout, :via => :post
   match 'login/otp' => 'pseudonym_sessions#otp_login', :as => :otp_login, :via => [:get, :post]
@@ -668,6 +668,7 @@ routes.draw do
       get :communication
       put :communication_update
       get :settings
+      get :observees
     end
   end
 
@@ -843,6 +844,8 @@ routes.draw do
       get  'courses/:course_id/folders/:id', :controller => :folders, :action => :show, :path_name => 'course_folder'
       put  'accounts/:account_id/courses', :action => :batch_update
       post 'courses/:course_id/ping', :action => :ping, :path_name => 'course_ping'
+
+      get "courses/:course_id/content_list", :controller => :content_exports_api, :action => :content_list, :path_name => "course_content_list"
     end
 
     scope(:controller => :tabs) do
@@ -866,6 +869,7 @@ routes.draw do
       get  'courses/:course_id/enrollments', :action => :index, :path_name => 'course_enrollments'
       get  'sections/:section_id/enrollments', :action => :index, :path_name => 'section_enrollments'
       get  'users/:user_id/enrollments', :action => :index, :path_name => 'user_enrollments'
+      get  'accounts/:account_id/enrollments/:id', :action => :show, :path_name => 'enrollment'
 
       post 'courses/:course_id/enrollments', :action => :create
       post 'sections/:section_id/enrollments', :action => :create
@@ -1051,6 +1055,7 @@ routes.draw do
       put 'users/:id', :action => :update
       post 'users/:user_id/files', :action => :create_file
 
+      get  'users/:user_id/files', :controller => :files, :action => :api_index, :path_name => 'user_files'
       post 'users/:user_id/folders', :controller => :folders, :action => :create
       get 'users/:user_id/folders/by_path/*full_path', :controller => :folders, :action => :resolve_path
       get 'users/:user_id/folders/by_path', :controller => :folders, :action => :resolve_path
@@ -1061,6 +1066,14 @@ routes.draw do
 
       put 'users/:id/merge_into/:destination_user_id', controller: 'users', action: 'merge_into'
       put 'users/:id/merge_into/accounts/:destination_account_id/users/:destination_user_id', controller: 'users', action: 'merge_into'
+
+      scope(:controller => :user_observees) do
+        get    'users/:user_id/observees', action: :index, path_name: 'user_observees'
+        post   'users/:user_id/observees', action: :create
+        get    'users/:user_id/observees/:observee_id', action: :show, path_name: 'user_observee'
+        put    'users/:user_id/observees/:observee_id', action: :update
+        delete 'users/:user_id/observees/:observee_id', action: :destroy
+      end
     end
 
     scope(:controller => :custom_data) do
@@ -1217,6 +1230,7 @@ routes.draw do
         resources :users, :path_prefix => "groups/:group_id", :name_prefix => "group_", :controller => :group_memberships, :except => [:show, :create]
       end
 
+      get  'groups/:group_id/files', :controller => :files, :action => :api_index, :path_name => 'group_files'
       post 'groups/:group_id/folders', :controller => :folders, :action => :create
       get 'groups/:group_id/folders/by_path/*full_path', :controller => :folders, :action => :resolve_path
       get 'groups/:group_id/folders/by_path', :controller => :folders, :action => :resolve_path
@@ -1385,8 +1399,8 @@ routes.draw do
 
     scope(:controller => 'quizzes/quiz_submission_questions') do
       get '/quiz_submissions/:quiz_submission_id/questions', :action => :index, :path_name => 'quiz_submission_questions'
+      post '/quiz_submissions/:quiz_submission_id/questions', :action => :answer, :path_name => 'quiz_submission_question_answer'
       get '/quiz_submissions/:quiz_submission_id/questions/:id', :action => :show, :path_name => 'quiz_submission_question'
-      put '/quiz_submissions/:quiz_submission_id/questions/:id', :action => :answer, :path_name => 'quiz_submission_question_answer'
       put '/quiz_submissions/:quiz_submission_id/questions/:id/flag', :action => :flag, :path_name => 'quiz_submission_question_flag'
       put '/quiz_submissions/:quiz_submission_id/questions/:id/unflag', :action => :unflag, :path_name => 'quiz_submission_question_unflag'
     end

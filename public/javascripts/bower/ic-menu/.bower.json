@@ -1,12 +1,12 @@
 {
   "name": "ic-menu",
-  "version": "0.1.9",
+  "version": "0.1.11",
   "authors": [
     "Ryan Florence <rpflorence@gmail.com>"
   ],
   "dependencies": {
     "ember": ">= 1.4.0 <= 1.5.1",
-    "ic-styled": "~1.1.0"
+    "ic-styled": "~1.1.6"
   },
   "license": "MIT",
   "ignore": [
@@ -20,13 +20,13 @@
     "ember-template-compiler": "http://builds.emberjs.com/release/ember-template-compiler.js"
   },
   "homepage": "https://github.com/instructure/ic-menu",
-  "_release": "0.1.9",
+  "_release": "0.1.11",
   "_resolution": {
     "type": "version",
-    "tag": "0.1.9",
-    "commit": "f54471c7b50dc1de6135eaa57f86aca7e5905c48"
+    "tag": "v0.1.11",
+    "commit": "a89a4e0709af24733098765cdd53de414ce3a9af"
   },
   "_source": "git://github.com/instructure/ic-menu.git",
-  "_target": "~0.1.9",
+  "_target": "0.1.11",
   "_originalSource": "ic-menu"
 }

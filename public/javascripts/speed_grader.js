@@ -243,12 +243,22 @@ define([
     }
   }
 
+  function formattedSubmissionStateName(raw, submission) {
+    switch(raw) {
+      case "graded":
+        return I18n.t('graded', "graded");
+      case "not_graded":
+        return I18n.t('not_graded', "not graded");
+      case "not_submitted":
+        return I18n.t('not_submitted', 'not submitted');
+      case "resubmitted":
+        return I18n.t('graded_then_resubmitted', "graded, then resubmitted (%{when})", {'when': $.datetimeString(submission.submitted_at)});
+    }
+  }
+
   function classNameBasedOnStudent(student){
     var raw = submissionStateName(student.submission);
-    var formatted = raw.replace("_", " ");
-    if (raw === "resubmitted") {
-      formatted = I18n.t('graded_then_resubmitted', "graded, then resubmitted (%{when})", {'when': $.datetimeString(student.submission.submitted_at)});
-    }
+    var formatted = formattedSubmissionStateName(raw, student.submission);
     return {raw: raw, formatted: formatted};
   }
 
@@ -882,9 +892,10 @@ define([
 
       $multiple_submissions.change(function(e) {
         if (typeof EG.currentStudent.submission == 'undefined') EG.currentStudent.submission = {};
-        var i = $("#submission_to_view").val() ||
-                EG.currentStudent.submission.submission_history.length - 1;
-        EG.currentStudent.submission.currentSelectedIndex = parseInt(i, 10);
+        var i = e.target.value ?
+          parseInt(e.target.value, 10) :
+          EG.currentStudent.submission.submission_history.length - 1;
+        EG.currentStudent.submission.currentSelectedIndex = i;
         EG.handleSubmissionSelectionChange();
       });
 
@@ -1215,9 +1226,6 @@ define([
 
       if (submissionHistory.length > 0) {
         var noSubmittedAt = I18n.t('no_submission_time', 'no submission time');
-        var selectedIndex = parseInt($("#submission_to_view").val() ||
-                                       submissionHistory.length - 1,
-                                     10);
         var templateSubmissions = _(submissionHistory).map(function(o, i) {
           var s = o.submission;
           if (s.grade && (s.grade_matches_current_submission ||
@@ -1227,12 +1235,11 @@ define([
           return {
             value: s.version || i,
             late: s.late,
-            selected: selectedIndex === i,
             submittedAt: $.datetimeString(s.submitted_at) || noSubmittedAt,
             grade: grade
           };
         });
-
+        _(templateSubmissions).last().selected = true;
         innerHTML = submissionsDropdownTemplate({
           singleSubmission: submissionHistory.length == 1,
           submissions: templateSubmissions,
@@ -1265,13 +1272,16 @@ define([
         })
       );
 
-      var gradedStudents = $.grep(jsonData.studentsWithSubmissions, function(s){
-        return (s.submission && s.submission.workflow_state === 'graded');
+      var gradedStudents = $.grep(jsonData.studentsWithSubmissions, function(s) {
+        return (s.submission &&
+                s.submission.workflow_state === 'graded' &&
+                s.submission.from_enrollment_type === "StudentEnrollment"
+        );
       });
-      var scores = $.map(gradedStudents, function(s){
+
+      var scores = $.map(gradedStudents , function(s){
         return s.submission.score;
       });
-      //scores shoud be an array that has all of the scores of the students that have submisisons
 
       if (scores.length) { //if there are some submissions that have been graded.
         $average_score_wrapper.show();
@@ -1293,9 +1303,10 @@ define([
       else { //there are no submissions that have been graded.
         $average_score_wrapper.hide();
       }
+
       $grded_so_far.html(
         I18n.t('portion_graded', '%{x} / %{y} Graded', {
-          x: scores.length,
+          x: gradedStudents.length,
           y: jsonData.context.students.length
         })
       );

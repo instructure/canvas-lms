@@ -99,7 +99,7 @@ describe "calendar2" do
       # also make sure the redirect from calendar -> calendar2 keeps the param
       unrelated_course = Course.create!(:account => Account.default, :name => "unrelated course")
       # make the user an admin so they can view the course's calendar without an enrollment
-      Account.default.add_user(@user)
+      Account.default.account_users.create!(user: @user)
       CalendarEvent.create!(:title => "from unrelated one", :start_at => Time.now, :end_at => 5.hours.from_now) { |c| c.context = unrelated_course }
       keep_trying_until { CalendarEvent.last.title.should == "from unrelated one" }
       get "/courses/#{unrelated_course.id}/settings"

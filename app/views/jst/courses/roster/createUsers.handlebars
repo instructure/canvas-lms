@@ -6,7 +6,14 @@
     {{/t}}<br>
   </p>
   <div class="row-fluid content-box">
-    <textarea id="user_list_textarea" name="user_list" class="span12" rows=7 placeholder='"Example Student" &lt;student@example.com&gt;, "Lastname, Firstname" &lt;firstlast@example.com&gt;, justAnEmailAddress@example.com'>{{user_list}}</textarea>
+    <textarea
+              id="user_list_textarea"
+              name="user_list"
+              class="span12"
+              rows=7
+              placeholder='{{#t "email_field_place_holder"}}"Example Student" &lt;student@example.com&gt;, "Lastname, Firstname" &lt;firstlast@example.com&gt;, justAnEmailAddress@example.com{{/t}}'
+              aria-label="{{#t "email_field_label"}}Enter the email addresses of the users you would like to add, seperated by commas{{/t}}"
+    >{{user_list}}</textarea>
   </div>
   <div class="form-horizontal">
     <div class="control-group">

@@ -434,7 +434,7 @@ class GroupsController < ApplicationController
           @group.invitees = params[:invitees]
           flash[:notice] = t('notices.create_success', 'Group was successfully created.')
           format.html { redirect_to group_url(@group) }
-          format.json { render :json => group_json(@group, @current_user, session) }
+          format.json { render :json => group_json(@group, @current_user, session, {include: ['users']}) }
         else
           format.html { render :action => "new" }
           format.json { render :json => @group.errors, :status => :bad_request }

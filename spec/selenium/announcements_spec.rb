@@ -284,32 +284,6 @@ describe "announcements" do
       f('.discussion-fyi').should include_text('This topic will not be visible')
     end
 
-    it "should remove delayed_post_at when unchecking delay_posting" do
-      topic = announcement_model(:title => @topic_title, :user => @user, :delayed_post_at => 10.days.ago)
-      get "/courses/#{@course.id}/announcements/#{topic.id}"
-      expect_new_page_load { f(".edit-btn").click }
-
-      f('input[type=checkbox][name="delay_posting"]').click
-      expect_new_page_load { f('.form-actions button[type=submit]').click }
-
-      topic.reload
-      topic.delayed_post_at.should be_nil
-    end
-
-    it "should have a teacher add a new entry to its own announcement" do
-      pending "delayed jobs"
-      create_announcement
-      get [@course, @announcement]
-
-      f('#content .add_entry_link').click
-      entry_text = 'new entry text'
-      type_in_tiny('textarea[name=message]', entry_text)
-      expect_new_page_load { submit_form('.form-actions') }
-      f('#entry_list .discussion_entry .content').should include_text(entry_text)
-      f('#left-side .announcements').click
-      f('.topic_reply_count').text.should == '1'
-    end
-
     it "should add and remove an external feed to announcements" do
       get "/courses/#{@course.id}/announcements"
       wait_for_ajaximations
@@ -339,6 +313,32 @@ describe "announcements" do
         wait_for_ajax_requests
         element_exists('.external_feed').should be_false
       }.to change(ExternalFeed, :count).by(-1)
+    end
+
+    it "should remove delayed_post_at when unchecking delay_posting" do
+      topic = announcement_model(:title => @topic_title, :user => @user, :delayed_post_at => 10.days.ago)
+      get "/courses/#{@course.id}/announcements/#{topic.id}"
+      expect_new_page_load { f(".edit-btn").click }
+
+      f('input[type=checkbox][name="delay_posting"]').click
+      expect_new_page_load { f('.form-actions button[type=submit]').click }
+
+      topic.reload
+      topic.delayed_post_at.should be_nil
+    end
+
+    it "should have a teacher add a new entry to its own announcement" do
+      pending "delayed jobs"
+      create_announcement
+      get [@course, @announcement]
+
+      f('#content .add_entry_link').click
+      entry_text = 'new entry text'
+      type_in_tiny('textarea[name=message]', entry_text)
+      expect_new_page_load { submit_form('.form-actions') }
+      f('#entry_list .discussion_entry .content').should include_text(entry_text)
+      f('#left-side .announcements').click
+      f('.topic_reply_count').text.should == '1'
     end
 
     it "should show announcements to student view student" do

@@ -140,5 +140,5 @@ class EnrollmentTerm < ActiveRecord::Base
     save!
   end
   
-  scope :active, where("enrollment_terms.workflow_state<>'deleted'")
+  scope :active, -> { where("enrollment_terms.workflow_state<>'deleted'") }
 end

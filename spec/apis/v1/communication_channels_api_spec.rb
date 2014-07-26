@@ -24,7 +24,7 @@ describe 'CommunicationChannels API', type: :request do
       @someone = user_with_pseudonym
       @admin   = user_with_pseudonym
 
-      Account.site_admin.add_user(@admin)
+      Account.site_admin.account_users.create!(user: @admin)
 
       @path = "/api/v1/users/#{@someone.id}/communication_channels"
       @path_options = { :controller => 'communication_channels',
@@ -70,8 +70,8 @@ describe 'CommunicationChannels API', type: :request do
       @admin      = user_with_pseudonym
       @site_admin = user_with_pseudonym
 
-      Account.site_admin.add_user(@site_admin)
-      Account.default.add_user(@admin)
+      Account.site_admin.account_users.create!(user: @site_admin)
+      Account.default.account_users.create!(user: @admin)
 
       @path = "/api/v1/users/#{@someone.id}/communication_channels"
       @path_options = { :controller => 'communication_channels',
@@ -196,7 +196,7 @@ describe 'CommunicationChannels API', type: :request do
     let! (:someone) { user_with_pseudonym }
     let! (:admin) do
       user = user_with_pseudonym
-      Account.default.add_user(user)
+      Account.default.account_users.create!(user: user)
       user
     end
     let (:channel) { someone.communication_channel }

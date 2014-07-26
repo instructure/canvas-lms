@@ -521,6 +521,22 @@ describe "Pages API", type: :request do
         page.should be_unpublished
         json['published'].should be_false
       end
+      
+      it "should create a published front page, even when published is blank (draft state)" do
+        @course.account.allow_feature!(:draft_state)
+        @course.enable_feature!(:draft_state)
+
+        front_page_url = 'my-front-page'
+        json = api_call(:put, "/api/v1/courses/#{@course.id}/front_page",
+                        { :controller => 'wiki_pages_api', :action => 'update_front_page', :format => 'json', :course_id => @course.to_param },
+                        { :wiki_page => { :published => '', :title => 'My Front Page' }})
+        json['url'].should == front_page_url
+        json['published'].should be_true
+
+        @course.wiki.get_front_page_url.should == front_page_url
+        page = @course.wiki.wiki_pages.find_by_url!(front_page_url)
+        page.should be_published
+      end
 
       it 'should allow teachers to set editing_roles' do
         @course.default_wiki_editing_roles = 'teachers'

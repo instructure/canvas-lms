@@ -19,6 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe GroupCategory do
+  let_once(:account) { Account.default }
 
   it 'delegates time_zone through to its context' do
     zone = ActiveSupport::TimeZone["America/Denver"]
@@ -29,7 +30,6 @@ describe GroupCategory do
 
   context "protected_name_for_context?" do
     it "should be false for 'Student Groups' in accounts" do
-      account = Account.default
       GroupCategory.protected_name_for_context?('Student Groups', account).should be_false
     end
 
@@ -39,7 +39,6 @@ describe GroupCategory do
     end
 
     it "should be true for 'Imported Groups' in both accounts and courses" do
-      account = Account.default
       course = course_model
       GroupCategory.protected_name_for_context?('Imported Groups', account).should be_true
       GroupCategory.protected_name_for_context?('Imported Groups', course).should be_true
@@ -48,7 +47,6 @@ describe GroupCategory do
 
   context "student_organized_for" do
     it "should be nil in accounts" do
-      account = Account.default
       GroupCategory.student_organized_for(account).should be_nil
     end
 
@@ -75,7 +73,6 @@ describe GroupCategory do
     end
 
     it "should be a category belonging to the account with role 'communities'" do
-      account = Account.default
       category = GroupCategory.communities_for(account)
       category.should_not be_nil
       category.role.should eql('communities')
@@ -83,7 +80,6 @@ describe GroupCategory do
     end
 
     it "should be the the same category every time for the same account" do
-      account = Account.default
       category1 = GroupCategory.communities_for(account)
       category2 = GroupCategory.communities_for(account)
       category1.id.should eql(category2.id)
@@ -92,7 +88,6 @@ describe GroupCategory do
 
   context "imported_for" do
     it "should be a category belonging to the account with role 'imported' in accounts" do
-      account = Account.default
       category = GroupCategory.imported_for(account)
       category.should_not be_nil
       category.role.should eql('imported')
@@ -117,7 +112,6 @@ describe GroupCategory do
 
   context 'student_organized?' do
     it "should be true iff the role is 'student_organized', regardless of name" do
-      account = Account.default
       course = course_model
       GroupCategory.student_organized_for(course).should be_student_organized
       account.group_categories.create(:name => 'Student Groups').should_not be_student_organized
@@ -130,7 +124,6 @@ describe GroupCategory do
 
   context 'communities?' do
     it "should be true iff the role is 'communities', regardless of name" do
-      account = Account.default
       course = course_model
       GroupCategory.student_organized_for(course).should_not be_communities
       account.group_categories.create(:name => 'Communities').should_not be_communities
@@ -143,7 +136,6 @@ describe GroupCategory do
 
   context 'allows_multiple_memberships?' do
     it "should be true iff the category is student organized or communities" do
-      account = Account.default
       course = course_model
       GroupCategory.student_organized_for(course).allows_multiple_memberships?.should be_true
       account.group_categories.create(:name => 'Student Groups').allows_multiple_memberships?.should be_false
@@ -156,7 +148,6 @@ describe GroupCategory do
 
   context 'protected?' do
     it "should be true iff the category has a role" do
-      account = Account.default
       course = course_model
       GroupCategory.student_organized_for(course).should be_protected
       account.group_categories.create(:name => 'Student Groups').should_not be_protected
@@ -220,7 +211,6 @@ describe GroupCategory do
 
   context "has_heterogenous_group?" do
     it "should be false for accounts" do
-      account = Account.default
       category = group_category(context: account)
       group = category.groups.create(:context => account)
       category.should_not have_heterogenous_group
@@ -267,7 +257,7 @@ describe GroupCategory do
   end
 
   describe "group_for" do
-    before :each do
+    before :once do
       course_with_teacher(:active_all => true)
       student_in_course(:active_all => true)
       @category = group_category
@@ -365,7 +355,7 @@ describe GroupCategory do
   end
 
   context "#assign_unassigned_members" do
-    before(:each) do
+    before(:once) do
       course_with_teacher_logged_in(:active_all => true)
       @category = @course.group_categories.create(:name => "Group Category")
     end

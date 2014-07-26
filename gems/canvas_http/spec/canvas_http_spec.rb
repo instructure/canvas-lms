@@ -87,4 +87,19 @@ describe "CanvasHttp" do
       CanvasHttp.tempfile_for_uri(URI.parse('1234567890' * 12))
     end
   end
+
+  describe ".connection_for_uri" do
+    it "returns a connection for host/port" do
+      http = CanvasHttp.connection_for_uri(URI.parse("http://example.com:1234/x/y/z"))
+      http.address.should == "example.com"
+      http.port.should == 1234
+      http.use_ssl?.should == false
+    end
+
+    it "returns an https connection" do
+      http = CanvasHttp.connection_for_uri(URI.parse("https://example.com"))
+      http.address.should == "example.com"
+      http.use_ssl?.should == true
+    end
+  end
 end

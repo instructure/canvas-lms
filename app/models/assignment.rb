@@ -262,7 +262,7 @@ class Assignment < ActiveRecord::Base
   def update_student_submissions
     graded_at = Time.zone.now
     submissions.graded.includes(:user).find_each do |s|
-      s.grade = score_to_grade(s.score)
+      s.grade = score_to_grade(s.score, s.grade)
       s.graded_at = graded_at
       s.assignment = self
       s.assignment_changed_not_sub = true
@@ -636,14 +636,11 @@ class Assignment < ActiveRecord::Base
     when "percent"
       result = "#{score_to_grade_percent(score)}%"
     when "pass_fail"
-      if points_possible && points_possible > 0
-        passed = score > 0
-      elsif given_grade
-        # the score for a zero-point pass/fail assignment could be considered
-        # either pass *or* fail, so look at what the current given grade is
-        # instead
-        passed = ["complete", "pass"].include?(given_grade)
-      end
+      passed = if points_possible && points_possible > 0
+                 score > 0
+               elsif given_grade
+                 given_grade == "complete" || given_grade == "pass"
+               end
       result = passed ? "complete" : "incomplete"
     when "letter_grade", "gpa_scale"
       if self.points_possible.to_f > 0.0
@@ -779,7 +776,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def locked_for?(user, opts={})
-    return false if opts[:check_policies] && self.grants_right?(user, nil, :update)
+    return false if opts[:check_policies] && self.grants_right?(user, :update)
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       locked = false
       assignment_for_user = self.overridden_for(user)
@@ -833,20 +830,20 @@ class Assignment < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user, session| self.cached_context_grants_right?(user, session, :read) && self.published? }
+    given { |user, session| self.context.grants_right?(user, session, :read) && self.published? }
     can :read and can :read_own_submission
 
     given { |user, session|
       (submittable_type? || submission_types == "discussion_topic") &&
-      cached_context_grants_right?(user, session, :participate_as_student) &&
+      context.grants_right?(user, session, :participate_as_student) &&
       !locked_for?(user)
     }
     can :submit and can :attach_submission_comment_files
 
-    given { |user, session| self.cached_context_grants_right?(user, session, :manage_grades) }
+    given { |user, session| self.context.grants_right?(user, session, :manage_grades) }
     can :grade and can :read and can :attach_submission_comment_files
 
-    given { |user, session| self.cached_context_grants_right?(user, session, :manage_assignments) }
+    given { |user, session| self.context.grants_right?(user, session, :manage_assignments) }
     can :update and can :delete and can :create and can :read and can :attach_submission_comment_files
   end
 
@@ -935,7 +932,7 @@ class Assignment < ActiveRecord::Base
   def grade_student(original_student, opts={})
     raise "Student is required" unless original_student
     raise "Student must be enrolled in the course as a student to be graded" unless context.includes_student?(original_student)
-    raise "Grader must be enrolled as a course admin" if opts[:grader] && !self.context.grants_right?(opts[:grader], nil, :manage_grades)
+    raise "Grader must be enrolled as a course admin" if opts[:grader] && !self.context.grants_right?(opts[:grader], :manage_grades)
     opts.delete(:id)
     dont_overwrite_grade = opts.delete(:dont_overwrite_grade)
     group_comment = Canvas::Plugin.value_to_boolean(opts.delete(:group_comment))
@@ -1195,6 +1192,8 @@ class Assignment < ActiveRecord::Base
       }
     end
 
+    enrollments = context.enrollments_visible_to(user)
+
     res[:context][:students] = students.map { |u|
       u.as_json(:include_root => false,
                 :methods => avatar_methods,
@@ -1202,7 +1201,7 @@ class Assignment < ActiveRecord::Base
     }
     res[:context][:active_course_sections] = context.sections_visible_to(user).
       map{|s| s.as_json(:include_root => false, :only => [:id, :name]) }
-    res[:context][:enrollments] = context.enrollments_visible_to(user).
+    res[:context][:enrollments] = enrollments.
         map{|s| s.as_json(:include_root => false, :only => [:user_id, :course_section_id]) }
     res[:context][:quiz] = self.quiz.as_json(:include_root => false, :only => [:anonymous_submissions])
 
@@ -1214,6 +1213,8 @@ class Assignment < ActiveRecord::Base
 
     res[:too_many_quiz_submissions] = too_many = too_many_qs_versions?(submissions)
     qs_versions = quiz_submission_versions(submissions, too_many)
+
+    enrollment_types_by_id = enrollments.inject({}){ |h, e| h[e.user_id] ||= e.type; h }
 
     res[:submissions] = submissions.map do |sub|
       json = sub.as_json(:include_root => false,
@@ -1228,7 +1229,8 @@ class Assignment < ActiveRecord::Base
         },
         :methods => [:scribdable?, :scribd_doc, :submission_history, :late],
         :only => submission_fields
-      )
+      ).merge("from_enrollment_type" => enrollment_types_by_id[sub.user_id])
+
       json['submission_history'] = if json['submission_history'] && (quiz.nil? || too_many)
                                      json['submission_history'].map do |version|
                                        version.as_json(
@@ -1351,7 +1353,7 @@ class Assignment < ActiveRecord::Base
 
   def visible_rubric_assessments_for(user)
     if self.rubric_association
-      self.rubric_association.rubric_assessments.select{|a| a.grants_rights?(user, :read)[:read]}.sort_by{|a| [a.assessment_type == 'grading' ? CanvasSort::First : CanvasSort::Last, Canvas::ICU.collation_key(a.assessor_name)] }
+      self.rubric_association.rubric_assessments.select{|a| a.grants_right?(user, :read)}.sort_by{|a| [a.assessment_type == 'grading' ? CanvasSort::First : CanvasSort::Last, Canvas::ICU.collation_key(a.assessor_name)] }
     end
   end
 
@@ -1499,21 +1501,21 @@ class Assignment < ActiveRecord::Base
     0.5
   end
 
-  scope :include_submitted_count, select(
+  scope :include_submitted_count, -> { select(
     "assignments.*, (SELECT COUNT(*) FROM submissions
     WHERE assignments.id = submissions.assignment_id
-    AND submissions.submission_type IS NOT NULL) AS submitted_count")
+    AND submissions.submission_type IS NOT NULL) AS submitted_count") }
 
-  scope :include_graded_count, select(
+  scope :include_graded_count, -> { select(
     "assignments.*, (SELECT COUNT(*) FROM submissions
     WHERE assignments.id = submissions.assignment_id
-    AND submissions.grade IS NOT NULL) AS graded_count")
+    AND submissions.grade IS NOT NULL) AS graded_count") }
 
-  scope :include_quiz_and_topic, includes(:quiz, :discussion_topic)
+  scope :include_quiz_and_topic, -> { includes(:quiz, :discussion_topic) }
 
-  scope :no_graded_quizzes_or_topics, where("submission_types NOT IN ('online_quiz', 'discussion_topic')")
+  scope :no_graded_quizzes_or_topics, -> { where("submission_types NOT IN ('online_quiz', 'discussion_topic')") }
 
-  scope :with_submissions, includes(:submissions)
+  scope :with_submissions, -> { includes(:submissions) }
 
   scope :for_context_codes, lambda { |codes| where(:context_code => codes) }
   scope :for_course, lambda { |course_id| where(:context_type => 'Course', :context_id => course_id) }
@@ -1521,11 +1523,11 @@ class Assignment < ActiveRecord::Base
   scope :due_before, lambda { |date| where("assignments.due_at<?", date) }
 
   scope :due_after, lambda { |date| where("assignments.due_at>?", date) }
-  scope :undated, where(:due_at => nil)
+  scope :undated, -> { where(:due_at => nil) }
 
-  scope :only_graded, where("submission_types<>'not_graded'")
+  scope :only_graded, -> { where("submission_types<>'not_graded'") }
 
-  scope :with_just_calendar_attributes, lambda {
+  scope :with_just_calendar_attributes, -> {
     select(((Assignment.column_names & CalendarEvent.column_names) + ['due_at', 'assignment_group_id', 'could_be_locked', 'unlock_at', 'lock_at', 'submission_types', '(freeze_on_copy AND copied) AS frozen'] - ['cloned_item_id', 'migration_id']).join(", "))
   }
 
@@ -1557,7 +1559,7 @@ class Assignment < ActiveRecord::Base
   # query as ambigious for the "due_at" field if combined with another table
   # (e.g. assignment overrides) with similar fields (like id,lock_at,etc),
   # throwing an error.
-  scope :api_needed_fields, select(API_NEEDED_FIELDS.map{ |f| "assignments." + f.to_s})
+  scope :api_needed_fields, -> { select(API_NEEDED_FIELDS.map{ |f| "assignments." + f.to_s}) }
 
   # This should only be used in the course drop down to show assignments needing a submission
   scope :need_submitting_info, lambda { |user_id, limit|
@@ -1592,22 +1594,22 @@ class Assignment < ActiveRecord::Base
     end
   }
 
-  scope :expecting_submission, where("submission_types NOT IN ('', 'none', 'not_graded', 'on_paper') AND submission_types IS NOT NULL")
+  scope :expecting_submission, -> { where("submission_types NOT IN ('', 'none', 'not_graded', 'on_paper') AND submission_types IS NOT NULL") }
 
-  scope :gradeable, where("assignments.submission_types<>'not_graded'")
+  scope :gradeable, -> { where("assignments.submission_types<>'not_graded'") }
 
-  scope :active, where("assignments.workflow_state<>'deleted'")
+  scope :active, -> { where("assignments.workflow_state<>'deleted'") }
   scope :before, lambda { |date| where("assignments.created_at<?", date) }
 
-  scope :not_locked, lambda {
+  scope :not_locked, -> {
     where("(assignments.unlock_at IS NULL OR assignments.unlock_at<:now) AND (assignments.lock_at IS NULL OR assignments.lock_at>:now)",
       :now => Time.zone.now)
   }
 
-  scope :order_by_base_due_at, order("assignments.due_at")
+  scope :order_by_base_due_at, -> { order("assignments.due_at") }
 
-  scope :unpublished, where(:workflow_state => 'unpublished')
-  scope :published, where(:workflow_state => 'published')
+  scope :unpublished, -> { where(:workflow_state => 'unpublished') }
+  scope :published, -> { where(:workflow_state => 'published') }
 
   def overdue?
     due_at && due_at <= Time.now

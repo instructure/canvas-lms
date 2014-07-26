@@ -24,6 +24,6 @@
   </p>
   <p>
     <button type="submit" class="btn btn-primary"><%= t "#buttons.submit", "Submit" %></button>
-    <a class="btn logout" href="/logout"><%= t "#buttons.cancel", "Cancel" %></a>
+    <%= link_to(t("#buttons.cancel", "Cancel"), logout_path, :method => :delete, :class => "btn logout") %>
   </p>
 </form>

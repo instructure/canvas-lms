@@ -2,8 +2,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/common.rb')
 
 describe Quizzes::QuizStatistics::ItemAnalysis::Summary do
-  let(:summary) {
+  before(:once) {
     simple_quiz_with_submissions %w{T T A}, %w{T T A}, %w{T T B}, %w{T F B}, %w{T F B}
+  }
+  let(:summary) {
     Quizzes::QuizStatistics::ItemAnalysis::Summary.new(@quiz)
   }
 

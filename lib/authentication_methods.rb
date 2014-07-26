@@ -34,7 +34,7 @@ module AuthenticationMethods
   def load_pseudonym_from_policy
     if (policy_encoded = params['Policy']) &&
         (signature = params['Signature']) &&
-        signature == Base64.encode64(OpenSSL::HMAC.digest(OpenSSL::Digest::Digest.new('sha1'), Attachment.shared_secret, policy_encoded)).gsub(/\n/, '') &&
+        signature == Base64.encode64(OpenSSL::HMAC.digest(OpenSSL::Digest.new('sha1'), Attachment.shared_secret, policy_encoded)).gsub(/\n/, '') &&
         (policy = JSON.parse(Base64.decode64(policy_encoded)) rescue nil) &&
         policy['conditions'] &&
         (credential = policy['conditions'].detect{ |cond| cond.is_a?(Hash) && cond.has_key?("pseudonym_id") })

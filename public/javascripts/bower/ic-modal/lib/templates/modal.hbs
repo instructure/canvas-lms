@@ -1,0 +1,16 @@
+{{#if isOpen}}
+  <ic-modal-main>
+
+    {{#if makeTitle}}
+      {{#ic-modal-title}}Modal Content{{/ic-modal-title}}
+    {{/if}}
+
+    {{#if makeTrigger}}
+      {{#ic-modal-trigger class="ic-modal-close" aria-label="close"}}×{{/ic-modal-trigger}}
+    {{/if}}
+
+    {{yield}}
+
+  </ic-modal-main>
+{{/if}}
+

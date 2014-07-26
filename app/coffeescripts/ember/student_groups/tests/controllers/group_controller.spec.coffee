@@ -53,7 +53,7 @@ define [
     ajax.defineFixture '/api/v1/groups/1/memberships/self',
       response:
         id: "1"
-      testStatus: '200'
+      textStatus: 'success'
       jqXHR: {}
     
     @gc.send('leave', @group)

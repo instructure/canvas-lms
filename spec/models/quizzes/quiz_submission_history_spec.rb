@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 describe Quizzes::QuizSubmissionHistory do
 
   context "submissions with history" do
-    before do
+    before :once do
       course
       @quiz       = @course.quizzes.create!
       @submission = @quiz.quiz_submissions.new

@@ -17,8 +17,8 @@ class MigrationIssue < ActiveRecord::Base
     state :resolved
   end
 
-  scope :active, where(:workflow_state => 'active')
-  scope :by_created_at, order(:created_at)
+  scope :active, -> { where(:workflow_state => 'active') }
+  scope :by_created_at, -> { order(:created_at) }
 
   set_policy do
     given { |user| Account.site_admin.grants_right?(user, :view_error_reports) }

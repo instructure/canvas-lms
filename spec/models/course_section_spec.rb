@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - 2013 Instructure, Inc.
+# Copyright (C) 2011 - 2014 Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -159,6 +159,8 @@ describe CourseSection, "moving to new course" do
     e = course1.enroll_user(u, 'StudentEnrollment', :section => cs)
     e.workflow_state = 'active'
     e.save!
+    #should also move deleted enrollments
+    e.destroy
     course1.reload
     course2.reload
     course3.workflow_state = 'active'
@@ -248,7 +250,7 @@ describe CourseSection, "moving to new course" do
   end
 
   describe 'validation' do
-    before(:each) do
+    before :once do
       course = Course.create_unique
       @section = CourseSection.create(course: course)
       @long_string = 'qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm'
@@ -272,7 +274,7 @@ describe CourseSection, "moving to new course" do
   end
 
   describe 'deletable?' do
-    before do
+    before :once do
       course_with_teacher
       @section = course.course_sections.create!
     end
@@ -295,7 +297,7 @@ describe CourseSection, "moving to new course" do
 
   context 'permissions' do
     context ':read and section_visibilities' do
-      before do
+      before :once do
         RoleOverride.create!({
           :context => Account.default,
           :permission => 'manage_students',
@@ -311,16 +313,16 @@ describe CourseSection, "moving to new course" do
         @ta.reload
 
         # make sure other ways to get :read are false
-        @other_section.cached_context_grants_right?(@ta, nil, :manage_sections).should be_false
-        @other_section.cached_context_grants_right?(@ta, nil, :manage_students).should be_false
+        @other_section.course.grants_right?(@ta, :manage_sections).should be_false
+        @other_section.course.grants_right?(@ta, :manage_students).should be_false
 
         @other_section.grants_right?(@ta, :read).should be_false
       end
 
       it "should work with section_limited false" do
         # make sure other ways to get :read are false
-        @other_section.cached_context_grants_right?(@ta, nil, :manage_sections).should be_false
-        @other_section.cached_context_grants_right?(@ta, nil, :manage_students).should be_false
+        @other_section.course.grants_right?(@ta, :manage_sections).should be_false
+        @other_section.course.grants_right?(@ta, :manage_students).should be_false
 
         @other_section.grants_right?(@ta, :read).should be_true
       end

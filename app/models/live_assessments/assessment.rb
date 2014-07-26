@@ -33,10 +33,10 @@ module LiveAssessments
     scope :for_context, lambda { |context| where(:context_id => context, :context_type => context.class.to_s) }
 
     set_policy do
-      given { |user, session| self.cached_context_grants_right?(user, session, :manage_assignments) }
+      given { |user, session| self.context.grants_right?(user, session, :manage_assignments) }
       can :create and can :update
 
-      given { |user, session| self.cached_context_grants_right?(user, session, :view_all_grades) }
+      given { |user, session| self.context.grants_right?(user, session, :view_all_grades) }
       can :read
     end
 

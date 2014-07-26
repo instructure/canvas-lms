@@ -19,6 +19,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe AssignmentOverride do
+  before :once do
+    student_in_course
+  end
+
   it "should soft-delete" do
     @override = assignment_override_model
     @override.stubs(:assignment_override_students).once.returns stub(:destroy_all)
@@ -42,7 +46,6 @@ describe AssignmentOverride do
   end
 
   it "should return the students as the set when set_type is adhoc" do
-    student_in_course
     @override = assignment_override_model(:course => @course)
 
     @override_student = @override.assignment_override_students.build
@@ -54,7 +57,6 @@ describe AssignmentOverride do
   end
 
   it "should remove adhoc associations when an adhoc override is deleted" do
-    student_in_course
     @override = assignment_override_model(:course => @course)
     @override_student = @override.assignment_override_students.build
     @override_student.user = @student
@@ -67,7 +69,6 @@ describe AssignmentOverride do
   end
 
   it "should allow reusing students from a deleted adhoc override" do
-    student_in_course
     @override = assignment_override_model(:course => @course)
     @override_student = @override.assignment_override_students.build
     @override_student.user = @student
@@ -87,7 +88,7 @@ describe AssignmentOverride do
   end
 
   describe 'versioning' do
-    before do
+    before :once do
       @override = assignment_override_model
     end
 
@@ -120,21 +121,23 @@ describe AssignmentOverride do
   end
 
   describe "active scope" do
+    before :once do
+      @overrides = 5.times.map{ assignment_override_model }
+    end
+
     it "should include active overrides" do
-      5.times.map{ assignment_override_model }
       AssignmentOverride.active.count.should == 5
     end
 
     it "should exclude deleted overrides" do
-      5.times.map{ assignment_override_model.destroy }
+      @overrides.map(&:destroy)
       AssignmentOverride.active.count.should == 0
     end
   end
 
   describe "validations" do
-    before :each do
+    before :once do
       @override = assignment_override_model
-      @override.should be_valid
     end
 
     def invalid_id_for_model(model)
@@ -260,7 +263,7 @@ describe AssignmentOverride do
   end
 
   describe "title" do
-    before :each do
+    before :once do
       @override = assignment_override_model
     end
 
@@ -292,7 +295,7 @@ describe AssignmentOverride do
 
   def self.describe_override(field, value1, value2)
     describe "#{field} overrides" do
-      before :each do
+      before :once do
         @assignment = assignment_model(field.to_sym => value1)
         @override = assignment_override_model(:assignment => @assignment)
       end
@@ -325,7 +328,7 @@ describe AssignmentOverride do
       end
     end
 
-    before :each do
+    before do
       @override = AssignmentOverride.new
     end
 
@@ -490,7 +493,7 @@ describe AssignmentOverride do
   end
 
   describe "updating cached due dates" do
-    before do
+    before :once do
       @override = assignment_override_model
       @override.override_due_at(3.days.from_now)
       @override.save

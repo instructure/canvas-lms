@@ -25,7 +25,8 @@ define [
     buildInvites: ->
       invites = {}
       @get('controllers.users').forEach (user) ->
-        invites[user.get('id')] = if user.get('invite') then 1 else 0
+        if user.get('invite')
+          invites[user.get('id')] = 1
       invites
 
 
@@ -42,5 +43,5 @@ define [
           group.save().then (group) =>
             @set('name','')
             json = group.toJSON()
-            json.users = [ENV.current_user]
+            json.id = group.id
             @get('controllers.student_groups.groups').pushObject(json)

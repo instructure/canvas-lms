@@ -25,8 +25,8 @@ describe SisImportsApiController, type: :request do
     @account = Account.default
     @account.allow_sis_import = true
     @account.save
-    @account.add_user(@user, 'AccountAdmin')
-    Account.site_admin.add_user(@user, 'AccountAdmin')
+    @account.account_users.create!(user: @user)
+    Account.site_admin.account_users.create!(user: @user)
 
     @user_count = User.count
     @batch_count = SisBatch.count
@@ -462,7 +462,7 @@ describe SisImportsApiController, type: :request do
     @account = Account.create(name: 'sis account')
     @account.allow_sis_import = true
     @account.save!
-    @account.add_user(@user, 'AccountAdmin')
+    @account.account_users.create!(user: @user)
     batch = post_csv(
       "account_id,parent_account_id,name,status",
       "A001,,TestAccount,active"

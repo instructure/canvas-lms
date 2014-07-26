@@ -21,7 +21,7 @@ class ContentExportsController < ApplicationController
   before_filter { |c| c.active_tab = "settings" }
 
   def index
-    return render_unauthorized_action unless @context.grants_rights?(@current_user, nil, :read, :read_as_admin).values.all?
+    return render_unauthorized_action unless @context.grants_all_rights?(@current_user, :read, :read_as_admin)
 
     @exports = @context.content_exports.active.not_for_copy
     @current_export_id = nil
@@ -31,7 +31,7 @@ class ContentExportsController < ApplicationController
   end
 
   def show
-    return render_unauthorized_action unless @context.grants_rights?(@current_user, nil, :read, :read_as_admin).values.all?
+    return render_unauthorized_action unless @context.grants_all_rights?(@current_user, :read, :read_as_admin)
 
     if params[:id].present? && export = @context.content_exports.find_by_id(params[:id])
       render_export(export)
@@ -41,7 +41,7 @@ class ContentExportsController < ApplicationController
   end
 
   def create
-    return render_unauthorized_action unless @context.grants_rights?(@current_user, nil, :read, :read_as_admin).values.all?
+    return render_unauthorized_action unless @context.grants_all_rights?(@current_user, :read, :read_as_admin)
 
     if @context.content_exports.running.count == 0
       export = ContentExport.new
@@ -70,7 +70,7 @@ class ContentExportsController < ApplicationController
   end
 
   def destroy
-    return render_unauthorized_action unless @context.grants_rights?(@current_user, nil, :read, :read_as_admin).values.all?
+    return render_unauthorized_action unless @context.grants_all_rights?(@current_user, :read, :read_as_admin)
 
     if params[:id].present? && export = @context.content_exports.find_by_id(params[:id])
       export.destroy

@@ -65,12 +65,12 @@ class Submission < ActiveRecord::Base
   include CustomValidations
   validates_as_url :url
 
-  scope :with_comments, includes(:submission_comments)
+  scope :with_comments, -> { includes(:submission_comments) }
   scope :after, lambda { |date| where("submissions.created_at>?", date) }
   scope :before, lambda { |date| where("submissions.created_at<?", date) }
   scope :submitted_before, lambda { |date| where("submitted_at<?", date) }
   scope :submitted_after, lambda { |date| where("submitted_at>?", date) }
-  scope :with_point_data, where("submissions.score IS NOT NULL OR submissions.grade IS NOT NULL")
+  scope :with_point_data, -> { where("submissions.score IS NOT NULL OR submissions.grade IS NOT NULL") }
 
   scope :for_context_codes, lambda { |context_codes| where(:context_code => context_codes) }
 
@@ -104,7 +104,7 @@ class Submission < ActiveRecord::Base
     conditions
   end
 
-  scope :needs_grading, where(needs_grading_conditions)
+  scope :needs_grading, -> { where(needs_grading_conditions) }
 
 
   sanitize_field :body, CanvasSanitize::SANITIZE
@@ -192,7 +192,7 @@ class Submission < ActiveRecord::Base
     given { |user| user && user.id == self.user_id && !self.assignment.muted? }
     can :read_grade
 
-    given {|user, session| self.assignment.cached_context_grants_right?(user, session, :view_all_grades) }
+    given {|user, session| self.assignment.context.grants_right?(user, session, :view_all_grades) }
     can :read and can :read_grade
 
     given {|user| self.assignment && self.assignment.context && user && self.user &&
@@ -203,7 +203,7 @@ class Submission < ActiveRecord::Base
       self.assignment.context.observer_enrollments.find_by_user_id_and_associated_user_id_and_workflow_state(user.id, self.user.id, 'active').try(:grants_right?, user, :read_grades) }
     can :read_grade
 
-    given {|user, session| self.assignment.published? && self.assignment.cached_context_grants_right?(user, session, :manage_grades) }#admins.include?(user) }
+    given {|user, session| self.assignment.published? && self.assignment.context.grants_right?(user, session, :manage_grades) }#admins.include?(user) }
     can :read and can :comment and can :make_group_comment and can :read_grade and can :grade
 
     given {|user| self.assignment.published? && user && self.assessment_requests.map{|a| a.assessor_id}.include?(user.id) }
@@ -212,7 +212,7 @@ class Submission < ActiveRecord::Base
     given { |user, session|
       grants_right?(user, session, :read_grade) &&
       turnitin_data &&
-      (assignment.cached_context_grants_right?(user, session, :manage_grades) ||
+      (assignment.context.grants_right?(user, session, :manage_grades) ||
         case assignment.turnitin_settings[:originality_report_visibility]
           when 'immediate'; true
           when 'after_grading'; current_submission_graded?
@@ -306,9 +306,9 @@ class Submission < ActiveRecord::Base
     if self.turnitin_data && self.turnitin_data[asset_string] && self.turnitin_data[asset_string][:similarity_score]
       turnitin = Turnitin::Client.new(*self.context.turnitin_settings)
       self.send_later(:check_turnitin_status)
-      if self.grants_right?(user, nil, :grade)
+      if self.grants_right?(user, :grade)
         turnitin.submissionReportUrl(self, asset_string)
-      elsif self.grants_right?(user, nil, :view_turnitin_report)
+      elsif self.grants_right?(user, :view_turnitin_report)
         turnitin.submissionStudentReportUrl(self, asset_string)
       end
     else
@@ -753,23 +753,23 @@ class Submission < ActiveRecord::Base
     state :graded
   end
 
-  scope :graded, where("submissions.grade IS NOT NULL")
+  scope :graded, -> { where("submissions.grade IS NOT NULL") }
 
-  scope :ungraded, where(:grade => nil).includes(:assignment)
+  scope :ungraded, -> { where(:grade => nil).includes(:assignment) }
 
   scope :in_workflow_state, lambda { |provided_state| where(:workflow_state => provided_state) }
 
-  scope :having_submission, where("submissions.submission_type IS NOT NULL")
-  scope :without_submission, where(submission_type: nil, workflow_state: "unsubmitted")
+  scope :having_submission, -> { where("submissions.submission_type IS NOT NULL") }
+  scope :without_submission, -> { where(submission_type: nil, workflow_state: "unsubmitted") }
 
-  scope :include_user, includes(:user)
+  scope :include_user, -> { includes(:user) }
 
-  scope :include_assessment_requests, includes(:assessment_requests, :assigned_assessments)
-  scope :include_versions, includes(:versions)
-  scope :include_submission_comments, includes(:submission_comments)
-  scope :speed_grader_includes, includes(:versions, :submission_comments, :attachments, :rubric_assessment)
+  scope :include_assessment_requests, -> { includes(:assessment_requests, :assigned_assessments) }
+  scope :include_versions, -> { includes(:versions) }
+  scope :include_submission_comments, -> { includes(:submission_comments) }
+  scope :speed_grader_includes, -> { includes(:versions, :submission_comments, :attachments, :rubric_assessment) }
   scope :for_user, lambda { |user| where(:user_id => user) }
-  scope :needing_screenshot, where("submissions.submission_type='online_url' AND submissions.attachment_id IS NULL AND submissions.process_attempts<3").order(:updated_at)
+  scope :needing_screenshot, -> { where("submissions.submission_type='online_url' AND submissions.attachment_id IS NULL AND submissions.process_attempts<3").order(:updated_at) }
 
   def needs_regrading?
     graded? && !grade_matches_current_submission?

@@ -37,11 +37,11 @@ class LearningOutcome < ActiveRecord::Base
 
   set_policy do
     # managing a contextual outcome requires manage_outcomes on the outcome's context
-    given {|user, session| self.context_id && self.cached_context_grants_right?(user, session, :manage_outcomes) }
+    given {|user, session| self.context_id && self.context.grants_right?(user, session, :manage_outcomes) }
     can :create and can :read and can :update and can :delete
 
     # reading a contextual outcome is also allowed by read_outcomes on the outcome's context
-    given {|user, session| self.context_id && self.cached_context_grants_right?(user, session, :read_outcomes) }
+    given {|user, session| self.context_id && self.context.grants_right?(user, session, :read_outcomes) }
     can :read
 
     # managing a global outcome requires manage_global_outcomes on the site_admin
@@ -207,13 +207,13 @@ class LearningOutcome < ActiveRecord::Base
   end
 
   scope :for_context_codes, lambda { |codes| where(:context_code => codes) }
-  scope :active, where("learning_outcomes.workflow_state<>'deleted'")
+  scope :active, -> { where("learning_outcomes.workflow_state<>'deleted'") }
   scope :has_result_for, lambda { |user|
     joins(:learning_outcome_results).
         where("learning_outcomes.id=learning_outcome_results.learning_outcome_id AND learning_outcome_results.user_id=?", user).
         order(best_unicode_collation_key('short_description'))
   }
 
-  scope :global, where(:context_id => nil)
+  scope :global, -> { where(:context_id => nil) }
 
 end

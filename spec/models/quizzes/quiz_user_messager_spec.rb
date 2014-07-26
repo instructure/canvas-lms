@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + "/quiz_user_messager_spec_help
 describe Quizzes::QuizUserMessager do
   include Quizzes::QuizUserMessagerSpecHelper
 
-  before do
+  before :once do
     course_with_teacher_logged_in(active_all: true)
     course_quiz(true)
     course_with_student(active_all: true, course: @course)

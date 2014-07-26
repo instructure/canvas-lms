@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe AssessmentRequest do
   describe "workflow" do
-    let(:request) do
+    let_once(:request) do
       user
       course
       assignment = @course.assignments.create!

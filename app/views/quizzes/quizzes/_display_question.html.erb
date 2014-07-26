@@ -120,13 +120,28 @@
           <span class="text_after_answers"><%= user_content(hash_get(question, :text_after_answers)) %></span>
         <% elsif question && hash_get(question, :question_type) == "fill_in_multiple_blanks_question" && @stored_params %>
 
-          <% answer_list = []
-             if assessment_results
-               variables = hash_get(question, :answers, []).map{|a| hash_get(a, :blank_id) }.compact.uniq
-               variables.each {|var| answer_list << hash_get(user_answer, "answer_for_#{var}") }
-             end
+          <%
+            answer_list = if assessment_results
+              blanks = hash_get(question, :answers, []).map do |answer|
+                hash_get(answer, :blank_id)
+              end
+
+              blanks.compact.uniq.map do |blank|
+                {
+                  blank_id: blank,
+                  answer: hash_get(user_answer, "answer_for_#{blank}")
+                }
+              end
+            else
+              []
+            end
           %>
-          <%= fill_in_multiple_blanks_question :question => question, :answers => @stored_params, :answer_list => answer_list, :editable => assessing %>
+          <%= fill_in_multiple_blanks_question({
+            question: question,
+            answers: @stored_params,
+            answer_list: answer_list,
+            editable: assessing
+          }) %>
         <% elsif question && hash_get(question, :question_type) == "multiple_dropdowns_question" %>
           <% answer_list = []
              if assessment_results

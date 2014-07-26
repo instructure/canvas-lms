@@ -65,11 +65,11 @@ describe GroupMembership do
 
   context "section homogeneity" do
     # can't use 'course' because it is defined in spec_helper, so use 'course1'
-    let(:course1) { course_with_teacher(:active_all => true); @course }
-    let(:student) { student = user_model; course1.enroll_student(student); student }
-    let(:group_category) { GroupCategory.student_organized_for(course1) }
-    let(:group) { course1.groups.create(:group_category => group_category) }
-    let(:group_membership) { group.group_memberships.create(:user => student) }
+    let_once(:course1) { course_with_teacher(:active_all => true); @course }
+    let_once(:student) { student = user_model; course1.enroll_student(student); student }
+    let_once(:group_category) { GroupCategory.student_organized_for(course1) }
+    let_once(:group) { course1.groups.create(:group_category => group_category) }
+    let_once(:group_membership) { group.group_memberships.create(:user => student) }
 
     it "should have a validation error on new record" do
       membership = GroupMembership.new
@@ -133,7 +133,7 @@ describe GroupMembership do
   end
 
   context 'active_given_enrollments?' do
-    before do
+    before :once do
       @enrollment = course_with_student(:active_all => true)
       @course_group = @course.groups.create!
       @membership = @course_group.add_user(@student)
@@ -192,6 +192,10 @@ describe GroupMembership do
   end
 
   context 'permissions' do
+    before :once do
+      course_with_teacher(:active_all => true)
+    end
+
     it "should allow someone to join an open, non-community group" do
       student_in_course(:active_all => true)
       student_organized = GroupCategory.student_organized_for(@course)
@@ -206,7 +210,6 @@ describe GroupMembership do
     end
 
     it "should allow someone to be added to a non-community group" do
-      course_with_teacher(:active_all => true)
       student_in_course(:active_all => true)
       course_groups = group_category
       course_group = course_groups.groups.create!(:context => @course, :join_level => "invitation_only")
@@ -220,7 +223,6 @@ describe GroupMembership do
     end
 
     it "should allow someone to join an open community group" do
-      course_with_teacher(:active_all => true)
       @account = @course.root_account
       community_groups = GroupCategory.communities_for(@account)
       community_group = community_groups.groups.create!(:context => @account, :join_level => "parent_context_auto_join")
@@ -229,7 +231,6 @@ describe GroupMembership do
     end
 
     it "should not allow someone to be added to a community group" do
-      course_with_teacher(:active_all => true)
       @account = @course.root_account
       account_admin_user(:active_all => true, :account => @account)
       community_groups = GroupCategory.communities_for(@account)
@@ -238,7 +239,6 @@ describe GroupMembership do
     end
 
     it "should allow a moderator to kick someone from a community" do
-      course_with_teacher(:active_all => true)
       @account = @course.root_account
       account_admin_user(:active_all => true, :account => @account)
       community_groups = GroupCategory.communities_for(@account)
@@ -262,7 +262,7 @@ describe GroupMembership do
   end
 
   describe "updating cached due dates" do
-    before do
+    before :once do
       course
       @group_category = @course.group_categories.create!(:name => "category")
       @membership = group_with_user(:group_context => @course, :group_category => @group_category)

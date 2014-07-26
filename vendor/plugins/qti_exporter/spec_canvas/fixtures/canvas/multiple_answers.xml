@@ -33,7 +33,7 @@ Unknown text type: ignored mattext with texttype="text" treated as text/plain
 <simpleChoice identifier="RESPONSE_1702" fixed="true">
 <p>Great idea</p></simpleChoice>
 <simpleChoice identifier="RESPONSE_6878" fixed="true">
-<p>I'll do that!</p></simpleChoice>
+<p>Ill do that!</p></simpleChoice>
 <simpleChoice identifier="RESPONSE_491" fixed="true">
 <p>Now way! every 0.24 points counts.</p></simpleChoice>
 </choiceInteraction>

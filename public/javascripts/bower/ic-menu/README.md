@@ -1,4 +1,4 @@
-ic-menu
+ic-menu [![Build Status](https://travis-ci.org/instructure/ic-menu.svg)](https://travis-ci.org/instructure/ic-menu)
 =======
 
 An accessible menu component for ember applications.

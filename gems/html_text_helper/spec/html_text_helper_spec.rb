@@ -92,6 +92,10 @@ describe HtmlTextHelper do
       th.html_to_text('<img alt="an image" src="/image.png"').should == "[an image](/image.png)"
     end
 
+    it "should not format src-less images" do
+      th.html_to_text('<img alt="an image">').should == ''
+    end
+
     it "should add base urls to links" do
       th.html_to_text('<a href="/link">Link</a>', base_url: "http://example.com").should == "[Link](http://example.com/link)"
       th.html_to_text('<a href="http://example.org/link">Link</a>', base_url: "http://example.com").should == "[Link](http://example.org/link)"
@@ -100,6 +104,10 @@ describe HtmlTextHelper do
     it "should add base urls to img src" do
       th.html_to_text('<img src="/image.png" alt="Image" />', base_url: "http://example.com").should == "[Image](http://example.com/image.png)"
       th.html_to_text('<img src="http://example.org/image.png" />', base_url: "http://example.com").should == "http://example.org/image.png"
+    end
+
+    it "should not format src-less images even with base urls" do
+      th.html_to_text('<img alt="an image">', base_url: "http://example.com").should == ''
     end
 
     it "should format list elements" do

@@ -1,4 +1,4 @@
-<% 
+<%
   show_context ||= false; upcoming ||= false
   is_assignment = recent_event.is_a?(Assignment)
   is_calendar_event = recent_event.is_a?(CalendarEvent)
@@ -8,7 +8,7 @@
     elsif @current_user
       submission = @current_user.submissions.select([:id, :assignment_id, :score, :workflow_state]).where(:assignment_id => recent_event).first
     end
-    
+
     if is_assignment
       recent_event = recent_event.overridden_for(@current_user)
     end
@@ -20,13 +20,13 @@
           (recent_event.due_at if is_assignment),
           Time.zone.today,
           Time.zone.name,
-          recent_event.cached_context_grants_right?(@current_user, nil, :manage_grades),
-          recent_event.cached_context_grants_right?(@current_user, nil, :participate_as_student)
+          recent_event.context.grants_right?(@current_user, :manage_grades),
+          recent_event.context.grants_right?(@current_user, :participate_as_student)
         ].cache_key) do
-    icon_explanation, icon_class = icon_data(:context => @context, 
-                                             :contexts => @contexts, 
-                                             :current_user => @current_user, 
-                                             :recent_event => recent_event, 
+    icon_explanation, icon_class = icon_data(:context => @context,
+                                             :contexts => @contexts,
+                                             :current_user => @current_user,
+                                             :recent_event => recent_event,
                                              :submission => submission)
 
 %>
@@ -41,7 +41,7 @@
       <span class='tooltip-carat'></span>
       <span class="tooltip_text">
         <% if is_assignment %>
-          <span style="display: block;"><%= t(:due, "due") %>: 
+          <span style="display: block;"><%= t(:due, "due") %>:
             <%= due_at(recent_event, @current_user) %>
           </span>
           <% if icon_explanation %>

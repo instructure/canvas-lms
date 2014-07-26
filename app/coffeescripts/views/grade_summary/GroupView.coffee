@@ -16,6 +16,7 @@ define [
 
     events:
       'click .group-description': 'expand'
+      'keyclick .group-description': 'expand'
 
     template: template
 
@@ -27,7 +28,12 @@ define [
         itemView: OutcomeView
       outcomesView.render()
 
-    expand: -> @$el.toggleClass('expanded')
+    expand: ->
+      @$el.toggleClass('expanded')
+      if @$el.hasClass("expanded")
+        @$el.children("div.group-description").attr("aria-expanded", "true")
+      else
+        @$el.children("div.group-description").attr("aria-expanded", "false")
 
     statusTooltip: ->
       switch @model.status()

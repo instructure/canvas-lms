@@ -414,38 +414,42 @@ var speakMessage = function ($this, message) {
         var text = parse_error_message;
         var text2 = ""
         if (!$this.val()) { text = ""; }
-        if (fudged_d) {
+        if (d != null) {
           $this.data('date', fudged_d);
           if ($this.data('hiddenInput')) {
             $this.data('hiddenInput').val(fudged_d);
           }
           if(!options.timeOnly && !options.dateOnly && (!$.midnight(d) || options.alwaysShowTime)) {
-            text = fudged_d.toString('ddd MMM d, yyyy h:mmtt');
-            if($suggest2)
-              text2 = tz.format(d,"%a %b %m, %Y %l:%M%p", ENV.CONTEXT_TIMEZONE);
+            text = tz.format(d, "%a %b %-d, %Y %-l:%M%P");
+            if($suggest2) {
+              text2 = tz.format(d,"%a %b %-d, %Y %-l:%M%P", ENV.CONTEXT_TIMEZONE);
+            }
             $this
-              .data('time-hour', fudged_d.toString('h'))
-              .data('time-minute', fudged_d.toString('mm'))
-              .data('time-ampm', fudged_d.toString('tt').toLowerCase());
+              .data('time-hour', tz.format(d, "%-l"))
+              .data('time-minute', tz.format(d, "%M"))
+              .data('time-ampm', tz.format(d, "%P"));
           } else if(!options.timeOnly) {
-            text = fudged_d.toString('ddd MMM d, yyyy');
+            text = tz.format(d, "%a %b %-d, %Y");
           } else {
-            text = fudged_d.toString('h:mmtt').toLowerCase();
-            if($suggest2)
-              text2 = tz.format(d,"%l:%M%p", ENV.CONTEXT_TIMEZONE);
+            text = tz.format(d, "%-l:%M%P");
+            if($suggest2) {
+              text2 = tz.format(d,"%-l:%M%P", ENV.CONTEXT_TIMEZONE);
+            }
           }
 
           if($suggest2) {
             if(text2.length > 0){
-              $suggest2.text(I18n.t('course_time',"COURSE: ")+text2);
+              text2 = I18n.t('#helpers.course', 'Course') + ": " + text2;
+              $suggest2.text(text2);
             } else {
               $suggest2.text("");
             }
           }
         }
 
-        if(text.length > 0 && $suggest2)
-          text = I18n.t('local_time',"LOCAL: ") + text;
+        if(text.length > 0 && $suggest2) {
+          text = I18n.t('#helpers.local', 'Local') + ": " + text;
+        }
 
         $suggest
           .toggleClass('invalid_datetime', text == parse_error_message)

@@ -42,7 +42,7 @@ class AssignmentsController < ApplicationController
       # because of course import/copy.
       @context.require_assignment_group
 
-      permissions = @context.grants_rights?(@current_user, :manage_assignments, :manage_grades)
+      permissions = @context.rights_status(@current_user, :manage_assignments, :manage_grades)
       permissions[:manage] = permissions[:manage_assignments]
       js_env({
         :URLS => {
@@ -127,7 +127,7 @@ class AssignmentsController < ApplicationController
 
       @locked = @assignment.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
       @locked.delete(:lock_at) if @locked.is_a?(Hash) && @locked.has_key?(:unlock_at) # removed to allow proper translation on show page
-      @unlocked = !@locked || @assignment.grants_rights?(@current_user, session, :update)[:update]
+      @unlocked = !@locked || @assignment.grants_right?(@current_user, session, :update)
       @assignment.context_module_action(@current_user, :read) if @unlocked && !@assignment.new_record?
 
       if @assignment.grants_right?(@current_user, session, :grade)
@@ -461,8 +461,8 @@ class AssignmentsController < ApplicationController
   # Delete the given assignment.
   #
   # @example_request
-  #     curl https://<canvas>/api/v1/courses/<course_id>/assignments/<assignment_id> \ 
-  #          -X DELETE \ 
+  #     curl https://<canvas>/api/v1/courses/<course_id>/assignments/<assignment_id> \
+  #          -X DELETE \
   #          -H 'Authorization: Bearer <token>'
   # @returns Assignment
   def destroy

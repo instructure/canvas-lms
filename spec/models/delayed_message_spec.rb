@@ -24,28 +24,27 @@ describe DelayedMessage do
   end
   
   context "named scopes" do
-    
-    it "should have scope for :daily" do
+    before :once do
       DelayedMessage.delete_all
+    end
+
+    it "should have scope for :daily" do
       delayed_message_model(:frequency => 'daily')
       DelayedMessage.for(:daily).should == [@delayed_message]
     end
     
     it "should scope for :weekly" do
-      DelayedMessage.delete_all
       delayed_message_model(:frequency => 'weekly')
       DelayedMessage.for(:weekly).should == [@delayed_message]
     end
     
     it "should scope for notification" do
-      DelayedMessage.delete_all
       notification_model
       delayed_message_model
       DelayedMessage.for(@notification).should == [@delayed_message]
     end
     
     it "should scope for notification_policy" do
-      DelayedMessage.delete_all
       notification_policy_model
       delayed_message_model(:notification_policy_id => @notification_policy.id)
       @notification_policy.should be_is_a(NotificationPolicy)
@@ -53,7 +52,6 @@ describe DelayedMessage do
     end
     
     it "should scope for communication_channel" do
-      DelayedMessage.delete_all
       communication_channel_model
       delayed_message_model(:communication_channel_id => @communication_channel.id)
       @communication_channel.should be_is_a(CommunicationChannel)
@@ -97,7 +95,7 @@ describe DelayedMessage do
   end
   
   context "workflow" do
-    before do
+    before :once do
       delayed_message_model
     end
     
@@ -154,7 +152,7 @@ describe DelayedMessage do
   end
 
   describe "set_send_at" do
-    before :each do
+    before :once do
       # shouldn't be used, but to make sure it's not equal to any of the other
       # time zones in play
       Time.zone = 'UTC'
@@ -172,7 +170,9 @@ describe DelayedMessage do
       @user.time_zone = @central.name
       @user.pseudonym.update_attribute(:account, @account)
       @user.save
+    end
 
+    before :each do
       # build the delayed message
       @dm = DelayedMessage.new(:context => @account, :communication_channel => @user.communication_channel)
     end
