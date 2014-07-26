@@ -1402,7 +1402,7 @@ tr:
       template: 
         body: "Aşağıdaki alanlar ile ilgili sorunlar var:"
         header: 
-          one: "%{count} kadar hata bu %{model} nin kaydedilmesini engelledi"
+          one: "1 hata bu %{model} nin kaydedilmesini engelledi"
           other: "%{count} kadar hata bu %{model} nin kaydedilmesini engelledi"
   ajax_errors: 
     error_heading: "Ajax Hatası: %{status_code}"
