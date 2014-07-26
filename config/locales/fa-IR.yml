@@ -9,26 +9,26 @@ fa-IR:
     context_required: "باید یک تقویم انتخاب کنید"
     select_calendars: "انتخاب تقویم‌ها"
   EditGroupAssignmentView: 
-    move_to: "برو به"
+    move_to: "انتقال به"
   GroupDetailView: 
-    delete_confirm: "آیا مطمئنید که می خواهید این گروه را حذف کنید؟"
+    delete_confirm: "مطمئنید که می خواهید این گروه حذف شود؟"
     flash: 
       removeError: "قادر به حذف این گروه نیست. لطفا دوباره سعی کنید."
-      removed: "گروه با موفقیت حذف شد"
+      removed: "گروه با موفقیت حذف شد."
     student_count: 
       one: "%{count} دانشجویان"
-      other: "%{count} دانشجویان"
+      other: "%{count} دانشجو"
     student_count_max: "%{count} / %{max} دانشجو"
     user_count: 
       one: "%{count} کاربران"
-      other: "%{count} کاربران"
+      other: "%{count} کاربر"
     user_count_max: "%{count} / %{max} کاربر"
   GroupUserCollection: 
     flash: 
-      userAlreadyInGroup: "هشدار: %{user} کاربر در حال حاضر عضو %{group} است"
+      userAlreadyInGroup: "هشدار: %{user} اکنون عضو %{group} است"
   LongTextEditor: 
-    cancel: "لغو کردن"
-    save: "ذخیره کردن"
+    cancel: لغو
+    save: "ذخیره سازی"
   academic_benchmark: 
     api_error: "قادر به بهنگام سازی استانداردها برای مرجع %{auth} نیست."
     bad_ab_file: "فایل معیار علمی فراهم شده یک خطا دارد."
@@ -41,8 +41,8 @@ fa-IR:
   account: 
     account_settings: 
       account_surveys: "نظرسنجی های حساب"
-      avatars: "عکس های کاربر"
-      delicious: خوشمزه
+      avatars: "آواتارهای کاربر"
+      delicious: Delicious
       diigo: Diigo
       facebook: "فیس بوک"
       google_docs: "Google Docs"
@@ -180,7 +180,7 @@ fa-IR:
       test_ldap_search_label: "در حال آزمایش جستجوی LDAP..."
     ldap_timeout_error: 
       last_ldap_timeout_failure: "آخرین خطای به پایان رسیدن زمان"
-      ldap_timeout_failure_help2: "اگر کانواس از چند بار ارتباط با سرور LDAP  پایان رسیده، آن را تلاش در انجمن بیشتر با استفاده از آن سرور LDAP برای جلوگیری از%{time}."
+      ldap_timeout_failure_help2: "اگر زمان برقراری ارتباط کانواس با سرور LDAP  برای دفعات زیاد به پایان برسد، مانع از استفاده از این سرور LDAP برای %{time} از طریق تلاش های دیگر برای ورود خواهد شد."
     login_required: "باید ارائه شود"
     no_changing_auth_types: "نمی توان نوع پیکربندی تأیید اعتبار را تغییر داد، لطفا حذف کنید و پیکربندی جدید را ایجاد نمایید."
     no_discovery_url: "هیچ یک تعیین نشده است"
@@ -260,18 +260,18 @@ fa-IR:
       course_text: "برای درس: %{course};"
       description: 
         header: مثال
-      end_text: "خاتمه در : %{end_at};"
-      error_text: "خطا، لطفا گزارش کد خطای زیر را به مدیر سیستم خود گزارش بدهید: کدخطای :%{error};"
+      end_text: "پایان در: %{end_at};"
+      error_text: "انجام نشد، لطفا رمز خطای زیر را به مدیر سیستم خود گزارش دهید: گزارش خطا:%{error}؛"
       extra_text_term: "نیمسال: %{term_name};"
       message: "گزارش %{type} با تنظیمات زیر با موفقیت ایجاد شد. حساب: %{account}; %{options}"
-      section_text: "برای بخش : %{section};"
-      start_text: "شروع از : %{start_at};"
-      term_text: "ترم :%{term_name};"
+      section_text: "برای بخش: %{section}؛"
+      start_text: "شروع در: %{start_at}؛"
+      term_text: "نیمسال: %{term_name}؛"
     grades: 
       deleted: "درج اشیاء حذف شده: درست؛"
-      limited: "چیزهای حذف شده توسط روز مشخصی محدود شده است."
+      limited: "اشیاء محدود شده بر اساس روزهای تعیین شده حذف شدند؛"
     outcomes: 
-      order: "دستور:%{order}"
+      order: "سایر: %{order}"
     report_header_account_id: شناسه_حساب
     report_header_assessment_id: "شناسه ارزیابی"
     report_header_assessment_question: "پرسش ارزیابی"
@@ -279,29 +279,29 @@ fa-IR:
     report_header_assessment_title: "عنوان ارزیابی"
     report_header_assessment_type: "نوع ارزیابی"
     report_header_assignment_id: "شناسه تکلیف"
-    report_header_assignment_title: "عنوان درس"
-    report_header_assignment_url: "لینک درس"
+    report_header_assignment_title: "عنوان تکلیف"
+    report_header_assignment_url: "نشانی اینترنتی تکلیف"
     report_header_associated_user_id: شناسه_کاربر_مرتبط
     report_header_attempt: تلاش
     report_header_canvas_account_id: شناسه_حساب_کانوس
-    report_header_canvas_associated_user_id: "شناسه_کاربر_در ارتباط با_کانوس"
-    report_header_canvas_course_id: شناسه_درس_کانوس
-    report_header_canvas_group_id: شناسه_گروه_کانوس
-    report_header_canvas_parent_id: شناسه_والدین_کانوس
-    report_header_canvas_section_id: شناسه_بخش_کانوس
-    report_header_canvas_term_id: شناسه_نیمسال_کانوس
-    report_header_canvas_user_id: شناسه_کاربر_کانوس
-    report_header_canvas_xlist_course_id: شناسه_درس_xlist_کانوس
+    report_header_canvas_associated_user_id: شناسه_کاربر_مرتبط_کانواس
+    report_header_canvas_course_id: شناسه_درس_کانواس
+    report_header_canvas_group_id: شناسه_گروه_کانواس
+    report_header_canvas_parent_id: شناسه_والدین_کانواس
+    report_header_canvas_section_id: شناسه_بخش_کانواس
+    report_header_canvas_term_id: شناسه_نیمسال_کانواس
+    report_header_canvas_user_id: شناسه_کاربر_کانواس
+    report_header_canvas_xlist_course_id: شناسه_درس_xlist_کانواس
     report_header_course: درس
     report_header_course__id: شناسه_درس
     report_header_course_id: "شناسه درس"
     report_header_course_name: "نام درس"
-    report_header_course_sis: "سامانه اطلاعات دانشجویی درس"
-    report_header_course_sis_id: "شناسه درس در سامانه اطلاعات دانشجویی"
+    report_header_course_sis: "درس در سامانه اطلاعات دانشجو"
+    report_header_course_sis_id: "شناسه درس در سامانه اطلاعات دانشجو"
     report_header_created_at: "ایجاد شد در"
     report_header_current_score: "نمره فعلی"
     report_header_email: "پست الکترونیکی"
-    report_header_end__date: پایان_روز
+    report_header_end__date: تاریخ_پایان
     report_header_end_date: "تاریخ پایان"
     report_header_enrollment_state: "وضعیت ثبت نام"
     report_header_final_score: "نمره نهایی"
@@ -315,46 +315,46 @@ fa-IR:
     report_header_learning_outcome_name: "نام نتیجه یادگیری"
     report_header_login_id: شناسه_ورود
     report_header_long__name: نام_بلند
-    report_header_long_name: "اسم کامل"
+    report_header_long_name: "نام بلند"
     report_header_name: نام
-    report_header_outcome_score: "نمره نهایی"
-    report_header_parent_account_id: والدین_حساب_شناسه
+    report_header_outcome_score: "نمره نتیجه"
+    report_header_parent_account_id: شناسه_حساب_والدین
     report_header_role: نقش
     report_header_section: بخش
-    report_header_section__id: "شناسه ی بخش"
+    report_header_section__id: شناسه_بخش
     report_header_section_id: "شناسه بخش"
     report_header_section_name: "نام بخش"
-    report_header_section_sis: "سامانه اطلاعات دانشجویی بخش"
-    report_header_section_sis_id: "شناسه بخش در سامانه اطلاعات دانشجویی"
+    report_header_section_sis: "بخش در سامانه اطلاعات دانشجو"
+    report_header_section_sis_id: "شناسه بخش در سامانه اطلاعات دانشجو"
     report_header_short__name: نام_کوتاه
     report_header_short_name: "نام کوتاه"
-    report_header_sis_id: "شناسه سامانه اطلاعات دانشجویی"
-    report_header_start__date: روز_شروع
+    report_header_sis_id: "شناسه سامانه اطلاعات دانشجو"
+    report_header_start__date: تاریخ_شروع
     report_header_start_date: "تاریخ شروع"
-    report_header_status: حالت
+    report_header_status: وضعیت
     report_header_student_id: "شناسه دانشجو"
     report_header_student_name: "نام دانشجو"
-    report_header_student_sis: "سامانه اطلاعات دانشجویی"
-    report_header_student_sis_id: "شناسه دانشجو در سامانه اطلاعات دانشجویی"
+    report_header_student_sis: "دانشجو در سامانه اطلاعات دانشجو"
+    report_header_student_sis_id: "شناسه دانشجو در سامانه اطلاعات دانشجو"
     report_header_submission_date: "تاریخ ارسال"
     report_header_submission_score: "نمره مورد ارسالی"
     report_header_term: نیمسال
     report_header_term__id: شناسه_نیمسال
     report_header_term_id: "شناسه نیمسال"
-    report_header_term_sis: "سامانه اطلاعات دانشجویی نیمسال"
+    report_header_term_sis: "نیمسال در سامانه اطلاعات دانشجو"
     report_header_user__id: شناسه_کاربر
     report_header_user_id: "شناسه کاربر"
     report_header_user_name: "نام کاربری"
-    report_header_user_sis_id: "شناسه کاربر در سامانه اطلاعات دانشجویی"
-    report_header_xlist_course_id: "لیست x_درس_شناسه"
+    report_header_user_sis_id: "شناسه کاربر در سامانه اطلاعات دانشجو"
+    report_header_xlist_course_id: شناسه_درس_xlist
     sis_exporter: 
       reports: "گزارش ها: %{files}"
     student: 
-      enrollment_state: "شامل موقعیت ثبت‌نام :درست;"
-      enrollment_states: "موقعیت های ثبت نام: %{states};"
+      enrollment_state: "شامل وضعیت ثبت‌نام :درست؛"
+      enrollment_states: "وضعیت های ثبت نام: %{states}؛"
   account_settings: 
     account: حساب
-    account_name_too_long: "نام حساب طولانی ست"
+    account_name_too_long: "نام حساب طولانی است"
     confirms: 
       delete_announcement: "مطمئنید که می خواهید این اطلاعیه حذف شود؟"
       global_announcement: "باید اطلاعیه سراسری را تأیید کنید"
@@ -379,8 +379,8 @@ fa-IR:
       account_admin: "مدیر حساب"
   accounts: 
     account_name_required: "نام حساب کاربری نمی تواند خالی باشد"
-    account_quotas_not_updated: "حساب سهمیه ها به روز اوری نشده است"
-    account_quotas_updated: "حساب سهمیه ها به روز اوری شده است"
+    account_quotas_not_updated: "سهمیه های حساب بهنگام سازی نشده اند"
+    account_quotas_updated: "سهمیه های حساب بهنگام سازی شدند"
     account_user: 
       remove_admin_tooltip: "حذف این مدیر"
     add_course_button: "افزودن درس"
@@ -427,7 +427,7 @@ fa-IR:
     admin_tools: 
       admin_tools: 
         tab_labels: 
-          admin_tools_logging: "ورود به سیستم"
+          admin_tools_logging: "در حال ورود"
           restore_course: "بازیابی درس ها"
         view_messages: "مشاهده اطلاعیه ها"
       admin_tools_cumb: "ابزارهای مدیر"
@@ -436,7 +436,7 @@ fa-IR:
       auth_logging_search_results: 
         activity: فعالیت
         date: تاریخ
-        no_item_found: "آیتمی یافت نشد"
+        no_item_found: "موردی یافت نشد"
         time: زمان
       comm_message_item: 
         created_at: "ایجاد شده در"
@@ -445,7 +445,7 @@ fa-IR:
         sent_at: "ارسال شده در"
         to: گیرنده
       comm_messages_content_pane: 
-        search_info2: "برای نمایش همه اطلاع ها به کاربر کانواس بفرس,کاربر و محدوده تاریخ را برای گشتن انتخاب کن."
+        search_info2: "برای مشاهده همه اطلاعیه هایی که برای یک کاربر کانواس ارسال می شود، کاربر و بازه زمانی را برای جستجوی خود انتخاب کنید."
         view_notifications: "مشاهده اطلاعیه ها"
       comm_messages_search_results: 
         no_messages_found: "پیامی یافت نشد"
@@ -455,18 +455,18 @@ fa-IR:
       course_logging_details: 
         Field: "جای خالی"
         From: فرستنده
-        To: به
+        To: گیرنده
         Value: ارزش
         blank_placeholder: "-"
         copied_from_label: "کپی شده از"
         copied_to_label: "کپی شده در"
         date: تاریخ
         event_id: "شناسه رویداد"
-        event_sis_batch: "دسته فایل سامانه اطلاعات دانشجویی"
+        event_sis_batch: "فایل دسته ای سامانه اطلاعات دانشجو"
         event_source_label: منبع
         event_type_label: نوع
-        reset_from_label: "بازنشانی از"
-        reset_to_label: "بازنشانی به"
+        reset_from_label: "بازنشانی شده از"
+        reset_to_label: "بازنشانی شده در"
         time: زمان
         user: کاربر
       course_logging_item: 
@@ -476,7 +476,7 @@ fa-IR:
         event_details: "اطلاعات رویداد"
         event_source: منبع
         event_type: نوع
-        no_item_found: "آیتمی یافت نشد"
+        no_item_found: "موردی یافت نشد"
         time: زمان
         user: کاربر
       course_search_form: 
@@ -519,22 +519,22 @@ fa-IR:
         Course: درس
         Grader: "نمره گذار"
         Student: دانشجو
-        To: به
+        To: گیرنده
         date: تاریخ
         from: فرستنده
-        no_item_found: "آیتمی یافت نشد"
+        no_item_found: "موردی یافت نشد"
         time: زمان
       logging_content_pane: 
-        authentication: "فعالیت ورود/خروج"
+        authentication: "فعالیت ورود / خروج"
         course: "فعالیت درس"
         grade_change: "فعالیت تغییر نمره "
-        select_default: "یک نوع لاگ را انتخاب کنید"
-        select_label: "نوع ورود را برای جستجو انتخاب کن."
+        select_default: "انتخاب نوع فایل ثبت"
+        select_label: "نوع فایل ثبت را برای جستجو انتخاب کنید."
       page_title: "ابزارهای مدیر برای %{account}"
       user_date_range_search_form: 
-        find: "پیدا کردن"
+        find: یافتن
         generate_activity_userid: "شناسه کاربر: *%{user_id}*"
-        generate_activity_username: "ساخت فعالیت برای *%{user}*"
+        generate_activity_username: "ایجاد فعالیت برای *%{user}*"
         message_date_from: "از تاریخ"
         message_date_to: "تا تاریخ"
         search: جستجو
@@ -543,21 +543,21 @@ fa-IR:
       account_reports: 
         newark: 
           assignment_count: 
-            field: "# تمرین:"
+            field: "# تکلیف:"
           assignment_groups: 
-            label: "گروه های تکلیف برای شامل شدن:"
+            label: "گروه های تکلیف برای شامل سازی:"
           assignments: 
             check_box: "تکلیف ها"
           major: 
             check_box: رشته
           papers: 
-            check_box: "کاغذ ها"
+            check_box: "مقاله ها"
           projects: 
             check_box: "پروژه ها"
           reports: 
             check_box: "گزارش ها"
           tests: 
-            check_box: "تست ها"
+            check_box: "آزمون ها"
     avatars: 
       all_link: 
         one: "همه %{count}"
@@ -638,7 +638,7 @@ fa-IR:
       account_reports: 
         edison: 
           outcome: 
-            text: "شناسه _ خروجی:"
+            text: "شناسه_نتیجه:"
     date_picker_parameter: 
       account_reports: 
         default: 
@@ -680,16 +680,16 @@ fa-IR:
       account_reports: 
         default: 
           last_user_access: 
-            text: "این گزارش اخرین ورودی برای کاربران فعال را نشان می دهد."
+            text: "این گزارش اخرین ورود برای کاربران فعال را نشان می دهد."
     learning_outcome_assignment_type_csv_parameters: 
       account_reports: 
         samuel_merrit_university: 
           course: 
             sis: 
-              text: " شناسه دوره ی سامانه اطلاعات دانشجویی"
-            text: "شناسه دوره"
+              text: " شناسه درس در سامانه اطلاعات دانشجو"
+            text: "شناسه درس"
           parameters: 
-            note1: "شماره درس را در طول ترم برای اجرای گزارش برای همه درس ها در دوره میتوان خالی گذاشت."
+            note1: "شماره درس را می توان برای اجرای گزارش برای همه درس های موجود در نیمسال خالی گذاشت."
     mississippi_sis_csv_parameters: 
       account_reports: 
         default: 
@@ -709,9 +709,9 @@ fa-IR:
       account_reports: 
         outcomes: 
           course: 
-            radio: "دوره ها"
+            radio: "درس ها"
           order: 
-            label: دستور
+            label: ترتیب
           outcome: 
             radio: نتایج
           user: 
@@ -730,7 +730,7 @@ fa-IR:
       account_reports: 
         default: 
           public_courses: 
-            text: "این گزارش همه درس هایی که برای یک نیمسال خاص حذف نشده اند و عمومی هستند را نشان می دهد. فایل csv حاصل شده یک ردیف در هر درس خواهد داشت و شناسه درس، شناسه درس در سامانه اطلاعات دانشجویی، نام کوتاه درس، نام درس و تاریخ های شروع و پایان درس را نشان خواهد داد."
+            text: "این گزارش همه درس هایی که برای یک نیمسال خاص حذف نشده اند و عمومی هستند را نشان می دهد. فایل csv به دست آمده یک ردیف در هر درس خواهد داشت و شناسه درس، شناسه درس در سامانه اطلاعات دانشجو، نام کوتاه درس، نام درس و تاریخ های شروع و پایان درس را نشان خواهد داد."
     quota_integer_required: "یک مقدار صحیح لازم است"
     quota_must_be_positive: "مقدار باید مثبت باشد"
     quota_not_updated: "سهمیه بهنگام سازی نشد"
@@ -749,19 +749,19 @@ fa-IR:
       account_reports: 
         newark: 
           assignment_groups: 
-            label: "گروه های تکلیف برای شامل شدن:"
+            label: "گروه های تکلیف برای شامل سازی:"
           assignments: 
             check_box: "تکلیف ها"
           major: 
-            check_box: اصلی
+            check_box: رشته
           papers: 
-            check_box: "کاغذ ها"
+            check_box: "مقاله ها"
           projects: 
             check_box: "پروژه ها"
           reports: 
-            check_box: گزارشات
+            check_box: "گزارش ها"
           tests: 
-            check_box: "تست ها"
+            check_box: "آزمون ها"
     scantron_quiz_csv_parameters: 
       account_reports: 
         edison: 
@@ -785,12 +785,12 @@ fa-IR:
       about_google_docs_tooltip: "درباره Google Docs Previews"
       account_admins_title: "مدیرهای حساب"
       account_quotas: 
-        file_quota: "پوشه ی سهمیه "
+        file_quota: "سهمیه فایل"
         gigabytes: گیگابایت
-        media_quota: "رسانه ی سهمیه "
-        site_admin_quotas: "سهمیه ی مدیر سایت "
-        student_quota: "سهمیه ی دانش آموزی "
-        update: بروزرسانی
+        media_quota: "سهمیه رسانه"
+        site_admin_quotas: "سهمیه های مدیر تارنما"
+        student_quota: "سهمیه دانشجو"
+        update: "بهنگام سازی"
       account_roles: "نقش‌های حساب:"
       account_settings_title: "تنظیمات حساب"
       add_a_custom_help_link: "افزودن یک پیوند راهنمای سفارشی"
@@ -805,8 +805,8 @@ fa-IR:
       alert_icon_warning_option: هشدار
       alert_timespan: "از %{start_at} تا %{end_at}"
       alerts_title: هشدارها
-      announcement_blank_to_all: "(اگر هیج کدام انتخاب نشده است، به همه ارسال کن)"
-      announcement_sent_to_roles: "فقط به کاربران روبرو ارسال کن"
+      announcement_blank_to_all: "(اگر هیج کدام انتخاب نشده است، به همه ارسال شود)"
+      announcement_sent_to_roles: "فقط به کاربران زیر ارسال شود:"
       announcement_sent_to_subset: "در هر ماه برای 1 / %{denominator} کاربر ارسال شد"
       buttons: 
         add_users: "خوب به نظر می رسد، این کاربران را اضافه کن"
@@ -826,13 +826,13 @@ fa-IR:
       enabled_web_serices_title: "وب سرویس های فعال شده"
       equall_endpoint_help: "این نشانی، نشانی اینترنتی سرویس Equella شماست. احتمالاً چیزی شبیه به \"%{sample_url}\" خواهد بود."
       equella_settings_title: "تنظیمات Equella"
-      feature_options: "گزینه‌های این امکان"
+      feature_options: "گزینه‌های ویژگی"
       features_title: "ویژگی ها"
       global_announcements_description: "می توانید از طریق اطلاعیه های سراسری، پیام های کوتاه و مهم را روی داشبورد همه کاربران موجود در حساب خود ارسال کنید. این پیام ها برای مدت زمان معین یا تا زمانی که کاربر برای نادیده گرفتن هشدار روی پیوند «بستن»(×) کلیک کند، روی داشبورد هر کاربر ظاهر می شوند. **از این اطلاعیه ها باید به طور محدود استفاده شود.**"
       global_announcements_title: "اطلاعیه های سراسری"
       global_js_and_css_includes_description: "این فایل ها در همه بارگذاری های صفحه که مربوط به حساب شما هستند، درج خواهند شد."
       global_js_and_css_includes_title: "جاوااسکریپت و CSS جهانی شامل"
-      google_docs_domain: "دامنه اسناد گوگل مجاز شد"
+      google_docs_domain: "دامنه مجاز Google Docs"
       headers: 
         report_last_run: "آخرین اجرا"
         report_name: نام
@@ -841,8 +841,8 @@ fa-IR:
       help_link_available_to_all_teachers: اساتید
       help_link_available_to_all_users: کاربران
       if_you_would_like_to_link_to_your_own_campus_support_website_in_the_help_dialog_you_can_do_that_here: "اگر مایلید به تارنمای پشتیبانی از پردیس خود در کادر گفتگوی راهنما پیوند دهید، در اینجا می توانید این کار را انجام دهید"
-      interpolate_account_domain: "\"{{ACCOUNT_DOMAIN}}\" را برای زیرنویس دامنه شناسه کاربری ریشه کاربر وارد کنید"
-      interpolate_user_id: "\"{{CANVAS_USER_ID}}\" را برای زیرنویس کردن شناسه منحصربفرد کانواس کاربر وارد کنید"
+      interpolate_account_domain: "\"{{ACCOUNT_DOMAIN}}\" را برای جایگزین کردن دامنه حساب ریشه کاربر وارد کنید"
+      interpolate_user_id: "\"{{CANVAS_USER_ID}}\" را برای جایگزین کردن شناسه یکتای کانواس کاربر وارد کنید"
       ip_filter_filter_label: فیلتر
       ip_filter_name_label: نام
       labels: 
@@ -881,11 +881,11 @@ fa-IR:
         outgoing_email_default_name_option_custom: "سفارشی کردن نام «فرستنده»"
         outgoing_email_default_name_option_default: "تنظیمات پیش فرض کانواس"
         prevent_course_renaming_by_teachers: "عدم اجازه دادن به اساتید برای تغییر نام درس های خود"
-        restrict_quiz_questions: "محدود کردن دانشجویان از دیدن سوالات امتحان بعد از پایان تاریخ درس"
+        restrict_quiz_questions: "محدود کردن دانشجویان از دیدن پرسش های آزمون بعد از تاریخ پایان درس"
         restrict_student_future_view: "محدود کردن دانشجویان برای مشاهده درس ها قبل از تاریخ شروع"
         self_enrollment: "اجازه دادن برای ثبت نام شخصی"
-        self_registration: عضویت
-        self_registration_type_all: "تمام انوع حساب های کاربری"
+        self_registration: "ثبت نام شخصی"
+        self_registration_type_all: "همه انواع حساب"
         self_registration_type_observer: "فقط حساب های بیننده "
         show_scheduler: "فعال سازی زمان بند"
         sis_source_id: "شناسه سامانه اطلاعات دانشجو"
@@ -915,7 +915,7 @@ fa-IR:
         select_type_label: "یافتن درس یا گروه"
         update_button: "بهنگام سازی سهمیه"
       never_allow_self_enrollment_option: هرگز
-      no_enrollment_roles: "کاربران حذف از لیست"
+      no_enrollment_roles: "کاربرانی که لغو ثبت نام کرده اند"
       no_language_preference: "تعیین نشده (زبان پیش فرض: %{language})"
       notifications: 
         custom_name_description: "در صورت انتخاب، جایگزین همه نام های تجاری ارسالی در اطلاعیه های کانواس خواهد شد."
@@ -1035,7 +1035,7 @@ fa-IR:
       clear_sis_stickiness_label: "پاک کردن وضعیت واسط کاربر تغییر یافته"
       import_failed_message: "در هنگام ورود اطلاعات سامانه اطلاعات دانشجو خطایی رخ داد. هیچ سابقه ای وارد نشد."
       import_failed_with_messages_message: "هیچ سابقه ای از سامانه اطلاعات دانشجو وارد نشد. ورود با این پیام ها انجام نشد:"
-      import_log_title: "دفتر ثبت پیشرفت ورود"
+      import_log_title: "فایل ثبت پیشرفت ورود"
       import_started_message: "روند ورود شروع شده است! اگر تعداد زیادی ورودی وجود داشته باشد، این امر می تواند مدتی طول بکشد. می توانید صفحه را ترک کنید و به عقب بازگردید."
       import_type_label: "نوع ورود "
       imported_message: "همه اطلاعات سامانه اطلاعات دانشجو با موفقیت وارد شد."
@@ -1112,24 +1112,24 @@ fa-IR:
       account_reports: 
         default: 
           students_with_no_submissions: 
-            text: "این گزارش از همه دانش آموزان ثبت نام شده در یک دوره با توجه به اینکه یک تکلیف بین محدوده تاریخ مشخص در یک دوره را ارائه نکردند. این گزارش شامل یک ردیف در ثبت نام دانش آموزان است  که با ضوابط.محدوده تاریخ می تواند از دو هفته  باشد نه بیشتر."
+            text: "این گزارش مربوط به همه دانشجویان ثبت نام شده در یک درس در یک نیمسال خاص است که یک تکلیف را در بازه زمانی تعیین شده در یک درس ارسال نکرده اند. این گزارش شامل یک ردیف برای هر ثبت نام دانشجو است که با معیارها مطابقت دارد. بازه زمانی نمی تواند بیشتر از دو هفته باشد."
     students_with_no_submissions_csv_parameters: 
       account_reports: 
         default: 
           enrollment_state: 
-            header: "موقعیت ثبت نام"
+            header: "وضعیت ثبت نام"
           include_enrollment_state: 
-            check_box: "شامل موقعیت ثبت نام"
+            check_box: "شامل سازی وضعیت ثبت نام"
       active: "ثبت نام های فعال"
       all: "همه ثبت نام ها"
     tempe_grade_export_csv_parameters: 
       account_reports: 
         tempe: 
           course: 
-            text: "شناسه دوره"
+            text: "شناسه درس"
           parameters: 
-            note1: "شماره درس را در طول ترم برای اجرای گزارش برای همه درس ها در دوره میتوان خالی گذاشت."
-            note2: "دوره ها با تمرینات غیرفعال ممکن است نمرات در این گزارش را به درستی نمایش ندهند."
+            note1: "شناسه درس را می توان برای اجرای گزارش برای همه درس های موجود در نیمسال خالی گذاشت."
+            note2: "درس های دارای تکلیف های غیرفعال ممکن است نمره های موجود در این گزارش را به طور دقیق نمایش ندهند."
     terms_parameters: 
       account_reports: 
         default: 
@@ -1153,8 +1153,8 @@ fa-IR:
         unused_courses: 
           main: 
             text: |-
-                این یک گزارش از همه ی دوره هایی است که هیچ یک از بخش های زیر را ندارند:
-                تکلیف درسی ، آگهی ، بحث ، پوشه ، اتاقک ، صفحه و یا امتحان.
+                این گزارش مربوط به همه ی درس هایی است که هیچ یک از موردهای زیر را ندارند:
+                تکلیف، اطلاعیه، بحث، فایل، ماژول، صفحه یا آزمون.
     update_failed_notice: "بهنگام سازی تنظیمات حساب انجام نشد"
     user_access_csv_parameters: 
       account_reports: 
@@ -1162,10 +1162,10 @@ fa-IR:
           enrollment_type: 
             header: "نوع ثبت نام"
       all: "همه ثبت نام ها"
-      designer: "ثبت نام طراحان"
+      designer: "ثبت نام طراح ها"
       observer: "ثبت نام های بیننده"
       students: "ثبت نام دانشجویان"
-      ta: "ثبت نام دستیار آموزشی"
+      ta: "ثبت نام دستیارهای آموزشی"
       teachers: "ثبت نام اساتید"
     user_add_failed_message: "افزودن کاربر انجام نشد، لطفا دوباره سعی کنید"
     user_added_message: "*%{user}* با موفقیت افزوده شد!"
@@ -1177,15 +1177,15 @@ fa-IR:
           login: 
             day_drop: "حداقل موردهای بازدید شده درس:"
     users_list: 
-      login_name_or_sis_id: "ورود/ SIS ID"
+      login_name_or_sis_id: "شناسه ورود / سامانه اطلاعات دانشجو"
       name: نام
       no_people_found: "شخصی یافت نشد"
-      you_can_search_by: "شما می توانید بگردید دنبال:"
+      you_can_search_by: "می توانید جستجو کنید بر اساس:"
     zero_activity_csv_description: 
       account_reports: 
         default: 
           zero_activity: 
-            text: "این گزارش همه دانش آموزان در هر دوره در یک دوره با توجه به ثبت نام را نشان می دهد. نتیجه های  فایل CSV یک ردیف برای هر کاربر دارد  که درس رااز تاریخ  بازدید نمی کنند."
+            text: "این گزارش، همه دانشجویان ثبت نام شده درهمه درس های موجود در یک نیمسال خاص را نشان می دهد. فایل CSV به دست آمده یک ردیف برای هر ثبت نام کاربر دارد  که از تاریخ مورد نظر از درس بازدید نکرده است."
   activerecord: 
     errors: 
       full_messages: 
@@ -1291,13 +1291,13 @@ fa-IR:
     file_copy_fail: "پوشه \"%{base_path}\" قابل کپی نیست"
     file_copy_fail_message: "تغییر نام دایرکتوری به مسیر \"%{path}\" امکان پذیر نیست"
     file_import_fail: "وارد کردن فایل \"%{file_path}\" امکان پذیر نیست"
-  angel_display: "اموزش  ANGEL"
+  angel_display: "یادگیری ANGEL"
   angel_file_description: "قالب .zip صدور Angel"
   announcement: 
     no_title: "عنوان موجود نیست"
   announcements: 
     announcements_crumb: "اطلاعیه ها"
-    error_draft_state: "این موضوع را نمیتوان به حالت پیش نویس تنظیم کرد چون آن یک اعلان است."
+    error_draft_state: "این موضوع را نمی توان در حالت پیش نویس قرار داد، چون یک اطلاعیه است."
     external_feed: 
       alts: 
         deleted_feed: "حذف این خوراک خبری"
@@ -1387,7 +1387,7 @@ fa-IR:
     title: "ویرایش %{name}"
     update: "بهنگام سازی"
   aria_labels: 
-    unlock_at_date: "بازمیشود در تاریخ"
+    unlock_at_date: "قفل گشایی در تاریخ"
   assessment_question: 
     default_question_name: پرسش
   assessment_question_bank: 
@@ -1409,13 +1409,13 @@ fa-IR:
       upload_as_zip: "لطفا فایل ها را در قالب .zip بارگذاری کنید"
     feed_entry_title: "تکلیف: %{assignment}"
     feed_entry_title_with_course: "تکلیف، %{course}: %{assignment}"
-    gpa_scale_explainer: "مقیاس درجه بندی معدل چیست؟"
+    gpa_scale_explainer: "نمره گذاری مقیاس معدل چیست؟"
     group_assignment_must_have_group_set: "لطفا یک مجموعه گروه را برای این تکلیف انتخاب کنید"
     labels: 
       due: مهلت
     name_is_required: "نام لازم است!"
-    percentage_points_possible: "نمره ها در صورت امکان باید بیشتز از0 باشند برای درصد نمره گذاری"
-    points_possible_number: "نمره ها باید در حد امکان یک عدد باشند."
+    percentage_points_possible: "امتیازهای ممکن باید برای نمره گذاری درصدی بیشتر از 0 باشند"
+    points_possible_number: "امتیازهای ممکن باید یک عدد باشد"
     select_external_tool_dialog_title: "پیکربندی ابزار بیرونی"
     submission_action_take_quiz: "دادن آزمون %{title}"
     submission_action_turn_in_assignment: "تحویل دادن %{title}"
@@ -1426,13 +1426,13 @@ fa-IR:
       a_quiz: "یک آزمون"
       a_text_entry_box: "یک کادر ورودی متن"
       a_website_url: "نشانی اینترنتی یک تارنما"
-      external_tool: "یک ابزار خارجی"
+      external_tool: "یک ابزار بیرونی"
       on_paper: "روی کاغذ"
     titles: 
-      gpa_scale_explainer: "مقیاس درجه بندی معدل چیست؟"
+      gpa_scale_explainer: "نمره گذاری مقیاس معدل چیست؟"
       grading_scheme_info: "مشاهده/ویرایش طرح نمره گذاری"
   assignment_details: 
-    no_graded_submissions: "هیچ ارسالی نمره گذاری نشده است"
+    no_graded_submissions: "هیچ مورد ارسالی نمره گذاری شده موجود نیست"
   assignment_details_dialog: 
     average_score: "میانگین نمره:"
     count_of_submissions: "%{cnt} مورد ارسالی"
@@ -1443,7 +1443,7 @@ fa-IR:
     no_one_scored_lower: "هیچ کس نمره پایین تر از %{min} نگرفت"
     scores_higher_than_the_average: "نمره های بالاتر از میانگین %{average}"
     scores_lower_than_the_average: "نمهر های پایین تر از میانگین %{average}"
-    total_graded_submissions: "ارسالات نمره داده شده ی کل"
+    total_graded_submissions: "کل موردهای ارسالی نمره گذاری شده:"
   assignment_group: 
     default_name: "تکلیف ها"
     default_title: "تکلیف ها"
@@ -1471,8 +1471,8 @@ fa-IR:
     unmute_button: "فعال کردن تکلیف"
     unmute_dialog: "این تکلیف در حال حاضر غیر فعال شده است. بدین معنا که دانشجویان نمی توانند نمره ها و بازخورد خود را ببینند. آیا مایلید الان فعال شود؟"
     unmuting_assignment: "در حال فعال کردن تکلیف..."
-  assignment_scheduling_title: "برنامه ی نکالیف"
-  assignment_score_summary_title: "خلاصه ی نمرات تکلیف"
+  assignment_scheduling_title: "زمان بندی تکلیف"
+  assignment_score_summary_title: "خلاصه نمره تکلیف"
   assignments: 
     add_assignment_form: 
       assignment_name: "نام تکلیف"
@@ -1522,15 +1522,15 @@ fa-IR:
       links: 
         add_assignment_group: "افزودن گروه تکلیف"
     assignment_group_list: 
-      no_assignment_groups: "هیچ گروه تکلیف"
+      no_assignment_groups: "هیچ گروه تکلیف یافت نشد"
     assignment_group_list_item: 
-      assignment_group_delete: "حذف گروه تمرین"
-      assignment_group_edit: "تغییر گروه تمرین"
-      assignment_group_move: "جا به جایی گروه تمرین"
+      assignment_group_delete: "حذف گروه تکلیف"
+      assignment_group_edit: "ویرایش گروه تکلیف"
+      assignment_group_move: "انتقال گروه تکلیف"
       delete: حذف
       edit: ویرایش
-      group_weight: "%{groupWeight}% of total"
-      manage: میدیریت
+      group_weight: "%{groupWeight}% از کل"
+      manage: مدیریت
       move: "انتقال به ..."
     assignment_group_selector: 
       assignment_group: "گروه تکلیف"
@@ -1540,23 +1540,25 @@ fa-IR:
       one: "%{count} گروه"
       other: "%{count} گروه"
     assignment_list_item: 
-      assignment_delete: "حذف تمرین"
-      assignment_edit: "ویرایش تمرین"
-      assignment_move: "جا به جایی تمرین"
+      assignment_delete: "حذف تکلیف"
+      assignment_edit: "ویرایش تکلیف"
+      assignment_move: "انتقال تکلیف"
       delete: حذف
-      edit: "ویرایش کردن"
+      edit: ویرایش
       module: ماژول
       move: "انتقال به ..."
-      multiple_modules: "چندین ماژول"
-      no_points_possible: "بدون نمره"
+      multiple_modules: "چند ماژول"
+      no_points_possible: "امتیاز ممکن موجود نیست"
+      points_possible: "%{pointsPossible} امتیاز"
       points_possible_screen_reader: "%{pointsPossible} امتیاز ممکن"
       settings: تنظیمات
     assignment_list_item_score: 
-      assignment_grading_type_is_not_graded: "به این تکلیف نمره ای تعلق نخواهد گرفت"
+      assignment_grading_type_is_not_graded: "به این تکلیف نمره ای تعلق نخواهد گرفت."
       assignment_not_yet_graded_screenreader: "تکلیف هنوز نمره گذاری نشده است. %{pointsPossible} امتیاز ممکن."
-      empty_points_possible: "-/%{pointsPossible} نمره"
-      no_submission: "بدون اطاعت"
-      no_submission_for_assignment_screenreader: "هیچ ارسالی برای این تکلیف موجود نیست. %{pointsPossible} امتیاز ممکن."
+      empty_points_possible: "-/%{pointsPossible} امتیاز"
+      no_submission: "مورد ارسالی موجود نیست"
+      no_submission_for_assignment_screenreader: "هیچ مورد ارسالی برای این تکلیف موجود نیست. %{pointsPossible} امتیاز ممکن."
+      not_yet_graded: "*هنوز نمره گذاری نشده است*"
       score_with_points_possible: "*%{score}*/%{pointsPossible} امتیاز"
       score_with_points_possible_screenreader: "نمره: %{score} از %{pointsPossible} امتیاز."
     assignment_locked: 
@@ -1564,10 +1566,10 @@ fa-IR:
       assignment_unlocked_from: "این تکلیف تا تاریخ *%{unlock_at}* قفل شده است"
       assignment_unlocked_from_to: "این تکلیف فقط از تاریخ *%{unlock_at}* تا *%{lock_at}* قفل گشایی شده است"
     assignment_settings: 
-      cancel: انصراف
-      save: ذخیره
-      validating: "درحال ذخیره..."
-      weight_groups: "وزن دهی نمره نهایی برمبنای گروه های تکلیف"
+      cancel: لغو
+      save: "ذخیره سازی"
+      validating: "در حال ذخیره سازی..."
+      weight_groups: "وزن دار کردن نمره نهایی بر مبنای گروه های تکلیف"
     assignment_sidebar: 
       links: 
         submit: "ارسال تکلیف"
@@ -1588,9 +1590,9 @@ fa-IR:
         delete_assignment_group: "در گروه تکلیف %{group} ،%{assignment_count} موجود است. می توانید این تکلیف ها را حذف کنید یا آنها را به گروه تکلیف دیگری انتقال دهید."
     assignments_list_content: 
       assignments: 
-        graded: "این تمرین نمره داده شده است"
-        needs_grading_count: "%{needs_grading_count} ارسال این تکالیف نیاز به نمره گذاری دارند"
-        overdue: "مهلت این تمرین سرآمده است"
+        graded: "این تکلیف نمره گذاری شده است"
+        needs_grading_count: "%{needs_grading_count} مورد ارسالی این تکلیف نیاز به نمره گذاری دارد"
+        overdue: "مهلت این تکلیف گذشته است"
       no_assignments: "هیچ تکلیفی برای این درس ایجاد نشده است."
       titles: 
         assignments: "تکلیف ها"
@@ -1615,76 +1617,76 @@ fa-IR:
       links: 
         add_assignment_group: "افزودن گروه تکلیف"
     available_date_description: 
-      available_until: "قابل دسترس تا"
-      closed: بسته
-      not_available_until: "غیر قابل دسترس تا"
+      available_until: "قابل دسترسی تا"
+      closed: "بسته شده"
+      not_available_until: "غیر قابل دسترسی تا"
     buttons: 
       add_group: "افزودن گروه"
       delete_group: "حذف گروه"
       submit_assignment: "ارسال تکلیف"
-    cannot_delete_group: "شما باید لااقل یک گروه تمرین داشته باشید"
-    cant_unpublish_when_students_submit: "اگر ارسالات دانشجویی هستند نمی توان لغو انتشار کرد"
+    cannot_delete_group: "باید حداقل یک گروه تکلیف داشته باشید"
+    cant_unpublish_when_students_submit: "اگر موردهای ارسالی دانشجو وجود داشته باشد، انتشار را نمی توان لغو کرد"
     complete: "تکمیل است"
     confirm: 
       delete_assignment: "مطمئنید که می خواهید این تکلیف حذف شود؟"
       delete_group: "مطمئنید که می خواهید این گروه حذف شود؟"
-    confirm_delete_group: "آیا مطمئن هستید که می خواهید این تکلیف را حذف کنید؟"
+    confirm_delete_group: "مطمئنید که می خواهید این تکلیف حذف شود؟"
     confirms: 
-      delete_assignment: "آیا مطمئن هستید که می خواهید این تکلیف را حذف کنید؟"
+      delete_assignment: "مطمئنید که می خواهید این تکلیف حذف شود؟"
     create_assignment: 
       assignment: تکلیف
       assignment_due_at: "مهلت:"
       assignment_name: "نام:"
-      assignment_points: "امتیاز:"
+      assignment_points: "امتیازها:"
       assignment_type: "نوع:"
-      cancel: انصراف
+      cancel: لغو
       discussion_type: بحث
-      external_tool_type: "ابزار خارجی"
-      more: "دیگر گزینه ها"
+      external_tool_type: "ابزار بیرونی"
+      more: "گزینه های دیگر"
       multiple_due_dates: "چند تاریخ مهلت"
-      not_graded_type: "Not graded"
+      not_graded_type: "نمره گذاری نشده"
       quiz_type: آزمون
-      save: ذخیره
-      saving: "درحال ذخیره..."
+      save: "ذخیره سازی"
+      saving: "در حال ذخیره سازی..."
     create_group: 
-      cancel: انصراف
-      drop_highest: "بالاترین نمره:"
-      drop_lowest: "پائین ترین نمره:"
-      example_group_name: "برای مثال: گروه1"
+      cancel: لغو
+      drop_highest: "بالاترین نمره ها:"
+      drop_lowest: "پایین ترین نمره ها:"
+      example_group_name: "برای مثال: گروه مقاله 1"
       group_name: "نام گروه:"
-      never_drop: "هرگز حذف نکن:"
-      percent_of_total: "% از نمره کامل"
-      save: ذخیره
-      saving: "درحال ذخیره..."
+      never_drop: "هرگز حذف نشود:"
+      percent_of_total: "% از نمره کل"
+      save: "ذخیره سازی"
+      saving: "در حال ذخیره سازی..."
     create_new_crumb: "ایجاد مورد جدید"
     date_available_column_view: 
       available: "قابل دسترسی"
-      multiple_dates: "تاریخ های متعدد"
+      multiple_dates: "چند تاریخ"
     date_due_column_view: 
       due: مهلت
       due_date: مهلت
-      multiple_dates: "تاریخ های متعدد"
+      multiple_dates: "چند تاریخ"
     delete_group: 
-      cancel: انصراف
+      cancel: لغو
       delete: "حذف گروه"
-      deleting: "درحال حذف..."
+      deleting: "در حال حذف..."
       labels: 
-        delete_assignments_in_group: "تمریناتش را حذف کن"
-        move_assignments_to: "تمریناتش را منتقل کن به"
+        delete_assignments_in_group: "حذف تکلیف های آن"
+        move_assignments_to: "انتقال تکلیف های آن به"
       options: 
         select_group: "انتخاب یک گروه"
       tooltips: 
-        target_group: "یک گروه انتخاب کن برای انتقال این تکلیف به"
+        target_group: "انتخاب یک گروه برای انتقال این تکلیف به"
       warnings: 
-        delete_assignment_group: "شما در حال پاک کردن  *%{name}* هستید, که شامل **%{assignment_count}** تکالیف در ان است. "
-      would_you_like: "تمایل دارید:"
+        delete_assignment_group: "شما در حال حذف *%{name}* هستید, که شامل **%{assignment_count}** تکلیف است"
+      would_you_like: "تمایل دارید که:"
     drop_highest_rule: 
       one: "افت بالاترین %{count} نمره ها "
-      other: "افت بالاترین %{count} نمره ها "
+      other: "حذف %{count} نمره بالاتر"
     drop_highest_scores: "حذف بالاترین %{number} نمره"
     drop_lowest_rule: 
       one: "افت پایین ترین %{count} نمره ها "
-      other: "افت پایین ترین %{count} نمره ها "
+      other: "حذف %{count} نمره پایین تر"
     drop_lowest_scores: "حذف پایین ترین %{number} نمره"
     due_date_override: 
       overrides: 
@@ -1701,7 +1703,7 @@ fa-IR:
       buttons: 
         not_published: "منتشر نشده"
         published: "منتشر شده"
-      manage_assignment: "مدیریت تکالیف"
+      manage_assignment: "مدیریت تکلیف"
       titles: 
         delete: حذف
     edit_view: 
@@ -1711,8 +1713,9 @@ fa-IR:
       description: شرح
       freeze_properties: "قفل کردن مشخصات تکلیف پس از کپی شدن"
       notify_content_change: "به کاربران اطلاع داده شود که این محتوا تغییر یافته است"
+      only_visible_to_overrides_note: "نکته: این تکلیف *فقط* برای بخش های تعیین شده در زیر قابل مشاهده است:"
       points_possible: امتیازها
-      post_to_sis: "ارسال به سامانه اطلاعات دانشجویی"
+      post_to_sis: "ارسال به سامانه اطلاعات دانشجو"
       warnings: 
         assignment_is_frozen: "برخی از تنظیمات از لحاظ مدیریتی قفل شده اند."
     errors: 
@@ -1720,7 +1723,7 @@ fa-IR:
       delete_reminder_failed: "حذف انجام نشد"
       google_docs_masquerade_rejected: "قادر به اتصال به Google Docs به عنوان یک کاربر که با تغییر عنوان وارد شده است، نیست."
       reminder_failed: "یادآوری انجام نشد"
-    everyone_else: "هرکس دیگری"
+    everyone_else: "هر شخص دیگر"
     external_content_homework_submission_view: 
       additional_comments: "نظرهای دیگر"
       buttons: 
@@ -1751,20 +1754,20 @@ fa-IR:
       speed_grader: "برنامه نمره گذاری سریع™"
       titles: 
         related_items: "موردهای مرتبط"
-    grade_gpa_scale_screenreader: "نمره:{grade}%"
-    grade_letter_grade_screenreader: "نمره:{grade}%"
-    grade_pass_fail_screenreader: "تمره:{grade}%"
+    grade_gpa_scale_screenreader: "نمره: {grade}%"
+    grade_letter_grade_screenreader: "نمره: {grade}%"
+    grade_pass_fail_screenreader: "نمره: {grade}%"
     grade_percent: "%{grade}%"
-    grade_percent_screenreader: "نمره:%{grade}%"
+    grade_percent_screenreader: "نمره: %{grade}%"
     grading_type_selector: 
       display_grade_as: "نمایش نمره به عنوان"
-      gpa_scale_explainer: "مقیاس درجه بندی معدل برای دانشگاه هایی که از مقیاس 4.0 ( یا 5.0 / 6.0 ) برای همه ی تکالیف استفاده میکنند طراحی شده است. این طرح نمره دهی مشابه نمایش حرفی نمره است ولی چندین تفاوت اصلی را شامل میشود:"
-      gpa_scale_input_explainer: "نمرات روی مقیاس 4.0 وارد شده اند. به عنوان مثال اگر تکلیفی از 100 امتیاز اساس، ورودی 4 100% را نتیجه میدهد، 3.0 87% را نتیجه میدهد و غیره"
-      gpa_scale_letters_explainer: "نمرات حرفی نیز علاوه بر نمرات عددی میتوانند مورد استفاده قرار گیرند."
-      gpa_scale_percentage_explainer: "شما نمیتوانید امتیازات را مستقیما وارد کنید، ولی میتوانید درصد ها را وارد کنید. به عنوان مثال اگر تکلیفی از 50 امتیاز است، ورودی 40 درست نیست بلکه ورودی 80% درست خواهد بود."
-      gpa_scale_recommendation: "Convas  نمایش نمرات به صورت نمره حرفی را پیشنهاد میکند، مگر اینکه دانشگاه شما از مقیاس 4.0 یا (5.0/6.0) برای نمره دهی استفاده میکند."
-      gpa_scale_scores_explainer: "تنها نمرات مجاز در طرح درجه بندی از پیش تعریف شده اند."
-      gpa_scale_title: "\"مقیاس درجه بندی معدل چیست؟\""
+      gpa_scale_explainer: "نمره گذاری مقیاس معدل برای دانشگاه هایی که از مقیاس 4.0 ( یا 5.0/6.0 ) برای همه تکلیف ها استفاده می کنند، طراحی شده است. این طرح نمره گذاری مشابه نمایش نمره حرفی است ولی دارای چند تفاوت مهم است:"
+      gpa_scale_input_explainer: "نمره ها در مقیاس 4.0 وارد می شوند. به عنوان مثال، اگر یک تکلیف از 100 امتیاز باشد، وارد کردن 4.0 به 100% و وارد کردن 3.0 به 87% منجر می شود و غیره."
+      gpa_scale_letters_explainer: "علاوه بر نمره های عددی، می توان از نمره های حرفی نیز استفاده کرد."
+      gpa_scale_percentage_explainer: "نمی توانید امتیازها را مستقیما وارد کنید، ولی می توانید درصد ها را وارد کنید. به عنوان مثال، اگر یک تکلیف از 50 امتیاز باشد، وارد کردن 40 جواب نمی دهد، اما وارد کردن 80% جواب خواهد داد."
+      gpa_scale_recommendation: "اگر دانشگاه شما از مقیاس 4.0 یا (5.0/6.0) برای نمره گذاری استفاده نمی کند، کانواس نمایش نمره ها به صورت نمره حرفی را توصیه می کند."
+      gpa_scale_scores_explainer: "تنها نمره های مجاز در طرح نمره گذاری از پیش تعریف شده اند."
+      gpa_scale_title: "«نمره گذاری مقیاس معدل چیست؟»"
       grading_type_options: 
         gpa_scale: "مقایس معدل"
         letter_grade: "نمره با حروف الفبا"
@@ -1776,7 +1779,7 @@ fa-IR:
     group_category_selector: 
       grade_group_students_individually: "تخصیص نمره به هر دانشجو به طور جداگانه"
       group_assignment_header: "تکلیف گروهی"
-      group_category_locked_explanation: "دانشجویان قبلا برای این تمرین، تکلیف ثبت کرده اند، بنابراین تنظیمات گروه نمیتواند تغییر کند."
+      group_category_locked_explanation: "دانشجویان قبلا برای این تکلیف، کار خود را ارسال کرده اند، بنابراین تنظیمات گروه را نمی توان تغییر داد."
       group_category_options: "رده جدید گروه"
       group_set: "مجموعه گروه"
       is_group_assignment: "یک گروه تکلیف است"
@@ -1792,14 +1795,14 @@ fa-IR:
         assignment_group: "گروه تکلیف"
         group_weight: وزن
         total: کل
-    higher_than_max: "شما نمی توانید از عددی استفاده کنید که از عدد تمرین بیشتر است"
-    incomplete: "تکمیل نیست!"
+    higher_than_max: "نمی توانید از عددی استفاده کنید که از عدد تکلیف ها بیشتر باشد"
+    incomplete: ناقص
     index: 
       assignment_locked: "این تکلیف در حال حاضر قفل است. برای کسب اطلاعات بیشتر، از صفحه اطلاعات تکلیف بازدید کنید."
       assignment_locked_tooltip: "قفل شد"
       keycode_descriptions: 
         add_assignment_or_group: "افزودن تکلیف ها به گروه جاری"
-        close_active_dialog: "بستن پنجره ی فعال"
+        close_active_dialog: "بستن کادر گفتگوی فعال"
         delete_assignment_or_group: "حذف تکلیف/گروه جاری"
         edit_assignment_or_group: "ویرایش تکلیف/گروه جاری"
         full_preview: "پیش نمایش کامل/ویرایش تکلیف"
@@ -1819,21 +1822,21 @@ fa-IR:
     index_view: 
       add_assignment: تکلیف
       add_group: گروه
-      assignments: تکلیف
-      assignments_settings: "تنظیمات تکلیف"
-      assignments_settings_screenreader: "تنظیمات تکلیف"
-      search_for_assignment: "جستجو برای تکلیف"
-      title_add_assignment: "اضافه کردن تکلیف"
+      assignments: "تکلیف ها"
+      assignments_settings: "تنظیمات تکلیف ها"
+      assignments_settings_screenreader: "تنظیمات تکلیف ها"
+      search_for_assignment: "جستجوی تکلیف"
+      title_add_assignment: "افزودن تکلیف"
       title_add_group: "افزودن گروه تکلیف"
     invalid_file_retrieval: "در هنگام بازیابی فایل ارسال شده از این ابزار، اشکالی رخ داد."
     invalid_tool_return: "ابزار راه اندازی شده یک منبع غیر معتبر را برای این تکلیف برگرداند"
-    keyboard_add_item: "اضافه کردن تکلیف به گروه انتخاب شده"
-    keyboard_close_menu: "بستن پنجره ی فعال"
+    keyboard_add_item: "افزودن تکلیف به گروه انتخاب شده"
+    keyboard_close_menu: "بستن کادر گفتگوی فعال"
     keyboard_del_item: "حذف تکلیف یا گروه فعلی"
     keyboard_edit_item: "ویرایش تکلیف یا گروه فعلی"
     keyboard_next_item: "تمرکز بر تکلیف یا گروه بعدی"
     keyboard_prev_item: "تمرکز بر تکلیف یا گروه قبلی"
-    keyboard_show_assign: "نشان دادن پیش نمایش کامل از تکلیف انتخاب شده"
+    keyboard_show_assign: "نشان دادن پیش نمایش کامل تکلیف انتخاب شده"
     keycodes: 
       add_item: a
       close_menu: esc
@@ -1843,8 +1846,8 @@ fa-IR:
       previous: k
       show_assign: f
     labels: 
-      assignment_group_move_label: "گروه تمرین"
-      label_place_before: "جایگذاری کن قبل از"
+      assignment_group_move_label: "گروه تکلیف"
+      label_place_before: "قرار دادن قبل از"
     messages: 
       adding_group: "در حال افزودن گروه..."
       agree_to_pledge: "قبل از اینکه بتوانید این تکلیف را ارسال کنید، باید تعهد نامه ارسال را بپذیرید."
@@ -1855,24 +1858,24 @@ fa-IR:
       submit_failed: "ارسال انجام نشد، لطفا دوباره سعی کنید"
       submitting: "در حال ارسال..."
     multiple_due_dates: "چند تاریخ مهلت"
-    name_is_required: "نام الزامی است!"
-    name_too_long: "نام بیش از حد طولانی است. "
-    name_too_long_error: "نام بیش از حد طولانی است. "
+    name_is_required: "نام لازم است!"
+    name_too_long: "نام طولانی است"
+    name_too_long_error: "نام طولانی است"
     never_drop_collection: 
       add_another_assignment: "افزودن یک تکلیف دیگر"
       add_first_assignment: "افزودن یک تکلیف"
-    never_drop_rule: "هیچ وقت افت نکن %{assignment_name} "
+    never_drop_rule: "%{assignment_name} هرگز حذف نشود"
     never_drop_scores: "%{assignment_name} هرگز حذف نشود"
     no_assignments: "[تکلیف موجود نیست]"
     no_assignments_list_item: 
-      no_assignments_in_this_group: "تمرینی برای این گروه وجود ندارد"
+      no_assignments_in_this_group: "تکلیفی در این گروه موجود نیست"
     no_assignments_search: 
       aria_assignments: "تکلیف ها"
       assignments: "تکلیف ها"
-      no_assignments_found: "تمرینی پیدا نشد"
-    no_name_error: "یک نام لازم است"
+      no_assignments_found: "تکلیفی یافت نشد"
+    no_name_error: "نام لازم است"
     no_tools_found: "ابزاری یافت نشد"
-    non_number: "شما باید از یک عدد استفاده کنید"
+    non_number: "باید از یک عدد استفاده کنید"
     notices: 
       assignment_delete: "این تکلیف حذف شده است"
       created: "تکلیف با موفقیت ایجاد شد."
@@ -1912,25 +1915,25 @@ fa-IR:
       titles: 
         automatically_assign_reviews: "تخصیص خودکار بازبینی ها"
         remind: "یادآوری به %{assessor} درباره ارزشیابی، آخرین اطلاع در %{time}"
-        reminder: "یادآوری به %{assessor} درباره ارزشیابی، آخرین اطلاع در %{time}"
+        reminder: "یادآوری به %{assessor} درباره ارزیابی، آخرین اطلاع در %{time}"
     peer_reviews_selector: 
-      how_to_peer_review: "چگونگی اختصاص دادن بررسی های دقیق"
+      how_to_peer_review: "شیوه تخصیص بازبینی های گروهی"
       labels: 
         automatically_assign_peer_reviews: "تخصیص بازبینی های گروهی به طور خودکار"
         manually_assign_peer_reviews: "تخصیص بازبینی های گروهی به طور دستی"
         require_peer_reviews: "نیازمند بازبینی های گروهی"
       locked_until: "تخصیص بازبینی ها"
       peer_reviews_assign_at_explanation: "باید بعد از تاریخ مهلت بیاید. ادر صورت خالی بودن، از تاریخ مهلت استفاده می کند."
-      peer_reviews_header: "بررسی های دقیق"
+      peer_reviews_header: "بازبینی های گروهی"
       reviews_per_user: "بازبینی ها در ازای هر کاربر"
-    points_possible_number: "نمره ها باید در حد امکان یک عدد باشند."
-    positive_number: "شما باید از یک عدد مثبت استفاده کنید"
+    points_possible_number: "امتیازهای ممکن باید یک عدد باشد"
+    positive_number: "باید از یک عدد مثبت استفاده کنید"
     redirect_page: 
       redirect_message: |-
           این مورد ارسالی یک نشانی اینترنتی بود، اکنون شما را به پیوند نشانی اینترنتی می بریم.
           [برای رفتن به مورد ارسالی، اینجا کلیک کنید](%{url})
-    remove_never_drop_rule: "هیچوقت قانونی را حذف نکن"
-    remove_unsaved_never_drop_rule: "هیچوقت قاون ذخیره نشده را حذف نکن"
+    remove_never_drop_rule: "حذف قاعده هرگز حذف نشود"
+    remove_unsaved_never_drop_rule: "حذف قانون ذخیره نشده هرگز حذف نشود"
     rules_text: 
       one: "%{count} قانون ها"
       other: "%{count} قاعده"
@@ -2014,7 +2017,7 @@ fa-IR:
         allow_url: "نشانی اینترنتی تارنما"
         allowed_extensions: "پسوندهای مجاز فایل"
         restrict_file_extensions: "محدود کردن بارگذاری انواع فایل"
-      online_entry_options: "گزینه های ورود آنلاین"
+      online_entry_options: "گزینه های ورودی آنلاین"
       submission_type: "نوع ارسال"
       submission_types: 
         external_tool: "ابزار بیرونی"
@@ -2029,14 +2032,14 @@ fa-IR:
       comments_placeholder: نظرها...
       errors: 
         unacceptable_file_type: "این نوع فایل مجاز نیست. انواع مورد قبول فایل عبارتست از: %{allowed_extensions_list}"
-      gmail_restriction_description: "حساب کاربری شما ارسال های Google Doc را به حساب های کاربری گوگل روی دامنه %{domain} محدود کرده است. برای ارسال این تکلیف با یک Google Doc، شما نیاز به پیکره بندی یکپارچه سازی Google Docs با صفحه تنظیمات کاربریتان دارید."
+      gmail_restriction_description: "حساب شما موردهای ارسالی Google Doc را به حساب های گوگل در دامنه %{domain} محدود کرده است. برای ارسال این تکلیف با استفاده از یک Google Doc، باید یکپارچه سازی Google Docs را در صفحه تنظیمات کاربر خود دوباره پیکربندی کنید."
       instructions: 
         from_external_tool: "یک ابزار را برای بارگذاری از فهرست زیر انتخاب کنید و یک منبع فراهم شده توسط این ابزار را ارسال نمایید."
         google_docs: "فایل را از فهرست زیر انتخاب نمایید."
         media_recording: "برای ثبت ارسال خود از پیوند زیر استفاده کنید. وقتی کار تمام شد و آماده ارسال شدید، روی «ذخیره سازی» کلیک کنید."
         online_text_entry: "مورد ارسالی خود را در اینجا کپی کرده و بچسبانید یا تایپ کنید."
         online_url: "پیوند تارنمایی که مایلید برای این تکلیف ارسال شود را کپی کرده و بچسبانید."
-      invalid_google_docs_domain: "دامنه نامعتبر"
+      invalid_google_docs_domain: "دامنه معتبر نیست"
       labels: 
         uploaded_data: فایل
         url: "نشانی اینترنتی تارنما"
@@ -2097,7 +2100,7 @@ fa-IR:
     toggle_message: "تغییر قابلیت مشاهده تکلیف"
     toggle_show_by: 
       date: تاریخ
-      show_by: "نمایش با:"
+      show_by: "نمایش بر اساس:"
       type: نوع
     turnitin_settings_dialog: 
       assignments: 
@@ -2192,7 +2195,7 @@ fa-IR:
   auth_logging: 
     login: ورود
     logout: خروج
-  bb_display: "اموزش تخته سیاه"
+  bb_display: "یادگیری Blackboard"
   bb_file_description: "فایل .zip صدور 6/7/8/9 Blackboard"
   bb_name: "مبدل Blackboard"
   better_file_browsing_description: |-
@@ -2200,7 +2203,7 @@ fa-IR:
       سپس تمام کاربران در آن درس واسط کاربری جدید را خواهند دید. برای دریافت آن جهت نمایش، زمانی که یک فرد
       به صفحه فایل های شخصی برای کاربر ('/files') می رود سپس شما نیاز خواهید داشت آنرا برای حساب کاربری که آنها در آن عضو هستند فعال کنید.
   big_blue_button_conference: 
-    conference_is_recorded: "این کنفرانس در حال ضبط است"
+    conference_is_recorded: "این کنفرانس در حال ضبط است."
     recording_setting: "در حال ضبط"
     recording_setting_description: "ضبظ این کنفرانس"
   blackboard: 
@@ -2280,14 +2283,14 @@ fa-IR:
     delete: حذف
     done: "انجام شد"
     filter: فیلتر
-    find_user: "کاربر را پیدا کن"
+    find_user: "یافتن کاربر"
     ignore_all: "صرفنظر از همه"
     import: "وارد کردن"
     login: ورود
     manage_rubrics: "مدیریت دستورالعمل های ارزیابی"
     masquerade: "تغییر عنوان کاربر"
     ok: تأیید
-    okay: بسیارخوب
+    okay: تأیید
     publish: انتشار
     published: "منتشر شده"
     refresh: "تازه سازی"
@@ -2394,15 +2397,15 @@ fa-IR:
     agenda_view: 
       due: مهلت
       loading: "در حال بارگذاری"
-      no_events: "اتفاق دیگری بعد از این تاریخ نیفتاده است."
+      no_events: "بعد از این تاریخ رویدادی وجود ندارد."
       starts_at: "شروع می شود از"
     agenda_view_displaying_start_end: "اکنون نمایش {start}% از طریق {end}%"
     appointment_group_deletion_details: "با حذف کردن آن، هر گونه قرار ملاقات که دانشجویان در آن ثبت نام کرده اند، حذف خواهد شد."
     appointment_group_list: 
       delete: حذف
-      edit: "ویرایش تکلیف"
+      edit: ویرایش
       location: "مکان:"
-      manage: میدیریت
+      manage: مدیریت
       message_groups: "ارسال پیام برای گروه هایی که..."
       message_students: "ارسال پیام برای دانشجویانی که..."
       scheduler_explanation_student_header: "هیچ گونه گروه قرار ملاقات برای ملحق شدن به آن وجود ندارد"
@@ -2743,7 +2746,7 @@ fa-IR:
       feed_title: "تک خوراک خبری تقویم درس"
       links: 
         feed: "برای مشاهده خوراک خبری اینجا را کلیک کنید"
-      skip_to_calendar: "پرش به تقویم"
+      skip_to_calendar: "رفتن به تقویم"
       toggle_calendars: "تغییر تقویم"
       toggle_undated_items: "تغییر دادنن قلم های بدون تاریخ"
       undated_items: "بخش های بدون تاریخ"
@@ -2790,7 +2793,7 @@ fa-IR:
   canvas_cartridge_display: " کارتریج رایج کانواس"
   canvas_cartridge_file_description: "بسته صدور درس کانواس"
   canvas_cartridge_name: "وارد کننده کارتریج کانواس"
-  canvas_revision_unknown: ناشناخته
+  canvas_revision_unknown: ناشناس
   cc: 
     by: "ارجاع کریتیو کامنز"
     by_nc: "ارجاع کریتیو کامنز، غیر تجاری"
@@ -14095,7 +14098,7 @@ fa-IR:
           تغییر عنوان در اصل به معنای ورود به عنوان یک کاربر دیگر بدون رمز عبور است.
           می توانید هر اقدامی را انجام دهید، طوری که انگار در جای این کاربر هستید، و از نظر
           کاربران دیگر،
-          طوری است که انگار این کاربر این اقدام ها را انجام داده است. اما دفترهای ثبت حسابرسی این حقیقت را ثبت
+          طوری است که انگار این کاربر این اقدام ها را انجام داده است. اما فایل های ثبت حسابرسی این حقیقت را ثبت
           می کنند که
           **شما** این اقدامات را از طرف این کاربر انجام داده اید.
       masquerade_as: "ورود به عنوان %{user_name}"
