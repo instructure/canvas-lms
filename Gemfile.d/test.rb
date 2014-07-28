@@ -4,6 +4,7 @@ group :test do
   gem 'simplecov-rcov', '0.2.3', :require => false
   gem 'bluecloth', '2.0.10' # for generating api docs
     gem 'redcarpet', '3.0.0'
+  gem 'bullet_instructure', '4.0.3', :require => 'bullet'
   if RUBY_VERSION >= '2.1'
     gem 'mocha', github: 'eac/mocha', :branch => 'eac/alias_method_fix', :ref => 'bb8813fbb4cc589d7c58073d93983722d61b6919', :require => false
       gem 'metaclass', '0.0.2'
@@ -37,6 +38,4 @@ group :test do
   gem 'yard', '0.8.0'
   gem 'yard-appendix', '>=0.1.8'
   gem 'timecop', '0.6.3'
-  gem 'bullet', '4.5.0', :require => false
-    gem 'uniform_notifier', '1.4.0'
 end
