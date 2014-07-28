@@ -5,6 +5,8 @@ define [
 
   NewGroupController = Ember.ObjectController.extend
 
+    content: []
+
     needs: [ 'student_groups', 'users' ]
 
     joinLevel: 'parent_context_auto_join'
