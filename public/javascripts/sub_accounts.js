@@ -126,7 +126,7 @@ jQuery(function($){
       $header.find(".collapse_sub_accounts_link, .add_sub_account_link").show();
     } else {
       $header.loadingImage({image_size: 'small'});
-      $.ajaxJSON($(this).attr('href'), 'GET', {}, function(data) {
+      $.ajaxJSON($(this).data('link'), 'GET', {}, function(data) {
         $header.loadingImage('remove').find(".expand_sub_accounts_link").hide();
         $header.find(".collapse_sub_accounts_link, .add_sub_account_link").show();
         $header.parent(".account").children("ul").empty().hide();
