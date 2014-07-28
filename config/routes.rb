@@ -664,6 +664,7 @@ CanvasRails::Application.routes.draw do
   end
 
   scope '/profile' do
+    match 'toggle_disable_inbox' => 'profile#toggle_disable_inbox', :as => :toggle_disable_inbox, :via => :post
     match 'profile_pictures' => 'profile#profile_pics', :as => :profile_pics
     match 'user_services/:id' => 'users#delete_user_service', :as => :profile_user_service, :via => :delete
     match 'user_services' => 'users#create_user_service', :as => :profile_create_user_service, :via => :post

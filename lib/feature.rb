@@ -264,6 +264,16 @@ END
       state: 'hidden',
       root_opt_in: true
     },
+    'allow_opt_out_of_inbox' =>
+    {
+      display_name: -> { I18n.t('features.allow_opt_out_of_inbox', "Allow users to opt out of the inbox") },
+      description:  -> { I18n.t('allow_opt_out_of_inbox', <<-END) },
+Allow users to opt out of the Conversation's Inbox. This will cause all conversation messages and notifications to be sent as ASAP notifications to the user's primary email, hide the Conversation's Inbox unread messages badge on the Inbox, and hide the Conversation's notification preferences.
+END
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      root_opt_in: true
+    }
   )
 
   def self.definitions

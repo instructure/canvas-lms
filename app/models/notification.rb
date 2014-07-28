@@ -531,6 +531,8 @@ EOS
     case category
     when 'All Submissions', 'Late Grading'
       user.teacher_enrollments.count > 0 || user.ta_enrollments.count > 0
+    when 'Added To Conversation', 'Conversation Message'
+      !user.disabled_inbox?
     else
       true
     end

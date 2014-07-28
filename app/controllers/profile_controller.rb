@@ -140,7 +140,7 @@
 #
 class ProfileController < ApplicationController
   before_filter :require_registered_user, :except => [:show, :settings, :communication, :communication_update]
-  before_filter :require_user, :only => [:settings, :communication, :communication_update, :observees]
+  before_filter :require_user, :only => [:settings, :communication, :communication_update, :observees, :toggle_inbox_disable]
   before_filter :require_user_for_private_profile, :only => :show
   before_filter :reject_student_view_student
   before_filter :require_password_session, :only => [:settings, :communication, :communication_update, :update]
@@ -299,6 +299,24 @@ class ProfileController < ApplicationController
     if authorized_action(@user, @current_user, :update_avatar)
       render :json => avatars_json_for_user(@user)
     end
+  end
+
+  def toggle_disable_inbox
+    disable_inbox = value_to_boolean(params[:user][:disable_inbox])
+    @current_user.preferences[:disable_inbox] = disable_inbox
+    @current_user.save!
+
+    email_channel_id = @current_user.email_channel.try(:id)
+    if disable_inbox && !email_channel_id.nil?
+      params = {:channel_id=>email_channel_id,:frequency=>"immediately"}
+
+      ["added_to_conversation", "conversation_message"].each do |category|
+        params[:category] = category
+        NotificationPolicy.setup_for(@current_user, params)
+      end
+    end
+
+    render :json => {}
   end
 
   def update
