@@ -201,14 +201,18 @@ class AssignmentGroup < ActiveRecord::Base
     false
   end
 
-  def visible_assignments(user)
-    return self.active_assignments if context.grants_right?(user, :manage_grades)
-    potential_assignments = self.send(AssignmentGroup.assignment_scope_for_draft_state(context))
-    if context.feature_enabled?(:differentiated_assignments)
-      potential_assignments.visible_to_student_in_course_with_da(user.id, context.id)
+  def visible_assignments(user, includes=[])
+    AssignmentGroup.visible_assignments(user, self.context, [self], includes)
+  end
+
+  def self.visible_assignments(user, context, assignment_groups, includes = [])
+    if context.grants_any_right?(user, :manage_grades, :read_as_admin) || (context.is_public && user.nil?)
+      scope = context.active_assignments.where(:assignment_group_id => assignment_groups)
     else
-      potential_assignments
+      scope = user.assignments_visibile_in_course(context).
+              where(:assignment_group_id => assignment_groups).published
     end
+    includes.any? ? scope.includes(includes) : scope
   end
 
   def move_assignments_to(move_to_id)

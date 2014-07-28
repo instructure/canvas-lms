@@ -35,7 +35,7 @@ module Api::V1::AssignmentGroup
     hash['rules'] = group.rules_hash(stringify_json_ids: opts[:stringify_json_ids])
 
     if includes.include?('assignments')
-      assignments = group.visible_assignments(user)
+      assignments = opts[:assignments] || group.visible_assignments(user)
 
       user_content_attachments   = opts[:preloaded_user_content_attachments]
       user_content_attachments ||= api_bulk_load_user_content_attachments(

@@ -557,8 +557,8 @@ class ApplicationController < ActionController::Base
         assignment_scope = :published_assignments
       end
 
-      @groups = @context.assignment_groups.active.includes(assignment_scope)
-      @assignments = @groups.flat_map{|grp| grp.visible_assignments(@current_user)}
+      @groups = @context.assignment_groups.active
+      @assignments = AssignmentGroup.visible_assignments(@current_user, @context, @groups)
     else
       assignments_and_groups = Shard.partition_by_shard(@courses) do |courses|
         [[Assignment.published.for_course(courses).all,

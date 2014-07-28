@@ -511,6 +511,7 @@ describe GradebooksController do
                                   :context  => @course
       AssignmentGroup.add_never_drop_assignment(ag, a)
       @controller.instance_variable_set(:@context, @course)
+      @controller.instance_variable_set(:@current_user, @user)
       @controller.light_weight_ags_json([ag]).should == [
         {
           id: ag.id,
@@ -533,6 +534,7 @@ describe GradebooksController do
 
     context 'draft state' do
       it 'should not return unpublished assignments' do
+        course_with_student
         @course.account.enable_feature!(:draft_state)
         ag = @course.assignment_groups.create! group_weight: 100
         a1 = ag.assignments.create! :submission_types => 'online_upload',
@@ -545,6 +547,7 @@ describe GradebooksController do
         a2.save!
 
       @controller.instance_variable_set(:@context, @course)
+      @controller.instance_variable_set(:@current_user, @user)
       @controller.light_weight_ags_json([ag]).should == [
         {
           id: ag.id,
