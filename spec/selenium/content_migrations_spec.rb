@@ -75,7 +75,7 @@ def test_selective_content(source_course=nil)
   visit_page
 
   f('.migrationProgressItem .progressStatus').should include_text("Completed")
-  @course.assignments.count.should == 1
+  @course.assignments.count.should == (source_course ? source_course.assignments.count : 1)
 end
 
 describe "content migrations", :non_parallel do
