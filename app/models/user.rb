@@ -1336,6 +1336,10 @@ class User < ActiveRecord::Base
     !!preferences[:manual_mark_as_read]
   end
 
+  def disabled_inbox?
+    !!preferences[:disable_inbox]
+  end
+
   def use_new_conversations?
     true
   end

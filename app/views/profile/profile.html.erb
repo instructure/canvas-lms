@@ -172,6 +172,14 @@
 </div>
 </div>
 
+<% if @user.associated_root_accounts.with_each_shard.any? { |a| a.feature_enabled?(:allow_opt_out_of_inbox) } %>
+<h2><%= t('headers.inbox_opt_out', "Conversations Inbox Opt-out" ) %></h2>
+<p>
+  <input type="checkbox" id="disable_inbox" <%= 'checked' if @user.disabled_inbox? %>/>
+  <label for="disable_inbox"><%= t('labels.disable_inbox', "Disable the Conversation's Inbox unread messages badge and send all conversation messages and notifications via email, ASAP.") %></label>
+</p>
+<% end %>
+
 <% unless (@domain_root_account && @domain_root_account.service_enabled?(:none)) %>
 <a name="registered_web_services"></a>
 <h2><%= t('headers.web_services', "Web Services") %></h2>
