@@ -199,8 +199,10 @@ div#audio_upload,div#video_upload
 
 .media_comment_thumbnail_play_button
   display: inline-block
-  height: image-height("play_overlay.png")
-  width: image-width("play_overlay.png")
+
+  // these are the height/width of "play_overlay.png"
+  height: 100px
+  width: 140px
 
   // accessibly hide text
   text-indent: -999px
@@ -209,7 +211,8 @@ div#audio_upload,div#video_upload
   background-image: url(/images/play_overlay.png)
 
   .media_comment_thumbnail-small &
-    height: image-height("play_overlay_small.png")
-    width: image-width("play_overlay_small.png")
+    // these are the height/width of "play_overlay_small.png"
+    height: 50px
+    width: 70px
 
     background-image: url(/images/play_overlay_small.png)
