@@ -4599,10 +4599,10 @@ fa-IR:
         add_section: "افزودن بخش"
         move_course: "انتقال درس"
         update_course: "بهنگام سازی اطلاعات درس"
-      course_conclude_at_warning_message: "این درس در حال حاضر برای اتمام در نیمه شب تنظیم شده است، بدین معنی که روز قبل از آن آخرین روزی خواهد بود که این درس فعال خواهد بود."
+      course_conclude_at_warning_message: "این درس در حال حاضر برای اتمام در نیمه شب تنظیم شده است، بدین معنی که روز قبل از آن آخرین روزی است که این درس فعال خواهد بود."
       course_conclude_at_warning_title: "درس در نیمه شب به پایان می رسد"
       course_open_enrollment: "این درس ثبت نام آزاد را فعال کرده است.  وقتی این URL :  *%{url}* را با دانشجویان به اشتراک بگذارید، آنها می توانند خود را در این درس ثبت نام کنند. آنها همچنین می توانند در *%{url2}* ثبت نام کنند و  از رمز عضویت زیر: *%{code}* استفاده کنند."
-      course_open_enrollment_without_code: "این درس امکان ثبت نام آزاد را فعال کرده است. دانشجویان می توانند پس از اینکه شما با آنها آدرس اینترنتی *%{url}* را باشتراک گذاشتید، خودشان در این درس ثبت نام کنند."
+      course_open_enrollment_without_code: "این درس امکان ثبت نام آزاد را فعال کرده است. دانشجویان می توانند به محض اینکه شما نشانی اینترنتی: *%{url}* را به آنها به اشتراک گذاشتید، خودشان در این درس ثبت نام کنند."
       course_overrides_term: "این امر هر گونه تنظیمات مربوط به موجود بودن نیمسال را جایگزین خواهد ساخت."
       date_restricted: "کاربران فقط می توانند در این درس در بین این تاریخ ها شرکت نمایند"
       deatils: 
@@ -4686,8 +4686,8 @@ fa-IR:
       private_course: خصوصی
       public_course: عمومی
       section_sis_id: "شناسه سامانه اطلاعات دانشجو: %{section_sis}"
-      self_enrollment: "با اشتراک گذاری یک آدرس اینترنتی یا کد رمزی با دانشجویان به آنها امکان بدهید خودشان ثبت نام کنند"
-      self_enrollment_without_code: "با اشتراک گذاری یک آدرس اینترنتی رمزی با دانشجویان به آنها امکان بدهید خودشان ثبت نام کنند"
+      self_enrollment: "با به اشتراک گذاری یک نشانی اینترنتی یا رمز محرمانه با دانشجویان به آنها این امکان داده شود که خودشان ثبت نام کنند"
+      self_enrollment_without_code: "با به اشتراک گذاری یک نشانی اینترنتی محرمانه با دانشجویان به آنها این امکان داده شود که خودشان ثبت نام کنند"
       set_grading_scheme: "تعیین طرح نمره گذاری"
       sis_source_id: "شناسه سامانه اطلاعات دانشجو"
       tab_cant_disable: "این صفحه را نمی توان غیر فعال کرد، فقط می توان مخفی نمود"
@@ -4696,7 +4696,7 @@ fa-IR:
       tabs: 
         alerts: هشدارها
         details: "اطلاعات درس"
-        feature_options: "گزینه‌های این امکان"
+        feature_options: "گزینه‌های ویژگی"
         grade_publishing: "انتشار نمره"
         navigation: پیمایش
         sections: "بخش ها"
@@ -4704,7 +4704,7 @@ fa-IR:
       titles: 
         edit_navigation: "ویرایش پیمایش درس"
       tooltips: 
-        cannot_unpublish_course: " اگر ارسال های نمره دار دانشجویان وجود داشته باشد شما نمی توانید این درس را منتشر کنید."
+        cannot_unpublish_course: "اگر موردهای ارسالی دانشجو وجود داشته باشد، نمی توانید انتشار این درس را لغو کنید"
       transifex_message: "به [انجمن ترجمه کانواس](%{transifex_url}) بپیوندید"
       turnitin: "این نظرها در هنگام ارسال یک تکلیف که Turnitin در آن فعال شده است، به دانشجویان نشان داده خواهد شد"
       view_grading_scheme: "مشاهده طرح نمره گذاری"
@@ -4734,38 +4734,42 @@ fa-IR:
         update_layout: "بهنگام سازی طرح بندی"
       change_home_page: تغییر
       details: 
+        assignments: "این نما **فهرست تکلیف های** این درس را به همراه تکلیف های آتی و اخیر در قسمت بالا نشان می دهد."
         confirm_unenroll: "آمطمئنید که می خواهید ثبت نام شما در این درس لغو شود؟دیگر قادر به مشاهده فهرست درس یا برقراری ارتباط مستقیم با اساتید نیستید و دیگر رویداد های درس را در جریان داده های خود و به صورت اطلاعیه نخواهید دید."
+        custom_page: "می توانید **صفحه اصلی درس خود را طراحی کنید** و هر گونه پیوند، تصویر یا رسانه غنی که دوست دارید را درج کنید."
+        recent_activity_dashboard: "**داشبورد فعالیت اخیر** به شرکت کنندگان امکان مشاهده جدیدترین گفتگوها، اطلاعیه ها، بحث ها و تعامل های مربوط به این درس را می دهد. بسیار شبیه صفحه داشبوردی است که کاربران در هنگام اولین ورود خواهند دید اما فقط محتوای این درس خاص را نمایش می دهد."
+        syllabus: "**نمای سرفصل** به شما امکان می دهد شرحی از انتظارات درس را بنویسید یا درس را با استفاده از پیوندها، تصاویر و غیره معرفی کنید و سپس یک نمای تقویم از همه تکلیف ها و رویدادهای درس را نیز نمایش دهید."
       draft_state: 
         buttons: 
-          cancel: "لغو کردن"
-          update_layout: "ذخیره کردن"
+          cancel: لغو
+          update_layout: "ذخیره سازی"
         headings: 
-          set_layout: "قراردادن طرح صفحه اصلی"
+          set_layout: "تعیین طرح صفحه اصلی"
         labels: 
-          select_content: "آنچه را که دوست دارید در صفحه اصلی نمایش دهید انتخاب کنید."
+          select_content: "آنچه را که مایلید در صفحه اصلی نمایش دهید انتخاب کنید."
         options: 
           assignments: "فهرست تکلیف ها"
-          custom_page: "صفحه اول"
+          custom_page: "صفحه آغازین صفحه ها"
           modules: "ماژول‌های درس"
-          recent_activity_dashboard: "فعالیت اخیر داشبورد"
-          syllabus: "برنامه درسی"
+          recent_activity_dashboard: "داشبورد فعالیت اخیر"
+          syllabus: سرفصل
       empty_body: "محتوا موجود نیست"
-      front_page_not_set: "صفحه اصلی باید اول باشد"
+      front_page_not_set: "ابتدا باید صفحه آغازین تعیین شود"
       headers: 
         course_status: "وضعیت درس"
       headings: 
-        choose_home_page_title: "انتخاب کردن خانه"
+        choose_home_page_title: "انتخاب صفحه اصلی"
         confirm_unenroll: " تأیید لغو ثبت نام"
         importing: "این درس در حال وارد شدن است"
         set_layout: "تنظیم طرح بندی صفحه اصلی"
         unpublished: "این درس منتشر نشده است"
       importing: "کپی/انتقال درس در حال انجام است. بدین معنا که بخشی از محتوا ممکن است به صورت موقت در دسترس نباشد."
       labels: 
-        select_content: "زمانی که افراد صفحه این درس را مشاهده می کنند، به آنها نشان بده"
+        select_content: "زمانی که افراد از صفحه درس بازدید می کنند، به آنها نشان داده شود"
       license_notice: "محتوای این درس تحت یک مجوز %{license_type} پیشنهاد شده است. محتوای موجود در این درس را می توان تحت این مجوز در نظر گرفت، مگر در صورتی که غیر از این گفته شده باشد."
       links: 
         change_layout: "تغییر طرح بندی صفحه اصلی"
-        choose_home_page: "انتخاب کردن خانه"
+        choose_home_page: "انتخاب صفحه اصلی"
         course_setup: "فهرست علامتگذاری راه اندازی درس"
         course_stream: "مشاهده جریان درس"
         drop_course: "رها کردن این درس"
@@ -4935,7 +4939,7 @@ fa-IR:
       student: 
         count: "تعداد دانشجویانی که اشتباه پاسخ داده اند"
         ratio: "نسبت دانشجویانی که اشتباه پاسخ داده اند"
-  current_grade_title: "نمره کنونی"
+  current_grade_title: "نمره فعلی"
   curve_grades_dialog: 
     average_score: "میانگین نمره"
     buttons: 
@@ -4947,32 +4951,32 @@ fa-IR:
       assign_blanks: "تخصیص صفر به دانشجویانی که ارسال نکرده اند"
     out_of_points_possible: "از %{assignment.points_possible}"
     this_is_permanent: "روی منحنی بردن نمره را نمی توان لغو کرد. تاریخچه نمره از پیش روی منحنی برده شده موجود خواهد بود، اما اقدام روی منحنی بردن غیر قابل برگشت است."
-  custom_grade_export_title: "صدور نمرات پرتال CampusVue"
-  custom_outcomes_title: "خروجی دلخواه"
-  cv_non_graded_data__title: "گزارش تکلیف نمره گذاری نشده پرتال CampusVue "
-  cv_submission_data__title: "ارسال داده پرتال CampusVue "
+  custom_grade_export_title: "صدور نمره CampusVue"
+  custom_outcomes_title: "نتایج سفارشی"
+  cv_non_graded_data__title: "گزارش تکلیف نمره گذاری نشده CampusVue "
+  cv_submission_data__title: "داده های ارسالی Campus Vue"
   d2l_display: Desire2Learn
   d2l_file_description: "قالب zip. صدور D2L"
   d2l_name: "مبدل D2L"
   dashboard: 
     announcements_collapse: 
       one: "آگهی ها را جمع آوری کنید %{count} "
-      other: "آگهی ها را جمع آوری کنید %{count} "
+      other: "جمع کردن %{count} اطلاعیه"
     announcements_expand: 
       one: "آگهی ها را گسترش دهید %{count} "
-      other: "آگهی ها را گسترش دهید %{count} "
+      other: "باز کردن %{count} اطلاعیه"
     assignments_collapse: 
       one: " بسته%{count} اطلاعیه های انتساب"
-      other: " بسته%{count} اطلاعیه های انتساب"
+      other: "جمع کردن %{count} اطلاعیه تکلیف"
     assignments_expand: 
       one: "توسعه %{count} اطلاعیه های انتساب"
-      other: "توسعه %{count} اطلاعیه های انتساب"
+      other: "باز کردن %{count} اطلاعیه تکلیف"
     conversations_collapse: 
       one: "بسته های%{count}  پیام های گفتگو"
-      other: "بسته های%{count}  پیام های گفتگو"
+      other: "جمع کردن %{count} پیام گفتگو"
     conversations_expand: 
       one: "توسعه های%{count}  پیام های گفتگو"
-      other: "توسعه های%{count}  پیام های گفتگو"
+      other: "باز کردن %{count} پیام گفتگو"
     disable_dashboard: "بازگشت به داشبورد قدیمی"
     discussions_collapse: 
       one: "بستن %{count} بحث"
@@ -5026,7 +5030,7 @@ fa-IR:
       date_at_time: "%b %-d در %l:%M%P"
       default: "%Y-%m-%d"
       long: "%B %d, %Y"
-      long_with_weekday: "%A,  %B %-d"
+      long_with_weekday: "%A, %B %-d"
       medium: "%b %-d, %Y"
       medium_month: "%b %Y"
       medium_with_weekday: "%a %b %-d, %Y"
@@ -5054,7 +5058,7 @@ fa-IR:
   dates_available_component: 
     available: "قابل دسترسی"
     due: مهلت
-    multiple_dates: "تاریخ های متعدد"
+    multiple_dates: "چند تاریخ"
   datetime: 
     distance_in_words: 
       about_x_hours: 
@@ -5099,17 +5103,17 @@ fa-IR:
       second: ثانیه
       year: سال
   default_conference_title: "کنفرانس %{course_name} "
-  default_question_name: سوال
-  default_question_text: "متن سوال"
+  default_question_name: پرسش
+  default_question_text: "متن پرسش"
   demos: 
     _register: 
       add_site: "افزودن تارنما"
       invalid_email: "نشانی پست الکترونیکی معتبر نیست"
       personalizing: "در حال شخصی سازی..."
-      ready: آماده
+      ready: آماده!
       registered_successfully: "با موفقیت ثبت شد!"
       specify_location: "لطفا موقعیت جغرافیایی خود را مشخص کنید"
-      try_again: "تلاش دوباره"
+      try_again: "دوباره سعی کنید"
       you_must_agree_to_terms: "باید شرایط استفاده را بپذیرید"
     demos_add: 
       labels: 
@@ -5117,34 +5121,34 @@ fa-IR:
         username: "نشانی پست الکترونیکی"
     register: 
       africa: آفریقا
-      agree_to_terms: "من با دوره های استفاده موافق هستم و سیاست حفظ حریم خصوصی را تقدیر می کنم "
+      agree_to_terms: "با *ضوابط استفاده* موافق هستم و **سیاست حریم خصوصی** را تأیید می کنم."
       asia_and_middle_east: "آسیا و خاورمیانه"
       assistant_superintendent: "دستیار سرپرست"
       australia_new_zealand_and_oceania: "استرالیا، نیوزلند و اقیانوسیه"
-      begin_trial: "محاکمه شدن"
+      begin_trial: "شروع نسخه آزمایشی"
       bus_finance_purchasing_director: "مدیر اتوبوس/امور مالی/خرید"
       c_level: "سطح C"
-      choose: "یکی را انتخاب کن"
-      cio: CIO
+      choose: "انتخاب یک مورد"
+      cio: "مأمور ارشد اطلاعات"
       corporate: شرکت
-      dean: رئيس
-      director: راهنما
+      dean: "رئيس دانشکده"
+      director: سرپرست
       e_rate_administrator: "مدیر ارزیابی الکترونیکی"
       employee: کارمند
       europe_other: "اروپا - سایر"
       europe_uk: "اروپا - بریتانیا"
-      executive_officer: "مامور اجرایی"
+      executive_officer: "مأمور اجرایی"
       government: دولت
       gs_11_15: "مقیاس نمره 11-15"
       gs_1_7: "مقیاس نمره 1-7"
       gs_8_10: "مقیاس نمره 8-10"
-      higher_education: "تحصیلات عالی"
-      higher_education_for_profit: "آموزش عالی برای سود"
-      incorrect: "نادرست است.محددا سعی نمائید."
+      higher_education: "آموزش عالی"
+      higher_education_for_profit: "آموزش عالی انتفاعی"
+      incorrect: "درست نیست. دوباره سعی کنید."
       instructional_designer: "طراح آموزشی"
       instructional_media_svcs_dir: "مدیر خدمات رسانه آموزشی"
       k12: K12
-      k12_for_profit: "K12 برای سود"
+      k12_for_profit: "K12 انتفاعی"
       labels: 
         location: مکان
         name: نام
@@ -5152,8 +5156,8 @@ fa-IR:
         phone: "شماره تلفن"
         school_name: "دانشکده / سازمان"
         school_position: عنوان
-        type_what_you_hear: "آنچه که می شنوید را تایپ کنید"
-        type_what_you_see: "آنچه را که می بینید تایپ کنید"
+        type_what_you_hear: "آنچه می شنوید را تایپ کنید"
+        type_what_you_see: "آنچه می بینید را تایپ کنید"
         username: "پست الکترونیکی"
       library_media_specialist: "متخصص کتابخانه/رسانه"
       lms_administrator: "مدیر سامانه مدیریت یادگیری"
@@ -5161,19 +5165,19 @@ fa-IR:
       network_system_administrator: "مدیر سامانه شبکه"
       one: سایر
       other: سایر
-      personalize_demo: "جنبه ی نمایشی خودت را منحصر به فرد کن"
+      personalize_demo: "شخصی سازی نمونه نمایشی خود"
       principal: مدیر
-      provost: شهردار
+      provost: "معاون دانشکده"
       school_administrator: "مدیر دانشکده"
       school_technology_coordinator: "هماهنگ کننده فناوری دانشکده"
-      sign_up_to_canvas: "برای امتحان بوم نقاشی ثبت نام کنید "
+      sign_up_to_canvas: "ثبت نام برای آزمایش کانواس"
       south_america_central_america_and_caribbean: "آمریکای جنوبی، آمریکای مرکزی، و جزایر کارائیب"
-      student: "دانش آموز"
-      subscribe: "من میخواهم که اخبار ، انعام و اطلاعات از مربی دریافت کنم"
+      student: دانشجو
+      subscribe: "می خواهم اخبار، نکته ها و اطلاعات را از Instructure دریافت کنم"
       superintendent: سرپرست
       support: پشتیبانی
-      teacher_instructor: استاد
-      technologist: تکنولوژی
+      teacher_instructor: استاد/مربی
+      technologist: "کارشناس فناوری"
       technology_computer_coord: "هماهنگ کننده فناوری/رایانه"
       technology_education_director: "مدیر آموزش فناوری"
       united_states_and_canada: "ایالات متحده و کانادا"
@@ -5210,6 +5214,10 @@ fa-IR:
     cancel: لغو
     save_settings: "ذخیره سازی تنظیمات"
     saving: "در حال ذخیره سازی..."
+  differentiated_assignments_description: |-
+      تکلیف های متمایز یک ویژگی *بتا* است که امکان انتخاب اینکه یک تکلیف در کدام بخش (ها) کاربرد دارد را میسر می سازد.
+      بخش هایی که تکلیف به آن اختصاص داده نشده است، آن را در محتوای درس خود نمی ببینند و نمره نهایی آنها
+      بدون این امتیازها محاسبه می شود.
   discussion_entries: 
     created_entry_notice: "ورودی با موفقیت ایجاد شد."
     deleted_entry_notice: "ورودی حذف شده است"
@@ -5236,7 +5244,7 @@ fa-IR:
         other: "این یک بحث نمره گذاری شده است: *%{count} امتیاز ممکن*"
       show_due_dates: "نمایش تاریخ های مهلت"
       until: تا
-    cannot_unpublish_with_replies: "نمی تواند منتشر نشود اگر پاسخ هایی وجود داشته باشد"
+    cannot_unpublish_with_replies: "اگر پاسخ هایی وجود داشته باشد، انتشار نمی تواند لغو شود"
     confirm_delete_announcement: 
       one: "مطمئنید که می خواهید این %{count} اطلاعیه حذف شود؟"
       other: "مطمئنید که می خواهید این %{count} اطلاعیه حذف شود؟"
@@ -5249,9 +5257,9 @@ fa-IR:
     discussion: 
       close_for_comments: "بستن امکان ارسال نظر"
       delete: حذف
-      due: Due
+      due: مهلت
       graded_discussion: "بحث نمره گذاری شده:"
-      last_post_date: "آخرین نوشته %{display_last_reply_at}"
+      last_post_date: "آخرین ارسال %{display_last_reply_at}"
       manage: مدیریت
       move: "انتقال به&hellip;"
       no_due_date: "بدون تاریخ مهلت"
@@ -5307,18 +5315,18 @@ fa-IR:
       show_more_entries: 
         one: "نمایش %{count} ورودی بیشتر"
         other: "نمایش %{count} ورودی بیشتر"
-    error_draft_state_unauthorized: "شما اجازه ندارید این سرفصل را به حالت پیش نویس تغییر دهید."
-    error_draft_state_with_posts: "سرفصل نمی تواند به حالت پیش نویس تغییر یابد زیرا محتوی پست است."
-    error_group_announcement: "شما در یک بحث گروهی نمی توانید از خبر استفاده کنید"
-    error_group_change: "شما نمیتوانید با پاسخ ها گروه بحث را عوض کنید"
+    error_draft_state_unauthorized: "شما اجازه ندارید این موضوع را به حالت پیش نویس تغییر دهید."
+    error_draft_state_with_posts: "این موضوع نمی تواند به حالت پیش نویس تغییر یابد زیرا دارای ارسال است."
+    error_group_announcement: "نمی توانید از بحث گروهی در یک اطلاعیه استفاده کنید."
+    error_group_change: "نمی توانید گروه بندی در یک بحث دارای پاسخ را تغییر دهید."
     group_assignment_discussion_entry: 
       posts: 
         one: "%{count} ارسال"
         other: "%{count} ارسال"
       separated_conversation_notice: "گفتگوی مربوط به این موضوع به گروه های جداگانه تقسیم شده است. در قسمت زیر همه موضوع های گروهی که به آنها دسترسی دارید آمده است."
     group_discussion: 
-      separated_conversation_notice: "از آنجایی که این یک بحث گروهی است، هر گروه بحث مخصوص خود را دارا است. این هم لیستی از بحث هایی که به آن دسترسی دارید"
-    group_discussion_locked: "از آنجایی که دانشجویان به بحث افزوده شده اند، دیگر نمی توانید تنظیمات را تغییر دهید"
+      separated_conversation_notice: "از آنجا که این بحث، گروهی است، هر گروه گفتگوی مخصوص خود برای این موضوع را دارد. فهرست گفتگوهایی که به آنها دسترسی دارید، در اینجا آمده است:"
+    group_discussion_locked: "دانشجویان از قبل به این بحث ارسال کرده اند، بنابراین تنظیمات گروهی را نمی توان تغییر داد."
     group_discussion_title: "بحث گروهی"
     index: 
       course_discussions_atom_feed_title: "تک خوراک خبری بحث های درس"
@@ -5354,17 +5362,17 @@ fa-IR:
       current_page: فعلی
       first_page: اولین
       last_page: آخرین
-    points_possible_number: "نمره ها باید در حد امکان یک عدد باشند."
+    points_possible_number: "امتیازهای ممکن باید یک عدد باشد"
     reply_count_tooltip: 
       one: "1 پاسخ."
       other: "%{count} پاسخ."
       zero: "پاسخ موجود نیست."
     show: 
       add_rubric: "افزودن دستورالعمل ارزیابی"
-      announcement_closed: "این اطلاعیه برای نظر ها بسته است"
+      announcement_closed: "امکان ارسال نظر برای این اطلاعیه وجود ندارد"
       announcement_locked: "این اطلاعیه تا تاریخ *%{date}* برای کاربران قابل مشاهده نخواهد بود"
-      announcement_locked_until: "این تکلیف تا زمان %{time} قفل شده است"
-      announcement_not_visible: "این اطلاعیه برای کاربر ها قابلیت مشاهده نیست"
+      announcement_locked_until: "این تکلیف تا تاریخ %{time} قفل شده است"
+      announcement_not_visible: "این اطلاعیه برای کاربران قابل مشاهده نیست"
       authors_name: "نام نویسنده"
       collapse_replies: "جمع کردن پاسخ ها"
       confirm_delete_discussion: "مطمئنید که می خواهید این بحث حذف شود؟"
@@ -5397,12 +5405,12 @@ fa-IR:
       speed_grader: "برنامه نمره گذار سریع"
       topic: موضوع
       topic_locked: "این موضوع تا تاریخ *%{date}* برای کاربران قابل مشاهده نخواهد بود"
-      topic_locked_until: "این موضوع تا زمان %{time} قفل شده است"
-      topic_not_visible: "این موضوع برای کاربران قابل رویت نیست"
+      topic_locked_until: "این موضوع تا تاریخ %{time} قفل شده است"
+      topic_not_visible: "این موضوع برای کاربران قابل مشاهده نیست"
       topic_podcast_feed_link: "خوراک خبری پادکست موضوع"
       topic_subscribe: اشتراک
       topic_subscribe_tooltip: "اشتراک خود را لغو کرده اید و از نظرهای جدید آگاه نخواهید شد"
-      topic_subscribed_tooltip: "شما ثبت نام کرده اید و نظرات جدید به شما اطلاع داده خواهد شد"
+      topic_subscribed_tooltip: "شما مشترک شده اید و از نظرهای جدید آگاه خواهید شد"
       topic_unsubscribe: "مشترک شدید"
       unlock_topic: "باز گذاشتن امکان ارسال نظر"
       unread: "خوانده نشده"
@@ -5426,9 +5434,9 @@ fa-IR:
       my_settings: "تنظیمات من"
   discussions: 
     are_your_sure_delete: "مطمئنید که می خواهید این ورودی حذف شود؟"
-    cant_subscribe_not_in_group: "شما باید برای اشتراک در این گروه باشید"
-    cant_subscribe_not_in_group_set: "شما باید برای اشتراک در یک گروه  مشترک باشید"
-    closed_for_comments: "برای نظر دهی بسته است"
+    cant_subscribe_not_in_group: "برای اشتراک باید در این گروه باشید"
+    cant_subscribe_not_in_group_set: "برای اشتراک در یک گروه مرتبط باشید"
+    closed_for_comments: "امکان ارسال نظر وجود ندارد"
     confirm_delete_discussion_topic: "مطمئنید که می خواهید این موضوع بحث را حذف شود؟"
     delete: حذف
     deleted_entry: 
@@ -5451,7 +5459,7 @@ fa-IR:
     entry_stats: 
       show_more: "نمایش بیشتر"
     hide_due_dates: "مخفی کردن تاریخ های مهلت"
-    initial_post_required_to_subscribe: "شما می بایست قبل از ثبت کردن یک جواب ارسال کنید"
+    initial_post_required_to_subscribe: "باید قبل از اشتراک، یک پاسخ ارسال کنید"
     mark_as_read: "علامتگذاری به عنوان خوانده شده"
     mark_as_unread: "علامتگذاری به عنوان خوانده نشده"
     no_content: "محتوا موجود نیست"
@@ -5461,7 +5469,7 @@ fa-IR:
       try_different_more_general_or_fewer_keywords: "کلید واژه های متفاوت، کلی تر یا کمتر را امتحان کنید."
       try_disabling_the_unread_filter: "فیلتر \"خوانده نشده\" را غیرفعال کنید."
       your_search_did_not_match_any_entries: "جستجوی شما با هیچ ورودی مطابقت نداشت."
-    ordered_by_recent_activity: "مرتب سازی بر اساس آخرین فعالیت ها"
+    ordered_by_recent_activity: "مرتب سازی شده بر اساس آخرین فعالیت ها"
     participant: 
       anonymous_user: ناشناس
     pinned_discussions: "بحث های الصاق شده"
@@ -5484,20 +5492,20 @@ fa-IR:
       one: "نمایش کل %{count} پاسخ"
       other: "نمایش کل %{count} پاسخ"
     show_due_dates: "نمایش تاریخ های مهلت"
-    subscribe: "مشترک شدن در این تاپیک"
+    subscribe: "اشتراک در این موضوع"
     subscribed: "مشترک شدید"
-    subscribed_hint: "شما در این تاپیک مشترک هستید.برای حذف اشتراک کلیک کنید."
-    toggle_message: "بخش دید ضامن "
+    subscribed_hint: "در این موضوع مشترک شدید. برای لغو اشتراک، کلیک کنید."
+    toggle_message: "تغییر قابلیت مشاهده بخش"
     uknown_author: "نویسنده ناشناس"
     unknown: ناشناس
     unknown_author: "نویسنده ناشناس"
-    unsubscribe: "حذف اشتراک از تاپیک"
-    unsubscribed: "اشتراک حذف شد"
-    unsubscribed_hint: "شما مشترک این تاپیک نمی باشید.برای مشترک شدن کلیک کنید."
+    unsubscribe: "لغو اشتراک از این موضوع"
+    unsubscribed: "اشتراک شما لغو شد"
+    unsubscribed_hint: "شما در این موضوع مشترک نیستید. برای اشتراک، کلیک کنید."
   draft_state_description: |-
-      این ویژگی بتا بخش های زیادی از کانواس را از نوطراحی می کند و به محتوا امکان خروج از
-      یک حالت غیرمنتشرشده جدید که برای دانشجویان نامرئی است را می دهد و از محسابت نمره مستثنی است.
-      احتیاط--غیرفعال کردن این ویژگی ممکن است محتوایی که جدید ایجاد شده یا ویرایش شده
+      این ویژگی بتا بخش های زیادی از کانواس را از نو طراحی می کند و به محتوا امکان می دهد که در
+      یک حالت منتشر نشده جدید باشد که برای دانشجویان غیر قابل مشاهده است و از محاسبه های نمره مستثنی است.
+      احتیاط--غیر فعال کردن این ویژگی ممکن است محتوایی که جدید ایجاد شده یا ویرایش شده
       را از نمای استاد حذف کند.
   due_dates: 
     due_at: "مهلت: %{assignment_due_date_time}"
@@ -5511,7 +5519,7 @@ fa-IR:
       update_rubric: "بهنگام سازی دستورالعمل ارزیابی"
     discussion_points_possible: 
       one: "%{count} امتیاز ممکن است"
-      other: "%{count} امتیاز ممکن است"
+      other: "%{count} امتیاز ممکن"
     errors: 
       load_rubrics_failed: "بارگذاری دستورالعمل های ارزیابی انجام نشد، لطفا دوباره سعی کنید"
     messages: 
@@ -5548,10 +5556,10 @@ fa-IR:
       remove_role_confirmation: "اگر کاربرانی با این نقش وجود داشته باشند، مجوزهای فعلی را نگه خواهند داشت، اما قادر نخواهید بود کاربران جدیدی با این نقش ایجاد کنید. برای ادامه حذف این نقش، روی تأیید کلیک کنید."
     save_failed: "ذخیره سازی انجام نشد، لطفا بعدا دوباره سعی کنید"
     saving: "درحال ذخیره سازی..."
-    screen_reader_tip: "کاربران خواننده صفحه نمایش: در دسترس ترین روش برای استفاده از این ویرایشگر این است که به نمای پیشرفته تعویض کنید و بعد از LaTeX مستقیماً وارد شوید؛ یا از نوار ابزار برای کمک استفاده کنید. لینک تعویض به نمای پیشرفته در انتهای این کادر محاوره ای، مستقیما قبل از ویرایش زمینه قرار گرفته است."
+    screen_reader_tip: "کاربران صفحه خوان: در دسترس ترین روش برای استفاده از این ویرایشگر رفتن به نمای پیشرفته است، و سپس LaTeX را مستقیما وارد کنید؛ یا از نوار ابزار برای کمک به انجام این کار استفاده کنید. پیوند رفتن به نمای پیشرفته را می توان نزدیک به انتهای این کادر گفتگو، مستقیما قبل از جای ویرایش یافت."
     search_flickr: "جستجوی کرییتیو کامنز فلیکر"
-    switch_editor_html: "ویراستار HTML"
-    switch_editor_visual: "ویراستار بصری"
+    switch_editor_html: "ویرایشگر HTML"
+    switch_editor_visual: "ویرایشگر بصری"
     switch_to_mathjax: "تغییر دادن نما به اصلی"
     switch_to_mathquill: "تغییر دادن نما به پیشرفته"
     tabs: 
@@ -5607,7 +5615,7 @@ fa-IR:
     student: دانشجو
     teacher: استاد
     teacher_assistant: "دستیار آموزشی"
-  enrollment_summary_title: "خلاصه ی ثبت نام"
+  enrollment_summary_title: "خلاصه ثبت نام"
   enrollment_term: 
     errors: 
       not_unique: "شناسه سامانه اطلاعات دانشجو \"%{sis_source_id}\" اکنون در حال استفاده است"
@@ -5623,10 +5631,10 @@ fa-IR:
     errors: 
       compiling: "در هنگام گردآوری مجموعه اسناد الکترونیکی شما خطایی رخ داد. لطفا مدت کوتاهی بعد دوباره سعی کنید."
       missing_file: "لطفا یک فایل انتخاب کنید"
-      name_required: "نام الزامی است. "
-      name_too_long: "نام بیش از حد طولانی است. "
-      section_name_invalid: "نام بخش معتبر نیست "
-      section_name_too_long: "نام بخش بسیار طولانی است "
+      name_required: "نام الزامی است"
+      name_too_long: "نام طولانی است"
+      section_name_invalid: "نام بخش معتبر نیست"
+      section_name_too_long: "نام بخش، طولانی است "
       upload_failed: "بارگذاری انجام نشد."
     first_category: "صفحه اصلی"
     first_entry: 
@@ -5886,7 +5894,7 @@ fa-IR:
     registration_incomplete: "قبل از اینکه بتوانید این صفحه را مشاهده کنید، باید نشانی پست الکترونیکی خود را تأیید کنید"
     required: لازم
     sis_id_in_use: "شناسه سامانه اطلاعات دانشجو  \"%{sis_id}\"در حال استفاده است"
-    unsaved_changes: "شما تغییرات ذخیره نشده دارید."
+    unsaved_changes: "ذخیره سازی تغییرات را لغو کرده اید."
   external_content: 
     cancel: 
       canceling: "درحال لغو..."
@@ -5908,14 +5916,14 @@ fa-IR:
         adding_feed: "درحال افزودن خوراک خبری..."
       descriptions: 
         add_new_feed: "می توانید به طور خودکار ارسال ها را از یک RSS یا تک خوراک خبری به عنوان اطلاعیه های مربوط به این درس بیفزایید. نشانی اینترنتی خوراک خبری را در قسمت زیر بچسبانید تا هر گونه ورودی جدید افزوده شود."
-      feed_url_label: "خوراک URL"
+      feed_url_label: "نشانی اینترنتی خوراک خبری"
       keyword: "کلید واژه:"
       labels: 
         match_phrase_checkbox: "فقط ارسال های دارای یک عبارت خاص در عنوان را اضافه شوند"
       links: 
         add_external_feed: "افزودن خوراک خبری بیرونی"
       options: 
-        content_to_post: "محتوا برای پست کردن"
+        content_to_post: "محتوا برای ارسال"
         full_article: "مقاله کامل"
         link_only: "فقط پیوند"
         truncated: "کوتاه شده"
@@ -5925,12 +5933,12 @@ fa-IR:
     account_navigation_configured: "پیمایش حساب پیکربندی شد"
     app_full_view: 
       add_tool: "افزودن ابزار"
-      app_already_installed: "این برنامه کاربردی نصب شده است"
-      average_rating: "رتبه میانگین"
+      app_already_installed: "این برنامه قبلا نصب شده است"
+      average_rating: "رتبه بندی میانگین"
       back_to_app_center: "بازگشت به مرکز برنامه"
       education_levels: "سطح(های) آموزشی"
-      extensions: "بسط ها"
-      help_link: "پیوند کمکی"
+      extensions: پسوندها
+      help_link: "پیوند راهنما"
       rate_tool: "رتبه دادن به این ابزار"
     app_saved_message: "%{app} با موفقیت ذخیره شد!"
     buttons: 
@@ -5938,9 +5946,9 @@ fa-IR:
       delete: حذف
     cannot_locate_launch_request: "درخواست راه اندازی یافت نشد، لطفا دوباره سعی کنید."
     consumer_key: "کلید مصرف کننده"
-    course_home_sub_navigation_configured: "زیرراهنمای صفحه اول درس پیکره بندی شد"
+    course_home_sub_navigation_configured: "پیمایش فرعی صفحه اصلی درس پیکربندی شد"
     course_navigation_configured: "پیمایش درس پیکربندی شد"
-    course_settings_sub_navigation_configured: "زیرپیمایش تنظیمات درس پیکره بندی شد"
+    course_settings_sub_navigation_configured: "پیمایش فرعی تنظیمات درس پیکربندی شد"
     delete: حذف
     dialog_title_add_app: "افزودن برنامه"
     dialog_title_edit_tool: "ویرایش ابزار بیرونی"
@@ -6014,12 +6022,12 @@ fa-IR:
     tool_post_iframe: 
       load_tool_button: "بارگذاری %{tool}"
       load_tool_new_tab_button: "بارگذاری %{tool} در یک پنجره جدید"
-      new_tab: "این ابزار باید در یک پنجره جدید مرورگر بارگزاری شود"
+      new_tab: "این ابزار باید در یک پنجره جدید مرورگر بارگذاری شود"
       new_tab_expired: "جلسه مربوط به این ابزار منقضی شده است. لطفا برای دسترسی دوباره به ابزار، صفحه را دوباره بارگذاری کنید."
       new_tab_loaded: "این ابزار به طور موفقیت آمیز در یک پنجره جدید مرورگر بارگذاری شد. برای دسترسی دوباره به این ابزار، صفحه را دوباره بارگذاری کنید."
     tool_show: 
-      tool_insecure_warning: "شما سعی دارید یک مطلب ناامن را از یک بخش امن (canvas) اجرا کنید. بعضی از مرورگرها ممکن است جلوی بارگذاری این مطلب را بگیرند"
-      tool_load_failure: "به نظر می رسد مطلب شما بارگذاری نشده است. شما میتوانید ازین دکمه برای بارگذاری در یک صفحه ی جدید استفاده کنید."
+      tool_insecure_warning: "سعی دارید یک محتوای ناامن را از یک تارنمای امن (کانواس) اجرا کنید. بعضی از مرورگرهای داخلی ممکن است جلوی بارگذاری این محتوا را بگیرند."
+      tool_load_failure: "به نظر می رسد محتوای شما بارگذاری نشود. می توانید از این دکمه برای راه اندازی آن در یک زبانه جدید استفاده کنید."
     user_navigation_configured: "پیمایش کاربر پیکربندی شد"
   facebook: 
     authorization_required: "فقط کاربران تایید شده اجازه دسترسی به این صفحه را دارند"
@@ -6071,42 +6079,42 @@ fa-IR:
   faculty_success_tile: "گزارش موفقیت دانشکده"
   feature_flags: 
     feature_flag: 
-      allow: "اجازه بده"
+      allow: "اجازه دادن"
       disabled: "غیر فعال شده"
       enabled: "فعال شده"
-      estimated_release: "تخمین انتشار:"
-      no_description: "بدون شرح"
+      estimated_release: "نسخه تخمینی:"
+      no_description: "شرح موجود نیست"
       ? "off"
-      : خاموش
+      : "غیر فعال"
       ? "on"
-      : روشن
-      release_notes: "منتشر کردن یاداشت ها"
+      : فعال
+      release_notes: "انتشار یادداشت ها"
       toggle_feature_details: "فعال سازی اطلاعات ویژگی"
     feature_flag_admin_view: 
-      feature_options: "گزینه‌های این امکان"
-      no_features_available: "امکانی در حال حاضر در دسترس نیست"
+      feature_options: "گزینه‌های ویژگی"
+      no_features_available: "هیچ ویژگی در حال حاضر در دسترس نیست."
   features: 
-    better_file_browsing: "جستجوی فایل بهتر"
-    differentiated_assignments: "تکالیف متفاوت"
+    better_file_browsing: "مرور بهتر فایل"
+    differentiated_assignments: "تکلیف های متمایز"
     draft_state: "حالت پیش نویس"
     draft_state_account_disable_warning: |-
-        غیرفعال کردن این ویژگی روی درس های موجود تاثیر می گذارد. برای راهنمایی در غیرفعال کردن این ویژگی لطفا تماس بگیرید
-        با مدیر موفقیت کانواس خود
+        غیرفعال کردن این ویژگی روی درس های موجود تأثیر می گذارد. برای راهنمایی برای غیر فعال کردن این ویژگی، لطفا
+        با مدیر موفقیت کانواس خود تماس بگیرید.
     draft_state_course_disable_warning: |-
-        غیرفعال کردن این ویژگی همه اشیاء موجود در درس را منتشر می کند.. لطفا مطمئن شوید که همه محتوای پیش نویس 
-        برای انتشار آماده است و برای همه کاربران این درس در دسترس است و بعد ادامه دهید.
+        غیرفعال کردن این ویژگی همه اشیاء موجود در درس را منتشر می کند.. لطفا قبل از ادامه دادن، مطمئن شوید که همه محتوای پیش نویس 
+        برای انتشار آماده است و برای همه کاربران این درس در دسترس است.
     google_docs_domain_restriction: "محدودیت دامنه Google Docs"
     high_contrast: "استفاده از سبک های دارای تضاد زیاد"
     html5_first_videos: "ترجیح دادن HTML5 برای پخش فیلم"
-    learning_mastery_gradebook: "دفتر نمره مهارت یادگیری"
+    learning_mastery_gradebook: "دفتر نمره تسلط یادگیری"
     new_quiz_moderate: "صفحه تعدیل سازی آزمون جدید"
-    new_quiz_statistics: "صفحه جدید آمار آزمونها"
+    new_quiz_statistics: "صفحه آمار آزمون جدید"
     new_styles: "استفاده از سبک های جدید"
-    post_grades: "ارسال نمره ها به سامانه اطلاعات دانشجویی"
-    student_groups: "صفحه جدید گروه های دانشجویان"
-    student_outcome_gradebook: "بخش نمرات یادگیری تسلط دانشجو"
+    post_grades: "ارسال نمره ها به سامانه اطلاعات دانشجو"
+    student_groups: "صفحه جدید گروه های دانشجو"
+    student_outcome_gradebook: "دفتر نمره تسلط یادگیری دانشجو"
   file_browser_view: 
-    folder_tree_instructions: "از کلیدهای جهت  دار بالا و پایین برای حرکت از طریق درخت استفاده کنید.  برای گسترش دادن کلید راست، برای مختصرکردن کلید چپ و برای انتخاب تصویر دکمه اینتر را فشار دهید.."
+    folder_tree_instructions: "از کلیدهای جهت دار بالا و پایین برای پیمایش از طریق درخت استفاده کنید. برای باز کردن پوشه ها کلید راست، برای جمع کردن کلید چپ و برای انتخاب تصویر کلید enter را فشار دهید."
   filebrowserview: 
     course_files: "فایل های درس"
     group_files: "فایل های گروه"
@@ -6185,7 +6193,7 @@ fa-IR:
         download_as_zip: "بارگیری فایل های موجود در این پوشه به صورت فایل فشرده"
         download_file: "بارگیری این فایل"
         download_with_size: "بارگیری فایل (%{size})"
-        download_zip: "برای دانلود %{size} اینجا را کلیک کنید"
+        download_zip: "برای بارگیری %{size}، اینجا کلیک کنید"
         edit_content: "ویرایش محتوا"
         import_zip: "وارد کردن یک فایل فشرده"
         lock_file: "قفل کردن این فایل"
@@ -6200,16 +6208,16 @@ fa-IR:
       locked: "این فایل هنوز قفل گشایی نشده است، بنابراین نمی توان آن را بارگیری کرد."
       locked2: "این فایل قفل شده است و برای دانشجویان قابل بارگیری نیست."
       messages: 
-        creating_zip: "درحال ایجاد کردن فایل زیپ..."
+        creating_zip: "در حال ایجاد فایل فشرده..."
         gathering_and_zipping: |-
             **محتویات این پوشه در حال گردآوری** و تبدیل به یک فایل فشرده
             هستند. این کار ممکن است بسته به اندازه و تعداد فایل ها مدتی طول بکشد.
-        gathering_data: "درحال جمع آوری داده..."
+        gathering_data: "در حال جمع آوری داده ها..."
         gathering_files: "در حال گردآوری فایل ها..."
-        gathering_files_with_progress: "جمع کردن فایل ها (%{progress}%)..."
+        gathering_files_with_progress: "در حال جمع آوری فایل ها (%{progress}%)..."
         no_preview_avaialble: "پیش نمایش موجود نیست"
         uploading: "در حال بارگذاری 5 فایل..."
-        zip_finished: "به پایان رسیده! تغییر مسیر به فایل ..."
+        zip_finished: "پایان یافت! تغییر مسیر به فایل..."
       page_title: "فایل ها"
       storage_used: "ذخیره استفاده شده: %{size1} از %{size2}"
       switch_views: "تغییر دادن نماها"
@@ -6308,25 +6316,25 @@ fa-IR:
     invitation: "دعوت نامه"
     question: پرسش
     warning: هشدار
-  google_doc_accounts_title: "حساب توضیحات گوگل"
+  google_doc_accounts_title: "حساب های Google Doc"
   google_docs_domain_restriction_description: |-
-      محدودیت دامنه Google Docs امکان ارسال های Google Docs و مشارکت
-      را به یک تک دامنه محدود می کند. دانشجویانی که تلاش می کنند تکالیف را ارسال کنند یا به مشارکت ها روی یک دامنه تایید نشده ملحق شوند یک پیغام خطا دریافت خواهند کرد که آنها را
-      از اینکه نیازخواهند داشت یکپارچه سازی Google Docs شان را بروزرسانی کنند، مطلع خواهد ساخت.
+      محدودیت دامنه Google Docs امکان محدود شدن موردهای ارسالی و همکاری ها به یک دامنه را فراهم می کند. دانشجویانی
+      که تلاش می کنند در یک دامنه تأیید نشده تکلیف ها را ارسال کنند یا به همکاری ها بپیوندند، یک پیام خطا دریافت خواهند
+      کرد که آنها را از اینکه باید یکپارچه سازی Google Docs خود را بهنگام سازی کنند، مطلع خواهد ساخت.
   grade_display_warning_dialog: 
     grade_display_warning: 
-      checkbox: "برای این درس دیگر نشان نده."
+      checkbox: "دوباره برای این درس نمایش داده نشود."
       warning: هشدار
-  grade_export_title: "Grade export"
+  grade_export_title: "صدور نمره"
   grade_summary: 
-    graph_title: "میانگین %{mean}،بیشترین %{high}،کمترین %{low} "
+    graph_title: "میانگین %{mean}،بالا %{high}، پایین %{low} "
     outcome: 
       alignment_count: "*%{count}* تطبیق"
   gradebook: 
     alerts: 
       no_active_students: "متأسفانه، یا دانشجوی فعالی در درس شما وجود ندارد و یا اینکه هیچ یک از آنها قابل نمره دهی توسط شما نیستند."
-      no_students_in_groups_back: "متاسفانه، ارسال ها برای این تکلیف نمی تواند در برنامه نمره گذاری سریع نمره دهی شود زیرا کاربری به آن تخصیص نیافته است. لطفا کاربرانی را به مجموعه گروه تخصیص داده و از نو سعی کنید. روی دکمه 'تایید' کلیک کنید و به عقب باز گردید."
-      no_students_in_groups_close: "متاسفانه ارسال ها برای این تکلیف قابل امتیازدهی در برنامه نمره گذاری سریع نیستند زیرا کاربری به آن تخصیص داده نشده است. لطفا کاربران را به این این مجموعه گروه تخصیص داده و مجدد سعی کنید. روی دکمه 'تایید' کلیک کنید تا این پنجره بسته شود."
+      no_students_in_groups_back: "متأسفانه، موردهای ارسالی برای این تکلیف را نمی توان در برنامه نمره گذاری سریع نمره گذاری کرد، زیرا کاربری به آن تخصیص داده نشده است. لطفا کاربران را به این مجموعه گروه تخصیص دهید و دوباره سعی کنید. برای بازگشت، روی دکمه «تأیید» کلیک کنید."
+      no_students_in_groups_close: "متأسفانه موردهای ارسالی این تکلیف را نمی توان در برنامه نمره گذاری سریع نمره گذاری کرد، زیرا کاربری به آن تخصیص داده نشده است. لطفا کاربران را به این مجموعه گروه تخصیص دهید و دوباره سعی کنید. روی دکمه 'تایید' کلیک کنید تا این پنجره بسته شود."
       no_students_in_section: "هیچ دانشجویی در این بخش یافت نشد، در حال بازگشت برای نشان دادن همه بخش ها."
     buttons: 
       saving_settings: "در حال ذخیره سازی تنظیمات..."
@@ -6356,7 +6364,7 @@ fa-IR:
     not_graded: "نمره گذاری نشده"
     not_submitted: "ارسال نشده"
     nth_student: "دانشجو %{n}"
-    portion_graded: "%{x} / %{y} نمره داده شده است"
+    portion_graded: "%{x} / %{y} نمره گذاری شده"
     show_all_details_button: "نمایش همه اطلاعات"
     student: دانشجو
     student_mute_notification: "استاد روی نمره ها کار می کند"
@@ -6399,8 +6407,8 @@ fa-IR:
     grade_display_warning: 
       cancel: لغو
       continue: ادامه
-      percent_text: "دانشجویان نمرات نهایی خود را به صورت درصد نیز مشاهده خواهند کرد. آیا مطمئن هستید که می خواهید ادامه دهید؟"
-      points_text: "دانشجویان نمره نهایی خود را به صورت امتیاز نیز مشاهده خواهند کرد. آیا مطمئنید که می خواهید ادامه دهید؟"
+      percent_text: "دانشجویان نمره نهایی خود را به صورت درصد نیز مشاهده خواهند کرد. مطمئنید که می خواهید ادامه دهید؟"
+      points_text: "دانشجویان نمره نهایی خود را به صورت امتیاز نیز مشاهده خواهند کرد. مطمئنید که می خواهید ادامه دهید؟"
     gradebook_header_menu: 
       assignment_details: "اطلاعات تکلیف"
       curve_grades: "روی منحنی بردن نمره ها"
@@ -6413,16 +6421,16 @@ fa-IR:
       course_average: "میانگین درس"
       course_median: "میانه درس"
       course_mode: "مد درس"
-    hide_notes: "ستون یادداشت ها را مخفی کن"
+    hide_notes: "مخفی کردن ستون یادداشت ها"
     hide_student_names: "مخفی کردن نام دانشجویان"
     invalid_assignment_groups_warning: 
       one: "نمره شامل  %{groups} نمی شود، زیرا آنها هیچ امتیاز ممکن ندارند"
       other: "نمره شامل  %{groups} نمی شود، زیرا آنها هیچ امتیاز ممکن ندارند"
-    keyboard_assignment_desc: "به صفحه جزئیات تکلیف فعلی بروید"
-    keyboard_close_menu: "فهرست تکلیف فعال موجود را ببند"
-    keyboard_comment_desc: "نظر دادن روی ارسال فعال"
-    keyboard_menu_desc: "این منو را برای ستون تکلیف فعال باز کن"
-    keyboard_sort_desc: "این شبکه را روی ستون فعال فعلی مرتب کن"
+    keyboard_assignment_desc: "رفتن به صفحه اطلاعات تکلیف فعلی"
+    keyboard_close_menu: "بستن منوی تکلیف فعال کنونی"
+    keyboard_comment_desc: "نظر دادن درباره مورد ارسالی فعال"
+    keyboard_menu_desc: "باز کردن منوی تکلیف ستون فعال"
+    keyboard_sort_desc: "مرتب کردن شبکه روی ستون فعال فعلی"
     keyboard_tooltip_desc: "نمایش نوع ارسال مورد ارسالی فعال"
     keycodes: 
       close_menu: esc
@@ -6431,17 +6439,17 @@ fa-IR:
       menu: m
       sort: s
       tooltip: t
-    learning_outcome: "نتیجه ی یادگیری"
-    mastery: مهارت
-    near_mastery: "نزدیک به مهارت "
+    learning_outcome: "نتیجه یادگیری"
+    mastery: تسلط
+    near_mastery: "تسلط تقریبی"
     no_assignments_have_points_warning: "تا زمانی که یک تکلیف نمره های ممکن نداشته باشد، نمره قابل محاسبه نیست"
     notes: "یادداشت ها"
     outcome_gradebook: 
       export_report: "گزارش صدور"
-      toggle_sidebar: "تغییر نوار کناری "
+      toggle_sidebar: "تغییر نوار کناری"
     outcome_popover: 
-      mastery_set_at: "مهارت تنظیم در"
-      no_results: "(بدون نمره)"
+      mastery_set_at: "تسلط تعیین شده در"
+      no_results: "(نتیجه موجود نیست)"
       view_more_details: "مشاهده اطلاعات بیشتر"
     percent_of_grade: "%{percentage} از نمره"
     points_out_of: "از %{points_possible}"
@@ -6460,8 +6468,8 @@ fa-IR:
       havent_been_graded: "نمره گذاری نشده است"
       havent_submitted_yet: "هنوز ارسال نکرده است"
       no_grade_for: "نمره ای برای {assignment}% وجود ندارد"
-      no_submission_for: "مورد ارسالی  برای {assignment}% وجود ندارد"
-      not_submitted_yet: "هنوز ارسال نشده"
+      no_submission_for: "مورد ارسالی برای {assignment}% وجود ندارد"
+      not_submitted_yet: "هنوز ارسال نکرده است"
       scored_less_than: "نمره گذاری شده کمتر از"
       scored_less_than_on: "نمره کمتر از  %{cutoff} در %{assignment} "
       scored_more_than: "نمره گذاری شده بیشتر از"
@@ -6539,7 +6547,7 @@ fa-IR:
     leaving_id_will_match_better_can_add_new_assignment: "تغییر ندادن شناسه (بخش (581) در این مورد)، در مطابقت بهتر مؤثر خواهد بود. همچنین می توانید تکلیف های جدیدی که به سرعت ایجاد می شوند را بیفزایید."
     new_assignment_example: "یک تکلیف جدید"
     optional_ignored: "انتخابی، صرفنظر شد."
-    screenreader_csv_explainer: "چه چیزهایی باید در فایل CSV  من باشد؟ ستون های زیر باید در آپلود شما باشد: \"دانشجو\" ، \" شناسه\" و \" تکلیف موجود (#)\". ستون دانشجو باید نام هر دانشجو را داشته باشد و با فرمت نام خانودگی، نام  باشد. به عنوان مثال \"Smith,John\". ستون های تکلیف موجود باید اسم تکلیف به همراه شناسه س تکلیف در پرانتز را نشان دهند. به عنوان مثال \"برگه ی فصل یک (201) \" .  اگر از sis استفاده میکنید، این ستون ها را اضافه کنید : \"شناسه کاربری SIS \" و\" شناسه ی ورود SIS \". اگر میخواهید تکلیف جدیدی بسازید، یک ستون جدید با عنوان اسم تکلیف ضمیمه کنید. برای مثال \" برگه مشتقات\". ستون های مقابل اختیاری هستند: \"بخش\" ، \" نمره فعلی\"، \" نمره نهایی\"."
+    screenreader_csv_explainer: "چه چیزهایی باید در فایل CSV من باشد؟ ستون های زیر باید در بارگذاری شما باشد: \"دانشجو\"، \"شناسه\" و \"تکلیف موجود (#)\". ستون دانشجو باید نام هر دانشجو را داشته باشد و با فرمت نام خانودگی، نام باشد. به عنوان مثال، \"Smith,John\". ستون های تکلیف موجود باید نام تکلیف به همراه شناسه تکلیف را در داخل پرانتز نشان دهند. به عنوان مثال، \"کاربرگ فصل یک (201)\".  اگر از سامانه اطلاعات دانشجو استفاده می کنید، این ستون های زیر را اضافه کنید : \"شناسه کاربری سامانه اطلاعات دانشجو\" و \"شناسه ی ورود سامانه اطلاعات دانشجو\". اگر می خواهید یک تکلیف جدید ایجاد کنید، یک ستون جدید با عنوان نام تکلیف درج کنید. برای مثال، \"کاربرگ مشتق ها\". ستون های زیر اختیاری هستند: \"بخش\"، \"نمره فعلی\"، \"نمره نهایی\"."
     titles: 
       upload_form: "انتخاب یک فایل CSV برای بارگذاری"
     what_should_csv_look_like: "فایل CSV باید چطور باشد؟"
@@ -6587,7 +6595,7 @@ fa-IR:
       change_score_instructions: "روی هر نمره کلیک کنید و یک مقدار جدید را برای نشان دادن اینکه تغییر چگونه نمره کل شما را تحت تأثیر خواهد داد، وارد کنید."
       click_to_change: "برای آزمایش یک نمره دیگر کلیک کنید"
       close_comments: بستن
-      close_comments_label: "بستن نظرات"
+      close_comments_label: "بستن نظرها"
       close_rubric: "بستن دستورالعمل ارزیابی"
       close_score: بستن
       close_score_screenreader: "بستن اطلاعات نمره "
@@ -6595,9 +6603,9 @@ fa-IR:
       comment_count: 
         one: "%{count} نظر"
         other: "%{count} نظر"
-      comment_count_screenreader: "خواندن نظریات"
-      comments: نظرات
-      disabled_for_student_view: "نمره دانشجویان تستی مشمول  آماره نمره ها نمی شود."
+      comment_count_screenreader: "خواندن نظرها"
+      comments: نظرها
+      disabled_for_student_view: "نمره های دانشجوی آزمایشی در آماره نمره ها گنجانده نشده است."
       expand: "باز کردن"
       faculty_journal: "ژورنال هیات علمی برای %{user}"
       for_course: "برای درس،"
@@ -6610,7 +6618,7 @@ fa-IR:
         score: نمره
       icons: 
         rubric_results: "مشاهده نتایج دستورالعمل ارزیابی"
-        turnitin_results: "مشاهده نتایج نرم افزار Turnitin"
+        turnitin_results: "مشاهده نتایج Turnitin"
       labels: 
         final_grade_hidden: "محاسبه نمره کل غیر فعال شده است"
         high: بالا
@@ -6639,7 +6647,7 @@ fa-IR:
       student_mute_notification: "استاد روی نمره ها کار می کند"
       submission_score: "*%{score}* از %{possible}"
       titles: 
-        enter_score: "وارد کردن یک نمره برای ازمایش"
+        enter_score: "وارد کردن یک نمره برای آزمایش"
         revert_score: "بازگشت به نمره اصلی"
         turnitin_score: "نمره شباهت Turnitin -- اطلاعات بیشتر"
         view_rubric_evaluation: "مشاهده ارزیابی با استفاده از دستورالعمل"
@@ -6653,11 +6661,11 @@ fa-IR:
       grades: "نمره ها"
       hide_student_names: "مخفی کردن نام دانشجویان"
       include_ungraded: "در نظر گرفتن نمره گذاری نشده به عنوان 0"
-      individual_view: "تغییر دادن به نمای فردی"
-      learning_mastery: "مهارت یادگیری"
+      individual_view: "تغییر دادن به نمای انفرادی"
+      learning_mastery: "تسلط یادگیری"
       post_grades: "ارسال نمره ها"
-      publish_to_sis: "انتشار نمره ها در سامانه اطلاعات دانشجویی"
-      set_group_weights: "تعیین وزن گروه ها"
+      publish_to_sis: "انتشار نمره ها در سامانه اطلاعات دانشجو"
+      set_group_weights: "تعیین وزن های گروه"
       show_attendance_columns: "نمایش ستون های حضور"
       show_concluded_enrollments: "نمایش ثبت نام های خاتمه یافته"
       upload_scores: "بارگذاری نمره ها (از .csv)"
@@ -6695,7 +6703,7 @@ fa-IR:
     out_of_final: "%{weight} از نمره نهایی"
     out_of_points_possible: "از %{points_possible}"
     screenreader: 
-      page_titles: "دفتر نمره: نمای فردی"
+      page_titles: "دفتر نمره: نمای انفرادی"
     speed_grader: 
       all_sections: "همه بخش ها"
       attach: "پیوست کردن"
@@ -6711,11 +6719,11 @@ fa-IR:
         assessment: ارزیابی
         discussion: بحث
         grading: "در حال نمره گذاری"
-        no_group_submission: "این گروه به هیچ وجه تسلیم این واگذاری نمی شود "
+        no_group_submission: "این گروه هیچ مورد ارسالی برای این تکلیف ندارد"
         no_submission: "این دانشجو یک مورد ارسالی برای این تکلیف ندارد"
         submission: "این دانشجو تکلیف را ارسال کرده است"
       icons: 
-        delete_comment: "حذف دیدگاه"
+        delete_comment: "حذف نظر"
         file_attachment: "پیوست فایل"
         media_comment: "نظر رسانه ای"
         speech_recognition: "بازشناسی گفتار"
@@ -6735,7 +6743,7 @@ fa-IR:
         add_comment: "افزودن یک نظر"
         average: میانگین
         grade: نمره
-        grade_by_question_beta: "نمره برای سوال (beta)"
+        grade_by_question_beta: "نمره گذاری بر اساس پرسش (بتا)"
         group_comment: "ارسال نظر برای کل گروه"
         hide_names: "مخفی کردن نام دانشجویان در برنامه نمره گذاری سریع"
         show_assessment_by: "نمایش ارزیابی بر اساس"
@@ -6813,11 +6821,11 @@ fa-IR:
   grading_box: 
     out_of_points_possible: "از %{assignment.points_possible}"
   grading_cell: 
-    grade_complete: "تکمیل است"
-    grade_incomplete: "تکمیل نیست!"
-    grade_ungraded: "نمره داده نشده"
+    grade_complete: کامل
+    grade_incomplete: ناقص
+    grade_ungraded: "نمره گذاری نشده"
     out_of: "(از %{points})"
-    out_of_nil: "بدون نمره"
+    out_of_nil: "امتیاز ممکن موجود نیست"
     out_of_with_score: "(%{score} از %{points})"
   grading_standard: 
     unknown_grading_details: "اطلاعات ناشناس"
@@ -6846,10 +6854,10 @@ fa-IR:
     titles: 
       grading_scheme_info: "مشاهده/ویرایش طرح نمره گذاری"
   group: 
-    greater_than_1: "Must be greater than 1"
+    greater_than_1: "باید بزرگتر از 1 باشد"
     memeber: عضو
-    name_required: "نام الزامی است. "
-    name_too_long: "اسمی کوتاه تر برای گروه وارد کنید"
+    name_required: "نام لازم است"
+    name_too_long: "یک نام کوتاه تر را برای گروه وارد کنید"
     tabs: 
       discussions: "بحث ها"
       files: "فایل ها"
@@ -6862,20 +6870,20 @@ fa-IR:
       delete_category_success: "رده با موفقیت حذف شد"
       update_category_success: "رده با موفقیت بهنگام سازی شد."
   group_category: 
-    cant_restrict_self_signup: "نمی توان خود ثبت نام را محدود کرد زمانی که یک گروه چند قسمتی در دسته وجود دارد "
+    cant_restrict_self_signup: "نمی توان ثبت نام شخصی را زمانی که یک گروه چند بخشی در رده وجود دارد، محدود کرد"
     greater_than_1: "باید بزرگتر از 1 باشد"
     group_categories: 
       communities: "انجمن ها"
       imported: "گروه های وارد شده"
       student_organized: "گروه های دانشجویی"
-      uncategorized: "دسته بندی نشده"
+      uncategorized: "رده بندی نشده"
     invalid_auto_leader: "نوع AutoLeader باید یکی از مقادیر زیر باشد: %{values}"
-    invalid_self_signup: "خود ثبت نام باید یکی از ارزش های تالی باشد. %{values}"
-    name_required: "وارد کردن نام اجباریست"
-    name_reserved: "%{name} نام رزرو شده می باشد."
-    name_too_long: "یک اسم منطقی کوتاه تر وارد کنید."
+    invalid_self_signup: "ثبت نام شخصی باید یکی از مقادیر زیر باشد: %{values}"
+    name_required: "نام لازم است"
+    name_reserved: "%{name} یک نام رزرو شده است."
+    name_too_long: "یک نام کوتاه تر برای رده وارد کنید"
     name_unavailable: "%{name} قبلا استفاده شده است."
-    self_signup_for_courses: "خود ثبت نام ممکن است فقط برای گروه های دوره ای و انجمن ها قابل استفاده باشد."
+    self_signup_for_courses: "ثبت نام شخصی ممکن است فقط برای گروه ها یا انجمن های درس فعال شده باشد"
   group_category_locked: "رده گروه را نمی توان تغییر داد، زیرا دانشجویان این تکلیف را ارسال کرده اند"
   group_membership: 
     errors: 
@@ -6970,8 +6978,8 @@ fa-IR:
         open_to_course_members: "پیوستن اعضای درس آزاد است"
       page_title: "گروه های درس"
       student_group_warning: "اگر استاد شما درباره قرار دادن شما در گروه ها به عنوان بخشی از یک تکلیف صحبت کرده باشد، این روش برای انجام این کار نیست. از گروه هایی که خود سازماندهی می کنید، نمی توان برای نمره گذاری استفاده کرد... با این وجود، می توانید گروه های خود را تشکیل دهید. اما تا زمانی که استاد شما گروه ها را برای شما نسازد، نمی توانید نسخه اکترونیکی هر گونه تکلیف را تحویل دهید."
-      student_groups_tabs_everyone: Everyone
-      student_groups_tabs_groups: Groups
+      student_groups_tabs_everyone: همه
+      student_groups_tabs_groups: "گروه ها"
     context_manage_groups: 
       account_group_explanation: "گروه های دانشجویی در سطح حساب، شیوه خوبی برای گروه بندی دانشجویان بدون داشتن وابستگی به یک درس خاص هستند. هر گروه دانشجویی تقویم، صفحه بحث و ابزارهای همکاری مخصوص به خود را دریافت می کند تا بتواند خود را سازماندهی کند و با گروه های دیگر به طور مؤثرتر همکاری نماید."
       actions: 
@@ -6989,9 +6997,9 @@ fa-IR:
       messages: 
         no_students: "هیچ دانشجویی به این درس افزوده نشده است"
       page_title: "گروه های درس"
-      page_title_accounts: "گروه های حساب کاربری"
-    create_group_set: "ایجاد کردن مجموعه گروه"
-    delete_confirm: "آیا می خواهید این دسته بندی گروه را حذف نمائید؟"
+      page_title_accounts: "گروه های حساب"
+    create_group_set: "ایجاد مجموعه گروه"
+    delete_confirm: "مطمئنید که می خواهید این مجموعه گروه حذف شود؟"
     edit: 
       buttons: 
         update: "بهنگام سازی گروه"
@@ -7008,7 +7016,7 @@ fa-IR:
       group_structure_group_limit: "*محدود کردن گروه به داشتن * %{group_limit} عضو"
       restricted_self_signup: "نیازمند این است که اعضای گروه در بخش یکسانی باشند"
       self_signup_help_tooltip: "گروه های ثبت نام شخصی چه هستند؟"
-    edit_group_set: "ویرایش کردن مجموعه گروه"
+    edit_group_set: "ویرایش مجموعه گروه"
     errors: 
       category_in_use: "\"%{category_name}\" اکنون در حال استفاده است"
       creating_category_failed: "ایجاد گروه انجام نشد، دوباره سعی کنید"
@@ -7017,11 +7025,11 @@ fa-IR:
       group_limit: "جای خالی مربوط به محدودیت گروه باید خالی یا بزرگتر از 1 باشد"
       unknown: "یک خطای پیش بینی نشده رخ داد."
       update_failed: "بهنگام سازی انجام نشد، دوباره سعی کنید"
-    everyone: "همه کس (%{count})"
+    everyone: "همه افراد (%{count})"
     feed_title: "خوراک خبری %{course_or_account_name}"
     flash: 
-      removeError: "خطا در حذف دسته بندی گروه،مجددا سعی نمائید."
-      removed: "دسته بندی گروه حذف شد."
+      removeError: "قادر به حذف مجموعه گروه نیست، لطفا بعدا دوباره سعی کنید."
+      removed: "مجموعه گروه با موفقیت حذف شد."
     group: 
       actions: 
         ask_to_join_group: "درخواست برای پیوستن به این گروه"
@@ -7036,138 +7044,138 @@ fa-IR:
       no_members: "هیچ عضوی موجود نیست"
       one: "1 گروه"
       other: "%{count} گروه"
-    group_limit_number: "محدوده گروه باید یک عدد باشد"
+    group_limit_number: "حداکثر ظرفیت گروه باید یک عدد باشد"
     group_name: "نام گروه"
-    groups_count: "گروه های (%{count})"
+    groups_count: "گروه ها (%{count})"
     index: 
       heading_current_groups: "گروه های فعلی"
       no_groups: "هیچ گروهی موجود نیست"
     loading: "درحال بارگذاری فهرست گروه..."
     manage: 
       add_unassigned_menu: 
-        add_unassigned_student: "افزودن دانشجوی منتصب نشده"
-        add_unassigned_user: "افزودن کاربر منتصب نشده"
+        add_unassigned_student: "افزودن دانشجوی تخصیص داده نشده"
+        add_unassigned_user: "افزودن کاربر تخصیص داده نشده"
         search_people: "جستجوی افراد"
       add_unassigned_user: 
-        add_to_group: "کاربر را به گروه اضافه کنید"
-        add_user_to_group: "به این گروه %{name} کاربری اضافه کنید"
+        add_to_group: "افزودن کاربر به گروه"
+        add_user_to_group: "افزودن کاربر %{name} به این گروه"
       add_unassigned_users: 
         no_users_found: "کاربری یافت نشد"
-        too_short: "لطفا یک واژه جستجو با 3 یا بیشتر کاراکتر وارد کنید"
+        too_short: "لطفا یک عبارت جستجو با 3 یا چند نویسه وارد کنید"
       assign_to_group_menu: 
         add_to_group: "افزودن به گروه"
-        all_groups_full: "تمام گروه ها پر هستند. "
-        all_groups_full_suggestion: "در هر صورت تغییر محدودیت های گروه و یا اضافه کردن گروه های دیگر. "
-        assign_user_to_group: "انتصاب کاربر به این گروه"
-        assign_user_to_group_name: "انتصاب کاربر به گروه %{name}"
-        no_groups_created: "گروه ها نیازدارند ایجاد شوند قبل از این که کاربران بتوانند اضافه شوند."
+        all_groups_full: "ظرفیت همه گروه ها تکمیل است."
+        all_groups_full_suggestion: "حداکثر ظرفیت گروه را تغییر دهید یا گروه های بیشتر اضافه کنید."
+        assign_user_to_group: "تخصیص دادن کاربر به این گروه"
+        assign_user_to_group_name: "تخصیص دادن کاربر به گروه %{name}"
+        no_groups_created: "قبل از این که بتوان کاربران را اضافه کرد، گروه ها باید ایجاد شوند."
       edit_group_assignment: 
-        all_available_groups_full: "تمام گروه های موجود تکمیل هستند"
-        all_groups_full_suggestion: "در هر صورت تغییر محدودیت های گروه و یا اضافه کردن گروه های دیگر. "
-        move_to_group_label: "برو به گروه"
-        saving: "ذخیره کردن..."
+        all_available_groups_full: "ظرفیت همه گروه های موجود تکمیل است."
+        all_groups_full_suggestion: "حداکثر ظرفیت گروه را تغییر دهید یا گروه های بیشتر اضافه کنید."
+        move_to_group_label: "انتقال به گروه"
+        saving: "در حال ذخیره سازی..."
         where_to_move: "می خواهید *%{userName}* به کجا منتقل شود؟"
       group_categories: 
         account_group_explanation: "گروه های دانشجویی در سطح حساب، روش خوبی برای گروه بندی دانشجویان بدون داشتن وابستگی به یک درس خاص هستند. هر گروه دانشجویی تقویم، صفحه بحث و ابزارهای همکاری مخصوص به خود را دریافت می کند تا بتواند خود را سازماندهی کند و به طور مؤثرتر با گروه های دیگر همکاری نماید."
-        add_group_set: "افزودن تنظیم گروه"
+        add_group_set: "افزودن مجموعه گروه"
         course_group_explanation: "گروه های دانشجویی روش مفیدی برای سازماندهی دانشجویان برای چیزهایی مانند پروژه ها یا مقاله های گروهی هستند. هر گروه دانشجویی تقویم، صفحه بحث و ابزارهای همکاری مخصوص به خود را دریافت می کند تا بتواند خود را سازماندهی کند و با گروه های دیگر به طور مؤثرتر همکاری نماید. "
-        group_assignment_instructions: "می توانید دانشجویان را به طور تصادفی به گروهایی با یک اندازه خاص تخصیص دهید، یا گروه ها را به طور دستی ایجاد و سازماندهی کنید. وقتی گروه های شما ایجاد شد، می توانید تکلیف ها را به عنوان تکلیف های «ارسالی گروه» تعیین کنید، بدین معنا که هر گروه یک مورد ارسالی برای همه کاربران این گروه خواهد داشت."
-        group_set: "Group set"
+        group_assignment_instructions: "می توانید دانشجویان را به طور تصادفی به گروهایی با یک اندازه خاص تخصیص دهید، یا گروه ها را به طور دستی ایجاد و سازماندهی کنید. وقتی گروه های شما ایجاد شدند، می توانید تکلیف ها را به عنوان تکلیف های «ارسالی گروه» تعیین کنید، بدین معنا که هر گروه یک مورد ارسالی برای همه کاربران این گروه خواهد داشت."
+        group_set: "مجموعه گروه"
         headings: 
-          account_groups: "گروه های دانشجو در سطح حساب"
-          course_groups: "گروه‌های دانشجو"
+          account_groups: "گروه های دانشجویی در سطح حساب"
+          course_groups: "گروه‌های دانشجویی"
         tabs: 
-          everyone: Everyone
+          everyone: همه
       group_category: 
-        randomly_assigning_students: "انتساب اتفاقی دانش آموزان"
+        randomly_assigning_students: "تخصیص دادن تصادفی دانشجویان"
         search_groups: "جستجوی گروه ها"
         search_users: "جستجوی کاربران"
       group_category_create: 
-        allow_self_signup: "اجازه دادن برای ثبت نام خود"
-        auto_first_group_leader: "قرار دادن اولین دانشجویی که به گروه پیوست به عنوان نماینده گروه "
-        auto_group_leader: "انتصاب خودکار یک رهبر گروه دانشجویی "
-        auto_random_group_leader: "قراردادن یک دانشجو بطور تصادفی بعنوان رهبر گروه "
-        cancel: "لغو کردن"
-        create_groups: "ساختن %h{num_groups}  گروه ها اکنون"
+        allow_self_signup: "اجازه دادن برای ثبت نام شخصی"
+        auto_first_group_leader: "قرار دادن اولین دانشجو برای پیوستن به عنوان سرگروه"
+        auto_group_leader: "تخصیص دادن خودکار یک سرگروه دانشجویی"
+        auto_random_group_leader: "تعیین یک دانشجوی تصادفی به عنوان سرگروه"
+        cancel: لغو
+        create_groups: "اکنون %h{num_groups} گروه ایجاد شود"
         create_groups_manually: "گروه ها را به طور دستی ایجاد خواهم کرد"
-        group_set_name: "نام تنظیم شده گروه"
+        group_set_name: "نام مجموعه گروه"
         group_structure: "ساختار گروه"
-        leadership: رهبری
-        leave_group_limit_blank: "برای این جای خالی هیچ حدی مشخص نکنید"
-        limit_group_size: "حد گروه برای %h{group_limit} اعضا"
+        leadership: ریاست
+        leave_group_limit_blank: "برای عدم محدودیت، خالی بگذارید"
+        limit_group_size: "محدود کردن گروه ها به داشتن %h{group_limit} عضو"
         require_same_section: "نیازمند این است که اعضای گروه در بخش یکسانی باشند"
-        save: "ذخیره کردن"
-        saving: "ذخیره کردن..."
-        self_signup: "ثبت نام خود"
+        save: "ذخیره سازی"
+        saving: "در حال ذخیره سازی..."
+        self_signup: "ثبت نام شخصی"
       group_category_detail: 
         add_group: "افزودن گروه"
         category_settings: تنظیمات
         delete_category_option: حذف
         edit_category_option: ویرایش
         group: گروه
-        message_all_unassigned_option: "به همه ی دانش آموزان اختصاص داده نشده پیامک بزنید"
-        randomly_assign_students_option: "انتساب اتفاقی دانش آموزان"
+        message_all_unassigned_option: "ارسال پیام برای همه دانشجویان تخصیص داده نشده"
+        randomly_assign_students_option: "تخصیص دادن تصادفی دانشجویان"
         restricted_self_signup_blurb: "همه دانشجویان یک گروه باید در بخش یکسانی باشند."
-        self_organized_warning: "این گروه ها توسط خود دانشجویان سازماندهی شده اند. بر خلاف انواع دیگر گروه ها، دانشجویان می توانند در یک زمان به بیش از یکی از این گروه ها تعلق داشته باشند تا از این گروه ها برای تکلیف های نمره گذاری شده استفاده نشود."
-        self_signup_blurb: "ثبت نام خود برای این گروه ها فعال شده است."
+        self_organized_warning: "این گروه ها توسط خود دانشجویان سازماندهی شده اند. بر خلاف انواع دیگر گروه ها، دانشجویان می توانند همزمان در بیش از یک گروه عضو باشند تا از این گروه ها برای تکلیف های نمره گذاری شده استفاده نشود."
+        self_signup_blurb: "ثبت نام شخصی برای این گروه ها فعال شده است."
         settings: تنظیمات
-        uncategorized_groups: "این گروه ها در هیچ گروه مرتبطی یافت نشد. زیرا از طریق سامانه اطلاعات دانشجویی وارد شده اند و فقط از طریق سامانه اطلاعات دانشجویی می توانند به روز یا حذف شوند."
+        uncategorized_groups: "این گروه ها به هیچ گروه خاصی مرتبط نیستند. زیرا از طریق سامانه اطلاعات دانشجو وارد شده اند، فقط می توان آنها را از طریق سامانه اطلاعات دانشجو بهنگام سازی یا حذف کرد."
       group_category_edit: 
-        allow_self_signup: "اجازه دادن برای ثبت نام خود"
-        cancel: "لغو کردن"
+        allow_self_signup: "اجازه دادن برای ثبت نام شخصی"
+        cancel: لغو
         group_limit_override: "با تغییر دادن این مورد، هر گونه محدودیت گروهی تعیین شده توسط فرد جایگزین خواهد شد"
-        group_set_name: "برای گروه اسم بگذارید"
-        leave_group_limit_blank: "برای این جای خالی هیچ جدی مشخص نکنید"
-        limit_group_size: "حد گروه برای %h{group_limit} اعضا"
+        group_set_name: "نام مجموعه گروه"
+        leave_group_limit_blank: "برای عدم محدودیت، خالی بگذارید"
+        limit_group_size: "محدود کردن گروه ها به %h{group_limit} عضو"
         require_same_section: "نیازمند این است که اعضای گروه در بخش یکسانی باشند"
-        save: "ذخیره کردن"
-        saving: "ذخیره کردن..."
+        save: "ذخیره سازی"
+        saving: "در حال ذخیره سازی..."
       group_detail: 
-        add_user_to_group: "انتصاب کاربر به گروه"
+        add_user_to_group: "تخصیص دادن کاربر به گروه"
         group_delete: حذف
-        group_edit: "ویرایش کردن"
+        group_edit: ویرایش
         group_full: کامل
-        group_leader: "رهبر گروه"
+        group_leader: سرگروه
         group_settings: تنظیمات
         show_group_details: "نمایش اطلاعات گروه %{name}"
-        visit_group_homepage: "دیدن صفحه اصلی گروه"
+        visit_group_homepage: "بازدید از صفحه اصلی گروه"
       group_edit: 
-        cancel: "لغو کردن"
+        cancel: لغو
         group_join_level: "درحال پیوستن"
-        group_max_membership: "محدود کردن گروه به"
-        group_max_membership_help: "(برای استفاده از حداکثر مجموعه گروه خالی بگذارید)"
+        group_max_membership: "محدود کردن گروه ها به"
+        group_max_membership_help: "(برای استفاده از حداکثر مجموعه گروه، خالی بگذارید)"
         group_max_membership_members: اعضا
         group_name: "نام گروه"
         invitation_only: "فقط از طریق دعوت نامه"
-        open: "افراد برای ملحق شده آزاد هستند"
-        save: "ذخیره کردن"
-        saving: "ذخیره کردن..."
+        open: "اعضا برای پیوستن به گروه آزاد هستند"
+        save: "ذخیره سازی"
+        saving: "در حال ذخیره سازی..."
       group_user: 
         assign_to_group: "تخصیص به گروه"
-        assign_user_to_group: "انتصاب %{name} به یک گروه"
-        edit_group_membership: "ویرایش  %{name}'s عضویت"
-        group_leader: "رهبر گروه"
-        move: "برو به..."
-        move_to_new_group: " %{name} را به یک گروه جدید منتقل کنید"
-        remove: "حذف کردن"
-        remove_as_leader: "حذف بعنوان رهبر"
+        assign_user_to_group: "تخصیص دادن %{name} به یک گروه"
+        edit_group_membership: "ویرایش عضویت %{name}'s"
+        group_leader: سرگروه
+        move: "انتقال به..."
+        move_to_new_group: "انتقال %{name} به یک گروه جدید"
+        remove: حذف
+        remove_as_leader: "حذف به عنوان سرگروه"
         remove_from_group: "حذف %{name} از گروه"
-        remove_user_as_leader: "حذف %{name}  به عنوان راهنما"
-        set_as_leader: "قراردادن بعنوان رهبر"
-        set_user_as_leader: "قراردادن %{name}  بعنوان رهبر"
+        remove_user_as_leader: "حذف %{name} به عنوان سرگروه"
+        set_as_leader: "تعیین به عنوان سرگروه"
+        set_user_as_leader: "تعیین %{name} به عنوان سرگروه"
       group_users: 
-        add_student: "یک دانشجو بیفزایید تا شروع به کار کنید."
-        add_user: "یک شناسه کاربری بیفزایید تا شروع به کار کنید."
-        no_matching_students: "هیج تطابق دانش اموز وجود ندارد."
-        no_matching_users: "هیج تطابق کاربر وجود ندارد."
-        no_students: "بدون دانش آموز"
+        add_student: "برای شروع به کار، یک دانشجو اضافه کنید."
+        add_user: "برای شروع به کار، یک کاربر اضافه کنید."
+        no_matching_students: "هیج دانشجویی مطابقت ندارد."
+        no_matching_users: "هیج کاربری مطابقت ندارد."
+        no_students: "در حال حاضر، هیچ دانشجویی در این گروه وجود ندارد."
         no_users: "در حال حاضر هیچ کاربری در این گروه وجود ندارد."
       groups: 
-        no_groups: "بدون گروه"
-        no_matching_groups: "هیچ گروهی که با واژه مورد جستجوی شما مطابقت داشته باشد وجود ندارد."
+        no_groups: "در حال حاضر، هیچ گروهی در این مجموعه گروه وجود ندارد. برای شروع به کار، یک گروه بیفزایید."
+        no_matching_groups: "هیچ گروهی که با عبارت جستجوی فعلی شما مطابقت داشته باشد، وجود ندارد."
       randomly_assign_members: 
-        cancel: "لغو کردن"
-        okay: "بسیار خوب"
+        cancel: لغو
+        okay: تأیید
         randomly_assign_students_dialog: "این به طور خودکار و مساوی همه ی دانش آموزانی را که به هیچ یک از گروه های دانش آموزان موجود اختصاص داده نشده اند را اختصاص خواهد داد."
       self_signup_help: 
         about_self_signup_groups: "درباره گروه های خود ثبت نام "
@@ -14234,7 +14242,7 @@ fa-IR:
           در یک یا چند درس ثبت نام کرده اید که هنوز شروع نشده اند. به محض اینکه
           این درس ها در دسترس قرار گیرند، اطلاعات مربوط به آنها را در اینجا
           و در پیمایش بالا خواهید دید. در ضمن، برای ثبت نام در درس های
-          بیشتر یا راه اندازی نمایه خود راحت باشید.
+          بیشتر یا راه اندازی نمایه خود به نحو دلخواه اقدام نمایید.
       welcome_to_happiness: "به کانواس خوش آمدید!"
   validate: 
     is_required: "تکمیل این جای خالی لازم است"
