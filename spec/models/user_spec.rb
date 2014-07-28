@@ -1876,49 +1876,6 @@ describe User do
       assignments = @student.assignments_needing_submitting(:contexts => [@course])
       assignments[0].has_attribute?(:only_visible_to_overrides).should be_true
     end
-
-    def create_course_with_assignment_needing_submitting(opts={})
-      student = opts[:student]
-      course_with_student_logged_in(:active_all => true, :user => student)
-      @course.enrollments.each(&:destroy!) #student removed from default section
-      section = @course.course_sections.create!
-      student_in_section(section, user: student)
-      assignment_quiz([], :course => @course, :user => student)
-      @assignment.only_visible_to_overrides = true
-      @assignment.publish
-      @quiz.due_at = 2.days.from_now
-      @quiz.save!
-      if opts[:differentiated_assignments]
-        @course.enable_feature!(:differentiated_assignments)
-      end
-      if opts[:override]
-        create_section_override_for_assignment(@assignment, {course_section: section})
-      end
-      @assignment
-    end
-
-    context "differentiated_assignments" do
-      context "feature flag on" do
-        before {@student = User.create!(name: "Test Student")}
-        it "should not return the assignments without an override" do
-          assignment = create_course_with_assignment_needing_submitting({differentiated_assignments: true, override: false, student: @student})
-          @student.assignments_needing_submitting(contexts: Course.all).include?(assignment).should be_false
-        end
-
-        it "should return the assignments with an override" do
-          assignment = create_course_with_assignment_needing_submitting({differentiated_assignments: true, override: true, student: @student})
-          @student.assignments_needing_submitting(contexts: Course.all).include?(assignment).should be_true
-        end
-      end
-
-      context "feature flag off" do
-        before {@student = User.create!(name: "Test Student")}
-        it "should return the assignment without an override" do
-          assignment = create_course_with_assignment_needing_submitting({differentiated_assignments: false, override: false, student: @student})
-          @student.assignments_needing_submitting(contexts: Course.all).include?(assignment).should be_true
-        end
-      end
-    end
   end
 
   describe "avatar_key" do

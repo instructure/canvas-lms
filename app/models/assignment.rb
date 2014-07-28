@@ -1559,11 +1559,6 @@ class Assignment < ActiveRecord::Base
     where(:assignment_student_visibilities => { :user_id => user_id, :course_id => course_id })
   }
 
-  scope :visible_to_student_in_all_courses_with_da, lambda { |user_id|
-    joins(:assignment_student_visibilities).
-    where(:assignment_student_visibilities => { :user_id => user_id})
-  }
-
   scope :due_before, lambda { |date| where("assignments.due_at<?", date) }
 
   scope :due_after, lambda { |date| where("assignments.due_at>?", date) }
