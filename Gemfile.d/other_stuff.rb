@@ -35,7 +35,7 @@ else
   gem 'rails-patch-json-encode', '0.0.1'
   gem 'rack', '1.4.5'
   gem 'routing_concerns', '0.1.0'
-  gem 'switchman', '1.2.11'
+  gem 'switchman', '1.2.12'
   gem 'folio-pagination', '0.0.7', :require => 'folio/rails'
   gem 'will_paginate', '3.0.4', :require => false
 end
