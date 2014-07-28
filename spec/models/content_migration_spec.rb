@@ -1774,78 +1774,121 @@ describe ContentMigration do
       (new_assignment.due_at.to_i - (today + 1.day).to_i).abs.should < 60
     end
 
-    it "should shift dates" do
-      pending unless Qti.qti_enabled?
-      options = {
-              :everything => true,
-              :shift_dates => true,
-              :old_start_date => 'Jul 1, 2012',
-              :old_end_date => 'Jul 11, 2012',
-              :new_start_date => 'Aug 5, 2012',
-              :new_end_date => 'Aug 15, 2012'
-      }
+    describe "date shifting" do
+      before do
+        @old_start = DateTime.parse("01 Jul 2012 06:00:00 UTC +00:00")
+        @new_start = DateTime.parse("05 Aug 2012 06:00:00 UTC +00:00")
 
-      old_start = DateTime.parse("01 Jul 2012 06:00:00 UTC +00:00")
-      new_start = DateTime.parse("05 Aug 2012 06:00:00 UTC +00:00")
+        @copy_from.assert_assignment_group
+        @copy_from.assignments.create!(:due_at => @old_start + 1.day,
+                                       :unlock_at => @old_start + 2.days,
+                                       :lock_at => @old_start + 3.days,
+                                       :peer_reviews_due_at => @old_start + 4.days
+        )
+        @copy_from.quizzes.create!(:due_at => "05 Jul 2012 06:00:00 UTC +00:00",
+                                   :unlock_at => @old_start + 1.days,
+                                   :lock_at => @old_start + 5.days,
+                                   :show_correct_answers_at => @old_start + 6.days,
+                                   :hide_correct_answers_at => @old_start + 7.days
+        )
+        @copy_from.discussion_topics.create!(:title => "some topic",
+                                             :message => "<p>some text</p>",
+                                             :delayed_post_at => @old_start + 3.days)
+        @copy_from.announcements.create!(:title => "hear ye",
+                                         :message => "<p>grades will henceforth be in Cyrillic letters</p>",
+                                         :delayed_post_at => @old_start + 10.days)
+        @copy_from.calendar_events.create!(:title => "an event",
+                                           :start_at => @old_start + 4.days,
+                                           :end_at => @old_start + 4.days + 1.hour)
+        cm = @copy_from.context_modules.build(:name => "some module", :unlock_at => @old_start + 1.days)
+        cm.start_at = @old_start + 2.day
+        cm.end_at = @old_start + 3.days
+        cm.save!
+      end
 
-      @copy_from.assert_assignment_group
-      @copy_from.assignments.create!(:due_at => old_start + 1.day,
-                                     :unlock_at => old_start + 2.days,
-                                     :lock_at => old_start + 3.days,
-                                     :peer_reviews_due_at => old_start + 4.days
-      )
-      @copy_from.quizzes.create!(:due_at => "05 Jul 2012 06:00:00 UTC +00:00",
-                                 :unlock_at => old_start + 1.days,
-                                 :lock_at => old_start + 5.days,
-                                 :show_correct_answers_at => old_start + 6.days,
-                                 :hide_correct_answers_at => old_start + 7.days
-      )
-      @copy_from.discussion_topics.create!(:title => "some topic",
-                                           :message => "<p>some text</p>",
-                                           :delayed_post_at => old_start + 3.days)
-      @copy_from.announcements.create!(:title => "hear ye",
-                                       :message => "<p>grades will henceforth be in Cyrillic letters</p>",
-                                       :delayed_post_at => old_start + 10.days)
-      @copy_from.calendar_events.create!(:title => "an event",
-                                         :start_at => old_start + 4.days,
-                                         :end_at => old_start + 4.days + 1.hour)
-      cm = @copy_from.context_modules.build(:name => "some module", :unlock_at => old_start + 1.days)
-      cm.start_at = old_start + 2.day
-      cm.end_at = old_start + 3.days
-      cm.save!
+      it "should shift dates" do
+        pending unless Qti.qti_enabled?
+        options = {
+                :everything => true,
+                :shift_dates => true,
+                :old_start_date => 'Jul 1, 2012',
+                :old_end_date => 'Jul 11, 2012',
+                :new_start_date => 'Aug 5, 2012',
+                :new_end_date => 'Aug 15, 2012'
+        }
+        @cm.copy_options = options
+        @cm.save!
 
-      @cm.copy_options = options
-      @cm.save!
+        run_course_copy
 
-      run_course_copy
+        new_asmnt = @copy_to.assignments.first
+        new_asmnt.due_at.to_i.should  == (@new_start + 1.day).to_i
+        new_asmnt.unlock_at.to_i.should == (@new_start + 2.day).to_i
+        new_asmnt.lock_at.to_i.should == (@new_start + 3.day).to_i
+        new_asmnt.peer_reviews_due_at.to_i.should == (@new_start + 4.day).to_i
 
-      new_asmnt = @copy_to.assignments.first
-      new_asmnt.due_at.to_i.should  == (new_start + 1.day).to_i
-      new_asmnt.unlock_at.to_i.should == (new_start + 2.day).to_i
-      new_asmnt.lock_at.to_i.should == (new_start + 3.day).to_i
-      new_asmnt.peer_reviews_due_at.to_i.should == (new_start + 4.day).to_i
+        new_quiz = @copy_to.quizzes.first
+        new_quiz.due_at.to_i.should  == (@new_start + 4.day).to_i
+        new_quiz.unlock_at.to_i.should == (@new_start + 1.day).to_i
+        new_quiz.lock_at.to_i.should == (@new_start + 5.day).to_i
+        new_quiz.show_correct_answers_at.to_i.should == (@new_start + 6.day).to_i
+        new_quiz.hide_correct_answers_at.to_i.should == (@new_start + 7.day).to_i
 
-      new_quiz = @copy_to.quizzes.first
-      new_quiz.due_at.to_i.should  == (new_start + 4.day).to_i
-      new_quiz.unlock_at.to_i.should == (new_start + 1.day).to_i
-      new_quiz.lock_at.to_i.should == (new_start + 5.day).to_i
-      new_quiz.show_correct_answers_at.to_i.should == (new_start + 6.day).to_i
-      new_quiz.hide_correct_answers_at.to_i.should == (new_start + 7.day).to_i
+        new_disc = @copy_to.discussion_topics.first
+        new_disc.delayed_post_at.to_i.should == (@new_start + 3.day).to_i
 
-      new_disc = @copy_to.discussion_topics.first
-      new_disc.delayed_post_at.to_i.should == (new_start + 3.day).to_i
+        new_ann = @copy_to.announcements.first
+        new_ann.delayed_post_at.to_i.should == (@new_start + 10.day).to_i
 
-      new_ann = @copy_to.announcements.first
-      new_ann.delayed_post_at.to_i.should == (new_start + 10.day).to_i
+        new_event = @copy_to.calendar_events.first
+        new_event.start_at.to_i.should == (@new_start + 4.day).to_i
+        new_event.end_at.to_i.should == (@new_start + 4.day + 1.hour).to_i
 
-      new_event = @copy_to.calendar_events.first
-      new_event.start_at.to_i.should == (new_start + 4.day).to_i
-      new_event.end_at.to_i.should == (new_start + 4.day + 1.hour).to_i
+        new_mod = @copy_to.context_modules.first
+        new_mod.unlock_at.to_i.should  == (@new_start + 1.day).to_i
+        new_mod.start_at.to_i.should == (@new_start + 2.day).to_i
+        new_mod.end_at.to_i.should == (@new_start + 3.day).to_i
+      end
 
-      new_mod = @copy_to.context_modules.first
-      new_mod.unlock_at.to_i.should  == (new_start + 1.day).to_i
-      new_mod.start_at.to_i.should == (new_start + 2.day).to_i
-      new_mod.end_at.to_i.should == (new_start + 3.day).to_i
+      it "should remove dates" do
+        pending unless Qti.qti_enabled?
+        options = {
+            :everything => true,
+            :remove_dates => true,
+        }
+        @cm.copy_options = options
+        @cm.save!
+
+        run_course_copy
+
+        new_asmnt = @copy_to.assignments.first
+        new_asmnt.due_at.should be_nil
+        new_asmnt.unlock_at.should be_nil
+        new_asmnt.lock_at.should be_nil
+        new_asmnt.peer_reviews_due_at.should be_nil
+
+        new_quiz = @copy_to.quizzes.first
+        new_quiz.due_at.should be_nil
+        new_quiz.unlock_at.should be_nil
+        new_quiz.lock_at.should be_nil
+        new_quiz.show_correct_answers_at.should be_nil
+        new_quiz.hide_correct_answers_at.should be_nil
+
+        new_disc = @copy_to.discussion_topics.first
+        new_disc.delayed_post_at.should be_nil
+
+        new_ann = @copy_to.announcements.first
+        new_ann.delayed_post_at.should be_nil
+
+        new_event = @copy_to.calendar_events.first
+        new_event.start_at.should be_nil
+        new_event.end_at.should be_nil
+
+        new_mod = @copy_to.context_modules.first
+        new_mod.unlock_at.should be_nil
+        new_mod.start_at.should be_nil
+        new_mod.end_at.should be_nil
+      end
     end
 
     it "should copy all quiz attributes" do

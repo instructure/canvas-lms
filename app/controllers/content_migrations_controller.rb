@@ -262,7 +262,7 @@ class ContentMigrationsController < ApplicationController
   #   package, if both bank id and name are set, id will take precedence.
   #
   # @argument date_shift_options[shift_dates] [Optional, Boolean]
-  #   Whether to shift dates
+  #   Whether to shift dates in the copied course
   #
   # @argument date_shift_options[old_start_date] [Optional, Date]
   #   The original start date of the source content/course
@@ -279,6 +279,10 @@ class ContentMigrationsController < ApplicationController
   # @argument date_shift_options[day_substitutions][X] [Optional, Integer]
   #   Move anything scheduled for day 'X' to the specified day. (0-Sunday,
   #   1-Monday, 2-Tuesday, 3-Wednesday, 4-Thursday, 5-Friday, 6-Saturday)
+  #
+  # @argument date_shift_options[remove_dates] [Optional, Boolean]
+  #   Whether to remove dates in the copied course. Cannot be used
+  #   in conjunction with *shift_dates*.
   #
   # @example_request
   #

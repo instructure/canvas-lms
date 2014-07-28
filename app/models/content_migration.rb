@@ -21,6 +21,7 @@ class ContentMigration < ActiveRecord::Base
   include TextHelper
   belongs_to :context, :polymorphic => true
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account', 'Group', 'User']
+  validate :valid_date_shift_options
   belongs_to :user
   belongs_to :attachment
   belongs_to :overview_attachment, :class_name => 'Attachment'
@@ -471,13 +472,19 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def set_date_shift_options(opts)
-    if opts && Canvas::Plugin.value_to_boolean(opts[:shift_dates])
-      self.migration_settings[:date_shift_options] = opts.slice(:shift_dates, :old_start_date, :old_end_date, :new_start_date, :new_end_date, :day_substitutions, :time_zone)
+    if opts && (Canvas::Plugin.value_to_boolean(opts[:shift_dates]) || Canvas::Plugin.value_to_boolean(opts[:remove_dates]))
+      self.migration_settings[:date_shift_options] = opts.slice(:shift_dates, :remove_dates, :old_start_date, :old_end_date, :new_start_date, :new_end_date, :day_substitutions, :time_zone)
     end
   end
 
   def date_shift_options
     self.migration_settings[:date_shift_options]
+  end
+
+  def valid_date_shift_options
+    if date_shift_options && Canvas::Plugin.value_to_boolean(date_shift_options[:shift_dates]) && Canvas::Plugin.value_to_boolean(date_shift_options[:remove_dates])
+      errors.add(:date_shift_options, t('errors.cannot_shift_and_remove', "cannot specify shift_dates and remove_dates simultaneously"))
+    end
   end
 
   scope :for_context, lambda { |context| where(:context_id => context, :context_type => context.class.to_s) }

@@ -2060,8 +2060,13 @@ class Course < ActiveRecord::Base
   end
 
   def set_course_dates_if_blank(shift_options)
-    self.start_at ||= shift_options[:default_start_at]
-    self.conclude_at ||= shift_options[:default_conclude_at]
+    if Canvas::Plugin.value_to_boolean(shift_options[:remove_dates])
+      self.start_at = nil
+      self.conclude_at = nil
+    else
+      self.start_at ||= shift_options[:default_start_at]
+      self.conclude_at ||= shift_options[:default_conclude_at]
+    end
   end
 
   def real_start_date
