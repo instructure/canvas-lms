@@ -2211,8 +2211,12 @@ describe User do
       end
 
       it "should find assignments from all shards" do
-        @teacher.assignments_needing_grading.sort_by(&:id).should ==
-            [@course1.assignments.first, @course2.assignments.first, @assignment3].sort_by(&:id)
+        [Shard.default, @shard1, @shard2].each do |shard|
+          shard.activate do
+            @teacher.assignments_needing_grading.sort_by(&:id).should ==
+                [@course1.assignments.first, @course2.assignments.first, @assignment3].sort_by(&:id)
+          end
+        end
       end
 
       it "should honor ignores for a separate shard" do

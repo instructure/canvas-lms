@@ -1364,18 +1364,18 @@ class User < ActiveRecord::Base
   end
 
   def assignments_needing_submitting(opts={})
-    course_ids = Shackles.activate(:slave) do
-      if opts[:contexts]
-        (Array(opts[:contexts]).map(&:id) &
-         current_student_enrollment_course_ids)
-      else
-        current_student_enrollment_course_ids
-      end
-    end
-
-    opts = {limit: 15}.merge(opts.slice(:due_after, :limit))
-
     shard.activate do
+      course_ids = Shackles.activate(:slave) do
+        if opts[:contexts]
+          (Array(opts[:contexts]).map(&:id) &
+           current_student_enrollment_course_ids)
+        else
+          current_student_enrollment_course_ids
+        end
+      end
+
+      opts = {limit: 15}.merge(opts.slice(:due_after, :limit))
+
       Rails.cache.fetch([self, 'assignments_needing_submitting', course_ids, opts].cache_key, expires_in: 15.minutes) do
         Shackles.activate(:slave) do
           limit = opts[:limit]
@@ -1399,18 +1399,18 @@ class User < ActiveRecord::Base
   end
 
   def assignments_needing_grading(opts={})
-    course_ids = Shackles.activate(:slave) do
-      if opts[:contexts]
-        (Array(opts[:contexts]).map(&:id) &
-        current_admin_enrollment_course_ids)
-      else
-        current_admin_enrollment_course_ids
-      end
-    end
-
-    opts = {limit: 15}.merge(opts.slice(:limit))
-
     shard.activate do
+      course_ids = Shackles.activate(:slave) do
+        if opts[:contexts]
+          (Array(opts[:contexts]).map(&:id) &
+          current_admin_enrollment_course_ids)
+        else
+          current_admin_enrollment_course_ids
+        end
+      end
+
+      opts = {limit: 15}.merge(opts.slice(:limit))
+
       Rails.cache.fetch([self, 'assignments_needing_grading', course_ids, opts].cache_key, expires_in: 15.minutes) do
         Shackles.activate(:slave) do
           limit = opts[:limit]
