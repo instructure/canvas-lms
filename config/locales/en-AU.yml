@@ -527,6 +527,7 @@ en-AU:
         time: Time
         user: User
       course_logging_item: 
+        blank_placeholder: "-"
         view_event_details: "View Details"
       course_logging_results: 
         date: Date
@@ -3823,6 +3824,9 @@ en-AU:
       crumbs: 
         course_exports: "Content Exports"
       export_type: "Export Type"
+      labels: 
+        course: Course
+        quiz: Quiz
       links: 
         download: "Course Export from %{date}: *Click here to download*"
         download_qti: "QTI Export from %{date}: *Click here to download*"
@@ -5982,10 +5986,13 @@ en-AU:
       saving: "Saving Key..."
       saving_failed: "Saving Key Failed"
     index: 
+      details: Details
       developer_keys: "Developer Keys"
       key_settings: "Key Settings"
+      name: Name
       show_all: "Show All %{count} Keys"
       title: "Developer Keys"
+      user: User
     messages: 
       confirm_delete: "Are you sure you want to delete this developer key?"
     no_user: "No User"
@@ -6678,6 +6685,7 @@ en-AU:
     bad_navigation_config: "Invalid course tab configuration"
     blank: Required
     failed: Failed
+    format: "%{attribute} %{message}"
     index: 
       all_categories: "- All Categories -"
       default_category: default
@@ -6691,6 +6699,25 @@ en-AU:
         user: user
       message_contains: "Message contains"
     max_attempts: "Too many failed login attempts. Please try again later or contact your system administrator."
+    messages: 
+      accepted: "must be accepted"
+      blank: "can't be blank"
+      confirmation: "doesn't match confirmation"
+      empty: "can't be empty"
+      equal_to: "must be equal to %{count}"
+      even: "must be even"
+      exclusion: "is reserved"
+      greater_than: "must be greater than %{count}"
+      greater_than_or_equal_to: "must be greater than or equal to %{count}"
+      inclusion: "is not included in the list"
+      invalid: "is invalid"
+      less_than: "must be less than %{count}"
+      less_than_or_equal_to: "must be less than or equal to %{count}"
+      not_a_number: "is not a number"
+      odd: "must be odd"
+      too_long: "is too long (maximum is %{count} characters)"
+      too_short: "is too short (minimum is %{count} characters)"
+      wrong_length: "is the wrong length (should be %{count} characters)"
     no_attached_file: "You must attach at least one file to this assignment"
     registration_incomplete: "You need to confirm your email address before you can view this page"
     required: Required
@@ -6759,15 +6786,19 @@ en-AU:
       by_url: "By URL"
       by_xml: "Paste XML"
       config_url: "Configuration URL"
+      configuration_type: "Configuration Type"
+      consumer_key: "Consumer Key"
       custom_feilds_explanation: "One per line. Format: name=value"
       custom_fields: "Custom Fields"
       description: Description
       email_only: "E-Mail Only"
       manual: "Manual Entry"
+      name: Name
       name_only: "Name Only"
       paste_xml: "Paste XML Here"
       privacy: Privacy
       public: Public
+      shared_secret: "Shared Secret"
       shared_secret_note: "Enter a new value to change"
       tool_domain: Domain
       tool_url: URL
@@ -8127,6 +8158,8 @@ en-AU:
         one: "*1* Discussion"
         other: "*%{count}* Discussions"
     local: Local
+    select: 
+      prompt: "Please select"
   high_contrast_description: |-
       If you would prefer a higher-contrast version of the Canvas user interface, enable this.
       This might be useful for people with impaired vision or dificulty reading.
@@ -8480,6 +8513,12 @@ en-AU:
     en: English
     en-AU: "English (Australia)"
   logged_out_user: "Logged Out User %{user_counter}"
+  lti: 
+    lti_message: 
+      load_tool_new_tab_button: "Load %{tool} in a new window"
+      new_tab: "This tool needs to be loaded in a new browser window"
+      new_tab_expired: "The session for this tool has expired. Please reload the page to access the tool again"
+      new_tab_loaded: "This tool was successfully loaded in a new browser window. Reload the page to access the tool again."
   m2c_file_description: "Moodle 1.9/2.x"
   m2c_name: "Moodle Importer"
   manage_avatars: 
@@ -10114,6 +10153,9 @@ en-AU:
     page_locked_module: "This page is part of the module *%{module}* and hasn't been unlocked yet."
     page_locked_until: "This page is locked until %{date}."
     page_unpublished_module: "This page is part of an unpublished module and is not available yet."
+    peer_review_invitation: 
+      sms: 
+        more_info: "More info at %{url}"
     pseudonym_registration: 
       email: 
         body: "You have been registered for a Canvas account at %{account}!  Before you can log in and start using Canvas, you'll need to finish the configuration process."
@@ -10823,6 +10865,8 @@ en-AU:
       delimiter: ","
       separator: "."
     human: 
+      decimal_units: 
+        format: "%n %u"
       storage_units: 
         format: "%n %u"
         units: 
@@ -10833,6 +10877,9 @@ en-AU:
           kb: KB
           mb: MB
           tb: TB
+  observees: 
+    new_observee_password: Password
+    new_observee_username: Username
   options: 
     ? "no"
     : "No"
@@ -13330,6 +13377,8 @@ en-AU:
     reupload_submission_files: "Re-Upload Submission Files"
     upload_info: "If you made changes to the student submission files you downloaded before, just zip them back up and upload the zip with the form below. Students will see the modified files in their comments for the submission."
     upload_warning: "Make sure you don't change the names of the submission files so we can recognize them."
+  react_files: 
+    loading_more_results: "Loading more results"
   recent_student: 
     last_logged_in: "last logged in %{last_login}"
   recently_deleted_courses_title: "Recently Deleted Courses"
