@@ -471,6 +471,7 @@ zh:
         time: 时间
         user: 用户
       course_logging_item: 
+        blank_placeholder: "-"
         view_event_details: 查看详细信息
       course_logging_results: 
         date: 日期
@@ -3268,6 +3269,9 @@ zh:
       crumbs: 
         course_exports: 课程导出
       export_type: 导出类型
+      labels: 
+        course: 课程
+        quiz: 测验
       links: 
         download: "课程导出从 %{date}:*单击此处下载*"
         download_qti: "%{date} 导出的 QTI: *点此下载*"
@@ -5515,10 +5519,13 @@ zh:
       saving: 正在保存密钥...
       saving_failed: 保存密钥失败
     index: 
+      details: 详细信息
       developer_keys: 开发人员密钥
       key_settings: 密钥设置
+      name: 姓名
       show_all: "显示所有 %{count} 密钥"
       title: 开发人员密钥
+      user: 用户
     messages: 
       confirm_delete: 是否确定要删除此开发人员密钥?
     no_user: 无用户
@@ -6188,6 +6195,7 @@ zh:
     bad_navigation_config: 课程标签配置无效
     blank: 必需
     failed: 已失败
+    format: "%{attribute} %{message}"
     index: 
       all_categories: "- 所有类别 -"
       default_category: 默认
@@ -6201,6 +6209,25 @@ zh:
         user: 用户
       message_contains: 消息包含
     max_attempts: 登录尝试失败次数过多。请稍后重试或联系您的系统管理员。
+    messages: 
+      accepted: 必须接受
+      blank: 不能为空
+      confirmation: 不匹配确认
+      empty: 不能为空
+      equal_to: "必须等于 %{count}"
+      even: 必须为偶数
+      exclusion: 已保留
+      greater_than: "必须大于 %{count}"
+      greater_than_or_equal_to: "必须大于或等于 %{count}"
+      inclusion: 未包含于列表中
+      invalid: 无效
+      less_than: "必须小于 %{count}"
+      less_than_or_equal_to: "必须小于或等于 %{count}"
+      not_a_number: 不是数字
+      odd: 必须为奇数
+      too_long: "太长（最大值为 %{count} 个字符）"
+      too_short: "太短（最小值为 %{count} 个字符）"
+      wrong_length: "长度错误（应为 %{count} 个字符）"
     no_attached_file: 您至少要为作业添加一份文件
     registration_incomplete: 您需要确认您的电子邮件地址，然后才能查看此页面
     required: 必需
@@ -6268,15 +6295,19 @@ zh:
       by_url: "通过 URL"
       by_xml: "粘贴 XML"
       config_url: "配置 URL"
+      configuration_type: 配置类型
+      consumer_key: 用户密钥
       custom_feilds_explanation: "每行一个。格式:姓名=值"
       custom_fields: 自定义字段
       description: 说明
       email_only: 仅限电子邮件
       manual: 手动输入
+      name: 姓名
       name_only: 仅限姓名
       paste_xml: "在此粘贴 XML"
       privacy: 隐私
       public: 公共
+      shared_secret: 共享密钥
       shared_secret_note: 输入要更改的新值
       tool_domain: 域
       tool_url: URL
@@ -7747,6 +7778,8 @@ zh:
       x_new_in_discussions: 
         one: "*%{count}* 个讨论"
         other: "*%{count}* 个讨论"
+    select: 
+      prompt: 请选择
   high_contrast_description: |-
       如果您更喜欢对比度较高版本的 Canvas 用户界面，请启用此项。
       这对于视力受损或阅读困难的人非常有用。
@@ -8076,6 +8109,12 @@ zh:
     en: 英语
     zh: 中文
   logged_out_user: "注销的用户 %{user_counter}"
+  lti: 
+    lti_message: 
+      load_tool_new_tab_button: "在新窗口中加载 %{tool}"
+      new_tab: 此工具需要在新的浏览器窗口中加载
+      new_tab_expired: 此工具的会话已过期。请重新加载页面以再次访问工具
+      new_tab_loaded: 此工具在新的浏览器窗口中成功加载。请重新加载页面以再次访问工具。
   m2c_file_description: "Moodle 1.9/2.x"
   m2c_name: "Moodle 导入程序"
   manage_avatars: 
@@ -9719,6 +9758,9 @@ zh:
     page_locked_module: "此页面是单元 *%{module}* 的一部分，尚未解锁。"
     page_locked_until: "此页面锁定至 %{date}。"
     page_unpublished_module: 此页面是未发布单元的一部分，尚未可用。
+    peer_review_invitation: 
+      sms: 
+        more_info: "更多信息请访问 %{url}"
     pseudonym_registration: 
       email: 
         body: "您已在 %{account} 注册 Canvas 帐户！您将需要完成配置过程，然后才能登录和开始使用 Canvas。"
@@ -10397,6 +10439,8 @@ zh:
       delimiter: ","
       separator: "."
     human: 
+      decimal_units: 
+        format: "%n %u"
       storage_units: 
         format: "%n %u"
         units: 
@@ -10407,6 +10451,9 @@ zh:
           kb: KB
           mb: MB
           tb: TB
+  observees: 
+    new_observee_password: 密码
+    new_observee_username: 用户名
   options: 
     ? "no"
     : 否
@@ -12755,6 +12802,8 @@ zh:
     reupload_submission_files: 重新上传提交文件
     upload_info: 如果您对此前下载的学生提交文件作出了更改，只需压缩其备份并使用以下表单上传该压缩文件。学生将在其提交评论中看到修改的文件。
     upload_warning: 确保不要更改提交文件的名称，以便我们组织。
+  react_files: 
+    loading_more_results: 正在加载其它结果
   recent_student: 
     last_logged_in: "上次登录时间 %{last_login}"
   recipient_input: 
