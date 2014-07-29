@@ -7,7 +7,7 @@ unless ARGV.any? { |a| a =~ /\Agems/ }
       require File.expand_path(File.dirname(__FILE__) + '/parallel_exclude')
       count = args[:count]
       single_thread_files = ParallelExclude::FILES
-      test_files = FileList['vendor/plugins/*/spec_canvas/**/*_spec.rb'].exclude('vendor/plugins/*/spec_canvas/selenium/*_spec.rb') + FileList['spec/**/*_spec.rb'].exclude('spec/selenium/**/*_spec.rb')
+      test_files = FileList['{gems,vendor}/plugins/*/spec_canvas/**/*_spec.rb'].exclude(%r'spec_canvas/selenium') + FileList['spec/**/*_spec.rb'].exclude(%r'spec/selenium')
       single_thread_files.each { |filename| test_files.delete(filename) } #need to exclude these tests from running in parallel because they have dependencies that break the spces when run in parallel
       test_files.map! { |f| "#{Rails.root}/#{f}" }
       Rake::Task['parallel:spec'].invoke(count, '', '', test_files.join(' '))
@@ -28,7 +28,7 @@ unless ARGV.any? { |a| a =~ /\Agems/ }
     task :nonseleniumallparallel, :count do |t, args|
       require "parallelized_specs"
       count = args[:count]
-      test_files = FileList['vendor/plugins/*/spec_canvas/**/*_spec.rb'].exclude('vendor/plugins/*/spec_canvas/selenium/*_spec.rb') + FileList['spec/**/*_spec.rb'].exclude('spec/selenium/**/*_spec.rb')
+      test_files = FileList['{gems,vendor}/plugins/*/spec_canvas/**/*_spec.rb'].exclude(%r'spec_canvas/selenium') + FileList['spec/**/*_spec.rb'].exclude(%r'spec/selenium')
       test_files.map! { |f| "#{Rails.root}/#{f}" }
       Rake::Task['parallel:spec'].invoke(count, '', '', test_files.join(' '))
     end
@@ -46,7 +46,7 @@ unless ARGV.any? { |a| a =~ /\Agems/ }
     task :selenium, :count, :build_section do |t, args|
       require "parallelized_specs"
       #used to split selenium builds when :build_section is set split it in two.
-      test_files = FileList['spec/selenium/**/*_spec.rb'] + FileList['vendor/plugins/*/spec_canvas/selenium/*_spec.rb']
+      test_files = FileList['spec/selenium/**/*_spec.rb'] + FileList['{gems,vendor}/plugins/*/spec_canvas/selenium/*_spec.rb']
       test_files = test_files.to_a.sort_by! { |file| File.size(file) }
 
       args[:build_section].to_i == 0 ? section = nil : section = args[:build_section].to_i

@@ -1,4 +1,4 @@
-require 'urn:RespondusAPI.rb'
+require 'respondus_soap_endpoint/urn:RespondusAPI.rb'
 require 'soap/mapping'
 
 module UrnRespondusAPIMappingRegistry

@@ -1536,6 +1536,6 @@ class String
   def colorize(text, color_code)  "#{color_code}#{text}\e[0m" end
 end
 
-Dir[Rails.root+'vendor/plugins/*/spec_canvas/spec_helper.rb'].each do |f|
+Dir[Rails.root+'{gems,vendor}/plugins/*/spec_canvas/spec_helper.rb'].each do |f|
   require f
 end

@@ -246,7 +246,7 @@ Implemented for: Canvas LMS}
     item_id.should == "xyz"
 
     # import root folder should've been created and marked as hidden
-    folder = Folder.assert_path(RespondusAPIPort::ATTACHMENT_FOLDER_NAME,
+    folder = Folder.assert_path(RespondusSoapEndpoint::RespondusAPIPort::ATTACHMENT_FOLDER_NAME,
                                 @course)
     folder.hidden?.should == true
   end

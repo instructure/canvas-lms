@@ -45,7 +45,7 @@ unless Rails.env.production? || ARGV.any? { |a| a =~ /\Agems/ }
     if ENV['SINGLE_TEST']
       t.spec_opts += ['-e', %{"#{ENV['SINGLE_TEST']}"}]
     end
-    spec_files = FileList['vendor/plugins/*/spec_canvas/**/*_spec.rb'].exclude('vendor/plugins/*/spec_canvas/selenium/*_spec.rb') + FileList['spec/**/*_spec.rb'].exclude('spec/selenium/**/*_spec.rb')
+    spec_files = FileList['{gems,vendor}/plugins/*/spec_canvas/**/*_spec.rb'].exclude(%r'spec_canvas/selenium') + FileList['spec/**/*_spec.rb'].exclude(%r'spec/selenium')
     Gem.loaded_specs.values.each do |spec|
       path = spec.full_gem_path
       spec_canvas_path = File.expand_path(path+"/spec_canvas")
@@ -110,7 +110,7 @@ unless Rails.env.production? || ARGV.any? { |a| a =~ /\Agems/ }
     desc "Run the code examples in vendor/plugins (except RSpec's own)"
     klass.new(:coverage) do |t|
       t.spec_opts = ['--options', "\"#{Rails.root}/spec/spec.opts\""]
-      t.send(spec_files_attr, FileList['vendor/plugins/*/spec_canvas/**/*_spec.rb'].exclude('vendor/plugins/*/spec_canvas/selenium/*_spec.rb') + FileList['spec/**/*_spec.rb'].exclude('spec/selenium/**/*_spec.rb'))
+      t.send(spec_files_attr, FileList['{gems,vendor}/plugins/*/spec_canvas/**/*_spec.rb'].exclude(%r'spec_canvas/selenium') + FileList['spec/**/*_spec.rb'].exclude(%r'spec/selenium'))
     end
 
     namespace :plugins do

@@ -1,4 +1,5 @@
-class RespondusAPIMiddleware
+module RespondusSoapEndpoint
+class Middleware
   class_attribute :servant
 
   Endpoint = %r{\A/api/respondus/soap}
@@ -31,7 +32,7 @@ class RespondusAPIMiddleware
     remove_method :call # we'll just use soap4r-middleware's
     Bundler.require 'respondus_soap_endpoint'
     include Soap4r::Middleware
-    require_dependency 'respondus_soap_endpoint'
+    require 'respondus_soap_endpoint'
     setup do
       self.endpoint = Endpoint
       self.servant = RespondusAPIPort.new
@@ -65,4 +66,5 @@ class RespondusAPIMiddleware
     self.servant.rack_env = env
     super(env)
   end
+end
 end

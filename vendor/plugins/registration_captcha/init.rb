@@ -1,5 +1,5 @@
 require 'recaptcha/rails'
-require 'canvas/plugin'
+require_dependency 'canvas/plugin'
 
 Rails.configuration.to_prepare do
   require_dependency 'users_controller_recaptcha'

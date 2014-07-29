@@ -1,6 +1,7 @@
-require_dependency 'urn:RespondusAPI.rb'
+require 'respondus_soap_endpoint/urn:RespondusAPI.rb'
 require 'benchmark'
 
+module RespondusSoapEndpoint
 class RespondusAPIPort
   attr_reader :session, :user
   attr_accessor :rack_env
@@ -48,7 +49,7 @@ class RespondusAPIPort
   def load_session(context)
     @verifier = ActiveSupport::MessageVerifier.new(
       Canvas::Security.encryption_key,
-      'SHA1')
+      digest: 'SHA1')
     if context.blank?
       @session = {}
     else
@@ -86,8 +87,6 @@ class RespondusAPIPort
       # password is the oauth token
       return load_user_with_oauth(password, domain_root_account)
     end
-
-    ip = rack_env['REMOTE_ADDR']
 
     Authlogic::Session::Base.controller = AuthlogicAdapter.new(self)
     pseudonym_session = domain_root_account.pseudonym_sessions.new(:unique_id => userName, :password => password)
@@ -591,4 +590,5 @@ Implemented for: Canvas LMS}]
 
     [ item_id ]
   end
+end
 end

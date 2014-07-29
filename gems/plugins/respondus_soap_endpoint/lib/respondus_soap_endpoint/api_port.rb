@@ -1,6 +1,4 @@
-require_dependency 'urn:RespondusAPIServant.rb'
-require_dependency 'urn:RespondusAPIMappingRegistry.rb'
-
+module RespondusSoapEndpoint
 class RespondusAPIPort
   NsRespondusAPI = "urn:RespondusAPI"
 
@@ -209,4 +207,5 @@ class RespondusAPIPort
         :faults => {} }
     ]
   ]
+end
 end
