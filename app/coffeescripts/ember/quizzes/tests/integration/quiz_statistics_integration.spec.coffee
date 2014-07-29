@@ -32,8 +32,8 @@ define [
     ok q = route.modelFor('quiz'), 'loads the quiz'
     equal q.get('quizReports.length'), 2, 'loads quiz reports'
     ok qs = route.modelFor('quizStatistics'), 'loads quiz statistics'
-    equal store.all('questionStatistics').get('length'), 11, 'loads question statistics into the store'
-    equal qs.get('questionStatistics.length'), 11, 'associates question statistics'
+    equal store.all('questionStatistics').get('length'), 13, 'loads question statistics into the store'
+    equal qs.get('questionStatistics.length'), 13, 'associates question statistics'
 
   testRedirection
     path: '/1/statistics'
@@ -44,3 +44,12 @@ define [
     env.setUserPermissions(true, true)
     visit('/3/statistics').then ->
       equal find('.erratic-statistics').length, 1
+
+  testPage 'it pre-activates an answer set for questions that have it', ->
+    visit('/1/statistics').then ->
+      equal find('.answer-set-tabs:first button:first.active').length, 1
+
+  # TODO: cover the case of answer-set pre-activation where the question has
+  # no answer sets, it should not blow up
+  #
+  # PENDING CNVS-14467
