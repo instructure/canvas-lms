@@ -479,6 +479,7 @@ de:
         time: Uhrzeit
         user: Benutzer
       course_logging_item: 
+        blank_placeholder: "-"
         view_event_details: "Details anzeigen"
       course_logging_results: 
         date: Datum
@@ -3250,6 +3251,9 @@ de:
       crumbs: 
         course_exports: Kursexporte
       export_type: Exporttyp
+      labels: 
+        course: Kurs
+        quiz: Quiz
       links: 
         download: "Kursexporte von %{date}: *Zum Herunterladen hier klicken*"
         download_qti: "QTI-export vom %{date}: *Hier zum Herunterladen klicken*"
@@ -5521,10 +5525,13 @@ de:
       saving: "Schlüssel speichern..."
       saving_failed: "Schlüssel speichern fehlgeschlagen"
     index: 
+      details: Details
       developer_keys: Entwicklerschlüssel
       key_settings: Schlüsseleinstellungen
+      name: Name
       show_all: "Alle %{count} Schlüssel anzeigen"
       title: Entwicklerschlüssel
+      user: Benutzer
     messages: 
       confirm_delete: "Möchten Sie wirklich diesen Entwicklerschlüssel löschen?"
     no_user: "Kein Benutzer"
@@ -6201,6 +6208,7 @@ de:
     bad_navigation_config: "Ungültige Kursfensterkonfiguration"
     blank: Erforderlich
     failed: Fehlgeschlagen
+    format: "%{attribute} %{message}"
     index: 
       all_categories: "- Alle Kategorien -"
       default_category: Standard
@@ -6214,6 +6222,25 @@ de:
         user: Benutzer
       message_contains: "Nachricht enthält"
     max_attempts: "Zu viele fehlgeschlagene Anmeldeversuche. Versuchen Sie es später erneut, oder wenden Sie sich an Ihren Systemadministrator."
+    messages: 
+      accepted: "muss akzeptiert werden"
+      blank: "darf nicht unausgefüllt bleiben"
+      confirmation: "stimmt nicht mit Bestätigungseingabe überein"
+      empty: "darf nicht leer bleiben"
+      equal_to: "muss gleich %{count} sein"
+      even: "muss gerade sein"
+      exclusion: "ist reserviert"
+      greater_than: "muss größer sein als %{count}"
+      greater_than_or_equal_to: "muss größer sein als oder gleich %{count}"
+      inclusion: "ist nicht Teil der Liste"
+      invalid: "ist ungültig"
+      less_than: "muss kleiner sein als %{count}"
+      less_than_or_equal_to: "muss kleiner sein als oder gleich %{count}"
+      not_a_number: "ist keine Zahl"
+      odd: "muss ungerade sein"
+      too_long: "ist zu lang (höchstens %{count} Zeichen)"
+      too_short: "ist zu kurz (mindestens %{count} Zeichen)"
+      wrong_length: "hat die falsche Länge (muss %{count} Zeichen haben)"
     no_attached_file: "Sie müssen dieser Aufgabe mindestens eine Datei anhängen"
     registration_incomplete: "Sie müssen Ihre E-mailadresse bestätigen, bevor Sie diese Seite aufrufen können"
     required: Erforderlich
@@ -6282,15 +6309,19 @@ de:
       by_url: "Nach URL"
       by_xml: "XML einfügen"
       config_url: Konfigurations-URL
+      configuration_type: Konfigurationstyp
+      consumer_key: Kundenschlüssel
       custom_feilds_explanation: "Eines pro Zeile, Format: name=value"
       custom_fields: "Benutzerdefinierte Felder"
       description: Beschreibung
       email_only: "Nur E-Mail"
       manual: "Manuelle Eingabe"
+      name: Name
       name_only: "Nur Name"
       paste_xml: "XML hier einfügen"
       privacy: Datenschutz
       public: Öffentlich
+      shared_secret: "Shared Secret"
       shared_secret_note: "Geben Sie einen neuen zu ändernden Wert ein"
       tool_domain: Domäne
       tool_url: URL
@@ -7777,6 +7808,8 @@ de:
       x_new_in_discussions: 
         one: "*1* Diskussion"
         other: "*%{count}* Diskussionen"
+    select: 
+      prompt: "Bitte auswählen"
   high_contrast_description: |-
       Wenn Sie eine Version der Canvas-Benutzeroberfläche mit einem höheren Kontrast bevorzugen, aktivieren Sie diese Funktion.
       Dies ist möglicherweise für Personen hilfreich, deren Sehfähigkeit eingeschränkt ist, oder die Schwierigkeiten beim Lesen haben.
@@ -8108,6 +8141,12 @@ de:
     de: Deutsch
     en: Englisch
   logged_out_user: "Abgemeldeter Benutzer %{user_counter}"
+  lti: 
+    lti_message: 
+      load_tool_new_tab_button: "%{tool} in neuem Fenster laden"
+      new_tab: "Dieses Tool muss in einem neuen Browserfenster geladen werden"
+      new_tab_expired: "Die Sitzung für dieses Tool ist abgelaufen. Bitte laden Sie die Seite erneut, um wieder auf das Tool zugreifen zu können"
+      new_tab_loaded: "Dieses Tool wurde erfolgreich in einem neuen Browserfenster geladen. Laden Sie die Seite erneut, um wieder auf das Tool zugreifen zu können."
   m2c_file_description: "Moodle 1.9/2x"
   m2c_name: "Moodle Importer"
   manage_avatars: 
@@ -9724,6 +9763,9 @@ de:
     page_locked_module: "Diese Seite ist Teil des Moduls *%{module}* und wurde noch nicht freigegeben."
     page_locked_until: "Diese Seite ist bis %{date} gesperrt."
     page_unpublished_module: "Diese Seite gehört zu einem nicht veröffentlichten Modul und ist noch nicht verfügbar."
+    peer_review_invitation: 
+      sms: 
+        more_info: "Weitere Informationen finden Sie unter %{url}"
     pseudonym_registration: 
       email: 
         body: "Sie wurden für ein Canvas-konto unter %{account} registriert!  Bevor Sie sich anmelden und Canvas nutzen können, müssen Sie den Konfigurationsprozess abschließen."
@@ -10402,6 +10444,8 @@ de:
       delimiter: ","
       separator: "."
     human: 
+      decimal_units: 
+        format: "%n %u"
       storage_units: 
         format: "%n %u"
         units: 
@@ -10412,6 +10456,9 @@ de:
           kb: KB
           mb: MB
           tb: TB
+  observees: 
+    new_observee_password: Passwort
+    new_observee_username: Benutzername
   options: 
     ? "no"
     : Nein
@@ -12727,6 +12774,8 @@ de:
     reupload_submission_files: "Einsendungsdateien erneut hochladen"
     upload_info: "Wenn Sie Änderungen an den heruntergeladenen Einsendungen der Studenten vorgenommen haben, komprimieren Sie die Einsendungen erneut und laden Sie die Zip-datei über das unten stehende Formular hoch. Die geänderten Dateien werden den Studenten in den Einsendungskommentaren angezeigt."
     upload_warning: "Bitte achten Sie darauf, dass die Namen der eingesandten Dateien unverändert bleiben, sodass eine eindeutige Zuordnung möglich ist."
+  react_files: 
+    loading_more_results: "Weitere Ergebnisse laden"
   recent_student: 
     last_logged_in: "letzte Anmeldung: %{last_login}"
   recipient_input: 
