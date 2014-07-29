@@ -203,6 +203,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
       @saml_hash['change_password_url'] = nil
       @saml_hash['requested_authn_context'] = nil
       @saml_hash['login_attribute'] = 'nameid'
+      @saml_hash['unknown_user_url'] = nil
       json.should == @saml_hash
     end
 
@@ -230,6 +231,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
       @cas_hash['log_in_url'] = nil
       @cas_hash['id'] = aac.id
       @cas_hash['position'] = 1
+      @cas_hash['unknown_user_url'] = nil
       json.should == @cas_hash
     end
 

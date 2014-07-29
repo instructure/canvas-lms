@@ -250,6 +250,33 @@ describe PseudonymSessionsController do
       Pseudonym.find(session['pseudonym_credentials_id']).should == user2.pseudonyms.first
     end
 
+    it "should redirect when a user is authenticted but is not found in canvas" do
+      ConfigFile.stub('saml', {})
+      unique_id = 'foo@example.com'
+
+      account = account_with_saml
+
+      controller.stubs(:saml_response).returns(
+        stub('response', :is_valid? => true, :success_status? => true, :name_id => unique_id, :name_qualifier => nil, :session_index => nil, :process => nil)
+      )
+
+      # We dont want to log them out of everything.
+      controller.expects(:logout_user_action).never
+      controller.request.env['canvas.domain_root_account'] = account
+
+      # Default to Login url
+      get 'saml_consume', :SAMLResponse => "foo"
+      response.should redirect_to(login_url(:no_auto => 'true'))
+      session[:saml_unique_id].should be_nil
+
+      # Redirect to a specifiec url
+      unknown_user_url = "https://example.com/unknown_user"
+      account.account_authorization_config.unknown_user_url = unknown_user_url
+      get 'saml_consume', :SAMLResponse => "foo"
+      response.should redirect_to(unknown_user_url)
+      session[:saml_unique_id].should be_nil
+   end
+
     context "multiple authorization configs" do
       before :once do
         @account = Account.create!
@@ -758,6 +785,29 @@ describe PseudonymSessionsController do
       response.should redirect_to(dashboard_url(:login_success => 1))
       session[:cas_session].should == 'ST-efgh'
       Pseudonym.find(session['pseudonym_credentials_id']).should == user2.pseudonyms.first
+    end
+
+    it "should redirect when a user is authorized but not found in canvas" do
+      unique_id = 'foo@example.com'
+
+      account = account_with_cas
+      stubby("yes\n#{unique_id}\n")
+
+      # We dont want to log them out of everything.
+      controller.expects(:logout_user_action).never
+      controller.request.env['canvas.domain_root_account'] = account
+
+      # Default to Login url
+      get 'new', :ticket => 'ST-abcd'
+      response.should redirect_to(cas_login_url(:no_auto => 'true'))
+      session[:cas_session].should be_nil
+
+      # Redirect to a specific url
+      unknown_user_url = "https://example.com/unknown_user"
+      account.account_authorization_config.unknown_user_url = unknown_user_url
+      get 'new', :ticket => 'ST-abcd'
+      response.should redirect_to(unknown_user_url)
+      session[:cas_session].should be_nil
     end
 
     it "should log out correctly if the user is from a different account" do

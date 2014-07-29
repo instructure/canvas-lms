@@ -78,10 +78,11 @@ class PseudonymSessionsController < ApplicationController
             successful_login(@user, @pseudonym)
             return
           else
-            logger.warn "Received CAS login for unknown user: #{st.user}"
+            unknown_user_url = @domain_root_account.account_authorization_config.unknown_user_url || cas_login_url(:no_auto=>'true')
+            logger.warn "Received CAS login for unknown user: #{st.user}, redirecting to: #{unknown_user_url}."
             reset_session
-            session[:delegated_message] = t 'errors.no_matching_user', "Canvas doesn't have an account for user: %{user}", :user => st.user
-            redirect_to(cas_client.logout_url(cas_login_url :no_auto => true))
+            flash[:delegated_message] = t 'errors.no_matching_user', "Canvas doesn't have an account for user: %{user}", :user => st.user
+            redirect_to unknown_user_url
             return
           end
         else
@@ -379,13 +380,13 @@ class PseudonymSessionsController < ApplicationController
 
             successful_login(@user, @pseudonym)
           else
+            unknown_user_url = aac.unknown_user_url || login_url(:no_auto => 'true')
             increment_saml_stat("errors.unknown_user")
-            message = "Received SAML login request for unknown user: #{unique_id}"
+            message = "Received SAML login request for unknown user: #{unique_id} redirecting to: #{unknown_user_url}."
             logger.warn message
             aac.debug_set(:canvas_login_fail_message, message) if debugging
-            # the saml message has to survive a couple redirects
-            session[:delegated_message] = t 'errors.no_matching_user', "Canvas doesn't have an account for user: %{user}", :user => unique_id
-            logout_user_action
+            flash[:delegated_message] = t 'errors.no_matching_user', "Canvas doesn't have an account for user: %{user}", :user => unique_id
+            redirect_to unknown_user_url
           end
         elsif response.auth_failure?
           increment_saml_stat("normal.login_failure")
