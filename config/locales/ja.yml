@@ -3178,6 +3178,9 @@ ja:
       crumbs: 
         course_exports: コースのエクスポート
       export_type: エクスポートのタイプ
+      labels: 
+        course: コース
+        quiz: クイズ
       links: 
         download: "%{date} からのコースをエクスポート:*ここをクリックしてダウンロード*"
         download_qti: "%{date} 以降の QTI をエクスポート: *ここをクリックしてダウンロード*"
@@ -5418,10 +5421,13 @@ ja:
       saving: 鍵を保存しています...
       saving_failed: 鍵の保存に失敗しました
     index: 
+      details: 詳細
       developer_keys: 開発者鍵
       key_settings: 鍵の設定
+      name: 名前
       show_all: "全部で %{count} 個の鍵を表示"
       title: 開発者鍵
+      user: ユーザ
     messages: 
       confirm_delete: この開発者鍵を削除してもよろしいですか?
     no_user: ユーザなし
@@ -6091,6 +6097,7 @@ ja:
     bad_navigation_config: "無効なコース タブ構成です"
     blank: 必須
     failed: 失敗しました
+    format: "%{attribute} %{message}"
     index: 
       all_categories: "- すべてのカテゴリ -"
       default_category: デフォルト
@@ -6104,6 +6111,25 @@ ja:
         user: ユーザ
       message_contains: メッセージには、次のものが含まれます
     max_attempts: ログインの試行回数が多すぎます。後でもう一度、試してください。または、システム管理者までご連絡ください。
+    messages: 
+      accepted: は承諾が必要です
+      blank: は空白にできません
+      confirmation: は確認入力と一致していません
+      empty: は空にできません
+      equal_to: "は %{count} と等しくなければなりません"
+      even: は偶数でなければなりません
+      exclusion: は予約されています
+      greater_than: "は %{count} より大きい値でなければなりません"
+      greater_than_or_equal_to: "は %{count} と等しいか、またはそれ以上でなければなりません"
+      inclusion: はリストに含まれていません
+      invalid: は無効です
+      less_than: "は %{count} より小さい値でなければなりません"
+      less_than_or_equal_to: "は %{count} と等しいか、またはそれ以下でなければなりません"
+      not_a_number: は数字ではありません
+      odd: は奇数でなければなりません
+      too_long: "は長すぎます (最大文字数は %{count} 文字です)"
+      too_short: "は短すぎます (最小文字数は %{count} 文字です)"
+      wrong_length: "は長さが間違っています (必ず %{count} 文字でなければなりません)"
     no_attached_file: "この課題には 1 個以上のファイルを添付する必要があります"
     registration_incomplete: "このページを表示するには、先に電子メール アドレスを確認する必要があります。"
     required: 必須
@@ -6171,15 +6197,19 @@ ja:
       by_url: "URL ごと"
       by_xml: "XML を貼り付け"
       config_url: "設定 URL"
+      configuration_type: 設定のタイプ
+      consumer_key: コンシューマ鍵
       custom_feilds_explanation: "1 行に 1 つ。形式:名前=値"
       custom_fields: "カスタム フィールド"
       description: 説明
       email_only: 電子メールのみ
       manual: 手入力
+      name: 名前
       name_only: 名前のみ
       paste_xml: "XML をここに貼り付ける"
       privacy: プライバシー
       public: 公開
+      shared_secret: 共有シークレット
       shared_secret_note: 変更するには新しい値を入力します
       tool_domain: ドメイン
       tool_url: URL
@@ -7647,6 +7677,8 @@ ja:
       x_new_in_discussions: 
         one: "*%{count}* 件のディスカッション"
         other: "*%{count}* 件のディスカッション"
+    select: 
+      prompt: 選択してください
   high_contrast_description: |-
       ハイ コントラスト バージョンの Canvas ユーザ インターフェイスを使用する場合は、これを有効にします。
       視覚に障害のある方や、画面の文字が読みづらい方は、この機能を有効にすることをお勧めします。
@@ -7970,6 +8002,12 @@ ja:
     en: 英語
     ja: 日本語
   logged_out_user: "ログアウトしたユーザ %{user_counter}"
+  lti: 
+    lti_message: 
+      load_tool_new_tab_button: "%{tool} を新しいウィンドウで読み込む"
+      new_tab: このツールは、ブラウザの別ウィンドウで読み込む必要があります
+      new_tab_expired: このツールのセッションが期限切れです。ページを再読み込みして、もう一度ツールにアクセスしてください
+      new_tab_loaded: このツールは、ブラウザの別ウィンドウに正常に読み込まれました。ページを再読み込みして、もう一度ツールにアクセスしてください。
   m2c_file_description: "Moodle 1.9/2.x"
   m2c_name: "Moodle インポーター"
   manage_avatars: 
@@ -9615,6 +9653,9 @@ ja:
     page_locked_module: "このページはモジュール *%{module}* の一部で、まだロックが解除されていません。"
     page_locked_until: "%{date} まで、このページはロックされています。"
     page_unpublished_module: このページは未公開モジュールの一部で、まだ使用できません。
+    peer_review_invitation: 
+      sms: 
+        more_info: "詳細は %{url} をご覧ください"
     pseudonym_registration: 
       email: 
         body: "%{account} というCanvas アカウントで登録されました!ログインして Canvas を使い始めるには、その前に、設定プロセスを完了する必要があります。"
@@ -10293,6 +10334,8 @@ ja:
       delimiter: ","
       separator: "."
     human: 
+      decimal_units: 
+        format: "%n %u"
       storage_units: 
         format: "%n %u"
         units: 
@@ -10303,6 +10346,9 @@ ja:
           kb: KB
           mb: MB
           tb: TB
+  observees: 
+    new_observee_password: パスワード
+    new_observee_username: ユーザ名
   options: 
     ? "no"
     : いいえ
@@ -12629,6 +12675,8 @@ ja:
     reupload_submission_files: 提出ファイルの再アップロード
     upload_info: "以前にダウンロードした、その受講生からの提出ファイルに変更を加えた場合は、zip ファイルに圧縮しなおして、下のフォームと一緒にアップロードしてください。受講生には、提出用のコメント内に、修正済みのファイルが表示されます。"
     upload_warning: ファイル名で区別しますので、提出ファイルのファイル名は変更しないでください。
+  react_files: 
+    loading_more_results: より多くの結果を読み込んでいます
   recent_student: 
     last_logged_in: "最終ログイン日時: %{last_login}"
   recipient_input: 
