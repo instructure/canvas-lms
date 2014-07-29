@@ -840,8 +840,8 @@ class AssignmentsApiController < ApplicationController
   #   The grading standard id to set for the course.  If no value is provided for this argument the current grading_standard will be un-set from this course.
   #   This will update the grading_type for the course to 'letter_grade' unless it is already 'gpa_scale'.
   #
-  # If the assignment[assignment_overrides] key is absent, any existing
-  # overrides are kept as is. If the assignment[assignment_overrides] key is
+  # If the assignment [assignment_overrides] key is absent, any existing
+  # overrides are kept as is. If the assignment [assignment_overrides] key is
   # present, existing overrides are updated or deleted (and new ones created,
   # as necessary) to match the provided list.
   #

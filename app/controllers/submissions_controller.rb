@@ -338,8 +338,8 @@ class SubmissionsController < ApplicationController
   #   include this submission type as an allowed option, or the submission will be rejected with a 400 error.
   #
   #   The submission_type given determines which of the following parameters is
-  #   used. For instance, to submit a URL, submission[submission_type] must be
-  #   set to "online_url", otherwise the submission[url] parameter will be
+  #   used. For instance, to submit a URL, submission [submission_type] must be
+  #   set to "online_url", otherwise the submission [url] parameter will be
   #   ignored.
   #
   # @argument submission[body] [Optional, String]

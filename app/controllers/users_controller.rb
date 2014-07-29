@@ -1192,7 +1192,7 @@ class UsersController < ApplicationController
   # @argument user[avatar][token] [Optional, String]
   #   A unique representation of the avatar record to assign as the user's
   #   current avatar. This token can be obtained from the user avatars endpoint.
-  #   This supersedes the user[avatar][url] argument, and if both are included
+  #   This supersedes the user [avatar] [url] argument, and if both are included
   #   the url will be ignored. Note: this is an internal representation and is
   #   subject to change without notice. It should be consumed with this api
   #   endpoint and used in the user update endpoint, and should not be
