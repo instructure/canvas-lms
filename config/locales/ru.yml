@@ -3200,6 +3200,9 @@ ru:
       crumbs: 
         course_exports: "Экспорты курса"
       export_type: "Тип экспорта"
+      labels: 
+        course: Курс
+        quiz: "Контрольная работа"
       links: 
         download: "Экспорт курса из %{date}: *Щелкните здесь для загрузки*"
         download_qti: "QTI Экспорт из %{date}: *Нажмите здесь, чтобы загрузить*"
@@ -5469,10 +5472,13 @@ ru:
       saving: "Сохранение ключа..."
       saving_failed: "Сохранение ключа не удалось"
     index: 
+      details: Сведения
       developer_keys: "Ключи разработчиков"
       key_settings: "Основные настройки"
+      name: Имя
       show_all: "Показать все %{count} ключи"
       title: "Ключи разработчиков"
+      user: Пользователь
     messages: 
       confirm_delete: "Вы уверены, что хотите удалить этот ключ разработчика?"
     no_user: "Нет пользователя"
@@ -6150,6 +6156,7 @@ ru:
     bad_navigation_config: "Недействительная конфигурация табуляции курса"
     blank: Требуется
     failed: Ошибка
+    format: "%{attribute} %{message}"
     index: 
       all_categories: "- Все категории -"
       default_category: "по умолчанию"
@@ -6163,6 +6170,25 @@ ru:
         user: пользователь
       message_contains: "Сообщение содержит"
     max_attempts: "Слишком много неудачных попыток входа. Повторите попытку позже или обратитесь к системному администратору."
+    messages: 
+      accepted: "должно быть принято"
+      blank: "не может быть пустым"
+      confirmation: "не соответствует подтверждению"
+      empty: "не может быть пустым"
+      equal_to: "должно равняться %{count}"
+      even: "должно быть четным числом"
+      exclusion: забронировано
+      greater_than: "должно быть больше %{count}"
+      greater_than_or_equal_to: "должно быть больше или равняться %{count}"
+      inclusion: "не включено в список"
+      invalid: неверно
+      less_than: "должно быть менее %{count}"
+      less_than_or_equal_to: "должно быть менее или равняться %{count}"
+      not_a_number: "не является числом"
+      odd: "должно быть нечетным числом"
+      too_long: "слишком длинный (максимум %{count} символов)"
+      too_short: "слишком короткий (максимум %{count} символов)"
+      wrong_length: "неверной длины (должно быть %{count} символов)"
     no_attached_file: "Вы должны приложить хотя бы один файл к данному заданию"
     registration_incomplete: "Вам необходимо подтвердить ваш адрес электронной почты, прежде чем вы сможете просмотреть эту страницу"
     required: Требуется
@@ -6230,15 +6256,19 @@ ru:
       by_url: "По URL-адресу"
       by_xml: "Вставить XML"
       config_url: "Конфигурация URL"
+      configuration_type: "Тип конфигурации"
+      consumer_key: "Пользовательский ключ"
       custom_feilds_explanation: "По одному на строку. Формат: имя=значение"
       custom_fields: "Пользовательские поля"
       description: Описание
       email_only: "Только по электронной почте"
       manual: "Ручной ввод"
+      name: Имя
       name_only: "Только имя"
       paste_xml: "Вставьте XML здесь"
       privacy: Конфиденциальность
       public: Общедоступный
+      shared_secret: "Общий секретный ключ"
       shared_secret_note: "Введите новое значение для изменения"
       tool_domain: Домен
       tool_url: URL-адрес
@@ -7724,6 +7754,8 @@ ru:
         few: "*%{count}* обсуждения"
         one: "*1* обсуждение"
         other: "*%{count}* обсуждений"
+    select: 
+      prompt: Выберите
   high_contrast_description: |-
       Если вы предпочитаете версию пользовательского интерфейса Canvas повышенной контрастности, включите ее.
       Это может быть полезно для людей со слабым зрением или при проблемах с чтением.
@@ -8052,6 +8084,12 @@ ru:
     en: Английский
     ru: pу́сский
   logged_out_user: "Вышедший из системы пользователь %{user_counter}"
+  lti: 
+    lti_message: 
+      load_tool_new_tab_button: "Загрузить %{tool} в новом окне"
+      new_tab: "Этот инструмент должен быть загружен в новом окне браузера"
+      new_tab_expired: "Сессия для этого инструмента истекла. Для повторного доступа к инструменту перезагрузите страницу"
+      new_tab_loaded: "Этот инструмент успешно загружен в новом окне браузера. Перезагрузите страницу для повторного доступа к инструменту."
   m2c_file_description: "Moodle 1.9/2.x"
   m2c_name: "Импортер Moodle"
   manage_avatars: 
@@ -9713,6 +9751,9 @@ ru:
     page_locked_module: "Эта страница — часть модуля *%{module}* и еще не разблокирована."
     page_locked_until: "Эта страница заблокирована до %{date}"
     page_unpublished_module: "Данная страница является частью неопубликованного модуля и на данный момент недоступна."
+    peer_review_invitation: 
+      sms: 
+        more_info: "Дополнительные сведения доступны в %{url}"
     pseudonym_registration: 
       email: 
         body: "Вы зарегистрированы для учетной записи Canvas в %{account}!  Перед входом в систему и использованием Canvas необходимо завершить процесс настройки."
@@ -10391,6 +10432,8 @@ ru:
       delimiter: ","
       separator: "."
     human: 
+      decimal_units: 
+        format: "%n %u"
       storage_units: 
         format: "%n %u"
         units: 
@@ -10402,6 +10445,9 @@ ru:
           kb: Кбайт
           mb: Мбайт
           tb: ТБ
+  observees: 
+    new_observee_password: Пароль
+    new_observee_username: "Имя пользователя"
   options: 
     ? "no"
     : Нет
@@ -12772,6 +12818,8 @@ ru:
     reupload_submission_files: "Повторно загрузить файлы отправки"
     upload_info: "Если в файлы отправок студентов ранее вносились изменения, просто заархивируйте их и загрузите ZIP-файл, используя форму ниже. Студенты будут видеть измененные файлы в комментариях для отправки."
     upload_warning: "Убедитесь, что имена файлов подписок не изменены, чтобы их можно было распознать."
+  react_files: 
+    loading_more_results: "Загрузка других результатов"
   recent_student: 
     last_logged_in: "последний вход в систему %{last_login}"
   recipient_input: 
