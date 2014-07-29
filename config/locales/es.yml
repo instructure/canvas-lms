@@ -3169,6 +3169,9 @@ es:
       crumbs: 
         course_exports: "Exportaciones del Curso"
       export_type: "Tipo de exportación"
+      labels: 
+        course: Curso
+        quiz: Evaluación
       links: 
         download: "Exportación del Curso desde %{date}: *Haga click aquí para descargar*"
         download_qti: "Exportación QTI de %{date}: *Haga clic aquí para descargar*"
@@ -5404,10 +5407,13 @@ es:
       saving: "Guardando la clave..."
       saving_failed: "Error al guardar la clave"
     index: 
+      details: Información
       developer_keys: "Claves del elaborador"
       key_settings: "Configuraciones clave"
+      name: Nombre
       show_all: "Mostrar todas las %{count} claves"
       title: "Claves del Elaborador"
+      user: Usuario
     messages: 
       confirm_delete: "¿Está seguro de que quiere borrar esta clave de programador?"
     no_user: "No hay usuario"
@@ -6071,6 +6077,7 @@ es:
     bad_navigation_config: "Configuración inválida de la pestaña del curso"
     blank: Obligatorio
     failed: Falló
+    format: "%{attribute} %{message}"
     index: 
       all_categories: " - Todas las Categorías -"
       default_category: predeterminado
@@ -6084,6 +6091,25 @@ es:
         user: usuario
       message_contains: "El Mensaje contiene"
     max_attempts: "Ha intentado iniciar sesión demasiadas veces. Intentelo de nuevo más tarde o contacte con el administrador de su sistema."
+    messages: 
+      accepted: "debe ser aceptado"
+      blank: "no puede dejarse en blanco"
+      confirmation: "no coincide con la confirmación"
+      empty: "no puede quedar vacío"
+      equal_to: "debe equivaler a %{count}"
+      even: "debe ser par"
+      exclusion: "está reservado(a)"
+      greater_than: "debe ser mayor que %{count}"
+      greater_than_or_equal_to: "debe ser mayor o igual a %{count}"
+      inclusion: "no está incluído en la lista"
+      invalid: "es inválido(a)"
+      less_than: "debe ser menos de %{count}"
+      less_than_or_equal_to: "debe ser menor o igual a %{count}"
+      not_a_number: "no es un número"
+      odd: "debe ser impar"
+      too_long: "es muy largo (máximo son %{count} caracteres)"
+      too_short: "es muy corto (mínimo son %{count} caracteres)"
+      wrong_length: "es la longitud errónea (debería tener %{count} caracteres)"
     no_attached_file: "Debe adjuntar al menos un archivo a esta tarea"
     registration_incomplete: "Necesita confirmar su correo electrónico antes de ver esta página"
     required: Obligatorio
@@ -6151,15 +6177,19 @@ es:
       by_url: "Por URL"
       by_xml: "Pegar XML"
       config_url: "URL de configuración"
+      configuration_type: "Tipo de Configuración"
+      consumer_key: "Código de consumidor"
       custom_feilds_explanation: "Una por línea. Formato: nombre=valor"
       custom_fields: "Campos personalizados"
       description: Descripción
       email_only: "Solo correo electrónico"
       manual: "Entrada manual"
+      name: Nombre
       name_only: "Solo el nombre"
       paste_xml: "Pegar XML aquí"
       privacy: Privacidad
       public: Público
+      shared_secret: "Secreto compartido"
       shared_secret_note: "Introduzca un nuevo valor para modificar"
       tool_domain: Dominio
       tool_url: URL
@@ -7620,6 +7650,8 @@ es:
       x_new_in_discussions: 
         one: "*1* debate"
         other: "*%{count}* debates"
+    select: 
+      prompt: "Por favor seleccione"
   high_contrast_description: |-
       Si prefiere ver una versión de la interfaz de usuario de Canvas con mayor contraste, habilite esta opción.
       Esta opción puede ser útil para personas con visión reducida o con dificultad para leer.
@@ -7939,6 +7971,12 @@ es:
     en: Ingles
     es: Español
   logged_out_user: "Usuario desconectado %{user_counter}"
+  lti: 
+    lti_message: 
+      load_tool_new_tab_button: "Cargar %{tool} en una ventana nueva"
+      new_tab: "Esta herramienta necesita ser cargada en una ventana del navegador nueva"
+      new_tab_expired: "The session for this tool has expired. Please reload the page to access the tool again"
+      new_tab_loaded: "Esta herramienta se cargó con éxito en una ventana del navegador nueva. Recargar la página para poder tener acceso a la herramienta otra vez."
   m2c_file_description: "Moodle 1.9/2.x"
   m2c_name: "Importador de Moodle"
   manage_avatars: 
@@ -9576,6 +9614,9 @@ es:
     page_locked_module: "Esta página es parte del módulo *%{module}* y aún no ha sido desbloqueada."
     page_locked_until: "Esta página está bloqueada hasta %{date}."
     page_unpublished_module: "Esta página es parte de un módulo sin publicar y aún no está disponible."
+    peer_review_invitation: 
+      sms: 
+        more_info: "Más información en %{url}"
     pseudonym_registration: 
       email: 
         body: "¡Se ha registrado para una cuenta con Canvas en %{account}! Antes que pueda ingresar y comenzar a usar Canvas, deberá terminar el proceso de configuración."
@@ -10252,6 +10293,8 @@ es:
       delimiter: ","
       separator: "."
     human: 
+      decimal_units: 
+        format: "%n %u"
       storage_units: 
         format: "%n %u"
         units: 
@@ -10262,6 +10305,9 @@ es:
           kb: KB
           mb: MB
           tb: TB
+  observees: 
+    new_observee_password: Contraseña
+    new_observee_username: "Nombre de usuario"
   options: 
     ? "no"
     : "No"
@@ -12574,6 +12620,8 @@ es:
     reupload_submission_files: "Volver a Cargar Archivos de los Envíos"
     upload_info: "Si hizo cambios a los archivos de envíos de estudiantes que descargó anteriormente, sólo comprímalos y cargue el archivo zip con el formulario a continuación. Los estudiantes verán los archivos modificados en sus comentarios para el envío."
     upload_warning: "Asegurese que no cambie los nombres de los archivos de envío para poder reconocerlos."
+  react_files: 
+    loading_more_results: "Cargando más resultados"
   recent_student: 
     last_logged_in: "último inicio de sesión en %{last_login}"
   recipient_input: 
