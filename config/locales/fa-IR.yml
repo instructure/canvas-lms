@@ -470,6 +470,7 @@ fa-IR:
         time: زمان
         user: کاربر
       course_logging_item: 
+        blank_placeholder: "-"
         view_event_details: "مشاهده اطلاعات بیشتر"
       course_logging_results: 
         date: تاریخ
@@ -3067,6 +3068,9 @@ fa-IR:
       crumbs: 
         course_exports: "صدور محتوا"
       export_type: "نوع صدور"
+      labels: 
+        course: درس
+        quiz: آزمون
       links: 
         download: "صدور درس از %{date}: *برای بارگیری، اینجا کلیک کنید*"
         download_qti: "صدور QTI از %{date}: *برای بارگیری، اینجا کلیک کنید*"
@@ -5202,10 +5206,13 @@ fa-IR:
       saving: "درحال ذخیره سازی کلید..."
       saving_failed: "ذخیره سازی کلید انجام نشد"
     index: 
+      details: "اطلاعات بیشتر"
       developer_keys: "کلیدهای توسعه دهنده"
       key_settings: "تنظیمات کلید"
+      name: نام
       show_all: "نمایش همه %{count} کلید"
       title: "کلیدهای توسعه دهنده"
+      user: کاربر
     messages: 
       confirm_delete: "مطمئنید که می خواهید این کلید توسعه دهنده حذف شود؟"
     no_user: "کاربر موجود نیست"
@@ -5877,6 +5884,7 @@ fa-IR:
     bad_navigation_config: "پیکربندی زبانه درس معتبر نیست"
     blank: لازم
     failed: "انجام نشد"
+    format: "%{attribute} %{message}"
     index: 
       all_categories: "- همه رده ها -"
       default_category: "پیش فرض"
@@ -5890,6 +5898,25 @@ fa-IR:
         user: کاربر
       message_contains: "محتوای پیام"
     max_attempts: "تعداد تلاش های ناموفق برای ورود زیاد است. لطفا بعدا دوباره تلاش کنید، یا با مدیر سیستم خود تماس بگیرید."
+    messages: 
+      accepted: "باید پذیرفته شود"
+      blank: "نمی تواند خالی باشد"
+      confirmation: "با تأییدیه مطابقت ندارد"
+      empty: "نمی تواند خالی باشد"
+      equal_to: "باید با %{count} برابر باشد"
+      even: "باید زوج باشد"
+      exclusion: "رزرو شده است"
+      greater_than: "باید از %{count} بزرگتر باشد"
+      greater_than_or_equal_to: "باید بزرگتر از %{count} یا مساوی با آن باشد"
+      inclusion: "در این فهرست گنجانده نشده است"
+      invalid: "معتبر نیست"
+      less_than: "باید کوچکتر از %{count} باشد"
+      less_than_or_equal_to: "باید کوچکتر از %{count} یا مساوی با آن باشد"
+      not_a_number: "عدد نیست"
+      odd: "باید فرد باشد"
+      too_long: "طولانی است (حداکثر باید %{count} نویسه باشد)"
+      too_short: "کوتاه است (حداقل باید %{count} نویسه باشد)"
+      wrong_length: "طول اشتباه است (باید %{count} نویسه باشد)"
     no_attached_file: "باید حداقل یک فایل را به این تکلیف پیوست کنید"
     registration_incomplete: "قبل از اینکه بتوانید این صفحه را مشاهده کنید، باید نشانی پست الکترونیکی خود را تأیید کنید"
     required: لازم
@@ -5958,15 +5985,18 @@ fa-IR:
       by_url: "بر اساس نشانی اینترنتی"
       by_xml: "چسباندن XML"
       config_url: "نشانی اینترنتی پیکربندی"
+      consumer_key: "کلید مصرف کننده"
       custom_feilds_explanation: "یکی در هر خط.. قالب: نام=مقدار"
       custom_fields: "جاهای خالی سفارشی"
       description: شرح
       email_only: "فقط پست الکترونیکی"
       manual: "ورودی دستی"
+      name: نام
       name_only: "فقط نام"
       paste_xml: "چسباندن XML در اینجا"
       privacy: "حریم خصوصی"
       public: عمومی
+      shared_secret: "رمز مشترک"
       shared_secret_note: "یک مقدار جدید را برای تغییر دادن وارد کنید"
       tool_domain: دامنه
       tool_url: "نشانی اینترنتی"
@@ -7274,6 +7304,8 @@ fa-IR:
         one: "*%{count}* بحث"
         other: "*%{count}* بحث"
     local: محلی
+    select: 
+      prompt: "لطفا انتخاب کنید"
   high_contrast_description: |-
       اگر نسخه دارای تضاد بیشتر واسط کاربر کانواس را ترجیح می دهید، این گزینه را فعال کنید.
       این نسخه ممکن است برای افراد دارای ضعف بینایی یا اشکال در خواندن مفید باشد.
@@ -7617,6 +7649,12 @@ fa-IR:
     en: انگلیسی
     fa-IR: "فارسی (crowd-sourced)"
   logged_out_user: "کاربر خارج شده %{user_counter}"
+  lti: 
+    lti_message: 
+      load_tool_new_tab_button: "بارگذاری %{tool} در یک پنجره جدید"
+      new_tab: "این ابزار باید در یک پنجره جدید مرورگر بارگذاری شود"
+      new_tab_expired: "جلسه مربوط به این ابزار منقضی شده است. لطفا برای دسترسی دوباره به ابزار، صفحه را دوباره بارگذاری کنید."
+      new_tab_loaded: "این ابزار به طور موفقیت آمیز در یک پنجره جدید مرورگر بارگذاری شد. برای دسترسی دوباره به این ابزار، صفحه را دوباره بارگذاری کنید."
   m2c_file_description: "ماژول 1.9/2.x"
   m2c_name: "وارد کننده Moodle"
   manage_avatars: 
@@ -9245,6 +9283,9 @@ fa-IR:
     page_locked_module: "این صفحه بخشی از ماژول *%{module}* است و هنوز قفل گشایی نشده است."
     page_locked_until: "این صفحه تا تاریخ %{date} قفل شده است."
     page_unpublished_module: "این صفحه بخشی از یک ماژول منتشر نشده است و هنوز در دسترس نیست."
+    peer_review_invitation: 
+      sms: 
+        more_info: "اطلاعات بیشتر در %{url}"
     pseudonym_registration: 
       email: 
         body: "شما برای یک حساب کانواس در %{account} ثبت نام شده اید! قبل از اینکه بتوانید وارد شوید و از کانواس استفاده کنید، باید به فرایند پیکربندی خاتمه دهید."
@@ -9892,6 +9933,8 @@ fa-IR:
       delimiter: ","
       separator: "."
     human: 
+      decimal_units: 
+        format: "%n %u"
       storage_units: 
         format: "%n %u"
         units: 
@@ -9902,6 +9945,9 @@ fa-IR:
           kb: کیلوبایت
           mb: مگابایت
           tb: ترابایت
+  observees: 
+    new_observee_password: "رمز عبور"
+    new_observee_username: "نام کاربری"
   options: 
     ? "no"
     : خیر
@@ -12290,6 +12336,8 @@ fa-IR:
     reupload_submission_files: "بارگذاری دوباره فایل های ارسالی"
     upload_info: "اگر در فایل های ارسالی دانشجو که قبلا بارگیری کرده اید، تغییراتی ایجاد کردید، آنها را دوباره فشرده کنید و فایل فشرده را با استفاده از فرم زیر بارگذاری نمایید. دانشجویان فایل های تغییر یافته را در نظرهای مربوط به مورد ارسالی خود مشاهده خواهند کرد."
     upload_warning: "مطمئن شوید که نام فایل های ارسالی را تغییر ندهید تا بتوانیم آنها را شناسایی کنیم."
+  react_files: 
+    loading_more_results: "در حال بارگذاری نتایج بیشتر"
   recent_student: 
     last_logged_in: "آخرین ورود در %{last_login}"
   recently_deleted_courses_title: "درسهایی که اخیرا حذف شده اند"
