@@ -472,6 +472,7 @@ tr:
         time: Zaman
         user: Kullanıcı
       course_logging_item: 
+        blank_placeholder: "-"
         view_event_details: "Ayrıntıları Göster"
       course_logging_results: 
         date: Tarih
@@ -3251,6 +3252,9 @@ tr:
       crumbs: 
         course_exports: "İçerik Dışa Aktarımları"
       export_type: "Dışa Aktarım Türü"
+      labels: 
+        course: Ders
+        quiz: "Kısa Sınav"
       links: 
         download: "%{date}: tarininde Ders Aktarımı *İndirmek için tıklayın*"
         download_qti: "%{date}: tarihinde QTI Aktarımı *İndirmek için tıklayın*"
@@ -5399,10 +5403,13 @@ tr:
       saving: "Key Kaydediliyor..."
       saving_failed: "Kay'i Kaydetme Başarısız"
     index: 
+      details: Ayrıntılar
       developer_keys: "Geliştirici Anahtarları"
       key_settings: "Key Ayarları"
+      name: İsim
       show_all: "%{count} Key'in Tümünü Göster"
       title: "Geliştirici Anahtarları"
+      user: Kullanıcı
     messages: 
       confirm_delete: "Bu geliştirici anahtarını silmek istediğinize eminmisiniz?"
     no_user: "Kullanıcı Yok"
@@ -6073,6 +6080,7 @@ tr:
     bad_navigation_config: "Geçersiz ders sekme yapılandırması"
     blank: Zorunlu
     failed: Başarısız
+    format: "%{attribute} %{message}"
     index: 
       all_categories: "- Tüm Kategoriler -"
       default_category: varsayılan
@@ -6086,6 +6094,25 @@ tr:
         user: kullanıcı
       message_contains: "Mesaj içeriği"
     max_attempts: "Çok fazla oturum açma denemesi meydana geldi. Lütfen daha sonra tekrar deneyiniz veya sistem yönetici ile iletişime geçiniz."
+    messages: 
+      accepted: "kabul edilmelidir"
+      blank: "boş bırakılamaz"
+      confirmation: "onaylama ile eşleşmiyor"
+      empty: "boş bırakılamaz"
+      equal_to: "%{count}'ye eşit olmalıdır "
+      even: " çift sayı olması gerekir"
+      exclusion: ayrıldı
+      greater_than: "%{count}'den büyük olmalıdır "
+      greater_than_or_equal_to: "%{count}'ye eşit veya büyük olmalıdır "
+      inclusion: "listeye dahil değil"
+      invalid: geçersiz
+      less_than: "%{count}'den küçük olmalıdır "
+      less_than_or_equal_to: "%{count}'ye eşit veya küçük olmalıdır "
+      not_a_number: "sayı değil"
+      odd: "tekil olmalı"
+      too_long: "çok uzun (maksimum %{count} karakter)"
+      too_short: "çok kısa (minimum %{count} karakter)"
+      wrong_length: "yanlış uzunluk (%{count} karakter olmalıdır)"
     no_attached_file: "Bu ödev için en az bir dosya eklemelisiniz"
     registration_incomplete: "Bu sayfayı görebilmek için e-posta adresinizi onaylamalısınız"
     required: Zorunlu
@@ -6153,15 +6180,18 @@ tr:
       by_url: "URL'ye göre"
       by_xml: "XML Yapıştır"
       config_url: "Yapılandırma URL'i"
+      consumer_key: "Müşteri Anahtarı"
       custom_feilds_explanation: "Her bir satır. Format: isim=değer"
       custom_fields: "Varsayılan Alanlar"
       description: Açıklama
       email_only: "Sadece E-Posta"
       manual: "Elle Giriş"
+      name: İsim
       name_only: "Sadece İsim"
       paste_xml: "XML'i Buraya Yapıştırın"
       privacy: Gizlilik
       public: "Herkese Açık"
+      shared_secret: "Shared Secret"
       shared_secret_note: "Değiştirmek için yeni bir değer girin"
       tool_domain: Alan
       tool_url: URL
@@ -7656,6 +7686,8 @@ tr:
         one: "*1* Tartışma"
         other: "*%{count}* Tartışma"
     local: Yerel
+    select: 
+      prompt: "Lütfen seçiniz"
   high_contrast_description: |-
       Canvas kullanıcı ara biriminin yüksek çözünürlüklü versiyonunu isterseniz bunu
       etkinleştirin. Görme engeli veya okumada zorluk çeken kişiler için yararlı olabilir.
@@ -7994,6 +8026,12 @@ tr:
     en: İngilizce
     tr: "Türkçe (crowd-sourced)"
   logged_out_user: "Oturum Kapatan Kullanıcı %{user_counter}"
+  lti: 
+    lti_message: 
+      load_tool_new_tab_button: "%{tool} aracını yeni pencerede Yükle"
+      new_tab: "Bu aracın yeni bir tarayıcı penceresinde yüklenmesi gerekiyor"
+      new_tab_expired: "Bu araç için oturum süresi doldu. Araca tekrar erişmek için lütfen sayfayı yeniden yükleyin"
+      new_tab_loaded: "Bu araç başarılı bir şekilde yeni tarayıcı penceresinde yüklendi. Araca tekrar erişmek için sayfayı yeniden yükleyin."
   m2c_file_description: "Moodle 1.9/2.x"
   m2c_name: "Moodle İçe Aktarma"
   manage_avatars: 
@@ -9642,6 +9680,9 @@ tr:
     page_locked_module: "Bu sayfa *%{module}* modülünün bir parçasıdır ve henüz kilidi kaldırılmamış."
     page_locked_until: "Bu sayfa %{date} tarihine kadar kilitlidir."
     page_unpublished_module: "Bu safa yayınlanmamış bir modülünün bir parçasıdır ve henüz mevcut değildir."
+    peer_review_invitation: 
+      sms: 
+        more_info: "Daha fazla bilgi için %{url}"
     pseudonym_registration: 
       email: 
         body: "Canvas'a %{account} hesabıyla kayıt oldunuz! Giriş yapıp Canvas'ı kullanmaya başlamadan önce yapılandırma sürecini tamamlamanız gerekecek."
@@ -10319,6 +10360,8 @@ tr:
       delimiter: ","
       separator: "."
     human: 
+      decimal_units: 
+        format: "%n %u"
       storage_units: 
         format: "%n %u"
         units: 
@@ -10329,6 +10372,9 @@ tr:
           kb: KB
           mb: MB
           tb: TB
+  observees: 
+    new_observee_password: Şifre
+    new_observee_username: "Kullanıcı Adı"
   options: 
     ? "no"
     : Hayır
@@ -12716,6 +12762,8 @@ tr:
     reupload_submission_files: "Ödev Gönderilerini Yeniden Yükle"
     upload_info: "Daha önce indirdiğiniz öğrencilerin gönderdikleri dosyalarda değişiklik yaptıysanız bunları zip dosyası olarak sıkıştırıp aşağıdaki form ile birlikte bu zipli dosyayı yükleyin. Öğrenciler değiştirilmiş dosyaları gönderi yorumlarında görecekler."
     upload_warning: "Gönderi dosyalarının adlarını değiştirmeyin ki bunları algılayabilelim."
+  react_files: 
+    loading_more_results: "Daha fazla sonuç yükleniyor"
   recent_student: 
     last_logged_in: "son oturum %{last_login}"
   recently_deleted_courses_title: "Son Silinen Kurslar"
