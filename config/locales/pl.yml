@@ -463,6 +463,7 @@ pl:
         time: Godzina
         user: Użytkownik
       course_logging_item: 
+        blank_placeholder: "-"
         view_event_details: "Pokaż informacje szczegółowe"
       course_logging_results: 
         date: Data
@@ -3237,6 +3238,9 @@ pl:
       crumbs: 
         course_exports: "Eksporty kursów"
       export_type: "Typ eksportu"
+      labels: 
+        course: Kurs
+        quiz: Test
       links: 
         download: "Eksporty kursów z dnia %{date}: *Kliknij tutaj, aby pobrać*"
         download_qti: "Eksportowanie QTI od %{date}: *Kliknij tutaj, aby pobrać*"
@@ -5512,10 +5516,13 @@ pl:
       saving: "Zapisywanie kluczy..."
       saving_failed: "Zapisanie kluczy nie powiodło się"
     index: 
+      details: "Informacje szczegółowe"
       developer_keys: "Klucze Dewelopera"
       key_settings: "Ustawienia klucza"
+      name: Nazwa
       show_all: "Pokaż wszystkie %{count} klucze"
       title: "Klucze Dewelopera"
+      user: Użytkownik
     messages: 
       confirm_delete: "Czy jesteś pewien, że chcesz usunąć ten klucz developera?"
     no_user: "Brak użytkownika"
@@ -6193,6 +6200,7 @@ pl:
     bad_navigation_config: "NIeprawidłowa konfiguracja zakładki kursu"
     blank: Wymagany
     failed: Niepowodzenie
+    format: "%{attribute} %{message}"
     index: 
       all_categories: "- Wszystkie kategorie -"
       default_category: domyślne
@@ -6206,6 +6214,25 @@ pl:
         user: użytkownik
       message_contains: "Wiadomość zawiera"
     max_attempts: "Za dużo prób logowania zakończonych niepowodzeniem. Spróbuj ponownie później lub skontaktuj się z administratorem systemu."
+    messages: 
+      accepted: "należy zatwierdzić"
+      blank: "nie może pozostać puste"
+      confirmation: "nie pasuje do potwierdzenia"
+      empty: "nie może pozostać puste"
+      equal_to: "musi być równe %{count}"
+      even: "musi być parzyste"
+      exclusion: "jest zastrzeżone"
+      greater_than: "musi być większe niż %{count}"
+      greater_than_or_equal_to: "musi być większe lub równe %{count}"
+      inclusion: "nie znajduje się na liście"
+      invalid: "jest niepoprawne"
+      less_than: "musi być mniejsze niż %{count}"
+      less_than_or_equal_to: "musi być mniejsze lub równe %{count}"
+      not_a_number: "nie jest liczbą"
+      odd: "musi być nieparzyste"
+      too_long: "jest za długie (maksymalna liczba znaków to %{count})"
+      too_short: "jest za krótkie (minimalna liczba znaków to %{count})"
+      wrong_length: "ma nieprawidłową długość (powinno być %{count} znaki(-ów))"
     no_attached_file: "Musisz dołączyć co najmniej jeden plik w tym zadaniu"
     registration_incomplete: "Musisz potwierdzić adres email zanim będziesz mógł przeglądać tę stronę."
     required: Wymagany
@@ -6273,15 +6300,19 @@ pl:
       by_url: "przez URL"
       by_xml: "Wklej XML"
       config_url: "URL konfiguracyjny"
+      configuration_type: "Typ konfiguracji"
+      consumer_key: "Klucz klienta"
       custom_feilds_explanation: "Pojedynczo w linii. Format: nazwa=wartość"
       custom_fields: "Pola niestandardowe"
       description: Opis
       email_only: "Tylko e-mail"
       manual: "Wpis ręczny"
+      name: Nazwa
       name_only: "Tylko nazwa"
       paste_xml: "Wklej XML tutaj"
       privacy: Prywatność
       public: Publiczny
+      shared_secret: "Wspólny klucz"
       shared_secret_note: "Wpisz nową wartość, aby dokonać zmiany"
       tool_domain: Domena
       tool_url: "Adres URL"
@@ -7775,6 +7806,8 @@ pl:
         few: "** dyskusje"
         one: "*1* dyskusja"
         other: "*%{count}* dyskusji"
+    select: 
+      prompt: Wybierz
   high_contrast_description: |-
       Jeśli wolisz wersję z wższym kontrastem interfejsu użytkownika systemu Canvas, uaktywnij to.
       Opcja może okazać się pomocna dla osób niedowidzących lub mających problem z czytaniem.
@@ -8107,6 +8140,12 @@ pl:
     en: Angielski
     pl: Polski
   logged_out_user: "Użytkownik wylogowany %{user_counter}"
+  lti: 
+    lti_message: 
+      load_tool_new_tab_button: "Załaduj %{tool} w nowym oknie"
+      new_tab: "Narzędzie musi zostać załadowane w nowym oknie przeglądarki"
+      new_tab_expired: "Wygasła sesja tego narzędzia. Ponownie załaduj stronę, uzyskać dostęp do narzędzia"
+      new_tab_loaded: "Ładowane narzędzia w nowym oknie przeglądarki zostało pomyślnie zakończone. Ponownie załaduj stronę, aby uzyskać dostęp do narzędzia."
   m2c_file_description: " Moodle 1.9/2.x"
   m2c_name: "Importer Moodle "
   manage_avatars: 
@@ -9776,6 +9815,9 @@ pl:
     page_locked_module: "Ta strona jest częścią modułu *%{module}* i nie została jeszcze odblokowana."
     page_locked_until: "Ta strona jest zablokowana do %{date}."
     page_unpublished_module: "Strona jest częścią nieopublikowanego modułu i nie jest jeszcze dostępna."
+    peer_review_invitation: 
+      sms: 
+        more_info: "Więcej informacji pod adresem %{url}"
     pseudonym_registration: 
       email: 
         body: "Zarejestrowano dla Ciebie konto w systemie Canvas — %{account}!  Zalogowanie się i korzystanie z systemu Canvas, będzie możliwe po zakończeniu procesu konfiguracji."
@@ -10454,6 +10496,8 @@ pl:
       delimiter: ","
       separator: "."
     human: 
+      decimal_units: 
+        format: "%n %u"
       storage_units: 
         format: "%n %u"
         units: 
@@ -10465,6 +10509,9 @@ pl:
           kb: KB
           mb: MB
           tb: TB
+  observees: 
+    new_observee_password: Hasło
+    new_observee_username: "Nazwa użytkownika"
   options: 
     ? "no"
     : Nie
@@ -12859,6 +12906,8 @@ pl:
     reupload_submission_files: "Ponownie przekaż pliki z zadaniem"
     upload_info: "W przypadku wprowadzenia zmian do pobranych wcześniej plików z zadaniami należy spakować je ponownie i przekazać paczkę wraz z poniższym formularzem. Uczestnicy będą widzieć zmodyfikowane pliki w komentarzach do przesłanego zadania."
     upload_warning: "Upewnij się, że nazwy plików nie zostały zmienione, gdyż system może ich nie rozpoznać."
+  react_files: 
+    loading_more_results: "Trwa ładowanie większej liczby wyników"
   recent_student: 
     last_logged_in: "ostatnio zalogowani w %{last_login}"
   recipient_input: 
