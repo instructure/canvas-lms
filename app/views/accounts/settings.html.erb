@@ -40,7 +40,7 @@
     <% if can_do(@context, @current_user, :manage_storage_quotas) %>
     <li><a href="#tab-quotas" id="tab-quotas-link"><%= t(:tab_quotas, "Quotas") %></a></li>
     <% end %>
-    <% if can_do(@context, @current_user, :manage_account_settings) %>
+    <% if can_do(@context, @current_user, :manage_account_settings) && @account.root_account? && !@account.site_admin? %>
     <li><a href="#tab-notifications" id="tab-notifications-link"><%= t(:tab_notifications, "Notifications") %></a></li>
     <% end %>
     <li><a href="#tab-users" id="tab-users-link"><%= t(:tab_admins, "Admins") %></a></li>
@@ -521,109 +521,106 @@ acknowledge that you have read and agreed to the
     <div id="tab-quotas"></div>
   <% end %>
 
-  <% if can_do(@context, @current_user, :manage_account_settings) %>
+  <% if can_do(@context, @current_user, :manage_account_settings) && @account.root_account? && !@account.site_admin? %>
     <div id="tab-notifications">
       <%= form_for :account, :url => account_url(@account), :html => {:method => :put, :id => "account_settings_notifications"} do |f| %>
-
-        <% if @account.root_account? && !@account.site_admin? %>
-          <h2><%= t(:email_notification_from_settings, 'E-mail Notification "From" Settings') %></h2>
-          <p><%= t(:email_notification_from_description, "This setting allows the Admin to brand or label the 'From' text on all notifications sent from Canvas for this Account.") %></p>
-          <%= f.fields_for :settings do |settings| %>
-            <div>
-              <%= settings.radio_button :outgoing_email_default_name_option, 'default',
-                                        :checked => @account.settings[:outgoing_email_default_name].blank?,
-                                        :class => 'notification_from_name_option' %>
-              <%= settings.label :outgoing_email_default_name_option_default, :en => "Default Canvas Setting" %>
-            </div>
-            <div style='padding-left: 2em;'>
-              <strong><%= t 'notifications.example', 'Example:' %></strong>
-              <blockquote>
-                <table class="formtable" style='margin-left: 1.5em;'>
-                <tr>
-                  <td><%= t 'notifications.from', 'From' %></td>
-                  <td><%= HostUrl.outgoing_email_default_name %> <%= '<notifications@instructure.com>' %></td>
-                </tr>
-                <tr>
-                  <td><%= t 'notifications.subject', 'Subject' %></td>
-                  <td><%= t 'notifications.sample_subject', 'Grade Changed: Check In Survey, Testing Course' %></td>
-                </tr>
-                <tr>
-                  <td><%= t 'notifications.email_date', 'Date' %></td>
-                  <td><%= DateTime.now.strftime('%B %d, %Y %I:%M:%S %p %z') %></td>
-                </tr>
-                <tr>
-                  <td><%= t 'notifications.email_to', 'To' %></td>
-                  <td><%= 'recipient@instructure.com' %></td>
-                </tr>
-                <tr>
-                  <td><%= t 'notifications.email_reply_to', 'Reply-To' %></td>
-                  <td><%= 'notifications+e79df3ljk09s3jkl09ssljk3lkj2l-10191633@instructure.com' %></td>
-                </tr>
-              </table>
-              </blockquote>
-            </div>
-            <div>
-              <%= settings.radio_button :outgoing_email_default_name_option, 'custom',
-                                        :checked => !@account.settings[:outgoing_email_default_name].blank?,
-                                        :class => 'notification_from_name_option' %>
-              <%= settings.label :outgoing_email_default_name_option_custom, :en => 'Custom "From" Name' %>
-            </div>
-            <div style='padding-left: 2em;'>
-              <p>
-                <%= t('notifications.custom_name_description', 'If selected, this will replace all other branding sent in Canvas notifications.') %>
-                <br/>
-                <%= text_field_tag 'account[settings][outgoing_email_default_name]', @account.settings[:outgoing_email_default_name] %>
-              </p>
-            </div>
-            <div style='padding-left: 2em;'>
-              <strong><%= t 'notifications.example', 'Example:' %></strong>
-              <blockquote>
+        <h2><%= t(:email_notification_from_settings, 'E-mail Notification "From" Settings') %></h2>
+        <p><%= t(:email_notification_from_description, "This setting allows the Admin to brand or label the 'From' text on all notifications sent from Canvas for this Account.") %></p>
+        <%= f.fields_for :settings do |settings| %>
+          <div>
+            <%= settings.radio_button :outgoing_email_default_name_option, 'default',
+                                      :checked => @account.settings[:outgoing_email_default_name].blank?,
+                                      :class => 'notification_from_name_option' %>
+            <%= settings.label :outgoing_email_default_name_option_default, :en => "Default Canvas Setting" %>
+          </div>
+          <div style='padding-left: 2em;'>
+            <strong><%= t 'notifications.example', 'Example:' %></strong>
+            <blockquote>
               <table class="formtable" style='margin-left: 1.5em;'>
-                <tr>
-                  <td><%= t 'notifications.from', 'From' %></td>
-                  <td><strong id='custom_default_name_display'></strong> <%= '<notifications@instructure.com>' %></td>
-                </tr>
-                <tr>
-                  <td><%= t 'notifications.subject', 'Subject' %></td>
-                  <td><%= t 'notifications.sample_subject', 'Grade Changed: Check In Survey, Testing Course' %></td>
-                </tr>
-                <tr>
-                  <td><%= t 'notifications.email_date', 'Date' %></td>
-                  <td><%= DateTime.now.strftime('%B %d, %Y %I:%M:%S %p %z') %></td>
-                </tr>
-                <tr>
-                  <td><%= t 'notifications.email_to', 'To' %></td>
-                  <td><%= 'recipient@instructure.com' %></td>
-                </tr>
-                <tr>
-                  <td><%= t 'notifications.email_reply_to', 'Reply-To' %></td>
-                  <td><%= 'notifications+e79df3ljk09s3jkl09ssljk3lkj2l-10191633@instructure.com' %></td>
-                </tr>
-              </table>
-              </blockquote>
-            </div>
-
-            <h2><%= t('notifications.external_services', 'Notifications Sent to External Services') %></h2>
-            <table class="formtable">
               <tr>
-                <td><input type="checkbox" id="account_settings_external_notification_warning_checkbox" <%= 'checked="checked"' if @account.settings[:external_notification_warning] %> /></td>
-                <td>
-                  <label for="account_settings_external_notification_warning_checkbox"><%= t('notifications.external_services_label', 'Display one time pop-up warning on Notification Preferences page.') %></label>
-                  <input type="hidden" name="account[settings][external_notification_warning]" id="account_settings_external_notification_warning" value="<%= @account.settings[:external_notification_warning] ? 1 : 0 %>" />
-                </td>
+                <td><%= t 'notifications.from', 'From' %></td>
+                <td><%= HostUrl.outgoing_email_default_name %> <%= '<notifications@instructure.com>' %></td>
+              </tr>
+              <tr>
+                <td><%= t 'notifications.subject', 'Subject' %></td>
+                <td><%= t 'notifications.sample_subject', 'Grade Changed: Check In Survey, Testing Course' %></td>
+              </tr>
+              <tr>
+                <td><%= t 'notifications.email_date', 'Date' %></td>
+                <td><%= DateTime.now.strftime('%B %d, %Y %I:%M:%S %p %z') %></td>
+              </tr>
+              <tr>
+                <td><%= t 'notifications.email_to', 'To' %></td>
+                <td><%= 'recipient@instructure.com' %></td>
+              </tr>
+              <tr>
+                <td><%= t 'notifications.email_reply_to', 'Reply-To' %></td>
+                <td><%= 'notifications+e79df3ljk09s3jkl09ssljk3lkj2l-10191633@instructure.com' %></td>
               </tr>
             </table>
-
-            <table style="margin-left: 1.5em;" cellspacing="0" class="formtable">
+            </blockquote>
+          </div>
+          <div>
+            <%= settings.radio_button :outgoing_email_default_name_option, 'custom',
+                                      :checked => !@account.settings[:outgoing_email_default_name].blank?,
+                                      :class => 'notification_from_name_option' %>
+            <%= settings.label :outgoing_email_default_name_option_custom, :en => 'Custom "From" Name' %>
+          </div>
+          <div style='padding-left: 2em;'>
+            <p>
+              <%= t('notifications.custom_name_description', 'If selected, this will replace all other branding sent in Canvas notifications.') %>
+              <br/>
+              <%= text_field_tag 'account[settings][outgoing_email_default_name]', @account.settings[:outgoing_email_default_name] %>
+            </p>
+          </div>
+          <div style='padding-left: 2em;'>
+            <strong><%= t 'notifications.example', 'Example:' %></strong>
+            <blockquote>
+            <table class="formtable" style='margin-left: 1.5em;'>
               <tr>
-                <td>
-                  <b><%= t('notifications.external_services_warning_label', 'Pop-up Message Content:') %></b>
-                  <blockquote><%= t('notifications.external_services_warning', 'Notice: Some notifications may contain confidential information. Selecting to receive notifications at an email other than your institution provided address may result in sending sensitive Canvas course and group information outside of the institutional system.')%></blockquote>
-                </td>
+                <td><%= t 'notifications.from', 'From' %></td>
+                <td><strong id='custom_default_name_display'></strong> <%= '<notifications@instructure.com>' %></td>
+              </tr>
+              <tr>
+                <td><%= t 'notifications.subject', 'Subject' %></td>
+                <td><%= t 'notifications.sample_subject', 'Grade Changed: Check In Survey, Testing Course' %></td>
+              </tr>
+              <tr>
+                <td><%= t 'notifications.email_date', 'Date' %></td>
+                <td><%= DateTime.now.strftime('%B %d, %Y %I:%M:%S %p %z') %></td>
+              </tr>
+              <tr>
+                <td><%= t 'notifications.email_to', 'To' %></td>
+                <td><%= 'recipient@instructure.com' %></td>
+              </tr>
+              <tr>
+                <td><%= t 'notifications.email_reply_to', 'Reply-To' %></td>
+                <td><%= 'notifications+e79df3ljk09s3jkl09ssljk3lkj2l-10191633@instructure.com' %></td>
               </tr>
             </table>
+            </blockquote>
+          </div>
 
-          <% end %>
+          <h2><%= t('notifications.external_services', 'Notifications Sent to External Services') %></h2>
+          <table class="formtable">
+            <tr>
+              <td><input type="checkbox" id="account_settings_external_notification_warning_checkbox" <%= 'checked="checked"' if @account.settings[:external_notification_warning] %> /></td>
+              <td>
+                <label for="account_settings_external_notification_warning_checkbox"><%= t('notifications.external_services_label', 'Display one time pop-up warning on Notification Preferences page.') %></label>
+                <input type="hidden" name="account[settings][external_notification_warning]" id="account_settings_external_notification_warning" value="<%= @account.settings[:external_notification_warning] ? 1 : 0 %>" />
+              </td>
+            </tr>
+          </table>
+
+          <table style="margin-left: 1.5em;" cellspacing="0" class="formtable">
+            <tr>
+              <td>
+                <b><%= t('notifications.external_services_warning_label', 'Pop-up Message Content:') %></b>
+                <blockquote><%= t('notifications.external_services_warning', 'Notice: Some notifications may contain confidential information. Selecting to receive notifications at an email other than your institution provided address may result in sending sensitive Canvas course and group information outside of the institutional system.')%></blockquote>
+              </td>
+            </tr>
+          </table>
+
         <% end %>
 
         <div class="button-container">
