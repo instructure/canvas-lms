@@ -1,38 +1,32 @@
 define [
   'react'
+  'react-router'
   '../mixins/BackboneMixin'
   'compiled/react/shared/utils/withReactDOM'
   './FriendlyDatetime'
   './ItemCog'
   'compiled/util/friendlyBytes'
-], (React, BackboneMixin, withReactDOM, FriendlyDatetime, ItemCog, friendlyBytes) ->
+], (React, {Link}, BackboneMixin, withReactDOM, FriendlyDatetime, ItemCog, friendlyBytes) ->
 
-  EVERYTHING_BEFORE_THE_FIRST_SLASH = /^[^\/]+/
 
   FolderChild = React.createClass
 
     mixins: [BackboneMixin('model')],
 
-    folderHref: ->
-      @props.baseUrl + 'folder' + @props.model.get('full_name').replace(EVERYTHING_BEFORE_THE_FIRST_SLASH, '')
-
     render: withReactDOM ->
-
       div className:'ef-item-row',
         div className:'ef-name-col',
-          (if @props.model.get('display_name')
+          if @props.model.get('display_name')
             a href: @props.model.get('url'),
-              (if @props.model.get('thumbnail_url')
+              if @props.model.get('thumbnail_url')
                 img src: @props.model.get('thumbnail_url'), className:'ef-thumbnail', alt:''
               else
                 i className:'icon-document'
-              ),
               @props.model.get('display_name')
           else
-            a href: @folderHref(),
-              i className:'icon-folder'
+            Link to: 'folder', contextType: @props.params.contextType, contextId: @props.params.contextId, splat: @props.model.urlPath(),
+              i className:'icon-folder',
               @props.model.get('name')
-          )
         div className:'ef-date-modified-col',
           FriendlyDatetime datetime: @props.model.get('updated_at'),
         div className:'ef-modified-by-col',

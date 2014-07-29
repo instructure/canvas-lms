@@ -1,8 +1,10 @@
 define [
+  'underscore'
   'react'
+  'react-router'
   'compiled/react/shared/utils/withReactDOM'
   'compiled/fn/preventDefault'
-], (React, withReactDOM, preventDefault) ->
+], (_, React, {Link}, withReactDOM, preventDefault) ->
 
 
   columns = [
@@ -25,23 +27,24 @@ define [
 
   ColumnHeaders = React.createClass
 
-    makeSorter: (property) ->
-      preventDefault (event) =>
-        @props.subject.set
-          sort: property
-          order: if (@props.subject.get('sort') is property) and (@props.subject.get('order') is 'asc')
-            'desc'
-          else
-            'asc'
+    queryParamsFor: (property) ->
+      order = if ((@props.query.sort || 'name') is property) and (@props.query.order is 'desc')
+        'asc'
+      else
+        'desc'
+      _.defaults({sort: property, order: order}, @props.query)
 
     render: withReactDOM ->
+      sort = @props.query.sort or 'name'
+      order = @props.query.order or 'asc'
+
       div className:'ef-directory',
         header className:'ef-directory-header',
           columns.map (column) =>
-            isSortedCol = @props.subject.get('sort') is column.property
+            isSortedCol = sort is column.property
             div key: column.property, className: "#{column.className} #{'current-filter' if isSortedCol}",
-              a onClick: @makeSorter(column.property),
+              Link _.defaults({to: @props.to, query: @queryParamsFor(column.property)}, @props.params),
                 column.displayName
-                i className:'icon-arrow-up'   if isSortedCol and @props.subject.get('order') is 'asc'
-                i className:'icon-arrow-down' if isSortedCol and @props.subject.get('order') is 'desc'
+                i className:'icon-arrow-up'   if isSortedCol and order is 'asc'
+                i className:'icon-arrow-down' if isSortedCol and order is 'desc'
           div className:'ef-links-col'

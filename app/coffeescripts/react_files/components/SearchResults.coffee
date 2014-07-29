@@ -1,33 +1,47 @@
 define [
-  'jquery'
   'underscore'
   'react'
-  '../mixins/BackboneMixin'
   'compiled/models/Folder'
+  'compiled/collections/FilesCollection'
   'compiled/react/shared/utils/withReactDOM'
-  'compiled/util/deparam'
   './ColumnHeaders'
   './LoadingIndicator'
   './FolderChild'
-  '../mixins/SortableMixin'
-], ($, _, React, BackboneMixin, Folder, withReactDOM, deparam, ColumnHeaders, LoadingIndicator, FolderChild, SortableMixin) ->
+  '../utils/updateAPIQuerySortParams'
+  '../utils/getAllPages'
+], (_, React, Folder, FilesCollection, withReactDOM, ColumnHeaders, LoadingIndicator, FolderChild, updateAPIQuerySortParams, getAllPages) ->
 
-  FolderChildren = React.createClass
 
-    mixins: [BackboneMixin('collection'), SortableMixin],
+  SearchResults = React.createClass
+
+    getInitialState: ->
+      return {
+        collection: new FilesCollection
+      }
+
+    updateResults: (props) ->
+      oldUrl = @state.collection.url
+      @state.collection.url = "#{location.origin}/api/v1/#{@props.params.contextType}/#{@props.params.contextId}/files"
+      updateAPIQuerySortParams(@state.collection, @props.query)
+
+      return if @state.collection.url is oldUrl
+      @setState({collection: @state.collection})
+
+      unless @state.collection.loadedAll and _.isEqual(@props.query.search_term, props.query.search_term)
+        forceUpdate = => @forceUpdate() if @isMounted()
+        @state.collection.fetch({data: props.query}).then(forceUpdate)
+        # TODO: use scroll position to only fetch the pages we need
+          .then getAllPages.bind(null, @state.collection, forceUpdate)
+
+    componentWillReceiveProps: (newProps) ->
+      @updateResults(newProps)
 
     componentWillMount: ->
-      @props.collection.loadAll = true #TODO: remove this and use scroll
-      @props.collection.fetch(data: search_term: '.js')
-
+      @updateResults(@props)
 
     render: withReactDOM ->
       div className:'ef-directory',
-        ColumnHeaders(subject: @props.collection)
-        @props.collection.models.sort(Folder::childrenSorter.bind(@props.collection)).map (child) =>
-          FolderChild key:child.cid, model: child, baseUrl: @props.baseUrl
-        LoadingIndicator isLoading: @props.collection.fetchingNextPage
-
-
-
-
+        ColumnHeaders to: 'search', subject: @state.collection, params: @props.params, query: @props.query
+        @state.collection.models.sort(Folder::childrenSorter.bind(@state.collection, @props.query.sort, @props.query.order)).map (child) =>
+          FolderChild key:child.cid, model: child, params: @props.params
+        LoadingIndicator isLoading: !@state.collection.loadedAll

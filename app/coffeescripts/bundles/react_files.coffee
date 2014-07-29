@@ -1,21 +1,25 @@
 require [
-  'compiled/react_files/FilesRouter'
-  'Backbone'
-  'compiled/str/splitAssetString'
-], (FilesRouter, Backbone, splitAssetString) ->
+  'react'
+  'react-router'
+  'compiled/react_files/components/FilesApp'
+  'compiled/react_files/components/ShowFolder'
+  'compiled/react_files/components/SearchResults'
+  'compiled/react_files/components/RedirectToRoot'
+], (React, {Routes, Route}, FilesApp, ShowFolder, SearchResults, redirectToRoot) ->
 
-  [contextType, contextId] = splitAssetString(ENV.context_asset_string)
-  contextId = Number(contextId)
-
-  baseUrl = if contextType is 'user'
+  baseUrl = if location.pathname is '/files'
     '/files'
   else
-    "/#{contextType}/#{contextId}/files"
+    '/:contextType/:contextId/files'
 
+  routes =
+    Routes location: 'history',
+      Route path:'/:contextType/:contextId', handler: FilesApp,
+        Route path: "#{baseUrl}/search", name: 'search', handler: SearchResults
+        Route path: "#{baseUrl}/folder/*", name: 'folder', handler: ShowFolder
+        # FIXME: If I don't put this below the previous line it will ALWAYS redirect.
+        # but if I put it below it NEVER redirects
+        Route path: "#{baseUrl}/folder", handler: redirectToRoot
+        Route path: baseUrl, name: 'rootFolder', handler: ShowFolder
 
-  new FilesRouter({contextType, contextId})
-
-  Backbone.history.start
-    pushState: true
-    hashChange: false
-    root: baseUrl
+  React.renderComponent(routes, document.getElementById('content'))

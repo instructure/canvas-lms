@@ -1,15 +1,21 @@
 define [
   'react'
+  'react-router'
   'compiled/react/shared/utils/withReactDOM'
-], (React, withReactDOM) ->
+], (React, Router, withReactDOM) ->
 
   Toolbar = React.createClass
 
+    onSubmit: (event) ->
+      event.preventDefault()
+      query = {search_term: @refs.searchTerm.getDOMNode().value}
+      Router.transitionTo 'search', @props.params, query
+
     render: withReactDOM ->
       header className:'ef-header',
-        form action: @props.baseUrl + 'search', method: 'GET', className:'ef-search-container',
+        form onSubmit: @onSubmit, className:'ef-search-container',
           i className:'icon-search',
-          input type:'search', name:'search_term'
+          input type:'search', ref:'searchTerm', defaultValue: @props.query.search_term #, onKeyUp: @onKeyUp
         div className:'ef-main-buttons',
           button className:'btn',
             i className:'icon-plus'

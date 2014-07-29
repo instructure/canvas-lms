@@ -1,34 +1,32 @@
 define [
-  'underscore'
   'react'
   'compiled/react/shared/utils/withReactDOM'
-  'compiled/models/Folder'
+  'compiled/str/splitAssetString'
   './Toolbar'
   './Breadcrumbs'
   './FolderTree'
   './FilesUsage'
-  './FolderChildren'
-  './SearchResults'
-], (_, React, withReactDOM, Folder, Toolbar, Breadcrumbs, FolderTree, FilesUsage, FolderChildren, SearchResults) ->
+], (React, withReactDOM, splitAssetString, Toolbar, Breadcrumbs, FolderTree, FilesUsage) ->
 
   FilesApp = React.createClass
 
-    propTypes:
-      currentFolder: React.PropTypes.instanceOf(Folder).isRequired
+    onResolvePath: ({currentFolder, rootTillCurrentFolder}) ->
+      @setState({currentFolder, rootTillCurrentFolder})
+
+    getInitialState: ->
+      {
+        currentFolder: undefined
+        rootTillCurrentFolder: undefined
+      }
 
     render: withReactDOM ->
       div null,
-        Toolbar(baseUrl: @props.baseUrl)
-        (Breadcrumbs(baseUrl: @props.baseUrl, folderPath:@props.folderPath) if @props.showBreadcrumb)
+        Toolbar(currentFolder: @state.currentFolder, query: @props.query, params: @props.params)
+        Breadcrumbs(rootTillCurrentFolder: @state.rootTillCurrentFolder, contextType:@props.params.contextType, contextId:@props.params.contextId) if @state.rootTillCurrentFolder
         div className: 'ef-main',
           aside className: 'visible-desktop ef-folder-content',
             FolderTree()
-            FilesUsage(contextType:@props.contextType, contextId:@props.contextId)
-          if @props.currentFolder
-            FolderChildren(model: @props.currentFolder, baseUrl: @props.baseUrl)
-          else
-            SearchResults(collection: @props.searchResults)
-
-
-
-
+            FilesUsage(contextType:@props.params.contextType, contextId:@props.params.contextId)
+          @props.activeRouteHandler
+            onResolvePath: @onResolvePath
+            currentFolder: @state.currentFolder
