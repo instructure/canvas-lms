@@ -505,6 +505,7 @@ nl:
         time: Tijd
         user: Gebruiker
       course_logging_item: 
+        blank_placeholder: "-"
         view_event_details: "Details bekijken"
       course_logging_results: 
         date: Datum
@@ -3288,6 +3289,9 @@ nl:
       crumbs: 
         course_exports: Inhoudsexports
       export_type: Exporttype
+      labels: 
+        course: Cursus
+        quiz: Toets
       links: 
         download: "Cursusexport vanaf %{date}: *Hier klikken om te downloaden*"
         download_qti: "QTI-export vanaf %{date}: *Hier klikken om te downloaden*"
@@ -5670,10 +5674,13 @@ nl:
       saving: "Bezig met opslaan van de sleutel..."
       saving_failed: "Het opslaan van de sleutel mislukt"
     index: 
+      details: Details
       developer_keys: "Sleutels voor ontwikkelaar"
       key_settings: Sleutelinstellingen
+      name: Naam
       show_all: "Alle %{count} sleutel tonen"
       title: "Sleutels voor ontwikkelaar"
+      user: Gebruiker
     messages: 
       confirm_delete: "Weet je zeker dat je deze sleutel voor ontwikkelaar wilt verwijderen?"
     no_user: "Geen gebruiker"
@@ -6360,6 +6367,7 @@ nl:
     bad_navigation_config: "Ongeldige configuratie van cursustabbladen"
     blank: Vereist
     failed: Mislukt
+    format: "%{attribute} %{message}"
     index: 
       all_categories: "- Alle categorieën -"
       default_category: standaard
@@ -6373,6 +6381,25 @@ nl:
         user: gebruiker
       message_contains: "Bericht bevat"
     max_attempts: "Te veel mislukte aanmeldingpogingen. Probeer het later opnieuw of neem contact op met jouw systeembeheerder."
+    messages: 
+      accepted: "moet geaccepteerd worden"
+      blank: "mag niet leeg zijn"
+      confirmation: "komt niet overeen met bevestiging"
+      empty: "mag niet leeg zijn"
+      equal_to: "moet gelijk zijn aan %{count}"
+      even: "moet even zijn"
+      exclusion: "is gereserveerd"
+      greater_than: "moet groter zijn dan %{count}"
+      greater_than_or_equal_to: "moet groter zijn dan of gelijk zijn aan %{count}"
+      inclusion: "is niet opgenomen in de lijst"
+      invalid: "is ongeldig"
+      less_than: "moet kleiner zijn dan %{count}"
+      less_than_or_equal_to: "moet kleiner zijn dan of gelijk zijn aan %{count}"
+      not_a_number: "is geen getal"
+      odd: "moet oneven zijn"
+      too_long: "is te lang (maximum is %{count} tekens)"
+      too_short: "is te kort (minimum is %{count} tekens)"
+      wrong_length: "heeft een onjuist lengte (moet %{count} tekens lang zijn)"
     no_attached_file: "Je moet minimaal een bestand als bijlage  aan deze opdracht toevoegen"
     registration_incomplete: "Je moet jouw e-mailadres bevestigen voordat je deze pagina kunt bekijken"
     required: Vereist
@@ -6447,15 +6474,19 @@ nl:
       by_url: "Op URL"
       by_xml: "XML plakken"
       config_url: Configuratie-URL
+      configuration_type: Configuratietype
+      consumer_key: Consument-sleutel
       custom_feilds_explanation: "Een per regel. Formaat: naam=waarde"
       custom_fields: "Aangepaste velden"
       description: Beschrijving
       email_only: "Alleen e-mail"
       manual: "Handmatige invoer"
+      name: Naam
       name_only: "Alleen naam"
       paste_xml: "XML hier plakken"
       privacy: Privacy
       public: Openbaar
+      shared_secret: "Gedeeld geheim"
       shared_secret_note: "Een nieuwe waarde invoeren om te wijzigen"
       tool_domain: Domein
       tool_url: URL
@@ -8004,6 +8035,8 @@ nl:
         one: "*1* discussie"
         other: "*%{count}* discussies"
     local: Plaatselijk
+    select: 
+      prompt: Selecteer
   high_contrast_description: |-
       Als je liever een hoger contrast versie van de gebruikersinterface van Canvas wilt, schakel die dan in.
       Dit kan handig zijn voor personen met verminderd zichtsvermogen of die moeilijk kunnen lezen.
@@ -8351,6 +8384,12 @@ nl:
     en: Engels
     nl: "Nederlands (crowd-sourced)"
   logged_out_user: "Uitgelogde gebruiker %{user_counter}"
+  lti: 
+    lti_message: 
+      load_tool_new_tab_button: "%{tool} in een nieuw venster laden"
+      new_tab: "Deze tool moet in een nieuw venster geopend worden"
+      new_tab_expired: "De sessie voor deze tool is verlopen. De pagina opnieuw laden om toegang te krijgen."
+      new_tab_loaded: "Deze tool is succesvol in een nieuw venster geopend. Deze pagina opnieuw laden om toegang te krijgen."
   m2c_file_description: "Moodle 1.9/2.x"
   m2c_name: "Moodle Importer"
   manage_avatars: 
@@ -10005,6 +10044,9 @@ nl:
     page_locked_module: "Deze pagina is onderdeel van de module *%{module}* en is nog niet ontgrendeld."
     page_locked_until: "Deze pagina is vergrendeld tot %{date}."
     page_unpublished_module: "Deze pagina is onderdeel van een niet-gepubliceerde module en is nog niet beschikbaar."
+    peer_review_invitation: 
+      sms: 
+        more_info: "Meer informatie op %{url}"
     pseudonym_registration: 
       email: 
         body: "Je bent geregistreerd voor een Canvas-account op %{account}! Voordat je kunt aanmelden en Canvas kunt gaan gebruiken, moet je het configuratieproces voltooien."
@@ -10690,6 +10732,8 @@ nl:
       delimiter: ","
       separator: "."
     human: 
+      decimal_units: 
+        format: "%n %u"
       storage_units: 
         format: "%n %u"
         units: 
@@ -10700,6 +10744,9 @@ nl:
           kb: kB
           mb: MB
           tb: TB
+  observees: 
+    new_observee_password: Wachtwoord
+    new_observee_username: Gebruikersnaam
   options: 
     ? "no"
     : Nee
@@ -13853,6 +13900,8 @@ nl:
     reupload_submission_files: "Ingestuurde bestanden opnieuw uploaden"
     upload_info: "Als u wijzigingen hebt aanbracht in bestanden die leerlingen hebben ingeleverd, zipt u ze opnieuw en uploadt u de zip met het onderstaande formulier. Leerlingen zullen dan de aangepaste bestanden ontvangen."
     upload_warning: "Let op dat u de naam van de ingeleverde bestanden niet wijzigt. Hieraan kan Canvas de bestanden herkennen."
+  react_files: 
+    loading_more_results: "Bezig met het laden van meer resultaten"
   recent_student: 
     last_logged_in: "laatst aangemeld op  %{last_login}"
   recently_deleted_courses_title: "Recent verwijderde cursus "
