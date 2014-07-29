@@ -527,6 +527,7 @@ nb:
         time: Tid
         user: Bruker
       course_logging_item: 
+        blank_placeholder: "-"
         view_event_details: "Se detaljer"
       course_logging_results: 
         date: Dato
@@ -3822,6 +3823,9 @@ nb:
       crumbs: 
         course_exports: Innholds-eksporter
       export_type: Eksporttype
+      labels: 
+        course: Kurs
+        quiz: Prøve
       links: 
         download: "Kurseksport fra %{date}: *Klikk her for å laste ned*"
         download_qti: "QTI Eksport fra %{date}: *Klikk her for å laste ned*"
@@ -5983,10 +5987,13 @@ nb:
       saving: "Lagrer nøkkel …"
       saving_failed: "Lagring av nøkkel mislyktes"
     index: 
+      details: Detaljer
       developer_keys: Utviklernøkler
       key_settings: Nøkkelinnstillinger
+      name: Navn
       show_all: "Vis alle %{count} nøkler"
       title: Utviklernøkler
+      user: Bruker
     messages: 
       confirm_delete: "Er du sikker på at du vil slette denne utviklernøkkelen?"
     no_user: "Ingen bruker"
@@ -6675,6 +6682,7 @@ nb:
     bad_navigation_config: "Ugyldig konfigurasjon av kursfane"
     blank: Obligatorisk
     failed: Feilet
+    format: "%{attribute} %{message}"
     index: 
       all_categories: "- Alle kategorier - "
       default_category: standard
@@ -6688,6 +6696,25 @@ nb:
         user: bruker
       message_contains: "Meldingen inneholder"
     max_attempts: "For mange innloggingsforsøk. Prøv igjen senere eller kontakt systemadministratoren."
+    messages: 
+      accepted: "må aksepteres"
+      blank: "må fylles ut"
+      confirmation: "samsvarer ikke med bekreftelsen"
+      empty: "kan ikke være tom"
+      equal_to: "må være lik %{count}"
+      even: "må være partall"
+      exclusion: "er reservert"
+      greater_than: "må være større enn %{count}"
+      greater_than_or_equal_to: "må være større enn eller lik %{count}"
+      inclusion: "er ikke inkludert i listen"
+      invalid: "er ugyldig"
+      less_than: "må være mindre enn %{count}"
+      less_than_or_equal_to: "må være mindre enn eller lik %{count}"
+      not_a_number: "er ikke et nummer"
+      odd: "må være oddetall"
+      too_long: "er for lang (maksimum er %{count} tegn)"
+      too_short: "er for kort (minimum er %{count} tegn)"
+      wrong_length: "er feil lengde (skal være %{count} tegn)"
     no_attached_file: "Du må legge ved minst en fil i denne innleveringen"
     registration_incomplete: "Du må bekrefte epostadressen min før du kan se denne siden"
     required: Obligatorisk
@@ -6756,15 +6783,18 @@ nb:
       by_url: "Etter URL"
       by_xml: "Lim inn XML"
       config_url: Konfigurasjons-URL
+      consumer_key: "Consumer Key"
       custom_feilds_explanation: "Én per linje. Format: navn=verdi"
       custom_fields: "Egendefinerte felt"
       description: Beskrivelse
       email_only: "Kun epost"
       manual: "Manuell innlegging"
+      name: Navn
       name_only: "Kun navn"
       paste_xml: "Lim inn XML her"
       privacy: Personvern
       public: Offentlig
+      shared_secret: "Delt hemmelighet"
       shared_secret_note: "Skriv inn en ny verdi å endre"
       tool_domain: Domene
       tool_url: URL
@@ -8120,6 +8150,8 @@ nb:
         one: "*1* diskusjon"
         other: "*%{count}* diskusjoner"
     local: Lokal
+    select: 
+      prompt: "Vennligst velg"
   high_contrast_description: |-
       Hvis du foretrekker en versjon av Canvas brukergrensesnitt med høyere kontrast, aktiver denne.
       Dette kan være nyttig for personer med nedsatt syn eller vansker med å lese.
@@ -8471,6 +8503,12 @@ nb:
     en: Engelsk
     nb: "Norwegian (Bokmål)"
   logged_out_user: "Avlogget bruker %{user_counter}"
+  lti: 
+    lti_message: 
+      load_tool_new_tab_button: "Laste %{tool} i et nytt vindu"
+      new_tab: "Dette verktøyet må lastes i et nytt nettleservindu"
+      new_tab_expired: "Sesjonen for dette verktøyet er utløpt. Last siden på nytt for å få tilgang til verktøyet igjen."
+      new_tab_loaded: "Dette verktøyet ble suksessfullt lastet i et nytt nettleservindu. Last siden på nytt for å få tilgang til verktøyet igjen."
   m2c_file_description: "Moodle 1.9/2.x"
   m2c_name: Moodle-importør
   manage_avatars: 
@@ -10101,6 +10139,9 @@ nb:
     page_locked_module: "Denne sien er del av modulen *%{module}* og er ikke tilgjengelig enda."
     page_locked_until: "Denne siden er låst inntil %{date}."
     page_unpublished_module: "Denne siden er del av en upublisert modul og er ikke tilgjengelig ennå."
+    peer_review_invitation: 
+      sms: 
+        more_info: "Mer informasjon på %{url}"
     pseudonym_registration: 
       email: 
         body: "Du har blitt registrert for en Canvas-konto på %{account}. Før du kan logge inn og begynne å bruke Canvas må du fullføre konfigurasjonsprosessen."
@@ -10810,6 +10851,8 @@ nb:
       delimiter: ","
       separator: "."
     human: 
+      decimal_units: 
+        format: "%n %u"
       storage_units: 
         format: "%n %u"
         units: 
@@ -10820,6 +10863,9 @@ nb:
           kb: KB
           mb: MB
           tb: TB
+  observees: 
+    new_observee_password: Passord
+    new_observee_username: Brukernavn
   options: 
     ? "no"
     : Nei
@@ -13298,6 +13344,8 @@ nb:
     reupload_submission_files: "Last opp innleveringsfiler på nytt"
     upload_info: "Om du endret de innleverte filene du lastet ned, komprimer de til zip-format og last opp zip-filen med skjemaet nedenfor. Studentene vil se de modifiserte filene via kommentarfeltet for innleveringen. "
     upload_warning: "Ikke endre navn på innleveringsfiler slik at vi kan gjenkjenne de."
+  react_files: 
+    loading_more_results: "Laster flere resultater"
   recent_student: 
     last_logged_in: "sist innlogget %{last_login}"
   recently_deleted_courses_title: "Nylig slettede kurs"
