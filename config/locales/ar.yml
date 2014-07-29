@@ -534,6 +534,7 @@ ar:
         time: الوقت
         user: مستخدم
       course_logging_item: 
+        blank_placeholder: "-"
         view_event_details: "عرض التفاصيل"
       course_logging_results: 
         date: التاريخ
@@ -3885,6 +3886,9 @@ ar:
       crumbs: 
         course_exports: "عمليات تصدير المساق"
       export_type: "نوع التصدير"
+      labels: 
+        course: المساق
+        quiz: اختبار
       links: 
         download: "تصدير المساق من %{date}: *انقر هنا للتنزيل*"
         download_qti: "تصدير QTI من %{date}: *انقر هنا للتنزيل*"
@@ -6152,10 +6156,13 @@ ar:
       saving: "يجري حفظ المفتاح..."
       saving_failed: "فشل حفظ المفتاح"
     index: 
+      details: التفاصيل
       developer_keys: "مفاتيح المطور"
       key_settings: "إعدادات المفتاح"
+      name: الاسم
       show_all: "إظهار كل مفاتيح %{count}"
       title: "مفاتيح المطور"
+      user: مستخدم
     messages: 
       confirm_delete: "هل تريد بالتأكيد حذف مفتاح المطور هذا؟"
     no_user: "بلا مستخدم"
@@ -6886,6 +6893,7 @@ ar:
     bad_navigation_config: "تكوين غير صالح لعلامة تبويب المساق"
     blank: مطلوب
     failed: فشل
+    format: "%{attribute} %{message}"
     index: 
       all_categories: "- كل الفئات -"
       default_category: افتراضي
@@ -6899,6 +6907,25 @@ ar:
         user: المستخدم
       message_contains: "محتويات الرسالة"
     max_attempts: "عدد كبير للغاية من محاولات تسجيل الدخول الفاشلة. الرجاء المحاولة مرة أخرى لاحقًا أو اتصل بمسؤول النظام."
+    messages: 
+      accepted: "يجب قبول"
+      blank: "لا يمكن أن يكون فارغًا"
+      confirmation: "لا يتطابق مع التأكيد"
+      empty: "لا يمكن أن يكون فارغًا"
+      equal_to: "يجب أن يكون مساويًا لـ %{count}"
+      even: "يجب أن يكون زوجيًا"
+      exclusion: محجوز
+      greater_than: "يجب أن يكون أكبر من %{count}"
+      greater_than_or_equal_to: "يجب أن يكون أكبر من أو مساويًا لـ %{count}"
+      inclusion: "لم يتم تضمينه في القائمة"
+      invalid: "غير صالح"
+      less_than: "يجب أن يكون أقل من %{count}"
+      less_than_or_equal_to: "يجب أن يكون أقل من أو مساويًا لـ %{count}"
+      not_a_number: "ليس رقمًا"
+      odd: "يجب أن يكون فرديًا"
+      too_long: "طويل للغاية (الحد الأقصى هو %{count} حرفًا/أحرف)"
+      too_short: "قصير للغاية (الحد الأدنى هو %{count} حرفًا/أحرف)"
+      wrong_length: "طول خاطئ (يجب أن يكون %{count} حرفًا/أحرف)"
     no_attached_file: "يجب أن ترفق ملفًا واحدًا على الأقل بهذا التعيين"
     registration_incomplete: "تحتاج إلى تأكيد عنوان بريدك الإلكتروني حتى تتمكن من عرض هذه الصفحة"
     required: مطلوب
@@ -6967,15 +6994,19 @@ ar:
       by_url: "حسب URL"
       by_xml: "لصق XML"
       config_url: "URL للتكوين"
+      configuration_type: "نوع التكوين"
+      consumer_key: "مفتاح العميل"
       custom_feilds_explanation: "واحد في السطر. التنسيق:الاسم=القيمة"
       custom_fields: "حقول مخصصة"
       description: الوصف
       email_only: "البريد الإلكتروني فقط"
       manual: "إدخال يدوي"
+      name: الاسم
       name_only: "الاسم فقط"
       paste_xml: "لصق XML هنا"
       privacy: الخصوصية
       public: عام
+      shared_secret: "كلمة السر المشتركة"
       shared_secret_note: "إدخال قيمة جديدة للتغيير"
       tool_domain: المجال
       tool_url: URL
@@ -8392,6 +8423,8 @@ ar:
         two: "*%{count}* من المناقشات"
         zero: "*%{count}* من المناقشات"
     local: محلي
+    select: 
+      prompt: "الرجاء تحديد"
   high_contrast_description: |-
       إذا كنت ترغب في إصدار عالي التباين من واجهة مستخدم Canvas، فعليك تمكين هذا.
       قد يفيد ذلك الأشخاص الذين يعانون من إعاقة بصرية أو صعوبة في القراءة.
@@ -8747,6 +8780,12 @@ ar:
     ar: العربية
     en: الإنجليزية
   logged_out_user: "المستخدم الذي قام بتسجيل الخروج %{user_counter}"
+  lti: 
+    lti_message: 
+      load_tool_new_tab_button: "تحميل %{tool} في نافذة جديدة"
+      new_tab: "تحتاج هذه الأداة للتحميل في نافذة مستعرض جديدة"
+      new_tab_expired: "انتهى وقت الجلسة الخاصة بهذه الأداة. الرجاء إعادة تحميل الصفحة للوصول إلى الأداة مرة أخرى."
+      new_tab_loaded: "تم تحميل هذه الأداة بنجاح في نافذة مستعرض جديدة. أعد تحميل الصفحة للوصول إلى الأداة مرة أخرى."
   m2c_file_description: "Moodle 1.9/2.x"
   m2c_name: "برنامج استيراد Moodle"
   manage_avatars: 
@@ -10442,6 +10481,9 @@ ar:
     page_locked_module: "تعد هذه الصفحة جزءًا من الوحدة *%{module}* ولم يتم إلغاء تأمينها بعد."
     page_locked_until: "تم تأمين هذه الصفحة حتى %{date}."
     page_unpublished_module: "تعد هذه الصفحة جزءًا من وحدة غير منشورة ولم يتم توفيره بعد."
+    peer_review_invitation: 
+      sms: 
+        more_info: "مزيد من المعلومات على %{url}"
     pseudonym_registration: 
       email: 
         body: "لقد تم تسجيلك لحساب Canvas على %{account}!  قبل أن تتمكن من تسجيل الدخول وبدء استخدام Canvas، سيلزم إنهاء عملية التكوين."
@@ -11150,6 +11192,8 @@ ar:
       delimiter: ","
       separator: "."
     human: 
+      decimal_units: 
+        format: "%n %u"
       storage_units: 
         format: "%n %u"
         units: 
@@ -11164,6 +11208,9 @@ ar:
           kb: كيلوبايت
           mb: ميجابايت
           tb: تيرابايت
+  observees: 
+    new_observee_password: "كلمة المرور"
+    new_observee_username: "اسم المستخدم"
   options: 
     ? "no"
     : لا
@@ -13786,6 +13833,8 @@ ar:
     reupload_submission_files: "إعادة تحميل ملفات الإرسال"
     upload_info: "إذا أجريت تغييرات في ملفات إرسال الطلاب التي قمت بتنزيلها من قبل، فما عليك سوى ضغطها مرة أخرى وتحميل الملف المضغوط مع النموذج أدناه. وسيرى الطلاب الملفات المعدلة في تعليقاتهم للإرسال."
     upload_warning: "تأكد من عدم تغيير أسماء ملفات الإرسال حتى نستطيع التعرف عليها."
+  react_files: 
+    loading_more_results: "تحميل مزيد من النتائج"
   recent_student: 
     last_logged_in: "آخر تسجيل دخول في %{last_login}"
   recently_deleted_courses_title: "المساقات التي تم حذفها مؤخرًا"
