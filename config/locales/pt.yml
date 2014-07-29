@@ -3189,6 +3189,9 @@ pt:
       crumbs: 
         course_exports: "Exportações de conteúdo"
       export_type: "Tipo de exportação"
+      labels: 
+        course: Disciplina
+        quiz: Teste
       links: 
         download: "Exportação da disciplina de %{date}: *Clique aqui para transferir*"
         download_qti: "Exportação de QTI de %{date}: *Clique aqui para transferir*"
@@ -5427,10 +5430,13 @@ pt:
       saving: "A guardar a chave..."
       saving_failed: "Falha ao guardar a chave"
     index: 
+      details: Detalhes
       developer_keys: "Chaves de desenvolvedor"
       key_settings: "Definições de chave"
+      name: Nome
       show_all: "Mostrar todas as %{count} chaves"
       title: "Chaves de desenvolvedor"
+      user: Utilizador
     messages: 
       confirm_delete: "Tem a certeza de que pretende eliminar esta chave de desenvolvedor?"
     no_user: "Nenhum utilizador"
@@ -6097,6 +6103,7 @@ pt:
     bad_navigation_config: "Configuração inválida do separador de disciplina"
     blank: Necessário
     failed: Falhou
+    format: "%{attribute} %{message}"
     index: 
       all_categories: "- Todas as categorias -"
       default_category: padrão
@@ -6110,6 +6117,25 @@ pt:
         user: utilizador
       message_contains: "A mensagem contém"
     max_attempts: "Ocorreram muitas falhas de tentativa de login. Tente novamente mais tarde ou contacte o administrador do sistema."
+    messages: 
+      accepted: "deve ser aceito"
+      blank: "não pode ficar em branco."
+      confirmation: "não corresponde à confirmação"
+      empty: "não pode ficar vazio"
+      equal_to: "deve ser igual a %{count}"
+      even: "deve ser par"
+      exclusion: "está reservado"
+      greater_than: "deve ser maior que %{count}"
+      greater_than_or_equal_to: "deve ser maior ou igual a %{count}"
+      inclusion: "não está incluído na lista"
+      invalid: "é inválido"
+      less_than: "deve ser menor que %{count}"
+      less_than_or_equal_to: "deve ser menor ou igual a %{count}"
+      not_a_number: "não é um número"
+      odd: "deve ser ímpar"
+      too_long: "é muito longo (máximo de %{count} caracteres)"
+      too_short: "é muito curto (mínimo de %{count} caracteres)"
+      wrong_length: "tem comprimento errado (deve ter %{count} caracteres)"
     no_attached_file: "Tem de anexar pelo menos um ficheiro a esta tarefa"
     registration_incomplete: "Tem de confirmar o seu endereço de e-mail antes de poder ver esta página"
     required: Necessário
@@ -6177,15 +6203,19 @@ pt:
       by_url: "Por URL"
       by_xml: "Colar XML"
       config_url: "URL de configuração"
+      configuration_type: "Tipo de configuração"
+      consumer_key: "Chave do cliente"
       custom_feilds_explanation: "Um por linha. Formato: nome=valor"
       custom_fields: "Campos personalizados"
       description: Descrição
       email_only: "Apenas e-mail"
       manual: "Introdução manual"
+      name: Nome
       name_only: "Apenas nome"
       paste_xml: "Colar XML aqui"
       privacy: Privacidade
       public: Público
+      shared_secret: "Segredo partilhado"
       shared_secret_note: "Introduzir um novo valor para alterar"
       tool_domain: Domínio
       tool_url: URL
@@ -7654,6 +7684,8 @@ pt:
       x_new_in_discussions: 
         one: "*1* discussão"
         other: "*%{count}* discussões"
+    select: 
+      prompt: Selecione
   high_contrast_description: |-
       Ative esta opção se preferir uma versão com contraste mais alto da interface do Canvas.
       Poderá ser útil para pessoas com deficiências visuais ou dificuldade de leitura.
@@ -7981,6 +8013,12 @@ pt:
     en: English
     pt: Português
   logged_out_user: "Utilizador %{user_counter} com sessão terminada"
+  lti: 
+    lti_message: 
+      load_tool_new_tab_button: "Carregar %{tool} em uma nova janela"
+      new_tab: "Esta ferramenta precisa ser carregada em uma nova janela do navegador"
+      new_tab_expired: "A sessão desta ferramenta expirou. Recarregue a página para acessar a ferramenta novamente."
+      new_tab_loaded: "Esta ferramenta foi carregada com sucesso em uma nova janela do navegador Recarregue a página para acessar a ferramenta novamente."
   m2c_file_description: "Moodle 1.9/2.x"
   m2c_name: "Importador Moodle"
   manage_avatars: 
@@ -9620,6 +9658,9 @@ pt:
     page_locked_module: "Esta página faz parte do módulo *%{module}* e ainda não foi destravada."
     page_locked_until: "Esta página está travada até %{date}."
     page_unpublished_module: "Esta página faz parte de um módulo não publicado e ainda não está disponível."
+    peer_review_invitation: 
+      sms: 
+        more_info: "Mais informações em %{url}"
     pseudonym_registration: 
       email: 
         body: "Foi registado para uma conta no Canvas em %{account}!  Antes de iniciar sessão e começar a utilizar o Canvas, tem de concluir o processo de configuração."
@@ -10298,6 +10339,8 @@ pt:
       delimiter: ","
       separator: "."
     human: 
+      decimal_units: 
+        format: "%n %u"
       storage_units: 
         format: "%n %u"
         units: 
@@ -10308,6 +10351,9 @@ pt:
           kb: KB
           mb: MB
           tb: TB
+  observees: 
+    new_observee_password: Palavra-passe
+    new_observee_username: "Nome de utilizador"
   options: 
     ? "no"
     : Não
@@ -12650,6 +12696,8 @@ pt:
     reupload_submission_files: "Fazer novamente o upload dos arquivos do envio"
     upload_info: "Se tiver efetuado alterações nos ficheiros enviados do aluno descarregados anteriormente, é só fazer novamente o zip e enviar o ficheiro zip com o formulário abaixo. Os alunos verão os ficheiros modificados nos seus comentários para o envio."
     upload_warning: "Certifique-se de não alterar os nomes dos arquivos enviados, para que possamos reconhecê-los."
+  react_files: 
+    loading_more_results: "A carregar mais resultados"
   recent_student: 
     last_logged_in: "último início de sessão em %{last_login}"
   recipient_input: 
