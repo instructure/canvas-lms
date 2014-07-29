@@ -23,7 +23,8 @@ module Lti
     skip_before_filter :load_user
 
     def show
-      profile = Lti::ToolConsumerProfileCreator.new(@account, tool_proxy_url).create
+      uuid = "339b6700-e4cb-47c5-a54f-3ee0064921a9" #Hard coded until we start persisting the tcp
+      profile = Lti::ToolConsumerProfileCreator.new(@account, tool_consumer_profile_url(uuid), tool_proxy_url).create
       render json: profile.to_json, :content_type => 'application/json'
     end
 
@@ -40,6 +41,16 @@ module Lti
       end
     end
 
+    def tool_consumer_profile_url(uuid)
+      case context
+        when Course
+          create_course_tool_consumer_profile_url(context)
+        when Account
+          create_account_tool_consumer_profile_url(context)
+        else
+          raise "Unsupported context"
+      end
+    end
 
   end
 end
