@@ -3184,6 +3184,9 @@ fr:
       crumbs: 
         course_exports: "Exportations du cours"
       export_type: "Type d’exportation"
+      labels: 
+        course: Cours
+        quiz: Questionnaire
       links: 
         download: "Exportation du cours du %{date}: *Cliquez ici pour télécharger*"
         download_qti: "Exportation QTI du %{date} : *Cliquez ici pour télécharger*"
@@ -5426,10 +5429,13 @@ fr:
       saving: "Enregistrement de la clé..."
       saving_failed: "Échec de l’enregistrement de la clé"
     index: 
+      details: Détails
       developer_keys: "Clés de développeur"
       key_settings: "Paramètres de clé"
+      name: Nom
       show_all: "Afficher l’ensemble des %{count} clés"
       title: "Clés de développeur"
+      user: Utilisateur
     messages: 
       confirm_delete: "Voulez-vous vraiment supprimer cette clé de développeur ?"
     no_user: "Aucun utilisateur"
@@ -6098,6 +6104,7 @@ fr:
     bad_navigation_config: "Configuration d’onglet de cours non valide"
     blank: Requis
     failed: Échec
+    format: "%{attribute} %{message}"
     index: 
       all_categories: "- Toutes les catégories -"
       default_category: "par défaut"
@@ -6111,6 +6118,25 @@ fr:
         user: utilisateur
       message_contains: "Le message contient"
     max_attempts: "Trop d’échecs de connexion. Réessayez ultérieurement ou contactez votre administrateur système."
+    messages: 
+      accepted: "doit être accepté"
+      blank: "ne peut pas être vide"
+      confirmation: "ne correspond pas à la confirmation"
+      empty: "ne peut pas être vide"
+      equal_to: "doit être égal à %{count}"
+      even: "doit être pair"
+      exclusion: "est réservé"
+      greater_than: "doit être supérieur à %{count}"
+      greater_than_or_equal_to: "doit être supérieur ou égal à %{count}"
+      inclusion: "n’est pas dans la liste"
+      invalid: "est incorrect"
+      less_than: "doit être inférieur à %{count}"
+      less_than_or_equal_to: "doit être inférieur ou égal à %{count}"
+      not_a_number: "n’est pas un nombre"
+      odd: "doit être impair"
+      too_long: "est trop long (%{count} caractères maximum autorisés)"
+      too_short: "est trop court (%{count} caractères minimum autorisés)"
+      wrong_length: "est une longueur incorrecte (%{count} caractères obligatoires)"
     no_attached_file: "Vous devez joindre au moins un fichier à cette tâche."
     registration_incomplete: "Vous devez confirmer votre adresse e-mail pour pouvoir consulter cette page."
     required: Requis
@@ -6178,15 +6204,19 @@ fr:
       by_url: "Par URL"
       by_xml: "Coller XML"
       config_url: "URL de configuration"
+      configuration_type: "Type de configuration"
+      consumer_key: "Code client"
       custom_feilds_explanation: "Un par ligne. Format : name=value"
       custom_fields: "Champs personnalisés"
       description: Description
       email_only: "E-mail uniquement"
       manual: "Saisie manuelle"
+      name: Nom
       name_only: "Nom uniquement"
       paste_xml: "Coller XML ici"
       privacy: Confidentialité
       public: Public
+      shared_secret: "Secret partagé"
       shared_secret_note: "Entrez une nouvelle valeur pour le modifier"
       tool_domain: Domaine
       tool_url: URL
@@ -7653,6 +7683,8 @@ fr:
       x_new_in_discussions: 
         one: "*1* discussion"
         other: "*%{count}* discussions"
+    select: 
+      prompt: "Effectuez une sélection"
   high_contrast_description: |-
       Si vous préférez une version de l’interface Canvas avec un contraste plus élevé, activez cette option.
       Cela peut être utile pour les malvoyants ou les personnes ayant des difficultés à lire.
@@ -7977,6 +8009,12 @@ fr:
     en: Français
     fr: Français
   logged_out_user: "Utilisateur déconnecté %{user_counter}"
+  lti: 
+    lti_message: 
+      load_tool_new_tab_button: "Télécharger %{tool} dans une nouvelle fenêtre"
+      new_tab: "Cet outil doit être téléchargé dans une nouvelle fenêtre du navigateur"
+      new_tab_expired: "La session de cet outil a expiré. Retéléchargez cette page pour accéder de nouveau à l’outil."
+      new_tab_loaded: "Cet outil a été téléchargé dans une nouvelle fenêtre du navigateur. Retéléchargez cette page pour accéder de nouveau à l’outil."
   m2c_file_description: "Moodle 1.9/2.x"
   m2c_name: "Outil d’importation Moodle"
   manage_avatars: 
@@ -9616,6 +9654,9 @@ fr:
     page_locked_module: "Cette page fait partie du module *%{module}* et n’a pas encore été déverrouillée."
     page_locked_until: "Cette page est verrouillée jusqu’au %{date}."
     page_unpublished_module: "Cette page fait partie d’un module non publié et n’est pas encore disponible."
+    peer_review_invitation: 
+      sms: 
+        more_info: "Informations complémentaires sur %{url}"
     pseudonym_registration: 
       email: 
         body: "Vous avez été enregistré pour un compte Canvas sur %{account}. Avant de vous connecter pour utiliser Canvas, vous devez terminer le processus de configuration."
@@ -10294,6 +10335,8 @@ fr:
       delimiter: ","
       separator: "."
     human: 
+      decimal_units: 
+        format: "%n %u"
       storage_units: 
         format: "%n %u"
         units: 
@@ -10304,6 +10347,9 @@ fr:
           kb: Ko
           mb: Mo
           tb: To
+  observees: 
+    new_observee_password: "Mot de passe"
+    new_observee_username: "Nom d’utilisateur"
   options: 
     ? "no"
     : Non
@@ -12653,6 +12699,8 @@ fr:
     reupload_submission_files: "Retélécharger les fichiers d’envoi"
     upload_info: "Si vous avez apporté des modifications aux fichiers d’envois de l’étudiant que vous avez téléchargés , compressez-les puis téléchargez le fichier zip avec le formulaire ci-dessous. Les étudiants verront les fichiers modifiés dans les commentaires de leur envoi."
     upload_warning: "Assurez-vous de ne pas modifier les noms des fichiers d’envoi afin que nous puissions les reconnaître."
+  react_files: 
+    loading_more_results: "Chargement de résultats supplémentaires"
   recent_student: 
     last_logged_in: "dernière connexion : %{last_login}"
   recipient_input: 
