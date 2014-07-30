@@ -1,5 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/external_tools_common')
+require File.expand_path(File.dirname(__FILE__) + '/../helpers/testrail_report')
+
 
 describe "account admin question bank" do
   include_examples "in-process server selenium tests"
@@ -85,6 +87,14 @@ describe "account admin question bank" do
     submit_form(question_form)
     wait_for_ajaximations
     verify_added_question(name, question_text, multiple_choice_value)
+  end
+
+  it "should add bank and multiple choice question" do
+    report_test(71462) do
+      question_bank2 = create_question_bank('question bank 2')
+      get "/accounts/#{Account.default.id}/question_banks/#{question_bank2.id}"
+      add_multiple_choice_question
+    end
   end
 
   it "should add a multiple choice question" do
