@@ -4167,27 +4167,37 @@ if (typeof jQuery != 'undefined') {
 
 })(mejs.$);
 
+//
+// mep-feature-tracks.js with instructure customizations
+//
+// to see the diff, run:
+//
+//   upstream_url='https://raw.githubusercontent.com/johndyer/mediaelement/743f4465231dc20e6f9e96a5cb8b9d5299ceddd3/src/js/mep-feature-tracks.js'
+//   diff -bu \
+//     <(curl -s "${upstream_url}") \
+//     public/javascripts/mediaelement/mep-feature-tracks-instructure.js
+//
 (function($) {
 
-	// add extra default options 
+	// add extra default options
 	$.extend(mejs.MepDefaults, {
 		// this will automatically turn on a <track>
 		startLanguage: '',
 
 		tracksText: mejs.i18n.t('Captions/Subtitles'),
-		
+
 		// option to remove the [cc] button when no <track kind="subtitles"> are present
 		hideCaptionsButtonWhenEmpty: true,
 
 		// If true and we only have one track, change captions to popup
 		toggleCaptionsButtonWhenOnlyOne: false,
 
-		// #id or .class		
+		// #id or .class
 		slidesSelector: ''
 	});
 
 	$.extend(MediaElementPlayer.prototype, {
-	
+
 		hasChapters: false,
 
 		buildtracks: function(player, controls, layers, media) {
@@ -4195,8 +4205,8 @@ if (typeof jQuery != 'undefined') {
 			if (player.tracks.length == 0 && !player.options.can_add_captions)
 				return;
 
-			var t = this, 
-				i, 
+			var t = this,
+				i,
 				options = '';
 
 			if (t.domNode.textTracks) { // if browser will do native captions, prefer mejs captions, loop through tracks and hide
@@ -4204,14 +4214,14 @@ if (typeof jQuery != 'undefined') {
 					t.domNode.textTracks[i].mode = "hidden";
 				}
 			}
-			player.chapters = 
+			player.chapters =
 					$('<div class="mejs-chapters mejs-layer"></div>')
 						.prependTo(layers).hide();
-			player.captions = 
+			player.captions =
 					$('<div class="mejs-captions-layer mejs-layer"><div class="mejs-captions-position mejs-captions-position-hover"><span class="mejs-captions-text"></span></div></div>')
 						.prependTo(layers).hide();
 			player.captionsText = player.captions.find('.mejs-captions-text');
-			player.captionsButton = 
+			player.captionsButton =
 					$('<div class="mejs-button mejs-captions-button">'+
 						'<button type="button" aria-controls="' + t.id + '" title="' + t.options.tracksText + '" aria-label="' + t.options.tracksText + '"></button>'+
 						'<div class="mejs-captions-selector">'+
@@ -4224,8 +4234,8 @@ if (typeof jQuery != 'undefined') {
 						'</div>'+
 					'</div>')
 						.appendTo(controls);
-			
-						
+
+
 			var subtitleCount = 0;
 			for (i=0; i<player.tracks.length; i++) {
 				if (player.tracks[i].kind == 'subtitles') {
@@ -4282,17 +4292,18 @@ if (typeof jQuery != 'undefined') {
 			player.selectedTrack = null;
 			player.isLoadingTrack = false;
 
-			
+
 
 			// add to list
 			for (i=0; i<player.tracks.length; i++) {
 				if (player.tracks[i].kind == 'subtitles') {
+					// INSTRUCTURE added third src argument
 					player.addTrackButton(player.tracks[i].srclang, player.tracks[i].label, player.tracks[i].src);
 				}
 			}
 
 			// INSTRUCTURE added code
-      if (player.options.can_add_captions) player.addUploadTrackButton();
+			if (player.options.can_add_captions) player.addUploadTrackButton();
 
 			// start loading tracks
 			player.loadNextTrack();
@@ -4301,14 +4312,14 @@ if (typeof jQuery != 'undefined') {
 			media.addEventListener('timeupdate',function(e) {
 				player.displayCaptions();
 			}, false);
-			
+
 			if (player.options.slidesSelector != '') {
 				player.slidesContainer = $(player.options.slidesSelector);
 
 				media.addEventListener('timeupdate',function(e) {
-					player.displaySlides();	
+					player.displaySlides();
 				}, false);
-			
+
 			}
 
 			media.addEventListener('loadedmetadata', function(e) {
@@ -4331,18 +4342,18 @@ if (typeof jQuery != 'undefined') {
 						});
 					}
 				});
-				
+
 			// check for autoplay
 			if (player.node.getAttribute('autoplay') !== null) {
 				player.chapters.css('visibility','hidden');
 			}
 		},
-		
+
 		setTrack: function(lang){
-		
+
 			var t = this,
 				i;
-		
+
 			if (lang == 'none') {
 				t.selectedTrack = null;
 				t.captionsButton.removeClass('mejs-captions-enabled');
@@ -4370,8 +4381,8 @@ if (typeof jQuery != 'undefined') {
 			} else {
 				// add done?
 				t.isLoadingTrack = false;
-				
-				t.checkForTracks();	
+
+				t.checkForTracks();
 			}
 		},
 
@@ -4399,11 +4410,11 @@ if (typeof jQuery != 'undefined') {
 
 					// parse the loaded file
 					if (typeof d == "string" && (/<tt\s+xml/ig).exec(d)) {
-						track.entries = mejs.TrackFormatParser.dfxp.parse(d);					
-					} else {	
+						track.entries = mejs.TrackFormatParser.dfxp.parse(d);
+					} else {
 						track.entries = mejs.TrackFormatParser.webvvt.parse(d);
 					}
-					
+
 					after();
 
 					if (track.kind == 'chapters') {
@@ -4413,10 +4424,10 @@ if (typeof jQuery != 'undefined') {
 							}
 						}, false);
 					}
-					
+
 					if (track.kind == 'slides') {
 						t.setupSlides(track);
-					}					
+					}
 				},
 				error: function() {
 					t.loadNextTrack();
@@ -4426,10 +4437,10 @@ if (typeof jQuery != 'undefined') {
 
 		enableTrackButton: function(lang, label) {
 			var t = this;
-			
+
 			if (label === '') {
 				label = mejs.language.codes[lang] || lang;
-			}			
+			}
 
 			t.captionsButton
 				.find('input[value=' + lang + ']')
@@ -4446,21 +4457,22 @@ if (typeof jQuery != 'undefined') {
 		},
 
 		// INSTRUCTURE added code
-    addUploadTrackButton: function() {
-      var t = this;
+		addUploadTrackButton: function() {
+			var t = this;
 
-      $('<a href="#" style="color:white">Upload subtitles</a>')
-        .appendTo(t.captionsButton.find('ul'))
-        .wrap('<li>')
-        .click(function(e){
-          e.preventDefault();
-          require(['compiled/widget/UploadMediaTrackForm'], function(UploadMediaTrackForm){
-            new UploadMediaTrackForm(t.options.mediaCommentId, t.media.src);
-          });
-        });
-      t.adjustLanguageBox();
-    },
+			$('<a href="#" style="color:white">Upload subtitles</a>')
+				.appendTo(t.captionsButton.find('ul'))
+				.wrap('<li>')
+				.click(function(e){
+					e.preventDefault();
+					require(['compiled/widget/UploadMediaTrackForm'], function(UploadMediaTrackForm){
+						new UploadMediaTrackForm(t.options.mediaCommentId, t.media.src);
+					});
+				});
+		  t.adjustLanguageBox();
+		},
 
+		// INSTRUCTURE added src argument
 		addTrackButton: function(lang, label, src) {
 			var t = this;
 			if (label === '') {
@@ -4496,12 +4508,12 @@ if (typeof jQuery != 'undefined') {
 				t.captionsButton.find('.mejs-captions-translations').outerHeight(true)
 			);
 		},
-		
+
 		checkForTracks: function() {
 			var
 				t = this,
 				hasSubtitles = false;
-			
+
 			// check if any subtitles
 			if (t.options.hideCaptionsButtonWhenEmpty) {
 				for (i=0; i<t.tracks.length; i++) {
@@ -4509,14 +4521,14 @@ if (typeof jQuery != 'undefined') {
 						hasSubtitles = true;
 						break;
 					}
-				}	
-					
-				// INSTRUCTURE added code
+				}
+
+				// INSTRUCTURE added code (second half of conditional)
 				if (!hasSubtitles && !t.options.can_add_captions) {
 					t.captionsButton.hide();
 					t.setControlsSize();
-				}													
-			}		
+				}
+			}
 		},
 
 		displayCaptions: function() {
@@ -4542,25 +4554,25 @@ if (typeof jQuery != 'undefined') {
 				t.captions.hide();
 			}
 		},
-		
+
 		setupSlides: function(track) {
 			var t = this;
-				
+
 			t.slides = track;
 			t.slides.entries.imgs = [t.slides.entries.text.length];
 			t.showSlide(0);
-			
+
 		},
-		
+
 		showSlide: function(index) {
 			if (typeof this.tracks == 'undefined' || typeof this.slidesContainer == 'undefined') {
-				return;			
+				return;
 			}
-								
+
 			var t = this,
 				url = t.slides.entries.text[index],
 				img = t.slides.entries.imgs[index];
-				
+
 			if (typeof img == 'undefined' || typeof img.fadeIn == 'undefined') {
 
 				t.slides.entries.imgs[index] = img = $('<img src="' + url + '">')
@@ -4569,46 +4581,46 @@ if (typeof jQuery != 'undefined') {
 								.hide()
 								.fadeIn()
 								.siblings(':visible')
-									.fadeOut();							
-						
+									.fadeOut();
+
 						});
-			
+
 			} else {
-			
+
 				if (!img.is(':visible') && !img.is(':animated')) {
-				
-					//			
-					
+
+					//
+
 					img.fadeIn()
 						.siblings(':visible')
-							.fadeOut();			
+							.fadeOut();
 				}
 			}
-				
+
 		},
-		
+
 		displaySlides: function() {
-		
+
 			if (typeof this.slides == 'undefined')
-				return;	
-				
-			var 
+				return;
+
+			var
 				t = this,
 				slides = t.slides,
-				i;				
-		
+				i;
+
 			for (i=0; i<slides.entries.times.length; i++) {
 				if (t.media.currentTime >= slides.entries.times[i].start && t.media.currentTime <= slides.entries.times[i].stop){
-				
+
 					t.showSlide(i);
-					
+
 					return; // exit out if one is visible;
 				}
 			}
 		},
 
 		displayChapters: function() {
-			var 
+			var
 				t = this,
 				i;
 
@@ -4622,7 +4634,7 @@ if (typeof jQuery != 'undefined') {
 		},
 
 		drawChapters: function(chapters) {
-			var 
+			var
 				t = this,
 				i,
 				dur,
@@ -4648,10 +4660,10 @@ if (typeof jQuery != 'undefined') {
 				//}
 
 				t.chapters.append( $(
-					'<div class="mejs-chapter" rel="' + chapters.entries.times[i].start + '" style="left: ' + usedPercent.toString() + '%;width: ' + percent.toString() + '%;">' + 
-						'<div class="mejs-chapter-block' + ((i==chapters.entries.times.length-1) ? ' mejs-chapter-block-last' : '') + '">' + 
-							'<span class="ch-title">' + chapters.entries.text[i] + '</span>' + 
-							'<span class="ch-time">' + mejs.Utility.secondsToTimeCode(chapters.entries.times[i].start) + '&ndash;' + mejs.Utility.secondsToTimeCode(chapters.entries.times[i].stop) + '</span>' + 
+					'<div class="mejs-chapter" rel="' + chapters.entries.times[i].start + '" style="left: ' + usedPercent.toString() + '%;width: ' + percent.toString() + '%;">' +
+						'<div class="mejs-chapter-block' + ((i==chapters.entries.times.length-1) ? ' mejs-chapter-block-last' : '') + '">' +
+							'<span class="ch-title">' + chapters.entries.text[i] + '</span>' +
+							'<span class="ch-time">' + mejs.Utility.secondsToTimeCode(chapters.entries.times[i].start) + '&ndash;' + mejs.Utility.secondsToTimeCode(chapters.entries.times[i].stop) + '</span>' +
 						'</div>' +
 					'</div>'));
 				usedPercent += percent;
@@ -4660,7 +4672,7 @@ if (typeof jQuery != 'undefined') {
 			t.chapters.find('div.mejs-chapter').click(function() {
 				t.media.setCurrentTime( parseFloat( $(this).attr('rel') ) );
 				if (t.media.paused) {
-					t.media.play(); 
+					t.media.play();
 				}
 			});
 
@@ -4735,7 +4747,7 @@ if (typeof jQuery != 'undefined') {
 	Parses WebVVT format which should be formatted as
 	================================
 	WEBVTT
-	
+
 	1
 	00:00:01,1 --> 00:00:05,000
 	A line of text
@@ -4743,7 +4755,7 @@ if (typeof jQuery != 'undefined') {
 	2
 	00:01:15,1 --> 00:02:05,000
 	A second line of text
-	
+
 	===============================
 
 	Adapted from: http://www.delphiki.com/html5/playr
@@ -4755,7 +4767,7 @@ if (typeof jQuery != 'undefined') {
 			pattern_timecode: /^([0-9]{2}:[0-9]{2}:[0-9]{2}([,.][0-9]{1,3})?) --\> ([0-9]{2}:[0-9]{2}:[0-9]{2}([,.][0-9]{3})?)(.*)$/,
 
 			parse: function(trackText) {
-				var 
+				var
 					i = 0,
 					lines = mejs.TrackFormatParser.split2(trackText, /\r?\n/),
 					entries = {text:[], times:[]},
@@ -4766,7 +4778,7 @@ if (typeof jQuery != 'undefined') {
 					if (this.pattern_identifier.exec(lines[i])){
 						// skip to the next line where the start --> end time code should be
 						i++;
-						timecode = this.pattern_timecode.exec(lines[i]);				
+						timecode = this.pattern_timecode.exec(lines[i]);
 
 						if (timecode && i<lines.length){
 							i++;
@@ -4796,7 +4808,7 @@ if (typeof jQuery != 'undefined') {
 		dfxp: {
 			parse: function(trackText) {
 				trackText = $(trackText).filter("tt");
-				var 
+				var
 					i = 0,
 					container = trackText.children("div").eq(0),
 					lines = container.find("p"),
@@ -4832,7 +4844,7 @@ if (typeof jQuery != 'undefined') {
 					if (styles) {
 						style = "";
 						for (var _style in styles) {
-							style += _style + ":" + styles[_style] + ";";					
+							style += _style + ":" + styles[_style] + ";";
 						}
 					}
 					if (style) _temp_times.style = style;
@@ -4851,13 +4863,13 @@ if (typeof jQuery != 'undefined') {
 			return text.split(regex);
 		}
 	};
-	
+
 	// test for browsers with bad String.split method.
 	if ('x\n\ny'.split(/\n/gi).length != 3) {
 		// add super slow IE8 and below version
 		mejs.TrackFormatParser.split2 = function(text, regex) {
-			var 
-				parts = [], 
+			var
+				parts = [],
 				chunk = '',
 				i;
 
@@ -4871,7 +4883,7 @@ if (typeof jQuery != 'undefined') {
 			parts.push(chunk);
 			return parts;
 		}
-	}	
+	}
 
 })(mejs.$);
 
