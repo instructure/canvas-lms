@@ -1,0 +1,6 @@
+// customizations to vendored mediaelementplayer css
+
+/* make subtitle text bigger when it's in fullscreen */
+.mejs-container-fullscreen .mejs-captions-layer {
+  font-size: 28px;
+}
