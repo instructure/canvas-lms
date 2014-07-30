@@ -1,6 +1,8 @@
 embed_assets: off
 gzip_assets: off
-css_compressor: 'sass'
+
+# libsass does this for us
+compress_assets: off
 
 # if you want use IE in dev mode and want to get around the max of 30 stylesheets
 # problem, uncomment the following lines and make sure you

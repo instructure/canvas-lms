@@ -43,6 +43,7 @@ end
 gem "aws-sdk", '1.21.0'
   gem 'uuidtools', '2.1.4'
 gem 'barby', '0.5.0'
+  gem 'chunky_png', '1.3.0'
 gem 'bcrypt-ruby', '3.0.1'
 gem 'builder', '3.0.0'
 gem 'canvas_connect', '0.3.5'

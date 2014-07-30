@@ -105,17 +105,16 @@ namespace :canvas do
   end
 
   desc "Compile javascript and css assets."
-  task :compile_assets, :generate_documentation, :use_sass_cache, :check_syntax do |t, args|
-    args.with_defaults(:generate_documentation => true, :use_sass_cache => false, :check_syntax => false)
+  task :compile_assets, :generate_documentation, :check_syntax do |t, args|
+    args.with_defaults(:generate_documentation => true, :check_syntax => false)
     truthy_values = [true, 'true', '1']
     generate_documentation = truthy_values.include?(args[:generate_documentation])
-    use_sass_cache = !truthy_values.include?(args[:use_sass_cache])
     check_syntax = truthy_values.include?(args[:check_syntax])
 
     tasks = {
       "Compile sass and make jammit css bundles" => -> {
-        log_time('css:generate') do
-          Rake::Task['css:generate'].invoke(use_sass_cache, !!:quiet, :production)
+        log_time('npm run compile-sass') do
+          raise unless system({"CANVAS_SASS_STYLE" => "compressed"}, "npm run compile-sass")
         end
 
         log_time("Jammit") do

@@ -30,19 +30,4 @@ module MultiVariantCompassCompiler
     YAML.dump(parsed)
   end
 
-  def compile_all(opts={})
-    require 'compass'
-    require 'compass/commands'
-    require 'parallel'
-
-    sass_files = all_sass_files
-    Parallel.each(VARIANTS) do |variant|
-      command = Compass::Commands::UpdateProject.new('./', opts.merge(
-        :css_dir => "public/stylesheets_compiled/#{variant}",
-        :additional_import_paths => ["app/stylesheets/variants/#{variant}"],
-        :cache_dir => "/tmp/sassc_#{variant}",
-        :sass_files => sass_files))
-      command.perform
-    end
-  end
 end
