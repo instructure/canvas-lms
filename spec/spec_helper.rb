@@ -1562,9 +1562,13 @@ end
       users.map(&:id) :
       users
 
+    if options[:account_associations]
+      create_records(UserAccountAssociation, user_ids.map{ |id| {account_id: course.account_id, user_id: id, depth: 0}})
+    end
+
     section_id = options[:section_id] || course.default_section.id
     type = options[:enrollment_type] || "StudentEnrollment"
-    create_records(Enrollment, user_ids.map{ |id| {course_id: course.id, user_id: id, type: type, course_section_id: section_id, root_account_id: course.account.id, workflow_state: 'active'}})
+    create_records(Enrollment, user_ids.map{ |id| {course_id: course.id, user_id: id, type: type, course_section_id: section_id, root_account_id: course.account.id, workflow_state: 'active'}}, options[:return_type])
   end
 
   def create_assignments(course_ids, count_per_course = 1, fields = {})

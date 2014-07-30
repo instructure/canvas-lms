@@ -19,18 +19,19 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe CanvadocSessionsController do
-  before do
+  before :once do
+    course_with_teacher(:active_all => true)
+
+    @attachment1 = attachment_model :content_type => 'application/pdf',
+      :context => @course
+  end
+
+  before :each do
     PluginSetting.create! :name => 'canvadocs',
                           :settings => {"base_url" => "https://example.com"}
     Canvadocs::API.any_instance.stubs(:upload).returns "id" => 1234
     Canvadocs::API.any_instance.stubs(:session).returns 'id' => 'SESSION'
-  end
-
-  before do
-    course_with_teacher_logged_in(:active_all => true)
-
-    @attachment1 = attachment_model :content_type => 'application/pdf',
-      :context => @course
+    user_session(@teacher)
   end
 
   describe '#show' do

@@ -19,20 +19,21 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe CollaborationsController do
-  before do
+  before :once do
     plugin_setting = PluginSetting.new(:name => "etherpad", :settings => {})
     plugin_setting.save!
+    course_with_teacher(active_all: true)
+    student_in_course(active_all: true)
   end
 
   describe "GET 'index'" do
     it "should require authorization" do
-      course_with_student(:active_all => true)
       get 'index', :course_id => @course.id
       assert_unauthorized
     end
 
     it "should redirect 'disabled', if disabled by the teacher" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       @course.update_attribute(:tab_configuration, [{'id'=>16,'hidden'=>true}])
       get 'index', :course_id => @course.id
       response.should be_redirect
@@ -40,7 +41,7 @@ describe CollaborationsController do
     end
 
     it "should assign variables" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       mock_user_service = mock()
       @user.expects(:user_services).returns(mock_user_service)
       mock_user_service.expects(:find_by_service).with("google_docs").returns(mock(token: "token", secret: "secret"))
@@ -53,7 +54,7 @@ describe CollaborationsController do
     end
 
     it "should handle users without google authorized" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       mock_user_service = mock()
       @user.expects(:user_services).returns(mock_user_service)
       mock_user_service.expects(:find_by_service).with("google_docs").returns(mock(token: nil, secret: nil))
@@ -65,7 +66,7 @@ describe CollaborationsController do
     end
 
     it "should assign variables when verify raises" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       mock_user_service = mock()
       @user.expects(:user_services).returns(mock_user_service)
       mock_user_service.expects(:find_by_service).with("google_docs").returns(mock(token: "token", secret: "secret"))
@@ -88,7 +89,7 @@ describe CollaborationsController do
     end
 
     it "should work with groups" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       gc = group_category
       group = gc.groups.create!(:context => @course)
       group.add_user(@student, 'accepted')
@@ -106,9 +107,13 @@ describe CollaborationsController do
     let(:collab_course) { course_with_teacher_logged_in(:active_all => true); @course }
     let(:collaboration) { collab_course.collaborations.create!(title: "my collab", user: @teacher).tap{ |c| c.update_attribute :url, 'http://www.example.com' } }
 
-    before do
+    before :once do
       Setting.set('enable_page_views', 'db')
-      course_with_teacher_logged_in(:active_all => true)
+      course_with_teacher(:active_all => true)
+    end
+
+    before :each do
+      user_session(@teacher)
       get 'show', :course_id=>collab_course.id, :id => collaboration.id
     end
 
@@ -134,21 +139,22 @@ describe CollaborationsController do
   end
 
   describe "POST 'create'" do
+    before(:once) { course_with_teacher(active_all: true) }
+
     it "should require authorization" do
-      course_with_teacher(:active_all => true)
       post 'create', :course_id => @course.id, :collaboration => {}
       assert_unauthorized
     end
 
     it "should fail with invalid collaboration type" do
-      course_with_teacher_logged_in(:active_all => true)
+      user_session(@teacher)
       rescue_action_in_public! if CANVAS_RAILS2
       post 'create', :course_id => @course.id, :collaboration => {:title => "My Collab"}
       assert_status(500)
     end
 
     it "should create collaboration" do
-      course_with_teacher_logged_in(:active_all => true)
+      user_session(@teacher)
       post 'create', :course_id => @course.id, :collaboration => {:collaboration_type => 'EtherPad', :title => "My Collab"}
       response.should be_redirect
       assigns[:collaboration].should_not be_nil

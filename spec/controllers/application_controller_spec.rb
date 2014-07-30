@@ -213,14 +213,16 @@ describe ApplicationController do
   end
 
   describe "safe_domain_file_user" do
-    before :each do
-      # safe_domain_file_url wants to use request.protocol
-      controller.stubs(:request).returns(mock(:protocol => '', :host_with_port => ''))
-
+    before :once do
       @user = User.create!
       @attachment = @user.attachments.new(:filename => 'foo.png')
       @attachment.content_type = 'image/png'
       @attachment.save!
+    end
+
+    before :each do
+      # safe_domain_file_url wants to use request.protocol
+      controller.stubs(:request).returns(mock(:protocol => '', :host_with_port => ''))
 
       @common_params = {
         :user_id => nil,

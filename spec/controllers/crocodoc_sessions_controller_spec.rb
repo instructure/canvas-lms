@@ -19,21 +19,21 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe CrocodocSessionsController do
-  before do
+  before :once do
     Setting.set 'crocodoc_counter', 0
     PluginSetting.create! :name => 'crocodoc',
                           :settings => { :api_key => "blahblahblahblahblah" }
-    Crocodoc::API.any_instance.stubs(:upload).returns 'uuid' => '1234567890'
-    Crocodoc::API.any_instance.stubs(:session).returns 'session' => 'SESSION'
-  end
-
-  before do
     @student_pseudonym = @pseudonym
     course_with_teacher(:active_all => true)
     student_in_course(:active_all => true)
     attachment_model :content_type => 'application/pdf', :context => @student
     @blob = {attachment_id: @attachment.global_id, user_id: @student.global_id}.to_json
     @hmac = Canvas::Security.hmac_sha1(@blob)
+  end
+
+  before :each do
+    Crocodoc::API.any_instance.stubs(:upload).returns 'uuid' => '1234567890'
+    Crocodoc::API.any_instance.stubs(:session).returns 'session' => 'SESSION'
     user_session(@student)
   end
 
