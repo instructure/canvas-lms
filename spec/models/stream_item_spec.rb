@@ -43,6 +43,17 @@ describe StreamItem do
     course_items.should == [item]
   end
 
+  it "doesn't unlink discussion entries from their topics" do
+    user
+    context = Course.create!
+    dt = DiscussionTopic.create!(:context => context, :require_initial_post => true)
+    de = dt.root_discussion_entries.create!
+    dt.generate_stream_items([@user])
+    si = @user.stream_item_instances.first.stream_item
+    data = si.data(@user.id)
+    de.reload.discussion_topic_id.should_not be_nil
+  end
+
   describe "destroy_stream_items_using_setting" do
     it "should have a default ttl" do
       si1 = StreamItem.create! { |si| si.asset_type = 'Message'; si.data = {} }
