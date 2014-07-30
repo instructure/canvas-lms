@@ -9,7 +9,8 @@
   width: $right_side_width - ($right_side_margin * 2)
   color: $right_side_text_color
   min-height: 20px
-  z-index: 10 // puts it equal with #main, used so datepickers that pop up from #right-side pop up on top
+  // puts it equal with #main, used so datepickers that pop up from #right-side pop up on top
+  z-index: 10
   margin: $right_side_margin $right_side_margin 0
 
   hr
@@ -60,8 +61,9 @@
     &:last-child a
       border-bottom: none
       box-shadow: none
-      
-    small // this is for things like "nothing for the next week"
+
+    // this is for things like "nothing for the next week"
+    small
       padding: 3px 0 0px 31px
       display: block
       color: #666

@@ -26,7 +26,8 @@
   left: 0
   width: 100%
 
-#flash_message_buffer // contains copies of all static messages so that we reserve enough height in the ui
+// contains copies of all static messages so that we reserve enough height in the ui
+#flash_message_buffer
   visibility: hidden
 
 #flash_message_holder
@@ -240,7 +241,7 @@
       float: right
       font-size: 10px
       font-weight: normal
-      
+
       &[class*=icon-]:before, &[class^=icon-]:before
         font-size: 16px
         vertical-align: middle
@@ -557,12 +558,12 @@ ul.group_list
       :margin 0px 20px
       :color #444
       :position relative
-      
+
       // adding override to link appearance, as javascript depends on there being a .link class here
       a.link
         :background-image none
         :padding 0
-      
+
       p
         :margin-top 0
 
@@ -585,9 +586,9 @@ ul.group_list
           :color #aaa
         &.selected
           :background-color #ccc
-        
+
         a[class*=icon-], a[class^=icon-]
-          
+
           &:before
             :font-size 16px
             :line-height 16px
