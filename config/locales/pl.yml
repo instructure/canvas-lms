@@ -1192,8 +1192,9 @@ pl:
       loading_error: błąd
       loading_text: "trwa ładowanie..."
       media_data: 
-        few: "{file_size} *z %{count} plików*"
+        few: "%{file_size} *z %{count} plików*"
         one: " %{file_size} *z jednego pliku*"
+        other: "%{file_size} *z %{count} plików*"
       media_file_storage_header: "Magazyn plików multimedialnych"
       none_message: "Brak wyników do wyświetlenia"
       over_time_link: "z okresu"
@@ -1205,8 +1206,9 @@ pl:
       started_at: "rozpoczęte %{at}"
       title_data_point_over_time: "%{data_point} Z okresu"
       uploaded_data: 
-        few: "{file_size} *z %{count} plików*"
+        few: "%{file_size} *z %{count} plików*"
         one: " %{file_size} *z jednego pliku*"
+        other: "%{file_size} *z %{count} plików*"
       uploaded_file_storage_header: "Magazyn przekazanych plików"
     student_access_csv_description: 
       account_reports: 
@@ -4073,9 +4075,9 @@ pl:
       other: "%{list_of_users} zostali dodani do konwersacji przez %{current_user}"
   conversation_participant: 
     batch_update_message: 
-      few: "przetworzonych konwersacji"
+      few: "%{count} przetworzonych konwersacji"
       one: "1 przetworzona konwersacja"
-      other: "Liczba przetworzonych konwersacji: %{count}"
+      other: "%{count} przetworzonych konwersacji"
     not_participating: "Użytkownik nie uczestniczy w tej rozmowie"
   conversations: 
     add_attachment: 
@@ -4376,9 +4378,9 @@ pl:
   course: 
     access_denied: "Dostęp uniemozliwiony"
     batch_update_message: 
-      few: "przetworzonych kursów"
+      few: "%{count} przetworzone kursy"
       one: "1 przetworzony kurs"
-      other: "Liczba przetworzonych kursów: %{count}"
+      other: "%{count} przetworzonych kursów"
     course_not_found: "Nie odnaleziono kursu"
     csv: 
       comments: Komentarze
@@ -5557,9 +5559,9 @@ pl:
       due_date: "termin dostarczenia: %{date}"
       for: Dla
       graded_discussion_and_points: 
-        few: "Ten temat jest tematem ocenianym: *możliwych punktów do zdobycia*"
+        few: "Ten temat jest tematem ocenianym: *%{count} możliwe punkty do zdobycia*"
         one: "Ten temat jest tematem ocenianym: *1 możliwy punkt do zdobycia*"
-        other: "Ten temat jest tematem ocenianym: możliwa liczba punktów do zdobycia: *%{count}*"
+        other: "Ten temat jest tematem ocenianym: *%{count} możliwych punktów do zdobycia*"
       separated_conversation_notice: "Rozmowa w tym temacie została rozdzielona na osobne grupy. Poniżej znajduje się lista pogrupowanych tematów, do których masz dostęp."
       show_due_dates: "Pokaż terminy dostarczenia"
       until: Do
@@ -7207,9 +7209,9 @@ pl:
       unauthorized: "Brak autoryzacji do przeglądania obecności dla tego kursu"
       updated: "Przesłane zadanie zostało pomyślnie zaktualizowane."
       uploaded: 
-        few: "Pliki oraz komentarze utworzone dla przesłanych zadań"
+        few: "Pliki oraz komentarze utworzone dla %{count} przesłanych zadań"
         one: "Pliki oraz komentarze utworzone dla 1 przesłanego zadania"
-        other: "Pliki oraz komentarze utworzone dla następującej liczby przesłanych zadań: %{count}"
+        other: "Pliki oraz komentarze utworzone dla %{count} przesłanych zadań"
     out_of_final: "%{weight} oceny końcowej"
     out_of_points_possible: "na %{points_possible} możliwych"
     screenreader: 
@@ -7791,19 +7793,19 @@ pl:
       discussion_details: "Informacje szczegółowe dotyczące dyskusji"
       x_more: "%{x} więcej..."
       x_new_in_announcements: 
-        few: "** ogłoszenia"
+        few: "*%{count}* ogłoszenia"
         one: "*1* ogłoszenie"
         other: "*%{count}* ogłoszeń"
       x_new_in_assignments: 
-        few: "** powiadomienia o zadaniach"
+        few: "*%{count}* powiadomienia o zadaniach"
         one: "*1* powiadomienie o zadaniach"
         other: "*%{count}* powiadomień o zadaniach"
       x_new_in_conversations: 
-        few: "** wiadomości w rozmowach"
+        few: "*%{count}* wiadomości w rozmowach"
         one: "*1* wiadomość w rozmowie"
         other: "*%{count}* wiadomości w rozmowach"
       x_new_in_discussions: 
-        few: "** dyskusje"
+        few: "*%{count}* dyskusje"
         one: "*1* dyskusja"
         other: "*%{count}* dyskusji"
     select: 
@@ -12805,9 +12807,9 @@ pl:
           other: "Nie odpowiedziano na %{count} pytań (szczegóły sprawdź w panelu po prawej). Czy na pewno wysłać?"
         unfinished_quiz: "Opuścisz ten test bez ukończenia.  Kontynuować mimo to?"
         unseen_questions: 
-          few: "Wciąż są pytania, których jeszcze nie widziałeś/aś. Przesłać mimo to?"
+          few: "Wciąż są %{count} pytania, których jeszcze nie widziałeś/aś. Przesłać mimo to?"
           one: "Wciąż jest 1 pytanie, którego jeszcze nie widziałeś. Przesłać mimo to?"
-          other: "Wciąż jest %{count} pytań, których jeszcze nie widziałeś. Przesłać mimo to?"
+          other: "Wciąż jest %{count} pytań, których jeszcze nie widziałeś/aś. Przesłać mimo to?"
       days_count: 
         few: "%{count} Dni"
         one: "1 Dzień"
@@ -13657,9 +13659,9 @@ pl:
       recent_activity_in_course: "Ostatnia aktywność w %{course_or_group}"
       unread_column: Nieprzeczytane
       unread_count_badge: 
-        few: "*nieprzeczytane informacje*"
+        few: "%{count} *nieprzeczytane informacje*"
         one: "1 *nieprzeczytana informacja*"
-        other: "%{count} *nieprzeczytanych informacje*"
+        other: "%{count} *nieprzeczytanych informacji*"
     recent_activity_item: 
       close: zamknij
       unread: Nieprzeczytane
@@ -14622,7 +14624,7 @@ pl:
     current_conference: 
       current_conference_text: "Masz zaproszenie, aby przyłączyć się do konferencji **[%{conference}](%{link_to_conference})**. Rozpoczęła się o godz. %{started_at} i bierze w niej następująca liczba uczestników: %{participant_count}."
       participant_count: 
-        few: uczestników
+        few: "%{count} uczestników"
         one: uczestnik
         other: "%{count} uczestników"
     dashboard_sidebar: 
