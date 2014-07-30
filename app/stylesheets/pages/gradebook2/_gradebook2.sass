@@ -110,7 +110,8 @@ $cell_height: 33px
       right: 14px
 
   .gradebook-header-drop
-    z-index: 1 //put it above the "out of"
+    //put it above the "out of"
+    z-index: 1
     background: url('/images/jqueryui/gradebook-header-drop.png') no-repeat top left
     width: 14px
     height: 14px
@@ -258,7 +259,8 @@ $cell_height: 33px
   height: 12px
   width: 12px
   visibility: hidden
-  z-index: 2 //needs to be above "normal but below tooltips"
+  //needs to be above "normal but below tooltips"
+  z-index: 2
   overflow: hidden
 
   #gradebook_grid.editable &:hover,
@@ -331,7 +333,8 @@ $cell_height: 33px
     left: 50%
     width: 400px
     margin-left: -200px
-    margin-top: -10px //changeme
+    //changeme
+    margin-top: -10px
     .divider
       padding: 0 1px 0 2px
     .outof, .grade
