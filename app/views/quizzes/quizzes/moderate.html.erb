@@ -30,12 +30,15 @@
           <input type="checkbox" class="student_check" data-id="<%= student.id %>" title="<%= t('titles.select_user', "Select %{user}", :user => student_name) %>"/>
         </td>
         <td class="name">
-          <%= t(:student_gets_extra_time, "*%{student_name}* **gets %{extra_time} extra minutes on each attempt**",
-               :student_name => student_name, :extra_time => (submission && submission.extra_time) || '&nbsp;',
-               :wrapper => {
+          <%= t(:student_gets_extra_time,
+              "*%{student_name}* **gets %{extra_time} extra minutes on each attempt**", {
+               student_name: student_name,
+               extra_time: (submission && submission.extra_time) || '0',
+               wrapper: {
                  '*' => submission ? %{<a class="student_name" href="#{context_url(@context, :context_quiz_history_url, @quiz.id, :quiz_submission_id => submission.id)}">\\1</a>} : '\1',
                  '**' => %{<div class='extra_time_allowed' style="#{hidden unless submission && submission.extra_time}">\\1</div>}
-               }) %>
+               }
+             }) %>
         </td>
         <td class="attempt number"><%= submission && !submission.settings_only? ? submission.attempt : "--" %></td>
         <td class="time_holder">
