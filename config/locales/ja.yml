@@ -844,6 +844,18 @@ ja:
           section_id: 
             field: "セクション ID"
     settings: 
+      about_google_docs: |-
+          Google ドキュメントのプレビューを使用すると、ユーザは
+          Canvas 内からドキュメントを表示できます。ドキュメントを
+          ダウンロードして、Word や Excel などの対応するプログラムで
+          開く必要はありません。
+          
+          このアカウントで Scribd が有効な場合は、Canvas は Scribd を
+          使用してプレビューを表示しようとします。Scribd でドキュメントを
+          プレビューできない場合や、ユーザが Flash Player をイン
+          ストールしていない場合は (iPad や iPhone など)、Google 
+          ドキュメントのプレビューが使用されます (有効な場合)。この
+          サービスを使用すると、[Google ドキュメント ビューア利用規約](%{terms_url}) を読み、同意したとみなされます。
       about_google_docs_tooltip: "Google ドキュメントのプレビューについて"
       account_admins_title: アカウント管理者
       account_quotas: 
