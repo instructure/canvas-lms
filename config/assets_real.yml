@@ -50,8 +50,6 @@ stylesheets:
     - public/stylesheets/compiled/pages/conferences.css
   gradebook_uploads:
     - public/stylesheets/compiled/pages/gradebook_uploads.css
-  calendar:
-    - public/stylesheets/compiled/pages/calendar/calendar.css    
   calendar2:
     - public/stylesheets/compiled/pages/calendar/calendar2.css
   agenda_view:
