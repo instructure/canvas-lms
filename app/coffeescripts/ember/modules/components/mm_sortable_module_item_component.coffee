@@ -15,7 +15,7 @@ define [
     # let the .sortable-handle draggable bubble up to here
     draggable: 'false'
 
-    tagName: 'li'
+    tagName: 'div'
 
     classNames: ['context_module_item']
 

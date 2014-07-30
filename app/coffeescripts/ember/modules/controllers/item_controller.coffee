@@ -7,6 +7,8 @@ define [
 
   ItemController = Ember.ObjectController.extend
 
+    isDeleting: false
+
     actions:
 
       increaseIndent: ->
@@ -16,6 +18,12 @@ define [
       decreaseIndent: ->
         @decrementProperty('model.indent')
         store.syncItemById(@get('model.id'))
+
+      remove: ->
+        @set 'isDeleting', yes #ma'am
+        Ember.run.later =>
+          store.removeItemById(@get('model.id'))
+        , 351
 
     indentClassName: (->
       "indent-#{@get('indent')}"

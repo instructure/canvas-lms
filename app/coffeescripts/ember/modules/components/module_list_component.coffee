@@ -2,9 +2,9 @@ define [
   'ember'
   'ic-lazy-list'
   '../models/module'
-], (Ember, LazyListComponent, Module) ->
+], (Ember, LazyList, Module) ->
 
-  ModuleListComponent = LazyListComponent.extend
+  ModuleListComponent = LazyList.IcLazyListComponent.extend
 
     href: "/api/v1/courses/#{ENV.course_id}/modules?include[]=items"
 

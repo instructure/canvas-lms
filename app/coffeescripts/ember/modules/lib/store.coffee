@@ -53,3 +53,13 @@ define [
         data: {module_item: item.serialize()}
         type: 'put'
 
+    removeItemById: (id) ->
+      item = @find('item', id)
+      module = @find('module', get(item, 'module_id'))
+      get(module, 'items').removeObject(item)
+      request
+        url: "/api/v1/courses/#{@courseId}/modules/#{id}/items/#{get(item, 'id')}"
+        type: 'delete'
+      # TODO: handle error
+
+
