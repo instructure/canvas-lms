@@ -5,7 +5,25 @@
 }
 $border: #e5e4e4;
 
+.form-horizontal{
+  .dialog-adapter-form-calendar-label{
+    width: 90px;
+    margin-left: 0px;
+  }
+}
 
+.adminCog-download-link{
+  color: black;
+  margin-right: 10px;
+}
+
+.dateSelectInput{
+  width: 100px;
+}
+
+.controls.dateSelectInputContainer{
+  margin-left: 100px;
+}
 .ef-search-container{
   position: relative;
   height: 30px;
