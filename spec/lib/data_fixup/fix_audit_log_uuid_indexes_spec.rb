@@ -1,3 +1,21 @@
+#
+# Copyright (C) 2014 Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
 require 'spec_helper'
 require File.expand_path(File.dirname(__FILE__) + '/../../../lib/data_fixup/fix_audit_log_uuid_indexes')
 
@@ -9,8 +27,10 @@ describe DataFixup::FixAuditLogUuidIndexes do
 
   before do
     @database ||= Canvas::Cassandra::DatabaseBuilder.from_config(:auditors)
+    DataFixup::FixAuditLogUuidIndexes::Migration.any_instance.stubs(:database).returns(@database)
+
     @stream_tables = {}
-    DataFixup::FixAuditLogUuidIndexes::INDEXES.each do |index|
+    DataFixup::FixAuditLogUuidIndexes::Migration::INDEXES.each do |index|
       @stream_tables[index.event_stream.table] ||= []
       @stream_tables[index.event_stream.table] << index.table
     end
@@ -25,6 +45,10 @@ describe DataFixup::FixAuditLogUuidIndexes do
         @database.execute("TRUNCATE #{table}")
       end
     end
+
+    # Truncate the mapping and last batch tables.
+    @database.execute("TRUNCATE #{DataFixup::FixAuditLogUuidIndexes::MAPPING_TABLE}")
+    @database.execute("TRUNCATE #{DataFixup::FixAuditLogUuidIndexes::LAST_BATCH_TABLE}")
   end
 
   def check_event_stream(event_id, stream_table, expected_total)
@@ -59,7 +83,7 @@ describe DataFixup::FixAuditLogUuidIndexes do
     event_id = CanvasSlug.generate
     CanvasUUID.stubs(:generate).returns(event_id)
 
-    (1..3).each do |i|
+    (1..4).each do |i|
       time = Time.now - i.days
 
       Timecop.freeze(time) do
@@ -69,13 +93,16 @@ describe DataFixup::FixAuditLogUuidIndexes do
       end
 
       Timecop.freeze(time + 1.hour) do
-        @assignment.grade_student(@student, grade: i, grader: @teacher).first
+        @submission = @assignment.grade_student(@student, grade: i, grader: @teacher).first
       end
     end
 
+    # Lets simulate a deleted submission
+    @submission.delete
+
     CanvasUUID.unstub(:generate)
 
-    { event_id: event_id, count: 3 }
+    { event_id: event_id, count: 4 }
   end
 
   def corrupt_course_changes
@@ -122,11 +149,27 @@ describe DataFixup::FixAuditLogUuidIndexes do
     stream_checks['authentications'] = corrupt_authentications
 
     # Run Fix
-    DataFixup::FixAuditLogUuidIndexes.run
+    DataFixup::FixAuditLogUuidIndexes::Migration.run
 
     # Make sure the data is fixed
     stream_checks.each do |stream_table, checks|
       check_event_stream(checks[:event_id], stream_table, checks[:count])
     end
+  end
+
+  it "saves the last batch" do
+    corrupt_course_changes
+    index = Auditors::Course::Stream.course_index
+
+    migration = DataFixup::FixAuditLogUuidIndexes::Migration.new
+    migration.stubs(:batch_size).returns(1)
+    migration.fix_index(index)
+
+    last_batch = migration.get_last_batch(index)
+    last_batch.size.should == 3
+    last_batch.should_not == ['', '', 0]
+
+    migration.expects(:update_index_batch).never
+    migration.fix_index(index)
   end
 end

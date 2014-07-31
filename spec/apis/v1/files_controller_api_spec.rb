@@ -126,6 +126,20 @@ describe "Files API", type: :request do
       @attachment.reload.file_state.should == 'available'
     end
 
+    it "should render the response as text/html when in app" do
+      s3_storage!
+      FilesController.any_instance.stubs(:in_app?).returns(true)
+
+      AWS::S3::S3Object.any_instance.expects(:head).returns({
+                                          :content_type => 'text/plain',
+                                          :content_length => 1234,
+                                      })
+
+      raw_api_call(:post, "/api/v1/files/#{@attachment.id}/create_success?uuid=#{@attachment.uuid}",
+               {:controller => "files", :action => "api_create_success", :format => "json", :id => @attachment.to_param, :uuid => @attachment.uuid})
+      response.headers["content-type"].should == "text/html; charset=utf-8"
+    end
+
     it "should fail for an incorrect uuid" do
       upload_data
       raw_api_call(:post, "/api/v1/files/#{@attachment.id}/create_success?uuid=abcde",

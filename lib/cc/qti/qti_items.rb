@@ -77,7 +77,7 @@ module CC
 
       def add_question(node, question, for_cc=false)
         aq_mig_id = create_key("assessment_question_#{question['assessment_question_id']}")
-        qq_mig_id = create_key("assessment_question_#{question['id']}")
+        qq_mig_id = create_key("quiz_question_#{question['id']}")
         question['migration_id'] = question[:is_quiz_question] ? qq_mig_id : aq_mig_id
 
         if question['question_type'] == 'missing_word_question'

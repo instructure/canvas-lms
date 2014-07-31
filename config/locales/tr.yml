@@ -285,6 +285,7 @@ tr:
       no_term: "Dönem seçebilmek için belirli bir dönemin olması gereklidir"
     grades: 
       deleted: "Silinen Nesneleri İçer: doğru;"
+      limited: "silinmiş nesneler belirtilen tarih aralığıyla sınırlandırılmıştır;"
     granite: 
       invalid_date_range: "Günler 1 haftalık süre aralığına göre ayarlandı;"
     mississippi: 
@@ -292,7 +293,7 @@ tr:
     outcomes: 
       order: "Sırala: %{order}"
     report_header_account_id: account_id
-    report_header_attempt: "giriş hakkı"
+    report_header_attempt: girişim
     report_header_canvas_associated_user_id: canvas_associated_user_id
     report_header_canvas_course_id: canvas_course_id
     report_header_canvas_group_id: canvas_group_id
@@ -304,16 +305,16 @@ tr:
     report_header_course: ders
     report_header_course__id: course_id
     report_header_course_id: "kurs id"
-    report_header_course_name: "kurs ismi"
-    report_header_course_sis: "kurs sis"
-    report_header_course_sis_id: "kurs sis id"
-    report_header_created_at: oluşturuldu
-    report_header_current_score: "varolan not"
+    report_header_course_name: "ders adı"
+    report_header_course_sis: "ders sis"
+    report_header_course_sis_id: "ders sis id"
+    report_header_created_at: "şu tarihte oluşturuldu"
+    report_header_current_score: "mevcut not"
     report_header_email: eposta
     report_header_end__date: end_date
     report_header_end_date: "bitiş tarihi"
     report_header_enrollment_state: "kayıt durumu"
-    report_header_final_score: "final notu"
+    report_header_final_score: "final puanı"
     report_header_first_name: first_name
     report_header_group_id: group_id
     report_header_id: id
@@ -324,7 +325,7 @@ tr:
     report_header_long_name: "uzun isim"
     report_header_name: ad
     report_header_parent_account_id: parent_account_id
-    report_header_role: role
+    report_header_role: rol
     report_header_section: bölüm
     report_header_section__id: section_id
     report_header_section_id: "bölüm id"
@@ -335,14 +336,14 @@ tr:
     report_header_sis_id: "sis id"
     report_header_start__date: start_date
     report_header_start_date: "başlangıç tarihi"
-    report_header_status: status
+    report_header_status: durum
     report_header_student_id: "öğrenci id"
     report_header_student_name: "öğrenci adı"
     report_header_student_sis: "öğrenci sis"
     report_header_term__id: term_id
     report_header_user__id: user_id
     report_header_user_id: "kullanıcı id"
-    report_header_user_name: "kullanıcı ismi"
+    report_header_user_name: "kullanıcı adı"
     report_header_user_sis_id: "kullanıcı sis id"
     report_header_xlist_course_id: xlist_course_id
     sis_exporter: 
@@ -1179,8 +1180,8 @@ tr:
       pending_batches_title: "Bekleyen Toplu İşlemler"
       process_data_button: "İşlem Verisi"
       select_file_instructions: |-
-          İçeri almak istediğiniz zip dosyasını seçin. 
-          Bu zip dosyalarının nasıl oluşturulacağına ilişkin, [lütfen bu belgelere bakın](%{uri}).
+          İçeri aktarmak istediğiniz zip dosyasını seçin. 
+          Bu zip dosyalarının nasıl oluşturulacağına ilişkin, [lütfen bu belgelere bakın](%{url}).
       sis_import_crumb: "ÖBS İçe Aktarımı"
       started_at_message: "Başladı: %{started_at}"
       title: "ÖBS İçe Aktarımı"
@@ -1401,7 +1402,7 @@ tr:
       template: 
         body: "Aşağıdaki alanlar ile ilgili sorunlar var:"
         header: 
-          one: "%{count} kadar hata bu %{model} nin kaydedilmesini engelledi"
+          one: "1 hata bu %{model} nin kaydedilmesini engelledi"
           other: "%{count} kadar hata bu %{model} nin kaydedilmesini engelledi"
   ajax_errors: 
     error_heading: "Ajax Hatası: %{status_code}"
@@ -2598,6 +2599,7 @@ tr:
       scheduler_explanation_teacher_paragraph_1: "Bu Program Yapma Aracıdır. Bu aracı, öğrencilerinizin katılmak için kayıt yaptırabilecekleri randevu grupları oluşturmak için kullanabilirsiniz."
       scheduler_explanation_teacher_paragraph_2: "Örnek olarak diyelim ki dersinizi alan her bir öğrenci ile ara sınav ödevini görüşmek istediniz. Aracı kullanarak yeni bir randevu grubu oluşturabilir, sizin için uygun olan tarih ve zamanı belirtebilir, araca bu süreyi 15'er dakikalık bloklara böldürüp her zaman bloğu için bir öğrenci ayarlamasını sağlayabilirsiniz."
       scheduler_explanation_teacher_paragraph_3: "Daha sonra öğrenciler bilgilendirilecek ve belirlenmiş zaman bloklarından birine kayıt yaptırmaları gerektiğini görecekler. Öğrenciler kendilerine uygun bir zamanı belirleyebilmeleri için diğer takvimlerin de üstünde bir takvim üzerinde zaman bloklarını görecekler."
+      scheduler_explanation_teacher_paragraph_4: "*Sağ tarafta bulunan \"Randevu grubu oluştur\" butonuna tıklayarak başlayabilirsiniz. *"
       x_groups_have_signed_up: "%{participant_count} grubuna kayıt oldu"
       x_people_have_signed_up: "%{participant_count} kişi kayıt oldu"
     buttons: 
@@ -3095,7 +3097,7 @@ tr:
     to_now: şimdi
   common_cartridge_description: "Bu eklenti ile Genel Kartuş paketleri, aktarılacak aracı json formatına dönüştürülür"
   common_cartridge_display: "Genel Cartridge"
-  common_cartridge_file_description: "Ortak Cartridge 1.x Paketi"
+  common_cartridge_file_description: "Ortak Kartuş 1.x Paketi"
   common_cartridge_name: "Genel Kartuş İçe Aktarıcı"
   communication_channel: 
     body: "Canvas doğrulama kodunuz : %{verification_code}"
@@ -4941,7 +4943,7 @@ tr:
         headings: 
           set_layout: "Ana Sayfa Düzenini Ayarla"
         labels: 
-          select_content: "Ana sayfada ne görmek istiyorsanız seçiniz."
+          select_content: "Ana sayfada gösterilecek şeyi seçin."
         options: 
           assignments: "Ödev Listesi"
           custom_page: "Ön Sayfa Sayfaları"
@@ -4949,9 +4951,9 @@ tr:
           recent_activity_dashboard: "En Son Yönetim Paneli Etkinlikleri"
           syllabus: "Ders Programı"
       empty_body: "İçerik Yok"
-      front_page_not_set: "Ana sayfa öncelikli ayarlanmalıdır"
+      front_page_not_set: "Önce ana sayfa ayarlanmalıdır."
       headers: 
-        course_status: "Kurs Durumu"
+        course_status: "Ders Durumu"
       headings: 
         choose_home_page_title: "Ana Sayfayı Seçin"
         confirm_unenroll: "Kaydın Silinmesini Onayla"
@@ -5138,7 +5140,7 @@ tr:
       student: 
         count: "Yanlış Öğrenci Sayısı"
         ratio: "Yanlış Öğrenci Oranı"
-  current_grade_title: "Varolan Not"
+  current_grade_title: "Mevcut Not"
   curve_grades_dialog: 
     average_score: "Ortalama Puan"
     buttons: 
@@ -5518,7 +5520,7 @@ tr:
         one: "1 Mesaj"
         other: "%{count} Mesaj"
       separated_conversation_notice: "Bu konu ile ilgili mesajlaşma gruplara ayrılmıştır. Aşağıda erişiminizin olduğu bütün grup konularını görebilirsiniz."
-    group_discussion_title: "Tartışma Grubu"
+    group_discussion_title: "Grup Tartışmasu"
     index: 
       course_discussions_atom_feed_title: "Ders Tartışmaları Atom Beslemesi"
     index_view: 
@@ -5614,7 +5616,7 @@ tr:
       locked: "Bu konu yoruma kapalıdır"
       this_topic_is_used_for_grading: "Bu konu değerlendirmek için kullanılıyor"
       topic_podcast_feed: "Konu Podcast Akışı"
-    this_is_a_group_discussion: "Bu bir Tartışma Grubudur"
+    this_is_a_group_discussion: "Bu bir Grup Tartışmasıdır"
     topic_deleted_notice: "%{topic_title} başarıyla silindi"
     unread_count_tooltip: 
       one: "1 okunmamış yanıt."
@@ -6214,7 +6216,7 @@ tr:
     submit: Gönder
     tool_post_iframe: 
       load_tool_button: "%{tool} Yükle"
-      load_tool_new_tab_button: "%{tool} aracını teni pencerede Yükle"
+      load_tool_new_tab_button: "%{tool} aracını yeni pencerede Yükle"
       new_tab: "Bu aracın yeni bir tarayıcı penceresinde yüklenmesi gerekiyor"
       new_tab_expired: "Bu araç için oturum süresi doldu. Araca tekrar erişmek için lütfen sayfayı yeniden yükleyin"
       new_tab_loaded: "Bu araç başarılı bir şekilde yeni tarayıcı penceresinde yüklendi. Araca tekrar erişmek için sayfayı yeniden yükleyin."
@@ -6272,7 +6274,7 @@ tr:
       notifications_config_notice: "Canvas'tan gelen bildirimler otomatik olarak Facebook hesabınıza gönderilebilir. Aşağıda gönderebileceğiniz bildirim türlerini görüyorsunuz. Bildirim tercihlerinizi ister burada ister Canvas'ta dilediğiniz zaman değiştirebilirsiniz."
       settings_title: "Canvas Bildirim Ayarları"
       updating_preferences: "Tercihler Güncelleniyor..."
-  faculty_success_tile: "Fakülte Başarı Raporu"
+  faculty_success_tile: "Öğretim Üyesi Başarı Raporu"
   feature_flags: 
     feature_flag: 
       allow: "İzin Ver"
@@ -6336,6 +6338,7 @@ tr:
     errors: 
       empty_file: "Bu dosya boş. Lütfen başka bir dosya yükleyin."
       extracting: "Sıkıştırılmış dosya açılırken hata oluştu. Lütfen tekrar deneyin."
+      failed_uploading: "Yükleme başarısız: %{error_info}"
       loading_file: "Dosya İçeriklerini Yüklemede Hata. Lütfen tekrar deneyin."
       missing_field: "Yükleme başarısız, zorunlu form alanı eksik"
       not_found: "Bu dosya yüklenirken birşeyler ters gitti ve asıl dosya bulunamıyor. Dosyanın sahibi bilgilendirilip dosyanın tekrar yüklenmesi gerekebilir."
@@ -6921,6 +6924,7 @@ tr:
       see_turnitin_results: "Turnitin sonuçlarına bak"
       student_mute_legend: "Eğitmeniniz notlar üzerinde çalışıyor. Notlar üzerinde çalışılırken not ve yorum bilgilerine erişilemez."
       student_mute_notification: "Öğretim elemanı notlar üzerinde çalışıyor"
+      submission_score: "%{possible} üzerinden *%{score}*"
       titles: 
         enter_score: "Teste bir puan gir"
         revert_score: "Orijinal puana dön"
@@ -9135,6 +9139,7 @@ tr:
         no_time_set: "Zaman Ayarlanmadı"
         subject: "Olay Tarihi Değişti: %{event_title}, %{course_name}"
       twitter: 
+        email_body: "%{course_name} dersi için %{event_title} olayının zamanı değiştirildi. Şu anda: %{new_time}"
         from_to_time: "%{start_date_time} ile %{end_date_time}"
         no_time_set: "Zaman Ayarlanmadı"
     file_locked: "Bu dosya kilitli."
@@ -9188,6 +9193,7 @@ tr:
           grades_based_on_percent: "Notlandırma her ödev grubu için ağırlıklı toplam üzerinden yapılır"
       sms: 
         grade_changed: "%{course_name} dersinin notlandırma ilkesi değişti."
+        more_info_at: "Daha fazla bilgi için %{course_url}"
       summary: 
         grade_changed: "%{course_name} dersinin notlandırma ilkesi değişti."
         grading_based_on_points: "Notlandırma tüm ödevler için toplam puanlar üzerinden yapılır."
@@ -9331,6 +9337,7 @@ tr:
         subject: "%{account} için Yeni Hesap Yöneticisi"
       sms: 
         body: " %{account} hesabı için yeni bir yönetici %{user} eklendi"
+        details: "Daha fazla bilgi için %{website}"
       summary: 
         body: " %{account} hesabı için yeni bir yönetici %{user} eklendi"
         subject: "Yeni Kullanıcı Hesabı"
@@ -9376,6 +9383,9 @@ tr:
         body_account: "%{account} hesabı için yeni bir gruba eklendiniz. Bu grubun adı %{group_name}."
         body_course: "%{course} dersi için yeni bir gruba eklendiniz. Bu grubun adı %{group_name}."
         subject: "%{course_or_account} için Yeni Grup Üyeliği"
+      twitter: 
+        body_account: "Canvas Uyarısı - Yeni Grup: %{account} hesabı için %{group}"
+        body_course: "Canvas Uyarısı - Yeni Grup: %{course} dersi için %{group}"
     new_context_group_membership_invitation: 
       email: 
         body_account: "%{account} hesabı için %{group} grubuna katılmaya davet edildiniz."
@@ -10368,6 +10378,7 @@ tr:
     find_instructions: 
       instructions: 
         find: 
+          description: "*Kurumunuz ya da devlet tarafından oluşturulan Öğrenme çıktılarına buradan erişilebilir. Dersinizde olduğu gibi soldaki bölümde varolan öğrenme çıktıları arasında gezinebilirsiniz. Kullanmak istediğiniz öğrenme çıktısı ya da öğrenme çıktı grubunu bulduğunuzda dersinize eklemek için aşağıdaki içe aktar butonuna tıklayın.*"
           title: "Öğrenme Çıktıları Aranıyor"
     flash: 
       addSuccess: "Oluşturma başarılı"
@@ -10383,6 +10394,7 @@ tr:
       instructions: 
         main: 
           manage: 
+            description: "*Öğrenme çıktıları bir dersteki yeterlilikleri izlemek için oluşturulur. İlk olarak üst sıradaki menü çubuğuna göz gezidirin. Yeni bir öğrenme çıktısı oluşturmak için Yeni Öğrenme Çıktısı butonuna tıklayın ya da öğrenme çıktılarınızı düzenleyeceğiniz bir grup oluşturmak için Yeni Grup butonuna tıklayın. Ara butonu sayesinde bölgeniz ya da kurumunuz tarafından oluşturulmuş öğrenme çıktılarını kullanabilirsiniz. Öğrenme çıktılarını oluşturup kullandıkça bu çıktılar arasında gezinmek için soldaki paneli kullanabileceksiniz. Farklı seviyelerdeki öğrenme çıktılarını sürükle bırak yaparak kendi yapınızı oluşturabilirsiniz.* *Daha da önemlisi, Canvas'ta notlandırma listelerine öğrenme çıktıları ekleyerek ödevleri notlandırırken yeterliliği değerlendirebilirsiniz. Öğrenme çıktılarını oluşturduktan sonra bunları notlandırmada kullanmaya başlamak için Değerlendirme Listelerini Yönet'e tıklayın.*"
             title: "Öğrenme Çıktılarını Ayarlama"
     mastery_error: "Daha büyük ceya 0'a eşit olmalıdır"
     missing_outcome: "Bu öğrenme çıktısı bulunamadı"
@@ -10442,11 +10454,13 @@ tr:
       attempts: 
         one: "%{count} hak"
         other: "%{count} hak"
+      attempts_from_artifacts: "*%{artifacts}'lardan* %{attempts}"
       labels: 
         see_results: "%{user_name}'ın sonuçlarını görün"
       mastery: "En son teşebbüs üzerine yeterlilik"
       no_mastery: "En son teşebbüs üzerine yeterlilik yok"
       outcomes_for: "%{user_name}'ın öğrenme çıktıları"
+      score_out_of_possible: "%{possible}* üzerinden %{score}*"
       short_title: 
         attempts: Girişimler
         average_percent: "Ortalama Yüzde"
@@ -10950,6 +10964,10 @@ tr:
       error_loading_token_details: "Token Ayrıntılarını Yüklemede Hata"
       facebook_description: "Eğer Facebook hesabına sahipseniz, Canvas uygulamasını yükleyin ve ders bildirimlerini profilinizde alın. Gönderilecek bildirim türünü ve sıklığını siz belirtebilirsiniz."
       feature_options: "Özellik Seçenekleri"
+      full_token_warning: |-
+          **Şu an bu token kopyalanıyor**. Bu sayfadan ayrıldıktan sonra tam token'ı
+          geri getiremezsiniz, yeni bir değer almak için yeniden oluşturma zorunda
+          kalacaksınız.
       generate_access_token_description: |-
           Access token'ları, sizin adınıza Canvas kaynaklarına erişim için üçüncü parti
           uygulamalara izin verirler. Bu token'lar normalde ihtiyaç oldukça uygulamalar
@@ -11135,6 +11153,7 @@ tr:
       validations: 
         should_be_10_digits: "10 haneli bir sayı olmalıdır"
     ways_to_contact_me: "Benimle iletişim yolları"
+    you_have_no_services: "Herhangi bir hizmete kayıtlı değilsiniz, *ayarlar* sayfasından hizmet ekleyebilirsiniz."
   profiles: 
     avatar_dialog: 
       from_gravatar: "Gravatar'dan al"
@@ -11560,7 +11579,7 @@ tr:
     and_num_more_students: "ve daha %{num} öğrenci"
     message_not_sent_because_empty: "Mesaj gönderilemedi çünkü boş bıraktınız"
     message_sent_successfully: "Mesaj başarıyla gönderildi"
-    message_students_who: "... Yapan Öğrencileri Göster"
+    message_students_who: "... Yapan Öğrencileri Mesaj Gönder"
     student_who_have_not_taken_the_quiz: "Kısa Sınavı Henüz Almamış Olan Öğrenciler"
     students_who_have_taken_the_quiz: "Kısa Sınavı Almış Olan Öğrenciler"
   quiz_model: 
@@ -13567,7 +13586,7 @@ tr:
       file_item: Dosya
       file_notice: "Bu *modül* ile ilişkilendirmek istediğiniz bir dosya seçin ya da \"Yeni Dosya\" yı seçerek bir dosya ekleyin."
       indent_level: 
-        one: "*%{count} Seviye İçerden Başlat*"
+        one: "*1 Seviye İçeriden Başlat*"
         other: "*%{count} Seviye İçerden Başlat*"
         zero: "*İçerden Başlatma*"
       labels: 
@@ -14554,6 +14573,14 @@ tr:
     no_self_registration: "Kendi kendine kayıt işlemi bu hesap için aktif değildir"
     oauth_fail: "OAuth isteği başarısız. Geçerli istek bulunamadı"
     recaptcha_settings: 
+      instructions: |-
+          ReCAPTCHA eklentisini kullanmadan önce 
+          [ReCAPTCHA adresinde bir hesap oluşturmalısınız](%{url}). Sitedeki alan ad(lar)ınızın 
+          bu özelliği kullanmaları için alan adınızı doğru tanımlayın. Hesap oluşturduktan
+          sonra aşağıya public ve private anahtarlarınızı girin.
+          
+          **Not:** bu ayarlarda yaptığınız değişiklikler sunucunuz yeniden
+          başlatılana kadar güncellenmez.
       labels: 
         private_key: "ReCAPTCHA Özel Anahtarı"
         public_key: "ReCAPTCHA Genel Anahtarı"

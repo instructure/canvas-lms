@@ -1,10 +1,11 @@
 # loading all the locales has a significant (>30%) impact on the speed of initializing canvas
 # so we skip it in situations where we don't need the locales, such as in development mode and in rails console
 skip_locale_loading = (Rails.env.development? || Rails.env.test? || $0 == 'irb') && !ENV['RAILS_LOAD_ALL_LOCALES']
+load_path = CANVAS_RAILS2 ? I18n.load_path : Rails.application.config.i18n.railties_load_path
 if skip_locale_loading
-  I18n.load_path = I18n.load_path.grep(%r{/(locales|en)\.yml\z})
+  load_path.replace(load_path.grep(%r{/(locales|en)\.yml\z}))
 else
-  I18n.load_path << (Rails.root + "config/locales/locales.yml").to_s # add it at the end, to trump any weird/invalid stuff in locale-specific files
+  load_path << (Rails.root + "config/locales/locales.yml").to_s # add it at the end, to trump any weird/invalid stuff in locale-specific files
 end
 
 I18n.backend = I18nema::Backend.new
@@ -146,7 +147,17 @@ I18n.class_eval do
         default
       end
 
-      result = translate_without_default_and_count_magic(key.to_s.sub(/\A#/, ''), options)
+      begin
+        result = translate_without_default_and_count_magic(key.to_s.sub(/\A#/, ''), options)
+      rescue I18n::MissingInterpolationArgument
+        # if we change an en default and its interpolation logic without
+        # changing its key, we might have broken translations during the
+        # window where we're waiting for updated translations. broken as in
+        # crashy, not just missing. if that's the case, just fall back to
+        # english, rather than asploding
+        raise if (options[:locale] || I18n.locale) == I18n.default_locale
+        return translate_with_default_and_count_magic(key, options.merge(locale: I18n.default_locale))
+      end
 
       # it's assumed that if you're using any wrappers, you're going
       # for html output. so the result will be escaped before being

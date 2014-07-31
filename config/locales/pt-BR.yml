@@ -1128,7 +1128,7 @@ pt-BR:
       process_data_button: "Processar dados"
       select_file_instructions: |-
           Selecione o arquivo zip que deseja importar.  
-          Para obter uma descrição sobre como gerar estes arquivos zip, [consulte esta documentação](%{uri}).
+          Para obter uma descrição sobre como gerar estes arquivos zip, [consulte esta documentação](%{url}).
       sis_import_crumb: "Importação de SIS"
       started_at_message: "Iniciado: %{started_at}"
       title: "Importação de SIS"
@@ -9201,6 +9201,7 @@ pt-BR:
       success: "Seu e-mail está sendo entregue."
     migration_export_ready: 
       email: 
+        body: "O conteúdo está pronto para ser importado em seu curso."
         html: 
           body: "Agora, o conteúdo está pronto para ser importado em seu curso."
           link_message2: "Clique *neste link* para escolher quais itens do seu conteúdo para importar"

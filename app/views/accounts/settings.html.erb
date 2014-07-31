@@ -637,11 +637,12 @@ acknowledge that you have read and agreed to the
     <h2><%= t(:account_admins_title, "Account Admins") %></h2>
     <ul class="admins_list user_list list admins">
       <%= render :partial => 'account_user', :collection => @account_users %>
-      <% if can_do(@context, @current_user, :manage_account_memberships) %>
+      <% available_roles = @context.available_account_roles(@current_user) %>
+      <% unless available_roles.empty? %>
         <%= render :partial => 'account_user', :object => nil %>
       <% end %>
     </ul>
-    <% if can_do(@context, @current_user, :manage_account_memberships) %>
+    <% unless available_roles.empty? %>
       <% js_bundle :user_lists %>
       <a href="#" class="add_users_link btn btn-primary"><i class="icon-add"></i> <%= t('links.add_admins', %{Add Account Admins}) %></a>
       <%= form_tag account_add_account_user_url(@account), {:id => "enroll_users_form", :style => "display: none;"} do  %>
@@ -650,7 +651,7 @@ acknowledge that you have read and agreed to the
           <div>
             <%= label_tag :membership_type, :en => "Add More" %>
             <select name="membership_type" id="admin_membership_type">
-            <% @context.available_account_roles(@current_user).each do |type| %>
+            <% available_roles.each do |type| %>
               <option value="<%= type %>"><%= AccountUser.readable_type(type) %></option>
             <% end %>
             </select>

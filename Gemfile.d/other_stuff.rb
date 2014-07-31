@@ -97,7 +97,7 @@ gem 'rscribd', '1.2.0'
 gem 'net-ldap', '0.3.1', :require => 'net/ldap'
 gem 'ruby-saml-mod', '0.1.29'
 gem 'rubycas-client', '2.3.9'
-gem 'rubyzip', '1.1.0', :require => 'zip', :github => 'rubyzip/rubyzip', :ref => '2697c7ea4fba6dca66acd4793965501b06ea8df6'
+gem 'rubyzip', '1.1.1', :require => 'zip'
 gem 'zip-zip', '0.2' # needed until plugins use the new namespace
 gem 'safe_yaml', '0.9.7', :require => false
 gem 'safe_yaml-instructure', '0.8.0', :require => false
@@ -135,6 +135,7 @@ gem 'canvas_statsd', :path => 'gems/canvas_statsd'
 gem 'canvas_stringex', :path => 'gems/canvas_stringex'
 gem 'canvas_text_helper', :path => 'gems/canvas_text_helper'
 gem 'canvas_time', :path => 'gems/canvas_time'
+gem 'canvas_unzip', :path => 'gems/canvas_unzip'
 gem 'canvas_uuid', :path => 'gems/canvas_uuid'
 gem 'facebook', :path => 'gems/facebook'
 gem 'google_docs', :path => 'gems/google_docs'
