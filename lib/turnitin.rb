@@ -18,7 +18,7 @@
 
 module Turnitin
   class Client
-    
+
     attr_accessor :endpoint, :account_id, :shared_secret, :host, :testing
 
     def initialize(account_id, shared_secret, host=nil, testing=false)
@@ -49,7 +49,7 @@ module Turnitin
         :logout_user              => '18',
       }
     end
-    
+
     def id(obj)
       if @testing
         "test_#{obj.asset_string}"
@@ -57,7 +57,7 @@ module Turnitin
         "#{account_id}_#{obj.asset_string}"
       end
     end
-    
+
     def email(item)
       # emails @example.com are, guaranteed by RFCs, to be like /dev/null :)
       null_email = "#{item.asset_string}@null.instructure.example.com"
@@ -69,28 +69,28 @@ module Turnitin
     end
 
     TurnitinUser = Struct.new(:asset_string,:first_name,:last_name,:name)
-    
+
     def testSettings
       user = TurnitinUser.new("admin_test","Admin","Test","Admin Test")
       res = createTeacher(user)
       !!res
     end
-    
+
     def createStudent(user)
       res = sendRequest(:create_user, 2, :user => user, :utp => '1')
       res.css("userid").first.try(:content)
     end
-    
+
     def createTeacher(user)
       res = sendRequest(:create_user, 2, :user => user, :utp => '2')
       res.css("userid").first.try(:content)
     end
-    
+
     def createCourse(course)
       res = sendRequest(:create_course, 2, :utp => '2', :course => course, :user => course, :utp => '2')
       res.css("classid").first.try(:content)
     end
-    
+
     def enrollStudent(course, student)
       res = sendRequest(:enroll_student, 2, :user => student, :course => course, :utp => '1', :tem => email(course))
       res.css("userid").first.try(:content)
@@ -105,7 +105,8 @@ module Turnitin
         :exclude_biblio => '1',
         :exclude_quoted => '1',
         :exclude_type => '0',
-        :exclude_value => ''
+        :exclude_value => '',
+        :submit_papers_to => '1'
       }
     end
 
@@ -118,11 +119,10 @@ module Turnitin
         settings[:originality_report_visibility] = 'immediate' unless ['immediate', 'after_grading', 'after_due_date', 'never'].include?(settings[:originality_report_visibility])
         settings[:s_view_report] =  determine_student_visibility(settings[:originality_report_visibility])
 
-        [:s_paper_check, :internet_check, :journal_check, :exclude_biblio, :exclude_quoted].each do |key|
+        [:s_paper_check, :internet_check, :journal_check, :exclude_biblio, :exclude_quoted, :submit_papers_to].each do |key|
           bool = Canvas::Plugin.value_to_boolean(settings[key])
           settings[key] = bool ? '1' : '0'
         end
-
         exclude_value = settings[:exclude_value].to_i
         settings[:exclude_type] = '0' unless ['0', '1', '2'].include?(settings[:exclude_type])
         settings[:exclude_value] = case settings[:exclude_type]
@@ -153,10 +153,10 @@ module Turnitin
         :user => course,
         :course => course,
         :assignment => assignment,
-        :utp => '2', 
-        :dtstart => "#{today.strftime} 00:00:00", 
-        :dtdue => "#{today.strftime} 00:00:00", 
-        :dtpost => "#{today.strftime} 00:00:00", 
+        :utp => '2',
+        :dtstart => "#{today.strftime} 00:00:00",
+        :dtdue => "#{today.strftime} 00:00:00",
+        :dtpost => "#{today.strftime} 00:00:00",
         :late_accept_flag => '1',
         :post => true
       }))
@@ -169,19 +169,19 @@ module Turnitin
         { :assignment_id => assignment_id } :
         { :error_code => rcode, :error_message => rmessage, :public_error_message => public_error_message(rcode) }
     end
-    
+
     # if asset_string is passed in, only submit that attachment
     def submitPaper(submission, asset_string=nil)
       student = submission.user
       assignment = submission.assignment
       course = assignment.context
-      opts = { 
-        :post => true, 
-        :utp => '1', 
-        :user => student, 
-        :course => course, 
-        :assignment => assignment, 
-        :tem => email(course) 
+      opts = {
+        :post => true,
+        :utp => '1',
+        :user => student,
+        :course => course,
+        :assignment => assignment,
+        :tem => email(course)
       }
       responses = {}
       if submission.submission_type == 'online_upload'
@@ -201,14 +201,14 @@ module Turnitin
         rcode = res.css('rcode').first.try(:content).try(:to_i)
         rmessage = res.css('rmessage').first.try(:content)
 
-        responses[asset_string] = object_id ? 
-                                  { :object_id => object_id } : 
+        responses[asset_string] = object_id ?
+                                  { :object_id => object_id } :
                                   { :error_code => rcode, :error_message => rmessage, :public_error_message => public_error_message(rcode) }
       end
 
       responses
     end
-    
+
     def generateReport(submission, asset_string)
       user = submission.user
       assignment = submission.assignment
@@ -225,7 +225,7 @@ module Turnitin
       end
       data
     end
-    
+
     def submissionReportUrl(submission, asset_string)
       user = submission.user
       assignment = submission.assignment
@@ -233,7 +233,7 @@ module Turnitin
       object_id = submission.turnitin_data[asset_string][:object_id] rescue nil
       sendRequest(:generate_report, 1, :oid => object_id, :utp => '2', :user => course, :course => course, :assignment => assignment)
     end
-    
+
     def submissionStudentReportUrl(submission, asset_string)
       user = submission.user
       assignment = submission.assignment
@@ -241,7 +241,7 @@ module Turnitin
       object_id = submission.turnitin_data[asset_string][:object_id] rescue nil
       sendRequest(:generate_report, 1, :oid => object_id, :utp => '1', :user => user, :course => course, :assignment => assignment, :tem => email(course))
     end
-    
+
     def submissionPreviewUrl(submission, asset_string)
       user = submission.user
       assignment = submission.assignment
@@ -249,7 +249,7 @@ module Turnitin
       object_id = submission.turnitin_data[asset_string][:object_id] rescue nil
       sendRequest(:show_paper, 1, :oid => object_id, :utp => '1', :user => user, :course => course, :assignment => assignment, :tem => email(course))
     end
-    
+
     def submissionDownloadUrl(submission, asset_string)
       user = submission.user
       assignment = submission.assignment
@@ -257,7 +257,7 @@ module Turnitin
       object_id = submission.turnitin_data[asset_string][:object_id] rescue nil
       sendRequest(:show_paper, 1, :oid => object_id, :utp => '1', :user => user, :course => course, :assignment => assignment, :tem => email(course))
     end
-    
+
     def listSubmissions(assignment)
       course = assignment.context
       sendRequest(:list_papers, 2, :assignment => assignment, :course => course, :user => course, :utp => '1', :tem => email(course))
@@ -268,7 +268,7 @@ module Turnitin
     # alphabetical order according to variable name, being sure to include at
     # least the following:
     #
-    # aid + diagnostic + encrypt + fcmd + fid + gmtime + uem + ufn + uln + utp + shared secret key 
+    # aid + diagnostic + encrypt + fcmd + fid + gmtime + uem + ufn + uln + utp + shared secret key
     #
     # The shared secret key is added to the end of the parameters.
     #
@@ -335,18 +335,18 @@ module Turnitin
         params[:assignid] = id(assignment)
       end
       params[:diagnostic] = "1" if @testing
-      
+
       params[:md5] = request_md5(params)
       params = escape_params(params) if post
       return params
     end
-    
+
     def sendRequest(command, fcmd, args)
       require 'net/http'
 
       post = args[:post] # gets deleted in prepare_params
       params = prepare_params(command, fcmd, args)
-      
+
       if post
         mp = Multipart::Post.new
         query, headers = mp.prepare_query(params)
@@ -375,7 +375,7 @@ module Turnitin
         else
           http = Net::HTTP.new(@host, 443)
           http.use_ssl = true
-          res = http.start{|conn| 
+          res = http.start{|conn|
             conn.get("#{@endpoint}?#{requestParams}")
           }
         end

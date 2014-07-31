@@ -44,6 +44,49 @@ describe Turnitin::Client do
     end
   end
 
+  describe 'class methods' do
+    before(:each) do
+      @default_settings = {
+        :originality_report_visibility => 'immediate',
+        :s_paper_check => '1',
+        :internet_check => '1',
+        :journal_check => '1',
+        :exclude_biblio => '1',
+        :exclude_quoted => '1',
+        :exclude_type => '0',
+        :exclude_value => '',
+        :submit_papers_to => '1'
+      }
+    end
+
+    it 'should have correct default assignment settings' do
+      Turnitin::Client.default_assignment_turnitin_settings.should == @default_settings
+    end
+
+    it 'should normalize assignment settings' do
+      @default_settings[:originality_report_visibility] = 'never'
+      @default_settings[:exclude_type] = '1'
+      @default_settings[:exclude_value] = '50'
+      normalized_settings = Turnitin::Client.normalize_assignment_turnitin_settings(@default_settings)
+      normalized_settings.should == {
+        :originality_report_visibility=>"never",
+        :s_paper_check=>"1",
+        :internet_check=>"1",
+        :journal_check=>"1",
+        :exclude_biblio=>"1",
+        :exclude_quoted=>"1",
+        :exclude_type=>"1",
+        :exclude_value=>"50",
+        :submit_papers_to=>"1",
+        :s_view_report=>"0" }
+    end
+
+    it 'should determine student visibility' do
+      Turnitin::Client.determine_student_visibility('after_grading').should == '1'
+      Turnitin::Client.determine_student_visibility('never').should == '0'
+    end
+  end
+
   describe "create assignment" do
     before(:each) do
       turnitin_assignment
@@ -70,7 +113,7 @@ describe Turnitin::Client do
       status = @assignment.create_in_turnitin
 
       status.should be_true
-      @assignment.reload.turnitin_settings.should eql @sample_turnitin_settings.merge({ :created => true, :current => true, :s_view_report => "1" })
+      @assignment.reload.turnitin_settings.should eql @sample_turnitin_settings.merge({ :created => true, :current => true, :s_view_report => "1", :submit_papers_to => '0'})
     end
 
     it "should store error code and message on failure" do
@@ -82,6 +125,7 @@ describe Turnitin::Client do
       status.should be_false
       @assignment.reload.turnitin_settings.should eql @sample_turnitin_settings.merge({
         :s_view_report => "1",
+        :submit_papers_to => '0',
         :error => {
           :error_code => 123,
           :error_message => 'You cannot create this assignment right now',
@@ -96,7 +140,7 @@ describe Turnitin::Client do
       status = @assignment.create_in_turnitin
 
       status.should be_true
-      @assignment.reload.turnitin_settings.should eql @sample_turnitin_settings.merge({ :created => true, :current => true, :s_view_report => "1" })
+      @assignment.reload.turnitin_settings.should eql @sample_turnitin_settings.merge({ :created => true, :current => true, :s_view_report => "1", :submit_papers_to => '0'})
     end
 
     it "should set s_view_report to 0 if originality_report_visibility is 'never'" do
@@ -105,7 +149,7 @@ describe Turnitin::Client do
       @turnitin_api.expects(:sendRequest).returns(Nokogiri('<assignmentid>12345</assignmentid>'))
       @assignment.create_in_turnitin
 
-      @assignment.reload.turnitin_settings.should eql @sample_turnitin_settings.merge({ :created => true, :current => true, :s_view_report => '0'})
+      @assignment.reload.turnitin_settings.should eql @sample_turnitin_settings.merge({ :created => true, :current => true, :s_view_report => '0', :submit_papers_to => '0'})
     end
   end
 
@@ -150,13 +194,13 @@ describe Turnitin::Client do
       turnitin_submission
       @turnitin_api = Turnitin::Client.new('test_account', 'sekret')
       @turnitin_submit_args = {
-        :post => true, 
-        :utp => '1', 
-        :ptl => @attachment.display_name, 
-        :ptype => "2", 
-        :user => @student, 
-        :course => @course, 
-        :assignment => @assignment, 
+        :post => true,
+        :utp => '1',
+        :ptl => @attachment.display_name,
+        :ptype => "2",
+        :user => @student,
+        :course => @course,
+        :assignment => @assignment,
         :tem => "spec@null.instructure.example.com"
       }
     end
@@ -186,7 +230,7 @@ describe Turnitin::Client do
       post_params.each do |key, value|
         md5_params[key] = URI.unescape(value) unless key == :md5
       end
-      
+
       @turnitin_api.request_md5(md5_params).should eql(post_params[:md5])
     end
 
