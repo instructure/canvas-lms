@@ -412,7 +412,6 @@ class ContextModuleItemsApiController < ApplicationController
   #     curl https://<canvas>/api/v1/courses/<course_id>/modules/<module_id>/items/<item_id> \
   #       -X PUT \
   #       -H 'Authorization: Bearer <token>' \
-  #       -d 'module_item[content_id]=10' \
   #       -d 'module_item[position]=2' \
   #       -d 'module_item[indent]=1' \
   #       -d 'module_item[new_tab]=true'
