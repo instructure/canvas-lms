@@ -518,6 +518,7 @@ describe AssignmentsApiController, type: :request do
       @json['turnitin_settings'].should == {
         'originality_report_visibility' => 'immediate',
         's_paper_check' => true,
+        'submit_papers_to' => true,
         'internet_check' => true,
         'journal_check' => true,
         'exclude_biblio' => true,
@@ -1182,6 +1183,7 @@ describe AssignmentsApiController, type: :request do
           :journal_check => '1',
           :exclude_biblio => true,
           :exclude_quoted => '0',
+          :submit_papers_to => '1',
           :exclude_small_matches_type => 'percent',
           :exclude_small_matches_value => 50
         }
@@ -1196,6 +1198,7 @@ describe AssignmentsApiController, type: :request do
           'journal_check' => true,
           'exclude_biblio' => true,
           'exclude_quoted' => false,
+          'submit_papers_to' => true,
           'exclude_small_matches_type' => 'percent',
           'exclude_small_matches_value' => 50
         }
@@ -1207,6 +1210,7 @@ describe AssignmentsApiController, type: :request do
           'journal_check' => '1',
           'exclude_biblio' => '1',
           'exclude_quoted' => '0',
+          'submit_papers_to' => '1',
           'exclude_type' => '2',
           'exclude_value' => '50',
           's_view_report' => '1'

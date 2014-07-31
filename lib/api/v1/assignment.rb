@@ -207,7 +207,7 @@ module Api::V1::Assignment
 
   def turnitin_settings_json(assignment)
     settings = assignment.turnitin_settings.with_indifferent_access
-    [:s_paper_check, :internet_check, :journal_check, :exclude_biblio, :exclude_quoted].each do |key|
+    [:s_paper_check, :internet_check, :journal_check, :exclude_biblio, :exclude_quoted, :submit_papers_to].each do |key|
       settings[key] = value_to_boolean(settings[key])
     end
 
@@ -261,6 +261,7 @@ module Api::V1::Assignment
     exclude_quoted
     exclude_small_matches_type
     exclude_small_matches_value
+    submit_papers_to
   )
 
   def update_api_assignment(assignment, assignment_params, user)

@@ -1997,7 +1997,8 @@ describe Assignment do
         :exclude_quoted => '0',
         :exclude_type => '0',
         :exclude_value => '',
-        :s_view_report => '1'
+        :s_view_report => '1',
+        :submit_papers_to => '0'
       })
     end
 
