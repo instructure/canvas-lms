@@ -678,14 +678,29 @@ acknowledge that you have read and agreed to the
       </p>
       <ul class="announcements_list unstyled_list">
         <% @announcements.each do |announcement| %>
+
           <li class="alert">
             <% if can_do(@account, @current_user, :manage_alerts) %>
               <a href="#" rel="<%= context_url(@account, :context_account_notification_url, announcement) %>" class="delete_notification_link close" title="<%= t(:delete_announcement_tooltip, "Delete this Announcement") %>">×</a>
             <% end %>
-            <div class="subject">
-              <%= image_tag("#{announcement.icon}.png") %><%= announcement.subject %>
+
+            <div class="global-message image-block">
+              <div class="image-block-image">
+                <i class="<%= notification_icon_classname(announcement) %>"></i>
+                <span class="hidden-inline-text">
+                  <%= accessible_message_icon_text(notification_icon_type(announcement)) %>
+                </span>
+              </div>
+              <div class="image-block-content">
+                <div class="subject title">
+                  <%= announcement.subject %>
+                </div>
+                <div class="message user_content">
+                  <%= user_content(announcement.message) %>
+                </div>
+              </div>
             </div>
-            <div>
+            <div class="announcement-details">
               <span>
                 <%= t(:alert_timespan, "from %{start_at} to %{end_at}",
                       :start_at => datetime_string(announcement.start_at),
@@ -723,9 +738,6 @@ acknowledge that you have read and agreed to the
                 <%= t :announcement_sent_to_subset, "Sent to 1 / %{denominator} users each month", denominator: announcement.months_in_display_cycle %>
               </div>
             <% end %>
-            <div class="message user_content">
-              <%= user_content(announcement.message) %>
-            </div>
           </li>
         <% end %>
       </ul>
