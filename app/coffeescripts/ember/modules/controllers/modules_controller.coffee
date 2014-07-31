@@ -5,9 +5,6 @@ define [
   '../lib/store'
 ], (Ember, Module, {request}, store) ->
 
-  #ModuleArray = Ember.ArrayProxy.extend Ember.SortableMixin,
-    #sortProperties: ['position']
-
   ModulesController = Ember.Controller.extend
 
     newModule: { name: 'Noname'}

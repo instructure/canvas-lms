@@ -41,7 +41,7 @@ define [
       request(
         data: module_item: @serialize()
         type: if @get('id') then 'put' else 'post'
-        url: @get('url')
+        url: @get('apiUrl')
       ).then ((response) =>
         @setProperties(response)
         @set('isSaving', no)
@@ -50,7 +50,7 @@ define [
         @set('error', on)
       )
 
-    url: (->
+    apiUrl: (->
       id = @get('id')
       base = "/api/v1/courses/#{ENV.course_id}/modules/#{@get('module_id')}/items"
       if id then "#{base}/#{id}" else base

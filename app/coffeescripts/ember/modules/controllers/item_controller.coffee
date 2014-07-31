@@ -9,6 +9,14 @@ define [
 
     isDeleting: false
 
+    modalId: (->
+      "item-modal-#{@get('model.id')}"
+    ).property('model.id')
+
+    actionsId: (->
+      "item-actions-#{@get('model.id')}"
+    ).property('model.id')
+
     actions:
 
       increaseIndent: ->
@@ -18,6 +26,17 @@ define [
       decreaseIndent: ->
         @decrementProperty('model.indent')
         store.syncItemById(@get('model.id'))
+
+      edit: ->
+        @set('copy', @get('model').serialize())
+        @set('modalIsOpen', true)
+        Ember.run.schedule 'afterRender', =>
+          Ember.View.views[@get('modalId')].open()
+
+      saveEdits: ->
+        model = @get('model')
+        model.setProperties(@get('copy'))
+        model.save()
 
       remove: ->
         @set 'isDeleting', yes #ma'am

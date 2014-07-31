@@ -44,18 +44,43 @@
       <div class="ig-admin">
         <span class="publish-icon" role="button" aria-label="Published. Click to unpublish."><i class="icon-publish"></i><span class="publish-text" tabindex="-1">&nbsp;Published</span><span class="screenreader-only accessible_label">Published. Click to unpublish.</span></span>
 
-        {{#ic-actions}}
+        {{#ic-actions id=actionsId}}
           {{#if showIncreaseIndent}}
             {{#ic-menu-item on-select="increaseIndent"}}Increase indent{{/ic-menu-item}}
           {{/if}}
           {{#if showDecreaseIndent}}
             {{#ic-menu-item on-select="decreaseIndent"}}Decrease indent{{/ic-menu-item}}
           {{/if}}
-          {{#ic-menu-item}}Edit{{/ic-menu-item}}
+          {{#ic-menu-item on-select="edit"}}Edit{{/ic-menu-item}}
           {{#ic-menu-item on-select="remove"}}Remove{{/ic-menu-item}}
         {{/ic-actions}}
 
       </div>
   </div>
+
+  {{#if modalIsOpen}}
+    {{! we don't want to setup 300 modals, just do it when we want to open it }}
+    {{#c-modal-form
+      id=modalId
+      on-submit="saveEdits"
+      return-focus-to=actionsId
+    }}
+      {{#ic-modal-title}}{{#t "edit_item"}}Edit Module Item{{/t}}{{/ic-modal-title}}
+
+      <div class="control-group">
+        <label class="control-label" for="edit-item-name">
+          {{#t "item_title"}}Module Item Title{{/t}}
+        </label>
+        <div class="controls">
+          {{input type="text" value=copy.title id="edit-item-name"}}
+        </div>
+      </div>
+
+      <div class="form-actions">
+        {{#ic-modal-trigger class="btn"}}{{#t "cancel"}}Cancel{{/t}}{{/ic-modal-trigger}}
+        <button type="submit" class="btn btn-primary">{{#t "save"}}Save{{/t}}</button>
+      </div>
+    {{/c-modal-form}}
+  {{/if}}
 {{/mm-sortable-module-item}}
 
