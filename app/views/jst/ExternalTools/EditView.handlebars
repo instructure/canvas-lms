@@ -2,19 +2,19 @@
   <div class="control-group">
     <label class="control-label" for="external_tool_name">{{#t "name"}}Name{{/t}}</label>
     <div class="controls">
-      <input type="text" id="external_tool_name" value="{{name}}" name="name">
+      <input aria-required="true" type="text" id="external_tool_name" value="{{name}}" name="name">
     </div>
   </div>
   <div class="control-group">
     <label class="control-label" for="external_tool_consumer_key">{{#t "consumer_key"}}Consumer Key{{/t}}</label>
     <div class="controls">
-      <input type="text" id="external_tool_consumer_key" value="{{consumer_key}}" name="consumer_key">
+      <input aria-required="true" type="text" id="external_tool_consumer_key" value="{{consumer_key}}" name="consumer_key">
     </div>
   </div>
   <div class="control-group">
     <label class="control-label" for="external_tool_shared_secret">{{#t "shared_secret"}}Shared Secret{{/t}}</label>
     <div class="controls">
-      <input type="text" id="external_tool_shared_secret" value="{{shared_secret}}" name="shared_secret">
+      <input aria-required="true" type="text" id="external_tool_shared_secret" value="{{shared_secret}}" name="shared_secret">
       {{#if id}}
         <p class="help-block">{{#t "shared_secret_note"}}Enter a new value
         to change{{/t}}</p>
