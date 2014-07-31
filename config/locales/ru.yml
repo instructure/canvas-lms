@@ -1295,7 +1295,7 @@ ru:
       teachers: "Регистрации учителей"
     user_add_failed_message: "Ошибка добавления пользователя, повторите попытку"
     user_added_message: "*%{user}* успешно добавлен!"
-    user_added_message_sent_message: "%{user} успешно добавлен! В скором времени они должны получить подтверждение по электронной почте."
+    user_added_message_sent_message: "*%{user}* успешно добавлен! В скором времени они должны получить подтверждение по электронной почте."
     user_deleted_message: "%{username} успешно удален"
     user_inactivity_csv_description: 
       account_reports: 
@@ -4037,7 +4037,7 @@ ru:
     batch_update_message: 
       few: "*%{count}* разговора завершено"
       one: "1 разговор завершен"
-      other: "*%{count}* разговоров завершено"
+      other: "%{count} разговоров завершено"
     not_participating: "Пользователь не участвует в данном разговоре"
   conversations: 
     add_attachment: 
@@ -6305,7 +6305,7 @@ ru:
       all: Все
       app_headder: "Внешние приложения"
       external_tools_note: "Приложения являются простым способом добавления новых функций в Canvas. Они могут добавляться к отдельному курсу, либо ко всем курсам учетной записи. После настройки вы можете связать их с помощью модулей курса и создать задания для инструментов проверки знаний."
-      external_tools_references: "Нажмите *здесь*, чтобы увидеть несколько инструментов LTI, которые отлично работают с Canvas. Также, вы можете посетить сообщество Canvas и просмотреть обсуждения по теме инструментов LTI ** здесь**"
+      external_tools_references: "Нажмите *здесь*, чтобы увидеть несколько инструментов LTI, которые отлично работают с Canvas. Также, вы можете посетить сообщество Canvas и просмотреть обсуждения по теме инструментов LTI **здесь**"
       installed: Установлено
       not_installed: "Не установлено"
       search_filter: "Сортировать по имени"
@@ -12413,7 +12413,7 @@ ru:
         multiple_due_dates: "Несколько сроков выполнения"
         no_due_date: "Нет срока выполнения"
         none: Нет
-        quiz_availabile_through: "%{start_time} — {end_time}"
+        quiz_availabile_through: "%{start_time} — %{end_time}"
         quiz_available_after: "после %{start_time}"
         quiz_available_until: "до %{end_time}"
         requires_lockdown: "Требуется браузер Respondus LockDown"
@@ -12430,7 +12430,7 @@ ru:
         attempts_so_far: 
           few: "%{count} %{count} попытки на данный момент"
           one: "1 %{count} попытка на данный момент"
-          other: "%{count} %{count} попыток на данный момент"
+          other: "%{count} попыток на данный момент"
         labels: 
           current_score: "Текущая оценка"
           kept_score: "Сохраненная оценка"
@@ -13184,7 +13184,7 @@ ru:
         enroll_in_course: "Зарегистрироваться на курсе"
         next: Далее
       getting_started: "Вы регистрируетесь на **%{course}**"
-      switch_users: "В настоящий момент вы вошли в систему как %{user_name}. **Войти в систему как другой пользователь**."
+      switch_users: "В настоящий момент вы вошли в систему как *%{user}*. **Войти в систему как другой пользователь**."
     course_full: 
       class_full: "Регистрация на курс **%{course}** завершена. Приносим извинения за неудобства."
     enrollment_closed: 
