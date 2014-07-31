@@ -1521,6 +1521,7 @@ class ApplicationController < ActionController::Base
       # file upload forms and s3 upload success redirects -- we'll respond with text instead.
       if options[:as_text] || json_as_text?
         options[:text] = json
+        options[:content_type] = "text/html"
       else
         options[:json] = json
       end
