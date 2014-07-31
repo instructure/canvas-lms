@@ -91,7 +91,7 @@ describe "course copy" do
 
       get "/courses/#{@course.id}/copy"
 
-      f('#dateShiftCheckbox').click
+      f('#dateAdjustCheckbox').click
 
       f('#oldStartDate').clear
       f('#oldStartDate').send_keys('7/1/2012')
@@ -100,9 +100,15 @@ describe "course copy" do
       f('#newStartDate').send_keys('8-5-2012')
       f('#newEndDate').send_keys('Aug 15, 2012')
 
+      f('#addDaySubstitution').click
+      click_option('#daySubstitution ul > div:nth-child(1) .currentDay', "1", :value)
+      click_option('#daySubstitution ul > div:nth-child(1) .subDay', "2", :value)
+
       expect_new_page_load { f('button[type="submit"]').click }
 
       opts = ContentMigration.last.migration_settings["date_shift_options"]
+      opts['shift_dates'].should == '1'
+      opts['day_substitutions'].should == {"1" => "2"}
       expected = {
           "old_start_date" => "Jul 1, 2012", "old_end_date" => "Jul 11, 2012",
           "new_start_date" => "Aug 5, 2012", "new_end_date" => "Aug 15, 2012"
@@ -110,6 +116,19 @@ describe "course copy" do
       expected.each do |k, v|
         Date.parse(opts[k].to_s).should == Date.parse(v)
       end
+    end
+
+    it "should remove dates" do
+      course_with_admin_logged_in
+
+      get "/courses/#{@course.id}/copy"
+
+      f('#dateAdjustCheckbox').click
+      f('#dateRemoveOption').click
+      expect_new_page_load { f('button[type="submit"]').click }
+
+      opts = ContentMigration.last.migration_settings["date_shift_options"]
+      opts['remove_dates'].should == '1'
     end
   end
 
