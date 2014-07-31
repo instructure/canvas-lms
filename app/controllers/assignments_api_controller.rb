@@ -459,7 +459,8 @@
 #         "assignment_visibility": {
 #           "description": "(Optional) If 'assignment_visibility' is included in the 'include' parameter, includes an array of student IDs who can see this assignment.",
 #           "example": "[137,381,572]",
-#           "type": "array"
+#           "type": "array",
+#           "items": {"type": "integer"}
 #         }
 #       }
 #     }
