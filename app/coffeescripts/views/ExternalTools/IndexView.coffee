@@ -96,7 +96,7 @@ define [
     addTool: ->
       newTool = new ExternalTool
       newTool.on 'sync', @onToolSync
-      @editView = new EditView(model: newTool).render()
+      @editView = new EditView(model: newTool, title: I18n.t 'dialog_title_add_tool', 'Add New App').render()
 
     editTool: (event) ->
       view = @$(event.currentTarget).closest('.external_tool_item').data('view')

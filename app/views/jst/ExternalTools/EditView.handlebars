@@ -95,10 +95,11 @@
     </label>
     <div class="controls">
       <textarea
+        aria-labelledby="custom_fields_explanation"
         id="external_tool_custom_fields_string"
         name="custom_fields_string"
       >{{custom_fields_string}}</textarea>
-      <div class="help-block"> {{#t "custom_feilds_explanation"}}One per
+      <div id="custom_fields_explanation" class="help-block"> {{#t "custom_feilds_explanation"}}One per
       line.  Format: name=value{{/t}}</div>
     </div>
   </div>

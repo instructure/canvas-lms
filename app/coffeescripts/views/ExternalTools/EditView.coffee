@@ -16,10 +16,14 @@ define [
     events:
       'change #external_tool_config_type': 'onConfigTypeChange'
 
+    initialize: ->
+      super
+      @title = @options.title || I18n.t 'dialog_title_edit_tool', 'Edit External Tool'
+
     afterRender: ->
       super
       @$el.dialog
-        title: I18n.t 'dialog_title_edit_tool', 'Edit External Tool'
+        title: @title
         width: 520
         height: "auto"
         resizable: true
