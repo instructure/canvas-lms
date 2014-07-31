@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe ContextExternalTool do
-  before(:each) do
+  before(:once) do
     course_model
     @root_account = @course.root_account
     @account = account_model(:root_account => @root_account, :parent_account => @root_account)
@@ -675,12 +675,15 @@ describe ContextExternalTool do
   end
   
   describe "find_for" do
+    before :once do
+      course_model
+    end
+
     def new_external_tool(context)
       context.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "google.com")
     end
     
     it "should find the tool if it's attached to the course" do
-      course_model
       tool = new_external_tool @course
       tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
       tool.save!
@@ -688,11 +691,7 @@ describe ContextExternalTool do
       (ContextExternalTool.find_for(tool.id, @course, :user_navigation) rescue nil).should be_nil
     end
     
-    it "should find the tool if it's attached to the account" do
-    end
-    
     it "should find the tool if it's attached to the course's account" do
-      course_model
       tool = new_external_tool @course.account
       tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
       tool.save!
@@ -701,7 +700,6 @@ describe ContextExternalTool do
     end
     
     it "should find the tool if it's attached to the course's root account" do
-      course_model
       tool = new_external_tool @course.root_account
       tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
       tool.save!
@@ -710,7 +708,6 @@ describe ContextExternalTool do
     end
     
     it "should not find the tool if it's attached to a sub-account" do
-      course_model
       @account = @course.account.sub_accounts.create!(:name => "sub-account")
       tool = new_external_tool @account
       tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
@@ -719,7 +716,7 @@ describe ContextExternalTool do
     end
     
     it "should not find the tool if it's attached to another course" do
-      @course2 = course_model
+      @course2 = @course
       @course = course_model
       tool = new_external_tool @course2
       tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
@@ -728,7 +725,6 @@ describe ContextExternalTool do
     end
     
     it "should not find the tool if it's not enabled for the correct navigation type" do
-      course_model
       tool = new_external_tool @course
       tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
       tool.save!
@@ -736,7 +732,6 @@ describe ContextExternalTool do
     end
 
     it "should raise RecordNotFound if the id is invalid" do
-      course_model
       expect { ContextExternalTool.find_for("horseshoes", @course, :course_navigation) }.to raise_error(ActiveRecord::RecordNotFound)
     end
   end

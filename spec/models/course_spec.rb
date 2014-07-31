@@ -1414,10 +1414,7 @@ describe Course, 'grade_publishing' do
     end
 
     def make_student_enrollments
-      @student_enrollments = []
-      9.times do
-        @student_enrollments << student_in_course({:course => @course, :active_all => true})
-      end
+      @student_enrollments = create_enrollments(@course, create_users(9), return_type: :record)
       @student_enrollments[0].tap do |enrollment|
         enrollment.grade_publishing_status = "published"
         enrollment.save!
@@ -2029,28 +2026,11 @@ describe Course, 'grade_publishing' do
       before :once do
         make_student_enrollments
         grade_publishing_user
-      end
-
-      def add_pseudonym(enrollment, account, unique_id, sis_user_id)
-        pseudonym = account.pseudonyms.build
-        pseudonym.user = enrollment.user
-        pseudonym.unique_id = unique_id
-        pseudonym.sis_user_id = sis_user_id
-        pseudonym.save!
-      end
-
-      it 'should generate valid csv without a grading standard' do
         @course.assignment_groups.create(:name => "Assignments")
         a1 = @course.assignments.create!(:title => "A1", :points_possible => 10)
         a2 = @course.assignments.create!(:title => "A2", :points_possible => 10)
         @course.enroll_teacher(@user).tap{|e| e.workflow_state = 'active'; e.save!}
         @ase = @student_enrollments.find_all(&:active?)
-        a1.grade_student(@ase[0].user, { :grade => "9", :grader => @user })
-        a2.grade_student(@ase[0].user, { :grade => "10", :grader => @user })
-        a1.grade_student(@ase[1].user, { :grade => "6", :grader => @user })
-        a2.grade_student(@ase[1].user, { :grade => "7", :grader => @user })
-        a1.grade_student(@ase[7].user, { :grade => "8", :grader => @user })
-        a2.grade_student(@ase[7].user, { :grade => "9", :grader => @user })
 
         add_pseudonym(@ase[2], Account.default, "student2", nil)
         add_pseudonym(@ase[3], Account.default, "student3", "student3")
@@ -2062,6 +2042,23 @@ describe Course, 'grade_publishing' do
         add_pseudonym(@ase[7], Account.default, "student7a", "student7a")
         add_pseudonym(@ase[7], Account.default, "student7b", "student7b")
 
+        a1.grade_student(@ase[0].user, { :grade => "9", :grader => @user })
+        a2.grade_student(@ase[0].user, { :grade => "10", :grader => @user })
+        a1.grade_student(@ase[1].user, { :grade => "6", :grader => @user })
+        a2.grade_student(@ase[1].user, { :grade => "7", :grader => @user })
+        a1.grade_student(@ase[7].user, { :grade => "8", :grader => @user })
+        a2.grade_student(@ase[7].user, { :grade => "9", :grader => @user })
+      end
+
+      def add_pseudonym(enrollment, account, unique_id, sis_user_id)
+        pseudonym = account.pseudonyms.build
+        pseudonym.user = enrollment.user
+        pseudonym.unique_id = unique_id
+        pseudonym.sis_user_id = sis_user_id
+        pseudonym.save!
+      end
+
+      it 'should generate valid csv without a grading standard' do
         @course.recompute_student_scores_without_send_later
         @course.generate_grade_publishing_csv_output(@ase.map(&:reload), @user, @pseudonym).should == [
           [@ase.map(&:id),
@@ -2083,28 +2080,6 @@ describe Course, 'grade_publishing' do
       end
 
       it 'should generate valid csv without a publishing pseudonym' do
-        @course.assignment_groups.create(:name => "Assignments")
-        a1 = @course.assignments.create!(:title => "A1", :points_possible => 10)
-        a2 = @course.assignments.create!(:title => "A2", :points_possible => 10)
-        @course.enroll_teacher(@user).tap{|e| e.workflow_state = 'active'; e.save!}
-        @ase = @student_enrollments.find_all(&:active?)
-        a1.grade_student(@ase[0].user, { :grade => "9", :grader => @user })
-        a2.grade_student(@ase[0].user, { :grade => "10", :grader => @user })
-        a1.grade_student(@ase[1].user, { :grade => "6", :grader => @user })
-        a2.grade_student(@ase[1].user, { :grade => "7", :grader => @user })
-        a1.grade_student(@ase[7].user, { :grade => "8", :grader => @user })
-        a2.grade_student(@ase[7].user, { :grade => "9", :grader => @user })
-
-        add_pseudonym(@ase[2], Account.default, "student2", nil)
-        add_pseudonym(@ase[3], Account.default, "student3", "student3")
-        add_pseudonym(@ase[4], Account.default, "student4a", "student4a")
-        add_pseudonym(@ase[4], Account.default, "student4b", "student4b")
-        another_account = account_model
-        add_pseudonym(@ase[5], another_account, "student5", nil)
-        add_pseudonym(@ase[6], another_account, "student6", "student6")
-        add_pseudonym(@ase[7], Account.default, "student7a", "student7a")
-        add_pseudonym(@ase[7], Account.default, "student7b", "student7b")
-
         @course.recompute_student_scores_without_send_later
         @course.generate_grade_publishing_csv_output(@ase.map(&:reload), @user, nil).should == [
           [@ase.map(&:id),
@@ -2128,28 +2103,6 @@ describe Course, 'grade_publishing' do
       it 'should generate valid csv with a section id' do
         @course_section.sis_source_id = "section1"
         @course_section.save!
-        @course.assignment_groups.create(:name => "Assignments")
-        a1 = @course.assignments.create!(:title => "A1", :points_possible => 10)
-        a2 = @course.assignments.create!(:title => "A2", :points_possible => 10)
-        @course.enroll_teacher(@user).tap{|e| e.workflow_state = 'active'; e.save!}
-        @ase = @student_enrollments.find_all(&:active?)
-        a1.grade_student(@ase[0].user, { :grade => "9", :grader => @user })
-        a2.grade_student(@ase[0].user, { :grade => "10", :grader => @user })
-        a1.grade_student(@ase[1].user, { :grade => "6", :grader => @user })
-        a2.grade_student(@ase[1].user, { :grade => "7", :grader => @user })
-        a1.grade_student(@ase[7].user, { :grade => "8", :grader => @user })
-        a2.grade_student(@ase[7].user, { :grade => "9", :grader => @user })
-
-        add_pseudonym(@ase[2], Account.default, "student2", nil)
-        add_pseudonym(@ase[3], Account.default, "student3", "student3")
-        add_pseudonym(@ase[4], Account.default, "student4a", "student4a")
-        add_pseudonym(@ase[4], Account.default, "student4b", "student4b")
-        another_account = account_model
-        add_pseudonym(@ase[5], another_account, "student5", nil)
-        add_pseudonym(@ase[6], another_account, "student6", "student6")
-        add_pseudonym(@ase[7], Account.default, "student7a", "student7a")
-        add_pseudonym(@ase[7], Account.default, "student7b", "student7b")
-
         @course.recompute_student_scores_without_send_later
         @course.generate_grade_publishing_csv_output(@ase.map(&:reload), @user, @pseudonym).should == [
           [@ase.map(&:id),
@@ -2171,30 +2124,8 @@ describe Course, 'grade_publishing' do
       end
 
       it 'should generate valid csv with a grading standard' do
-        @course.assignment_groups.create(:name => "Assignments")
         @course.grading_standard_id = 0
         @course.save!
-        a1 = @course.assignments.create!(:title => "A1", :points_possible => 10)
-        a2 = @course.assignments.create!(:title => "A2", :points_possible => 10)
-        @course.enroll_teacher(@user).tap{|e| e.workflow_state = 'active'; e.save!}
-        @ase = @student_enrollments.find_all(&:active?)
-        a1.grade_student(@ase[0].user, { :grade => "9", :grader => @user })
-        a2.grade_student(@ase[0].user, { :grade => "10", :grader => @user })
-        a1.grade_student(@ase[1].user, { :grade => "6", :grader => @user })
-        a2.grade_student(@ase[1].user, { :grade => "7", :grader => @user })
-        a1.grade_student(@ase[7].user, { :grade => "8", :grader => @user })
-        a2.grade_student(@ase[7].user, { :grade => "9", :grader => @user })
-
-        add_pseudonym(@ase[2], Account.default, "student2", nil)
-        add_pseudonym(@ase[3], Account.default, "student3", "student3")
-        add_pseudonym(@ase[4], Account.default, "student4a", "student4a")
-        add_pseudonym(@ase[4], Account.default, "student4b", "student4b")
-        another_account = account_model
-        add_pseudonym(@ase[5], another_account, "student5", nil)
-        add_pseudonym(@ase[6], another_account, "student6", "student6")
-        add_pseudonym(@ase[7], Account.default, "student7a", "student7a")
-        add_pseudonym(@ase[7], Account.default, "student7b", "student7b")
-
         @course.recompute_student_scores_without_send_later
         @course.generate_grade_publishing_csv_output(@ase.map(&:reload), @user, @pseudonym).should == [
           [@ase.map(&:id),
@@ -2216,30 +2147,8 @@ describe Course, 'grade_publishing' do
       end
 
       it 'should generate valid csv and skip users with no computed final score' do
-        @course.assignment_groups.create(:name => "Assignments")
         @course.grading_standard_id = 0
         @course.save!
-        a1 = @course.assignments.create!(:title => "A1", :points_possible => 10)
-        a2 = @course.assignments.create!(:title => "A2", :points_possible => 10)
-        @course.enroll_teacher(@user).tap{|e| e.workflow_state = 'active'; e.save!}
-        @ase = @student_enrollments.find_all(&:active?)
-        a1.grade_student(@ase[0].user, { :grade => "9", :grader => @user })
-        a2.grade_student(@ase[0].user, { :grade => "10", :grader => @user })
-        a1.grade_student(@ase[1].user, { :grade => "6", :grader => @user })
-        a2.grade_student(@ase[1].user, { :grade => "7", :grader => @user })
-        a1.grade_student(@ase[7].user, { :grade => "8", :grader => @user })
-        a2.grade_student(@ase[7].user, { :grade => "9", :grader => @user })
-
-        add_pseudonym(@ase[2], Account.default, "student2", nil)
-        add_pseudonym(@ase[3], Account.default, "student3", "student3")
-        add_pseudonym(@ase[4], Account.default, "student4a", "student4a")
-        add_pseudonym(@ase[4], Account.default, "student4b", "student4b")
-        another_account = account_model
-        add_pseudonym(@ase[5], another_account, "student5", nil)
-        add_pseudonym(@ase[6], another_account, "student6", "student6")
-        add_pseudonym(@ase[7], Account.default, "student7a", "student7a")
-        add_pseudonym(@ase[7], Account.default, "student7b", "student7b")
-
         @course.recompute_student_scores_without_send_later
         @ase.map(&:reload)
 

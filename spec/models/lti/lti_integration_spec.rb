@@ -47,7 +47,7 @@ describe "LTI integration tests" do
 
   let_once(:canvas_user) { user(name: 'Shorty McLongishname') }
 
-  let(:canvas_course) {
+  let_once(:canvas_course) {
     course(active_course: true, course_name: 'my course').tap do |course|
       course.course_code = 'abc'
       course.sis_source_id = 'course_sis_id'
@@ -56,7 +56,7 @@ describe "LTI integration tests" do
     end
   }
 
-  let(:root_account) {
+  let_once(:root_account) {
     Account.new.tap do |account|
       account.name = 'root_account'
       account.save!
@@ -140,7 +140,7 @@ describe "LTI integration tests" do
   end
 
   describe "legacy integration tests" do
-    before do
+    before :once do
       course_with_teacher(:active_all => true)
       @tool = @course.context_external_tools.create!(:domain => 'yahoo.com',
                                                      :consumer_key => '12345', :shared_secret => 'secret', :name => 'tool')

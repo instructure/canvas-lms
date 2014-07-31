@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/../lib/validates_as_url.rb')
 
 describe Submission do
-  before(:each) do
+  before(:once) do
     @user = factory_with_protected_attributes(User, :name => "some student", :workflow_state => "registered")
     @course = @context = factory_with_protected_attributes(Course, :name => "some course", :workflow_state => "available")
     @context.enroll_student(@user)
@@ -142,7 +142,7 @@ describe Submission do
 
   context "broadcast policy" do
     context "Submission Notifications" do
-      before do
+      before :once do
         Notification.create(:name => 'Assignment Submitted')
         Notification.create(:name => 'Assignment Resubmitted')
         Notification.create(:name => 'Assignment Submitted Late')
@@ -201,7 +201,7 @@ describe Submission do
     end
 
     context "Submission Graded" do
-      before do
+      before :once do
         Notification.create(:name => 'Submission Graded')
       end
 
@@ -399,7 +399,7 @@ describe Submission do
         Turnitin::Client.expects(:new).at_least(1).with(:placeholder).returns(@turnitin_api)
       end
 
-      before(:each) do
+      before(:once) do
         @assignment.submission_types = "online_upload,online_text_entry"
         @assignment.turnitin_enabled = true
         @assignment.turnitin_settings = @assignment.turnitin_settings
@@ -502,7 +502,7 @@ describe Submission do
     end
 
     describe "group" do
-      before(:each) do
+      before(:once) do
         @teacher = User.create(:name => "some teacher")
         @student = User.create(:name => "a student")
         @student1 = User.create(:name => "student 1")
@@ -535,7 +535,7 @@ describe Submission do
     end
 
     context "report" do
-      before do
+      before :once do
         @assignment.submission_types = "online_upload,online_text_entry"
         @assignment.turnitin_enabled = true
         @assignment.turnitin_settings = @assignment.turnitin_settings
@@ -553,7 +553,9 @@ describe Submission do
           }
         }
         @submission.save!
+      end
 
+      before :each do
         api = Turnitin::Client.new('test_account', 'sekret')
         Turnitin::Client.expects(:new).at_least(1).returns(api)
         api.expects(:sendRequest).with(:generate_report, 1, has_entries(:oid => "123456789")).at_least(1).returns('http://foo.bar')
@@ -805,7 +807,7 @@ describe Submission do
   end
 
   describe "past_due" do
-    before do
+    before :once do
       u1 = @user
       submission_spec_model
       @submission1 = @submission
@@ -863,7 +865,7 @@ describe Submission do
   end
 
   describe "late" do
-    before do
+    before :once do
       submission_spec_model
     end
 
@@ -887,7 +889,7 @@ describe Submission do
   end
 
   describe "missing" do
-    before do
+    before :once do
       submission_spec_model
     end
 
@@ -1035,7 +1037,7 @@ describe Submission do
   end
 
   describe "assignment_visible_to_student?" do
-    before(:each) do
+    before(:once) do
       student_in_course(active_all: true)
       @assignment.only_visible_to_overrides = true
       @assignment.save!

@@ -79,9 +79,9 @@ def simple_quiz_with_submissions(answer_key, *submissions)
     {:question_data => {:name => "question #{i + 1}", :points_possible => points, :question_type => type, :answers => answers}}
   }
   assignment_quiz(questions, opts)
-  submissions.each do |data|
-    student_in_course(active_all: true, course: @quiz.context)
-    sub = @quiz.generate_submission(@student)
+  students = create_users_in_course(@quiz.context, submissions.size, return_type: :record)
+  submissions.each_with_index do |data, i|
+    sub = @quiz.generate_submission(students[i])
     sub.mark_completed
     sub.submission_data = Hash[data.each_with_index.map{ |answer, i|
       matched_answer = @questions[i].question_data[:answers].detect{ |a| a[:text] == answer}
@@ -109,9 +109,9 @@ def simple_quiz_with_shuffled_answers(answer_key, *submissions)
   @quiz.shuffle_answers = true
   @quiz.save!
 
-  submissions.each do |data|
-    student_in_course(active_all: true, course: @quiz.context)
-    sub = @quiz.generate_submission(@student)
+  students = create_users_in_course(@quiz.context, submissions.size, return_type: :record)
+  submissions.each_with_index do |data, i|
+    sub = @quiz.generate_submission(students[i])
     sub.mark_completed
     sub.submission_data = Hash[data.each_with_index.map{ |answer, i|
       answer = {"T" => "True", "F" => "False"}[answer] || answer
