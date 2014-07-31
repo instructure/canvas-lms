@@ -41,7 +41,7 @@ module CC::Importer::Standard
 
     # exports the package into the intermediary json
     def convert(to_export = nil)
-      prepare_cartridge_file(MANIFEST_FILE)
+      @archive.prepare_cartridge_file(MANIFEST_FILE)
       @manifest = open_file_xml(File.join(@unzipped_file_path, MANIFEST_FILE))
       @manifest.remove_namespaces!
 

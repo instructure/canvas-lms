@@ -31,7 +31,6 @@ describe Moodle::Converter do
     it "should convert discussion topics" do
       @course.discussion_topics.count.should == 2
 
-      pending("moodle2cc 0.2.14")
       dt = @course.discussion_topics.first
       dt.title.should == "Hidden Forum"
       dt.message.should == "<p>Description of hidden forum</p>"
