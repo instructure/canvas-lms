@@ -317,13 +317,14 @@ define([
           }).end()
         .end()
         .find("a:not(.not_external, .external):external").each(function(){
+          var externalLink = htmlEscape(I18n.t('titles.external_link', 'Links to an external site.'));
           $(this)
             .not(":has(img)")
             .addClass('external')
             .html('<span>' + $(this).html() + '</span>')
             .attr('target', '_blank')
-            .attr('aria-label', htmlEscape(I18n.t('titles.external_link', 'Links to an external site.')))
-            .append('<span class="ui-icon ui-icon-extlink ui-icon-inline" title="' + htmlEscape(I18n.t('titles.external_link', 'Links to an external site.')) + '"/>');
+            .append('<span aria-hidden="true" class="ui-icon ui-icon-extlink ui-icon-inline" title="' + externalLink + '"/>')
+            .append('<span class="screenreader-only">&nbsp;(' + externalLink + ')</span>');
         }).end()
           .find("a.instructure_file_link").each(function() {
               var $link = $(this),
