@@ -53,7 +53,7 @@ describe Quizzes::QuizGroup do
     end
 
     context "with a question bank" do
-      before(:each) do
+      before(:once) do
         course
         @bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
         @bank.assessment_questions.create!(:question_data => {'name' => 'test question', 'answers' => [{'id' => 1}, {'id' => 2}]})
@@ -112,7 +112,7 @@ describe Quizzes::QuizGroup do
       quiz.quiz_groups.sort_by{|g| g.position }.map {|g| g.id }
     end
 
-    before do
+    before :once do
       course
       @quiz = @course.quizzes.create!(:title => "some quiz")
       @group1 = @quiz.quiz_groups.create(:name => "question group 1")

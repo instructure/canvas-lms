@@ -23,7 +23,6 @@ describe "/quizzes/quizzes/show" do
   it "should render" do
     course_with_student
     view_context
-    ActiveRecord::Base.clear_cached_contexts
     assigns[:quiz] = @course.quizzes.create!
     render "quizzes/quizzes/show"
     response.should_not be_nil

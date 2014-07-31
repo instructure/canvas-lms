@@ -268,7 +268,7 @@ describe Course do
   end
 
   describe "import_settings_from_migration" do
-    before do
+    before :once do
       course_with_teacher
       @course.storage_quota = 1
       @cm = ContentMigration.create!(

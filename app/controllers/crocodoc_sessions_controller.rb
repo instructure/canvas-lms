@@ -18,32 +18,12 @@
 
 class CrocodocSessionsController < ApplicationController
   before_filter :require_user
+  include HmacHelper
 
-  def create
-    attachment = Attachment.find(params[:attachment_id])
-    submission = Submission.find(params[:submission_id]) if params[:submission_id]
-
-    if submission
-      if params[:version]
-        submission = submission.submission_history[params[:version].to_i]
-      end
-
-      # make sure the attachment is tied to this submission
-      attachment_ids = (submission.attachment_ids || "").split(',')
-      unless attachment_ids.include? attachment.id.to_s
-        raise ActiveRecord::RecordNotFound
-      end
-
-      unless submission.grants_right? @current_user, session, :read
-        render :text => 'unauthorized', :status => :unauthorized
-        return
-      end
-    else
-      unless attachment.grants_right? @current_user, session, :download
-        render :text => 'unauthorized', :status => :unauthorized
-        return
-      end
-    end
+  def show
+    blob = extract_blob(params[:hmac], params[:blob],
+                        "user_id" => @current_user.global_id)
+    attachment = Attachment.find(blob["attachment_id"])
 
     if attachment.crocodoc_available?
       annotations = params[:annotations] ?
@@ -51,11 +31,13 @@ class CrocodocSessionsController < ApplicationController
         true
 
       crocodoc = attachment.crocodoc_document
-      session_url = crocodoc.session_url :user => @current_user,
-                                         :annotations => annotations
-      render :json => { :session_url => session_url }
+      redirect_to crocodoc.session_url(:user => @current_user,
+                                       :annotations => annotations)
     else
-      raise ActiveRecord::RecordNotFound
+      render :text => "Not found", :status => :not_found
     end
+
+  rescue HmacHelper::Error
+    render :text => 'unauthorized', :status => :unauthorized
   end
 end

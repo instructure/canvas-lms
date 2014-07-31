@@ -239,7 +239,7 @@ class ConversationsController < ApplicationController
       }
 
       if notes_enabled
-        unless hash[:CAN_ADD_NOTES_FOR_ACCOUNT] = @current_user.associated_accounts.any?{|a| a.grants_right?(@current_user, nil, :manage_students) }
+        unless hash[:CAN_ADD_NOTES_FOR_ACCOUNT] = @current_user.associated_accounts.any?{|a| a.grants_right?(@current_user, :manage_students) }
           course_note_permissions = {}
           @current_user.enrollments.of_instructor_type.each do |enrollment|
             course_note_permissions[enrollment.course_id] = true if enrollment.has_permission_to?(:manage_user_notes)

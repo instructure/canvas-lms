@@ -268,6 +268,8 @@ describe UsersController, type: :request do
     @assignment.reload
     assign_json = assignment_json(@assignment, @user, session,
                                   include_discussion_topic: false)
+    assign_json['created_at'] = @assignment.created_at.as_json
+    assign_json['updated_at'] = @assignment.updated_at.as_json
     assign_json['title'] = @assignment.title
     json.should == [{
       'id' => StreamItem.last.id,
@@ -367,6 +369,8 @@ describe UsersController, type: :request do
     @assignment.reload
     assign_json = assignment_json(@assignment, @user, session,
                                   include_discussion_topic: false)
+    assign_json['created_at'] = @assignment.created_at.as_json
+    assign_json['updated_at'] = @assignment.updated_at.as_json
     assign_json['title'] = @assignment.title
     json.should == [{
       'id' => StreamItem.last.id,

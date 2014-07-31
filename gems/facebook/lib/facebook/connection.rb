@@ -23,7 +23,7 @@ module Facebook
 
     def self.parse_signed_request(signed_request)
       sig, str = signed_request.split('.')
-      generated_sig = Base64.encode64(OpenSSL::HMAC.digest(OpenSSL::Digest::Digest.new('sha256'), config['secret'], str)).strip.tr('+/', '-_').sub(/=+$/, '')
+      generated_sig = Base64.encode64(OpenSSL::HMAC.digest(OpenSSL::Digest.new('sha256'), config['secret'], str)).strip.tr('+/', '-_').sub(/=+$/, '')
       str += '=' * (4 - str.length.modulo(4))
       data = JSON.parse(str.tr('-_', '+/').unpack('m')[0]) rescue nil
       [data, sig == generated_sig ? sig : nil]

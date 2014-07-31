@@ -282,7 +282,7 @@ define [
     ).property('shouldCreateNotes')
 
     updateOrCreateNotesColumn: (->
-      ajax(
+      ajax.request(
         dataType: "json"
         type: @get('notesVerb')
         url: @get('notesURL')
@@ -304,7 +304,7 @@ define [
         @set 'teacherNotes', col
 
       unless col.hidden
-        ajax(
+        ajax.request(
           url: ENV.GRADEBOOK_OPTIONS.reorder_custom_columns_url
           type:"POST"
           data:
@@ -324,7 +324,7 @@ define [
 
     updateShowTotalAs: (->
       @set "showTotalAsPoints", @get("displayPointTotals")
-      ajax(
+      ajax.request(
         dataType: "json"
         type: "PUT"
         url: ENV.GRADEBOOK_OPTIONS.setting_update_url

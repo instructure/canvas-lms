@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe ContentExport do
 
   context "export_object?" do
-    before do
+    before :once do
       @ce = ContentExport.new(course: Account.default.courses.create!)
     end
 
@@ -61,7 +61,7 @@ describe ContentExport do
   end
 
   context "add_item_to_export" do
-    before do
+    before :once do
       @ce = ContentExport.new(course: Account.default.courses.create!)
     end
 
@@ -96,7 +96,7 @@ describe ContentExport do
   end
 
   context "notifications" do
-    before(:each) do
+    before :once do
       course_with_teacher(:active_all => true)
       @ce = ContentExport.create! { |ce| ce.user = @user; ce.course = @course }
 

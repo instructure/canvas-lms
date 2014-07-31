@@ -95,12 +95,12 @@ describe DiscussionTopicPresenter do
       before { assignment.stubs(:rubric_association).returns nil }
 
       it "returns true when the assignment grants the user update privs" do
-        assignment.expects(:grants_right?).with(user,nil,:update).returns true
+        assignment.expects(:grants_right?).with(user, :update).returns true
         presenter.should_show_rubric?(user).should == true
       end
 
       it "returns false when the assignment grants the user update privs" do
-        assignment.expects(:grants_right?).with(user,nil,:update).returns false
+        assignment.expects(:grants_right?).with(user, :update).returns false
         presenter.should_show_rubric?(user).should == false
       end
     end

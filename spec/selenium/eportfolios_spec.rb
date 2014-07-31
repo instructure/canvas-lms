@@ -269,7 +269,7 @@ describe "eportfolios" do
     end
 
     it "should be viewable with a shared link" do
-      destroy_session @pseudonym, false
+      destroy_session false
       get "/eportfolios/#{@eportfolio.id}?verifier=#{@eportfolio.uuid}"
       f('#content h2').text.should == "page"
     end

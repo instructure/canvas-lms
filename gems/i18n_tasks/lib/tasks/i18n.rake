@@ -142,7 +142,7 @@ namespace :i18n do
     FileUtils.mkdir_p(File.join(yaml_dir))
     yaml_file = File.join(yaml_dir, "en.yml")
     File.open(Rails.root.join(yaml_file), "w") do |file|
-      file.write({'en' => @translations}.ya2yaml(:syck_compatible => true))
+      file.write({'en' => @translations.except('locales', 'qualified_locale')}.ya2yaml(:syck_compatible => true))
     end
     print "Wrote new #{yaml_file}\n\n"
   end

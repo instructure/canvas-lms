@@ -1,9 +1,6 @@
 Canvas LMS
 ======
 
-[![Build
-Status](https://travis-ci.org/instructure/canvas-lms.png?branch=master)](https://travis-ci.org/instructure/canvas-lms)
-
 Canvas is a new, open-source LMS by Instructure Inc. It is released under the
 AGPLv3 license for use by anyone interested in learning more about or using
 learning management systems.

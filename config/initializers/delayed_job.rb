@@ -63,3 +63,9 @@ Delayed::Worker.lifecycle.around(:pop) do |worker, &block|
     block.call(worker)
   end
 end
+
+Delayed::Worker.lifecycle.before(:perform) do |job|
+  # Since AdheresToPolicy::Cache uses an instance variable class cache lets clear
+  # it so we start with a clean slate.
+  AdheresToPolicy::Cache.clear
+end

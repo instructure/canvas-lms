@@ -107,7 +107,7 @@ class AssignmentOverride < ActiveRecord::Base
     end
   end
 
-  scope :active, where(:workflow_state => 'active')
+  scope :active, -> { where(:workflow_state => 'active') }
 
   before_validation :default_values
   def default_values

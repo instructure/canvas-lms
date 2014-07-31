@@ -432,6 +432,24 @@ describe "speed grader" do
     end
   end
 
+  it "shows the first ungraded student with a submission" do
+    s1, s2, s3 = n_students_in_course(3)
+    s1.update_attribute :name, "A"
+    s2.update_attribute :name, "B"
+    s3.update_attribute :name, "C"
+
+    @assignment.grade_student s1, score: 10
+    @assignment.find_or_create_submission(s2).tap { |submission|
+      submission.student_entered_score = 5
+    }.save!
+    @assignment.submit_homework(s3, body: "Homework!?")
+
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    wait_for_ajaximations
+
+    fj("#students_selectmenu option[value=#{s3.id}]")[:selected].should be_true
+  end
+
   it "should be able to change sorting and hide student names" do
     student_submission(name: 'student@example.com')
 
@@ -542,24 +560,6 @@ describe "speed grader" do
       wait_for_ajaximations
       f("#students_selectmenu-button").should have_class("graded")
     end
-  end
-
-  it "shows the first ungraded student with a submission" do
-    s1, s2, s3 = n_students_in_course(3)
-    s1.update_attribute :name, "A"
-    s2.update_attribute :name, "B"
-    s3.update_attribute :name, "C"
-
-    @assignment.grade_student s1, score: 10
-    @assignment.find_or_create_submission(s2).tap { |submission|
-      submission.student_entered_score = 5
-    }.save!
-    @assignment.submit_homework(s3, body: "Homework!?")
-
-    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    wait_for_ajaximations
-
-    fj("#students_selectmenu option[value=#{s3.id}]")[:selected].should be_true
   end
 
   context "grading display" do

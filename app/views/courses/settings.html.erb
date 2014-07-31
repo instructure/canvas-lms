@@ -359,7 +359,7 @@ TEXT
           <% if can_do(@context, @current_user, :update) %>
             <a href="#" class="edit_course_link btn"><i class="icon-edit"></i> <%= t('links.edit_course', %{Edit Course Details}) %></a>
           <% end %>
-          <% if Account.site_admin.grants_right?(@current_user, nil, :manage_courses) && Account.root_accounts.length > 1 %>
+          <% if Account.site_admin.grants_right?(@current_user, :manage_courses) && Account.root_accounts.length > 1 %>
             <a href="#" class="move_course_link btn"><i class="icon-arrow-right"></i> <%= t('links.move_course', %{Move To Another Account}) %></a>
           <% end %>
           <span class="course_form">
@@ -518,7 +518,7 @@ TEXT
   <% end %>
 </div><!-- end course details tab -->
 
-<% if Account.site_admin.grants_right?(@current_user, nil, :manage_courses) %>
+<% if Account.site_admin.grants_right?(@current_user, :manage_courses) %>
   <div id="move_course_dialog" style="display: none;">
     <h2><%= t('headings.move_course', %{Move the course to another root account}) %></h2>
     <%= t('deatils.move_course', %{Select a new root account for this course.  After you move the course you'll want to specify a new department for the course as well.}) %>

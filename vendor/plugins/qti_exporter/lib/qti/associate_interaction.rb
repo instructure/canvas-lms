@@ -196,14 +196,19 @@ class AssociateInteraction < AssessmentItemConverter
   end
   
   def get_all_matches_with_interaction(match_map)
-    if matches = @doc.at_css('associateInteraction')
+    @doc.css('associateInteraction').each do |matches|
       matches.css('simpleAssociableChoice').each do |m|
         match = {}
-        @question[:matches] << match
         extract_answer!(match, m)
-        match[:match_id] = unique_local_id
-        match_map[match[:text]] = match[:match_id]
-        match_map[m['identifier']] = match[:match_id]
+
+        if other_match = @question[:matches].detect{|om| match[:text].to_s.strip == om[:text].to_s.strip}
+          match_map[m['identifier']] = other_match[:match_id]
+        else
+          @question[:matches] << match
+          match[:match_id] = unique_local_id
+          match_map[match[:text]] = match[:match_id]
+          match_map[m['identifier']] = match[:match_id]
+        end
       end
     end
   end

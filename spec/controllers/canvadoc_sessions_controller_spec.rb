@@ -71,5 +71,13 @@ describe CanvadocSessionsController do
       get :show, blob: blob, hmac: Canvas::Security.hmac_sha1(blob)
       assert_status(401)
     end
+
+    it "allows nil users" do
+      remove_user_session
+      @blob[:user_id] = nil
+      blob = @blob.to_json
+      get :show, blob: blob, hmac: Canvas::Security.hmac_sha1(blob)
+      response.should redirect_to("https://example.com/sessions/SESSION/view?theme=dark")
+    end
   end
 end

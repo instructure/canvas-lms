@@ -20,8 +20,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe AccountNotification do
 
-  before do
-    account_notification 
+  before :once do
+    account_notification
     user
   end
 
@@ -117,6 +117,14 @@ describe AccountNotification do
         AccountNotification.display_for_user?(7, 3, Time.zone.parse('2012-09-02')).should == true
       end
     end
+  end
+end
+
+describe AccountNotification do
+
+  before do
+    account_notification
+    user
   end
 
   context "sharding" do

@@ -325,7 +325,7 @@ describe CommunicationChannelsController do
         user
         @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
-        @account.add_user(@user)
+        @account.account_users.create!(user: @user)
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
         @user.should be_creation_pending
 
@@ -342,7 +342,7 @@ describe CommunicationChannelsController do
         user
         @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
-        @account.add_user(@user)
+        @account.account_users.create!(user: @user)
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
         @user.should be_creation_pending
 

@@ -1,4 +1,4 @@
-<div class="group-description">
+<div class="group-description" role='button' tabindex='0' aria-controls="group_detail-{{id}}" aria-expanded='false'>
   <div class="outcome-icon {{status}}" data-tooltip title="{{statusTooltip}}" aria-label="Outcome Group: {{title}} status is {{statusTooltip}}">
     {{#if started}}
       {{#ifEqual status 'mastery'}}
@@ -14,10 +14,10 @@
       <i class="icon-empty"></i>
     {{/if}}
   </div>
-  <h3 class="group-title">{{title}}</h3>
+  <h3 class="group-title"><span role='button' tabindex='0'>{{title}}</span></h3>
   <div class="group-status" aria-label="{{mastery_count}} out of {{count}} outcomes mastered">
     <strong>{{mastery_count}}</strong>/{{count}} <span>Outcomes</span>
   </div>
 </div>
-<div class="outcomes">
+<div id="group_detail-{{id}}" class="outcomes">
 </div>

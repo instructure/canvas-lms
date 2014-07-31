@@ -26,8 +26,8 @@ class DiscussionTopicPresenter
   # Returns a boolean.
   def can_grade?(user=@user)
     topic.for_assignment? &&
-    (assignment.grants_right?(user, nil, :grade) ||
-      assignment.context.grants_right?(user, nil, :manage_assignments))
+    (assignment.grants_right?(user, :grade) ||
+      assignment.context.grants_right?(user, :manage_assignments))
   end
 
   # Public: Determine if the given user has permissions to view peer reviews.
@@ -37,7 +37,7 @@ class DiscussionTopicPresenter
   # Returns a boolean.
   def show_peer_reviews?(user)
     if assignment.present?
-      assignment.grants_right?(user, nil, :grade) &&
+      assignment.grants_right?(user, :grade) &&
         assignment.has_peer_reviews?
     else
       false
@@ -58,7 +58,7 @@ class DiscussionTopicPresenter
   # Returns a boolean.
   def should_show_rubric?(user)
     if assignment
-      has_attached_rubric? || assignment.grants_right?(user, nil, :update)
+      has_attached_rubric? || assignment.grants_right?(user, :update)
     else
       false
     end

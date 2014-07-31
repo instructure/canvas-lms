@@ -243,12 +243,22 @@ define([
     }
   }
 
+  function formattedSubmissionStateName(raw, submission) {
+    switch(raw) {
+      case "graded":
+        return I18n.t('graded', "graded");
+      case "not_graded":
+        return I18n.t('not_graded', "not graded");
+      case "not_submitted":
+        return I18n.t('not_submitted', 'not submitted');
+      case "resubmitted":
+        return I18n.t('graded_then_resubmitted', "graded, then resubmitted (%{when})", {'when': $.datetimeString(submission.submitted_at)});
+    }
+  }
+
   function classNameBasedOnStudent(student){
     var raw = submissionStateName(student.submission);
-    var formatted = raw.replace("_", " ");
-    if (raw === "resubmitted") {
-      formatted = I18n.t('graded_then_resubmitted', "graded, then resubmitted (%{when})", {'when': $.datetimeString(student.submission.submitted_at)});
-    }
+    var formatted = formattedSubmissionStateName(raw, student.submission);
     return {raw: raw, formatted: formatted};
   }
 
@@ -882,7 +892,9 @@ define([
 
       $multiple_submissions.change(function(e) {
         if (typeof EG.currentStudent.submission == 'undefined') EG.currentStudent.submission = {};
-        var i = parseInt(e.target.value, 10);
+        var i = e.target.value ?
+          parseInt(e.target.value, 10) :
+          EG.currentStudent.submission.submission_history.length - 1;
         EG.currentStudent.submission.currentSelectedIndex = i;
         EG.handleSubmissionSelectionChange();
       });
@@ -1141,7 +1153,7 @@ define([
         $turnitinInfoContainer = $("#submission_files_container .turnitin_info_container").empty();
         $.each(submission.versioned_attachments || [], function(i,a){
           var attachment = a.attachment;
-          if (attachment['crocodoc_available?'] ||
+          if (attachment.crocodoc_url ||
               attachment.canvadoc_url ||
               (attachment.scribd_doc && attachment.scribd_doc.created) ||
               $.isPreviewable(attachment.content_type, 'google')) {
@@ -1260,13 +1272,16 @@ define([
         })
       );
 
-      var gradedStudents = $.grep(jsonData.studentsWithSubmissions, function(s){
-        return (s.submission && s.submission.workflow_state === 'graded');
+      var gradedStudents = $.grep(jsonData.studentsWithSubmissions, function(s) {
+        return (s.submission &&
+                s.submission.workflow_state === 'graded' &&
+                s.submission.from_enrollment_type === "StudentEnrollment"
+        );
       });
-      var scores = $.map(gradedStudents, function(s){
+
+      var scores = $.map(gradedStudents , function(s){
         return s.submission.score;
       });
-      //scores shoud be an array that has all of the scores of the students that have submisisons
 
       if (scores.length) { //if there are some submissions that have been graded.
         $average_score_wrapper.show();
@@ -1288,9 +1303,10 @@ define([
       else { //there are no submissions that have been graded.
         $average_score_wrapper.hide();
       }
+
       $grded_so_far.html(
         I18n.t('portion_graded', '%{x} / %{y} Graded', {
-          x: scores.length,
+          x: gradedStudents.length,
           y: jsonData.context.students.length
         })
       );
@@ -1307,7 +1323,6 @@ define([
         $iframe_holder.empty();
 
         if (attachment) {
-          var crocodocAvailable = attachment['crocodoc_available?'];
           var scribdDocAvailable = attachment.scribd_doc && attachment.scribd_doc.created && attachment.workflow_state != 'errored' && attachment.scribd_doc.attributes.doc_id;
           var previewOptions = {
             height: '100%',
@@ -1322,27 +1337,10 @@ define([
             }
           };
         }
-        if (crocodocAvailable) {
-          var currentStudentIDAsOfAjaxCall = this.currentStudent.id;
-          var that = this;
-          $iframe_holder.show();
-          $iframe_holder.disableWhileLoading($.ajaxJSON(
-            '/submissions/' + this.currentStudent.submission.id + '/attachments/' + attachment.id + '/crocodoc_sessions/',
-            'POST',
-            {version: this.currentStudent.submission.currentSelectedIndex},
-            function(response) {
-              if (currentStudentIDAsOfAjaxCall == that.currentStudent.id) {
-                $iframe_holder.loadDocPreview($.extend(previewOptions, {
-                  crocodoc_session_url: response.session_url
-                }));
-              }
-            },
-            function() {
-              // pretend there isn't a crocodoc and try again
-              attachment['crocodoc_available?'] = false;
-              EG.handleSubmissionSelectionChange();
-            }
-          ));
+        if (attachment && attachment.crocodoc_url) {
+          $iframe_holder.show().loadDocPreview($.extend(previewOptions, {
+            crocodoc_session_url: attachment.crocodoc_url
+          }));
         }
         else if (attachment && attachment.canvadoc_url) {
           $iframe_holder.show().loadDocPreview($.extend(previewOptions, {
@@ -1378,6 +1376,7 @@ define([
             '/assignments/' + this.currentStudent.submission.assignment_id +
             '/submissions/' + this.currentStudent.submission.user_id +
             '?preview=true' + (
+
               this.currentStudent.submission &&
               !isNaN(this.currentStudent.submission.currentSelectedIndex) &&
               this.currentStudent.submission.currentSelectedIndex != null ?

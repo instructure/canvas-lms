@@ -37,8 +37,8 @@ class AssetUserAccess < ActiveRecord::Base
 
   scope :for_context, lambda { |context| where(:context_id => context, :context_type => context.class.to_s) }
   scope :for_user, lambda { |user| where(:user_id => user) }
-  scope :participations, where(:action_level => 'participate')
-  scope :most_recent, order('updated_at DESC')
+  scope :participations, -> { where(:action_level => 'participate') }
+  scope :most_recent, -> { order('updated_at DESC') }
 
   def category
     self.asset_category

@@ -23,17 +23,17 @@
               <a href="#"
                  data-id="outcome"><%= t(:learning_mastery, "Learning Mastery") %></a>
             </li>
-             <% end %>
+            <% end %>
           </ul>
         </nav>
         <div class="section-button-placeholder"></div>
         <% if @context.feature_enabled?(:post_grades) %>
         <div class="pull-right">
-          <nav class="gradebook-navigation">
+          <nav class="gradebook-navigation hidden">
             <ul class="nav nav-pills gradebook-navigation-pills pull-right">
               <li>
                 <a class="btn-outline" href="#"
-                   id="publish"><%= t(:post_grades, "Post Grades") %></a>
+                   id="post-grades-button"><%= t(:post_grades, "Post Grades") %></a>
               </li>
             </ul>
           </nav>

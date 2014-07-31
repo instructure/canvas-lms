@@ -2818,11 +2818,12 @@ tinymce.html.Styles = function(settings, schema) {
 				H : 'G|F',
 				G : 'br|span|bdo',
 				F : 'object|applet|img|map|iframe',
-				E : 'A|B|C',
+				E : 'A|B|C|AA',
 				D : 'accesskey|tabindex|onfocus|onblur',
 				C : 'onclick|ondblclick|onmousedown|onmouseup|onmouseover|onmousemove|onmouseout|onkeypress|onkeydown|onkeyup',
 				B : 'lang|xml:lang|dir',
-				A : 'id|class|style|title'
+        A : 'id|class|style|title',
+        AA: 'aria-label|role|aria-labelledby|aria-atomic|aria-busy|aria-controls|aria-describedby|aria-disabled|aria-dropeffect|aria-flowto|aria-grabbed|aria-haspopup|aria-hidden|aria-invalid|aria-label|aria-labelledby|aria-live|aria-owns|aria-relevant|aria-autocomplete|aria-checked|aria-disabled|aria-expanded|aria-haspopup|aria-hidden|aria-invalid|aria-label|aria-level|aria-multiline|aria-multiselectable|aria-orientation|aria-pressed|aria-readonly|aria-required|aria-selected|aria-sort|aria-valuemax|aria-valuemin|aria-valuenow|aria-valuetext'
 			}, 'script[id|charset|type|language|src|defer|xml:space][]' + 
 				'style[B|id|type|media|title|xml:space][]' + 
 				'object[E|declare|classid|codebase|data|type|codetype|archive|standby|width|height|usemap|name|tabindex|align|border|hspace|vspace][#|param|Y]' + 

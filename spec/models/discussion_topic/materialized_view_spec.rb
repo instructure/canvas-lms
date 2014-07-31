@@ -23,7 +23,7 @@ describe DiscussionTopic::MaterializedView do
     list.map { |l| l = l.slice('id', 'replies'); l['replies'] = map_to_ids_and_replies(l['replies'] || []); l }
   end
 
-  before do
+  before :once do
     topic_with_nested_replies
     @view = DiscussionTopic::MaterializedView.find_by_discussion_topic_id(@topic.id)
   end

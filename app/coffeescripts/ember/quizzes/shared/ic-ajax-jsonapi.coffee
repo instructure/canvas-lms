@@ -19,4 +19,4 @@ define [
     else
       $.extend(true, options, url: url, opts)
 
-    ajax.call null, newArguments
+    ajax.request newArguments

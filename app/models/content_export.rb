@@ -92,7 +92,7 @@ class ContentExport < ActiveRecord::Base
   end
   handle_asynchronously :export_course, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1
 
-  def queue_api_job
+  def queue_api_job(opts)
     if self.job_progress
       p = self.job_progress
     else
@@ -104,7 +104,7 @@ class ContentExport < ActiveRecord::Base
     p.user = self.user
     p.save!
 
-    export_course
+    export_course(opts)
   end
 
   def referenced_files
@@ -164,12 +164,12 @@ class ContentExport < ActiveRecord::Base
     is_set?(selected_content[symbol]) || is_set?(selected_content[:everything])
   end
 
-  def add_item_to_export(obj)
-    return unless obj && obj.class.respond_to?(:table_name)
+  def add_item_to_export(obj, type=nil)
+    return unless obj && (type || obj.class.respond_to?(:table_name))
     return if selected_content.empty?
     return if is_set?(selected_content[:everything])
 
-    asset_type = obj.class.table_name
+    asset_type = type || obj.class.table_name
     selected_content[asset_type] ||= {}
     selected_content[asset_type][CC::CCHelper.create_key(obj)] = true
   end
@@ -210,12 +210,12 @@ class ContentExport < ActiveRecord::Base
     self.job_progress.try(:update_completion!, val)
   end
   
-  scope :active, where("workflow_state<>'deleted'")
-  scope :not_for_copy, where("export_type<>?", COURSE_COPY)
-  scope :common_cartridge, where(:export_type => COMMON_CARTRIDGE)
-  scope :qti, where(:export_type => QTI)
-  scope :course_copy, where(:export_type => COURSE_COPY)
-  scope :running, where(:workflow_state => ['created', 'exporting'])
+  scope :active, -> { where("workflow_state<>'deleted'") }
+  scope :not_for_copy, -> { where("export_type<>?", COURSE_COPY) }
+  scope :common_cartridge, -> { where(:export_type => COMMON_CARTRIDGE) }
+  scope :qti, -> { where(:export_type => QTI) }
+  scope :course_copy, -> { where(:export_type => COURSE_COPY) }
+  scope :running, -> { where(:workflow_state => ['created', 'exporting']) }
 
   private
 

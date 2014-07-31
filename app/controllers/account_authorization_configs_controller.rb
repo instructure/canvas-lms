@@ -131,7 +131,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   #
   # @example_request
   #
-  #   curl 'https://<canvas>/api/v1/account/<account_id>/account_authorization_configs' \ 
+  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/account_authorization_configs' \
   #        -H 'Authorization: Bearer <token>'
   #
   # @returns [AccountAuthorizationConfig]
@@ -272,7 +272,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   #
   # @example_request
   #   # Create LDAP config
-  #   curl 'https://<canvas>/api/v1/account/<account_id>/account_authorization_configs' \ 
+  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/account_authorization_configs' \
   #        -F 'auth_type=ldap' \ 
   #        -F 'auth_host=ldap.mydomain.edu' \ 
   #        -F 'auth_filter=(sAMAccountName={{login}})' \ 
@@ -283,7 +283,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   #
   # @example_request
   #   # Create SAML config
-  #   curl 'https://<canvas>/api/v1/account/<account_id>/account_authorization_configs' \ 
+  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/account_authorization_configs' \
   #        -F 'auth_type=saml' \ 
   #        -F 'idp_entity_id=<idp_entity_id>' \ 
   #        -F 'log_in_url=<login_url>' \ 
@@ -293,7 +293,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   #
   # @example_request
   #   # Create CAS config
-  #   curl 'https://<canvas>/api/v1/account/<account_id>/account_authorization_configs' \ 
+  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/account_authorization_configs' \
   #        -F 'auth_type=cas' \ 
   #        -F 'auth_base=cas.mydomain.edu' \ 
   #        -F 'log_in_url=<login_url>' \ 
@@ -385,7 +385,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   #
   # @example_request
   #   # update SAML config
-  #   curl -XPUT 'https://<canvas>/api/v1/account/<account_id>/account_authorization_configs/<id>' \ 
+  #   curl -XPUT 'https://<canvas>/api/v1/accounts/<account_id>/account_authorization_configs/<id>' \
   #        -F 'idp_entity_id=<new_idp_entity_id>' \ 
   #        -F 'log_in_url=<new_url>' \ 
   #        -H 'Authorization: Bearer <token>'
@@ -416,7 +416,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   # Get the specified authorization config
   #
   # @example_request
-  #   curl 'https://<canvas>/api/v1/account/<account_id>/account_authorization_configs/<id>' \ 
+  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/account_authorization_configs/<id>' \
   #        -H 'Authorization: Bearer <token>'
   #
   # @returns AccountAuthorizationConfig
@@ -430,7 +430,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   # Delete the config
   #
   # @example_request
-  #   curl -XDELETE 'https://<canvas>/api/v1/account/<account_id>/account_authorization_configs/<id>' \ 
+  #   curl -XDELETE 'https://<canvas>/api/v1/accounts/<account_id>/account_authorization_configs/<id>' \
   #        -H 'Authorization: Bearer <token>'
   def destroy
     aac = @account.account_authorization_configs.find params[:id]
@@ -481,7 +481,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   # Get the discovery url
   #
   # @example_request
-  #   curl 'https://<canvas>/api/v1/account/<account_id>/account_authorization_configs/discovery_url' \ 
+  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/account_authorization_configs/discovery_url' \
   #        -H 'Authorization: Bearer <token>'
   #
   # @returns DiscoveryUrl
@@ -500,7 +500,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   # attempt to authenticate the user.
   #
   # @example_request
-  #   curl -XPUT 'https://<canvas>/api/v1/account/<account_id>/account_authorization_configs/discovery_url' \ 
+  #   curl -XPUT 'https://<canvas>/api/v1/accounts/<account_id>/account_authorization_configs/discovery_url' \
   #        -F 'discovery_url=<new_url>' \ 
   #        -H 'Authorization: Bearer <token>'
   #
@@ -523,7 +523,7 @@ class AccountAuthorizationConfigsController < ApplicationController
   # Clear discovery url
   # 
   # @example_request
-  #   curl -XDELETE 'https://<canvas>/api/v1/account/<account_id>/account_authorization_configs/discovery_url' \ 
+  #   curl -XDELETE 'https://<canvas>/api/v1/accounts/<account_id>/account_authorization_configs/discovery_url' \
   #        -H 'Authorization: Bearer <token>'
   #
   def destroy_discovery_url

@@ -19,7 +19,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Quizzes::QuizQuestionDataFixer do
 
-  before(:each) do
+  before(:once) do
     @bad = {:correct_comments=>"",
             :question_bank_name=>"Quiz",
             :question_type=>"multiple_choice_question",
@@ -51,9 +51,12 @@ describe Quizzes::QuizQuestionDataFixer do
                       {:migration_id=>"QUE_1017_A2", :text=>"False", :weight=>0, :id=>2279}]}.with_indifferent_access
   end
 
-  it "should fix questions from old version on assessment question" do
+  let_once(:bank) do
     course
     bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
+  end
+
+  it "should fix questions from old version on assessment question" do
     aq = bank.assessment_questions.create(:question_data => @good)
     aq.migration_id = "yes_i_have_one"
     aq.with_versioning(&:save)
@@ -89,8 +92,6 @@ describe Quizzes::QuizQuestionDataFixer do
   end
 
   it "should fix questions from quiz question" do
-    course
-    bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
     aq = bank.assessment_questions.create(:question_data => @bad.to_hash)
 
     quiz = @course.quizzes.create!(:title => "test quiz")

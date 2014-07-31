@@ -1,6 +1,6 @@
 <li class="user" id="enrollment_<%= account_user ? account_user.id : 'blank' %>"<%= ' style="display: none;"' unless account_user %>>
   <a href="<%= user_url(account_user ? account_user.user_id : '{{ user_id }}') %>" class="user_name name"><%= account_user.try(:user).try(:name) %></a>
-  <% if can_do(@context, @current_user, :manage_account_memberships) %>
+  <% if !account_user || can_do(account_user, @current_user, :destroy) %>
     <a href="<%= account_remove_account_user_url(@context.id, account_user ? account_user.id : '{{ id }}') %>" class="remove_account_user_link no-hover" title="<%= t(:remove_admin_tooltip, "Remove this admin") %>"><i class="icon-end standalone-icon"></i></a>
   <% end -%>
   <span class="membership_type"><%= account_user.try(:readable_type) %></span>

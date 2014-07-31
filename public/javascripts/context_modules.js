@@ -592,6 +592,7 @@ define([
         $module.attr('id', 'context_module_' + data.context_module.id);
 
         // Set this module up with correct data attributes
+        $module.data('moduleId', data.context_module.id);
         $module.data('module-url', "/courses/" + data.context_module.context_id + "/modules/" + data.context_module.id);
         $module.data('workflow-state', data.context_module.workflow_state);
         if(data.context_module.workflow_state == "unpublished"){
@@ -605,10 +606,14 @@ define([
         var $publishIcon = $module.find('.publish-icon');
         // new module, setup publish icon and other stuff
         if (ENV.ENABLE_DRAFT && !$publishIcon.data('id')) {
-          var collapse = $module.find('h2.collapse_module_link');
-          var expand = $module.find('h2.collapse_module_link');
-          var href = collapse.attr('href');
-          $(collapse, expand).attr('href', href.replace('{{ id }}', data.context_module.id));
+          var fixLink = function(locator, attribute) {
+              el = $module.find(locator);
+              el.attr(attribute, el.attr(attribute).replace('{{ id }}', data.context_module.id));
+          }
+          fixLink('h2.collapse_module_link', 'href');
+          fixLink('h2.expand_module_link', 'href');
+          fixLink('.reorder_items_url', 'href');
+          fixLink('.add_module_item_link', 'rel');
           var publishData = {
             moduleType: 'module',
             id: data.context_module.id,

@@ -175,7 +175,7 @@ describe CalendarEventsApiController, type: :request do
 
     it "should allow specifying an unenrolled but accessible context" do
       unrelated_course = Course.create!(:account => Account.default, :name => "unrelated course")
-      Account.default.add_user(@user)
+      Account.default.account_users.create!(user: @user)
       CalendarEvent.create!(:title => "from unrelated one", :start_at => Time.now, :end_at => 5.hours.from_now) { |c| c.context = unrelated_course }
 
       json = api_call(:get, "/api/v1/calendar_events",

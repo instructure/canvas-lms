@@ -31,6 +31,8 @@ unless CANVAS_RAILS2
   end
 
   RSpec.configure do |c|
+    c.color_enabled = true
+
     c.around(:each) do |example|
       attempts = 0
       begin
@@ -277,15 +279,6 @@ def truncate_all_tables
   end
 end
 
-def truncate_all_cassandra_tables
-  Canvas::Cassandra::DatabaseBuilder.config_names.each do |cass_config|
-    db = Canvas::Cassandra::DatabaseBuilder.from_config(cass_config)
-    db.tables.each do |table|
-      db.execute("TRUNCATE #{table}")
-    end
-  end
-end
-
 # wipe out the test db, in case some non-transactional tests crapped out before
 # cleaning up after themselves
 truncate_all_tables
@@ -318,6 +311,12 @@ Mocha::Mock.class_eval do
 
   def marshal_load(data)
     raise "Mocks aren't really serializeable!"
+  end
+
+  def to_yaml(opts = {})
+    YAML.quick_emit(self.object_id, opts) do |out|
+      out.scalar(nil, 'null')
+    end
   end
 
   def respond_to_with_marshalling?(symbol, include_private = false)
@@ -414,10 +413,39 @@ end
 
   config.include Helpers
 
+  if CANVAS_RAILS2
+    require 'spec/onceler_noop'
+    config.include Onceler::Noop
+  else
+    config.include Onceler::BasicHelpers
+
+    # rspec 2+ only runs global before(:all)'s before the top-level
+    # groups, not before each nested one. so we need to reset some
+    # things to play nicely with its caching
+    Onceler.configure do |c|
+      c.before :record do
+        Account.clear_special_account_cache!
+        AdheresToPolicy::Cache.clear
+      end
+    end
+
+    Onceler.instance_eval do
+      # since once-ler creates potentially multiple levels of transaction
+      # nesting, we need a way to know the base level so we can compare it
+      # to AR::Conn#open_transactions. that will tell us if something is
+      # "committed" or not (from the perspective of the spec)
+      def base_transactions
+        # if not recording, it's presumed we're in a spec, in which case
+        # transactional fixtures add one more level
+        open_transactions + (recording? ? 0 : 1)
+      end
+    end
+  end
+
+  Notification.after_create { Notification.reset_cache! }
   config.before :all do
     # so before(:all)'s don't get confused
     Account.clear_special_account_cache!
-    Notification.after_create { Notification.reset_cache! }
     AdheresToPolicy::Cache.clear
 
     # allow tests to still run in non-draft state even though it's hard-coded on
@@ -436,6 +464,7 @@ end
     I18n.locale = :en
     Time.zone = 'UTC'
     Account.clear_special_account_cache!
+    AdheresToPolicy::Cache.clear
     Setting.reset_cache!
     ConfigFile.unstub
     HostUrl.reset_cache!
@@ -444,7 +473,6 @@ end
     Attachment.clear_cached_mime_ids
     RoleOverride.clear_cached_contexts
     Delayed::Job.redis.flushdb if Delayed::Job == Delayed::Backend::Redis::Job
-    truncate_all_cassandra_tables
     Rails::logger.try(:info, "Running #{self.class.description} #{@method_name}")
     Attachment.domain_namespace = nil
   end
@@ -527,17 +555,12 @@ end
     account = opts[:account] || Account.default
     @user = opts[:user] || account.shard.activate { user(opts) }
     @admin = @user
-    account_user = @user.account_users.build(:account => account, :membership_type => opts[:membership_type] || 'AccountAdmin')
-    account_user.shard = account.shard
-    account_user.save!
+    account.account_users.create!(:user => @user, :membership_type => opts[:membership_type])
     @user
   end
 
   def site_admin_user(opts={})
-    @user = opts[:user] || user(opts)
-    @admin = @user
-    Account.site_admin.add_user(@user, opts[:membership_type] || 'AccountAdmin')
-    @user
+    account_admin_user(opts.merge(account: Account.site_admin))
   end
 
   def user(opts={})
@@ -563,8 +586,6 @@ end
       cc.workflow_state = 'active' if opts[:active_cc] || opts[:active_all]
       cc.workflow_state = opts[:cc_state] if opts[:cc_state]
     end
-    @cc.should_not be_nil
-    @cc.should_not be_new_record
     @cc
   end
 
@@ -734,9 +755,11 @@ end
     req_service = opts[:required_account_service] || nil
     roles = opts[:roles] || []
     message = opts[:message] || "hi there"
+    subj = opts[:subject] || "this is a subject"
     @account = opts[:account] || Account.default
-    @announcement = @account.announcements.build(message: message, required_account_service: req_service)
+    @announcement = @account.announcements.build(subject: subj, message: message, required_account_service: req_service)
     @announcement.start_at = opts[:start_at] || 5.minutes.ago.utc
+    @announcement.end_at = opts[:end_at] || 1.day.from_now.utc
     @announcement.account_notification_roles.build(roles.map { |r| {account_notification_id: @announcement.id, role_type: r} }) unless roles.empty?
     @announcement.save!
   end

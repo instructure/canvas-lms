@@ -1,0 +1,34 @@
+{
+  "name": "ic-lazy-list",
+  "version": "0.2.2",
+  "main": "main.js",
+  "authors": [
+    "Ryan Florence <rpflorence@gmail.com>"
+  ],
+  "dependencies": {
+    "ember": "^1.2.0",
+    "ic-ajax": "^1.0.4"
+  },
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "ember-template-compiler": "http://builds.emberjs.com/release/ember-template-compiler.js"
+  },
+  "homepage": "https://github.com/instructure/ic-lazy-list",
+  "_release": "0.2.2",
+  "_resolution": {
+    "type": "version",
+    "tag": "v0.2.2",
+    "commit": "a8e9978a760c439a64976c0c34450a4610de3007"
+  },
+  "_source": "git://github.com/instructure/ic-lazy-list.git",
+  "_target": "~0.2.2",
+  "_originalSource": "ic-lazy-list",
+  "_direct": true
+}

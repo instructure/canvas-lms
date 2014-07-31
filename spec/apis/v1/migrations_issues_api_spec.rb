@@ -76,7 +76,7 @@ describe MigrationIssuesController, type: :request do
     end
 
     it "should return error messages to site admins" do
-      Account.site_admin.add_user(@user)
+      Account.site_admin.account_users.create!(user: @user)
       json = api_call(:get, @issue_url, @params)
       json['error_message'].should == 'secret error'
       json['error_report_html_url'].should == "http://www.example.com/error_reports/0"

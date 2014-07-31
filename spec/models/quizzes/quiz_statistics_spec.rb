@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 require 'csv'
 
 describe Quizzes::QuizStatistics do
-  before(:each) do
+  before(:once) do
     student_in_course(:active_all => true)
     @quiz = @course.quizzes.create!
     @quiz.quiz_questions.create!(:question_data => { :name => "test 1" })

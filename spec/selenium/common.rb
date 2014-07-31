@@ -312,9 +312,8 @@ shared_examples_for "all selenium tests" do
   end
 
   def login_as(username = "nobody@example.com", password = "asdfasdf", expect_success = true)
-    # log out (just in case)
-    driver.navigate.to(app_host + '/logout')
-
+    destroy_session(true)
+    driver.navigate.to(app_host + '/login')
     if expect_success
       expect_new_page_load { fill_in_login_form(username, password) }
       f('#identity .logout').should be_present
@@ -336,9 +335,12 @@ shared_examples_for "all selenium tests" do
     end
   end
 
-  def destroy_session(pseudonym, real_login)
+  def destroy_session(real_login)
     if real_login
-      driver.navigate.to(app_host + '/logout')
+      logout_link = f('#identity .logout a')
+      if logout_link
+        expect_new_page_load { logout_link.click() }
+      end
     else
       PseudonymSession.any_instance.unstub :session_credentials
       PseudonymSession.any_instance.unstub :record

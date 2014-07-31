@@ -28,9 +28,12 @@ describe Quizzes::QuizSubmissionZipper do
   end
   let(:zip_attachment) { stub(:id => 1, :user => nil) }
 
-  before :each do
+  before :once do
     @student = course_with_student
     @quiz = course_quiz !!:active
+  end
+
+  before :each do
     @quiz.stubs(:quiz_submissions).returns submission_stubs
     Attachment.stubs(:where).with(:id => ["1","2"]).returns [attachments.first,attachments.second]
     @zipper = Quizzes::QuizSubmissionZipper.new(:quiz => @quiz,

@@ -20,7 +20,9 @@
       <%= notification.subject %>
     </div>
     <div class="message user_content">
-      <%= user_content(notification.message.gsub(/(({{)|(%7B%7B))ACCOUNT_DOMAIN((}})|(%7D%7D))/,request.host_with_port)) unless notification.message.nil? %>
+      <% # I don't see a problem with using gsub given that there are only potential substituations%>
+      <% #    but if you found this comment while looking to add a third, it might be time to consider being smarter about this :p %>
+      <%= user_content(notification.message.gsub(/(({{)|(%7B%7B))ACCOUNT_DOMAIN((}})|(%7D%7D))/,request.host_with_port).gsub(/(({{)|(%7B%7B))CANVAS_USER_ID((}})|(%7D%7D))/,@current_user.global_id.to_s)) unless notification.message.nil? %>
     </div>
   </div>
 </div>

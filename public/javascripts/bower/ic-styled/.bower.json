@@ -1,6 +1,6 @@
 {
   "name": "ic-styled",
-  "version": "1.1.4",
+  "version": "1.1.6",
   "authors": [
     "Ryan Florence <rpflorence@gmail.com>"
   ],
@@ -20,16 +20,16 @@
     "**/.*"
   ],
   "dependencies": {
-    "ember": "~1.2.0"
+    "ember": "^1.2.0"
   },
   "homepage": "https://github.com/instructure/ic-styled",
-  "_release": "1.1.4",
+  "_release": "1.1.6",
   "_resolution": {
     "type": "version",
-    "tag": "v1.1.4",
-    "commit": "8f07d9bf8d66b8b37cf599d59b0225c97b366809"
+    "tag": "v1.1.6",
+    "commit": "06caf97b2c3be00ea3c4987d8f9640210d505a69"
   },
   "_source": "git://github.com/instructure/ic-styled.git",
-  "_target": "~1.1.0",
+  "_target": "~1.1.6",
   "_originalSource": "ic-styled"
 }

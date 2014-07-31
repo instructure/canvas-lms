@@ -105,6 +105,7 @@
 class FoldersController < ApplicationController
   include Api::V1::Folders
   include Api::V1::Attachment
+  include AttachmentHelper
 
   before_filter :require_context, :except => [:api_index, :show, :api_destroy, :update, :create, :create_file]
 
@@ -226,7 +227,7 @@ class FoldersController < ApplicationController
             :sub_folders => sub_folders_scope.by_position.map { |f| f.as_json(folders_options) },
             :files => files.map { |f|
               f.as_json(files_options).tap { |json|
-                json['attachment']['canvadoc_session_url'] = f.canvadoc_url(@current_user)
+                json['attachment'].merge! doc_preview_json(f, @current_user)
               }
             }
           }

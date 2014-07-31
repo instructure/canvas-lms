@@ -250,6 +250,20 @@ class EnrollmentsApiController < ApplicationController
     render :json => enrollments.map { |e| enrollment_json(e, @current_user, session, includes) }
   end
 
+  # @API Enrollment by ID
+  # Get an Enrollment object by Enrollment ID
+  #
+  # @argument id [Integer]
+  #  The ID of the enrollment object
+  # @returns Enrollment
+
+  def show
+    enrollment = Enrollment.find(params[:id])
+    if enrollment.user_id == @current_user.id || enrollment.root_account == @context && authorized_action(@context, @current_user, [:read_roster])
+      #render enrollment object if requesting user is the current_user or user is authorized to read enrollment.
+      render :json => enrollment_json(enrollment, @current_user, session)
+    end
+  end
   # @API Enroll a user
   # Create a new user enrollment for a course or section.
   #

@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe AssetUserAccess do
-  before :each do
+  before :once do
     @course = Account.default.courses.create!(:name => 'My Course')
     @assignment = @course.assignments.create!(:title => 'My Assignment')
     @user = User.create!

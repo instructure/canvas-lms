@@ -22,7 +22,7 @@ module Alerts
   describe Alerts::UngradedCount do
 
     describe "#should_not_receive_message?" do
-      before(:each) do
+      before :once do
         course_with_teacher(:active_all => 1)
         @teacher = @user
         @user = nil

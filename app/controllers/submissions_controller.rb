@@ -190,7 +190,7 @@ class SubmissionsController < ApplicationController
   before_filter :require_context
 
   include Api::V1::Submission
-  
+
   def index
     @assignment = @context.assignments.active.find(params[:assignment_id])
     if authorized_action(@assignment, @current_user, :grade)
@@ -203,7 +203,7 @@ class SubmissionsController < ApplicationController
       end
     end
   end
-  
+
   def show
     @assignment = @context.assignments.active.find(params[:assignment_id])
     if @context_enrollment && @context_enrollment.is_a?(ObserverEnrollment) && @context_enrollment.associated_user_id
@@ -227,14 +227,13 @@ class SubmissionsController < ApplicationController
 
     @submission = @assignment.submissions.where(user_id: @user).first
     @submission ||= @assignment.submissions.build(:user => @user)
-    @submission.grants_rights?(@current_user, session)
     @rubric_association = @assignment.rubric_association
     @rubric_association.assessing_user_id = @submission.user_id if @rubric_association
     # can't just check the permission, because peer reviewiers can never read the grade
     if @assignment.muted? && !@submission.grants_right?(@current_user, :read_grade)
       @visible_rubric_assessments = []
     else
-      @visible_rubric_assessments = @submission.rubric_assessments.select{|a| a.grants_rights?(@current_user, session, :read)[:read]}.sort_by{|a| [a.assessment_type == 'grading' ? CanvasSort::First : CanvasSort::Last, Canvas::ICU.collation_key(a.assessor_name)] }
+      @visible_rubric_assessments = @submission.rubric_assessments.select{|a| a.grants_right?(@current_user, session, :read)}.sort_by{|a| [a.assessment_type == 'grading' ? CanvasSort::First : CanvasSort::Last, Canvas::ICU.collation_key(a.assessor_name)] }
     end
 
     @assessment_request = @submission.assessment_requests.find_by_assessor_id(@current_user.id) rescue nil
@@ -288,7 +287,7 @@ class SubmissionsController < ApplicationController
           format.html
         end
         if !json_handled
-          format.json { 
+          format.json {
             @submission.limit_comments(@current_user, session)
             excludes = @assignment.grants_right?(@current_user, session, :grade) ? [:grade, :score] : []
             render :json => @submission.as_json(
@@ -370,7 +369,7 @@ class SubmissionsController < ApplicationController
     @assignment = @context.assignments.active.find(params[:assignment_id])
     @assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @current_user)
     if authorized_action(@assignment, @current_user, :submit)
-      if @assignment.locked_for?(@current_user) && !@assignment.grants_right?(@current_user, nil, :update)
+      if @assignment.locked_for?(@current_user) && !@assignment.grants_right?(@current_user, :update)
         flash[:notice] = t('errors.can_not_submit_locked_assignment', "You can't submit an assignment when it is locked")
         redirect_to named_context_url(@context, :context_assignment_user, @assignment.id)
         return
@@ -589,7 +588,7 @@ class SubmissionsController < ApplicationController
         end
         params[:submission][:comment_attachments] = attachments#.map{|a| a.id}.join(",")
       end
-      unless @submission.grants_rights?(@current_user, session, :submit)[:submit]
+      unless @submission.grants_right?(@current_user, session, :submit)
         @request = @submission.assessment_requests.find_by_assessor_id(@current_user.id) if @current_user
         params[:submission] = {
           :comment => params[:submission][:comment],
@@ -610,7 +609,7 @@ class SubmissionsController < ApplicationController
       end
       respond_to do |format|
         if @submissions
-          @submissions.each{|s| s.limit_comments(@current_user, session) unless @submission.grants_rights?(@current_user, session, :submit)[:submit] }
+          @submissions.each{|s| s.limit_comments(@current_user, session) unless @submission.grants_right?(@current_user, session, :submit) }
           @submissions = @submissions.select{|s| s.grants_right?(@current_user, session, :read) }
           flash[:notice] = t('assignment_submitted', 'Assignment submitted.')
 
@@ -621,10 +620,10 @@ class SubmissionsController < ApplicationController
             :except => [:quiz_submission,:submission_history],
             :comments => admin_in_context ? :submission_comments : :visible_submission_comments
           }).merge(:permissions => { :user => @current_user, :session => session, :include_permissions => false })
-          format.json { 
+          format.json {
             render :json => @submissions.map{ |s| s.as_json(json_args) }, :status => :created, :location => course_gradebook_url(@submission.assignment.context)
           }
-          format.text { 
+          format.text {
             render :json => @submissions.map{ |s| s.as_json(json_args) }, :status => :created, :location => course_gradebook_url(@submission.assignment.context)
           }
         else

@@ -24,7 +24,7 @@ describe UsersController do
     before :each do
       @a = Account.default
       @u = user(:active_all => true)
-      @a.add_user(@u)
+      @a.account_users.create!(user: @u)
       user_session(@user)
       @t1 = @a.default_enrollment_term
       @t2 = @a.enrollment_terms.create!(:name => 'Term 2')
@@ -442,7 +442,7 @@ describe UsersController do
 
         before do
           user_with_pseudonym(:account => account)
-          account.add_user(@user)
+          account.account_users.create!(user: @user)
           user_session(@user, @pseudonym)
         end
 
@@ -497,7 +497,7 @@ describe UsersController do
       it "should notify the user if a merge opportunity arises" do
         account = Account.create!
         user_with_pseudonym(:account => account)
-        account.add_user(@user)
+        account.account_users.create!(user: @user)
         user_session(@user, @pseudonym)
         @admin = @user
 
@@ -514,7 +514,7 @@ describe UsersController do
 
         account = Account.create!
         user_with_pseudonym(:account => account)
-        account.add_user(@user)
+        account.account_users.create!(user: @user)
         user_session(@user, @pseudonym)
         @admin = @user
 
@@ -720,7 +720,7 @@ describe UsersController do
     end
 
     describe 'as site admin' do
-      before { Account.site_admin.add_user(@admin) }
+      before { Account.site_admin.account_users.create!(user: @admin) }
 
       it 'warns about merging a user with itself' do
         user = User.create!
@@ -815,7 +815,7 @@ describe UsersController do
       PageView.stubs(:page_view_method).returns(:db)
       user_with_pseudonym
       admin = @user
-      Account.site_admin.add_user(admin)
+      Account.site_admin.account_users.create!(user: admin)
       user_session(admin)
       @shard1.activate do
         account = Account.create!
@@ -847,7 +847,7 @@ describe UsersController do
     it "should not associate the user with target user's shard for non-db page views" do
       user_with_pseudonym
       admin = @user
-      Account.site_admin.add_user(admin)
+      Account.site_admin.account_users.create!(user: admin)
       user_session(admin)
       @shard1.activate do
         account = Account.create!

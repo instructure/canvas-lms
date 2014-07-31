@@ -96,7 +96,7 @@ module SIS
             if File.extname(file).downcase == '.zip'
               tmp_dir = Dir.mktmpdir
               @tmp_dirs << tmp_dir
-              unzip_file(file, tmp_dir)
+              CanvasUnzip::extract_archive(file, tmp_dir)
               Dir[File.join(tmp_dir, "**/**")].each do |fn|
                 process_file(tmp_dir, fn[tmp_dir.size+1 .. -1])
               end
@@ -316,16 +316,6 @@ module SIS
         @pause_duration = (@batch.data[:pause_duration] || Setting.get('sis_batch_pause_duration', 0)).to_f
       end
     
-      def unzip_file(file, dest)
-        Zip::File.open(file) do |zip_file|
-          zip_file.each do |f|
-            f_path = File.join(dest, f.name)
-            FileUtils.mkdir_p(File.dirname(f_path))
-            zip_file.extract(f, f_path) unless File.exist?(f_path)
-          end
-        end
-      end
-
       def rebalance_csvs(importer)
         rows_per_batch = (@rows[importer].to_f / @parallelism).ceil.to_i
         new_csvs = []

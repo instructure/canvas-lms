@@ -48,7 +48,7 @@ module AppCenter
       return {} unless valid_app_center?
 
       uri = URI.parse(@app_center.settings['apps_index_endpoint'])
-      params = URI.decode_www_form(uri.query || [])
+      params = URI.decode_www_form(uri.query || '')
       params << ['access_token', @app_center.settings['token']]
       uri.query = URI.encode_www_form(params)
 
@@ -122,7 +122,7 @@ module AppCenter
         #uri = URI.parse("#{base_url}#{app_reviews_endpoint}/#{token}/#{user_id}")
 
         uri = URI.parse("#{base_url}#{app_reviews_endpoint}")
-        params = URI.decode_www_form(uri.query || [])
+        params = URI.decode_www_form(uri.query || '')
         params << ['organization[access_token]', @app_center.settings['token']]
         params << ['membership[remote_uid]', user_id]
         uri.query = URI.encode_www_form(params)

@@ -65,6 +65,10 @@ module Polling
   #         "description": "The results of the submissions of the poll. Each key is the poll choice id, and the value is the count of submissions.",
   #         "example": { "144": 10, "145": 3, "146": 27, "147": 8 },
   #         "type": "object"
+  #       },
+  #       "poll_submissions": {
+  #         "description": "If the poll session has public results, this will return an array of all submissions, viewable by both students and teachers. If the results are not public, for students it will return their submission only.",
+  #         "$ref": "PollSubmission"
   #       }
   #     }
   #   }

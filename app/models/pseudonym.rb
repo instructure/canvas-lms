@@ -381,7 +381,7 @@ class Pseudonym < ActiveRecord::Base
     nil
   end
 
-  scope :active, where(workflow_state: 'active')
+  scope :active, -> { where(workflow_state: 'active') }
 
   def self.serialization_excludes; [:crypted_password, :password_salt, :reset_password_token, :persistence_token, :single_access_token, :perishable_token, :sis_ssha]; end
 

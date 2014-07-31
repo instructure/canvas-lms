@@ -80,7 +80,7 @@ module ActiveSupport::Callbacks
     def suspended_callback_ancestor
       unless defined?(@suspended_callback_ancestor)
         @suspended_callback_ancestor = is_a?(Class) ? superclass : self.class
-        @suspended_callback_ancestor = nil unless @suspended_callback_ancestor.respond_to?(:suspended_callback?)
+        @suspended_callback_ancestor = nil unless @suspended_callback_ancestor.respond_to?(:suspended_callback?, true)
       end
       @suspended_callback_ancestor
     end

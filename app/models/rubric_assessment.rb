@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# Associates an artifact with a rubric while offering an assessment and 
+# Associates an artifact with a rubric while offering an assessment and
 # scoring using the rubric.  Assessments are grouped together in one
 # RubricAssociation, which may or may not have an association model.
 class RubricAssessment < ActiveRecord::Base
@@ -40,17 +40,17 @@ class RubricAssessment < ActiveRecord::Base
 
   validates_presence_of :assessment_type, :rubric_id, :artifact_id, :artifact_type, :assessor_id
   validates_length_of :comments, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
-  
+
   before_save :update_artifact_parameters
   before_save :htmlify_rating_comments
   after_save :update_assessment_requests, :update_artifact
   after_save :track_outcomes
-  
+
   def track_outcomes
     outcome_ids = (self.data || []).map{|r| r[:learning_outcome_id] }.compact.uniq
     send_later_if_production(:update_outcomes_for_assessment, outcome_ids) unless outcome_ids.empty?
   end
-  
+
   def update_outcomes_for_assessment(outcome_ids=[])
     return if outcome_ids.empty?
     alignments = self.rubric_association.association_object.learning_outcome_alignments.find_all_by_learning_outcome_id(outcome_ids)
@@ -140,7 +140,7 @@ class RubricAssessment < ActiveRecord::Base
       Submission.where(:id => self.artifact).update_all(:has_rubric_assessment => true)
       if self.rubric_association && self.rubric_association.use_for_grading && self.artifact.score != self.score
         if self.rubric_association.association_object.grants_right?(self.assessor, nil, :grade)
-          # TODO: this should go through assignment.grade_student to 
+          # TODO: this should go through assignment.grade_student to
           # handle group assignments.
           self.artifact.workflow_state = 'graded'
           self.artifact.update_attributes(:score => self.score, :graded_at => Time.now, :grade_matches_current_submission => true, :grader => self.assessor)
@@ -149,25 +149,25 @@ class RubricAssessment < ActiveRecord::Base
     end
   end
   protected :update_artifact
-  
+
   set_policy do
     given {|user| user && self.assessor_id == user.id }
     can :create and can :read and can :update
-    
+
     given {|user| user && self.user_id == user.id }
     can :read
-    
-    given {|user, session| self.rubric_association && self.rubric_association.grants_rights?(user, session, :manage)[:manage] }
+
+    given {|user, session| self.rubric_association && self.rubric_association.grants_right?(user, session, :manage) }
     can :create and can :read and can :delete
 
-    given {|user, session| 
-      self.rubric_association && 
-      self.rubric_association.grants_rights?(user, session, :manage)[:manage] &&
-      (self.rubric_association.association_object.context.grants_right?(self.assessor, nil, :manage_rubrics) rescue false)
+    given {|user, session|
+      self.rubric_association &&
+      self.rubric_association.grants_right?(user, session, :manage) &&
+      (self.rubric_association.association_object.context.grants_right?(self.assessor, :manage_rubrics) rescue false)
     }
     can :update
   end
-  
+
   scope :of_type, lambda { |type| where(:assessment_type => type.to_s) }
 
   def methods_for_serialization(*methods)
@@ -177,19 +177,19 @@ class RubricAssessment < ActiveRecord::Base
   def serialization_methods
     @serialization_methods || []
   end
-  
+
   def assessor_name
     self.assessor.short_name rescue t('unknown_user', "Unknown User")
   end
-  
+
   def assessment_url
     self.artifact.url rescue nil
   end
-  
+
   def ratings
     self.data
   end
-  
+
   def related_group_submissions_and_assessments
     if self.rubric_association && self.rubric_association.association_object.is_a?(Assignment) && !self.rubric_association.association_object.grade_group_students_individually
       students = self.rubric_association.association_object.group_students(self.user).last
@@ -201,5 +201,5 @@ class RubricAssessment < ActiveRecord::Base
       []
     end
   end
-  
+
 end

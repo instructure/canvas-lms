@@ -185,12 +185,27 @@ describe Polling::PollSessionsController, type: :request do
         2.times { create_submission(choice1) }
         1.times { create_submission(choice2) }
 
-        student = student_in_course(active_user:true).user
-        @user = student
+        @user = student_in_course(active_user:true).user
 
         json = get_show['poll_sessions'].first
 
-        json.should_not have_key('poll_submissions')
+        json.should have_key('poll_submissions')
+        json['poll_submissions'].size.should be_zero
+      end
+
+      it "does embed the student's own submission" do
+        choice = @poll.poll_choices.create!(text: 'Choice A', is_correct: true)
+        @user = student_in_course(active_user:true).user
+
+        @poll_session.poll_submissions.create!(
+          poll: @poll,
+          user: @user,
+          poll_choice: choice
+        )
+
+        json = get_show['poll_sessions'].first
+        json.should have_key('poll_submissions')
+        json['poll_submissions'].size.should be(1)
       end
 
       context "when has_public_results is false" do

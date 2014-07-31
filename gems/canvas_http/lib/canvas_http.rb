@@ -30,9 +30,8 @@ module CanvasHttp
       raise(TooManyRedirectsError) if redirect_limit <= 0
 
       _, uri = CanvasHttp.validate_url(url_str)
+      http = CanvasHttp.connection_for_uri(uri)
       request = Net::HTTP::Get.new(uri.request_uri, other_headers)
-      http = Net::HTTP.new(uri.host, uri.port)
-      http.use_ssl = uri.scheme == 'https'
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE
       http.request(request) do |response|
         case response
@@ -63,6 +62,13 @@ module CanvasHttp
     raise ArgumentError unless %w(http https).include?(uri.scheme.downcase)
     raise(RelativeUriError) if uri.host.nil? || uri.host.strip.empty?
     return value, uri
+  end
+
+  # returns a Net::HTTP connection object for the given URI object
+  def self.connection_for_uri(uri)
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = (uri.scheme == 'https')
+    return http
   end
 
   # returns a tempfile with a filename based on the uri (same extension, if

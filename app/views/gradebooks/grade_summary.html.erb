@@ -80,7 +80,7 @@
   <select id="course_url">
     <% @presenter.selectable_courses.each do |course| %>
       <%
-         url = if course.grants_rights?(@current_user, nil, :manage_grades, :view_all_grades).values.any?
+         url = if course.grants_any_right?(@current_user, :manage_grades, :view_all_grades)
            context_url(course, :context_student_grades_url, @presenter.student_id)
          else
            context_url(course, :context_grades_url)

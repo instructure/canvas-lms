@@ -67,7 +67,7 @@ define [
       @rawCollections.groups.each (group) =>
         return unless group.get('outcomes').length
         parentObj = group.get('parent_outcome_group')
-        parentId = if parentObj then parentObj.id else group
+        parentId = if parentObj then parentObj.id else group.id
         unless parent = tmp.get(parentId)
           parent = tmp.add(new Section(id: parentId, path: @getPath(parentId)))
         parent.get('groups').add(group)

@@ -217,21 +217,24 @@ module Alerts
     end
 
     context "notification alert info" do
-      before do
+      before :once do
         Notification.create!(:name => 'Alert')
         course_with_teacher(:active_all => 1)
         @teacher = @user
         @user = nil
         student_in_course(:active_all => 1)
-        @pseudonym = mock('Pseudonym')
-        @pseudonym.stubs(:destroyed?).returns(false)
-        Pseudonym.stubs(:find_by_user_id).returns(@pseudonym)
         a = @user.communication_channels.create(:path => "a@example.com")
         a.confirm!
         @assignment = @course.assignments.new(:title => "some assignment")
         @assignment.workflow_state = "published"
         @assignment.save
         @submission = @assignment.submit_homework(@user, :body => 'body')
+      end
+
+      before :each do
+        @pseudonym = mock('Pseudonym')
+        @pseudonym.stubs(:destroyed?).returns(false)
+        Pseudonym.stubs(:find_by_user_id).returns(@pseudonym)
       end
 
       it "should tell you what the alert is about timespan" do

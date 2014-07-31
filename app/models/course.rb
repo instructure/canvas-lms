@@ -491,14 +491,14 @@ class Course < ActiveRecord::Base
     accounts
   end
 
-  scope :recently_started, lambda { where(:start_at => 1.month.ago..Time.zone.now).order("start_at DESC").limit(10) }
-  scope :recently_ended, lambda { where(:conclude_at => 1.month.ago..Time.zone.now).order("start_at DESC").limit(10) }
-  scope :recently_created, lambda { where("created_at>?", 1.month.ago).order("created_at DESC").limit(50).includes(:teachers) }
+  scope :recently_started, -> { where(:start_at => 1.month.ago..Time.zone.now).order("start_at DESC").limit(10) }
+  scope :recently_ended, -> { where(:conclude_at => 1.month.ago..Time.zone.now).order("start_at DESC").limit(10) }
+  scope :recently_created, -> { where("created_at>?", 1.month.ago).order("created_at DESC").limit(50).includes(:teachers) }
   scope :for_term, lambda {|term| term ? where(:enrollment_term_id => term) : scoped }
-  scope :active_first, lambda { order("CASE WHEN courses.workflow_state='available' THEN 0 ELSE 1 END, #{best_unicode_collation_key('name')}") }
+  scope :active_first, -> { order("CASE WHEN courses.workflow_state='available' THEN 0 ELSE 1 END, #{best_unicode_collation_key('name')}") }
   scope :name_like, lambda { |name| where(wildcard('courses.name', 'courses.sis_source_id', 'courses.course_code', name)) }
   scope :needs_account, lambda { |account, limit| where(:account_id => nil, :root_account_id => account).limit(limit) }
-  scope :active, where("courses.workflow_state<>'deleted'")
+  scope :active, -> { where("courses.workflow_state<>'deleted'") }
   scope :least_recently_updated, lambda { |limit| order(:updated_at).limit(limit) }
   scope :manageable_by_user, lambda { |*args|
     # args[0] should be user_id, args[1], if true, will include completed
@@ -515,19 +515,19 @@ class Course < ActiveRecord::Base
          WHERE courses.workflow_state <> 'deleted') as course_users
        ON course_users.course_id = courses.id")
   }
-  scope :not_deleted, where("workflow_state<>'deleted'")
+  scope :not_deleted, -> { where("workflow_state<>'deleted'") }
 
-  scope :with_enrollments, lambda {
+  scope :with_enrollments, -> {
     where("EXISTS (?)", Enrollment.active.where("enrollments.course_id=courses.id"))
   }
-  scope :without_enrollments, lambda {
+  scope :without_enrollments, -> {
     where("NOT EXISTS (?)", Enrollment.active.where("enrollments.course_id=courses.id"))
   }
-  scope :completed, lambda {
+  scope :completed, -> {
     joins(:enrollment_term).
         where("courses.workflow_state='completed' OR courses.conclude_at<? OR enrollment_terms.end_at<?", Time.now.utc, Time.now.utc)
   }
-  scope :not_completed, lambda {
+  scope :not_completed, -> {
     joins(:enrollment_term).
         where("courses.workflow_state<>'completed' AND
           (courses.conclude_at IS NULL OR courses.conclude_at>=?) AND
@@ -538,13 +538,13 @@ class Course < ActiveRecord::Base
       none :
       where("EXISTS (?)", Enrollment.active.where("enrollments.course_id=courses.id AND enrollments.type='TeacherEnrollment' AND enrollments.user_id IN (?)", teacher_ids))
   }
-  scope :by_associated_accounts, lambda{ |account_ids|
+  scope :by_associated_accounts, lambda { |account_ids|
     account_ids.empty? ?
       none :
       where("EXISTS (?)", CourseAccountAssociation.where("course_account_associations.course_id=courses.id AND course_account_associations.account_id IN (?)", account_ids))
   }
 
-  scope :deleted, where(:workflow_state => 'deleted')
+  scope :deleted, -> { where(:workflow_state => 'deleted') }
 
   set_broadcast_policy do |p|
     p.dispatch :grade_weight_changed
@@ -1211,12 +1211,12 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def account_chain
-    self.account.account_chain
+  def account_chain(opts = {})
+    self.account.account_chain(opts)
   end
 
-  def account_chain_ids
-    account_chain.map(&:id)
+  def account_chain_ids(opts = {})
+    account_chain(opts).map(&:id)
   end
 
   def institution_name
@@ -1627,7 +1627,7 @@ class Course < ActiveRecord::Base
         e.already_enrolled = true
         e.attributes = {
           :course_section => section,
-          :workflow_state => 'invited',
+          :workflow_state => e.is_a?(StudentViewEnrollment) ? 'active' : 'invited',
           :limit_privileges_to_course_section => limit_privileges_to_course_section } if e.completed? || e.rejected? || e.deleted?
       end
       # if we're creating a new enrollment, we want to return it as the correct
@@ -1830,7 +1830,7 @@ class Course < ActiveRecord::Base
       context = Context.find_by_asset_string("#{context_type}_#{id}") rescue nil
       if context
         next if to_context.respond_to?(:context) && context == to_context.context
-        if context.grants_right?(user, nil, :manage_content)
+        if context.grants_right?(user, :manage_content)
           html = self.migrate_content_links(html, context, to_context, content_types_to_copy)
         else
           html = self.migrate_content_links(html, context, to_context, content_types_to_copy, user)
@@ -2187,9 +2187,9 @@ class Course < ActiveRecord::Base
     end
   end
 
-  # derived from policy for Group#grants_right?(user, nil, :read)
+  # derived from policy for Group#grants_right?(user, :read)
   def groups_visible_to(user, groups = active_groups)
-    if grants_rights?(user, nil, :manage_groups, :view_group_pages).values.any?
+    if grants_any_right?(user, :manage_groups, :view_group_pages)
       # course-wide permissions; all groups are visible
       groups
     else
@@ -2204,7 +2204,7 @@ class Course < ActiveRecord::Base
     permissions = require_message_permission ?
       [:send_messages] :
       [:manage_grades, :manage_students, :manage_admin_users, :read_roster, :view_all_grades]
-    granted_permissions = self.grants_rights?(user, nil, *permissions).select {|key, value| value}.keys
+    granted_permissions = self.granted_rights(user, *permissions)
     if granted_permissions.empty?
       :restricted # e.g. observer, can only see admins in the course
     elsif visibilities.present? && visibility_limited_to_course_sections?(user, visibilities)
@@ -2340,14 +2340,14 @@ class Course < ActiveRecord::Base
         tab[:hidden_unused] = true if tab[:id] == TAB_QUIZZES && !active_record_types[:quizzes]
         tab[:hidden_unused] = true if tab[:id] == TAB_ASSIGNMENTS && !active_record_types[:assignments]
         tab[:hidden_unused] = true if tab[:id] == TAB_PAGES && !active_record_types[:pages] && !allow_student_wiki_edits
-        tab[:hidden_unused] = true if tab[:id] == TAB_CONFERENCES && !active_record_types[:conferences] && !self.grants_right?(user, nil, :create_conferences)
+        tab[:hidden_unused] = true if tab[:id] == TAB_CONFERENCES && !active_record_types[:conferences] && !self.grants_right?(user, :create_conferences)
         tab[:hidden_unused] = true if tab[:id] == TAB_ANNOUNCEMENTS && !active_record_types[:announcements]
         tab[:hidden_unused] = true if tab[:id] == TAB_OUTCOMES && !active_record_types[:outcomes]
       end
 
       # remove tabs that the user doesn't have access to
       unless opts[:for_reordering]
-        unless self.grants_rights?(user, opts[:session], :read, :manage_content).values.any?
+        unless self.grants_any_right?(user, opts[:session], :read, :manage_content)
           tabs.delete_if { |t| t[:id] == TAB_HOME }
           tabs.delete_if { |t| t[:id] == TAB_ANNOUNCEMENTS }
           tabs.delete_if { |t| t[:id] == TAB_PAGES }
@@ -2356,40 +2356,40 @@ class Course < ActiveRecord::Base
           tabs.delete_if { |t| t[:id] == TAB_COLLABORATIONS }
           tabs.delete_if { |t| t[:id] == TAB_MODULES }
         end
-        unless self.grants_rights?(user, opts[:session], :participate_as_student, :manage_content).values.any?
+        unless self.grants_any_right?(user, opts[:session], :participate_as_student, :manage_content)
           tabs.delete_if{ |t| t[:visibility] == 'members' }
         end
-        unless self.grants_rights?(user, opts[:session], :read, :manage_content, :manage_assignments).values.any?
+        unless self.grants_any_right?(user, opts[:session], :read, :manage_content, :manage_assignments)
           tabs.delete_if { |t| t[:id] == TAB_ASSIGNMENTS }
           tabs.delete_if { |t| t[:id] == TAB_QUIZZES }
         end
-        unless self.grants_rights?(user, opts[:session], :read, :read_syllabus, :manage_content, :manage_assignments).values.any?
+        unless self.grants_any_right?(user, opts[:session], :read, :read_syllabus, :manage_content, :manage_assignments)
           tabs.delete_if { |t| t[:id] == TAB_SYLLABUS }
         end
         tabs.delete_if{ |t| t[:visibility] == 'admins' } unless self.grants_right?(user, opts[:session], :manage_content)
-        if self.grants_rights?(user, opts[:session], :manage_content, :manage_assignments).values.any?
+        if self.grants_any_right?(user, opts[:session], :manage_content, :manage_assignments)
           tabs.detect { |t| t[:id] == TAB_ASSIGNMENTS }[:manageable] = true
           tabs.detect { |t| t[:id] == TAB_SYLLABUS }[:manageable] = true
           tabs.detect { |t| t[:id] == TAB_QUIZZES }[:manageable] = true
         end
-        tabs.delete_if { |t| t[:hidden] && t[:external] } unless opts[:api] && self.grants_rights?(user, nil, :manage_content)
-        tabs.delete_if { |t| t[:id] == TAB_GRADES } unless self.grants_rights?(user, opts[:session], :read_grades, :view_all_grades, :manage_grades).values.any?
-        tabs.detect { |t| t[:id] == TAB_GRADES }[:manageable] = true if self.grants_rights?(user, opts[:session], :view_all_grades, :manage_grades).values.any?
-        tabs.delete_if { |t| t[:id] == TAB_PEOPLE } unless self.grants_rights?(user, opts[:session], :read_roster, :manage_students, :manage_admin_users).values.any?
-        tabs.detect { |t| t[:id] == TAB_PEOPLE }[:manageable] = true if self.grants_rights?(user, opts[:session], :manage_students, :manage_admin_users).values.any?
-        tabs.delete_if { |t| t[:id] == TAB_FILES } unless self.grants_rights?(user, opts[:session], :read, :manage_files).values.any?
+        tabs.delete_if { |t| t[:hidden] && t[:external] } unless opts[:api] && self.grants_right?(user, :manage_content)
+        tabs.delete_if { |t| t[:id] == TAB_GRADES } unless self.grants_any_right?(user, opts[:session], :read_grades, :view_all_grades, :manage_grades)
+        tabs.detect { |t| t[:id] == TAB_GRADES }[:manageable] = true if self.grants_any_right?(user, opts[:session], :view_all_grades, :manage_grades)
+        tabs.delete_if { |t| t[:id] == TAB_PEOPLE } unless self.grants_any_right?(user, opts[:session], :read_roster, :manage_students, :manage_admin_users)
+        tabs.detect { |t| t[:id] == TAB_PEOPLE }[:manageable] = true if self.grants_any_right?(user, opts[:session], :manage_students, :manage_admin_users)
+        tabs.delete_if { |t| t[:id] == TAB_FILES } unless self.grants_any_right?(user, opts[:session], :read, :manage_files)
         tabs.detect { |t| t[:id] == TAB_FILES }[:manageable] = true if self.grants_right?(user, opts[:session], :managed_files)
-        tabs.delete_if { |t| t[:id] == TAB_DISCUSSIONS } unless self.grants_rights?(user, opts[:session], :read_forum, :moderate_forum, :post_to_forum).values.any?
+        tabs.delete_if { |t| t[:id] == TAB_DISCUSSIONS } unless self.grants_any_right?(user, opts[:session], :read_forum, :moderate_forum, :post_to_forum)
         tabs.detect { |t| t[:id] == TAB_DISCUSSIONS }[:manageable] = true if self.grants_right?(user, opts[:session], :moderate_forum)
         tabs.delete_if { |t| t[:id] == TAB_SETTINGS } unless self.grants_right?(user, opts[:session], :read_as_admin)
 
-        if !user || !self.grants_right?(user, nil, :manage_content)
+        if !user || !self.grants_right?(user, :manage_content)
           # remove some tabs for logged-out users or non-students
-          if grants_rights?(user, nil, :read_as_admin, :participate_as_student).values.none?
+          unless grants_any_right?(user, :read_as_admin, :participate_as_student)
             tabs.delete_if {|t| [TAB_PEOPLE, TAB_OUTCOMES].include?(t[:id]) }
           end
 
-          unless discussion_topics.new.grants_right?(user, nil, :read)
+          unless discussion_topics.new.grants_right?(user, :read)
             tabs.delete_if { |t| t[:id] == TAB_ANNOUNCEMENTS }
           end
 

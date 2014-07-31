@@ -84,8 +84,8 @@ class ContentTag < ActiveRecord::Base
 
   alias_method :published?, :active?
 
-  scope :active, where(:workflow_state => 'active')
-  scope :not_deleted, where("content_tags.workflow_state<>'deleted'")
+  scope :active, -> { where(:workflow_state => 'active') }
+  scope :not_deleted, -> { where("content_tags.workflow_state<>'deleted'") }
 
   attr_accessor :skip_touch
   def touch_context_module
@@ -414,8 +414,8 @@ class ContentTag < ActiveRecord::Base
       where(:context_type => context.class.to_s, :context_id => context)
     end
   }
-  scope :learning_outcome_alignments, where(:tag_type => 'learning_outcome')
-  scope :learning_outcome_links, where(:tag_type => 'learning_outcome_association', :associated_asset_type => 'LearningOutcomeGroup', :content_type => 'LearningOutcome')
+  scope :learning_outcome_alignments, -> { where(:tag_type => 'learning_outcome') }
+  scope :learning_outcome_links, -> { where(:tag_type => 'learning_outcome_association', :associated_asset_type => 'LearningOutcomeGroup', :content_type => 'LearningOutcome') }
 
   # only intended for learning outcome links
   def self.outcome_title_order_by_clause

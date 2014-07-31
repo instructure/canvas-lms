@@ -177,13 +177,13 @@ describe ConversationParticipant do
   end
 
   context "for_masquerading_user scope" do
-    before do
+    before :once do
       @a1 = Account.create
       @a2 = Account.create
       @a3 = Account.create
       @admin_user = user
-      @a1.add_user(@admin_user)
-      @a2.add_user(@admin_user)
+      @a1.account_users.create!(user: @admin_user)
+      @a2.account_users.create!(user: @admin_user)
       @a3.pseudonyms.create!(:user => @admin_user, :unique_id => 'a3') # in the account, but not an admin
 
       @target_user = user
@@ -202,7 +202,7 @@ describe ConversationParticipant do
     end
 
     it "should let site admins see everything" do
-      Account.site_admin.add_user(@admin_user)
+      Account.site_admin.account_users.create!(user: @admin_user)
       Account.site_admin.stubs(:grants_right?).with(@admin_user, :become_user).returns(false)
       convos = @target_user.conversations.for_masquerading_user(@admin_user)
       convos.size.should eql 4
@@ -217,7 +217,7 @@ describe ConversationParticipant do
   end
 
   context "participants" do
-    before do
+    before :once do
       @me = course_with_student(:active_all => true).user
       @u1 = student_in_course(:active_all => true).user
       @u2 = student_in_course(:active_all => true).user
@@ -264,7 +264,7 @@ describe ConversationParticipant do
   end
 
   context "move_to_user" do
-    before do
+    before :once do
       @user1 = user_model
       @user2 = user_model
     end
@@ -427,22 +427,27 @@ describe ConversationParticipant do
       @user2.reload.unread_conversations_count.should eql 1
       other_guy.reload.unread_conversations_count.should eql 1
     end
+  end
 
-    context "sharding" do
-      specs_require_sharding
+  context "move_to_user with sharding" do
+    specs_require_sharding
 
-      it "should be able to move to a user on a different shard" do
-        u1 = User.create!
-        cp = u1.initiate_conversation([u1])
-        @shard1.activate do
-          u2 = User.create!
-          cp.move_to_user(u2)
-          cp.reload
-          cp.user.should == u2
-          cp2 = u2.all_conversations.first
-          cp2.should_not == cp
-          cp2.shard.should == @shard1
-        end
+    before do
+      @user1 = user_model
+      @user2 = user_model
+    end
+
+    it "should be able to move to a user on a different shard" do
+      u1 = User.create!
+      cp = u1.initiate_conversation([u1])
+      @shard1.activate do
+        u2 = User.create!
+        cp.move_to_user(u2)
+        cp.reload
+        cp.user.should == u2
+        cp2 = u2.all_conversations.first
+        cp2.should_not == cp
+        cp2.shard.should == @shard1
       end
     end
   end

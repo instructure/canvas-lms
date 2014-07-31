@@ -10,8 +10,8 @@ class AccountNotification < ActiveRecord::Base
 
   EXPORTABLE_ASSOCIATIONS = [:account, :user, :account_notification_roles]
 
-  validates_presence_of :start_at, :end_at, :account_id
-  before_validation :infer_defaults
+  validates_presence_of :start_at, :end_at, :subject, :message, :account_id
+  validate :validate_dates
   belongs_to :account, :touch => true
   belongs_to :user
   has_many :account_notification_roles, dependent: :destroy
@@ -23,10 +23,10 @@ class AccountNotification < ActiveRecord::Base
 
   validates_inclusion_of :months_in_display_cycle, in: 1..48, allow_nil: true
 
-  def infer_defaults
-    self.start_at ||= Time.now.utc
-    self.end_at ||= self.start_at + 2.weeks
-    self.end_at = [self.end_at, self.start_at].max
+  def validate_dates
+    if self.start_at && self.end_at
+      errors.add(:end_at, t('errors.invalid_account_notification_end_at', "Account notification end time precedes start time")) if self.end_at < self.start_at
+    end
   end
 
   def self.for_user_and_account(user, account)

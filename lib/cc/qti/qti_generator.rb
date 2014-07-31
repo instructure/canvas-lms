@@ -196,7 +196,7 @@ module CC
           if quiz.assignment && !quiz.assignment.deleted?
             assignment_migration_id = CCHelper.create_key(quiz.assignment)
             doc.assignment(:identifier=>assignment_migration_id) do |a|
-              AssignmentResources.create_assignment(a, quiz.assignment)
+              AssignmentResources.create_canvas_assignment(a, quiz.assignment)
             end
           end
           if quiz.assignment_group_id

@@ -23,7 +23,6 @@ describe "/quizzes/quizzes/statistics" do
   it "should render with non-nil submission statistics" do
     course_with_student
     view_context
-    ActiveRecord::Base.clear_cached_contexts
     assigns[:quiz] = q = @course.quizzes.create!(:quiz_type => 'assignment').tap{|q| q.should be_graded }
     assigns[:submitted_users] = []
     assigns[:statistics] = { :submission_score_high => 20,
@@ -65,7 +64,6 @@ describe "/quizzes/quizzes/statistics" do
   it "should render with nil submission statistics" do
     course_with_student
     view_context
-    ActiveRecord::Base.clear_cached_contexts
     assigns[:quiz] = @course.quizzes.create!
     assigns[:statistics] = { :submission_duration_average => 0,
                              :questions => [] }

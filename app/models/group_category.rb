@@ -80,7 +80,7 @@ class GroupCategory < ActiveRecord::Base
     end
   end
 
-  scope :active, where(:deleted_at => nil)
+  scope :active, -> { where(:deleted_at => nil) }
 
   scope :other_than, lambda { |cat| where("group_categories.id<>?", cat.id || 0) }
 

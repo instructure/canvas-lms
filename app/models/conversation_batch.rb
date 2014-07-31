@@ -19,7 +19,7 @@ class ConversationBatch < ActiveRecord::Base
 
   validates_presence_of :user_id, :workflow_state, :root_conversation_message_id
 
-  scope :in_progress, where(:workflow_state => ['created', 'sending'])
+  scope :in_progress, -> { where(:workflow_state => ['created', 'sending']) }
 
   attr_accessible
   attr_accessor :mode

@@ -51,9 +51,9 @@ class ConversationMessage < ActiveRecord::Base
 
   after_create :generate_user_note!
 
-  scope :human, where("NOT generated")
-  scope :with_attachments, where("attachment_ids<>'' OR has_attachments") # TODO: simplify post-migration
-  scope :with_media_comments, where("media_comment_id IS NOT NULL OR has_media_objects") # TODO: simplify post-migration
+  scope :human, -> { where("NOT generated") }
+  scope :with_attachments, -> { where("attachment_ids<>'' OR has_attachments") } # TODO: simplify post-migration
+  scope :with_media_comments, -> { where("media_comment_id IS NOT NULL OR has_media_objects") } # TODO: simplify post-migration
   scope :by_user, lambda { |user_or_id| where(:author_id => user_or_id) }
 
   def self.preload_latest(conversation_participants, author=nil)

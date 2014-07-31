@@ -25,12 +25,12 @@ define [
     ajax.defineFixture window.ENV.submission_zip_url,
       response: clone data
       jqXHR: { getResponseHeader: -> {} }
-      textStatus: ''
+      textStatus: 'success'
 
     ajax.defineFixture window.ENV.numbers_url,
       response: clone numbers
       jqXHR: { getResponseHeader: -> {} }
-      textStatus: ''
+      textStatus: 'success'
 
   makeAvailable: ->
     data.attachment.file_state = 100

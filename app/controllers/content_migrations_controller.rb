@@ -428,7 +428,12 @@ class ContentMigrationsController < ApplicationController
   def content_list
     @content_migration = @context.content_migrations.find(params[:id])
     base_url = api_v1_course_content_migration_selective_data_url(@context, @content_migration)
-    render :json => @content_migration.get_content_list(params[:type], base_url)
+    formatter = Canvas::Migration::Helpers::SelectiveContentFormatter.new(@content_migration, base_url)
+
+    unless formatter.valid_type?(params[:type])
+      return render :json => {:message => "unsupported migration type"}, :status => :bad_request
+    end
+    render :json => formatter.get_content_list(params[:type])
   end
 
   protected

@@ -6,7 +6,7 @@ describe "public courses" do
   include_examples "in-process server selenium tests"
 
   def ensure_logged_out
-    driver.navigate.to(app_host + '/logout')
+    destroy_session(true)
   end
 
   def validate_selector_displayed(selector1, selector2)

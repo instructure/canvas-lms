@@ -69,7 +69,7 @@ module Polling
     end
 
     def visible_to?(user, session)
-      self.cached_context_grants_right?(user, session, :read) &&
+      self.course.grants_right?(user, session, :read) &&
       (self.course_section ? self.course_section.grants_right?(user, session, :read) : true)
     end
 

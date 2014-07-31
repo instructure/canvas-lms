@@ -58,7 +58,7 @@ Unknown text type: ignored mattext with texttype="text" treated as text/plain
 <calculated>
 <formulas decimal_places="2"><formula>temp = 1 + x</formula><formula>temp + x + y + brian</formula>
 </formulas>
-<answer_tolerance type="None">0.1</answer_tolerance>
+<answer_tolerance type="None">0.1%</answer_tolerance>
 <vars>
 <var name="x" scale="2">
 <min>1</min>

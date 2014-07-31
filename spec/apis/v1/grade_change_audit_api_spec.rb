@@ -18,6 +18,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../cassandra_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 
 describe "GradeChangeAudit API", type: :request do
   before do
@@ -58,7 +59,7 @@ describe "GradeChangeAudit API", type: :request do
 
     def fetch_for_context(context, options={})
       type = context.class.to_s.downcase unless type = options.delete(:type)
-      id = context.id.to_s
+      id = Shard.global_id_for(context).to_s
 
       arguments = { controller: 'grade_change_audit_api', action: "for_#{type}", :"#{type}_id" => id, format: 'json' }
       query_string = []

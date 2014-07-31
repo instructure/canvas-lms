@@ -48,23 +48,6 @@ describe "security" do
   end
 
   describe "permissions" do
-    it "should flush the role_override caches on permission changes" do
-      course_with_teacher_logged_in
-
-      get "/courses/#{@course.to_param}/statistics"
-      assert_response :success
-
-      RoleOverride.create!(:context => @course.account,
-                           :permission => 'read_reports',
-                           :enrollment_type => 'TeacherEnrollment',
-                           :enabled => false)
-
-      # if this second get doesn't fail with a permission denied error, we've
-      # still got the permissions cached and haven't seen the change
-      get "/courses/#{@course.to_param}/statistics"
-      assert_response 401
-    end
-
     # if we end up moving the permissions cache to memcache, this test won't be
     # valid anymore and we need some more extensive tests for actual cache
     # invalidation. right now, though, this is the only really valid way to
@@ -313,7 +296,7 @@ describe "security" do
       c.should be_present
 
       expect {
-        get "/logout"
+        delete "/logout"
       }.to change(SessionPersistenceToken, :count).by(-1)
       cookies['pseudonym_credentials'].should_not be_present
       SessionPersistenceToken.find_by_pseudonym_credentials(CGI.unescape(c)).should be_nil
@@ -338,7 +321,7 @@ describe "security" do
       s3.https!
       s3.get "/", {}, "HTTP_COOKIE" => "pseudonym_credentials=#{c1}"
       s3.response.should be_success
-      s3.get "/logout"
+      s3.delete "/logout"
       # make sure c2 can still work
       s4 = open_session
       s4.https!

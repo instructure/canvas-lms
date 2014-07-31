@@ -14,8 +14,10 @@ describe Quizzes::QuizStatistics::ItemAnalysis::Item do
     end
   end
 
-  let(:item) {
+  before(:once) {
     simple_quiz_with_submissions %w{T T A}, %w{T T A}, %w{T F A}, %w{T T B}, %w{T T}
+  }
+  let(:item) {
     @summary = Quizzes::QuizStatistics::ItemAnalysis::Summary.new(@quiz)
     @summary.sorted_items.last
   }

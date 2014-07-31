@@ -28,7 +28,7 @@ describe AccountsController do
   def cross_listed_course
     account_with_admin_logged_in
     @account1 = Account.create!
-    @account1.add_user(@user)
+    @account1.account_users.create!(user: @user)
     @course1 = @course
     @course1.account = @account1
     @course1.save!
@@ -302,7 +302,7 @@ describe AccountsController do
       user
       user_session(@user)
       @account = Account.create!
-      Account.site_admin.add_user(@user)
+      Account.site_admin.account_users.create!(user: @user)
       post 'update', :id => @account.id, :account => { :settings => { 
         :global_includes => true,
         :enable_profiles => true,
@@ -322,7 +322,7 @@ describe AccountsController do
       user_session(user)
       @account = Account.create!
       Account.register_service(:test3, { name: 'test3', description: '', expose_to_ui: :setting, default: false, expose_to_ui_proc: proc { |user, account| account == @account } })
-      Account.site_admin.add_user(@user)
+      Account.site_admin.account_users.create!(user: @user)
       post 'update', id: @account.id, account: {
         services: {
           'test1' => '1',
@@ -355,7 +355,7 @@ describe AccountsController do
                                           :enrollment_type => 'quota-setter'
           @account.role_overrides.create! :permission => 'manage_storage_quotas', :enabled => true,
                                           :enrollment_type => 'quota-setter'
-          @account.add_user @user, 'quota-setter'
+          @account.account_users.create!(user: @user, membership_type: 'quota-setter')
         end
         
         it "should allow setting default quota (mb)" do
@@ -392,7 +392,7 @@ describe AccountsController do
           custom_account_role 'quota-loser', :account => @account
           @account.role_overrides.create! :permission => 'manage_account_settings', :enabled => true,
                                           :enrollment_type => 'quota-loser'
-          @account.add_user @user, 'quota-loser'
+          @account.account_users.create!(user: @user, membership_type: 'quota-loser')
         end
         
         it "should disallow setting default quota (mb)" do

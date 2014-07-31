@@ -5,12 +5,13 @@ class ContextExternalTool < ActiveRecord::Base
   has_many :content_tags, :as => :content
   belongs_to :context, :polymorphic => true
   validates_inclusion_of :context_type, :allow_nil => true, :in => ['Course', 'Account']
-  attr_accessible :privacy_level, :domain, :url, :shared_secret, :consumer_key, 
+  attr_accessible :privacy_level, :domain, :url, :shared_secret, :consumer_key,
                   :name, :description, :custom_fields, :custom_fields_string,
                   :course_navigation, :account_navigation, :user_navigation,
                   :resource_selection, :editor_button, :homework_submission,
-                  :course_home_sub_navigation,
-                  :config_type, :config_url, :config_xml, :tool_id
+                  :course_home_sub_navigation, :course_settings_sub_navigation,
+                  :config_type, :config_url, :config_xml, :tool_id,
+                  :integration_type
 
   validates_presence_of :context_id, :context_type, :workflow_state
   validates_presence_of :name, :consumer_key, :shared_secret
@@ -21,7 +22,7 @@ class ContextExternalTool < ActiveRecord::Base
   validate :url_or_domain_is_set
   serialize :settings
   attr_accessor :config_type, :config_url, :config_xml
-  
+
   before_save :infer_defaults, :validate_vendor_help_link
   after_save :touch_context
   validate :check_for_xml_error
@@ -35,11 +36,16 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user, session| self.cached_context_grants_right?(user, session, :update) }
+    given { |user, session| self.context.grants_right?(user, session, :update) }
     can :read and can :update and can :delete
   end
-  
-  EXTENSION_TYPES = [:user_navigation, :course_navigation, :account_navigation, :resource_selection, :editor_button, :homework_submission, :migration_selection, :course_home_sub_navigation]
+
+  EXTENSION_TYPES = [
+    :user_navigation, :course_navigation, :account_navigation, :resource_selection,
+    :editor_button, :homework_submission, :migration_selection, :course_home_sub_navigation,
+    :course_settings_sub_navigation
+  ]
+
   def url_or_domain_is_set
     setting_types = EXTENSION_TYPES
     # url or domain (or url on canvas lti extension) is required
@@ -48,43 +54,43 @@ class ContextExternalTool < ActiveRecord::Base
       errors.add(:domain, t('url_or_domain_required', "Either the url or domain should be set."))
     end
   end
-  
+
   def settings
     read_attribute(:settings) || write_attribute(:settings, {})
   end
-  
+
   def label_for(key, lang=nil)
     labels = settings[key] && settings[key][:labels]
     labels2 = settings[:labels]
     (labels && labels[lang]) ||
-      (labels && lang && labels[lang.split('-').first]) || 
+      (labels && lang && labels[lang.split('-').first]) ||
       (settings[key] && settings[key][:text]) ||
       (labels2 && labels2[lang]) ||
       (labels2 && lang && labels2[lang.split('-').first]) ||
       settings[:text] || name || "External Tool"
   end
-  
+
   def check_for_xml_error
     (@config_errors || []).each { |attr,msg|
       errors.add attr, msg
     }
   end
   protected :check_for_xml_error
-  
+
   def readable_state
     workflow_state.titleize
   end
-  
+
   def privacy_level=(val)
     if ['anonymous', 'name_only', 'email_only', 'public'].include?(val)
       self.workflow_state = val
     end
   end
-  
+
   def privacy_level
     self.workflow_state
   end
-  
+
   def custom_fields_string
     (settings[:custom_fields] || {}).map{|key, val|
       "#{key}=#{val}"
@@ -113,17 +119,17 @@ class ContextExternalTool < ActiveRecord::Base
     @config_type = val
     process_extended_configuration
   end
-  
+
   def config_xml=(val)
     @config_xml = val
     process_extended_configuration
   end
-  
+
   def config_url=(val)
     @config_url = val
     process_extended_configuration
   end
-  
+
   def process_extended_configuration
     return unless (config_type == 'by_url' && config_url) || (config_type == 'by_xml' && config_xml)
     tool_hash = nil
@@ -138,7 +144,7 @@ class ContextExternalTool < ActiveRecord::Base
        tool_hash = {:error => e.message}
     end
 
-    
+
     @config_errors = []
     error_field = config_type == 'by_xml' ? 'config_xml' : 'config_url'
 
@@ -165,7 +171,7 @@ class ContextExternalTool < ActiveRecord::Base
   rescue ActiveRecord::RecordInvalid => e
     @config_errors += Array(e.record.errors)
   end
-  
+
   def custom_fields_string=(str)
     hash = {}
     str.split(/[\r\n]+/).each do |line|
@@ -174,11 +180,11 @@ class ContextExternalTool < ActiveRecord::Base
     end
     settings[:custom_fields] = hash
   end
-  
+
   def custom_fields=(hash)
     settings[:custom_fields] = hash if hash.is_a?(Hash)
   end
-  
+
   def custom_fields
     settings[:custom_fields]
   end
@@ -226,11 +232,11 @@ class ContextExternalTool < ActiveRecord::Base
   def editor_button(setting = nil)
     extension_setting(:editor_button, setting)
   end
-  
+
   def homework_submission=(hash)
     tool_setting(:homework_submission, hash, :selection_width, :selection_height, :icon_url)
   end
-  
+
   def homework_submission(setting = nil)
     extension_setting(:homework_submission, setting)
   end
@@ -255,6 +261,18 @@ class ContextExternalTool < ActiveRecord::Base
     extension_setting(:course_home_sub_navigation, setting)
   end
 
+  def course_settings_sub_navigation=(hash)
+    tool_setting(:course_settings_sub_navigation, hash, :icon_url) do |tool_settings|
+      if %w(members admins).include?(hash[:visibility])
+        tool_settings[:visibility] = hash[:visibility]
+      end
+    end
+  end
+
+  def course_settings_sub_navigation(setting = nil)
+    extension_setting(:course_settings_sub_navigation, setting)
+  end
+
   def icon_url=(i_url)
     settings[:icon_url] = i_url
   end
@@ -270,7 +288,7 @@ class ContextExternalTool < ActiveRecord::Base
   def text
     settings[:text]
   end
-  
+
   def shared_secret=(val)
     write_attribute(:shared_secret, val) unless val.blank?
   end
@@ -297,7 +315,7 @@ class ContextExternalTool < ActiveRecord::Base
         nil
     end
   end
-  
+
   def infer_defaults
     self.url = nil if url.blank?
     self.domain = nil if domain.blank?
@@ -361,21 +379,21 @@ class ContextExternalTool < ActiveRecord::Base
     res.query = res.query.split(/&/).sort.join('&') if !res.query.blank?
     res.to_s
   end
-  
+
   alias_method :destroy!, :destroy
   def destroy
     self.workflow_state = 'deleted'
     save!
   end
-  
+
   def include_email?
     email_only? || public?
   end
-  
+
   def include_name?
     name_only? || public?
   end
-  
+
   def precedence
     if domain
       # Somebody tell me if we should be expecting more than
@@ -394,7 +412,7 @@ class ContextExternalTool < ActiveRecord::Base
     end
     @standard_url
   end
-  
+
   def matches_url?(url, match_queries_exactly=true)
     if match_queries_exactly
       url = ContextExternalTool.standardize_url(url)
@@ -425,47 +443,8 @@ class ContextExternalTool < ActiveRecord::Base
       false
     end
   end
-  
-  def self.all_tools_for(context, options={})
-    contexts = []
-    tools = []
-    if options[:user]
-      contexts << options[:user]
-    end
-    while context
-      if context.is_a?(Group)
-        contexts << context
-        context = context.context || context.account
-      elsif context.is_a?(Course)
-        contexts << context
-        context = context.account
-      elsif context.is_a?(Account)
-        contexts << context
-        context = context.parent_account
-      else
-        context = nil
-      end
-    end
-    return nil if contexts.empty?
-    contexts.each do |context|
-      tools += context.context_external_tools.active
-    end
-    Canvas::ICU.collate_by(tools, &:name)
-  end
-  
-  # Order of precedence: Basic LTI defines precedence as first
-  # checking for a match on domain.  Subdomains count as a match 
-  # on less-specific domains, but the most-specific domain will 
-  # match first.  So awesome.bob.example.com matches an 
-  # external_tool with example.com as the domain, but only if 
-  # there isn't another external_tool where awesome.bob.example.com 
-  # or bob.example.com is set as the domain.  
-  # 
-  # If there is no domain match then check for an exact url match
-  # as configured by an admin.  If there is still no match
-  # then check for a match on the current context (configured by
-  # the teacher).
-  def self.find_external_tool(url, context, preferred_tool_id=nil)
+
+  def self.contexts_to_search(context)
     contexts = []
     while context
       if context.is_a?(Group)
@@ -482,6 +461,38 @@ class ContextExternalTool < ActiveRecord::Base
       end
     end
 
+    contexts
+  end
+  private_class_method :contexts_to_search
+
+  def self.all_tools_for(context, options={})
+    contexts = []
+    if options[:user]
+      contexts << options[:user]
+    end
+    contexts.concat contexts_to_search(context)
+    return nil if contexts.empty?
+
+    tools = contexts.each_with_object([]) do |context, tools|
+      tools.concat context.context_external_tools.active
+    end
+    Canvas::ICU.collate_by(tools, &:name)
+  end
+
+  # Order of precedence: Basic LTI defines precedence as first
+  # checking for a match on domain.  Subdomains count as a match
+  # on less-specific domains, but the most-specific domain will
+  # match first.  So awesome.bob.example.com matches an
+  # external_tool with example.com as the domain, but only if
+  # there isn't another external_tool where awesome.bob.example.com
+  # or bob.example.com is set as the domain.
+  #
+  # If there is no domain match then check for an exact url match
+  # as configured by an admin.  If there is still no match
+  # then check for a match on the current context (configured by
+  # the teacher).
+  def self.find_external_tool(url, context, preferred_tool_id=nil)
+    contexts = contexts_to_search(context)
     preferred_tool = ContextExternalTool.active.find_by_id(preferred_tool_id)
     if preferred_tool && contexts.member?(preferred_tool.context) && preferred_tool.matches_domain?(url)
       return preferred_tool
@@ -501,7 +512,16 @@ class ContextExternalTool < ActiveRecord::Base
 
     nil
   end
-  
+
+  def self.find_integration_for(context, type)
+    contexts_to_search(context).each do |context|
+      tools = context.context_external_tools.active.where(integration_type: type)
+      return tools.first unless tools.empty?
+    end
+
+    nil
+  end
+
   scope :having_setting, lambda { |setting| setting ? where("has_#{setting.to_s}" => true) : scoped }
 
   def self.find_for(id, context, type, raise_error=true)
@@ -527,8 +547,8 @@ class ContextExternalTool < ActiveRecord::Base
 
     tool
   end
-  scope :active, where("context_external_tools.workflow_state<>'deleted'")
-  
+  scope :active, -> { where("context_external_tools.workflow_state<>'deleted'") }
+
   def self.find_all_for(context, type)
     tools = []
     if !context.is_a?(Account) && context.respond_to?(:context_external_tools)
@@ -537,7 +557,7 @@ class ContextExternalTool < ActiveRecord::Base
     account_ids = context.account_chain_ids
     tools += ContextExternalTool.having_setting(type.to_s).find_all_by_context_type_and_context_id('Account', account_ids)
   end
-  
+
   def self.serialization_excludes; [:shared_secret,:settings]; end
 
   # sets the custom fields from the main tool settings, and any on individual resource type settings

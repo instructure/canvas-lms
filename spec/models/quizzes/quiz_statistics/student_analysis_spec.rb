@@ -6,7 +6,7 @@ require 'csv'
 describe Quizzes::QuizStatistics::StudentAnalysis do
   let(:report_type) { 'student_analysis' }
   include_examples "Quizzes::QuizStatistics::Report"
-  before { course }
+  before(:once) { course }
 
   def csv(opts = {}, quiz = @quiz)
     stats = quiz.statistics_csv('student_analysis', opts)

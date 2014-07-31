@@ -50,7 +50,7 @@ describe "User Profile API", type: :request do
     new_user = user(:name => 'new guy')
     @user = @me
     @course.enroll_user(new_user, 'ObserverEnrollment')
-    Account.site_admin.add_user(@user)
+    Account.site_admin.account_users.create!(user: @user)
     json = api_call(:get, "/api/v1/users/#{new_user.id}/profile",
              :controller => "profile", :action => "settings", :user_id => new_user.to_param, :format => 'json')
     json.should == {
