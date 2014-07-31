@@ -34,17 +34,13 @@ class Migrator
     @course = {:file_map=>{}, :wikis=>[]}
     @course[:name] = @settings[:course_name]
 
-    unless settings[:no_archive_file]
-      unless settings[:archive_file]
-        MigratorHelper::download_archive(settings)
-      end
-      if @archive_file = settings[:archive_file]
-        @archive_file_path = @archive_file.path
-      end
+    unless @settings[:no_archive_file]
+      @archive = @settings[:archive] || Canvas::Migration::Archive.new(@settings)
+      @archive_file = @archive.file
+      @unzipped_file_path = @archive.unzipped_file_path
+      @archive_file_path = @archive.path
     end
-    
-    config = ConfigFile.load('external_migration') || {}
-    @unzipped_file_path = Dir.mktmpdir(migration_type.to_s, config[:data_folder].presence)
+
     @base_export_dir = @settings[:base_download_dir] || find_export_dir
     @course[:export_folder_path] = File.expand_path(@base_export_dir)
     make_export_dir
@@ -55,40 +51,17 @@ class Migrator
   end
 
   def unzip_archive
-    logger.debug "Extracting #{@archive_file_path} to #{@unzipped_file_path}"
-    warnings = CanvasUnzip.extract_archive(@archive_file_path, @unzipped_file_path)
-    unless warnings.empty?
-      diagnostic_text = ''
-      warnings.each do |tag, files|
-        diagnostic_text += tag.to_s + ': ' + files.join(', ') + "\n"
-      end
-      logger.debug "CanvasUnzip returned warnings: " + diagnostic_text
-      add_warning(I18n.t('canvas.migration.warning.unzip_warning', 'The content package unzipped successfully, but with a warning'), diagnostic_text)
-    end
-    return true
-  end
-
-  # If the file is a zip file, unzip it, if it's an xml file, copy
-  # it into the directory with the given file name
-  def prepare_cartridge_file(file_name='imsmanifest.xml')
-    if @archive_file_path.ends_with?('xml')
-      FileUtils::cp(@archive_file_path, File.join(@unzipped_file_path, file_name))
-    else
-      unzip_archive
+    @archive.unzip_archive
+    @archive.warnings.each do |warn|
+      add_warning(warn)
     end
   end
 
   def delete_unzipped_archive
-    delete_file(@unzipped_file_path)
-  end
-
-  def delete_file(file)
-    if File.exists?(file)
-      begin
-        FileUtils::rm_rf(file)
-      rescue
-        Rails.logger.warn "Couldn't delete #{file} for content_migration #{@settings[:content_migration_id]}"
-      end
+    begin
+      @archive.delete_unzipped_archive
+    rescue
+      Rails.logger.warn "Couldn't delete #{@unzipped_file_path} for content_migration #{@settings[:content_migration_id]}"
     end
   end
 

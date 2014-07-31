@@ -2697,4 +2697,31 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       bank.assessment_questions.count.should == 1
     end
   end
+
+  it "should identify and import compressed tarball archives" do
+    pending unless Qti.qti_enabled?
+
+    course_with_teacher
+    cm = ContentMigration.new(:context => @course, :user => @user)
+    cm.migration_type = 'qti_converter'
+    cm.migration_settings['import_immediately'] = true
+    cm.save!
+
+    package_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/cc_default_qb_test.tar.gz")
+    attachment = Attachment.new
+    attachment.context = cm
+    attachment.uploaded_data = File.open(package_path, 'rb')
+    attachment.filename = 'file.zip'
+    attachment.save!
+
+    cm.attachment = attachment
+    cm.save!
+
+    cm.queue_migration
+    run_jobs
+
+    cm.migration_issues.should be_empty
+
+    @course.assessment_question_banks.count.should == 1
+  end
 end
