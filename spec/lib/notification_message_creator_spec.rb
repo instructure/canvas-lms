@@ -335,41 +335,45 @@ describe NotificationMessageCreator do
     end
 
     it "should respect browser locales" do
-      I18n.backend.store_translations :piglatin, {:messages => {:test_name => {:email => {:subject => "Isthay isay ivefay!"}}}}
-      @user.browser_locale = 'piglatin'
-      @user.save(validate: false) # the validation was declared before :piglatin was added, so we skip it
-      messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
-      messages.each {|m| m.subject.should eql("Isthay isay ivefay!")}
-      I18n.locale.should eql(:en)
+      I18n.backend.stub(piglatin: {messages: {test_name: {email: {subject: "Isthay isay ivefay!"}}}}) do
+        @user.browser_locale = 'piglatin'
+        @user.save(validate: false) # the validation was declared before :piglatin was added, so we skip it
+        messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
+        messages.each {|m| m.subject.should eql("Isthay isay ivefay!")}
+        I18n.locale.should eql(:en)
+      end
     end
 
     it "should respect user locales" do
-      I18n.backend.store_translations :shouty, {:messages => {:test_name => {:email => {:subject => "THIS IS *5*!!!!?!11eleventy1"}}}}
-      @user.locale = 'shouty'
-      @user.save(validate: false)
-      messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
-      messages.each {|m| m.subject.should eql("THIS IS *5*!!!!?!11eleventy1")}
-      I18n.locale.should eql(:en)
+      I18n.backend.stub(shouty: {messages: {test_name: {email: {subject: "THIS IS *5*!!!!?!11eleventy1"}}}}) do
+        @user.locale = 'shouty'
+        @user.save(validate: false)
+        messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
+        messages.each {|m| m.subject.should eql("THIS IS *5*!!!!?!11eleventy1")}
+        I18n.locale.should eql(:en)
+      end
     end
 
     it "should respect course locales" do
       course
-      I18n.backend.store_translations :es, { :messages => { :test_name => { :email => { :subject => 'El Tigre Chino' } } } }
-      @course.enroll_teacher(@user).accept!
-      @course.update_attribute(:locale, 'es')
-      messages = NotificationMessageCreator.new(@notification, @course, :to_list => @user).create_message
-      messages.each { |m| m.subject.should eql('El Tigre Chino') }
-      I18n.locale.should eql(:en)
+      I18n.backend.stub(es: {messages: {test_name: {email: {subject: 'El Tigre Chino'}}}}) do
+        @course.enroll_teacher(@user).accept!
+        @course.update_attribute(:locale, 'es')
+        messages = NotificationMessageCreator.new(@notification, @course, :to_list => @user).create_message
+        messages.each { |m| m.subject.should eql('El Tigre Chino') }
+        I18n.locale.should eql(:en)
+      end
     end
 
     it "should respect account locales" do
       course
-      I18n.backend.store_translations :es, { :messages => { :test_name => { :email => { :subject => 'El Tigre Chino' } } } }
-      @course.account.update_attribute(:default_locale, 'es')
-      @course.enroll_teacher(@user).accept!
-      messages = NotificationMessageCreator.new(@notification, @course, :to_list => @user).create_message
-      messages.each { |m| m.subject.should eql('El Tigre Chino') }
-      I18n.locale.should eql(:en)
+      I18n.backend.stub(es: {messages: {test_name: {email: {subject: 'El Tigre Chino'}}}}) do
+        @course.account.update_attribute(:default_locale, 'es')
+        @course.enroll_teacher(@user).accept!
+        messages = NotificationMessageCreator.new(@notification, @course, :to_list => @user).create_message
+        messages.each { |m| m.subject.should eql('El Tigre Chino') }
+        I18n.locale.should eql(:en)
+      end
     end
   end
 

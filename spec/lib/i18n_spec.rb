@@ -116,11 +116,12 @@ describe I18n do
 
     it "should fall back to en if the current locale's interpolation is broken" do
       I18n.locale = :es
-      I18n.backend.store_translations :es, __interpolation_test: "Hola %{mundo}"
-      I18n.t(:__interpolation_test, "Hello %{mundo}", {mundo: "WORLD"}).
-        should == "Hola WORLD"
-      I18n.t(:__interpolation_test, "Hello %{world}", {world: "WORLD"}).
-        should == "Hello WORLD"
+      I18n.backend.stub es: {__interpolation_test: "Hola %{mundo}"} do
+        I18n.t(:__interpolation_test, "Hello %{mundo}", {mundo: "WORLD"}).
+          should == "Hola WORLD"
+        I18n.t(:__interpolation_test, "Hello %{world}", {world: "WORLD"}).
+          should == "Hello WORLD"
+      end
     end
 
     it "should raise an error if the the en interpolation is broken" do

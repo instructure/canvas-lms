@@ -1578,6 +1578,35 @@ end
   end
 end
 
+class I18nema::Backend
+  def stub(translations)
+    @stubs = translations.with_indifferent_access
+    singleton_class.instance_eval do
+      alias_method :lookup, :lookup_with_stubs
+      alias_method :available_locales, :available_locales_with_stubs
+    end
+    yield
+  ensure
+    singleton_class.instance_eval do
+      alias_method :lookup, :lookup_without_stubs
+      alias_method :available_locales, :available_locales_without_stubs
+    end
+    @stubs = nil
+  end
+
+  def lookup_with_stubs(locale, key, scope = [], options = {})
+    init_translations unless initialized?
+    keys = normalize_keys(locale, key, scope, options[:separator])
+    keys.inject(@stubs){ |h,k| h[k] if h.respond_to?(:key) } || direct_lookup(*keys)
+  end
+  alias_method :lookup_without_stubs, :lookup
+
+  def available_locales_with_stubs
+    available_locales_without_stubs | @stubs.keys.map(&:to_sym)
+  end
+  alias_method :available_locales_without_stubs, :available_locales
+end
+
 class String
   def red; colorize(self, "\e[1m\e[31m"); end
   def green; colorize(self, "\e[1m\e[32m"); end
