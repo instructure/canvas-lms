@@ -41,6 +41,7 @@ describe PageView do
     include_examples "cassandra page views"
     it "should store and load from cassandra" do
       expect {
+        @page_view.request_id = "abcde1"
         @page_view.save!
       }.to change { PageView::EventStream.database.execute("select count(*) from page_views").fetch_row["count"] }.by(1)
       PageView.find(@page_view.id).should == @page_view
@@ -83,6 +84,7 @@ describe PageView do
         Shard.stubs(:birth).returns(@shard1)
         @shard2.activate do
           expect {
+            @page_view.request_id = "abcde2"
             @page_view.save!
           }.to change { PageView::EventStream.database.execute("select count(*) from page_views").fetch_row["count"] }.by(1)
           PageView.find(@page_view.id).should == @page_view
