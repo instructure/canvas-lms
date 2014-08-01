@@ -689,6 +689,7 @@ describe Attachment do
         truncate_table(Attachment)
         truncate_table(Folder)
         truncate_table(Group)
+        truncate_table(Delayed::Job)
       end
 
       it "should delay upload until the #save transaction is committed" do
