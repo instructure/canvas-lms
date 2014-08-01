@@ -16,11 +16,11 @@ fa-IR:
       removeError: "قادر به حذف این گروه نیست. لطفا دوباره سعی کنید."
       removed: "گروه با موفقیت حذف شد."
     student_count: 
-      one: "%{count} دانشجویان"
+      one: "%{count} دانشجو"
       other: "%{count} دانشجو"
     student_count_max: "%{count} / %{max} دانشجو"
     user_count: 
-      one: "%{count} کاربران"
+      one: "%{count} کاربر"
       other: "%{count} کاربر"
     user_count_max: "%{count} / %{max} کاربر"
   GroupUserCollection: 
@@ -1053,9 +1053,6 @@ fa-IR:
         other: "%{count} دسته در انتظار برای پردازش."
       pending_batches_title: "دسته های در انتظار"
       process_data_button: "پردازش داده ها"
-      select_file_instructions: |-
-          فایل فشرده ای که می خواهید وارد شود را انتخاب کنید.
-          برای توضیح درباره چگونگی ایجاد این فایلهای فشرده، [لطفا این اسناد را ملاحظه کنید](%{uri}).
       sis_import_crumb: "ورود اطلاعات سامانه اطلاعات دانشجو"
       started_at_message: "شروع شد: %{started_at}"
       title: "ورود اطلاعات سامانه اطلاعات دانشجو"
@@ -1189,29 +1186,9 @@ fa-IR:
             text: "این گزارش، همه دانشجویان ثبت نام شده درهمه درس های موجود در یک نیمسال خاص را نشان می دهد. فایل CSV به دست آمده یک ردیف برای هر ثبت نام کاربر دارد  که از تاریخ مورد نظر از درس بازدید نکرده است."
   activerecord: 
     errors: 
-      full_messages: 
-        format: "%{attribute} %{message}"
       messages: 
-        accepted: "باید پذیرفته شود"
-        blank: "نمی تواند خالی باشد"
-        confirmation: "با تأییدیه مطابقت ندارد"
-        empty: "نمی تواند خالی باشد"
-        equal_to: "باید با %{count} برابر باشد"
-        even: "باید زوج باشد"
-        exclusion: "رزرو شده است"
-        greater_than: "باید از %{count} بزرگتر باشد"
-        greater_than_or_equal_to: "باید بزرگتر از %{count} یا مساوی با آن باشد"
-        inclusion: "در این فهرست گنجانده نشده است"
-        invalid: "معتبر نیست"
-        less_than: "باید کوچکتر از %{count} باشد"
-        less_than_or_equal_to: "باید کوچکتر از %{count} یا مساوی با آن باشد"
-        not_a_number: "عدد نیست"
-        odd: "باید فرد باشد"
         record_invalid: "تأیید اعتبار انجام نشد: %{errors}"
         taken: "قبلا انتخاب شده است"
-        too_long: "طولانی است (حداکثر باید %{count} نویسه باشد)"
-        too_short: "کوتاه است (حداقل باید %{count} نویسه باشد)"
-        wrong_length: "طول اشتباه است (باید %{count} نویسه باشد)"
       template: 
         body: "جاهای خالی زیر مشکلاتی داشت:"
         header: 
@@ -1682,11 +1659,11 @@ fa-IR:
         delete_assignment_group: "شما در حال حذف *%{name}* هستید, که شامل **%{assignment_count}** تکلیف است"
       would_you_like: "تمایل دارید که:"
     drop_highest_rule: 
-      one: "افت بالاترین %{count} نمره ها "
+      one: "حذف %{count} نمره بالاتر"
       other: "حذف %{count} نمره بالاتر"
     drop_highest_scores: "حذف بالاترین %{number} نمره"
     drop_lowest_rule: 
-      one: "افت پایین ترین %{count} نمره ها "
+      one: "حذف %{count} نمره پایین تر"
       other: "حذف %{count} نمره پایین تر"
     drop_lowest_scores: "حذف پایین ترین %{number} نمره"
     due_date_override: 
@@ -1936,7 +1913,7 @@ fa-IR:
     remove_never_drop_rule: "حذف قاعده هرگز حذف نشود"
     remove_unsaved_never_drop_rule: "حذف قانون ذخیره نشده هرگز حذف نشود"
     rules_text: 
-      one: "%{count} قانون ها"
+      one: "%{count} قاعده"
       other: "%{count} قاعده"
     select_assignment: "[انتخاب تکلیف]"
     show: 
@@ -2199,13 +2176,6 @@ fa-IR:
   bb_display: "یادگیری Blackboard"
   bb_file_description: "فایل .zip صدور 6/7/8/9 Blackboard"
   bb_name: "مبدل Blackboard"
-  better_file_browsing_description: |-
-      یک واسط جدید، ساده تر و کاربر پسندتر برای مرور کردن فایل. اگر آن را در
-      سطح درس
-      فعال کنید، تمام کاربران موجود در این درس واسط جدید را خواهند دید. برای اینکه
-      وقتی شخصی
-      به صفحه فایل های شخصی یک کاربر می رود ظاهر شود، باید آن را برای حسابی که
-      او عضو آن است فعال کنید.
   big_blue_button_conference: 
     conference_is_recorded: "این کنفرانس در حال ضبط است."
     recording_setting: "در حال ضبط"
@@ -2909,10 +2879,6 @@ fa-IR:
         current: "همکاری های فعلی"
     titles: 
       delete: "همکاری حذف شود؟"
-  collection_items: 
-    new: 
-      pin_to_canvas_network: "اتصال به شبکه کانواس"
-      saved_successfully: "با موفقیت ذخیره سازی شد"
   comm_messages: 
     from_beginning: آغاز
     to_now: اکنون
@@ -3059,7 +3025,6 @@ fa-IR:
     buttons: 
       process: "پردازش داده ها"
     errors: 
-      couldnt_create: "ایجاد صدور درس انجام نشد."
       error: "در صادر کردن محتوای شما خطایی رخ داد. لطفا به مدیر سیستم خود اطلاع دهید و شناسه صدور زیر را به او بدهید: \"%{code}\""
       not_found: "صدور موجود نیست"
     index: 
@@ -3905,7 +3870,7 @@ fa-IR:
     subject: "پیام خصوصی"
     subject_specified: "پیام خصوصی:  %{subject}"
     users_added: 
-      one: "%{list_of_users} به مکالمه توسط %{current_user} دعوت شده اند"
+      one: "%{list_of_users} توسط %{current_user} به گفتگو افزوده شد"
       other: "%{list_of_users} توسط %{current_user} به گفتگو افزوده شد"
   conversation_participant: 
     batch_update_message: 
@@ -4964,22 +4929,22 @@ fa-IR:
   d2l_name: "مبدل D2L"
   dashboard: 
     announcements_collapse: 
-      one: "آگهی ها را جمع آوری کنید %{count} "
+      one: "جمع کردن %{count} اطلاعیه"
       other: "جمع کردن %{count} اطلاعیه"
     announcements_expand: 
-      one: "آگهی ها را گسترش دهید %{count} "
+      one: "باز کردن %{count} اطلاعیه"
       other: "باز کردن %{count} اطلاعیه"
     assignments_collapse: 
-      one: " بسته%{count} اطلاعیه های انتساب"
+      one: "جمع کردن %{count} اطلاعیه تکلیف"
       other: "جمع کردن %{count} اطلاعیه تکلیف"
     assignments_expand: 
-      one: "توسعه %{count} اطلاعیه های انتساب"
+      one: "باز کردن %{count} اطلاعیه تکلیف"
       other: "باز کردن %{count} اطلاعیه تکلیف"
     conversations_collapse: 
-      one: "بسته های%{count}  پیام های گفتگو"
+      one: "جمع کردن %{count} پیام گفتگو"
       other: "جمع کردن %{count} پیام گفتگو"
     conversations_expand: 
-      one: "توسعه های%{count}  پیام های گفتگو"
+      one: "باز کردن %{count} پیام گفتگو"
       other: "باز کردن %{count} پیام گفتگو"
     disable_dashboard: "بازگشت به داشبورد قدیمی"
     discussions_collapse: 
@@ -4989,8 +4954,6 @@ fa-IR:
       one: "باز کردن %{count} بحث"
       other: "باز کردن %{count} بحث"
     enable_dashboard: "امتحان کردن داشبورد جدید"
-    event_created: "رویداد ایجاد شد"
-    message_sent: "پیام ارسال شد"
     show_more_link: 
       show_less: "نمایش کمتر"
       show_more: "نمایش بیشتر"
@@ -5525,7 +5488,7 @@ fa-IR:
       create_rubric: "ایجاد دستورالعمل ارزیابی"
       update_rubric: "بهنگام سازی دستورالعمل ارزیابی"
     discussion_points_possible: 
-      one: "%{count} امتیاز ممکن است"
+      one: "%{count} امتیاز ممکن"
       other: "%{count} امتیاز ممکن"
     errors: 
       load_rubrics_failed: "بارگذاری دستورالعمل های ارزیابی انجام نشد، لطفا دوباره سعی کنید"
@@ -7376,7 +7339,6 @@ fa-IR:
       search_by_tag: "جستجو بر اساس برچسب"
     confirms: 
       default_delete_thing: "مطمئنید که می خواهید این مورد حذف شود؟"
-    course_time: "درس:"
     datepicker: 
       titles: 
         am_pm: "قبل از ظهر/بعد از ظهر"
@@ -7402,7 +7364,6 @@ fa-IR:
       minimize_youtube_video: "کمینه کردن تصویر"
       view_equella_content_in_new_window: "مشاهده محتوا در پنجره جدید"
     loading: "درحال بارگذاری..."
-    local_time: "محلی:"
     no_description: "شرح موجود نیست"
     no_items: "هیچ موردی یافت نشد."
     no_results_found: "نتیجه ای یافت نشد"
@@ -8448,7 +8409,6 @@ fa-IR:
         subject: "صدور درس انجام نشد: %{course}"
     content_export_finished: 
       email: 
-        body: "صدور درس شما برای \"%{course}\" به اتمام رسیده است."
         html: 
           body2: "صدور درس *%{course}* شما پایان یافت."
           link: "برای مشاهده صدورها کلیک کنید"
@@ -9879,14 +9839,7 @@ fa-IR:
         
         ثبت نام قرار ملاقات دانشجو
     student_appointment_display: "ثبت نام های قرار ملاقات دانشجو"
-    submission_comment_description: |-
-        نظر درباره مورد ارسالی تکلیف
-        
-        &nbsp;
-        
-        اگر نمی خواهید نظرهای مربوط به مورد ارسالی جدید در صندوق پستی کانواس شما به عنوان «جدید» نشان داده شود، گزینه «علامتگذاری نظرهای مربوط به مورد ارسالی جدید به عنوان خوانده شده» را علامت بزنید
     submission_comment_display: "نظر درباره مورد ارسالی"
-    submission_new_as_read: "نظرهای مربوط به مورد ارسالی جدید به عنوان خوانده شده علامت گذاری شود."
   notification_preferences: 
     communication: 
       email: 
@@ -11041,16 +10994,16 @@ fa-IR:
     bookmarking: "در حال نشانه گذاری..."
     buttons: 
       submit_copying: 
-        one: "در حال کپی کردن سوالات..."
+        one: "در حال کپی کردن پرسش ها..."
         other: "در حال کپی کردن پرسش ها..."
       submit_copying_failed: 
-        one: "کپی کردن سوالات با شکست مواجه شد، لطفأ دوباره تلاش کنید"
+        one: "کپی کردن پرسش ها انجام نشد، لطفا دوباره تلاش کنید"
         other: "کپی کردن پرسش ها انجام نشد، لطفا دوباره تلاش کنید"
       submit_moving: 
-        one: "در حال انتقال سوالات..."
+        one: "در حال انتقال پرسش ها..."
         other: "در حال انتقال پرسش ها..."
       submit_moving_failed: 
-        one: "انتقال سوالات با شکست مواجه شد، لطفا دوباره تلاش کنید"
+        one: "انتقال پرسش ها انجام نشد، لطفا دوباره تلاش کنید"
         other: "انتقال پرسش ها انجام نشد، لطفا دوباره تلاش کنید"
       submit_retry_copying: "کپی کردن پرسش ها انجام نشد، لطفا دوباره تلاش کنید..."
       submit_retry_moving: "انتقال پرسش ها انجام نشد، لطفا دوباره تلاش کنید..."
@@ -11177,7 +11130,6 @@ fa-IR:
   quiz_extend_time: 
     ending_time: "زمان پایان"
     extend_time: "تمدید مهلت"
-    extensions_student: "تمدید مهلت برای %{student}"
     extensions_successfully_added: "تمدیدها با موفقیت اضافه شد"
     now: اکنون
   quiz_extensions: 
@@ -11194,10 +11146,10 @@ fa-IR:
     delete_quiz: "حذف کردن آزمون"
     edit_quiz: "ویرایش آزمون"
     points: 
-      one: "%{count} نمره"
+      one: "%{count} امتیاز"
       other: "%{count} امتیاز"
     questions: 
-      one: "%{count} سوال"
+      one: "%{count} پرسش"
       other: "%{count} پرسش"
   quiz_message_students: 
     and_num_more_students: " و %{num} دانشجوی دیگر"
@@ -11477,7 +11429,7 @@ fa-IR:
     practices_label: "آزمون های تمرینی قابلیت مشاهده آزمون را تغییر می دهند"
     question_colon: "پرسش:"
     question_count: 
-      one: "%{count} سوال"
+      one: "%{count} پرسش"
       other: "%{count} پرسش"
     question_limit_reached: "به بیشینه تعداد پرسش های مجاز برای آزمون رسیده اید (%{count}/%{limit}).\\n\\nبه عنوان راه حل، مطالب را در بین چند آزمون توزیع کنید."
     quiz: 
@@ -12047,8 +11999,6 @@ fa-IR:
         quiz_fudged_negative: "امتیاز این کویز به صورت دستی با %{fudge} امتیاز تنظیم شده است."
         quiz_fudged_positive: "امتیاز این کویز به صورت دستی با + %{fudge} امتیاز تنظیم شده است."
         quiz_not_yet_taken: "این کویز هنوز داده نشده است."
-        quiz_results_protected: "نتایج کویز برای این کویز محافظت شده اند و برای دانشجویان قابل مشاهده نیستند."
-        quiz_results_protected_until_last_attempt: "نتایج کویز برای این کویز محافظت شده اند و برای دانشجویان تا زمانی که آخرین تلاششان را ثبت نکرده اند قابل مشاهده نیستند."
         quiz_submission_needs_review: "این کویز از زمانی که این ارسال انجام شده است تغییرات عمده ای کرده است. این ارسال ممکن است به نمره دهی مجدد نیاز داشته باشد."
         requires_lockdown: "نرم افزار Respondus LockDown Browser برای مشاهده نتایج آزمون شما مورد نیاز است"
         submitted_at: "ارسال شده %{when}"
@@ -12883,13 +12833,9 @@ fa-IR:
           email: "پست الکترونیکی (اختیاری)"
     event_list: 
       at_least_more_events: "حداقل %{count_of_events} رویداد دیگر"
-      at_least_more_events_one_week: "حداقل  %{count_of_events} رویداد دیگر در هفته بعد"
-      at_least_more_events_two_weeks: "حداقل %{count_of_events} رویداد دیگر در دو هفته بعد"
       links: 
         view_calendar: "مشاهده تقویم"
       more_events: "%{count_of_events} رویداد دیگر"
-      more_events_one_week: "%{count_of_events} رویداد دیگر در هفته بعد"
-      more_events_two_weeks: "%{count_of_events} رویداد دیگر در دو هفته بعد"
       nothing_for_now: "چیزی در حال حاضر موجود نیست"
       nothing_one_week: "چیزی برای هفته آینده موجود نیست"
       nothing_two_weeks: "چیز برای دو هفته بعد موجود نیست"
@@ -13701,8 +13647,6 @@ fa-IR:
       curriculum_assessment_errata_description: "خطاهای گزارش شده ارزیابی و برنامه درسی را مشاهده کنید. «اشتباه های تایپی» را جستجو کنید."
       networking_academy_description: "پاسخ های سیسکو به پرسش های متداول را مشاهده کنید."
       networking_academy_faqs: "پرسش های متداول آکادمی شبکه سازی"
-    select: 
-      prompt: "لطفا انتخاب کنید"
   table_headings: 
     name: نام
     total: کل
@@ -14499,8 +14443,6 @@ fa-IR:
       page_updated: "صفحه با موفقیت بهنگام سازی شد."
     page_link: 
       link_hidden_from_students_warning: "دانشجویان این پیوند را نخواهند دید"
-    page_revisions: 
-      page_revisions_title: "%{title} بازنگری ها:‌ %{context_name}"
     pages_index: 
       titles: 
         pages: "صفحه ها"
