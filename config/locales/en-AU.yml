@@ -38,27 +38,6 @@ en-AU:
     no_file: "No outcome file or authority given"
     no_permissions: "User isn't allowed to edit global outcomes"
     no_perms: "User isn't allowed to edit global outcomes"
-  access: 
-    course: 
-      extra_text: "Course: %{course};"
-  access_report_header_content: content
-  access_report_header_content_access_id: "content access id"
-  access_report_header_content_type: "content type"
-  access_report_header_course_id: "course id"
-  access_report_header_course_name: "course name"
-  access_report_header_course_sis_id: "course sis id"
-  access_report_header_enrollment_type: "enrollment type"
-  access_report_header_last_viewed: "last viewed"
-  access_report_header_root_account_id: "root account id"
-  access_report_header_section_id: "section id"
-  access_report_header_section_name: "section name"
-  access_report_header_section_sis_id: "section sis id"
-  access_report_header_term_id: "term id"
-  access_report_header_term_sis_id: "term sis id"
-  access_report_header_times_participated: "times participated"
-  access_report_header_times_viewed: "times viewed"
-  access_report_header_user_id: "user id"
-  access_report_header_user_sis_id: "user sis id"
   account: 
     account_settings: 
       account_surveys: "Account Surveys"
@@ -280,13 +259,6 @@ en-AU:
     announcement_deleted_notice: "Announcement successfully deleted"
     permission_denied_notice: "You cannot create announcements for that account"
   account_reports: 
-    bucks: 
-      courses_only: "Online sections only"
-    ccp: 
-      course: 
-        check_box: "For Course: %{course_id};"
-      courses_only: "Online courses only"
-      start_at: "Start At: %{start_at};"
     default: 
       all_terms: "All Terms"
       course_text: "For Course: %{course};"
@@ -299,26 +271,10 @@ en-AU:
       section_text: "For Section: %{section};"
       start_text: "Start At: %{start_at};"
       term_text: "Term: %{term_name};"
-    galen: 
-      no_term: "A specific term is required please select a term"
     grades: 
       deleted: "Include Deleted Objects: true;"
-    granite: 
-      invalid_date_range: "Dates were adjusted to 1 week range;"
-    lincoln: 
-      invalid_term: "Please select a valid term"
-    mississippi: 
-      reports: "Reports: %{files}"
-    newark: 
-      assignment_text: "Assignment Group Types: %{groups};"
     outcomes: 
       order: "Order: %{order}"
-    pasco: 
-      missing_start_date: "Please select a start date"
-    penn_harris: 
-      student_grades: 
-        description: 
-          text: "This report shows the student final grade results for students in a given term. The resulting csv file will have one row per enrollment, and will show the final grade that is displayed in the course gradebook."
     report_header_account_id: account_id
     report_header_assessment_id: "assessment id"
     report_header_assessment_question: "assessment question"
@@ -399,13 +355,6 @@ en-AU:
     student: 
       enrollment_state: "Include Enrollment State: true;"
       enrollment_states: "Enrollment States: %{states};"
-    usu: 
-      enrollment_types: "Enrollment types: %{types}"
-    webster: 
-      min: "Minimum Number of items: %{min};"
-      student: Students;
-      ta: Ta's;
-      teacher: Teachers;
   account_settings: 
     account: Account
     account_name_too_long: "Account Name is too long"
@@ -597,20 +546,6 @@ en-AU:
         message_date_to: "To Date"
         search: Search
         search_people: "Search people"
-    assignment_scheduling_csv_description: 
-      account_reports: 
-        newark: 
-          description: 
-            header: Example
-          student_activity: 
-            text: "This report shows shows all of the assignments and info pertaining to those assignments that are in the specified assignment group or groups and in the specified date range. This report provides data for scheduling assignments, and managing students assignment load, showing only students and assignments where there are 2 or more conflicting assignments due on the same date for a student."
-      newark_report_header__assignment_count: "# of assignments"
-      newark_report_header_due_date: "due date"
-      newark_report_header_section_id: "section id"
-      newark_report_header_section_name: "section name"
-      newark_report_header_student_name: "student name"
-      newark_report_header_teacher_id: "teacher id"
-      newark_report_header_teacher_name: "teacher name"
     assignment_scheduling_csv_parameters: 
       account_reports: 
         newark: 
@@ -630,24 +565,6 @@ en-AU:
             check_box: Reports
           tests: 
             check_box: Tests
-    assignment_score_summary_csv_description: 
-      account_reports: 
-        granite: 
-          assignme_score_summary: 
-            text: "This report shows the score for all assignments graded between dates selected"
-          description: 
-            header: Example
-      granite_report_header_account_id: account_id
-      granite_report_header_assignment_id: assignment_id
-      granite_report_header_assignment_name: assignment_name
-      granite_report_header_assignment_unique_id: assignment_unique_id
-      granite_report_header_course_id: course_id
-      granite_report_header_graded_at: graded_at
-      granite_report_header_submission_date: submission_date
-      granite_report_header_submission_id: submission_id
-      granite_report_header_submission_score: submission_score
-      granite_report_header_term_id: term_id
-      granite_report_header_user_id: user_id
     avatars: 
       all_link: 
         one: "All %{count}"
@@ -675,61 +592,13 @@ en-AU:
         zero: Submitted
       title: "Profile Pictures"
       unlock_link: unlock
-    bucks_zero_activity_csv_description: 
-      account_reports: 
-        bucks: 
-          description: 
-            header: Example
-          student_login: 
-            text: "This report shows all the students enrolled in any courses in a given term. Resulting csv file will have one row per student enrollment that have not visited the course since the date. The online filter will only include enrollments from sections that have '.E' in the section name."
-      bucks_report_header_last_access_to_canvas: "last access to canvas"
-      bucks_report_header_name: name
-      bucks_report_header_section_id: "section id"
-      bucks_report_header_section_name: "section name"
-      bucks_report_header_section_sis_id: "section sis id"
-      bucks_report_header_user_sis_id: "user sis id"
     cannot_manage_account: "You are not allowed to manage account settings"
     cannot_manage_quotas: "You are not allowed to manage quota settings"
-    ccp_zero_activity_csv_description: 
-      account_reports: 
-        ccp: 
-          ccp_zero_activity_csv: 
-            header: Example
-            text: "This report shows all the students enrolled in any courses in a given term. Resulting csv file will have one row per user enrollment that have not visited the course since the date."
-      ccp_report_header_course_id: "course id"
-      ccp_report_header_course_name: course_name
-      ccp_report_header_course_sis_id: "course sis id"
-      ccp_report_header_email: email
-      ccp_report_header_enrollment_type: "enrollment type"
-      ccp_report_header_first_name: "first name"
-      ccp_report_header_last_name: last_name
-      ccp_report_header_section_id: "section id"
-      ccp_report_header_section_name: "section name"
-      ccp_report_header_section_sis_id: "section sis id"
-      ccp_report_header_user_id: "user id"
-      ccp_report_header_user_sis_id: "user sis id"
     ccp_zero_activity_csv_parameters: 
       account_reports: 
         ccp: 
           filter_online: 
             check_box: "Online classes only"
-    chcp_student_activity_csv_description: 
-      account_reports: 
-        chcp: 
-          student_activity: 
-            description: 
-              header: Example
-            text: "This report shows student involvment in their courses. The resulting csv file will have one row per enrollment and will show the student sis id, student name, phone number, email address, course name, last submission, days since last submission(LDA), current grade percentage, and their term start date."
-      chcp_report_header_course: course
-      chcp_report_header_email: email
-      chcp_report_header_grade: grade
-      chcp_report_header_last_submissio: "last submission"
-      chcp_report_header_lda: lda
-      chcp_report_header_phone: phone
-      chcp_report_header_start_date: "start date"
-      chcp_report_header_student_id: "student id"
-      chcp_report_header_student_name: "student name"
-      chcp_report_header_teacher: teacher
     confirm_delete_user: 
       confirm_delete: "Are you sure you want to delete this user from the account %{account}? This will remove the user's data (including grades) from all courses and groups. This process cannot be undone."
       delete_button: "Delete %{user}"
@@ -752,59 +621,6 @@ en-AU:
       teachers_label: Teachers
     course_add_failed_message: "Adding Course Failed, please try again"
     course_added_message: "%{course} successfully added!"
-    course_enrollment_csv_description: 
-      account_reports: 
-        cedar_rapids: 
-          course_status: 
-            text: |-
-                This report shows the status of all the courses for a given term. The
-                  resulting csv file will have one row per course section and will
-                  show the course, course status, term, effective start and end dates,
-                  enrollment count, department, and account
-          description: 
-            header: Example
-      cedar_rapids_report_header_account_id: "Account ID"
-      cedar_rapids_report_header_account_name: "Account Name"
-      cedar_rapids_report_header_course_end_date: "Course End Date"
-      cedar_rapids_report_header_course_id: "Course ID"
-      cedar_rapids_report_header_course_name: "Course Name"
-      cedar_rapids_report_header_course_start_date: "Course Start Date"
-      cedar_rapids_report_header_course_status: "Course Status"
-      cedar_rapids_report_header_department_id: "Department ID"
-      cedar_rapids_report_header_department_name: "Department Name"
-      cedar_rapids_report_header_observer_count: "Observer Count"
-      cedar_rapids_report_header_student_count: "Student Count"
-      cedar_rapids_report_header_ta_count: "TA Count"
-      cedar_rapids_report_header_teacher_count: "Teacher Count"
-      cedar_rapids_report_header_term_id: "Term ID"
-      cedar_rapids_report_header_term_name: "Term Name"
-    course_status_csv_description: 
-      account_reports: 
-        auburn: 
-          course_status: 
-            text: "This report shows the status of all the courses for a given term. The resulting csv file will have one row per course section and will show the course, course status, term, effective start and end dates, and a teacher of record in the section."
-          description: 
-            header: Example
-      auburn_report_header_account_id: "account id"
-      auburn_report_header_account_name: "account name"
-      auburn_report_header_account_sis_id: "account sis id"
-      auburn_report_header_course_id: "course id"
-      auburn_report_header_course_name: "course name"
-      auburn_report_header_course_sis_id: "course sis id"
-      auburn_report_header_course_status: "course status"
-      auburn_report_header_effective_date: "effective date"
-      auburn_report_header_end_date: "end date"
-      auburn_report_header_section_id: "section id"
-      auburn_report_header_section_name: "section name"
-      auburn_report_header_section_sis_id: "section sis id"
-      auburn_report_header_start_date: "start date"
-      auburn_report_header_student_count: "student count"
-      auburn_report_header_teacher_id: "teacher id"
-      auburn_report_header_teacher_name: "teacher name"
-      auburn_report_header_teacher_sis_id: "teacher sis id"
-      auburn_report_header_term_id: "term id"
-      auburn_report_header_term_name: "term name"
-      auburn_report_header_term_sis_id: "term sis id"
     course_type: course
     courses: 
       courses_crumb: Courses
@@ -820,84 +636,16 @@ en-AU:
       go_button: Go
       hide_enrollmentless_courses: "Hide enrollmentless courses"
     crumb_statistics: Statistics
-    current_grade_csv_description: 
-      account_reports: 
-        lincoln: 
-          current_grade_report: 
-            text: "This report shows the current grade for a student per course for a specified term"
-          description: 
-            header: Example
-      lincoln_report_header_course_id: Course_ID
-      lincoln_report_header_course_name: Course_Name
-      lincoln_report_header_course_role: Course_Role
-      lincoln_report_header_course_sis_id: Course_SIS_ID
-      lincoln_report_header_current_grade: Current_Grade
-      lincoln_report_header_login: Login_ID
-      lincoln_report_header_student_name: Student_Name
-      lincoln_report_header_student_sis_id: Student_SIS_ID
-      lincoln_report_header_term_id: Term_ID
-      lincoln_report_header_term_name: Term_Name
-    custom_grade_export_csv_description: 
-      account_reports: 
-        ross: 
-          description: 
-            header: Example
-            text: "This report shows the student final grade results for all students in a given term. The resulting csv file will have one row per enrollment, and will show the current and final grade that is displayed in the course gradebook."
-      ross_report_header_comment: Comment
-      ross_report_header_course_id: Course_ID
-      ross_report_header_grade_posting_date: "Grade Posting Date"
-      ross_report_header_grade_type: "Grade Type"
-      ross_report_header_grade_value_type: "Grade Value Type"
-      ross_report_header_miscfield1: MiscField1
-      ross_report_header_miscfield13: MiscField13
-      ross_report_header_miscfield2: MiscField2
-      ross_report_header_numeric_grade: "Numeric Grade"
-      ross_report_header_source_id: Source_ID
     custom_grade_export_csv_parameters: 
       account_reports: 
         ross: 
           parameters: 
             note: "Courses with muted assignments may not accurately reflect scores in this report."
-    custom_outcomes_csv_description: 
-      account_reports: 
-        edison: 
-          description: 
-            header: Example
-            text: "This report shows the learning outcome results for all students, for a given outcome and course. The resulting csv file will have one row per user, and will show the details of the result including the associated assignment."
     custom_outcomes_csv_parameters: 
       account_reports: 
         edison: 
           outcome: 
             text: "outcome_id:"
-    cv_non_graded_data_csv_description: 
-      account_reports: 
-        galen: 
-          cv: 
-            non_graded: 
-              text: "This report shows non-graded submissions by course for quizzes surveys and discussions."
-          description: 
-            header: Example
-      galen_report_header_account_id: account_id
-      galen_report_header_account_name: account_name
-      galen_report_header_course_name: course_name
-      galen_report_header_course_sis_id: course_sis_id
-      galen_report_header_resource_type: resource_type
-      galen_report_header_title: title
-    cv_submission_data_csv_description: 
-      account_reports: 
-        galen: 
-          cv: 
-            attendance: 
-              text: "This report shows student submissions up to provided date. This is used for CampusVue attendance."
-        tmcc: 
-          description: 
-            header: Example
-      galen_report_header_course_sis_id: course_sis_id
-      galen_report_header_first_submission: first_submission
-      galen_report_header_section_sis_id: section_sis_id
-      galen_report_header_submission_date: submission_date
-      galen_report_header_submission_type: submission_type
-      galen_report_header_user_sis_id: user_sis_id
     date_picker_parameter: 
       account_reports: 
         default: 
@@ -918,40 +666,11 @@ en-AU:
     default_account_quotas_updated: "Default account quotas updated"
     find_not_authorized: "You are not authorised to access that %{type}"
     find_not_found: "Could not find a %{type} with that ID"
-    google_doc_accounts_csv_description: 
-      account_reports: 
-        ut_austin: 
-          description: 
-            header: Example
-          google_doc: 
-            text: "This is a report of all users and the associated email address used for the Google Docs integration."
-      ut_austin_report_header_canvas_user_id: "canvas user id"
-      ut_austin_report_header_default_email: "default email"
-      ut_austin_report_header_google_doc_address: "google doc address"
-      ut_austin_report_header_name: name
-      ut_austin_report_header_sis_id: "sis id"
     grade_export_csv_description: 
       account_reports: 
         default: 
           description: 
-            header: Example
             text: "This report shows the student final grade results for all students in a given term. The resulting csv file will have one row per enrollment, and will show the current and final grade that is displayed in the course gradebook."
-      course_report_header_course_id: "course id"
-      grade_report_header_course: course
-      grade_report_header_course_id: "course id"
-      grade_report_header_course_sis: "course sis"
-      grade_report_header_current_score: "current score"
-      grade_report_header_enrollment_state: "enrollment state"
-      grade_report_header_final_score: "final score"
-      grade_report_header_section: section
-      grade_report_header_section_id: "section id"
-      grade_report_header_section_sis: "section sis"
-      grade_report_header_student_id: "student id"
-      grade_report_header_student_name: "student name"
-      grade_report_header_student_sis: "student sis"
-      grade_report_header_term: term
-      grade_report_header_term_id: "term id"
-      grade_report_header_term_sis: "term sis"
     group_type: group
     include_deleted_parameter: 
       account_reports: 
@@ -964,72 +683,11 @@ en-AU:
       page_title: Accounts
       title: "Accounts I Manage"
     integer_required: "An integer value is required"
-    last_submission_activity_csv_description: 
-      account_reports: 
-        concorde: 
-          description: 
-            header: Example
-          last_submission: 
-            text: "This report shows students last activity for submissions."
-      concord_report_header_campus: campus
-      concord_report_header_course_name: "course name"
-      concord_report_header_course_sis_id: "course sis id"
-      concord_report_header_last_course_activity_date: "last course activity date"
-      concord_report_header_student_current_grade: "student current grade"
-      concord_report_header_student_default_email: "student default email"
-      concord_report_header_student_name: "student name"
-      concord_report_header_student_sis_id: "student sis id"
-      concord_report_header_term_name: "term name"
-      concord_report_header_zero_grade_assignments: "zero grade assignments"
     last_user_access_csv_description: 
       account_reports: 
         default: 
           last_user_access: 
-            header: Example
             text: "This report shows the last login for active users."
-      student_report_header_last_access_at: "last access at"
-      student_report_header_last_ip: "last ip"
-      student_report_header_user_id: "user id"
-      student_report_header_user_name: "user name"
-      student_report_header_user_sis_id: "user sis id"
-    learning_outcome_assignment_type_csv_description: 
-      account_reports: 
-        newark: 
-          student_activity: 
-            text: "This report provides an export of data that relates outcomes to assignments."
-        samuel_merrit_university: 
-          description: 
-            header: Example
-      samuel_report_header_assessment_question_id: "Assessment Question ID"
-      samuel_report_header_assessment_question_name: "Assessment Question name"
-      samuel_report_header_assignment_description: "Assignment Description"
-      samuel_report_header_assignment_id: "Assignment ID"
-      samuel_report_header_assignment_points_possible: "Assignment Points Possible"
-      samuel_report_header_assignment_title: "Assignment Title"
-      samuel_report_header_assignment_type: "Assignment Type"
-      samuel_report_header_course_canvas_id: "Course Canvas ID"
-      samuel_report_header_course_current_score: "Course Current Score"
-      samuel_report_header_course_name: "Course Name"
-      samuel_report_header_course_sis_id: "Course SIS ID"
-      samuel_report_header_course_student_count: "Course Student Count"
-      samuel_report_header_grading_scheme: "Grading Scheme"
-      samuel_report_header_learning_outcome_desc: "Learning Outcome Desc"
-      samuel_report_header_learning_outcome_id: "Learning Outcome ID"
-      samuel_report_header_learning_outcome_score: "Learning Outcome Score"
-      samuel_report_header_learning_outcome_short_name: "Learning Outcome Short Name"
-      samuel_report_header_rubric_title: "Rubric Title"
-      samuel_report_header_section_canvas_id: "Section Canvas ID"
-      samuel_report_header_section_name: "Section Name"
-      samuel_report_header_section_sis_id: "Section SIS ID"
-      samuel_report_header_student_id: "Student ID"
-      samuel_report_header_student_name: "Student Name"
-      samuel_report_header_student_sis_id: "Student SIS ID"
-      samuel_report_header_subaccount_id: "Subaccount ID"
-      samuel_report_header_subaccount_name: "Subaccount Name"
-      samuel_report_header_submission_date: "Submission Date"
-      samuel_report_header_submission_grade: "Submission Grade"
-      samuel_report_header_submissions_attempt: "Submissions Attempt"
-      samuel_report_header_teacher_name: "Teacher Name"
     learning_outcome_assignment_type_csv_parameters: 
       account_reports: 
         samuel_merrit_university: 
@@ -1039,11 +697,6 @@ en-AU:
             text: "Course ID"
           parameters: 
             note1: "Course ID can be left blank to run the report for all courses in the term."
-    mississippi_sis_csv_description: 
-      account_reports: 
-        mississisppi: 
-          sis_data: 
-            text: "This report returns all the sis users, sections, and enrollments for all trusted root accounts for the Enrollment Tool."
     mississippi_sis_csv_parameters: 
       account_reports: 
         default: 
@@ -1058,25 +711,7 @@ en-AU:
       account_reports: 
         outcomes: 
           description: 
-            header: Example
             text: "This report shows the learning outcome results for all students. The resulting csv file will have one row per user-outcome-result pair, and will show the details of the result including the associated assignment."
-      outcome_report_header_assessment_id: "assessment id"
-      outcome_report_header_assessment_question: "assessment question"
-      outcome_report_header_assessment_question_id: "assessment question id"
-      outcome_report_header_assessment_title: "assessment title"
-      outcome_report_header_assessment_type: "assessment type"
-      outcome_report_header_attempt: attempt
-      outcome_report_header_course_id: "course id"
-      outcome_report_header_course_name: "course name"
-      outcome_report_header_course_sis_id: "course sis id"
-      outcome_report_header_learning_outcome_id: "learning outcome id"
-      outcome_report_header_learning_outcome_name: "learning outcome name"
-      outcome_report_header_outcome_score: "outcome score"
-      outcome_report_header_student_id: "student id"
-      outcome_report_header_student_name: "student name"
-      outcome_report_header_student_sis_id: "student sis id"
-      outcome_report_header_submission_date: "submission date"
-      outcome_report_header_submission_score: "submission score"
     outcome_results_csv_parameters: 
       account_reports: 
         outcomes: 
@@ -1102,50 +737,7 @@ en-AU:
       account_reports: 
         default: 
           public_courses: 
-            header: Example
             text: "This report shows all the courses that are not deleted for a given term that are public. The resulting csv file will have one row per course and will show the course id, course sis id, course short name, course name, course start and end dates."
-      course_report_header_end_date: "end date"
-      course_report_header_id: id
-      course_report_header_name: name
-      course_report_header_short_name: "short name"
-      course_report_header_sis_id: "sis id"
-      course_report_header_start_date: "start date"
-    quiz_data_csv_description: 
-      account_reports: 
-        ace: 
-          quiz_data_description: 
-            header: Example
-            text: "This report shows quiz questions and answers for all quizzes in a given term. The resulting csv file will have one row per quiz question and answer."
-      ace_report_header_correct: correct
-      ace_report_header_course_id: "course id"
-      ace_report_header_course_sis_id: "course sis id"
-      ace_report_header_login_id: "login id"
-      ace_report_header_outcome_id: "outcome id"
-      ace_report_header_points_earned: "points earned"
-      ace_report_header_points_possible: "points possible"
-      ace_report_header_question_id: "question id"
-      ace_report_header_question_name: "question name"
-      ace_report_header_question_text: "question text"
-      ace_report_header_quiz_title: "quiz title"
-      ace_report_header_user_id: "user id"
-      ace_report_header_user_name: "user name"
-      ace_report_header_user_sis_id: "user sis id"
-    quiz_statistics_csv_description: 
-      account_reports: 
-        ace: 
-          quiz_statistics_description: 
-            header: Example
-            text: "This report shows quiz questions, how many users answered the questions, and how many users answered them correctly for all quizzes in a given term. The resulting csv file will have one row per quiz question."
-      ace_report_header_count_correct: "count correct"
-      ace_report_header_count_taken: "count taken"
-      ace_report_header_course_id: "course id"
-      ace_report_header_course_sis_id: "course sis id"
-      ace_report_header_outcome_ids: "outcome ids"
-      ace_report_header_points_possible: "points possible"
-      ace_report_header_question_id: "question id"
-      ace_report_header_question_name: "question name"
-      ace_report_header_question_text: "question text"
-      ace_report_header_quiz_title: "quiz title"
     quota_integer_required: "An integer value is required"
     quota_must_be_positive: "Value must be positive"
     quota_not_updated: "Quota was not updated"
@@ -1155,29 +747,11 @@ en-AU:
       account_reports: 
         default: 
           recently_deleted_courses: 
-            header: Example
             text: "This report shows all the courses for a given term that have been deleted in the last 30 days. The resulting csv file will have one row per course and will show the course id, course sis id, course short name, course name, course start and end dates."
     retry_login: "Retry Login"
     root_accounts: 
       labels: 
         name: "Account Name"
-    safety_drill_csv_description: 
-      account_reports: 
-        newark: 
-          description: 
-            header: Example
-          student_activity: 
-            text: "This report shows all of the assignments and info pertaining to those assignments that are in the specified assignment group or groups and in the specified date range. This report provides data for scheduling safety drills with a minimum of disruption to major in-class assessments."
-      newark_report_header_assignment_due_date: "assignment due date"
-      newark_report_header_assignment_group_name: "assignment group name"
-      newark_report_header_assignment_id: "assignment id"
-      newark_report_header_assignment_name: "assignment name"
-      newark_report_header_course_code: "course code"
-      newark_report_header_course_id: "course id"
-      newark_report_header_course_name: "course name"
-      newark_report_header_course_sis_id: "course sis id"
-      newark_report_header_section_name: "section name"
-      newark_report_header_teacher_name: "teacher name"
     safety_drill_csv_parameters: 
       account_reports: 
         newark: 
@@ -1275,7 +849,6 @@ en-AU:
       help_link_available_to_all_teachers: Teachers
       help_link_available_to_all_users: Users
       if_you_would_like_to_link_to_your_own_campus_support_website_in_the_help_dialog_you_can_do_that_here: "If you would like to link to your own campus support website in the help dialog you can do that here"
-      interpolate_account_domain: "Note: enter \"{{ACCOUNT_DOMAIN}}\" to substitute the user's root account domain"
       ip_filter_filter_label: Filter
       ip_filter_name_label: Name
       labels: 
@@ -1485,9 +1058,6 @@ en-AU:
         other: "%{count} batches waiting to be processed."
       pending_batches_title: "Pending Batches"
       process_data_button: "Process Data"
-      select_file_instructions: |-
-          Select the zip file that you want imported.  
-          For a description of how to generate these zip files, [please see this documentation](%{url}).
       sis_import_crumb: "SIS Import"
       started_at_message: "Started: %{started_at}"
       title: "SIS Import"
@@ -1531,135 +1101,21 @@ en-AU:
         one: "%{file_size} *from one file*"
         other: "%{file_size} *from %{count} files*"
       uploaded_file_storage_header: "Uploaded File Storage"
-    student_access_csv_description: 
-      access_report_header_content: content
-      access_report_header_content_access_id: "content access id"
-      access_report_header_content_type: "content type"
-      access_report_header_course_id: "course id"
-      access_report_header_course_name: "course name"
-      access_report_header_course_sis_id: "course sis id"
-      access_report_header_last_viewed: "last viewed"
-      access_report_header_root_account_id: "root account id"
-      access_report_header_section_id: "section id"
-      access_report_header_section_name: "section name"
-      access_report_header_section_sis_id: "section sis id"
-      access_report_header_term_id: "term id"
-      access_report_header_term_sis_id: "term sis id"
-      access_report_header_times_participated: "times participated"
-      access_report_header_times_viewed: "times viewed"
-      access_report_header_user_id: "user id"
-      access_report_header_user_sis_id: "user sis id"
-      account_reports: 
-        tmcc: 
-          description: 
-            header: Example
-          student_activity: 
-            text: "This report shows all the activity from students enrolled in a given course or all courses in a given term. Resulting csv file will have one row per student activity and will have the following headers; section id, section sis id, section name, course id, course sis id, course name, user id, user sis id, content type, content, times viewed, times participated, last viewed. The times viewed and times participated are counters from the beginning of time until the time the report was generated."
     student_assignment_outcome_map_csv_description: 
       account_reports: 
         student_assignment_map: 
           description: 
-            header: Example
             text: "This report shows the learning outcome results for all students. The resulting csv file will have one row per user-outcome-result pair, and will show the details of the result including the associated assignment. This report only shows outcome results for assignments and does not include outcomes tied to question banks."
-      outcome_report_header_assignment_id: "assignment id"
-      outcome_report_header_assignment_title: "assignment title"
-      outcome_report_header_assignment_url: "assignment url"
-      outcome_report_header_attempt: attempt
-      outcome_report_header_course_id: "course id"
-      outcome_report_header_course_name: "course name"
-      outcome_report_header_course_sis_id: "course sis id"
-      outcome_report_header_learning_outcome_id: "learning outcome id"
-      outcome_report_header_learning_outcome_name: "learning outcome name"
-      outcome_report_header_outcome_score: "outcome score"
-      outcome_report_header_section_id: "section id"
-      outcome_report_header_section_name: "section name"
-      outcome_report_header_section_sis_id: "section sis id"
-      outcome_report_header_student_id: "student id"
-      outcome_report_header_student_name: "student name"
-      outcome_report_header_student_sis_id: "student sis id"
-      outcome_report_header_submission_date: "submission date"
-      outcome_report_header_submission_score: "submission score"
-    student_grades_csv_description: 
-      account_reports: 
-        auburn: 
-          student_grades: 
-            description: 
-              text: "This report shows the student final grade results for students in a given term. The resulting csv file will have one row per enrollment, and will show the current and final grade that is displayed in the course gradebook."
-        default: 
-          description: 
-            header: Example
-      auburn_report_header_course: course
-      auburn_report_header_course_id: "course id"
-      auburn_report_header_course_sis: "course sis"
-      auburn_report_header_current_score: "current score"
-      auburn_report_header_enrollment_state: "enrollment state"
-      auburn_report_header_final_score: "final score"
-      auburn_report_header_section: section
-      auburn_report_header_section_id: "section id"
-      auburn_report_header_section_sis: "section sis"
-      auburn_report_header_student_id: "student id"
-      auburn_report_header_student_name: "student name"
-      auburn_report_header_student_sis: "student sis"
-      auburn_report_header_term: term
-      auburn_report_header_term_id: "term id"
-      auburn_report_header_term_sis: "term sis"
     student_grades_csv_parameters: 
       account_reports: 
         auburn: 
           pseudonym_ids: 
             field: "Pseudonym IDs"
-    student_ip_csv_description: 
-      account_reports: 
-        dubspot: 
-          description: 
-            header: Example
-          student_login: 
-            text: "This report shows all the students enrolled in a given course or all courses in a given term. Resulting csv file will have one row per student enrollment."
-      dubspot_report_header_course_id: "course id"
-      dubspot_report_header_course_name: "course name"
-      dubspot_report_header_course_sis_id: "course sis id"
-      dubspot_report_header_ip_address: "ip address"
-      dubspot_report_header_last_seen_at: "last seen at"
-      dubspot_report_header_section_id: "section id"
-      dubspot_report_header_section_name: "section name"
-      dubspot_report_header_section_sis_id: "section sis id"
-      dubspot_report_header_user_id: "user id"
-      dubspot_report_header_user_login_id: "user login id"
-      dubspot_report_header_user_sis_id: "user sis id"
-    student_submissions_csv_description: 
-      account_reports: 
-        vilas: 
-          description: 
-            header: Example
-          student_submissions: 
-            text: "This is a report of all students enrolled in a course in a given term that have submitted an assignment. This report contains one row per student submission."
-      vilas_report_header_assignment_id: "assignment id"
-      vilas_report_header_assignment_name: "assignment name"
-      vilas_report_header_canvas_course_id: "canvas course id"
-      vilas_report_header_canvas_user_id: "canvas user id"
-      vilas_report_header_course_name: "course name"
-      vilas_report_header_points_possible: "points possible"
-      vilas_report_header_score: score
-      vilas_report_header_sis_course_id: "sis course id"
-      vilas_report_header_sis_user_id: "sis user id"
-      vilas_report_header_submission_date: "submission date"
-      vilas_report_header_user_name: "user name"
     students_with_no_submissions_csv_description: 
       account_reports: 
         default: 
           students_with_no_submissions: 
-            description: 
-              header: Example
             text: "This is a report of all students enrolled in a course in a given term that have not submitted an assignment between the given date range in a course. This report contains one row per student enrollment that meet the criteria. The date range can be no longer than two weeks."
-      student_report_header_course_id: "course id"
-      student_report_header_course_name: "course name"
-      student_report_header_course_sis_id: "course sis id"
-      student_report_header_section_id: "section id"
-      student_report_header_section_name: "section name"
-      student_report_header_section_sis_id: "section sis id"
-      student_report_header_user_id: "user id"
-      student_report_header_user_name: "user name"
-      student_report_header_user_sis_id: "user sis id"
     students_with_no_submissions_csv_parameters: 
       account_reports: 
         default: 
@@ -1669,31 +1125,6 @@ en-AU:
             check_box: "Include Enrollment State"
       active: "Active Enrollments"
       all: "All Enrollments"
-    submission_data_csv_description: 
-      account_reports: 
-        submission_data: 
-          description: 
-            text: "This report contains dates of submissions for the attendance tool."
-    tempe_grade_export_csv_description: 
-      account_reports: 
-        tempe: 
-          description: 
-            header: Example
-          grade_export: 
-            text: "This report shows the student final grade results for all students in a given term. The resulting tab delimited file will have one row per enrollment, and will show the final grade and multiple course information fields that will be used for uploading grade data into Synergy SIS."
-      tempe_report_header_absences: ABSENCES
-      tempe_report_header_citizenship: CITIZENSHIP
-      tempe_report_header_comment_1: COMMENT_1
-      tempe_report_header_comment_2: COMMENT_2
-      tempe_report_header_comment_3: COMMENT_3
-      tempe_report_header_grade_mark: GRADE_MARK
-      tempe_report_header_grading_term: GRADING_TERM
-      tempe_report_header_mark_name: MARK_NAME
-      tempe_report_header_school_code: SCHOOL_CODE
-      tempe_report_header_school_year: SCHOOL_YEAR
-      tempe_report_header_section_id: SECTION_ID
-      tempe_report_header_sis_number: SIS_NUMBER
-      tempe_report_header_workhabits: WORKHABITS
     tempe_grade_export_csv_parameters: 
       account_reports: 
         tempe: 
@@ -1718,54 +1149,14 @@ en-AU:
       account_reports: 
         default: 
           unpublishd_courses: 
-            header: Example
             text: "This report shows all the courses for a given term that are not published. The resulting csv file will have one row per course and will show the course id, course sis id, course short name, course name, course start and end dates."
-      course_report_header_end_date: "end date"
-      course_report_header_id: id
-      course_report_header_name: name
-      course_report_header_short_name: "short name"
-      course_report_header_sis_id: "sis id"
-      course_report_header_start_date: "start date"
     unrecognized_time_zone: "'%{timezone}' is not a recognised time zone"
     unused_courses_csv_description: 
       account_reports: 
         unused_courses: 
-          description: 
-            header: Example
           main: 
             text: "This is a report of all courses that have none of the following items: assignments, announcements, discussions, files, modules, pages, or quizzes."
-      course_report_header_course_id: "course id"
-      course_report_header_course_sis_id: "course sis id"
-      course_report_header_created_at: "created at"
-      course_report_header_long_name: "long name"
-      course_report_header_short_name: "short name"
-      course_report_header_status: status
     update_failed_notice: "Account settings update failed"
-    user_access_csv_description: 
-      access_report_header_content: content
-      access_report_header_content_access_id: "content access id"
-      access_report_header_content_type: "content type"
-      access_report_header_course_id: "course id"
-      access_report_header_course_name: "course name"
-      access_report_header_course_sis_id: "course sis id"
-      access_report_header_enrollment_type: "enrollment type"
-      access_report_header_last_viewed: "last viewed"
-      access_report_header_root_account_id: "root account id"
-      access_report_header_section_id: "section id"
-      access_report_header_section_name: "section name"
-      access_report_header_section_sis_id: "section sis id"
-      access_report_header_term_id: "term id"
-      access_report_header_term_sis_id: "term sis id"
-      access_report_header_times_participated: "times participated"
-      access_report_header_times_viewed: "times viewed"
-      access_report_header_user_id: "user id"
-      access_report_header_user_sis_id: "user sis id"
-      account_reports: 
-        usu: 
-          description: 
-            header: Example
-          user_activity: 
-            text: "This report shows all the activity from users enrolled in a given course or all courses in a given term. Resulting csv file will have one row per student activity and will have the following headers; enrollment_type, section id, section sis id, section name, course id, course sis id, course name, user id, user sis id, content type, content, times viewed, times participated, last viewed. The times viewed and times participated are counters from the beginning of time until the time the report was generated."
     user_access_csv_parameters: 
       account_reports: 
         usu: 
@@ -1781,46 +1172,11 @@ en-AU:
     user_added_message: "*%{user}* successfully added!"
     user_added_message_sent_message: "*%{user}* successfully added! They should receive an email confirmation shortly."
     user_deleted_message: "%{username} successfully deleted"
-    user_inactivity_csv_description: 
-      account_reports: 
-        webster: 
-          description: 
-            header: Example
-          low_activity: 
-            text: "This report shows all the users enrolled in a given course or all courses in a given term. Resulting csv file will have one row per user enrollment that have not visited the minimum number of course items."
-      webster_report_header_course_id: "course id"
-      webster_report_header_course_name: "course name"
-      webster_report_header_course_sis_id: "course sis id"
-      webster_report_header_enrollment_state: "enrollment state"
-      webster_report_header_enrollment_type: "enrollment type"
-      webster_report_header_last_ip: "last ip"
-      webster_report_header_login_id: "login id"
-      webster_report_header_user_id: "user id"
-      webster_report_header_user_name: "user name"
-      webster_report_header_user_sis_id: "user sis id"
     user_inactivity_csv_parameters: 
       account_reports: 
         webster: 
           login: 
             day_drop: "Minimum course items visited:"
-    user_notes_csv_description: 
-      account_reports: 
-        pasco: 
-          description: 
-            header: Example
-          user_notes: 
-            text: "This report shows students user notes."
-      pasco_report_header_created_at: created_at
-      pasco_report_header_created_by_id: created_by_id
-      pasco_report_header_deleted_at: deleted_at
-      pasco_report_header_note: note
-      pasco_report_header_note_id: id
-      pasco_report_header_title: title
-      pasco_report_header_updated_at: updated_at
-      pasco_report_header_user_id: user_id
-      pasco_report_header_user_sis_id: user_sis_id
-      pasco_report_header_workflow_state: workflow_state
-      pasco_report_url: url
     users_list: 
       login_name_or_sis_id: "Login / SIS ID"
       name: Name
@@ -1830,59 +1186,12 @@ en-AU:
       account_reports: 
         default: 
           zero_activity: 
-            header: Example
             text: "This report shows all the students enrolled in any courses in a given term. Resulting csv file will have one row per user enrollment that have not visited the course since the date."
-      student_report_header_course_id: "course id"
-      student_report_header_course_name: "course name"
-      student_report_header_course_sis_id: "course sis id"
-      student_report_header_name: name
-      student_report_header_section_id: "section id"
-      student_report_header_section_name: "section name"
-      student_report_header_section_sis_id: "section sis id"
-      student_report_header_user_id: "user id"
-      student_report_header_user_sis_id: "user sis id"
-  ace_report_header_correct: correct
-  ace_report_header_count_correct: "count correct"
-  ace_report_header_count_taken: "count taken"
-  ace_report_header_course_id: "course id"
-  ace_report_header_course_sis_id: "course sis id"
-  ace_report_header_login_id: "login id"
-  ace_report_header_outcome_id: "outcome id"
-  ace_report_header_outcome_ids: "outcome ids"
-  ace_report_header_points_earned: "points earned"
-  ace_report_header_points_possible: "points possible"
-  ace_report_header_question_id: "question id"
-  ace_report_header_question_name: "question name"
-  ace_report_header_question_text: "question text"
-  ace_report_header_quiz_title: "quiz title"
-  ace_report_header_user_id: "user id"
-  ace_report_header_user_name: "user name"
-  ace_report_header_user_sis_id: "user sis id"
   activerecord: 
     errors: 
-      full_messages: 
-        format: "%{attribute} %{message}"
       messages: 
-        accepted: "must be accepted"
-        blank: "can't be blank"
-        confirmation: "doesn't match confirmation"
-        empty: "can't be empty"
-        equal_to: "must be equal to %{count}"
-        even: "must be even"
-        exclusion: "is reserved"
-        greater_than: "must be greater than %{count}"
-        greater_than_or_equal_to: "must be greater than or equal to %{count}"
-        inclusion: "is not included in the list"
-        invalid: "is invalid"
-        less_than: "must be less than %{count}"
-        less_than_or_equal_to: "must be less than or equal to %{count}"
-        not_a_number: "is not a number"
-        odd: "must be odd"
         record_invalid: "Validation failed: %{errors}"
         taken: "has already been taken"
-        too_long: "is too long (maximum is %{count} characters)"
-        too_short: "is too short (minimum is %{count} characters)"
-        wrong_length: "is the wrong length (should be %{count} characters)"
       template: 
         body: "There were problems with the following fields:"
         header: 
@@ -2864,48 +2173,12 @@ en-AU:
     titles: 
       attendance_help: "Attendance Help"
       new_attendance_column: "New Attendance Column"
-  auburn_report_header_account_id: "account id"
-  auburn_report_header_account_name: "account name"
-  auburn_report_header_account_sis_id: "account sis id"
-  auburn_report_header_course: course
-  auburn_report_header_course_id: "course id"
-  auburn_report_header_course_name: "course name"
-  auburn_report_header_course_sis: "course sis"
-  auburn_report_header_course_sis_id: "course sis id"
-  auburn_report_header_course_status: "course status"
-  auburn_report_header_current_score: "current score"
-  auburn_report_header_effective_date: "effective date"
-  auburn_report_header_end_date: "end date"
-  auburn_report_header_enrollment_state: "enrollment state"
-  auburn_report_header_final_score: "final score"
-  auburn_report_header_section: section
-  auburn_report_header_section_id: "section id"
-  auburn_report_header_section_name: "section name"
-  auburn_report_header_section_sis: "section sis"
-  auburn_report_header_section_sis_id: "section sis id"
-  auburn_report_header_start_date: "start date"
-  auburn_report_header_student_count: "student count"
-  auburn_report_header_student_id: "student id"
-  auburn_report_header_student_name: "student name"
-  auburn_report_header_student_sis: "student sis"
-  auburn_report_header_teacher_id: "teacher id"
-  auburn_report_header_teacher_name: "teacher name"
-  auburn_report_header_teacher_sis_id: "teacher sis id"
-  auburn_report_header_term: term
-  auburn_report_header_term_id: "term id"
-  auburn_report_header_term_name: "term name"
-  auburn_report_header_term_sis: "term sis"
-  auburn_report_header_term_sis_id: "term sis id"
   auth_logging: 
     login: LOGIN
     logout: LOGOUT
   bb_display: "Blackboard Learn"
   bb_file_description: "Blackboard 6/7/8/9 export .zip file"
   bb_name: "Blackboard Converter"
-  better_file_browsing_description: |-
-      A new, simpler, more user friendly file browsing interface.  If you turn this on at the course level,
-      then all of the users in that course will see the new interface.  To get it to show up when someone
-      goes to the personal files page for a user ('/files') then you need to turn it on for the account they are a memeber of.
   big_blue_button_conference: 
     conference_is_recorded: "This conference is being recorded."
     recording_setting: Recording
@@ -2914,12 +2187,6 @@ en-AU:
     no_manifest: "This Blackboard .zip has no imsmanifest.xml file in the root directory."
   bookmark_service: 
     default_title: "No Title"
-  bucks_report_header_last_access_to_canvas: "last access to canvas"
-  bucks_report_header_name: name
-  bucks_report_header_section_id: "section id"
-  bucks_report_header_section_name: "section name"
-  bucks_report_header_section_sis_id: "section sis id"
-  bucks_report_header_user_sis_id: "user sis id"
   bucks_zero_activity_title: "Bucks Zero Activity"
   bulk_course_migration: 
     export_failed: "There was an error exporting the course with bb_lcid %{id} from Blackboard"
@@ -3515,49 +2782,12 @@ en-AU:
     by_sa: "CC Attribution Share Alike"
     private: "Private (Copyrighted)"
     public_domain: "Public Domain"
-  ccp_report_header_course_id: "course id"
-  ccp_report_header_course_name: course_name
-  ccp_report_header_course_sis_id: "course sis id"
-  ccp_report_header_email: email
-  ccp_report_header_enrollment_type: "enrollment type"
-  ccp_report_header_first_name: "first name"
-  ccp_report_header_last_name: last_name
-  ccp_report_header_section_id: "section id"
-  ccp_report_header_section_name: "section name"
-  ccp_report_header_section_sis_id: "section sis id"
-  ccp_report_header_user_id: "user id"
-  ccp_report_header_user_sis_id: "user sis id"
   ccp_zero_activity_title: "CCP Zero Activity"
-  cedar_rapids_report_header_account_id: "Account ID"
-  cedar_rapids_report_header_account_name: "Account Name"
-  cedar_rapids_report_header_course_end_date: "Course End Date"
-  cedar_rapids_report_header_course_id: "Course ID"
-  cedar_rapids_report_header_course_name: "Course Name"
-  cedar_rapids_report_header_course_start_date: "Course Start Date"
-  cedar_rapids_report_header_course_status: "Course Status"
-  cedar_rapids_report_header_department_id: "Department ID"
-  cedar_rapids_report_header_department_name: "Department Name"
-  cedar_rapids_report_header_observer_count: "Observer Count"
-  cedar_rapids_report_header_student_count: "Student Count"
-  cedar_rapids_report_header_ta_count: "TA Count"
-  cedar_rapids_report_header_teacher_count: "Teacher Count"
-  cedar_rapids_report_header_term_id: "Term ID"
-  cedar_rapids_report_header_term_name: "Term Name"
   change_points_possible_to_match_rubric_dialog: 
     prompts: 
       update_assignment_points: "This assignment has %{assignmentPoints} points possible, would you like to change it to have %{rubricPoints} points possible to match this rubric?"
     titles: 
       update_assignment_points: "Change points possible to match rubric?"
-  chcp_report_header_course: course
-  chcp_report_header_email: email
-  chcp_report_header_grade: grade
-  chcp_report_header_last_submissio: "last submission"
-  chcp_report_header_lda: lda
-  chcp_report_header_phone: phone
-  chcp_report_header_start_date: "start date"
-  chcp_report_header_student_id: "student id"
-  chcp_report_header_student_name: "student name"
-  chcp_report_header_teacher: teacher
   chcp_student_activity_title: "CHCP Student Activity Report"
   collaboration: 
     default_title: "Unnamed Collaboration"
@@ -3655,10 +2885,6 @@ en-AU:
         current: "Current Collaborations"
     titles: 
       delete: "Delete collaboration?"
-  collection_items: 
-    new: 
-      pin_to_canvas_network: "Pin to Canvas Network"
-      saved_successfully: "Saved Successfully"
   comm_messages: 
     from_beginning: "the beginning"
     to_now: now
@@ -3727,16 +2953,6 @@ en-AU:
     profile: 
       notices: 
         contact_registered: "Contact method registered!"
-  concord_report_header_campus: campus
-  concord_report_header_course_name: "course name"
-  concord_report_header_course_sis_id: "course sis id"
-  concord_report_header_last_course_activity_date: "last course activity date"
-  concord_report_header_student_current_grade: "student current grade"
-  concord_report_header_student_default_email: "student default email"
-  concord_report_header_student_name: "student name"
-  concord_report_header_student_sis_id: "student sis id"
-  concord_report_header_term_name: "term name"
-  concord_report_header_zero_grade_assignments: "zero grade assignments"
   conferences: 
     concluded_conference: 
       delete: Delete
@@ -3815,7 +3031,6 @@ en-AU:
     buttons: 
       process: "Process Data"
     errors: 
-      couldnt_create: "Couldn't create course export."
       error: "There was an error exporting your content.  Please notify your system administrator and give them the following export identifier: \"%{code}\""
       not_found: "Export does not exist"
     index: 
@@ -5015,17 +4230,6 @@ en-AU:
       uuid: UUID
       wiki_id: "Wiki Id"
       workflow_state: "Workflow State"
-  course_report_header_course_id: "course id"
-  course_report_header_course_sis_id: "course sis id"
-  course_report_header_created_at: "created at"
-  course_report_header_end_date: "end date"
-  course_report_header_id: id
-  course_report_header_long_name: "long name"
-  course_report_header_name: name
-  course_report_header_short_name: "short name"
-  course_report_header_sis_id: "sis id"
-  course_report_header_start_date: "start date"
-  course_report_header_status: status
   course_restore: 
     restore_error: "There was an error attempting to restore the course. Course was not restored."
   course_search: 
@@ -5769,8 +4973,6 @@ en-AU:
       one: "Expand %{count} discussions"
       other: "Expand %{count} discussions"
     enable_dashboard: "Try out the new dashboard"
-    event_created: "Event created"
-    message_sent: "Message Sent"
     show_more_link: 
       show_less: "Show Less"
       show_more: "Show More"
@@ -6294,30 +5496,12 @@ en-AU:
       a new unpublished state that is invisible to students and excluded from grade
       calculations. Caution--disabling this feature may delete newly created or edited
       content from the teacher's view.
-  dubspot_report_header_course_id: "course id"
-  dubspot_report_header_course_name: "course name"
-  dubspot_report_header_course_sis_id: "course sis id"
-  dubspot_report_header_ip_address: "ip address"
-  dubspot_report_header_last_seen_at: "last seen at"
-  dubspot_report_header_section_id: "section id"
-  dubspot_report_header_section_name: "section name"
-  dubspot_report_header_section_sis_id: "section sis id"
-  dubspot_report_header_user_id: "user id"
-  dubspot_report_header_user_login_id: "user login id"
-  dubspot_report_header_user_sis_id: "user sis id"
   due_dates: 
     due_at: "due: %{assignment_due_date_time}"
     multiple_due_dates: "due: Multiple Due Dates"
     no_due_date: "due: No Due Date"
   ecollege_file_description: Ecollege
   ecollege_name: "Ecollege Converter"
-  edison: 
-    outcome: 
-      extra_text: "Outcome Id: %{outcome_id};"
-    quiz_id: 
-      extra_text: "Quiz id: %{quiz_id};"
-    section_id: 
-      extra_text: "Section: %{section_id};"
   edit_rubric: 
     buttons: 
       create_rubric: "Create Rubric"
@@ -6750,7 +5934,6 @@ en-AU:
       links: 
         add_external_feed: "Add External Feed"
       options: 
-        content_to_post: "--Content to post--"
         full_article: "Full article"
         link_only: "Link only"
         truncated: Truncated
@@ -7140,17 +6323,6 @@ en-AU:
     no_deleting_folders_with_content: "Can't delete a folder with content"
     no_deleting_root: "Can't delete the root folder"
     only_one_folder: "Can't set folder path and folder id"
-  galen_report_header_account_id: account_id
-  galen_report_header_account_name: account_name
-  galen_report_header_course_name: course_name
-  galen_report_header_course_sis_id: course_sis_id
-  galen_report_header_first_submission: first_submission
-  galen_report_header_resource_type: resource_type
-  galen_report_header_section_sis_id: section_sis_id
-  galen_report_header_submission_date: submission_date
-  galen_report_header_submission_type: submission_type
-  galen_report_header_title: title
-  galen_report_header_user_sis_id: user_sis_id
   global_message_icons: 
     announcement: announcement
     calendar: calendar
@@ -7170,21 +6342,6 @@ en-AU:
       checkbox: "Don't show for this course again."
       warning: Warning
   grade_export_title: "Grade Export"
-  grade_report_header_course: course
-  grade_report_header_course_id: "course id"
-  grade_report_header_course_sis: "course sis"
-  grade_report_header_current_score: "current score"
-  grade_report_header_enrollment_state: "enrollment state"
-  grade_report_header_final_score: "final score"
-  grade_report_header_section: section
-  grade_report_header_section_id: "section id"
-  grade_report_header_section_sis: "section sis"
-  grade_report_header_student_id: "student id"
-  grade_report_header_student_name: "student name"
-  grade_report_header_student_sis: "student sis"
-  grade_report_header_term: term
-  grade_report_header_term_id: "term id"
-  grade_report_header_term_sis: "term sis"
   grade_summary: 
     graph_title: "Mean %{mean}, High %{high}, Low %{low}"
     outcome: 
@@ -7712,27 +6869,6 @@ en-AU:
       saving: Saving...
     titles: 
       grading_scheme_info: "View/Edit Grading Scheme"
-  granite_report_header_account_id: account_id
-  granite_report_header_assignment_id: assignment_id
-  granite_report_header_assignment_name: assignment_name
-  granite_report_header_assignment_unique_id: assignment_unique_id
-  granite_report_header_course_id: course_id
-  granite_report_header_department: Department
-  granite_report_header_ends: Ends
-  granite_report_header_graded_at: graded_at
-  granite_report_header_name: Name
-  granite_report_header_observer_count: Observer_Count
-  granite_report_header_sis_id: SIS_Id
-  granite_report_header_starts: Starts
-  granite_report_header_student_count: Student_Count
-  granite_report_header_submission_date: submission_date
-  granite_report_header_submission_id: submission_id
-  granite_report_header_submission_score: submission_score
-  granite_report_header_ta_count: TA_Count
-  granite_report_header_teacher_count: Teacher_Count
-  granite_report_header_term: Term
-  granite_report_header_term_id: term_id
-  granite_report_header_user_id: user_id
   group: 
     greater_than_1: "Must be greater than 1"
     memeber: Member
@@ -8230,7 +7366,6 @@ en-AU:
       search_by_tag: "Search by Tag"
     confirms: 
       default_delete_thing: "Are you sure you want to delete this?"
-    course_time: "COURSE:"
     datepicker: 
       titles: 
         am_pm: am/pm
@@ -8256,7 +7391,6 @@ en-AU:
       minimize_youtube_video: "Minimize Video"
       view_equella_content_in_new_window: "view the content in a new window"
     loading: Loading...
-    local_time: "LOCAL:"
     no_description: "No description"
     no_items: "No items."
     no_results_found: "No Results Found"
@@ -8359,7 +7493,6 @@ en-AU:
       links: 
         close: Close
         dashboard: "My Dashboard"
-        home: Home
         skip_to_content: "Skip To Content"
       menu: 
         assignments: Assignments
@@ -8475,17 +7608,6 @@ en-AU:
       word_separator: " "
   license_help: 
     content_license_help: "Content Licensing Help"
-  lincoln_report_header_course_id: "Course ID"
-  lincoln_report_header_course_name: "Course Name"
-  lincoln_report_header_course_role: "Course Role"
-  lincoln_report_header_course_sis_id: "Course SIS ID"
-  lincoln_report_header_current_grade: "Current Grade"
-  lincoln_report_header_invalid_term: "Invalid Term"
-  lincoln_report_header_login: "login ID"
-  lincoln_report_header_student_name: "Student Name"
-  lincoln_report_header_student_sis: "Student SIS ID"
-  lincoln_report_header_term_id: "Term ID"
-  lincoln_report_header_term_name: "Term Name"
   link_enrollment: 
     buttons: 
       link: "Link to Student"
@@ -9318,7 +8440,6 @@ en-AU:
         subject: "Course Export Failed: %{course}"
     content_export_finished: 
       email: 
-        body: "Your course export for \"%{course}\" has finished."
         html: 
           body2: "Your course export for *%{course}* has finished."
           link: "Click to view exports"
@@ -10518,17 +9639,6 @@ en-AU:
   migration_issues: 
     errors: 
       valid_workflow_state: "Must send a valid workflow state"
-  mississippi_report_header_course_id: course_id
-  mississippi_report_header_enrollment_id: enrollment_id
-  mississippi_report_header_enrollment_state: enrollment_state
-  mississippi_report_header_observer_sis_id: observer_sis_id
-  mississippi_report_header_observer_user_id: observer_user_id
-  mississippi_report_header_role: role
-  mississippi_report_header_section_id: section_id
-  mississippi_report_header_sis_course_id: sis_course_id
-  mississippi_report_header_sis_section_id: sis_section_id
-  mississippi_report_header_sis_user_id: sis_user_id
-  mississippi_report_header_user_id: user_id
   mississippi_sis_title: "SIS data"
   module_item_types: 
     assignment: Assignment
@@ -10609,21 +9719,6 @@ en-AU:
   new_styles_description: |-
       We are working on a UI facelift to Canvas. Turn this on to opt-in to seeing the
       updated, simplified look and feel of the Canvas interface.
-  newark_report_header__assignment_count: "# of assignments"
-  newark_report_header_assignment_due_date: "assignment due date"
-  newark_report_header_assignment_group_name: "assignment group name"
-  newark_report_header_assignment_id: "assignment id"
-  newark_report_header_assignment_name: "assignment name"
-  newark_report_header_course_code: "course code"
-  newark_report_header_course_id: "course id"
-  newark_report_header_course_name: "course name"
-  newark_report_header_course_sis_id: "course sis id"
-  newark_report_header_due_date: "due date"
-  newark_report_header_section_id: "section id"
-  newark_report_header_section_name: "section name"
-  newark_report_header_student_name: "student name"
-  newark_report_header_teacher_id: "teacher id"
-  newark_report_header_teacher_name: "teacher name"
   no_migration_file: "File required for content migration."
   not_a_number: "must be a positive number"
   notification: 
@@ -10688,17 +9783,6 @@ en-AU:
     due_date_display: "Due Date"
     files_description: "New file added to your course"
     files_display: Files
-    grading_description: |-
-        Includes:
-        
-        * Assignment/submission grade entered/changed
-        * Un-muted assignment grade
-        * Grade weight changed
-        
-        &nbsp;
-        
-        Check 'Include scores when alerting about grade changes' if you want to see your grades in the notifications.
-        If your email is not an institution email this means sensitive content will be sent outside of the institution.
     grading_display: Grading
     grading_notify_include_grade: "Include scores when alerting about grade changes."
     grading_policies_description: "Course grading policy change"
@@ -10811,14 +9895,7 @@ en-AU:
         
         Student appointment sign-up
     student_appointment_display: "Student Appointment Signups"
-    submission_comment_description: |-
-        Assignment submission comment
-        
-        &nbsp;
-        
-        Check 'Mark new submission comments as read' if you don't want them to show up as 'new' in your Canvas Inbox
     submission_comment_display: "Submission Comment"
-    submission_new_as_read: "Mark new submission comments as read."
   notification_preferences: 
     communication: 
       email: 
@@ -10891,29 +9968,6 @@ en-AU:
     account_group_description: "Account level outcomes group."
   outcome_path_mastery_points: "%{path} mastery points"
   outcome_path_result: "%{path} result"
-  outcome_report_header_assessment_id: "assessment id"
-  outcome_report_header_assessment_question: "assessment question"
-  outcome_report_header_assessment_question_id: "assessment question id"
-  outcome_report_header_assessment_title: "assessment title"
-  outcome_report_header_assessment_type: "assessment type"
-  outcome_report_header_assignment_id: "assignment id"
-  outcome_report_header_assignment_title: "assignment title"
-  outcome_report_header_assignment_url: "assignment url"
-  outcome_report_header_attempt: attempt
-  outcome_report_header_course_id: "course id"
-  outcome_report_header_course_name: "course name"
-  outcome_report_header_course_sis_id: "course sis id"
-  outcome_report_header_learning_outcome_id: "learning outcome id"
-  outcome_report_header_learning_outcome_name: "learning outcome name"
-  outcome_report_header_outcome_score: "outcome score"
-  outcome_report_header_section_id: "section id"
-  outcome_report_header_section_name: "section name"
-  outcome_report_header_section_sis_id: "section sis id"
-  outcome_report_header_student_id: "student id"
-  outcome_report_header_student_name: "student name"
-  outcome_report_header_student_sis_id: "student sis id"
-  outcome_report_header_submission_date: "submission date"
-  outcome_report_header_submission_score: "submission score"
   outcome_results: 
     outcomes_filename: Outcomes
   outcome_results_title: "Outcome Results"
@@ -11100,33 +10154,10 @@ en-AU:
     view_more_link: "View More"
   paginated_view: 
     loading_more_results: "Loading more results"
-  pasco_report_header_created_at: created_at
-  pasco_report_header_created_by_id: created_by_id
-  pasco_report_header_deleted_at: deleted_at
-  pasco_report_header_note: note
-  pasco_report_header_note_id: id
-  pasco_report_header_title: title
-  pasco_report_header_updated_at: updated_at
-  pasco_report_header_user_id: user_id
-  pasco_report_header_user_sis_id: user_sis_id
-  pasco_report_header_workflow_state: workflow_state
-  pasco_report_url: url
   pasco_user_notes_title: "User Notes"
   paypal: 
     exception: "We're sorry, an error has occurred, please try again later."
-  pci_report_header_course_sis_id: course_sis_id
-  pci_report_header_submission_date: submission_date
-  pci_report_header_submission_type: submission_type
-  pci_report_header_user_sis: user_sis
   penn_harris_student_grade_title: "Penn Harris Student Grades"
-  ph_student_grades_report_header_account_id: account_id
-  ph_student_grades_report_header_course_id: course_id
-  ph_student_grades_report_header_final_letter_grade: final_letter_grade
-  ph_student_grades_report_header_final_score: final_score
-  ph_student_grades_report_header_mark_type: mark_type
-  ph_student_grades_report_header_term_id: term_id
-  ph_student_grades_report_header_user_id: user_id
-  ph_student_grades_report_term_required: "A Term is required for this report."
   plugins: 
     academic_benchmark_importer: 
       description: "This enables importing Academic Benchmark standards into Canvas."
@@ -11789,35 +10820,6 @@ en-AU:
     upload_file_view: 
       choose_a_picture: "choose a picture"
       crop_instructions: "To crop image, drag the selection and then click the \"Save\" button below."
-  provisioning_report_header_account_id: account_id
-  provisioning_report_header_associated_user_id: associated_user_id
-  provisioning_report_header_canvas_account_id: canvas_account_id
-  provisioning_report_header_canvas_associated_user_id: canvas_associated_user_id
-  provisioning_report_header_canvas_course_id: canvas_course_id
-  provisioning_report_header_canvas_group_id: canvas_group_id
-  provisioning_report_header_canvas_parent_id: canvas_parent_id
-  provisioning_report_header_canvas_section_id: canvas_section_id
-  provisioning_report_header_canvas_term_id: canvas_term_id
-  provisioning_report_header_canvas_user_id: canvas_user_id
-  provisioning_report_header_canvas_xlist_course_id: canvas_xlist_course_id
-  provisioning_report_header_course_id: course_id
-  provisioning_report_header_email: email
-  provisioning_report_header_end_date: end_date
-  provisioning_report_header_first_name: first_name
-  provisioning_report_header_group_id: group_id
-  provisioning_report_header_last_name: last_name
-  provisioning_report_header_login_id: login_id
-  provisioning_report_header_long_name: long_name
-  provisioning_report_header_name: name
-  provisioning_report_header_parent_account_id: parent_account_id
-  provisioning_report_header_role: role
-  provisioning_report_header_section_id: section_id
-  provisioning_report_header_short_name: short_name
-  provisioning_report_header_start_date: start_date
-  provisioning_report_header_status: status
-  provisioning_report_header_term_id: term_id
-  provisioning_report_header_user_id: user_id
-  provisioning_report_header_xlist_course_id: xlist_course_id
   provisioning_title: Provisioning
   pseudonym: 
     errors: 
@@ -12203,7 +11205,6 @@ en-AU:
   quiz_extend_time: 
     ending_time: "ending time"
     extend_time: "Extend Time"
-    extensions_student: "Extend time for for %{student}"
     extensions_successfully_added: "Extensions Successfully Added"
     now: now
   quiz_extensions: 
@@ -12293,15 +11294,6 @@ en-AU:
   quiz_statistics_route: 
     quiz_statistics: Statistics
   quiz_statistics_title: "Quiz Statistics"
-  quiz_submission: 
-    answers: 
-      correct: Correct!
-      correct_answers: "Correct Answers"
-      incorrect: Incorrect
-      partial: Partial
-      right: "Correct Answer"
-      unanswered: Unanswered
-      you_answered: "You Answered"
   quiz_submission_arrows: 
     answers: 
       correct: Correct!
@@ -13084,8 +12076,6 @@ en-AU:
         quiz_fudged_negative: "This quiz score has been manually adjusted by %{fudge} points."
         quiz_fudged_positive: "This quiz score has been manually adjusted by +%{fudge} points."
         quiz_not_yet_taken: "The quiz hasn't been taken yet."
-        quiz_results_protected: "Quiz results are protected for this quiz, and are not visible to students."
-        quiz_results_protected_until_last_attempt: "Quiz results are protected for this quiz, and are not visible to students until they have submitted their last attempt."
         quiz_submission_needs_review: "The quiz has changed significantly since this submission was made. This submission may need re-grading."
         requires_lockdown: "Respondus LockDown Browser is required to view your quiz results."
         submitted_at: "Submitted %{when}"
@@ -13545,16 +12535,6 @@ en-AU:
     roles_override_index: 
       account_roles: "Account Roles"
       course_roles: "Course Roles"
-  ross_report_header_comment: Comment
-  ross_report_header_course_id: Course_ID
-  ross_report_header_grade_posting_date: "Grade Posting Date"
-  ross_report_header_grade_type: "Grade Type"
-  ross_report_header_grade_value_type: "Grade Value Type"
-  ross_report_header_miscfield1: MiscField1
-  ross_report_header_miscfield13: MiscField13
-  ross_report_header_miscfield2: MiscField2
-  ross_report_header_numeric_grade: "Numeric Grade"
-  ross_report_header_source_id: Source_ID
   roster: 
     delete_confirm: "Are you sure you want to remove this user?"
     error_sending_invitations: "Error sending invitation. Please try again."
@@ -13623,36 +12603,6 @@ en-AU:
         are_you_sure_remove: "Are you sure you want to remove this rubric from your list?"
       remove_rubric: "Remove this Rubric from my list"
   safety_drill_title: "Safety Drill Scheduling"
-  samuel_report_header_assessment_question_id: "Assessment Question ID"
-  samuel_report_header_assessment_question_name: "Assessment Question name"
-  samuel_report_header_assignment_description: "Assignment Description"
-  samuel_report_header_assignment_id: "Assignment ID"
-  samuel_report_header_assignment_points_possible: "Assignment Points Possible"
-  samuel_report_header_assignment_title: "Assignment Title"
-  samuel_report_header_assignment_type: "Assignment Type"
-  samuel_report_header_course_canvas_id: "Course Canvas ID"
-  samuel_report_header_course_current_score: "Course Current Score"
-  samuel_report_header_course_name: "Course Name"
-  samuel_report_header_course_sis_id: "Course SIS ID"
-  samuel_report_header_course_student_count: "Course Student Count"
-  samuel_report_header_grading_scheme: "Grading Scheme"
-  samuel_report_header_learning_outcome_desc: "Learning Outcome Desc"
-  samuel_report_header_learning_outcome_id: "Learning Outcome ID"
-  samuel_report_header_learning_outcome_score: "Learning Outcome Score"
-  samuel_report_header_learning_outcome_short_name: "Learning Outcome Short Name"
-  samuel_report_header_rubric_title: "Rubric Title"
-  samuel_report_header_section_canvas_id: "Section Canvas ID"
-  samuel_report_header_section_name: "Section Name"
-  samuel_report_header_section_sis_id: "Section SIS ID"
-  samuel_report_header_student_id: "Student ID"
-  samuel_report_header_student_name: "Student Name"
-  samuel_report_header_student_sis_id: "Student SIS ID"
-  samuel_report_header_subaccount_id: "Subaccount ID"
-  samuel_report_header_subaccount_name: "Subaccount Name"
-  samuel_report_header_submission_date: "Submission Date"
-  samuel_report_header_submission_grade: "Submission Grade"
-  samuel_report_header_submissions_attempt: "Submissions Attempt"
-  samuel_report_header_teacher_name: "Teacher Name"
   scantron_quiz_title: "Scantron Quiz"
   scribd: 
     upgrade_flash: "Hello, you have an old version of Adobe Flash Player. To use iPaper (and lots of other stuff on the web) you need to %{link_tag}get the latest Flash player%{end_link}."
@@ -13964,13 +12914,9 @@ en-AU:
           email: "Email (optional)"
     event_list: 
       at_least_more_events: "at least %{count_of_events} more"
-      at_least_more_events_one_week: "at least %{count_of_events} more in the next week"
-      at_least_more_events_two_weeks: "at least %{count_of_events} more in the next two weeks"
       links: 
         view_calendar: "View Calendar"
       more_events: "%{count_of_events} more"
-      more_events_one_week: "%{count_of_events} more in the next week"
-      more_events_two_weeks: "%{count_of_events} more in the next two weeks"
       nothing_for_now: "Nothing for now"
       nothing_one_week: "Nothing for the next week"
       nothing_two_weeks: "Nothing for the next two weeks"
@@ -14624,19 +13570,6 @@ en-AU:
       on course learning outcomes. Outcomes are presented in a Gradebook-like
       format and progress is displayed both as a numerical score and as mastered/near
       mastery/remedial.
-  student_report_header_course_id: "course id"
-  student_report_header_course_name: "course name"
-  student_report_header_course_sis_id: "course sis id"
-  student_report_header_enrollment_state: "enrollment state"
-  student_report_header_last_access_at: "last access at"
-  student_report_header_last_ip: "last ip"
-  student_report_header_name: name
-  student_report_header_section_id: "section id"
-  student_report_header_section_name: "section name"
-  student_report_header_section_sis_id: "section sis id"
-  student_report_header_user_id: "user id"
-  student_report_header_user_name: "user name"
-  student_report_header_user_sis_id: "user sis id"
   student_submissions_title: "Student Submissions"
   students_with_no_submissions_title: "Students with no submissions"
   sub_accounts: 
@@ -14801,8 +13734,6 @@ en-AU:
       curriculum_assessment_errata_description: "View already reported assessment and curricula errors. Search for \"errata.\""
       networking_academy_description: "View Cisco answers to the most commonly asked questions."
       networking_academy_faqs: "Networking Academy FAQs"
-    select: 
-      prompt: "Please select"
   table_headings: 
     name: Name
     total: Total
@@ -14831,19 +13762,6 @@ en-AU:
     tab_location_error: "That tab location is invalid"
     tab_unmanagable_error: "%{css_class} is not manageable"
   tempe_grade_export_title: "Tempe Grade Export"
-  tempe_report_header_absences: ABSENCES
-  tempe_report_header_citizenship: CITIZENSHIP
-  tempe_report_header_comment_1: COMMENT_1
-  tempe_report_header_comment_2: COMMENT_2
-  tempe_report_header_comment_3: COMMENT_3
-  tempe_report_header_grade_mark: GRADE_MARK
-  tempe_report_header_grading_term: GRADING_TERM
-  tempe_report_header_mark_name: MARK_NAME
-  tempe_report_header_school_code: SCHOOL_CODE
-  tempe_report_header_school_year: SCHOOL_YEAR
-  tempe_report_header_section_id: SECTION_ID
-  tempe_report_header_sis_number: SIS_NUMBER
-  tempe_report_header_workhabits: WORKHABITS
   terms: 
     index: 
       date: 
@@ -15401,24 +14319,8 @@ en-AU:
                   and in the top navigation. In the meantime, feel free to sign up for
                   more courses or set up your profile.
       welcome_to_happiness: "Welcome to Canvas!"
-  ut_austin_report_header_canvas_user_id: "canvas user id"
-  ut_austin_report_header_default_email: "default email"
-  ut_austin_report_header_google_doc_address: "google doc address"
-  ut_austin_report_header_name: name
-  ut_austin_report_header_sis_id: "sis id"
   validate: 
     is_required: "This field is required"
-  vilas_report_header_assignment_id: "assignment id"
-  vilas_report_header_assignment_name: "assignment name"
-  vilas_report_header_canvas_course_id: "canvas course id"
-  vilas_report_header_canvas_user_id: "canvas user id"
-  vilas_report_header_course_name: "course name"
-  vilas_report_header_points_possible: "points possible"
-  vilas_report_header_score: score
-  vilas_report_header_sis_course_id: "sis course id"
-  vilas_report_header_sis_user_id: "sis user id"
-  vilas_report_header_submission_date: "submission date"
-  vilas_report_header_user_name: "user name"
   warnings: 
     test_install: 
       periodic_message: "This Canvas installation is only for testing, and will reset periodically."
@@ -15440,36 +14342,6 @@ en-AU:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Blackboard Vista/CE, WebCT 6+ Course"
   webct_name: "Blackboard Vista/CE (WebCT)"
-  webster_report_header_course_id: "course id"
-  webster_report_header_course_name: "course name"
-  webster_report_header_course_sis_id: "course sis id"
-  webster_report_header_enrollment_state: "enrollment state"
-  webster_report_header_enrollment_type: "enrollment type"
-  webster_report_header_last_ip: "last ip"
-  webster_report_header_login_id: "login id"
-  webster_report_header_user_id: "user id"
-  webster_report_header_user_name: "user name"
-  webster_report_header_user_sis_id: "user sis id"
-  westminster_report_header_cohort_id: "cohort id"
-  westminster_report_header_cohort_name: "cohort name"
-  westminster_report_header_course_name: "course name"
-  westminster_report_header_current_courses: "current courses"
-  westminster_report_header_current_grade: "current grade"
-  westminster_report_header_first_name: "first name"
-  westminster_report_header_last_completed_course: "last completed course"
-  westminster_report_header_last_completed_module: "last completed module"
-  westminster_report_header_last_faculty_journal_entry: "last faculty journal entry"
-  westminster_report_header_last_graded_date: "last graded date"
-  westminster_report_header_last_mastered_assignment: "last mastered assignment"
-  westminster_report_header_last_name: "last name"
-  westminster_report_header_last_submission_date: "last submission date"
-  westminster_report_header_last_submission_graded: "last submission graded"
-  westminster_report_header_professor_id: "professor id"
-  westminster_report_header_professor_name: "professor name"
-  westminster_report_header_student_id: "student id"
-  westminster_report_header_student_name: "student name"
-  westminster_report_header_term_taken: "term taken"
-  westminster_report_header_ungraded_submissions: "# of ungraded submissions"
   widget: 
     upload_media_track_form: 
       choose_a_language: "--Choose a Language--"
@@ -15653,8 +14525,6 @@ en-AU:
       page_updated: "Page was successfully updated."
     page_link: 
       link_hidden_from_students_warning: "Students won't see this link"
-    page_revisions: 
-      page_revisions_title: "%{title} revisions : %{context_name}"
     pages_index: 
       titles: 
         pages: Pages
