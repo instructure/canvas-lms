@@ -47,18 +47,6 @@ module Lti
       end
     end
 
-    def register
-      @lti_launch = Launch.new
-      @lti_launch.resource_url = params[:tool_consumer_url]
-      message = RegistrationRequestService.create_request(tool_consumer_profile_url, registration_return_url)
-      @lti_launch.params = message.post_params
-      @lti_launch.link_text = I18n.t('lti2.register_tool', 'Register Tool')
-      @lti_launch.launch_type = message.launch_presentation_document_target
-      @lti_launch.message_type = message.lti_message_type
-
-      render template: 'lti/framed_launch'
-    end
-
     private
 
     def authorized_request?(secret)
@@ -67,29 +55,6 @@ module Lti
 
     def oauth_consumer_key
       @oauth_consumer_key ||= OAuth::Helper.parse_header(authorization_header(request))['oauth_consumer_key']
-    end
-
-    def tool_consumer_profile_url
-      tp_id = SecureRandom.uuid
-      case context
-        when Course
-          course_tool_consumer_profile_url(context, tp_id)
-        when Account
-          account_tool_consumer_profile_url(context, tp_id)
-        else
-          raise "Unsupported context"
-      end
-    end
-
-    def registration_return_url
-      case context
-        when Course
-          course_settings_url(context)
-        when Account
-          account_settings_url(context)
-        else
-          raise "Unsupported context"
-      end
     end
 
     def authorization_header(request)

@@ -290,7 +290,7 @@ routes.draw do
       match 'homework_submission' => 'external_tools#homework_submission', :as => :homework_submission
       match 'finished' => 'external_tools#finished', :as => :finished
       collection do
-        get :tool_proxy_registration, controller: 'lti/tool_proxy', action: 'register', :as => :tool_proxy_registration
+        get :tool_proxy_registration, controller: 'lti/message', action: 'registration', :as => :tool_proxy_registration
         get :retrieve
         get :homework_submissions
       end
@@ -555,7 +555,7 @@ routes.draw do
       match 'finished' => 'external_tools#finished', :as => :finished
       match 'resource_selection' => 'external_tools#resource_selection', :as => :resource_selection
       collection do
-        get  :tool_proxy_registration, controller: 'lti/tool_proxy', action: 'register', :as => :tool_proxy_registration
+        get  :tool_proxy_registration, controller: 'lti/message', action: 'registration', :as => :tool_proxy_registration
       end
     end
 
