@@ -866,32 +866,44 @@ class RoleOverride < ActiveRecord::Base
     @@role_override_chain ||= {}
     overrides = @@role_override_chain[permissionless_key] ||= begin
       role_context.shard.activate do
-        account_ids = context.account_chain_ids(include_site_admin: true)
-        case_string = ""
-        account_ids.each_with_index{|account_id, idx| case_string += " WHEN context_id='#{account_id}' THEN #{idx} " }
-        overrides = RoleOverride.where(:context_id => account_ids, :enrollment_type => generated_permission[:enrollment_type].to_s).order("CASE #{case_string} ELSE 9999 END DESC")
-        overrides.group_by(&:permission).freeze
+        account_ids = context.account_chain_ids(include_site_admin: true).reverse
+        overrides = RoleOverride.where(:context_id => account_ids, :enrollment_type => generated_permission[:enrollment_type].to_s).group_by(&:permission)
+        # every context has to be represented so that we can't miss role_context below
+        overrides.each_key do |permission|
+          overrides_by_account = overrides[permission].index_by { |override| [override.context_id, override.context.class.base_class.name] }
+          overrides[permission] = account_ids.map do |account_id|
+            overrides_by_account[[account_id, 'Account']] || RoleOverride.new { |ro| ro.context_id = account_id; ro.context_type = 'Account' }
+          end
+        end
+        overrides
       end
     end
 
-    # walk the overrides from most general (root account) to most specific (the role's account)
+    # walk the overrides from most general (site admin, root account) to most specific (the role's account)
     # and apply them; short-circuit once someone has locked it
     last_override = false
+    hit_role_context = false
     (overrides[permission.to_s] || []).each do |override|
       # set the flag that we have an override for the context we're on
       last_override = override.context_id == context.id && override.context_type == context.class.base_class.name
 
-      generated_permission[:context_id] = override.context_id
+      generated_permission[:context_id] = override.context_id unless override.new_record?
       generated_permission[:locked] = override.locked?
       # keep track of the value for the parent
       generated_permission[:prior_default] = generated_permission[:enabled]
 
       unless override.enabled.nil?
         generated_permission[:explicit] = true if last_override
-        generated_permission[:enabled] = override.enabled? ? override.applies_to : nil
+        if hit_role_context
+          generated_permission[:enabled] ||= override.enabled? ? override.applies_to : nil
+        else
+          generated_permission[:enabled] = override.enabled? ? override.applies_to : nil
+        end
       end
+      hit_role_context ||= override.context_id == role_context.id && override.context_type == role_context.class.base_class.name
 
       break if override.locked?
+      break if generated_permission[:enabled] && hit_role_context
     end
 
     # there was not an override matching this context, so do a half loop

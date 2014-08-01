@@ -349,6 +349,7 @@ describe RoleOverride do
           it "should use permission for role in parent account" do
             @parent_account = @account
             @sub = account_model(:parent_account => @account)
+            @course = @sub.courses.create!
             @account = @parent_account
 
             # create in parent
@@ -363,13 +364,14 @@ describe RoleOverride do
             create_override(@role_name, !@default_perm)
 
             # check based on sub account
-            hash = RoleOverride.permission_for(@parent_account, @sub, @permission, @base_role.to_s, @role_name.to_s)
+            hash = RoleOverride.permission_for(@course, @sub, @permission, @base_role.to_s, @role_name.to_s)
             (!!hash[:enabled]).should == !@default_perm
           end
 
           it "should use permission for role in parent account even if sub account doesn't have role" do
             @parent_account = @account
             @sub = account_model(:parent_account => @account)
+            @course = @sub.courses.create!
             @account = @parent_account
 
             create_role(@base_role, @role_name)
@@ -378,13 +380,14 @@ describe RoleOverride do
             create_override(@role_name, !@default_perm)
 
             # check based on sub account
-            hash = RoleOverride.permission_for(@parent_account, @sub, @permission, @base_role.to_s, @role_name.to_s)
+            hash = RoleOverride.permission_for(@course, @sub, @permission, @base_role.to_s, @role_name.to_s)
             (!!hash[:enabled]).should == !@default_perm
           end
 
           it "should use permission for role in sub account" do
             @parent_account = @account
             @sub = account_model(:parent_account => @account)
+            @course = @sub.courses.create!
 
             create_role(@base_role, @role_name)
 
@@ -392,7 +395,7 @@ describe RoleOverride do
             create_override(@role_name, !@default_perm)
 
             # check based on sub account
-            hash = RoleOverride.permission_for(@parent_account, @sub, @permission, @base_role.to_s, @role_name.to_s)
+            hash = RoleOverride.permission_for(@course, @sub, @permission, @base_role.to_s, @role_name.to_s)
             (!!hash[:enabled]).should == !@default_perm
           end
         end
@@ -434,6 +437,13 @@ describe RoleOverride do
         @account = @account.courses.create!
         @permission = :become_user
         check_permission(AccountUser::BASE_ROLE_NAME, 'AccountAdmin', false)
+      end
+
+      it "should not allow a sub-account to revoke a permission granted to a parent account" do
+        @sub_account.role_overrides.create!(enrollment_type: 'AccountAdmin', enabled: false, permission: :manage_admin_users)
+        @sub_account.grants_right?(@site_admin, :manage_admin_users).should be_true
+        @sub_account.grants_right?(@root_admin, :manage_admin_users).should be_true
+        @sub_account.grants_right?(@sub_admin, :manage_admin_users).should be_false
       end
     end
 
