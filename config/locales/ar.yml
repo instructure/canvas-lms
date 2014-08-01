@@ -46,27 +46,6 @@ ar:
     no_file: "لا يتوفر ملف نتيجة أو إعطاء تفويض"
     no_permissions: "غير مسموح للمستخدم بتحرير النتائج العالمية"
     no_perms: "غير مسموح للمستخدم بتحرير النتائج العالمية"
-  access: 
-    course: 
-      extra_text: "المساق: %{course};"
-  access_report_header_content: المحتوى
-  access_report_header_content_access_id: "معرف الوصول إلى المحتوى"
-  access_report_header_content_type: "نوع المحتوى"
-  access_report_header_course_id: "معرف المساق"
-  access_report_header_course_name: "اسم المساق"
-  access_report_header_course_sis_id: "معرف sis للمساق"
-  access_report_header_enrollment_type: "نوع التسجيل"
-  access_report_header_last_viewed: "آخر عرض"
-  access_report_header_root_account_id: "معرف الحساب الجذري"
-  access_report_header_section_id: "معرف القسم"
-  access_report_header_section_name: "اسم القسم"
-  access_report_header_section_sis_id: "معرف sis للقسم"
-  access_report_header_term_id: "معرف الفصل الدراسي"
-  access_report_header_term_sis_id: "معرف sis للفصل الدراسي"
-  access_report_header_times_participated: "أوقات المشاركة"
-  access_report_header_times_viewed: "أوقات العرض"
-  access_report_header_user_id: "معرف المستخدم"
-  access_report_header_user_sis_id: "معرف sis للمستخدم"
   account: 
     account_settings: 
       account_surveys: "استطلاعات الحساب"
@@ -287,13 +266,6 @@ ar:
     announcement_deleted_notice: "تم حذف الإعلان بنجاح"
     permission_denied_notice: "لا يمكنك إنشاء إعلانات لهذا الحساب"
   account_reports: 
-    bucks: 
-      courses_only: "الأقسام عبر الإنترنت فقط"
-    ccp: 
-      course: 
-        check_box: "بالنسبة للدورة التدريبية: %{course_id};"
-      courses_only: "الدورات التدريبية على الإنترنت فقط"
-      start_at: "بدء عند: %{start_at};"
     default: 
       all_terms: "كل الفصول الدراسية"
       course_text: "للمساق: %{course};"
@@ -306,26 +278,10 @@ ar:
       section_text: "للقسم: %{section};"
       start_text: "بدء عند: %{start_at};"
       term_text: "الفصل الدراسي: %{term_name}؛"
-    galen: 
-      no_term: "مطلوب فصل دراسي محدد، يرجى تحديد فصل"
     grades: 
       deleted: "تضمين الكائنات المحذوفة: صواب؛"
-    granite: 
-      invalid_date_range: "تم ضبط التواريخ إلى نطاق من 1 أسبوع،"
-    lincoln: 
-      invalid_term: "الرجاء تحديد فصل دراسي صالح"
-    mississippi: 
-      reports: "التقارير: %{ملفًا}"
-    newark: 
-      assignment_text: "أنواع مجموعات المهام: %{groups};"
     outcomes: 
       order: "الأمر: %{order}"
-    pasco: 
-      missing_start_date: "الرجاء تحديد تاريخ بداية صالح"
-    penn_harris: 
-      student_grades: 
-        description: 
-          text: "يعرض هذا التقرير نتائج الدرجات النهائية للطلاب في فصل دراسي معين. وسيحتوي ملف CSV الناتج على صف واحد لكل تسجيل، كما سيُظهر الدرجة النهائية المعروضة في دفتر تقديرات المساق."
     report_header_account_id: "معرف الحساب"
     report_header_assessment_id: "معرف التقييم"
     report_header_assessment_question: "سؤال التقييم"
@@ -406,13 +362,6 @@ ar:
     student: 
       enrollment_state: "تضمين حالة التسجيل: صواب؛"
       enrollment_states: "حالات التسجيل: %{states};"
-    usu: 
-      enrollment_types: "أنواع التسجيل: %{types}"
-    webster: 
-      min: "الحد الأدنى لعدد العناصر: %{min};"
-      student: الطلاب،
-      ta: "المدرسون المساعدون،"
-      teacher: المدرسون،
   account_settings: 
     account: الحساب
     account_name_too_long: "اسم الحساب طويل جدًا"
@@ -604,20 +553,6 @@ ar:
         message_date_to: "إلى تاريخ"
         search: بحث
         search_people: "البحث عن أشخاص"
-    assignment_scheduling_csv_description: 
-      account_reports: 
-        newark: 
-          description: 
-            header: مثال
-          student_activity: 
-            text: "يعرض هذا التقرير كل المهام والمعلومات المتعلقة بتلك المهام الموجودة في مجموعة أو مجموعات المهام المحددة والتي في نطاق التاريخ المحدد. ويوفر هذا التقرير بيانات لجدولة المهام وإدارة عبء مهام الطلاب، مع عرض الطلاب والمهام التي توجد بها مهمتان متعارضتان أو أكثر ومستحقة في اليوم نفسه لأحد الطلاب."
-      newark_report_header__assignment_count: "عدد المهام"
-      newark_report_header_due_date: "تاريخ الاستحقاق"
-      newark_report_header_section_id: "معرف القسم"
-      newark_report_header_section_name: "اسم القسم"
-      newark_report_header_student_name: "اسم الطالب"
-      newark_report_header_teacher_id: "معرف المدرس"
-      newark_report_header_teacher_name: "اسم المدرس"
     assignment_scheduling_csv_parameters: 
       account_reports: 
         newark: 
@@ -637,24 +572,6 @@ ar:
             check_box: التقارير
           tests: 
             check_box: الاختبارات
-    assignment_score_summary_csv_description: 
-      account_reports: 
-        granite: 
-          assignme_score_summary: 
-            text: "يعرض هذا التقرير درجة كل المهام التي تم تقدير درجاتها بين التواريخ المحددة"
-          description: 
-            header: مثال
-      granite_report_header_account_id: "معرف الحساب"
-      granite_report_header_assignment_id: "معرف المهمة"
-      granite_report_header_assignment_name: "اسم المهمة"
-      granite_report_header_assignment_unique_id: "المعرف الفريد للمهمة"
-      granite_report_header_course_id: "معرف المساق"
-      granite_report_header_graded_at: "تاريخ تقدير الدرجة"
-      granite_report_header_submission_date: "تاريخ الإرسال"
-      granite_report_header_submission_id: "معرف الإرسال"
-      granite_report_header_submission_score: "درجة الإرسال"
-      granite_report_header_term_id: "معرف الفصل الدراسي"
-      granite_report_header_user_id: "معرف المستخدم"
     avatars: 
       all_link: 
         one: "الكل%{count}"
@@ -682,61 +599,13 @@ ar:
         zero: "تم الإرسال"
       title: "صور ملف التعريف"
       unlock_link: "إلغاء التأمين"
-    bucks_zero_activity_csv_description: 
-      account_reports: 
-        bucks: 
-          description: 
-            header: مثال
-          student_login: 
-            text: "يوضح هذا التقرير جميع الطلاب الملتحقين بأي مساقات في فصل دراسي معين. سيحتوي الملف الناتج بتنسيق cvs على صف واحد لتسجيل كل مستخدم لم يقم بزيارة المساق منذ ذلك التاريخ. وسيتضمن عامل التصفية عبر الإنترنت عمليات التسجيل من الأقسام التي تشتمل على '.E' في اسم القسم فقط."
-      bucks_report_header_last_access_to_canvas: "آخر وصول إلى canvas"
-      bucks_report_header_name: الاسم
-      bucks_report_header_section_id: "معرف القسم"
-      bucks_report_header_section_name: "اسم القسم"
-      bucks_report_header_section_sis_id: "معرف sis للقسم"
-      bucks_report_header_user_sis_id: "معرف sis للمستخدم"
     cannot_manage_account: "غير مسموح لك بإدارة إعدادات الحساب"
     cannot_manage_quotas: "غير مسموح لك بإدارة إعدادات الحصة النسبية"
-    ccp_zero_activity_csv_description: 
-      account_reports: 
-        ccp: 
-          ccp_zero_activity_csv: 
-            header: مثال
-            text: "يوضح هذا التقرير جميع الطلاب الملتحقين بأي مساقات في فصل دراسي معين. سيحتوي الملف الناتج بتنسيق cvs على صف واحد لالتحاق كل مستخدم لم يقم بزيارة المساق منذ ذلك التاريخ."
-      ccp_report_header_course_id: "معرف المساق"
-      ccp_report_header_course_name: "اسم المساق"
-      ccp_report_header_course_sis_id: "معرف sis للمساق"
-      ccp_report_header_email: "البريد الإلكتروني"
-      ccp_report_header_enrollment_type: "نوع التسجيل"
-      ccp_report_header_first_name: "الاسم الأول"
-      ccp_report_header_last_name: "الاسم الأخير"
-      ccp_report_header_section_id: "معرف القسم"
-      ccp_report_header_section_name: "اسم القسم"
-      ccp_report_header_section_sis_id: "معرف sis للقسم"
-      ccp_report_header_user_id: "معرف المستخدم"
-      ccp_report_header_user_sis_id: "معرف sis للمستخدم"
     ccp_zero_activity_csv_parameters: 
       account_reports: 
         ccp: 
           filter_online: 
             check_box: "الفصول عبر الإنترنت فقط"
-    chcp_student_activity_csv_description: 
-      account_reports: 
-        chcp: 
-          student_activity: 
-            description: 
-              header: مثال
-            text: "يعرض هذا التقرير اشتراك الطالب في المساقات المشترك بها. وسيشتمل ملف csv الناتج على صف واحد لكل اشتراك، وسيعرض معرف sis للطالب واسم الطالب ورقم الهاتف وعنوان البريد الإلكتروني واسم المساق وآخر عملية إرسال وعدد الأيام منذ آخر عملية إرسال (LDA) والنسبة المئوية للدرجة الحالية وتاريخ بدء الفصل الدراسي."
-      chcp_report_header_course: المساق
-      chcp_report_header_email: "البريد الإلكتروني"
-      chcp_report_header_grade: الدرجة
-      chcp_report_header_last_submissio: "آخر إرسال"
-      chcp_report_header_lda: "آخر تاريخ حضور (LDA)"
-      chcp_report_header_phone: الهاتف
-      chcp_report_header_start_date: "تاريخ البدء"
-      chcp_report_header_student_id: "معرف الطالب"
-      chcp_report_header_student_name: "اسم الطالب"
-      chcp_report_header_teacher: المدرس
     confirm_delete_user: 
       confirm_delete: "هل ترغب بالتأكيد في إزالة هذا المستخدم من الحساب %{account}؟ سيؤدي ذلك إلى إزالة بيانات المستخدم (بما في ذلك التقييمات) من كل المساقات والمجموعات. لا يمكن التراجع عن هذه العملية."
       delete_button: "حذف%{user}"
@@ -767,59 +636,6 @@ ar:
       teachers_label: المعلمون
     course_add_failed_message: "فشل إضافة المساق، الرجاء المحاولة مرة أخرى"
     course_added_message: "تمت إضافة %{course} بنجاح!"
-    course_enrollment_csv_description: 
-      account_reports: 
-        cedar_rapids: 
-          course_status: 
-            text: |-
-                يعرض هذا التقرير حالة جميع المساقات في فصل دراسي معين.
-                وسيحتوي ملف CSV الناتج على صف واحد لكل قسم مساق،
-                كما سيعرض المساق وحالة المساق والفصل الدراسي وتاريخ البداية وتاريخ النهاية
-                وعدد التسجيلات والقسم والحساب.
-          description: 
-            header: مثال
-      cedar_rapids_report_header_account_id: "معرف الحساب"
-      cedar_rapids_report_header_account_name: "اسم الحساب"
-      cedar_rapids_report_header_course_end_date: "تاريخ انتهاء المساق"
-      cedar_rapids_report_header_course_id: "معرف المساق"
-      cedar_rapids_report_header_course_name: "اسم المساق"
-      cedar_rapids_report_header_course_start_date: "تاريخ بدء المساق"
-      cedar_rapids_report_header_course_status: "حالة المساق"
-      cedar_rapids_report_header_department_id: "معرف القسم"
-      cedar_rapids_report_header_department_name: "اسم القسم"
-      cedar_rapids_report_header_observer_count: "عدد الملاحظين"
-      cedar_rapids_report_header_student_count: "عدد الطلاب"
-      cedar_rapids_report_header_ta_count: "عدد المدرسين المساعدين"
-      cedar_rapids_report_header_teacher_count: "عدد المدرسين"
-      cedar_rapids_report_header_term_id: "معرف الفصل الدراسي"
-      cedar_rapids_report_header_term_name: "اسم الفصل الدراسي"
-    course_status_csv_description: 
-      account_reports: 
-        auburn: 
-          course_status: 
-            text: "يعرض هذا التقرير حالة جميع المساقات في فصل دراسي معين. وسيحتوي ملف CSV الناتج على صف واحد لكل قسم في المساق، وسيعرض المساق وحالة المساق والفصل الدراسي وتاريخ سريان الفعالية وتواريخ النهاية ومعلم له سجل في القسم."
-          description: 
-            header: مثال
-      auburn_report_header_account_id: "معرف الحساب"
-      auburn_report_header_account_name: "اسم الحساب"
-      auburn_report_header_account_sis_id: "معرف sis للحساب"
-      auburn_report_header_course_id: "معرف المساق"
-      auburn_report_header_course_name: "اسم المساق"
-      auburn_report_header_course_sis_id: "معرف sis للمساق"
-      auburn_report_header_course_status: "حالة المساق"
-      auburn_report_header_effective_date: "تاريخ السريان"
-      auburn_report_header_end_date: "تاريخ الانتهاء"
-      auburn_report_header_section_id: "معرف القسم"
-      auburn_report_header_section_name: "اسم القسم"
-      auburn_report_header_section_sis_id: "معرف sis القسم"
-      auburn_report_header_start_date: "تاريخ البدء"
-      auburn_report_header_student_count: "عدد الطلاب"
-      auburn_report_header_teacher_id: "معرف المدرس"
-      auburn_report_header_teacher_name: "اسم المدرس"
-      auburn_report_header_teacher_sis_id: "معرف sis للمدرس"
-      auburn_report_header_term_id: "معرف الفصل الدراسي"
-      auburn_report_header_term_name: "اسم الفصل الدراسي"
-      auburn_report_header_term_sis_id: "معرف sis للفصل الدراسي"
     course_type: المساق
     courses: 
       courses_crumb: المساقات
@@ -835,84 +651,16 @@ ar:
       go_button: انتقال
       hide_enrollmentless_courses: "إخفاء المساقات غير المسجلة"
     crumb_statistics: إحصاءات
-    current_grade_csv_description: 
-      account_reports: 
-        lincoln: 
-          current_grade_report: 
-            text: "يعرض هذا التقرير الدرجة الحالية للطالب لكل مساق في فصل دراسي معين"
-          description: 
-            header: مثال
-      lincoln_report_header_course_id: "معرف المساق"
-      lincoln_report_header_course_name: "اسم المساق"
-      lincoln_report_header_course_role: "دور المساق"
-      lincoln_report_header_course_sis_id: "معرف SIS للمساق"
-      lincoln_report_header_current_grade: "الدرجة الحالية"
-      lincoln_report_header_login: "معرف تسجيل الدخول"
-      lincoln_report_header_student_name: "اسم الطالب"
-      lincoln_report_header_student_sis_id: "معرف SIS للطالب"
-      lincoln_report_header_term_id: "معرف الفصل الدراسي"
-      lincoln_report_header_term_name: "اسم الفصل الدراسي"
-    custom_grade_export_csv_description: 
-      account_reports: 
-        ross: 
-          description: 
-            header: مثال
-            text: "يعرض هذا التقرير نتائج درجات الطلاب النهائية لجميع الطلاب في فصل دراسي معين. وسيحتوي ملف CSV الناتج على صف واحد لكل تسجيل، وسوف يُظهر الدرجة الحالية والنهائية المعروضتين في دفتر تقديرات المساق."
-      ross_report_header_comment: تعليق
-      ross_report_header_course_id: "معرف الفصل الدراسي"
-      ross_report_header_grade_posting_date: "تاريخ نشر الدرجات"
-      ross_report_header_grade_type: "نوع الدرجة"
-      ross_report_header_grade_value_type: "نوع قيمة الدرجة"
-      ross_report_header_miscfield1: MiscField1
-      ross_report_header_miscfield13: MiscField13
-      ross_report_header_miscfield2: MiscField2
-      ross_report_header_numeric_grade: "درجة رقمية"
-      ross_report_header_source_id: "معرف المصدر"
     custom_grade_export_csv_parameters: 
       account_reports: 
         ross: 
           parameters: 
             note: "قد لا تعكس المساقات ذات المهام المخفية الدرجات بدقة في هذا التقرير."
-    custom_outcomes_csv_description: 
-      account_reports: 
-        edison: 
-          description: 
-            header: مثال
-            text: "يعرض هذا التقرير نتائج التحصيل الدراسي لجميع الطلاب لمساق ونتيجة محددين. وسيحتوي ملف CSV الناتج على صف واحد لكل طالب، وسوف يُظهر تفاصيل النتيجة بما في ذلك المهمة المقترنة."
     custom_outcomes_csv_parameters: 
       account_reports: 
         edison: 
           outcome: 
             text: "outcome_id:"
-    cv_non_graded_data_csv_description: 
-      account_reports: 
-        galen: 
-          cv: 
-            non_graded: 
-              text: "يعرض هذا التقرير عمليات الإرسال التي لم يتم تصحيحها حسب المساق لاستبيانات الاختبارات والمناقشات."
-          description: 
-            header: مثال
-      galen_report_header_account_id: "معرف الحساب"
-      galen_report_header_account_name: "اسم الحساب"
-      galen_report_header_course_name: "اسم المساق"
-      galen_report_header_course_sis_id: "معرف sis للمساق"
-      galen_report_header_resource_type: "نوع المورد"
-      galen_report_header_title: العنوان
-    cv_submission_data_csv_description: 
-      account_reports: 
-        galen: 
-          cv: 
-            attendance: 
-              text: "يوضع هذا التقرير عمليات الإرسال التي قام بها الطلاب حتى التاريخ المحدد. ويستخدم هذا لحضور CampusVue."
-        tmcc: 
-          description: 
-            header: مثال
-      galen_report_header_course_sis_id: "معرف sis للمساق"
-      galen_report_header_first_submission: "أول إرسال"
-      galen_report_header_section_sis_id: "معرف sis للقسم"
-      galen_report_header_submission_date: "تاريخ الإرسال"
-      galen_report_header_submission_type: "نوع الإرسال"
-      galen_report_header_user_sis_id: "معرف sis للمستخدم"
     date_picker_parameter: 
       account_reports: 
         default: 
@@ -933,40 +681,11 @@ ar:
     default_account_quotas_updated: "تم تحديث الحصص النسبية للحساب الافتراضي"
     find_not_authorized: "لست مخولاً للوصول إلى %{type} ذلك"
     find_not_found: "تعذر العثور على %{type} بذلك المعرف"
-    google_doc_accounts_csv_description: 
-      account_reports: 
-        ut_austin: 
-          description: 
-            header: مثال
-          google_doc: 
-            text: "هذا تقرير لكل المستخدمين وعنوان البريد الإلكتروني المقترن المستخدَم لتكامل Google Docs."
-      ut_austin_report_header_canvas_user_id: "معرف مستخدم Canvas"
-      ut_austin_report_header_default_email: "البريد الإلكتروني الافتراضي"
-      ut_austin_report_header_google_doc_address: "عنوان Google Docs"
-      ut_austin_report_header_name: الاسم
-      ut_austin_report_header_sis_id: "معرف sis"
     grade_export_csv_description: 
       account_reports: 
         default: 
           description: 
-            header: مثال
             text: "يبين هذا التقرير نتائج درجة الطالب النهائية لجميع الطلاب في فصل دراسي معين. سوف يحتوي ملف CSV الناتج على صف واحد لكل تسجيل، وسوف يُظهر الدرجة الحالية والنهائية المعروضة في دفتر تقديرات المساق."
-      course_report_header_course_id: "معرف المساق"
-      grade_report_header_course: المساق
-      grade_report_header_course_id: "معرف المساق"
-      grade_report_header_course_sis: "sis للمساق"
-      grade_report_header_current_score: "درجة المساق"
-      grade_report_header_enrollment_state: "حالة التسجيل"
-      grade_report_header_final_score: "الدرجة النهائية"
-      grade_report_header_section: القسم
-      grade_report_header_section_id: "معرف القسم"
-      grade_report_header_section_sis: "sis للقسم"
-      grade_report_header_student_id: "معرف الطالب"
-      grade_report_header_student_name: "اسم الطالب"
-      grade_report_header_student_sis: "sis للطالب"
-      grade_report_header_term: "الفصل الدراسي"
-      grade_report_header_term_id: "معرف الفصل الدراسي"
-      grade_report_header_term_sis: "sis للفصل الدراسي"
     group_type: المجموعة
     include_deleted_parameter: 
       account_reports: 
@@ -979,72 +698,11 @@ ar:
       page_title: الحسابات
       title: "الحسابات التي أديرها"
     integer_required: "مطلوب قيمة عدد صحيح"
-    last_submission_activity_csv_description: 
-      account_reports: 
-        concorde: 
-          description: 
-            header: مثال
-          last_submission: 
-            text: "يعرض هذا التقرير آخر نشاط للطلاب فيما يتعلق بعمليات الإرسال."
-      concord_report_header_campus: "الحرم الجامعي"
-      concord_report_header_course_name: "اسم المساق"
-      concord_report_header_course_sis_id: "معرف sis للمساق"
-      concord_report_header_last_course_activity_date: "تاريخ آخر نشاط للمساق"
-      concord_report_header_student_current_grade: "الدرجة الحالية للطالب"
-      concord_report_header_student_default_email: "البريد الإلكتروني الافتراضي للطالب"
-      concord_report_header_student_name: "اسم الطالب"
-      concord_report_header_student_sis_id: "معرف sis للطالب"
-      concord_report_header_term_name: "اسم الفصل الدراسي"
-      concord_report_header_zero_grade_assignments: "مهام بدرجة صفرية"
     last_user_access_csv_description: 
       account_reports: 
         default: 
           last_user_access: 
-            header: مثال
             text: "يوضح هذا التقرير آخر عملية تسجيل دخول للمستخدمين النشطاء."
-      student_report_header_last_access_at: "تاريخ آخر وصول"
-      student_report_header_last_ip: "آخر ip"
-      student_report_header_user_id: "معرف المستخدم"
-      student_report_header_user_name: "اسم المستخدم"
-      student_report_header_user_sis_id: "معرف sis للمستخدم"
-    learning_outcome_assignment_type_csv_description: 
-      account_reports: 
-        newark: 
-          student_activity: 
-            text: "يقدم هذا التقرير تصديرًا للبيانات التي تربط النتائج بالمهام."
-        samuel_merrit_university: 
-          description: 
-            header: مثال
-      samuel_report_header_assessment_question_id: "معرف سؤال التقييم"
-      samuel_report_header_assessment_question_name: "اسم سؤال التقييم"
-      samuel_report_header_assignment_description: "وصف المهمة"
-      samuel_report_header_assignment_id: "معرف المهمة"
-      samuel_report_header_assignment_points_possible: "النقاط الممكنة للمهمة"
-      samuel_report_header_assignment_title: "عنوان المهمة"
-      samuel_report_header_assignment_type: "نوع المهمة"
-      samuel_report_header_course_canvas_id: "معرف Canvas للمساق"
-      samuel_report_header_course_current_score: "الدرجة الحالية للمساق"
-      samuel_report_header_course_name: "اسم المساق"
-      samuel_report_header_course_sis_id: "معرف SIS للمساق"
-      samuel_report_header_course_student_count: "عدد الطلاب في المساق"
-      samuel_report_header_grading_scheme: "نظام التقييم"
-      samuel_report_header_learning_outcome_desc: "وصف نتيجة التعلم"
-      samuel_report_header_learning_outcome_id: "معرف نتيجة التعلم"
-      samuel_report_header_learning_outcome_score: "درجة نتيجة التعلم"
-      samuel_report_header_learning_outcome_short_name: "الاسم القصير لنتيجة التعلم"
-      samuel_report_header_rubric_title: العنوان
-      samuel_report_header_section_canvas_id: "معرف Canvas للقسم"
-      samuel_report_header_section_name: "اسم القسم"
-      samuel_report_header_section_sis_id: "معرف sis  للقسم"
-      samuel_report_header_student_id: "معرف الطالب"
-      samuel_report_header_student_name: "اسم الطالب"
-      samuel_report_header_student_sis_id: "معرف sis  للطالب"
-      samuel_report_header_subaccount_id: "معرف الحساب الفرعي"
-      samuel_report_header_subaccount_name: "اسم الحساب الفرعي"
-      samuel_report_header_submission_date: "تاريخ الإرسال"
-      samuel_report_header_submission_grade: "درجة الإرسال"
-      samuel_report_header_submissions_attempt: "محاولة الإرسالات"
-      samuel_report_header_teacher_name: "اسم المدرس"
     learning_outcome_assignment_type_csv_parameters: 
       account_reports: 
         samuel_merrit_university: 
@@ -1054,11 +712,6 @@ ar:
             text: "معرف المساق"
           parameters: 
             note1: "يمكن ترك معرف المساق خاليًا لتشغيل التقرير لكل المساقات في الفصل الدراسي."
-    mississippi_sis_csv_description: 
-      account_reports: 
-        mississisppi: 
-          sis_data: 
-            text: "يقوم هذا التقرير بإرجاع جميع مستخدمي وأقسام والتحاقات sis لجميع الحسابات الجذرية الموثوقة لأداة الالتحاق."
     mississippi_sis_csv_parameters: 
       account_reports: 
         default: 
@@ -1073,25 +726,7 @@ ar:
       account_reports: 
         outcomes: 
           description: 
-            header: مثال
             text: "يعرض هذا التقرير نتائج التحصيل التعليمي لكل الطلاب. وسيحتوي ملف csv الناتج على صف واحد لكل زوج من نتائج تحصيل الطالب، وسيعرض تفاصيل النتيجة بما في ذلك المهمة المقترنة."
-      outcome_report_header_assessment_id: "معرف التقييم"
-      outcome_report_header_assessment_question: "سؤال التقييم"
-      outcome_report_header_assessment_question_id: "معرف سؤال التقييم"
-      outcome_report_header_assessment_title: "عنوان التقييم"
-      outcome_report_header_assessment_type: "نوع التقييم"
-      outcome_report_header_attempt: المحاولة
-      outcome_report_header_course_id: "معرف المساق"
-      outcome_report_header_course_name: "اسم المساق"
-      outcome_report_header_course_sis_id: "معرف sis للمساق"
-      outcome_report_header_learning_outcome_id: "معرف نتيجة التعلم"
-      outcome_report_header_learning_outcome_name: "اسم نتيجة التعلم"
-      outcome_report_header_outcome_score: "درجة التعلم"
-      outcome_report_header_student_id: "معرف الطالب"
-      outcome_report_header_student_name: "اسم الطالب"
-      outcome_report_header_student_sis_id: "معرف sis للطالب"
-      outcome_report_header_submission_date: "تاريخ الإرسال"
-      outcome_report_header_submission_score: "درجة الإرسال"
     outcome_results_csv_parameters: 
       account_reports: 
         outcomes: 
@@ -1117,50 +752,7 @@ ar:
       account_reports: 
         default: 
           public_courses: 
-            header: مثال
             text: "يعرض هذا التقرير جميع المساقات التي لم يتم حذفها لفصل دراسي محدد غير منشور. سيشتمل ملف csv الناتج على صف واحد لكل مساق، وسيعرض معرف المساق ومعرف sis للمساق والاسم القصير للمساق واسم المساق وتاريخ البدء وتاريخ الانتهاء للمساق."
-      course_report_header_end_date: "تاريخ الانتهاء"
-      course_report_header_id: المعرف
-      course_report_header_name: الاسم
-      course_report_header_short_name: "الاسم القصير"
-      course_report_header_sis_id: "معرف sis"
-      course_report_header_start_date: "تاريخ البدء"
-    quiz_data_csv_description: 
-      account_reports: 
-        ace: 
-          quiz_data_description: 
-            header: مثال
-            text: "يعرض هذا التقرير أسئلة الاختبار وإجاباتها لكل الاختبارات في فصل دراسي معين. وسيحتوي ملف csv الناتج على صف واحد لكل سؤال وإجابته في الاختبار."
-      ace_report_header_correct: صحيح
-      ace_report_header_course_id: "معرف المساق"
-      ace_report_header_course_sis_id: "معرف sis للمساق"
-      ace_report_header_login_id: "معرف تسجيل الدخول"
-      ace_report_header_outcome_id: "معرف النتيجة"
-      ace_report_header_points_earned: "النقاط المكتسبة"
-      ace_report_header_points_possible: "النقاط الممكنة"
-      ace_report_header_question_id: "معرف السؤال"
-      ace_report_header_question_name: "اسم السؤال"
-      ace_report_header_question_text: "نص السؤال"
-      ace_report_header_quiz_title: "عنوان الاختبار"
-      ace_report_header_user_id: "معرف المستخدم"
-      ace_report_header_user_name: "اسم المستخدم"
-      ace_report_header_user_sis_id: "معرف sis للمستخدم"
-    quiz_statistics_csv_description: 
-      account_reports: 
-        ace: 
-          quiz_statistics_description: 
-            header: مثال
-            text: "يعرض هذا التقرير أسئلة الاختبار وعدد المستخدمين الذي أجابوا على الأسئلة وعدد المستخدمين الذين أجابوا على الأسئلة بشكل صحيح لكل الاختبارات في فصل دراسي معين. وسيحتوي ملف csv النائتج على صف واحد لكل سؤال اختبار."
-      ace_report_header_count_correct: "العدد صحيح"
-      ace_report_header_count_taken: "العدد المأخوذ"
-      ace_report_header_course_id: "معرف المساق"
-      ace_report_header_course_sis_id: "معرف sis للمساق"
-      ace_report_header_outcome_ids: "معرفات النتائج"
-      ace_report_header_points_possible: "النقاط الممكنة"
-      ace_report_header_question_id: "معرف السؤال"
-      ace_report_header_question_name: "اسم السؤال"
-      ace_report_header_question_text: "نص السؤال"
-      ace_report_header_quiz_title: "عنوان الاختبار"
     quota_integer_required: "مطلوب قيمة عدد صحيح"
     quota_must_be_positive: "يجب أن تكون القيمة موجبة"
     quota_not_updated: "لم يتم تحديث الحصة"
@@ -1170,29 +762,11 @@ ar:
       account_reports: 
         default: 
           recently_deleted_courses: 
-            header: مثال
             text: "يعرض هذا التقرير جميع المساقات لمدة محددة تم حذفها في آخر 30 يومًا. سيشتمل ملف csv الناتج على صف واحد لكل مساق، وسيعرض معرف المساق و معرف sis للمساق والاسم المختصر للمساق واسم المساق وتواريخ بدء وانتهاء المساق."
     retry_login: "إعادة محاولة تسجيل الدخول"
     root_accounts: 
       labels: 
         name: "اسم الحساب"
-    safety_drill_csv_description: 
-      account_reports: 
-        newark: 
-          description: 
-            header: مثال
-          student_activity: 
-            text: "يعرض هذا التقرير كل المهام والمعلومات المتعلقة بتلك المهام الموجودة في مجموعة أو مجموعات المهام المحددة والتي في نطاق التاريخ المحدد. ويوفر هذا التقرير بيانات جدولة تدريبات الأمان بأدنى درجة من التشويش للمهام في الفصل لمواد التخصص."
-      newark_report_header_assignment_due_date: "تاريخ استحقاق المهمة"
-      newark_report_header_assignment_group_name: "اسم مجموعة المهام"
-      newark_report_header_assignment_id: "معرف المهمة"
-      newark_report_header_assignment_name: "اسم المهمة"
-      newark_report_header_course_code: "كود المساق"
-      newark_report_header_course_id: "معرف المساق"
-      newark_report_header_course_name: "اسم المساق"
-      newark_report_header_course_sis_id: "معرف sis للمساق"
-      newark_report_header_section_name: "اسم القسم"
-      newark_report_header_teacher_name: "اسم المدرس"
     safety_drill_csv_parameters: 
       account_reports: 
         newark: 
@@ -1277,7 +851,6 @@ ar:
       help_link_available_to_all_teachers: المعلمون
       help_link_available_to_all_users: المستخدمون
       if_you_would_like_to_link_to_your_own_campus_support_website_in_the_help_dialog_you_can_do_that_here: "إذا رغبت في الارتباط بموقع ويب لدعم مجمع المباني الخاص بك في مربع الحوار تعليمات فيمكنك ذلك من هنا"
-      interpolate_account_domain: "ملاحظة: أدخل \"{{ACCOUNT_DOMAIN}}\" لاستبدال مجال الحساب الجذر للمستخدم"
       ip_filter_filter_label: تصفية
       ip_filter_name_label: الاسم
       labels: 
@@ -1403,7 +976,6 @@ ar:
       tab_quotas: الحصص
       tab_reports: التقارير
       tab_settings: إعدادات
-      transifex_message: "انضم إلى [مجتمع ترجمة Canvas](%{transifex_url})"
       turnitin_comments_help: "سيتم عرض هذه التعليقات للطلاب عند إرسال مهمة تم تمكين Turnitin لها"
       turnitin_pledge_help: "يجب أن يضع الطلاب علامة اختيار أمام الخانة التي تفيد بأنهم يوافقون على هذا التعهد"
       turnitin_settings_title: "إعدادات Turnitin"
@@ -1491,9 +1063,6 @@ ar:
         zero: "%{count} مجموعة في انتظار المعالجة."
       pending_batches_title: "دفعات معلقة"
       process_data_button: "بيانات العملية"
-      select_file_instructions: |-
-          حدد ملف zip الذي تريد استيراده.
-          للحصول على وصف لكيفية إنشاء ملفات zip هذه، [الرجاء مراجعة هذه الوثائق](%{url}).
       sis_import_crumb: "استيراد SIS"
       started_at_message: "بدأ: %{started_at}"
       title: "استيراد SIS"
@@ -1545,135 +1114,21 @@ ar:
         two: "%{file_size} *من %{count} من الملفات*"
         zero: "%{file_size} *من %{count} من الملفات*"
       uploaded_file_storage_header: "تخزين الملف الذي تم تحميله"
-    student_access_csv_description: 
-      access_report_header_content: المحتوى
-      access_report_header_content_access_id: "معرف الوصول إلى المحتوى"
-      access_report_header_content_type: "نوع المحتوى"
-      access_report_header_course_id: "معرف المساق"
-      access_report_header_course_name: "اسم المساق"
-      access_report_header_course_sis_id: "معرف sis  للمساق"
-      access_report_header_last_viewed: "آخر عرض"
-      access_report_header_root_account_id: "معرف الحساب الجذري"
-      access_report_header_section_id: "معرف القسم"
-      access_report_header_section_name: "اسم القسم"
-      access_report_header_section_sis_id: "معرف sis للقسم"
-      access_report_header_term_id: "معرف الفصل الدراسي"
-      access_report_header_term_sis_id: "معرف sis للفصل الدراسي"
-      access_report_header_times_participated: "أوقات المشاركة"
-      access_report_header_times_viewed: "أوقات العرض"
-      access_report_header_user_id: "معرف المستخدم"
-      access_report_header_user_sis_id: "معرف sis  للمستخدم"
-      account_reports: 
-        tmcc: 
-          description: 
-            header: مثال
-          student_activity: 
-            text: "يعرض هذا التقرير كل أنشطة الطلاب المسجلين في مساق معين أو كل المساقات في فصل دراسي معين. وسيحتوي ملف csv الناتج على صف واحد لكل نشاط طالب وسيكون به الرؤوس التالية: معرف القسم، معرف SIS للقسم، اسم القسم، معرف المساق، معرف SIS للمساق، اسم المساق، معرف المستخدم، معرف SIS للمستخدم، نوع المحتوى، المحتوى، أوقات العرض، أوقات المشاركة، آخر عرض،. علمًا بأن أوقات العرض وأوقات المشاركة عبارة عن عدادات من بداية الوقت حتى وقت إنشاء التقرير."
     student_assignment_outcome_map_csv_description: 
       account_reports: 
         student_assignment_map: 
           description: 
-            header: مثال
             text: "يعرض هذا التقرير نتائج التحصيل الدراسي لكل الطلاب. وسيتضمن ملف csv الناتج على صف واحد لكل زوج من نتائج تحصيل الطالب، وسيعرض تفاصيل النتيجة بما في ذلك المهمة المقترنة. ويعرض هذا التقرير نتائج التحصيل الدراسي فقط للمهام ولا يتضمن النتائج المرتبطة ببنوك الأسئلة."
-      outcome_report_header_assignment_id: "معرف المهمة"
-      outcome_report_header_assignment_title: "عنوان المهمة"
-      outcome_report_header_assignment_url: "عنوان url للمهمة"
-      outcome_report_header_attempt: المحاولة
-      outcome_report_header_course_id: "معرف المساق"
-      outcome_report_header_course_name: "اسم المساق"
-      outcome_report_header_course_sis_id: "معرف sis  للمساق"
-      outcome_report_header_learning_outcome_id: "معرف نتيجة التعلم"
-      outcome_report_header_learning_outcome_name: "اسم نتيجة التعلم"
-      outcome_report_header_outcome_score: "درجة النتيجة"
-      outcome_report_header_section_id: "معرف القسم"
-      outcome_report_header_section_name: "اسم القسم"
-      outcome_report_header_section_sis_id: "معرف sis للقسم"
-      outcome_report_header_student_id: "معرف الطالب"
-      outcome_report_header_student_name: "اسم الطالب"
-      outcome_report_header_student_sis_id: "معرف sis للطالب"
-      outcome_report_header_submission_date: "حالة الإرسال"
-      outcome_report_header_submission_score: "درجة الإرسال"
-    student_grades_csv_description: 
-      account_reports: 
-        auburn: 
-          student_grades: 
-            description: 
-              text: "يعرض هذا التقرير نتائج الدرجات النهائية لجميع الطلاب في فصل دراسي معين. وسيحتوي ملف CSV الناتج على صف واحد لكل تسجيل، وسوف يُظهر الدرجة الحالية والدرجة النهائية المعروضتين في دفتر درجات المساق."
-        default: 
-          description: 
-            header: مثال
-      auburn_report_header_course: المساق
-      auburn_report_header_course_id: "معرف المساق"
-      auburn_report_header_course_sis: "sis للمساق"
-      auburn_report_header_current_score: "الدرجة الحالية"
-      auburn_report_header_enrollment_state: "حالة التسجيل"
-      auburn_report_header_final_score: "الدرجة النهائية"
-      auburn_report_header_section: القسم
-      auburn_report_header_section_id: "معرف القسم"
-      auburn_report_header_section_sis: "sis للقسم"
-      auburn_report_header_student_id: "معرف الطالب"
-      auburn_report_header_student_name: "اسم الطالب"
-      auburn_report_header_student_sis: "sis للطالب"
-      auburn_report_header_term: "الفصل الدراسي"
-      auburn_report_header_term_id: "معرف الفصل الدراسي"
-      auburn_report_header_term_sis: "sis للفصل الدراسي"
     student_grades_csv_parameters: 
       account_reports: 
         auburn: 
           pseudonym_ids: 
             field: "معرفات الأسماء المستعارة"
-    student_ip_csv_description: 
-      account_reports: 
-        dubspot: 
-          description: 
-            header: مثال
-          student_login: 
-            text: "يعرض هذا التقرير كل الطلاب المسجلين في مساق معين أو كل المساقات في فصل دراسي معين. وسيحتوي ملف csv الناتج على صف واحد لكل تسجيل طالب."
-      dubspot_report_header_course_id: "معرف المساق"
-      dubspot_report_header_course_name: "اسم المساق"
-      dubspot_report_header_course_sis_id: "معرف sis للمساق"
-      dubspot_report_header_ip_address: "عنوان ip"
-      dubspot_report_header_last_seen_at: "تاريخ آخر مشاهدة"
-      dubspot_report_header_section_id: "معرف القسم"
-      dubspot_report_header_section_name: "اسم القسم"
-      dubspot_report_header_section_sis_id: "معرف sis للقسم"
-      dubspot_report_header_user_id: "معرف المستخدم"
-      dubspot_report_header_user_login_id: "معرف تسجيل الدخول للمستخدم"
-      dubspot_report_header_user_sis_id: "معرف sis للمستخدم"
-    student_submissions_csv_description: 
-      account_reports: 
-        vilas: 
-          description: 
-            header: مثال
-          student_submissions: 
-            text: "هذا تقرير لكل الطلاب المسجلين في مساق في فصل دراسي معين والذين قاموا بإرسال مهمة. ويحتوي هذا التقرير على صف واحد لكل عملية إرسال لطالب."
-      vilas_report_header_assignment_id: "معرف المهمة"
-      vilas_report_header_assignment_name: "اسم المهمة"
-      vilas_report_header_canvas_course_id: "معرف مساق Canvas"
-      vilas_report_header_canvas_user_id: "معرف مستخدم Canvas"
-      vilas_report_header_course_name: "اسم المساق"
-      vilas_report_header_points_possible: "النقاط الممكنة"
-      vilas_report_header_score: النقاط
-      vilas_report_header_sis_course_id: "معرف مساق sis"
-      vilas_report_header_sis_user_id: "معرف مستخدم sis"
-      vilas_report_header_submission_date: "تاريخ الإرسال"
-      vilas_report_header_user_name: "اسم المستخدم"
     students_with_no_submissions_csv_description: 
       account_reports: 
         default: 
           students_with_no_submissions: 
-            description: 
-              header: مثال
             text: "هذا تقرير لكل الطلاب المسجلين في مساق في فصل دراسي معين والذين لم يرسلوا مهمة بين نطاق التاريخ المعين في المساق. ويحتوي هذا التقرير على صف واحد لكل عملية تسجيل لطالب تفي بالمعايير. ولا يمكن أن يكون نطاق التاريخ أكثر من أسبوعين."
-      student_report_header_course_id: "معرف المساق"
-      student_report_header_course_name: "اسم المساق"
-      student_report_header_course_sis_id: "معرف sis للمساق"
-      student_report_header_section_id: "معرف القسم"
-      student_report_header_section_name: "اسم القسم"
-      student_report_header_section_sis_id: "معرف sis للقسم"
-      student_report_header_user_id: "معرف المستخدم"
-      student_report_header_user_name: "اسم المستخدم"
-      student_report_header_user_sis_id: "معرف sis للمستخدم"
     students_with_no_submissions_csv_parameters: 
       account_reports: 
         default: 
@@ -1683,31 +1138,6 @@ ar:
             check_box: "تضمين حالة التسجيل"
       active: "التسجيلات النشطة"
       all: "جميع التسجيلات"
-    submission_data_csv_description: 
-      account_reports: 
-        submission_data: 
-          description: 
-            text: "يحتوي هذا التقرير على تواريخ عمليات الإرسال لأداة الحضور."
-    tempe_grade_export_csv_description: 
-      account_reports: 
-        tempe: 
-          description: 
-            header: مثال
-          grade_export: 
-            text: "يبين هذا التقرير نتائج درجة الطالب النهائية لجميع الطلاب في فصل دراسي معين. سوف يحتوي الملف المحدد بعلامات تبويب الناتج على صف واحد لكل تسجيل، وسوف يُظهر الدرجة النهائية المعروضة وحقول معلومات المساق المتعددة التي ستُستخدم لتحميل بيانات الدرجات إلى Synergy SIS."
-      tempe_report_header_absences: "حالات الغياب"
-      tempe_report_header_citizenship: الجنسية
-      tempe_report_header_comment_1: "تعليق 1"
-      tempe_report_header_comment_2: "تعليق 2"
-      tempe_report_header_comment_3: "تعليق 3"
-      tempe_report_header_grade_mark: "علامة الدرجة"
-      tempe_report_header_grading_term: "الفصل الدراسي الخاضع للتقييم"
-      tempe_report_header_mark_name: "اسم العلامة"
-      tempe_report_header_school_code: "رمز المدرسة"
-      tempe_report_header_school_year: "السنة الدراسية"
-      tempe_report_header_section_id: "معرف القسم"
-      tempe_report_header_sis_number: "رقم SIS"
-      tempe_report_header_workhabits: "عادات العمل"
     tempe_grade_export_csv_parameters: 
       account_reports: 
         tempe: 
@@ -1732,54 +1162,14 @@ ar:
       account_reports: 
         default: 
           unpublishd_courses: 
-            header: مثال
             text: "يعرض هذا التقرير جميع المساقات لمدة محددة غير منشورة. سيشتمل ملف csv الناتج على صف واحد لكل مساق، وسيعرض معرف المساق و معرف sis للمساق والاسم المختصر للمساق واسم المساق وتواريخ بدء وانتهاء المساق."
-      course_report_header_end_date: "تاريخ الانتهاء"
-      course_report_header_id: المعرف
-      course_report_header_name: الاسم
-      course_report_header_short_name: "الاسم القصير"
-      course_report_header_sis_id: "معرف sis"
-      course_report_header_start_date: "تاريخ البدء"
     unrecognized_time_zone: "'%{timezone}' ليست منطقة زمنية معروفة"
     unused_courses_csv_description: 
       account_reports: 
         unused_courses: 
-          description: 
-            header: مثال
           main: 
             text: "هذا تقرير لكل المساقات التي ليس لها أي من العناصر التالية: مهام أو إعلانات أو مناقشات أو ملفات أو وحدات أو صفحات أو اختبارات."
-      course_report_header_course_id: "معرف المساق"
-      course_report_header_course_sis_id: "معرف sis للمساق"
-      course_report_header_created_at: "تاريخ الإنشاء"
-      course_report_header_long_name: "الاسم الطويل"
-      course_report_header_short_name: "الاسم القصير"
-      course_report_header_status: الحالة
     update_failed_notice: "فشل تحديث إعدادات الحساب"
-    user_access_csv_description: 
-      access_report_header_content: المحتوى
-      access_report_header_content_access_id: "معرف الوصول إلى المحتوى"
-      access_report_header_content_type: "نوع المحتوى"
-      access_report_header_course_id: "معرف المساق"
-      access_report_header_course_name: "اسم المساق"
-      access_report_header_course_sis_id: "معرف sis للمساق"
-      access_report_header_enrollment_type: "نوع التسجيل"
-      access_report_header_last_viewed: "آخر عرض"
-      access_report_header_root_account_id: "معرف الحساب الجذري"
-      access_report_header_section_id: "معرف القسم"
-      access_report_header_section_name: "اسم القسم"
-      access_report_header_section_sis_id: "معرف sis للقسم"
-      access_report_header_term_id: "معرف الفصل الدراسي"
-      access_report_header_term_sis_id: "معرف sis للفصل الدراسي"
-      access_report_header_times_participated: "أوقات المشاركة"
-      access_report_header_times_viewed: "أوقات العرض"
-      access_report_header_user_id: "معرف المستخدم"
-      access_report_header_user_sis_id: "معرف sis للمستخدم"
-      account_reports: 
-        usu: 
-          description: 
-            header: مثال
-          user_activity: 
-            text: "يعرض هذا التقرير كل أنشطة المستخدمين المسجلين في مساق معين أو كل المساقات في فصل دراسي معين. وسيحتوي ملف csv الناتج على صف واحد لكل نشاط طالب وسيكون به الرؤوس التالية: نوع التسجيل، معرف القسم، معرف sis للقسم، اسم القسم، معرف المساق، معرف sis للمساق، اسم المساق، معرف المستخدم، معرف sis للمستخدم، نوع المحتوى، المحتوى، أوقات العرض، أوقات المشاركة، آخر عرض،. علمًا بأن أوقات العرض وأوقات المشاركة عبارة عن عدادات من بداية الوقت حتى وقت إنشاء التقرير."
     user_access_csv_parameters: 
       account_reports: 
         usu: 
@@ -1795,46 +1185,11 @@ ar:
     user_added_message: "تمت إضافة *%{user}* بنجاح!"
     user_added_message_sent_message: "تمت إضافة *%{user}* بنجاح! يجب أن يتلقوا بريدًا إلكترونيًا للتأكيد بعد قليل."
     user_deleted_message: "تم حذف %{username} بنجاح"
-    user_inactivity_csv_description: 
-      account_reports: 
-        webster: 
-          description: 
-            header: مثال
-          low_activity: 
-            text: "يوضح هذا التقرير المستخدمين الملتحقين في مساق معين أو في جميع المساقات خلال فترة معينة. سيكون للملف الناتج بتنسيق cvs صف واحد لالتحاق كل مستخدم لم يحصل على الحد الأدنى من الزيارات."
-      webster_report_header_course_id: "معرف المساق"
-      webster_report_header_course_name: "اسم المساق"
-      webster_report_header_course_sis_id: "معرف sis للمساق"
-      webster_report_header_enrollment_state: "حالة التسجيل"
-      webster_report_header_enrollment_type: "نوع التسجيل"
-      webster_report_header_last_ip: "آخر ip"
-      webster_report_header_login_id: "معرف تسجيل الدخول"
-      webster_report_header_user_id: "معرف المستخدم"
-      webster_report_header_user_name: "اسم المستخدم"
-      webster_report_header_user_sis_id: "معرف sis للمستخدم"
     user_inactivity_csv_parameters: 
       account_reports: 
         webster: 
           login: 
             day_drop: "الحد الأدنى من عناصر المساق التي تمت زيارتها:"
-    user_notes_csv_description: 
-      account_reports: 
-        pasco: 
-          description: 
-            header: مثال
-          user_notes: 
-            text: "يعرض هذا التقرير ملاحظات المستخدم للطلاب."
-      pasco_report_header_created_at: "تاريخ الإنشاء"
-      pasco_report_header_created_by_id: "معرف المنشئ"
-      pasco_report_header_deleted_at: "تاريخ الحذف"
-      pasco_report_header_note: ملاحظة
-      pasco_report_header_note_id: المعرف
-      pasco_report_header_title: العنوان
-      pasco_report_header_updated_at: "تاريخ التحديث"
-      pasco_report_header_user_id: "معرف المستخدم"
-      pasco_report_header_user_sis_id: "معرف sis للمستخدم"
-      pasco_report_header_workflow_state: "حالة سير العمل"
-      pasco_report_url: "عنوان url"
     users_list: 
       login_name_or_sis_id: "معرّف تسجيل دخول / SIS"
       name: الاسم
@@ -1844,59 +1199,12 @@ ar:
       account_reports: 
         default: 
           zero_activity: 
-            header: مثال
             text: "يوضح هذا التقرير جميع الطلاب الملتحقين بأي مساقات في فصل دراسي معين. سيحتوي الملف الناتج بتنسيق cvs على صف واحد لالتحاق كل مستخدم لم يقم بزيارة المساق منذ ذلك التاريخ."
-      student_report_header_course_id: "معرف المساق"
-      student_report_header_course_name: "اسم المساق"
-      student_report_header_course_sis_id: "معرف sis للمساق"
-      student_report_header_name: الاسم
-      student_report_header_section_id: "معرف القسم"
-      student_report_header_section_name: "اسم القسم"
-      student_report_header_section_sis_id: "معرف sis للقسم"
-      student_report_header_user_id: "معرف المستخدم"
-      student_report_header_user_sis_id: "معرف sis للمستخدم"
-  ace_report_header_correct: صحيح
-  ace_report_header_count_correct: "العدد صحيح"
-  ace_report_header_count_taken: "العدد المأخوذ"
-  ace_report_header_course_id: "معرف المساق"
-  ace_report_header_course_sis_id: "معرف sis للمساق"
-  ace_report_header_login_id: "معرف تسجيل الدخول"
-  ace_report_header_outcome_id: "معرف النتيجة"
-  ace_report_header_outcome_ids: "معرفات النتائج"
-  ace_report_header_points_earned: "النقاط المكتسبة"
-  ace_report_header_points_possible: "نقاط ممكنة"
-  ace_report_header_question_id: "معرف السؤال"
-  ace_report_header_question_name: "اسم السؤال"
-  ace_report_header_question_text: "نص السؤال"
-  ace_report_header_quiz_title: "عنوان الاختبار"
-  ace_report_header_user_id: "معرف المستخدم"
-  ace_report_header_user_name: "اسم المستخدم"
-  ace_report_header_user_sis_id: "معرف sis للمستخدم"
   activerecord: 
     errors: 
-      full_messages: 
-        format: "%{attribute} %{message}"
       messages: 
-        accepted: "يجب قبول"
-        blank: "لا يمكن أن يكون فارغًا"
-        confirmation: "لا يتطابق مع التأكيد"
-        empty: "لا يمكن أن يكون فارغًا"
-        equal_to: "يجب أن يكون مساويًا لـ %{count}"
-        even: "يجب أن يكون زوجيًا"
-        exclusion: محجوز
-        greater_than: "يجب أن يكون أكبر من %{count}"
-        greater_than_or_equal_to: "يجب أن يكون أكبر من أو مساويًا لـ %{count}"
-        inclusion: "لم يتم تضمينه في القائمة"
-        invalid: "غير صالح"
-        less_than: "يجب أن يكون أقل من %{count}"
-        less_than_or_equal_to: "يجب أن يكون أقل من أو مساويًا لـ %{count}"
-        not_a_number: "ليس رقمًا"
-        odd: "يجب أن يكون فرديًا"
         record_invalid: "فشل التحقق: %{errors}"
         taken: "تم أخذها بالفعل"
-        too_long: "طويل للغاية (الحد الأقصى هو %{count} حرفًا/أحرف)"
-        too_short: "قصير للغاية (الحد الأدنى هو %{count} حرفًا/أحرف)"
-        wrong_length: "طول خاطئ (يجب أن يكون %{count} حرفًا/أحرف)"
       template: 
         body: "كانت هناك مشكلات مع الحقول التالية:"
         header: 
@@ -2916,48 +2224,12 @@ ar:
     titles: 
       attendance_help: "تعليمات الحضور"
       new_attendance_column: "العمود الجديد للحضور"
-  auburn_report_header_account_id: "معرف الحساب"
-  auburn_report_header_account_name: "اسم الحساب"
-  auburn_report_header_account_sis_id: "معرف sis للحساب"
-  auburn_report_header_course: المساق
-  auburn_report_header_course_id: "معرف المساق"
-  auburn_report_header_course_name: "اسم المساق"
-  auburn_report_header_course_sis: "sis للمساق"
-  auburn_report_header_course_sis_id: "معرف sis للمساق"
-  auburn_report_header_course_status: "حالة المساق"
-  auburn_report_header_current_score: "الدرجة الحالية"
-  auburn_report_header_effective_date: "تاريخ السريان"
-  auburn_report_header_end_date: "تاريخ الانتهاء"
-  auburn_report_header_enrollment_state: "حالة التسجيل"
-  auburn_report_header_final_score: "الدرجة النهائية"
-  auburn_report_header_section: القسم
-  auburn_report_header_section_id: "معرف القسم"
-  auburn_report_header_section_name: "اسم القسم"
-  auburn_report_header_section_sis: "sis للقسم"
-  auburn_report_header_section_sis_id: "معرف sis للقسم"
-  auburn_report_header_start_date: "تاريخ البدء"
-  auburn_report_header_student_count: "عدد الطلاب"
-  auburn_report_header_student_id: "معرف الطالب"
-  auburn_report_header_student_name: "اسم الطالب"
-  auburn_report_header_student_sis: "sis للطالب"
-  auburn_report_header_teacher_id: "معرف المدرس"
-  auburn_report_header_teacher_name: "اسم المدرس"
-  auburn_report_header_teacher_sis_id: "معرف sis للمدرس"
-  auburn_report_header_term: "الفصل الدراسي"
-  auburn_report_header_term_id: "معرف الفصل الدراسي"
-  auburn_report_header_term_name: "اسم الفصل الدراسي"
-  auburn_report_header_term_sis: "sis للفصل الدراسي"
-  auburn_report_header_term_sis_id: "معرف sis للفصل الدراسي"
   auth_logging: 
     login: "تسجيل الدخول"
     logout: "تسجيل الخروج"
   bb_display: "تعلم Blackboard"
   bb_file_description: "تصدير Blackboard 6/7/8/9 بتنسيق ملف zip."
   bb_name: "محول Blackboard"
-  better_file_browsing_description: |-
-      واجهة جديدة وبسيطة وسهلة الاستخدام لاستعراض الملفات. إذا قمت بتشغيلها على مستوى المساق،
-      فإن جميع المستخدمين في هذا المساق سيشاهدون الواجهة الجديدة. ولجعلها تظهر عندما ينتقل أحد الأشخاص إلى
-      صفحة الملفات الشخصية لأحد المستخدمين ('/files')، فإنك تحتاج إلى تشغيلها للحساب الذي هو عضو فيه.
   big_blue_button_conference: 
     conference_is_recorded: "يتم تسجيل هذا المؤتمر."
     recording_setting: تسجيل
@@ -2966,12 +2238,6 @@ ar:
     no_manifest: "لا يوجد أي ملف imsmanifest.xml في imsmanifest.xml في الدليل الجذر."
   bookmark_service: 
     default_title: "بلا عنوان"
-  bucks_report_header_last_access_to_canvas: "آخر وصول إلى canvas"
-  bucks_report_header_name: الاسم
-  bucks_report_header_section_id: "معرف القسم"
-  bucks_report_header_section_name: "اسم القسم"
-  bucks_report_header_section_sis_id: "معرف sis للقسم"
-  bucks_report_header_user_sis_id: "معرف sis للمستخدم"
   bucks_zero_activity_title: "النشاط الصفري لـ Bucks"
   bulk_course_migration: 
     export_failed: "حدث خطأ أثناء تصدير المساق ذي المعرف bb_lcid %{id} من Blackboard"
@@ -3575,49 +2841,12 @@ ar:
     by_sa: "سمة CC المشاركة أيضًا"
     private: "خاص (محمي بموجب حقوق النشر)"
     public_domain: "المجال العام"
-  ccp_report_header_course_id: "معرف المساق"
-  ccp_report_header_course_name: "اسم المساق"
-  ccp_report_header_course_sis_id: "معرف sis للمساق"
-  ccp_report_header_email: "البريد الإلكتروني"
-  ccp_report_header_enrollment_type: "نوع التسجيل"
-  ccp_report_header_first_name: "الاسم الأول"
-  ccp_report_header_last_name: "الاسم الأخير"
-  ccp_report_header_section_id: "معرف القسم"
-  ccp_report_header_section_name: "اسم القسم"
-  ccp_report_header_section_sis_id: "معرف sis للقسم"
-  ccp_report_header_user_id: "معرف المستخدم"
-  ccp_report_header_user_sis_id: "معرف sis للمستخدم"
   ccp_zero_activity_title: "النشاط الصفري لـ CCP"
-  cedar_rapids_report_header_account_id: "معرف الحساب"
-  cedar_rapids_report_header_account_name: "اسم الحساب"
-  cedar_rapids_report_header_course_end_date: "تاريخ انتهاء المساق"
-  cedar_rapids_report_header_course_id: "معرف المساق"
-  cedar_rapids_report_header_course_name: "اسم المساق"
-  cedar_rapids_report_header_course_start_date: "تاريخ بداية المساق"
-  cedar_rapids_report_header_course_status: "حالة المساق"
-  cedar_rapids_report_header_department_id: "معرف القسم"
-  cedar_rapids_report_header_department_name: "اسم القسم"
-  cedar_rapids_report_header_observer_count: "عدد الملاحظين"
-  cedar_rapids_report_header_student_count: "عدد الطلاب"
-  cedar_rapids_report_header_ta_count: "عدد مساعدي المدرسين"
-  cedar_rapids_report_header_teacher_count: "عدد المدرسين"
-  cedar_rapids_report_header_term_id: "معرف الفصل الدراسي"
-  cedar_rapids_report_header_term_name: "اسم الفصل الدراسي"
   change_points_possible_to_match_rubric_dialog: 
     prompts: 
       update_assignment_points: "هذا التعيين يشتمل على %{assignmentPoints} نقطة ممكنة، هل ترغب في تغييره بحيث يشتمل على %{rubricPoints} نقطة ممكنة لمطابقة هذا المعيار؟"
     titles: 
       update_assignment_points: "هل تريد تغيير النقاط الممكنة لمطابقة نموذج التقييم؟"
-  chcp_report_header_course: المساق
-  chcp_report_header_email: "البريد الإلكتروني"
-  chcp_report_header_grade: الدرجة
-  chcp_report_header_last_submissio: "آخر إرسال"
-  chcp_report_header_lda: "تاريخ آخر حضور (LDA)"
-  chcp_report_header_phone: الهاتف
-  chcp_report_header_start_date: "تاريخ البدء"
-  chcp_report_header_student_id: "معرف الطالب"
-  chcp_report_header_student_name: "اسم الطالب"
-  chcp_report_header_teacher: المدرس
   chcp_student_activity_title: "تقرير نشاط طلاب CHCP"
   collaboration: 
     default_title: "تعاون بدون تسمية"
@@ -3715,10 +2944,6 @@ ar:
         current: "علاقات التعاون الحالية"
     titles: 
       delete: "هل تريد حذف التعاون؟"
-  collection_items: 
-    new: 
-      pin_to_canvas_network: "تثبيت في شبكة Canvas"
-      saved_successfully: "تم الحفظ بنجاح"
   comm_messages: 
     from_beginning: البداية
     to_now: الآن
@@ -3785,16 +3010,6 @@ ar:
     profile: 
       notices: 
         contact_registered: "تم تسجيل طريقة الاتصال!"
-  concord_report_header_campus: "الحرم الجامعي"
-  concord_report_header_course_name: "اسم المساق"
-  concord_report_header_course_sis_id: "معرف sis للمساق"
-  concord_report_header_last_course_activity_date: "تاريخ آخر نشاط للمساق"
-  concord_report_header_student_current_grade: "الدرجة الحالية للطالب"
-  concord_report_header_student_default_email: "البريد الإلكتروني الافتراضي للطالب"
-  concord_report_header_student_name: "اسم الطالب"
-  concord_report_header_student_sis_id: "معرف sis للطالب"
-  concord_report_header_term_name: "اسم الفصل الدراسي"
-  concord_report_header_zero_grade_assignments: "مهام بدرجة صفرية"
   conferences: 
     concluded_conference: 
       delete: حذف
@@ -3877,7 +3092,6 @@ ar:
     buttons: 
       process: "بيانات العملية"
     errors: 
-      couldnt_create: "تعذر إنشاء تصدير المساق."
       error: "حدث خطأ أثناء تصدير المساق.  الرجاء إعلام مسؤول النظام، وإعطاؤه معرف التصدير التالي: \"%{code}\""
       not_found: "التصدير غير موجود"
     index: 
@@ -5097,17 +4311,6 @@ ar:
       uuid: UUID
       wiki_id: "معرّف Wiki"
       workflow_state: "حالة سير العمل"
-  course_report_header_course_id: "معرف المساق"
-  course_report_header_course_sis_id: "معرف sis للمساق"
-  course_report_header_created_at: "تاريخ الإنشاء"
-  course_report_header_end_date: "تاريخ الانتهاء"
-  course_report_header_id: المعرف
-  course_report_header_long_name: "الاسم الطويل"
-  course_report_header_name: الاسم
-  course_report_header_short_name: "الاسم القصير"
-  course_report_header_sis_id: "معرف sis"
-  course_report_header_start_date: "تاريخ البدء"
-  course_report_header_status: الحالة
   course_restore: 
     restore_error: "حدثت مشكلة أثناء محاولة استرداد المساق. لم يتم استرداد المساق."
   course_search: 
@@ -5575,7 +4778,6 @@ ar:
         tools: التطبيق
       titles: 
         edit_navigation: "تحرير تنقل المساق"
-      transifex_message: "انضم إلى [مجتمع ترجمة Canvas](%{transifex_url})"
       turnitin: "سيتم عرض هذه التعليقات للطلاب عند إرسال مهمة تم تمكين Turnitin لها"
       view_grading_scheme: "عرض نظام التقييم"
       wiki_editing_roles: "يستطيع إنشاء صفحات wiki للمساق وإعادة تسميتها وتحريرها بشكل افتراضي"
@@ -5895,8 +5097,6 @@ ar:
       two: مناقشتان
       zero: مناقشة
     enable_dashboard: "حاول استخدام لوحة المعلومات الجديدة"
-    event_created: "تم إنشاء الحدث"
-    message_sent: "تم إرسال الرسالة"
     show_more_link: 
       show_less: "عرض القليل"
       show_more: "عرض المزيد"
@@ -6488,30 +5688,12 @@ ar:
       بحالة غير منشورة جديدة وغير مرئية للطلاب ويتم استبعادها من حسابات الدرجات
       تنبيه--قد يؤدي تعطيل هذه الميزة إلى حذف المحتوى المضاف
       أو المحرر من طريقة عرض المدرس.
-  dubspot_report_header_course_id: "معرف المساق"
-  dubspot_report_header_course_name: "اسم المساق"
-  dubspot_report_header_course_sis_id: "معرف sis للمساق"
-  dubspot_report_header_ip_address: "عنوان ip"
-  dubspot_report_header_last_seen_at: "تاريخ آخر مشاهدة"
-  dubspot_report_header_section_id: "معرف القسم"
-  dubspot_report_header_section_name: "اسم القسم"
-  dubspot_report_header_section_sis_id: "معرف sis للقسم"
-  dubspot_report_header_user_id: "معرف المستخدم"
-  dubspot_report_header_user_login_id: "معرف تسجيل الدخول للمستخدم"
-  dubspot_report_header_user_sis_id: "معرف sis للمستخدم"
   due_dates: 
     due_at: "موعد الاستحقاق: %{assignment_due_date_time}"
     multiple_due_dates: "موعد الاستحقاق: تواريخ محددة عديدة"
     no_due_date: "موعد الاستحقاق: بلا تاريخ استحقاق"
   ecollege_file_description: Ecollege
   ecollege_name: "محول Ecollege"
-  edison: 
-    outcome: 
-      extra_text: "معرف النتيجة: %{outcome_id}،"
-    quiz_id: 
-      extra_text: "معرف الاختبار: %{quiz_id}،"
-    section_id: 
-      extra_text: "القسم: %{section_id}،"
   edit_rubric: 
     buttons: 
       create_rubric: "إنشاء عنوان"
@@ -7354,17 +6536,6 @@ ar:
     no_deleting_folders_with_content: "يتعذر حذف مجلد بداخله محتوى"
     no_deleting_root: "يتعذر حذف المجلد الجذري"
     only_one_folder: "يتعذر تعيين مسار مجلد ومعرف المجلد"
-  galen_report_header_account_id: "معرف الحساب"
-  galen_report_header_account_name: "اسم الحساب"
-  galen_report_header_course_name: "اسم المساق"
-  galen_report_header_course_sis_id: "معرف sis للمساق"
-  galen_report_header_first_submission: "أول إرسال"
-  galen_report_header_resource_type: "نوع المورد"
-  galen_report_header_section_sis_id: "معرف sis للقسم"
-  galen_report_header_submission_date: "تاريخ الإرسال"
-  galen_report_header_submission_type: "نوع الإرسال"
-  galen_report_header_title: العنوان
-  galen_report_header_user_sis_id: "معرف sis للمستخدم"
   global_message_icons: 
     announcement: إعلان
     calendar: تقويم
@@ -7380,21 +6551,6 @@ ar:
       checkbox: "عدم إظهار لهذا المساق مرة أخرى."
       warning: تحذير
   grade_export_title: "تصدير الدرجة"
-  grade_report_header_course: المساق
-  grade_report_header_course_id: "معرف المساق"
-  grade_report_header_course_sis: "sis للمساق"
-  grade_report_header_current_score: "الدرجة الحالية"
-  grade_report_header_enrollment_state: "حالة التسجيل"
-  grade_report_header_final_score: "الدرجة النهائية"
-  grade_report_header_section: القسم
-  grade_report_header_section_id: "معرف القسم"
-  grade_report_header_section_sis: "sis للقسم"
-  grade_report_header_student_id: "معرف الطالب"
-  grade_report_header_student_name: "اسم الطالب"
-  grade_report_header_student_sis: "sis للطالب"
-  grade_report_header_term: "الفصل الدراسي"
-  grade_report_header_term_id: "معرف الفصل الدراسي"
-  grade_report_header_term_sis: "sis للفصل الدراسي"
   grade_summary: 
     graph_title: "متوسط %{mean}، مرتفع %{high}، منخفض %{low}"
     outcome: 
@@ -7958,27 +7114,6 @@ ar:
       saving: "جارٍ الحفظ..."
     titles: 
       grading_scheme_info: "عرض/تحرير نظام تقييم الدرجات"
-  granite_report_header_account_id: "معرف الحساب"
-  granite_report_header_assignment_id: "معرف المهمة"
-  granite_report_header_assignment_name: "اسم المهمة"
-  granite_report_header_assignment_unique_id: "المعرف الفريد للمهمة"
-  granite_report_header_course_id: "معرف المساق"
-  granite_report_header_department: القسم
-  granite_report_header_ends: ينتهي
-  granite_report_header_graded_at: "تاريخ تقدير الدرجة"
-  granite_report_header_name: الاسم
-  granite_report_header_observer_count: "عدد الملاحظين"
-  granite_report_header_sis_id: "معرف SIS"
-  granite_report_header_starts: يبدأ
-  granite_report_header_student_count: "عدد الطلاب"
-  granite_report_header_submission_date: "تاريخ الإرسال"
-  granite_report_header_submission_id: "معرف الإرسال"
-  granite_report_header_submission_score: "درجة الإرسال"
-  granite_report_header_ta_count: "عدد المدرسين المساعدين"
-  granite_report_header_teacher_count: "عدد المدرسين"
-  granite_report_header_term: "الفصل الدراسي"
-  granite_report_header_term_id: "معرف الفصل الدراسي"
-  granite_report_header_user_id: "معرف المستخدم"
   group: 
     greater_than_1: "يجب أن يكون أكبر من 1"
     memeber: العضو
@@ -8495,7 +7630,6 @@ ar:
       search_by_tag: "بحث حسب العلامة"
     confirms: 
       default_delete_thing: "هل ترغب بالتأكيد في حذف هذا؟"
-    course_time: "المساق:"
     datepicker: 
       titles: 
         am_pm: صباحًا/مساءً
@@ -8521,7 +7655,6 @@ ar:
       minimize_youtube_video: "تصغير الفيديو"
       view_equella_content_in_new_window: "عرض المحتوى في نافذة جديدة"
     loading: "جارٍ التحميل..."
-    local_time: "محلي:"
     no_description: "بلا وصف"
     no_items: "لا توجد عناصر."
     no_results_found: "لم يتم العثور على نتائج"
@@ -8624,7 +7757,6 @@ ar:
       links: 
         close: إغلاق
         dashboard: "لوحة معلوماتي"
-        home: البداية
         skip_to_content: "التخطي إلى المحتوى"
       menu: 
         assignments: المهام
@@ -8742,17 +7874,6 @@ ar:
       word_separator: " "
   license_help: 
     content_license_help: "تعليمات ترخيص المحتوى"
-  lincoln_report_header_course_id: "معرف المساق"
-  lincoln_report_header_course_name: "اسم المساق"
-  lincoln_report_header_course_role: "دور المساق"
-  lincoln_report_header_course_sis_id: "معرف SIS للمساق"
-  lincoln_report_header_current_grade: "الدرجة الحالية"
-  lincoln_report_header_invalid_term: "الفصل الدراسي غير صحيح"
-  lincoln_report_header_login: "معرف تسجيل الدخول"
-  lincoln_report_header_student_name: "اسم الطالب"
-  lincoln_report_header_student_sis: "معرف sis  للطالب"
-  lincoln_report_header_term_id: "معرف الفصل الدراسي"
-  lincoln_report_header_term_name: "اسم الفصل الدراسي"
   link_enrollment: 
     buttons: 
       link: "الارتباط بالطالب"
@@ -9648,7 +8769,6 @@ ar:
         subject: "فشل تصدير المساق: %{course}"
     content_export_finished: 
       email: 
-        body: "لقد انتهى تصدير المساق الخاص بك \"%{course}\"."
         html: 
           body2: "لقد انتهى تصدير المساق الخاص بك *%{course}*."
           link: "انقر لعرض عمليات التصدير"
@@ -10846,17 +9966,6 @@ ar:
   migration_issues: 
     errors: 
       valid_workflow_state: "يجب إرسال حالة سير عمل صالحة"
-  mississippi_report_header_course_id: "معرف المساق"
-  mississippi_report_header_enrollment_id: "معرف التسجيل"
-  mississippi_report_header_enrollment_state: "حالة التسجيل"
-  mississippi_report_header_observer_sis_id: "معرف sis للملاحظ"
-  mississippi_report_header_observer_user_id: "معرف المستخدم للملاحظ"
-  mississippi_report_header_role: الدور
-  mississippi_report_header_section_id: "معرف القسم"
-  mississippi_report_header_sis_course_id: "معرف المساق لنظام SIS"
-  mississippi_report_header_sis_section_id: "معرف القسم لنظام SIS"
-  mississippi_report_header_sis_user_id: "معرف المستخدم لنظام SIS"
-  mississippi_report_header_user_id: "معرف المستخدم"
   mississippi_sis_title: "بيانات SIS"
   module_item_types: 
     assignment: المهمة
@@ -10937,21 +10046,6 @@ ar:
   new_styles_description: |-
       نحن نستخدم شكل معدل من واجهة مستخدم Canvas. عليك تشغيل هذا لاختيار مشاهدة
       شكل وأداء واجهة Canvas المحدثة والمبسطة.
-  newark_report_header__assignment_count: "عدد المهام"
-  newark_report_header_assignment_due_date: "تاريخ استحقاق المهمة"
-  newark_report_header_assignment_group_name: "اسم مجموعة المهام"
-  newark_report_header_assignment_id: "معرف المهمة"
-  newark_report_header_assignment_name: "اسم المهمة"
-  newark_report_header_course_code: "رمز المساق"
-  newark_report_header_course_id: "معرف المساق"
-  newark_report_header_course_name: "اسم المساق"
-  newark_report_header_course_sis_id: "معرف sis للمساق"
-  newark_report_header_due_date: "تاريخ الاستحقاق"
-  newark_report_header_section_id: "معرف القسم"
-  newark_report_header_section_name: "اسم القسم"
-  newark_report_header_student_name: "اسم الطالب"
-  newark_report_header_teacher_id: "معرف المدرس"
-  newark_report_header_teacher_name: "اسم المدرس"
   no_migration_file: "الملف مطلوب لترحيل المحتوى."
   not_a_number: "يجب أن تكون القيمة عددًا موجبًا"
   notification: 
@@ -11016,17 +10110,6 @@ ar:
     due_date_display: "تاريخ الاستحقاق"
     files_description: "ملف جديد مضاف إلى المساق لديك"
     files_display: الملفات
-    grading_description: |-
-        يتضمن:
-        
-        * الدرجة المدخلة/المتغيرة للمهمة/الإرسال
-        * درجة مهمة صوتية
-        * تم تغيير معدل الدرجة
-        
-        &nbsp;
-        
-        تحقق من "تضمين النتائج عند التنبيه بشأن تغيرات الدرجة" إذا كنت تريد رؤية درجاتك في الإشعارات.
-        إذا كان بريدك الإلكتروني غير مؤسسي، فهذا يعني أنه سيتم إرسال المحتوى الحساس خارج المؤسسة.
     grading_display: التقديرات
     grading_notify_include_grade: "تضمين النقاط عند التنبيه حول تغييرات التقديرات."
     grading_policies_description: "تغييرات سياسة تقييم درجات المساق"
@@ -11139,13 +10222,7 @@ ar:
         
         التسجيل لموعد طالب
     student_appointment_display: "تسجيلات موعد الطالب"
-    submission_comment_description: |-
-        تعليق إرسال المهمة
-        &nbsp;
-        
-        تحقق من "وضع علامة على تعليقات الإرسال الجديدة" إذا كنت لا تريد عرضها "كجديدة" في علبة وراد Canvas
     submission_comment_display: "تعليق الإرسال"
-    submission_new_as_read: "وضع علامة على تعليقات الإرسال كمقروءة."
   notification_preferences: 
     communication: 
       email: 
@@ -11222,29 +10299,6 @@ ar:
     account_group_description: "مجموعة نتائج مستوى الحساب."
   outcome_path_mastery_points: "%{path} نقاط درجة الإتقان"
   outcome_path_result: "%{path} النتيجة"
-  outcome_report_header_assessment_id: "معرف التقييم"
-  outcome_report_header_assessment_question: "سؤال التقييم"
-  outcome_report_header_assessment_question_id: "معرف سؤال التقييم"
-  outcome_report_header_assessment_title: "عنوان التقييم"
-  outcome_report_header_assessment_type: "نوع التقييم"
-  outcome_report_header_assignment_id: "معرف المهمة"
-  outcome_report_header_assignment_title: "عنوان المهمة"
-  outcome_report_header_assignment_url: "عنوان url للمهمة"
-  outcome_report_header_attempt: المحاولة
-  outcome_report_header_course_id: "معرف المساق"
-  outcome_report_header_course_name: "اسم المساق"
-  outcome_report_header_course_sis_id: "معرف sis للمساق"
-  outcome_report_header_learning_outcome_id: "معرف نتيجة التعلم"
-  outcome_report_header_learning_outcome_name: "اسم نتيجة التعلم"
-  outcome_report_header_outcome_score: "درجة التعلم"
-  outcome_report_header_section_id: "معرف القسم"
-  outcome_report_header_section_name: "اسم القسم"
-  outcome_report_header_section_sis_id: "معرف sis للقسم"
-  outcome_report_header_student_id: "معرف الطالب"
-  outcome_report_header_student_name: "اسم الطالب"
-  outcome_report_header_student_sis_id: "معرف sis للطالب"
-  outcome_report_header_submission_date: "تاريخ الإرسال"
-  outcome_report_header_submission_score: "درجة الإرسال"
   outcome_results: 
     outcomes_filename: النتائج
   outcome_results_title: "نتائج التحصيل"
@@ -11439,33 +10493,10 @@ ar:
     view_more_link: "عرض المزيد"
   paginated_view: 
     loading_more_results: "تحميل مزيد من النتائج"
-  pasco_report_header_created_at: "تاريخ الإنشاء"
-  pasco_report_header_created_by_id: "معرف المنشئ"
-  pasco_report_header_deleted_at: "تاريخ الحذف"
-  pasco_report_header_note: ملاحظة
-  pasco_report_header_note_id: المعرف
-  pasco_report_header_title: العنوان
-  pasco_report_header_updated_at: "تاريخ التحديث"
-  pasco_report_header_user_id: "معرف المستخدم"
-  pasco_report_header_user_sis_id: "معرف sis للمستخدم"
-  pasco_report_header_workflow_state: "حالة سير العمل"
-  pasco_report_url: "عنوان url"
   pasco_user_notes_title: "ملاحظات المستخدم"
   paypal: 
     exception: "عذرًا، حدث خطأ، الرجاء المحاولة مرة أخرى لاحقًا."
-  pci_report_header_course_sis_id: "معرف sis للمساق"
-  pci_report_header_submission_date: "حالة الإرسال"
-  pci_report_header_submission_type: "نوع الإرسال"
-  pci_report_header_user_sis: "sis للمستخدم"
   penn_harris_student_grade_title: "درجات طلاب Penn Harris"
-  ph_student_grades_report_header_account_id: "معرف الحساب"
-  ph_student_grades_report_header_course_id: "معرف المساق"
-  ph_student_grades_report_header_final_letter_grade: "الدرجة الحرفية النهائية"
-  ph_student_grades_report_header_final_score: "الدرجة النهائية"
-  ph_student_grades_report_header_mark_type: "نوع العلامة"
-  ph_student_grades_report_header_term_id: "معرف الفصل الدراسي"
-  ph_student_grades_report_header_user_id: "معرف المستخدم"
-  ph_student_grades_report_term_required: "يجب تحديد فصل دراسي لهذا التقرير."
   plugins: 
     academic_benchmark_importer: 
       description: "يقوم هذا بتمكين استيراد معايير القياس الأكاديمي إلى Canvas."
@@ -11504,7 +10535,6 @@ ar:
       description: "دعم عقد مؤتمرات على ويب من خلال BigBlueButton"
       name: BigBlueButton
     big_blue_button_settings: 
-      description: "سيلزم الوصول إلى مثيل [BigBlueButton](%{url})."
       domain_description: "**اسم المضيف** أو **عنوان ip** لتثبيت BigBlueButton (مثل bigbluebutton.mycompany.com)"
       labels: 
         domain: المجال
@@ -11788,7 +10818,6 @@ ar:
       description: "دعم عقد مؤتمرات Wimba عبر الويب"
       name: Wimba
     wimba_settings: 
-      description: "سيلزمك الوصول إلى حساب [Wimba](%{url})."
       domain_description: "(على سبيل المثال، mycompany.wimba.com)"
       labels: 
         domain: المجال
@@ -11911,11 +10940,6 @@ ar:
           **انسخ هذا الرمز المميز الآن**. وبمجرد أن تترك هذه الصفحة، لن تستطيع
           استرداد الرمز المميز الكامل بعد ذلك، وسيلزم إعادة إنشائه للحصول على قيمة
           جديدة.
-      generate_access_token_description: |-
-          إن رموز الوصول هي ما يسمح لتطبيقات الجهات الأخرى بالوصول إلى موارد Canvas
-          نيابة عنك. ويتم إنشاء هذه الرموز بشكل طبيعي تلقائيًا
-          للتطبيقات بحسب الحاجة، ولكن إذا [كنت تقوم بتطوير مشروع
-          جديد أو محدد](%{documentation_url}) فما عليك سوى إنشاء الرمز المميز من هنا.
       google_docs_description: "وبمجرد تخويلك لرؤية Google Docs، ستستطيع إرسال مهامك مباشرة من Google Docs، وإنشاء مستنداتك ومشاركتها مع أفراد من فصلك."
       headers: 
         application_abbrev: التطبيق
@@ -12118,23 +11142,6 @@ ar:
     upload_file_view: 
       choose_a_picture: "اختيار صورة"
       crop_instructions: "لقص صورة، اسحب الجزء المحدد، ثم انقر فوق زر \"حفظ\" بالأسفل."
-  provisioning_report_header_account_id: "معرف الحساب"
-  provisioning_report_header_course_id: "معرف المساق"
-  provisioning_report_header_email: "البريد الإلكتروني"
-  provisioning_report_header_end_date: "تاريخ الانتهاء"
-  provisioning_report_header_first_name: "الاسم الأول"
-  provisioning_report_header_group_id: "معرف المجموعة"
-  provisioning_report_header_last_name: "الاسم الأخير"
-  provisioning_report_header_login_id: "معرف تسجيل الدخول"
-  provisioning_report_header_long_name: "الاسم الطويل"
-  provisioning_report_header_name: الاسم
-  provisioning_report_header_role: الدور
-  provisioning_report_header_section_id: "معرف القسم"
-  provisioning_report_header_short_name: "الاسم القصير"
-  provisioning_report_header_start_date: "تاريخ البدء"
-  provisioning_report_header_status: الحالة
-  provisioning_report_header_term_id: "معرف الفصل الدراسس"
-  provisioning_report_header_user_id: "معرف المستخدم"
   provisioning_title: التزويد
   pseudonym: 
     errors: 
@@ -12535,7 +11542,6 @@ ar:
   quiz_extend_time: 
     ending_time: "وقت النهاية"
     extend_time: "تمديد الوقت"
-    extensions_student: "تمديد الوقت لـ %{student}"
     extensions_successfully_added: "تمت إضافة التمديدات بنجاح"
     now: الآن
   quiz_extensions: 
@@ -12633,15 +11639,6 @@ ar:
   quiz_statistics_route: 
     quiz_statistics: إحصاءات
   quiz_statistics_title: "إحصاءات الاختبار"
-  quiz_submission: 
-    answers: 
-      correct: صحيح!
-      correct_answers: "إجابات صحيحة"
-      incorrect: "غير صحيح"
-      partial: جزئي
-      right: "إجابة صحيحة"
-      unanswered: "غير مجاب عنه"
-      you_answered: "أنت أجبت"
   quiz_submission_arrows: 
     answers: 
       correct: صحيح!
@@ -13476,8 +12473,6 @@ ar:
         quiz_fudged_negative: "لقد تم تعديل درجة الاختبار هذه يدويًا بواسطة نقاط %{fudge}."
         quiz_fudged_positive: "لقد تم تعديل درجة الاختبار هذه يدويًا بواسطة نقاط %{fudge} الموجبة."
         quiz_not_yet_taken: "لم يتم البدء في الاختبار بعد."
-        quiz_results_protected: "تتم حماية نتائج الاختبار لهذا الاختبار، وهي غير مرئية للطلاب."
-        quiz_results_protected_until_last_attempt: "تتم حماية نتائج الاختبار لهذا الاختبار، وهي غير مرئية للطلاب إلى أن قاموا بإرسال محاولتهم الأخيرة."
         quiz_submission_needs_review: "لقد تغير الامتحان تغيرًا كبيرًا منذ آخر مرة تم فيها هذا الإرسال. فقد يحتاج هذا الإرسال إلى إعادة تقييم."
         requires_lockdown: "يعد مستعرض Respondus LockDown مطلوبًا لعرض نتائج الاختبار."
         submitted_at: "تم إرسال %{when}"
@@ -14013,16 +13008,6 @@ ar:
     roles_override_index: 
       account_roles: "أدوار الحساب"
       course_roles: "أدوار المساق"
-  ross_report_header_comment: تعليق
-  ross_report_header_course_id: "معرف المساق"
-  ross_report_header_grade_posting_date: "تاريخ نشر الدرجات"
-  ross_report_header_grade_type: "نوع الدرجة"
-  ross_report_header_grade_value_type: "نوع قيمة الدرجة"
-  ross_report_header_miscfield1: MiscField1
-  ross_report_header_miscfield13: MiscField13
-  ross_report_header_miscfield2: MiscField2
-  ross_report_header_numeric_grade: "درجة رقمية"
-  ross_report_header_source_id: "معرف المصدر"
   roster: 
     delete_confirm: "هل ترغب بالتأكيد في إزالة هذه المستخدم؟"
     error_sending_invitations: "حدث خطأ في إرسال الدعوة.  يرجى المحاولة مرة أخرى."
@@ -14099,36 +13084,6 @@ ar:
         are_you_sure_remove: "هل ترغب بالتأكيد في إزالة هذا العنوان من قائمتك؟"
       remove_rubric: "إزالة هذا العنوان من قائمتي"
   safety_drill_title: "جدولة تدريبات السلامة"
-  samuel_report_header_assessment_question_id: "معرف سؤال التقييم"
-  samuel_report_header_assessment_question_name: "اسم سؤال التقييم"
-  samuel_report_header_assignment_description: "وصف المهمة"
-  samuel_report_header_assignment_id: "معرف المهمة"
-  samuel_report_header_assignment_points_possible: "النقاط الممكنة للمهمة"
-  samuel_report_header_assignment_title: "عنوان المهمة"
-  samuel_report_header_assignment_type: "نوع المهمة"
-  samuel_report_header_course_canvas_id: "معرف Canvas للمساق"
-  samuel_report_header_course_current_score: "الدرجة الحالية للمساق"
-  samuel_report_header_course_name: "اسم المساق"
-  samuel_report_header_course_sis_id: "معرف SIS للمساق"
-  samuel_report_header_course_student_count: "عدد الطلاب في المساق"
-  samuel_report_header_grading_scheme: "نظام التقييم"
-  samuel_report_header_learning_outcome_desc: "وصف نتيجة التعلم"
-  samuel_report_header_learning_outcome_id: "معرف نتيجة التعلم"
-  samuel_report_header_learning_outcome_score: "درجة نتيجة التعلم"
-  samuel_report_header_learning_outcome_short_name: "الاسم القصير لنتيجة التعلم"
-  samuel_report_header_rubric_title: العنوان
-  samuel_report_header_section_canvas_id: "معرف Canvas للقسم"
-  samuel_report_header_section_name: "اسم القسم"
-  samuel_report_header_section_sis_id: "معرف sis  للقسم"
-  samuel_report_header_student_id: "معرف الطالب"
-  samuel_report_header_student_name: "اسم الطالب"
-  samuel_report_header_student_sis_id: "معرف sis  للطالب"
-  samuel_report_header_subaccount_id: "معرف الحساب الفرعي"
-  samuel_report_header_subaccount_name: "اسم الحساب الفرعي"
-  samuel_report_header_submission_date: "تاريخ الإرسال"
-  samuel_report_header_submission_grade: "درجة الإرسال"
-  samuel_report_header_submissions_attempt: "محاولة الإرسالات"
-  samuel_report_header_teacher_name: "اسم المدرس"
   scantron_quiz_title: "اختبار Scantron"
   scribd: 
     upgrade_flash: "مرحبًا، إصدار Adobe Flash Player الذي لديك قديم. لاستخدام iPaper (وكثير من المواد الأخرى على الويب) تحتاج إلى %{link_tag}get the latest Flash player%{end_link}."
@@ -14456,13 +13411,9 @@ ar:
           email: "البريد الإلكتروني (اختياري)"
     event_list: 
       at_least_more_events: "على الأقل %{count_of_events} آخر (أخرى)"
-      at_least_more_events_one_week: "على الأقل %{count_of_events} آخر (أخرى) في الأسبوع القادم"
-      at_least_more_events_two_weeks: "على الأقل %{count_of_events} آخر (أخرى) في الأسبوعين القادمين"
       links: 
         view_calendar: "عرض التقويم"
       more_events: "%{count_of_events} آخر (أخرى)"
-      more_events_one_week: "%{count_of_events} آخر (أخرى) في الأسبوع القادم"
-      more_events_two_weeks: "%{count_of_events} آخر (أخرى) في الأسبوعين القادمين"
       nothing_for_now: "لا شيء موجود الآن"
       nothing_one_week: "لا شيء موجود للأسبوع القادم"
       nothing_two_weeks: "لا شيء موجود للأسبوعين القادمين"
@@ -15136,19 +14087,6 @@ ar:
       في نتائج التعلم للمساق. ويتم عرض النتائج بتنسيق يشبه دفتر الدرجات ويتم عرض تقدم
       الطلاب كدرجة رقمية وكتقدير من بين إتقان/قريب من الإتقان/
       بحاجة إلى تحسين.
-  student_report_header_course_id: "معرف المساق"
-  student_report_header_course_name: "اسم المساق"
-  student_report_header_course_sis_id: "معرف sis للمساق"
-  student_report_header_enrollment_state: "حالة التسجيل"
-  student_report_header_last_access_at: "تاريخ آخر وصول"
-  student_report_header_last_ip: "آخر ip"
-  student_report_header_name: الاسم
-  student_report_header_section_id: "معرف القسم"
-  student_report_header_section_name: "اسم القسم"
-  student_report_header_section_sis_id: "معرف sis للقسم"
-  student_report_header_user_id: "معرف المستخدم"
-  student_report_header_user_name: "اسم المستخدم"
-  student_report_header_user_sis_id: "معرف sis للمستخدم"
   student_submissions_title: "إرسالات الطلاب"
   students_with_no_submissions_title: "الطلاب الذين بدون إرسالات"
   sub_accounts: 
@@ -15329,8 +14267,6 @@ ar:
       curriculum_assessment_errata_description: "عرض أخطاء التقييم والمناهج الدراسية التي تم الإعلام عنها مسبقًا. البحث عن \"الأخطاء المطبعية\"."
       networking_academy_description: "عرض إجابات Cisco عن الأسئلة الشائعة."
       networking_academy_faqs: "الأسئلة الشائعة حول أكاديمية الشبكات"
-    select: 
-      prompt: "الرجاء تحديد"
   table_headings: 
     name: الاسم
     total: الإجمالي
@@ -15359,19 +14295,6 @@ ar:
     tab_location_error: "موقع علامة التبويب هذه غير صالح"
     tab_unmanagable_error: "%{css_class} غير قابل للإدارة"
   tempe_grade_export_title: "تصدير درجات Tempe"
-  tempe_report_header_absences: "حالات الغياب"
-  tempe_report_header_citizenship: الجنسية
-  tempe_report_header_comment_1: "تعليق 1"
-  tempe_report_header_comment_2: "تعليق 2"
-  tempe_report_header_comment_3: "تعليق 3"
-  tempe_report_header_grade_mark: "علامة الدرجة"
-  tempe_report_header_grading_term: "الفصل الدراسي الخاضع للتقييم"
-  tempe_report_header_mark_name: "اسم العلامة"
-  tempe_report_header_school_code: "رمز المدرسة"
-  tempe_report_header_school_year: "السنة الدراسية"
-  tempe_report_header_section_id: "معرف القسم"
-  tempe_report_header_sis_number: "رقم SIS"
-  tempe_report_header_workhabits: "عادات العمل"
   terms: 
     index: 
       date: 
@@ -15973,24 +14896,8 @@ ar:
       no_courses_message: "ليس لديك أي مساقات، لذا لن تكون هذه الصفحة مثيرة جدًا الآن. بمجرد أن قمت بإنشاء المساقات أو توقيعها، ستبدأ في رؤية المحادثات الواردة من كافة الفصول."
       unpublished_courses_message: "لقد قمت بالتسجيل في واحد أو أكثر من المساقات التي لم تبدأ بعد. بمجرد أن تصبح هذه المساقات متاحة، ستظهر المعلومات المتعلقة بها هنا وفي شريط التنقل العلوي. في نفس الوقت؛ يمكنك الاشتراك في المزيد من المساقات أو إعداد ملفك التعريفي."
       welcome_to_happiness: "مرحبًا بك في Canvas!"
-  ut_austin_report_header_canvas_user_id: "معرف مستخدم Canvas"
-  ut_austin_report_header_default_email: "البريد الإلكتروني الافتراضي"
-  ut_austin_report_header_google_doc_address: "عنوان Google Docs"
-  ut_austin_report_header_name: الاسم
-  ut_austin_report_header_sis_id: "معرف sis"
   validate: 
     is_required: "هذا الحقل مطلوب"
-  vilas_report_header_assignment_id: "معرف المهمة"
-  vilas_report_header_assignment_name: "اسم المهمة"
-  vilas_report_header_canvas_course_id: "معرف مساق Canvas"
-  vilas_report_header_canvas_user_id: "معرف مستخدم Canvas"
-  vilas_report_header_course_name: "اسم المساق"
-  vilas_report_header_points_possible: "النقاط الممكنة"
-  vilas_report_header_score: الدرجة
-  vilas_report_header_sis_course_id: "معرف مساق sis"
-  vilas_report_header_sis_user_id: "معرف مستخدم sis"
-  vilas_report_header_submission_date: "تاريخ الإرسال"
-  vilas_report_header_user_name: "اسم المستخدم"
   warnings: 
     test_install: 
       periodic_message: "تثبيت Canvas هذا للاختبار فقط وستتم إعادة تعيينه بشكل دوري."
@@ -16016,36 +14923,6 @@ ar:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Blackboard Vista/CE،‏ WebCT 6+ المساق"
   webct_name: "Blackboard Vista/CE (WebCT)"
-  webster_report_header_course_id: "معرف المساق"
-  webster_report_header_course_name: "اسم المساق"
-  webster_report_header_course_sis_id: "معرف sis للمساق"
-  webster_report_header_enrollment_state: "حالة التسجيل"
-  webster_report_header_enrollment_type: "نوع التسجيل"
-  webster_report_header_last_ip: "آخر ip"
-  webster_report_header_login_id: "معرف تسجيل الدخول"
-  webster_report_header_user_id: "معرف المستخدم"
-  webster_report_header_user_name: "اسم المستخدم"
-  webster_report_header_user_sis_id: "معرف sis للمستخدم"
-  westminster_report_header_cohort_id: "معرف المجموعة"
-  westminster_report_header_cohort_name: "اسم المجموعة"
-  westminster_report_header_course_name: "اسم المساق"
-  westminster_report_header_current_courses: "المساقات الحالية"
-  westminster_report_header_current_grade: "الدرجة الحالية"
-  westminster_report_header_first_name: "الاسم الأول"
-  westminster_report_header_last_completed_course: "آخر مساق مكتمل"
-  westminster_report_header_last_completed_module: "آخر وحدة مكتملة"
-  westminster_report_header_last_faculty_journal_entry: "آخر إدخال دفتر كلية"
-  westminster_report_header_last_graded_date: "آخر تاريخ تم فيه تقدير الدرجات"
-  westminster_report_header_last_mastered_assignment: "آخر مهمة تمت بإتقان"
-  westminster_report_header_last_name: "الاسم الأخير"
-  westminster_report_header_last_submission_date: "آخر تاريخ إرسال"
-  westminster_report_header_last_submission_graded: "آخر إرسال تم تقدير الدرجة له"
-  westminster_report_header_professor_id: "معرف المعلم"
-  westminster_report_header_professor_name: "اسم المعلم"
-  westminster_report_header_student_id: "معرف الطالب"
-  westminster_report_header_student_name: "اسم الطالب"
-  westminster_report_header_term_taken: "الفصل الدراسي"
-  westminster_report_header_ungraded_submissions: "عدد الإرسالات التي لم يتم تقدير درجاتها"
   widget: 
     upload_media_track_form: 
       choose_a_language: "-- اختر لغة--"
@@ -16229,8 +15106,6 @@ ar:
       page_updated: "تم تحديث الصفحة بنجاح."
     page_link: 
       link_hidden_from_students_warning: "لن يرى الطلاب هذا الارتباط"
-    page_revisions: 
-      page_revisions_title: "مراجعات %{title}: %{context_name}"
     pages_index: 
       titles: 
         pages: الصفحات
