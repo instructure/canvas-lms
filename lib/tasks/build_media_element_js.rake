@@ -52,7 +52,7 @@ task :build_media_element_js do
     'public/javascripts/mediaelement/mep-feature-tracks-instructure.js',
     # 'mep-feature-contextmenu.js',
     'public/javascripts/mediaelement/mep-feature-speed-instructure.js',
-    # 'mep-feature-sourcechooser.js',
+    'public/javascripts/mediaelement/mep-feature-sourcechooser-instructure.js',
     'mep-feature-googleanalytics.js'
   ]
   mep_chunks = mep_files.map { |path|
