@@ -557,5 +557,28 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       aq.question_data[:question_text].should == data[:question_text]
     end
 
+    it "should retain imported quiz questions in their original assessment question banks" do
+      pending unless Qti.qti_enabled?
+
+      data = {'question_name' => 'test question 1', 'question_type' => 'essay_question', 'question_text' => 'blah'}
+
+      aqb = @copy_from.assessment_question_banks.create!(:title => "oh noes")
+      aq = aqb.assessment_questions.create!(:question_data => data)
+
+      data['points_possible'] = 2
+      quiz = @copy_from.quizzes.create!(:title => "ruhroh")
+      qq = quiz.quiz_questions.create!(:question_data => data, :assessment_question => aq)
+
+      run_course_copy
+
+      aqb2 = @copy_to.assessment_question_banks.find_by_migration_id(mig_id(aqb))
+      aqb2.assessment_questions.count.should == 1
+
+      quiz2 = @copy_to.quizzes.find_by_migration_id(mig_id(quiz))
+      quiz2.quiz_questions.count.should == 1
+      qq2 = quiz2.quiz_questions.first
+      qq2.assessment_question_id.should == aqb2.assessment_questions.first.id
+      qq2.question_data['points_possible'].should == qq.question_data['points_possible']
+    end
   end
 end
