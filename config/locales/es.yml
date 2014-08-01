@@ -36,8 +36,6 @@ es:
     no_file: "Sin archivo o autoridad de resultados"
     no_permissions: "El usuario no tiene permisos para modificar los resultados globales"
     no_perms: "El usuario no tiene permisos para modificar los resultados globales"
-  accont: 
-    feedback_pricing_sub: "Obtener los números de su institución"
   account: 
     account_settings: 
       account_surveys: "Encuestas de la cuenta"
@@ -61,7 +59,6 @@ es:
     feedback_feature_request: "Solicitar una función"
     feedback_feature_request_canvas_net: "Solicitar una función en la Canvas Network"
     feedback_feature_request_sub: "¿Se le ocurre algo para mejorar Canvas?"
-    feedback_pricing: "Información sobre precios de Canvas"
     manually_created_courses: "Cursos Creados Manualmente"
     root_account_cant_have_sis_id: "IDs del SIS no pueden establecerse en supercuentas"
     sis_id_in_use: "SIS ID \"%{sis_id}\" ya está en uso"
@@ -259,13 +256,6 @@ es:
     announcement_deleted_notice: "Anuncio borrado"
     permission_denied_notice: "No puede crear alertas para esta cuenta"
   account_reports: 
-    bucks: 
-      courses_only: "Solo secciones en línea"
-    ccp: 
-      course: 
-        check_box: "Para el curso: %{course_id};"
-      courses_only: "Solo cursos online"
-      start_at: "Inicio: %{start_at};"
     default: 
       all_terms: "Todos los términos"
       course_text: "Para el curso: %{course};"
@@ -278,14 +268,8 @@ es:
       section_text: "Para la sección: %{section};"
       start_text: "Inicio: %{start_at};"
       term_text: "Período: %{term_name};"
-    galen: 
-      no_term: "Es obligatorio un período específico. Por favor, seleccione un período"
     grades: 
       deleted: "Incluir objetos eliminados: verdadero;"
-    granite: 
-      invalid_date_range: "Las fechas se ajustaron al intervalo de 1 semana;"
-    mississippi: 
-      reports: "Informes: %{files}"
     outcomes: 
       order: "Orden: %{order}"
     report_header_attempt: intento
@@ -297,13 +281,10 @@ es:
     report_header_section: sección
     report_header_section__id: section_id
     sis_exporter: 
-      deleted: "Incluir objetos eliminados: verdadero;"
       reports: "Informes: %{files}"
     student: 
       enrollment_state: "Incluir estado de inscripción: verdadero;"
       enrollment_states: "Estados de inscripción: %{states};"
-    usu: 
-      enrollment_types: "Tipos de inscripción: %{types}"
   account_settings: 
     account: Cuenta
     account_name_too_long: "El nombre de la cuenta es demasiado largo"
@@ -486,13 +467,6 @@ es:
         message_date_to: "Hasta la fecha"
         search: Buscar
         search_people: "Buscar personas"
-    assignment_scheduling_csv_description: 
-      account_reports: 
-        newark: 
-          description: 
-            header: Ejemplo
-          student_activity: 
-            text: "Este informe muestra todas las tareas y la información correspondiente a las tareas incluidas en un grupo o varios grupos de tareas específicos y en un intervalo de fechas específico. Este informe ofrece datos útiles para programar tareas y gestionar la cantidad de tareas de los alumnos, mostrando solo los alumnos y las tareas en las que hay dos o más tareas en conflicto que vencen en la misma fecha para el mismo alumno."
     assignment_scheduling_csv_parameters: 
       account_reports: 
         newark: 
@@ -512,13 +486,6 @@ es:
             check_box: Informes
           tests: 
             check_box: Pruebas
-    assignment_score_summary_csv_description: 
-      account_reports: 
-        granite: 
-          assignme_score_summary: 
-            text: "Este informe muestra la puntuación de todas las tareas calificadas en el intervalo de fechas seleccionado"
-          description: 
-            header: Ejemplo
     avatars: 
       all_link: 
         one: "Todo %{count}"
@@ -546,33 +513,13 @@ es:
         zero: Presentado
       title: "Fotos de perfil"
       unlock_link: desbloquear
-    bucks_zero_activity_csv_description: 
-      account_reports: 
-        bucks: 
-          description: 
-            header: Ejemplo
-          student_login: 
-            text: "En este informe aparecen todos los alumnos inscritos en cualquier curso en un periodo en concreto.  El archivo csv que se genera incluirá una línea por inscripción de alumno que no haya visitado el curso desde la fecha. El filtro en línea incluirá las inscripciones de la secciones que contengan la letra \"E\" en el nombre de la sección."
     cannot_manage_account: "No tiene permiso para gestionar la configuración de la cuenta"
     cannot_manage_quotas: "No tiene permiso para gestionar la configuración de la cuota"
-    ccp_zero_activity_csv_description: 
-      account_reports: 
-        ccp: 
-          ccp_zero_activity_csv: 
-            header: Ejemplo
-            text: "En este informe aparecen todos los alumnos inscritos en cualquier curso en un periodo en concreto.  El archivo csv que se genera incluirá una línea por inscripción de usuario que no haya visitado el curso desde la fecha."
     ccp_zero_activity_csv_parameters: 
       account_reports: 
         ccp: 
           filter_online: 
             check_box: "Solo clases online"
-    chcp_student_activity_csv_description: 
-      account_reports: 
-        chcp: 
-          student_activity: 
-            description: 
-              header: Ejemplo
-            text: "Este informe muestra la participación de los alumnos en sus respectivos cursos. El archivo csv que se genera muestra las inscripciones en filas y contiene información sobre la ID de SIS del alumno, el nombre del alumno, su número de teléfono, su dirección de correo elecrónico, el nombre del curso, el último envío, los días transcurridos desde el último envío, el porcentaje de realización actual del curso y la fecha de inicio de su período."
     confirm_delete_user: 
       confirm_delete: |-
           ¿Está seguro de que quiere borrar este usuario de la cuenta %{account}?
@@ -597,20 +544,6 @@ es:
       teachers_label: Profesores
     course_add_failed_message: "Falló la Agregación del Curso, intente de nuevo"
     course_added_message: "¡%{course} agregado con éxito!"
-    course_enrollment_csv_description: 
-      account_reports: 
-        cedar_rapids: 
-          course_status: 
-            text: "Este informe muestra el estado de todos los cursos en un período determinado. El archivo csv resultante incluirá una línea por sección de curso y en él aparecerán el curso, el estado del curso, el período, las fechas de comienzo y finalización, el recuento de inscripciones, el departamento y la cuenta"
-          description: 
-            header: Ejemplo
-    course_status_csv_description: 
-      account_reports: 
-        auburn: 
-          course_status: 
-            text: "Este informe muestra el estado de todos los cursos en un período determinado. El archivo csv resultante incluirá una línea por sección de curso y en él aparecerán el curso, el estado del curso, el período, las fechas de comienzo y fin y un profesor de acta en la sección."
-          description: 
-            header: Ejemplo
     course_type: curso
     courses: 
       courses_crumb: Cursos
@@ -626,45 +559,16 @@ es:
       go_button: Ir
       hide_enrollmentless_courses: "Esconder cursos sin inscripciones"
     crumb_statistics: Estadísticas
-    custom_grade_export_csv_description: 
-      account_reports: 
-        ross: 
-          description: 
-            header: Ejemplo
-            text: "Este informe muestra los resultados finales de los alumnos en un período determinado. El archivo csv resultante tendrá una fila por inscripción y mostrará la calificación actual y final que aparecerá en el libro de calificaciones del curso."
     custom_grade_export_csv_parameters: 
       account_reports: 
         ross: 
           parameters: 
             note: "Los cursos con tareas desactivadas pueden no reflejar las calificaciones con exactitud en este informe."
-    custom_outcomes_csv_description: 
-      account_reports: 
-        edison: 
-          description: 
-            header: Ejemplo
-            text: "Este infome muestra los resultados finales del aprendizaje de todos los alumnos para un resultado final y un curso determinados. El archivo csv que se genera incluirá una línea por usuario y mostrará los detales del resultado, incluida la tarea asociada."
     custom_outcomes_csv_parameters: 
       account_reports: 
         edison: 
           outcome: 
             text: "outcome_id:"
-    cv_non_graded_data_csv_description: 
-      account_reports: 
-        galen: 
-          cv: 
-            non_graded: 
-              text: "Este informe muestra los envíos que no han sido calificados en cada curso para los debates y las encuestas de evaluaciones."
-          description: 
-            header: Ejemplo
-    cv_submission_data_csv_description: 
-      account_reports: 
-        galen: 
-          cv: 
-            attendance: 
-              text: "Este informe muestra los envíos que han realizado los alumnos hasta una fecha determinada. Su uso está relacionado con la asistencia de CampusVue."
-        tmcc: 
-          description: 
-            header: Ejemplo
     date_picker_parameter: 
       account_reports: 
         default: 
@@ -685,18 +589,10 @@ es:
     default_account_quotas_updated: "Se han actualizado las cuotas de las cuentas predeterminadas "
     find_not_authorized: "No tiene autorización para acceder a ese %{type}"
     find_not_found: "No se ha podido encontrar un %{type} con esta ID"
-    google_doc_accounts_csv_description: 
-      account_reports: 
-        ut_austin: 
-          description: 
-            header: Ejemplo
-          google_doc: 
-            text: "Este es un informe de todos los usuarios y la dirección de correo electrónico asociada que se utiliza para la integración con Google Docs."
     grade_export_csv_description: 
       account_reports: 
         default: 
           description: 
-            header: Ejemplo
             text: "Este informe muestra los resultados finales de los estudiantes en un período determinado. El archivo csv resultante tendrá una fila por inscripción, y mostrará la calificación actual y final que aparecerá en el libro de calificaciones del curso."
     group_type: grupo
     include_deleted_parameter: 
@@ -710,27 +606,11 @@ es:
       page_title: Cuentas
       title: "Cuentas que Administro"
     integer_required: "Valor entero obligatorio"
-    last_submission_activity_csv_description: 
-      account_reports: 
-        concorde: 
-          description: 
-            header: Ejemplo
-          last_submission: 
-            text: "Este informe muestra la última actividad de envío de los alumnos."
     last_user_access_csv_description: 
       account_reports: 
         default: 
           last_user_access: 
-            header: Ejemplo
             text: "Este informe muestra los últimos inicios de sesión de los usuarios activos."
-    learning_outcome_assignment_type_csv_description: 
-      account_reports: 
-        newark: 
-          student_activity: 
-            text: "En este informe aparecen exportados los datos relativos a los resultados de las tareas."
-        samuel_merrit_university: 
-          description: 
-            header: Ejemplo
     learning_outcome_assignment_type_csv_parameters: 
       account_reports: 
         samuel_merrit_university: 
@@ -740,11 +620,6 @@ es:
             text: "ID del curso"
           parameters: 
             note1: "La ID del curso puede dejarse en blanco para generar el informe de todos los cursos del período."
-    mississippi_sis_csv_description: 
-      account_reports: 
-        mississisppi: 
-          sis_data: 
-            text: "Este informe detalla todos los usuarios sis, secciones e incripciones para todas las cuentas principales de confianza de la Herramienta de inscripciones."
     mississippi_sis_csv_parameters: 
       account_reports: 
         default: 
@@ -759,7 +634,6 @@ es:
       account_reports: 
         outcomes: 
           description: 
-            header: Ejemplo
             text: "Este informe muestra los resultados finales del aprendizaje de los alumnos. El archivo csv resultante incluirá una línea por par de resultados finales de cada usuario y mostrará la información del resultado con las correspondientes tareas asociadas."
     outcome_results_csv_parameters: 
       account_reports: 
@@ -782,18 +656,6 @@ es:
         sis_export: 
           description: 
             text: "Este informe exportará toda la información necesaria relacionada con la provisión en Canvas en sus categorías respectivas."
-    quiz_data_csv_description: 
-      account_reports: 
-        ace: 
-          quiz_data_description: 
-            header: Ejemplo
-            text: "Este informe muestra las preguntas y respuestas de todos los cuestionarios de un período determinado. El archivo csv resultante incluirá una fila por pregunta y respuesta de cuestionario."
-    quiz_statistics_csv_description: 
-      account_reports: 
-        ace: 
-          quiz_statistics_description: 
-            header: Ejemplo
-            text: "Este informe muestra las preguntas de cuestionario, cuántos usuarios han respondido a las preguntas y cuántos usuarios respondieron correctamente a todos los cuestionarios de un período determinado. El archivo csv resultante incluirá una fila por pregunta de cuestionario."
     quota_integer_required: "Valor entero obligatorio"
     quota_must_be_positive: "El valor debe ser positivo"
     quota_not_updated: "No se ha actualizado la cuota"
@@ -803,19 +665,11 @@ es:
       account_reports: 
         default: 
           recently_deleted_courses: 
-            header: Ejemplo
             text: "El informe muestra todos los cursos de un periodo determinado que hayan sido borrado en los últimos 30 días. El archivo csv que se genera muestra los cursos en filas y contiene información sobre la ID del curso, la ID de SIS del curso, el nombre abreviado del curso, el nombre del curso y las fechas de inicio y fin del curso."
     retry_login: "Intente iniciar sesión de nuevo"
     root_accounts: 
       labels: 
         name: "Nombre de la cuenta"
-    safety_drill_csv_description: 
-      account_reports: 
-        newark: 
-          description: 
-            header: Ejemplo
-          student_activity: 
-            text: "Este informe muestra todas las tareas y la información correspondiente a las tareas incluidas en un grupo o varios grupos de tareas específicas en un intervalo de fechas específico. Este informe ofrece datos útiles para la programación de simulacros de seguridad con la menor interrupción posible en las evaluaciones principales en clase."
     safety_drill_csv_parameters: 
       account_reports: 
         newark: 
@@ -904,7 +758,6 @@ es:
       help_link_available_to_all_teachers: Profesores
       help_link_available_to_all_users: Usuarios
       if_you_would_like_to_link_to_your_own_campus_support_website_in_the_help_dialog_you_can_do_that_here: "Si desea crear un enlace a la página de asistencia técnica de sus propias instalaciones en el diálogo de ayuda, lo puede hacer aquí"
-      interpolate_account_domain: "Nota: Introduzca \"{{ACCOUNT_DOMAIN}}\" para remplazar el dominio de la cuenta principal del usuario"
       ip_filter_filter_label: Filtro
       ip_filter_name_label: Nombre
       labels: 
@@ -922,7 +775,6 @@ es:
         enable_alerts: Alertas
         enable_eportfolios: ePortafolios
         enable_profiles: "Permitir perfiles"
-        enable_scheduler: "Permitir Calendario 2"
         enable_user_notes: "Revista de Facultad"
         end_at: Termina
         equella: Equella
@@ -1117,9 +969,6 @@ es:
         other: "%{count} grupos esperando a ser procesados."
       pending_batches_title: "Grupos Pendientes"
       process_data_button: "Información de Proceso"
-      select_file_instructions: |-
-          Seleccione el archivo zip que quiere importar.  
-          Para una descripción de como generar estos archivos zip, [porfavor vea esta documentación](%{uri}).
       sis_import_crumb: "Importación SIS"
       started_at_message: "Comenzó: %{started_at}"
       title: "Importación SIS"
@@ -1163,53 +1012,20 @@ es:
         one: "%{file_size} *de un archivo*"
         other: "%{file_size} *de %{count} archivos*"
       uploaded_file_storage_header: "Se cargó el Almacenaje del Archivo"
-    student_access_csv_description: 
-      account_reports: 
-        tmcc: 
-          description: 
-            header: Ejemplo
-          student_activity: 
-            text: "Este informe muestra toda la actividad de los alumnos inscritos en un curso determinado o todos los cursos de un período determinado. El archivo csv resultante incluirá una fila por actividad de alumno y tendrá los siguientes encabezados: ID de la sección, ID sis de la sección, nombre de la sección, ID del curso, ID sis del curso, nombre del curso, ID de usuario, ID sis de usuario, tipo de contenido, contenido, número de veces que se ha visto, número de veces en que se ha participado, última vez que se vio. El número de veces que se ha visto o en que se ha participado son contadores que registran las veces desde el principio hasta el momento en el que se genera el informe."
     student_assignment_outcome_map_csv_description: 
       account_reports: 
         student_assignment_map: 
           description: 
-            header: Ejemplo
             text: "Este informe muestra los resultados finales del aprendizaje de los alumnos. El archivo csv resultante incluirá una línea por par de resultados finales de cada usuario y mostrará la información del resultado con las correspondientes tareas asociadas. Este informe solo muestra resultados finales por tarea y no incluye los resultados vinculados a grupos de preguntas."
-    student_grades_csv_description: 
-      account_reports: 
-        auburn: 
-          student_grades: 
-            description: 
-              text: "En este informe aparecen los resultados finales de los alumnos en un período determinado. El archivo csv que se genera tendrá una fila por inscripción, y mostrará la calificación actual y final que aparecerá en el libro de calificaciones del curso."
-        default: 
-          description: 
-            header: Ejemplo
     student_grades_csv_parameters: 
       account_reports: 
         auburn: 
           pseudonym_ids: 
             field: "ID de seudónimo"
-    student_ip_csv_description: 
-      account_reports: 
-        dubspot: 
-          description: 
-            header: Ejemplo
-          student_login: 
-            text: "Este informe muestra todos los alumnos inscritos en un determinado curso o todos los cursos de un determinado periodo. El archivo csv resultante incuirá una fila por alumno inscrito."
-    student_submissions_csv_description: 
-      account_reports: 
-        vilas: 
-          description: 
-            header: Ejemplo
-          student_submissions: 
-            text: "Este infome muestra todos los usuarios inscritos en un curso en un determinado periodo que han enviado una tarea. Este informe incluye una fila por envío de alumno."
     students_with_no_submissions_csv_description: 
       account_reports: 
         default: 
           students_with_no_submissions: 
-            description: 
-              header: Ejemplo
             text: "Este infome muestra todos los alumnos inscritos en un curso en un determinado período que no han enviado una tarea en un intervalo de tiempo determinado en el curso. Este informe incluye una fila por alumno inscrito que cumpla los criterios. El intervalo de tiempo no puede ser mayor de dos semanas."
     students_with_no_submissions_csv_parameters: 
       account_reports: 
@@ -1220,18 +1036,6 @@ es:
             check_box: "Incluir estado de inscripción"
       active: "Inscripciones activas"
       all: "Todas las inscripciones"
-    submission_data_csv_description: 
-      account_reports: 
-        submission_data: 
-          description: 
-            text: "Este informe incluye las fechas de envío de la herramienta de asistencia."
-    tempe_grade_export_csv_description: 
-      account_reports: 
-        tempe: 
-          description: 
-            header: Ejemplo
-          grade_export: 
-            text: "En este informe aparecen los resultados de las calificaciones finales de todos los alumnos en un periodo en concreto. El archivo delimitado por tabulaciones que se genera incluirá una línea por inscripción de usuario, en la que aparecerá la calificación final y varios campos de información de los cursos, que se utilizarán para cargar los datos de las calificaciones en Synergy SIS."
     tempe_grade_export_csv_parameters: 
       account_reports: 
         tempe: 
@@ -1256,24 +1060,14 @@ es:
       account_reports: 
         default: 
           unpublishd_courses: 
-            header: Ejemplo
             text: "Este informe muestra todos los cursos de un periodo determinado que no se han publicado. El archivo csv que se genera muestra los cursos en filas y contiene información sobre la ID del curso, la ID de SIS del curso, el nombre abreviado del curso, el nombre del curso y las fechas de inicio y fin del curso."
     unrecognized_time_zone: "'%{timezone}' no se reconoce como zona horaria"
     unused_courses_csv_description: 
       account_reports: 
         unused_courses: 
-          description: 
-            header: Ejemplo
           main: 
             text: "Este informe muestra todos los cursos que no tienen ninguno de los siguientes elementos: tareas, anuncios, debates, archivos, módulos, páginas o cuestionarios."
     update_failed_notice: "Configuraciones de actualización de cuenta falló"
-    user_access_csv_description: 
-      account_reports: 
-        usu: 
-          description: 
-            header: Ejemplo
-          user_activity: 
-            text: "Este informe muestra toda la actividad de los usuarios inscritos en un curso concreto o en todos los cursos de un período determinado. El archivo csv resultante tendrá una fila por cada actividad del alumno y tendrá los siguientes encabezados: tipo_inscripción, id sección, id sis sección, nombre sección, id curso, id sis curso, nombre curso, id usuario, id sis usuario, tipo contenido, contenido, veces visto, veces participado, visto por última vez. Los indicadores veces visto y veces participado son contadores que miden desde el principio hasta el momento en que se generó el informe."
     user_access_csv_parameters: 
       account_reports: 
         usu: 
@@ -1287,13 +1081,6 @@ es:
       teachers: "Inscripciones de profesores"
     user_add_failed_message: "La adición del usuario falló, intente de nuevo"
     user_deleted_message: "%{username} borrado con éxito"
-    user_inactivity_csv_description: 
-      account_reports: 
-        webster: 
-          description: 
-            header: Ejemplo
-          low_activity: 
-            text: "En este informe aparecen todos los usuarios inscritos en un curso determinado o en todos los cursos de un periodo en concreto. El archivo csv que se genera incluirá una línea por inscripción de usuario que no haya visitado el número mínimo de elementos de un curso."
     user_inactivity_csv_parameters: 
       account_reports: 
         webster: 
@@ -1308,33 +1095,12 @@ es:
       account_reports: 
         default: 
           zero_activity: 
-            header: Ejemplo
             text: "En este informe aparecen todos los alumnos inscritos en cualquier curso en un periodo en concreto.  El archivo csv que se genera incluirá una línea por inscripción de usuario que no haya visitado el curso desde la fecha."
   activerecord: 
     errors: 
-      full_messages: 
-        format: "%{attribute} %{message}"
       messages: 
-        accepted: "debe ser aceptado"
-        blank: "no puede dejarse en blanco"
-        confirmation: "no coincide con la confirmación"
-        empty: "no puede quedar vacío"
-        equal_to: "debe equivaler a %{count}"
-        even: "debe ser par"
-        exclusion: "está reservado(a)"
-        greater_than: "debe ser mayor que %{count}"
-        greater_than_or_equal_to: "debe ser mayor o igual a %{count}"
-        inclusion: "no está incluído en la lista"
-        invalid: "es inválido(a)"
-        less_than: "debe ser menos de %{count}"
-        less_than_or_equal_to: "debe ser menor o igual a %{count}"
-        not_a_number: "no es un número"
-        odd: "debe ser impar"
         record_invalid: "La validación falló: %{errors}"
         taken: "ya ha sido tomado"
-        too_long: "es muy largo (máximo son %{count} caracteres)"
-        too_short: "es muy corto (mínimo son %{count} caracteres)"
-        wrong_length: "es la longitud errónea (debería tener %{count} caracteres)"
       template: 
         body: "Hubieron problemas con los siguientes campos:"
         header: 
@@ -1821,13 +1587,10 @@ es:
         remove_these_dates: "Eliminar estas fechas"
     edit: 
       edit_assignment: "Editar la tarea"
-      new_discussion: "Nuevo debate"
-      new_quiz: "Nuevo cuestionario"
     edit_header_view: 
       buttons: 
         not_published: "No publicado"
         published: Publicado
-      manage: Gestionar
       titles: 
         delete: Borrar
     edit_view: 
@@ -1984,8 +1747,6 @@ es:
     name_is_required: "Es obligatorio escribir un nombre"
     name_too_long: "El nombre es demasiado largo"
     name_too_long_error: "El nombre es demasiado largo"
-    never_drop: 
-      remove_rule: "Eliminar regla"
     never_drop_collection: 
       add_another_assignment: "Agregar otra tarea"
       add_first_assignment: "Agregar una tarea"
@@ -2121,9 +1882,6 @@ es:
         submission: Envío
         submission_not_turned_in: "No se pudo entregar"
         submission_turned_in: ¡Entregado!
-      tooltips: 
-        finished: finalizado
-        incomplete: incompleto
     submission_type_icon: 
       tooltips: 
         submitted: Enviado
@@ -3008,16 +2766,11 @@ es:
         current: "Colaboraciones Actuales"
     titles: 
       delete: "¿Borrar esta colaboración?"
-  collection_items: 
-    new: 
-      pin_to_canvas_network: "Pegar a red de Canvas"
-      saved_successfully: "Guardado correctamente"
   comm_messages: 
     from_beginning: "el comienzo"
     to_now: ahora
   common_cartridge_description: "Esta función permite convertir un paquete común de cartucho al formato intermedio json que será el que se importará"
   common_cartridge_display: "Common Cartridge"
-  common_cartridge_file_description: "Paquete de cartucho común 1.0/1.1/1.2"
   common_cartridge_name: "Importador de cartucho común"
   communication_channel: 
     body: "Su código de verificación de Canvas es %{verification_code}"
@@ -3087,7 +2840,6 @@ es:
       preparing_video: "Preparando el vídeo"
       recording: "1 grabación "
       recordings: "%{recordingCount} grabaciones"
-      setings: Configuración
       settings: Configuraciones
       view: Vista
     confirm: 
@@ -3126,7 +2878,6 @@ es:
       join: Unirse
       recording: "1 grabación"
       recordings: "%{recordingCount} grabaciones"
-      setings: configuración
       settings: Configuraciones
       start: Comenzar
       view: Vista
@@ -3160,7 +2911,6 @@ es:
     buttons: 
       process: "Procesar Información"
     errors: 
-      couldnt_create: "No se pudo crear la exportación del curso."
       error: "Ocurrió un error al exportar su curso. Por favor notifique al administrador de su sistema y proveale el siguiente identificador: \"%{code}\""
       not_found: "La exportación no existe"
     index: 
@@ -3649,9 +3399,7 @@ es:
         module_complete_when: "Este módulo está completo cuando"
         modules: 
           before_students_view: "Antes que los estudiantes puedan ver este módulo"
-        new_tab: "Cargue esta herramienta en una lengüeta nueva"
         publish_final_grade: "publicar la puntuación final del alumno una vez finalizado el módulo"
-        require_sequential_progress: "los estudiantes deben seguir los requerimientos en este módulo en orden secuencial"
         sort_by: "Ordenar por"
         title: Título
         unlock_at: "Desbloquear en"
@@ -3757,8 +3505,6 @@ es:
         module_complete_when: "Este módulo está completo cuando"
         modules: 
           before_students_view: "Antes que los estudiantes puedan ver este módulo"
-        new_tab: "Cargar esta herramienta en una lengüeta nueva"
-        require_sequential_progress: "los estudiantes deben seguir los requerimientos en este módulo en orden secuencial"
         sort_by: "Ordenar por"
         title: Título
         unlock_at: "Desbloquear en"
@@ -3829,7 +3575,6 @@ es:
         aria: 
           module_options: 
             label: "Opciones de módulo"
-      module_will_unlock_at: "se desbloqueará en *%{unlock_date}*"
       progression_complete_count: "*%{count}*Completo"
       progression_started_count: "*%{count}* En Progreso"
       reorder_modules: "Arrastrar para reordenar los módulos"
@@ -3854,7 +3599,6 @@ es:
           edit_module: Editar
           student_progress: "Ver el Progreso del Estudiante para este Módulo"
       manager_module: "Gestionar módulo"
-      module_will_unlock_at: "se desbloqueará en *%{unlock_date}*"
       progression_complete_count: "*%{count}*Completo"
       progression_started_count: "*%{count}* En Progreso"
       reorder_modules: "Arrastrar para reordenar los módulos"
@@ -4012,16 +3756,12 @@ es:
     all_in_context: "Todo lo incluido en %{context}"
     archive: Archivo
     archive_conversation: "Archivar conversación"
-    attachment_error: "No se pudo cargar el archivo adjunto. Por favor, inténtelo de nuevo."
     autocomplete_result: 
       group_people: "Personas: %{people}"
       no_results: "Sin resultados"
     autocomplete_token: 
       remove_recipient: "Eliminar destinatario"
     back: Volver
-    buttons: 
-      add_people: "Agregar personas"
-      send_message: Enviar
     cannot_add_to_private: "No puede añadir participantes a una conversación privada."
     cannot_be_empty: "El mensaje no puede estar vacío"
     compose_button_bar: 
@@ -4034,7 +3774,6 @@ es:
     confirm: 
       delete_conversation: "¿Está seguro de que desea borrar su copia de esta conversación? Esta acción no se puede deshacer."
       delete_message: "¿Está seguro de que quiere borrar su copia de este mensaje? Esta acción no se puede deshacer."
-      delete_messages: "¿Está seguro de que quiere borrar su copia de estos mensajes? Esta acción no se puede deshacer."
     context_message: 
       delete_message: "Borrar mensaje"
       labels: 
@@ -4057,63 +3796,13 @@ es:
         unsubscribe: "Cancelar la suscripción"
       inbox_actions_description: "Menú de acciones del mensaje"
       read_more: más...
-    conversations_list: 
-      no_archived_messages: "No ha archivado ningún mensaje"
-      no_messages: "No tiene mensajes"
-      no_sent_messages: "No tiene mensajes enviados"
-      no_starred_messages: "No tiene mensajes destacados"
-      no_unread_messages: "No tiene mensajes no leídos"
-    conversations_pane: 
-      confirm: 
-        delete_conversation: "¿Está seguro que quiere borrar su copia de esta conversación? Esta acción no puede deshacerse."
     course_name: "Nombre del curso"
     course_options: 
       course_options: 
         concluded: Finalizado
         groups: Grupos
         more_courses: "Más cursos"
-    enrollments_everyone: Todos
-    errors: 
-      field_is_required: "Este campo es requerido"
-    filter_by_course: "Filtrar por este curso"
-    filter_by_group: "Filtrar por este grupo"
-    headings: 
-      new_message: "Mensaje Nuevo"
     hide: Esconder
-    index: 
-      add_recipients_instructions: "Gente que agrega a la conversación verán todos los mensajes previos."
-      conversations_intro: "Introducción a las conversaciones"
-      help: Ayuda
-      inbox_actions: 
-        delete: Borrar
-        forward: "Enviar Copia"
-      inbox_view: VER
-      inbox_views: 
-        archived_messages: Archivado
-        inbox: "Bandeja de Entrada"
-        sent_messages: Enviado
-        starred_messages: Destacado
-        unread_messages: "No leído"
-      labels: 
-        filter: Filtro
-        message: Mensaje
-        submitted: Enviado
-        to: A
-      links: 
-        compose_new_message: "Mensaje Nuevo"
-      more_messages: "%{count} más..."
-      page_title: Conversaciones
-      send_private_message: "Nuevo mensaje..."
-      titles: 
-        compose_new_message: "Escribir un mensaje nuevo"
-        download_attachment: "Descargar un archivo adjunto"
-        play_media_comment: "Reproducir comentario de contenido audiovisual"
-        rss: 
-          conversations: "Feed de conversaciones Atom"
-        submission_author: "Autor del Envío"
-        submission_score: "Calificación del Envío"
-        view_submission: "Abra el envío en una ventana nueva."
-      try_new_conversations: "Probar conversaciones nuevas"
     index_new: 
       archive: Archivo
       archive_conversation: "Archivar conversación"
@@ -4125,7 +3814,6 @@ es:
       filter_messages_by_course: "Filtrar mensajes por curso"
       filter_messages_by_type: "Filtrar mensajes por tipo"
       forward: Reenviar
-      help: Ayuda
       inbox: "Bandeja de entrada"
       mark_as_read: "Marcar como leído"
       mark_as_unread: "Marcar como no leído"
@@ -4139,7 +3827,6 @@ es:
       sent: Enviado
       settings: Configuraciones
       starred: Señalado
-      switch_to_old_conversations: "Cambiar de nuevo a conversaciones antiguas"
       titles: 
         conversations: Conversaciones
       unread: "No leído"
@@ -4221,80 +3908,24 @@ es:
     more_participants: "+%{total} más"
     no_message: 
       batch_selected: "Se han seleccionado varias conversaciones"
-      beta_description: "Está utilizando una versión beta de la bandeja de entrada de Canvas"
-      beta_version: "Versión beta"
       no_conversations_selected: "No se han seleccionado conversaciones"
     no_recipients_choose_another_group: "No hay destinatarios en este grupo. Por favor, elija otro grupo."
     no_results_found: "No se encontraron resultados"
-    not_applicable: N/A
-    not_scored: "sin puntuación"
-    notes_to_self: Monólogo
     other: 
       one: "1 más"
       other: "%{count} más"
     other_recipients: 
       one: "1 otro"
       other: "%{count} otros"
-    people_count: 
-      one: "1 persona"
-      other: "%{count} personas"
-    recipient_error: "El curso o grupo que ha seleccionado no tiene destinatarios válidos"
     search_category: "Buscar %{category}"
-    select_all: "Seleccionar Todo"
     star: Señalar
     star_conversation: "Marcar conversación como destacada"
-    title: 
-      add_recipients: "Agregar destinatarios"
-      forward_messages: "Reeviar Mensaje"
     titles: 
-      expand_inline: "Mostrar más comentarios"
       rss_feed: "Feed de conversaciones"
-      view_submission: "Abra el envío en una ventana nueva."
     unarchive: Desarchivar
     unarchive_conversation: "Desarchivar conversación"
-    unknown_user: "Usuario desconocido"
-    unspecified_error: "Ha ocurrido un error inesperado. Inténtelo de nuevo."
     unstar: "No Señalar"
     unstar_conversation: "Eliminar la conversación de destacados"
-  conversations_intro: 
-    slide1: 
-      paragraph1: "Revise su bandeja de correo."
-      paragraph2: "Conversations, el nuevo sistema de mensajería de Canvas, ha llegado."
-      paragraph3: "Use Conversations para enviar mensajes privados a un compañero o para contactar con un grupo de personas. "
-      paragraph4: "¿Listo para una introducción rápida? Haga clic en la flecha derecha para comenzar"
-    slide2: 
-      paragraph1: "Todas las conversaciones se muestran en el lado izquierdo"
-      paragraph2: "Puede ver con quién mantiene la conversación, cuántos mensajes hay y las primeras frases de los últimos mensajes de cada conversación."
-    slide3: 
-      paragraph1: "Las conversaciones pueden marcarse como leídas/no leídas o archivadas, usando el botón de \"acciones\" en el mensaje."
-      paragraph2: "Los mensajes archivados no se borran, sino que se eliminan de su bandeja de entrada, aunque puede acceder a ellos en caso necesario."
-    slide4: 
-      paragraph1: "Cuando seleccione una conversación, todos los mensajes de esa conversación se mostrarán en el panel de la derecha. Cuando las conversaciones son muy largas, siempre puede desplazarse para ver mensajes anteriores."
-    slide5: 
-      paragraph1: "Para iniciar un mensaje, haga clic en el ícono de Escribir"
-    slide6: 
-      paragraph1: "En el espacio de Mensaje nuevo, comience escribiendo el nombre de la persona o grupo, e inmediatamente aparecerán en el menú desplegable. Otra posibilidad es hacer clic en el ícono del libro de direcciones para encontrar a alguien si no recuerda su nombre."
-      paragraph2: "Escriba su mensaje, haga clic en Enviar y ya está listo"
-    slide7: 
-      paragraph1: "Puede enviar mensajes a una persona o a un grupo de personas. Los mensajes a grupos están disponibles para todos los miembros de un grupo."
-      paragraph2: "Si desea enviar un mensaje privado a todos los destinatarios, no seleccione la opción \"Esta es una conversación de grupo\"."
-    slide8: 
-      paragraph1: "Puede seleccionar uno o más mensajes haciendo clic en la casilla a la derecha del mensaje."
-      paragraph2: "Una vez seleccionado, puede reenviar un mensaje o borrarlo"
-    slide9: 
-      paragraph1: "Verá que Conversations es un método sencillo y fácil de usar."
-      paragraph2: "Vea este corto video de introducción para ver cómo funciona Conversations."
-      paragraph3: "Sus mensajes antiguos se han organizado ahora en Conversations  para usted. ¿Qué está esperando? ¡Comencemos!"
-    titles: 
-      slide1: "Diapositiva 1"
-      slide2: "Diapositiva 2"
-      slide3: "Diapositiva 3"
-      slide4: "Diapositiva 4"
-      slide5: "Diapositiva 5"
-      slide6: "Diapositiva 6"
-      slide7: "Diapositiva 7"
-      slide8: "Diapositiva 8"
-      slide9: "Diapositiva 9"
   correct_answer: "Esta era la respuesta correcta."
   course: 
     access_denied: "Se ha denegado el acceso"
@@ -4504,7 +4135,6 @@ es:
     re_send_invitation: "Renviar la invitación"
     remove_user_from_course_section: "Eliminar usuario de %{course_section} "
     titles: 
-      click_to_edit: "Haga Click para Editar"
       link_to_students: "Enlazar a alumnos"
       move_course: "Mover el Curso"
       reset_course_content_dialog_help: "Restablecer el Contenido del Curso"
@@ -4595,7 +4225,6 @@ es:
               
               Por favor **ingrese** o ***inscríbase*** para reclamar este curso.
         files: "La lengüeta de archivos es el lugar en donde ubicar las diapositivas de clases, documentos de ejemplo, ayudas para estudiar – cualquiera que sus estudiantes quieran descargar. La carga y organización de sus archivos es fácil con Canvas. Le mostraremos como."
-        home: "Cuando gente visita el curso, esta es la página que verá. Puede establecerla para mostrar un flujo de actividades, la liste de los módulos del curso, un plan de estudios, o una página personalizada que usted mismo crea. Lo predeterminado es el flujo de actividad del curso. Para personalizarlo, sólo haga click en %{change_layout}."
         import: "Si ha estado usando otro sistema de manejo de cursos, probablemente ya tiene algo que quiere transferir a Canvas. Le podemos ayudar con el proceso para facilitar el movimiento del contenido hacia Canvas."
         navigation: "De manera predeterminada todos los enlaces estan activados para un curso. Los estudiantes no verán los enlaces hacia secciones sin contenido. Por ejemplo, si no ha creado evaluaciones, los enlaces a estos no se podrán ver. Puede revisar y desactivar estos enlaces si hay áreas del curso a los que no quiere que los estudiantes tengan acceso."
         publish: 
@@ -4674,11 +4303,8 @@ es:
         look_around: "Sientase libre de dar una vuelta en el curso. Cuando esté listo, puede aceptar o rechazar la invitación."
     errors: 
       create_failed: "Creación del curso falló"
-      invalid_role: "Tipo de función inválida"
       role_not_active: "No puede añadir usuarios para una función no activa: '%{role}'"
       role_not_found: "No existe la función llamada '%{role}' ."
-      unauthorized: 
-        switch_roles: "No tiene permiso para cambiar funciones"
     group_list: 
       headings: 
         groups: "Grupos del Curso"
@@ -4715,8 +4341,6 @@ es:
       login_to_accept: "Necesitará ingresar antes de aceptar la inscripción."
       preview_course: "Ha sido invitado a unirse a este curso. Puede tomar un vistazo, pero deberá aceptar la invitación de inscripción antes de poder participar."
       reset_test_student: "El alumno de prueba ha sido restablecido con éxito."
-      role_restored: "Su función predeterminada y sus permisos han sido restaurados"
-      role_switched: "Ha cambiado de funciones para este curso. Ahora verá el curso en esta función nueva: %{enrollment_type}"
       unconcluded: "Curso no-concluído"
       updated: "El curso fue actualizado con éxito."
     recent_event: 
@@ -4758,7 +4382,6 @@ es:
       index: 
         cannot_add_users: "No se pueden incorporar nuevos usuarios porque este curso ha finalizado"
         filter_field_description: "Al escribir en este campo, la lista de personas se irá filtrando automáticamente para incluir solo a aquellos cuyos nombres coincidan con los datos que escriba."
-        filter_list_of_people: "Filtrar lista de personas"
         group_set: "Conjunto de grupos"
         people: Personas
         role_to_search: "Limitar la búsqueda a la función"
@@ -4938,7 +4561,6 @@ es:
         stats: "Estadísticas del Curso"
         student_view: "Vista de alumno"
     show: 
-      acting_as: "Ahora está viendo este curso con la función: %{enrollment_type}. Sólo tendrá permisos y podrá tener acceso a los usuarios disponibles de esta función."
       buttons: 
         update_layout: "Actualización del Diseño"
       details: 
@@ -4957,8 +4579,6 @@ es:
           update_layout: Guardar
         headings: 
           set_layout: "Establecer el Diseño de la Página de Inicio"
-        labels: 
-          select_content: "Seleccione lo que desee que aparezca en la página de inicio"
         options: 
           assignments: "Lista de tareas"
           custom_page: "Página principal de las páginas"
@@ -4968,7 +4588,6 @@ es:
       empty_body: "Sin Contenido"
       headings: 
         confirm_unenroll: "Confirmar el Borrado de la Inscripción"
-        edit_homepage_title: "Editar página de inicio"
         importing: "Este curso está siendo importado."
         set_layout: "Establecer el Diseño de la Página de Inicio"
         unpublished: "Este curso no está publicado"
@@ -4981,10 +4600,8 @@ es:
         course_setup: "Lista de comprobación de la Configuración del Curso"
         course_stream: "Vea el flujo de información del Curso"
         drop_course: "Dejar este Curso"
-        edit_homepage: "Editar página de inicio"
         join_course: "Unirse al Curso"
         new_announcement: "Nuevo Anuncio"
-        restore_role: "Restaure las Funciones y Permisos"
         view_course_stream: "Ver flujo de información del curso"
       options: 
         assignments: "la Lista de Tareas"
@@ -5190,8 +4807,6 @@ es:
       one: "Expandir %{count} debate"
       other: "Expandir %{count} debates"
     enable_dashboard: "Pruebe el nuevo panel de control"
-    event_created: "Evento creado"
-    message_sent: "Mensaje enviado"
     show_more_link: 
       show_less: "Mostrar menos"
       show_more: "Mostrar más"
@@ -5450,7 +5065,6 @@ es:
       graded_discussion_and_points: 
         one: "Este es un debate con calificación: *vale 1 punto*"
         other: "Este es un debate con calificación: *vale %{count} puntos*"
-      separated_conversation_notice: "Ya que esta es una tarea de grupo, cada grupo tiene su propia conversación sobre este tema. Aquí están las tareas a las que tiene acceso:"
       show_due_dates: "Mostrar fechas de vencimiento"
       until: Hasta
     cannot_unpublish_with_replies: "No se puede ocultar si hay respuestas"
@@ -5490,7 +5104,6 @@ es:
       my_settings: "Mi configuración"
       student_settings: "Configuración de los alumnos"
     edit: 
-      edit_topic: "Editar el tema de debate"
       new_assignment: "Nueva tarea"
       new_quiz: "Nueva evaluación"
     edit_crumb: Editar
@@ -5705,10 +5318,6 @@ es:
     unsubscribe: "Cancelar la suscripción a este tema"
     unsubscribed: "No suscrito"
     unsubscribed_hint: "No está suscrito a este tema. Haga clic aquí para suscribirse."
-  draft_state: 
-    cant_unpublish_when_students_submit: "No se puede ocultar la publicación si hay envíos de alumnos"
-    publish: Publicar
-    unpublish: Ocultar
   draft_state_description: "En esta función beta se han rediseñado muchas de las secciones de Canvas y permite que el contenido aparezca en un nuevo estado sin publicar que está visible pra los alumnos y excluido de los cálculos de las calificaciones. Atención: si deshabilita esta función, es posible que borre contenido creado o editado recientemente de la vista del profesor."
   due_dates: 
     due_at: "fecha límite: %{assignment_due_date_time}"
@@ -6248,12 +5857,6 @@ es:
       new_tab: "Esta herramienta necesita ser cargada en una ventana del navegador nueva"
       new_tab_expired: "The session for this tool has expired. Please reload the page to access the tool again"
       new_tab_loaded: "Esta herramienta se cargó con éxito en una ventana del navegador nueva. Recargar la página para poder tener acceso a la herramienta otra vez."
-    tool_show: 
-      load_tool_button: "Cargar %{tool}"
-      load_tool_new_tab_button: "Cargar %{tool} en una ventana nueva"
-      new_tab: "Esta herramienta necesita ser cargada en una ventana del navegador nueva"
-      new_tab_expired: "The session for this tool has expired. Please reload the page to access the tool again"
-      new_tab_loaded: "Esta herramienta se cargó con éxito en una ventana del navegador nueva. Recargar la página para poder tener acceso a la herramienta otra vez."
     user_navigation_configured: "Navegación del usuario configurada"
   facebook: 
     authorization_required: "Solo usuarios autorizados pueden tener acceso a esa página"
@@ -6325,11 +5928,9 @@ es:
     draft_state_course_disable_warning: "Desactivar esta función hará que se publiquen TODOS los objetos existentes en su curso. Por favor, asegúrese de que todo el contenido del borrador está listo para ser publicado y disponible para todos los usuarios del curso antes de continuar."
     google_docs_domain_restriction: "Restricción de dominio de Google Docs"
     high_contrast: "Utilizar estilos de gran contraste"
-    individual_gradebook: "Vista del libro de calificaciones individual"
     learning_mastery_gradebook: "Libro de calificaciones de dominio de aprendizaje"
     new_styles: "Utilizar nuevos estilos"
     post_grades: "Publicar calificaciones en SIS"
-    student_outcome_gradebook: "Libro de calificaciones de resultados del alumno"
   file_browser_view: 
     folder_tree_instructions: "Utilice la tecla de dirección hacia arriba o hacia abajo para navegar a través del árbol. Presione la flecha derecha para expandir las carpetas, la izquierda para contraerlas y la tecla Intro para elegir una imagen."
   filebrowserview: 
@@ -6543,62 +6144,27 @@ es:
       no_students_in_groups_back: "Lo sentimos pero los envíos para esta tarea no se pueden calificar en Speedgrader ya que no hay ningún usuario asignado. Le rogamos que asigne usuarios a este conjunto de grupos y lo intente de nuevo. Haga clic en \"Aceptar\" para volver."
       no_students_in_groups_close: "Lo sentimos pero los envíos para esta tarea no se pueden calificar en Speedgrader ya que no hay ningún usuario asignado. Le rogamos que asigne usuarios a este conjunto de grupos y lo intente de nuevo. Haga clic en \"Aceptar\" para volver."
       no_students_in_section: "No se pudieron encontrar estudiantes en esa sección, regresando para mostrar todas las secciones."
-      none_to_update: "Nada que Actualizar"
-      scores_updated: 
-        one: "1 calificación de estudiante actualizada"
-        other: "%{count} calificaciones de estudiantes actualizados"
-      students_updated: 
-        one: "1 Estudiante Actualizado"
-        other: "%{count} estudiantes actualizados"
-    assignment_details: "Detalles de la Tarea"
     buttons: 
-      change_section: "Cambiar Sección"
       saving_settings: "Guardar Configuraciones..."
       submit_comment: "Enviar Comentario"
       submitting: Enviando...
-      upload_data: "Cargar Información"
     cancel_button: Cancelar
     click_to_change: "Haga click para probar una calificación diferente"
-    click_to_expand: "Haga click para expandir"
-    computing_grades: "Computando Calificaciones..."
     confirms: 
       delete_comment: "¿Seguro que quiere borrar este comentario?"
       unsaved_changes: |-
           Los siguientes estudiantes tienen cambios no guardados en los envíos de sus evaluaciones: 
           %{users}
           ¿Continuar?
-    curve_grade_for_course: "Aplicar Curva a %{assignment}"
-    curve_grades: "Aplicar Curva a los Grados"
-    default_grade_for_course: "Calificación Predeterminada para %{assignment}"
-    download_scores: "Descargar Calificaciones (%{format})"
-    download_submissions: "Descargar los Envíos"
     edit_view_rubric: "Ver Rúbrica"
     errors: 
-      failed_to_load: "El libro de calificaciones no se pudo cargar, intente recargar la página"
-      none_to_update: "Nada que Actualizar"
       select_an_option: "Por favor seleccione una opción"
-      upload_as_zip: "Por favor cargue los archivos como un .zip"
     graded: calificado
     graded_by_me: "%{graded_time} por mí"
     graded_then_resubmitted: "calificado, luego reenviado (%{when})"
     gradee_index_of_total: "%{gradee} %{x} de %{y}"
     group: Grupo
     hide_all_details_button: "Ocultar todos los detalles"
-    hide_all_things: "Esconder %{things}"
-    hide_column: "Esconder Columna"
-    hide_student_name: "Esconder los Nombres de los Estudiantes"
-    ignore_ungraded: "Ignorar Tareas No Calificadas"
-    include_ungraded: "Incluír Tareas Actualizadas"
-    labels: 
-      details: Detalles
-    links: 
-      download_attachment: "Descargando %{attachment}"
-      finish_scoring: "Terminar la Calificación de esta Evaluación"
-      go_to_submission: "Ir al URL de Envío"
-      submission_details: "Detalles de Envío"
-      view_quiz: "Ver esta Evaluación"
-      view_submission: "Ver Envío"
-    message_students_who: "Enviar Mensaje a Estudiante Que..."
     mute_assignment: "Obviar Tarea"
     new_assessment: "[Tarea Nueva]"
     no_submission_time: "ningun tiempo de envío"
@@ -6606,43 +6172,13 @@ es:
     not_submitted: "no enviado"
     nth_student: "Estudiante %{n}"
     portion_graded: "%{x} / %{y} Calificado"
-    publish_to_sis: "Publicar calificaciones a SIS"
-    reupload_submission_files: "Recargar los Archivos de Envío"
-    reupload_submissions: "Recargar los Envíos"
-    set_default_grade: "Establecer Calificación Predeterminada"
-    set_group_weights: "Establecer Peso por Grupo"
     show_all_details_button: "Mostrar todos los detalles"
-    show_student_name: "Mostrar los Nombres de Estudiantes"
-    showing_all_sections: "Mostrando Todas las Secciones"
-    showing_section: "Mostrando la Sección: %{section}"
-    sort_columns_by: "Ordenar Columnas Por..."
-    sort_rows_by: "Ordenar Filas Por..."
-    speed_grader: "Calificador Rápido"
     student: Estudiante
     student_mute_notification: "El instructor está trabajando en las calificaciones"
-    student_name: "Nombre del Estudiante"
-    students_who: 
-      havent_been_graded: "No ha sido calificado"
-      havent_submitted_yet: "Aún no ha enviado"
-      no_grade_for: "No hay calificación para %{assignment}"
-      no_submission_for: "No hay envío para %{assignment}"
-      not_submitted_yet: "No ha sido enviado"
-      scored_less_than: "Obtuvo menos de"
-      scored_less_than_on: "Puntuación inferior a %{cutoff} en %{assignment}"
-      scored_more_than: "Obtuvo más de"
-      scored_more_than_on: "Puntuación superior a %{cutoff} en %{assignment}"
-    submission_information: "Información del Envío"
-    teacher_muted_title: "Tarea ha sido obviada"
     titles: 
-      assignment_groups: "Grupos de Trabajo"
       click_to_record: "Haga click en el micrófono para grabar sus comentarios"
       dropped_assignment_no_total: "Esta tarea no será considerada en el cálculo total"
       hypothetical_score: "Esta es una calificación \"que pasa si\""
-      loading: Cargando...
-      turnitin_score: "Calificación de Similaridad de Turnitin -- más información"
-    tooltips: 
-      submission_dropped: "Este envío se eliminó para la calificación"
-      submitted_late: "Este envío se envió tarde"
     turnitin: 
       error_message: "Ocurrió un error al enviar a turnitin. Intente enviar el archivo de nuevo antes de contactar a el servicio de asistencia técnica"
       info_message: "Este archivo todavía está siendo procesado por turnitin. Vuelva más tarde para comprobar la calificación."
@@ -6652,12 +6188,8 @@ es:
         pending: "Calificación de similitud en Turnitin - Envío pendiente"
         score: "Calificación de similitud en Turnitin - Ver informe detallado"
     unmute_assignment: "Activar Tarea"
-    unmute_button: "Activar la Tarea"
-    upload_scores: "Cargar Calificaciones (desde %{format})"
-    view_grading_history: "Ver el Historial de Calificación"
   gradebook2: 
     alerts: 
-      none_to_update: "Nada que Actualizar"
       scores_updated: 
         one: "1 resultado actualizado"
         other: "%{count} resultados actualizados"
@@ -6826,19 +6358,6 @@ es:
       upload_form: "Escoger un archivo CSV para cargar"
     what_should_csv_look_like: "¿Cómo se debería ver el archivo CSV?"
   gradebooks: 
-    assignment: 
-      gradebook: 
-        unmute_assignment: "Activar la Tarea"
-      out_of_points_possible: "*de* %{points_possible}"
-      points_possible_of_grade: "%{points_possible} *del grado*"
-      teacher_muted_title: "La Tareas está obviada"
-      unmute_dialog: "Esta tarea está obviada. Esto significa que los estudiantes no pueden ver sus calificaciones ni retroalimentación. ¿Quiere activarla ahora?"
-      zero_point_assignment: "Las tareas de este grupo no se pueden evaluar y no se pueden incluir en la evaluación"
-    assignments: 
-      options: Opciones
-      refresh_grades: "Recargar las Calificaciones"
-      titles: 
-        refresh_scores: "Recargar las Calificaciones"
     attendance: 
       attendance_info: "No se han creado tareas de asistencia."
       buttons: 
@@ -6907,11 +6426,8 @@ es:
       labels: 
         final_grade_hidden: "Cálculo del total ha sido desactivado"
         high: Alta
-        high_score: Alta
         low: Baja
-        low_score: Baja
         mean: Promedio
-        mean_score: Promedio
         only_graded: "Calcular basado sólo en las tareas calificadas"
         total: Total
         your_score: "Su Calificación"
@@ -6940,80 +6456,6 @@ es:
         view_rubric_evaluation: "Ver la Rúbrica de la Evaluación"
         view_scoring_details: "Ver los detalles de la Calificación"
       total: Total
-    gradebook: 
-      all_sections: Todo
-      assignment_submitted_late: (tarde)
-      buttons: 
-        by_due_date: "Por Fecha Límite"
-        by_email: "Por Correo Electrónico/ID"
-        by_group: "Por Grupo de Trabajo"
-        by_name: "Por Nombre de Estudiante"
-        by_section: "Por Nombre de Sección"
-        by_total_asc: "Por Total (Menor Primero)"
-        by_total_desc: "Por Total (Mayor Primero)"
-        curve_grades: "Aplicar Curva a Calificaciones"
-        done: Completado
-        normalize: "Hacer el Total 100%"
-        set_grade: "Establecer Calificación"
-        update: Actualizar
-        upload: "Cargar Archivos"
-      curve_average: "Ingrese una calificación promedio para la curva para *la tarea*. La tabla muestra el mejor intento para aplicar la curva a las calificaciones basado en las calificaciones actuales de los estudiantes."
-      default_grades: "Otorgar la misma calificación a todos los estudiantes visibles para %{class} ingresando y enviando una calificación en el espacio siguiente:"
-      download: "Descargar %{attachment}"
-      grade_statistics: "Estadísticas de las Calificaciones para %{assignment}"
-      headers: 
-        loading_gradebook: "Cargando el Libro de Calificaciones..."
-      hide_names: "Esconder los Nombres de Estudiantes"
-      labels: 
-        assign_blanks: "Asignar ceros a los estudiantes que no han hecho envíos"
-        assignment_submitted: Enviado
-        average_score: "Calificación Promedio"
-        choose_section: "Sección para mostrar"
-        comments: "Comentarios para el estudiante"
-        grade: Calificación
-        group_comment: "Enviar Comentario al Grupo Entero"
-        high_score: "Calificación alta"
-        low_score: "Calificación baja"
-        send_comment: "Enviar un Comentario al Estudiante"
-        sort_columns: "Clasificar las Columnas del Libro de Calificaciones"
-        sort_rows: "Clasificar las Filas del Libro de Calificaciones"
-        total_grade_subs: "Total de envíos calificados"
-      links: 
-        add_assignments: "Agregar Tareas al Curso"
-        add_students: "Agregar Estudiantes al Curso"
-        attach_file: "Adjuntar Archivo"
-        manage: "Manejar los Grupos de Trabajo"
-      loading_submission: "Cargando Detalles del Envío..."
-      no_assignments: "Aún no se han creado tareas para este curso."
-      no_comments: "Sin Comentarios"
-      no_students: "No hay estudiantes inscritos en el curso."
-      out_of_points_possible: "*de* %{points_possible}"
-      overwrite: "Sobrescribir calificaciónes ya ingresadas"
-      submissions: envíos
-      title: 
-        quiz: "Envío de Evaluación"
-      titles: 
-        choose_section: "Escoger una Sección para poder Mostrarla"
-        comments: "Comentarios de los Envíos"
-        complete: Completado
-        discussion: "Envío de la Discusión"
-        fail: "No Aprobado"
-        incomplete: Incompleto
-        media: "Envío de Comentario de Media"
-        new_message: "Mensaje nuevo para este envío"
-        pass: Aprobado
-        quiz_review: "Esta evaluación necesita revisión"
-        submission_review: "Este envío necesita revisión"
-        text: "Envío de Ingreso de Texto"
-        total: Total
-        turnitin: "Este envío tiene una calificación de similaridad turnitin"
-        upload: "Envío para la Carga del Archivo"
-        url: "Envío de URL"
-        view: Vista
-      try_out_the_new_gradebook: "Pruebe el nuevo libro de calificaciones"
-      upload_info: " Si hizo cambios a los archivos de los estudiantes que descargo anteriormente, simplemente comprímalos otra vez y cargue el archivo comprimido con el siguiente formulario. Los estudiantes verán los archivos modificados en sus comentarios para el envío. "
-      upload_warning: "Asegúrese de no cambiar los nombres de los archivos enviados para que podamos reconocerlos."
-      weight_final: "Designar peso a la calificación final basado en grupos"
     gradebook2: 
       arrange_columns_by_due_date: "Ordenar las columnas por fecha límite"
       arrange_columns_by_group: "Ordenar las columnas por grupo de tareas"
@@ -7023,13 +6465,11 @@ es:
       hide_student_names: "Ocultar los nombres de los alumnos"
       include_ungraded: "Considerar lo no calificado como 0"
       learning_mastery: "Dominio de aprendizaje"
-      old_gradebook: "anterior libro de calificaciones"
       post_grades: "Publicar calificaciones"
       publish_to_sis: "Publicar las calificaciones en SIS"
       set_group_weights: "Establezca la ponderación del grupo"
       show_attendance_columns: "Ver columnas de asistencia"
       show_concluded_enrollments: "Mostrar matrículas concluidas"
-      srgb_gradebook: "alternar libros de calificaciones"
       upload_scores: "Actualizar calificaciones (desde .csv)"
       view_grading_history: "Ver el historial de calificación"
     grades: 
@@ -7064,26 +6504,6 @@ es:
         other: "Archivos y comentarios creados para %{count} envíos"
     out_of_final: "%{weight} del Final"
     out_of_points_possible: "de %{points_possible}"
-    screenreader: 
-      page_titles: "Libro de calificaciones del lector de pantalla"
-    show: 
-      keycode_descriptions: 
-        edit_cell: "Editar la Celda"
-        more_information: "Más información para la Celda Actual"
-        next_assignment: "Próxima Tarea"
-        next_student: "Próximo Estudiante"
-        previous_assignment: "Tarea Previa"
-        previous_student: "Estudiante Anterior"
-        refresh_gradebook: "Recargar el Libro de Calificaciones"
-      keycodes: 
-        edit_cell: ingresar
-        more_information: i
-        next_assignment: derecha
-        next_student: abajo
-        previous_assignment: izquierda
-        previous_student: arriba
-        refresh_gradebook: r
-      page_title: "Libro de Calificación"
     speed_grader: 
       all_sections: "Todas las Secciones"
       attach: Adjuntar
@@ -7162,9 +6582,6 @@ es:
         speech_recognition: "Reconocimiento de Voz"
     speed_grader_disabled: "SpeedGrader está deshabilitado para este curso"
     speedgrader_enabled_only_for_published_content: "Speedgrader está habilitado solo para el contenido publicado."
-    student: 
-      new_student: "Estudiante Nuevo"
-      student: Estudiante
     student_attendance: 
       headers: 
         assignment: Tarea
@@ -7180,16 +6597,6 @@ es:
         absent: "Marcado como Ausente, haga click para más detalles"
         click_for_details: "Haga click para más Detalles"
         present: "Marcado como Presente, haga click para más detalles"
-    submission: 
-      titles: 
-        submission_review: "Este envío necesita revisión"
-    submission_score: 
-      icons: 
-        discussion_submission: "Envío del debate"
-        file_upload_submission: "Envío de archivos cargados"
-        online_url_submission: "Envío de URL online"
-        quiz_submission: "Envío de evaluación"
-        text_entry_submission: "Envío de introducción de texto"
     submissions_zip_upload: 
       comments_made: 
         one: "Se ha hecho 1 Comentario"
@@ -7537,7 +6944,6 @@ es:
       group_user: 
         assign_to_group: "Asignar a grupo"
         assign_user_to_group: "Asignar %{name} a un grupo"
-        edit_user_group_assignment: "Eliminar o mover a %{name} del grupo"
         move: "Mover a..."
         move_to_new_group: "Mover a %{name} a un nuevo grupo"
         remove: Eliminar
@@ -7692,7 +7098,6 @@ es:
     title_for_topics_category: "Temas de %{category}"
     warnings: 
       truncated_wiki_title: "Se truncó el título de la siguiente página wiki: %{title}"
-  individual_gradebook_description: "La vista del libro de calificaciones individual ofrece una vista del libro de calificaciones diseñada para la accesibilidad."
   info: 
     notices: 
       error_reported: "¡Gracias por su ayuda! Comenzaremos rápidamente"
@@ -7720,7 +7125,6 @@ es:
         am_pm: am/pm
     draft: Borrador
     errors: 
-      cannot_view_document_inline: "Este documento no puede ser visto en línea, puede que no tenga permiso para verlo o puede que esté borrado."
       document_preview_processing: "Todavía se está procesando la vista previa del documento. Inténtelo de nuevo más tarde."
       field_is_required: "Este campo es requerido"
       invalid_datetime: "Valor de fecha/tiempo inválido"
@@ -7812,7 +7216,6 @@ es:
         locked_by: "Bloqueado por"
         max_attempts: "Intentos Máximos"
         num_attempts: Intentos
-        original_id: "ID original"
         priority: Prioridad
         run_at: "Correr en"
         strand: hilo
@@ -7828,8 +7231,6 @@ es:
     module_sequence_footer: 
       next: Siguiente
       previous: Anterior
-  labels: 
-    lock_module_until: "bloquear el modulo hasta una fecha dada"
   layouts: 
     application: 
       instructure_description: "Instructure, creadores del sistema de manejo de aprendizaje Canvas"
@@ -7838,7 +7239,6 @@ es:
       links: 
         close: Cerrar
         dashboard: "Mi Tablero"
-        home: Inicio
         skip_to_content: "Saltar al Contenido"
       menu: 
         assignments: Tareas
@@ -8184,7 +7584,6 @@ es:
           attendee: Participante
           attendees: Participantes
           cancel_reason: "Motivo de la cancelación"
-          click_to_see_assignment: "Haga clic aquí para ver la tarea"
           date_and_time: Fecha/Hora
           details: "Detalles de la cita"
           group: Grupo
@@ -8192,7 +7591,6 @@ es:
           no_reason_given: "no se ha proporcionado"
           slots_remaining: "Intervalos disponibles"
           subject: "Reserva cancelada para %{appointment_name} (%{course})"
-          view_appointment: "Ver la cita en el siguiente enlace"
         instructions: "Ver la cita en el siguiente enlace: %{link}"
         labels: 
           attendee: Participante
@@ -8561,7 +7959,6 @@ es:
           assignment_due_date_changed: "Fecha de vencimiento de la tarea modificada: %{assignment_name}, %{course_name} (%{override})"
           assignment_due_date_changed_sentence: "Se ha modificado la fecha de vencimiento de la tarea, %{assignment_name}, para el curso, %{course_name} (%{override}), a:"
           link: "Haga clic aquí para ver la tarea"
-          link_text: "Ver la tarea"
           no_due_date: "No hay fecha límite"
         labels: 
           click_to_see_assignment: "Haga clic aquí para ver la tarea"
@@ -8587,7 +7984,6 @@ es:
         html: 
           assignment_graded: "Tarea calificada: %{assignment_name}, %{course_name}"
           link: "Haga clic aquí para ver la tarea"
-          link_text: "Ver la tarea"
           the_assignment_is_graded: "La tarea %{assignment_name} se ha calificado."
         labels: 
           view_here: "Puede verlo aquí"
@@ -8609,7 +8005,6 @@ es:
     assignment_resubmitted: 
       email: 
         html: 
-          link_text: "Ver el envío"
           user_resubmitted: "Reenvío: %{user_name}, %{assignment_name}"
           user_resubmitted_sentence: "%{user_name} acaba de reenviar %{assignment_name} en el curso %{course_name}"
         labels: 
@@ -8630,7 +8025,6 @@ es:
     assignment_submitted: 
       email: 
         html: 
-          link_text: "Ver el envío"
           user_submitted: "Envío: %{user_name}, %{assignment_name}"
           user_submitted_sentence: "%{user_name} acaba de realizar un envío para %{assignment_name} en el curso %{course_name}"
         labels: 
@@ -8651,7 +8045,6 @@ es:
     assignment_submitted_late: 
       email: 
         html: 
-          link_text: "Ver el envío"
           user_resubmitted_sentence: "%{user_name} acaba de realizar un envío atrasado para %{assignment_name} en el curso %{course_name}"
           user_submitted: "Tarea atrasada: %{user_name}, %{assignment_name}"
         labels: 
@@ -8774,7 +8167,6 @@ es:
         subject: "Falló la Exportación del Curso: %{course}"
     content_export_finished: 
       email: 
-        body: "Su exportación del curso para \"%{course}\" ha terminado."
         html: 
           body2: "La exportación de su curso para *%{course}* ha terminado."
           link: "Haga clic para ver las exportaciones"
@@ -8789,16 +8181,11 @@ es:
       email: 
         attached_files: "Archivos Adjuntos:"
         audio_comment: "Este mensaje incluye comentarios de media. Para reproducirlos o responder a ellos, haga click en el enlace a continuación:"
-        body: "%{user_name} le acaba de enviar un mensaje en Canvas:"
         html: 
           attached_files: "Archivos adjuntos:"
-          audio_comment: "Este mensaje incluye comentarios con contenido audiovisual. Para reproducirlos o responder a ellos, haga clic en el enlace que aparece a continuación:"
-          body: "%{user_name} acaba de enviarle un mensaje en Canvas:"
           download: descargar
-          reply_to_conversation_message: "Puede contestar este mensaje en Canvas respondiendo directamente a este mensaje de correo electrónico."
           subject: "%{user_name} acaba de enviarle un mensaje en Canvas:"
           unknown_user: "Usuario desconocido"
-        reply_to_conversation_message: "Puede contestar este mensaje en Canvas respondiendo directamente a este mensaje de correo electrónico."
         subject: "%{user_name} le acaba de enviar un mensaje en Canvas."
         unknown_user: "Usuario Desconocido"
       facebook: 
@@ -9151,7 +8538,6 @@ es:
           grading_based_on_points: "La calificación está basada en el total de puntos de todas las tareas."
           labels: 
             grades_based_on_percent: "La calificación está basada en el total de la media ponderada de cada grupo de trabajo"
-            now_see_here: "Puede ver los detalles aquí"
             subject: "La media ponderada de la calificación ha cambiado"
           see_details: "Puede ver los detalles aquí"
         labels: 
@@ -9256,10 +8642,6 @@ es:
     index: 
       titles: 
         messages: "Mensajes para %{name}"
-    layout: 
-      email: 
-        html: 
-          click_to_preferences: "Haga clic aquí para modificar sus preferencias de notificación"
     merge_email_communication_channel: 
       email: 
         body: "Se ha creado una cuenta para usted en %{host}, pero ya tiene una cuenta de Canvas. Si desea combinarlas, diríjase a la siguiente url:"
@@ -9422,7 +8804,6 @@ es:
         discussion_entry_reply_message: "Participe en la conversación utilizando el enlace siguiente o haga un comentario respondiendo a este mensaje."
         html: 
           body: "%{user} ha publicado un comentario nuevo en la conversación %{discussion_topic} para %{course}:"
-          discussion_entry_link_message: "[Haga clic aquí para participar en la conversación](%{url}), o haga un comentario respondiendo a este mensaje."
           link: "Haga clic aquí para participar en la conversación"
           subject: "Nuevo comentario para %{discussion_topic}: %{course}"
         subject: "Comentario Nuevo para %{discussion_topic}: %{course}"
@@ -9442,7 +8823,6 @@ es:
         html: 
           attached_file: "Archivo adjunto"
           body: "Ha comenzado una nueva discusión que le puede interesar:"
-          details: "participe en la conversación aquí"
           download: descargar
           link: "Haga clic aquí para participar en la conversación"
           subject: "Nueva discusión - %{discussion_topic}: %{course}"
@@ -9512,7 +8892,6 @@ es:
         body: "Se han añadido %{count} nuevos archivos para el curso %{name}:"
         html: 
           body: "Se han añadido %{count} nuevos archivos para el curso %{name}:"
-          link: "Puede verlos aquí"
           see_details: "Puede verlos aquí"
           subject: "Se han añadido %{count} nuevos archivos para el curso %{name}:"
         link: "Puede verlos aquí"
@@ -9563,7 +8942,6 @@ es:
           body: "%{user} se acaba de registrar como un profesor en %{website}."
           details: "Haga clic aquí para ver el profesor"
           email: "Correo electrónico"
-          link: "Haga clic aquí para ver el profesor"
           phone: Teléfono
           school_name: "Nombre de la escuela"
           school_position: "Puesto en la escuela"
@@ -9752,7 +9130,6 @@ es:
         body: "%{author} acaba de comentar en el envío de %{user} para %{assignment}"
         html: 
           body: "%{author} acaba de comentar en el envío de %{user} para %{assignment}"
-          link_message: "Puede revisar los detalles del envío aquí:"
           someone: Alguien
           subject: "Comentario sobre el envío: %{user}, %{assignment}, %{context}"
         someone: Alguien
@@ -10053,7 +9430,6 @@ es:
   new_styles_description: "Estamos rediseñando la interfaz de usuario de Canvas. Active esta opción para poder ver el nuevo aspecto simplificado de la interfaz de Canvas,"
   no_migration_file: "Archivo obligatorio para la migración de contenido."
   not_a_number: "debe ser un número positivo"
-  not_applicable: N/A
   notification: 
     added_to_conversation_description: "Se le ha agregado a la conversación"
     added_to_conversation_display: "Agregado a la Conversación"
@@ -10116,17 +9492,6 @@ es:
     due_date_display: "Fecha de entrega"
     files_description: "Nuevo archivo añadido a su curso"
     files_display: Archivos
-    grading_description: |-
-        Incluye:⏎
-        ⏎
-        * Introducción o modificación de la calificación de una tarea o envío⏎
-        * Calificación de las tareas activadas⏎
-        * Modificación de la media ponderada de la calificación⏎
-        ⏎
-        &nbsp;⏎
-        ⏎
-        Active la casilla 'Incluir las puntuaciones en los avisos de modificación de calificaciones' si quiere que las calificaciones aparezcan en las notificaciones.⏎
-        Si su correo electrónico no pertenece a una organización, tenga en cuenta que estará enviando contenido confidencial fuera de dicha organización.
     grading_display: Calificación
     grading_notify_include_grade: "Incluír calificaciones al alertar acerca de cambios de calificaciones."
     grading_policies_description: "Modificación de la política de calificaciones del curso"
@@ -10239,14 +9604,7 @@ es:
         ⏎
         Registros de citas de alumnos
     student_appointment_display: "Registros de citas para alumnos"
-    submission_comment_description: |-
-        Comentario de envío de tareas⏎
-        ⏎
-        &nbsp;⏎
-        ⏎
-        Active la casilla 'Marcar nuevos comentarios de envío como leídos' si no desea que aparezcan como 'nuevos' en su bandeja de entrada de Canvas
     submission_comment_display: "Comentario de Envío"
-    submission_new_as_read: "Marcar como leídos los mensajes del nuevo envío"
   notification_preferences: 
     communication: 
       email: 
@@ -10553,7 +9911,6 @@ es:
         api_key: "Código API"
         base_url: "URL base"
     crocodoc: 
-      description: "Crocodoc habilitado como opción de previsualización del documento"
       name: Crocodoc
     crocodoc_settings: 
       description: "Este complemento se integra con Crocodoc para ofrecer un previsualizador de documentos HTML5 que proporciona a los profesores y los alumnos la capacidad para anotar documentos."
@@ -11542,7 +10899,6 @@ es:
     always: Siempre
     answer_comments: "Contestar comentarios"
     answer_text: "Texto de respuesta"
-    assignment: Tarea
     assignment_points_possible: 
       one: "1 pto"
       other: "%{count} pts"
@@ -11635,7 +10991,6 @@ es:
         other: "%{count} minutos"
         zero: "menos de 1 minuto"
       score_out_of_points_possible: "%{score} de %{points_possible}"
-    highest: "más alto"
     index: 
       buttons: 
         publishing_quizzes: "Publicando Evaluaciones..."
@@ -11669,7 +11024,6 @@ es:
       multiple_blanks_question: "Rellene el espacio en blanco, lea el texto que lo acompaña"
       other_incorrect_matches: "Otras Opciones Incorrectas de Apareo"
       possible_answer: "Respuesta Posible"
-    latest: "más reciente"
     ldb_login_popup: 
       email: "Correo electrónico"
       log_in: "Iniciar sesión"
@@ -12316,8 +11670,6 @@ es:
         quiz_fudged_negative: "Esta evaluación ha sido ajustada manualmente por %{fudge} puntos."
         quiz_fudged_positive: "La calificación de la evaluación ha sido ajustada manualmente por +%{fudge} puntos."
         quiz_not_yet_taken: "La evaluación no se ha realizado aún."
-        quiz_results_protected: "Los resultados de la evaluación están protegidos para esta evaluación, y no son visibles para los alumnos."
-        quiz_results_protected_until_last_attempt: "Los resultados de las evaluaciones estan protegidos, y no son visibles para los alumnos hasta que hayan enviado su último intento."
         quiz_submission_needs_review: "La evaluación ha cambiado desde que se hizo el envío. Es posible que este envío se deba calificar de nuevo."
         requires_lockdown: "Es obligatorio disponde del navegador Respondus LockDown Browser para ver los resultados de la evaluación."
         submitted_at: "Enviado %{when}"
@@ -12596,18 +11948,6 @@ es:
       draft_state_unsaved_changes: "*Ha realizado cambios en las preguntas de esta evaluación.* Estos cambios no serán visibles para los alumnos hasta que no guarde la evaluación."
       unpublished_changes: "*Ha realizado cambios a este cuestionario que aún no se han publicado.* Estos cambios no estarán visibles para los alumnos hasta que no publique o vuelva a publicar el cuestionario."
       unpublished_quiz: "*Este cuestionario no está publicado* Solo los profesores pueden ver el cuestionario hasta que esté publicado."
-  quizzes_model: 
-    cant_unpublish_when_students_submit: "No se puede ocultar la publicación si hay envíos de alumnos"
-    confirms: 
-      delete_quiz: "¿Está seguro de que desea eliminar esta evaluación?"
-    delete_quiz: "Borrar la evaluación"
-    edit_quiz: "Editar la evaluación"
-    points: 
-      one: "1 pto"
-      other: "%{count} pts"
-    questions: 
-      one: "1 pregunta"
-      other: "%{count} preguntas"
   quizzes_redirects: 
     no_access: "Acceso denegado. Se le redirigirá a una página a la que tenga acceso."
   quizzes_route: 
@@ -13155,13 +12495,9 @@ es:
           email: "Correo Electrónico (opcional)"
     event_list: 
       at_least_more_events: "al menos %{count_of_events} más"
-      at_least_more_events_one_week: "al menos %{count_of_events} más en la siguiente semana"
-      at_least_more_events_two_weeks: "al menos %{count_of_events} más en las siguientes dos semanas"
       links: 
         view_calendar: "Ver el Calendario"
       more_events: "%{count_of_events} más"
-      more_events_one_week: "%{count_of_events} más en la siguiente semana"
-      more_events_two_weeks: "%{count_of_events} más en las siguientes dos semanas"
       nothing_for_now: "Nada por ahora"
       nothing_one_week: "Nada para la siguiente semana"
       nothing_two_weeks: "Nada para las siguientes dos semanas"
@@ -13499,7 +12835,6 @@ es:
       new_file_option: "[ Archivo Nuevo ]"
       new_page_option: "[ Página Nueva ]"
       new_quiz_option: "[ Evaluación Nueva ]"
-      new_tab: "Cargar esta herramienta en una lengüeta nueva"
       new_topic_option: "[ Tema Nuevo ]"
       options: 
         assignments: Tareas
@@ -13781,13 +13116,11 @@ es:
     available_until: "Disponible hasta"
     closed: Cerrado
     due: "Fecha límite"
-    everyone_else: "Todos los demás"
     not_available: "Disponible en"
     pending: "No disponible hasta"
   step: Paso
   student_id: "ID del alumno"
   student_name: "Nombre del alumno"
-  student_outcome_gradebook_description: "El libro de calificaciones de resultados del alumno representa el modo en el que los alumnos pueden ver de un vistazo el progreso en los resultados de aprendizaje de los cursos. Los resultados se presentan en un formato similar al de los libros de calificaciones y el progreso aparece tanto en el formato de puntuación numérica como clasificado como dominado/casi dominio/medidas correctoras."
   sub_accounts: 
     alerts: 
       subaccount_has_courses: "No puede borrar una sub-cuenta que contiene cursos"
@@ -13917,7 +13250,6 @@ es:
       paper_view: "Vista del Artículo"
       plain_view: "Vista de Texto Normal"
       preview_crocodoc_document: "Ver una vista previa del envío y consultar los comentarios del profesor, si están disponibles"
-      preview_scribd_document: "Ver una vista previa del envío"
       preview_submission: "Ver una vista previa del envío"
       preview_title: "Vista previa de %{title}"
       quiz_submission: "Este envío fue un envío de evaluación. Redirigiendo a la página de evaluaciones."
@@ -13948,8 +13280,6 @@ es:
       curriculum_assessment_errata_description: "Ver errores de currículum/evaluación ya comunicados. Buscar \"erratas\"."
       networking_academy_description: "Ver las respuestas de Cisco a las preguntas más frecuentes."
       networking_academy_faqs: "Preguntas más frecuentes de Networking Academy"
-    select: 
-      prompt: "Por favor seleccione"
   table_headings: 
     name: Nombre
     total: Total
@@ -14033,10 +13363,6 @@ es:
         term_start: "comienzo del período"
         unspecified: "siempre que"
       timespan: "%{start_at} *a* %{end_at}"
-  text_helper: 
-    time: 
-      ranges: 
-        different_days: "%{start_date_and_time} *hasta* %{end_date_and_time}"
   time: 
     am: am
     count_hours_ago: 
@@ -14728,8 +14054,6 @@ es:
       page_updated: "La página se actualizó."
     page_link: 
       link_hidden_from_students_warning: "Los estudiantes no verán este enlace"
-    page_revisions: 
-      page_revisions_title: "%{title} revisiones : %{context_name}"
     pages_index: 
       titles: 
         pages: Páginas
