@@ -38,27 +38,6 @@ nb:
     no_file: "Ingen resultatfil eller autoritet gitt"
     no_permissions: "Brukeren har ikke lov til å redigere globale resultater"
     no_perms: "Brukeren har ikke lov til å redigere globale resultater"
-  access: 
-    course: 
-      extra_text: "Kurs: %{course};"
-  access_report_header_content: innhold
-  access_report_header_content_access_id: "innholdstilgang id"
-  access_report_header_content_type: innholdstype
-  access_report_header_course_id: "kurs ID"
-  access_report_header_course_name: kursnavn
-  access_report_header_course_sis_id: "kurs sis id"
-  access_report_header_enrollment_type: påmeldingstype
-  access_report_header_last_viewed: "sist sett på"
-  access_report_header_root_account_id: "rot-konto id"
-  access_report_header_section_id: klasse-ID
-  access_report_header_section_name: klassenavn
-  access_report_header_section_sis_id: "klasse sis id"
-  access_report_header_term_id: "semester id"
-  access_report_header_term_sis_id: "semester sis id"
-  access_report_header_times_participated: "antall ganger deltatt"
-  access_report_header_times_viewed: "antall ganger sett"
-  access_report_header_user_id: "bruker id"
-  access_report_header_user_sis_id: "bruker sis id"
   account: 
     account_settings: 
       account_surveys: Kontoundersøkelser
@@ -280,13 +259,6 @@ nb:
     announcement_deleted_notice: "Kunngjøringen ble slettet"
     permission_denied_notice: "Du kan ikke opprette kunngjøringer for den kontoen"
   account_reports: 
-    bucks: 
-      courses_only: "Kun online klasser"
-    ccp: 
-      course: 
-        check_box: "For kurs: %{course_id};"
-      courses_only: "Kun nettkurs"
-      start_at: "Start: %{start_at};"
     default: 
       all_terms: "Alle semestre"
       course_text: "For kurs: %{course};"
@@ -299,26 +271,10 @@ nb:
       section_text: "For klasse: %{section};"
       start_text: "Start: %{start_at};"
       term_text: "Semester: %{term_name};"
-    galen: 
-      no_term: "Et spesifikt semester er påkrevet, vennligst velg et semester"
     grades: 
       deleted: "Inkluder slettede objekter: sant;"
-    granite: 
-      invalid_date_range: "Datoene ble tilpasset 1-ukes visning;"
-    lincoln: 
-      invalid_term: "Vennligst velg et gyldig semester"
-    mississippi: 
-      reports: "Rapporter: %{files}"
-    newark: 
-      assignment_text: "Typer av oppgavegrupper: %{groups};"
     outcomes: 
       order: "Rekkefølge: %{order}"
-    pasco: 
-      missing_start_date: "Vennligst velg en startdato"
-    penn_harris: 
-      student_grades: 
-        description: 
-          text: "Denne rapporten viser studentens sluttkarakter for studenter i et gitt semester. Den resulterende csv-filen vil ha en rad per påmelding, og vil vise den sluttkarakteren som vises li kursets karakteroversikt."
     report_header_account_id: konto_id
     report_header_assessment_id: "vurdering id"
     report_header_assessment_question: vurderingsspørsmål
@@ -399,13 +355,6 @@ nb:
     student: 
       enrollment_state: "Inkluder påmeldingsstatus: true;"
       enrollment_states: "Påmeldingsstatus: %{states};"
-    usu: 
-      enrollment_types: "Påmeldingstyper: %{types}"
-    webster: 
-      min: "Minimum antall elementer: %{min};"
-      student: Studenter;
-      ta: LA-er;
-      teacher: Forelesere;
   account_settings: 
     account: Konto
     account_name_too_long: "Kontonavn er for langt"
@@ -597,20 +546,6 @@ nb:
         message_date_to: "Til dato"
         search: Søk
         search_people: "Søk blant personer"
-    assignment_scheduling_csv_description: 
-      account_reports: 
-        newark: 
-          description: 
-            header: Eksempel
-          student_activity: 
-            text: "Denne rapporten viser oppgaver og informasjon knyttet til de oppgaver som er i den angitte oppgavegruppe eller grupper, og i den angitte tidsperioden. Denne rapporten gir data for planlegging av oppgaver, og håndtering av oppgavebelastning for studentene, viser bare studenter og oppgaver der det er 2 eller flere motstridende oppgaver som skal leveres på samme dato for en student."
-      newark_report_header__assignment_count: "# oppgaver"
-      newark_report_header_due_date: frist
-      newark_report_header_section_id: klasse-ID
-      newark_report_header_section_name: klassenavn
-      newark_report_header_student_name: studentnavn
-      newark_report_header_teacher_id: "foreleser id"
-      newark_report_header_teacher_name: "foreleser navn"
     assignment_scheduling_csv_parameters: 
       account_reports: 
         newark: 
@@ -630,24 +565,6 @@ nb:
             check_box: Rapporter
           tests: 
             check_box: Prøver
-    assignment_score_summary_csv_description: 
-      account_reports: 
-        granite: 
-          assignme_score_summary: 
-            text: "Denne rapporten viser resultatet for alle oppgaver som er rettet mellom de valgte datoene"
-          description: 
-            header: Eksempel
-      granite_report_header_account_id: konto_id
-      granite_report_header_assignment_id: oppgave_id
-      granite_report_header_assignment_name: oppgave_navn
-      granite_report_header_assignment_unique_id: oppgave_unik_id
-      granite_report_header_course_id: kurs_id
-      granite_report_header_graded_at: rettet_ved
-      granite_report_header_submission_date: innlevering_dato
-      granite_report_header_submission_id: innlevering_id
-      granite_report_header_submission_score: innlevering_resultat
-      granite_report_header_term_id: semester_id
-      granite_report_header_user_id: bruker_id
     avatars: 
       all_link: 
         one: "Alle %{count}"
@@ -675,61 +592,13 @@ nb:
         zero: Innlevert
       title: Profilbilder
       unlock_link: "lås opp"
-    bucks_zero_activity_csv_description: 
-      account_reports: 
-        bucks: 
-          description: 
-            header: Eksempel
-          student_login: 
-            text: "Denne rapporten viser alle studenter som er påmeldt kurs i et gitt semester. Den resulterende CSV-filen vil ha én rad per studentpåmelding som ikke har besøkt kurset siden datoen. Filteret vil kun inkludere påmeldinger fra klasser som har '.E' i klassenavnet."
-      bucks_report_header_last_access_to_canvas: "forrige tilgang til canvas"
-      bucks_report_header_name: navn
-      bucks_report_header_section_id: klasse-ID
-      bucks_report_header_section_name: klassenavn
-      bucks_report_header_section_sis_id: "klasse sis id"
-      bucks_report_header_user_sis_id: "bruker sis id"
     cannot_manage_account: "Du har ikke tillatelse til å behandle kontoinnstillinger"
     cannot_manage_quotas: "Du har ikke lov til å behandle kvoteinnstillinger"
-    ccp_zero_activity_csv_description: 
-      account_reports: 
-        ccp: 
-          ccp_zero_activity_csv: 
-            header: Eksempel
-            text: "Denne rapporten viser alle studenter som er påmeldt kurs i et gitt semester. Den resulterende CSV-filen vil ha én rad per brukerpåmelding som ikke har besøkt kurset siden datoen."
-      ccp_report_header_course_id: "kurs ID"
-      ccp_report_header_course_name: kurs_navn
-      ccp_report_header_course_sis_id: "kurs sis id"
-      ccp_report_header_email: epost
-      ccp_report_header_enrollment_type: påmeldingstype
-      ccp_report_header_first_name: fornavn
-      ccp_report_header_last_name: etternavn
-      ccp_report_header_section_id: klasse-ID
-      ccp_report_header_section_name: klassenavn
-      ccp_report_header_section_sis_id: "klasse sis id"
-      ccp_report_header_user_id: "bruker id"
-      ccp_report_header_user_sis_id: "bruker sis id"
     ccp_zero_activity_csv_parameters: 
       account_reports: 
         ccp: 
           filter_online: 
             check_box: "Kun nettkurs"
-    chcp_student_activity_csv_description: 
-      account_reports: 
-        chcp: 
-          student_activity: 
-            description: 
-              header: Eksempel
-            text: "Denne rapporten viser studentens bidrag i sine kurs. Den resulterende csv-fil vil ha en rad per innmelding og vil vise studenten sis id, studentnavn, telefonnummer, e-postadresse, kursnavn, siste innlevering, dager siden siste innlevering (LDA), nåværende karakterprosent, og deres semester-startdato ."
-      chcp_report_header_course: kurs
-      chcp_report_header_email: epost
-      chcp_report_header_grade: karakter
-      chcp_report_header_last_submissio: "siste innlevering"
-      chcp_report_header_lda: lda
-      chcp_report_header_phone: telefon
-      chcp_report_header_start_date: startdato
-      chcp_report_header_student_id: "student id"
-      chcp_report_header_student_name: "studentens navn"
-      chcp_report_header_teacher: foreleser
     confirm_delete_user: 
       confirm_delete: "Er du sikker på at du vil slette denne brukeren fra kontoen %{account}? Dette vil fjerne brukerens data (inkludert karakterer) fra alle kurs og grupper. Prosessen kan ikke gjøres om."
       delete_button: "Slett %{user}"
@@ -752,59 +621,6 @@ nb:
       teachers_label: Forelesere
     course_add_failed_message: "Legg til kurs mislyktes, prøv igjen"
     course_added_message: "%{course} ble lagt til."
-    course_enrollment_csv_description: 
-      account_reports: 
-        cedar_rapids: 
-          course_status: 
-            text: |-
-                Denne rapporten viser statusen til alle kursene i et gitt semester. Den
-                resulterende CSV-filen har én rad per kurs-klasse og vil
-                vise kurset, kursstatus, semester, start- og sluttdatoer
-                antall påmeldte, avdeling og konto
-          description: 
-            header: Eksempel
-      cedar_rapids_report_header_account_id: Konto-ID
-      cedar_rapids_report_header_account_name: Kontonavn
-      cedar_rapids_report_header_course_end_date: "Kurs sluttdato"
-      cedar_rapids_report_header_course_id: Kurs-ID
-      cedar_rapids_report_header_course_name: Kursnavn
-      cedar_rapids_report_header_course_start_date: "Kurs startdato"
-      cedar_rapids_report_header_course_status: "Kurs status"
-      cedar_rapids_report_header_department_id: "Avdelings ID"
-      cedar_rapids_report_header_department_name: "Avdeling Navn"
-      cedar_rapids_report_header_observer_count: "Observatører antall"
-      cedar_rapids_report_header_student_count: "Student antall"
-      cedar_rapids_report_header_ta_count: "Antall Læringsassistenter"
-      cedar_rapids_report_header_teacher_count: "Foreleser antall"
-      cedar_rapids_report_header_term_id: "Semester ID"
-      cedar_rapids_report_header_term_name: Semesternavn
-    course_status_csv_description: 
-      account_reports: 
-        auburn: 
-          course_status: 
-            text: "Denne rapporten viser statusen til alle kursene i et gitt semester. Den resulterende CSV-filen har én rad per kursklasse og viser kurset, kursstatusen, semesteret, start- og sluttdatoer og foreleseren i klassen."
-          description: 
-            header: Eksempel
-      auburn_report_header_account_id: "konto id"
-      auburn_report_header_account_name: kontonavn
-      auburn_report_header_account_sis_id: "konto sis id"
-      auburn_report_header_course_id: "kurs id"
-      auburn_report_header_course_name: kursnavn
-      auburn_report_header_course_sis_id: "kurs sis id"
-      auburn_report_header_course_status: kursstatus
-      auburn_report_header_effective_date: virkningsdato
-      auburn_report_header_end_date: sluttdato
-      auburn_report_header_section_id: klasse-ID
-      auburn_report_header_section_name: klassenavn
-      auburn_report_header_section_sis_id: "klasse sis id"
-      auburn_report_header_start_date: startdato
-      auburn_report_header_student_count: "antall studenter"
-      auburn_report_header_teacher_id: "foreleser id"
-      auburn_report_header_teacher_name: "foreleser navn"
-      auburn_report_header_teacher_sis_id: "foreleser sis id"
-      auburn_report_header_term_id: "semester id"
-      auburn_report_header_term_name: "semester navn"
-      auburn_report_header_term_sis_id: "semester sis id"
     course_type: kurs
     courses: 
       courses_crumb: Kurs
@@ -820,84 +636,16 @@ nb:
       go_button: Gå
       hide_enrollmentless_courses: "Skjul kurs uten påmeldinger"
     crumb_statistics: Statistikk
-    current_grade_csv_description: 
-      account_reports: 
-        lincoln: 
-          current_grade_report: 
-            text: "Denne rapporten viser nåværende karakter for en student per kurs for et spesifisert semester"
-          description: 
-            header: Eksempel
-      lincoln_report_header_course_id: Kurs_ID
-      lincoln_report_header_course_name: Kurs_Navn
-      lincoln_report_header_course_role: Kurs_Rolle
-      lincoln_report_header_course_sis_id: Kurs_SIS_ID
-      lincoln_report_header_current_grade: Gjeldende_karakter
-      lincoln_report_header_login: Innloggings_ID
-      lincoln_report_header_student_name: Student_Navn
-      lincoln_report_header_student_sis_id: Student_SIS_ID
-      lincoln_report_header_term_id: Semester_ID
-      lincoln_report_header_term_name: Semester_Navn
-    custom_grade_export_csv_description: 
-      account_reports: 
-        ross: 
-          description: 
-            header: Eksempel
-            text: "Denne rapporten viser studentens endelige karakterresultater for alle studenter i en gitt periode. Den resulterende csv filen vil ha en rad per registrering, og viser den nåværende og endelige karakter som vises i kursets karakterbok."
-      ross_report_header_comment: Kommentar
-      ross_report_header_course_id: Kurs_ID
-      ross_report_header_grade_posting_date: "Dato karakter er lagt ut"
-      ross_report_header_grade_type: Karaktertype
-      ross_report_header_grade_value_type: "Type av karakterverdi"
-      ross_report_header_miscfield1: MiscField1
-      ross_report_header_miscfield13: MiscField13
-      ross_report_header_miscfield2: MiscField2
-      ross_report_header_numeric_grade: "Numerisk karakter"
-      ross_report_header_source_id: Kilde_ID
     custom_grade_export_csv_parameters: 
       account_reports: 
         ross: 
           parameters: 
             note: "Kurs med skjulte oppgaver vil muligens ikke reflektere resultatene i denne rapporten."
-    custom_outcomes_csv_description: 
-      account_reports: 
-        edison: 
-          description: 
-            header: Eksempel
-            text: "Denne rapporten viser resultater for læringsmål for alle studenter for et gitt mål og kurs. Den resulterende CSV-filen vil ha én rad per bruker, og vil vise resultatdetaljer for den tilhørende oppgaven."
     custom_outcomes_csv_parameters: 
       account_reports: 
         edison: 
           outcome: 
             text: "mål_id:"
-    cv_non_graded_data_csv_description: 
-      account_reports: 
-        galen: 
-          cv: 
-            non_graded: 
-              text: "Denne rapporten viser innleveringer som ikke er rettet blant prøver, undersøkelser og diskusjoner."
-          description: 
-            header: Eksempel
-      galen_report_header_account_id: konto_id
-      galen_report_header_account_name: konto_navn
-      galen_report_header_course_name: kurs_navn
-      galen_report_header_course_sis_id: kurs_sis_id
-      galen_report_header_resource_type: ressurs_type
-      galen_report_header_title: tittel
-    cv_submission_data_csv_description: 
-      account_reports: 
-        galen: 
-          cv: 
-            attendance: 
-              text: "Denne rapporten viser studentinnleveringer fram til den gitte datoen. Dette brukes for oppmøte i CampusVue."
-        tmcc: 
-          description: 
-            header: Eksempel
-      galen_report_header_course_sis_id: kurs_sis_id
-      galen_report_header_first_submission: første_innlevering
-      galen_report_header_section_sis_id: klasse_sis_id
-      galen_report_header_submission_date: innlevering_dato
-      galen_report_header_submission_type: innlevering_type
-      galen_report_header_user_sis_id: bruker_sis_id
     date_picker_parameter: 
       account_reports: 
         default: 
@@ -918,40 +666,11 @@ nb:
     default_account_quotas_updated: "Kontokvotene ble oppdatert"
     find_not_authorized: "Du har ikke tilgang til den %{type}"
     find_not_found: "Kunne ikke finne en %{type} med den ID-en"
-    google_doc_accounts_csv_description: 
-      account_reports: 
-        ut_austin: 
-          description: 
-            header: Eksempel
-          google_doc: 
-            text: "Dette er en rapport over alle brukere og deres epostadresser som brukes i Google Docs-integrering."
-      ut_austin_report_header_canvas_user_id: "canvas bruker id"
-      ut_austin_report_header_default_email: "standard epost"
-      ut_austin_report_header_google_doc_address: "google doc addresse"
-      ut_austin_report_header_name: navn
-      ut_austin_report_header_sis_id: "sis id"
     grade_export_csv_description: 
       account_reports: 
         default: 
           description: 
-            header: Eksempel
             text: "Denne rapporten viser studentenes endelige karakterer for alle studenter i et gitt semester. Den resulterende csv-filen vil ha en rad per registrering, og vil vise den nåværende og endelige karakter som vises i kursets karakterbok."
-      course_report_header_course_id: "kurs id"
-      grade_report_header_course: kurs
-      grade_report_header_course_id: "kurs id"
-      grade_report_header_course_sis: "kurs sis"
-      grade_report_header_current_score: "gjeldende resultat"
-      grade_report_header_enrollment_state: påmeldingsstatus
-      grade_report_header_final_score: sluttresultat
-      grade_report_header_section: klasse
-      grade_report_header_section_id: klasse-ID
-      grade_report_header_section_sis: "klasse sis"
-      grade_report_header_student_id: "student id"
-      grade_report_header_student_name: studentnavn
-      grade_report_header_student_sis: "student sis"
-      grade_report_header_term: semester
-      grade_report_header_term_id: "semester id"
-      grade_report_header_term_sis: "semester sis"
     group_type: gruppe
     include_deleted_parameter: 
       account_reports: 
@@ -964,72 +683,11 @@ nb:
       page_title: Kontoer
       title: "Kontoer jeg administrerer"
     integer_required: "Et heltall kreves"
-    last_submission_activity_csv_description: 
-      account_reports: 
-        concorde: 
-          description: 
-            header: Eksempel
-          last_submission: 
-            text: "Denne rapporten viser studentenes nyeste aktivitet som er relevant for innleveringer"
-      concord_report_header_campus: campus
-      concord_report_header_course_name: kursnavn
-      concord_report_header_course_sis_id: "kurs sis id"
-      concord_report_header_last_course_activity_date: "siste dato med aktiviteter på kurset"
-      concord_report_header_student_current_grade: "studentens gjeldende karakter"
-      concord_report_header_student_default_email: "studentens standard epost"
-      concord_report_header_student_name: "studentens navn"
-      concord_report_header_student_sis_id: "student sis id"
-      concord_report_header_term_name: "semester navn"
-      concord_report_header_zero_grade_assignments: "ingen oppgaver med karakter"
     last_user_access_csv_description: 
       account_reports: 
         default: 
           last_user_access: 
-            header: Eksempel
             text: "Denne rapporten viser forrige innlogging for aktive brukere."
-      student_report_header_last_access_at: "forrige tilgang"
-      student_report_header_last_ip: "siste ip"
-      student_report_header_user_id: "bruker id"
-      student_report_header_user_name: brukernavn
-      student_report_header_user_sis_id: "bruker sis id"
-    learning_outcome_assignment_type_csv_description: 
-      account_reports: 
-        newark: 
-          student_activity: 
-            text: "Denne rapporten gir eksport av data som relaterer resultater til oppgaver."
-        samuel_merrit_university: 
-          description: 
-            header: Eksempel
-      samuel_report_header_assessment_question_id: "ID for vurderingsspørsmål"
-      samuel_report_header_assessment_question_name: "Navn for vurderingsspørsmål"
-      samuel_report_header_assignment_description: Oppgavebeskrivelse
-      samuel_report_header_assignment_id: "Oppgave ID"
-      samuel_report_header_assignment_points_possible: "Poeng oppnåelig for oppgaven"
-      samuel_report_header_assignment_title: Oppgavenavn
-      samuel_report_header_assignment_type: Oppgavetype
-      samuel_report_header_course_canvas_id: "Kurs Canvas ID"
-      samuel_report_header_course_current_score: "Kursets gjeldende resultat"
-      samuel_report_header_course_name: Kursnavn
-      samuel_report_header_course_sis_id: "SIS-ID for kurs"
-      samuel_report_header_course_student_count: "Kursets studentantall"
-      samuel_report_header_grading_scheme: Karaktersettingsplan
-      samuel_report_header_learning_outcome_desc: "Beskrivelse for læringsmål"
-      samuel_report_header_learning_outcome_id: "Læringsmål ID"
-      samuel_report_header_learning_outcome_score: "Resultat for læringsmål"
-      samuel_report_header_learning_outcome_short_name: "Kortnavn for læringsmål"
-      samuel_report_header_rubric_title: "Navn på vurderingsskjema"
-      samuel_report_header_section_canvas_id: "Klasse Canvas ID"
-      samuel_report_header_section_name: Klassenavn
-      samuel_report_header_section_sis_id: "Section SIS ID"
-      samuel_report_header_student_id: "Student ID"
-      samuel_report_header_student_name: Studentnavn
-      samuel_report_header_student_sis_id: "Student SIS ID"
-      samuel_report_header_subaccount_id: "Underkonto ID"
-      samuel_report_header_subaccount_name: "Underkonto Navn"
-      samuel_report_header_submission_date: "Dato for innlevering"
-      samuel_report_header_submission_grade: "Karakter for innleveringen"
-      samuel_report_header_submissions_attempt: Innleveringsforsøk
-      samuel_report_header_teacher_name: "Foreleser Navn"
     learning_outcome_assignment_type_csv_parameters: 
       account_reports: 
         samuel_merrit_university: 
@@ -1039,11 +697,6 @@ nb:
             text: Kurs-ID
           parameters: 
             note1: "Kurs-ID kan forbli tom for å kjøre rapporten for alle kurs i semesteret."
-    mississippi_sis_csv_description: 
-      account_reports: 
-        mississisppi: 
-          sis_data: 
-            text: "Denne rapporten returnerer alle sis brukere, klasser og påmeldingene for alle betrodde rot-kontoer for påmeldingsverktøyet."
     mississippi_sis_csv_parameters: 
       account_reports: 
         default: 
@@ -1058,25 +711,7 @@ nb:
       account_reports: 
         outcomes: 
           description: 
-            header: Eksempel
             text: "Denne rapporten viser  læringsresultat for alle studenter. Den resulterende CSV-filen har én rad per bruker-mål-resultat-par, og viser resultatdetaljer for hver tilhørende oppgave."
-      outcome_report_header_assessment_id: "vurdering id"
-      outcome_report_header_assessment_question: vurderingsspørsmål
-      outcome_report_header_assessment_question_id: "id for vurderingsspørsmål"
-      outcome_report_header_assessment_title: "vurdering navn"
-      outcome_report_header_assessment_type: "vurdering type"
-      outcome_report_header_attempt: forsøk
-      outcome_report_header_course_id: "kurs id"
-      outcome_report_header_course_name: kursnavn
-      outcome_report_header_course_sis_id: "kurs sis id"
-      outcome_report_header_learning_outcome_id: "læringsmål id"
-      outcome_report_header_learning_outcome_name: "læringsmål navn"
-      outcome_report_header_outcome_score: "resultat for læringsmål"
-      outcome_report_header_student_id: "student id"
-      outcome_report_header_student_name: "studentens navn"
-      outcome_report_header_student_sis_id: "student sis id"
-      outcome_report_header_submission_date: "dato for innlevering"
-      outcome_report_header_submission_score: innleveringsresultat
     outcome_results_csv_parameters: 
       account_reports: 
         outcomes: 
@@ -1102,50 +737,7 @@ nb:
       account_reports: 
         default: 
           public_courses: 
-            header: Eksempel
             text: "Denne rapporten viser alle kurs som ikke er slettet i et gitt semester som er publisert. Den resulterende CSV-filen vil ha én rad per kurs og vil vise kurs-id-en, kursets sis-id, kursets kortnavn, kursets navn og kursets start- og sluttdatoer."
-      course_report_header_end_date: sluttdato
-      course_report_header_id: id
-      course_report_header_name: navn
-      course_report_header_short_name: kortnavn
-      course_report_header_sis_id: "sis id"
-      course_report_header_start_date: startdato
-    quiz_data_csv_description: 
-      account_reports: 
-        ace: 
-          quiz_data_description: 
-            header: Eksempel
-            text: "Denne rapporten viser prøvespørsmål og svar for alle prøver i en gitt periode. Den resulterende csv filen vil ha en rad per prøvespørsmål og -svar."
-      ace_report_header_correct: korrekt
-      ace_report_header_course_id: "kurs id"
-      ace_report_header_course_sis_id: "kurs sis id"
-      ace_report_header_login_id: "innloggings id"
-      ace_report_header_outcome_id: "læringsmål id"
-      ace_report_header_points_earned: "poeng opptjent"
-      ace_report_header_points_possible: "poeng oppnåelig"
-      ace_report_header_question_id: "spørsmål id"
-      ace_report_header_question_name: spørsmålsnavn
-      ace_report_header_question_text: spørsmålstekst
-      ace_report_header_quiz_title: "prøve navn"
-      ace_report_header_user_id: "bruker id"
-      ace_report_header_user_name: "bruker navn"
-      ace_report_header_user_sis_id: "bruker sis id"
-    quiz_statistics_csv_description: 
-      account_reports: 
-        ace: 
-          quiz_statistics_description: 
-            header: Eksempel
-            text: "Denne rapporten viser prøvespørsmål, hvor mange brukere som har besvart spørsmålene og hvor mange som har besvart dem korrekt for alle prøver i en gitt periode. Den resulterende csv filen vil ha en rad per prøvespørsmål."
-      ace_report_header_count_correct: "antall korrekt"
-      ace_report_header_count_taken: "opptelling utført"
-      ace_report_header_course_id: "kurs ID"
-      ace_report_header_course_sis_id: "kurs sis id"
-      ace_report_header_outcome_ids: "læringsmål id'er"
-      ace_report_header_points_possible: "poeng oppnåelig"
-      ace_report_header_question_id: "spørsmål id"
-      ace_report_header_question_name: spørsmålsnavn
-      ace_report_header_question_text: spørsmålstekst
-      ace_report_header_quiz_title: prøvenavn
     quota_integer_required: "Et heltall kreves"
     quota_must_be_positive: "Verdier må være positive"
     quota_not_updated: "Kvoten ble ikke oppdatert"
@@ -1155,29 +747,11 @@ nb:
       account_reports: 
         default: 
           recently_deleted_courses: 
-            header: Eksempel
             text: "Denne rapporten viser alle kursene i et gitt semester som har blitt slettet de siste 30 dagene. Den resulterende CSV-filen vil ha én rad per kurs, og vil vise kurs-ID-en, kursets SIS-ID, kursets kortnavn, kursets navn og kursets start- og sluttdatoer."
     retry_login: "Prøv å logge inn på nytt"
     root_accounts: 
       labels: 
         name: Kontonavn
-    safety_drill_csv_description: 
-      account_reports: 
-        newark: 
-          description: 
-            header: Eksempel
-          student_activity: 
-            text: "Denne rapporten viser alle oppgaver og informasjon knyttet til de oppgaver som er i den angitte oppgavegruppe eller grupper, og i den angitte tidsperioden. Denne rapporten gir data for å planlegge sikkerhetsøvelser med et minimum av forstyrrelser til store i-klassen vurderinger."
-      newark_report_header_assignment_due_date: oppgavefrist
-      newark_report_header_assignment_group_name: "navn oppgavegruppe"
-      newark_report_header_assignment_id: "oppgave id"
-      newark_report_header_assignment_name: oppgavenavn
-      newark_report_header_course_code: kurskode
-      newark_report_header_course_id: "kurs ID"
-      newark_report_header_course_name: kursnavn
-      newark_report_header_course_sis_id: "kurs sis id"
-      newark_report_header_section_name: klassenavn
-      newark_report_header_teacher_name: "foreleser navn"
     safety_drill_csv_parameters: 
       account_reports: 
         newark: 
@@ -1275,7 +849,6 @@ nb:
       help_link_available_to_all_teachers: Forelesere
       help_link_available_to_all_users: Brukere
       if_you_would_like_to_link_to_your_own_campus_support_website_in_the_help_dialog_you_can_do_that_here: "Hvis du vil lenke til hjemmesiden for din egen Campus-brukerstøtte i hjelp-dialogen kan du gjøre det her"
-      interpolate_account_domain: "Merk: Skriv inn \"{{ACCOUNT_DOMAIN}}\" som substitutt for brukerens rotdomene"
       ip_filter_filter_label: Filter
       ip_filter_name_label: Navn
       labels: 
@@ -1485,9 +1058,6 @@ nb:
         other: "%{count} batcher venter på prosessering."
       pending_batches_title: "Ventende batcher"
       process_data_button: "Prosesser data"
-      select_file_instructions: |-
-          Velg zip-filen du ønsker å importere.
-          For en beskrivelse av hvordan å generere disse zip-filene, [se denne dokumentasjonen](%{url}).
       sis_import_crumb: SIS-import
       started_at_message: "Startet: %{started_at}"
       title: SIS-import
@@ -1531,135 +1101,21 @@ nb:
         one: "%{file_size} *fra en fil*"
         other: "%{file_size} *fra %{count} filer*"
       uploaded_file_storage_header: "Lagring opplastede filer"
-    student_access_csv_description: 
-      access_report_header_content: innhold
-      access_report_header_content_access_id: "innholdstilgang id"
-      access_report_header_content_type: innholdstype
-      access_report_header_course_id: "kurs ID"
-      access_report_header_course_name: kursnavn
-      access_report_header_course_sis_id: "kurs sis id"
-      access_report_header_last_viewed: "sist sett på"
-      access_report_header_root_account_id: "rot-konto id"
-      access_report_header_section_id: klasse-ID
-      access_report_header_section_name: klassenavn
-      access_report_header_section_sis_id: "klasse sis id"
-      access_report_header_term_id: "semester id"
-      access_report_header_term_sis_id: "semester sis id"
-      access_report_header_times_participated: "antall ganger deltatt"
-      access_report_header_times_viewed: "antall ganger sett"
-      access_report_header_user_id: "bruker id"
-      access_report_header_user_sis_id: "bruker sis id"
-      account_reports: 
-        tmcc: 
-          description: 
-            header: Eksempel
-          student_activity: 
-            text: "Denne rapporten viser all aktivitet fra brukere som er påmeldt et gitt kurs eller alle kurs i et gitt semester. Den resulterende csv-filen vil ha en rad pr studentaktivitet og har følgende overskrifter; klasse id, klasse sis id, klassenavn, kurs id, kurs sis id, kursnavn, bruker id, bruker sis id, innholdstype, innhold, antall ganger vist, antall ganger deltatt, sist sett. Antall ganger vist og deltatt er tellere helt fra begynnelsen og frem til rapporten ble generert."
     student_assignment_outcome_map_csv_description: 
       account_reports: 
         student_assignment_map: 
           description: 
-            header: Eksempel
             text: "Denne rapporten viser resultatet av læringsmålet for alle studenter. Den resulterende CSV-filen har én rad per bruker-mål-resultat-par, og viser resultatdetaljer inkludert tilhørende oppgave. Denne rapporten viser kun resultat for oppgaver og inkluderer ikke resultat som tilhører spørsmålsbanker."
-      outcome_report_header_assignment_id: "oppgave id"
-      outcome_report_header_assignment_title: "oppgave navn"
-      outcome_report_header_assignment_url: "oppgave url"
-      outcome_report_header_attempt: forsøk
-      outcome_report_header_course_id: "kurs ID"
-      outcome_report_header_course_name: kursnavn
-      outcome_report_header_course_sis_id: "kurs sis id"
-      outcome_report_header_learning_outcome_id: "læringsmål id"
-      outcome_report_header_learning_outcome_name: "læringsmål navn"
-      outcome_report_header_outcome_score: resultat
-      outcome_report_header_section_id: klasse-ID
-      outcome_report_header_section_name: klassenavn
-      outcome_report_header_section_sis_id: "klasse sis id"
-      outcome_report_header_student_id: "student id"
-      outcome_report_header_student_name: studentnavn
-      outcome_report_header_student_sis_id: "student sis id"
-      outcome_report_header_submission_date: "dato for innlevering"
-      outcome_report_header_submission_score: innleveringsresultat
-    student_grades_csv_description: 
-      account_reports: 
-        auburn: 
-          student_grades: 
-            description: 
-              text: "Denne rapporten viser studentenes endelige karakterresultater for studenter i et gitt semester. Den resulterende csv-filen vil ha en rad per påmelding, og vil vise den nåværende og endelig karakter som vises i kursets karakterbok."
-        default: 
-          description: 
-            header: Eksempel
-      auburn_report_header_course: kurs
-      auburn_report_header_course_id: "kurs ID"
-      auburn_report_header_course_sis: "kurs sis"
-      auburn_report_header_current_score: "gjeldende resultat"
-      auburn_report_header_enrollment_state: påmeldingsstatus
-      auburn_report_header_final_score: sluttresultat
-      auburn_report_header_section: klasse
-      auburn_report_header_section_id: klasse-ID
-      auburn_report_header_section_sis: "klasse sis"
-      auburn_report_header_student_id: "student id"
-      auburn_report_header_student_name: studentnavn
-      auburn_report_header_student_sis: "student sis"
-      auburn_report_header_term: semester
-      auburn_report_header_term_id: "semester id"
-      auburn_report_header_term_sis: "semester sis"
     student_grades_csv_parameters: 
       account_reports: 
         auburn: 
           pseudonym_ids: 
             field: Psevdonym-ID-er
-    student_ip_csv_description: 
-      account_reports: 
-        dubspot: 
-          description: 
-            header: Eksempel
-          student_login: 
-            text: "Denne rapporten viser alle studenter som er påmeldt et gitt kurs eller alle kurs i et gitt semester. Den resulterende csv-filen vil ha én rad per studentpåmelding."
-      dubspot_report_header_course_id: "kurs ID"
-      dubspot_report_header_course_name: kursnavn
-      dubspot_report_header_course_sis_id: "kurs sis id"
-      dubspot_report_header_ip_address: "ip adresse"
-      dubspot_report_header_last_seen_at: "sist sett"
-      dubspot_report_header_section_id: klasse-ID
-      dubspot_report_header_section_name: klassenavn
-      dubspot_report_header_section_sis_id: "klasse sis id"
-      dubspot_report_header_user_id: "bruker id"
-      dubspot_report_header_user_login_id: "brukers innloggings id"
-      dubspot_report_header_user_sis_id: "bruker sis id"
-    student_submissions_csv_description: 
-      account_reports: 
-        vilas: 
-          description: 
-            header: Eksempel
-          student_submissions: 
-            text: "Dette er en rapport over alle studenter i et kurs i en gitt periode som har sendt inn en oppgave. Denne rapporten inneholder en rad per studentinnlevering."
-      vilas_report_header_assignment_id: "oppgave id"
-      vilas_report_header_assignment_name: "oppgave navn"
-      vilas_report_header_canvas_course_id: "canvas kurs id"
-      vilas_report_header_canvas_user_id: "canvas bruker id"
-      vilas_report_header_course_name: kursnavn
-      vilas_report_header_points_possible: "poeng oppnåelig"
-      vilas_report_header_score: resultat
-      vilas_report_header_sis_course_id: "sis kurs id"
-      vilas_report_header_sis_user_id: "sis bruker id"
-      vilas_report_header_submission_date: "dato for innlevering"
-      vilas_report_header_user_name: brukernavn
     students_with_no_submissions_csv_description: 
       account_reports: 
         default: 
           students_with_no_submissions: 
-            description: 
-              header: Eksempel
             text: "Dette er en rapport over alle studenter påmeldt i et kurs i et gitt semester som ikke har levert besvarelse innenfor gitte datoer. Rapporten inneholder en rad pr påmeldt student som tilfredsstiller kriteriet. Tidsperioden kan ikke være lenger enn to uker."
-      student_report_header_course_id: "kurs ID"
-      student_report_header_course_name: kursnavn
-      student_report_header_course_sis_id: "kurs sis id"
-      student_report_header_section_id: klasse-ID
-      student_report_header_section_name: klassenavn
-      student_report_header_section_sis_id: "klasse sis id"
-      student_report_header_user_id: "bruker id"
-      student_report_header_user_name: brukernavn
-      student_report_header_user_sis_id: "bruker sis id"
     students_with_no_submissions_csv_parameters: 
       account_reports: 
         default: 
@@ -1669,31 +1125,6 @@ nb:
             check_box: "Inkluder påmeldingsstatus"
       active: "Aktive påmeldinger"
       all: "Alle påmeldinger"
-    submission_data_csv_description: 
-      account_reports: 
-        submission_data: 
-          description: 
-            text: "Denne rapporten inneholder innleveringsdatoer for oppmøteverktøyet."
-    tempe_grade_export_csv_description: 
-      account_reports: 
-        tempe: 
-          description: 
-            header: Eksempel
-          grade_export: 
-            text: "Denne rapporten viser studentens endelige karakterresultater for alle studenter i et gitt semester. Den resulterende tabulatordelt filen vil ha en rad per registrering, og vil vise den endelige karakteren og flere kursinformasjonsfelt som brukes for å laste opp karakterdata til Synergy SIS."
-      tempe_report_header_absences: FRAVÆR
-      tempe_report_header_citizenship: STATSBORGERSKAP
-      tempe_report_header_comment_1: KOMMENTAR_1
-      tempe_report_header_comment_2: KOMMENTAR_2
-      tempe_report_header_comment_3: KOMMENTAR_3
-      tempe_report_header_grade_mark: GRADE_MARK
-      tempe_report_header_grading_term: KARAKTER_SEMESTER
-      tempe_report_header_mark_name: MARK_NAME
-      tempe_report_header_school_code: INSTITUSJON_KODE
-      tempe_report_header_school_year: INSTITUSJON_ÅR
-      tempe_report_header_section_id: KLASSE_ID
-      tempe_report_header_sis_number: SIS_ANTALL
-      tempe_report_header_workhabits: ARBEIDSVANER
     tempe_grade_export_csv_parameters: 
       account_reports: 
         tempe: 
@@ -1718,54 +1149,14 @@ nb:
       account_reports: 
         default: 
           unpublishd_courses: 
-            header: Eksempel
             text: "Denne rapporten viser alle kurs i et gitt semester som ikke er publisert. Den resulterende CSV-filen vil ha én rad per kurs og vil vise kurs-ID-en, kursets SIS-ID, kursets kortnavn, kursets navn og kursets start- og sluttdatoer."
-      course_report_header_end_date: sluttdato
-      course_report_header_id: id
-      course_report_header_name: navn
-      course_report_header_short_name: kortnavn
-      course_report_header_sis_id: "sis id"
-      course_report_header_start_date: startdato
     unrecognized_time_zone: "'%{timezone}' gjenkjennes ikke som tidssone"
     unused_courses_csv_description: 
       account_reports: 
         unused_courses: 
-          description: 
-            header: Eksempel
           main: 
             text: "Dette er en rapport over alle kurs som mangler alle følgende elementer: oppgaver, kunngjøringer, diskusjoner, filer, moduler, sider og prøver."
-      course_report_header_course_id: "kurs ID"
-      course_report_header_course_sis_id: "kurs sis id"
-      course_report_header_created_at: opprettet
-      course_report_header_long_name: "langt navn"
-      course_report_header_short_name: kortnavn
-      course_report_header_status: status
     update_failed_notice: "Oppdatering av kontoinnstillinger feilet"
-    user_access_csv_description: 
-      access_report_header_content: innhold
-      access_report_header_content_access_id: "innholdstilgang id"
-      access_report_header_content_type: innholdstype
-      access_report_header_course_id: "kurs ID"
-      access_report_header_course_name: kursnavn
-      access_report_header_course_sis_id: "kurs sis id"
-      access_report_header_enrollment_type: påmeldingstype
-      access_report_header_last_viewed: "sist sett på"
-      access_report_header_root_account_id: "rot-konto id"
-      access_report_header_section_id: klasse-ID
-      access_report_header_section_name: klassenavn
-      access_report_header_section_sis_id: "klasse sis id"
-      access_report_header_term_id: "semester id"
-      access_report_header_term_sis_id: "semester sis id"
-      access_report_header_times_participated: "antall ganger deltatt"
-      access_report_header_times_viewed: "antall ganger sett"
-      access_report_header_user_id: "bruker id"
-      access_report_header_user_sis_id: "bruker sis id"
-      account_reports: 
-        usu: 
-          description: 
-            header: Eksempel
-          user_activity: 
-            text: "Denne rapporten viser all aktivitet fra brukere som er påmeldt et gitt kurs i et spesifikt semester. Den resulterende csv-filen vil ha en rad pr studentaktivitet og har følgende overskrifter; enrollment_type, section id, section sis id, section name, course id, course sis id, course name, user id, user sis id, content type, content, times viewed, times participated, last viewed. Antall ganger vist og deltatt er tellere helt fra begynnelsen og frem til rapporten ble generert."
     user_access_csv_parameters: 
       account_reports: 
         usu: 
@@ -1781,46 +1172,11 @@ nb:
     user_added_message: "*%{user}* lagt til!"
     user_added_message_sent_message: "*%{user}* lagt til med suksess! De vil snart motta en bekreftelse via e-post.."
     user_deleted_message: "%{username} ble slettet"
-    user_inactivity_csv_description: 
-      account_reports: 
-        webster: 
-          description: 
-            header: Eksempel
-          low_activity: 
-            text: "Denne rapporten viser alle brukerne som deltok i et gitt kurs eller alle kurs i et gitt semester. Den resulterende csv-filen vil ha en rad per brukerpåmelding som ikke har besøkt et minimum antall kurselementer."
-      webster_report_header_course_id: "kurs ID"
-      webster_report_header_course_name: kursnavn
-      webster_report_header_course_sis_id: "kurs sis id"
-      webster_report_header_enrollment_state: påmeldingsstatus
-      webster_report_header_enrollment_type: påmeldingstype
-      webster_report_header_last_ip: "siste ip"
-      webster_report_header_login_id: "innloggings id"
-      webster_report_header_user_id: "bruker id"
-      webster_report_header_user_name: brukernavn
-      webster_report_header_user_sis_id: "bruker sis id"
     user_inactivity_csv_parameters: 
       account_reports: 
         webster: 
           login: 
             day_drop: "Minimum kurselementer besøkt:"
-    user_notes_csv_description: 
-      account_reports: 
-        pasco: 
-          description: 
-            header: Eksempel
-          user_notes: 
-            text: "Denne rapporten viser studentenes notater."
-      pasco_report_header_created_at: laget_ved
-      pasco_report_header_created_by_id: laget_av_id
-      pasco_report_header_deleted_at: slettet_ved
-      pasco_report_header_note: merknad
-      pasco_report_header_note_id: id
-      pasco_report_header_title: tittel
-      pasco_report_header_updated_at: oppdatert_ved
-      pasco_report_header_user_id: bruker_id
-      pasco_report_header_user_sis_id: bruker_sis_id
-      pasco_report_header_workflow_state: arbeidsflyt_tilstand
-      pasco_report_url: URL
     users_list: 
       login_name_or_sis_id: "Innlogging / SIS-ID"
       name: Navn
@@ -1830,59 +1186,12 @@ nb:
       account_reports: 
         default: 
           zero_activity: 
-            header: Eksempel
             text: "Denne rapporten viser alle studenter som er påmeldt kurs i et gitt semester. Den resulterende CSV-filen vil ha én rad per brukerpåmelding som ikke har besøkt kurset siden datoen."
-      student_report_header_course_id: "kurs ID"
-      student_report_header_course_name: kursnavn
-      student_report_header_course_sis_id: "kurs sis id"
-      student_report_header_name: Navn
-      student_report_header_section_id: klasse-ID
-      student_report_header_section_name: klassenavn
-      student_report_header_section_sis_id: "klasse sis id"
-      student_report_header_user_id: "bruker id"
-      student_report_header_user_sis_id: "bruker sis id"
-  ace_report_header_correct: korrekt
-  ace_report_header_count_correct: "antall korrekt"
-  ace_report_header_count_taken: "opptelling utført"
-  ace_report_header_course_id: "kurs ID"
-  ace_report_header_course_sis_id: "kurs sis id"
-  ace_report_header_login_id: "innloggings id"
-  ace_report_header_outcome_id: "læringsmål id"
-  ace_report_header_outcome_ids: "resultat IDer"
-  ace_report_header_points_earned: "poeng opptjent"
-  ace_report_header_points_possible: "poeng oppnåelig"
-  ace_report_header_question_id: "spørsmål id"
-  ace_report_header_question_name: spørsmålsnavn
-  ace_report_header_question_text: spørsmålstekst
-  ace_report_header_quiz_title: prøvenavn
-  ace_report_header_user_id: "bruker id"
-  ace_report_header_user_name: brukernavn
-  ace_report_header_user_sis_id: "bruker sis id"
   activerecord: 
     errors: 
-      full_messages: 
-        format: "%{attribute} %{message}"
       messages: 
-        accepted: "må aksepteres"
-        blank: "må fylles ut"
-        confirmation: "samsvarer ikke med bekreftelsen"
-        empty: "kan ikke være tom"
-        equal_to: "må være lik %{count}"
-        even: "må være partall"
-        exclusion: "er reservert"
-        greater_than: "må være større enn %{count}"
-        greater_than_or_equal_to: "må være større enn eller lik %{count}"
-        inclusion: "er ikke inkludert i listen"
-        invalid: "er ugyldig"
-        less_than: "må være mindre enn %{count}"
-        less_than_or_equal_to: "må være mindre enn eller lik %{count}"
-        not_a_number: "er ikke et nummer"
-        odd: "må være oddetall"
         record_invalid: "Validering feilet: %{errors}"
         taken: "er opptatt"
-        too_long: "er for lang (maksimum er %{count} tegn)"
-        too_short: "er for kort (minimum er %{count} tegn)"
-        wrong_length: "er feil lengde (skal være %{count} tegn)"
       template: 
         body: "Det var problemer med følgende felt:"
         header: 
@@ -2864,48 +2173,12 @@ nb:
     titles: 
       attendance_help: "For hjelp om oppmøte"
       new_attendance_column: "Ny kolonne for oppmøte"
-  auburn_report_header_account_id: "konto id"
-  auburn_report_header_account_name: kontonavn
-  auburn_report_header_account_sis_id: "konto sis id"
-  auburn_report_header_course: kurs
-  auburn_report_header_course_id: "kurs ID"
-  auburn_report_header_course_name: kursnavn
-  auburn_report_header_course_sis: "kurs sis"
-  auburn_report_header_course_sis_id: "kurs sis id"
-  auburn_report_header_course_status: kursstatus
-  auburn_report_header_current_score: "gjeldende resultat"
-  auburn_report_header_effective_date: virkningsdato
-  auburn_report_header_end_date: sluttdato
-  auburn_report_header_enrollment_state: påmeldingsstatus
-  auburn_report_header_final_score: sluttresultat
-  auburn_report_header_section: klasse
-  auburn_report_header_section_id: klasse-ID
-  auburn_report_header_section_name: klassenavn
-  auburn_report_header_section_sis: "klasse sis"
-  auburn_report_header_section_sis_id: "klasse sis id"
-  auburn_report_header_start_date: startdato
-  auburn_report_header_student_count: "antall studenter"
-  auburn_report_header_student_id: "student id"
-  auburn_report_header_student_name: studentnavn
-  auburn_report_header_student_sis: "student sis"
-  auburn_report_header_teacher_id: "faglærer id"
-  auburn_report_header_teacher_name: "foreleser navn"
-  auburn_report_header_teacher_sis_id: "foreleser sis id"
-  auburn_report_header_term: semester
-  auburn_report_header_term_id: "semester id"
-  auburn_report_header_term_name: semesternavn
-  auburn_report_header_term_sis: "semester sis"
-  auburn_report_header_term_sis_id: "semester sis id"
   auth_logging: 
     login: "LOGG INN"
     logout: "LOGG UT"
   bb_display: "Blackboard Learn"
   bb_file_description: "Blackboard 6/7/8/9 export .zip file"
   bb_name: Blackboard-konvertør
-  better_file_browsing_description: |-
-      Et nytt, enklere, og mer brukervennlig søkegrensesnitt for å finne filer. Hvis du aktiverer denne på kursnivå,
-      så vil alle brukerne i respektive kurs se det nye grensesnittet. For at det skal vises når noen
-      går til sin personlige side med personlige filer ('/ filer') så må du slå den på for kontoen de er en del av.
   big_blue_button_conference: 
     conference_is_recorded: "Denne konferansen tas opp."
     recording_setting: "Spiller inn"
@@ -2914,12 +2187,6 @@ nb:
     no_manifest: "Denne Blackboard-zipfilen har ingen imsmanifest.xml-fil i rotmappen."
   bookmark_service: 
     default_title: "Ingen tittel"
-  bucks_report_header_last_access_to_canvas: "forrige tilgang til canvas"
-  bucks_report_header_name: Navn
-  bucks_report_header_section_id: klasse-ID
-  bucks_report_header_section_name: klassenavn
-  bucks_report_header_section_sis_id: "klasse sis id"
-  bucks_report_header_user_sis_id: "bruker sis id"
   bucks_zero_activity_title: "Bucks Zero Activity"
   bulk_course_migration: 
     export_failed: "En feil oppsto under eksporteringen av kurset med bb_lcid %{id} fra Blackboard"
@@ -3515,49 +2782,12 @@ nb:
     by_sa: "CC Navngivelse-Del på samme vilkår BY-SA"
     private: "Privat (Kopibeskyttet)"
     public_domain: "Åpent område"
-  ccp_report_header_course_id: "kurs ID"
-  ccp_report_header_course_name: kurs_navn
-  ccp_report_header_course_sis_id: "kurs sis id"
-  ccp_report_header_email: epost
-  ccp_report_header_enrollment_type: påmeldingstype
-  ccp_report_header_first_name: fornavn
-  ccp_report_header_last_name: etternavn
-  ccp_report_header_section_id: klasse-ID
-  ccp_report_header_section_name: klassenavn
-  ccp_report_header_section_sis_id: "klasse sis id"
-  ccp_report_header_user_id: "bruker id"
-  ccp_report_header_user_sis_id: "bruker sis id"
   ccp_zero_activity_title: "CCP Ingen activitet"
-  cedar_rapids_report_header_account_id: Konto-ID
-  cedar_rapids_report_header_account_name: Kontonavn
-  cedar_rapids_report_header_course_end_date: "Kurs sluttdato"
-  cedar_rapids_report_header_course_id: Kurs-ID
-  cedar_rapids_report_header_course_name: Kursnavn
-  cedar_rapids_report_header_course_start_date: "Kurs startdato"
-  cedar_rapids_report_header_course_status: Kursstatus
-  cedar_rapids_report_header_department_id: "Avdelings ID"
-  cedar_rapids_report_header_department_name: "Avdeling Navn"
-  cedar_rapids_report_header_observer_count: "Observatører antall"
-  cedar_rapids_report_header_student_count: "Student antall"
-  cedar_rapids_report_header_ta_count: "Antall Læringsassistenter"
-  cedar_rapids_report_header_teacher_count: "Faglærer antall"
-  cedar_rapids_report_header_term_id: "Semester ID"
-  cedar_rapids_report_header_term_name: Semesternavn
   change_points_possible_to_match_rubric_dialog: 
     prompts: 
       update_assignment_points: "Denne oppgaven har %{assignmentPoints} oppnåelige poeng, ønsker du å endre den til å ha %{rubricPoints} oppnåelige poeng for å passe med denne vurderingen?"
     titles: 
       update_assignment_points: "Endre oppnåelige poeng for å passe med vurderingen?"
-  chcp_report_header_course: kurs
-  chcp_report_header_email: epost
-  chcp_report_header_grade: karakter
-  chcp_report_header_last_submissio: "siste innlevering"
-  chcp_report_header_lda: lda
-  chcp_report_header_phone: telefon
-  chcp_report_header_start_date: startdato
-  chcp_report_header_student_id: "student id"
-  chcp_report_header_student_name: studentnavn
-  chcp_report_header_teacher: foreleser
   chcp_student_activity_title: "CHCP Student aktivitetsrapport"
   collaboration: 
     default_title: "Samarbeid uten navn"
@@ -3654,10 +2884,6 @@ nb:
         current: "Gjeldende samarbeid"
     titles: 
       delete: "Slette samarbeid?"
-  collection_items: 
-    new: 
-      pin_to_canvas_network: "Fest til Canvas Network"
-      saved_successfully: Lagret
   comm_messages: 
     from_beginning: begynnelsen
     to_now: nå
@@ -3726,16 +2952,6 @@ nb:
     profile: 
       notices: 
         contact_registered: "Kontaktmetode er registrert!"
-  concord_report_header_campus: campus
-  concord_report_header_course_name: kursnavn
-  concord_report_header_course_sis_id: "kurs sis id"
-  concord_report_header_last_course_activity_date: "siste dato med aktiviteter på kurset"
-  concord_report_header_student_current_grade: "studentens gjeldende karakter"
-  concord_report_header_student_default_email: "studentens standard epost"
-  concord_report_header_student_name: studentnavn
-  concord_report_header_student_sis_id: "student sis id"
-  concord_report_header_term_name: "semester navn"
-  concord_report_header_zero_grade_assignments: "ingen oppgaver med karakter"
   conferences: 
     concluded_conference: 
       delete: Slett
@@ -3814,7 +3030,6 @@ nb:
     buttons: 
       process: "Behandle data"
     errors: 
-      couldnt_create: "Kunne ikke etablere kurs-eksport."
       error: "Det oppsto en feil i eksporten av ditt kursinnhold. Vær snill å kontakte system administrator og gi De den følgende eksportidentifikator: \"%{code}\""
       not_found: "Eksporten eksisterer ikke"
     index: 
@@ -5015,17 +4230,6 @@ nb:
       uuid: UUID
       wiki_id: Wiki-ID
       workflow_state: "Arbeidsflyt status"
-  course_report_header_course_id: "kurs ID"
-  course_report_header_course_sis_id: "kurs sis id"
-  course_report_header_created_at: opprettet
-  course_report_header_end_date: sluttdato
-  course_report_header_id: id
-  course_report_header_long_name: "langt navn"
-  course_report_header_name: Navn
-  course_report_header_short_name: kortnavn
-  course_report_header_sis_id: "sis id"
-  course_report_header_start_date: startdato
-  course_report_header_status: status
   course_restore: 
     restore_error: "En feil oppsto under forsøket på å gjenopprette kurset. Kurset ble ikke gjenopprettet."
   course_search: 
@@ -5169,7 +4373,6 @@ nb:
               
               **Logg inn** eller ***registrer deg*** for å gjøre krav på dette kurset.
         files: "Filer-fanen er stedet du deler forelesningspresentasjoner, eksempeldokumenter, studietips – alt det studentene dine vil ønske å laste ned. Å laste opp og organisere filene er enkelt med Canvas. Vi vil vise deg hvordan du gjør det."
-        home: "Når noen besøker kurset, er dette siden de får se. Du kan gjøre at den viser en aktivitetsstrøm, listen over kursmoduler, pensum eller en egendefinert side du skriver selv. Standarden er aktivitetsstrømmen. For å endre på dette, klikk %{change_layout}."
         import: "Om du har brukt en annen læringsplattform har du sikkert saker der som du ønsker å flytte over til Canvas. Vi kan vise deg prosessen med hvordan man enkelt flytter innholdet over til Canvas."
         navigation: "Som standard er alle lenker slått på for et kurs. Studentene vil ikke se lenker til klasser som ikke har innhold. For eksempel, om du ikke har opprettet noen prøver, vil de ikke se lenka til prøver. Du kan sortere og bevisst slå av disse lenkene om det er deler av kurset du ikke vil at studentene skal ha tilgang til."
         publish: 
@@ -5770,8 +4973,6 @@ nb:
       one: "Vis %{count} diskusjon"
       other: "Vis %{count} diskusjoner"
     enable_dashboard: "Prøv det nye kontrollpanelet"
-    event_created: "Hendelse opprettet"
-    message_sent: "Beskjed sendt"
     show_more_link: 
       show_less: "Vis mindre"
       show_more: "Vis mer"
@@ -6291,30 +5492,12 @@ nb:
     unsubscribed: "Abonnument avsluttet"
     unsubscribed_hint: "Du abonnerer ikke på dette temaet. Klikk for å abonnere."
   draft_state_description: "Denne betafunksjonen redesigner mange deler av Canvas og lar innhold eksistere i en ny upublisert status som er usynlig for studenter og ekskluderes fra karakterberegninger. Advarsel – å slå av denne funksjonen kan føre til sletting av nylig opprettet eller redigert innhold fra foreleserens visning."
-  dubspot_report_header_course_id: "kurs ID"
-  dubspot_report_header_course_name: kursnavn
-  dubspot_report_header_course_sis_id: "kurs sis id"
-  dubspot_report_header_ip_address: "ip adresse"
-  dubspot_report_header_last_seen_at: "sist sett"
-  dubspot_report_header_section_id: klasse-ID
-  dubspot_report_header_section_name: klassenavn
-  dubspot_report_header_section_sis_id: "klasse sis id"
-  dubspot_report_header_user_id: "bruker id"
-  dubspot_report_header_user_login_id: "brukers innloggings id"
-  dubspot_report_header_user_sis_id: "bruker sis id"
   due_dates: 
     due_at: "leveres innen: %{assignment_due_date_time}"
     multiple_due_dates: "frist: Flere frister"
     no_due_date: "leveres innen: Ingen frist"
   ecollege_file_description: Ecollege
   ecollege_name: Ecollege-konvertør
-  edison: 
-    outcome: 
-      extra_text: "Læringsmål ID: %{outcome_id};"
-    quiz_id: 
-      extra_text: "Prøve id: %{quiz_id};"
-    section_id: 
-      extra_text: "Klasse: %{section_id};"
   edit_rubric: 
     buttons: 
       create_rubric: "Opprett vurderingsveiledning"
@@ -6747,7 +5930,6 @@ nb:
       links: 
         add_external_feed: "Legg til ekstern informasjonsstrøm"
       options: 
-        content_to_post: "--Innhold å poste--"
         full_article: "Hele artikkelen"
         link_only: "Kun lenke"
         truncated: Avkortet
@@ -7132,17 +6314,6 @@ nb:
     no_deleting_folders_with_content: "Kan ikke slette en mappe med innhold"
     no_deleting_root: "Kan ikke slette rotmappen"
     only_one_folder: "Kan ikke sette mappesti og mappe-ID"
-  galen_report_header_account_id: konto_id
-  galen_report_header_account_name: konto_navn
-  galen_report_header_course_name: kurs_navn
-  galen_report_header_course_sis_id: kurs_sis_id
-  galen_report_header_first_submission: første_innlevering
-  galen_report_header_resource_type: ressurs_type
-  galen_report_header_section_sis_id: klasse_sis_id
-  galen_report_header_submission_date: innlevering_dato
-  galen_report_header_submission_type: innlevering_type
-  galen_report_header_title: tittel
-  galen_report_header_user_sis_id: bruker_sis_id
   global_message_icons: 
     announcement: kunngjøring
     calendar: kalender
@@ -7162,21 +6333,6 @@ nb:
       checkbox: "Ikke vis for dette kurset senere."
       warning: Advarsel
   grade_export_title: Karaktereksport
-  grade_report_header_course: kurs
-  grade_report_header_course_id: "kurs ID"
-  grade_report_header_course_sis: "kurs sis"
-  grade_report_header_current_score: "gjeldende resultat"
-  grade_report_header_enrollment_state: påmeldingsstatus
-  grade_report_header_final_score: sluttresultat
-  grade_report_header_section: klasse
-  grade_report_header_section_id: klasse-id
-  grade_report_header_section_sis: "klasse sis"
-  grade_report_header_student_id: "student id"
-  grade_report_header_student_name: studentnavn
-  grade_report_header_student_sis: "student sis"
-  grade_report_header_term: semester
-  grade_report_header_term_id: "semester id"
-  grade_report_header_term_sis: "semester sis"
   grade_summary: 
     graph_title: "Gjennomsnitt %{mean}, Høy %{high}, Lav %{low}"
     outcome: 
@@ -7704,27 +6860,6 @@ nb:
       saving: Lagrer...
     titles: 
       grading_scheme_info: "Se/rediger karaktersettingsplan"
-  granite_report_header_account_id: konto_id
-  granite_report_header_assignment_id: oppgave_id
-  granite_report_header_assignment_name: oppgave_navn
-  granite_report_header_assignment_unique_id: oppgave_unik_id
-  granite_report_header_course_id: kurs_id
-  granite_report_header_department: Avdeling
-  granite_report_header_ends: Slutter
-  granite_report_header_graded_at: rettet_ved
-  granite_report_header_name: Navn
-  granite_report_header_observer_count: Observatør_antall
-  granite_report_header_sis_id: SIS_Id
-  granite_report_header_starts: Starter
-  granite_report_header_student_count: Student_Antall
-  granite_report_header_submission_date: innlevering_dato
-  granite_report_header_submission_id: innlevering_id
-  granite_report_header_submission_score: innlevering_resultat
-  granite_report_header_ta_count: LA_Antall
-  granite_report_header_teacher_count: Foreleser_Antall
-  granite_report_header_term: Semester
-  granite_report_header_term_id: semester_id
-  granite_report_header_user_id: bruker_id
   group: 
     greater_than_1: "Må være større enn én"
     memeber: Medlem
@@ -8222,7 +7357,6 @@ nb:
       search_by_tag: "Søk basert på merking"
     confirms: 
       default_delete_thing: "Er du sikker på at du ønsker å slette dette?"
-    course_time: "KURS:"
     datepicker: 
       titles: 
         am_pm: am/pm
@@ -8248,7 +7382,6 @@ nb:
       minimize_youtube_video: "Minimer video"
       view_equella_content_in_new_window: "se innholdet i et nytt vindu"
     loading: Laster...
-    local_time: "LOKAL:"
     no_description: "Ingen beskrivelse"
     no_items: "Ingen elementer."
     no_results_found: "Ingen resultater funnet"
@@ -8351,7 +7484,6 @@ nb:
       links: 
         close: Lukk
         dashboard: "Mitt kontrollpanel"
-        home: Hjem
         skip_to_content: "Gå til innhold"
       menu: 
         assignments: Oppgaver
@@ -8465,17 +7597,6 @@ nb:
       word_separator: " "
   license_help: 
     content_license_help: "Hjelp for lisensiering av innhold"
-  lincoln_report_header_course_id: Kurs-ID
-  lincoln_report_header_course_name: Kursnavn
-  lincoln_report_header_course_role: Kursrolle
-  lincoln_report_header_course_sis_id: "SIS-ID for kurs"
-  lincoln_report_header_current_grade: "Gjeldende karakter"
-  lincoln_report_header_invalid_term: "Ugyldig semester"
-  lincoln_report_header_login: "innlogings ID"
-  lincoln_report_header_student_name: Studentnavn
-  lincoln_report_header_student_sis: "Student SIS ID"
-  lincoln_report_header_term_id: "Semester ID"
-  lincoln_report_header_term_name: Semesternavn
   link_enrollment: 
     buttons: 
       link: "Lenke til Student"
@@ -9304,7 +8425,6 @@ nb:
         subject: "Kurseksport feilet: %{course}"
     content_export_finished: 
       email: 
-        body: "Din eksport av kurset \"%{course}\" er ferdig."
         html: 
           body2: "Eksport av *%{course}* er fullført."
           link: "Klikk for å se eksporter"
@@ -10504,17 +9624,6 @@ nb:
   migration_issues: 
     errors: 
       valid_workflow_state: "Må sende en gyldig arbeidsflyt-status"
-  mississippi_report_header_course_id: kurs_id
-  mississippi_report_header_enrollment_id: påmelding_id
-  mississippi_report_header_enrollment_state: påmelding_status
-  mississippi_report_header_observer_sis_id: observatør_sis_id
-  mississippi_report_header_observer_user_id: observatør_bruker_id
-  mississippi_report_header_role: rolle
-  mississippi_report_header_section_id: klasse_id
-  mississippi_report_header_sis_course_id: sis_kurs_id
-  mississippi_report_header_sis_section_id: sis_klasse_id
-  mississippi_report_header_sis_user_id: sis_bruker_id
-  mississippi_report_header_user_id: bruker_id
   mississippi_sis_title: "SIS data"
   module_item_types: 
     assignment: Oppgave
@@ -10595,21 +9704,6 @@ nb:
   new_styles_description: |-
       Vi jobber med en ansiktsløftning på brukergrensesnittet i Canvas. Slå på dette for å oppleve et
       oppdatert, forenklet utseende på Canvas grensesnittet.
-  newark_report_header__assignment_count: "# oppgaver"
-  newark_report_header_assignment_due_date: oppgavefrist
-  newark_report_header_assignment_group_name: "navn oppgavegruppe"
-  newark_report_header_assignment_id: "oppgave id"
-  newark_report_header_assignment_name: oppgavenavn
-  newark_report_header_course_code: kurskode
-  newark_report_header_course_id: "kurs ID"
-  newark_report_header_course_name: kursnavn
-  newark_report_header_course_sis_id: "kurs sis id"
-  newark_report_header_due_date: frist
-  newark_report_header_section_id: klasse-ID
-  newark_report_header_section_name: klassenavn
-  newark_report_header_student_name: studentnavn
-  newark_report_header_teacher_id: "faglærer id"
-  newark_report_header_teacher_name: faglærernavn
   no_migration_file: "En fil er påkrevet for innholdsflytting."
   not_a_number: "må være et positivt tall"
   notification: 
@@ -10674,17 +9768,6 @@ nb:
     due_date_display: Frist
     files_description: "Ny fil lagt til i kurset ditt"
     files_display: Filer
-    grading_description: |-
-        Inkluderer:
-        
-        * Karakterendringer på oppgaver/innleveringer
-        * Karakterer på oppgaver hvor demping er fjernet
-        * Endringer i karaktervekting
-        
-        &nbsp;
-        
-        Merk av 'Inkluder resultater når det varsles om karakterendringer' om du ønsker å se karakteren din i varslene. 
-        Om eposten din ikke er en institusjonsadresse betyr dette at sensitivt materiale kan sendes utenfor institusjonen.
     grading_display: Karaktersetting
     grading_notify_include_grade: "Inkluder resultat når det varsles om karakterendringer."
     grading_policies_description: "Retningslinjer for karaktersetting i kurset er endret"
@@ -10797,14 +9880,7 @@ nb:
         
         Påmelding for studentavtale
     student_appointment_display: "Påmeldinger til studentavtaler"
-    submission_comment_description: |-
-        Kommentar til oppgaveinnlevering
-        
-        &nbsp;
-        
-        Kryss av for 'Marker nye innleveringskommentarer som lest' om du ikke vil at de skal vises som 'nye' i din Canvas Innboks
     submission_comment_display: Innleveringskommentar
-    submission_new_as_read: "Merk nye innleveringskommentarer som lest."
   notification_preferences: 
     communication: 
       email: 
@@ -10877,29 +9953,6 @@ nb:
     account_group_description: "Resultatgruppe på kontonivå"
   outcome_path_mastery_points: "%{path} mestringspoeng"
   outcome_path_result: "%{path} resultat"
-  outcome_report_header_assessment_id: "vurdering id"
-  outcome_report_header_assessment_question: vurderingsspørsmål
-  outcome_report_header_assessment_question_id: "id for vurderingsspørsmål"
-  outcome_report_header_assessment_title: "vurdering navn"
-  outcome_report_header_assessment_type: "vurdering type"
-  outcome_report_header_assignment_id: "oppgave id"
-  outcome_report_header_assignment_title: "oppgave navn"
-  outcome_report_header_assignment_url: "oppgave url"
-  outcome_report_header_attempt: forsøk
-  outcome_report_header_course_id: "kurs ID"
-  outcome_report_header_course_name: kursnavn
-  outcome_report_header_course_sis_id: "kurs sis id"
-  outcome_report_header_learning_outcome_id: "læringsmål id"
-  outcome_report_header_learning_outcome_name: "læringsmål navn"
-  outcome_report_header_outcome_score: resultat
-  outcome_report_header_section_id: klasse-ID
-  outcome_report_header_section_name: klassenavn
-  outcome_report_header_section_sis_id: "klasse sis id"
-  outcome_report_header_student_id: "student id"
-  outcome_report_header_student_name: studentnavn
-  outcome_report_header_student_sis_id: "student sis id"
-  outcome_report_header_submission_date: "dato for innlevering"
-  outcome_report_header_submission_score: innleveringsresultat
   outcome_results: 
     outcomes_filename: Resultat
   outcome_results_title: Resultater
@@ -11086,33 +10139,10 @@ nb:
     view_more_link: "Vis mer"
   paginated_view: 
     loading_more_results: "Laster flere resultater"
-  pasco_report_header_created_at: laget_ved
-  pasco_report_header_created_by_id: laget_av_id
-  pasco_report_header_deleted_at: slettet_ved
-  pasco_report_header_note: notat
-  pasco_report_header_note_id: id
-  pasco_report_header_title: tittel
-  pasco_report_header_updated_at: oppdatert_ved
-  pasco_report_header_user_id: bruker_id
-  pasco_report_header_user_sis_id: bruker_sis_id
-  pasco_report_header_workflow_state: arbeidsflyt_tilstand
-  pasco_report_url: URL
   pasco_user_notes_title: Brukernotater
   paypal: 
     exception: "Beklager, en feil har oppstått. Prøv igjen senere."
-  pci_report_header_course_sis_id: kurs_sis_id
-  pci_report_header_submission_date: innlevering_dato
-  pci_report_header_submission_type: innlevering_type
-  pci_report_header_user_sis: bruker_sis
   penn_harris_student_grade_title: "Penn Harris Studentkarakterer"
-  ph_student_grades_report_header_account_id: konto_id
-  ph_student_grades_report_header_course_id: kurs_id
-  ph_student_grades_report_header_final_letter_grade: endelig_bokstav_karakter
-  ph_student_grades_report_header_final_score: endelig_resultat
-  ph_student_grades_report_header_mark_type: merke_type
-  ph_student_grades_report_header_term_id: semester_id
-  ph_student_grades_report_header_user_id: bruker_id
-  ph_student_grades_report_term_required: "Et semester kreves for denne rapporten"
   plugins: 
     academic_benchmark_importer: 
       description: "Dette gjør det mulig å importere Academic Benchmark standarder inn i Canvas."
@@ -11761,35 +10791,6 @@ nb:
     upload_file_view: 
       choose_a_picture: "velg et bilde"
       crop_instructions: "For å beskjære bildet, flytt det valgte området for deretter å klikke \"Lagre\" knappen nedenfor."
-  provisioning_report_header_account_id: konto_id
-  provisioning_report_header_associated_user_id: tilhørende_bruker_id
-  provisioning_report_header_canvas_account_id: canvas_konto_id
-  provisioning_report_header_canvas_associated_user_id: canvas_assosiert_bruker_id
-  provisioning_report_header_canvas_course_id: canvas_kurs_id
-  provisioning_report_header_canvas_group_id: canvas_gruppe_id
-  provisioning_report_header_canvas_parent_id: canvas_oopphavs_id
-  provisioning_report_header_canvas_section_id: canvas_klasse_id
-  provisioning_report_header_canvas_term_id: canvas_semester_id
-  provisioning_report_header_canvas_user_id: canvas_bruker_id
-  provisioning_report_header_canvas_xlist_course_id: canvas_xlist_kurs_id
-  provisioning_report_header_course_id: kurs_id
-  provisioning_report_header_email: epost
-  provisioning_report_header_end_date: slutt_dato
-  provisioning_report_header_first_name: fornavn
-  provisioning_report_header_group_id: gruppe_id
-  provisioning_report_header_last_name: etternavn
-  provisioning_report_header_login_id: innloggings_id
-  provisioning_report_header_long_name: langt_navn
-  provisioning_report_header_name: Navn
-  provisioning_report_header_parent_account_id: opphav_konto_id
-  provisioning_report_header_role: rolle
-  provisioning_report_header_section_id: klasse_id
-  provisioning_report_header_short_name: kort_navn
-  provisioning_report_header_start_date: start_dato
-  provisioning_report_header_status: status
-  provisioning_report_header_term_id: semester_id
-  provisioning_report_header_user_id: bruker_id
-  provisioning_report_header_xlist_course_id: xlist_kurs_id
   provisioning_title: Klargjøring
   pseudonym: 
     errors: 
@@ -12170,7 +11171,6 @@ nb:
   quiz_extend_time: 
     ending_time: sluttidspunkt
     extend_time: "Forleng tiden"
-    extensions_student: "Utvid tiden for %{student}"
     extensions_successfully_added: "Utvidelser er lagt til"
     now: nå
   quiz_extensions: 
@@ -12260,15 +11260,6 @@ nb:
   quiz_statistics_route: 
     quiz_statistics: Statistikk
   quiz_statistics_title: Prøvestatistikk
-  quiz_submission: 
-    answers: 
-      correct: Riktig!
-      correct_answers: "Riktige svar"
-      incorrect: Feil
-      partial: Delvis
-      right: "Riktig svar"
-      unanswered: Ubesvart
-      you_answered: "Du svarte"
   quiz_submission_arrows: 
     answers: 
       correct: Riktig!
@@ -13051,8 +12042,6 @@ nb:
         quiz_fudged_negative: "Resultatet på denne prøven har blitt manuelt endret med %{fudge} poeng."
         quiz_fudged_positive: "Resultatet på denne prøven har blitt manuelt endret med +%{fudge} poeng."
         quiz_not_yet_taken: "Denne prøven er ikke tatt ennå."
-        quiz_results_protected: "Prøveresultatene er beskyttet for denne prøven, og er ikke synlige for studenter."
-        quiz_results_protected_until_last_attempt: "Prøveresultatene er beskyttet for denne prøven, og er ikke synlige for studentene før de har levert sitt siste forsøk."
         quiz_submission_needs_review: "Prøven har endret seg signifikant siden innleveringen ble gjort. Denne innleveringen kan ha behov for ny vurdering."
         requires_lockdown: "Respondus LockDown Browser kreves for å vise prøveresultatene dine."
         submitted_at: "Levert %{when}"
@@ -13512,16 +12501,6 @@ nb:
     roles_override_index: 
       account_roles: Kontoroller
       course_roles: Kursroller
-  ross_report_header_comment: Kommentar
-  ross_report_header_course_id: Kurs_ID
-  ross_report_header_grade_posting_date: "Dato karakter er lagt ut"
-  ross_report_header_grade_type: Karaktertype
-  ross_report_header_grade_value_type: "Type av karakterverdi"
-  ross_report_header_miscfield1: MiscField1
-  ross_report_header_miscfield13: MiscField13
-  ross_report_header_miscfield2: MiscField2
-  ross_report_header_numeric_grade: "Numerisk karakter"
-  ross_report_header_source_id: Kilde_ID
   roster: 
     delete_confirm: "Er du sikker på at du ønsker å fjerne denne brukeren?"
     error_sending_invitations: "Feil under invitering. Prøv igjen senere."
@@ -13590,36 +12569,6 @@ nb:
         are_you_sure_remove: "Er du sikker på at du vil fjerne denne vurderingsveiledning fra lista di?"
       remove_rubric: "Fjern denne vurderingsveiledningen fra lista mi"
   safety_drill_title: "Plan for sikkerhetsdrill"
-  samuel_report_header_assessment_question_id: "ID for vurderingsspørsmål"
-  samuel_report_header_assessment_question_name: "Navn for vurderingsspørsmål"
-  samuel_report_header_assignment_description: Oppgavebeskrivelse
-  samuel_report_header_assignment_id: "Oppgave ID"
-  samuel_report_header_assignment_points_possible: "Poeng oppnåelig for oppgaven"
-  samuel_report_header_assignment_title: Oppgavenavn
-  samuel_report_header_assignment_type: Oppgavetype
-  samuel_report_header_course_canvas_id: "Kurs Canvas ID"
-  samuel_report_header_course_current_score: "Kursets nåværende resultat"
-  samuel_report_header_course_name: Kursnavn
-  samuel_report_header_course_sis_id: "SIS-ID for kurs"
-  samuel_report_header_course_student_count: "Kursets studentantall"
-  samuel_report_header_grading_scheme: Karaktersettingsplan
-  samuel_report_header_learning_outcome_desc: "Beskrivelse for læringsmål"
-  samuel_report_header_learning_outcome_id: "Læringsmål ID"
-  samuel_report_header_learning_outcome_score: "Resultat for læringsmål"
-  samuel_report_header_learning_outcome_short_name: "Kortnavn for læringsmål"
-  samuel_report_header_rubric_title: "Navn på vurderingsveiledning"
-  samuel_report_header_section_canvas_id: "Klasse Canvas ID"
-  samuel_report_header_section_name: Klassenavn
-  samuel_report_header_section_sis_id: "Klasse SIS ID"
-  samuel_report_header_student_id: "Student ID"
-  samuel_report_header_student_name: Studentnavn
-  samuel_report_header_student_sis_id: "Student SIS ID"
-  samuel_report_header_subaccount_id: "Underkonto ID"
-  samuel_report_header_subaccount_name: "Underkonto navn"
-  samuel_report_header_submission_date: "Dato for innlevering"
-  samuel_report_header_submission_grade: "Karakter for innleveringen"
-  samuel_report_header_submissions_attempt: Innleveringsforsøk
-  samuel_report_header_teacher_name: Faglærernavn
   scantron_quiz_title: Scantronprøve
   scribd: 
     upgrade_flash: "Hei, du har en gammel versjon av Adobe Flash Player. For å benytte iPaper (og mye annet på web) må du %{link_tag}installere siste versjon av Flash player%{end_link}."
@@ -13931,13 +12880,9 @@ nb:
           email: "Epost (valgfritt)"
     event_list: 
       at_least_more_events: "minst %{count_of_events} til"
-      at_least_more_events_one_week: "minst %{count_of_events} til i kommende uke"
-      at_least_more_events_two_weeks: "minst %{count_of_events} til i de neste to ukene"
       links: 
         view_calendar: "Se kalender"
       more_events: "%{count_of_events} til"
-      more_events_one_week: "%{count_of_events} til i kommende uke"
-      more_events_two_weeks: "%{count_of_events} til i de neste to ukene"
       nothing_for_now: "Ingenting for øyeblikket"
       nothing_one_week: "Ingenting i kommende uke"
       nothing_two_weeks: "Ingenting i de neste to ukene"
@@ -14589,19 +13534,6 @@ nb:
       fremdrift i forhold til på kursets læringsmål. Læringsmålene presenteres i et karakterboklignende
       format og fremdrift vises både som en numerisk resultat og som mestret/nær
       mestring/forbedringspotensial.
-  student_report_header_course_id: "kurs ID"
-  student_report_header_course_name: kursnavn
-  student_report_header_course_sis_id: "kurs sis id"
-  student_report_header_enrollment_state: påmeldingsstatus
-  student_report_header_last_access_at: "forrige tilgang"
-  student_report_header_last_ip: "siste ip"
-  student_report_header_name: Navn
-  student_report_header_section_id: klasse-ID
-  student_report_header_section_name: klassenavn
-  student_report_header_section_sis_id: "klasse sis id"
-  student_report_header_user_id: "bruker id"
-  student_report_header_user_name: brukernavn
-  student_report_header_user_sis_id: "bruker sis id"
   student_submissions_title: Studentinnleveringer
   students_with_no_submissions_title: "Studenter uten innleveringer"
   sub_accounts: 
@@ -14766,8 +13698,6 @@ nb:
       curriculum_assessment_errata_description: "Vis allerede meldt vurderings- og fagplanfeil. Søk etter \"errata\"."
       networking_academy_description: "Vis Cisco sine svar på de vanligst stilte spørsmålene."
       networking_academy_faqs: "Networking Academy FAQs"
-    select: 
-      prompt: "Vennligst velg"
   table_headings: 
     name: Navn
     total: Total
@@ -14796,19 +13726,6 @@ nb:
     tab_location_error: "Den faneplasseringen er ugyldig"
     tab_unmanagable_error: "%{css_class} kan ikke behandles"
   tempe_grade_export_title: "Tempe karaktereksport"
-  tempe_report_header_absences: FRAVÆR
-  tempe_report_header_citizenship: STATSBORGERSKAP
-  tempe_report_header_comment_1: KOMMENTAR_1
-  tempe_report_header_comment_2: KOMMENTAR_2
-  tempe_report_header_comment_3: KOMMENTAR_3
-  tempe_report_header_grade_mark: KARAKTER_MERKE
-  tempe_report_header_grading_term: KARAKTER_SEMESTER
-  tempe_report_header_mark_name: MERKE_NAVN
-  tempe_report_header_school_code: INSTITUSJON_KODE
-  tempe_report_header_school_year: INSTITUSJON_ÅR
-  tempe_report_header_section_id: KLASSE_ID
-  tempe_report_header_sis_number: SIS_ANTALL
-  tempe_report_header_workhabits: ARBEIDSVANER
   terms: 
     index: 
       date: 
@@ -15358,24 +14275,8 @@ nb:
           og i toppmenyen. I mellomtiden kan du melde deg på 
           flere kurs eller fylle inn informasjon i din profil.
       welcome_to_happiness: "Velkommen til Canvas!"
-  ut_austin_report_header_canvas_user_id: "canvas bruker id"
-  ut_austin_report_header_default_email: "standard epost"
-  ut_austin_report_header_google_doc_address: "google doc addresse"
-  ut_austin_report_header_name: Navn
-  ut_austin_report_header_sis_id: "sis id"
   validate: 
     is_required: "Dette feltet er obligatorisk"
-  vilas_report_header_assignment_id: "oppgave id"
-  vilas_report_header_assignment_name: oppgavenavn
-  vilas_report_header_canvas_course_id: "canvas kurs id"
-  vilas_report_header_canvas_user_id: "canvas bruker id"
-  vilas_report_header_course_name: kursnavn
-  vilas_report_header_points_possible: "poeng oppnåelig"
-  vilas_report_header_score: resultat
-  vilas_report_header_sis_course_id: "sis kurs id"
-  vilas_report_header_sis_user_id: "sis bruker id"
-  vilas_report_header_submission_date: "dato for innlevering"
-  vilas_report_header_user_name: brukernavn
   warnings: 
     test_install: 
       periodic_message: "Denne Canvas-installasjonen er kun ment for testing, og blir tilbakestilt periodevis."
@@ -15397,36 +14298,6 @@ nb:
   webct_display: "Blackboard Vista/CE (WebCT)"
   webct_file_description: "Blackboard Vista/CE, WebCT 6+ Course"
   webct_name: "Blackboard Vista/CE (WebCT)"
-  webster_report_header_course_id: "kurs ID"
-  webster_report_header_course_name: kursnavn
-  webster_report_header_course_sis_id: "kurs sis id"
-  webster_report_header_enrollment_state: påmeldingsstatus
-  webster_report_header_enrollment_type: påmeldingstype
-  webster_report_header_last_ip: "siste ip"
-  webster_report_header_login_id: "innloggings id"
-  webster_report_header_user_id: "bruker id"
-  webster_report_header_user_name: brukernavn
-  webster_report_header_user_sis_id: "bruker sis id"
-  westminster_report_header_cohort_id: "kull id"
-  westminster_report_header_cohort_name: kullnavn
-  westminster_report_header_course_name: kursnavn
-  westminster_report_header_current_courses: "gjeldende kurs"
-  westminster_report_header_current_grade: "gjeldende karakter"
-  westminster_report_header_first_name: fornavn
-  westminster_report_header_last_completed_course: "siste fullførte kurs"
-  westminster_report_header_last_completed_module: "siste fullførte modul"
-  westminster_report_header_last_faculty_journal_entry: "siste innlegg i faglærers protokoll"
-  westminster_report_header_last_graded_date: "siste dato for vurdering"
-  westminster_report_header_last_mastered_assignment: "oppgave som er sist mestret"
-  westminster_report_header_last_name: etternavn
-  westminster_report_header_last_submission_date: "dato for siste innlevering"
-  westminster_report_header_last_submission_graded: "siste innlevering vurdert"
-  westminster_report_header_professor_id: "professor id"
-  westminster_report_header_professor_name: "professor navn"
-  westminster_report_header_student_id: "student id"
-  westminster_report_header_student_name: "studentens navn"
-  westminster_report_header_term_taken: "semesteret utført"
-  westminster_report_header_ungraded_submissions: "# av ikke vurderte innleveringer"
   widget: 
     upload_media_track_form: 
       choose_a_language: "--Velg et språk--"
@@ -15608,8 +14479,6 @@ nb:
       page_updated: "Siden ble oppdatert."
     page_link: 
       link_hidden_from_students_warning: "Studentene vil ikke se denne lenken"
-    page_revisions: 
-      page_revisions_title: "%{title}-revisjoner: %{context_name}"
     pages_index: 
       titles: 
         pages: Sider
