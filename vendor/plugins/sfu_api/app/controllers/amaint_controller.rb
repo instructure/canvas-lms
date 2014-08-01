@@ -62,9 +62,9 @@ class AmaintController < ApplicationController
     course_hash["section"] = course_info[3]
     course_hash["peopleSoftCode"] = course_info.first
     course_hash["sis_source_id"] = course_hash["peopleSoftCode"] + "-" +
-        course_hash["name"].downcase +  "-" +
-        course_hash["number"] + "-" +
-        course_hash["section"].downcase
+    course_hash["name"].downcase +  "-" +
+    course_hash["number"] + "-" +
+    course_hash["section"].downcase
 
     # If asking for a specific property then clear hash
     course_hash = {} unless property.nil?
