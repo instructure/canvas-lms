@@ -163,6 +163,7 @@ fa-IR:
       test_ldap_bind_help_header: "کانواس نمی تواند (ورود) را به سرور LDAP شما متصل کند"
       test_ldap_bind_label: "در حال آزمایش اتصال LDAP..."
       test_ldap_connection_help_body: "اتصال متوقف و یا رد شده است. چیزهایی که باید در نظر بگیرید:"
+      test_ldap_connection_help_fixes_1: "کانواس درحال اتصال به %{ips} است"
       test_ldap_connection_help_fixes_2: "فقط یک آزمایش اتصال انجام شد. گواهی های SSL تأیید اعتبار نشدند."
       test_ldap_connection_help_fixes_3: "تنظیمات دیواره آتش خود را بررسی کنید. آیا کل نشانی IP کانواس مجاز به دسترسی به سرور شماست؟"
       test_ldap_connection_help_header: "کانواس نمی تواند به سرور LDAP شما متصل شود"
@@ -404,6 +405,7 @@ fa-IR:
         sis_user_id: "شناسه سامانه اطلاعات دانشجو"
         sortable_name: "نام قابل مرتب کردن"
       sortable_name_help: "این نام در فهرست های مرتب شده ظاهر می شود."
+      unique_id_label: "%{label}:*"
     add_user_button: "افزودن کاربر"
     add_user_dialog_title: "افزودن کاربر جدید"
     adding_course_message: "در حال افزودن درس..."
@@ -447,6 +449,8 @@ fa-IR:
       comm_messages_content_pane: 
         search_info2: "برای مشاهده همه اطلاعیه هایی که برای یک کاربر کانواس ارسال می شود، کاربر و بازه زمانی را برای جستجوی خود انتخاب کنید."
         view_notifications: "مشاهده اطلاعیه ها"
+      comm_messages_search_overview: 
+        messages_viewed: "اطلاعیه های ارسال شده برای *%{user}* از *%{start_date}* تا *%{end_date}*."
       comm_messages_search_results: 
         no_messages_found: "پیامی یافت نشد"
       course_logging_content: 
@@ -1053,6 +1057,9 @@ fa-IR:
         other: "%{count} دسته در انتظار برای پردازش."
       pending_batches_title: "دسته های در انتظار"
       process_data_button: "پردازش داده ها"
+      select_file_instructions: |-
+          فایل فشرده ای که می خواهید وارد شود را انتخاب کنید.
+          برای شرحی از شیوه ایجاد این فایل های فشرده، [به این سند مراجعه کنید](%{url}).
       sis_import_crumb: "ورود اطلاعات سامانه اطلاعات دانشجو"
       started_at_message: "شروع شد: %{started_at}"
       title: "ورود اطلاعات سامانه اطلاعات دانشجو"
@@ -1307,6 +1314,7 @@ fa-IR:
       unread: "خوانده نشده"
       your_search_did_not_match_any_announcements: "جستجوی شما با هیچ اطلاعیه ای مطابقت نداشت"
     podcast_feed_description_course: "هر گونه فایل رسانه ای که از اطلاعیه های موجود در درس \"%{course}\" پیوند داده شده یا در آن درج شده است، در این خوراک خبری ظاهر خواهد شد."
+    podcast_feed_description_group: "هر گونه فایل رسانه ای که از اطلاعیه های موجود در گروه \"%{group}\" پیوند داده شده یا در آن درج شده است، در این خوراک خبری ظاهر خواهد شد."
     podcast_feed_name: "خوراک خبری پادکست اطلاعیه های \"%{course}\""
   application: 
     errors: 
@@ -1502,6 +1510,7 @@ fa-IR:
     assignment_group_list: 
       no_assignment_groups: "هیچ گروه تکلیف یافت نشد"
     assignment_group_list_item: 
+      add_assignment_to: "افزودن تکلیف به %{name}"
       assignment_group_delete: "حذف گروه تکلیف"
       assignment_group_edit: "ویرایش گروه تکلیف"
       assignment_group_move: "انتقال گروه تکلیف"
@@ -2597,6 +2606,7 @@ fa-IR:
         location: مکان
         title: عنوان
       no_content: "محتوا موجود نیست"
+      timespan: "%{start_time} *تا* %{end_time}"
     new: 
       links: 
         back_to_calendar: "بازگشت به تقویم"
@@ -2659,6 +2669,7 @@ fa-IR:
       tabs: 
         assignment: تکلیف
         event: رویداد
+      timespan: "%{start_time} *تا* %{end_time}"
     default_title: رویداد
     event: 
       due: مهلت
@@ -4356,6 +4367,19 @@ fa-IR:
               
               *این درس تا زمانی که منتشر نشود، فقط برای اساتید قابل مشاهده است*
           saved: "انجام شد! درس شما، %{course}، اکنون به طور رسمی ایجاد شده است. فقط زمانی که منتشر شود برای شما قابل مشاهده است -- اما قبل از اینکه خیلی زود شروع کنید، فهرست سمت چپ را مرور کنید تا نسبت به شیوه کارکرد کانواس شناخت پیدا کنید و مطمئن شوید برای تدریس واقعا آماده هستید."
+        created: 
+          not_saved: |-
+              این کلاس ایجاد شده است ولی هنوز تقاضا نشده است. اگر ظرف مدت یک هفته تقاضا نشود، حذف خواهد شد. در عین حال، می توانید به فهرست سمت چپ سری بزنید تا مطمئن شوید که برای رفتن آماده هستید.
+              
+              اگر باید از اینجا خارج شوید و دوباره بازگردید، فقط کافیست *این پیوند* را ذخیره کنید تا بعدا دوباره به اینجا بازگردید.
+              
+              برای تقاضای این درس، لطفا **وارد شوید** یا ***ثبت نام کنید*** .
+          saved: |-
+              انجام شد! درس شما، %{course}، هم اکنون به طور رسمی ایجاد شد است. تا زمانی که منتشر شود، فقط برای شما قابل مشاهده است -- ولی قبل از خیلی زود شروع کنید، فهرست سمت چپ را مرور کنید تا نسبت به شیوه کارکرد کانواس شناخت پیدا کنید و مطمئن شوید برای تدریس واقعا آماده هستید.
+              
+              اگر باید از اینجا خارج شوید و دوباره بازگردید، فقط کافیست *این پیوند* را ذخیره کنید تا بعدا دوباره به اینجا بازگردید.
+              
+              لطفا برای تقاضای این درس **وارد شوید** یا ***ثبت نام کنید*** .
         files: "زبانه فایل ها مکانی است برای به اشتراک گذاشتن اسلاید های سخنرانی، اسناد نمونه، راهنماهای مطالعه-- هر چیزی که دانشجویان بخواهند بارگیری کنند. بارگذاری و سازماندهی فایل های شما با استفاده از کانواس آسان است. شیوه کار را به شما نشان خواهیم داد."
         home2: "زمانی که افراد این درس را می بینند، این صفحه را خواهند دید. می توانید آن را برای نمایش یک جریان فعالیت، فهرست ماژول های درس، سرفصل، یا یک صفحه سفارسی که خودتان نوشته اید تنظیم کنید. پیش فرض آن، جریان فعالیت درس است. برای سفارشی کردن آن، کافیست روی %{choose_home_page}  کلیک کنید."
         import: "اگر از یک سیستم مدیریت درس دیگر استفاده می کنید، احتمالا چیزهایی دارید که می خواهید به کانواس منتقل کنید. می توانیم شما را در فرایند انتقال آسان محتوای خود به کانواس همراهی کنیم."
@@ -4438,6 +4462,7 @@ fa-IR:
         look_around: "برای بازدید و بررسی این درس راحت باشید. وقتی آماده بودید می توانید دعوت نامه را قبول یا رد کنید."
     errors: 
       create_failed: "ایجاد درس انجام نشد"
+      role_not_active: "نمی توان کاربران را برای نقش غیر فعال اضافه کرد: '%{role}'"
       role_not_found: "هیچ نقشی با نام '%{role}' موجود نیست."
       unpublish: "اگر موردهای ارسالی دانشجو وجود داشته باشد، انتشار درس نمی تواند لغو شود."
     group_list: 
@@ -4457,6 +4482,10 @@ fa-IR:
     link_enrollment: 
       buttons: 
         link: "پیوند به دانشجو"
+      details: |-
+          وقتی یک بیننده به یک دانشجو مرتبط می شود، به نمره های دانشجو و تعامل های درس او دسترسی دارد. *هم اکنون این بیننده با دانشجوی %{student} مرتبط است.*
+          
+          برای پیوند دادن بیننده درس %{user} به یک دانشجو، نام دانشجو را از فهرست زیر انتخاب کنید.
       labels: 
         student: دانشجو
       loading: "درحال بارگذاری دانشجویان..."
@@ -4486,12 +4515,14 @@ fa-IR:
       comments: "نظرها: %{count}"
       not_graded: "نمره گذاری نشده"
       submission_points: 
+        with_score: "نمره: %{score} *از %{points_possible}*"
         without_score: "از %{points_possible}"
     roster: 
       create_users: 
         add_more_users: "افزودن کاربران دیگر"
         add_these_users: "افزودن کاربران"
         adding: "در حال افزودن..."
+        adding_n_users: "معتبر و آماده برای افزودن %{users.length} کاربر:"
         can_only_grade_students_in_section: "می توانید به دانشجویان فقط در بخش خود آنها نمره بدهید"
         close: "انجام شد"
         duplicates_removed: "برخی تکرارها حذف شد."
@@ -4706,6 +4737,10 @@ fa-IR:
         assignments: "این نما **فهرست تکلیف های** این درس را به همراه تکلیف های آتی و اخیر در قسمت بالا نشان می دهد."
         confirm_unenroll: "آمطمئنید که می خواهید ثبت نام شما در این درس لغو شود؟دیگر قادر به مشاهده فهرست درس یا برقراری ارتباط مستقیم با اساتید نیستید و دیگر رویداد های درس را در جریان داده های خود و به صورت اطلاعیه نخواهید دید."
         custom_page: "می توانید **صفحه اصلی درس خود را طراحی کنید** و هر گونه پیوند، تصویر یا رسانه غنی که دوست دارید را درج کنید."
+        modules: |-
+            می توانید درس خود را در **ماژول ها یا بخش ها** سازماندهی کنید، به طوری که هر بخش شامل یک مجموعه مرتبط از فایل ها، تکلیف ها، صفحه ها و غیره باشد. در صورت تمایل،‌ همچنین می توانید با تعیین معیارها و پیش نیازهایی که باید پیش از قفل گشایی هر ماژول تکمیل شوند، ماژول ها را مرتب کنید.
+            
+            -این طرح احتمالا برای درس هایی که بر اساس یک زمان بندی خاص مانند یک نیمسال نیستند، بهترین گزینه است.
         recent_activity_dashboard: "**داشبورد فعالیت اخیر** به شرکت کنندگان امکان مشاهده جدیدترین گفتگوها، اطلاعیه ها، بحث ها و تعامل های مربوط به این درس را می دهد. بسیار شبیه صفحه داشبوردی است که کاربران در هنگام اولین ورود خواهند دید اما فقط محتوای این درس خاص را نمایش می دهد."
         syllabus: "**نمای سرفصل** به شما امکان می دهد شرحی از انتظارات درس را بنویسید یا درس را با استفاده از پیوندها، تصاویر و غیره معرفی کنید و سپس یک نمای تقویم از همه تکلیف ها و رویدادهای درس را نیز نمایش دهید."
       draft_state: 
@@ -4755,6 +4790,7 @@ fa-IR:
       re_sending: "در حال ارسال دوباره..."
       send_done: " انجام شد. ارسال پیام ممکن است چند دقیقه طول بکشد."
       send_failed: "درخواست انجام نشد. دوباره سعی کنید."
+      teachers_only: "بعد از اینکه این درس *منتشر شود*، فقط اساتید می توانند آن را ببینند"
       titles: 
         drop_course: "رها کردن این درس"
         recent_feedback: "بازخورد اخیر"
@@ -5475,7 +5511,7 @@ fa-IR:
   draft_state_description: |-
       این ویژگی بتا بخش های زیادی از کانواس را از نو طراحی می کند و به محتوا امکان می دهد که در
       یک حالت منتشر نشده جدید باشد که برای دانشجویان غیر قابل مشاهده است و از محاسبه های نمره مستثنی است.
-      احتیاط--غیر فعال کردن این ویژگی ممکن است محتوایی که جدید ایجاد شده یا ویرایش شده
+      احتیاط--غیر فعال کردن این ویژگی ممکن است محتوای ایجاد شده یا ویرایش شده جدید
       را از نمای استاد حذف کند.
   due_dates: 
     due_at: "مهلت: %{assignment_due_date_time}"
@@ -5930,6 +5966,8 @@ fa-IR:
       extensions: پسوندها
       help_link: "پیوند راهنما"
       rate_tool: "رتبه دادن به این ابزار"
+    app_review_view: 
+      posted_by_on: "توسط *%{user.name}* در *%{created_at}* ارسال شد"
     app_saved_message: "%{app} با موفقیت ذخیره شد!"
     buttons: 
       cancel: لغو
@@ -6434,7 +6472,7 @@ fa-IR:
       tooltip: t
     learning_outcome: "نتیجه یادگیری"
     mastery: تسلط
-    near_mastery: "تسلط تقریبی"
+    near_mastery: "نزدیک به تسلط"
     no_assignments_have_points_warning: "تا زمانی که یک تکلیف نمره های ممکن نداشته باشد، نمره قابل محاسبه نیست"
     notes: "یادداشت ها"
     outcome_gradebook: 
@@ -6893,6 +6931,8 @@ fa-IR:
       default_name_for_groups: "گروه های پروژه"
       group_limit_blank: "(جای خالی به معنی نامحدود می باشد)"
       group_structure_group_limit: "*محدود کردن گروه ها به داشتن* %{group_limit} عضو"
+      group_structure_self_signup: "%{number_of_groups} *گروه اکنون* *ایجاد شود*"
+      group_structure_standard: "*تقسیم دانشجویان به* %{number_of_groups} *گروه مساوی*"
       labels: 
         group_structure: "ساختار گروه"
         manually_create_groups: "گروه ها را به طور دستی ایجاد خواهم کرد"
@@ -7100,12 +7140,14 @@ fa-IR:
         save: "ذخیره سازی"
         saving: "در حال ذخیره سازی..."
         self_signup: "ثبت نام شخصی"
+        split_into_groups: "تقسیم دانشجویان به %h{num_groups} گروه مساوی"
       group_category_detail: 
         add_group: "افزودن گروه"
         category_settings: تنظیمات
         delete_category_option: حذف
         edit_category_option: ویرایش
         group: گروه
+        group_limit_blurb: "گروه ها به *%{group_limit}* عضو محدود شده اند."
         message_all_unassigned_option: "ارسال پیام برای همه دانشجویان تخصیص داده نشده"
         randomly_assign_students_option: "تخصیص دادن تصادفی دانشجویان"
         restricted_self_signup_blurb: "همه دانشجویان یک گروه باید در بخش یکسانی باشند."
@@ -7169,12 +7211,12 @@ fa-IR:
       randomly_assign_members: 
         cancel: لغو
         okay: تأیید
-        randomly_assign_students_dialog: "این به طور خودکار و مساوی همه ی دانش آموزانی را که به هیچ یک از گروه های دانش آموزان موجود اختصاص داده نشده اند را اختصاص خواهد داد."
+        randomly_assign_students_dialog: "این امر به طور خودکار همه دانشجویانی تخصیص داده نشده را تا حد امکان به طور مساوی در بین گروه های دانشجویی موجود تخصیص خواهد داد."
       self_signup_help: 
-        about_self_signup_groups: "درباره گروه های خود ثبت نام "
-        self_signup_description: "شما می توانید مجموعه ای از گروهها درست کنید که با کمک آنها دانش آموزان می توانند ثبت نام کنند. دانش آموزان هنوز محدود به یک گروه در یک مجموع هستند ولی می توانند مدیریت عضویت در گروه را خود؛ به جای آموزگار؛ به عهده بگیرند. توجه داشته باشید که تا هنگامی که این مورد فعال است؛ دانش آموزان می توانند گروه خود را تغییر دهند.\n\
+        about_self_signup_groups: "درباره گروه های ثبت نام شخصی"
+        self_signup_description: "می توانید مجموعه هایی از گروه ها را ایجاد کنید که خود دانشجویان بتوانند در آنها ثبت نام کنند. دانشجویان هنوز محدود به عضویت در تنها یک گروه در مجموعه هستند، ولی به این طریق می توانند به جای نیاز به اینکه استاد آنها را در گروه ها سازماندهی کنند، خودشان این کار را انجام دهند. توجه داشته باشید تا هنگامی که این گزینه فعال باشد، دانشجویان می توانند خود را از یک گروه به گروه دیگر انتقال دهند.\n\
             \x20"
-    max_membership_number: "عضویت حداکثر باید یک نام باشد"
+    max_membership_number: "حداکثر عضویت باید یک عدد باشد"
     member: 
       one: "%{count} عضو"
       other: "%{count} عضو"
@@ -7186,7 +7228,7 @@ fa-IR:
       group_join_request_info: "این گروه درخواست شما برای پیوستن را دریافت کرده است. به محض اینکه آنها درخواست شما را بپذیرند یا رد کنند، مطلع خواهید شد."
     messages: 
       creating_group: "درحال ایجاد گروه..."
-    name_too_long: "نام بیش از حد طولانی ست"
+    name_too_long: "نام طولانی است"
     notices: 
       already_deleted: "این گروه حذف شده است"
       create_success: "گروه با موفقیت ایجاد شد."
@@ -7197,7 +7239,7 @@ fa-IR:
       update_success: "گروه با موفقیت بهنگام سازی شد."
       welcome: "به گروه %{group_name} خوش آمدید!"
     positive_group_count: "تعداد گروه ها باید عددی مثبت باشد"
-    randomly_assigning_members: "انتساب اتفاقی دانش آموزان"
+    randomly_assigning_members: "تخصیص تصادفی دانشجویان"
     show: 
       coming_up: "در حال ظاهر شدن"
       edit_group: "ویرایش گروه"
@@ -7273,24 +7315,24 @@ fa-IR:
       اگر نسخه دارای تضاد بیشتر واسط کاربر کانواس را ترجیح می دهید، این گزینه را فعال کنید.
       این نسخه ممکن است برای افراد دارای ضعف بینایی یا اشکال در خواندن مفید باشد.
   html5_first_videos_description: |-
-      کانواس به طور پیش فرض سعی می کند که برای پخش فیلم ها ابتدا از فلش استفاده کند. برای اینکه ابتدا از HTML5 استفاده کنید، این گزینه
+      کانواس به طور پیش فرض سعی می کند برای پخش فیلم ها ابتدا از فلش استفاده کند. برای اینکه ابتدا از HTML5 استفاده کنید، این گزینه
       را فعال کنید، سپس به فلش بازگردید.
   ic_actions: 
-    manage: "مدیریت کردن"
+    manage: مدیریت
   icons: 
     discussion_submission: "مورد ارسالی بحث"
     file_upload_submission: "ارسال بارگذاری فایل"
     media_submission: "ارسال رسانه"
-    online_url_submission: "Online URL submission"
+    online_url_submission: "ارسال نشانی اینترنتی آنلاین"
     quiz_submission: "ارسال آزمون"
     text_entry_submission: "ارسال ورودی متن"
   images: 
-    error_checking_color: "خطا در چک کردن رنگ تصویر"
+    error_checking_color: "خطا در بازبینی رنگ تصویر"
     invalid_background_color: "رنگ پس زمینه باید %{color} باشد"
-    invalid_dimensions: "ابعاد تصویر غیر معتبر می باشد (got %{actual}, expected: %{expected})"
-    invalid_file_size: "حجم تصویر بیش از حد مجاز می باشد (max %{max} bytes, got %{actual})"
-    invalid_file_type: "فرمت %{type} غیر معتبر می باشد. فرمت های مجاز: %{type_list}"
-    not_an_image: "فایل انتخابی تصویر نمی باشد"
+    invalid_dimensions: "ابعاد تصویر معتبر نیست (%{actual} دریافت کرد، انتظار داشت: %{expected})"
+    invalid_file_size: "اندازه فایل تصویر بزرگ است (حداکثر %{max} بایت، %{actual} دریافت کرد)"
+    invalid_file_type: "نوع فایل معتبر نیست %{type}. انواع مجاز عبارتند از: %{type_list}"
+    not_an_image: "فایل انتخابی تصویر نیست"
   importers/assignment_importer: 
     errors: 
       import: 
@@ -7303,14 +7345,14 @@ fa-IR:
   importers/course_content_importer: 
     account_grading_standard_warning: "قادر به یافتن استاندارد نمره گذاری حساب برای درس نبود."
     copied_grading_standard_warning: "قادر به یافتن استاندارد نمره گذاری کپی شده برای درس نبود."
-    due_dates_warning: "قادر به تنظیم تاریخهای مهلت نبود."
+    due_dates_warning: "قادر به تنظیم تاریخ های مهلت نبود."
     failed_import_media_objects: "وارد کردن اشیاء رسانه ای انجام نشد"
     file_import_warning: "فایل %{file} یافت نشد"
   importers/learning_outcome_group_importer: 
     no_global_permission: "برای مدیریت نتایج همگانی مجاز نیستید، نمی توانید \"%{title}\" را بیفزایید"
   importers/learning_outcome_importer: 
     no_context_found: "نتیجه یادگیری بیرونی برای \"%{title}\" یافت نشد، در حال ایجاد یک نسخه."
-    no_global_permission: "برای مدیریت نتایج همگانی مجاز نیستید، نمی توانید \"%{title}\" را بیفزایید"
+    no_global_permission: "مجاز به مدیریت نتایج همگانی نیستید، نمی توانید \"%{title}\" را بیفزایید"
   importers/rubric_importer: 
     no_context_found: "دستورالعمل ارزیابی بیرونی برای \"%{title}\" یافت نشد، در حال ایجاد یک کپی."
   importers/wiki_page_importer: 
@@ -7344,7 +7386,7 @@ fa-IR:
         am_pm: "قبل از ظهر/بعد از ظهر"
     draft: "پیش نویس"
     errors: 
-      cannot_view_document_in_canvas: "این سند نمی تواند توسط کانوس نمایش داده شود."
+      cannot_view_document_in_canvas: "این سند نمی تواند در کانواس نمایش داده شود."
       document_preview_processing: "پیش نمایش سند در حال پردازش است. لطفا بعدا دوباره تلاش کنید."
       field_is_required: "تکمیل این جای خالی لازم است"
       invalid_datetime: "مقدار تاریخ/زمان معتبر نیست"
@@ -7352,7 +7394,7 @@ fa-IR:
       invalid_number: "باید یک عدد باشد."
       not_a_date: "تاریخ نیست!"
       posting_message_failed: "ارسال انجام نشد، دوباره سعی کنید"
-      required: "قلم ضروری"
+      required: "تکمیل جای خالی لازم است"
       search_failed: "جستجو انجام نشد، لطفا دوباره سعی کنید."
     ignore_forever: "صرفنظر برای همیشه"
     ignore_until_new_submission: "صرفنظر تا زمان ارسال جدید"
@@ -7389,7 +7431,7 @@ fa-IR:
       view_in_new_window: "مشاهده در پنجره جدید"
     tooltips: 
       enter_search_terms: "وارد کردن عبارت های جستجو"
-  invalid_points_possible: "ارزش نمره امکانپذیر برای این تکلیف باید صفر یا بیشتر باشد."
+  invalid_points_possible: "ارزش امتیازهای ممکن برای این تکلیف باید صفر یا بیشتر باشد."
   invalid_url_in_xml: "نشانی اینترنتی در xml معتبر نیست. نویسه & نباید در آن باشد."
   invalid_xml_syntax: "قواعد xml معتبر نیست"
   jobs: 
@@ -7500,7 +7542,7 @@ fa-IR:
     mobile_auth: 
       log_in_to_canvas: "ورود به کانواس"
   learning_mastery_gradebook_description: |-
-      دفتر نمره مهرات یادگیری روشی را به اساتید ارائه می دهد که بتوانند پیشرفت دانشجو و درس را در نتایج یادگیری 
+      دفتر نمره تسلط یادگیری روشی را به اساتید ارائه می دهد که بتوانند پیشرفت دانشجو و درس را در نتایج یادگیری 
       درس به سرعت مشاهده کنند. نتایج در قالبی 
       شبیه دفتر نمره 
       ارائه می شوند و پیشرفت دانشجو هم به صورت نمره عددی و هم به عنوان
@@ -7509,7 +7551,7 @@ fa-IR:
   learning_outcome: 
     no_comment: "نظر موجود نیست"
     no_description: "شرح موجود نیست"
-  learning_outcome_assignment_type_title: "فراگیری نتیجه و نوع تکلیف"
+  learning_outcome_assignment_type_title: "نتیجه یادگیری و نوع تکلیف"
   lib: 
     angel: 
       failed_import_link: "وارد کردن پیوند انجام نشد"
@@ -7532,7 +7574,7 @@ fa-IR:
       no_points_comment: "یک ابزار بیرونی تلاش کرد نمره این تکلیف را %{grade} تعیین کند، اما از آنجا که تکلیف هیچ امتیاز ممکن ندارد، قادر به انجام این کار نبود."
       no_points_possible: "تکلیف، امتیاز ممکن ندارد."
       no_score: "هیچ نمره ای داده نشده است"
-      no_submission_created: "این درخواست نتیجه شکست خورده برای ایجاد یک ارسال تکالیف جدید است."
+      no_submission_created: "این درخواست نتیجه ارسال تکلیف جدید را ایجاد نکرد."
     canvas: 
       migration: 
         announcements: "اطلاعیه ها"
@@ -7596,9 +7638,9 @@ fa-IR:
       no_link: "[ پیوند موجود نیست ]"
     titles: 
       link_to_student: "پیوند دادن به دانشجو"
-  linked_assignment_message: "لینک شده همراه با واگذاری '%{title}' "
+  linked_assignment_message: "پیوند داده شده به تکلیف '%{title}' "
   linked_discussion_topic_message: "مرتبط با موضوع بحث '%{title}' "
-  linked_quiz_message: "پیوند داده شده با امتحان '%{title}'"
+  linked_quiz_message: "پیوند داده شده به آزمون '%{title}'"
   links: 
     dashboard: "داشبورد من"
     errors: 
@@ -7614,7 +7656,7 @@ fa-IR:
     lti_message: 
       load_tool_new_tab_button: "بارگذاری %{tool} در یک پنجره جدید"
       new_tab: "این ابزار باید در یک پنجره جدید مرورگر بارگذاری شود"
-      new_tab_expired: "جلسه مربوط به این ابزار منقضی شده است. لطفا برای دسترسی دوباره به ابزار، صفحه را دوباره بارگذاری کنید."
+      new_tab_expired: "جلسه مربوط به این ابزار منقضی شده است. لطفا برای دسترسی دوباره به ابزار، صفحه را دوباره بارگذاری کنید"
       new_tab_loaded: "این ابزار به طور موفقیت آمیز در یک پنجره جدید مرورگر بارگذاری شد. برای دسترسی دوباره به این ابزار، صفحه را دوباره بارگذاری کنید."
   m2c_file_description: "ماژول 1.9/2.x"
   m2c_name: "وارد کننده Moodle"
@@ -7645,14 +7687,14 @@ fa-IR:
     errors: 
       file_too_large: "*حجم این فایل زیاد است.* حداکثر اندازه فایل %{size} مگابایت است."
       load_failed: "بارگذاری برنامه نظر رسانه ای انجام نشد. لطفا دوباره سعی کنید."
-      media_comment_installation_broken: "رسانه نظر آپلود به درستی راه اندازی نشده است . لطفا با سرپرست خود تماس بگیرید."
+      media_comment_installation_broken: "بارگذاری نظر رسانه ای درست راه اندازی نشده است . لطفا با مدیر خود تماس بگیرید."
       must_be_logged_in: "برای ضبط رسانه، باید وارد شده باشید."
       persistent_problem: "اگر این اشکال ادامه یافت، ممکن است بخواهید رسانه خود را به طور محلی ضبط کنید و سپس در عوض فایل ذخیره شده را بارگذاری نمایید."
       save_failed: "ظاهرا ذخیره سازی انجام نشده است. لطفا برای تلاش دوباره، این منوی باز شونده را ببندید."
       save_failed_try_again: "ذخیره سازی ورودی انجام نشد. لطفا دوباره سعی کنید."
       upload_failed: "بارگذاری با بروز خطا انجام نشد:"
-    file_size_error: "اندازه ی %{file} از حداکثر اندازه مجاز فایل %{max} بیشتر است."
-    file_type_error: "%{type}   %{file} فایل مورد قبولی نیست."
+    file_size_error: "اندازه %{file} از حداکثر اندازه مجاز فایل %{max} بیشتر است."
+    file_type_error: "%{file} یک فایل قابل قبول از نوع %{type} نیست."
     links: 
       minimize_embedded_kaltura_content: "به حداقل رساندن محتوای درج شده"
     loading: "در حال بارگذاری رسانه..."
@@ -7680,7 +7722,7 @@ fa-IR:
   message: 
     default_subject: "هشدار کانواس"
   message_dialog_component: 
-    ok: Ok
+    ok: تأیید
   message_students: 
     buttons: 
       send_message: "ارسال پیام"
@@ -7825,7 +7867,7 @@ fa-IR:
           attendee: حاضر
           attendees: حاضرین
           cancel_reason: "دلیل لغو"
-          click_to_see_appointment: "برا مشاهده این ملاقات اینجا را کلیک کنید"
+          click_to_see_appointment: "برا مشاهده این قرار ملاقات، اینجا کلیک کنید"
           date_and_time: تاریخ/زمان
           details: "اطلاعات قرار ملاقات"
           group: گروه
@@ -8248,7 +8290,7 @@ fa-IR:
     assignment_resubmitted: 
       email: 
         html: 
-          link: "برای مشاهده این ارسال  اینجا را کلیک کنید"
+          link: "برای مشاهده مورد ارسالی، اینجا کلیک کنید"
           user_resubmitted: "ارسال دوباره: %{user_name}، %{assignment_name}"
           user_resubmitted_sentence: "%{user_name} یک مورد ارسالی مجدد را برای %{assignment_name} در درس %{course_name} تحویل داده است"
         labels: 
@@ -8269,7 +8311,7 @@ fa-IR:
     assignment_submitted: 
       email: 
         html: 
-          link: "برای مشاهده این ارسال اینجا را کلیک کنید"
+          link: "برای مشاهده مورد ارسالی، اینجا کلیک کنید"
           user_submitted: "ارسال: %{user_name}، %{assignment_name}"
           user_submitted_sentence: "%{user_name} یک مورد ارسالی را برای %{assignment_name} در درس %{course_name} تحویل داده است"
         labels: 
@@ -8290,7 +8332,7 @@ fa-IR:
     assignment_submitted_late: 
       email: 
         html: 
-          link: "برای مشاهده این ارسال اینجا را کلیک کنید"
+          link: "برای مشاهده مورد ارسالی، اینجا کلیک کنید"
           user_resubmitted_sentence: "%{user_name} یک مورد ارسالی دارای تأخیر را برای %{assignment_name} در درس %{course_name} تحویل داده است"
           user_submitted: "تکلیف دارای تأخیر: %{user_name}، %{assignment_name}"
         labels: 
@@ -8428,10 +8470,10 @@ fa-IR:
           download: بارگیری
           subject: "%{user_name} یک پیام را در کانواس برای شما ارسال کرده است."
           unknown_user: "کاربر ناشناس"
-          view_message: "مشاهده این پیام در مکالمات"
+          view_message: "مشاهده این پیام در گفتگوها"
         subject: "%{user_name} یک پیام را برای شما در کانواس ارسال کرد."
         unknown_user: "کاربر ناشناس"
-        view_message: "مشاهده این پیام در مکالمات"
+        view_message: "مشاهده این پیام در گفتگوها"
       facebook: 
         body: "%{user_name} یک پیام را برای شما در کانواس ارسال کرد."
         link_text: "مشاهده پیام"
@@ -8752,6 +8794,7 @@ fa-IR:
     file_locked: "این فایل در حال حاضر قفل است."
     file_locked_at: "این فایل در %{at} قفل شد."
     file_locked_module: "این فایل بخشی از ماژول *%{module}* است و هنوز قفل گشایی نشده است."
+    file_locked_until: "این فایل تا تاریخ %{date} قفل شده است."
     file_unpublished_module: "این فایل بخشی از یک ماژول منتشر نشده است و هنوز در دسترس نیست."
     forgot_password: 
       email: 
@@ -9052,10 +9095,10 @@ fa-IR:
     new_discussion_entry: 
       email: 
         body: "%{user} یک نظر جدید را در رشته %{discussion_topic} برای %{course} ارسال کرد."
-        discussion_entry_reply_message: "با لینک زیر به بحث بپیوندید یا با پاسخ دادن به این پیام نظر دهید."
+        discussion_entry_reply_message: "با استفاده از پیوند زیر به گفتگو بپیوندید یا با پاسخ دادن به این پیام نظر دهید."
         html: 
           body: "%{user} یک نظر جدید را در رشته %{discussion_topic} برای %{course} ارسال کرد."
-          link: "برای مشاهده این مکالمه اینجا را کلیک کنید"
+          link: "برای پیوستن به گفتگو، اینجا کلیک کنید"
           subject: "نظر جدید برای %{discussion_topic}: %{course}"
         subject: "نظر جدید برای %{discussion_topic}: %{course}"
       facebook: 
@@ -9075,7 +9118,7 @@ fa-IR:
           attached_file: "فایل پیوست شده"
           body: "یک بحث جدید شروع شده است که ممکن است برای شما جالب باشد:"
           download: بارگیری
-          link: "برای ملحق شدن به این مکالمه اینجا را کلیک کنید"
+          link: "برای پیوستن به گفتگو، اینجا کلیک کنید"
           subject: "بحث جدید - %{discussion_topic}: %{course}"
         labels: 
           file_included: "فایل درج شد"
@@ -9143,7 +9186,7 @@ fa-IR:
         body: "%{count} فایل جدید به درس %{name} افزوده شده است:"
         html: 
           body: "%{count} فایل جدید به درس %{name} افزوده شده است:"
-          see_details: "می توانید آنرا اینجا مشاهده نمائید"
+          see_details: "می توانید آنها را اینجا مشاهده کنید"
           subject: "%{count} فایل جدید به درس %{name} افزوده شده است:"
         link: "می توانید آنها را در اینجا مشاهده کنید"
         subject: "%{count} فایل جدید به درس %{name} افزوده شد:"
@@ -9261,23 +9304,23 @@ fa-IR:
     quiz_locked_until: "این آزمون تا تاریخ %{date} قفل شده است."
     quiz_regrade_finished: 
       email: 
-        body: "یک نمره دهی دوباره برای امتحان تمام شد:%{quiz}"
+        body: "یک نمره گذاری دوباره برای آزمون %{quiz} پایان یافته است"
         html: 
-          body: "یک نمره دهی دوباره برای امتحان تمام شد:%{quiz}"
-          link_message: "می توانید این جا امتحان را ببینید:"
-          subject: "ازمون  نمره دهی دوباره تمام شد:%{quiz}, %{context}"
-        link_message: "می توانید این جا امتحان را ببینید:"
-        subject: "ازمون  نمره دهی دوباره تمام شد:%{quiz}, %{context}"
+          body: "یک نمره گذاری دوباره برای آزمون %{quiz} پایان یافته است"
+          link_message: "در اینجا می توانید آزمون را مشاهده کنید:"
+          subject: "نمره گذاری دوباره آزمون پایان یافت: %{quiz}، %{context}"
+        link_message: "در اینجا می توانید آزمون را مشاهده کنید:"
+        subject: "نمره گذاری دوباره آزمون پایان یافت: %{quiz}، %{context}"
       facebook: 
-        body: "امتحان  نمره دهی دوباره تمام شد: %{title}"
+        body: "نمره گذاری دوباره آزمون پایان یافت: %{title}"
       sms: 
-        body_sms: "ازمون نمره دهی دوباره تمام شد برای %{title} in %{context}."
-        more_info: "اطلاعات بیشتردر%{url}"
+        body_sms: "نمره گذاری دوباره آزمون برای %{title} در %{context} پایان یافت."
+        more_info: "اطلاعات بیشتر در %{url}"
       summary: 
-        body: "یک نمره دهی دوباره برای امتحان تمام شد %{title}"
-        subject: "ازمون تجدید نظر شده:%{quiz}, %{context}"
+        body: "نمره گذاری دوباره برای آزمون %{title} شما پایان یافته است."
+        subject: "آزمون دوباره نمره گذاری شد: %{quiz}، %{context}"
       twitter: 
-        body: "اخطار کانواس - ازمون تجدید نظر شده : %{quiz}"
+        body: "هشدار کانواس - آزمون دوباره نمره گذاری شد : %{quiz}"
     quiz_unpublished_module: "این آزمون بخشی از یک ماژول منتشر نشده است و هنوز در دسترس نیست."
     report_generated: 
       email: 
@@ -9342,10 +9385,10 @@ fa-IR:
              
              شبکه کانواس
         html: 
-          farewell: "به یادگیری ادامه بده,"
+          farewell: "به یادگیری ادامه دهید،"
           greetings: "سلام %{user},"
           profile_reminder: "فراموش نکنید که * نمایه شبکه کانواس* خود را راه اندازی کنید تا افراد دیگر شرکت کننده در این درس با شما آشنا شوند."
-          self_enrollment_confirmation: "شما با موفقیت خود را در %{course} ثبت نام کردید، یک دوره در کانواس شبکه!"
+          self_enrollment_confirmation: "با موفقیت در %{course}، یک درس در شبکه کانواس خود را ثبت نام کرده اید!"
           self_enrollment_registration: "ثبت نام شما در %{course} "
           signature: "شبکه کانواس"
         self_enrollment_registration: "ثبت نام شما در %{course} "
@@ -9358,7 +9401,7 @@ fa-IR:
         body: "%{author} یک نظر جدید را درباره مورد ارسالی برای %{user} برای %{assignment} ایجاد کرد"
         html: 
           body: "%{author} یک نظر جدید را درباره مورد ارسالی %{user} برای %{assignment} ایجاد کرد"
-          link_message: "برای مشاهده این نظر اینجا را کلیک کنید"
+          link_message: "برای مشاهده نظر، اینجا کلیک کنید"
           someone: "یک شخص"
           subject: "نظر درباره مورد ارسالی: %{user}، %{assignment}، %{context}"
           submission_comment_link_message: "می توانید با استفاده از پیوند زیر، اطلاعات مورد ارسالی را بازبینی کنید یا با پاسخ دادن به این پیام، به نظر پاسخ دهید."
@@ -9383,7 +9426,7 @@ fa-IR:
         html: 
           body: "%{author} یک نظر جدید درباره مورد ارسالی %{user} برای %{assignment} ایجاد کرد."
           link_message: "می توانید با کلیک کردن روی پیوند زیر، اطلاعات مورد ارسالی را بازبینی کنید:"
-          review_submission: "برای مرور این ارسال اینجا را کلیک کنید"
+          review_submission: "برای بازبینی مورد ارسالی، اینجا کلیک کنید"
           someone: "یک شخص"
           subject: "نظر درباره مورد ارسالی: %{user}، %{assignment}، %{context}"
         someone: "یک شخص"
@@ -9593,7 +9636,7 @@ fa-IR:
     ecollege: 
       course_not_found: "درس ECollege یافت نشد."
     external_feed_type: "خوراک خبری بیرونی"
-    external_tool_type: "ابزار خارجی"
+    external_tool_type: "ابزار بیرونی"
     file_type: فایل
     grading_standard_type: "استاندارد نمره گذاری"
     group_type: گروه
@@ -9608,64 +9651,65 @@ fa-IR:
   migration_issues: 
     errors: 
       valid_workflow_state: "باید یک وضعیت جریان کاری معتبر ارسال شود"
-  mississippi_sis_title: "داده سامانه اطلاعات دانشجویی"
+  mississippi_sis_title: "داده های سامانه اطلاعات دانشجو"
   module_item_types: 
     assignment: تکلیف
     disuccsion: بحث
-    external_tool: "ابزار خارجی"
-    external_url: "آدرس خارجی"
+    external_tool: "ابزار بیرونی"
+    external_url: "نشانی اینترنتی بیرونی"
     file: فایل
     page: صفحه
     quiz: آزمون
-    sub_header: "زیر حساب سرصفحه"
+    sub_header: "عنوان فرعی"
   modules: 
     add_module_item_dialog: 
       item_type: "نوع:"
     add_module_item_dialog_wrapper: 
-      Save: ذخیره
+      Save: "ذخیره سازی"
       cancel: لغو
-      creating: "درحال ایجاد ..."
-    dialog_title: "اضافه کردن بخش به {moduleName}%"
+      creating: "در حال ایجاد..."
+    dialog_title: "افزودن مورد به {moduleName}%"
     module_collection_view: 
       button: 
         preview: "پیش نمایش"
-      course_modules: "مااژول های درس"
+      course_modules: "ماژول های درس"
       header: 
         module: ماژول
     module_item_view: 
       button: 
         delete: حذف
-        edit: "ویرایش تکلیف"
-      manage: میدیریت
+        edit: ویرایش
+      manage: مدیریت
       module_item: 
         available: موجود
         due: مهلت
         points_abbreviated: امتیازها
     module_view: 
       module: 
-        prerequisites: پیشنیازها
+        prerequisites: "پیش نیازها"
         published: "منتشر شده"
-    post_grades_dialog_title: "ارسال نمره ها به سامانه اطلاعات دانشجویی"
+    post_grades_dialog_title: "ارسال نمره ها به سامانه اطلاعات دانشجو"
     progression_module_collection: 
-      module_progress_for: "پیشرفت واحد برای %h{student_link} "
-      no_modules_found: "هیچ واحدی یافت نشد "
+      module_progress_for: "پیشرفت ماژول برای %h{student_link} "
+      module_progress_for_student: "پیشرفت ماژول برای %{student.name}"
+      no_modules_found: "هیچ ماژولی یافت نشد"
     progression_module_view: 
-      items: "گزینه های کامل کردن "
-      items_below: "گزینه های کامل کردن زیر "
+      items: "موردها جهت تکمیل"
+      items_below: "موردها جهت تکمیل در قسمت زیر"
     progression_student_view: 
-      show_progressions_for_student: "پیشرفت %{name} را نشان دهید "
+      show_progressions_for_student: "نمایش پیشرفت های مربوط به %{name}"
     progressions_index: 
-      back_to_modules: "بازگشت به صفحه ی واحد ها "
-      no_students_found: "هیچ یک از دانش آموزان پیدا نشدند"
+      back_to_modules: "بازگشت به صفحه ماژول ها"
+      no_students_found: "هیچ دانشجویی یافت نشد"
       student_progress: "پیشرفت دانشجو"
-  moodle_dropdown_many_warning_title: "%{count} پرسش بازشونده چندگانه در این بانک وجود دارد که ممکن است به طور اشتباه وارد شده باشد"
-  moodle_dropdown_warning_title: "سوال های گوناگون کرکره ممکن است نادرست وارد شده باشند "
-  moodle_formula_many_warning_title: "%{count} پرسش فرمولی در این بانک وجود دارد که پاسخ های احتمالی آنها باید از نو ایجاد شوند"
-  moodle_formula_warning_title: "پاسخ های احتمالی باید برای پرسش فرمول ها از نو ایجاد شوند"
+  moodle_dropdown_many_warning_title: "%{count} پرسش بازشونده چندگانه در این مخزن وجود دارد که ممکن است به اشتباه وارد شده باشند"
+  moodle_dropdown_warning_title: "پرسش بازشونده چندگانه ممکن است به اشتباه وارد شده باشد"
+  moodle_formula_many_warning_title: "%{count} پرسش فرمولی در این مخزن وجود دارد که پاسخ های احتمالی آنها باید از نو ایجاد شوند"
+  moodle_formula_warning_title: "پاسخ های احتمالی باید برای پرسش فرمولی از نو ایجاد شوند"
   move_dialog: 
-    cancel: "لغو کردن"
-    save: "ذخیره کردن"
-    saving: "ذخیره کردن..."
+    cancel: لغو
+    save: "ذخیره سازی"
+    saving: "در حال ذخیره سازی..."
     where_to_move: "می خواهید *%{name}* به کجا انتقال یابد؟"
   move_dialog_select: 
     move_to_end: "-- در پایین --"
@@ -9681,7 +9725,7 @@ fa-IR:
     submission_comments: "نظرهای مربوط به مورد ارسالی"
     sure_you_want_to_mute: "مطمئنید که می خواهید این تکلیف غیرفعال شود؟ مادامی که این تکلیف غیرفعال است، دانشجویان اطلاعیه های جدیدی درباره آن دریافت نخواهند کرد و یا قادر به مشاهده آن نخواهند بود:"
   name: "واردکننده معیار علمی"
-  new_facebook_message: "شما یک پیغام جدید ازکانواس  دارید"
+  new_facebook_message: "یک پیام جدید از طرف کانواس  دارید"
   new_quiz_moderate_desc: "زمانی که حالت پیش نویس و آمار آزمون مجاز/فعال باشند،‌ صفحه تعدیل سازی آزمون جدید برای این حساب فعال می شود."
   new_quiz_statistics_desc: "زمانی که حالت پیش نویس مجاز/فعال است،‌ صفحه آمارهای آزمون جدید برای این حساب کاربری فعال می شود."
   new_styles_description: "روی یک طرح گرافیکی واسط کاربر برای کانواس کار می کنیم. این گزینه را روی انتخاب قرار دهید تا ظاهر ساده شده و حس واسط بهنگام سازی شده کانواس را ببینید."
@@ -9697,6 +9741,10 @@ fa-IR:
     all_submissions_display: "همه موردهای ارسالی"
     announcement_description: "اطلاعیه جدید در درس شما"
     announcement_display: اطلاعیه
+    appointment_availability_description: |-
+        *فقط استاد و مدیر:*
+        
+        تغییر به بازه های زمانی قرار ملاقات
     appointment_availability_display: "در دسترس بودن قرار ملاقات"
     appointment_cancelations_description: "لغو قرار ملاقات"
     appointment_cancelations_display: "لغوهای قرار ملاقات"
@@ -9730,6 +9778,12 @@ fa-IR:
       submission_comment: "نظر درباره مورد ارسالی"
     conversation_message_description: "پیام های جدید صندوق ورودی"
     conversation_message_display: "پیام گفتگو"
+    course_content_description: |-
+        تغییر در محتوای درس:
+        
+        * صفحه ویکی
+        * محتوای آزمون
+        * محتوای تکلیف
     course_content_display: "محتوای درس"
     discussion_description: "موضوع جدید بحث در درس شما"
     discussion_display: بحث
@@ -9739,11 +9793,34 @@ fa-IR:
     due_date_display: "تاریخ مهلت"
     files_description: "فایل جدید به درس شما افزوده شد"
     files_display: "فایل ها"
+    grading_description: |-
+        شامل این موارد می شود:
+        
+        * نمره تکلیف/مورد ارسالی وارد شد/تغییر یافت
+        * نمره تکلیف فعال شده
+        * وزن نمره تغییر یافت
+        
+        
+        
+        اگر می خواهید نمره های خود را در اطلاعیه ها ببینید، «شامل سازی نمره ها در هنگام هشدار دادن درباره تغییرهای نمره» را علامتگذاری کنید.
+        اگر پست الکترونیکی شما دانشگاهی نیست، این امر بدین معناست که محتوای حساس به خارج از دانشگاه شما ارسال خواهد شد.
     grading_display: "نمره گذاری"
     grading_notify_include_grade: "نمره در هنگام هشدار دادن درباره تغییرهای نمره، شامل شود."
     grading_policies_description: "تغییر سیاست نمره گذاری درس"
     grading_policies_display: "سیاست های نمره گذاری"
+    invitation_description: |-
+        دعوت نامه برای:
+        
+        * کنفرانس مجازی
+        * گروه
+        * همکاری
+        * درس
+        * بازبینی گروهی و یادآور
     invitation_display: "دعوت نامه"
+    late_grading_description: |-
+        *فقط استاد و مدیر:*
+        
+        ارسال تکلیف با تأخیر
     late_grading_display: "نمره گذاری با تأخیر"
     membership_update_description: |-
         *فقط مدیر: ثبت نام در انتظار فعال شد*
@@ -9972,7 +10049,7 @@ fa-IR:
     mastery: تسلط
     mastery_error: "باید بزرگتر از 0 یا مساوی با آن باشد"
     missing_outcome: "این نتیجه یادگیری یافت نشد"
-    near: "تسلط نسبی"
+    near: "نزدیک به مسلط"
     new_outcome: "نتیجه جدید"
     new_outcome_group: "گروه جدید نتیجه"
     outcome: 
@@ -10032,6 +10109,7 @@ fa-IR:
       attempts: 
         one: "%{count} تلاش"
         other: "%{count} تلاش"
+      attempts_from_artifacts: "%{attempts} *از %{artifacts}*"
       labels: 
         see_results: "نگاه کنید به نتایج %{user_name}'s برای"
       mastery: "تسلط در آخرین تلاش"
@@ -10211,6 +10289,14 @@ fa-IR:
       description: "برنامه فیس بوک کانواس"
       name: "فیس بوک"
     facebook_settings: 
+      description: |-
+          نیاز خواهید داشت یک [برنامه جدید در facebook.com](%{facebook_url}) ایجاد کنید و «برنامه در فیس بوک» را به عنوان یک پلتفرم بیفزایید.
+          گزینه های پیکربندی زیر را تنظیم کنید تا مطمئن شوید که برنامه فیس بوک
+          درست کار می کند:
+          
+          * **تنظیمات -- برنامه در فیس بوک -- نشانی اینترنتی کانواس:** از هر آنچه انتخاب می کنید (بخش بعد از apps.facebook.com) یادداشت بردارید و در فرم زیر وارد نمایید
+          * **تنظیمات-- برنامه در فیس بوک -- نشانی اینترنتی کانواس:** روی %{canvas_url} تنظیم کنید
+          * بعد از ذخیره سازی برنامه، از شناسه برنامه، نشانه مشتری و رمز برنامه یادداشت بردارید
       domain_name: دامنه
       headers: 
         domain_settings: "تنظیمات دامنه"
@@ -10319,6 +10405,15 @@ fa-IR:
       description: "یکپارچه‌سازی لینکدین"
       name: لینکدین
     linked_in_settings: 
+      description: |-
+          نیاز به ثبت یک [برنامه جدید در لینکدین](%{linkedin_url}) خواهید داشت.
+          گزینه های پیکر بندی زیر را تنظیم کنید تا مطمئن شوید یکپارچه‌سازی لینکدین شما
+          درست کار می کند.
+          
+          * **نوع برنامه:** روی «برنامه وب» تنظیم کنید
+          * **وضعیت فعال:** روی «فعال» تنظیم کنید
+          * **نشانی اینترنتی هدایت OAuth:** روی %{oauth_url} تنظیم کنید
+          * بعد از اینکه برنامه خود را ذخیره ساختید، از کلید API و کلید رمز یادداشت بردارید
       domain_name: دامنه
       labels: 
         api_key: "کلید API"
@@ -11265,6 +11360,7 @@ fa-IR:
     correct_answers_no_longer_available: "پاسخ های درست، دیگر در دسترس نیستند."
     correct_answers_protected: "پاسخ های درست مخفی شده اند."
     correct_answers_shown_after: "پاسخ های درست در %{date} در دسترس خواهند بود."
+    correct_answers_shown_between: "پاسخ های درست %{from} - %{to} در دسترس خواهند بود."
     correct_answers_shown_until: "پاسخ های درست تا %{date} در دسترس هستند."
     default_answer_comments: "پاسخ در صورتی که دانشجو این پاسخ را انتخاب کند"
     default_answer_comments_on_match: "پاسخ در صورتی که دانشجو این پاسخ را تطبیق دهد"
@@ -11543,6 +11639,7 @@ fa-IR:
       equations_help: 
         equation_functions: "علاوه بر متغیرها، مجموعه ای از توابع کمکی نیز وجود دارد که می توانید برای ایجاد مقادیر مفید استفاده کنید. به عنوان مثال: %{example}. برای مشاهده شرح یک تابع کمکی خاص، آن را از فهرست زیر انتخاب کنید:"
         equation_intro: "محاسبه بر اساس مجموعه ای از یک یا چند فرمول محاسبه  است. شما می توانید متغیر میانی در این فرمول تعریف کنید، اما نتیجه عددی از آخرین فرمول آن چیزی است که مورد استفاده قرار می گیرد برای تولید پاسخ درست. به عنوان مثال %{example} برای این مجموعه ای از فرمول ها، پاسخ نهایی 71 است با این حال، هیچ متغیرهای از پیش تعریف شده وجود ندارد، بنابراین همه دانش آموزان این سوال مشابه با همان جواب داشته باشد\"variables\" تب برای اطلاعات بیشتر در مورد متغیرهای کنید."
+        equation_variables2: "همچنین می توانید متغیرهای موجود در متن پرسش خود را با استفاده از کروشه («[a] + [b]\" چیست؟») تعیین کنید. برای هر متغیر، یک \"مقدار نمونه\" را بر اساس تنظیمات متغیر خواهید دید. این امر به شما امکان می دهد ریاضی خود را بررسی کنید و مطمئن شوید که فرمول ها کار می کنند. برای مثال، اگر پرسش شما «حاصل [a] + 5 چند است؟» بود، از شما خواسته می شد، متغیر \"a\" را تعریف کنید. اگر مقدار نمونه برای a 5.2 بود، می توانستید بنویسید : %{example} با استفاده از این فرمول، می توانید هر تعداد از مجموعه راه حل ها را با یک مقدار متفاوت از a در هر مجموعه ایجاد کنید. یک دانشجو ممکن است این پرسش را مشاهده کند، «حاصل 5.2 + 5 چند است؟» و دانشجوی دیگر ممکن است این پرسش را مشاهده کند، «حاصل 9 + 5 چند است؟»."
         links: 
           functions: توابع
           intro: معرفی
@@ -11657,6 +11754,7 @@ fa-IR:
           add_another_answer: "افزودن جواب دیگر"
           need_help: "بکمک نیاز دارید؟"
         multi_answer_sets_example: "i.e. \"Roses are [color1], violets are [color2]\""
+        offer_combinations: " پیشنهاد %{how_many} ترکیب مقدار ممکن (max %{max_combinations})"
         options: 
           only_one_correct: "فقط یک جواب درست"
           students_select_multiple: "دانش اموزان انتخاب می کنند پاسخ های چند گانه را"
@@ -12136,6 +12234,7 @@ fa-IR:
         labels: 
           started: "شروع شده"
           times_up: "زمان به اتمام رسیده است! ثبت نتایج در"
+        logged_out_of_canvas: "*از کانواس خارج شده اید.* برای ادامه، لطفا وارد شوید"
         login_required: "نیاز به ورود"
         not_saved: "ذخیره نشده"
         quiz_instructions: "دستورالعمل های کویز"
@@ -12192,6 +12291,8 @@ fa-IR:
       count_attempts: 
         one: "%{count} تلاش"
         other: "%{count} تلاش"
+      titles: 
+        submitted_users_for_quesiton: "کاربرانی که ارسال کرده اند برای %{user}"
       uncounted_submissions: 
         one: "%{count} مورد ارسالی دیگر"
         other: "%{count} مورد ارسالی دیگر"
@@ -12271,6 +12372,7 @@ fa-IR:
     : درست
     ungraded_survey: "نظرسنجی نمره گذاری نشده"
     warnings: 
+      draft_state_unsaved_changes: "*تغییراتی در پرسش های موجود در این آزمون اعمال کرده اید.* این تغییرات تا زمانی که آزمون را ذخیره نکنید، برای دانشجویان نمایش داده نمی شوند."
       unpublished_changes: "*تغییرات منتشر نشده ای را در این آزمون انجام داده اید.* تا زمانی که آزمون را منتشر نکنید یا از نو منتشر نکنید، این تغییرها برای دانشجویان ظاهر نخواهند شد."
       unpublished_quiz: "*این آزمون منتشر نشده است* تا زمان انتشار، فقط اساتید می توانند آن را مشاهده کنند."
   quizzes_redirects: 
@@ -12471,6 +12573,7 @@ fa-IR:
     unknown_error: "جستجوی شما با اشکال مواجه شد، لطفا دوباره سعی کنید."
     updating: "در حال بهنگام سازی..."
   rubric: 
+    context_name_rubric: "دستورالعمل ارزیابی %{course_name}"
     no_description: "شرح موجود نیست"
     unknown_details: "اطلاعات ناشناس"
   rubric_assessment: 
@@ -12523,6 +12626,8 @@ fa-IR:
       remove_rubric: "حذف این دستورالعمل ارزیابی از فهرست من"
   safety_drill_title: "زمان بندی تمرین ایمنی"
   scantron_quiz_title: "کوئیز Scantron"
+  scribd: 
+    upgrade_flash: "سلام، یک نسخه قدیمی ادوبی فلش پلیر دارید. برای استفاده از iPaper (و بسیاری از چیزهای دیگر در وب)، باید %{link_tag}آخرین نسخه فلش پلیر را دریافت کنید%{end_link}."
   search: 
     course_sections: "بخش های درس"
     enrollments_observers: "بیننده ها"
@@ -12916,9 +13021,14 @@ fa-IR:
     invitation: 
       accept_or_reject: "وقتی آماده شدید، می توانید دعوت نامه را قبول یا رد کنید."
       body_designer: "برای پیوستن به %{course} به عنوان  **طراح** برای حساب کاربری **%{email_address}** دعوت شده اید."
+      body_observer: "برای پیوستن به %{course} به عنوان **بیننده** برای حساب کاربری **%{email_address}** دعوت شده اید."
+      body_student: "برای پیوستن به %{course} به عنوان **دانشجو** برای حساب کاربری **%{email_address}** دعوت شده اید."
+      body_ta: "برای پیوستن به %{course} به عنوان **دستیار آموزشی** برای حساب کاربری **%{email_address}** دعوت شده اید."
+      body_teacher: "برای پیوستن به %{course} به عنوان **استاد** برای حساب کاربری **%{email_address}** دعوت شده اید."
       buttons: 
         accept: "پذیرفتن دعوت نامه"
         reject: "رد کردن دعوت نامه"
+      wander_around_dont_get_lost: "[برای گشت و گذار](%{link_to_course}) و بازدید از جاهای مختلف آزادانه اقدام نمایید."
     keyboard_navigation_hint: 
       prompt: "ویرگول را فشار دهید تا فهرستی از میانبرهای صفحه کلید برای این صفحه را بشنوید."
     locale_warning: 
@@ -13094,6 +13204,7 @@ fa-IR:
         select: "[ انتخاب ]"
       points: "%{points} امتیاز"
       points_label: نمره
+      points_out_of2: "%{points} / %{total} امتیاز"
       titles: 
         linked_to_learning_outcome: "این معیار به نتیجه یادگیری پیوند داده شده است"
     rubric_criterion_dialog: 
@@ -13479,10 +13590,12 @@ fa-IR:
   student_ip_title: "آدرس آی پی دانشجو"
   student_name: "نام دانشجو"
   student_outcome_gradebook_description: |-
-      دفتر نمره مهارت های یادگیری دانشجویان راهی را برای دانشجویان فراهم می آورد که بسرعت پیشرفت یا نتایج یادگیری درس را مشاهده کنند.
-      نتایج در قالبی شبیه دفتر نمره نمایش داده می شوند
-      و پیشرفت هم در امتیاز عددی و نمایش داده خواهد شد و هم به عنوان
-      مهارتی/نزدیک مهارتی/جبرانی نمایش داده خواهد شد.
+      دفتر نمره تسلط یادگیری روشی را به دانشجویان ارائه می دهد که بتوانند پیشرفت خود در نتایج یادگیری
+      درس 
+      را به سرعت مشاهده کنند. نتایج در قالبی شبیه دفتر نمره ارائه می شوند
+      و پیشرفت دانشجو هم به صورت نمره عددی و هم به عنوان
+      مسلط/نزدیک به مسلط/
+      در حال بهبود ارائه می شود.
   student_submissions_title: "ارسالات دانشجویی"
   students_with_no_submissions_title: "دانشجوهای بدون ارسال"
   sub_accounts: 
@@ -14125,6 +14238,7 @@ fa-IR:
       become: "تبدیل شدن به"
       buttons: 
         update_details: "اطلاعات بهنگام سازی"
+      delete_from_account: "حذف از %{account}"
       edit: ویرایش
       labels: 
         default_email: "پست الکترونیکی پیش فرض"
@@ -14269,6 +14383,7 @@ fa-IR:
       upload_media_track_form_description: "هنگامی که یک مسیر زیرنویس در  فرمت SRT یا *WebVTT* داشتید، می توانید آن را در اینجا بارگذاری کنید."
       upload_media_track_form_description_1: "نشانی اینترنتی این فیلم را کپی کنید:"
       upload_media_track_form_description_2: "با کلیک کردن روی این پیوند و دنبال کردن دستورالعمل ها، یک فایل زیرنویس ایجاد کنید."
+      upload_media_track_form_description_3: "یک شیار زیرنویس در قالب SRT یا *WebVTT* بارگذاری کنید."
       upload_media_track_form_step1_label: "مرحله 1:"
       upload_media_track_form_step2_label: "مرحله 2:"
       upload_media_track_form_step3_label: "مرحله 3:"
