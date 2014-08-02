@@ -94,27 +94,29 @@ module DataFixup
         }
 
         loop do
-          rows = []
-
-          database.execute(cql, last_seen_key, batch_size, consistency: index.event_stream.read_consistency_level).fetch do |row|
-            row = row.to_hash
-            last_seen_key = row[index.key_column]
-            last_seen_ordered_id = row['ordered_id']
-            rows << row
+          if last_seen_ordered_id == ''
+            rows = []
+            database.execute(cql, last_seen_key, batch_size, consistency: index.event_stream.read_consistency_level).fetch do |row|
+              row = row.to_hash
+              last_seen_key = row[index.key_column]
+              last_seen_ordered_id = row['ordered_id']
+              rows << row
+            end
+            break if rows.empty?
+            yield rows, last_seen_key, last_seen_ordered_id
           end
 
           # Sort of lame but we need to get the rest of the rows if the limit exculded them.
-          last_seen_key, last_seen_ordered_id = get_ordered_id_rows(index, last_seen_key, last_seen_ordered_id) do |ordered_id_rows|
-            rows.concat(ordered_id_rows)
+          get_ordered_id_rows(index, last_seen_key, last_seen_ordered_id) do |rows, last_seen_ordered_id|
+            yield rows, last_seen_key, last_seen_ordered_id
           end
 
-          break if rows.empty?
-          yield rows, last_seen_key, last_seen_ordered_id
+          last_seen_ordered_id = ''
         end
       end
 
       def get_ordered_id_rows(index, last_seen_key, last_seen_ordered_id)
-        return [last_seen_key, last_seen_ordered_id] if last_seen_key.blank?
+        return if last_seen_key.blank?
 
         cql = %{
         SELECT #{index.id_column},
@@ -131,16 +133,13 @@ module DataFixup
 
           database.execute(cql, last_seen_key, last_seen_ordered_id, batch_size, consistency: index.event_stream.read_consistency_level).fetch do |row|
             row = row.to_hash
-            last_seen_key = row[index.key_column]
             last_seen_ordered_id = row['ordered_id']
             rows << row
           end
 
           break if rows.empty?
-          yield rows
+          yield rows, last_seen_ordered_id
         end
-
-        return [last_seen_key, last_seen_ordered_id]
       end
     end
 
