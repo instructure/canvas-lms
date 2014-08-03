@@ -1012,17 +1012,13 @@ end
   end
 
   def eportfolio(opts={})
-    user(opts)
+    user(opts) unless @user
     @portfolio = @user.eportfolios.create!
   end
 
   def eportfolio_with_user(opts={})
+    user(opts)
     eportfolio(opts)
-  end
-
-  def eportfolio_with_user_logged_in(opts={})
-    eportfolio_with_user(opts)
-    user_session(@user)
   end
 
   def conversation(*users)

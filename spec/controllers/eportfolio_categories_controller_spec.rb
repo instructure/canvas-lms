@@ -19,28 +19,30 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe EportfolioCategoriesController do
+  before :once do
+    eportfolio_with_user(:active_all => true)
+  end
+
   def eportfolio_category
     @category = @portfolio.eportfolio_categories.create(:name => "some name")
   end
 
   describe "GET 'index'" do
     it "should redirect" do
-      eportfolio
       get 'index', :eportfolio_id => @portfolio.id
       response.should be_redirect
     end
   end
   
   describe "GET 'show'" do
+    before(:once) { eportfolio_category }
     it "should require authorization" do
-      eportfolio_with_user(:active_all => true)
       get 'show', :eportfolio_id => @portfolio.id, :id => 1
       assert_unauthorized
     end
     
     it "should assign variables" do
-      eportfolio_with_user_logged_in(:active_all => true)
-      eportfolio_category
+      user_session(@user)
       get 'show', :eportfolio_id => @portfolio.id, :id => @category.id
       response.should be_success
       assigns[:portfolio].should_not be_nil
@@ -50,8 +52,7 @@ describe EportfolioCategoriesController do
     end
     
     it "should responsd to named category request" do
-      eportfolio_with_user_logged_in(:active_all => true)
-      eportfolio_category
+      user_session(@user)
       get 'show', :eportfolio_id => @portfolio.id, :category_name => @category.slug
       response.should be_success
       assigns[:portfolio].should_not be_nil
@@ -63,13 +64,12 @@ describe EportfolioCategoriesController do
   
   describe "POST 'create'" do
     it "should require authorization" do
-      eportfolio_with_user
       post 'create', :eportfolio_id => @portfolio.id, :eportfolio_category => {:name => "some portfolio"}
       assert_unauthorized
     end
     
     it "should create eportfolio category" do
-      eportfolio_with_user_logged_in
+      user_session(@user)
       post 'create', :eportfolio_id => @portfolio.id, :eportfolio_category => {:name => "some category"}
       response.should be_redirect
       assigns[:category].should_not be_nil
@@ -78,16 +78,14 @@ describe EportfolioCategoriesController do
   end
   
   describe "PUT 'update'" do
+    before(:once) { eportfolio_category }
     it "should require authorization" do
-      eportfolio_with_user(:active_all => true)
-      eportfolio_category
       put 'update', :eportfolio_id => @portfolio.id, :id => @category.id, :eportfolio_category => {:name => "new name" }
       assert_unauthorized
     end
     
     it "should update eportfolio category" do
-      eportfolio_with_user_logged_in(:active_all => true)
-      eportfolio_category
+      user_session(@user)
       put 'update', :eportfolio_id => @portfolio.id, :id => @category.id, :eportfolio_category => {:name => "new name" }
       assigns[:category].should_not be_nil
       assigns[:category].should eql(@category)
@@ -95,16 +93,14 @@ describe EportfolioCategoriesController do
   end
   
   describe "DELETE 'destroy'" do
+    before(:once) { eportfolio_category }
     it "should require authorization" do
-      eportfolio_with_user(:active_all => true)
-      eportfolio_category
       delete 'destroy', :eportfolio_id => @portfolio.id, :id => @category.id
       assert_unauthorized
     end
     
     it "should delete eportfolio category" do
-      eportfolio_with_user_logged_in(:active_all => true)
-      eportfolio_category
+      user_session(@user)
       delete 'destroy', :eportfolio_id => @portfolio.id, :id => @category.id
       assigns[:category].should be_frozen
     end

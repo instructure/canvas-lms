@@ -19,15 +19,14 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe DiscussionEntriesController do
-  def course_topic
+  before :once do
+    course_with_teacher(:active_all => true)
+    student_in_course(:active_all => true)
     @topic = @course.discussion_topics.create(:title => "some topic")
+    @entry = @topic.discussion_entries.create(:message => "some message", :user => @student)
   end
-  def topic_entry
-    @entry = @topic.discussion_entries.create(:message => "some message", :user => @user)
-  end
+
   def topic_with_media_reply
-    course_with_student(:active_all => true)
-    course_topic
     @topic.update_attribute(:podcast_enabled, true)
     @mo1 = @course.media_objects.build(:media_id => 'asdf', :title => 'asdf')
     @mo1.data = {:extensions => {:mp4 => {
@@ -35,22 +34,17 @@ describe DiscussionEntriesController do
       :extension => 'mp4'
     }}}
     @mo1.save!
-    @entry = @topic.discussion_entries.create!(:user => @user, :message => " media_comment_asdf ")
+    @entry = @topic.discussion_entries.create!(:user => @student, :message => " media_comment_asdf ")
   end
 
   describe "GET 'show'" do
     it "should require authorization" do
-      course_with_student(:active_all => true)
-      course_topic
-      topic_entry
       get 'show', :course_id => @course.id, :id => @entry.id
       assert_unauthorized
     end
     
     it "should assign variables" do
-      course_with_student_logged_in(:active_all => true)
-      course_topic
-      topic_entry
+      user_session(@student)
       get 'show', :course_id => @course.id, :id => @entry.id, :format => :json
       # response.should be_success
       assigns[:entry].should_not be_nil
@@ -60,15 +54,12 @@ describe DiscussionEntriesController do
   
   describe "POST 'create'" do
     it "should require authorization" do
-      course_with_teacher(:active_all => true)
-      course_topic
       post 'create', :course_id => @course.id, :discussion_entry => {:discussion_topic_id => @topic.id, :message => "yo"}
       assert_unauthorized
     end
     
     it "should create a message" do
-      course_with_student_logged_in(:active_all => true)
-      course_topic
+      user_session(@student)
       post 'create', :course_id => @course.id, :discussion_entry => {:discussion_topic_id => @topic.id, :message => "yo"}
       assigns[:topic].should eql(@topic)
       assigns[:entry].should_not be_nil
@@ -77,8 +68,7 @@ describe DiscussionEntriesController do
     end
     
     it "should attach a file if authorized" do
-      course_with_teacher_logged_in(:active_all => true)
-      course_topic
+      user_session(@teacher)
       post 'create', :course_id => @course.id, :discussion_entry => {:discussion_topic_id => @topic.id, :message => "yo"}, :attachment => {:uploaded_data => default_uploaded_data}
       assigns[:topic].should eql(@topic)
       assigns[:entry].should_not be_nil
@@ -88,8 +78,7 @@ describe DiscussionEntriesController do
     end
     
     it "should NOT attach a file if not authorized" do
-      course_with_student_logged_in(:active_all => true)
-      course_topic
+      user_session(@student)
       post 'create', :course_id => @course.id, :discussion_entry => {:discussion_topic_id => @topic.id, :message => "yo"}, :attachment => {:uploaded_data => default_uploaded_data}
       assigns[:topic].should eql(@topic)
       assigns[:entry].should_not be_nil
@@ -99,35 +88,29 @@ describe DiscussionEntriesController do
     end
 
     it "should create a submission if the topic has an assignment" do
-      course_with_student_logged_in(:active_all => true)
+      course_with_student_logged_in(active_all: true, :course => @course)
       assignment_model(:course => @course)
-      course_topic
       @topic.assignment = @assignment
       @topic.save
-      @user.submissions.should be_empty
+      @student.submissions.should be_empty
 
       post 'create', :course_id => @course.id, :discussion_entry => {:discussion_topic_id => @topic.id, :message => "yo"}
       response.should be_redirect
 
-      @user.reload
-      @user.submissions.size.should == 1
-      @user.submissions.first.submission_type.should == 'discussion_topic'
+      @student.reload
+      @student.submissions.size.should == 1
+      @student.submissions.first.submission_type.should == 'discussion_topic'
     end
   end
   
   describe "PUT 'update'" do
     it "should require authorization" do
-      course_with_teacher(:active_all => true)
-      course_topic
-      topic_entry
       put 'update', :course_id => @course.id, :id => @entry.id, :discussion_entry => {}
       assert_unauthorized
     end
     
     it "should update the entry" do
-      course_with_teacher_logged_in(:active_all => true)
-      course_topic
-      topic_entry
+      user_session(@teacher)
       put 'update', :course_id => @course.id, :id => @entry.id, :discussion_entry => {:message => "ahem"}
       response.should be_redirect
       assigns[:entry].should eql(@entry)
@@ -135,9 +118,7 @@ describe DiscussionEntriesController do
     end
     
     it "should attach a new file to the entry" do
-      course_with_teacher_logged_in(:active_all => true)
-      course_topic
-      topic_entry
+      user_session(@teacher)
       put 'update', :course_id => @course.id, :id => @entry.id, :discussion_entry => {:message => "ahem"}, :attachment => {:uploaded_data => default_uploaded_data}
       response.should be_redirect
       assigns[:entry].should eql(@entry)
@@ -146,10 +127,8 @@ describe DiscussionEntriesController do
     end
     
     it "should replace the file to the entry" do
-      course_with_teacher_logged_in(:active_all => true)
-      course_topic
+      user_session(@teacher)
       @a = @course.attachments.create!(:uploaded_data => default_uploaded_data)
-      topic_entry
       @entry.attachment = @a
       @entry.save
       put 'update', :course_id => @course.id, :id => @entry.id, :discussion_entry => {:message => "ahem"}, :attachment => {:uploaded_data => default_uploaded_data}
@@ -161,10 +140,8 @@ describe DiscussionEntriesController do
     end
     
     it "should replace the file to the entry" do
-      course_with_teacher_logged_in(:active_all => true)
-      course_topic
+      user_session(@teacher)
       @a = @course.attachments.create!(:uploaded_data => default_uploaded_data)
-      topic_entry
       @entry.attachment = @a
       @entry.save
       put 'update', :course_id => @course.id, :id => @entry.id, :discussion_entry => {:message => "ahem", :remove_attachment => '1'}
@@ -175,9 +152,7 @@ describe DiscussionEntriesController do
     end
     
     it "should not replace the file to the entry if not authorized" do
-      course_with_student_logged_in(:active_all => true)
-      course_topic
-      topic_entry
+      user_session(@student)
       put 'update', :course_id => @course.id, :id => @entry.id, :discussion_entry => {:message => "ahem"}, :attachment => {:uploaded_data => default_uploaded_data}
       response.should be_redirect
       assigns[:entry].should eql(@entry)
@@ -186,11 +161,7 @@ describe DiscussionEntriesController do
     end
     
     it "should set the editor_id to whoever edited to entry" do
-      course_with_teacher_logged_in(:active_all => true)
-      @teacher = @user
-      course_topic
-      @student = user_model
-      @course.enroll_student(@student).accept
+      user_session(@teacher)
       @entry = @topic.discussion_entries.build(:message => "test")
       @entry.user = @student
       @entry.save!
@@ -205,17 +176,12 @@ describe DiscussionEntriesController do
   
   describe "DELETE 'destroy'" do
     it "should require authorization" do
-      course_with_teacher(:active_all => true)
-      course_topic
-      topic_entry
       delete 'destroy', :course_id => @course.id, :id => @entry.id
       assert_unauthorized
     end
     
     it "should delete the entry" do
-      course_with_teacher_logged_in(:active_all => true)
-      course_topic
-      topic_entry
+      user_session(@teacher)
       delete 'destroy', :course_id => @course.id, :id => @entry.id
       response.should be_redirect
 
@@ -229,25 +195,23 @@ describe DiscussionEntriesController do
   end
   
   describe "GET 'public_feed.rss'" do
+    before :once do
+      @entry.destroy
+    end
+
     it "should require authorization" do
-      course_with_student(:active_all => true)
-      course_topic
       get 'public_feed', :discussion_topic_id => @topic.id, :format => 'rss', :feed_code => @enrollment.feed_code + "x"
       assigns[:problem].should eql("The verification code does not match any currently enrolled user.")
       response.should
     end
     
     it "should require the podcast to be enabled" do
-      course_with_student(:active_all => true)
-      course_topic
       get 'public_feed', :discussion_topic_id => @topic.id, :format => 'rss', :feed_code => @enrollment.feed_code
       assigns[:problem].should eql("Podcasts have not been enabled for this topic.")
       response.should
     end
     
     it "should return a valid RSS feed" do
-      course_with_student(:active_all => true)
-      course_topic
       @topic.update_attribute(:podcast_enabled, true)
       get 'public_feed', :discussion_topic_id => @topic.id, :format => 'rss', :feed_code => @enrollment.feed_code
       assigns[:entries].should_not be_nil
@@ -289,7 +253,7 @@ describe DiscussionEntriesController do
       topic_with_media_reply
       @topic.update_attribute(:podcast_has_student_posts, true)
       @topic.update_attribute(:delayed_post_at, 2.days.from_now)
-      @topic.locked_for?(@user).should_not eql(nil)
+      @topic.locked_for?(@student).should_not eql(nil)
       get 'public_feed', :discussion_topic_id => @topic.id, :format => 'rss', :feed_code => @enrollment.feed_code
       assigns[:entries].should_not be_nil
       assigns[:entries].should_not be_empty

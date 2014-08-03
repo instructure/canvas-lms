@@ -37,9 +37,13 @@ def new_valid_tool(course)
 end
 
 describe ExternalToolsController do
+  before :once do
+    course_with_teacher(:active_all => true)
+    student_in_course(:active_all => true)
+  end
+
   describe "GET 'retrieve'" do
     it "should require authentication" do
-      course_with_teacher(:active_all => true)
       user_model
       user_session(@user)
       get 'retrieve', :course_id => @course.id
@@ -47,7 +51,7 @@ describe ExternalToolsController do
     end
 
     it "should find tools matching by exact url" do
-      course_with_teacher_logged_in(:active_all => true)
+      user_session(@teacher)
       tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
       tool.url = "http://www.example.com/basic_lti"
       tool.save!
@@ -58,7 +62,7 @@ describe ExternalToolsController do
     end
 
     it "should find tools matching by domain" do
-      course_with_teacher_logged_in(:active_all => true)
+      user_session(@teacher)
       tool = new_valid_tool(@course)
       get 'retrieve', :course_id => @course.id, :url => "http://www.example.com/basic_lti"
       response.should be_success
@@ -67,7 +71,7 @@ describe ExternalToolsController do
     end
 
     it "should redirect if no matching tools are found" do
-      course_with_teacher_logged_in(:active_all => true)
+      user_session(@teacher)
       get 'retrieve', :course_id => @course.id, :url => "http://www.example.com"
       response.should be_redirect
       flash[:error].should == "Couldn't find valid settings for this link"
@@ -76,7 +80,6 @@ describe ExternalToolsController do
 
   describe "GET 'resource_selection'" do
     it "should require authentication" do
-      course_with_teacher(:active_all => true)
       user_model
       user_session(@user)
       get 'resource_selection', :course_id => @course.id, :external_tool_id => 0
@@ -84,14 +87,14 @@ describe ExternalToolsController do
     end
 
     it "should be accessible by students" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       tool = new_valid_tool(@course)
       get 'resource_selection', :course_id => @course.id, :external_tool_id => tool.id
       response.should be_success
     end
 
     it "should redirect if no matching tools are found" do
-      course_with_teacher_logged_in(:active_all => true)
+      user_session(@teacher)
       tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
       tool.url = "http://www.example.com/basic_lti"
       # this tool exists, but isn't properly configured
@@ -102,7 +105,7 @@ describe ExternalToolsController do
     end
 
     it "should find a valid tool if one exists" do
-      course_with_teacher_logged_in(:active_all => true)
+      user_session(@teacher)
       tool = new_valid_tool(@course)
       get 'resource_selection', :course_id => @course.id, :external_tool_id => tool.id
       response.should be_success
@@ -111,7 +114,7 @@ describe ExternalToolsController do
     end
 
     it "should set html selection if specified" do
-      course_with_teacher_logged_in(:active_all => true)
+      user_session(@teacher)
       tool = new_valid_tool(@course)
       html = "<img src='/blank.png'/>"
       get 'resource_selection', :course_id => @course.id, :external_tool_id => tool.id, :editor_button => '1', :selection => html
@@ -131,7 +134,7 @@ describe ExternalToolsController do
     end
 
     it "should be accessible even after course is soft-concluded" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       @course.conclude_at = 1.day.ago
       @course.restrict_enrollments_to_course_dates = true
       @course.save!
@@ -144,7 +147,7 @@ describe ExternalToolsController do
     end
 
     it "should be accessible even after course is hard-concluded" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       @course.complete
 
       tool = new_valid_tool(@course)
@@ -155,7 +158,7 @@ describe ExternalToolsController do
     end
 
     it "should be accessible even after enrollment is concluded and include a parameter indicating inactive state" do
-      course_with_student_logged_in(:active_all => true)
+      user_session(@student)
       e = @student.enrollments.first
       e.conclude
       e.reload
@@ -171,13 +174,12 @@ describe ExternalToolsController do
 
   describe "POST 'create'" do
     it "should require authentication" do
-      course_with_teacher(:active_all => true)
       post 'create', :course_id => @course.id, :format => "json"
       assert_status(401)
     end
 
     it "should accept basic configurations" do
-      course_with_teacher_logged_in(:active_all => true)
+      user_session(@teacher)
       post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret"}, :format => "json"
       response.should be_success
       assigns[:tool].should_not be_nil
@@ -189,7 +191,7 @@ describe ExternalToolsController do
 
     it "should fail on basic xml with no url or domain set" do
       rescue_action_in_public! if CANVAS_RAILS2
-      course_with_teacher_logged_in(:active_all => true)
+      user_session(@teacher)
       xml = <<-XML
 <?xml version="1.0" encoding="UTF-8"?>
 <cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0"
@@ -215,7 +217,7 @@ describe ExternalToolsController do
     end
 
     it "should handle advanced xml configurations" do
-      course_with_teacher_logged_in(:active_all => true)
+      user_session(@teacher)
       xml = <<-XML
 <?xml version="1.0" encoding="UTF-8"?>
 <cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0"
@@ -257,7 +259,7 @@ describe ExternalToolsController do
     end
 
     it "should handle advanced xml configurations with no url or domain set" do
-      course_with_teacher_logged_in(:active_all => true)
+      user_session(@teacher)
       xml = <<-XML
 <?xml version="1.0" encoding="UTF-8"?>
 <cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0"
@@ -299,7 +301,7 @@ describe ExternalToolsController do
     end
 
     it "should handle advanced xml configurations by URL retrieval" do
-      course_with_teacher_logged_in(:active_all => true)
+      user_session(@teacher)
       xml = <<-XML
 <?xml version="1.0" encoding="UTF-8"?>
 <cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0"
@@ -344,7 +346,7 @@ describe ExternalToolsController do
 
     it "should fail gracefully on invalid URL retrieval or timeouts" do
       Net::HTTP.any_instance.stubs(:request).raises(Timeout::Error)
-      course_with_teacher_logged_in(:active_all => true)
+      user_session(@teacher)
       xml = "bob"
       post 'create', :course_id => @course.id, :external_tool => {:name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_url", :config_url => "http://config.example.com"}, :format => "json"
       response.should_not be_success
@@ -356,7 +358,7 @@ describe ExternalToolsController do
     context "navigation tabs caching" do
       it "shouldn't clear the navigation tabs cache for non navigtaion tools" do
         enable_cache do
-          course_with_teacher_logged_in(:active_all => true)
+          user_session(@teacher)
           nav_cache = Lti::NavigationCache.new(@course.root_account)
           cache_key = nav_cache.cache_key
           xml = <<-XML
@@ -387,7 +389,7 @@ describe ExternalToolsController do
 
       it 'should clear the navigation tabs cache for course nav' do
         enable_cache do
-          course_with_teacher_logged_in(:active_all => true)
+          user_session(@teacher)
           cache_key = Lti::NavigationCache.new(@course.root_account).cache_key
           xml = <<-XML
 <cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0" xmlns:blti="http://www.imsglobal.org/xsd/imsbasiclti_v1p0" xmlns:lticm="http://www.imsglobal.org/xsd/imslticm_v1p0" xmlns:lticp="http://www.imsglobal.org/xsd/imslticp_v1p0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imslticc_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticc_v1p0.xsd http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0p1.xsd http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
@@ -421,7 +423,7 @@ describe ExternalToolsController do
 
       it 'should clear the navigation tabs cache for account nav' do
         enable_cache do
-          course_with_teacher_logged_in(:active_all => true)
+          user_session(@teacher)
           cache_key = Lti::NavigationCache.new(@course.root_account).cache_key
           xml = <<-XML
 <cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0" xmlns:blti="http://www.imsglobal.org/xsd/imsbasiclti_v1p0" xmlns:lticm="http://www.imsglobal.org/xsd/imslticm_v1p0" xmlns:lticp="http://www.imsglobal.org/xsd/imslticp_v1p0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imslticc_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticc_v1p0.xsd http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0p1.xsd http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
@@ -455,7 +457,7 @@ describe ExternalToolsController do
 
       it 'should clear the navigation tabs cache for user nav' do
         enable_cache do
-          course_with_teacher_logged_in(:active_all => true)
+          user_session(@teacher)
           cache_key = Lti::NavigationCache.new(@course.root_account).cache_key
           xml = <<-XML
 <cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0" xmlns:blti="http://www.imsglobal.org/xsd/imsbasiclti_v1p0" xmlns:lticm="http://www.imsglobal.org/xsd/imslticm_v1p0" xmlns:lticp="http://www.imsglobal.org/xsd/imslticp_v1p0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imslticc_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticc_v1p0.xsd http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0p1.xsd http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
