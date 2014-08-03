@@ -54,14 +54,14 @@ class AdminsController < ApplicationController
   #
   # Flag an existing user as an admin within the account.
   #
-  # @argument user_id [Integer]
+  # @argument user_id [Required, Integer]
   #   The id of the user to promote.
   #
-  # @argument role [Optional, String]
+  # @argument role [String]
   #   The user's admin relationship with the account will be created with the
   #   given role. Defaults to 'AccountAdmin'.
   #
-  # @argument send_confirmation [Optional, Boolean] Send a notification email to
+  # @argument send_confirmation [Boolean] Send a notification email to
   #   the new admin if true. Default is true.
   #
   # @returns Admin
@@ -90,7 +90,7 @@ class AdminsController < ApplicationController
   #
   # Remove the rights associated with an account admin role from a user.
   #
-  # @argument role [Optional, String]
+  # @argument role [String]
   #   Account role to remove from the user. Defaults to 'AccountAdmin'. Any
   #   other account role must be specified explicitly.
   #
@@ -109,7 +109,7 @@ class AdminsController < ApplicationController
   #
   # List the admins in the account
   #
-  # @argument user_id[] [Optional, [Integer]]
+  # @argument user_id[] [[Integer]]
   #   Scope the results to those with user IDs equal to any of the IDs specified here.
   #
   # @returns [Admin]

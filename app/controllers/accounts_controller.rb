@@ -145,7 +145,7 @@ class AccountsController < ApplicationController
   #
   # List accounts that are sub-accounts of the given account.
   #
-  # @argument recursive [Optional, Boolean] If true, the entire account tree underneath
+  # @argument recursive [Boolean] If true, the entire account tree underneath
   #   this account will be returned (though still paginated). If false, only
   #   direct sub-accounts of this account will be returned. Defaults to false.
   #
@@ -185,40 +185,40 @@ class AccountsController < ApplicationController
   # @API List active courses in an account
   # Retrieve the list of courses in this account.
   #
-  # @argument with_enrollments [Optional, Boolean]
+  # @argument with_enrollments [Boolean]
   #   If true, include only courses with at least one enrollment.  If false,
   #   include only courses with no enrollments.  If not present, do not filter
   #   on course enrollment status.
   #
-  # @argument published [Optional, Boolean]
+  # @argument published [Boolean]
   #   If true, include only published courses.  If false, exclude published
   #   courses.  If not present, do not filter on published status.
   #
-  # @argument completed [Optional, Boolean]
+  # @argument completed [Boolean]
   #   If true, include only completed courses (these may be in state
   #   'completed', or their enrollment term may have ended).  If false, exclude
   #   completed courses.  If not present, do not filter on completed status.
   #
-  # @argument by_teachers[] [Optional, Integer]
+  # @argument by_teachers[] [Integer]
   #   List of User IDs of teachers; if supplied, include only courses taught by
   #   one of the referenced users.
   #
-  # @argument by_subaccounts[] [Optional, Integer]
+  # @argument by_subaccounts[] [Integer]
   #   List of Account IDs; if supplied, include only courses associated with one
   #   of the referenced subaccounts.
   #
-  # @argument hide_enrollmentless_courses [Optional, Boolean]
+  # @argument hide_enrollmentless_courses [Boolean]
   #   If present, only return courses that have at least one enrollment.
   #   Equivalent to 'with_enrollments=true'; retained for compatibility.
   #
-  # @argument state[] [Optional, "created"|"claimed"|"available"|"completed"|"deleted"|"all"]
+  # @argument state[] ["created"|"claimed"|"available"|"completed"|"deleted"|"all"]
   #   If set, only return courses that are in the given state(s). By default,
   #   all states but "deleted" are returned.
   #
-  # @argument enrollment_term_id [Optional, Integer]
+  # @argument enrollment_term_id [Integer]
   #   If set, only includes courses from the specified term.
   #
-  # @argument search_term [Optional, String]
+  # @argument search_term [String]
   #   The partial course name, code, or full ID to match and return in the results list. Must be at least 3 characters.
   #
   # @returns [Course]
@@ -344,21 +344,21 @@ class AccountsController < ApplicationController
   # @API Update an account
   # Update an existing account.
   #
-  # @argument account[name] [Optional, String]
+  # @argument account[name] [String]
   #   Updates the account name
   #
-  # @argument account[default_time_zone] [Optional, String]
+  # @argument account[default_time_zone] [String]
   #   The default time zone of the account. Allowed time zones are
   #   {http://www.iana.org/time-zones IANA time zones} or friendlier
   #   {http://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html Ruby on Rails time zones}.
   #
-  # @argument account[default_storage_quota_mb] [Optional, Integer]
+  # @argument account[default_storage_quota_mb] [Integer]
   #   The default course storage quota to be used, if not otherwise specified.
   #
-  # @argument account[default_user_storage_quota_mb] [Optional, Integer]
+  # @argument account[default_user_storage_quota_mb] [Integer]
   #   The default user storage quota to be used, if not otherwise specified.
   #
-  # @argument account[default_group_storage_quota_mb] [Optional, Integer]
+  # @argument account[default_group_storage_quota_mb] [Integer]
   #   The default group storage quota to be used, if not otherwise specified.
   #
   # @example_request

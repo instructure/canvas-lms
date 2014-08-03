@@ -94,16 +94,16 @@ class SubAccountsController < ApplicationController
   # @API Create a new sub-account
   # Add a new sub-account to a given account.
   #
-  # @argument account[name] [String]
+  # @argument account[name] [Required, String]
   #   The name of the new sub-account.
   #
-  # @argument account[default_storage_quota_mb] [Optional, Integer]
+  # @argument account[default_storage_quota_mb] [Integer]
   #   The default course storage quota to be used, if not otherwise specified.
   #
-  # @argument account[default_user_storage_quota_mb] [Optional, Integer]
+  # @argument account[default_user_storage_quota_mb] [Integer]
   #   The default user storage quota to be used, if not otherwise specified.
   #
-  # @argument account[default_group_storage_quota_mb] [Optional, Integer]
+  # @argument account[default_group_storage_quota_mb] [Integer]
   #   The default group storage quota to be used, if not otherwise specified.
   #
   # @returns [Account]
