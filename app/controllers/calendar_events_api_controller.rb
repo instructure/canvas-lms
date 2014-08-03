@@ -257,22 +257,22 @@ class CalendarEventsApiController < ApplicationController
   #
   # Retrieve the list of calendar events or assignments for the current user
   #
-  # @argument type [Optional, String, "event"|"assignment"] Defaults to "event"
-  # @argument start_date [Optional, Date]
+  # @argument type [String, "event"|"assignment"] Defaults to "event"
+  # @argument start_date [Date]
   #   Only return events since the start_date (inclusive). 
   #   Defaults to today. The value should be formatted as: yyyy-mm-dd or ISO 8601 YYYY-MM-DDTHH:MM:SSZ.
-  # @argument end_date [Optional, Date]
+  # @argument end_date [Date]
   #   Only return events before the end_date (inclusive). 
   #   Defaults to start_date. The value should be formatted as: yyyy-mm-dd or ISO 8601 YYYY-MM-DDTHH:MM:SSZ.
   #   If end_date is the same as start_date, then only events on that day are 
   #   returned.
-  # @argument undated [Optional, Boolean]
+  # @argument undated [Boolean]
   #   Defaults to false (dated events only).
   #   If true, only return undated events and ignore start_date and end_date.
-  # @argument all_events [Optional, Boolean]
+  # @argument all_events [Boolean]
   #   Defaults to false (uses start_date, end_date, and undated criteria).
   #   If true, all events are returned, ignoring start_date, end_date, and undated criteria.
-  # @argument context_codes[] [Optional, String]
+  # @argument context_codes[] [String]
   #   List of context codes of courses/groups/users whose events you want to see.
   #   If not specified, defaults to the current user (i.e personal calendar, 
   #   no course/group events). Limited to 10 context codes, additional ones are 
@@ -318,32 +318,32 @@ class CalendarEventsApiController < ApplicationController
   #
   # Create and return a new calendar event
   #
-  # @argument calendar_event[context_code] [String]
+  # @argument calendar_event[context_code] [Required, String]
   #   Context code of the course/group/user whose calendar this event should be
   #   added to.
-  # @argument calendar_event[title] [Optional, String]
+  # @argument calendar_event[title] [String]
   #   Short title for the calendar event.
-  # @argument calendar_event[description] [Optional, String]
+  # @argument calendar_event[description] [String]
   #   Longer HTML description of the event.
-  # @argument calendar_event[start_at] [Optional, DateTime]
+  # @argument calendar_event[start_at] [DateTime]
   #   Start date/time of the event.
-  # @argument calendar_event[end_at] [Optional, DateTime]
+  # @argument calendar_event[end_at] [DateTime]
   #   End date/time of the event.
-  # @argument calendar_event[location_name] [Optional, String]
+  # @argument calendar_event[location_name] [String]
   #   Location name of the event.
-  # @argument calendar_event[location_address] [Optional, String]
+  # @argument calendar_event[location_address] [String]
   #   Location address
-  # @argument calendar_event[time_zone_edited] [Optional, String]
+  # @argument calendar_event[time_zone_edited] [String]
   #   Time zone of the user editing the event. Allowed time zones are
   #   {http://www.iana.org/time-zones IANA time zones} or friendlier
   #   {http://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html Ruby on Rails time zones}.
-  # @argument calendar_event[child_event_data][X][start_at] [Optional, DateTime]
+  # @argument calendar_event[child_event_data][X][start_at] [DateTime]
   #   Section-level start time(s) if this is a course event. X can be any
   #   identifier, provided that it is consistent across the start_at, end_at
   #   and context_code
-  # @argument calendar_event[child_event_data][X][end_at] [Optional, DateTime]
+  # @argument calendar_event[child_event_data][X][end_at] [DateTime]
   #   Section-level end time(s) if this is a course event.
-  # @argument calendar_event[child_event_data][X][context_code] [Optional, String]
+  # @argument calendar_event[child_event_data][X][context_code] [String]
   #   Context code(s) corresponding to the section-level start and end time(s).
   #
   # @example_request
@@ -385,11 +385,11 @@ class CalendarEventsApiController < ApplicationController
   #
   # Reserves a particular time slot and return the new reservation
   #
-  # @argument participant_id [Optional, String]
+  # @argument participant_id [String]
   #   User or group id for whom you are making the reservation (depends on the
   #   participant type). Defaults to the current user (or user's candidate group).
   #
-  # @argument cancel_existing [Optional, Boolean]
+  # @argument cancel_existing [Boolean]
   #   Defaults to false. If true, cancel any previous reservation(s) for this
   #   participant and appointment group.
   #
@@ -429,32 +429,32 @@ class CalendarEventsApiController < ApplicationController
   #
   # Update and return a calendar event
   #
-  # @argument calendar_event[context_code] [String]
+  # @argument calendar_event[context_code] [Required, String]
   #   Context code of the course/group/user whose calendar this event should be
   #   added to.
-  # @argument calendar_event[title] [Optional, String]
+  # @argument calendar_event[title] [String]
   #   Short title for the calendar event.
-  # @argument calendar_event[description] [Optional, String]
+  # @argument calendar_event[description] [String]
   #   Longer HTML description of the event.
-  # @argument calendar_event[start_at] [Optional, DateTime]
+  # @argument calendar_event[start_at] [DateTime]
   #   Start date/time of the event.
-  # @argument calendar_event[end_at] [Optional, DateTime]
+  # @argument calendar_event[end_at] [DateTime]
   #   End date/time of the event.
-  # @argument calendar_event[location_name] [Optional, String]
+  # @argument calendar_event[location_name] [String]
   #   Location name of the event.
-  # @argument calendar_event[location_address] [Optional, String]
+  # @argument calendar_event[location_address] [String]
   #   Location address
-  # @argument calendar_event[time_zone_edited] [Optional, String]
+  # @argument calendar_event[time_zone_edited] [String]
   #   Time zone of the user editing the event. Allowed time zones are
   #   {http://www.iana.org/time-zones IANA time zones} or friendlier
   #   {http://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html Ruby on Rails time zones}.
-  # @argument calendar_event[child_event_data][X][start_at] [Optional, DateTime]
+  # @argument calendar_event[child_event_data][X][start_at] [DateTime]
   #   Section-level start time(s) if this is a course event. X can be any
   #   identifier, provided that it is consistent across the start_at, end_at
   #   and context_code
-  # @argument calendar_event[child_event_data][X][end_at] [Optional, DateTime]
+  # @argument calendar_event[child_event_data][X][end_at] [DateTime]
   #   Section-level end time(s) if this is a course event.
-  # @argument calendar_event[child_event_data][X][context_code] [Optional, String]
+  # @argument calendar_event[child_event_data][X][context_code] [String]
   #   Context code(s) corresponding to the section-level start and end time(s).
   #
   # @example_request
@@ -488,7 +488,7 @@ class CalendarEventsApiController < ApplicationController
   #
   # Delete an event from the calendar and return the deleted event
   #
-  # @argument cancel_reason [Optional, String]
+  # @argument cancel_reason [String]
   #   Reason for deleting/canceling the event.
   #
   # @example_request
