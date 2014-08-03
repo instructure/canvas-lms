@@ -253,6 +253,9 @@ nb:
       logout_request_to_idp: "LogoutRequest sendt til IdP"
       logout_response_from_idp: "LogoutResponse fra IdP"
       saml_required: "En SAML-konfigurering kreves for å teste SAML"
+  account_notification: 
+    errors: 
+      invalid_account_notification_end_at: "Kontovarsel sluttid går forut med starttiden"
   account_notifications: 
     announcement_created_notice: "Kunngjøringen ble opprettet"
     announcement_creation_failed_notice: "Opprettelse av kunngjøring mislyktes"
@@ -273,6 +276,7 @@ nb:
       term_text: "Semester: %{term_name};"
     grades: 
       deleted: "Inkluder slettede objekter: sant;"
+      limited: "slettet objekter er begrenset av dager som er spesifisert;"
     outcomes: 
       order: "Rekkefølge: %{order}"
     report_header_account_id: konto_id
@@ -521,6 +525,8 @@ nb:
         message_course_id: Kurs-ID
       grade_change_logging_item: 
         blank_placeholder: "-"
+        event_type: 
+          corrupted: "Detaljer Ikke Tilgjengelig"
       grade_change_logging_results: 
         Assignment: Oppgave
         Course: Kurs
@@ -849,6 +855,8 @@ nb:
       help_link_available_to_all_teachers: Forelesere
       help_link_available_to_all_users: Brukere
       if_you_would_like_to_link_to_your_own_campus_support_website_in_the_help_dialog_you_can_do_that_here: "Hvis du vil lenke til hjemmesiden for din egen Campus-brukerstøtte i hjelp-dialogen kan du gjøre det her"
+      interpolate_account_domain: "Tast inn \"{{ACCOUNT_DOMAIN}}\" for å erstatte brukerens root kontoen domene"
+      interpolate_user_id: "Tast inn \"{{CANVAS_USER_ID}}\" for å erstatte brukerens unik Canvas ID"
       ip_filter_filter_label: Filter
       ip_filter_name_label: Navn
       labels: 
@@ -938,7 +946,9 @@ nb:
         subject: Tema
       open_registration_delegated_warning_message: "En ekstern identitetsleverandør er slått på, og brukere som er opprettet via åpen registrering kan muligens ikke logge inn dersom ikke den eksterne identitetsleverandørens innloggingsskjema har en lenke tilbake til %{url}."
       open_registration_delegated_warning_tooltip: "En ekstern identitetsleverandør er slått på "
+      open_report_description: "Åpne Rapport Beskrivelse"
       page_title: Kontoinnstillinger
+      quiz_ip_filters_delete: "Fjern Filter"
       quiz_ip_filters_help_message: |-
           IP-filtere for prøver er en måte å begrense tilgang til prøver til datamaskiner i et visst IP-område.
           
@@ -1058,6 +1068,9 @@ nb:
         other: "%{count} batcher venter på prosessering."
       pending_batches_title: "Ventende batcher"
       process_data_button: "Prosesser data"
+      select_file_instructions: |-
+          Velg zip filen som du vil importere. 
+          Beskrivelse om hvordan å generere disse zip filer, [vennligst se dette dokumentasjon](%{url}).
       sis_import_crumb: SIS-import
       started_at_message: "Startet: %{started_at}"
       title: SIS-import
@@ -2174,6 +2187,7 @@ nb:
       attendance_help: "For hjelp om oppmøte"
       new_attendance_column: "Ny kolonne for oppmøte"
   auth_logging: 
+    corrupted: "Detaljer Ikke Tilgjengelig"
     login: "LOGG INN"
     logout: "LOGG UT"
   bb_display: "Blackboard Learn"
@@ -3030,6 +3044,7 @@ nb:
     buttons: 
       process: "Behandle data"
     errors: 
+      couldnt_create: "Kan ikke lage innhold eksport."
       error: "Det oppsto en feil i eksporten av ditt kursinnhold. Vær snill å kontakte system administrator og gi De den følgende eksportidentifikator: \"%{code}\""
       not_found: "Eksporten eksisterer ikke"
     index: 
@@ -3563,6 +3578,9 @@ nb:
     content_next: 
       add_prerequisite: "Legg til forhåndskrav til *%{module}*"
       assignment_points_possible: "av %{points_possible}"
+      button: 
+        delete_label: "Slett forutsetninger"
+        delete_title: "Slett forutsetninger"
       buttons: 
         add_module: "Legg til modul"
         add_prerequisite: "Legg til forhåndskrav"
@@ -4171,6 +4189,7 @@ nb:
       concluded: Avsluttet
       copied_from: "Kopiert fra"
       copied_to: "Kopiert til"
+      corrupted: "Detaljer Ikke Tilgjengelig"
       created: Opprettet
       deleted: Slettet
       published: Publisert
