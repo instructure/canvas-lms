@@ -253,6 +253,9 @@ en-AU:
       logout_request_to_idp: "LogoutRequest sent to IdP"
       logout_response_from_idp: "LogoutResponse from IdP"
       saml_required: "A SAML configuration is required to test SAML"
+  account_notification: 
+    errors: 
+      invalid_account_notification_end_at: "Account notification end time precedes start time"
   account_notifications: 
     announcement_created_notice: "Announcement successfully created"
     announcement_creation_failed_notice: "Announcement creation failed"
@@ -273,6 +276,7 @@ en-AU:
       term_text: "Term: %{term_name};"
     grades: 
       deleted: "Include Deleted Objects: true;"
+      limited: "deleted objects limited by days specified;"
     outcomes: 
       order: "Order: %{order}"
     report_header_account_id: account_id
@@ -521,6 +525,8 @@ en-AU:
         message_course_id: "Course Id"
       grade_change_logging_item: 
         blank_placeholder: "-"
+        event_type: 
+          corrupted: "Details Not Available"
       grade_change_logging_results: 
         Assignment: Assignment
         Course: Course
@@ -849,6 +855,7 @@ en-AU:
       help_link_available_to_all_teachers: Teachers
       help_link_available_to_all_users: Users
       if_you_would_like_to_link_to_your_own_campus_support_website_in_the_help_dialog_you_can_do_that_here: "If you would like to link to your own campus support website in the help dialog you can do that here"
+      interpolate_account_domain: "Enter \"{{ACCOUNT_DOMAIN}}\" to substitute the user's root account domain"
       ip_filter_filter_label: Filter
       ip_filter_name_label: Name
       labels: 
