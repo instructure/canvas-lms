@@ -250,6 +250,9 @@ fa-IR:
       logout_request_to_idp: "درخواست خروج برای IdP ارسال شد"
       logout_response_from_idp: "درخواست خروج از IdP"
       saml_required: "یک پیکربندی SAML برای آزمون SAML لازم است"
+  account_notification: 
+    errors: 
+      invalid_account_notification_end_at: "زمان پایان اطلاعیه حساب قبل از زمان شروع است"
   account_notifications: 
     announcement_created_notice: "اطلاعیه با موفقیت ایجاد شد"
     announcement_creation_failed_notice: "ایجاد اطلاعیه انجام نشد"
@@ -519,6 +522,8 @@ fa-IR:
         message_course_id: "شناسه درس"
       grade_change_logging_item: 
         blank_placeholder: "-"
+        event_type: 
+          corrupted: "اطلاعات بیشتر موجود نیست"
       grade_change_logging_results: 
         Assignment: تکلیف
         Course: درس
@@ -937,7 +942,9 @@ fa-IR:
         subject: موضوع
       open_registration_delegated_warning_message: "یک ارائه دهنده بیرونی هویت فعال شده است، و کاربرانی که به واسطه ثبت نام آزاد ایجاد شده اند تازمانی که فرم ورود ارائه دهنده بیرونی هویت یک پیوند بازگشت به %{url} را نداشته باشد، قادر نخواهند بود وارد سامانه شوند."
       open_registration_delegated_warning_tooltip: "یک ارائه دهنده بیرونی هویت فعال شده است"
+      open_report_description: "باز کردن شرح گزارش"
       page_title: "تنظیمات حساب"
+      quiz_ip_filters_delete: "حذف فیلتر"
       quiz_ip_filters_help_message: |-
           فیلترهای آی پی آزمون روشی است برای محدود کردن دسترسی به آزمون ها به رایانه های موجود در یک محدوده خاص آی پی.
           
@@ -2180,11 +2187,19 @@ fa-IR:
       attendance_help: "راهنمای حضور"
       new_attendance_column: "ستون جدید حضور"
   auth_logging: 
+    corrupted: "اطلاعات بیشتر موجود نیست"
     login: ورود
     logout: خروج
   bb_display: "یادگیری Blackboard"
   bb_file_description: "فایل .zip صدور 6/7/8/9 Blackboard"
   bb_name: "مبدل Blackboard"
+  better_file_browsing_description: |-
+      یک واسط ساده تر و کاربرپسندتر برای مرور فایل ها. اگر آن را در سطح درس
+      فعال کنید،
+      همه کاربران موجود در این درس، واسط جدید را خواهند دید. برای نمایش آن در هنگامی
+      که شخصی
+      به صفحه فایل های شخصی یک کاربر می رود ('/files')، باید آن را برای حسابی که
+      عضوی از آن هستید، فعال کنید.
   big_blue_button_conference: 
     conference_is_recorded: "این کنفرانس در حال ضبط است."
     recording_setting: "در حال ضبط"
@@ -2264,6 +2279,7 @@ fa-IR:
     cancel: لغو
     choose_a_file: "انتخاب یک فایل"
     delete: حذف
+    delete_file: "حذف فایل %{name}"
     done: "انجام شد"
     filter: فیلتر
     find_user: "یافتن کاربر"
@@ -3036,6 +3052,7 @@ fa-IR:
     buttons: 
       process: "پردازش داده ها"
     errors: 
+      couldnt_create: "نمی توان صدور محتوا را ایجاد کرد."
       error: "در صادر کردن محتوای شما خطایی رخ داد. لطفا به مدیر سیستم خود اطلاع دهید و شناسه صدور زیر را به او بدهید: \"%{code}\""
       not_found: "صدور موجود نیست"
     index: 
@@ -4179,6 +4196,7 @@ fa-IR:
       concluded: "خاتمه یافته"
       copied_from: "کپی شده از"
       copied_to: "کپی شده در"
+      corrupted: "اطلاعات بیشتر موجود نیست"
       created: "ایجاد شده"
       deleted: "حذف شده"
       published: "منتشر شده"
@@ -5205,12 +5223,13 @@ fa-IR:
       saving: "درحال ذخیره سازی کلید..."
       saving_failed: "ذخیره سازی کلید انجام نشد"
     index: 
+      add_developer_key: "افزودن کلید توسعه دهنده"
       details: "اطلاعات بیشتر"
       developer_keys: "کلیدهای توسعه دهنده"
       key_settings: "تنظیمات کلید"
       name: نام
       show_all: "نمایش همه %{count} کلید"
-      stats: آمارها
+      stats: آمار
       title: "کلیدهای توسعه دهنده"
       user: کاربر
     messages: 
@@ -5236,6 +5255,7 @@ fa-IR:
   discussion_entry: 
     atom_no_author: "نویسنده موجود نیست"
     default_user_name: "نام کاربری"
+  discussion_group_category_locked: "رده های گروه را نمی توان مستقیما در یک تکلیف بحث تعیین کرد، بلکه در عوض باید آنها را در خود بحث تعیین کرد"
   discussion_topic: 
     atom_no_author: "نویسنده موجود نیست"
     default_title: "عنوان موجود نیست"
@@ -5301,6 +5321,7 @@ fa-IR:
       delay_posting: "ارسال با تأخیر"
       enable_podcast_feed: "فعال سازی خوراک خبری پادکست"
       include_replies_in_podcast_feed: "شامل سازی پاسخ ها در خوراک خبری پادکست"
+      only_visible_to_overrides_note: "نکته: این بحث *فقط* برای بخش(های) تعیین شده در زیر قابل مشاهده است:"
       options: "گزینه ها"
       points_possible: "امتیازهای ممکن"
       post_at: "ارسال در"
@@ -5989,7 +6010,7 @@ fa-IR:
       by_url: "بر اساس نشانی اینترنتی"
       by_xml: "چسباندن XML"
       config_url: "نشانی اینترنتی پیکربندی"
-      configuration_type: "نوع پیکره بندی"
+      configuration_type: "نوع پیکربندی"
       consumer_key: "کلید مصرف کننده"
       custom_feilds_explanation: "یکی در هر خط.. قالب: نام=مقدار"
       custom_fields: "جاهای خالی سفارشی"
@@ -6141,6 +6162,7 @@ fa-IR:
     google_docs_domain_restriction: "محدودیت دامنه Google Docs"
     high_contrast: "استفاده از سبک های دارای تضاد زیاد"
     html5_first_videos: "ترجیح دادن HTML5 برای پخش فیلم"
+    k12: "ویژگی های خاص K-12"
     learning_mastery_gradebook: "دفتر نمره تسلط یادگیری"
     new_quiz_moderate: "صفحه تعدیل سازی آزمون جدید"
     new_quiz_statistics: "صفحه آمار آزمون جدید"
@@ -7294,9 +7316,9 @@ fa-IR:
     your_email_address: "نشانی پست الکترونیکی شما"
   helpers: 
     button: 
-      create: "ایجاد کردن %{model}"
-      submit: "ذخیره %{model}"
-      update: "بروزرسانی %{model}"
+      create: "ایجاد %{model}"
+      submit: "ذخیره سازی %{model}"
+      update: "بهنگام سازی %{model}"
     course: درس
     dashboard_helper: 
       announcement_details: "جزئیات اطلاعیه"
@@ -7321,8 +7343,8 @@ fa-IR:
       prompt: "لطفا انتخاب کنید"
     submit: 
       create: "ایجاد %{model}"
-      submit: "ذخیره %{model}"
-      update: "بروزرسانی %{model}"
+      submit: "ذخیره سازی %{model}"
+      update: "بهنگام سازی %{model}"
   high_contrast_description: |-
       اگر نسخه دارای تضاد بیشتر واسط کاربر کانواس را ترجیح می دهید، این گزینه را فعال کنید.
       این نسخه ممکن است برای افراد دارای ضعف بینایی یا اشکال در خواندن مفید باشد.
@@ -7507,6 +7529,10 @@ fa-IR:
     module_sequence_footer: 
       next: بعدی
       previous: قبلی
+  k12_description: |-
+      ویژگی ها، تنظیمات و سبک هایی که به طور خاص در یک محیط K-12 معنادارتر
+      هستند. اکنون این مورد فقط
+      در برخی تغییرهای سبک کاربرد دارد، اما ویژگی های بیشتر خاص K-12 ممکن است در آینده افزوده شوند.
   labels: 
     lock_module_until: "قفل کردن ماژول تا یک تاریخ خاص"
   last_submission_activity_title: "آخرین فعالیت ارسال"
@@ -7671,7 +7697,7 @@ fa-IR:
       new_tab_expired: "جلسه مربوط به این ابزار منقضی شده است. لطفا برای دسترسی دوباره به ابزار، صفحه را دوباره بارگذاری کنید"
       new_tab_loaded: "این ابزار به طور موفقیت آمیز در یک پنجره جدید مرورگر بارگذاری شد. برای دسترسی دوباره به این ابزار، صفحه را دوباره بارگذاری کنید."
   lti2: 
-    register_tool: "ابزار ثبت نام"
+    register_tool: "ثبت ابزار"
   m2c_file_description: "ماژول 1.9/2.x"
   m2c_name: "وارد کننده Moodle"
   manage_avatars: 
@@ -8465,6 +8491,7 @@ fa-IR:
         subject: "صدور درس انجام نشد: %{course}"
     content_export_finished: 
       email: 
+        body: "صدور محتوای شما برای \"%{course}\" پایان یافته است."
         html: 
           body2: "صدور درس *%{course}* شما پایان یافت."
           link: "برای مشاهده صدورها کلیک کنید"
@@ -9301,8 +9328,19 @@ fa-IR:
     page_locked_until: "این صفحه تا تاریخ %{date} قفل شده است."
     page_unpublished_module: "این صفحه بخشی از یک ماژول منتشر نشده است و هنوز در دسترس نیست."
     peer_review_invitation: 
+      email: 
+        body: "از شما برای بازبینی گروهی %{reviewee} دعوت شده است. برای بازبینی آنها از پیوند زیر پیروی کنید!"
+        html: 
+          link_message: "برای تکمیل بازبینی خود، اینجا کلیک کنید"
+        subject: "بازبینی گروهی تخصیص داده شده برای %{reviewee}"
+      facebook: 
+        body: "از شما برای بازبینی گروهی %{reviewee} دعوت شده است. برای بازبینی آنها، از پیوند زیر پیروی کنید!"
       sms: 
         more_info: "اطلاعات بیشتر در %{url}"
+      summary: 
+        body: "از شما برای بازبینی گروهی %{reviewee} دعوت شده است. برای بازبینی آنها، از پیوند زیر پیروی کنید!"
+      twitter: 
+        body: "از شما برای بازبینی گروهی %{reviewee} دعوت شده است. برای بازبینی آنها، از پیوند زیر پیروی کنید!"
     pseudonym_registration: 
       email: 
         body: "شما برای یک حساب کانواس در %{account} ثبت نام شده اید! قبل از اینکه بتوانید وارد شوید و از کانواس استفاده کنید، باید به فرایند پیکربندی خاتمه دهید."
@@ -9930,6 +9968,7 @@ fa-IR:
         
         ثبت نام قرار ملاقات دانشجو
     student_appointment_display: "ثبت نام های قرار ملاقات دانشجو"
+    submission_comment_description: "نظر درباره تکلیف ارسالی"
     submission_comment_display: "نظر درباره مورد ارسالی"
   notification_preferences: 
     communication: 
@@ -9980,7 +10019,9 @@ fa-IR:
       decimal_units: 
         format: "%n %u"
         units: 
+          billion: میلیارد
           million: میلیون
+          quadrillion: کادريليون
           thousand: هزار
           trillion: تریلیون
       storage_units: 
@@ -9995,8 +10036,11 @@ fa-IR:
           tb: ترابایت
   observees: 
     add_observee_button: "افزودن دانشجو"
+    being_observed: "دانشجویانی که در حال مشاهده شدن هستند"
     new_observee_password: "رمز عبور"
     new_observee_username: "نام کاربری"
+    observee_added: "اکنون در حال مشاهده %{user}"
+    observing: "در حال مشاهده"
   options: 
     ? "no"
     : خیر
@@ -10601,6 +10645,7 @@ fa-IR:
       unregister_service: "مطمئنید که می خواهید ثبت نام این سرویس لغو شود؟"
     crumb: "تنظیمات %{user}"
     crumbs: 
+      observees: "در حال مشاهده"
       settings_frd: "تنظیمات %{user}"
     done_resending: "انجام شد! ارسال پیام ممکن است چند دقیقه طول بکشد."
     email_select: 
@@ -10625,6 +10670,8 @@ fa-IR:
       contact_confirmed: "تماس با موفقیت تأیید شد!"
       mfa_disabled: "اعتبارسنجی چند عاملی غیر فعال شد"
       updated_profile: "تنظیمات با موفقیت بهنگام سازی شد"
+    observees: 
+      page_title: "دانشجویانی که در حال مشاهده شدن هستند"
     please_select_an_option: "لطفا یک گزینه را انتخاب کنید"
     profile: 
       access_token_description: "از نشانه های دسترسی می توان برای دادن اجازه برقراری تماس های API از طرف شما به برنامه های دیگر استفاده کرد. همچنین می توانید نشانه های دسترسی را ایجاد کنید و *از Canvas Open API استفاده کنید* تا یکپارچه‌سازی های خود را ایجاد کنید."
@@ -11098,6 +11145,8 @@ fa-IR:
       payment_info: "اطلاعات پرداخت"
   qti_display: QTI
   qti_file_description: "فایل .zip QTI"
+  qti_img_matching_question: "پرسش نظیر وارد شده دارای تصاویری در هر دو طرف است که پشتیبانی نشده اند"
+  qti_img_matching_question_distractors: "پرسش نظیر وارد شده دارای تصاویری در داخل گزینه هاست و نمی تواند ثابت شود، زیرا دارای گزینه های نادرست نیز هست"
   qti_name: "مبدل QTI"
   qualified_locale: "انگلیسی-ایالات متحده"
   question_answered: "پاسخ داده شده"
@@ -11244,6 +11293,7 @@ fa-IR:
   quiz_extend_time: 
     ending_time: "زمان پایان"
     extend_time: "تمدید مهلت"
+    extensions_student: "تمدید مهلت برای %{student}"
     extensions_successfully_added: "تمدیدها با موفقیت اضافه شد"
     now: اکنون
   quiz_extensions: 
@@ -11295,6 +11345,9 @@ fa-IR:
       generated_at_date_time: "%{dateAndTime} ایجاد شده"
       generating_report_name: "در حال ایجاد %{report_name}..."
       item_analysis_not_available: "تحلیل پرسش برای نظرسنجی ها موجود نیست"
+  quiz_results_protected: "نتایج آزمون برای این آزمون محافظت شده هستند و برای دانشجویان قابل مشاهده نیستند."
+  quiz_results_protected_after_first_glimpse: "نتایج آزمون برای این آزمون محافظت شده هستند و می توان آن را در یک دفعه بلافاصله بعد از ارسال مشاهده کرد."
+  quiz_results_protected_until_last_attempt: "نتایج آزمون برای این آزمون محافظت شده هستند و تا زمانی که دانشجویان آخرین تلاش خود را ارسال نکنند، برای آنها قابل مشاهده نیستند."
   quiz_route: 
     that_quiz_doesnt_exist: "این آزمون موجود نیست"
     that_quiz_has_been_deleted: "این آزمون حذف شده است"
@@ -11896,6 +11949,7 @@ fa-IR:
           extra_attempts: "تلاش های اضافی "
           extra_time_per_attempt: "زمان اضافی برای هر تلاش"
           manually_unlock: "قفل گشایی دستی آزمون برای تلاش بعدی"
+          reset_has_seen_results: "اجازه داده شود که دانشجو نتایج را یک بار دیگر مشاهده کند"
           started: "شروع شده"
         minutes: دقیقه
         moderate_page_title: "%{title}: تعدیل سازی"
@@ -11955,6 +12009,8 @@ fa-IR:
         new_assignment: "تکلیف جدید"
         new_discussion: "بحث جدید"
         one_question_at_a_time: "نمایش یک پرسش در هر بار"
+        one_time_results: "فقط یک بار بعد از هر تلاش"
+        only_visible_to_overrides_note: "نکته: این آزمون **فقط** برای بخش(های) تعیین شده در زیر قابل مشاهده است:"
         points_possible: "امتیاز %{n}"
         quiz_title: "عنوان آزمون"
         quiz_type: "نوع آزمون"
@@ -12142,103 +12198,103 @@ fa-IR:
         quiz_multiple_due_dates: "چند تاریخ"
         quiz_no_points: "امتیاز موجود نیست"
         quiz_points_possible: 
-          one: "%{count} نمره"
-          other: "%{count} نمره"
+          one: "%{count} امتیاز"
+          other: "%{count} امتیاز"
         student_mute_notification: "استاد روی نمره ها کار می کند"
-        unlimited_attempts: "شرکت بدون محدودیت"
+        unlimited_attempts: "تلاش های نامحدود"
       read_only: 
-        default_page_title: "امتحان جدید"
+        default_page_title: "آزمون جدید"
         headers: 
           quiz_details: "اطلاعات آزمون"
         labels: 
           question_details: "نمایش اطلاعات پرسش"
-          quiz_instructions: "دستورالعمل های کویز"
+          quiz_instructions: "دستورالعمل های آزمون"
         links: 
-          back_to_quiz_page: "بازگشت به صفحه ی کویز"
+          back_to_quiz_page: "بازگشت به صفحه آزمون"
       refresh_quiz_after_popup: 
         headers: 
-          loading_in_lockdown: "بارگیری آزمون در نرم افزار Respondus LockDown Browser"
+          loading_in_lockdown: "بارگذاری آزمون در مرورگر Respondus LockDown "
       show: 
         buttons: 
-          lock_quiz: "این کویز را هم اکنون قفل کن"
-          lock_survey: "این نظرسنجی را هم اکنون قفل کن"
-          publish: "منتشر شده"
-          republish: "دوباره منتشر کردن"
-          unlock_quiz: "به دانشجویان اجازه بده این کویز را هم اکنون بدهند"
-          unlock_survey: "به دانشجویان اجازه بده این بررسی را هم اکنون انجام بدهند"
+          lock_quiz: "این آزمون اکنون قفل شود"
+          lock_survey: "این نظرسنجی اکنون قفل شود"
+          publish: انتشار
+          republish: "انتشار دوباره"
+          unlock_quiz: "به دانشجویان اجازه داده شود اکنون این آزمون را بدهند"
+          unlock_survey: "به دانشجویان اجازه داده شود اکنون این نظرسنجی را انجام بدهند"
         labels: 
           available_until: تا
           no_time_limit: "بدون محدودیت زمانی"
           warning_icon: هشدار
         links: 
-          edit: "ویرایش کردن"
-          keep_editing_this_quiz: "به وبرایش کویز ادامه بده"
-          keep_editing_this_survey: "به ویرایش بررسی ادامه بده"
+          edit: ویرایش
+          keep_editing_this_quiz: "ویرایش این آزمون ادامه یابد"
+          keep_editing_this_survey: "ویرایش این نظرسنجی ادامه یابد"
           message_students_who: "ارسال پیام برای دانشجویانی که..."
           moderate_this_quiz: "تعدیل سازی این آزمون"
           moderate_this_survey: "تعدیل سازی این نظرسنجی"
           preview: پیش‌نمایش
-          quiz_statistics: "آمار های کویز"
-          see_full_quiz: "مشاهده کویز کامل"
+          quiz_statistics: "آمار آزمون"
+          see_full_quiz: "مشاهده آزمون کامل"
           show_assignment_rubric: "نمایش دستورالعمل ارزیابی"
-          show_student_quiz_results: "نمایش نتایج امتحانات دانشجو"
-          show_student_survey_results: "نمایش نتایج تحقیق دانشجو"
-          survey_statistics: "آمارهای نظرسنجی"
-        manage: میدیریت
-        only_registered_users: "فقط کاربران ثبت نام کرده، وارد شده میتوانند کویز های نمره دهی شده را بدهند"
+          show_student_quiz_results: "نمایش نتایج آزمون دانشجو"
+          show_student_survey_results: "نمایش نتایج نظرسنجی دانشجو"
+          survey_statistics: "آمار نظرسنجی"
+        manage: مدیریت
+        only_registered_users: "فقط کاربران ثبت نام شده می توانند آزمون های نمره گذاری شده را بدهند"
         quiz_regraded_your_score_affected: 
-          one: "این کویز مجددا نمره دهی شده است. نمره ی جدید شما %{count}سؤالی را که مورد اثر واقع شده اند منعکس میکند."
-          other: "این کویز مجددا نمره دهی شده است. نمره ی جدید شما %{count}سؤالی را که مورد اثر واقع شده اند منعکس میکند."
-        quiz_regraded_your_score_not_affected: "این کویز مجددا نمره دهی شده است. نمره ی شما مورد اثر واقع نشده است."
+          one: "این آزمون دوباره نمره گذاری شده است. نمره جدید شما %{count} پرسش که تحت تأثیر قرار گرفته اند را منعکس می کند."
+          other: "این آزمون دوباره نمره گذاری شده است. نمره جدید شما %{count} پرسش که تحت تأثیر قرار گرفته اند را منعکس می کند."
+        quiz_regraded_your_score_not_affected: "این آزمون دوباره نمره گذاری شده است: نمره شما تحت تأثیر قرار نگرفته است."
         speed_grader: "برنامه نمره گذاری سریع™"
         students_submitted_so_far: 
-          one: "%{count} دانشجو تا کنون ثبت کرده اند."
-          other: "%{count} دانشجو تا کنون ثبت کرده اند."
+          one: "%{count} دانشجو تاکنون ارسال کرده اند."
+          other: "%{count} دانشجو تاکنون ارسال کرده اند."
         titles: 
           delete: حذف
-          related_items: "قلم های مرتبط"
-          unlock_for_how_long: "برای چه مدت میخواهید کویز را باز کنید؟"
+          related_items: "موردهای مرتبط"
+          unlock_for_how_long: "برای چه مدت می خواهید آزمون قفل گشایی شده باشد؟"
         warnings: 
-          draft_version: "این پیش نمایشی از نسخه ی پیش نویس کویز است"
+          draft_version: "این پیش نمایش، نسخه پیش نویس آزمون است"
       single_answer: 
-        upload: "بارگذاری شده"
+        upload: بارگذاری
       statistics: 
-        class_too_large: "این دوره برای نمایش آماری بسیار بزرگ است. ولی میتواند از نوار کناری سمت راست دانلود شود."
+        class_too_large: "این درس برای نمایش آمار بزرگ است. ولی می تواند از نوار کناری سمت راست بارگیری شود."
         headers: 
           for_question: "برای %{question_name}"
-          quiz_statistics: "آمارهای کویز"
-          survey_statistics: "آمار های بررسی"
-          users_have_taken_this_quiz: "%{count} کاربر این کویز را داده اند."
-          users_have_taken_this_survey: "%{count} کاربر این نظرسنجی را انجام داده اند."
+          quiz_statistics: "آمار آزمون"
+          survey_statistics: "آمار نظرسنجی"
+          users_have_taken_this_quiz: "%{count} کاربر این آزمون را داده اند."
+          users_have_taken_this_survey: "%{count} کاربر این نظرسنجی را انجام داده اند"
         labels: 
-          average_correct: "متوسط درست"
-          average_incorrect: "متوسط نادرست"
-          average_time: "زمان متوسط"
+          average_correct: "میانگین درست"
+          average_incorrect: "میانگین نادرست"
+          average_time: "میانگین زمان"
           high_score: "نمره بالا"
           low_score: "نمره پایین"
           mean_score: "نمره میانگین"
           standard_deviation: "انحراف معیار"
-          users_selected_the_answer: "کاربران زیر جواب  %{answer_text} را انتخاب کرده اند"
+          users_selected_the_answer: "کاربران زیر پاسخ  %{answer_text} را انتخاب کرده اند"
         links: 
-          count_all_attempts: "**همه** تلاش ها را بشمار"
-          count_only_latest_attempts: "فقط هر آخرین تلاش را بشمار"
-        page_title: آمارها
-        quiz_all_version_disclaimer: "این گزارش آمار های کویز را بر اساس همه ی تلاش های همه ی کاربران نشان میدهد."
-        quiz_latest_version_disclaimer: "این گزارش آمار های کویز را بر اساس آخرین تلاش هر کاربر نشان میدهد."
+          count_all_attempts: "شمارش **همه** تلاش ها"
+          count_only_latest_attempts: "فقط شمارش هر آخرین تلاش"
+        page_title: آمار
+        quiz_all_version_disclaimer: "این گزارش آمار آزمون را بر اساس همه تلاش های همه کاربران نشان می دهد."
+        quiz_latest_version_disclaimer: "این گزارش آمار آزمون را بر اساس آخرین تلاش هر کاربر نشان می دهد."
         student_n: "دانشجو %{student_counter}"
-        survey_all_version_disclaimer: "این گزارش آمار های بررسی را بر اساس همه ی تلاش های همه ی کاربران نشان میدهد."
-        survey_latest_version_disclaimer: "این گزارش آمار های بررسی را بر اساس آخرین تلاش هر کاربر نشان میدهد."
-      statistics_crumb: آمارها
+        survey_all_version_disclaimer: "این گزارش آمار نظرسنجی را بر اساس همه تلاش های همه کاربران نشان می دهد."
+        survey_latest_version_disclaimer: "این گزارش آمار نظرسنجی را بر اساس آخرین تلاش هر کاربر نشان می دهد."
+      statistics_crumb: آمار
       submission_version: 
         attempt_number: "تلاش %{att_no}"
         kept: "نگه داری شده"
         latest: آخرین
       submission_versions: 
         attempt: تلاش
-        attempt_history: "تاریخچه تلاش‌ها"
-        questions_not_graded: "بعضی سؤال ها هنوز نمره دهی نشده اند"
-        quiz_attempt_history_description: "جدولی که تاریخچه تلاش های کویز شما را نشان میدهد. هر تلاش در سمت چپ است. تلاش، زمان و امتیاز در بالا میباشند."
-        regraded: "مجددا نمره دهی شده"
+        attempt_history: "تاریخچه تلاش ها"
+        questions_not_graded: "برخی پرسش ها هنوز نمره گذاری نشده اند"
+        quiz_attempt_history_description: "جدولی که تاریخچه تلاش آزمون شما را نشان می دهد. هر تلاش در سمت چپ است. تلاش، زمان و نمره در قسمت بالا هستند."
+        regraded: "دوباره نمره گذاری شده"
         score: نمره
         time: زمان
       take_quiz: 
@@ -12248,35 +12304,35 @@ fa-IR:
           previous: قبلی
           submit_quiz: "ارسال آزمون"
         headers: 
-          draft_preview: "این پیش نمایشی از نسخه ی پیش نویس کویز است"
+          draft_preview: "این پیش نمایش، نسخه پیش نویس آزمون است"
         labels: 
           started: "شروع شده"
-          times_up: "زمان به اتمام رسیده است! ثبت نتایج در"
+          times_up: "زمان به اتمام رسیده است! در حال ارسال نتایج در"
         logged_out_of_canvas: "*از کانواس خارج شده اید.* برای ادامه، لطفا وارد شوید"
-        login_required: "نیاز به ورود"
+        login_required: "ورود لازم است"
         not_saved: "ذخیره نشده"
-        quiz_instructions: "دستورالعمل های کویز"
+        quiz_instructions: "دستورالعمل های آزمون"
       take_quiz_in_popup: 
         headers: 
-          loading_in_lockdown: "بارگیری نرم افزار Respondus LockDown Browser"
+          loading_in_lockdown: "بارگذاری مرورگر Respondus LockDown"
         links: 
-          return_to_quiz_page: "برای بازگشت به صفحه ی کویز [اینجا را کلیک کنید](%{url})"
+          return_to_quiz_page: "برای بازگشت به صفحه آزمون [اینجا را کلیک کنید](%{url})."
       take_quiz_right_side: 
         labels: 
-          attempt_due: "تلاش به دلیل"
+          attempt_due: "مهلت تلاش"
           score: نمره
           time_elapsed: "زمان سپری شده"
           time_running: "زمان در حال اجرا"
         links: 
           hide_time_running: "مخفی کردن"
-          keep_editing_quiz: "به وبرایش کویز ادامه بده"
-          keep_editing_survey: "به ویرایش بررسی ادامه بده"
+          keep_editing_quiz: "ویرایش این آزمون ادامه یابد"
+          keep_editing_survey: "ویرایش این نظرسنجی ادامه یابد"
     retrieving_filters: "در حال بازیابی فیلترها..."
     rubric: 
       loading: "در حال بارگذاری..."
       titles: 
         details: "اطلاعات دستورالعمل ارزیابی تکلیف"
-    search_placeholder: "جست‌وجوی آزمون"
+    search_placeholder: "جستجوی آزمون"
     show: 
       answers: 
         correct: "درست است!"
@@ -12301,9 +12357,9 @@ fa-IR:
         show_student_survey_results: "نمایش نتایج نظرسنجی دانشجو"
       students_who_have_not_taken_the_quiz: "دانشجویانی که امتحان نداده اند"
       students_who_have_taken_the_quiz: "دانشجویانی که امتحان داده اند"
-    show_and_hide_correct_answers: "از %{from}  به  %{to}"
+    show_and_hide_correct_answers: "از %{from} به %{to}"
     show_correct_answers_after: "بعد از %{date} "
-    show_correct_answers_immediately: بلادرنگ
+    show_correct_answers_immediately: بلافاصله
     show_correct_answers_until: "تا %{date}"
     statistics: 
       count_attempts: 
@@ -12314,8 +12370,8 @@ fa-IR:
       uncounted_submissions: 
         one: "%{count} مورد ارسالی دیگر"
         other: "%{count} مورد ارسالی دیگر"
-    survey: بررسی
-    surveys_label: "گزارش ها قابلیت دید امتحان را تغییر می دهد"
+    survey: نظرسنجی
+    surveys_label: "نظرسنجی ها قابلیت دید آزمون را تغییر می دهند"
     take_quiz: 
       confirms: 
         cant_go_back_blank: "بعد از اینکه روی بعدی بزنید، نمی توانید به این پرسش برگردید. مطمئنید که می خواهید آن را خالی بگذارید؟"
@@ -12339,8 +12395,8 @@ fa-IR:
         other: "%{count} ساعت"
       labels: 
         time_elapsed: "زمان سپری شده"
-      login_failed: "ورود ناموفق"
-      login_successful: "ورود با موفقیت"
+      login_failed: "ورود انجام نشد."
+      login_successful: "ورود موفقیت آمیز."
       minutes_count: 
         one: "%{count} دقیقه"
         other: "%{count} دقیقه"
@@ -12358,7 +12414,7 @@ fa-IR:
       question_unanswered: "هنوز پاسخ نداده شده است"
       saved_at: "آزمون در %{t} ذخیره شد"
       saving: "در حال ذخیره سازی..."
-      saving_not_needed: "اطلاعات جدید برای ثبت نیست. آخرین بار در %{t} چک شد"
+      saving_not_needed: "داده جدید برای ذخیره سازی موجود نیست. آخرین بار در %{t} بازبینی شد"
       seconds_count: 
         one: "%{count} ثانیه"
         other: "%{count} ثانیه"
@@ -12373,7 +12429,7 @@ fa-IR:
       labels: 
         time_elapsed: "زمان سپری شده"
         time_remaining: "زمان باقیمانده"
-    title_add_quiz: "اضافه کردن آزمون"
+    title_add_quiz: "افزودن آزمون"
     titles: 
       add_questions_as_group: "افزودن پرسش ها به عنوان یک گروه"
       click_to_enter_comments_on_answer: "برای وارد کردن نظر برای دانشجو در صورتی که این پاسخ را انتخاب کند، کلیک کنید"
@@ -12385,7 +12441,7 @@ fa-IR:
       help_with_formulas: "راهنمایی در مورد فرمول های پرسش آزمون"
       ip_address_filtering: "فیلتر نشانی آی پی"
       set_as_correct: "این پاسخ به عنوان پاسخ درست تعیین شده است"
-    toggle_message: "تغییر قابلیت دید ازمون"
+    toggle_message: "تغییر قابلیت دید آزمون"
     ? "true"
     : درست
     ungraded_survey: "نظرسنجی نمره گذاری نشده"
@@ -12398,7 +12454,7 @@ fa-IR:
   quizzes_route: 
     quizzes_route_title: "آزمون ها"
   quizzez_submission_row: 
-    gets_extra_minutes: "برای هر تلاش زمان %{num} اضافه می گیرد "
+    gets_extra_minutes: "برای هر تلاش %{num} دقیقه اضافی دریافت می کند"
     unlimited: نامحدود
   re_upload_submissions_form: 
     buttons: 
@@ -12408,12 +12464,13 @@ fa-IR:
     upload_warning: "مطمئن شوید که نام فایل های ارسالی را تغییر ندهید تا بتوانیم آنها را شناسایی کنیم."
   react_files: 
     loading_more_results: "در حال بارگذاری نتایج بیشتر"
+    usage_details: "%{quota_used} از %{quota}"
   recent_student: 
     last_logged_in: "آخرین ورود در %{last_login}"
-  recently_deleted_courses_title: "درسهایی که اخیرا حذف شده اند"
+  recently_deleted_courses_title: "درس هایی که اخیرا حذف شده اند"
   recipient_input: 
     context_search_placeholder: "نام، درس یا گروه را وارد کنید"
-    context_search_title: "اسم,دوره ,یا گروه"
+    context_search_title: "نام, درس یا گروه"
     groups_count: 
       one: "%{count} گروه"
       other: "%{count} گروه"
@@ -12461,7 +12518,7 @@ fa-IR:
         email: "پست الکترونیکی"
         name: نام
     welcome_to_canvas: "به کانواس خوش آمدید!"
-  reply_from_name: "%{name} از طریق اخطار کانوس "
+  reply_from_name: "%{name} از طریق اطلاعیه های کانواس "
   retrieve_timeout: " پیکربندی قابل بازیابی نیست، زمان پاسخ سرور به پایان رسیده است"
   role_override: 
     permission: 
@@ -12477,7 +12534,7 @@ fa-IR:
       manage_account_memberships: "افزودن/حذف مدیران دیگر حساب"
       manage_account_settings: "مدیریت تنظیمات در سطح حساب"
       manage_admin_users: "افزودن/حذف دیگر اساتید، طراح های درس یا دستیارهای آموزشی درس"
-      manage_announcements: "مدیریت اعلان های عمومی"
+      manage_announcements: "مدیریت اطلاعیه های سراسری"
       manage_assignments: "مدیریت (افزودن / ویرایش / حذف) تکلیف ها و آزمون ها"
       manage_calendar: "افزودن، ویرایش و حذف رویدادها در تقویم درس"
       manage_canvasnet_courses: "مدیریت درس های شبکه کانواس"
@@ -12485,7 +12542,7 @@ fa-IR:
       manage_courses: "مدیریت ( افزودن / ویرایش / حذف ) درس ها"
       manage_demos: "مدیریت نمونه های نمایشی"
       manage_developer_keys: "مدیریت کلیدهای توسعه دهنده"
-      manage_feature_flags: "فعال یا غیر فعال کردن ویژگی های سطح حساب کاربری"
+      manage_feature_flags: "فعال سازی یا غیر فعال سازی ویژگی ها در سطح حساب"
       manage_files: "مدیریت (افزودن / ویرایش / حذف) فایل های درس"
       manage_frozen_assignment: "مدیریت (ویرایش / حذف) تکلیف های تثبیت شده"
       manage_global_outcomes: "مدیریت نتایج یادگیری سراسری"
@@ -12503,7 +12560,7 @@ fa-IR:
       manage_students: "افزودن/حذف دانشجویان درس"
       manage_user_logins: "اصلاح اطلاعات ورود برای کاربران"
       manage_user_notes: "مدیریت ورودی های ژورنال هیأت علمی"
-      manage_user_observers: "مدیریت مشاهده کنندگان برای کاربران"
+      manage_user_observers: "مدیریت بیننده ها برای کاربران"
       manage_wiki: "مدیریت ویکی (افزودن / ویرایش / حذف صفحه ها)"
       managed_jobs: "مدیریت کارهای پس زمینه"
       moderate_form: "اداره کردن بحث ها ( حذف / ویرایش ارسال های دیگر، قفل کردن موضوعات)"
@@ -12521,9 +12578,9 @@ fa-IR:
       undelete_courses: "لغو حذف درس ها"
       view_all_grades: "مشاهده همه نمره ها"
       view_analytics: "مشاهده صفحه های تحلیل"
-      view_course_changes: "دیدن گزارشات تغییر دوره آموزشی"
+      view_course_changes: "مشاهده گزارش های ثبت تغییر درس"
       view_error_reports: "مشاهده گزارش خطاها"
-      view_grade_changes: "دیدن گزارشات تغییر نمره"
+      view_grade_changes: "مشاهده گزارش های ثبت تغییر نمره"
       view_group_pages: "مشاهده صفحه های گروهی همه گروه های دانشجویی"
       view_jobs: "مشاهده کارهای پس زمینه"
       view_notifications: "مشاهده اطلاعیه ها"
@@ -12573,14 +12630,14 @@ fa-IR:
         use_default: "استفاده از پیش فرض"
     permissions: مجوزها
     roles_override_index: 
-      account_roles: "نقش کاربر"
+      account_roles: "نقش های حساب"
       course_roles: "نقش های درس"
   roster: 
     delete_confirm: "مطمئنید که می خواهید این کاربر حذف شود؟"
     error_sending_invitations: "در هنگام ارسال دعوت نامه، خطایی رخ داد. لطفا دوباره سعی کنید."
-    filter_multiple_users_found: "%{userCount} کاربر پیدا شد."
-    filter_no_users_found: "هیج کاربر نظیری پیدا نشد."
-    filter_one_user_found: "1 کاربر پیدا شد."
+    filter_multiple_users_found: "%{userCount} کاربر یافت شد."
+    filter_no_users_found: "هیج کاربر نظیری یافت نشد."
+    filter_one_user_found: "1 کاربر یافت شد."
     flash: 
       removeError: "قادر به حذف این کاربر نیست. لطفا بعدا دوباره سعی کنید."
       removed: "کاربر با موفقیت حذف شد."
@@ -12643,7 +12700,7 @@ fa-IR:
         are_you_sure_remove: "مطمئنید که می خواهید این سرفصل از فهرست شما حذف شود؟"
       remove_rubric: "حذف این دستورالعمل ارزیابی از فهرست من"
   safety_drill_title: "زمان بندی تمرین ایمنی"
-  scantron_quiz_title: "کوئیز Scantron"
+  scantron_quiz_title: "آزمون Scantron"
   scribd: 
     upgrade_flash: "سلام، یک نسخه قدیمی ادوبی فلش پلیر دارید. برای استفاده از iPaper (و بسیاری از چیزهای دیگر در وب)، باید %{link_tag}آخرین نسخه فلش پلیر را دریافت کنید%{end_link}."
   search: 
@@ -12733,7 +12790,7 @@ fa-IR:
         decrosslist_section: "لغو فهرست بندی متقابل این بخش"
   select_content: "انتخاب محتوا"
   select_content_checkbox: 
-    select_content_error: "شما باید یک گزینه ی محتوا انتخاب کنید"
+    select_content_error: "باید یک گزینه محتوا را انتخاب کنید"
   select_content_dialog: 
     buttons: 
       add_item: "افزودن مورد"
@@ -12746,7 +12803,7 @@ fa-IR:
     titles: 
       add_item_to_module: "افزودن مورد به ماژول"
       find_links_using_service: "یافتن پیوندها با استفاده از %{service}"
-  selected_answer: "شما این پاسخ را انتخاب کرده اید"
+  selected_answer: "این پاسخ را انتخاب کرده اید."
   self_enrollments: 
     already_enrolled: 
       already_enrolled: "در حال حاضر در درس **%{course}** ثبت نام شده اید."
@@ -12794,9 +12851,9 @@ fa-IR:
         go_to_dashboard: "رفتن به داشبورد"
       not_available_yet: "مدت کوتاهی قبل از شروع درس، یک نامه الکترونیکی را برای شما ارسال خواهیم کرد."
   sequence_footer: 
-    next_module: "ماژول بعدی"
+    next_module: "ماژول بعدی:"
     next_module_desc: "ماژول بعدی: *module*"
-    next_module_item_desc: "بعدی: *item*"
+    next_module_item_desc: "بعدی: *مورد*"
     prev_module: "ماژول قبلی:"
     prev_module_desc: "ماژول قبلی: *module*"
     prev_module_item_desc: "قبلی: *item*"
@@ -12919,8 +12976,8 @@ fa-IR:
       titles: 
         course_section: "بخش درس"
     error_form: 
-      message_failed: "گزارش فرستاده نشد. لطفا مجددا امتحان کنید."
-      message_sent: "با تشکر از کمک شما! ما سریعا به این مورد رسیدگی میکنیم."
+      message_failed: "گزارش ارسال نشد. لطفا دوباره سعی کنید."
+      message_sent: "با تشکر از راهنمایی شما! سریعا به این مورد رسیدگی می کنیم."
     errors: 
       400_message: 
         description: "به نظر می رسد در هنگام بازگذاری صفحه درخواستی شما اشکالی رخ داد."
@@ -12956,9 +13013,13 @@ fa-IR:
           email: "پست الکترونیکی (اختیاری)"
     event_list: 
       at_least_more_events: "حداقل %{count_of_events} رویداد دیگر"
+      at_least_more_events_one_week: "حداقل %{count_of_events} رویداد بیشتر در هفته گذشته"
+      at_least_more_events_two_weeks: "حداقل %{count_of_events} رویداد بیشتر در دو هفته گذشته"
       links: 
         view_calendar: "مشاهده تقویم"
       more_events: "%{count_of_events} رویداد دیگر"
+      more_events_one_week: "%{count_of_events} رویداد بیشتر در هفته گذشته"
+      more_events_two_weeks: "%{count_of_events} رویداد بیشتر در دو هفته گذشته"
       nothing_for_now: "چیزی در حال حاضر موجود نیست"
       nothing_one_week: "چیزی برای هفته آینده موجود نیست"
       nothing_two_weeks: "چیز برای دو هفته بعد موجود نیست"
@@ -12999,8 +13060,8 @@ fa-IR:
       find: یافتن
       find_existing_scheme: "یافتن طرح نمره گذاری موجود"
       full_name: "نام کامل، متن کوچکتر"
-      grading_standard_name_table_summary: "جدول تنها با یک سلول قابل ویرایش شامل نام طرح درجه بندی خود ."
-      grading_standard_summary: "یک جدول که شامل طرح درجه بندی شما است. به نام ارزش و دامنه در بالا می باشد. هر سطر شامل یک مقدار حداقل و حداکثر درصد است."
+      grading_standard_name_table_summary: "یک جدول تنها با یک سلول قابل ویرایش شامل نام طرح نمره گذاری شما."
+      grading_standard_summary: "یک جدول که شامل طرح نمره گذاری شماست. نام مقدار و محدوده در قسمت بالاست. هر ردیف حاوی یک مقدار درصدی حداقل و حداکثر است."
       insert_here: "اینجا قرار دهید"
       labels: 
         name: نام
@@ -13008,9 +13069,9 @@ fa-IR:
         scheme_name: "نام طرح"
       loading_grading_standards: "در حال بارگذاری استانداردهای نمره گذاری..."
       managing_grading_standards: "مدیریت طرح های نمره گذاری"
-      range_lower: "حد پایین تر از محدوده"
+      range_lower: "حد پایین تر محدوده"
       range_of_numbers: "%{lower_number} تا %{higher_number}"
-      range_upper: "حد بالاتر از محدوده"
+      range_upper: "حد بالاتر محدوده"
       remove_row: "حذف ردیف"
       remove_scheme: "حذف طرح نمره گذاری"
       select_another_scheme: "انتخاب یک طرح دیگر"
@@ -13056,7 +13117,7 @@ fa-IR:
       back_to_login: "بازگشت به صفحه ورود"
       buttons: 
         request_password: "درخواست رمز عبور"
-      coenrollment_banner: "*از والدین کاربر کانواس هستید؟* **برای اکانت کلیک کنید**"
+      coenrollment_banner: "*والدین یک کاربر کانواس هستید؟* **برای یک حساب، اینجا کلیک کنید**"
       default_login_message: "به سامانه دانشگاه خود وارد شوید"
       dont_know_password: "رمز عبور خود را نمی دانید؟"
       labels: 
@@ -13084,6 +13145,7 @@ fa-IR:
         body: پیام
         subject: موضوع
       message_students_who: "ارسال پیام برای دانشجویانی که..."
+      message_type: "نوع پیام"
       out_of_points: "از %{points_possible}"
     mute_dialog: 
       gradebook: 
@@ -13102,6 +13164,7 @@ fa-IR:
     new_course_form: 
       cancel: لغو
       course_cose_explanation: "در مکان هایی با فضای اندک نمایش داده می شود"
+      course_is_public_explanation: "درس به طور عمومی قابل مشاهده شود *(اطلاعات دانشجو خصوصی خواهد ماند)*"
       create_course: "ایجاد درس"
       creating_course: "در حال ایجاد درس..."
       labels: 
@@ -13203,15 +13266,15 @@ fa-IR:
     rubric_criterion: 
       defaults: 
         description: "شرح معیار"
-      delete_criterion_row: "حذف معیار ردیف"
+      delete_criterion_row: "حذف ردیف معیار"
       description: 
         custom_comments_area: "این قسمت توسط ارزیابی کننده برای درج نظرات مربوط به این معیار مورد استفاده قرار خواهد گرفت."
       full_marks: "نمره های کامل"
       icons: 
-        additional_comments: "نظرات اضافی"
+        additional_comments: "نظرهای دیگر"
       instructor_comments: "نظرهای استاد"
       labels: 
-        long_description: "توصیف طولانی"
+        long_description: "شرح طولانی"
         save_criterion_for_reuse: "ذخیره سازی این نظر برای استفاده دوباره"
         threshold: آستانه
       links: 
@@ -13221,7 +13284,7 @@ fa-IR:
       options: 
         select: "[ انتخاب ]"
       points: "%{points} امتیاز"
-      points_label: نمره
+      points_label: امتیازها
       points_out_of2: "%{points} / %{total} امتیاز"
       titles: 
         linked_to_learning_outcome: "این معیار به نتیجه یادگیری پیوند داده شده است"
@@ -13231,7 +13294,7 @@ fa-IR:
         update_description: "بهنگام سازی شرح"
       labels: 
         additional_comments: "نظرهای دیگر"
-        long_description: "توصیف طولانی"
+        long_description: "شرح طولانی"
     rubric_dialog: 
       buttons: 
         use_this_rubric: "استفاده از این دستورالعمل ارزیابی"
@@ -13260,7 +13323,7 @@ fa-IR:
         description: "شرح معیار"
       full_marks: "نمره های کامل"
       labels: 
-        long_description: "توصیف طولانی"
+        long_description: "شرح طولانی"
       links: 
         view_longer_description: "مشاهده شرح طولانی تر"
       no_marks: "نمره موجود نیست"
@@ -13320,7 +13383,7 @@ fa-IR:
       grading_alt: "نمره گذاری"
       submission_comment: "نظر درباره مورد ارسالی"
     terms_required: 
-      updated_terms_of_use: "به روز اوری ترم های مورد استفاده"
+      updated_terms_of_use: "ضوابط استفاده بهنگام سازی شده"
     unauthorized: 
       headings: 
         needs_cookies: "کوکی لازم است"
@@ -13362,12 +13425,12 @@ fa-IR:
         embed_image: "برای درج تصویر کلیک کنید"
     wiki_sidebar: 
       aria: 
-        file_label: "یک فایل انتخاب کنید،  حدود بارگذاری  50"
+        file_label: "یک فایل انتخاب کنید، حد بارگذاری 50"
       aria_label: 
-        folder_select_label: "یک پوشه انتخاب کنید تا عکس خود را در آن بارگذاری نمایید"
-        image_form_collapsed: "برای تغییر آپلود کلیک کنید یک فرم تصویر جدید (از بین رفته)"
+        folder_select_label: "یک پوشه را برای بارگذاری تصویر خود در آن انتخاب کنید"
+        image_form_collapsed: "برای تغییر بارگذاری یک شکل تصویر جدید (جمع شده)، کلیک کنید "
       aria_labels: 
-        files: "فایلها، برای پیمایش از طریق درخت از دکمه های جهت نمای بالا و پایین استفاده کنید . دکمه راست را برای گسترش پوشه ها و چپ را برای از بین بردن فشار دهید."
+        files: "فایل ها، برای پیمایش از طریق درخت از کلیدهای جهت نمای بالا و پایین استفاده کنید. کلید راست را برای باز کردن پوشه ها و چپ را برای جمع کردن آنها فشار دهید"
       aria_only: 
         folder: پوشه
       buttons: 
@@ -13459,12 +13522,12 @@ fa-IR:
         uploading: "درحال بارگذاری, لطفا صبر کنید."
   sis_batch: 
     errors: 
-      too_many_errors: "%{count} خطاهای بیشتری وجود داشت"
-      too_many_warnings: "%{count} هشدارهای بیشتری وجود داشت"
+      too_many_errors: "%{count} خطای بیشتر وجود داشت"
+      too_many_warnings: "%{count} هشدار بیشتر وجود داشت"
       unrecorgnized_type: "نوع ورود ناشناخته است"
     instructure_csv: "Instructure فایل CSV یا فایل فشرده CSVها را فرمت کرد"
     upload_filename: "بارگذاری_سامانه اطلاعات دانشجو_%{id}.zip"
-  sis_export_title: "خروجی سامانه اطلاعات دانشجویی"
+  sis_export_title: "صدور سامانه اطلاعات دانشجو"
   sis_import: 
     buttons: 
       process_data: "پردازش داده ها"
@@ -13503,12 +13566,12 @@ fa-IR:
       date: تاریخ
       value: مقدار
     domain_not_found: 
-      body_description: "لطفا Canvas URL  خود را چک کرده و مجددا تلاش کنید. اگر Canvas URL  خود را نمیدانید لطفا با مؤسسه خود و یا مسئول دوره تماس بگیرید."
-      body_reference: "اگر به حساب مجانی در Canvas  بدون اتصال به مؤسسه ای خاص علاقه مندید میتوانید در ثبت نام کنید"
+      body_description: "لطفا نشانی اینترنتی کانواس خود را بازبینی کنید و دوباره سعی کنید. اگر نشانی اینترنتی کانواس خود را نمی دانید، لطفا با دانشگاه یا استاد درس خود تماس بگیرید."
+      body_reference: "اگر به یک حساب رایگان کانواس علاقمند هستید که به یک دانشگاه خاص که می توانید در آن ثبت نام کنید متصل نیست"
       links: 
         canvas_instructure: canvas.instructure.com
-      page_title: "Canvas  نمیتواند صفحه ی ورود شما را پیدا کند."
-      you_typed: "شما تایپ کردید"
+      page_title: "کانواس نمی تواند صفحه ورود شما را بیابد."
+      you_typed: "تایپ کردید"
     institution_suspended: 
       body: "حساب کانواس دانشکده شما به طور موقت معلق شده است. لطفا با مدیر کانواس خود تماس بگیرید."
       links: 
@@ -13522,11 +13585,11 @@ fa-IR:
     titles: 
       value_over_time: "%{value} در طول زمان"
     user_search: 
-      find_user_by: "کاربر را از طریق شناسه ورود/ایمیل بیابید."
-      find_user_by_label: "شناسه ورود/ایمیل"
+      find_user_by: "یافتن یک کاربر بر اساس ورود/پست الکترونیکی"
+      find_user_by_label: "ورود/پست الکترونیکی"
     users: 
-      user_search_label: "یافتن کاربر"
-      users_matching_label: "کاربران منطبق"
+      user_search_label: "جستجوی کاربر"
+      users_matching_label: "کاربران نظیر"
   slideshow: 
     titles: 
       back: "به عقب"
@@ -13536,34 +13599,35 @@ fa-IR:
     submissions_dropdown: 
       grade: "(نمره: %{grade})"
       loud_late: "با تأخیر"
-      see_all_quiz_attempts: "مشاهده همه اقدام های آزمون"
+      see_all_quiz_attempts: "مشاهده همه تلاش های آزمون"
       submission_to_view: "مورد ارسالی برای مشاهده:"
       submitted: "*ارسال شد:* %{submittedAt}"
   sr_gradebook: 
     all_sections: "همه بخش‌ها"
-    assignment_muted: "کلیک برای فعال شدن"
-    assignment_order_alpha: الفبایی
-    assignment_order_assignment_groups: "به وسیله گروه تکلیف و موقعیت"
-    assignment_order_due_date: "با مهلت تحویل"
-    assignment_unmuted: "کلیک برای غیر فعال کردن"
+    assignment_muted: "برای فعال سازی، کلیک کنید."
+    assignment_order_alpha: "به ترتیب حروف الفبا"
+    assignment_order_assignment_groups: "بر اساس گروه و موقعیت تکلیف"
+    assignment_order_due_date: "بر اساس تاریخ مهلت"
+    assignment_unmuted: "برای غیر فعال سازی، کلیک کنید."
     discussion_topic: "موضوع بحث"
-    external_tool: "ابزار خارجی"
+    external_tool: "ابزار بیرونی"
+    final_point_ratio: "%{pointRatio} امتیازها"
     invalid_group_warning: 
-      one: "توجه: امتیاز شامل تکالیف گروه های  %{list_of_group_names} نمیشود زیرا آن ها امتیاز ممکنی ندارند."
-      other: "توجه: امتیاز شامل تکالیف گروه های  %{list_of_group_names} نمیشود زیرا آن ها امتیاز ممکنی ندارند."
-    media_recordin: "ضبط رسانه"
+      one: "نکته: نمره شامل تکلیف گروه های %{list_of_group_names} نیست، زیرا آنها دارای امتیاز ممکن نیستند."
+      other: "نکته: نمره شامل تکلیف گروه های %{list_of_group_names} نیست، زیرا آنها دارای امتیاز ممکن نیستند."
+    media_recordin: "ضبط رسانه ای"
     next_object: "%{type} بعدی"
     no_assignment: "هیچ تکلیفی انتخاب نشده است"
-    no_outcome: "نتیجه انتخاب نشد"
+    no_outcome: "هیچ نتیجه ای انتخاب نشده است"
     no_student: "هیچ دانشجویی انتخاب نشده است"
-    none: هیچکدام
+    none: "هیچ یک"
     notes: "یادداشت ها"
     on_paper: "روی کاغذ"
-    online_quiz: "کویز آنلاین"
+    online_quiz: "آزمون آنلاین"
     online_text_entry: "ورودی متن آنلاین"
-    online_upload: "آپلود آنلاین"
-    online_url: "URL  آنلاین"
-    previous_object: "قبلی %{type}"
+    online_upload: "بارگذاری آنلاین"
+    online_url: "نشانی اینترنتی آنلاین"
+    previous_object: "%{type} قبلی"
     student_hidden_name: "دانشجو %{position}"
   statistics: 
     csv_columns: 
@@ -13572,7 +13636,7 @@ fa-IR:
       n_correct: "n درست"
       n_incorrect: "n نادرست"
       name: نام
-      root_account: "حساب _ ریشه"
+      root_account: حساب_ریشه
       score: امتیاز
       section: بخش
       section_id: شناسه_بخش
@@ -13584,28 +13648,29 @@ fa-IR:
     no_answer: "پاسخ موجود نیست"
   status_dates: 
     available: "قابل دسترسی"
-    available_until: "قابل دسترس تا"
-    closed: بسته
+    available_until: "قابل دسترسی تا"
+    closed: "بسته شده"
     due: مهلت
-    not_available: "در دسترس"
-    pending: "غیر قابل دسترس تا"
+    not_available: "قابل دسترسی در"
+    pending: "غیر قابل دسترسی تا"
   step: مرحله
   student_access_title: "گزارش دسترسی دانشجویان"
   student_assignment_outcome_map_title: "صلاحیت دانشجو"
-  student_grades_title: "نمرات دانشجو"
+  student_grades_title: "نمره های دانشجو"
   student_groups: 
-    group_join: "پیوستن به گروه %{group_name}"
-    group_leave: "%{group_name} را ترک کرد"
-    search_groups_placeholder: "گروه ها یا افراد را پیدا کن"
-    student_groups_filter_description: "هنگام تایپ در این زمینه، لیست گروه ها به طور خودکارفیلتر می شوند تا فقط نام کسانی که مطابق ورودی شما هستند نمایش داده شود."
+    group_join: "به گروه %{group_name} پیوست"
+    group_leave: "گروه %{group_name} را ترک کرد"
+    group_name: "%{group_name} در %{group_category}"
+    search_groups_placeholder: "جستجوی گروه ها یا افراد"
+    student_groups_filter_description: "وقتی در این جای خالی تایپ می کنید، فهرست گروه ها به طور خودکار فقط برای شامل سازی افرادی که نام آنها با ورودی شما مطابقت دارند، فیلتر خواهد شد."
     students_count: 
-      one: "%{count} دانشجو ها"
-      other: "%{count} دانشجو ها"
+      one: "%{count} دانشجو"
+      other: "%{count} دانشجو"
   student_groups_desc: |-
-      این گزینه یک صفحه گروه دانشجویی جدید را برای یک حساب فعال می کند. این صفحه برای تامین تجربه ثبت نام 
-      گروه پویا تری طراحی شده است.
-  student_id: "شماره دانشجویی"
-  student_ip_title: "آدرس آی پی دانشجو"
+      این گزینه صفحه گروه دانشجویی جدید برای یک حساب را فعال می کند. صفحه جدید برای فراهم کردن یک تجربه پویا تر ثبت نام در گروه
+      طراحی شده است.
+  student_id: "شناسه دانشجو"
+  student_ip_title: "نشانی آی پی دانشجویان"
   student_name: "نام دانشجو"
   student_outcome_gradebook_description: |-
       دفتر نمره تسلط یادگیری روشی را به دانشجویان ارائه می دهد که بتوانند پیشرفت خود در نتایج یادگیری
@@ -13614,8 +13679,8 @@ fa-IR:
       و پیشرفت دانشجو هم به صورت نمره عددی و هم به عنوان
       مسلط/نزدیک به مسلط/
       در حال بهبود ارائه می شود.
-  student_submissions_title: "ارسالات دانشجویی"
-  students_with_no_submissions_title: "دانشجوهای بدون ارسال"
+  student_submissions_title: "موردهای ارسالی دانشجویان"
+  students_with_no_submissions_title: "دانشجویان فاقد مورد ارسالی"
   sub_accounts: 
     alerts: 
       subaccount_has_courses: "نمی توانید یک زیر حساب که دارای درس است را حذف کنید"
@@ -13675,7 +13740,7 @@ fa-IR:
     post_comment: "ارسال نظر"
     submitted: "ارسال شده:"
     this_was_submitted_multiple_times_choose_a_submission_to_view: "چند بار ارسال شده است, انتخاب کنید کدام را ببینید:"
-    update_grade: "بروز رسانی نمره"
+    update_grade: "بهنگام سازی نمره"
     view_rubric_assessment_in_the_speedgrader: "مشاهده ارزیابی با استفاده از دستورالعمل در برنامه نمره گذاری سریع"
   submissions: 
     assignment_submit_success: "تکلیف با موفقیت ارسال شد."
@@ -13688,7 +13753,7 @@ fa-IR:
       assignment_submit_fail: "ارسال تکلیف انجام نشد "
       can_not_submit_locked_assignment: "وقتی تکلیف قفل است، نمی توانید آن را ارسال کنید"
       invalid_file_type: "نوع فایل معتبر نیست"
-      invalid_google_docs_domain: "شما نمی توانید تمرین خود را از طریق گوگل داک ثبت کنید"
+      invalid_google_docs_domain: "نمی توانید تکلیف ها را از طریق این دامنه google_docs ارسال کنید"
       media_file_attached: "هیچ ضبط رسانه ای در مورد ارسالی وجود نداشت"
       no_attached_file: "باید حداقل یک فایل را به این تکلیف پیوست کنید"
       no_report: "گزارش مربوط به این مورد ارسالی یافت نشد"
@@ -13747,9 +13812,9 @@ fa-IR:
       no_submission: "مورد ارسالی موجود نیست"
       paper_view: "نمای مقاله"
       plain_view: "نمای متن ساده"
-      preview_crocodoc_document: "پیش نمایش ارسال شما و بازخورد استاد، در صورت در دسترس بودن"
+      preview_crocodoc_document: "در صورت وجود، مورد ارسالی خود را پیش نمایش دهید و بازخورد استاد را مشاهده کنید"
       preview_submission: "پیش نمایش مورد ارسالی شما"
-      preview_title: "پیش‌نمایش از %{title}"
+      preview_title: "پیش‌نمایش %{title}"
       quiz_submission: "این مورد ارسالی یک آزمون بود. در حال تغییر مسیر به صفحه آزمون."
       show_entire_discussion: "نمایش کل بحث"
       student: دانشجو
@@ -13788,14 +13853,15 @@ fa-IR:
     collaborations: "همکاری ها"
     conferences: "همایش ها"
     course_assignments: "تکلیف های درس"
-    course_grades: "نمرات دوره"
-    course_settings: "تنظیمات دوره"
+    course_grades: "نمره های درس"
+    course_settings: "تنظیمات درس"
     discussions: "بحث ها"
     eportfolios: "مجموعه های اسناد الکترونیکی"
     files: "فایل ها"
     grades: "نمره ها"
     home: "صفحه اصلی"
     modules: "ماژول ها"
+    observees: "در حال مشاهده"
     outcomes: نتایج
     pages: "صفحه ها"
     people: افراد
@@ -13803,9 +13869,9 @@ fa-IR:
     quizzes: "آزمون ها"
     settings: تنظیمات
     syllabus: سرفصل
-    tab_location_error: "آن موقعیت زبانه معتبر نیست"
+    tab_location_error: "مکان این زبانه معتبر نیست"
     tab_unmanagable_error: "%{css_class} قابل مدیریت نیست"
-  tempe_grade_export_title: "استخراج نمره Tempe"
+  tempe_grade_export_title: "صدور نمره Tempe"
   terms: 
     index: 
       date: 
@@ -13825,7 +13891,7 @@ fa-IR:
       titles: 
         enrollment_terms: "نیمسال های ثبت نام"
         term_details: "اطلاعات نیمسال"
-      update_term: "ترم را به روز رسانی کنید"
+      update_term: "بهنگام سازی نیمسال"
     term: 
       buttons: 
         add: "افزودن نیمسال"
@@ -13898,27 +13964,27 @@ fa-IR:
       flickr: فلیکر
       image_height: "ارتفاع تصویر"
       image_source: "منبع تصویر"
-      image_url_field_label: "عکس URL"
+      image_url_field_label: "نشانی اینترنتی تصویر"
       image_width: "عرض تصویر"
       url: "نشانی اینترنتی"
   title: 
     edit_announcement: "ویرایش اطلاعیه"
     edit_topic: "ویرایش موضوع بحث"
-    new_announcement: "تکلیف جدید"
+    new_announcement: "اطلاعیه جدید"
     new_topic: "موضوع جدید بحث"
   title_separator: ": "
   titles: 
     aligned_items: "موردهای تطبیق داده شده"
     announcement: اطلاعیه
     announcements: "اطلاعیه ها"
-    assignments: تکلیف
-    come_back_later: "شما این سوال را علامت زده اید تا دوباره به آن بازگردید"
-    delete_quiz: "حذف کردن امتحان"
-    delete_survey: "نقشه برداری را حذف کنید "
+    assignments: "تکلیف ها"
+    come_back_later: "این پرسش را علامت زده اید تا دوباره به آن بازگردید"
+    delete_quiz: "حذف آزمون"
+    delete_survey: "حذف نظرسنجی"
     discussion: بحث
     discussions: "بحث ها"
-    edit_quiz: "ویرایش امتحان"
-    edit_survey: "نقشه برداری را ویرایش کنید "
+    edit_quiz: "ویرایش آزمون"
+    edit_survey: "ویرایش نظرسنجی"
     error_reports: "گزارش خطاها"
     learning_outcomes: "نتایج یادگیری"
     messages: "پیام ها"
@@ -13926,17 +13992,17 @@ fa-IR:
     people: افراد
     view_in_separate_window: "مشاهده در پنجره جداگانه"
   tooltips: 
-    finished: "اتمام یافته"
-    incomplete: "کامل نشده"
+    finished: "پایان یافت"
+    incomplete: ناقص
     vdd: 
       more_message: "و %{count} دیگر..."
   tours: 
     quiz_regrade: 
-      first_bullet: "هنگامی که شما یک جواب تغییر داده اید  باید قبل از به روز رسانی سوال یک گزینه را انتخاب کنید."
-      got_it: "اوکی متوجه شدم."
-      second_bullet: "اطمینان حاصل کنید که شما گزینه مناسب ترین را انتخاب کنید به عنوان نمرات دانش آموزان ممکن است تحت تاثیر قرارگیرد."
-      third_bullet: "کانواس  همه ارسالی شما را مجددا نمره دهی می کند  پس از این که ازمون را ذخیره کنید، این ممکن است چند دقیقه طول بکشد."
-      try_later: "اکنون شما می توانید گزینه های مجددا نمره دهی شده برای دانش آموزان که در حال حاضرازمون دادند را تنظیم کنید ."
+      first_bullet: "هنگامی که یک پاسخ را تغییر داده اید، باید قبل از بهنگام سازی پرسش یک گزینه را انتخاب کنید."
+      got_it: "بله، متوجه شدم"
+      second_bullet: "مطمئن شوید که مناسب ترین گزینه را انتخاب می کنید، زیرا نمره های دانشجویان ممکن است تحت تاثیر قرارگیرند."
+      third_bullet: "کانواس همه موردهای ارسالی شما را پس از اینکه آزمون را ذخیره کردید، دوباره نمره گذاری می کند. این کار ممکن است چند دقیقه طول بکشد."
+      try_later: "اکنون می توانید گزینه های نمره گذاری دوباره را برای دانشجویانی که در حال حاضر آزمون را داده اند، تنظیم کنید."
   turnitin: 
     error_1007: "فایل بارگذاری شده بزرگ است."
     error_1009: "نوع فایل معتبر نیست. (انواع معتبر فایل MS Word، Acrobat PDF، Postscript، Text، HTML، WordPerfect (WPD) و Rich Text Format هستند.)"
@@ -13952,13 +14018,13 @@ fa-IR:
   turnitin_info: 
     buttons: 
       resubmit_to_turnitin: "ارسال دوباره به turnitin "
-  ungraded_submissions_tile: "ارسالات دانشجوی نمره گذاری نشده"
+  ungraded_submissions_tile: "موردهای ارسالی نمره گذاری نشده دانشجویان"
   unknown: نامعلوم
   unknown_question_bank: "مخزن پرسش نامعلوم"
   unknown_quiz: "آزمون نامعلوم"
   unpublished_courses_title: "درس های منتشر نشده"
-  unsupported_package: "بسته محتوی پشتیبانی نشده"
-  unused_courses_title: "درس های مورد استفاده قرار نگرفته"
+  unsupported_package: "بسته محتوای پشتیبانی نشده"
+  unused_courses_title: "درس های استفاده نشده"
   user: 
     default_user_name: کاربر
     errors: 
@@ -13969,12 +14035,12 @@ fa-IR:
       terms: "باید ضوابط را بپذیرید"
       too_long: "نمی تواند از %{max} نویسه فراتر رود"
     registration: 
-      agree_to_terms_and_privacy_policy: "شما موافق با *terms of use* هستید و **privacy policy** را تصدیق میکنید"
+      agree_to_terms_and_privacy_policy: "با *ضوابط استفاده* موافق هستید و **سیاست حریم خصوصی** را تصدیق می کنید."
       agree_to_terms_with_code_of_conduct: "شما با *ضوابط استفاده* و **آیین نامه اجرایی** موافق هستید."
   user_access_title: "گزارش دسترسی کاربر"
   user_date_range_search: 
-    cant_be_blank: "ID کاربر کانوس نمی تواند خالی باشد"
-    cant_come_before_from: "'To Date' can't come before 'From Date'"
+    cant_be_blank: "شناسه کاربر کانواس نمی تواند خالی باشد"
+    cant_come_before_from: "«تا تاریخ» نمی تواند قبل از «از تاریخ» بیاید"
   user_inactivity_title: "گزارش عدم فعالیت کاربر"
   user_lists: 
     add_n_users: 
@@ -14079,7 +14145,7 @@ fa-IR:
         student: دانشجو
       page_title: "ژورنال هیأت علمی"
   user_profile: 
-    profile_title_too_long: "عنوانی خیلی طولانی است"
+    profile_title_too_long: "عنوان طولانی است"
     tabs: 
       notifications: "اطلاعیه ها"
       profile: "رخ نما"
@@ -14157,6 +14223,7 @@ fa-IR:
       roles_student: "به عنوان دانشجو ثبت نام شد."
       roles_ta: "به عنوان دستیار آمو.زشی ثبت نام شد."
       roles_teacher: "به عنوان استاد ثبت نام شد."
+      unenrollr: "لغو ثبت نام"
       unpublished: "منتشر نشده"
     errors: 
       no_teacher_courses: "هیچ درسی بین این استاد و دانشجو مشترک نیست"
@@ -14277,8 +14344,8 @@ fa-IR:
       update_instructions: "شما می توانید بعضی از اطلاعات این کاربر را بهنگام کنید ولی این کاربر می تواند تغییرات را به حالت اولیه برگرداند."
     new: 
       create_a_canvas_account: "ایجاد یک حساب کانواس"
-      privacy_policy: "سیاست حفظ حریم خصوصی."
-      terms_of_use: "ترم های مورد استفاده"
+      privacy_policy: "سیاست حریم خصوصی"
+      terms_of_use: "ضوابط استفاده"
     no_deleting_sis_user: "نمی توانید یک کاربر ایجاد شده توسط سیستم را حذف کنید"
     no_self_registration: "ثبت نام شخصی برای این حساب فعال نشده است"
     oauth_fail: "درخواست OAuth انجام نشد. درخواست معتبر یافت نشد"
@@ -14308,7 +14375,7 @@ fa-IR:
       sent_email_paragraph: "یک نامه الکترونیکی را به نشانی %{email_address} فرستادیم. *برای پایان دادن به ثبت نام، روی پیوند موجود در نامه الکترونیکی کلیک کنید*. اگر آن را ندیدید، **برای ارسال دوباره نامه الکترونیکی کلیک کنید** و حتما صندوق هرزنامه خود را بازبینی کنید."
       while_you_wait: "در حالی که منتظر هستید..."
     scheduled_conference: 
-      current_conference_text: "از شما دعوت شده در %{conference} شرکت کنید. این کنفرانس در %{starts_at} شروع می‌شود."
+      current_conference_text: "شما برای پیوستن به %{conference} دعوت شده اید. این کنفرانس در %{starts_at} شروع می‌شود."
     service_not_enabled: "این سرویس فعال نشده است"
     show: 
       accounts: "حساب ها"
@@ -14372,11 +14439,11 @@ fa-IR:
     is_required: "تکمیل این جای خالی لازم است"
   warnings: 
     test_install: 
-      periodic_message: "این کانواس نصب شده فقط برای امتحان کردن است,و به صورت دوره ای دوباره نصب خواهد شد."
+      periodic_message: "این کانواس نصب شده فقط برای آزمایش است و به طور دوره ای بازنشانی خواهد شد."
       title: "نصب آزمایشی کانواس"
       weekly_message: 
-        one: "این کانواس نصب شده فقط برای امتحان کردن است,و هر{count}% هفته دوباره نصب خواهد شد."
-        other: "این کانواس نصب شده فقط برای امتحان کردن است,و هر{count}% هفته دوباره نصب خواهد شد."
+        one: "این کانواس نصب شده فقط برای آزمایش است و هر {count}% هفته یک بار بازنشانی خواهد شد."
+        other: "این کانواس نصب شده فقط برای آزمایش است و هر {count}% هفته یک بار بازنشانی خواهد شد."
   web_conference: 
     default_name_for_courses: "کنفرانس مجازی درس"
     default_name_for_groups: "کنفرانس مجازی گروه"
@@ -14422,25 +14489,23 @@ fa-IR:
         unexpected_upload_problem: "در هنگام بارگذاری %{filename} اشکال غیر منتظره ای رخ داد. لطفا دوباره سعی کنید."
         upload_failed: "بارگذاری انجام نشد، لطفا دوباره سعی کنید"
       image_form: 
-        collapsed: "کلیک برای تغییر عکس جدید از (collapsed)"
-        expanded: "کلیک برای تغییر عکس جدید از (expanded)"
+        collapsed: "برای تغییر شکل تصویر جدید (جمع شده) کلیک کنید"
+        expanded: "برای تغییر شکل تصویر جدید (باز شده) کلیک کنید"
       loading_more_results: "در حال بارگذاری نتایج بیشتر"
       no_title: "عنوان موجود نیست"
       titles: 
         select_folder_for_uploads: "انتخاب پوشه برای بارگذاری های فایل"
     wiki_page: 
       buttons: 
-        edit: "ویرایش تکلیف"
-        view_all_pages: "مشاهده تمام صفحه ها"
+        edit: ویرایش
+        view_all_pages: "مشاهده همه صفحه ها"
       delete_wiki: حذف
       labels: 
-        front_page: "صفحه اول"
+        front_page: "صفحه آغازین"
       page_locked: "این صفحه قفل شده است"
-      page_locked_by_modules: "این صفجه زمانی قابل دسترسی خواهد بود که این واحد ها را کامل کنید"
-      page_locked_by_modules_until: |-
-          این صفجه قابل دسترسی خواهد بود در %{lock_info.unlock_at}
-          این واحد ها:
-      page_locked_until: "این صفجه قابل دسترسی خواهد بود در %{lock_info.unlock_at}"
+      page_locked_by_modules: "این صفحه زمانی قابل دسترسی خواهد بود که این ماژول ها را کامل کنید:"
+      page_locked_by_modules_until: "اگر این ماژول ها را تکمیل کنید، این صفجه در %{lock_info.unlock_at} قابل دسترسی خواهد بود:"
+      page_locked_until: "این صفحه در %{lock_info.unlock_at}  قابل دسترسی خواهد بود"
       published_indicator: "منتشر شده"
       toolbar_menu: 
         settings: تنظیمات
@@ -14448,26 +14513,26 @@ fa-IR:
       view_page_history_wiki: "مشاهده تاریخچه صفحه"
     wiki_page_content: 
       page_locked: "این صفحه قفل شده است"
-      page_locked_by_modules: "این صفحه یکبارزمانی که شما این ماژولها را کامل کردید قابل دسترس خواهد بود."
-      page_locked_by_modules_until: "این صفحه قابل دسترس خواهد بود در %{lock_info.unlock_at} اگر شما این ماژولها را تکمیل کنید:"
-      page_locked_until: "این صفحه قابل دسترس خواهد بود در %{lock_info.unlock_at}"
+      page_locked_by_modules: "این صفحه به محض اینکه این ماژول ها را تکمیل کنید، قابل دسترسی خواهد بود:"
+      page_locked_by_modules_until: "در صورتی که این ماژول ها را تکمیل کنید، این صفحه در %{lock_info.unlock_at} قابل دسترسی خواهد بود:"
+      page_locked_until: "این صفحه در %{lock_info.unlock_at} قابل دسترسی خواهد بود"
     wiki_page_edit: 
       buttons: 
         cancel: لغو
-        save: ذخیره
+        save: "ذخیره سازی"
       course_editing_roles: 
         anyone: همه
-        only_teachers: "فقط استادان"
-        teachers_and_students: "استادان و دانشجویان"
+        only_teachers: "فقط اساتید"
+        teachers_and_students: "اساتید و دانشجویان"
       editing_roles: 
         anyone: همه
-        can_edit_page: "می توان این صفحه را تغییر داد"
+        can_edit_page: "می توان این صفحه را ویرایش کرد"
         only_members: "فقط اعضا"
-      notify_users_text: "به کاربران اطلاع بده که محتوا عوض شده است"
-      options_label: "انتخاب ها"
+      notify_users_text: "به کاربران اطلاع داده شود که این محتوا تغییر یافته است"
+      options_label: "گزینه ها"
       title_label: "عنوان صفحه"
     wiki_page_index: 
-      add_page: "یک اضافه کن!"
+      add_page: "افزودن یک مورد!"
       buttons: 
         new_page: صفحه
         new_page_label: "افزودن یک صفحه"
@@ -14476,23 +14541,23 @@ fa-IR:
         last_edit: "آخرین ویرایش"
         page_title: "عنوان صفحه"
       loading: "در حال بارگذاری..."
-      loading_more: "در حال بارگذاری بیشتر..."
-      no_pages: "هیچ صفحه ای تاکنون ایجاد نشده است"
+      loading_more: "در حال بارگذاری بیشتر ..."
+      no_pages: "هنوز هیچ صفحه ای ایجاد نشده است"
     wiki_page_index_edit_dialog: 
       page_title: عنوان
     wiki_page_index_item: 
       labels: 
-        front_page: "صفحه روبه رو"
+        front_page: "صفحه آغازین"
       menu: 
         delete: حذف
-        edit: "ویرایش تکلیف"
+        edit: ویرایش
         settings: تنظیمات
-        use_front_page: "به عنوان صفحه اول استفاده کن"
+        use_front_page: "استفاده به عنوان صفحه آغازین"
     wiki_page_revision: 
-      latest_revision: "آخرین اصلاح"
-      restore_revision: "بازیابی این اصلاح"
+      latest_revision: "آخرین بازنگری"
+      restore_revision: "بازیابی این بازنگری"
       revision_summary: "*%{updated_at}* توسط %{edited_by}"
-      same_as_latest: "مشابه *آخرین*"
+      same_as_latest: "یکسان با *آخرین*"
     wiki_page_revisions: 
       revision_history: "تاریخچه بازنگری"
   wiki_page: 
@@ -14500,7 +14565,7 @@ fa-IR:
     atom_entry_title: "صفحه ویکی، %{course_or_group_name}: %{page_title}"
     cannot_hide_page: "نمی توان صفحه آغازین را مخفی کرد"
     cannot_set_hidden_front_page: "نمی توان آن را به عنوان صفحه آغازین تعیین کرد، زیرا مخفی است"
-    cannot_set_unpublished_front_page: "نمی تواند به عنوان صفحه اول تنظیم شود زیرا منتشر نشده است"
+    cannot_set_unpublished_front_page: "نمی تواند به عنوان صفحه آغازین تعیین شود، زیرا منتشر نشده است"
     defaults: 
       no_content: "محتوا موجود نیست"
     errors: 
@@ -14568,14 +14633,16 @@ fa-IR:
       cannot_delete_front_page: "نمی توانید صفحه آغازین را حذف کنید."
     front_page: "صفحه آغازین"
     notices: 
-      cannot_edit: "اجازه ندارید این صفحه را تغییر دهید\"%{title}\"."
-      cannot_read_revisions: "شما مجاز به مرور تاریخچه بازنگری های \"%{title}\" نیستید."
-      create_non_existent_page: "صفحه ی \"%{title}\" وجود ندارد، ولی شما میتوانید آن را در زیر بسازید"
+      cannot_edit: "اجازه ندارید صفحه \"%{title}\" را ویرایش کنید."
+      cannot_read_revisions: "مجاز به بازبینی بازنگری های تاریخی \"%{title}\" نیستید."
+      create_non_existent_page: "صفحه \"%{title}\" وجود ندارد، ولی می توانید آن را در قسمت زیر ایجاد کنید"
       page_deleted: "صفحه \"%{title}\" حذف شده است"
-      page_does_not_exist: "صفجه \"%{title}\" موجود نیست"
+      page_does_not_exist: "صفحه \"%{title}\" موجود نیست."
       page_updated: "صفحه با موفقیت بهنگام سازی شد."
     page_link: 
       link_hidden_from_students_warning: "دانشجویان این پیوند را نخواهند دید"
+    page_revisions: 
+      page_revisions_title: "بازنگری های %{title}: %{context_name}"
     pages_index: 
       titles: 
         pages: "صفحه ها"
@@ -14601,15 +14668,30 @@ fa-IR:
       wiki_description_for_group: "آن را به عنوان یک فضای بی انتها برای نگهداری محتوا در نظر بگیرید. می توانید از آن برای شرح دادن گروه خود، تأمین توضیحات مفید برای موضوعات دشوار یا حتی فراهم کردن امکان همکاری اعضاء با یکدیگر روی پروژه های نگارش استفاده کنید."
       wiki_description_header: "ویکی برای چیست؟"
   wiki_pages_api: 
-    cannot_delete_front_page: "صفحه جلویی نمی تواند حذف شود"
-    cannot_have_hidden_front_page: "صفحه اول نمی تواند پنهان شود"
-    cannot_have_unpublished_front_page: "صفحه ی اول نمی تواند منتشر نشود "
-    cannot_update_editing_roles: "اجازه ندارید تغییرات نقش های این صفحه wiki را به روز اوری کنید  "
-    cannot_update_front_page: "اجازه ندارید صفحه مقابل wiki را تغییر دهید"
-    cannot_update_hide_from_students: "شما اجازه ندارید که پنهان را از پرچم دانش اموزان این صفحه ی ویکی را به روز کنید "
-    cannot_update_published: "شما اجازه ندارید که حالت های منتشر شده ی این صفحه ی ویکی را به روز کنید "
-    cannot_update_title: "شما اجازه ندارید که عنوان این صفحه ی ویکی را به روز کنید."
-    invalid_editing_roles: "بخش های آماده ی ویرایش نامعتبر هستند."
+    cannot_delete_front_page: "صفحه آغازین را نمی توان حذف کرد"
+    cannot_have_hidden_front_page: "صفحه آغازین را نمی توان مخفی کرد"
+    cannot_have_unpublished_front_page: "انتشار صفحه آغازین را نمی توان لغو کرد"
+    cannot_update_editing_roles: "اجازه ندارید نقش های ویرایش این صفحه ویکی را بهنگام سازی کنید"
+    cannot_update_front_page: "اجازه ندارید صفحه آغازین ویکی را تغییر دهید"
+    cannot_update_hide_from_students: "اجازه ندارید موارد مخفی شده را از پرچم دانشجویان این صفحه ویکی بهنگام سازی کنید"
+    cannot_update_published: "اجازه ندارید وضعیت منتشر شده این صفحه ویکی را بهنگام سازی کنید"
+    cannot_update_title: "اجازه ندارید عنوان این صفحه ویکی را بهنگام سازی کنید"
+    invalid_editing_roles: "نقش های ویرایش ارائه شده معتبر نیستند"
+  will_paginate: 
+    next_label: "&#8594 بعدی؛"
+    page_entries_info: 
+      multi_page: "در حال نمایش %{model} %{from} - %{to} از %{count} در کل"
+      multi_page_html: "در حال نمایش %{model} <b>%{from}&nbsp;-&nbsp;%{to}</b> از <b>%{count}</b> در کل"
+      single_page: 
+        one: "در حال نمایش 1 %{model}"
+        other: "در حال نمایش همه %{count} %{model}"
+        zero: "%{model} یافت نشد"
+      single_page_html: 
+        one: "در حال نمایش <b>1</b> %{model}"
+        other: "در حال نمایش <b>all&nbsp;%{count}</b> %{model}"
+        zero: "%{model} یافت نشد"
+    page_gap: "&hellip؛"
+    previous_label: "&#8592؛ قبلی"
   wimba_conference: 
     external_urls: 
       archive: بایگانی
