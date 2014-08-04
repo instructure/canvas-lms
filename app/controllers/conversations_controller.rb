@@ -127,19 +127,19 @@ class ConversationsController < ApplicationController
   # @API List conversations
   # Returns the list of conversations for the current user, most recent ones first.
   #
-  # @argument scope [Optional, String, "unread"|"starred"|"archived"]
+  # @argument scope [String, "unread"|"starred"|"archived"]
   #   When set, only return conversations of the specified type. For example,
   #   set to "unread" to return only conversations that haven't been read.
   #   The default behavior is to return all non-archived conversations (i.e.
   #   read and unread).
   #
-  # @argument filter[] [Optional, String, course_id|group_id|user_id]
+  # @argument filter[] [String, course_id|group_id|user_id]
   #   When set, only return conversations for the specified courses, groups
   #   or users. The id should be prefixed with its type, e.g. "user_123" or
   #   "course_456". Can be an array (by setting "filter[]") or single value
   #   (by setting "filter")
   #
-  # @argument filter_mode [Optional, "and"|"or", default "or"]
+  # @argument filter_mode ["and"|"or", default "or"]
   #   When filter[] contains multiple filters, combine them with this mode,
   #   filtering conversations that at have at least all of the contexts ("and")
   #   or at least one of the contexts ("or")
@@ -261,16 +261,16 @@ class ConversationsController < ApplicationController
   # an existing private conversation with the given recipients, it will be
   # reused.
   #
-  # @argument recipients[] [String]
+  # @argument recipients[] [Required, String]
   #   An array of recipient ids. These may be user ids or course/group ids
   #   prefixed with "course_" or "group_" respectively, e.g.
   #   recipients[]=1&recipients[]=2&recipients[]=course_3
   #
-  # @argument subject [Optional, String]
+  # @argument subject [String]
   #   The subject of the conversation. This is ignored when reusing a
   #   conversation. Maximum length is 255 characters.
   #
-  # @argument body [String]
+  # @argument body [Required, String]
   #   The message to be sent
   #
   # @argument group_conversation [Boolean]
@@ -289,7 +289,7 @@ class ConversationsController < ApplicationController
   # @argument media_comment_type [String, "audio"|"video"]
   #   Type of the associated media file
   #
-  # @argument user_note [Optional, Boolean]
+  # @argument user_note [Boolean]
   #   Will add a faculty journal entry for each recipient as long as the user
   #   making the api call has permission, the recipient is a student and
   #   faculty journals are enabled in the account.
@@ -301,17 +301,17 @@ class ConversationsController < ApplicationController
   #   private message). When sent async, the response will be an empty array
   #   (batch status can be queried via the {api:ConversationsController#batches batches API})
   #
-  # @argument scope [Optional, String, "unread"|"starred"|"archived"]
+  # @argument scope [String, "unread"|"starred"|"archived"]
   #   Used when generating "visible" in the API response. See the explanation
   #   under the {api:ConversationsController#index index API action}
-  # @argument filter[] [Optional, String, course_id|group_id|user_id]
+  # @argument filter[] [String, course_id|group_id|user_id]
   #   Used when generating "visible" in the API response. See the explanation
   #   under the {api:ConversationsController#index index API action}
-  # @argument filter_mode [Optional, "and"|"or", default "or"]
+  # @argument filter_mode ["and"|"or", default "or"]
   #   Used when generating "visible" in the API response. See the explanation
   #   under the {api:ConversationsController#index index API action}
   #
-  # @argument context_code [Optional, String]
+  # @argument context_code [String]
   #   The course or group that is the context for this conversation. Same format
   #   as courses or groups in the recipients argument.
   def create
@@ -400,13 +400,13 @@ class ConversationsController < ApplicationController
   # @argument interleave_submissions [Boolean] (Obsolete) Submissions are no
   #   longer linked to conversations. This parameter is ignored.
   #
-  # @argument scope [Optional, String, "unread"|"starred"|"archived"]
+  # @argument scope [String, "unread"|"starred"|"archived"]
   #   Used when generating "visible" in the API response. See the explanation
   #   under the {api:ConversationsController#index index API action}
-  # @argument filter[] [Optional, String, course_id|group_id|user_id]
+  # @argument filter[] [String, course_id|group_id|user_id]
   #   Used when generating "visible" in the API response. See the explanation
   #   under the {api:ConversationsController#index index API action}
-  # @argument filter_mode [Optional, "and"|"or", default "or"]
+  # @argument filter_mode ["and"|"or", default "or"]
   #   Used when generating "visible" in the API response. See the explanation
   #   under the {api:ConversationsController#index index API action}
   #
@@ -533,13 +533,13 @@ class ConversationsController < ApplicationController
   # @argument conversation[starred] [Boolean]
   #   Toggle the starred state of the current user's view of the conversation.
   #
-  # @argument scope [Optional, String, "unread"|"starred"|"archived"]
+  # @argument scope [String, "unread"|"starred"|"archived"]
   #   Used when generating "visible" in the API response. See the explanation
   #   under the {api:ConversationsController#index index API action}
-  # @argument filter[] [Optional, String, course_id|group_id|user_id]
+  # @argument filter[] [String, course_id|group_id|user_id]
   #   Used when generating "visible" in the API response. See the explanation
   #   under the {api:ConversationsController#index index API action}
-  # @argument filter_mode [Optional, "and"|"or", default "or"]
+  # @argument filter_mode ["and"|"or", default "or"]
   #   Used when generating "visible" in the API response. See the explanation
   #   under the {api:ConversationsController#index index API action}
   #
@@ -617,7 +617,7 @@ class ConversationsController < ApplicationController
   # the GET/show action, except that only includes the
   # latest message (e.g. "joe was added to the conversation by bob")
   #
-  # @argument recipients[] [String]
+  # @argument recipients[] [Required, String]
   #   An array of recipient ids. These may be user ids or course/group ids
   #   prefixed with "course_" or "group_" respectively, e.g.
   #   recipients[]=1&recipients[]=2&recipients[]=course_3
@@ -667,7 +667,7 @@ class ConversationsController < ApplicationController
   # GET/show action, except that only includes the
   # latest message (i.e. what we just sent)
   #
-  # @argument body [String]
+  # @argument body [Required, String]
   #   The message to be sent.
   #
   # @argument attachment_ids[] [String]
@@ -681,17 +681,17 @@ class ConversationsController < ApplicationController
   # @argument media_comment_type [String, "audio"|"video"]
   #   Type of the associated media file.
   #
-  # @argument recipients[] [Optional, String]
+  # @argument recipients[] [String]
   # An array of user ids. Defaults to all of the current conversation
   # recipients. To explicitly send a message to no other recipients,
   # this array should consist of the logged-in user id.
   #
-  # @argument included_messages[] [Optional, String]
+  # @argument included_messages[] [String]
   # An array of message ids from this conversation to send to recipients
   # of the new message. Recipients who already had a copy of included
   # messages will not be affected.
   #
-  # @argument user_note [Optional, Boolean]
+  # @argument user_note [Boolean]
   #   Will add a faculty journal entry for each recipient as long as the user
   #   making the api call has permission, the recipient is a student and
   #   faculty journals are enabled in the account.
@@ -768,7 +768,7 @@ class ConversationsController < ApplicationController
   # user's view of the conversation. If all messages are deleted, the
   # conversation will be as well (equivalent to DELETE)
   #
-  # @argument remove[] [String]
+  # @argument remove[] [Required, String]
   #   Array of message ids to be deleted
   #
   # @example_response
@@ -798,10 +798,10 @@ class ConversationsController < ApplicationController
   # Perform a change on a set of conversations. Operates asynchronously; use the {api:ProgressController#show progress endpoint}
   # to query the status of an operation.
   #
-  # @argument conversation_ids[] [String]
+  # @argument conversation_ids[] [required, String]
   #   List of conversations to update. Limited to 500 conversations.
   #
-  # @argument event [String, "mark_as_read"|"mark_as_unread"|"star"|"unstar"|"archive"|"destroy"]
+  # @argument event [Required, String, "mark_as_read"|"mark_as_unread"|"star"|"unstar"|"archive"|"destroy"]
   #   The action to take on each conversation.
   #
   # @example_request

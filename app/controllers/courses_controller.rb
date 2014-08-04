@@ -262,12 +262,12 @@ class CoursesController < ApplicationController
   # @API List your courses
   # Returns the list of active courses for the current user.
   #
-  # @argument enrollment_type [Optional, String, "teacher"|"student"|"ta"|"observer"|"designer"]
+  # @argument enrollment_type [String, "teacher"|"student"|"ta"|"observer"|"designer"]
   #   When set, only return courses where the user is enrolled as this type. For
   #   example, set to "teacher" to return only courses where the user is
   #   enrolled as a Teacher.  This argument is ignored if enrollment_role is given.
   #
-  # @argument enrollment_role [Optional, String]
+  # @argument enrollment_role [String]
   #   When set, only return courses where the user is enrolled with the specified
   #   course-level role.  This can be a role created with the
   #   {api:RoleOverridesController#add_role Add Role API} or a base role type of
@@ -313,7 +313,7 @@ class CoursesController < ApplicationController
   #     (name), start and end dates (start_at, end_at), as well as the enrollment
   #     type (enrollment_role, e.g. 'StudentEnrollment').
   #
-  # @argument state[] [Optional, String, "unpublished"|"available"|"completed"|"deleted"]
+  # @argument state[] [String, "unpublished"|"available"|"completed"|"deleted"]
   #   If set, only return courses that are in the given state(s).
   #   By default, "available" is returned for students and observers, and
   #   anything except "deleted", for all other enrollment types
@@ -391,23 +391,23 @@ class CoursesController < ApplicationController
   # @API Create a new course
   # Create a new course
   #
-  # @argument account_id [Integer]
+  # @argument account_id [Required, Integer]
   #   The unique ID of the account to create to course under.
   #
-  # @argument course[name] [Optional, String]
+  # @argument course[name] [String]
   #   The name of the course. If omitted, the course will be named "Unnamed
   #   Course."
   #
-  # @argument course[course_code] [Optional, String]
+  # @argument course[course_code] [String]
   #   The course code for the course.
   #
-  # @argument course[start_at] [Optional, DateTime]
+  # @argument course[start_at] [DateTime]
   #   Course start date in ISO8601 format, e.g. 2011-01-01T01:00Z
   #
-  # @argument course[end_at] [Optional, DateTime]
+  # @argument course[end_at] [DateTime]
   #   Course end date in ISO8601 format. e.g. 2011-01-01T01:00Z
   #
-  # @argument course[license] [Optional, String]
+  # @argument course[license] [String]
   #   The name of the licensing. Should be one of the following abbreviations
   #   (a descriptive name is included in parenthesis for reference):
   #   - 'private' (Private Copyrighted)
@@ -419,58 +419,58 @@ class CoursesController < ApplicationController
   #   - 'cc_by' (CC Attribution)
   #   - 'public_domain' (Public Domain).
   #
-  # @argument course[is_public] [Optional, Boolean]
+  # @argument course[is_public] [Boolean]
   #   Set to true if course if public.
   #
-  # @argument course[public_syllabus] [Optional, Boolean]
+  # @argument course[public_syllabus] [Boolean]
   #   Set to true to make the course syllabus public.
   #
-  # @argument course[public_description] [Optional, String]
+  # @argument course[public_description] [String]
   #   A publicly visible description of the course.
   #
-  # @argument course[allow_student_wiki_edits] [Optional, Boolean]
+  # @argument course[allow_student_wiki_edits] [Boolean]
   #   If true, students will be able to modify the course wiki.
   #
-  # @argument course[allow_wiki_comments] [Optional, Boolean]
+  # @argument course[allow_wiki_comments] [Boolean]
   #   If true, course members will be able to comment on wiki pages.
   #
-  # @argument course[allow_student_forum_attachments] [Optional, Boolean]
+  # @argument course[allow_student_forum_attachments] [Boolean]
   #   If true, students can attach files to forum posts.
   #
-  # @argument course[open_enrollment] [Optional, Boolean]
+  # @argument course[open_enrollment] [Boolean]
   #   Set to true if the course is open enrollment.
   #
-  # @argument course[self_enrollment] [Optional, Boolean]
+  # @argument course[self_enrollment] [Boolean]
   #   Set to true if the course is self enrollment.
   #
-  # @argument course[restrict_enrollments_to_course_dates] [Optional, Boolean]
+  # @argument course[restrict_enrollments_to_course_dates] [Boolean]
   #   Set to true to restrict user enrollments to the start and end dates of the
   #   course.
   #
-  # @argument course[term_id] [Optional, Integer]
+  # @argument course[term_id] [Integer]
   #   The unique ID of the term to create to course in.
   #
-  # @argument course[sis_course_id] [Optional, String]
+  # @argument course[sis_course_id] [String]
   #   The unique SIS identifier.
   #
-  # @argument course[integration_id] [Optional, String]
+  # @argument course[integration_id] [String]
   #   The unique Integration identifier.
   #
-  # @argument course[hide_final_grades] [Optional, Boolean]
+  # @argument course[hide_final_grades] [Boolean]
   #   If this option is set to true, the totals in student grades summary will
   #   be hidden.
   #
-  # @argument course[apply_assignment_group_weights] [Optional, Boolean]
+  # @argument course[apply_assignment_group_weights] [Boolean]
   #   Set to true to weight final grade based on assignment groups percentages.
   #
-  # @argument offer [Optional, Boolean]
+  # @argument offer [Boolean]
   #   If this option is set to true, the course will be available to students
   #   immediately.
   #
-  # @argument enroll_me [Optional, Boolean]
+  # @argument enroll_me [Boolean]
   #   Set to true to enroll the current user as the teacher.
   #
-  # @argument course[syllabus_body] [Optional, String]
+  # @argument course[syllabus_body] [String]
   #   The syllabus body for the course
   #
   # @returns Course
@@ -624,14 +624,14 @@ class CoursesController < ApplicationController
   # @API List users in course
   # Returns the list of users in this course. And optionally the user's enrollments in the course.
   #
-  # @argument search_term [Optional, String]
+  # @argument search_term [String]
   #   The partial name or full ID of the users to match and return in the results list.
   #
-  # @argument enrollment_type [Optional, String, "teacher"|"student"|"ta"|"observer"|"designer"]
+  # @argument enrollment_type [String, "teacher"|"student"|"ta"|"observer"|"designer"]
   #   When set, only return users where the user is enrolled as this type.
   #   This argument is ignored if enrollment_role is given.
   #
-  # @argument enrollment_role [Optional, String]
+  # @argument enrollment_role [String]
   #   When set, only return users enrolled with the specified course-level role.  This can be
   #   a role created with the {api:RoleOverridesController#add_role Add Role API} or a
   #   base role type of 'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment',
@@ -650,7 +650,7 @@ class CoursesController < ApplicationController
   #   - "test_student": Optionally include the course's Test Student,
   #   if present. Default is to not include Test Student.
   #
-  # @argument user_id [Optional, String]
+  # @argument user_id [String]
   #   If included, the user will be queried and if the user is part of the
   #   users set, the page parameter will be modified so that the page
   #   containing user_id will be returned.
@@ -817,7 +817,7 @@ class CoursesController < ApplicationController
   # @API Conclude a course
   # Delete or conclude an existing course
   #
-  # @argument event [String, "delete"|"conclude"]
+  # @argument event [Required, String, "delete"|"conclude"]
   #   The action to take on the course.
   def destroy
     @context = api_find(Course, params[:id])
@@ -1648,7 +1648,7 @@ class CoursesController < ApplicationController
   #
   # Additional arguments available for Courses#update
   #
-  # @argument course[grading_standard_id] [Optional, Integer]
+  # @argument course[grading_standard_id] [Integer]
   #   The grading standard id to set for the course.  If no value is provided for this argument the current grading_standard will be un-set from this course.
   #
   #
@@ -1804,8 +1804,9 @@ class CoursesController < ApplicationController
   # Update multiple courses in an account.  Operates asynchronously; use the {api:ProgressController#show progress endpoint}
   # to query the status of an operation.
   #
-  # @argument course_ids[] List of ids of courses to update. At most 500 courses may be updated in one call.
-  # @argument event The action to take on each course.  Must be one of 'offer', 'conclude', 'delete', or 'undelete'.
+  # @argument course_ids[] [Required] List of ids of courses to update. At most 500 courses may be updated in one call.
+  # @argument event [Required, String, "offer"|"conclude"|"delete"|"undelete"]
+  # The action to take on each course.  Must be one of 'offer', 'conclude', 'delete', or 'undelete'.
   #   * 'offer' makes a course visible to students. This action is also called "publish" on the web site.
   #   * 'conclude' prevents future enrollments and makes a course read-only for all participants. The course still appears
   #     in prior-enrollment lists.
