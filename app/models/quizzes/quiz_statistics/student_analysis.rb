@@ -101,8 +101,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
       end
       answers = sub.submission_data || []
       next unless answers.is_a?(Array)
-      points = answers.map { |a| a[:points] }.sum
-      score_counter << points
+      score_counter << sub.score.to_f
       correct_cnt += answers.count { |a| a[:correct] == true }
       incorrect_cnt += answers.count { |a| a[:correct] == false }
       total_duration += ((sub.finished_at - sub.started_at).to_i rescue 30)

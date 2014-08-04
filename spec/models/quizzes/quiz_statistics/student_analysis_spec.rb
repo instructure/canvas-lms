@@ -44,7 +44,8 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     student_in_course :course => @course, :user => @user3
     sub = q.generate_submission(@user1)
     sub.workflow_state = 'complete'
-    sub.submission_data = [{ :points => 15, :text => "", :correct => "undefined", :question_id => question.id }]
+    sub.submission_data = [{ :points => 10, :text => "", :correct => "undefined", :question_id => question.id }]
+    # simulate a positive fudge of 5 points:
     sub.score = 15
     sub.with_versioning(true, &:save!)
     stats = q.statistics
