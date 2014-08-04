@@ -73,17 +73,21 @@ module IncomingMailProcessor
     private
 
     def extract_body(incoming_message)
-      if incoming_message.multipart? && part = incoming_message.parts.find { |p| p.content_type.try(:match, %r{^text/html(;|$)}) }
-        html_body = self.class.utf8ify(part.body.decoded, part.charset)
+
+      if incoming_message.multipart?
+        html_part = incoming_message.html_part
+        text_part =  incoming_message.text_part
+
+        html_body = self.class.utf8ify(html_part.body.decoded, html_part.charset)
+        body = self.class.utf8ify(text_part.body.decoded, text_part.charset)
+      else
+        body = self.class.utf8ify(incoming_message.body.decoded, incoming_message.charset)
       end
-      html_body = self.class.utf8ify(incoming_message.body.decoded, incoming_message.charset) if !incoming_message.multipart? && incoming_message.content_type.try(:match, %r{^text/html(;|$)})
-      if incoming_message.multipart? && part = incoming_message.parts.find { |p| p.content_type.try(:match, %r{^text/plain(;|$)}) }
-        body = self.class.utf8ify(part.body.decoded, part.charset)
-      end
-      body ||= self.class.utf8ify(incoming_message.body.decoded, incoming_message.charset)
+
       if !html_body
         html_body = self.class.format_message(body).first
       end
+
       return body, html_body
     end
 
