@@ -17,6 +17,7 @@
 #
 
 require 'spec_helper'
+MAIL_FIXTURES_PATH = File.dirname(__FILE__) + '/../fixtures/'
 describe IncomingMailProcessor::IncomingMessageProcessor do
 
   # Import this one constant
@@ -35,6 +36,46 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
       @incoming_message = incoming_message
       @address_tag = tag
     end
+  end
+
+  def get_fixture (name)
+    mail = Mail.read(MAIL_FIXTURES_PATH + name)
+    return mail
+  end
+
+
+  def get_expected_text (name)
+    file = File.open(MAIL_FIXTURES_PATH + 'expected/' + name + '.text_body', 'rb')
+    content = file.read
+    file.close
+
+    return content
+  end
+
+  def get_expected_html (name)
+    file = File.open(MAIL_FIXTURES_PATH + 'expected/' + name + '.html_body', 'rb')
+    content = file.read
+    file.close
+
+    return content
+  end
+
+  def test_message (filename)
+    message = get_processed_message(filename)
+
+    text_body =  message.body.strip!
+    text_body.should == get_expected_text(filename)
+
+    html_body =  message.html_body.strip!
+    html_body.should == get_expected_html(filename)
+  end
+
+  def get_processed_message(name)
+    processor = IncomingMessageProcessor.new(message_handler, error_reporter)
+    message = get_fixture(name)
+    processor.process_single(message, '')
+
+    return message_handler
   end
 
   let(:error_reporter) { MockErrorReporter.new }
@@ -126,6 +167,20 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
       message_handler.expects(:handle).never
 
       IncomingMessageProcessor.new(message_handler, error_reporter).process_single(incoming_bounce_message, '')
+    end
+  end
+
+  describe "#process_single__CNVS-5873" do
+    it "should be able to extract text and html bodies from nested_multipart_sample.eml" do
+      test_message('nested_multipart_sample.eml')
+    end
+
+    it "should be able to extract text and html bodies from multipart_mixed.eml" do
+      test_message('multipart_mixed.eml')
+    end
+
+    it "should be able to extract text and html bodies from no_image.eml" do
+      message = test_message('no_image.eml')
     end
   end
 
