@@ -214,8 +214,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def build_assignment
     if (context.feature_enabled?(:draft_state) || self.available?) &&
-      !self.assignment_id && self.graded? && @saved_by != :assignment &&
-      @saved_by != :clone
+      !self.assignment_id && self.graded? && ![:assignment, :clone, :migration].include?(@saved_by)
       assignment = self.assignment
       assignment ||= self.context.assignments.build(:title => self.title, :due_at => self.due_at, :submission_types => 'online_quiz')
       assignment.assignment_group_id = self.assignment_group_id
