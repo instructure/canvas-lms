@@ -21,15 +21,20 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require 'csv'
 
 describe GradebookUploadsController do
+  before :once do
+    course_with_teacher active_all: true
+    student_in_course active_all: true
+    course_with_graded_student
+  end
+
   describe "POST 'create'" do
     it "should require authorization" do
-      course_model
       post 'create', :course_id => @course.id
       assert_unauthorized
     end
 
     it "should redirect on failed csvs" do
-      course_with_teacher_logged_in(:active_all => true)
+      user_session(@teacher)
       file = Tempfile.new("csv.csv")
       file.puts("not a good csv")
       file.close
@@ -39,19 +44,19 @@ describe GradebookUploadsController do
     end
 
     it "should accept a valid csv upload" do
-      course_with_graded_student
+      user_session(@teacher)
       check_create_response
     end
 
     it "should accept a valid csv upload with a final grade column" do
-      course_with_graded_student
+      user_session(@teacher)
       @course.grading_standard_id = 0
       @course.save!
       check_create_response
     end
 
     it "should accept a valid csv upload with sis id columns" do
-      course_with_graded_student
+      user_session(@teacher)
       @course.grading_standard_id = 0
       @course.save!
       check_create_response(true)
@@ -59,9 +64,11 @@ describe GradebookUploadsController do
   end
 
   describe "POST 'update'" do
+    before :each do
+      user_session(@teacher)
+    end
 
     it "should update grades and save new versions" do
-      course_with_graded_student
       @assignment.reload
       @assignment2.reload
       @assignment.submissions.first.grade.should == '10'
@@ -92,8 +99,6 @@ describe GradebookUploadsController do
     end
 
     it "should create new assignments" do
-      course_with_graded_student
-
       uploaded_csv = CSV.generate do |csv|
         csv << ["Student", "ID", "SIS User ID", "SIS Login ID", "Section", "Some Assignment", "Some Assignment 2", "Third Assignment"]
         csv << ["    Points Possible", "", "","", "", "", "", "15"]
@@ -115,7 +120,6 @@ describe GradebookUploadsController do
   end
 
   def course_with_graded_student
-    course_with_student(:active_all => true)
     @group = @course.assignment_groups.create!(:name => "Some Assignment Group", :group_weight => 100)
     @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :assignment_group => @group)
     @assignment.grade_student(@user, :grade => "10")
@@ -124,10 +128,6 @@ describe GradebookUploadsController do
     @course.recompute_student_scores
     @user.reload
     @course.reload
-    @student = @user
-    user_model
-    @course.enroll_teacher(@user).accept
-    user_session(@user)
   end
 
   def check_create_response(include_sis_id=false)
@@ -144,13 +144,9 @@ describe GradebookUploadsController do
   describe "POST 'update'" do
 
     it "should allow entering a percentage for a score" do
-      course_with_student(:active_all => true)
       @group = @course.assignment_groups.create!(:name => "Some Assignment Group", :group_weight => 100)
       @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :grading_type => 'percent', :assignment_group => @group)
-      @student = @user
-      user_model
-      @course.enroll_teacher(@user).accept
-      user_session(@user)
+      user_session(@teacher)
       uploaded_json = <<-JSON
       {
         "students": [{

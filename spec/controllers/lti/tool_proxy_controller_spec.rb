@@ -22,9 +22,11 @@ module Lti
   describe ToolProxyController do
 
     describe "GET #register" do
+      before(:once) { course_with_teacher(active_all: true) }
+      before(:each) { user_session(@teacher) }
+
       context 'course' do
         it 'initiates a tool proxy registration request' do
-          course_with_teacher_logged_in(:active_all => true)
           get 'register', course_id: @course.id, tool_consumer_url: 'http://tool.consumer.url'
           lti_launch = assigns[:lti_launch]
           lti_launch.resource_url.should == 'http://tool.consumer.url'
@@ -42,7 +44,6 @@ module Lti
 
       context 'account' do
         it 'initiates a tool proxy registration request' do
-          course_with_teacher_logged_in(:active_all => true)
           get 'register', account_id: @course.root_account.id, tool_consumer_url: 'http://tool.consumer.url'
           lti_launch = assigns[:lti_launch]
           lti_launch.resource_url.should == 'http://tool.consumer.url'
