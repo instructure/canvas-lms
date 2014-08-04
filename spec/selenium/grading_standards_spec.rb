@@ -39,6 +39,8 @@ describe "grading standards" do
 
     get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
     form = f("#edit_assignment_form")
+    f("#assignment_points_possible").clear()
+    f("#assignment_points_possible").send_keys("1")
     click_option('#assignment_grading_type', "Letter Grade")
     f('.edit_letter_grades_link').should be_displayed
     f('.edit_letter_grades_link').click

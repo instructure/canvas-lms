@@ -86,6 +86,8 @@ describe "assignments" do
 
       #check peer reviews option
       form = f("#edit_assignment_form")
+      assignment_points_possible = f("#assignment_points_possible")
+      replace_content(assignment_points_possible, "5")
       form.find_element(:css, '#assignment_peer_reviews').click
       wait_for_ajaximations
       form.find_element(:css, '#assignment_automatic_peer_reviews').click
@@ -136,7 +138,6 @@ describe "assignments" do
       datepicker = datepicker_next
       datepicker.find_element(:css, '.ui-datepicker-ok').click
       wait_for_ajaximations
-      f('#assignment_points_possible').send_keys('5')
       submit_form('#add_assignment_form')
 
       #make sure assignment was added to correct assignment group
@@ -163,6 +164,8 @@ describe "assignments" do
           replace_content f('#assignment_points_possible'), ('1')
         end
         click_option('#assignment_submission_type', 'No Submission')
+        assignment_points_possible = f("#assignment_points_possible")
+        replace_content(assignment_points_possible, "5")
         submit_assignment_form
         f('.title').should include_text(assignment_title)
         Assignment.find_by_title(assignment_title).grading_type.should == grading_option
@@ -214,6 +217,8 @@ describe "assignments" do
         wait_for_ajaximations
         expect_new_page_load { f('.more_options_link').click }
         click_option('#assignment_submission_type', 'No Submission')
+        assignment_points_possible = f("#assignment_points_possible")
+        replace_content(assignment_points_possible, "5")
         submit_assignment_form
         @course.assignments.count.should == 1
         get "/courses/#{@course.id}/assignments"
@@ -278,7 +283,7 @@ describe "assignments" do
       end
     end
 
-    it "should validate points for percentage grading (> 0)" do
+    def point_validation
       assignment_name = 'first test assignment'
       @assignment = @course.assignments.create({
                                                    :name => assignment_name,
@@ -286,40 +291,70 @@ describe "assignments" do
                                                })
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
-      click_option('#assignment_grading_type', 'Percentage')
+      yield if block_given?
       f('.btn-primary[type=submit]').click
       wait_for_ajaximations
-      fj('.error_text div').text.should == "Points possible must be more than 0 for percentage grading"
+      fj('.error_text div').text.should == "Points possible must be more than 0 for selected grading type"
+    end
+
+    it "should validate points for percentage grading (> 0)" do
+      point_validation{
+        click_option('#assignment_grading_type', 'Percentage')
+      }
     end
 
     it "should validate points for percentage grading (!= '')" do
-      assignment_name = 'first test assignment'
-      @assignment = @course.assignments.create({
-                                                   :name => assignment_name,
-                                                   :assignment_group => @course.assignment_groups.create!(:name => "default")
-                                               })
-
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
-      click_option('#assignment_grading_type', 'Percentage')
-      replace_content f('#assignment_points_possible'), ('')
-      f('.btn-primary[type=submit]').click
-      wait_for_ajaximations
-      fj('.error_text div').text.should == "Points possible must be more than 0 for percentage grading"
+      point_validation{
+        click_option('#assignment_grading_type', 'Percentage')
+        replace_content f('#assignment_points_possible'), ('')
+      }
     end
 
     it "should validate points for percentage grading (digits only)" do
-      assignment_name = 'first test assignment'
-      @assignment = @course.assignments.create({
-                                                   :name => assignment_name,
-                                                   :assignment_group => @course.assignment_groups.create!(:name => "default")
-                                               })
+      point_validation{
+        click_option('#assignment_grading_type', 'Percentage')
+        replace_content f('#assignment_points_possible'), ('taco')
+      }
+    end
 
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
-      click_option('#assignment_grading_type', 'Percentage')
-      replace_content f('#assignment_points_possible'), ('taco')
-      f('.btn-primary[type=submit]').click
-      wait_for_ajaximations
-      fj('.error_text div').text.should == "Points possible must be more than 0 for percentage grading"
+    it "should validate points for letter grading (> 0)" do
+      point_validation{
+        click_option('#assignment_grading_type', 'Letter Grade')
+      }
+    end
+
+    it "should validate points for letter grading (!= '')" do
+      point_validation{
+        click_option('#assignment_grading_type', 'Letter Grade')
+        replace_content f('#assignment_points_possible'), ('')
+      }
+    end
+
+    it "should validate points for letter grading (digits only)" do
+      point_validation{
+        click_option('#assignment_grading_type', 'Letter Grade')
+        replace_content f('#assignment_points_possible'), ('taco')
+      }
+    end
+
+    it "should validate points for GPA scale grading (> 0)" do
+      point_validation{
+        click_option('#assignment_grading_type', 'GPA Scale')
+      }
+    end
+
+    it "should validate points for GPA scale grading (!= '')" do
+      point_validation{
+        click_option('#assignment_grading_type', 'GPA Scale')
+        replace_content f('#assignment_points_possible'), ('')
+      }
+    end
+
+    it "should validate points for GPA scale grading (digits only)" do
+      point_validation{
+        click_option('#assignment_grading_type', 'GPA Scale')
+        replace_content f('#assignment_points_possible'), ('taco')
+      }
     end
 
     context "frozen assignment_group_id" do
