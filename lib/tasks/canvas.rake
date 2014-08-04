@@ -111,10 +111,15 @@ namespace :canvas do
     generate_documentation = truthy_values.include?(args[:generate_documentation])
     check_syntax = truthy_values.include?(args[:check_syntax])
 
+    require 'parallel'
+    processes = ENV['CANVAS_BUILD_CONCURRENCY'] || Parallel.processor_count
+    puts "working in #{processes} processes"
+
     tasks = {
       "Compile sass and make jammit css bundles" => -> {
         log_time('npm run compile-sass') do
-          raise unless system({"CANVAS_SASS_STYLE" => "compressed"}, "npm run compile-sass")
+          half_of_avilable_cores = (processes / 2).ceil.to_s
+          raise unless system({"CANVAS_SASS_STYLE" => "compressed", "CANVAS_BUILD_CONCURRENCY" => half_of_avilable_cores}, "npm run compile-sass")
         end
 
         log_time("Jammit") do
@@ -144,11 +149,6 @@ namespace :canvas do
       }
     end
 
-
-
-    require 'parallel'
-    processes = ENV['CANVAS_BUILD_CONCURRENCY'] || Parallel.processor_count
-    puts "working in #{processes} processes"
     times = nil
     real_time = Benchmark.realtime do
       times = Parallel.map(tasks, :in_processes => processes.to_i) do |name, lamduh|
