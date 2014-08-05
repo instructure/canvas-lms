@@ -856,6 +856,7 @@ en-AU:
       help_link_available_to_all_users: Users
       if_you_would_like_to_link_to_your_own_campus_support_website_in_the_help_dialog_you_can_do_that_here: "If you would like to link to your own campus support website in the help dialog you can do that here"
       interpolate_account_domain: "Enter \"{{ACCOUNT_DOMAIN}}\" to substitute the user's root account domain"
+      interpolate_user_id: "Enter \"{{CANVAS_USER_ID}}\" to substitute the user's unique Canvas ID"
       ip_filter_filter_label: Filter
       ip_filter_name_label: Name
       labels: 
@@ -945,7 +946,9 @@ en-AU:
         subject: Subject
       open_registration_delegated_warning_message: "An external identity provider is enabled, and users created via open registration may not be able to log in unless the external identity provider's login form has a link back to %{url}."
       open_registration_delegated_warning_tooltip: "An External Identity Provider is Enabled"
+      open_report_description: "Open Report Description"
       page_title: "Account Settings"
+      quiz_ip_filters_delete: "Remove Filter"
       quiz_ip_filters_help_message: |-
           Quiz IP filters are a way to limit access to quizzes to computers in a specified IP range.
           
@@ -1065,6 +1068,9 @@ en-AU:
         other: "%{count} batches waiting to be processed."
       pending_batches_title: "Pending Batches"
       process_data_button: "Process Data"
+      select_file_instructions: |-
+          Select the zip file that you want imported.  
+          For a description of how to generate these zip files, [please see this documentation](%{url}).
       sis_import_crumb: "SIS Import"
       started_at_message: "Started: %{started_at}"
       title: "SIS Import"
@@ -2181,11 +2187,16 @@ en-AU:
       attendance_help: "Attendance Help"
       new_attendance_column: "New Attendance Column"
   auth_logging: 
+    corrupted: "Details Not Available"
     login: LOGIN
     logout: LOGOUT
   bb_display: "Blackboard Learn"
   bb_file_description: "Blackboard 6/7/8/9 export .zip file"
   bb_name: "Blackboard Converter"
+  better_file_browsing_description: |-
+      A new, simpler, more user friendly file browsing interface.  If you turn this on at the course level,
+      then all of the users in that course will see the new interface.  To get it to show up when someone
+      goes to the personal files page for a user ('/files') then you need to turn it on for the account they are a member of.
   big_blue_button_conference: 
     conference_is_recorded: "This conference is being recorded."
     recording_setting: Recording
@@ -2265,6 +2276,7 @@ en-AU:
     cancel: Cancel
     choose_a_file: "Choose a File"
     delete: Delete
+    delete_file: "Delete file %{name}"
     done: Done
     filter: Filter
     find_user: "Find User"
@@ -3038,6 +3050,7 @@ en-AU:
     buttons: 
       process: "Process Data"
     errors: 
+      couldnt_create: "Couldn't create content export."
       error: "There was an error exporting your content.  Please notify your system administrator and give them the following export identifier: \"%{code}\""
       not_found: "Export does not exist"
     index: 
@@ -3570,6 +3583,9 @@ en-AU:
     content_next: 
       add_prerequisite: "Add prerequisite to *%{module}*"
       assignment_points_possible: "out of %{points_possible}"
+      button: 
+        delete_label: "Delete prerequisites"
+        delete_title: "Delete prerequisites"
       buttons: 
         add_module: "Add Module"
         add_prerequisite: "Add Prerequisite"
@@ -4178,6 +4194,7 @@ en-AU:
       concluded: Concluded
       copied_from: "Copied From"
       copied_to: "Copied To"
+      corrupted: "Details Not Available"
       created: Created
       deleted: Deleted
       published: Published
@@ -4380,6 +4397,7 @@ en-AU:
               
               Please **log in** or ***register*** to claim this course.
         files: "The Files tab is the place to share lecture slides, example documents, study helps -- anything your students will want to download. Uploading and organizing your files is easy with Canvas. We'll show you how."
+        home2: "When people visit the course, this is the page they'll see. You can set it to show an activity stream, the list of course modules, a syllabus, or a custom page you write yourself. The default is the course activity stream. To customise this, just click %{choose_home_page}."
         import: "If you've been using another course management system, you probably have stuff in there that you're going to want moved over to Canvas. We can walk you through the process of easily migrating your content into Canvas."
         navigation: "By default all links are enabled for a course. Students won't see links to sections that don't have content. For example, if you haven't created any quizzes, they won't see the quizzes link. You can sort and explicitly disable these links if there are areas of the course you don't want your students accessing."
         publish: 
@@ -4462,6 +4480,7 @@ en-AU:
       create_failed: "Course creation failed"
       role_not_active: "Can't add users for non-active role: '%{role}'"
       role_not_found: "No role named '%{role}' exists."
+      unpublish: "Course cannot be unpublished if student submissions exist."
     group_list: 
       headings: 
         groups: "Course Groups"
@@ -4524,6 +4543,8 @@ en-AU:
         close: Done
         duplicates_removed: "Some duplicates were removed."
         email: Email
+        email_field_label: "Enter the email addresses of the users you would like to add, seperated by commas"
+        email_field_place_holder: "\"Example Student\" &lt;student@example.com&gt;, \"Lastname, Firstname\" &lt;firstlast@example.com&gt;, justAnEmailAddress@example.com"
         example_formats: "Examples: user@example.com, \"First Last\" &lt;user@example.com&gt;, \"Last, First\" &lt;user@example.com&gt;"
         form_instructions: "Type or paste a list of email addresses below:"
         go_back: "Start Over"
@@ -4641,6 +4662,8 @@ en-AU:
         course_lock_all_announcements: "Disable comments on announcements"
         course_name: Name
         course_section_name: "Add a New Section"
+        course_status_published: "Course is Published"
+        course_status_unpublished: "Course is Unpublished"
         course_visibility: Visibility
         enrollment_term_id: Term
         grading_scheme: "Grading Scheme"
@@ -4696,6 +4719,8 @@ en-AU:
         tools: Apps
       titles: 
         edit_navigation: "Edit Course Navigation"
+      tooltips: 
+        cannot_unpublish_course: "You cannot unpublish this course if there are graded student submissions"
       transifex_message: "Join the [Canvas Translation Community](%{transifex_url})"
       turnitin: "these comments will be shown to students when submitting a Turnitin-enabled assignment"
       view_grading_scheme: "view grading scheme"
@@ -5195,11 +5220,13 @@ en-AU:
       saving: "Saving Key..."
       saving_failed: "Saving Key Failed"
     index: 
+      add_developer_key: "Add Developer Key"
       details: Details
       developer_keys: "Developer Keys"
       key_settings: "Key Settings"
       name: Name
       show_all: "Show All %{count} Keys"
+      stats: Stats
       title: "Developer Keys"
       user: User
     messages: 
@@ -5225,6 +5252,7 @@ en-AU:
   discussion_entry: 
     atom_no_author: "No Author"
     default_user_name: "User Name"
+  discussion_group_category_locked: "Group categories cannot be set directly on a discussion assignment, but should be set on the discussion instead"
   discussion_topic: 
     atom_no_author: "No Author"
     default_title: "No Title"
@@ -5290,6 +5318,7 @@ en-AU:
       delay_posting: "Delay posting"
       enable_podcast_feed: "Enable podcast feed"
       include_replies_in_podcast_feed: "Include Replies in podcast feed"
+      only_visible_to_overrides_note: "Note: This discussion is *only* visible to the section(s) specified below:"
       options: Options
       points_possible: "Points Possible"
       post_at: "Post At"
@@ -5875,6 +5904,7 @@ en-AU:
   errors: 
     bad_navigation_config: "Invalid course tab configuration"
     blank: Required
+    dynamic_format: "%{message}"
     failed: Failed
     format: "%{attribute} %{message}"
     index: 
@@ -5905,6 +5935,7 @@ en-AU:
       less_than: "must be less than %{count}"
       less_than_or_equal_to: "must be less than or equal to %{count}"
       not_a_number: "is not a number"
+      not_an_integer: "must be an integer"
       odd: "must be odd"
       too_long: "is too long (maximum is %{count} characters)"
       too_short: "is too short (minimum is %{count} characters)"
@@ -5935,12 +5966,14 @@ en-AU:
         adding_feed: "Adding feed..."
       descriptions: 
         add_new_feed: "You can automatically add posts from an RSS or Atom feed as announcements for this course. Just paste the feed URL below and any new entries will be added."
+      feed_url_label: "Feed URL"
       keyword: "Keyword:"
       labels: 
         match_phrase_checkbox: "Only add posts with a specific phrase in the title"
       links: 
         add_external_feed: "Add External Feed"
       options: 
+        content_to_post: "Content to post"
         full_article: "Full article"
         link_only: "Link only"
         truncated: Truncated
@@ -5967,6 +6000,7 @@ en-AU:
     consumer_key: "Consumer Key"
     course_home_sub_navigation_configured: "Course home sub navigation configured"
     course_navigation_configured: "Course navigation configured"
+    course_settings_sub_navigation_configured: "Course settings sub navigation configured"
     delete: Delete
     dialog_title_add_app: "Add App"
     dialog_title_edit_tool: "Edit External Tool"
@@ -6128,6 +6162,7 @@ en-AU:
     google_docs_domain_restriction: "Google Docs Domain Restriction"
     high_contrast: "Use High Contrast Styles"
     html5_first_videos: "Prefer HTML5 for video playback"
+    k12: "K-12 specific features"
     learning_mastery_gradebook: "Learning Mastery Gradebook"
     new_quiz_moderate: "New Quiz Moderate Page"
     new_quiz_statistics: "New Quiz Statistics Page"
@@ -7281,6 +7316,10 @@ en-AU:
     which_course_is_this_question_about: "Which course is this question about?"
     your_email_address: "Your email address"
   helpers: 
+    button: 
+      create: "Create %{model}"
+      submit: "Save %{model}"
+      update: "Update %{model}"
     course: Course
     dashboard_helper: 
       announcement_details: "Announcement Details"
@@ -7303,6 +7342,10 @@ en-AU:
     local: Local
     select: 
       prompt: "Please select"
+    submit: 
+      create: "Create %{model}"
+      submit: "Save %{model}"
+      update: "Update %{model}"
   high_contrast_description: |-
       If you would prefer a higher-contrast version of the Canvas user interface, enable this.
       This might be useful for people with impaired vision or dificulty reading.
@@ -7487,6 +7530,9 @@ en-AU:
     module_sequence_footer: 
       next: Next
       previous: Previous
+  k12_description: |-
+      Features, settings and styles that make more sense specifically in a K-12 environment. For now, this only
+      applies some style changes, but more K-12 specific things may be added in the future.
   labels: 
     lock_module_until: "Lock module until a given date"
   last_submission_activity_title: "Last Submission Activity"
@@ -7648,6 +7694,8 @@ en-AU:
       new_tab: "This tool needs to be loaded in a new browser window"
       new_tab_expired: "The session for this tool has expired. Please reload the page to access the tool again"
       new_tab_loaded: "This tool was successfully loaded in a new browser window. Reload the page to access the tool again."
+  lti2: 
+    register_tool: "Register Tool"
   m2c_file_description: "Moodle 1.9/2.x"
   m2c_name: "Moodle Importer"
   manage_avatars: 
@@ -8447,6 +8495,7 @@ en-AU:
         subject: "Course Export Failed: %{course}"
     content_export_finished: 
       email: 
+        body: "Your content export for \"%{course}\" has finished."
         html: 
           body2: "Your course export for *%{course}* has finished."
           link: "Click to view exports"
@@ -9282,8 +9331,19 @@ en-AU:
     page_locked_until: "This page is locked until %{date}."
     page_unpublished_module: "This page is part of an unpublished module and is not available yet."
     peer_review_invitation: 
+      email: 
+        body: "You've been invited to peer review %{reviewee}. Follow the link below to review them!"
+        html: 
+          link_message: "Click here to complete your review"
+        subject: "Assigned peer review for %{reviewee}"
+      facebook: 
+        body: "You've been invited to peer review %{reviewee}. Follow the link below to review them!"
       sms: 
         more_info: "More info at %{url}"
+      summary: 
+        body: "You've been invited to peer review %{reviewee}. Follow the link below to review them!"
+      twitter: 
+        body: "You've been invited to peer review %{reviewee}. Follow the link below to review them!"
     pseudonym_registration: 
       email: 
         body: "You have been registered for a Canvas account at %{account}!  Before you can log in and start using Canvas, you'll need to finish the configuration process."
@@ -9790,6 +9850,17 @@ en-AU:
     due_date_display: "Due Date"
     files_description: "New file added to your course"
     files_display: Files
+    grading_description: |-
+        Includes:
+        
+        * Assignment/submission grade entered/changed
+        * Un-muted assignment grade
+        * Grade weight changed
+        
+        ​
+        
+        Check 'Include scores when alerting about grade changes' if you want to see your grades in the notifications.
+        If your email is not an institution email this means sensitive content will be sent outside of the institution.
     grading_display: Grading
     grading_notify_include_grade: "Include scores when alerting about grade changes."
     grading_policies_description: "Course grading policy change"
@@ -9902,6 +9973,7 @@ en-AU:
         
         Student appointment sign-up
     student_appointment_display: "Student Appointment Signups"
+    submission_comment_description: "Assignment submission comment"
     submission_comment_display: "Submission Comment"
   notification_preferences: 
     communication: 
@@ -9951,6 +10023,12 @@ en-AU:
     human: 
       decimal_units: 
         format: "%n %u"
+        units: 
+          billion: Billion
+          million: Million
+          quadrillion: Quadrillion
+          thousand: Thousand
+          trillion: Trillion
       storage_units: 
         format: "%n %u"
         units: 
@@ -9962,8 +10040,12 @@ en-AU:
           mb: MB
           tb: TB
   observees: 
+    add_observee_button: "Add Student"
+    being_observed: "Students Being Observed"
     new_observee_password: Password
     new_observee_username: Username
+    observee_added: "Now observing %{user}"
+    observing: Observing
   options: 
     ? "no"
     : "No"
@@ -10567,6 +10649,7 @@ en-AU:
       unregister_service: "Are you sure you want to unregister this service?"
     crumb: "%{user}'s settings"
     crumbs: 
+      observees: Observing
       settings_frd: "%{user}'s settings"
     done_resending: "Done! Message delivery may take a few minutes."
     email_select: 
@@ -10591,6 +10674,8 @@ en-AU:
       contact_confirmed: "Contact successfully confirmed!"
       mfa_disabled: "Multi-factor authentication disabled"
       updated_profile: "Settings successfully updated"
+    observees: 
+      page_title: "Students Being Observed"
     please_select_an_option: "Please select an option"
     profile: 
       access_token_description: "Access tokens can be used to allow other applications to make API calls on your behalf. You can also generate access tokens and *use the Canvas Open API* to come up with your own integrations."
@@ -11066,6 +11151,8 @@ en-AU:
       payment_info: "Payment Information"
   qti_display: QTI
   qti_file_description: "QTI .zip file"
+  qti_img_matching_question: "Imported matching question contains images on both sides, which is unsupported"
+  qti_img_matching_question_distractors: "Imported matching question contains images inside the choices, and could not be fixed because it also contains distractors"
   qti_name: "QTI Converter"
   qualified_locale: en-US
   question_answered: Answered
@@ -11212,6 +11299,7 @@ en-AU:
   quiz_extend_time: 
     ending_time: "ending time"
     extend_time: "Extend Time"
+    extensions_student: "Extend time for %{student}"
     extensions_successfully_added: "Extensions Successfully Added"
     now: now
   quiz_extensions: 
@@ -11263,6 +11351,9 @@ en-AU:
       generated_at_date_time: "Generated %{dateAndTime}"
       generating_report_name: "Generating %{report_name}..."
       item_analysis_not_available: "Item Analysis is not available for Surveys"
+  quiz_results_protected: "Quiz results are protected for this quiz and are not visible to students."
+  quiz_results_protected_after_first_glimpse: "Quiz results are protected for this quiz and can be viewed a single time immediately after submission."
+  quiz_results_protected_until_last_attempt: "Quiz results are protected for this quiz and are not visible to students until they have submitted their last attempt."
   quiz_route: 
     that_quiz_doesnt_exist: "That quiz doesn't exist"
     that_quiz_has_been_deleted: "That quiz has been deleted"
@@ -11864,6 +11955,7 @@ en-AU:
           extra_attempts: "Extra Attempts"
           extra_time_per_attempt: "Extra Time on Every Attempt"
           manually_unlock: "Manually unlock the quiz for the next attempt"
+          reset_has_seen_results: "Let the student see the results one more time"
           started: Started
         minutes: minutes
         moderate_page_title: "%{title}: Moderate"
@@ -11923,6 +12015,8 @@ en-AU:
         new_assignment: "New Assignment"
         new_discussion: "New Discussion"
         one_question_at_a_time: "Show one question at a time"
+        one_time_results: "Only Once After Each Attempt"
+        only_visible_to_overrides_note: "Note: This quiz is **only** visible to the section(s) specified below:"
         points_possible: "Points %{n}"
         quiz_title: "Quiz Title"
         quiz_type: "Quiz Type"
@@ -12376,6 +12470,7 @@ en-AU:
     upload_warning: "Make sure you don't change the names of the submission files so we can recognize them."
   react_files: 
     loading_more_results: "Loading more results"
+    usage_details: "%{quota_used} of %{quota}"
   recent_student: 
     last_logged_in: "last logged in %{last_login}"
   recently_deleted_courses_title: "Recently Deleted Courses"
@@ -12471,6 +12566,7 @@ en-AU:
       manage_students: "Add/remove students for the course"
       manage_user_logins: "Modify login details for users"
       manage_user_notes: "Manage faculty journal entries"
+      manage_user_observers: "Manage observers for users"
       manage_wiki: "Manage wiki (add / edit / delete pages)"
       managed_jobs: "Manage background jobs"
       moderate_form: "Moderate discussions ( delete / edit other's posts, lock topics)"
@@ -12921,9 +13017,13 @@ en-AU:
           email: "Email (optional)"
     event_list: 
       at_least_more_events: "at least %{count_of_events} more"
+      at_least_more_events_one_week: "at least %{count_of_events} more in the past week"
+      at_least_more_events_two_weeks: "at least %{count_of_events} more in the past two weeks"
       links: 
         view_calendar: "View Calendar"
       more_events: "%{count_of_events} more"
+      more_events_one_week: "%{count_of_events} more in the past week"
+      more_events_two_weeks: "%{count_of_events} more in the past two weeks"
       nothing_for_now: "Nothing for now"
       nothing_one_week: "Nothing for the next week"
       nothing_two_weeks: "Nothing for the next two weeks"
@@ -13049,6 +13149,7 @@ en-AU:
         body: Message
         subject: Subject
       message_students_who: "Message students who..."
+      message_type: "Message Type"
       out_of_points: "out of %{points_possible}"
     mute_dialog: 
       gradebook: 
@@ -13070,6 +13171,7 @@ en-AU:
     new_course_form: 
       cancel: Cancel
       course_cose_explanation: "This will be displayed in places with little space"
+      course_is_public_explanation: "Make course publicly visible *(student data will remain private)*"
       create_course: "Create course"
       creating_course: "Creating course..."
       labels: 
@@ -13179,6 +13281,7 @@ en-AU:
         additional_comments: "Additional Comments"
       instructor_comments: "Instructor Comments"
       labels: 
+        long_description: "Long Description"
         save_criterion_for_reuse: "Save this comment for reuse"
         threshold: threshold
       links: 
@@ -13198,6 +13301,7 @@ en-AU:
         update_description: "Update Description"
       labels: 
         additional_comments: "Additional Comments"
+        long_description: "Long Description"
     rubric_dialog: 
       buttons: 
         use_this_rubric: "Use This Rubric"
@@ -13225,6 +13329,8 @@ en-AU:
       defaults: 
         description: "Description of criterion"
       full_marks: "Full Marks"
+      labels: 
+        long_description: "Long Description"
       links: 
         view_longer_description: "view longer description"
       no_marks: "No Marks"
@@ -13513,6 +13619,7 @@ en-AU:
     assignment_unmuted: "Click to mute."
     discussion_topic: "Discussion topic"
     external_tool: "External tool"
+    final_point_ratio: "%{pointRatio} points"
     invalid_group_warning: 
       one: "Note: Score does not include assignments from the group %{list_of_group_names} because it has no points possible."
       other: "Note: Score does not include assignments from the groups %{list_of_group_names} because they have no points possible."
@@ -13561,6 +13668,7 @@ en-AU:
   student_groups: 
     group_join: "Joined Group %{group_name}"
     group_leave: "Left Group %{group_name}"
+    group_name: "%{group_name} in %{group_category}"
     search_groups_placeholder: "Search Groups or People"
     student_groups_filter_description: "As you type in this field, the list of groups will be automatically filtered to only include those whose names match your input."
     students_count: 
@@ -13759,6 +13867,7 @@ en-AU:
     grades: Grades
     home: Home
     modules: Modules
+    observees: Observing
     outcomes: Outcomes
     pages: Pages
     people: People
@@ -14120,6 +14229,7 @@ en-AU:
       roles_student: "Enrolled as a Student."
       roles_ta: "Enrolled as a TA."
       roles_teacher: "Enrolled as a Teacher."
+      unenrollr: Unenroll
       unpublished: Unpublished
     errors: 
       no_teacher_courses: "There are no courses shared between this teacher and student"
@@ -14532,6 +14642,8 @@ en-AU:
       page_updated: "Page was successfully updated."
     page_link: 
       link_hidden_from_students_warning: "Students won't see this link"
+    page_revisions: 
+      page_revisions_title: "%{title} revisions: %{context_name}"
     pages_index: 
       titles: 
         pages: Pages
@@ -14566,6 +14678,21 @@ en-AU:
     cannot_update_published: "You are not allowed to update the published state of this wiki page"
     cannot_update_title: "You are not allowed to update the title of this wiki page"
     invalid_editing_roles: "The provided editing roles are invalid"
+  will_paginate: 
+    next_label: "Next &#8594;"
+    page_entries_info: 
+      multi_page: "Displaying %{model} %{from} - %{to} of %{count} in total"
+      multi_page_html: "Displaying %{model} <b>%{from}&nbsp;-&nbsp;%{to}</b> of <b>%{count}</b> in total"
+      single_page: 
+        one: "Displaying 1 %{model}"
+        other: "Displaying all %{count} %{model}"
+        zero: "No %{model} found"
+      single_page_html: 
+        one: "Displaying <b>1</b> %{model}"
+        other: "Displaying <b>all&nbsp;%{count}</b> %{model}"
+        zero: "No %{model} found"
+    page_gap: "&hellip;"
+    previous_label: "&#8592; Previous"
   wimba_conference: 
     external_urls: 
       archive: Archive
