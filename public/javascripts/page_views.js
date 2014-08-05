@@ -53,6 +53,7 @@ define([
         $("#page_view_id").text(id);
         update_url = "/page_views/" + id;
       });
+      var updateTrigger;
       $(document).bind('page_view_update', function(event, force) {
         var data = {};
 
@@ -62,11 +63,15 @@ define([
             if(resultData && resultData.id) {
               $(document).triggerHandler('page_view_id_receved', resultData.id);
             }
-          }, function() {});
+          }, function(result, xhr) {
+            if(xhr.status === 422) {
+              clearInterval(updateTrigger);
+            }
+          });
           interactionSeconds = 0;
         }
       });
-      setInterval(function() {
+      updateTrigger = setInterval(function() {
         $(document).triggerHandler('page_view_update');
       }, 1000*intervalInSeconds);
       window.onbeforeunload = function() {
