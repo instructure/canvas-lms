@@ -48,6 +48,9 @@ module AuthenticationMethods
   class AccessTokenError < Exception
   end
 
+  class LoggedOutError < Exception
+  end
+
   def self.access_token(request, params_method = :params)
     auth_header = CANVAS_RAILS2 ? ActionController::HttpAuthentication::Basic.authorization(request) : request.authorization
     if auth_header.present? && (header_parts = auth_header.split(' ', 2)) && header_parts[0] == 'Bearer'
@@ -104,6 +107,9 @@ module AuthenticationMethods
 
           destroy_session
           @current_pseudonym = nil
+          if api_request? || request.format.json?
+            raise LoggedOutError
+          end
         end
       end
       if params[:login_success] == '1' && !@current_pseudonym
