@@ -56,6 +56,16 @@ define [
       @initScrollContainer()
 
     ##
+    # Set the scroll container after the view has been created.
+    # Useful if the view is created before the container is rendered.
+
+    resetScrollContainer: (container) =>
+      @detachScroll()
+      @scrollContainer = container
+      @initScrollContainer()
+      @attachScroll()
+
+    ##
     # Extends parent to detach scroll container event
     #
     # @api private
