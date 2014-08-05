@@ -276,6 +276,7 @@ module Api::V1::Assignment
     return if overrides && !overrides.is_a?(Array)
     return false unless valid_assignment_group_id?(assignment, assignment_params)
     return false unless valid_assignment_dates?(assignment, assignment_params)
+    return false unless valid_submission_types?(assignment, assignment_params)
 
     assignment = update_from_params(assignment, assignment_params, user)
 
@@ -292,6 +293,29 @@ module Api::V1::Assignment
     return true
   rescue ActiveRecord::RecordInvalid
     return false
+  end
+
+  API_ALLOWED_SUBMISSION_TYPES = %w(
+    online_quiz
+    none
+    on_paper
+    discussion_topic
+    external_tool
+    online_upload
+    online_text_entry
+    online_url
+    media_recording
+  )
+
+  def valid_submission_types?(assignment, assignment_params)
+    if assignment_params['submission_types'].present? &&
+      !assignment_params['submission_types'].all? { |s| API_ALLOWED_SUBMISSION_TYPES.include?(s) }
+        assignment.errors.add('assignment[submission_types]',
+          I18n.t('assignments_api.invalid_submission_types',
+            'Invalid submission types'))
+        return false
+    end
+    true
   end
 
   # validate that date and times are iso8601

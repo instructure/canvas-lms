@@ -577,6 +577,37 @@ describe AssignmentsApiController, type: :request do
       end
     end
 
+    it "should allow valid submission types" do
+      raw_api_call(:post, "/api/v1/courses/#{@course.id}/assignments",
+        { :controller => 'assignments_api',
+          :action => 'create',
+          :format => 'json',
+          :course_id => @course.id.to_s },
+        { :assignment => {
+            'name' => 'some assignment',
+            'submission_types' => [
+              'online_upload',
+              'online_url'
+            ]}
+      })
+      response.should be_success
+    end
+
+    it "should not allow unpermitted submission types" do
+      raw_api_call(:post, "/api/v1/courses/#{@course.id}/assignments",
+        { :controller => 'assignments_api',
+          :action => 'create',
+          :format => 'json',
+          :course_id => @course.id.to_s },
+        { :assignment => {
+            'name' => 'some assignment',
+            'submission_types' => [
+              'on_papers'
+            ]}
+      })
+      response.code.should eql '400'
+    end
+
     it "allows creating an assignment with overrides via the API" do
       student_in_course(:course => @course, :active_enrollment => true)
 
