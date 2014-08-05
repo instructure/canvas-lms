@@ -275,11 +275,14 @@ CanvasRails::Application.routes.draw do
       match 'homework_submission' => 'external_tools#homework_submission', :as => :homework_submission
       match 'finished' => 'external_tools#finished', :as => :finished
       collection do
-        get :tool_proxy_registration, controller: 'lti/message', action: 'registration', :as => :tool_proxy_registration
         get :retrieve
         get :homework_submissions
       end
     end
+
+    get 'lti/basic_lti_launch_request/:lti_message_handler_id', controller: 'lti/message', action: 'basic_lti_launch_request', as: :basic_lti_launch_request
+    get 'lti/tool_proxy_registration', controller: 'lti/message', action: 'registration', :as => :tool_proxy_registration
+
 
     resources :submissions
     resources :calendar_events
@@ -539,10 +542,12 @@ CanvasRails::Application.routes.draw do
     resources :external_tools do
       match 'finished' => 'external_tools#finished', :as => :finished
       match 'resource_selection' => 'external_tools#resource_selection', :as => :resource_selection
-      collection do
-        get  :tool_proxy_registration, controller: 'lti/message', action: 'registration', :as => :tool_proxy_registration
-      end
     end
+
+
+    get 'lti/basic_lti_launch_request/:lti_message_handler_id', controller: 'lti/message', action: 'basic_lti_launch_request', as: :basic_lti_launch_request
+    get 'lti/tool_proxy_registration', controller: 'lti/message', action: 'registration', :as => :tool_proxy_registration
+
 
     match 'outcomes/users/:user_id' => 'outcomes#user_outcome_results', :as => :user_outcomes_results
     resources :outcomes do

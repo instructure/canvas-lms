@@ -59,6 +59,49 @@ module Lti
 
     end
 
+    describe "GET #basic_lti_launch_reuqest" do
 
+      let (:account) { Account.create }
+      let (:product_family) { ProductFamily.create(vendor_code: '123', product_code: 'abc', vendor_name: 'acme', root_account: account) }
+      let (:resource_handler) { ResourceHandler.create(resource_type_code: 'code', name: 'resource name', tool_proxy: tool_proxy) }
+      let (:message_handler) { MessageHandler.create(message_type: 'message_type', launch_path:'https://samplelaunch/blti', resource: resource_handler)}
+      let (:tool_proxy) { ToolProxy.create(
+        shared_secret: 'shared_secret',
+        guid: 'guid',
+        product_version: '1.0beta',
+        lti_version: 'LTI-2p0',
+        product_family: product_family,
+        context: account,
+        workflow_state: 'active',
+        raw_data: 'some raw data'
+      ) }
+
+      context 'account' do
+        before :each do
+          @tool_proxy_binding = ToolProxyBinding.create(context: account, tool_proxy: tool_proxy)
+        end
+
+        it 'returns the signed params' do
+          get 'basic_lti_launch_request', account_id: account.id, lti_message_handler_id: message_handler.id
+          response.code.should == "200"
+
+          lti_launch = assigns[:lti_launch]
+          lti_launch.resource_url.should == 'https://samplelaunch/blti'
+          params = lti_launch.params.with_indifferent_access
+          params[:oauth_consumer_key].should == 'guid'
+          params[:context_id].should_not be_empty
+          params[:resource_link_id].should_not be_empty
+          params[:tool_consumer_instance_guid].should_not be_empty
+          params[:launch_presentation_document_target].should == 'iframe'
+          params[:oauth_signature].should_not be_empty
+        end
+
+        it 'returns a 404 when when no handler is found' do
+          get 'basic_lti_launch_request', account_id: account.id, lti_message_handler_id: 0
+          response.code.should == "404"
+        end
+
+      end
+    end
   end
 end

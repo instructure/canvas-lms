@@ -32,6 +32,35 @@ module Lti
       render template: 'lti/framed_launch'
     end
 
+
+    def basic_lti_launch_request
+      if message_handler = MessageHandler.where(id: params[:lti_message_handler_id]).first
+        resource_handler = message_handler.resource
+        tool_proxy = resource_handler.tool_proxy
+        #TODO create scoped method for query
+        if ToolProxyBinding.where(tool_proxy_id: tool_proxy.id, context_id: @context.id, context_type: @context.class).count(:all) > 0
+          message_service = IMS::LTI::Services::MessageService.new(tool_proxy.guid, tool_proxy.shared_secret)
+          message = IMS::LTI::Models::Messages::BasicLTILaunchRequest.new(
+            lti_version: IMS::LTI::Models::LTIModel::LTI_VERSION_2P0,
+            resource_link_id: ContextExternalTool.opaque_identifier_for(@context, @context.shard),
+            context_id: ContextExternalTool.context_id_for(@context, @context.shard),
+            tool_consumer_instance_guid: @context.root_account.lti_guid,
+            launch_presentation_document_target: IMS::LTI::Models::Messages::Message::LAUNCH_TARGET_IFRAME
+          )
+          @lti_launch = Launch.new
+          @lti_launch.resource_url = message_handler.launch_path
+          @lti_launch.params = message_service.signed_params(@lti_launch.resource_url, message)
+          @lti_launch.link_text = message_handler.resource.name
+          @lti_launch.launch_type = message.launch_presentation_document_target
+          @lti_launch.message_type = message.lti_message_type
+
+          render template: 'lti/framed_launch' and return
+        end
+      end
+      not_found and return
+    end
+
+
     private
 
     def tool_consumer_profile_url
