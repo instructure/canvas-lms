@@ -110,7 +110,7 @@ describe ExternalToolsController do
       get 'resource_selection', :course_id => @course.id, :external_tool_id => tool.id
       response.should be_success
       assigns[:tool].should == tool
-      assigns[:tool_settings]['custom_canvas_enrollment_state'].should == 'active'
+      assigns[:lti_launch].params['custom_canvas_enrollment_state'].should == 'active'
     end
 
     it "should set html selection if specified" do
@@ -120,7 +120,7 @@ describe ExternalToolsController do
       get 'resource_selection', :course_id => @course.id, :external_tool_id => tool.id, :editor_button => '1', :selection => html
       response.should be_success
       assigns[:tool].should == tool
-      assigns[:tool_settings]['text'].should == CGI::escape(html)
+      assigns[:lti_launch].params['text'].should == CGI::escape(html)
     end
 
     it "should find account-level tools" do
@@ -143,7 +143,7 @@ describe ExternalToolsController do
       get 'resource_selection', :course_id => @course.id, :external_tool_id => tool.id
       response.should be_success
       assigns[:tool].should == tool
-      assigns[:tool_settings]['custom_canvas_enrollment_state'].should == 'inactive'
+      assigns[:lti_launch].params['custom_canvas_enrollment_state'].should == 'inactive'
     end
 
     it "should be accessible even after course is hard-concluded" do
@@ -154,7 +154,7 @@ describe ExternalToolsController do
       get 'resource_selection', :course_id => @course.id, :external_tool_id => tool.id
       response.should be_success
       assigns[:tool].should == tool
-      assigns[:tool_settings]['custom_canvas_enrollment_state'].should == 'inactive'
+      assigns[:lti_launch].params['custom_canvas_enrollment_state'].should == 'inactive'
     end
 
     it "should be accessible even after enrollment is concluded and include a parameter indicating inactive state" do
@@ -168,7 +168,7 @@ describe ExternalToolsController do
       get 'resource_selection', :course_id => @course.id, :external_tool_id => tool.id
       response.should be_success
       assigns[:tool].should == tool
-      assigns[:tool_settings]['custom_canvas_enrollment_state'].should == 'inactive'
+      assigns[:lti_launch].params['custom_canvas_enrollment_state'].should == 'inactive'
     end
   end
 

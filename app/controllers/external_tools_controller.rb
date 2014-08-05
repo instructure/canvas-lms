@@ -28,9 +28,10 @@ class ExternalToolsController < ApplicationController
   REDIS_PREFIX = 'external_tool:sessionless_launch:'
 
   TOOL_DISPLAY_TEMPLATES = {
-    'full_width' => 'external_tools/full_width',
-    'in_context' => 'external_tools/tool_show',
-    'default' => 'external_tools/tool_show',
+    'borderless' => {template: 'lti/unframed_launch', layout: 'borderless_lti'},
+    'full_width' => {template: 'lti/full_width_launch'},
+    'in_context' => {template: 'lti/framed_launch'},
+    'default' =>    {template: 'lti/framed_launch'},
   }
 
   # @API List external tools
@@ -123,13 +124,10 @@ class ExternalToolsController < ApplicationController
 
       @lti_launch.resource_url = params[:url]
       @lti_launch.link_text =  @tool.name
+      @lti_launch.analytics_id =  @tool.tool_id
 
-      if params['borderless']
-        @lti_launch.launch_type = 'self'
-        render :template => 'lti/framed_launch', layout: 'borderless_lti'
-      else
-        render :template => 'lti/framed_launch'
-      end
+      display = (params['borderless'] ? 'borderless' : params['display'])
+      render TOOL_DISPLAY_TEMPLATES[display] || TOOL_DISPLAY_TEMPLATES['default']
     end
   end
 
@@ -222,6 +220,7 @@ class ExternalToolsController < ApplicationController
       launch_settings = {
         'launch_url' => adapter.launch_url,
         'tool_name' => @tool.name,
+        'analytics_id' => @tool.tool_id
       }
 
       if assignment
@@ -258,12 +257,13 @@ class ExternalToolsController < ApplicationController
 
     launch_settings = JSON.parse(launch_settings)
 
-    @resource_url = launch_settings['launch_url']
-    @resource_title = launch_settings['tool_name']
-    @tool_settings = launch_settings['tool_settings']
+    @lti_launch = Lti::Launch.new
+    @lti_launch.params = launch_settings['tool_settings']
+    @lti_launch.resource_url = launch_settings['launch_url']
+    @lti_launch.link_text =  launch_settings['tool_name']
+    @lti_launch.analytics_id =  launch_settings['analytics_id']
 
-    @tool_launch_type = 'self'
-    render :template => 'external_tools/tool_show'
+    render TOOL_DISPLAY_TEMPLATES['borderless']
   end
 
   # @API Get a single external tool
@@ -320,8 +320,10 @@ class ExternalToolsController < ApplicationController
         end
         @active_tab = @tool.asset_string
         @show_embedded_chat = false if @tool.tool_id == 'chat'
+
+        @lti_launch = lti_launch(@tool, selection_type)
+        render tool_launch_template(@tool, selection_type)
       end
-      render tool_launch(@tool, selection_type) if @tool
       add_crumb(@context.name, named_context_url(@context, :context_url))
     end
   end
@@ -336,10 +338,12 @@ class ExternalToolsController < ApplicationController
 
     @return_url = external_content_success_url('external_tool_dialog')
     @headers = false
-    @tool_launch_type = 'self'
 
-    find_tool(params[:external_tool_id], selection_type)
-    render tool_launch(@tool, selection_type) if @tool
+    tool = find_tool(params[:external_tool_id], selection_type)
+    if tool
+      @lti_launch = lti_launch(@tool, selection_type)
+      render TOOL_DISPLAY_TEMPLATES['borderless']
+    end
   end
 
   def find_tool(id, selection_type)
@@ -356,9 +360,9 @@ class ExternalToolsController < ApplicationController
   end
   protected :find_tool
 
-  def tool_launch(tool, selection_type)
-    @resource_title = tool.label_for(selection_type.to_sym)
+  def lti_launch(tool, selection_type)
     @return_url ||= url_for(@context)
+    lti_launch = Lti::Launch.new
 
     opts = {
         resource_type: selection_type,
@@ -367,28 +371,23 @@ class ExternalToolsController < ApplicationController
     }
     adapter = Lti::LtiOutboundAdapter.new(tool, @current_user, @context).prepare_tool_launch(@return_url, opts)
     if selection_type == 'homework_submission'
-      @assignment = @context.assignments.active.find(params[:assignment_id])
-      @tool_settings = adapter.generate_post_payload_for_homework_submission(@assignment)
+      assignment = @context.assignments.active.find(params[:assignment_id])
+      lti_launch.params = adapter.generate_post_payload_for_homework_submission(assignment)
     else
-      @tool_settings = adapter.generate_post_payload
+      lti_launch.params = adapter.generate_post_payload
     end
 
-    @resource_url = adapter.launch_url
-
-    resource_uri = URI.parse @resource_url
-    @tool_id = tool.tool_id || resource_uri.host || 'unknown'
-    @tool_path = (resource_uri.path.empty? ? "/" : resource_uri.path)
-
-    return :template => find_display_type_template(tool, selection_type)
+    lti_launch.resource_url = adapter.launch_url
+    lti_launch.link_text = tool.label_for(selection_type.to_sym)
+    lti_launch.analytics_id = tool.tool_id
+    lti_launch
   end
-  protected :tool_launch
+  protected :lti_launch
 
-  def find_display_type_template(tool, selection_type)
-    TOOL_DISPLAY_TEMPLATES[tool.display_type(selection_type)] ||
-    TOOL_DISPLAY_TEMPLATES['default']
+  def tool_launch_template(tool, selection_type)
+    TOOL_DISPLAY_TEMPLATES[tool.display_type(selection_type)] || TOOL_DISPLAY_TEMPLATES['default']
   end
-  protected :find_display_type_template
-
+  protected :tool_launch_template
 
   # @API Create an external tool
   # Create an external tool in the specified course/account.
