@@ -122,7 +122,7 @@ class ExternalToolsController < ApplicationController
 
       if params['borderless']
         @lti_launch.launch_type = 'self'
-        render :template => 'lti/framed_launch', layout: 'bare'
+        render :template => 'lti/framed_launch', layout: 'borderless_lti'
       else
         render :template => 'lti/framed_launch'
       end
