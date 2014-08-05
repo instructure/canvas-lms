@@ -18,6 +18,7 @@
 
 require 'set'
 require 'canvas/draft_state_validations'
+require 'bigdecimal'
 
 class Assignment < ActiveRecord::Base
   include Workflow
@@ -680,7 +681,7 @@ class Assignment < ActiveRecord::Base
       result = passed ? "complete" : "incomplete"
     when "letter_grade", "gpa_scale"
       if self.points_possible.to_f > 0.0
-        score = score.to_f / self.points_possible.to_f
+        score = (BigDecimal.new(score.to_s) / BigDecimal.new(points_possible.to_s)).to_f
         result = grading_standard_or_default.score_to_grade(score * 100)
       elsif given_grade
         # the score for a zero-point letter_grade assignment could be considered

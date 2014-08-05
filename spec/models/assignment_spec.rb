@@ -474,6 +474,22 @@ describe Assignment do
       @submission.user_id.should eql(@user.id)
     end
 
+    it "should properly calculate letter grades" do
+      @assignment.grading_type = 'letter_grade'
+      @assignment.points_possible = 10
+      @assignment.save!
+      grade = @assignment.score_to_grade(8.7)
+      grade.should eql("B+")
+    end
+
+    it "should properly allow decimal points in grading" do
+      @assignment.grading_type = 'letter_grade'
+      @assignment.points_possible = 10
+      @assignment.save!
+      grade = @assignment.score_to_grade(8.6999)
+      grade.should eql("B")
+    end
+
     it "should preserve letter grades grades with nil points possible" do
       @assignment.grading_type = 'letter_grade'
       @assignment.points_possible = nil
