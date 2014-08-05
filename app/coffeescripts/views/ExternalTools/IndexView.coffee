@@ -67,6 +67,8 @@ define [
       @$addToolLink.show()
       @externalToolsView.collection.fetch()
       @externalToolsView.show()
+      delay = (ms, func) -> setTimeout func, ms
+      delay 1, -> @$(".view_app_center_link").first().focus()
 
     showAppCenterView: =>
       @removeAppFullView()
@@ -75,6 +77,8 @@ define [
       @appCenterView.show()
       @$appCenterFilterWrapper.show()
       $(document).scrollTop(@currentAppCenterPosition)
+      delay = (ms, func) -> setTimeout func, ms
+      delay 1, -> @$(".view_tools_link").first().focus()
 
     showAppFullView: (event) ->
       if event.type != 'keyup' || event.keyCode == 32
