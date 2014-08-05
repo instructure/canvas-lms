@@ -3,11 +3,15 @@ define [
   'react'
   'react-router'
   'compiled/react/shared/utils/withReactDOM'
-], (I18n, React, Router, withReactDOM) ->
+  './UploadButton'
+], (I18n, React, Router, withReactDOM, UploadButton) ->
 
   Toolbar = React.createClass
 
-    onSubmitSearch: (event) ->
+    propTypes:
+      currentFolder: React.PropTypes.object # not required as we don't have it on the first render
+
+    onSubmit: (event) ->
       event.preventDefault()
       query = {search_term: @refs.searchTerm.getDOMNode().value}
       Router.transitionTo 'search', @props.params, query
@@ -24,9 +28,7 @@ define [
           button onClick: @addFolder, className:'btn',
             i className:'icon-plus'
             'Folder'
-          button className:'btn btn-primary',
-            i className:'icon-plus'
-            'Files'
+          UploadButton currentFolder: this.props.currentFolder
           a className:'ef-admin-cog al-trigger btn', role:'button', 'aria-haspopup':'true', 'aria-owns':'toolbar-1', 'aria-label':'Settings', href:'#',
             i className:'icon-settings'
             i className:'icon-mini-arrow-down'
