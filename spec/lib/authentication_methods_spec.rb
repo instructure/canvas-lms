@@ -114,7 +114,8 @@ describe AuthenticationMethods do
 
   describe "#load_user" do
     before do
-      @request = stub(:env => {'encrypted_cookie_store.session_refreshed_at' => 5.minutes.ago})
+      @request = stub(:env => {'encrypted_cookie_store.session_refreshed_at' => 5.minutes.ago},
+                      :format => stub(:json? => false))
       @controller = RSpec::MockController.new(nil, @request)
       @controller.stubs(:load_pseudonym_from_access_token)
       @controller.stubs(:api_request?).returns(false)
