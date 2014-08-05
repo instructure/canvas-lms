@@ -972,12 +972,9 @@ describe PseudonymSessionsController do
     end
 
     context "verification" do
-      before :once do
+      before :each do
         @user.otp_secret_key = ROTP::Base32.random_base32
         @user.save!
-      end
-
-      before :each do
         CommunicationChannel.any_instance.expects(:send_otp!).never
         user_session(@user, @pseudonym)
         session[:pending_otp] = true
