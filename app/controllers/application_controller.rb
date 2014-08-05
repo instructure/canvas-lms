@@ -972,8 +972,10 @@ class ApplicationController < ActionController::Base
 
   if CANVAS_RAILS2
     rescue_responses['AuthenticationMethods::AccessTokenError'] = 401
+    rescue_responses['AuthenticationMethods::LoggedOutError'] = 401
   else
     ActionDispatch::ShowExceptions.rescue_responses['AuthenticationMethods::AccessTokenError'] = 401
+    ActionDispatch::ShowExceptions.rescue_responses['AuthenticationMethods::LoggedOutError'] = 401
   end
 
   def rescue_action_in_api(exception, error_report, response_code)
