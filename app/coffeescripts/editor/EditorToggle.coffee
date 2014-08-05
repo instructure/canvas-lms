@@ -116,7 +116,7 @@ define [
       $switchToHtmlLink = $('<a/>', href: "#")
       $switchToVisualLink = $switchToHtmlLink.clone()
       $switchToHtmlLink.text(I18n.t('switch_editor_html', 'HTML Editor'))
-      $switchToVisualLink.hide().text(I18n.t('switch_editor_visual', 'Visual Editor'))
+      $switchToVisualLink.hide().text(I18n.t('switch_editor_rich_text', 'Rich Text Editor'))
       $switchViewsContainer = $('<div/>', style: "float: right")
       $switchViewsContainer.append($switchToHtmlLink, $switchToVisualLink)
       $switchViewsContainer.find('a').click preventDefault (e) =>

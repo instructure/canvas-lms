@@ -25,7 +25,7 @@ DOC
 <%= form_for @context.class.to_s.underscore.to_sym, :url => context_url(@context, :context_url), :html => {:id => 'edit_course_syllabus_form', :style => 'display: none; margin-bottom: 10px;', :method => :put} do |f| %>
   <div style="float: right;">
     <a href="#" class="toggle_views_link"><%= t '#editor.switch_editor_html', "HTML Editor" %></a>
-    <a href="#" class="toggle_views_link" style="display:none;"><%= t '#editor.switch_editor_visual', "Visual Editor" %></a>
+    <a href="#" class="toggle_views_link" style="display:none;"><%= t '#editor.switch_editor_rich_text', "Rich Text Editor" %></a>
   </div>
   <%= f.blabel :syllabus_body, :en => "Syllabus Description" %>
   <div class="clear"></div>

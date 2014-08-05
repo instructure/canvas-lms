@@ -161,7 +161,7 @@
             <%= before_label(:quiz_instructions, "Quiz Instructions") %>
             <div style="float: right; font-size: 0.8em; cursor: pointer;">
               <a href="#" class="toggle_description_views_link"><%= t '#editor.switch_editor_html', "HTML Editor" %></a>
-              <a href="#" class="toggle_description_views_link" style="display:none;"><%= t '#editor.switch_editor_visual', "Visual Editor" %></a>
+              <a href="#" class="toggle_description_views_link" style="display:none;"><%= t '#editor.switch_editor_rich_text', "Rich Text Editor" %></a>
             </div>
             <textarea id="quiz_description" style="display: block;width: 100%;margin: 0px auto;height: 125px"><%= @quiz.description %></textarea>
           </div>
@@ -513,4 +513,3 @@
     </tbody>
   </table>
 </div>
-
