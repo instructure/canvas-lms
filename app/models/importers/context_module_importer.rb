@@ -226,7 +226,7 @@ module Importers
     def self.add_custom_fields_to_url(original_url, custom_fields)
       return nil unless uri = URI.parse(original_url)
 
-      custom_fields_query = custom_fields.map{|k, v| "#{CGI.escape(k)}=#{CGI.escape(v)}"}.join("&")
+      custom_fields_query = custom_fields.map{|k, v| "custom_#{CGI.escape(k)}=#{CGI.escape(v)}"}.join("&")
       uri.query = uri.query.present? ? ([uri.query, custom_fields_query].join("&")) : custom_fields_query
       new_url = uri.to_s
 
