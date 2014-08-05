@@ -522,6 +522,8 @@ nl:
         message_course_id: Cursus-Id
       grade_change_logging_item: 
         blank_placeholder: "-"
+        event_type: 
+          corrupted: "Details zijn niet beschikbaar"
       grade_change_logging_results: 
         Assignment: Opdracht
         Course: Cursus
@@ -941,7 +943,9 @@ nl:
         subject: Onderwerp
       open_registration_delegated_warning_message: "Als een externe identiteitsprovider ingeschakeld is kunnen gebruikers die via open registratie zijn aangemaakt niet aanmelden, tenzij de aanmeldings-formule van de externe identiteitsprovider een link terug naar %{url} bevat."
       open_registration_delegated_warning_tooltip: "Een externe identiteitsprovider is ingeschakeld"
+      open_report_description: "Rapport beschrijving openen"
       page_title: Accountinstellingen
+      quiz_ip_filters_delete: "Filter verwijderen"
       quiz_ip_filters_help_message: |-
           Met toets-IP-filters kun je de toegang tot toetsen beperken tot computers uit een bepaald IP-bereik.
           
@@ -2168,6 +2172,7 @@ nl:
       attendance_help: Presentielijst
       new_attendance_column: "Nieuwe aanwezigheidskolom"
   auth_logging: 
+    corrupted: "Details zijn niet beschikbaar"
     login: AANMELDEN
     logout: UITLOGGEN
   bb_display: "Blackboard Learn"
@@ -2252,6 +2257,7 @@ nl:
     cancel: Annuleren
     choose_a_file: "Een bestand kiezen"
     delete: Verwijderen
+    delete_file: "%{name} bestand verwijderen"
     done: Gereed
     filter: Filter
     find_user: "Gebruiker zoeken"
@@ -3011,6 +3017,7 @@ nl:
     buttons: 
       process: "Gegevens verwerken"
     errors: 
+      couldnt_create: "Kon geen inhoud export creëren."
       error: "Er is een fout opgetreden bij het exporteren van jouw inhoud. Neem met jouw systeembeheerder contact op en geef de volgende export-ID door: \"%{code}\""
       not_found: "Export bestaat niet"
     index: 
@@ -4154,6 +4161,7 @@ nl:
       concluded: Voltooid
       copied_from: "Gekopieerd van"
       copied_to: "Gekopieerd naar"
+      corrupted: "Details zijn niet beschikbaar"
       created: Gemaakt
       deleted: Verwijderd
       published: Gepubliceerd
@@ -5177,11 +5185,13 @@ nl:
       saving: "Bezig met opslaan van de sleutel..."
       saving_failed: "Het opslaan van de sleutel mislukt"
     index: 
+      add_developer_key: "Ontwikkelaar-sleutel toevoegen"
       details: Details
       developer_keys: "Sleutels voor ontwikkelaar"
       key_settings: Sleutelinstellingen
       name: Naam
       show_all: "Alle %{count} sleutel tonen"
+      stats: Statistieken
       title: "Sleutels voor ontwikkelaar"
       user: Gebruiker
     messages: 
@@ -5856,6 +5866,7 @@ nl:
   errors: 
     bad_navigation_config: "Ongeldige configuratie van cursustabbladen"
     blank: Vereist
+    dynamic_format: "%{message}"
     failed: Mislukt
     format: "%{attribute} %{message}"
     index: 
@@ -5886,10 +5897,11 @@ nl:
       less_than: "moet kleiner zijn dan %{count}"
       less_than_or_equal_to: "moet kleiner zijn dan of gelijk zijn aan %{count}"
       not_a_number: "is geen getal"
+      not_an_integer: "moet een geheel getaal zijn"
       odd: "moet oneven zijn"
       too_long: "is te lang (maximum is %{count} tekens)"
       too_short: "is te kort (minimum is %{count} tekens)"
-      wrong_length: "heeft een onjuist lengte (moet %{count} tekens lang zijn)"
+      wrong_length: "heeft een onjuiste lengte (moet %{count} tekens lang zijn)"
     no_attached_file: "Je moet minimaal een bestand als bijlage  aan deze opdracht toevoegen"
     registration_incomplete: "Je moet jouw e-mailadres bevestigen voordat je deze pagina kunt bekijken"
     required: Vereist
@@ -6108,6 +6120,7 @@ nl:
     google_docs_domain_restriction: "Beperking van Google Docs domein"
     high_contrast: "Hoge contrast stijlen gebruiken"
     html5_first_videos: "Liever HTML5 voor videoweergave"
+    k12: "Functie specifiek voor basis onderwijs, lager en hoger middelbaar onderwijs"
     learning_mastery_gradebook: "Cijferlijst bekwaam leren"
     new_quiz_moderate: "Pagina voor het overzien van nieuwe toets "
     new_quiz_statistics: "Pagina met statistieken voor nieuwe toets"
@@ -7253,6 +7266,10 @@ nl:
     which_course_is_this_question_about: "Over welke cursus gaat de vraag?"
     your_email_address: "Jouw e-mailadres"
   helpers: 
+    button: 
+      create: "%{model} creëren"
+      submit: "%{model} opslaan"
+      update: "%{model} bijwerken"
     course: Cursus
     dashboard_helper: 
       announcement_details: "Details over aankondiging"
@@ -7274,7 +7291,11 @@ nl:
         other: "*%{count}* discussies"
     local: Plaatselijk
     select: 
-      prompt: Selecteer
+      prompt: Selecteren
+    submit: 
+      create: "%{model} creëren"
+      submit: "%{model} opslaan"
+      update: "%{model} bijwerken"
   high_contrast_description: |-
       Als je liever een hoger contrast versie van de gebruikersinterface van Canvas wilt, schakel die dan in.
       Dit kan handig zijn voor personen met verminderd zichtsvermogen of die moeilijk kunnen lezen.
@@ -7616,9 +7637,11 @@ nl:
   lti: 
     lti_message: 
       load_tool_new_tab_button: "%{tool} in een nieuw venster laden"
-      new_tab: "Deze tool moet in een nieuw venster geopend worden"
+      new_tab: "Deze tool moet in een nieuw venster geladen worden"
       new_tab_expired: "De sessie voor deze tool is verlopen. De pagina opnieuw laden om toegang te krijgen."
-      new_tab_loaded: "Deze tool is succesvol in een nieuw venster geopend. Deze pagina opnieuw laden om toegang te krijgen."
+      new_tab_loaded: "Deze tool is succesvol in een nieuw venster geladen. Deze pagina opnieuw laden om weer toegang te krijgen."
+  lti2: 
+    register_tool: "Tool registreren"
   m2c_file_description: "Moodle 1.9/2.x"
   m2c_name: "Moodle Importer"
   manage_avatars: 
@@ -9924,6 +9947,12 @@ nl:
     human: 
       decimal_units: 
         format: "%n %u"
+        units: 
+          billion: Miljard
+          million: Miljoen
+          quadrillion: Quadriljoen
+          thousand: Duizend
+          trillion: Triljoen
       storage_units: 
         format: "%n %u"
         units: 
@@ -9935,8 +9964,12 @@ nl:
           mb: MB
           tb: TB
   observees: 
+    add_observee_button: "Student toevoegen"
+    being_observed: "Studenten worden waargenomen"
     new_observee_password: Wachtwoord
     new_observee_username: Gebruikersnaam
+    observee_added: "Nu %{user} waarnemen"
+    observing: "Aan het waarnemen"
   options: 
     ? "no"
     : Nee
@@ -10538,6 +10571,7 @@ nl:
       unregister_service: "Weet je zeker dat je de registratie van deze dienst wilt opheffen?"
     crumb: "Instellingen van %{user}"
     crumbs: 
+      observees: "Aan het waarnemen"
       settings_frd: " %{user}s instellingen"
     done_resending: "Klaar! Het afleveren van het bericht kan een paar minuten duren."
     email_select: 
@@ -10562,6 +10596,8 @@ nl:
       contact_confirmed: "Contact succesvol bevestigd!"
       mfa_disabled: "Multi-Factor-verificatie uitgeschakeld"
       updated_profile: "Instellingen succesvol bijgewerkt"
+    observees: 
+      page_title: "Studenten worden waargenomen"
     please_select_an_option: "Selecteer een optie"
     profile: 
       access_token_description: "Met behulp van toegangstoken kun je aan andere applicaties toestaan om API-oproepen namens jou uit te voeren. Je kunt ook toegangstokens genereren en *de Canvas Open API* gebruiken om met jouw eigen integraties te komen."
@@ -11172,6 +11208,7 @@ nl:
   quiz_extend_time: 
     ending_time: eindtijd
     extend_time: "Tijd verlengen"
+    extensions_student: "Tijd voor %{student} verlengen"
     extensions_successfully_added: "Verlengingen succesvol toegevoegd"
     now: nu
   quiz_extensions: 
@@ -11883,6 +11920,7 @@ nl:
         new_assignment: "Nieuwe opdracht"
         new_discussion: "Nieuwe discussie"
         one_question_at_a_time: "Een vraag tegelijk tonen"
+        one_time_results: "Alleen maar eenmaal na iedere poging"
         points_possible: "Punten %{n}"
         quiz_title: "Naam van toets"
         quiz_type: Toetstype
@@ -12336,6 +12374,7 @@ nl:
     upload_warning: "Let op dat u de naam van de ingeleverde bestanden niet wijzigt. Hieraan kan Canvas de bestanden herkennen."
   react_files: 
     loading_more_results: "Bezig met het laden van meer resultaten"
+    usage_details: "%{quota_used} van %{quota}"
   recent_student: 
     last_logged_in: "laatst aangemeld op  %{last_login}"
   recently_deleted_courses_title: "Recent verwijderde cursus "
@@ -13010,6 +13049,7 @@ nl:
         body: Bericht
         subject: Onderwerp
       message_students_who: "Bericht sturen naar cursisten die..."
+      message_type: "Type bericht"
       out_of_points: "van %{points_possible}"
     mute_dialog: 
       gradebook: 
@@ -13474,6 +13514,7 @@ nl:
     assignment_unmuted: "Klikken om te dempen."
     discussion_topic: "Discussie onderwerp"
     external_tool: "Extern tool"
+    final_point_ratio: "%{pointRatio} punten"
     invalid_group_warning: 
       one: "Opgelet: In de score zijn opdrachten van de groep %{list_of_group_names} niet opgenomen, omdat er geen punten mogelijk zijn"
       other: "Opgelet: In de score zijn geen opdrachten van de groepen %{list_of_group_names}, omdat er geen punten mogelijk zijn:"
@@ -13522,6 +13563,7 @@ nl:
   student_groups: 
     group_join: "aangesloten op groep %{group_name} "
     group_leave: "heeft group %{group_name} verlaten"
+    group_name: "%{group_name} in %{group_category}"
     search_groups_placeholder: "Groepen of personen zoeken"
     student_groups_filter_description: "Als je in dit veld typt zal de lijst met groepen automatisch gefilterd worden om alleen namen te bevatten van diegenen waarvan de namen met jouw invoer overeenkomen."
     students_count: 
@@ -13717,6 +13759,7 @@ nl:
     grades: Cijfers
     home: Startpagina
     modules: Modules
+    observees: "Aan het waarnemen"
     outcomes: Leerresultaten
     pages: Paginas
     people: Personen
@@ -14487,6 +14530,8 @@ nl:
       page_updated: "Pagina succesvol bijgewerkt."
     page_link: 
       link_hidden_from_students_warning: "Cursisten zullen deze koppeling niet zien"
+    page_revisions: 
+      page_revisions_title: "%{title} revisies: %{context_name}"
     pages_index: 
       titles: 
         pages: Paginas
@@ -14521,6 +14566,15 @@ nl:
     cannot_update_published: "Je mag de gepubliceerde status van deze wiki-pagina niet bijwerken"
     cannot_update_title: "Je mag de titel van deze wiki-pagina niet bijwerken"
     invalid_editing_roles: "De voorgeschreven bewerkingsfuncties zijn ongeldig"
+  will_paginate: 
+    next_label: "Volgende &#8594;"
+    page_entries_info: 
+      single_page: 
+        zero: "%{model} niet gevonden"
+      single_page_html: 
+        zero: "%{model} niet gevonden"
+    page_gap: "&hellip;"
+    previous_label: "&#8592; Vorige"
   wimba_conference: 
     external_urls: 
       archive: Archief
