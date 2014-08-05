@@ -260,6 +260,9 @@ ar:
       logout_request_to_idp: "تم إرسال LogoutRequest إلى IdP"
       logout_response_from_idp: "LogoutResponse من IdP"
       saml_required: "مطلوب تكوين SAML لاختبار SAML"
+  account_notification: 
+    errors: 
+      invalid_account_notification_end_at: "وقت نهاية إشعار الحساب يسبق وقت البداية"
   account_notifications: 
     announcement_created_notice: "تم إنشاء الإعلان بنجاح"
     announcement_creation_failed_notice: "فشل إنشاء الإعلان"
@@ -280,9 +283,10 @@ ar:
       term_text: "الفصل الدراسي: %{term_name}؛"
     grades: 
       deleted: "تضمين الكائنات المحذوفة: صواب؛"
+      limited: "الكائنات المحذوفة تُحدد بحسب الأيام المحددة؛"
     outcomes: 
       order: "الأمر: %{order}"
-    report_header_account_id: "معرف الحساب"
+    report_header_account_id: account_id
     report_header_assessment_id: "معرف التقييم"
     report_header_assessment_question: "سؤال التقييم"
     report_header_assessment_question_id: "معرف سؤال التقييم"
@@ -303,7 +307,7 @@ ar:
     report_header_canvas_user_id: canvas_user_id
     report_header_canvas_xlist_course_id: canvas_xlist_course_id
     report_header_course: المساق
-    report_header_course__id: "معرف المساق"
+    report_header_course__id: course_id
     report_header_course_id: "معرف المساق"
     report_header_course_name: "اسم المساق"
     report_header_course_sis: "sis للمساق"
@@ -311,35 +315,35 @@ ar:
     report_header_created_at: "تاريخ الإنشاء"
     report_header_current_score: "الدرجة الحالية"
     report_header_email: "البريد الإلكتروني"
-    report_header_end__date: "تاريخ الانتهاء"
+    report_header_end__date: end_date
     report_header_end_date: "تاريخ الانتهاء"
     report_header_enrollment_state: "حالة التسجيل"
     report_header_final_score: "الدرجة النهائية"
-    report_header_first_name: "الاسم الأول"
-    report_header_group_id: "معرف المجموعة"
+    report_header_first_name: first_name
+    report_header_group_id: group_id
     report_header_id: المعرف
     report_header_last_access_at: "تاريخ آخر وصول"
     report_header_last_ip: "آخر ip"
-    report_header_last_name: "الاسم الأخير"
+    report_header_last_name: last_name
     report_header_learning_outcome_id: "معرف نتيجة التعلم"
     report_header_learning_outcome_name: "اسم نتيجة التعلم"
-    report_header_login_id: "معرف تسجيل الدخول"
-    report_header_long__name: "الاسم الطويل"
+    report_header_login_id: login_id
+    report_header_long__name: long_name
     report_header_long_name: "الاسم الطويل"
     report_header_name: الاسم
     report_header_outcome_score: "درجة التعلم"
     report_header_parent_account_id: parent_account_id
     report_header_role: الدور
     report_header_section: القسم
-    report_header_section__id: "معرف القسم"
+    report_header_section__id: section_id
     report_header_section_id: "معرف القسم"
     report_header_section_name: "اسم القسم"
     report_header_section_sis: "sis للقسم"
     report_header_section_sis_id: "معرف sis للقسم"
-    report_header_short__name: "الاسم القصير"
+    report_header_short__name: short_name
     report_header_short_name: "الاسم القصير"
     report_header_sis_id: "معرف sis"
-    report_header_start__date: "تاريخ البدء"
+    report_header_start__date: start_date
     report_header_start_date: "تاريخ البدء"
     report_header_status: الحالة
     report_header_student_id: "معرف الطالب"
@@ -349,10 +353,10 @@ ar:
     report_header_submission_date: "تاريخ الإرسال"
     report_header_submission_score: "درجة الإرسال"
     report_header_term: "الفصل الدراسي"
-    report_header_term__id: "معرف الفصل الدراسس"
+    report_header_term__id: term_id
     report_header_term_id: "معرف الفصل الدراسي"
     report_header_term_sis: "sis للفصل الدراسي"
-    report_header_user__id: "معرف المستخدم"
+    report_header_user__id: user_id
     report_header_user_id: "معرف المستخدم"
     report_header_user_name: "اسم المستخدم"
     report_header_user_sis_id: "معرف sis للمستخدم"
@@ -528,6 +532,8 @@ ar:
         message_course_id: "معرف المساق"
       grade_change_logging_item: 
         blank_placeholder: "-"
+        event_type: 
+          corrupted: "التفاصيل غير متوفرة"
       grade_change_logging_results: 
         Assignment: المهمة
         Course: المساق
@@ -851,6 +857,8 @@ ar:
       help_link_available_to_all_teachers: المعلمون
       help_link_available_to_all_users: المستخدمون
       if_you_would_like_to_link_to_your_own_campus_support_website_in_the_help_dialog_you_can_do_that_here: "إذا رغبت في الارتباط بموقع ويب لدعم مجمع المباني الخاص بك في مربع الحوار تعليمات فيمكنك ذلك من هنا"
+      interpolate_account_domain: "أدخل \"{{ACCOUNT_DOMAIN}}\" لاستبدال مجال الحساب الجذر للمستخدم"
+      interpolate_user_id: "أدخل \"{{CANVAS_USER_ID}}\" لاستبدال معرف Canvas الفريد للمستخدم"
       ip_filter_filter_label: تصفية
       ip_filter_name_label: الاسم
       labels: 
@@ -940,7 +948,9 @@ ar:
         subject: الموضوع
       open_registration_delegated_warning_message: "تم تمكين موفر هوية خارجي، وربما لا يستطيع المستخدمون الذين تم إنشاؤهم عبر التسجيل المفتوح من تسجيل الدخول ما لم يشتمل نموذج تسجيل الدخول الخاص بموفر الهوية الخارجي على ارتباط خلفي إلى %{url}."
       open_registration_delegated_warning_tooltip: "تم تمكين موفر هوية خارجي"
+      open_report_description: "فتح وصف التقرير"
       page_title: "إعدادات الحساب"
+      quiz_ip_filters_delete: "إزالة عامل التصفية"
       quiz_ip_filters_help_message: |-
           تعد عوامل تصفية IP للاختبار إحدى وسائل تقييد الوصول إلى الاختبارات لأجهزة الكمبيوتر التي في نطاق IP محدد.
           
@@ -1063,6 +1073,9 @@ ar:
         zero: "%{count} مجموعة في انتظار المعالجة."
       pending_batches_title: "دفعات معلقة"
       process_data_button: "بيانات العملية"
+      select_file_instructions: |-
+          حدد ملف zip الذي تريد استيراده.  
+          للحصول على وصف لطريقة إنشاء ملفات zip هذه، [الرجاء الاطلاع على هذه الوثائق](%{url}).
       sis_import_crumb: "استيراد SIS"
       started_at_message: "بدأ: %{started_at}"
       title: "استيراد SIS"
@@ -2225,11 +2238,16 @@ ar:
       attendance_help: "تعليمات الحضور"
       new_attendance_column: "العمود الجديد للحضور"
   auth_logging: 
+    corrupted: "التفاصيل غير متوفرة"
     login: "تسجيل الدخول"
     logout: "تسجيل الخروج"
   bb_display: "تعلم Blackboard"
   bb_file_description: "تصدير Blackboard 6/7/8/9 بتنسيق ملف zip."
   bb_name: "محول Blackboard"
+  better_file_browsing_description: |-
+      واجهة جديدة لاستعراض الملفات تتميز بأنها أكثر سهولة وسلاسة في الاستخدام. في حال تشغيل هذا،
+      فسيشاهد جميع المستخدمين في المساق الواجهة الجديدة. ولكي تجعلها تظهر عندما ينتقل أحد الأشخاص
+      إلى صفحة الملفات الشخصية لأحد المستخدمين ('/files')، فإنك تحتاج إلى تشغيلها للحساب الذي هو عضو فيه.
   big_blue_button_conference: 
     conference_is_recorded: "يتم تسجيل هذا المؤتمر."
     recording_setting: تسجيل
@@ -2309,6 +2327,7 @@ ar:
     cancel: إلغاء
     choose_a_file: "اختيار ملف"
     delete: حذف
+    delete_file: "حذف الملف %{name}"
     done: انتهاء
     filter: تصفية
     find_user: "العثور على مستخدم"
@@ -3092,6 +3111,7 @@ ar:
     buttons: 
       process: "بيانات العملية"
     errors: 
+      couldnt_create: "تعذر إنشاء تصدير المحتوى."
       error: "حدث خطأ أثناء تصدير المساق.  الرجاء إعلام مسؤول النظام، وإعطاؤه معرف التصدير التالي: \"%{code}\""
       not_found: "التصدير غير موجود"
     index: 
@@ -3624,6 +3644,9 @@ ar:
     content_next: 
       add_prerequisite: "إضافة متطلب ضروري إلى *%{module}*"
       assignment_points_possible: "من %{points_possible}"
+      button: 
+        delete_label: "حذف المتطلبات الأساسية"
+        delete_title: "حذف المتطلبات الأساسية"
       buttons: 
         add_module: "إضافة وحدة"
         add_prerequisite: "إضافة متطلب ضروري"
@@ -4252,6 +4275,7 @@ ar:
       concluded: "تم الانتهاء"
       copied_from: "منسوخ من"
       copied_to: "منسوخ إلى"
+      corrupted: "التفاصيل غير متوفرة"
       created: "تاريخ الإنشاء"
       deleted: محذوف
       published: منشور
@@ -4458,6 +4482,7 @@ ar:
               
               الرجاء **تسجيل الدخول** أو ***التسجيل*** للمطالبة بهذا المساق.
         files: "تعتبر علامة التبويب الملفات هي المكان المناسب لمشاركة شرائح المحاضرة ومستندات الأمثلة وتعليمات الدراسة؛ وأي شيء يريد الطلاب تنزيله. إن تحميل الملفات وتنظيمها صار سهلا ً عبر Canvas. وسنوضح لك كيف ذلك."
+        home2: "عندما يقوم الأشخاص بزيارة المساق، فهذه هي الصفحة التي سيشاهدونها. يمكنك إعدادها بحيث تعرض تدفق النشاط أو قائمة وحدات المساق أو المنهج الدراسي أو صفحة مخصصة تكتبها بنفسك. الإعداد الافتراضي هو تدفق نشاط المساق. لتخصيص هذا، انقر فوق %{choose_home_page}."
         import: "إذا كنت تستخدم نظام إدارة مساق آخر، فربما يكون لديك بعض الأشياء تريد نقلها إلى Canvas. يمكننا إرشادك عبر عملية ترحيل المحتوى بسهولة إلى داخل موقع Canvas."
         navigation: "وقد تم تمكين كل الارتباطات الخاصة بالمساق افتراضيًا. لن يرى الطلاب الارتباطات الخاصة بالأقسام التي ليس بها محتوى. على سبيل المثال، إذا لم تقم بإنشاء أي اختبارات، فإنهم لن يروا ارتباط الاختبارات. يمكنك فرز هذه الارتباطات وتعطيلها بشكل صريح إذا كانت هناك مناطق في المساق لا تريد أن يصل إليها الطلاب."
         publish: 
@@ -4540,6 +4565,7 @@ ar:
       create_failed: "فشل إنشاء المساق"
       role_not_active: "لا يمكن إضافة مستخدمين لدور غير نشط: '%{role}'"
       role_not_found: "لا يوجد دور تحت اسم '%{role}'."
+      unpublish: "لا يمكن إلغاء نشر المساق في حالة وجود عمليات إرسال للطلاب."
     group_list: 
       headings: 
         groups: "مجموعات المساق"
@@ -4602,6 +4628,8 @@ ar:
         close: تم
         duplicates_removed: "تم حذف بعض العناصر المكررة."
         email: "البريد الإلكتروني"
+        email_field_label: "أدخل عناوين البريد الإلكتروني للمستخدمين الذين ترغب في إضافتهم، مفصولة بفاصلات."
+        email_field_place_holder: "\"مثال لطالب\" &lt;student@example.com&gt;, \"Lastname, Firstname\" &lt;firstlast@example.com&gt;, justAnEmailAddress@example.com"
         example_formats: "أمثلة: user@example.com، \"الأول الأخير\" &lt;user@example.com&gt;، \"الأخير، الأول\" &lt;user@example.com&gt;"
         form_instructions: "اكتب أو انسخ قائمة بعناوين البريد الإلكتروني أدناه:"
         go_back: "البدء مرة أخرى"
@@ -4723,6 +4751,8 @@ ar:
         course_lock_all_announcements: "تعطيل التعليقات على الإعلانات"
         course_name: الاسم
         course_section_name: "إضافة قسم جديد"
+        course_status_published: "تم نشر المساق"
+        course_status_unpublished: "تم إلغاء نشر المساق"
         course_visibility: الرؤية
         enrollment_term_id: "فصل دراسي"
         grading_scheme: "نظام التقييم"
@@ -4778,6 +4808,8 @@ ar:
         tools: التطبيق
       titles: 
         edit_navigation: "تحرير تنقل المساق"
+      tooltips: 
+        cannot_unpublish_course: "لا يمكنك إلغاء نشر هذا المساق في حالة وجود عمليات إرسال تم تقدير درجاتها للطلاب"
       turnitin: "سيتم عرض هذه التعليقات للطلاب عند إرسال مهمة تم تمكين Turnitin لها"
       view_grading_scheme: "عرض نظام التقييم"
       wiki_editing_roles: "يستطيع إنشاء صفحات wiki للمساق وإعادة تسميتها وتحريرها بشكل افتراضي"
@@ -5356,11 +5388,13 @@ ar:
       saving: "يجري حفظ المفتاح..."
       saving_failed: "فشل حفظ المفتاح"
     index: 
+      add_developer_key: "إضافة مفتاح المطور"
       details: التفاصيل
       developer_keys: "مفاتيح المطور"
       key_settings: "إعدادات المفتاح"
       name: الاسم
       show_all: "إظهار كل مفاتيح %{count}"
+      stats: إحصائيات
       title: "مفاتيح المطور"
       user: مستخدم
     messages: 
@@ -5386,6 +5420,7 @@ ar:
   discussion_entry: 
     atom_no_author: "بلا مؤلف"
     default_user_name: "اسم المستخدم"
+  discussion_group_category_locked: "لا يمكن تعيين فئات المجموعات مباشرةً في مهمة مناقشة ولكن يجب تعيينها في المناقشة بدلاً من ذلك."
   discussion_topic: 
     atom_no_author: "بلا مؤلف"
     default_title: "بلا عنوان"
@@ -5463,6 +5498,7 @@ ar:
       delay_posting: "تأخير النشر"
       enable_podcast_feed: "تمكين موجز بودكاست"
       include_replies_in_podcast_feed: "تضمين الردود في موجز البودكاست"
+      only_visible_to_overrides_note: "ملاحظة: لا يمكن مشاهدة هذه المناقشة *إلا* بواسطة القسم (الأقسام) المحدد أدناه:"
       options: خيارات
       points_possible: "النقاط المحتملة"
       post_at: "نشر في"
@@ -6074,6 +6110,7 @@ ar:
   errors: 
     bad_navigation_config: "تكوين غير صالح لعلامة تبويب المساق"
     blank: مطلوب
+    dynamic_format: "%{message}"
     failed: فشل
     format: "%{attribute} %{message}"
     index: 
@@ -6090,21 +6127,22 @@ ar:
       message_contains: "محتويات الرسالة"
     max_attempts: "عدد كبير للغاية من محاولات تسجيل الدخول الفاشلة. الرجاء المحاولة مرة أخرى لاحقًا أو اتصل بمسؤول النظام."
     messages: 
-      accepted: "يجب قبول"
-      blank: "لا يمكن أن يكون فارغًا"
+      accepted: "يجب القبول"
+      blank: "لا يمكن أن يكون خاليًا"
       confirmation: "لا يتطابق مع التأكيد"
       empty: "لا يمكن أن يكون فارغًا"
-      equal_to: "يجب أن يكون مساويًا لـ %{count}"
-      even: "يجب أن يكون زوجيًا"
+      equal_to: "يجب أن يساوي %{count}"
+      even: "يجب أن يكون عددًا زوجيًا"
       exclusion: محجوز
       greater_than: "يجب أن يكون أكبر من %{count}"
       greater_than_or_equal_to: "يجب أن يكون أكبر من أو مساويًا لـ %{count}"
       inclusion: "لم يتم تضمينه في القائمة"
       invalid: "غير صالح"
       less_than: "يجب أن يكون أقل من %{count}"
-      less_than_or_equal_to: "يجب أن يكون أقل من أو مساويًا لـ %{count}"
+      less_than_or_equal_to: "يجب أن يكون أقل من أو يساوي %{count}"
       not_a_number: "ليس رقمًا"
-      odd: "يجب أن يكون فرديًا"
+      not_an_integer: "يجب أن يكون عددًا صحيحًا"
+      odd: "يجب أن يكون عددًا فرديًا"
       too_long: "طويل للغاية (الحد الأقصى هو %{count} حرفًا/أحرف)"
       too_short: "قصير للغاية (الحد الأدنى هو %{count} حرفًا/أحرف)"
       wrong_length: "طول خاطئ (يجب أن يكون %{count} حرفًا/أحرف)"
@@ -6134,6 +6172,7 @@ ar:
         adding_feed: "إضافة تغذية..."
       descriptions: 
         add_new_feed: "يمكنك إضافة منشورات بشكل تلقائي من موجز RSS أو Atom كإعلانات خاصة بهذا المساق. ما عليك سوى لصق عنوان URL الخاص بالموجز أدناه وستتم إضافة أي إدخالات جديدة."
+      feed_url_label: "عنوان URL للموجز"
       keyword: "الكلمة الأساسية:"
       labels: 
         match_phrase_checkbox: "ما عليك سوى إضافة منشورات بعبارة معينة في العنوان"
@@ -6167,6 +6206,7 @@ ar:
     consumer_key: "مفتاح العميل"
     course_home_sub_navigation_configured: "تم تكوين التنقل الفرعي بالصفحة الرئيسية للدورة التدريبية"
     course_navigation_configured: "تم تكوين التنقل في المساق"
+    course_settings_sub_navigation_configured: "تم تكوين التنقل الفرعي لإعدادات المساق"
     delete: حذف
     dialog_title_add_app: "إضافة تطبيق"
     dialog_title_edit_tool: "تحرير أداة خارجية"
@@ -6328,6 +6368,7 @@ ar:
     google_docs_domain_restriction: "قيد على مجال Google Docs"
     high_contrast: "استخدام الأنماط العالية التباين"
     html5_first_videos: "تفضيل HTML5 لتشغيل الفيديو"
+    k12: "ميزات خاصة بالتعليم الأساسي والثانوي K-12"
     learning_mastery_gradebook: "دفتر درجات إتقان التعلم"
     new_quiz_moderate: "صفحة جديدة لمتوسط الاختبار"
     new_quiz_statistics: "صفحة جديدة لإحصاءات الاختبار"
@@ -7522,6 +7563,10 @@ ar:
     which_course_is_this_question_about: "أي مساق يدور حوله هذا السؤال؟"
     your_email_address: "بريدك الإلكتروني"
   helpers: 
+    button: 
+      create: "إنشاء %{model}"
+      submit: "حفظ %{model}"
+      update: "تحديث %{model}"
     course: المساق
     dashboard_helper: 
       announcement_details: "تفاصيل الإعلان"
@@ -7559,7 +7604,11 @@ ar:
         zero: "*%{count}* من المناقشات"
     local: محلي
     select: 
-      prompt: "الرجاء تحديد"
+      prompt: "يرجى التحديد"
+    submit: 
+      create: "إنشاء %{model}"
+      submit: "حفظ %{model}"
+      update: "تحديث %{model}"
   high_contrast_description: |-
       إذا كنت ترغب في إصدار عالي التباين من واجهة مستخدم Canvas، فعليك تمكين هذا.
       قد يفيد ذلك الأشخاص الذين يعانون من إعاقة بصرية أو صعوبة في القراءة.
@@ -7744,6 +7793,9 @@ ar:
     module_sequence_footer: 
       next: التالي
       previous: السابق
+  k12_description: |-
+      ميزات وإعدادات وأنماط مفيدة بشكل خاص في بيئة التعليم الأساسي والثانوي K-12. يطبق هذا الآن
+      بعض تغييرات الأنماط فقط، ولكن ستتم إضافة المزيد من الميزات الخاصة بالتعليم الأساسي والثانوي في المستقبل.
   labels: 
     lock_module_until: "تأمين الوحدة حتى تاريخ محدد"
   last_submission_activity_title: "آخر نشاط إرسال"
@@ -7907,6 +7959,8 @@ ar:
       new_tab: "تحتاج هذه الأداة للتحميل في نافذة مستعرض جديدة"
       new_tab_expired: "انتهى وقت الجلسة الخاصة بهذه الأداة. الرجاء إعادة تحميل الصفحة للوصول إلى الأداة مرة أخرى."
       new_tab_loaded: "تم تحميل هذه الأداة بنجاح في نافذة مستعرض جديدة. أعد تحميل الصفحة للوصول إلى الأداة مرة أخرى."
+  lti2: 
+    register_tool: "أداة التسجيل"
   m2c_file_description: "Moodle 1.9/2.x"
   m2c_name: "برنامج استيراد Moodle"
   manage_avatars: 
@@ -8769,6 +8823,7 @@ ar:
         subject: "فشل تصدير المساق: %{course}"
     content_export_finished: 
       email: 
+        body: "انتهى تصدير المحتوى الخاص بالمساق \"%{course}\"."
         html: 
           body2: "لقد انتهى تصدير المساق الخاص بك *%{course}*."
           link: "انقر لعرض عمليات التصدير"
@@ -9602,8 +9657,19 @@ ar:
     page_locked_until: "تم تأمين هذه الصفحة حتى %{date}."
     page_unpublished_module: "تعد هذه الصفحة جزءًا من وحدة غير منشورة ولم يتم توفيره بعد."
     peer_review_invitation: 
+      email: 
+        body: "تمت دعوتك لإجراء مراجعة الأقران على %{reviewee}. اتبع الرابط التالي للمراجعة!"
+        html: 
+          link_message: "انقر هنا لإكمال المراجعة"
+        subject: "تم تعيين مراجعة الأقران لـ %{reviewee}"
+      facebook: 
+        body: "تمت دعوتك لإجراء مراجعة الأقران على %{reviewee}. اتبع الرابط التالي للمراجعة!"
       sms: 
         more_info: "مزيد من المعلومات على %{url}"
+      summary: 
+        body: "تمت دعوتك لإجراء مراجعة الأقران على %{reviewee}. اتبع الرابط التالي للمراجعة!"
+      twitter: 
+        body: "تمت دعوتك لإجراء مراجعة الأقران على %{reviewee}. اتبع الرابط التالي للمراجعة!"
     pseudonym_registration: 
       email: 
         body: "لقد تم تسجيلك لحساب Canvas على %{account}!  قبل أن تتمكن من تسجيل الدخول وبدء استخدام Canvas، سيلزم إنهاء عملية التكوين."
@@ -10110,6 +10176,16 @@ ar:
     due_date_display: "تاريخ الاستحقاق"
     files_description: "ملف جديد مضاف إلى المساق لديك"
     files_display: الملفات
+    grading_description: |-
+        يتضمن:
+        
+        * تم إدخال/تغيير درجة المهمة/الإرسال
+        * تم إلغاء كتم درجة المهمة
+        * تم تغيير وزن الدرجة
+        
+        
+        حدد "تضمين النقاط عند التنبيه حول تغييرات التقديرات" إذا كنت ترغب في مشاهدة درجاتك في الإشعارات.
+        إذا لم يكن البريد الإلكتروني الخاص بك تابعًا لمؤسسة فهذا يعني أن المحتوى الحساس سيتم إرساله خارج المؤسسة.
     grading_display: التقديرات
     grading_notify_include_grade: "تضمين النقاط عند التنبيه حول تغييرات التقديرات."
     grading_policies_description: "تغييرات سياسة تقييم درجات المساق"
@@ -10222,6 +10298,7 @@ ar:
         
         التسجيل لموعد طالب
     student_appointment_display: "تسجيلات موعد الطالب"
+    submission_comment_description: "تعليق إرسال المهمة"
     submission_comment_display: "تعليق الإرسال"
   notification_preferences: 
     communication: 
@@ -10271,6 +10348,12 @@ ar:
     human: 
       decimal_units: 
         format: "%n %u"
+        units: 
+          billion: مليار
+          million: مليون
+          quadrillion: كوادريليون
+          thousand: ألف
+          trillion: تريليون
       storage_units: 
         format: "%n %u"
         units: 
@@ -10286,8 +10369,12 @@ ar:
           mb: ميجابايت
           tb: تيرابايت
   observees: 
+    add_observee_button: "إضافة طالب"
+    being_observed: "الطلاب قيد الملاحظة"
     new_observee_password: "كلمة المرور"
     new_observee_username: "اسم المستخدم"
+    observee_added: "جارٍ ملاحظة %{user}"
+    observing: ملاحظة
   options: 
     ? "no"
     : لا
@@ -10889,6 +10976,7 @@ ar:
       unregister_service: "هل ترغب بالتأكيد في إلغاء تسجيل هذه الخدمة؟"
     crumb: "ملف تعريف %{user}"
     crumbs: 
+      observees: ملاحظة
       settings_frd: "إعدادات %{user}"
     done_resending: "تم! قد يستغرق تسليم الرسالة بضع دقائق."
     email_select: 
@@ -10913,6 +11001,8 @@ ar:
       contact_confirmed: "تم تأكيد جهة الاتصال بنجاح!"
       mfa_disabled: "تم تعطيل المصادقة متعددة العوامل"
       updated_profile: "تم تحديث ملف التعريف بنجاح"
+    observees: 
+      page_title: "الطلاب قيد الملاحظة"
     please_select_an_option: "الرجاء تحديد خيار"
     profile: 
       access_token_description: "يمكن استخدام رموز الوصول للسماح للتطبيقات الأخرى بإجراء مكالمات API نيابة عنك. ويمكنك كذلك إنشاء رموز الوصول و*استخدام API المفتوحة لـ Canvas* لمسايرة عمليات التكامل الخاصة بك."
@@ -11376,6 +11466,8 @@ ar:
       payment_info: "معلومات الدفع"
   qti_display: QTI
   qti_file_description: "ملف QTI مضغوط"
+  qti_img_matching_question: "يشتمل سؤال المطابقة الذي تم استيراده على صور في كلا الجانبين، وهذا غير مدعوم"
+  qti_img_matching_question_distractors: "يشتمل سؤال المطابقة الذي تم استيراده على صور ضمن الخيارات، ولا يمكن إصلاح ذلك لأنه يشتمل على عناصر تشتيت أيضًا"
   qti_name: "محول QTI"
   qualified_locale: en-US
   question_answered: "تمت الإجابة"
@@ -11542,6 +11634,7 @@ ar:
   quiz_extend_time: 
     ending_time: "وقت النهاية"
     extend_time: "تمديد الوقت"
+    extensions_student: "تمديد الوقت للطالب %{student}"
     extensions_successfully_added: "تمت إضافة التمديدات بنجاح"
     now: الآن
   quiz_extensions: 
@@ -11601,6 +11694,9 @@ ar:
       generated_at_date_time: "تم الإنشاء في %{dateAndTime}"
       generating_report_name: "جارٍ إنشاء %{report_name}..."
       item_analysis_not_available: "تحليل العنصر غير متاح للاستبيانات"
+  quiz_results_protected: "نتائج الاختبار محمية لهذا الاختبار ولا يتم عرضها على الطلاب."
+  quiz_results_protected_after_first_glimpse: "نتائج الاختبار محمية لهذا الاختبار ويمكن مشاهدتها مرة واحدة بعد إرسالها مباشرة."
+  quiz_results_protected_until_last_attempt: "نتائج الاختبار محمية لهذا الاختبار ولا يتم عرضها على الطلاب حتى يقوموا بإرسال محاولتهم الأخيرة."
   quiz_route: 
     that_quiz_doesnt_exist: "هذا الاختبار غير موجود"
     that_quiz_has_been_deleted: "لقد تم حذف ذلك الاختبار"
@@ -12222,6 +12318,7 @@ ar:
           extra_attempts: "المحاولات الإضافية"
           extra_time_per_attempt: "الوقت الإضافي في كل محاولة"
           manually_unlock: "إلغاء تأمين الاختبار يدويًا للمحاولة التالية"
+          reset_has_seen_results: "دع الطلاب يشاهدون النتائج مرة أخرى"
           started: "تم البدء"
         minutes: دقائق
         moderate_page_title: "%{title}: متوسط"
@@ -12281,6 +12378,8 @@ ar:
         new_assignment: "مهمة جديدة"
         new_discussion: "نقاش جديد"
         one_question_at_a_time: "عرض سؤال واحد في كل مرة"
+        one_time_results: "مرة واحدة فقط بعد كل محاولة"
+        only_visible_to_overrides_note: "ملاحظة: لا يمكن مشاهدة هذا الاختبار **إلا** بواسطة القسم (الأقسام) المحدد أدناه:"
         points_possible: "%{n} نقطة (نقاط)"
         quiz_title: "عنوان الاختبار"
         quiz_type: "نوع الاختبار"
@@ -12830,6 +12929,7 @@ ar:
     upload_warning: "تأكد من عدم تغيير أسماء ملفات الإرسال حتى نستطيع التعرف عليها."
   react_files: 
     loading_more_results: "تحميل مزيد من النتائج"
+    usage_details: "%{quota_used} من %{quota}"
   recent_student: 
     last_logged_in: "آخر تسجيل دخول في %{last_login}"
   recently_deleted_courses_title: "المساقات التي تم حذفها مؤخرًا"
@@ -12937,6 +13037,7 @@ ar:
       manage_students: "إضافة/إزالة الطلاب للمساق"
       manage_user_logins: "تعديل تفاصيل تسجيل الدخول للمستخدمين"
       manage_user_notes: "إضافة إدخالات دفاتر الكلية"
+      manage_user_observers: "إدارة ملاحظي المستخدمين"
       manage_wiki: "إدارة wiki (إضافة / تحرير / حذف الصفحات)"
       managed_jobs: "إدارة وظائف الخلفية"
       moderate_form: "توسيط الاتصالات (حذف / تحرير نشرات الآخرين وتأمين الموضوعات)"
@@ -13411,9 +13512,13 @@ ar:
           email: "البريد الإلكتروني (اختياري)"
     event_list: 
       at_least_more_events: "على الأقل %{count_of_events} آخر (أخرى)"
+      at_least_more_events_one_week: "%{count_of_events} زيادة على الأقل في الأسبوع الماضي"
+      at_least_more_events_two_weeks: "%{count_of_events} زيادة في الأسبوعين الماضيين"
       links: 
         view_calendar: "عرض التقويم"
       more_events: "%{count_of_events} آخر (أخرى)"
+      more_events_one_week: "%{count_of_events} زيادة في الأسبوع الماضي"
+      more_events_two_weeks: "%{count_of_events} زيادة في الأسبوعين الماضيين"
       nothing_for_now: "لا شيء موجود الآن"
       nothing_one_week: "لا شيء موجود للأسبوع القادم"
       nothing_two_weeks: "لا شيء موجود للأسبوعين القادمين"
@@ -13543,6 +13648,7 @@ ar:
         body: الرسالة
         subject: الموضوع
       message_students_who: "إرسال رسائل للطلاب الذين..."
+      message_type: "نوع الرسالة"
       out_of_points: "من %{points_possible}"
     mute_dialog: 
       gradebook: 
@@ -13564,6 +13670,7 @@ ar:
     new_course_form: 
       cancel: إلغاء
       course_cose_explanation: "سيتم عرض هذا في الأماكن ذات المساحة القليلة"
+      course_is_public_explanation: "جعل المساق مرئيًا بواسطة الجميع *(ستظل بيانات الطلاب سرية)*"
       create_course: "إنشاء مساق"
       creating_course: "جارٍ إنشاء المساق..."
       labels: 
@@ -13681,6 +13788,7 @@ ar:
         additional_comments: "التعليقات الإضافية"
       instructor_comments: "تعليقات المعلم"
       labels: 
+        long_description: "الوصف الطويل"
         save_criterion_for_reuse: "حفظ هذا التعليق لإعادة استخدامه"
         threshold: العتبة
       links: 
@@ -13700,6 +13808,7 @@ ar:
         update_description: "تحديث الوصف"
       labels: 
         additional_comments: "التعليقات الإضافية"
+        long_description: "الوصف الطويل"
     rubric_dialog: 
       buttons: 
         use_this_rubric: "استخدام هذا العنوان"
@@ -13727,6 +13836,8 @@ ar:
       defaults: 
         description: "وصف المعيار"
       full_marks: "العلامات النهائية"
+      labels: 
+        long_description: "الوصف الطويل"
       links: 
         view_longer_description: "عرض وصف أطول"
       no_marks: "لا توجد علامات"
@@ -14015,6 +14126,7 @@ ar:
     assignment_unmuted: "انقر لكتم الصوت."
     discussion_topic: "موضوع المناقشة"
     external_tool: "الأداة الخارجية"
+    final_point_ratio: "%{pointRatio} من النقاط"
     invalid_group_warning: 
       few: "ملاحظة: لا تتضمن الدرجات تعيينات من المجموعات %{list_of_group_names} لأنها ليست لديها نقاط ممكنة."
       many: "ملاحظة: لا تتضمن الدرجات تعيينات من المجموعات %{list_of_group_names} لأنها ليست لديها نقاط ممكنة."
@@ -14067,6 +14179,7 @@ ar:
   student_groups: 
     group_join: "تم الانضمام إلى المجموعة %{group_name}"
     group_leave: "تمت مغادرة المجموعة %{group_name}"
+    group_name: "%{group_name} في %{group_category}"
     search_groups_placeholder: "بحث عن مجموعات أو أشخاص"
     student_groups_filter_description: "بينما تقوم بالكتابة في هذا الحقل، ستتم تصفية قائمة المجموعات تلقائيًا لتشمل فقط تلك التي تطابق أسماؤها إدخالك."
     students_count: 
@@ -14285,6 +14398,7 @@ ar:
     grades: الدرجات
     home: المنزل
     modules: الوحدات
+    observees: ملاحظة
     outcomes: النتائج
     pages: الصفحات
     people: الأشخاص
@@ -14690,6 +14804,7 @@ ar:
       roles_student: "تم التسجيل كطالب."
       roles_ta: "تم التسجيل كمساعد معلم."
       roles_teacher: "تم التسجيل كمعلم."
+      unenrollr: "إلغاء تسجيل"
       unpublished: "غير منشور"
     errors: 
       no_teacher_courses: "لا توجد مساقات مشتركة بين هذا المعلم والطالب"
@@ -15106,6 +15221,8 @@ ar:
       page_updated: "تم تحديث الصفحة بنجاح."
     page_link: 
       link_hidden_from_students_warning: "لن يرى الطلاب هذا الارتباط"
+    page_revisions: 
+      page_revisions_title: "مراجعات %{title}: %{context_name}"
     pages_index: 
       titles: 
         pages: الصفحات
@@ -15140,6 +15257,21 @@ ar:
     cannot_update_published: "غير مسموح لك بتحديث الحالة المنشورة لصفحة wiki هذه"
     cannot_update_title: "غير مسموح لك بتحديث عنوان صفحة wiki هذه"
     invalid_editing_roles: "أدوار التحرير المتوفرة غير صالحة"
+  will_paginate: 
+    next_label: "التالي &#8594;"
+    page_entries_info: 
+      multi_page: "عرض %{model} %{from} - %{to} من %{count} في المجمل"
+      multi_page_html: "عرض %{model} <b>%{from}&nbsp;-&nbsp;%{to}</b> من <b>%{count}</b> في المجمل"
+      single_page: 
+        one: "عرض 1 %{model}"
+        other: "عرض كل %{model} البالغ عددها %{count}"
+        zero: "لم يتم العثور على %{model}"
+      single_page_html: 
+        one: "عرض <b>1</b> %{model}"
+        other: "عرض كل %{model} البالغ عددها <b>&nbsp;%{count}</b>"
+        zero: "لم يتم العثور على %{model}"
+    page_gap: "&hellip;"
+    previous_label: "&#8592; السابق"
   wimba_conference: 
     external_urls: 
       archive: أرشيف
