@@ -196,14 +196,19 @@ class PseudonymSessionsController < ApplicationController
       # Call for some cleanups that should be run when a user logs in
       @user = @pseudonym.login_assertions_for_user
       successful_login(@user, @pseudonym)
-    # Otherwise re-render the login page to show the error
+      # Otherwise re-render the login page to show the error
     else
       unsuccessful_login t('errors.invalid_credentials', "Incorrect username and/or password")
     end
   end
 
   def destroy
-    logout_user_action
+    # Only allow DELETE method for all logout requests except for SAML.
+    if saml_request?
+      saml_logout
+    else
+      logout_user_action
+    end
   end
 
   def logout_user_action
@@ -218,19 +223,19 @@ class PseudonymSessionsController < ApplicationController
     end
 
     account = @current_pseudonym.try(:account) || @domain_root_account
-    if account.saml_authentication? and session[:saml_unique_id]
+    if account.saml_authentication? && session[:saml_unique_id]
       increment_saml_stat("logout_attempt")
       # logout at the saml identity provider
       # once logged out it'll be redirected to here again
       if aac = account.account_authorization_configs.find_by_id(session[:saml_aac_id])
         settings = aac.saml_settings(request.host_with_port)
-        request = Onelogin::Saml::LogOutRequest.new(settings, session)
-        forward_url = request.generate_request
+        saml_request = Onelogin::Saml::LogOutRequest.new(settings, session)
+        forward_url = saml_request.generate_request
 
         if aac.debugging? && aac.debug_get(:logged_in_user_id) == @current_user.id
           aac.debug_set(:logout_request_id, request.id)
           aac.debug_set(:logout_to_idp_url, forward_url)
-          aac.debug_set(:logout_to_idp_xml, request.request_xml)
+          aac.debug_set(:logout_to_idp_xml, saml_request.request_xml)
           aac.debug_set(:debugging, t('debug.logout_redirect', "LogoutRequest sent to IdP"))
         end
 
@@ -269,7 +274,7 @@ class PseudonymSessionsController < ApplicationController
       # NOT SUPPORTED without redis
       return render :text => "NOT SUPPORTED", :status => :method_not_allowed
     elsif params['logoutRequest'] &&
-        params['logoutRequest'] =~ %r{^<samlp:LogoutRequest.*?<samlp:SessionIndex>(.*)</samlp:SessionIndex>}m
+      params['logoutRequest'] =~ %r{^<samlp:LogoutRequest.*?<samlp:SessionIndex>(.*)</samlp:SessionIndex>}m
       # we *could* validate the timestamp here, but the whole request is easily spoofed anyway, so there's no
       # point. all the security is in the ticket being secret and non-predictable
       return render :text => "OK", :status => :ok if Pseudonym.release_cas_ticket($1)
@@ -286,7 +291,7 @@ class PseudonymSessionsController < ApplicationController
   end
 
   def saml_consume
-    if @domain_root_account.account_authorization_configs.any? { |aac| aac.saml_authentication? } && params[:SAMLResponse]
+    if saml_request?
       # Break up the SAMLResponse into chunks for logging (a truncated version was probably already
       # logged with the request when using syslog)
       chunks = params[:SAMLResponse].scan(/.{1,1024}/)
@@ -428,10 +433,10 @@ class PseudonymSessionsController < ApplicationController
   end
 
   def saml_logout
-    if @domain_root_account.account_authorization_configs.any? { |aac| aac.saml_authentication? } && params[:SAMLResponse]
+    if saml_request?
       increment_saml_stat("logout_response_received")
       response = saml_logout_response(params[:SAMLResponse])
-      if  aac = @domain_root_account.account_authorization_configs.find_by_idp_entity_id(response.issuer)
+      if aac = @domain_root_account.account_authorization_configs.find_by_idp_entity_id(response.issuer)
         settings = aac.saml_settings(request.host_with_port)
         response.process(settings)
 
@@ -443,8 +448,20 @@ class PseudonymSessionsController < ApplicationController
           aac.debug_set(:debugging, t('debug.logout_redirect_from_idp', "Received LogoutResponse from IdP"))
         end
       end
+
+      logout_user_action
+      return
     end
-    logout_user_action
+
+    @message = 'SAML Logout request requires a SAMLResponse parameter on a SAML enabled account.'
+    respond_to do |format|
+      format.html { render :template => 'shared/errors/400_message', :status => :bad_request }
+      format.json { render :json => { message: @message }, :status => :bad_request }
+    end
+  end
+
+  def saml_request?
+    @domain_root_account.account_authorization_configs.any? { |aac| aac.saml_authentication? } && params[:SAMLResponse]
   end
 
   def saml_response(raw_response, settings=nil)
@@ -512,7 +529,7 @@ class PseudonymSessionsController < ApplicationController
     drift = 30
     # give them 5 minutes to enter an OTP sent via SMS
     drift = 300 if session[:pending_otp_communication_channel_id] ||
-        (!session[:pending_otp_secret_key] && @current_user.otp_communication_channel_id)
+      (!session[:pending_otp_secret_key] && @current_user.otp_communication_channel_id)
 
     if !force_fail && ROTP::TOTP.new(secret_key).verify_with_drift(verification_code, drift)
       if session[:pending_otp_secret_key]
@@ -527,13 +544,13 @@ class PseudonymSessionsController < ApplicationController
         old_cookie = cookies['canvas_otp_remember_me']
         old_cookie = nil unless @current_user.validate_otp_secret_key_remember_me_cookie(old_cookie)
         cookies['canvas_otp_remember_me'] = {
-              :value => @current_user.otp_secret_key_remember_me_cookie(now, old_cookie, request.remote_ip),
-              :expires => now + 30.days,
-              :domain => otp_remember_me_cookie_domain,
-              :httponly => true,
-              :secure => CanvasRails::Application.config.session_options[:secure],
-              :path => '/login'
-            }
+          :value => @current_user.otp_secret_key_remember_me_cookie(now, old_cookie, request.remote_ip),
+          :expires => now + 30.days,
+          :domain => otp_remember_me_cookie_domain,
+          :httponly => true,
+          :secure => CanvasRails::Application.config.session_options[:secure],
+          :path => '/login'
+        }
       end
       if session.delete(:pending_otp)
         successful_login(@current_user, @current_pseudonym, true)
@@ -572,7 +589,7 @@ class PseudonymSessionsController < ApplicationController
     if !otp_passed
       mfa_settings = @current_user.mfa_settings
       if (@current_user.otp_secret_key && mfa_settings == :optional) ||
-          mfa_settings == :required
+        mfa_settings == :required
         session[:pending_otp] = true
         return otp_login(true)
       end
@@ -580,10 +597,10 @@ class PseudonymSessionsController < ApplicationController
 
     if pseudonym.account_id == Account.site_admin.id && Account.site_admin.account_authorization_config.try(:delegated_authentication?)
       cookies['canvas_sa_delegated'] = {
-          :value => '1',
-          :domain => otp_remember_me_cookie_domain,
-          :httponly => true,
-          :secure => CanvasRails::Application.config.session_options[:secure]
+        :value => '1',
+        :domain => otp_remember_me_cookie_domain,
+        :httponly => true,
+        :secure => CanvasRails::Application.config.session_options[:secure]
       }
     end
     session[:require_terms] = true if @domain_root_account.require_acceptance_of_terms?(@current_user)

@@ -449,7 +449,22 @@ describe PseudonymSessionsController do
             @stub_hash[:issuer] = "nobody eh"
             get_saml_consume
           end
+
+          it "should return bad request if a SAMLResponse parameter is not provided" do
+            controller.expects(:logout_user_action).never
+            get 'saml_logout'
+            response.status.should == 400
+          end
         end
+      end
+    end
+
+    context "/saml_logout" do
+      it "should return bad request if SAML is not configured for account" do
+        controller.expects(:logout_user_action).never
+        controller.request.env['canvas.domain_root_account'] = @account
+        get 'saml_logout', :SAMLResponse => "foo", :RelayState => "/courses"
+        response.status.should == 400
       end
     end
 
@@ -753,7 +768,7 @@ describe PseudonymSessionsController do
       user_session(@user, @pseudonym)
       PseudonymSession.find.stubs(:destroy)
       session[:cas_session] = true
-      post 'destroy'
+      delete 'destroy'
       response.should be_redirect
       response.location.should match %r{^https://localhost/cas/logout}
     end
