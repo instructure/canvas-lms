@@ -366,7 +366,7 @@ describe "AccountAuthorizationConfigs API", type: :request do
   end
 
   context "discovery url" do
-    before :once do
+    before do
       @account.auth_discovery_url = "http://example.com/auth"
       @account.save!
     end
