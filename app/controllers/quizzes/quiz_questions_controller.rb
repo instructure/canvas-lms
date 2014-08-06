@@ -185,7 +185,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
   # @returns [QuizQuestion]
   def index
     if authorized_action(@quiz, @current_user, :update)
-      scope = @quiz.quiz_questions
+      scope = @quiz.active_quiz_questions
       api_route = polymorphic_url([:api, :v1, @context, :quiz_questions])
       @questions = Api.paginate(scope, self, api_route)
 
