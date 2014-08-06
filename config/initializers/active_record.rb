@@ -60,7 +60,7 @@ class ActiveRecord::Base
     @from_files ||= Dir[
       "#{Rails.root}/app/models/**/*.rb",
       "#{Rails.root}/vendor/plugins/*/app/models/**/*.rb",
-    ].collect { |file|
+    ].sort.collect { |file|
       model = file.sub(%r{.*/app/models/(.*)\.rb$}, '\1').camelize.constantize
       next unless model < ActiveRecord::Base
       model

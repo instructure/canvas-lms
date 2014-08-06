@@ -73,6 +73,10 @@ module CanvasRails
                             #{Rails.root}/app/serializers
                             #{Rails.root}/app/presenters)
 
+    # prevent directory->module inference in these directories from wreaking
+    # havoc on the app (e.g. stylesheets/base -> ::Base)
+    config.eager_load_paths -= %W(#{Rails.root}/app/coffeescripts
+                                  #{Rails.root}/app/stylesheets)
 
     # we don't know what middleware to make SessionsTimeout follow until after
     # we've loaded config/initializers/session_store.rb
