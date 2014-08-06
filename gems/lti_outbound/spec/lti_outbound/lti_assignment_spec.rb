@@ -25,4 +25,7 @@ describe LtiOutbound::LTIAssignment do
   it_behaves_like 'it has a proc attribute setter and getter for', :points_possible
   it_behaves_like 'it has a proc attribute setter and getter for', :return_types
   it_behaves_like 'it has a proc attribute setter and getter for', :allowed_extensions
+  it_behaves_like 'it has a proc attribute setter and getter for', :unlock_at
+  it_behaves_like 'it has a proc attribute setter and getter for', :due_at
+  it_behaves_like 'it has a proc attribute setter and getter for', :lock_at
 end

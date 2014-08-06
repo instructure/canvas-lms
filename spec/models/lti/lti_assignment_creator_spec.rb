@@ -25,6 +25,9 @@ describe Lti::LtiAssignmentCreator do
     assignment.title = 'name'
     assignment.points_possible = 10
     assignment.allowed_extensions = 'csv,txt'
+    assignment.unlock_at = DateTime.parse("2011-04-13 00:00:00")
+    assignment.due_at = DateTime.parse("2011-05-13 00:00:00")
+    assignment.lock_at = DateTime.parse("2011-06-13 00:00:00")
 
     lti_assignment = Lti::LtiAssignmentCreator.new(assignment, 'source_id').convert
     lti_assignment.should be_a LtiOutbound::LTIAssignment
@@ -33,6 +36,9 @@ describe Lti::LtiAssignmentCreator do
     lti_assignment.title.should == 'name'
     lti_assignment.points_possible.should == 10
     lti_assignment.allowed_extensions.should == ['csv', 'txt']
+    lti_assignment.unlock_at.should == DateTime.parse("2011-04-13 00:00:00")
+    lti_assignment.due_at.should == DateTime.parse("2011-05-13 00:00:00")
+    lti_assignment.lock_at.should == DateTime.parse("2011-06-13 00:00:00")
   end
 
   it "sets the correct return type for lti assignment launches" do
