@@ -147,7 +147,7 @@ else
         @@postgresql_patches_applied = true
       end
     end
-    alias_method_chain :initialize, :postgresql_patches
+    alias_method_chain :initialize, :postgresql_patches unless private_instance_methods.include?(:initialize_without_postgresql_patches)
   end
 end
 
