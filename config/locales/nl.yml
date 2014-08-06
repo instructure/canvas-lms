@@ -253,6 +253,9 @@ nl:
       logout_request_to_idp: "LogoutRequest verstuurd naar IdP"
       logout_response_from_idp: "LogoutResponse van IdP"
       saml_required: "Een SAML-configuratie is nodig om SAML te testen"
+  account_notification: 
+    errors: 
+      invalid_account_notification_end_at: "Eindtijd van de account-melding gaat starttijd vooraf"
   account_notifications: 
     announcement_created_notice: "Aankondiging succesvol gemaakt"
     announcement_creation_failed_notice: "Het maken van aankondiging mislukt"
@@ -1062,6 +1065,9 @@ nl:
         other: "%{count} batches wachten op verwerking."
       pending_batches_title: "Batches in behandeling"
       process_data_button: "Gegevens verwerken"
+      select_file_instructions: |-
+          Het zip-bestand kiezen die jij wilt importeren.
+          Voor een beschrijving om deze zip-bestanden te genereren, [zie deze documentatie](%{url}).
       sis_import_crumb: SIS-import
       started_at_message: "Gestart: %{started_at}"
       title: SIS-import
@@ -2178,6 +2184,10 @@ nl:
   bb_display: "Blackboard Learn"
   bb_file_description: "Blackboard 6/7/8/9-exportbestand .zip/zip-exportbestand"
   bb_name: "Blackboard Converter"
+  better_file_browsing_description: |-
+      Een nieuw, eenvoudiger, vriendelijker interface voor het bekijken van bestanden. Als jij dit op cursus niveau inschakelt,
+      dan zullen alle gebruikers van die cursus de nieuwe interface zien. Om het te kunnen laten zien wanneer iemand
+      naar de persoonlijke bestandspagina van een gebruiker ('/files') gaat dan moet je dit inschakelen voor de account waar hij/zij deel van uitmaakt.
   big_blue_button_conference: 
     conference_is_recorded: "Deze vergadering wordt opgenomen."
     recording_setting: "Bezig met opnemen"
@@ -5216,6 +5226,7 @@ nl:
   discussion_entry: 
     atom_no_author: "Geen auteur"
     default_user_name: Gebruikersnaam
+  discussion_group_category_locked: "Groep categorieën kunnen niet direct op een opdracht discussie ingesteld worden, maar zouden op de discussie ingesteld moeten worden"
   discussion_topic: 
     atom_no_author: "Geen auteur"
     default_title: "Geen titel"
@@ -5281,6 +5292,7 @@ nl:
       delay_posting: "Posten uitstellen"
       enable_podcast_feed: "Podcast feed inschakelen"
       include_replies_in_podcast_feed: "Antwoorden in podcast feed opnemen"
+      only_visible_to_overrides_note: "Opmerking: Deze discussie is *alleen* zichtbaar voor de sectie(s) hieronder vermeld:"
       options: Opties
       points_possible: "Aantal punten mogelijk"
       post_at: "Posten om"
@@ -7480,6 +7492,7 @@ nl:
     module_sequence_footer: 
       next: Volgende
       previous: Vorige
+  k12_description: "Functies, instellingen en stijlen die meer van toepassing zijn in een omgeving van het basis onderwijs, het lager en hoger middelbaar onderwijs. Voor nu, houdt dit slechts enkele stijlwijzigingen in, maar meer specifieke aanpassingen voor het basis onderwijs, het lager en hoger middelbaar onderwijs kunnen in de toekomst toegevoegd worden."
   labels: 
     lock_module_until: "Module tot een bepaalde datum vergrendelen"
   last_submission_activity_title: "Laatste inzending activiteit "
@@ -8441,6 +8454,7 @@ nl:
         subject: "Cursus Export mislukt: %{course}"
     content_export_finished: 
       email: 
+        body: "Jouw inhoud export voor \"%{course}\" is klaar."
         html: 
           body2: "Het exporteren van jouw cursus *%{course}* is voltooid."
           link: "Klikken om exports te bekijken"
@@ -9278,6 +9292,11 @@ nl:
     page_locked_until: "Deze pagina is vergrendeld tot %{date}."
     page_unpublished_module: "Deze pagina is onderdeel van een niet-gepubliceerde module en is nog niet beschikbaar."
     peer_review_invitation: 
+      email: 
+        body: "Je bent voor een peer review uitgenodigd voor %{reviewee}. De koppeling hieronder volgen om ze te beoordelen!"
+        html: 
+          link_message: "Hier klikken om je beoordeling te voltooien"
+        subject: "Toegewezen peer review voor %{reviewee}"
       sms: 
         more_info: "Meer informatie op %{url}"
     pseudonym_registration: 
@@ -9786,6 +9805,12 @@ nl:
     due_date_display: Inleverdatum
     files_description: "Nieuw bestand aan jouw cursus  toegevoegd "
     files_display: Bestanden
+    grading_description: "Inclusief:\n\n\
+        * Opdrachten/cijfer van inzending ingevoerd/gewijzigd\n\
+        * Ongewijzigde cijfer van opdracht\n\
+        * Gemiddelde cijfer gewijzigd\n\n\n\n\
+        'Scoren opnemen wanneer er waarschuwingen zijn van cijfer wijzigingen' aanvinken als je jouw cijfers in de meldingen wilt zien.\n\
+        Als jouw e-mail geen e-mail van de instelling is dan betekent dit dat gevoelige inhoud naar buiten de instelling verzonden zal worden.  "
     grading_display: Beoordeling
     grading_notify_include_grade: "Scores insluiten wanneer waarschuwingen over wijzigingen in cijfers worden verstuurd."
     grading_policies_description: "Gewijzigd beleid voor het beoordelen van cursussen"
@@ -9898,6 +9923,7 @@ nl:
         
         Aanmelding voor afspraak van cursist
     student_appointment_display: "Ingeplande afspraken van cursist"
+    submission_comment_description: "Opmerking op ingezonden opdracht"
     submission_comment_display: "Opmerking over inzending"
   notification_preferences: 
     communication: 
@@ -11062,6 +11088,8 @@ nl:
       payment_info: Betaalgegevens
   qti_display: QTI
   qti_file_description: QTI-zipbestand
+  qti_img_matching_question: "Geïmporteerde overeenkomstige vraag bevat afbeelding aan beide zijden, die niet ondersteund wordt"
+  qti_img_matching_question_distractors: "Geïmporteerde overeenkomstige vraag bevat afbeeldingen binnen de keuzes, en kan niet opgelost worden omdat het ook onjuiste opties bevat"
   qti_name: "QTI Converter"
   qualified_locale: en-VS
   question_answered: Beantwoord
@@ -11260,6 +11288,9 @@ nl:
       generated_at_date_time: "%{dateAndTime} gegenereerd"
       generating_report_name: "%{report_name} Bezig met genereren..."
       item_analysis_not_available: "Analyse van item is niet voor enquêtes beschikbaar"
+  quiz_results_protected: "Toetsresultaten zijn voor deze toets beveiligd en zijn niet zichtbaar voor cursisten. "
+  quiz_results_protected_after_first_glimpse: "Toetsresultaten zijn voor deze toets beveiligd en kunnen meteen na inzending eenmalig bekeken worden."
+  quiz_results_protected_until_last_attempt: "Toetsresultaten zijn voor deze toets beveiligd en zijn niet zichtbaar voor cursisten totdat zij hun laatste poging hebben ingezonden."
   quiz_route: 
     that_quiz_doesnt_exist: "Die toets bestaat niet"
     that_quiz_has_been_deleted: "Deze toets is verwijderd"
@@ -11861,6 +11892,7 @@ nl:
           extra_attempts: "Extra pogingen"
           extra_time_per_attempt: "Extra tijd voor elke poging"
           manually_unlock: "De toets handmatig ontgrendelen voor de volgende poging"
+          reset_has_seen_results: "Laat de cursist de resultaten nog eenmaal zien"
           started: Gestart
         minutes: minuten
         moderate_page_title: "%{title}: Overzien"
@@ -12921,9 +12953,13 @@ nl:
           email: "E-mail (optioneel)"
     event_list: 
       at_least_more_events: "minimaal %{count_of_events} meer"
+      at_least_more_events_one_week: "tenminste %{count_of_events} meer in de afgelopen week"
+      at_least_more_events_two_weeks: "tenminste %{count_of_events} meer in de afgelopen twee weken"
       links: 
         view_calendar: "Kalender bekijken"
       more_events: "%{count_of_events} meer"
+      more_events_one_week: "%{count_of_events} meer in de afgelopen week"
+      more_events_two_weeks: "%{count_of_events} meer in de afgelopen twee weken"
       nothing_for_now: "Momenteel niets"
       nothing_one_week: "Niets voor de volgende week"
       nothing_two_weeks: "Niets voor de volgende twee weken"
@@ -13067,6 +13103,7 @@ nl:
     new_course_form: 
       cancel: Annuleren
       course_cose_explanation: "Dit wordt weergegeven op plekken met weinig ruimte"
+      course_is_public_explanation: "Cursus openbaar zichtbaar maken *(data van cursist zal privé blijven)*"
       create_course: "Cursus maken"
       creating_course: "Bezig met het maken van cursus..."
       labels: 
@@ -14121,6 +14158,7 @@ nl:
       roles_student: "Ingeschreven als cursist."
       roles_ta: "Ingeschreven als onderwijsassistent."
       roles_teacher: "Ingeschreven als docent."
+      unenrollr: Uitschrijven
       unpublished: "Niet gepubliceerd"
     errors: 
       no_teacher_courses: "Er zijn geen cursussen gedeeld tussen deze docent en deze cursist."
@@ -14569,9 +14607,15 @@ nl:
   will_paginate: 
     next_label: "Volgende &#8594;"
     page_entries_info: 
+      multi_page: "%{model} weergeven %{from} - %{to} van in totaal %{count} "
+      multi_page_html: "%{model} weergeven <b>%{from}&nbsp;-&nbsp;%{to}</b> van in totaal <b>%{count}</b>"
       single_page: 
+        one: "1 %{model} weergeven"
+        other: "Alle %{count} %{model} weergeven"
         zero: "%{model} niet gevonden"
       single_page_html: 
+        one: "<b>1</b> %{model} weergeven"
+        other: "<b>all&nbsp;%{count}</b> %{model} weergeven"
         zero: "%{model} niet gevonden"
     page_gap: "&hellip;"
     previous_label: "&#8592; Vorige"
