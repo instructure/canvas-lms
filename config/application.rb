@@ -120,7 +120,7 @@ module CanvasRails
           @@postgresql_patches_applied = true
         end
       end
-      alias_method_chain :initialize, :postgresql_patches
+      alias_method_chain :initialize, :postgresql_patches unless private_instance_methods.include?(:initialize_without_postgresql_patches)
     end
 
     # We need to make sure that safe_yaml is loaded *after* the YAML engine
