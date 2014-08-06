@@ -1,0 +1,5 @@
+This folder contains symlinks to every client app's built JS assets.
+
+A client app is expected to store its built JS asset in:
+
+    /client_apps/NAME/dist/NAME.js

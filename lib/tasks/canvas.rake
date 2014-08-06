@@ -112,7 +112,7 @@ namespace :canvas do
     check_syntax = truthy_values.include?(args[:check_syntax])
 
     require 'parallel'
-    processes = ENV['CANVAS_BUILD_CONCURRENCY'] || Parallel.processor_count
+    processes = (ENV['CANVAS_BUILD_CONCURRENCY'] || Parallel.processor_count).to_i
     puts "working in #{processes} processes"
 
     tasks = {

@@ -1,0 +1,45 @@
+{
+  "quiz_reports": [
+    {
+      "id": "14",
+      "report_type": "student_analysis",
+      "readable_type": "Student Analysis",
+      "includes_all_versions": false,
+      "generatable": true,
+      "anonymous": false,
+      "url": "http://localhost:3000/api/v1/courses/1/quizzes/1/reports/14",
+      "created_at": "2014-04-29T08:57:36Z",
+      "updated_at": "2014-04-29T09:08:55Z",
+      "links": {
+        "quiz": "http://localhost:3000/api/v1/courses/1/quizzes/1"
+      },
+      "progress": {
+        "completion": 64,
+        "context_id": 13,
+        "context_type": "Quizzes::QuizStatistics",
+        "created_at": "2014-04-02T06:41:47Z",
+        "id": 143,
+        "message": null,
+        "tag": "Quizzes::QuizStatistics",
+        "updated_at": "2014-04-02T06:41:47Z",
+        "user_id": null,
+        "workflow_state": "active",
+        "url": "http://localhost:3000/api/v1/progress/143"
+      }
+    },
+    {
+      "id": "13",
+      "report_type": "item_analysis",
+      "readable_type": "Item Analysis",
+      "includes_all_versions": true,
+      "generatable": true,
+      "anonymous": false,
+      "url": "http://localhost:3000/api/v1/courses/1/quizzes/1/reports/13",
+      "created_at": "2014-04-29T08:57:36Z",
+      "updated_at": "2014-04-29T09:08:25Z",
+      "links": {
+        "quiz": "http://localhost:3000/api/v1/courses/1/quizzes/1"
+      }
+    }
+  ]
+}

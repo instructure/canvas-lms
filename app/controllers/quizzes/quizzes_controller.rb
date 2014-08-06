@@ -30,7 +30,7 @@ class Quizzes::QuizzesController < ApplicationController
   before_filter :require_context
   add_crumb(proc { t('#crumbs.quizzes', "Quizzes") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_quizzes_url }
   before_filter { |c| c.active_tab = "quizzes" }
-  before_filter :require_quiz, :only => [:statistics, :edit, :show, :history, :update, :destroy, :moderate, :read_only, :managed_quiz_data, :submission_versions, :submission_html]
+  before_filter :require_quiz, :only => [:statistics, :statistics_cqs, :edit, :show, :history, :update, :destroy, :moderate, :read_only, :managed_quiz_data, :submission_versions, :submission_html]
   before_filter :set_download_submission_dialog_title , only: [:show,:statistics]
   after_filter :lock_results, only: [ :show, :submission_html ]
   # The number of questions that can display "details". After this number, the "Show details" option is disabled
@@ -465,6 +465,23 @@ class Quizzes::QuizzesController < ApplicationController
           }
         end
 
+    end
+  end
+
+  def statistics_cqs
+    if authorized_action(@quiz, @current_user, :read_statistics)
+      respond_to do |format|
+        format.html {
+          add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
+          add_crumb(t(:statistics_cqs_crumb, "Statistics CQS"), named_context_url(@context, :context_quiz_statistics_cqs_url, @quiz))
+
+          js_env({
+            quiz_url: api_v1_course_quiz_url(@context, @quiz),
+            quiz_statistics_url: api_v1_course_quiz_statistics_url(@context, @quiz),
+            quiz_reports_url: api_v1_course_quiz_reports_url(@context, @quiz),
+          })
+        }
+      end
     end
   end
 

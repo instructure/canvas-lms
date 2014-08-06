@@ -53,6 +53,9 @@ Gemfile.lock3
 /spec/coffeescripts/plugins/
 /spec/plugins/
 
+# generate client app stuff
+/public/javascripts/client_apps/
+
 #remove this once we move jqeury into bower
 /public/javascripts/bower/jquery/
 

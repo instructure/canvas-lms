@@ -306,6 +306,7 @@ CanvasRails::Application.routes.draw do
       match 'submission_versions' => 'quizzes/quizzes#submission_versions', :as => :submission_versions
       match 'history' => 'quizzes/quizzes#history', :as => :history
       match 'statistics' => 'quizzes/quizzes#statistics', :as => :statistics
+      match 'statistics_cqs' => 'quizzes/quizzes#statistics_cqs', :as => :statistics_cqs
       match 'read_only' => 'quizzes/quizzes#read_only', :as => :read_only
       match 'submission_html' => 'quizzes/quizzes#submission_html', :as => :submission_html
 
