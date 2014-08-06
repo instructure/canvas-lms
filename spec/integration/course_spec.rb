@@ -35,4 +35,43 @@ describe "course" do
     get "/courses/#{@course.id}/assignments/syllabus"
     response.should be_success
   end
+
+  it "should show the migration-in-progress notice" do
+    enable_cache do
+      course(active_all: true)
+      user_session(@teacher)
+      migration = @course.content_migrations.build
+      migration.migration_settings[:import_in_progress_notice] = '1'
+      migration.save!
+
+      migration.update_attribute(:workflow_state, 'importing')
+      get "/courses/#{@course.id}"
+      response.should be_success
+      body = Nokogiri::HTML(response.body)
+      body.css('div.import-in-progress-notice').should_not be_empty
+
+      migration.update_attribute(:workflow_state, 'imported')
+      get "/courses/#{@course.id}"
+      response.should be_success
+      body = Nokogiri::HTML(response.body)
+      body.css('div.import-in-progress-notice').should be_empty
+    end
+  end
+
+  it "should not show the migration-in-progress notice to students" do
+    enable_cache do
+      course(active_all: true)
+      student_in_course active_all: true
+      user_session(@student)
+      migration = @course.content_migrations.build
+      migration.migration_settings[:import_in_progress_notice] = '1'
+      migration.save!
+
+      migration.update_attribute(:workflow_state, 'importing')
+      get "/courses/#{@course.id}"
+      response.should be_success
+      body = Nokogiri::HTML(response.body)
+      body.css('div.import-in-progress-notice').should be_empty
+    end
+  end
 end

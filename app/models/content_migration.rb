@@ -32,6 +32,7 @@ class ContentMigration < ActiveRecord::Base
   has_one :job_progress, :class_name => 'Progress', :as => :context
   serialize :migration_settings
   cattr_accessor :export_file_path
+  after_save :handle_import_in_progress_notice
   DATE_FORMAT = "%m/%d/%Y"
 
   attr_accessible :context, :migration_settings, :user, :source_course, :copy_options, :migration_type, :initiated_source
@@ -676,5 +677,15 @@ class ContentMigration < ActiveRecord::Base
 
   def find_external_tool_translation(migration_id)
     @external_tool_translation_map && migration_id && @external_tool_translation_map[migration_id]
+  end
+
+  def handle_import_in_progress_notice
+    return unless context.is_a?(Course) && is_set?(migration_settings[:import_in_progress_notice])
+    if (new_record? || (workflow_state_changed? && workflow_state_was == 'created')) &&
+        %w(pre_processing pre_processed exporting importing).include?(workflow_state)
+      context.add_content_notice(:import_in_progress, 4.hours)
+    elsif workflow_state_changed? && %w(pre_process_error exported imported failed).include?(workflow_state)
+      context.remove_content_notice(:import_in_progress)
+    end
   end
 end

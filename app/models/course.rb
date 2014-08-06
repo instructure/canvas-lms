@@ -231,6 +231,15 @@ class Course < ActiveRecord::Base
 
   include FeatureFlags
 
+  include ContentNotices
+  define_content_notice :import_in_progress,
+    icon_class: 'icon-import-content',
+    alert_class: 'alert-info import-in-progress-notice',
+    template: 'courses/import_in_progress_notice',
+    should_show: ->(course, user) do
+      course.grants_right?(user, :manage_content)
+    end
+
   has_a_broadcast_policy
 
   def [](attr)

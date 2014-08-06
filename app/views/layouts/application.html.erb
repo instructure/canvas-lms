@@ -165,6 +165,7 @@
 	      <%= right_side %>
 	    </aside>
 	  </div>
+          <%= render :partial => 'shared/content_notices' if @context && @context.respond_to?(:content_notices) %>
           <div id="content" role="main" class="container-fluid">
             <%= yield %>
           </div>
