@@ -59,7 +59,7 @@ Delayed::Worker.lifecycle.around(:perform) do |worker, job, &block|
 end
 
 Delayed::Worker.lifecycle.around(:pop) do |worker, &block|
-  CanvasStatsd::Statsd.time(["delayedjob.pop", "delayedjob.pop.jobshard.#{Shard.current(:delayed_job).id}"]) do
+  CanvasStatsd::Statsd.time(["delayedjob.pop", "delayedjob.pop.jobshard.#{Shard.current(:delayed_jobs).id}"]) do
     block.call(worker)
   end
 end
