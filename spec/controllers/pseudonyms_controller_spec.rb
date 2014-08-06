@@ -360,7 +360,7 @@ describe PseudonymsController do
       # not logged in!
 
       post 'update', :format => 'json', :id => @pseudonym1.id, :user_id => @user1.id, :pseudonym => { :password => 'bobbob', :password_confirmation => 'bobbob' }
-      response.should be_success
+      response.should_not be_success
       @pseudonym1.reload
       @pseudonym1.valid_password?('qwerty1').should be_true
       @pseudonym1.valid_password?('bobob').should be_false

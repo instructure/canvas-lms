@@ -251,6 +251,13 @@ describe PseudonymsController, type: :request do
         json['sis_user_id'].should eql 'old-12345'
       end
 
+      it "should return 200 if changing only sis id" do
+        json = api_call(:put, @path, @path_options, {
+            :login => { :sis_user_id => 'old-12345' }
+        })
+        json['sis_user_id'].should eql 'old-12345'
+      end
+
       it "should not allow updating a deleted pseudonym" do
         to_delete = @student.pseudonyms.first
         @student.pseudonyms.create!(:unique_id => 'other@example.com')
