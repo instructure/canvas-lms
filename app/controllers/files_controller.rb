@@ -207,23 +207,23 @@ class FilesController < ApplicationController
   # @API List files
   # Returns the paginated list of files for the folder or course.
   #
-  # @argument content_types[] [Optional, String]
+  # @argument content_types[] [String]
   #   Filter results by content-type. You can specify type/subtype pairs (e.g.,
   #   'image/jpeg'), or simply types (e.g., 'image', which will match
   #   'image/gif', 'image/jpeg', etc.).
   #
-  # @argument search_term [Optional, String]
+  # @argument search_term [String]
   #   The partial name of the files to match and return.
   #
-  # @argument include[] [Optional, "user"]
+  # @argument include[] ["user"]
   #   Array of additional information to include.
   #
   #   "user":: the user who uploaded the file or last edited its content
   #
-  # @argument sort [Optional, String, "name"|"size"|"created_at"|"updated_at"|"content_type"|"user"]
+  # @argument sort [String, "name"|"size"|"created_at"|"updated_at"|"content_type"|"user"]
   #   Sort results by this field. Defaults to 'name'. Note that `sort=user` implies `include[]=user`.
   #
-  # @argument order [Optional, String, "asc"|"desc"]
+  # @argument order [String, "asc"|"desc"]
   #   The sorting order. Defaults to 'asc'.
   #
   # @example_request
@@ -412,7 +412,7 @@ class FilesController < ApplicationController
   # @API Get file
   # Returns the standard attachment json object
   #
-  # @argument include[] [Optional, "user"]
+  # @argument include[] ["user"]
   #   Array of additional information to include.
   #
   #   "user":: the user who uploaded the file or last edited its content

@@ -206,13 +206,13 @@ class FeatureFlagsController < ApplicationController
   # Set a feature flag for a given Account, Course, or User. This call will fail if a parent account sets
   # a feature flag for the same feature in any state other than "allowed".
   #
-  # @argument state [Optional, String, "off"|"allowed"|"on"]
+  # @argument state [String, "off"|"allowed"|"on"]
   #   "off":: The feature is not available for the course, user, or account and sub-accounts.
   #   "allowed":: (valid only on accounts) The feature is off in the account, but may be enabled in
   #               sub-accounts and courses by setting a feature flag on the sub-account or course.
   #   "on":: The feature is turned on unconditionally for the user, course, or account and sub-accounts.
   #
-  # @argument locking_account_id [Optional, Integer]
+  # @argument locking_account_id [Integer]
   #   If set, this FeatureFlag may only be modified by someone with administrative rights
   #   in the specified account. The locking account must be above the target object in the
   #   account chain.
