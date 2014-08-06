@@ -253,7 +253,7 @@ class EnrollmentsApiController < ApplicationController
   # @API Enrollment by ID
   # Get an Enrollment object by Enrollment ID
   #
-  # @argument id [Integer]
+  # @argument id [Required, Integer]
   #  The ID of the enrollment object
   # @returns Enrollment
 
@@ -267,36 +267,36 @@ class EnrollmentsApiController < ApplicationController
   # @API Enroll a user
   # Create a new user enrollment for a course or section.
   #
-  # @argument enrollment[user_id] [String]
+  # @argument enrollment[user_id] [Required, String]
   #   The ID of the user to be enrolled in the course.
   #
-  # @argument enrollment[type] [String, "StudentEnrollment"|"TeacherEnrollment"|"TaEnrollment"|"ObserverEnrollment"|"DesignerEnrollment"]
+  # @argument enrollment[type] [Required, String, "StudentEnrollment"|"TeacherEnrollment"|"TaEnrollment"|"ObserverEnrollment"|"DesignerEnrollment"]
   #   Enroll the user as a student, teacher, TA, observer, or designer. If no
   #   value is given, the type will be inferred by enrollment[role] if supplied,
   #   otherwise 'StudentEnrollment' will be used.
   #
-  # @argument enrollment[role] [Optional, String]
+  # @argument enrollment[role] [String]
   #   Assigns a custom course-level role to the user.
   #
-  # @argument enrollment[enrollment_state] [Optional, String, "active"|"invited"]
+  # @argument enrollment[enrollment_state] [String, "active"|"invited"]
   #   If set to 'active,' student will be immediately enrolled in the course.
   #   Otherwise they will be required to accept a course invitation. Default is
   #   'invited.'
   #
-  # @argument enrollment[course_section_id] [Optional, Integer]
+  # @argument enrollment[course_section_id] [Integer]
   #   The ID of the course section to enroll the student in. If the
   #   section-specific URL is used, this argument is redundant and will be
   #   ignored.
   #
-  # @argument enrollment[limit_privileges_to_course_section] [Optional, Boolean]
+  # @argument enrollment[limit_privileges_to_course_section] [Boolean]
   #   If a teacher or TA enrollment, teacher/TA will be restricted to the
   #   section given by course_section_id.
   #
-  # @argument enrollment[notify] [Optional, Boolean]
+  # @argument enrollment[notify] [Boolean]
   #   If true, a notification will be sent to the enrolled user.
   #   Notifications are not sent by default.
   #
-  # @argument enrollment[self_enrollment_code] [Optional, String]
+  # @argument enrollment[self_enrollment_code] [String]
   #   If the current user is not allowed to manage enrollments in this
   #   course, but the course allows self-enrollment, the user can self-
   #   enroll as a student in the default section by passing in a valid

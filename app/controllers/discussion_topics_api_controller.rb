@@ -141,7 +141,7 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # @argument message [String] The body of the entry.
   #
-  # @argument attachment [Optional] a multipart/form-data form-field-style
+  # @argument attachment a multipart/form-data form-field-style
   #   attachment. Attachments larger than 1 kilobyte are subject to quota
   #   restrictions.
   #
@@ -253,7 +253,7 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # @argument message [String] The body of the entry.
   #
-  # @argument attachment [Optional] a multipart/form-data form-field-style
+  # @argument attachment a multipart/form-data form-field-style
   #   attachment. Attachments larger than 1 kilobyte are subject to quota
   #   restrictions.
   #
@@ -406,7 +406,7 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # No request fields are necessary.
   #
-  # @argument forced_read_state [Optional, Boolean]
+  # @argument forced_read_state [Boolean]
   #   A boolean value to set all of the entries' forced_read_state. No change
   #   is made if this argument is not specified.
   # 
@@ -427,7 +427,7 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # No request fields are necessary.
   #
-  # @argument forced_read_state [Optional, Boolean]
+  # @argument forced_read_state [Boolean]
   #   A boolean value to set all of the entries' forced_read_state. No change is
   #   made if this argument is not specified.
   # 
@@ -447,7 +447,7 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # No request fields are necessary.
   #
-  # @argument forced_read_state [Optional, Boolean]
+  # @argument forced_read_state [Boolean]
   #   A boolean value to set the entry's forced_read_state. No change is made if
   #   this argument is not specified.
   #
@@ -468,7 +468,7 @@ class DiscussionTopicsApiController < ApplicationController
   #
   # No request fields are necessary.
   #
-  # @argument forced_read_state [Optional, Boolean]
+  # @argument forced_read_state [Boolean]
   #   A boolean value to set the entry's forced_read_state. No change is made if
   #   this argument is not specified.
   #
