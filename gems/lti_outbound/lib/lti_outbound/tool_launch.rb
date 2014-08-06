@@ -140,9 +140,30 @@ module LtiOutbound
 
       hash['custom_canvas_assignment_title'] = '$Canvas.assignment.title'
       hash['custom_canvas_assignment_points_possible'] = '$Canvas.assignment.pointsPossible'
+      hash['custom_canvas_assignment_unlock_at'] = '$Canvas.assignment.unlockAt'
+      hash['custom_canvas_assignment_due_at'] = '$Canvas.assignment.dueAt'
+      hash['custom_canvas_assignment_lock_at'] = '$Canvas.assignment.lockAt'
       @variable_substitutor.add_substitution('$Canvas.assignment.id', assignment.id)
       @variable_substitutor.add_substitution('$Canvas.assignment.title', assignment.title)
       @variable_substitutor.add_substitution('$Canvas.assignment.pointsPossible', assignment.points_possible)
+
+      if assignment.unlock_at
+        @variable_substitutor.add_substitution('$Canvas.assignment.unlockAt', assignment.unlock_at.iso8601)
+      else
+        @variable_substitutor.add_substitution('$Canvas.assignment.unlockAt', "")
+      end
+
+      if assignment.due_at
+        @variable_substitutor.add_substitution('$Canvas.assignment.dueAt', assignment.due_at.iso8601)
+      else
+        @variable_substitutor.add_substitution('$Canvas.assignment.dueAt', "")
+      end
+
+      if assignment.lock_at
+        @variable_substitutor.add_substitution('$Canvas.assignment.lockAt', assignment.lock_at.iso8601)
+      else
+        @variable_substitutor.add_substitution('$Canvas.assignment.lockAt', "")
+      end
     end
 
     def set_resource_type_keys
