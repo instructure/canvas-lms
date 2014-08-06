@@ -4746,6 +4746,7 @@ pt-BR:
           syllabus: Programa
       empty_body: "Sem conteúdo"
       headings: 
+        choose_home_page_title: "Escolher página inicial"
         confirm_unenroll: "Confirmar cancelamento de inscrição"
         importing: "Este curso está sendo importado"
         set_layout: "Definir o layout a página inicial"
@@ -4756,6 +4757,7 @@ pt-BR:
       license_notice: "O conteúdo deste curso é oferecido sob uma licença %{license_type}. O conteúdo deste curso pode ser considerado sob esta licença, a menos que esteja indicado de outra forma."
       links: 
         change_layout: "Alterar o layout da página inicial"
+        choose_home_page: "Escolher página inicial"
         course_setup: "Lista de verificação da configuração do curso"
         course_stream: "Exibir fluxo do curso"
         drop_course: "Desistir deste curso"
@@ -6071,6 +6073,7 @@ pt-BR:
       notifications_config_notice: "As notificações do Canvas podem ser enviadas automaticamente para sua conta no Facebook. Abaixo, você verá os tipos de notificação que podem ser enviadas. É possível alterar suas preferências de notificação a qualquer momento, seja aqui ou no Canvas."
       settings_title: "Configurações de notificação do Canvas"
       updating_preferences: "Atualizando preferências..."
+  faculty_success_tile: "Relatório de sucesso da faculdade"
   feature_flags: 
     feature_flag: 
       allow: Permitir
@@ -6088,6 +6091,7 @@ pt-BR:
       feature_options: "Opções de recurso"
       no_features_available: "Nenhum recurso está disponível no momento."
   features: 
+    better_file_browsing: "Melhor navegação de arquivo"
     differentiated_assignments: "Tarefas diferenciadas"
     draft_state: "Estado de rascunho"
     draft_state_account_disable_warning: |-
@@ -6099,8 +6103,11 @@ pt-BR:
     google_docs_domain_restriction: "Restrição de domínio do Google Docs"
     high_contrast: "Usar estilos de alto contraste"
     learning_mastery_gradebook: "Livro de Notas de Domínio do Aprendizado"
+    new_quiz_statistics: "Página de novas estatísticas do teste"
     new_styles: "Use novos estilos"
     post_grades: "Postar notas no SIS"
+    student_groups: "Página de novos grupos de alunos"
+    student_outcome_gradebook: "Livro de notas de domínio da aprendizagem do aluno"
   file_browser_view: 
     folder_tree_instructions: "Utilize as setas para cima e para baixo para navegar pela árvore. Pressione para direita para expandir as pastas, esquerda para recolher, e entre para escolher uma imagem."
   filebrowserview: 
