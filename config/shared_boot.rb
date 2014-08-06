@@ -73,6 +73,11 @@ else
     app.config.middleware.insert_before(config.session_store, 'LoadAccount')
     app.config.middleware.insert_before(config.session_store, 'SessionsTimeout')
   end
+
+  # prevent directory->module inference in these directories from wreaking
+  # havoc on the app (e.g. stylesheets/base -> ::Base)
+  config.eager_load_paths -= %W(#{Rails.root}/app/coffeescripts
+                                #{Rails.root}/app/stylesheets)
 end
 
 params_parser = CANVAS_RAILS2 ? 'ActionController::ParamsParser' : 'ActionDispatch::ParamsParser'
