@@ -94,6 +94,21 @@ describe EportfoliosController do
       response.should be_success
       assigns[:portfolio].should_not be_nil
     end
+
+    it "should create a category if one doesn't exist" do
+      user_session(@user)
+      get 'show', :id => @portfolio.id
+      response.should be_success
+      assigns[:category].should_not be_nil
+    end
+
+    it "should create an entry in the first category if one doesn't exist" do
+      @portfolio.eportfolio_categories.create!(:name => "Home")
+      user_session(@user)
+      get 'show', :id => @portfolio.id
+      response.should be_success
+      assigns[:page].should_not be_nil
+    end
   end
   
   describe "PUT 'update'" do
