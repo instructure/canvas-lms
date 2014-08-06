@@ -230,7 +230,8 @@
                         <span class="icon"><%= image_tag "webcam.png", :alt => t('icons.media_comment', 'Media Comment') %></span>
                       </a>
                     </li>
-                    <li style="display:none">
+                  <% end %>
+                  <li style="display:none">
                       <a class="speech_recognition_link tooltip" href="#">
                         <span class="tooltip_wrap">
                           <span class="tooltip_text"><%= t('tooltips.speech_recognition', "Speech Recognition") %></span>
@@ -238,7 +239,6 @@
                         <span class="icon"><%= image_tag "microphone_pencil.png", :alt => t('icons.speech_recognition', 'Speech Recognition') %></span>
                       </a>
                     </li>
-                  <% end %>
                   <li style="clear:both;"></li>
                 </ul>
                 <div style="clear:both;"></div>
