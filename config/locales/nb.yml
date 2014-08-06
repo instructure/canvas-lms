@@ -2294,8 +2294,8 @@ nb:
     show_all_artifacts: "Vis alle artifakter"
     submit: "Send inn"
     unmasquerade: "Stopp forkledning"
-    unpublish: Depubliser
-    unpublished: "Ikke publisert"
+    unpublish: Avpubliser
+    unpublished: Upublisert
     update: Oppdater
     view_account_roster: "Se kontodeltagere"
     view_course_roster: "Se kursets deltagere"
@@ -4474,6 +4474,7 @@ nb:
       create_failed: "Etablering av kurset feilet"
       role_not_active: "Kan ikke legge til brukere for ikke-aktiv rolle: '%{role}'"
       role_not_found: "Ingen rolle ved navn '%{role}' finnes."
+      unpublish: "Kurset kan ikke bli upublisert hvis student innleveringer eksistere."
     group_list: 
       headings: 
         groups: Kursgrupper
@@ -4536,6 +4537,8 @@ nb:
         close: Ferdig
         duplicates_removed: "Noen duplikater ble fjernet."
         email: Epost
+        email_field_label: "Skriv inn epostadresser til brukerne som du ønsker å legge til, atskilt med komma"
+        email_field_place_holder: "\"Eksempel Student\" &lt;student@example.com&gt;, \"Etternavn, Fornavn\" &lt;firstlast@example.com&gt;, justAnEmailAddress@example.com"
         example_formats: "Eksempler: user@example.com, \"Fornavn Etternavn\" &lt; user@example.com&gt;, \"Etternavn, Fornavn\" &lt; user@example.com&gt;"
         form_instructions: "Skriv inn eller lim inn en liste over epostadresser nedenfor:"
         go_back: "Start på nytt"
@@ -4653,6 +4656,8 @@ nb:
         course_lock_all_announcements: "Slå av kommentarer på kunngjøringer"
         course_name: Navn
         course_section_name: "Legg til en ny klasse"
+        course_status_published: "Kurset er publisert"
+        course_status_unpublished: "Kurset er ikke publisert"
         course_visibility: Synlighet
         enrollment_term_id: Semester
         grading_scheme: Karaktersettingsplan
@@ -4708,6 +4713,8 @@ nb:
         tools: Apper
       titles: 
         edit_navigation: "Rediger kursnavigasjon"
+      tooltips: 
+        cannot_unpublish_course: "Du kan ikke avpublisere dette kurset hvis det er gradert studentinnleveringer"
       transifex_message: "Hjelp til med [oversettingen av Canvas](%{transifex_url})"
       turnitin: "disse kommentarene vises til studenter når de leverer oppgaver via Turnitin-tjenesten"
       view_grading_scheme: "se karaktersettingsplan"
@@ -5207,11 +5214,13 @@ nb:
       saving: "Lagrer nøkkel …"
       saving_failed: "Lagring av nøkkel mislyktes"
     index: 
+      add_developer_key: "Legge til Utvikler Nøkkel"
       details: Detaljer
       developer_keys: Utviklernøkler
       key_settings: Nøkkelinnstillinger
       name: Navn
       show_all: "Vis alle %{count} nøkler"
+      stats: Statistikker
       title: Utviklernøkler
       user: Bruker
     messages: 
@@ -5913,6 +5922,7 @@ nb:
       less_than: "må være mindre enn %{count}"
       less_than_or_equal_to: "må være mindre enn eller lik %{count}"
       not_a_number: "er ikke et nummer"
+      not_an_integer: "må bli et heltall"
       odd: "må være oddetall"
       too_long: "er for lang (maksimum er %{count} tegn)"
       too_short: "er for kort (minimum er %{count} tegn)"
@@ -5943,12 +5953,14 @@ nb:
         adding_feed: "Legger til strøm…"
       descriptions: 
         add_new_feed: "Du kan automatisk legge til poster fra en RSS- eller Atom-strøm som kunngjøringer i dette kurset. Bare lim inn stømmings-URL-en nedenfor, så vil nye oppslagg legges til."
+      feed_url_label: "Feed URL"
       keyword: "Søkeord:"
       labels: 
         match_phrase_checkbox: "Kun poster med en spesifikk frase i tittelen"
       links: 
         add_external_feed: "Legg til ekstern informasjonsstrøm"
       options: 
+        content_to_post: "Innlegg Innhold"
         full_article: "Hele artikkelen"
         link_only: "Kun lenke"
         truncated: Avkortet
@@ -5975,6 +5987,7 @@ nb:
     consumer_key: Forbrukernøkkel
     course_home_sub_navigation_configured: "Navigasjon for kursets hjemmeside er konfigurert"
     course_navigation_configured: "Kursnavigering konfigurert"
+    course_settings_sub_navigation_configured: "Kurset innstillinger  sub navigasjon konfigurert"
     delete: Slett
     dialog_title_add_app: "Legg til app"
     dialog_title_edit_tool: "Rediger eksternt verktøy"
@@ -5984,6 +5997,7 @@ nb:
       by_url: "Etter URL"
       by_xml: "Lim inn XML"
       config_url: Konfigurasjons-URL
+      configuration_type: Konfigurasjonstype
       consumer_key: "Consumer Key"
       custom_feilds_explanation: "Én per linje. Format: navn=verdi"
       custom_fields: "Egendefinerte felt"
@@ -6131,6 +6145,7 @@ nb:
     google_docs_domain_restriction: "Domenebegrensning for Google Docs"
     high_contrast: "Bruk stiler med høy kontrast"
     html5_first_videos: "Foretrekk HTML5 for videoavspilling"
+    k12: "K-12 spesifikk funksjoner"
     learning_mastery_gradebook: "Karakterbok for mestringsbasert læring"
     new_quiz_moderate: "Ny side for prøvemoderering"
     new_quiz_statistics: "Ny statistikkside for prøver"
@@ -6388,7 +6403,7 @@ nb:
     new_assessment: "[Ny vurdering]"
     no_submission_time: "intet tidspunkt for innlevering"
     not_graded: "ikke rettet"
-    not_submitted: "ikke levert inn"
+    not_submitted: "ikke levert"
     nth_student: "Student %{n}"
     portion_graded: "%{x} / %{y} karaktersatt"
     show_all_details_button: "Vis alle detaljer"
@@ -7284,6 +7299,9 @@ nb:
     which_course_is_this_question_about: "Hvilket kurs gjelder spørsmålet?"
     your_email_address: "Din epostadresse"
   helpers: 
+    button: 
+      create: "Opprett %{model}"
+      update: "Oppdater %{model}"
     course: Kurs
     dashboard_helper: 
       announcement_details: Kunngjøringsdetaljer
@@ -7306,6 +7324,10 @@ nb:
     local: Lokal
     select: 
       prompt: "Vennligst velg"
+    submit: 
+      create: "Opprett %{model}"
+      submit: "Lagre %{model}"
+      update: "Oppdater %{model}"
   high_contrast_description: |-
       Hvis du foretrekker en versjon av Canvas brukergrensesnitt med høyere kontrast, aktiver denne.
       Dette kan være nyttig for personer med nedsatt syn eller vansker med å lese.
@@ -7649,6 +7671,8 @@ nb:
       new_tab: "Dette verktøyet må lastes i et nytt nettleservindu"
       new_tab_expired: "Sesjonen for dette verktøyet er utløpt. Last siden på nytt for å få tilgang til verktøyet igjen."
       new_tab_loaded: "Dette verktøyet ble suksessfullt lastet i et nytt nettleservindu. Last siden på nytt for å få tilgang til verktøyet igjen."
+  lti2: 
+    register_tool: "Registrere verktøy"
   m2c_file_description: "Moodle 1.9/2.x"
   m2c_name: Moodle-importør
   manage_avatars: 
@@ -8444,6 +8468,7 @@ nb:
         subject: "Kurseksport feilet: %{course}"
     content_export_finished: 
       email: 
+        body: "Innholdet ditt for eksport \"%{course}\" er ferdig."
         html: 
           body2: "Eksport av *%{course}* er fullført."
           link: "Klikk for å se eksporter"
@@ -9899,6 +9924,7 @@ nb:
         
         Påmelding for studentavtale
     student_appointment_display: "Påmeldinger til studentavtaler"
+    submission_comment_description: "Overdragelse innlevering kommentar"
     submission_comment_display: Innleveringskommentar
   notification_preferences: 
     communication: 
@@ -9948,6 +9974,12 @@ nb:
     human: 
       decimal_units: 
         format: "%n %u"
+        units: 
+          billion: Milliard
+          million: Millioner
+          quadrillion: Kvadrillion
+          thousand: Tusen
+          trillion: Trillioner
       storage_units: 
         format: "%n %u"
         units: 
@@ -9959,8 +9991,12 @@ nb:
           mb: MB
           tb: TB
   observees: 
+    add_observee_button: "Legg til Student"
+    being_observed: "Studenter blir observert"
     new_observee_password: Passord
     new_observee_username: Brukernavn
+    observee_added: "Observere nå %{user}"
+    observing: Observere
   options: 
     ? "no"
     : Nei
@@ -10562,6 +10598,7 @@ nb:
       unregister_service: "Er du sikker på at du vil fjerne denne tjenesten?"
     crumb: "%{user}s innstillinger"
     crumbs: 
+      observees: Observere
       settings_frd: "%{user}s innstillinger"
     done_resending: "Gjort. Levering av beskjeden kan ta noen minutter."
     email_select: 
@@ -10586,6 +10623,8 @@ nb:
       contact_confirmed: "Kontakt bekreftet."
       mfa_disabled: "Flerfaktors autentisering slått av"
       updated_profile: "Innstillingene ble oppdatert"
+    observees: 
+      page_title: "Studenter blir observert"
     please_select_an_option: "Vennligst gjør et valg"
     profile: 
       access_token_description: "Tilgangssymboler kan brukes til å la andre applikasjoner gjøre API-kall på dine vegne. Du kan også generere tilgangssymboler og *bruke Canvas Open API* til å lage dine egne integrasjoner."
@@ -11044,6 +11083,7 @@ nb:
       payment_info: Betalingsinformasjon
   qti_display: QTI
   qti_file_description: QTI-zip-fil
+  qti_img_matching_question: "Importert matchende spørsmål inneholder bilder på begge sider, som støttes ikke"
   qti_name: QTI-konvertør
   qualified_locale: en-US
   question_answered: Besvart
@@ -11190,6 +11230,7 @@ nb:
   quiz_extend_time: 
     ending_time: sluttidspunkt
     extend_time: "Forleng tiden"
+    extensions_student: "Utvid tiden for %{student}"
     extensions_successfully_added: "Utvidelser er lagt til"
     now: nå
   quiz_extensions: 
@@ -13735,6 +13776,7 @@ nb:
     grades: Karakterer
     home: Hjem
     modules: Moduler
+    observees: Observere
     outcomes: Læringsmål
     pages: Sider
     people: Personer
