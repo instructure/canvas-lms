@@ -21,7 +21,7 @@ module Delayed
         self.table_name = :delayed_jobs
 
         def self.reconnect!
-          connection.reconnect!
+          clear_all_connections!
         end
 
         class << self
