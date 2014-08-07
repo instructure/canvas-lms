@@ -113,8 +113,12 @@ class ExternalToolsController < ApplicationController
 
       @lti_launch = Lti::Launch.new
 
-      adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @context)
-      adapter.prepare_tool_launch(url_for(@context), resource_type: @resource_type, launch_url: params[:url])
+      opts = {
+          resource_type: @resource_type,
+          launch_url: params[:url],
+          custom_substitutions: common_variable_substitutions
+      }
+      adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @context).prepare_tool_launch(url_for(@context), opts)
       @lti_launch.params = adapter.generate_post_payload
 
       @lti_launch.resource_url = params[:url]
@@ -208,8 +212,12 @@ class ExternalToolsController < ApplicationController
       end
 
       # generate the launch
-      adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @context)
-      adapter.prepare_tool_launch(url_for(@context), resource_type: params[:launch_type], launch_url: launch_url)
+      opts = {
+          launch_url: launch_url,
+          resource_type: params[:launch_type],
+          custom_substitution: common_variable_substitutions
+      }
+      adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @context).prepare_tool_launch(url_for(@context), opts)
 
       launch_settings = {
         'launch_url' => adapter.launch_url,
@@ -352,8 +360,12 @@ class ExternalToolsController < ApplicationController
     @resource_title = tool.label_for(selection_type.to_sym)
     @return_url ||= url_for(@context)
 
-    adapter = Lti::LtiOutboundAdapter.new(tool, @current_user, @context)
-    adapter.prepare_tool_launch(@return_url, resource_type: selection_type, selected_html: params[:selection])
+    opts = {
+        resource_type: selection_type,
+        selected_html: params[:selection],
+        custom_substitutions: common_variable_substitutions
+    }
+    adapter = Lti::LtiOutboundAdapter.new(tool, @current_user, @context).prepare_tool_launch(@return_url, opts)
     if selection_type == 'homework_submission'
       @assignment = @context.assignments.active.find(params[:assignment_id])
       @tool_settings = adapter.generate_post_payload_for_homework_submission(@assignment)

@@ -50,7 +50,6 @@ module Lti
       #Consumer Instance
       variable_substitutor.add_substitution('$Canvas.root_account.id', lti_context.consumer_instance.id)
       variable_substitutor.add_substitution('$Canvas.root_account.sisSourceId', lti_context.consumer_instance.sis_source_id)
-      variable_substitutor.add_substitution('$Canvas.api.domain', lti_context.consumer_instance.domain)
       #Course
       if lti_context.is_a? LtiOutbound::LTICourse
         variable_substitutor.add_substitution('$Canvas.course.id', lti_context.id)

@@ -85,7 +85,7 @@ describe "LTI integration tests" do
     Time.zone.tzinfo.stubs(:name).returns('my/zone')
 
     adapter = Lti::LtiOutboundAdapter.new(canvas_tool, canvas_user, canvas_course)
-    adapter.prepare_tool_launch(return_url)
+    adapter.prepare_tool_launch(return_url, custom_substitutions: {'$Canvas.api.domain' => root_account.domain})
     post_payload = adapter.generate_post_payload
 
     expected_tool_settings = {
@@ -168,7 +168,7 @@ describe "LTI integration tests" do
       hash['custom_canvas_user_id'].should == @user.id.to_s
       hash['custom_canvas_user_login_id'].should == @user.pseudonyms.first.unique_id
       hash['custom_canvas_course_id'].should == @course.id.to_s
-      hash['custom_canvas_api_domain'].should == @course.root_account.domain
+      hash['custom_canvas_api_domain'].should == '$Canvas.api.domain'
       hash['lis_course_offering_sourcedid'].should == 'coursesis'
       hash['lis_person_contact_email_primary'].should == 'nobody@example.com'
       hash['lis_person_name_full'].should == 'A Name'

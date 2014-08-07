@@ -32,6 +32,7 @@ class ApplicationController < ActionController::Base
   include LocaleSelection
   include Api::V1::User
   include Api::V1::WikiPage
+  include Lti::MessageHelper
   around_filter :set_locale
 
   helper :all
@@ -1145,7 +1146,13 @@ class ApplicationController < ActionController::Base
         @return_url = named_context_url(@context, :context_external_tool_finished_url, @tool.id, :include_host => true)
         @opaque_id = @tool.opaque_identifier_for(@tag)
 
-        adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @context).prepare_tool_launch(@return_url, launch_url: @resource_url, link_code: @opaque_id, overrides: {'resource_link_title' => @resource_title})
+        opts = {
+            launch_url: @resource_url,
+            link_code: @opaque_id,
+            overrides: {'resource_link_title' => @resource_title},
+            custom_substitutions: common_variable_substitutions
+        }
+        adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @context).prepare_tool_launch(@return_url, opts)
         if @assignment
           @tool_settings = adapter.generate_post_payload_for_assignment(@assignment, lti_grade_passback_api_url(@tool), blti_legacy_grade_passback_api_url(@tool))
         else

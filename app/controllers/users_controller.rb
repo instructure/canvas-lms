@@ -909,8 +909,12 @@ class UsersController < ApplicationController
     @resource_type = 'user_navigation'
     @return_url = user_profile_url(@current_user, :include_host => true)
 
-    adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @domain_root_account)
-    adapter.prepare_tool_launch(@return_url, resource_type: @resource_type, link_code: @opaque_id)
+    opts = {
+        resource_type: @resource_type,
+        link_code: @opaque_id,
+        custom_substitutions: common_variable_substitutions
+    }
+    adapter = Lti::LtiOutboundAdapter.new(@tool, @current_user, @domain_root_account).prepare_tool_launch(@return_url, opts)
     @tool_settings = adapter.generate_post_payload
 
     @active_tab = @tool.asset_string
