@@ -229,7 +229,7 @@ describe "assignments" do
       f('.add_assignment_link').click
       expect_new_page_load { f('.more_options_link').click }
       wait_for_ajaximations
-      f('#assignment_has_group_category').click
+      f('#has_group_category').click
       wait_for_ajaximations
       click_option('#assignment_group_category_id', 'new', :value)
       fj('.ui-dialog:visible .self_signup_help_link img').click
@@ -246,7 +246,7 @@ describe "assignments" do
       })
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
-      f('#assignment_has_group_category').click
+      f('#has_group_category').click
       close_visible_dialog
       f('.btn-primary[type=submit]').click
       wait_for_ajaximations

@@ -1141,7 +1141,7 @@ describe "discussions" do
           get url
           wait_for_ajaximations
 
-          f("#assignment_has_group_category").click
+          f("#has_group_category").click
           click_option("#assignment_group_category_id", group_cat.name)
 
           expect_new_page_load { f('.form-actions button[type=submit]').click }
@@ -1377,7 +1377,7 @@ describe "discussions" do
           wait_for_ajaximations
 
           f('input[type=checkbox][name="assignment[set_assignment]"]').click
-          f('#assignment_has_group_category').click
+          f('#has_group_category').click
           close_visible_dialog
           f('.btn-primary[type=submit]').click
           wait_for_ajaximations
