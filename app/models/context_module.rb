@@ -286,8 +286,9 @@ class ContextModule < ActiveRecord::Base
     completion_requirements.select { |cr| valid_ids.include? cr[:id]  }
   end
 
-  def content_tags_visible_to(user)
-    if self.content_tags.loaded?
+  def content_tags_visible_to(user, opts={})
+    opts[:tags_loaded] = self.content_tags.loaded?
+    tags = if opts[:tags_loaded]
       if self.grants_right?(user, :update)
         self.content_tags.select{|tag| tag.workflow_state != 'deleted'}
       else
@@ -300,6 +301,47 @@ class ContextModule < ActiveRecord::Base
         self.content_tags.active
       end
     end
+
+    if !self.grants_right?(user, :update) && self.context.feature_enabled?(:differentiated_assignments) && user
+      tags = filter_tags_for_da(tags, user, opts)
+    end
+
+    tags
+  end
+
+  def filter_tags_for_da(tags, user, opts={})
+
+    scope_filter = Proc.new{|tags, user_ids, course_id, opts|
+      tags.visible_to_students_with_da_enabled(user_ids)
+    }
+
+    array_filter = Proc.new{|tags, user_ids, course_id, opts|
+      visible_assignments = opts[:assignment_visibilities] || AssignmentStudentVisibility.visible_assignment_ids_for_user(user_ids, course_id)
+      visible_discussions = opts[:discussion_visibilities] || DiscussionTopic.where(context_id: course_id).visible_to_students_with_da_enabled(user_ids).pluck(:id)
+      # TODO: uncomment once quiz visibilities sql view makes it into master
+      # visible_quizzes = opts[:quiz_visibilities] || QuizStudentVisibility.visible_assignment_ids_for_user(user_ids, course_id)
+      tags.select{|tag|
+        case tag.content_type;
+        when 'Assignment'; visible_assignments.include?(tag.content_id);
+        when 'DiscussionTopic'; visible_discussions.include?(tag.content_id);
+        # when 'Quizzes::Quiz'; visible_quizzes.include?(tag.content_id);
+        else; true; end
+      }
+    }
+
+    filter = opts[:tags_loaded] ? array_filter : scope_filter
+
+    student_ids = [user.id]
+    if self.context.user_has_been_observer?(user)
+      observed_student_ids = opts[:observed_student_ids] || ObserverEnrollment.observed_student_ids(self.context, user)
+      student_ids.concat(observed_student_ids)
+      # if no observed_students, allow observer to see all content_tags
+      tags = filter.call(tags, student_ids, self.context_id, opts) if observed_student_ids.any?
+    else
+      tags = filter.call(tags, student_ids, self.context_id, opts)
+    end
+
+    tags
   end
 
   def add_item(params, added_item=nil, opts={})
@@ -460,19 +502,6 @@ class ContextModule < ActiveRecord::Base
     prereq_ids = self.prerequisites.select{|pre|pre[:type] == 'context_module'}.map{|pre| pre[:id] }
     active_ids = self.context.context_modules.active.where(:id => prereq_ids).pluck(:id)
     self.prerequisites.select{|pre| pre[:type] == 'context_module' && active_ids.member?(pre[:id])}
-  end
-
-  def reload
-    clear_cached_lookups
-    super
-  end
-
-  def clear_cached_lookups
-    @cached_active_tags = nil
-  end
-
-  def cached_active_tags
-    @cached_active_tags ||= self.content_tags.active
   end
 
   def confirm_valid_requirements(do_save=false)

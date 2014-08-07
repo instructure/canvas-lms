@@ -225,7 +225,11 @@ TEXT
     class="ig-list <%= 'editable' if can_do(@context, @current_user, :manage_content) %>"
   >
     <% editable = can_do(@context, @current_user, :manage_content) %>
-    <% cache_key = [@context.cache_key, editable, 'all_context_modules_draft_6', collection_cache_key(@modules), Time.zone].join('/') %>
+    <% differentiated_assignments_on = @context.feature_enabled?(:differentiated_assignments) %>
+    <% visible_assignments = differentiated_assignments_on ? @current_user.assignments_visibile_in_course(@context).pluck(:id) : [] %>
+    <% cache_key_items = [@context.cache_key, editable, 'all_context_modules_draft_6', collection_cache_key(@modules), Time.zone]%>
+    <% cache_key_items << visible_assignments if differentiated_assignments_on %>
+    <% cache_key = cache_key_items.join('/') %>
     <% cache_key = add_menu_tools_to_cache_key(cache_key) %>
     <% cache(cache_key) do %>
       <% ContextModule.send(:preload_associations, @modules, :content_tags => :content) %>

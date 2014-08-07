@@ -18,8 +18,26 @@
 
 class StudentEnrollment < Enrollment
   belongs_to :student, :foreign_key => :user_id, :class_name => 'User'
+  after_save :evaluate_modules, if: Proc.new{ |e|
+    # if enrollment switches sections or is created
+    e.course_section_id_changed? || e.course_id_changed? ||
+    # or if an enrollment is deleted and they are in another section of the course
+    (e.workflow_state_changed? && e.workflow_state == 'deleted' &&
+     e.user.enrollments.where('id != ?',e.id).active.where(course_id: e.course_id).exists?)
+  }
 
   def student?
     true
+  end
+
+  def evaluate_modules
+    if self.course.feature_enabled?(:differentiated_assignments)
+      ContextModuleProgression.for_user(self.user_id).
+        joins(:context_module).
+        where(:context_modules => { :context_type => 'Course', :context_id => self.course_id}).
+        each do |prog|
+          prog.mark_as_outdated!
+        end
+    end
   end
 end

@@ -64,7 +64,7 @@ class ContextModulesController < ApplicationController
   def module_redirect
     if authorized_action(@context, @current_user, :read)
       @module = @context.context_modules.not_deleted.find(params[:context_module_id])
-      @tags = @module.content_tags.active
+      @tags = @module.content_tags_visible_to(@current_user)
       if params[:last]
         @tags.pop while @tags.last && @tags.last.content_type == 'ContextModuleSubHeader'
       else
@@ -117,11 +117,11 @@ class ContextModulesController < ApplicationController
       end
     end
   end
-  
+
   def reorder
     if authorized_action(@context.context_modules.scoped.new, @current_user, :update)
       m = @context.context_modules.not_deleted.first
-      
+
       m.update_order(params[:order].split(","))
       # Need to invalidate the ordering cache used by context_module.rb
       @context.touch
@@ -132,7 +132,7 @@ class ContextModulesController < ApplicationController
       @modules = @context.context_modules.not_deleted
       @modules.each{|m| m.save_without_touching_context }
       @context.touch
-      
+
       # # Background this, not essential that it happen right away
       # ContextModule.send_later(:update_tag_order, @context)
       respond_to do |format|
@@ -140,11 +140,11 @@ class ContextModulesController < ApplicationController
       end
     end
   end
-  
+
   def content_tag_assignment_data
     if authorized_action(@context, @current_user, :read)
       info = {}
-      @context.context_module_tags.not_deleted.each do |tag|
+      @context.module_items_visible_to(@current_user).each do |tag|
         info[tag.id] = Rails.cache.fetch([tag, @current_user, "content_tag_assignment_info"].cache_key) do
           if tag.assignment
             tag.assignment.context_module_tag_info(@current_user)
@@ -158,7 +158,7 @@ class ContextModulesController < ApplicationController
   end
 
   def prerequisites_needing_finishing_for(mod, progression, before_tag=nil)
-    tags = mod.content_tags.active
+    tags = mod.content_tags_visible_to(@current_user)
     pres = []
     tags.each do |tag|
       if req = (mod.completion_requirements || []).detect{|r| r[:id] == tag.id }
@@ -251,7 +251,7 @@ class ContextModulesController < ApplicationController
       @progression.save
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_context_modules_url) }
-        format.json { render :json => (@progression.collapsed ? @progression : @module.content_tags.active) }
+        format.json { render :json => (@progression.collapsed ? @progression : @module.content_tags_visible_to(@current_user) )}
       end
     end
   end
@@ -433,5 +433,4 @@ class ContextModulesController < ApplicationController
       end
     end
   end
-
 end

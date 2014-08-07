@@ -46,7 +46,7 @@ class CourseProgress
 
   def current_content_tag
     return unless in_progress?
-    current_module.content_tags.active.where(:position => current_position).first
+    current_module.content_tags_visible_to(user).where(:position => current_position).first
   end
 
   def requirements

@@ -134,7 +134,7 @@ class ContextModuleProgression < ActiveRecord::Base
     calc = CompletedRequirementCalculator.new(self.requirements_met || [])
     completion_requirements.each do |req|
       # create the hash inside the loop in case the completion_requirements is empty (performance)
-      tags_hash ||= context_module.cached_active_tags.index_by(&:id)
+      tags_hash ||= context_module.content_tags_visible_to(self.user).index_by(&:id)
 
       tag = tags_hash[req[:id]]
       next unless tag
@@ -264,7 +264,7 @@ class ContextModuleProgression < ActiveRecord::Base
     completion_requirements = context_module.completion_requirements || []
     requirements_met = self.requirements_met || []
 
-    context_module.cached_active_tags.each do |tag|
+    context_module.content_tags_visible_to(self.user).each do |tag|
       self.current_position = tag.position if tag.position
       all_met = completion_requirements.select{|r| r[:id] == tag.id }.all? do |req|
         requirements_met.any?{|r| r[:id] == req[:id] && r[:type] == req[:type] }

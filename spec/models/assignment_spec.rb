@@ -249,7 +249,7 @@ describe Assignment do
       end
 
       context "draft state on" do
-        before(:once) {@course.enable_feature!(:draft_state)}
+        before {@course.enable_feature!(:draft_state)}
         context "differentiated_assignment on" do
           before {@course.enable_feature!(:differentiated_assignments)}
           it "should return assignments only when a student has overrides" do
@@ -338,7 +338,7 @@ describe Assignment do
       end
 
       context "differentiated_assignment off" do
-        before(:once) { @course.disable_feature!(:differentiated_assignments) }
+        before{ @course.disable_feature!(:differentiated_assignments) }
         context "observing only a section with visibility" do
           before do
             @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section, :enrollment_state => 'active')

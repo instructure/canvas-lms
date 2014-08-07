@@ -1,9 +1,10 @@
 <%
   editable ||= can_do(@context, @current_user, :manage_content)
   workflow_state = context_module && context_module.workflow_state
+  differentiated_assignments_on = @context.feature_enabled?(:differentiated_assignments)
   @modules ||= []
 %>
-<% cache_if_module(context_module, editable, false) do %>
+<% cache_if_module(context_module, editable, false, differentiated_assignments_on, @current_user) do %>
 
   <div class="context_module bordered <%= 'unpublished_module' if workflow_state == "unpublished" %> <%= 'editable_context_module' if editable %>" tabindex="0" aria-label="<%= context_module ? context_module.name : "" %>" data-workflow-state="<%= context_module ? context_module.workflow_state : "{{ workflow_state }}"%>" data-module-url="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>" data-module-id="<%= context_module ? context_module.id : "{{ id }}" %>" id="context_module_<%= context_module ? context_module.id : "blank" %>" style="<%= hidden unless context_module %>">
   <a name="module_<%= context_module.id if context_module %>"></a>
@@ -73,8 +74,7 @@
     <div class="items context_module_items <%= 'manageable' if editable %>" style="min-height: 10px;">
       <% if context_module %>
         <%
-          tags = context_module.content_tags
-          tags = can_do(@context, @current_user, :manage_content) ? tags.not_deleted : tags.active
+          tags = context_module.content_tags_visible_to(@current_user)
           tags.each do |tag|
         %>
           <%= render :partial => 'context_modules/module_item', :object => tag, :locals => {:completion_criteria => context_module.completion_requirements, :editable => editable} %>

@@ -177,6 +177,32 @@ describe "context_modules" do
       driver.current_url.should match %r{/courses/#{@course.id}/quizzes/#{@quiz_1.id}}
     end
 
+    it "should validate that a students cannot see unassigned differentiated assignments" do
+      @assignment_2.only_visible_to_overrides = true
+      @assignment_2.save!
+
+      @course.enable_feature!(:differentiated_assignments)
+      @student.enrollments.each(&:destroy)
+      @overriden_section = @course.course_sections.create!(name: "test section")
+      student_in_section(@overriden_section, user: @student)
+
+      go_to_modules
+
+      context_modules = ff('.context_module')
+      context_modules[0].find_element(:css, '.context_module_items').should_not include_text(@assignment_2.name)
+      context_modules[1].find_element(:css, '.context_module_items').should_not include_text(@assignment_2.name)
+
+      # Should not redirect to the hidden assignment
+      get "/courses/#{@course.id}/modules/#{@module_2.id}/items/first"
+      driver.current_url.should_not match %r{/courses/#{@course.id}/assignments/#{@assignment_2.id}}
+
+      create_section_override_for_assignment(@assignment_2, {course_section: @overriden_section})
+
+      # Should redirect to the now visible assignment
+      get "/courses/#{@course.id}/modules/#{@module_2.id}/items/first"
+      driver.current_url.should match %r{/courses/#{@course.id}/assignments/#{@assignment_2.id}}
+    end
+
     it "should allow a student view student to progress through module content" do
       course_with_teacher_logged_in(:course => @course, :active_all => true)
       @fake_student = @course.student_view_student

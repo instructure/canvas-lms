@@ -38,6 +38,8 @@ module FeatureFlags
     flag = self.feature_flags.where(feature: feature).first
     flag ||= self.feature_flags.build(feature: feature)
     flag.state = state
+    @feature_flag_cache ||= {}
+    @feature_flag_cache[feature] = flag
     flag.save!
   end
 

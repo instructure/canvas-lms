@@ -914,6 +914,62 @@ describe "Module Items API", type: :request do
       json.map{|item| item['id']}.sort.should == @module2.content_tags.map(&:id).sort
     end
 
+    context 'differentiated_assignments' do
+      before do
+        @new_section = @course.course_sections.create!(name: "test section")
+        @student.enrollments.each(&:destroy!)
+        student_in_section(@new_section, user: @student)
+        @assignment.only_visible_to_overrides = true
+        @assignment.save!
+      end
+
+      context 'enabled' do
+        before {@course.enable_feature!(:differentiated_assignments)}
+        context 'with override' do
+          before{create_section_override_for_assignment(@assignment, {course_section: @new_section})}
+          it "should list all assignments" do
+            json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
+                                  :controller => "context_module_items_api", :action => "index", :format => "json",
+                                  :course_id => "#{@course.id}", :module_id => "#{@module1.id}")
+
+            json.map{|item| item['id']}.sort.should == @module1.content_tags.map(&:id).sort
+          end
+        end
+        context 'without override' do
+          it "should exclude unassigned assignments" do
+            json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
+                                  :controller => "context_module_items_api", :action => "index", :format => "json",
+                                  :course_id => "#{@course.id}", :module_id => "#{@module1.id}")
+
+            json.map{|item| item['id']}.sort.should_not == @module1.content_tags.map(&:id).sort
+          end
+        end
+      end
+      context 'disabled' do
+        before {@course.disable_feature!(:differentiated_assignments)}
+        context 'with override' do
+          before{create_section_override_for_assignment(@assignment, {course_section: @new_section})}
+          it "should list all assignments" do
+            json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
+                                  :controller => "context_module_items_api", :action => "index", :format => "json",
+                                  :course_id => "#{@course.id}", :module_id => "#{@module1.id}")
+
+            json.map{|item| item['id']}.sort.should == @module1.content_tags.map(&:id).sort
+          end
+        end
+        context 'without override' do
+          it "should list all assignments" do
+            json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
+                                  :controller => "context_module_items_api", :action => "index", :format => "json",
+                                  :course_id => "#{@course.id}", :module_id => "#{@module1.id}")
+
+            json.map{|item| item['id']}.sort.should == @module1.content_tags.map(&:id).sort
+          end
+        end
+      end
+
+    end
+
     context 'index including content details' do
       let(:json) do
         api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items?include[]=content_details",

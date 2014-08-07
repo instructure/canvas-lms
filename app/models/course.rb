@@ -303,10 +303,24 @@ class Course < ActiveRecord::Base
 
   def module_items_visible_to(user)
     if self.grants_right?(user, :manage_content)
-      self.context_module_tags.not_deleted.joins(:context_module).where("context_modules.workflow_state <> 'deleted'")
+      tags = self.context_module_tags.not_deleted.joins(:context_module).where("context_modules.workflow_state <> 'deleted'")
     else
-      self.context_module_tags.active.joins(:context_module).where(:context_modules => {:workflow_state => 'active'})
+      tags = self.context_module_tags.active.joins(:context_module).where(:context_modules => {:workflow_state => 'active'})
     end
+
+    if !self.grants_any_right?(user, :manage_content, :read_as_admin, :manage_grades, :manage_assignments) && self.feature_enabled?(:differentiated_assignments) && user
+      student_ids = [user.id]
+      if self.user_has_been_observer?(user)
+        observed_student_ids = ObserverEnrollment.observed_student_ids(self, user)
+        student_ids.concat(observed_student_ids)
+        # if no observed_students, allow observer to see all content_tags
+        tags = tags.visible_to_students_with_da_enabled(student_ids) if observed_student_ids.any?
+      else
+        tags = tags.visible_to_students_with_da_enabled(student_ids)
+      end
+    end
+
+    tags
   end
 
   def verify_unique_sis_source_id

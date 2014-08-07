@@ -3,9 +3,10 @@
   editable ||= can_do(@context, @current_user, :manage_content)
   workflow_state = context_module && context_module.workflow_state
   published_status = context_module && context_module.published? ? 'published' : 'unpublished'
+  differentiated_assignments_on = @context.feature_enabled?(:differentiated_assignments)
   @modules ||= []
 %>
-<% cache_if_module(context_module, editable, true) do %>
+<% cache_if_module(context_module, editable, true, differentiated_assignments_on, @current_user) do %>
 
 <div
   class="item-group-condensed context_module
