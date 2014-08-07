@@ -16,12 +16,12 @@
     </div>
 
     <div class="discussion-title">
-      <div role="heading" aria-level="3">
+      <h3 class="inline-block discussion-title-block">
         {{#if assignment}}
           <span class="screenreader-only">{{#t "graded_discussion"}}Graded discussion: {{/t}}</span>
         {{/if}}
         <a href="{{html_url}}" class="title">{{title}}</a>
-      </div>
+      </h3>
       <small {{ contextSensitiveDatetimeTitle last_reply_at }}>{{#t "last_post_date"}}Last post {{display_last_reply_at}}{{/t}}</small>
     </div>
 
