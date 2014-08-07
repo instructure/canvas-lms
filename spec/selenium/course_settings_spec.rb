@@ -180,7 +180,7 @@ describe "course settings" do
       end
 
       f('.edit_section_link').click
-      section_input = f('#course_section_name')
+      section_input = f('#course_section_name_edit')
       keep_trying_until { section_input.should be_displayed }
       replace_content(section_input, edit_text)
       section_input.send_keys(:return)
