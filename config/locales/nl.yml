@@ -676,7 +676,7 @@ nl:
       account_reports: 
         default: 
           description: 
-            text: "Dit rapport toont de eindcijfers van alle studenten in een bepaalde periode . Het daaruitvoortvloeiende CSV-bestand zal een rij per inschrijving hebben en zal het huidige cijfer en het eindcijfer bevatten zoals deze in de cijferlijst van de cursus staan."
+            text: "Dit rapport toont de eindcijfers van alle cursisten in een bepaalde periode . Het daaruitvoortvloeiende CSV-bestand zal een rij per inschrijving hebben en zal het huidige cijfer en het eindcijfer bevatten zoals deze in de cijferlijst van de cursus staan."
     group_type: groep
     include_deleted_parameter: 
       account_reports: 
@@ -1066,7 +1066,7 @@ nl:
       pending_batches_title: "Batches in behandeling"
       process_data_button: "Gegevens verwerken"
       select_file_instructions: |-
-          Het zip-bestand kiezen die jij wilt importeren.
+          Het zip-bestand kiezen die je wilt importeren.
           Voor een beschrijving om deze zip-bestanden te genereren, [zie deze documentatie](%{url}).
       sis_import_crumb: SIS-import
       started_at_message: "Gestart: %{started_at}"
@@ -1767,7 +1767,7 @@ nl:
     group_category_selector: 
       grade_group_students_individually: "Cijfer toekennen aan iedere cursist afzonderlijk"
       group_assignment_header: Groepsopdracht
-      group_category_locked_explanation: "Studenten hebben al werk ingelevered voor deze opdracht, zodat groep instellingen niet kunnen worden veranderd."
+      group_category_locked_explanation: "Cursisten hebben al werk ingeleverd voor deze opdracht, zodat groep instellingen niet kunnen worden veranderd."
       group_category_options: "Nieuwe groepscategorie"
       group_set: "Groep instellen"
       is_group_assignment: "Dit is een groepsopdracht"
@@ -2185,7 +2185,7 @@ nl:
   bb_file_description: "Blackboard 6/7/8/9-exportbestand .zip/zip-exportbestand"
   bb_name: "Blackboard Converter"
   better_file_browsing_description: |-
-      Een nieuw, eenvoudiger, vriendelijker interface voor het bekijken van bestanden. Als jij dit op cursus niveau inschakelt,
+      Een nieuw, eenvoudiger, vriendelijker interface voor het bekijken van bestanden. Als je dit op cursus niveau inschakelt,
       dan zullen alle gebruikers van die cursus de nieuwe interface zien. Om het te kunnen laten zien wanneer iemand
       naar de persoonlijke bestandspagina van een gebruiker ('/files') gaat dan moet je dit inschakelen voor de account waar hij/zij deel van uitmaakt.
   big_blue_button_conference: 
@@ -2387,7 +2387,7 @@ nl:
       no_events: "Geen gebeurtenissen na deze datum."
       starts_at: "Begint op"
     agenda_view_displaying_start_end: " Nu weergeven %{start} tot %{end}"
-    appointment_group_deletion_details: "Verwijderen betekent ook dat iedere afspraak die door studenten gemaakt  is verwijderd wordt"
+    appointment_group_deletion_details: "Verwijderen betekent ook dat iedere afspraak die door cursisten gemaakt  is verwijderd wordt"
     appointment_group_list: 
       delete: Verwijder
       edit: Bewerken
@@ -2798,7 +2798,7 @@ nl:
       update_assignment_points: "Deze opdracht heeft maximaal %{assignmentPoints} aantal punten. Wil je dit wijzigen in maximaal %{rubricPoints} punten in overeenstemming met deze rubric?"
     titles: 
       update_assignment_points: "Maximaal aantal punten wijzigen om met de rubric te matchen?"
-  chcp_student_activity_title: "CHCP Student-activiteitsrapport"
+  chcp_student_activity_title: "CHCP Cursist-activiteitsrapport"
   collaboration: 
     default_title: "Samenwerking zonder naam"
   collaborations: 
@@ -4457,7 +4457,7 @@ nl:
       create_failed: "Maken van de cursus is mislukt"
       role_not_active: "Kan gebruikers niet toevoegen voor niet-actieve functie: %{role}"
       role_not_found: "Functie %{role} bestaat niet."
-      unpublish: "Publicatie van de cursus kan niet ongedaan gemaakt worden als er inzendingen van studenten bestaan."
+      unpublish: "Publicatie van de cursus kan niet ongedaan gemaakt worden als er inzendingen van cursisten bestaan."
     group_list: 
       headings: 
         groups: Cursusgroepen
@@ -4549,8 +4549,8 @@ nl:
         student_invitation_unaccepted_available: "%{name} heeft de uitnodiging om deel te nemen aan de cursus nog niet geaccepteerd. De uitnodiging is verzonden om %{time}"
         student_invitation_unaccepted_unavailable: "%{name} is toegevoegd aan de cursus om %{time}"
       link_to_students_view: 
-        link_student_action: "Om de waarnemer van de cursus *%{name}*) aan een student te koppelen, dan de naam van de student uit de onderstaande lijst selecteren."
-        link_student_desc: "Wanneer een waarnemer aan een student is gekoppeled, hebben ze alle twee toegang tot de cijfers en cursusinteracties van die cursist."
+        link_student_action: "Om de waarnemer van de cursus *%{name}*) aan een cursist te koppelen, dan de naam van de cursist uit de onderstaande lijst selecteren."
+        link_student_desc: "Wanneer een waarnemer aan een cursist is gekoppeld, hebben ze alle twee toegang tot de cijfers en cursusinteracties van die cursist."
       resend_invitations: 
         pending_invitations: "%{pendingInvitationsCount} uitnodigingen zijn niet geaccepteerd."
         re_send_invitations: "Opnieuw verzenden"
@@ -4563,7 +4563,7 @@ nl:
       roster_user: 
         links: 
           edit_sections: "Secties bewerken"
-          link_to_students: "Aan studenten linken"
+          link_to_students: "Aan cursisten linken"
           remove_from_course: "Uit cursus verwijderen"
           resend_invitation: "Uitnodiging opnieuw verzenden"
           user_details: Gebruikersgegevens
@@ -6132,7 +6132,7 @@ nl:
     google_docs_domain_restriction: "Beperking van Google Docs domein"
     high_contrast: "Hoge contrast stijlen gebruiken"
     html5_first_videos: "Liever HTML5 voor videoweergave"
-    k12: "Functie specifiek voor basis onderwijs, lager en hoger middelbaar onderwijs"
+    k12: "Functies specifiek voor het basis onderwijs, het lager en hoger middelbaar onderwijs"
     learning_mastery_gradebook: "Cijferlijst bekwaam leren"
     new_quiz_moderate: "Pagina voor het overzien van nieuwe toets "
     new_quiz_statistics: "Pagina met statistieken voor nieuwe toets"
@@ -7117,7 +7117,7 @@ nl:
         allow_self_signup: "Zelfinschrijving toestaan"
         auto_first_group_leader: "Eerste cursist als groepsleider aanstellen "
         auto_group_leader: "Een cursist automatisch aanstellen als groepsleider"
-        auto_random_group_leader: "Willekeurige student als groepsleider aanstellen"
+        auto_random_group_leader: "Willekeurige cursist als groepsleider aanstellen"
         cancel: Annuleren
         create_groups: " %h{num_groups} groepen nu maken"
         create_groups_manually: "Ik zal groepen handmatig maken"
@@ -7138,7 +7138,7 @@ nl:
         edit_category_option: Bewerken
         group: Groep
         group_limit_blurb: "Groepen worden beperkt tot *%{group_limit}* leden."
-        message_all_unassigned_option: "Bericht naar alle niet toegewezen studenten verzenden"
+        message_all_unassigned_option: "Bericht naar alle niet toegewezen cursisten verzenden"
         randomly_assign_students_option: "Cursisten willekeurig toewijzen"
         restricted_self_signup_blurb: "Alle  cursisten uit een groep moeten in dezelfde sectie zitten."
         self_organized_warning: "Deze groepen zijn door cursisten zelf ingedeeld. Cursisten kunnen niet tegelijkertijd, zoals in andere typen groepen, deel uit maken van meer dan een van deze groepen, dus deze groepen zijn niet geschikt voor het beoordelen van opdrachten."
@@ -7492,7 +7492,9 @@ nl:
     module_sequence_footer: 
       next: Volgende
       previous: Vorige
-  k12_description: "Functies, instellingen en stijlen die meer van toepassing zijn in een omgeving van het basis onderwijs, het lager en hoger middelbaar onderwijs. Voor nu, houdt dit slechts enkele stijlwijzigingen in, maar meer specifieke aanpassingen voor het basis onderwijs, het lager en hoger middelbaar onderwijs kunnen in de toekomst toegevoegd worden."
+  k12_description: |-
+      Functies, instellingen en stijlen die meer van toepassing zijn in een omgeving van het basis onderwijs, het lager en hoger middelbaar onderwijs. Voor nu, houdt dit slechts
+      enkele stijlwijzigingen in, maar meer specifieke aanpassingen voor het basis onderwijs, het lager en hoger middelbaar onderwijs kunnen in de toekomst toegevoegd worden.
   labels: 
     lock_module_until: "Module tot een bepaalde datum vergrendelen"
   last_submission_activity_title: "Laatste inzending activiteit "
@@ -9806,7 +9808,7 @@ nl:
     files_description: "Nieuw bestand aan jouw cursus  toegevoegd "
     files_display: Bestanden
     grading_description: "Inclusief:\n\n\
-        * Opdrachten/cijfer van inzending ingevoerd/gewijzigd\n\
+        * Cijfer van opdracht/inzending ingevoerd/gewijzigd\n\
         * Ongewijzigde cijfer van opdracht\n\
         * Gemiddelde cijfer gewijzigd\n\n\n\n\
         'Scoren opnemen wanneer er waarschuwingen zijn van cijfer wijzigingen' aanvinken als je jouw cijfers in de meldingen wilt zien.\n\
@@ -9990,12 +9992,12 @@ nl:
           mb: MB
           tb: TB
   observees: 
-    add_observee_button: "Student toevoegen"
-    being_observed: "Studenten worden waargenomen"
+    add_observee_button: "Cursist toevoegen"
+    being_observed: "Cursisten worden waargenomen"
     new_observee_password: Wachtwoord
     new_observee_username: Gebruikersnaam
-    observee_added: "Nu %{user} waarnemen"
-    observing: "Aan het waarnemen"
+    observee_added: "Nu %{user} bezig met waarnemen"
+    observing: "Bezig met waarnemen"
   options: 
     ? "no"
     : Nee
@@ -10196,7 +10198,7 @@ nl:
   pasco_user_notes_title: "Notitities van de gebruiker"
   paypal: 
     exception: "Onze excuses, er is een fout opgetreden. Probeer later opnieuw."
-  penn_harris_student_grade_title: "Eindcijfers voor studenten Penn Harris"
+  penn_harris_student_grade_title: "Eindcijfers voor cursist Penn Harris"
   plugins: 
     academic_benchmark_importer: 
       description: "Hiermee kun je Academic Benchmark-standaarden in Canvas importeren."
@@ -10597,7 +10599,7 @@ nl:
       unregister_service: "Weet je zeker dat je de registratie van deze dienst wilt opheffen?"
     crumb: "Instellingen van %{user}"
     crumbs: 
-      observees: "Aan het waarnemen"
+      observees: "Bezig met waarnemen"
       settings_frd: " %{user}s instellingen"
     done_resending: "Klaar! Het afleveren van het bericht kan een paar minuten duren."
     email_select: 
@@ -10623,7 +10625,7 @@ nl:
       mfa_disabled: "Multi-Factor-verificatie uitgeschakeld"
       updated_profile: "Instellingen succesvol bijgewerkt"
     observees: 
-      page_title: "Studenten worden waargenomen"
+      page_title: "Cursisten worden waargenomen"
     please_select_an_option: "Selecteer een optie"
     profile: 
       access_token_description: "Met behulp van toegangstoken kun je aan andere applicaties toestaan om API-oproepen namens jou uit te voeren. Je kunt ook toegangstokens genereren en *de Canvas Open API* gebruiken om met jouw eigen integraties te komen."
@@ -11217,7 +11219,7 @@ nl:
       no_scores_reduced: "Punten toekennen voor zowel gecorrigeerde als eerdere juiste antwoorden (*scores zullen niet verlaagd worden*)"
       regrade_disabled: "Het opnieuw beoordelen van deze vraag is niet toegestaan omdat het antwoord was verwijderd of omdat het type vraag was veranderd nadat een cursist een inzending heeft gedaan."
       regrade_options: "Opties voor het herberekenen *(voor cursisten die deze vraag al hebben beantwoord):*"
-      some_scores_reduced: "Geef alleen punten voor het correcte antwoord (*scores van sommige studenten kunen verlaagd worden*)"
+      some_scores_reduced: "Geef alleen punten voor het correcte antwoord (*scores van sommige cursisten kunnen verlaagd worden*)"
       update_question_without_regrading: "Vraag bijwerken zonder opnieuw te beoordelen"
     regrade_count_affected: "Deze toets is herberekend; jouw nieuwe score weerspiegelt %{count} vragen die aangepast zijn."
     regrade_score_affected: "Deze toets is herberekend; jouw score is aangepast."
@@ -11231,7 +11233,7 @@ nl:
     there_are_no_submissions_to_grade: "Er zijn geen inzendingen die beoorbeeld moeten worden."
     time_limit_minutes: "%{limit} minuten"
     warning: Waarschuwing
-    you_cannot_message_unpublished: "Je kunt pas berichten aan studenten sturen als deze toets is gepubliceerd."
+    you_cannot_message_unpublished: "Je kunt pas berichten aan cursisten sturen als deze toets is gepubliceerd."
   quiz_data_title: Toetsgegevens
   quiz_extend_time: 
     ending_time: eindtijd
@@ -11264,7 +11266,7 @@ nl:
     message_sent_successfully: "Bericht succesvol verzonden"
     message_students_who: "Verstuur een bericht naar cursisten die..."
     student_who_have_not_taken_the_quiz: "Cursisten die de toets niet gemaakt hebben"
-    students_who_have_taken_the_quiz: "Studenten die de toets gemaakt hebben"
+    students_who_have_taken_the_quiz: "Cursisten die de toets gemaakt hebben"
   quiz_model: 
     everyone: Iedereen
     everyone_else: "Alle anderen"
@@ -11300,7 +11302,7 @@ nl:
     attempts: "Pogingen: %{count} uit %{total}"
     correct_essay_student_ratio: "%{ratio}% van jouw cusisten hebben het volledig aantal punten voor deze vraag gekregen."
     correct_multiple_response_ratio: "%{ratio}% hebben juist beantwoord."
-    correct_response_ratio: "%{ratio}% van jouw studenten hebben deze vraag juist beantwoord."
+    correct_response_ratio: "%{ratio}% van jouw cursisten hebben deze vraag juist beantwoord."
     discrimination_index_help_dialog_title: "De disciminatie index grafiek"
     errors: 
       stats_empty: 
@@ -11892,7 +11894,7 @@ nl:
           extra_attempts: "Extra pogingen"
           extra_time_per_attempt: "Extra tijd voor elke poging"
           manually_unlock: "De toets handmatig ontgrendelen voor de volgende poging"
-          reset_has_seen_results: "Laat de cursist de resultaten nog eenmaal zien"
+          reset_has_seen_results: "Laat aan de cursist de resultaten nog eenmaal zien"
           started: Gestart
         minutes: minuten
         moderate_page_title: "%{title}: Overzien"
@@ -11953,6 +11955,7 @@ nl:
         new_discussion: "Nieuwe discussie"
         one_question_at_a_time: "Een vraag tegelijk tonen"
         one_time_results: "Alleen maar eenmaal na iedere poging"
+        only_visible_to_overrides_note: "Opmerking: Deze toets is **alleen** zichtbaar voor sectie(s) hieronder vermeld:"
         points_possible: "Punten %{n}"
         quiz_title: "Naam van toets"
         quiz_type: Toetstype
@@ -13559,7 +13562,7 @@ nl:
     next_object: "Volgende %{type}"
     no_assignment: "Geen opdracht geselecteerd"
     no_outcome: "Geen resultaat geselecteerd"
-    no_student: "Geen student geselecteerd"
+    no_student: "Geen cursist geselecteerd"
     none: Geen
     notes: Opmerkingen
     on_paper: "Op papier"
@@ -13594,7 +13597,7 @@ nl:
     not_available: "Beschikbaar op"
     pending: "Niet beschikbaar tot"
   step: Stap
-  student_access_title: "Rapport over toegang studenten"
+  student_access_title: "Rapport over toegang cursisten "
   student_assignment_outcome_map_title: "Competentie van cusist"
   student_grades_title: "Cursisten cijfers"
   student_groups: 
@@ -13608,7 +13611,7 @@ nl:
       other: "%{count} cursisten"
   student_groups_desc: "Dit schakelt de nieuw pagina voor de groep cursisten voor een account in. De nieuwe pagina is samengesteld om de aanmelding van een groep dynamischer te maken."
   student_id: Cursist-ID
-  student_ip_title: "IP adressen van studenten "
+  student_ip_title: "IP adressen van cursisten "
   student_name: Cursisnaam
   student_outcome_gradebook_description: |-
       De cijferlijst bekwaam leren cursisten biedt een manier aan cursisten om snel hun voortgang 
@@ -13796,7 +13799,7 @@ nl:
     grades: Cijfers
     home: Startpagina
     modules: Modules
-    observees: "Aan het waarnemen"
+    observees: "Bezig met waarnemen"
     outcomes: Leerresultaten
     pages: Paginas
     people: Personen
@@ -13953,7 +13956,7 @@ nl:
   turnitin_info: 
     buttons: 
       resubmit_to_turnitin: "Opnieuw inleveren bij Turnitin"
-  ungraded_submissions_tile: "Inzendingen van student die niet beoordeeld zijn"
+  ungraded_submissions_tile: "Inzendingen van cursist die niet beoordeeld zijn"
   unknown: Onbekend
   unknown_question_bank: "Onbekende toetsbank"
   unknown_quiz: "Onbekende toets"
