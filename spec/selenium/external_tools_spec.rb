@@ -73,7 +73,7 @@ describe "external tools" do
       fj('button.btn-primary[role="button"]').click
       wait_for_ajaximations
 
-      ff('td.external_tool').size.should > 0
+      ff('th.external_tool').size.should > 0
       fj('.view_app_center_link').click
       wait_for_ajaximations
 
