@@ -105,8 +105,10 @@ module Api::V1::ContextModule
       when 'ContextExternalTool'
         if content_tag.content && content_tag.content.tool_id
           api_url = sessionless_launch_url(context_module.context, :id => content_tag.content.id, :url => content_tag.content.url)
-        else
+        elseif content_tag.content
           api_url = sessionless_launch_url(context_module.context, :url => content_tag.content.url)
+        else
+          api_url = sessionless_launch_url(context_module.context, :url => content_tag.url)
         end
     end
     hash['url'] = api_url if api_url
