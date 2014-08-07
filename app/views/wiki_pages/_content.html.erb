@@ -89,7 +89,7 @@ course will see this page first.  You can change that from [the course home page
 <div id="wiki_edit_view_main" style="display:none; text-align: right;">
   <div>
     <a href="#" class="wiki_switch_views_link"><%= t '#editor.switch_editor_html', "HTML Editor" %></a>
-    <a href="#" class="wiki_switch_views_link" style="display:none;"><%= t '#editor.switch_editor_rich_text', "Rich Text Editor" %></a>
+    <a href="#" class="wiki_switch_views_link" style="display:none;"><%= t '#editor.switch_editor_rich_text', "Rich Content Editor" %></a>
   </div>
   <div class="clear"></div>
   <%= form_for(@page, :url => (@page.new_record?) ? context_url(@context, :context_wiki_pages_url) : context_url(@context, :context_wiki_page_url, @page)) do |f| -%>
