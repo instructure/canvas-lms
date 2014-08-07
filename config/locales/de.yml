@@ -18,11 +18,11 @@ de:
     student_count: 
       one: "1 Student"
       other: "%{count} Studenten"
-    student_count_max: "%{count} / %{max} Studenten"
+    student_count_max: "%{count}/%{max} Studenten"
     user_count: 
       one: "1 Benutzer"
       other: "%{count} Benutzer"
-    user_count_max: "%{count} / %{max} Benutzer"
+    user_count_max: "%{count}/%{max} Benutzer"
   GroupUserCollection: 
     flash: 
       userAlreadyInGroup: "ACHTUNG: %{user} ist bereits Mitglied von %{group}"
@@ -250,6 +250,9 @@ de:
       logout_request_to_idp: "LogoutRequest sent to IdP"
       logout_response_from_idp: "LogoutResponse from IdP"
       saml_required: "Zum Testen von SAML ist eine SAML-konfiguration erforderlich"
+  account_notification: 
+    errors: 
+      invalid_account_notification_end_at: "Endzeit für Benachrichtigung für das Konto liegt vor Startzeit"
   account_notifications: 
     announcement_created_notice: "Ankündigung erfolgreich erstellt"
     announcement_creation_failed_notice: "Ankündigung konnte nicht erstellt werden"
@@ -270,6 +273,7 @@ de:
       term_text: "Kursperiode: %{term_name};"
     grades: 
       deleted: "Einschließlich gelöschter Objekte: wahr;"
+      limited: "gelöschte Objekte werden durch angegebene Tage eingeschränkt."
     outcomes: 
       order: "Reihenfolge: %{order}"
     report_header_account_id: account_id
@@ -279,11 +283,15 @@ de:
     report_header_assessment_title: "Titel des Leistungstests"
     report_header_assessment_type: Leistungstesttyp
     report_header_assignment_id: Aufgaben-ID
-    report_header_assignment_title: "Titel der Aufgabe"
+    report_header_assignment_title: Aufgabentitel
     report_header_assignment_url: Aufgaben-URL
     report_header_associated_user_id: associated_user_id
     report_header_attempt: Versuch
+    report_header_canvas_account_id: canvas_account_id
+    report_header_canvas_associated_user_id: canvas_associated_user_id
     report_header_canvas_course_id: canvas_course_id
+    report_header_canvas_group_id: canvas_group_id
+    report_header_canvas_parent_id: canvas_parent_id
     report_header_canvas_section_id: canvas_section_id
     report_header_canvas_term_id: canvas_term_id
     report_header_canvas_user_id: canvas_user_id
@@ -294,29 +302,38 @@ de:
     report_header_course_name: Kursname
     report_header_course_sis: Kurs-SIS
     report_header_course_sis_id: "SIS-ID für Kurs"
-    report_header_created_at: "erstellt am"
+    report_header_created_at: "Erstellt am"
     report_header_current_score: "Aktuelle Punktzahl"
     report_header_email: E-Mail
+    report_header_end__date: end_date
     report_header_end_date: Enddatum
     report_header_enrollment_state: Einschreibungsstatus
     report_header_final_score: Gesamtpunktzahl
+    report_header_first_name: first_name
+    report_header_group_id: group_id
     report_header_id: ID
-    report_header_last_access_at: "Letzter Zugriff am"
-    report_header_last_ip: "Letzte IP"
+    report_header_last_access_at: "letzter Zugriff am"
+    report_header_last_ip: "letzte IP"
     report_header_last_name: last_name
-    report_header_learning_outcome_id: "ID für Lernergebnis"
-    report_header_learning_outcome_name: "Name Lernergebnis"
+    report_header_learning_outcome_id: Lernergebnis-ID
+    report_header_learning_outcome_name: "Name für Lernergebnis"
+    report_header_login_id: login_id
+    report_header_long__name: long_name
     report_header_long_name: Langbezeichnung
     report_header_name: Name
     report_header_outcome_score: "Punktzahl für Ergebnis"
+    report_header_parent_account_id: parent_account_id
+    report_header_role: Rolle
     report_header_section: Abschnitt
     report_header_section__id: section_id
     report_header_section_id: Abschnitts-ID
     report_header_section_name: Abschnittsname
     report_header_section_sis: "SIS für Abschnitt"
     report_header_section_sis_id: "SIS-ID für Abschnitt"
+    report_header_short__name: short_name
     report_header_short_name: Kurzbezeichnung
     report_header_sis_id: SIS-ID
+    report_header_start__date: start_date
     report_header_start_date: Startdatum
     report_header_status: Status
     report_header_student_id: Studenten-ID
@@ -505,6 +522,8 @@ de:
         message_course_id: Kurs-ID
       grade_change_logging_item: 
         blank_placeholder: "-"
+        event_type: 
+          corrupted: "Keine Details verfügbar"
       grade_change_logging_results: 
         Assignment: Aufgabe
         Course: Kurs
@@ -833,6 +852,8 @@ de:
       help_link_available_to_all_teachers: Dozenten
       help_link_available_to_all_users: Benutzer
       if_you_would_like_to_link_to_your_own_campus_support_website_in_the_help_dialog_you_can_do_that_here: "Falls sie einen Link zum Onlinesupport ihres eigenen Campusses im Hilfefenster setzen möchten, können sie dies hier tun"
+      interpolate_account_domain: "Geben Sie \"{{ACCOUNT_DOMAIN}}\" ein, um die Domain für das Stammkonto des Benutzers zu ersetzen"
+      interpolate_user_id: "Geben Sie \"{{CANVAS_USER_ID}}\" ein, um die eindeutige Canvas-ID des Benutzers zu ersetzen"
       ip_filter_filter_label: Filter
       ip_filter_name_label: Name
       labels: 
@@ -922,7 +943,9 @@ de:
         subject: Betreff
       open_registration_delegated_warning_message: "Ein externer Identitätsanbieter ist aktiviert und Benutzer, die über eine offene Registirerung erstellt wurden, können sich eventuell nicht anmelden, sofern das Anmeldeformular des externen Identitätsanbieter nicht zu %{url} rückverlinkt."
       open_registration_delegated_warning_tooltip: "Ein externer Identitätsanbieter ist aktiviert"
+      open_report_description: "Berichtsbeschreibung öffnen"
       page_title: Kontoeinstellungen
+      quiz_ip_filters_delete: "Filter entfernen"
       quiz_ip_filters_help_message: "Mit Quiz-IP-filtern lässt sich der Quizzugang auf Computer eines bestimmten IP-bereichs beschränken. Definieren Sie IP-adressbereiche, die Dozenten zur Einschränkung des Quizzugangs verwenden können.  Die IP-filter werden als kommagetrennte Adressenliste oder als eine Adresse gefolgt von einer Maske angezeigt (\"192.168.217.1/24\" oder \"192.168.217.1/255.255.255.0\").\""
       quiz_ip_filters_help_title: "Was sind Quiz-IP-filter?"
       quiz_ip_filters_help_tooltip: "Was sind Quiz-IP-filter?"
@@ -1035,6 +1058,9 @@ de:
         other: "%{count} Batches in Warteposition für Verarbeitung"
       pending_batches_title: "Noch unverarbeitete Batches"
       process_data_button: "Daten verarbeiten"
+      select_file_instructions: |-
+          Wählen Sie die zu importierende ZIP-Datei aus.  
+          Eine Beschreibung darüber, wie Sie diese ZIP-Dateien generieren, [finden Sie in dieser Dokumentation](%{url}).
       sis_import_crumb: SIS-import
       started_at_message: "Beginn: %{started_at}"
       title: SIS-import
@@ -1346,7 +1372,7 @@ de:
     title: "%{name} bearbeiten"
     update: Aktualisieren
   aria_labels: 
-    unlock_at_date: "Freigabe an folgendem Datum"
+    unlock_at_date: "Freigabe am folgenden Datum"
   assessment_question: 
     default_question_name: Frage
   assessment_question_bank: 
@@ -1431,7 +1457,7 @@ de:
     unmute_dialog: "Diese Aufgabe ist zurzeit stummgeschaltet. Das bedeutet, dass die Studenten Ihre Noten und Feedbacks nicht aufrufen können. Möchten Sie diese Aufgabe jetzt lautschalten?"
     unmuting_assignment: "Aufgabe lautschalten..."
   assignment_scheduling_title: Aufgabenplanung
-  assignment_score_summary_title: "Punktezahl für Aufgabe – Zusammenfassung"
+  assignment_score_summary_title: "Punktzahl für Aufgabe – Zusammenfassung"
   assignments: 
     add_assignment_form: 
       assignment_name: "Name der Aufgabe"
@@ -1675,7 +1701,7 @@ de:
       notify_content_change: "Benutzer bei Änderung von Inhalten benachrichtigen"
       only_visible_to_overrides_note: |-
           Hinweis: Diese Aufgabe ist *nur* in dem/n nachfolgend angegebenen A
-          Abschnitt/en sichtbar.
+          Abschnitt/en sichtbar:
       points_possible: Punkte
       post_to_sis: "In SIS veröffentlichen"
       warnings: 
@@ -2147,11 +2173,16 @@ de:
       attendance_help: Teilnahmehilfe
       new_attendance_column: "Neue Anwesenheitsspalte"
   auth_logging: 
+    corrupted: "Keine Details verfügbar"
     login: ANMELDUNG
     logout: ABMELDUNG
   bb_display: "Blackboard Learn"
   bb_file_description: "ZIP-Datei für Blackboard 6/7/8/9-Export"
   bb_name: "Blackboard Converter"
+  better_file_browsing_description: |-
+      Eine neue, einfachere und bedienerfreundlichere Benutzeroberfläche zum Durchsuchen von Dateien. Wenn Sie dies auf Kursebene aktivieren,
+      wird die neue Benutzeroberfläche allen Benutzern des Kurses angezeigt. Damit die Oberfläche angezeigt wird, wenn jemand
+      zur Seite mit persönlichen Dateien für einen Benutzer wechselt ('/files'), müssen Sie sie für das Konto des Benutzers aktivieren.
   big_blue_button_conference: 
     conference_is_recorded: "Diese Konferenz wird aufgezeichnet."
     recording_setting: Aufzeichnung
@@ -2231,6 +2262,7 @@ de:
     cancel: Abbrechen
     choose_a_file: "Datei auswählen"
     delete: Löschen
+    delete_file: "Datei %{name} löschen"
     done: Fertig
     filter: Filter
     find_user: "Nach Benutzer suchen"
@@ -2990,6 +3022,7 @@ de:
     buttons: 
       process: "Daten verarbeiten"
     errors: 
+      couldnt_create: "Inhaltsexport konnte nicht erstellt werden."
       error: "Beim Exportieren Ihrer Inhalte ist ein Fehler aufgetreten.  Bitte benachrichtigen Sie Ihren Systemadministrator und geben Sie folgenden Export-identifier an: \"%{code}\""
       not_found: "Export existiert nicht"
     index: 
@@ -3522,6 +3555,9 @@ de:
     content_next: 
       add_prerequisite: "Voraussetzung zu *%{module}* hinzufügen"
       assignment_points_possible: "von insgesamt %{points_possible}"
+      button: 
+        delete_label: "Voraussetzungen löschen"
+        delete_title: "Voraussetzungen löschen"
       buttons: 
         add_module: "Modul hinzufügen"
         add_prerequisite: "Vorraussetzung hinzufügen"
@@ -4130,6 +4166,7 @@ de:
       concluded: Abgeschlossen
       copied_from: "Kopiert von"
       copied_to: "Kopiert in"
+      corrupted: "Keine Details verfügbar"
       created: Erstellt
       deleted: Gelöscht
       published: Veröffentlicht
@@ -4330,6 +4367,7 @@ de:
               Wenn Sie Canvas verlassen müssen, speichern Sie *diesen Link*, um später hierher zurückzukehren.
               Bitte **melden Sie sich an** oder ***registrieren Sie sich***, um diesen Kurs anzufordern.
         files: "Auf der Registerkarte 'Dateien' können Sie Ihren Studenten Vorlesungsfolien, Beispieldokumente und Lehrmaterial zum Herunterladen bereitstellen. Das Hochladen und Verwalten Ihrer Dateien ist mit Canvas denkbar einfach. Wir zeigen Ihnen nun, wie das geht."
+        home2: "Wenn Personen den Kurs besuchen, wird ihnen diese Seite angezeigt. Sie können die Seite so einrichten, dass ein Aktivitäts-Stream, die Liste der Kursmodule, ein Syllabus oder eine benutzerdefinierte Seite angezeigt wird, die Sie selber verfassen können. Standardmäßig wird der Aktivitäts-Stream für den Kurs angezeigt. Um diese Einstellung anzupassen, klicken Sie einfach auf %{choose_home_page}."
         import: "Wenn Sie bisher ein anderes Kursmanagementsystem verwendet haben, besitzen Sie wahrscheinlich Materialien, die Sie auf Canvas weiterverwenden wollen. Die Migration Ihrer Inhalte zu Canvas ist denkbar einfach; wenn sie wollen, zeigen wir es Ihnen."
         navigation: "Als Standardeinstellung sind alle Links für einen Kurs aktiviert. Abschnitte ohne Inhalte sind für die Studenten unsichtbar. Wenn Sie beispielsweise keine Quizzes erstellt haben, wird den Studenten der Link \"Quizzes\" nicht angezeigt. Sie können Links sortieren und individuell deaktivieren, wenn Ihre Studenten auf diese Bereiche nicht zugreifen sollen."
         publish: 
@@ -4412,6 +4450,7 @@ de:
       create_failed: "Kurserstellung fehlgeschlagen"
       role_not_active: "Hinzufügen von Benutzern für folgende nicht aktive Rolle nicht möglich: '%{role}'"
       role_not_found: "Es ist keine Rolle mit dem Namen '%{role}' vorhanden."
+      unpublish: "Kursveröffentlichung kann nicht rückgängig gemacht werden, wenn Einsendungen von Studenten vorliegen."
     group_list: 
       headings: 
         groups: Kursgruppen
@@ -4474,6 +4513,8 @@ de:
         close: Fertig
         duplicates_removed: "Duplikate wurden entfernt."
         email: E-mail
+        email_field_label: "Geben Sie die E-Mail-Adresse der hinzuzufügenden Benutzer durch Kommata getrennt ein"
+        email_field_place_holder: "\"Beispiel-Student\" &lt;student@beispiel.com&gt;, \"Nachname, Vorname\" &lt;vornach@beispiel.com&gt;, nureineE-Mail-Adresse@beispiel.com"
         example_formats: "Beispiele: benutzer@beispiel.com, \"Vorname Nachname\" &lt;benutzer@beispiel.com&gt;, \"Nachname, Vorname\" &lt;benutzer@beispiel.com&gt;"
         form_instructions: "Liste mit E-Mail-Adressen unten eingeben oder einfügen:"
         go_back: "Nochmals beginnen"
@@ -4591,6 +4632,8 @@ de:
         course_lock_all_announcements: "Kommentare zu Ankündigungen deaktivieren"
         course_name: Name
         course_section_name: "Neuen Kursabschnitt hinzufügen"
+        course_status_published: "Kurs wurde veröffentlicht"
+        course_status_unpublished: "Veröffentlichung des Kurses wurde rückgängig gemacht"
         course_visibility: Sichtbarkeit
         enrollment_term_id: Kursperiode
         grading_scheme: Benotungssystem
@@ -4646,6 +4689,8 @@ de:
         tools: Apps
       titles: 
         edit_navigation: "Kursnavigation bearbeiten"
+      tooltips: 
+        cannot_unpublish_course: "Sie können die Veröffentlichung des Kurses nicht rückgängig machen, wenn benotete Einsendungen von Studenten vorliegen"
       transifex_message: "Mitglied der [Canvas-Übersetzungs-Community](%{transifex_url}) werden"
       turnitin: "diese Kommentare werden den Studenten beim Einschicken einer Turnitin-fähigen Aufgabe angezeigt"
       view_grading_scheme: "Benotungssystem anzeigen"
@@ -4898,7 +4943,7 @@ de:
     this_is_permanent: "Anpassung von Noten kann nicht rückgängig gemacht werden. Die Verläufe zuvor angepasster Noten sind verfügbar, der Anpassungsvorgang kann jedoch nicht rückgängig gemacht werden."
   custom_grade_export_title: CampusVue-Notenexport
   custom_outcomes_title: "Benutzerdefinierte Ergebnisse"
-  cv_non_graded_data__title: "Bericht zu nicht benoteten CampusVue-Aufgaben"
+  cv_non_graded_data__title: "Bericht zu nicht benoteter CampusVue-Aufgabe"
   cv_submission_data__title: "Einsendungsdaten für CampusVue"
   d2l_display: Desire2Learn
   d2l_file_description: D2L-Export-ZIP-Format
@@ -5145,11 +5190,13 @@ de:
       saving: "Schlüssel speichern..."
       saving_failed: "Schlüssel speichern fehlgeschlagen"
     index: 
+      add_developer_key: "Entwicklerschlüssel hinzufügen"
       details: Details
       developer_keys: Entwicklerschlüssel
       key_settings: Schlüsseleinstellungen
       name: Name
       show_all: "Alle %{count} Schlüssel anzeigen"
+      stats: Statistiken
       title: Entwicklerschlüssel
       user: Benutzer
     messages: 
@@ -5174,6 +5221,7 @@ de:
   discussion_entry: 
     atom_no_author: "Kein Autor"
     default_user_name: Benutzername
+  discussion_group_category_locked: "Gruppenkategorieren für eine Diskussionsaufgabe können nicht direkt festgelegt werden. Sie sollten stattdessen für die Diskussion festgelegt werden."
   discussion_topic: 
     atom_no_author: "Kein Autor"
     default_title: "Ohne Titel"
@@ -5239,6 +5287,7 @@ de:
       delay_posting: "Einstellen verzögern"
       enable_podcast_feed: "Podcast-feed zulassen"
       include_replies_in_podcast_feed: "Antworten in Podcast-feed miteinbeziehen"
+      only_visible_to_overrides_note: "Hinweis: Diese Diskussion ist *nur* im/in den unten angegebenen Abschnitt/en sichtbar:"
       options: Optionen
       points_possible: "Mögliche Punkte"
       post_at: "Einstellen um"
@@ -5821,6 +5870,7 @@ de:
   errors: 
     bad_navigation_config: "Ungültige Kursfensterkonfiguration"
     blank: Erforderlich
+    dynamic_format: "%{message}"
     failed: Fehlgeschlagen
     format: "%{attribute} %{message}"
     index: 
@@ -5844,17 +5894,18 @@ de:
       equal_to: "muss gleich %{count} sein"
       even: "muss gerade sein"
       exclusion: "ist reserviert"
-      greater_than: "muss größer sein als %{count}"
-      greater_than_or_equal_to: "muss größer sein als oder gleich %{count}"
+      greater_than: "muss größer als %{count} sein"
+      greater_than_or_equal_to: "muss größer als oder gleich %{count} sein"
       inclusion: "ist nicht Teil der Liste"
       invalid: "ist ungültig"
-      less_than: "muss kleiner sein als %{count}"
-      less_than_or_equal_to: "muss kleiner sein als oder gleich %{count}"
+      less_than: "muss kleiner als %{count} sein"
+      less_than_or_equal_to: "muss kleiner als oder gleich %{count} sein"
       not_a_number: "ist keine Zahl"
+      not_an_integer: "muss eine Ganzzahl sein"
       odd: "muss ungerade sein"
-      too_long: "ist zu lang (höchstens %{count} Zeichen)"
+      too_long: "ist zu lang (maximal %{count} Zeichen)"
       too_short: "ist zu kurz (mindestens %{count} Zeichen)"
-      wrong_length: "hat die falsche Länge (muss %{count} Zeichen haben)"
+      wrong_length: "hat die falsche Länge (muss %{count} Zeichen umfassen)"
     no_attached_file: "Sie müssen dieser Aufgabe mindestens eine Datei anhängen"
     registration_incomplete: "Sie müssen Ihre E-mailadresse bestätigen, bevor Sie diese Seite aufrufen können"
     required: Erforderlich
@@ -5881,6 +5932,7 @@ de:
         adding_feed: "Feed wird hinzugefügt..."
       descriptions: 
         add_new_feed: "Sie können für diesen Kurs automatisch die Beiträge eines RSS- oder Atom-feeds als Ankündigungen hinzuzufügen. Fügen Sie einfach die Feed-URL unten ein, um alle neuen Beiträge automatisch hinzuzufügen."
+      feed_url_label: Feed-URL
       keyword: "Schlüsselwort:"
       labels: 
         match_phrase_checkbox: "Veröffentlichen Sie nur Beiträge mit aussagekräftiger Titelzeile"
@@ -5914,6 +5966,7 @@ de:
     consumer_key: Kundenschlüssel
     course_home_sub_navigation_configured: "Untergeordnete Navigation für Startseite des Kurses konfiguriert"
     course_navigation_configured: "Kursnavigation konfiguriert"
+    course_settings_sub_navigation_configured: "Untergeordnete Navigation für Kurseinstellungen konfiguriert"
     delete: Löschen
     dialog_title_add_app: "App hinzufügen"
     dialog_title_edit_tool: "Externes Tool bearbeiten"
@@ -6076,13 +6129,14 @@ de:
     google_docs_domain_restriction: "Google Docs Domain-Beschränkung"
     high_contrast: "Stile mit hohem Kontrast verwenden"
     html5_first_videos: "HTML5 für Videowiedergabe vorziehen"
+    k12: "K-12-spezifische Funktionen"
     learning_mastery_gradebook: "Notenbuch für Leistungsziel erreicht"
     new_quiz_moderate: "Neue Seite für die Quiz-Moderation"
     new_quiz_statistics: "Neue Seite für Quiz-Statistiken"
     new_styles: "Neue Stile verwenden"
     post_grades: "Noten in SIS veröffentlichen"
     student_groups: "Neue Seite für Studentengruppen"
-    student_outcome_gradebook: "Notenbuch für Leistungsziel erreicht des Studenten"
+    student_outcome_gradebook: "Notenbuch für Leistungsziel erreicht für Studenten"
   file_browser_view: 
     folder_tree_instructions: "Verwenden Sie die Nach-oben- und die Nach-unten-Tasten, um durch die Baumstruktur zu navigieren. Drücken Sie die Nach-rechts-Taste, um Ordner zu erweitern, die Nach-links-Taste, um sie zu minimieren, und die Eingabetaste, um ein Bild auszuwählen."
   filebrowserview: 
@@ -6330,7 +6384,7 @@ de:
     mute_assignment: "Aufgabe stummschalten"
     new_assessment: "[Neue Aufgabe]"
     no_submission_time: "Keine Einsendungszeit"
-    not_graded: "Nicht benotet"
+    not_graded: "nicht benotet"
     not_submitted: "nicht eingesandt"
     nth_student: "Student %{n}"
     portion_graded: "%{x} / %{y} benotet"
@@ -7057,11 +7111,13 @@ de:
         allow_self_signup: "Selbstregistrierung zulassen"
         auto_first_group_leader: "Ersten Studenten, der Mitglied wird, als Gruppenleiter festlegen"
         auto_group_leader: "Studentengruppenleiten automatisch zuweisen"
+        auto_random_group_leader: "Beliebigen Studenten als Gruppenleiter festlegen"
         cancel: Abbrechen
         create_groups: "Jetzt %h{num_groups} Gruppen erstellen"
         create_groups_manually: "Ich erstelle Gruppen manuell"
         group_set_name: "Name des Gruppensatzes"
         group_structure: Gruppenstruktur
+        leadership: Leitung
         leave_group_limit_blank: "Leer lassen, um kein Limit anzugeben"
         limit_group_size: "Gruppen auf %h{group_limit} Mitglieder beschränken"
         require_same_section: "Festlegen, dass Gruppenmitglieder zum selben Abschnitt gehören müssen"
@@ -7086,6 +7142,7 @@ de:
       group_category_edit: 
         allow_self_signup: "Selbstregistrierung zulassen"
         cancel: Abbrechen
+        group_limit_override: "Beim Ändern dieser Einstellung werden einzeln festgelegte Gruppenlimits überschrieben"
         group_set_name: "Name des Gruppensatzes"
         leave_group_limit_blank: "Leer lassen, um kein Limit anzugeben"
         limit_group_size: "Gruppen auf %h{group_limit} Mitglieder beschränken"
@@ -7097,12 +7154,16 @@ de:
         group_delete: Löschen
         group_edit: Bearbeiten
         group_full: Voll
+        group_leader: Gruppenleiter
         group_settings: Einstellungen
         show_group_details: "Details für Gruppe %{name} anzeigen"
         visit_group_homepage: "Startseite der Gruppe besuchen"
       group_edit: 
         cancel: Abbrechen
         group_join_level: Beitreten
+        group_max_membership: "Beschränkt Gruppen auf"
+        group_max_membership_help: "(Unausgefüllt lassen, um festgelegtes Maximum für Gruppe zu verwenden)"
+        group_max_membership_members: Mitglieder
         group_name: Gruppenname
         invitation_only: "Nur auf Einladung"
         open: "Mitglieder dürfen beitreten"
@@ -7111,10 +7172,16 @@ de:
       group_user: 
         assign_to_group: "Gruppe zuweisen"
         assign_user_to_group: "%{name} einer Gruppe zuweisen"
+        edit_group_membership: "Mitgliedschaft von %{name} bearbeiten"
+        group_leader: Gruppenleiter
         move: "Verschieben in..."
         move_to_new_group: "%{name} in eine neue Gruppe verschieben"
         remove: Entfernen
+        remove_as_leader: "Als Leiter entfernen"
         remove_from_group: "%{name} aus Gruppe entfernen"
+        remove_user_as_leader: "%{name} als Leiter entfernen"
+        set_as_leader: "Als Leiter festlegen"
+        set_user_as_leader: "%{name} als Leiter festlegen"
       group_users: 
         add_student: "Fügen Sie einen Studenten hinzu, um zu beginnen."
         add_user: "Fügen Sie einen Benutzer hinzu, um zu beginnen."
@@ -7132,6 +7199,7 @@ de:
       self_signup_help: 
         about_self_signup_groups: "Info zu Selbstregistrierungsgruppen"
         self_signup_description: "Sie können Gruppensätze erstellen, für die sich Studenten selbst anmelden können. Die Studenten sind immer noch auf eine Gruppe im Satz beschränkt, sie können sich jedoch ohne Unterstützung des Dozenten selbst in Gruppen organisieren. Beachten Sie, dass die Studenten selbst die Gruppe wechseln können, solange diese Option aktiviert ist."
+    max_membership_number: "Die maximale Mitgliedschaft muss eine Zahl sein"
     member: 
       one: "1 Mitglied"
       other: "%{count} Mitglieder"
@@ -7204,6 +7272,10 @@ de:
     which_course_is_this_question_about: "Auf welchen Kurs bezieht sich diese Frage?"
     your_email_address: "Ihre E-mailadresse"
   helpers: 
+    button: 
+      create: "%{model} erstellen"
+      submit: "%{model} speichern"
+      update: "%{model} aktualisieren"
     course: Kurs
     dashboard_helper: 
       announcement_details: Ankündigungsdetails
@@ -7223,8 +7295,13 @@ de:
       x_new_in_discussions: 
         one: "*1* Diskussion"
         other: "*%{count}* Diskussionen"
+    local: "Vor Ort"
     select: 
       prompt: "Bitte auswählen"
+    submit: 
+      create: "%{model} erstellen"
+      submit: "%{model} speichern"
+      update: "%{model} aktualisieren"
   high_contrast_description: |-
       Wenn Sie eine Version der Canvas-Benutzeroberfläche mit einem höheren Kontrast bevorzugen, aktivieren Sie diese Funktion.
       Dies ist möglicherweise für Personen hilfreich, deren Sehfähigkeit eingeschränkt ist, oder die Schwierigkeiten beim Lesen haben.
@@ -7236,6 +7313,7 @@ de:
   icons: 
     discussion_submission: Diskussionseinsendung
     file_upload_submission: "Einsendung durch Hochladen von Datei"
+    media_submission: "Einsendung von Medien"
     online_url_submission: "Einsendung über Online-URL"
     quiz_submission: Quiz-Einsendung
     text_entry_submission: "Einsendung von Texteingabe"
@@ -7256,7 +7334,11 @@ de:
   importers/context_module_importer: 
     migration_module_item_type: Modulelement
   importers/course_content_importer: 
+    account_grading_standard_warning: "Die Benotungskriterien für den Kurs konnten nicht gefunden werden."
+    copied_grading_standard_warning: "Die kopierten Benotungskriterien für den Kurs konnten nicht gefunden werden."
+    due_dates_warning: "Die Abgabefristen konnten nicht angepasst werden."
     failed_import_media_objects: "Fehler beim Import von Medienobjekten"
+    file_import_warning: "Die Datei %{file} konnte nicht gefunden werden"
   importers/learning_outcome_group_importer: 
     no_global_permission: "Sie dürfen keine globalen Ergebnisse verwalten. \"%{title}\" kann nicht hinzugefügt werden"
   importers/learning_outcome_importer: 
@@ -7295,6 +7377,7 @@ de:
         am_pm: am/pm
     draft: Entwurf
     errors: 
+      cannot_view_document_in_canvas: "Dieses Dokument kann in Canvas nicht angezeigt werden."
       document_preview_processing: "Die Dokumentvorschau wird derzeit verarbeitet. Versuchen Sie es später erneut."
       field_is_required: "Dies ist ein Pflichtfeld"
       invalid_datetime: "Ungültige Datums-/Uhrzeitangabe"
@@ -7339,6 +7422,7 @@ de:
       view_in_new_window: "In einem neuen Fenster anzeigen"
     tooltips: 
       enter_search_terms: "Suchbegriffe eingeben"
+  invalid_points_possible: "Der Wert für mögliche Punkte für diese Aufgabe muss Null oder höher sein."
   invalid_url_in_xml: "Ungültige URL in XML. Und-Zeichen müssen mithilfe von Escapezeichen dargestellt werden."
   invalid_xml_syntax: "Ungültiger XML-syntax"
   jobs: 
@@ -7402,10 +7486,16 @@ de:
     module_sequence_footer: 
       next: Weiter
       previous: Zurück
+  k12_description: |-
+      Funktionen, Einstellungen und Stile, die vor allem in K-12-Umgebungen mehr Sinn machen. Derzeit gilt dies nur
+      für einige Stiländerungen. In Zukunft werden jedoch u. U. weitere K-12-spezifische Elemente hinzugefügt.
   labels: 
     lock_module_until: "Modul bis zu einem bestimmten Datum sperren"
+  last_submission_activity_title: "Letzte Einsendungsaktivität"
+  last_user_access_title: "Letzter Benutzerzugriff"
   layouts: 
     application: 
+      group_switch: Wechseln
       instructure_description: "Instructure, Entwickler des Open-Source-Lernverwaltungssystems Canvas"
       keyboard_navigation: 
         close: "Komma-Taste drücken, um das Dialogfeld zu schließen"
@@ -7422,6 +7512,7 @@ de:
         grades: Noten
       navigation: 
         main: Hauptnavigation
+        user_menu: Benutzermenü
       open_source_learning_management_system: Open-Source-LMS
     facebook: 
       title: Facebook-seite
@@ -7450,6 +7541,7 @@ de:
   learning_outcome: 
     no_comment: "Keine Kommentare"
     no_description: "Keine Beschreibung"
+  learning_outcome_assignment_type_title: "Lernergebnis und Aufgabentyp"
   lib: 
     angel: 
       failed_import_link: "Fehler bei Link-Import"
@@ -7558,6 +7650,8 @@ de:
       new_tab: "Dieses Tool muss in einem neuen Browserfenster geladen werden"
       new_tab_expired: "Die Sitzung für dieses Tool ist abgelaufen. Bitte laden Sie die Seite erneut, um wieder auf das Tool zugreifen zu können"
       new_tab_loaded: "Dieses Tool wurde erfolgreich in einem neuen Browserfenster geladen. Laden Sie die Seite erneut, um wieder auf das Tool zugreifen zu können."
+  lti2: 
+    register_tool: "Tool registrieren"
   m2c_file_description: "Moodle 1.9/2x"
   m2c_name: "Moodle Importer"
   manage_avatars: 
@@ -7765,6 +7859,7 @@ de:
           attendee: Anwesende/r
           attendees: Anwesende
           cancel_reason: "Grund der Stornierung"
+          click_to_see_appointment: "Zum Anzeigen des Termins hier klicken"
           date_and_time: Datum/Uhrzeit
           details: Termindetails
           group: Gruppe
@@ -8186,6 +8281,7 @@ de:
     assignment_resubmitted: 
       email: 
         html: 
+          link: "Zum Anzeigen der Einsendung hier klicken"
           user_resubmitted: "Neueinsendung am %{user_name}, %{assignment_name}"
           user_resubmitted_sentence: "%{user_name} hat soeben die Aufgabe %{assignment_name} für den Kurs %{course_name} neu eingesandt"
         labels: 
@@ -8206,6 +8302,7 @@ de:
     assignment_submitted: 
       email: 
         html: 
+          link: "Zum Anzeigen der Einsendung hier klicken"
           user_submitted: " Einsendung: %{user_name}, %{assignment_name} "
           user_submitted_sentence: "%{user_name} hat soeben die Aufgabe %{assignment_name} für den Kurs %{course_name} neu eingesandt"
         labels: 
@@ -8226,6 +8323,7 @@ de:
     assignment_submitted_late: 
       email: 
         html: 
+          link: "Zum Anzeigen der Einsendung hier klicken"
           user_resubmitted_sentence: "%{user_name} hat soeben die Aufgabe %{assignment_name} für den Kurs %{course_name} verspätet eingesandt"
           user_submitted: "Verspätete Aufgabe: %{user_name}, %{assignment_name}"
         labels: 
@@ -8324,6 +8422,7 @@ de:
         subject: "Kursexport fehlgeschlagen: %{course}"
     content_export_finished: 
       email: 
+        body: "Der Inhaltsexport für \"%{course}\" wurde abgeschlossen."
         html: 
           body2: "Der Export des Kurses *%{course}* wurde abgeschlossen."
           link: "Zum Anzeigen von Exporten klicken"
@@ -8343,8 +8442,10 @@ de:
           download: herunterladen
           subject: "%{user_name} hat Ihnen soeben eine Nachricht in Canvas geschickt."
           unknown_user: "Unbekannter Benutzer"
+          view_message: "Diese Nachricht in Konversationen anzeigen"
         subject: "%{user_name} hat Ihnen soeben eine Nachricht über Canvas geschickt."
         unknown_user: "Unbekannter Benutzer"
+        view_message: "Diese Nachricht in Konversationen anzeigen"
       facebook: 
         body: "%{user_name} hat Ihnen soeben eine Nachricht über Canvas geschickt."
         link_text: "Nachricht anzeigen"
@@ -9157,8 +9258,19 @@ de:
     page_locked_until: "Diese Seite ist bis %{date} gesperrt."
     page_unpublished_module: "Diese Seite gehört zu einem nicht veröffentlichten Modul und ist noch nicht verfügbar."
     peer_review_invitation: 
+      email: 
+        body: "Sie wurden eingeladen, eine Peer-Review für %{reviewee} durchzuführen. Klicken Sie hierzu auf den Link unten."
+        html: 
+          link_message: "Zum Abschließen der Review hier klicken"
+        subject: "Peer-Review für %{reviewee} zugewiesen"
+      facebook: 
+        body: "Sie wurden eingeladen, eine Peer-Review für %{reviewee} durchzuführen. Klicken Sie hierzu auf den Link unten."
       sms: 
         more_info: "Weitere Informationen finden Sie unter %{url}"
+      summary: 
+        body: "Sie wurden eingeladen, eine Peer-Review für %{reviewee} durchzuführen. Klicken Sie hierzu auf den Link unten."
+      twitter: 
+        body: "Sie wurden eingeladen, eine Peer-Review für %{reviewee} durchzuführen. Klicken Sie hierzu auf den Link unten."
     pseudonym_registration: 
       email: 
         body: "Sie wurden für ein Canvas-konto unter %{account} registriert!  Bevor Sie sich anmelden und Canvas nutzen können, müssen Sie den Konfigurationsprozess abschließen."
@@ -9271,6 +9383,7 @@ de:
         body: "%{author} hat soeben einen neuen Kommentar eingestellt zur Einsendung von %{user} für %{assignment}"
         html: 
           body: "%{author} hat soeben einen neuen Kommentar zur Einsendung für %{user} für %{assignment} abgegeben"
+          link_message: "Zum Anzeigen des Kommentars hier klicken"
           someone: Jemand
           subject: "Kommentar zur Einsendung: %{user}, %{assignment}, %{context}"
           submission_comment_link_message: "Sie können die Details der Einsendung über den unten stehenden Link überprüfen, oder auf den Kommentar antworten, indem Sie auf diese Nachricht antworten."
@@ -9295,6 +9408,7 @@ de:
         html: 
           body: "%{author} hat soeben einen neuen Kommentar zur Einsendung für %{user} für %{assignment} abgegeben"
           link_message: "Sie können die Einsendungsdetails anzeigen, indem Sie auf den Link unten klicken:"
+          review_submission: "Zum Überprüfen der Einsendung hier klicken"
           someone: Jemand
           subject: "Kommentar zur Einsendung: %{user}, %{assignment}, %{context}"
         someone: Jemand
@@ -9519,6 +9633,7 @@ de:
   migration_issues: 
     errors: 
       valid_workflow_state: "Muss einen gültigen Workflow-Status senden"
+  mississippi_sis_title: SIS-Daten
   module_item_types: 
     assignment: Aufgabe
     disuccsion: Diskussion
@@ -9580,6 +9695,7 @@ de:
     where_to_move: "Wohin möchten Sie *%{name}* verschieben?"
   move_dialog_select: 
     move_to_end: "– An den unteren Rand –"
+  multi_student_progress_title: "Fortschritt mehrerer Studenten"
   mute_dialog: 
     curving_assignments: "Aufgaben-chart erstellen"
     grade_change_notifications: "Benachrichtigungen bei Notenänderung"
@@ -9592,6 +9708,8 @@ de:
     sure_you_want_to_mute: "Möchten Sie diese Aufgabe wirklich stummschalten? Solange diese Aufgabe stummgeschaltet ist, erhalten die Studenten keine neuen Benachrichtigungen und sehen keine Informationen im Zusammenhang mit:"
   name: "Academic Benchmark Importer"
   new_facebook_message: "Sie haben eine neue Nachricht von Canvas"
+  new_quiz_moderate_desc: "Wenn die Funktionen 'Entwurfstatus' und 'Quiz-Statistiken' zulässig/aktiviert sind, ist die neue Seite für die Quiz-Moderation für ein Konto verfügbar."
+  new_quiz_statistics_desc: "Wenn die Funktion 'Entwurfstatus' zulässig/aktiviert ist, ist die neue Seite mit Quiz-Statistiken für ein Konto verfügbar."
   new_styles_description: |-
       Wir aktualisieren gerade die Benutzeroberfläche von Canvas. Aktivieren Sie diese Option, 
       um die aktualisierte und vereinfachte Canvas-Benutzeroberfläche zu sehen.
@@ -10077,7 +10195,7 @@ de:
       description: "Canvadocs (mit Box View kompatibel) als Dokumentvorschau-Option aktivieren"
       name: Canvadocs
     canvadocs_settings: 
-      description: "Dieses Plun-in ist in Canvadocs (oder eine beliebige mit Box View-kompatible API) integrierbar, um eine HTML5-Dokumentvorschaufunktion bereitzustellen."
+      description: "Dieses Plug-in ist in Canvadocs (oder eine beliebige mit Box View-kompatible API) integrierbar, um eine HTML5-Dokumentvorschaufunktion bereitzustellen."
       labels: 
         api_key: API-Key
         base_url: Basis-URL
@@ -11066,7 +11184,7 @@ de:
       partial: Teilweise
       right: "Richtige Antwort"
       unanswered: Unbeantwortet
-      you_answered: "Sie antworteten"
+      you_answered: "Sie beantworteten"
   quizzes: 
     after_last_attempt: "Nach dem letzten Versuch"
     alerts: 
@@ -12132,7 +12250,7 @@ de:
     upload_info: "Wenn Sie Änderungen an den heruntergeladenen Einsendungen der Studenten vorgenommen haben, komprimieren Sie die Einsendungen erneut und laden Sie die Zip-datei über das unten stehende Formular hoch. Die geänderten Dateien werden den Studenten in den Einsendungskommentaren angezeigt."
     upload_warning: "Bitte achten Sie darauf, dass die Namen der eingesandten Dateien unverändert bleiben, sodass eine eindeutige Zuordnung möglich ist."
   react_files: 
-    loading_more_results: "Weitere Ergebnisse laden"
+    loading_more_results: "Weitere Ergebnisse werden geladen"
   recent_student: 
     last_logged_in: "letzte Anmeldung: %{last_login}"
   recipient_input: 
@@ -13295,7 +13413,7 @@ de:
   student_id: Studenten-ID
   student_name: "Name des Studenten"
   student_outcome_gradebook_description: |-
-      Mithilfe des Notenbuchs für Leistungsziel erreicht des Studenten können Studenten den Fortschritt
+      Mithilfe des Notenbuchs für Leistungsziel erreicht für Studenten können Studenten den Fortschritt
       in Bezug auf die Lernergebnisse des Kurses schnell anzeigen. Die Ergebnisse werden in einem Notenbuch-ähnlichen Format und der Fortschritt als numerischer Punktestand
       und als Leistungziel erreicht/Leistungsziel fast erreicht/Wiederholung angezeigt.
   sub_accounts: 
