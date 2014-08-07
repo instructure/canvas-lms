@@ -74,6 +74,19 @@ describe Quizzes::QuizzesApiController, type: :request do
                    :course_id => "#{@course.id}")
       assert_status(404)
     end
+    it "limits student requests to published quizzes" do
+      student_in_course(:active_all => true)
+      quizzes = (0..1).map { |i| @course.quizzes.create! :title => "quiz_#{i}"}
+      published_quiz = quizzes.first
+      published_quiz.publish!
+      json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes",
+                      :controller => 'quizzes/quizzes_api',
+                      :action => 'index',
+                      :format => 'json',
+                      :course_id => "#{@course.id}")
+      quiz_ids = json.collect { |quiz| quiz['id'] }
+      quiz_ids.should == [ published_quiz.id]
+    end
 
     context "jsonapi style" do
 
