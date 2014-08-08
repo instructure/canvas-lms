@@ -24,15 +24,15 @@ else
             end
           activate_without_delayed_jobs!(categories)
         end
-      end
-      alias_method_chain :activate!, :delayed_jobs
+        alias_method_chain :activate!, :delayed_jobs
 
-      def skip_delayed_job_auto_activation
-        was = @skip_delayed_job_auto_activation
-        @skip_delayed_job_auto_activation = true
-        yield
-      ensure
-        @skip_delayed_job_auto_activation = was
+        def skip_delayed_job_auto_activation
+          was = @skip_delayed_job_auto_activation
+          @skip_delayed_job_auto_activation = true
+          yield
+        ensure
+          @skip_delayed_job_auto_activation = was
+        end
       end
 
       self.primary_key = "id"
