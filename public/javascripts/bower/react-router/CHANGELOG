@@ -1,3 +1,30 @@
+v0.5.2
+Thu, 07 Aug 2014 18:25:47 GMT
+
+21f4f57 [added] preserveScrollPosition Route/Routes props
+f3b4de8 [added] support for extra props in Links, fixes #170
+f7342b0 [added] Link to react-router-bootstrap related module in readme
+829a9ec [added] <Redirect/> component
+0a49665 [added] Router.makeHref
+2100b8c [changed] handlers receive route name
+154afba [changed] location of public modules
+
+
+v0.5.1
+Mon, 04 Aug 2014 22:16:38 GMT
+
+08f5a69 [fixed] location="history" fallback
+87b1c2a [fixed] Navigation to root URL can fail
+760f021 [fixed] infinite loop in RouteStore.unregisterRoute
+5663924 Revert "[added] initialPath prop to <Routes>"
+5fea685 [added] Router.AsyncState mixin
+b0aa491 [added] initialPath prop to <Routes>
+395a590 [changed] fallback to window.location for history
+2a3582e [changed] make URLStore.push idempotent
+4c4f87b [fixed] alt click on Link should count as modified
+97c02f1 [fixed] middle click on <Link/>
+
+
 v0.5.0
 Sat, 26 Jul 2014 22:38:36 GMT
 
