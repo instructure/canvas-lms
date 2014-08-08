@@ -255,7 +255,7 @@ ja:
       saml_required: "SAML をテストするには SAML の設定が必要です"
   account_notification: 
     errors: 
-      invalid_account_notification_end_at: アカウントの通知終了時刻が開始時刻よりも前になっています
+      invalid_account_notification_end_at: アカウントのお知らせの終了時刻が開始時刻よりも前になっています
   account_notifications: 
     announcement_created_notice: アナウンスは正常に作成されました
     announcement_creation_failed_notice: アナウンスの作成に失敗しました
@@ -284,7 +284,7 @@ ja:
     report_header_assessment_question: アセスメントの質問
     report_header_assessment_question_id: "アセスメントの質問 ID"
     report_header_assessment_title: アセスメントのタイトル
-    report_header_assessment_type: アセスメントの種類
+    report_header_assessment_type: "アセスメント タイプ"
     report_header_assignment_id: "課題 ID"
     report_header_assignment_title: 課題のタイトル
     report_header_assignment_url: "課題の URL"
@@ -296,7 +296,7 @@ ja:
     report_header_course_sis: "コース SIS"
     report_header_course_sis_id: "コース SIS ID"
     report_header_created_at: 作成日時
-    report_header_current_score: "コース スコア"
+    report_header_current_score: 現在のスコア
     report_header_email: 電子メール
     report_header_end__date: 終了日
     report_header_end_date: 終了日
@@ -306,7 +306,7 @@ ja:
     report_header_group_id: "グループ ID"
     report_header_id: ID
     report_header_last_access_at: 最終アクセス日時
-    report_header_last_ip: "最終 IP"
+    report_header_last_ip: "前回の IP"
     report_header_last_name: 姓
     report_header_learning_outcome_id: "学習成果 ID"
     report_header_learning_outcome_name: 学習成果名
@@ -327,7 +327,7 @@ ja:
     report_header_sis_id: "SIS ID"
     report_header_start__date: 開始日
     report_header_start_date: 開始日
-    report_header_status: ステータス
+    report_header_status: 状況
     report_header_student_id: "受講生 ID"
     report_header_student_name: 受講生名
     report_header_student_sis: "受講生 SIS"
@@ -456,8 +456,8 @@ ja:
         To: 変更後
         Value: 値
         blank_placeholder: "-"
-        copied_from_label: コピー元
-        copied_to_label: コピー先
+        copied_from_label: コピー開始
+        copied_to_label: コピー終了
         date: 日付
         event_id: "イベント ID"
         event_sis_batch: "SIS バッチ"
@@ -731,7 +731,7 @@ ja:
       account_reports: 
         default: 
           public_courses: 
-            text: "このレポートでは、特定の期間に削除されなかった公開されているすべてのコースが示されます。生成される csv ファイルでは、個々のコースが 1 行で示され、コース ID、コース SIS ID、コースの省略名、コース名、コース開始日、コース終了日が表示されます。"
+            text: "このレポートでは、特定の期間で削除されていない、公開されているすべてのコースが示されます。生成される csv ファイルでは、個々のコースが 1 行で示され、コース ID、コース SIS ID、コースの省略名、コース名、コース開始日、コース終了日が表示されます。"
     quota_integer_required: 整数の値が必要です
     quota_must_be_positive: 値は正数でなければなりません
     quota_not_updated: クォータは更新されませんでした
@@ -1915,8 +1915,8 @@ ja:
       redirect_message: |-
           この提出物は URL でした。今からその URL リンクにお連れします。  
           [ここをクリックして提出用 URL に移動](%{url})
-    remove_never_drop_rule: 決して下げないのルールを削除
-    remove_unsaved_never_drop_rule: 未保存を決して下げないのルールを削除
+    remove_never_drop_rule: 決して下げないルールを削除
+    remove_unsaved_never_drop_rule: 未保存の決して下げないルールを削除
     rules_text: 
       one: "%{count} 件のルール"
       other: "%{count} 件のルール"
@@ -3868,7 +3868,7 @@ ja:
       edit_item: アイテムの詳細情報の編集
       student_progress: モジュールに対する受講生の進捗
     url_show: 
-      new_tab: "このサイトを新しいブラウザ ウィンドウで表示する必要があります。"
+      new_tab: このサイトは、ブラウザの別ウィンドウで表示する必要があります。
       open_url_button: "%{title} を新しいウィンドウで表示"
       tool_insecure_warning: "安全なサイト (Canvas) 内から安全でないコンテンツを開こうとしています。一部のインターネット ブラウザでは、このコンテンツを読み込めない場合があります。"
   context_modules_api: 
@@ -4179,8 +4179,8 @@ ja:
       sis: SIS
     event_type: 
       concluded: 完了
-      copied_from: コピー元
-      copied_to: コピー先
+      copied_from: コピー開始
+      copied_to: コピー終了
       corrupted: 詳細なし
       created: 作成日時
       deleted: 削除済み
@@ -4384,7 +4384,7 @@ ja:
               
               このコースの使用権を請求するには、 **ログイン** または ***登録*** を行ってください。
         files: "[ファイル] タブは、講義用スライド、文書サンプル、研究支援素材など、受講生がダウンロードを希望するものを何でも共有できる場所です。ファイルのアップロードや整理は、Canvas なら簡単に行うことができます。使用方法をご覧ください。"
-        home2: "コースを訪問したときに表示されるのがこのページです。アクティビティ ストリーム、コースモジュールのリスト、要綱、または自身で記述したカスタム ページを表示できます。デフォルトでは、アクティビティ ストリームが表示されます。カスタマイズするには、%{choose_home_page} をクリックします。"
+        home2: "コースを訪問したときに表示されるのがこのページです。アクティビティ ストリーム、コース モジュールのリスト、要綱、または自身で記述したカスタム ページを表示できます。デフォルトでは、アクティビティ ストリームが表示されます。カスタマイズするには、%{choose_home_page} をクリックします。"
         import: "別のコース管理システムをご利用になっていた場合は、既にその場所にできあがっているものを Canvas に移動したいとお考えではないでしょうか。当システムでは、コンテンツを簡単に Canvas に移行するためのプロセスを、順を追ってご案内しています。"
         navigation: "デフォルトでは、コース用のすべてのリンクが有効になります。受講生には、コンテンツのないセクションへのリンクは表示されません。例えば、クイズを 1 つも作成していない場合、そのクイズへのリンクは受講生には表示されません。コース内に、受講生からのアクセスを禁止したいエリアがある場合は、それらのリンクを並べ替えて明確に無効にすることができます。"
         publish: 
@@ -4530,7 +4530,7 @@ ja:
         close: 完了
         duplicates_removed: 重複が削除されました。
         email: "電子メール アドレス"
-        email_field_label: "追加するユーザの電子メール アドレスを完まで区切って入力します"
+        email_field_label: "追加するユーザの電子メール アドレスをカンマで区切って入力します"
         email_field_place_holder: "\"受講生のサンプル\" &lt;student@example.com&gt;, \"姓, 名\" &lt;firstlast@example.com&gt;, justAnEmailAddress@example.com"
         example_formats: "例: user@example.com, \"名 姓\" &lt;user@example.com&gt;, \"姓 名\" &lt;user@example.com&gt;"
         form_instructions: "以下に電子メール アドレスのリストを入力または貼り付け:"
@@ -4649,7 +4649,7 @@ ja:
         course_lock_all_announcements: アナウンスへのコメントを無効にする
         course_name: 名前
         course_section_name: 新しいセクションの追加
-        course_status_published: コースは公開されました
+        course_status_published: コースは公開されています
         course_status_unpublished: コースは未公開です
         course_visibility: 可視性
         enrollment_term_id: 期間
@@ -4958,7 +4958,7 @@ ja:
       assign_blanks: 未提出の受講生にゼロを割り当てる
     out_of_points_possible: "配点: %{assignment.points_possible}"
     this_is_permanent: 分布曲線評価は取り消しできません。分布曲線評価を行う前の成績の履歴は利用できますが、分布曲線評価の処理は取り消すことができません。
-  custom_grade_export_title: "CampusVue の成績のエクスポート"
+  custom_grade_export_title: "CampusVue 成績のエクスポート"
   custom_outcomes_title: カスタムの成果
   cv_non_graded_data__title: "CampusVue 未採点の課題レポート"
   cv_submission_data__title: "CampusVue 提出データ"
@@ -5985,7 +5985,7 @@ ja:
       delete: 削除
     cannot_locate_launch_request: 起動要求が見つかりません。もう一度、試してください。
     consumer_key: コンシューマ鍵
-    course_home_sub_navigation_configured: "コースのホームのサブ ナビゲーション設定済み"
+    course_home_sub_navigation_configured: "コース ホームのサブ ナビゲーション設定済み"
     course_navigation_configured: コースのナビゲーションが構成されました
     course_settings_sub_navigation_configured: "コース設定のサブ ナビゲーション設定済み"
     delete: 削除
@@ -6070,7 +6070,7 @@ ja:
       new_tab_loaded: このツールは、ブラウザの別ウィンドウに正常に読み込まれました。ページを再読み込みして、もう一度ツールにアクセスしてください。
     tool_show: 
       tool_insecure_warning: "安全なサイト (Canvas) 内から安全でないコンテンツを開こうとしています。一部のインターネット ブラウザでは、このコンテンツを読み込めない場合があります。"
-      tool_load_failure: コンテンツを読み込めません。このボタンを使用して、新しいタブで開くことができます。
+      tool_load_failure: コンテンツを読み込めない可能性があります。このボタンを使用して、新しいタブで開くことができます。
     user_navigation_configured: ユーザのナビゲーションが構成されました
   facebook: 
     authorization_required: 認証されたユーザのみが、そのページにアクセスできます
@@ -6119,7 +6119,7 @@ ja:
       notifications_config_notice: "Canvas からのお知らせを、自動的に Facebook アカウントに送信できます。送信できるお知らせのタイプには、次のものがあります。お知らせの基本設定は、ここで、または Canvas 内でいつでも変更できます。"
       settings_title: "Canvas のお知らせ設定"
       updating_preferences: 基本設定を更新しています...
-  faculty_success_tile: 講師の成功度レポート
+  faculty_success_tile: 講師の成功レポート
   feature_flags: 
     feature_flag: 
       allow: 許可
@@ -6374,7 +6374,7 @@ ja:
   grade_summary: 
     graph_title: "平均 %{mean}、最高 %{high}、最低 %{low}"
     outcome: 
-      alignment_count: "整列 *%{count}*"
+      alignment_count: "整列: *%{count}* 件"
   gradebook: 
     alerts: 
       no_active_students: 申し訳ありません。このコースには、アクティブな受講生がいないか、採点済みの受講生がいません。
@@ -7331,7 +7331,7 @@ ja:
       視覚に障害のある方や、画面の文字が読みづらい方は、この機能を有効にすることをお勧めします。
   html5_first_videos_description: |-
       デフォルトで、Canvas は Flash を優先的に使用してビデオの再生を試みます。HTML5 を優先して使用し、
-      その後に Flash での再生を試みる場合は、この設定をオンにします。
+      その後に Flash での再生を試みる場合は、この設定を有効にします。
   ic_actions: 
     manage: 管理
   icons: 
@@ -7446,7 +7446,7 @@ ja:
       view_in_new_window: 新しいウィンドウで表示
     tooltips: 
       enter_search_terms: 検索語を入力
-  invalid_points_possible: "この課題の配点の値は、0 異常であることが必要です。"
+  invalid_points_possible: "この課題の配点の値は、0 以上であることが必要です。"
   invalid_url_in_xml: "xml 内の url が無効です。アンパサンドはエスケープする必要があります。"
   invalid_xml_syntax: "無効な XML 構文"
   jobs: 
@@ -7511,7 +7511,7 @@ ja:
       next: 次へ
       previous: 前へ
   k12_description: |-
-      K-12 環境でのみ意味を持つ機能、設定、およびスタイルです。現時点では、一部のスタイル変更のみに当てはまりますが、
+      K-12 環境で意味を持つ機能、設定、およびスタイルです。現時点では、一部のスタイル変更のみに当てはまりますが、
       今後 K-12 固有の項目が追加される可能性があります。
   labels: 
     lock_module_until: 特定の日付までモジュールをロック
@@ -9991,7 +9991,7 @@ ja:
         units: 
           billion: "10 億"
           million: "100 万"
-          quadrillion: 1000兆
+          quadrillion: "1000 兆"
           thousand: "1000"
           trillion: "1 兆"
       storage_units: 
@@ -10260,10 +10260,10 @@ ja:
     buttons: 
       saving: 保存しています...
     canvadocs: 
-      description: "(Box View と互換性のある) Canvadocs を文書プレビューオプションとして有効にする"
+      description: "(Box View と互換性のある) Canvadocs を文書プレビュー オプションとして有効にする"
       name: Canvadocs
     canvadocs_settings: 
-      description: "このプラグインは Canvadocs (または任意の Box View 互換 API) と統合して、HTML5 文書プレビューツールを提供します。"
+      description: "このプラグインは Canvadocs (または任意の Box View 互換 API) と統合して、HTML5 文書プレビュー ツールを提供します。"
       labels: 
         api_key: "API 鍵"
         base_url: "ベース URL"
@@ -11097,7 +11097,7 @@ ja:
   qti_display: QTI
   qti_file_description: "QTI .zip ファイル"
   qti_img_matching_question: インポートされた一致する質問には両側に画像が含まれていますが、これはサポートされていません
-  qti_img_matching_question_distractors: インポートされた一致する質問には、選択しないに画像が含まれていますが、デストラクタも含まれているため修正できませんでした
+  qti_img_matching_question_distractors: インポートされた一致する質問には、選択肢内に画像が含まれていますが、デストラクタも含まれているため修正できませんでした
   qti_name: "QTI コンバータ"
   qualified_locale: ja-JP
   question_answered: 解答済み
@@ -11227,7 +11227,7 @@ ja:
       regrade_options: "再評価オプション *(すでにこの問題に回答した受講生用):*"
       some_scores_reduced: "正しい回答に対してのみポイントを与える (*一部の受講生は減点される場合があります*)"
       update_question_without_regrading: 再評価せずに問題を更新する
-    regrade_count_affected: "このクイズが再評価されました。新しいスコアは、影響のある %{num} 個の質問を反映しています。"
+    regrade_count_affected: "このクイズが再評価されました。新しいスコアは、影響のある %{num} 個の問題を反映しています。"
     regrade_score_affected: このクイズが再評価されました。スコアが変更されました。
     resume_the_quiz: クイズを再開
     resume_the_survey: サーベイを再開
@@ -11244,11 +11244,11 @@ ja:
   quiz_extend_time: 
     ending_time: 終了時刻
     extend_time: 時間の延長
-    extensions_student: "%{student} の延長時間"
+    extensions_student: "%{student} の時間を延長"
     extensions_successfully_added: 延長が正常に追加されました
     now: 今すぐ
   quiz_extensions: 
-    everyone_gets_attempts: "すべての受講生が %{num} 受けています"
+    everyone_gets_attempts: "すべての受講生が %{num} 回受けています"
     everyone_gets_time: "すべての受講生が %{num} 分受けています"
     extensions_num_students: "%{num} 人の受講生の延長"
     extensions_student: "%{student} に対する延長時間"
@@ -12472,7 +12472,7 @@ ja:
         email: "電子メール アドレス"
         name: 名前
     welcome_to_canvas: "Canvas へようこそ!"
-  reply_from_name: "Canvas のお知らせによる %{name}"
+  reply_from_name: "%{name} (Canvas のお知らせから)"
   retrieve_timeout: 設定を取得できませんでした。サーバの応答がタイムアウトしました
   role_override: 
     permission: 
@@ -12514,7 +12514,7 @@ ja:
       manage_students: コースに対する受講生の追加/削除
       manage_user_logins: ユーザのログインの詳細変更
       manage_user_notes: 講師日誌のエントリの管理
-      manage_user_observers: ユーザーのオブザーバを管理
+      manage_user_observers: ユーザのオブザーバを管理
       manage_wiki: "Wiki の管理 (ページの追加/編集/削除)"
       managed_jobs: "バックグラウンド ジョブの管理"
       moderate_form: "ディスカッションの管理 (他者の投稿の削除/編集、トピックのロック)"
@@ -13119,7 +13119,7 @@ ja:
     new_course_form: 
       cancel: キャンセル
       course_cose_explanation: これは小さいスペースの場所に表示されます
-      course_is_public_explanation: "コースを一般に表示します *(受講生データは非公開のままです)*"
+      course_is_public_explanation: "コースを一般公開します *(受講生データは非公開のままです)*"
       create_course: コースの作成
       creating_course: コースを作成しています...
       labels: 
@@ -13623,14 +13623,14 @@ ja:
       one: "%{count} 人の受講生"
       other: "%{count} 人の受講生"
   student_groups_desc: |-
-      これにより、アカウントの新しい受講生グループ ページが可能になります。新しいページは、動的にグループにサインアップできるように
+      これにより、アカウントの新しい受講生グループ ページが有効になります。新しいページは、動的にグループにサインアップできるように
       提供されました。
   student_id: "受講生 ID"
   student_ip_title: "受講生 IP アドレス"
   student_name: 受講生名
   student_outcome_gradebook_description: |-
       受講生は、受講生の学習達成度の成績表を使用して、コース学習成果の進捗を簡単に表示できます。
-       成果は成績表のような形式で表示され、進捗が数字のスコアおよび達成/ほぼ達成/ 補習として
+      成果は成績表のような形式で表示され、進捗が数字のスコアおよび達成/ほぼ達成/ 補習として
       表示されます。
   student_submissions_title: 受講生の提出
   students_with_no_submissions_title: 提出のない受講生
@@ -14625,7 +14625,7 @@ ja:
     next_label: "次 &#8594;"
     page_entries_info: 
       multi_page: "%{model} %{from} ～ %{to} を表示、合計で %{count} 件"
-      multi_page_html: "%{model} <b>%{from}}&nbsp;～}&nbsp;%{to}</b> を表示、合計で <b>%{count}</b>"
+      multi_page_html: "%{model} <b>%{from}&nbsp;～&nbsp;%{to}</b> を表示、合計で <b>%{count}</b> 件"
       single_page: 
         one: "1 件の %{model} を表示"
         other: "%{count} 件のすべての %{model} を表示"
