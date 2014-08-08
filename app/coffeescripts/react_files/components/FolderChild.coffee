@@ -6,28 +6,48 @@ define [
   './FriendlyDatetime'
   './ItemCog'
   'compiled/util/friendlyBytes'
-], (React, {Link}, BackboneMixin, withReactDOM, FriendlyDatetime, ItemCog, friendlyBytes) ->
+  'compiled/models/Folder'
+  'compiled/fn/preventDefault'
+], (React, {Link}, BackboneMixin, withReactDOM, FriendlyDatetime, ItemCog, friendlyBytes, Folder, preventDefault) ->
 
 
   FolderChild = React.createClass
 
     mixins: [BackboneMixin('model')],
 
+    getInitialState: ->
+      editing: false
+
+    startEditingName: preventDefault ->
+      @setState editing: true
+      setTimeout =>
+        @refs.newName.getDOMNode().focus()
+
+
+    doneEditing: preventDefault ->
+      @props.model.save(name: @refs.newName.getDOMNode().value)
+      @setState(editing: false)
+
+
     render: withReactDOM ->
       div className:'ef-item-row',
         div className:'ef-name-col',
-          if @props.model.get('display_name')
+          if @state.editing
+            form onSubmit: @doneEditing,
+              input type:'text', ref:'newName', defaultValue: @props.model.get('name') || @props.model.get('display_name')
+          else if @props.model instanceof Folder
+            Link to: 'folder', contextType: @props.params.contextType, contextId: @props.params.contextId, splat: @props.model.urlPath(),
+              i className:'icon-folder',
+              @props.model.get('name')
+          else
             a href: @props.model.get('url'),
               if @props.model.get('thumbnail_url')
                 img src: @props.model.get('thumbnail_url'), className:'ef-thumbnail', alt:''
               else
                 i className:'icon-document'
               @props.model.get('display_name')
-          else
-            Link to: 'folder', contextType: @props.params.contextType, contextId: @props.params.contextId, splat: @props.model.urlPath(),
-              i className:'icon-folder',
-              @props.model.get('name')
-        div className:'ef-date-created-col',
+
+        div className:'ef-date-created-col', onClick: @startEditing,
           FriendlyDatetime datetime: @props.model.get('created_at'),
         div className:'ef-date-modified-col',
           FriendlyDatetime datetime: @props.model.get('updated_at'),
@@ -44,5 +64,5 @@ define [
             span( {className:'screenreader-only accessible_label'}, 'Published. Click to unpublish.')
           ),
 
-          ItemCog(model: @props.model)
+          ItemCog(model: @props.model, startEditingName: @startEditingName)
         )

@@ -18,6 +18,8 @@ define [
       @on 'change:sort change:order', @setQueryStringParams
       super
 
+    url: -> "/api/v1/folders/#{@id}"
+
     parse: (response) ->
       json = super
       @contentTypes ||= response.contentTypes
