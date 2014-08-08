@@ -1,0 +1,225 @@
+// This stylesheet contains styles for any NEW markup created for the k-12 header
+// K-12 styles for existing markup can be found under the k-12 flag in _#header.sass
+
+@if $is-k12 {
+
+  .canvas-header {
+    @include border-box;
+    border-bottom: 1px solid #ccc;
+  }
+
+  .canvas-header__secondary,
+  .canvas-logo-area,
+  .canvas-user-nav {
+    @include border-box;
+    display: flex;
+  }
+
+  .canvas-header__primary {
+    display: flex;
+    @if $use_high_contrast { background: darken($brand-k12, 35%); }
+    @else { 
+      background: $brand-k12;
+      border-bottom: 1px solid $brand-k12-dark;
+    }
+  }
+
+  .canvas-header__secondary {
+    height: $k12-header-secondary-height;
+
+    @if $use_high_contrast { background: darken($brand-k12-dark, 30%);  }
+    @else { background: $brand-k12-dark; }
+
+    .canvas-logo-area {
+      align-items: center;
+      flex: 0 0 $k12-sp*12;
+
+      .canvas-logo-area__logo-link {
+        @include border-box;
+        transition: all 0.5s $k12-transition;
+        line-height: 1;
+        height: $k12-header-secondary-height;
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-content: center;
+
+        &:hover {
+          .svg-logo-canvas__logomark { transform: translate3d(0,0,0) rotate(-180deg); }
+        }
+
+        &:focus { box-shadow: inset 0 0 0 2px $orange; }
+      }
+
+      .svg-canvas-logo {
+        display: inline-block;
+        flex: 0 0 114px;
+      }
+
+      .svg-logo-canvas__logomark {
+        transition: all 0.5s $k12-transition;
+        transform-origin: center center;
+        transform: translate3d(0,0,0);
+        path, circle { fill: $k12-header-text; }
+      }
+
+      .svg-logo-canvas__logotype {
+        path, circle { fill: $k12-header-text; }  
+      }
+
+    }
+
+    .canvas-customer-area {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      color: $k12-header-text;
+    }
+
+    .canvas-customer-area__content {
+      padding: $k12-sp/4 0 $k12-sp/4 ($k12-sp + 2);
+      border-left: 1px solid rgba($k12-header-text, 0.5);
+    }
+
+    .canvas-user-nav {
+      flex: 1.5;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: $k12-sp*2;
+    }
+
+  }
+
+  .canvas-primary-nav {
+    @include border-box;
+    // give the primary nav a minimum width of 4 links * the width of each link .menu-item
+    // will need to adjust if the # of links changes
+    flex: 1 0 $k12-sp*40;
+    display: flex;
+
+    .menu-item__text {
+      margin: $k12-sp/3 0 0;
+      font-size: 14px;
+      @include breakpoint(desktop) {
+        font-size: 17px;
+        margin: 0 0 0 $k12-sp;
+      }
+    }
+
+    .menu-item {
+
+      .menu-item__icon {
+        width: $k12-sp*3;
+        // keeps Safari happy when icons are stacked on top of text
+        max-height: $k12-sp*3;
+        
+        @include breakpoint(desktop) { 
+          width: $k12-sp*3.5;
+          max-height: $k12-sp*3.5;
+        }
+        
+        &.svg-icon-courses { 
+          width: ($k12-sp*3) + 10; 
+          @include breakpoint(desktop) { width: ($k12-sp*3.5) + 10; }
+        }
+        path { fill: $k12-header-text; }
+      }
+      
+      // For main courses dropdown, add a slide-up opacity effect
+      &#courses_menu_item .menu-item-drop__inner-content {
+        transition: all 0.3s $k12-transition;
+        transform: translate3d(0,25%,0);
+        opacity: 0;
+      }
+      
+      &.hover {
+
+        &#courses_menu_item {
+          .menu-item-drop__inner-content {
+            transform: translate3d(0,0,0);
+            opacity: 1;
+          }  
+        }
+
+      }
+
+      .menu-item-drop__inner-content {
+        background: white;
+        border: 1px solid #ddd;
+        border-top: none;
+        border-left: none;
+        position: relative;
+        box-shadow: 3px 3px 2px rgba(black, 0.05);
+
+        &:before, &:after {
+          content: "";
+          bottom: 100%; left: 62px;
+          border: solid transparent;
+          height: 0; width: 0;
+          position: absolute;
+          pointer-events: none;  
+        }
+
+        &:after {
+          border-color: rgba(255, 255, 255, 0);
+          border-bottom-color: white;
+          border-width: 10px;
+          margin-left: -10px;
+        }
+
+      }
+
+    }
+  }
+  
+  .canvas-customer-logo {
+    @include border-box;
+    padding: $k12-sp;
+    flex: 0 0 $k12-sp*13;
+    height: $k12-header-primary-height;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    img {
+      @include border-box;
+      display: block;
+      max-width: 100%; 
+      height: auto;
+      max-height: $k12-header-primary-height - ($k12-sp*2);
+      background: white;
+      padding: $k12-sp/3;
+      // Customer logos should have a white background by default, except for the placeholder image...
+      &.canvas-customer-logo__placeholder { background: transparent; }
+    }
+  }
+
+  .icon-badge-combo { position: relative; }
+
+  .icon-badge-combo__badge {
+    $h: 18px;
+    @include border-box;
+    display: inline-block;
+    line-height: $h;
+    border-radius: $h;
+    padding: 0 $k12-sp/2;
+    
+    position: absolute;
+    top: -($h/2 - 2); right: -$h/3;
+    font-size: 13px;
+    box-shadow: 1px 1px 1px rgba(black, 0.4);
+    @if $use_high_contrast {
+      background: white;
+      color: black;
+      font-weight: bold;
+    }
+    @else { background: $orange; }
+  }
+
+  // HACK for Firefox ignoring transform-origin in %: http://stackoverflow.com/questions/22361088/css-transform-origin-from-center-on-svg-ignored-in-firefox
+  @-moz-document url-prefix() {
+    .canvas-header__secondary .canvas-logo-area .svg-logo-canvas__logomark {
+      transform-origin: 13.5px 13.5px;
+    }
+  }
+
+}

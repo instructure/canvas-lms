@@ -1,8 +1,15 @@
 <% @current_user.set_menu_data(session[:enrollment_uuid]) %>
 <a href="<%= courses_path %>" class="menu-item-title">
+<% if k12? %>
+  <%= render(:partial => 'shared/svg/svg_icon_courses') %>
+  <div class="menu-item__text">
+<% end %>
   <%= @current_user.menu_data[:group_memberships_count].zero? ? t('links.courses', "Courses") : t('links.courses_and_groups', "Courses & Groups") -%>
-  <span class="menu-item-title-icon"></span> <i class="icon-mini-arrow-down"></i></a>
+  <span class="menu-item-title-icon"></span> <i class="icon-mini-arrow-down"></i>
+<% if k12? %></div><% end %>
+</a>
 <div class="menu-item-drop">
+  <% if k12? %><div class="menu-item-drop__inner-content"><% end %>
   <table cellspacing="0">
     <tr>
       <%= render(:partial => "shared/menu_courses", :locals => menu_courses_locals) %>
@@ -10,4 +17,5 @@
       <%= render(:partial => "shared/menu_section", :locals => menu_accounts_locals) %>
     </tr>
   </table>
+  <% if k12? %></div><% end %>
 </div>

@@ -43,6 +43,40 @@
     </div>
   <% end %>
 
+  <%# Begin alternate markup for K-12 Canvas header %>
+  <% if k12? %>
+  <a href="#content" id="skip_navigation_link"><%= t 'links.skip_to_content', "Skip To Content" %></a>
+  <header id="header" class="canvas-header no-print <%= 'no-user' unless @current_user %>">
+    <div class="canvas-header__secondary">
+      <div class="canvas-logo-area">
+        <a class="canvas-logo-area__logo-link" href="<%= dashboard_url %>">
+          <span class="screenreader-only"><%= t 'links.dashboard', "My Dashboard" %></span>
+          <%= render(:partial => 'shared/svg/svg_canvas_logo') %>
+        </a> 
+      </div>
+      <div class="canvas-customer-area">
+        <div class="canvas-customer-area__content">
+          <%= @domain_root_account.display_name %>
+        </div>
+      </div>
+      <nav class="canvas-user-nav">
+        <%= render(:partial => "shared/user_header_navigation") %>
+      </nav>
+    </div>
+    <div class="canvas-header__primary">
+      <%= render(:partial => "shared/keyboard_navigation_hint") if keyboard_navigation %>
+      <div class="canvas-primary-nav">
+        <%= render(:partial => "shared/primary_header_navigation") %>
+      </div>
+      <div class="canvas-customer-logo">
+        <img class="canvas-customer-logo__placeholder" src="/images/k-12-logo-placeholder.png" />
+      </div>
+    </div>
+  </header>
+  <%# End alternate markup for K-12 Canvas header %>
+  
+  <%# Begin default Canvas header %>
+  <% else %>
   <div id="header" class="no-print <%= 'no-user' unless @current_user %>">
     <div id="header-inner">
       <a href="#content" id="skip_navigation_link"><%= t 'links.skip_to_content', "Skip To Content" %></a>
@@ -53,6 +87,9 @@
       <%= render(:partial => "shared/primary_header_navigation") %>
     </div>
   </div>
+  <%# End default Canvas header %>
+  <% end %>
+
   <div id="instructure_ajax_error_box">
     <div style="text-align: right; background-color: #fff;"><a href="#" class="close_instructure_ajax_error_box_link"><%= t('links.close', 'Close') %></a></div>
     <iframe id="instructure_ajax_error_result" src="about:blank" style="border: 0;"></iframe>

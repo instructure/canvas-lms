@@ -208,6 +208,17 @@ $activeBG:                      #d6ecfc;
 
 $masquerade-link-color: #ffa500;
 
+// Canvas K-12 brand color and global spacing variables
+@if $is-k12 {
+  $brand-k12: #2a89e8;
+  $brand-k12-dark: darken(desaturate($brand-k12, 21), 15);
+  $k12-sp: 12px;
+  $k12-header-primary-height: $k12-sp*8;
+  $k12-header-secondary-height: $k12-sp*4;
+  $k12-header-text: white;
+  $k12-transition: cubic-bezier(0,1,0.5,1);  
+}
+
 // Font Sizes
 $h1-font-size: 23px;
 $h2-font-size: 14px;
@@ -218,5 +229,9 @@ $spacing-width: 20px;
 $wellBackground: #e8ecef;
 
 // override bootstrap green buttons
-$green: #34832b !default;
+@if $is-k12 { $green: #25bc34; }
+@else { $green: #34832b !default; }
+
+// override bootstrap orange color for k-12
+@if $is-k12 { $orange: #f55e22; }
 

@@ -34,3 +34,9 @@
     background-size: $bgw $bgh;
   }
 }
+
+// Easier box model
+@mixin border-box {
+  -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
+  &:before, &:after { -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; }
+}

@@ -11,24 +11,38 @@
 
 // List View
 .list-view {
+  @if $is-k12 { background-color: white; }
   overflow: auto;
   & > header,
   // oldskool compat
   #section-tabs-header {
-    @include buttonBackground($listViewHeaderBackgroundLight, $listViewHeaderBackground, $gray);
-    margin-top: 0;
-    padding: 4px 12px;
-    font-weight: bold;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.75);
-    border-bottom: 1px solid #efefef;
-    border-top: 1px solid $listBorderColor;
-    text-shadow: none;
-    // oldskool overrides
-    font-size: $baseFontSize;
-    font-weight: normal;
-    margin-bottom: 0;
-    line-height: 19px;
-    height: inherit;
+    @if $is-k12 { 
+      background-color: white;
+      margin: 0;
+      line-height: 1.1;
+      font-weight: bold;
+      padding: $k12-sp;
+      font-size: 14px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    @else {
+      @include buttonBackground($listViewHeaderBackgroundLight, $listViewHeaderBackground, $gray);
+      margin-top: 0;
+      padding: 4px 12px;
+      font-weight: bold;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.75);
+      border-bottom: 1px solid #efefef;
+      border-top: 1px solid $listBorderColor;
+      text-shadow: none;
+      // oldskool overrides
+      font-size: $baseFontSize;
+      font-weight: normal;
+      margin-bottom: 0;
+      line-height: 19px;
+      height: inherit;
+    }
   }
   #section-tabs-header-subtitle {
     display: block;
@@ -50,26 +64,42 @@
 
     & > li {
       padding: 0;
+      @if $is-k12 { padding: 0 $k12-sp - 4; }
 
       & > a {
         display: block;
-        padding: 4px 12px;
         color: ensure-contrast($gray, $lightBackground);
+        &:hover { text-decoration: none; }
+        &:focus { text-decoration: underline; }
+        
+        @if $is-k12 { 
+          padding: ($k12-sp - 4) $k12-sp;
+          border-radius: $k12-sp/2;
+          
+          @if $use_high_contrast {
+            &:hover, &:focus {
+              background: darken($brand-k12-dark, 30%);
+              color: white;
+            }
+          }
+          @else { &:hover, &:focus { background: #f2f2f2; } }
+        }
+        
+        @else {
+          padding: 4px 12px;
+          &:hover {
+            @if $use_high_contrast {
+              background: #333;
+              color: #fff;
+            } 
+            @else { background: $white; }
+          }
+        }
 
         & > span {
           white-space: nowrap;
         }
-
-        &:hover {
-          text-decoration: none;
-          @if $use_high_contrast {
-            background: #333;
-            color: #fff;
-          } @else {
-          background: $white;  
-          }
-          
-        }
+ 
       }
 
       &:last-child > a {
@@ -84,19 +114,36 @@
   }
 
   a.active {
-    @if $use_high_contrast {
-      background: #333;
-      color: #fff;
-    } @else {
-    background: $white;  
-    } 
-    &:hover {      
+
+    @if $is-k12 {
+      background-color: $brand-k12;
+      color: white;
       @if $use_high_contrast {
-      background: #333;
-      color: #fff;
-      } @else {
-      background: $white;  
+        background-color: darken($brand-k12, 35%);
+        &:hover, &:focus { background-color: darken($brand-k12, 35%); }
+      }
+      @else {
+        background-color: $brand-k12;
+        &:hover, &:focus { background-color: $brand-k12; }
+      }
+    }
+    
+    @else {
+      
+      @if $use_high_contrast {
+        background: #333;
+        color: #fff;
       } 
+      @else { background: $white; } 
+      
+      &:hover {      
+        @if $use_high_contrast {
+          background: #333;
+          color: #fff;
+        } 
+        @else { background: $white; } 
+      }
+
     }
   }
 }
@@ -139,5 +186,3 @@
     }
   }
 }
-
-

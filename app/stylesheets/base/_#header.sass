@@ -44,61 +44,80 @@
   position: relative
 
 #header
-  position: relative
-  z-index: 11 /* IE7 needs this o so the menu-item-drops get stuck above #main */
-  @if $use_high_contrast
-    background-color: #333
-  @else    
-    background-color: #4b5662
-  &.no-user
-    background-position: 0 -25px
-    min-height: 45px
-    #header-logo
-      top: 11px
-      left: 6px
-    #header-logo-secondary
-      display: none
+  @if $is-k12 == false
+    position: relative
+    z-index: 11 /* IE7 needs this so the menu-item-drops get stuck above #main */
+    @if $use_high_contrast
+      background-color: #333
+    @else    
+      background-color: #4b5662
+    &.no-user
+      background-position: 0 -25px
+      min-height: 45px
+      #header-logo
+        top: 11px
+        left: 6px
+      #header-logo-secondary
+        display: none
 
 #topbar
-  position: absolute
-  top: 0
-  right: 0
-  width: 100%
-  overflow: hidden
+  @if $is-k12 == false
+    position: absolute
+    top: 0
+    right: 0
+    width: 100%
+    overflow: hidden
 
 #identity
   +reset-list
-  float: right
-  font-size: 12px
-  margin-right: $right_side_margin
-  /*make room for the drop shadow*/
-  margin-bottom: 4px
-  padding: 0 11px
-  @if $use_high_contrast
-    background-color: #555
-  @else
-    background-color: #31383e
-  border-bottom-left-radius: 5px
-  border-bottom-right-radius: 5px
-  border-top: 0
+
+  @if $is-k12
+    font-size: 14px
+  @else  
+    float: right
+    font-size: 12px
+    margin-right: $right_side_margin
+    /*make room for the drop shadow*/
+    margin-bottom: 4px
+    padding: 0 11px
+    @if $use_high_contrast
+      background-color: #555
+    @else
+      background-color: #31383e
+    border-bottom-left-radius: 5px
+    border-bottom-right-radius: 5px
+    border-top: 0
 
   li
-    color: white
-    float: left
-    line-height: 1em
-    margin: 5px 8px 5px 0
-    padding-left: 8px
+    @if $is-k12
+      margin: 0 0 0 $k12-sp 
+      padding: 0
+      display: inline-block
+    @else
+      color: white
+      float: left
+      line-height: 1em
+      margin: 5px 8px 5px 0
+      padding-left: 8px
     &.first, &#identity-help-container
       border-left: none
     form
       margin: 0
 
   .user_name
-    margin-right: 15px
+    @if $is-k12 == false
+      margin-right: 15px
     a
-      text-decoration: none !important
+      @if $is-k12 == false
+        text-decoration: none !important
   a
-    color: $identity_link_color
+    @if $is-k12
+      color: $k12-header-text
+      &:hover, &:focus
+        text-decoration: underline
+    @else
+      color: $identity_link_color
+
   .emphasize-name
     color: $masquerade-link-color
 
@@ -116,49 +135,116 @@
 #menu
   +pie-clearfix
   +reset-list
-  padding-top: 3px
-  margin-left: $left_side_width
+  
+  @if $is-k12
+    display: flex
+    flex: 1
+    height: $k12-header-primary-height
+  @else
+    padding-top: 3px
+    margin-left: $left_side_width
+
 .menu-item
-  display: block
-  float: left
   position: relative
-  .menu-item-title, .menu-item-no-drop
-    color: #fff
-    font-size: 16px
-    border: 1px solid transparent
-    border-bottom: 0 none
+  @if $is-k12
+    +border-box
+    border-right: 1px solid $brand-k12-dark
+    flex: 0 0 $k12-sp*10
+    display: flex
+    @if $use_high_contrast
+      border-color: darken($brand-k12-dark, 15%)
+    +breakpoint(desktop)
+      flex: 0 0 $k12-sp*14
+    +breakpoint(wide)
+      flex: 0 0 $k12-sp*16
+  @else
     display: block
-    padding: 6px 17px 5px
-    text-decoration: none
+    float: left
+  .menu-item-title, .menu-item-no-drop
     position: relative
     z-index: 100
-    height: 29px
-    font-size: 15px
+    @if $is-k12
+      +border-box
+      transition: background 0.2s linear
+      flex: 1
+      display: flex
+      flex-direction: column
+      align-items: center
+      justify-content: center
+      color: $k12-header-text
+      +breakpoint(desktop)
+        flex-direction: row
+    @else
+      color: #fff
+      border: 1px solid transparent
+      border-bottom: 0 none
+      display: block
+      padding: 6px 17px 5px
+      height: 29px
+      text-decoration: none
+      color: #fff
+      font-size: 15px
+  
+  .menu-item-title
+    @if $is-k12
+      &:focus
+        outline: none
+        box-shadow: inset 0 0 0 2px $orange
+      @if $use_high_contrast == false
+        &:hover, &:focus
+          text-decoration: none
 
-  .menu-item-no-drop:hover
-    text-decoration: underline
+  .menu-item-no-drop
+    &:hover, &:focus
+      text-decoration: underline
+    @if $is-k12
+      &:focus
+        outline: none
+        box-shadow: inset 0 0 0 2px $orange
+      &:hover, &:focus
+        background: rgba($k12-header-text, 0.15)
+        @if $use_high_contrast == false
+          text-decoration: none
+      &:active
+        background: $brand-k12-dark
+        box-shadow: inset 0 2px 1px rgba(black, 0.3)    
   &.hover
     .menu-item-title
       text-shadow: none
-      color: $menu-text-color
-      background-color: $menu-background-color
+      @if $is-k12
+        background: rgba($k12-header-text, 0.1)
+        color: $k12-header-text
+        text-decoration: none
+      @else
+        color: $menu-text-color
+        border-top-color: $menu-border-color
+        border-left-color: $menu-border-color
+        border-right-color: $menu-border-color
+        background-color: $menu-background-color
 
     .menu-item-drop
       // bring it back on screen so you can see it
       left: 0
 
-  .menu-item-drop    
-    background-color: $menu-background-color    
-    box-shadow: 0 2px 18px rgba(0, 0, 0, .30)
-    // brings it down by one pixel so it doesn't overlap
-    top: 41px 
-    z-index: 99
+
+  .menu-item-drop
     font-size: 13px
     // hide off screen, dont do display:none, so screenreaders can see it
     overflow: hidden
     position: absolute
     left: -999999px
-
+    @if $is-k12
+      padding: $k12-sp $k12-sp/2 $k12-sp/2 0
+      z-index: 101
+      top: 90%
+      // For browsers that support it, offset the dropdown by the height of the triangle shape in .menu-item-drop__inner-content
+      top: calc(100% - 11px)
+    @else
+      background-color: $menu-background-color    
+      box-shadow: 0 2px 18px rgba(0, 0, 0, .30)
+      // brings it down by one pixel so it doesn't overlap
+      top: 41px
+      z-index: 99
     .menu-item-view-all
       border-bottom: none
       font-size: 12px
@@ -173,7 +259,6 @@
     .menu-item-drop-column
       padding: 0
       border-left: 1px solid lighten($borderColor, 22%)
-
       min-width: 270px
       width: 270px
       vertical-align: top
@@ -202,7 +287,12 @@
         float: right
         white-space: nowrap
       &:hover
-        background-color: $activeBG
+        @if $is-k12
+          background: #f0f0f0
+          &.menu-item-view-all
+            background: transparent
+        @else
+          background-color: $activeBG
 
         .secondary-right, .subtitle
           color: #666
@@ -224,16 +314,31 @@
 .menu-item-drop-column-list, .customListGhost
   +reset-list
   width: 270px
-  li        
+  
+  li
+    border-top: 1px solid #FAFAFA
+    border-bottom: 1px solid lighten($borderColor, 22%)
+    @if $is-k12
+      border-top: none  
     &:hover
       .name
         color: $linkColorHover
     a
       display: block
       line-height: 1.2
-      padding: 8px 12px
       text-decoration: none
+      
+      @if $is-k12
+        padding: $k12-sp - 4 $k12-sp
+        color: $brand-k12-dark
+        &:hover, &:focus
+          color: ensure-contrast($brand-k12-dark, #f0f0f0)
+          .name
+            color: ensure-contrast($brand-k12-dark, #f0f0f0)
+      @else
+        padding: 8px 12px
 
+        
 .menu-item-drop.menuCustomListEditing
   min-width: 589px
 
@@ -284,12 +389,17 @@
         background-position: -8px -41px
 
   .customListOpen
-    color: $linkColor
     font-size: 11px
     float: right
     position: relative
     top: -26px
     right: 12px
+    @if $is-k12
+      color: ensure-contrast($brand-k12-dark, #f0f0f0)
+      .name
+        color: ensure-contrast($brand-k12-dark, #f0f0f0)
+    @else
+      color: $linkColor
 
 .customListEditing ul
   min-height: 350px
@@ -309,4 +419,3 @@
 .customListGhost
   position: absolute
   z-index: 100
-

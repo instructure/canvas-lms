@@ -3,13 +3,22 @@
 body, html
   height: 100%
 body
-  @if not $use_high_contrast
-    background-color: #f7f7f7    
   min-width: $min_main_width
 
+  @if not $use_high_contrast
+    @if $is-k12
+      background: white
+    @else
+      background-color: #f7f7f7
+  @else
+    background: white
+  
   &.no-headers, &.embedded
     #header, #topbar, #left-side, #breadcrumbs
       display: none !important
+    @if $is-k12
+      .canvas-header
+        display: none !important
     #footer
       display: none
     #wrapper
@@ -85,6 +94,9 @@ body
   +pie-clearfix
   min-height: 450px
   max-width: $max_main_width
+  @if $is-k12
+    border: none
+    
 
 #content
   padding: 1em

@@ -1,0 +1,15 @@
+// Breakpoints
+@mixin breakpoint($breakpoint) {
+  @if $breakpoint == mini-tablet {
+    @media only screen and (min-width: 480px) { @content; }
+  }
+  @else if $breakpoint == tablet {
+    @media only screen and (min-width: 768px) { @content; }
+  }
+  @else if $breakpoint == desktop {
+    @media only screen and (min-width: 940px) { @content; }
+  }
+  @else if $breakpoint == wide {
+    @media only screen and (min-width: 1024px) { @content; }
+  }
+}
