@@ -176,7 +176,7 @@
         </td>
       </tr><tr>
         <td class="form-label"><%= f.blabel :conclude_at, :en => "Ends" %></td>
-        <td class="nobr">
+        <td class="nobr tall-row">
           <span class="course_form"><%= f.text_field :conclude_at, :class => "date_entry", :value => unlocalized_datetime_string(@context.conclude_at, :verbose) %></span>
           <i id="course_conclude_at_warning" style="<%= hidden %>" class="date-warning icon-warning" data-tooltip='{"tooltipClass":"popover", "position":"right"}'
              title="<div class='popover-title'><%= t(:course_conclude_at_warning_title, "Course Ending at Midnight") %></div><div class='popover-content'><p>
@@ -200,7 +200,7 @@
       <% if available_locales.size > 1 %>
       </tr><tr>
         <td class="form-label"><%= f.blabel :locale, :language, :en => "Language" %></td>
-        <td>
+        <td class="tall-row">
           <div class="course_form">
             <% no_language = t(:no_language_preference, "Not set (user-configurable, defaults to %{language})", :language => available_locales[infer_locale(:context => @context.account)]) %>
             <%= f.select :locale, [[no_language, nil]] + available_locales.invert.sort, {:selected => @context.locale}, {:class => 'locale'} %>
