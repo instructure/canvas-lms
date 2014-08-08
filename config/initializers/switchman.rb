@@ -18,11 +18,21 @@ else
         alias_method_chain :current, :delayed_jobs
 
         def activate_with_delayed_jobs!(categories)
-          if !categories[:delayed_jobs] && categories[:default]
-            categories[:delayed_jobs] = categories[:default].delayed_jobs_shard
-          end
+          if !categories[:delayed_jobs] && categories[:default] && !@skip_delayed_job_auto_activation
+            skip_delayed_job_auto_activation do
+              categories[:delayed_jobs] = categories[:default].delayed_jobs_shard
+            end
           activate_without_delayed_jobs!(categories)
         end
+      end
+      alias_method_chain :activate!, :delayed_jobs
+
+      def skip_delayed_job_auto_activation
+        was = @skip_delayed_job_auto_activation
+        @skip_delayed_job_auto_activation = true
+        yield
+      ensure
+        @skip_delayed_job_auto_activation = was
       end
 
       self.primary_key = "id"
