@@ -105,18 +105,6 @@ class ActiveRecord::Base
   end
 end
 
-# Make sure the flash sets the encoding to UTF-8 as well.
-module ActionController
-  module Flash
-    class FlashHash
-      def [](k)
-        v = super
-        v.is_a?(String) ? v.force_encoding("UTF-8") : v
-      end
-    end
-  end
-end
-
 # Fix for https://bugs.ruby-lang.org/issues/7278 , which was filling up our logs with these warnings
 if RUBY_VERSION < "2."
   require 'net/protocol'
