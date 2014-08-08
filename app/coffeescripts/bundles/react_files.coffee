@@ -4,8 +4,7 @@ require [
   'compiled/react_files/components/FilesApp'
   'compiled/react_files/components/ShowFolder'
   'compiled/react_files/components/SearchResults'
-  'compiled/react_files/components/RedirectToRoot'
-], (React, {Routes, Route}, FilesApp, ShowFolder, SearchResults, redirectToRoot) ->
+], (React, {Routes, Route, Redirect}, FilesApp, ShowFolder, SearchResults) ->
 
   baseUrl = if location.pathname is '/files'
     '/files'
@@ -17,9 +16,7 @@ require [
       Route path:'/:contextType/:contextId', handler: FilesApp,
         Route path: "#{baseUrl}/search", name: 'search', handler: SearchResults
         Route path: "#{baseUrl}/folder/*", name: 'folder', handler: ShowFolder
-        # FIXME: If I don't put this below the previous line it will ALWAYS redirect.
-        # but if I put it below it NEVER redirects
-        Route path: "#{baseUrl}/folder", handler: redirectToRoot
         Route path: baseUrl, name: 'rootFolder', handler: ShowFolder
+      Redirect from: "#{baseUrl}/folder", to: "#{baseUrl}"
 
   React.renderComponent(routes, document.getElementById('content'))
