@@ -92,7 +92,7 @@ describe ContextExternalTool do
                 :text => "Example"
       }
       @tool.save!
-      @tool.has_course_navigation.should == false
+      @tool.has_placement?(:course_navigation).should == false
     end
 
     it "should not validate with no domain or url setting" do
@@ -115,7 +115,7 @@ describe ContextExternalTool do
               :enabled => "true"
     }
     @tool.save!
-    @tool.has_course_navigation.should == true
+    @tool.has_placement?(:course_navigation).should == true
   end
 
   it "should clear disabled extensions" do
@@ -124,7 +124,7 @@ describe ContextExternalTool do
               :enabled => "false"
     }
     @tool.save!
-    @tool.has_course_navigation.should == false
+    @tool.has_placement?(:course_navigation).should == false
   end
 
   describe "find_external_tool" do
@@ -448,44 +448,44 @@ describe ContextExternalTool do
       tool.editor_button.should_not be_nil
     end
     
-    it "should set has_user_navigation if navigation configured" do
+    it "should set user_navigation if navigation configured" do
       tool = new_external_tool
       tool.settings = {:user_navigation => {:url => "http://www.example.com"}}
-      tool.has_user_navigation.should be_false
+      tool.has_placement?(:user_navigation).should be_false
       tool.save
-      tool.has_user_navigation.should be_true
+      tool.has_placement?(:user_navigation).should be_true
     end
     
-    it "should set has_course_navigation if navigation configured" do
+    it "should set course_navigation if navigation configured" do
       tool = new_external_tool
       tool.settings = {:course_navigation => {:url => "http://www.example.com"}}
-      tool.has_course_navigation.should be_false
+      tool.has_placement?(:course_navigation).should be_false
       tool.save
-      tool.has_course_navigation.should be_true
+      tool.has_placement?(:course_navigation).should be_true
     end
 
-    it "should set has_account_navigation if navigation configured" do
+    it "should set account_navigation if navigation configured" do
       tool = new_external_tool
       tool.settings = {:account_navigation => {:url => "http://www.example.com"}}
-      tool.has_account_navigation.should be_false
+      tool.has_placement?(:account_navigation).should be_false
       tool.save
-      tool.has_account_navigation.should be_true
+      tool.has_placement?(:account_navigation).should be_true
     end
 
-    it "should set has_resource_selection if selection configured" do
+    it "should set resource_selection if selection configured" do
       tool = new_external_tool
       tool.settings = {:resource_selection => {:url => "http://www.example.com", :selection_width => 100, :selection_height => 100}}
-      tool.has_resource_selection.should be_false
+      tool.has_placement?(:resource_selection).should be_false
       tool.save
-      tool.has_resource_selection.should be_true
+      tool.has_placement?(:resource_selection).should be_true
     end
 
-    it "should set has_editor_button if button configured" do
+    it "should set editor_button if button configured" do
       tool = new_external_tool
       tool.settings = {:editor_button => {:url => "http://www.example.com", :icon_url => "http://www.example.com", :selection_width => 100, :selection_height => 100}}
-      tool.has_editor_button.should be_false
+      tool.has_placement?(:editor_button).should be_false
       tool.save
-      tool.has_editor_button.should be_true
+      tool.has_placement?(:editor_button).should be_true
     end
 
     it "should allow setting tool_id and icon_url" do

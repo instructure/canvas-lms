@@ -89,7 +89,7 @@ class ExternalToolsController < ApplicationController
 
   def homework_submissions
     if authorized_action(@context, @current_user, :read)
-      @tools = ContextExternalTool.all_tools_for(@context, :user => @current_user).select(&:has_homework_submission)
+      @tools = ContextExternalTool.all_tools_for(@context, :user => @current_user, :type => :has_homework_submission)
       respond_to do |format|
         format.json { render :json => external_tools_json(@tools, @context, @current_user, session) }
       end
@@ -633,7 +633,7 @@ class ExternalToolsController < ApplicationController
   end
 
   def invalidate_nav_tabs_cache(tool)
-    if tool.has_user_navigation || tool.has_course_navigation || tool.has_account_navigation
+    if tool.has_placement?(:user_navigation) || tool.has_placement?(:course_navigation) || tool.has_placement?(:account_navigation)
       Lti::NavigationCache.new(@domain_root_account).invalidate_cache_key
     end
   end

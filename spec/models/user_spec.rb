@@ -1065,7 +1065,7 @@ describe User do
       tool = Account.default.context_external_tools.new(:consumer_key => 'bob', :shared_secret => 'bob', :name => 'bob', :domain => "example.com")
       tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
       tool.save!
-      tool.has_user_navigation.should == false
+      tool.has_placement?(:user_navigation).should == false
       user_model
       tabs = @user.profile.tabs_available(@user, :root_account => Account.default)
       tabs.map{|t| t[:id] }.should_not be_include(tool.asset_string)
@@ -1075,7 +1075,7 @@ describe User do
       tool = Account.default.context_external_tools.new(:consumer_key => 'bob', :shared_secret => 'bob', :name => 'bob', :domain => "example.com")
       tool.user_navigation = {:url => "http://www.example.com", :text => "Example URL"}
       tool.save!
-      tool.has_user_navigation.should == true
+      tool.has_placement?(:user_navigation).should == true
       user_model
       tabs = @user.profile.tabs_available(@user, :root_account => Account.default)
       tabs.map{|t| t[:id] }.should be_include(tool.asset_string)

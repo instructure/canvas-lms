@@ -936,7 +936,7 @@ class CoursesController < ApplicationController
         enabled: Canvas::Plugin.find(:app_center).enabled?
       }
 
-      @course_settings_sub_navigation_tools = ContextExternalTool.all_tools_for(@context).select(&:has_course_settings_sub_navigation?)
+      @course_settings_sub_navigation_tools = ContextExternalTool.all_tools_for(@context, :type => :course_settings_sub_navigation)
       unless @context.grants_right?(@current_user, session, :manage_content)
         @course_settings_sub_navigation_tools.reject! { |tool| tool.course_settings_sub_navigation(:visibility) == 'admins' }
       end
@@ -1395,7 +1395,7 @@ class CoursesController < ApplicationController
         @recent_feedback = (@current_user && @current_user.recent_feedback(:contexts => @contexts)) || []
       end
 
-      @course_home_sub_navigation_tools = ContextExternalTool.all_tools_for(@context).select(&:has_course_home_sub_navigation?)
+      @course_home_sub_navigation_tools = ContextExternalTool.all_tools_for(@context, :type => :course_home_sub_navigation)
       unless @context.grants_right?(@current_user, session, :manage_content)
         @course_home_sub_navigation_tools.reject! { |tool| tool.course_home_sub_navigation(:visibility) == 'admins' }
       end

@@ -2457,7 +2457,7 @@ describe Course, 'tabs_available' do
     tool = new_external_tool @course
     tool.user_navigation = {:url => "http://www.example.com", :text => "Example URL"}
     tool.save!
-    tool.has_course_navigation.should == false
+    tool.has_placement?(:course_navigation).should == false
     @teacher = user_model
     @course.enroll_teacher(@teacher).accept
     tabs = @course.tabs_available(@teacher)
@@ -2468,7 +2468,7 @@ describe Course, 'tabs_available' do
     tool = new_external_tool @course
     tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
     tool.save!
-    tool.has_course_navigation.should == true
+    tool.has_placement?(:course_navigation).should == true
     @teacher = user_model
     @course.enroll_teacher(@teacher).accept
     tabs = @course.tabs_available(@teacher)
@@ -2485,7 +2485,7 @@ describe Course, 'tabs_available' do
     tool = new_external_tool @account
     tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
     tool.save!
-    tool.has_course_navigation.should == true
+    tool.has_placement?(:course_navigation).should == true
     @teacher = user_model
     @course.enroll_teacher(@teacher).accept
     tabs = @course.tabs_available(@teacher)
@@ -2502,7 +2502,7 @@ describe Course, 'tabs_available' do
     tool = new_external_tool @account.root_account
     tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
     tool.save!
-    tool.has_course_navigation.should == true
+    tool.has_placement?(:course_navigation).should == true
     @teacher = user_model
     @course.enroll_teacher(@teacher).accept
     tabs = @course.tabs_available(@teacher)
@@ -2520,7 +2520,7 @@ describe Course, 'tabs_available' do
     tool = new_external_tool @course
     tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL", :visibility => 'admins'}
     tool.save!
-    tool.has_course_navigation.should == true
+    tool.has_placement?(:course_navigation).should == true
     @teacher = user_model
     @course.enroll_teacher(@teacher).accept
     @student = user_model
@@ -2545,7 +2545,7 @@ describe Course, 'tabs_available' do
     tool = new_external_tool @course
     tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL", :visibility => 'members'}
     tool.save!
-    tool.has_course_navigation.should == true
+    tool.has_placement?(:course_navigation).should == true
     @teacher = user_model
     @course.enroll_teacher(@teacher).accept
     @student = user_model
@@ -2567,7 +2567,7 @@ describe Course, 'tabs_available' do
     tool = new_external_tool @course
     tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
     tool.save!
-    tool.has_course_navigation.should == true
+    tool.has_placement?(:course_navigation).should == true
     @teacher = user_model
     @course.enroll_teacher(@teacher).accept
     @course.tab_configuration = Course.default_tabs.map{|t| {:id => t[:id] } }.insert(1, {:id => tool.asset_string})
@@ -2580,7 +2580,7 @@ describe Course, 'tabs_available' do
     tool = new_external_tool @course
     tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
     tool.save!
-    tool.has_course_navigation.should == true
+    tool.has_placement?(:course_navigation).should == true
     @teacher = user_model
     @course.enroll_teacher(@teacher).accept
     tabs = @course.tabs_available(@teacher)
@@ -2605,7 +2605,7 @@ describe Course, 'tabs_available' do
     tool.save!
 
     tool.course_navigation(:url).should == "http://www.example.com"
-    tool.has_course_navigation.should == true
+    tool.has_placement?(:course_navigation).should == true
 
     settings = @course.external_tool_tabs({}).first
     settings.should include(:visibility=>"members")
@@ -2620,7 +2620,7 @@ describe Course, 'tabs_available' do
     tool.save!
 
     tool.course_navigation(:url).should == "http://www.example.com"
-    tool.has_course_navigation.should == true
+    tool.has_placement?(:course_navigation).should == true
 
     settings = @course.external_tool_tabs({}).first
     settings.should include(:visibility=>"admins")

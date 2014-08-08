@@ -254,7 +254,7 @@ describe ExternalToolsController do
       assigns[:tool].url.should == "http://example.com/other_url"
       assigns[:tool].consumer_key.should == "key"
       assigns[:tool].shared_secret.should == "secret"
-      assigns[:tool].has_editor_button.should be_true
+      assigns[:tool].has_placement?(:editor_button).should be_true
     end
 
     it "should handle advanced xml configurations with no url or domain set" do
@@ -296,7 +296,7 @@ describe ExternalToolsController do
       assigns[:tool].domain.should be_nil
       assigns[:tool].consumer_key.should == "key"
       assigns[:tool].shared_secret.should == "secret"
-      assigns[:tool].has_editor_button.should be_true
+      assigns[:tool].has_placement?(:editor_button).should be_true
     end
 
     it "should handle advanced xml configurations by URL retrieval" do
@@ -340,7 +340,7 @@ describe ExternalToolsController do
       assigns[:tool].url.should == "http://example.com/other_url"
       assigns[:tool].consumer_key.should == "key"
       assigns[:tool].shared_secret.should == "secret"
-      assigns[:tool].has_editor_button.should be_true
+      assigns[:tool].has_placement?(:editor_button).should be_true
     end
 
     it "should fail gracefully on invalid URL retrieval or timeouts" do

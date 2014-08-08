@@ -27,7 +27,7 @@ describe ContentMigration do
 
       tool_to.name.should == @tool_from.name
       tool_to.custom_fields.should == @tool_from.custom_fields
-      tool_to.has_course_navigation.should == true
+      tool_to.has_placement?(:course_navigation).should == true
       tool_to.consumer_key.should == @tool_from.consumer_key
       tool_to.shared_secret.should == @tool_from.shared_secret
     end
@@ -47,7 +47,7 @@ describe ContentMigration do
       tool_to = @copy_to.context_external_tools.first
       tool_to.name.should == @tool_from.name
       tool_to.consumer_key.should == @tool_from.consumer_key
-      tool_to.has_course_navigation.should == true
+      tool_to.has_placement?(:course_navigation).should == true
     end
 
     it "should copy external tool assignments" do
