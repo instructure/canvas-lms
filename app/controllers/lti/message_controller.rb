@@ -42,8 +42,8 @@ module Lti
           message_service = IMS::LTI::Services::MessageService.new(tool_proxy.guid, tool_proxy.shared_secret)
           message = IMS::LTI::Models::Messages::BasicLTILaunchRequest.new(
             lti_version: IMS::LTI::Models::LTIModel::LTI_VERSION_2P0,
-            resource_link_id: ContextExternalTool.opaque_identifier_for(@context, @context.shard),
-            context_id: ContextExternalTool.context_id_for(@context, @context.shard),
+            resource_link_id: Lti::Asset.opaque_identifier_for(@context),
+            context_id: Lti::Asset.opaque_identifier_for(@context),
             tool_consumer_instance_guid: @context.root_account.lti_guid,
             launch_presentation_document_target: IMS::LTI::Models::Messages::Message::LAUNCH_TARGET_IFRAME
           )
