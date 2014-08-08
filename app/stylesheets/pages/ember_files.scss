@@ -245,6 +245,13 @@ $border: #e5e4e4;
       -ms-flex: 8 0;
     }
 
+    .ef-date-created-col{
+      flex: 3 3 0;
+      -webkit-flex: 3 3 0;
+      -ms-flex: 3 0;
+      @include hideForPhone;
+    }
+
     .ef-date-modified-col{
       flex: 3 3 0;
       -webkit-flex: 3 3 0;

@@ -12,6 +12,10 @@ define [
     property: 'name'
     className: 'ef-name-col'
   ,
+    displayName: 'Date Created'
+    property: 'created_at'
+    className: 'ef-date-created-col'
+  ,
     displayName: 'Date Modified'
     property: 'updated_at'
     className: 'ef-date-modified-col'

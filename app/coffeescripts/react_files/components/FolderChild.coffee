@@ -27,6 +27,8 @@ define [
             Link to: 'folder', contextType: @props.params.contextType, contextId: @props.params.contextId, splat: @props.model.urlPath(),
               i className:'icon-folder',
               @props.model.get('name')
+        div className:'ef-date-created-col',
+          FriendlyDatetime datetime: @props.model.get('created_at'),
         div className:'ef-date-modified-col',
           FriendlyDatetime datetime: @props.model.get('updated_at'),
         div className:'ef-modified-by-col',
