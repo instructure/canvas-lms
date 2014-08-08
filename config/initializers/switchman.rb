@@ -22,6 +22,7 @@ else
             skip_delayed_job_auto_activation do
               categories[:delayed_jobs] = categories[:default].delayed_jobs_shard
             end
+          end
           activate_without_delayed_jobs!(categories)
         end
         alias_method_chain :activate!, :delayed_jobs
