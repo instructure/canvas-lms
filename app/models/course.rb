@@ -1448,10 +1448,19 @@ class Course < ActiveRecord::Base
     # user > pseudonyms > account: used in find_pseudonym_for_account > works_for_account
     includes = [:user, :course_section]
     includes = {:user => {:pseudonyms => :account}, :course_section => []} if options[:include_sis_id]
-    scope = options[:user] ? self.enrollments_visible_to(options[:user]) : self.student_enrollments
-    student_enrollments = scope.includes(includes).order_by_sortable_name
-    student_enrollments = student_enrollments.all
-    student_enrollments.partition{|enrollment| enrollment.type != "StudentViewEnrollment"}.flatten
+
+    scope = if options[:user]
+              enrollment_opts = options.slice(:include_priors)
+              enrollments_visible_to(options[:user], enrollment_opts)
+            else
+              options[:include_priors] ?
+                all_student_enrollments :
+                student_enrollments
+            end
+    enrollments = scope.includes(includes).order_by_sortable_name.all
+    enrollments.partition { |enrollment|
+      enrollment.type != "StudentViewEnrollment"
+    }.flatten
   end
   private :enrollments_for_csv
 

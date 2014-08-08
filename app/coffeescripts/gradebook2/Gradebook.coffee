@@ -857,8 +857,13 @@ define [
       @userFilter.on 'input', @onUserFilterInput
 
       @initPostGrades()
-
+      @setDownloadCsvUrl()
       @renderTotalHeader()
+
+    setDownloadCsvUrl: ->
+      if @show_concluded_enrollments
+        $("#download_csv")[0].href += "?include_priors=true"
+
 
     studentNamesToggle: (e) =>
       e.preventDefault()

@@ -971,6 +971,14 @@ describe Course, "gradebook_to_csv" do
     rows[4][4].should be_nil
   end
 
+  it "can include concluded enrollments" do
+    e = course_with_student active_all: true
+    e.update_attribute :workflow_state, 'completed'
+
+    @course.gradebook_to_csv.should_not include @student.name
+    @course.gradebook_to_csv(include_priors: true).should include @student.name
+  end
+
   context "accumulated points" do
     before :once do
       student_in_course(:active_all => true)
