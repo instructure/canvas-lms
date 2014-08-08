@@ -23,7 +23,7 @@
     <tr class="date{{#if passed}} date_passed{{/if}}{{#if date}} events_{{strftime date "%Y_%m_%d"}}{{/if}}">
       <th scope="row" class="day_date" data-date="{{#if date}}{{strftime date "%Y_%m_%d"}}{{/if}}" {{ contextSensitiveDatetimeTitle date }}>
         {{#if date}}
-          {{tDateToString date "short_with_weekday"}}
+          {{tDateToString date "medium_with_weekday"}}
         {{/if}}
       </th>
       <td class="details">
