@@ -26,7 +26,7 @@ class ContextExternalTool < ActiveRecord::Base
   attr_accessor :config_type, :config_url, :config_xml
 
   before_save :infer_defaults, :validate_vendor_help_link
-  after_save :touch_context
+  after_save :touch_context, :check_global_navigation_cache
   validate :check_for_xml_error
 
   workflow do
@@ -45,7 +45,7 @@ class ContextExternalTool < ActiveRecord::Base
   EXTENSION_TYPES = [
     :user_navigation, :course_navigation, :account_navigation, :resource_selection,
     :editor_button, :homework_submission, :migration_selection, :course_home_sub_navigation,
-    :course_settings_sub_navigation
+    :course_settings_sub_navigation, :global_navigation
   ]
 
   EXTENSION_TYPES.each do |type|
@@ -72,27 +72,16 @@ class ContextExternalTool < ActiveRecord::Base
       return
     end
 
-    custom_keys = case type
-    when :course_navigation, :course_home_sub_navigation, :course_settings_sub_navigation
-      keys = {
-        :visibility => lambda{|v| %w{members admins}.include?(v)}
-      }.to_a
-
-      keys << :default if type == :course_navigation
-      keys << :icon_url if [:course_home_sub_navigation, :course_settings_sub_navigation].include?(type)
-      keys
-    when :resource_selection, :editor_button, :homework_submission, :migration_selection
-      [:selection_width, :selection_height, :icon_url]
-    else
-      []
-    end
-
     hash = hash.with_indifferent_access
     hash[:enabled] = Canvas::Plugin.value_to_boolean(hash[:enabled]) if hash[:enabled]
-
     settings[type] = {}.with_indifferent_access
 
-    extension_keys = [:url, :text, :display_type, :custom_fields, :enabled] + custom_keys
+    extension_keys = [:custom_fields, :default, :display_type, :enabled, :icon_url,
+                      :selection_height, :selection_width, :text, :url]
+    extension_keys += {
+        :visibility => lambda{|v| %w{members admins}.include?(v)}
+    }.to_a
+
     extension_keys.each do |key, validator|
       if hash.has_key?(key) && (!validator || validator.call(hash[key]))
         settings[type][key] = hash[key]
@@ -103,19 +92,18 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def has_placement?(type)
-    self.context_external_tool_placements.for_type(type).exists?
+    self.context_external_tool_placements.to_a.any?{|p| p.placement_type == type.to_s}
   end
 
   def set_placement!(type, value=true)
     raise "invalid type" unless EXTENSION_TYPES.include?(type.to_sym)
     if value
-      self.context_external_tool_placements.new(:placement_type => type) unless has_placement?(type)
+      self.context_external_tool_placements.new(:placement_type => type.to_s) unless has_placement?(type)
     else
       if self.persisted?
         self.context_external_tool_placements.for_type(type).delete_all
-      else
-        self.context_external_tool_placements.delete_if{|p| p.placement_type == type}
       end
+      self.context_external_tool_placements.delete_if{|p| p.placement_type == type.to_s}
     end
   end
 
@@ -448,7 +436,7 @@ class ContextExternalTool < ActiveRecord::Base
   private_class_method :contexts_to_search
 
   def self.all_tools_for(context, options={})
-    if [:course_home_sub_navigation, :course_settings_sub_navigation, :migration_selection].include?(options[:type])
+    if [:course_home_sub_navigation, :course_settings_sub_navigation, :global_navigation].include?(options[:type])
       return [] unless (options[:root_account] && options[:root_account].feature_enabled?(:lor_for_account)) ||
           (options[:current_user] && options[:current_user].feature_enabled?(:lor_for_user))
     end
@@ -604,5 +592,43 @@ class ContextExternalTool < ActiveRecord::Base
     str = asset.asset_string.to_s
     raise "Empty value" if str.blank?
     Canvas::Security.hmac_sha1(str, shard.settings[:encryption_key])
+  end
+
+  def check_global_navigation_cache
+    if self.context.is_a?(Account) && self.context.root_account?
+      %w{members admins}.each do |visibility|
+        Rails.cache.delete("external_tools/global_navigation/#{self.context.asset_string}/#{visibility}")
+      end
+    end
+  end
+
+  def self.global_navigation_visibility_for_user(root_account, user)
+    Rails.cache.fetch(['external_tools/global_navigation/visibility', root_account.asset_string, user].cache_key) do
+      # let them see admin level tools if there are any courses they can manage
+      if root_account.grants_right?(user, :manage_content) ||
+        Course.manageable_by_user(user.id, true).not_deleted.where(:root_account_id => root_account).exists?
+        'admins'
+      else
+        'members'
+      end
+    end
+  end
+
+  def self.global_navigation_tools(root_account, visibility)
+    tools = root_account.context_external_tools.active.having_setting(:global_navigation)
+    if visibility == 'members'
+      # reject the admin only tools
+      tools.reject!{|tool| tool.global_navigation[:visibility] == 'admins'}
+    end
+    tools
+  end
+
+  def self.global_navigation_menu_cache_key(root_account, visibility)
+    # only reload the menu if one of the global nav tools has changed
+    key = "external_tools/global_navigation/#{root_account.asset_string}/#{visibility}"
+    Rails.cache.fetch(key) do
+      tools = global_navigation_tools(root_account, visibility)
+      Digest::MD5.hexdigest(tools.map(&:cache_key).join('/'))
+    end
   end
 end

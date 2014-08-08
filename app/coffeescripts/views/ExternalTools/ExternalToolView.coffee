@@ -25,6 +25,7 @@ define [
         {extension_type: 'migration_selection', text: I18n.t 'migration_selection_configured', 'Migration selection configured'}
         {extension_type: 'course_home_sub_navigation', text: I18n.t 'course_home_sub_navigation_configured', 'Course home sub navigation configured'}
         {extension_type: 'course_settings_sub_navigation', text: I18n.t 'course_settings_sub_navigation_configured', 'Course settings sub navigation configured'}
+        {extension_type: 'global_navigation', text: I18n.t 'global_navigation_configured', 'Global navigation configured'}
       ]
 
       json = super

@@ -754,4 +754,83 @@ describe ContextExternalTool do
       @course.lti_context_id.should == 'dummy_context_id'
     end
   end
+
+  describe "global navigation" do
+    before(:once) do
+      @account = account_model
+    end
+
+    it "should let account admins see admin tools" do
+      account_admin_user(:account => @account, :active_all => true)
+      ContextExternalTool.global_navigation_visibility_for_user(@account, @user).should == 'admins'
+    end
+
+    it "should let teachers see admin tools" do
+      course_with_teacher(:account => @account, :active_all => true)
+      ContextExternalTool.global_navigation_visibility_for_user(@account, @user).should == 'admins'
+    end
+
+    it "should not let students see admin tools" do
+      course_with_student(:account => @account, :active_all => true)
+      ContextExternalTool.global_navigation_visibility_for_user(@account, @user).should == 'members'
+    end
+
+    it "should update the visibility cache if enrollments are updated or user is touched" do
+      time = Time.now
+      enable_cache do
+        Timecop.freeze(time) do
+          course_with_student(:account => @account, :active_all => true)
+          ContextExternalTool.global_navigation_visibility_for_user(@account, @user).should == 'members'
+        end
+
+        Timecop.freeze(time + 1.second) do
+          course_with_teacher(:account => @account, :active_all => true, :user => @user)
+          ContextExternalTool.global_navigation_visibility_for_user(@account, @user).should == 'admins'
+        end
+
+        Timecop.freeze(time + 2.second) do
+          @user.teacher_enrollments.update_all(:workflow_state => 'deleted')
+          # should not have affected the earlier cache
+          ContextExternalTool.global_navigation_visibility_for_user(@account, @user).should == 'admins'
+
+          @user.touch
+          ContextExternalTool.global_navigation_visibility_for_user(@account, @user).should == 'members'
+        end
+      end
+    end
+
+    it "should update the global navigation menu cache key when the global navigation tools are updated (or removed)" do
+      time = Time.now
+      enable_cache do
+        Timecop.freeze(time) do
+          @admin_tool = @account.context_external_tools.new(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+          @admin_tool.global_navigation = {:visibility => 'admins', :url => "http://www.example.com", :text => "Example URL"}
+          @admin_tool.save!
+          @member_tool = @account.context_external_tools.new(:name => "b", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+          @member_tool.global_navigation = {:url => "http://www.example.com", :text => "Example URL"}
+          @member_tool.save!
+          @other_tool = @account.context_external_tools.create!(:name => "c", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+
+          @admin_cache_key = ContextExternalTool.global_navigation_menu_cache_key(@account, 'admins')
+          @member_cache_key = ContextExternalTool.global_navigation_menu_cache_key(@account, 'members')
+        end
+
+        Timecop.freeze(time + 1.second) do
+          @other_tool.save!
+          # cache keys should remain the same
+          ContextExternalTool.global_navigation_menu_cache_key(@account, 'admins').should == @admin_cache_key
+          ContextExternalTool.global_navigation_menu_cache_key(@account, 'members').should == @member_cache_key
+        end
+
+        Timecop.freeze(time + 2.second) do
+          @admin_tool.global_navigation = nil
+          @admin_tool.save!
+          # should update the admin key
+          ContextExternalTool.global_navigation_menu_cache_key(@account, 'admins').should_not == @admin_cache_key
+          # should not update the members key
+          ContextExternalTool.global_navigation_menu_cache_key(@account, 'members').should == @member_cache_key
+        end
+      end
+    end
+  end
 end
