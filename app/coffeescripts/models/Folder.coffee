@@ -67,6 +67,9 @@ define [
       if @get('context_type') in ['Course', 'Group']
         "/#{ @get('context_type').toLowerCase() + 's' }/#{ @get('context_id') }/files/{{id}}/preview"
 
+    isEmpty: ->
+      !!(@files.loadedAll and (@files.length is 0)) and (@folders.loadedAll and (@folders.length is 0))
+
     # `full_name` will be something like "course files/some folder/another".
     # For routing in the react app in the browser, we want something that will take that "course files"
     # out. because urls will end up being /courses/2/files/folder/some folder/another

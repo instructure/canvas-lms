@@ -1,5 +1,6 @@
 define [
   'react'
+  'i18n!react_files'
   'compiled/react/shared/utils/withReactDOM'
   './ColumnHeaders'
   './LoadingIndicator'
@@ -7,7 +8,7 @@ define [
   '../utils/getAllPages'
   '../utils/updateAPIQuerySortParams'
   'compiled/models/Folder'
-], (React, withReactDOM, ColumnHeaders, LoadingIndicator, FolderChild, getAllPages, updateAPIQuerySortParams, Folder) ->
+], (React, I18n, withReactDOM, ColumnHeaders, LoadingIndicator, FolderChild, getAllPages, updateAPIQuerySortParams, Folder) ->
 
   ShowFolder = React.createClass
 
@@ -36,11 +37,14 @@ define [
         updateAPIQuerySortParams(collection, newProps.query)
 
     render: withReactDOM ->
-      return div({}, "loading") unless @props.currentFolder
+      return div({}) unless @props.currentFolder
       div className:'ef-directory',
-        ColumnHeaders to: (if @props.params.splat then 'folder' else 'rootFolder'), subject: @props.currentFolder, params: @props.params, query: @props.query
-        @props.currentFolder.children(@props.query).map (child) =>
-          FolderChild key:child.cid, model: child, params: @props.params
+        ColumnHeaders(to: (if @props.params.splat then 'folder' else 'rootFolder'), subject: @props.currentFolder, params: @props.params, query: @props.query),
+        if @props.currentFolder.isEmpty()
+          div className: 'muted', I18n.t('this_folder_is_empty', 'This folder is empty')
+        else
+          @props.currentFolder.children(@props.query).map (child) =>
+            FolderChild key:child.cid, model: child, params: @props.params
         LoadingIndicator isLoading: @props.currentFolder.folders.fetchingNextPage || @props.currentFolder.files.fetchingNextPage
 
 

@@ -1,5 +1,6 @@
 define [
   'underscore'
+  'i18n!react_files'
   'react'
   'compiled/models/Folder'
   'compiled/collections/FilesCollection'
@@ -9,7 +10,7 @@ define [
   './FolderChild'
   '../utils/updateAPIQuerySortParams'
   '../utils/getAllPages'
-], (_, React, Folder, FilesCollection, withReactDOM, ColumnHeaders, LoadingIndicator, FolderChild, updateAPIQuerySortParams, getAllPages) ->
+], (_, I18n, React, Folder, FilesCollection, withReactDOM, ColumnHeaders, LoadingIndicator, FolderChild, updateAPIQuerySortParams, getAllPages) ->
 
 
   SearchResults = React.createClass
@@ -45,3 +46,11 @@ define [
         @state.collection.models.sort(Folder::childrenSorter.bind(@state.collection, @props.query.sort, @props.query.order)).map (child) =>
           FolderChild key:child.cid, model: child, params: @props.params
         LoadingIndicator isLoading: !@state.collection.loadedAll
+        if @state.collection.loadedAll and (@state.collection.length is 0)
+          div {},
+            p {}, I18n.t('errors.no_match.your_search', 'Your search - "%{search_term}" - did not match any files.', {search_term: @props.query.search_term})
+            p {}, I18n.t('errors.no_match.suggestions', 'Suggestions:')
+            ul {},
+              li {}, I18n.t('errors.no_match.spelled', 'Make sure all words are spelled correctly.')
+              li {}, I18n.t('errors.no_match.keywords', 'Try different keywords.')
+              li {}, I18n.t('errors.no_match.three_chars', 'Enter at least 3 letters in the search box.')
