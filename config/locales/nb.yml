@@ -2193,6 +2193,10 @@ nb:
   bb_display: "Blackboard Learn"
   bb_file_description: "Blackboard 6/7/8/9 export .zip file"
   bb_name: Blackboard-konvertør
+  better_file_browsing_description: |-
+      Et nytt, enklere, mer brukervennlig fil surfing grensesnitt. Hvis du slår dette på ved kursnivå
+      deretter alle brukere som er i dette kurset vil se det nye grensesnittet. For å få det til å viser opp når noen
+      går til den personlige filer side for en bruker ('/files') så du må slå den på for kontoen de er medlem av.
   big_blue_button_conference: 
     conference_is_recorded: "Denne konferansen tas opp."
     recording_setting: "Spiller inn"
@@ -4392,6 +4396,7 @@ nb:
               
               **Logg inn** eller ***registrer deg*** for å gjøre krav på dette kurset.
         files: "Filer-fanen er stedet du deler forelesningspresentasjoner, eksempeldokumenter, studietips – alt det studentene dine vil ønske å laste ned. Å laste opp og organisere filene er enkelt med Canvas. Vi vil vise deg hvordan du gjør det."
+        home2: "Når folk besøker kurset, er dette siden de vil se. Du kan sette den til å vise en aktivitetsforløp, listen over kursmoduler, et pensum, eller en tilpasset side du skriver selv. Standard er kurset aktivitetsforløp. For å tilpasse dette, klikker du bare %{choose_home_page}."
         import: "Om du har brukt en annen læringsplattform har du sikkert saker der som du ønsker å flytte over til Canvas. Vi kan vise deg prosessen med hvordan man enkelt flytter innholdet over til Canvas."
         navigation: "Som standard er alle lenker slått på for et kurs. Studentene vil ikke se lenker til klasser som ikke har innhold. For eksempel, om du ikke har opprettet noen prøver, vil de ikke se lenka til prøver. Du kan sortere og bevisst slå av disse lenkene om det er deler av kurset du ikke vil at studentene skal ha tilgang til."
         publish: 
@@ -5246,6 +5251,7 @@ nb:
   discussion_entry: 
     atom_no_author: "Ingen forfatter"
     default_user_name: Brukernavn
+  discussion_group_category_locked: "Gruppekategorier kan ikke settes rett på en diskusjon oppdraget, men bør settes på diskusjonen i stedet"
   discussion_topic: 
     atom_no_author: "Ingen forfatter"
     default_title: "Ingen tittel"
@@ -5311,6 +5317,7 @@ nb:
       delay_posting: "Avvent posting"
       enable_podcast_feed: "Slå på podkaststrøm"
       include_replies_in_podcast_feed: "Inkluder svar i podkaststrømmen"
+      only_visible_to_overrides_note: "Merk: Diskusjonen er *bare* synlig for seksjonen(s) spesifisert nedenfor:"
       options: Muligheter
       points_possible: "Poeng oppnåelig"
       post_at: Post
@@ -7512,6 +7519,9 @@ nb:
     module_sequence_footer: 
       next: Neste
       previous: Forrige
+  k12_description: |-
+      Funksjoner, innstillinger og stiler som gjør at mer fornuftig konkret i en K-12 miljø. For nå er, dette bare
+      gjelder noen stil endringer, men flere K-12 spesifikke ting kan legges i fremtiden.
   labels: 
     lock_module_until: "Lås modulen inntil en gitt dato"
   last_submission_activity_title: "Siste innleveringsaktivitet"
@@ -9304,8 +9314,19 @@ nb:
     page_locked_until: "Denne siden er låst inntil %{date}."
     page_unpublished_module: "Denne siden er del av en upublisert modul og er ikke tilgjengelig ennå."
     peer_review_invitation: 
+      email: 
+        body: "Du har blitt invitert til fagfellevurdering %{reviewee}. Følg lenken nedenfor for å gjennomgå dem!"
+        html: 
+          link_message: "Klikk her for å fullføre anmeldelsen din"
+        subject: "Tilordnet fagfellevurdering for %{reviewee}"
+      facebook: 
+        body: "Du har blitt invitert til fagfellevurdering %{reviewee}. Følg lenken nedenfor for å gjennomgå dem!"
       sms: 
         more_info: "Mer informasjon på %{url}"
+      summary: 
+        body: "Du har blitt invitert til fagfellevurdering %{reviewee}. Følg lenken nedenfor for å gjennomgå dem!"
+      twitter: 
+        body: "Du har blitt invitert til fagfellevurdering %{reviewee}. Følg lenken nedenfor for å gjennomgå dem!"
     pseudonym_registration: 
       email: 
         body: "Du har blitt registrert for en Canvas-konto på %{account}. Før du kan logge inn og begynne å bruke Canvas må du fullføre konfigurasjonsprosessen."
@@ -11883,6 +11904,7 @@ nb:
           extra_attempts: "Ekstra forsøk"
           extra_time_per_attempt: "Ekstra tid på hvert forsøk"
           manually_unlock: "Lås opp prøven manuelt for neste forsøk"
+          reset_has_seen_results: "La elevene se resultater en gang til"
           started: Startet
         minutes: minutter
         moderate_page_title: "%{title}: Moderer"
@@ -11942,6 +11964,7 @@ nb:
         new_assignment: "Ny oppgave"
         new_discussion: "Ny diskusjon"
         one_question_at_a_time: "Vis ett spørsmål om gangen"
+        one_time_results: "Kun én gang etter hvert forsøk"
         points_possible: "Poeng %{n}"
         quiz_title: Prøvetittel
         quiz_type: Prøvetype
@@ -12395,6 +12418,7 @@ nb:
     upload_warning: "Ikke endre navn på innleveringsfiler slik at vi kan gjenkjenne de."
   react_files: 
     loading_more_results: "Laster flere resultater"
+    usage_details: "%{quota_used} av %{quota}"
   recent_student: 
     last_logged_in: "sist innlogget %{last_login}"
   recently_deleted_courses_title: "Nylig slettede kurs"
@@ -12490,6 +12514,7 @@ nb:
       manage_students: "Legg til/fjern studenter på kurset"
       manage_user_logins: "Modifiser innloggingsdetaljer for brukeren"
       manage_user_notes: "Administrer aktivitet i faglærerprotokollen"
+      manage_user_observers: "Behandle observatører for brukerne"
       manage_wiki: "Administrer wiki (legg til/rediger/slett sider)"
       managed_jobs: "Administrer bakgrunnsjobber"
       moderate_form: "Moderer diskusjoner ( slett/redigere andres innlegg, lås temaer)"
@@ -12940,9 +12965,13 @@ nb:
           email: "Epost (valgfritt)"
     event_list: 
       at_least_more_events: "minst %{count_of_events} til"
+      at_least_more_events_one_week: "minst %{count_of_events} mer i den siste uken"
+      at_least_more_events_two_weeks: "minst %{count_of_events} mer de siste to uker"
       links: 
         view_calendar: "Se kalender"
       more_events: "%{count_of_events} til"
+      more_events_one_week: "%{count_of_events} mer i den siste uken"
+      more_events_two_weeks: "%{count_of_events} mer de siste to uker"
       nothing_for_now: "Ingenting for øyeblikket"
       nothing_one_week: "Ingenting i kommende uke"
       nothing_two_weeks: "Ingenting i de neste to ukene"
@@ -13068,6 +13097,7 @@ nb:
         body: Beskjed
         subject: Tema
       message_students_who: "Send beskjed til studenter som…"
+      message_type: Meldingstype
       out_of_points: "av %{points_possible}"
     mute_dialog: 
       gradebook: 
@@ -13196,6 +13226,7 @@ nb:
         additional_comments: Tilleggskommentarer
       instructor_comments: "Instruktørens kommentarer"
       labels: 
+        long_description: "Lang Beskrivelse"
         save_criterion_for_reuse: "Lagre denne kommentaren for bruk flere ganger"
         threshold: grense
       links: 
@@ -13215,6 +13246,7 @@ nb:
         update_description: "Oppdater kommentar"
       labels: 
         additional_comments: Tilleggskommentarer
+        long_description: "Lang Beskrivelse"
     rubric_dialog: 
       buttons: 
         use_this_rubric: "Bruk denne vurderingsveiledningen"
@@ -13242,6 +13274,8 @@ nb:
       defaults: 
         description: "Beskrivelse av kriterium"
       full_marks: "Topp resultat"
+      labels: 
+        long_description: "Lang Beskrivelse"
       links: 
         view_longer_description: "se en lenger beskrivelse"
       no_marks: "Ingen resultater"
@@ -13530,6 +13564,7 @@ nb:
     assignment_unmuted: "Klikk for å dempe."
     discussion_topic: Diskusjonstema
     external_tool: "Eksternt verktøy"
+    final_point_ratio: "%{pointRatio} poeng"
     invalid_group_warning: 
       one: "Mrk: Resultatet inneholder ingen oppgaver fra gruppen %{list_of_group_names} fordi den ikke har noen oppnåelige poeng."
       other: "Mrk: Resultatet inneholder ingen oppgaver fra gruppene %{list_of_group_names} fordi de ikke har noen oppnåelige poeng."
@@ -13578,6 +13613,7 @@ nb:
   student_groups: 
     group_join: "Ble med i gruppen %{group_name}"
     group_leave: "Forlot gruppe %{group_name}"
+    group_name: "%{group_name} i %{group_category}"
     search_groups_placeholder: "Søk i grupper eller personer"
     student_groups_filter_description: "Etter hvert som du skriver tekst i dette feltet, vil listen over grupper bli automatisk filtrert til kun å inneholde de som har et navn som passer med det du skriver inn. "
     students_count: 
@@ -14138,6 +14174,7 @@ nb:
       roles_student: "Påmeldt som student."
       roles_ta: "Påmeldt som LA."
       roles_teacher: "Påmeldt som faglærer."
+      unenrollr: avløse
       unpublished: "Ikke publisert"
     errors: 
       no_teacher_courses: "Denne faglæreren og denne studenten har ingen kurs til felles"
@@ -14540,6 +14577,8 @@ nb:
       page_updated: "Siden ble oppdatert."
     page_link: 
       link_hidden_from_students_warning: "Studentene vil ikke se denne lenken"
+    page_revisions: 
+      page_revisions_title: "%{title} revisjoner: %{context_name}"
     pages_index: 
       titles: 
         pages: Sider
@@ -14574,6 +14613,19 @@ nb:
     cannot_update_published: "Du kan ikke oppdatere publiseringsstatusen til denne wikisiden"
     cannot_update_title: "Du kan ikke oppdatere tittelen til denne wikisiden"
     invalid_editing_roles: "De gitte redigeringsrollene er ugyldige"
+  will_paginate: 
+    next_label: "Neste &#8594;"
+    page_entries_info: 
+      single_page: 
+        one: "Viser alle %{count} %{model}"
+        other: "Viser alle %{count} %{model}"
+        zero: "Ingen %{model} fant"
+      single_page_html: 
+        one: "Viser <b>all&nbsp;%{count}</b> %{model}"
+        other: "Viser <b>all&nbsp;%{count}</b> %{model}"
+        zero: "Ingen %{model} fant"
+    page_gap: "&hellip;"
+    previous_label: "8592; Forrige"
   wimba_conference: 
     external_urls: 
       archive: Arkiv
