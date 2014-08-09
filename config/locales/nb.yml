@@ -11105,6 +11105,7 @@ nb:
   qti_display: QTI
   qti_file_description: QTI-zip-fil
   qti_img_matching_question: "Importert matchende spørsmål inneholder bilder på begge sider, som støttes ikke"
+  qti_img_matching_question_distractors: "Importert matchende spørsmål inneholder bilder innenfor valg, og kan ikke rettes fordi den også inneholder distraktører"
   qti_name: QTI-konvertør
   qualified_locale: en-US
   question_answered: Besvart
@@ -11303,6 +11304,9 @@ nb:
       generated_at_date_time: "Generert %{dateAndTime}"
       generating_report_name: "Genererer %{report_name} …"
       item_analysis_not_available: "Elementanalyse er ikke tilgjengelig for undersøkelser."
+  quiz_results_protected: "Quiz resultater er beskyttet for denne quiz og ikke er synlig for studenter."
+  quiz_results_protected_after_first_glimpse: "Quiz resultater er beskyttet for denne quizen og kan vises engang umiddelbart etter innlevering."
+  quiz_results_protected_until_last_attempt: "Quiz resultater er beskyttet for denne quizen og ikke er synlig for studenter inntil de har leverte sin siste forsøk."
   quiz_route: 
     that_quiz_doesnt_exist: "Den prøven eksisterer ikke"
     that_quiz_has_been_deleted: "Den prøven er slettet"
@@ -11965,6 +11969,7 @@ nb:
         new_discussion: "Ny diskusjon"
         one_question_at_a_time: "Vis ett spørsmål om gangen"
         one_time_results: "Kun én gang etter hvert forsøk"
+        only_visible_to_overrides_note: "Merk: Denne quizen er **bare** synlig for seksjonen(s) spesifisert nedenfor:"
         points_possible: "Poeng %{n}"
         quiz_title: Prøvetittel
         quiz_type: Prøvetype
@@ -13117,6 +13122,7 @@ nb:
     new_course_form: 
       cancel: Avbryt
       course_cose_explanation: "Dette vises på steder med liten plass"
+      course_is_public_explanation: "Gjør kurset offentlig synlig *(studentdata vil fortsatt være privat)*"
       create_course: "Opprett kurs"
       creating_course: "Oppretter kurs..."
       labels: 
@@ -14616,12 +14622,14 @@ nb:
   will_paginate: 
     next_label: "Neste &#8594;"
     page_entries_info: 
+      multi_page: "Viser %{model} %{from} - %{to} of %{count} til sammen"
+      multi_page_html: "Viser %{model} <b>%{from}&nbsp;-&nbsp;%{to}</b> of <b>%{count}</b> til sammen"
       single_page: 
-        one: "Viser alle %{count} %{model}"
+        one: "Viser 1 %{model}"
         other: "Viser alle %{count} %{model}"
         zero: "Ingen %{model} fant"
       single_page_html: 
-        one: "Viser <b>all&nbsp;%{count}</b> %{model}"
+        one: "Viser <b>1</b> %{model}"
         other: "Viser <b>all&nbsp;%{count}</b> %{model}"
         zero: "Ingen %{model} fant"
     page_gap: "&hellip;"
