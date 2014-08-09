@@ -1757,7 +1757,7 @@ class CoursesController < ApplicationController
       if params[:course][:event] && @course.grants_right?(@current_user, session, :change_course_state)
         event = params[:course].delete(:event)
         event = event.to_sym
-        if event == :claim && @course.submissions.with_point_data.exists?
+        if event == :claim && !@course.unpublishable?
           flash[:error] = t('errors.unpublish', 'Course cannot be unpublished if student submissions exist.')
           redirect_to(course_url(@course)) and return
         else

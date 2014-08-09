@@ -372,6 +372,11 @@ class Course < ActiveRecord::Base
     license_data[:readable_license]
   end
 
+  def unpublishable?
+    ids = self.all_real_students.pluck :id
+    !self.submissions.with_point_data.where(:user_id => ids).exists?
+  end
+
   def self.update_account_associations(courses_or_course_ids, opts = {})
     return [] if courses_or_course_ids.empty?
     opts.reverse_merge! :account_chain_cache => {}

@@ -47,14 +47,14 @@
           <i class="icon-unpublished"></i>
         </span>
       <% else %>
-        <% if @context.submissions.with_point_data.exists? %>
-          <% unpublish_tooltip = t('tooltips.cannot_unpublish_course', %{You cannot unpublish this course if there are graded student submissions}) %>
-          <span data-tooltip title="<%= unpublish_tooltip %>" id='course-status' class='published-status published pull-right'>
+        <% if @context.unpublishable? %>
+          <span data-tooltip title="" id='course-status' class='published-status published pull-right'>
             <%= t('labels.course_status_published', %{Course is Published}) %>
             <i class="icon-publish"></i>
           </span>
         <% else %>
-          <span data-tooltip title="" id='course-status' class='published-status published pull-right'>
+          <% unpublish_tooltip = t('tooltips.cannot_unpublish_course', %{You cannot unpublish this course if there are graded student submissions}) %>
+          <span data-tooltip title="<%= unpublish_tooltip %>" id='course-status' class='published-status published pull-right'>
             <%= t('labels.course_status_published', %{Course is Published}) %>
             <i class="icon-publish"></i>
           </span>

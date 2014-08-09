@@ -1040,6 +1040,16 @@ describe CoursesController do
       @course.workflow_state.should == 'claimed'
     end
 
+    it "should allow the course to be unpublished if it contains only graded student view submissions" do
+      assignment = @course.assignments.create!(:workflow_state => 'published')
+      sv_student = @course.student_view_student
+      sub = assignment.grade_student sv_student, { :grade => 1, :grader => @teacher }
+      user_session @teacher
+      put 'update', :id => @course.id, :course => { :event => 'claim' }
+      @course.reload
+      @course.workflow_state.should == 'claimed'
+    end
+
     it "should lock active course announcements" do
       user_session(@teacher)
       active_announcement  = @course.announcements.create!(:title => 'active', :message => 'test')
