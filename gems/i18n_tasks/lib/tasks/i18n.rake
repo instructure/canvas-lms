@@ -2,6 +2,17 @@ require 'i18n_tasks'
 require 'i18n_extraction'
 
 namespace :i18n do
+  EXCLUDED_JAVASCRIPT_SOURCES = /
+    \A\.\/public\/javascripts\/(
+      i18nObj.js|
+      i18n.js|
+      .*jst\/|
+      translations\/|
+      compiled\/handlebars_helpers.js|
+      tinymce\/jscripts\/tiny_mce(.*\/langs|\/tiny_mce\w*\.js)
+    )
+  /x
+
   def infer_scope(filename)
     case filename
       when /app\/views\/.*\.handlebars\z/
@@ -100,18 +111,26 @@ namespace :i18n do
 
 
     # JavaScript
-    files = (Dir.glob('./public/javascripts/{,**/*/**/}*.js') + Dir.glob('./app/views/**/*.erb')).
-      reject{ |file| file =~ /\A\.\/public\/javascripts\/(i18nObj.js|i18n.js|.*jst\/|translations\/|compiled\/handlebars_helpers.js|tinymce\/jscripts\/tiny_mce(.*\/langs|\/tiny_mce\w*\.js))/ }
+    files = (
+      Dir.glob('./public/javascripts/{,**/*/**/}*.js') +
+      Dir.glob('./app/views/**/*.erb')
+    )
+    files = files.reject { |file| file =~ EXCLUDED_JAVASCRIPT_SOURCES }
     files &= only if only
     js_extractor = I18nExtraction::JsExtractor.new(:translations => @translations)
-    process_files(files) do |file|
-      t2 = Time.now
-      ret = js_extractor.process(File.read(file), :erb => (file =~ /\.erb\z/), :filename => file)
-      file_count += 1 if ret
-      puts "#{file} #{Time.now - t2}" if Time.now - t2 > 1
-      ret
-    end
+    process_files(files) do |filename|
+      rc = true
+      started_at = Time.now
+      options = { erb: filename =~ /\.erb\z/, filename: filename }
 
+      I18nTasks::Utils.extract_js_scripts(File.read(filename)).each do |script|
+        rc = rc && js_extractor.process(script, options)
+      end
+
+      file_count += 1 if rc
+      puts "#{filename} #{Time.now - started_at}" if Time.now - started_at > 1
+      rc
+    end
 
     # Handlebars
     files = Dir.glob('./app/views/jst/{,**/*/**/}*.handlebars')
@@ -189,35 +208,58 @@ namespace :i18n do
       exit 0
     end
 
-    process_files = lambda do |extractor, files, arg_block|
-      files.each do |file|
-        begin
-          extractor.translations = {}
-          extractor.process(File.read(file), *arg_block.call(file)) or next
+    # Process a single script
+    process_file = lambda do |extractor, file, filename, arg_block|
+      extractor.translations = {}
 
-          translations = extractor.translations.flatten_keys.keys
-          next if translations.empty?
+      begin
+        unless extractor.process(file, *arg_block.call(filename))
+          return
+        end
+      rescue Exception => e
+        puts e
+        raise "Error reading #{file}: #{$!}\nYou should probably run `rake i18n:check' first"
+      end
 
-          file_translations[extractor.scope] ||= {}
-          locales.each do |locale|
-            file_translations[extractor.scope].update flat_translations.slice(*translations.map{ |k| k.gsub(/\A/, "#{locale}.") })
-          end
-        rescue
-          raise "Error reading #{file}: #{$!}\nYou should probably run `rake i18n:check' first"
+      translations = extractor.translations.flatten_keys.keys
+
+      unless translations.empty?
+        scope = extractor.scope
+
+        file_translations[scope] ||= {}
+        locales.each do |locale|
+          file_translations[scope].update flat_translations.slice(*translations.map{ |k| k.gsub(/\A/, "#{locale}.") })
+        end
+      end
+    end
+
+    process_files = lambda do |extractor, files, arg_block, has_precompiled|
+      # Process any number of scripts that may be contained in a single file
+      files.each do |filename|
+        scripts = if has_precompiled
+          I18nTasks::Utils.extract_js_scripts(File.read(filename))
+        else
+          [ File.read(filename) ]
+        end
+
+        scripts.each do |script|
+          process_file.call(extractor, script, filename, arg_block)
         end
       end
     end
 
     # JavaScript
-    files = Dir.glob('./public/javascripts/{,**/*/**/}*.js').
-      reject{ |file| file =~ /\A\.\/public\/javascripts\/(i18nObj.js|i18n.js|.*jst\/|translations\/|compiled\/handlebars_helpers.js|tinymce\/jscripts\/tiny_mce(.*\/langs|\/tiny_mce\w*\.js))/ }
+    files = Dir.glob('./public/javascripts/{,**/*/**/}*.js').reject do |file|
+      file =~ EXCLUDED_JAVASCRIPT_SOURCES
+    end
+
     js_extractor = I18nExtraction::JsExtractor.new
-    process_files.call(js_extractor, files, lambda{ |file| [{:filename => file}] } )
+    process_files.call(js_extractor, files, lambda{ |file| [{:filename => file}] }, true)
 
     # Handlebars
     files = Dir.glob('./app/views/jst/{,**/*/**/}*.handlebars')
     handlebars_extractor = I18nExtraction::HandlebarsExtractor.new
-    process_files.call(handlebars_extractor, files, lambda{ |file| [infer_scope(file)] } )
+    process_files.call(handlebars_extractor, files, lambda{ |file| [infer_scope(file)] }, false)
 
     dump_translations = lambda do |translation_name, translations|
       file = "public/javascripts/translations/#{translation_name}.js"
