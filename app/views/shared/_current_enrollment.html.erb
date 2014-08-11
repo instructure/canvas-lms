@@ -18,11 +18,11 @@
         <%= image_tag "hammer.png", :title => t('course_unpublished', "This course hasn't been published yet"), :alt => "Unpublished", :class => "unpublished_icon" %>
       <% end %>
     </span>
-    
+
     <% unless current_enrollment.course.enrollment_term.default_term? %>
       <span class="subtitle ellipsis"><%= current_enrollment.course.enrollment_term.name %></span>
     <% end %>
-    
+
     <%
        message = t('enrolled_as_student', "Enrolled as a student")
        case current_enrollment.type
@@ -35,7 +35,7 @@
        when 'DesignerEnrollment'
          message = t('enrolled_as_designer', "Enrolled as a designer")
        end
-    %> 
+    %>
     <span class="subtitle ellipsis"><%= message %></span>
   <% if show_link %></a><% end %>
 <% end %>

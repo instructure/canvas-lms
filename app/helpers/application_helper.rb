@@ -614,7 +614,7 @@ module ApplicationHelper
       :collection_size        => all_courses_count,
       :more_link_for_over_max => courses_path,
       :title                  => t('#menu.my_courses', "My Courses"),
-      :link_text              => t('#layouts.menu.view_all_enrollments', 'View all courses'),
+      :link_text              => t('#layouts.menu.view_all_or_customize', 'View All or Customize'),
       :edit                   => t("#menu.customize", "Customize")
     }
   end

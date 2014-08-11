@@ -38,9 +38,8 @@ describe "enrollment_date_restrictions" do
     get "/"
     page = Nokogiri::HTML(response.body)
     list = page.css(".menu-item-drop-column-list li")
-    list.length.should == 2 # view all courses should always show up
+    list.length.should == 1
     list[0].text.should match /Course 1/
-    list[1].text.should match /View all courses/
     page.css(".menu-item-drop-padded").should be_empty
 
     get "/courses"
@@ -66,7 +65,7 @@ describe "enrollment_date_restrictions" do
 
     get "/courses"
     page = Nokogiri::HTML(response.body)
-    page.css(".past_enrollments li").should be_empty
+    page.css(".past_enrollments tr").should be_empty
   end
 
   it "should not list groups from inactive enrollments in the menu" do
@@ -90,7 +89,7 @@ describe "enrollment_date_restrictions" do
     list = page.css(".menu-item-drop-column-list li").to_a
     # course lis are still there and view all groups should always show up when
     # there's at least one 'visible' group
-    list.size.should == 4
+    list.size.should == 3
     list.select{ |li| li.text =~ /Group 1/ }.should_not be_empty
     list.select{ |li| li.text =~ /View all groups/ }.should_not be_empty
     list.select{ |li| li.text =~ /Group 2/ }.should be_empty
